@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jgross@suse.com>) id 1cr3DC-0002TP-Oe
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 09:55:35 -0400
+	(envelope-from <kraxel@redhat.com>) id 1cr3EW-00032E-CF
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 09:56:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jgross@suse.com>) id 1cr3D9-0007vh-Mb
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 09:55:34 -0400
-Received: from mx2.suse.de ([195.135.220.15]:45124)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jgross@suse.com>) id 1cr3D9-0007vC-F9
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 09:55:31 -0400
-References: <alpine.DEB.2.10.1703201117560.23684@sstabellini-ThinkPad-X260>
-	<1490033952-26735-1-git-send-email-sstabellini@kernel.org>
-	<20170323140005.6b0853b3@bahia.lan>
-From: Juergen Gross <jgross@suse.com>
-Message-ID: <15207674-c5cd-3874-7ac9-5b23cdac8888@suse.com>
-Date: Thu, 23 Mar 2017 14:55:26 +0100
-MIME-Version: 1.0
-In-Reply-To: <20170323140005.6b0853b3@bahia.lan>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 1/8] xen: import ring.h from xen
+	(envelope-from <kraxel@redhat.com>) id 1cr3ES-0008Ij-N8
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 09:56:56 -0400
+Message-ID: <1490277406.13302.1.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 23 Mar 2017 14:56:46 +0100
+In-Reply-To: <87tw6ktban.fsf@dusky.pond.sub.org>
+References: <20170322204844.446-1-f4bug@amsat.org>
+	<20170322204844.446-2-f4bug@amsat.org>
+	<87y3vw1o94.fsf@dusky.pond.sub.org>
+	<1490255007.463.11.camel@redhat.com>
+	<CAJ+F1CJNy+e83EHR_8uzAHURxDk6idnNTTL_FoD-krWPue7Lww@mail.gmail.com>
+	<1490262680.463.27.camel@redhat.com>
+	<87tw6ktban.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH RESEND 1/3] usb-ccid: make
+ ccid_write_data_block() cope with null buffers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +29,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, Stefano Stabellini <sstabellini@kernel.org>
-Cc: qemu-devel@nongnu.org, Stefano Stabellini <stefano@aporeto.com>, anthony.perard@citrix.com, Paolo Bonzini <pbonzini@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-trivial@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
-On 23/03/17 14:00, Greg Kurz wrote:
-> On Mon, 20 Mar 2017 11:19:05 -0700
-> Stefano Stabellini <sstabellini@kernel.org> wrote:
-> 
->> Do not use the ring.h header installed on the system. Instead, import
->> the header into the QEMU codebase. This avoids problems when QEMU is
->> built against a Xen version too old to provide all the ring macros.
->>
->> Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
->> Reviewed-by: Greg Kurz <groug@kaod.org>
->> CC: anthony.perard@citrix.com
->> CC: jgross@suse.com
->> ---
->> NB: The new macros have not been committed to Xen yet. Do not apply this
->> patch until they do.
->> ---
-> 
-> Looking at your other series for the kernel part of this feature:
-> 
-> https://lkml.org/lkml/2017/3/22/761
-> 
-> I realize that the ring.h header from Xen also exists in the kernel tree... 
-> 
-> Shouldn't all the code that can be used in both kernel and userspace go to a
-> header file under include/uapi in the kernel tree ? And then we would import
-> it under include/standard-headers/linux in the QEMU tree and we could keep it
-> in sync using scripts/update-linux-headers.sh.
-> 
-> Cc'ing Paolo for insights.
+On Do, 2017-03-23 at 13:41 +0100, Markus Armbruster wrote:
+> Gerd Hoffmann <kraxel@redhat.com> writes:
+>=20
+> >   Hi,
+> >
+> >>  oops, there are hard-coded calls with NULL/0. I suppose to fix clang
+> >> warning, it would need to check if data !=3D null for memcpy.
+> >
+> > I'd check for len > 0, and in that if branch we can also assert on data
+> > =3D=3D NULL and thereby check that len and data are consistent.
+>=20
+> If len is non-zero but data is null, memcpy() will crash just fine by
+> itself, so why bother asserting.
 
-As Xen isn't part of the kernel we don't want that. You can use and/or
-build qemu with xen-9pfs backend support on an old Linux kernel without
-the related frontend.
+To make clang happy?  But maybe clang is clever enough to figure data
+can't be null at that point in case we call memcpy with len !=3D 0
+only ...
 
-OTOH I don't see the advantage of not using the headers from Xen. This
-is working for qdisk and pvusb backends and for all the Xen libraries.
-Do you expect the 9pfs backend to be used for a qemu version built
-against a Xen version not supporting that backend?
-
-
-Juergen
+cheers,
+  Gerd
