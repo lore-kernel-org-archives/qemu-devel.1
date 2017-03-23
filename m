@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cr0vr-0000Qu-Ga
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 07:29:32 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1cr0xc-0001AT-0Y
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 07:31:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cr0vm-0002P8-Jg
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 07:29:31 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:36289)
+	(envelope-from <alex.bennee@linaro.org>) id 1cr0xW-000518-EA
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 07:31:20 -0400
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:35066)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cr0vm-0002Np-De
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 07:29:26 -0400
-Received: by mail-wm0-x241.google.com with SMTP id x124so15954721wmf.3
-	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 04:29:26 -0700 (PDT)
-Date: Thu, 23 Mar 2017 11:29:22 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170323112922.GB12560@stefanha-x1.localdomain>
-References: <148900626714.27090.1616990932333159904.stgit@brijesh-build-machine>
-	<148900628810.27090.3461280348833651824.stgit@brijesh-build-machine>
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cr0xW-0004zv-82
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 07:31:14 -0400
+Received: by mail-wm0-x22d.google.com with SMTP id u132so58600398wmg.0
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 04:31:14 -0700 (PDT)
+References: <20170322172621.26186.61813.malonedeb@gac.canonical.com>
+	<CAFEAcA8UYsjy6sBTGqk1Crd-0tWpF0WWukA03_GyNRaG95L07Q@mail.gmail.com>
+	<87d1d8xn41.fsf@linaro.org>
+	<CAFEAcA-VQHv-wD+2NBwYAe75139+37qkaypCbKOoHHk5ZRr-QA@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA-VQHv-wD+2NBwYAe75139+37qkaypCbKOoHHk5ZRr-QA@mail.gmail.com>
+Date: Thu, 23 Mar 2017 11:31:11 +0000
+Message-ID: <87bmssxm9s.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="uZ3hkaAS1mZxFaxD"
-Content-Disposition: inline
-In-Reply-To: <148900628810.27090.3461280348833651824.stgit@brijesh-build-machine>
-Subject: Re: [Qemu-devel] [RFC PATCH v4 02/20] memattrs: add debug attribute
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Bug 1675108] [NEW] Cocoa UI always crashes on
+ startup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,68 +33,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.singh@amd.com>
-Cc: ehabkost@redhat.com, crosthwaite.peter@gmail.com, armbru@redhat.com, mst@redhat.com, p.fedin@samsung.com, qemu-devel@nongnu.org, lcapitulino@redhat.com, pbonzini@redhat.com, rth@twiddle.net, Thomas.Lendacky@amd.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Bug 1675108 <1675108@bugs.launchpad.net>, QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
 
---uZ3hkaAS1mZxFaxD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-On Wed, Mar 08, 2017 at 03:51:28PM -0500, Brijesh Singh wrote:
-> Add a new debug attribute, the attribute should be set when guest memory
-> accesses are performed for debug purposes.
-> The attribute will be used in SEV guest, where we need to distinguish nor=
-mal
-> vs debug access to guest memory. In debug mode, we need to use SEV comman=
-ds
-> to access the guest memory.
->=20
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  include/exec/memattrs.h |    4 ++++
->  1 file changed, 4 insertions(+)
->=20
-> diff --git a/include/exec/memattrs.h b/include/exec/memattrs.h
-> index e601061..b802073 100644
-> --- a/include/exec/memattrs.h
-> +++ b/include/exec/memattrs.h
-> @@ -37,6 +37,8 @@ typedef struct MemTxAttrs {
->      unsigned int user:1;
->      /* Requester ID (for MSI for example) */
->      unsigned int requester_id:16;
-> +    /* Memory access for debug purposes */
+> On 23 March 2017 at 11:13, Alex Bennée <alex.bennee@linaro.org> wrote:
+>> Technically its not a random thread its the vCPU context (which ensures
+>> the vCPU isn't updating while the display is being updated). But I guess
+>> the Cocoa is limited to not being able to update from an arbitrary
+>> thread?
+>
+> Yes. It's very common for windowing libraries to mandate that you
+> do all windowing operations from one specific thread.
 
-What does "debug purposes" mean?  gdbstub?  Can the guest initiate debug
-memory accesses or is the purely QEMU-internal?
+Fair enough. Well let me know if that works OK on MacOS and I'll fold it
+in to the other console patches. In fact I might as well do the
+start/end_exclusive dance for all OSes and it will achieve the same thing.
 
-> +    unsigned int debug:1;
->  } MemTxAttrs;
-> =20
->  /* Bus masters which don't specify any attributes will get this,
-> @@ -46,4 +48,6 @@ typedef struct MemTxAttrs {
->   */
->  #define MEMTXATTRS_UNSPECIFIED ((MemTxAttrs) { .unspecified =3D 1 })
-> =20
-> +/* Access the guest memory for debug purposes */
-> +#define MEMTXATTRS_DEBUG ((MemTxAttrs) { .debug =3D 1 })
->  #endif
->=20
->=20
-
---uZ3hkaAS1mZxFaxD
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJY07GSAAoJEJykq7OBq3PIh1IH/jjXVEz0QDnBNUb/DzXyfi8c
-+gOk2UZpkQLUxNH1o/kOvJt3pX8AZe2pQiuYdaxbARCPeCozv10iO2cDnIFp5UJ7
-a4kR1KF5qwh0CqZV4cG55ZJzytcEv9L6X3HPxQuOozSLOqG/ocW4UzbW6P2vzdNP
-Bs1VFlue/XDOMZZch0+FEUK6wxIuy9bYC2MSKA51bwcCFdn+nYt4HR6LSX++lrKZ
-yvuEDsnBrfKjU0abo9houW0OeaAoBX4pKobI676OlMORNAsr+BvHzaa+sxEKfPL4
-Klk6zrSSk86j3d+zADMKOc/G/SdJn9aP/fBFmtfbKkyCRL8vSZqYb+B5RNnAkBA=
-=19K8
------END PGP SIGNATURE-----
-
---uZ3hkaAS1mZxFaxD--
+--
+Alex Bennée
