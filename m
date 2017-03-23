@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cqyVP-0001VX-14
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 04:54:06 -0400
+	(envelope-from <stefanha@gmail.com>) id 1cqyZs-0003Lv-2U
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 04:58:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cqyVO-0004YL-Ag
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 04:54:03 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35349)
+	(envelope-from <stefanha@gmail.com>) id 1cqyZn-00064n-Q6
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 04:58:38 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34705)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cqyVO-0004YE-3q
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 04:54:02 -0400
-Received: by mail-wm0-x241.google.com with SMTP id z133so15161407wmb.2
-	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 01:54:01 -0700 (PDT)
-Date: Thu, 23 Mar 2017 08:53:58 +0000
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cqyZn-00064G-JW
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 04:58:35 -0400
+Received: by mail-wm0-x243.google.com with SMTP id u132so15075081wmg.1
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 01:58:33 -0700 (PDT)
+Date: Thu, 23 Mar 2017 08:56:00 +0000
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170323085358.GK16717@stefanha-x1.localdomain>
+Message-ID: <20170323085559.GL16717@stefanha-x1.localdomain>
 References: <1490092792-30957-1-git-send-email-thuth@redhat.com>
-	<1490092792-30957-3-git-send-email-thuth@redhat.com>
+	<1490092792-30957-4-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ee6FjwWxuMujAVRe"
+	protocol="application/pgp-signature"; boundary="L/Qt9NZ8t00Dhfad"
 Content-Disposition: inline
-In-Reply-To: <1490092792-30957-3-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/3] libqtest: Add a generic function to
- run a callback function for every machine
+In-Reply-To: <1490092792-30957-4-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] tests: Add a tester for HMP commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,39 +34,39 @@ To: Thomas Huth <thuth@redhat.com>
 Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
 
---ee6FjwWxuMujAVRe
+--L/Qt9NZ8t00Dhfad
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 21, 2017 at 11:39:51AM +0100, Thomas Huth wrote:
-> Some tests need to run single tests for every available machine of the
-> current QEMU binary. To avoid code duplication, let's extract this
-> code that deals with 'query-machines' into a separate function.
+On Tue, Mar 21, 2017 at 11:39:52AM +0100, Thomas Huth wrote:
+> HMP commands do not get any automatic testing yet, so on certain
+> QEMU machines, some HMP commands were causing crashes in the past.
+> Thus we should test HMP commands in our test suite, too, to avoid
+> that such problems creep in again in the future.
 >=20
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  tests/libqtest.c    | 30 +++++++++++++++++
->  tests/libqtest.h    |  8 +++++
->  tests/pc-cpu-test.c | 95 ++++++++++++++++++++---------------------------=
-------
->  tests/qom-test.c    | 36 ++++----------------
->  4 files changed, 80 insertions(+), 89 deletions(-)
+>  tests/Makefile.include |   2 +
+>  tests/test-hmp.c       | 160 +++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  2 files changed, 162 insertions(+)
+>  create mode 100644 tests/test-hmp.c
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---ee6FjwWxuMujAVRe
+--L/Qt9NZ8t00Dhfad
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJY040mAAoJEJykq7OBq3PIkuwH/1s4VNf79SLq+jZ9UILCcztv
-GOFR4PoJnLQ6bAXzQEVme4lQnqtSKhJnqPpMEPpiD6VHINeWMZnCwaXiwCoXbKcF
-5x95XRIb9Cjp7vHzJgt7AgJ3y1hVnweObhLHlwoysCZa+QN2OYt2mw0Fm5/HNQVA
-IR9C3NzlZ/pE5B6D/eVnr4WQuD1ZqvyYzggiWNtC0AhAEQdT1ZYKkU9atT89+NTn
-i+82wkwWLe7a3s9uW2Yh0LdEBERzUephsSsK1+wEYEGtVBoqcW1skTIlI82nLYb3
-Fus8YYNH2Yizi6KqlWCOfB2GjgE7YuyTf7jgbqor7xcZaD1V0c1wa49ijOaUHmo=
-=Ze8P
+iQEcBAEBAgAGBQJY042fAAoJEJykq7OBq3PIW14IAMEPRXezStSeJ04QHAls7Cku
+U3FE0y6slwtrTgHsRtBFh0q4X/I2jvnpoiOp2WOiBZLP3IrtcotfHEasn6IHbl7/
+C3JOOXhvTLMQYpcVgu+GC6AG6RvCUPRrIsgfnofgJYY/t6bT3kYJRKwXRBIhwF9W
+jBnm3n1mXBfHdyYBwTRBAw0XwPy3WACZueCEiMO3YB6HfIxWsqr4dHQLKQNUdXcz
+dL7jT045oLiiakDQ85jxV2TLGiN4KnEr4SbjVPOIRieRbfRzsL1vTatMWuVOuOSY
+LqtzQin5/eotrQgW5Va0a/G2TDk6h319zZgklb0iO1JmPCAOFuN+9X24kYs9TvA=
+=R8Cv
 -----END PGP SIGNATURE-----
 
---ee6FjwWxuMujAVRe--
+--L/Qt9NZ8t00Dhfad--
