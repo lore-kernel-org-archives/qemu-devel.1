@@ -1,17 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cqzhw-0004ic-Id
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:11:05 -0400
+	(envelope-from <jiahuanzhang90@gmail.com>) id 1cqzjZ-0006Af-5s
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:12:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cqzhq-000698-9h
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:11:04 -0400
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 23 Mar 2017 21:10:48 +1100
-Message-Id: <20170323101048.24848-2-david@gibson.dropbear.id.au>
-In-Reply-To: <20170323101048.24848-1-david@gibson.dropbear.id.au>
-References: <20170323101048.24848-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 1/1] numa,
- spapr: align default numa node memory size to 256MB
+	(envelope-from <jiahuanzhang90@gmail.com>) id 1cqzjY-00070y-8z
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:12:45 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:34019)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jiahuanzhang90@gmail.com>)
+	id 1cqzjY-000705-3u
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:12:44 -0400
+Received: by mail-qk0-x244.google.com with SMTP id v127so29496856qkb.1
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 03:12:43 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <2d7a5a9a-8a7b-1bae-feb8-80fc4ee3048a@redhat.com>
+References: <CAJy91CY1SOwi7D-kyU0ooe5SyhM414WaBCedXuPfXXhJpbo1fg@mail.gmail.com>
+	<CAFEAcA_etsFstPtUzs0AZjWD35MhMLhwru0ibJzS_upgE-nsng@mail.gmail.com>
+	<CAJy91CZmqEUXLKjRJ0JdUEf83E3FwE_24qmej-4C8uAGQkTPWA@mail.gmail.com>
+	<CAFEAcA-mzO7vniDEaZeueVFQ7+MVBB7pnzHhahv2Yk_f3q0mJw@mail.gmail.com>
+	<CAJy91CZ4Ed-HGHLkzEc1dqQbo32d-eTE1S1ovO_ZwkDdTpkQXQ@mail.gmail.com>
+	<CAJy91CaCV40FgSP55qWZeZgkQ=2+E8Cr7xdbu9pn5HLEo+6JJQ@mail.gmail.com>
+	<CAJy91CYEwOVT7oEdYY=21__c2kcLTyxyjAaq7Zx4VnQdeLdQQQ@mail.gmail.com>
+	<CAFEAcA_t9iLude4Vu3Zc=_wcXMTtFb4Q4oJ8O+zLAJ9isAPqHQ@mail.gmail.com>
+	<1322109813.6444955.1490172025040.JavaMail.zimbra@redhat.com>
+	<CAJy91CaUxFHJeGLLW4DqK6sBwx2qDnE9s20ZbdT86JDn8yQoHg@mail.gmail.com>
+	<218df442-1a31-e969-32ef-01184fae84c0@redhat.com>
+	<CAJy91CbBV97RRKr=Rze5-eYrYAvnwiDZQ0oQZi33aKR1v-UXKg@mail.gmail.com>
+	<2d7a5a9a-8a7b-1bae-feb8-80fc4ee3048a@redhat.com>
+From: Jiahuan Zhang <jiahuanzhang90@gmail.com>
+Date: Thu, 23 Mar 2017 11:12:42 +0100
+Message-ID: <CAJy91CbcV3_jVg9PTD6unka6_M65rgkKDv0KsBK=YpVd=XKqvg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] Guest application reading from pl011 without
+ device driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,112 +41,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lvivier@redhat.com, thuth@redhat.com, ehabkost@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, David Gibson <david@gibson.dropbear.id.au>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
 
-From: Laurent Vivier <lvivier@redhat.com>
+On 22 March 2017 at 12:27, Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-Since commit 224245b ("spapr: Add LMB DR connectors"), NUMA node
-memory size must be aligned to 256MB (SPAPR_MEMORY_BLOCK_SIZE).
+>
+>
+> On 22/03/2017 11:28, Jiahuan Zhang wrote:
+> >
+> >     A function that lets a process sleep until data is available on the
+> >     socket.  The solution is to rewrite Windows chardev handling in QEMU
+> to
+> >     use threads or overlapped I/O.
+> >
+> > Yes, socket is working well. Will you add the "select" to pipe
+> > implementation?
+>
+> It's Windows that doesn't support it (the Windows function name is
+> WaitForSingleObject).
 
-But when "-numa" option is provided without "mem" parameter,
-the memory is equally divided between nodes, but 8MB aligned.
-This can be not valid for pseries.
 
-In that case we can have:
-$ ./ppc64-softmmu/qemu-system-ppc64 -m 4G -numa node -numa node -numa node
-qemu-system-ppc64: Node 0 memory size 0x55000000 is not aligned to 256 MiB
+Hi, I have checked the Windows chardev implimentation in QEMU.
+I learned from char-win-stdio.c to using thread and WaitForSingleObject for
+interlocking.
+char-win-stdio.c uses qemu_add_wait_object().
+Char-pipe.c uses qemu_add_polling_cb().
+I found all over qemu, only char-pipe uses qemu_add_polling_cb().
+Does this mean that somebody has already looked into this issue,
+and failed in using qemu_add_wait_object(),
+and then he/she created qemu_add_polling_cb()?
 
-With this patch, we have:
-(qemu) info numa
-3 nodes
-node 0 cpus: 0
-node 0 size: 1280 MB
-node 1 cpus:
-node 1 size: 1280 MB
-node 2 cpus:
-node 2 size: 1536 MB
+If so, what I am going to do is just something has been proved to be
+useless.
+Please tell me if my guess is true.
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/core/machine.c   | 5 +++++
- hw/ppc/spapr.c      | 6 ++++++
- include/hw/boards.h | 1 +
- numa.c              | 6 +++---
- 4 files changed, 15 insertions(+), 3 deletions(-)
+Best,
+Huan
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 0d92672..ada9eea 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -396,6 +396,11 @@ static void machine_class_init(ObjectClass *oc, void *data)
-     mc->default_ram_size = 128 * M_BYTE;
-     mc->rom_file_has_mr = true;
- 
-+    /* numa node memory size aligned on 8MB by default.
-+     * On Linux, each node's border has to be 8MB aligned
-+     */
-+    mc->numa_mem_align_shift = 23;
-+
-     object_class_property_add_str(oc, "accel",
-         machine_get_accel, machine_set_accel, &error_abort);
-     object_class_property_set_description(oc, "accel",
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 6ee566d..8aecea3 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3096,6 +3096,11 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-     xic->ics_resend = spapr_ics_resend;
-     xic->icp_get = spapr_icp_get;
-     ispc->print_info = spapr_pic_print_info;
-+    /* Force NUMA node memory size to be a multiple of
-+     * SPAPR_MEMORY_BLOCK_SIZE (256M) since that's the granularity
-+     * in which LMBs are represented and hot-added
-+     */
-+    mc->numa_mem_align_shift = 28;
- }
- 
- static const TypeInfo spapr_machine_info = {
-@@ -3180,6 +3185,7 @@ static void spapr_machine_2_8_class_options(MachineClass *mc)
- {
-     spapr_machine_2_9_class_options(mc);
-     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_8);
-+    mc->numa_mem_align_shift = 23;
- }
- 
- DEFINE_SPAPR_MACHINE(2_8, "2.8", false);
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 269d0ba..31d9c72 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -135,6 +135,7 @@ struct MachineClass {
-     bool rom_file_has_mr;
-     int minimum_page_bits;
-     bool has_hotpluggable_cpus;
-+    int numa_mem_align_shift;
- 
-     HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
-                                            DeviceState *dev);
-diff --git a/numa.c b/numa.c
-index e01cb54..6fc2393 100644
---- a/numa.c
-+++ b/numa.c
-@@ -338,12 +338,12 @@ void parse_numa_opts(MachineClass *mc)
-         if (i == nb_numa_nodes) {
-             uint64_t usedmem = 0;
- 
--            /* On Linux, each node's border has to be 8MB aligned,
--             * the final node gets the rest.
-+            /* Align each node according to the alignment
-+             * requirements of the machine class
-              */
-             for (i = 0; i < nb_numa_nodes - 1; i++) {
-                 numa_info[i].node_mem = (ram_size / nb_numa_nodes) &
--                                        ~((1 << 23UL) - 1);
-+                                        ~((1 << mc->numa_mem_align_shift) - 1);
-                 usedmem += numa_info[i].node_mem;
-             }
-             numa_info[i].node_mem = ram_size - usedmem;
--- 
-2.9.3
+>
+> Paolo
+>
+> > Or shall I look into it and fix? Since in my case, I prefer windows pipe
+> > to socket.
+> > But if I do, definitly, I will spend much more effort than you, the
+> experts.
+>
