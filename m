@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cr24q-00063r-77
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 08:42:53 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cr2DA-0000Pm-3t
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 08:51:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cr24p-00051Q-Gk
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 08:42:52 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48905)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cr2D8-0008MM-Nn
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 08:51:28 -0400
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:35303)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cr24p-0004wS-96
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 08:42:51 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 23 Mar 2017 12:42:41 +0000
-Message-Id: <1490272961-1128-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH for-2.9] disas/microblaze: Remove unused REG_PC
- define
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cr2D8-0008M5-Bj
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 08:51:26 -0400
+Received: by mail-lf0-x244.google.com with SMTP id v2so16744076lfi.2
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 05:51:26 -0700 (PDT)
+MIME-Version: 1.0
+References: <20170322171656.7901-1-vfeenstr@redhat.com>
+	<20170322171656.7901-2-vfeenstr@redhat.com>
+	<db0744da-66e9-9f65-1772-2bbb6b85126e@daynix.com>
+In-Reply-To: <db0744da-66e9-9f65-1772-2bbb6b85126e@daynix.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 23 Mar 2017 12:51:13 +0000
+Message-ID: <CAJ+F1C+953eKcpLFO7_6mnXb0tE4zP_jAhhMbDX5tBEDUtNZVw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] qga: Add `guest-get-timezone` command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,41 +31,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: sameeh jubran <sameeh@daynix.com>, Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com
 
-The REG_PC define in disas/microblaze.c clashes with a define in
-the Linux SPARC system headers:
+Hi
 
-/home/pm215/qemu/disas/microblaze.c:162:0: error: "REG_PC" redefined [-Werror]
- #define REG_PC  32 /* PC */
+On Thu, Mar 23, 2017 at 4:41 PM sameeh jubran <sameeh@daynix.com> wrote:
 
-In file included from /usr/include/signal.h:326:0,
-                 from /home/pm215/qemu/include/qemu/osdep.h:86,
-                 from /home/pm215/qemu/disas/microblaze.c:36:
-/usr/include/sparc64-linux-gnu/sys/ucontext.h:96:0: note: this is the location of the previous definition
- #define REG_PC  (1)
+> I have tested the patch on Windows 2012 R2 and it seems to be working goo=
+d.
+>
+> Please see some comments inline.
+>
+>
+> On 3/22/2017 7:16 PM, Vinzenz 'evilissimo' Feenstra wrote:
+> > From: Vinzenz Feenstra <vfeenstr@redhat.com>
+> >
+> > Adds a new command `guest-get-timezone` reporting the currently
+> > configured timezone on the system. The information on what timezone is
+> > currently is configured is useful in case of Windows VMs where the
+> > offset of the hardware clock is required to have the same offset. This
+> > can be used for management systems like `oVirt` to detect the timezone
+> > difference and warn administrators of the misconfiguration.
+> >
+> > Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+> > ---
+> >   qga/commands.c       | 19 +++++++++++++++++++
+> >   qga/qapi-schema.json | 26 ++++++++++++++++++++++++++
+> >   2 files changed, 45 insertions(+)
+> >
+> > diff --git a/qga/commands.c b/qga/commands.c
+> > index 4d92946..83d7f99 100644
+> > --- a/qga/commands.c
+> > +++ b/qga/commands.c
+> > @@ -499,3 +499,22 @@ int ga_parse_whence(GuestFileWhence *whence, Error
+> **errp)
+> >       error_setg(errp, "invalid whence code %"PRId64, whence->u.value);
+> >       return -1;
+> >   }
+> > +
+> > +GuestTimezone *qmp_guest_get_timezone(Error **errp)
+> > +{
+> > +    GuestTimezone *info =3D g_new0(GuestTimezone, 1);
+> Check for null
+> > +    GTimeZone *tz =3D g_time_zone_new_local();
+> Check for null
+> > +    gint32 interval =3D g_time_zone_find_interval(tz,
+> G_TIME_TYPE_STANDARD, 0);
+> Check if interval is -1
+> > +    gchar const *name =3D g_time_zone_get_abbreviation(tz, interval);
+> > +    if (name !=3D NULL) {
+> > +        info->offset =3D g_time_zone_get_offset(tz, interval) / 60;
+> g_time_zone_get_offset returns the offset in seconds, dividing by 60
+> will give us the offset in minutes.
+> Is there a reason to display it in minutes instead of hours?
+> Either way I think you should display the units in the output.
+>
+> And 60 is a magic number, Even though it is very clear, I think it is
+> better to add a define for that or check if glib already has one.
+>
 
-Since the code doesn't actually use the REG_PC define
-anywhere, the simplest fix is just to remove it.
+Instead, why not follow glib API and return seconds?
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- disas/microblaze.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/disas/microblaze.c b/disas/microblaze.c
-index 407c0a3..7795a0b 100644
---- a/disas/microblaze.c
-+++ b/disas/microblaze.c
-@@ -159,7 +159,7 @@ enum microblaze_instr_type {
- #define MIN_PVR_REGNUM 0
- #define MAX_PVR_REGNUM 15
- 
--#define REG_PC  32 /* PC */
-+/* 32 is REG_PC */
- #define REG_MSR 33 /* machine status reg */
- #define REG_EAR 35 /* Exception reg */
- #define REG_ESR 37 /* Exception reg */
--- 
-2.7.4
+> > +        info->zone =3D g_strdup(name);
+> > +    } else {
+> > +        error_setg(errp, "Timezone lookup failed");
+> > +        g_free(info);
+> > +        info =3D NULL;
+> > +    }
+> > +    g_time_zone_unref(tz);
+> > +    return info;
+> > +}
+> > +
+> > diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+> > index a02dbf2..62d6909 100644
+> > --- a/qga/qapi-schema.json
+> > +++ b/qga/qapi-schema.json
+> > @@ -1042,3 +1042,29 @@
+> >     'data':    { 'path': 'str', '*arg': ['str'], '*env': ['str'],
+> >                  '*input-data': 'str', '*capture-output': 'bool' },
+> >     'returns': 'GuestExec' }
+> > +
+> > +
+> > +##
+> > +# @GuestTimezone:
+> > +#
+> > +# @zone:    Timezone name
+> > +# @offset:  Offset to UTC in minutes. For western timezones the offset
+> has a
+> > +#           negative value and for eastern the offset is positive valu=
+e
+> > +#
+> > +# Since: 2.10
+> > +##
+> > +{ 'struct': 'GuestTimezone',
+> > +  'data':   { 'zone': 'str', 'offset': 'int' } }
+> > +
+> > +
+> > +##
+> > +# @guest-get-timezone:
+> > +#
+> > +# Retrieves the timezone information from the guest.
+> > +#
+> > +# Returns: A GuestTimezone dictionary.
+> > +#
+> > +# Since: 2.10
+> > +##
+> > +{ 'command': 'guest-get-timezone',
+> > +  'returns': 'GuestTimezone' }
+>
+> --
+Marc-Andr=C3=A9 Lureau
