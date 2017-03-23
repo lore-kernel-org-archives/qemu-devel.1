@@ -1,39 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1crPvA-0004BP-O6
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:10:32 -0400
+	(envelope-from <vfeenstr@redhat.com>) id 1crPyY-0006Um-QH
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:13:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1crPv9-0007Oq-Qh
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:10:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36682)
+	(envelope-from <vfeenstr@redhat.com>) id 1crPyU-0000NC-PA
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:13:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33468)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1crPv9-0007Od-LO
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:10:27 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B8703C04B945
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 14:10:27 +0000 (UTC)
-Date: Fri, 24 Mar 2017 10:10:25 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170324141025.GE15423@localhost.localdomain>
-References: <1490266548-22500-1-git-send-email-armbru@redhat.com>
-	<1490266548-22500-5-git-send-email-armbru@redhat.com>
-	<fe5583dc-bbe7-3387-dea9-3f4b89d682a8@redhat.com>
-	<a438ce0a-3035-1b2e-0d16-296ee930ed35@redhat.com>
-	<e6621b99-a980-dc61-b267-590eb08923c0@redhat.com>
-	<59a3aed6-e1cf-a601-4369-1a7cd74500cc@redhat.com>
-	<20170324035537.GA22342@localhost.localdomain>
-	<87fui3yx0y.fsf@dusky.pond.sub.org>
-	<20170324124213.GC22342@localhost.localdomain>
-	<89101331-9bba-fb6c-42a1-dfce7775fe4c@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <89101331-9bba-fb6c-42a1-dfce7775fe4c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9 4/5] rbd: Peel off redundant
- RbdAuthMethod wrapper struct
+	(Exim 4.71) (envelope-from <vfeenstr@redhat.com>) id 1crPyU-0000MT-Jc
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:13:54 -0400
+From: Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>
+Date: Thu, 23 Mar 2017 12:39:12 +0100
+Message-Id: <20170323113913.26974-1-vfeenstr@redhat.com>
+Subject: [Qemu-devel] [PATCH v5] qga: Add `guest-get-timezone` command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,30 +21,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, kwolf@redhat.com, jdurgin@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, dillaman@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: eblake@redhat.com, mdroth@linux.vnet.ibm.com, sameeh@daynix.com, marcandre.lureau@gmail.com, Vinzenz Feenstra <vfeenstr@redhat.com>
 
-On Fri, Mar 24, 2017 at 08:49:20AM -0500, Eric Blake wrote:
-> On 03/24/2017 07:42 AM, Jeff Cody wrote:
-> 
-> > Agree.  My preference is to leave it as an array of methods, so long as that
-> > is tenable to libvirt.
-> 
-> The -drive syntax should remain unchanged (that's an absolute must for
-> libvirt).  But the QMP syntax being an array of methods sounds best to
-> me, and I think password-secret should be part of the array.  So my vote
-> would be for:
-> 
-> { "driver": "rbd", "image": "foo",
->   "auth": [ { "type": "cephx", "password-secret": "sec0" },
->             { "type": "none" } ],
->   "pool": "bar" }
-> 
-> It makes mapping -drive arguments into QMP form a bit trickier, but the
-> QMP form is then easily extensible if we add another auth method down
-> the road.
-> 
+From: Vinzenz Feenstra <vfeenstr@redhat.com>
 
-In that case, what about adding user as well, and not just password-secret?
+Changes since v4:
+- Corrected usage of the optional zone (Missing has_zone = true)
+- Updated documentation string for offset in the schema
+- Removed unnecessary checks
+- Uses the current time to check for the interval, not 0
+- Switched to UNIVERSAL time type, since that can't fail and is all that's
+  needed
 
-Jeff
+Vinzenz Feenstra (1):
+  qga: Add `guest-get-timezone` command
+
+ qga/commands.c       | 29 +++++++++++++++++++++++++++++
+ qga/qapi-schema.json | 26 ++++++++++++++++++++++++++
+ 2 files changed, 55 insertions(+)
+
+-- 
+2.9.3
