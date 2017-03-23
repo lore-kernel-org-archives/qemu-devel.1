@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59396)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cqzOz-0007WT-E7
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:51:30 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cqzWy-00011D-Rp
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:59:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cqzOu-0007wd-I0
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:51:29 -0400
-Message-ID: <1490262680.463.27.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 23 Mar 2017 10:51:20 +0100
-In-Reply-To: <CAJ+F1CJNy+e83EHR_8uzAHURxDk6idnNTTL_FoD-krWPue7Lww@mail.gmail.com>
-References: <20170322204844.446-1-f4bug@amsat.org>
-	<20170322204844.446-2-f4bug@amsat.org>
-	<87y3vw1o94.fsf@dusky.pond.sub.org>
-	<1490255007.463.11.camel@redhat.com>
-	<CAJ+F1CJNy+e83EHR_8uzAHURxDk6idnNTTL_FoD-krWPue7Lww@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH RESEND 1/3] usb-ccid: make
- ccid_write_data_block() cope with null buffers
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cqzWt-0001m3-R2
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:59:44 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52360
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cqzWt-0001ld-Jr
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:59:39 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2N9xOm5053613
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 05:59:37 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 29bxj0uj4j-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 05:59:37 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Thu, 23 Mar 2017 09:59:35 -0000
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+Date: Thu, 23 Mar 2017 10:59:28 +0100
+Message-Id: <20170323095929.20140-1-cornelia.huck@de.ibm.com>
+Subject: [Qemu-devel] [PULL for-2.9 0/1] another s390x bugfix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,16 +36,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-trivial@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: peter.maydell@linaro.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-  Hi,
+The following changes since commit 55a19ad8b2d0797e3a8fe90ab99a9bb713824059:
 
->  oops, there are hard-coded calls with NULL/0. I suppose to fix clang
-> warning, it would need to check if data !=3D null for memcpy.
+  Update version for v2.9.0-rc1 release (2017-03-21 17:13:29 +0000)
 
-I'd check for len > 0, and in that if branch we can also assert on data
-=3D=3D NULL and thereby check that len and data are consistent.
+are available in the git repository at:
 
-cheers,
-  Gerd
+  git://github.com/cohuck/qemu tags/s390x-20170323
+
+for you to fetch changes up to a352aa62a75fcb1db35a0c71a10af3b2c1f8b89f:
+
+  target/s390x: Fix broken user mode (2017-03-23 10:49:13 +0100)
+
+----------------------------------------------------------------
+Fix linux-user vs. cpu models.
+
+----------------------------------------------------------------
+
+Stefan Weil (1):
+  target/s390x: Fix broken user mode
+
+ target/s390x/cpu_models.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+-- 
+2.11.0
