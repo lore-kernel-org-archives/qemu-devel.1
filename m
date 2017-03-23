@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cqzWz-00011J-Pu
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:59:46 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cqzcD-0002e0-Jw
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:05:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cqzWv-0001o8-Go
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:59:45 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34722)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cqzWv-0001ms-57
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:59:41 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2N9xLNd067201
-	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 05:59:39 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29bv4jkkvg-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 05:59:38 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Thu, 23 Mar 2017 09:59:36 -0000
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-Date: Thu, 23 Mar 2017 10:59:29 +0100
-In-Reply-To: <20170323095929.20140-1-cornelia.huck@de.ibm.com>
-References: <20170323095929.20140-1-cornelia.huck@de.ibm.com>
-Message-Id: <20170323095929.20140-2-cornelia.huck@de.ibm.com>
-Subject: [Qemu-devel] [PULL for-2.9 1/1] target/s390x: Fix broken user mode
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cqzcA-00045m-Gx
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:05:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:22000)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1cqzcA-00044b-9L
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:05:06 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Thu, 23 Mar 2017 14:04:55 +0400
+Message-Id: <20170323100455.26821-1-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] spapr: fix buffer-overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,42 +25,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, qemu-devel@nongnu.org, Stefan Weil <sw@weilnetz.de>, qemu-stable@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: david@gibson.dropbear.id.au, agraf@suse.de, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: Stefan Weil <sw@weilnetz.de>
+Running postcopy-test with ASAN produces the following error:
 
-Returning NULL from get_max_cpu_model results in a SIGSEGV runtime error.
+QTEST_QEMU_BINARY=3Dppc64-softmmu/qemu-system-ppc64  tests/postcopy-test
+...
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+=3D=3D23641=3D=3DERROR: AddressSanitizer: heap-buffer-overflow on address=
+ 0x7f1556600000 at pc 0x55b8e9d28208 bp 0x7f1555f4d3c0 sp 0x7f1555f4d3b0
+READ of size 8 at 0x7f1556600000 thread T6
+    #0 0x55b8e9d28207 in htab_save_first_pass /home/elmarco/src/qq/hw/ppc=
+/spapr.c:1528
+    #1 0x55b8e9d2939c in htab_save_iterate /home/elmarco/src/qq/hw/ppc/sp=
+apr.c:1665
+    #2 0x55b8e9beae3a in qemu_savevm_state_iterate /home/elmarco/src/qq/m=
+igration/savevm.c:1044
+    #3 0x55b8ea677733 in migration_thread /home/elmarco/src/qq/migration/=
+migration.c:1976
+    #4 0x7f15845f46c9 in start_thread (/lib64/libpthread.so.0+0x76c9)
+    #5 0x7f157d9d0f7e in clone (/lib64/libc.so.6+0x107f7e)
 
-Signed-off-by: Stefan Weil <sw@weilnetz.de>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20170130131517.8092-1-sw@weilnetz.de>
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+0x7f1556600000 is located 0 bytes to the right of 2097152-byte region [0x=
+7f1556400000,0x7f1556600000)
+allocated by thread T0 here:
+    #0 0x7f159bb76980 in posix_memalign (/lib64/libasan.so.3+0xc7980)
+    #1 0x55b8eab185b2 in qemu_try_memalign /home/elmarco/src/qq/util/osli=
+b-posix.c:106
+    #2 0x55b8eab186c8 in qemu_memalign /home/elmarco/src/qq/util/oslib-po=
+six.c:122
+    #3 0x55b8e9d268a8 in spapr_reallocate_hpt /home/elmarco/src/qq/hw/ppc=
+/spapr.c:1214
+    #4 0x55b8e9d26e04 in ppc_spapr_reset /home/elmarco/src/qq/hw/ppc/spap=
+r.c:1261
+    #5 0x55b8ea12e913 in qemu_system_reset /home/elmarco/src/qq/vl.c:1697
+    #6 0x55b8ea13fa40 in main /home/elmarco/src/qq/vl.c:4679
+    #7 0x7f157d8e9400 in __libc_start_main (/lib64/libc.so.6+0x20400)
+
+Thread T6 created by T0 here:
+    #0 0x7f159bae0488 in __interceptor_pthread_create (/lib64/libasan.so.=
+3+0x31488)
+    #1 0x55b8eab1d9cb in qemu_thread_create /home/elmarco/src/qq/util/qem=
+u-thread-posix.c:465
+    #2 0x55b8ea67874c in migrate_fd_connect /home/elmarco/src/qq/migratio=
+n/migration.c:2096
+    #3 0x55b8ea66cbb0 in migration_channel_connect /home/elmarco/src/qq/m=
+igration/migration.c:500
+    #4 0x55b8ea678f38 in socket_outgoing_migration /home/elmarco/src/qq/m=
+igration/socket.c:87
+    #5 0x55b8eaa5a03a in qio_task_complete /home/elmarco/src/qq/io/task.c=
+:142
+    #6 0x55b8eaa599cc in gio_task_thread_result /home/elmarco/src/qq/io/t=
+ask.c:88
+    #7 0x7f15823e38e6  (/lib64/libglib-2.0.so.0+0x468e6)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /home/elmarco/src/qq/hw/p=
+pc/spapr.c:1528 in htab_save_first_pass
+
+index seems to be wrongly incremented, unless I miss something that
+would be worth a comment.
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- target/s390x/cpu_models.c | 2 --
- 1 file changed, 2 deletions(-)
+ hw/ppc/spapr.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 4ea3a2de80..1434d15315 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -660,7 +660,6 @@ static void check_compatibility(const S390CPUModel *max_model,
- 
- static S390CPUModel *get_max_cpu_model(Error **errp)
- {
--#ifndef CONFIG_USER_ONLY
-     static S390CPUModel max_model;
-     static bool cached;
- 
-@@ -680,7 +679,6 @@ static S390CPUModel *get_max_cpu_model(Error **errp)
-         cached = true;
-         return &max_model;
-     }
--#endif
-     return NULL;
- }
- 
--- 
-2.11.0
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 6ee566d658..63439811d5 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1524,16 +1524,16 @@ static void htab_save_first_pass(QEMUFile *f, sPA=
+PRMachineState *spapr,
+         /* Consume invalid HPTEs */
+         while ((index < htabslots)
+                && !HPTE_VALID(HPTE(spapr->htab, index))) {
+-            index++;
+             CLEAN_HPTE(HPTE(spapr->htab, index));
++            index++;
+         }
+=20
+         /* Consume valid HPTEs */
+         chunkstart =3D index;
+         while ((index < htabslots) && (index - chunkstart < USHRT_MAX)
+                && HPTE_VALID(HPTE(spapr->htab, index))) {
+-            index++;
+             CLEAN_HPTE(HPTE(spapr->htab, index));
++            index++;
+         }
+=20
+         if (index > chunkstart) {
+--=20
+2.12.0.191.gc5d8de91d
