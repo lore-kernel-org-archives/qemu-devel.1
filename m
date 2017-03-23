@@ -1,31 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cr4JV-0004Bh-NK
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 11:06:10 -0400
+	(envelope-from <diana.craciun@nxp.com>) id 1cr4Lz-0004qe-Nm
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 11:08:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cr4JS-0001Tc-Jb
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 11:06:09 -0400
-Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:53380)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cr4JS-0001TR-9t
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 11:06:06 -0400
-Received: from player731.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 082FA76801
-	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 16:06:05 +0100 (CET)
-Date: Thu, 23 Mar 2017 16:05:58 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170323160558.51d506ce@bahia.lan>
-In-Reply-To: <28db5816-2ed9-0d92-a15d-af47b58a9da1@redhat.com>
-References: <alpine.DEB.2.10.1703201117560.23684@sstabellini-ThinkPad-X260>
-	<1490033952-26735-1-git-send-email-sstabellini@kernel.org>
-	<20170323140005.6b0853b3@bahia.lan>
-	<15207674-c5cd-3874-7ac9-5b23cdac8888@suse.com>
-	<28db5816-2ed9-0d92-a15d-af47b58a9da1@redhat.com>
+	(envelope-from <diana.craciun@nxp.com>) id 1cr4Ly-00020m-D4
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 11:08:43 -0400
+From: Diana Craciun <diana.craciun@nxp.com>
+Date: Thu, 23 Mar 2017 15:36:51 +0200
+Message-ID: <1490276212-32008-2-git-send-email-diana.craciun@nxp.com>
+In-Reply-To: <1490276212-32008-1-git-send-email-diana.craciun@nxp.com>
+References: <1490276212-32008-1-git-send-email-diana.craciun@nxp.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/88CmU20CY0rpfgF0lilLOGM";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v4 1/8] xen: import ring.h from xen
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH RFC 1/2] Increased the size of requester_id
+ field from MemTxAttrs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,90 +22,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org, Stefano Stabellini <stefano@aporeto.com>, anthony.perard@citrix.com
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: eric.auger@redhat.com, christoffer.dall@linaro.org, bharat.bhushan@nxp.com, mike.caraman@nxp.com, laurentiu.tudor@nxp.com, Diana Craciun <diana.craciun@nxp.com>
 
---Sig_/88CmU20CY0rpfgF0lilLOGM
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+The PCI requester ID field is 16 bits. The requester_id field
+from MemTxAttrs is used for MSIs to specify the device ID for
+the platforms where this device ID is needed (e.g virt machine + GICv3
+ITS). However, if more entities that uses MSIs in the system are used,
+16 bit is no longer enough to represent the device ID. Increased the size
+of this field to 24 bits in order to accomodate 256 entities.
+Also the name requester_id does no longer reflect the content, so
+the name was changed to stream_id.
 
-On Thu, 23 Mar 2017 15:19:28 +0100
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+Signed-off-by: Diana Craciun <diana.craciun@nxp.com>
+---
+ hw/intc/arm_gicv3_its_common.c         | 2 +-
+ hw/intc/arm_gicv3_its_kvm.c            | 2 +-
+ hw/pci/msi.c                           | 2 +-
+ include/exec/memattrs.h                | 4 ++--
+ include/hw/intc/arm_gicv3_its_common.h | 2 +-
+ 5 files changed, 6 insertions(+), 6 deletions(-)
 
-> On 23/03/2017 14:55, Juergen Gross wrote:
-> > On 23/03/17 14:00, Greg Kurz wrote: =20
-> >> On Mon, 20 Mar 2017 11:19:05 -0700
-> >> Stefano Stabellini <sstabellini@kernel.org> wrote:
-> >> =20
-> >>> Do not use the ring.h header installed on the system. Instead, import
-> >>> the header into the QEMU codebase. This avoids problems when QEMU is
-> >>> built against a Xen version too old to provide all the ring macros.
-> >>>
-> >>> Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
-> >>> Reviewed-by: Greg Kurz <groug@kaod.org>
-> >>> CC: anthony.perard@citrix.com
-> >>> CC: jgross@suse.com
-> >>> ---
-> >>> NB: The new macros have not been committed to Xen yet. Do not apply t=
-his
-> >>> patch until they do.
-> >>> --- =20
-> >>
-> >> Looking at your other series for the kernel part of this feature:
-> >>
-> >> https://lkml.org/lkml/2017/3/22/761
-> >>
-> >> I realize that the ring.h header from Xen also exists in the kernel tr=
-ee...=20
-> >>
-> >> Shouldn't all the code that can be used in both kernel and userspace g=
-o to a
-> >> header file under include/uapi in the kernel tree ? And then we would =
-import
-> >> it under include/standard-headers/linux in the QEMU tree and we could =
-keep it
-> >> in sync using scripts/update-linux-headers.sh.
-> >>
-> >> Cc'ing Paolo for insights. =20
-> >=20
-> > As Xen isn't part of the kernel we don't want that. You can use and/or
-> > build qemu with xen-9pfs backend support on an old Linux kernel without
-> > the related frontend. =20
->=20
-> As long as the header changes rarely, I guess it's fine not to go
-> through update-linux-headers.sh.
->=20
-> Paolo
->=20
-
-If the header (or at least the parts that are relevant to QEMU) are stable
-then my questioning can be ignored :)
-
-Thanks.
-
---
-Greg
-
-> > OTOH I don't see the advantage of not using the headers from Xen. This
-> > is working for qdisk and pvusb backends and for all the Xen libraries.
-> > Do you expect the 9pfs backend to be used for a qemu version built
-> > against a Xen version not supporting that backend?
-> >=20
-> >=20
-> > Juergen
-> >  =20
-
-
---Sig_/88CmU20CY0rpfgF0lilLOGM
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAljT5FcACgkQAvw66wEB28L+lwCeKiWpikZ5whqRTZPX83Og998j
-SEQAnRoIoRBiXJg4M0n7625bfrOlzwpe
-=oPz2
------END PGP SIGNATURE-----
-
---Sig_/88CmU20CY0rpfgF0lilLOGM--
+diff --git a/hw/intc/arm_gicv3_its_common.c b/hw/intc/arm_gicv3_its_common.c
+index 9d67c5c..efdb1b3 100644
+--- a/hw/intc/arm_gicv3_its_common.c
++++ b/hw/intc/arm_gicv3_its_common.c
+@@ -66,7 +66,7 @@ static MemTxResult gicv3_its_trans_write(void *opaque, hwaddr offset,
+     if (offset == 0x0040 && ((size == 2) || (size == 4))) {
+         GICv3ITSState *s = ARM_GICV3_ITS_COMMON(opaque);
+         GICv3ITSCommonClass *c = ARM_GICV3_ITS_COMMON_GET_CLASS(s);
+-        int ret = c->send_msi(s, le64_to_cpu(value), attrs.requester_id);
++        int ret = c->send_msi(s, le64_to_cpu(value), attrs.stream_id);
+ 
+         if (ret <= 0) {
+             qemu_log_mask(LOG_GUEST_ERROR,
+diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
+index bd4f3aa..9006907 100644
+--- a/hw/intc/arm_gicv3_its_kvm.c
++++ b/hw/intc/arm_gicv3_its_kvm.c
+@@ -29,7 +29,7 @@
+ #define TYPE_KVM_ARM_ITS "arm-its-kvm"
+ #define KVM_ARM_ITS(obj) OBJECT_CHECK(GICv3ITSState, (obj), TYPE_KVM_ARM_ITS)
+ 
+-static int kvm_its_send_msi(GICv3ITSState *s, uint32_t value, uint16_t devid)
++static int kvm_its_send_msi(GICv3ITSState *s, uint32_t value, uint32_t devid)
+ {
+     struct kvm_msi msi;
+ 
+diff --git a/hw/pci/msi.c b/hw/pci/msi.c
+index a87b227..7925851 100644
+--- a/hw/pci/msi.c
++++ b/hw/pci/msi.c
+@@ -336,7 +336,7 @@ void msi_send_message(PCIDevice *dev, MSIMessage msg)
+ {
+     MemTxAttrs attrs = {};
+ 
+-    attrs.requester_id = pci_requester_id(dev);
++    attrs.stream_id = pci_requester_id(dev);
+     address_space_stl_le(&dev->bus_master_as, msg.address, msg.data,
+                          attrs, NULL);
+ }
+diff --git a/include/exec/memattrs.h b/include/exec/memattrs.h
+index e601061..b13e1b8 100644
+--- a/include/exec/memattrs.h
++++ b/include/exec/memattrs.h
+@@ -35,8 +35,8 @@ typedef struct MemTxAttrs {
+     unsigned int secure:1;
+     /* Memory access is usermode (unprivileged) */
+     unsigned int user:1;
+-    /* Requester ID (for MSI for example) */
+-    unsigned int requester_id:16;
++    /* Stream ID (for MSI for example) */
++    unsigned int stream_id:24;
+ } MemTxAttrs;
+ 
+ /* Bus masters which don't specify any attributes will get this,
+diff --git a/include/hw/intc/arm_gicv3_its_common.h b/include/hw/intc/arm_gicv3_its_common.h
+index 1ba1894..6140fc6 100644
+--- a/include/hw/intc/arm_gicv3_its_common.h
++++ b/include/hw/intc/arm_gicv3_its_common.h
+@@ -68,7 +68,7 @@ struct GICv3ITSCommonClass {
+     SysBusDeviceClass parent_class;
+     /*< public >*/
+ 
+-    int (*send_msi)(GICv3ITSState *s, uint32_t data, uint16_t devid);
++    int (*send_msi)(GICv3ITSState *s, uint32_t data, uint32_t devid);
+     void (*pre_save)(GICv3ITSState *s);
+     void (*post_load)(GICv3ITSState *s);
+ };
+-- 
+2.5.5
