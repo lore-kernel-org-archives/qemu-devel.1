@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38731)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cqwYy-0006Mr-0k
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 02:49:36 -0400
+	(envelope-from <wang.guang55@zte.com.cn>) id 1cqwf5-00083v-9y
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 02:55:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cqwYu-0008QS-Vh
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 02:49:36 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170322204844.446-1-f4bug@amsat.org>
-	<20170322204844.446-2-f4bug@amsat.org>
-Date: Thu, 23 Mar 2017 07:49:27 +0100
-In-Reply-To: <20170322204844.446-2-f4bug@amsat.org> ("Philippe
-	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Wed,
-	22 Mar 2017 17:48:42 -0300")
-Message-ID: <87y3vw1o94.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RESEND 1/3] usb-ccid: make
- ccid_write_data_block() cope with null buffers
+	(envelope-from <wang.guang55@zte.com.cn>) id 1cqwf1-0002QV-OK
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 02:55:55 -0400
+Received: from out1.zte.com.cn ([202.103.147.172]:57228)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <wang.guang55@zte.com.cn>) id 1cqwf1-0002Md-4m
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 02:55:51 -0400
+From: Guang Wang <wang.guang55@zte.com.cn>
+Date: Fri, 24 Mar 2017 07:14:23 +0800
+Message-Id: <1490310863-12890-1-git-send-email-wang.guang55@zte.com.cn>
+Subject: [Qemu-devel] [PATCH RESEND] migration: Fix colo hang in
+ socket_accept_incoming_migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,51 +22,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>, Gerd Hoffmann <kraxel@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+To: berrange@redhat.com
+Cc: zhang.zhanghailiang@huawei.com, zhangchen.fnst@cn.fujitsu.com, qemu-devel@nongnu.org, Wang guang <wang.guang55@zte.com.cn>
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+From: Wang guang <wang.guang55@zte.com.cn>
 
-> static code analyzer complain:
->
-> hw/usb/dev-smartcard-reader.c:816:5: warning: Null pointer passed as an a=
-rgument to a 'nonnull' parameter
->     memcpy(p->abData, data, len);
->     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
->
-> Reported-by: Clang Static Analyzer
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  hw/usb/dev-smartcard-reader.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.c
-> index 757b8b3f5a..c38a4e5886 100644
-> --- a/hw/usb/dev-smartcard-reader.c
-> +++ b/hw/usb/dev-smartcard-reader.c
-> @@ -799,8 +799,14 @@ static void ccid_write_parameters(USBCCIDState *s, C=
-CID_Header *recv)
->  static void ccid_write_data_block(USBCCIDState *s, uint8_t slot, uint8_t=
- seq,
->                                    const uint8_t *data, uint32_t len)
->  {
-> -    CCID_DataBlock *p =3D ccid_reserve_recv_buf(s, sizeof(*p) + len);
-> +    CCID_DataBlock *p;
->=20=20
-> +    if (len =3D=3D 0) {
-> +        return;
+Due to the feature of accept channel does not support QIO_CHANNEL_FEATURE_SHUTDOWN.
+when failover,channel_shutdown could not shut down the channel.
+So the colo_process_incoming_thread will hang at recvmsg.
+This patch just call qio_channel_socket_new to get channel,
+Which set QIO_CHANNEL_FEATURE_SHUTDOWN already.
 
-Correct only if messages without data always have the same meaning as no
-message.  Gerd?
+Signed-off-by: Wang Guang<wang.guang55@zte.com.cn>
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+---
+ io/channel-socket.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
-> +    }
-> +    g_assert(data !=3D NULL);
-
-The assertion feels like noise to me.
-
-> +
-> +    p =3D ccid_reserve_recv_buf(s, sizeof(*p) + len);
->      if (p =3D=3D NULL) {
->          return;
->      }
+diff --git a/io/channel-socket.c b/io/channel-socket.c
+index f546c68..64b36f5 100644
+--- a/io/channel-socket.c
++++ b/io/channel-socket.c
+@@ -331,16 +331,10 @@ qio_channel_socket_accept(QIOChannelSocket *ioc,
+ {
+     QIOChannelSocket *cioc;
+ 
+-    cioc = QIO_CHANNEL_SOCKET(object_new(TYPE_QIO_CHANNEL_SOCKET));
+-    cioc->fd = -1;
++    cioc = qio_channel_socket_new();
+     cioc->remoteAddrLen = sizeof(ioc->remoteAddr);
+     cioc->localAddrLen = sizeof(ioc->localAddr);
+ 
+-#ifdef WIN32
+-    QIO_CHANNEL(cioc)->event = CreateEvent(NULL, FALSE, FALSE, NULL);
+-#endif
+-
+-
+  retry:
+     trace_qio_channel_socket_accept(ioc);
+     cioc->fd = qemu_accept(ioc->fd, (struct sockaddr *)&cioc->remoteAddr,
+-- 
+1.8.3.1
