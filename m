@@ -1,38 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiahuanzhang90@gmail.com>) id 1cqzjZ-0006Af-5s
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:12:46 -0400
+	(envelope-from <prvs=248a72cc7=Paul.Durrant@citrix.com>)
+	id 1cqzl4-00075c-D6
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:14:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jiahuanzhang90@gmail.com>) id 1cqzjY-00070y-8z
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:12:45 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:34019)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jiahuanzhang90@gmail.com>)
-	id 1cqzjY-000705-3u
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:12:44 -0400
-Received: by mail-qk0-x244.google.com with SMTP id v127so29496856qkb.1
-	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 03:12:43 -0700 (PDT)
+	(envelope-from <prvs=248a72cc7=Paul.Durrant@citrix.com>)
+	id 1cqzl1-0007UB-7s
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:14:18 -0400
+Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:65333
+	helo=SMTP.EU.CITRIX.COM)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=248a72cc7=Paul.Durrant@citrix.com>)
+	id 1cqzl0-0007Tt-Sg
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:14:15 -0400
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Thu, 23 Mar 2017 10:14:12 +0000
+Message-ID: <b2104b3cc02d44eba1cd891baa1859d6@AMSPEX02CL03.citrite.net>
+References: <1490263801-25206-1-git-send-email-paul.durrant@citrix.com>
+In-Reply-To: <1490263801-25206-1-git-send-email-paul.durrant@citrix.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <2d7a5a9a-8a7b-1bae-feb8-80fc4ee3048a@redhat.com>
-References: <CAJy91CY1SOwi7D-kyU0ooe5SyhM414WaBCedXuPfXXhJpbo1fg@mail.gmail.com>
-	<CAFEAcA_etsFstPtUzs0AZjWD35MhMLhwru0ibJzS_upgE-nsng@mail.gmail.com>
-	<CAJy91CZmqEUXLKjRJ0JdUEf83E3FwE_24qmej-4C8uAGQkTPWA@mail.gmail.com>
-	<CAFEAcA-mzO7vniDEaZeueVFQ7+MVBB7pnzHhahv2Yk_f3q0mJw@mail.gmail.com>
-	<CAJy91CZ4Ed-HGHLkzEc1dqQbo32d-eTE1S1ovO_ZwkDdTpkQXQ@mail.gmail.com>
-	<CAJy91CaCV40FgSP55qWZeZgkQ=2+E8Cr7xdbu9pn5HLEo+6JJQ@mail.gmail.com>
-	<CAJy91CYEwOVT7oEdYY=21__c2kcLTyxyjAaq7Zx4VnQdeLdQQQ@mail.gmail.com>
-	<CAFEAcA_t9iLude4Vu3Zc=_wcXMTtFb4Q4oJ8O+zLAJ9isAPqHQ@mail.gmail.com>
-	<1322109813.6444955.1490172025040.JavaMail.zimbra@redhat.com>
-	<CAJy91CaUxFHJeGLLW4DqK6sBwx2qDnE9s20ZbdT86JDn8yQoHg@mail.gmail.com>
-	<218df442-1a31-e969-32ef-01184fae84c0@redhat.com>
-	<CAJy91CbBV97RRKr=Rze5-eYrYAvnwiDZQ0oQZi33aKR1v-UXKg@mail.gmail.com>
-	<2d7a5a9a-8a7b-1bae-feb8-80fc4ee3048a@redhat.com>
-From: Jiahuan Zhang <jiahuanzhang90@gmail.com>
-Date: Thu, 23 Mar 2017 11:12:42 +0100
-Message-ID: <CAJy91CbcV3_jVg9PTD6unka6_M65rgkKDv0KsBK=YpVd=XKqvg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Guest application reading from pl011 without
- device driver
+Subject: Re: [Qemu-devel] [PATCH] xen-platform: separate unplugging of NVMe
+ disks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,49 +32,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
-
-On 22 March 2017 at 12:27, Paolo Bonzini <pbonzini@redhat.com> wrote:
-
->
->
-> On 22/03/2017 11:28, Jiahuan Zhang wrote:
-> >
-> >     A function that lets a process sleep until data is available on the
-> >     socket.  The solution is to rewrite Windows chardev handling in QEMU
-> to
-> >     use threads or overlapped I/O.
-> >
-> > Yes, socket is working well. Will you add the "select" to pipe
-> > implementation?
->
-> It's Windows that doesn't support it (the Windows function name is
-> WaitForSingleObject).
+To: Paul Durrant <Paul.Durrant@citrix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
 
 
-Hi, I have checked the Windows chardev implimentation in QEMU.
-I learned from char-win-stdio.c to using thread and WaitForSingleObject for
-interlocking.
-char-win-stdio.c uses qemu_add_wait_object().
-Char-pipe.c uses qemu_add_polling_cb().
-I found all over qemu, only char-pipe uses qemu_add_polling_cb().
-Does this mean that somebody has already looked into this issue,
-and failed in using qemu_add_wait_object(),
-and then he/she created qemu_add_polling_cb()?
 
-If so, what I am going to do is just something has been proved to be
-useless.
-Please tell me if my guess is true.
+> -----Original Message-----
+> From: Paul Durrant [mailto:paul.durrant@citrix.com]
+> Sent: 23 March 2017 10:10
+> To: qemu-devel@nongnu.org; xen-devel@lists.xenproject.org
+> Cc: Paul Durrant <Paul.Durrant@citrix.com>; Stefano Stabellini
+> <sstabellini@kernel.org>; Anthony Perard <anthony.perard@citrix.com>
+> Subject: [PATCH] xen-platform: separate unplugging of NVMe disks
+>=20
+> Commit 090fa1c8 "add support for unplugging NVMe disks..." extended the
+> existing disk unplug flag to cover NVMe disks as well as IDE and SCSI.
+>=20
+> The cecent thread on the xen-devel mailing list [1] have highlighted that
 
-Best,
-Huan
+That spelling and grammar is terrible. Sorry about that... I'll send a v2 w=
+ith it fixed.
 
->
-> Paolo
->
-> > Or shall I look into it and fix? Since in my case, I prefer windows pipe
-> > to socket.
-> > But if I do, definitly, I will spend much more effort than you, the
-> experts.
->
+  Paul
+
+> this is not desirable behaviour: PV frontends should be able to distingui=
+sh
+> NVMe disks from other types of disk and should have separate control over
+> whether they are unplugged.
+>=20
+> This patch defines a new bit in the unplug mask for this purpose and also
+> tidies up the definitions of, and improves the comments regarding, the
+> previously exiting bits in the protocol.
+>=20
+> [1] https://lists.xen.org/archives/html/xen-devel/2017-03/msg02924.html
+>=20
+> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> --
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: Anthony Perard <anthony.perard@citrix.com>
+>=20
+> NOTE: A companion patch will be submitted to xen-devel to align the
+>       unplug protocol documentation once this patch is acked.
+> ---
+>  hw/i386/xen/xen_platform.c | 47
+> ++++++++++++++++++++++++++++++++++------------
+>  1 file changed, 35 insertions(+), 12 deletions(-)
+>=20
+> diff --git a/hw/i386/xen/xen_platform.c b/hw/i386/xen/xen_platform.c
+> index 6010f35..983d532 100644
+> --- a/hw/i386/xen/xen_platform.c
+> +++ b/hw/i386/xen/xen_platform.c
+> @@ -87,10 +87,30 @@ static void log_writeb(PCIXenPlatformState *s, char
+> val)
+>      }
+>  }
+>=20
+> -/* Xen Platform, Fixed IOPort */
+> -#define UNPLUG_ALL_DISKS 1
+> -#define UNPLUG_ALL_NICS 2
+> -#define UNPLUG_AUX_IDE_DISKS 4
+> +/*
+> + * Unplug device flags.
+> + *
+> + * The logic got a little confused at some point in the past but this is
+> + * what they do now.
+> + *
+> + * bit 0: Unplug all IDE and SCSI disks.
+> + * bit 1: Unplug all NICs.
+> + * bit 2: Unplug IDE disks except primary master. This is overridden if
+> + *        bit 0 is also present in the mask.
+> + * bit 3: Unplug all NVMe disks.
+> + *
+> + */
+> +#define _UNPLUG_IDE_SCSI_DISKS 0
+> +#define UNPLUG_IDE_SCSI_DISKS (1u << _UNPLUG_IDE_SCSI_DISKS)
+> +
+> +#define _UNPLUG_ALL_NICS 1
+> +#define UNPLUG_ALL_NICS (1u << _UNPLUG_ALL_NICS)
+> +
+> +#define _UNPLUG_AUX_IDE_DISKS 2
+> +#define UNPLUG_AUX_IDE_DISKS (1u << _UNPLUG_AUX_IDE_DISKS)
+> +
+> +#define _UNPLUG_NVME_DISKS 3
+> +#define UNPLUG_NVME_DISKS (1u << _UNPLUG_NVME_DISKS)
+>=20
+>  static void unplug_nic(PCIBus *b, PCIDevice *d, void *o)
+>  {
+> @@ -111,7 +131,7 @@ static void unplug_disks(PCIBus *b, PCIDevice *d,
+> void *opaque)
+>  {
+>      uint32_t flags =3D *(uint32_t *)opaque;
+>      bool aux =3D (flags & UNPLUG_AUX_IDE_DISKS) &&
+> -        !(flags & UNPLUG_ALL_DISKS);
+> +        !(flags & UNPLUG_IDE_SCSI_DISKS);
+>=20
+>      /* We have to ignore passthrough devices */
+>      if (!strcmp(d->name, "xen-pci-passthrough")) {
+> @@ -124,12 +144,16 @@ static void unplug_disks(PCIBus *b, PCIDevice *d,
+> void *opaque)
+>          break;
+>=20
+>      case PCI_CLASS_STORAGE_SCSI:
+> -    case PCI_CLASS_STORAGE_EXPRESS:
+>          if (!aux) {
+>              object_unparent(OBJECT(d));
+>          }
+>          break;
+>=20
+> +    case PCI_CLASS_STORAGE_EXPRESS:
+> +        if (flags & UNPLUG_NVME_DISKS) {
+> +            object_unparent(OBJECT(d));
+> +        }
+> +
+>      default:
+>          break;
+>      }
+> @@ -147,10 +171,9 @@ static void platform_fixed_ioport_writew(void
+> *opaque, uint32_t addr, uint32_t v
+>      switch (addr) {
+>      case 0: {
+>          PCIDevice *pci_dev =3D PCI_DEVICE(s);
+> -        /* Unplug devices.  Value is a bitmask of which devices to
+> -           unplug, with bit 0 the disk devices, bit 1 the network
+> -           devices, and bit 2 the non-primary-master IDE devices. */
+> -        if (val & (UNPLUG_ALL_DISKS | UNPLUG_AUX_IDE_DISKS)) {
+> +        /* Unplug devices. See comment above flag definitions */
+> +        if (val & (UNPLUG_IDE_SCSI_DISKS | UNPLUG_AUX_IDE_DISKS |
+> +                   UNPLUG_NVME_DISKS)) {
+>              DPRINTF("unplug disks\n");
+>              pci_unplug_disks(pci_dev->bus, val);
+>          }
+> @@ -338,14 +361,14 @@ static void xen_platform_ioport_writeb(void
+> *opaque, hwaddr addr,
+>               * If VMDP was to control both disk and LAN it would use 4.
+>               * If it controlled just disk or just LAN, it would use 8 be=
+low.
+>               */
+> -            pci_unplug_disks(pci_dev->bus, UNPLUG_ALL_DISKS);
+> +            pci_unplug_disks(pci_dev->bus, UNPLUG_IDE_SCSI_DISKS);
+>              pci_unplug_nics(pci_dev->bus);
+>          }
+>          break;
+>      case 8:
+>          switch (val) {
+>          case 1:
+> -            pci_unplug_disks(pci_dev->bus, UNPLUG_ALL_DISKS);
+> +            pci_unplug_disks(pci_dev->bus, UNPLUG_IDE_SCSI_DISKS);
+>              break;
+>          case 2:
+>              pci_unplug_nics(pci_dev->bus);
+> --
+> 2.1.4
