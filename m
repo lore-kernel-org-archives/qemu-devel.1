@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cqzEX-00026H-1v
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:40:42 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1cqzHG-0003le-Dp
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:43:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cqzET-0003sC-Uo
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:40:41 -0400
-Received: from [45.249.212.187] (port=3009 helo=dggrg01-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cqzET-0003bF-5s
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:40:37 -0400
-From: Gonglei <arei.gonglei@huawei.com>
-Date: Thu, 23 Mar 2017 17:39:10 +0800
-Message-ID: <1490261951-21352-2-git-send-email-arei.gonglei@huawei.com>
-In-Reply-To: <1490261951-21352-1-git-send-email-arei.gonglei@huawei.com>
-References: <1490261951-21352-1-git-send-email-arei.gonglei@huawei.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1cqzHD-0005FJ-Az
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:43:30 -0400
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:35321)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cqzHD-0005Eb-4a
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:43:27 -0400
+Received: by mail-wr0-x22e.google.com with SMTP id u1so9245889wra.2
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 02:43:26 -0700 (PDT)
+References: <1664622118.881360.1490207709240.ref@mail.yahoo.com>
+	<1664622118.881360.1490207709240@mail.yahoo.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1664622118.881360.1490207709240@mail.yahoo.com>
+Date: Thu, 23 Mar 2017 09:43:24 +0000
+Message-ID: <87efxoxr9f.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PULL for-2.9 1/2] cryptodev: setiv only when really
- need
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] help please how to use  qemu.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,41 +30,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, "Longpeng(Mike)" <longpeng2@huawei.com>, Gonglei <arei.gonglei@huawei.com>
+To: Richard Odell <richard_odell@ymail.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-From: "Longpeng(Mike)" <longpeng2@huawei.com>
 
-ECB mode cipher doesn't need IV, if we setiv for it then qemu
-crypto API would report "Expected IV size 0 not **", so we should
-setiv only when the cipher algos really need.
+Richard Odell <richard_odell@ymail.com> writes:
 
-Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
-Signed-off-by: Gonglei <arei.gonglei@huawei.com>
----
- backends/cryptodev-builtin.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+> step by step instructions please
 
-diff --git a/backends/cryptodev-builtin.c b/backends/cryptodev-builtin.c
-index 82a068e..b24a299 100644
---- a/backends/cryptodev-builtin.c
-+++ b/backends/cryptodev-builtin.c
-@@ -320,10 +320,12 @@ static int cryptodev_builtin_sym_operation(
- 
-     sess = builtin->sessions[op_info->session_id];
- 
--    ret = qcrypto_cipher_setiv(sess->cipher, op_info->iv,
--                               op_info->iv_len, errp);
--    if (ret < 0) {
--        return -VIRTIO_CRYPTO_ERR;
-+    if (op_info->iv_len > 0) {
-+        ret = qcrypto_cipher_setiv(sess->cipher, op_info->iv,
-+                                   op_info->iv_len, errp);
-+        if (ret < 0) {
-+            return -VIRTIO_CRYPTO_ERR;
-+        }
-     }
- 
-     if (sess->direction == VIRTIO_CRYPTO_OP_ENCRYPT) {
--- 
-1.7.12.4
+https://qemu.weilnetz.de/doc/qemu-doc.html
+
+--
+Alex Bennée
