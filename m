@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45777)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cr9d0-0008DA-L1
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:46:40 -0400
+	(envelope-from <quintela@redhat.com>) id 1cr9cy-0008CE-Ou
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:46:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cr9cz-0000WQ-G4
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:46:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36782)
+	(envelope-from <quintela@redhat.com>) id 1cr9cv-0000Uo-LN
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:46:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45422)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cr9cz-0000Vg-7u
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:46:37 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cr9cv-0000Uc-C2
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:46:33 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 407C2624CF
-	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 20:46:37 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5886CC0467F1
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 20:46:33 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu, 23 Mar 2017 21:45:26 +0100
-Message-Id: <20170323204544.12015-34-quintela@redhat.com>
+Date: Thu, 23 Mar 2017 21:45:23 +0100
+Message-Id: <20170323204544.12015-31-quintela@redhat.com>
 In-Reply-To: <20170323204544.12015-1-quintela@redhat.com>
 References: <20170323204544.12015-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 33/51] ram: Move dirty_pages_rate to RAMState
+Subject: [Qemu-devel] [PATCH 30/51] ram: Move src_page_req* to RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,120 +32,251 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com
 
-Treat it like the rest of ram stats counters.  Export its value the
-same way.  As an added bonus, no more MigrationState used in
-migration_bitmap_sync();
+This are the last postcopy fields still at MigrationState.  Once there
+Move MigrationSrcPageRequest to ram.c and remove MigrationState
+parameters where appropiate.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
 ---
- include/migration/migration.h |  2 +-
- migration/migration.c         |  7 +++----
- migration/ram.c               | 12 +++++++++---
- 3 files changed, 13 insertions(+), 8 deletions(-)
+ include/migration/migration.h | 17 +-----------
+ migration/migration.c         |  5 +---
+ migration/ram.c               | 62 ++++++++++++++++++++++++++-----------------
+ 3 files changed, 40 insertions(+), 44 deletions(-)
 
 diff --git a/include/migration/migration.h b/include/migration/migration.h
-index 0d5d5fc..ffa7944 100644
+index e032fb0..8a6caa3 100644
 --- a/include/migration/migration.h
 +++ b/include/migration/migration.h
-@@ -154,7 +154,6 @@ struct MigrationState
-     int64_t total_time;
-     int64_t downtime;
-     int64_t expected_downtime;
--    int64_t dirty_pages_rate;
-     bool enabled_capabilities[MIGRATION_CAPABILITY__MAX];
-     int64_t xbzrle_cache_size;
-     int64_t setup_time;
-@@ -254,6 +253,7 @@ uint64_t ram_bytes_remaining(void);
- uint64_t ram_bytes_transferred(void);
- uint64_t ram_bytes_total(void);
- uint64_t ram_dirty_sync_count(void);
-+uint64_t ram_dirty_pages_rate(void);
- void free_xbzrle_decoded_buf(void);
+@@ -128,18 +128,6 @@ struct MigrationIncomingState {
+ MigrationIncomingState *migration_incoming_get_current(void);
+ void migration_incoming_state_destroy(void);
  
- void acct_update_position(QEMUFile *f, size_t size, bool zero);
+-/*
+- * An outstanding page request, on the source, having been received
+- * and queued
+- */
+-struct MigrationSrcPageRequest {
+-    RAMBlock *rb;
+-    hwaddr    offset;
+-    hwaddr    len;
+-
+-    QSIMPLEQ_ENTRY(MigrationSrcPageRequest) next_req;
+-};
+-
+ struct MigrationState
+ {
+     size_t bytes_xfer;
+@@ -186,9 +174,6 @@ struct MigrationState
+     /* Flag set once the migration thread called bdrv_inactivate_all */
+     bool block_inactive;
+ 
+-    /* Queue of outstanding page requests from the destination */
+-    QemuMutex src_page_req_mutex;
+-    QSIMPLEQ_HEAD(src_page_requests, MigrationSrcPageRequest) src_page_requests;
+     /* The semaphore is used to notify COLO thread that failover is finished */
+     QemuSemaphore colo_exit_sem;
+ 
+@@ -371,7 +356,7 @@ void savevm_skip_configuration(void);
+ int global_state_store(void);
+ void global_state_store_running(void);
+ 
+-void flush_page_queue(MigrationState *ms);
++void flush_page_queue(void);
+ int ram_save_queue_pages(MigrationState *ms, const char *rbname,
+                          ram_addr_t start, ram_addr_t len);
+ uint64_t ram_pagesize_summary(void);
 diff --git a/migration/migration.c b/migration/migration.c
-index 4af934b..d2d9b91 100644
+index b220941..58c1587 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -653,7 +653,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
+@@ -109,7 +109,6 @@ MigrationState *migrate_get_current(void)
+     };
  
-     if (s->state != MIGRATION_STATUS_COMPLETED) {
-         info->ram->remaining = ram_bytes_remaining();
--        info->ram->dirty_pages_rate = s->dirty_pages_rate;
-+        info->ram->dirty_pages_rate = ram_dirty_pages_rate();
-     }
+     if (!once) {
+-        qemu_mutex_init(&current_migration.src_page_req_mutex);
+         current_migration.parameters.tls_creds = g_strdup("");
+         current_migration.parameters.tls_hostname = g_strdup("");
+         once = true;
+@@ -949,7 +948,7 @@ static void migrate_fd_cleanup(void *opaque)
+     qemu_bh_delete(s->cleanup_bh);
+     s->cleanup_bh = NULL;
+ 
+-    flush_page_queue(s);
++    flush_page_queue();
+ 
+     if (s->to_dst_file) {
+         trace_migrate_fd_cleanup();
+@@ -1123,8 +1122,6 @@ MigrationState *migrate_init(const MigrationParams *params)
+ 
+     migrate_set_state(&s->state, MIGRATION_STATUS_NONE, MIGRATION_STATUS_SETUP);
+ 
+-    QSIMPLEQ_INIT(&s->src_page_requests);
+-
+     s->total_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+     return s;
  }
- 
-@@ -1109,7 +1109,6 @@ MigrationState *migrate_init(const MigrationParams *params)
-     s->mbps = 0.0;
-     s->downtime = 0;
-     s->expected_downtime = 0;
--    s->dirty_pages_rate = 0;
-     s->setup_time = 0;
-     s->start_postcopy = false;
-     s->postcopy_after_devices = false;
-@@ -1999,8 +1998,8 @@ static void *migration_thread(void *opaque)
-                                       bandwidth, max_size);
-             /* if we haven't sent anything, we don't want to recalculate
-                10000 is a small enough number for our purposes */
--            if (s->dirty_pages_rate && transferred_bytes > 10000) {
--                s->expected_downtime = s->dirty_pages_rate *
-+            if (ram_dirty_pages_rate() && transferred_bytes > 10000) {
-+                s->expected_downtime = ram_dirty_pages_rate() *
-                     (1ul << qemu_target_page_bits()) / bandwidth;
-             }
- 
 diff --git a/migration/ram.c b/migration/ram.c
-index c66c308..6cb1435 100644
+index 325a0f3..601370c 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -211,6 +211,8 @@ struct RAMState {
-     uint64_t migration_dirty_pages;
-     /* total number of bytes transferred */
-     uint64_t bytes_transferred;
-+    /* number of dirtied pages in the last second */
-+    uint64_t dirty_pages_rate;
-     /* protects modification of the bitmap */
-     QemuMutex bitmap_mutex;
-     /* Ram Bitmap protected by RCU */
-@@ -275,6 +277,11 @@ uint64_t ram_dirty_sync_count(void)
-     return ram_state.bitmap_sync_count;
- }
+@@ -151,6 +151,18 @@ struct RAMBitmap {
+ };
+ typedef struct RAMBitmap RAMBitmap;
  
-+uint64_t ram_dirty_pages_rate(void)
-+{
-+    return ram_state.dirty_pages_rate;
-+}
++/*
++ * An outstanding page request, on the source, having been received
++ * and queued
++ */
++struct RAMSrcPageRequest {
++    RAMBlock *rb;
++    hwaddr    offset;
++    hwaddr    len;
 +
- /* used by the search for pages to send */
- struct PageSearchStatus {
-     /* Current block being searched */
-@@ -665,7 +672,6 @@ uint64_t ram_pagesize_summary(void)
- static void migration_bitmap_sync(RAMState *rs)
++    QSIMPLEQ_ENTRY(RAMSrcPageRequest) next_req;
++};
++
+ /* State of RAM for migration */
+ struct RAMState {
+     /* Last block that we have visited searching for dirty pages */
+@@ -205,6 +217,9 @@ struct RAMState {
+     RAMBitmap *ram_bitmap;
+     /* The RAMBlock used in the last src_page_request */
+     RAMBlock *last_req_rb;
++    /* Queue of outstanding page requests from the destination */
++    QemuMutex src_page_req_mutex;
++    QSIMPLEQ_HEAD(src_page_requests, RAMSrcPageRequest) src_page_requests;
+ };
+ typedef struct RAMState RAMState;
+ 
+@@ -1084,20 +1099,20 @@ static bool find_dirty_block(RAMState *rs, QEMUFile *f, PageSearchStatus *pss,
+  *
+  * Returns the block of the page (or NULL if none available)
+  *
+- * @ms: current migration state
++ * @rs: current RAM state
+  * @offset: used to return the offset within the RAMBlock
+  * @ram_addr_abs: pointer into which to store the address of the dirty page
+  *                within the global ram_addr space
+  */
+-static RAMBlock *unqueue_page(MigrationState *ms, ram_addr_t *offset,
++static RAMBlock *unqueue_page(RAMState *rs, ram_addr_t *offset,
+                               ram_addr_t *ram_addr_abs)
  {
-     RAMBlock *block;
--    MigrationState *s = migrate_get_current();
-     int64_t end_time;
-     int64_t bytes_xfer_now;
+     RAMBlock *block = NULL;
  
-@@ -704,7 +710,7 @@ static void migration_bitmap_sync(RAMState *rs)
-                throttling */
-             bytes_xfer_now = ram_bytes_transferred();
- 
--            if (s->dirty_pages_rate &&
-+            if (rs->dirty_pages_rate &&
-                (rs->num_dirty_pages_period * TARGET_PAGE_SIZE >
-                    (bytes_xfer_now - rs->bytes_xfer_prev) / 2) &&
-                (rs->dirty_rate_high_cnt++ >= 2)) {
-@@ -725,7 +731,7 @@ static void migration_bitmap_sync(RAMState *rs)
-             rs->iterations_prev = rs->iterations;
-             rs->xbzrle_cache_miss_prev = rs->xbzrle_cache_miss;
+-    qemu_mutex_lock(&ms->src_page_req_mutex);
+-    if (!QSIMPLEQ_EMPTY(&ms->src_page_requests)) {
+-        struct MigrationSrcPageRequest *entry =
+-                                QSIMPLEQ_FIRST(&ms->src_page_requests);
++    qemu_mutex_lock(&rs->src_page_req_mutex);
++    if (!QSIMPLEQ_EMPTY(&rs->src_page_requests)) {
++        struct RAMSrcPageRequest *entry =
++                                QSIMPLEQ_FIRST(&rs->src_page_requests);
+         block = entry->rb;
+         *offset = entry->offset;
+         *ram_addr_abs = (entry->offset + entry->rb->offset) &
+@@ -1108,11 +1123,11 @@ static RAMBlock *unqueue_page(MigrationState *ms, ram_addr_t *offset,
+             entry->offset += TARGET_PAGE_SIZE;
+         } else {
+             memory_region_unref(block->mr);
+-            QSIMPLEQ_REMOVE_HEAD(&ms->src_page_requests, next_req);
++            QSIMPLEQ_REMOVE_HEAD(&rs->src_page_requests, next_req);
+             g_free(entry);
          }
--        s->dirty_pages_rate = rs->num_dirty_pages_period * 1000
-+        rs->dirty_pages_rate = rs->num_dirty_pages_period * 1000
-             / (end_time - rs->start_time);
-         rs->start_time = end_time;
-         rs->num_dirty_pages_period = 0;
+     }
+-    qemu_mutex_unlock(&ms->src_page_req_mutex);
++    qemu_mutex_unlock(&rs->src_page_req_mutex);
+ 
+     return block;
+ }
+@@ -1125,13 +1140,11 @@ static RAMBlock *unqueue_page(MigrationState *ms, ram_addr_t *offset,
+  * Returns if a queued page is found
+  *
+  * @rs: current RAM state
+- * @ms: current migration state
+  * @pss: data about the state of the current dirty page scan
+  * @ram_addr_abs: pointer into which to store the address of the dirty page
+  *                within the global ram_addr space
+  */
+-static bool get_queued_page(RAMState *rs, MigrationState *ms,
+-                            PageSearchStatus *pss,
++static bool get_queued_page(RAMState *rs, PageSearchStatus *pss,
+                             ram_addr_t *ram_addr_abs)
+ {
+     RAMBlock  *block;
+@@ -1139,7 +1152,7 @@ static bool get_queued_page(RAMState *rs, MigrationState *ms,
+     bool dirty;
+ 
+     do {
+-        block = unqueue_page(ms, &offset, ram_addr_abs);
++        block = unqueue_page(rs, &offset, ram_addr_abs);
+         /*
+          * We're sending this page, and since it's postcopy nothing else
+          * will dirty it, and we must make sure it doesn't get sent again
+@@ -1191,19 +1204,18 @@ static bool get_queued_page(RAMState *rs, MigrationState *ms,
+  *
+  * It should be empty at the end anyway, but in error cases there may
+  * xbe some left.
+- *
+- * @ms: current migration state
+  */
+-void flush_page_queue(MigrationState *ms)
++void flush_page_queue(void)
+ {
+-    struct MigrationSrcPageRequest *mspr, *next_mspr;
++    struct RAMSrcPageRequest *mspr, *next_mspr;
++    RAMState *rs = &ram_state;
+     /* This queue generally should be empty - but in the case of a failed
+      * migration might have some droppings in.
+      */
+     rcu_read_lock();
+-    QSIMPLEQ_FOREACH_SAFE(mspr, &ms->src_page_requests, next_req, next_mspr) {
++    QSIMPLEQ_FOREACH_SAFE(mspr, &rs->src_page_requests, next_req, next_mspr) {
+         memory_region_unref(mspr->rb->mr);
+-        QSIMPLEQ_REMOVE_HEAD(&ms->src_page_requests, next_req);
++        QSIMPLEQ_REMOVE_HEAD(&rs->src_page_requests, next_req);
+         g_free(mspr);
+     }
+     rcu_read_unlock();
+@@ -1260,16 +1272,16 @@ int ram_save_queue_pages(MigrationState *ms, const char *rbname,
+         goto err;
+     }
+ 
+-    struct MigrationSrcPageRequest *new_entry =
+-        g_malloc0(sizeof(struct MigrationSrcPageRequest));
++    struct RAMSrcPageRequest *new_entry =
++        g_malloc0(sizeof(struct RAMSrcPageRequest));
+     new_entry->rb = ramblock;
+     new_entry->offset = start;
+     new_entry->len = len;
+ 
+     memory_region_ref(ramblock->mr);
+-    qemu_mutex_lock(&ms->src_page_req_mutex);
+-    QSIMPLEQ_INSERT_TAIL(&ms->src_page_requests, new_entry, next_req);
+-    qemu_mutex_unlock(&ms->src_page_req_mutex);
++    qemu_mutex_lock(&rs->src_page_req_mutex);
++    QSIMPLEQ_INSERT_TAIL(&rs->src_page_requests, new_entry, next_req);
++    qemu_mutex_unlock(&rs->src_page_req_mutex);
+     rcu_read_unlock();
+ 
+     return 0;
+@@ -1408,7 +1420,7 @@ static int ram_find_and_save_block(RAMState *rs, QEMUFile *f, bool last_stage)
+ 
+     do {
+         again = true;
+-        found = get_queued_page(rs, ms, &pss, &dirty_ram_abs);
++        found = get_queued_page(rs, &pss, &dirty_ram_abs);
+ 
+         if (!found) {
+             /* priority queue empty, so just search for something dirty */
+@@ -1968,6 +1980,8 @@ static int ram_state_init(RAMState *rs)
+ 
+     memset(rs, 0, sizeof(*rs));
+     qemu_mutex_init(&rs->bitmap_mutex);
++    qemu_mutex_init(&rs->src_page_req_mutex);
++    QSIMPLEQ_INIT(&rs->src_page_requests);
+ 
+     if (migrate_use_xbzrle()) {
+         XBZRLE_cache_lock();
 -- 
 2.9.3
