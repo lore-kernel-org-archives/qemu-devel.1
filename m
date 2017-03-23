@@ -1,27 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cr03V-0002rC-UA
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:33:25 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1cr05e-0003W8-Kk
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:35:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cr03S-00059d-RB
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:33:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32988)
+	(envelope-from <pbonzini@redhat.com>) id 1cr05b-0005vC-Ip
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:35:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:17049)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cr03S-00059G-L4
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:33:18 -0400
-References: <CAFEAcA9pqDoCWrPAJ+KVxLC_eRy-xRg36oYuARYg2YP8VpGpBg@mail.gmail.com>
-	<CAFEAcA-2mcGih5bscnMsevTNTy71g9kE7OjTy3hYJKeGoGQw-g@mail.gmail.com>
-	<87k27hxyni.fsf@linaro.org>
-	<CAFEAcA-oLDW2F=L3NCdSvrLp_eh3tu9mfKR0mTfZ=3O3dpdKbQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cr05b-0005uX-Cr
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:35:31 -0400
+References: <CAJy91CY1SOwi7D-kyU0ooe5SyhM414WaBCedXuPfXXhJpbo1fg@mail.gmail.com>
+	<CAFEAcA_etsFstPtUzs0AZjWD35MhMLhwru0ibJzS_upgE-nsng@mail.gmail.com>
+	<CAJy91CZmqEUXLKjRJ0JdUEf83E3FwE_24qmej-4C8uAGQkTPWA@mail.gmail.com>
+	<CAFEAcA-mzO7vniDEaZeueVFQ7+MVBB7pnzHhahv2Yk_f3q0mJw@mail.gmail.com>
+	<CAJy91CZ4Ed-HGHLkzEc1dqQbo32d-eTE1S1ovO_ZwkDdTpkQXQ@mail.gmail.com>
+	<CAJy91CaCV40FgSP55qWZeZgkQ=2+E8Cr7xdbu9pn5HLEo+6JJQ@mail.gmail.com>
+	<CAJy91CYEwOVT7oEdYY=21__c2kcLTyxyjAaq7Zx4VnQdeLdQQQ@mail.gmail.com>
+	<CAFEAcA_t9iLude4Vu3Zc=_wcXMTtFb4Q4oJ8O+zLAJ9isAPqHQ@mail.gmail.com>
+	<1322109813.6444955.1490172025040.JavaMail.zimbra@redhat.com>
+	<CAJy91CaUxFHJeGLLW4DqK6sBwx2qDnE9s20ZbdT86JDn8yQoHg@mail.gmail.com>
+	<218df442-1a31-e969-32ef-01184fae84c0@redhat.com>
+	<CAJy91CbBV97RRKr=Rze5-eYrYAvnwiDZQ0oQZi33aKR1v-UXKg@mail.gmail.com>
+	<2d7a5a9a-8a7b-1bae-feb8-80fc4ee3048a@redhat.com>
+	<CAJy91CbcV3_jVg9PTD6unka6_M65rgkKDv0KsBK=YpVd=XKqvg@mail.gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1a35985f-ad4b-c017-b355-51d47aaffa11@redhat.com>
-Date: Thu, 23 Mar 2017 11:33:15 +0100
+Message-ID: <ed9e6d65-ba93-d572-861a-46926a37d42a@redhat.com>
+Date: Thu, 23 Mar 2017 11:35:27 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-oLDW2F=L3NCdSvrLp_eh3tu9mfKR0mTfZ=3O3dpdKbQ@mail.gmail.com>
+In-Reply-To: <CAJy91CbcV3_jVg9PTD6unka6_M65rgkKDv0KsBK=YpVd=XKqvg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Proposal for deprecating unsupported host OSes &
- architecutures
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Guest application reading from pl011 without
+ device driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +40,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Jiahuan Zhang <jiahuanzhang90@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
 
 
 
-On 22/03/2017 14:09, Peter Maydell wrote:
-> On 22 March 2017 at 12:51, Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
-ote:
->> Peter Maydell <peter.maydell@linaro.org> writes:
->>> ...unfortunately the gcc compile farm mips board (1) is very slow
->>> and (2) has very little disk space free in /tmp, which means that
->>> it can't pass "make check" because for instance tests/test-replicatio=
-n
->>> assumes it can write comparatively large test files to /tmp/...
->>
->> That makes it sound like a mips cross build or mips linux-user powered
->> image would be useful then?
->=20
-> Cross build can't actually run 'make check' and I wouldn't
-> trust linux-user to run our test suite. Also, if there's
-> no hardware that we can sensibly do make/make check
-> on then how much can people really care about QEMU on MIPS?
-> (In fact since MIPS supports KVM these days, there really
-> ought to be sufficiently capable hardware to work as
-> a build system.)
+On 23/03/2017 11:12, Jiahuan Zhang wrote:
+> 
+>     It's Windows that doesn't support it (the Windows function name is
+>     WaitForSingleObject).
+> 
+> 
+> Hi, I have checked the Windows chardev implimentation in QEMU.
+> I learned from char-win-stdio.c to using thread and WaitForSingleObject
+> for interlocking.
+> char-win-stdio.c uses qemu_add_wait_object().
+> Char-pipe.c uses qemu_add_polling_cb().
+> I found all over qemu, only char-pipe uses qemu_add_polling_cb().
+> Does this mean that somebody has already looked into this issue,
+> and failed in using qemu_add_wait_object(),
+> and then he/she created qemu_add_polling_cb()?
 
-I own a MIPS Creator ci20 board (donated by Imagination Technologies).
-I cannot give it a public IP address, but I can try and use it to do
-builds every now and then.
+I don't know, but using threads sounds like a way to solve the bug, indeed.
+
+Thanks,
 
 Paolo
