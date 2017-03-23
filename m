@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cqyai-0003u8-Gp
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 04:59:33 -0400
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cqybv-0004uC-Ie
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:00:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cqyaf-0006EX-GN
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 04:59:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59002)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cqyaf-0006EL-6X
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 04:59:29 -0400
-References: <1490092792-30957-1-git-send-email-thuth@redhat.com>
-	<1490092792-30957-2-git-send-email-thuth@redhat.com>
-	<20170323085240.GJ16717@stefanha-x1.localdomain>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d2b1fe30-8b83-82c7-fae5-7a77bff02805@redhat.com>
-Date: Thu, 23 Mar 2017 09:59:18 +0100
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cqybt-00073q-Ks
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:00:47 -0400
+Received: from [59.151.112.132] (port=34027 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cqybt-00070x-9E
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:00:45 -0400
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Date: Thu, 23 Mar 2017 17:09:21 +0800
+Message-ID: <1490260163-6157-2-git-send-email-caoj.fnst@cn.fujitsu.com>
+In-Reply-To: <1490260163-6157-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+References: <1490260163-6157-1-git-send-email-caoj.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <20170323085240.GJ16717@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="XFSXw70SgdCTGL9QoDtJcVaOlbSX6I8lS"
-Subject: Re: [Qemu-devel] [PATCH 1/3] libqtest: Ignore QMP events when
- parsing the response for HMP commands
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3 1/3] pcie aer: verify if AER functionality
+ is available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,68 +26,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: izumi.taku@jp.fujitsu.com, alex.williamson@redhat.com, mst@redhat.com, Dou Liyang <douly.fnst@cn.fujitsu.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XFSXw70SgdCTGL9QoDtJcVaOlbSX6I8lS
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+For devices which support AER function, verify it can work or not in the
+system:
+1. AER capable device is a PCIe device, it can't be plugged into PCI bus
+2. If root port doesn't support AER, then there is no need to expose the
+   AER capability
 
-On 23.03.2017 09:52, Stefan Hajnoczi wrote:
-> On Tue, Mar 21, 2017 at 11:39:50AM +0100, Thomas Huth wrote:
->> When running certain HMP commands (like "device_del") via QMP, we
->> can sometimes get a QMP event in the response first, so that the
->> "g_assert(ret)" statement in qtest_hmp() triggers and the test
->> fails. So ignore such QMP events when looking for the real
->> return value from QMP.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  tests/libqtest.c | 6 ++++++
->>  1 file changed, 6 insertions(+)
->=20
-> qmp.py keeps a queue of events so they can be processed later.  I guess=
+Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+---
+ hw/pci/pcie_aer.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-> an event queue will be needed eventually because discarding events make=
-s
-> it hard to write reliable test cases that check for events.
-
-Yes, but in that case the test likely should not use the hmp() functions
-at all and use qmp directly.
-
-> But as long as current qtests work correctly:
->=20
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
-Thanks!
-
- Thomas
-
-
-
-
---XFSXw70SgdCTGL9QoDtJcVaOlbSX6I8lS
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJY045rAAoJEC7Z13T+cC21kdwP/0Sxw22qWRg0GRobGDh360Q3
-ihUnjKJjjONY3FT5Y4raRbN+hL+XVOZt/yLA5MRVxdO7yrIqepuHIHkq6WpAlZRB
-RDler2nAwAEGHwQc0nXG1VHaX1+kyiylFQ80Q0u71FLxd/nCwTkyy+juSnQIQ1vC
-Rgee4D7y9C5FF5f2/4UFxBSLdjHmjtevY5dLTz2QZ1MRFQi8+x7YT8kEHEDNWn5v
-mUCaCHNjWUexRCVDCwlnABknw2zrJWB7zzlwXCZilXYu5fP0SCiTqb6QrZ+A1IA9
-K+JC5SjiBIjAE/fIaQF+Imppn4ypcyFXBEX3SCZAcvsD7au3eucwDQ4W0QACDKxn
-dUsXF1qd2e7HkuP2mYUdhzuJksU8Flemh6Hb+CoGweI1YHUPgTk6z7G908wj/EcA
-8E9pyff77BHchLKQhKMl6TDUymG5l5P+ETEDc7uUgdlQFz74k13MoKKQZR4g1s9h
-e3Rh5kmOkl87v1u6oSGLW7kUM+X4PPaE6F+K32jF7yIkP/G7ZaK/z9tR7ijL3TLt
-oC0Z7fT/obr/f0czBWVgcF28xEocLcXqrjhw6QhfyMQbb7mFGHOpUIA8FfJ6pfud
-afTK+nPZY95AdEYLcvRAsLZfA0HuZMss27I0/uLQTz2bSwpiZ+bbxMmKm2oDiZKv
-KINTiwU5RKF3Ae2QuUuY
-=9wl1
------END PGP SIGNATURE-----
-
---XFSXw70SgdCTGL9QoDtJcVaOlbSX6I8lS--
+diff --git a/hw/pci/pcie_aer.c b/hw/pci/pcie_aer.c
+index daf1f65..a2e9818 100644
+--- a/hw/pci/pcie_aer.c
++++ b/hw/pci/pcie_aer.c
+@@ -100,6 +100,34 @@ static void aer_log_clear_all_err(PCIEAERLog *aer_log)
+ int pcie_aer_init(PCIDevice *dev, uint8_t cap_ver, uint16_t offset,
+                   uint16_t size, Error **errp)
+ {
++    PCIDevice *parent_dev;
++    uint8_t type;
++    uint8_t parent_type;
++
++    /* Topology test: see if there is need to expose AER cap */
++    type = pcie_cap_get_type(dev);
++    parent_dev = pci_bridge_get_device(dev->bus);
++    while (parent_dev) {
++        parent_type = pcie_cap_get_type(parent_dev);
++
++        if (type == PCI_EXP_TYPE_ENDPOINT &&
++                (parent_type != PCI_EXP_TYPE_ROOT_PORT &&
++                 parent_type != PCI_EXP_TYPE_DOWNSTREAM)) {
++            error_setg(errp, "Parent device is not a PCIe component");
++            return -ENOTSUP;
++        }
++        
++        if (parent_type == PCI_EXP_TYPE_ROOT_PORT) {
++            if (!parent_dev->exp.aer_cap)
++            {
++                error_setg(errp, "Root port does not support AER");
++                return -ENOTSUP;
++            }
++        }
++
++        parent_dev = pci_bridge_get_device(parent_dev->bus);
++    }
++
+     pcie_add_capability(dev, PCI_EXT_CAP_ID_ERR, cap_ver,
+                         offset, size);
+     dev->exp.aer_cap = offset;
+-- 
+1.8.3.1
