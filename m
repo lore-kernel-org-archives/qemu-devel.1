@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33411)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata.rao@gmail.com>) id 1cqvx9-0000mh-UA
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 02:10:32 -0400
+	(envelope-from <peterx@redhat.com>) id 1cqwEm-0003w4-VP
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 02:28:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata.rao@gmail.com>) id 1cqvx9-0005H1-0A
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 02:10:31 -0400
+	(envelope-from <peterx@redhat.com>) id 1cqwEi-0002CQ-3f
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 02:28:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44112)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cqwEh-0002C3-UU
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 02:28:40 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1DAEA7F3EB
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 06:28:39 +0000 (UTC)
+Date: Thu, 23 Mar 2017 14:28:31 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170323062831.GD4224@pxdev.xzpeter.org>
 MIME-Version: 1.0
-In-Reply-To: <1490189568-167621-6-git-send-email-imammedo@redhat.com>
-References: <1490189568-167621-1-git-send-email-imammedo@redhat.com>
-	<1490189568-167621-6-git-send-email-imammedo@redhat.com>
-From: Bharata B Rao <bharata.rao@gmail.com>
-Date: Thu, 23 Mar 2017 11:40:29 +0530
-Message-ID: <CAGZKiBpD=uLyJWFPhxKYfn0-wLL2WYnUm5h4KJhZ_fVHi+1z-w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH for-2.10 05/23] numa: move source of
- default CPUs to NUMA node mapping into boards
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Subject: [Qemu-devel] Wiki page for VT-d
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +30,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-arm@nongnu.org, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: QEMU Devel Mailing List <qemu-devel@nongnu.org>
+Cc: Peter Xu <peterx@redhat.com>
 
-On Wed, Mar 22, 2017 at 7:02 PM, Igor Mammedov <imammedo@redhat.com> wrote:
+Hello everyone,
 
-> diff --git a/numa.c b/numa.c
-> index e01cb54..b6e71bc 100644
-> --- a/numa.c
-> +++ b/numa.c
-> @@ -294,9 +294,10 @@ static void validate_numa_cpus(void)
->      g_free(seen_cpus);
->  }
->
-> -void parse_numa_opts(MachineClass *mc)
-> +void parse_numa_opts(MachineState *ms)
->  {
->      int i;
-> +    MachineClass *mc = MACHINE_GET_CLASS(ms);
->
->      for (i = 0; i < MAX_NODES; i++) {
->          numa_info[i].node_cpu = bitmap_new(max_cpus);
-> @@ -378,14 +379,16 @@ void parse_numa_opts(MachineClass *mc)
->           * rule grouping VCPUs by socket so that VCPUs from the same
-> socket
->           * would be on the same node.
->           */
-> +        if (!mc->cpu_index_to_instance_props) {
-> +            error_report("default CPUs to NUMA node mapping isn't
-> supported");
-> +            exit(1);
-> +        }
->
+Since we still don't have a document-like thing for vIOMMUs on x86 yet
+(for the basic command line interface, usage scenarios, etc.), I just
+opened a VT-d wiki page to note down everything that might be related
+to VT-d emulation in QEMU. It's here:
 
-Just trying to understand the impact of the above enforcement. So targets
-and machine types that don't define ->cpu_index_to_instance_props() are
-expected not to boot ? Shouldn't they have a default to fall back upon ?
+  http://wiki.qemu-project.org/Features/VT-d
 
-Regards,
-Bharata.
+We can have AMD IOMMUs as well in the future, but since currently
+these two devices are not synced-up (most of the work are based on
+Intel vIOMMUs), so I'll first create the VT-d page. We can extend the
+documentation when needed.
+
+Currently it only contains the most basic usages of the emulated VT-d
+device, and some explanations on the recent VT-d vfio enablement
+series (what it does, where it can be used, etc.). Please feel free to
+add more things to it. :-)
+
+Thanks,
+
+-- peterx
