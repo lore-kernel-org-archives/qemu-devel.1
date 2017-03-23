@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45588)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cr6Ey-0005Lf-Ce
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 13:09:37 -0400
+	(envelope-from <bounces@canonical.com>) id 1cr5FX-0001xM-Ny
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 12:06:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cr6Ev-0000ji-8R
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 13:09:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41922)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cr6Eu-0000gQ-V8
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 13:09:33 -0400
-Date: Thu, 23 Mar 2017 19:09:31 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170323190609-mutt-send-email-mst@kernel.org>
-References: <20170302185942.76255-1-pasic@linux.vnet.ibm.com>
-	<20170303132149.34e5906a.cornelia.huck@de.ibm.com>
-	<aa9b9219-f3a6-165c-2d92-156a9295adbb@linux.vnet.ibm.com>
-	<20170303135012.17edb640.cornelia.huck@de.ibm.com>
-	<d00802cc-150a-2263-604d-9c2eaa5c19d1@linux.vnet.ibm.com>
-	<20170306155625.5c426793.cornelia.huck@de.ibm.com>
-	<bf1f8af2-9d76-c148-24c5-7d00312c10d4@linux.vnet.ibm.com>
-	<20170306170441.2a8f8b27.cornelia.huck@de.ibm.com>
+	(envelope-from <bounces@canonical.com>) id 1cr5FS-0000C0-Mk
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 12:06:07 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49728)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cr5FS-0000Bt-Av
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 12:06:02 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cr5FQ-0000GY-50
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 16:06:00 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 23FE62E80CE
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 16:06:00 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170306170441.2a8f8b27.cornelia.huck@de.ibm.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/1] virtio: fail device if
- set_event_notifier fails
+Date: Thu, 23 Mar 2017 15:51:04 -0000
+From: Aaron Doyle <aaron_doyle_48@hotmail.com>
+Reply-To: Bug 1675458 <1675458@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170323155104.30547.10490.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1675458] [NEW] attach-interface - unexpected
+ action
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,96 +36,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Mon, Mar 06, 2017 at 05:04:41PM +0100, Cornelia Huck wrote:
-> On Mon, 6 Mar 2017 16:21:13 +0100
-> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
->=20
-> > On 03/06/2017 03:56 PM, Cornelia Huck wrote:
-> > > On Fri, 3 Mar 2017 14:08:37 +0100
-> > > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> > >=20
-> > >> On 03/03/2017 01:50 PM, Cornelia Huck wrote:
-> > >>> On Fri, 3 Mar 2017 13:43:32 +0100
-> > >>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> > >>>
-> > >>>> On 03/03/2017 01:21 PM, Cornelia Huck wrote:
-> > >>>>> On Thu,  2 Mar 2017 19:59:42 +0100
-> > >>>>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> > [...]
-> > >> I admit, I did not investigate this thoroughly, also because the p=
-atch
-> > >> is flawed regarding multi-thread anyway. After a quick investigati=
-on
-> > >> it seems the linux guest won't auto-reset the device so the guest =
-should
-> > >> end up with a not working device. I think it's pretty likely that =
-the
-> > >> admin will check the logs if the device was important.
-> > >=20
-> > > Thinking a bit more about this, it seems setting the device broken =
-is
-> > > not the right solution for exactly that reason. Setting the virtio
-> > > device broken is a way to signal the guest to 'you did something
-> > > broken; please reset the device and start anew' (and that's how cur=
-rent
-> > > callers use it). In our case, this is not the guest's fault.
-> >=20
-> > Do we have something to just say stuff broken without blaming the gue=
-st?
-> > And device reset might not be that stupid at all in the given situati=
-on,
-> > if we want to save what can be saved from the perspective of the gues=
-t.
-> > (After reset stuff should work again until we hit the race again -- a=
-nd
-> > since turning ioeventfd on/off should not happen that often during no=
-rmal
-> > operation it could help limit damage suffered -- e.g. controlled shut=
-down).
->=20
-> Checking again, the spec says
->=20
-> DEVICE_NEEDS_RESET (64) Indicates that the device has experienced an
-> error from which it can=E2=80=99t recover.
->=20
-> Nothing about 'guest error'.
->=20
-> The only problem is that legacy devices don't have that state, which
-> means they'll have a broken device through no fault of their own.
->=20
-> >=20
-> > >=20
-> > > Maybe go back to the assert 'solution'? But I'm not sure that's eno=
-ugh
-> > > if production builds disable asserts...
-> > >=20
-> >=20
-> > I will wait a bit, maybe other virtio folks are going to have an=20
-> > opinion too.
-> >=20
-> > My concern about the assert solution is that for production it is
-> > either too rigorous (kill off, hopefully with a dump) or not
-> > enough (as you have mentioned, if NDEBUG assert does nothing).
-> >=20
-> >=20
-> > I think there are setups where a loss of device does not have to be
-> > fatal, and I would not like to be the one who makes it fatal (for the
-> > guest).
->=20
-> Basically, it's a host bug (and not a bug specific to a certain
-> device). Moving the device which was impacted to a broken state may be
-> a useful mitigation.
->=20
-> But yes, let's hear some other opinions.
+Public bug reported:
 
-We don't support NDEBUG really so I think an assert is fine for now.
-Handling unexpected errors more gracefully is laudable but I think we
-want a more systematic approach than just open-coding it in
-this specific place.
+Hello,
+
+Not sure where to report this, or if it is a bug. However, I feel like
+the behaviour is not what would/should be expected.
+
+---------------------------------------------------------------------------=
+-------------------------------
+
+Environment:
+KVM Version:		root@hostname:~# virsh version
+      			Compiled against library: libvirt 1.2.9
+			Using library: libvirt 1.2.9
+			Using API: QEMU 1.2.9
+			Running hypervisor: QEMU 2.1.2
+uname -a:		Linux hostname 3.16.0-4-amd64 #1 SMP Debian 3.16.39-1+deb8u2 (20=
+17-03-07) x86_64 GNU/Linux
+CPU:			Intel(R) Xeon(R) CPU E3-1240 V2 @ 3.40GHz
+Host Debian Version:	8.7 (Jessie)
+Guest Debian Version:	8.7 (Jessie)
+
+---------------------------------------------------------------------------=
+-------------------------------
+
+Issue:
+When adding an interface to a live VM, the position of interfaces within th=
+e VM may change post reboot.
+It appears a new interface takes up the first available =E2=80=9Cpci slot=
+=E2=80=9D. If you have removed an interface in the past, this will be the o=
+ne that is taken up.
+
+---------------------------------------------------------------------------=
+-------------------------------
+
+Example:
+
+If the VM Has the following interfaces layout:
+
+eth0  HWaddr 00:00:00:00:00:00
+eth1  HWaddr 11:11:11:11:11:11
+eth2  HWaddr 22:22:22:22:22:22
+eth3  HWaddr 33:33:33:33:33:33
+
+Now I delete the interface with MAC address 11:11:11:11:11:11, you now
+have this:
+
+eth0  HWaddr 00:00:00:00:00:00
+eth1  HWaddr 22:22:22:22:22:22
+eth2  HWaddr 33:33:33:33:33:33
+
+And then you add a new interface with MAC address 44:44:44:44:44:44,
+using virsh:
+
+virsh attach-interface --domain guest --type bridge --source br3 --mac
+44:44:44:44:44:44 --model e1000 --target vmeth3 --live --persistent
+
+It will now look like this:
+
+eth0  HWaddr 00:00:00:00:00:00
+eth1  HWaddr 22:22:22:22:22:22
+eth2  HWaddr 33:33:33:33:33:33
+eth3  HWaddr 44:44:44:44:44:44
+
+However, after a reboot, it will look like this:
+
+eth0  HWaddr 00:00:00:00:00:00
+eth1  HWaddr 44:44:44:44:44:44
+eth2  HWaddr 22:22:22:22:22:22
+eth3  HWaddr 33:33:33:33:33:33 =
 
 
---=20
-MST
+This can be a problem, as /etc/network/interfaces file, etc., will be
+pointing to the wrong interfaces. I.E. originally eth1 was connected to
+br1 (for example), after reboot eth1 is now connected to br3.
+
+To resolve this issue, I need to edit the .xml file in the KVM machine,
+and edit the following lines:
+
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x0c'
+function=3D'0x0'/>
+
+Changing these into the order I want them to be loaded in, i.e. eth0,
+eth1, eth2=E2=80=A6. (I know 4 are taken already and not usable by ethernet
+interfaces.)
+
+---------------------------------------------------------------------------=
+-------------------------------
+
+
+Thanks in advance.
+
+Kind regards,
+
+Aaron Doyle
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1675458
+
+Title:
+  attach-interface - unexpected action
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello,
+
+  Not sure where to report this, or if it is a bug. However, I feel like
+  the behaviour is not what would/should be expected.
+
+  -------------------------------------------------------------------------=
+---------------------------------
+
+  Environment:
+  KVM Version:		root@hostname:~# virsh version
+        			Compiled against library: libvirt 1.2.9
+  			Using library: libvirt 1.2.9
+  			Using API: QEMU 1.2.9
+  			Running hypervisor: QEMU 2.1.2
+  uname -a:		Linux hostname 3.16.0-4-amd64 #1 SMP Debian 3.16.39-1+deb8u2 (=
+2017-03-07) x86_64 GNU/Linux
+  CPU:			Intel(R) Xeon(R) CPU E3-1240 V2 @ 3.40GHz
+  Host Debian Version:	8.7 (Jessie)
+  Guest Debian Version:	8.7 (Jessie)
+
+  -------------------------------------------------------------------------=
+---------------------------------
+
+  Issue:
+  When adding an interface to a live VM, the position of interfaces within =
+the VM may change post reboot.
+  It appears a new interface takes up the first available =E2=80=9Cpci slot=
+=E2=80=9D. If you have removed an interface in the past, this will be the o=
+ne that is taken up.
+
+  -------------------------------------------------------------------------=
+---------------------------------
+
+  Example:
+
+  If the VM Has the following interfaces layout:
+
+  eth0  HWaddr 00:00:00:00:00:00
+  eth1  HWaddr 11:11:11:11:11:11
+  eth2  HWaddr 22:22:22:22:22:22
+  eth3  HWaddr 33:33:33:33:33:33
+
+  Now I delete the interface with MAC address 11:11:11:11:11:11, you now
+  have this:
+
+  eth0  HWaddr 00:00:00:00:00:00
+  eth1  HWaddr 22:22:22:22:22:22
+  eth2  HWaddr 33:33:33:33:33:33
+
+  And then you add a new interface with MAC address 44:44:44:44:44:44,
+  using virsh:
+
+  virsh attach-interface --domain guest --type bridge --source br3 --mac
+  44:44:44:44:44:44 --model e1000 --target vmeth3 --live --persistent
+
+  It will now look like this:
+
+  eth0  HWaddr 00:00:00:00:00:00
+  eth1  HWaddr 22:22:22:22:22:22
+  eth2  HWaddr 33:33:33:33:33:33
+  eth3  HWaddr 44:44:44:44:44:44
+
+  However, after a reboot, it will look like this:
+
+  eth0  HWaddr 00:00:00:00:00:00
+  eth1  HWaddr 44:44:44:44:44:44
+  eth2  HWaddr 22:22:22:22:22:22
+  eth3  HWaddr 33:33:33:33:33:33 =
+
+
+  This can be a problem, as /etc/network/interfaces file, etc., will be
+  pointing to the wrong interfaces. I.E. originally eth1 was connected
+  to br1 (for example), after reboot eth1 is now connected to br3.
+
+  To resolve this issue, I need to edit the .xml file in the KVM
+  machine, and edit the following lines:
+
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x0c'
+  function=3D'0x0'/>
+
+  Changing these into the order I want them to be loaded in, i.e. eth0,
+  eth1, eth2=E2=80=A6. (I know 4 are taken already and not usable by ethern=
+et
+  interfaces.)
+
+  -------------------------------------------------------------------------=
+---------------------------------
+
+  =
+
+  Thanks in advance.
+
+  Kind regards,
+
+  Aaron Doyle
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1675458/+subscriptions
