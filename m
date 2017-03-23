@@ -1,27 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cr6i8-0005Vt-T0
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 13:39:46 -0400
+	(envelope-from <bobby.prani@gmail.com>) id 1cr6m9-0000lu-RU
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 13:43:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cr6i8-0002U0-47
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 13:39:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33508)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cr6i7-0002Th-UH
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 13:39:44 -0400
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EB5D77AEA1
-	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 17:39:43 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 23 Mar 2017 18:39:28 +0100
-Message-Id: <20170323173928.14439-11-pbonzini@redhat.com>
-In-Reply-To: <20170323173928.14439-1-pbonzini@redhat.com>
-References: <20170323173928.14439-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 10/10] blockjob: use deferred_to_main_loop to
- indicate the coroutine has ended
+	(envelope-from <bobby.prani@gmail.com>) id 1cr6m8-0004XX-Uw
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 13:43:53 -0400
+Received: from mail-yw0-x243.google.com ([2607:f8b0:4002:c05::243]:35096)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1cr6m8-0004XN-RT
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 13:43:52 -0400
+Received: by mail-yw0-x243.google.com with SMTP id h11so24380832ywa.2
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 10:43:52 -0700 (PDT)
+MIME-Version: 1.0
+Sender: bobby.prani@gmail.com
+In-Reply-To: <575fee6e-489d-54a8-dfbc-1f42172d5713@redhat.com>
+References: <CAG48ez1tcz7GGsc5+L3EF140NsW=UyNir=0UpuZZYrBn4ZxrSA@mail.gmail.com>
+	<CAFEAcA8-GJxpmppZGF5ygSAL4Y81BdvYKqso-XhjR2pbjMLi+A@mail.gmail.com>
+	<CAJhHMCA=rwLqLOPq3kMOz9SpV83yrzkK_K6RfPmuyXMU1pXT7g@mail.gmail.com>
+	<CAFEAcA9ZtayLn-bOPL4=2=w0SS_H0-EYO0UpFzXJSvyueGOHMw@mail.gmail.com>
+	<CAJhHMCAjG1kfG8-3E8CcWu4V2cWMsR0La6iZ3hq0rbM91+brsA@mail.gmail.com>
+	<CAFEAcA-x8CbqVpnaszmdZzLZt6+urxSntdWxLHeFXAOy327OqA@mail.gmail.com>
+	<CAJhHMCDfmT_zrnuEBcmoJ+CJV9j8CB79ybehWoMBeh3rd+hA3Q@mail.gmail.com>
+	<9f45e912-5fc8-bb99-506e-221f2cb6ac7e@twiddle.net>
+	<df57bde4-a33c-54b0-3f5a-3d0e28cdbca7@redhat.com>
+	<CAJhHMCDke60mQgOza1xgTs9sSTcE0HESG7G=f3bQ5sP+0Baz0A@mail.gmail.com>
+	<575fee6e-489d-54a8-dfbc-1f42172d5713@redhat.com>
+From: Pranith Kumar <bobby.prani+qemu@gmail.com>
+Date: Thu, 23 Mar 2017 13:43:21 -0400
+Message-ID: <CAJhHMCAdxeQNJmkncB9+en1NSXgYUV8-wtsKEU1-FKo9TRUkdg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [BUG] user-to-root privesc inside VM via bad
+ translation caching
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +40,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jcody@redhat.com, jsnow@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Qemu Developers <qemu-devel@nongnu.org>, Jann Horn <jannh@google.com>
 
-All block jobs are using block_job_defer_to_main_loop as the final
-step just before the coroutine terminates.  At this point,
-block_job_enter should do nothing, but currently it restarts
-the freed coroutine.
+On Thu, Mar 23, 2017 at 1:37 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+>
+> On 23/03/2017 17:50, Pranith Kumar wrote:
+>> On Thu, Mar 23, 2017 at 6:27 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>>
+>>>
+>>> On 22/03/2017 21:01, Richard Henderson wrote:
+>>>>>
+>>>>> Ah, OK. Thanks for the explanation. May be we should check the size of
+>>>>> the instruction while decoding the prefixes and error out once we
+>>>>> exceed the limit. We would not generate any IR code.
+>>>>
+>>>> Yes.
+>>>>
+>>>> It would not enforce a true limit of 15 bytes, since you can't know that
+>>>> until you've done the rest of the decode.  But you'd be able to say that
+>>>> no more than 14 prefix + 1 opc + 6 modrm+sib+ofs + 4 immediate = 25
+>>>> bytes is used.
+>>>>
+>>>> Which does fix the bug.
+>>>
+>>> Yeah, that would work for 2.9 if somebody wants to put together a patch.
+>>>  Ensuring that all instruction fetching happens before translation side
+>>> effects is a little harder, but perhaps it's also the opportunity to get
+>>> rid of s->rip_offset which is a little ugly.
+>>
+>> How about the following?
+>>
+>> diff --git a/target/i386/translate.c b/target/i386/translate.c
+>> index 72c1b03a2a..67c58b8900 100644
+>> --- a/target/i386/translate.c
+>> +++ b/target/i386/translate.c
+>> @@ -4418,6 +4418,11 @@ static target_ulong disas_insn(CPUX86State
+>> *env, DisasContext *s,
+>>      s->vex_l = 0;
+>>      s->vex_v = 0;
+>>   next_byte:
+>> +    /* The prefixes can atmost be 14 bytes since x86 has an upper
+>> +       limit of 15 bytes for the instruction */
+>> +    if (s->pc - pc_start > 14) {
+>> +        goto illegal_op;
+>> +    }
+>>      b = cpu_ldub_code(env, s->pc);
+>>      s->pc++;
+>>      /* Collect prefixes.  */
+>
+> Please make the comment more verbose, based on Richard's remark.  We
+> should apply it to 2.9.
+>
+> Also, QEMU usually formats comments with stars on every line.
 
-Now, the job->co states should probably be changed to an enum
-(e.g. BEFORE_START, STARTED, YIELDED, COMPLETED) subsuming
-block_job_started, job->deferred_to_main_loop and job->busy.
-For now, this patch eliminates the problematic reenter by
-removing the reset of job->deferred_to_main_loop (which served
-no purpose, as far as I could see) and checking the flag in
-block_job_enter.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- blockjob.c                   | 10 ++++++++--
- include/block/blockjob_int.h |  3 ++-
- 2 files changed, 10 insertions(+), 3 deletions(-)
+OK. I'll send a proper patch with updated comment.
 
-diff --git a/blockjob.c b/blockjob.c
-index 3fa2885..2d80dae 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -750,7 +750,14 @@ void block_job_resume_all(void)
- 
- void block_job_enter(BlockJob *job)
- {
--    if (job->co && !job->busy) {
-+    if (!block_job_started(job)) {
-+        return;
-+    }
-+    if (job->deferred_to_main_loop) {
-+        return;
-+    }
-+
-+    if (!job->busy) {
-         qemu_coroutine_enter(job->co);
-     }
- }
-@@ -874,7 +881,6 @@ static void block_job_defer_to_main_loop_bh(void *opaque)
-         aio_context_acquire(aio_context);
-     }
- 
--    data->job->deferred_to_main_loop = false;
-     data->fn(data->job, data->opaque);
- 
-     if (aio_context != data->aio_context) {
-diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index 97ffc43..4d287ba 100644
---- a/include/block/blockjob_int.h
-+++ b/include/block/blockjob_int.h
-@@ -227,7 +227,8 @@ typedef void BlockJobDeferToMainLoopFn(BlockJob *job, void *opaque);
-  * @fn: The function to run in the main loop
-  * @opaque: The opaque value that is passed to @fn
-  *
-- * Execute a given function in the main loop with the BlockDriverState
-+ * This function must be called by the main job coroutine just before it
-+ * returns.  @fn is executed in the main loop with the BlockDriverState
-  * AioContext acquired.  Block jobs must call bdrv_unref(), bdrv_close(), and
-  * anything that uses bdrv_drain_all() in the main loop.
-  *
--- 
-2.9.3
+Thanks,
+--
+Pranith
