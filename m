@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46021)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cr9dH-000058-Hq
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:46:57 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cr9dG-0000iD-4T
+	(envelope-from <quintela@redhat.com>) id 1cr9dG-0008UB-7l
 	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:46:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37074)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cr9dF-0000i7-Rw
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <quintela@redhat.com>) id 1cr9dD-0000gW-53
 	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:46:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40020)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cr9dC-0000gI-T6
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:46:51 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D159861E7C
-	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 20:46:53 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E0A2D80F9D
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 20:46:50 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu, 23 Mar 2017 21:45:38 +0100
-Message-Id: <20170323204544.12015-46-quintela@redhat.com>
+Date: Thu, 23 Mar 2017 21:45:36 +0100
+Message-Id: <20170323204544.12015-44-quintela@redhat.com>
 In-Reply-To: <20170323204544.12015-1-quintela@redhat.com>
 References: <20170323204544.12015-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 45/51] ram: Use page number instead of an
- address for the bitmap operations
+Subject: [Qemu-devel] [PATCH 43/51] ram: ram_discard_range() don't use the
+ mis parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,230 +33,111 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com
 
-We use an unsigned long for the page number.  Notice that our bitmaps
-already got that for the index, so we have that limit.
-
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/ram.c | 76 ++++++++++++++++++++++++++-------------------------------
- 1 file changed, 34 insertions(+), 42 deletions(-)
+ include/migration/migration.h | 3 +--
+ migration/postcopy-ram.c      | 6 ++----
+ migration/ram.c               | 9 +++------
+ migration/savevm.c            | 3 +--
+ 4 files changed, 7 insertions(+), 14 deletions(-)
 
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index 90849a5..39a8e7e 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -270,8 +270,7 @@ void ram_debug_dump_bitmap(unsigned long *todump, bool expected);
+ /* For outgoing discard bitmap */
+ int ram_postcopy_send_discard_bitmap(MigrationState *ms);
+ /* For incoming postcopy discard */
+-int ram_discard_range(MigrationIncomingState *mis, const char *block_name,
+-                      uint64_t start, size_t length);
++int ram_discard_range(const char *block_name, uint64_t start, size_t length);
+ int ram_postcopy_incoming_init(MigrationIncomingState *mis);
+ void ram_postcopy_migrated_memory_release(MigrationState *ms);
+ 
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index 8756364..85fd8d7 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -213,8 +213,6 @@ out:
+ static int init_range(const char *block_name, void *host_addr,
+                       ram_addr_t offset, ram_addr_t length, void *opaque)
+ {
+-    MigrationIncomingState *mis = opaque;
+-
+     trace_postcopy_init_range(block_name, host_addr, offset, length);
+ 
+     /*
+@@ -223,7 +221,7 @@ static int init_range(const char *block_name, void *host_addr,
+      * - we're going to get the copy from the source anyway.
+      * (Precopy will just overwrite this data, so doesn't need the discard)
+      */
+-    if (ram_discard_range(mis, block_name, 0, length)) {
++    if (ram_discard_range(block_name, 0, length)) {
+         return -1;
+     }
+ 
+@@ -271,7 +269,7 @@ static int cleanup_range(const char *block_name, void *host_addr,
+  */
+ int postcopy_ram_incoming_init(MigrationIncomingState *mis, size_t ram_pages)
+ {
+-    if (qemu_ram_foreach_block(init_range, mis)) {
++    if (qemu_ram_foreach_block(init_range, NULL)) {
+         return -1;
+     }
+ 
 diff --git a/migration/ram.c b/migration/ram.c
-index 6cd77b5..b1a031e 100644
+index 9772fd8..83c749c 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -611,13 +611,12 @@ static int save_xbzrle_page(RAMState *rs, uint8_t **current_data,
-  * @rs: current RAM state
-  * @rb: RAMBlock where to search for dirty pages
-  * @start: starting address (typically so we can continue from previous page)
-- * @ram_addr_abs: pointer into which to store the address of the dirty page
-- *                within the global ram_addr space
-+ * @page: pointer into where to store the dirty page
-  */
- static inline
- ram_addr_t migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
-                                        ram_addr_t start,
--                                       ram_addr_t *ram_addr_abs)
-+                                       unsigned long *page)
- {
-     unsigned long base = rb->offset >> TARGET_PAGE_BITS;
-     unsigned long nr = base + (start >> TARGET_PAGE_BITS);
-@@ -634,17 +633,17 @@ ram_addr_t migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
-         next = find_next_bit(bitmap, size, nr);
+@@ -784,7 +784,7 @@ static void ram_release_pages(const char *rbname, uint64_t offset, int pages)
+         return;
      }
  
--    *ram_addr_abs = next << TARGET_PAGE_BITS;
-+    *page = next;
-     return (next - base) << TARGET_PAGE_BITS;
+-    ram_discard_range(NULL, rbname, offset, pages << TARGET_PAGE_BITS);
++    ram_discard_range(rbname, offset, pages << TARGET_PAGE_BITS);
  }
  
--static inline bool migration_bitmap_clear_dirty(RAMState *rs, ram_addr_t addr)
-+static inline bool migration_bitmap_clear_dirty(RAMState *rs,
-+                                                unsigned long page)
- {
-     bool ret;
--    int nr = addr >> TARGET_PAGE_BITS;
-     unsigned long *bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
+ /**
+@@ -1602,7 +1602,7 @@ void ram_postcopy_migrated_memory_release(MigrationState *ms)
  
--    ret = test_and_clear_bit(nr, bitmap);
-+    ret = test_and_clear_bit(page, bitmap);
- 
-     if (ret) {
-         rs->migration_dirty_pages--;
-@@ -1056,14 +1055,13 @@ static int ram_save_compressed_page(RAMState *rs, PageSearchStatus *pss,
-  * @rs: current RAM state
-  * @pss: data about the state of the current dirty page scan
-  * @again: set to false if the search has scanned the whole of RAM
-- * @ram_addr_abs: pointer into which to store the address of the dirty page
-- *                within the global ram_addr space
-+ * @page: pointer into where to store the dirty page
-  */
- static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss,
--                             bool *again, ram_addr_t *ram_addr_abs)
-+                             bool *again, unsigned long *page)
- {
-     pss->offset = migration_bitmap_find_dirty(rs, pss->block, pss->offset,
--                                              ram_addr_abs);
-+                                              page);
-     if (pss->complete_round && pss->block == rs->last_seen_block &&
-         pss->offset >= rs->last_offset) {
-         /*
-@@ -1111,11 +1109,10 @@ static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss,
+         while (run_start < range) {
+             unsigned long run_end = find_next_bit(bitmap, range, run_start + 1);
+-            ram_discard_range(NULL, block->idstr, run_start << TARGET_PAGE_BITS,
++            ram_discard_range(block->idstr, run_start << TARGET_PAGE_BITS,
+                               (run_end - run_start) << TARGET_PAGE_BITS);
+             run_start = find_next_zero_bit(bitmap, range, run_end + 1);
+         }
+@@ -1942,15 +1942,12 @@ int ram_postcopy_send_discard_bitmap(MigrationState *ms)
   *
-  * @rs: current RAM state
-  * @offset: used to return the offset within the RAMBlock
-- * @ram_addr_abs: pointer into which to store the address of the dirty page
-- *                within the global ram_addr space
-+ * @page: pointer into where to store the dirty page
-  */
- static RAMBlock *unqueue_page(RAMState *rs, ram_addr_t *offset,
--                              ram_addr_t *ram_addr_abs)
-+                              unsigned long *page)
- {
-     RAMBlock *block = NULL;
- 
-@@ -1125,8 +1122,7 @@ static RAMBlock *unqueue_page(RAMState *rs, ram_addr_t *offset,
-                                 QSIMPLEQ_FIRST(&rs->src_page_requests);
-         block = entry->rb;
-         *offset = entry->offset;
--        *ram_addr_abs = (entry->offset + entry->rb->offset) &
--                        TARGET_PAGE_MASK;
-+        *page = (entry->offset + entry->rb->offset) >> TARGET_PAGE_BITS;
- 
-         if (entry->len > TARGET_PAGE_SIZE) {
-             entry->len -= TARGET_PAGE_SIZE;
-@@ -1151,18 +1147,17 @@ static RAMBlock *unqueue_page(RAMState *rs, ram_addr_t *offset,
+  * Returns zero on success
   *
-  * @rs: current RAM state
-  * @pss: data about the state of the current dirty page scan
-- * @ram_addr_abs: pointer into which to store the address of the dirty page
-- *                within the global ram_addr space
-+ * @page: pointer into where to store the dirty page
+- * @mis: current migration incoming state
+  * @rbname: name of the RAMBLock of the request. NULL means the
+  *          same that last one.
+  * @start: RAMBlock starting page
+  * @length: RAMBlock size
   */
- static bool get_queued_page(RAMState *rs, PageSearchStatus *pss,
--                            ram_addr_t *ram_addr_abs)
-+                            unsigned long *page)
+-int ram_discard_range(MigrationIncomingState *mis,
+-                      const char *rbname,
+-                      uint64_t start, size_t length)
++int ram_discard_range(const char *rbname, uint64_t start, size_t length)
  {
-     RAMBlock  *block;
-     ram_addr_t offset;
-     bool dirty;
+     int ret = -1;
  
-     do {
--        block = unqueue_page(rs, &offset, ram_addr_abs);
-+        block = unqueue_page(rs, &offset, page);
-         /*
-          * We're sending this page, and since it's postcopy nothing else
-          * will dirty it, and we must make sure it doesn't get sent again
-@@ -1172,17 +1167,15 @@ static bool get_queued_page(RAMState *rs, PageSearchStatus *pss,
-         if (block) {
-             unsigned long *bitmap;
-             bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
--            dirty = test_bit(*ram_addr_abs >> TARGET_PAGE_BITS, bitmap);
-+            dirty = test_bit(*page, bitmap);
-             if (!dirty) {
--                trace_get_queued_page_not_dirty(
--                    block->idstr, (uint64_t)offset,
--                    (uint64_t)*ram_addr_abs,
--                    test_bit(*ram_addr_abs >> TARGET_PAGE_BITS,
--                         atomic_rcu_read(&rs->ram_bitmap)->unsentmap));
-+                trace_get_queued_page_not_dirty(block->idstr, (uint64_t)offset,
-+                    *page,
-+                    test_bit(*page,
-+                             atomic_rcu_read(&rs->ram_bitmap)->unsentmap));
-             } else {
--                trace_get_queued_page(block->idstr,
--                                      (uint64_t)offset,
--                                      (uint64_t)*ram_addr_abs);
-+                trace_get_queued_page(block->idstr, (uint64_t)offset,
-+                                     *page);
-             }
+diff --git a/migration/savevm.c b/migration/savevm.c
+index bbf055d..7cf387f 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1479,8 +1479,7 @@ static int loadvm_postcopy_ram_handle_discard(MigrationIncomingState *mis,
+         block_length = qemu_get_be64(mis->from_src_file);
+ 
+         len -= 16;
+-        int ret = ram_discard_range(mis, ramid, start_addr,
+-                                    block_length);
++        int ret = ram_discard_range(ramid, start_addr, block_length);
+         if (ret) {
+             return ret;
          }
- 
-@@ -1308,15 +1301,15 @@ err:
-  * @ms: current migration state
-  * @pss: data about the page we want to send
-  * @last_stage: if we are at the completion stage
-- * @dirty_ram_abs: address of the start of the dirty page in ram_addr_t space
-+ * @page: page number of the dirty page
-  */
- static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
--                                bool last_stage, ram_addr_t dirty_ram_abs)
-+                                bool last_stage, unsigned long page)
- {
-     int res = 0;
- 
-     /* Check the pages is dirty and if it is send it */
--    if (migration_bitmap_clear_dirty(rs, dirty_ram_abs)) {
-+    if (migration_bitmap_clear_dirty(rs, page)) {
-         unsigned long *unsentmap;
-         if (!rs->preffer_xbzrle && migrate_use_compression()) {
-             res = ram_save_compressed_page(rs, pss, last_stage);
-@@ -1329,7 +1322,7 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
-         }
-         unsentmap = atomic_rcu_read(&rs->ram_bitmap)->unsentmap;
-         if (unsentmap) {
--            clear_bit(dirty_ram_abs >> TARGET_PAGE_BITS, unsentmap);
-+            clear_bit(page, unsentmap);
-         }
-     }
- 
-@@ -1351,24 +1344,24 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
-  * @ms: current migration state
-  * @pss: data about the page we want to send
-  * @last_stage: if we are at the completion stage
-- * @dirty_ram_abs: Address of the start of the dirty page in ram_addr_t space
-+ * @page: Page number of the dirty page
-  */
- static int ram_save_host_page(RAMState *rs, PageSearchStatus *pss,
-                               bool last_stage,
--                              ram_addr_t dirty_ram_abs)
-+                              unsigned long page)
- {
-     int tmppages, pages = 0;
-     size_t pagesize = qemu_ram_pagesize(pss->block);
- 
-     do {
--        tmppages = ram_save_target_page(rs, pss, last_stage, dirty_ram_abs);
-+        tmppages = ram_save_target_page(rs, pss, last_stage, page);
-         if (tmppages < 0) {
-             return tmppages;
-         }
- 
-         pages += tmppages;
-         pss->offset += TARGET_PAGE_SIZE;
--        dirty_ram_abs += TARGET_PAGE_SIZE;
-+        page++;
-     } while (pss->offset & (pagesize - 1));
- 
-     /* The offset we leave with is the last one we looked at */
-@@ -1395,8 +1388,7 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
-     PageSearchStatus pss;
-     int pages = 0;
-     bool again, found;
--    ram_addr_t dirty_ram_abs; /* Address of the start of the dirty page in
--                                 ram_addr_t space */
-+    unsigned long page; /* Page number of the dirty page */
- 
-     /* No dirty page as there is zero RAM */
-     if (!ram_bytes_total()) {
-@@ -1413,15 +1405,15 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
- 
-     do {
-         again = true;
--        found = get_queued_page(rs, &pss, &dirty_ram_abs);
-+        found = get_queued_page(rs, &pss, &page);
- 
-         if (!found) {
-             /* priority queue empty, so just search for something dirty */
--            found = find_dirty_block(rs, &pss, &again, &dirty_ram_abs);
-+            found = find_dirty_block(rs, &pss, &again, &page);
-         }
- 
-         if (found) {
--            pages = ram_save_host_page(rs, &pss, last_stage, dirty_ram_abs);
-+            pages = ram_save_host_page(rs, &pss, last_stage, page);
-         }
-     } while (!pages && again);
- 
 -- 
 2.9.3
