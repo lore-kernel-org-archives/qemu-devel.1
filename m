@@ -1,31 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=252db12a3=Paul.Durrant@citrix.com>)
-	id 1csQwq-0000YV-HJ
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 05:28:25 -0400
+	(envelope-from <vfeenstr@redhat.com>) id 1csR9O-0003Vq-66
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 05:41:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=252db12a3=Paul.Durrant@citrix.com>)
-	id 1csQwn-00016i-8y
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 05:28:24 -0400
-Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:62974
-	helo=SMTP.EU.CITRIX.COM)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=252db12a3=Paul.Durrant@citrix.com>)
-	id 1csQwn-00016W-0j
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 05:28:21 -0400
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Mon, 27 Mar 2017 09:28:18 +0000
-Message-ID: <24e4427dea5d4991bf8e64227886cb86@AMSPEX02CL03.citrite.net>
-References: <20170327074245.3821-1-jgross@suse.com>
-	<1330e0a0d9814073b39b52bd6e08a6a8@AMSPEX02CL03.citrite.net>
-	<552de1bb-46bf-1579-d8b2-763d4612eb44@suse.com>
-In-Reply-To: <552de1bb-46bf-1579-d8b2-763d4612eb44@suse.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2] configure: use pkg-config for obtaining
- xen version
+	(envelope-from <vfeenstr@redhat.com>) id 1csR9J-0004mA-7C
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 05:41:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47236)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vfeenstr@redhat.com>) id 1csR9J-0004lZ-1n
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 05:41:17 -0400
+From: Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>
+Date: Thu, 23 Mar 2017 19:51:07 +0100
+Message-Id: <20170323185107.2261-1-vfeenstr@redhat.com>
+Subject: [Qemu-devel] [PATCH v1] qga: Add 'guest-get-fqdn' command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,82 +21,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Juergen Gross' <jgross@suse.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>, "kraxel@redhat.com" <kraxel@redhat.com>, "sstabellini@kernel.org" <sstabellini@kernel.org>
+To: qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, Vinzenz Feenstra <vfeenstr@redhat.com>
 
-> -----Original Message-----
-> From: Juergen Gross [mailto:jgross@suse.com]
-> Sent: 27 March 2017 10:15
-> To: Paul Durrant <Paul.Durrant@citrix.com>; qemu-devel@nongnu.org; xen-
-> devel@lists.xenproject.org
-> Cc: Anthony Perard <anthony.perard@citrix.com>; kraxel@redhat.com;
-> sstabellini@kernel.org
-> Subject: Re: [PATCH v2] configure: use pkg-config for obtaining xen versi=
-on
->=20
-> On 27/03/17 11:07, Paul Durrant wrote:
-> >> -----Original Message-----
-> >> From: Juergen Gross [mailto:jgross@suse.com]
-> >> Sent: 27 March 2017 08:43
-> >> To: qemu-devel@nongnu.org; xen-devel@lists.xenproject.org
-> >> Cc: Anthony Perard <anthony.perard@citrix.com>; kraxel@redhat.com;
-> >> sstabellini@kernel.org; Paul Durrant <Paul.Durrant@citrix.com>; Juerge=
-n
-> >> Gross <jgross@suse.com>
-> >> Subject: [PATCH v2] configure: use pkg-config for obtaining xen versio=
-n
-> >>
-> >> Instead of trying to guess the Xen version to use by compiling various
-> >> test programs first just ask the system via pkg-config. Only if it
-> >> can't return the version fall back to the test program scheme.
-> >>
-> >> If configure is being called with dedicated flags for the Xen librarie=
-s
-> >> use those instead of the pkg-config output. This will avoid breaking
-> >> an in-tree Xen build of an old Xen version while a new Xen version is
-> >> installed on the build machine: pkg-config would pick up the installed
-> >> Xen config files as the Xen tree wouldn't contain any of them.
-> >>
-> >> Signed-off-by: Juergen Gross <jgross@suse.com>
-> >> ---
-> >> V2: - use pkg-config only if no Xen library paths have been specified =
-via
-> >>       --extra-ldflags
-> >>     - keep test program for detecting Xen 4.9
-> >
-> > This all looks plausible but it doesn't seem to be working for me when
-> trying to build 4.8. I'm still getting a xen ctrl version of 40900... sti=
-ll trying to
-> figure out why.
->=20
-> I suppose you reverted my previous patch?
->=20
+From: Vinzenz Feenstra <vfeenstr@redhat.com>
 
-Yes, I reverted that then applied this one.
+Retrieving the guest OS fully qualified domain name (FQDN) is a very
+useful feature for virtual management systems. This information can help
+to have more user friendly VM access details, instead of an IP there
+would be the FQDN. Also the FQDN reported can be used to have automated
+checks for valid SSL certificates.
 
-> Do you happen to have some stale 4.9 libraries in your Xen tree?
->
+virsh # qemu-agent-command F25 '{ "execute": "guest-get-fqdn" }'
+{"return":{"fqdn":"F25.lab.evilissimo.net"}}
 
-Yes, it was picking up a libxendevicemodel when it should not have been. It=
- would be handy if the probe compilations used --nostdlib, but that's not r=
-egression introduced by your patch. Now that pkg-config is used for out-of-=
-tree builds I guess it may be possible to add that though.
-=20
-> What happens without this patch?
->=20
-> > Also, the whitespace changes later on in the patch should probably be s=
-plit
-> out.
->=20
-> Hmm, those are just due to the nesting level of the if's changed.
-> I don't think they can easily be split out without having a
-> malformed indentation.
->=20
+Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+---
+ qga/commands.c       | 11 +++++++++++
+ qga/qapi-schema.json | 25 +++++++++++++++++++++++++
+ 2 files changed, 36 insertions(+)
 
-Ok, I see that now I look at the code rather than just the patch. So, havin=
-g fixed my linkage issue...
-
-Tested-by: Paul Durrant <paul.durrant@citrix.com>
-
->=20
-> Juergen
+diff --git a/qga/commands.c b/qga/commands.c
+index 4d92946..61577af 100644
+--- a/qga/commands.c
++++ b/qga/commands.c
+@@ -499,3 +499,14 @@ int ga_parse_whence(GuestFileWhence *whence, Error **errp)
+     error_setg(errp, "invalid whence code %"PRId64, whence->u.value);
+     return -1;
+ }
++
++GuestFQDN *qmp_guest_get_fqdn(Error **err)
++{
++    GuestFQDN *result = NULL;
++    gchar const *hostname = g_get_host_name();
++    if (hostname != NULL) {
++        result = g_new0(GuestFQDN, 1);
++        result->fqdn = g_strdup(hostname);
++    }
++    return result;
++}
+diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+index a02dbf2..0a2c0a4 100644
+--- a/qga/qapi-schema.json
++++ b/qga/qapi-schema.json
+@@ -1042,3 +1042,28 @@
+   'data':    { 'path': 'str', '*arg': ['str'], '*env': ['str'],
+                '*input-data': 'str', '*capture-output': 'bool' },
+   'returns': 'GuestExec' }
++
++
++
++##
++# @GuestFQDN:
++# @fqdn: Fully qualified domain name of the guest OS
++#
++# Since: 2.10
++##
++{ 'struct': 'GuestFQDN',
++  'data':   { 'fqdn': 'str' } }
++
++
++##
++# @guest-get-fqdn:
++#
++# Request the FQDN (Fully Qualified Domain Name) of the guest operating system
++#
++# Returns: FQDN on success
++#
++# Since: 2.10
++##
++{ 'command': 'guest-get-fqdn',
++  'returns': 'GuestFQDN' }
++
+-- 
+2.9.3
