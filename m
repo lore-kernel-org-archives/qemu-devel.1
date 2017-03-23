@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cr70j-0008WR-0l
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 13:58:58 -0400
+	(envelope-from <kwolf@redhat.com>) id 1cr72n-0000uU-HJ
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 14:01:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cr70f-0001r4-To
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 13:58:57 -0400
-Received: from mail-yw0-x242.google.com ([2607:f8b0:4002:c05::242]:34846)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1cr70f-0001qn-PO
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 13:58:53 -0400
-Received: by mail-yw0-x242.google.com with SMTP id h11so24424803ywa.2
-	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 10:58:53 -0700 (PDT)
-From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Thu, 23 Mar 2017 13:58:51 -0400
-Message-Id: <20170323175851.14342-1-bobby.prani@gmail.com>
-Subject: [Qemu-devel] [PATCH] tcg/i386: Check the size of instruction being
- translated
+	(envelope-from <kwolf@redhat.com>) id 1cr72m-0002Z5-Kp
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 14:01:05 -0400
+Date: Thu, 23 Mar 2017 19:00:54 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170323180054.GD5344@noname.redhat.com>
+References: <20170308191434.2413-1-mreitz@redhat.com>
+	<20170308191544.3025-1-mreitz@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170308191544.3025-1-mreitz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 3/4] block: Add errp to
+ BD.bdrv_truncate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,41 +24,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
 
-Sending again since I messed by pbonzini's email.
+Am 08.03.2017 um 20:15 hat Max Reitz geschrieben:
+> Add an Error parameter to the block drivers' bdrv_truncate() interface.
+> If a block driver does not set this in case of an error, the generic
+> bdrv_truncate() implementation will do so.
+> 
+> Where it is obvious, this patch also makes some block drivers set this
+> value.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 
-This fixes the bug: 'user-to-root privesc inside VM via bad translation
-caching' reported by Jann Horn here:
-https://bugs.chromium.org/p/project-zero/issues/detail?id=1122
+> diff --git a/block/iscsi.c b/block/iscsi.c
+> index 75d890538e..ab559a6f71 100644
+> --- a/block/iscsi.c
+> +++ b/block/iscsi.c
+> @@ -2060,7 +2060,7 @@ static void iscsi_reopen_commit(BDRVReopenState *reopen_state)
+>      }
+>  }
+>  
+> -static int iscsi_truncate(BlockDriverState *bs, int64_t offset)
+> +static int iscsi_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
+>  {
+>      IscsiLun *iscsilun = bs->opaque;
+>      Error *local_err = NULL;
+> @@ -2071,7 +2071,7 @@ static int iscsi_truncate(BlockDriverState *bs, int64_t offset)
+>  
+>      iscsi_readcapacity_sync(iscsilun, &local_err);
+>      if (local_err != NULL) {
+> -        error_free(local_err);
+> +        error_propagate(errp, local_err);
+>          return -EIO;
+>      }
 
-CC: Richard Henderson <rth@twiddle.net>
-CC: Peter Maydell <peter.maydell@linaro.org>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-Reported-by: Jann Horn <jannh@google.com>
-Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
----
- target/i386/translate.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+I think this function contains a few more cases for patch 4.
 
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 72c1b03a2a..1d1372fb43 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -4418,6 +4418,13 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
-     s->vex_l = 0;
-     s->vex_v = 0;
-  next_byte:
-+    /* x86 has an upper limit of 15 bytes for an instruction. Since we
-+     * do not want to decode and generate IR for an illegal
-+     * instruction, the following check limits the instruction size to
-+     * 25 bytes: 14 prefix + 1 opc + 6 (modrm+sib+ofs) + 4 imm */
-+    if (s->pc - pc_start > 14) {
-+        goto illegal_op;
-+    }
-     b = cpu_ldub_code(env, s->pc);
-     s->pc++;
-     /* Collect prefixes.  */
--- 
-2.11.0
+Kevin
