@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cqxQL-0001RI-DB
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 03:44:46 -0400
+	(envelope-from <igor.rubinov@gmail.com>) id 1cqxkx-0005jp-VM
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 04:06:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cqxQK-0004gh-P5
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 03:44:45 -0400
-Date: Thu, 23 Mar 2017 08:44:33 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20170323074433.u6irjyrmq2gcnpaj@hawk.localdomain>
-References: <1490175166-19785-1-git-send-email-he.chen@linux.intel.com>
-	<20170322103405.rcye74zye6gvrfis@hawk.localdomain>
-	<20170323072335.GC10166@he>
+	(envelope-from <igor.rubinov@gmail.com>) id 1cqxkw-0003WY-Pg
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 04:06:03 -0400
+Received: from mail-vk0-x22f.google.com ([2607:f8b0:400c:c05::22f]:36790)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <igor.rubinov@gmail.com>)
+	id 1cqxkw-0003VG-KZ
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 04:06:02 -0400
+Received: by mail-vk0-x22f.google.com with SMTP id j64so128126810vkg.3
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 01:06:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170323072335.GC10166@he>
-Subject: Re: [Qemu-devel] [PATCH v3] Allow setting NUMA distance for
- different NUMA nodes
+Sender: igor.rubinov@gmail.com
+From: Igor R <boost.lists@gmail.com>
+Date: Thu, 23 Mar 2017 10:05:31 +0200
+Message-ID: <CAPnv1PJeMRPKv9UUSmSWxyn=GFOPaWY8eUgH8ZeL=ZBMDJpbdg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: [Qemu-devel] What is the best commit for record-replay?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,21 +27,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: He Chen <he.chen@linux.intel.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-arm@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Mar 23, 2017 at 03:23:35PM +0800, He Chen wrote:
-> > 
-> > And maybe should also point out how to set an unreachable node with 255.
-> > 
-> Thanks for your careful review. Regarding setting unreachable node,
-> which way is good? Set exact 255 as distance or distance that is larger
-> than 255 is regarded as unreachable?
+Hi,
 
-If a numeric distance is to be used, then I think following the spec with
-255 is best. Alternatively, we could have something like
-'-numa dist,src=0,dst=1,unreachable', rather than specifying val at all,
-but, IMO, it's not worth it.
+I'm trying to use the deterministic record/replay feature, and I would
+like to know which commit I should take to get it work.
+In RC0 it seems to be broken. I tried pre-MTTCG commit 2421f381dc, as
+mentioned here:
+http://lists.nongnu.org/archive/html/qemu-devel/2017-03/msg02657.html
+with this patch:
+http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg01316.html
+My command line is:
+./qemu-system-i386 -net none  -icount
+shift=7,rr=replay,rrfile=replay.bin -drive
+file=MyFedora386.qcow,if=none,id=img-direct -drive
+driver=blkreplay,if=none,image=img-direct,id=img-blkreplay -device
+ide-hd,drive=img-blkreplay -monitor stdio
 
-Thanks,
-drew
+The replay advances for a while, but gets stuck in about 10-15 sec,
+and it looks like it encounters deadlock trying to acquire rcu lock.
+
+Is there a working commit of RR?
+
+
+Thanks.
