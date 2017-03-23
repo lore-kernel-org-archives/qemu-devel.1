@@ -1,20 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cqq0d-0005K6-Qd
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 19:49:44 -0400
+	(envelope-from <ashmit602@gmail.com>) id 1cqqDl-0008Oi-Ez
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 20:03:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cqq0d-0002tG-2o
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 19:49:43 -0400
-Date: Thu, 23 Mar 2017 07:49:33 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170322234933.GB25152@lemon>
-References: <20170322210005.16533-1-kwolf@redhat.com>
+	(envelope-from <ashmit602@gmail.com>) id 1cqqDk-0006ba-3v
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 20:03:17 -0400
+Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:35548)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ashmit602@gmail.com>) id 1cqqDj-0006bV-UV
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 20:03:16 -0400
+Received: by mail-io0-x241.google.com with SMTP id f103so11674314ioi.2
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 17:03:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170322210005.16533-1-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9?] file-posix: Make bdrv_flush()
- failure permanent without O_DIRECT
+In-Reply-To: <20170320125528.GM3792@redhat.com>
+References: <CAAo6VWPyQrjSp2qjvxqXRPS8=5N85i0-DJdkWhiGaXmND_8+qA@mail.gmail.com>
+	<20170227092207.GA18219@redhat.com>
+	<CAAo6VWO6zAijMMjHOkefO22wh+6dXigZ6a+g-pMNBcM0MN1HHw@mail.gmail.com>
+	<20170301091851.GD17125@redhat.com>
+	<CAAo6VWNRhK6zvc+CferSd9wYQZNNoXDqCEW_G62crqsamyEC9Q@mail.gmail.com>
+	<20170306092305.GA9866@redhat.com>
+	<CAAo6VWMo-wYwkOAENk4swYk3dkbxaJObXrj85yDRLAUofK2qtw@mail.gmail.com>
+	<20170313095723.GC4799@redhat.com>
+	<CAAo6VWPd0NrvzxAsYrnRrOhs8+31RYCLFvXG6ak-b3uVZFKxyg@mail.gmail.com>
+	<CAAo6VWO7rpDPwP_iFGHNTo3zJqoZZXHAnfPbtkq+FZSSAWAjHw@mail.gmail.com>
+	<20170320125528.GM3792@redhat.com>
+From: ashish mittal <ashmit602@gmail.com>
+Date: Wed, 22 Mar 2017 17:03:13 -0700
+Message-ID: <CAAo6VWOEzopqUw_vPuZ39VncvYZXD43oGLQbLPgnAd1c4ayAPw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
+ block device type called "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,70 +38,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
 
-On Wed, 03/22 22:00, Kevin Wolf wrote:
-> Success for bdrv_flush() means that all previously written data is safe
-> on disk. For fdatasync(), the best semantics we can hope for on Linux
-> (without O_DIRECT) is that all data that was written since the last call
-> was successfully written back. Therefore, and because we can't redo all
-> writes after a flush failure, we have to give up after a single
-> fdatasync() failure. After this failure, we would never be able to make
-> the promise that a successful bdrv_flush() makes.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/file-posix.c | 22 ++++++++++++++++++++++
->  1 file changed, 22 insertions(+)
-> 
-> diff --git a/block/file-posix.c b/block/file-posix.c
-> index 53febd3..beb7a4f 100644
-> --- a/block/file-posix.c
-> +++ b/block/file-posix.c
-> @@ -144,6 +144,7 @@ typedef struct BDRVRawState {
->      bool has_write_zeroes:1;
->      bool discard_zeroes:1;
->      bool use_linux_aio:1;
-> +    bool page_cache_inconsistent:1;
->      bool has_fallocate;
->      bool needs_alignment;
->  } BDRVRawState;
-> @@ -824,10 +825,31 @@ static ssize_t handle_aiocb_ioctl(RawPosixAIOData *aiocb)
->  
->  static ssize_t handle_aiocb_flush(RawPosixAIOData *aiocb)
->  {
-> +    BDRVRawState *s = aiocb->bs->opaque;
->      int ret;
->  
-> +    if (s->page_cache_inconsistent) {
-> +        return -EIO;
-> +    }
-> +
->      ret = qemu_fdatasync(aiocb->aio_fildes);
->      if (ret == -1) {
-> +        /* There is no clear definition of the semantics of a failing fsync(),
-> +         * so we may have to assume the worst. The sad truth is that this
-> +         * assumption is correct for Linux. Some pages are now probably marked
-> +         * clean in the page cache even though they are inconsistent with the
-> +         * on-disk contents. The next fdatasync() call would succeed, but no
-> +         * further writeback attempt will be made. We can't get back to a state
-> +         * in which we know what is on disk (we would have to rewrite
-> +         * everything that was touched since the last fdatasync() at least), so
-> +         * make bdrv_flush() fail permanently. Given that the behaviour isn't
-> +         * really defined, I have little hope that other OSes are doing better.
-> +         *
-> +         * Obviously, this doesn't affect O_DIRECT, which bypasses the page
-> +         * cache. */
-> +        if ((s->open_flags & O_DIRECT) == 0) {
-> +            s->page_cache_inconsistent = true;
-> +        }
->          return -errno;
->      }
->      return 0;
-> -- 
-> 2.9.3
-> 
-> 
+On Mon, Mar 20, 2017 at 5:55 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
+> On Fri, Mar 17, 2017 at 06:44:56PM -0700, ashish mittal wrote:
+>> On Thu, Mar 16, 2017 at 5:29 PM, ashish mittal <ashmit602@gmail.com> wrote:
+>> > On Mon, Mar 13, 2017 at 2:57 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
+>> >> On Tue, Mar 07, 2017 at 05:27:55PM -0800, ashish mittal wrote:
+>> >>> Thanks! There is one more input I need some help with!
+>> >>>
+>> >>> VxHS network library opens a fixed number of connection channels to a
+>> >>> given host, and all the vdisks (that connect to the same host) share
+>> >>> these connection channels.
+>> >>>
+>> >>> Therefore, we need to open secure channels to a specific target host
+>> >>> only once for the first vdisk that connects to that host. All the
+>> >>> other vdisks that connect to the same target host will share the same
+>> >>> set of secure communication channels.
+>> >>>
+>> >>> I hope the above scheme is acceptable?
+>> >>>
+>> >>> If yes, then we have a couple of options to implement this:
+>> >>>
+>> >>> (1) Accept the TLS credentials per vdisk using the previously
+>> >>> discussed --object tls-creds-x509 mechanism. In this case, if more
+>> >>> than one vdisk have the same host info, then we will use only the
+>> >>> first one's creds to set up the secure connection, and ignore the
+>> >>> others. vdisks that connect to different target hosts will use their
+>> >>> individual tls-creds-x509 to set up the secure channels. This is, of
+>> >>> course, not relevant for qemu-img/qemu-io as they can open only one
+>> >>> vdisk at a time.
+>> >>
+>> >> It looks like option 1 here is the way to go. Just report an error if
+>> >> there are multiple creds provided for the same host and they don't
+>> >> match.
+>> >>
+>> >
+>> > I have made changes to implement option 1 in the library (branch
+>> > per_channel_ssl).
+>> > Can you please help review it?
+>> > https://github.com/VeritasHyperScale/libqnio/compare/per_channel_ssl
+>> >
+>> > Here's the changelog:
+>> > (1) Changed code to not use instance UUID for setting up SSL context.
+>> > (2) User is supposed to pass the cacert, client_key and client_cert
+>> >     files to iio_open(). These will be used to set up a per-channel secure SSL
+>> >     connection to the server. All three values are needed to set up a
+>> >     secure connection.
+>> > (3) If the secure channel to a particular host is already open, other
+>> >     block device connections to the same host will have to provide
+>> >     TLS/SSL credentials that match the original one.
+>> > (4) Set default locations for trusted client CA certificates
+>> >      based on user specified cacert file.
+>> >
+>> > NB - I have given steps to test SSL communication (using the supplied
+>> > test client/server programs) in the commit log. I have not tested
+>> > using qemu binary yet. Will run more tests in the days to come.
+>> >
+>> > qemu vxhs patch changes should be pretty straightforward, given that
+>> > we have already discussed how to implement passing --object
+>> > tls-creds-x509 per block device.
+>> >
+>> > Thanks!
+>> >
+>>
+>> Update -
+>> (1) Successfully tested SSL communication using qemu-io and the test server.
+>> (2) Minor changes to per_channel_ssl branch.
+>> (3) Created a pull request.
+>>
+>> Please review per convenience. Thanks!
+>
+> IIUC, on that branch the 'is_secure()' method is still looking for the
+> directory /var/lib/libvxhs/secure to exist on the host. If that is not
+> present, then it appears to be silently ignoring the SSL certs passed
+> in from QEMU.
+>
+> IMHO it should enable TLS when 'cacert' passed to iio_open is not NULL,
+> not relying on a magic directory to exist.
+>
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+I have made changes per above to the library. Please see commits -
+
+https://github.com/VeritasHyperScale/libqnio/commit/6c3261e9c9bb1350f4433a1ae4fcd98f7692cf39
+https://github.com/VeritasHyperScale/libqnio/commit/502c74278457e6ac86a4ee4ad9102e56ff3be5d4
+
+Commit log: Enable secure mode based on the SSL/TLS args passed in iio_open()
+
+(1) Do not use /var/lib/libvxhs/secure to enable secure SSL mode on
+    the client side.
+(2) Instead, enable SSL mode if the user passes TLS/SSL creds for
+    the block device on the qemu CLI.
+
+Will be posting v10 qemu vxhs patch soon. v10 will work with the
+latest library changes, and will support passing tls-creds-x509 creds
+for every vxhs block device.
+
+
+> Regards,
+> Daniel
+> --
+> |: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+> |: http://libvirt.org              -o-             http://virt-manager.org :|
+> |: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
