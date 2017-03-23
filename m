@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59789)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqqNC-0001Mk-SM
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 20:13:03 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1cqrG0-00011A-JE
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 21:09:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqqNB-0001Ro-S4
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 20:13:02 -0400
-References: <20170322210005.16533-1-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2f187f50-20b5-eed5-7c11-3259f163291a@redhat.com>
-Date: Wed, 22 Mar 2017 19:12:54 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1cqrFx-0003px-TI
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 21:09:40 -0400
+Received: from [45.249.212.188] (port=2966 helo=dggrg02-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1cqrFx-0003ZT-0r
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 21:09:37 -0400
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Thu, 23 Mar 2017 01:09:02 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA1FFB71@DGGEMA505-MBX.china.huawei.com>
+References: <20170322123655.32085-1-pasic@linux.vnet.ibm.com>
+	<9f770dc9-f26c-796a-67a7-dc37997efc69@linux.vnet.ibm.com>
+In-Reply-To: <9f770dc9-f26c-796a-67a7-dc37997efc69@linux.vnet.ibm.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20170322210005.16533-1-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="f5qmRSMd8oM2noKaHUgLSOhBFfVFLuRhc"
-Subject: Re: [Qemu-devel] [PATCH for-2.9?] file-posix: Make bdrv_flush()
- failure permanent without O_DIRECT
+Subject: Re: [Qemu-devel] [PATCH] cryptodev: fix asserting single queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,68 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
+To: Halil Pasic <pasic@linux.vnet.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---f5qmRSMd8oM2noKaHUgLSOhBFfVFLuRhc
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
-Message-ID: <2f187f50-20b5-eed5-7c11-3259f163291a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9?] file-posix: Make bdrv_flush()
- failure permanent without O_DIRECT
-References: <20170322210005.16533-1-kwolf@redhat.com>
-In-Reply-To: <20170322210005.16533-1-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 03/22/2017 04:00 PM, Kevin Wolf wrote:
-> Success for bdrv_flush() means that all previously written data is safe=
-
-> on disk. For fdatasync(), the best semantics we can hope for on Linux
-> (without O_DIRECT) is that all data that was written since the last cal=
-l
-> was successfully written back. Therefore, and because we can't redo all=
-
-> writes after a flush failure, we have to give up after a single
-> fdatasync() failure. After this failure, we would never be able to make=
-
-> the promise that a successful bdrv_flush() makes.
 >=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/file-posix.c | 22 ++++++++++++++++++++++
->  1 file changed, 22 insertions(+)
+>=20
+> On 03/22/2017 01:36 PM, Halil Pasic wrote:
+> > We already check for queues =3D=3D 1 in cryptodev_builtin_init and when=
+ that
+> > is not true raise an error. But before that error is reported the
+> > assertion in cryptodev_builtin_cleanup kicks in (because object is bein=
+g
+> > finalized and freed).
+> >
+> > Let's remove assert(queues =3D=3D 1) form cryptodev_builtin_cleanup as =
+it
+> > does only harm and no good.
+> >
+> > Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>=20
+> Sorry guys, I forgot to give credit to the reporter.
+>=20
+> Reported-by: Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>
 
-Makes sense for 2.9 (it doesn't change the data loss, but alerts to the
-user to the knowledge of data loss a lot sooner, perhaps before things
-get even worse).
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+Applied, thanks!
 
 
---f5qmRSMd8oM2noKaHUgLSOhBFfVFLuRhc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY0xMGAAoJEKeha0olJ0Nq9ZwIAKJ1Euk2B6eiwo5j00Fwqa2B
-GQnf0+M67yNkb6vUbxQzV48qwARZ2ysaFaTYXOWqKFii023lT1GAPybqWvQfxBC6
-Suic5ia/6gTqsb7wCvrLdorylDp2NYrlIGkh6/XnRvxKow6mhDdL/bjlVEQwGyVY
-i3lzjEkbs5fmPcho5zKqoIEGbqreaRqFhQG8QG+U09Nez/dJ3wmVusWEKNpNnOgK
-3L0gwtsFqIi5fK2Jhp+sMPczTus1RsRVMnw2Ij6MLJiCRiNVNjGlclpD42y6H2oh
-RqhvPWbaRVPPrYzGnO6nfGua5FaIm6dmwBqrYfte3/RHR075H/5OY2kfUk1wqks=
-=xefa
------END PGP SIGNATURE-----
-
---f5qmRSMd8oM2noKaHUgLSOhBFfVFLuRhc--
+> > ---
+> >  backends/cryptodev-builtin.c | 2 --
+> >  1 file changed, 2 deletions(-)
+> >
+> > diff --git a/backends/cryptodev-builtin.c b/backends/cryptodev-builtin.=
+c
+> > index 82a068e..137c7a6 100644
+> > --- a/backends/cryptodev-builtin.c
+> > +++ b/backends/cryptodev-builtin.c
+> > @@ -359,8 +359,6 @@ static void cryptodev_builtin_cleanup(
+> >          }
+> >      }
+> >
+> > -    assert(queues =3D=3D 1);
+> > -
+> >      for (i =3D 0; i < queues; i++) {
+> >          cc =3D backend->conf.peers.ccs[i];
+> >          if (cc) {
+> >
