@@ -1,37 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41616)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cr05e-0003W8-Kk
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:35:35 -0400
+	(envelope-from <armbru@redhat.com>) id 1cr0PL-0006rk-4B
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:55:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cr05b-0005vC-Ip
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:35:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:17049)
+	(envelope-from <armbru@redhat.com>) id 1cr0PJ-0005jp-Jy
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:55:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34436)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cr05b-0005uX-Cr
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:35:31 -0400
-References: <CAJy91CY1SOwi7D-kyU0ooe5SyhM414WaBCedXuPfXXhJpbo1fg@mail.gmail.com>
-	<CAFEAcA_etsFstPtUzs0AZjWD35MhMLhwru0ibJzS_upgE-nsng@mail.gmail.com>
-	<CAJy91CZmqEUXLKjRJ0JdUEf83E3FwE_24qmej-4C8uAGQkTPWA@mail.gmail.com>
-	<CAFEAcA-mzO7vniDEaZeueVFQ7+MVBB7pnzHhahv2Yk_f3q0mJw@mail.gmail.com>
-	<CAJy91CZ4Ed-HGHLkzEc1dqQbo32d-eTE1S1ovO_ZwkDdTpkQXQ@mail.gmail.com>
-	<CAJy91CaCV40FgSP55qWZeZgkQ=2+E8Cr7xdbu9pn5HLEo+6JJQ@mail.gmail.com>
-	<CAJy91CYEwOVT7oEdYY=21__c2kcLTyxyjAaq7Zx4VnQdeLdQQQ@mail.gmail.com>
-	<CAFEAcA_t9iLude4Vu3Zc=_wcXMTtFb4Q4oJ8O+zLAJ9isAPqHQ@mail.gmail.com>
-	<1322109813.6444955.1490172025040.JavaMail.zimbra@redhat.com>
-	<CAJy91CaUxFHJeGLLW4DqK6sBwx2qDnE9s20ZbdT86JDn8yQoHg@mail.gmail.com>
-	<218df442-1a31-e969-32ef-01184fae84c0@redhat.com>
-	<CAJy91CbBV97RRKr=Rze5-eYrYAvnwiDZQ0oQZi33aKR1v-UXKg@mail.gmail.com>
-	<2d7a5a9a-8a7b-1bae-feb8-80fc4ee3048a@redhat.com>
-	<CAJy91CbcV3_jVg9PTD6unka6_M65rgkKDv0KsBK=YpVd=XKqvg@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ed9e6d65-ba93-d572-861a-46926a37d42a@redhat.com>
-Date: Thu, 23 Mar 2017 11:35:27 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAJy91CbcV3_jVg9PTD6unka6_M65rgkKDv0KsBK=YpVd=XKqvg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Guest application reading from pl011 without
- device driver
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cr0PJ-0005jQ-DT
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:55:53 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3D6C54E03F
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 10:55:53 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Thu, 23 Mar 2017 11:55:48 +0100
+Message-Id: <1490266548-22500-6-git-send-email-armbru@redhat.com>
+In-Reply-To: <1490266548-22500-1-git-send-email-armbru@redhat.com>
+References: <1490266548-22500-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.9 5/5] rbd: Reject options
+ server.*.{numeric, to, ipv4, ipv6}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,29 +30,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jiahuan Zhang <jiahuanzhang90@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: jdurgin@redhat.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com
 
+We use InetSocketAddress in the QAPI schema.  However, the code
+doesn't use inet_connect_saddr(), but formats "host" and "port" into a
+configuration string for rados_conf_set().  Thus, members "numeric",
+"to", "ipv4" and "ipv6" are silently ignored.  Not nice.
 
+Factor a suitable InetSocketAddressBase out of InetSocketAddress, and
+use that.  "numeric", "to", "ipv4" and "ipv6" are now rejected.
 
-On 23/03/2017 11:12, Jiahuan Zhang wrote:
-> 
->     It's Windows that doesn't support it (the Windows function name is
->     WaitForSingleObject).
-> 
-> 
-> Hi, I have checked the Windows chardev implimentation in QEMU.
-> I learned from char-win-stdio.c to using thread and WaitForSingleObject
-> for interlocking.
-> char-win-stdio.c uses qemu_add_wait_object().
-> Char-pipe.c uses qemu_add_polling_cb().
-> I found all over qemu, only char-pipe uses qemu_add_polling_cb().
-> Does this mean that somebody has already looked into this issue,
-> and failed in using qemu_add_wait_object(),
-> and then he/she created qemu_add_polling_cb()?
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ qapi-schema.json     | 21 ++++++++++++++-------
+ qapi/block-core.json |  2 +-
+ 2 files changed, 15 insertions(+), 8 deletions(-)
 
-I don't know, but using threads sounds like a way to solve the bug, indeed.
-
-Thanks,
-
-Paolo
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 68a4327..b921994 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -4051,19 +4051,27 @@
+   'data': [ 'all', 'rx', 'tx' ] }
+ 
+ ##
++# @InetSocketAddressBase:
++#
++# @host: host part of the address
++# @port: port part of the address
++##
++{ 'struct': 'InetSocketAddressBase',
++  'data': {
++    'host': 'str',
++    'port': 'str' } }
++
++##
+ # @InetSocketAddress:
+ #
+ # Captures a socket address or address range in the Internet namespace.
+ #
+-# @host: host part of the address
+-#
+-# @port: port part of the address, or lowest port if @to is present
+-#
+ # @numeric: true if the host/port are guaranteed to be numeric,
+ #           false if name resolution should be attempted. Defaults to false.
+ #           (Since 2.9)
+ #
+-# @to: highest port to try
++# @to: If present, this is range of possible addresses, with port
++#      between @port and @to.
+ #
+ # @ipv4: whether to accept IPv4 addresses, default try both IPv4 and IPv6
+ #
+@@ -4072,9 +4080,8 @@
+ # Since: 1.3
+ ##
+ { 'struct': 'InetSocketAddress',
++  'base': 'InetSocketAddressBase',
+   'data': {
+-    'host': 'str',
+-    'port': 'str',
+     '*numeric':  'bool',
+     '*to': 'uint16',
+     '*ipv4': 'bool',
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index fe1e40f..a57c9e8 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2641,7 +2641,7 @@
+             '*conf': 'str',
+             '*snapshot': 'str',
+             '*user': 'str',
+-            '*server': ['InetSocketAddress'],
++            '*server': ['InetSocketAddressBase'],
+             '*auth-supported': ['RbdAuthMethod'],
+             '*password-secret': 'str' } }
+ 
+-- 
+2.7.4
