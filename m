@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cqkAu-00018l-Qr
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 13:35:57 -0400
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cqsDx-0001a4-CK
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 22:11:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cqkAq-0005HH-US
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 13:35:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36370)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cqkAq-0005Fo-J8
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 13:35:52 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cqkAo-0007HN-Fa
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 17:35:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4786A2E80EB
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 17:35:47 +0000 (UTC)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cqsDr-0005QZ-2E
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 22:11:35 -0400
+Received: from [59.151.112.132] (port=54541 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cqsDq-0005Pu-MN
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 22:11:30 -0400
+References: <1490178863-14806-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+	<20170322143058-mutt-send-email-mst@kernel.org>
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Message-ID: <58D330D7.3090908@cn.fujitsu.com>
+Date: Thu, 23 Mar 2017 10:20:07 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 22 Mar 2017 17:26:21 -0000
-From: Brendan Shanks <brendan@bslabs.net>
-Reply-To: Bug 1675108 <1675108@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20170322172621.26186.61813.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1675108] [NEW] Cocoa UI always crashes on startup
+In-Reply-To: <20170322143058-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5] vfio error recovery: kernel support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,98 +27,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, izumi.taku@jp.fujitsu.com, alex.williamson@redhat.com
 
-Public bug reported:
 
-Commit 8bb93c6f99a42c2e0943bc904b283cd622d302c5 ("ui/console: ensure
-graphic updates don't race with TCG vCPUs") causes the graphic update to
-run on a non-main thread, which Cocoa is not happy with. It crashes
-immediately after startup.
 
-$ i386-softmmu/qemu-system-i386 =
+On 03/22/2017 09:10 PM, Michael S. Tsirkin wrote:
+> Minor comments on commit log below.
+> 
+> On Wed, Mar 22, 2017 at 06:34:23PM +0800, Cao jin wrote:
+>> From: "Michael S. Tsirkin" <mst@redhat.com>
+>>
 
-2017-03-22 10:09:25.113 qemu-system-i386[15968:9538245] *** Terminating app=
- due to uncaught exception 'NSInternalInconsistencyException', reason: 'nex=
-tEventMatchingMask should only be called from the Main Thread!'
-*** First throw call stack:
-(
-	0   CoreFoundation                      0x00007fff91e72e7b __exceptionPrep=
-rocess + 171
-	1   libobjc.A.dylib                     0x00007fffa6a5ccad objc_exception_=
-throw + 48
-	2   AppKit                              0x00007fff900953fd -[NSApplication=
-(NSEvent) _nextEventMatchingEventMask:untilDate:inMode:dequeue:] + 4471
-	3   qemu-system-i386                    0x0000000104f75a49 cocoa_refresh +=
- 233
-	4   qemu-system-i386                    0x0000000104e0312c process_queued_=
-cpu_work + 140
-	5   qemu-system-i386                    0x0000000104d1a73c qemu_tcg_rr_cpu=
-_thread_fn + 284
-	6   libsystem_pthread.dylib             0x00007fffa7557aab _pthread_body +=
- 180
-	7   libsystem_pthread.dylib             0x00007fffa75579f7 _pthread_body +=
- 0
-	8   libsystem_pthread.dylib             0x00007fffa75571fd thread_start + =
-13
-)
-libc++abi.dylib: terminating with uncaught exception of type NSException
-Abort trap: 6
+> 
+>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+>> ---
+>>
+>> v5 changelog:
+>> 1. Add another new eventfd passive_reset_trigger & the boilerplate code,
+>>    used in slot_reset. Add comment for slot_reset().
+>> 2. Rewrite the commit log.
+>>
+>>  drivers/vfio/pci/vfio_pci.c         | 49 +++++++++++++++++++++++++++++++++++--
+>>  drivers/vfio/pci/vfio_pci_intrs.c   | 38 ++++++++++++++++++++++++++++
+>>  drivers/vfio/pci/vfio_pci_private.h |  2 ++
+>>  include/uapi/linux/vfio.h           |  2 ++
+>>  4 files changed, 89 insertions(+), 2 deletions(-)
+>>
 
-System: macOS 10.12.3, Xcode 8.2.1
+> 
+> 
+>> +static pci_ers_result_t vfio_pci_aer_slot_reset(struct pci_dev *pdev)
+>> +{
+>> +	struct vfio_pci_device *vdev;
+>> +	struct vfio_device *device;
+>> +	static pci_ers_result_t err = PCI_ERS_RESULT_NONE;
+>> +
+>> +	device = vfio_device_get_from_dev(&pdev->dev);
+>> +	if (!device)
+>> +		goto err_dev;
+>> +
+>> +	vdev = vfio_device_data(device);
+>> +	if (!vdev)
+>> +		goto err_data;
+>> +
+>> +	mutex_lock(&vdev->igate);
+>> +
+>> +	if (vdev->passive_reset_trigger)
+>> +		eventfd_signal(vdev->passive_reset_trigger, 1);
+>> +	else if (vdev->err_trigger)
+>> +		eventfd_signal(vdev->err_trigger, 1);
+> 
+> why is this chunk here? why not just do
+> 
+> 	if (vdev->passive_reset_trigger)
+> 		eventfd_signal(vdev->passive_reset_trigger, 1);
+> 
+> without a fallback?
+> 
+> 
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+I thought it is one way of "passing maximum info to userspace and let it
+decide."
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1675108
-
-Title:
-  Cocoa UI always crashes on startup
-
-Status in QEMU:
-  New
-
-Bug description:
-  Commit 8bb93c6f99a42c2e0943bc904b283cd622d302c5 ("ui/console: ensure
-  graphic updates don't race with TCG vCPUs") causes the graphic update
-  to run on a non-main thread, which Cocoa is not happy with. It crashes
-  immediately after startup.
-
-  $ i386-softmmu/qemu-system-i386 =
-
-  2017-03-22 10:09:25.113 qemu-system-i386[15968:9538245] *** Terminating a=
-pp due to uncaught exception 'NSInternalInconsistencyException', reason: 'n=
-extEventMatchingMask should only be called from the Main Thread!'
-  *** First throw call stack:
-  (
-  	0   CoreFoundation                      0x00007fff91e72e7b __exceptionPr=
-eprocess + 171
-  	1   libobjc.A.dylib                     0x00007fffa6a5ccad objc_exceptio=
-n_throw + 48
-  	2   AppKit                              0x00007fff900953fd -[NSApplicati=
-on(NSEvent) _nextEventMatchingEventMask:untilDate:inMode:dequeue:] + 4471
-  	3   qemu-system-i386                    0x0000000104f75a49 cocoa_refresh=
- + 233
-  	4   qemu-system-i386                    0x0000000104e0312c process_queue=
-d_cpu_work + 140
-  	5   qemu-system-i386                    0x0000000104d1a73c qemu_tcg_rr_c=
-pu_thread_fn + 284
-  	6   libsystem_pthread.dylib             0x00007fffa7557aab _pthread_body=
- + 180
-  	7   libsystem_pthread.dylib             0x00007fffa75579f7 _pthread_body=
- + 0
-  	8   libsystem_pthread.dylib             0x00007fffa75571fd thread_start =
-+ 13
-  )
-  libc++abi.dylib: terminating with uncaught exception of type NSException
-  Abort trap: 6
-
-  System: macOS 10.12.3, Xcode 8.2.1
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1675108/+subscriptions
+-- 
+Sincerely,
+Cao jin
