@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cqybv-0004uC-Ie
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cqyc0-0004xS-DB
 	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:00:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cqybt-00073q-Ks
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:00:47 -0400
-Received: from [59.151.112.132] (port=34027 helo=heian.cn.fujitsu.com)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cqybu-00075B-PZ
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:00:52 -0400
+Received: from [59.151.112.132] (port=4330 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cqybt-00070x-9E
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:00:45 -0400
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cqybu-00073g-4x
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:00:46 -0400
 From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Date: Thu, 23 Mar 2017 17:09:21 +0800
-Message-ID: <1490260163-6157-2-git-send-email-caoj.fnst@cn.fujitsu.com>
+Date: Thu, 23 Mar 2017 17:09:22 +0800
+Message-ID: <1490260163-6157-3-git-send-email-caoj.fnst@cn.fujitsu.com>
 In-Reply-To: <1490260163-6157-1-git-send-email-caoj.fnst@cn.fujitsu.com>
 References: <1490260163-6157-1-git-send-email-caoj.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 1/3] pcie aer: verify if AER functionality
- is available
+Subject: [Qemu-devel] [PATCH v3 2/3] vfio pci: new function to init AER
+ capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +29,115 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: izumi.taku@jp.fujitsu.com, alex.williamson@redhat.com, mst@redhat.com, Dou Liyang <douly.fnst@cn.fujitsu.com>
 
-For devices which support AER function, verify it can work or not in the
-system:
-1. AER capable device is a PCIe device, it can't be plugged into PCI bus
-2. If root port doesn't support AER, then there is no need to expose the
-   AER capability
-
 Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
 Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
 ---
- hw/pci/pcie_aer.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ hw/vfio/pci.c | 41 ++++++++++++++++++++++++++++++++++++-----
+ hw/vfio/pci.h |  1 +
+ 2 files changed, 37 insertions(+), 5 deletions(-)
 
-diff --git a/hw/pci/pcie_aer.c b/hw/pci/pcie_aer.c
-index daf1f65..a2e9818 100644
---- a/hw/pci/pcie_aer.c
-+++ b/hw/pci/pcie_aer.c
-@@ -100,6 +100,34 @@ static void aer_log_clear_all_err(PCIEAERLog *aer_log)
- int pcie_aer_init(PCIDevice *dev, uint8_t cap_ver, uint16_t offset,
-                   uint16_t size, Error **errp)
- {
-+    PCIDevice *parent_dev;
-+    uint8_t type;
-+    uint8_t parent_type;
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 332f41d..3d0d005 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -1855,18 +1855,42 @@ out:
+     return 0;
+ }
+ 
+-static void vfio_add_ext_cap(VFIOPCIDevice *vdev)
++static int vfio_setup_aer(VFIOPCIDevice *vdev, uint8_t cap_ver,
++                          int pos, uint16_t size, Error **errp)
++{
++    PCIDevice *pdev = &vdev->pdev;
++    uint32_t errcap;
 +
-+    /* Topology test: see if there is need to expose AER cap */
-+    type = pcie_cap_get_type(dev);
-+    parent_dev = pci_bridge_get_device(dev->bus);
-+    while (parent_dev) {
-+        parent_type = pcie_cap_get_type(parent_dev);
-+
-+        if (type == PCI_EXP_TYPE_ENDPOINT &&
-+                (parent_type != PCI_EXP_TYPE_ROOT_PORT &&
-+                 parent_type != PCI_EXP_TYPE_DOWNSTREAM)) {
-+            error_setg(errp, "Parent device is not a PCIe component");
-+            return -ENOTSUP;
-+        }
-+        
-+        if (parent_type == PCI_EXP_TYPE_ROOT_PORT) {
-+            if (!parent_dev->exp.aer_cap)
-+            {
-+                error_setg(errp, "Root port does not support AER");
-+                return -ENOTSUP;
-+            }
-+        }
-+
-+        parent_dev = pci_bridge_get_device(parent_dev->bus);
++    errcap = vfio_pci_read_config(pdev, pos + PCI_ERR_CAP, 4);
++    /*
++     * The ability to record multiple headers is depending on
++     * the state of the Multiple Header Recording Capable bit and
++     * enabled by the Multiple Header Recording Enable bit.
++     */
++    if ((errcap & PCI_ERR_CAP_MHRC) &&
++        (errcap & PCI_ERR_CAP_MHRE)) {
++        pdev->exp.aer_log.log_max = PCIE_AER_LOG_MAX_DEFAULT;
++    } else {
++        pdev->exp.aer_log.log_max = 0;
 +    }
 +
-     pcie_add_capability(dev, PCI_EXT_CAP_ID_ERR, cap_ver,
-                         offset, size);
-     dev->exp.aer_cap = offset;
++    pcie_cap_deverr_init(pdev);
++    return pcie_aer_init(pdev, cap_ver, pos, size, errp);
++}
++
++static int vfio_add_ext_cap(VFIOPCIDevice *vdev, Error **errp)
+ {
+     PCIDevice *pdev = &vdev->pdev;
+     uint32_t header;
+     uint16_t cap_id, next, size;
+     uint8_t cap_ver;
+     uint8_t *config;
++    int ret = 0;
+ 
+     /* Only add extended caps if we have them and the guest can see them */
+     if (!pci_is_express(pdev) || !pci_bus_is_express(pdev->bus) ||
+         !pci_get_long(pdev->config + PCI_CONFIG_SPACE_SIZE)) {
+-        return;
++        return 0;
+     }
+ 
+     /*
+@@ -1915,6 +1939,9 @@ static void vfio_add_ext_cap(VFIOPCIDevice *vdev)
+                                    PCI_EXT_CAP_NEXT_MASK);
+ 
+         switch (cap_id) {
++        case PCI_EXT_CAP_ID_ERR:
++            ret = vfio_setup_aer(vdev, cap_ver, next, size, errp);
++            break;
+         case PCI_EXT_CAP_ID_SRIOV: /* Read-only VF BARs confuse OVMF */
+         case PCI_EXT_CAP_ID_ARI: /* XXX Needs next function virtualization */
+             trace_vfio_add_ext_cap_dropped(vdev->vbasedev.name, cap_id, next);
+@@ -1923,6 +1950,9 @@ static void vfio_add_ext_cap(VFIOPCIDevice *vdev)
+             pcie_add_capability(pdev, cap_id, cap_ver, next, size);
+         }
+ 
++        if (ret) {
++            goto out;
++        }
+     }
+ 
+     /* Cleanup chain head ID if necessary */
+@@ -1930,8 +1960,9 @@ static void vfio_add_ext_cap(VFIOPCIDevice *vdev)
+         pci_set_word(pdev->config + PCI_CONFIG_SPACE_SIZE, 0);
+     }
+ 
++out:
+     g_free(config);
+-    return;
++    return ret;
+ }
+ 
+ static int vfio_add_capabilities(VFIOPCIDevice *vdev, Error **errp)
+@@ -1949,8 +1980,8 @@ static int vfio_add_capabilities(VFIOPCIDevice *vdev, Error **errp)
+         return ret;
+     }
+ 
+-    vfio_add_ext_cap(vdev);
+-    return 0;
++    ret = vfio_add_ext_cap(vdev, errp);
++    return ret;
+ }
+ 
+ static void vfio_pci_pre_reset(VFIOPCIDevice *vdev)
+diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+index a8366bb..34e8b04 100644
+--- a/hw/vfio/pci.h
++++ b/hw/vfio/pci.h
+@@ -15,6 +15,7 @@
+ #include "qemu-common.h"
+ #include "exec/memory.h"
+ #include "hw/pci/pci.h"
++#include "hw/pci/pci_bridge.h"
+ #include "hw/vfio/vfio-common.h"
+ #include "qemu/event_notifier.h"
+ #include "qemu/queue.h"
 -- 
 1.8.3.1
