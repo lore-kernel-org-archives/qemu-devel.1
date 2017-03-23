@@ -1,23 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=248a72cc7=Paul.Durrant@citrix.com>)
-	id 1cqzhA-0004KY-E6
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:10:17 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1cqzhs-0004gB-P2
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:11:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=248a72cc7=Paul.Durrant@citrix.com>)
-	id 1cqzh4-0005td-5u
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:10:16 -0400
-Received: from smtp.citrix.com ([66.165.176.89]:54325)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=248a72cc7=Paul.Durrant@citrix.com>)
-	id 1cqzh4-0005ru-09
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:10:10 -0400
-From: Paul Durrant <paul.durrant@citrix.com>
-Date: Thu, 23 Mar 2017 10:10:01 +0000
-Message-ID: <1490263801-25206-1-git-send-email-paul.durrant@citrix.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] xen-platform: separate unplugging of NVMe disks
+	(envelope-from <dgibson@ozlabs.org>) id 1cqzhp-00067g-LL
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:11:00 -0400
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Thu, 23 Mar 2017 21:10:47 +1100
+Message-Id: <20170323101048.24848-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PULL 0/1] ppc-for-2.9 queue 20170323
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,130 +17,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lvivier@redhat.com, thuth@redhat.com, ehabkost@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, David Gibson <david@gibson.dropbear.id.au>
 
-Commit 090fa1c8 "add support for unplugging NVMe disks..." extended the
-existing disk unplug flag to cover NVMe disks as well as IDE and SCSI.
+The following changes since commit 55a19ad8b2d0797e3a8fe90ab99a9bb713824059:
 
-The cecent thread on the xen-devel mailing list [1] have highlighted that
-this is not desirable behaviour: PV frontends should be able to distinguish
-NVMe disks from other types of disk and should have separate control over
-whether they are unplugged.
+  Update version for v2.9.0-rc1 release (2017-03-21 17:13:29 +0000)
 
-This patch defines a new bit in the unplug mask for this purpose and also
-tidies up the definitions of, and improves the comments regarding, the
-previously exiting bits in the protocol.
+are available in the git repository at:
 
-[1] https://lists.xen.org/archives/html/xen-devel/2017-03/msg02924.html
+  git://github.com/dgibson/qemu.git tags/ppc-for-2.9-20170323
 
-Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
---
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
+for you to fetch changes up to 55641213fc81cdfc3bcd56c9e9991faa119201b2:
 
-NOTE: A companion patch will be submitted to xen-devel to align the
-      unplug protocol documentation once this patch is acked.
----
- hw/i386/xen/xen_platform.c | 47 ++++++++++++++++++++++++++++++++++------------
- 1 file changed, 35 insertions(+), 12 deletions(-)
+  numa,spapr: align default numa node memory size to 256MB (2017-03-22 11:32:42 +1100)
 
-diff --git a/hw/i386/xen/xen_platform.c b/hw/i386/xen/xen_platform.c
-index 6010f35..983d532 100644
---- a/hw/i386/xen/xen_platform.c
-+++ b/hw/i386/xen/xen_platform.c
-@@ -87,10 +87,30 @@ static void log_writeb(PCIXenPlatformState *s, char val)
-     }
- }
- 
--/* Xen Platform, Fixed IOPort */
--#define UNPLUG_ALL_DISKS 1
--#define UNPLUG_ALL_NICS 2
--#define UNPLUG_AUX_IDE_DISKS 4
-+/*
-+ * Unplug device flags.
-+ *
-+ * The logic got a little confused at some point in the past but this is
-+ * what they do now.
-+ *
-+ * bit 0: Unplug all IDE and SCSI disks.
-+ * bit 1: Unplug all NICs.
-+ * bit 2: Unplug IDE disks except primary master. This is overridden if
-+ *        bit 0 is also present in the mask.
-+ * bit 3: Unplug all NVMe disks.
-+ *
-+ */
-+#define _UNPLUG_IDE_SCSI_DISKS 0
-+#define UNPLUG_IDE_SCSI_DISKS (1u << _UNPLUG_IDE_SCSI_DISKS)
-+
-+#define _UNPLUG_ALL_NICS 1
-+#define UNPLUG_ALL_NICS (1u << _UNPLUG_ALL_NICS)
-+
-+#define _UNPLUG_AUX_IDE_DISKS 2
-+#define UNPLUG_AUX_IDE_DISKS (1u << _UNPLUG_AUX_IDE_DISKS)
-+
-+#define _UNPLUG_NVME_DISKS 3
-+#define UNPLUG_NVME_DISKS (1u << _UNPLUG_NVME_DISKS)
- 
- static void unplug_nic(PCIBus *b, PCIDevice *d, void *o)
- {
-@@ -111,7 +131,7 @@ static void unplug_disks(PCIBus *b, PCIDevice *d, void *opaque)
- {
-     uint32_t flags = *(uint32_t *)opaque;
-     bool aux = (flags & UNPLUG_AUX_IDE_DISKS) &&
--        !(flags & UNPLUG_ALL_DISKS);
-+        !(flags & UNPLUG_IDE_SCSI_DISKS);
- 
-     /* We have to ignore passthrough devices */
-     if (!strcmp(d->name, "xen-pci-passthrough")) {
-@@ -124,12 +144,16 @@ static void unplug_disks(PCIBus *b, PCIDevice *d, void *opaque)
-         break;
- 
-     case PCI_CLASS_STORAGE_SCSI:
--    case PCI_CLASS_STORAGE_EXPRESS:
-         if (!aux) {
-             object_unparent(OBJECT(d));
-         }
-         break;
- 
-+    case PCI_CLASS_STORAGE_EXPRESS:
-+        if (flags & UNPLUG_NVME_DISKS) {
-+            object_unparent(OBJECT(d));
-+        }
-+
-     default:
-         break;
-     }
-@@ -147,10 +171,9 @@ static void platform_fixed_ioport_writew(void *opaque, uint32_t addr, uint32_t v
-     switch (addr) {
-     case 0: {
-         PCIDevice *pci_dev = PCI_DEVICE(s);
--        /* Unplug devices.  Value is a bitmask of which devices to
--           unplug, with bit 0 the disk devices, bit 1 the network
--           devices, and bit 2 the non-primary-master IDE devices. */
--        if (val & (UNPLUG_ALL_DISKS | UNPLUG_AUX_IDE_DISKS)) {
-+        /* Unplug devices. See comment above flag definitions */
-+        if (val & (UNPLUG_IDE_SCSI_DISKS | UNPLUG_AUX_IDE_DISKS |
-+                   UNPLUG_NVME_DISKS)) {
-             DPRINTF("unplug disks\n");
-             pci_unplug_disks(pci_dev->bus, val);
-         }
-@@ -338,14 +361,14 @@ static void xen_platform_ioport_writeb(void *opaque, hwaddr addr,
-              * If VMDP was to control both disk and LAN it would use 4.
-              * If it controlled just disk or just LAN, it would use 8 below.
-              */
--            pci_unplug_disks(pci_dev->bus, UNPLUG_ALL_DISKS);
-+            pci_unplug_disks(pci_dev->bus, UNPLUG_IDE_SCSI_DISKS);
-             pci_unplug_nics(pci_dev->bus);
-         }
-         break;
-     case 8:
-         switch (val) {
-         case 1:
--            pci_unplug_disks(pci_dev->bus, UNPLUG_ALL_DISKS);
-+            pci_unplug_disks(pci_dev->bus, UNPLUG_IDE_SCSI_DISKS);
-             break;
-         case 2:
-             pci_unplug_nics(pci_dev->bus);
--- 
-2.1.4
+----------------------------------------------------------------
+ppc patch queue for 2017-03-23
+
+Just a single bugfix in this batch.  It's not strictly in ppc code,
+though it's for the pseries machine's benefit.  Eduardo suggested it
+go through my tree however.
+
+----------------------------------------------------------------
+Laurent Vivier (1):
+      numa,spapr: align default numa node memory size to 256MB
+
+ hw/core/machine.c   | 5 +++++
+ hw/ppc/spapr.c      | 6 ++++++
+ include/hw/boards.h | 1 +
+ numa.c              | 6 +++---
+ 4 files changed, 15 insertions(+), 3 deletions(-)
