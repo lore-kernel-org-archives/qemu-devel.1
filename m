@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56586)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cr0jO-0005qk-5D
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 07:16:39 -0400
+	(envelope-from <armbru@redhat.com>) id 1cr0q9-0007eS-Ix
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 07:23:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cr0jN-0007gh-BR
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 07:16:38 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:36085)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cr0jN-0007gU-57
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 07:16:37 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id n11so57996884wma.1
-	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 04:16:36 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <87d1d8xn41.fsf@linaro.org>
-References: <20170322172621.26186.61813.malonedeb@gac.canonical.com>
-	<CAFEAcA8UYsjy6sBTGqk1Crd-0tWpF0WWukA03_GyNRaG95L07Q@mail.gmail.com>
-	<87d1d8xn41.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 23 Mar 2017 11:16:15 +0000
-Message-ID: <CAFEAcA-VQHv-wD+2NBwYAe75139+37qkaypCbKOoHHk5ZRr-QA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Bug 1675108] [NEW] Cocoa UI always crashes on
- startup
+	(envelope-from <armbru@redhat.com>) id 1cr0q4-00039p-Mj
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 07:23:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41474)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cr0q4-000381-H3
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 07:23:32 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 69F7861D33
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 11:23:32 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Thu, 23 Mar 2017 12:23:28 +0100
+Message-Id: <1490268208-23368-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.9] sockets: Fix
+ socket_address_to_string() hostname truncation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,17 +28,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Bug 1675108 <1675108@bugs.launchpad.net>, QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: berrange@redhat.com, kraxel@redhat.com, pbonzini@redhat.com
 
-On 23 March 2017 at 11:13, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
-> Technically its not a random thread its the vCPU context (which ensures
-> the vCPU isn't updating while the display is being updated). But I guess
-> the Cocoa is limited to not being able to update from an arbitrary
-> thread?
+We first snprintf() to a fixed buffer, then g_strdup() the result
+*boggle*.
 
-Yes. It's very common for windowing libraries to mandate that you
-do all windowing operations from one specific thread.
+Worse, the size of the fixed buffer INET6_ADDRSTRLEN + 5 + 4 is bogus:
+the 4 correctly accounts for '[', ']', ':' and '\0', but
+INET6_ADDRSTRLEN is not a suitable limit for inet->host, and 5 is not
+one for inet->port!  They are for host and port in *numeric* form
+(exploiting that INET6_ADDRSTRLEN > INET_ADDRSTRLEN), but inet->host
+can also be a hostname, and inet->port can be a service name, to be
+resolved with getaddrinfo().
 
-thanks
--- PMM
+Fortunately, the only user so far is the "socket" network backend's
+net_socket_connected(), which uses it to initialize a NetSocketState's
+info_str[].  info_str[] has considerable more space: 256 instead of
+55.  So the bug's impact appears to be limited to truncated "info
+networks" with the "socket" network backend.
+
+The fix is obvious: use g_strdup_printf().
+
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ util/qemu-sockets.c | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
+
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index 7c120c4..40164bf 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -1307,19 +1307,14 @@ char *socket_address_to_string(struct SocketAddress *addr, Error **errp)
+ {
+     char *buf;
+     InetSocketAddress *inet;
+-    char host_port[INET6_ADDRSTRLEN + 5 + 4];
+ 
+     switch (addr->type) {
+     case SOCKET_ADDRESS_KIND_INET:
+         inet = addr->u.inet.data;
+         if (strchr(inet->host, ':') == NULL) {
+-            snprintf(host_port, sizeof(host_port), "%s:%s", inet->host,
+-                    inet->port);
+-            buf = g_strdup(host_port);
++            buf = g_strdup_printf("%s:%s", inet->host, inet->port);
+         } else {
+-            snprintf(host_port, sizeof(host_port), "[%s]:%s", inet->host,
+-                    inet->port);
+-            buf = g_strdup(host_port);
++            buf = g_strdup_printf("[%s]:%s", inet->host, inet->port);
+         }
+         break;
+ 
+-- 
+2.7.4
