@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cqz52-0008H1-8N
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:30:53 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1cqzE4-0001q1-6c
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:40:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cqz4x-00018A-N1
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:30:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42227)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cqz4x-00017Z-I9
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:30:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cqz4w-0002Dl-Lk
-	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 09:30:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A27DD2E80CD
-	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 09:30:46 +0000 (UTC)
+	(envelope-from <arei.gonglei@huawei.com>) id 1cqzE1-0003nh-2O
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:40:12 -0400
+Received: from [45.249.212.187] (port=3008 helo=dggrg01-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1cqzE0-0003bD-LJ
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 05:40:09 -0400
+From: Gonglei <arei.gonglei@huawei.com>
+Date: Thu, 23 Mar 2017 17:39:09 +0800
+Message-ID: <1490261951-21352-1-git-send-email-arei.gonglei@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 23 Mar 2017 09:25:34 -0000
-From: baoxue <1675332@bugs.launchpad.net>
-Reply-To: Bug 1675332 <1675332@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20170323092534.31010.48815.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1675332] [NEW] qemu-system crashes when use
- sheepdog driver
+Content-Type: text/plain
+Subject: [Qemu-devel] [PULL for-2.9 0/2] cryptodev patches 20170323
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,36 +24,33 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Gonglei <arei.gonglei@huawei.com>
 
-Public bug reported:
+The following changes since commit 55a19ad8b2d0797e3a8fe90ab99a9bb713824059:
 
-Already solved.
+  Update version for v2.9.0-rc1 release (2017-03-21 17:13:29 +0000)
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+are available in the git repository at:
 
+  https://github.com/gongleiarei/qemu.git tags/cryptodev-next-20170323
 
-** Tags: sheepdog
+for you to fetch changes up to b7bad50ae81efeb180609eeecdb086ebc7536ed7:
 
-** Attachment added: "i have fixed."
-   https://bugs.launchpad.net/bugs/1675332/+attachment/4843175/+files/sheep=
-dog.c
+  cryptodev: fix asserting single queue (2017-03-23 17:22:01 +0800)
 
--- =
+----------------------------------------------------------------
+cryptodev fixes
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1675332
+----------------------------------------------------------------
 
-Title:
-  qemu-system crashes when use sheepdog driver
+Halil Pasic (1):
+  cryptodev: fix asserting single queue
 
-Status in QEMU:
-  New
+Longpeng(Mike) (1):
+  cryptodev: setiv only when really need
 
-Bug description:
-  Already solved.
+ backends/cryptodev-builtin.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1675332/+subscriptions
+-- 
+1.7.12.4
