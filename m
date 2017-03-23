@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cr9ca-0007pF-Mf
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:46:13 -0400
+	(envelope-from <quintela@redhat.com>) id 1cr9cd-0007rz-A7
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:46:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cr9cZ-0000FI-Qb
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:46:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47324)
+	(envelope-from <quintela@redhat.com>) id 1cr9cc-0000Hk-Er
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:46:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39420)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cr9cZ-0000Eg-Kb
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:46:11 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cr9cc-0000H8-9L
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:46:14 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9B3CC3B713
-	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 20:46:11 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 45C21804E5
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 20:46:14 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu, 23 Mar 2017 21:45:08 +0100
-Message-Id: <20170323204544.12015-16-quintela@redhat.com>
+Date: Thu, 23 Mar 2017 21:45:10 +0100
+Message-Id: <20170323204544.12015-18-quintela@redhat.com>
 In-Reply-To: <20170323204544.12015-1-quintela@redhat.com>
 References: <20170323204544.12015-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 15/51] ram: Remove norm_mig_bytes_transferred
+Subject: [Qemu-devel] [PATCH 17/51] ram: Move xbzrle_bytes into RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,57 +32,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com
 
-Its value can be calculated by other exported.
-
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- include/migration/migration.h | 1 -
- migration/migration.c         | 3 ++-
- migration/ram.c               | 5 -----
- 3 files changed, 2 insertions(+), 7 deletions(-)
+ migration/ram.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/include/migration/migration.h b/include/migration/migration.h
-index 9c83951..84cef4b 100644
---- a/include/migration/migration.h
-+++ b/include/migration/migration.h
-@@ -277,7 +277,6 @@ void free_xbzrle_decoded_buf(void);
- void acct_update_position(QEMUFile *f, size_t size, bool zero);
- 
- uint64_t dup_mig_pages_transferred(void);
--uint64_t norm_mig_bytes_transferred(void);
- uint64_t norm_mig_pages_transferred(void);
- uint64_t xbzrle_mig_bytes_transferred(void);
- uint64_t xbzrle_mig_pages_transferred(void);
-diff --git a/migration/migration.c b/migration/migration.c
-index c078157..e532430 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -646,7 +646,8 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
-     /* legacy value.  It is not used anymore */
-     info->ram->skipped = 0;
-     info->ram->normal = norm_mig_pages_transferred();
--    info->ram->normal_bytes = norm_mig_bytes_transferred();
-+    info->ram->normal_bytes = norm_mig_pages_transferred() *
-+        (1ul << qemu_target_page_bits());
-     info->ram->mbps = s->mbps;
-     info->ram->dirty_sync_count = s->dirty_sync_count;
-     info->ram->postcopy_requests = s->postcopy_requests;
 diff --git a/migration/ram.c b/migration/ram.c
-index 2c36729..9fa3bd7 100644
+index 690ca8f..721fd66 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -197,11 +197,6 @@ uint64_t dup_mig_pages_transferred(void)
-     return ram_state.zero_pages;
+@@ -172,6 +172,8 @@ struct RAMState {
+     uint64_t norm_pages;
+     /* Iterations since start */
+     uint64_t iterations;
++    /* xbzrle transmitted bytes */
++    uint64_t xbzrle_bytes;
+ };
+ typedef struct RAMState RAMState;
+ 
+@@ -179,7 +181,6 @@ static RAMState ram_state;
+ 
+ /* accounting for migration statistics */
+ typedef struct AccountingInfo {
+-    uint64_t xbzrle_bytes;
+     uint64_t xbzrle_pages;
+     uint64_t xbzrle_cache_miss;
+     double xbzrle_cache_miss_rate;
+@@ -205,7 +206,7 @@ uint64_t norm_mig_pages_transferred(void)
+ 
+ uint64_t xbzrle_mig_bytes_transferred(void)
+ {
+-    return acct_info.xbzrle_bytes;
++    return ram_state.xbzrle_bytes;
  }
  
--uint64_t norm_mig_bytes_transferred(void)
--{
--    return ram_state.norm_pages * TARGET_PAGE_SIZE;
--}
--
- uint64_t norm_mig_pages_transferred(void)
- {
-     return ram_state.norm_pages;
+ uint64_t xbzrle_mig_pages_transferred(void)
+@@ -544,7 +545,7 @@ static int save_xbzrle_page(RAMState *rs, QEMUFile *f, uint8_t **current_data,
+     qemu_put_buffer(f, XBZRLE.encoded_buf, encoded_len);
+     bytes_xbzrle += encoded_len + 1 + 2;
+     acct_info.xbzrle_pages++;
+-    acct_info.xbzrle_bytes += bytes_xbzrle;
++    rs->xbzrle_bytes += bytes_xbzrle;
+     *bytes_transferred += bytes_xbzrle;
+ 
+     return 1;
+@@ -1995,6 +1996,7 @@ static int ram_save_init_globals(RAMState *rs)
+     rs->zero_pages = 0;
+     rs->norm_pages = 0;
+     rs->iterations = 0;
++    rs->xbzrle_bytes = 0;
+     migration_bitmap_sync_init(rs);
+     qemu_mutex_init(&migration_bitmap_mutex);
+ 
 -- 
 2.9.3
