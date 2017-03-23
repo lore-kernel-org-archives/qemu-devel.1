@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cr95i-00083V-GN
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:12:15 -0400
+	(envelope-from <bounces@canonical.com>) id 1cr9SN-0004ag-JG
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:35:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cr95f-0005HI-AW
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:12:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38336)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cr95f-0005GU-2V
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:12:11 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 670E32E6067
-	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 20:12:09 +0000 (UTC)
-Date: Thu, 23 Mar 2017 17:12:03 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170323201203.GA28530@thinpad.lan.raisama.net>
-References: <20170322160052.2820-1-ehabkost@redhat.com>
-	<20170322191305.GO2811@thinpad.lan.raisama.net>
-	<38285f0d-bcb3-e0cd-6bf7-037e81f07b0f@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1cr9SK-00058I-G3
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:35:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37068)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cr9SK-00058B-AO
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:35:36 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cr9SH-0001BS-Md
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 20:35:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A77C02E80C6
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 20:35:33 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <38285f0d-bcb3-e0cd-6bf7-037e81f07b0f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/3] script for crash-testing -device
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 23 Mar 2017 20:29:36 -0000
+From: luigiburdo <intermediadc@hotmail.com>
+Reply-To: Bug 1675549 <1675549@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170323202936.30994.35916.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1675549] [NEW] tcg softmmu i386 crashes on BE
+ hardware
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,98 +36,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Thu, Mar 23, 2017 at 04:43:01PM +0100, Thomas Huth wrote:
-> On 22.03.2017 20:13, Eduardo Habkost wrote:
-> > On Wed, Mar 22, 2017 at 01:00:49PM -0300, Eduardo Habkost wrote:
-> >> This series adds scripts/device-crashtest.py, that can be used to
-> >> crash-test -device with multiple machine/accel/device
-> >> combinations.
-> >>
-> >> The script found a few crashes on some machines/devices. A dump
-> >> of existing cases can be seen here:
-> >>   https://gist.github.com/ehabkost/503b0af0375f0d98d3e84017e8ca54eb
-> >>
-> >> The script contains a whitelist that can also be useful as
-> >> documentation of existing ways -device can fail or crash.
-> >>
-> >> Note that the script takes a few hours to run on the default mode
-> >> (testing all accel/machine/device combinations), but the "-r N"
-> >> option can be used to make it only test N random samples.
-> 
-> Wow, impressive script, that must have been a lot of work 'til you've
-> got it in a usable shape with that huge whitelist!
-> 
-> > Something I forgot to mention: I would like to run some subset of
-> > these tests on "make check", but I don't know how we could choose
-> > that subset. We could run, e.g., 100 random samples, but I am not
-> > sure we really want to make "make check" non-deterministic.
-> 
-> Maybe limit the tests to the devices that have a high chance to work on
-> different machines? ... that means primarily PCI, ISA and USB devices, I
-> guess.
+Public bug reported:
 
-On the other hand, I believe the remaining devices are the ones
-most likely to crash machines unexpectedly...
+Hi,
+today i try to test qemu 2.9rc 1 with qemu-system-i386 if i set display as =
+sdl and i push a key on keyboard qemu exit with an error =
 
-For reference, these are the numbers when trying to test every
-single machine type:
 
-Total: 89321 test cases
-pci: 27749 test cases
-usb: 5125 test cases
-isa: 3948 test cases
+translate-common.c:34:tcg_handle_interrupt: assertion failed:
+(qemu_mutex_iothread_locked())
 
->From those 89k test cases, 67k fail (cleanly). The top reasons they fail are:
+This issue was not present on qemu 2.8.0
 
-Count | Whitelist entry
-------+------------------------------------------------------------------------
-20681 | {'log': "No '[\\w-]+' bus found for device '[\\w-]+'"}
-13076 | {'log': "Option '-device [\\w.,-]+' cannot be handled by this machine"}
- 4821 | {'log': '(Guest|ROM|Flash|Kernel) image must be specified'}
- 4096 | {'device': '.*-(i386|x86_64)-cpu'}
- 3200 | {'log': "images* must be given with the 'pflash' parameter"}
- 3084 | {'log': "[cC]ould not load [\\w ]+ (BIOS|bios) '[\\w-]+\\.bin'"}
- 1120 | {'log': 'Device [\\w.,-]+ can not be dynamically instantiated'}
-  800 | {'log': "Couldn't find rom image '[\\w-]+\\.bin'"}
-  607 | {'device': 'vhost-scsi.*'}
-  551 | {'loglevel': 40, 'log': "Device 'serial0' is in use", 'exitcode': -6}
-  476 | {'log': 'Device [\\w.,-]+ is not supported by this machine yet'}
+Test Machine PowerMac G5 Quad Fedora 25 Server PPC64
+Qemu build with target-list=3Di386-softmuu --with-sdlabi=3D2.0 =
 
-So, a few things we can do:
 
-1) Using query-device-slots: if the test code knew in advance
-which buses/device-types are supported by each machine, we could
-limit the number of devices being tested. That means the test
-code will probably benefit from a query-device-slots command.
+Ciao =
 
-This would get rid of the following:
+Luigi
 
-20681 | {'log': "No '[\\w-]+' bus found for device '[\\w-]+'"}
-13076 | {'log': "Option '-device [\\w.,-]+' cannot be handled by this machine"}
- 1120 | {'log': 'Device [\\w.,-]+ can not be dynamically instantiated'}
-  476 | {'log': 'Device [\\w.,-]+ is not supported by this machine yet'}
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-2) Don't keep trying to test machines that can't be tested out of
-the box because they need rom or kernel images.  The script can
-first try to run the machine with no -device arguments, to ensure
-it is really usable, before trying to test it with all devices.
+-- =
 
-This will get rid of the following:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1675549
 
- 4821 | {'log': '(Guest|ROM|Flash|Kernel) image must be specified'}
- 3200 | {'log': "images* must be given with the 'pflash' parameter"}
- 3084 | {'log': "[cC]ould not load [\\w ]+ (BIOS|bios) '[\\w-]+\\.bin'"}
-  800 | {'log': "Couldn't find rom image '[\\w-]+\\.bin'"}
+Title:
+  tcg  softmmu i386 crashes on BE hardware
 
-3) Not testing the devices from the "devices that won't work out
-   of the box" section. There are ~18k test cases matching those
-   entries.
+Status in QEMU:
+  New
 
-If I did the calculations right, all of the above would eliminate
-more than 63k test cases.
+Bug description:
+  Hi,
+  today i try to test qemu 2.9rc 1 with qemu-system-i386 if i set display a=
+s sdl and i push a key on keyboard qemu exit with an error =
 
--- 
-Eduardo
+
+  translate-common.c:34:tcg_handle_interrupt: assertion failed:
+  (qemu_mutex_iothread_locked())
+
+  This issue was not present on qemu 2.8.0
+
+  Test Machine PowerMac G5 Quad Fedora 25 Server PPC64
+  Qemu build with target-list=3Di386-softmuu --with-sdlabi=3D2.0 =
+
+
+  Ciao =
+
+  Luigi
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1675549/+subscriptions
