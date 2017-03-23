@@ -1,37 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sebott@linux.vnet.ibm.com>) id 1cr1SG-00066H-2T
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 08:03:03 -0400
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1cr1X5-00077T-0J
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 08:08:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sebott@linux.vnet.ibm.com>) id 1cr1SC-0001Ar-7Y
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 08:03:00 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38411)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sebott@linux.vnet.ibm.com>)
-	id 1cr1SB-00019R-Uc
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 08:02:56 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2NBxIng124645
-	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 08:02:54 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29c4yw169d-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 08:02:53 -0400
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <sebott@linux.vnet.ibm.com>;
-	Thu, 23 Mar 2017 12:02:51 -0000
-Date: Thu, 23 Mar 2017 13:02:46 +0100 (CET)
-From: Sebastian Ott <sebott@linux.vnet.ibm.com>
-In-Reply-To: <20170317031743.40128-3-bjsdjshi@linux.vnet.ibm.com>
-References: <20170317031743.40128-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170317031743.40128-3-bjsdjshi@linux.vnet.ibm.com>
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1cr1X1-0002Rn-Qb
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 08:07:58 -0400
+Received: from lhrrgout.huawei.com ([194.213.3.17]:8870)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1cr1X1-0002LT-EB
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 08:07:55 -0400
+References: <1490015240-49118-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<a08674d1-0f08-b8fb-aa11-c971042ac58a@redhat.com>
+	<d149478f-fb4e-6699-5508-570a5bf27869@huawei.com>
+	<20170321130646.7609eb01@bahia.lan>
+From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Message-ID: <85af12e1-b257-50aa-ddc8-fdbe1067741d@huawei.com>
+Date: Thu, 23 Mar 2017 13:07:20 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Message-Id: <alpine.LFD.2.20.1703231302221.3020@schleppi>
-Subject: Re: [Qemu-devel] [PATCH v4 02/16] s390: cio: export more interfaces
+In-Reply-To: <20170321130646.7609eb01@bahia.lan>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v0] fsdev: QMP interface for throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,17 +29,240 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, Cornelia Huck <cornelia.huck@de.ibm.com>, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: Eric Blake <eblake@redhat.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, Alberto Garcia <berto@igalia.com>, Jani Kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-On Fri, 17 Mar 2017, Dong Jia Shi wrote:
-> Export the common I/O interfaces those are needed by an I/O
-> subchannel driver to actually talk to the subchannel.
-> 
-> Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
-> Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> Cc: Sebastian Ott <sebott@linux.vnet.ibm.com>
-> Cc: Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
-> ---
-
-Acked-by: Sebastian Ott <sebott@linux.vnet.ibm.com>
+On 3/21/2017 1:06 PM, Greg Kurz wrote:
+> On Tue, 21 Mar 2017 10:44:32 +0100
+> Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com> wrote:
+>
+>> Hi Eric,
+>>
+>> Thanks for having a look at the patch. My answers are inline.
+>>
+>>> On 03/20/2017 08:07 AM, Pradeep Jagadeesh wrote:
+>>>> This patchset enables qmp interfaces for the 9pfs
+>>>> devices (fsdev).This provides two interfaces one
+>>>
+>>> Space between English sentences, after '.'
+>> OK
+>>>
+>>>> for querying all the 9pfs devices info. The second one
+>>>> to set the IO limits for the required 9pfs device.
+>>>>
+>>>> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+>>>> ---
+>>>
+>>>> +++ b/qapi-schema.json
+>>>> @@ -81,6 +81,9 @@
+>>>>  # QAPI block definitions
+>>>>  { 'include': 'qapi/block.json' }
+>>>>
+>>>> +# QAPI 9pfs definitions
+>>>> +{ 'include': 'qapi/9pfs.json' }
+>>>> +
+>>>>  # QAPI event definitions
+>>>>  { 'include': 'qapi/event.json' }
+>>>>
+>>>> diff --git a/qapi/9pfs.json b/qapi/9pfs.json
+>>>> new file mode 100644
+>>>> index 0000000..c068474
+>>>> --- /dev/null
+>>>> +++ b/qapi/9pfs.json
+>>>> @@ -0,0 +1,169 @@
+>>>> +# -*- Mode: Python -*-
+>>>> +
+>>>> +##
+>>>> +# == QAPI 9p definitions
+>>>> +##
+>>>> +
+>>>> +# QAPI common definitions
+>>>> +{ 'include': 'common.json' }
+>>>> +
+>>>> +##
+>>>> +# @fs9p_set_io_throttle:
+>>>> +#
+>>>> +# Change I/O limits for a 9p/fsdev device.
+>>>> +#
+>>>> +# Since QEMU 2.9, I/0 limits can be enabled on each  fsdev(9pfs) device
+>>>
+>>> This says 2.9...
+>> I meant that, the qemu cli io throttle facility for 9p/fsdev is enabled
+>> in 2.9.But the qmp interfaces are from 2.10.
+>
+> QMP users don't care about the cli API. The only important thing is:
+>
+> Since: 2.10
+>
+> The curious will find out about the background in git log, no need to
+> mention this in the *code*.
+OK
+>
+>>>
+>>>> +#
+>>>> +# I/O limits can be disabled by setting all of them to 0.
+>>>> +#
+>>>> +# Returns: Nothing on success
+>>>> +#          If @device is not a valid 9p device, DeviceNotFound
+>>>> +#
+>>>> +# Since: 2:10
+>>>
+>>> ...but this says 2:10 (typo, should be 2.10).  No need to mention the
+>>> version twice, especially if one of them is wrong (keep the Since: line).
+>> OK, mentioned above.
+>>>
+>>>> +#
+>>>> +# Example:
+>>>> +#
+>>>> +# -> { "execute": "fs9p_set_io_throttle",
+>>>> +#      "arguments": { "device": "ide0-1-0",
+>>>> +#                     "bps": 1000000,
+>>>> +#                     "bps_rd": 0,
+>>>> +#                     "bps_wr": 0,
+>>>> +#                     "iops": 0,
+>>>> +#                     "iops_rd": 0,
+>>>> +#                     "iops_wr": 0,
+>>>> +#                     "bps_max": 8000000,
+>>>> +#                     "bps_rd_max": 0,
+>>>> +#                     "bps_wr_max": 0,
+>>>> +#                     "iops_max": 0,
+>>>> +#                     "iops_rd_max": 0,
+>>>> +#                     "iops_wr_max": 0,
+>>>> +#                     "bps_max_length": 60,
+>>>> +#                     "iops_size": 0 } }
+>>>> +# <- { "returns": {} }
+>>>> +##
+>>>> +{ 'command': 'fs9p_set_io_throttle', 'boxed': true,
+>>>> +  'data': 'FS9PIOThrottle' }
+>>>
+>>> New commands and members should be named with '-' rather than '_' as the
+>>> word separator, so this should be 'fs9p-set-io-throttle', 'bps-rd', etc.
+>> OK, I will change.
+>>
+>>>> +##
+>>>> +# @FS9PIOThrottle:
+>>>> +#
+>>>> +# A set of parameters describing block
+>>>> +#
+>>>> +# @device: Block device name
+>>>> +#
+>>>> +# @bps: total throughput limit in bytes per second
+>>>> +#
+>>>> +# @bps_rd: read throughput limit in bytes per second
+>>>> +#
+>>>> +# @bps_wr: write throughput limit in bytes per second
+>>>> +#
+>>>> +# @iops: total I/O operations per second
+>>>> +#
+>>>> +# @iops_rd: read I/O operations per second
+>>>> +#
+>>>> +# @iops_wr: write I/O operations per second
+>>>> +#
+>>>> +# @bps_max: total throughput limit during bursts,
+>>>> +#                     in bytes (Since 1.7)
+>>>
+>>> You're introducing this struct in 2.10, so this member is not since 1.7.
+>>>  Either that, or you're copying-and-pasting when you should be sharing
+>>> code and reusing an existing struct.
+>> Hmm..copied the block devices code, I will correct it.
+>> I thought of reusing the code, but the whole struct from block devices
+>> can not be used, as there is one member called "group" that is not used
+>> in case of 9p. Also this needs lot of changes even in case of block
+>> devices. Because I may need to rename the structure as IOThrottle or
+>> something like that.
+>> Shall I reuse the code and avoid setting the group member in case of 9p?
+>> What do you think?
+>
+> The code factoring would affect:
+> - hmp_9pfs_set_io_throttle() which looks identical to the existing
+>   hmp_block_set_io_throttle() function
+> - a bunch of lines to handle the throttle arguments in fsdev_set_io_throttle()
+>   which are the same as in qmp_block_set_io_throttle(). And BTW, a similar
+>   refactoring seems doable in the cli API between fsdev_throttle_parse_opts()
+>   and extract_common_blockdev_options().
+Yes, I am going to take care of this.
+> This being said, I don't know what this would mean with json files.
+As of now IOThrottle structure I have put into a different file.
+>
+>>>
+>>>
+>>>> +#
+>>>> +# Since: 2.10
+>>>> +##
+>>>> +{ 'struct': 'FS9PIOThrottle',
+>>>> +  'data': { '*device': 'str', 'bps': 'int', 'bps_rd': 'int',
+>>>> +            'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int', 'iops_wr': 'int',
+>>>> +            '*bps_max': 'int', '*bps_rd_max': 'int',
+>>>> +            '*bps_wr_max': 'int', '*iops_max': 'int',
+>>>> +            '*iops_rd_max': 'int', '*iops_wr_max': 'int',
+>>>> +            '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
+>>>> +            '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
+>>>> +            '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
+>>>> +            '*iops_size': 'int' } }
+>>>
+>>> If you reuse an existing struct that uses _ instead of -, then that
+>>> explains your naming.  But in that case, why do you need to declare a
+>>> new (copied) struct, instead of just reusing the existing one?
+>>>
+>> Explained in above comment.
+>>>> +
+>>>> +##
+>>>> +# @query-9pfs-io-throttle:
+>>>> +#
+>>>> +# Return a list of information about each iothread
+>>>> +#
+>>>> +# Returns: @FS9PIOIOThrottle
+>>>> +#
+>>>> +# Since: 2.10
+>>>> +#
+>>>> +# Example:
+>>>> +#
+>>>> +# -> { "Execute": "query-9pfs-io-throttle" }
+>>>> +# <- { "returns" : [
+>>>> +#          {
+>>>> +#             "device": "ide0-hd0",
+>>>> +#              "bps":1000000,
+>>>> +#              "bps_rd":0,
+>>>> +#              "bps_wr":0,
+>>>> +#              "iops":1000000,
+>>>> +#              "iops_rd":0,
+>>>> +#              "iops_wr":0,
+>>>> +#              "bps_max": 8000000,
+>>>> +#              "bps_rd_max": 0,
+>>>> +#              "bps_wr_max": 0,
+>>>
+>>> You are not consistent on whether to include a space after ':'.  The
+>>> easiest way to get this right is to paste actual output from pretty qmp
+>>> mode.
+>> I will fix this.
+>>>
+>>>> +#              "iops_max": 0,
+>>>> +#              "iops_rd_max": 0,
+>>>> +#              "iops_wr_max": 0,
+>>>> +#              "bps_max_length": 0,
+>>>> +#              "bps_rd_max_length": 0,
+>>>> +#              "bps_wr_max_length": 0,
+>>>> +#              "iops_max_length": 0,
+>>>> +#              "iops_rd_max_length": 0,
+>>>> +#              "iops_wr_max_length": 0,
+>>>> +#              "iops_size": 0,
+>>>> +#            }
+>>>
+>>> This is not valid JSON. No trailing commas.
+>> Will fix
+>>>
+>>>> +#          ]
+>>>> +#      }
+>>>> +#
+>>>> +##
+>>>> +{ 'command': 'query-9pfs-io-throttle', 'returns': [ 'FS9PIOThrottle' ] }
+>>>> +
+>
+> .git/rebase-apply/patch:631: new blank line at EOF.
+> +
+> warning: 1 line adds whitespace errors.
+>
+>>>>
+>>>
+>>
+>
