@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cr0xc-0001AT-0Y
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 07:31:20 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cr0yS-0001nv-NI
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 07:32:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cr0xW-000518-EA
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 07:31:20 -0400
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:35066)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cr0xW-0004zv-82
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 07:31:14 -0400
-Received: by mail-wm0-x22d.google.com with SMTP id u132so58600398wmg.0
-	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 04:31:14 -0700 (PDT)
-References: <20170322172621.26186.61813.malonedeb@gac.canonical.com>
-	<CAFEAcA8UYsjy6sBTGqk1Crd-0tWpF0WWukA03_GyNRaG95L07Q@mail.gmail.com>
-	<87d1d8xn41.fsf@linaro.org>
-	<CAFEAcA-VQHv-wD+2NBwYAe75139+37qkaypCbKOoHHk5ZRr-QA@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA-VQHv-wD+2NBwYAe75139+37qkaypCbKOoHHk5ZRr-QA@mail.gmail.com>
-Date: Thu, 23 Mar 2017 11:31:11 +0000
-Message-ID: <87bmssxm9s.fsf@linaro.org>
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cr0yN-00064Y-Q6
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 07:32:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51120)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1cr0yN-00064A-Jh
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 07:32:07 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Thu, 23 Mar 2017 15:31:56 +0400
+Message-Id: <20170323113156.9277-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Bug 1675108] [NEW] Cocoa UI always crashes on
- startup
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] slirp: tftp, copy sockaddr_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,24 +25,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Bug 1675108 <1675108@bugs.launchpad.net>, QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
+ASAN detects an "unknown-crash" when running pxe-test:
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+/ppc64/pxe/spapr-vlan: =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+=3D=3D7143=3D=3DERROR: AddressSanitizer: unknown-crash on address 0x7f6dc=
+d298d30 at pc 0x55e22218830d bp 0x7f6dcd2989e0 sp 0x7f6dcd2989d0
+READ of size 128 at 0x7f6dcd298d30 thread T2
+    #0 0x55e22218830c in tftp_session_allocate /home/elmarco/src/qq/slirp=
+/tftp.c:73
+    #1 0x55e22218a1f8 in tftp_handle_rrq /home/elmarco/src/qq/slirp/tftp.=
+c:289
+    #2 0x55e22218b54c in tftp_input /home/elmarco/src/qq/slirp/tftp.c:446
+    #3 0x55e2221833fe in udp6_input /home/elmarco/src/qq/slirp/udp6.c:82
+    #4 0x55e222137b17 in ip6_input /home/elmarco/src/qq/slirp/ip6_input.c=
+:67
 
-> On 23 March 2017 at 11:13, Alex Bennée <alex.bennee@linaro.org> wrote:
->> Technically its not a random thread its the vCPU context (which ensures
->> the vCPU isn't updating while the display is being updated). But I guess
->> the Cocoa is limited to not being able to update from an arbitrary
->> thread?
->
-> Yes. It's very common for windowing libraries to mandate that you
-> do all windowing operations from one specific thread.
+Address 0x7f6dcd298d30 is located in stack of thread T2 at offset 96 in f=
+rame
+    #0 0x55e222182420 in udp6_input /home/elmarco/src/qq/slirp/udp6.c:13
 
-Fair enough. Well let me know if that works OK on MacOS and I'll fold it
-in to the other console patches. In fact I might as well do the
-start/end_exclusive dance for all OSes and it will achieve the same thing.
+  This frame has 3 object(s):
+    [32, 48) '<unknown>'
+    [96, 124) 'lhost' <=3D=3D Memory access at offset 96 partially overfl=
+ows this variable
+    [160, 200) 'save_ip' <=3D=3D Memory access at offset 96 partially und=
+erflows this variable
 
---
-Alex Bennée
+The sockaddr_storage pointer is the sockaddr_in6 lhost on the
+stack. Copy only the source addr size.
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ slirp/tftp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/slirp/tftp.c b/slirp/tftp.c
+index 50e714807d..a9bc4bb1b6 100644
+--- a/slirp/tftp.c
++++ b/slirp/tftp.c
+@@ -70,7 +70,7 @@ static int tftp_session_allocate(Slirp *slirp, struct s=
+ockaddr_storage *srcsas,
+=20
+  found:
+   memset(spt, 0, sizeof(*spt));
+-  spt->client_addr =3D *srcsas;
++  memcpy(&spt->client_addr, srcsas, sockaddr_size(srcsas));
+   spt->fd =3D -1;
+   spt->block_size =3D 512;
+   spt->client_port =3D tp->udp.uh_sport;
+--=20
+2.12.0.191.gc5d8de91d
