@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cr9cO-0007eN-3f
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:46:01 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cr9cL-00006E-BD
+	(envelope-from <quintela@redhat.com>) id 1cr9cK-0007cL-SW
 	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:46:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35846)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <quintela@redhat.com>) id 1cr9cJ-00005L-WB
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:45:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34458)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cr9cL-00005Z-3F
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:45:57 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cr9cJ-000057-OZ
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 16:45:55 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1483A61E5F
-	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 20:45:57 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BC7977AE9A
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 20:45:55 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu, 23 Mar 2017 21:44:58 +0100
-Message-Id: <20170323204544.12015-6-quintela@redhat.com>
+Date: Thu, 23 Mar 2017 21:44:57 +0100
+Message-Id: <20170323204544.12015-5-quintela@redhat.com>
 In-Reply-To: <20170323204544.12015-1-quintela@redhat.com>
 References: <20170323204544.12015-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 05/51] ram: Move bitmap_sync_count into RAMState
+Subject: [Qemu-devel] [PATCH 04/51] ram: Add dirty_rate_high_cnt to RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,112 +32,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com
 
+We need to add a parameter to several functions to make this work.
+
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/ram.c | 23 ++++++++++++-----------
- 1 file changed, 12 insertions(+), 11 deletions(-)
+ migration/ram.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
 diff --git a/migration/ram.c b/migration/ram.c
-index 1d5bf22..f811e81 100644
+index a6e90d7..1d5bf22 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
 @@ -45,8 +45,6 @@
  #include "qemu/rcu_queue.h"
  #include "migration/colo.h"
  
--static uint64_t bitmap_sync_count;
+-static int dirty_rate_high_cnt;
 -
- /***********************************************************/
- /* ram save/restore */
+ static uint64_t bitmap_sync_count;
  
+ /***********************************************************/
 @@ -154,6 +152,8 @@ struct RAMState {
+     uint32_t last_version;
+     /* We are in the first round */
      bool ram_bulk_stage;
-     /* How many times we have dirty too many pages */
-     int dirty_rate_high_cnt;
-+    /* How many times we have synchronized the bitmap */
-+    uint64_t bitmap_sync_count;
++    /* How many times we have dirty too many pages */
++    int dirty_rate_high_cnt;
  };
  typedef struct RAMState RAMState;
  
-@@ -471,7 +471,7 @@ static void xbzrle_cache_zero_page(RAMState *rs, ram_addr_t current_addr)
-     /* We don't care if this fails to allocate a new cache page
-      * as long as it updated an old one */
-     cache_insert(XBZRLE.cache, current_addr, ZERO_TARGET_PAGE,
--                 bitmap_sync_count);
-+                 rs->bitmap_sync_count);
+@@ -651,7 +651,7 @@ uint64_t ram_pagesize_summary(void)
+     return summary;
  }
  
- #define ENCODING_FLAG_XBZRLE 0x1
-@@ -483,6 +483,7 @@ static void xbzrle_cache_zero_page(RAMState *rs, ram_addr_t current_addr)
-  *          0 means that page is identical to the one already sent
-  *          -1 means that xbzrle would be longer than normal
-  *
-+ * @rs: current RAM state
-  * @f: QEMUFile where to send the data
-  * @current_data: contents of the page
-  * @current_addr: addr of the page
-@@ -491,7 +492,7 @@ static void xbzrle_cache_zero_page(RAMState *rs, ram_addr_t current_addr)
-  * @last_stage: if we are at the completion stage
-  * @bytes_transferred: increase it with the number of transferred bytes
-  */
--static int save_xbzrle_page(QEMUFile *f, uint8_t **current_data,
-+static int save_xbzrle_page(RAMState *rs, QEMUFile *f, uint8_t **current_data,
-                             ram_addr_t current_addr, RAMBlock *block,
-                             ram_addr_t offset, bool last_stage,
-                             uint64_t *bytes_transferred)
-@@ -499,11 +500,11 @@ static int save_xbzrle_page(QEMUFile *f, uint8_t **current_data,
-     int encoded_len = 0, bytes_xbzrle;
-     uint8_t *prev_cached_page;
+-static void migration_bitmap_sync(void)
++static void migration_bitmap_sync(RAMState *rs)
+ {
+     RAMBlock *block;
+     MigrationState *s = migrate_get_current();
+@@ -696,9 +696,9 @@ static void migration_bitmap_sync(void)
+             if (s->dirty_pages_rate &&
+                (num_dirty_pages_period * TARGET_PAGE_SIZE >
+                    (bytes_xfer_now - bytes_xfer_prev)/2) &&
+-               (dirty_rate_high_cnt++ >= 2)) {
++               (rs->dirty_rate_high_cnt++ >= 2)) {
+                     trace_migration_throttle();
+-                    dirty_rate_high_cnt = 0;
++                    rs->dirty_rate_high_cnt = 0;
+                     mig_throttle_guest_down();
+              }
+              bytes_xfer_prev = bytes_xfer_now;
+@@ -1919,7 +1919,7 @@ int ram_postcopy_send_discard_bitmap(MigrationState *ms)
+     rcu_read_lock();
  
--    if (!cache_is_cached(XBZRLE.cache, current_addr, bitmap_sync_count)) {
-+    if (!cache_is_cached(XBZRLE.cache, current_addr, rs->bitmap_sync_count)) {
-         acct_info.xbzrle_cache_miss++;
-         if (!last_stage) {
-             if (cache_insert(XBZRLE.cache, current_addr, *current_data,
--                             bitmap_sync_count) == -1) {
-+                             rs->bitmap_sync_count) == -1) {
-                 return -1;
-             } else {
-                 /* update *current_data when the page has been
-@@ -658,7 +659,7 @@ static void migration_bitmap_sync(RAMState *rs)
-     int64_t end_time;
-     int64_t bytes_xfer_now;
+     /* This should be our last sync, the src is now paused */
+-    migration_bitmap_sync();
++    migration_bitmap_sync(&ram_state);
  
--    bitmap_sync_count++;
-+    rs->bitmap_sync_count++;
- 
-     if (!bytes_xfer_prev) {
-         bytes_xfer_prev = ram_bytes_transferred();
-@@ -720,9 +721,9 @@ static void migration_bitmap_sync(RAMState *rs)
-         start_time = end_time;
-         num_dirty_pages_period = 0;
-     }
--    s->dirty_sync_count = bitmap_sync_count;
-+    s->dirty_sync_count = rs->bitmap_sync_count;
-     if (migrate_use_events()) {
--        qapi_event_send_migration_pass(bitmap_sync_count, NULL);
-+        qapi_event_send_migration_pass(rs->bitmap_sync_count, NULL);
-     }
- }
- 
-@@ -829,7 +830,7 @@ static int ram_save_page(RAMState *rs, MigrationState *ms, QEMUFile *f,
-             ram_release_pages(ms, block->idstr, pss->offset, pages);
-         } else if (!rs->ram_bulk_stage &&
-                    !migration_in_postcopy(ms) && migrate_use_xbzrle()) {
--            pages = save_xbzrle_page(f, &p, current_addr, block,
-+            pages = save_xbzrle_page(rs, f, &p, current_addr, block,
-                                      offset, last_stage, bytes_transferred);
-             if (!last_stage) {
-                 /* Can't send this cached data async, since the cache page
-@@ -1998,7 +1999,7 @@ static int ram_save_init_globals(RAMState *rs)
+     unsentmap = atomic_rcu_read(&migration_bitmap_rcu)->unsentmap;
+     if (!unsentmap) {
+@@ -1997,7 +1997,7 @@ static int ram_save_init_globals(RAMState *rs)
+ {
      int64_t ram_bitmap_pages; /* Size of bitmap in pages, including gaps */
  
-     rs->dirty_rate_high_cnt = 0;
--    bitmap_sync_count = 0;
-+    rs->bitmap_sync_count = 0;
+-    dirty_rate_high_cnt = 0;
++    rs->dirty_rate_high_cnt = 0;
+     bitmap_sync_count = 0;
      migration_bitmap_sync_init();
      qemu_mutex_init(&migration_bitmap_mutex);
+@@ -2061,7 +2061,7 @@ static int ram_save_init_globals(RAMState *rs)
+     migration_dirty_pages = ram_bytes_total() >> TARGET_PAGE_BITS;
  
+     memory_global_dirty_log_start();
+-    migration_bitmap_sync();
++    migration_bitmap_sync(rs);
+     qemu_mutex_unlock_ramlist();
+     qemu_mutex_unlock_iothread();
+     rcu_read_unlock();
+@@ -2209,7 +2209,7 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
+     rcu_read_lock();
+ 
+     if (!migration_in_postcopy(migrate_get_current())) {
+-        migration_bitmap_sync();
++        migration_bitmap_sync(rs);
+     }
+ 
+     ram_control_before_iterate(f, RAM_CONTROL_FINISH);
+@@ -2242,6 +2242,7 @@ static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
+                              uint64_t *non_postcopiable_pending,
+                              uint64_t *postcopiable_pending)
+ {
++    RAMState *rs = opaque;
+     uint64_t remaining_size;
+ 
+     remaining_size = ram_save_remaining() * TARGET_PAGE_SIZE;
+@@ -2250,7 +2251,7 @@ static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
+         remaining_size < max_size) {
+         qemu_mutex_lock_iothread();
+         rcu_read_lock();
+-        migration_bitmap_sync();
++        migration_bitmap_sync(rs);
+         rcu_read_unlock();
+         qemu_mutex_unlock_iothread();
+         remaining_size = ram_save_remaining() * TARGET_PAGE_SIZE;
 -- 
 2.9.3
