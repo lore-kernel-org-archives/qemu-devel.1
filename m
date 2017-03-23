@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53846)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cr6i1-0005Pz-Cv
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 13:39:38 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1cr6i3-0005Rz-LV
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 13:39:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cr6i0-0002RI-4c
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 13:39:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37358)
+	(envelope-from <pbonzini@redhat.com>) id 1cr6i2-0002S8-Oz
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 13:39:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54300)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cr6hz-0002R9-Rv
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 13:39:36 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cr6i2-0002Rq-JR
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 13:39:38 -0400
 Received: from int-mx13.intmail.prod.int.phx2.redhat.com
 	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E1655624A9
-	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 17:39:35 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 94883A0E46
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 17:39:38 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 23 Mar 2017 18:39:22 +0100
-Message-Id: <20170323173928.14439-5-pbonzini@redhat.com>
+Date: Thu, 23 Mar 2017 18:39:24 +0100
+Message-Id: <20170323173928.14439-7-pbonzini@redhat.com>
 In-Reply-To: <20170323173928.14439-1-pbonzini@redhat.com>
 References: <20170323173928.14439-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 04/10] blockjob: introduce
- block_job_pause/resume_all
+Subject: [Qemu-devel] [PATCH 06/10] blockjob: move iostatus reset inside
+ block_job_user_resume
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,258 +33,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: jcody@redhat.com, jsnow@redhat.com
 
-Remove use of block_job_pause/resume from outside blockjob.c, thus
-making them static.  Again, one reason to do this is that
-block_job_pause/resume will have different locking rules compared
-to everything else that block.c and block/io.c use.
+Outside blockjob.c, the block_job_iostatus_reset function is used once
+in the monitor and once in BlockBackend.  When we introduce the block
+job mutex, block_job_iostatus_reset's client is going to be the block
+layer (for which blockjob.c will take the block job mutex) rather than
+the monitor (which will take the block job mutex by itself).
+
+The monitor's call to block_job_iostatus_reset from the monitor comes
+just before the sole call to block_job_user_resume, so reset the
+iostatus directly from block_job_iostatus_reset.  This will avoid
+the need to introduce separate block_job_iostatus_reset and
+block_job_iostatus_reset_locked APIs.
+
+After making this change, move the function together with the others
+that were moved in the previous patch.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/io.c               |  18 +-------
- blockjob.c               | 114 ++++++++++++++++++++++++++++-------------------
- include/block/blockjob.h |  14 +++---
- 3 files changed, 77 insertions(+), 69 deletions(-)
+ blockdev.c |  1 -
+ blockjob.c | 11 ++++++-----
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/block/io.c b/block/io.c
-index 2709a70..1cc9318 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -284,16 +284,9 @@ void bdrv_drain_all_begin(void)
-     bool waited = true;
-     BlockDriverState *bs;
-     BdrvNextIterator it;
--    BlockJob *job = NULL;
-     GSList *aio_ctxs = NULL, *ctx;
- 
--    while ((job = block_job_next(job))) {
--        AioContext *aio_context = blk_get_aio_context(job->blk);
--
--        aio_context_acquire(aio_context);
--        block_job_pause(job);
--        aio_context_release(aio_context);
--    }
-+    block_job_pause_all();
- 
-     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
-         AioContext *aio_context = bdrv_get_aio_context(bs);
-@@ -337,7 +330,6 @@ void bdrv_drain_all_end(void)
- {
-     BlockDriverState *bs;
-     BdrvNextIterator it;
--    BlockJob *job = NULL;
- 
-     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
-         AioContext *aio_context = bdrv_get_aio_context(bs);
-@@ -348,13 +340,7 @@ void bdrv_drain_all_end(void)
-         aio_context_release(aio_context);
+diff --git a/blockdev.c b/blockdev.c
+index c5b2c2c..fbc376b 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3726,7 +3726,6 @@ void qmp_block_job_resume(const char *device, Error **errp)
      }
  
--    while ((job = block_job_next(job))) {
--        AioContext *aio_context = blk_get_aio_context(job->blk);
--
--        aio_context_acquire(aio_context);
--        block_job_resume(job);
--        aio_context_release(aio_context);
--    }
-+    block_job_resume_all();
+     trace_qmp_block_job_resume(job);
+-    block_job_iostatus_reset(job);
+     block_job_user_resume(job);
+     aio_context_release(aio_context);
  }
- 
- void bdrv_drain_all(void)
 diff --git a/blockjob.c b/blockjob.c
-index 1c63d15..caca718 100644
+index c5f1d19..c9cb5b1 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -55,36 +55,6 @@ struct BlockJobTxn {
- 
- static QLIST_HEAD(, BlockJob) block_jobs = QLIST_HEAD_INITIALIZER(block_jobs);
- 
--static char *child_job_get_parent_desc(BdrvChild *c)
--{
--    BlockJob *job = c->opaque;
--    return g_strdup_printf("%s job '%s'",
--                           BlockJobType_lookup[job->driver->job_type],
--                           job->id);
--}
--
--static const BdrvChildRole child_job = {
--    .get_parent_desc    = child_job_get_parent_desc,
--    .stay_at_node       = true,
--};
--
--static void block_job_drained_begin(void *opaque)
--{
--    BlockJob *job = opaque;
--    block_job_pause(job);
--}
--
--static void block_job_drained_end(void *opaque)
--{
--    BlockJob *job = opaque;
--    block_job_resume(job);
--}
--
--static const BlockDevOps block_job_dev_ops = {
--    .drained_begin = block_job_drained_begin,
--    .drained_end = block_job_drained_end,
--};
--
- BlockJob *block_job_next(BlockJob *job)
+@@ -481,6 +481,7 @@ void block_job_user_resume(BlockJob *job)
  {
-     if (!job) {
-@@ -106,6 +76,21 @@ BlockJob *block_job_get(const char *id)
-     return NULL;
+     if (job && job->user_paused && job->pause_count > 0) {
+         job->user_paused = false;
++        block_job_iostatus_reset(job);
+         block_job_resume(job);
+     }
  }
- 
-+static void block_job_pause(BlockJob *job)
-+{
-+    job->pause_count++;
-+}
-+
-+static void block_job_resume(BlockJob *job)
-+{
-+    assert(job->pause_count > 0);
-+    job->pause_count--;
-+    if (job->pause_count) {
-+        return;
-+    }
-+    block_job_enter(job);
-+}
-+
- static void block_job_ref(BlockJob *job)
- {
-     ++job->refcnt;
-@@ -171,6 +156,36 @@ static void block_job_detach_aio_context(void *opaque)
-     block_job_unref(job);
- }
- 
-+static char *child_job_get_parent_desc(BdrvChild *c)
-+{
-+    BlockJob *job = c->opaque;
-+    return g_strdup_printf("%s job '%s'",
-+                           BlockJobType_lookup[job->driver->job_type],
-+                           job->id);
-+}
-+
-+static const BdrvChildRole child_job = {
-+    .get_parent_desc    = child_job_get_parent_desc,
-+    .stay_at_node       = true,
-+};
-+
-+static void block_job_drained_begin(void *opaque)
-+{
-+    BlockJob *job = opaque;
-+    block_job_pause(job);
-+}
-+
-+static void block_job_drained_end(void *opaque)
-+{
-+    BlockJob *job = opaque;
-+    block_job_resume(job);
-+}
-+
-+static const BlockDevOps block_job_dev_ops = {
-+    .drained_begin = block_job_drained_begin,
-+    .drained_end = block_job_drained_end,
-+};
-+
- void block_job_remove_all_bdrv(BlockJob *job)
- {
-     GSList *l;
-@@ -471,11 +486,6 @@ void block_job_complete(BlockJob *job, Error **errp)
-     job->driver->complete(job, errp);
- }
- 
--void block_job_pause(BlockJob *job)
--{
--    job->pause_count++;
--}
--
- void block_job_user_pause(BlockJob *job)
- {
-     job->user_paused = true;
-@@ -520,16 +530,6 @@ void coroutine_fn block_job_pause_point(BlockJob *job)
+@@ -496,11 +497,6 @@ void block_job_cancel(BlockJob *job)
      }
  }
  
--void block_job_resume(BlockJob *job)
+-void block_job_iostatus_reset(BlockJob *job)
 -{
--    assert(job->pause_count > 0);
--    job->pause_count--;
--    if (job->pause_count) {
--        return;
--    }
--    block_job_enter(job);
+-    job->iostatus = BLOCK_DEVICE_IO_STATUS_OK;
 -}
 -
- void block_job_user_resume(BlockJob *job)
- {
-     if (job && job->user_paused && job->pause_count > 0) {
-@@ -723,6 +723,30 @@ static void block_job_event_completed(BlockJob *job, const char *msg)
-                                         &error_abort);
+ static int block_job_finish_sync(BlockJob *job,
+                                  void (*finish)(BlockJob *, Error **errp),
+                                  Error **errp)
+@@ -751,6 +747,11 @@ void block_job_yield(BlockJob *job)
+     block_job_pause_point(job);
  }
  
-+void block_job_pause_all(void)
++void block_job_iostatus_reset(BlockJob *job)
 +{
-+    BlockJob *job = NULL;
-+    while ((job = block_job_next(job))) {
-+        AioContext *aio_context = blk_get_aio_context(job->blk);
-+
-+        aio_context_acquire(aio_context);
-+        block_job_pause(job);
-+        aio_context_release(aio_context);
-+    }
-+}
-+
-+void block_job_resume_all(void)
-+{
-+    BlockJob *job = NULL;
-+    while ((job = block_job_next(job))) {
-+        AioContext *aio_context = blk_get_aio_context(job->blk);
-+
-+        aio_context_acquire(aio_context);
-+        block_job_resume(job);
-+        aio_context_release(aio_context);
-+    }
++    job->iostatus = BLOCK_DEVICE_IO_STATUS_OK;
 +}
 +
  void block_job_event_ready(BlockJob *job)
  {
      job->ready = true;
-diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index 9e906f7..aac87cd 100644
---- a/include/block/blockjob.h
-+++ b/include/block/blockjob.h
-@@ -235,12 +235,11 @@ void block_job_complete(BlockJob *job, Error **errp);
- BlockJobInfo *block_job_query(BlockJob *job, Error **errp);
- 
- /**
-- * block_job_pause:
-- * @job: The job to be paused.
-+ * block_job_pause_all:
-  *
-- * Asynchronously pause the specified job.
-+ * Asynchronously pause all jobs.
-  */
--void block_job_pause(BlockJob *job);
-+void block_job_pause_all(void);
- 
- /**
-  * block_job_user_pause:
-@@ -260,12 +259,11 @@ void block_job_user_pause(BlockJob *job);
- bool block_job_user_paused(BlockJob *job);
- 
- /**
-- * block_job_resume:
-- * @job: The job to be resumed.
-+ * block_job_resume_all:
-  *
-- * Resume the specified job.  Must be paired with a preceding block_job_pause.
-+ * Resume all block jobs.  Must be paired with a preceding block_job_pause_all.
-  */
--void block_job_resume(BlockJob *job);
-+void block_job_resume_all(void);
- 
- /**
-  * block_job_user_resume:
 -- 
 2.9.3
