@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cr2iP-0008KI-Rs
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 09:23:47 -0400
+	(envelope-from <vfeenstr@redhat.com>) id 1cr2lK-0000ik-4Q
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 09:26:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cr2iO-0004au-LM
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 09:23:45 -0400
-References: <1490189568-167621-1-git-send-email-imammedo@redhat.com>
-	<1490189568-167621-23-git-send-email-imammedo@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c22d6e03-e63c-6a90-e9f3-419255c2c4d2@redhat.com>
-Date: Thu, 23 Mar 2017 08:23:32 -0500
-MIME-Version: 1.0
-In-Reply-To: <1490189568-167621-23-git-send-email-imammedo@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="joBDmX8SifM9LJm99qNarDjcdWPvlNogk"
-Subject: Re: [Qemu-devel] [PATCH for-2.10 22/23] numa: add '-numa cpu,
- ...' option for property based node mapping
+	(envelope-from <vfeenstr@redhat.com>) id 1cr2lG-0005tg-Ux
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 09:26:46 -0400
+Received: from mail-wm0-f43.google.com ([74.125.82.43]:38732)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <vfeenstr@redhat.com>) id 1cr2lG-0005tE-JW
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 09:26:42 -0400
+Received: by mail-wm0-f43.google.com with SMTP id t189so63120547wmt.1
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 06:26:42 -0700 (PDT)
+From: Vinzenz Feenstra <vfeenstr@redhat.com>
+Message-Id: <AAC5CDB0-6044-41AF-8DAB-DD778255C688@redhat.com>
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Date: Thu, 23 Mar 2017 14:26:39 +0100
+In-Reply-To: <CAJ+F1C+953eKcpLFO7_6mnXb0tE4zP_jAhhMbDX5tBEDUtNZVw@mail.gmail.com>
+References: <20170322171656.7901-1-vfeenstr@redhat.com>
+	<20170322171656.7901-2-vfeenstr@redhat.com>
+	<db0744da-66e9-9f65-1772-2bbb6b85126e@daynix.com>
+	<CAJ+F1C+953eKcpLFO7_6mnXb0tE4zP_jAhhMbDX5tBEDUtNZVw@mail.gmail.com>
+Content-Type: text/plain;
+	charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] qga: Add `guest-get-timezone` command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,129 +32,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: sameeh jubran <sameeh@daynix.com>, QEMU Developers <qemu-devel@nongnu.org>, mdroth@linux.vnet.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---joBDmX8SifM9LJm99qNarDjcdWPvlNogk
-From: Eric Blake <eblake@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao
- <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
-Message-ID: <c22d6e03-e63c-6a90-e9f3-419255c2c4d2@redhat.com>
-Subject: Re: [PATCH for-2.10 22/23] numa: add '-numa cpu,...' option for
- property based node mapping
-References: <1490189568-167621-1-git-send-email-imammedo@redhat.com>
- <1490189568-167621-23-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1490189568-167621-23-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 03/22/2017 08:32 AM, Igor Mammedov wrote:
-> legacy cpu to node mapping is using cpu index values to map
-> VCPU to node with help of '-numa node,nodeid=3Dnode,cpus=3Dx[-y]'
-> option. However cpu index is internal concept and QEMU users
-> have to guess /reimplement qemu's logic/ to map it to
-> a concrete cpu socket/core/thread to make sane CPUs
-> placement across numa nodes.
+> On Mar 23, 2017, at 1:51 PM, Marc-Andr=C3=A9 Lureau =
+<marcandre.lureau@gmail.com> wrote:
 >=20
-> This patch allows to map cpu objects to numa nodes using
-> the same properties as used for cpus with -device/device_add
-> (socket-id/core-id/thread-id/node-id).
+> Hi
 >=20
-> At present valid properties/values to address CPUs could be
-> fetched using hotpluggable-cpus monitor/qmp command, it will
-> require user to start qemu twice when creating domain to fetch
-> possible CPUs for a machine type/-smp layout first and
-> then the second time with numa explicit mapping for actual
-> usage. The first step results could be saved and reused to
-> set/change mapping later as far as machine type/-smp stays
-> the same.
+> On Thu, Mar 23, 2017 at 4:41 PM sameeh jubran <sameeh@daynix.com =
+<mailto:sameeh@daynix.com>> wrote:
+> I have tested the patch on Windows 2012 R2 and it seems to be working =
+good.
 >=20
-> Proposed impl. supports exact and wildcard matching to
-> simplify CLI and allow to set mapping for a specific cpu
-> or group of cpu objects specified by matched properties.
+> Please see some comments inline.
 >=20
-> For example:
 >=20
->    # exact mapping x86
->    -numa cpu,node-id=3Dx,socket-id=3Dy,core-id=3Dz,thread-id=3Dn
+> On 3/22/2017 7:16 PM, Vinzenz 'evilissimo' Feenstra wrote:
+> > From: Vinzenz Feenstra <vfeenstr@redhat.com =
+<mailto:vfeenstr@redhat.com>>
+> >
+> > Adds a new command `guest-get-timezone` reporting the currently
+> > configured timezone on the system. The information on what timezone =
+is
+> > currently is configured is useful in case of Windows VMs where the
+> > offset of the hardware clock is required to have the same offset. =
+This
+> > can be used for management systems like `oVirt` to detect the =
+timezone
+> > difference and warn administrators of the misconfiguration.
+> >
+> > Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com =
+<mailto:vfeenstr@redhat.com>>
+> > ---
+> >   qga/commands.c       | 19 +++++++++++++++++++
+> >   qga/qapi-schema.json | 26 ++++++++++++++++++++++++++
+> >   2 files changed, 45 insertions(+)
+> >
+> > diff --git a/qga/commands.c b/qga/commands.c
+> > index 4d92946..83d7f99 100644
+> > --- a/qga/commands.c
+> > +++ b/qga/commands.c
+> > @@ -499,3 +499,22 @@ int ga_parse_whence(GuestFileWhence *whence, =
+Error **errp)
+> >       error_setg(errp, "invalid whence code %"PRId64, =
+whence->u.value);
+> >       return -1;
+> >   }
+> > +
+> > +GuestTimezone *qmp_guest_get_timezone(Error **errp)
+> > +{
+> > +    GuestTimezone *info =3D g_new0(GuestTimezone, 1);
+> Check for null
+> > +    GTimeZone *tz =3D g_time_zone_new_local();
+> Check for null
+> > +    gint32 interval =3D g_time_zone_find_interval(tz, =
+G_TIME_TYPE_STANDARD, 0);
+> Check if interval is -1
+
+Will add the checks above in v3
+
+> > +    gchar const *name =3D g_time_zone_get_abbreviation(tz, =
+interval);
+> > +    if (name !=3D NULL) {
+> > +        info->offset =3D g_time_zone_get_offset(tz, interval) / 60;
+> g_time_zone_get_offset returns the offset in seconds, dividing by 60
+> will give us the offset in minutes.
+> Is there a reason to display it in minutes instead of hours?
+
+Yes, there are offsets that are in minutes, some are 45 minutes, some 30 =
+minutes so hours
+aren=E2=80=99t enough.
+
+> Either way I think you should display the units in the output.
 >=20
->    # exact mapping SPAPR
->    -numa cpu,node-id=3Dx,core-id=3Dy
+> And 60 is a magic number, Even though it is very clear, I think it is
+> better to add a define for that or check if glib already has one.
 >=20
->    # wildcard mapping, all cpu objects that match socket-id=3Dy
->    # are mapped to node-id=3Dx
->    -numa cpu,node-id=3Dx,socket-id=3Dy
->=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
->  numa.c           | 13 +++++++++++++
->  qapi-schema.json |  7 +++++--
->  qemu-options.hx  | 23 ++++++++++++++++++++++-
->  3 files changed, 40 insertions(+), 3 deletions(-)
->=20
+> Instead, why not follow glib API and return seconds?
+
+In an earlier iteration I did use a Windows API function and the offset =
+value in Windows is returned
+in minutes. See here the documentation for the  =E2=80=98Bias=E2=80=99 =
+fields:
+=
+https://msdn.microsoft.com/en-us/library/windows/desktop/ms725481(v=3Dvs.8=
+5).aspx =
+<https://msdn.microsoft.com/en-us/library/windows/desktop/ms725481(v=3Dvs.=
+85).aspx>
+
+That was for me the main motivation, plus the seconds granularity is not =
+required for the offsets,
+minutes is granular enough. However I could change it to seconds of =
+course, seems more
+reasonable in the light of the glib support for it.
+
 
 > =20
-> +@samp{cpu} option is new alternative to @samp{cpus} option
-
-s/is/is a/
-
-> +uses @samp{socket-id|core-id|thread-id} properties to assign
-
-s/uses/which uses/
-
-> +CPU objects to a @var{node} using topology layout properties of CPU.
-> +Set of properties is machine specific, and depends on used machine
-
-s/Set/The set/
-
-> +type/@samp{smp} options. It could be queried with @samp{hotpluggable-c=
-pus}
-> +monitor command.
-> +@samp{node-id} property specifies @var{node} to which CPU object
-> +will be assigned, it's required for @var{node} to be declared
-> +with @samp{node} option before it's used with @samp{cpu} option.
-> +
-> +For example:
-> +@example
-> +-M pc \
-> +-smp 1,sockets=3D2,maxcpus=3D2 \
-> +-numa node,nodeid=3D0 -numa node,nodeid=3D1 \
-> +-numa cpu,node-id=3D0,socket-id=3D0 -numa cpu,node-id=3D1,socket-id=3D=
-1
-> +@end example
-> +
->  @samp{mem} assigns a given RAM amount to a node. @samp{memdev}
->  assigns RAM from a given memory backend device to a node. If
->  @samp{mem} and @samp{memdev} are omitted in all nodes, RAM is
+> > +        info->zone =3D g_strdup(name);
+> > +    } else {
+> > +        error_setg(errp, "Timezone lookup failed");
+> > +        g_free(info);
+> > +        info =3D NULL;
+> > +    }
+> > +    g_time_zone_unref(tz);
+> > +    return info;
+> > +}
+> > +
+> > diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+> > index a02dbf2..62d6909 100644
+> > --- a/qga/qapi-schema.json
+> > +++ b/qga/qapi-schema.json
+> > @@ -1042,3 +1042,29 @@
+> >     'data':    { 'path': 'str', '*arg': ['str'], '*env': ['str'],
+> >                  '*input-data': 'str', '*capture-output': 'bool' },
+> >     'returns': 'GuestExec' }
+> > +
+> > +
+> > +##
+> > +# @GuestTimezone:
+> > +#
+> > +# @zone:    Timezone name
+> > +# @offset:  Offset to UTC in minutes. For western timezones the =
+offset has a
+> > +#           negative value and for eastern the offset is positive =
+value
+> > +#
+> > +# Since: 2.10
+> > +##
+> > +{ 'struct': 'GuestTimezone',
+> > +  'data':   { 'zone': 'str', 'offset': 'int' } }
+> > +
+> > +
+> > +##
+> > +# @guest-get-timezone:
+> > +#
+> > +# Retrieves the timezone information from the guest.
+> > +#
+> > +# Returns: A GuestTimezone dictionary.
+> > +#
+> > +# Since: 2.10
+> > +##
+> > +{ 'command': 'guest-get-timezone',
+> > +  'returns': 'GuestTimezone' }
 >=20
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---joBDmX8SifM9LJm99qNarDjcdWPvlNogk
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY08xUAAoJEKeha0olJ0NqPNgH/3zKqCfYxhGsSAZ0Mto4OcC+
-dFWGQsi3BT9/6OkzmCpR/SHNu0PbG6XuzDo9NQSB2VuQWBXrCGDUtmeyht+4xdJ5
-dtPwgHdhyUKUT/v6h+cDnBMM8rGqb+eai5I/Rt6/50bSgYIjMvrK7V67lZL5hBr8
-PD/XyArVwbt0oRZw17BtLHdL+DHZxFKXShTGKfTY5t9crieNNnh0UhqWoC2fW2Fa
-XOEaRffSlxOUiiaGfP5y6OguAVvDpNRWR/smswhFMpgW6PXFFrVg09hJm9c13JFw
-yT3KLNs5UMA4hmeNcw6yPFFZvkxrEIZFM5kj6IS7ONhBr0VtEVJ9+x7q4EvxaD8=
-=01YH
------END PGP SIGNATURE-----
-
---joBDmX8SifM9LJm99qNarDjcdWPvlNogk--
+> --=20
+> Marc-Andr=C3=A9 Lureau
