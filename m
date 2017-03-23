@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cqyQG-0006tP-Rk
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 04:48:45 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1cqyTr-0000PL-Gz
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 04:52:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cqyQG-0002VV-2l
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 04:48:44 -0400
-Date: Thu, 23 Mar 2017 09:48:34 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170323094834.0de7c3cb@nial.brq.redhat.com>
-In-Reply-To: <CAGZKiBpD=uLyJWFPhxKYfn0-wLL2WYnUm5h4KJhZ_fVHi+1z-w@mail.gmail.com>
-References: <1490189568-167621-1-git-send-email-imammedo@redhat.com>
-	<1490189568-167621-6-git-send-email-imammedo@redhat.com>
-	<CAGZKiBpD=uLyJWFPhxKYfn0-wLL2WYnUm5h4KJhZ_fVHi+1z-w@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.10 05/23] numa: move source of
- default CPUs to NUMA node mapping into boards
+	(envelope-from <liq3ea@gmail.com>) id 1cqyTo-0003j9-Fz
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 04:52:27 -0400
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:34745)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1cqyTo-0003il-A7
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 04:52:24 -0400
+Received: by mail-pg0-x243.google.com with SMTP id w20so9968885pgc.1
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 01:52:23 -0700 (PDT)
+From: Li Qiang <liq3ea@gmail.com>
+Date: Thu, 23 Mar 2017 01:52:13 -0700
+Message-Id: <1490259133-44411-1-git-send-email-liqiang6-s@360.cn>
+Subject: [Qemu-devel] [PATCH] 9pfs: fix file descriptor leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,54 +23,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bharata B Rao <bharata.rao@gmail.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-arm@nongnu.org, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: groug@kaod.org, qemu-devel@nongnu.org
+Cc: ppandit@redhat.com, Li Qiang <liqiang6-s@360.cn>
 
-On Thu, 23 Mar 2017 11:40:29 +0530
-Bharata B Rao <bharata.rao@gmail.com> wrote:
+In v9fs_create/lcreate dispatch handler, the fidp's fid_type is not checked
+before used. As these function will set the fid_type, if the guest call
+more than once them, it will leak the fidp. This can cause some other
+issue, such as memory leak. Check the fid_type before using them.
 
-> On Wed, Mar 22, 2017 at 7:02 PM, Igor Mammedov <imammedo@redhat.com> wrote:
-> 
-> > diff --git a/numa.c b/numa.c
-> > index e01cb54..b6e71bc 100644
-> > --- a/numa.c
-> > +++ b/numa.c
-> > @@ -294,9 +294,10 @@ static void validate_numa_cpus(void)
-> >      g_free(seen_cpus);
-> >  }
-> >
-> > -void parse_numa_opts(MachineClass *mc)
-> > +void parse_numa_opts(MachineState *ms)
-> >  {
-> >      int i;
-> > +    MachineClass *mc = MACHINE_GET_CLASS(ms);
-> >
-> >      for (i = 0; i < MAX_NODES; i++) {
-> >          numa_info[i].node_cpu = bitmap_new(max_cpus);
-> > @@ -378,14 +379,16 @@ void parse_numa_opts(MachineClass *mc)
-> >           * rule grouping VCPUs by socket so that VCPUs from the same
-> > socket
-> >           * would be on the same node.
-> >           */
-> > +        if (!mc->cpu_index_to_instance_props) {
-> > +            error_report("default CPUs to NUMA node mapping isn't
-> > supported");
-> > +            exit(1);
-> > +        }
-> >  
-> 
-> Just trying to understand the impact of the above enforcement. So targets
-> and machine types that don't define ->cpu_index_to_instance_props() are
-> expected not to boot ? Shouldn't they have a default to fall back upon ?
-Currently there are 3 boards that support numa and with this series
-they all implement cpu_index_to_instance_props callback,
-so boards that has supported numa shouldn't be affected.
+Signed-off-by: Li Qiang <liqiang6-s@360.cn>
+---
+ hw/9pfs/9p.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-But if someone used '-numa' with a board that doesn't support numa,
-it would stop booting with error message instead of silently parsing
-not supported option or falling back bogus defaults (which aren't
-used anyway).
-
-
-> Regards,
-> Bharata.
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index b8c0b99..48babce 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -1550,6 +1550,10 @@ static void coroutine_fn v9fs_lcreate(void *opaque)
+         err = -ENOENT;
+         goto out_nofid;
+     }
++    if (fidp->fid_type != P9_FID_NONE) {
++        err = -EINVAL;
++        goto out;
++    }
+ 
+     flags = get_dotl_openflags(pdu->s, flags);
+     err = v9fs_co_open2(pdu, fidp, &name, gid,
+@@ -2153,6 +2157,10 @@ static void coroutine_fn v9fs_create(void *opaque)
+         err = -EINVAL;
+         goto out_nofid;
+     }
++    if (fidp->fid_type != P9_FID_NONE) {
++        err = -EINVAL;
++        goto out;
++    }
+     if (perm & P9_STAT_MODE_DIR) {
+         err = v9fs_co_mkdir(pdu, fidp, &name, perm & 0777,
+                             fidp->uid, -1, &stbuf);
+-- 
+1.8.3.1
