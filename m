@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cqxtp-0007Sg-Rr
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 04:15:14 -0400
+	(envelope-from <kraxel@redhat.com>) id 1cqxxh-0000Yo-TM
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 04:19:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cqxto-0005pd-Qm
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 04:15:13 -0400
-MIME-Version: 1.0
-References: <20170322204844.446-1-f4bug@amsat.org>
-	<20170322204844.446-2-f4bug@amsat.org>
-	<87y3vw1o94.fsf@dusky.pond.sub.org>
-	<1490255007.463.11.camel@redhat.com>
-In-Reply-To: <1490255007.463.11.camel@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 23 Mar 2017 08:14:49 +0000
-Message-ID: <CAJ+F1CJNy+e83EHR_8uzAHURxDk6idnNTTL_FoD-krWPue7Lww@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+	(envelope-from <kraxel@redhat.com>) id 1cqxxe-00075b-Q3
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 04:19:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54126)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cqxxe-000751-Jp
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 04:19:10 -0400
+Message-ID: <1490257145.463.24.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 23 Mar 2017 09:19:05 +0100
+In-Reply-To: <da2bfbb8-c000-eaff-826f-904582f6e98a@redhat.com>
+References: <87bmstu19t.fsf@dusky.pond.sub.org>
+	<1f744cad-f67b-92d3-b4e4-32f8b05c643c@redhat.com>
+	<da2bfbb8-c000-eaff-826f-904582f6e98a@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RESEND 1/3] usb-ccid: make
- ccid_write_data_block() cope with null buffers
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] Minimum RAM size for PC machines?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,31 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-trivial@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, seabios@seabios.org, =?ISO-8859-1?Q?L=E1szl=F3_=C9rsek?= <lersek@redhat.com>
 
-Hi
+On Mi, 2017-03-22 at 11:19 +0100, David Hildenbrand wrote:
+> On 22.03.2017 11:03, Thomas Huth wrote:
+> > On 22.03.2017 10:08, Markus Armbruster wrote:
+> > [...]
+> >> Are we now ready to accept a simple & stupid patch that actually helps
+> >> users, say letting boards that care declare minimum and maximum RAM
+> >> size?  And make PC reject RAM size less than 1MiB, even though "someon=
+e"
+> >> might conceivably have firmware that works with less?
+> >=20
+> > I'd say enforce a minimum RAM size on the normal "pc" and "q35" machine=
+,
+> > but still allow smaller sizes on the "isapc" machine. So if "someone"
+> > comes around and claims to have a legacy firmware that wants less memor=
+y
+> > than 1MiB, just point them to the isapc machine.
+> > Just my 0.02 =E2=82=AC.
+> >=20
+> >  Thomas
+>=20
+> Or maybe simply warn the user that things may go wrong instead of
+> enforcing it.
 
-On Thu, Mar 23, 2017 at 11:44 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
+Why bother?  I have my doubts physical i440fx works with less than 1M
+either, given that this memory is needed to shadow the roms.  Possibly
+you can't even find dimms that are small to plug them into such a system
+to try ...
 
->   Hi,
->
-> > > +    if (len =3D=3D 0) {
-> > > +        return;
-> >
-> > Correct only if messages without data always have the same meaning as n=
-o
-> > message.  Gerd?
->
-> Not a ccid expert, but looking through the code it seems writing a
-> (reply) data block with status and without payload (data =3D NULL and len
-> =3D 0) is perfectly fine and can happen in case no (virtual) smartcard is
-> inserted into the card reader.  Which this patch breaks.  So,
->
-> NACK.
->
+I'd say just add a hard limit and be done with it.
 
- oops, there are hard-coded calls with NULL/0. I suppose to fix clang
-warning, it would need to check if data !=3D null for memcpy.
---=20
-Marc-Andr=C3=A9 Lureau
+Maybe exclude isapc.  That one hasn't shadow support so things have at
+least a chance to work with less than 1M of memory.  But honestly I'd
+rather drop isapc, together with ia64 and sparc.  I mean, what is the
+use case?  'pc' machine type is compatible enough with vga and ide ports
+being on the standard isa locations so even msdos which has no pci
+support at all boots happily.
+
+cheers,
+  Gerd
