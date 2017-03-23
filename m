@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33758)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cqzcD-0002e0-Jw
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:05:13 -0400
+	(envelope-from <prvs=248a72cc7=Paul.Durrant@citrix.com>)
+	id 1cqzhA-0004KY-E6
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:10:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cqzcA-00045m-Gx
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:05:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:22000)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cqzcA-00044b-9L
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:05:06 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 23 Mar 2017 14:04:55 +0400
-Message-Id: <20170323100455.26821-1-marcandre.lureau@redhat.com>
+	(envelope-from <prvs=248a72cc7=Paul.Durrant@citrix.com>)
+	id 1cqzh4-0005td-5u
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:10:16 -0400
+Received: from smtp.citrix.com ([66.165.176.89]:54325)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=248a72cc7=Paul.Durrant@citrix.com>)
+	id 1cqzh4-0005ru-09
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 06:10:10 -0400
+From: Paul Durrant <paul.durrant@citrix.com>
+Date: Thu, 23 Mar 2017 10:10:01 +0000
+Message-ID: <1490263801-25206-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] spapr: fix buffer-overflow
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] xen-platform: separate unplugging of NVMe disks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,96 +26,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: david@gibson.dropbear.id.au, agraf@suse.de, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
 
-Running postcopy-test with ASAN produces the following error:
+Commit 090fa1c8 "add support for unplugging NVMe disks..." extended the
+existing disk unplug flag to cover NVMe disks as well as IDE and SCSI.
 
-QTEST_QEMU_BINARY=3Dppc64-softmmu/qemu-system-ppc64  tests/postcopy-test
-...
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-=3D=3D23641=3D=3DERROR: AddressSanitizer: heap-buffer-overflow on address=
- 0x7f1556600000 at pc 0x55b8e9d28208 bp 0x7f1555f4d3c0 sp 0x7f1555f4d3b0
-READ of size 8 at 0x7f1556600000 thread T6
-    #0 0x55b8e9d28207 in htab_save_first_pass /home/elmarco/src/qq/hw/ppc=
-/spapr.c:1528
-    #1 0x55b8e9d2939c in htab_save_iterate /home/elmarco/src/qq/hw/ppc/sp=
-apr.c:1665
-    #2 0x55b8e9beae3a in qemu_savevm_state_iterate /home/elmarco/src/qq/m=
-igration/savevm.c:1044
-    #3 0x55b8ea677733 in migration_thread /home/elmarco/src/qq/migration/=
-migration.c:1976
-    #4 0x7f15845f46c9 in start_thread (/lib64/libpthread.so.0+0x76c9)
-    #5 0x7f157d9d0f7e in clone (/lib64/libc.so.6+0x107f7e)
+The cecent thread on the xen-devel mailing list [1] have highlighted that
+this is not desirable behaviour: PV frontends should be able to distinguish
+NVMe disks from other types of disk and should have separate control over
+whether they are unplugged.
 
-0x7f1556600000 is located 0 bytes to the right of 2097152-byte region [0x=
-7f1556400000,0x7f1556600000)
-allocated by thread T0 here:
-    #0 0x7f159bb76980 in posix_memalign (/lib64/libasan.so.3+0xc7980)
-    #1 0x55b8eab185b2 in qemu_try_memalign /home/elmarco/src/qq/util/osli=
-b-posix.c:106
-    #2 0x55b8eab186c8 in qemu_memalign /home/elmarco/src/qq/util/oslib-po=
-six.c:122
-    #3 0x55b8e9d268a8 in spapr_reallocate_hpt /home/elmarco/src/qq/hw/ppc=
-/spapr.c:1214
-    #4 0x55b8e9d26e04 in ppc_spapr_reset /home/elmarco/src/qq/hw/ppc/spap=
-r.c:1261
-    #5 0x55b8ea12e913 in qemu_system_reset /home/elmarco/src/qq/vl.c:1697
-    #6 0x55b8ea13fa40 in main /home/elmarco/src/qq/vl.c:4679
-    #7 0x7f157d8e9400 in __libc_start_main (/lib64/libc.so.6+0x20400)
+This patch defines a new bit in the unplug mask for this purpose and also
+tidies up the definitions of, and improves the comments regarding, the
+previously exiting bits in the protocol.
 
-Thread T6 created by T0 here:
-    #0 0x7f159bae0488 in __interceptor_pthread_create (/lib64/libasan.so.=
-3+0x31488)
-    #1 0x55b8eab1d9cb in qemu_thread_create /home/elmarco/src/qq/util/qem=
-u-thread-posix.c:465
-    #2 0x55b8ea67874c in migrate_fd_connect /home/elmarco/src/qq/migratio=
-n/migration.c:2096
-    #3 0x55b8ea66cbb0 in migration_channel_connect /home/elmarco/src/qq/m=
-igration/migration.c:500
-    #4 0x55b8ea678f38 in socket_outgoing_migration /home/elmarco/src/qq/m=
-igration/socket.c:87
-    #5 0x55b8eaa5a03a in qio_task_complete /home/elmarco/src/qq/io/task.c=
-:142
-    #6 0x55b8eaa599cc in gio_task_thread_result /home/elmarco/src/qq/io/t=
-ask.c:88
-    #7 0x7f15823e38e6  (/lib64/libglib-2.0.so.0+0x468e6)
-SUMMARY: AddressSanitizer: heap-buffer-overflow /home/elmarco/src/qq/hw/p=
-pc/spapr.c:1528 in htab_save_first_pass
+[1] https://lists.xen.org/archives/html/xen-devel/2017-03/msg02924.html
 
-index seems to be wrongly incremented, unless I miss something that
-would be worth a comment.
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+--
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+NOTE: A companion patch will be submitted to xen-devel to align the
+      unplug protocol documentation once this patch is acked.
 ---
- hw/ppc/spapr.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/i386/xen/xen_platform.c | 47 ++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 35 insertions(+), 12 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 6ee566d658..63439811d5 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1524,16 +1524,16 @@ static void htab_save_first_pass(QEMUFile *f, sPA=
-PRMachineState *spapr,
-         /* Consume invalid HPTEs */
-         while ((index < htabslots)
-                && !HPTE_VALID(HPTE(spapr->htab, index))) {
--            index++;
-             CLEAN_HPTE(HPTE(spapr->htab, index));
-+            index++;
+diff --git a/hw/i386/xen/xen_platform.c b/hw/i386/xen/xen_platform.c
+index 6010f35..983d532 100644
+--- a/hw/i386/xen/xen_platform.c
++++ b/hw/i386/xen/xen_platform.c
+@@ -87,10 +87,30 @@ static void log_writeb(PCIXenPlatformState *s, char val)
+     }
+ }
+ 
+-/* Xen Platform, Fixed IOPort */
+-#define UNPLUG_ALL_DISKS 1
+-#define UNPLUG_ALL_NICS 2
+-#define UNPLUG_AUX_IDE_DISKS 4
++/*
++ * Unplug device flags.
++ *
++ * The logic got a little confused at some point in the past but this is
++ * what they do now.
++ *
++ * bit 0: Unplug all IDE and SCSI disks.
++ * bit 1: Unplug all NICs.
++ * bit 2: Unplug IDE disks except primary master. This is overridden if
++ *        bit 0 is also present in the mask.
++ * bit 3: Unplug all NVMe disks.
++ *
++ */
++#define _UNPLUG_IDE_SCSI_DISKS 0
++#define UNPLUG_IDE_SCSI_DISKS (1u << _UNPLUG_IDE_SCSI_DISKS)
++
++#define _UNPLUG_ALL_NICS 1
++#define UNPLUG_ALL_NICS (1u << _UNPLUG_ALL_NICS)
++
++#define _UNPLUG_AUX_IDE_DISKS 2
++#define UNPLUG_AUX_IDE_DISKS (1u << _UNPLUG_AUX_IDE_DISKS)
++
++#define _UNPLUG_NVME_DISKS 3
++#define UNPLUG_NVME_DISKS (1u << _UNPLUG_NVME_DISKS)
+ 
+ static void unplug_nic(PCIBus *b, PCIDevice *d, void *o)
+ {
+@@ -111,7 +131,7 @@ static void unplug_disks(PCIBus *b, PCIDevice *d, void *opaque)
+ {
+     uint32_t flags = *(uint32_t *)opaque;
+     bool aux = (flags & UNPLUG_AUX_IDE_DISKS) &&
+-        !(flags & UNPLUG_ALL_DISKS);
++        !(flags & UNPLUG_IDE_SCSI_DISKS);
+ 
+     /* We have to ignore passthrough devices */
+     if (!strcmp(d->name, "xen-pci-passthrough")) {
+@@ -124,12 +144,16 @@ static void unplug_disks(PCIBus *b, PCIDevice *d, void *opaque)
+         break;
+ 
+     case PCI_CLASS_STORAGE_SCSI:
+-    case PCI_CLASS_STORAGE_EXPRESS:
+         if (!aux) {
+             object_unparent(OBJECT(d));
          }
-=20
-         /* Consume valid HPTEs */
-         chunkstart =3D index;
-         while ((index < htabslots) && (index - chunkstart < USHRT_MAX)
-                && HPTE_VALID(HPTE(spapr->htab, index))) {
--            index++;
-             CLEAN_HPTE(HPTE(spapr->htab, index));
-+            index++;
+         break;
+ 
++    case PCI_CLASS_STORAGE_EXPRESS:
++        if (flags & UNPLUG_NVME_DISKS) {
++            object_unparent(OBJECT(d));
++        }
++
+     default:
+         break;
+     }
+@@ -147,10 +171,9 @@ static void platform_fixed_ioport_writew(void *opaque, uint32_t addr, uint32_t v
+     switch (addr) {
+     case 0: {
+         PCIDevice *pci_dev = PCI_DEVICE(s);
+-        /* Unplug devices.  Value is a bitmask of which devices to
+-           unplug, with bit 0 the disk devices, bit 1 the network
+-           devices, and bit 2 the non-primary-master IDE devices. */
+-        if (val & (UNPLUG_ALL_DISKS | UNPLUG_AUX_IDE_DISKS)) {
++        /* Unplug devices. See comment above flag definitions */
++        if (val & (UNPLUG_IDE_SCSI_DISKS | UNPLUG_AUX_IDE_DISKS |
++                   UNPLUG_NVME_DISKS)) {
+             DPRINTF("unplug disks\n");
+             pci_unplug_disks(pci_dev->bus, val);
          }
-=20
-         if (index > chunkstart) {
---=20
-2.12.0.191.gc5d8de91d
+@@ -338,14 +361,14 @@ static void xen_platform_ioport_writeb(void *opaque, hwaddr addr,
+              * If VMDP was to control both disk and LAN it would use 4.
+              * If it controlled just disk or just LAN, it would use 8 below.
+              */
+-            pci_unplug_disks(pci_dev->bus, UNPLUG_ALL_DISKS);
++            pci_unplug_disks(pci_dev->bus, UNPLUG_IDE_SCSI_DISKS);
+             pci_unplug_nics(pci_dev->bus);
+         }
+         break;
+     case 8:
+         switch (val) {
+         case 1:
+-            pci_unplug_disks(pci_dev->bus, UNPLUG_ALL_DISKS);
++            pci_unplug_disks(pci_dev->bus, UNPLUG_IDE_SCSI_DISKS);
+             break;
+         case 2:
+             pci_unplug_nics(pci_dev->bus);
+-- 
+2.1.4
