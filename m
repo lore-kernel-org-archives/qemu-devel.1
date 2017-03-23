@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cr3Ah-0001pA-GI
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 09:53:00 -0400
+	(envelope-from <jgross@suse.com>) id 1cr3DC-0002TP-Oe
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 09:55:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cr3Ad-0007Dz-Hj
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 09:52:59 -0400
-References: <1490175166-19785-1-git-send-email-he.chen@linux.intel.com>
-	<20170322103405.rcye74zye6gvrfis@hawk.localdomain>
-	<20170323072335.GC10166@he>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <4c620bdf-5979-38f5-8dc2-74641c627151@redhat.com>
-Date: Thu, 23 Mar 2017 08:52:40 -0500
+	(envelope-from <jgross@suse.com>) id 1cr3D9-0007vh-Mb
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 09:55:34 -0400
+Received: from mx2.suse.de ([195.135.220.15]:45124)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jgross@suse.com>) id 1cr3D9-0007vC-F9
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 09:55:31 -0400
+References: <alpine.DEB.2.10.1703201117560.23684@sstabellini-ThinkPad-X260>
+	<1490033952-26735-1-git-send-email-sstabellini@kernel.org>
+	<20170323140005.6b0853b3@bahia.lan>
+From: Juergen Gross <jgross@suse.com>
+Message-ID: <15207674-c5cd-3874-7ac9-5b23cdac8888@suse.com>
+Date: Thu, 23 Mar 2017 14:55:26 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170323072335.GC10166@he>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="aSlSVi119flFnvmNsdRmavNEsFwfjtXJJ"
-Subject: Re: [Qemu-devel] [PATCH v3] Allow setting NUMA distance for
- different NUMA nodes
+In-Reply-To: <20170323140005.6b0853b3@bahia.lan>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 1/8] xen: import ring.h from xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,67 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: He Chen <he.chen@linux.intel.com>, Andrew Jones <drjones@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-arm@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Greg Kurz <groug@kaod.org>, Stefano Stabellini <sstabellini@kernel.org>
+Cc: qemu-devel@nongnu.org, Stefano Stabellini <stefano@aporeto.com>, anthony.perard@citrix.com, Paolo Bonzini <pbonzini@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---aSlSVi119flFnvmNsdRmavNEsFwfjtXJJ
-From: Eric Blake <eblake@redhat.com>
-To: He Chen <he.chen@linux.intel.com>, Andrew Jones <drjones@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin"
- <mst@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- qemu-arm@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
-Message-ID: <4c620bdf-5979-38f5-8dc2-74641c627151@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] Allow setting NUMA distance for different
- NUMA nodes
-References: <1490175166-19785-1-git-send-email-he.chen@linux.intel.com>
- <20170322103405.rcye74zye6gvrfis@hawk.localdomain>
- <20170323072335.GC10166@he>
-In-Reply-To: <20170323072335.GC10166@he>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 03/23/2017 02:23 AM, He Chen wrote:
-
->>> -numa dist,src=3D1,dst=3D0,val=3D21 \
-
+On 23/03/17 14:00, Greg Kurz wrote:
+> On Mon, 20 Mar 2017 11:19:05 -0700
+> Stefano Stabellini <sstabellini@kernel.org> wrote:
+> 
+>> Do not use the ring.h header installed on the system. Instead, import
+>> the header into the QEMU codebase. This avoids problems when QEMU is
+>> built against a Xen version too old to provide all the ring macros.
 >>
->> And maybe should also point out how to set an unreachable node with 25=
-5.
->>
-> Thanks for your careful review. Regarding setting unreachable node,
-> which way is good? Set exact 255 as distance or distance that is larger=
+>> Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
+>> Reviewed-by: Greg Kurz <groug@kaod.org>
+>> CC: anthony.perard@citrix.com
+>> CC: jgross@suse.com
+>> ---
+>> NB: The new macros have not been committed to Xen yet. Do not apply this
+>> patch until they do.
+>> ---
+> 
+> Looking at your other series for the kernel part of this feature:
+> 
+> https://lkml.org/lkml/2017/3/22/761
+> 
+> I realize that the ring.h header from Xen also exists in the kernel tree... 
+> 
+> Shouldn't all the code that can be used in both kernel and userspace go to a
+> header file under include/uapi in the kernel tree ? And then we would import
+> it under include/standard-headers/linux in the QEMU tree and we could keep it
+> in sync using scripts/update-linux-headers.sh.
+> 
+> Cc'ing Paolo for insights.
 
-> than 255 is regarded as unreachable?
+As Xen isn't part of the kernel we don't want that. You can use and/or
+build qemu with xen-9pfs backend support on an old Linux kernel without
+the related frontend.
 
-Given that you spec'd val as 'uint8', you can't pass a value for
-distance that is larger than 255.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+OTOH I don't see the advantage of not using the headers from Xen. This
+is working for qdisk and pvusb backends and for all the Xen libraries.
+Do you expect the 9pfs backend to be used for a qemu version built
+against a Xen version not supporting that backend?
 
 
---aSlSVi119flFnvmNsdRmavNEsFwfjtXJJ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY09MoAAoJEKeha0olJ0NqEDsH/0kauDQHjgH93I+2C7D78tXZ
-XuJwTAsx35eolxLFYPasKbwrQ4QRsR/4DQB+enX12LTbaqNCWyw/UQu8ZyI9yDBM
-4KuLxXD+LWFOfyKFjf9nAmtRJlaPzgvaXhHuoJRY+jjUxBIRGCf1cYQdacodhASm
-1CB9b2FsqjSy7i3Ye03zqs3F6MtqvIL1IxYrRuKxUjhtqnDLQmwS6a3yEMtscikh
-zAVXrRz7/ZCdv3jWtoVI832Gj7IZEOc4CyMbbwllshsNLMN1VCuW7mwFvPyGgG5D
-FspF+htjYieTUNKRyNzigQ3scHKg/7M6pG/f8oBs3BpiQT+CF7DCLc8Gs/c5WwY=
-=VMmG
------END PGP SIGNATURE-----
-
---aSlSVi119flFnvmNsdRmavNEsFwfjtXJJ--
+Juergen
