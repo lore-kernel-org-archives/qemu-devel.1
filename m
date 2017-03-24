@@ -1,30 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1crRK3-0005Wf-33
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:40:16 -0400
+	(envelope-from <prvs=249263d75=Paul.Durrant@citrix.com>)
+	id 1crROB-0007H2-CR
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:44:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1crRK0-0007Ji-13
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:40:15 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:33384)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1crRJz-0007JP-R4
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:40:11 -0400
-Received: by mail-wr0-x243.google.com with SMTP id 20so981166wrx.0
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 08:40:11 -0700 (PDT)
-Date: Fri, 24 Mar 2017 15:40:07 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170324154007.GB5849@stefanha-x1.localdomain>
-References: <148900626714.27090.1616990932333159904.stgit@brijesh-build-machine>
-	<148900632968.27090.15435012868487968230.stgit@brijesh-build-machine>
-	<20170323113517.GC12560@stefanha-x1.localdomain>
-	<6ed30368-1433-cf00-ee2e-611faf2a98e3@amd.com>
+	(envelope-from <prvs=249263d75=Paul.Durrant@citrix.com>)
+	id 1crRO4-0000HZ-U0
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:44:31 -0400
+Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:53303
+	helo=SMTP.EU.CITRIX.COM)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=249263d75=Paul.Durrant@citrix.com>)
+	id 1crRO4-0000HL-It
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:44:24 -0400
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Fri, 24 Mar 2017 15:44:21 +0000
+Message-ID: <7208ddd9b76b4196be0a3d3cd12aee71@AMSPEX02CL03.citrite.net>
+References: <20170316141953.16161-1-jgross@suse.com>
+	<20170316141953.16161-3-jgross@suse.com>
+	<alpine.DEB.2.10.1703161306380.15430@sstabellini-ThinkPad-X260>
+	<214bc24d-1c0c-16d6-9c33-e20962b150d2@suse.com>
+	<alpine.DEB.2.10.1703171123520.22036@sstabellini-ThinkPad-X260>
+	<da852b5f-2490-c483-984d-c7be4f83b9a7@suse.com>
+	<alpine.DEB.2.10.1703211152240.11679@sstabellini-ThinkPad-X260>
+	<f1f79b77-f3bf-4bb0-135c-802bd5829de5@suse.com>
+	<alpine.DEB.2.10.1703221120530.13499@sstabellini-ThinkPad-X260>
+	<2fb1da9d14c14eb4826a87657f7d0eb1@AMSPEX02CL03.citrite.net>
+	<550ea61e-c9ba-5afc-12b5-438a2a57af6e@suse.com>
+In-Reply-To: <550ea61e-c9ba-5afc-12b5-438a2a57af6e@suse.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Y7xTucakfITjPcLV"
-Content-Disposition: inline
-In-Reply-To: <6ed30368-1433-cf00-ee2e-611faf2a98e3@amd.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v4 06/20] core: add new security-policy
- object
+Subject: Re: [Qemu-devel] [Xen-devel] [PATCH 2/2] configure: use pkg-config
+ for obtaining xen version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,76 +42,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.singh@amd.com>
-Cc: ehabkost@redhat.com, crosthwaite.peter@gmail.com, armbru@redhat.com, mst@redhat.com, p.fedin@samsung.com, qemu-devel@nongnu.org, lcapitulino@redhat.com, pbonzini@redhat.com, rth@twiddle.net, Thomas.Lendacky@amd.com
+To: 'Juergen Gross' <jgross@suse.com>, 'Stefano Stabellini' <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kraxel@redhat.com" <kraxel@redhat.com>
 
-
---Y7xTucakfITjPcLV
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Mar 23, 2017 at 01:59:48PM -0500, Brijesh Singh wrote:
-> Hi Stefan,
->=20
->=20
-> On 03/23/2017 06:35 AM, Stefan Hajnoczi wrote:
-> > On Wed, Mar 08, 2017 at 03:52:09PM -0500, Brijesh Singh wrote:
-> > > The object can be used to define global security policy for the guest.
-> >=20
-> > "security-policy" is very vague.  Lots of parts of QEMU have security
-> > related options (e.g. VNC display, networking, etc).
-> >=20
-> > I'd prefer a
-> > -machine memory-encryption=3Don|off,memory-encryption-debug=3Don|off
-> > or -m encryption=3Don|off,encryption-debug=3Don|off switch instead of a=
- new
-> > security policy object with questionable scope.
-> >=20
->=20
-> In v1 [1], I had something similar but not exactly the same. I had a new =
-command
-> line switch but the overall feedback was to consider creating new securit=
-y object
-> which can be used to define a machine security policy.
->=20
-> [1] http://marc.info/?t=3D147378617700002&r=3D1&w=3D2
->=20
-> some more discussion here [2]
->=20
-> [2] http://marc.info/?t=3D147378241700011&r=3D1&w=3D2
->=20
-> IMHO, a new object is helpful because it provide options to launch a gues=
-t without
-> memory encryption support but still can take a advantage of disabling the=
- debug
-> feature. e.g on non SEV platform we can launch guest with "-object securi=
-ty-policy,id=3Dsecure0,debug=3Doff'
-> which will reject the guest memory accesses via gdbstub or qemu monitor c=
-ommand line interface.
-
-Having one security policy doesn't make sense to me.  As mentioned,
-there are many different areas of QEMU that have security relevant
-configuration.  They are all unrelated so combining them into one object
-with vague parameter names like "debug" makes for a confusing
-command-line interface.
-
-If the object is called sev-security-policy then I'm happy.
-
-Stefan
-
---Y7xTucakfITjPcLV
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJY1T3XAAoJEJykq7OBq3PITOYH/1ZWLukikTSSpVayR8cIy6Ov
-w8a2Xr/eXGur39FzegoPHTUBk0uoi9TjGbCUsLaLgZz19/VsGTbiBiwpjCBizDri
-ctq6V78jEIIAAe8DtLAGWBzWX8qxG2+FJU54Y5arAqTcP+uypYcssL86jsyyAA5d
-JgMm//O9cL6JKMUdC2mWCekIRdGJJdEk3uH0jEgq1Mffl4xTI8+PQxdUv+NVHW0o
-EwVYnbqiaqMuArljMw+RxvR3TeRzpgZfyQUUPFfM01ZX+X4N0tds5FA5yQdF2t9D
-7wUuSmmYISYNBTTByoJWjoIyWY6KT+GWatbFLuWo3HiHEg1aq8e34pxxLOmgsN4=
-=85qJ
------END PGP SIGNATURE-----
-
---Y7xTucakfITjPcLV--
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBKdWVyZ2VuIEdyb3NzIFttYWls
+dG86amdyb3NzQHN1c2UuY29tXQ0KPiBTZW50OiAyNCBNYXJjaCAyMDE3IDE1OjM1DQo+IFRvOiBQ
+YXVsIER1cnJhbnQgPFBhdWwuRHVycmFudEBjaXRyaXguY29tPjsgJ1N0ZWZhbm8gU3RhYmVsbGlu
+aScNCj4gPHNzdGFiZWxsaW5pQGtlcm5lbC5vcmc+DQo+IENjOiBBbnRob255IFBlcmFyZCA8YW50
+aG9ueS5wZXJhcmRAY2l0cml4LmNvbT47IHhlbi0NCj4gZGV2ZWxAbGlzdHMueGVucHJvamVjdC5v
+cmc7IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsga3JheGVsQHJlZGhhdC5jb20NCj4gU3ViamVjdDog
+UmU6IFtYZW4tZGV2ZWxdIFtQQVRDSCAyLzJdIGNvbmZpZ3VyZTogdXNlIHBrZy1jb25maWcgZm9y
+IG9idGFpbmluZw0KPiB4ZW4gdmVyc2lvbg0KPiANCj4gT24gMjQvMDMvMTcgMTY6MTIsIFBhdWwg
+RHVycmFudCB3cm90ZToNCj4gPj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPj4gRnJv
+bTogU3RlZmFubyBTdGFiZWxsaW5pIFttYWlsdG86c3N0YWJlbGxpbmlAa2VybmVsLm9yZ10NCj4g
+Pj4gU2VudDogMjIgTWFyY2ggMjAxNyAxODoyMg0KPiA+PiBUbzogSnVlcmdlbiBHcm9zcyA8amdy
+b3NzQHN1c2UuY29tPg0KPiA+PiBDYzogU3RlZmFubyBTdGFiZWxsaW5pIDxzc3RhYmVsbGluaUBr
+ZXJuZWwub3JnPjsgcWVtdS0NCj4gZGV2ZWxAbm9uZ251Lm9yZzsNCj4gPj4geGVuLWRldmVsQGxp
+c3RzLnhlbnByb2plY3Qub3JnOyBBbnRob255IFBlcmFyZA0KPiA+PiA8YW50aG9ueS5wZXJhcmRA
+Y2l0cml4LmNvbT47IGtyYXhlbEByZWRoYXQuY29tOyBQYXVsIER1cnJhbnQNCj4gPj4gPFBhdWwu
+RHVycmFudEBjaXRyaXguY29tPg0KPiA+PiBTdWJqZWN0OiBSZTogW1BBVENIIDIvMl0gY29uZmln
+dXJlOiB1c2UgcGtnLWNvbmZpZyBmb3Igb2J0YWluaW5nIHhlbg0KPiB2ZXJzaW9uDQo+ID4+DQo+
+ID4+IE9uIFdlZCwgMjIgTWFyIDIwMTcsIEp1ZXJnZW4gR3Jvc3Mgd3JvdGU6DQo+ID4+PiBPbiAy
+MS8wMy8xNyAxOTo1NCwgU3RlZmFubyBTdGFiZWxsaW5pIHdyb3RlOg0KPiA+Pj4+IE9uIFR1ZSwg
+MjEgTWFyIDIwMTcsIEp1ZXJnZW4gR3Jvc3Mgd3JvdGU6DQo+ID4+Pj4+IE9uIDE3LzAzLzE3IDE5
+OjMzLCBTdGVmYW5vIFN0YWJlbGxpbmkgd3JvdGU6DQo+ID4+Pj4+PiBPbiBGcmksIDE3IE1hciAy
+MDE3LCBKdWVyZ2VuIEdyb3NzIHdyb3RlOg0KPiA+Pj4+Pj4+IE9uIDE2LzAzLzE3IDIxOjIwLCBT
+dGVmYW5vIFN0YWJlbGxpbmkgd3JvdGU6DQo+ID4+Pj4+Pj4+IE9uIFRodSwgMTYgTWFyIDIwMTcs
+IEp1ZXJnZW4gR3Jvc3Mgd3JvdGU6DQo+ID4+Pj4+Pj4+PiBJbnN0ZWFkIG9mIHRyeWluZyB0byBn
+dWVzcyB0aGUgWGVuIHZlcnNpb24gdG8gdXNlIGJ5IGNvbXBpbGluZw0KPiA+PiB2YXJpb3VzDQo+
+ID4+Pj4+Pj4+PiB0ZXN0IHByb2dyYW1zIGZpcnN0IGp1c3QgYXNrIHRoZSBzeXN0ZW0gdmlhIHBr
+Zy1jb25maWcuIE9ubHkgaWYgaXQNCj4gPj4+Pj4+Pj4+IGNhbid0IHJldHVybiB0aGUgdmVyc2lv
+biBmYWxsIGJhY2sgdG8gdGhlIHRlc3QgcHJvZ3JhbSBzY2hlbWUuDQo+ID4+Pj4+Pj4+DQo+ID4+
+Pj4+Pj4+IFRoYXQncyBPSywgYnV0IHdoeSBkaWQgeW91IHJlbW92ZSB0aGUgWGVuIHVuc3RhYmxl
+IHRlc3Q/DQo+ID4+Pj4+Pj4NCj4gPj4+Pj4+PiA+RnJvbSBYZW4gNC45IG9uIHBrZy1jb25maWcg
+d2lsbCByZXR1cm4gdGhlIG5lZWRlZCBpbmZvcm1hdGlvbi4NCj4gPj4gVGhlcmUgaXMNCj4gPj4+
+Pj4+PiBubyBsb25nZXIgYSBuZWVkIGZvciBhIHRlc3QgcHJvZ3JhbSB0byBkZXRlcm1pbmUgdGhl
+IFhlbiB2ZXJzaW9uLg0KPiA+PiBBZnRlcg0KPiA+Pj4+Pj4+IGFsbCB0aGlzIHdhcyB0aGUgbWFp
+biBvYmplY3RpdmUgb2YgbXkgc2VyaWVzIGFkZGluZyB0aGUgcGtnLWNvbmZpZw0KPiA+Pj4+Pj4+
+IGZpbGVzIHRvIFhlbi4NCj4gPj4+Pj4+DQo+ID4+Pj4+PiBJIHdhcyBnb2luZyB0byBzYXkgc29t
+ZXRoaW5nIGxpa2UgInllYWgsIGJ1dCBpcyBwa2ctY29uZmlnIGFsd2F5cw0KPiA+Pj4+Pj4gYXZh
+aWxhYmxlPyIgSW4gcmVhbGl0eSwgUUVNVSBhbHJlYWR5IGhhcyBwa2ctY29uZmlnIGFzIGJ1aWxk
+DQo+ID4+Pj4+PiBkZXBlbmRlbmN5LCBzbyBJIGd1ZXNzIHRoZXJlIGlzIG5vIHByb2JsZW0gd2l0
+aCB0aGF0Lg0KPiA+Pj4+Pj4NCj4gPj4+Pj4+IFBsZWFzZSBhZGQgYSBub3RlIGFib3V0IHRoaXMg
+dG8gdGhlIGNvbW1pdCBtZXNzYWdlLg0KPiA+Pj4+Pj4NCj4gPj4+Pj4NCj4gPj4+Pj4gT2theS4N
+Cj4gPj4+Pg0KPiA+Pj4+IFNvcnJ5IHRvIHBvaW50IHRoaXMgb3V0IG9ubHkgbm93LCBhbmQgSSBy
+ZWFsaXplIHRoYXQgaXQgbWlnaHQgYmUNCj4gPj4+PiB1bmltcG9ydGFudCBmb3IgcHJvZHVjdGlv
+biBidWlsZHMsIGJ1dCBpdCBpcyBpbXBvcnRhbnQgdG8gbWUsIGFuZA0KPiA+Pj4+IGRldmVsb3Bl
+cnMgaW4gZ2VuZXJhbCwgdG8gYmUgYWJsZSB0byB0ZXN0IGEgc2luZ2xlIFFFTVUgdHJlZSBhZ2Fp
+bnN0IGENCj4gPj4+PiBudW1iZXIgb2YgWGVuIHRyZWVzIChhbGwgcmVsZWFzZXMgZnJvbSA0LjMg
+b253YXJkKS4NCj4gPj4+Pg0KPiA+Pj4+IFdpdGggdGhpcyBjaGFuZ2UgKHNwZWNpZmljYWxseSBk
+cm9wcGluZyB0aGUgNC45IGJ1aWxkIHRlc3QpLCBvdXQgb2YgdHJlZQ0KPiA+Pj4+IGJ1aWxkcyBk
+b24ndCB3b3JrIGFueW1vcmUuIEkgd291bGQgbGlrZSB0byBiZSBhYmxlIHRvIGRvOg0KPiA+Pj4+
+DQo+ID4+Pj4gLi9jb25maWd1cmUgLS1lbmFibGUteGVuIC0tdGFyZ2V0LWxpc3Q9aTM4Ni1zb2Z0
+bW11IFwNCj4gPj4+PiAgICAgICAgICAgICAgICAgLS1leHRyYS1jZmxhZ3M9Ii1JJERJUi90b29s
+cy9pbmNsdWRlIFwNCj4gPj4+PiAgICAgICAgICAgICAgICAgLUkkRElSL3Rvb2xzL2xpYnMvdG9v
+bGxvZy9pbmNsdWRlIFwNCj4gPj4+PiAgICAgICAgICAgICAgICAgLUkkRElSL3Rvb2xzL2xpYnMv
+ZXZ0Y2huL2luY2x1ZGUgXA0KPiA+Pj4+ICAgICAgICAgICAgICAgICAtSSRESVIvdG9vbHMvbGli
+cy9nbnR0YWIvaW5jbHVkZSBcDQo+ID4+Pj4gICAgICAgICAgICAgICAgIC1JJERJUi90b29scy9s
+aWJzL2ZvcmVpZ25tZW1vcnkvaW5jbHVkZSBcDQo+ID4+Pj4gICAgICAgICAgICAgICAgIC1JJERJ
+Ui90b29scy9saWJzL2RldmljZW1vZGVsL2luY2x1ZGUgXA0KPiA+Pj4+ICAgICAgICAgICAgICAg
+ICAtSSRESVIvdG9vbHMvbGlieGMvaW5jbHVkZSBcDQo+ID4+Pj4gICAgICAgICAgICAgICAgIC1J
+JERJUi90b29scy94ZW5zdG9yZS9pbmNsdWRlIFwNCj4gPj4+PiAgICAgICAgICAgICAgICAgLUkk
+RElSL3Rvb2xzL3hlbnN0b3JlL2NvbXBhdC9pbmNsdWRlIiBcDQo+ID4+Pj4gICAgICAgICAgICAg
+ICAgIC0tZXh0cmEtbGRmbGFncz0iLUwkRElSL3Rvb2xzL2xpYnhjIFwNCj4gPj4+PiAgICAgICAg
+ICAgICAgICAgLUwkRElSL3Rvb2xzL3hlbnN0b3JlIFwNCj4gPj4+PiAgICAgICAgICAgICAgICAg
+LUwkRElSL3Rvb2xzL2xpYnMvZXZ0Y2huIFwNCj4gPj4+PiAgICAgICAgICAgICAgICAgLUwkRElS
+L3Rvb2xzL2xpYnMvZ250dGFiIFwNCj4gPj4+PiAgICAgICAgICAgICAgICAgLUwkRElSL3Rvb2xz
+L2xpYnMvZm9yZWlnbm1lbW9yeSBcDQo+ID4+Pj4gICAgICAgICAgICAgICAgIC1MJERJUi90b29s
+cy9saWJzL2RldmljZW1vZGVsIFwNCj4gPj4+PiAgICAgICAgICAgICAgICAgLVdsLC1ycGF0aC1s
+aW5rPSRESVIvdG9vbHMvbGlicy90b29sbG9nIFwNCj4gPj4+PiAgICAgICAgICAgICAgICAgLVds
+LC1ycGF0aC1saW5rPSRESVIvdG9vbHMvbGlicy9ldnRjaG4gXA0KPiA+Pj4+ICAgICAgICAgICAg
+ICAgICAtV2wsLXJwYXRoLWxpbms9JERJUi90b29scy9saWJzL2dudHRhYiBcDQo+ID4+Pj4gICAg
+ICAgICAgICAgICAgIC1XbCwtcnBhdGgtbGluaz0kRElSL3Rvb2xzL2xpYnMvY2FsbCBcDQo+ID4+
+Pj4gICAgICAgICAgICAgICAgIC1XbCwtcnBhdGgtbGluaz0kRElSL3Rvb2xzL2xpYnMvZm9yZWln
+bm1lbW9yeSBcDQo+ID4+Pj4gICAgICAgICAgICAgICAgIC1XbCwtcnBhdGgtbGluaz0kRElSL3Rv
+b2xzL2xpYnMvZGV2aWNlbW9kZWwiIFwNCj4gPj4+PiAgICAgICAgICAgICAtLWRpc2FibGUta3Zt
+DQo+ID4+Pj4gbWFrZQ0KPiA+Pj4+DQo+ID4+Pj4gQW5kIHRoZSBtYWtlIHNob3VsZCBzdWNjZWVk
+LiBJcyB0aGVyZSBhIHdheSB0byBkbyB0aGF0IHdpdGggcGtnLQ0KPiBjb25maWc/DQo+ID4+Pg0K
+PiA+Pj4gU3VyZSwgZm9yIFhlbiA0LjkganVzdCBkbzoNCj4gPj4+DQo+ID4+PiBQS0dfQ09ORklH
+X1BBVEg9JChESVIpL3Rvb2xzL3BrZy1jb25maWcgLi9jb25maWd1cmUgXA0KPiA+Pj4gCQktLWVu
+YWJsZS14ZW4gLS10YXJnZXQtbGlzdD1pMzg2LXNvZnRtbXUgXA0KPiA+Pj4gCQktLWRpc2FibGUt
+a3ZtDQo+ID4+PiBtYWtlDQo+ID4+DQo+ID4+IFllcywgdGhhdCB3b3JrcywgdGhhbmtzISBJIGNv
+bW1pdHRlZCBpdCB0byBteSBuZXh0IGJyYW5jaCBhZGRpbmcNCj4gPj4gInBrZy1jb25maWcsIHdo
+aWNoIGlzIGFscmVhZHkgYSBidWlsZCBkZXBlbmRlbmN5IG9mIFFFTVUsIHdpbGwgYmUgdXNlZA0K
+PiA+PiBleGNsdXNpdmVseSB0byBkZXRlcm1pbmUgdGhlIFhlbiB2ZXJzaW9uIGZyb20gWGVuIDQu
+OSBvbndhcmQuIiB0byB0aGUNCj4gPj4gY29tbWl0IG1lc3NhZ2UuDQo+ID4NCj4gPiBBIGZ1cnRo
+ZXIgcXVlc3Rpb24uLi4NCj4gPg0KPiA+IEkgaGF2ZSBhIHhlbiB0cmVlIHdoaWNoIEkndmUgYmVl
+biB1c2luZyB0byBidWlsZCBhbmQgaW5zdGFsbCBtYXN0ZXIgYWdhaW5zdA0KPiBteSBvd24gY2hl
+Y2tlZCBvdXQgUUVNVSByZXBvLiBObyBwcm9ibGVtIHdpdGggdGhhdC4gSSd2ZSBub3cgcmV2ZXJ0
+ZWQNCj4gbXkgdHJlZSB0byA0LjcuMCBhbmQgY2Fubm90IGJ1aWxkIHRvb2xzIChldmVuIGFmdGVy
+IGEgbWFrZSBkaXN0Y2xlYW4pIGJlY2F1c2UNCj4gUUVNVSdzIGNvbmZpZ3VyZSBpcyBzdGlsbCBn
+ZXR0aW5nIHVwIGEgeGVuX2N0cmxfdmVyc2lvbiBvZiA0MDkwMC4gVGhpcyBpcw0KPiBiZWNhdXNl
+IHBrZy1jb25maWcgaXMgc3RpbGwgZmluZGluZyBhIDQuOS4wIHhlbmNvbnRyb2wgcGFja2FnZT8g
+V2hlcmUgaXMgaXQNCj4gZ2V0dGluZyB0aGlzIGZyb20/DQo+IA0KPiBIbW0sIGNvdWxkIGl0IGJl
+IHlvdSBoYXZlIFhlbiB1bnN0YWJsZSBpbnN0YWxsZWQgb24geW91ciBtYWNoaW5lPw0KDQpJIGRv
+IGluZGVlZC4gSSBidWlsZCBvbiBteSB0ZXN0IG1hY2hpbmUuDQoNCj4gDQo+IERpZG4ndCB0aGlu
+ayBvZiB0aGlzIHByb2JsZW0uIEkgY2FuIHRoaW5rIG9mIDMgc29sdXRpb25zOg0KPiANCj4gYSkg
+ZGVsZXRlIHRoZSB4ZW5jb250cm9sLnBjIGZpbGUgKG9uIG15IHN5c3RlbSB1bmRlcg0KPiAgICAv
+dXNyL3NoYXJlL3BrZ2NvbmZpZy8gKQ0KPiANCg0KSSBqdXN0IGZvdW5kIG1pbmUgdXNpbmcgcGtn
+LWNvbmZpZyAtLWRlYnVnLi4uIC91c3IvbG9jYWwvc2hhcmUvcGtnY29uZmlnIGZvciBtZQ0KDQo+
+IGIpIHdlIGFkZCBhIHBhdGNoIHRvIHFlbXUgdG8gdGVzdCBhbiBlbnZpcm9ubWVudCB2YXJpYWJs
+ZSB3aGV0aGVyDQo+ICAgIHBrZy1jb25maWcgc2hvdWxkIGJlIGlnbm9yZWQgZm9yIFhlbiB2ZXJz
+aW9uIGRldGVjdGlvbg0KPiANCj4gYykgc2V0IHRoZSBlbnZpcm9ubWVudCB2YXJpYWJsZSBQS0df
+Q09ORklHX0xJQkRJUiB0byBhIGxvY2FsIGRpcmVjdG9yeQ0KPiAgICBhbmQgY29weSBhbGwgYnV0
+IHRoZSB4ZW4qLnBjIGZpbGVzIGZyb20gL3Vzci9zaGFyZS9wa2djb25maWcvIChvcg0KPiAgICB5
+b3VyIGNvcnJlY3QgZGlyZWN0b3J5KSB0byBpdCAob3IgbGluayB0aGVtIHRvIGF2b2lkIG1pc3Np
+bmcgdXBkYXRlcykNCj4gDQo+IE9UT0ggdGhpcyBpcyBzb21ldGhpbmcgeW91IGhhdmUgdG8gYmUg
+YXdhcmUgb2YgZm9yIG90aGVyIHBhY2thZ2VzIGFzDQo+IHdlbGw6IG1peGluZyB0aGUgYnVpbGQg
+ZW52aXJvbm1lbnQgYW5kIHRoZSB0YXJnZXQgZW52aXJvbm1lbnQgY2FuIGxlYWQNCj4gdG8gYmFk
+IHJlc3VsdHMuIE5vdyBYZW4gaGFzIGJlZW4gYWRkZWQgdG8gdGhlIGxpc3QuDQo+IA0KDQpUaGF0
+J3MgYSBjaGFuZ2UgaW4gYmVoYXZpb3VyIHRoYXQgSSwgYW5kIHByb2JhYmx5IG90aGVycywgaGF2
+ZSBsb25nIGJlZW4gdXNlZCB0by4gV2hhdCB3ZSByZWFsbHkgd2FudCwgcHJlc3VtYWJseSwgaXMg
+dG8gaGF2ZSBwa2ctY29uZmlnIGp1c3QgbG9vayB1bmRlciB0b29scy9wa2djb25maWcgd2hlbiBx
+dWVyeWluZyBmb3IgdGhlIHZlcnNpb24gb2YgeGVuY29udHJvbC4gQ291bGQgdGhhdCBub3QgYmUg
+ZG9uZSBieSBzaW1wbHkgc2V0dGluZyBQS0dfQ09ORklHX0xJQkRJUiBpbiBRRU1VJ3MgY29uZmln
+dXJlIHNjcmlwdCwgb3Igd291bGQgaXQgc3RpbGwgbWVhbiBwaWNraW5nIHVwIGluc3RhbGxlZCBs
+aWJyYXJpZXMgYmVmb3JlIG9uZXMganVzdCBidWlsdD8NCg0KICBQYXVsDQoNCj4gDQo+IEp1ZXJn
+ZW4NCg0K
