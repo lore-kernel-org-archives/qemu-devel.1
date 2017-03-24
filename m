@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=249263d75=Paul.Durrant@citrix.com>)
-	id 1crPSB-0003AW-Fa
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 09:40:32 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1crPZt-0006iz-NP
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 09:48:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=249263d75=Paul.Durrant@citrix.com>)
-	id 1crPS8-00036o-Aw
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 09:40:31 -0400
-Received: from smtp.citrix.com ([66.165.176.89]:45521)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=249263d75=Paul.Durrant@citrix.com>)
-	id 1crPS8-00036R-3r
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 09:40:28 -0400
-From: Paul Durrant <paul.durrant@citrix.com>
-Date: Fri, 24 Mar 2017 13:40:25 +0000
-Message-ID: <1490362825-24854-1-git-send-email-paul.durrant@citrix.com>
+	(envelope-from <ehabkost@redhat.com>) id 1crPZq-0006Y6-Kk
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 09:48:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60854)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1crPZq-0006Xz-C6
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 09:48:26 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 260CB7AEA1
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 13:48:26 +0000 (UTC)
+Date: Fri, 24 Mar 2017 10:48:21 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170324134821.GC28530@thinpad.lan.raisama.net>
+References: <20170322203140.GA12155@thinpad.lan.raisama.net>
+	<3d10c7b3-b702-3c16-7f3e-dfc6b332fbd4@redhat.com>
+	<b5516794-4592-569e-66ba-05dc40573a10@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3] xen-platform: separate unplugging of NVMe
- disks
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b5516794-4592-569e-66ba-05dc40573a10@redhat.com>
+Subject: Re: [Qemu-devel] q35 and sysbus devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,134 +34,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-Commit 090fa1c8 "add support for unplugging NVMe disks..." extended the
-existing disk unplug flag to cover NVMe disks as well as IDE and SCSI.
+On Fri, Mar 24, 2017 at 01:49:16PM +0300, Marcel Apfelbaum wrote:
+> On 03/22/2017 10:46 PM, Laszlo Ersek wrote:
+> > On 03/22/17 21:31, Eduardo Habkost wrote:
+> > > Hi,
+> > > 
+> > > I am investigating the current status of has_dynamic_sysbus and
+> > > sysbus device support on each of QEMU's machine types. The good
+> > > news is that almost all has_dynamic_sysbus=1 machines have their
+> > > own internal (often short) whitelist of supported sysbus device
+> > > types, and automatically reject unsupported devices.
+> > > 
+> > > ...except for q35.
+> > > 
+> > > q35 currently accepts all sys-bus-device subtypes on "-device",
+> > > and today this includes the following 23 devices:
+> > > 
+> > > * allwinner-ahci
+> > > * amd-iommu
+> > > * cfi.pflash01
+> > > * esp
+> > > * fw_cfg_io
+> > > * fw_cfg_mem
+> > > * generic-sdhci
+> > > * hpet
+> > > * intel-iommu
+> > > * ioapic
+> > > * isabus-bridge
+> > > * kvmclock
+> > > * kvm-ioapic
+> > > * kvmvapic
+> > > * SUNW,fdtwo
+> > > * sysbus-ahci
+> > > * sysbus-fdc
+> > > * sysbus-ohci
+> > > * unimplemented-device
+> > > * virtio-mmio
+> > > * xen-backend
+> > > * xen-sysdev
+> > > 
+> > > My question is: do all those devices really make sense to be used
+> > > with "-device" on q35?
+> > 
+> > I think fw_cfg_io and fw_cfg_mem should be board-only devices (no
+> > -device switch).
+> > 
+> > Regarding cfi.pflash01, I think originally it would have been nice to
+> > specify pflash chips with the modern (non-legacy) syntax, that is,
+> > separate -drive if=none,file=... backend options combined with -device
+> > cfi.pflash01,drive=... frontend options. However, that ship has sailed,
+> > even libvirt uses -drive if=pflash for these, and given the purpose we
+> > use pflash chips for, on Q35, I don't see much benefit in exposing
+> > cfi.pflash01 with a naked -device *now*.
+> > 
+> > Re: virtio-mmio, I don't think that should be available on Q35 at all.
+> > 
+> > I can't comment on the rest.
+> > 
+> 
+> Hi Eduardo,
+> Thanks for finding these problems.
+> 
+> We should ping all maintainers of the above devices, the best way to do it
+> is to add the "cannot_instantiate_with_device_add_yet = true" and ask maintainers
+> to agree (or not) on that.
 
-The recent thread on the xen-devel mailing list [1] has highlighted that
-this is not desirable behaviour: PV frontends should be able to distinguish
-NVMe disks from other types of disk and should have separate control over
-whether they are unplugged.
+If I understand it correctly,
+cannot_instantiate_with_device_add_yet is supposed to be
+temporary. And it applies to all machines, with no exceptions.
 
-This patch defines a new bit in the unplug mask for this purpose (see Xen
-commit [2]) and also tidies up the definitions of, and improves the
-comments regarding, the previously exiting bits in the protocol.
+The problem with today's mechanism is that we have no way to make
+a machine accept one type of sysbus device without making it
+start accepting every other sysbus devices. If we thought all
+!cannot_instantiate_with_device_add_yet sysbus devices were
+already safe, we wouldn't have has_dynamic_sysbus in the first
+place, would we?
 
-[1] https://lists.xen.org/archives/html/xen-devel/2017-03/msg02924.html
-[2] http://xenbits.xen.org/gitweb/?p=xen.git;a=commit;h=1096aa02
-
-Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
---
-Cc: Anthony Perard <anthony.perard@citrix.com>
-
-v3:
-- Updated to reference Xen documentation patch
-
-v2:
-- Fix the commit comment
----
- hw/i386/xen/xen_platform.c | 47 ++++++++++++++++++++++++++++++++++------------
- 1 file changed, 35 insertions(+), 12 deletions(-)
-
-diff --git a/hw/i386/xen/xen_platform.c b/hw/i386/xen/xen_platform.c
-index 6010f35..983d532 100644
---- a/hw/i386/xen/xen_platform.c
-+++ b/hw/i386/xen/xen_platform.c
-@@ -87,10 +87,30 @@ static void log_writeb(PCIXenPlatformState *s, char val)
-     }
- }
- 
--/* Xen Platform, Fixed IOPort */
--#define UNPLUG_ALL_DISKS 1
--#define UNPLUG_ALL_NICS 2
--#define UNPLUG_AUX_IDE_DISKS 4
-+/*
-+ * Unplug device flags.
-+ *
-+ * The logic got a little confused at some point in the past but this is
-+ * what they do now.
-+ *
-+ * bit 0: Unplug all IDE and SCSI disks.
-+ * bit 1: Unplug all NICs.
-+ * bit 2: Unplug IDE disks except primary master. This is overridden if
-+ *        bit 0 is also present in the mask.
-+ * bit 3: Unplug all NVMe disks.
-+ *
-+ */
-+#define _UNPLUG_IDE_SCSI_DISKS 0
-+#define UNPLUG_IDE_SCSI_DISKS (1u << _UNPLUG_IDE_SCSI_DISKS)
-+
-+#define _UNPLUG_ALL_NICS 1
-+#define UNPLUG_ALL_NICS (1u << _UNPLUG_ALL_NICS)
-+
-+#define _UNPLUG_AUX_IDE_DISKS 2
-+#define UNPLUG_AUX_IDE_DISKS (1u << _UNPLUG_AUX_IDE_DISKS)
-+
-+#define _UNPLUG_NVME_DISKS 3
-+#define UNPLUG_NVME_DISKS (1u << _UNPLUG_NVME_DISKS)
- 
- static void unplug_nic(PCIBus *b, PCIDevice *d, void *o)
- {
-@@ -111,7 +131,7 @@ static void unplug_disks(PCIBus *b, PCIDevice *d, void *opaque)
- {
-     uint32_t flags = *(uint32_t *)opaque;
-     bool aux = (flags & UNPLUG_AUX_IDE_DISKS) &&
--        !(flags & UNPLUG_ALL_DISKS);
-+        !(flags & UNPLUG_IDE_SCSI_DISKS);
- 
-     /* We have to ignore passthrough devices */
-     if (!strcmp(d->name, "xen-pci-passthrough")) {
-@@ -124,12 +144,16 @@ static void unplug_disks(PCIBus *b, PCIDevice *d, void *opaque)
-         break;
- 
-     case PCI_CLASS_STORAGE_SCSI:
--    case PCI_CLASS_STORAGE_EXPRESS:
-         if (!aux) {
-             object_unparent(OBJECT(d));
-         }
-         break;
- 
-+    case PCI_CLASS_STORAGE_EXPRESS:
-+        if (flags & UNPLUG_NVME_DISKS) {
-+            object_unparent(OBJECT(d));
-+        }
-+
-     default:
-         break;
-     }
-@@ -147,10 +171,9 @@ static void platform_fixed_ioport_writew(void *opaque, uint32_t addr, uint32_t v
-     switch (addr) {
-     case 0: {
-         PCIDevice *pci_dev = PCI_DEVICE(s);
--        /* Unplug devices.  Value is a bitmask of which devices to
--           unplug, with bit 0 the disk devices, bit 1 the network
--           devices, and bit 2 the non-primary-master IDE devices. */
--        if (val & (UNPLUG_ALL_DISKS | UNPLUG_AUX_IDE_DISKS)) {
-+        /* Unplug devices. See comment above flag definitions */
-+        if (val & (UNPLUG_IDE_SCSI_DISKS | UNPLUG_AUX_IDE_DISKS |
-+                   UNPLUG_NVME_DISKS)) {
-             DPRINTF("unplug disks\n");
-             pci_unplug_disks(pci_dev->bus, val);
-         }
-@@ -338,14 +361,14 @@ static void xen_platform_ioport_writeb(void *opaque, hwaddr addr,
-              * If VMDP was to control both disk and LAN it would use 4.
-              * If it controlled just disk or just LAN, it would use 8 below.
-              */
--            pci_unplug_disks(pci_dev->bus, UNPLUG_ALL_DISKS);
-+            pci_unplug_disks(pci_dev->bus, UNPLUG_IDE_SCSI_DISKS);
-             pci_unplug_nics(pci_dev->bus);
-         }
-         break;
-     case 8:
-         switch (val) {
-         case 1:
--            pci_unplug_disks(pci_dev->bus, UNPLUG_ALL_DISKS);
-+            pci_unplug_disks(pci_dev->bus, UNPLUG_IDE_SCSI_DISKS);
-             break;
-         case 2:
-             pci_unplug_nics(pci_dev->bus);
 -- 
-2.1.4
+Eduardo
