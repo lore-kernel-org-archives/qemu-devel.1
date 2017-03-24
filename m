@@ -1,39 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=249263d75=Paul.Durrant@citrix.com>)
-	id 1crROB-0007H2-CR
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:44:32 -0400
+	(envelope-from <clg@kaod.org>) id 1crRQ0-0008QA-5T
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:46:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=249263d75=Paul.Durrant@citrix.com>)
-	id 1crRO4-0000HZ-U0
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:44:31 -0400
-Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:53303
-	helo=SMTP.EU.CITRIX.COM)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=249263d75=Paul.Durrant@citrix.com>)
-	id 1crRO4-0000HL-It
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:44:24 -0400
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Fri, 24 Mar 2017 15:44:21 +0000
-Message-ID: <7208ddd9b76b4196be0a3d3cd12aee71@AMSPEX02CL03.citrite.net>
-References: <20170316141953.16161-1-jgross@suse.com>
-	<20170316141953.16161-3-jgross@suse.com>
-	<alpine.DEB.2.10.1703161306380.15430@sstabellini-ThinkPad-X260>
-	<214bc24d-1c0c-16d6-9c33-e20962b150d2@suse.com>
-	<alpine.DEB.2.10.1703171123520.22036@sstabellini-ThinkPad-X260>
-	<da852b5f-2490-c483-984d-c7be4f83b9a7@suse.com>
-	<alpine.DEB.2.10.1703211152240.11679@sstabellini-ThinkPad-X260>
-	<f1f79b77-f3bf-4bb0-135c-802bd5829de5@suse.com>
-	<alpine.DEB.2.10.1703221120530.13499@sstabellini-ThinkPad-X260>
-	<2fb1da9d14c14eb4826a87657f7d0eb1@AMSPEX02CL03.citrite.net>
-	<550ea61e-c9ba-5afc-12b5-438a2a57af6e@suse.com>
-In-Reply-To: <550ea61e-c9ba-5afc-12b5-438a2a57af6e@suse.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <clg@kaod.org>) id 1crRPx-000161-1j
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:46:24 -0400
+Received: from 3.mo7.mail-out.ovh.net ([46.105.34.113]:56181)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1crRPw-00013x-Rf
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:46:20 -0400
+Received: from player788.ha.ovh.net (b7.ovh.net [213.186.33.57])
+	by mo7.mail-out.ovh.net (Postfix) with ESMTP id EFF4F48FA3
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 16:46:18 +0100 (CET)
+References: <20170322092818.25605.49354.malonedeb@gac.canonical.com>
+	<20170322133509.30547.6423.malone@soybean.canonical.com>
+	<69a94326-4115-cac7-7f0f-1f455896fd2c@redhat.com>
+	<e7be24c8-dbc6-0e32-5b18-73cd5454fc64@kaod.org>
+	<AM5P194MB01291ABD7713F7A68E517AB6C83C0@AM5P194MB0129.EURP194.PROD.OUTLOOK.COM>
+	<4c420daf-83f4-8f4e-160f-a880041b2c51@kaod.org>
+	<AM5P194MB01297823A835C4F56CE786AAC83C0@AM5P194MB0129.EURP194.PROD.OUTLOOK.COM>
+	<2f2d5717-6b28-ea35-ceba-f005a2ce13ef@kaod.org>
+	<AM5P194MB0129DD9D4ADC6D711725D4D8C83E0@AM5P194MB0129.EURP194.PROD.OUTLOOK.COM>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <8b068f22-16fe-371a-76f3-37a7d8de306e@kaod.org>
+Date: Fri, 24 Mar 2017 16:46:14 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH 2/2] configure: use pkg-config
- for obtaining xen version
+In-Reply-To: <AM5P194MB0129DD9D4ADC6D711725D4D8C83E0@AM5P194MB0129.EURP194.PROD.OUTLOOK.COM>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [Bug 1674925] Re: Qemu PPC64 kvm no
+ display if --device virtio-gpu-pci is selected
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,120 +38,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Juergen Gross' <jgross@suse.com>, 'Stefano Stabellini' <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kraxel@redhat.com" <kraxel@redhat.com>
+To: luigi burdo <intermediadc@hotmail.com>, Thomas Huth <thuth@redhat.com>, Bug 1674925 <1674925@bugs.launchpad.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemU-ppc@nongnu.org" <qemU-ppc@nongnu.org>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBKdWVyZ2VuIEdyb3NzIFttYWls
-dG86amdyb3NzQHN1c2UuY29tXQ0KPiBTZW50OiAyNCBNYXJjaCAyMDE3IDE1OjM1DQo+IFRvOiBQ
-YXVsIER1cnJhbnQgPFBhdWwuRHVycmFudEBjaXRyaXguY29tPjsgJ1N0ZWZhbm8gU3RhYmVsbGlu
-aScNCj4gPHNzdGFiZWxsaW5pQGtlcm5lbC5vcmc+DQo+IENjOiBBbnRob255IFBlcmFyZCA8YW50
-aG9ueS5wZXJhcmRAY2l0cml4LmNvbT47IHhlbi0NCj4gZGV2ZWxAbGlzdHMueGVucHJvamVjdC5v
-cmc7IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsga3JheGVsQHJlZGhhdC5jb20NCj4gU3ViamVjdDog
-UmU6IFtYZW4tZGV2ZWxdIFtQQVRDSCAyLzJdIGNvbmZpZ3VyZTogdXNlIHBrZy1jb25maWcgZm9y
-IG9idGFpbmluZw0KPiB4ZW4gdmVyc2lvbg0KPiANCj4gT24gMjQvMDMvMTcgMTY6MTIsIFBhdWwg
-RHVycmFudCB3cm90ZToNCj4gPj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPj4gRnJv
-bTogU3RlZmFubyBTdGFiZWxsaW5pIFttYWlsdG86c3N0YWJlbGxpbmlAa2VybmVsLm9yZ10NCj4g
-Pj4gU2VudDogMjIgTWFyY2ggMjAxNyAxODoyMg0KPiA+PiBUbzogSnVlcmdlbiBHcm9zcyA8amdy
-b3NzQHN1c2UuY29tPg0KPiA+PiBDYzogU3RlZmFubyBTdGFiZWxsaW5pIDxzc3RhYmVsbGluaUBr
-ZXJuZWwub3JnPjsgcWVtdS0NCj4gZGV2ZWxAbm9uZ251Lm9yZzsNCj4gPj4geGVuLWRldmVsQGxp
-c3RzLnhlbnByb2plY3Qub3JnOyBBbnRob255IFBlcmFyZA0KPiA+PiA8YW50aG9ueS5wZXJhcmRA
-Y2l0cml4LmNvbT47IGtyYXhlbEByZWRoYXQuY29tOyBQYXVsIER1cnJhbnQNCj4gPj4gPFBhdWwu
-RHVycmFudEBjaXRyaXguY29tPg0KPiA+PiBTdWJqZWN0OiBSZTogW1BBVENIIDIvMl0gY29uZmln
-dXJlOiB1c2UgcGtnLWNvbmZpZyBmb3Igb2J0YWluaW5nIHhlbg0KPiB2ZXJzaW9uDQo+ID4+DQo+
-ID4+IE9uIFdlZCwgMjIgTWFyIDIwMTcsIEp1ZXJnZW4gR3Jvc3Mgd3JvdGU6DQo+ID4+PiBPbiAy
-MS8wMy8xNyAxOTo1NCwgU3RlZmFubyBTdGFiZWxsaW5pIHdyb3RlOg0KPiA+Pj4+IE9uIFR1ZSwg
-MjEgTWFyIDIwMTcsIEp1ZXJnZW4gR3Jvc3Mgd3JvdGU6DQo+ID4+Pj4+IE9uIDE3LzAzLzE3IDE5
-OjMzLCBTdGVmYW5vIFN0YWJlbGxpbmkgd3JvdGU6DQo+ID4+Pj4+PiBPbiBGcmksIDE3IE1hciAy
-MDE3LCBKdWVyZ2VuIEdyb3NzIHdyb3RlOg0KPiA+Pj4+Pj4+IE9uIDE2LzAzLzE3IDIxOjIwLCBT
-dGVmYW5vIFN0YWJlbGxpbmkgd3JvdGU6DQo+ID4+Pj4+Pj4+IE9uIFRodSwgMTYgTWFyIDIwMTcs
-IEp1ZXJnZW4gR3Jvc3Mgd3JvdGU6DQo+ID4+Pj4+Pj4+PiBJbnN0ZWFkIG9mIHRyeWluZyB0byBn
-dWVzcyB0aGUgWGVuIHZlcnNpb24gdG8gdXNlIGJ5IGNvbXBpbGluZw0KPiA+PiB2YXJpb3VzDQo+
-ID4+Pj4+Pj4+PiB0ZXN0IHByb2dyYW1zIGZpcnN0IGp1c3QgYXNrIHRoZSBzeXN0ZW0gdmlhIHBr
-Zy1jb25maWcuIE9ubHkgaWYgaXQNCj4gPj4+Pj4+Pj4+IGNhbid0IHJldHVybiB0aGUgdmVyc2lv
-biBmYWxsIGJhY2sgdG8gdGhlIHRlc3QgcHJvZ3JhbSBzY2hlbWUuDQo+ID4+Pj4+Pj4+DQo+ID4+
-Pj4+Pj4+IFRoYXQncyBPSywgYnV0IHdoeSBkaWQgeW91IHJlbW92ZSB0aGUgWGVuIHVuc3RhYmxl
-IHRlc3Q/DQo+ID4+Pj4+Pj4NCj4gPj4+Pj4+PiA+RnJvbSBYZW4gNC45IG9uIHBrZy1jb25maWcg
-d2lsbCByZXR1cm4gdGhlIG5lZWRlZCBpbmZvcm1hdGlvbi4NCj4gPj4gVGhlcmUgaXMNCj4gPj4+
-Pj4+PiBubyBsb25nZXIgYSBuZWVkIGZvciBhIHRlc3QgcHJvZ3JhbSB0byBkZXRlcm1pbmUgdGhl
-IFhlbiB2ZXJzaW9uLg0KPiA+PiBBZnRlcg0KPiA+Pj4+Pj4+IGFsbCB0aGlzIHdhcyB0aGUgbWFp
-biBvYmplY3RpdmUgb2YgbXkgc2VyaWVzIGFkZGluZyB0aGUgcGtnLWNvbmZpZw0KPiA+Pj4+Pj4+
-IGZpbGVzIHRvIFhlbi4NCj4gPj4+Pj4+DQo+ID4+Pj4+PiBJIHdhcyBnb2luZyB0byBzYXkgc29t
-ZXRoaW5nIGxpa2UgInllYWgsIGJ1dCBpcyBwa2ctY29uZmlnIGFsd2F5cw0KPiA+Pj4+Pj4gYXZh
-aWxhYmxlPyIgSW4gcmVhbGl0eSwgUUVNVSBhbHJlYWR5IGhhcyBwa2ctY29uZmlnIGFzIGJ1aWxk
-DQo+ID4+Pj4+PiBkZXBlbmRlbmN5LCBzbyBJIGd1ZXNzIHRoZXJlIGlzIG5vIHByb2JsZW0gd2l0
-aCB0aGF0Lg0KPiA+Pj4+Pj4NCj4gPj4+Pj4+IFBsZWFzZSBhZGQgYSBub3RlIGFib3V0IHRoaXMg
-dG8gdGhlIGNvbW1pdCBtZXNzYWdlLg0KPiA+Pj4+Pj4NCj4gPj4+Pj4NCj4gPj4+Pj4gT2theS4N
-Cj4gPj4+Pg0KPiA+Pj4+IFNvcnJ5IHRvIHBvaW50IHRoaXMgb3V0IG9ubHkgbm93LCBhbmQgSSBy
-ZWFsaXplIHRoYXQgaXQgbWlnaHQgYmUNCj4gPj4+PiB1bmltcG9ydGFudCBmb3IgcHJvZHVjdGlv
-biBidWlsZHMsIGJ1dCBpdCBpcyBpbXBvcnRhbnQgdG8gbWUsIGFuZA0KPiA+Pj4+IGRldmVsb3Bl
-cnMgaW4gZ2VuZXJhbCwgdG8gYmUgYWJsZSB0byB0ZXN0IGEgc2luZ2xlIFFFTVUgdHJlZSBhZ2Fp
-bnN0IGENCj4gPj4+PiBudW1iZXIgb2YgWGVuIHRyZWVzIChhbGwgcmVsZWFzZXMgZnJvbSA0LjMg
-b253YXJkKS4NCj4gPj4+Pg0KPiA+Pj4+IFdpdGggdGhpcyBjaGFuZ2UgKHNwZWNpZmljYWxseSBk
-cm9wcGluZyB0aGUgNC45IGJ1aWxkIHRlc3QpLCBvdXQgb2YgdHJlZQ0KPiA+Pj4+IGJ1aWxkcyBk
-b24ndCB3b3JrIGFueW1vcmUuIEkgd291bGQgbGlrZSB0byBiZSBhYmxlIHRvIGRvOg0KPiA+Pj4+
-DQo+ID4+Pj4gLi9jb25maWd1cmUgLS1lbmFibGUteGVuIC0tdGFyZ2V0LWxpc3Q9aTM4Ni1zb2Z0
-bW11IFwNCj4gPj4+PiAgICAgICAgICAgICAgICAgLS1leHRyYS1jZmxhZ3M9Ii1JJERJUi90b29s
-cy9pbmNsdWRlIFwNCj4gPj4+PiAgICAgICAgICAgICAgICAgLUkkRElSL3Rvb2xzL2xpYnMvdG9v
-bGxvZy9pbmNsdWRlIFwNCj4gPj4+PiAgICAgICAgICAgICAgICAgLUkkRElSL3Rvb2xzL2xpYnMv
-ZXZ0Y2huL2luY2x1ZGUgXA0KPiA+Pj4+ICAgICAgICAgICAgICAgICAtSSRESVIvdG9vbHMvbGli
-cy9nbnR0YWIvaW5jbHVkZSBcDQo+ID4+Pj4gICAgICAgICAgICAgICAgIC1JJERJUi90b29scy9s
-aWJzL2ZvcmVpZ25tZW1vcnkvaW5jbHVkZSBcDQo+ID4+Pj4gICAgICAgICAgICAgICAgIC1JJERJ
-Ui90b29scy9saWJzL2RldmljZW1vZGVsL2luY2x1ZGUgXA0KPiA+Pj4+ICAgICAgICAgICAgICAg
-ICAtSSRESVIvdG9vbHMvbGlieGMvaW5jbHVkZSBcDQo+ID4+Pj4gICAgICAgICAgICAgICAgIC1J
-JERJUi90b29scy94ZW5zdG9yZS9pbmNsdWRlIFwNCj4gPj4+PiAgICAgICAgICAgICAgICAgLUkk
-RElSL3Rvb2xzL3hlbnN0b3JlL2NvbXBhdC9pbmNsdWRlIiBcDQo+ID4+Pj4gICAgICAgICAgICAg
-ICAgIC0tZXh0cmEtbGRmbGFncz0iLUwkRElSL3Rvb2xzL2xpYnhjIFwNCj4gPj4+PiAgICAgICAg
-ICAgICAgICAgLUwkRElSL3Rvb2xzL3hlbnN0b3JlIFwNCj4gPj4+PiAgICAgICAgICAgICAgICAg
-LUwkRElSL3Rvb2xzL2xpYnMvZXZ0Y2huIFwNCj4gPj4+PiAgICAgICAgICAgICAgICAgLUwkRElS
-L3Rvb2xzL2xpYnMvZ250dGFiIFwNCj4gPj4+PiAgICAgICAgICAgICAgICAgLUwkRElSL3Rvb2xz
-L2xpYnMvZm9yZWlnbm1lbW9yeSBcDQo+ID4+Pj4gICAgICAgICAgICAgICAgIC1MJERJUi90b29s
-cy9saWJzL2RldmljZW1vZGVsIFwNCj4gPj4+PiAgICAgICAgICAgICAgICAgLVdsLC1ycGF0aC1s
-aW5rPSRESVIvdG9vbHMvbGlicy90b29sbG9nIFwNCj4gPj4+PiAgICAgICAgICAgICAgICAgLVds
-LC1ycGF0aC1saW5rPSRESVIvdG9vbHMvbGlicy9ldnRjaG4gXA0KPiA+Pj4+ICAgICAgICAgICAg
-ICAgICAtV2wsLXJwYXRoLWxpbms9JERJUi90b29scy9saWJzL2dudHRhYiBcDQo+ID4+Pj4gICAg
-ICAgICAgICAgICAgIC1XbCwtcnBhdGgtbGluaz0kRElSL3Rvb2xzL2xpYnMvY2FsbCBcDQo+ID4+
-Pj4gICAgICAgICAgICAgICAgIC1XbCwtcnBhdGgtbGluaz0kRElSL3Rvb2xzL2xpYnMvZm9yZWln
-bm1lbW9yeSBcDQo+ID4+Pj4gICAgICAgICAgICAgICAgIC1XbCwtcnBhdGgtbGluaz0kRElSL3Rv
-b2xzL2xpYnMvZGV2aWNlbW9kZWwiIFwNCj4gPj4+PiAgICAgICAgICAgICAtLWRpc2FibGUta3Zt
-DQo+ID4+Pj4gbWFrZQ0KPiA+Pj4+DQo+ID4+Pj4gQW5kIHRoZSBtYWtlIHNob3VsZCBzdWNjZWVk
-LiBJcyB0aGVyZSBhIHdheSB0byBkbyB0aGF0IHdpdGggcGtnLQ0KPiBjb25maWc/DQo+ID4+Pg0K
-PiA+Pj4gU3VyZSwgZm9yIFhlbiA0LjkganVzdCBkbzoNCj4gPj4+DQo+ID4+PiBQS0dfQ09ORklH
-X1BBVEg9JChESVIpL3Rvb2xzL3BrZy1jb25maWcgLi9jb25maWd1cmUgXA0KPiA+Pj4gCQktLWVu
-YWJsZS14ZW4gLS10YXJnZXQtbGlzdD1pMzg2LXNvZnRtbXUgXA0KPiA+Pj4gCQktLWRpc2FibGUt
-a3ZtDQo+ID4+PiBtYWtlDQo+ID4+DQo+ID4+IFllcywgdGhhdCB3b3JrcywgdGhhbmtzISBJIGNv
-bW1pdHRlZCBpdCB0byBteSBuZXh0IGJyYW5jaCBhZGRpbmcNCj4gPj4gInBrZy1jb25maWcsIHdo
-aWNoIGlzIGFscmVhZHkgYSBidWlsZCBkZXBlbmRlbmN5IG9mIFFFTVUsIHdpbGwgYmUgdXNlZA0K
-PiA+PiBleGNsdXNpdmVseSB0byBkZXRlcm1pbmUgdGhlIFhlbiB2ZXJzaW9uIGZyb20gWGVuIDQu
-OSBvbndhcmQuIiB0byB0aGUNCj4gPj4gY29tbWl0IG1lc3NhZ2UuDQo+ID4NCj4gPiBBIGZ1cnRo
-ZXIgcXVlc3Rpb24uLi4NCj4gPg0KPiA+IEkgaGF2ZSBhIHhlbiB0cmVlIHdoaWNoIEkndmUgYmVl
-biB1c2luZyB0byBidWlsZCBhbmQgaW5zdGFsbCBtYXN0ZXIgYWdhaW5zdA0KPiBteSBvd24gY2hl
-Y2tlZCBvdXQgUUVNVSByZXBvLiBObyBwcm9ibGVtIHdpdGggdGhhdC4gSSd2ZSBub3cgcmV2ZXJ0
-ZWQNCj4gbXkgdHJlZSB0byA0LjcuMCBhbmQgY2Fubm90IGJ1aWxkIHRvb2xzIChldmVuIGFmdGVy
-IGEgbWFrZSBkaXN0Y2xlYW4pIGJlY2F1c2UNCj4gUUVNVSdzIGNvbmZpZ3VyZSBpcyBzdGlsbCBn
-ZXR0aW5nIHVwIGEgeGVuX2N0cmxfdmVyc2lvbiBvZiA0MDkwMC4gVGhpcyBpcw0KPiBiZWNhdXNl
-IHBrZy1jb25maWcgaXMgc3RpbGwgZmluZGluZyBhIDQuOS4wIHhlbmNvbnRyb2wgcGFja2FnZT8g
-V2hlcmUgaXMgaXQNCj4gZ2V0dGluZyB0aGlzIGZyb20/DQo+IA0KPiBIbW0sIGNvdWxkIGl0IGJl
-IHlvdSBoYXZlIFhlbiB1bnN0YWJsZSBpbnN0YWxsZWQgb24geW91ciBtYWNoaW5lPw0KDQpJIGRv
-IGluZGVlZC4gSSBidWlsZCBvbiBteSB0ZXN0IG1hY2hpbmUuDQoNCj4gDQo+IERpZG4ndCB0aGlu
-ayBvZiB0aGlzIHByb2JsZW0uIEkgY2FuIHRoaW5rIG9mIDMgc29sdXRpb25zOg0KPiANCj4gYSkg
-ZGVsZXRlIHRoZSB4ZW5jb250cm9sLnBjIGZpbGUgKG9uIG15IHN5c3RlbSB1bmRlcg0KPiAgICAv
-dXNyL3NoYXJlL3BrZ2NvbmZpZy8gKQ0KPiANCg0KSSBqdXN0IGZvdW5kIG1pbmUgdXNpbmcgcGtn
-LWNvbmZpZyAtLWRlYnVnLi4uIC91c3IvbG9jYWwvc2hhcmUvcGtnY29uZmlnIGZvciBtZQ0KDQo+
-IGIpIHdlIGFkZCBhIHBhdGNoIHRvIHFlbXUgdG8gdGVzdCBhbiBlbnZpcm9ubWVudCB2YXJpYWJs
-ZSB3aGV0aGVyDQo+ICAgIHBrZy1jb25maWcgc2hvdWxkIGJlIGlnbm9yZWQgZm9yIFhlbiB2ZXJz
-aW9uIGRldGVjdGlvbg0KPiANCj4gYykgc2V0IHRoZSBlbnZpcm9ubWVudCB2YXJpYWJsZSBQS0df
-Q09ORklHX0xJQkRJUiB0byBhIGxvY2FsIGRpcmVjdG9yeQ0KPiAgICBhbmQgY29weSBhbGwgYnV0
-IHRoZSB4ZW4qLnBjIGZpbGVzIGZyb20gL3Vzci9zaGFyZS9wa2djb25maWcvIChvcg0KPiAgICB5
-b3VyIGNvcnJlY3QgZGlyZWN0b3J5KSB0byBpdCAob3IgbGluayB0aGVtIHRvIGF2b2lkIG1pc3Np
-bmcgdXBkYXRlcykNCj4gDQo+IE9UT0ggdGhpcyBpcyBzb21ldGhpbmcgeW91IGhhdmUgdG8gYmUg
-YXdhcmUgb2YgZm9yIG90aGVyIHBhY2thZ2VzIGFzDQo+IHdlbGw6IG1peGluZyB0aGUgYnVpbGQg
-ZW52aXJvbm1lbnQgYW5kIHRoZSB0YXJnZXQgZW52aXJvbm1lbnQgY2FuIGxlYWQNCj4gdG8gYmFk
-IHJlc3VsdHMuIE5vdyBYZW4gaGFzIGJlZW4gYWRkZWQgdG8gdGhlIGxpc3QuDQo+IA0KDQpUaGF0
-J3MgYSBjaGFuZ2UgaW4gYmVoYXZpb3VyIHRoYXQgSSwgYW5kIHByb2JhYmx5IG90aGVycywgaGF2
-ZSBsb25nIGJlZW4gdXNlZCB0by4gV2hhdCB3ZSByZWFsbHkgd2FudCwgcHJlc3VtYWJseSwgaXMg
-dG8gaGF2ZSBwa2ctY29uZmlnIGp1c3QgbG9vayB1bmRlciB0b29scy9wa2djb25maWcgd2hlbiBx
-dWVyeWluZyBmb3IgdGhlIHZlcnNpb24gb2YgeGVuY29udHJvbC4gQ291bGQgdGhhdCBub3QgYmUg
-ZG9uZSBieSBzaW1wbHkgc2V0dGluZyBQS0dfQ09ORklHX0xJQkRJUiBpbiBRRU1VJ3MgY29uZmln
-dXJlIHNjcmlwdCwgb3Igd291bGQgaXQgc3RpbGwgbWVhbiBwaWNraW5nIHVwIGluc3RhbGxlZCBs
-aWJyYXJpZXMgYmVmb3JlIG9uZXMganVzdCBidWlsdD8NCg0KICBQYXVsDQoNCj4gDQo+IEp1ZXJn
-ZW4NCg0K
+On 03/24/2017 12:31 PM, luigi burdo wrote:
+> Hi C=E8dric,
+>=20
+> first of all thanks for your relpy.
+>=20
+>=20
+>=20
+>=20
+>>I have some difficulty sorting out what is going on and what
+>>could be considered a regression :/ you are reporting many
+>>issues at the same time with a home made kernel.
+>=20
+>>Could you please use the kernel shipped with the distro to
+>>start with ?
+>=20
+> I can do it and report.
+>=20
+>> yes usually with 2.8 i  boot  the VM without issue on G5 Quad  with th=
+e option
+>> -M  pseries from 2.1 to 2.5 with kvm-pr enabled.
+>> i did the tests and with all pseries now on 2.9 i have the same issue.
+>> example:
+>> qemu-system-ppc64 --enable-kvm -cpu 970fx_v2.0 -m 1024 -M pseries-2.1
+>> qemu-system-ppc64: KVM and IRQ_XICS capability must be present for in-=
+kernel XICS
+>=20
+>>This error message is because your host kernel lacks in-kernel XICS,
+>>but you are saying that was not an issue with QEMU-2.8. Correct ?=20
+>=20
+> Exactly i have the same on Qoriq too.
+
+I will look at the problem but I think you should recompile your kernel=20
+with in-kernel XICS or use the kernel shipped by the distro you use.
+=20
+>>Here is the command line I used on a 17.04 host :
+>>qemu-system-ppc64 -M pseries-2.[1-8],accel=3Dkvm,kvm-type=3DPR -cpu 970=
+fx_v2.0 -m 1024 -nographic
+>=20
+> I will try your same command line and see what will exit on me.
+> I cant use qemu on 17.04 host because there is no more support=20
+> for PPC32, PPC64 dead line is 16.10 and last working version
+> of qemu on PPC  is 2.6.1  i dint try 2.9 there if needed i can=20
+> do i have ubuntu mate 17.04 installed too.
+
+Also please try with a core supported by pseries :=20
+
+    /* 970 */
+    "970_v2.2",
+
+    /* 970MP variants */
+    "970MP_v1.0",
+    "970mp_v1.0",
+    "970MP_v1.1",
+    "970mp_v1.1",
+
+you should be fine with these.
+
+Thanks,
+
+C.
+
+
+>>Did we introduce a regression in compatibility in QEMU 2.9 ?  or=20
+> Im facing many issue on this last update im try to help how i can befor=
+e all come upstream.
+> i like really much qemu. i can help in testing on PPC64 Be if need with=
+ my hw.
+>>was it bogus before ? That needs a little digging. I did not work
+>>on that part.
+> dont worry you did much=20
+>=20
+> Thanks=20
+> Luigi=20
+>=20
+>=20
+>=20
