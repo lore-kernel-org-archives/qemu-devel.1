@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yanghongyang@huawei.com>) id 1crLTB-0004rO-7w
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:25:18 -0400
+	(envelope-from <thuth@redhat.com>) id 1crLUs-0005aL-Cr
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:27:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yanghongyang@huawei.com>) id 1crLT8-0004hp-3R
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:25:17 -0400
-Received: from [45.249.212.187] (port=3013 helo=dggrg01-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <yanghongyang@huawei.com>) id 1crLT7-0004bp-BM
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:25:14 -0400
-References: <20170323210124.12300-1-quintela@redhat.com>
-	<5023e01f-ee47-d066-eb7b-0ac4b8837283@huawei.com>
-	<87d1d7844y.fsf@secure.mitica>
-From: Yang Hongyang <yanghongyang@huawei.com>
-Message-ID: <31202c71-ced1-3cdd-e1a1-829daf5d2819@huawei.com>
-Date: Fri, 24 Mar 2017 17:23:39 +0800
-MIME-Version: 1.0
-In-Reply-To: <87d1d7844y.fsf@secure.mitica>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] Split migration bitmaps by ramblock
+	(envelope-from <thuth@redhat.com>) id 1crLUp-0005St-81
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:27:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52248)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1crLUp-0005SE-24
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:26:59 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Fri, 24 Mar 2017 10:26:55 +0100
+Message-Id: <1490347615-19222-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] target/s390x/kvm: Fix problem when running
+ with SELinux under z/VM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +22,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
+To: qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
 
+When running QEMU with KVM under z/VM, the memory for the guest
+is allocated via legacy_s390_alloc() since the KVM_CAP_S390_COW
+extension is not supported on z/VM. legacy_s390_alloc() then uses
+mmap(... PROT_EXEC ...) for the guest memory - but this does not
+work when running with SELinux enabled, mmap() fails and QEMU aborts
+with the following error message:
 
+ cannot set up guest memory 's390.ram': Permission denied
 
-On 2017/3/24 16:34, Juan Quintela wrote:
-> Yang Hongyang <yanghongyang@huawei.com> wrote:
->> Hi Juan,
->>
->>   First of all, I like the refactor patchset about RAMState, it makes
->> things clean, great!
-> 
-> Thanks.
-> 
-> The whole idea of the series was to make testing changes easier.
-> 
->> On 2017/3/24 5:01, Juan Quintela wrote:
->>> Hi
->>>
->>> This series split the migration and unsent bitmaps by ramblock.  This
->>> makes it easier to synchronize in small bits.  This is on top of the
->>> RAMState and not-hotplug series.
->>>
->>> Why?
->>>
->>> reason 1:
->>>
->>> People have complained that by the time that we detect that a page is
->>> sent, it has already been marked dirty "again" inside kvm, so we are
->>> going to send it again.  On top of this patch, my idea is, for words
->>> of the bitmap that have any bit set, just synchonize the bitmap before
->>> sending the pages.  I have not looking into performance numbers yet,
->>> jsut asking for comments about how it is done.
->>
->> Here you said 'synchonize the bitmap before sending the pages', do you
->> mean synchronize the bitmap from kvm? If so, I doubt the performance...
->> because every synchronization will require a ioctl(). If not, the
->> synchronization of per block is useless.
->>
->> Currently, migration thread will synchronize the bitmap from kvm every
->> iter(migration_bitmap_sync()). The RAMBlock already has kind of per block
->> bitmap for this kind of sync. And the migration bitmap is used to put all
->> those per block bitmap together for data sending use.
-> 
-> Hi
-> For huge memory machines, we are doing it always in one go.
-> 
-> 
-> bitmap_sync(1TB RAM)
-> walk bitmap for 512MB of RAM, at that point, it is very probable that
-> this page is again dirty in the KVM bitmap, so, we send it, but as it is
-> dirty again, we would have to send it in the next pass.  This sent is
-> completely useless.
+Looking at the other allocator function qemu_anon_ram_alloc(), it
+seems like PROT_EXEC is normally not needed for allocating the
+guest RAM, and indeed, the guest also starts successfully under
+z/VM when we remove the PROT_EXEC from the legacy_s390_alloc()
+function. So let's get rid of that flag here to be able to run
+with SELinux under z/VM, too.
 
-I got your point, the problem is KVM do not have the ability to sync in
-small chunks currently, even it has, it will generate lots of ioctls:
-KVM bitmap sync is per Memory Region IIRC, think we have a 1T mem
-guest, 16 MRs for example, currently, every iter we need to do 16 ioctls.
-But if we sync in small chunks, 64M for example, we might need to do
-16384 ioctls in the worst case. eg:mem press(dirty rate) is very high.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ target/s390x/kvm.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-
-> 
-> So my idea is to split things in smaller chunks.  As we have to do an
-> ioctl, we wouldn't want to synchronize page by page, but perhaps 16MB at
-> a time, 64MB, anything less than the whole amount of memory.
-> 
-> Later, Juan.
-> 
-
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index ac47154..5167436 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -678,8 +678,7 @@ static void *legacy_s390_alloc(size_t size, uint64_t *align)
+ {
+     void *mem;
+ 
+-    mem = mmap((void *) 0x800000000ULL, size,
+-               PROT_EXEC|PROT_READ|PROT_WRITE,
++    mem = mmap((void *) 0x800000000ULL, size, PROT_READ | PROT_WRITE,
+                MAP_SHARED | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
+     return mem == MAP_FAILED ? NULL : mem;
+ }
 -- 
-Thanks,
-Yang
+1.8.3.1
