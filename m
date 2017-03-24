@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41559)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1crPSA-0003AK-5s
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 09:40:31 -0400
+	(envelope-from <prvs=249263d75=Paul.Durrant@citrix.com>)
+	id 1crPSB-0003AW-Fa
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 09:40:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1crPS9-000379-Ba
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 09:40:30 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:35166)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1crPS9-00036s-46
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 09:40:29 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id u132so13365854wmg.0
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 06:40:28 -0700 (PDT)
+	(envelope-from <prvs=249263d75=Paul.Durrant@citrix.com>)
+	id 1crPS8-00036o-Aw
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 09:40:31 -0400
+Received: from smtp.citrix.com ([66.165.176.89]:45521)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=249263d75=Paul.Durrant@citrix.com>)
+	id 1crPS8-00036R-3r
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 09:40:28 -0400
+From: Paul Durrant <paul.durrant@citrix.com>
+Date: Fri, 24 Mar 2017 13:40:25 +0000
+Message-ID: <1490362825-24854-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJSP0QX3z_Zn-jdi7=2qw795Ep2nG5xvWR9DqyWajnKjkCGd3g@mail.gmail.com>
-References: <20170316120110.11677-1-iwona260909@gmail.com>
-	<20170316120110.11677-2-iwona260909@gmail.com>
-	<CAFEAcA8ZBAAqYNbh_3J69W5SMXRsbW4S367Xe8ceF1C0M-RNnA@mail.gmail.com>
-	<1489673540.15659.93.camel@redhat.com>
-	<CAJSP0QX3z_Zn-jdi7=2qw795Ep2nG5xvWR9DqyWajnKjkCGd3g@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Mar 2017 13:40:07 +0000
-Message-ID: <CAFEAcA-RH5zqJKAkzRaB-BJBMreLPDUiDtSE639dE_1K-FfBOw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] Dead code removal: removing code for
- unsupported DEPTH.
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3] xen-platform: separate unplugging of NVMe
+ disks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,28 +27,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: iwona260909@gmail.com, QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
+Cc: Paul Durrant <paul.durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>
 
-On 24 March 2017 at 13:36, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> Gerd, please reply if this is wrong, but here is a summary of the task:
->
-> Some emulated graphics cards use qemu_console_surface() and that
-> surface is always in 32 bits per pixel format.  Therefore, code for
-> dealing with other pixel formats can be removed.
->
-> When looking for emulated graphics cards where this cleanup is
-> possible, keep in mind that some of the code operates on the guest's
-> frame buffer, whose pixel format is not under QEMU's control.
-> Therefore we cannot assume that 32bpp is always used and this cleanup
-> doesn't apply there.  Limit yourself to code that uses
-> qemu_console_surface() exclusively to access the surface and you
-> should be fine.  Other code is likely to need support for additional
-> pixel formats.
+Commit 090fa1c8 "add support for unplugging NVMe disks..." extended the
+existing disk unplug flag to cover NVMe disks as well as IDE and SCSI.
 
-Also worth pointing at an example of a patchset that does
-this for some other device, eg Gerd's recent pl110 set,
-as a guide to what's getting removed.
+The recent thread on the xen-devel mailing list [1] has highlighted that
+this is not desirable behaviour: PV frontends should be able to distinguish
+NVMe disks from other types of disk and should have separate control over
+whether they are unplugged.
 
-thanks
--- PMM
+This patch defines a new bit in the unplug mask for this purpose (see Xen
+commit [2]) and also tidies up the definitions of, and improves the
+comments regarding, the previously exiting bits in the protocol.
+
+[1] https://lists.xen.org/archives/html/xen-devel/2017-03/msg02924.html
+[2] http://xenbits.xen.org/gitweb/?p=xen.git;a=commit;h=1096aa02
+
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+--
+Cc: Anthony Perard <anthony.perard@citrix.com>
+
+v3:
+- Updated to reference Xen documentation patch
+
+v2:
+- Fix the commit comment
+---
+ hw/i386/xen/xen_platform.c | 47 ++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 35 insertions(+), 12 deletions(-)
+
+diff --git a/hw/i386/xen/xen_platform.c b/hw/i386/xen/xen_platform.c
+index 6010f35..983d532 100644
+--- a/hw/i386/xen/xen_platform.c
++++ b/hw/i386/xen/xen_platform.c
+@@ -87,10 +87,30 @@ static void log_writeb(PCIXenPlatformState *s, char val)
+     }
+ }
+ 
+-/* Xen Platform, Fixed IOPort */
+-#define UNPLUG_ALL_DISKS 1
+-#define UNPLUG_ALL_NICS 2
+-#define UNPLUG_AUX_IDE_DISKS 4
++/*
++ * Unplug device flags.
++ *
++ * The logic got a little confused at some point in the past but this is
++ * what they do now.
++ *
++ * bit 0: Unplug all IDE and SCSI disks.
++ * bit 1: Unplug all NICs.
++ * bit 2: Unplug IDE disks except primary master. This is overridden if
++ *        bit 0 is also present in the mask.
++ * bit 3: Unplug all NVMe disks.
++ *
++ */
++#define _UNPLUG_IDE_SCSI_DISKS 0
++#define UNPLUG_IDE_SCSI_DISKS (1u << _UNPLUG_IDE_SCSI_DISKS)
++
++#define _UNPLUG_ALL_NICS 1
++#define UNPLUG_ALL_NICS (1u << _UNPLUG_ALL_NICS)
++
++#define _UNPLUG_AUX_IDE_DISKS 2
++#define UNPLUG_AUX_IDE_DISKS (1u << _UNPLUG_AUX_IDE_DISKS)
++
++#define _UNPLUG_NVME_DISKS 3
++#define UNPLUG_NVME_DISKS (1u << _UNPLUG_NVME_DISKS)
+ 
+ static void unplug_nic(PCIBus *b, PCIDevice *d, void *o)
+ {
+@@ -111,7 +131,7 @@ static void unplug_disks(PCIBus *b, PCIDevice *d, void *opaque)
+ {
+     uint32_t flags = *(uint32_t *)opaque;
+     bool aux = (flags & UNPLUG_AUX_IDE_DISKS) &&
+-        !(flags & UNPLUG_ALL_DISKS);
++        !(flags & UNPLUG_IDE_SCSI_DISKS);
+ 
+     /* We have to ignore passthrough devices */
+     if (!strcmp(d->name, "xen-pci-passthrough")) {
+@@ -124,12 +144,16 @@ static void unplug_disks(PCIBus *b, PCIDevice *d, void *opaque)
+         break;
+ 
+     case PCI_CLASS_STORAGE_SCSI:
+-    case PCI_CLASS_STORAGE_EXPRESS:
+         if (!aux) {
+             object_unparent(OBJECT(d));
+         }
+         break;
+ 
++    case PCI_CLASS_STORAGE_EXPRESS:
++        if (flags & UNPLUG_NVME_DISKS) {
++            object_unparent(OBJECT(d));
++        }
++
+     default:
+         break;
+     }
+@@ -147,10 +171,9 @@ static void platform_fixed_ioport_writew(void *opaque, uint32_t addr, uint32_t v
+     switch (addr) {
+     case 0: {
+         PCIDevice *pci_dev = PCI_DEVICE(s);
+-        /* Unplug devices.  Value is a bitmask of which devices to
+-           unplug, with bit 0 the disk devices, bit 1 the network
+-           devices, and bit 2 the non-primary-master IDE devices. */
+-        if (val & (UNPLUG_ALL_DISKS | UNPLUG_AUX_IDE_DISKS)) {
++        /* Unplug devices. See comment above flag definitions */
++        if (val & (UNPLUG_IDE_SCSI_DISKS | UNPLUG_AUX_IDE_DISKS |
++                   UNPLUG_NVME_DISKS)) {
+             DPRINTF("unplug disks\n");
+             pci_unplug_disks(pci_dev->bus, val);
+         }
+@@ -338,14 +361,14 @@ static void xen_platform_ioport_writeb(void *opaque, hwaddr addr,
+              * If VMDP was to control both disk and LAN it would use 4.
+              * If it controlled just disk or just LAN, it would use 8 below.
+              */
+-            pci_unplug_disks(pci_dev->bus, UNPLUG_ALL_DISKS);
++            pci_unplug_disks(pci_dev->bus, UNPLUG_IDE_SCSI_DISKS);
+             pci_unplug_nics(pci_dev->bus);
+         }
+         break;
+     case 8:
+         switch (val) {
+         case 1:
+-            pci_unplug_disks(pci_dev->bus, UNPLUG_ALL_DISKS);
++            pci_unplug_disks(pci_dev->bus, UNPLUG_IDE_SCSI_DISKS);
+             break;
+         case 2:
+             pci_unplug_nics(pci_dev->bus);
+-- 
+2.1.4
