@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anthony.xu@intel.com>) id 1crD6y-00006h-Gv
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 20:29:49 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1crDS3-0004Kr-QL
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 20:51:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anthony.xu@intel.com>) id 1crD6u-0000Tg-E5
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 20:29:48 -0400
-Received: from mga11.intel.com ([192.55.52.93]:47521)
+	(envelope-from <sstabellini@kernel.org>) id 1crDS1-0000EI-6b
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 20:51:35 -0400
+Received: from mail.kernel.org ([198.145.29.136]:57642)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
-	id 1crD6u-0000Sp-0c
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 20:29:44 -0400
-From: "Xu, Anthony" <anthony.xu@intel.com>
-Date: Fri, 24 Mar 2017 00:29:39 +0000
-Message-ID: <4712D8F4B26E034E80552F30A67BE0B1A3BA2D@ORSMSX112.amr.corp.intel.com>
-References: <4712D8F4B26E034E80552F30A67BE0B1A2D69E@ORSMSX112.amr.corp.intel.com>
-	<cce399b0-45d2-ac24-4975-6e27ad04f833@redhat.com>
-	<20170323090516.GN16717@stefanha-x1.localdomain>
-In-Reply-To: <20170323090516.GN16717@stefanha-x1.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1crDS0-0000BY-SF
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 20:51:33 -0400
+Date: Thu, 23 Mar 2017 17:51:26 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <1490264111-25273-1-git-send-email-paul.durrant@citrix.com>
+Message-ID: <alpine.DEB.2.10.1703231730120.8001@sstabellini-ThinkPad-X260>
+References: <1490264111-25273-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] only link current target arch traces to
- qemu-system
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v2] xen-platform: separate unplugging of
+ NVMe disks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,134 +27,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Daniel Berrange <berrange@redhat.com>
+To: Paul Durrant <paul.durrant@citrix.com>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
 
-> Perhaps all trace.o files should be put into their own .a instead of
-> being added directly to the linker line:
->=20
-> COMMON_LDADDS =3D $(trace-obj-y) libqemuutil.a libqemustub.a
->=20
-> I think the linker would only pull in .o files containing symbols that ar=
-e
-> actually referenced by the program.
+On Thu, 23 Mar 2017, Paul Durrant wrote:
+> Commit 090fa1c8 "add support for unplugging NVMe disks..." extended the
+> existing disk unplug flag to cover NVMe disks as well as IDE and SCSI.
+> 
+> The recent thread on the xen-devel mailing list [1] has highlighted that
+> this is not desirable behaviour: PV frontends should be able to distinguish
+> NVMe disks from other types of disk and should have separate control over
+> whether they are unplugged.
+> 
+> This patch defines a new bit in the unplug mask for this purpose and also
+> tidies up the definitions of, and improves the comments regarding, the
+> previously exiting bits in the protocol.
+> 
+> [1] https://lists.xen.org/archives/html/xen-devel/2017-03/msg02924.html
+> 
+> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> --
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: Anthony Perard <anthony.perard@citrix.com>
+> 
+> NOTE: A companion patch will be submitted to xen-devel to align the
+>       unplug protocol documentation once this patch is acked.
 
-Hi Stefan,
+The companion patch needs to be acked before this patch gets applied. In
+fact, I would prefer if the changeset of the Xen commit was added to
+this patch description.
 
-That's a good idea!
+If you add that, then you can repost this with
 
-Below patch creates libqemutrace.a.  ./trace.o, ./qapi/trace.o and=20
-./util/trace.o are added into libqemuutil.a  to avoid recursive dependencie=
-s=20
-between libqemuutil.a and libqemutrace.a.
-
-
-Anthony
-
-
-
-
-diff --git a/Makefile b/Makefile
-index 6c359b2..565f5c7 100644
---- a/Makefile
-+++ b/Makefile
-@@ -345,8 +345,8 @@ subdir-dtc:dtc/libfdt dtc/tests
- dtc/%:
-        mkdir -p $@
-
--$(SUBDIR_RULES): libqemuutil.a libqemustub.a $(common-obj-y) $(chardev-obj=
--y) \
--       $(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY)) $(trace-obj-y)
-+$(SUBDIR_RULES): libqemutrace.a libqemuutil.a libqemustub.a $(common-obj-y=
-) $(chardev-obj-y) \
-+       $(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY))
-
- ROMSUBDIR_RULES=3D$(patsubst %,romsubdir-%, $(ROMS))
- # Only keep -O and -g cflags
-@@ -367,10 +367,11 @@ Makefile: $(version-obj-y)
-
- libqemustub.a: $(stub-obj-y)
- libqemuutil.a: $(util-obj-y)
-+libqemutrace.a: $(trace-obj-y)
-
- ######################################################################
-
--COMMON_LDADDS =3D $(trace-obj-y) libqemuutil.a libqemustub.a
-+COMMON_LDADDS =3D libqemutrace.a libqemuutil.a libqemustub.a
-
- qemu-img.o: qemu-img-cmds.h
-
-diff --git a/Makefile.objs b/Makefile.objs
-index 6167e7b..4289ef9 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -3,6 +3,7 @@
- stub-obj-y =3D stubs/ crypto/
- util-obj-y =3D util/ qobject/ qapi/
- util-obj-y +=3D qmp-introspect.o qapi-types.o qapi-visit.o qapi-event.o
-+util-obj-y +=3D $(trace-root-obj-y)
-
- chardev-obj-y =3D chardev/
-
-@@ -167,8 +168,9 @@ trace-events-subdirs +=3D qapi
-
- trace-events-files =3D $(SRC_PATH)/trace-events $(trace-events-subdirs:%=
-=3D$(SRC_PATH)/%/trace-events)
-
--trace-obj-y =3D trace-root.o
-+trace-root-obj-y =3D trace-root.o
-+trace-root-obj-$(CONFIG_TRACE_DTRACE) +=3D trace-dtrace-root.o
-+trace-obj-y =3D $(trace-root-obj-y)
- trace-obj-y +=3D $(trace-events-subdirs:%=3D%/trace.o)
- trace-obj-$(CONFIG_TRACE_UST) +=3D trace-ust-all.o
--trace-obj-$(CONFIG_TRACE_DTRACE) +=3D trace-dtrace-root.o
- trace-obj-$(CONFIG_TRACE_DTRACE) +=3D $(trace-events-subdirs:%=3D%/trace-d=
-trace.o)
-diff --git a/Makefile.target b/Makefile.target
-index 7df2b8c..6f508c8 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -201,7 +201,7 @@ all-obj-$(CONFIG_SOFTMMU) +=3D $(io-obj-y)
-
- $(QEMU_PROG_BUILD): config-devices.mak
-
--COMMON_LDADDS =3D $(trace-obj-y) ../libqemuutil.a ../libqemustub.a
-+COMMON_LDADDS =3D ../libqemutrace.a ../libqemuutil.a ../libqemustub.a
-
- # build either PROG or PROGW
- $(QEMU_PROG_BUILD): $(all-obj-y) $(COMMON_LDADDS)
-diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
-index 33906ff..d543d56 100644
---- a/qapi/Makefile.objs
-+++ b/qapi/Makefile.objs
-@@ -4,3 +4,5 @@ util-obj-y +=3D string-input-visitor.o string-output-visito=
-r.o
- util-obj-y +=3D opts-visitor.o qapi-clone-visitor.o
- util-obj-y +=3D qmp-event.o
- util-obj-y +=3D qapi-util.o
-+util-obj-y +=3D  trace.o
-+util-obj-$(CONFIG_TRACE_DTRACE) +=3D trace-dtrace.o
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index f3de81f..6cbd602 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -519,7 +519,7 @@ QEMU_CFLAGS +=3D -I$(SRC_PATH)/tests
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 
 
- # Deps that are common to various different sets of tests below
--test-util-obj-y =3D $(trace-obj-y) libqemuutil.a libqemustub.a
-+test-util-obj-y =3D libqemutrace.a libqemuutil.a libqemustub.a
- test-qom-obj-y =3D $(qom-obj-y) $(test-util-obj-y)
- test-qapi-obj-y =3D tests/test-qapi-visit.o tests/test-qapi-types.o \
-        tests/test-qapi-event.o tests/test-qmp-introspect.o \
-diff --git a/util/Makefile.objs b/util/Makefile.objs
-index c6205eb..e38b91e 100644
---- a/util/Makefile.objs
-+++ b/util/Makefile.objs
-@@ -43,3 +43,5 @@ util-obj-y +=3D qdist.o
- util-obj-y +=3D qht.o
- util-obj-y +=3D range.o
- util-obj-y +=3D systemd.o
-+util-obj-y +=3D  trace.o
-+util-obj-$(CONFIG_TRACE_DTRACE) +=3D trace-dtrace.o
-                                                          =20
+> v2:
+> - Fix the commit comment
+> ---
+>  hw/i386/xen/xen_platform.c | 47 ++++++++++++++++++++++++++++++++++------------
+>  1 file changed, 35 insertions(+), 12 deletions(-)
+> 
+> diff --git a/hw/i386/xen/xen_platform.c b/hw/i386/xen/xen_platform.c
+> index 6010f35..983d532 100644
+> --- a/hw/i386/xen/xen_platform.c
+> +++ b/hw/i386/xen/xen_platform.c
+> @@ -87,10 +87,30 @@ static void log_writeb(PCIXenPlatformState *s, char val)
+>      }
+>  }
+>  
+> -/* Xen Platform, Fixed IOPort */
+> -#define UNPLUG_ALL_DISKS 1
+> -#define UNPLUG_ALL_NICS 2
+> -#define UNPLUG_AUX_IDE_DISKS 4
+> +/*
+> + * Unplug device flags.
+> + *
+> + * The logic got a little confused at some point in the past but this is
+> + * what they do now.
+> + *
+> + * bit 0: Unplug all IDE and SCSI disks.
+> + * bit 1: Unplug all NICs.
+> + * bit 2: Unplug IDE disks except primary master. This is overridden if
+> + *        bit 0 is also present in the mask.
+> + * bit 3: Unplug all NVMe disks.
+> + *
+> + */
+> +#define _UNPLUG_IDE_SCSI_DISKS 0
+> +#define UNPLUG_IDE_SCSI_DISKS (1u << _UNPLUG_IDE_SCSI_DISKS)
+> +
+> +#define _UNPLUG_ALL_NICS 1
+> +#define UNPLUG_ALL_NICS (1u << _UNPLUG_ALL_NICS)
+> +
+> +#define _UNPLUG_AUX_IDE_DISKS 2
+> +#define UNPLUG_AUX_IDE_DISKS (1u << _UNPLUG_AUX_IDE_DISKS)
+> +
+> +#define _UNPLUG_NVME_DISKS 3
+> +#define UNPLUG_NVME_DISKS (1u << _UNPLUG_NVME_DISKS)
+>  
+>  static void unplug_nic(PCIBus *b, PCIDevice *d, void *o)
+>  {
+> @@ -111,7 +131,7 @@ static void unplug_disks(PCIBus *b, PCIDevice *d, void *opaque)
+>  {
+>      uint32_t flags = *(uint32_t *)opaque;
+>      bool aux = (flags & UNPLUG_AUX_IDE_DISKS) &&
+> -        !(flags & UNPLUG_ALL_DISKS);
+> +        !(flags & UNPLUG_IDE_SCSI_DISKS);
+>  
+>      /* We have to ignore passthrough devices */
+>      if (!strcmp(d->name, "xen-pci-passthrough")) {
+> @@ -124,12 +144,16 @@ static void unplug_disks(PCIBus *b, PCIDevice *d, void *opaque)
+>          break;
+>  
+>      case PCI_CLASS_STORAGE_SCSI:
+> -    case PCI_CLASS_STORAGE_EXPRESS:
+>          if (!aux) {
+>              object_unparent(OBJECT(d));
+>          }
+>          break;
+>  
+> +    case PCI_CLASS_STORAGE_EXPRESS:
+> +        if (flags & UNPLUG_NVME_DISKS) {
+> +            object_unparent(OBJECT(d));
+> +        }
+> +
+>      default:
+>          break;
+>      }
+> @@ -147,10 +171,9 @@ static void platform_fixed_ioport_writew(void *opaque, uint32_t addr, uint32_t v
+>      switch (addr) {
+>      case 0: {
+>          PCIDevice *pci_dev = PCI_DEVICE(s);
+> -        /* Unplug devices.  Value is a bitmask of which devices to
+> -           unplug, with bit 0 the disk devices, bit 1 the network
+> -           devices, and bit 2 the non-primary-master IDE devices. */
+> -        if (val & (UNPLUG_ALL_DISKS | UNPLUG_AUX_IDE_DISKS)) {
+> +        /* Unplug devices. See comment above flag definitions */
+> +        if (val & (UNPLUG_IDE_SCSI_DISKS | UNPLUG_AUX_IDE_DISKS |
+> +                   UNPLUG_NVME_DISKS)) {
+>              DPRINTF("unplug disks\n");
+>              pci_unplug_disks(pci_dev->bus, val);
+>          }
+> @@ -338,14 +361,14 @@ static void xen_platform_ioport_writeb(void *opaque, hwaddr addr,
+>               * If VMDP was to control both disk and LAN it would use 4.
+>               * If it controlled just disk or just LAN, it would use 8 below.
+>               */
+> -            pci_unplug_disks(pci_dev->bus, UNPLUG_ALL_DISKS);
+> +            pci_unplug_disks(pci_dev->bus, UNPLUG_IDE_SCSI_DISKS);
+>              pci_unplug_nics(pci_dev->bus);
+>          }
+>          break;
+>      case 8:
+>          switch (val) {
+>          case 1:
+> -            pci_unplug_disks(pci_dev->bus, UNPLUG_ALL_DISKS);
+> +            pci_unplug_disks(pci_dev->bus, UNPLUG_IDE_SCSI_DISKS);
+>              break;
+>          case 2:
+>              pci_unplug_nics(pci_dev->bus);
+> -- 
+> 2.1.4
+> 
