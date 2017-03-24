@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1crMnd-0006hu-Sc
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 06:50:31 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1crMqB-0008S1-59
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 06:53:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1crMna-0007RJ-QJ
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 06:50:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41232)
+	(envelope-from <dgilbert@redhat.com>) id 1crMq5-0000A6-4d
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 06:53:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58200)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1crMna-0007Qx-HK
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 06:50:26 -0400
-References: <1490079006-32495-1-git-send-email-jitendra.kolhe@hpe.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c1ae1dba-33eb-c325-177a-6a74888f1ebb@redhat.com>
-Date: Fri, 24 Mar 2017 11:50:22 +0100
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1crMq4-00009n-SP
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 06:53:01 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D01027F3EC
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 10:53:00 +0000 (UTC)
+Date: Fri, 24 Mar 2017 10:52:56 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170324105256.GI2901@work-vm>
+References: <20170323204544.12015-1-quintela@redhat.com>
+	<20170323204544.12015-36-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1490079006-32495-1-git-send-email-jitendra.kolhe@hpe.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] mem-prealloc: fix
- sysconf(_SC_NPROCESSORS_ONLN) failure case.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170323204544.12015-36-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 35/51] ram: Add QEMUFile to RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,69 +33,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jitendra Kolhe <jitendra.kolhe@hpe.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, armbru@redhat.com, stefanha@redhat.com, kwolf@redhat.com, renganathan.meenakshisundaram@hpe.com, mohan_parthasarathy@hpe.com
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-
-
-On 21/03/2017 07:50, Jitendra Kolhe wrote:
-> This was spotted by Coverity, in case where sysconf(_SC_NPROCESSORS_ONLN)
-> fails and returns -1. This results in memset_num_threads getting set to -1.
-> Which we then pass to g_new0().
-> The patch replaces MAX_MEM_PREALLOC_THREAD_COUNT macro with a function call
-> get_memset_num_threads() to handle sysconf() failure gracefully. In case
-> sysconf() fails, we fall back to single threaded.
-> 
-> (Spotted by Coverity, CID 1372465.)
-> 
-> Signed-off-by: Jitendra Kolhe <jitendra.kolhe@hpe.com>
+* Juan Quintela (quintela@redhat.com) wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 > ---
->  util/oslib-posix.c | 16 ++++++++++++++--
->  1 file changed, 14 insertions(+), 2 deletions(-)
+>  migration/ram.c | 17 ++++++++++-------
+>  1 file changed, 10 insertions(+), 7 deletions(-)
 > 
-> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> index 3fe6089..4d9189e 100644
-> --- a/util/oslib-posix.c
-> +++ b/util/oslib-posix.c
-> @@ -55,7 +55,7 @@
->  #include "qemu/error-report.h"
->  #endif
+> diff --git a/migration/ram.c b/migration/ram.c
+> index c0d6841..7667e73 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -165,6 +165,8 @@ struct RAMSrcPageRequest {
 >  
-> -#define MAX_MEM_PREALLOC_THREAD_COUNT (MIN(sysconf(_SC_NPROCESSORS_ONLN), 16))
-> +#define MAX_MEM_PREALLOC_THREAD_COUNT 16
->  
->  struct MemsetThread {
->      char *addr;
-> @@ -381,6 +381,18 @@ static void *do_touch_pages(void *arg)
->      return NULL;
->  }
->  
-> +static inline int get_memset_num_threads(int smp_cpus)
-> +{
-> +    long host_procs = sysconf(_SC_NPROCESSORS_ONLN);
-> +    int ret = 1;
-> +
-> +    if (host_procs > 0) {
-> +        ret = MIN(MIN(host_procs, MAX_MEM_PREALLOC_THREAD_COUNT), smp_cpus);
-> +    }
-> +    /* In case sysconf() fails, we fall back to single threaded */
-> +    return ret;
-> +}
-> +
->  static bool touch_all_pages(char *area, size_t hpagesize, size_t numpages,
->                              int smp_cpus)
+>  /* State of RAM for migration */
+>  struct RAMState {
+> +    /* QEMUFile used for this migration */
+> +    QEMUFile *f;
+
+Yes, I guess you're hoping that becomes 'for this RAMBlock' eventually?
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+>      /* Last block that we have visited searching for dirty pages */
+>      RAMBlock *last_seen_block;
+>      /* Last block from where we have sent data */
+> @@ -524,14 +526,13 @@ static void xbzrle_cache_zero_page(RAMState *rs, ram_addr_t current_addr)
+>   *          -1 means that xbzrle would be longer than normal
+>   *
+>   * @rs: current RAM state
+> - * @f: QEMUFile where to send the data
+>   * @current_data: contents of the page
+>   * @current_addr: addr of the page
+>   * @block: block that contains the page we want to send
+>   * @offset: offset inside the block for the page
+>   * @last_stage: if we are at the completion stage
+>   */
+> -static int save_xbzrle_page(RAMState *rs, QEMUFile *f, uint8_t **current_data,
+> +static int save_xbzrle_page(RAMState *rs, uint8_t **current_data,
+>                              ram_addr_t current_addr, RAMBlock *block,
+>                              ram_addr_t offset, bool last_stage)
 >  {
-> @@ -389,7 +401,7 @@ static bool touch_all_pages(char *area, size_t hpagesize, size_t numpages,
->      int i = 0;
+> @@ -582,10 +583,11 @@ static int save_xbzrle_page(RAMState *rs, QEMUFile *f, uint8_t **current_data,
+>      }
 >  
->      memset_thread_failed = false;
-> -    memset_num_threads = MIN(smp_cpus, MAX_MEM_PREALLOC_THREAD_COUNT);
-> +    memset_num_threads = get_memset_num_threads(smp_cpus);
->      memset_thread = g_new0(MemsetThread, memset_num_threads);
->      numpages_per_thread = (numpages / memset_num_threads);
->      size_per_thread = (hpagesize * numpages_per_thread);
+>      /* Send XBZRLE based compressed page */
+> -    bytes_xbzrle = save_page_header(f, block, offset | RAM_SAVE_FLAG_XBZRLE);
+> -    qemu_put_byte(f, ENCODING_FLAG_XBZRLE);
+> -    qemu_put_be16(f, encoded_len);
+> -    qemu_put_buffer(f, XBZRLE.encoded_buf, encoded_len);
+> +    bytes_xbzrle = save_page_header(rs->f, block,
+> +                                    offset | RAM_SAVE_FLAG_XBZRLE);
+> +    qemu_put_byte(rs->f, ENCODING_FLAG_XBZRLE);
+> +    qemu_put_be16(rs->f, encoded_len);
+> +    qemu_put_buffer(rs->f, XBZRLE.encoded_buf, encoded_len);
+>      bytes_xbzrle += encoded_len + 1 + 2;
+>      rs->xbzrle_pages++;
+>      rs->xbzrle_bytes += bytes_xbzrle;
+> @@ -849,7 +851,7 @@ static int ram_save_page(RAMState *rs, MigrationState *ms, QEMUFile *f,
+>              ram_release_pages(ms, block->idstr, pss->offset, pages);
+>          } else if (!rs->ram_bulk_stage &&
+>                     !migration_in_postcopy(ms) && migrate_use_xbzrle()) {
+> -            pages = save_xbzrle_page(rs, f, &p, current_addr, block,
+> +            pages = save_xbzrle_page(rs, &p, current_addr, block,
+>                                       offset, last_stage);
+>              if (!last_stage) {
+>                  /* Can't send this cached data async, since the cache page
+> @@ -2087,6 +2089,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
+>              return -1;
+>           }
+>      }
+> +    rs->f = f;
+>  
+>      rcu_read_lock();
+>  
+> -- 
+> 2.9.3
 > 
-
-Queued, thanks.
-
-Paolo
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
