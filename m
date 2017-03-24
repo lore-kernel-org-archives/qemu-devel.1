@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yanghongyang@huawei.com>) id 1crLIo-0002wK-CH
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:14:35 -0400
+	(envelope-from <yanghongyang@huawei.com>) id 1crLTB-0004rO-7w
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:25:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yanghongyang@huawei.com>) id 1crLIj-0000tw-In
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:14:34 -0400
-Received: from [45.249.212.189] (port=2872 helo=dggrg03-dlp.huawei.com)
+	(envelope-from <yanghongyang@huawei.com>) id 1crLT8-0004hp-3R
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:25:17 -0400
+Received: from [45.249.212.187] (port=3013 helo=dggrg01-dlp.huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <yanghongyang@huawei.com>) id 1crLIi-0000JV-RE
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:14:29 -0400
-References: <20170323204544.12015-1-quintela@redhat.com>
-	<20170323204544.12015-43-quintela@redhat.com>
-	<8b10b0bc-909e-d6e8-da76-72b20fbf7e32@huawei.com>
-	<87h92j84db.fsf@secure.mitica>
+	(envelope-from <yanghongyang@huawei.com>) id 1crLT7-0004bp-BM
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:25:14 -0400
+References: <20170323210124.12300-1-quintela@redhat.com>
+	<5023e01f-ee47-d066-eb7b-0ac4b8837283@huawei.com>
+	<87d1d7844y.fsf@secure.mitica>
 From: Yang Hongyang <yanghongyang@huawei.com>
-Message-ID: <dc72157a-3bf2-645b-ed9c-db5535adfd6e@huawei.com>
-Date: Fri, 24 Mar 2017 17:11:54 +0800
+Message-ID: <31202c71-ced1-3cdd-e1a1-829daf5d2819@huawei.com>
+Date: Fri, 24 Mar 2017 17:23:39 +0800
 MIME-Version: 1.0
-In-Reply-To: <87h92j84db.fsf@secure.mitica>
+In-Reply-To: <87d1d7844y.fsf@secure.mitica>
 Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 42/51] ram: Pass RAMBlock to bitmap_sync
+Subject: Re: [Qemu-devel] [RFC] Split migration bitmaps by ramblock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,81 +31,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: quintela@redhat.com
 Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
 
-Hi Juan,
 
-On 2017/3/24 16:29, Juan Quintela wrote:
+
+On 2017/3/24 16:34, Juan Quintela wrote:
 > Yang Hongyang <yanghongyang@huawei.com> wrote:
->> On 2017/3/24 4:45, Juan Quintela wrote:
->>> We change the meaning of start to be the offset from the beggining of
->>> the block.
->>>
->>> @@ -701,7 +701,7 @@ static void migration_bitmap_sync(RAMState *rs)
->>>      qemu_mutex_lock(&rs->bitmap_mutex);
->>>      rcu_read_lock();
->>>      QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
->>> -        migration_bitmap_sync_range(rs, block->offset, block->used_length);
->>> +        migration_bitmap_sync_range(rs, block, 0, block->used_length);
+>> Hi Juan,
 >>
->> Since RAMBlock been passed to bitmap_sync, could we remove
->> param 'block->used_length' either?
+>>   First of all, I like the refactor patchset about RAMState, it makes
+>> things clean, great!
+> 
+> Thanks.
+> 
+> The whole idea of the series was to make testing changes easier.
+> 
+>> On 2017/3/24 5:01, Juan Quintela wrote:
+>>> Hi
+>>>
+>>> This series split the migration and unsent bitmaps by ramblock.  This
+>>> makes it easier to synchronize in small bits.  This is on top of the
+>>> RAMState and not-hotplug series.
+>>>
+>>> Why?
+>>>
+>>> reason 1:
+>>>
+>>> People have complained that by the time that we detect that a page is
+>>> sent, it has already been marked dirty "again" inside kvm, so we are
+>>> going to send it again.  On top of this patch, my idea is, for words
+>>> of the bitmap that have any bit set, just synchonize the bitmap before
+>>> sending the pages.  I have not looking into performance numbers yet,
+>>> jsut asking for comments about how it is done.
+>>
+>> Here you said 'synchonize the bitmap before sending the pages', do you
+>> mean synchronize the bitmap from kvm? If so, I doubt the performance...
+>> because every synchronization will require a ioctl(). If not, the
+>> synchronization of per block is useless.
+>>
+>> Currently, migration thread will synchronize the bitmap from kvm every
+>> iter(migration_bitmap_sync()). The RAMBlock already has kind of per block
+>> bitmap for this kind of sync. And the migration bitmap is used to put all
+>> those per block bitmap together for data sending use.
 > 
 > Hi
-> 
-> good catch.
-> 
-> I had that removed, and then realized that I want to synchronize parts
-> of the bitmap, not the whole one.  That part of the series is still not
-> done.
-> 
-> Right now we do something like (I have simplified a lot of details):
-> 
-> while(true) {
->             foreach(block)
->                 bitmap_sync(block)
->             foreach(page)
->                 if(dirty(page))
->                    page_send(page)
-> }
+> For huge memory machines, we are doing it always in one go.
 > 
 > 
-> If you have several terabytes of RAM that is too ineficient, because
-> when we arrive to the page_send(page), it is possible that it is already
-> dirty again, and we have to send it twice.  So, the idea is to change to
-> something like:
-> 
-> while(true) {
->             foreach(block)
->                 bitmap_sync(block)
+> bitmap_sync(1TB RAM)
+> walk bitmap for 512MB of RAM, at that point, it is very probable that
+> this page is again dirty in the KVM bitmap, so, we send it, but as it is
+> dirty again, we would have to send it in the next pass.  This sent is
+> completely useless.
 
-Do you mean sync with KVM here?
+I got your point, the problem is KVM do not have the ability to sync in
+small chunks currently, even it has, it will generate lots of ioctls:
+KVM bitmap sync is per Memory Region IIRC, think we have a 1T mem
+guest, 16 MRs for example, currently, every iter we need to do 16 ioctls.
+But if we sync in small chunks, 64M for example, we might need to do
+16384 ioctls in the worst case. eg:mem press(dirty rate) is very high.
 
->             foreach(block)
->                 foreach(64pages)
->                     bitmap_sync(64pages)
 
-Then here, we will sync with KVM too. For huge MEM,
-it will generates lots of ioctl()...
-Bitmap in KVM is per Memory region IIRC. KVM module currently
-haven't the ability to sync parts of the bitmap. A sync have
-to sync the whole mr. So if we want to do small sync, we might
-need to modify KVM also, but that still won't solve the preblem
-of increased ioctls.
-
->                     foreach(page of the 64)
->                        if (dirty)
->                           page_send(page)
-> }
 > 
-> 
-> Where 64 is a magic number, I have to test what is the good value.
-> Basically it should be a multiple of sizeof(long) and a multiple/divisor
-> of host page size.
-> 
-> Reason of changing the for to be for each block, is that then we can
-> easily put bitmaps by hostpage size, instead of having to had it for
-> target page size.
-> 
-> Thanks for the review, Juan.
+> So my idea is to split things in smaller chunks.  As we have to do an
+> ioctl, we wouldn't want to synchronize page by page, but perhaps 16MB at
+> a time, 64MB, anything less than the whole amount of memory.
 > 
 > Later, Juan.
 > 
