@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1crR8T-0006Dg-3b
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:28:18 -0400
+	(envelope-from <stefanha@gmail.com>) id 1crRA4-0007PT-Ci
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:29:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1crR8P-0001Zd-5m
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:28:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60090)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1crR8O-0001ZT-UA
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:28:13 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0078D61D03
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 15:28:13 +0000 (UTC)
-Date: Fri, 24 Mar 2017 15:28:08 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170324152808.GE19076@work-vm>
-References: <20170323204544.12015-1-quintela@redhat.com>
-	<20170323204544.12015-40-quintela@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1crRA0-0002Et-F1
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:29:56 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:34582)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1crRA0-0002Ef-8d
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:29:52 -0400
+Received: by mail-wm0-x241.google.com with SMTP id u132so1307985wmg.1
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 08:29:52 -0700 (PDT)
+Date: Fri, 24 Mar 2017 15:29:46 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170324152946.GS12560@stefanha-x1.localdomain>
+References: <4712D8F4B26E034E80552F30A67BE0B1A2D69E@ORSMSX112.amr.corp.intel.com>
+	<cce399b0-45d2-ac24-4975-6e27ad04f833@redhat.com>
+	<20170323090516.GN16717@stefanha-x1.localdomain>
+	<4712D8F4B26E034E80552F30A67BE0B1A3BA2D@ORSMSX112.amr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="qjXtncIm5b3tWrFJ"
 Content-Disposition: inline
-In-Reply-To: <20170323204544.12015-40-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 39/51] ram: We don't need MigrationState
- parameter anymore
+In-Reply-To: <4712D8F4B26E034E80552F30A67BE0B1A3BA2D@ORSMSX112.amr.corp.intel.com>
+Subject: Re: [Qemu-devel] [PATCH] only link current target arch traces to
+ qemu-system
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,118 +33,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: "Xu, Anthony" <anthony.xu@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Daniel Berrange <berrange@redhat.com>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Remove it from callers and callees.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+--qjXtncIm5b3tWrFJ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> ---
->  migration/ram.c | 27 ++++++++++-----------------
->  1 file changed, 10 insertions(+), 17 deletions(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index cb5f06f..064b2c0 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -796,13 +796,11 @@ static void ram_release_pages(const char *rbname, uint64_t offset, int pages)
->   *                if xbzrle noticed the page was the same.
->   *
->   * @rs: current RAM state
-> - * @ms: current migration state
->   * @block: block that contains the page we want to send
->   * @offset: offset inside the block for the page
->   * @last_stage: if we are at the completion stage
->   */
-> -static int ram_save_page(RAMState *rs, MigrationState *ms,
-> -                         PageSearchStatus *pss, bool last_stage)
-> +static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
->  {
->      int pages = -1;
->      uint64_t bytes_xmit;
-> @@ -976,13 +974,12 @@ static int compress_page_with_multi_thread(RAMState *rs, RAMBlock *block,
->   * Returns the number of pages written.
->   *
->   * @rs: current RAM state
-> - * @ms: current migration state
->   * @block: block that contains the page we want to send
->   * @offset: offset inside the block for the page
->   * @last_stage: if we are at the completion stage
->   */
-> -static int ram_save_compressed_page(RAMState *rs, MigrationState *ms,
-> -                                    PageSearchStatus *pss, bool last_stage)
-> +static int ram_save_compressed_page(RAMState *rs, PageSearchStatus *pss,
-> +                                    bool last_stage)
->  {
->      int pages = -1;
->      uint64_t bytes_xmit = 0;
-> @@ -1312,10 +1309,8 @@ err:
->   * @last_stage: if we are at the completion stage
->   * @dirty_ram_abs: address of the start of the dirty page in ram_addr_t space
->   */
-> -static int ram_save_target_page(RAMState *rs, MigrationState *ms,
-> -                                PageSearchStatus *pss,
-> -                                bool last_stage,
-> -                                ram_addr_t dirty_ram_abs)
-> +static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
-> +                                bool last_stage, ram_addr_t dirty_ram_abs)
->  {
->      int res = 0;
->  
-> @@ -1323,9 +1318,9 @@ static int ram_save_target_page(RAMState *rs, MigrationState *ms,
->      if (migration_bitmap_clear_dirty(rs, dirty_ram_abs)) {
->          unsigned long *unsentmap;
->          if (!rs->preffer_xbzrle && migrate_use_compression()) {
-> -            res = ram_save_compressed_page(rs, ms, pss, last_stage);
-> +            res = ram_save_compressed_page(rs, pss, last_stage);
->          } else {
-> -            res = ram_save_page(rs, ms, pss, last_stage);
-> +            res = ram_save_page(rs, pss, last_stage);
->          }
->  
->          if (res < 0) {
-> @@ -1364,8 +1359,7 @@ static int ram_save_target_page(RAMState *rs, MigrationState *ms,
->   * @last_stage: if we are at the completion stage
->   * @dirty_ram_abs: Address of the start of the dirty page in ram_addr_t space
->   */
-> -static int ram_save_host_page(RAMState *rs, MigrationState *ms,
-> -                              PageSearchStatus *pss,
-> +static int ram_save_host_page(RAMState *rs, PageSearchStatus *pss,
->                                bool last_stage,
->                                ram_addr_t dirty_ram_abs)
->  {
-> @@ -1373,7 +1367,7 @@ static int ram_save_host_page(RAMState *rs, MigrationState *ms,
->      size_t pagesize = qemu_ram_pagesize(pss->block);
->  
->      do {
-> -        tmppages = ram_save_target_page(rs, ms, pss, last_stage, dirty_ram_abs);
-> +        tmppages = ram_save_target_page(rs, pss, last_stage, dirty_ram_abs);
->          if (tmppages < 0) {
->              return tmppages;
->          }
-> @@ -1405,7 +1399,6 @@ static int ram_save_host_page(RAMState *rs, MigrationState *ms,
->  static int ram_find_and_save_block(RAMState *rs, bool last_stage)
->  {
->      PageSearchStatus pss;
-> -    MigrationState *ms = migrate_get_current();
->      int pages = 0;
->      bool again, found;
->      ram_addr_t dirty_ram_abs; /* Address of the start of the dirty page in
-> @@ -1434,7 +1427,7 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
->          }
->  
->          if (found) {
-> -            pages = ram_save_host_page(rs, ms, &pss, last_stage, dirty_ram_abs);
-> +            pages = ram_save_host_page(rs, &pss, last_stage, dirty_ram_abs);
->          }
->      } while (!pages && again);
->  
-> -- 
-> 2.9.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+On Fri, Mar 24, 2017 at 12:29:39AM +0000, Xu, Anthony wrote:
+> > Perhaps all trace.o files should be put into their own .a instead of
+> > being added directly to the linker line:
+> >=20
+> > COMMON_LDADDS =3D $(trace-obj-y) libqemuutil.a libqemustub.a
+> >=20
+> > I think the linker would only pull in .o files containing symbols that =
+are
+> > actually referenced by the program.
+>=20
+> Hi Stefan,
+>=20
+> That's a good idea!
+>=20
+> Below patch creates libqemutrace.a.  ./trace.o, ./qapi/trace.o and=20
+> ./util/trace.o are added into libqemuutil.a  to avoid recursive dependenc=
+ies=20
+> between libqemuutil.a and libqemutrace.a.
+
+Please see the guidelines for submitting patches:
+http://wiki.qemu-project.org/Contribute/SubmitAPatch
+
+Each patch revision should be sent as a separate email thread.
+
+Each patch series must have your Signed-off-by and a commit
+message/description.
+
+Stefan
+
+--qjXtncIm5b3tWrFJ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJY1TtqAAoJEJykq7OBq3PIw34IAMD6bupfUtQqbiId5M4yG49U
++vGldCEuTLTGr5UE8VlLSJEWYpqqkVcvNYbNqNTHJw5ROp5iIR0R4hVF/klXu3J2
+Vn0m2eFBjM9cjH9U5t6Zep9FI/a0/+zIaWiZuGuOUXxyTyuR2U4h5hTA+1Fzy7T3
+MUQn7j3kdjDLUN4vQ8542IGpR5Lh24ctDwOM41isaoucEqeN9rA/XFO5Te5c630Y
+v6bQyxiFaO/R+1HhK0aqLJ4KDd3XvfTtZtNP7tklqISWh++LSLozeyJx6SIYd3om
+81iKpLEsyrr/ONH3iBpRGYlhIpRmF+sJp6oYYGlPVPzC7dQQUzJkzvCLyydz1w8=
+=0xTS
+-----END PGP SIGNATURE-----
+
+--qjXtncIm5b3tWrFJ--
