@@ -1,24 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1crDS3-0004Kr-QL
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 20:51:37 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1crDf8-0006iF-5z
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 21:05:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1crDS1-0000EI-6b
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 20:51:35 -0400
-Received: from mail.kernel.org ([198.145.29.136]:57642)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1crDS0-0000BY-SF
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 20:51:33 -0400
-Date: Thu, 23 Mar 2017 17:51:26 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <1490264111-25273-1-git-send-email-paul.durrant@citrix.com>
-Message-ID: <alpine.DEB.2.10.1703231730120.8001@sstabellini-ThinkPad-X260>
-References: <1490264111-25273-1-git-send-email-paul.durrant@citrix.com>
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1crDf4-00046D-Pl
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 21:05:06 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57006)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1crDf4-00045u-Gi
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 21:05:02 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2O0wmoF059185
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 21:05:00 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 29c4yx4mwk-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 21:04:59 -0400
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Thu, 23 Mar 2017 19:04:59 -0600
+Date: Fri, 24 Mar 2017 09:04:53 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170317031743.40128-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170317031743.40128-3-bjsdjshi@linux.vnet.ibm.com>
+	<alpine.LFD.2.20.1703231302221.3020@schleppi>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v2] xen-platform: separate unplugging of
- NVMe disks
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.LFD.2.20.1703231302221.3020@schleppi>
+Message-Id: <20170324010453.GW10704@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v4 02/16] s390: cio: export more interfaces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,144 +42,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
+To: Sebastian Ott <sebott@linux.vnet.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, Cornelia Huck <cornelia.huck@de.ibm.com>, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
 
-On Thu, 23 Mar 2017, Paul Durrant wrote:
-> Commit 090fa1c8 "add support for unplugging NVMe disks..." extended the
-> existing disk unplug flag to cover NVMe disks as well as IDE and SCSI.
-> 
-> The recent thread on the xen-devel mailing list [1] has highlighted that
-> this is not desirable behaviour: PV frontends should be able to distinguish
-> NVMe disks from other types of disk and should have separate control over
-> whether they are unplugged.
-> 
-> This patch defines a new bit in the unplug mask for this purpose and also
-> tidies up the definitions of, and improves the comments regarding, the
-> previously exiting bits in the protocol.
-> 
-> [1] https://lists.xen.org/archives/html/xen-devel/2017-03/msg02924.html
-> 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-> --
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> 
-> NOTE: A companion patch will be submitted to xen-devel to align the
->       unplug protocol documentation once this patch is acked.
+* Sebastian Ott <sebott@linux.vnet.ibm.com> [2017-03-23 13:02:46 +0100]:
 
-The companion patch needs to be acked before this patch gets applied. In
-fact, I would prefer if the changeset of the Xen commit was added to
-this patch description.
-
-If you add that, then you can repost this with
-
-Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
-
-
-> v2:
-> - Fix the commit comment
-> ---
->  hw/i386/xen/xen_platform.c | 47 ++++++++++++++++++++++++++++++++++------------
->  1 file changed, 35 insertions(+), 12 deletions(-)
+> On Fri, 17 Mar 2017, Dong Jia Shi wrote:
+> > Export the common I/O interfaces those are needed by an I/O
+> > subchannel driver to actually talk to the subchannel.
+> > 
+> > Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+> > Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> > Cc: Sebastian Ott <sebott@linux.vnet.ibm.com>
+> > Cc: Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
+> > ---
 > 
-> diff --git a/hw/i386/xen/xen_platform.c b/hw/i386/xen/xen_platform.c
-> index 6010f35..983d532 100644
-> --- a/hw/i386/xen/xen_platform.c
-> +++ b/hw/i386/xen/xen_platform.c
-> @@ -87,10 +87,30 @@ static void log_writeb(PCIXenPlatformState *s, char val)
->      }
->  }
->  
-> -/* Xen Platform, Fixed IOPort */
-> -#define UNPLUG_ALL_DISKS 1
-> -#define UNPLUG_ALL_NICS 2
-> -#define UNPLUG_AUX_IDE_DISKS 4
-> +/*
-> + * Unplug device flags.
-> + *
-> + * The logic got a little confused at some point in the past but this is
-> + * what they do now.
-> + *
-> + * bit 0: Unplug all IDE and SCSI disks.
-> + * bit 1: Unplug all NICs.
-> + * bit 2: Unplug IDE disks except primary master. This is overridden if
-> + *        bit 0 is also present in the mask.
-> + * bit 3: Unplug all NVMe disks.
-> + *
-> + */
-> +#define _UNPLUG_IDE_SCSI_DISKS 0
-> +#define UNPLUG_IDE_SCSI_DISKS (1u << _UNPLUG_IDE_SCSI_DISKS)
-> +
-> +#define _UNPLUG_ALL_NICS 1
-> +#define UNPLUG_ALL_NICS (1u << _UNPLUG_ALL_NICS)
-> +
-> +#define _UNPLUG_AUX_IDE_DISKS 2
-> +#define UNPLUG_AUX_IDE_DISKS (1u << _UNPLUG_AUX_IDE_DISKS)
-> +
-> +#define _UNPLUG_NVME_DISKS 3
-> +#define UNPLUG_NVME_DISKS (1u << _UNPLUG_NVME_DISKS)
->  
->  static void unplug_nic(PCIBus *b, PCIDevice *d, void *o)
->  {
-> @@ -111,7 +131,7 @@ static void unplug_disks(PCIBus *b, PCIDevice *d, void *opaque)
->  {
->      uint32_t flags = *(uint32_t *)opaque;
->      bool aux = (flags & UNPLUG_AUX_IDE_DISKS) &&
-> -        !(flags & UNPLUG_ALL_DISKS);
-> +        !(flags & UNPLUG_IDE_SCSI_DISKS);
->  
->      /* We have to ignore passthrough devices */
->      if (!strcmp(d->name, "xen-pci-passthrough")) {
-> @@ -124,12 +144,16 @@ static void unplug_disks(PCIBus *b, PCIDevice *d, void *opaque)
->          break;
->  
->      case PCI_CLASS_STORAGE_SCSI:
-> -    case PCI_CLASS_STORAGE_EXPRESS:
->          if (!aux) {
->              object_unparent(OBJECT(d));
->          }
->          break;
->  
-> +    case PCI_CLASS_STORAGE_EXPRESS:
-> +        if (flags & UNPLUG_NVME_DISKS) {
-> +            object_unparent(OBJECT(d));
-> +        }
-> +
->      default:
->          break;
->      }
-> @@ -147,10 +171,9 @@ static void platform_fixed_ioport_writew(void *opaque, uint32_t addr, uint32_t v
->      switch (addr) {
->      case 0: {
->          PCIDevice *pci_dev = PCI_DEVICE(s);
-> -        /* Unplug devices.  Value is a bitmask of which devices to
-> -           unplug, with bit 0 the disk devices, bit 1 the network
-> -           devices, and bit 2 the non-primary-master IDE devices. */
-> -        if (val & (UNPLUG_ALL_DISKS | UNPLUG_AUX_IDE_DISKS)) {
-> +        /* Unplug devices. See comment above flag definitions */
-> +        if (val & (UNPLUG_IDE_SCSI_DISKS | UNPLUG_AUX_IDE_DISKS |
-> +                   UNPLUG_NVME_DISKS)) {
->              DPRINTF("unplug disks\n");
->              pci_unplug_disks(pci_dev->bus, val);
->          }
-> @@ -338,14 +361,14 @@ static void xen_platform_ioport_writeb(void *opaque, hwaddr addr,
->               * If VMDP was to control both disk and LAN it would use 4.
->               * If it controlled just disk or just LAN, it would use 8 below.
->               */
-> -            pci_unplug_disks(pci_dev->bus, UNPLUG_ALL_DISKS);
-> +            pci_unplug_disks(pci_dev->bus, UNPLUG_IDE_SCSI_DISKS);
->              pci_unplug_nics(pci_dev->bus);
->          }
->          break;
->      case 8:
->          switch (val) {
->          case 1:
-> -            pci_unplug_disks(pci_dev->bus, UNPLUG_ALL_DISKS);
-> +            pci_unplug_disks(pci_dev->bus, UNPLUG_IDE_SCSI_DISKS);
->              break;
->          case 2:
->              pci_unplug_nics(pci_dev->bus);
-> -- 
-> 2.1.4
-> 
+> Acked-by: Sebastian Ott <sebott@linux.vnet.ibm.com>
+
+Hi Sebastian,
+
+Thanks for all of your acks!
+
+-- 
+Dong Jia Shi
