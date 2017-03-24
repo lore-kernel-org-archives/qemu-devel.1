@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1crIuK-00088i-Ll
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 02:41:09 -0400
+	(envelope-from <bounces@canonical.com>) id 1crJ3d-0001pt-5k
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 02:50:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1crIuH-0007Jv-J5
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 02:41:08 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38414)
+	(envelope-from <bounces@canonical.com>) id 1crJ3a-0002zP-3Z
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 02:50:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39276)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1crIuH-0007Ji-CX
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 02:41:05 -0400
+	id 1crJ3Z-0002yJ-Tn
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 02:50:42 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1crIuF-0001ld-ET
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 06:41:03 +0000
+	id 1crJ3Y-00035Q-GF
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 06:50:40 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6BAFD2E80C1
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 06:41:03 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 75FB72E80C2
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 06:50:40 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 24 Mar 2017 06:29:50 -0000
+Date: Fri, 24 Mar 2017 06:38:05 -0000
 From: Brendan Shanks <brendan@bslabs.net>
 Reply-To: Bug 1675108 <1675108@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20170322172621.26186.61813.malonedeb@gac.canonical.com>
-Message-Id: <20170324062950.30507.96974.malone@soybean.canonical.com>
+Message-Id: <20170324063805.31010.98028.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1675108] Re: Cocoa UI always crashes on startup
 List-Id: <qemu-devel.nongnu.org>
@@ -38,41 +38,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Tested on 10.12.3, it doesn't crash immediately (like before) but
-crashes reliably once I send some keyboard input to qemu:
-
-$ i386-softmmu/qemu-system-i386 =
-
-**
-ERROR:/Users/pip/no_backup/qemu/translate-common.c:34:tcg_handle_interrupt:=
- assertion failed: (qemu_mutex_iothread_locked())
-Abort trap: 6
-
-
-Thread 0 Crashed:: Dispatch queue: com.apple.main-thread
-0   libsystem_kernel.dylib        	0x00007fffa746edd6 __pthread_kill + 10
-1   libsystem_pthread.dylib       	0x00007fffa755a787 pthread_kill + 90
-2   libsystem_c.dylib             	0x00007fffa73d4420 abort + 129
-3   libglib-2.0.0.dylib           	0x00000001076aec86 g_assertion_message +=
- 388
-4   libglib-2.0.0.dylib           	0x00000001076aece4 g_assertion_message_e=
-xpr + 94
-5   qemu-system-i386              	0x00000001066bb1ec tcg_handle_interrupt =
-+ 156 (translate-common.c:50)
-6   qemu-system-i386              	0x0000000106740dfc pic_irq_request + 156=
- (pc.c:187)
-7   qemu-system-i386              	0x000000010673e5e4 gsi_handler + 36 (pc.=
-c:115)
-8   qemu-system-i386              	0x000000010685e97a kbd_update_kbd_irq + =
-138 (pckbd.c:180)
-9   qemu-system-i386              	0x000000010694164a qemu_input_event_send=
-_impl + 938 (input.c:328)
-10  qemu-system-i386              	0x000000010694188f qemu_input_event_send=
-_key + 239 (input.c:359)
-11  qemu-system-i386              	0x0000000106946a00 cocoa_refresh + 272 (=
-cocoa.m:1402)
-12  qemu-system-i386              	0x000000010693f6a8 gui_update + 104 (con=
-sole.c:1603)
+The keyboard input issue looks the same as #1675549, and that's on
+Linux/SDL. So not specific to this fix or Cocoa.
 
 -- =
 
