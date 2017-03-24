@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1crLpW-0002ki-Pm
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:48:24 -0400
+	(envelope-from <vfeenstr@redhat.com>) id 1crLpz-0002wq-9n
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:48:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1crLpS-0001u4-Rw
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:48:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53590)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1crLpS-0001tu-La
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:48:18 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D79AAC056800
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 09:48:17 +0000 (UTC)
-References: <20170323205025.12113-1-quintela@redhat.com>
-	<20170323205025.12113-2-quintela@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <afa29375-4d2f-8d69-4552-1b7c68d399f8@redhat.com>
-Date: Fri, 24 Mar 2017 10:48:13 +0100
-MIME-Version: 1.0
-In-Reply-To: <20170323205025.12113-2-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] migration: Disable hotplug/unplug
- during migration
+	(envelope-from <vfeenstr@redhat.com>) id 1crLpw-00020l-4a
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:48:51 -0400
+Received: from mail-wr0-f178.google.com ([209.85.128.178]:36322)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <vfeenstr@redhat.com>) id 1crLpv-0001yH-LW
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:48:48 -0400
+Received: by mail-wr0-f178.google.com with SMTP id u108so5733754wrb.3
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 02:48:46 -0700 (PDT)
+From: Vinzenz Feenstra <vfeenstr@redhat.com>
+Message-Id: <2267A6B3-1C16-406A-B83A-34F17E8D3F98@redhat.com>
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Date: Fri, 24 Mar 2017 10:48:43 +0100
+In-Reply-To: <05ad6588-58c5-796c-48b5-05bb6c2dc612@redhat.com>
+References: <0342808A-63C6-40BE-91AB-B6088AD62CD2@redhat.com>
+	<20170316145045.10840-1-vfeenstr@redhat.com>
+	<20170316145045.10840-2-vfeenstr@redhat.com>
+	<05ad6588-58c5-796c-48b5-05bb6c2dc612@redhat.com>
+Content-Type: text/plain;
+	charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] qemu-ga: add guest-get-osinfo command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,67 +32,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com
-
-On 23.03.2017 21:50, Juan Quintela wrote:
-> Until we have reviewed what can/can't be hotplug during migration,
-> disable it.  We can enable it later for the things that we know that
-> work.  For instance, memory hotplug during postcopy don't work
-> currently.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  hw/core/qdev.c | 5 +++++
->  qdev-monitor.c | 7 ++++++-
->  2 files changed, 11 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 1e7fb33..8c4a3f3 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -277,6 +277,11 @@ void qdev_unplug(DeviceState *dev, Error **errp)
->      HotplugHandler *hotplug_ctrl;
->      HotplugHandlerClass *hdc;
->  
-> +    if (!migration_is_idle()) {
-> +        error_setg(errp, "device_add not allowed while migrating");
-> +        return;
-> +    }
-> +
->      if (dev->parent_bus && !qbus_is_hotpluggable(dev->parent_bus)) {
->          error_setg(errp, QERR_BUS_NO_HOTPLUG, dev->parent_bus->name);
->          return;
-> diff --git a/qdev-monitor.c b/qdev-monitor.c
-> index 5f2fcdf..e0622b4 100644
-> --- a/qdev-monitor.c
-> +++ b/qdev-monitor.c
-> @@ -29,7 +29,7 @@
->  #include "qemu/error-report.h"
->  #include "qemu/help_option.h"
->  #include "sysemu/block-backend.h"
-> -
-> +#include "migration/migration.h"
->  /*
->   * Aliases were a bad idea from the start.  Let's keep them
->   * from spreading further.
-
-Maybe better keep an empty line between the include statement and the
-comment?
-
- Thomas
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
 
-> @@ -566,6 +566,11 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
->      BusState *bus = NULL;
->      Error *err = NULL;
->  
-> +    if (!migration_is_idle()) {
-> +        error_setg(errp, "device_add not allowed while migrating");
-> +        return NULL;
-> +    }
-> +
->      driver = qemu_opt_get(opts, "driver");
->      if (!driver) {
->          error_setg(errp, QERR_MISSING_PARAMETER, "driver");
-> 
+> On Mar 23, 2017, at 3:58 PM, Eric Blake <eblake@redhat.com> wrote:
+>=20
+> On 03/16/2017 09:50 AM, Vinzenz 'evilissimo' Feenstra wrote:
+>> From: Vinzenz Feenstra <vfeenstr@redhat.com>
+>>=20
+>> Add a new 'guest-get-osinfo' command for reporting basic information =
+of
+>> the guest operating system (hereafter just 'OS'). This information
+>> includes the type of the OS, the version, and the architecture.
+>> Additionally reported would be a name, distribution type and kernel
+>> version where applicable.
+>>=20
+>> Here an example for a Fedora 25 VM:
+>>=20
+>> $ virsh -c qemu:////system qemu-agent-command F25 \
+>>    '{ "execute": "guest-get-osinfo" }'
+>>  {"return":{"arch":"x86_64","codename":"Server =
+Edition","version":"25",
+>>   =
+"kernel":"4.8.6-300.fc25.x86_64","type":"linux","distribution":"Fedora"}}
+>>=20
+>> And an example for a Windows 2012 R2 VM:
+>>=20
+>> $ virsh -c qemu:////system qemu-agent-command Win2k12R2 \
+>>    '{ "execute": "guest-get-osinfo" }'
+>>  {"return":{"arch":"x86_64","codename":"Win 2012 R2",
+>>   "version":"6.3","kernel":"","type":"windows","distribution":""}}
+>>=20
+>> Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+>> ---
+>=20
+> Let's make sure we get the interface right, before I even bother =
+looking
+> at the code.
+
+Sure
+
+>=20
+>> +++ b/qga/qapi-schema.json
+>> @@ -1042,3 +1042,43 @@
+>>   'data':    { 'path': 'str', '*arg': ['str'], '*env': ['str'],
+>>                '*input-data': 'str', '*capture-output': 'bool' },
+>>   'returns': 'GuestExec' }
+>> +
+>> +##
+>> +# @GuestOSType:
+>> +#
+>> +# @linux:    Indicator for linux distributions
+>> +# @windows:  Indicator for windows versions
+>> +# @other:    Indicator for any other operating system that is not =
+yet
+>> +#            explicitly supported
+>> +#
+>> +# Since: 2.10
+>> +##
+>> +{ 'enum': 'GuestOSType', 'data': ['linux', 'windows', 'other'] }
+>> +
+>> +##
+>> +# @GuestOSInfo:
+>> +#
+>> +# @version:      OS version, e.g. 25 for FC25 etc.
+>> +# @distribution: Fedora, Ubuntu, Debian, CentOS...
+>> +# @codename:     Code name of the OS. e.g. Ubuntu has Xenial Xerus =
+etc.
+>> +# @arch:         Architecture of the OS e.g. x86, x86_64, ppc64, =
+aarch64...
+>> +# @type:         Specifies the type of the OS.
+>> +# @kernel:       Linux kernel version (Might be used by other OS =
+types too).
+>> +#                May be empty.
+>=20
+> Why would it be empty, instead of just omitted?
+That=E2=80=99s a relict of v1 where this was still the case and all =
+fields were supposed to be there all the time.
+>=20
+>> +# Since: 2.10
+>> +##
+>> +{ 'struct': 'GuestOSInfo',
+>> +  'data': { '*version': 'str', '*distribution': 'str', '*codename': =
+'str',
+>> +            '*arch': 'str', 'type': 'GuestOSType', '*kernel': 'str'} =
+}
+>=20
+> So everything except 'type' is optional?  Is there anything a client =
+can
+> actually rely on being always present?
+>=20
+> uname() is probably the lowest-common-denominator interface for
+> describing a system (in that it is implemented on more OSs than =
+anything
+> else, and Windows information can be mapped to uname concepts).  Let's
+> compare:
+>=20
+> POSIX says:
+> =
+http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_utsname.h.htm=
+l#tag_13_70 =
+<http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_utsname.h.ht=
+ml#tag_13_70>
+>=20
+>    The <sys/utsname.h> header shall define the structure utsname which
+> shall include at least the following members:
+>=20
+>    char  sysname[]  Name of this implementation of the operating =
+system.
+>    char  nodename[] Name of this node within the communications
+>                     network to which this node is attached, if any.
+>    char  release[]  Current release level of this implementation.
+>    char  version[]  Current version level of this release.
+>    char  machine[]  Name of the hardware type on which the system is
+> running.
+>=20
+> So you both have version; your 'arch' maps somewhat to machine, your
+> 'type' maps somewhat to sysname, your 'kernel' probably matches =
+release,
+> and then you are adding 'distribution' and 'codename' which don't =
+appear
+> in uname output.  Is it worth naming your members after the uname()
+> names, for less confusion?
+
+OK So how about something like this:
+
+{=E2=80=98struct=E2=80=99: =E2=80=98GuestWindowsVersionInfo=E2=80=99,
+ =E2=80=98data=E2=80=99: {
+	=E2=80=98version=E2=80=99: =E2=80=98str=E2=80=99,
+        =E2=80=98name=E2=80=99: =E2=80=98str=E2=80=99,
+} }
+
+{=E2=80=98struct=E2=80=99: =E2=80=98GuestLinuxOSRelease=E2=80=99,
+ =E2=80=98data=E2=80=99: {
+        =E2=80=98id=E2=80=99: =E2=80=98str=E2=80=99,
+        =E2=80=98name=E2=80=99: =E2=80=98str'
+	=E2=80=98*version=E2=80=99: =E2=80=98str=E2=80=99,
+        =E2=80=98*variant=E2=80=99: =E2=80=98str=E2=80=99
+        =E2=80=98*codename=E2=80=99: =E2=80=98str=E2=80=99
+} }
+
+{=E2=80=98enum=E2=80=99: =E2=80=98GuestOSVersionInfo=E2=80=99,
+ =E2=80=98data=E2=80=99: {=E2=80=98linux=E2=80=99: =E2=80=98 =
+GuestLinuxOSRelease=E2=80=99,
+             =E2=80=98win=E2=80=99: =E2=80=98 GuestWindowsVersionInfo=E2=80=
+=99
+}}
+
+{ 'struct': 'GuestOSInfo=E2=80=99,
+    'data': {=20
+	=E2=80=98machine': 'str=E2=80=99,
+	=E2=80=99sysname': 'GuestOSType=E2=80=99,=20
+	=E2=80=98release': =E2=80=98str=E2=80=99,
+	=E2=80=98*version_info=E2=80=99: =E2=80=98GuestOSVersionInfo=E2=80=
+=99,
+} }
+
+>=20
+>> +
+>> +##
+>> +# @guest-get-osinfo:
+>> +#
+>> +# Retrieve guest operating system information
+>> +#
+>> +# Returns: operating system information on success
+>> +#
+>> +# Since 2.10
+>> +##
+>> +{ 'command': 'guest-get-osinfo',
+>> +  'returns': 'GuestOSInfo' }
+>>=20
+>=20
+> --=20
+> Eric Blake   eblake redhat com    +1-919-301-3266
+> Libvirt virtualization library http://libvirt.org =
+<http://libvirt.org/>
