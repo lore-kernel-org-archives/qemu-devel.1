@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54730)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yanghongyang@huawei.com>) id 1crEUG-0000hr-MH
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 21:57:57 -0400
+	(envelope-from <cota@braap.org>) id 1crF8n-0008Dz-TG
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 22:39:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yanghongyang@huawei.com>) id 1crEUD-0003bD-KD
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 21:57:56 -0400
-Received: from [45.249.212.187] (port=3011 helo=dggrg01-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <yanghongyang@huawei.com>) id 1crEUC-0003VY-Pt
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 21:57:53 -0400
-References: <20170323210124.12300-1-quintela@redhat.com>
-From: Yang Hongyang <yanghongyang@huawei.com>
-Message-ID: <5023e01f-ee47-d066-eb7b-0ac4b8837283@huawei.com>
-Date: Fri, 24 Mar 2017 09:57:31 +0800
+	(envelope-from <cota@braap.org>) id 1crF8k-0004lp-Oy
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 22:39:49 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:55036)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1crF8k-0004kn-B7
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 22:39:46 -0400
+Date: Thu, 23 Mar 2017 22:39:43 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170324023943.GA21650@flamenco>
+References: <CAFEAcA-ej2CMRBHoOG4gO34wgP01Q==O8jtEDMnNjOJZrs6ncg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170323210124.12300-1-quintela@redhat.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] Split migration bitmaps by ramblock
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAFEAcA-ej2CMRBHoOG4gO34wgP01Q==O8jtEDMnNjOJZrs6ncg@mail.gmail.com>
+Subject: Re: [Qemu-devel] compile failure if I enable guest_mem_before trace
+ event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,67 +28,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>, "Daniel P. Berrange" <berrange@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Hi Juan,
+On Thu, Mar 23, 2017 at 19:08:11 +0000, Peter Maydell wrote:
+> Hi; I thought I'd have a look at the guest_mem_before trace event,
+> but if I enable it (by deleting "disable" from the line in trace-events)
+> QEMU doesn't compile:
+> 
+>   CC      arm-softmmu/tcg/tcg-op.o
+> In file included from
+> /home/petmay01/linaro/qemu-from-laptop/qemu/include/trace-tcg.h:4:0,
+>                  from
+> /home/petmay01/linaro/qemu-from-laptop/qemu/tcg/tcg-op.c:31:
+> ../trace/generated-tcg-tracers.h: In function ‘trace_guest_mem_before_tcg’:
+> ../trace/generated-tcg-tracers.h:11:5: error: implicit declaration of
+> function ‘trace_guest_mem_before_trans’
+> [-Werror=implicit-function-declaration]
+>      trace_guest_mem_before_trans(__cpu, info);
+>      ^
+> ../trace/generated-tcg-tracers.h:11:5: error: nested extern
+> declaration of ‘trace_guest_mem_before_trans’ [-Werror=nested-externs]
+> 
+> Am I doing something wrong, or is this a bug?
 
-  First of all, I like the refactor patchset about RAMState, it makes
-things clean, great!
+It doesn't work for me either. I bisected it to:
 
-On 2017/3/24 5:01, Juan Quintela wrote:
-> Hi
-> 
-> This series split the migration and unsent bitmaps by ramblock.  This
-> makes it easier to synchronize in small bits.  This is on top of the
-> RAMState and not-hotplug series.
-> 
-> Why?
-> 
-> reason 1:
-> 
-> People have complained that by the time that we detect that a page is
-> sent, it has already been marked dirty "again" inside kvm, so we are
-> going to send it again.  On top of this patch, my idea is, for words
-> of the bitmap that have any bit set, just synchonize the bitmap before
-> sending the pages.  I have not looking into performance numbers yet,
-> jsut asking for comments about how it is done.
+0ab8ed18 "trace: switch to modular code generation for sub-directories"
 
-Here you said 'synchonize the bitmap before sending the pages', do you
-mean synchronize the bitmap from kvm? If so, I doubt the performance...
-because every synchronization will require a ioctl(). If not, the
-synchronization of per block is useless.
+It seems that after that commit no appropriate include is added
+to the generated tcg tracing .h files. The 'header' variable isn't used
+in the generation scripts for TCG, which is suspicious, e.g.:
 
-Currently, migration thread will synchronize the bitmap from kvm every
-iter(migration_bitmap_sync()). The RAMBlock already has kind of per block
-bitmap for this kind of sync. And the migration bitmap is used to put all
-those per block bitmap together for data sending use.
+--- a/scripts/tracetool/format/tcg_h.py
++++ b/scripts/tracetool/format/tcg_h.py
+@@ -28,13 +28,17 @@ def vcpu_transform_args(args):
 
-> 
-> reason 2:
-> 
-> In case where the host page is a multiple of the the TARGET_PAGE_SIZE,
-> we do a lot of work when we are synchronizing the bitmaps to pass it
-> to target page size.  The idea is to change the bitmaps on that
-> RAMBlocks to mean host page size and not TARGET_PAGE_SIZE.
-> 
-> Note that there are two reason for this, ARM and PPC do things like
-> guests with 4kb pages on hosts with 16/64kb hosts, and then we have
-> HugePages.  Note all the workarounds that postcopy has to do because
-> to work in HugePages size.
-> 
-> Please, comment?
-> 
-> Later, Juan.
-> 
-> Juan Quintela (1):
->   ram: Split dirty bitmap by RAMBlock
-> 
->  include/exec/ram_addr.h |  13 +++-
->  migration/ram.c         | 201 ++++++++++++++++++------------------------------
->  2 files changed, 85 insertions(+), 129 deletions(-)
-> 
 
--- 
+ def generate(events, backend, group):
++    if group == "root":
++        header = "trace-root.h"
++    else:
++        header = "trace.h"
++
+     out('/* This file is autogenerated by tracetool, do not edit. */',
+         '/* You must include this file after the inclusion of helper.h */',
+         '',
+         '#ifndef TRACE_%s_GENERATED_TCG_TRACERS_H' % group.upper(),
+         '#define TRACE_%s_GENERATED_TCG_TRACERS_H' % group.upper(),
+         '',
+-        '#include "trace.h"',
+         '#include "exec/helper-proto.h"',
+         '',
+         )
+
+
+The appended fixes it for me; I hope it's enough for the tracing
+people to come quickly to a proper fix (sorry, I didn't even know
+what the tracing features were only a few minutes ago!).
+
 Thanks,
-Yang
+
+		Emilio
+
+diff --git a/scripts/tracetool/format/tcg_h.py b/scripts/tracetool/format/tcg_h.py
+index 7ddc4a5..d020e9d 100644
+--- a/scripts/tracetool/format/tcg_h.py
++++ b/scripts/tracetool/format/tcg_h.py
+@@ -28,10 +28,7 @@ def vcpu_transform_args(args):
+ 
+ 
+ def generate(events, backend, group):
+-    if group == "root":
+-        header = "trace-root.h"
+-    else:
+-        header = "trace.h"
++    header = "trace-root.h"
+ 
+     out('/* This file is autogenerated by tracetool, do not edit. */',
+         '/* You must include this file after the inclusion of helper.h */',
+@@ -40,6 +37,7 @@ def generate(events, backend, group):
+         '#define TRACE_%s_GENERATED_TCG_TRACERS_H' % group.upper(),
+         '',
+         '#include "exec/helper-proto.h"',
++        '#include "%s"' % header,
+         '',
+         )
+ 
+diff --git a/scripts/tracetool/format/tcg_helper_c.py b/scripts/tracetool/format/tcg_helper_c.py
+index 7dccd8c..be7c71b 100644
+--- a/scripts/tracetool/format/tcg_helper_c.py
++++ b/scripts/tracetool/format/tcg_helper_c.py
+@@ -41,10 +41,7 @@ def vcpu_transform_args(args, mode):
+ 
+ 
+ def generate(events, backend, group):
+-    if group == "root":
+-        header = "trace-root.h"
+-    else:
+-        header = "trace.h"
++    header = "trace-root.h"
+ 
+     events = [e for e in events
+               if "disable" not in e.properties]
+@@ -55,6 +52,7 @@ def generate(events, backend, group):
+         '#include "qemu-common.h"',
+         '#include "cpu.h"',
+         '#include "exec/helper-proto.h"',
++        '#include "%s"' % header,
+         '',
+         )
+ 
