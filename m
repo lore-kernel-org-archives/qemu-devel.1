@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1crTUz-00085k-PL
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:59:42 -0400
+	(envelope-from <stefanha@redhat.com>) id 1crTa6-0001dX-9W
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 14:04:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1crTUv-0007bj-1j
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:59:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50043)
+	(envelope-from <stefanha@redhat.com>) id 1crTa1-00016Q-9a
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 14:04:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38292)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1crTUu-0007bY-So
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:59:36 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170322203140.GA12155@thinpad.lan.raisama.net>
-	<3d10c7b3-b702-3c16-7f3e-dfc6b332fbd4@redhat.com>
-	<b5516794-4592-569e-66ba-05dc40573a10@redhat.com>
-	<20170324134821.GC28530@thinpad.lan.raisama.net>
-	<87y3vur4qk.fsf@dusky.pond.sub.org>
-	<CAFEAcA_V3w6-WELX_M-jW1M=2TV7-wmEWa-c40ZmXLywC=+=Cg@mail.gmail.com>
-Date: Fri, 24 Mar 2017 18:59:31 +0100
-In-Reply-To: <CAFEAcA_V3w6-WELX_M-jW1M=2TV7-wmEWa-c40ZmXLywC=+=Cg@mail.gmail.com>
-	(Peter Maydell's message of "Fri, 24 Mar 2017 17:08:56 +0000")
-Message-ID: <877f3emu7w.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1crTa1-00015v-1m
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 14:04:53 -0400
+Date: Fri, 24 Mar 2017 18:04:45 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170324180445.GA6789@stefanha-x1.localdomain>
+References: <1490174864-7454-1-git-send-email-nanjekyejoannah@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] q35 and sysbus devices
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="1yeeQ81UyVL57Vl7"
+Content-Disposition: inline
+In-Reply-To: <1490174864-7454-1-git-send-email-nanjekyejoannah@gmail.com>
+Subject: Re: [Qemu-devel] [Patch v2] Provided python3 support for qmp.py 2/2]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +27,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Joannah Nanjekye <nanjekyejoannah@gmail.com>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com
 
-Peter Maydell <peter.maydell@linaro.org> writes:
 
-> On 24 March 2017 at 16:58, Markus Armbruster <armbru@redhat.com> wrote:
->> "Sysbus" isn't a bus.  In qdev's original design, every device had to
->> plug into a bus, period.  The ones that really didn't were made to plug
->> into "sysbus".
->>
->> Pretty much the only thing "sysbus" devices had in common was that they
->> couldn't be used with device_add and device_del.
->
-> This isn't really true. Sysbus devices support having MMIO regions
-> and IRQ lines and GPIO lines. If you need those you're a
-> sysbus device; otherwise you can probably just be a plain old Device.
+--1yeeQ81UyVL57Vl7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Well, "device has MMIO regions, IRQ lines and GPIO lines" is about as
-"device contains virtual silicon".  What would a device without any of
-these *do*?
+On Wed, Mar 22, 2017 at 12:27:44PM +0300, Joannah Nanjekye wrote:
+> From: nanjekyejoannah <nanjekyejoannah@gmail.com>
 
-Devices plugging into a bus have to expose their MMIO regions, IRQ
-lines, etc. in a certain way dictated by the bus.  In return, you don't
-have to wire up each resource manually, you simply plug into the bus and
-are done.  That's what makes a bus a bus for me.
+Thanks for the patch!
 
-"Sysbus" does nothing of the sort.
+>=20
+> Signed-off-by: nanjekyejoannah <nanjekyejoannah@gmail.com>
+>=20
+> The patch provides python 3 support for one of the scripts  in scripts/qm=
+p that is to say qmp.py. This is not a port to python 3 but rather the patc=
+h ensures that the script runs fine for both python 2 and 3.
+>=20
+> Minimum Python Versions supported:
+>=20
+>   Python 2 : python 2.6 +
+>   Python 3 : python 3.3 +
+>=20
+> The two new imports future and builtins introduced refer to the future
+> pip-installable package on PyPI.
 
->> We fixed the design to permit bus-less devices, but we didn't get rid of
->> "sysbus".
->
-> Call it what you want, but we should have some common code support
-> for "I want to have MMIOs and IRQs and GPIO lines".
+Signed-off-by goes here (after the commit description).
 
-Of course.
+>=20
+> ---
+> diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
+> index 6dcb870..57ac86b 100644
+> --- a/scripts/qmp/qmp.py
+> +++ b/scripts/qmp/qmp.py
+> @@ -8,8 +8,6 @@
+>  # This work is licensed under the terms of the GNU GPL, version 2.  See
+>  # the COPYING file in the top-level directory.
+>  from __future__ import absolute_import, print_function, unicode_literals
+> -from future.utils import raise_from
+> -from builtins import str=20
 
->                                                     You could
-> argue for moving all that into Device I suppose.
+This looks like a patch on top of your previous patch.
 
-Yup.
+Please send a v3 patch that applies directly to qemu.git/master.  You
+may need to use "git rebase -i master" to squash intermediate commits
+you've made together into a single patch.  Logically these changes are
+part of the same code change so there's no need for multiple patches.
 
->> We got a "platform bus", which is really not the same as "sysbus", but
->> we shoehorned it into "sysbus" anyway.
->
-> I agree 'platform bus' is a mess, and I'd rather it didn't exist.
-> Unfortunately people really really want to be able to do device
-> pass through of random memory-mapped devices :-(
+The v3 patch email should be:
 
-The "platform" bus adds certain constraints over "sysbus", precisely to
-make these uses possible.  And that's precisely why it should be its own
-thing instead of complicating "sysbus".
+  [PATCH v3] scripts/qmp: python3 support for qmp.py
+
+Please also CC Markus Armbruster <armbru@redhat.com>.  He is the
+maintainer of this file (you can check for maintainers using
+scripts/get_maintainer.pl -f scripts/qmp.py).
+
+>  import json
+>  import errno
+>  import socket
+> @@ -58,13 +56,13 @@ class QEMUMonitorProtocol:
+> =20
+>      def __negotiate_capabilities(self):
+>          greeting =3D self.__json_read()
+> -        if greeting is None or not greeting.has_key('QMP'):
+> -            raise_from(QMPConnectError())
+> +        if greeting is None or not 'QMP' in list(greeting):
+> +            raise QMPConnectError()
+>          # Greeting seems ok, negotiate capabilities
+>          resp =3D self.cmd('qmp_capabilities')
+>          if "return" in resp:
+>              return greeting
+> -        raise_from(QMPCapabilitiesError())
+> +        raise QMPCapabilitiesError()
+> =20
+>      def __json_read(self, only_event=3DFalse):
+>          while True:
+> @@ -74,7 +72,7 @@ class QEMUMonitorProtocol:
+>              resp =3D json.loads(data)
+>              if 'event' in resp:
+>                  if self._debug:
+> -                    print(u"QMP:<<< %s" % str(resp), file=3Dsys.stderr)=
+=20
+> +                    print(u"QMP:<<< %s" % resp, file=3Dsys.stderr)=20
+>                  self.__events.append(resp)
+>                  if not only_event:
+>                      continue
+> @@ -113,11 +111,11 @@ class QEMUMonitorProtocol:
+>              try:
+>                  ret =3D self.__json_read(only_event=3DTrue)
+>              except socket.timeout:
+> -                raise_from(QMPTimeoutError("Timeout waiting for event"))
+> +                raise QMPTimeoutError("Timeout waiting for event")
+>              except:
+> -                raise_from(QMPConnectError("Error while reading from soc=
+ket"))
+> +                raise(QMPConnectError("Error while reading from socket"))
+>              if ret is None:
+> -                raise_from(QMPConnectError("Error while reading from soc=
+ket"))
+> +                raise QMPConnectError("Error while reading from socket")
+>              self.__sock.settimeout(None)
+> =20
+>      def connect(self, negotiate=3DTrue):
+> @@ -157,16 +155,16 @@ class QEMUMonitorProtocol:
+>                  been closed
+>          """
+>          if self._debug:
+> -            print(u"QMP:>>> %s" % str(qmp_cmd), file=3Dsys.stderr)=20
+> +            print(u"QMP:>>> %s" % qmp_cmd, file=3Dsys.stderr)=20
+>          try:
+> -            self.__sock.sendall(json.dumps(qmp_cmd))
+> +            self.__sock.sendall((json.dumps(qmp_cmd)).encode('latin-1'))
+>          except socket.error as err:
+>              if err[0] =3D=3D errno.EPIPE:
+>                  return
+> -            raise_from(socket.error(), err)
+> +            raise (socket.error(), err)
+>          resp =3D self.__json_read()
+>          if self._debug:
+> -            print(u"QMP:<<< %s" % str(resp), file=3Dsys.stderr) =20
+> +            print(u"QMP:<<< %s" % resp, file=3Dsys.stderr) =20
+>          return resp
+> =20
+>      def cmd(self, name, args=3DNone, id=3DNone):
+
+--1yeeQ81UyVL57Vl7
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJY1V+9AAoJEJykq7OBq3PICUQH/2QIYhWqcIoVZggL56F+sHcK
+uPtf44RDZKbNyDrQ9UHoBQ1i/1Yp+8TFYxgolruwkXb4Nuy3HDFlE5RNoUfilsMU
+nQKXQFWrn8XswImacZZWcUM5y5C4Gkr0Q6wbp/I171PlzekUK5981cEPZ/r8uu03
+FiHxdCV0XzOuaIKYpLed2Z6pIBXVF5TqSODiXUZaGGfl1f3XkRGJF2QTopnHlzv9
+DtHZ47175ZXwj2ptBwWH0pPHoIDkchYgXK/uFDL+ZXq3CuCVfJfhCGQb0irpgOrd
+v0uoQK5lC5v4vtMsDe38HCrQmy84q5qihXFSuvNpHwGNmJbspE5zhnpXDw0o8+M=
+=z38B
+-----END PGP SIGNATURE-----
+
+--1yeeQ81UyVL57Vl7--
