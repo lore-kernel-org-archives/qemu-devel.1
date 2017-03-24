@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1crSkm-0003pA-FT
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:11:57 -0400
+	(envelope-from <eblake@redhat.com>) id 1crSoM-0005KV-Gb
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:15:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1crSkh-0007FE-HF
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:11:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45362)
+	(envelope-from <eblake@redhat.com>) id 1crSoH-0008MD-JT
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:15:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47568)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1crSkh-0007Et-8o
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:11:51 -0400
-References: <20170324152607.6604-1-alex.bennee@linaro.org>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1crSoH-0008M3-Dd
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:15:33 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 43202624B3
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 17:15:33 +0000 (UTC)
+References: <20170323204544.12015-1-quintela@redhat.com>
+	<20170323204544.12015-3-quintela@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <fa4d3712-859a-ced3-3883-8951ee9b6aa7@redhat.com>
-Date: Fri, 24 Mar 2017 12:11:48 -0500
+Message-ID: <5172eb13-0183-52a8-32af-4b37468ded67@redhat.com>
+Date: Fri, 24 Mar 2017 12:15:30 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170324152607.6604-1-alex.bennee@linaro.org>
+In-Reply-To: <20170323204544.12015-3-quintela@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="krKQjmQErfAPEg2MEd3PDiCStELqwXFu6"
-Subject: Re: [Qemu-devel] [PATCH-for-2.9] replay/replay.c: bump
- REPLAY_VERSION
+	boundary="l7Swm0HeBwOMKQRwxLhWwef1BWUx9x81w"
+Subject: Re: [Qemu-devel] [PATCH 02/51] ram: rename block_name to rbname
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +34,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, pavel.dovgaluk@ispras.ru
-Cc: qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---krKQjmQErfAPEg2MEd3PDiCStELqwXFu6
+--l7Swm0HeBwOMKQRwxLhWwef1BWUx9x81w
 From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- pavel.dovgaluk@ispras.ru
-Cc: qemu-devel@nongnu.org
-Message-ID: <fa4d3712-859a-ced3-3883-8951ee9b6aa7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH-for-2.9] replay/replay.c: bump REPLAY_VERSION
-References: <20170324152607.6604-1-alex.bennee@linaro.org>
-In-Reply-To: <20170324152607.6604-1-alex.bennee@linaro.org>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com
+Message-ID: <5172eb13-0183-52a8-32af-4b37468ded67@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 02/51] ram: rename block_name to rbname
+References: <20170323204544.12015-1-quintela@redhat.com>
+ <20170323204544.12015-3-quintela@redhat.com>
+In-Reply-To: <20170323204544.12015-3-quintela@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 03/24/2017 10:26 AM, Alex Benn=C3=A9e wrote:
-> A previous commit (3d4d16f4) added support for audio record/playback.
-> However this breaks the logfile ABI due to the re-ordering of the
-> ReplayEvents enum. The REPLAY_VERSION check is meant to prevent you
-> from using old log files in newer QEMUs but this is currently broken.
+On 03/23/2017 03:44 PM, Juan Quintela wrote:
+> So all places are consisten on the nambing of a block name parameter.
 
-As we don't have a formal release with the reordered enum yet, would an
-alternative approach be partially reverting 3d4d16f4 to instead stick
-the new enum values at the end, so that all existing enums are in the
-same order?  Or do you still need the version bump even then, because
-you don't want a new stream (with the new enums) being played to an
-older system that isn't expecting them?
+s/consisten/consistent/
+s/nambing/naming/
+
+>=20
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  migration/ram.c | 17 ++++++++---------
+>  1 file changed, 8 insertions(+), 9 deletions(-)
+>=20
 
 --=20
 Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---krKQjmQErfAPEg2MEd3PDiCStELqwXFu6
+--l7Swm0HeBwOMKQRwxLhWwef1BWUx9x81w
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -72,13 +78,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJY1VNUAAoJEKeha0olJ0NqHQcH/AvuQ7OtZPEKM6lJhVv0HVzb
-ortxU+OY3O4HQcWxqQi45wKaqDtnqVfvKo1uNnmXPHWheJn3vK5coeAx251HiTcq
-hepD3+RjHpAhvPph0jt7HWoLT+dvHon5ntQkOTbijPrU/fFYNVOERFrQF5JFsWgu
-jImI9HqgIEv9/HqcFSQ1Jc/2SXHWTVs2WUWhj6DExsYmWywvPA4o5tYMfUHw1SdY
-kWpOmnAD6kZz3fLgEk4CBEvBC+T7P/mkPb+0tAJF2p5pPBPaXvNMPzkgMpxPId+B
-9Pfrkz+SPu1Re2j6n1kvE9yeuyTXV1/EZO4awPxGVJxEcpHrvVpIsN67O7t/DAA=
-=mpbL
+iQEcBAEBCAAGBQJY1VQzAAoJEKeha0olJ0NqYzcIAKTfqRMlu7/IFUDB9yo1z565
+5UoiW5zqXLKZzdc9KvRU3qqsB691GNefM1zVABmVGeP2E3T220d1sv7xOxALkmfn
+dy/R66odu/X2WZkxLf+6KvfuZOZkGSXaB0YloJJwoa4Y8ZBkcBlYLdVt1bZQPg9k
+wj/lD/MFk+EElDYbSFn5hv4U9i9SF6mn4uKVydNktHD3//vVruM+DMvLYTAGvv1x
+RPysvK5rweofC+3M3nbryNesWKoK3Tvb7crJn4BQcHNg1G63VUS4712wcIZDkGG5
+BpMQLswI8CmysqHZ46OolUyn8sGl2UtlwXLoH+/HmuRCbI8F38V03LJnG82kiO4=
+=5wU3
 -----END PGP SIGNATURE-----
 
---krKQjmQErfAPEg2MEd3PDiCStELqwXFu6--
+--l7Swm0HeBwOMKQRwxLhWwef1BWUx9x81w--
