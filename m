@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1crPto-000354-0C
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:09:05 -0400
+	(envelope-from <stefanha@redhat.com>) id 1crPtq-00037S-QO
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:09:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1crPtl-0006vF-E2
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:09:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60308)
+	(envelope-from <stefanha@redhat.com>) id 1crPtp-0006wG-R4
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:09:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56216)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1crPtl-0006v0-82
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:09:01 -0400
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1crPtp-0006w3-Ll
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:09:05 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri, 24 Mar 2017 14:08:51 +0000
-Message-Id: <20170324140854.28134-2-stefanha@redhat.com>
+Date: Fri, 24 Mar 2017 14:08:52 +0000
+Message-Id: <20170324140854.28134-3-stefanha@redhat.com>
 In-Reply-To: <20170324140854.28134-1-stefanha@redhat.com>
 References: <20170324140854.28134-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL for-2.9 1/3] trace: Fix backwards mirror_yield
+Subject: [Qemu-devel] [PULL for-2.9 2/3] trace: Fix incorrect megasas trace
  parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,46 +29,43 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, St
 
 From: Eric Blake <eblake@redhat.com>
 
-block/trace-events lists the parameters for mirror_yield
-consistently with other mirror events (cnt just after s, like in
-mirror_before_sleep; in_flight last, like in mirror_yield_in_flight).
-But the callers were passing parameters in the wrong order, leading
-to poor trace messages, including type truncation when there are
-more than 4G dirty sectors involved.  Broken since its introduction
-in commit bd48bde.
-
-While touching this, ensure that all callers use the same type
-(uint64_t) for cnt, as a later patch will enable the compiler to do
-stricter type-checking.
+hw/scsi/trace-events lists cmd as the first parameter for both
+megasas_iovec_overflow and megasas_iovec_underflow, but the caller
+was mistakenly passing cmd->iov_size twice instead of the command
+index.  Also, trace_megasas_abort_invalid is called with parameters
+in the wrong order.  Broken since its introduction in commit
+e8f943c3.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/mirror.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ hw/scsi/megasas.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/block/mirror.c b/block/mirror.c
-index ca4baa5..9e2fecc 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -634,7 +634,8 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
-             }
- 
-             if (s->in_flight >= MAX_IN_FLIGHT) {
--                trace_mirror_yield(s, s->in_flight, s->buf_free_count, -1);
-+                trace_mirror_yield(s, UINT64_MAX, s->buf_free_count,
-+                                   s->in_flight);
-                 mirror_wait_for_io(s);
-                 continue;
-             }
-@@ -809,7 +810,7 @@ static void coroutine_fn mirror_run(void *opaque)
-             s->common.iostatus == BLOCK_DEVICE_IO_STATUS_OK) {
-             if (s->in_flight >= MAX_IN_FLIGHT || s->buf_free_count == 0 ||
-                 (cnt == 0 && s->in_flight > 0)) {
--                trace_mirror_yield(s, s->in_flight, s->buf_free_count, cnt);
-+                trace_mirror_yield(s, cnt, s->buf_free_count, s->in_flight);
-                 mirror_wait_for_io(s);
-                 continue;
-             } else if (cnt != 0) {
+diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+index e3d59b7..84b8caf 100644
+--- a/hw/scsi/megasas.c
++++ b/hw/scsi/megasas.c
+@@ -291,7 +291,7 @@ static int megasas_map_sgl(MegasasState *s, MegasasCmd *cmd, union mfi_sgl *sgl)
+     if (cmd->iov_size > iov_size) {
+         trace_megasas_iovec_overflow(cmd->index, iov_size, cmd->iov_size);
+     } else if (cmd->iov_size < iov_size) {
+-        trace_megasas_iovec_underflow(cmd->iov_size, iov_size, cmd->iov_size);
++        trace_megasas_iovec_underflow(cmd->index, iov_size, cmd->iov_size);
+     }
+     cmd->iov_offset = 0;
+     return 0;
+@@ -1924,8 +1924,8 @@ static int megasas_handle_abort(MegasasState *s, MegasasCmd *cmd)
+         abort_ctx &= (uint64_t)0xFFFFFFFF;
+     }
+     if (abort_cmd->context != abort_ctx) {
+-        trace_megasas_abort_invalid_context(cmd->index, abort_cmd->index,
+-                                            abort_cmd->context);
++        trace_megasas_abort_invalid_context(cmd->index, abort_cmd->context,
++                                            abort_cmd->index);
+         s->event_count++;
+         return MFI_STAT_ABORT_NOT_POSSIBLE;
+     }
 -- 
 2.9.3
