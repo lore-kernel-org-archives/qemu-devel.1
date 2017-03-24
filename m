@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1crVxE-0005oO-3V
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 16:37:01 -0400
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1crWeM-0001Yx-DN
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 17:21:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1crVxB-0002y2-05
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 16:37:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42850)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1crVxA-0002xV-OO
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 16:36:56 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri, 24 Mar 2017 17:36:45 -0300
-Message-Id: <20170324203645.12828-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9] i386: Don't override -cpu options on
- -cpu host/max
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1crWeJ-0001P9-9b
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 17:21:34 -0400
+Received: from mail-co1nam03on0099.outbound.protection.outlook.com
+	([104.47.40.99]:55707
+	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Andrew.Baumann@microsoft.com>)
+	id 1crWeI-0001NC-QW
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 17:21:31 -0400
+From: Andrew Baumann <Andrew.Baumann@microsoft.com>
+Date: Fri, 24 Mar 2017 14:21:15 -0700
+Message-ID: <20170324212115.6772-1-Andrew.Baumann@microsoft.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2] virtio: fix vring_align() on 64-bit win32
+ platforms
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,155 +28,30 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, "Collin L . Walling" <walling@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>
+Cc: Eric Blake <eblake@redhat.com>, Stefan Weil <sw@weilnetz.de>, "Michael S .
+	Tsirkin" <mst@redhat.com>, Andrew Baumann <Andrew.Baumann@microsoft.com>
 
-The existing code for "host" and "max" CPU models overrides every
-single feature in the CPU object at realize time, even the ones
-that were explicitly enabled or disabled by the user using
-"feat=on" or "feat=off", while features set using +feat/-feat are
-kept.
+long is 32-bits on win32, which caused the top half of the address to
+be truncated; this patch changes it to use the QEMU_ALIGN_UP macro
+which does not suffer the same problem
 
-This means "-cpu host,+invtsc" works as expected, while
-"-cpu host,invtsc=on" doesn't.
-
-This was a known bug, already documented in a comment inside
-x86_cpu_expand_features(). What makes this bug worse now is that
-libvirt 3.0.0 and newer now use "feat=on|off" instead of
-+feat/-feat when it detects a QEMU version that supports it (see
-libvirt commit d47db7b16dd5422c7e487c8c8ee5b181a2f9cd66).
-
-Change the feature property getter/setter to set a
-env->user_features field, to keep track of features that were
-explicitly changed using QOM properties. Then make the
-max_features code not override user features when handling "-cpu
-host" and "-cpu max".
-
-This will also allow us to remove the plus_features/minus_features
-hack in the future, but I plan to do that after 2.9.0 is
-released.
-
-Reported-by: Jiri Denemark <jdenemar@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Andrew Baumann <Andrew.Baumann@microsoft.com>
 ---
- target/i386/cpu.h |  2 ++
- target/i386/cpu.c | 33 +++++++++++++++++++++------------
- 2 files changed, 23 insertions(+), 12 deletions(-)
+ include/hw/virtio/virtio.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 07401ad9fe..c4602ca80d 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1147,6 +1147,8 @@ typedef struct CPUX86State {
-     uint32_t cpuid_vendor3;
-     uint32_t cpuid_version;
-     FeatureWordArray features;
-+    /* Features that were explicitly enabled/disabled */
-+    FeatureWordArray user_features;
-     uint32_t cpuid_model[12];
- 
-     /* MTRRs */
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 7aa762245a..5f2addbf75 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -3373,15 +3373,20 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
-     GList *l;
-     Error *local_err = NULL;
- 
--    /*TODO: cpu->max_features incorrectly overwrites features
--     * set using "feat=on|off". Once we fix this, we can convert
-+    /*TODO: Now cpu->max_features doesn't overwrite features
-+     * set using QOM properties, and we can convert
-      * plus_features & minus_features to global properties
-      * inside x86_cpu_parse_featurestr() too.
-      */
-     if (cpu->max_features) {
-         for (w = 0; w < FEATURE_WORDS; w++) {
--            env->features[w] =
--                x86_cpu_get_supported_feature_word(w, cpu->migratable);
-+            /* Override only features that weren't not set explicitly
-+             * by the user.
-+             */
-+            env->features[w] &= env->user_features[w];
-+            env->features[w] |=
-+                x86_cpu_get_supported_feature_word(w, cpu->migratable) &
-+                ~env->user_features[w];
-         }
-     }
- 
-@@ -3692,15 +3697,17 @@ static void x86_cpu_unrealizefn(DeviceState *dev, Error **errp)
- }
- 
- typedef struct BitProperty {
--    uint32_t *ptr;
-+    FeatureWord w;
-     uint32_t mask;
- } BitProperty;
- 
- static void x86_cpu_get_bit_prop(Object *obj, Visitor *v, const char *name,
-                                  void *opaque, Error **errp)
+diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+index 15efcf2..7b6edba 100644
+--- a/include/hw/virtio/virtio.h
++++ b/include/hw/virtio/virtio.h
+@@ -34,7 +34,7 @@ struct VirtQueue;
+ static inline hwaddr vring_align(hwaddr addr,
+                                              unsigned long align)
  {
-+    X86CPU *cpu = X86_CPU(obj);
-     BitProperty *fp = opaque;
--    bool value = (*fp->ptr & fp->mask) == fp->mask;
-+    uint32_t f = cpu->env.features[fp->w];
-+    bool value = (f & fp->mask) == fp->mask;
-     visit_type_bool(v, name, &value, errp);
+-    return (addr + align - 1) & ~(align - 1);
++    return QEMU_ALIGN_UP(addr, align);
  }
  
-@@ -3708,6 +3715,7 @@ static void x86_cpu_set_bit_prop(Object *obj, Visitor *v, const char *name,
-                                  void *opaque, Error **errp)
- {
-     DeviceState *dev = DEVICE(obj);
-+    X86CPU *cpu = X86_CPU(obj);
-     BitProperty *fp = opaque;
-     Error *local_err = NULL;
-     bool value;
-@@ -3724,10 +3732,11 @@ static void x86_cpu_set_bit_prop(Object *obj, Visitor *v, const char *name,
-     }
- 
-     if (value) {
--        *fp->ptr |= fp->mask;
-+        cpu->env.features[fp->w] |= fp->mask;
-     } else {
--        *fp->ptr &= ~fp->mask;
-+        cpu->env.features[fp->w] &= ~fp->mask;
-     }
-+    cpu->env.user_features[fp->w] |= fp->mask;
- }
- 
- static void x86_cpu_release_bit_prop(Object *obj, const char *name,
-@@ -3745,7 +3754,7 @@ static void x86_cpu_release_bit_prop(Object *obj, const char *name,
-  */
- static void x86_cpu_register_bit_prop(X86CPU *cpu,
-                                       const char *prop_name,
--                                      uint32_t *field,
-+                                      FeatureWord w,
-                                       int bitnr)
- {
-     BitProperty *fp;
-@@ -3755,11 +3764,11 @@ static void x86_cpu_register_bit_prop(X86CPU *cpu,
-     op = object_property_find(OBJECT(cpu), prop_name, NULL);
-     if (op) {
-         fp = op->opaque;
--        assert(fp->ptr == field);
-+        assert(fp->w == w);
-         fp->mask |= mask;
-     } else {
-         fp = g_new0(BitProperty, 1);
--        fp->ptr = field;
-+        fp->w = w;
-         fp->mask = mask;
-         object_property_add(OBJECT(cpu), prop_name, "bool",
-                             x86_cpu_get_bit_prop,
-@@ -3787,7 +3796,7 @@ static void x86_cpu_register_feature_bit_props(X86CPU *cpu,
-     /* aliases don't use "|" delimiters anymore, they are registered
-      * manually using object_property_add_alias() */
-     assert(!strchr(name, '|'));
--    x86_cpu_register_bit_prop(cpu, name, &cpu->env.features[w], bitnr);
-+    x86_cpu_register_bit_prop(cpu, name, w, bitnr);
- }
- 
- static GuestPanicInformation *x86_cpu_get_crash_info(CPUState *cs)
+ typedef struct VirtQueue VirtQueue;
 -- 
-2.11.0.259.g40922b1
+2.8.3
