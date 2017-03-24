@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=249263d75=Paul.Durrant@citrix.com>)
-	id 1crSsq-0008BR-La
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:20:17 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1crSxh-0001EU-S5
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:25:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=249263d75=Paul.Durrant@citrix.com>)
-	id 1crSsm-00028b-BC
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:20:16 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:5120)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=249263d75=Paul.Durrant@citrix.com>)
-	id 1crSsm-00028Q-40
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:20:12 -0400
-From: Paul Durrant <paul.durrant@citrix.com>
-Date: Fri, 24 Mar 2017 17:20:02 +0000
-Message-ID: <1490376002-1223-1-git-send-email-paul.durrant@citrix.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1crSxd-0003zR-Tk
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:25:17 -0400
+Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:33404)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1crSxd-0003zD-Lk
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:25:13 -0400
+Received: by mail-wr0-x230.google.com with SMTP id y90so6123582wrb.0
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 10:25:13 -0700 (PDT)
+References: <20170324152607.6604-1-alex.bennee@linaro.org>
+	<fa4d3712-859a-ced3-3883-8951ee9b6aa7@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <fa4d3712-859a-ced3-3883-8951ee9b6aa7@redhat.com>
+Date: Fri, 24 Mar 2017 17:25:10 +0000
+Message-ID: <871stmy4cp.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH RESEND] xen: limit pkg-config to
- PKG_CONFIG_PATH for xen libraries
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH-for-2.9] replay/replay.c: bump
+ REPLAY_VERSION
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,69 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Juergen Gross <jgross@suse.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: pavel.dovgaluk@ispras.ru, qemu-devel@nongnu.org
 
-The Xen tools Makefile has been modified to set PKG_CONFIG_PATH such that
-use of pkg-config in QEMU configure finds the newly built Xen libraries.
-However, because older versions of Xen do not set PKG_CONFIG_PATH in the
-Makefile, the QEMU configure script will pick up any Xen libraries that may
-be installed in the build system rather than the newly built ones. Thus,
-if Xen 4.9 is built and installed it becomes impossible to build tools for
-an older version of Xen on the same system (without manual de-installtion).
 
-This patch modifies configure to set PKG_CONFIG_LIBDIR to empty when
-looking for Xen libraries to ensure the search is limited only to
-PKG_CONFIG_PATH. This makes sure that, for versions of Xen prior to 4.9,
-pkg-config fails to find the Xen libraries an approriately falls back to
-previous methods of probing.
+Eric Blake <eblake@redhat.com> writes:
 
-Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
----
-Cc: Anthony Perard <anthony.perard@citrix.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Juergen Gross <jgross@suse.com>
----
- configure | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+> On 03/24/2017 10:26 AM, Alex Bennée wrote:
+>> A previous commit (3d4d16f4) added support for audio record/playback.
+>> However this breaks the logfile ABI due to the re-ordering of the
+>> ReplayEvents enum. The REPLAY_VERSION check is meant to prevent you
+>> from using old log files in newer QEMUs but this is currently broken.
+>
+> As we don't have a formal release with the reordered enum yet, would an
+> alternative approach be partially reverting 3d4d16f4 to instead stick
+> the new enum values at the end, so that all existing enums are in the
+> same order?
 
-diff --git a/configure b/configure
-index fdf47e4..6ef5980 100755
---- a/configure
-+++ b/configure
-@@ -1974,6 +1974,10 @@ fi
- ##########################################
- # xen probe
- 
-+xen_query_pkg_config() {
-+    PKG_CONFIG_LIBDIR= ${pkg_config_exe} "$@"
-+}
-+
- if test "$xen" != "no" ; then
-   xen_libs="-lxenstore -lxenctrl -lxenguest"
-   xen_stable_libs="-lxenforeignmemory -lxengnttab -lxenevtchn"
-@@ -1997,9 +2001,9 @@ EOF
-     xen=no
- 
-   # Xen version via pkg-config (Xen 4.9.0 and newer)
--  elif $pkg_config --exists xencontrol ; then
-+  elif xen_query_pkg_config --exists xencontrol; then
-     xen_ctrl_version="$(printf '%d%02d%02d' \
--      $($pkg_config --modversion xencontrol | sed 's/\./ /g') )"
-+      $(xen_query_pkg_config --modversion xencontrol | sed 's/\./ /g') )"
-     xen=yes
- 
-   elif
-@@ -2216,8 +2220,8 @@ EOF
-     if test $xen_ctrl_version -ge 40900 ; then
-       xen_pc="xencontrol xenstore xenguest xenforeignmemory xengnttab xenevtchn"
-       xen_pc="$xen_pc xendevicemodel"
--      xen_libs="$($pkg_config --libs $xen_pc)"
--      QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags $xen_pc)"
-+      xen_libs="$(xen_query_pkg_config --libs $xen_pc)"
-+      QEMU_CFLAGS="$QEMU_CFLAGS $(xen_query_pkg_config --cflags $xen_pc)"
-     elif test $xen_ctrl_version -ge 40701 ; then
-       libs_softmmu="$xen_stable_libs $libs_softmmu"
-     fi
--- 
-2.1.4
+That would certainly be an option.
+
+> Or do you still need the version bump even then, because
+> you don't want a new stream (with the new enums) being played to an
+> older system that isn't expecting them?
+
+I'm not personally bothered either way. Currently the check is a simple
+match so there is not really the concept of a super/subsets of log file.
+
+I only ran into this as I was trying to debug the record/replay
+regression while writing a dumper script to debug the current
+regression:
+
+  https://github.com/stsquad/qemu/blob/mttcg/more-fixes-for-rc1-v2/scripts/replay-dump.py
+
+--
+Alex Bennée
