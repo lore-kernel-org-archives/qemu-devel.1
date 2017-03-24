@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1crXPx-0003sz-QF
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 18:10:46 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1crXRh-0004Yi-2u
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 18:12:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1crXPu-0001mu-KN
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 18:10:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44626)
+	(envelope-from <alex.williamson@redhat.com>) id 1crXRf-0002tp-FI
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 18:12:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54370)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1crXPu-0001ld-Dp
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 18:10:42 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 90297C05AA41
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 22:10:41 +0000 (UTC)
-Received: from scv.usersys.redhat.com (vpn-59-71.rdu2.redhat.com [10.10.59.71])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 4BA865C8A3
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 22:10:41 +0000 (UTC)
-References: <3d1c16a1-ec05-0367-e569-64a63b34f2e3@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <4a56f716-3528-ddd4-f8c4-f3f6b23c469a@redhat.com>
-Date: Fri, 24 Mar 2017 18:10:40 -0400
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1crXRf-0002tc-5b
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 18:12:31 -0400
+Date: Fri, 24 Mar 2017 16:12:28 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170324161228.73f7ac0f@t450s.home>
+In-Reply-To: <1490260163-6157-3-git-send-email-caoj.fnst@cn.fujitsu.com>
+References: <1490260163-6157-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+	<1490260163-6157-3-git-send-email-caoj.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <3d1c16a1-ec05-0367-e569-64a63b34f2e3@redhat.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] What's the next QEMU version after 2.9 ? (or: when
- is a good point in time to get rid of old interfaces)
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] vfio pci: new function to init AER
+ capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,45 +29,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Cao jin <caoj.fnst@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, izumi.taku@jp.fujitsu.com, mst@redhat.com, Dou Liyang <douly.fnst@cn.fujitsu.com>
 
+On Thu, 23 Mar 2017 17:09:22 +0800
+Cao jin <caoj.fnst@cn.fujitsu.com> wrote:
 
+This is not a sufficiently trivial patch to leave the commit log empty.
 
-On 03/08/2017 03:26 AM, Thomas Huth wrote:
+> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+> ---
+>  hw/vfio/pci.c | 41 ++++++++++++++++++++++++++++++++++++-----
+>  hw/vfio/pci.h |  1 +
+>  2 files changed, 37 insertions(+), 5 deletions(-)
 > 
->  Hi everybody,
-> 
-> what will be the next version of QEMU after 2.9? Will we go for a 2.10
-> (as I've seen it mentioned a couple of times on the mailing list
-> already), or do we dare to switch to 3.0 instead?
-> 
-> I personally dislike two-digit minor version numbers like 2.10 since the
-> non-experienced users sometimes mix it up with 2.1 ... and there have
-> been a couple of new cool features in the past releases that would
-> justify a 3.0 now, too, I think.
-> 
-> But anyway, the more important thing that keeps me concerned is: Someone
->  once told me that we should get rid of old parameters and interfaces
-> (like HMP commands) primarily only when we're changing to a new major
-> version number. As you all know, QEMU has a lot of legacy options, which
-> are likely rather confusing than helpful for the new users nowadays,
-> e.g. things like the "-net channel" option (which is fortunately even
-> hardly documented), but maybe also even the whole vlan/hub concept in
-> the net code, or legacy parameters like "-usbdevice". If we switch to
-> version 3.0, could we agree to remove at least some of them?
-> 
->  Thomas
-> 
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 332f41d..3d0d005 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -1855,18 +1855,42 @@ out:
+>      return 0;
+>  }
+>  
+> -static void vfio_add_ext_cap(VFIOPCIDevice *vdev)
+> +static int vfio_setup_aer(VFIOPCIDevice *vdev, uint8_t cap_ver,
+> +                          int pos, uint16_t size, Error **errp)
+> +{
+> +    PCIDevice *pdev = &vdev->pdev;
+> +    uint32_t errcap;
+> +
+> +    errcap = vfio_pci_read_config(pdev, pos + PCI_ERR_CAP, 4);
+> +    /*
+> +     * The ability to record multiple headers is depending on
+> +     * the state of the Multiple Header Recording Capable bit and
+> +     * enabled by the Multiple Header Recording Enable bit.
+> +     */
+> +    if ((errcap & PCI_ERR_CAP_MHRC) &&
+> +        (errcap & PCI_ERR_CAP_MHRE)) {
+> +        pdev->exp.aer_log.log_max = PCIE_AER_LOG_MAX_DEFAULT;
+> +    } else {
+> +        pdev->exp.aer_log.log_max = 0;
+> +    }
+> +
+> +    pcie_cap_deverr_init(pdev);
 
-As others have stated, we need a few releases to deprecate things first.
+This assumes we've set exp_cap, perhaps the code should validate this
+to avoid corner case configurations where the PCIe cap has been dropped
+yet AER is still present.  I'm not sure if it's possible, but I'd
+rather test than segfault.
 
-Maybe we should develop a serious plan to develop some of our legacy
-interfaces first.
+> +    return pcie_aer_init(pdev, cap_ver, pos, size, errp);
 
-Maybe 2.10 can introduce a list of things we want to deprecate,
-2.11 can be the transition release,
-and then 3.0 can cut the cord and free of us our terrible burden?
 
-I have a list of things I want to axe...
+I think here too, users may have existing configurations that could
+break by suddenly imposing a new topology requirement.
 
---js
+
+> +}
+> +
+> +static int vfio_add_ext_cap(VFIOPCIDevice *vdev, Error **errp)
+>  {
+>      PCIDevice *pdev = &vdev->pdev;
+>      uint32_t header;
+>      uint16_t cap_id, next, size;
+>      uint8_t cap_ver;
+>      uint8_t *config;
+> +    int ret = 0;
+>  
+>      /* Only add extended caps if we have them and the guest can see them */
+>      if (!pci_is_express(pdev) || !pci_bus_is_express(pdev->bus) ||
+>          !pci_get_long(pdev->config + PCI_CONFIG_SPACE_SIZE)) {
+> -        return;
+> +        return 0;
+>      }
+>  
+>      /*
+> @@ -1915,6 +1939,9 @@ static void vfio_add_ext_cap(VFIOPCIDevice *vdev)
+>                                     PCI_EXT_CAP_NEXT_MASK);
+>  
+>          switch (cap_id) {
+> +        case PCI_EXT_CAP_ID_ERR:
+> +            ret = vfio_setup_aer(vdev, cap_ver, next, size, errp);
+> +            break;
+>          case PCI_EXT_CAP_ID_SRIOV: /* Read-only VF BARs confuse OVMF */
+>          case PCI_EXT_CAP_ID_ARI: /* XXX Needs next function virtualization */
+>              trace_vfio_add_ext_cap_dropped(vdev->vbasedev.name, cap_id, next);
+> @@ -1923,6 +1950,9 @@ static void vfio_add_ext_cap(VFIOPCIDevice *vdev)
+>              pcie_add_capability(pdev, cap_id, cap_ver, next, size);
+>          }
+>  
+> +        if (ret) {
+> +            goto out;
+> +        }
+>      }
+>  
+>      /* Cleanup chain head ID if necessary */
+> @@ -1930,8 +1960,9 @@ static void vfio_add_ext_cap(VFIOPCIDevice *vdev)
+>          pci_set_word(pdev->config + PCI_CONFIG_SPACE_SIZE, 0);
+>      }
+>  
+> +out:
+>      g_free(config);
+> -    return;
+> +    return ret;
+>  }
+>  
+>  static int vfio_add_capabilities(VFIOPCIDevice *vdev, Error **errp)
+> @@ -1949,8 +1980,8 @@ static int vfio_add_capabilities(VFIOPCIDevice *vdev, Error **errp)
+>          return ret;
+>      }
+>  
+> -    vfio_add_ext_cap(vdev);
+> -    return 0;
+> +    ret = vfio_add_ext_cap(vdev, errp);
+> +    return ret;
+
+return vfio_add_ext_cap(vdev, errp);
+
+>  }
+>  
+>  static void vfio_pci_pre_reset(VFIOPCIDevice *vdev)
+> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+> index a8366bb..34e8b04 100644
+> --- a/hw/vfio/pci.h
+> +++ b/hw/vfio/pci.h
+> @@ -15,6 +15,7 @@
+>  #include "qemu-common.h"
+>  #include "exec/memory.h"
+>  #include "hw/pci/pci.h"
+> +#include "hw/pci/pci_bridge.h"
+>  #include "hw/vfio/vfio-common.h"
+>  #include "qemu/event_notifier.h"
+>  #include "qemu/queue.h"
