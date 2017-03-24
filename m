@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1crT9m-00054c-4v
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:37:47 -0400
+	(envelope-from <armbru@redhat.com>) id 1crTGb-0006sd-1B
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:44:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1crT9i-0007vu-62
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:37:46 -0400
-Received: from mail.kernel.org ([198.145.29.136]:45734)
+	(envelope-from <armbru@redhat.com>) id 1crTGX-0001h6-RB
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:44:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57572)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1crT9h-0007vW-SD
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:37:42 -0400
-Date: Fri, 24 Mar 2017 10:37:36 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <3d94c0aa-6b18-5574-4034-110cc2cf4b90@suse.com>
-Message-ID: <alpine.DEB.2.10.1703241030391.8001@sstabellini-ThinkPad-X260>
-References: <alpine.DEB.2.10.1703201117560.23684@sstabellini-ThinkPad-X260>
-	<1490033952-26735-1-git-send-email-sstabellini@kernel.org>
-	<20170323140005.6b0853b3@bahia.lan>
-	<15207674-c5cd-3874-7ac9-5b23cdac8888@suse.com>
-	<28db5816-2ed9-0d92-a15d-af47b58a9da1@redhat.com>
-	<alpine.DEB.2.10.1703230953120.8001@sstabellini-ThinkPad-X260>
-	<3d94c0aa-6b18-5574-4034-110cc2cf4b90@suse.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v4 1/8] xen: import ring.h from xen
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1crTGX-0001gW-J2
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:44:45 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 84572635D9
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 17:44:45 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Fri, 24 Mar 2017 18:44:34 +0100
+Message-Id: <1490377482-13337-2-git-send-email-armbru@redhat.com>
+In-Reply-To: <1490377482-13337-1-git-send-email-armbru@redhat.com>
+References: <1490377482-13337-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC v2 1/9] rbd: Reject -blockdev
+ server.*.{numeric, to, ipv4, ipv6}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,76 +30,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juergen Gross <jgross@suse.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, Stefano Stabellini <stefano@aporeto.com>, anthony.perard@citrix.com, xen-devel <xen-devel@lists.xenproject.org>
+To: qemu-devel@nongnu.org
+Cc: jdurgin@redhat.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com
 
-On Fri, 24 Mar 2017, Juergen Gross wrote:
-> On 23/03/17 19:22, Stefano Stabellini wrote:
-> > On Thu, 23 Mar 2017, Paolo Bonzini wrote:
-> >> On 23/03/2017 14:55, Juergen Gross wrote:
-> >>> On 23/03/17 14:00, Greg Kurz wrote:
-> >>>> On Mon, 20 Mar 2017 11:19:05 -0700
-> >>>> Stefano Stabellini <sstabellini@kernel.org> wrote:
-> >>>>
-> >>>>> Do not use the ring.h header installed on the system. Instead, import
-> >>>>> the header into the QEMU codebase. This avoids problems when QEMU is
-> >>>>> built against a Xen version too old to provide all the ring macros.
-> >>>>>
-> >>>>> Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
-> >>>>> Reviewed-by: Greg Kurz <groug@kaod.org>
-> >>>>> CC: anthony.perard@citrix.com
-> >>>>> CC: jgross@suse.com
-> >>>>> ---
-> >>>>> NB: The new macros have not been committed to Xen yet. Do not apply this
-> >>>>> patch until they do.
-> >>>>> ---
-> >>>>
-> >>>> Looking at your other series for the kernel part of this feature:
-> >>>>
-> >>>> https://lkml.org/lkml/2017/3/22/761
-> >>>>
-> >>>> I realize that the ring.h header from Xen also exists in the kernel tree... 
-> >>>>
-> >>>> Shouldn't all the code that can be used in both kernel and userspace go to a
-> >>>> header file under include/uapi in the kernel tree ? And then we would import
-> >>>> it under include/standard-headers/linux in the QEMU tree and we could keep it
-> >>>> in sync using scripts/update-linux-headers.sh.
-> >>>>
-> >>>> Cc'ing Paolo for insights.
-> >>>
-> >>> As Xen isn't part of the kernel we don't want that. You can use and/or
-> >>> build qemu with xen-9pfs backend support on an old Linux kernel without
-> >>> the related frontend.
-> >>
-> >> As long as the header changes rarely, I guess it's fine not to go
-> >> through update-linux-headers.sh.
-> > 
-> > Very rarely, last time ring.h was changed was 2015, and to introduce a
-> > new macro (which we don't necessarily need in QEMU).
-> > 
-> > 
-> >>> OTOH I don't see the advantage of not using the headers from Xen. This
-> >>> is working for qdisk and pvusb backends and for all the Xen libraries.
-> >>> Do you expect the 9pfs backend to be used for a qemu version built
-> >>> against a Xen version not supporting that backend?
-> > 
-> > Yes, I think that is entirely possible: Xen and QEMU versions can mix
-> > and match.
-> > 
-> > Keeping in mind that the 9pfs backend has actually no build dependencies
-> > on Xen, except for these new ring.h macros, we have the following
-> > options:
-> > 
-> > 1) we build the 9pfs backend only for Xen >= 4.9, because of the new
-> >    macros in ring.h that we need
-> 
-> Right. You have sent 9pfs support patches for Xen tools. So obviously
-> you need a proper Xen version to use 9pfs. Why not build qemu against
-> it? Do you really expect a new Xen being used with an old qemu while
-> wanting to use new features? That makes no sense for me.
+We use InetSocketAddress in the QAPI schema.  However, the code
+doesn't use inet_connect_saddr(), but formats "host" and "port" into a
+configuration string for rados_conf_set().  Thus, members "numeric",
+"to", "ipv4" and "ipv6" are silently ignored.  Not nice.  Example:
+
+    -blockdev rbd,node-name=nn,pool=p,image=i,server.0.host=h0,server.0.port=12345,server.0.ipv4=off
+
+Factor a suitable InetSocketAddressBase out of InetSocketAddress, and
+use that.  "numeric", "to", "ipv4" and "ipv6" are now rejected.
+
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ qapi-schema.json     | 21 ++++++++++++++-------
+ qapi/block-core.json |  2 +-
+ 2 files changed, 15 insertions(+), 8 deletions(-)
+
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 68a4327..b921994 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -4051,19 +4051,27 @@
+   'data': [ 'all', 'rx', 'tx' ] }
  
-Tools support is needed to setup the frontend/backend connection as
-usual, but that's not a requirement for building the 9pfs backend. In
-fact, the backend doesn't need any tools support for it to work. The
-macro themselves are just a convenience - the backend would work just
-fine without them. Why restrict the QEMU build gratuitously?
+ ##
++# @InetSocketAddressBase:
++#
++# @host: host part of the address
++# @port: port part of the address
++##
++{ 'struct': 'InetSocketAddressBase',
++  'data': {
++    'host': 'str',
++    'port': 'str' } }
++
++##
+ # @InetSocketAddress:
+ #
+ # Captures a socket address or address range in the Internet namespace.
+ #
+-# @host: host part of the address
+-#
+-# @port: port part of the address, or lowest port if @to is present
+-#
+ # @numeric: true if the host/port are guaranteed to be numeric,
+ #           false if name resolution should be attempted. Defaults to false.
+ #           (Since 2.9)
+ #
+-# @to: highest port to try
++# @to: If present, this is range of possible addresses, with port
++#      between @port and @to.
+ #
+ # @ipv4: whether to accept IPv4 addresses, default try both IPv4 and IPv6
+ #
+@@ -4072,9 +4080,8 @@
+ # Since: 1.3
+ ##
+ { 'struct': 'InetSocketAddress',
++  'base': 'InetSocketAddressBase',
+   'data': {
+-    'host': 'str',
+-    'port': 'str',
+     '*numeric':  'bool',
+     '*to': 'uint16',
+     '*ipv4': 'bool',
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 0f132fc..5d2efe4 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2652,7 +2652,7 @@
+             '*conf': 'str',
+             '*snapshot': 'str',
+             '*user': 'str',
+-            '*server': ['InetSocketAddress'],
++            '*server': ['InetSocketAddressBase'],
+             '*auth-supported': ['RbdAuthMethod'],
+             '*password-secret': 'str' } }
+ 
+-- 
+2.7.4
