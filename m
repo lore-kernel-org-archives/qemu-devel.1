@@ -1,39 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1crPat-0007MN-Ld
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 09:49:37 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1crPcR-00081b-6N
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 09:51:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1crPas-0006qE-Rw
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 09:49:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39082)
+	(envelope-from <ehabkost@redhat.com>) id 1crPcO-0007bc-0S
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 09:51:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56991)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1crPas-0006pv-Iz
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 09:49:30 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 907A780463
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 13:49:30 +0000 (UTC)
-References: <1490266548-22500-1-git-send-email-armbru@redhat.com>
-	<1490266548-22500-5-git-send-email-armbru@redhat.com>
-	<fe5583dc-bbe7-3387-dea9-3f4b89d682a8@redhat.com>
-	<a438ce0a-3035-1b2e-0d16-296ee930ed35@redhat.com>
-	<e6621b99-a980-dc61-b267-590eb08923c0@redhat.com>
-	<59a3aed6-e1cf-a601-4369-1a7cd74500cc@redhat.com>
-	<20170324035537.GA22342@localhost.localdomain>
-	<87fui3yx0y.fsf@dusky.pond.sub.org>
-	<20170324124213.GC22342@localhost.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <89101331-9bba-fb6c-42a1-dfce7775fe4c@redhat.com>
-Date: Fri, 24 Mar 2017 08:49:20 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1crPcN-0007aR-Lr
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 09:51:03 -0400
+Date: Fri, 24 Mar 2017 10:50:57 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170324135057.GD28530@thinpad.lan.raisama.net>
+References: <20170323212848.8492-1-ehabkost@redhat.com>
+	<20170323212848.8492-2-ehabkost@redhat.com>
+	<0596af14-a95c-edbf-1441-2f1a39bdff99@suse.com>
+	<CAFEAcA8Wif2DshJ1YEbxBU4MMY3W0r2U036+4qqL8YzWAuNzJg@mail.gmail.com>
+	<2194e9a4-19f1-4a87-789e-f6353c6eb959@suse.com>
+	<20170324111020.GB28530@thinpad.lan.raisama.net>
+	<5b43c101-2dc8-0374-045f-6cc895bf10a9@suse.com>
 MIME-Version: 1.0
-In-Reply-To: <20170324124213.GC22342@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="PpiwWT0nxDCevd053itJ44BcD92XeXk7P"
-Subject: Re: [Qemu-devel] [PATCH for-2.9 4/5] rbd: Peel off redundant
- RbdAuthMethod wrapper struct
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5b43c101-2dc8-0374-045f-6cc895bf10a9@suse.com>
+Subject: Re: [Qemu-devel] [RFC 1/4] [UNTESTED] xen: Don't force
+ has_dynamic_sysbus on machine class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,74 +33,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: kwolf@redhat.com, jdurgin@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, dillaman@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>
+To: Juergen Gross <jgross@suse.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>, Thomas Huth <thuth@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Laszlo Ersek <lersek@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PpiwWT0nxDCevd053itJ44BcD92XeXk7P
-From: Eric Blake <eblake@redhat.com>
-To: Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: kwolf@redhat.com, jdurgin@redhat.com, qemu-devel@nongnu.org,
- mreitz@redhat.com, dillaman@redhat.com,
- "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <89101331-9bba-fb6c-42a1-dfce7775fe4c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9 4/5] rbd: Peel off redundant
- RbdAuthMethod wrapper struct
-References: <1490266548-22500-1-git-send-email-armbru@redhat.com>
- <1490266548-22500-5-git-send-email-armbru@redhat.com>
- <fe5583dc-bbe7-3387-dea9-3f4b89d682a8@redhat.com>
- <a438ce0a-3035-1b2e-0d16-296ee930ed35@redhat.com>
- <e6621b99-a980-dc61-b267-590eb08923c0@redhat.com>
- <59a3aed6-e1cf-a601-4369-1a7cd74500cc@redhat.com>
- <20170324035537.GA22342@localhost.localdomain>
- <87fui3yx0y.fsf@dusky.pond.sub.org>
- <20170324124213.GC22342@localhost.localdomain>
-In-Reply-To: <20170324124213.GC22342@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Mar 24, 2017 at 01:27:31PM +0100, Juergen Gross wrote:
+> On 24/03/17 12:10, Eduardo Habkost wrote:
+> > On Fri, Mar 24, 2017 at 11:24:31AM +0100, Juergen Gross wrote:
+> >> On 24/03/17 11:09, Peter Maydell wrote:
+> >>> On 24 March 2017 at 08:23, Juergen Gross <jgross@suse.com> wrote:
+> >>>> On 23/03/17 22:28, Eduardo Habkost wrote:
+> >>>>> The xen-backend devices created by the Xen code are not supposed
+> >>>>> to be treated as dynamic sysbus devices. This is an attempt to
+> >>>>> change that and see what happens, but I couldn't test it because
+> >>>>> I don't have a Xen host set up.
+> >>>>>
+> >>>>> If this patch breaks anything, this means we have a bug in
+> >>>>> foreach_dynamic_sysbus_device(), which is supposed to return only
+> >>>>> devices created using -device.
+> >>>>>
+> >>>>> The original code that sets has_dynamic_sysbus was added by
+> >>>>> commit 3a6c9172ac5951e6dac2b3f6cbce3cfccdec5894, but I don't see
+> >>>>> any comment explaining why it was necessary.
+> >>>>
+> >>>> xen-backend devices are created via qmp commands when attaching new
+> >>>> pv-devices to a domain. They can be dynamically removed, too. Setting
+> >>>> has_dynamic_sysbus was necessary to support this feature.
+> >>>
+> >>> This seems like it ought to be handled by marking the xen-backend
+> >>> devices as being ok-to-dynamically-create somehow, not by marking
+> >>> the machine as supporting dynamic-sysbus (which it doesn't).
+> >>> Maybe we don't have the necessary support code to do that though?
+> >>
+> >> When writing the patches I couldn't find a way to do it differently.
+> >> OTOH I'm not so deep in qemu internals I'd be able to add the needed
+> >> support.
+> >>
+> >> I'd be happy to test any patch, though.
+> > 
+> > If xen-backend devices are created via QMP commands, then
+> > has_dynamic_sysbus is (currently) really needed, although I would
+> > have preferred to set it on all x86 machines instead of changing
+> > MachineClass::has_dynamic_sysbus outside class_init.
+> > 
+> > But with the new whitelist implemented by this series, we could
+> > simply include xen-backend in the whitelist for the machines that
+> > can be used with Xen, and get rid of xen_set_dynamic_sysbus().
+> > 
+> > I assume plugging/unplugging xen-backend devices apply to both
+> > xen{pv,fv} and pc,accel=xen, right? Do we need to make it work
+> > with "-machine none,accel=xen" and "-machine isapc" too?
+> 
+> AFAIK -xenpv, -xenfv and -pc,accel=xen are the only machine types
+> to support. Wouldn't it make sense to do the whitelisting in
+> xen_be_register_common() in spite of setting has_dynamic_sysbus?
 
-On 03/24/2017 07:42 AM, Jeff Cody wrote:
+It would, but that would mean we would make the whitelisting
+mechanism more complex: in addition to the static
+per-machine-class whitelist, we would need a runtime whitelist.
 
-> Agree.  My preference is to leave it as an array of methods, so long as=
- that
-> is tenable to libvirt.
+This would make the interface for querying available/supported
+device types more complex and messier, and I would like to avoid
+that.
 
-The -drive syntax should remain unchanged (that's an absolute must for
-libvirt).  But the QMP syntax being an array of methods sounds best to
-me, and I think password-secret should be part of the array.  So my vote
-would be for:
-
-{ "driver": "rbd", "image": "foo",
-  "auth": [ { "type": "cephx", "password-secret": "sec0" },
-            { "type": "none" } ],
-  "pool": "bar" }
-
-It makes mapping -drive arguments into QMP form a bit trickier, but the
-QMP form is then easily extensible if we add another auth method down
-the road.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---PpiwWT0nxDCevd053itJ44BcD92XeXk7P
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY1SPgAAoJEKeha0olJ0Nqjy8H/3DkbDDaS0zTA54NelDqXJIY
-AAMd77PKyoLgXELkV9z0tmnyHIrnpxlAD3ObPlrYwc/HiXn1uVoUVGvp2yQLjZ/M
-HNDXq9QjCmftulWnendn4CEq9xVtGj6zTA7klkf6yiOQjcDP8F1JI61kwjAeXoqD
-zKSm+LJ9eZ+LIkVlI+QzlJpzF5aYaikahQyx+YSqpDkQNnVAVHW41hL7VFzaLwi4
-2Uy/yEynuwcZ2uWe3YepO4avVYug03K8li0T25M0N8LcPNg78OCWdfr0b3/wiswm
-TWZ9U9OS+UGqHAjsQF0Qj8Vt3parz8uEQxEnFcmm3DfOvPOINQm7mDa1R0YYIgs=
-=DwuI
------END PGP SIGNATURE-----
-
---PpiwWT0nxDCevd053itJ44BcD92XeXk7P--
+-- 
+Eduardo
