@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35155)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1crN8V-0004FU-BP
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 07:12:04 -0400
+	(envelope-from <quintela@redhat.com>) id 1crNAt-0005Mk-BN
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 07:14:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1crN8S-000648-53
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 07:12:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39742)
+	(envelope-from <quintela@redhat.com>) id 1crNAq-0006z4-6B
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 07:14:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48084)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1crN8R-00063v-Vb
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 07:12:00 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1crNAp-0006xU-U9
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 07:14:28 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1D09D3B717
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 11:12:00 +0000 (UTC)
-Date: Fri, 24 Mar 2017 11:11:54 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170324111154.GA16047@work-vm>
+	by mx1.redhat.com (Postfix) with ESMTPS id E52ACF622F
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 11:14:27 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170324105256.GI2901@work-vm> (David Alan Gilbert's message of
+	"Fri, 24 Mar 2017 10:52:56 +0000")
 References: <20170323204544.12015-1-quintela@redhat.com>
-	<20170323204544.12015-3-quintela@redhat.com>
+	<20170323204544.12015-36-quintela@redhat.com>
+	<20170324105256.GI2901@work-vm>
+Reply-To: quintela@redhat.com
+Date: Fri, 24 Mar 2017 12:14:25 +0100
+Message-ID: <87vaqz6i5q.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170323204544.12015-3-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 02/51] ram: rename block_name to rbname
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 35/51] ram: Add QEMUFile to RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,75 +35,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Cc: qemu-devel@nongnu.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> So all places are consisten on the nambing of a block name parameter.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Juan Quintela (quintela@redhat.com) wrote:
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> ---
+>>  migration/ram.c | 17 ++++++++++-------
+>>  1 file changed, 10 insertions(+), 7 deletions(-)
+>> 
+>> diff --git a/migration/ram.c b/migration/ram.c
+>> index c0d6841..7667e73 100644
+>> --- a/migration/ram.c
+>> +++ b/migration/ram.c
+>> @@ -165,6 +165,8 @@ struct RAMSrcPageRequest {
+>>  
+>>  /* State of RAM for migration */
+>>  struct RAMState {
+>> +    /* QEMUFile used for this migration */
+>> +    QEMUFile *f;
+>
+> Yes, I guess you're hoping that becomes 'for this RAMBlock' eventually?
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+For this ramblock or for this migration.  For some reason that I can't
+yet fully understand people continues asking about starting a new migration
+before the previous one has finished.  No, I haven't a good explanation
+for why that could be a good idea.
 
-> ---
->  migration/ram.c | 17 ++++++++---------
->  1 file changed, 8 insertions(+), 9 deletions(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 76f1fc4..21047c5 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -743,14 +743,14 @@ static int save_zero_page(QEMUFile *f, RAMBlock *block, ram_addr_t offset,
->      return pages;
->  }
->  
-> -static void ram_release_pages(MigrationState *ms, const char *block_name,
-> +static void ram_release_pages(MigrationState *ms, const char *rbname,
->                                uint64_t offset, int pages)
->  {
->      if (!migrate_release_ram() || !migration_in_postcopy(ms)) {
->          return;
->      }
->  
-> -    ram_discard_range(NULL, block_name, offset, pages << TARGET_PAGE_BITS);
-> +    ram_discard_range(NULL, rbname, offset, pages << TARGET_PAGE_BITS);
->  }
->  
->  /**
-> @@ -1942,25 +1942,24 @@ int ram_postcopy_send_discard_bitmap(MigrationState *ms)
->   * Returns zero on success
->   *
->   * @mis: current migration incoming state
-> - * @block_name: Name of the RAMBLock of the request. NULL means the
-> - *              same that last one.
-> + * @rbname: name of the RAMBLock of the request. NULL means the
-> + *          same that last one.
->   * @start: RAMBlock starting page
->   * @length: RAMBlock size
->   */
->  int ram_discard_range(MigrationIncomingState *mis,
-> -                      const char *block_name,
-> +                      const char *rbname,
->                        uint64_t start, size_t length)
->  {
->      int ret = -1;
->  
-> -    trace_ram_discard_range(block_name, start, length);
-> +    trace_ram_discard_range(rbname, start, length);
->  
->      rcu_read_lock();
-> -    RAMBlock *rb = qemu_ram_block_by_name(block_name);
-> +    RAMBlock *rb = qemu_ram_block_by_name(rbname);
->  
->      if (!rb) {
-> -        error_report("ram_discard_range: Failed to find block '%s'",
-> -                     block_name);
-> +        error_report("ram_discard_range: Failed to find block '%s'", rbname);
->          goto err;
->      }
->  
-> -- 
-> 2.9.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Later, Juan.
+
+>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>
+>>      /* Last block that we have visited searching for dirty pages */
+>>      RAMBlock *last_seen_block;
+>>      /* Last block from where we have sent data */
+>> @@ -524,14 +526,13 @@ static void xbzrle_cache_zero_page(RAMState *rs, ram_addr_t current_addr)
+>>   *          -1 means that xbzrle would be longer than normal
+>>   *
+>>   * @rs: current RAM state
+>> - * @f: QEMUFile where to send the data
+>>   * @current_data: contents of the page
+>>   * @current_addr: addr of the page
+>>   * @block: block that contains the page we want to send
+>>   * @offset: offset inside the block for the page
+>>   * @last_stage: if we are at the completion stage
+>>   */
+>> -static int save_xbzrle_page(RAMState *rs, QEMUFile *f, uint8_t **current_data,
+>> +static int save_xbzrle_page(RAMState *rs, uint8_t **current_data,
+>>                              ram_addr_t current_addr, RAMBlock *block,
+>>                              ram_addr_t offset, bool last_stage)
+>>  {
+>> @@ -582,10 +583,11 @@ static int save_xbzrle_page(RAMState *rs, QEMUFile *f, uint8_t **current_data,
+>>      }
+>>  
+>>      /* Send XBZRLE based compressed page */
+>> -    bytes_xbzrle = save_page_header(f, block, offset | RAM_SAVE_FLAG_XBZRLE);
+>> -    qemu_put_byte(f, ENCODING_FLAG_XBZRLE);
+>> -    qemu_put_be16(f, encoded_len);
+>> -    qemu_put_buffer(f, XBZRLE.encoded_buf, encoded_len);
+>> +    bytes_xbzrle = save_page_header(rs->f, block,
+>> +                                    offset | RAM_SAVE_FLAG_XBZRLE);
+>> +    qemu_put_byte(rs->f, ENCODING_FLAG_XBZRLE);
+>> +    qemu_put_be16(rs->f, encoded_len);
+>> +    qemu_put_buffer(rs->f, XBZRLE.encoded_buf, encoded_len);
+>>      bytes_xbzrle += encoded_len + 1 + 2;
+>>      rs->xbzrle_pages++;
+>>      rs->xbzrle_bytes += bytes_xbzrle;
+>> @@ -849,7 +851,7 @@ static int ram_save_page(RAMState *rs, MigrationState *ms, QEMUFile *f,
+>>              ram_release_pages(ms, block->idstr, pss->offset, pages);
+>>          } else if (!rs->ram_bulk_stage &&
+>>                     !migration_in_postcopy(ms) && migrate_use_xbzrle()) {
+>> -            pages = save_xbzrle_page(rs, f, &p, current_addr, block,
+>> +            pages = save_xbzrle_page(rs, &p, current_addr, block,
+>>                                       offset, last_stage);
+>>              if (!last_stage) {
+>>                  /* Can't send this cached data async, since the cache page
+>> @@ -2087,6 +2089,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
+>>              return -1;
+>>           }
+>>      }
+>> +    rs->f = f;
+>>  
+>>      rcu_read_lock();
+>>  
+>> -- 
+>> 2.9.3
+>> 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
