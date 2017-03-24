@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59100)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=249263d75=Paul.Durrant@citrix.com>)
-	id 1crSr6-0007Fd-Pz
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:18:29 -0400
+	id 1crSsq-0008BR-La
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:20:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=249263d75=Paul.Durrant@citrix.com>)
-	id 1crSr2-0001Zr-Fc
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:18:28 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:13687)
+	id 1crSsm-00028b-BC
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:20:16 -0400
+Received: from smtp02.citrix.com ([66.165.176.63]:5120)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=249263d75=Paul.Durrant@citrix.com>)
-	id 1crSr2-0001Ym-95
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:18:24 -0400
+	id 1crSsm-00028Q-40
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:20:12 -0400
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Fri, 24 Mar 2017 17:18:17 +0000
-Message-ID: <1490375897-1181-1-git-send-email-paul.durrant@citrix.com>
+Date: Fri, 24 Mar 2017 17:20:02 +0000
+Message-ID: <1490376002-1223-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] xen: limit pkg-config to PKG_CONFIG_PATH for
- xen libraries
+Subject: [Qemu-devel] [PATCH RESEND] xen: limit pkg-config to
+ PKG_CONFIG_PATH for xen libraries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,7 +27,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.com
+To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
 Cc: Paul Durrant <paul.durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Juergen Gross <jgross@suse.com>
 
 The Xen tools Makefile has been modified to set PKG_CONFIG_PATH such that
