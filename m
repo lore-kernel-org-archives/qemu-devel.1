@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1crQGP-0006ZT-Gv
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:32:31 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1crQY1-0001lO-38
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:50:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1crQGM-0000IO-8m
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:32:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37222)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1crQGM-0000IC-2C
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:32:22 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 18813624CD
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 14:32:22 +0000 (UTC)
-Date: Fri, 24 Mar 2017 15:32:18 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170324153218.05864a87@nial.brq.redhat.com>
-In-Reply-To: <20170323205025.12113-2-quintela@redhat.com>
-References: <20170323205025.12113-1-quintela@redhat.com>
-	<20170323205025.12113-2-quintela@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1crQXw-0000p6-KD
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:50:37 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:33241)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1crQXw-0000os-D3
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:50:32 -0400
+Received: by mail-wm0-x233.google.com with SMTP id v203so7971113wmg.0
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 07:50:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] migration: Disable hotplug/unplug
- during migration
+In-Reply-To: <20170324140854.28134-1-stefanha@redhat.com>
+References: <20170324140854.28134-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 24 Mar 2017 14:50:10 +0000
+Message-ID: <CAFEAcA9D1r+X9UALs8ctCj7QUWKifnOzY4CAdXW7YWLk2gO9FA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL for-2.9 0/3] Tracing patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,68 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, 23 Mar 2017 21:50:24 +0100
-Juan Quintela <quintela@redhat.com> wrote:
+On 24 March 2017 at 14:08, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> The following changes since commit 08329701199449bde497570dcfdb9c86062baf20:
+>
+>   qom: Fix regression with 'qom-type' (2017-03-23 17:59:40 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/stefanha/qemu.git tags/tracing-pull-request
+>
+> for you to fetch changes up to 0d3ef78829332f2fdc323d1b625b60fe9c89119c:
+>
+>   trace: Avoid abuse of amdvi_mmio_read (2017-03-24 09:21:42 +0000)
+>
+> ----------------------------------------------------------------
+>
+> ----------------------------------------------------------------
+>
+> Eric Blake (3):
+>   trace: Fix backwards mirror_yield parameters
+>   trace: Fix incorrect megasas trace parameters
+>   trace: Avoid abuse of amdvi_mmio_read
+>
+>  block/mirror.c       | 5 +++--
+>  hw/i386/amd_iommu.c  | 3 +--
+>  hw/scsi/megasas.c    | 6 +++---
+>  hw/i386/trace-events | 1 +
+>  4 files changed, 8 insertions(+), 7 deletions(-)
+>
 
-> Until we have reviewed what can/can't be hotplug during migration,
-> disable it.  We can enable it later for the things that we know that
-> work.  For instance, memory hotplug during postcopy don't work
-> currently.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  hw/core/qdev.c | 5 +++++
->  qdev-monitor.c | 7 ++++++-
->  2 files changed, 11 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 1e7fb33..8c4a3f3 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -277,6 +277,11 @@ void qdev_unplug(DeviceState *dev, Error **errp)
->      HotplugHandler *hotplug_ctrl;
->      HotplugHandlerClass *hdc;
->  
-> +    if (!migration_is_idle()) {
-> +        error_setg(errp, "device_add not allowed while migrating");
-s/device_add/device_del/
+Applied, thanks.
 
-
-I'd put this check after "if (!dc->hotpluggable)" block, so error
-message won't hide wrong upluggable device error cases
-
-> +        return;
-> +    }
-> +
->      if (dev->parent_bus && !qbus_is_hotpluggable(dev->parent_bus)) {
->          error_setg(errp, QERR_BUS_NO_HOTPLUG, dev->parent_bus->name);
->          return;
-> diff --git a/qdev-monitor.c b/qdev-monitor.c
-> index 5f2fcdf..e0622b4 100644
-> --- a/qdev-monitor.c
-> +++ b/qdev-monitor.c
-> @@ -29,7 +29,7 @@
->  #include "qemu/error-report.h"
->  #include "qemu/help_option.h"
->  #include "sysemu/block-backend.h"
-> -
-> +#include "migration/migration.h"
->  /*
->   * Aliases were a bad idea from the start.  Let's keep them
->   * from spreading further.
-> @@ -566,6 +566,11 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
->      BusState *bus = NULL;
->      Error *err = NULL;
->  
-> +    if (!migration_is_idle()) {
-> +        error_setg(errp, "device_add not allowed while migrating");
-> +        return NULL;
-> +    }
-the same here, do it right before "/* create device */"
-
->      driver = qemu_opt_get(opts, "driver");
->      if (!driver) {
->          error_setg(errp, QERR_MISSING_PARAMETER, "driver");
+-- PMM
