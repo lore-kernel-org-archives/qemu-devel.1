@@ -1,36 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43718)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1crJIK-00046d-NT
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 03:05:58 -0400
+	(envelope-from <jiahuanzhang90@gmail.com>) id 1crJa7-0006la-Kq
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 03:24:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1crJIH-0007Bh-Bv
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 03:05:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41070)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1crJIH-0007BU-0k
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 03:05:53 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 759EDC05490A
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 07:05:52 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <1490266548-22500-1-git-send-email-armbru@redhat.com>
-	<1490266548-22500-5-git-send-email-armbru@redhat.com>
-	<fe5583dc-bbe7-3387-dea9-3f4b89d682a8@redhat.com>
-	<a438ce0a-3035-1b2e-0d16-296ee930ed35@redhat.com>
-	<e6621b99-a980-dc61-b267-590eb08923c0@redhat.com>
-	<59a3aed6-e1cf-a601-4369-1a7cd74500cc@redhat.com>
-	<20170324035537.GA22342@localhost.localdomain>
-Date: Fri, 24 Mar 2017 08:05:49 +0100
-In-Reply-To: <20170324035537.GA22342@localhost.localdomain> (Jeff Cody's
-	message of "Thu, 23 Mar 2017 23:55:37 -0400")
-Message-ID: <87fui3yx0y.fsf@dusky.pond.sub.org>
+	(envelope-from <jiahuanzhang90@gmail.com>) id 1crJa6-0004qL-Ox
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 03:24:19 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:35936)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jiahuanzhang90@gmail.com>)
+	id 1crJa6-0004qD-Ju
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 03:24:18 -0400
+Received: by mail-qt0-x243.google.com with SMTP id n37so811449qtb.3
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 00:24:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-2.9 4/5] rbd: Peel off redundant
- RbdAuthMethod wrapper struct
+In-Reply-To: <d355d12a-9f37-b7ca-aab0-1fcd0d481a8f@redhat.com>
+References: <CAJy91CY1SOwi7D-kyU0ooe5SyhM414WaBCedXuPfXXhJpbo1fg@mail.gmail.com>
+	<CAJy91CZmqEUXLKjRJ0JdUEf83E3FwE_24qmej-4C8uAGQkTPWA@mail.gmail.com>
+	<CAFEAcA-mzO7vniDEaZeueVFQ7+MVBB7pnzHhahv2Yk_f3q0mJw@mail.gmail.com>
+	<CAJy91CZ4Ed-HGHLkzEc1dqQbo32d-eTE1S1ovO_ZwkDdTpkQXQ@mail.gmail.com>
+	<CAJy91CaCV40FgSP55qWZeZgkQ=2+E8Cr7xdbu9pn5HLEo+6JJQ@mail.gmail.com>
+	<CAJy91CYEwOVT7oEdYY=21__c2kcLTyxyjAaq7Zx4VnQdeLdQQQ@mail.gmail.com>
+	<CAFEAcA_t9iLude4Vu3Zc=_wcXMTtFb4Q4oJ8O+zLAJ9isAPqHQ@mail.gmail.com>
+	<1322109813.6444955.1490172025040.JavaMail.zimbra@redhat.com>
+	<CAJy91CaUxFHJeGLLW4DqK6sBwx2qDnE9s20ZbdT86JDn8yQoHg@mail.gmail.com>
+	<218df442-1a31-e969-32ef-01184fae84c0@redhat.com>
+	<CAJy91CbBV97RRKr=Rze5-eYrYAvnwiDZQ0oQZi33aKR1v-UXKg@mail.gmail.com>
+	<2d7a5a9a-8a7b-1bae-feb8-80fc4ee3048a@redhat.com>
+	<CAJy91CbcV3_jVg9PTD6unka6_M65rgkKDv0KsBK=YpVd=XKqvg@mail.gmail.com>
+	<ed9e6d65-ba93-d572-861a-46926a37d42a@redhat.com>
+	<CAJy91CYfOUZ+_TrN6-tLtWuPX-3_gRc7bfNa4anW0iM42i1FTg@mail.gmail.com>
+	<d355d12a-9f37-b7ca-aab0-1fcd0d481a8f@redhat.com>
+From: Jiahuan Zhang <jiahuanzhang90@gmail.com>
+Date: Fri, 24 Mar 2017 08:24:17 +0100
+Message-ID: <CAJy91Ca+=vJtXn6dV-awqz8xKHNyAnAw0MY91Fbr9yOE2-NNPw@mail.gmail.com>
+Content-Type: multipart/mixed; boundary=94eb2c12381cabfef2054b74e109
+Subject: Re: [Qemu-devel] Guest application reading from pl011 without
+ device driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,113 +44,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, kwolf@redhat.com, jdurgin@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, dillaman@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
 
-Adding Daniel Berrange for QCryptoSecret expertise.
+--94eb2c12381cabfef2054b74e109
+Content-Type: text/plain; charset=UTF-8
 
-Jeff Cody <jcody@redhat.com> writes:
+Hi, here are the patch files for char-pipe.c, char-win.c, char-win.h
 
-> On Thu, Mar 23, 2017 at 04:56:30PM -0500, Eric Blake wrote:
->> On 03/23/2017 04:43 PM, Eric Blake wrote:
->> 
->> > We'd still have to allow libvirt's use of
->> > ":key=...:auth_supported=cephx\\;none" on the command line, but from the
->> > QMP side, we would support exactly one auth method, and libvirt will be
->> > updated to match when it starts targetting blockdev-add instead of
->> > legacy command line.
->> > 
->> > If librados really needs 'cephx;none' any time cephx authorization is
->> > requested, then even though the QMP only requests 'cephx', we can still
->> > map it to 'cephx;none' in qemu - but I'm hoping that setting
->> > auth_supported=cephx rather than auth_supported=cephx;none on the
->> > librados side gives us what we (and libvirt) really want in the first place.
->> 
->> Or, if it becomes something that libvirt wants to allow users to tune in
->> their XML (right now, users don't get a choice, they get either 'none'
->> or 'cephx;none'), a forward-compatible solution under my QMP proposal
->> would be to have qemu add a third enum state, "none", "cephx", and
->> "cephx-no-fallback".
->> 
->> On the other hand, if supporting multiple methods at once makes sense
->> (say librados adds a 'cephy' method, and that users could legitimately
->> use both 'cephx;cephy' and 'cephy;cephx' with different behaviors), then
->> keeping auth as an array of instances of a simple flat union scales
->> nicer than having to add a combinatorial explosion of branches to the
->> flat union to cover every useful combination of auth_supported methods.
->> Maybe I'm overthinking it.
->> 
+
+On 23 March 2017 at 18:31, Paolo Bonzini <pbonzini@redhat.com> wrote:
+
 >
-> I spoke over email with Jason Dillaman (cc'ed), and this is what he told me
-> with regards to the authentication methods, and what cephx;none means:
 >
-> On Thu, Mar 23, 2017 at 06:04:30PM -0400, Jason Dillaman wrote:
->> It's saying that the client is willing to connect to a server that
->> uses cephx auth or a server that uses no auth. Looking at the code,
->> the "auth_supported" configuration key is actually deprecated and
->> "auth_client_required" should be used instead (which defaults to
->> 'cephx, none' already). Since it's been deprecated since v0.55 and if
->> you are cleaning things up, feel free to switch to the new one if
->> possible.
+> On 23/03/2017 18:28, Jiahuan Zhang wrote:
+> > Hi, the method doesn't work for pipe. It still causes the same issue.
+> > The only difference is that the first byte in the UART fifo can be read
+> > by the guest app.
+> > So now my guest app can immediately read 17bytes when the host is
+> > sending data continuously,
+> > then guest app is unable to read.
+> >
+> > Now there is a solution-to-be. Set the qemu pipe chardev to wait for 1
+> > millisecond before do a next ReadFile(),
+> > then the pl011 can deliver the complete large data by the 16-byte fifo
+> > continuously to the guest app.
+> >
+> > Is it rational? Or is this host -CPU-dependent?
 >
-> So from what Jason is saying, it seems like the conclusion we reached over
-> IRC is correct: it will attempt cephx but also fallback to no auth.
-
-So the client offers the server a list of authentication methods with
-credentials, and the server picks one it likes.  Makes sense to me.
-
-Inluding "none" in the default less so, but that's of no concern to the
-QMP interface, so let's ignore it for now.
-
-> Also, since the preferred auth option may be named different depending on
-> ceph versions, I know think we probably should not tie the QAPI parameter to
-> the name of the older deprecated option.
-
-Yes.
-
-> I suggest that the 'auth_supported' parameter for QAPI be renamed to
-> 'auth_method'.  If you don't like the array and the flexibility it provides
-> at the cost of complexity, I think a flat enum consisting of 3 values like
-> you mentioned is reasonable.  Since the QAPI does not need to map to the
-> legacy commandline used by libvirt, I would suggest maybe naming them
-> slightly different, though: any, none, strict
+> Post the patch, maybe you have a bug.
 >
-> For 2.9, they could each map to 'auth_supported' like so:
->     
->     any:     "cephx;none"
->     none:    "none"
->     strict:  "cephx"
+> Paolo
 >
-> For 2.10, we could try to discover if 'auth_client_required' is supported or
-> not, and use either it or 'auth_supported' as appropriate (with the same
-> mappings as above).
->
-> The reason I like "any" and "strict", is it gives consistent meanings to
-> options even if new auth methods are introduced.  For a hypothetical "cephy"
-> method example:
->
->     any:     "cephy;cephx;none"
->     none:    "none"
->     strict:  "cephy;cephx"
 
-Two years later, an unfixable cryptograhic weakness in cephx is
-discovered.  Some users really, really want to select only "cephy", but
-they can't.  We react by pushing out a QEMU update adding method
-"stricter", which expands into "cephy".  Libvirt then reacts and pushes
-out an update.  And so forth, up the stack.  Many moons later, users can
-actually select "cephy".  Thanks, but no thanks.
+--94eb2c12381cabfef2054b74e109
+Content-Type: application/octet-stream; name="char-pipe.patch"
+Content-Disposition: attachment; filename="char-pipe.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_j0ni33l50
 
-I think we should expose the current, recommended way to configure
-authentication, in a form that is suitable for QAPI/QMP, i.e. structured
-data as JSON objects, not strings you need to parse.
+LS0tIGNoYXItcGlwZS5jCTIwMTctMDMtMjQgMDg6MDg6MTMuOTk5MjM3MDAwICswMTAwCisrKyBj
+aGFyLXBpcGVfbmV3LmMJMjAxNy0wMy0yNCAwODoxNzowMC41ODA3NjkxMDAgKzAxMDAKQEAgLTM1
+LDYgKzM1LDY3IEBACiAjZGVmaW5lIE1BWENPTk5FQ1QgMQ0KICNkZWZpbmUgTlRJTUVPVVQgNTAw
+MA0KIA0KK3N0YXRpYyBEV09SRCBXSU5BUEkgd2luX2Nocl9waXBlX3RocmVhZChMUFZPSUQgcGFy
+YW0pDQorew0KKyAgICAvL0NoYXJkZXYgKmNociA9IENIQVJERVYocGFyYW0pOw0KKyAgICBXaW5D
+aGFyZGV2ICpzID0gV0lOX0NIQVJERVYocGFyYW0pOw0KKyAgICBEV09SRCBzaXplOw0KKw0KKyAg
+ICBpbnQgcmV0Ow0KKw0KKyAgICBaZXJvTWVtb3J5KCZzLT5vcmVjdiwgc2l6ZW9mKHMtPm9yZWN2
+KSk7DQorICAgIHMtPm9yZWN2LmhFdmVudCA9IHMtPmhyZWN2Ow0KKwl3aGlsZSAoMSkgew0KKw0K
+KwkJUGVla05hbWVkUGlwZShzLT5oY29tLCBOVUxMLCAwLCBOVUxMLCAmc2l6ZSwgTlVMTCk7DQor
+CQlpZiAoc2l6ZT4wKSB7DQorCQkJCS8vIFdhaXQgZm9yIG9uZSBieXRlDQorCQkgICAgU2xlZXAo
+MSk7DQorCQkJcmV0ID0gUmVhZEZpbGUocy0+aGNvbSwgJnMtPndpbl9waXBlX2J1ZiwgMSwgJnNp
+emUsICZzLT5vcmVjdik7DQorCQkJcHJpbnRmKCIJCQklcyBidWYgPSAlYyBzaXplID0gJWx1XG4i
+LCBfX2Z1bmNfXywgcy0+d2luX3BpcGVfYnVmLCBzaXplKTsNCisNCisJCQlpZiAoIXJldCkgew0K
+KwkJCQlicmVhazsNCisJCQl9DQorCQkJaWYgKCFzaXplKSB7DQorCQkJCWJyZWFrOw0KKwkJCX0N
+CisNCisJCQkvLyBTb21lIHRlcm1pbmFsIGVtdWxhdG9yIHJldHVybnMgXHJcbiBmb3IgRW50ZXIs
+IGp1c3QgcGFzcyBcbg0KKwkJCWlmIChzLT53aW5fcGlwZV9idWYgPT0gJ1xyJykgew0KKwkJCQkg
+Y29udGludWU7DQorCQkJfQ0KKw0KKwkJCS8vIFNpZ25hbCB0aGUgbWFpbiB0aHJlYWQgYW5kIHdh
+aXQgdW50aWwgdGhlIGJ5dGUgd2FzIGVhdGVuDQorCQkJaWYgKCFTZXRFdmVudChzLT5ocGlwZUlu
+cHV0UmVhZHlFdmVudCkpIHsNCisJCQkJIGJyZWFrOw0KKwkJCX0NCisJCQlwcmludGYoIgkJCSVz
+IHRoZSBtYWluIHRocmVhZCBpcyBzaWduYWxlZFxuIiwgX19mdW5jX18pOw0KKwkJCWlmIChXYWl0
+Rm9yU2luZ2xlT2JqZWN0KHMtPmhwaXBlSW5wdXREb25lRXZlbnQsIElORklOSVRFKSAhPSBXQUlU
+X09CSkVDVF8wKSB7DQorCQkJCSBicmVhazsNCisJCQl9DQorCQkJcHJpbnRmKCIJCQklcyB0aGUg
+Ynl0ZSB3YXMgZWF0ZW5cbiIsIF9fZnVuY19fKTsNCisJCX0NCisJfQ0KKyAgICBxZW11X2RlbF93
+YWl0X29iamVjdChzLT5ocGlwZUlucHV0UmVhZHlFdmVudCwgTlVMTCwgTlVMTCk7DQorICAgIHJl
+dHVybiAwOw0KK30NCisNCitzdGF0aWMgdm9pZCB3aW5fcGlwZV90aHJlYWRfd2FpdF9mdW5jKHZv
+aWQgKm9wYXF1ZSkNCit7DQorICAgIENoYXJkZXYgKmNociA9IENIQVJERVYob3BhcXVlKTsNCisg
+ICAgV2luQ2hhcmRldiAqcyA9IFdJTl9DSEFSREVWKG9wYXF1ZSk7DQorDQorCWlmIChxZW11X2No
+cl9iZV9jYW5fd3JpdGUoY2hyKSkgew0KKwkJcWVtdV9jaHJfYmVfd3JpdGUoY2hyLCAmcy0+d2lu
+X3BpcGVfYnVmLCAxKTsNCisJCXByaW50ZigiCQkJJXMsIHMtPndpbl9waXBlX2J1ZiA9ICV4XG4i
+LF9fZnVuY19fLCBzLT53aW5fcGlwZV9idWYpOw0KKwkJU2V0RXZlbnQocy0+aHBpcGVJbnB1dERv
+bmVFdmVudCk7IC8vZm9yY2UgdGhlIGJ5dGUgaXMgZWF0ZW4gYnkgdGhlIGZpZm8NCisJCXByaW50
+ZigiCQkJJXMgdGhlIGlucHV0IHRocmVhZCBpcyBzaWduYWxlZFxuIiwgX19mdW5jX18pOw0KKwl9
+DQorDQorICAgLy8gU2V0RXZlbnQocy0+aHBpcGVJbnB1dERvbmVFdmVudCk7DQorCS8vcHJpbnRm
+KCIJCQklcyB0aGUgaW5wdXQgdGhyZWFkIGlzIHNpZ25hbGVkXG4iLCBfX2Z1bmNfXyk7DQorfQ0K
+IHN0YXRpYyBpbnQgd2luX2Nocl9waXBlX2luaXQoQ2hhcmRldiAqY2hyLCBjb25zdCBjaGFyICpm
+aWxlbmFtZSwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEVycm9yICoqZXJycCkNCiB7
+DQpAQCAtOTQsOCArMTU1LDM4IEBACiAgICAgICAgIG92LmhFdmVudCA9IE5VTEw7DQogICAgIH0N
+CiANCi0gICAgcWVtdV9hZGRfcG9sbGluZ19jYih3aW5fY2hyX3BpcGVfcG9sbCwgY2hyKTsNCi0g
+ICAgcmV0dXJuIDA7DQorICAgICAvLyBmb3IgaW50ZXJsb2NraW5nDQorICAgIERXT1JEICAgZHdJ
+ZDsNCisNCisNCisgICAgcy0+aHBpcGVJbnB1dFJlYWR5RXZlbnQgPSBDcmVhdGVFdmVudChOVUxM
+LCBGQUxTRSwgRkFMU0UsIE5VTEwpOw0KKyAgICBzLT5ocGlwZUlucHV0RG9uZUV2ZW50ICA9IENy
+ZWF0ZUV2ZW50KE5VTEwsIEZBTFNFLCBGQUxTRSwgTlVMTCk7DQorICAgIGlmIChzLT5ocGlwZUlu
+cHV0UmVhZHlFdmVudCA9PSBJTlZBTElEX0hBTkRMRV9WQUxVRQ0KKyAgICAgICAgfHwgcy0+aHBp
+cGVJbnB1dERvbmVFdmVudCA9PSBJTlZBTElEX0hBTkRMRV9WQUxVRSkgew0KKyAgICAgICAgZXJy
+b3Jfc2V0ZyhlcnJwLCAiY2Fubm90IGNyZWF0ZSBldmVudCIpOw0KKyAgICAgICAgZ290byBlcnIy
+Ow0KKyAgICB9DQorDQorICAgIGlmIChxZW11X2FkZF93YWl0X29iamVjdChzLT5ocGlwZUlucHV0
+UmVhZHlFdmVudCwgd2luX3BpcGVfdGhyZWFkX3dhaXRfZnVuYywgY2hyKSkgew0KKyAgICAgICAg
+ZXJyb3Jfc2V0ZyhlcnJwLCAicWVtdV9hZGRfd2FpdF9vYmplY3Q6IGZhaWxlZCIpOw0KKyAgICAg
+ICAgZ290byBlcnIyOw0KKyAgICB9DQorDQorICAgIHMtPmhwaXBlSW5wdXRUaHJlYWQgPSBDcmVh
+dGVUaHJlYWQoTlVMTCwgMCwgd2luX2Nocl9waXBlX3RocmVhZCwgY2hyLCAwLCAmZHdJZCk7DQor
+ICAgIGlmIChzLT5ocGlwZUlucHV0VGhyZWFkID09IElOVkFMSURfSEFORExFX1ZBTFVFKSB7DQor
+ICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJjYW5ub3QgY3JlYXRlIHN0ZGlvIHRocmVhZCIpOw0K
+KyAgICAgICAgZ290byBlcnIzOw0KKyAgICB9DQorDQorICAgICByZXR1cm4gMDsNCisNCitlcnIz
+Og0KKyAgICBxZW11X2RlbF93YWl0X29iamVjdChzLT5ocGlwZUlucHV0UmVhZHlFdmVudCwgTlVM
+TCwgTlVMTCk7DQorICAgIHJldHVybiAtMTsNCitlcnIyOg0KKyAgICBDbG9zZUhhbmRsZShzLT5o
+cGlwZUlucHV0UmVhZHlFdmVudCk7DQorICAgIENsb3NlSGFuZGxlKHMtPmhwaXBlSW5wdXREb25l
+RXZlbnQpOw0KKyAgICByZXR1cm4gLTE7DQogDQogIGZhaWw6DQogICAgIHJldHVybiAtMTsNCg==
+--94eb2c12381cabfef2054b74e109
+Content-Type: application/octet-stream; name="char-win.h.patch"
+Content-Disposition: attachment; filename="char-win.h.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_j0ni3e201
 
-If a future authentication method might need something else than a
-QCryptoSecret object, we need to take Eric's proposal and make this an
-array of unions, where the union tag is the method, and the variant
-members supply whatever data the method needs (none: nothing, cephx: a
-QCryptoSecret).  Member @password-secret goes away.
+LS0tIGNoYXItd2luLmgJMjAxNy0wMy0yMiAxNDo1NTowNC43MTMxNjMwMDAgKzAxMDAKKysrIGNo
+YXItd2luX25ldy5oCTIwMTctMDMtMjQgMDg6MjA6MjMuOTM0NzY5MTAwICswMTAwCkBAIC0zOCw2
+ICszOCwxMSBAQAogICAgIE9WRVJMQVBQRUQgb3NlbmQ7DQogICAgIC8qIEZJWE1FOiBmaWxlL2Nv
+bnNvbGUgZG8gbm90IGZpbmFsaXplICovDQogICAgIGJvb2wgc2tpcF9mcmVlOw0KKwkvL2ZvciBp
+bnRlcmxvY2tpbmcNCisgICAgdWludDhfdCB3aW5fcGlwZV9idWY7DQorICAgIEhBTkRMRSAgaHBp
+cGVJbnB1dFJlYWR5RXZlbnQ7DQorICAgIEhBTkRMRSAgaHBpcGVJbnB1dERvbmVFdmVudDsNCisg
+ICAgSEFORExFICBocGlwZUlucHV0VGhyZWFkOw0KIH0gV2luQ2hhcmRldjsNCiANCiAjZGVmaW5l
+IE5TRU5EQlVGIDIwNDgNCg==
+--94eb2c12381cabfef2054b74e109
+Content-Type: application/octet-stream; name="char-win.patch"
+Content-Disposition: attachment; filename="char-win.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_j0ni3i8z2
 
-Else, we can make it an array of methods, and keep member
-@password-secret.
-
-We need to decide quickly to keep rbd fully supported in 2.9.
+LS0tIGNoYXItd2luLmMJMjAxNy0wMy0yNCAwODowOToyOC4wNzA3MjY1MDAgKzAxMDAKKysrIGNo
+YXItd2luX25ldy5jCTIwMTctMDMtMjQgMDg6MTg6NTMuMzA4NzY5MTAwICswMTAwCkBAIC0yMjYs
+MTAgKzIyNiwxNCBAQAogICAgIGlmIChzLT5oY29tKSB7DQogICAgICAgICBDbG9zZUhhbmRsZShz
+LT5oY29tKTsNCiAgICAgfQ0KLSAgICBpZiAocy0+ZnBpcGUpIHsNCi0gICAgICAgIHFlbXVfZGVs
+X3BvbGxpbmdfY2Iod2luX2Nocl9waXBlX3BvbGwsIGNocik7DQotICAgIH0gZWxzZSB7DQotICAg
+ICAgICBxZW11X2RlbF9wb2xsaW5nX2NiKHdpbl9jaHJfcG9sbCwgY2hyKTsNCisJaWYgKHMtPmhw
+aXBlSW5wdXRSZWFkeUV2ZW50ICE9IElOVkFMSURfSEFORExFX1ZBTFVFKSB7DQorICAgICAgICBD
+bG9zZUhhbmRsZShzLT5ocGlwZUlucHV0UmVhZHlFdmVudCk7DQorICAgIH0NCisgICAgaWYgKHMt
+PmhwaXBlSW5wdXREb25lRXZlbnQgIT0gSU5WQUxJRF9IQU5ETEVfVkFMVUUpIHsNCisgICAgICAg
+IENsb3NlSGFuZGxlKHMtPmhwaXBlSW5wdXREb25lRXZlbnQpOw0KKyAgICB9DQorICAgIGlmIChz
+LT5ocGlwZUlucHV0VGhyZWFkICE9IElOVkFMSURfSEFORExFX1ZBTFVFKSB7DQorICAgICAgICBU
+ZXJtaW5hdGVUaHJlYWQocy0+aHBpcGVJbnB1dFRocmVhZCwgMCk7DQogICAgIH0NCiANCiAgICAg
+cWVtdV9jaHJfYmVfZXZlbnQoY2hyLCBDSFJfRVZFTlRfQ0xPU0VEKTsNCg==
+--94eb2c12381cabfef2054b74e109--
