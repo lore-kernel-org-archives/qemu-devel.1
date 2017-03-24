@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1crR6a-0004mL-KV
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:26:21 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1crR7T-0005MR-UQ
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:27:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1crR6W-0000qy-NA
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:26:20 -0400
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:35851)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1crR6W-0000qk-Gg
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:26:16 -0400
-Received: by mail-wm0-x230.google.com with SMTP id n11so15832037wma.1
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 08:26:16 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 24 Mar 2017 15:26:07 +0000
-Message-Id: <20170324152607.6604-1-alex.bennee@linaro.org>
+	(envelope-from <dgilbert@redhat.com>) id 1crR7S-0001Ah-Mu
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:27:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52360)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1crR7S-0001AA-Eq
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:27:14 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3AC0280514
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 15:27:14 +0000 (UTC)
+Date: Fri, 24 Mar 2017 15:27:09 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170324152708.GD19076@work-vm>
+References: <20170323204544.12015-1-quintela@redhat.com>
+	<20170323204544.12015-39-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH-for-2.9] replay/replay.c: bump REPLAY_VERSION
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170323204544.12015-39-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 38/51] migration: Remove MigrationState
+ from migration_in_postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +34,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pavel.dovgaluk@ispras.ru
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-A previous commit (3d4d16f4) added support for audio record/playback.
-However this breaks the logfile ABI due to the re-ordering of the
-ReplayEvents enum. The REPLAY_VERSION check is meant to prevent you
-from using old log files in newer QEMUs but this is currently broken.
+* Juan Quintela (quintela@redhat.com) wrote:
+> We need to call for the migrate_get_current() in more that half of the
+> uses, so call that inside.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- replay/replay.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-diff --git a/replay/replay.c b/replay/replay.c
-index 78e2a7e570..9e0724e756 100644
---- a/replay/replay.c
-+++ b/replay/replay.c
-@@ -22,7 +22,7 @@
- 
- /* Current version of the replay mechanism.
-    Increase it when file format changes. */
--#define REPLAY_VERSION              0xe02005
-+#define REPLAY_VERSION              0xe02006
- /* Size of replay log header */
- #define HEADER_SIZE                 (sizeof(uint32_t) + sizeof(uint64_t))
- 
--- 
-2.11.0
+> ---
+>  include/migration/migration.h |  2 +-
+>  migration/migration.c         |  6 ++++--
+>  migration/ram.c               | 22 ++++++++++------------
+>  migration/savevm.c            |  4 ++--
+>  4 files changed, 17 insertions(+), 17 deletions(-)
+> 
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index e88bbaf..90849a5 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -238,7 +238,7 @@ bool migration_is_idle(MigrationState *s);
+>  bool migration_has_finished(MigrationState *);
+>  bool migration_has_failed(MigrationState *);
+>  /* True if outgoing migration has entered postcopy phase */
+> -bool migration_in_postcopy(MigrationState *);
+> +bool migration_in_postcopy(void);
+>  /* ...and after the device transmission */
+>  bool migration_in_postcopy_after_devices(MigrationState *);
+>  MigrationState *migrate_get_current(void);
+> diff --git a/migration/migration.c b/migration/migration.c
+> index ad4ea03..3f99ab3 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1054,14 +1054,16 @@ bool migration_has_failed(MigrationState *s)
+>              s->state == MIGRATION_STATUS_FAILED);
+>  }
+>  
+> -bool migration_in_postcopy(MigrationState *s)
+> +bool migration_in_postcopy(void)
+>  {
+> +    MigrationState *s = migrate_get_current();
+> +
+>      return (s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE);
+>  }
+>  
+>  bool migration_in_postcopy_after_devices(MigrationState *s)
+>  {
+> -    return migration_in_postcopy(s) && s->postcopy_after_devices;
+> +    return migration_in_postcopy() && s->postcopy_after_devices;
+>  }
+>  
+>  bool migration_is_idle(MigrationState *s)
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 591cf89..cb5f06f 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -778,10 +778,9 @@ static int save_zero_page(RAMState *rs, RAMBlock *block, ram_addr_t offset,
+>      return pages;
+>  }
+>  
+> -static void ram_release_pages(MigrationState *ms, const char *rbname,
+> -                              uint64_t offset, int pages)
+> +static void ram_release_pages(const char *rbname, uint64_t offset, int pages)
+>  {
+> -    if (!migrate_release_ram() || !migration_in_postcopy(ms)) {
+> +    if (!migrate_release_ram() || !migration_in_postcopy()) {
+>          return;
+>      }
+>  
+> @@ -847,9 +846,9 @@ static int ram_save_page(RAMState *rs, MigrationState *ms,
+>               * page would be stale
+>               */
+>              xbzrle_cache_zero_page(rs, current_addr);
+> -            ram_release_pages(ms, block->idstr, pss->offset, pages);
+> +            ram_release_pages(block->idstr, pss->offset, pages);
+>          } else if (!rs->ram_bulk_stage &&
+> -                   !migration_in_postcopy(ms) && migrate_use_xbzrle()) {
+> +                   !migration_in_postcopy() && migrate_use_xbzrle()) {
+>              pages = save_xbzrle_page(rs, &p, current_addr, block,
+>                                       offset, last_stage);
+>              if (!last_stage) {
+> @@ -868,7 +867,7 @@ static int ram_save_page(RAMState *rs, MigrationState *ms,
+>          if (send_async) {
+>              qemu_put_buffer_async(rs->f, p, TARGET_PAGE_SIZE,
+>                                    migrate_release_ram() &
+> -                                  migration_in_postcopy(ms));
+> +                                  migration_in_postcopy());
+>          } else {
+>              qemu_put_buffer(rs->f, p, TARGET_PAGE_SIZE);
+>          }
+> @@ -898,8 +897,7 @@ static int do_compress_ram_page(QEMUFile *f, RAMBlock *block,
+>          error_report("compressed data failed!");
+>      } else {
+>          bytes_sent += blen;
+> -        ram_release_pages(migrate_get_current(), block->idstr,
+> -                          offset & TARGET_PAGE_MASK, 1);
+> +        ram_release_pages(block->idstr, offset & TARGET_PAGE_MASK, 1);
+>      }
+>  
+>      return bytes_sent;
+> @@ -1035,7 +1033,7 @@ static int ram_save_compressed_page(RAMState *rs, MigrationState *ms,
+>                  }
+>              }
+>              if (pages > 0) {
+> -                ram_release_pages(ms, block->idstr, pss->offset, pages);
+> +                ram_release_pages(block->idstr, pss->offset, pages);
+>              }
+>          } else {
+>              offset |= RAM_SAVE_FLAG_CONTINUE;
+> @@ -1043,7 +1041,7 @@ static int ram_save_compressed_page(RAMState *rs, MigrationState *ms,
+>              if (pages == -1) {
+>                  pages = compress_page_with_multi_thread(rs, block, offset);
+>              } else {
+> -                ram_release_pages(ms, block->idstr, pss->offset, pages);
+> +                ram_release_pages(block->idstr, pss->offset, pages);
+>              }
+>          }
+>      }
+> @@ -2194,7 +2192,7 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
+>  
+>      rcu_read_lock();
+>  
+> -    if (!migration_in_postcopy(migrate_get_current())) {
+> +    if (!migration_in_postcopy()) {
+>          migration_bitmap_sync(rs);
+>      }
+>  
+> @@ -2232,7 +2230,7 @@ static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
+>  
+>      remaining_size = rs->migration_dirty_pages * TARGET_PAGE_SIZE;
+>  
+> -    if (!migration_in_postcopy(migrate_get_current()) &&
+> +    if (!migration_in_postcopy() &&
+>          remaining_size < max_size) {
+>          qemu_mutex_lock_iothread();
+>          rcu_read_lock();
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 3b19a4a..853a81a 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1062,7 +1062,7 @@ int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy)
+>  static bool should_send_vmdesc(void)
+>  {
+>      MachineState *machine = MACHINE(qdev_get_machine());
+> -    bool in_postcopy = migration_in_postcopy(migrate_get_current());
+> +    bool in_postcopy = migration_in_postcopy();
+>      return !machine->suppress_vmdesc && !in_postcopy;
+>  }
+>  
+> @@ -1111,7 +1111,7 @@ void qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only)
+>      int vmdesc_len;
+>      SaveStateEntry *se;
+>      int ret;
+> -    bool in_postcopy = migration_in_postcopy(migrate_get_current());
+> +    bool in_postcopy = migration_in_postcopy();
+>  
+>      trace_savevm_state_complete_precopy();
+>  
+> -- 
+> 2.9.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
