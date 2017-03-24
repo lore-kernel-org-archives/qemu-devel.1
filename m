@@ -1,41 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=249263d75=Paul.Durrant@citrix.com>)
-	id 1crRa1-0006UE-5C
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:56:46 -0400
+	(envelope-from <anthony.xu@intel.com>) id 1crS4x-0007qC-CU
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 12:28:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=249263d75=Paul.Durrant@citrix.com>)
-	id 1crRZy-0005J0-1i
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:56:45 -0400
-Received: from smtp.eu.citrix.com ([185.25.65.24]:45319)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=249263d75=Paul.Durrant@citrix.com>)
-	id 1crRZx-0005IY-N8
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:56:42 -0400
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Fri, 24 Mar 2017 15:56:39 +0000
-Message-ID: <3cf6b98d251e462d96ffc0e996fab6a9@AMSPEX02CL03.citrite.net>
-References: <20170316141953.16161-1-jgross@suse.com>
-	<20170316141953.16161-3-jgross@suse.com>
-	<alpine.DEB.2.10.1703161306380.15430@sstabellini-ThinkPad-X260>
-	<214bc24d-1c0c-16d6-9c33-e20962b150d2@suse.com>
-	<alpine.DEB.2.10.1703171123520.22036@sstabellini-ThinkPad-X260>
-	<da852b5f-2490-c483-984d-c7be4f83b9a7@suse.com>
-	<alpine.DEB.2.10.1703211152240.11679@sstabellini-ThinkPad-X260>
-	<f1f79b77-f3bf-4bb0-135c-802bd5829de5@suse.com>
-	<alpine.DEB.2.10.1703221120530.13499@sstabellini-ThinkPad-X260>
-	<2fb1da9d14c14eb4826a87657f7d0eb1@AMSPEX02CL03.citrite.net>
-	<550ea61e-c9ba-5afc-12b5-438a2a57af6e@suse.com>
-	<7208ddd9b76b4196be0a3d3cd12aee71@AMSPEX02CL03.citrite.net>
-	<20f2b3ce-218b-4d61-6af1-8c70b751ed18@suse.com>
-	<0103d60e-cd96-ab48-70fb-f75ba1273f39@suse.com>
-In-Reply-To: <0103d60e-cd96-ab48-70fb-f75ba1273f39@suse.com>
+	(envelope-from <anthony.xu@intel.com>) id 1crS4t-0007wD-F8
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 12:28:43 -0400
+Received: from mga11.intel.com ([192.55.52.93]:37707)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
+	id 1crS4t-0007vg-28
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 12:28:39 -0400
+From: "Xu, Anthony" <anthony.xu@intel.com>
+Date: Fri, 24 Mar 2017 16:28:32 +0000
+Message-ID: <4712D8F4B26E034E80552F30A67BE0B1A3D97E@ORSMSX112.amr.corp.intel.com>
 Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH 2/2] configure: use pkg-config
- for obtaining xen version
+Subject: [Qemu-devel]  [PATCH] Create libqemutrace.a for all trace.o
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,146 +26,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Juergen Gross' <jgross@suse.com>, 'Stefano Stabellini' <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kraxel@redhat.com" <kraxel@redhat.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Daniel Berrange <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBKdWVyZ2VuIEdyb3NzIFttYWls
-dG86amdyb3NzQHN1c2UuY29tXQ0KPiBTZW50OiAyNCBNYXJjaCAyMDE3IDE1OjU1DQo+IFRvOiBQ
-YXVsIER1cnJhbnQgPFBhdWwuRHVycmFudEBjaXRyaXguY29tPjsgJ1N0ZWZhbm8gU3RhYmVsbGlu
-aScNCj4gPHNzdGFiZWxsaW5pQGtlcm5lbC5vcmc+DQo+IENjOiBBbnRob255IFBlcmFyZCA8YW50
-aG9ueS5wZXJhcmRAY2l0cml4LmNvbT47IHhlbi0NCj4gZGV2ZWxAbGlzdHMueGVucHJvamVjdC5v
-cmc7IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsga3JheGVsQHJlZGhhdC5jb20NCj4gU3ViamVjdDog
-UmU6IFtYZW4tZGV2ZWxdIFtQQVRDSCAyLzJdIGNvbmZpZ3VyZTogdXNlIHBrZy1jb25maWcgZm9y
-IG9idGFpbmluZw0KPiB4ZW4gdmVyc2lvbg0KPiANCj4gT24gMjQvMDMvMTcgMTY6NTEsIEp1ZXJn
-ZW4gR3Jvc3Mgd3JvdGU6DQo+ID4gT24gMjQvMDMvMTcgMTY6NDQsIFBhdWwgRHVycmFudCB3cm90
-ZToNCj4gPj4+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4+PiBGcm9tOiBKdWVyZ2Vu
-IEdyb3NzIFttYWlsdG86amdyb3NzQHN1c2UuY29tXQ0KPiA+Pj4gU2VudDogMjQgTWFyY2ggMjAx
-NyAxNTozNQ0KPiA+Pj4gVG86IFBhdWwgRHVycmFudCA8UGF1bC5EdXJyYW50QGNpdHJpeC5jb20+
-OyAnU3RlZmFubyBTdGFiZWxsaW5pJw0KPiA+Pj4gPHNzdGFiZWxsaW5pQGtlcm5lbC5vcmc+DQo+
-ID4+PiBDYzogQW50aG9ueSBQZXJhcmQgPGFudGhvbnkucGVyYXJkQGNpdHJpeC5jb20+OyB4ZW4t
-DQo+ID4+PiBkZXZlbEBsaXN0cy54ZW5wcm9qZWN0Lm9yZzsgcWVtdS1kZXZlbEBub25nbnUub3Jn
-Ow0KPiBrcmF4ZWxAcmVkaGF0LmNvbQ0KPiA+Pj4gU3ViamVjdDogUmU6IFtYZW4tZGV2ZWxdIFtQ
-QVRDSCAyLzJdIGNvbmZpZ3VyZTogdXNlIHBrZy1jb25maWcgZm9yDQo+IG9idGFpbmluZw0KPiA+
-Pj4geGVuIHZlcnNpb24NCj4gPj4+DQo+ID4+PiBPbiAyNC8wMy8xNyAxNjoxMiwgUGF1bCBEdXJy
-YW50IHdyb3RlOg0KPiA+Pj4+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+Pj4+PiBG
-cm9tOiBTdGVmYW5vIFN0YWJlbGxpbmkgW21haWx0bzpzc3RhYmVsbGluaUBrZXJuZWwub3JnXQ0K
-PiA+Pj4+PiBTZW50OiAyMiBNYXJjaCAyMDE3IDE4OjIyDQo+ID4+Pj4+IFRvOiBKdWVyZ2VuIEdy
-b3NzIDxqZ3Jvc3NAc3VzZS5jb20+DQo+ID4+Pj4+IENjOiBTdGVmYW5vIFN0YWJlbGxpbmkgPHNz
-dGFiZWxsaW5pQGtlcm5lbC5vcmc+OyBxZW11LQ0KPiA+Pj4gZGV2ZWxAbm9uZ251Lm9yZzsNCj4g
-Pj4+Pj4geGVuLWRldmVsQGxpc3RzLnhlbnByb2plY3Qub3JnOyBBbnRob255IFBlcmFyZA0KPiA+
-Pj4+PiA8YW50aG9ueS5wZXJhcmRAY2l0cml4LmNvbT47IGtyYXhlbEByZWRoYXQuY29tOyBQYXVs
-IER1cnJhbnQNCj4gPj4+Pj4gPFBhdWwuRHVycmFudEBjaXRyaXguY29tPg0KPiA+Pj4+PiBTdWJq
-ZWN0OiBSZTogW1BBVENIIDIvMl0gY29uZmlndXJlOiB1c2UgcGtnLWNvbmZpZyBmb3Igb2J0YWlu
-aW5nIHhlbg0KPiA+Pj4gdmVyc2lvbg0KPiA+Pj4+Pg0KPiA+Pj4+PiBPbiBXZWQsIDIyIE1hciAy
-MDE3LCBKdWVyZ2VuIEdyb3NzIHdyb3RlOg0KPiA+Pj4+Pj4gT24gMjEvMDMvMTcgMTk6NTQsIFN0
-ZWZhbm8gU3RhYmVsbGluaSB3cm90ZToNCj4gPj4+Pj4+PiBPbiBUdWUsIDIxIE1hciAyMDE3LCBK
-dWVyZ2VuIEdyb3NzIHdyb3RlOg0KPiA+Pj4+Pj4+PiBPbiAxNy8wMy8xNyAxOTozMywgU3RlZmFu
-byBTdGFiZWxsaW5pIHdyb3RlOg0KPiA+Pj4+Pj4+Pj4gT24gRnJpLCAxNyBNYXIgMjAxNywgSnVl
-cmdlbiBHcm9zcyB3cm90ZToNCj4gPj4+Pj4+Pj4+PiBPbiAxNi8wMy8xNyAyMToyMCwgU3RlZmFu
-byBTdGFiZWxsaW5pIHdyb3RlOg0KPiA+Pj4+Pj4+Pj4+PiBPbiBUaHUsIDE2IE1hciAyMDE3LCBK
-dWVyZ2VuIEdyb3NzIHdyb3RlOg0KPiA+Pj4+Pj4+Pj4+Pj4gSW5zdGVhZCBvZiB0cnlpbmcgdG8g
-Z3Vlc3MgdGhlIFhlbiB2ZXJzaW9uIHRvIHVzZSBieQ0KPiBjb21waWxpbmcNCj4gPj4+Pj4gdmFy
-aW91cw0KPiA+Pj4+Pj4+Pj4+Pj4gdGVzdCBwcm9ncmFtcyBmaXJzdCBqdXN0IGFzayB0aGUgc3lz
-dGVtIHZpYSBwa2ctY29uZmlnLiBPbmx5IGlmDQo+IGl0DQo+ID4+Pj4+Pj4+Pj4+PiBjYW4ndCBy
-ZXR1cm4gdGhlIHZlcnNpb24gZmFsbCBiYWNrIHRvIHRoZSB0ZXN0IHByb2dyYW0NCj4gc2NoZW1l
-Lg0KPiA+Pj4+Pj4+Pj4+Pg0KPiA+Pj4+Pj4+Pj4+PiBUaGF0J3MgT0ssIGJ1dCB3aHkgZGlkIHlv
-dSByZW1vdmUgdGhlIFhlbiB1bnN0YWJsZSB0ZXN0Pw0KPiA+Pj4+Pj4+Pj4+DQo+ID4+Pj4+Pj4+
-Pj4gPkZyb20gWGVuIDQuOSBvbiBwa2ctY29uZmlnIHdpbGwgcmV0dXJuIHRoZSBuZWVkZWQNCj4g
-aW5mb3JtYXRpb24uDQo+ID4+Pj4+IFRoZXJlIGlzDQo+ID4+Pj4+Pj4+Pj4gbm8gbG9uZ2VyIGEg
-bmVlZCBmb3IgYSB0ZXN0IHByb2dyYW0gdG8gZGV0ZXJtaW5lIHRoZSBYZW4NCj4gdmVyc2lvbi4N
-Cj4gPj4+Pj4gQWZ0ZXINCj4gPj4+Pj4+Pj4+PiBhbGwgdGhpcyB3YXMgdGhlIG1haW4gb2JqZWN0
-aXZlIG9mIG15IHNlcmllcyBhZGRpbmcgdGhlIHBrZy0NCj4gY29uZmlnDQo+ID4+Pj4+Pj4+Pj4g
-ZmlsZXMgdG8gWGVuLg0KPiA+Pj4+Pj4+Pj4NCj4gPj4+Pj4+Pj4+IEkgd2FzIGdvaW5nIHRvIHNh
-eSBzb21ldGhpbmcgbGlrZSAieWVhaCwgYnV0IGlzIHBrZy1jb25maWcgYWx3YXlzDQo+ID4+Pj4+
-Pj4+PiBhdmFpbGFibGU/IiBJbiByZWFsaXR5LCBRRU1VIGFscmVhZHkgaGFzIHBrZy1jb25maWcg
-YXMgYnVpbGQNCj4gPj4+Pj4+Pj4+IGRlcGVuZGVuY3ksIHNvIEkgZ3Vlc3MgdGhlcmUgaXMgbm8g
-cHJvYmxlbSB3aXRoIHRoYXQuDQo+ID4+Pj4+Pj4+Pg0KPiA+Pj4+Pj4+Pj4gUGxlYXNlIGFkZCBh
-IG5vdGUgYWJvdXQgdGhpcyB0byB0aGUgY29tbWl0IG1lc3NhZ2UuDQo+ID4+Pj4+Pj4+Pg0KPiA+
-Pj4+Pj4+Pg0KPiA+Pj4+Pj4+PiBPa2F5Lg0KPiA+Pj4+Pj4+DQo+ID4+Pj4+Pj4gU29ycnkgdG8g
-cG9pbnQgdGhpcyBvdXQgb25seSBub3csIGFuZCBJIHJlYWxpemUgdGhhdCBpdCBtaWdodCBiZQ0K
-PiA+Pj4+Pj4+IHVuaW1wb3J0YW50IGZvciBwcm9kdWN0aW9uIGJ1aWxkcywgYnV0IGl0IGlzIGlt
-cG9ydGFudCB0byBtZSwgYW5kDQo+ID4+Pj4+Pj4gZGV2ZWxvcGVycyBpbiBnZW5lcmFsLCB0byBi
-ZSBhYmxlIHRvIHRlc3QgYSBzaW5nbGUgUUVNVSB0cmVlIGFnYWluc3QNCj4gYQ0KPiA+Pj4+Pj4+
-IG51bWJlciBvZiBYZW4gdHJlZXMgKGFsbCByZWxlYXNlcyBmcm9tIDQuMyBvbndhcmQpLg0KPiA+
-Pj4+Pj4+DQo+ID4+Pj4+Pj4gV2l0aCB0aGlzIGNoYW5nZSAoc3BlY2lmaWNhbGx5IGRyb3BwaW5n
-IHRoZSA0LjkgYnVpbGQgdGVzdCksIG91dCBvZg0KPiB0cmVlDQo+ID4+Pj4+Pj4gYnVpbGRzIGRv
-bid0IHdvcmsgYW55bW9yZS4gSSB3b3VsZCBsaWtlIHRvIGJlIGFibGUgdG8gZG86DQo+ID4+Pj4+
-Pj4NCj4gPj4+Pj4+PiAuL2NvbmZpZ3VyZSAtLWVuYWJsZS14ZW4gLS10YXJnZXQtbGlzdD1pMzg2
-LXNvZnRtbXUgXA0KPiA+Pj4+Pj4+ICAgICAgICAgICAgICAgICAtLWV4dHJhLWNmbGFncz0iLUkk
-RElSL3Rvb2xzL2luY2x1ZGUgXA0KPiA+Pj4+Pj4+ICAgICAgICAgICAgICAgICAtSSRESVIvdG9v
-bHMvbGlicy90b29sbG9nL2luY2x1ZGUgXA0KPiA+Pj4+Pj4+ICAgICAgICAgICAgICAgICAtSSRE
-SVIvdG9vbHMvbGlicy9ldnRjaG4vaW5jbHVkZSBcDQo+ID4+Pj4+Pj4gICAgICAgICAgICAgICAg
-IC1JJERJUi90b29scy9saWJzL2dudHRhYi9pbmNsdWRlIFwNCj4gPj4+Pj4+PiAgICAgICAgICAg
-ICAgICAgLUkkRElSL3Rvb2xzL2xpYnMvZm9yZWlnbm1lbW9yeS9pbmNsdWRlIFwNCj4gPj4+Pj4+
-PiAgICAgICAgICAgICAgICAgLUkkRElSL3Rvb2xzL2xpYnMvZGV2aWNlbW9kZWwvaW5jbHVkZSBc
-DQo+ID4+Pj4+Pj4gICAgICAgICAgICAgICAgIC1JJERJUi90b29scy9saWJ4Yy9pbmNsdWRlIFwN
-Cj4gPj4+Pj4+PiAgICAgICAgICAgICAgICAgLUkkRElSL3Rvb2xzL3hlbnN0b3JlL2luY2x1ZGUg
-XA0KPiA+Pj4+Pj4+ICAgICAgICAgICAgICAgICAtSSRESVIvdG9vbHMveGVuc3RvcmUvY29tcGF0
-L2luY2x1ZGUiIFwNCj4gPj4+Pj4+PiAgICAgICAgICAgICAgICAgLS1leHRyYS1sZGZsYWdzPSIt
-TCRESVIvdG9vbHMvbGlieGMgXA0KPiA+Pj4+Pj4+ICAgICAgICAgICAgICAgICAtTCRESVIvdG9v
-bHMveGVuc3RvcmUgXA0KPiA+Pj4+Pj4+ICAgICAgICAgICAgICAgICAtTCRESVIvdG9vbHMvbGli
-cy9ldnRjaG4gXA0KPiA+Pj4+Pj4+ICAgICAgICAgICAgICAgICAtTCRESVIvdG9vbHMvbGlicy9n
-bnR0YWIgXA0KPiA+Pj4+Pj4+ICAgICAgICAgICAgICAgICAtTCRESVIvdG9vbHMvbGlicy9mb3Jl
-aWdubWVtb3J5IFwNCj4gPj4+Pj4+PiAgICAgICAgICAgICAgICAgLUwkRElSL3Rvb2xzL2xpYnMv
-ZGV2aWNlbW9kZWwgXA0KPiA+Pj4+Pj4+ICAgICAgICAgICAgICAgICAtV2wsLXJwYXRoLWxpbms9
-JERJUi90b29scy9saWJzL3Rvb2xsb2cgXA0KPiA+Pj4+Pj4+ICAgICAgICAgICAgICAgICAtV2ws
-LXJwYXRoLWxpbms9JERJUi90b29scy9saWJzL2V2dGNobiBcDQo+ID4+Pj4+Pj4gICAgICAgICAg
-ICAgICAgIC1XbCwtcnBhdGgtbGluaz0kRElSL3Rvb2xzL2xpYnMvZ250dGFiIFwNCj4gPj4+Pj4+
-PiAgICAgICAgICAgICAgICAgLVdsLC1ycGF0aC1saW5rPSRESVIvdG9vbHMvbGlicy9jYWxsIFwN
-Cj4gPj4+Pj4+PiAgICAgICAgICAgICAgICAgLVdsLC1ycGF0aC1saW5rPSRESVIvdG9vbHMvbGli
-cy9mb3JlaWdubWVtb3J5IFwNCj4gPj4+Pj4+PiAgICAgICAgICAgICAgICAgLVdsLC1ycGF0aC1s
-aW5rPSRESVIvdG9vbHMvbGlicy9kZXZpY2Vtb2RlbCIgXA0KPiA+Pj4+Pj4+ICAgICAgICAgICAg
-IC0tZGlzYWJsZS1rdm0NCj4gPj4+Pj4+PiBtYWtlDQo+ID4+Pj4+Pj4NCj4gPj4+Pj4+PiBBbmQg
-dGhlIG1ha2Ugc2hvdWxkIHN1Y2NlZWQuIElzIHRoZXJlIGEgd2F5IHRvIGRvIHRoYXQgd2l0aCBw
-a2ctDQo+ID4+PiBjb25maWc/DQo+ID4+Pj4+Pg0KPiA+Pj4+Pj4gU3VyZSwgZm9yIFhlbiA0Ljkg
-anVzdCBkbzoNCj4gPj4+Pj4+DQo+ID4+Pj4+PiBQS0dfQ09ORklHX1BBVEg9JChESVIpL3Rvb2xz
-L3BrZy1jb25maWcgLi9jb25maWd1cmUgXA0KPiA+Pj4+Pj4gCQktLWVuYWJsZS14ZW4gLS10YXJn
-ZXQtbGlzdD1pMzg2LXNvZnRtbXUgXA0KPiA+Pj4+Pj4gCQktLWRpc2FibGUta3ZtDQo+ID4+Pj4+
-PiBtYWtlDQo+ID4+Pj4+DQo+ID4+Pj4+IFllcywgdGhhdCB3b3JrcywgdGhhbmtzISBJIGNvbW1p
-dHRlZCBpdCB0byBteSBuZXh0IGJyYW5jaCBhZGRpbmcNCj4gPj4+Pj4gInBrZy1jb25maWcsIHdo
-aWNoIGlzIGFscmVhZHkgYSBidWlsZCBkZXBlbmRlbmN5IG9mIFFFTVUsIHdpbGwgYmUNCj4gdXNl
-ZA0KPiA+Pj4+PiBleGNsdXNpdmVseSB0byBkZXRlcm1pbmUgdGhlIFhlbiB2ZXJzaW9uIGZyb20g
-WGVuIDQuOSBvbndhcmQuIiB0bw0KPiB0aGUNCj4gPj4+Pj4gY29tbWl0IG1lc3NhZ2UuDQo+ID4+
-Pj4NCj4gPj4+PiBBIGZ1cnRoZXIgcXVlc3Rpb24uLi4NCj4gPj4+Pg0KPiA+Pj4+IEkgaGF2ZSBh
-IHhlbiB0cmVlIHdoaWNoIEkndmUgYmVlbiB1c2luZyB0byBidWlsZCBhbmQgaW5zdGFsbCBtYXN0
-ZXINCj4gYWdhaW5zdA0KPiA+Pj4gbXkgb3duIGNoZWNrZWQgb3V0IFFFTVUgcmVwby4gTm8gcHJv
-YmxlbSB3aXRoIHRoYXQuIEkndmUgbm93DQo+IHJldmVydGVkDQo+ID4+PiBteSB0cmVlIHRvIDQu
-Ny4wIGFuZCBjYW5ub3QgYnVpbGQgdG9vbHMgKGV2ZW4gYWZ0ZXIgYSBtYWtlIGRpc3RjbGVhbikN
-Cj4gYmVjYXVzZQ0KPiA+Pj4gUUVNVSdzIGNvbmZpZ3VyZSBpcyBzdGlsbCBnZXR0aW5nIHVwIGEg
-eGVuX2N0cmxfdmVyc2lvbiBvZiA0MDkwMC4gVGhpcyBpcw0KPiA+Pj4gYmVjYXVzZSBwa2ctY29u
-ZmlnIGlzIHN0aWxsIGZpbmRpbmcgYSA0LjkuMCB4ZW5jb250cm9sIHBhY2thZ2U/IFdoZXJlIGlz
-IGl0DQo+ID4+PiBnZXR0aW5nIHRoaXMgZnJvbT8NCj4gPj4+DQo+ID4+PiBIbW0sIGNvdWxkIGl0
-IGJlIHlvdSBoYXZlIFhlbiB1bnN0YWJsZSBpbnN0YWxsZWQgb24geW91ciBtYWNoaW5lPw0KPiA+
-Pg0KPiA+PiBJIGRvIGluZGVlZC4gSSBidWlsZCBvbiBteSB0ZXN0IG1hY2hpbmUuDQo+ID4+DQo+
-ID4+Pg0KPiA+Pj4gRGlkbid0IHRoaW5rIG9mIHRoaXMgcHJvYmxlbS4gSSBjYW4gdGhpbmsgb2Yg
-MyBzb2x1dGlvbnM6DQo+ID4+Pg0KPiA+Pj4gYSkgZGVsZXRlIHRoZSB4ZW5jb250cm9sLnBjIGZp
-bGUgKG9uIG15IHN5c3RlbSB1bmRlcg0KPiA+Pj4gICAgL3Vzci9zaGFyZS9wa2djb25maWcvICkN
-Cj4gPj4+DQo+ID4+DQo+ID4+IEkganVzdCBmb3VuZCBtaW5lIHVzaW5nIHBrZy1jb25maWcgLS1k
-ZWJ1Zy4uLiAvdXNyL2xvY2FsL3NoYXJlL3BrZ2NvbmZpZw0KPiBmb3IgbWUNCj4gPj4NCj4gPj4+
-IGIpIHdlIGFkZCBhIHBhdGNoIHRvIHFlbXUgdG8gdGVzdCBhbiBlbnZpcm9ubWVudCB2YXJpYWJs
-ZSB3aGV0aGVyDQo+ID4+PiAgICBwa2ctY29uZmlnIHNob3VsZCBiZSBpZ25vcmVkIGZvciBYZW4g
-dmVyc2lvbiBkZXRlY3Rpb24NCj4gPj4+DQo+ID4+PiBjKSBzZXQgdGhlIGVudmlyb25tZW50IHZh
-cmlhYmxlIFBLR19DT05GSUdfTElCRElSIHRvIGEgbG9jYWwgZGlyZWN0b3J5DQo+ID4+PiAgICBh
-bmQgY29weSBhbGwgYnV0IHRoZSB4ZW4qLnBjIGZpbGVzIGZyb20gL3Vzci9zaGFyZS9wa2djb25m
-aWcvIChvcg0KPiA+Pj4gICAgeW91ciBjb3JyZWN0IGRpcmVjdG9yeSkgdG8gaXQgKG9yIGxpbmsg
-dGhlbSB0byBhdm9pZCBtaXNzaW5nIHVwZGF0ZXMpDQo+ID4+Pg0KPiA+Pj4gT1RPSCB0aGlzIGlz
-IHNvbWV0aGluZyB5b3UgaGF2ZSB0byBiZSBhd2FyZSBvZiBmb3Igb3RoZXIgcGFja2FnZXMgYXMN
-Cj4gPj4+IHdlbGw6IG1peGluZyB0aGUgYnVpbGQgZW52aXJvbm1lbnQgYW5kIHRoZSB0YXJnZXQg
-ZW52aXJvbm1lbnQgY2FuIGxlYWQNCj4gPj4+IHRvIGJhZCByZXN1bHRzLiBOb3cgWGVuIGhhcyBi
-ZWVuIGFkZGVkIHRvIHRoZSBsaXN0Lg0KPiA+Pj4NCj4gPj4NCj4gPj4gVGhhdCdzIGEgY2hhbmdl
-IGluIGJlaGF2aW91ciB0aGF0IEksIGFuZCBwcm9iYWJseSBvdGhlcnMsIGhhdmUgbG9uZyBiZWVu
-DQo+IHVzZWQgdG8uIFdoYXQgd2UgcmVhbGx5IHdhbnQsIHByZXN1bWFibHksIGlzIHRvIGhhdmUg
-cGtnLWNvbmZpZyBqdXN0IGxvb2sNCj4gdW5kZXIgdG9vbHMvcGtnY29uZmlnIHdoZW4gcXVlcnlp
-bmcgZm9yIHRoZSB2ZXJzaW9uIG9mIHhlbmNvbnRyb2wuIENvdWxkDQo+IHRoYXQgbm90IGJlIGRv
-bmUgYnkgc2ltcGx5IHNldHRpbmcgUEtHX0NPTkZJR19MSUJESVIgaW4gUUVNVSdzIGNvbmZpZ3Vy
-ZQ0KPiBzY3JpcHQsIG9yIHdvdWxkIGl0IHN0aWxsIG1lYW4gcGlja2luZyB1cCBpbnN0YWxsZWQg
-bGlicmFyaWVzIGJlZm9yZSBvbmVzIGp1c3QNCj4gYnVpbHQ/DQo+ID4NCj4gPiBJIGd1ZXNzIHRo
-aXMgd291bGQgYnJlYWsgcWVtdSdzIGNvbmZpZ3VyZSBiYWRseSBhcyBpdCB3b3VsZG4ndCBmaW5k
-IGFsbA0KPiA+IHRoZSBvdGhlciBsaWJyYXJ5IGluZm9ybWF0aW9ucyBpdCBpcyBsb29raW5nIGZv
-ciB2aWEgcGtnLWNvbmZpZy4NCj4gDQo+IEFhaCwgd2FpdCwgeW91IG1lYW4ganVzdCBmb3IgdGhl
-IFhlbiBxdWVyeT8NCj4gDQoNClllcywgd2Ugd2FudCBRRU1VIHRvIHBpY2sgdXAgeGVuIGxpYnMg
-ZnJvbSB0aGUgYnVpbGQgZW52IGFuZCBub3QgYW55IHRoYXQgaGF2ZSBiZWVuIHByZXZpb3VzbHkg
-aW5zdGFsbGVkIHRoZSBkZWZhdWx0IHNlYXJjaCBwYXRoIG5lZWRzIHRvIGJlIHNxdWFzaGVkLg0K
-DQo+IFRoaXMgbWlnaHQgY29tcGxpY2F0ZSB0aGluZ3MgZm9yIG15IHFlbXUgc3R1YmRvbSBwbGFu
-cy4uLg0KPiANCg0KTWF5YmUgdGhhdCBjYW4gYmUgd29ya2VkIGFyb3VuZCBpbiB0aGUgc3R1YmRv
-bSBidWlsZD8NCg0KICBQYXVsDQoNCj4gDQo+IEp1ZXJnZW4NCg0K
+Create libqemutrace.a for all trace.o
+Currently all trace.o are linked into qemu-system, qemu-img,=20
+qemu-nbd, qemu-io etc., even the corresponding components=20
+are not included.
+Create a libqemutrace.a that the linker would only pull in .o=20
+files containing symbols that are actually referenced by the=20
+program.
+./trace.o, ./qapi/trace.o and ./util/trace.o are added into=20
+libqemuutil.a  to avoid recursive dependencies between=20
+libqemuutil.a and libqemutrace.a.
+
+Signed-off -by: Anthony Xu <anthony.xu@intel.com>
+
+
+diff --git a/Makefile b/Makefile
+index 6c359b2..565f5c7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -345,8 +345,8 @@ subdir-dtc:dtc/libfdt dtc/tests
+ dtc/%:
+        mkdir -p $@
+
+-$(SUBDIR_RULES): libqemuutil.a libqemustub.a $(common-obj-y) $(chardev-obj=
+-y) \
+-       $(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY)) $(trace-obj-y)
++$(SUBDIR_RULES): libqemutrace.a libqemuutil.a libqemustub.a $(common-obj-y=
+) $(chardev-obj-y) \
++       $(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY))
+
+ ROMSUBDIR_RULES=3D$(patsubst %,romsubdir-%, $(ROMS))
+ # Only keep -O and -g cflags
+@@ -367,10 +367,11 @@ Makefile: $(version-obj-y)
+
+ libqemustub.a: $(stub-obj-y)
+ libqemuutil.a: $(util-obj-y)
++libqemutrace.a: $(trace-obj-y)
+
+ ######################################################################
+
+-COMMON_LDADDS =3D $(trace-obj-y) libqemuutil.a libqemustub.a
++COMMON_LDADDS =3D libqemutrace.a libqemuutil.a libqemustub.a
+
+ qemu-img.o: qemu-img-cmds.h
+
+diff --git a/Makefile.objs b/Makefile.objs
+index 6167e7b..4289ef9 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -3,6 +3,7 @@
+ stub-obj-y =3D stubs/ crypto/
+ util-obj-y =3D util/ qobject/ qapi/
+ util-obj-y +=3D qmp-introspect.o qapi-types.o qapi-visit.o qapi-event.o
++util-obj-y +=3D $(trace-root-obj-y)
+
+ chardev-obj-y =3D chardev/
+
+@@ -167,8 +168,9 @@ trace-events-subdirs +=3D qapi
+
+ trace-events-files =3D $(SRC_PATH)/trace-events $(trace-events-subdirs:%=
+=3D$(SRC_PATH)/%/trace-events)
+
+-trace-obj-y =3D trace-root.o
++trace-root-obj-y =3D trace-root.o
++trace-root-obj-$(CONFIG_TRACE_DTRACE) +=3D trace-dtrace-root.o
++trace-obj-y =3D $(trace-root-obj-y)
+ trace-obj-y +=3D $(trace-events-subdirs:%=3D%/trace.o)
+ trace-obj-$(CONFIG_TRACE_UST) +=3D trace-ust-all.o
+-trace-obj-$(CONFIG_TRACE_DTRACE) +=3D trace-dtrace-root.o
+ trace-obj-$(CONFIG_TRACE_DTRACE) +=3D $(trace-events-subdirs:%=3D%/trace-d=
+trace.o)
+diff --git a/Makefile.target b/Makefile.target
+index 7df2b8c..6f508c8 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -201,7 +201,7 @@ all-obj-$(CONFIG_SOFTMMU) +=3D $(io-obj-y)
+
+ $(QEMU_PROG_BUILD): config-devices.mak
+
+-COMMON_LDADDS =3D $(trace-obj-y) ../libqemuutil.a ../libqemustub.a
++COMMON_LDADDS =3D ../libqemutrace.a ../libqemuutil.a ../libqemustub.a
+
+ # build either PROG or PROGW
+ $(QEMU_PROG_BUILD): $(all-obj-y) $(COMMON_LDADDS)
+diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
+index 33906ff..d543d56 100644
+--- a/qapi/Makefile.objs
++++ b/qapi/Makefile.objs
+@@ -4,3 +4,5 @@ util-obj-y +=3D string-input-visitor.o string-output-visito=
+r.o
+ util-obj-y +=3D opts-visitor.o qapi-clone-visitor.o
+ util-obj-y +=3D qmp-event.o
+ util-obj-y +=3D qapi-util.o
++util-obj-y +=3D  trace.o
++util-obj-$(CONFIG_TRACE_DTRACE) +=3D trace-dtrace.o
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index f3de81f..6cbd602 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -519,7 +519,7 @@ QEMU_CFLAGS +=3D -I$(SRC_PATH)/tests
+
+
+ # Deps that are common to various different sets of tests below
+-test-util-obj-y =3D $(trace-obj-y) libqemuutil.a libqemustub.a
++test-util-obj-y =3D libqemutrace.a libqemuutil.a libqemustub.a
+ test-qom-obj-y =3D $(qom-obj-y) $(test-util-obj-y)
+ test-qapi-obj-y =3D tests/test-qapi-visit.o tests/test-qapi-types.o \
+        tests/test-qapi-event.o tests/test-qmp-introspect.o \
+diff --git a/util/Makefile.objs b/util/Makefile.objs
+index c6205eb..e38b91e 100644
+--- a/util/Makefile.objs
++++ b/util/Makefile.objs
+@@ -43,3 +43,5 @@ util-obj-y +=3D qdist.o
+ util-obj-y +=3D qht.o
+ util-obj-y +=3D range.o
+ util-obj-y +=3D systemd.o
++util-obj-y +=3D  trace.o
++util-obj-$(CONFIG_TRACE_DTRACE) +=3D trace-dtrace.o
+                                                          =20
