@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1crIph-0006zn-4h
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 02:36:21 -0400
+	(envelope-from <armbru@redhat.com>) id 1crIu9-00082U-Tn
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 02:40:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1crIpe-00063k-1W
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 02:36:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45650)
+	(envelope-from <armbru@redhat.com>) id 1crIu6-0007J0-Hh
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 02:40:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42662)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1crIpd-00062q-S9
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 02:36:17 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1crIu6-0007Io-8V
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 02:40:54 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D83377E9CB
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 06:36:17 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 22F6361D1D
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 06:40:54 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
 References: <1490266548-22500-1-git-send-email-armbru@redhat.com>
 	<1490266548-22500-4-git-send-email-armbru@redhat.com>
-	<011d21ee-aa96-2541-2e54-16c423f07cce@redhat.com>
-	<878tnv6e6q.fsf@dusky.pond.sub.org>
-	<385d2fa4-a7ec-e22c-e89d-5387cccc2ca4@redhat.com>
-	<ff1ac3a6-2ad0-f3aa-f085-17e1fc43d21c@redhat.com>
-Date: Fri, 24 Mar 2017 07:36:14 +0100
-In-Reply-To: <ff1ac3a6-2ad0-f3aa-f085-17e1fc43d21c@redhat.com> (Eric Blake's
-	message of "Thu, 23 Mar 2017 15:51:25 -0500")
-Message-ID: <87shm3yye9.fsf@dusky.pond.sub.org>
+	<20170323203819.GH5344@noname.redhat.com>
+Date: Fri, 24 Mar 2017 07:40:50 +0100
+In-Reply-To: <20170323203819.GH5344@noname.redhat.com> (Kevin Wolf's message
+	of "Thu, 23 Mar 2017 21:38:19 +0100")
+Message-ID: <87lgrvyy6l.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 Subject: Re: [Qemu-devel] [PATCH for-2.9 3/5] rbd: Rewrite the code to
@@ -38,34 +35,225 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: kwolf@redhat.com, jdurgin@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: jdurgin@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org, jcody@redhat.com
 
-Eric Blake <eblake@redhat.com> writes:
+Kevin Wolf <kwolf@redhat.com> writes:
 
-> On 03/23/2017 02:18 PM, Eric Blake wrote:
->
->>>>> -            if (port) {
->>>>> -                /* check for ipv6 */
->>>>> -                if (strchr(host, ':')) {
->>>>> -                    strbuf = g_strdup_printf("[%s]:%s", host, port);
->>>>> -                } else {
->>>>> -                    strbuf = g_strdup_printf("%s:%s", host, port);
->>>>
->>>> The old code only prints port information if it is present...
->>>>
->
->>>> ...but the new code unconditionally prints port information, even when
->>>> port == NULL.  Oops.
->>>
->>> How can port be null?  SocketAddress member port is mandatory...
+> Am 23.03.2017 um 11:55 hat Markus Armbruster geschrieben:
+>> We have two list-values options:
 >> 
->> Indeed. Does that mean the old code had a dead branch? Looks like it!
+>> * "server" is a list of InetSocketAddress.  We use members "host" and
+>>   "port", and silently ignore the rest.
+>> 
+>> * "auth-supported" is a list of RbdAuthMethod.  We use its only member
+>>   "auth".
+>> 
+>> Since qemu_rbd_open() takes options as a flattened QDict, options has
+>> keys of the form server.%d.host, server.%d.port and
+>> auth-supported.%d.auth, where %d counts up from zero.
+>> 
+>> qemu_rbd_array_opts() extracts these values as follows.  First, it
+>> calls qdict_array_entries() to find the list's length.  For each list
+>> element, it first formats the list's key prefix (e.g. "server.0."),
+>> then creates a new QDict holding the options with that key prefix,
+>> then converts that to a QemuOpts, so it can finally get the member
+>> values from there.
+>> 
+>> If there's one surefire way to make code using QDict more awkward,
+>> it's creating more of them and mixing in QemuOpts for good measure.
+>> 
+>> The conversion to QemuOpts abuses runtime_opts, as described in the
+>> commit before previous.
+>> 
+>> Rewrite to simply get the values straight from the options QDict.
+>> This removes the abuse of runtime_opts, so clean it up.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 >
-> Or else my reading of the old code was wrong.  It looks like port was
-> optional on the command line, but in the conversion to QemuOpts, a
-> missing port was treated as the default port.  Now that you are not
-> going through QemuOpts, you have to make sure that you can still supply
-> a default port to keep the QAPI happy with a mandatory port.
+>> @@ -577,91 +557,59 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)
+>>      qemu_aio_unref(acb);
+>>  }
+>>  
+>> -#define RBD_MON_HOST          0
+>> -#define RBD_AUTH_SUPPORTED    1
+>> -
+>> -static char *qemu_rbd_array_opts(QDict *options, const char *prefix, int type,
+>> -                                 Error **errp)
+>> +static char *rbd_auth(QDict *options)
+>>  {
+>> -    int num_entries;
+>> -    QemuOpts *opts = NULL;
+>> -    QDict *sub_options;
+>> -    const char *host;
+>> -    const char *port;
+>> -    char *str;
+>> -    char *rados_str = NULL;
+>> -    Error *local_err = NULL;
+>> +    const char **vals = g_new(const char *, qdict_size(options));
+>> +    char keybuf[32];
+>> +    QObject *val;
+>> +    char *rados_str;
+>>      int i;
+>>  
+>> -    assert(type == RBD_MON_HOST || type == RBD_AUTH_SUPPORTED);
+>> -
+>> -    num_entries = qdict_array_entries(options, prefix);
+>> +    for (i = 0;; i++) {
+>> +        sprintf(keybuf, "auth-supported.%d.auth", i);
+>> +        val = qdict_get(options, keybuf);
+>> +        if (!val) {
+>> +            break;
+>> +        }
+>>  
+>> -    if (num_entries < 0) {
+>> -        error_setg(errp, "Parse error on RBD QDict array");
+>> -        return NULL;
+>> +        vals[i] = qstring_get_str(qobject_to_qstring(val));
+>>      }
+>> +    vals[i] = NULL;
+>
+> In case of doubt, i is one more than vals can hold. (It segfaulted for
+> me when options was empty because I passed only options that are removed
+> before this function is called.)
 
-Who is "you", and what exactly does "you" have to do?  ;)
+Yes, the g_new() above needs one extra slot.
+
+> You also want to remove the options from the QDict, otherwise
+> bdrv_open_inherit() will complain that the options are unknown.
+
+Okay.
+
+>>  
+>> -    for (i = 0; i < num_entries; i++) {
+>> -        char *strbuf = NULL;
+>> -        const char *value;
+>> -        char *rados_str_tmp;
+>> -
+>> -        str = g_strdup_printf("%s%d.", prefix, i);
+>> -        qdict_extract_subqdict(options, &sub_options, str);
+>> -        g_free(str);
+>> -
+>> -        opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+>> -        qemu_opts_absorb_qdict(opts, sub_options, &local_err);
+>> -        QDECREF(sub_options);
+>> -        if (local_err) {
+>> -            error_propagate(errp, local_err);
+>> -            g_free(rados_str);
+>> -            rados_str = NULL;
+>> -            goto exit;
+>> -        }
+>> +    rados_str = g_strjoinv(";", (char **)vals);
+>> +    g_free(vals);
+>> +    return rados_str;
+>> +}
+>>  
+>> -        if (type == RBD_MON_HOST) {
+>> -            host = qemu_opt_get(opts, "host");
+>> -            port = qemu_opt_get(opts, "port");
+>> +static char *rbd_mon_host(QDict *options)
+>> +{
+>> +    const char **vals = g_new(const char *, qdict_size(options));
+>> +    char keybuf[32];
+>> +    QObject *val;
+>> +    const char *host, *port;
+>> +    char *rados_str;
+>> +    int i;
+>>  
+>> -            value = host;
+>> -            if (port) {
+>> -                /* check for ipv6 */
+>> -                if (strchr(host, ':')) {
+>> -                    strbuf = g_strdup_printf("[%s]:%s", host, port);
+>> -                } else {
+>> -                    strbuf = g_strdup_printf("%s:%s", host, port);
+>> -                }
+>> -                value = strbuf;
+>> -            } else if (strchr(host, ':')) {
+>> -                strbuf = g_strdup_printf("[%s]", host);
+>> -                value = strbuf;
+>> -            }
+>> -        } else {
+>> -            value = qemu_opt_get(opts, "auth");
+>> +    for (i = 0;; i++) {
+>> +        sprintf(keybuf, "server.%d.host", i);
+>> +        val = qdict_get(options, keybuf);
+>> +        if (!val) {
+>> +            break;
+>>          }
+>> +        host = qstring_get_str(qobject_to_qstring(val));
+>> +        sprintf(keybuf, "server.%d.port", i);
+>> +        port = qdict_get_str(options, keybuf);
+>
+> This segfaults if the port option isn't given.
+
+@port is mandatory in BlockdevOptionsRbd.  If it's not there here, the
+options must have bypassed QAPI.  That would be bad news.  Can you
+explain how it can happen?
+
+>> -
+>> -        /* each iteration in the for loop will build upon the string, and if
+>> -         * rados_str is NULL then it is our first pass */
+>> -        if (rados_str) {
+>> -            /* separate options with ';', as that  is what rados_conf_set()
+>> -             * requires */
+>> -            rados_str_tmp = rados_str;
+>> -            rados_str = g_strdup_printf("%s;%s", rados_str_tmp, value);
+>> -            g_free(rados_str_tmp);
+>> +        if (strchr(host, ':')) {
+>> +            vals[i] = g_strdup_printf("[%s]:%s", host, port);
+>>          } else {
+>> -            rados_str = g_strdup(value);
+>> +            vals[i] = g_strdup_printf("%s:%s", host, port);
+>>          }
+>> -
+>> -        g_free(strbuf);
+>> -        qemu_opts_del(opts);
+>> -        opts = NULL;
+>>      }
+>> +    vals[i] = NULL;
+>
+> Probably the same buffer overflow as above (but I didn't test that this
+> one really segfaults).
+
+Yes, same off-by-one.
+
+>> -exit:
+>> -    qemu_opts_del(opts);
+>> +    rados_str = g_strjoinv(";", (char **)vals);
+>> +    g_strfreev((char **)vals);
+>>      return rados_str;
+>>  }
+>>  
+>> @@ -685,24 +633,9 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+>>          return -EINVAL;
+>>      }
+>>  
+>> -    auth_supported = qemu_rbd_array_opts(options, "auth-supported.",
+>> -                                         RBD_AUTH_SUPPORTED, &local_err);
+>> -    if (local_err) {
+>> -        error_propagate(errp, local_err);
+>> -        r = -EINVAL;
+>> -        goto failed_opts;
+>> -    }
+>> -
+>> -    mon_host = qemu_rbd_array_opts(options, "server.",
+>> -                                   RBD_MON_HOST, &local_err);
+>> -    if (local_err) {
+>> -        error_propagate(errp, local_err);
+>> -        r = -EINVAL;
+>> -        goto failed_opts;
+>> -    }
+>> -
+>> +    auth_supported = rbd_auth(options);
+>> +    mon_host = rbd_mon_host(options);
+>>      secretid = qemu_opt_get(opts, "password-secret");
+>
+> Of course, this also changes the behaviour so that additional options in
+> server.* and auth-supported.* aren't silently ignored any more, but we
+> complain that they are unknown. I consider this a bonus bug fix, but it
+> should probably be spelt out in the commit message.
+
+Good point.
+
+Thanks!
