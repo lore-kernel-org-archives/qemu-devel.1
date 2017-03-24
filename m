@@ -1,35 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1crAik-0005jR-OR
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 17:56:39 -0400
+	(envelope-from <anthony.xu@intel.com>) id 1crD6y-00006h-Gv
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 20:29:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1crAif-0003Yo-Vi
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 17:56:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54166)
+	(envelope-from <anthony.xu@intel.com>) id 1crD6u-0000Tg-E5
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 20:29:48 -0400
+Received: from mga11.intel.com ([192.55.52.93]:47521)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1crAif-0003Wv-NA
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 17:56:33 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3791B437F47
-	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 21:56:33 +0000 (UTC)
-References: <1490266548-22500-1-git-send-email-armbru@redhat.com>
-	<1490266548-22500-5-git-send-email-armbru@redhat.com>
-	<fe5583dc-bbe7-3387-dea9-3f4b89d682a8@redhat.com>
-	<a438ce0a-3035-1b2e-0d16-296ee930ed35@redhat.com>
-	<e6621b99-a980-dc61-b267-590eb08923c0@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <59a3aed6-e1cf-a601-4369-1a7cd74500cc@redhat.com>
-Date: Thu, 23 Mar 2017 16:56:30 -0500
+	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
+	id 1crD6u-0000Sp-0c
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 20:29:44 -0400
+From: "Xu, Anthony" <anthony.xu@intel.com>
+Date: Fri, 24 Mar 2017 00:29:39 +0000
+Message-ID: <4712D8F4B26E034E80552F30A67BE0B1A3BA2D@ORSMSX112.amr.corp.intel.com>
+References: <4712D8F4B26E034E80552F30A67BE0B1A2D69E@ORSMSX112.amr.corp.intel.com>
+	<cce399b0-45d2-ac24-4975-6e27ad04f833@redhat.com>
+	<20170323090516.GN16717@stefanha-x1.localdomain>
+In-Reply-To: <20170323090516.GN16717@stefanha-x1.localdomain>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <e6621b99-a980-dc61-b267-590eb08923c0@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="GCTmm1fwSJticPRP83hEC8w0DQ7tVrCG3"
-Subject: Re: [Qemu-devel] [PATCH for-2.9 4/5] rbd: Peel off redundant
- RbdAuthMethod wrapper struct
+Subject: Re: [Qemu-devel] [PATCH] only link current target arch traces to
+ qemu-system
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,84 +31,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jdurgin@redhat.com, jcody@redhat.com, mreitz@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Daniel Berrange <berrange@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GCTmm1fwSJticPRP83hEC8w0DQ7tVrCG3
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jdurgin@redhat.com, jcody@redhat.com, mreitz@redhat.com
-Message-ID: <59a3aed6-e1cf-a601-4369-1a7cd74500cc@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9 4/5] rbd: Peel off redundant
- RbdAuthMethod wrapper struct
-References: <1490266548-22500-1-git-send-email-armbru@redhat.com>
- <1490266548-22500-5-git-send-email-armbru@redhat.com>
- <fe5583dc-bbe7-3387-dea9-3f4b89d682a8@redhat.com>
- <a438ce0a-3035-1b2e-0d16-296ee930ed35@redhat.com>
- <e6621b99-a980-dc61-b267-590eb08923c0@redhat.com>
-In-Reply-To: <e6621b99-a980-dc61-b267-590eb08923c0@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 03/23/2017 04:43 PM, Eric Blake wrote:
-
-> We'd still have to allow libvirt's use of
-> ":key=3D...:auth_supported=3Dcephx\\;none" on the command line, but fro=
-m the
-> QMP side, we would support exactly one auth method, and libvirt will be=
-
-> updated to match when it starts targetting blockdev-add instead of
-> legacy command line.
+> Perhaps all trace.o files should be put into their own .a instead of
+> being added directly to the linker line:
 >=20
-> If librados really needs 'cephx;none' any time cephx authorization is
-> requested, then even though the QMP only requests 'cephx', we can still=
-
-> map it to 'cephx;none' in qemu - but I'm hoping that setting
-> auth_supported=3Dcephx rather than auth_supported=3Dcephx;none on the
-> librados side gives us what we (and libvirt) really want in the first p=
-lace.
-
-Or, if it becomes something that libvirt wants to allow users to tune in
-their XML (right now, users don't get a choice, they get either 'none'
-or 'cephx;none'), a forward-compatible solution under my QMP proposal
-would be to have qemu add a third enum state, "none", "cephx", and
-"cephx-no-fallback".
-
-On the other hand, if supporting multiple methods at once makes sense
-(say librados adds a 'cephy' method, and that users could legitimately
-use both 'cephx;cephy' and 'cephy;cephx' with different behaviors), then
-keeping auth as an array of instances of a simple flat union scales
-nicer than having to add a combinatorial explosion of branches to the
-flat union to cover every useful combination of auth_supported methods.
-Maybe I'm overthinking it.
-
+> COMMON_LDADDS =3D $(trace-obj-y) libqemuutil.a libqemustub.a
 >=20
-> Jeff or Josh, if you could chime in, that would be helpful.
->=20
+> I think the linker would only pull in .o files containing symbols that ar=
+e
+> actually referenced by the program.
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+Hi Stefan,
+
+That's a good idea!
+
+Below patch creates libqemutrace.a.  ./trace.o, ./qapi/trace.o and=20
+./util/trace.o are added into libqemuutil.a  to avoid recursive dependencie=
+s=20
+between libqemuutil.a and libqemutrace.a.
 
 
---GCTmm1fwSJticPRP83hEC8w0DQ7tVrCG3
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Anthony
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJY1ESOAAoJEKeha0olJ0NqoIUIAI4u0vtrz4hhd/sYZgmn0PP/
-7kmflT1WKjdq1OWifEA9OXZ34E2O+sOujVSzvfiLIESXVwXpMsvK0Byx5x5rubYc
-rMspnBi1/HBeg4Nn5RLUeGhzqXnWGYlSOJJbS+1NRO20yG1xRpSxTyn5SIHCUNr7
-2TAddRpj9An1jLDuzYpbTDTbNmSrnXFsSImUsPRmXH11U1C115f4hdR4VKRHw3Sl
-gjMgE0P+kvS1RjU7rhrC/JlPnbkMOem826u74bfii+AUoOq5LrBIU+NAIa3a4mab
-Pa1snaQl8fBmQl8XOOXYIBMXxdgcT4zdSuXx8fllwDkX13Ur5IJQvGHdmBuxe6Q=
-=gvKC
------END PGP SIGNATURE-----
 
---GCTmm1fwSJticPRP83hEC8w0DQ7tVrCG3--
+
+diff --git a/Makefile b/Makefile
+index 6c359b2..565f5c7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -345,8 +345,8 @@ subdir-dtc:dtc/libfdt dtc/tests
+ dtc/%:
+        mkdir -p $@
+
+-$(SUBDIR_RULES): libqemuutil.a libqemustub.a $(common-obj-y) $(chardev-obj=
+-y) \
+-       $(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY)) $(trace-obj-y)
++$(SUBDIR_RULES): libqemutrace.a libqemuutil.a libqemustub.a $(common-obj-y=
+) $(chardev-obj-y) \
++       $(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY))
+
+ ROMSUBDIR_RULES=3D$(patsubst %,romsubdir-%, $(ROMS))
+ # Only keep -O and -g cflags
+@@ -367,10 +367,11 @@ Makefile: $(version-obj-y)
+
+ libqemustub.a: $(stub-obj-y)
+ libqemuutil.a: $(util-obj-y)
++libqemutrace.a: $(trace-obj-y)
+
+ ######################################################################
+
+-COMMON_LDADDS =3D $(trace-obj-y) libqemuutil.a libqemustub.a
++COMMON_LDADDS =3D libqemutrace.a libqemuutil.a libqemustub.a
+
+ qemu-img.o: qemu-img-cmds.h
+
+diff --git a/Makefile.objs b/Makefile.objs
+index 6167e7b..4289ef9 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -3,6 +3,7 @@
+ stub-obj-y =3D stubs/ crypto/
+ util-obj-y =3D util/ qobject/ qapi/
+ util-obj-y +=3D qmp-introspect.o qapi-types.o qapi-visit.o qapi-event.o
++util-obj-y +=3D $(trace-root-obj-y)
+
+ chardev-obj-y =3D chardev/
+
+@@ -167,8 +168,9 @@ trace-events-subdirs +=3D qapi
+
+ trace-events-files =3D $(SRC_PATH)/trace-events $(trace-events-subdirs:%=
+=3D$(SRC_PATH)/%/trace-events)
+
+-trace-obj-y =3D trace-root.o
++trace-root-obj-y =3D trace-root.o
++trace-root-obj-$(CONFIG_TRACE_DTRACE) +=3D trace-dtrace-root.o
++trace-obj-y =3D $(trace-root-obj-y)
+ trace-obj-y +=3D $(trace-events-subdirs:%=3D%/trace.o)
+ trace-obj-$(CONFIG_TRACE_UST) +=3D trace-ust-all.o
+-trace-obj-$(CONFIG_TRACE_DTRACE) +=3D trace-dtrace-root.o
+ trace-obj-$(CONFIG_TRACE_DTRACE) +=3D $(trace-events-subdirs:%=3D%/trace-d=
+trace.o)
+diff --git a/Makefile.target b/Makefile.target
+index 7df2b8c..6f508c8 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -201,7 +201,7 @@ all-obj-$(CONFIG_SOFTMMU) +=3D $(io-obj-y)
+
+ $(QEMU_PROG_BUILD): config-devices.mak
+
+-COMMON_LDADDS =3D $(trace-obj-y) ../libqemuutil.a ../libqemustub.a
++COMMON_LDADDS =3D ../libqemutrace.a ../libqemuutil.a ../libqemustub.a
+
+ # build either PROG or PROGW
+ $(QEMU_PROG_BUILD): $(all-obj-y) $(COMMON_LDADDS)
+diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
+index 33906ff..d543d56 100644
+--- a/qapi/Makefile.objs
++++ b/qapi/Makefile.objs
+@@ -4,3 +4,5 @@ util-obj-y +=3D string-input-visitor.o string-output-visito=
+r.o
+ util-obj-y +=3D opts-visitor.o qapi-clone-visitor.o
+ util-obj-y +=3D qmp-event.o
+ util-obj-y +=3D qapi-util.o
++util-obj-y +=3D  trace.o
++util-obj-$(CONFIG_TRACE_DTRACE) +=3D trace-dtrace.o
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index f3de81f..6cbd602 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -519,7 +519,7 @@ QEMU_CFLAGS +=3D -I$(SRC_PATH)/tests
+
+
+ # Deps that are common to various different sets of tests below
+-test-util-obj-y =3D $(trace-obj-y) libqemuutil.a libqemustub.a
++test-util-obj-y =3D libqemutrace.a libqemuutil.a libqemustub.a
+ test-qom-obj-y =3D $(qom-obj-y) $(test-util-obj-y)
+ test-qapi-obj-y =3D tests/test-qapi-visit.o tests/test-qapi-types.o \
+        tests/test-qapi-event.o tests/test-qmp-introspect.o \
+diff --git a/util/Makefile.objs b/util/Makefile.objs
+index c6205eb..e38b91e 100644
+--- a/util/Makefile.objs
++++ b/util/Makefile.objs
+@@ -43,3 +43,5 @@ util-obj-y +=3D qdist.o
+ util-obj-y +=3D qht.o
+ util-obj-y +=3D range.o
+ util-obj-y +=3D systemd.o
++util-obj-y +=3D  trace.o
++util-obj-$(CONFIG_TRACE_DTRACE) +=3D trace-dtrace.o
+                                                          =20
