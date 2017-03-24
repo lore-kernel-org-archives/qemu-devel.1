@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1crSxh-0001EU-S5
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:25:19 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1crSxk-0001Ec-RX
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:25:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1crSxd-0003zR-Tk
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:25:17 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:33404)
+	(envelope-from <peter.maydell@linaro.org>) id 1crSxj-00040x-OX
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:25:20 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:37567)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1crSxd-0003zD-Lk
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:25:13 -0400
-Received: by mail-wr0-x230.google.com with SMTP id y90so6123582wrb.0
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 10:25:13 -0700 (PDT)
-References: <20170324152607.6604-1-alex.bennee@linaro.org>
-	<fa4d3712-859a-ced3-3883-8951ee9b6aa7@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <fa4d3712-859a-ced3-3883-8951ee9b6aa7@redhat.com>
-Date: Fri, 24 Mar 2017 17:25:10 +0000
-Message-ID: <871stmy4cp.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1crSxj-00040c-Hq
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:25:19 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id n11so7754489wma.0
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 10:25:19 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH-for-2.9] replay/replay.c: bump
- REPLAY_VERSION
+In-Reply-To: <0036c9a7-717b-356a-e184-69270386431c@twiddle.net>
+References: <CAFEAcA9pqDoCWrPAJ+KVxLC_eRy-xRg36oYuARYg2YP8VpGpBg@mail.gmail.com>
+	<CAFEAcA-2mcGih5bscnMsevTNTy71g9kE7OjTy3hYJKeGoGQw-g@mail.gmail.com>
+	<87k27hxyni.fsf@linaro.org>
+	<CAFEAcA-oLDW2F=L3NCdSvrLp_eh3tu9mfKR0mTfZ=3O3dpdKbQ@mail.gmail.com>
+	<1a35985f-ad4b-c017-b355-51d47aaffa11@redhat.com>
+	<CAFEAcA9oBDYqmRpwU5B2o2X-viYrccf1V3zASYGpuaQBL866ig@mail.gmail.com>
+	<0036c9a7-717b-356a-e184-69270386431c@twiddle.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 24 Mar 2017 17:24:57 +0000
+Message-ID: <CAFEAcA_E82Hn-7W=WDTSWoZPmEHifKUKDJgDpO0-vqeGBwBCsA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] Proposal for deprecating unsupported host OSes &
+ architecutures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +35,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: pavel.dovgaluk@ispras.ru, qemu-devel@nongnu.org
+To: Richard Henderson <rth@twiddle.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-
-Eric Blake <eblake@redhat.com> writes:
-
-> On 03/24/2017 10:26 AM, Alex Bennée wrote:
->> A previous commit (3d4d16f4) added support for audio record/playback.
->> However this breaks the logfile ABI due to the re-ordering of the
->> ReplayEvents enum. The REPLAY_VERSION check is meant to prevent you
->> from using old log files in newer QEMUs but this is currently broken.
+On 24 March 2017 at 01:28, Richard Henderson <rth@twiddle.net> wrote:
+> I also have access to a sparc box.
 >
-> As we don't have a formal release with the reordered enum yet, would an
-> alternative approach be partially reverting 3d4d16f4 to instead stick
-> the new enum values at the end, so that all existing enums are in the
-> same order?
+> (At the moment I'm trying to update it from 2013 era system libraries, and
+> to enable the 64-bit userland, before I do any testing of current mainline.)
 
-That would certainly be an option.
+So far I have found that we seem to be mishandling 32-bit guest
+load/stores, which I tentatively suggest
 
-> Or do you still need the version bump even then, because
-> you don't want a new stream (with the new enums) being played to an
-> older system that isn't expecting them?
+diff --git a/tcg/sparc/tcg-target.inc.c b/tcg/sparc/tcg-target.inc.c
+index d1f4c0dead..c72b57dc58 100644
+--- a/tcg/sparc/tcg-target.inc.c
++++ b/tcg/sparc/tcg-target.inc.c
+@@ -1119,7 +1119,7 @@ static void tcg_out_qemu_ld(TCGContext *s,
+TCGReg data, TCGReg addr,
+         /* Skip the high-part; we'll perform the extract in the trampoline.  */
+         param++;
+     }
+-    tcg_out_mov(s, TCG_TYPE_REG, param++, addr);
++    tcg_out_mov(s, TCG_TYPE_REG, param++, addrz);
 
-I'm not personally bothered either way. Currently the check is a simple
-match so there is not really the concept of a super/subsets of log file.
+     /* We use the helpers to extend SB and SW data, leaving the case
+        of SL needing explicit extending below.  */
+@@ -1199,7 +1199,7 @@ static void tcg_out_qemu_st(TCGContext *s,
+TCGReg data, TCGReg addr,
+         /* Skip the high-part; we'll perform the extract in the trampoline.  */
+         param++;
+     }
+-    tcg_out_mov(s, TCG_TYPE_REG, param++, addr);
++    tcg_out_mov(s, TCG_TYPE_REG, param++, addrz);
+     if (!SPARC64 && (memop & MO_SIZE) == MO_64) {
+         /* Skip the high-part; we'll perform the extract in the trampoline.  */
+         param++;
 
-I only ran into this as I was trying to debug the record/replay
-regression while writing a dumper script to debug the current
-regression:
+(otherwise we pass a high-bits-set value to the slowpath functions,
+which happens to work if QEMU was built with debug enabled but not
+if it doesn't.)
 
-  https://github.com/stsquad/qemu/blob/mttcg/more-fixes-for-rc1-v2/scripts/replay-dump.py
+That then at least makes i386 and x86_64 guests behave the same,
+ie they don't work. I haven't figured out what's going wrong there yet.
 
---
-Alex Bennée
+thanks
+-- PMM
