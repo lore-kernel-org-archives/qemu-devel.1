@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1crMn9-0006IT-5g
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 06:50:00 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1crMnd-0006hu-Sc
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 06:50:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1crMn6-0007EZ-4R
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 06:49:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42450)
+	(envelope-from <pbonzini@redhat.com>) id 1crMna-0007RJ-QJ
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 06:50:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41232)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1crMn5-0007EJ-VA
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 06:49:56 -0400
-References: <20170323175851.14342-1-bobby.prani@gmail.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1crMna-0007Qx-HK
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 06:50:26 -0400
+References: <1490079006-32495-1-git-send-email-jitendra.kolhe@hpe.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3dd9c1d8-bc6d-0b6e-14c2-b37bfd40d852@redhat.com>
-Date: Fri, 24 Mar 2017 11:49:52 +0100
+Message-ID: <c1ae1dba-33eb-c325-177a-6a74888f1ebb@redhat.com>
+Date: Fri, 24 Mar 2017 11:50:22 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170323175851.14342-1-bobby.prani@gmail.com>
+In-Reply-To: <1490079006-32495-1-git-send-email-jitendra.kolhe@hpe.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] tcg/i386: Check the size of instruction
- being translated
+Subject: Re: [Qemu-devel] [PATCH] mem-prealloc: fix
+ sysconf(_SC_NPROCESSORS_ONLN) failure case.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +27,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pranith Kumar <bobby.prani@gmail.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: Jitendra Kolhe <jitendra.kolhe@hpe.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, armbru@redhat.com, stefanha@redhat.com, kwolf@redhat.com, renganathan.meenakshisundaram@hpe.com, mohan_parthasarathy@hpe.com
+
+
+
+On 21/03/2017 07:50, Jitendra Kolhe wrote:
+> This was spotted by Coverity, in case where sysconf(_SC_NPROCESSORS_ONLN)
+> fails and returns -1. This results in memset_num_threads getting set to -1.
+> Which we then pass to g_new0().
+> The patch replaces MAX_MEM_PREALLOC_THREAD_COUNT macro with a function call
+> get_memset_num_threads() to handle sysconf() failure gracefully. In case
+> sysconf() fails, we fall back to single threaded.
+> 
+> (Spotted by Coverity, CID 1372465.)
+> 
+> Signed-off-by: Jitendra Kolhe <jitendra.kolhe@hpe.com>
+> ---
+>  util/oslib-posix.c | 16 ++++++++++++++--
+>  1 file changed, 14 insertions(+), 2 deletions(-)
+> 
+> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+> index 3fe6089..4d9189e 100644
+> --- a/util/oslib-posix.c
+> +++ b/util/oslib-posix.c
+> @@ -55,7 +55,7 @@
+>  #include "qemu/error-report.h"
+>  #endif
+>  
+> -#define MAX_MEM_PREALLOC_THREAD_COUNT (MIN(sysconf(_SC_NPROCESSORS_ONLN), 16))
+> +#define MAX_MEM_PREALLOC_THREAD_COUNT 16
+>  
+>  struct MemsetThread {
+>      char *addr;
+> @@ -381,6 +381,18 @@ static void *do_touch_pages(void *arg)
+>      return NULL;
+>  }
+>  
+> +static inline int get_memset_num_threads(int smp_cpus)
+> +{
+> +    long host_procs = sysconf(_SC_NPROCESSORS_ONLN);
+> +    int ret = 1;
+> +
+> +    if (host_procs > 0) {
+> +        ret = MIN(MIN(host_procs, MAX_MEM_PREALLOC_THREAD_COUNT), smp_cpus);
+> +    }
+> +    /* In case sysconf() fails, we fall back to single threaded */
+> +    return ret;
+> +}
+> +
+>  static bool touch_all_pages(char *area, size_t hpagesize, size_t numpages,
+>                              int smp_cpus)
+>  {
+> @@ -389,7 +401,7 @@ static bool touch_all_pages(char *area, size_t hpagesize, size_t numpages,
+>      int i = 0;
+>  
+>      memset_thread_failed = false;
+> -    memset_num_threads = MIN(smp_cpus, MAX_MEM_PREALLOC_THREAD_COUNT);
+> +    memset_num_threads = get_memset_num_threads(smp_cpus);
+>      memset_thread = g_new0(MemsetThread, memset_num_threads);
+>      numpages_per_thread = (numpages / memset_num_threads);
+>      size_per_thread = (hpagesize * numpages_per_thread);
+> 
 
 Queued, thanks.
 
 Paolo
-
-On 23/03/2017 18:58, Pranith Kumar wrote:
-> Sending again since I messed by pbonzini's email.
-> 
-> This fixes the bug: 'user-to-root privesc inside VM via bad translation
-> caching' reported by Jann Horn here:
-> https://bugs.chromium.org/p/project-zero/issues/detail?id=1122
-> 
-> CC: Richard Henderson <rth@twiddle.net>
-> CC: Peter Maydell <peter.maydell@linaro.org>
-> CC: Paolo Bonzini <pbonzini@redhat.com>
-> Reported-by: Jann Horn <jannh@google.com>
-> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
-> ---
->  target/i386/translate.c | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/target/i386/translate.c b/target/i386/translate.c
-> index 72c1b03a2a..1d1372fb43 100644
-> --- a/target/i386/translate.c
-> +++ b/target/i386/translate.c
-> @@ -4418,6 +4418,13 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
->      s->vex_l = 0;
->      s->vex_v = 0;
->   next_byte:
-> +    /* x86 has an upper limit of 15 bytes for an instruction. Since we
-> +     * do not want to decode and generate IR for an illegal
-> +     * instruction, the following check limits the instruction size to
-> +     * 25 bytes: 14 prefix + 1 opc + 6 (modrm+sib+ofs) + 4 imm */
-> +    if (s->pc - pc_start > 14) {
-> +        goto illegal_op;
-> +    }
->      b = cpu_ldub_code(env, s->pc);
->      s->pc++;
->      /* Collect prefixes.  */
-> 
