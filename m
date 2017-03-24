@@ -1,37 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1crLgF-0000Fw-Ox
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:38:48 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1crLh9-0000o9-1H
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:39:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1crLgC-0008Br-Le
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:38:47 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52370
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <borntraeger@de.ibm.com>) id 1crLh5-0008KR-Ts
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:39:43 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55453)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1crLgC-0008Bn-GA
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:38:44 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2O9ceAT112483
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 05:38:43 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 29cg2rep11-1
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1crLh5-0008K5-KP
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:39:39 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2O9ce9c091214
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 05:39:36 -0400
+Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 29cwbtskvg-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 05:38:43 -0400
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 05:39:36 -0400
 Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Fri, 24 Mar 2017 09:38:41 -0000
-Date: Fri, 24 Mar 2017 10:38:37 +0100
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <1490347615-19222-1-git-send-email-thuth@redhat.com>
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Fri, 24 Mar 2017 03:39:35 -0600
 References: <1490347615-19222-1-git-send-email-thuth@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Fri, 24 Mar 2017 10:39:29 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170324103837.60533aaf.cornelia.huck@de.ibm.com>
+In-Reply-To: <1490347615-19222-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: 8bit
+Message-Id: <f3b0b14e-4ea1-6c4e-f9c6-cb86e78c6104@de.ibm.com>
 Subject: Re: [Qemu-devel] [PATCH] target/s390x/kvm: Fix problem when running
  with SELinux under z/VM
 List-Id: <qemu-devel.nongnu.org>
@@ -42,12 +41,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-On Fri, 24 Mar 2017 10:26:55 +0100
-Thomas Huth <thuth@redhat.com> wrote:
-
+On 03/24/2017 10:26 AM, Thomas Huth wrote:
 > When running QEMU with KVM under z/VM, the memory for the guest
 > is allocated via legacy_s390_alloc() since the KVM_CAP_S390_COW
 > extension is not supported on z/VM. legacy_s390_alloc() then uses
@@ -64,7 +60,16 @@ Thomas Huth <thuth@redhat.com> wrote:
 > function. So let's get rid of that flag here to be able to run
 > with SELinux under z/VM, too.
 
-The root cause of this is lack of ESOP in the host.
+Older z/VM versions do not provide the enhanced suppression on protection
+facility, which would result in guest failures as soon as the kernel
+starts dirty pages tracking by write protecting the pages via the page
+table. Some kernel release back (last time I checked) the PROT_EXEC was 
+necessary to prevent the dirty pages tracking from taking place. So this
+patch would break KVM in that case.
+
+Newer z/VMs (e.g. 6.3) do provide ESOP. SO the question is,
+why is KVM_CAP_S390_COW not set?
+
 
 > 
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
@@ -86,5 +91,4 @@ The root cause of this is lack of ESOP in the host.
 >                 MAP_SHARED | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
 >      return mem == MAP_FAILED ? NULL : mem;
 >  }
-
-Wouldn't it be better to adapt the SELinux rules?
+> 
