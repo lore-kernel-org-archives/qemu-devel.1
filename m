@@ -1,38 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44804)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1crLh9-0000o9-1H
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:39:44 -0400
+	(envelope-from <thuth@redhat.com>) id 1crLpW-0002ki-Pm
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:48:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1crLh5-0008KR-Ts
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:39:43 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55453)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1crLh5-0008K5-KP
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:39:39 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2O9ce9c091214
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 05:39:36 -0400
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29cwbtskvg-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 05:39:36 -0400
-Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 24 Mar 2017 03:39:35 -0600
-References: <1490347615-19222-1-git-send-email-thuth@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 24 Mar 2017 10:39:29 +0100
+	(envelope-from <thuth@redhat.com>) id 1crLpS-0001u4-Rw
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:48:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53590)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1crLpS-0001tu-La
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:48:18 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D79AAC056800
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 09:48:17 +0000 (UTC)
+References: <20170323205025.12113-1-quintela@redhat.com>
+	<20170323205025.12113-2-quintela@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <afa29375-4d2f-8d69-4552-1b7c68d399f8@redhat.com>
+Date: Fri, 24 Mar 2017 10:48:13 +0100
 MIME-Version: 1.0
-In-Reply-To: <1490347615-19222-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: 8bit
-Message-Id: <f3b0b14e-4ea1-6c4e-f9c6-cb86e78c6104@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] target/s390x/kvm: Fix problem when running
- with SELinux under z/VM
+In-Reply-To: <20170323205025.12113-2-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] migration: Disable hotplug/unplug
+ during migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,54 +34,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com
 
-On 03/24/2017 10:26 AM, Thomas Huth wrote:
-> When running QEMU with KVM under z/VM, the memory for the guest
-> is allocated via legacy_s390_alloc() since the KVM_CAP_S390_COW
-> extension is not supported on z/VM. legacy_s390_alloc() then uses
-> mmap(... PROT_EXEC ...) for the guest memory - but this does not
-> work when running with SELinux enabled, mmap() fails and QEMU aborts
-> with the following error message:
+On 23.03.2017 21:50, Juan Quintela wrote:
+> Until we have reviewed what can/can't be hotplug during migration,
+> disable it.  We can enable it later for the things that we know that
+> work.  For instance, memory hotplug during postcopy don't work
+> currently.
 > 
->  cannot set up guest memory 's390.ram': Permission denied
-> 
-> Looking at the other allocator function qemu_anon_ram_alloc(), it
-> seems like PROT_EXEC is normally not needed for allocating the
-> guest RAM, and indeed, the guest also starts successfully under
-> z/VM when we remove the PROT_EXEC from the legacy_s390_alloc()
-> function. So let's get rid of that flag here to be able to run
-> with SELinux under z/VM, too.
-
-Older z/VM versions do not provide the enhanced suppression on protection
-facility, which would result in guest failures as soon as the kernel
-starts dirty pages tracking by write protecting the pages via the page
-table. Some kernel release back (last time I checked) the PROT_EXEC was 
-necessary to prevent the dirty pages tracking from taking place. So this
-patch would break KVM in that case.
-
-Newer z/VMs (e.g. 6.3) do provide ESOP. SO the question is,
-why is KVM_CAP_S390_COW not set?
-
-
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 > ---
->  target/s390x/kvm.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+>  hw/core/qdev.c | 5 +++++
+>  qdev-monitor.c | 7 ++++++-
+>  2 files changed, 11 insertions(+), 1 deletion(-)
 > 
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index ac47154..5167436 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -678,8 +678,7 @@ static void *legacy_s390_alloc(size_t size, uint64_t *align)
->  {
->      void *mem;
-> 
-> -    mem = mmap((void *) 0x800000000ULL, size,
-> -               PROT_EXEC|PROT_READ|PROT_WRITE,
-> +    mem = mmap((void *) 0x800000000ULL, size, PROT_READ | PROT_WRITE,
->                 MAP_SHARED | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
->      return mem == MAP_FAILED ? NULL : mem;
->  }
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index 1e7fb33..8c4a3f3 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -277,6 +277,11 @@ void qdev_unplug(DeviceState *dev, Error **errp)
+>      HotplugHandler *hotplug_ctrl;
+>      HotplugHandlerClass *hdc;
+>  
+> +    if (!migration_is_idle()) {
+> +        error_setg(errp, "device_add not allowed while migrating");
+> +        return;
+> +    }
+> +
+>      if (dev->parent_bus && !qbus_is_hotpluggable(dev->parent_bus)) {
+>          error_setg(errp, QERR_BUS_NO_HOTPLUG, dev->parent_bus->name);
+>          return;
+> diff --git a/qdev-monitor.c b/qdev-monitor.c
+> index 5f2fcdf..e0622b4 100644
+> --- a/qdev-monitor.c
+> +++ b/qdev-monitor.c
+> @@ -29,7 +29,7 @@
+>  #include "qemu/error-report.h"
+>  #include "qemu/help_option.h"
+>  #include "sysemu/block-backend.h"
+> -
+> +#include "migration/migration.h"
+>  /*
+>   * Aliases were a bad idea from the start.  Let's keep them
+>   * from spreading further.
+
+Maybe better keep an empty line between the include statement and the
+comment?
+
+ Thomas
+
+
+> @@ -566,6 +566,11 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
+>      BusState *bus = NULL;
+>      Error *err = NULL;
+>  
+> +    if (!migration_is_idle()) {
+> +        error_setg(errp, "device_add not allowed while migrating");
+> +        return NULL;
+> +    }
+> +
+>      driver = qemu_opt_get(opts, "driver");
+>      if (!driver) {
+>          error_setg(errp, QERR_MISSING_PARAMETER, "driver");
 > 
