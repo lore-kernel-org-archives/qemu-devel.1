@@ -1,37 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=249263d75=Paul.Durrant@citrix.com>)
-	id 1crR4j-0003fk-Ti
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:24:27 -0400
+	(envelope-from <stefanha@gmail.com>) id 1crR4s-0003j2-5g
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:24:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=249263d75=Paul.Durrant@citrix.com>)
-	id 1crR4g-0000ET-0X
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:24:25 -0400
-Received: from smtp.eu.citrix.com ([185.25.65.24]:29144)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=249263d75=Paul.Durrant@citrix.com>)
-	id 1crR4f-0000Dh-Jz
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:24:21 -0400
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Fri, 24 Mar 2017 15:24:19 +0000
-Message-ID: <4ff73294ec7f4ca0b90f7dfb71250f99@AMSPEX02CL03.citrite.net>
-References: <20170316141953.16161-1-jgross@suse.com>
-	<20170316141953.16161-3-jgross@suse.com>
-	<alpine.DEB.2.10.1703161306380.15430@sstabellini-ThinkPad-X260>
-	<214bc24d-1c0c-16d6-9c33-e20962b150d2@suse.com>
-	<alpine.DEB.2.10.1703171123520.22036@sstabellini-ThinkPad-X260>
-	<da852b5f-2490-c483-984d-c7be4f83b9a7@suse.com>
-	<alpine.DEB.2.10.1703211152240.11679@sstabellini-ThinkPad-X260>
-	<f1f79b77-f3bf-4bb0-135c-802bd5829de5@suse.com>
-	<alpine.DEB.2.10.1703221120530.13499@sstabellini-ThinkPad-X260>
-	<2fb1da9d14c14eb4826a87657f7d0eb1@AMSPEX02CL03.citrite.net>
-In-Reply-To: <2fb1da9d14c14eb4826a87657f7d0eb1@AMSPEX02CL03.citrite.net>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <stefanha@gmail.com>) id 1crR4q-0000Hx-MR
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:24:34 -0400
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 2/2] configure: use pkg-config for
- obtaining xen version
+In-Reply-To: <CAC2QTZZSPKXW6_Aaw4pTOqixpijT7XuiO3TjXwWz6BNkR-H+9g@mail.gmail.com>
+References: <1489233245-27057-1-git-send-email-ashijeetacharya@gmail.com>
+	<CAJSP0QXYdcBt1zOLEz1fdVBg6eo2Yg+uCA=u2nPQHBe01Bo9ow@mail.gmail.com>
+	<CAC2QTZbOK76fi3fX_msqc_UJu_J1RMkA7dXnSn+Zs5Cxyon6jA@mail.gmail.com>
+	<20170323150955.GD12560@stefanha-x1.localdomain>
+	<CAC2QTZZSPKXW6_Aaw4pTOqixpijT7XuiO3TjXwWz6BNkR-H+9g@mail.gmail.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Fri, 24 Mar 2017 15:24:27 +0000
+Message-ID: <CAJSP0QX_FVWE2Y=TwCDLNqpX8i+erSr=2OY4iw9jPVUmD5ieqA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH 0/2] Allocate mutiple clusters for VMDK I/O
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,132 +25,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Stefano Stabellini' <sstabellini@kernel.org>, 'Juergen Gross' <jgross@suse.com>
-Cc: "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>, "'xen-devel@lists.xenproject.org'" <xen-devel@lists.xenproject.org>, Anthony Perard <anthony.perard@citrix.com>, "'kraxel@redhat.com'" <kraxel@redhat.com>
+To: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Cc: Fam Zheng <famz@redhat.com>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
 
-> -----Original Message-----
-> From: Paul Durrant
-> Sent: 24 March 2017 15:13
-> To: 'Stefano Stabellini' <sstabellini@kernel.org>; Juergen Gross
-> <jgross@suse.com>
-> Cc: qemu-devel@nongnu.org; xen-devel@lists.xenproject.org; Anthony
-> Perard <anthony.perard@citrix.com>; kraxel@redhat.com
-> Subject: RE: [PATCH 2/2] configure: use pkg-config for obtaining xen vers=
-ion
->=20
-> > -----Original Message-----
-> > From: Stefano Stabellini [mailto:sstabellini@kernel.org]
-> > Sent: 22 March 2017 18:22
-> > To: Juergen Gross <jgross@suse.com>
-> > Cc: Stefano Stabellini <sstabellini@kernel.org>; qemu-devel@nongnu.org;
-> > xen-devel@lists.xenproject.org; Anthony Perard
-> > <anthony.perard@citrix.com>; kraxel@redhat.com; Paul Durrant
-> > <Paul.Durrant@citrix.com>
-> > Subject: Re: [PATCH 2/2] configure: use pkg-config for obtaining xen
-> version
-> >
-> > On Wed, 22 Mar 2017, Juergen Gross wrote:
-> > > On 21/03/17 19:54, Stefano Stabellini wrote:
-> > > > On Tue, 21 Mar 2017, Juergen Gross wrote:
-> > > >> On 17/03/17 19:33, Stefano Stabellini wrote:
-> > > >>> On Fri, 17 Mar 2017, Juergen Gross wrote:
-> > > >>>> On 16/03/17 21:20, Stefano Stabellini wrote:
-> > > >>>>> On Thu, 16 Mar 2017, Juergen Gross wrote:
-> > > >>>>>> Instead of trying to guess the Xen version to use by compiling
-> > various
-> > > >>>>>> test programs first just ask the system via pkg-config. Only i=
-f it
-> > > >>>>>> can't return the version fall back to the test program scheme.
-> > > >>>>>
-> > > >>>>> That's OK, but why did you remove the Xen unstable test?
-> > > >>>>
-> > > >>>> >From Xen 4.9 on pkg-config will return the needed information.
-> > There is
-> > > >>>> no longer a need for a test program to determine the Xen version=
-.
-> > After
-> > > >>>> all this was the main objective of my series adding the pkg-conf=
-ig
-> > > >>>> files to Xen.
-> > > >>>
-> > > >>> I was going to say something like "yeah, but is pkg-config always
-> > > >>> available?" In reality, QEMU already has pkg-config as build
-> > > >>> dependency, so I guess there is no problem with that.
-> > > >>>
-> > > >>> Please add a note about this to the commit message.
-> > > >>>
-> > > >>
-> > > >> Okay.
-> > > >
-> > > > Sorry to point this out only now, and I realize that it might be
-> > > > unimportant for production builds, but it is important to me, and
-> > > > developers in general, to be able to test a single QEMU tree agains=
-t a
-> > > > number of Xen trees (all releases from 4.3 onward).
-> > > >
-> > > > With this change (specifically dropping the 4.9 build test), out of=
- tree
-> > > > builds don't work anymore. I would like to be able to do:
-> > > >
-> > > > ./configure --enable-xen --target-list=3Di386-softmmu \
-> > > >                 --extra-cflags=3D"-I$DIR/tools/include \
-> > > >                 -I$DIR/tools/libs/toollog/include \
-> > > >                 -I$DIR/tools/libs/evtchn/include \
-> > > >                 -I$DIR/tools/libs/gnttab/include \
-> > > >                 -I$DIR/tools/libs/foreignmemory/include \
-> > > >                 -I$DIR/tools/libs/devicemodel/include \
-> > > >                 -I$DIR/tools/libxc/include \
-> > > >                 -I$DIR/tools/xenstore/include \
-> > > >                 -I$DIR/tools/xenstore/compat/include" \
-> > > >                 --extra-ldflags=3D"-L$DIR/tools/libxc \
-> > > >                 -L$DIR/tools/xenstore \
-> > > >                 -L$DIR/tools/libs/evtchn \
-> > > >                 -L$DIR/tools/libs/gnttab \
-> > > >                 -L$DIR/tools/libs/foreignmemory \
-> > > >                 -L$DIR/tools/libs/devicemodel \
-> > > >                 -Wl,-rpath-link=3D$DIR/tools/libs/toollog \
-> > > >                 -Wl,-rpath-link=3D$DIR/tools/libs/evtchn \
-> > > >                 -Wl,-rpath-link=3D$DIR/tools/libs/gnttab \
-> > > >                 -Wl,-rpath-link=3D$DIR/tools/libs/call \
-> > > >                 -Wl,-rpath-link=3D$DIR/tools/libs/foreignmemory \
-> > > >                 -Wl,-rpath-link=3D$DIR/tools/libs/devicemodel" \
-> > > >             --disable-kvm
-> > > > make
-> > > >
-> > > > And the make should succeed. Is there a way to do that with pkg-
-> config?
-> > >
-> > > Sure, for Xen 4.9 just do:
-> > >
-> > > PKG_CONFIG_PATH=3D$(DIR)/tools/pkg-config ./configure \
-> > > 		--enable-xen --target-list=3Di386-softmmu \
-> > > 		--disable-kvm
-> > > make
-> >
-> > Yes, that works, thanks! I committed it to my next branch adding
-> > "pkg-config, which is already a build dependency of QEMU, will be used
-> > exclusively to determine the Xen version from Xen 4.9 onward." to the
-> > commit message.
->=20
-> A further question...
->=20
-> I have a xen tree which I've been using to build and install master again=
-st my
-> own checked out QEMU repo. No problem with that. I've now reverted my
-> tree to 4.7.0 and cannot build tools (even after a make distclean) becaus=
-e
-> QEMU's configure is still getting up a xen_ctrl_version of 40900. This is
-> because pkg-config is still finding a 4.9.0 xencontrol package? Where is =
-it
-> getting this from?
->=20
+On Thu, Mar 23, 2017 at 4:22 PM, Ashijeet Acharya
+<ashijeetacharya@gmail.com> wrote:
+> On Thu, Mar 23, 2017 at 8:39 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>> On Tue, Mar 21, 2017 at 09:14:08AM +0000, Ashijeet Acharya wrote:
+>>> On Tue, 21 Mar 2017 at 13:21, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>>>
+>>> > On Sat, Mar 11, 2017 at 11:54 AM, Ashijeet Acharya
+>>> > <ashijeetacharya@gmail.com> wrote:
+>>> > > This series optimizes the I/O performance of VMDK driver.
+>>> > >
+>>> > > Patch 1 makes the VMDK driver to allocate multiple clusters at once.
+>>> > Earlier
+>>> > > it used to allocate cluster by cluster which slowed down its performance
+>>> > to a
+>>> > > great extent.
+>>> > >
+>>> > > Patch 2 changes the metadata update code to update the L2 tables for
+>>> > multiple
+>>> > > clusters at once.
+>>> >
+>>> > This patch series is a performance optimization.  Benchmark results
+>>> > are required to justify optimizations.  Please include performance
+>>> > results in the next revision.
+>>> >
+>>> > A popular disk I/O benchmarking is fio (https://github.com/axboe/fio).
+>>> > I suggest a write-heavy workload with a large block size:
+>>> >
+>>> > $ cat fio.job
+>>> > [global]
+>>> > direct=1
+>>> > filename=/dev/vdb
+>>> > ioengine=libaio
+>>> > runtime=30
+>>> > ramp_time=5
+>>> >
+>>> > [job1]
+>>> > iodepth=4
+>>> > rw=randwrite
+>>> > bs=256k
+>>> > $ for i in 1 2 3 4 5; do fio --output=fio-$i.txt fio.job; done #
+>>> > WARNING: overwrites /dev/vdb
+>>> >
+>>> > It's good practice to run the benchmark several times because there is
+>>> > usually some variation between runs.  This allows you to check that
+>>> > the variance is within a reasonable range (5-10% on a normal machine
+>>> > that hasn't been specially prepared for benchmarking).
+>>>
+>>>
+>>> I ran a few write tests of 128M using qemu-io and the results showed the
+>>> time to drop to almost half, will those work? Although, I will also try to
+>>> use the tool you mentioned later today when I am free and include those
+>>> results as well.
+>>
+>> Maybe, it's hard to say without seeing the commands you ran.
+>
+> These are the commands I ran to test the write requests:
+>
+> My test file "test1.vmdk" is a 1G empty vmdk image created by using
+> 'qemu-img' tool.
+>
+> Before optimization:
+> $ ./bin/qemu-io -f vmdk --cache writeback
+> qemu-io> open -n -o driver=vmdk test1.vmdk
+> qemu-io> aio_write 0 128M
+> qemu-io> wrote 134217728/134217728 bytes at offset 0
+> 128 MiB, 1 ops; 0:00:16.46 (7.772 MiB/sec and 0.0607 ops/sec)
+>
+> After optimization:
+> $ ./bin/qemu-io -f vmdk --cache writeback
+> qemu-io> open -n -o driver=vmdk test1.vmdk
+> qemu-io> aio_write 0 128M
+> qemu-io> wrote 134217728/134217728 bytes at offset 0
+> 128 MiB, 1 ops; 0:00:08.19 (15.627 MiB/sec and 0.1221 ops/sec)
+>
+> Will these work?
 
-Even in a completely fresh checkout of xen.git RELEASE-4.7.2 tag I'm *still=
-* getting a xen_ctrl_version of 40900, which presumably means it is coming =
-from the version of xenctrl I have *installed* rather than the one I've bui=
-lt. This is quite a change in behaviour and one that is going to cause prob=
-lems.
+It is best to avoid --cache writeback in performance tests because
+using the host page cache puts the performance at the mercy of the
+kernel's page cache.
 
-  Paul
+I have run the following benchmark using "qemu-img bench":
 
->   Paul
+This patch series improves 128 KB sequential write performance to an
+empty VMDK file by 29%.
+
+Benchmark command: ./qemu-img bench -w -c 1024 -s 128K -d 1 -t none -f
+vmdk test.vmdk
+
+(Please include the 2 lines above in the next revision of the patch.)
+
+The qemu-img bench options used:
+ * -w issues write requests instead of reads
+ * -c 1024 terminates after 1024 requests
+ * -s 128K sets the request size to 128 KB
+ * -d 1 restricts the benchmark to 1 in-flight request at any time
+ * -t none uses O_DIRECT to bypass the host page cache
+
+1. Without your patch
+$ for i in 1 2 3 4 5; do ./qemu-img create -f vmdk test.vmdk 4G;
+./qemu-img bench -w -c 1024 -s 128K -d 1 -t none -f vmdk test.vmdk;
+done
+Formatting 'test.vmdk', fmt=vmdk size=4294967296 compat6=off hwversion=undefined
+Sending 1024 write requests, 131072 bytes each, 1 in parallel
+(starting at offset 0, step size 131072)
+Run completed in 35.081 seconds.
+Formatting 'test.vmdk', fmt=vmdk size=4294967296 compat6=off hwversion=undefined
+Sending 1024 write requests, 131072 bytes each, 1 in parallel
+(starting at offset 0, step size 131072)
+Run completed in 34.548 seconds.
+Formatting 'test.vmdk', fmt=vmdk size=4294967296 compat6=off hwversion=undefined
+Sending 1024 write requests, 131072 bytes each, 1 in parallel
+(starting at offset 0, step size 131072)
+Run completed in 34.637 seconds.
+Formatting 'test.vmdk', fmt=vmdk size=4294967296 compat6=off hwversion=undefined
+Sending 1024 write requests, 131072 bytes each, 1 in parallel
+(starting at offset 0, step size 131072)
+Run completed in 34.411 seconds.
+Formatting 'test.vmdk', fmt=vmdk size=4294967296 compat6=off hwversion=undefined
+Sending 1024 write requests, 131072 bytes each, 1 in parallel
+(starting at offset 0, step size 131072)
+Run completed in 34.599 seconds.
+
+2. With your patch
+$ for i in 1 2 3 4 5; do ./qemu-img create -f vmdk test.vmdk 4G;
+./qemu-img bench -w -c 1024 -s 128K -d 1 -t none -f vmdk test.vmdk;
+done
+Formatting 'test.vmdk', fmt=vmdk size=4294967296 compat6=off hwversion=undefined
+Sending 1024 write requests, 131072 bytes each, 1 in parallel
+(starting at offset 0, step size 131072)
+Run completed in 24.974 seconds.
+Formatting 'test.vmdk', fmt=vmdk size=4294967296 compat6=off hwversion=undefined
+Sending 1024 write requests, 131072 bytes each, 1 in parallel
+(starting at offset 0, step size 131072)
+Run completed in 24.769 seconds.
+Formatting 'test.vmdk', fmt=vmdk size=4294967296 compat6=off hwversion=undefined
+Sending 1024 write requests, 131072 bytes each, 1 in parallel
+(starting at offset 0, step size 131072)
+Run completed in 24.800 seconds.
+Formatting 'test.vmdk', fmt=vmdk size=4294967296 compat6=off hwversion=undefined
+Sending 1024 write requests, 131072 bytes each, 1 in parallel
+(starting at offset 0, step size 131072)
+Run completed in 24.928 seconds.
+Formatting 'test.vmdk', fmt=vmdk size=4294967296 compat6=off hwversion=undefined
+Sending 1024 write requests, 131072 bytes each, 1 in parallel
+(starting at offset 0, step size 131072)
+Run completed in 24.897 seconds.
+
+Stefan
