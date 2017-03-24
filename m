@@ -1,35 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49692)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1crJv6-0001wG-0H
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 03:46:01 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1crK1l-0003lA-FJ
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 03:52:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1crJv1-0003kr-QY
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 03:45:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50510)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1crJv1-0003k6-9U
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 03:45:55 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1crJuz-0004Zh-0T
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 07:45:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C64A12E80DD
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 07:45:52 +0000 (UTC)
+	(envelope-from <alex.bennee@linaro.org>) id 1crK1i-0006Ua-Ah
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 03:52:53 -0400
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:33091)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1crK1i-0006UR-4T
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 03:52:50 -0400
+Received: by mail-wr0-x22e.google.com with SMTP id y90so3935595wrb.0
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 00:52:49 -0700 (PDT)
+References: <20170322172621.26186.61813.malonedeb@gac.canonical.com>
+	<20170324062950.30507.96974.malone@soybean.canonical.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170324062950.30507.96974.malone@soybean.canonical.com>
+Date: Fri, 24 Mar 2017 07:52:46 +0000
+Message-ID: <878tnvxga9.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 24 Mar 2017 07:30:18 -0000
-From: ChristianEhrhardt <1490611@bugs.launchpad.net>
-Reply-To: Bug 1490611 <1490611@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150831152901.21817.58033.malonedeb@gac.canonical.com>
-Message-Id: <20170324073018.3792.3640.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1490611] Re: Using qemu >=2.2.1 to convert
- raw->VHD (fixed) adds extra padding to the result file,
- which Microsoft Azure rejects as invalid
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Bug 1675108] Re: Cocoa UI always crashes on
+ startup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,149 +31,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Bug 1675108 <1675108@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org
 
-Verified Proposed:
 
-dd if=3D/dev/zero of=3Dsource-disk.img bs=3D1M count=3D4096
-qemu-img convert -f raw -o subformat=3Dfixed -O vpc source-disk.img dest-di=
-sk-old.vhd
-#upgrade
-$qemu-img convert -f raw -o subformat=3Dfixed -O vpc source-disk.img dest-d=
-isk-new.vhd
-$qemu-img convert -f raw -o subformat=3Dfixed,force_size -O vpc source-disk=
-.img dest-disk-new-forced.vhd
-#check alignment:
-$ stat dest-disk-old.vhd dest-disk-new.vhd dest-disk-new-forced.vhd | awk '=
-/^ *Size:/ {print ($2-512)/1024/1024}'
-4096.48
-4096.48
-4096
+Brendan Shanks <brendan@bslabs.net> writes:
 
-That means:
-1. without adding the new parm no behaviour change (good since it is SRU)
-2. with the force_size parm the size is aligned
+> Tested on 10.12.3, it doesn't crash immediately (like before) but
+> crashes reliably once I send some keyboard input to qemu:
+>
+> $ i386-softmmu/qemu-system-i386
+> **
+> ERROR:/Users/pip/no_backup/qemu/translate-common.c:34:tcg_handle_interrupt: assertion failed: (qemu_mutex_iothread_locked())
+> Abort trap: 6
 
-That is enough for verification, but it would be even greater if that
-could also be tested on real azure.
+Can you test with the suggested patch I posted yesterday? If we keep the
+update under BQL this shouldn't fail.
 
-** Tags removed: verification-needed
-** Tags added: verification-done
+>
+>
+> Thread 0 Crashed:: Dispatch queue: com.apple.main-thread
+> 0   libsystem_kernel.dylib        	0x00007fffa746edd6 __pthread_kill + 10
+> 1   libsystem_pthread.dylib       	0x00007fffa755a787 pthread_kill + 90
+> 2   libsystem_c.dylib             	0x00007fffa73d4420 abort + 129
+> 3   libglib-2.0.0.dylib           	0x00000001076aec86 g_assertion_message + 388
+> 4   libglib-2.0.0.dylib           	0x00000001076aece4 g_assertion_message_expr + 94
+> 5   qemu-system-i386              	0x00000001066bb1ec tcg_handle_interrupt + 156 (translate-common.c:50)
+> 6   qemu-system-i386              	0x0000000106740dfc pic_irq_request + 156 (pc.c:187)
+> 7   qemu-system-i386              	0x000000010673e5e4 gsi_handler + 36 (pc.c:115)
+> 8   qemu-system-i386              	0x000000010685e97a kbd_update_kbd_irq + 138 (pckbd.c:180)
+> 9   qemu-system-i386              	0x000000010694164a qemu_input_event_send_impl + 938 (input.c:328)
+> 10  qemu-system-i386              	0x000000010694188f qemu_input_event_send_key + 239 (input.c:359)
+> 11  qemu-system-i386              	0x0000000106946a00 cocoa_refresh + 272 (cocoa.m:1402)
+> 12  qemu-system-i386              	0x000000010693f6a8 gui_update + 104 (console.c:1603)
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1490611
-
-Title:
-  Using qemu >=3D2.2.1 to convert raw->VHD (fixed) adds extra padding to
-  the result file, which Microsoft Azure rejects as invalid
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Xenial:
-  Fix Committed
-
-Bug description:
-  [Impact]
-
-  =C2=A0* Starting with a raw disk image, using "qemu-img convert" to conve=
-rt
-  from raw to VHD results in the output VHD file's virtual size being
-  aligned to the nearest 516096 bytes (16 heads x 63 sectors per head x
-  512 bytes per sector), instead of preserving the input file's size as
-  the output VHD's virtual disk size.
-
-  =C2=A0* Microsoft Azure requires that disk images (VHDs) submitted for
-  upload have virtual sizes aligned to a megabyte boundary. (Ex. 4096MB,
-  4097MB, 4098MB, etc. are OK, 4096.5MB is rejected with an error.) This
-  is reflected in Microsoft's documentation: https://azure.microsoft.com
-  /en-us/documentation/articles/virtual-machines-linux-create-upload-
-  vhd-generic/
-
-  =C2=A0* The fix for this bug is a backport from upstream.
-  http://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Dfb9245c2610932d33ce14
-
-  [Test Case]
-
-  =C2=A0* This is reproducible with the following set of commands (including
-  the Azure command line tools from https://github.com/Azure/azure-
-  xplat-cli). For the following example, I used qemu version 2.2.1:
-
-  $ dd if=3D/dev/zero of=3Dsource-disk.img bs=3D1M count=3D4096
-
-  $ stat source-disk.img
-  =C2=A0=C2=A0File: =E2=80=98source-disk.img=E2=80=99
-  =C2=A0=C2=A0Size: 4294967296      Blocks: 798656     IO Block: 4096   reg=
-ular file
-  Device: fc01h/64513d    Inode: 13247963    Links: 1
-  Access: (0644/-rw-r--r--)  Uid: ( 1000/  smkent)   Gid: ( 1000/  smkent)
-  Access: 2015-08-18 09:48:02.613988480 -0700
-  Modify: 2015-08-18 09:48:02.825985646 -0700
-  Change: 2015-08-18 09:48:02.825985646 -0700
-  =C2=A0Birth: -
-
-  $ qemu-img convert -f raw -o subformat=3Dfixed -O vpc source-disk.img
-  dest-disk.vhd
-
-  $ stat dest-disk.vhd
-  =C2=A0=C2=A0File: =E2=80=98dest-disk.vhd=E2=80=99
-  =C2=A0=C2=A0Size: 4296499712      Blocks: 535216     IO Block: 4096   reg=
-ular file
-  Device: fc01h/64513d    Inode: 13247964    Links: 1
-  Access: (0644/-rw-r--r--)  Uid: ( 1000/  smkent)   Gid: ( 1000/  smkent)
-  Access: 2015-08-18 09:50:22.252077624 -0700
-  Modify: 2015-08-18 09:49:24.424868868 -0700
-  Change: 2015-08-18 09:49:24.424868868 -0700
-  =C2=A0Birth: -
-
-  $ azure vm image create testimage1 dest-disk.vhd -o linux -l "West US"
-  info:    Executing command vm image create
-  + Retrieving storage accounts
-  info:    VHD size : 4097 MB
-  info:    Uploading 4195800.5 KB
-  Requested:100.0% Completed:100.0% Running:   0 Time: 1m 0s Speed:  6744 K=
-B/s
-  info:    https://[redacted].blob.core.windows.net/vm-images/dest-disk.vhd=
- was uploaded successfully
-  error:   The VHD https://[redacted].blob.core.windows.net/vm-images/dest-=
-disk.vhd has an unsupported virtual size of 4296499200 bytes.  The size mus=
-t be a whole number (in MBs).
-  info:    Error information has been recorded to /home/smkent/.azure/azure=
-.err
-  error:   vm image create command failed
-
-  =C2=A0* A fixed qemu-img will not result in an error during azure image
-  creation. It will require passing -o force_size, which will leverage
-  the backported functionality.
-
-  [Regression Potential]
-
-  =C2=A0* The upstream fix introduces a qemu-img option (-o force_size) whi=
-ch
-  is unset by default. The regression potential is very low, as a
-  result.
-
-  ...
-
-  I also ran the above commands using qemu 2.4.0, which resulted in the
-  same error as the conversion behavior is the same.
-
-  However, qemu 2.1.1 and earlier (including qemu 2.0.0 installed by
-  Ubuntu 14.04) does not pad the virtual disk size during conversion.
-  Using qemu-img convert from qemu versions <=3D2.1.1 results in a VHD
-  that is exactly the size of the raw input file plus 512 bytes (for the
-  VHD footer). Those qemu versions do not attempt to realign the disk.
-  As a result, Azure accepts VHD files created using those versions of
-  qemu-img convert for upload.
-
-  Is there a reason why newer qemu realigns the converted VHD file? It
-  would be useful if an option were added to disable this feature, as
-  current versions of qemu cannot be used to create VHD files for Azure
-  using Microsoft's official instructions.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1490611/+subscriptions
+--
+Alex Bennée
