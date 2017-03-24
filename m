@@ -1,21 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1crPty-0003Am-5B
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:09:15 -0400
+	(envelope-from <jcody@redhat.com>) id 1crPvA-0004BP-O6
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:10:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1crPtu-0006yU-3s
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:09:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54882)
+	(envelope-from <jcody@redhat.com>) id 1crPv9-0007Oq-Qh
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:10:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36682)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1crPtt-0006yJ-RS
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:09:10 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri, 24 Mar 2017 14:08:53 +0000
-Message-Id: <20170324140854.28134-4-stefanha@redhat.com>
-In-Reply-To: <20170324140854.28134-1-stefanha@redhat.com>
-References: <20170324140854.28134-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL for-2.9 3/3] trace: Avoid abuse of
- amdvi_mmio_read
+	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1crPv9-0007Od-LO
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:10:27 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B8703C04B945
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 14:10:27 +0000 (UTC)
+Date: Fri, 24 Mar 2017 10:10:25 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170324141025.GE15423@localhost.localdomain>
+References: <1490266548-22500-1-git-send-email-armbru@redhat.com>
+	<1490266548-22500-5-git-send-email-armbru@redhat.com>
+	<fe5583dc-bbe7-3387-dea9-3f4b89d682a8@redhat.com>
+	<a438ce0a-3035-1b2e-0d16-296ee930ed35@redhat.com>
+	<e6621b99-a980-dc61-b267-590eb08923c0@redhat.com>
+	<59a3aed6-e1cf-a601-4369-1a7cd74500cc@redhat.com>
+	<20170324035537.GA22342@localhost.localdomain>
+	<87fui3yx0y.fsf@dusky.pond.sub.org>
+	<20170324124213.GC22342@localhost.localdomain>
+	<89101331-9bba-fb6c-42a1-dfce7775fe4c@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <89101331-9bba-fb6c-42a1-dfce7775fe4c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.9 4/5] rbd: Peel off redundant
+ RbdAuthMethod wrapper struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,59 +42,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, kwolf@redhat.com, jdurgin@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, dillaman@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>
 
-From: Eric Blake <eblake@redhat.com>
+On Fri, Mar 24, 2017 at 08:49:20AM -0500, Eric Blake wrote:
+> On 03/24/2017 07:42 AM, Jeff Cody wrote:
+> 
+> > Agree.  My preference is to leave it as an array of methods, so long as that
+> > is tenable to libvirt.
+> 
+> The -drive syntax should remain unchanged (that's an absolute must for
+> libvirt).  But the QMP syntax being an array of methods sounds best to
+> me, and I think password-secret should be part of the array.  So my vote
+> would be for:
+> 
+> { "driver": "rbd", "image": "foo",
+>   "auth": [ { "type": "cephx", "password-secret": "sec0" },
+>             { "type": "none" } ],
+>   "pool": "bar" }
+> 
+> It makes mapping -drive arguments into QMP form a bit trickier, but the
+> QMP form is then easily extensible if we add another auth method down
+> the road.
+> 
 
-hw/i386/trace-events has an amdvi_mmio_read trace that is used for
-both normal reads (listing the register name, address, size, and
-offset) and for an error case (abusing the register name to show
-an error message, the address to show the maximum value supported,
-then shoehorning address and size into the size and offset
-parameters).  The change from a wide address to a narrower size
-parameter could truncate a (rather-large) bogus read attempt, so
-it's better to create a separate dedicated trace with correct types,
-rather than abusing the trace mechanism.  Broken since its
-introduction in commit d29a09c.
+In that case, what about adding user as well, and not just password-secret?
 
-[Change trace event argument type from hwaddr to uint64_t since
-user-defined types should not be used for trace events.  This fixes a
-build failure with LTTng UST.
---Stefan]
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- hw/i386/amd_iommu.c  | 3 +--
- hw/i386/trace-events | 1 +
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-index e0732cc..f86a40a 100644
---- a/hw/i386/amd_iommu.c
-+++ b/hw/i386/amd_iommu.c
-@@ -572,8 +572,7 @@ static uint64_t amdvi_mmio_read(void *opaque, hwaddr addr, unsigned size)
- 
-     uint64_t val = -1;
-     if (addr + size > AMDVI_MMIO_SIZE) {
--        trace_amdvi_mmio_read("error: addr outside region: max ",
--                (uint64_t)AMDVI_MMIO_SIZE, addr, size);
-+        trace_amdvi_mmio_read_invalid(AMDVI_MMIO_SIZE, addr, size);
-         return (uint64_t)-1;
-     }
- 
-diff --git a/hw/i386/trace-events b/hw/i386/trace-events
-index 88ad5e4..baed874 100644
---- a/hw/i386/trace-events
-+++ b/hw/i386/trace-events
-@@ -37,6 +37,7 @@ amdvi_cache_update(uint16_t domid, uint8_t bus, uint8_t slot, uint8_t func, uint
- amdvi_completion_wait_fail(uint64_t addr) "error: fail to write at address 0x%"PRIx64
- amdvi_mmio_write(const char *reg, uint64_t addr, unsigned size, uint64_t val, uint64_t offset) "%s write addr 0x%"PRIx64", size %u, val 0x%"PRIx64", offset 0x%"PRIx64
- amdvi_mmio_read(const char *reg, uint64_t addr, unsigned size, uint64_t offset) "%s read addr 0x%"PRIx64", size %u offset 0x%"PRIx64
-+amdvi_mmio_read_invalid(int max, uint64_t addr, unsigned size) "error: addr outside region (max 0x%x): read addr 0x%" PRIx64 ", size %u"
- amdvi_command_error(uint64_t status) "error: Executing commands with command buffer disabled 0x%"PRIx64
- amdvi_command_read_fail(uint64_t addr, uint32_t head) "error: fail to access memory at 0x%"PRIx64" + 0x%"PRIx32
- amdvi_command_exec(uint32_t head, uint32_t tail, uint64_t buf) "command buffer head at 0x%"PRIx32" command buffer tail at 0x%"PRIx32" command buffer base at 0x%"PRIx64
--- 
-2.9.3
+Jeff
