@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jgross@suse.com>) id 1crREu-0001wO-3U
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:34:57 -0400
+	(envelope-from <stefanha@gmail.com>) id 1crRGH-0002zi-L4
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:36:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jgross@suse.com>) id 1crREq-0004L2-3E
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:34:56 -0400
-Received: from mx2.suse.de ([195.135.220.15]:57975)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jgross@suse.com>) id 1crREp-0004Kk-Nt
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:34:52 -0400
-References: <20170316141953.16161-1-jgross@suse.com>
-	<20170316141953.16161-3-jgross@suse.com>
-	<alpine.DEB.2.10.1703161306380.15430@sstabellini-ThinkPad-X260>
-	<214bc24d-1c0c-16d6-9c33-e20962b150d2@suse.com>
-	<alpine.DEB.2.10.1703171123520.22036@sstabellini-ThinkPad-X260>
-	<da852b5f-2490-c483-984d-c7be4f83b9a7@suse.com>
-	<alpine.DEB.2.10.1703211152240.11679@sstabellini-ThinkPad-X260>
-	<f1f79b77-f3bf-4bb0-135c-802bd5829de5@suse.com>
-	<alpine.DEB.2.10.1703221120530.13499@sstabellini-ThinkPad-X260>
-	<2fb1da9d14c14eb4826a87657f7d0eb1@AMSPEX02CL03.citrite.net>
-From: Juergen Gross <jgross@suse.com>
-Message-ID: <550ea61e-c9ba-5afc-12b5-438a2a57af6e@suse.com>
-Date: Fri, 24 Mar 2017 16:34:48 +0100
+	(envelope-from <stefanha@gmail.com>) id 1crRGD-00055F-Mr
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:36:21 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:34825)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1crRGD-00054N-Fv
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:36:17 -0400
+Received: by mail-wr0-x241.google.com with SMTP id u108so946580wrb.2
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 08:36:17 -0700 (PDT)
+Date: Fri, 24 Mar 2017 15:36:13 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170324153613.GA5849@stefanha-x1.localdomain>
+References: <148900626714.27090.1616990932333159904.stgit@brijesh-build-machine>
+	<148900628810.27090.3461280348833651824.stgit@brijesh-build-machine>
+	<20170323112922.GB12560@stefanha-x1.localdomain>
+	<b3cc6807-9cac-968a-0759-60a203102751@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <2fb1da9d14c14eb4826a87657f7d0eb1@AMSPEX02CL03.citrite.net>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH 2/2] configure: use pkg-config
- for obtaining xen version
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="ibTvN161/egqYuK8"
+Content-Disposition: inline
+In-Reply-To: <b3cc6807-9cac-968a-0759-60a203102751@amd.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v4 02/20] memattrs: add debug attribute
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,118 +32,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <Paul.Durrant@citrix.com>, 'Stefano Stabellini' <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kraxel@redhat.com" <kraxel@redhat.com>
-
-On 24/03/17 16:12, Paul Durrant wrote:
->> -----Original Message-----
->> From: Stefano Stabellini [mailto:sstabellini@kernel.org]
->> Sent: 22 March 2017 18:22
->> To: Juergen Gross <jgross@suse.com>
->> Cc: Stefano Stabellini <sstabellini@kernel.org>; qemu-devel@nongnu.org;
->> xen-devel@lists.xenproject.org; Anthony Perard
->> <anthony.perard@citrix.com>; kraxel@redhat.com; Paul Durrant
->> <Paul.Durrant@citrix.com>
->> Subject: Re: [PATCH 2/2] configure: use pkg-config for obtaining xen version
->>
->> On Wed, 22 Mar 2017, Juergen Gross wrote:
->>> On 21/03/17 19:54, Stefano Stabellini wrote:
->>>> On Tue, 21 Mar 2017, Juergen Gross wrote:
->>>>> On 17/03/17 19:33, Stefano Stabellini wrote:
->>>>>> On Fri, 17 Mar 2017, Juergen Gross wrote:
->>>>>>> On 16/03/17 21:20, Stefano Stabellini wrote:
->>>>>>>> On Thu, 16 Mar 2017, Juergen Gross wrote:
->>>>>>>>> Instead of trying to guess the Xen version to use by compiling
->> various
->>>>>>>>> test programs first just ask the system via pkg-config. Only if it
->>>>>>>>> can't return the version fall back to the test program scheme.
->>>>>>>>
->>>>>>>> That's OK, but why did you remove the Xen unstable test?
->>>>>>>
->>>>>>> >From Xen 4.9 on pkg-config will return the needed information.
->> There is
->>>>>>> no longer a need for a test program to determine the Xen version.
->> After
->>>>>>> all this was the main objective of my series adding the pkg-config
->>>>>>> files to Xen.
->>>>>>
->>>>>> I was going to say something like "yeah, but is pkg-config always
->>>>>> available?" In reality, QEMU already has pkg-config as build
->>>>>> dependency, so I guess there is no problem with that.
->>>>>>
->>>>>> Please add a note about this to the commit message.
->>>>>>
->>>>>
->>>>> Okay.
->>>>
->>>> Sorry to point this out only now, and I realize that it might be
->>>> unimportant for production builds, but it is important to me, and
->>>> developers in general, to be able to test a single QEMU tree against a
->>>> number of Xen trees (all releases from 4.3 onward).
->>>>
->>>> With this change (specifically dropping the 4.9 build test), out of tree
->>>> builds don't work anymore. I would like to be able to do:
->>>>
->>>> ./configure --enable-xen --target-list=i386-softmmu \
->>>>                 --extra-cflags="-I$DIR/tools/include \
->>>>                 -I$DIR/tools/libs/toollog/include \
->>>>                 -I$DIR/tools/libs/evtchn/include \
->>>>                 -I$DIR/tools/libs/gnttab/include \
->>>>                 -I$DIR/tools/libs/foreignmemory/include \
->>>>                 -I$DIR/tools/libs/devicemodel/include \
->>>>                 -I$DIR/tools/libxc/include \
->>>>                 -I$DIR/tools/xenstore/include \
->>>>                 -I$DIR/tools/xenstore/compat/include" \
->>>>                 --extra-ldflags="-L$DIR/tools/libxc \
->>>>                 -L$DIR/tools/xenstore \
->>>>                 -L$DIR/tools/libs/evtchn \
->>>>                 -L$DIR/tools/libs/gnttab \
->>>>                 -L$DIR/tools/libs/foreignmemory \
->>>>                 -L$DIR/tools/libs/devicemodel \
->>>>                 -Wl,-rpath-link=$DIR/tools/libs/toollog \
->>>>                 -Wl,-rpath-link=$DIR/tools/libs/evtchn \
->>>>                 -Wl,-rpath-link=$DIR/tools/libs/gnttab \
->>>>                 -Wl,-rpath-link=$DIR/tools/libs/call \
->>>>                 -Wl,-rpath-link=$DIR/tools/libs/foreignmemory \
->>>>                 -Wl,-rpath-link=$DIR/tools/libs/devicemodel" \
->>>>             --disable-kvm
->>>> make
->>>>
->>>> And the make should succeed. Is there a way to do that with pkg-config?
->>>
->>> Sure, for Xen 4.9 just do:
->>>
->>> PKG_CONFIG_PATH=$(DIR)/tools/pkg-config ./configure \
->>> 		--enable-xen --target-list=i386-softmmu \
->>> 		--disable-kvm
->>> make
->>
->> Yes, that works, thanks! I committed it to my next branch adding
->> "pkg-config, which is already a build dependency of QEMU, will be used
->> exclusively to determine the Xen version from Xen 4.9 onward." to the
->> commit message.
-> 
-> A further question...
-> 
-> I have a xen tree which I've been using to build and install master against my own checked out QEMU repo. No problem with that. I've now reverted my tree to 4.7.0 and cannot build tools (even after a make distclean) because QEMU's configure is still getting up a xen_ctrl_version of 40900. This is because pkg-config is still finding a 4.9.0 xencontrol package? Where is it getting this from?
-
-Hmm, could it be you have Xen unstable installed on your machine?
-
-Didn't think of this problem. I can think of 3 solutions:
-
-a) delete the xencontrol.pc file (on my system under
-   /usr/share/pkgconfig/ )
-
-b) we add a patch to qemu to test an environment variable whether
-   pkg-config should be ignored for Xen version detection
-
-c) set the environment variable PKG_CONFIG_LIBDIR to a local directory
-   and copy all but the xen*.pc files from /usr/share/pkgconfig/ (or
-   your correct directory) to it (or link them to avoid missing updates)
-
-OTOH this is something you have to be aware of for other packages as
-well: mixing the build environment and the target environment can lead
-to bad results. Now Xen has been added to the list.
+To: Brijesh Singh <brijesh.singh@amd.com>
+Cc: ehabkost@redhat.com, crosthwaite.peter@gmail.com, armbru@redhat.com, mst@redhat.com, p.fedin@samsung.com, qemu-devel@nongnu.org, lcapitulino@redhat.com, pbonzini@redhat.com, rth@twiddle.net, Thomas.Lendacky@amd.com
 
 
-Juergen
+--ibTvN161/egqYuK8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Mar 23, 2017 at 01:14:17PM -0500, Brijesh Singh wrote:
+> Hi Stefan,
+>=20
+>=20
+> On 03/23/2017 06:29 AM, Stefan Hajnoczi wrote:
+> > On Wed, Mar 08, 2017 at 03:51:28PM -0500, Brijesh Singh wrote:
+> > > Add a new debug attribute, the attribute should be set when guest mem=
+ory
+> > > accesses are performed for debug purposes.
+> > > The attribute will be used in SEV guest, where we need to distinguish=
+ normal
+> > > vs debug access to guest memory. In debug mode, we need to use SEV co=
+mmands
+> > > to access the guest memory.
+> > >=20
+> > > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> > > ---
+> > >  include/exec/memattrs.h |    4 ++++
+> > >  1 file changed, 4 insertions(+)
+> > >=20
+> > > diff --git a/include/exec/memattrs.h b/include/exec/memattrs.h
+> > > index e601061..b802073 100644
+> > > --- a/include/exec/memattrs.h
+> > > +++ b/include/exec/memattrs.h
+> > > @@ -37,6 +37,8 @@ typedef struct MemTxAttrs {
+> > >      unsigned int user:1;
+> > >      /* Requester ID (for MSI for example) */
+> > >      unsigned int requester_id:16;
+> > > +    /* Memory access for debug purposes */
+> >=20
+> > What does "debug purposes" mean?  gdbstub?  Can the guest initiate debug
+> > memory accesses or is the purely QEMU-internal?
+> >=20
+>=20
+> What I mean by that is, any access to the guest memory within Qemu intern=
+al functions
+> (e.g gdbstub, qemu monitor's memory dump, info mem, info tlb etc). I have=
+ also introduced
+> debug version of ldl_phys, ldq_phys, cpu_physical_memory_* [1] and have u=
+pdated hmp monitor
+> code to use the debug version api's when accessing the guest memory [2].
+>=20
+> [1] http://marc.info/?l=3Dqemu-devel&m=3D148900832814697&w=3D2
+> [2] http://marc.info/?l=3Dqemu-devel&m=3D148900831414693&w=3D2
+>=20
+>=20
+> Note: SEV debug API's are meant to be used by hypervisor to decrypt/encry=
+pt guest memory.
+> But when you are inside the guest, the  guest will have access to decrypt=
+ed data and does
+> not need to call down to hypervisor for debug access.
+
+People reading the code in memattrs.h aren't thinking about AMD SEV, so
+"debug purposes" isn't meaningful in this context.
+
+I suggest something like this instead:
+
+  /* Debug memory access for AMD SEV */
+
+That way it's clear this "debug" flag has a very specific meaning in the
+context of memory encryption.
+
+Stefan
+
+--ibTvN161/egqYuK8
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJY1TztAAoJEJykq7OBq3PIfzAH/3z6dBWD/05UmIQWcGcEx5ke
+/FROp7dEOxlWdl1HWGumn3JrZzL9nm0D+moo58ZnTcwpPr1EK3VEpn6ChqPX1TtR
+5nUJYBSYyLlj5z9LwkW7FbOn0bGRVZ1p2oJda4rLgGlp9GQKoAQfAUvhODdW+E6z
+fYg+AhjAPohSqrLTddpsyZU4RCOoYN69Gg0MtMVXKL/PrlUbL/HyJHla0fTSLj0v
+6LPrCmnlOwSZG2ag/TDWB0HQM59+XeLAZ9RcTvY1pCpBm8lZrux5njx4+XDMjSll
+DYivd6XQM+Uf0l/yOrZwxdsE/dl56udmxUP46aurikh3GgXA6fgF5aocOKPww2Q=
+=w0cn
+-----END PGP SIGNATURE-----
+
+--ibTvN161/egqYuK8--
