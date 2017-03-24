@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1crRHm-00042Q-9F
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:37:55 -0400
+	(envelope-from <stefanha@gmail.com>) id 1crRK3-0005Wf-33
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:40:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1crRHl-0006E1-C8
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:37:54 -0400
+	(envelope-from <stefanha@gmail.com>) id 1crRK0-0007Ji-13
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:40:15 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:33384)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1crRJz-0007JP-R4
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:40:11 -0400
+Received: by mail-wr0-x243.google.com with SMTP id 20so981166wrx.0
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 08:40:11 -0700 (PDT)
+Date: Fri, 24 Mar 2017 15:40:07 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170324154007.GB5849@stefanha-x1.localdomain>
+References: <148900626714.27090.1616990932333159904.stgit@brijesh-build-machine>
+	<148900632968.27090.15435012868487968230.stgit@brijesh-build-machine>
+	<20170323113517.GC12560@stefanha-x1.localdomain>
+	<6ed30368-1433-cf00-ee2e-611faf2a98e3@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJSP0QX_FVWE2Y=TwCDLNqpX8i+erSr=2OY4iw9jPVUmD5ieqA@mail.gmail.com>
-References: <1489233245-27057-1-git-send-email-ashijeetacharya@gmail.com>
-	<CAJSP0QXYdcBt1zOLEz1fdVBg6eo2Yg+uCA=u2nPQHBe01Bo9ow@mail.gmail.com>
-	<CAC2QTZbOK76fi3fX_msqc_UJu_J1RMkA7dXnSn+Zs5Cxyon6jA@mail.gmail.com>
-	<20170323150955.GD12560@stefanha-x1.localdomain>
-	<CAC2QTZZSPKXW6_Aaw4pTOqixpijT7XuiO3TjXwWz6BNkR-H+9g@mail.gmail.com>
-	<CAJSP0QX_FVWE2Y=TwCDLNqpX8i+erSr=2OY4iw9jPVUmD5ieqA@mail.gmail.com>
-From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Fri, 24 Mar 2017 21:07:49 +0530
-Message-ID: <CAC2QTZZfCbT0BQ0CzwHBxjSn1-9_xbfD88Jax82HMdt6pDpbQw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 0/2] Allocate mutiple clusters for VMDK I/O
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Y7xTucakfITjPcLV"
+Content-Disposition: inline
+In-Reply-To: <6ed30368-1433-cf00-ee2e-611faf2a98e3@amd.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v4 06/20] core: add new security-policy
+ object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,71 +33,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Fam Zheng <famz@redhat.com>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
+To: Brijesh Singh <brijesh.singh@amd.com>
+Cc: ehabkost@redhat.com, crosthwaite.peter@gmail.com, armbru@redhat.com, mst@redhat.com, p.fedin@samsung.com, qemu-devel@nongnu.org, lcapitulino@redhat.com, pbonzini@redhat.com, rth@twiddle.net, Thomas.Lendacky@amd.com
 
-On Fri, Mar 24, 2017 at 8:54 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> On Thu, Mar 23, 2017 at 4:22 PM, Ashijeet Acharya
-> <ashijeetacharya@gmail.com> wrote:
->> On Thu, Mar 23, 2017 at 8:39 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->>> On Tue, Mar 21, 2017 at 09:14:08AM +0000, Ashijeet Acharya wrote:
->>>> On Tue, 21 Mar 2017 at 13:21, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->>>>
->>>> > On Sat, Mar 11, 2017 at 11:54 AM, Ashijeet Acharya
->>>> > <ashijeetacharya@gmail.com> wrote:
->>>> > > This series optimizes the I/O performance of VMDK driver.
->>>> > >
->>>> > > Patch 1 makes the VMDK driver to allocate multiple clusters at once.
->>>> > Earlier
->>>> > > it used to allocate cluster by cluster which slowed down its performance
->>>> > to a
->>>> > > great extent.
->>>> > >
->>>> > > Patch 2 changes the metadata update code to update the L2 tables for
->>>> > multiple
->>>> > > clusters at once.
->>
->> These are the commands I ran to test the write requests:
->>
->> My test file "test1.vmdk" is a 1G empty vmdk image created by using
->> 'qemu-img' tool.
->>
->> Before optimization:
->> $ ./bin/qemu-io -f vmdk --cache writeback
->> qemu-io> open -n -o driver=vmdk test1.vmdk
->> qemu-io> aio_write 0 128M
->> qemu-io> wrote 134217728/134217728 bytes at offset 0
->> 128 MiB, 1 ops; 0:00:16.46 (7.772 MiB/sec and 0.0607 ops/sec)
->>
->> After optimization:
->> $ ./bin/qemu-io -f vmdk --cache writeback
->> qemu-io> open -n -o driver=vmdk test1.vmdk
->> qemu-io> aio_write 0 128M
->> qemu-io> wrote 134217728/134217728 bytes at offset 0
->> 128 MiB, 1 ops; 0:00:08.19 (15.627 MiB/sec and 0.1221 ops/sec)
->>
->> Will these work?
->
-> It is best to avoid --cache writeback in performance tests because
-> using the host page cache puts the performance at the mercy of the
-> kernel's page cache.
 
-Okay, understood.
+--Y7xTucakfITjPcLV
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->
-> I have run the following benchmark using "qemu-img bench":
->
-> This patch series improves 128 KB sequential write performance to an
-> empty VMDK file by 29%.
->
-> Benchmark command: ./qemu-img bench -w -c 1024 -s 128K -d 1 -t none -f
-> vmdk test.vmdk
->
-> (Please include the 2 lines above in the next revision of the patch.)
->
-Yes, I will do that. Also, this really helped me understand how to
-actually test I/O optimizations.
+On Thu, Mar 23, 2017 at 01:59:48PM -0500, Brijesh Singh wrote:
+> Hi Stefan,
+>=20
+>=20
+> On 03/23/2017 06:35 AM, Stefan Hajnoczi wrote:
+> > On Wed, Mar 08, 2017 at 03:52:09PM -0500, Brijesh Singh wrote:
+> > > The object can be used to define global security policy for the guest.
+> >=20
+> > "security-policy" is very vague.  Lots of parts of QEMU have security
+> > related options (e.g. VNC display, networking, etc).
+> >=20
+> > I'd prefer a
+> > -machine memory-encryption=3Don|off,memory-encryption-debug=3Don|off
+> > or -m encryption=3Don|off,encryption-debug=3Don|off switch instead of a=
+ new
+> > security policy object with questionable scope.
+> >=20
+>=20
+> In v1 [1], I had something similar but not exactly the same. I had a new =
+command
+> line switch but the overall feedback was to consider creating new securit=
+y object
+> which can be used to define a machine security policy.
+>=20
+> [1] http://marc.info/?t=3D147378617700002&r=3D1&w=3D2
+>=20
+> some more discussion here [2]
+>=20
+> [2] http://marc.info/?t=3D147378241700011&r=3D1&w=3D2
+>=20
+> IMHO, a new object is helpful because it provide options to launch a gues=
+t without
+> memory encryption support but still can take a advantage of disabling the=
+ debug
+> feature. e.g on non SEV platform we can launch guest with "-object securi=
+ty-policy,id=3Dsecure0,debug=3Doff'
+> which will reject the guest memory accesses via gdbstub or qemu monitor c=
+ommand line interface.
 
-Thanks for your help, this really solved my issue.
+Having one security policy doesn't make sense to me.  As mentioned,
+there are many different areas of QEMU that have security relevant
+configuration.  They are all unrelated so combining them into one object
+with vague parameter names like "debug" makes for a confusing
+command-line interface.
 
-Ashijeet
+If the object is called sev-security-policy then I'm happy.
+
+Stefan
+
+--Y7xTucakfITjPcLV
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJY1T3XAAoJEJykq7OBq3PITOYH/1ZWLukikTSSpVayR8cIy6Ov
+w8a2Xr/eXGur39FzegoPHTUBk0uoi9TjGbCUsLaLgZz19/VsGTbiBiwpjCBizDri
+ctq6V78jEIIAAe8DtLAGWBzWX8qxG2+FJU54Y5arAqTcP+uypYcssL86jsyyAA5d
+JgMm//O9cL6JKMUdC2mWCekIRdGJJdEk3uH0jEgq1Mffl4xTI8+PQxdUv+NVHW0o
+EwVYnbqiaqMuArljMw+RxvR3TeRzpgZfyQUUPFfM01ZX+X4N0tds5FA5yQdF2t9D
+7wUuSmmYISYNBTTByoJWjoIyWY6KT+GWatbFLuWo3HiHEg1aq8e34pxxLOmgsN4=
+=85qJ
+-----END PGP SIGNATURE-----
+
+--Y7xTucakfITjPcLV--
