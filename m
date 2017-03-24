@@ -1,39 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1crDf8-0006iF-5z
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 21:05:06 -0400
+	(envelope-from <wang.guang55@zte.com.cn>) id 1crDfg-0006z6-9h
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 21:05:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1crDf4-00046D-Pl
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 21:05:06 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57006)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1crDf4-00045u-Gi
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 21:05:02 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2O0wmoF059185
-	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 21:05:00 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29c4yx4mwk-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 23 Mar 2017 21:04:59 -0400
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Thu, 23 Mar 2017 19:04:59 -0600
-Date: Fri, 24 Mar 2017 09:04:53 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170317031743.40128-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170317031743.40128-3-bjsdjshi@linux.vnet.ibm.com>
-	<alpine.LFD.2.20.1703231302221.3020@schleppi>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.LFD.2.20.1703231302221.3020@schleppi>
-Message-Id: <20170324010453.GW10704@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v4 02/16] s390: cio: export more interfaces
+	(envelope-from <wang.guang55@zte.com.cn>) id 1crDfd-0004Eq-5I
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 21:05:40 -0400
+Received: from mx7.zte.com.cn ([202.103.147.169]:52648)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <wang.guang55@zte.com.cn>) id 1crDfc-0004DN-Ia
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 21:05:37 -0400
+From: Guang Wang <wang.guang55@zte.com.cn>
+Date: Fri, 24 Mar 2017 09:04:49 +0800
+Message-Id: <1490317489-3544-1-git-send-email-wang.guang55@zte.com.cn>
+Subject: [Qemu-devel] [PATCH v2] migration: Fix colo hang in
+ socket_accept_incoming_migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,26 +22,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sebastian Ott <sebott@linux.vnet.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, Cornelia Huck <cornelia.huck@de.ibm.com>, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
+To: berrange@redhat.com
+Cc: zhang.zhanghailiang@huawei.com, zhangchen.fnst@cn.fujitsu.com, eblake@redhat.com, qemu-devel@nongnu.org, Wang guang <wang.guang55@zte.com.cn>
 
-* Sebastian Ott <sebott@linux.vnet.ibm.com> [2017-03-23 13:02:46 +0100]:
+From: Wang guang <wang.guang55@zte.com.cn>
 
-> On Fri, 17 Mar 2017, Dong Jia Shi wrote:
-> > Export the common I/O interfaces those are needed by an I/O
-> > subchannel driver to actually talk to the subchannel.
-> > 
-> > Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
-> > Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> > Cc: Sebastian Ott <sebott@linux.vnet.ibm.com>
-> > Cc: Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
-> > ---
-> 
-> Acked-by: Sebastian Ott <sebott@linux.vnet.ibm.com>
+The channel socket was initialized manually, 
+but forgot to set QIO_CHANNEL_FEATURE_SHUTDOWN.
+Thus, the colo_process_incoming_thread would hang at recvmsg.
+This patch just call qio_channel_socket_new to get channel,
+Which set QIO_CHANNEL_FEATURE_SHUTDOWN already.
 
-Hi Sebastian,
+Signed-off-by: Wang Guang<wang.guang55@zte.com.cn>
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ io/channel-socket.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
-Thanks for all of your acks!
-
+diff --git a/io/channel-socket.c b/io/channel-socket.c
+index f546c68..64b36f5 100644
+--- a/io/channel-socket.c
++++ b/io/channel-socket.c
+@@ -331,16 +331,10 @@ qio_channel_socket_accept(QIOChannelSocket *ioc,
+ {
+     QIOChannelSocket *cioc;
+ 
+-    cioc = QIO_CHANNEL_SOCKET(object_new(TYPE_QIO_CHANNEL_SOCKET));
+-    cioc->fd = -1;
++    cioc = qio_channel_socket_new();
+     cioc->remoteAddrLen = sizeof(ioc->remoteAddr);
+     cioc->localAddrLen = sizeof(ioc->localAddr);
+ 
+-#ifdef WIN32
+-    QIO_CHANNEL(cioc)->event = CreateEvent(NULL, FALSE, FALSE, NULL);
+-#endif
+-
+-
+  retry:
+     trace_qio_channel_socket_accept(ioc);
+     cioc->fd = qemu_accept(ioc->fd, (struct sockaddr *)&cioc->remoteAddr,
 -- 
-Dong Jia Shi
+1.8.3.1
