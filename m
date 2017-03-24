@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1crUKx-0001Ov-Nt
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 14:53:24 -0400
+	(envelope-from <eblake@redhat.com>) id 1crUNX-0003M5-Cv
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 14:56:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1crUKu-0000hw-Na
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 14:53:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39468)
+	(envelope-from <eblake@redhat.com>) id 1crUNS-00025G-FY
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 14:56:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57338)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1crUKu-0000hn-F8
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 14:53:20 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1crUNS-00024y-0N
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 14:55:58 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 45AA7C03BD7C
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 18:53:20 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E69A183F47
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 18:55:57 +0000 (UTC)
 References: <1490377482-13337-1-git-send-email-armbru@redhat.com>
-	<1490377482-13337-6-git-send-email-armbru@redhat.com>
+	<1490377482-13337-7-git-send-email-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <63d75079-5933-7193-dd25-0094af1542e4@redhat.com>
-Date: Fri, 24 Mar 2017 13:53:17 -0500
+Message-ID: <a0187ac2-7eaf-e199-6d59-337ffc1a3ab1@redhat.com>
+Date: Fri, 24 Mar 2017 13:55:55 -0500
 MIME-Version: 1.0
-In-Reply-To: <1490377482-13337-6-git-send-email-armbru@redhat.com>
+In-Reply-To: <1490377482-13337-7-git-send-email-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="3e6xX93jPEGla6BWejuwUhr2DusJR1RhP"
-Subject: Re: [Qemu-devel] [PATCH RFC v2 5/9] rbd: Don't accept -drive
- driver=rbd, keyvalue-pairs=...
+	boundary="EbPmpsCN7J1TO4u6I5bJGAxr62axEQbGQ"
+Subject: Re: [Qemu-devel] [PATCH RFC v2 6/9] rbd: Clean up runtime_opts,
+ fix -drive to reject filename
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,38 +39,42 @@ To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: jdurgin@redhat.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3e6xX93jPEGla6BWejuwUhr2DusJR1RhP
+--EbPmpsCN7J1TO4u6I5bJGAxr62axEQbGQ
 From: Eric Blake <eblake@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: jdurgin@redhat.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com
-Message-ID: <63d75079-5933-7193-dd25-0094af1542e4@redhat.com>
-Subject: Re: [PATCH RFC v2 5/9] rbd: Don't accept -drive
- driver=rbd,keyvalue-pairs=...
+Message-ID: <a0187ac2-7eaf-e199-6d59-337ffc1a3ab1@redhat.com>
+Subject: Re: [PATCH RFC v2 6/9] rbd: Clean up runtime_opts, fix -drive to
+ reject filename
 References: <1490377482-13337-1-git-send-email-armbru@redhat.com>
- <1490377482-13337-6-git-send-email-armbru@redhat.com>
-In-Reply-To: <1490377482-13337-6-git-send-email-armbru@redhat.com>
+ <1490377482-13337-7-git-send-email-armbru@redhat.com>
+In-Reply-To: <1490377482-13337-7-git-send-email-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 03/24/2017 12:44 PM, Markus Armbruster wrote:
-> The way we communicate extra key-value pairs from
-> qemu_rbd_parse_filename() to qemu_rbd_open() exposes option parameter
-> "keyvalue-pairs" on the command line.  It's not wanted there.  Hack:
-> rename the parameter to "=3Dkeyvalue-pairs" to make it inaccessible.
+> runtime_opts is used for three different purposes:
 
-We could also use the hack "x-keyvalue-pairs" to make it obvious that it
-is unsupported as an external interface (we've used the hack "x-image"
-in blkverify/blkdebug), or even "=3Dx-keyvalue-pairs" (combining your hac=
-k
-with the blkverify hack).  In fact, if your leading '=3D' hack is nice
-enough, we could retrofit blkverify and blkdebug to use it instead of
-(or in addition to) the leading "x-" hack.
-
+> This is a confusing mess.  Dates back to commit 0f9d252.  First step
+> to clean it up is documenting runtime_opts.desc[]:
+>=20
+> * Reorder entries to match the QAPI schema, like we do in other block
+>   drivers.
+>=20
+> * Document why the schema's "server" and "auth-supported" aren't in
+>   .desc[].
+>=20
+> * Document why "keyvalue-pairs", "host", "port" and "auth" are in
+>   .desc[], but not the schema.
+>=20
+> * Delete "filename", because none of the three users actually uses it.
+>   This fixes -drive to reject parameter filename instead of silently
+>   ignoring it.
 >=20
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  block/rbd.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
+>  block/rbd.c | 39 ++++++++++++++++++++++++---------------
+>  1 file changed, 24 insertions(+), 15 deletions(-)
 >=20
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
@@ -80,7 +84,7 @@ Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---3e6xX93jPEGla6BWejuwUhr2DusJR1RhP
+--EbPmpsCN7J1TO4u6I5bJGAxr62axEQbGQ
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -90,13 +94,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJY1WsdAAoJEKeha0olJ0Nqwc0H/2AcG4jgwGFQDFCF2cd1bkDb
-0r+16A/DvJQcmfl+nhFuYkxl/xuvD167jd6IU7bCHhsbxBCKxdiwDRHtn3v9a94D
-FsIqTwTZUd6ypX4M3KOIuHxraM4+WtwuIpwUvHRGwfR7KwpW+5rNTrjUp694MwLT
-hZpsqHn9cv71xMe0cgPudWsymuN7pSOeoSw70Jw9jme+0VrwYV7tyTVWAapvNKjN
-IFiZ96/WPl19/h+PKxvMBEN1/y0bQqZ39Wz8vwTYcUe56L4CAq9ebpHfV28/wevK
-kVALTYb+a4/WrGLnUjkKevhcPXpYApB2TntBsX0bXWpwhfLfjmcxUe1uMGhqYiQ=
-=srxq
+iQEcBAEBCAAGBQJY1Wu7AAoJEKeha0olJ0Nq2HAIALCGzAQAcOjs6tuEJwU6wg5f
+pIZZUUs+MLaA6zBxEmfSpNA1iw5vPfAsUfULOKtV0d6cZAx5WQc67yMIsN/TSgEg
+jk5JcTxWJ0O8CP/FYMHXR4LQEG8r9Lly7c2V6Lmh0tb1BdYZOjPhdk5fRyk05lmw
+G2tzx+36/LqAOkH9lXHs0wFLkUerDGt1ClKmiERn2kYT7AimK1cAeRIDgJUiu8us
+hGuVa81PhKsrvfnJcvLIKuNnuJ3xeYtdNjXNx4NGDGdsRee9PhY2gvGGlqfHFJ9K
+eIEQweQPspeukVUYXfVkGIqzV/COmLtRvzt5jh4XpJ6fMPapj5He4P4IRDQFR5U=
+=Sehd
 -----END PGP SIGNATURE-----
 
---3e6xX93jPEGla6BWejuwUhr2DusJR1RhP--
+--EbPmpsCN7J1TO4u6I5bJGAxr62axEQbGQ--
