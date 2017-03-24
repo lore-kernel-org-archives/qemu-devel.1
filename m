@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1crXHd-0002Mi-JJ
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 18:02:10 -0400
+	(envelope-from <jsnow@redhat.com>) id 1crXPx-0003sz-QF
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 18:10:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1crXHa-0007R7-7m
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 18:02:09 -0400
-Received: from mail-dm3nam03on0098.outbound.protection.outlook.com
-	([104.47.41.98]:6257
-	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Andrew.Baumann@microsoft.com>)
-	id 1crXHZ-0007Q5-N4
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 18:02:06 -0400
-From: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Date: Fri, 24 Mar 2017 15:01:41 -0700
-Message-ID: <20170324220141.10104-1-Andrew.Baumann@microsoft.com>
+	(envelope-from <jsnow@redhat.com>) id 1crXPu-0001mu-KN
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 18:10:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44626)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1crXPu-0001ld-Dp
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 18:10:42 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 90297C05AA41
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 22:10:41 +0000 (UTC)
+Received: from scv.usersys.redhat.com (vpn-59-71.rdu2.redhat.com [10.10.59.71])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4BA865C8A3
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 22:10:41 +0000 (UTC)
+References: <3d1c16a1-ec05-0367-e569-64a63b34f2e3@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <4a56f716-3528-ddd4-f8c4-f3f6b23c469a@redhat.com>
+Date: Fri, 24 Mar 2017 18:10:40 -0400
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] win32: replace custom mutex and condition
- variable with native primitives
+In-Reply-To: <3d1c16a1-ec05-0367-e569-64a63b34f2e3@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] What's the next QEMU version after 2.9 ? (or: when
+ is a good point in time to get rid of old interfaces)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,257 +37,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefan Weil <sw@weilnetz.de>, Paolo Bonzini <pbonzini@redhat.com>, Andrey Shedel <ashedel@microsoft.com>, Andrew Baumann <Andrew.Baumann@microsoft.com>
 
-From: Andrey Shedel <ashedel@microsoft.com>
 
-The multithreaded TCG implementation exposed deadlocks in the win32
-condition variables: as implemented, qemu_cond_broadcast waited on
-receivers, whereas the pthreads API it was intended to emulate does
-not. This was causing a deadlock because broadcast was called while
-holding the IO lock, as well as all possible waiters blocked on the
-same lock.
 
-This patch replaces all the custom synchronisation code for mutexes
-and condition variables with native Windows primitives (SRWlocks and
-condition variables) with the same semantics as their POSIX
-equivalents. To enable that, it requires a Windows Vista or newer host
-OS.
+On 03/08/2017 03:26 AM, Thomas Huth wrote:
+> 
+>  Hi everybody,
+> 
+> what will be the next version of QEMU after 2.9? Will we go for a 2.10
+> (as I've seen it mentioned a couple of times on the mailing list
+> already), or do we dare to switch to 3.0 instead?
+> 
+> I personally dislike two-digit minor version numbers like 2.10 since the
+> non-experienced users sometimes mix it up with 2.1 ... and there have
+> been a couple of new cool features in the past releases that would
+> justify a 3.0 now, too, I think.
+> 
+> But anyway, the more important thing that keeps me concerned is: Someone
+>  once told me that we should get rid of old parameters and interfaces
+> (like HMP commands) primarily only when we're changing to a new major
+> version number. As you all know, QEMU has a lot of legacy options, which
+> are likely rather confusing than helpful for the new users nowadays,
+> e.g. things like the "-net channel" option (which is fortunately even
+> hardly documented), but maybe also even the whole vlan/hub concept in
+> the net code, or legacy parameters like "-usbdevice". If we switch to
+> version 3.0, could we agree to remove at least some of them?
+> 
+>  Thomas
+> 
 
-[AB: edited commit message]
-Signed-off-by: Andrew Baumann <Andrew.Baumann@microsoft.com>
----
-The major implication of this patch is that it drops support for
-pre-Vista versions of Windows. However, those OSes are past their end
-of life, and other OSS projects have dropped support. e.g.; the last
-Cygwin release supporting XP was in Jun 2016. It doesn't seem like a
-good tradeoff to invest effort in fixing broken code needed to support
-them, so hopefully this isn't too controversial.
+As others have stated, we need a few releases to deprecate things first.
 
- include/qemu/thread-win32.h |   7 +--
- util/qemu-thread-win32.c    | 136 +++++---------------------------------------
- 2 files changed, 17 insertions(+), 126 deletions(-)
+Maybe we should develop a serious plan to develop some of our legacy
+interfaces first.
 
-diff --git a/include/qemu/thread-win32.h b/include/qemu/thread-win32.h
-index 5fb6541..4c4a261 100644
---- a/include/qemu/thread-win32.h
-+++ b/include/qemu/thread-win32.h
-@@ -4,8 +4,7 @@
- #include <windows.h>
- 
- struct QemuMutex {
--    CRITICAL_SECTION lock;
--    LONG owner;
-+    SRWLOCK lock;
- };
- 
- typedef struct QemuRecMutex QemuRecMutex;
-@@ -19,9 +18,7 @@ int qemu_rec_mutex_trylock(QemuRecMutex *mutex);
- void qemu_rec_mutex_unlock(QemuRecMutex *mutex);
- 
- struct QemuCond {
--    LONG waiters, target;
--    HANDLE sema;
--    HANDLE continue_event;
-+    CONDITION_VARIABLE var;
- };
- 
- struct QemuSemaphore {
-diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
-index 29c3e4d..59befd5 100644
---- a/util/qemu-thread-win32.c
-+++ b/util/qemu-thread-win32.c
-@@ -10,6 +10,11 @@
-  * See the COPYING file in the top-level directory.
-  *
-  */
-+
-+#ifndef _WIN32_WINNT
-+#define _WIN32_WINNT 0x0600
-+#endif
-+
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "qemu/thread.h"
-@@ -39,44 +44,30 @@ static void error_exit(int err, const char *msg)
- 
- void qemu_mutex_init(QemuMutex *mutex)
- {
--    mutex->owner = 0;
--    InitializeCriticalSection(&mutex->lock);
-+    InitializeSRWLock(&mutex->lock);
- }
- 
- void qemu_mutex_destroy(QemuMutex *mutex)
- {
--    assert(mutex->owner == 0);
--    DeleteCriticalSection(&mutex->lock);
-+    InitializeSRWLock(&mutex->lock);
- }
- 
- void qemu_mutex_lock(QemuMutex *mutex)
- {
--    EnterCriticalSection(&mutex->lock);
--
--    /* Win32 CRITICAL_SECTIONs are recursive.  Assert that we're not
--     * using them as such.
--     */
--    assert(mutex->owner == 0);
--    mutex->owner = GetCurrentThreadId();
-+    AcquireSRWLockExclusive(&mutex->lock);
- }
- 
- int qemu_mutex_trylock(QemuMutex *mutex)
- {
-     int owned;
- 
--    owned = TryEnterCriticalSection(&mutex->lock);
--    if (owned) {
--        assert(mutex->owner == 0);
--        mutex->owner = GetCurrentThreadId();
--    }
-+    owned = TryAcquireSRWLockExclusive(&mutex->lock);
-     return !owned;
- }
- 
- void qemu_mutex_unlock(QemuMutex *mutex)
- {
--    assert(mutex->owner == GetCurrentThreadId());
--    mutex->owner = 0;
--    LeaveCriticalSection(&mutex->lock);
-+    ReleaseSRWLockExclusive(&mutex->lock);
- }
- 
- void qemu_rec_mutex_init(QemuRecMutex *mutex)
-@@ -107,124 +98,27 @@ void qemu_rec_mutex_unlock(QemuRecMutex *mutex)
- void qemu_cond_init(QemuCond *cond)
- {
-     memset(cond, 0, sizeof(*cond));
--
--    cond->sema = CreateSemaphore(NULL, 0, LONG_MAX, NULL);
--    if (!cond->sema) {
--        error_exit(GetLastError(), __func__);
--    }
--    cond->continue_event = CreateEvent(NULL,    /* security */
--                                       FALSE,   /* auto-reset */
--                                       FALSE,   /* not signaled */
--                                       NULL);   /* name */
--    if (!cond->continue_event) {
--        error_exit(GetLastError(), __func__);
--    }
-+    InitializeConditionVariable(&cond->var);
- }
- 
- void qemu_cond_destroy(QemuCond *cond)
- {
--    BOOL result;
--    result = CloseHandle(cond->continue_event);
--    if (!result) {
--        error_exit(GetLastError(), __func__);
--    }
--    cond->continue_event = 0;
--    result = CloseHandle(cond->sema);
--    if (!result) {
--        error_exit(GetLastError(), __func__);
--    }
--    cond->sema = 0;
-+    InitializeConditionVariable(&cond->var);
- }
- 
- void qemu_cond_signal(QemuCond *cond)
- {
--    DWORD result;
--
--    /*
--     * Signal only when there are waiters.  cond->waiters is
--     * incremented by pthread_cond_wait under the external lock,
--     * so we are safe about that.
--     */
--    if (cond->waiters == 0) {
--        return;
--    }
--
--    /*
--     * Waiting threads decrement it outside the external lock, but
--     * only if another thread is executing pthread_cond_broadcast and
--     * has the mutex.  So, it also cannot be decremented concurrently
--     * with this particular access.
--     */
--    cond->target = cond->waiters - 1;
--    result = SignalObjectAndWait(cond->sema, cond->continue_event,
--                                 INFINITE, FALSE);
--    if (result == WAIT_ABANDONED || result == WAIT_FAILED) {
--        error_exit(GetLastError(), __func__);
--    }
-+    WakeConditionVariable(&cond->var);
- }
- 
- void qemu_cond_broadcast(QemuCond *cond)
- {
--    BOOLEAN result;
--    /*
--     * As in pthread_cond_signal, access to cond->waiters and
--     * cond->target is locked via the external mutex.
--     */
--    if (cond->waiters == 0) {
--        return;
--    }
--
--    cond->target = 0;
--    result = ReleaseSemaphore(cond->sema, cond->waiters, NULL);
--    if (!result) {
--        error_exit(GetLastError(), __func__);
--    }
--
--    /*
--     * At this point all waiters continue. Each one takes its
--     * slice of the semaphore. Now it's our turn to wait: Since
--     * the external mutex is held, no thread can leave cond_wait,
--     * yet. For this reason, we can be sure that no thread gets
--     * a chance to eat *more* than one slice. OTOH, it means
--     * that the last waiter must send us a wake-up.
--     */
--    WaitForSingleObject(cond->continue_event, INFINITE);
-+    WakeAllConditionVariable(&cond->var);
- }
- 
- void qemu_cond_wait(QemuCond *cond, QemuMutex *mutex)
- {
--    /*
--     * This access is protected under the mutex.
--     */
--    cond->waiters++;
--
--    /*
--     * Unlock external mutex and wait for signal.
--     * NOTE: we've held mutex locked long enough to increment
--     * waiters count above, so there's no problem with
--     * leaving mutex unlocked before we wait on semaphore.
--     */
--    qemu_mutex_unlock(mutex);
--    WaitForSingleObject(cond->sema, INFINITE);
--
--    /* Now waiters must rendez-vous with the signaling thread and
--     * let it continue.  For cond_broadcast this has heavy contention
--     * and triggers thundering herd.  So goes life.
--     *
--     * Decrease waiters count.  The mutex is not taken, so we have
--     * to do this atomically.
--     *
--     * All waiters contend for the mutex at the end of this function
--     * until the signaling thread relinquishes it.  To ensure
--     * each waiter consumes exactly one slice of the semaphore,
--     * the signaling thread stops until it is told by the last
--     * waiter that it can go on.
--     */
--    if (InterlockedDecrement(&cond->waiters) == cond->target) {
--        SetEvent(cond->continue_event);
--    }
--
--    qemu_mutex_lock(mutex);
-+    SleepConditionVariableSRW(&cond->var, &mutex->lock, INFINITE, 0);
- }
- 
- void qemu_sem_init(QemuSemaphore *sem, int init)
--- 
-2.8.3
+Maybe 2.10 can introduce a list of things we want to deprecate,
+2.11 can be the transition release,
+and then 3.0 can cut the cord and free of us our terrible burden?
+
+I have a list of things I want to axe...
+
+--js
