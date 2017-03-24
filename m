@@ -1,25 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1crQY1-0001lO-38
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:50:37 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1crQlI-0005F9-7S
+	for Qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:04:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1crQXw-0000p6-KD
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:50:37 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:33241)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1crQXw-0000os-D3
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:50:32 -0400
-Received: by mail-wm0-x233.google.com with SMTP id v203so7971113wmg.0
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 07:50:31 -0700 (PDT)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1crQlC-0006Zp-N5
+	for Qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:04:20 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59896
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1crQlC-0006XC-Hi
+	for Qemu-devel@nongnu.org; Fri, 24 Mar 2017 11:04:14 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2OF01N3099035
+	for <Qemu-devel@nongnu.org>; Fri, 24 Mar 2017 11:04:11 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 29cg2rw39n-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <Qemu-devel@nongnu.org>; Fri, 24 Mar 2017 11:04:09 -0400
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <Qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Fri, 24 Mar 2017 09:04:07 -0600
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20170324140854.28134-1-stefanha@redhat.com>
-References: <20170324140854.28134-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Mar 2017 14:50:10 +0000
-Message-ID: <CAFEAcA9D1r+X9UALs8ctCj7QUWKifnOzY4CAdXW7YWLk2gO9FA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL for-2.9 0/3] Tracing patches
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <CAOvx4-1MYO14+hkP8ZZg6Y4v_GFU8HtzYSeRo692zbsZN8D79A@mail.gmail.com>
+References: <CAOvx4-1MYO14+hkP8ZZg6Y4v_GFU8HtzYSeRo692zbsZN8D79A@mail.gmail.com>
+Date: Fri, 24 Mar 2017 10:03:55 -0500
+Message-Id: <149036783558.3910.1779320846654726604@loki>
+Subject: Re: [Qemu-devel] guest-exec of qemu-guest-agent fails on Windows
+ guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +42,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Armin Ranjbar <zoup@zoup.org>, Qemu-devel@nongnu.org
+Cc: Behrooz <everplays@gmail.com>
 
-On 24 March 2017 at 14:08, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> The following changes since commit 08329701199449bde497570dcfdb9c86062baf20:
->
->   qom: Fix regression with 'qom-type' (2017-03-23 17:59:40 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/stefanha/qemu.git tags/tracing-pull-request
->
-> for you to fetch changes up to 0d3ef78829332f2fdc323d1b625b60fe9c89119c:
->
->   trace: Avoid abuse of amdvi_mmio_read (2017-03-24 09:21:42 +0000)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
->
-> Eric Blake (3):
->   trace: Fix backwards mirror_yield parameters
->   trace: Fix incorrect megasas trace parameters
->   trace: Avoid abuse of amdvi_mmio_read
->
->  block/mirror.c       | 5 +++--
->  hw/i386/amd_iommu.c  | 3 +--
->  hw/scsi/megasas.c    | 6 +++---
->  hw/i386/trace-events | 1 +
->  4 files changed, 8 insertions(+), 7 deletions(-)
->
-
-Applied, thanks.
-
--- PMM
+What steps did you use to install qga? Did you use the .msi
+installer? If not you'll need to make those glib helper executables
+available to the agent by placing them in the install directory or
+somewhere in its executable paths. The MSI installer should handle
+all this for you.
