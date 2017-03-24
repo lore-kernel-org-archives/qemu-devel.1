@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1crPtn-000353-W9
+	(envelope-from <stefanha@redhat.com>) id 1crPto-000354-0C
 	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:09:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1crPtj-0006uu-Us
+	(envelope-from <stefanha@redhat.com>) id 1crPtl-0006vF-E2
 	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:09:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60266)
+Received: from mx1.redhat.com ([209.132.183.28]:60308)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1crPtj-0006ul-Pf
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:08:59 -0400
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1crPtl-0006v0-82
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 10:09:01 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri, 24 Mar 2017 14:08:50 +0000
-Message-Id: <20170324140854.28134-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL for-2.9 0/3] Tracing patches
+Date: Fri, 24 Mar 2017 14:08:51 +0000
+Message-Id: <20170324140854.28134-2-stefanha@redhat.com>
+In-Reply-To: <20170324140854.28134-1-stefanha@redhat.com>
+References: <20170324140854.28134-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PULL for-2.9 1/3] trace: Fix backwards mirror_yield
+ parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,34 +25,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-The following changes since commit 08329701199449bde497570dcfdb9c86062baf20:
+From: Eric Blake <eblake@redhat.com>
 
-  qom: Fix regression with 'qom-type' (2017-03-23 17:59:40 +0000)
+block/trace-events lists the parameters for mirror_yield
+consistently with other mirror events (cnt just after s, like in
+mirror_before_sleep; in_flight last, like in mirror_yield_in_flight).
+But the callers were passing parameters in the wrong order, leading
+to poor trace messages, including type truncation when there are
+more than 4G dirty sectors involved.  Broken since its introduction
+in commit bd48bde.
 
-are available in the git repository at:
+While touching this, ensure that all callers use the same type
+(uint64_t) for cnt, as a later patch will enable the compiler to do
+stricter type-checking.
 
-  git://github.com/stefanha/qemu.git tags/tracing-pull-request
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ block/mirror.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-for you to fetch changes up to 0d3ef78829332f2fdc323d1b625b60fe9c89119c:
-
-  trace: Avoid abuse of amdvi_mmio_read (2017-03-24 09:21:42 +0000)
-
-----------------------------------------------------------------
-
-----------------------------------------------------------------
-
-Eric Blake (3):
-  trace: Fix backwards mirror_yield parameters
-  trace: Fix incorrect megasas trace parameters
-  trace: Avoid abuse of amdvi_mmio_read
-
- block/mirror.c       | 5 +++--
- hw/i386/amd_iommu.c  | 3 +--
- hw/scsi/megasas.c    | 6 +++---
- hw/i386/trace-events | 1 +
- 4 files changed, 8 insertions(+), 7 deletions(-)
-
+diff --git a/block/mirror.c b/block/mirror.c
+index ca4baa5..9e2fecc 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -634,7 +634,8 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+             }
+ 
+             if (s->in_flight >= MAX_IN_FLIGHT) {
+-                trace_mirror_yield(s, s->in_flight, s->buf_free_count, -1);
++                trace_mirror_yield(s, UINT64_MAX, s->buf_free_count,
++                                   s->in_flight);
+                 mirror_wait_for_io(s);
+                 continue;
+             }
+@@ -809,7 +810,7 @@ static void coroutine_fn mirror_run(void *opaque)
+             s->common.iostatus == BLOCK_DEVICE_IO_STATUS_OK) {
+             if (s->in_flight >= MAX_IN_FLIGHT || s->buf_free_count == 0 ||
+                 (cnt == 0 && s->in_flight > 0)) {
+-                trace_mirror_yield(s, s->in_flight, s->buf_free_count, cnt);
++                trace_mirror_yield(s, cnt, s->buf_free_count, s->in_flight);
+                 mirror_wait_for_io(s);
+                 continue;
+             } else if (cnt != 0) {
 -- 
 2.9.3
