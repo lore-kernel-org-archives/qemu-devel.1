@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1crSxk-0001Ec-RX
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:25:21 -0400
+	(envelope-from <bounces@canonical.com>) id 1crSyx-0001zl-CI
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:26:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1crSxj-00040x-OX
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:25:20 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:37567)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1crSxj-00040c-Hq
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:25:19 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id n11so7754489wma.0
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 10:25:19 -0700 (PDT)
+	(envelope-from <bounces@canonical.com>) id 1crSyt-0004Kh-CP
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:26:35 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41364)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1crSyt-0004KZ-66
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 13:26:31 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1crSyq-0007aw-Ur
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 17:26:29 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6D0FD2E80D6
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 17:26:27 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <0036c9a7-717b-356a-e184-69270386431c@twiddle.net>
-References: <CAFEAcA9pqDoCWrPAJ+KVxLC_eRy-xRg36oYuARYg2YP8VpGpBg@mail.gmail.com>
-	<CAFEAcA-2mcGih5bscnMsevTNTy71g9kE7OjTy3hYJKeGoGQw-g@mail.gmail.com>
-	<87k27hxyni.fsf@linaro.org>
-	<CAFEAcA-oLDW2F=L3NCdSvrLp_eh3tu9mfKR0mTfZ=3O3dpdKbQ@mail.gmail.com>
-	<1a35985f-ad4b-c017-b355-51d47aaffa11@redhat.com>
-	<CAFEAcA9oBDYqmRpwU5B2o2X-viYrccf1V3zASYGpuaQBL866ig@mail.gmail.com>
-	<0036c9a7-717b-356a-e184-69270386431c@twiddle.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Mar 2017 17:24:57 +0000
-Message-ID: <CAFEAcA_E82Hn-7W=WDTSWoZPmEHifKUKDJgDpO0-vqeGBwBCsA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Proposal for deprecating unsupported host OSes &
- architecutures
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 24 Mar 2017 17:14:55 -0000
+From: luigiburdo <intermediadc@hotmail.com>
+Reply-To: Bug 1674925 <1674925@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170322092818.25605.49354.malonedeb@gac.canonical.com>
+Message-Id: <AM5P194MB0129F8B8B38FDF21BD118CD3C83E0@AM5P194MB0129.EURP194.PROD.OUTLOOK.COM>
+Errors-To: bounces@canonical.com
+Subject: Re: [Qemu-devel] [Qemu-ppc] [Bug 1674925] Re: Qemu PPC64 kvm no
+ display if --device virtio-gpu-pci is selected
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,49 +37,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 24 March 2017 at 01:28, Richard Henderson <rth@twiddle.net> wrote:
-> I also have access to a sparc box.
->
-> (At the moment I'm trying to update it from 2013 era system libraries, and
-> to enable the 64-bit userland, before I do any testing of current mainline.)
+Hi C=C3=A8dric,
 
-So far I have found that we seem to be mishandling 32-bit guest
-load/stores, which I tentatively suggest
+i had been build the kernel with the Xics option enabled and all work on
+G5 970MP on Mate 17.04
 
-diff --git a/tcg/sparc/tcg-target.inc.c b/tcg/sparc/tcg-target.inc.c
-index d1f4c0dead..c72b57dc58 100644
---- a/tcg/sparc/tcg-target.inc.c
-+++ b/tcg/sparc/tcg-target.inc.c
-@@ -1119,7 +1119,7 @@ static void tcg_out_qemu_ld(TCGContext *s,
-TCGReg data, TCGReg addr,
-         /* Skip the high-part; we'll perform the extract in the trampoline.  */
-         param++;
-     }
--    tcg_out_mov(s, TCG_TYPE_REG, param++, addr);
-+    tcg_out_mov(s, TCG_TYPE_REG, param++, addrz);
+i will test the same kernel of Fedora server PPC64 and see if there will
+work too.
 
-     /* We use the helpers to extend SB and SW data, leaving the case
-        of SL needing explicit extending below.  */
-@@ -1199,7 +1199,7 @@ static void tcg_out_qemu_st(TCGContext *s,
-TCGReg data, TCGReg addr,
-         /* Skip the high-part; we'll perform the extract in the trampoline.  */
-         param++;
-     }
--    tcg_out_mov(s, TCG_TYPE_REG, param++, addr);
-+    tcg_out_mov(s, TCG_TYPE_REG, param++, addrz);
-     if (!SPARC64 && (memop & MO_SIZE) == MO_64) {
-         /* Skip the high-part; we'll perform the extract in the trampoline.  */
-         param++;
+but it is strange thing, because the option was not needed (by the
+kernel default)
 
-(otherwise we pass a high-bits-set value to the slowpath functions,
-which happens to work if QEMU was built with debug enabled but not
-if it doesn't.)
+on PowerMacs and was not need to be enabled on Qemu 2.8.
 
-That then at least makes i386 and x86_64 guests behave the same,
-ie they don't work. I haven't figured out what's going wrong there yet.
+I suggest to add this in the user faq PowerPC.
 
-thanks
--- PMM
+
+I  will test it on Qoriq too if kernel build with this option enabled and i=
+f all work ok there too
+
+in case i will report as usual.
+
+
+I will warn all the PowerPc comunity about if the qemu devs will need to ha=
+ve Xics turned on as default in the kernel
+
+Thanks for your support
+Luigi
+
+________________________________
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1674925
+
+Title:
+  Qemu PPC64 kvm no display if  --device virtio-gpu-pci is selected
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi,
+  i did many tests on qemu 2.8 on my BE machines and i found an issue that =
+i think was need to be reported
+
+  Test Machines BE 970MP
+
+  if i setup qemu with
+
+  qemu-system-ppc64 -M 1024 --display sdl(or gtk),gl=3Don --device virtio-
+  gpu-pci,virgl --enable-kvm and so and so
+
+  result is doubled window one is vga other is virtio-gpu-pci without
+  any start of the VM . pratically i dont have any output of openbios
+  and on the virtual serial output
+
+  the same issue i found is if i select:
+  qemu-system-ppc64 -M 1024 --display gtk(or sdl) --device virtio-gpu-pci -=
+-enable-kvm and so and so
+
+  =
+
+  i had been try to change all the -M types of all kind of pseries without =
+any positive result.
+
+  Ciao =
+
+  Luigi
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1674925/+subscriptions
