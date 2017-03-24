@@ -1,19 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1crLUs-0005aL-Cr
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:27:03 -0400
+	(envelope-from <bounces@canonical.com>) id 1crLZL-0006Ua-Ju
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:31:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1crLUp-0005St-81
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:27:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52248)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1crLUp-0005SE-24
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:26:59 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 24 Mar 2017 10:26:55 +0100
-Message-Id: <1490347615-19222-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] target/s390x/kvm: Fix problem when running
- with SELinux under z/VM
+	(envelope-from <bounces@canonical.com>) id 1crLZI-0006vB-HV
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:31:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54900)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1crLZI-0006v3-Bz
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 05:31:36 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1crLZE-0005Nm-Ee
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 09:31:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D5F002E80E5
+	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 09:31:27 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 24 Mar 2017 09:24:06 -0000
+From: Thomas Huth <1675549@bugs.launchpad.net>
+Reply-To: Bug 1675549 <1675549@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170323202936.30994.35916.malonedeb@wampee.canonical.com>
+Message-Id: <20170324092406.3759.30657.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1675549] Re: tcg softmmu i386 crashes on BE
+ hardware
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,43 +37,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+To: qemu-devel@nongnu.org
 
-When running QEMU with KVM under z/VM, the memory for the guest
-is allocated via legacy_s390_alloc() since the KVM_CAP_S390_COW
-extension is not supported on z/VM. legacy_s390_alloc() then uses
-mmap(... PROT_EXEC ...) for the guest memory - but this does not
-work when running with SELinux enabled, mmap() fails and QEMU aborts
-with the following error message:
+This is likely the same or at least a similar problem as reported in this b=
+ug here:
+https://bugs.launchpad.net/qemu/+bug/1675108
 
- cannot set up guest memory 's390.ram': Permission denied
+-- =
 
-Looking at the other allocator function qemu_anon_ram_alloc(), it
-seems like PROT_EXEC is normally not needed for allocating the
-guest RAM, and indeed, the guest also starts successfully under
-z/VM when we remove the PROT_EXEC from the legacy_s390_alloc()
-function. So let's get rid of that flag here to be able to run
-with SELinux under z/VM, too.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1675549
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- target/s390x/kvm.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Title:
+  tcg  softmmu i386 crashes on BE hardware
 
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index ac47154..5167436 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -678,8 +678,7 @@ static void *legacy_s390_alloc(size_t size, uint64_t *align)
- {
-     void *mem;
- 
--    mem = mmap((void *) 0x800000000ULL, size,
--               PROT_EXEC|PROT_READ|PROT_WRITE,
-+    mem = mmap((void *) 0x800000000ULL, size, PROT_READ | PROT_WRITE,
-                MAP_SHARED | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
-     return mem == MAP_FAILED ? NULL : mem;
- }
--- 
-1.8.3.1
+Status in QEMU:
+  New
+
+Bug description:
+  Hi,
+  today i try to test qemu 2.9rc 1 with qemu-system-i386 if i set display a=
+s sdl and i push a key on keyboard qemu exit with an error =
+
+
+  translate-common.c:34:tcg_handle_interrupt: assertion failed:
+  (qemu_mutex_iothread_locked())
+
+  This issue was not present on qemu 2.8.0
+
+  Test Machine PowerMac G5 Quad Fedora 25 Server PPC64
+  Qemu build with target-list=3Di386-softmuu --with-sdlabi=3D2.0 =
+
+
+  Ciao =
+
+  Luigi
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1675549/+subscriptions
