@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1crMkU-0004uG-Pc
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 06:47:20 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1crMmV-0005v7-MO
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 06:49:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1crMkR-0006fv-Mm
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 06:47:14 -0400
-Received: from 19.mo7.mail-out.ovh.net ([178.33.251.118]:52156)
+	(envelope-from <pbonzini@redhat.com>) id 1crMmS-00076E-MF
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 06:49:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57666)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1crMkR-0006cw-DC
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 06:47:11 -0400
-Received: from player788.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 0F9E348F83
-	for <qemu-devel@nongnu.org>; Fri, 24 Mar 2017 11:47:01 +0100 (CET)
-References: <20170322092818.25605.49354.malonedeb@gac.canonical.com>
-	<20170322133509.30547.6423.malone@soybean.canonical.com>
-	<69a94326-4115-cac7-7f0f-1f455896fd2c@redhat.com>
-	<e7be24c8-dbc6-0e32-5b18-73cd5454fc64@kaod.org>
-	<AM5P194MB01291ABD7713F7A68E517AB6C83C0@AM5P194MB0129.EURP194.PROD.OUTLOOK.COM>
-	<4c420daf-83f4-8f4e-160f-a880041b2c51@kaod.org>
-	<AM5P194MB01297823A835C4F56CE786AAC83C0@AM5P194MB0129.EURP194.PROD.OUTLOOK.COM>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <2f2d5717-6b28-ea35-ceba-f005a2ce13ef@kaod.org>
-Date: Fri, 24 Mar 2017 11:46:52 +0100
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1crMmS-00075x-Ft
+	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 06:49:16 -0400
+References: <20170317061447.16243-1-famz@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3f35a1c8-752f-a7e4-ddce-74cf58d96e30@redhat.com>
+Date: Fri, 24 Mar 2017 11:49:13 +0100
 MIME-Version: 1.0
-In-Reply-To: <AM5P194MB01297823A835C4F56CE786AAC83C0@AM5P194MB0129.EURP194.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [Qemu-ppc] [Bug 1674925] Re: Qemu PPC64 kvm no
- display if --device virtio-gpu-pci is selected
+In-Reply-To: <20170317061447.16243-1-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.9 v3 0/2] virtio-scsi: Fix assertion
+ failure on dataplane handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,76 +27,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: luigi burdo <intermediadc@hotmail.com>, Thomas Huth <thuth@redhat.com>, Bug 1674925 <1674925@bugs.launchpad.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemU-ppc@nongnu.org" <qemU-ppc@nongnu.org>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Ed Swierk <eswierk@skyportsystems.com>
 
-SGVsbG8gTHVpZ2ksDQoNCkkgaGF2ZSBzb21lIGRpZmZpY3VsdHkgc29ydGluZyBvdXQgd2hh
-dCBpcyBnb2luZyBvbiBhbmQgd2hhdCANCmNvdWxkIGJlIGNvbnNpZGVyZWQgYSByZWdyZXNz
-aW9uIDovIHlvdSBhcmUgcmVwb3J0aW5nIG1hbnkgDQppc3N1ZXMgYXQgdGhlIHNhbWUgdGlt
-ZSB3aXRoIGEgaG9tZSBtYWRlIGtlcm5lbC4gDQoNCkNvdWxkIHlvdSBwbGVhc2UgdXNlIHRo
-ZSBrZXJuZWwgc2hpcHBlZCB3aXRoIHRoZSBkaXN0cm8gdG8gDQpzdGFydCB3aXRoID8gDQoN
-Cj4geWVzIHVzdWFsbHkgd2l0aCAyLjggaSAgYm9vdCAgdGhlIFZNIHdpdGhvdXQgaXNzdWUg
-b24gRzUgUXVhZCAgd2l0aCB0aGUgb3B0aW9uIA0KPiAtTSAgcHNlcmllcyBmcm9tIDIuMSB0
-byAyLjUgd2l0aCBrdm0tcHIgZW5hYmxlZC4NCj4gaSBkaWQgdGhlIHRlc3RzIGFuZCB3aXRo
-IGFsbCBwc2VyaWVzIG5vdyBvbiAyLjkgaSBoYXZlIHRoZSBzYW1lIGlzc3VlLg0KPiBleGFt
-cGxlOg0KPiBxZW11LXN5c3RlbS1wcGM2NCAtLWVuYWJsZS1rdm0gLWNwdSA5NzBmeF92Mi4w
-IC1tIDEwMjQgLU0gcHNlcmllcy0yLjENCj4gcWVtdS1zeXN0ZW0tcHBjNjQ6IEtWTSBhbmQg
-SVJRX1hJQ1MgY2FwYWJpbGl0eSBtdXN0IGJlIHByZXNlbnQgZm9yIGluLWtlcm5lbCBYSUNT
-DQoNClRoaXMgZXJyb3IgbWVzc2FnZSBpcyBiZWNhdXNlIHlvdXIgaG9zdCBrZXJuZWwgbGFj
-a3MgaW4ta2VybmVsIFhJQ1MsIA0KYnV0IHlvdSBhcmUgc2F5aW5nIHRoYXQgd2FzIG5vdCBh
-biBpc3N1ZSB3aXRoIFFFTVUtMi44LiBDb3JyZWN0ID8gDQpJZiBzbywgdGhhdCBpcyBhIGZp
-cnN0IHRoaW5nIHRvIGxvb2sgYXQuIE1heSBiZSB0aGUgY2hhbmdlcyBJIG1hZGUNCmludHJv
-ZHVjZWQgc29tZSByZWdyZXNzaW9uIGluIHRoYXQgY2FzZS4gDQoNCkhlcmUgaXMgdGhlIGNv
-bW1hbmQgbGluZSBJIHVzZWQgb24gYSAxNy4wNCBob3N0IDoNCg0KCXFlbXUtc3lzdGVtLXBw
-YzY0IC1NIHBzZXJpZXMtMi5bMS04XSxhY2NlbD1rdm0sa3ZtLXR5cGU9UFIgLWNwdSA5NzBm
-eF92Mi4wIC1tIDEwMjQgLW5vZ3JhcGhpYw0KDQpJIGdldCB0aGlzIG1lc3NhZ2Ugd2l0aCBR
-RU1VIDIuOSwgZm9yIGFsbCBwc2VyaWVzDQoNCglxZW11LXN5c3RlbS1wcGM2NDogVW5hYmxl
-IHRvIGZpbmQgc1BBUFIgQ1BVIENvcmUgZGVmaW5pdGlvbg0KDQp3aXRoIFFFTVUgMi44LCB0
-aGUgZ3Vlc3Qgc3RhcnRzIGZvciBwc2VyaWVzLTIuWzEtNl0gYW5kIGZhaWxzIHRoZSBzYW1l
-DQp3YXkgZm9yIHBzZXJpZXMtMi5bNy04XS4NCg0KSSB0cmllZCB3aXRoICctY3B1IDk3MF92
-Mi4yJyBhbmQgdGhlcmUgYXJlIG5vIGlzc3VlcyBidXQgdGhhdCBpcyBhIA0KZGVmaW5lZCBz
-UEFQUiBDUFUgQ29yZS4gDQoNCkRpZCB3ZSBpbnRyb2R1Y2UgYSByZWdyZXNzaW9uIGluIGNv
-bXBhdGliaWxpdHkgaW4gUUVNVSAyLjkgPyAgb3IgDQp3YXMgaXQgYm9ndXMgYmVmb3JlID8g
-VGhhdCBuZWVkcyBhIGxpdHRsZSBkaWdnaW5nLiBJIGRpZCBub3Qgd29yaw0Kb24gdGhhdCBw
-YXJ0Lg0KDQpUaGFua3MsDQoNCkMuIA0KDQoNCj4gYnV0IG5vIGlzc3VlIGlmIGkgcnVuIHdp
-dGggLU0gbWFjOTkgYmVmb3JlIDIuOSB3YXMgbm90IHBvc3NpYmxlIHVzZSBpdCBvbiBxZW11
-LXN5c3RlbS1wcGM2NA0KPiBJdCBtZWFucyBpdCB3aWxsIG5vIHBvc3NpYmxlIGFueW1vcmUg
-aW4gZnV0dXJlIHJlbGVhc2Ugb2YgcWVtdSB1c2Ugb3BlbiBmaXJtd2FyZSBvbiBwb3dlcm1h
-Y3MgDQo+IGFueSBtb29yZT8NCj4NCj4+SSBhZG1pdCB0aGUgbWVzc2FnZSBpcyBub3QgdmVy
-eSBjbGVhciwgYnV0IHRoZSBob3N0IGtlcm5lbCBpcw0KPj51c2luZyBhIGRldiBjb25maWcu
-DQo+IA0KPiBJbSBzbyBzb3JyeSwgaSBsZWFybiBFbmdsaXNoIGJ5IG15IHNlbGYgcmVhZGlu
-ZyBtbCBhbmQgb24gaXJjIA0KPiBjaGF0dGluZyBpcyB0b28gZGlmZmljdWx0IHdoZXJlIG5v
-IG9uZSBzcGVhayBFbmdsaXNoICBhcm91bmQuDQo+IA0KPj4+IE9uIFFvcmlxIGlmIGkgcGFz
-cyB0aGUgLWNwdSBlNTAwIChub3JtYWwgdGhpbmcpIGFsbCBpcyB3b3JraW5nIHJpZ2h0IHFl
-bXUgMi45cmMxDQo+Pj4gYWxsIGJvb3QgYW5kIHNvIGFuZCBzby4NCj4+YnV0IHlvdSBtdXN0
-IGJlIGNoYW5naW5nIHRoZSBtYWNoaW5lIHJpZ2h0ID8NCj4gbm90IG9uIFFvcmlxIGJlY2F1
-c2UgaXQgaXMgYm9vazNlIGFuZCBpcyBub3Qgc28gZmxleGlibGUgbGlrZSB0aGUgRzUgUXVh
-ZCB3aG8gaXMgYm9vazNzIG1hY2hpbmUuDQo+IGkgY2FuIHJ1biBxZW11IGt2bSBvbmx5IHdp
-dGggZW1iIGhhcmR3YXJlIG9uIFFvcmlxDQo+IA0KPj4+T24gRzUgdGhlIC1jcHUgdmFyaWFi
-bGUgZG9udCBmaXggdGhlIGlzc3VlLg0KPj53aXRoIHdoaWNoIG1hY2hpbmUgPw0KPiBPbiBQ
-b3dlck1hYyBHNSBRdWFkIDk3ME1QIGl0IGhhdmUgc2ltaWxhciBoYXJkd2FyZSBjb25maWd1
-cmF0aW9uIG9mIElCTSBpbnRlbGxpc3RhdGlvbiBwb3dlciAyODUNCj4gDQo+PiA+SSBjYW4g
-YnVpbGQgYSBuZXcga2VybmVsIHJlbGVhc2UgLCB1c3VhbGx5IG1pbmUgZG9udCBoYXZlIHhp
-Y3MgZW5hYmxlZCBiZWNhdXNlIEc1DQo+Pj4gZG9udCBoYXZlIHRoYXQgZmVhdHVyZSwgaWYg
-bmVlZGVkIGkgY2FuIGVuYWJsZSBpdCBmb3IgdGVzdGluZy4qKg0KPj5ZZXMgdGhhdCB3b3Vs
-ZCBiZSBpbnRlcmVzdGluZy4NCj4gDQo+IEkgd2lsbCBkbyBBU0FQIGp1c3QgdGhlIHRpbWUg
-dG8gYnVpbGQgaXQgLg0KPiANCj4gVGhhbmsgeW91IHJlYWxseSBtdWNoIGZvciB5b3VyIHRp
-bWUgYW5kIHBhdGllbmNlLg0KPiBMdWlnaQ0KPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCg0K
+
+
+On 17/03/2017 07:14, Fam Zheng wrote:
+> v3: Don't forget the virtio_scsi_release in virtio_scsi_handle_event_vq. [Ed Swierk]
+> v2: Use virtio_scsi_acquire/release. [Paolo]
+> 
+> Fam Zheng (2):
+>   virtio-scsi: Make virtio_scsi_acquire/release public
+>   virtio-scsi: Fix acquire/release in dataplane handlers
+> 
+>  hw/scsi/virtio-scsi-dataplane.c | 20 ++++++++++++++++----
+>  hw/scsi/virtio-scsi.c           | 41 ++++++++++++++---------------------------
+>  include/hw/virtio/virtio-scsi.h | 14 ++++++++++++++
+>  3 files changed, 44 insertions(+), 31 deletions(-)
+> 
+
+Queued, thanks.
+
+Paolo
