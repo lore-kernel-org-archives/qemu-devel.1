@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1crkvG-0004ZJ-Qr
-	for qemu-devel@nongnu.org; Sat, 25 Mar 2017 08:35:59 -0400
+	(envelope-from <jcelaya@gmail.com>) id 1crjom-0005as-CY
+	for qemu-devel@nongnu.org; Sat, 25 Mar 2017 07:25:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1crkvF-0001K7-MS
-	for qemu-devel@nongnu.org; Sat, 25 Mar 2017 08:35:58 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:36191)
+	(envelope-from <jcelaya@gmail.com>) id 1crjoj-0002GI-9s
+	for qemu-devel@nongnu.org; Sat, 25 Mar 2017 07:25:12 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36494)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1crkvF-0001Jf-ED
-	for qemu-devel@nongnu.org; Sat, 25 Mar 2017 08:35:57 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id u108so8103785wrb.3
-	for <qemu-devel@nongnu.org>; Sat, 25 Mar 2017 05:35:56 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <C94A741879221447B4FC9B607EB4FFCD79EACAC2@DGGEMA504-MBS.china.huawei.com>
-References: <1459777195-7907-1-git-send-email-vijayak@caviumnetworks.com>
-	<1459777195-7907-3-git-send-email-vijayak@caviumnetworks.com>
-	<CAFEAcA_755uEOZoGj0SCtmT-5PyLMntkK3wZeuHvZ_kPG9A1aQ@mail.gmail.com>
-	<5703D7EE.2000005@redhat.com>
-	<CAFEAcA8G_-jQOtnVag2Ef++RbfbEJ-XzNnyYM=o9Sh8c6ohecA@mail.gmail.com>
-	<C94A741879221447B4FC9B607EB4FFCD79EA34F4@DGGEMA504-MBX.china.huawei.com>
-	<CAJhHMCDDu_kEJichH=60N=np+ZKbU1e9bWK-pP9Z-9=Fn4w1_w@mail.gmail.com>
-	<C94A741879221447B4FC9B607EB4FFCD79EA7BA3@DGGEMA504-MBX.china.huawei.com>
-	<CAFEAcA_0UA1hnP9XVBn8w0B66eyR12GnnUoCOxjirPSDgHcHvQ@mail.gmail.com>
-	<C94A741879221447B4FC9B607EB4FFCD79EACAC2@DGGEMA504-MBS.china.huawei.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 25 Mar 2017 12:35:35 +0000
-Message-ID: <CAFEAcA_NQjvKiGxLwAOZ8zSwJXgHHwABWmDvQfC0dv7kaYFyqA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [Qemu-arm] [patch 1/1]about armv8's prefetch decode
+	(Exim 4.71) (envelope-from <jcelaya@gmail.com>) id 1crjoj-0002F0-4M
+	for qemu-devel@nongnu.org; Sat, 25 Mar 2017 07:25:09 -0400
+Received: by mail-wm0-x243.google.com with SMTP id x124so2510654wmf.3
+	for <qemu-devel@nongnu.org>; Sat, 25 Mar 2017 04:25:08 -0700 (PDT)
+From: Javier Celaya <jcelaya@gmail.com>
+Date: Sat, 25 Mar 2017 12:25:01 +0100
+Message-Id: <20170325112501.15887-1-jcelaya@gmail.com>
+Subject: [Qemu-devel] [PATCH] Fix input-linux reading from device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,32 +23,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wangjintang <wangjintang@huawei.com>
-Cc: Pranith Kumar <bobby.prani@gmail.com>, "Shlomo Pongratz (A)" <shlomo.pongratz@huawei.com>, "Ori Chalak (A)" <Ori.Chalak@huawei.com>, "Wanghaibin (Benjamin)" <benjamin.wanghaibin@huawei.com>, qemu-arm <qemu-arm@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com
 
-On 25 March 2017 at 02:22, Wangjintang <wangjintang@huawei.com> wrote:
-> the patch regard the prefetch as load instruction, at the same time
-> don't affect rm/rt register. Only the PRFM instruction been emitted to
-> intermediate code and do a really load, then we can get the memory
-> address relative to the prefetch instruction. Because the rm/rt register
-> don't been modified, so the application can run correctly.
+The evdev devices in input-linux.c are read in blocks of one whole
+event. If there are not enough bytes available, they are discarded,
+instead of being kept for the next read operation. This results in
+lost events, of even non-working devices.
 
-It will still fault if the address is not valid, which is
-not a permitted behaviour.
+This patch keeps track of the number of bytes to be read to fill up
+a whole event, and then handle it.
 
-> In our case, we need all the instruction trace & ld/st instruction's
-> access memory address, the trace as the input for chip cycle-accurate
-> model. Similar with flexus + qemu.
-> Current code that skip generate prefetch instructions' intermediate code,
-> So we can get prefetch instruction, but can't get the prefetch instruction
-> relative memory address.
+Signed-off-by: Javier Celaya <jcelaya@gmail.com>
+---
+ ui/input-linux.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
-I understand the use case you would like, but if we want
-to support that kind of thing we should do it with a much
-more significant and consistent degree of support for
-tracing of guest code actions, not with a small ad-hoc
-change that happens to fix the immediate thing you're
-running into for your specific problem.
-
-thanks
--- PMM
+diff --git a/ui/input-linux.c b/ui/input-linux.c
+index ac31f47719..33bcdb00c6 100644
+--- a/ui/input-linux.c
++++ b/ui/input-linux.c
+@@ -169,6 +169,8 @@ struct InputLinux {
+     bool        has_abs_x;
+     int         num_keys;
+     int         num_btns;
++    struct input_event event;
++    int         to_be_read;
+ 
+     QTAILQ_ENTRY(InputLinux) next;
+ };
+@@ -327,25 +329,29 @@ static void input_linux_handle_mouse(InputLinux *il, struct input_event *event)
+ static void input_linux_event(void *opaque)
+ {
+     InputLinux *il = opaque;
+-    struct input_event event;
+     int rc;
++    int offset = sizeof(il->event) - il->to_be_read;
++    uint8_t *p = (uint8_t *)&il->event;
+ 
+     for (;;) {
+-        rc = read(il->fd, &event, sizeof(event));
+-        if (rc != sizeof(event)) {
++        rc = read(il->fd, &p[offset], il->to_be_read);
++        if (rc != il->to_be_read) {
+             if (rc < 0 && errno != EAGAIN) {
+                 fprintf(stderr, "%s: read: %s\n", __func__, strerror(errno));
+                 qemu_set_fd_handler(il->fd, NULL, NULL, NULL);
+                 close(il->fd);
++            } else if (rc > 0){
++                il->to_be_read -= rc;
+             }
+             break;
+         }
++        il->to_be_read = sizeof(il->event);
+ 
+         if (il->num_keys) {
+-            input_linux_handle_keyboard(il, &event);
++            input_linux_handle_keyboard(il, &il->event);
+         }
+         if (il->has_rel_x && il->num_btns) {
+-            input_linux_handle_mouse(il, &event);
++            input_linux_handle_mouse(il, &il->event);
+         }
+     }
+ }
+@@ -417,6 +423,7 @@ static void input_linux_complete(UserCreatable *uc, Error **errp)
+         }
+     }
+ 
++    il->to_be_read = sizeof(il->event);
+     qemu_set_fd_handler(il->fd, input_linux_event, NULL, il);
+     if (il->keycount) {
+         /* delay grab until all keys are released */
+-- 
+2.11.0
