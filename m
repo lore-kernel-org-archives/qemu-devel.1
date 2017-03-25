@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1crdLd-0007HP-3n
+	(envelope-from <bounces@canonical.com>) id 1crdLd-0007HQ-3n
 	for qemu-devel@nongnu.org; Sat, 25 Mar 2017 00:30:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1crdLX-000488-Tv
+	(envelope-from <bounces@canonical.com>) id 1crdLX-00048F-U6
 	for qemu-devel@nongnu.org; Sat, 25 Mar 2017 00:30:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60960)
+Received: from indium.canonical.com ([91.189.90.7]:60959)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1crdLX-00045o-Nl
+	id 1crdLX-00045n-Ng
 	for qemu-devel@nongnu.org; Sat, 25 Mar 2017 00:30:35 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1crdLW-0000Pi-Cl
-	for <qemu-devel@nongnu.org>; Sat, 25 Mar 2017 04:30:34 +0000
+	id 1crdLV-0000Pk-Fc
+	for <qemu-devel@nongnu.org>; Sat, 25 Mar 2017 04:30:33 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 50B752E80C0
-	for <qemu-devel@nongnu.org>; Sat, 25 Mar 2017 04:30:34 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 6BA9A2E808A
+	for <qemu-devel@nongnu.org>; Sat, 25 Mar 2017 04:30:33 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 25 Mar 2017 04:17:47 -0000
-From: Launchpad Bug Tracker <1248168@bugs.launchpad.net>
-Reply-To: Bug 1248168 <1248168@bugs.launchpad.net>
+Date: Sat, 25 Mar 2017 04:17:54 -0000
+From: Launchpad Bug Tracker <1253777@bugs.launchpad.net>
+Reply-To: Bug 1253777 <1253777@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20131105124713.24131.16100.malonedeb@gac.canonical.com>
-Message-Id: <20170325041748.21484.10854.malone@loganberry.canonical.com>
+References: <20131121204609.27303.82489.malonedeb@gac.canonical.com>
+Message-Id: <20170325041754.21484.69593.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1248168] Re: MIPS,
- self-modifying code and uncached memory
+Subject: [Qemu-devel] [Bug 1253777] Re: OpenBSD VM running on OpenBSD host
+ has sleep calls taking twice as long as they should
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,39 +48,54 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1248168
+https://bugs.launchpad.net/bugs/1253777
 
 Title:
-  MIPS, self-modifying code and uncached memory
+  OpenBSD VM running on OpenBSD host has sleep calls taking twice as
+  long as they should
 
 Status in QEMU:
   Expired
 
 Bug description:
-  Self-modifying code does not work properly in MIPS in uncached and
-  unmapped kseg1 memory region.
+  Running a script like
 
-  For example, when running this code I get unexpected behavior:
+  while [ 1 ]
+  do
+    date
+    sleep 1
+  done
 
-     0:	e3000010 	b	0x390
-     4:	00000000 	nop
-  	...
-   380:	00701f40 	mfc0	ra,c0_epc
-   384:	0400e0bb 	swr	zero,4(ra)
-   388:	18000042 	eret
-   38c:	00000000 	nop
-   390:	25500000 	move	t2,zero
-   394:	02000b34 	li	t3,0x2
-   398:	23504b01 	subu	t2,t2,t3
-   39c:	e9003c0b 	j	0xcf003a4
-   3a0:	0a004a21 	addi	t2,t2,10
-   3a4:	ffff0010 	b	0x3a4
-   3a8:	00000000 	nop
-   3ac:	00000000 	nop
+  on the VM will result in the (correct) date being displayed, but it is
+  displayed only every two (!) seconds.  We have also noticed that if we
+  connect to the VM's console using VNC, and move the mouse pointer
+  constantly in the VNC window, the script runs normally with updates
+  every second!  Note that the script doesn't have to be running on the
+  VM's console - it's also possible to (say) ssh to the VM from a
+  separate machine and run the script and it will display the '2 second'
+  issue, but as soon as you move the mouse pointer constantly in the VNC
+  console window the script starts behaving normally with updates every
+  second.
 
-    I expect that swr instruction in line 384 would change `addi	t2,t2,1`0 =
-to `nop`
-  This should work because no cache is used for this memory region.
+  I have only seen this bug when running an OpenBSD VM on an OpenBSD
+  host.  Running an OpenBSD VM on a Linux host does not exhibit the
+  problem for me.  I also belive (am told) that a Linux VM running on an
+  OpenBSD host does not exhibit the problem.
+
+  I have been using the OpenBSD 5.4 64 bit distro which comes with qemu
+  1.5.1 in a package, however I tried compiling qemu 1.6.1 and that has
+  the same bug.  In fact older OpenBSD distros have the same issue -
+  going back to OpenBSD distros from two years ago still have the
+  problem.  This is not a 'new' bug recently introduced.
+
+  Initially I wondered if it could be traced to an incorrectly set
+  command line option, but I've since gone through many of the options
+  in the man page simply trying different values (eg. different CPU
+  types ( -cpu) , different emulated PC (-M)) but so far the problem
+  remains.
+
+  I'm quite happy to run tests in order to track this bug down better.
+  We use qemu running on OpenBSD extensively and find it very useful!
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1248168/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1253777/+subscriptions
