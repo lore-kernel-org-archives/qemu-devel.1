@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wangjintang@huawei.com>) id 1crbLt-00024I-L3
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 22:22:50 -0400
+	(envelope-from <bounces@canonical.com>) id 1crdLd-0007HP-3n
+	for qemu-devel@nongnu.org; Sat, 25 Mar 2017 00:30:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wangjintang@huawei.com>) id 1crbLq-00076W-FK
-	for qemu-devel@nongnu.org; Fri, 24 Mar 2017 22:22:49 -0400
-From: Wangjintang <wangjintang@huawei.com>
-Date: Sat, 25 Mar 2017 02:22:11 +0000
-Message-ID: <C94A741879221447B4FC9B607EB4FFCD79EACAC2@DGGEMA504-MBS.china.huawei.com>
-References: <1459777195-7907-1-git-send-email-vijayak@caviumnetworks.com>
-	<1459777195-7907-3-git-send-email-vijayak@caviumnetworks.com>
-	<CAFEAcA_755uEOZoGj0SCtmT-5PyLMntkK3wZeuHvZ_kPG9A1aQ@mail.gmail.com>
-	<5703D7EE.2000005@redhat.com>
-	<CAFEAcA8G_-jQOtnVag2Ef++RbfbEJ-XzNnyYM=o9Sh8c6ohecA@mail.gmail.com>
-	<C94A741879221447B4FC9B607EB4FFCD79EA34F4@DGGEMA504-MBX.china.huawei.com>
-	<CAJhHMCDDu_kEJichH=60N=np+ZKbU1e9bWK-pP9Z-9=Fn4w1_w@mail.gmail.com>
-	<C94A741879221447B4FC9B607EB4FFCD79EA7BA3@DGGEMA504-MBX.china.huawei.com>
-	<CAFEAcA_0UA1hnP9XVBn8w0B66eyR12GnnUoCOxjirPSDgHcHvQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA_0UA1hnP9XVBn8w0B66eyR12GnnUoCOxjirPSDgHcHvQ@mail.gmail.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <bounces@canonical.com>) id 1crdLX-000488-Tv
+	for qemu-devel@nongnu.org; Sat, 25 Mar 2017 00:30:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60960)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1crdLX-00045o-Nl
+	for qemu-devel@nongnu.org; Sat, 25 Mar 2017 00:30:35 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1crdLW-0000Pi-Cl
+	for <qemu-devel@nongnu.org>; Sat, 25 Mar 2017 04:30:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 50B752E80C0
+	for <qemu-devel@nongnu.org>; Sat, 25 Mar 2017 04:30:34 +0000 (UTC)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Qemu-arm] [patch 1/1]about armv8's prefetch decode
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 25 Mar 2017 04:17:47 -0000
+From: Launchpad Bug Tracker <1248168@bugs.launchpad.net>
+Reply-To: Bug 1248168 <1248168@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20131105124713.24131.16100.malonedeb@gac.canonical.com>
+Message-Id: <20170325041748.21484.10854.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1248168] Re: MIPS,
+ self-modifying code and uncached memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +37,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Pranith Kumar <bobby.prani@gmail.com>, "Shlomo Pongratz (A)" <shlomo.pongratz@huawei.com>, "Ori Chalak (A)" <Ori.Chalak@huawei.com>, "Wanghaibin (Benjamin)" <benjamin.wanghaibin@huawei.com>, qemu-arm <qemu-arm@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-SGkgUGV0ZXIsDQoJTW9yZSBkZXRhaWwgaWxsdXN0cmF0aW9uIGF0IGJlbG93Lg0KDQo+IC0tLS0t
-T3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFBldGVyIE1heWRlbGwgW21haWx0bzpwZXRl
-ci5tYXlkZWxsQGxpbmFyby5vcmddDQo+IFNlbnQ6IEZyaWRheSwgTWFyY2ggMjQsIDIwMTcgNjow
-NiBQTQ0KPiBUbzogV2FuZ2ppbnRhbmcNCj4gQ2M6IFByYW5pdGggS3VtYXI7IFNobG9tbyBQb25n
-cmF0eiAoQSk7IFdhbmdoYWliaW4gKEJlbmphbWluKTsgcWVtdS1hcm07DQo+IHFlbXUtZGV2ZWw7
-IE9yaSBDaGFsYWsgKEEpDQo+IFN1YmplY3Q6IFJlOiBbUWVtdS1hcm1dIFtwYXRjaCAxLzFdYWJv
-dXQgYXJtdjgncyBwcmVmZXRjaCBkZWNvZGUNCj4gTm8sIHRoZXNlIGNoYW5nZXMgbG9vayB3cm9u
-Zy4gUFJGTSBpbnN0cnVjdGlvbnMgZG8gbm90IG5lZWQgdG8NCj4gZG8gYW55dGhpbmcgYW5kIHNo
-b3VsZCBkZWZpbml0ZWx5IG5vdCBiZSBlbWl0dGluZyBhbnkgaW50ZXJtZWRpYXRlDQo+IGNvZGUu
-IEluIHBhcnRpY3VsYXIgaWYgeW91IGxldCBleGVjdXRpb24gZmFsbCB0aHJvdWdoIGFuZCB0cnkN
-Cj4gZG9fZ3ByX2xkKCkgdGhlbiBpdCB3aWxsIHJlYWxseSBkbyBhIGxvYWQsIHdoaWNoIG1pZ2h0
-IGNhdXNlDQo+IGFuIGV4Y2VwdGlvbiAtLSB0aGlzIGlzIHNwZWNpZmljYWxseSBmb3JiaWRkZW4g
-Zm9yIFBSRk0uDQo+IEFyY2hpdGVjdHVyYWxseSB0aGUgQVJNIEFSTSBzYXlzICJpdCBpcyB2YWxp
-ZCBmb3IgdGhlIFBFIHRvDQo+IHRyZWF0IGFueSBvciBhbGwgcHJlZmV0Y2ggaW5zdHJ1Y3Rpb25z
-IGFzIGEgTk9QIiwgd2hpY2ggaXMNCj4gd2hhdCBRRU1VIGRvZXMuDQo+IA0KPiBUaGUgZXhpc3Rp
-bmcgY29kZSBpcyBjb3JyZWN0LiBJbiBnZW5lcmFsIHlvdSBzaG91bGQgbm90DQo+IGV4cGVjdCB0
-byBiZSBhYmxlIHRvIGRlZHVjZSB0aGUgZ3Vlc3QgaW5zdHJ1Y3Rpb25zIGZyb20NCj4gdGhlIGlu
-dGVybWVkaWF0ZSBjb2RlIHJlcHJlc2VudGF0aW9uLg0KPiANCg0KIml0IGlzIHZhbGlkIGZvciB0
-aGUgUEUgdG8gdHJlYXQgYW55IG9yIGFsbCBwcmVmZXRjaCBpbnN0cnVjdGlvbnMgYXMgYSBOT1Ai
-LCANCmZyb20gc29mdHdhcmUgdmlldywgaXQncyByaWdodC4NCnRoZSBwYXRjaCByZWdhcmQgdGhl
-IHByZWZldGNoIGFzIGxvYWQgaW5zdHJ1Y3Rpb24sIGF0IHRoZSBzYW1lIHRpbWUgDQpkb24ndCBh
-ZmZlY3Qgcm0vcnQgcmVnaXN0ZXIuIE9ubHkgdGhlIFBSRk0gaW5zdHJ1Y3Rpb24gYmVlbiBlbWl0
-dGVkIHRvDQppbnRlcm1lZGlhdGUgY29kZSBhbmQgZG8gYSByZWFsbHkgbG9hZCwgdGhlbiB3ZSBj
-YW4gZ2V0IHRoZSBtZW1vcnkgDQphZGRyZXNzIHJlbGF0aXZlIHRvIHRoZSBwcmVmZXRjaCBpbnN0
-cnVjdGlvbi4gQmVjYXVzZSB0aGUgcm0vcnQgcmVnaXN0ZXIgDQpkb24ndCBiZWVuIG1vZGlmaWVk
-LCBzbyB0aGUgYXBwbGljYXRpb24gY2FuIHJ1biBjb3JyZWN0bHkuIA0KQlRXLCB0aGUgbmV3IGFk
-ZGVkIGNvZGUgZGVmYXVsdCBpcyBkaXNhYmxlLiBTbyBmb3IgdGhlIGNvbW1vbiB1c2VyLCBoYXZl
-IG5vIA0KYWZmZWN0IHRvIHRoZW0uDQoNCkluIG91ciBjYXNlLCB3ZSBuZWVkIGFsbCB0aGUgaW5z
-dHJ1Y3Rpb24gdHJhY2UgJiBsZC9zdCBpbnN0cnVjdGlvbidzIA0KYWNjZXNzIG1lbW9yeSBhZGRy
-ZXNzLCB0aGUgdHJhY2UgYXMgdGhlIGlucHV0IGZvciBjaGlwIGN5Y2xlLWFjY3VyYXRlIA0KbW9k
-ZWwuIFNpbWlsYXIgd2l0aCBmbGV4dXMgKyBxZW11LiANCkN1cnJlbnQgY29kZSB0aGF0IHNraXAg
-Z2VuZXJhdGUgcHJlZmV0Y2ggaW5zdHJ1Y3Rpb25zJyBpbnRlcm1lZGlhdGUgY29kZSwgDQpTbyB3
-ZSBjYW4gZ2V0IHByZWZldGNoIGluc3RydWN0aW9uLCBidXQgY2FuJ3QgZ2V0IHRoZSBwcmVmZXRj
-aCBpbnN0cnVjdGlvbiANCnJlbGF0aXZlIG1lbW9yeSBhZGRyZXNzLiANCldlIGhhdmUgdGVzdGVk
-IHRoYXQgdGhlIHJhdGlvIG9mIHByZWZldGNoIGluc3RydWN0aW9ucyBpcyBhYm91dCAyJX4zJSBk
-dXJpbmcgDQpydW4gRGhyeXN0b25lIGluIHN5c3RlbSBtb2RlLiBUaGUgcmF0aW8gaXMgaGlnaC4N
-Cl9fX19fX19fX19fX19fX18gICAgICAgICAgICAgICAgICAgICAgIF9fX19fX19fX19fX19fX18N
-CnwgICAgICAgICAgICAgICAgfCAgICAgICAgICAgICAgICAgICAgIHwgICAgICAgICAgICAgICAg
-fA0KfCAgICAgICAgICAgICAgICB8ICAgICAgICAgICAgICAgICAgICAgfCAgICAgICAgICAgICAg
-ICB8DQp8ICAgUWVtdSAgICAgICAgfCAgICAgICAgICAgICAgICAgICAgIHwgIGNoaXAgICAgICAg
-ICAgfA0KfCAgICAgICAgICAgICAgICB8ICAgaW5zdHJ1Y3Rpb24gdHJhY2UgICAgfCBjeWNsZS1h
-Y2N1cmF0ZSAgIHwNCnwgICAgICAgICAgICAgICAgfCAgICAtLS0tLS0tLS0tLS0tLS0tLT4gICAg
-ICB8IG1vZGVsICAgICAgICAgIHwNCnwgICAgICAgICAgICAgICAgfCAgIG1lbW9yeSB0cmFjZSAg
-ICAgIHwgICAgICAgICAgICAgICAgfA0KfF9fX19fX19fX19fX19fX198ICAgICAgICAgICAgICAg
-ICAgICAgfF9fX19fX19fX19fX19fX198DQoNCg0KDQpPcmkgQ2hhbGFrJ3MgZXhwbGFpbiB0aGlz
-IGFzIGJlbG93Og0KIiBJbmRlZWQsIHByZWZldGNoIGluc3RydWN0aW9uIGFmZmVjdHMgb25seSB0
-aGUgbWljcm8gYXJjaGl0ZWN0dXJlLCANCmFuZCBoZW5jZSBub3QgbmVlZGVkIGZvciBydW5uaW5n
-IGNvcnJlY3RseSB0aGUgZ2VuZXJhdGVkIGNvZGUuDQpIb3dldmVyLCB3ZSBkZXZlbG9wZWQgYSBw
-ZXJmb3JtYW5jZSBzaW11bGF0b3IgZm9yIGEgZGV0YWlsZWQgDQpBUk12OCBDUFUgbW9kZWwsIGFu
-ZCB1c2UgUWVtdSB0byByZXNvbHZlIHRoZSBmdW5jdGlvbmFsaXR5Lg0KQW5kIGZvciB0aGlzIHB1
-cnBvc2Ugd2UgbmVlZCB0byB0cmFuc2xhdGUgYWxsIGluc3RydWN0aW9ucyB0aGF0IA0KbWF5IGFm
-ZmVjdCB0aGUgcGlwZWxpbmUgYmVoYXZpb3IsIGNhY2hlcywgZXRjLg0KDQpUaGlzIGlzIG5vdCB0
-aGUgbWFqb3IgdXNhZ2Ugb2YgUWVtdSwgaG93ZXZlciB0aGVyZSBtYXkgYmUgDQpvdGhlcnMgZG9p
-bmcgdGhpcyBhbmQgaXQgbWF5IGhlbHAgdGhlbS4NCmh0dHA6Ly93d3cubGludXgta3ZtLm9yZy9p
-bWFnZXMvNC80NS8wMXgwOS1DaHJpc3RvcGhlcl9Db3Zpbmd0b24tVXNpbmdfVXBzdHJlYW1fUUVN
-VV9mb3JfQ0FTUy5wZGYgIg0KDQoNCkJlc3QgUmVnYXJkcywNCldhbmcgamludGFuZyAvIEplZA0K
-SHVhd2VpIFRlY2hub2xvZ2llcyBDby4sIEx0ZC4gDQpFbWFpbDogd2FuZ2ppbnRhbmdAaHVhd2Vp
-LmNvbQ0KaHR0cDovL3d3dy5odWF3ZWkuY29tDQo=
+[Expired for QEMU because there has been no activity for 60 days.]
+
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1248168
+
+Title:
+  MIPS, self-modifying code and uncached memory
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  Self-modifying code does not work properly in MIPS in uncached and
+  unmapped kseg1 memory region.
+
+  For example, when running this code I get unexpected behavior:
+
+     0:	e3000010 	b	0x390
+     4:	00000000 	nop
+  	...
+   380:	00701f40 	mfc0	ra,c0_epc
+   384:	0400e0bb 	swr	zero,4(ra)
+   388:	18000042 	eret
+   38c:	00000000 	nop
+   390:	25500000 	move	t2,zero
+   394:	02000b34 	li	t3,0x2
+   398:	23504b01 	subu	t2,t2,t3
+   39c:	e9003c0b 	j	0xcf003a4
+   3a0:	0a004a21 	addi	t2,t2,10
+   3a4:	ffff0010 	b	0x3a4
+   3a8:	00000000 	nop
+   3ac:	00000000 	nop
+
+    I expect that swr instruction in line 384 would change `addi	t2,t2,1`0 =
+to `nop`
+  This should work because no cache is used for this memory region.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1248168/+subscriptions
