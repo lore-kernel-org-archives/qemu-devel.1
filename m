@@ -1,17 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1crjiX-0001UM-Ip
-	for qemu-devel@nongnu.org; Sat, 25 Mar 2017 07:18:46 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1crkvG-0004ZJ-Qr
+	for qemu-devel@nongnu.org; Sat, 25 Mar 2017 08:35:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1crjiW-0000v2-BU
-	for qemu-devel@nongnu.org; Sat, 25 Mar 2017 07:18:45 -0400
-From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Sat, 25 Mar 2017 16:48:21 +0530
-Message-Id: <1490440701-12037-8-git-send-email-ashijeetacharya@gmail.com>
-In-Reply-To: <1490440701-12037-1-git-send-email-ashijeetacharya@gmail.com>
-References: <1490440701-12037-1-git-send-email-ashijeetacharya@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 7/7] vmdk: Update metadata for multiple
- clusters
+	(envelope-from <peter.maydell@linaro.org>) id 1crkvF-0001K7-MS
+	for qemu-devel@nongnu.org; Sat, 25 Mar 2017 08:35:58 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:36191)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1crkvF-0001Jf-ED
+	for qemu-devel@nongnu.org; Sat, 25 Mar 2017 08:35:57 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id u108so8103785wrb.3
+	for <qemu-devel@nongnu.org>; Sat, 25 Mar 2017 05:35:56 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <C94A741879221447B4FC9B607EB4FFCD79EACAC2@DGGEMA504-MBS.china.huawei.com>
+References: <1459777195-7907-1-git-send-email-vijayak@caviumnetworks.com>
+	<1459777195-7907-3-git-send-email-vijayak@caviumnetworks.com>
+	<CAFEAcA_755uEOZoGj0SCtmT-5PyLMntkK3wZeuHvZ_kPG9A1aQ@mail.gmail.com>
+	<5703D7EE.2000005@redhat.com>
+	<CAFEAcA8G_-jQOtnVag2Ef++RbfbEJ-XzNnyYM=o9Sh8c6ohecA@mail.gmail.com>
+	<C94A741879221447B4FC9B607EB4FFCD79EA34F4@DGGEMA504-MBX.china.huawei.com>
+	<CAJhHMCDDu_kEJichH=60N=np+ZKbU1e9bWK-pP9Z-9=Fn4w1_w@mail.gmail.com>
+	<C94A741879221447B4FC9B607EB4FFCD79EA7BA3@DGGEMA504-MBX.china.huawei.com>
+	<CAFEAcA_0UA1hnP9XVBn8w0B66eyR12GnnUoCOxjirPSDgHcHvQ@mail.gmail.com>
+	<C94A741879221447B4FC9B607EB4FFCD79EACAC2@DGGEMA504-MBS.china.huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 25 Mar 2017 12:35:35 +0000
+Message-ID: <CAFEAcA_NQjvKiGxLwAOZ8zSwJXgHHwABWmDvQfC0dv7kaYFyqA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [Qemu-arm] [patch 1/1]about armv8's prefetch decode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,256 +37,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com
-Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com, stefanha@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, Ashijeet Acharya <ashijeetacharya@gmail.com>
+To: Wangjintang <wangjintang@huawei.com>
+Cc: Pranith Kumar <bobby.prani@gmail.com>, "Shlomo Pongratz (A)" <shlomo.pongratz@huawei.com>, "Ori Chalak (A)" <Ori.Chalak@huawei.com>, "Wanghaibin (Benjamin)" <benjamin.wanghaibin@huawei.com>, qemu-arm <qemu-arm@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
 
-Include a next pointer in VmdkMetaData struct to point to the previous
-allocated L2 table. Modify vmdk_L2update to start updating metadata for
-allocation of multiple clusters at once.
+On 25 March 2017 at 02:22, Wangjintang <wangjintang@huawei.com> wrote:
+> the patch regard the prefetch as load instruction, at the same time
+> don't affect rm/rt register. Only the PRFM instruction been emitted to
+> intermediate code and do a really load, then we can get the memory
+> address relative to the prefetch instruction. Because the rm/rt register
+> don't been modified, so the application can run correctly.
 
-Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
----
- block/vmdk.c | 131 ++++++++++++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 102 insertions(+), 29 deletions(-)
+It will still fault if the address is not valid, which is
+not a permitted behaviour.
 
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 3de8b8f..4517409 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -137,6 +137,8 @@ typedef struct VmdkMetaData {
-     int valid;
-     uint32_t *l2_cache_entry;
-     uint32_t nb_clusters;
-+    uint32_t offset;
-+    struct VmdkMetaData *next;
- } VmdkMetaData;
- 
- typedef struct VmdkGrainMarker {
-@@ -1037,29 +1039,81 @@ static void vmdk_refresh_limits(BlockDriverState *bs, Error **errp)
-     }
- }
- 
--static int vmdk_L2update(VmdkExtent *extent, VmdkMetaData *m_data,
--                         uint32_t offset)
-+static int vmdk_alloc_cluster_link_l2(VmdkExtent *extent,
-+                                      VmdkMetaData *m_data, bool zeroed)
- {
--    offset = cpu_to_le32(offset);
-+    int i;
-+    uint32_t offset, temp_offset;
-+
-+    if (zeroed) {
-+        temp_offset = VMDK_GTE_ZEROED;
-+    } else {
-+        temp_offset = m_data->offset;
-+    }
-+
-+    temp_offset = cpu_to_le32(temp_offset);
-+
-     /* update L2 table */
--    if (bdrv_pwrite_sync(extent->file,
-+    offset = temp_offset;
-+    for (i = 0; i < m_data->nb_clusters; i++) {
-+        if (bdrv_pwrite_sync(extent->file,
-                 ((int64_t)m_data->l2_offset * 512)
--                    + (m_data->l2_index * sizeof(offset)),
--                &offset, sizeof(offset)) < 0) {
--        return VMDK_ERROR;
-+                    + ((m_data->l2_index + i) * sizeof(offset)),
-+                &(offset), sizeof(offset)) < 0) {
-+            return VMDK_ERROR;
-+        }
-+        if (!zeroed) {
-+            offset += 128;
-+        }
-     }
-+
-     /* update backup L2 table */
-+    offset = temp_offset;
-     if (extent->l1_backup_table_offset != 0) {
-         m_data->l2_offset = extent->l1_backup_table[m_data->l1_index];
--        if (bdrv_pwrite_sync(extent->file,
--                    ((int64_t)m_data->l2_offset * 512)
--                        + (m_data->l2_index * sizeof(offset)),
--                    &offset, sizeof(offset)) < 0) {
--            return VMDK_ERROR;
-+        for (i = 0; i < m_data->nb_clusters; i++) {
-+            if (bdrv_pwrite_sync(extent->file,
-+                        ((int64_t)m_data->l2_offset * 512)
-+                            + ((m_data->l2_index + i) * sizeof(offset)),
-+                        &(offset), sizeof(offset)) < 0) {
-+                return VMDK_ERROR;
-+            }
-+            if (!zeroed) {
-+                offset += 128;
-+            }
-         }
-     }
-+
-+    offset = temp_offset;
-     if (m_data->l2_cache_entry) {
--        *m_data->l2_cache_entry = offset;
-+        for (i = 0; i < m_data->nb_clusters; i++) {
-+            *m_data->l2_cache_entry = offset;
-+            m_data->l2_cache_entry++;
-+
-+            if (!zeroed) {
-+                offset += 128;
-+            }
-+        }
-+    }
-+
-+    return VMDK_OK;
-+}
-+
-+static int vmdk_L2update(VmdkExtent *extent, VmdkMetaData *m_data,
-+                         bool zeroed)
-+{
-+    int ret;
-+
-+    while (m_data->next != NULL) {
-+        VmdkMetaData *next;
-+
-+        ret = vmdk_alloc_cluster_link_l2(extent, m_data, zeroed);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+
-+        next = m_data->next;
-+        m_data = next;
-     }
- 
-     return VMDK_OK;
-@@ -1271,7 +1325,7 @@ exit:
-  */
- static int handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
-                         uint64_t offset, uint64_t *cluster_offset,
--                        int64_t *bytes, VmdkMetaData *m_data,
-+                        int64_t *bytes, VmdkMetaData **m_data,
-                         bool allocate, uint32_t *total_alloc_clusters)
- {
-     int l1_index, l2_offset, l2_index;
-@@ -1280,6 +1334,7 @@ static int handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
-     uint32_t nb_clusters;
-     bool zeroed = false;
-     uint64_t skip_start_bytes, skip_end_bytes;
-+    VmdkMetaData *old_m_data;
-     int ret;
- 
-     ret = get_cluster_table(extent, offset, &l1_index, &l2_offset,
-@@ -1330,13 +1385,21 @@ static int handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
-         if (ret < 0) {
-             return ret;
-         }
--        if (m_data) {
--            m_data->valid = 1;
--            m_data->l1_index = l1_index;
--            m_data->l2_index = l2_index;
--            m_data->l2_offset = l2_offset;
--            m_data->l2_cache_entry = &l2_table[l2_index];
--            m_data->nb_clusters = nb_clusters;
-+
-+        if (*m_data) {
-+            old_m_data = *m_data;
-+            *m_data = g_malloc0(sizeof(**m_data));
-+
-+            **m_data = (VmdkMetaData) {
-+                .valid            =    1,
-+                .l1_index         =    l1_index,
-+                .l2_index         =    l2_index,
-+                .l2_offset        =    l2_offset,
-+                .l2_cache_entry   =    &l2_table[l2_index],
-+                .nb_clusters      =    nb_clusters,
-+                .offset           =    cluster_sector,
-+                .next             =    old_m_data,
-+            };
-         }
-     }
-     *cluster_offset = cluster_sector << BDRV_SECTOR_BITS;
-@@ -1365,7 +1428,7 @@ static int handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
-  */
- static int vmdk_alloc_cluster_offset(BlockDriverState *bs,
-                                      VmdkExtent *extent,
--                                     VmdkMetaData *m_data, uint64_t offset,
-+                                     VmdkMetaData **m_data, uint64_t offset,
-                                      bool allocate, uint64_t *cluster_offset,
-                                      int64_t bytes,
-                                      uint32_t *total_alloc_clusters)
-@@ -1385,8 +1448,8 @@ static int vmdk_alloc_cluster_offset(BlockDriverState *bs,
-     new_cluster_offset = 0;
-     *cluster_offset = 0;
-     n_bytes = 0;
--    if (m_data) {
--        m_data->valid = 0;
-+    if (*m_data) {
-+        (*m_data)->valid = 0;
-     }
- 
-     /* due to L2 table margins all bytes may not get allocated at once */
-@@ -1768,9 +1831,11 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
-     uint64_t cluster_offset;
-     uint64_t bytes_done = 0;
-     uint64_t extent_size;
--    VmdkMetaData m_data;
-+    VmdkMetaData *m_data;
-     uint32_t total_alloc_clusters = 0;
- 
-+    m_data = g_malloc0(sizeof(*m_data));
-+
-     if (DIV_ROUND_UP(offset, BDRV_SECTOR_SIZE) > bs->total_sectors) {
-         error_report("Wrong offset: offset=0x%" PRIx64
-                      " total_sectors=0x%" PRIx64,
-@@ -1779,6 +1844,7 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
-     }
- 
-     while (bytes > 0) {
-+        m_data->next = NULL;
-         extent = find_extent(s, offset >> BDRV_SECTOR_BITS, extent);
-         if (!extent) {
-             return -EIO;
-@@ -1825,7 +1891,7 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
-                                         total_alloc_clusters;
-                 if (!zero_dry_run) {
-                     /* update L2 tables */
--                    if (vmdk_L2update(extent, &m_data, VMDK_GTE_ZEROED)
-+                    if (vmdk_L2update(extent, m_data, zeroed)
-                             != VMDK_OK) {
-                         return -EIO;
-                     }
-@@ -1839,10 +1905,9 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
-             if (ret) {
-                 return ret;
-             }
--            if (m_data.valid) {
-+            if (m_data->valid) {
-                 /* update L2 tables */
--                if (vmdk_L2update(extent, &m_data,
--                                  cluster_offset >> BDRV_SECTOR_BITS)
-+                if (vmdk_L2update(extent, m_data, zeroed)
-                         != VMDK_OK) {
-                     return -EIO;
-                 }
-@@ -1852,6 +1917,13 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
-         offset += n_bytes;
-         bytes_done += n_bytes;
- 
-+        while (m_data->next != NULL) {
-+            VmdkMetaData *next;
-+            next = m_data->next;
-+            g_free(m_data);
-+            m_data = next;
-+        }
-+
-         /* update CID on the first write every time the virtual disk is
-          * opened */
-         if (!s->cid_updated) {
-@@ -1862,6 +1934,7 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
-             s->cid_updated = true;
-         }
-     }
-+    g_free(m_data);
-     return 0;
- }
- 
--- 
-2.6.2
+> In our case, we need all the instruction trace & ld/st instruction's
+> access memory address, the trace as the input for chip cycle-accurate
+> model. Similar with flexus + qemu.
+> Current code that skip generate prefetch instructions' intermediate code,
+> So we can get prefetch instruction, but can't get the prefetch instruction
+> relative memory address.
+
+I understand the use case you would like, but if we want
+to support that kind of thing we should do it with a much
+more significant and consistent degree of support for
+tracing of guest code actions, not with a small ad-hoc
+change that happens to fix the immediate thing you're
+running into for your specific problem.
+
+thanks
+-- PMM
