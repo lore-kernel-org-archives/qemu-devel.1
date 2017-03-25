@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1crdLd-0007HQ-3n
+	(envelope-from <bounces@canonical.com>) id 1crdLd-0007HR-3u
 	for qemu-devel@nongnu.org; Sat, 25 Mar 2017 00:30:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1crdLX-00048F-U6
+	(envelope-from <bounces@canonical.com>) id 1crdLa-0004Di-Bq
 	for qemu-devel@nongnu.org; Sat, 25 Mar 2017 00:30:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60959)
+Received: from indium.canonical.com ([91.189.90.7]:32796)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1crdLX-00045n-Ng
-	for qemu-devel@nongnu.org; Sat, 25 Mar 2017 00:30:35 -0400
+	id 1crdLa-0004CF-61
+	for qemu-devel@nongnu.org; Sat, 25 Mar 2017 00:30:38 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1crdLV-0000Pk-Fc
-	for <qemu-devel@nongnu.org>; Sat, 25 Mar 2017 04:30:33 +0000
+	id 1crdLZ-0000Nn-8L
+	for <qemu-devel@nongnu.org>; Sat, 25 Mar 2017 04:30:37 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6BA9A2E808A
-	for <qemu-devel@nongnu.org>; Sat, 25 Mar 2017 04:30:33 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 3E1FD2E806C
+	for <qemu-devel@nongnu.org>; Sat, 25 Mar 2017 04:30:37 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 25 Mar 2017 04:17:54 -0000
-From: Launchpad Bug Tracker <1253777@bugs.launchpad.net>
-Reply-To: Bug 1253777 <1253777@bugs.launchpad.net>
+Date: Sat, 25 Mar 2017 04:17:24 -0000
+From: Launchpad Bug Tracker <804517@bugs.launchpad.net>
+Reply-To: Bug 804517 <804517@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20131121204609.27303.82489.malonedeb@gac.canonical.com>
-Message-Id: <20170325041754.21484.69593.malone@loganberry.canonical.com>
+References: <20110701200216.25071.79043.malonedeb@gac.canonical.com>
+Message-Id: <20170325041724.21484.86374.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1253777] Re: OpenBSD VM running on OpenBSD host
- has sleep calls taking twice as long as they should
+Subject: [Qemu-devel] [Bug 804517] Re: qemu crashes on Darwin in
+ qemu_iohandler_poll
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,54 +48,62 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1253777
+https://bugs.launchpad.net/bugs/804517
 
 Title:
-  OpenBSD VM running on OpenBSD host has sleep calls taking twice as
-  long as they should
+  qemu crashes on Darwin in qemu_iohandler_poll
 
 Status in QEMU:
   Expired
 
 Bug description:
-  Running a script like
+  I have an issue when I try to run qemu-system-arm on Mac OS X. =
 
-  while [ 1 ]
-  do
-    date
-    sleep 1
-  done
+  Sometime between 1 and 15 secs after qemu is started it crashes
+  as shown bellow.
 
-  on the VM will result in the (correct) date being displayed, but it is
-  displayed only every two (!) seconds.  We have also noticed that if we
-  connect to the VM's console using VNC, and move the mouse pointer
-  constantly in the VNC window, the script runs normally with updates
-  every second!  Note that the script doesn't have to be running on the
-  VM's console - it's also possible to (say) ssh to the VM from a
-  separate machine and run the script and it will display the '2 second'
-  issue, but as soon as you move the mouse pointer constantly in the VNC
-  console window the script starts behaving normally with updates every
-  second.
+  Same thing on linux host works fine.
 
-  I have only seen this bug when running an OpenBSD VM on an OpenBSD
-  host.  Running an OpenBSD VM on a Linux host does not exhibit the
-  problem for me.  I also belive (am told) that a Linux VM running on an
-  OpenBSD host does not exhibit the problem.
+  Is anybody else experiencing this?
+  Any Hints?
 
-  I have been using the OpenBSD 5.4 64 bit distro which comes with qemu
-  1.5.1 in a package, however I tried compiling qemu 1.6.1 and that has
-  the same bug.  In fact older OpenBSD distros have the same issue -
-  going back to OpenBSD distros from two years ago still have the
-  problem.  This is not a 'new' bug recently introduced.
+  Thanks,
 
-  Initially I wondered if it could be traced to an incorrectly set
-  command line option, but I've since gone through many of the options
-  in the man page simply trying different values (eg. different CPU
-  types ( -cpu) , different emulated PC (-M)) but so far the problem
-  remains.
+  Damjan
 
-  I'm quite happy to run tests in order to track this bug down better.
-  We use qemu running on OpenBSD extensively and find it very useful!
+
+  (gdb) run
+  Starting program: /opt/arm-qemu/bin/qemu-system-arm -M verdex -pflash fla=
+sh.img -nographic -monitor null -m 289
+  Reading symbols for shared libraries .++++++++++++++.....................=
+................................................................... done
+  pxa2xx_clkpwr_write: CPU frequency change attempt
+
+  =
+
+  U-Boot 1.2.0 (May 10 2008 - 21:17:19) - PXA270@400 MHz - 1604
+
+  *** Welcome to Gumstix ***
+
+  DRAM:  256 MB
+  Flash: 32 MB
+  Using default environment
+
+  Hit any key to stop autoboot:  1 =
+
+  Program received signal EXC_BAD_ACCESS, Could not access memory.
+  Reason: KERN_PROTECTION_FAILURE at address: 0x00007fff5fbfed30
+  0x00007fff5fbfed30 in ?? ()
+  (gdb) =
+
+  (gdb) bt
+  #0  0x00007fff5fbfed30 in ?? ()
+  #1  0x00000001000c26f4 in qemu_iohandler_poll ()
+  #2  0x00000001001975ae in main_loop_wait ()
+  #3  0x00000001001976e2 in main_loop ()
+  #4  0x000000010019bfbc in qemu_main ()
+  #5  0x00000001000d63a5 in main ()
+  (gdb)
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1253777/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/804517/+subscriptions
