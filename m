@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1cs4uV-0007Mr-SR
-	for qemu-devel@nongnu.org; Sun, 26 Mar 2017 05:56:32 -0400
+	(envelope-from <bounces@canonical.com>) id 1cs5Mm-0002je-So
+	for qemu-devel@nongnu.org; Sun, 26 Mar 2017 06:25:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1cs4uS-0002xn-PL
-	for qemu-devel@nongnu.org; Sun, 26 Mar 2017 05:56:31 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:34417)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1cs4uS-0002xb-J0
-	for qemu-devel@nongnu.org; Sun, 26 Mar 2017 05:56:28 -0400
-Received: by mail-wr0-x243.google.com with SMTP id w43so1432092wrb.1
-	for <qemu-devel@nongnu.org>; Sun, 26 Mar 2017 02:56:28 -0700 (PDT)
-From: Sameeh Jubran <sameeh@daynix.com>
-Date: Sun, 26 Mar 2017 12:56:22 +0300
-Message-Id: <20170326095622.5105-1-sameeh@daynix.com>
-Subject: [Qemu-devel] [PATCH qemu-ga v3] qga: Make qemu-ga compile
- statically for Windows
+	(envelope-from <bounces@canonical.com>) id 1cs5Mi-0005L4-NZ
+	for qemu-devel@nongnu.org; Sun, 26 Mar 2017 06:25:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60079)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cs5Mi-0005K7-IS
+	for qemu-devel@nongnu.org; Sun, 26 Mar 2017 06:25:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cs5Mg-0004Vh-MC
+	for <qemu-devel@nongnu.org>; Sun, 26 Mar 2017 10:25:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9910F2E80AD
+	for <qemu-devel@nongnu.org>; Sun, 26 Mar 2017 10:25:38 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 26 Mar 2017 10:20:09 -0000
+From: Danil <1660599@bugs.launchpad.net>
+Reply-To: Bug 1660599 <1660599@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170131114543.27337.90403.malonedeb@wampee.canonical.com>
+Message-Id: <20170326102009.25541.68185.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1660599] Re: v2.8.0 won't compile if g++ compiler
+ doesn't understand "-fstack-protector-strong"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,51 +37,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: Yan Vugenfirer <yan@daynix.com>, Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
 
-Attempting to compile qemu-ga statically as follows for Windows causes
-the following error:
+Could you provide the command you've used?
+I tried `CC=3Dgcc-4.8 ./configure --enable-stack-protector && make` in Ubun=
+tu 14.04 and qemu v2.8.0. It didn't set `-fstack-protector-strong` flag, on=
+ly `-fstack-protector-all`.
 
-Compilation:
-    ./configure --disable-docs --target-list=x86_64-softmmu \
-    --cross-prefix=x86_64-w64-mingw32- --static \
-    --enable-guest-agent-msi --with-vss-sdk=/path/to/VSSSDK72
+-- =
 
-    make -j8 qemu-ga
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1660599
 
-Error:
-    path/to/qemu/stubs/error-printf.c:7: undefined reference to `__imp_g_test_config_vars'
-    collect2: error: ld returned 1 exit status
-    Makefile:444: recipe for target 'qemu-ga.exe' failed
-    make: *** [qemu-ga.exe] Error 1
+Title:
+  v2.8.0 won't compile if g++ compiler doesn't understand "-fstack-
+  protector-strong"
 
-This is caused by a bug in the pkg-config file for glib as it doesn't define
-GLIB_STATIC_COMPILATION for pkg-config --static.
+Status in QEMU:
+  New
 
-Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- configure | 7 +++++++
- 1 file changed, 7 insertions(+)
+Bug description:
+  For example, Ubuntu Trusty (LTS 14.04) uses g++ v4.8.5.
+  Compilation fails with a syntax error saying that the ""-fstack-protector=
+-strong" option in g++ is unrecognized.
+  Instead, under Ubuntu Xenial (LTS 16.04), the g++ compiler is v5.4.0 and =
+the compilation goes on smoothly.
 
-diff --git a/configure b/configure
-index b9a30cf..8210494 100755
---- a/configure
-+++ b/configure
-@@ -3041,6 +3041,13 @@ if test "$modules" = yes; then
-     glib_modules="$glib_modules gmodule-2.0"
- fi
- 
-+# This workaround is required due to a bug in pkg-config file for glib as it
-+# doesn't define GLIB_STATIC_COMPILATION for pkg-config --static
-+
-+if test "$static" = yes -a "$mingw32" = yes; then
-+    QEMU_CFLAGS="-DGLIB_STATIC_COMPILATION $QEMU_CFLAGS"
-+fi
-+
- for i in $glib_modules; do
-     if $pkg_config --atleast-version=$glib_req_ver $i; then
-         glib_cflags=$($pkg_config --cflags $i)
--- 
-2.9.3
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1660599/+subscriptions
