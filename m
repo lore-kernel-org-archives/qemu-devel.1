@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1cs4nH-0005Re-11
-	for qemu-devel@nongnu.org; Sun, 26 Mar 2017 05:49:04 -0400
+	(envelope-from <jcelaya@gmail.com>) id 1cs4s8-0006KI-1k
+	for qemu-devel@nongnu.org; Sun, 26 Mar 2017 05:54:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1cs4nD-0008A9-Ko
-	for qemu-devel@nongnu.org; Sun, 26 Mar 2017 05:49:03 -0400
-Received: from mail-vk0-x241.google.com ([2607:f8b0:400c:c05::241]:35025)
+	(envelope-from <jcelaya@gmail.com>) id 1cs4s4-0000zU-VT
+	for qemu-devel@nongnu.org; Sun, 26 Mar 2017 05:54:04 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:33562)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1cs4nD-00089x-Dx
-	for qemu-devel@nongnu.org; Sun, 26 Mar 2017 05:48:59 -0400
-Received: by mail-vk0-x241.google.com with SMTP id z204so4211912vkd.2
-	for <qemu-devel@nongnu.org>; Sun, 26 Mar 2017 02:48:58 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170323182127.GK12560@stefanha-x1.localdomain>
-References: <20170323092211.29990-1-sameeh@daynix.com>
-	<20170323182127.GK12560@stefanha-x1.localdomain>
-From: Sameeh Jubran <sameeh@daynix.com>
-Date: Sun, 26 Mar 2017 12:48:58 +0300
-Message-ID: <CAKPgXcHt2ERvH-zeHhX_7CQNd+FogEseO6-6LBSRh1fCDx_dew@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH qemu-ga v2] qga: Make qemu-ga compile
- statically for Windows
+	(Exim 4.71) (envelope-from <jcelaya@gmail.com>) id 1cs4s4-0000z3-OF
+	for qemu-devel@nongnu.org; Sun, 26 Mar 2017 05:54:00 -0400
+Received: by mail-wr0-x243.google.com with SMTP id 20so4283593wrx.0
+	for <qemu-devel@nongnu.org>; Sun, 26 Mar 2017 02:54:00 -0700 (PDT)
+From: Javier Celaya <jcelaya@gmail.com>
+Date: Sun, 26 Mar 2017 11:53:49 +0200
+Message-Id: <20170326095349.8571-1-jcelaya@gmail.com>
+Subject: [Qemu-devel] [PATCH v2] Fix input-linux reading from device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +23,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Yan Vugenfirer <yan@daynix.com>, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com
 
-On Thu, Mar 23, 2017 at 9:21 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+The evdev devices in input-linux.c are read in blocks of one whole
+event. If there are not enough bytes available, they are discarded,
+instead of being kept for the next read operation. This results in
+lost events, of even non-working devices.
 
-> On Thu, Mar 23, 2017 at 11:22:11AM +0200, Sameeh Jubran wrote:
-> > Attempting to compile qemu-ga statically as follows for Windows causes
-> > the following error:
-> >
-> > Compilation:
-> >     ./configure --disable-docs --target-list=x86_64-softmmu \
-> >     --cross-prefix=x86_64-w64-mingw32- --static \
-> >     --enable-guest-agent-msi --with-vss-sdk=/path/to/VSSSDK72
-> >
-> >     make -j8 qemu-ga
-> >
-> > Error:
-> >     path/to/qemu/stubs/error-printf.c:7: undefined reference to
-> `__imp_g_test_config_vars'
-> >     collect2: error: ld returned 1 exit status
-> >     Makefile:444: recipe for target 'qemu-ga.exe' failed
-> >     make: *** [qemu-ga.exe] Error 1
-> >
-> > This is caused by a bug in the pkg-config file for glib as it doesn't
-> define
-> > GLIB_STATIC_COMPILATION for pkg-config --static.
->
-> >
-> > Signed-off-by: Stefan Hajnoczi <stefanha@gmail.com>
->
-> Please remove this.  I didn't post my Signed-off-by.  Only add
-> Signed-off-by for someone else if they ask you to do so.
->
-> For details on Signed-off-by please read:
-> "11) Sign your work - the Developer's Certificate of Origin"
-> https://www.kernel.org/doc/Documentation/process/submitting-patches.rst
+This patch keeps track of the number of bytes to be read to fill up
+a whole event, and then handle it.
 
- I added your signed off to indicate that you were involved in the
-development of the patch as you are the one that suggested
-this workaround in the first place. No problem I will drop it.
+Signed-off-by: Javier Celaya <jcelaya@gmail.com>
+---
+ ui/input-linux.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
->
->
-> > Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
-> > ---
-> >  configure | 7 +++++++
-> >  1 file changed, 7 insertions(+)
-> >
-> > diff --git a/configure b/configure
-> > index b9a30cf..8210494 100755
-> > --- a/configure
-> > +++ b/configure
-> > @@ -3041,6 +3041,13 @@ if test "$modules" = yes; then
-> >      glib_modules="$glib_modules gmodule-2.0"
-> >  fi
-> >
-> > +# This workaround is required due to a bug in pkg-config file for glib
-> as it
-> > +# doesn't define GLIB_STATIC_COMPILATION for pkg-config --static
->
-> Please add:
->
-> # See https://bugzilla.gnome.org/show_bug.cgi?id=780399 for the glib bug
-> # report.
-
-
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
->
-I'll add them in v3, thanks for the review.
-
-
+diff --git a/ui/input-linux.c b/ui/input-linux.c
+index ac31f47719..02b0d4b2fe 100644
+--- a/ui/input-linux.c
++++ b/ui/input-linux.c
+@@ -169,6 +169,8 @@ struct InputLinux {
+     bool        has_abs_x;
+     int         num_keys;
+     int         num_btns;
++    struct input_event event;
++    int         to_be_read;
+ 
+     QTAILQ_ENTRY(InputLinux) next;
+ };
+@@ -327,25 +329,30 @@ static void input_linux_handle_mouse(InputLinux *il, struct input_event *event)
+ static void input_linux_event(void *opaque)
+ {
+     InputLinux *il = opaque;
+-    struct input_event event;
+     int rc;
++    int offset;
++    uint8_t *p = (uint8_t *)&il->event;
+ 
+     for (;;) {
+-        rc = read(il->fd, &event, sizeof(event));
+-        if (rc != sizeof(event)) {
++        offset = sizeof(il->event) - il->to_be_read;
++        rc = read(il->fd, &p[offset], il->to_be_read);
++        if (rc != il->to_be_read) {
+             if (rc < 0 && errno != EAGAIN) {
+                 fprintf(stderr, "%s: read: %s\n", __func__, strerror(errno));
+                 qemu_set_fd_handler(il->fd, NULL, NULL, NULL);
+                 close(il->fd);
++            } else if (rc > 0){
++                il->to_be_read -= rc;
+             }
+             break;
+         }
++        il->to_be_read = sizeof(il->event);
+ 
+         if (il->num_keys) {
+-            input_linux_handle_keyboard(il, &event);
++            input_linux_handle_keyboard(il, &il->event);
+         }
+         if (il->has_rel_x && il->num_btns) {
+-            input_linux_handle_mouse(il, &event);
++            input_linux_handle_mouse(il, &il->event);
+         }
+     }
+ }
+@@ -417,6 +424,7 @@ static void input_linux_complete(UserCreatable *uc, Error **errp)
+         }
+     }
+ 
++    il->to_be_read = sizeof(il->event);
+     qemu_set_fd_handler(il->fd, input_linux_event, NULL, il);
+     if (il->keycount) {
+         /* delay grab until all keys are released */
 -- 
-Respectfully,
-*Sameeh Jubran*
-*Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
-*Software Engineer @ Daynix <http://www.daynix.com>.*
+2.11.0
