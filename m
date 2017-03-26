@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1csALo-0002Ns-PD
-	for qemu-devel@nongnu.org; Sun, 26 Mar 2017 11:45:06 -0400
+	(envelope-from <bounces@canonical.com>) id 1csALo-0002Nr-PD
+	for qemu-devel@nongnu.org; Sun, 26 Mar 2017 11:45:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1csALl-0006eg-Ln
+	(envelope-from <bounces@canonical.com>) id 1csALl-0006eb-LQ
 	for qemu-devel@nongnu.org; Sun, 26 Mar 2017 11:45:04 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60144)
+Received: from indium.canonical.com ([91.189.90.7]:60148)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1csALl-0006eQ-G7
+	id 1csALl-0006eU-G9
 	for qemu-devel@nongnu.org; Sun, 26 Mar 2017 11:45:01 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1csALk-0008Nm-7A
+	id 1csALk-0008No-Iz
 	for <qemu-devel@nongnu.org>; Sun, 26 Mar 2017 15:45:00 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 259602E80C2
+	by loganberry.canonical.com (Postfix) with ESMTP id 8E7762E80C1
 	for <qemu-devel@nongnu.org>; Sun, 26 Mar 2017 15:45:00 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 26 Mar 2017 15:30:13 -0000
+Date: Sun, 26 Mar 2017 15:32:29 -0000
 From: milasudril <milasudril@gmail.com>
 Reply-To: Bug 1295587 <1295587@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20140321093246.9788.71300.malonedeb@soybean.canonical.com>
-Message-Id: <20170326153013.30419.50510.malone@soybean.canonical.com>
+Message-Id: <20170326153229.26084.53799.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1295587] Re: Temporal freeze and slowdown while
  using emulated sb16
@@ -39,16 +39,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-On Windows 98 SE:
-
- * SB16: System hangs as described in this bug report
- * ES1370: Causes system freeze with back screen at boot time
- * AC97 (as suggested here: https://smcv.pseudorandom.co.uk/2015/discworldn=
-oir/): BSODs during the installation
- * GUS: Device is not even detected
-
-Conclusion: At the moment, there is no way to get audio output from
-Windows 98 se VM.
+Addendum: Since this report is from 2014, I should mention that I am
+currently on 16.04.
 
 -- =
 
