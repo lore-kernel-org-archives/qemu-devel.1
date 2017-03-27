@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37917)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1csO1Z-00084l-U4
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 02:21:06 -0400
+	(envelope-from <kraxel@redhat.com>) id 1csO4A-0000GI-N3
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 02:23:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1csO1V-0004rf-Tp
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 02:21:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45586)
+	(envelope-from <kraxel@redhat.com>) id 1csO46-0006LW-Mz
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 02:23:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57328)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1csO1V-0004rF-Nm
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 02:21:01 -0400
-Message-ID: <1490595656.31035.5.camel@redhat.com>
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1csO46-0006L4-Hc
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 02:23:42 -0400
+Message-ID: <1490595820.31035.7.camel@redhat.com>
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 27 Mar 2017 08:20:56 +0200
-In-Reply-To: <CAJSP0QX3z_Zn-jdi7=2qw795Ep2nG5xvWR9DqyWajnKjkCGd3g@mail.gmail.com>
+Date: Mon, 27 Mar 2017 08:23:40 +0200
+In-Reply-To: <CAFEAcA-RH5zqJKAkzRaB-BJBMreLPDUiDtSE639dE_1K-FfBOw@mail.gmail.com>
 References: <20170316120110.11677-1-iwona260909@gmail.com>
 	<20170316120110.11677-2-iwona260909@gmail.com>
 	<CAFEAcA8ZBAAqYNbh_3J69W5SMXRsbW4S367Xe8ceF1C0M-RNnA@mail.gmail.com>
 	<1489673540.15659.93.camel@redhat.com>
 	<CAJSP0QX3z_Zn-jdi7=2qw795Ep2nG5xvWR9DqyWajnKjkCGd3g@mail.gmail.com>
+	<CAFEAcA-RH5zqJKAkzRaB-BJBMreLPDUiDtSE639dE_1K-FfBOw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Mime-Version: 1.0
@@ -31,22 +32,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: iwona260909@gmail.com, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, iwona260909@gmail.com, QEMU Developers <qemu-devel@nongnu.org>
 
   Hi,
 
-> Some emulated graphics cards use qemu_console_surface() and that
-> surface is always in 32 bits per pixel format.  Therefore, code for
-> dealing with other pixel formats can be removed.
+> Also worth pointing at an example of a patchset that does
+> this for some other device, eg Gerd's recent pl110 set,
+> as a guide to what's getting removed.
 
-qemu_create_displaysurface() creates a displaysurface with the default
-depth 32bpp.  qemu_console_resize() will create a new displaysurface,
-with the given size, also with the default depth 32bpp.
+that was sm501 ;)
 
-qemu_console_surface() just asks for the current surface, that alone
-isn't a good indicator, but often display drivers use
-qemu_console_surface + qemu_console_resize.
+https://patchwork.ozlabs.org/patch/735753/
+https://patchwork.ozlabs.org/patch/735764/
 
 cheers,
   Gerd
