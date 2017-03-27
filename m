@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1csXJj-0006lv-M4
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:16:28 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1csXJl-0006nW-Di
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:16:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1csXJi-0000we-NI
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:16:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35868)
+	(envelope-from <pbonzini@redhat.com>) id 1csXJk-0000yr-43
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:16:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35918)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1csXJi-0000vI-Hs
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:16:26 -0400
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A4F3461B8F
-	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 16:16:25 +0000 (UTC)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1csXJj-0000xY-RY
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:16:28 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 27 Mar 2017 18:16:13 +0200
-Message-Id: <20170327161615.19637-8-pbonzini@redhat.com>
+Date: Mon, 27 Mar 2017 18:16:14 +0200
+Message-Id: <20170327161615.19637-9-pbonzini@redhat.com>
 In-Reply-To: <20170327161615.19637-1-pbonzini@redhat.com>
 References: <20170327161615.19637-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 7/9] nbd: drop unused NBDClientSession.is_unix
- field
+Subject: [Qemu-devel] [PULL 8/9] Revert "apic: save apic_delivered flag"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +24,95 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+This reverts commit 07bfa354772f2de67008dc66c201b627acff0106.
+The global variable is only read as part of a
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20170327123223.1199-1-stefanha@redhat.com>
+            apic_reset_irq_delivered();
+            qemu_irq_raise(s->irq);
+            if (!apic_get_irq_delivered()) {
+
+sequence, so the value never matters at migration time.
+
+Reported-by: Dr. David Alan Gilbert <dglibert@redhat.com>
+Cc: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/nbd-client.h | 2 --
- block/nbd.c        | 2 --
- 2 files changed, 4 deletions(-)
+ hw/intc/apic_common.c           | 33 ---------------------------------
+ include/hw/i386/apic_internal.h |  2 --
+ 2 files changed, 35 deletions(-)
 
-diff --git a/block/nbd-client.h b/block/nbd-client.h
-index 8cdfc92..891ba44 100644
---- a/block/nbd-client.h
-+++ b/block/nbd-client.h
-@@ -30,8 +30,6 @@ typedef struct NBDClientSession {
+diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
+index 7a6e771..c3829e3 100644
+--- a/hw/intc/apic_common.c
++++ b/hw/intc/apic_common.c
+@@ -387,25 +387,6 @@ static bool apic_common_sipi_needed(void *opaque)
+     return s->wait_for_sipi != 0;
+ }
  
-     Coroutine *recv_coroutine[MAX_NBD_REQUESTS];
-     NBDReply reply;
+-static bool apic_irq_delivered_needed(void *opaque)
+-{
+-    APICCommonState *s = APIC_COMMON(opaque);
+-    return s->cpu == X86_CPU(first_cpu) && apic_irq_delivered != 0;
+-}
 -
--    bool is_unix;
- } NBDClientSession;
- 
- NBDClientSession *nbd_get_client_session(BlockDriverState *bs);
-diff --git a/block/nbd.c b/block/nbd.c
-index f478f80..1b832c2 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -285,8 +285,6 @@ static SocketAddress *nbd_config(BDRVNBDState *s, QDict *options, Error **errp)
-         goto done;
+-static void apic_irq_delivered_pre_save(void *opaque)
+-{
+-    APICCommonState *s = APIC_COMMON(opaque);
+-    s->apic_irq_delivered = apic_irq_delivered;
+-}
+-
+-static int apic_irq_delivered_post_load(void *opaque, int version_id)
+-{
+-    APICCommonState *s = APIC_COMMON(opaque);
+-    apic_irq_delivered = s->apic_irq_delivered;
+-    return 0;
+-}
+-
+ static const VMStateDescription vmstate_apic_common_sipi = {
+     .name = "apic_sipi",
+     .version_id = 1,
+@@ -418,19 +399,6 @@ static const VMStateDescription vmstate_apic_common_sipi = {
      }
+ };
  
--    s->client.is_unix = saddr->type == SOCKET_ADDRESS_KIND_UNIX;
+-static const VMStateDescription vmstate_apic_irq_delivered = {
+-    .name = "apic_irq_delivered",
+-    .version_id = 1,
+-    .minimum_version_id = 1,
+-    .needed = apic_irq_delivered_needed,
+-    .pre_save = apic_irq_delivered_pre_save,
+-    .post_load = apic_irq_delivered_post_load,
+-    .fields = (VMStateField[]) {
+-        VMSTATE_INT32(apic_irq_delivered, APICCommonState),
+-        VMSTATE_END_OF_LIST()
+-    }
+-};
 -
- done:
-     QDECREF(addr);
-     qobject_decref(crumpled_addr);
+ static const VMStateDescription vmstate_apic_common = {
+     .name = "apic",
+     .version_id = 3,
+@@ -465,7 +433,6 @@ static const VMStateDescription vmstate_apic_common = {
+     },
+     .subsections = (const VMStateDescription*[]) {
+         &vmstate_apic_common_sipi,
+-        &vmstate_apic_irq_delivered,
+         NULL
+     }
+ };
+diff --git a/include/hw/i386/apic_internal.h b/include/hw/i386/apic_internal.h
+index 20ad28c..1209eb4 100644
+--- a/include/hw/i386/apic_internal.h
++++ b/include/hw/i386/apic_internal.h
+@@ -189,8 +189,6 @@ struct APICCommonState {
+     DeviceState *vapic;
+     hwaddr vapic_paddr; /* note: persistence via kvmvapic */
+     bool legacy_instance_id;
+-
+-    int apic_irq_delivered; /* for saving static variable */
+ };
+ 
+ typedef struct VAPICState {
 -- 
 2.9.3
