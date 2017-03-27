@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1csTNd-0007Nt-Ty
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 08:04:14 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1csTc0-00015m-L9
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 08:19:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1csTNY-0002z7-LP
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 08:04:13 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:36371)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1csTNY-0002yr-FS
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 08:04:08 -0400
-Received: by mail-wr0-x243.google.com with SMTP id u1so12565573wra.3
-	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 05:04:08 -0700 (PDT)
-Date: Mon, 27 Mar 2017 13:04:04 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170327120404.GA28620@stefanha-x1.localdomain>
-References: <148900626714.27090.1616990932333159904.stgit@brijesh-build-machine>
-	<148900632968.27090.15435012868487968230.stgit@brijesh-build-machine>
-	<20170323113517.GC12560@stefanha-x1.localdomain>
-	<6ed30368-1433-cf00-ee2e-611faf2a98e3@amd.com>
-	<20170324154007.GB5849@stefanha-x1.localdomain>
-	<3b210d06-b6f9-af04-ff68-e7cee1c8033f@amd.com>
+	(envelope-from <eric.auger@redhat.com>) id 1csTbw-00084o-J2
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 08:19:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54376)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1csTbw-00084h-AD
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 08:19:00 -0400
+References: <20160822161740.4252-1-prem.mallappa@broadcom.com>
+	<465528b8-332b-083e-fc04-5613fadc57fa@redhat.com>
+	<20170327114410.GE9606@toto>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <f010e979-b648-1caa-fc4a-cac3fa3104df@redhat.com>
+Date: Mon, 27 Mar 2017 14:18:56 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="TB36FDmn/VVEgNH/"
-Content-Disposition: inline
-In-Reply-To: <3b210d06-b6f9-af04-ff68-e7cee1c8033f@amd.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v4 06/20] core: add new security-policy
- object
+In-Reply-To: <20170327114410.GE9606@toto>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/9] SMMUv3 Emulation support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,75 +29,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.singh@amd.com>
-Cc: ehabkost@redhat.com, crosthwaite.peter@gmail.com, armbru@redhat.com, mst@redhat.com, p.fedin@samsung.com, qemu-devel@nongnu.org, lcapitulino@redhat.com, pbonzini@redhat.com, rth@twiddle.net, Thomas.Lendacky@amd.com
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org, Christoffer Dall <christoffer.dall@linaro.org>
 
+Hi Edgar,
 
---TB36FDmn/VVEgNH/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+removing Prem's address which is not valid anymore
 
-On Fri, Mar 24, 2017 at 02:42:47PM -0500, Brijesh Singh wrote:
->=20
-> On 03/24/2017 10:40 AM, Stefan Hajnoczi wrote:
->=20
-> >=20
-> > Having one security policy doesn't make sense to me.  As mentioned,
-> > there are many different areas of QEMU that have security relevant
-> > configuration.  They are all unrelated so combining them into one object
-> > with vague parameter names like "debug" makes for a confusing
-> > command-line interface.
-> >=20
-> > If the object is called sev-security-policy then I'm happy.
-> >=20
->=20
-> Works for with me but one of the feedback was to use security-policy [1].
-> IIRC, the main reason for using 'security-policy' instead of 'sev-securit=
-y-policy'
-> was to add a layer of abstraction so that in future if other platforms su=
-pports
-> memory encryption in slightly different way then all we need to do is to =
-create
-> new object without needing to add a new parameter in -machine.
->=20
-> [1] http://marc.info/?l=3Dqemu-devel&m=3D147388592213137&w=3D2
->=20
-> How about using 'memory-encryption-id' instead of security-policy ? If us=
-er wants
-> to launch SEV guest then memory-encryption-id should be set SEV specific =
-object.
-> Something like this:
->=20
-> -machine ..,memory-encryption-id=3Dsev0 \
-> -object sev-guest,id=3Dsev,debug=3Doff,launch=3Dlaunch0 \
-> -object sev-launch-info,id=3Dlaunch0 \
+On 27/03/2017 13:44, Edgar E. Iglesias wrote:
+> On Wed, Mar 08, 2017 at 06:46:13PM +0100, Auger Eric wrote:
+>> Hi,
+>> On 22/08/2016 18:17, Prem Mallappa wrote:
+>>> v1 -> v2:
+>>> 	- Adopted review comments from Eric Auger
+>>> 		- Make SMMU_DPRINTF to internally call qemu_log
+>>> 	            (since translation requests are too many, we need control
+>>> 		     on the type of log we want)
+>>> 		- SMMUTransCfg modified to suite simplicity
+>>> 		- Change RegInfo to uint64 register array
+>>> 		- Code cleanup
+>>> 		- Test cleanups
+>>> 	- Reshuffled patches
+>>>
+>>> RFC -> v1:
+>>> 	- As per SMMUv3 spec 16.0 (only is_ste_consistant() is noticeable)
+>>> 	- Reworked register access/update logic
+>>> 	- Factored out translation code for
+>>> 		- single point bug fix
+>>> 		- sharing/removal in future
+>>> 	- (optional) Unit tests added, with PCI test device
+>>> 		- S1 with 4k/64k, S1+S2 with 4k/64k
+>>> 		- (S1 or S2) only can be verified by Linux 4.7 driver
+>>> 	- (optional) Priliminary ACPI support
+>>>
+>>> RFC:
+>>> 	- Implements SMMUv3 spec 11.0
+>>> 	- Supported for PCIe devices, 
+>>> 	- Command Queue and Event Queue supported
+>>> 	- LPAE only, S1 is supported and Tested, S2 not tested
+>>> 	- BE mode Translation not supported
+>>> 	- IRQ support (legacy, no MSI)
+>>> 	- Tested with DPDK and e1000 
+>>>
+>>> Patch 1: Add new log type for IOMMU transactions
+>>>
+>>> Patch 2: Adds support in virt.c to create both SMMUv3 device and dts entries
+>>>
+>>> Patch 2: Adds SMMUv3 model to QEMU
+>>> 	Multiple files, big ones, translate functionality is split across to
+>>> 	accomodate SMMUv2 model, and to remove when common translation feature
+>>> 	(if) becomes available.
+>>>
+>>> Patch 3: Adds SMMU build support
+>>>
+>>> Patch 4: Some devicetree function to add support for SMMU's multiple interrupt
+>>> 	 assignment with names
+>>>
+>>> << optional patches >>
+>>> Optional patches are posted for completeness or for those who wants to test.
+>>>
+>>> Patch 5: A simple PCI device which does DMA from 'src' to 'dst' given
+>>> 	 src_addr, dst_addr and size, and is used by unit test, uses
+>>> 	 pci_dma_read and pci_dma_write in a crude way but serves the purpose.
+>>>
+>>> Patch 6: Current libqos PCI helpers are x86 only, this addes a generic interface
+>>>
+>>> Patch 7: Unit tests for SMMU, 
+>>> 		- initializes SMMU device 
+>>> 		- initializes Test device
+>>> 		- allocates page tables 1:1 mapping va == pa
+>>> 		- allocates STE/CD accordingly for S1, S2, S1+S2
+>>> 		- initiates DMA via PCI test device
+>>> 		- verifies transfered data
+>>>
+>>> Patch 8: Added ACPI IORT tables, was needed for internal project purpose, but 
+>>> 	 posting here for anyone looking for testing ACPI on ARM platforms.
+>>> 	 (P.S: Linux side IORT patches are WIP)
+>>>
+>>> Repo:
+>>> https://github.com/pmallappa/qemu/tree/upstream/smmuv3/v2
+>>>
+>>> To Test:
+>>> $ make tests/smmuv3-test
+>>> $ QTEST_QEMU_BINARY=aarch64-softmmu/qemu-system-aarch64 tests/smmuv3-test
+>>> << expect lot of prints >>
+>>>
+>>> Any comments welcome..
+>> As Prem was forced to stop his activity on this series, I volunteer to
+>> pursue his work. Prior to starting the work, I just would like to check
+>> nobody works on this already or objects.
+>>
+>> If not, I intend to rebase and will do my utmost to align, when sensible
+>> with what was done on Xilinx vsmmuv2/intel iommu.
+> 
+> 
+> That would be awesome! Sorry for the late reply.
+no worries.
+> 
+> I had some comments on the PCI integration that Prem did but I'm not sure
+> it matters now if you're going to go through the work. We can do a review
+> of your future patches instead.
 
-Something like that sounds good.  I think "-id" typically isn't included
-in the option name.
+I plan to send a respin this week. As I am still getting familiar with
+the code, this may be mostly a rebase on 2.9 plus some cleanups. Then I
+plan to dig into more details, add missing features, maybe reuse your
+table translation code if you allow me to do so, share a base class. So
+I will be delighted to share about enhancements and possible reuse of
+your code too.
 
-So just the following is fine:
+note: at the moment I chose not to use the register API since you said
+that maybe for this IP it didn't bring much added-value.
 
- -machine memory-encryption=3Dsev0 \
- ...
+Thanks
 
-Other examples: -device virtio-blk-pci,drive=3Ddrive0 and -device
-e1000,netdev=3Dnetdev0.
-
-Stefan
-
---TB36FDmn/VVEgNH/
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJY2P+0AAoJEJykq7OBq3PIIxYIAIp04fq/ChPNGnOd32d69Zn5
-uN7bo8yXSf01aqOqAMf/1/9g8PVjnHXzlKOZgeoF1IUGJMoO1l3G9FJOHyESX0v3
-AE60eODfyasY85bvuZkQZ1FY+1Do63NlGSYtA+ekPf5EllZ9D+81KOEFZLn9CvGn
-0tbttXGzmdHsKY8jRhPWwrSgcAGZ6NeRFLAcYGYKDRAZYSiG6GYkeCYxFqHt5wOy
-20KG7QBN6QQbOeA21e/O+n0q7xIdafurDrDA08YPco7k9824SmlWWMf+ssFSNy54
-AiFQZGrbXpH1V123NKqNDNBwQveESWkWwJFZB+JZ3e3bhaXBXILQGB2rbGXotpY=
-=yqWY
------END PGP SIGNATURE-----
-
---TB36FDmn/VVEgNH/--
+Eric
+> 
+> Cheers,
+> Edgar
+> 
