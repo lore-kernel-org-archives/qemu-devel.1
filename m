@@ -1,15 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1csN7K-0000hc-LZ
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 01:22:59 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1csNOp-0002Qa-O0
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 01:41:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1csN7H-0007yM-Jb
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 01:22:58 -0400
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Mon, 27 Mar 2017 16:22:19 +1100
-Message-Id: <20170327052219.33110-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu] target-ppc/kvm: Enable in-kernel TCE
- acceleration for multi-tce
+	(envelope-from <dovgaluk@ispras.ru>) id 1csNOj-0004Bk-Rm
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 01:41:03 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:49916)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1csNOj-0004An-Be
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 01:40:57 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <1488382850-19252-1-git-send-email-kraxel@redhat.com>
+	<1488382850-19252-2-git-send-email-kraxel@redhat.com>
+	<874lyiya3i.fsf@linaro.org>
+In-Reply-To: <874lyiya3i.fsf@linaro.org>
+Date: Mon, 27 Mar 2017 08:40:55 +0300
+Message-ID: <003e01d2a6bc$b4214f30$1c63ed90$@ru>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PULL v3 1/3] replay: add record/replay for audio
+ passthrough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,89 +31,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>, 'Gerd Hoffmann' <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>
 
-This enables in-kernel handling of H_PUT_TCE_INDIRECT and
-H_STUFF_TCE hypercalls. The host kernel support is there since v4.6,
-in particular d3695aa4f452
-("KVM: PPC: Add support for multiple-TCE hcalls").
+> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
+> > From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> >
+> > This patch adds recording and replaying audio data. Is saves =
+synchronization
+> > information for audio out and inputs from the microphone.
+> >
+> > v2: removed unneeded whitespace change
+> >
+> > Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> > Message-id: 20170202055054.4848.94901.stgit@PASHA-ISP.lan02.inno
+> >
+> > [ kraxel: add qemu/error-report.h include to fix osx build failure ]
+> >
+> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> > ---
+> >  audio/audio.c            |  9 ++++--
+> >  audio/audio.h            |  5 +++
+> >  audio/mixeng.c           | 32 ++++++++++++++++++++
+> >  docs/replay.txt          |  7 +++++
+> >  include/sysemu/replay.h  |  7 +++++
+> >  replay/Makefile.objs     |  1 +
+> >  replay/replay-audio.c    | 79 =
+++++++++++++++++++++++++++++++++++++++++++++++++
+> >  replay/replay-internal.h |  4 +++
+> >  8 files changed, 142 insertions(+), 2 deletions(-)
+> >  create mode 100644 replay/replay-audio.c
+> >
+> <snip>
+> > diff --git a/replay/replay-internal.h b/replay/replay-internal.h
+> > index c26d079..ed66ed8 100644
+> > --- a/replay/replay-internal.h
+> > +++ b/replay/replay-internal.h
+> > @@ -29,6 +29,10 @@ enum ReplayEvents {
+> >      /* for character device read all event */
+> >      EVENT_CHAR_READ_ALL,
+> >      EVENT_CHAR_READ_ALL_ERROR,
+> > +    /* for audio out event */
+> > +    EVENT_AUDIO_OUT,
+> > +    /* for audio in event */
+> > +    EVENT_AUDIO_IN,
+> >      /* for clock read/writes */
+> >      /* some of greater codes are reserved for clocks */
+> >      EVENT_CLOCK,
+>=20
+> Well one thing I noticed while I was trying to work out the difference
+> between pre/post mttcg replay problems is the log format ABI has
+> changed. REPLAY_VERSION needs to be bumped to prevent confusion.
 
-H_PUT_TCE is already accelerated and does not need any special enablement.
+Right, I missed that while sending the patches.
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
- target/ppc/kvm_ppc.h |  6 ++++++
- hw/ppc/spapr.c       |  4 +++-
- target/ppc/kvm.c     | 14 ++++++++++++++
- 3 files changed, 23 insertions(+), 1 deletion(-)
-
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index 4b2fd9a609..f48243d13f 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -39,6 +39,7 @@ target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
- #ifndef CONFIG_USER_ONLY
- off_t kvmppc_alloc_rma(void **rma);
- bool kvmppc_spapr_use_multitce(void);
-+int kvmppc_spapr_enable_inkernel_multitce(void);
- void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
-                               uint64_t bus_offset, uint32_t nb_table,
-                               int *pfd, bool need_vfio);
-@@ -180,6 +181,11 @@ static inline bool kvmppc_spapr_use_multitce(void)
-     return false;
- }
- 
-+static inline int kvmppc_spapr_enable_inkernel_multitce(void)
-+{
-+    return -1;
-+}
-+
- static inline void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
-                                             uint64_t bus_offset,
-                                             uint32_t nb_table,
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 0e1c29bcf8..8027716f73 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2360,10 +2360,12 @@ static void ppc_spapr_init(MachineState *machine)
- 
-     qemu_register_boot_set(spapr_boot_set, spapr);
- 
--    /* to stop and start vmclock */
-     if (kvm_enabled()) {
-+        /* to stop and start vmclock */
-         qemu_add_vm_change_state_handler(cpu_ppc_clock_vm_state_change,
-                                          &spapr->tb);
-+
-+        kvmppc_spapr_enable_inkernel_multitce();
-     }
- }
- 
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 6dc39623e5..560ce655c7 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2194,6 +2194,20 @@ bool kvmppc_spapr_use_multitce(void)
-     return cap_spapr_multitce;
- }
- 
-+int kvmppc_spapr_enable_inkernel_multitce(void)
-+{
-+    int ret;
-+
-+    ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PPC_ENABLE_HCALL, 0,
-+                            H_PUT_TCE_INDIRECT, 1);
-+    if (!ret) {
-+        ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PPC_ENABLE_HCALL, 0,
-+                                H_STUFF_TCE, 1);
-+    }
-+
-+    return ret;
-+}
-+
- void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
-                               uint64_t bus_offset, uint32_t nb_table,
-                               int *pfd, bool need_vfio)
--- 
-2.11.0
+Pavel Dovgalyuk
