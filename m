@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1csUk5-0006EF-9m
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:31:33 -0400
+	(envelope-from <tejaswinipoluri3@gmail.com>) id 1csRvw-0007FC-DG
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 06:31:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1csUk4-0000Yh-8d
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:31:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46308)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1csUk4-0000Yc-3L
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:31:28 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2C1B6C05AA53
-	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 13:31:27 +0000 (UTC)
-Date: Mon, 27 Mar 2017 14:31:14 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170327133113.GA31177@work-vm>
-References: <1490092792-30957-1-git-send-email-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1490092792-30957-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/3] Add a tester for HMP commands
+	(envelope-from <tejaswinipoluri3@gmail.com>) id 1csRvt-0007mW-HI
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 06:31:32 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:33904)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tejaswinipoluri3@gmail.com>)
+	id 1csRvt-0007mH-BR
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 06:31:29 -0400
+Received: by mail-pg0-x242.google.com with SMTP id o123so8995036pga.1
+	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 03:31:29 -0700 (PDT)
+From: Tejaswini <tejaswinipoluri3@gmail.com>
+Date: Mon, 27 Mar 2017 16:01:02 +0530
+Message-Id: <1490610662-5483-1-git-send-email-tejaswinipoluri3@gmail.com>
+Subject: [Qemu-devel] [[RFC]PATCH:hw/sd:sd_init()] hw/sd : modified the
+ sd_init() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,40 +25,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, kwolf@redhat.com, Tejaswini Poluri <tejaswinipoluri3@gmail.com>
 
-* Thomas Huth (thuth@redhat.com) wrote:
-> We currently do not test HMP commands automatically yet, so if they
-> break, we do not notice this until somebody runs into the problem
-> (like the "info qtree" problem that we recently had on qemu-system-ppc64).
-> So let's add a simple tester that runs some HMP commands to check if they
-> can crash or abort QEMU.
-> 
-> Note: Three boards are currently still blacklisted in the third patch.
-> I've added the problems to our BiteSizeTasks wiki page, so I hope they
-> will get fixed by GSoC students or somebody else soon. Once the problems
-> are fixed, the blacklisting can be removed in the tester, too.
+From: Tejaswini Poluri <tejaswinipoluri3@gmail.com>
 
-Queued
+Changed sd_init() to take SDstate by value and return state as success/failure
+Edited the rest of the functions using sd_init() to accommodate the change
 
-> Thomas Huth (3):
->   libqtest: Ignore QMP events when parsing the response for HMP commands
->   libqtest: Add a generic function to run a callback function for every
->     machine
->   tests: Add a tester for HMP commands
-> 
->  tests/Makefile.include |   2 +
->  tests/libqtest.c       |  36 +++++++++++
->  tests/libqtest.h       |   8 +++
->  tests/pc-cpu-test.c    |  95 +++++++++++------------------
->  tests/qom-test.c       |  36 ++---------
->  tests/test-hmp.c       | 160 +++++++++++++++++++++++++++++++++++++++++++++++++
->  6 files changed, 248 insertions(+), 89 deletions(-)
->  create mode 100644 tests/test-hmp.c
-> 
-> -- 
-> 1.8.3.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Signed-off-by: Tejaswini Poluri <tejaswinipoluri3@gmail.com>
+---
+ hw/sd/milkymist-memcard.c |  3 +--
+ hw/sd/omap_mmc.c          |  6 ++----
+ hw/sd/pl181.c             |  4 ++--
+ hw/sd/sd.c                | 13 ++++++++-----
+ hw/sd/ssi-sd.c            |  3 +--
+ include/hw/sd/sd.h        |  2 +-
+ 6 files changed, 15 insertions(+), 16 deletions(-)
+
+diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
+index 1f2f0ed..68e50e5 100644
+--- a/hw/sd/milkymist-memcard.c
++++ b/hw/sd/milkymist-memcard.c
+@@ -259,8 +259,7 @@ static int milkymist_memcard_init(SysBusDevice *dev)
+     /* FIXME use a qdev drive property instead of drive_get_next() */
+     dinfo = drive_get_next(IF_SD);
+     blk = dinfo ? blk_by_legacy_dinfo(dinfo) : NULL;
+-    s->card = sd_init(blk, false);
+-    if (s->card == NULL) {
++    if (sd_init(s->card, blk, false) < 0) {
+         return -1;
+     }
+ 
+diff --git a/hw/sd/omap_mmc.c b/hw/sd/omap_mmc.c
+index e934cd3..add48a6 100644
+--- a/hw/sd/omap_mmc.c
++++ b/hw/sd/omap_mmc.c
+@@ -593,8 +593,7 @@ struct omap_mmc_s *omap_mmc_init(hwaddr base,
+     memory_region_add_subregion(sysmem, base, &s->iomem);
+ 
+     /* Instantiate the storage */
+-    s->card = sd_init(blk, false);
+-    if (s->card == NULL) {
++    if (sd_init(s->card, blk, false) < 0) {
+         exit(1);
+     }
+ 
+@@ -620,8 +619,7 @@ struct omap_mmc_s *omap2_mmc_init(struct omap_target_agent_s *ta,
+     omap_l4_attach(ta, 0, &s->iomem);
+ 
+     /* Instantiate the storage */
+-    s->card = sd_init(blk, false);
+-    if (s->card == NULL) {
++    if (sd_init(s->card, blk, false) < 0) {
+         exit(1);
+     }
+ 
+diff --git a/hw/sd/pl181.c b/hw/sd/pl181.c
+index 82c63a4..c2e2459 100644
+--- a/hw/sd/pl181.c
++++ b/hw/sd/pl181.c
+@@ -502,8 +502,8 @@ static void pl181_realize(DeviceState *dev, Error **errp)
+ 
+     /* FIXME use a qdev drive property instead of drive_get_next() */
+     dinfo = drive_get_next(IF_SD);
+-    s->card = sd_init(dinfo ? blk_by_legacy_dinfo(dinfo) : NULL, false);
+-    if (s->card == NULL) {
++    if (sd_init(s->card, dinfo ?
++		blk_by_legacy_dinfo(dinfo) : NULL, false) < 0) {
+         error_setg(errp, "sd_init failed");
+     }
+ }
+diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+index ba47bff..b593939 100644
+--- a/hw/sd/sd.c
++++ b/hw/sd/sd.c
+@@ -562,7 +562,7 @@ static const VMStateDescription sd_vmstate = {
+ };
+ 
+ /* Legacy initialization function for use by non-qdevified callers */
+-SDState *sd_init(BlockBackend *blk, bool is_spi)
++int sd_init(SDState *sd_state, BlockBackend *blk, bool is_spi)
+ {
+     Object *obj;
+     DeviceState *dev;
+@@ -573,16 +573,19 @@ SDState *sd_init(BlockBackend *blk, bool is_spi)
+     qdev_prop_set_drive(dev, "drive", blk, &err);
+     if (err) {
+         error_report("sd_init failed: %s", error_get_pretty(err));
+-        return NULL;
++        return -1;
+     }
+     qdev_prop_set_bit(dev, "spi", is_spi);
+     object_property_set_bool(obj, true, "realized", &err);
+     if (err) {
+         error_report("sd_init failed: %s", error_get_pretty(err));
+-        return NULL;
++        return -1;
+     }
+-
+-    return SD_CARD(dev);
++    sd_state = SD_CARD(dev);
++    if (!sd_state) {
++		return -1;
++	}
++    return 0;
+ }
+ 
+ void sd_set_cb(SDState *sd, qemu_irq readonly, qemu_irq insert)
+diff --git a/hw/sd/ssi-sd.c b/hw/sd/ssi-sd.c
+index 24001dc..c70b32d 100644
+--- a/hw/sd/ssi-sd.c
++++ b/hw/sd/ssi-sd.c
+@@ -244,8 +244,7 @@ static void ssi_sd_realize(SSISlave *d, Error **errp)
+     s->mode = SSI_SD_CMD;
+     /* FIXME use a qdev drive property instead of drive_get_next() */
+     dinfo = drive_get_next(IF_SD);
+-    s->sd = sd_init(dinfo ? blk_by_legacy_dinfo(dinfo) : NULL, true);
+-    if (s->sd == NULL) {
++    if (sd_init(s->sd, dinfo ? blk_by_legacy_dinfo(dinfo) : NULL, true) < 0) {
+         error_setg(errp, "Device initialization failed.");
+         return;
+     }
+diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
+index 96caefe..63741c0 100644
+--- a/include/hw/sd/sd.h
++++ b/include/hw/sd/sd.h
+@@ -115,7 +115,7 @@ typedef struct {
+ } SDBusClass;
+ 
+ /* Legacy functions to be used only by non-qdevified callers */
+-SDState *sd_init(BlockBackend *bs, bool is_spi);
++int sd_init(SDState *sd, BlockBackend *bs, bool is_spi);
+ int sd_do_command(SDState *sd, SDRequest *req,
+                   uint8_t *response);
+ void sd_write_data(SDState *sd, uint8_t value);
+-- 
+2.7.4
