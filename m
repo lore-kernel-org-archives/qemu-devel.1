@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1csZ2D-0003OX-Q1
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:06:30 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1csZEA-0006Pi-3Y
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:18:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1csZ28-0003sM-RJ
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:06:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34800)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1csZ28-0003rz-JX
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:06:24 -0400
-Date: Mon, 27 Mar 2017 15:06:21 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170327180621.GM28530@thinpad.lan.raisama.net>
-References: <1490624810-44752-1-git-send-email-agraf@suse.de>
-	<20170327154636.GI28530@thinpad.lan.raisama.net>
-	<c14eb231-10d1-63cb-ed14-8b7cd131b7b0@suse.de>
-	<20170327163333.GL28530@thinpad.lan.raisama.net>
-	<164e6c5d-ca36-b92d-2831-468a54cd3efe@suse.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <164e6c5d-ca36-b92d-2831-468a54cd3efe@suse.de>
-Subject: Re: [Qemu-devel] [PATCH] i386: Allow monitor / mwait cpuid override
+	(envelope-from <pm215@archaic.org.uk>) id 1csZE9-0006Vs-30
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:18:50 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48943)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1csZE8-0006U6-RK
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:18:48 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 27 Mar 2017 19:18:45 +0100
+Message-Id: <1490638725-19939-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH for-2.9] tests/bios-tables-test: Don't pass
+ addresses of packed struct fields
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,99 +23,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Graf <agraf@suse.de>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, kvm@vger.kernel.org
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On Mon, Mar 27, 2017 at 06:42:49PM +0200, Alexander Graf wrote:
-> 
-> 
-> On 27/03/2017 18:33, Eduardo Habkost wrote:
-> > On Mon, Mar 27, 2017 at 06:10:43PM +0200, Alexander Graf wrote:
-> > > 
-> > > 
-> > > On 27/03/2017 17:46, Eduardo Habkost wrote:
-> > > > On Mon, Mar 27, 2017 at 04:26:50PM +0200, Alexander Graf wrote:
-> > > > > KVM allows trap and emulate (read: NOP) of the MONITOR and MWAIT
-> > > > > instructions. There is work undergoing to enable actual execution
-> > > > > of these inside of KVM, but nobody really wants to expose the feature
-> > > > > to the guest by default, as it would eat up all of the host CPU.
-> > > > 
-> > > > Isn't this something that should be reported using
-> > > > KVM_GET_EMULATED_CPUID? (QEMU still doesn't know how to use
-> > > > KVM_GET_EMULATED_CPUID, however.)
-> > > 
-> > > Depends how you look at it. In KVM land there are basically 3 ways to deal
-> > > with MONITOR/MWAIT:
-> > > 
-> > >   1) #VMEXIT on every execution, treat them as NOP
-> > >   2) let the guest natively execute them (looks like a busy loop for the
-> > > host, but saves power)
-> > >   3) be smart in KVM about it, add actual emulation and adaptively allow for
-> > > native mwait execution or emulated mwait which means we can run inside host
-> > > context
-> > 
-> > Which case is going to be enabled when using your patch? Don't
-> > you want to make that configurable?
+Passing the address of a field in a packed struct to a function
+that expects a pointer to normally aligned data will result in
+a SEGBUS on architectures like SPARC that have strict alignment
+requirements.
 
-If the answer to this question is "no", then we can ignore all
-the rest of my previous message. :)
+Pass addresses of local variables rather than addresses of packed
+structure fields to glib functions like g_file_get_contents() to
+avoid this bug.
 
-> > 
-> > This looks like configuration that can't be easily represented
-> > using the GET_SUPPORTED_CPUID/KVM_SET_CPUID abstraction, as the
-> > ability to enable the feature can't be represented by a single
-> > bit.
-> > 
-> > We already have a few cases where we make
-> > kvm_arch_get_supported_cpuid() look at something other than just
-> > GET_SUPPORTED_CPUID return values (most cases are related to
-> > in-kernel irqchip). We can change kvm_arch_get_supported_cpuid()
-> > to look at other flags (like one that would configure mwait
-> > behavior), and decide to report CPUID_EXT_MONITOR on those cases.
-> > 
-> > Would something like the following make sense?
-> > 
-> > * Having a "mwait=(none|nop|native|smart)" option, to choose
-> >   mwait behavior
-> > * Making kvm_arch_get_supported_cpuid() return CPUID_EXT_MONITOR
-> >   as supported only if the "mwait" option is not "none".
-> > 
-> > Then:
-> > * "-cpu ...,monitor=on" would fail, because mwait=none would be
-> >   the default
-> > * "-cpu ...,mwait=none,monitor=on" would fail
-> > * "-cpu ...,mwait=(nop|native|smart)" would fail if
-> >   host KVM doesn't report the corresponding mwait behavior as
-> >   supported
-> > * "-cpu ...,mwait=(nop|native|smart),monitor=on" would work
-> > * "-cpu ...,mwait=(nop|native|smart)" would also work, and
-> >   probably should enable CPUID_EXT_MONITOR flag by default
-> > 
-> > We could still implement "monitor=force" for debugging, but I
-> > think we need something safer than "just ignore what KVM is
-> > telling us" for production.
-> 
-> I personally think we want the =force for any cpuid bit that we want to
-> randomly poke into the expose CPUID bitmap and if a customer is daring
-> enough, leave that to him as an option.
-> 
-> For anything else, I wouldn't overengineer this interface. I think
-> eventually we want to just natively support emulated mwait with proper
-> adaptive logic on when to trap vs execute mwait inside the guest (as
-> mentioned in the kvm thread on this). Once that's implemented, KVM can just
-> expose the MONITOR bit as supported and everyone gets it automatically.
-> 
-> If at that point, the adaptive interface performs much worse than the naive
-> one, we can still think about pushing this into an enable_cap and add a
-> specific mwait= option.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ tests/bios-tables-test.c | 24 ++++++++++++++++++------
+ 1 file changed, 18 insertions(+), 6 deletions(-)
 
-Sounds good to me.
-
-I thought the user still had to choose between the options above
-somehow, and that KVM was not going to return MONITOR on
-GET_SUPPORTED_CPUID because of that. If getting adaptative logic
-that's good enough to add MONITOR to GET_SUPPORTED_CPUID is still
-a possibility, then that's even better.
-
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index 88dbf97..e9a5092 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -261,7 +261,10 @@ static void dump_aml_files(test_data *data, bool rebuild)
+             fd = g_open(aml_file, O_WRONLY|O_TRUNC|O_CREAT,
+                         S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+         } else {
+-            fd = g_file_open_tmp("aml-XXXXXX", &sdt->aml_file, &error);
++            gchar *name;
++
++            fd = g_file_open_tmp("aml-XXXXXX", &name, &error);
++            sdt->aml_file = name;
+             g_assert_no_error(error);
+         }
+         g_assert(fd >= 0);
+@@ -291,8 +294,10 @@ static bool load_asl(GArray *sdts, AcpiSdtTable *sdt)
+     gchar *out, *out_err;
+     gboolean ret;
+     int i;
++    gchar *name;
+ 
+-    fd = g_file_open_tmp("asl-XXXXXX.dsl", &sdt->asl_file, &error);
++    fd = g_file_open_tmp("asl-XXXXXX.dsl", &name, &error);
++    sdt->asl_file = name;
+     g_assert_no_error(error);
+     close(fd);
+ 
+@@ -314,8 +319,12 @@ static bool load_asl(GArray *sdts, AcpiSdtTable *sdt)
+     ret = g_spawn_command_line_sync(command_line->str, &out, &out_err, NULL, &error);
+     g_assert_no_error(error);
+     if (ret) {
+-        ret = g_file_get_contents(sdt->asl_file, (gchar **)&sdt->asl,
+-                                  &sdt->asl_len, &error);
++        gchar *contents;
++        gsize len;
++
++        ret = g_file_get_contents(sdt->asl_file, &contents, &len, &error);
++        sdt->asl = contents;
++        sdt->asl_len = len;
+         g_assert(ret);
+         g_assert_no_error(error);
+         ret = (sdt->asl_len > 0);
+@@ -371,6 +380,8 @@ static GArray *load_expected_aml(test_data *data)
+         uint32_t signature;
+         gchar *aml_file = NULL;
+         const char *ext = data->variant ? data->variant : "";
++        gchar *aml_contents;
++        gsize aml_length;
+ 
+         sdt = &g_array_index(data->tables, AcpiSdtTable, i);
+ 
+@@ -397,8 +408,9 @@ try_again:
+         if (getenv("V")) {
+             fprintf(stderr, "\nUsing expected file '%s'\n", aml_file);
+         }
+-        ret = g_file_get_contents(aml_file, &exp_sdt.aml,
+-                                  &exp_sdt.aml_len, &error);
++        ret = g_file_get_contents(aml_file, &aml_contents, &aml_length, &error);
++        exp_sdt.aml = aml_contents;
++        exp_sdt.aml_len = aml_length;
+         g_assert(ret);
+         g_assert_no_error(error);
+         g_assert(exp_sdt.aml);
 -- 
-Eduardo
+2.7.4
