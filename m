@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1csa4C-0007ZR-DP
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 15:12:37 -0400
+	(envelope-from <armbru@redhat.com>) id 1csa6N-0008GE-5L
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 15:14:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1csa49-000382-4M
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 15:12:36 -0400
-Received: from 1.mo2.mail-out.ovh.net ([46.105.63.121]:45187)
+	(envelope-from <armbru@redhat.com>) id 1csa6J-0003l7-SH
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 15:14:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35488)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1csa48-00037m-Uo
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 15:12:33 -0400
-Received: from player796.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 2149F78382
-	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 21:12:30 +0200 (CEST)
-Date: Mon, 27 Mar 2017 21:12:20 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170327211220.1b593d47@bahia.lan>
-In-Reply-To: <1490637544-15650-1-git-send-email-peter.maydell@linaro.org>
-References: <1490637544-15650-1-git-send-email-peter.maydell@linaro.org>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1csa6J-0003kv-NG
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 15:14:47 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 993EC80F93
+	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 19:14:46 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
+	<1490621195-2228-9-git-send-email-armbru@redhat.com>
+	<d6cd1529-2f9a-45fe-3bbf-76e7baf5e9d4@redhat.com>
+	<87h92eefmf.fsf@dusky.pond.sub.org>
+	<a07cf17a-146e-1b5b-e5e5-0456cecb88d1@redhat.com>
+Date: Mon, 27 Mar 2017 21:14:44 +0200
+In-Reply-To: <a07cf17a-146e-1b5b-e5e5-0456cecb88d1@redhat.com> (Eric Blake's
+	message of "Mon, 27 Mar 2017 14:00:15 -0500")
+Message-ID: <87lgrq8rbv.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/4uk_Bt72E.ytUcZW6=2sY.=";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH for-2.9] tests/virtio-9p-test: Don't call
- le*_to_cpus on fields of packed struct
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH RFC v3 for-2.9 08/11] rbd: Revert -blockdev
+ and -drive parameter auth-supported
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +37,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, patches@linaro.org, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: kwolf@redhat.com, jdurgin@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org, jcody@redhat.com
 
---Sig_/4uk_Bt72E.ytUcZW6=2sY.=
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Eric Blake <eblake@redhat.com> writes:
 
-On Mon, 27 Mar 2017 18:59:04 +0100
-Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 03/27/2017 01:31 PM, Markus Armbruster wrote:
+>
+>>>> -
+>>>> -##
+>>>> -# @RbdAuthMethod:
+>>>> -#
+>>>> -# An enumeration of rados auth_supported types
+>>>> -#
+>>>> -# Since: 2.9
+>>>> -##
+>>>> -{ 'struct': 'RbdAuthMethod',
+>>>> -  'data': { 'auth': 'RbdAuthSupport' } }
+>>>> -
+>>>
+>>> Removing the .json QMP support is fine. But I'm reluctant to give R-b
+>>> without knowing for sure that -drive usage won't regress.
+>> 
+>> auth-supported landed in master only on March 2nd.
+>
+> auth-supported via -blockdev-add only landed on March 2nd.  But
+> auth-supported via -drive landed in commit 60390a2, Jan 2016; and is in
+> use by libvirt:
+>
+> src/qemu/qemu_command.c:
+> ":key=%s:auth_supported=cephx\\;none",
 
-> For a packed struct like 'P9Hdr' the fields within it may not be
-> aligned as much as the natural alignment for their types.  This means
-> it is not valid to pass the address of such a field to a function
-> like le32_to_cpus() which operate on uint32_t* and assume alignment.
-> Doing this results in a SIGBUS on hosts like SPARC which have strict
-> alignment requirements.
->=20
-> Use ldl_le_p() instead, which is specified to correctly handle
-> unaligned pointers.
->=20
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
+That's a key-value part of the pseudo-filename.  *Not* reverted by this
+patch.  Only QemuOpts parameter auth_supported is.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+QemuOpts parameter: -drive driver=rbd,auth_supported.0.auth=none,...
+Pseudo-filename:    -drive file=rbd:...:auth_supported=none
 
-I'll apply this to my tree and send a pull request tomorrow.
+>> What libvirt usage exactly do you think this could break?
+>> 
+>
+> Libvirt has been managing rbd drives using -drive since at least libvirt
+> commit 5745cd1, in Nov 2011, where even back then it was passing:
+>             virBufferEscape(opt, ":", ":key=%s:auth_supported=cephx none",
+>
+> (back when it used space instead of ; to separate the list of supported
+> auth types).
+>
+> As I've never personally used RBD (whether through qemu directly, or
+> through libvirt), I'm extremely wary of breaking -drive usage that
+> "works" (for some definition of "works"), even though I have no qualms
+> making the QMP interface extremely limited.
 
-Cheers.
-
---
-Greg
-
-> Sadly gcc doesn't warn about this:
->  https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D51628
-> clang supposedly was fixed to do so:
->  https://bugs.llvm.org//show_bug.cgi?id=3D22821
-> but I think that commit was reverted without the bug being
-> reopened; at least my clang doesn't have that warning flag.
-> ---
->  tests/virtio-9p-test.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
-> index 43a1ad8..ad33d96 100644
-> --- a/tests/virtio-9p-test.c
-> +++ b/tests/virtio-9p-test.c
-> @@ -256,8 +256,8 @@ static void v9fs_req_recv(P9Req *req, uint8_t id)
->          qvirtio_wait_queue_isr(v9p->dev, v9p->vq, 1000 * 1000);
-> =20
->          v9fs_memread(req, &hdr, 7);
-> -        le32_to_cpus(&hdr.size);
-> -        le16_to_cpus(&hdr.tag);
-> +        hdr.size =3D ldl_le_p(&hdr.size);
-> +        hdr.tag =3D lduw_le_p(&hdr.tag);
->          if (hdr.size >=3D 7) {
->              break;
->          }
-
-
---Sig_/4uk_Bt72E.ytUcZW6=2sY.=
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAljZZBQACgkQAvw66wEB28LPlACfWtp55iV5qStBXQzov323VsLi
-rgwAnA4qgDXGrVzMCgaT6KPEzt8PkIEn
-=5KAi
------END PGP SIGNATURE-----
-
---Sig_/4uk_Bt72E.ytUcZW6=2sY.=--
+All clear now?
