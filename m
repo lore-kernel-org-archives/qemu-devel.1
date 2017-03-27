@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43634)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1csTc0-00015m-L9
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 08:19:06 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1csTfr-0002JU-0e
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 08:23:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1csTbw-00084o-J2
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 08:19:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54376)
+	(envelope-from <pbonzini@redhat.com>) id 1csTfm-0000fa-Vh
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 08:23:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53084)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1csTbw-00084h-AD
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 08:19:00 -0400
-References: <20160822161740.4252-1-prem.mallappa@broadcom.com>
-	<465528b8-332b-083e-fc04-5613fadc57fa@redhat.com>
-	<20170327114410.GE9606@toto>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <f010e979-b648-1caa-fc4a-cac3fa3104df@redhat.com>
-Date: Mon, 27 Mar 2017 14:18:56 +0200
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1csTfm-0000fU-Pw
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 08:22:58 -0400
+References: <20170325111424.21752-1-herongguang.he@huawei.com>
+	<58D8BD6D.8080404@huawei.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4c9e0c46-ac81-a455-e2ed-530ad916ff71@redhat.com>
+Date: Mon, 27 Mar 2017 14:22:53 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170327114410.GE9606@toto>
+In-Reply-To: <58D8BD6D.8080404@huawei.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/9] SMMUv3 Emulation support
+Subject: Re: [Qemu-devel] [PATCH v2] KVM: pci-assign: do not map smm memory
+ slot pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,121 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org, Christoffer Dall <christoffer.dall@linaro.org>
+To: "Herongguang (Stephen)" <herongguang.he@huawei.com>, rkrcmar@redhat.com, kvm@vger.kernel.org
+Cc: qemu-devel@nongnu.org, wangxinxin.wang@huawei.com
 
-Hi Edgar,
 
-removing Prem's address which is not valid anymore
 
-On 27/03/2017 13:44, Edgar E. Iglesias wrote:
-> On Wed, Mar 08, 2017 at 06:46:13PM +0100, Auger Eric wrote:
->> Hi,
->> On 22/08/2016 18:17, Prem Mallappa wrote:
->>> v1 -> v2:
->>> 	- Adopted review comments from Eric Auger
->>> 		- Make SMMU_DPRINTF to internally call qemu_log
->>> 	            (since translation requests are too many, we need control
->>> 		     on the type of log we want)
->>> 		- SMMUTransCfg modified to suite simplicity
->>> 		- Change RegInfo to uint64 register array
->>> 		- Code cleanup
->>> 		- Test cleanups
->>> 	- Reshuffled patches
->>>
->>> RFC -> v1:
->>> 	- As per SMMUv3 spec 16.0 (only is_ste_consistant() is noticeable)
->>> 	- Reworked register access/update logic
->>> 	- Factored out translation code for
->>> 		- single point bug fix
->>> 		- sharing/removal in future
->>> 	- (optional) Unit tests added, with PCI test device
->>> 		- S1 with 4k/64k, S1+S2 with 4k/64k
->>> 		- (S1 or S2) only can be verified by Linux 4.7 driver
->>> 	- (optional) Priliminary ACPI support
->>>
->>> RFC:
->>> 	- Implements SMMUv3 spec 11.0
->>> 	- Supported for PCIe devices, 
->>> 	- Command Queue and Event Queue supported
->>> 	- LPAE only, S1 is supported and Tested, S2 not tested
->>> 	- BE mode Translation not supported
->>> 	- IRQ support (legacy, no MSI)
->>> 	- Tested with DPDK and e1000 
->>>
->>> Patch 1: Add new log type for IOMMU transactions
->>>
->>> Patch 2: Adds support in virt.c to create both SMMUv3 device and dts entries
->>>
->>> Patch 2: Adds SMMUv3 model to QEMU
->>> 	Multiple files, big ones, translate functionality is split across to
->>> 	accomodate SMMUv2 model, and to remove when common translation feature
->>> 	(if) becomes available.
->>>
->>> Patch 3: Adds SMMU build support
->>>
->>> Patch 4: Some devicetree function to add support for SMMU's multiple interrupt
->>> 	 assignment with names
->>>
->>> << optional patches >>
->>> Optional patches are posted for completeness or for those who wants to test.
->>>
->>> Patch 5: A simple PCI device which does DMA from 'src' to 'dst' given
->>> 	 src_addr, dst_addr and size, and is used by unit test, uses
->>> 	 pci_dma_read and pci_dma_write in a crude way but serves the purpose.
->>>
->>> Patch 6: Current libqos PCI helpers are x86 only, this addes a generic interface
->>>
->>> Patch 7: Unit tests for SMMU, 
->>> 		- initializes SMMU device 
->>> 		- initializes Test device
->>> 		- allocates page tables 1:1 mapping va == pa
->>> 		- allocates STE/CD accordingly for S1, S2, S1+S2
->>> 		- initiates DMA via PCI test device
->>> 		- verifies transfered data
->>>
->>> Patch 8: Added ACPI IORT tables, was needed for internal project purpose, but 
->>> 	 posting here for anyone looking for testing ACPI on ARM platforms.
->>> 	 (P.S: Linux side IORT patches are WIP)
->>>
->>> Repo:
->>> https://github.com/pmallappa/qemu/tree/upstream/smmuv3/v2
->>>
->>> To Test:
->>> $ make tests/smmuv3-test
->>> $ QTEST_QEMU_BINARY=aarch64-softmmu/qemu-system-aarch64 tests/smmuv3-test
->>> << expect lot of prints >>
->>>
->>> Any comments welcome..
->> As Prem was forced to stop his activity on this series, I volunteer to
->> pursue his work. Prior to starting the work, I just would like to check
->> nobody works on this already or objects.
->>
->> If not, I intend to rebase and will do my utmost to align, when sensible
->> with what was done on Xilinx vsmmuv2/intel iommu.
+On 27/03/2017 09:21, Herongguang (Stephen) wrote:
+> From f6f0ee6831488bef7af841cb86f3d85a04848fe5 Mon Sep 17 00:00:00 2001
+> From: herongguang <herongguang.he@huawei.com>
+> Date: Mon, 27 Mar 2017 15:08:59 +0800
+> Subject: [PATCH] KVM: pci-assign: do not map smm memory slot pages
+>  in vt-d page table
 > 
+> or VM memory are not put thus leaked in kvm_iommu_unmap_memslots() when
+> destroy VM.
 > 
-> That would be awesome! Sorry for the late reply.
-no worries.
+> This is consistent with current vfio implementation.
+
+Oops, you forgot a Signed-off-by.
+
+Paolo
+
+> ---
+>  virt/kvm/kvm_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> I had some comments on the PCI integration that Prem did but I'm not sure
-> it matters now if you're going to go through the work. We can do a review
-> of your future patches instead.
-
-I plan to send a respin this week. As I am still getting familiar with
-the code, this may be mostly a rebase on 2.9 plus some cleanups. Then I
-plan to dig into more details, add missing features, maybe reuse your
-table translation code if you allow me to do so, share a base class. So
-I will be delighted to share about enhancements and possible reuse of
-your code too.
-
-note: at the moment I chose not to use the register API since you said
-that maybe for this IP it didn't bring much added-value.
-
-Thanks
-
-Eric
-> 
-> Cheers,
-> Edgar
-> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 482612b..9018d06 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1052,7 +1052,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
+>       * changes) is disallowed above, so any other attribute changes
+> getting
+>       * here can be skipped.
+>       */
+> -    if ((change == KVM_MR_CREATE) || (change == KVM_MR_MOVE)) {
+> +    if ((as_id == 0) && ((change == KVM_MR_CREATE) || (change ==
+> KVM_MR_MOVE))) {
+>          r = kvm_iommu_map_pages(kvm, &new);
+>          return r;
+>      }
