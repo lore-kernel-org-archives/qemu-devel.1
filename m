@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1csSMs-0004yt-JK
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 06:59:23 -0400
+	(envelope-from <peterx@redhat.com>) id 1csSOM-0005o6-8X
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 07:01:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1csSMp-0002to-Id
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 06:59:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50872)
+	(envelope-from <peterx@redhat.com>) id 1csSOI-0003QE-Ml
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 07:00:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52954)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1csSMp-0002tU-DE
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 06:59:19 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1csSOI-0003Oe-IF
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 07:00:50 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6062A4DD70
-	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 10:59:18 +0000 (UTC)
-Date: Mon, 27 Mar 2017 18:59:13 +0800
+	by mx1.redhat.com (Postfix) with ESMTPS id 674AB61BA9
+	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 11:00:49 +0000 (UTC)
+Date: Mon, 27 Mar 2017 19:00:40 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170327105913.GA18129@pxdev.xzpeter.org>
+Message-ID: <20170327110040.GB18129@pxdev.xzpeter.org>
 References: <20170323204544.12015-1-quintela@redhat.com>
-	<20170323204544.12015-19-quintela@redhat.com>
+	<20170323204544.12015-20-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170323204544.12015-19-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 18/51] ram: Move xbzrle_pages into RAMState
+In-Reply-To: <20170323204544.12015-20-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 19/51] ram: Move xbzrle_cache_miss into
+ RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,7 +37,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Juan Quintela <quintela@redhat.com>
 Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
 
-On Thu, Mar 23, 2017 at 09:45:11PM +0100, Juan Quintela wrote:
+On Thu, Mar 23, 2017 at 09:45:12PM +0100, Juan Quintela wrote:
 > Signed-off-by: Juan Quintela <quintela@redhat.com>
 
 Reviewed-by: Peter Xu <peterx@redhat.com>
