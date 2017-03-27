@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1csUfW-00026u-PD
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:26:48 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1csUk5-0006EF-9m
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:31:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1csUfQ-0006Pf-Ls
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:26:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49456)
+	(envelope-from <dgilbert@redhat.com>) id 1csUk4-0000Yh-8d
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:31:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46308)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1csUfQ-0006OU-9X
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:26:40 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1csUk4-0000Yc-3L
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:31:28 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1C942D7127
-	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 13:26:39 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 27 Mar 2017 15:26:32 +0200
-Message-Id: <1490621195-2228-9-git-send-email-armbru@redhat.com>
-In-Reply-To: <1490621195-2228-1-git-send-email-armbru@redhat.com>
-References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC v3 for-2.9 08/11] rbd: Revert -blockdev and
- -drive parameter auth-supported
+	by mx1.redhat.com (Postfix) with ESMTPS id 2C1B6C05AA53
+	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 13:31:27 +0000 (UTC)
+Date: Mon, 27 Mar 2017 14:31:14 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170327133113.GA31177@work-vm>
+References: <1490092792-30957-1-git-send-email-thuth@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1490092792-30957-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/3] Add a tester for HMP commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,204 +32,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jdurgin@redhat.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-This reverts half of commit 0a55679.  We're having second thoughts on
-the QAPI schema (and thus the external interface), and haven't reached
-consensus, yet.  Issues include:
+* Thomas Huth (thuth@redhat.com) wrote:
+> We currently do not test HMP commands automatically yet, so if they
+> break, we do not notice this until somebody runs into the problem
+> (like the "info qtree" problem that we recently had on qemu-system-ppc64).
+> So let's add a simple tester that runs some HMP commands to check if they
+> can crash or abort QEMU.
+> 
+> Note: Three boards are currently still blacklisted in the third patch.
+> I've added the problems to our BiteSizeTasks wiki page, so I hope they
+> will get fixed by GSoC students or somebody else soon. Once the problems
+> are fixed, the blacklisting can be removed in the tester, too.
 
-* The implementation uses deprecated rados_conf_set() key
-  "auth_supported".  No biggie.
+Queued
 
-* The implementation makes -drive silently ignore invalid parameters
-  "auth" and "auth-supported.*.X" where X isn't "auth".  Fixable (in
-  fact I'm going to fix similar bugs around parameter server), so
-  again no biggie.
-
-* BlockdevOptionsRbd member @password-secret applies only to
-  authentication method cephx.  Should it be a variant member of
-  RbdAuthMethod?
-
-* BlockdevOptionsRbd member @user could apply to both methods cephx
-  and none, but I'm not sure it's actually used with none.  If it
-  isn't, should it be a variant member of RbdAuthMethod?
-
-* The client offers a *set* of authentication methods, not a list.
-  Should the methods be optional members of BlockdevOptionsRbd instead
-  of members of list @auth-supported?  The latter begs the question
-  what multiple entries for the same method mean.  Trivial question
-  now that RbdAuthMethod contains nothing but @type, but less so when
-  RbdAuthMethod acquires other members, such the ones discussed above.
-
-* How BlockdevOptionsRbd member @auth-supported interacts with
-  settings from a configuration file specified with @conf is
-  undocumented.  I suspect it's untested, too.
-
-Let's avoid painting ourselves into a corner now, and revert the
-feature for 2.9.
-
-Note that users can still configure authentication methods with a
-configuration file.  They probably do that anyway if they use Ceph
-outside QEMU as well.
-
-qemu_rbd_array_opts()'s parameter @type now must be RBD_MON_HOST,
-which is silly.  This will be cleaned up shortly.
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- block/rbd.c          | 31 +++----------------------------
- qapi/block-core.json | 24 ------------------------
- 2 files changed, 3 insertions(+), 52 deletions(-)
-
-diff --git a/block/rbd.c b/block/rbd.c
-index cf0bab0..103ce44 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -320,8 +320,7 @@ static QemuOptsList runtime_opts = {
-             .help = "Rados id name",
-         },
-         /*
--         * server.* and auth-supported.* extracted manually, see
--         * qemu_rbd_array_opts()
-+         * server.* extracted manually, see qemu_rbd_array_opts()
-          */
-         {
-             .name = "password-secret",
-@@ -356,11 +355,6 @@ static QemuOptsList runtime_opts = {
-             .name = "port",
-             .type = QEMU_OPT_STRING,
-         },
--        {
--            .name = "auth",
--            .type = QEMU_OPT_STRING,
--            .help = "Supported authentication method, either cephx or none",
--        },
-         { /* end of list */ }
-     },
- };
-@@ -512,7 +506,6 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)
- }
- 
- #define RBD_MON_HOST          0
--#define RBD_AUTH_SUPPORTED    1
- 
- static char *qemu_rbd_array_opts(QDict *options, const char *prefix, int type,
-                                  Error **errp)
-@@ -527,7 +520,7 @@ static char *qemu_rbd_array_opts(QDict *options, const char *prefix, int type,
-     Error *local_err = NULL;
-     int i;
- 
--    assert(type == RBD_MON_HOST || type == RBD_AUTH_SUPPORTED);
-+    assert(type == RBD_MON_HOST);
- 
-     num_entries = qdict_array_entries(options, prefix);
- 
-@@ -573,10 +566,9 @@ static char *qemu_rbd_array_opts(QDict *options, const char *prefix, int type,
-                 value = strbuf;
-             }
-         } else {
--            value = qemu_opt_get(opts, "auth");
-+            abort();
-         }
- 
--
-         /* each iteration in the for loop will build upon the string, and if
-          * rados_str is NULL then it is our first pass */
-         if (rados_str) {
-@@ -608,7 +600,6 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-     QemuOpts *opts;
-     Error *local_err = NULL;
-     char *mon_host = NULL;
--    char *auth_supported = NULL;
-     int r;
- 
-     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
-@@ -619,14 +610,6 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-         return -EINVAL;
-     }
- 
--    auth_supported = qemu_rbd_array_opts(options, "auth-supported.",
--                                         RBD_AUTH_SUPPORTED, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        r = -EINVAL;
--        goto failed_opts;
--    }
--
-     mon_host = qemu_rbd_array_opts(options, "server.",
-                                    RBD_MON_HOST, &local_err);
-     if (local_err) {
-@@ -678,13 +661,6 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-         }
-     }
- 
--    if (auth_supported) {
--        r = rados_conf_set(s->cluster, "auth_supported", auth_supported);
--        if (r < 0) {
--            goto failed_shutdown;
--        }
--    }
--
-     if (qemu_rbd_set_auth(s->cluster, secretid, errp) < 0) {
-         r = -EIO;
-         goto failed_shutdown;
-@@ -735,7 +711,6 @@ failed_shutdown:
- failed_opts:
-     qemu_opts_del(opts);
-     g_free(mon_host);
--    g_free(auth_supported);
-     return r;
- }
- 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 5d2efe4..6a7ca0b 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2601,27 +2601,6 @@
- 
- 
- ##
--# @RbdAuthSupport:
--#
--# An enumeration of RBD auth support
--#
--# Since: 2.9
--##
--{ 'enum': 'RbdAuthSupport',
--  'data': [ 'cephx', 'none' ] }
--
--
--##
--# @RbdAuthMethod:
--#
--# An enumeration of rados auth_supported types
--#
--# Since: 2.9
--##
--{ 'struct': 'RbdAuthMethod',
--  'data': { 'auth': 'RbdAuthSupport' } }
--
--##
- # @BlockdevOptionsRbd:
- #
- # @pool:               Ceph pool name.
-@@ -2639,8 +2618,6 @@
- # @server:             Monitor host address and port.  This maps
- #                      to the "mon_host" Ceph option.
- #
--# @auth-supported:     Authentication supported.
--#
- # @password-secret:    The ID of a QCryptoSecret object providing
- #                      the password for the login.
- #
-@@ -2653,7 +2630,6 @@
-             '*snapshot': 'str',
-             '*user': 'str',
-             '*server': ['InetSocketAddressBase'],
--            '*auth-supported': ['RbdAuthMethod'],
-             '*password-secret': 'str' } }
- 
- ##
--- 
-2.7.4
+> Thomas Huth (3):
+>   libqtest: Ignore QMP events when parsing the response for HMP commands
+>   libqtest: Add a generic function to run a callback function for every
+>     machine
+>   tests: Add a tester for HMP commands
+> 
+>  tests/Makefile.include |   2 +
+>  tests/libqtest.c       |  36 +++++++++++
+>  tests/libqtest.h       |   8 +++
+>  tests/pc-cpu-test.c    |  95 +++++++++++------------------
+>  tests/qom-test.c       |  36 ++---------
+>  tests/test-hmp.c       | 160 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  6 files changed, 248 insertions(+), 89 deletions(-)
+>  create mode 100644 tests/test-hmp.c
+> 
+> -- 
+> 1.8.3.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
