@@ -1,24 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crobinso@redhat.com>) id 1csbLx-0000OC-Bs
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 16:35:02 -0400
+	(envelope-from <jcody@redhat.com>) id 1cscGx-00076W-Lw
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 17:33:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crobinso@redhat.com>) id 1csbLt-0003KS-Gw
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 16:35:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32842)
+	(envelope-from <jcody@redhat.com>) id 1cscGu-0007Is-DW
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 17:33:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45686)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crobinso@redhat.com>) id 1csbLt-0003Js-CD
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 16:34:57 -0400
-References: <db8ccb55-0570-4b6f-1635-7df2ff0b9ec3@redhat.com>
-	<20170326183908.cogmdiisen2jlsh5@var.youpi.perso.aquilenet.fr>
-From: Cole Robinson <crobinso@redhat.com>
-Message-ID: <0436cb6b-9cfe-efd0-5084-a3d79af73dd3@redhat.com>
-Date: Mon, 27 Mar 2017 16:34:54 -0400
+	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1cscGu-0007Ij-7Y
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 17:33:52 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4B82541A2D
+	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 21:33:50 +0000 (UTC)
+Date: Mon, 27 Mar 2017 17:33:47 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170327213347.GF22342@localhost.localdomain>
+References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
+	<1490621195-2228-3-git-send-email-armbru@redhat.com>
+	<ba4b08e7-7e8d-5210-be2c-545be4cdeb99@redhat.com>
+	<abc2a347-5f42-59c0-5f51-0f03bb2b3c6d@redhat.com>
+	<87wpbaefzo.fsf@dusky.pond.sub.org>
+	<8737dybl7v.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170326183908.cogmdiisen2jlsh5@var.youpi.perso.aquilenet.fr>
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] slirp + ipxe + ipv6 dns issue
+Content-Disposition: inline
+In-Reply-To: <8737dybl7v.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH RFC v3 for-2.9 02/11] rbd: Fix to cleanly
+ reject -drive without pool or image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,21 +38,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@gnu.org>
-Cc: ondrejj@salstar.sk, qemu-devel <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, jdurgin@redhat.com
 
-On 03/26/2017 02:39 PM, Samuel Thibault wrote:
-> Hello,
+On Mon, Mar 27, 2017 at 08:58:28PM +0200, Markus Armbruster wrote:
+> Markus Armbruster <armbru@redhat.com> writes:
 > 
-> Cole Robinson, on ven. 24 mars 2017 21:17:43 -0400, wrote:
->> I bisected to this commit:
->>
->>     slirp: Add RDNSS advertisement
+> > Max Reitz <mreitz@redhat.com> writes:
+> >
+> >> On 27.03.2017 18:10, Max Reitz wrote:
+> >>> On 27.03.2017 15:26, Markus Armbruster wrote:
+> >>>> qemu_rbd_open() neglects to check pool and image are present.
+> >>>> Reproducer:
+> >>>>
+> >>>>     $ qemu-system-x86_64 -nodefaults -drive if=none,driver=rbd,pool=p
+> >>>>     Segmentation fault (core dumped)
+> >>>>     $ qemu-system-x86_64 -nodefaults -drive if=none,driver=rbd,image=i
+> >>>>     qemu-system-x86_64: -drive if=none,driver=rbd,image=i: error opening pool (null)
+> >>>>
+> >>>> Doesn't affect -drive with file=..., because qemu_rbd_parse_filename()
+> >>>> always sets both pool and image.
+> >>>>
+> >>>> Doesn't affect -blockdev, because pool and image are mandatory in the
+> >>>> QAPI schema.
+> >>>>
+> >>>> Fix by adding the missing checks.
+> >>>>
+> >>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> >>>> Reviewed-by: Eric Blake <eblake@redhat.com>
+> >>>> ---
+> >>>>  block/rbd.c | 10 +++++++---
+> >>>>  1 file changed, 7 insertions(+), 3 deletions(-)
+> >>> 
+> >>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> >>
+> >> That said, don't we have a similar issue with qemu_rbd_create()? It too
+> >> doesn't check whether those options are given but I guess they're just
+> >> as mandatory.
+> >
+> > Looks like it.  I'll try to stick a fix into v4.
 > 
-> Mmm, I see.  Could you try the attached patch to confirm that it fixes
-> the issue for you too?
-> 
+> Hmm, ignorant question: how can I reach qemu_rbd_create() without going
+> through qemu_rbd_parse_filename()?
 
-I also confirmed your patches fix the test case. Thanks!
-
-- Cole
+You can't -- commit c7cacb3e7 forces qemu_rbd_create() to call
+qemu_rbd_parse_filename().  And in qemu_rbd_parse_filename(), it will
+complain if pool is not provided (and that is what causes the abort, not the
+missing image parameter).  So I think we are safe, but a nicer error message
+for a missing 'image' parameter might be nice anyway.
