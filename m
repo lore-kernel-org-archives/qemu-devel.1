@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1csUdq-0001Uo-50
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:25:07 -0400
+	(envelope-from <armbru@redhat.com>) id 1csUfW-00026v-Py
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:26:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1csUdm-0005sI-WC
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:25:02 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:36122)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1csUdm-0005s7-OW
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:24:58 -0400
-Received: by mail-wr0-x234.google.com with SMTP id w11so42923247wrc.3
-	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 06:24:58 -0700 (PDT)
-Date: Mon, 27 Mar 2017 14:24:54 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170327132454.GD28620@stefanha-x1.localdomain>
-References: <4712D8F4B26E034E80552F30A67BE0B1A3D97E@ORSMSX112.amr.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="AkbCVLjbJ9qUtAXD"
-Content-Disposition: inline
-In-Reply-To: <4712D8F4B26E034E80552F30A67BE0B1A3D97E@ORSMSX112.amr.corp.intel.com>
-Subject: Re: [Qemu-devel] [PATCH] Create libqemutrace.a for all trace.o
+	(envelope-from <armbru@redhat.com>) id 1csUfQ-0006PP-H7
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:26:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38984)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1csUfQ-0006OH-4h
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:26:40 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E88C9C0624C3
+	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 13:26:38 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Mon, 27 Mar 2017 15:26:30 +0200
+Message-Id: <1490621195-2228-7-git-send-email-armbru@redhat.com>
+In-Reply-To: <1490621195-2228-1-git-send-email-armbru@redhat.com>
+References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC v3 for-2.9 06/11] rbd: Clean up
+ runtime_opts, fix -drive to reject filename
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +30,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Xu, Anthony" <anthony.xu@intel.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Daniel Berrange <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: jdurgin@redhat.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com
 
+runtime_opts is used for three different purposes:
 
---AkbCVLjbJ9qUtAXD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+* qemu_rbd_open() uses it to accept options it recognizes, such as
+  "pool" and "image".  Other .bdrv_open() methods do it similarly.
 
-On Fri, Mar 24, 2017 at 04:28:32PM +0000, Xu, Anthony wrote:
-> Create libqemutrace.a for all trace.o
-> Currently all trace.o are linked into qemu-system, qemu-img,=20
-> qemu-nbd, qemu-io etc., even the corresponding components=20
-> are not included.
-> Create a libqemutrace.a that the linker would only pull in .o=20
-> files containing symbols that are actually referenced by the=20
-> program.
-> ./trace.o, ./qapi/trace.o and ./util/trace.o are added into=20
-> libqemuutil.a  to avoid recursive dependencies between=20
-> libqemuutil.a and libqemutrace.a.
+* qemu_rbd_open() accepts additional list-valued options
+  auth-supported and server, with the help of qemu_rbd_array_opts().
+  The list elements are again dictionaries.  qemu_rbd_array_opts()
+  uses runtime_opts to accept their members.  Thus, runtime_opts
+  contains recognized sub-sub-options "auth", "host", "port" in
+  addition to recognized options.  No other block driver does that.
 
-Why would libqemutrace.a depend on libqemuutil.a?
+* qemu_rbd_create() uses it to convert the QDict produced by
+  qemu_rbd_parse_filename() to QemuOpts.  No other block driver does
+  that.  The keys produced by qemu_rbd_parse_filename() are "pool",
+  "image", "snapshot", "conf", "user" and "keyvalue-pairs".
+  qemu_rbd_open() accepts these, so no additional ones here.
 
-Tracing code shouldn't call other QEMU code.  That would could create
-infinite recursion when a trace event is fired.
+This is a confusing mess.  Dates back to commit 0f9d252.  First step
+to clean it up is documenting runtime_opts.desc[]:
 
---AkbCVLjbJ9qUtAXD
-Content-Type: application/pgp-signature; name="signature.asc"
+* Reorder entries to match the QAPI schema, like we do in other block
+  drivers.
 
------BEGIN PGP SIGNATURE-----
+* Document why the schema's "server" and "auth-supported" aren't in
+  .desc[].
 
-iQEcBAEBAgAGBQJY2RKmAAoJEJykq7OBq3PI2HwH/Au+YCZgW+qGQeOtesqP3524
-8sgTNrJeXnYZOdobrVOQ5EU/olwtODbTMRCq8kBEYQToXDCXL8R46and+M9tuqNn
-y5uulY8Jr/AlxbAWddLTuNAFAYx88npUgYa64oVX5bv5+mL3WECzj/8NyJ5LZFg2
-IxNIdtyH5WEBLUPwCpSp2EuMyJDiYoWjirIlEp+XU0MhjpxNfa7WRC8GmLGzaFBM
-US/qLSax7d6x9W1TGaRWIay5Zvsgfqq81VxUbhyUA4++7MNIH8j380vWBxXMZqIC
-htJ4d78dmI8Q19flgsnay/doNcz4bk/XY9e4QyketvhaT6YUwfqGmHkKBBF+IbI=
-=tz1w
------END PGP SIGNATURE-----
+* Document why "keyvalue-pairs", "host", "port" and "auth" are in
+  .desc[], but not the schema.
 
---AkbCVLjbJ9qUtAXD--
+* Delete "filename", because none of the three users actually uses it.
+  This fixes -drive to reject parameter filename instead of silently
+  ignoring it.
+
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ block/rbd.c | 40 +++++++++++++++++++++++++---------------
+ 1 file changed, 25 insertions(+), 15 deletions(-)
+
+diff --git a/block/rbd.c b/block/rbd.c
+index 2632533..b2afe07 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -294,21 +294,6 @@ static QemuOptsList runtime_opts = {
+     .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
+     .desc = {
+         {
+-            .name = "filename",
+-            .type = QEMU_OPT_STRING,
+-            .help = "Specification of the rbd image",
+-        },
+-        {
+-            .name = "password-secret",
+-            .type = QEMU_OPT_STRING,
+-            .help = "ID of secret providing the password",
+-        },
+-        {
+-            .name = "conf",
+-            .type = QEMU_OPT_STRING,
+-            .help = "Rados config file location",
+-        },
+-        {
+             .name = "pool",
+             .type = QEMU_OPT_STRING,
+             .help = "Rados pool name",
+@@ -319,6 +304,11 @@ static QemuOptsList runtime_opts = {
+             .help = "Image name in the pool",
+         },
+         {
++            .name = "conf",
++            .type = QEMU_OPT_STRING,
++            .help = "Rados config file location",
++        },
++        {
+             .name = "snapshot",
+             .type = QEMU_OPT_STRING,
+             .help = "Ceph snapshot name",
+@@ -329,6 +319,19 @@ static QemuOptsList runtime_opts = {
+             .type = QEMU_OPT_STRING,
+             .help = "Rados id name",
+         },
++        /*
++         * server.* and auth-supported.* extracted manually, see
++         * qemu_rbd_array_opts()
++         */
++        {
++            .name = "password-secret",
++            .type = QEMU_OPT_STRING,
++            .help = "ID of secret providing the password",
++        },
++
++        /*
++         * Keys for qemu_rbd_parse_filename(), not in the QAPI schema
++         */
+         {
+             /*
+              * HACK: name starts with '=' so that qemu_opts_parse()
+@@ -338,6 +341,13 @@ static QemuOptsList runtime_opts = {
+             .type = QEMU_OPT_STRING,
+             .help = "Legacy rados key/value option parameters",
+         },
++
++        /*
++         * The remainder aren't option keys, but option sub-sub-keys,
++         * so that qemu_rbd_array_opts() can abuse runtime_opts for
++         * its own purposes
++         * TODO clean this up
++         */
+         {
+             .name = "host",
+             .type = QEMU_OPT_STRING,
+-- 
+2.7.4
