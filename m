@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1csXJl-0006nW-Di
+	(envelope-from <pbonzini@redhat.com>) id 1csXJq-0006sG-2W
 	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:16:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1csXJk-0000yr-43
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:16:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35918)
+	(envelope-from <pbonzini@redhat.com>) id 1csXJl-00010i-5w
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:16:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40356)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1csXJj-0000xY-RY
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:16:28 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1csXJl-0000zW-0C
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:16:29 -0400
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1F526C054C58
+	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 16:16:28 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 27 Mar 2017 18:16:14 +0200
-Message-Id: <20170327161615.19637-9-pbonzini@redhat.com>
+Date: Mon, 27 Mar 2017 18:16:15 +0200
+Message-Id: <20170327161615.19637-10-pbonzini@redhat.com>
 In-Reply-To: <20170327161615.19637-1-pbonzini@redhat.com>
 References: <20170327161615.19637-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 8/9] Revert "apic: save apic_delivered flag"
+Subject: [Qemu-devel] [PULL 9/9] scsi-generic: Fill in opt_xfer_len in
+ INQUIRY reply if it is zero
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,95 +31,37 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Cc: Fam Zheng <famz@redhat.com>
 
-This reverts commit 07bfa354772f2de67008dc66c201b627acff0106.
-The global variable is only read as part of a
+From: Fam Zheng <famz@redhat.com>
 
-            apic_reset_irq_delivered();
-            qemu_irq_raise(s->irq);
-            if (!apic_get_irq_delivered()) {
+When opt_xfer_len is zero, Linux ignores max_xfer_len erroneously.
 
-sequence, so the value never matters at migration time.
+While that obviously should be fixed, we do older guests a favor to
+always filling in a value.
 
-Reported-by: Dr. David Alan Gilbert <dglibert@redhat.com>
-Cc: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+Message-Id: <20170327142625.1249-1-famz@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/intc/apic_common.c           | 33 ---------------------------------
- include/hw/i386/apic_internal.h |  2 --
- 2 files changed, 35 deletions(-)
+ hw/scsi/scsi-generic.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
-index 7a6e771..c3829e3 100644
---- a/hw/intc/apic_common.c
-+++ b/hw/intc/apic_common.c
-@@ -387,25 +387,6 @@ static bool apic_common_sipi_needed(void *opaque)
-     return s->wait_for_sipi != 0;
- }
- 
--static bool apic_irq_delivered_needed(void *opaque)
--{
--    APICCommonState *s = APIC_COMMON(opaque);
--    return s->cpu == X86_CPU(first_cpu) && apic_irq_delivered != 0;
--}
--
--static void apic_irq_delivered_pre_save(void *opaque)
--{
--    APICCommonState *s = APIC_COMMON(opaque);
--    s->apic_irq_delivered = apic_irq_delivered;
--}
--
--static int apic_irq_delivered_post_load(void *opaque, int version_id)
--{
--    APICCommonState *s = APIC_COMMON(opaque);
--    apic_irq_delivered = s->apic_irq_delivered;
--    return 0;
--}
--
- static const VMStateDescription vmstate_apic_common_sipi = {
-     .name = "apic_sipi",
-     .version_id = 1,
-@@ -418,19 +399,6 @@ static const VMStateDescription vmstate_apic_common_sipi = {
+diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
+index 2933119..a55ff87 100644
+--- a/hw/scsi/scsi-generic.c
++++ b/hw/scsi/scsi-generic.c
+@@ -237,9 +237,8 @@ static void scsi_read_complete(void * opaque, int ret)
+         assert(max_transfer);
+         stl_be_p(&r->buf[8], max_transfer);
+         /* Also take care of the opt xfer len. */
+-        if (ldl_be_p(&r->buf[12]) > max_transfer) {
+-            stl_be_p(&r->buf[12], max_transfer);
+-        }
++        stl_be_p(&r->buf[12],
++                 MIN_NON_ZERO(max_transfer, ldl_be_p(&r->buf[12])));
      }
- };
- 
--static const VMStateDescription vmstate_apic_irq_delivered = {
--    .name = "apic_irq_delivered",
--    .version_id = 1,
--    .minimum_version_id = 1,
--    .needed = apic_irq_delivered_needed,
--    .pre_save = apic_irq_delivered_pre_save,
--    .post_load = apic_irq_delivered_post_load,
--    .fields = (VMStateField[]) {
--        VMSTATE_INT32(apic_irq_delivered, APICCommonState),
--        VMSTATE_END_OF_LIST()
--    }
--};
--
- static const VMStateDescription vmstate_apic_common = {
-     .name = "apic",
-     .version_id = 3,
-@@ -465,7 +433,6 @@ static const VMStateDescription vmstate_apic_common = {
-     },
-     .subsections = (const VMStateDescription*[]) {
-         &vmstate_apic_common_sipi,
--        &vmstate_apic_irq_delivered,
-         NULL
-     }
- };
-diff --git a/include/hw/i386/apic_internal.h b/include/hw/i386/apic_internal.h
-index 20ad28c..1209eb4 100644
---- a/include/hw/i386/apic_internal.h
-+++ b/include/hw/i386/apic_internal.h
-@@ -189,8 +189,6 @@ struct APICCommonState {
-     DeviceState *vapic;
-     hwaddr vapic_paddr; /* note: persistence via kvmvapic */
-     bool legacy_instance_id;
--
--    int apic_irq_delivered; /* for saving static variable */
- };
- 
- typedef struct VAPICState {
+     scsi_req_data(&r->req, len);
+     scsi_req_unref(&r->req);
 -- 
 2.9.3
