@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1csXEs-0004KB-2A
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:11:27 -0400
+	(envelope-from <mreitz@redhat.com>) id 1csXG7-0005OY-4z
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:12:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1csXEm-0006ae-D2
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:11:26 -0400
-Received: from mail-sn1nam02on0072.outbound.protection.outlook.com
-	([104.47.36.72]:23680
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1csXEl-0006Xi-TE
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:11:20 -0400
-References: <148900626714.27090.1616990932333159904.stgit@brijesh-build-machine>
-	<148900632968.27090.15435012868487968230.stgit@brijesh-build-machine>
-	<20170323113517.GC12560@stefanha-x1.localdomain>
-	<6ed30368-1433-cf00-ee2e-611faf2a98e3@amd.com>
-	<20170324154007.GB5849@stefanha-x1.localdomain>
-	<3b210d06-b6f9-af04-ff68-e7cee1c8033f@amd.com>
-	<20170327120404.GA28620@stefanha-x1.localdomain>
-From: Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <ecc81dc9-6d1c-796d-cfc3-f252e3e10277@amd.com>
-Date: Mon, 27 Mar 2017 11:11:10 -0500
+	(envelope-from <mreitz@redhat.com>) id 1csXG6-0007K6-2I
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:12:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57484)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1csXG5-0007Js-PP
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:12:41 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D77E6C0528D5
+	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 16:12:40 +0000 (UTC)
+References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
+	<1490621195-2228-3-git-send-email-armbru@redhat.com>
+	<ba4b08e7-7e8d-5210-be2c-545be4cdeb99@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <abc2a347-5f42-59c0-5f51-0f03bb2b3c6d@redhat.com>
+Date: Mon, 27 Mar 2017 18:12:37 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170327120404.GA28620@stefanha-x1.localdomain>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v4 06/20] core: add new security-policy
- object
+In-Reply-To: <ba4b08e7-7e8d-5210-be2c-545be4cdeb99@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="XulBikwG5gEUGa0mPHC4Kko3weCSw1DWX"
+Subject: Re: [Qemu-devel] [PATCH RFC v3 for-2.9 02/11] rbd: Fix to cleanly
+ reject -drive without pool or image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,53 +36,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: brijesh.singh@amd.com, ehabkost@redhat.com, crosthwaite.peter@gmail.com, armbru@redhat.com, mst@redhat.com, p.fedin@samsung.com, qemu-devel@nongnu.org, lcapitulino@redhat.com, pbonzini@redhat.com, rth@twiddle.net, Thomas.Lendacky@amd.com
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: jdurgin@redhat.com, jcody@redhat.com, kwolf@redhat.com, eblake@redhat.com
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--XulBikwG5gEUGa0mPHC4Kko3weCSw1DWX
+From: Max Reitz <mreitz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: jdurgin@redhat.com, jcody@redhat.com, kwolf@redhat.com, eblake@redhat.com
+Message-ID: <abc2a347-5f42-59c0-5f51-0f03bb2b3c6d@redhat.com>
+Subject: Re: [PATCH RFC v3 for-2.9 02/11] rbd: Fix to cleanly reject -drive
+ without pool or image
+References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
+ <1490621195-2228-3-git-send-email-armbru@redhat.com>
+ <ba4b08e7-7e8d-5210-be2c-545be4cdeb99@redhat.com>
+In-Reply-To: <ba4b08e7-7e8d-5210-be2c-545be4cdeb99@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
+
+On 27.03.2017 18:10, Max Reitz wrote:
+> On 27.03.2017 15:26, Markus Armbruster wrote:
+>> qemu_rbd_open() neglects to check pool and image are present.
+>> Reproducer:
+>>
+>>     $ qemu-system-x86_64 -nodefaults -drive if=3Dnone,driver=3Drbd,poo=
+l=3Dp
+>>     Segmentation fault (core dumped)
+>>     $ qemu-system-x86_64 -nodefaults -drive if=3Dnone,driver=3Drbd,ima=
+ge=3Di
+>>     qemu-system-x86_64: -drive if=3Dnone,driver=3Drbd,image=3Di: error=
+ opening pool (null)
+>>
+>> Doesn't affect -drive with file=3D..., because qemu_rbd_parse_filename=
+()
+>> always sets both pool and image.
+>>
+>> Doesn't affect -blockdev, because pool and image are mandatory in the
+>> QAPI schema.
+>>
+>> Fix by adding the missing checks.
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> ---
+>>  block/rbd.c | 10 +++++++---
+>>  1 file changed, 7 insertions(+), 3 deletions(-)
+>=20
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+That said, don't we have a similar issue with qemu_rbd_create()? It too
+doesn't check whether those options are given but I guess they're just
+as mandatory.
+
+Max
 
 
-On 03/27/2017 07:04 AM, Stefan Hajnoczi wrote:
-> On Fri, Mar 24, 2017 at 02:42:47PM -0500, Brijesh Singh wrote:
->>
->> On 03/24/2017 10:40 AM, Stefan Hajnoczi wrote:
->>
->>>
->>> Having one security policy doesn't make sense to me.  As mentioned,
->>> there are many different areas of QEMU that have security relevant
->>> configuration.  They are all unrelated so combining them into one object
->>> with vague parameter names like "debug" makes for a confusing
->>> command-line interface.
->>>
->>> If the object is called sev-security-policy then I'm happy.
->>>
->>
->> Works for with me but one of the feedback was to use security-policy [1].
->> IIRC, the main reason for using 'security-policy' instead of 'sev-security-policy'
->> was to add a layer of abstraction so that in future if other platforms supports
->> memory encryption in slightly different way then all we need to do is to create
->> new object without needing to add a new parameter in -machine.
->>
->> [1] http://marc.info/?l=qemu-devel&m=147388592213137&w=2
->>
->> How about using 'memory-encryption-id' instead of security-policy ? If user wants
->> to launch SEV guest then memory-encryption-id should be set SEV specific object.
->> Something like this:
->>
->> -machine ..,memory-encryption-id=sev0 \
->> -object sev-guest,id=sev,debug=off,launch=launch0 \
->> -object sev-launch-info,id=launch0 \
->
-> Something like that sounds good.  I think "-id" typically isn't included
-> in the option name.
->
-> So just the following is fine:
->
->  -machine memory-encryption=sev0 \
->  ...
->
-> Other examples: -device virtio-blk-pci,drive=drive0 and -device
-> e1000,netdev=netdev0.
+--XulBikwG5gEUGa0mPHC4Kko3weCSw1DWX
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
-Sounds good. I will take care of this in next rev. thanks for review
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljZOfUSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ABYcIAJyja2ma/gLszHCiwvx9k2aKuEM2WIs8
+NzCRsJIXTE9EP3taZXHKzFzIxw1rx8xiQMK9NVC2Um6KI6QeoqvPXfWK/yzLYQ90
+5h4+W9MOg9xJW2hTOffde5qDPIRti+qMaecH4XCcw+zEP4xYaOyNkcl8z0BwdRj0
+TrzGrHS1Tq3vSEurg4JghhXnsLX2gUmMU4OU5tdv/CzwtBNoRKJoNLHtzS+Oroyb
+okQvqELBYaOvB9kuvWJMztgDg+zU94fWSSGHL8WL4ferP4Sb5rT8Hk7nQqty1Fga
+tMoSl0zi/LI2QhvHZoAT0oCHZs1OqbecATTE5KUrm6I10f9BYmwOnUM=
+=7P3P
+-----END PGP SIGNATURE-----
 
--Brijesh
+--XulBikwG5gEUGa0mPHC4Kko3weCSw1DWX--
