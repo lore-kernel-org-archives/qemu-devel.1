@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1csOyE-0005q5-Gw
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 03:21:43 -0400
+	(envelope-from <herongguang.he@huawei.com>) id 1csOya-00066z-A6
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 03:22:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1csOyD-0002V6-Oy
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 03:21:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58872)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1csOyD-0002V0-JR
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 03:21:41 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A180BC0799A3
-	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 07:21:40 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Mon, 27 Mar 2017 15:21:24 +0800
-Message-Id: <1490599288-11751-2-git-send-email-peterx@redhat.com>
-In-Reply-To: <1490599288-11751-1-git-send-email-peterx@redhat.com>
-References: <1490599288-11751-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/5] migration: set current_active_state once
+	(envelope-from <herongguang.he@huawei.com>) id 1csOyX-0002aj-7f
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 03:22:04 -0400
+Received: from [45.249.212.189] (port=2878 helo=dggrg03-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <herongguang.he@huawei.com>) id 1csOyW-0002Wm-Ns
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 03:22:01 -0400
+References: <20170325111424.21752-1-herongguang.he@huawei.com>
+From: "Herongguang (Stephen)" <herongguang.he@huawei.com>
+Message-ID: <58D8BD6D.8080404@huawei.com>
+Date: Mon, 27 Mar 2017 15:21:17 +0800
+MIME-Version: 1.0
+In-Reply-To: <20170325111424.21752-1-herongguang.he@huawei.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH v2] KVM: pci-assign: do not map smm memory slot
+ pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +27,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Juan Quintela <quintela@redhat.com>, "\\  Dr . David Alan Gilbert \\ " <dgilbert@redhat.com>, peterx@redhat.com
+To: pbonzini@redhat.com, rkrcmar@redhat.com, kvm@vger.kernel.org
+Cc: qemu-devel@nongnu.org, wangxinxin.wang@huawei.com
 
-We set it right above this one. No need to set it twice.
+ From f6f0ee6831488bef7af841cb86f3d85a04848fe5 Mon Sep 17 00:00:00 2001
+From: herongguang <herongguang.he@huawei.com>
+Date: Mon, 27 Mar 2017 15:08:59 +0800
+Subject: [PATCH] KVM: pci-assign: do not map smm memory slot pages
+  in vt-d page table
 
-CC: Juan Quintela <quintela@redhat.com>
-CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
+or VM memory are not put thus leaked in kvm_iommu_unmap_memslots() when
+destroy VM.
+
+This is consistent with current vfio implementation.
 ---
- migration/migration.c | 1 -
- 1 file changed, 1 deletion(-)
+  virt/kvm/kvm_main.c | 2 +-
+  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 54060f7..f9f4d98 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1938,7 +1938,6 @@ static void *migration_thread(void *opaque)
-     qemu_savevm_state_begin(s->to_dst_file, &s->params);
- 
-     s->setup_time = qemu_clock_get_ms(QEMU_CLOCK_HOST) - setup_start;
--    current_active_state = MIGRATION_STATUS_ACTIVE;
-     migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
-                       MIGRATION_STATUS_ACTIVE);
- 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 482612b..9018d06 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1052,7 +1052,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
+  	 * changes) is disallowed above, so any other attribute changes getting
+  	 * here can be skipped.
+  	 */
+-	if ((change == KVM_MR_CREATE) || (change == KVM_MR_MOVE)) {
++	if ((as_id == 0) && ((change == KVM_MR_CREATE) || (change == KVM_MR_MOVE))) {
+  		r = kvm_iommu_map_pages(kvm, &new);
+  		return r;
+  	}
 -- 
-2.7.4
+1.7.12.4
+
+On 2017/3/25 19:14, herongguang wrote:
+> or pages are not unmaped and freed
+>
+> Signed-off-by: herongguang <herongguang.he@huawei.com>
+> ---
+>   arch/x86/kvm/iommu.c | 6 ++++--
+>   1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> Well, do we should change pci-assign to not map SMM slots instead? Like vfio.
+>
+> diff --git a/arch/x86/kvm/iommu.c b/arch/x86/kvm/iommu.c
+> index b181426..5b931bb 100644
+> --- a/arch/x86/kvm/iommu.c
+> +++ b/arch/x86/kvm/iommu.c
+> @@ -320,15 +320,17 @@ void kvm_iommu_unmap_pages(struct kvm *kvm, struct kvm_memory_slot *slot)
+>   static int kvm_iommu_unmap_memslots(struct kvm *kvm)
+>   {
+>   	int idx;
+> -	struct kvm_memslots *slots;
+> +	struct kvm_memslots *slots, *smm_slots;
+>   	struct kvm_memory_slot *memslot;
+>
+>   	idx = srcu_read_lock(&kvm->srcu);
+>   	slots = kvm_memslots(kvm);
+> -
+>   	kvm_for_each_memslot(memslot, slots)
+>   		kvm_iommu_unmap_pages(kvm, memslot);
+>
+> +	smm_slots = __kvm_memslots(kvm, 1);
+> +	kvm_for_each_memslot(memslot, smm_slots)
+> +		kvm_iommu_unmap_pages(kvm, memslot);
+>   	srcu_read_unlock(&kvm->srcu, idx);
+>
+>   	if (kvm->arch.iommu_noncoherent)
+>
