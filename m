@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1csWES-00072S-JJ
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 11:06:57 -0400
+	(envelope-from <kraxel@redhat.com>) id 1csWGK-0007tR-PP
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 11:08:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1csWER-0007t4-Mb
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 11:06:56 -0400
-References: <bd7cb196-0779-42ad-ce9c-5871d307adce@kamp.de>
-	<82d604c8-068a-aff4-6037-e3cd247b3588@redhat.com>
-	<819af057-3777-dffc-4670-895b8265fd01@kamp.de>
-	<d41d1428-4c8b-7e2f-b197-8d45b834776d@redhat.com>
-	<32e1e781-f0b0-ac67-a5ce-74ccc64071a0@kamp.de>
-	<20170320024649.GA18938@lemon.lan>
-	<37879546-cf6e-01fa-adc6-c777e14eab0e@redhat.com>
-	<20170320114926.GB17020@lemon.lan>
-	<b3bf1d26-7caa-1d0d-c8a1-02f4c80e51e4@kamp.de>
-	<fc755658-8d1d-db71-1f4d-2e18f5c3c4b2@kamp.de>
-	<ff4b36e6-cf69-5b32-77b7-285adf4aaca0@redhat.com>
-	<4aa3e0fc-1176-af7d-bef9-2b881a984605@kamp.de>
-	<f0e9decf-7b92-9218-a43f-d7d6eee10208@redhat.com>
-	<a7b9b590-a0b5-5b2f-3efa-bfafefc5037c@kamp.de>
-	<df268a18-9b31-61d7-c449-e36f6ca12930@redhat.com>
-	<293a74e1-f355-6969-9b76-9913e7f56930@kamp.de>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5cb7f3f5-cd3f-b54c-3109-140dee3b2cad@redhat.com>
-Date: Mon, 27 Mar 2017 17:06:47 +0200
-MIME-Version: 1.0
-In-Reply-To: <293a74e1-f355-6969-9b76-9913e7f56930@kamp.de>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] callout to *file in bdrv_co_get_block_status
+	(envelope-from <kraxel@redhat.com>) id 1csWGH-0000Az-KW
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 11:08:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48023)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1csWGH-0000AH-C0
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 11:08:49 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 050E375EAB
+	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 15:08:48 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 27 Mar 2017 15:28:36 +0200
+Message-Id: <1490621317-25483-5-git-send-email-kraxel@redhat.com>
+In-Reply-To: <1490621317-25483-1-git-send-email-kraxel@redhat.com>
+References: <1490621317-25483-1-git-send-email-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL for-2.9 4/5] ui/egl-helpers: fix egl 1.5 display
+ init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,40 +30,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>, Fam Zheng <famz@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Frediano Ziglio <fziglio@redhat.com>
 
+Unfortunaly switching to getPlatformDisplayEXT isn't as easy as
+implemented by 0ea1523fb6703aa0dcd65e66b59e96fec028e60a.  See the
+longish comment for the complete story.
 
+Cc: Frediano Ziglio <fziglio@redhat.com>
+Suggested-by: Hans de Goede <hdegoede@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-id: 1489997042-1824-1-git-send-email-kraxel@redhat.com
+---
+ ui/egl-helpers.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 52 insertions(+), 6 deletions(-)
 
-On 27/03/2017 15:21, Peter Lieven wrote:
->>>
->>> I stumbled across the issue with lseek on a tmpfs because in the
->>> build process for our templates
->>> I temporarily have vmdks on a tmpfs and it takes ages before qemu-img
->>> convert starts to run (it iterates
->>> over every 64kb cluster with that callout to find_allocation and for
->>> some reason lseek is very slow on tmpfs).
->> Ok, thanks.  Perhaps it's worth benchmarking tmpfs specifically.  Apart
->> from the system call overhead (which does not really matter if you're
->> going to do a read), lseek on other filesystems should not be any slower
->> than read.
-> 
-> Okay, but the even the read is not really necessary if the metadata is
-> correct?
-
-Yeah, what I mean is:
-
-- if you're going to do a read of non-zero blocks, the lseek you do
-before reading those blocks should not matter.
-
-- if you're going to skip the read of non-zero blocks, the lseek you do
-is always going to be faster than reading them and then checking with
-buffer_is_nonzero.
-
-> Would it be an idea to introduce an inverse flag live BDRV_BLOCK_NOT_ZERO
-> for cases where we know that there is really DATA and thus can avoid the
-> second callout?
-
-How would you know that a block is nonzero?
-
-Paolo
+diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
+index 584dd1b..b7b6b2e 100644
+--- a/ui/egl-helpers.c
++++ b/ui/egl-helpers.c
+@@ -192,6 +192,56 @@ EGLSurface qemu_egl_init_surface_x11(EGLContext ectx, Window win)
+ 
+ /* ---------------------------------------------------------------------- */
+ 
++/*
++ * Taken from glamor_egl.h from the Xorg xserver, which is MIT licensed
++ *
++ * Create an EGLDisplay from a native display type. This is a little quirky
++ * for a few reasons.
++ *
++ * 1: GetPlatformDisplayEXT and GetPlatformDisplay are the API you want to
++ * use, but have different function signatures in the third argument; this
++ * happens not to matter for us, at the moment, but it means epoxy won't alias
++ * them together.
++ *
++ * 2: epoxy 1.3 and earlier don't understand EGL client extensions, which
++ * means you can't call "eglGetPlatformDisplayEXT" directly, as the resolver
++ * will crash.
++ *
++ * 3: You can't tell whether you have EGL 1.5 at this point, because
++ * eglQueryString(EGL_VERSION) is a property of the display, which we don't
++ * have yet. So you have to query for extensions no matter what. Fortunately
++ * epoxy_has_egl_extension _does_ let you query for client extensions, so
++ * we don't have to write our own extension string parsing.
++ *
++ * 4. There is no EGL_KHR_platform_base to complement the EXT one, thus one
++ * needs to know EGL 1.5 is supported in order to use the eglGetPlatformDisplay
++ * function pointer.
++ * We can workaround this (circular dependency) by probing for the EGL 1.5
++ * platform extensions (EGL_KHR_platform_gbm and friends) yet it doesn't seem
++ * like mesa will be able to advertise these (even though it can do EGL 1.5).
++ */
++static EGLDisplay qemu_egl_get_display(void *native)
++{
++    EGLDisplay dpy = EGL_NO_DISPLAY;
++
++#ifdef EGL_MESA_platform_gbm
++    /* In practise any EGL 1.5 implementation would support the EXT extension */
++    if (epoxy_has_egl_extension(NULL, "EGL_EXT_platform_base")) {
++        PFNEGLGETPLATFORMDISPLAYEXTPROC getPlatformDisplayEXT =
++            (void *) eglGetProcAddress("eglGetPlatformDisplayEXT");
++        if (getPlatformDisplayEXT) {
++            dpy = getPlatformDisplayEXT(EGL_PLATFORM_GBM_MESA, native, NULL);
++        }
++    }
++#endif
++
++    if (dpy == EGL_NO_DISPLAY) {
++        /* fallback */
++        dpy = eglGetDisplay(native);
++    }
++    return dpy;
++}
++
+ int qemu_egl_init_dpy(EGLNativeDisplayType dpy, bool gles, bool debug)
+ {
+     static const EGLint conf_att_gl[] = {
+@@ -222,12 +272,8 @@ int qemu_egl_init_dpy(EGLNativeDisplayType dpy, bool gles, bool debug)
+         setenv("LIBGL_DEBUG", "verbose", true);
+     }
+ 
+-    egl_dbg("eglGetDisplay (dpy %p) ...\n", dpy);
+-#ifdef EGL_MESA_platform_gbm
+-    qemu_egl_display = eglGetPlatformDisplayEXT(EGL_PLATFORM_GBM_MESA, dpy, NULL);
+-#else
+-    qemu_egl_display = eglGetDisplay(dpy);
+-#endif
++    egl_dbg("qemu_egl_get_display (dpy %p) ...\n", dpy);
++    qemu_egl_display = qemu_egl_get_display(dpy);
+     if (qemu_egl_display == EGL_NO_DISPLAY) {
+         error_report("egl: eglGetDisplay failed");
+         return -1;
+-- 
+1.8.3.1
