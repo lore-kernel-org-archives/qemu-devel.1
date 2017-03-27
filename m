@@ -1,14 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59032)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1csUbi-0000BC-Uc
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:22:52 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1csUbr-0000Gf-Ai
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:23:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1csUbf-0005CQ-Ow
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:22:50 -0400
-From: Laurent Vivier <lvivier@redhat.com>
-Date: Mon, 27 Mar 2017 15:22:42 +0200
-Message-Id: <20170327132242.17104-1-lvivier@redhat.com>
-Subject: [Qemu-devel] [PATCH] spapr: fix memory hot-unplugging
+	(envelope-from <alex.bennee@linaro.org>) id 1csUbo-0005Fa-54
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:22:59 -0400
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:35866)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1csUbn-0005F8-Ui
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:22:56 -0400
+Received: by mail-wr0-x234.google.com with SMTP id w11so42850219wrc.3
+	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 06:22:55 -0700 (PDT)
+References: <CAJhHMCBwu-pVAyxN+w8SSo19wi3DW3JCRRF-K1Sj9zYqGYkFvQ@mail.gmail.com>
+	<1e67644b-4b30-887e-d329-1848e94c9484@twiddle.net>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1e67644b-4b30-887e-d329-1848e94c9484@twiddle.net>
+Date: Mon, 27 Mar 2017 14:22:51 +0100
+Message-ID: <874lye6ehg.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] GSoC 2017 Proposal: TCG performance enhancements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,77 +30,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: Pranith Kumar <bobby.prani@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, "Emilio G. Cota" <cota@braap.org>, qemu-devel <qemu-devel@nongnu.org>
 
-If, once the kernel has booted, we try to remove a memory
-hotplugged while the kernel was not started, QEMU crashes on
-an assert:
 
-    qemu-system-ppc64: hw/virtio/vhost.c:651:
-                       vhost_commit: Assertion `r >= 0' failed.
-    ...
-    #4  in vhost_commit
-    #5  in memory_region_transaction_commit
-    #6  in pc_dimm_memory_unplug
-    #7  in spapr_memory_unplug
-    #8  spapr_machine_device_unplug
-    #9  in hotplug_handler_unplug
-    #10 in spapr_lmb_release
-    #11 in detach
-    #12 in set_allocation_state
-    #13 in rtas_set_indicator
-    ...
+Richard Henderson <rth@twiddle.net> writes:
 
-If we take a closer look to the guest kernel log, we can see when
-we try to unplug the memory:
+> On 03/26/2017 02:52 AM, Pranith Kumar wrote:
+>> Hello,
+>>
+<snip>
+>
+>> Please let me know if you have any comments or suggestions. Also please let me
+>> know if there are other enhancements that are easily implementable to increase
+>> TCG performance as part of this project or otherwise.
+>
+> I think it would be interesting to place TranslationBlock structures
+> into the same memory block as code_gen_buffer, immediately before the
+> code that implements the TB.
+>
+> Consider what happens within every TB:
+>
+> (1) We have one or more references to the TB address, via exit_tb.
+>
+> For aarch64, this will normally require 2-4 insns.
+>
+> # alpha-softmmu
+> 0x7f75152114:  d0ffb320      adrp x0, #-0x99a000 (addr 0x7f747b8000)
+> 0x7f75152118:  91004c00      add x0, x0, #0x13 (19)
+> 0x7f7515211c:  17ffffc3      b #-0xf4 (addr 0x7f75152028)
+>
+> # alpha-linux-user
+> 0x00569500:  d2800260      mov x0, #0x13
+> 0x00569504:  f2b59820      movk x0, #0xacc1, lsl #16
+> 0x00569508:  f2c00fe0      movk x0, #0x7f, lsl #32
+> 0x0056950c:  17ffffdf      b #-0x84 (addr 0x569488)
+>
+> We would reduce this to one insn, always, if the TB were close by,
+> since the ADR instruction has a range of 1MB.
 
-    pseries-hotplug-mem: Attempting to hot-add 4 LMB(s)
+Having a TB address statically addressable from the generated code would
+also be very handy for doing things like rough block execution counts
+(or even precise if you want to go through the atomic penalty for it).
 
-What happens:
+It would be nice for future work to be able to track where our hot-paths
+are through generated code.
 
-    1- The kernel has ignored the memory hotplug event because
-       it was not started when it was generated.
+>
+>
+> (2) We have zero to two references to a linked TB, via goto_tb.
+>
+> Your stated goal above for eliminating the code_gen_buffer maximum of
+> 128MB can be done in two ways.
+>
+> (2A) Raise the maximum to 2GB.  For this we would align an instruction
+> pair, adrp+add, to compute the address; the following insn would
+> branch.  The update code would write a new destination by modifing the
+> adrp+add with a single 64-bit store.
+>
+> (2B) Eliminate the maximum altogether by referencing the destination
+> directly in the TB.  This is the !USE_DIRECT_JUMP path.  It is
+> normally not used on 64-bit targets because computing the full 64-bit
+> address of the TB is harder, or just as hard, as computing the full
+> 64-bit address of the destination.
+>
+> However, if the TB is nearby, aarch64 can load the address from
+> TB.jmp_target_addr in one insn, with LDR (literal).  This pc-relative
+> load also has a 1MB range.
+>
+> This has the side benefit that it is much quicker to re-link TBs, both
+> in the computation of the code for the destination as well as
+> re-flushing the icache.
+>
+>
+> In addition, I strongly suspect the 1,342,177 entries (153MB) that we
+> currently allocate for tcg_ctx.tb_ctx.tbs, given a 512MB
+> code_gen_buffer, is excessive.
+>
+> If we co-allocate the TB and the code, then we get exactly the right
+> number of TBs allocated with no further effort.
+>
+> There will be some additional memory wastage, since we'll want to keep
+> the code and the data in different cache lines and that means padding,
+> but I don't think that'll be significant.  Indeed, given the above
+> over-allocation will probably still be a net savings.
+>
+>
+> r~
 
-    2- When we hot-unplug the memory,
-       QEMU starts to remove the memory,
-            generates an hot-unplug event,
-        and signals the kernel of the incoming new event
 
-    3- as the kernel is started, on the QEMU signal, it reads
-       the event list, decodes the hotplug event and tries to
-       finish the hotplugging.
-
-    4- QEMU receives the hotplug notification while it
-       is trying to hot-unplug the memory. This moves the memory
-       DRC to an invalid state
-
-This patch prevents this by not allowing to set the allocation
-state to USABLE while the DRC is awaiting release and allocation.
-
-RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=1432382
-
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
----
- hw/ppc/spapr_drc.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index 150f6bf..377ea65 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -135,6 +135,12 @@ static uint32_t set_allocation_state(sPAPRDRConnector *drc,
-         if (!drc->dev) {
-             return RTAS_OUT_NO_SUCH_INDICATOR;
-         }
-+        if (drc->awaiting_release && drc->awaiting_allocation) {
-+            /* kernel is acknowledging a previous hotplug event
-+             * while we are already removing it.
-+             */
-+            return RTAS_OUT_NO_SUCH_INDICATOR;
-+        }
-     }
- 
-     if (drc->type != SPAPR_DR_CONNECTOR_TYPE_PCI) {
--- 
-2.9.3
+--
+Alex Bennée
