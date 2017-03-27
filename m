@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1csUCD-0002wQ-Lb
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 08:56:30 -0400
+	(envelope-from <hrgstephen@gmail.com>) id 1csUEP-0003Zp-2b
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 08:58:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1csUC9-0002nV-Dj
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 08:56:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34992)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1csUC9-0002nF-4s
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 08:56:25 -0400
-References: <3d1c16a1-ec05-0367-e569-64a63b34f2e3@redhat.com>
-	<4a56f716-3528-ddd4-f8c4-f3f6b23c469a@redhat.com>
-	<bbc2671a-42dd-aa2a-0f03-6a4a487cb8f5@redhat.com>
-	<20170327120148.GC26900@stefanha-x1.localdomain>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <c58c7688-7ffa-6043-0919-0842931ddc9b@redhat.com>
-Date: Mon, 27 Mar 2017 14:56:14 +0200
+	(envelope-from <hrgstephen@gmail.com>) id 1csUEN-0003Jc-Jz
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 08:58:45 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:33409)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hrgstephen@gmail.com>)
+	id 1csUEN-0003JF-E2
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 08:58:43 -0400
+Received: by mail-wr0-x244.google.com with SMTP id 20so13004885wrx.0
+	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 05:58:42 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170327120148.GC26900@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="1FkbCGGrai5Q6x9WjXLQwPmAarurNWcSp"
-Subject: Re: [Qemu-devel] Deprecating the -net option (was: What's the next
- QEMU version after 2.9 ? (or: when is a good point in time to get rid of
- old interfaces))
+In-Reply-To: <4c9e0c46-ac81-a455-e2ed-530ad916ff71@redhat.com>
+References: <20170325111424.21752-1-herongguang.he@huawei.com>
+	<58D8BD6D.8080404@huawei.com>
+	<4c9e0c46-ac81-a455-e2ed-530ad916ff71@redhat.com>
+From: hrg <hrgstephen@gmail.com>
+Date: Mon, 27 Mar 2017 20:58:41 +0800
+Message-ID: <CADZi59x17NbwErfTUhN-aSy-XWvUOUA45eXU5jHvLZq=LW237g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2] KVM: pci-assign: do not map smm memory
+ slot pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,120 +31,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: jasowang@redhat.com, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Herongguang (Stephen)" <herongguang.he@huawei.com>, rkrcmar@redhat.com, kvm@vger.kernel.org, wangxinxin.wang@huawei.com, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1FkbCGGrai5Q6x9WjXLQwPmAarurNWcSp
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 27.03.2017 14:01, Stefan Hajnoczi wrote:
-> On Mon, Mar 27, 2017 at 10:06:09AM +0200, Thomas Huth wrote:
->> On 24.03.2017 23:10, John Snow wrote:
->>>
->>>
->>> On 03/08/2017 03:26 AM, Thomas Huth wrote:
->>>>
->>>>  Hi everybody,
->>>>
->>>> what will be the next version of QEMU after 2.9? Will we go for a 2.=
-10
->>>> (as I've seen it mentioned a couple of times on the mailing list
->>>> already), or do we dare to switch to 3.0 instead?
->>>>
->>>> I personally dislike two-digit minor version numbers like 2.10 since=
- the
->>>> non-experienced users sometimes mix it up with 2.1 ... and there hav=
-e
->>>> been a couple of new cool features in the past releases that would
->>>> justify a 3.0 now, too, I think.
->>>>
->>>> But anyway, the more important thing that keeps me concerned is: Som=
-eone
->>>>  once told me that we should get rid of old parameters and interface=
-s
->>>> (like HMP commands) primarily only when we're changing to a new majo=
-r
->>>> version number. As you all know, QEMU has a lot of legacy options, w=
-hich
->>>> are likely rather confusing than helpful for the new users nowadays,=
-
->>>> e.g. things like the "-net channel" option (which is fortunately eve=
-n
->>>> hardly documented), but maybe also even the whole vlan/hub concept i=
-n
->>>> the net code, or legacy parameters like "-usbdevice". If we switch t=
-o
->>>> version 3.0, could we agree to remove at least some of them?
->>>>
->>>>  Thomas
->>>>
->>>
->>> As others have stated, we need a few releases to deprecate things fir=
-st.
->>>
->>> Maybe we should develop a serious plan to develop some of our legacy
->>> interfaces first.
->>>
->>> Maybe 2.10 can introduce a list of things we want to deprecate,
->>> 2.11 can be the transition release,
->>> and then 3.0 can cut the cord and free of us our terrible burden?
->>>
->>> I have a list of things I want to axe...
+On Mon, Mar 27, 2017 at 8:22 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+>
+> On 27/03/2017 09:21, Herongguang (Stephen) wrote:
+>> From f6f0ee6831488bef7af841cb86f3d85a04848fe5 Mon Sep 17 00:00:00 2001
+>> From: herongguang <herongguang.he@huawei.com>
+>> Date: Mon, 27 Mar 2017 15:08:59 +0800
+>> Subject: [PATCH] KVM: pci-assign: do not map smm memory slot pages
+>>  in vt-d page table
 >>
->> I've started a Wiki page with such a list here:
+>> or VM memory are not put thus leaked in kvm_iommu_unmap_memslots() when
+>> destroy VM.
 >>
->> http://wiki.qemu-project.org/Features/LegacyRemoval
->=20
-> It would be nice to get rid of the legacy -net option in 3.0.0.  I have=
+>> This is consistent with current vfio implementation.
+>
+> Oops, you forgot a Signed-off-by.
 
-> added it and included pointers to loose ends.  I think this is doable
-> but will require some time to achieve.
+Sorry, I forget this, I'll resend it tomorrow since I am home now.
 
-Not sure whether we really can get rid of the -net option completely,
-since AFAIK it is the only way to configure on-board NICs at the moment,
-and Paolo complains if he needs to type longer command lines
-(https://lists.gnu.org/archive/html/qemu-devel/2015-12/msg02448.html).
+PS, what's your opinion about this
+(http://www.spinics.net/lists/kvm/msg146914.html)?
 
-But maybe we could get rid of the VLANs here at least, e.g. by matching
-"-net nic" and a following "-net user|bridge|tap|..." with an internal
-netdev ID instead of creating a "VLAN" hub?
-
-Or we could even turn the -net option into a full "convenience" option
-instead (similar to "-hda" and friends), so that you even do not have to
-specify "-net nic" anymore but create both, network source and sink with
-one "-net" statement, e.g.:
-
- qemu-system-xxx -net user,model=3De1000,hostfwd=3D...
-
-Just my 0.02 =E2=82=AC
-
- Thomas
-
-
-
---1FkbCGGrai5Q6x9WjXLQwPmAarurNWcSp
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJY2QvzAAoJEC7Z13T+cC21js4P/3pazhtHG5MJnlehRzoOgYgw
-bHAQ83fEfnhFLqOMNECKPREX4oKWcglxXLlYykucVky+gPVs0IYmx6EzJzupR59c
-a8Q/LtblKqc/t3tvyhRxg7OBsxbEd3ImjYTARdzkNjDpoPnBgPwD42xTVpPPjB+1
-wh61x0zb6XZM3x0CL9y6qTU8jvb4v5a1P8jB94ylXyCbhMw81npXe3TTDbafwjOX
-flYaQRFSdUxMYc0W7ce+jaU72Q6oBTPeyESdKeyDmS4Ak8hBtGw1o561K8uoZtrp
-0DXzcCKUEOEs5OVS2R9x/jpz3ZHyZckn8dJn8rHTuMUPfz6JvtjVwE4j2lZoiCnr
-RZosEV7KvcxTE9LmAc3LwUv3lefb2z+Gac/ewrDo4aD4LHp53FBXW12leN0hQQRi
-0NcC+6X6vCG9IgqZNbdAFZVY5zxZH2KX9TvzH9W9CEycRO9uAlnNGzod5mtKpqSH
-v4IdF+m1GYt1T34UIXgoiu5j9Vm5Q4spJhGYgxigLxCJPLgQ1+/7VH2akPPwDFQk
-3q6vloRPMNVNnXQLqbfw/B+Dk2pYfNvKfA+N9KQ6T2F7inUmjngSmJqWcsxvnCrw
-YrPXs1grrda0X8nlv9njcxmVxpOMJzHlK+C5V1SiWMR1AS7YgxFpvIW8W//5NakF
-bRw1D8uUm0n87iWC4YjX
-=DJm0
------END PGP SIGNATURE-----
-
---1FkbCGGrai5Q6x9WjXLQwPmAarurNWcSp--
+>
+> Paolo
+>
+>> ---
+>>  virt/kvm/kvm_main.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>> index 482612b..9018d06 100644
+>> --- a/virt/kvm/kvm_main.c
+>> +++ b/virt/kvm/kvm_main.c
+>> @@ -1052,7 +1052,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
+>>       * changes) is disallowed above, so any other attribute changes
+>> getting
+>>       * here can be skipped.
+>>       */
+>> -    if ((change == KVM_MR_CREATE) || (change == KVM_MR_MOVE)) {
+>> +    if ((as_id == 0) && ((change == KVM_MR_CREATE) || (change ==
+>> KVM_MR_MOVE))) {
+>>          r = kvm_iommu_map_pages(kvm, &new);
+>>          return r;
+>>      }
+>
