@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1csSYG-00009Y-N5
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 07:11:09 -0400
+	(envelope-from <stefanha@redhat.com>) id 1csSaL-0000sF-GG
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 07:13:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1csSYD-0008In-Hb
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 07:11:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37838)
+	(envelope-from <stefanha@redhat.com>) id 1csSaG-0000ZW-JQ
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 07:13:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43878)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1csSYD-0008IK-4B
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 07:11:05 -0400
-Date: Mon, 27 Mar 2017 13:10:59 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170327131059.4580f299@nial.brq.redhat.com>
-In-Reply-To: <20170324203645.12828-1-ehabkost@redhat.com>
-References: <20170324203645.12828-1-ehabkost@redhat.com>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1csSaG-0000ZA-Do
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 07:13:12 -0400
+Date: Mon, 27 Mar 2017 12:13:09 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170327111309.GB26900@stefanha-x1.localdomain>
+References: <1490610662-5483-1-git-send-email-tejaswinipoluri3@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.9] i386: Don't override -cpu options
- on -cpu host/max
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="2B/JsCI69OhZNC5r"
+Content-Disposition: inline
+In-Reply-To: <1490610662-5483-1-git-send-email-tejaswinipoluri3@gmail.com>
+Subject: Re: [Qemu-devel] [[RFC]PATCH:hw/sd:sd_init()] hw/sd : modified the
+ sd_init() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,167 +28,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, "Collin L . Walling" <walling@linux.vnet.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Tejaswini <tejaswinipoluri3@gmail.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
 
-On Fri, 24 Mar 2017 17:36:45 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-> The existing code for "host" and "max" CPU models overrides every
-> single feature in the CPU object at realize time, even the ones
-> that were explicitly enabled or disabled by the user using
-> "feat=on" or "feat=off", while features set using +feat/-feat are
-> kept.
-> 
-> This means "-cpu host,+invtsc" works as expected, while
-> "-cpu host,invtsc=on" doesn't.
-> 
-> This was a known bug, already documented in a comment inside
-> x86_cpu_expand_features(). What makes this bug worse now is that
-> libvirt 3.0.0 and newer now use "feat=on|off" instead of
-> +feat/-feat when it detects a QEMU version that supports it (see
-> libvirt commit d47db7b16dd5422c7e487c8c8ee5b181a2f9cd66).
-> 
-> Change the feature property getter/setter to set a
-> env->user_features field, to keep track of features that were
-> explicitly changed using QOM properties. Then make the
-> max_features code not override user features when handling "-cpu
-> host" and "-cpu max".
-> 
-> This will also allow us to remove the plus_features/minus_features
-> hack in the future, but I plan to do that after 2.9.0 is
-> released.
-> 
-> Reported-by: Jiri Denemark <jdenemar@redhat.com>
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  target/i386/cpu.h |  2 ++
->  target/i386/cpu.c | 33 +++++++++++++++++++++------------
->  2 files changed, 23 insertions(+), 12 deletions(-)
-> 
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 07401ad9fe..c4602ca80d 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1147,6 +1147,8 @@ typedef struct CPUX86State {
->      uint32_t cpuid_vendor3;
->      uint32_t cpuid_version;
->      FeatureWordArray features;
-> +    /* Features that were explicitly enabled/disabled */
-> +    FeatureWordArray user_features;
->      uint32_t cpuid_model[12];
->  
->      /* MTRRs */
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 7aa762245a..5f2addbf75 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -3373,15 +3373,20 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
->      GList *l;
->      Error *local_err = NULL;
->  
-> -    /*TODO: cpu->max_features incorrectly overwrites features
-> -     * set using "feat=on|off". Once we fix this, we can convert
-> +    /*TODO: Now cpu->max_features doesn't overwrite features
-> +     * set using QOM properties, and we can convert
->       * plus_features & minus_features to global properties
->       * inside x86_cpu_parse_featurestr() too.
->       */
->      if (cpu->max_features) {
->          for (w = 0; w < FEATURE_WORDS; w++) {
-> -            env->features[w] =
-> -                x86_cpu_get_supported_feature_word(w, cpu->migratable);
-> +            /* Override only features that weren't not set explicitly
-> +             * by the user.
-s/not// or if it was intended rephrase to avoid double negation.
+--2B/JsCI69OhZNC5r
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> +             */
-> +            env->features[w] &= env->user_features[w];
-it probably should be assert to catch features not set via property,
-which shouldn't be there in the first place, I don't like silent
-filtering that happens here.
+On Mon, Mar 27, 2017 at 04:01:02PM +0530, Tejaswini wrote:
+> From: Tejaswini Poluri <tejaswinipoluri3@gmail.com>
 
-> +            env->features[w] |=
-> +                x86_cpu_get_supported_feature_word(w, cpu->migratable) &
-> +                ~env->user_features[w];
->          }
+Please shorten the subject line: "[PATCH] hw/sd: simplify sd_init() prototype"
+
+> @@ -573,16 +573,19 @@ SDState *sd_init(BlockBackend *blk, bool is_spi)
+>      qdev_prop_set_drive(dev, "drive", blk, &err);
+>      if (err) {
+>          error_report("sd_init failed: %s", error_get_pretty(err));
+> -        return NULL;
+> +        return -1;
 >      }
->  
-> @@ -3692,15 +3697,17 @@ static void x86_cpu_unrealizefn(DeviceState *dev, Error **errp)
->  }
->  
->  typedef struct BitProperty {
-> -    uint32_t *ptr;
-> +    FeatureWord w;
-it would be better if this refactoring and related changes
-were in a separate patch, something along lines:
- "x86/cpu: use FeatureWord instead of keeping a pointer to cpuid leaf"
+>      qdev_prop_set_bit(dev, "spi", is_spi);
+>      object_property_set_bool(obj, true, "realized", &err);
+>      if (err) {
+>          error_report("sd_init failed: %s", error_get_pretty(err));
+> -        return NULL;
+> +        return -1;
+>      }
+> -
+> -    return SD_CARD(dev);
+> +    sd_state = SD_CARD(dev);
 
->      uint32_t mask;
->  } BitProperty;
->  
->  static void x86_cpu_get_bit_prop(Object *obj, Visitor *v, const char *name,
->                                   void *opaque, Error **errp)
->  {
-> +    X86CPU *cpu = X86_CPU(obj);
->      BitProperty *fp = opaque;
-> -    bool value = (*fp->ptr & fp->mask) == fp->mask;
-> +    uint32_t f = cpu->env.features[fp->w];
-> +    bool value = (f & fp->mask) == fp->mask;
->      visit_type_bool(v, name, &value, errp);
->  }
->  
-> @@ -3708,6 +3715,7 @@ static void x86_cpu_set_bit_prop(Object *obj, Visitor *v, const char *name,
->                                   void *opaque, Error **errp)
->  {
->      DeviceState *dev = DEVICE(obj);
-> +    X86CPU *cpu = X86_CPU(obj);
->      BitProperty *fp = opaque;
->      Error *local_err = NULL;
->      bool value;
-> @@ -3724,10 +3732,11 @@ static void x86_cpu_set_bit_prop(Object *obj, Visitor *v, const char *name,
->      }
->  
->      if (value) {
-> -        *fp->ptr |= fp->mask;
-> +        cpu->env.features[fp->w] |= fp->mask;
->      } else {
-> -        *fp->ptr &= ~fp->mask;
-> +        cpu->env.features[fp->w] &= ~fp->mask;
->      }
-> +    cpu->env.user_features[fp->w] |= fp->mask;
->  }
->  
->  static void x86_cpu_release_bit_prop(Object *obj, const char *name,
-> @@ -3745,7 +3754,7 @@ static void x86_cpu_release_bit_prop(Object *obj, const char *name,
->   */
->  static void x86_cpu_register_bit_prop(X86CPU *cpu,
->                                        const char *prop_name,
-> -                                      uint32_t *field,
-> +                                      FeatureWord w,
->                                        int bitnr)
->  {
->      BitProperty *fp;
-> @@ -3755,11 +3764,11 @@ static void x86_cpu_register_bit_prop(X86CPU *cpu,
->      op = object_property_find(OBJECT(cpu), prop_name, NULL);
->      if (op) {
->          fp = op->opaque;
-> -        assert(fp->ptr == field);
-> +        assert(fp->w == w);
->          fp->mask |= mask;
->      } else {
->          fp = g_new0(BitProperty, 1);
-> -        fp->ptr = field;
-> +        fp->w = w;
->          fp->mask = mask;
->          object_property_add(OBJECT(cpu), prop_name, "bool",
->                              x86_cpu_get_bit_prop,
-> @@ -3787,7 +3796,7 @@ static void x86_cpu_register_feature_bit_props(X86CPU *cpu,
->      /* aliases don't use "|" delimiters anymore, they are registered
->       * manually using object_property_add_alias() */
->      assert(!strchr(name, '|'));
-> -    x86_cpu_register_bit_prop(cpu, name, &cpu->env.features[w], bitnr);
-> +    x86_cpu_register_bit_prop(cpu, name, w, bitnr);
->  }
->  
->  static GuestPanicInformation *x86_cpu_get_crash_info(CPUState *cs)
+The caller will not see the new value of sd_state.  In C arguments are
+passed by value.  That means they are local variables inside the
+function and do not affect the caller.
+
+I have CCed Paolo Bonzini, who posted this task.  Maybe he can explain
+what he meant by "Include SDState by value instead of allocating it in
+sd_init (hw/sd/)".
+
+> +    if (!sd_state) {
+> +		return -1;
+> +	}
+
+QEMU use 4 space indentation.  Please do not use tabs.
+
+--2B/JsCI69OhZNC5r
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEbBAEBAgAGBQJY2PPFAAoJEJykq7OBq3PIYx0H+P+1vce7Z0isy1XShBEh4eOk
+2ewEfKFGMQiK8F++hXGXBR/p4FZHV5X3RQRU2/inkazVy5vLMgwBmSEiHIbnTo3G
+lNNOhRx7vjFTAvotl+3HevZ6J6XhVdhbPgOD7aYZt1lKieX8CK1eGlFGJ8R6sqUt
+SNWNena6uQ2L0Ppoag0VQu1O+evm20FVg6uITJEFPtVpRDbfY8gK4hWRMQAYsvHa
+VGj6s7iGz0OYUZPnCqx68bfY16Tn+/eNjcyC/eapG79Z2/xQtrxTg2Zol+KqaSnZ
+sTJVUQdAQa1iZAV+fMJBIm6+oi6AwBnJBnHnLvX6Z4pZpAJ97PUZLmRnkJMF4Q==
+=8baK
+-----END PGP SIGNATURE-----
+
+--2B/JsCI69OhZNC5r--
