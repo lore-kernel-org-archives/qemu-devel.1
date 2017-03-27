@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1csOzP-0006dM-Ru
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 03:22:56 -0400
+	(envelope-from <peterx@redhat.com>) id 1csOzT-0006fr-3P
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 03:23:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1csOzL-00030R-CB
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 03:22:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46936)
+	(envelope-from <peterx@redhat.com>) id 1csOzS-00036W-5f
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 03:22:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59886)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1csOzL-00030C-3L
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 03:22:51 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 315BFA203B
-	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 07:22:50 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1csOzR-00036D-Vd
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 03:22:58 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Mon, 27 Mar 2017 15:21:27 +0800
-Message-Id: <1490599288-11751-5-git-send-email-peterx@redhat.com>
+Date: Mon, 27 Mar 2017 15:21:28 +0800
+Message-Id: <1490599288-11751-6-git-send-email-peterx@redhat.com>
 In-Reply-To: <1490599288-11751-1-git-send-email-peterx@redhat.com>
 References: <1490599288-11751-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/5] hmp: info migrate_parameters format tunes
+Subject: [Qemu-devel] [PATCH 5/5] cpu: throttle: fix throttle time slice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,76 +24,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Juan Quintela <quintela@redhat.com>, "\\  Dr . David Alan Gilbert \\ " <dgilbert@redhat.com>, peterx@redhat.com
+Cc: Juan Quintela <quintela@redhat.com>, "\\  Dr . David Alan Gilbert \\ " <dgilbert@redhat.com>, peterx@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>
 
-Do the same (one per line) to the parameter list.
+IIUC the throttle idea is that: we split a CPU_THROTTLE_TIMESLICE_NS
+time slice into two parts - one for vcpu, one for throttle thread (which
+will suspend the thread by a sleep). However current algorithm on
+calculating the working piece and sleeping piece is strange.
 
-CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Assume a 99% throttle, what we want is to merely stop vcpu from running,
+but the old logic will just first let the vcpu run for a very long
+time (which is "CPU_THROTTLE_TIMESLICE_NS / (1-pct)" = 1 second) before
+doing anything else.
+
+Fixing it up to the simplest but imho accurate logic.
+
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Richard Henderson <rth@twiddle.net>
+CC: Jason J. Herne <jjherne@linux.vnet.ibm.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- hmp.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
+ cpus.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/hmp.c b/hmp.c
-index 95eef8c..b33e39e 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -282,46 +282,44 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
-     params = qmp_query_migrate_parameters(NULL);
+diff --git a/cpus.c b/cpus.c
+index 167d961..7976ce4 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -633,7 +633,6 @@ static const VMStateDescription vmstate_timers = {
+ static void cpu_throttle_thread(CPUState *cpu, run_on_cpu_data opaque)
+ {
+     double pct;
+-    double throttle_ratio;
+     long sleeptime_ns;
  
-     if (params) {
--        monitor_printf(mon, "parameters:");
-         assert(params->has_compress_level);
--        monitor_printf(mon, " %s: %" PRId64,
-+        monitor_printf(mon, "%s: %" PRId64 "\n",
-             MigrationParameter_lookup[MIGRATION_PARAMETER_COMPRESS_LEVEL],
-             params->compress_level);
-         assert(params->has_compress_threads);
--        monitor_printf(mon, " %s: %" PRId64,
-+        monitor_printf(mon, "%s: %" PRId64 "\n",
-             MigrationParameter_lookup[MIGRATION_PARAMETER_COMPRESS_THREADS],
-             params->compress_threads);
-         assert(params->has_decompress_threads);
--        monitor_printf(mon, " %s: %" PRId64,
-+        monitor_printf(mon, "%s: %" PRId64 "\n",
-             MigrationParameter_lookup[MIGRATION_PARAMETER_DECOMPRESS_THREADS],
-             params->decompress_threads);
-         assert(params->has_cpu_throttle_initial);
--        monitor_printf(mon, " %s: %" PRId64,
-+        monitor_printf(mon, "%s: %" PRId64 "\n",
-             MigrationParameter_lookup[MIGRATION_PARAMETER_CPU_THROTTLE_INITIAL],
-             params->cpu_throttle_initial);
-         assert(params->has_cpu_throttle_increment);
--        monitor_printf(mon, " %s: %" PRId64,
-+        monitor_printf(mon, "%s: %" PRId64 "\n",
-             MigrationParameter_lookup[MIGRATION_PARAMETER_CPU_THROTTLE_INCREMENT],
-             params->cpu_throttle_increment);
--        monitor_printf(mon, " %s: '%s'",
-+        monitor_printf(mon, "%s: '%s'\n",
-             MigrationParameter_lookup[MIGRATION_PARAMETER_TLS_CREDS],
-             params->has_tls_creds ? params->tls_creds : "");
--        monitor_printf(mon, " %s: '%s'",
-+        monitor_printf(mon, "%s: '%s'\n",
-             MigrationParameter_lookup[MIGRATION_PARAMETER_TLS_HOSTNAME],
-             params->has_tls_hostname ? params->tls_hostname : "");
-         assert(params->has_max_bandwidth);
--        monitor_printf(mon, " %s: %" PRId64 " bytes/second",
-+        monitor_printf(mon, "%s: %" PRId64 " bytes/second\n",
-             MigrationParameter_lookup[MIGRATION_PARAMETER_MAX_BANDWIDTH],
-             params->max_bandwidth);
-         assert(params->has_downtime_limit);
--        monitor_printf(mon, " %s: %" PRId64 " milliseconds",
-+        monitor_printf(mon, "%s: %" PRId64 " milliseconds\n",
-             MigrationParameter_lookup[MIGRATION_PARAMETER_DOWNTIME_LIMIT],
-             params->downtime_limit);
-         assert(params->has_x_checkpoint_delay);
--        monitor_printf(mon, " %s: %" PRId64,
-+        monitor_printf(mon, "%s: %" PRId64 "\n",
-             MigrationParameter_lookup[MIGRATION_PARAMETER_X_CHECKPOINT_DELAY],
-             params->x_checkpoint_delay);
--        monitor_printf(mon, "\n");
+     if (!cpu_throttle_get_percentage()) {
+@@ -641,8 +640,7 @@ static void cpu_throttle_thread(CPUState *cpu, run_on_cpu_data opaque)
      }
  
-     qapi_free_MigrationParameters(params);
+     pct = (double)cpu_throttle_get_percentage()/100;
+-    throttle_ratio = pct / (1 - pct);
+-    sleeptime_ns = (long)(throttle_ratio * CPU_THROTTLE_TIMESLICE_NS);
++    sleeptime_ns = (long)((1 - pct) * CPU_THROTTLE_TIMESLICE_NS);
+ 
+     qemu_mutex_unlock_iothread();
+     atomic_set(&cpu->throttle_thread_scheduled, 0);
+@@ -668,7 +666,7 @@ static void cpu_throttle_timer_tick(void *opaque)
+ 
+     pct = (double)cpu_throttle_get_percentage()/100;
+     timer_mod(throttle_timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL_RT) +
+-                                   CPU_THROTTLE_TIMESLICE_NS / (1-pct));
++                                   CPU_THROTTLE_TIMESLICE_NS * pct);
+ }
+ 
+ void cpu_throttle_set(int new_throttle_pct)
 -- 
 2.7.4
