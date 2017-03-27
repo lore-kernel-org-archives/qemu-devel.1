@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1csVgc-0000RJ-4k
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 10:31:59 -0400
+	(envelope-from <den@openvz.org>) id 1csVml-0001pF-Kr
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 10:38:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1csVgX-0000Eo-8I
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 10:31:58 -0400
-References: <20170327132242.17104-1-lvivier@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <33d2d3c8-6a18-45e6-23b8-813a1cae2b9f@redhat.com>
-Date: Mon, 27 Mar 2017 16:31:26 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170327132242.17104-1-lvivier@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] spapr: fix memory hot-unplugging
+	(envelope-from <den@openvz.org>) id 1csVmg-0002Ve-O5
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 10:38:19 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:15760 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <den@openvz.org>) id 1csVmg-0002TQ-DM
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 10:38:14 -0400
+From: "Denis V. Lunev" <den@openvz.org>
+Date: Mon, 27 Mar 2017 17:38:08 +0300
+Message-Id: <1490625488-7980-1-git-send-email-den@openvz.org>
+Subject: [Qemu-devel] [PATCH 1/1] parallels: wrong call to bdrv_truncate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,85 +21,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: "Denis V. Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Adding cc: Bharata.
+Parallels driver should not call bdrv_truncate if the image was opened
+in the read-only mode. Without the patch
+    qemu-img check harddisk.hds
+asserts with
+    bdrv_truncate: Assertion `child->perm & BLK_PERM_RESIZE' failed.
 
-On 27/03/2017 15:22, Laurent Vivier wrote:
-> If, once the kernel has booted, we try to remove a memory
-> hotplugged while the kernel was not started, QEMU crashes on
-> an assert:
-> 
->     qemu-system-ppc64: hw/virtio/vhost.c:651:
->                        vhost_commit: Assertion `r >= 0' failed.
->     ...
->     #4  in vhost_commit
->     #5  in memory_region_transaction_commit
->     #6  in pc_dimm_memory_unplug
->     #7  in spapr_memory_unplug
->     #8  spapr_machine_device_unplug
->     #9  in hotplug_handler_unplug
->     #10 in spapr_lmb_release
->     #11 in detach
->     #12 in set_allocation_state
->     #13 in rtas_set_indicator
->     ...
-> 
-> If we take a closer look to the guest kernel log, we can see when
-> we try to unplug the memory:
-> 
->     pseries-hotplug-mem: Attempting to hot-add 4 LMB(s)
-> 
-> What happens:
-> 
->     1- The kernel has ignored the memory hotplug event because
->        it was not started when it was generated.
-> 
->     2- When we hot-unplug the memory,
->        QEMU starts to remove the memory,
->             generates an hot-unplug event,
->         and signals the kernel of the incoming new event
-> 
->     3- as the kernel is started, on the QEMU signal, it reads
->        the event list, decodes the hotplug event and tries to
->        finish the hotplugging.
-> 
->     4- QEMU receives the hotplug notification while it
->        is trying to hot-unplug the memory. This moves the memory
->        DRC to an invalid state
-> 
-> This patch prevents this by not allowing to set the allocation
-> state to USABLE while the DRC is awaiting release and allocation.
-> 
-> RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=1432382
-> 
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
->  hw/ppc/spapr_drc.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-> index 150f6bf..377ea65 100644
-> --- a/hw/ppc/spapr_drc.c
-> +++ b/hw/ppc/spapr_drc.c
-> @@ -135,6 +135,12 @@ static uint32_t set_allocation_state(sPAPRDRConnector *drc,
->          if (!drc->dev) {
->              return RTAS_OUT_NO_SUCH_INDICATOR;
->          }
-> +        if (drc->awaiting_release && drc->awaiting_allocation) {
-> +            /* kernel is acknowledging a previous hotplug event
-> +             * while we are already removing it.
-> +             */
+Parameters used on the write path are not needed if the image is opened
+in the read-only mode.
 
-I'm wondering if I should set drc->awaiting_allocation to false here?
+Signed-off-by: Denis V. Lunev <den@openvz.org>
+Reported-by: Edgar Kaziahmedov <edos@virtuozzo.mipt.ru>
+CC: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ block/parallels.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-> +            return RTAS_OUT_NO_SUCH_INDICATOR;
-> +        }
->      }
->  
->      if (drc->type != SPAPR_DR_CONNECTOR_TYPE_PCI) {
-> 
-
-Thanks,
-Laurent
+diff --git a/block/parallels.c b/block/parallels.c
+index 6bf9375..4173b3f 100644
+--- a/block/parallels.c
++++ b/block/parallels.c
+@@ -687,7 +687,8 @@ static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
+     if (local_err != NULL) {
+         goto fail_options;
+     }
+-    if (!bdrv_has_zero_init(bs->file->bs) ||
++
++    if (!(flags & BDRV_O_RESIZE) || !bdrv_has_zero_init(bs->file->bs) ||
+             bdrv_truncate(bs->file, bdrv_getlength(bs->file->bs)) != 0) {
+         s->prealloc_mode = PRL_PREALLOC_MODE_FALLOCATE;
+     }
+-- 
+2.7.4
