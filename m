@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1csPUT-0005p9-6W
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 03:55:01 -0400
+	(envelope-from <thuth@redhat.com>) id 1csPZt-0007S5-2w
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 04:00:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1csPUP-0004nI-BW
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 03:55:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36582)
+	(envelope-from <thuth@redhat.com>) id 1csPZq-0006RB-3K
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 04:00:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46568)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1csPUP-0004nE-5v
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 03:54:57 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DC4913F725
-	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 07:54:55 +0000 (UTC)
-Date: Mon, 27 Mar 2017 15:54:50 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170327075450.GD11497@pxdev.xzpeter.org>
-References: <20170323204544.12015-1-quintela@redhat.com>
-	<20170323204544.12015-7-quintela@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1csPZp-0006Qo-Tp
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 04:00:34 -0400
+References: <20170322203140.GA12155@thinpad.lan.raisama.net>
+	<3d10c7b3-b702-3c16-7f3e-dfc6b332fbd4@redhat.com>
+	<b5516794-4592-569e-66ba-05dc40573a10@redhat.com>
+	<20170324134821.GC28530@thinpad.lan.raisama.net>
+	<87y3vur4qk.fsf@dusky.pond.sub.org>
+	<CAFEAcA_V3w6-WELX_M-jW1M=2TV7-wmEWa-c40ZmXLywC=+=Cg@mail.gmail.com>
+	<877f3emu7w.fsf@dusky.pond.sub.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <479099e3-614d-42d3-31f2-f61a624a2844@redhat.com>
+Date: Mon, 27 Mar 2017 10:00:27 +0200
 MIME-Version: 1.0
+In-Reply-To: <877f3emu7w.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170323204544.12015-7-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 06/51] ram: Move start time into RAMState
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] q35 and sysbus devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +32,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
+To: Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Mar 23, 2017 at 09:44:59PM +0100, Juan Quintela wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  migration/ram.c | 20 +++++++++++---------
->  1 file changed, 11 insertions(+), 9 deletions(-)
+On 24.03.2017 18:59, Markus Armbruster wrote:
+> Peter Maydell <peter.maydell@linaro.org> writes:
 > 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index f811e81..5881805 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -154,6 +154,9 @@ struct RAMState {
->      int dirty_rate_high_cnt;
->      /* How many times we have synchronized the bitmap */
->      uint64_t bitmap_sync_count;
-> +    /* this variables are used for bitmap sync */
+>> On 24 March 2017 at 16:58, Markus Armbruster <armbru@redhat.com> wrote:
+>>> "Sysbus" isn't a bus.  In qdev's original design, every device had to
+>>> plug into a bus, period.  The ones that really didn't were made to plug
+>>> into "sysbus".
+>>>
+>>> Pretty much the only thing "sysbus" devices had in common was that they
+>>> couldn't be used with device_add and device_del.
+>>
+>> This isn't really true. Sysbus devices support having MMIO regions
+>> and IRQ lines and GPIO lines. If you need those you're a
+>> sysbus device; otherwise you can probably just be a plain old Device.
+> 
+> Well, "device has MMIO regions, IRQ lines and GPIO lines" is about as
+> "device contains virtual silicon".  What would a device without any of
+> these *do*?
 
-s/this/These/?
+On ppc64, we've got for a example pseudo-devices that takes care of
+certain hypercalls, e.g. the spapr-rng or the spapr-rtc devices (well,
+the latter is still a TYPE_SYS_BUS_DEVICE ... we should convert it to
+TYPE_DEVICE instead one day...). These devices do not have any MMIO, IRQ
+or GPIO lines at all, so I think the differentiation between a very
+generic TYPE_DEVICE class and a "SYS_BUS_DEVICE" (with MMIO/IRQ/GPIO)
+class still makes sense.
 
-> +    /* last time we did a full bitmap_sync */
-> +    int64_t start_time;
-
-Not sure whether it'll be a good chance we rename this variable in
-this patch to make it a less-generic name, like: bm_sync_start? But
-again, this is nicpicking and totally optional.
-
-With the typo fixed, please add:
-
-Reviewed-by: Peter Xu <peterx@redhat.com>
-
-Thanks,
-
--- peterx
+ Thomas
