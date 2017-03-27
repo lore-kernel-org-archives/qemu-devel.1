@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33399)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tejaswinipoluri3@gmail.com>) id 1csjil-0004OT-TG
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 01:31:09 -0400
+	(envelope-from <intermediadc@hotmail.com>) id 1csjwm-0005vz-4j
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 01:45:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tejaswinipoluri3@gmail.com>) id 1csjik-00069T-O0
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 01:31:07 -0400
-Received: from mail-it0-x234.google.com ([2607:f8b0:4001:c0b::234]:37067)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tejaswinipoluri3@gmail.com>)
-	id 1csjik-00069G-I5
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 01:31:06 -0400
-Received: by mail-it0-x234.google.com with SMTP id 190so7109135itm.0
-	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 22:31:06 -0700 (PDT)
+	(envelope-from <intermediadc@hotmail.com>) id 1csjwk-0003Vg-KM
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 01:45:36 -0400
+From: luigi burdo <intermediadc@hotmail.com>
+Date: Mon, 27 Mar 2017 17:10:16 +0000
+Message-ID: <HE1P194MB0139BDEBD270E4A51DAAC348C8330@HE1P194MB0139.EURP194.PROD.OUTLOOK.COM>
+References: <CABLmASH=JA8qh+bqNjHiAB_hwbxZ-DnA4fy5tgu8+THbwvM7zg@mail.gmail.com>
+	<81b9d4e2-92b2-4ab9-8e67-faf2dee8dc81@ilande.co.uk>,
+	<25901d9c-7539-3bc6-8372-9ab04d91c95b@redhat.com>
+In-Reply-To: <25901d9c-7539-3bc6-8372-9ab04d91c95b@redhat.com>
+Content-Language: it-IT
 MIME-Version: 1.0
-In-Reply-To: <20170327111309.GB26900@stefanha-x1.localdomain>
-References: <1490610662-5483-1-git-send-email-tejaswinipoluri3@gmail.com>
-	<20170327111309.GB26900@stefanha-x1.localdomain>
-From: Tejaswini Poluri <tejaswinipoluri3@gmail.com>
-Date: Tue, 28 Mar 2017 11:01:05 +0530
-Message-ID: <CAH=b03tqB4vy0fg3ikhf1iGpbQyLfDd28ymrO_Qo_QSysHOAKA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [[RFC]PATCH:hw/sd:sd_init()] hw/sd : modified the
- sd_init() function
+Content-Type: text/plain; charset="Windows-1252"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] Bug in qemu-system-ppc in Windows using
+ the SDL2 GUI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +26,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Howard Spoelstra <hsp.cat7@gmail.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, =?Windows-1252?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, Mar 27, 2017 at 4:43 PM, Stefan Hajnoczi <stefanha@redhat.com>
-wrote:
+Hi Thomas,
 
-> On Mon, Mar 27, 2017 at 04:01:02PM +0530, Tejaswini wrote:
-> > From: Tejaswini Poluri <tejaswinipoluri3@gmail.com>
->
-> Please shorten the subject line: "[PATCH] hw/sd: simplify sd_init()
-> prototype"
->
-> > @@ -573,16 +573,19 @@ SDState *sd_init(BlockBackend *blk, bool is_spi)
-> >      qdev_prop_set_drive(dev, "drive", blk, &err);
-> >      if (err) {
-> >          error_report("sd_init failed: %s", error_get_pretty(err));
-> > -        return NULL;
-> > +        return -1;
-> >      }
-> >      qdev_prop_set_bit(dev, "spi", is_spi);
-> >      object_property_set_bool(obj, true, "realized", &err);
-> >      if (err) {
-> >          error_report("sd_init failed: %s", error_get_pretty(err));
-> > -        return NULL;
-> > +        return -1;
-> >      }
-> > -
-> > -    return SD_CARD(dev);
-> > +    sd_state = SD_CARD(dev);
->
-> The caller will not see the new value of sd_state.  In C arguments are
-> passed by value.  That means they are local variables inside the
-> function and do not affect the caller.
->
-> The caller will call sd_init() along with passing SDState pointer as an
-argument like below
-if (sd_init(s->card, blk, false) < 0) .
-And the sd_init() function is modified to
-int sd_init(SDState *sd_state, BlockBackend *blk, bool is_spi)
-so that the caller gets the new value of SDstate updated.
-Looking forward for the comments of Paolo Bonzini to understand what more
-needs to be done as part of the task.
+i had been patched the qemu 2.8.91 on the git repository too and the patch =
+gave positive result.
 
-I have CCed Paolo Bonzini, who posted this task.  Maybe he can explain
-> what he meant by "Include SDState by value instead of allocating it in
-> sd_init (hw/sd/)".
->
-> > +    if (!sd_state) {
-> > +             return -1;
-> > +     }
->
-> QEMU use 4 space indentation.  Please do not use tabs.
->
+i have no more the exit of qemu when a key was pressed .
 
 
+Thanks
 
--- 
-Regards,
-Tejaswini
+Luigi
+
+
+________________________________
+Da: Thomas Huth <thuth@redhat.com>
+Inviato: venerd=EC 24 marzo 2017 10.33
+A: Mark Cave-Ayland; Howard Spoelstra; qemu-ppc@nongnu.org; luigi burdo; Al=
+ex Benn=E9e; QEMU Developers
+Oggetto: Re: [Qemu-ppc] Bug in qemu-system-ppc in Windows using the SDL2 GU=
+I
+
+On 24.03.2017 09:56, Mark Cave-Ayland wrote:
+> On 24/03/17 08:47, Howard Spoelstra wrote:
+>
+>> Hi,
+>>
+>> Running qemu-system-ppc.exe in windows with the SDL2 GUI results in a
+>> hangup. I bisected to this commit:
+>>
+>> 8bb93c6f99a42c2e0943bc904b283cd622d302c5 is the first bad commit
+>> commit 8bb93c6f99a42c2e0943bc904b283cd622d302c5
+>> Author: Alex Benn=E9e <alex.bennee@linaro.org>
+>> Date:   Wed Mar 15 14:48:25 2017 +0000
+>>
+>>     ui/console: ensure graphic updates don't race with TCG vCPUs
+>>
+>>     Commit 8d04fb55..
+>>
+>>       tcg: drop global lock during TCG code execution
+>>
+>>     ..broke the assumption that updates to the GUI couldn't happen at th=
+e
+>>     same time as TCG vCPUs where running. As a result the TCG vCPU could
+>>     still be updating a directly mapped frame-buffer while the display
+>>     side was updating. This would cause artefacts to appear when the
+>>     update code assumed that memory block hadn't changed.
+>>
+>>     The simplest solution is to ensure the two things can't happen at th=
+e
+>>     same time like the old BQL locking scheme. Here we use the solution
+>>     introduced for MTTCG and schedule the update as async_safe_work when
+>>     we know no vCPUs can be running.
+>>
+>>     Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>>     Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+>>     Message-id: 20170315144825.3108-1-alex.bennee@linaro.org
+>>     Cc: BALATON Zoltan <balaton@eik.bme.hu>
+>>     Cc: Gerd Hoffmann <kraxel@redhat.com>
+>>     Cc: Paolo Bonzini <pbonzini@redhat.com>
+>>     Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+>>
+>>     [ kraxel: updated comment clarifying the display adapters are buggy
+>>               and this is a temporary workaround ]
+>>
+>>     Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+>
+> Hi Howard,
+>
+> Alex posted another patch yesterday to resolve a similar issue:
+> https://lists.nongnu.org/archive/html/qemu-devel/2017-03/msg04474.html.
+>
+> Does applying the above patch help at all?
+
+Luigi Burdo reported a similar issue here:
+
+https://bugs.launchpad.net/qemu/+bug/1675549
+Bug #1675549 =93tcg softmmu i386 crashes on BE hardware " : Bugs : QEMU<htt=
+ps://bugs.launchpad.net/qemu/+bug/1675549>
+bugs.launchpad.net
+Hi, today i try to test qemu 2.9rc 1 with qemu-system-i386 if i set display=
+ as sdl and i push a key on keyboard qemu exit with an error translate-comm=
+on.c:34:tcg_handle_interrupt: assertion failed: (qemu_mutex_iothread_locked=
+()) This issue was not present on qemu 2.8.0 Test Machine PowerMac G5 Quad =
+Fedora 25 Server PPC64 Qemu build with target-list=3Di386-softmuu --with-sd=
+labi=3D2.0 Ciao Luigi
+
+
+
+Luigi, could you please try Alex' patch to see whether it fixes your crash?
+
+ Thanks,
+  Thomas
