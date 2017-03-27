@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1csXEH-0003xv-QW
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:10:50 -0400
+	(envelope-from <mreitz@redhat.com>) id 1csXES-00042b-MU
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:11:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1csXEE-00068z-KW
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:10:49 -0400
-Received: from mx2.suse.de ([195.135.220.15]:37252)
+	(envelope-from <mreitz@redhat.com>) id 1csXEP-0006KN-EL
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:11:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33550)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <agraf@suse.de>) id 1csXEE-00068L-EC
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:10:46 -0400
-References: <1490624810-44752-1-git-send-email-agraf@suse.de>
-	<20170327154636.GI28530@thinpad.lan.raisama.net>
-From: Alexander Graf <agraf@suse.de>
-Message-ID: <c14eb231-10d1-63cb-ed14-8b7cd131b7b0@suse.de>
-Date: Mon, 27 Mar 2017 18:10:43 +0200
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1csXEP-0006IH-4x
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:10:57 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 26BCBC208088
+	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 16:10:56 +0000 (UTC)
+References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
+	<1490621195-2228-3-git-send-email-armbru@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <ba4b08e7-7e8d-5210-be2c-545be4cdeb99@redhat.com>
+Date: Mon, 27 Mar 2017 18:10:52 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170327154636.GI28530@thinpad.lan.raisama.net>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] i386: Allow monitor / mwait cpuid override
+In-Reply-To: <1490621195-2228-3-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="7l7EMNLHmEROSGSpMnkrV9Dcn0MaQ7BsQ"
+Subject: Re: [Qemu-devel] [PATCH RFC v3 for-2.9 02/11] rbd: Fix to cleanly
+ reject -drive without pool or image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,79 +35,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, kvm@vger.kernel.org
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: jdurgin@redhat.com, jcody@redhat.com, kwolf@redhat.com, eblake@redhat.com
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--7l7EMNLHmEROSGSpMnkrV9Dcn0MaQ7BsQ
+From: Max Reitz <mreitz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: jdurgin@redhat.com, jcody@redhat.com, kwolf@redhat.com, eblake@redhat.com
+Message-ID: <ba4b08e7-7e8d-5210-be2c-545be4cdeb99@redhat.com>
+Subject: Re: [PATCH RFC v3 for-2.9 02/11] rbd: Fix to cleanly reject -drive
+ without pool or image
+References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
+ <1490621195-2228-3-git-send-email-armbru@redhat.com>
+In-Reply-To: <1490621195-2228-3-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
+
+On 27.03.2017 15:26, Markus Armbruster wrote:
+> qemu_rbd_open() neglects to check pool and image are present.
+> Reproducer:
+>=20
+>     $ qemu-system-x86_64 -nodefaults -drive if=3Dnone,driver=3Drbd,pool=
+=3Dp
+>     Segmentation fault (core dumped)
+>     $ qemu-system-x86_64 -nodefaults -drive if=3Dnone,driver=3Drbd,imag=
+e=3Di
+>     qemu-system-x86_64: -drive if=3Dnone,driver=3Drbd,image=3Di: error =
+opening pool (null)
+>=20
+> Doesn't affect -drive with file=3D..., because qemu_rbd_parse_filename(=
+)
+> always sets both pool and image.
+>=20
+> Doesn't affect -blockdev, because pool and image are mandatory in the
+> QAPI schema.
+>=20
+> Fix by adding the missing checks.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> ---
+>  block/rbd.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
+--7l7EMNLHmEROSGSpMnkrV9Dcn0MaQ7BsQ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 27/03/2017 17:46, Eduardo Habkost wrote:
-> On Mon, Mar 27, 2017 at 04:26:50PM +0200, Alexander Graf wrote:
->> KVM allows trap and emulate (read: NOP) of the MONITOR and MWAIT
->> instructions. There is work undergoing to enable actual execution
->> of these inside of KVM, but nobody really wants to expose the feature
->> to the guest by default, as it would eat up all of the host CPU.
->
-> Isn't this something that should be reported using
-> KVM_GET_EMULATED_CPUID? (QEMU still doesn't know how to use
-> KVM_GET_EMULATED_CPUID, however.)
+-----BEGIN PGP SIGNATURE-----
 
-Depends how you look at it. In KVM land there are basically 3 ways to 
-deal with MONITOR/MWAIT:
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljZOY0SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AqC0H/jGyFwNYIzfB+jXCg/4d0QGoo9jczqk+
+LUPmKlz63OOPxMwKxQaF3gzJ7f+lFTbVUqmCn+gUwOwJafw5f5LN8/S8ZW7Ph1Kn
+1nNnF0y7uPXGMbxsiyKmToBDcDvbiiEEhRQ+swW580dIh1XFj5P6xdwv3CJQBnFA
+Ui/RLDvtUA0SacdvTaLPeRsaiwXEMQ1SsuqDBmiErRDZThn6UCnlxtcZtHkY9kjf
+bjPmQYeR26JXOW4Up/xYxlksXvX4m0kv3ODXesCQg+nhlmOoEtRdIZz++Sj0kZBT
+E4MShqKHwm0sH61YsdVzrrRsILPddg659zHdCXxkUV6zfSOTUGY9s/k=
+=wod1
+-----END PGP SIGNATURE-----
 
-   1) #VMEXIT on every execution, treat them as NOP
-   2) let the guest natively execute them (looks like a busy loop for 
-the host, but saves power)
-   3) be smart in KVM about it, add actual emulation and adaptively 
-allow for native mwait execution or emulated mwait which means we can 
-run inside host context
-
->> So today there is no streamlined way to actually notify the guest that
->> it's ok to execute MONITOR / MWAIT, even when we want to explicitly
->> leave the guest in guest context.
->
-> I'm not familiar with the variables involved in this decision.
-> How exactly would somebody (human or software) determine if it's
-> really ok to let the guest execute MONITOR / MWAIT?
->
-> Under what circumstances do you expect this to be used? Is this
-> just for debugging and development?
-
-The main reason this is bubbling up at all are IPC intensive workloads. 
-Imagine you have the following:
-
-CPU0 goes idle (waiting on something)
-CPU1 wants to wake up CPU0 (because wait time is over)
-
-In a normal KVM environment what you get is that
-
-CPU0 calls HLT (going into KVM to do other work)
-CPU1 triggers IPI via emulated APIC to wake up CPU0
-
-However with actual native MWAIT what happens is
-
-CPU0 calls MWAIT, stays in guest context ("wasting" CPU time)
-CPU1 writes a byte to a memory location, waking up CPU0
-
-With that scheme, you get your IPC latency down by a *huge* margin.
-
-
-When is that useful? When you only have a single VM on your host for 
-example, so you want virtual machines for the sake of administration, 
-not for overprovisioning.
-
->
->>
->> This patch adds a new -cpu parameter called "mwait" which - when
->> enabled - force enables the MONITOR / MWAIT CPUID flag, even when
->> the underlying accel framework does not explicitly advertise support.
->>
->
-> If you really want something that makes QEMU ignore what the
-> accel code is reporting, I would prefer a syntax that could be
-> used for other features too, like "-cpu ...,monitor=force".
-
-That sounds like a pretty nice idea and much more scalable. Let me see 
-if I can somehow pull that off :).
-
-
-Alex
+--7l7EMNLHmEROSGSpMnkrV9Dcn0MaQ7BsQ--
