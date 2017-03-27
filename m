@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50477)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1csQv2-0008Fc-1Y
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 05:26:33 -0400
+	(envelope-from <prvs=252db12a3=Paul.Durrant@citrix.com>)
+	id 1csQwq-0000YV-HJ
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 05:28:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1csQuy-0000Vq-Qf
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 05:26:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58972)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1csQuy-0000Va-Kg
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 05:26:28 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A717EC04BD27
-	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 09:26:27 +0000 (UTC)
-Date: Mon, 27 Mar 2017 17:26:23 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170327092623.GJ11497@pxdev.xzpeter.org>
-References: <20170323204544.12015-1-quintela@redhat.com>
-	<20170323204544.12015-14-quintela@redhat.com>
+	(envelope-from <prvs=252db12a3=Paul.Durrant@citrix.com>)
+	id 1csQwn-00016i-8y
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 05:28:24 -0400
+Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:62974
+	helo=SMTP.EU.CITRIX.COM)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=252db12a3=Paul.Durrant@citrix.com>)
+	id 1csQwn-00016W-0j
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 05:28:21 -0400
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Mon, 27 Mar 2017 09:28:18 +0000
+Message-ID: <24e4427dea5d4991bf8e64227886cb86@AMSPEX02CL03.citrite.net>
+References: <20170327074245.3821-1-jgross@suse.com>
+	<1330e0a0d9814073b39b52bd6e08a6a8@AMSPEX02CL03.citrite.net>
+	<552de1bb-46bf-1579-d8b2-763d4612eb44@suse.com>
+In-Reply-To: <552de1bb-46bf-1579-d8b2-763d4612eb44@suse.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170323204544.12015-14-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 13/51] ram: Remove unused pages_skipped
- variable
+Subject: Re: [Qemu-devel] [PATCH v2] configure: use pkg-config for obtaining
+ xen version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,16 +34,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
+To: 'Juergen Gross' <jgross@suse.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>, "kraxel@redhat.com" <kraxel@redhat.com>, "sstabellini@kernel.org" <sstabellini@kernel.org>
 
-On Thu, Mar 23, 2017 at 09:45:06PM +0100, Juan Quintela wrote:
-> For compatibility, we need to still send a value, but just specify it
-> and comment the fact.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> -----Original Message-----
+> From: Juergen Gross [mailto:jgross@suse.com]
+> Sent: 27 March 2017 10:15
+> To: Paul Durrant <Paul.Durrant@citrix.com>; qemu-devel@nongnu.org; xen-
+> devel@lists.xenproject.org
+> Cc: Anthony Perard <anthony.perard@citrix.com>; kraxel@redhat.com;
+> sstabellini@kernel.org
+> Subject: Re: [PATCH v2] configure: use pkg-config for obtaining xen versi=
+on
+>=20
+> On 27/03/17 11:07, Paul Durrant wrote:
+> >> -----Original Message-----
+> >> From: Juergen Gross [mailto:jgross@suse.com]
+> >> Sent: 27 March 2017 08:43
+> >> To: qemu-devel@nongnu.org; xen-devel@lists.xenproject.org
+> >> Cc: Anthony Perard <anthony.perard@citrix.com>; kraxel@redhat.com;
+> >> sstabellini@kernel.org; Paul Durrant <Paul.Durrant@citrix.com>; Juerge=
+n
+> >> Gross <jgross@suse.com>
+> >> Subject: [PATCH v2] configure: use pkg-config for obtaining xen versio=
+n
+> >>
+> >> Instead of trying to guess the Xen version to use by compiling various
+> >> test programs first just ask the system via pkg-config. Only if it
+> >> can't return the version fall back to the test program scheme.
+> >>
+> >> If configure is being called with dedicated flags for the Xen librarie=
+s
+> >> use those instead of the pkg-config output. This will avoid breaking
+> >> an in-tree Xen build of an old Xen version while a new Xen version is
+> >> installed on the build machine: pkg-config would pick up the installed
+> >> Xen config files as the Xen tree wouldn't contain any of them.
+> >>
+> >> Signed-off-by: Juergen Gross <jgross@suse.com>
+> >> ---
+> >> V2: - use pkg-config only if no Xen library paths have been specified =
+via
+> >>       --extra-ldflags
+> >>     - keep test program for detecting Xen 4.9
+> >
+> > This all looks plausible but it doesn't seem to be working for me when
+> trying to build 4.8. I'm still getting a xen ctrl version of 40900... sti=
+ll trying to
+> figure out why.
+>=20
+> I suppose you reverted my previous patch?
+>=20
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Yes, I reverted that then applied this one.
 
--- peterx
+> Do you happen to have some stale 4.9 libraries in your Xen tree?
+>
+
+Yes, it was picking up a libxendevicemodel when it should not have been. It=
+ would be handy if the probe compilations used --nostdlib, but that's not r=
+egression introduced by your patch. Now that pkg-config is used for out-of-=
+tree builds I guess it may be possible to add that though.
+=20
+> What happens without this patch?
+>=20
+> > Also, the whitespace changes later on in the patch should probably be s=
+plit
+> out.
+>=20
+> Hmm, those are just due to the nesting level of the if's changed.
+> I don't think they can easily be split out without having a
+> malformed indentation.
+>=20
+
+Ok, I see that now I look at the code rather than just the patch. So, havin=
+g fixed my linkage issue...
+
+Tested-by: Paul Durrant <paul.durrant@citrix.com>
+
+>=20
+> Juergen
