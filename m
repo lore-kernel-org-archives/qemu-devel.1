@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39418)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1csXjL-0004cq-9J
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:42:56 -0400
+	(envelope-from <mreitz@redhat.com>) id 1csXjQ-0004gO-QI
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:43:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1csXjI-0003tz-4J
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:42:55 -0400
-Received: from mx2.suse.de ([195.135.220.15]:41628)
+	(envelope-from <mreitz@redhat.com>) id 1csXjN-0003xo-LJ
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:43:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39682)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <agraf@suse.de>) id 1csXjH-0003td-R2
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:42:52 -0400
-References: <1490624810-44752-1-git-send-email-agraf@suse.de>
-	<20170327154636.GI28530@thinpad.lan.raisama.net>
-	<c14eb231-10d1-63cb-ed14-8b7cd131b7b0@suse.de>
-	<20170327163333.GL28530@thinpad.lan.raisama.net>
-From: Alexander Graf <agraf@suse.de>
-Message-ID: <164e6c5d-ca36-b92d-2831-468a54cd3efe@suse.de>
-Date: Mon, 27 Mar 2017 18:42:49 +0200
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1csXjN-0003wn-CK
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:42:57 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 684E36AADE
+	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 16:42:56 +0000 (UTC)
+References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
+	<1490621195-2228-8-git-send-email-armbru@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <c0b92f66-8e3b-e419-359b-a6b0f986a03d@redhat.com>
+Date: Mon, 27 Mar 2017 18:42:53 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170327163333.GL28530@thinpad.lan.raisama.net>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] i386: Allow monitor / mwait cpuid override
+In-Reply-To: <1490621195-2228-8-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="lbtqg0T9ststaLXSpCM7R3t9t9hOiUg9h"
+Subject: Re: [Qemu-devel] [PATCH RFC v3 for-2.9 07/11] rbd: Clean up
+ qemu_rbd_create()'s detour through QemuOpts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,86 +35,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, kvm@vger.kernel.org
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: jdurgin@redhat.com, jcody@redhat.com, kwolf@redhat.com, eblake@redhat.com
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--lbtqg0T9ststaLXSpCM7R3t9t9hOiUg9h
+From: Max Reitz <mreitz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: jdurgin@redhat.com, jcody@redhat.com, kwolf@redhat.com, eblake@redhat.com
+Message-ID: <c0b92f66-8e3b-e419-359b-a6b0f986a03d@redhat.com>
+Subject: Re: [PATCH RFC v3 for-2.9 07/11] rbd: Clean up qemu_rbd_create()'s
+ detour through QemuOpts
+References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
+ <1490621195-2228-8-git-send-email-armbru@redhat.com>
+In-Reply-To: <1490621195-2228-8-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
+
+On 27.03.2017 15:26, Markus Armbruster wrote:
+> The conversion from QDict to QemuOpts is pointless.  Simply get the
+> stuff straight from the QDict.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/rbd.c | 20 +++++---------------
+>  1 file changed, 5 insertions(+), 15 deletions(-)
+>=20
+> diff --git a/block/rbd.c b/block/rbd.c
+> index b2afe07..cf0bab0 100644
+> --- a/block/rbd.c
+> +++ b/block/rbd.c
+> @@ -376,7 +376,6 @@ static int qemu_rbd_create(const char *filename, Qe=
+muOpts *opts, Error **errp)
+>      rados_t cluster;
+>      rados_ioctx_t io_ctx;
+>      QDict *options =3D NULL;
+> -    QemuOpts *rbd_opts =3D NULL;
+>      int ret =3D 0;
+> =20
+>      secretid =3D qemu_opt_get(opts, "password-secret");
+> @@ -407,19 +406,11 @@ static int qemu_rbd_create(const char *filename, =
+QemuOpts *opts, Error **errp)
+>          goto exit;
+>      }
+> =20
+> -    rbd_opts =3D qemu_opts_create(&runtime_opts, NULL, 0, &error_abort=
+);
+> -    qemu_opts_absorb_qdict(rbd_opts, options, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> -        ret =3D -EINVAL;
+> -        goto exit;
+> -    }
+> -
+> -    pool       =3D qemu_opt_get(rbd_opts, "pool");
+> -    conf       =3D qemu_opt_get(rbd_opts, "conf");
+> -    clientname =3D qemu_opt_get(rbd_opts, "user");
+> -    name       =3D qemu_opt_get(rbd_opts, "image");
+> -    keypairs   =3D qemu_opt_get(rbd_opts, "=3Dkeyvalue-pairs");
+> +    pool       =3D qdict_get_str(options, "pool");
+> +    conf       =3D qdict_get_str(options, "conf");
+> +    clientname =3D qdict_get_str(options, "user");
+> +    name       =3D qdict_get_str(options, "image");
+> +    keypairs   =3D qdict_get_str(options, "=3Dkeyvalue-pairs");
+
+This assumes that all of these options are given which they are not
+necessarily:
+
+$ ./qemu-img create -f rbd rbd:blub/ 1M
+Formatting 'rbd:blub/', fmt=3Drbd size=3D1048576
+[1]    27387 segmentation fault (core dumped)  ./qemu-img create -f rbd
+rbd:blub/ 1M
+
+qdict_get_try_str() would probably be better.
+
+Max
+
+> =20
+>      ret =3D rados_create(&cluster, clientname);
+>      if (ret < 0) {
+> @@ -470,7 +461,6 @@ shutdown:
+> =20
+>  exit:
+>      QDECREF(options);
+> -    qemu_opts_del(rbd_opts);
+>      return ret;
+>  }
+> =20
+>=20
 
 
 
-On 27/03/2017 18:33, Eduardo Habkost wrote:
-> On Mon, Mar 27, 2017 at 06:10:43PM +0200, Alexander Graf wrote:
->>
->>
->> On 27/03/2017 17:46, Eduardo Habkost wrote:
->>> On Mon, Mar 27, 2017 at 04:26:50PM +0200, Alexander Graf wrote:
->>>> KVM allows trap and emulate (read: NOP) of the MONITOR and MWAIT
->>>> instructions. There is work undergoing to enable actual execution
->>>> of these inside of KVM, but nobody really wants to expose the feature
->>>> to the guest by default, as it would eat up all of the host CPU.
->>>
->>> Isn't this something that should be reported using
->>> KVM_GET_EMULATED_CPUID? (QEMU still doesn't know how to use
->>> KVM_GET_EMULATED_CPUID, however.)
->>
->> Depends how you look at it. In KVM land there are basically 3 ways to deal
->> with MONITOR/MWAIT:
->>
->>   1) #VMEXIT on every execution, treat them as NOP
->>   2) let the guest natively execute them (looks like a busy loop for the
->> host, but saves power)
->>   3) be smart in KVM about it, add actual emulation and adaptively allow for
->> native mwait execution or emulated mwait which means we can run inside host
->> context
->
-> Which case is going to be enabled when using your patch? Don't
-> you want to make that configurable?
->
-> This looks like configuration that can't be easily represented
-> using the GET_SUPPORTED_CPUID/KVM_SET_CPUID abstraction, as the
-> ability to enable the feature can't be represented by a single
-> bit.
->
-> We already have a few cases where we make
-> kvm_arch_get_supported_cpuid() look at something other than just
-> GET_SUPPORTED_CPUID return values (most cases are related to
-> in-kernel irqchip). We can change kvm_arch_get_supported_cpuid()
-> to look at other flags (like one that would configure mwait
-> behavior), and decide to report CPUID_EXT_MONITOR on those cases.
->
-> Would something like the following make sense?
->
-> * Having a "mwait=(none|nop|native|smart)" option, to choose
->   mwait behavior
-> * Making kvm_arch_get_supported_cpuid() return CPUID_EXT_MONITOR
->   as supported only if the "mwait" option is not "none".
->
-> Then:
-> * "-cpu ...,monitor=on" would fail, because mwait=none would be
->   the default
-> * "-cpu ...,mwait=none,monitor=on" would fail
-> * "-cpu ...,mwait=(nop|native|smart)" would fail if
->   host KVM doesn't report the corresponding mwait behavior as
->   supported
-> * "-cpu ...,mwait=(nop|native|smart),monitor=on" would work
-> * "-cpu ...,mwait=(nop|native|smart)" would also work, and
->   probably should enable CPUID_EXT_MONITOR flag by default
->
-> We could still implement "monitor=force" for debugging, but I
-> think we need something safer than "just ignore what KVM is
-> telling us" for production.
+--lbtqg0T9ststaLXSpCM7R3t9t9hOiUg9h
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-I personally think we want the =force for any cpuid bit that we want to 
-randomly poke into the expose CPUID bitmap and if a customer is daring 
-enough, leave that to him as an option.
+-----BEGIN PGP SIGNATURE-----
 
-For anything else, I wouldn't overengineer this interface. I think 
-eventually we want to just natively support emulated mwait with proper 
-adaptive logic on when to trap vs execute mwait inside the guest (as 
-mentioned in the kvm thread on this). Once that's implemented, KVM can 
-just expose the MONITOR bit as supported and everyone gets it automatically.
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljZQQ0SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AvIUH/3ace/+s7ULwovX55P9P6j6rnt+Ky4vK
+YhwR/TWaj9jHiKzqoNjfBa66p3C/5zhLC2DySQY3GdK8BSRPzDEEY9qFd2PzahnM
+vyQtTFx7FUPoLJJP1ldV1U//U2zVPztz9G1nMBf+FY3b1VJ0LM/6WpGf66Kza7nn
+A1XC9wpP5DdeGEV7xM0vpU1syVT8ll08YwraJ76a17DxP/A7kEUw1z8snHfHbsfo
+CrWR8gJlwvIQJMA09+P4nZoiECdGTCuU4WqNqXsXfHi15hWkYLdinaK0b1ACpCcZ
+olb2WaYyrjDMDgAVI/vdW3GKIilWHPwp7oDE2DJ4pavO1/ElRbXSv+Y=
+=cyYn
+-----END PGP SIGNATURE-----
 
-If at that point, the adaptive interface performs much worse than the 
-naive one, we can still think about pushing this into an enable_cap and 
-add a specific mwait= option.
-
-
-Alex
+--lbtqg0T9ststaLXSpCM7R3t9t9hOiUg9h--
