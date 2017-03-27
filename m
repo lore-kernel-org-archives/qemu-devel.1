@@ -1,22 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1csRBD-0004W6-PY
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 05:43:17 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1csRGp-0006MB-Sh
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 05:49:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1csRBC-0005Ta-NZ
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 05:43:15 -0400
-References: <1488800894-22421-1-git-send-email-eric.auger@redhat.com>
-	<1488800894-22421-4-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA97hCS-bbKDV+w2G3yRunUm=QpsA+8Bqp9YNaa_VtMP-w@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <ce019ab1-ad72-390a-72a0-79eadcd92fd8@redhat.com>
-Date: Mon, 27 Mar 2017 11:43:04 +0200
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA97hCS-bbKDV+w2G3yRunUm=QpsA+8Bqp9YNaa_VtMP-w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 3/3] hw/intc/arm_gicv3_its: Allow
- save/restore
+	(envelope-from <eric.auger@redhat.com>) id 1csRGp-0007Z7-04
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 05:49:03 -0400
+From: Eric Auger <eric.auger@redhat.com>
+Date: Mon, 27 Mar 2017 11:48:44 +0200
+Message-Id: <1490608126-22187-2-git-send-email-eric.auger@redhat.com>
+In-Reply-To: <1490608126-22187-1-git-send-email-eric.auger@redhat.com>
+References: <1490608126-22187-1-git-send-email-eric.auger@redhat.com>
+Subject: [Qemu-devel] [RFC v3 1/3] linux-headers: Partial header update for
+ vITS save/restore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,157 +20,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Vijay Kilari <vijay.kilari@gmail.com>, "Kumar, Vijaya" <Vijaya.Kumar@cavium.com>, Andrew Jones <drjones@redhat.com>, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: vijay.kilari@gmail.com, Vijaya.Kumar@cavium.com, drjones@redhat.com, peterx@redhat.com, quintela@redhat.com, dgilbert@redhat.com, christoffer.dall@linaro.org
 
-Hi Peter,
-On 13/03/2017 19:03, Peter Maydell wrote:
-> On 6 March 2017 at 12:48, Eric Auger <eric.auger@redhat.com> wrote:
->> We change the restoration priority of both the GICv3 and ITS. The
->> GICv3 must be restored before the ITS and the ITS needs to be restored
->> before PCIe devices since it translates their MSI transactions.
-> 
->> We typically observe the virtio-pci-net device sending MSI transactions
->> very early (even before the first vcpu run) which looks weird. It
->> appears that not servicing those transactions cause the virtio-pci-net
->> to stall.
-> 
-> This does seem rather weird and worth closer investigation.
-> A stopped VM ought IMHO to be completely stopped, not still
-> doing things...
-After further investigations, here is what I observe:
+This is a linux header update against 4.11-rc3 plus the non
+upstreamed ITS migration series.
 
-Between the "running" vm_change_state_handler and the 1st
-KVM_RUN I observe virtio_notify_config that calls
-msix_notify(). This eventually attempts to inject an MSI.
-This looks valid as the VM is in its running state.
+https://github.com/eauger/linux/tree/v4.11-rc3-its-mig-v4
 
-Unfortunately the VGIC gets its final init stage, map_resources(),
-executed on the first KVM_RUN. Until that point
-no MMIO access can be performed. This looks the bad part to me.
-So at the moment I trigger a map_resources() at the end of the ITS table
-flush and that works.
+It aims at enhancing the KVM user API with vITS save/restore
+capability. This consists in two new groups for the
+ARM_VGIC_ITS KVM device, named: KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
+KVM_DEV_ARM_VGIC_GRP_ITS_TABLES.
 
-If I don't do that, the virtio-net based network is not functional
-on restore path.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+---
+ linux-headers/asm-arm/kvm.h   | 2 ++
+ linux-headers/asm-arm64/kvm.h | 2 ++
+ 2 files changed, 4 insertions(+)
 
-Hope this clarifies.
-
-Thanks
-
-Eric
-
-> 
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->>
->> v1 -> v2:
->> - handle case where migrate_add_blocker fails
->> - add comments along with ITS and GICv3 migration priorities
->> ---
->>  hw/intc/arm_gicv3_common.c     |  1 +
->>  hw/intc/arm_gicv3_its_common.c |  3 ++-
->>  hw/intc/arm_gicv3_its_kvm.c    | 23 +++++++++++------------
->>  include/migration/vmstate.h    |  2 ++
->>  4 files changed, 16 insertions(+), 13 deletions(-)
->>
->> diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
->> index c6493d6..4228b7c 100644
->> --- a/hw/intc/arm_gicv3_common.c
->> +++ b/hw/intc/arm_gicv3_common.c
->> @@ -145,6 +145,7 @@ static const VMStateDescription vmstate_gicv3 = {
->>      .minimum_version_id = 1,
->>      .pre_save = gicv3_pre_save,
->>      .post_load = gicv3_post_load,
->> +    .priority = MIG_PRI_GICV3,
->>      .fields = (VMStateField[]) {
->>          VMSTATE_UINT32(gicd_ctlr, GICv3State),
->>          VMSTATE_UINT32_ARRAY(gicd_statusr, GICv3State, 2),
->> diff --git a/hw/intc/arm_gicv3_its_common.c b/hw/intc/arm_gicv3_its_common.c
->> index 75b9f04..854709f 100644
->> --- a/hw/intc/arm_gicv3_its_common.c
->> +++ b/hw/intc/arm_gicv3_its_common.c
->> @@ -48,7 +48,8 @@ static const VMStateDescription vmstate_its = {
->>      .name = "arm_gicv3_its",
->>      .pre_save = gicv3_its_pre_save,
->>      .post_load = gicv3_its_post_load,
->> -    .unmigratable = true,
->> +    .unmigratable = false,
-> 
-> unmigratable = false is the default, so we can just delete the line.
-> 
->> +    .priority = MIG_PRI_GICV3_ITS,
->>      .fields = (VMStateField[]) {
->>          VMSTATE_UINT32(ctlr, GICv3ITSState),
->>          VMSTATE_UINT64(cbaser, GICv3ITSState),
->> diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
->> index 45e57d6..3bd2873 100644
->> --- a/hw/intc/arm_gicv3_its_kvm.c
->> +++ b/hw/intc/arm_gicv3_its_kvm.c
->> @@ -76,18 +76,6 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
->>      GICv3ITSState *s = ARM_GICV3_ITS_COMMON(dev);
->>      Error *local_err = NULL;
->>
->> -    /*
->> -     * Block migration of a KVM GICv3 ITS device: the API for saving and
->> -     * restoring the state in the kernel is not yet available
->> -     */
->> -    error_setg(&s->migration_blocker, "vITS migration is not implemented");
->> -    migrate_add_blocker(s->migration_blocker, &local_err);
->> -    if (local_err) {
->> -        error_propagate(errp, local_err);
->> -        error_free(s->migration_blocker);
->> -        return;
->> -    }
->> -
->>      s->dev_fd = kvm_create_device(kvm_state, KVM_DEV_TYPE_ARM_VGIC_ITS, false);
->>      if (s->dev_fd < 0) {
->>          error_setg_errno(errp, -s->dev_fd, "error creating in-kernel ITS");
->> @@ -104,6 +92,17 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
->>
->>      gicv3_its_init_mmio(s, NULL);
->>
->> +    if (!kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
->> +        GITS_CTLR)) {
->> +        error_setg(&s->migration_blocker, "vITS migration is not implemented");
-> 
-> I think we should specifically say that it's the host kernel
-> that doesn't support ITS migration (ie not QEMU that's missing
-> support).
-> 
-> The GICv3 uses the message
->  "This operating system kernel does not support vGICv3 migration"
-> which is slightly odd phrasing but I guess we should follow that.
-> 
->> +        migrate_add_blocker(s->migration_blocker, &local_err);
->> +        if (local_err) {
->> +            error_propagate(errp, local_err);
->> +            error_free(s->migration_blocker);
->> +            return;
->> +        }
->> +    }
->> +
->>      kvm_msi_use_devid = true;
->>      kvm_gsi_direct_mapping = false;
->>      kvm_msi_via_irqfd_allowed = kvm_irqfds_enabled();
->> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
->> index f2dbf84..8dab9c7 100644
->> --- a/include/migration/vmstate.h
->> +++ b/include/migration/vmstate.h
->> @@ -198,6 +198,8 @@ enum VMStateFlags {
->>  typedef enum {
->>      MIG_PRI_DEFAULT = 0,
->>      MIG_PRI_IOMMU,              /* Must happen before PCI devices */
->> +    MIG_PRI_GICV3_ITS,          /* Must happen before PCI devices */
->> +    MIG_PRI_GICV3,              /* Must happen before the ITS */
->>      MIG_PRI_MAX,
->>  } MigrationPriority;
->>
->> --
->> 2.5.5
->>
-> 
-> thanks
-> -- PMM
-> 
+diff --git a/linux-headers/asm-arm/kvm.h b/linux-headers/asm-arm/kvm.h
+index 1101d55..c8b9a68 100644
+--- a/linux-headers/asm-arm/kvm.h
++++ b/linux-headers/asm-arm/kvm.h
+@@ -192,6 +192,8 @@ struct kvm_arch_memory_slot {
+ #define KVM_DEV_ARM_VGIC_GRP_REDIST_REGS 5
+ #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
+ #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
++#define KVM_DEV_ARM_VGIC_GRP_ITS_REGS	8
++#define KVM_DEV_ARM_VGIC_GRP_ITS_TABLES	9
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
+ 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
+diff --git a/linux-headers/asm-arm64/kvm.h b/linux-headers/asm-arm64/kvm.h
+index 651ec30..a8d7d67 100644
+--- a/linux-headers/asm-arm64/kvm.h
++++ b/linux-headers/asm-arm64/kvm.h
+@@ -212,6 +212,8 @@ struct kvm_arch_memory_slot {
+ #define KVM_DEV_ARM_VGIC_GRP_REDIST_REGS 5
+ #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
+ #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
++#define KVM_DEV_ARM_VGIC_GRP_ITS_REGS 8
++#define KVM_DEV_ARM_VGIC_GRP_ITS_TABLES 9
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
+ 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
+-- 
+2.5.5
