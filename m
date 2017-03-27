@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1csWx0-0001Zj-DT
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 11:52:59 -0400
+	(envelope-from <mreitz@redhat.com>) id 1csWx0-0001a8-Sr
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 11:53:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1csWwz-0006JN-6R
+	(envelope-from <mreitz@redhat.com>) id 1csWwz-0006JS-6n
 	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 11:52:58 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 27 Mar 2017 17:52:30 +0200
-Message-Id: <20170327155234.10980-3-mreitz@redhat.com>
+Date: Mon, 27 Mar 2017 17:52:31 +0200
+Message-Id: <20170327155234.10980-4-mreitz@redhat.com>
 In-Reply-To: <20170327155234.10980-1-mreitz@redhat.com>
 References: <20170327155234.10980-1-mreitz@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 2/6] qemu-img: fix switch indentation in
- img_amend()
+Subject: [Qemu-devel] [PULL 3/6] qemu-img: print short help on getopt failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,117 +24,341 @@ Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.m
 
 From: Stefan Hajnoczi <stefanha@redhat.com>
 
-QEMU coding style indents 'case' to the same level as the 'switch'
-statement:
+Printing the full help output obscures the error message for an invalid
+command-line option or missing argument.
 
-  switch (foo) {
-  case 1:
+Before this patch:
 
-Fix this coding style violation so checkpatch.pl doesn't complain about
-the next patch.
+  $ ./qemu-img --foo
+  ...pages of output...
 
+After this patch:
+
+  $ ./qemu-img --foo
+  qemu-img: unrecognized option '--foo'
+  Try 'qemu-img --help' for more information
+
+This patch adds the getopt ':' character so that it can distinguish
+between missing arguments and unrecognized options.  This helps provide
+more detailed error messages.
+
+Suggested-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-id: 20170317104541.28979-3-stefanha@redhat.com
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Message-id: 20170317104541.28979-4-stefanha@redhat.com
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qemu-img.c | 82 +++++++++++++++++++++++++++++++-------------------------=
-------
- 1 file changed, 41 insertions(+), 41 deletions(-)
+ qemu-img.c | 117 ++++++++++++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 97 insertions(+), 20 deletions(-)
 
 diff --git a/qemu-img.c b/qemu-img.c
-index ce293a4710..c7ffabb268 100644
+index c7ffabb268..b220cf71d7 100644
 --- a/qemu-img.c
 +++ b/qemu-img.c
-@@ -3500,47 +3500,47 @@ static int img_amend(int argc, char **argv)
+@@ -88,6 +88,16 @@ static void QEMU_NORETURN GCC_FMT_ATTR(1, 2) error_exit(const char *fmt, ...)
+     exit(EXIT_FAILURE);
+ }
+ 
++static void QEMU_NORETURN missing_argument(const char *option)
++{
++    error_exit("missing argument for option '%s'", option);
++}
++
++static void QEMU_NORETURN unrecognized_option(const char *option)
++{
++    error_exit("unrecognized option '%s'", option);
++}
++
+ /* Please keep in synch with qemu-img.texi */
+ static void QEMU_NORETURN help(void)
+ {
+@@ -406,13 +416,18 @@ static int img_create(int argc, char **argv)
+             {"object", required_argument, 0, OPTION_OBJECT},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, "F:b:f:he6o:q",
++        c = getopt_long(argc, argv, ":F:b:f:he6o:q",
+                         long_options, NULL);
+         if (c == -1) {
+             break;
          }
-=20
+         switch(c) {
++        case ':':
++            missing_argument(argv[optind - 1]);
++            break;
+         case '?':
++            unrecognized_option(argv[optind - 1]);
++            break;
+         case 'h':
+             help();
+             break;
+@@ -651,13 +666,18 @@ static int img_check(int argc, char **argv)
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, "hf:r:T:q",
++        c = getopt_long(argc, argv, ":hf:r:T:q",
+                         long_options, &option_index);
+         if (c == -1) {
+             break;
+         }
+         switch(c) {
++        case ':':
++            missing_argument(argv[optind - 1]);
++            break;
+         case '?':
++            unrecognized_option(argv[optind - 1]);
++            break;
+         case 'h':
+             help();
+             break;
+@@ -855,13 +875,18 @@ static int img_commit(int argc, char **argv)
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, "f:ht:b:dpq",
++        c = getopt_long(argc, argv, ":f:ht:b:dpq",
+                         long_options, NULL);
+         if (c == -1) {
+             break;
+         }
+         switch(c) {
++        case ':':
++            missing_argument(argv[optind - 1]);
++            break;
+         case '?':
++            unrecognized_option(argv[optind - 1]);
++            break;
+         case 'h':
+             help();
+             break;
+@@ -1190,13 +1215,18 @@ static int img_compare(int argc, char **argv)
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, "hf:F:T:pqs",
++        c = getopt_long(argc, argv, ":hf:F:T:pqs",
+                         long_options, NULL);
+         if (c == -1) {
+             break;
+         }
          switch (c) {
--            case 'h':
--            case '?':
--                help();
--                break;
--            case 'o':
--                if (!is_valid_option_list(optarg)) {
--                    error_report("Invalid option list: %s", optarg);
--                    ret =3D -1;
--                    goto out_no_progress;
--                }
--                if (!options) {
--                    options =3D g_strdup(optarg);
--                } else {
--                    char *old_options =3D options;
--                    options =3D g_strdup_printf("%s,%s", options, optarg=
-);
--                    g_free(old_options);
--                }
--                break;
--            case 'f':
--                fmt =3D optarg;
--                break;
--            case 't':
--                cache =3D optarg;
--                break;
--            case 'p':
--                progress =3D true;
--                break;
--            case 'q':
--                quiet =3D true;
--                break;
--            case OPTION_OBJECT:
--                opts =3D qemu_opts_parse_noisily(&qemu_object_opts,
--                                               optarg, true);
--                if (!opts) {
--                    ret =3D -1;
--                    goto out_no_progress;
--                }
--                break;
--            case OPTION_IMAGE_OPTS:
--                image_opts =3D true;
--                break;
-+        case 'h':
-+        case '?':
-+            help();
++        case ':':
++            missing_argument(argv[optind - 1]);
 +            break;
-+        case 'o':
-+            if (!is_valid_option_list(optarg)) {
-+                error_report("Invalid option list: %s", optarg);
-+                ret =3D -1;
-+                goto out_no_progress;
-+            }
-+            if (!options) {
-+                options =3D g_strdup(optarg);
-+            } else {
-+                char *old_options =3D options;
-+                options =3D g_strdup_printf("%s,%s", options, optarg);
-+                g_free(old_options);
-+            }
+         case '?':
++            unrecognized_option(argv[optind - 1]);
 +            break;
-+        case 'f':
-+            fmt =3D optarg;
-+            break;
-+        case 't':
-+            cache =3D optarg;
-+            break;
-+        case 'p':
-+            progress =3D true;
-+            break;
-+        case 'q':
-+            quiet =3D true;
-+            break;
-+        case OPTION_OBJECT:
-+            opts =3D qemu_opts_parse_noisily(&qemu_object_opts,
-+                                           optarg, true);
-+            if (!opts) {
-+                ret =3D -1;
-+                goto out_no_progress;
-+            }
-+            break;
-+        case OPTION_IMAGE_OPTS:
-+            image_opts =3D true;
-+            break;
+         case 'h':
+             help();
+             break;
+@@ -1926,13 +1956,18 @@ static int img_convert(int argc, char **argv)
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, "hf:O:B:ce6o:s:l:S:pt:T:qnm:W",
++        c = getopt_long(argc, argv, ":hf:O:B:ce6o:s:l:S:pt:T:qnm:W",
+                         long_options, NULL);
+         if (c == -1) {
+             break;
          }
-     }
-=20
---=20
+         switch(c) {
++        case ':':
++            missing_argument(argv[optind - 1]);
++            break;
+         case '?':
++            unrecognized_option(argv[optind - 1]);
++            break;
+         case 'h':
+             help();
+             break;
+@@ -2502,13 +2537,18 @@ static int img_info(int argc, char **argv)
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, "f:h",
++        c = getopt_long(argc, argv, ":f:h",
+                         long_options, &option_index);
+         if (c == -1) {
+             break;
+         }
+         switch(c) {
++        case ':':
++            missing_argument(argv[optind - 1]);
++            break;
+         case '?':
++            unrecognized_option(argv[optind - 1]);
++            break;
+         case 'h':
+             help();
+             break;
+@@ -2713,13 +2753,18 @@ static int img_map(int argc, char **argv)
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, "f:h",
++        c = getopt_long(argc, argv, ":f:h",
+                         long_options, &option_index);
+         if (c == -1) {
+             break;
+         }
+         switch (c) {
++        case ':':
++            missing_argument(argv[optind - 1]);
++            break;
+         case '?':
++            unrecognized_option(argv[optind - 1]);
++            break;
+         case 'h':
+             help();
+             break;
+@@ -2835,13 +2880,18 @@ static int img_snapshot(int argc, char **argv)
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, "la:c:d:hq",
++        c = getopt_long(argc, argv, ":la:c:d:hq",
+                         long_options, NULL);
+         if (c == -1) {
+             break;
+         }
+         switch(c) {
++        case ':':
++            missing_argument(argv[optind - 1]);
++            break;
+         case '?':
++            unrecognized_option(argv[optind - 1]);
++            break;
+         case 'h':
+             help();
+             return 0;
+@@ -2988,13 +3038,18 @@ static int img_rebase(int argc, char **argv)
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, "hf:F:b:upt:T:q",
++        c = getopt_long(argc, argv, ":hf:F:b:upt:T:q",
+                         long_options, NULL);
+         if (c == -1) {
+             break;
+         }
+         switch(c) {
++        case ':':
++            missing_argument(argv[optind - 1]);
++            break;
+         case '?':
++            unrecognized_option(argv[optind - 1]);
++            break;
+         case 'h':
+             help();
+             return 0;
+@@ -3355,13 +3410,18 @@ static int img_resize(int argc, char **argv)
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, "f:hq",
++        c = getopt_long(argc, argv, ":f:hq",
+                         long_options, NULL);
+         if (c == -1) {
+             break;
+         }
+         switch(c) {
++        case ':':
++            missing_argument(argv[optind - 1]);
++            break;
+         case '?':
++            unrecognized_option(argv[optind - 1]);
++            break;
+         case 'h':
+             help();
+             break;
+@@ -3493,15 +3553,20 @@ static int img_amend(int argc, char **argv)
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, "ho:f:t:pq",
++        c = getopt_long(argc, argv, ":ho:f:t:pq",
+                         long_options, NULL);
+         if (c == -1) {
+             break;
+         }
+ 
+         switch (c) {
+-        case 'h':
++        case ':':
++            missing_argument(argv[optind - 1]);
++            break;
+         case '?':
++            unrecognized_option(argv[optind - 1]);
++            break;
++        case 'h':
+             help();
+             break;
+         case 'o':
+@@ -3759,14 +3824,19 @@ static int img_bench(int argc, char **argv)
+             {"no-drain", no_argument, 0, OPTION_NO_DRAIN},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, "hc:d:f:no:qs:S:t:w", long_options, NULL);
++        c = getopt_long(argc, argv, ":hc:d:f:no:qs:S:t:w", long_options, NULL);
+         if (c == -1) {
+             break;
+         }
+ 
+         switch (c) {
+-        case 'h':
++        case ':':
++            missing_argument(argv[optind - 1]);
++            break;
+         case '?':
++            unrecognized_option(argv[optind - 1]);
++            break;
++        case 'h':
+             help();
+             break;
+         case 'c':
+@@ -4093,7 +4163,7 @@ static int img_dd(int argc, char **argv)
+         { 0, 0, 0, 0 }
+     };
+ 
+-    while ((c = getopt_long(argc, argv, "hf:O:", long_options, NULL))) {
++    while ((c = getopt_long(argc, argv, ":hf:O:", long_options, NULL))) {
+         if (c == EOF) {
+             break;
+         }
+@@ -4104,10 +4174,12 @@ static int img_dd(int argc, char **argv)
+         case 'f':
+             fmt = optarg;
+             break;
++        case ':':
++            missing_argument(argv[optind - 1]);
++            break;
+         case '?':
+-            error_report("Try 'qemu-img --help' for more information.");
+-            ret = -1;
+-            goto out;
++            unrecognized_option(argv[optind - 1]);
++            break;
+         case 'h':
+             help();
+             break;
+@@ -4336,10 +4408,15 @@ int main(int argc, char **argv)
+     qemu_add_opts(&qemu_source_opts);
+     qemu_add_opts(&qemu_trace_opts);
+ 
+-    while ((c = getopt_long(argc, argv, "+hVT:", long_options, NULL)) != -1) {
++    while ((c = getopt_long(argc, argv, "+:hVT:", long_options, NULL)) != -1) {
+         switch (c) {
+-        case 'h':
++        case ':':
++            missing_argument(argv[optind - 1]);
++            return 0;
+         case '?':
++            unrecognized_option(argv[optind - 1]);
++            return 0;
++        case 'h':
+             help();
+             return 0;
+         case 'V':
+-- 
 2.12.1
