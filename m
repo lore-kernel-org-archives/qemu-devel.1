@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1csXL0-0007rN-Cc
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:17:47 -0400
+	(envelope-from <agraf@suse.de>) id 1csXPs-0003VR-O0
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:22:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1csXKv-0002z4-CC
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:17:46 -0400
-Received: from mail-db5eur01on0114.outbound.protection.outlook.com
-	([104.47.2.114]:52352
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1csXKu-0002sS-O2
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:17:41 -0400
-References: <1490628915-19459-1-git-send-email-den@openvz.org>
-	<accb1519-45c3-e287-0408-7c02c9714ed2@redhat.com>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <c15d21d5-71ea-2454-d4fc-48e4cec9408a@openvz.org>
-Date: Mon, 27 Mar 2017 19:17:28 +0300
+	(envelope-from <agraf@suse.de>) id 1csXPn-0002JH-QL
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:22:48 -0400
+Received: from mx2.suse.de ([195.135.220.15]:39012)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <agraf@suse.de>) id 1csXPn-0002Gy-KJ
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:22:43 -0400
+References: <1490624810-44752-1-git-send-email-agraf@suse.de>
+	<20170327154636.GI28530@thinpad.lan.raisama.net>
+From: Alexander Graf <agraf@suse.de>
+Message-ID: <437e1004-b9b2-e9c0-cc89-5c926eb0b306@suse.de>
+Date: Mon, 27 Mar 2017 18:22:41 +0200
 MIME-Version: 1.0
-In-Reply-To: <accb1519-45c3-e287-0408-7c02c9714ed2@redhat.com>
-Content-Type: text/plain; charset="iso-8859-15"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC for 2.9 1/1] block: add missed
- aio_context_acquire into blk_unref
+In-Reply-To: <20170327154636.GI28530@thinpad.lan.raisama.net>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] i386: Allow monitor / mwait cpuid override
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,90 +27,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, kvm@vger.kernel.org
 
-On 03/27/2017 06:45 PM, Max Reitz wrote:
-> @Subject: Do you mean "PATCH for-2.9?"? Because "RFC" to me means
-> "please do not merge". ;-)
+
+
+On 27/03/2017 17:46, Eduardo Habkost wrote:
+> On Mon, Mar 27, 2017 at 04:26:50PM +0200, Alexander Graf wrote:
+>> KVM allows trap and emulate (read: NOP) of the MONITOR and MWAIT
+>> instructions. There is work undergoing to enable actual execution
+>> of these inside of KVM, but nobody really wants to expose the feature
+>> to the guest by default, as it would eat up all of the host CPU.
 >
-> I wouldn't mind a change like this to go into 2.9.
-I am quite sure that problem is here but unsure about the place.
-Here I use term 'RFC' as 'Can we start the discussion'?
-
-
-> On 27.03.2017 17:35, Denis V. Lunev wrote:
->> Recently we expirience hang with iothreads enabled with the following
->> call trace:
->> Thread 1 (Thread 0x7fa95efebc80 (LWP 177117)):
->> 0  ppoll () from /lib64/libc.so.6
->> 2  qemu_poll_ns () at qemu-timer.c:313
->> 3  aio_poll () at aio-posix.c:457
->> 4  bdrv_flush () at block/io.c:2641
->> 5  bdrv_close () at block.c:2143
->> 6  bdrv_delete () at block.c:2352
->> 7  bdrv_unref () at block.c:3429
->> 8  blk_remove_bs () at block/block-backend.c:427
->> 9  blk_delete () at block/block-backend.c:178
->> 10 blk_unref () at block/block-backend.c:226
->> 11 object_property_del_all () at qom/object.c:399
->> 12 object_finalize () at qom/object.c:461
->> 13 object_unref () at qom/object.c:898
->> 14 object_property_del_child () at qom/object.c:422
->> 15 qmp_marshal_device_del () at qmp-marshal.c:1145
->> 16 handle_qmp_command () at /usr/src/debug/qemu-2.6.0/monitor.c:3929
->>
->> Technically bdrv_flush() stucks in
->>     while (rwco.ret =3D=3D NOT_DONE) {
->>         aio_poll(aio_context, true);
->>     }
->> but rwco.ret is equal to 0 thus we have missed wakeup. Code investigat=
-ion
->> reveals that we do not have performed aio_context_acquire() on this ca=
-ll
->> stack.
->>
->> This patch adds missed lock.
->>
->> Signed-off-by: Denis V. Lunev <den@openvz.org>
->> CC: Kevin Wolf <kwolf@redhat.com>
->> CC: Max Reitz <mreitz@redhat.com>
->> CC: Eric Blake <eblake@redhat.com>
->> CC: Markus Armbruster <armbru@redhat.com>
->> ---
->>  block/block-backend.c | 4 ++++
->>  1 file changed, 4 insertions(+)
->>
->> diff --git a/block/block-backend.c b/block/block-backend.c
->> index 5742c09..65d5da9 100644
->> --- a/block/block-backend.c
->> +++ b/block/block-backend.c
->> @@ -273,7 +273,11 @@ void blk_unref(BlockBackend *blk)
->>      if (blk) {
->>          assert(blk->refcnt > 0);
->>          if (!--blk->refcnt) {
->> +            AioContext *ctx =3D blk_get_aio_context(blk);
->> +
->> +            aio_context_acquire(ctx);
->>              blk_delete(blk);
->> +            aio_context_release(ctx);
-> But I don't think this is quite the correct place. The caller of
-> blk_unref() should have acquired the AioContext already. As far as I ca=
-n
-> tell in this case that would be originally release_drive() in
-> hw/core/qdev-properties-system.c and then blk_detach_dev().
+> Isn't this something that should be reported using
+> KVM_GET_EMULATED_CPUID? (QEMU still doesn't know how to use
+> KVM_GET_EMULATED_CPUID, however.)
 >
-> I think the former would be the somehow more correct place but I can
-> imagine the latter to be more useful in reality. I'll leave it to you.
+>>
+>> So today there is no streamlined way to actually notify the guest that
+>> it's ok to execute MONITOR / MWAIT, even when we want to explicitly
+>> leave the guest in guest context.
 >
-> (As an alternative, you may of course convince me that this patch is
-> indeed correct and should be taken as-is. :-))
-ha-ha ;) no, I not going to try to convince you and that is why the
-patch was
-marked as RFC. I like release_drive() place. This should solve the proble=
-m
-for me.
+> I'm not familiar with the variables involved in this decision.
+> How exactly would somebody (human or software) determine if it's
+> really ok to let the guest execute MONITOR / MWAIT?
+>
+> Under what circumstances do you expect this to be used? Is this
+> just for debugging and development?
+>
+>>
+>> This patch adds a new -cpu parameter called "mwait" which - when
+>> enabled - force enables the MONITOR / MWAIT CPUID flag, even when
+>> the underlying accel framework does not explicitly advertise support.
+>>
+>
+> If you really want something that makes QEMU ignore what the
+> accel code is reporting, I would prefer a syntax that could be
+> used for other features too, like "-cpu ...,monitor=force".
 
-Thank you for the quick answer and good proposal.
+Is there any QOM property that does this yet? I can't seem to find any 
+tri-state (on/off/force) parsers and I want to make sure I don't 
+reinvent the wheel.
 
-Den
+
+Alex
