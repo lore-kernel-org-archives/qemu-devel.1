@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1csZaK-00079g-SE
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:41:45 -0400
+	(envelope-from <James.Hogan@imgtec.com>) id 1csZe6-0007xh-Lh
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:45:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1csZaH-00033F-N1
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:41:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57990)
+	(envelope-from <James.Hogan@imgtec.com>) id 1csZe1-0005qg-MP
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:45:38 -0400
+Received: from mailapp01.imgtec.com ([195.59.15.196]:51392
+	helo=imgpgp01.kl.imgtec.org)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1csZaH-00031m-Di
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:41:41 -0400
-References: <20170327182137.7006-1-laurent@vivier.eu>
-	<20170327182137.7006-2-laurent@vivier.eu>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <237b2650-da58-c844-d594-390f41e23e65@redhat.com>
-Date: Mon, 27 Mar 2017 13:41:36 -0500
+	(Exim 4.71) (envelope-from <James.Hogan@imgtec.com>)
+	id 1csZe1-0005ps-DP
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:45:33 -0400
+Date: Mon, 27 Mar 2017 19:45:28 +0100
+From: James Hogan <james.hogan@imgtec.com>
+Message-ID: <20170327184528.GQ31606@jhogan-linux.le.imgtec.org>
+References: <20170317215725.GJ996@jhogan-linux.le.imgtec.org>
+	<6b3ec98b-55e2-ecc8-d962-dc9d13866319@redhat.com>
+	<20170320174101-mutt-send-email-mst@kernel.org>
+	<c92a77f3-7ddc-c0b8-7046-6d8f1c56aec7@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170327182137.7006-2-laurent@vivier.eu>
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="0WUKN1SfB0Xe1WnnaJE9mFKG1apNLw5ae"
-Subject: Re: [Qemu-devel] [PATCH 1/1] slirp: add SOCKS5 support
+	protocol="application/pgp-signature"; boundary="qcTtWMBd/uZDG7+Y"
+Content-Disposition: inline
+In-Reply-To: <c92a77f3-7ddc-c0b8-7046-6d8f1c56aec7@redhat.com>
+Subject: Re: [Qemu-devel] [BUG] virtio-net linux driver fails to probe on
+ MIPS Malta since 'hw/virtio-pci: fix virtio behaviour'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,101 +33,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, Samuel Thibault <samuel.thibault@ens-lyon.org>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, virtualization@lists.linux-foundation.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0WUKN1SfB0Xe1WnnaJE9mFKG1apNLw5ae
-From: Eric Blake <eblake@redhat.com>
-To: Laurent Vivier <laurent@vivier.eu>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
- "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <237b2650-da58-c844-d594-390f41e23e65@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] slirp: add SOCKS5 support
-References: <20170327182137.7006-1-laurent@vivier.eu>
- <20170327182137.7006-2-laurent@vivier.eu>
-In-Reply-To: <20170327182137.7006-2-laurent@vivier.eu>
+--qcTtWMBd/uZDG7+Y
 Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 03/27/2017 01:21 PM, Laurent Vivier wrote:
-> When the VM is used behind a firewall, This allows
-> to use a SOCKS5 proxy server to connect the VM IP stack
+Hi Marcel,
 
-"allows to $verb" is not idiomatic English; the correct forms are
-generally "allows $subject to $verb" or "allows ${verb}ing".  In this
-case, I'd lean towards "this allows the use of a SOCKS5 proxy server"
-
-> directly to the Internet.
+On Tue, Mar 21, 2017 at 04:16:58PM +0200, Marcel Apfelbaum wrote:
+> Can you please check if the below patch fixes the problem?
+> Please note it is not a solution.
 >=20
-> This implementation doesn't manage UDP packets, so they
-> are simply dropped (as with restrict=3Don), except for
-> the localhost as we need it for DNS.
+> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> index f9b7244..5b4d429 100644
+> --- a/hw/virtio/virtio-pci.c
+> +++ b/hw/virtio/virtio-pci.c
+> @@ -1671,9 +1671,7 @@ static void virtio_pci_device_plugged(DeviceState *=
+d, Error **errp)
+>           }
 >=20
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
+>           pci_register_bar(&proxy->pci_dev, proxy->modern_mem_bar_idx,
+> -                         PCI_BASE_ADDRESS_SPACE_MEMORY |
+> -                         PCI_BASE_ADDRESS_MEM_PREFETCH |
+> -                         PCI_BASE_ADDRESS_MEM_TYPE_64,
+> +                         PCI_BASE_ADDRESS_SPACE_MEMORY,
+>                            &proxy->modern_bar);
+>=20
+>           proxy->config_cap =3D virtio_pci_add_mem_cap(proxy, &cfg.cap);
 
-> +++ b/qapi-schema.json
-> @@ -3680,6 +3680,9 @@
->      '*ipv6-dns':         'str',
->      '*smb':       'str',
->      '*smbserver': 'str',
-> +    '*proxy-server': 'str',
-> +    '*proxy-user':   'str',
-> +    '*proxy-passwd': 'str',
+Sorry for the delay trying this, I was away last week.
 
-Why can't we spell this out as password, instead of abbreviating?
-Should this hook into the "secrets object" framework so that someone
-does not have to pass the password in plaintext?
+No, it doesn't seem to make any difference.
 
->      '*hostfwd':   ['String'],
->      '*guestfwd':  ['String'] } }
+Thanks
+James
 
-Missing documentation.
-
-Do we want all three proxy elements to be in a substruct? The difference
-is between:
-
-{ ... "smb": "foo", "proxy-server": "bar", "proxy-user": "noone",
-"proxy-passwd": "hello" }
-
-and a substruct:
-
-{ ... "smb": "foo", "proxy": { "server": "bar", "user", "noone",
-"passwd": "hello" } }
-
-
-> =20
-> +@item proxy-server=3D@var{addr}:@var{port}[,proxy-user=3D@var{user},pr=
-oxy-passwd=3D@var{passwd}]]
-
-Yes, you DEFINITELY need to hook into the "secrets object" framework to
-avoid having to pass a password in plaintext on the command line.  Dan
-Berrange may have more advice on doing that.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---0WUKN1SfB0Xe1WnnaJE9mFKG1apNLw5ae
+--qcTtWMBd/uZDG7+Y
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Content-Description: Digital signature
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJY2VzgAAoJEKeha0olJ0NqHrUH/398n2bOxDZ0lDDyxjB4Ghmd
-r0kL9wLdfAXkYF2cy9ZO568g6Fti/ui+N8H9FTRSiwczGA5EDM+rEtjZLGaqLcKk
-RL/xEODdXvsF3LZd0T10mCma3CTsbjmd58JtCgxIhpsrRYvMxza/hFe6L8zwMENs
-RzCmpvj5YOwszVbPwYmO84AoiT+a8t8e4QgGkYu4kHbz53WryGom+LWjkyme4/vQ
-4FRJQYdYCXOmypQmHVLnJy0mFVHvOi4CIbTLuTDpfqyuWghY58r0Wupwnase243e
-cMLlA8HKRCaRY6cIFksaV8Q0kpBviqGTBEP4HdTiSBLO3SLLi8MnMFuhzYSrgf0=
-=z2m6
+iQIcBAEBCAAGBQJY2V3IAAoJEGwLaZPeOHZ6qz8QAKGWlc6KTI7rybtB7mjTGSnd
+M8Rkp4d7AZtS+pJTdiyl5B5MmRl6Jsrq7hF546Lq4KL4jB7XIqsn9FyvDfO1wGpa
+tIdi0q3wimxOuj/VRez+NgeqS0ThhhmxEJGCSUi2tpt6OyCO1jxdUtvox6VX1tzb
+DArpXyuCcfa7CyCTniStAWt5umHRZdL9t6OsAhn7iMsyTHYc9yFq2fgd4me6D5nQ
+q4KHNK/N7N25ADvvuk5/iiU1a4uoBAXjsanXhe6xQrr9sxfrWHSONu8cFMU9ToKR
+FlVTt6qEq12Qoo4W/Ryt1lp0QYt/Xm2+RxNNekiEUVD5nOhprh38HIPaSBXDYz8d
+eCl/QVfASOQfC0WB8oyLERHK9DCiDHxfvPyAc5Frsm9qZtoXDaxKyuMBvv7ZVVKZ
+jYn69rJnogM1xOmZ0+DNoNoTQtmbG0anz3Bzh5b2hXZYrBrc54Ddb0fTEzcZ95Z7
+6WTn/tlFp7CyHTpynxSPTmCWm6e+pshn1H+XJo/PgG+rC/O0jMOMC6aoY/7aI+m7
+7xUaz4J+L3GMtWs0LWJHxHhQTyEuFqOtPDzSPuVQGDexgX1chWPRcje0EYW6gnbr
+zKiozfA2/lcNiT2Rg8ETR2ptuhJd+lJk6Ex9kSntUdVVPo6Nm2v+q0NMcaM71xtk
++mD09HeTDntwWExYAVJp
+=Hzmk
 -----END PGP SIGNATURE-----
 
---0WUKN1SfB0Xe1WnnaJE9mFKG1apNLw5ae--
+--qcTtWMBd/uZDG7+Y--
