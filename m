@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1csVUa-0004tF-7Q
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 10:19:33 -0400
+	(envelope-from <mreitz@redhat.com>) id 1csVUp-0004zt-5s
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 10:19:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1csVUX-0003N5-0A
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 10:19:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58852)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1csVUW-0003MN-Nz
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 10:19:28 -0400
-Date: Mon, 27 Mar 2017 11:19:19 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170327141919.GH28530@thinpad.lan.raisama.net>
-References: <20170324203645.12828-1-ehabkost@redhat.com>
-	<20170327131059.4580f299@nial.brq.redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1csVUo-0003Wr-4j
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 10:19:47 -0400
+References: <20170313214001.26339-1-mreitz@redhat.com>
+	<20170313214001.26339-2-mreitz@redhat.com>
+	<20170320101828.GC17887@stefanha-x1.localdomain>
+	<56ea38e1-61fa-9339-741a-dbe8ceed8816@redhat.com>
+	<20170322162859.GC16717@stefanha-x1.localdomain>
+	<52aecf7b-5cd7-44d0-94bf-bce90588da32@redhat.com>
+	<20170323153241.GG12560@stefanha-x1.localdomain>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <8bc2b49b-3602-388e-c939-1a1a544ffe62@redhat.com>
+Date: Mon, 27 Mar 2017 16:19:36 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170327131059.4580f299@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9] i386: Don't override -cpu options
- on -cpu host/max
+In-Reply-To: <20170323153241.GG12560@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="TJLPuTECpGFpGuXRO4FnMCW8vi4U13Vjq"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.10 01/16] block: Add
+ PreallocMode to BD.bdrv_truncate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,184 +30,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, "Collin L . Walling" <walling@linux.vnet.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-On Mon, Mar 27, 2017 at 01:10:59PM +0200, Igor Mammedov wrote:
-> On Fri, 24 Mar 2017 17:36:45 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
-> 
-> > The existing code for "host" and "max" CPU models overrides every
-> > single feature in the CPU object at realize time, even the ones
-> > that were explicitly enabled or disabled by the user using
-> > "feat=on" or "feat=off", while features set using +feat/-feat are
-> > kept.
-> > 
-> > This means "-cpu host,+invtsc" works as expected, while
-> > "-cpu host,invtsc=on" doesn't.
-> > 
-> > This was a known bug, already documented in a comment inside
-> > x86_cpu_expand_features(). What makes this bug worse now is that
-> > libvirt 3.0.0 and newer now use "feat=on|off" instead of
-> > +feat/-feat when it detects a QEMU version that supports it (see
-> > libvirt commit d47db7b16dd5422c7e487c8c8ee5b181a2f9cd66).
-> > 
-> > Change the feature property getter/setter to set a
-> > env->user_features field, to keep track of features that were
-> > explicitly changed using QOM properties. Then make the
-> > max_features code not override user features when handling "-cpu
-> > host" and "-cpu max".
-> > 
-> > This will also allow us to remove the plus_features/minus_features
-> > hack in the future, but I plan to do that after 2.9.0 is
-> > released.
-> > 
-> > Reported-by: Jiri Denemark <jdenemar@redhat.com>
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> >  target/i386/cpu.h |  2 ++
-> >  target/i386/cpu.c | 33 +++++++++++++++++++++------------
-> >  2 files changed, 23 insertions(+), 12 deletions(-)
-> > 
-> > diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> > index 07401ad9fe..c4602ca80d 100644
-> > --- a/target/i386/cpu.h
-> > +++ b/target/i386/cpu.h
-> > @@ -1147,6 +1147,8 @@ typedef struct CPUX86State {
-> >      uint32_t cpuid_vendor3;
-> >      uint32_t cpuid_version;
-> >      FeatureWordArray features;
-> > +    /* Features that were explicitly enabled/disabled */
-> > +    FeatureWordArray user_features;
-> >      uint32_t cpuid_model[12];
-> >  
-> >      /* MTRRs */
-> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > index 7aa762245a..5f2addbf75 100644
-> > --- a/target/i386/cpu.c
-> > +++ b/target/i386/cpu.c
-> > @@ -3373,15 +3373,20 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
-> >      GList *l;
-> >      Error *local_err = NULL;
-> >  
-> > -    /*TODO: cpu->max_features incorrectly overwrites features
-> > -     * set using "feat=on|off". Once we fix this, we can convert
-> > +    /*TODO: Now cpu->max_features doesn't overwrite features
-> > +     * set using QOM properties, and we can convert
-> >       * plus_features & minus_features to global properties
-> >       * inside x86_cpu_parse_featurestr() too.
-> >       */
-> >      if (cpu->max_features) {
-> >          for (w = 0; w < FEATURE_WORDS; w++) {
-> > -            env->features[w] =
-> > -                x86_cpu_get_supported_feature_word(w, cpu->migratable);
-> > +            /* Override only features that weren't not set explicitly
-> > +             * by the user.
-> s/not// or if it was intended rephrase to avoid double negation.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--TJLPuTECpGFpGuXRO4FnMCW8vi4U13Vjq
+From: Max Reitz <mreitz@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ qemu-devel@nongnu.org
+Message-ID: <8bc2b49b-3602-388e-c939-1a1a544ffe62@redhat.com>
+Subject: Re: [Qemu-block] [PATCH for-2.10 01/16] block: Add PreallocMode to
+ BD.bdrv_truncate()
+References: <20170313214001.26339-1-mreitz@redhat.com>
+ <20170313214001.26339-2-mreitz@redhat.com>
+ <20170320101828.GC17887@stefanha-x1.localdomain>
+ <56ea38e1-61fa-9339-741a-dbe8ceed8816@redhat.com>
+ <20170322162859.GC16717@stefanha-x1.localdomain>
+ <52aecf7b-5cd7-44d0-94bf-bce90588da32@redhat.com>
+ <20170323153241.GG12560@stefanha-x1.localdomain>
+In-Reply-To: <20170323153241.GG12560@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-I will fix that, thanks for spotting it.
+On 23.03.2017 16:32, Stefan Hajnoczi wrote:
+> On Wed, Mar 22, 2017 at 05:50:59PM +0100, Max Reitz wrote:
+>> On 22.03.2017 17:28, Stefan Hajnoczi wrote:
+>>> On Mon, Mar 20, 2017 at 04:07:16PM +0100, Max Reitz wrote:
+>>>> On 20.03.2017 11:18, Stefan Hajnoczi wrote:
+>>>>> On Mon, Mar 13, 2017 at 10:39:46PM +0100, Max Reitz wrote:
+>>>>>> diff --git a/block/iscsi.c b/block/iscsi.c
+>>>>>> index ab559a6f71..5d6265c4a6 100644
+>>>>>> --- a/block/iscsi.c
+>>>>>> +++ b/block/iscsi.c
+>>>>>> @@ -2060,11 +2060,16 @@ static void iscsi_reopen_commit(BDRVReopen=
+State *reopen_state)
+>>>>>>      }
+>>>>>>  }
+>>>>>> =20
+>>>>>> -static int iscsi_truncate(BlockDriverState *bs, int64_t offset, E=
+rror **errp)
+>>>>>> +static int iscsi_truncate(BlockDriverState *bs, int64_t offset,
+>>>>>> +                          PreallocMode prealloc, Error **errp)
+>>>>>>  {
+>>>>>>      IscsiLun *iscsilun =3D bs->opaque;
+>>>>>>      Error *local_err =3D NULL;
+>>>>>> =20
+>>>>>> +    if (prealloc !=3D PREALLOC_MODE_OFF) {
+>>>>>> +        return -ENOTSUP;
+>>>>>> +    }
+>>>>>> +
+>>>>>>      if (iscsilun->type !=3D TYPE_DISK) {
+>>>>>>          return -ENOTSUP;
+>>>>>>      }
+>>>>>
+>>>>> Nevermind what I said about adding a BiteSizedTasks entry:
+>>>>>
+>>>>> The missing errp usage is not in qemu.git/master yet.  Please fix u=
+p
+>>>>> your bdrv_truncate() errp patch to use errp in all cases, e.g.
+>>>>> error_setg("Unable to truncate non-disk LUN").
+>>>>
+>>>> The thing is that I wasn't comfortable doing that for all block driv=
+ers.
+>>>> I mean, I can take another look but I'd rather have vague error mess=
+ages
+>>>> ("truncation failed: #{strerror}") than outright wrong ones because =
+I
+>>>> didn't know what error message to use.
+>>>>
+>>>> Of course you could argue that this may probably come out during rev=
+iew
+>>>> but that implies that every submaintainer for every block driver wou=
+ld
+>>>> actually come out for review...
+>>>
+>>> I'm worried about errp being set in only a subset of error cases.
+>>>
+>>> This is likely to cause bugs if callers use if (local_err).  Grepping=
 
-> 
-> > +             */
-> > +            env->features[w] &= env->user_features[w];
-> it probably should be assert to catch features not set via property,
-> which shouldn't be there in the first place, I don't like silent
-> filtering that happens here.
+>>> through the codebase I can see instances of:
+>>
+>> Yes, but the generic bdrv_truncate() will always set errp if the drive=
+r
+>> hasn't done so.
+>=20
+> I prefer consistently setting errp to make patch review easy (no
+> checking all callers to see how they behave), making it safe to
+> copy-paste the code elsewhere, etc.
 
-I wouldn't like to add an assert() so late in the 2.9 schedule.
-But you are right that having anything present in
-(env->features & ~env->user_features) would be a bug somewhere
-else, and this line is not necessary.
+The thing is, there is only a single caller for all of the
+BlockDriver.bdrv_truncate() functions and that is the generic
+bdrv_truncate() function.
 
-> 
-> > +            env->features[w] |=
-> > +                x86_cpu_get_supported_feature_word(w, cpu->migratable) &
-> > +                ~env->user_features[w];
-> >          }
-> >      }
-> >  
-> > @@ -3692,15 +3697,17 @@ static void x86_cpu_unrealizefn(DeviceState *dev, Error **errp)
-> >  }
-> >  
-> >  typedef struct BitProperty {
-> > -    uint32_t *ptr;
-> > +    FeatureWord w;
-> it would be better if this refactoring and related changes
-> were in a separate patch, something along lines:
->  "x86/cpu: use FeatureWord instead of keeping a pointer to cpuid leaf"
+I mean, of course I can copy-paste my generic error message from the
+global bdrv_truncate() function into every driver where I'm not sure
+what error to emit, but I find that a bit... Well, it looks bad when you
+just look at the code without the history behind it.
 
-I will do it in v2.
+But since you insist, I'll do so gladly. :-)
 
-> 
-> >      uint32_t mask;
-> >  } BitProperty;
-> >  
-> >  static void x86_cpu_get_bit_prop(Object *obj, Visitor *v, const char *name,
-> >                                   void *opaque, Error **errp)
-> >  {
-> > +    X86CPU *cpu = X86_CPU(obj);
-> >      BitProperty *fp = opaque;
-> > -    bool value = (*fp->ptr & fp->mask) == fp->mask;
-> > +    uint32_t f = cpu->env.features[fp->w];
-> > +    bool value = (f & fp->mask) == fp->mask;
-> >      visit_type_bool(v, name, &value, errp);
-> >  }
-> >  
-> > @@ -3708,6 +3715,7 @@ static void x86_cpu_set_bit_prop(Object *obj, Visitor *v, const char *name,
-> >                                   void *opaque, Error **errp)
-> >  {
-> >      DeviceState *dev = DEVICE(obj);
-> > +    X86CPU *cpu = X86_CPU(obj);
-> >      BitProperty *fp = opaque;
-> >      Error *local_err = NULL;
-> >      bool value;
-> > @@ -3724,10 +3732,11 @@ static void x86_cpu_set_bit_prop(Object *obj, Visitor *v, const char *name,
-> >      }
-> >  
-> >      if (value) {
-> > -        *fp->ptr |= fp->mask;
-> > +        cpu->env.features[fp->w] |= fp->mask;
-> >      } else {
-> > -        *fp->ptr &= ~fp->mask;
-> > +        cpu->env.features[fp->w] &= ~fp->mask;
-> >      }
-> > +    cpu->env.user_features[fp->w] |= fp->mask;
-> >  }
-> >  
-> >  static void x86_cpu_release_bit_prop(Object *obj, const char *name,
-> > @@ -3745,7 +3754,7 @@ static void x86_cpu_release_bit_prop(Object *obj, const char *name,
-> >   */
-> >  static void x86_cpu_register_bit_prop(X86CPU *cpu,
-> >                                        const char *prop_name,
-> > -                                      uint32_t *field,
-> > +                                      FeatureWord w,
-> >                                        int bitnr)
-> >  {
-> >      BitProperty *fp;
-> > @@ -3755,11 +3764,11 @@ static void x86_cpu_register_bit_prop(X86CPU *cpu,
-> >      op = object_property_find(OBJECT(cpu), prop_name, NULL);
-> >      if (op) {
-> >          fp = op->opaque;
-> > -        assert(fp->ptr == field);
-> > +        assert(fp->w == w);
-> >          fp->mask |= mask;
-> >      } else {
-> >          fp = g_new0(BitProperty, 1);
-> > -        fp->ptr = field;
-> > +        fp->w = w;
-> >          fp->mask = mask;
-> >          object_property_add(OBJECT(cpu), prop_name, "bool",
-> >                              x86_cpu_get_bit_prop,
-> > @@ -3787,7 +3796,7 @@ static void x86_cpu_register_feature_bit_props(X86CPU *cpu,
-> >      /* aliases don't use "|" delimiters anymore, they are registered
-> >       * manually using object_property_add_alias() */
-> >      assert(!strchr(name, '|'));
-> > -    x86_cpu_register_bit_prop(cpu, name, &cpu->env.features[w], bitnr);
-> > +    x86_cpu_register_bit_prop(cpu, name, w, bitnr);
-> >  }
-> >  
-> >  static GuestPanicInformation *x86_cpu_get_crash_info(CPUState *cs)
-> 
+Max
 
--- 
-Eduardo
+> It's safer to be consistent, can produce more detailed error messages,
+> and the cost of writing error_setg() calls is low.  But it's a matter o=
+f
+> style, you've pointed out the code is technically correct right now.
+>=20
+> Stefan
+>=20
+
+
+
+--TJLPuTECpGFpGuXRO4FnMCW8vi4U13Vjq
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljZH3gSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ADX0IALTqw/IZRAzK6z7puSx4ZVBFE1wQE6K0
+S8/VgySJ33yW6D04xfUGvVR+c8FJAmMKmfMhegeTZaMnPs6O9xrITIMwunFLiEWA
+DC3blymEpyvCEsUV1g6lqVDFj/gJU+eNjpqsu2qhUQVm8yXASKMmQrk2T/MuYu4H
+POK5+ci+nW+I92w5ILaqxoF/0HbTLU0HA3Lr8iPQdlyB7d8ckGacHMSfTaEQEwPA
+F3BWTGNcv1X1U5Uhd8GDm7SMDDHyRA/2mDSCZWOlDi3xXntbcA2tyJBsXPULlZKs
+TM7Y/z1C+JMMxpWbuxrQMKaTbT3t3ggk+T5/ckfRBIzOWwF6rL8+y5U=
+=UguB
+-----END PGP SIGNATURE-----
+
+--TJLPuTECpGFpGuXRO4FnMCW8vi4U13Vjq--
