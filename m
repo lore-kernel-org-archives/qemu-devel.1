@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jgross@suse.com>) id 1csQkI-0005A2-4M
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 05:15:31 -0400
+	(envelope-from <yi.l.liu@intel.com>) id 1csQqh-0006Dw-TL
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 05:22:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jgross@suse.com>) id 1csQkE-0004mc-2W
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 05:15:26 -0400
-Received: from mx2.suse.de ([195.135.220.15]:44454)
+	(envelope-from <yi.l.liu@intel.com>) id 1csQqd-0007eO-VL
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 05:22:03 -0400
+Received: from mga05.intel.com ([192.55.52.43]:53449)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jgross@suse.com>) id 1csQkD-0004jj-Ry
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 05:15:21 -0400
-References: <20170327074245.3821-1-jgross@suse.com>
-	<1330e0a0d9814073b39b52bd6e08a6a8@AMSPEX02CL03.citrite.net>
-From: Juergen Gross <jgross@suse.com>
-Message-ID: <552de1bb-46bf-1579-d8b2-763d4612eb44@suse.com>
-Date: Mon, 27 Mar 2017 11:14:39 +0200
+	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1csQqd-0007eF-Ke
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 05:21:59 -0400
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+Date: Mon, 27 Mar 2017 09:21:53 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C257439032D78@shsmsx102.ccr.corp.intel.com>
+References: <1486456099-7345-1-git-send-email-peterx@redhat.com>
+	<1486456099-7345-15-git-send-email-peterx@redhat.com>
+	<A2975661238FB949B60364EF0F2C257439032C79@shsmsx102.ccr.corp.intel.com>
+	<20170327091208.GG11497@pxdev.xzpeter.org>
+In-Reply-To: <20170327091208.GG11497@pxdev.xzpeter.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <1330e0a0d9814073b39b52bd6e08a6a8@AMSPEX02CL03.citrite.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] configure: use pkg-config for obtaining
- xen version
+Subject: Re: [Qemu-devel] [PATCH v7 14/17] memory: add
+ MemoryRegionIOMMUOps.replay() callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +31,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <Paul.Durrant@citrix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>, "kraxel@redhat.com" <kraxel@redhat.com>, "sstabellini@kernel.org" <sstabellini@kernel.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "Lan, Tianyu" <tianyu.lan@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, "mst@redhat.com" <mst@redhat.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "bd.aviv@gmail.com" <bd.aviv@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 27/03/17 11:07, Paul Durrant wrote:
->> -----Original Message-----
->> From: Juergen Gross [mailto:jgross@suse.com]
->> Sent: 27 March 2017 08:43
->> To: qemu-devel@nongnu.org; xen-devel@lists.xenproject.org
->> Cc: Anthony Perard <anthony.perard@citrix.com>; kraxel@redhat.com;
->> sstabellini@kernel.org; Paul Durrant <Paul.Durrant@citrix.com>; Juergen
->> Gross <jgross@suse.com>
->> Subject: [PATCH v2] configure: use pkg-config for obtaining xen version
->>
->> Instead of trying to guess the Xen version to use by compiling various
->> test programs first just ask the system via pkg-config. Only if it
->> can't return the version fall back to the test program scheme.
->>
->> If configure is being called with dedicated flags for the Xen libraries
->> use those instead of the pkg-config output. This will avoid breaking
->> an in-tree Xen build of an old Xen version while a new Xen version is
->> installed on the build machine: pkg-config would pick up the installed
->> Xen config files as the Xen tree wouldn't contain any of them.
->>
->> Signed-off-by: Juergen Gross <jgross@suse.com>
->> ---
->> V2: - use pkg-config only if no Xen library paths have been specified via
->>       --extra-ldflags
->>     - keep test program for detecting Xen 4.9
-> 
-> This all looks plausible but it doesn't seem to be working for me when trying to build 4.8. I'm still getting a xen ctrl version of 40900... still trying to figure out why.
-
-I suppose you reverted my previous patch?
-
-Do you happen to have some stale 4.9 libraries in your Xen tree?
-
-What happens without this patch?
-
-> Also, the whitespace changes later on in the patch should probably be split out.
-
-Hmm, those are just due to the nesting level of the if's changed.
-I don't think they can easily be split out without having a
-malformed indentation.
-
-
-Juergen
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBl
+dGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBNb25kYXksIE1hcmNoIDI3LCAyMDE3IDU6MTIgUE0N
+Cj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVAaW50ZWwuY29tPg0KPiBDYzogYWxleC53aWxsaWFt
+c29uQHJlZGhhdC5jb207IExhbiwgVGlhbnl1IDx0aWFueXUubGFuQGludGVsLmNvbT47IFRpYW4s
+IEtldmluDQo+IDxrZXZpbi50aWFuQGludGVsLmNvbT47IG1zdEByZWRoYXQuY29tOyBqYW4ua2lz
+emthQHNpZW1lbnMuY29tOw0KPiBqYXNvd2FuZ0ByZWRoYXQuY29tOyBiZC5hdml2QGdtYWlsLmNv
+bTsgRGF2aWQgR2lic29uDQo+IDxkYXZpZEBnaWJzb24uZHJvcGJlYXIuaWQuYXU+OyBxZW11LWRl
+dmVsQG5vbmdudS5vcmcNCj4gU3ViamVjdDogUmU6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjcgMTQv
+MTddIG1lbW9yeTogYWRkDQo+IE1lbW9yeVJlZ2lvbklPTU1VT3BzLnJlcGxheSgpIGNhbGxiYWNr
+DQo+IA0KPiBPbiBNb24sIE1hciAyNywgMjAxNyBhdCAwODozNTowNUFNICswMDAwLCBMaXUsIFlp
+IEwgd3JvdGU6DQo+ID4gPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+ID4gRnJvbTog
+UWVtdS1kZXZlbA0KPiA+ID4gW21haWx0bzpxZW11LWRldmVsLWJvdW5jZXMreWkubC5saXU9aW50
+ZWwuY29tQG5vbmdudS5vcmddIE9uIEJlaGFsZg0KPiA+ID4gT2YgUGV0ZXIgWHUNCj4gPiA+IFNl
+bnQ6IFR1ZXNkYXksIEZlYnJ1YXJ5IDcsIDIwMTcgNDoyOCBQTQ0KPiA+ID4gVG86IHFlbXUtZGV2
+ZWxAbm9uZ251Lm9yZw0KPiA+ID4gQ2M6IExhbiwgVGlhbnl1IDx0aWFueXUubGFuQGludGVsLmNv
+bT47IFRpYW4sIEtldmluDQo+ID4gPiA8a2V2aW4udGlhbkBpbnRlbC5jb20+OyBtc3RAcmVkaGF0
+LmNvbTsgamFuLmtpc3prYUBzaWVtZW5zLmNvbTsNCj4gPiA+IGphc293YW5nQHJlZGhhdC5jb207
+IHBldGVyeEByZWRoYXQuY29tOyBhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbTsNCj4gPiA+IGJk
+LmF2aXZAZ21haWwuY29tOyBEYXZpZCBHaWJzb24gPGRhdmlkQGdpYnNvbi5kcm9wYmVhci5pZC5h
+dT4NCj4gPiA+IFN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjcgMTQvMTddIG1lbW9yeTog
+YWRkDQo+ID4gPiBNZW1vcnlSZWdpb25JT01NVU9wcy5yZXBsYXkoKSBjYWxsYmFjaw0KPiA+ID4N
+Cj4gPiA+IE9yaWdpbmFsbHkgd2UgaGF2ZSBvbmUgbWVtb3J5X3JlZ2lvbl9pb21tdV9yZXBsYXko
+KSBmdW5jdGlvbiwgd2hpY2gNCj4gPiA+IGlzIHRoZSBkZWZhdWx0IGJlaGF2aW9yIHRvIHJlcGxh
+eSB0aGUgdHJhbnNsYXRpb25zIG9mIHRoZSB3aG9sZQ0KPiA+ID4gSU9NTVUgcmVnaW9uLiBIb3dl
+dmVyLCBvbiBzb21lIHBsYXRmb3JtIGxpa2UgeDg2LCB3ZSBtYXkgd2FudCBvdXIgb3duDQo+IHJl
+cGxheSBsb2dpYyBmb3IgSU9NTVUgcmVnaW9ucy4NCj4gPiA+IFRoaXMgcGF0Y2ggYWRkIG9uZSBt
+b3JlIGhvb2sgZm9yIElPTU1VT3BzIGZvciB0aGUgY2FsbGJhY2ssIGFuZA0KPiA+ID4gaXQnbGwg
+b3ZlcnJpZGUgdGhlIGRlZmF1bHQgaWYgc2V0Lg0KPiA+ID4NCj4gPiA+IFNpZ25lZC1vZmYtYnk6
+IFBldGVyIFh1IDxwZXRlcnhAcmVkaGF0LmNvbT4NCj4gPiA+IC0tLQ0KPiA+ID4gIGluY2x1ZGUv
+ZXhlYy9tZW1vcnkuaCB8IDIgKysNCj4gPiA+ICBtZW1vcnkuYyAgICAgICAgICAgICAgfCA2ICsr
+KysrKw0KPiA+ID4gIDIgZmlsZXMgY2hhbmdlZCwgOCBpbnNlcnRpb25zKCspDQo+ID4gPg0KPiA+
+ID4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvZXhlYy9tZW1vcnkuaCBiL2luY2x1ZGUvZXhlYy9tZW1v
+cnkuaCBpbmRleA0KPiA+ID4gMDc2Nzg4OC4uMzBiMmE3NCAxMDA2NDQNCj4gPiA+IC0tLSBhL2lu
+Y2x1ZGUvZXhlYy9tZW1vcnkuaA0KPiA+ID4gKysrIGIvaW5jbHVkZS9leGVjL21lbW9yeS5oDQo+
+ID4gPiBAQCAtMTkxLDYgKzE5MSw4IEBAIHN0cnVjdCBNZW1vcnlSZWdpb25JT01NVU9wcyB7DQo+
+ID4gPiAgICAgIHZvaWQgKCpub3RpZnlfZmxhZ19jaGFuZ2VkKShNZW1vcnlSZWdpb24gKmlvbW11
+LA0KPiA+ID4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgSU9NTVVOb3RpZmllckZs
+YWcgb2xkX2ZsYWdzLA0KPiA+ID4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgSU9N
+TVVOb3RpZmllckZsYWcgbmV3X2ZsYWdzKTsNCj4gPiA+ICsgICAgLyogU2V0IHRoaXMgdXAgdG8g
+cHJvdmlkZSBjdXN0b21pemVkIElPTU1VIHJlcGxheSBmdW5jdGlvbiAqLw0KPiA+ID4gKyAgICB2
+b2lkICgqcmVwbGF5KShNZW1vcnlSZWdpb24gKmlvbW11LCBJT01NVU5vdGlmaWVyICpub3RpZmll
+cik7DQo+ID4gPiAgfTsNCj4gPiA+DQo+ID4gPiAgdHlwZWRlZiBzdHJ1Y3QgQ29hbGVzY2VkTWVt
+b3J5UmFuZ2UgQ29hbGVzY2VkTWVtb3J5UmFuZ2U7IGRpZmYNCj4gPiA+IC0tZ2l0IGEvbWVtb3J5
+LmMgYi9tZW1vcnkuYyBpbmRleCA3YTRmMmY5Li45YzI1M2NjIDEwMDY0NA0KPiA+ID4gLS0tIGEv
+bWVtb3J5LmMNCj4gPiA+ICsrKyBiL21lbW9yeS5jDQo+ID4gPiBAQCAtMTYzMCw2ICsxNjMwLDEy
+IEBAIHZvaWQgbWVtb3J5X3JlZ2lvbl9pb21tdV9yZXBsYXkoTWVtb3J5UmVnaW9uDQo+ID4gPiAq
+bXIsIElPTU1VTm90aWZpZXIgKm4sDQo+ID4gPiAgICAgIGh3YWRkciBhZGRyLCBncmFudWxhcml0
+eTsNCj4gPiA+ICAgICAgSU9NTVVUTEJFbnRyeSBpb3RsYjsNCj4gPiA+ICsgICAgLyogSWYgdGhl
+IElPTU1VIGhhcyBpdHMgb3duIHJlcGxheSBjYWxsYmFjaywgb3ZlcnJpZGUgKi8NCj4gPiA+ICsg
+ICAgaWYgKG1yLT5pb21tdV9vcHMtPnJlcGxheSkgew0KPiA+ID4gKyAgICAgICAgbXItPmlvbW11
+X29wcy0+cmVwbGF5KG1yLCBuKTsNCj4gPiA+ICsgICAgICAgIHJldHVybjsNCj4gPiA+ICsgICAg
+fQ0KPiA+DQo+ID4gSGkgQWxleCwgUGV0ZXIsDQo+ID4NCj4gPiBXaWxsIGFsbCB0aGUgb3RoZXIg
+dmVuZG9ycyhlLmcuIFBQQywgczM5MCwgQVJNKSBhZGQgdGhlaXIgb3duIHJlcGxheQ0KPiA+IGNh
+bGxiYWNrIGFzIHdlbGw/IEkgZ3Vlc3MgaXQgZGVwZW5kcyBvbiB3aGV0aGVyIHRoZSBvcmlnaW5h
+bCByZXBsYXkNCj4gPiBhbGdvcml0aG0gd29yayB3ZWxsIGZvciB0aGVtPyBEbyB5b3UgaGF2ZSBz
+dWNoIGtub3dsZWRnZT8NCj4gDQo+IEkgZ3Vlc3Mgc28uIEF0IGxlYXN0IGZvciBWVC1kIHdlIGhh
+ZCB0aGlzIGNhbGxiYWNrIHNpbmNlIHRoZSBkZWZhdWx0IHJlcGxheSBtZWNoYW5pc20NCj4gZGlk
+IG5vdCB3b3JrIHdlbGwgb24geDg2IGR1ZSB0byBpdHMgZXh0cmVtZWx5IGxhcmdlIG1lbW9yeSBy
+ZWdpb24gc2l6ZS4gVGhhbmtzLA0KDQp0aHguIHRoYXQgd291bGQgbWFrZSBzZW5zZS4gDQo=
