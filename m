@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1csX8M-0001PK-CP
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:04:43 -0400
+	(envelope-from <agraf@suse.de>) id 1csXEH-0003xv-QW
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:10:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1csX8L-0003jA-IP
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:04:42 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48932)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1csX8L-0003YE-Bd
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:04:41 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 27 Mar 2017 17:04:28 +0100
-Message-Id: <1490630670-15818-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH for-2.9 0/2] tcg/sparc: zero extend ld/st
- helper args
+	(envelope-from <agraf@suse.de>) id 1csXEE-00068z-KW
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:10:49 -0400
+Received: from mx2.suse.de ([195.135.220.15]:37252)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <agraf@suse.de>) id 1csXEE-00068L-EC
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:10:46 -0400
+References: <1490624810-44752-1-git-send-email-agraf@suse.de>
+	<20170327154636.GI28530@thinpad.lan.raisama.net>
+From: Alexander Graf <agraf@suse.de>
+Message-ID: <c14eb231-10d1-63cb-ed14-8b7cd131b7b0@suse.de>
+Date: Mon, 27 Mar 2017 18:10:43 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170327154636.GI28530@thinpad.lan.raisama.net>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] i386: Allow monitor / mwait cpuid override
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,30 +27,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>
-
-These patches fix problems with the SPARC TCG backend code
-which calls the load and store helpers. Where the argument
-being passed to the helper is narrower than the size of the
-native register, the SPARC calling convention requires that
-we extend it to the register size, but we weren't doing that.
-This meant we passed the host code registers which might have
-garbage in the high parts, and if the host code was built
-with optimization this resulted in wrong behaviour.
-
-I still see problems trying to run the bits of 'make check'
-that run guest code, but at least with these patches we can
-run the i386 bios code enough to try to do PXE boot and not
-find a server.
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, kvm@vger.kernel.org
 
 
-Peter Maydell (2):
-  tcg/sparc: Zero extend data argument to store helpers
-  tcg/sparc: Zero extend address argument to ld/st helpers
 
- tcg/sparc/tcg-target.inc.c | 31 +++++++++++++++++++++++++++++--
- 1 file changed, 29 insertions(+), 2 deletions(-)
+On 27/03/2017 17:46, Eduardo Habkost wrote:
+> On Mon, Mar 27, 2017 at 04:26:50PM +0200, Alexander Graf wrote:
+>> KVM allows trap and emulate (read: NOP) of the MONITOR and MWAIT
+>> instructions. There is work undergoing to enable actual execution
+>> of these inside of KVM, but nobody really wants to expose the feature
+>> to the guest by default, as it would eat up all of the host CPU.
+>
+> Isn't this something that should be reported using
+> KVM_GET_EMULATED_CPUID? (QEMU still doesn't know how to use
+> KVM_GET_EMULATED_CPUID, however.)
 
--- 
-2.7.4
+Depends how you look at it. In KVM land there are basically 3 ways to 
+deal with MONITOR/MWAIT:
+
+   1) #VMEXIT on every execution, treat them as NOP
+   2) let the guest natively execute them (looks like a busy loop for 
+the host, but saves power)
+   3) be smart in KVM about it, add actual emulation and adaptively 
+allow for native mwait execution or emulated mwait which means we can 
+run inside host context
+
+>> So today there is no streamlined way to actually notify the guest that
+>> it's ok to execute MONITOR / MWAIT, even when we want to explicitly
+>> leave the guest in guest context.
+>
+> I'm not familiar with the variables involved in this decision.
+> How exactly would somebody (human or software) determine if it's
+> really ok to let the guest execute MONITOR / MWAIT?
+>
+> Under what circumstances do you expect this to be used? Is this
+> just for debugging and development?
+
+The main reason this is bubbling up at all are IPC intensive workloads. 
+Imagine you have the following:
+
+CPU0 goes idle (waiting on something)
+CPU1 wants to wake up CPU0 (because wait time is over)
+
+In a normal KVM environment what you get is that
+
+CPU0 calls HLT (going into KVM to do other work)
+CPU1 triggers IPI via emulated APIC to wake up CPU0
+
+However with actual native MWAIT what happens is
+
+CPU0 calls MWAIT, stays in guest context ("wasting" CPU time)
+CPU1 writes a byte to a memory location, waking up CPU0
+
+With that scheme, you get your IPC latency down by a *huge* margin.
+
+
+When is that useful? When you only have a single VM on your host for 
+example, so you want virtual machines for the sake of administration, 
+not for overprovisioning.
+
+>
+>>
+>> This patch adds a new -cpu parameter called "mwait" which - when
+>> enabled - force enables the MONITOR / MWAIT CPUID flag, even when
+>> the underlying accel framework does not explicitly advertise support.
+>>
+>
+> If you really want something that makes QEMU ignore what the
+> accel code is reporting, I would prefer a syntax that could be
+> used for other features too, like "-cpu ...,monitor=force".
+
+That sounds like a pretty nice idea and much more scalable. Let me see 
+if I can somehow pull that off :).
+
+
+Alex
