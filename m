@@ -1,18 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1csUWU-00073J-P8
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:17:28 -0400
+	(envelope-from <stefanha@gmail.com>) id 1csUX1-0007H8-42
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:18:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1csUWR-0003TV-J6
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:17:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:25970)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1csUWR-0003TO-AR
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:17:23 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon, 27 Mar 2017 14:17:18 +0100
-Message-Id: <20170327131718.18268-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH] trace: fix tcg tracing build breakage
+	(envelope-from <stefanha@gmail.com>) id 1csUWx-0003ak-Uj
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:17:59 -0400
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:33659)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1csUWx-0003aE-NS
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:17:55 -0400
+Received: by mail-wr0-x22b.google.com with SMTP id w43so44317575wrb.0
+	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 06:17:55 -0700 (PDT)
+Date: Mon, 27 Mar 2017 14:17:52 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170327131752.GC28620@stefanha-x1.localdomain>
+References: <CAFEAcA-ej2CMRBHoOG4gO34wgP01Q==O8jtEDMnNjOJZrs6ncg@mail.gmail.com>
+	<20170324023943.GA21650@flamenco>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="ghzN8eJ9Qlbqn3iT"
+Content-Disposition: inline
+In-Reply-To: <20170324023943.GA21650@flamenco>
+Subject: Re: [Qemu-devel] compile failure if I enable guest_mem_before trace
+ event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,117 +31,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Emilio G . Cota" <cota@braap.org>, "Daniel P . Berrange" <berrange@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Stefan Hajnoczi <stefanha@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>, Daniel Berrange <berrange@redhat.com>
 
-Commit 0ab8ed18a6fe98bfc82705b0f041fbf2a8ca5b60 ("trace: switch to
-modular code generation for sub-directories") forgot to convert "tcg"
-trace events to the modular code generation approach where each
-sub-directory has its own trace-events file.
 
-This patch fixes compilation for "tcg" trace events.  Currently they are
-only used in the root ./trace-events file.
+--ghzN8eJ9Qlbqn3iT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-"tcg" trace events can only be used in the root ./trace-events file for
-the time being.
+On Thu, Mar 23, 2017 at 10:39:43PM -0400, Emilio G. Cota wrote:
+> On Thu, Mar 23, 2017 at 19:08:11 +0000, Peter Maydell wrote:
+> > Hi; I thought I'd have a look at the guest_mem_before trace event,
+> > but if I enable it (by deleting "disable" from the line in trace-events)
+> > QEMU doesn't compile:
+> >=20
+> >   CC      arm-softmmu/tcg/tcg-op.o
+> > In file included from
+> > /home/petmay01/linaro/qemu-from-laptop/qemu/include/trace-tcg.h:4:0,
+> >                  from
+> > /home/petmay01/linaro/qemu-from-laptop/qemu/tcg/tcg-op.c:31:
+> > ../trace/generated-tcg-tracers.h: In function =E2=80=98trace_guest_mem_=
+before_tcg=E2=80=99:
+> > ../trace/generated-tcg-tracers.h:11:5: error: implicit declaration of
+> > function =E2=80=98trace_guest_mem_before_trans=E2=80=99
+> > [-Werror=3Dimplicit-function-declaration]
+> >      trace_guest_mem_before_trans(__cpu, info);
+> >      ^
+> > ../trace/generated-tcg-tracers.h:11:5: error: nested extern
+> > declaration of =E2=80=98trace_guest_mem_before_trans=E2=80=99 [-Werror=
+=3Dnested-externs]
+> >=20
+> > Am I doing something wrong, or is this a bug?
+>=20
+> It doesn't work for me either. I bisected it to:
+>=20
+> 0ab8ed18 "trace: switch to modular code generation for sub-directories"
+>=20
+> It seems that after that commit no appropriate include is added
+> to the generated tcg tracing .h files. The 'header' variable isn't used
+> in the generation scripts for TCG, which is suspicious, e.g.:
+>=20
+> --- a/scripts/tracetool/format/tcg_h.py
+> +++ b/scripts/tracetool/format/tcg_h.py
+> @@ -28,13 +28,17 @@ def vcpu_transform_args(args):
+>=20
+>=20
+>  def generate(events, backend, group):
+> +    if group =3D=3D "root":
+> +        header =3D "trace-root.h"
+> +    else:
+> +        header =3D "trace.h"
+> +
+>      out('/* This file is autogenerated by tracetool, do not edit. */',
+>          '/* You must include this file after the inclusion of helper.h *=
+/',
+>          '',
+>          '#ifndef TRACE_%s_GENERATED_TCG_TRACERS_H' % group.upper(),
+>          '#define TRACE_%s_GENERATED_TCG_TRACERS_H' % group.upper(),
+>          '',
+> -        '#include "trace.h"',
+>          '#include "exec/helper-proto.h"',
+>          '',
+>          )
+>=20
+>=20
+> The appended fixes it for me; I hope it's enough for the tracing
+> people to come quickly to a proper fix (sorry, I didn't even know
+> what the tracing features were only a few minutes ago!).
 
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Suggested-by: Emilio G. Cota <cota@braap.org>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- docs/tracing.txt                         |  3 +++
- trace/Makefile.objs                      | 16 ++++++++--------
- scripts/tracetool/format/tcg_h.py        |  1 +
- scripts/tracetool/format/tcg_helper_c.py |  1 +
- 4 files changed, 13 insertions(+), 8 deletions(-)
+Thanks for looking into this.  I have sent a patch.
 
-diff --git a/docs/tracing.txt b/docs/tracing.txt
-index e14bb6d..8c0029b 100644
---- a/docs/tracing.txt
-+++ b/docs/tracing.txt
-@@ -405,6 +405,9 @@ information. If used together with the "tcg" property, it adds a second
- "TCGv_env" argument that must point to the per-target global TCG register that
- points to the vCPU when guest code is executed (usually the "cpu_env" variable).
- 
-+The "tcg" and "vcpu" properties are currently only honored in the root
-+./trace-events file.
-+
- The following example events:
- 
-     foo(uint32_t a) "a=%x"
-diff --git a/trace/Makefile.objs b/trace/Makefile.objs
-index 1b8eb4a..afd571c 100644
---- a/trace/Makefile.objs
-+++ b/trace/Makefile.objs
-@@ -9,27 +9,27 @@ $(BUILD_DIR)/trace-events-all: $(trace-events-files)
- 
- $(obj)/generated-helpers-wrappers.h: $(obj)/generated-helpers-wrappers.h-timestamp
- 	@cmp $< $@ >/dev/null 2>&1 || cp $< $@
--$(obj)/generated-helpers-wrappers.h-timestamp: $(trace-events-files) $(BUILD_DIR)/config-host.mak $(tracetool-y)
-+$(obj)/generated-helpers-wrappers.h-timestamp: $(SRC_PATH)/trace-events $(BUILD_DIR)/config-host.mak $(tracetool-y)
- 	$(call quiet-command,$(TRACETOOL) \
--		--group=all \
-+		--group=root \
- 		--format=tcg-helper-wrapper-h \
- 		--backend=$(TRACE_BACKENDS) \
- 		$< > $@,"GEN","$(patsubst %-timestamp,%,$@)")
- 
- $(obj)/generated-helpers.h: $(obj)/generated-helpers.h-timestamp
- 	@cmp $< $@ >/dev/null 2>&1 || cp $< $@
--$(obj)/generated-helpers.h-timestamp: $(trace-events-files) $(BUILD_DIR)/config-host.mak $(tracetool-y)
-+$(obj)/generated-helpers.h-timestamp: $(SRC_PATH)/trace-events $(BUILD_DIR)/config-host.mak $(tracetool-y)
- 	$(call quiet-command,$(TRACETOOL) \
--		--group=all \
-+		--group=root \
- 		--format=tcg-helper-h \
- 		--backend=$(TRACE_BACKENDS) \
- 		$< > $@,"GEN","$(patsubst %-timestamp,%,$@)")
- 
- $(obj)/generated-helpers.c: $(obj)/generated-helpers.c-timestamp
- 	@cmp $< $@ >/dev/null 2>&1 || cp $< $@
--$(obj)/generated-helpers.c-timestamp: $(trace-events-files) $(BUILD_DIR)/config-host.mak $(tracetool-y)
-+$(obj)/generated-helpers.c-timestamp: $(SRC_PATH)/trace-events $(BUILD_DIR)/config-host.mak $(tracetool-y)
- 	$(call quiet-command,$(TRACETOOL) \
--		--group=all \
-+		--group=root \
- 		--format=tcg-helper-c \
- 		--backend=$(TRACE_BACKENDS) \
- 		$< > $@,"GEN","$(patsubst %-timestamp,%,$@)")
-@@ -41,9 +41,9 @@ target-obj-y += generated-helpers.o
- 
- $(obj)/generated-tcg-tracers.h: $(obj)/generated-tcg-tracers.h-timestamp
- 	@cmp $< $@ >/dev/null 2>&1 || cp $< $@
--$(obj)/generated-tcg-tracers.h-timestamp: $(trace-events-files) $(BUILD_DIR)/config-host.mak $(tracetool-y)
-+$(obj)/generated-tcg-tracers.h-timestamp: $(SRC_PATH)/trace-events $(BUILD_DIR)/config-host.mak $(tracetool-y)
- 	$(call quiet-command,$(TRACETOOL) \
--		--group=all \
-+		--group=root \
- 		--format=tcg-h \
- 		--backend=$(TRACE_BACKENDS) \
- 		$< > $@,"GEN","$(patsubst %-timestamp,%,$@)")
-diff --git a/scripts/tracetool/format/tcg_h.py b/scripts/tracetool/format/tcg_h.py
-index 7ddc4a5..db55f52 100644
---- a/scripts/tracetool/format/tcg_h.py
-+++ b/scripts/tracetool/format/tcg_h.py
-@@ -40,6 +40,7 @@ def generate(events, backend, group):
-         '#define TRACE_%s_GENERATED_TCG_TRACERS_H' % group.upper(),
-         '',
-         '#include "exec/helper-proto.h"',
-+        '#include "%s"' % header,
-         '',
-         )
- 
-diff --git a/scripts/tracetool/format/tcg_helper_c.py b/scripts/tracetool/format/tcg_helper_c.py
-index 7dccd8c..ec7acbe 100644
---- a/scripts/tracetool/format/tcg_helper_c.py
-+++ b/scripts/tracetool/format/tcg_helper_c.py
-@@ -55,6 +55,7 @@ def generate(events, backend, group):
-         '#include "qemu-common.h"',
-         '#include "cpu.h"',
-         '#include "exec/helper-proto.h"',
-+        '#include "%s"' % header,
-         '',
-         )
- 
--- 
-2.9.3
+Stefan
+
+--ghzN8eJ9Qlbqn3iT
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJY2REAAAoJEJykq7OBq3PIEOIH+gNCo7LLiAJ0yB+/N5ccQ17w
+gJGiUEtZ81Zh8yM+xd36DGtHhE9+rIsvmrCnSny0yceAhF74j4pa/xfxt/cKxaeA
+Zz+ITlqfhN+5Oj1tEkTfIK4McThU7xJZy2GbUD0XUVLF1OifKHfEqYOQEp61oR8T
+JTxf5dRc+cMZBcD2krIaXOlhpg9K8cxFAXOV91047TND9/pPSMt/I5o17eAYpHZk
+vJuakA9CnCa/Jp1UfsQEl3REofJ6aDh/IojEObpmkwdkJY6aP+qvNfmOf2vjVwhG
+yvQDdP9wVeAa/yaGcflWlI8CoZKeCkBbm7QyFuoAZnidhQG9rmsFFnxLy+2FyQI=
+=BM/5
+-----END PGP SIGNATURE-----
+
+--ghzN8eJ9Qlbqn3iT--
