@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashmit602@gmail.com>) id 1csZL8-0002Vb-TL
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:26:04 -0400
+	(envelope-from <armbru@redhat.com>) id 1csZLf-0002lT-CI
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:26:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashmit602@gmail.com>) id 1csZL7-0004jz-OB
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:26:02 -0400
-Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:36033)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ashmit602@gmail.com>) id 1csZL7-0004jn-Hm
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:26:01 -0400
-Received: by mail-it0-x243.google.com with SMTP id 190so13249092itm.3
-	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 11:26:01 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1csZLb-00050I-Ex
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:26:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41684)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1csZLb-0004zN-94
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:26:31 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 42C4E811AC
+	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 18:26:30 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
+	<1490621195-2228-6-git-send-email-armbru@redhat.com>
+	<bfae4dc1-ba50-385a-1c8e-7c760b34da88@redhat.com>
+Date: Mon, 27 Mar 2017 20:26:28 +0200
+In-Reply-To: <bfae4dc1-ba50-385a-1c8e-7c760b34da88@redhat.com> (Max Reitz's
+	message of "Mon, 27 Mar 2017 18:29:10 +0200")
+Message-ID: <87shlyefu3.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <aea80d19-4a6f-8791-9b10-34734d238206@redhat.com>
-References: <1490583036-3683-1-git-send-email-Ashish.Mittal@veritas.com>
-	<aea80d19-4a6f-8791-9b10-34734d238206@redhat.com>
-From: ashish mittal <ashmit602@gmail.com>
-Date: Mon, 27 Mar 2017 11:25:59 -0700
-Message-ID: <CAAo6VWPT36ECzr1gDdW0CqmdXtPbZudtec9Tc_xi+9cvbuDmMw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v10 1/2] block/vxhs.c: Add support for a
- new block device type called "vxhs"
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH RFC v3 for-2.9 05/11] rbd: Don't accept
+ -drive driver=rbd, keyvalue-pairs=...
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,145 +35,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Jeff Cody <jcody@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <ashish.mittal@veritas.com>, Stefan Hajnoczi <stefanha@gmail.com>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, "Venkatesha M.G." <venkatesha.mg@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jdurgin@redhat.com, jcody@redhat.com
 
-On Mon, Mar 27, 2017 at 8:56 AM, Eric Blake <eblake@redhat.com> wrote:
-> On 03/26/2017 09:50 PM, Ashish Mittal wrote:
->> Source code for the qnio library that this code loads can be downloaded from:
->> https://github.com/VeritasHyperScale/libqnio.git
->
-> When sending a multi-patch series, please include a 0/2 cover letter
-> ('git config format.coverletter auto' can help).
->
+Max Reitz <mreitz@redhat.com> writes:
 
-Will do!
-
->>
->> Sample command line using JSON syntax:
->> ./x86_64-softmmu/qemu-system-x86_64 -name instance-00000008 -S -vnc 0.0.0.0:0
->> -k en-us -vga cirrus -device virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x5
->> -msg timestamp=on
->> 'json:{"driver":"vxhs","vdisk-id":"c3e9095a-a5ee-4dce-afeb-2a59fb387410",
->> "server":{"host":"172.172.17.4","port":"9999"}}'
->>
->> Sample command line using URI syntax:
->> qemu-img convert -f raw -O raw -n
->> /var/lib/nova/instances/_base/0c5eacd5ebea5ed914b6a3e7b18f1ce734c386ad
->> vxhs://192.168.0.1:9999/c6718f6b-0401-441d-a8c3-1f0064d75ee0
->
-> Do we really need URI syntax, now that we have -blockdev-add going into 2.9?
->
-
-Having it just makes manual testing with CLI easier (less to type).
-Would like to retain it for now, unless having this is a problem.
-Removing it will also require rework and retesting of the qemu-iotests
-patch.
-
->>
->> Sample command line using TLS credentials (run in secure mode):
->> ./qemu-io --object
->> tls-creds-x509,id=tls0,dir=/etc/pki/qemu/vxhs,endpoint=client -c 'read
->> -v 66000 2.5k' 'json:{"server.host": "127.0.0.1", "server.port": "9999",
->> "vdisk-id": "/test.raw", "driver": "vxhs", "tls-creds":"tls0"}'
->>
->> Signed-off-by: Ashish Mittal <Ashish.Mittal@veritas.com>
+> On 27.03.2017 15:26, Markus Armbruster wrote:
+>> The way we communicate extra key-value pairs from
+>> qemu_rbd_parse_filename() to qemu_rbd_open() exposes option parameter
+>> "keyvalue-pairs" on the command line.  It's not wanted there.  Hack:
+>> rename the parameter to "=keyvalue-pairs" to make it inaccessible.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
 >> ---
->>
+>>  block/rbd.c | 12 ++++++++----
+>>  1 file changed, 8 insertions(+), 4 deletions(-)
 >
-> I'm just doing a high-level review of the interface, and leaving the
-> actual code review to others.
->
->> +++ b/block/vxhs.c
->> @@ -0,0 +1,595 @@
->> +/*
->> + * QEMU Block driver for Veritas HyperScale (VxHS)
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
->> + * See the COPYING file in the top-level directory.
->> + *
->
-> No Copyright notice?  The GPL works by virtue of copyright law, so
-> generally a copyright holder should be mentioned.
->
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-I guess what's missing is the "Copyright (c) Veritas, LLC. 2017" line.
-Is that correct?
+Thanks!
 
->
->> +++ b/qapi/block-core.json
->> @@ -2118,6 +2118,7 @@
->>  # @iscsi: Since 2.9
->>  # @rbd: Since 2.9
->>  # @sheepdog: Since 2.9
->> +# @vxhs: Since 2.10
->>  #
->>  # Since: 2.0
->>  ##
->> @@ -2127,7 +2128,7 @@
->>              'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', 'nfs',
->>              'null-aio', 'null-co', 'parallels', 'qcow', 'qcow2', 'qed',
->>              'quorum', 'raw', 'rbd', 'replication', 'sheepdog', 'ssh',
->> -            'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat' ] }
->> +            'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs' ] }
->
-> Markus has patches pending (to promote x-blockdev-del over to
-> blockdev-del) that will conflict in context with this patch.  You may
-> have to rebase again, but hopefully the conflicts should be easy to
-> figure out.
->
+> (Or you could just use x- like blkdebug does...)
 
-I will rebase again as needed. Not having vxhs code merged yet does
-create conflicts while rebasing. It would have been much easier to
-just send out patches for the review comments :)
+Yes.
 
->>
->>  ##
->>  # @BlockdevOptionsFile:
->> @@ -2820,6 +2821,22 @@
->>    'data': { '*offset': 'int', '*size': 'int' } }
->>
->>  ##
->> +# @BlockdevOptionsVxHS:
->> +#
->> +# Driver specific block device options for VxHS
->> +#
->> +# @vdisk-id:    UUID of VxHS volume
->> +# @server:      vxhs server IP, port
->> +# @tls-creds:   TLS credentials ID
->> +#
->> +# Since: 2.10
->> +##
->> +{ 'struct': 'BlockdevOptionsVxHS',
->> +  'data': { 'vdisk-id': 'str',
->> +            'server': 'InetSocketAddress',
->
-> Do you want to use the new InetSocketAddressBase (just host and port,
-> eliminating things like 'to' that don't make much sense in this context)?
->
+An "x-" prefix tells you "don't use this", which you're free to ignore.
+The "=" prefix cannot be ignored, because the QemuOpts parser will
+choke on it.
 
-Don't see InetSocketAddressBase in the latest code. Could you please
-give me a usage example for reference? Thanks!
-
->> +            '*tls-creds': 'str' } }
->> +
->> +##
->>  # @BlockdevOptions:
->>  #
->>  # Options for creating a block device.  Many options are available for all
->> @@ -2881,7 +2898,8 @@
->>        'vhdx':       'BlockdevOptionsGenericFormat',
->>        'vmdk':       'BlockdevOptionsGenericCOWFormat',
->>        'vpc':        'BlockdevOptionsGenericFormat',
->> -      'vvfat':      'BlockdevOptionsVVFAT'
->> +      'vvfat':      'BlockdevOptionsVVFAT',
->> +      'vxhs':       'BlockdevOptionsVxHS'
->>    } }
->>
->>  ##
->>
->
-> --
-> Eric Blake   eblake redhat com    +1-919-301-3266
-> Libvirt virtualization library http://libvirt.org
->
+Matter of taste, I guess.
