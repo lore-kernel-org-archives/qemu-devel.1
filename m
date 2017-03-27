@@ -1,41 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1csNgF-0006Ab-4N
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 01:59:04 -0400
+	(envelope-from <kraxel@redhat.com>) id 1csO1Z-00084l-U4
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 02:21:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1csNgA-000814-9j
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 01:59:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37370)
+	(envelope-from <kraxel@redhat.com>) id 1csO1V-0004rf-Tp
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 02:21:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45586)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1csNgA-00080y-1b
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 01:58:58 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8990C63306
-	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 05:58:56 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <1490266548-22500-1-git-send-email-armbru@redhat.com>
-	<1490266548-22500-5-git-send-email-armbru@redhat.com>
-	<fe5583dc-bbe7-3387-dea9-3f4b89d682a8@redhat.com>
-	<a438ce0a-3035-1b2e-0d16-296ee930ed35@redhat.com>
-	<e6621b99-a980-dc61-b267-590eb08923c0@redhat.com>
-	<59a3aed6-e1cf-a601-4369-1a7cd74500cc@redhat.com>
-	<20170324035537.GA22342@localhost.localdomain>
-	<87fui3yx0y.fsf@dusky.pond.sub.org>
-	<20170324124213.GC22342@localhost.localdomain>
-	<89101331-9bba-fb6c-42a1-dfce7775fe4c@redhat.com>
-	<20170324141025.GE15423@localhost.localdomain>
-	<2c25aa1c-3832-e8a6-4bfa-004a79a10c77@redhat.com>
-Date: Mon, 27 Mar 2017 07:58:51 +0200
-In-Reply-To: <2c25aa1c-3832-e8a6-4bfa-004a79a10c77@redhat.com> (Eric Blake's
-	message of "Fri, 24 Mar 2017 09:31:37 -0500")
-Message-ID: <87h92ffeg4.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-2.9 4/5] rbd: Peel off redundant
- RbdAuthMethod wrapper struct
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1csO1V-0004rF-Nm
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 02:21:01 -0400
+Message-ID: <1490595656.31035.5.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 27 Mar 2017 08:20:56 +0200
+In-Reply-To: <CAJSP0QX3z_Zn-jdi7=2qw795Ep2nG5xvWR9DqyWajnKjkCGd3g@mail.gmail.com>
+References: <20170316120110.11677-1-iwona260909@gmail.com>
+	<20170316120110.11677-2-iwona260909@gmail.com>
+	<CAFEAcA8ZBAAqYNbh_3J69W5SMXRsbW4S367Xe8ceF1C0M-RNnA@mail.gmail.com>
+	<1489673540.15659.93.camel@redhat.com>
+	<CAJSP0QX3z_Zn-jdi7=2qw795Ep2nG5xvWR9DqyWajnKjkCGd3g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] Dead code removal: removing code for
+ unsupported DEPTH.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,187 +31,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Jeff Cody <jcody@redhat.com>, kwolf@redhat.com, jdurgin@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, dillaman@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: iwona260909@gmail.com, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
+  Hi,
 
-> On 03/24/2017 09:10 AM, Jeff Cody wrote:
->> On Fri, Mar 24, 2017 at 08:49:20AM -0500, Eric Blake wrote:
->>> On 03/24/2017 07:42 AM, Jeff Cody wrote:
->>>
->>>> Agree.  My preference is to leave it as an array of methods, so long as that
->>>> is tenable to libvirt.
->>>
->>> The -drive syntax should remain unchanged (that's an absolute must for
->>> libvirt).  But the QMP syntax being an array of methods sounds best to
->>> me, and I think password-secret should be part of the array.  So my vote
->>> would be for:
->>>
->>> { "driver": "rbd", "image": "foo",
->>>   "auth": [ { "type": "cephx", "password-secret": "sec0" },
->>>             { "type": "none" } ],
->>>   "pool": "bar" }
->>>
->>> It makes mapping -drive arguments into QMP form a bit trickier, but the
->>> QMP form is then easily extensible if we add another auth method down
->>> the road.
->>>
->> 
->> In that case, what about adding user as well, and not just password-secret?
->
-> Makes sense - anything that is associated solely with cephx should
-> belong to the same flat-union branch for cephx, rather than at the top
-> level.
+> Some emulated graphics cards use qemu_console_surface() and that
+> surface is always in 32 bits per pixel format.  Therefore, code for
+> dealing with other pixel formats can be removed.
 
-I've thought about this some more and have come to the conclusion that
-this design is clumsy and overly complex.  Moreover, I suspect our
-testing has been poor.  Let me explain.
+qemu_create_displaysurface() creates a displaysurface with the default
+depth 32bpp.  qemu_console_resize() will create a new displaysurface,
+with the given size, also with the default depth 32bpp.
 
-= Overview =
+qemu_console_surface() just asks for the current surface, that alone
+isn't a good indicator, but often display drivers use
+qemu_console_surface + qemu_console_resize.
 
-What we're trying to configure is authentication methods the client is
-to offer to the server.
-
-This is not a list, it's a set: the order doesn't matter, and multiple
-entries of the same type make no sense.  We could reject multiple
-entries, or let the last one win silently, but this is just unnecessary
-complexity.
-
-Type "cephx" uses a user name and a key.
-
-Type "none" uses neither (it could theoretically use the user name, but
-I've been assured it doesn't).
-
-The user name defaults to "admin".
-
-The key defaults to the user name's entry in a keyring.  There is a
-configurable list of key ring files, with a default.  The default
-commonly includes /etc/ceph/client.keyring.
-
-= Librados configuration =
-
-Librados takes these configuration bits as follows:
-
-* The user name is to be passed to rados_create().  NULL means default
-  to "admin".
-
-* The key may be passed to rados_conf_set() with key "key" (value is the
-  key) or "keyfile" (value is name of the file containing the key).
-  Documentation discourages use of "key".
-
-* The list of keyrings may passed to rados_conf_set() with key
-  "keyring" and a value listing file names separated by ','.  At least
-  according to the documentation; the source looks like any non-empty
-  sequence of [;,= \t]* serves as separator.
-
-* The offered authentication methods may be passed to rados_conf_set()
-  with key "auth_supported" (deprecated) or "auth_client_required", and
-  a value listing methods separated by "," (or maybe [;,= \t]*, see
-  above).  The methods are "cephx" and "none".  Default is "cephx,none".
-
-= Command line -drive =
-
-With -drive file=rbd:pool/image[@snapshot][:key=value...], the
-key=value... part lets you specify arbitrary rados_conf_set() settings,
-except pseudo-key "id" is mapped to the user name instead, and
-pseudo-key "conf" names a rados configuration file.  This overloading of
-rados_conf_set() keys and our own pseudo-keys isn't pretty, but it's a
-done deal.  The full set of authentication configuration discussed above
-is available as keys "id", "key", "keyfile", "keyring", "auth_supported"
-and "auth_client_required".  Also via "conf", of course.
-
-These -drive rbd:...:key=value settings are also available in -drive
-QemuOpts syntax -drive driver=rbd,key=value:
-
-* Pseudo-key "id" is "user" in QemuOpts.
-
-* Pseudo-key "conf" is "conf" in QemuOpts, too
-
-* Any other keys together become "keyvalue-pairs" in QemuOpts, with
-  the same key=value:... syntax.
-
-Additionally, QemuOpts-only "password-secret" lets you set
-rados_conf_set() key "key" to a value obtained from the QCryptoSecret
-interface.
-
-Note that @password-secret is a misnomer: this is *not* a password, it's
-a *key*.  Calling it a password is confusing, and makes it harder to
-mentally connect QMP and Ceph configuration.
-
-The settings in file=rbd:... override the ones in QemuOpts (that's how
-->bdrv_parse_filename() works), which in turn override (I think)
-settings from a config file.  Note that *any* key other than "id" and
-"conf" in file=rbd:... completely overrides *all* keys in
-"keyvalue-pairs".
-
-Except "password-secret" works the other way: it overrides "key" set in
-file=rbd:... or "keyvalue-pairs".
-
-As so often with syntactic sugar, once you actually explain how it
-works, you realize what a bloody mess it is.
-
-It's not quite clear whether "keyvalue-pairs" is really meant for the
-user, or just for internal use to implement file=rbd:...  I posted a
-patch to hide it from the user.
-
-= QMP blockdev-add and command line -blockdev =
-
-The current QAPI/QMP schema lets you specify only a few settings
-directly: pseudo-keys "id" and "conf" (optional members @user and
-@conf), keys "key" and "auth_supported" (optional members
-@password-secret and @auth_supported).  The only way to specify other
-rados_conf_set() settings such as "keyfile" and "keyring" is via "conf".
-
-Begs the question how the settings you can specify directly interact
-with the config file.  I figure they override the config file.
-
-Let's review how this could be used.
-
-If you specify no optional members, you get the Ceph defaults described
-above.  Good.
-
-If you want to override the default user, there's @user.  Good.
-
-If you want to override the keyring, you have to fall back to @conf.
-Not ideal, but good enough for 2.9.  I guess most users will be fine
-with the default keyrings.
-
-If you want to override the authentication methods, you have several
-options:
-
-* Use @conf and set auth_supported (deprecated) or auth_client_required
-  in the config file
-
-* Use @auth_supported like this:
-
-      "auth_supported": [ { "auth": METHOD}, ... ]
-
-  Clumsy.
-
-If you want to override the key, you again have several options:
-
-* Use @conf and set keyfile or key in the config file
-
-* Use @password-secret to get it from the QCryptoSecret interface
-
-  Did we actually test this?
-
-= What to do for 2.9 =
-
-I propose to
-
-* drop both "auth_supported" and "password-secret" from the QAPI schema
-
-* drop "password-secret" from QemuOpts
-
-* hide "keyvalue-pairs" in QemuOpts
-
-No existing usage is affected, since all these things are new in 2.9.
-
-Users who need something else than the default keyring can continue to
-configure alternate keys and keyrings with -drive, both directly with
-file=rbd:...:key=value and with a config file.  With -blockdev /
-blockdev_add, they need to use the config file.
-
-We can consider improvements post 2.9.
+cheers,
+  Gerd
