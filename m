@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1csXZn-0000PG-7q
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:33:04 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1csXaP-0000lW-HN
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:33:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1csXZm-0007ah-En
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:33:03 -0400
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:34303)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1csXZm-0007a5-9X
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:33:02 -0400
-Received: by mail-wr0-x22d.google.com with SMTP id l43so64639508wre.1
-	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 09:33:02 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1csXaL-00089b-Ip
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:33:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60866)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1csXaL-00087s-As
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 12:33:37 -0400
+Date: Mon, 27 Mar 2017 13:33:33 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170327163333.GL28530@thinpad.lan.raisama.net>
+References: <1490624810-44752-1-git-send-email-agraf@suse.de>
+	<20170327154636.GI28530@thinpad.lan.raisama.net>
+	<c14eb231-10d1-63cb-ed14-8b7cd131b7b0@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <1490519798.11328.113.camel@oracle.com>
-References: <CAFEAcA9pqDoCWrPAJ+KVxLC_eRy-xRg36oYuARYg2YP8VpGpBg@mail.gmail.com>
-	<1490474958.11328.86.camel@oracle.com>
-	<CAFEAcA-BaDtJyNk0pB7AwyJNXtZ8V9LgJzcuAfPbN65b7OFsSw@mail.gmail.com>
-	<1490519798.11328.113.camel@oracle.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 27 Mar 2017 17:32:40 +0100
-Message-ID: <CAFEAcA8uZK3tX_XKhL9S6Wt00Ei_dJw52K+f8yX5vqRygYwP-g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Proposal for deprecating unsupported host OSes &
- architecutures
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c14eb231-10d1-63cb-ed14-8b7cd131b7b0@suse.de>
+Subject: Re: [Qemu-devel] [PATCH] i386: Allow monitor / mwait cpuid override
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,27 +28,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Knut Omang <knut.omang@oracle.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Alexander Graf <agraf@suse.de>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, kvm@vger.kernel.org
 
-On 26 March 2017 at 10:16, Knut Omang <knut.omang@oracle.com> wrote:
-> On Sat, 2017-03-25 at 21:15 +0000, Peter Maydell wrote:
->> On 25 March 2017 at 20:49, Knut Omang <knut.omang@oracle.com> wrote:
->> >
->> > Can we please keep the Sparc support in for a while still?
->>
->> Yes, John Paul Adrian Glaubitz and the Debian Project have
->> kindly provided me with access to a Sparc box. I'm planning
->> to send a patch that puts sparc into the 'supported'
->> category before 2.9 release.
->
-> good to hear!
+On Mon, Mar 27, 2017 at 06:10:43PM +0200, Alexander Graf wrote:
+> 
+> 
+> On 27/03/2017 17:46, Eduardo Habkost wrote:
+> > On Mon, Mar 27, 2017 at 04:26:50PM +0200, Alexander Graf wrote:
+> > > KVM allows trap and emulate (read: NOP) of the MONITOR and MWAIT
+> > > instructions. There is work undergoing to enable actual execution
+> > > of these inside of KVM, but nobody really wants to expose the feature
+> > > to the guest by default, as it would eat up all of the host CPU.
+> > 
+> > Isn't this something that should be reported using
+> > KVM_GET_EMULATED_CPUID? (QEMU still doesn't know how to use
+> > KVM_GET_EMULATED_CPUID, however.)
+> 
+> Depends how you look at it. In KVM land there are basically 3 ways to deal
+> with MONITOR/MWAIT:
+> 
+>   1) #VMEXIT on every execution, treat them as NOP
+>   2) let the guest natively execute them (looks like a busy loop for the
+> host, but saves power)
+>   3) be smart in KVM about it, add actual emulation and adaptively allow for
+> native mwait execution or emulated mwait which means we can run inside host
+> context
 
-It occurred to me that it might be helpful to point out that
-support of Solaris as a host OS is a separate thing and is
-still in the 'unsupported' category. (It's also quite high
-on the list of stuff to drop because I suspect it's broken
-and it's one of the things making a mess of our configure code.)
+Which case is going to be enabled when using your patch? Don't
+you want to make that configurable?
 
-thanks
--- PMM
+This looks like configuration that can't be easily represented
+using the GET_SUPPORTED_CPUID/KVM_SET_CPUID abstraction, as the
+ability to enable the feature can't be represented by a single
+bit.
+
+We already have a few cases where we make
+kvm_arch_get_supported_cpuid() look at something other than just
+GET_SUPPORTED_CPUID return values (most cases are related to
+in-kernel irqchip). We can change kvm_arch_get_supported_cpuid()
+to look at other flags (like one that would configure mwait
+behavior), and decide to report CPUID_EXT_MONITOR on those cases.
+
+Would something like the following make sense?
+
+* Having a "mwait=(none|nop|native|smart)" option, to choose
+  mwait behavior
+* Making kvm_arch_get_supported_cpuid() return CPUID_EXT_MONITOR
+  as supported only if the "mwait" option is not "none".
+
+Then:
+* "-cpu ...,monitor=on" would fail, because mwait=none would be
+  the default
+* "-cpu ...,mwait=none,monitor=on" would fail
+* "-cpu ...,mwait=(nop|native|smart)" would fail if
+  host KVM doesn't report the corresponding mwait behavior as
+  supported
+* "-cpu ...,mwait=(nop|native|smart),monitor=on" would work
+* "-cpu ...,mwait=(nop|native|smart)" would also work, and
+  probably should enable CPUID_EXT_MONITOR flag by default
+
+We could still implement "monitor=force" for debugging, but I
+think we need something safer than "just ignore what KVM is
+telling us" for production.
+
+-- 
+Eduardo
