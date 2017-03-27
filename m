@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1csNQG-0002zA-Ex
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 01:42:33 -0400
+	(envelope-from <jgross@suse.com>) id 1csNTT-0003d9-0h
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 01:45:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1csNQD-0004wv-91
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 01:42:32 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:50042)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1csNQD-0004wm-0d
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 01:42:29 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20170324152607.6604-1-alex.bennee@linaro.org>
-In-Reply-To: <20170324152607.6604-1-alex.bennee@linaro.org>
-Date: Mon, 27 Mar 2017 08:42:28 +0300
-Message-ID: <004901d2a6bc$ebbf9730$c33ec590$@ru>
+	(envelope-from <jgross@suse.com>) id 1csNTQ-0005fC-01
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 01:45:51 -0400
+Received: from mx2.suse.de ([195.135.220.15]:50145)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jgross@suse.com>) id 1csNTP-0005e0-Lc
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 01:45:47 -0400
+References: <1490376002-1223-1-git-send-email-paul.durrant@citrix.com>
+	<671b281d-4536-0117-b9a2-b6b72242d3f5@suse.com>
+	<alpine.DEB.2.10.1703241153340.8001@sstabellini-ThinkPad-X260>
+	<2a218de0a59a4060b00a0f3839323d37@AMSPEX02CL03.citrite.net>
+	<4334f125a9174a2e99e5b6f1228da2cd@AMSPEX02CL03.citrite.net>
+From: Juergen Gross <jgross@suse.com>
+Message-ID: <f18632d1-dba1-084d-893c-aca6176754b6@suse.com>
+Date: Mon, 27 Mar 2017 07:45:42 +0200
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH-for-2.9] replay/replay.c: bump
- REPLAY_VERSION
+In-Reply-To: <4334f125a9174a2e99e5b6f1228da2cd@AMSPEX02CL03.citrite.net>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RESEND] xen: limit pkg-config to
+ PKG_CONFIG_PATH for xen libraries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +31,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>, pavel.dovgaluk@ispras.ru
-Cc: qemu-devel@nongnu.org
+To: Paul Durrant <Paul.Durrant@citrix.com>, 'Stefano Stabellini' <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Reviewed-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+On 24/03/17 20:34, Paul Durrant wrote:
+>> -----Original Message-----
+>> From: Qemu-devel [mailto:qemu-devel-
+>> bounces+paul.durrant=citrix.com@nongnu.org] On Behalf Of Paul Durrant
+>> Sent: 24 March 2017 19:18
+>> To: 'Stefano Stabellini' <sstabellini@kernel.org>; Juergen Gross
+>> <jgross@suse.com>
+>> Cc: Anthony Perard <anthony.perard@citrix.com>; xen-
+>> devel@lists.xenproject.org; qemu-devel@nongnu.org
+>> Subject: Re: [Qemu-devel] [PATCH RESEND] xen: limit pkg-config to
+>> PKG_CONFIG_PATH for xen libraries
+>>
+>>> -----Original Message-----
+>>> From: Stefano Stabellini [mailto:sstabellini@kernel.org]
+>>> Sent: 24 March 2017 19:12
+>>> To: Juergen Gross <jgross@suse.com>
+>>> Cc: Paul Durrant <Paul.Durrant@citrix.com>; qemu-devel@nongnu.org;
+>> xen-
+>>> devel@lists.xenproject.org; Anthony Perard
+>> <anthony.perard@citrix.com>;
+>>> Stefano Stabellini <sstabellini@kernel.org>
+>>> Subject: Re: [PATCH RESEND] xen: limit pkg-config to PKG_CONFIG_PATH
+>> for
+>>> xen libraries
+>>>
+>>> On Fri, 24 Mar 2017, Juergen Gross wrote:
+>>>> On 24/03/17 18:20, Paul Durrant wrote:
+>>>>> The Xen tools Makefile has been modified to set PKG_CONFIG_PATH
+>>> such that
+>>>>> use of pkg-config in QEMU configure finds the newly built Xen libraries.
+>>>>> However, because older versions of Xen do not set
+>> PKG_CONFIG_PATH
+>>> in the
+>>>>> Makefile, the QEMU configure script will pick up any Xen libraries that
+>>> may
+>>>>> be installed in the build system rather than the newly built ones. Thus,
+>>>>> if Xen 4.9 is built and installed it becomes impossible to build tools for
+>>>>> an older version of Xen on the same system (without manual de-
+>>> installtion).
+>>>>>
+>>>>> This patch modifies configure to set PKG_CONFIG_LIBDIR to empty
+>> when
+>>>>> looking for Xen libraries to ensure the search is limited only to
+>>>>> PKG_CONFIG_PATH. This makes sure that, for versions of Xen prior to
+>>> 4.9,
+>>>>> pkg-config fails to find the Xen libraries an approriately falls back to
+>>>>> previous methods of probing.
+>>>>>
+>>>>> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+>>>
+>>> Paul, thanks for spotting this. I didn't spot it because I don't have
+>>> Xen installed in my build environment, but we should not rely on that.
+>>>
+>>>
+>>>> NAK. You are breaking normal qemu build with installed Xen pkg-config
+>>>> files.
+>>>
+>>> The normal QEMU build, done as part of the xen-unstable build, is
+>>> actually done without Xen being installed in the system. So, if I am not
+>>> mistaken, the current mechanism also breaks the following entirely
+>>> legitimate scenario:
+>>>
+>>> - user has 4.9 installed on her system
+>>> - user git clones xen 4.10
+>>> - user build xen 4.10
+>>>   - as part of the xen build, qemu is cloned and built
+>>>   - the qemu configure script picks up the pkgconfig file from
+>>>     /usr/share and misconfigure the xen version, setting it to 4.9
+>>>     instead of 4.10
+>>>   - the qemu build fails
+>>> - the xen build fails
+>>>
+>>> Am I right?
+>>>
+>>
+>> I think the above would actually work because the 4.10 files would be found
+>> before the 4.9 files. What fails is installing 4.9 and then trying to build 4.8.
+> 
+> I should qualify that with saying 'trying to build 4.8 with a newer QEMU (i.e. one that has a configure which knows about pkg-config).
+> I still think that's a legitimate use-case though.
+
+To sum it up we have to care about the following scenarios:
+
+a) Xen in-tree build, Xen >= 4.9
+b) Xen in-tree build, Xen < 4.9
+c) build out-of-Xen-tree
+
+combined with any of:
+
+1) no Xen installed on build machine
+2) Xen >= 4.9 installed
+3) Xen < 4.9 installed
+
+1) + c) is not supported, all other combinations should work.
+
+I suggest the following modifications of my patch:
+
+- keep the test program for detection of Xen 4.9
+- scan the extra ldflags for special mentioning of tools/libxc
+  to detect Xen in-tree build < 4.9 (will detect 4.9, too, but
+  this is no problem), set xen_in_tree_old if found
+- if xen_in_tree_old found, don't use pkg-config for Xen version
+  detection and flags
+- otherwise try pkg-config first
+
+This should cover all cases we need.
 
 
-> -----Original Message-----
-> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
-> Sent: Friday, March 24, 2017 6:26 PM
-> To: pavel.dovgaluk@ispras.ru
-> Cc: qemu-devel@nongnu.org; Alex Benn=C3=A9e
-> Subject: [PATCH-for-2.9] replay/replay.c: bump REPLAY_VERSION
->=20
-> A previous commit (3d4d16f4) added support for audio record/playback.
-> However this breaks the logfile ABI due to the re-ordering of the
-> ReplayEvents enum. The REPLAY_VERSION check is meant to prevent you
-> from using old log files in newer QEMUs but this is currently broken.
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  replay/replay.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/replay/replay.c b/replay/replay.c
-> index 78e2a7e570..9e0724e756 100644
-> --- a/replay/replay.c
-> +++ b/replay/replay.c
-> @@ -22,7 +22,7 @@
->=20
->  /* Current version of the replay mechanism.
->     Increase it when file format changes. */
-> -#define REPLAY_VERSION              0xe02005
-> +#define REPLAY_VERSION              0xe02006
->  /* Size of replay log header */
->  #define HEADER_SIZE                 (sizeof(uint32_t) + =
-sizeof(uint64_t))
->=20
-> --
-> 2.11.0
+Juergen
