@@ -1,20 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcelaya@gmail.com>) id 1csZLh-0002mV-2Z
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:26:38 -0400
+	(envelope-from <armbru@redhat.com>) id 1csZMG-0003Ia-RK
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:27:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcelaya@gmail.com>) id 1csZLd-000523-40
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:26:37 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:35731)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcelaya@gmail.com>) id 1csZLc-00051N-Uj
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:26:33 -0400
-Received: by mail-wr0-x241.google.com with SMTP id p52so12782843wrc.2
-	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 11:26:32 -0700 (PDT)
-From: Javier Celaya <jcelaya@gmail.com>
-Date: Mon, 27 Mar 2017 20:26:24 +0200
-Message-Id: <20170327182624.2914-1-jcelaya@gmail.com>
-Subject: [Qemu-devel] [PATCH v3] Fix input-linux reading from device
+	(envelope-from <armbru@redhat.com>) id 1csZMB-0005L9-6L
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:27:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57442)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1csZMA-0005Kr-Tq
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:27:07 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 06FD54E048
+	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 18:27:06 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
+	<1490621195-2228-8-git-send-email-armbru@redhat.com>
+	<c0b92f66-8e3b-e419-359b-a6b0f986a03d@redhat.com>
+Date: Mon, 27 Mar 2017 20:27:04 +0200
+In-Reply-To: <c0b92f66-8e3b-e419-359b-a6b0f986a03d@redhat.com> (Max Reitz's
+	message of "Mon, 27 Mar 2017 18:42:53 +0200")
+Message-ID: <87o9wmeft3.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH RFC v3 for-2.9 07/11] rbd: Clean up
+ qemu_rbd_create()'s detour through QemuOpts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,77 +35,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jdurgin@redhat.com, jcody@redhat.com
 
-The evdev devices in input-linux.c are read in blocks of one whole
-event. If there are not enough bytes available, they are discarded,
-instead of being kept for the next read operation. This results in
-lost events, of even non-working devices.
+Max Reitz <mreitz@redhat.com> writes:
 
-This patch keeps track of the number of bytes to be read to fill up
-a whole event, and then handle it.
+> On 27.03.2017 15:26, Markus Armbruster wrote:
+>> The conversion from QDict to QemuOpts is pointless.  Simply get the
+>> stuff straight from the QDict.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+>> ---
+>>  block/rbd.c | 20 +++++---------------
+>>  1 file changed, 5 insertions(+), 15 deletions(-)
+>> 
+>> diff --git a/block/rbd.c b/block/rbd.c
+>> index b2afe07..cf0bab0 100644
+>> --- a/block/rbd.c
+>> +++ b/block/rbd.c
+>> @@ -376,7 +376,6 @@ static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
+>>      rados_t cluster;
+>>      rados_ioctx_t io_ctx;
+>>      QDict *options = NULL;
+>> -    QemuOpts *rbd_opts = NULL;
+>>      int ret = 0;
+>>  
+>>      secretid = qemu_opt_get(opts, "password-secret");
+>> @@ -407,19 +406,11 @@ static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
+>>          goto exit;
+>>      }
+>>  
+>> -    rbd_opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+>> -    qemu_opts_absorb_qdict(rbd_opts, options, &local_err);
+>> -    if (local_err) {
+>> -        error_propagate(errp, local_err);
+>> -        ret = -EINVAL;
+>> -        goto exit;
+>> -    }
+>> -
+>> -    pool       = qemu_opt_get(rbd_opts, "pool");
+>> -    conf       = qemu_opt_get(rbd_opts, "conf");
+>> -    clientname = qemu_opt_get(rbd_opts, "user");
+>> -    name       = qemu_opt_get(rbd_opts, "image");
+>> -    keypairs   = qemu_opt_get(rbd_opts, "=keyvalue-pairs");
+>> +    pool       = qdict_get_str(options, "pool");
+>> +    conf       = qdict_get_str(options, "conf");
+>> +    clientname = qdict_get_str(options, "user");
+>> +    name       = qdict_get_str(options, "image");
+>> +    keypairs   = qdict_get_str(options, "=keyvalue-pairs");
+>
+> This assumes that all of these options are given which they are not
+> necessarily:
+>
+> $ ./qemu-img create -f rbd rbd:blub/ 1M
+> Formatting 'rbd:blub/', fmt=rbd size=1048576
+> [1]    27387 segmentation fault (core dumped)  ./qemu-img create -f rbd
+> rbd:blub/ 1M
+>
+> qdict_get_try_str() would probably be better.
 
-Changes from v1 to v2:
-- Fix: Calculate offset on each iteration
-
-Changes from v2 to v3:
-- Fix coding style
-- Store offset instead of bytes to be read
-
-Signed-off-by: Javier Celaya <jcelaya@gmail.com>
----
- ui/input-linux.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
-
-diff --git a/ui/input-linux.c b/ui/input-linux.c
-index ac31f47719..dc0613ca1f 100644
---- a/ui/input-linux.c
-+++ b/ui/input-linux.c
-@@ -169,6 +169,8 @@ struct InputLinux {
-     bool        has_abs_x;
-     int         num_keys;
-     int         num_btns;
-+    struct input_event event;
-+    int         read_offset;
- 
-     QTAILQ_ENTRY(InputLinux) next;
- };
-@@ -327,25 +329,30 @@ static void input_linux_handle_mouse(InputLinux *il, struct input_event *event)
- static void input_linux_event(void *opaque)
- {
-     InputLinux *il = opaque;
--    struct input_event event;
-     int rc;
-+    int read_size;
-+    uint8_t *p = (uint8_t *)&il->event;
- 
-     for (;;) {
--        rc = read(il->fd, &event, sizeof(event));
--        if (rc != sizeof(event)) {
-+        read_size = sizeof(il->event) - il->read_offset;
-+        rc = read(il->fd, &p[il->read_offset], read_size);
-+        if (rc != read_size) {
-             if (rc < 0 && errno != EAGAIN) {
-                 fprintf(stderr, "%s: read: %s\n", __func__, strerror(errno));
-                 qemu_set_fd_handler(il->fd, NULL, NULL, NULL);
-                 close(il->fd);
-+            } else if (rc > 0) {
-+                il->read_offset += rc;
-             }
-             break;
-         }
-+        il->read_offset = 0;
- 
-         if (il->num_keys) {
--            input_linux_handle_keyboard(il, &event);
-+            input_linux_handle_keyboard(il, &il->event);
-         }
-         if (il->has_rel_x && il->num_btns) {
--            input_linux_handle_mouse(il, &event);
-+            input_linux_handle_mouse(il, &il->event);
-         }
-     }
- }
--- 
-2.11.0
+Yes, will fix.  I've fallen into this trap before...
