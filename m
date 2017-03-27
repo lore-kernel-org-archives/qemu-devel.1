@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1csUfW-00026v-Py
+	(envelope-from <armbru@redhat.com>) id 1csUfV-00026q-Eb
 	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:26:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1csUfQ-0006PP-H7
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:26:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38984)
+	(envelope-from <armbru@redhat.com>) id 1csUfP-0006O7-6F
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:26:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34688)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1csUfQ-0006OH-4h
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:26:40 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1csUfO-0006NQ-SC
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 09:26:39 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E88C9C0624C3
-	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 13:26:38 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 724929D1E1
+	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 13:26:37 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 27 Mar 2017 15:26:30 +0200
-Message-Id: <1490621195-2228-7-git-send-email-armbru@redhat.com>
+Date: Mon, 27 Mar 2017 15:26:27 +0200
+Message-Id: <1490621195-2228-4-git-send-email-armbru@redhat.com>
 In-Reply-To: <1490621195-2228-1-git-send-email-armbru@redhat.com>
 References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC v3 for-2.9 06/11] rbd: Clean up
- runtime_opts, fix -drive to reject filename
+Subject: [Qemu-devel] [PATCH RFC v3 for-2.9 03/11] rbd: Don't limit length
+ of parameter values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,117 +33,245 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: jdurgin@redhat.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com
 
-runtime_opts is used for three different purposes:
+We laboriously enforce parameter values are between one and some
+arbitrary limit in length.  Only RBD_MAX_IMAGE_NAME_SIZE comes from
+librbd.h, and I'm not sure it applies.  Where the other limits come
+from is unclear.
 
-* qemu_rbd_open() uses it to accept options it recognizes, such as
-  "pool" and "image".  Other .bdrv_open() methods do it similarly.
+Drop the length checking.  The limits librbd actually imposes must be
+checked by librbd anyway.
 
-* qemu_rbd_open() accepts additional list-valued options
-  auth-supported and server, with the help of qemu_rbd_array_opts().
-  The list elements are again dictionaries.  qemu_rbd_array_opts()
-  uses runtime_opts to accept their members.  Thus, runtime_opts
-  contains recognized sub-sub-options "auth", "host", "port" in
-  addition to recognized options.  No other block driver does that.
-
-* qemu_rbd_create() uses it to convert the QDict produced by
-  qemu_rbd_parse_filename() to QemuOpts.  No other block driver does
-  that.  The keys produced by qemu_rbd_parse_filename() are "pool",
-  "image", "snapshot", "conf", "user" and "keyvalue-pairs".
-  qemu_rbd_open() accepts these, so no additional ones here.
-
-This is a confusing mess.  Dates back to commit 0f9d252.  First step
-to clean it up is documenting runtime_opts.desc[]:
-
-* Reorder entries to match the QAPI schema, like we do in other block
-  drivers.
-
-* Document why the schema's "server" and "auth-supported" aren't in
-  .desc[].
-
-* Document why "keyvalue-pairs", "host", "port" and "auth" are in
-  .desc[], but not the schema.
-
-* Delete "filename", because none of the three users actually uses it.
-  This fixes -drive to reject parameter filename instead of silently
-  ignoring it.
+There's one minor complication: BDRVRBDState member name is a
+fixed-size array.  Depends on the length limit.  Make it a pointer to
+a dynamically allocated string.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/rbd.c | 40 +++++++++++++++++++++++++---------------
- 1 file changed, 25 insertions(+), 15 deletions(-)
+ block/rbd.c | 91 ++++++++++---------------------------------------------------
+ 1 file changed, 14 insertions(+), 77 deletions(-)
 
 diff --git a/block/rbd.c b/block/rbd.c
-index 2632533..b2afe07 100644
+index 5ba2a87..0fea348 100644
 --- a/block/rbd.c
 +++ b/block/rbd.c
-@@ -294,21 +294,6 @@ static QemuOptsList runtime_opts = {
-     .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
-     .desc = {
-         {
--            .name = "filename",
--            .type = QEMU_OPT_STRING,
--            .help = "Specification of the rbd image",
--        },
--        {
--            .name = "password-secret",
--            .type = QEMU_OPT_STRING,
--            .help = "ID of secret providing the password",
--        },
--        {
--            .name = "conf",
--            .type = QEMU_OPT_STRING,
--            .help = "Rados config file location",
--        },
--        {
-             .name = "pool",
-             .type = QEMU_OPT_STRING,
-             .help = "Rados pool name",
-@@ -319,6 +304,11 @@ static QemuOptsList runtime_opts = {
-             .help = "Image name in the pool",
-         },
-         {
-+            .name = "conf",
-+            .type = QEMU_OPT_STRING,
-+            .help = "Rados config file location",
-+        },
-+        {
-             .name = "snapshot",
-             .type = QEMU_OPT_STRING,
-             .help = "Ceph snapshot name",
-@@ -329,6 +319,19 @@ static QemuOptsList runtime_opts = {
-             .type = QEMU_OPT_STRING,
-             .help = "Rados id name",
-         },
-+        /*
-+         * server.* and auth-supported.* extracted manually, see
-+         * qemu_rbd_array_opts()
-+         */
-+        {
-+            .name = "password-secret",
-+            .type = QEMU_OPT_STRING,
-+            .help = "ID of secret providing the password",
-+        },
-+
-+        /*
-+         * Keys for qemu_rbd_parse_filename(), not in the QAPI schema
-+         */
-         {
-             /*
-              * HACK: name starts with '=' so that qemu_opts_parse()
-@@ -338,6 +341,13 @@ static QemuOptsList runtime_opts = {
-             .type = QEMU_OPT_STRING,
-             .help = "Legacy rados key/value option parameters",
-         },
-+
-+        /*
-+         * The remainder aren't option keys, but option sub-sub-keys,
-+         * so that qemu_rbd_array_opts() can abuse runtime_opts for
-+         * its own purposes
-+         * TODO clean this up
-+         */
-         {
-             .name = "host",
-             .type = QEMU_OPT_STRING,
+@@ -56,11 +56,6 @@
+ 
+ #define OBJ_MAX_SIZE (1UL << OBJ_DEFAULT_OBJ_ORDER)
+ 
+-#define RBD_MAX_CONF_NAME_SIZE 128
+-#define RBD_MAX_CONF_VAL_SIZE 512
+-#define RBD_MAX_CONF_SIZE 1024
+-#define RBD_MAX_POOL_NAME_SIZE 128
+-#define RBD_MAX_SNAP_NAME_SIZE 128
+ #define RBD_MAX_SNAPS 100
+ 
+ /* The LIBRBD_SUPPORTS_IOVEC is defined in librbd.h */
+@@ -99,16 +94,12 @@ typedef struct BDRVRBDState {
+     rados_t cluster;
+     rados_ioctx_t io_ctx;
+     rbd_image_t image;
+-    char name[RBD_MAX_IMAGE_NAME_SIZE];
++    char *name;
+     char *snap;
+ } BDRVRBDState;
+ 
+-static char *qemu_rbd_next_tok(int max_len,
+-                               char *src, char delim,
+-                               const char *name,
+-                               char **p, Error **errp)
++static char *qemu_rbd_next_tok(char *src, char delim, char **p)
+ {
+-    int l;
+     char *end;
+ 
+     *p = NULL;
+@@ -127,15 +118,6 @@ static char *qemu_rbd_next_tok(int max_len,
+             *end = '\0';
+         }
+     }
+-    l = strlen(src);
+-    if (l >= max_len) {
+-        error_setg(errp, "%s too long", name);
+-        return NULL;
+-    } else if (l == 0) {
+-        error_setg(errp, "%s too short", name);
+-        return NULL;
+-    }
+-
+     return src;
+ }
+ 
+@@ -159,7 +141,6 @@ static void qemu_rbd_parse_filename(const char *filename, QDict *options,
+     char *p, *buf, *keypairs;
+     char *found_str;
+     size_t max_keypair_size;
+-    Error *local_err = NULL;
+ 
+     if (!strstart(filename, "rbd:", &start)) {
+         error_setg(errp, "File name must start with 'rbd:'");
+@@ -171,11 +152,7 @@ static void qemu_rbd_parse_filename(const char *filename, QDict *options,
+     keypairs = g_malloc0(max_keypair_size);
+     p = buf;
+ 
+-    found_str = qemu_rbd_next_tok(RBD_MAX_POOL_NAME_SIZE, p,
+-                                  '/', "pool name", &p, &local_err);
+-    if (local_err) {
+-        goto done;
+-    }
++    found_str = qemu_rbd_next_tok(p, '/', &p);
+     if (!p) {
+         error_setg(errp, "Pool name is required");
+         goto done;
+@@ -184,27 +161,15 @@ static void qemu_rbd_parse_filename(const char *filename, QDict *options,
+     qdict_put(options, "pool", qstring_from_str(found_str));
+ 
+     if (strchr(p, '@')) {
+-        found_str = qemu_rbd_next_tok(RBD_MAX_IMAGE_NAME_SIZE, p,
+-                                      '@', "object name", &p, &local_err);
+-        if (local_err) {
+-            goto done;
+-        }
++        found_str = qemu_rbd_next_tok(p, '@', &p);
+         qemu_rbd_unescape(found_str);
+         qdict_put(options, "image", qstring_from_str(found_str));
+ 
+-        found_str = qemu_rbd_next_tok(RBD_MAX_SNAP_NAME_SIZE, p,
+-                                      ':', "snap name", &p, &local_err);
+-        if (local_err) {
+-            goto done;
+-        }
++        found_str = qemu_rbd_next_tok(p, ':', &p);
+         qemu_rbd_unescape(found_str);
+         qdict_put(options, "snapshot", qstring_from_str(found_str));
+     } else {
+-        found_str = qemu_rbd_next_tok(RBD_MAX_IMAGE_NAME_SIZE, p,
+-                                      ':', "object name", &p, &local_err);
+-        if (local_err) {
+-            goto done;
+-        }
++        found_str = qemu_rbd_next_tok(p, ':', &p);
+         qemu_rbd_unescape(found_str);
+         qdict_put(options, "image", qstring_from_str(found_str));
+     }
+@@ -212,11 +177,7 @@ static void qemu_rbd_parse_filename(const char *filename, QDict *options,
+         goto done;
+     }
+ 
+-    found_str = qemu_rbd_next_tok(RBD_MAX_CONF_NAME_SIZE, p,
+-                                  '\0', "configuration", &p, &local_err);
+-    if (local_err) {
+-        goto done;
+-    }
++    found_str = qemu_rbd_next_tok(p, '\0', &p);
+ 
+     p = found_str;
+ 
+@@ -224,12 +185,7 @@ static void qemu_rbd_parse_filename(const char *filename, QDict *options,
+      * 'id' and 'conf' a bit special.  Key/value pairs may be in any order. */
+     while (p) {
+         char *name, *value;
+-        name = qemu_rbd_next_tok(RBD_MAX_CONF_NAME_SIZE, p,
+-                                 '=', "conf option name", &p, &local_err);
+-        if (local_err) {
+-            break;
+-        }
+-
++        name = qemu_rbd_next_tok(p, '=', &p);
+         if (!p) {
+             error_setg(errp, "conf option %s has no value", name);
+             break;
+@@ -237,11 +193,7 @@ static void qemu_rbd_parse_filename(const char *filename, QDict *options,
+ 
+         qemu_rbd_unescape(name);
+ 
+-        value = qemu_rbd_next_tok(RBD_MAX_CONF_VAL_SIZE, p,
+-                                  ':', "conf option value", &p, &local_err);
+-        if (local_err) {
+-            break;
+-        }
++        value = qemu_rbd_next_tok(p, ':', &p);
+         qemu_rbd_unescape(value);
+ 
+         if (!strcmp(name, "conf")) {
+@@ -274,9 +226,6 @@ static void qemu_rbd_parse_filename(const char *filename, QDict *options,
+ 
+ 
+ done:
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-    }
+     g_free(buf);
+     g_free(keypairs);
+     return;
+@@ -308,30 +257,20 @@ static int qemu_rbd_set_keypairs(rados_t cluster, const char *keypairs,
+     char *p, *buf;
+     char *name;
+     char *value;
+-    Error *local_err = NULL;
+     int ret = 0;
+ 
+     buf = g_strdup(keypairs);
+     p = buf;
+ 
+     while (p) {
+-        name = qemu_rbd_next_tok(RBD_MAX_CONF_NAME_SIZE, p,
+-                                 '=', "conf option name", &p, &local_err);
+-        if (local_err) {
+-            break;
+-        }
+-
++        name = qemu_rbd_next_tok(p, '=', &p);
+         if (!p) {
+             error_setg(errp, "conf option %s has no value", name);
+             ret = -EINVAL;
+             break;
+         }
+ 
+-        value = qemu_rbd_next_tok(RBD_MAX_CONF_VAL_SIZE, p,
+-                                  ':', "conf option value", &p, &local_err);
+-        if (local_err) {
+-            break;
+-        }
++        value = qemu_rbd_next_tok(p, ':', &p);
+ 
+         ret = rados_conf_set(cluster, name, value);
+         if (ret < 0) {
+@@ -341,10 +280,6 @@ static int qemu_rbd_set_keypairs(rados_t cluster, const char *keypairs,
+         }
+     }
+ 
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        ret = -EINVAL;
+-    }
+     g_free(buf);
+     return ret;
+ }
+@@ -724,7 +659,7 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+     }
+ 
+     s->snap = g_strdup(snap);
+-    pstrcpy(s->name, RBD_MAX_IMAGE_NAME_SIZE, name);
++    s->name = g_strdup(name);
+ 
+     /* try default location when conf=NULL, but ignore failure */
+     r = rados_conf_read_file(s->cluster, conf);
+@@ -798,6 +733,7 @@ failed_open:
+ failed_shutdown:
+     rados_shutdown(s->cluster);
+     g_free(s->snap);
++    g_free(s->name);
+ failed_opts:
+     qemu_opts_del(opts);
+     g_free(mon_host);
+@@ -812,6 +748,7 @@ static void qemu_rbd_close(BlockDriverState *bs)
+     rbd_close(s->image);
+     rados_ioctx_destroy(s->io_ctx);
+     g_free(s->snap);
++    g_free(s->name);
+     rados_shutdown(s->cluster);
+ }
+ 
 -- 
 2.7.4
