@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1csPH4-00044s-7p
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 03:41:11 -0400
+	(envelope-from <jgross@suse.com>) id 1csPIl-0004eZ-GD
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 03:42:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1csPGz-0008DV-A8
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 03:41:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57684)
+	(envelope-from <jgross@suse.com>) id 1csPIh-0000je-JJ
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 03:42:55 -0400
+Received: from mx2.suse.de ([195.135.220.15]:32950)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1csPGz-0008DM-1g
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 03:41:05 -0400
-Date: Mon, 27 Mar 2017 15:40:58 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170327074058.GC11497@pxdev.xzpeter.org>
-References: <1490599288-11751-1-git-send-email-peterx@redhat.com>
-	<1490599288-11751-6-git-send-email-peterx@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1490599288-11751-6-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 5/5] cpu: throttle: fix throttle time slice
+	(Exim 4.71) (envelope-from <jgross@suse.com>) id 1csPIh-0000jX-9y
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 03:42:51 -0400
+From: Juergen Gross <jgross@suse.com>
+Date: Mon, 27 Mar 2017 09:42:45 +0200
+Message-Id: <20170327074245.3821-1-jgross@suse.com>
+Subject: [Qemu-devel] [PATCH v2] configure: use pkg-config for obtaining xen
+ version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,68 +22,257 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Juan Quintela <quintela@redhat.com>, "\\  Dr . David Alan Gilbert \\ " <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
+Cc: anthony.perard@citrix.com, kraxel@redhat.com, sstabellini@kernel.org, paul.durrant@citrix.com, Juergen Gross <jgross@suse.com>
 
-On Mon, Mar 27, 2017 at 03:21:28PM +0800, Peter Xu wrote:
-> IIUC the throttle idea is that: we split a CPU_THROTTLE_TIMESLICE_NS
-> time slice into two parts - one for vcpu, one for throttle thread (which
-> will suspend the thread by a sleep). However current algorithm on
-> calculating the working piece and sleeping piece is strange.
-> 
-> Assume a 99% throttle, what we want is to merely stop vcpu from running,
-> but the old logic will just first let the vcpu run for a very long
-> time (which is "CPU_THROTTLE_TIMESLICE_NS / (1-pct)" = 1 second) before
-> doing anything else.
-> 
-> Fixing it up to the simplest but imho accurate logic.
+Instead of trying to guess the Xen version to use by compiling various
+test programs first just ask the system via pkg-config. Only if it
+can't return the version fall back to the test program scheme.
 
-Oh, looks like I need to switch the two pct below... :)
+If configure is being called with dedicated flags for the Xen libraries
+use those instead of the pkg-config output. This will avoid breaking
+an in-tree Xen build of an old Xen version while a new Xen version is
+installed on the build machine: pkg-config would pick up the installed
+Xen config files as the Xen tree wouldn't contain any of them.
 
-> 
-> CC: Paolo Bonzini <pbonzini@redhat.com>
-> CC: Richard Henderson <rth@twiddle.net>
-> CC: Jason J. Herne <jjherne@linux.vnet.ibm.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  cpus.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/cpus.c b/cpus.c
-> index 167d961..7976ce4 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -633,7 +633,6 @@ static const VMStateDescription vmstate_timers = {
->  static void cpu_throttle_thread(CPUState *cpu, run_on_cpu_data opaque)
->  {
->      double pct;
-> -    double throttle_ratio;
->      long sleeptime_ns;
->  
->      if (!cpu_throttle_get_percentage()) {
-> @@ -641,8 +640,7 @@ static void cpu_throttle_thread(CPUState *cpu, run_on_cpu_data opaque)
->      }
->  
->      pct = (double)cpu_throttle_get_percentage()/100;
-> -    throttle_ratio = pct / (1 - pct);
-> -    sleeptime_ns = (long)(throttle_ratio * CPU_THROTTLE_TIMESLICE_NS);
-> +    sleeptime_ns = (long)((1 - pct) * CPU_THROTTLE_TIMESLICE_NS);
-                             ^^^^^^^^^
-                             here it should be "pct", while...
+Signed-off-by: Juergen Gross <jgross@suse.com>
+---
+V2: - use pkg-config only if no Xen library paths have been specified via
+      --extra-ldflags
+    - keep test program for detecting Xen 4.9
+---
+ configure | 155 ++++++++++++++++++++++++++++++++++----------------------------
+ 1 file changed, 86 insertions(+), 69 deletions(-)
 
->  
->      qemu_mutex_unlock_iothread();
->      atomic_set(&cpu->throttle_thread_scheduled, 0);
-> @@ -668,7 +666,7 @@ static void cpu_throttle_timer_tick(void *opaque)
->  
->      pct = (double)cpu_throttle_get_percentage()/100;
->      timer_mod(throttle_timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL_RT) +
-> -                                   CPU_THROTTLE_TIMESLICE_NS / (1-pct));
-> +                                   CPU_THROTTLE_TIMESLICE_NS * pct);
-                                                                  ^^^
-                                                here it should be (1 - pct)
-
-I'll wait for review comment on the raw idea, to see whether I will
-need a repost. Sorry for the misunderstanding.
-
--- peterx
+diff --git a/configure b/configure
+index aabf098..c34b025 100755
+--- a/configure
++++ b/configure
+@@ -1962,30 +1962,46 @@ fi
+ # xen probe
+ 
+ if test "$xen" != "no" ; then
+-  xen_libs="-lxenstore -lxenctrl -lxenguest"
+-  xen_stable_libs="-lxenforeignmemory -lxengnttab -lxenevtchn"
++  # Check whether Xen library path is specified via --extra-ldflags to avoid
++  # overriding this setting with pkg-config output. If not, try pkg-config
++  # to obtain all needed flags.
+ 
+-  # First we test whether Xen headers and libraries are available.
+-  # If no, we are done and there is no Xen support.
+-  # If yes, more tests are run to detect the Xen version.
++  if ! echo $EXTRA_LDFLAGS | grep tools/libxc > /dev/null && \
++     $pkg_config --exists xencontrol ; then
++    xen_ctrl_version="$(printf '%d%02d%02d' \
++      $($pkg_config --modversion xencontrol | sed 's/\./ /g') )"
++    xen=yes
++    xen_pc="xencontrol xenstore xenguest xenforeignmemory xengnttab"
++    xen_pc="$xen_pc xenevtchn xendevicemodel"
++    QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags $xen_pc)"
++    libs_softmmu="$($pkg_config --libs $xen_pc) $libs_softmmu"
++    LDFLAGS="$($pkg_config --libs $xen_pc) $LDFLAGS"
++  else
+ 
+-  # Xen (any)
+-  cat > $TMPC <<EOF
++    xen_libs="-lxenstore -lxenctrl -lxenguest"
++    xen_stable_libs="-lxenforeignmemory -lxengnttab -lxenevtchn"
++
++    # First we test whether Xen headers and libraries are available.
++    # If no, we are done and there is no Xen support.
++    # If yes, more tests are run to detect the Xen version.
++
++    # Xen (any)
++    cat > $TMPC <<EOF
+ #include <xenctrl.h>
+ int main(void) {
+   return 0;
+ }
+ EOF
+-  if ! compile_prog "" "$xen_libs" ; then
+-    # Xen not found
+-    if test "$xen" = "yes" ; then
+-      feature_not_found "xen" "Install xen devel"
+-    fi
+-    xen=no
++    if ! compile_prog "" "$xen_libs" ; then
++      # Xen not found
++      if test "$xen" = "yes" ; then
++        feature_not_found "xen" "Install xen devel"
++      fi
++      xen=no
+ 
+-  # Xen unstable
+-  elif
+-      cat > $TMPC <<EOF &&
++    # Xen unstable
++    elif
++        cat > $TMPC <<EOF &&
+ #undef XC_WANT_COMPAT_DEVICEMODEL_API
+ #define __XEN_TOOLS__
+ #include <xendevicemodel.h>
+@@ -1998,13 +2014,13 @@ int main(void) {
+   return 0;
+ }
+ EOF
+-      compile_prog "" "$xen_libs $xen_stable_libs -lxendevicemodel"
+-    then
+-    xen_stable_libs="$xen_stable_libs -lxendevicemodel"
+-    xen_ctrl_version=40900
+-    xen=yes
+-  elif
+-      cat > $TMPC <<EOF &&
++        compile_prog "" "$xen_libs $xen_stable_libs -lxendevicemodel"
++      then
++      xen_stable_libs="$xen_stable_libs -lxendevicemodel"
++      xen_ctrl_version=40900
++      xen=yes
++    elif
++        cat > $TMPC <<EOF &&
+ /*
+  * If we have stable libs the we don't want the libxc compat
+  * layers, regardless of what CFLAGS we may have been given.
+@@ -2054,12 +2070,12 @@ int main(void) {
+   return 0;
+ }
+ EOF
+-      compile_prog "" "$xen_libs $xen_stable_libs"
+-    then
+-    xen_ctrl_version=40800
+-    xen=yes
+-  elif
+-      cat > $TMPC <<EOF &&
++        compile_prog "" "$xen_libs $xen_stable_libs"
++      then
++      xen_ctrl_version=40800
++      xen=yes
++    elif
++        cat > $TMPC <<EOF &&
+ /*
+  * If we have stable libs the we don't want the libxc compat
+  * layers, regardless of what CFLAGS we may have been given.
+@@ -2105,12 +2121,12 @@ int main(void) {
+   return 0;
+ }
+ EOF
+-      compile_prog "" "$xen_libs $xen_stable_libs"
+-    then
+-    xen_ctrl_version=40701
+-    xen=yes
+-  elif
+-      cat > $TMPC <<EOF &&
++        compile_prog "" "$xen_libs $xen_stable_libs"
++      then
++      xen_ctrl_version=40701
++      xen=yes
++    elif
++        cat > $TMPC <<EOF &&
+ #include <xenctrl.h>
+ #include <stdint.h>
+ int main(void) {
+@@ -2120,14 +2136,14 @@ int main(void) {
+   return 0;
+ }
+ EOF
+-      compile_prog "" "$xen_libs"
+-    then
+-    xen_ctrl_version=40700
+-    xen=yes
++        compile_prog "" "$xen_libs"
++      then
++      xen_ctrl_version=40700
++      xen=yes
+ 
+-  # Xen 4.6
+-  elif
+-      cat > $TMPC <<EOF &&
++    # Xen 4.6
++    elif
++        cat > $TMPC <<EOF &&
+ #include <xenctrl.h>
+ #include <xenstore.h>
+ #include <stdint.h>
+@@ -2148,14 +2164,14 @@ int main(void) {
+   return 0;
+ }
+ EOF
+-      compile_prog "" "$xen_libs"
+-    then
+-    xen_ctrl_version=40600
+-    xen=yes
++        compile_prog "" "$xen_libs"
++      then
++      xen_ctrl_version=40600
++      xen=yes
+ 
+-  # Xen 4.5
+-  elif
+-      cat > $TMPC <<EOF &&
++    # Xen 4.5
++    elif
++        cat > $TMPC <<EOF &&
+ #include <xenctrl.h>
+ #include <xenstore.h>
+ #include <stdint.h>
+@@ -2175,13 +2191,13 @@ int main(void) {
+   return 0;
+ }
+ EOF
+-      compile_prog "" "$xen_libs"
+-    then
+-    xen_ctrl_version=40500
+-    xen=yes
++        compile_prog "" "$xen_libs"
++      then
++      xen_ctrl_version=40500
++      xen=yes
+ 
+-  elif
+-      cat > $TMPC <<EOF &&
++    elif
++        cat > $TMPC <<EOF &&
+ #include <xenctrl.h>
+ #include <xenstore.h>
+ #include <stdint.h>
+@@ -2200,24 +2216,25 @@ int main(void) {
+   return 0;
+ }
+ EOF
+-      compile_prog "" "$xen_libs"
+-    then
+-    xen_ctrl_version=40200
+-    xen=yes
++        compile_prog "" "$xen_libs"
++      then
++      xen_ctrl_version=40200
++      xen=yes
+ 
+-  else
+-    if test "$xen" = "yes" ; then
+-      feature_not_found "xen (unsupported version)" \
+-                        "Install a supported xen (xen 4.2 or newer)"
++    else
++      if test "$xen" = "yes" ; then
++        feature_not_found "xen (unsupported version)" \
++                          "Install a supported xen (xen 4.2 or newer)"
++      fi
++      xen=no
+     fi
+-    xen=no
+-  fi
+ 
+-  if test "$xen" = yes; then
+-    if test $xen_ctrl_version -ge 40701  ; then
+-      libs_softmmu="$xen_stable_libs $libs_softmmu"
++    if test "$xen" = yes; then
++      if test $xen_ctrl_version -ge 40701  ; then
++        libs_softmmu="$xen_stable_libs $libs_softmmu"
++      fi
++      libs_softmmu="$xen_libs $libs_softmmu"
+     fi
+-    libs_softmmu="$xen_libs $libs_softmmu"
+   fi
+ fi
+ 
+-- 
+2.10.2
