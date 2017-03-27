@@ -1,23 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51166)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1csWqy-0007tq-Jp
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 11:46:45 -0400
+	(envelope-from <mreitz@redhat.com>) id 1csWwn-0001R9-SB
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 11:52:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1csWqt-0003Qd-QI
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 11:46:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55100)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1csWqt-0003Pb-Hc
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 11:46:39 -0400
-Date: Mon, 27 Mar 2017 12:46:36 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170327154636.GI28530@thinpad.lan.raisama.net>
-References: <1490624810-44752-1-git-send-email-agraf@suse.de>
+	(envelope-from <mreitz@redhat.com>) id 1csWwn-0006Bt-7k
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 11:52:45 -0400
+From: Max Reitz <mreitz@redhat.com>
+Date: Mon, 27 Mar 2017 17:52:28 +0200
+Message-Id: <20170327155234.10980-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1490624810-44752-1-git-send-email-agraf@suse.de>
-Subject: Re: [Qemu-devel] [PATCH] i386: Allow monitor / mwait cpuid override
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/6] Block patches for rc2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,88 +20,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Graf <agraf@suse.de>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, kvm@vger.kernel.org
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On Mon, Mar 27, 2017 at 04:26:50PM +0200, Alexander Graf wrote:
-> KVM allows trap and emulate (read: NOP) of the MONITOR and MWAIT
-> instructions. There is work undergoing to enable actual execution
-> of these inside of KVM, but nobody really wants to expose the feature
-> to the guest by default, as it would eat up all of the host CPU.
+The following changes since commit ea2afcf5b6727a577cf561fd8fe0d8c397ecc9=
+27:
 
-Isn't this something that should be reported using
-KVM_GET_EMULATED_CPUID? (QEMU still doesn't know how to use
-KVM_GET_EMULATED_CPUID, however.)
+  Merge remote-tracking branch 'remotes/stefanha/tags/tracing-pull-reques=
+t' into staging (2017-03-24 14:14:18 +0000)
 
-> 
-> So today there is no streamlined way to actually notify the guest that
-> it's ok to execute MONITOR / MWAIT, even when we want to explicitly
-> leave the guest in guest context.
+are available in the git repository at:
 
-I'm not familiar with the variables involved in this decision.
-How exactly would somebody (human or software) determine if it's
-really ok to let the guest execute MONITOR / MWAIT?
+  git://github.com/XanClic/qemu.git tags/pull-block-2017-03-27
 
-Under what circumstances do you expect this to be used? Is this
-just for debugging and development?
+for you to fetch changes up to 700f9ce0f9f49675818ac95c8953cbc65aa1d112:
 
-> 
-> This patch adds a new -cpu parameter called "mwait" which - when
-> enabled - force enables the MONITOR / MWAIT CPUID flag, even when
-> the underlying accel framework does not explicitly advertise support.
-> 
+  block/file-posix.c: Fix unused variable warning on OpenBSD (2017-03-27 =
+17:28:34 +0200)
 
-If you really want something that makes QEMU ignore what the
-accel code is reporting, I would prefer a syntax that could be
-used for other features too, like "-cpu ...,monitor=force".
+----------------------------------------------------------------
+Block patches for 2.9-rc2.
 
-> With that in place, we can explicitly allow users to specify that
-> they want have the guest execute MONITOR / MWAIT in its idle loop.
-> 
-> Signed-off-by: Alexander Graf <agraf@suse.de>
-> ---
->  target/i386/cpu.c | 5 +++++
->  target/i386/cpu.h | 1 +
->  2 files changed, 6 insertions(+)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 7aa7622..c44020b 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -3460,6 +3460,10 @@ static int x86_cpu_filter_features(X86CPU *cpu)
->              x86_cpu_get_supported_feature_word(w, false);
->          uint32_t requested_features = env->features[w];
->          env->features[w] &= host_feat;
-> +        if (cpu->expose_monitor && (w == FEAT_1_ECX)) {
-> +            /* Force monitor feature in */
-> +            env->features[w] |= CPUID_EXT_MONITOR;
-> +        }
->          cpu->filtered_features[w] = requested_features & ~env->features[w];
->          if (cpu->filtered_features[w]) {
->              rv = 1;
-> @@ -3988,6 +3992,7 @@ static Property x86_cpu_properties[] = {
->      DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
->      DEFINE_PROP_BOOL("enforce", X86CPU, enforce_cpuid, false),
->      DEFINE_PROP_BOOL("kvm", X86CPU, expose_kvm, true),
-> +    DEFINE_PROP_BOOL("mwait", X86CPU, expose_monitor, false),
->      DEFINE_PROP_UINT32("phys-bits", X86CPU, phys_bits, 0),
->      DEFINE_PROP_BOOL("host-phys-bits", X86CPU, host_phys_bits, false),
->      DEFINE_PROP_BOOL("fill-mtrr-mask", X86CPU, fill_mtrr_mask, true),
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 07401ad..7400d00 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1214,6 +1214,7 @@ struct X86CPU {
->      bool check_cpuid;
->      bool enforce_cpuid;
->      bool expose_kvm;
-> +    bool expose_monitor;
->      bool migratable;
->      bool max_features; /* Enable all supported features automatically */
->      uint32_t apic_id;
-> -- 
-> 1.8.5.6
-> 
+----------------------------------------------------------------
+Hi Peter,
 
--- 
-Eduardo
+This pull request contains your build fix for OpenBSD on top so you can
+just drop it if you have merged it yourself already.
+
+
+Thanks,
+
+Max
+
+----------------------------------------------------------------
+Kevin Wolf (1):
+      file-posix: Make bdrv_flush() failure permanent without O_DIRECT
+
+Paolo Bonzini (1):
+      nbd-client: fix handling of hungup connections
+
+Peter Maydell (1):
+      block/file-posix.c: Fix unused variable warning on OpenBSD
+
+Stefan Hajnoczi (3):
+      qemu-img: show help for invalid global options
+      qemu-img: fix switch indentation in img_amend()
+      qemu-img: print short help on getopt failure
+
+ block/file-posix.c |  50 ++++++++++----
+ block/nbd-client.c |  12 ++--
+ nbd/client.c       |   2 +-
+ qemu-img.c         | 196 +++++++++++++++++++++++++++++++++++++----------=
+------
+ 4 files changed, 180 insertions(+), 80 deletions(-)
+
+--=20
+2.12.1
