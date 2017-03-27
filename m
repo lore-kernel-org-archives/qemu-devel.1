@@ -1,18 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1cscyw-00058G-Ut
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 18:19:24 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1csdR9-0000Iz-8j
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 18:48:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1cscyt-0007Oy-Iq
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 18:19:22 -0400
-Received: from mx2.suse.de ([195.135.220.15]:53227)
+	(envelope-from <sstabellini@kernel.org>) id 1csdR6-0000VX-5S
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 18:48:31 -0400
+Received: from mail.kernel.org ([198.145.29.136]:47146)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <agraf@suse.de>) id 1cscyt-0007Oa-8l
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 18:19:19 -0400
-From: Alexander Graf <agraf@suse.de>
-Date: Tue, 28 Mar 2017 00:19:37 +0200
-Message-Id: <1490653177-131484-1-git-send-email-agraf@suse.de>
-Subject: [Qemu-devel] [PATCH] i386: Allow cpuid bit override
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1csdR5-0000VM-SD
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 18:48:28 -0400
+Date: Mon, 27 Mar 2017 15:48:23 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <d02897ba-88c6-f92e-ccf5-afab3c584f75@suse.com>
+Message-ID: <alpine.DEB.2.10.1703271537330.8001@sstabellini-ThinkPad-X260>
+References: <alpine.DEB.2.10.1703201117560.23684@sstabellini-ThinkPad-X260>
+	<1490033952-26735-1-git-send-email-sstabellini@kernel.org>
+	<20170323140005.6b0853b3@bahia.lan>
+	<15207674-c5cd-3874-7ac9-5b23cdac8888@suse.com>
+	<28db5816-2ed9-0d92-a15d-af47b58a9da1@redhat.com>
+	<alpine.DEB.2.10.1703230953120.8001@sstabellini-ThinkPad-X260>
+	<3d94c0aa-6b18-5574-4034-110cc2cf4b90@suse.com>
+	<alpine.DEB.2.10.1703241030391.8001@sstabellini-ThinkPad-X260>
+	<d02897ba-88c6-f92e-ccf5-afab3c584f75@suse.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v4 1/8] xen: import ring.h from xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,137 +34,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: Juergen Gross <jgross@suse.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, Stefano Stabellini <stefano@aporeto.com>, anthony.perard@citrix.com, xen-devel <xen-devel@lists.xenproject.org>
 
-KVM has a feature bitmap of CPUID bits that it knows works for guests.
-QEMU removes bits that are not part of that bitmap automatically on VM
-start.
+On Mon, 27 Mar 2017, Juergen Gross wrote:
+> On 24/03/17 18:37, Stefano Stabellini wrote:
+> > On Fri, 24 Mar 2017, Juergen Gross wrote:
+> >> On 23/03/17 19:22, Stefano Stabellini wrote:
+> >>> On Thu, 23 Mar 2017, Paolo Bonzini wrote:
+> >>>> On 23/03/2017 14:55, Juergen Gross wrote:
+> >>>>> On 23/03/17 14:00, Greg Kurz wrote:
+> >>>>>> On Mon, 20 Mar 2017 11:19:05 -0700
+> >>>>>> Stefano Stabellini <sstabellini@kernel.org> wrote:
+> >>>>>>
+> >>>>>>> Do not use the ring.h header installed on the system. Instead, import
+> >>>>>>> the header into the QEMU codebase. This avoids problems when QEMU is
+> >>>>>>> built against a Xen version too old to provide all the ring macros.
+> >>>>>>>
+> >>>>>>> Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
+> >>>>>>> Reviewed-by: Greg Kurz <groug@kaod.org>
+> >>>>>>> CC: anthony.perard@citrix.com
+> >>>>>>> CC: jgross@suse.com
+> >>>>>>> ---
+> >>>>>>> NB: The new macros have not been committed to Xen yet. Do not apply this
+> >>>>>>> patch until they do.
+> >>>>>>> ---
+> >>>>>>
+> >>>>>> Looking at your other series for the kernel part of this feature:
+> >>>>>>
+> >>>>>> https://lkml.org/lkml/2017/3/22/761
+> >>>>>>
+> >>>>>> I realize that the ring.h header from Xen also exists in the kernel tree... 
+> >>>>>>
+> >>>>>> Shouldn't all the code that can be used in both kernel and userspace go to a
+> >>>>>> header file under include/uapi in the kernel tree ? And then we would import
+> >>>>>> it under include/standard-headers/linux in the QEMU tree and we could keep it
+> >>>>>> in sync using scripts/update-linux-headers.sh.
+> >>>>>>
+> >>>>>> Cc'ing Paolo for insights.
+> >>>>>
+> >>>>> As Xen isn't part of the kernel we don't want that. You can use and/or
+> >>>>> build qemu with xen-9pfs backend support on an old Linux kernel without
+> >>>>> the related frontend.
+> >>>>
+> >>>> As long as the header changes rarely, I guess it's fine not to go
+> >>>> through update-linux-headers.sh.
+> >>>
+> >>> Very rarely, last time ring.h was changed was 2015, and to introduce a
+> >>> new macro (which we don't necessarily need in QEMU).
+> >>>
+> >>>
+> >>>>> OTOH I don't see the advantage of not using the headers from Xen. This
+> >>>>> is working for qdisk and pvusb backends and for all the Xen libraries.
+> >>>>> Do you expect the 9pfs backend to be used for a qemu version built
+> >>>>> against a Xen version not supporting that backend?
+> >>>
+> >>> Yes, I think that is entirely possible: Xen and QEMU versions can mix
+> >>> and match.
+> >>>
+> >>> Keeping in mind that the 9pfs backend has actually no build dependencies
+> >>> on Xen, except for these new ring.h macros, we have the following
+> >>> options:
+> >>>
+> >>> 1) we build the 9pfs backend only for Xen >= 4.9, because of the new
+> >>>    macros in ring.h that we need
+> >>
+> >> Right. You have sent 9pfs support patches for Xen tools. So obviously
+> >> you need a proper Xen version to use 9pfs. Why not build qemu against
+> >> it? Do you really expect a new Xen being used with an old qemu while
+> >> wanting to use new features? That makes no sense for me.
+> >  
+> > Tools support is needed to setup the frontend/backend connection as
+> > usual, but that's not a requirement for building the 9pfs backend. In
+> > fact, the backend doesn't need any tools support for it to work. The
+> > macro themselves are just a convenience - the backend would work just
+> > fine without them. Why restrict the QEMU build gratuitously?
+> 
+> You are duplicating a header without any real benefit I can see. This
+> is adding future work for keeping both versions of the header in sync.
+> 
+> In which scenario would you want qemu to support xen-9pfs without being
+> built against a Xen version supporting xen-9pfs?
+> 
+> I am not completely against copying the header, I just don't see an
+> advantage for any distro or user in doing it.
 
-However, some times we just don't list features in that list because
-they don't make sense for normal scenarios, but may be useful in specific,
-targeted workloads.
-
-For that purpose, add a new =force option to all CPUID feature flags in
-the CPU property. With that we can override the accel filtering and give
-users full control over the CPUID feature bits exposed into guests.
-
-Signed-off-by: Alexander Graf <agraf@suse.de>
----
- target/i386/cpu.c | 30 ++++++++++++++++++++++++++----
- target/i386/cpu.h |  3 +++
- 2 files changed, 29 insertions(+), 4 deletions(-)
-
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 7aa7622..5a22f9a 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2229,7 +2229,7 @@ void x86_cpu_list(FILE *f, fprintf_function cpu_fprintf)
-     g_slist_foreach(list, x86_cpu_list_entry, &s);
-     g_slist_free(list);
- 
--    (*cpu_fprintf)(f, "\nRecognized CPUID flags:\n");
-+    (*cpu_fprintf)(f, "\nRecognized CPUID flags (=on|=off|=force):\n");
-     for (i = 0; i < ARRAY_SIZE(feature_word_info); i++) {
-         FeatureWordInfo *fw = &feature_word_info[i];
- 
-@@ -3460,6 +3460,7 @@ static int x86_cpu_filter_features(X86CPU *cpu)
-             x86_cpu_get_supported_feature_word(w, false);
-         uint32_t requested_features = env->features[w];
-         env->features[w] &= host_feat;
-+        env->features[w] |= cpu->forced_features[w];
-         cpu->filtered_features[w] = requested_features & ~env->features[w];
-         if (cpu->filtered_features[w]) {
-             rv = 1;
-@@ -3693,6 +3694,7 @@ static void x86_cpu_unrealizefn(DeviceState *dev, Error **errp)
- 
- typedef struct BitProperty {
-     uint32_t *ptr;
-+    uint32_t *force_ptr;
-     uint32_t mask;
- } BitProperty;
- 
-@@ -3701,7 +3703,15 @@ static void x86_cpu_get_bit_prop(Object *obj, Visitor *v, const char *name,
- {
-     BitProperty *fp = opaque;
-     bool value = (*fp->ptr & fp->mask) == fp->mask;
--    visit_type_bool(v, name, &value, errp);
-+    bool forced = (*fp->force_ptr & fp->mask) == fp->mask;
-+    char str[] = "force";
-+    char *strval = str;
-+
-+    if (!forced) {
-+        strcpy(str, value ? "on" : "off");
-+    }
-+
-+    visit_type_str(v, name, &strval, errp);
- }
- 
- static void x86_cpu_set_bit_prop(Object *obj, Visitor *v, const char *name,
-@@ -3710,6 +3720,7 @@ static void x86_cpu_set_bit_prop(Object *obj, Visitor *v, const char *name,
-     DeviceState *dev = DEVICE(obj);
-     BitProperty *fp = opaque;
-     Error *local_err = NULL;
-+    char *strval = NULL;
-     bool value;
- 
-     if (dev->realized) {
-@@ -3717,7 +3728,15 @@ static void x86_cpu_set_bit_prop(Object *obj, Visitor *v, const char *name,
-         return;
-     }
- 
--    visit_type_bool(v, name, &value, &local_err);
-+    visit_type_str(v, name, &strval, &local_err);
-+    if (!local_err && !strcmp(strval, "force")) {
-+        value = true;
-+        *fp->force_ptr |= fp->mask;
-+    } else {
-+        local_err = NULL;
-+        visit_type_bool(v, name, &value, &local_err);
-+    }
-+
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-@@ -3746,6 +3765,7 @@ static void x86_cpu_release_bit_prop(Object *obj, const char *name,
- static void x86_cpu_register_bit_prop(X86CPU *cpu,
-                                       const char *prop_name,
-                                       uint32_t *field,
-+                                      uint32_t *force_field,
-                                       int bitnr)
- {
-     BitProperty *fp;
-@@ -3760,6 +3780,7 @@ static void x86_cpu_register_bit_prop(X86CPU *cpu,
-     } else {
-         fp = g_new0(BitProperty, 1);
-         fp->ptr = field;
-+        fp->force_ptr = force_field;
-         fp->mask = mask;
-         object_property_add(OBJECT(cpu), prop_name, "bool",
-                             x86_cpu_get_bit_prop,
-@@ -3787,7 +3808,8 @@ static void x86_cpu_register_feature_bit_props(X86CPU *cpu,
-     /* aliases don't use "|" delimiters anymore, they are registered
-      * manually using object_property_add_alias() */
-     assert(!strchr(name, '|'));
--    x86_cpu_register_bit_prop(cpu, name, &cpu->env.features[w], bitnr);
-+    x86_cpu_register_bit_prop(cpu, name, &cpu->env.features[w],
-+                              &cpu->forced_features[w], bitnr);
- }
- 
- static GuestPanicInformation *x86_cpu_get_crash_info(CPUState *cs)
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 07401ad..128530e 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1228,6 +1228,9 @@ struct X86CPU {
-     /* Features that were filtered out because of missing host capabilities */
-     uint32_t filtered_features[FEATURE_WORDS];
- 
-+    /* Features that are force enabled despite incompatible accel */
-+    uint32_t forced_features[FEATURE_WORDS];
-+
-     /* Enable PMU CPUID bits. This can't be enabled by default yet because
-      * it doesn't have ABI stability guarantees, as it passes all PMU CPUID
-      * bits returned by GET_SUPPORTED_CPUID (that depend on host CPU and kernel
--- 
-1.8.5.6
+I understand your point of view, and honestly it wouldn't be a problem
+doing it the way you suggested either. However, I think that going
+forward it will be less of a maintenance pain to keep ring.h in sync,
+compared to maintaining a versioned build dependency between Xen and
+QEMU for the compilation of one PV backend. We do have version checks
+in QEMU for Xen compatibility, but not for PV backends or the xenpv
+machine yet.
