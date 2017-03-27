@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1csal1-0000qm-Fw
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 15:56:52 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1csaz4-0004AM-RW
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 16:11:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1csaky-0003lA-Dx
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 15:56:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36260)
+	(envelope-from <sstabellini@kernel.org>) id 1csaz1-0002wa-MD
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 16:11:22 -0400
+Received: from mail.kernel.org ([198.145.29.136]:35552)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1csaky-0003kD-50
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 15:56:48 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D08957F40B
-	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 19:56:46 +0000 (UTC)
-Date: Mon, 27 Mar 2017 15:56:45 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170327195645.GE22342@localhost.localdomain>
-References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
-	<1490621195-2228-2-git-send-email-armbru@redhat.com>
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1csaz1-0002wM-C8
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 16:11:19 -0400
+Date: Mon, 27 Mar 2017 13:11:13 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <24e4427dea5d4991bf8e64227886cb86@AMSPEX02CL03.citrite.net>
+Message-ID: <alpine.DEB.2.10.1703271309580.8001@sstabellini-ThinkPad-X260>
+References: <20170327074245.3821-1-jgross@suse.com>
+	<1330e0a0d9814073b39b52bd6e08a6a8@AMSPEX02CL03.citrite.net>
+	<552de1bb-46bf-1579-d8b2-763d4612eb44@suse.com>
+	<24e4427dea5d4991bf8e64227886cb86@AMSPEX02CL03.citrite.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1490621195-2228-2-git-send-email-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v3 for-2.9 01/11] rbd: Reject -blockdev
- server.*.{numeric, to, ipv4, ipv6}
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v2] configure: use pkg-config for obtaining
+ xen version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,91 +30,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, jdurgin@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com
+To: Paul Durrant <Paul.Durrant@citrix.com>
+Cc: 'Juergen Gross' <jgross@suse.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Anthony Perard <anthony.perard@citrix.com>, "kraxel@redhat.com" <kraxel@redhat.com>, "sstabellini@kernel.org" <sstabellini@kernel.org>
 
-On Mon, Mar 27, 2017 at 03:26:25PM +0200, Markus Armbruster wrote:
-> We use InetSocketAddress in the QAPI schema.  However, the code
-> doesn't use inet_connect_saddr(), but formats "host" and "port" into a
-> configuration string for rados_conf_set().  Thus, members "numeric",
-> "to", "ipv4" and "ipv6" are silently ignored.  Not nice.  Example:
+On Mon, 27 Mar 2017, Paul Durrant wrote:
+> > -----Original Message-----
+> > From: Juergen Gross [mailto:jgross@suse.com]
+> > Sent: 27 March 2017 10:15
+> > To: Paul Durrant <Paul.Durrant@citrix.com>; qemu-devel@nongnu.org; xen-
+> > devel@lists.xenproject.org
+> > Cc: Anthony Perard <anthony.perard@citrix.com>; kraxel@redhat.com;
+> > sstabellini@kernel.org
+> > Subject: Re: [PATCH v2] configure: use pkg-config for obtaining xen version
+> > 
+> > On 27/03/17 11:07, Paul Durrant wrote:
+> > >> -----Original Message-----
+> > >> From: Juergen Gross [mailto:jgross@suse.com]
+> > >> Sent: 27 March 2017 08:43
+> > >> To: qemu-devel@nongnu.org; xen-devel@lists.xenproject.org
+> > >> Cc: Anthony Perard <anthony.perard@citrix.com>; kraxel@redhat.com;
+> > >> sstabellini@kernel.org; Paul Durrant <Paul.Durrant@citrix.com>; Juergen
+> > >> Gross <jgross@suse.com>
+> > >> Subject: [PATCH v2] configure: use pkg-config for obtaining xen version
+> > >>
+> > >> Instead of trying to guess the Xen version to use by compiling various
+> > >> test programs first just ask the system via pkg-config. Only if it
+> > >> can't return the version fall back to the test program scheme.
+> > >>
+> > >> If configure is being called with dedicated flags for the Xen libraries
+> > >> use those instead of the pkg-config output. This will avoid breaking
+> > >> an in-tree Xen build of an old Xen version while a new Xen version is
+> > >> installed on the build machine: pkg-config would pick up the installed
+> > >> Xen config files as the Xen tree wouldn't contain any of them.
+> > >>
+> > >> Signed-off-by: Juergen Gross <jgross@suse.com>
+> > >> ---
+> > >> V2: - use pkg-config only if no Xen library paths have been specified via
+> > >>       --extra-ldflags
+> > >>     - keep test program for detecting Xen 4.9
+> > >
+> > > This all looks plausible but it doesn't seem to be working for me when
+> > trying to build 4.8. I'm still getting a xen ctrl version of 40900... still trying to
+> > figure out why.
+> > 
+> > I suppose you reverted my previous patch?
+> > 
 > 
->     -blockdev rbd,node-name=nn,pool=p,image=i,server.0.host=h0,server.0.port=12345,server.0.ipv4=off
+> Yes, I reverted that then applied this one.
 > 
-> Factor a suitable InetSocketAddressBase out of InetSocketAddress, and
-> use that.  "numeric", "to", "ipv4" and "ipv6" are now rejected.
+> > Do you happen to have some stale 4.9 libraries in your Xen tree?
+> >
 > 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-
-> ---
->  qapi-schema.json     | 21 ++++++++++++++-------
->  qapi/block-core.json |  2 +-
->  2 files changed, 15 insertions(+), 8 deletions(-)
-> 
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 68a4327..b921994 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -4051,19 +4051,27 @@
->    'data': [ 'all', 'rx', 'tx' ] }
+> Yes, it was picking up a libxendevicemodel when it should not have been. It would be handy if the probe compilations used --nostdlib, but that's not regression introduced by your patch. Now that pkg-config is used for out-of-tree builds I guess it may be possible to add that though.
 >  
->  ##
-> +# @InetSocketAddressBase:
-> +#
-> +# @host: host part of the address
-> +# @port: port part of the address
-> +##
-> +{ 'struct': 'InetSocketAddressBase',
-> +  'data': {
-> +    'host': 'str',
-> +    'port': 'str' } }
-> +
-> +##
->  # @InetSocketAddress:
->  #
->  # Captures a socket address or address range in the Internet namespace.
->  #
-> -# @host: host part of the address
-> -#
-> -# @port: port part of the address, or lowest port if @to is present
-> -#
->  # @numeric: true if the host/port are guaranteed to be numeric,
->  #           false if name resolution should be attempted. Defaults to false.
->  #           (Since 2.9)
->  #
-> -# @to: highest port to try
-> +# @to: If present, this is range of possible addresses, with port
-> +#      between @port and @to.
->  #
->  # @ipv4: whether to accept IPv4 addresses, default try both IPv4 and IPv6
->  #
-> @@ -4072,9 +4080,8 @@
->  # Since: 1.3
->  ##
->  { 'struct': 'InetSocketAddress',
-> +  'base': 'InetSocketAddressBase',
->    'data': {
-> -    'host': 'str',
-> -    'port': 'str',
->      '*numeric':  'bool',
->      '*to': 'uint16',
->      '*ipv4': 'bool',
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 0f132fc..5d2efe4 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -2652,7 +2652,7 @@
->              '*conf': 'str',
->              '*snapshot': 'str',
->              '*user': 'str',
-> -            '*server': ['InetSocketAddress'],
-> +            '*server': ['InetSocketAddressBase'],
->              '*auth-supported': ['RbdAuthMethod'],
->              '*password-secret': 'str' } }
->  
-> -- 
-> 2.7.4
+> > What happens without this patch?
+> > 
+> > > Also, the whitespace changes later on in the patch should probably be split
+> > out.
+> > 
+> > Hmm, those are just due to the nesting level of the if's changed.
+> > I don't think they can easily be split out without having a
+> > malformed indentation.
+> > 
 > 
+> Ok, I see that now I look at the code rather than just the patch. So, having fixed my linkage issue...
+> 
+> Tested-by: Paul Durrant <paul.durrant@citrix.com>
+
+Yes, that works.
+
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
