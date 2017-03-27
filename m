@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcelaya@gmail.com>) id 1csSrQ-000455-Pk
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 07:30:58 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1csStC-000582-Jh
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 07:32:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcelaya@gmail.com>) id 1csSrO-0006NB-Vr
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 07:30:56 -0400
-Received: from mail-it0-x232.google.com ([2607:f8b0:4001:c0b::232]:38257)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcelaya@gmail.com>) id 1csSrO-0006Mn-OU
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 07:30:54 -0400
-Received: by mail-it0-x232.google.com with SMTP id y18so48789834itc.1
-	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 04:30:54 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1csSt8-0006yS-Mk
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 07:32:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54948)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1csSt8-0006xz-Ht
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 07:32:42 -0400
+References: <CAJhHMCBwu-pVAyxN+w8SSo19wi3DW3JCRRF-K1Sj9zYqGYkFvQ@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e274d249-806e-473b-2a44-0ce26fd847cb@redhat.com>
+Date: Mon, 27 Mar 2017 13:32:37 +0200
 MIME-Version: 1.0
-In-Reply-To: <1490609499.31035.29.camel@redhat.com>
-References: <20170326095349.8571-1-jcelaya@gmail.com>
-	<1490609499.31035.29.camel@redhat.com>
-From: Javier Celaya <jcelaya@gmail.com>
-Date: Mon, 27 Mar 2017 13:30:33 +0200
-Message-ID: <CAE6Ev=yhEbRW1-SVgVJ3RLiEetgfPQ7yX9L13jGFPS4VJr_OwQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2] Fix input-linux reading from device
+In-Reply-To: <CAJhHMCBwu-pVAyxN+w8SSo19wi3DW3JCRRF-K1Sj9zYqGYkFvQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] GSoC 2017 Proposal: TCG performance enhancements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +26,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
-
-Hi
-
-Javi
-
-2017-03-27 12:11 GMT+02:00 Gerd Hoffmann <kraxel@redhat.com>:
-
-> On So, 2017-03-26 at 11:53 +0200, Javier Celaya wrote:
-> > The evdev devices in input-linux.c are read in blocks of one whole
-> > event. If there are not enough bytes available, they are discarded,
-> > instead of being kept for the next read operation. This results in
-> > lost events, of even non-working devices.
->
-> Have you seen this happening in practice?
->
-
-Yes, quite frequently, like once per hour. Totally destroys a good gaming
-session :)
-The curious thing is, the mouse stops working, but in the keyboard I see
-some missing keyup events (the keys get stuck), but then it recovers.
+To: Pranith Kumar <bobby.prani@gmail.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, "Emilio G. Cota" <cota@braap.org>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel <qemu-devel@nongnu.org>
 
 
->
-> > +    struct input_event event;
-> > +    int         to_be_read;
->
-> I'd suggest to store offset (i.e. bytes already read) instead, should
-> make the whole logic a bit simpler and easier to read.
->
 
-OK
+On 25/03/2017 17:52, Pranith Kumar wrote:
+> * Implement an LRU translation block code cache.
+> 
+>   In the current TCG design, when the translation cache fills up, we flush all
+>   the translated blocks (TBs) to free up space. We can improve this situation
+>   by not flushing the TBs that were recently used i.e., by implementing an LRU
+>   policy for freeing the blocks. This should avoid the re-translation overhead
+>   for frequently used blocks and improve performance.
 
+IIRC, Emilio measured one flush every roughly 10 seconds with 128 MB
+cache in system emulation mode---and "never" is a pretty accurate
+estimate for user-mode emulation.  This means that a really hot block
+would be retranslated very quickly.
 
->
-> > +            } else if (rc > 0){
->
-> checkpatch.pl complains here:
-> ERROR: space required before the open brace '{'
->
-
-Oops, missed that
-
-
->
-> cheers,
->   Gerd
->
->
+Paolo
