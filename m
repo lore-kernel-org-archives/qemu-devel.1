@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1csZGH-0007Pe-Bo
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:21:02 -0400
+	(envelope-from <laurent@vivier.eu>) id 1csZH6-0007sk-Tm
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:21:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1csZGE-0001t5-TQ
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:21:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45778)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1csZGE-0001pu-GM
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:20:58 -0400
-Date: Mon, 27 Mar 2017 21:20:56 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170327211728-mutt-send-email-mst@kernel.org>
-References: <149063674781.4447.14258971700726134711.stgit@bahia.lan>
-	<149063676337.4447.2095575576822297032.stgit@bahia.lan>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <149063676337.4447.2095575576822297032.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 1/5] virtio: Error object based
- virtio_error()
+	(envelope-from <laurent@vivier.eu>) id 1csZH3-0002zs-0j
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:21:52 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:54420)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1csZH2-0002zY-Lz
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 14:21:48 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Mon, 27 Mar 2017 20:21:36 +0200
+Message-Id: <20170327182137.7006-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH 0/1] slirp: add SOCKS5 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,80 +21,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Laurent Vivier <laurent@vivier.eu>
 
-On Mon, Mar 27, 2017 at 07:46:03PM +0200, Greg Kurz wrote:
-> This introduces an Error object based implementation of virtio_error(). It
-> allows to implement virtio_error() wrappers in device-specific code.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/virtio/virtio.c         |   21 ++++++++++++++++-----
->  include/hw/virtio/virtio.h |    1 +
->  2 files changed, 17 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 03592c542a55..4036f4816038 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -2443,6 +2443,16 @@ void virtio_device_set_child_bus_name(VirtIODevice *vdev, char *bus_name)
->      vdev->bus_name = g_strdup(bus_name);
->  }
->  
-> +static void virtio_device_set_broken(VirtIODevice *vdev)
-> +{
-> +    vdev->broken = true;
-> +
-> +    if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
-> +        virtio_set_status(vdev, vdev->status | VIRTIO_CONFIG_S_NEEDS_RESET);
-> +        virtio_notify_config(vdev);
-> +    }
-> +}
-> +
->  void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
->  {
->      va_list ap;
+This patch implements the SOCKS5 client part for "-net user" backend.
 
-It's worth pondering whether we can set this for versions < 1.0 too.
+It allows to route all internet traffic of the virtual machine
+to a SOCKS5 server.
 
+But all the local traffic (to the host) is sent to the host.
+It is needed because this SOCKS5 client doesn't route UDP traffic,
+and this allows to use the host DNS server.
 
-> @@ -2451,12 +2461,13 @@ void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
->      error_vreport(fmt, ap);
->      va_end(ap);
->  
-> -    vdev->broken = true;
-> +    virtio_device_set_broken(vdev);
-> +}
->  
-> -    if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
-> -        virtio_set_status(vdev, vdev->status | VIRTIO_CONFIG_S_NEEDS_RESET);
-> -        virtio_notify_config(vdev);
-> -    }
-> +void virtio_error_err(VirtIODevice *vdev, Error *err)
-> +{
-> +    error_report_err(err);
-> +    virtio_device_set_broken(vdev);
->  }
->  
->  static void virtio_memory_listener_commit(MemoryListener *listener)
+I've tested this using public SOCKS5 proxy list found on the WEB, and
+using TOR server on my host.
 
-Should this skip error report if device is already broken?
-Otherwise we'll get a ton of errors in the log.
+Used with TOR, all the TCP connections are sent to the TOR network and
+this allows to insert a virtual machine directly in the TOR network
+without needing more configuration in the virtual machine.
 
-Also, whether to stop the device, or the VM, or just warn,
-seems like a policy decision. Why not set it on command line
-like we do for other storage?
+But be aware that all DNS requests will be sent to the host that can
+forward them to internet with its own IP address. So confidentiality
+will not be as good as with the TOR browser which hides in the TOR
+network all the DNS requests.
 
-> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-> index 15efcf205711..5b13c5f67b63 100644
-> --- a/include/hw/virtio/virtio.h
-> +++ b/include/hw/virtio/virtio.h
-> @@ -150,6 +150,7 @@ void virtio_init(VirtIODevice *vdev, const char *name,
->  void virtio_cleanup(VirtIODevice *vdev);
->  
->  void virtio_error(VirtIODevice *vdev, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
-> +void virtio_error_err(VirtIODevice *vdev, Error *err);
->  
->  /* Set the child bus name. */
->  void virtio_device_set_child_bus_name(VirtIODevice *vdev, char *bus_name);
+If you want to test this:
+
+- with a public SOCKS5 server, ask google for "socks5 proxy address"
+  and start QEMU with, for instance:
+
+  qemu-system-x86_64 -net nic,model=e1000 -net user,proxy-server=46.105.121.37:63066 ...
+
+  if needed, you can provide user/password with
+  "-net user,...,proxy-user=user,proxy-passwd=passwd"
+
+- with a local TOR proxy:
+
+  sudo systemctl start tor
+  qemu-system-x86_64 -net nic,model=e1000 -net user,proxy-server=localhost:9050 ...
+
+You can check your IP address is the one of the proxy by connecting
+to http://check.torproject.org with a browser inside the VM.
+
+Laurent Vivier (1):
+  slirp: add SOCKS5 support
+
+ net/slirp.c         |  30 +++++-
+ qapi-schema.json    |   3 +
+ qemu-options.hx     |  11 ++
+ slirp/Makefile.objs |   2 +-
+ slirp/ip_icmp.c     |   2 +-
+ slirp/libslirp.h    |   3 +
+ slirp/slirp.c       |  66 +++++++++++-
+ slirp/slirp.h       |   6 ++
+ slirp/socket.h      |   4 +
+ slirp/socks5.c      | 283 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ slirp/socks5.h      |  85 ++++++++++++++++
+ slirp/tcp_subr.c    |  21 +++-
+ slirp/udp.c         |   9 ++
+ slirp/udp6.c        |   2 +-
+ 14 files changed, 515 insertions(+), 12 deletions(-)
+ create mode 100644 slirp/socks5.c
+ create mode 100644 slirp/socks5.h
+
+-- 
+2.9.3
