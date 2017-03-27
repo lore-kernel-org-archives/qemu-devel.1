@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1csPx9-0004dy-KR
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 04:24:40 -0400
+	(envelope-from <yi.l.liu@intel.com>) id 1csQ7Q-0006Im-Uo
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 04:35:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1csPx4-0003zM-NL
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 04:24:39 -0400
-Received: from mga02.intel.com ([134.134.136.20]:57810)
+	(envelope-from <yi.l.liu@intel.com>) id 1csQ7N-0008OU-2B
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 04:35:16 -0400
+Received: from mga02.intel.com ([134.134.136.20]:65081)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
-	id 1csPx4-0003z3-8Z
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 04:24:34 -0400
-From: Changpeng Liu <changpeng.liu@intel.com>
-Date: Tue, 28 Mar 2017 16:39:25 +0800
-Message-Id: <1490690365-21109-1-git-send-email-changpeng.liu@intel.com>
-Subject: [Qemu-devel] [PATCH] virtio-blk: add DISCARD support to virtio-blk
- driver
+	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1csQ7M-0008NO-M8
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 04:35:12 -0400
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+Date: Mon, 27 Mar 2017 08:35:05 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C257439032C79@shsmsx102.ccr.corp.intel.com>
+References: <1486456099-7345-1-git-send-email-peterx@redhat.com>
+	<1486456099-7345-15-git-send-email-peterx@redhat.com>
+In-Reply-To: <1486456099-7345-15-git-send-email-peterx@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v7 14/17] memory: add
+ MemoryRegionIOMMUOps.replay() callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,141 +29,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: virtio-dev@lists.oasis-open.org, virtualization@lists.linux-foundation.org, linux-kernel@vger.kernel.org, hch@lst.de
-Cc: qemu-devel@nongnu.org
+To: "alex.williamson@redhat.com" <alex.williamson@redhat.com>, Peter Xu <peterx@redhat.com>
+Cc: "Lan, Tianyu" <tianyu.lan@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, "mst@redhat.com" <mst@redhat.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "bd.aviv@gmail.com" <bd.aviv@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Currently virtio-blk driver does not provide discard feature flag, so the
-filesystems which built on top of the block device will not send discard
-command. This is okay for HDD backend, but it will impact the performance
-for SSD backend.
+> -----Original Message-----
+> From: Qemu-devel [mailto:qemu-devel-bounces+yi.l.liu=3Dintel.com@nongnu.o=
+rg] On
+> Behalf Of Peter Xu
+> Sent: Tuesday, February 7, 2017 4:28 PM
+> To: qemu-devel@nongnu.org
+> Cc: Lan, Tianyu <tianyu.lan@intel.com>; Tian, Kevin <kevin.tian@intel.com=
+>;
+> mst@redhat.com; jan.kiszka@siemens.com; jasowang@redhat.com;
+> peterx@redhat.com; alex.williamson@redhat.com; bd.aviv@gmail.com; David
+> Gibson <david@gibson.dropbear.id.au>
+> Subject: [Qemu-devel] [PATCH v7 14/17] memory: add
+> MemoryRegionIOMMUOps.replay() callback
+>=20
+> Originally we have one memory_region_iommu_replay() function, which is th=
+e
+> default behavior to replay the translations of the whole IOMMU region. Ho=
+wever,
+> on some platform like x86, we may want our own replay logic for IOMMU reg=
+ions.
+> This patch add one more hook for IOMMUOps for the callback, and it'll ove=
+rride the
+> default if set.
+>=20
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  include/exec/memory.h | 2 ++
+>  memory.c              | 6 ++++++
+>  2 files changed, 8 insertions(+)
+>=20
+> diff --git a/include/exec/memory.h b/include/exec/memory.h index
+> 0767888..30b2a74 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -191,6 +191,8 @@ struct MemoryRegionIOMMUOps {
+>      void (*notify_flag_changed)(MemoryRegion *iommu,
+>                                  IOMMUNotifierFlag old_flags,
+>                                  IOMMUNotifierFlag new_flags);
+> +    /* Set this up to provide customized IOMMU replay function */
+> +    void (*replay)(MemoryRegion *iommu, IOMMUNotifier *notifier);
+>  };
+>=20
+>  typedef struct CoalescedMemoryRange CoalescedMemoryRange; diff --git
+> a/memory.c b/memory.c index 7a4f2f9..9c253cc 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -1630,6 +1630,12 @@ void memory_region_iommu_replay(MemoryRegion
+> *mr, IOMMUNotifier *n,
+>      hwaddr addr, granularity;
+>      IOMMUTLBEntry iotlb;
+> +    /* If the IOMMU has its own replay callback, override */
+> +    if (mr->iommu_ops->replay) {
+> +        mr->iommu_ops->replay(mr, n);
+> +        return;
+> +    }
 
-Add a feature flag VIRTIO_BLK_F_DISCARD and command VIRTIO_BLK_T_DISCARD
-to extend exist virtio-blk protocol. virtio-blk protocol uses a single
-8 bytes descriptor containing type,reserved and sector, currently Linux
-uses the reserved field as IO priority, here we also re-use the reserved
-field as number of discard sectors.
+Hi Alex, Peter,
 
-Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
----
- drivers/block/virtio_blk.c      | 38 +++++++++++++++++++++++++++++---------
- include/uapi/linux/virtio_blk.h | 12 ++++++++++--
- 2 files changed, 39 insertions(+), 11 deletions(-)
+Will all the other vendors(e.g. PPC, s390, ARM) add their own replay callba=
+ck
+as well? I guess it depends on whether the original replay algorithm work w=
+ell
+for them? Do you have such knowledge?
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 1d4c9f8..550cfe7 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -241,6 +241,9 @@ static int virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	case REQ_OP_FLUSH:
- 		type = VIRTIO_BLK_T_FLUSH;
- 		break;
-+	case REQ_OP_DISCARD:
-+		type = VIRTIO_BLK_T_DISCARD;
-+		break;
- 	case REQ_OP_SCSI_IN:
- 	case REQ_OP_SCSI_OUT:
- 		type = VIRTIO_BLK_T_SCSI_CMD;
-@@ -256,16 +259,24 @@ static int virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	vbr->out_hdr.type = cpu_to_virtio32(vblk->vdev, type);
- 	vbr->out_hdr.sector = type ?
- 		0 : cpu_to_virtio64(vblk->vdev, blk_rq_pos(req));
--	vbr->out_hdr.ioprio = cpu_to_virtio32(vblk->vdev, req_get_ioprio(req));
-+	vbr->out_hdr.u.ioprio = cpu_to_virtio32(vblk->vdev, req_get_ioprio(req));
- 
- 	blk_mq_start_request(req);
- 
--	num = blk_rq_map_sg(hctx->queue, req, vbr->sg);
--	if (num) {
--		if (rq_data_dir(req) == WRITE)
--			vbr->out_hdr.type |= cpu_to_virtio32(vblk->vdev, VIRTIO_BLK_T_OUT);
--		else
--			vbr->out_hdr.type |= cpu_to_virtio32(vblk->vdev, VIRTIO_BLK_T_IN);
-+	if (type == VIRTIO_BLK_T_DISCARD) {
-+		vbr->out_hdr.u.discard_nr_sectors = cpu_to_virtio32(vblk->vdev,
-+								    blk_rq_sectors(req));
-+		num = 0;
-+	} else {
-+		num = blk_rq_map_sg(hctx->queue, req, vbr->sg);
-+		if (num) {
-+			if (rq_data_dir(req) == WRITE)
-+				vbr->out_hdr.type |= cpu_to_virtio32(vblk->vdev,
-+								     VIRTIO_BLK_T_OUT);
-+			else
-+				vbr->out_hdr.type |= cpu_to_virtio32(vblk->vdev,
-+								     VIRTIO_BLK_T_IN);
-+		}
- 	}
- 
- 	spin_lock_irqsave(&vblk->vqs[qid].lock, flags);
-@@ -775,6 +786,15 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	if (!err && opt_io_size)
- 		blk_queue_io_opt(q, blk_size * opt_io_size);
- 
-+	if (virtio_has_feature(vdev, VIRTIO_BLK_F_DISCARD)) {
-+		q->limits.discard_zeroes_data = 0;
-+		q->limits.discard_alignment = blk_size;
-+		q->limits.discard_granularity = blk_size;
-+		blk_queue_max_discard_sectors(q, UINT_MAX);
-+		blk_queue_max_discard_segments(q, 1);
-+		queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, q);
-+	}
-+
- 	virtio_device_ready(vdev);
- 
- 	device_add_disk(&vdev->dev, vblk->disk);
-@@ -882,14 +902,14 @@ static int virtblk_restore(struct virtio_device *vdev)
- 	VIRTIO_BLK_F_SCSI,
- #endif
- 	VIRTIO_BLK_F_FLUSH, VIRTIO_BLK_F_TOPOLOGY, VIRTIO_BLK_F_CONFIG_WCE,
--	VIRTIO_BLK_F_MQ,
-+	VIRTIO_BLK_F_MQ, VIRTIO_BLK_F_DISCARD,
- }
- ;
- static unsigned int features[] = {
- 	VIRTIO_BLK_F_SEG_MAX, VIRTIO_BLK_F_SIZE_MAX, VIRTIO_BLK_F_GEOMETRY,
- 	VIRTIO_BLK_F_RO, VIRTIO_BLK_F_BLK_SIZE,
- 	VIRTIO_BLK_F_FLUSH, VIRTIO_BLK_F_TOPOLOGY, VIRTIO_BLK_F_CONFIG_WCE,
--	VIRTIO_BLK_F_MQ,
-+	VIRTIO_BLK_F_MQ, VIRTIO_BLK_F_DISCARD,
- };
- 
- static struct virtio_driver virtio_blk = {
-diff --git a/include/uapi/linux/virtio_blk.h b/include/uapi/linux/virtio_blk.h
-index 9ebe4d9..d608649 100644
---- a/include/uapi/linux/virtio_blk.h
-+++ b/include/uapi/linux/virtio_blk.h
-@@ -38,6 +38,7 @@
- #define VIRTIO_BLK_F_BLK_SIZE	6	/* Block size of disk is available*/
- #define VIRTIO_BLK_F_TOPOLOGY	10	/* Topology information is available */
- #define VIRTIO_BLK_F_MQ		12	/* support more than one vq */
-+#define VIRTIO_BLK_F_DISCARD	13	/* DISCARD command is supported */
- 
- /* Legacy feature bits */
- #ifndef VIRTIO_BLK_NO_LEGACY
-@@ -114,6 +115,9 @@ struct virtio_blk_config {
- /* Get device ID command */
- #define VIRTIO_BLK_T_GET_ID    8
- 
-+/* Discard command */
-+#define VIRTIO_BLK_T_DISCARD	16
-+
- #ifndef VIRTIO_BLK_NO_LEGACY
- /* Barrier before this op. */
- #define VIRTIO_BLK_T_BARRIER	0x80000000
-@@ -127,8 +131,12 @@ struct virtio_blk_config {
- struct virtio_blk_outhdr {
- 	/* VIRTIO_BLK_T* */
- 	__virtio32 type;
--	/* io priority. */
--	__virtio32 ioprio;
-+	union {
-+		/* io priority. */
-+		__virtio32 ioprio;
-+		/* discard number of sectors */
-+		__virtio32 discard_nr_sectors;
-+	} u;
- 	/* Sector (ie. 512 byte offset) */
- 	__virtio64 sector;
- };
--- 
-1.9.3
+Regards,
+Yi L
+
+> +
+>      granularity =3D memory_region_iommu_get_min_page_size(mr);
+>=20
+>      for (addr =3D 0; addr < memory_region_size(mr); addr +=3D granularit=
+y) {
+> --
+> 2.7.4
+>=20
