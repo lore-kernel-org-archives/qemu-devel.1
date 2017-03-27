@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1csZtD-0004OP-NM
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 15:01:16 -0400
+	(envelope-from <jsnow@redhat.com>) id 1csZwJ-0005RX-0T
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 15:04:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1csZt9-0005rR-PH
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 15:01:15 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52923)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1csZt9-0005qK-KK
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 15:01:11 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1csZt8-00011A-Ew
-	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 19:01:10 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 605252E80C1
-	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 19:01:10 +0000 (UTC)
+	(envelope-from <jsnow@redhat.com>) id 1csZwF-0007sF-0R
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 15:04:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40880)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1csZwE-0007qE-RC
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 15:04:22 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 529754E024
+	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 19:04:20 +0000 (UTC)
+References: <3d1c16a1-ec05-0367-e569-64a63b34f2e3@redhat.com>
+	<4a56f716-3528-ddd4-f8c4-f3f6b23c469a@redhat.com>
+	<bbc2671a-42dd-aa2a-0f03-6a4a487cb8f5@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <fddf5055-c458-3893-9a18-5b0701e5431a@redhat.com>
+Date: Mon, 27 Mar 2017 15:04:18 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 27 Mar 2017 18:52:04 -0000
-From: Brendan Shanks <brendan@bslabs.net>
-Reply-To: Bug 1675108 <1675108@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170322172621.26186.61813.malonedeb@gac.canonical.com>
-Message-Id: <20170327185204.3388.63632.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1675108] Re: Cocoa UI always crashes on startup
+In-Reply-To: <bbc2671a-42dd-aa2a-0f03-6a4a487cb8f5@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] What's the next QEMU version after 2.9 ? (or: when
+ is a good point in time to get rid of old interfaces)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,59 +35,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-I just did a quick test on 10.12.3 with those two patches and didn't get
-any crashes
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1675108
+On 03/27/2017 04:06 AM, Thomas Huth wrote:
+> On 24.03.2017 23:10, John Snow wrote:
+>>
+>>
+>> On 03/08/2017 03:26 AM, Thomas Huth wrote:
+>>>
+>>>  Hi everybody,
+>>>
+>>> what will be the next version of QEMU after 2.9? Will we go for a 2.10
+>>> (as I've seen it mentioned a couple of times on the mailing list
+>>> already), or do we dare to switch to 3.0 instead?
+>>>
+>>> I personally dislike two-digit minor version numbers like 2.10 since the
+>>> non-experienced users sometimes mix it up with 2.1 ... and there have
+>>> been a couple of new cool features in the past releases that would
+>>> justify a 3.0 now, too, I think.
+>>>
+>>> But anyway, the more important thing that keeps me concerned is: Someone
+>>>  once told me that we should get rid of old parameters and interfaces
+>>> (like HMP commands) primarily only when we're changing to a new major
+>>> version number. As you all know, QEMU has a lot of legacy options, which
+>>> are likely rather confusing than helpful for the new users nowadays,
+>>> e.g. things like the "-net channel" option (which is fortunately even
+>>> hardly documented), but maybe also even the whole vlan/hub concept in
+>>> the net code, or legacy parameters like "-usbdevice". If we switch to
+>>> version 3.0, could we agree to remove at least some of them?
+>>>
+>>>  Thomas
+>>>
+>>
+>> As others have stated, we need a few releases to deprecate things first.
+>>
+>> Maybe we should develop a serious plan to develop some of our legacy
+>> interfaces first.
+>>
+>> Maybe 2.10 can introduce a list of things we want to deprecate,
+>> 2.11 can be the transition release,
+>> and then 3.0 can cut the cord and free of us our terrible burden?
+>>
+>> I have a list of things I want to axe...
+> 
+> I've started a Wiki page with such a list here:
+> 
+> http://wiki.qemu-project.org/Features/LegacyRemoval
+> 
+> Feel free to amend!
+> 
 
-Title:
-  Cocoa UI always crashes on startup
+Absolutely!
 
-Status in QEMU:
-  New
+>  Thomas
+> 
 
-Bug description:
-  Commit 8bb93c6f99a42c2e0943bc904b283cd622d302c5 ("ui/console: ensure
-  graphic updates don't race with TCG vCPUs") causes the graphic update
-  to run on a non-main thread, which Cocoa is not happy with. It crashes
-  immediately after startup.
+Should we make an effort to print warnings for any of these items in the
+list for 2.10 that they may disappear for 3.0?
 
-  $ i386-softmmu/qemu-system-i386 =
+It'd be nice to turn this wiki list into something that we're actually
+definitely going to do.
 
-  2017-03-22 10:09:25.113 qemu-system-i386[15968:9538245] *** Terminating a=
-pp due to uncaught exception 'NSInternalInconsistencyException', reason: 'n=
-extEventMatchingMask should only be called from the Main Thread!'
-  *** First throw call stack:
-  (
-  	0   CoreFoundation                      0x00007fff91e72e7b __exceptionPr=
-eprocess + 171
-  	1   libobjc.A.dylib                     0x00007fffa6a5ccad objc_exceptio=
-n_throw + 48
-  	2   AppKit                              0x00007fff900953fd -[NSApplicati=
-on(NSEvent) _nextEventMatchingEventMask:untilDate:inMode:dequeue:] + 4471
-  	3   qemu-system-i386                    0x0000000104f75a49 cocoa_refresh=
- + 233
-  	4   qemu-system-i386                    0x0000000104e0312c process_queue=
-d_cpu_work + 140
-  	5   qemu-system-i386                    0x0000000104d1a73c qemu_tcg_rr_c=
-pu_thread_fn + 284
-  	6   libsystem_pthread.dylib             0x00007fffa7557aab _pthread_body=
- + 180
-  	7   libsystem_pthread.dylib             0x00007fffa75579f7 _pthread_body=
- + 0
-  	8   libsystem_pthread.dylib             0x00007fffa75571fd thread_start =
-+ 13
-  )
-  libc++abi.dylib: terminating with uncaught exception of type NSException
-  Abort trap: 6
-
-  System: macOS 10.12.3, Xcode 8.2.1
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1675108/+subscriptions
+--js
