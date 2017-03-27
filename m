@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1csWCT-0005iT-KG
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 11:04:54 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1csWES-00072S-JJ
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 11:06:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1csWCP-0004ib-2b
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 11:04:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:19559)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1csWCO-0004h1-RF
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 11:04:49 -0400
-References: <3d1c16a1-ec05-0367-e569-64a63b34f2e3@redhat.com>
-	<4a56f716-3528-ddd4-f8c4-f3f6b23c469a@redhat.com>
-	<bbc2671a-42dd-aa2a-0f03-6a4a487cb8f5@redhat.com>
-	<20170327120148.GC26900@stefanha-x1.localdomain>
-	<c58c7688-7ffa-6043-0919-0842931ddc9b@redhat.com>
-	<b82cff1f-173f-147f-4359-fc8266605f9f@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1csWER-0007t4-Mb
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 11:06:56 -0400
+References: <bd7cb196-0779-42ad-ce9c-5871d307adce@kamp.de>
+	<82d604c8-068a-aff4-6037-e3cd247b3588@redhat.com>
+	<819af057-3777-dffc-4670-895b8265fd01@kamp.de>
+	<d41d1428-4c8b-7e2f-b197-8d45b834776d@redhat.com>
+	<32e1e781-f0b0-ac67-a5ce-74ccc64071a0@kamp.de>
+	<20170320024649.GA18938@lemon.lan>
+	<37879546-cf6e-01fa-adc6-c777e14eab0e@redhat.com>
+	<20170320114926.GB17020@lemon.lan>
+	<b3bf1d26-7caa-1d0d-c8a1-02f4c80e51e4@kamp.de>
+	<fc755658-8d1d-db71-1f4d-2e18f5c3c4b2@kamp.de>
+	<ff4b36e6-cf69-5b32-77b7-285adf4aaca0@redhat.com>
+	<4aa3e0fc-1176-af7d-bef9-2b881a984605@kamp.de>
+	<f0e9decf-7b92-9218-a43f-d7d6eee10208@redhat.com>
+	<a7b9b590-a0b5-5b2f-3efa-bfafefc5037c@kamp.de>
+	<df268a18-9b31-61d7-c449-e36f6ca12930@redhat.com>
+	<293a74e1-f355-6969-9b76-9913e7f56930@kamp.de>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b15704d3-a0be-2663-4368-224fae93c53c@redhat.com>
-Date: Mon, 27 Mar 2017 17:04:37 +0200
+Message-ID: <5cb7f3f5-cd3f-b54c-3109-140dee3b2cad@redhat.com>
+Date: Mon, 27 Mar 2017 17:06:47 +0200
 MIME-Version: 1.0
-In-Reply-To: <b82cff1f-173f-147f-4359-fc8266605f9f@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="HOrwBtcipbDI75TwRBsarXCF3AmH6KQFT"
-Subject: Re: [Qemu-devel] Deprecating the -net option
+In-Reply-To: <293a74e1-f355-6969-9b76-9913e7f56930@kamp.de>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] callout to *file in bdrv_co_get_block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,60 +37,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: jasowang@redhat.com, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HOrwBtcipbDI75TwRBsarXCF3AmH6KQFT
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: jasowang@redhat.com, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <b15704d3-a0be-2663-4368-224fae93c53c@redhat.com>
-Subject: Re: [Qemu-devel] Deprecating the -net option
-References: <3d1c16a1-ec05-0367-e569-64a63b34f2e3@redhat.com>
- <4a56f716-3528-ddd4-f8c4-f3f6b23c469a@redhat.com>
- <bbc2671a-42dd-aa2a-0f03-6a4a487cb8f5@redhat.com>
- <20170327120148.GC26900@stefanha-x1.localdomain>
- <c58c7688-7ffa-6043-0919-0842931ddc9b@redhat.com>
- <b82cff1f-173f-147f-4359-fc8266605f9f@redhat.com>
-In-Reply-To: <b82cff1f-173f-147f-4359-fc8266605f9f@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+To: Peter Lieven <pl@kamp.de>, Fam Zheng <famz@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
 
 
 
-On 27/03/2017 15:09, Thomas Huth wrote:
-> ... and I forgot to mention: We should at least try to get rid of the
-> options first that only work with -net (or rather the VLAN concept),
-> like "-net dump", "-net channel", "-tftp", "-smb", "-bootp" and
-> "-redir", since these will hinder us from doing further reworks /
-> clean-ups in this area. I think I've mentioned them all on the Wiki pag=
-e
-> now, if somebody is aware of another legacy option here that does not
-> work with "-netdev" yet (apart from -net nic itself), please let me kno=
-w.
+On 27/03/2017 15:21, Peter Lieven wrote:
+>>>
+>>> I stumbled across the issue with lseek on a tmpfs because in the
+>>> build process for our templates
+>>> I temporarily have vmdks on a tmpfs and it takes ages before qemu-img
+>>> convert starts to run (it iterates
+>>> over every 64kb cluster with that callout to find_allocation and for
+>>> some reason lseek is very slow on tmpfs).
+>> Ok, thanks.  Perhaps it's worth benchmarking tmpfs specifically.  Apart
+>> from the system call overhead (which does not really matter if you're
+>> going to do a read), lseek on other filesystems should not be any slower
+>> than read.
+> 
+> Okay, but the even the read is not really necessary if the metadata is
+> correct?
 
-Yes, please.  No objections at all for those, except possibly "-net
-dump" (but I've never used it).
+Yeah, what I mean is:
+
+- if you're going to do a read of non-zero blocks, the lseek you do
+before reading those blocks should not matter.
+
+- if you're going to skip the read of non-zero blocks, the lseek you do
+is always going to be faster than reading them and then checking with
+buffer_is_nonzero.
+
+> Would it be an idea to introduce an inverse flag live BDRV_BLOCK_NOT_ZERO
+> for cases where we know that there is really DATA and thus can avoid the
+> second callout?
+
+How would you know that a block is nonzero?
 
 Paolo
-
-
---HOrwBtcipbDI75TwRBsarXCF3AmH6KQFT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEcBAEBCAAGBQJY2SoIAAoJEL/70l94x66DvE8H/25k/DdMOOxN8XPcCfK5dJCb
-itKEMD7ySaPqDENj8JaJZU+XrZPnzavcCwhW4GqNZ8f0QracwunkF5H71yOTEC73
-ujjuiafLgqDQi4SKLhDGbnQ8xg4hmoRgq6HRcVTUSRGGzRV9Y/3LY4gHE5Q7io9q
-d4DDSpG42M0XFFu3KuaBG4xjwZ/L3ioICLaLAp9l3ZmV/ADWncqCoc5L6IbqxqGU
-+LPNyIABucSOtDWyZUC9IoJNhRKOHWIvl16OQ1RcrX7XiFjUeWITb3+o6pPIPNTQ
-cKonXASoVgD3NJ/M46Pfkync40S5TcfkOP7SQhsKM8rvlUSsWIua01WcXPFZD4I=
-=dsKy
------END PGP SIGNATURE-----
-
---HOrwBtcipbDI75TwRBsarXCF3AmH6KQFT--
