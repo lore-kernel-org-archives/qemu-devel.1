@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49691)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1csWmN-0005ub-9n
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 11:42:03 -0400
+	(envelope-from <mreitz@redhat.com>) id 1csWq5-0007Tm-Pw
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 11:45:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1csWmJ-0000Sg-4x
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 11:41:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53826)
+	(envelope-from <mreitz@redhat.com>) id 1csWq0-0002f1-Vi
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 11:45:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52514)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1csWmI-0000Qz-ST
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 11:41:55 -0400
-Date: Mon, 27 Mar 2017 17:41:49 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20170327154149.gi222rcrns3wmiqk@kamzik.brq.redhat.com>
-References: <20160822161740.4252-1-prem.mallappa@broadcom.com>
-	<20160822161740.4252-7-prem.mallappa@broadcom.com>
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1csWq0-0002dl-Md
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 11:45:44 -0400
+References: <1490628915-19459-1-git-send-email-den@openvz.org>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <accb1519-45c3-e287-0408-7c02c9714ed2@redhat.com>
+Date: Mon, 27 Mar 2017 17:45:37 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20160822161740.4252-7-prem.mallappa@broadcom.com>
-Subject: Re: [Qemu-devel] [PATCH v2 6/9] [optional] hw: misc: added testdev
- for smmu
+In-Reply-To: <1490628915-19459-1-git-send-email-den@openvz.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="cSSegtBTUKRT64w146nTupTD4da0sktMl"
+Subject: Re: [Qemu-devel] [RFC for 2.9 1/1] block: add missed
+ aio_context_acquire into blk_unref
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,323 +28,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Prem Mallappa <prem.mallappa@broadcom.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
+To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Mon, Aug 22, 2016 at 09:47:37PM +0530, Prem Mallappa wrote:
-> A simple PCI device which does DMA from 'src' to 'dst' given
-> src_addr, dst_addr and size, and is used by unit test. uses
-> pci_dma_read and pci_dma_write in a crude way but serves the purpose.
-> 
-> Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--cSSegtBTUKRT64w146nTupTD4da0sktMl
+From: Max Reitz <mreitz@redhat.com>
+To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
+Message-ID: <accb1519-45c3-e287-0408-7c02c9714ed2@redhat.com>
+Subject: Re: [RFC for 2.9 1/1] block: add missed aio_context_acquire into
+ blk_unref
+References: <1490628915-19459-1-git-send-email-den@openvz.org>
+In-Reply-To: <1490628915-19459-1-git-send-email-den@openvz.org>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
+
+@Subject: Do you mean "PATCH for-2.9?"? Because "RFC" to me means
+"please do not merge". ;-)
+
+I wouldn't mind a change like this to go into 2.9.
+
+On 27.03.2017 17:35, Denis V. Lunev wrote:
+> Recently we expirience hang with iothreads enabled with the following
+> call trace:
+> Thread 1 (Thread 0x7fa95efebc80 (LWP 177117)):
+> 0  ppoll () from /lib64/libc.so.6
+> 2  qemu_poll_ns () at qemu-timer.c:313
+> 3  aio_poll () at aio-posix.c:457
+> 4  bdrv_flush () at block/io.c:2641
+> 5  bdrv_close () at block.c:2143
+> 6  bdrv_delete () at block.c:2352
+> 7  bdrv_unref () at block.c:3429
+> 8  blk_remove_bs () at block/block-backend.c:427
+> 9  blk_delete () at block/block-backend.c:178
+> 10 blk_unref () at block/block-backend.c:226
+> 11 object_property_del_all () at qom/object.c:399
+> 12 object_finalize () at qom/object.c:461
+> 13 object_unref () at qom/object.c:898
+> 14 object_property_del_child () at qom/object.c:422
+> 15 qmp_marshal_device_del () at qmp-marshal.c:1145
+> 16 handle_qmp_command () at /usr/src/debug/qemu-2.6.0/monitor.c:3929
+>=20
+> Technically bdrv_flush() stucks in
+>     while (rwco.ret =3D=3D NOT_DONE) {
+>         aio_poll(aio_context, true);
+>     }
+> but rwco.ret is equal to 0 thus we have missed wakeup. Code investigati=
+on
+> reveals that we do not have performed aio_context_acquire() on this cal=
+l
+> stack.
+>=20
+> This patch adds missed lock.
+>=20
+> Signed-off-by: Denis V. Lunev <den@openvz.org>
+> CC: Kevin Wolf <kwolf@redhat.com>
+> CC: Max Reitz <mreitz@redhat.com>
+> CC: Eric Blake <eblake@redhat.com>
+> CC: Markus Armbruster <armbru@redhat.com>
 > ---
->  hw/misc/Makefile.objs      |   2 +-
->  hw/misc/pci-testdev-smmu.c | 239 +++++++++++++++++++++++++++++++++++++++++++++
->  hw/misc/pci-testdev-smmu.h |  22 +++++
->  3 files changed, 262 insertions(+), 1 deletion(-)
->  create mode 100644 hw/misc/pci-testdev-smmu.c
->  create mode 100644 hw/misc/pci-testdev-smmu.h
-> 
-> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-> index ffb49c1..fc34c5f 100644
-> --- a/hw/misc/Makefile.objs
-> +++ b/hw/misc/Makefile.objs
-> @@ -29,7 +29,6 @@ obj-$(CONFIG_IMX) += imx_ccm.o
->  obj-$(CONFIG_IMX) += imx31_ccm.o
->  obj-$(CONFIG_IMX) += imx25_ccm.o
->  obj-$(CONFIG_IMX) += imx6_ccm.o
-> -obj-$(CONFIG_IMX) += imx6_src.o
->  obj-$(CONFIG_MILKYMIST) += milkymist-hpdmc.o
->  obj-$(CONFIG_MILKYMIST) += milkymist-pfpu.o
->  obj-$(CONFIG_MAINSTONE) += mst_fpga.o
-> @@ -52,3 +51,4 @@ obj-$(CONFIG_PVPANIC) += pvpanic.o
->  obj-$(CONFIG_EDU) += edu.o
->  obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
->  obj-$(CONFIG_AUX) += aux.o
-> +obj-$(CONFIG_ARM_SMMUV3) += pci-testdev-smmu.o
-> diff --git a/hw/misc/pci-testdev-smmu.c b/hw/misc/pci-testdev-smmu.c
-> new file mode 100644
-> index 0000000..b605912
-> --- /dev/null
-> +++ b/hw/misc/pci-testdev-smmu.c
-> @@ -0,0 +1,239 @@
-> +/*
-> + * QEMU PCI test device
-> + *
-> + * Copyright (c) 2012 Red Hat Inc.
-> + * Author: Michael S. Tsirkin <mst@redhat.com>
+>  block/block-backend.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>=20
+> diff --git a/block/block-backend.c b/block/block-backend.c
+> index 5742c09..65d5da9 100644
+> --- a/block/block-backend.c
+> +++ b/block/block-backend.c
+> @@ -273,7 +273,11 @@ void blk_unref(BlockBackend *blk)
+>      if (blk) {
+>          assert(blk->refcnt > 0);
+>          if (!--blk->refcnt) {
+> +            AioContext *ctx =3D blk_get_aio_context(blk);
+> +
+> +            aio_context_acquire(ctx);
+>              blk_delete(blk);
+> +            aio_context_release(ctx);
 
-Header copy+paste mistake.
+But I don't think this is quite the correct place. The caller of
+blk_unref() should have acquired the AioContext already. As far as I can
+tell in this case that would be originally release_drive() in
+hw/core/qdev-properties-system.c and then blk_detach_dev().
 
-Anyway, this device appears to be redundant with the hw/misc/edu.c
-device.
+I think the former would be the somehow more correct place but I can
+imagine the latter to be more useful in reality. I'll leave it to you.
 
-Thanks,
-drew
+(As an alternative, you may of course convince me that this patch is
+indeed correct and should be taken as-is. :-))
 
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation; either version 2 of the License, or
-> + * (at your option) any later version.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along
-> + * with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +#include "qemu/osdep.h"
-> +#include "hw/hw.h"
-> +#include "hw/pci/pci.h"
-> +#include "qemu/event_notifier.h"
-> +
-> +#include "pci-testdev-smmu.h"
-> +
-> +/*
-> + * pci-testdev-smmu:
-> + *          Simple PCIe device, to enable read and write from memory.
-> + * Architecture:
-> + *          Following registers are supported.
-> + *          TST_COMMAND = 0x0
-> + *          TST_STATUS  = 0x4
-> + *          TST_SRC_ADDRESS = 0x8
-> + *          TST_SIZE        = 0x10
-> + *          TST_DST_ADDRESS = 0x18
-> + */
-> +#define PCI_TSTDEV_NREGS 0x10
-> +
-> +/*
-> + *  TST_COMMAND Register bits
-> + *      OP[0]
-> + *          READ = 0x0
-> + *          WRITE = 0x1
-> + */
-> +
-> +struct RegInfo {
-> +        uint64_t data;
-> +        char *name;
-> +};
-> +typedef struct RegInfo RegInfo;
-> +
-> +typedef struct PCITestDevState {
-> +    /*< private >*/
-> +    PCIDevice dev;
-> +    /*< public >*/
-> +
-> +    MemoryRegion mmio;
-> +    RegInfo regs[PCI_TSTDEV_NREGS];
-> +} PCITestDevState;
-> +
-> +#define TYPE_PCI_TEST_DEV "pci-testdev-smmu"
-> +
-> +#define PCI_TEST_DEV(obj) \
-> +    OBJECT_CHECK(PCITestDevState, (obj), TYPE_PCI_TEST_DEV)
-> +
-> +static void
-> +pci_tstdev_reset(PCITestDevState *d)
-> +{
-> +    memset(d->regs, 0, sizeof(d->regs));
-> +}
-> +
-> +static inline void
-> +pci_tstdev_write_reg(PCITestDevState *pdev, hwaddr addr, uint64_t val)
-> +{
-> +    RegInfo *reg = &pdev->regs[addr >> 2];
-> +    reg->data = val;
-> +}
-> +
-> +static inline uint32_t
-> +pci_tstdev_read32_reg(PCITestDevState *pdev, hwaddr addr)
-> +{
-> +    RegInfo *reg = &pdev->regs[addr >> 2];
-> +    return (uint32_t) reg->data;
-> +}
-> +
-> +static inline uint64_t
-> +pci_tstdev_read64_reg(PCITestDevState *pdev, hwaddr addr)
-> +{
-> +        RegInfo *reg = &pdev->regs[addr >> 2];
-> +        return reg->data;
-> +}
-> +
-> +static void
-> +pci_tstdev_handle_cmd(PCITestDevState *pdev, hwaddr addr, uint64_t val,
-> +                            unsigned _unused_size)
-> +{
-> +    uint64_t s = pci_tstdev_read64_reg(pdev, TST_REG_SRC_ADDR);
-> +    uint64_t d = pci_tstdev_read64_reg(pdev, TST_REG_DST_ADDR);
-> +    uint32_t size = pci_tstdev_read32_reg(pdev, TST_REG_SIZE);
-> +    uint8_t buf[128];
-> +
-> +    printf("+++++++++++++++++++++> src:%lx, dst:%lx size:%d\n",
-> +           s, d, size);
-> +    while (size) {
-> +        int nbytes = (size < sizeof(buf)) ? size: sizeof(buf);
-> +        int ret = 0;
-> +        printf("nbytes:%d\n", nbytes);
-> +        if (val & CMD_READ) {
-> +            printf("doing pci_dma_read\n");
-> +            ret = pci_dma_read(&pdev->dev, s, (void*)buf, nbytes);
-> +        }
-> +        if (ret)
-> +            return;
-> +
-> +        if (val & CMD_WRITE) {
-> +            printf("doing pci_dma_write\n");
-> +            ret = pci_dma_write(&pdev->dev, d, (void*)buf, nbytes);
-> +        }
-> +        size -= nbytes;
-> +        s += nbytes;
-> +        d += nbytes;
-> +    }
-> +}
-> +
-> +static void
-> +pci_tstdev_mmio_write(void *opaque, hwaddr addr,
-> +                      uint64_t val, unsigned size)
-> +{
-> +    PCITestDevState *d = opaque;
-> +    uint64_t lo;
-> +
-> +    printf("=================> addr:%ld act:%d val:%lx reg_addr:%p\n",
-> +           addr, TST_REG_COMMAND, val, &d->regs[addr]);
-> +    //addr >>= 2;
-> +    switch (addr) {
-> +    case TST_REG_COMMAND:
-> +            printf("Calling command handler.....\n");
-> +            pci_tstdev_handle_cmd(d, addr, val, size);
-> +    case TST_REG_SRC_ADDR:
-> +    case TST_REG_DST_ADDR:
-> +    case TST_REG_SIZE:
-> +            pci_tstdev_write_reg(d, addr, val);
-> +            break;
-> +    case TST_REG_SRC_ADDR + 4:
-> +    case TST_REG_DST_ADDR + 4:
-> +            lo = pci_tstdev_read32_reg(d, addr);
-> +            lo &= (0xffffffffULL << 32);
-> +            pci_tstdev_write_reg(d, addr, (val << 32) | lo);
-> +            break;
-> +    case TST_REG_STATUS:        /* Read only reg */
-> +    default:
-> +        printf("Unkown/RO register write\n");
-> +        break;
-> +    }
-> +}
-> +
-> +static uint64_t
-> +pci_tstdev_mmio_read(void *opaque, hwaddr addr, unsigned size)
-> +{
-> +    PCITestDevState *d = opaque;
-> +
-> +    switch (addr) {
-> +    case TST_REG_SRC_ADDR:
-> +    case TST_REG_DST_ADDR:
-> +            return pci_tstdev_read64_reg(d, addr);
-> +    }
-> +
-> +    return pci_tstdev_read32_reg(d, addr);
-> +}
-> +
-> +static const MemoryRegionOps pci_testdev_mmio_ops = {
-> +    .read = pci_tstdev_mmio_read,
-> +    .write = pci_tstdev_mmio_write,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
-> +    .impl = {
-> +        .min_access_size = 1,
-> +        .max_access_size = 8,
-> +    },
-> +};
-> +
-> +static void pci_tstdev_realize(PCIDevice *pci_dev, Error **errp)
-> +{
-> +    PCITestDevState *d = PCI_TEST_DEV(pci_dev);
-> +    uint8_t *pci_conf;
-> +
-> +    pci_conf = pci_dev->config;
-> +
-> +    pci_conf[PCI_INTERRUPT_PIN] = 0; /* no interrupt pin */
-> +
-> +    memory_region_init_io(&d->mmio, OBJECT(d), &pci_testdev_mmio_ops, d,
-> +                          "pci-testdev-smmu-mmio", 1 << 10);
-> +
-> +    pci_register_bar(pci_dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->mmio);
-> +}
-> +
-> +static void
-> +pci_tstdev_uninit(PCIDevice *dev)
-> +{
-> +    PCITestDevState *d = PCI_TEST_DEV(dev);
-> +
-> +    pci_tstdev_reset(d);
-> +}
-> +
-> +static void qdev_pci_tstdev_reset(DeviceState *dev)
-> +{
-> +    PCITestDevState *d = PCI_TEST_DEV(dev);
-> +    pci_tstdev_reset(d);
-> +}
-> +
-> +static void pci_tstdev_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-> +
-> +    k->realize = pci_tstdev_realize;
-> +    k->exit = pci_tstdev_uninit;
-> +    k->vendor_id = PCI_VENDOR_ID_REDHAT;
-> +    k->device_id = PCI_DEVICE_ID_REDHAT_TEST;
-> +    k->revision = 0x00;
-> +    k->class_id = PCI_CLASS_OTHERS;
-> +    dc->desc = "PCI Test Device - for smmu";
-> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-> +    dc->reset = qdev_pci_tstdev_reset;
-> +}
-> +
-> +static const TypeInfo pci_tstdev_info = {
-> +    .name          = TYPE_PCI_TEST_DEV,
-> +    .parent        = TYPE_PCI_DEVICE,
-> +    .instance_size = sizeof(PCITestDevState),
-> +    .class_init    = pci_tstdev_class_init,
-> +};
-> +
-> +static void pci_tstdev_register_types(void)
-> +{
-> +    type_register_static(&pci_tstdev_info);
-> +}
-> +
-> +type_init(pci_tstdev_register_types)
-> diff --git a/hw/misc/pci-testdev-smmu.h b/hw/misc/pci-testdev-smmu.h
-> new file mode 100644
-> index 0000000..4a2d463
-> --- /dev/null
-> +++ b/hw/misc/pci-testdev-smmu.h
-> @@ -0,0 +1,22 @@
-> +#ifndef HW_MISC_PCI_TESTDEV_SMMU
-> +#define HW_MISC_PCI_TESTDEV_SMMU
-> +
-> +enum reg {
-> +        TST_REG_COMMAND  = 0x0,
-> +        TST_REG_STATUS   = 0x4,
-> +        TST_REG_SRC_ADDR = 0x8,
-> +        TST_REG_SIZE     = 0x10,
-> +        TST_REG_DST_ADDR = 0x18,
-> +
-> +        TST_REG_LAST     = 0x30,
-> +};
-> +
-> +#define CMD_READ    0x100
-> +#define CMD_WRITE   0x200
-> +#define CMD_RW      (CMD_READ | CMD_WRITE)
-> +
-> +#define STATUS_OK   (1 << 0)
-> +#define STATUS_CMD_ERROR (1 << 1)
-> +#define STATUS_CMD_INVALID (1 << 2)
-> +
-> +#endif
-> -- 
-> 2.9.3
-> 
-> 
+Max
+
+>          }
+>      }
+>  }
+>=20
+
+
+
+--cSSegtBTUKRT64w146nTupTD4da0sktMl
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljZM6ESHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AwWoH/ilja/AbIp4Ynd32yPkMWctI4A374k5j
+/2uXT1BW+iDXOG0A21S5ZuqXCHQXexk/pP8bNQBZRcp963cYYtOXNNT0/dNvZYsj
+VLvYHPLFguhpvzEhzMo6JxFPnb9T1CPRcmUnvdu107GvcHDY+WTpqzUZ9LH8NNeJ
+P4z90FChUzPL4EtSVTiOGDu4yXZVJwlK7DKE0B7wr19wsQHiZZehte++fzeCYEKA
+ZkG5vSsbgIOIBdTTG8FJTrw2KGO5Wc+j8pfsZBwyRvZbkrYnQAy2fy62VCF7Up0j
+5U8ZEUnlYtCH5ReZ7fXwywoN4JS4m5/JFC1eaDguRFaOrPdPB/CdIiw=
+=kaym
+-----END PGP SIGNATURE-----
+
+--cSSegtBTUKRT64w146nTupTD4da0sktMl--
