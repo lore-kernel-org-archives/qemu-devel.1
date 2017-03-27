@@ -1,16 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1csRH2-0006W0-R2
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 05:49:19 -0400
+	(envelope-from <kraxel@redhat.com>) id 1csRcw-0002oM-1y
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 06:11:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1csRH1-0007cb-RE
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 05:49:16 -0400
-From: Eric Auger <eric.auger@redhat.com>
-Date: Mon, 27 Mar 2017 11:48:46 +0200
-Message-Id: <1490608126-22187-4-git-send-email-eric.auger@redhat.com>
-In-Reply-To: <1490608126-22187-1-git-send-email-eric.auger@redhat.com>
-References: <1490608126-22187-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v3 3/3] hw/intc/arm_gicv3_its: Allow save/restore
+	(envelope-from <kraxel@redhat.com>) id 1csRcn-0007cB-4P
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 06:11:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55698)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1csRcm-0007aW-RN
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 06:11:44 -0400
+Message-ID: <1490609499.31035.29.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 27 Mar 2017 12:11:39 +0200
+In-Reply-To: <20170326095349.8571-1-jcelaya@gmail.com>
+References: <20170326095349.8571-1-jcelaya@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2] Fix input-linux reading from device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,109 +26,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: vijay.kilari@gmail.com, Vijaya.Kumar@cavium.com, drjones@redhat.com, peterx@redhat.com, quintela@redhat.com, dgilbert@redhat.com, christoffer.dall@linaro.org
+To: Javier Celaya <jcelaya@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-We change the restoration priority of both the GICv3 and ITS. The
-GICv3 must be restored before the ITS and the ITS needs to be restored
-before PCIe devices since it translates their MSI transactions.
+On So, 2017-03-26 at 11:53 +0200, Javier Celaya wrote:
+> The evdev devices in input-linux.c are read in blocks of one whole
+> event. If there are not enough bytes available, they are discarded,
+> instead of being kept for the next read operation. This results in
+> lost events, of even non-working devices.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Have you seen this happening in practice?
 
----
-v2 -> v3:
-- reword migration blocker message
-- remove unmigratable setting to false
+> +    struct input_event event;
+> +    int         to_be_read;
 
-v1 -> v2:
-- handle case where migrate_add_blocker fails
-- add comments along with ITS and GICv3 migration priorities
----
- hw/intc/arm_gicv3_common.c     |  1 +
- hw/intc/arm_gicv3_its_common.c |  2 +-
- hw/intc/arm_gicv3_its_kvm.c    | 24 ++++++++++++------------
- include/migration/vmstate.h    |  2 ++
- 4 files changed, 16 insertions(+), 13 deletions(-)
+I'd suggest to store offset (i.e. bytes already read) instead, should
+make the whole logic a bit simpler and easier to read.
 
-diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
-index c6493d6..4228b7c 100644
---- a/hw/intc/arm_gicv3_common.c
-+++ b/hw/intc/arm_gicv3_common.c
-@@ -145,6 +145,7 @@ static const VMStateDescription vmstate_gicv3 = {
-     .minimum_version_id = 1,
-     .pre_save = gicv3_pre_save,
-     .post_load = gicv3_post_load,
-+    .priority = MIG_PRI_GICV3,
-     .fields = (VMStateField[]) {
-         VMSTATE_UINT32(gicd_ctlr, GICv3State),
-         VMSTATE_UINT32_ARRAY(gicd_statusr, GICv3State, 2),
-diff --git a/hw/intc/arm_gicv3_its_common.c b/hw/intc/arm_gicv3_its_common.c
-index efab8c7..22ce4c4 100644
---- a/hw/intc/arm_gicv3_its_common.c
-+++ b/hw/intc/arm_gicv3_its_common.c
-@@ -48,7 +48,7 @@ static const VMStateDescription vmstate_its = {
-     .name = "arm_gicv3_its",
-     .pre_save = gicv3_its_pre_save,
-     .post_load = gicv3_its_post_load,
--    .unmigratable = true,
-+    .priority = MIG_PRI_GICV3_ITS,
-     .fields = (VMStateField[]) {
-         VMSTATE_UINT32(ctlr, GICv3ITSState),
-         VMSTATE_UINT32(iidr, GICv3ITSState),
-diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
-index 1732831..15159f4 100644
---- a/hw/intc/arm_gicv3_its_kvm.c
-+++ b/hw/intc/arm_gicv3_its_kvm.c
-@@ -76,18 +76,6 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
-     GICv3ITSState *s = ARM_GICV3_ITS_COMMON(dev);
-     Error *local_err = NULL;
- 
--    /*
--     * Block migration of a KVM GICv3 ITS device: the API for saving and
--     * restoring the state in the kernel is not yet available
--     */
--    error_setg(&s->migration_blocker, "vITS migration is not implemented");
--    migrate_add_blocker(s->migration_blocker, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        error_free(s->migration_blocker);
--        return;
--    }
--
-     s->dev_fd = kvm_create_device(kvm_state, KVM_DEV_TYPE_ARM_VGIC_ITS, false);
-     if (s->dev_fd < 0) {
-         error_setg_errno(errp, -s->dev_fd, "error creating in-kernel ITS");
-@@ -104,6 +92,18 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
- 
-     gicv3_its_init_mmio(s, NULL);
- 
-+    if (!kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
-+        GITS_CTLR)) {
-+        error_setg(&s->migration_blocker, "This operating system kernel "
-+                   "does not support vGICv3 migration");
-+        migrate_add_blocker(s->migration_blocker, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            error_free(s->migration_blocker);
-+            return;
-+        }
-+    }
-+
-     kvm_msi_use_devid = true;
-     kvm_gsi_direct_mapping = false;
-     kvm_msi_via_irqfd_allowed = kvm_irqfds_enabled();
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index f2dbf84..8dab9c7 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -198,6 +198,8 @@ enum VMStateFlags {
- typedef enum {
-     MIG_PRI_DEFAULT = 0,
-     MIG_PRI_IOMMU,              /* Must happen before PCI devices */
-+    MIG_PRI_GICV3_ITS,          /* Must happen before PCI devices */
-+    MIG_PRI_GICV3,              /* Must happen before the ITS */
-     MIG_PRI_MAX,
- } MigrationPriority;
- 
--- 
-2.5.5
+> +            } else if (rc > 0){
+
+checkpatch.pl complains here:
+ERROR: space required before the open brace '{'
+
+cheers,
+  Gerd
