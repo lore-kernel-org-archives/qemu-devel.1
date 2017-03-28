@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1csmvJ-0000BX-KK
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:56:18 -0400
+	(envelope-from <armbru@redhat.com>) id 1csmvJ-0000CD-TA
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:56:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1csmvI-0008Lv-DA
+	(envelope-from <armbru@redhat.com>) id 1csmvI-0008Mt-OL
 	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:56:17 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 28 Mar 2017 10:56:05 +0200
-Message-Id: <1490691368-32099-8-git-send-email-armbru@redhat.com>
+Date: Tue, 28 Mar 2017 10:55:59 +0200
+Message-Id: <1490691368-32099-2-git-send-email-armbru@redhat.com>
 In-Reply-To: <1490691368-32099-1-git-send-email-armbru@redhat.com>
 References: <1490691368-32099-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 for-2.9 07/10] rbd: Clean up
- qemu_rbd_create()'s detour through QemuOpts
+Subject: [Qemu-devel] [PATCH v4 for-2.9 01/10] rbd: Reject -blockdev
+ server.*.{numeric, to, ipv4, ipv6}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,60 +23,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, jdurgin@redhat.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com
 
-The conversion from QDict to QemuOpts is pointless.  Simply get the
-stuff straight from the QDict.
+We use InetSocketAddress in the QAPI schema.  However, the code
+doesn't use inet_connect_saddr(), but formats "host" and "port" into a
+configuration string for rados_conf_set().  Thus, members "numeric",
+"to", "ipv4" and "ipv6" are silently ignored.  Not nice.  Example:
+
+    -blockdev rbd,node-name=nn,pool=p,image=i,server.0.host=h0,server.0.port=12345,server.0.ipv4=off
+
+Factor a suitable InetSocketAddressBase out of InetSocketAddress, and
+use that.  "numeric", "to", "ipv4" and "ipv6" are now rejected.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Jeff Cody <jcody@redhat.com>
 ---
- block/rbd.c | 20 +++++---------------
- 1 file changed, 5 insertions(+), 15 deletions(-)
+ qapi-schema.json     | 21 ++++++++++++++-------
+ qapi/block-core.json |  2 +-
+ 2 files changed, 15 insertions(+), 8 deletions(-)
 
-diff --git a/block/rbd.c b/block/rbd.c
-index b2afe07..16ea60a 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -376,7 +376,6 @@ static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
-     rados_t cluster;
-     rados_ioctx_t io_ctx;
-     QDict *options = NULL;
--    QemuOpts *rbd_opts = NULL;
-     int ret = 0;
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 68a4327..b921994 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -4051,19 +4051,27 @@
+   'data': [ 'all', 'rx', 'tx' ] }
  
-     secretid = qemu_opt_get(opts, "password-secret");
-@@ -407,19 +406,11 @@ static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
-         goto exit;
-     }
- 
--    rbd_opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
--    qemu_opts_absorb_qdict(rbd_opts, options, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        ret = -EINVAL;
--        goto exit;
--    }
--
--    pool       = qemu_opt_get(rbd_opts, "pool");
--    conf       = qemu_opt_get(rbd_opts, "conf");
--    clientname = qemu_opt_get(rbd_opts, "user");
--    name       = qemu_opt_get(rbd_opts, "image");
--    keypairs   = qemu_opt_get(rbd_opts, "=keyvalue-pairs");
-+    pool       = qdict_get_try_str(options, "pool");
-+    conf       = qdict_get_try_str(options, "conf");
-+    clientname = qdict_get_try_str(options, "user");
-+    name       = qdict_get_try_str(options, "image");
-+    keypairs   = qdict_get_try_str(options, "=keyvalue-pairs");
- 
-     ret = rados_create(&cluster, clientname);
-     if (ret < 0) {
-@@ -470,7 +461,6 @@ shutdown:
- 
- exit:
-     QDECREF(options);
--    qemu_opts_del(rbd_opts);
-     return ret;
- }
+ ##
++# @InetSocketAddressBase:
++#
++# @host: host part of the address
++# @port: port part of the address
++##
++{ 'struct': 'InetSocketAddressBase',
++  'data': {
++    'host': 'str',
++    'port': 'str' } }
++
++##
+ # @InetSocketAddress:
+ #
+ # Captures a socket address or address range in the Internet namespace.
+ #
+-# @host: host part of the address
+-#
+-# @port: port part of the address, or lowest port if @to is present
+-#
+ # @numeric: true if the host/port are guaranteed to be numeric,
+ #           false if name resolution should be attempted. Defaults to false.
+ #           (Since 2.9)
+ #
+-# @to: highest port to try
++# @to: If present, this is range of possible addresses, with port
++#      between @port and @to.
+ #
+ # @ipv4: whether to accept IPv4 addresses, default try both IPv4 and IPv6
+ #
+@@ -4072,9 +4080,8 @@
+ # Since: 1.3
+ ##
+ { 'struct': 'InetSocketAddress',
++  'base': 'InetSocketAddressBase',
+   'data': {
+-    'host': 'str',
+-    'port': 'str',
+     '*numeric':  'bool',
+     '*to': 'uint16',
+     '*ipv4': 'bool',
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 0f132fc..5d2efe4 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2652,7 +2652,7 @@
+             '*conf': 'str',
+             '*snapshot': 'str',
+             '*user': 'str',
+-            '*server': ['InetSocketAddress'],
++            '*server': ['InetSocketAddressBase'],
+             '*auth-supported': ['RbdAuthMethod'],
+             '*password-secret': 'str' } }
  
 -- 
 2.7.4
