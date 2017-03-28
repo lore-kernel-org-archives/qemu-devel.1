@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1csqCh-0003Wq-8e
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 08:26:31 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1csqHK-0004zH-28
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 08:31:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1csqCg-0000qj-8d
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 08:26:27 -0400
-Date: Tue, 28 Mar 2017 20:26:13 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170328122613.GD5207@lemon.lan>
-References: <20170316212351.13797-1-jsnow@redhat.com>
-	<CAJSP0QU1g9iijqMnrf27Yp5BTr_U4c--+GqYTnvnVtyud0O2Gw@mail.gmail.com>
-	<bb9eafce-797e-3d94-d6da-4b519772fcaf@redhat.com>
-	<20170324152755.GR12560@stefanha-x1.localdomain>
+	(envelope-from <ehabkost@redhat.com>) id 1csqHF-0002Vf-48
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 08:31:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36088)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1csqHE-0002VY-Rv
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 08:31:09 -0400
+Date: Tue, 28 Mar 2017 09:31:05 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170328123105.GA4418@thinpad.lan.raisama.net>
+References: <1490653177-131484-1-git-send-email-agraf@suse.de>
+	<20170328004108.GP28530@thinpad.lan.raisama.net>
+	<9d85e056-3331-9815-404b-9557ca5028cc@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170324152755.GR12560@stefanha-x1.localdomain>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 0/3] block: pause block
- jobs for bdrv_drain_begin/end
+In-Reply-To: <9d85e056-3331-9815-404b-9557ca5028cc@suse.de>
+Subject: Re: [Qemu-devel] [PATCH] i386: Allow cpuid bit override
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,53 +28,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+To: Alexander Graf <agraf@suse.de>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Fri, 03/24 15:27, Stefan Hajnoczi wrote:
-> On Thu, Mar 23, 2017 at 06:57:14PM +0100, Paolo Bonzini wrote:
-> >=20
-> >=20
-> > On 23/03/2017 18:44, Stefan Hajnoczi wrote:
-> > >> It's possible to wedge QEMU if the guest tries to reset a virtio-p=
-ci
-> > >> device as QEMU is also using the drive for a blockjob. This patchs=
-et
-> > >> aims to allow us to safely pause/resume jobs attached to individua=
-l
-> > >> nodes in a manner similar to how bdrv_drain_all_begin/end do.
-> > >=20
-> > > Weird, I thought the 0 nanosecond sleep that block jobs do in their
-> > > main loop allows aio_poll() loops to finish.
-> >=20
-> > The 0 nanosecond sleep is now done in the BDS AioContext rather than =
-in=20
-> > the "non-aio_poll-aware" main loop:
-> >=20
-> >     commit 0b9caf9b3166c8deb3c4f3a774c2384b069dc29c
-> >     Author: Fam Zheng <famz@redhat.com>
-> >     Date:   Tue Aug 26 15:15:43 2014 +0800
-> >=20
-> >     coroutine: Drop co_sleep_ns
-> >    =20
-> >     block_job_sleep_ns is the only user. Since we are moving towards
-> >     AioContext aware code, it's better to use the explicit version an=
-d drop
-> >     the old one.
-> >    =20
-> >     Signed-off-by: Fam Zheng <famz@redhat.com>
-> >     Reviewed-by: Beno=EEt Canet <benoit.canet@nodalink.com>
-> >     Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->=20
-> But we hold the AioContext lock and are calling aio_poll(), so I would
-> expect our loop to terminate.  The blockjob coroutine should still be
-> leaving this little gap in activity during which the aio_poll() loop
-> finishes.
+On Tue, Mar 28, 2017 at 01:26:04PM +0200, Alexander Graf wrote:
+> On 03/28/2017 02:41 AM, Eduardo Habkost wrote:
+> > On Tue, Mar 28, 2017 at 12:19:37AM +0200, Alexander Graf wrote:
+> > > KVM has a feature bitmap of CPUID bits that it knows works for guests.
+> > > QEMU removes bits that are not part of that bitmap automatically on VM
+> > > start.
+> > > 
+> > > However, some times we just don't list features in that list because
+> > > they don't make sense for normal scenarios, but may be useful in specific,
+> > > targeted workloads.
+> > > 
+> > > For that purpose, add a new =force option to all CPUID feature flags in
+> > > the CPU property. With that we can override the accel filtering and give
+> > > users full control over the CPUID feature bits exposed into guests.
+> > > 
+> > > Signed-off-by: Alexander Graf <agraf@suse.de>
+> > > ---
+> > >   target/i386/cpu.c | 30 ++++++++++++++++++++++++++----
+> > >   target/i386/cpu.h |  3 +++
+> > >   2 files changed, 29 insertions(+), 4 deletions(-)
+> > > 
+> > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > > index 7aa7622..5a22f9a 100644
+> > > --- a/target/i386/cpu.c
+> > > +++ b/target/i386/cpu.c
+> > > @@ -2229,7 +2229,7 @@ void x86_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+> > >       g_slist_foreach(list, x86_cpu_list_entry, &s);
+> > >       g_slist_free(list);
+> > > -    (*cpu_fprintf)(f, "\nRecognized CPUID flags:\n");
+> > > +    (*cpu_fprintf)(f, "\nRecognized CPUID flags (=on|=off|=force):\n");
+> > >       for (i = 0; i < ARRAY_SIZE(feature_word_info); i++) {
+> > >           FeatureWordInfo *fw = &feature_word_info[i];
+> > > @@ -3460,6 +3460,7 @@ static int x86_cpu_filter_features(X86CPU *cpu)
+> > >               x86_cpu_get_supported_feature_word(w, false);
+> > >           uint32_t requested_features = env->features[w];
+> > >           env->features[w] &= host_feat;
+> > > +        env->features[w] |= cpu->forced_features[w];
+> > >           cpu->filtered_features[w] = requested_features & ~env->features[w];
+> > >           if (cpu->filtered_features[w]) {
+> > >               rv = 1;
+> > > @@ -3693,6 +3694,7 @@ static void x86_cpu_unrealizefn(DeviceState *dev, Error **errp)
+> > >   typedef struct BitProperty {
+> > >       uint32_t *ptr;
+> > > +    uint32_t *force_ptr;
+> > >       uint32_t mask;
+> > >   } BitProperty;
+> > Please take a look at:
+> >    Subject: [PATCH for-2.9 v2 1/2] i386: Replace uint32_t* with FeatureWord on feature getter/setter
+> > 
+> > I plan to include that series in 2.9, and it would make the
+> > force_ptr field unnecessary.
+> > 
+> > > @@ -3701,7 +3703,15 @@ static void x86_cpu_get_bit_prop(Object *obj, Visitor *v, const char *name,
+> > >   {
+> > >       BitProperty *fp = opaque;
+> > >       bool value = (*fp->ptr & fp->mask) == fp->mask;
+> > > -    visit_type_bool(v, name, &value, errp);
+> > > +    bool forced = (*fp->force_ptr & fp->mask) == fp->mask;
+> > > +    char str[] = "force";
+> > > +    char *strval = str;
+> > > +
+> > > +    if (!forced) {
+> > > +        strcpy(str, value ? "on" : "off");
+> > > +    }
+> > > +
+> > > +    visit_type_str(v, name, &strval, errp);
+> > You can define an enum type in qapi-schema.json, and use
+> > visit_type_<YourEnumType>(). You can grep for
+> > visit_type_OnOffAuto to find examples.
+> > 
+> > (But I suggest naming the enum something like
+> > "X86CPUFeatureSetting" instead of "OnOffForce", because we will
+> > probably add other enum values in the future).
+> > 
+> > However: we need to find a way to do this and not break
+> > compatibility with "feat=yes|true|no|false", that's supported by
+> > StringInputVisitor (which is used by object_property_parse()).
+> > Maybe fallback to visit_type_bool() in case
+> > visit_type_<YourEnumType>() fails?
+> 
+> Putting it into a special enum sounds much more fragile than the current
+> solution to me. We need to bool fallback either way, so I fail to see any
+> benefit from having the enum.
 
-I am not sure, but at each gap, aio_poll() is free to fire the 0 nanoseco=
-nd
-sleep timer cb already, which will generate more I/O. The correct thing i=
-s, like
-in this series, set the pause flag.
+I don't see why the enum would be more fragile. With the QAPI
+enum, we:
+* Have a meaningful value for the QOM property 'type' field,
+  and have some hope to make type information for QOM properties
+  really useful one day;
+* Have the possible values for the property well-documented in
+  the QAPI schema;
+* Have the string<->enum translation code automatically generated
+  for us;
+* Can easily add other values later (I have been planning to
+  support "feat=host" so "-cpu host/max" aren't special cases in
+  the code.
 
-Fam
+-- 
+Eduardo
