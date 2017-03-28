@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <herongguang.he@huawei.com>) id 1csfdY-0006XM-Pb
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 21:09:29 -0400
+	(envelope-from <changpeng.liu@intel.com>) id 1csgB2-0002Z8-IN
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 21:44:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <herongguang.he@huawei.com>) id 1csfdV-0004F9-IU
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 21:09:28 -0400
-Received: from [45.249.212.188] (port=2968 helo=dggrg02-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <herongguang.he@huawei.com>) id 1csfdU-0004Dn-Sc
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 21:09:25 -0400
-References: <20170325111424.21752-1-herongguang.he@huawei.com>
-	<58D8BD6D.8080404@huawei.com>
-	<4c9e0c46-ac81-a455-e2ed-530ad916ff71@redhat.com>
-From: "Herongguang (Stephen)" <herongguang.he@huawei.com>
-Message-ID: <58D9B791.2000905@huawei.com>
-Date: Tue, 28 Mar 2017 09:08:33 +0800
+	(envelope-from <changpeng.liu@intel.com>) id 1csgAy-000106-Qd
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 21:44:04 -0400
+Received: from mga02.intel.com ([134.134.136.20]:63081)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
+	id 1csgAy-0000za-F4
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 21:44:00 -0400
+From: "Liu, Changpeng" <changpeng.liu@intel.com>
+Date: Tue, 28 Mar 2017 01:43:53 +0000
+Message-ID: <FF7FC980937D6342B9D289F5F3C7C2625B567044@SHSMSX103.ccr.corp.intel.com>
+References: <1490690365-21109-1-git-send-email-changpeng.liu@intel.com>
+	<20170327145625.GA24952@lst.de>
+In-Reply-To: <20170327145625.GA24952@lst.de>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <4c9e0c46-ac81-a455-e2ed-530ad916ff71@redhat.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] KVM: pci-assign: do not map smm memory
- slot pages
+Subject: Re: [Qemu-devel] [PATCH] virtio-blk: add DISCARD support to
+ virtio-blk driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +30,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, rkrcmar@redhat.com, kvm@vger.kernel.org
-Cc: qemu-devel@nongnu.org, wangxinxin.wang@huawei.com
-
- From 8f5b9d2c2944ea7cd8149e9d3b4088f487217d20 Mon Sep 17 00:00:00 2001
-From: herongguang <herongguang.he@huawei.com>
-Date: Mon, 27 Mar 2017 15:08:59 +0800
-Subject: [PATCH] KVM: pci-assign: do not map smm memory slot pages in vt-d
-  page table
-
-or VM memory are not put thus leaked in kvm_iommu_unmap_memslots() when
-destroy VM.
-
-This is consistent with current vfio implementation.
-
-Signed-off-by: herongguang <herongguang.he@huawei.com>
----
-  virt/kvm/kvm_main.c | 2 +-
-  1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 482612b..9018d06 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1052,7 +1052,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
-  	 * changes) is disallowed above, so any other attribute changes getting
-  	 * here can be skipped.
-  	 */
--	if ((change == KVM_MR_CREATE) || (change == KVM_MR_MOVE)) {
-+	if ((as_id == 0) && ((change == KVM_MR_CREATE) || (change == KVM_MR_MOVE))) {
-  		r = kvm_iommu_map_pages(kvm, &new);
-  		return r;
-  	}
--- 
-1.7.12.4
+To: Christoph Hellwig <hch@lst.de>
+Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
 
 
-On 2017/3/27 20:22, Paolo Bonzini wrote:
->
->
-> On 27/03/2017 09:21, Herongguang (Stephen) wrote:
->>  From f6f0ee6831488bef7af841cb86f3d85a04848fe5 Mon Sep 17 00:00:00 2001
->> From: herongguang <herongguang.he@huawei.com>
->> Date: Mon, 27 Mar 2017 15:08:59 +0800
->> Subject: [PATCH] KVM: pci-assign: do not map smm memory slot pages
->>   in vt-d page table
->>
->> or VM memory are not put thus leaked in kvm_iommu_unmap_memslots() when
->> destroy VM.
->>
->> This is consistent with current vfio implementation.
->
-> Oops, you forgot a Signed-off-by.
->
-> Paolo
->
->> ---
->>   virt/kvm/kvm_main.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->> index 482612b..9018d06 100644
->> --- a/virt/kvm/kvm_main.c
->> +++ b/virt/kvm/kvm_main.c
->> @@ -1052,7 +1052,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
->>        * changes) is disallowed above, so any other attribute changes
->> getting
->>        * here can be skipped.
->>        */
->> -    if ((change == KVM_MR_CREATE) || (change == KVM_MR_MOVE)) {
->> +    if ((as_id == 0) && ((change == KVM_MR_CREATE) || (change ==
->> KVM_MR_MOVE))) {
->>           r = kvm_iommu_map_pages(kvm, &new);
->>           return r;
->>       }
->
-> .
->
+> -----Original Message-----
+> From: Christoph Hellwig [mailto:hch@lst.de]
+> Sent: Monday, March 27, 2017 10:56 PM
+> To: Liu, Changpeng <changpeng.liu@intel.com>
+> Cc: virtio-dev@lists.oasis-open.org; virtualization@lists.linux-foundatio=
+n.org; linux-
+> kernel@vger.kernel.org; hch@lst.de; qemu-devel@nongnu.org
+> Subject: Re: [PATCH] virtio-blk: add DISCARD support to virtio-blk driver
+>=20
+> On Tue, Mar 28, 2017 at 04:39:25PM +0800, Changpeng Liu wrote:
+> > Currently virtio-blk driver does not provide discard feature flag, so t=
+he
+> > filesystems which built on top of the block device will not send discar=
+d
+> > command. This is okay for HDD backend, but it will impact the performan=
+ce
+> > for SSD backend.
+> >
+> > Add a feature flag VIRTIO_BLK_F_DISCARD and command
+> VIRTIO_BLK_T_DISCARD
+> > to extend exist virtio-blk protocol. virtio-blk protocol uses a single
+> > 8 bytes descriptor containing type,reserved and sector, currently Linux
+> > uses the reserved field as IO priority, here we also re-use the reserve=
+d
+> > field as number of discard sectors.
+>=20
+> Do you have a link to the specification for this feature?  At least
+> virtio-v1.0 does not seem to specify a discard feature.
+Not yet, patch goes first, there are uses who don't want to migrate from vi=
+rtio-blk to virtio-scsi,
+so this feature seems reasonable, the question is that how we should define=
+ the specification to
+support this feature.
+>=20
+> Note that Linux 4.11 and later have support for multi-range discard
+> ala ATA TRIM, SCSI UNMAP and NVMe deallocate which might be useful
+> here, too.
+For support multi-range discard features, the DISCARD command must have dat=
+a_in buffer, similar with
+SCSI UNMAP and NVMe DEALLOCATE commands, maybe 16 bytes aligned descriptors=
+ are required for each
+DISCARD command.
+>=20
+> > +		q->limits.discard_zeroes_data =3D 0;
+>=20
+> No need to clear this.  Also hopefully this field goes away for 4.12
+>=20
+> > +		blk_queue_max_discard_segments(q, 1);
+>=20
+> No need to set this.
