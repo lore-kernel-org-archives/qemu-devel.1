@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1csr1U-0004f4-UO
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:18:57 -0400
+	(envelope-from <no-reply@patchew.org>) id 1csr1e-0004jq-5D
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:19:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1csr1Q-0004bG-Oh
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:18:56 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48958)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1csr1Q-0004aZ-Hy
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:18:52 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Mar 2017 14:18:49 +0100
-Message-Id: <1490707129-12622-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH for-2.9] configure: Don't claim 'unsupported
- host OS' when better message available
+	(envelope-from <no-reply@patchew.org>) id 1csr1b-0004eQ-0V
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:19:06 -0400
+Resent-Message-Id: <E1csr1b-0004eQ-0V@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21496)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1csr1a-0004eF-Qg
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:19:02 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <149070710997.135.5898281058928332635@6c512846dbc7>
+In-Reply-To: <20170320001249.25521-1-haozhong.zhang@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 28 Mar 2017 06:18:31 -0700 (PDT)
+Subject: Re: [Qemu-devel] [RFC QEMU PATCH v2 00/10] Implement vNVDIMM for
+ Xen HVM guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,74 +29,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Stefan Weil <sw@weilnetz.de>
+To: haozhong.zhang@intel.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, xen-devel@lists.xen.org, sstabellini@kernel.org, guangrong.xiao@linux.intel.com, ehabkost@redhat.com, mst@redhat.com, dgilbert@redhat.com, armbru@redhat.com, pbonzini@redhat.com, imammedo@redhat.com, anthony.perard@citrix.com, konrad@darnok.org, dan.j.williams@intel.com, rth@twiddle.net
 
-The change in commit 898be3e0415c6d which made completely
-unrecognized OSes cause an error_exit "Unsupported host OS"
-has some unfortunate unintended effects:
- * if you run 'configure --help' on an unsupported host OS
-   (eg if intending to use it as a build machine for a
-   cross compile to a supported host) then the message
-   is printed instead of --help
- * if the C compiler doesn't work or is missing (eg if
-   you passed an incorrect --cross-prefix by mistake)
-   the message is printed instead of the more useful
-   'compiler does not exist or does not work' message
-
-Fix this by postponing the error_exit in this situation
-until later, when we have already identified the more
-useful cases for this.
-
-The long term fix for this would be to move handling
-of --help much further up in the configure script,
-and make its output not dependent on checks that configure
-runs. However for 2.9 this would be too invasive.
-
-Reported-by: Stefan Weil <sw@weilnetz.de>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- configure | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
-
-diff --git a/configure b/configure
-index 82966f7..8820036 100755
---- a/configure
-+++ b/configure
-@@ -323,6 +323,7 @@ replication="yes"
- 
- supported_cpu="no"
- supported_os="no"
-+bogus_os="no"
- 
- # parse CC options first
- for opt do
-@@ -695,7 +696,10 @@ Linux)
-   supported_os="yes"
- ;;
- *)
--  error_exit "Unsupported host OS $targetos"
-+  # This is a fatal error, but don't report it yet, because we
-+  # might be going to just print the --help text, or it might
-+  # be the result of a missing compiler.
-+  bogus_os="yes"
- ;;
- esac
- 
-@@ -1461,6 +1465,14 @@ if ! compile_prog ; then
-     error_exit "\"$cc\" cannot build an executable (is your linker broken?)"
- fi
- 
-+if test "$bogus_os" = "yes"; then
-+    # Now that we know that we're not printing the help and that
-+    # the compiler works (so the results of the check_defines we used
-+    # to identify the OS are reliable), if we didn't recognize the
-+    # host OS we should stop now.
-+    error_exit "Unsupported host OS $targetos"
-+fi
-+
- # Check that the C++ compiler exists and works with the C compiler
- if has $cxx; then
-     cat > $TMPC <<EOF
--- 
-2.7.4
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtSRkMgUUVNVSBQQVRDSCB2MiAwMC8xMF0gSW1wbGVtZW50IHZOVkRJTU0gZm9yIFhl
+biBIVk0gZ3Vlc3QKTWVzc2FnZS1pZDogMjAxNzAzMjAwMDEyNDkuMjU1MjEtMS1oYW96aG9uZy56
+aGFuZ0BpbnRlbC5jb20KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
+L2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0Uu
+LiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRy
+dWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZv
+ciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAk
+KGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0t
+Zm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVu
+CiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25l
+CgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5
+YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNo
+ICd0ZXN0Jwo0ZjQyMjBjIHFhcGk6IGV4dGVuZCAncXVlcnktbWVtb3J5LWRldmljZXMnIHRvIGxp
+c3QgZGV2aWNlcyBvZiBzcGVjaWZpZWQgdHlwZQpiOTQ2NTJhIHhlbi1odm06IGNyZWF0ZSBob3Rw
+bHVnIG1lbW9yeSByZWdpb24gb24gWGVuCmE5OTFhYjUgaG9zdG1lbTogYWRkIGEgaG9zdCBtZW1v
+cnkgYmFja2VuZCBmb3IgWGVuCmZmZGUzM2MgeGVuLWh2bTogaW5pdGlhdGUgYnVpbGRpbmcgRE0g
+QUNQSSBvbiBpMzg2IG1hY2hpbmUKY2MxNzI3YiBudmRpbW0gYWNwaTogYnVpbGQgYW5kIGNvcHkg
+TlZESU1NIG5hbWVzcGFjZSBkZXZpY2VzIHRvIGd1ZXN0IG9uIFhlbgo5MDdlMWU2IG52ZGltbSBh
+Y3BpOiBjb3B5IE5GSVQgdG8gWGVuIGd1ZXN0CjY2NDNiYTUgbnZkaW1tIGFjcGk6IGRvIG5vdCB1
+c2UgZndfY2ZnIG9uIFhlbgpkMWQ3MzE0IHhlbi1odm06IHN1cHBvcnQgY29weWluZyBBQ1BJIHRv
+IGd1ZXN0IG1lbW9yeQpiOTNmNWFhIHhlbi1odm06IGluaXRpYWxpemUgRE0gQUNQSQowZTlhNDFk
+IG52ZGltbSB4ZW46IGRpc2FibGUgbGFiZWwgc3VwcG9ydCBvbiBYZW4KCj09PSBPVVRQVVQgQkVH
+SU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTA6IG52ZGltbSB4ZW46IGRpc2FibGUgbGFiZWwgc3Vw
+cG9ydCBvbiBYZW4uLi4KRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJt
+cyBvZiB0aGlzIHN0YXRlbWVudAojMjY6IEZJTEU6IGh3L21lbS9udmRpbW0uYzo5MzoKKyAgICBp
+ZiAobnZkaW1tLT5sYWJlbF9zaXplKQpbLi4uXQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdz
+LCAxMiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
+IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
+cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
+CgpDaGVja2luZyBQQVRDSCAyLzEwOiB4ZW4taHZtOiBpbml0aWFsaXplIERNIEFDUEkuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMy8xMDogeGVuLWh2bTogc3VwcG9ydCBjb3B5aW5nIEFDUEkgdG8gZ3Vlc3Qg
+bWVtb3J5Li4uCkNoZWNraW5nIFBBVENIIDQvMTA6IG52ZGltbSBhY3BpOiBkbyBub3QgdXNlIGZ3
+X2NmZyBvbiBYZW4uLi4KRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJt
+cyBvZiB0aGlzIHN0YXRlbWVudAojNDM6IEZJTEU6IGh3L2FjcGkvbnZkaW1tLmM6ODkyOgorICAg
+IGlmIChmd19jZmcpClsuLi5dCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDI2IGxpbmVz
+IGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
+SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
+IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5n
+IFBBVENIIDUvMTA6IG52ZGltbSBhY3BpOiBjb3B5IE5GSVQgdG8gWGVuIGd1ZXN0Li4uCkNoZWNr
+aW5nIFBBVENIIDYvMTA6IG52ZGltbSBhY3BpOiBidWlsZCBhbmQgY29weSBOVkRJTU0gbmFtZXNw
+YWNlIGRldmljZXMgdG8gZ3Vlc3Qgb24gWGVuLi4uCkNoZWNraW5nIFBBVENIIDcvMTA6IHhlbi1o
+dm06IGluaXRpYXRlIGJ1aWxkaW5nIERNIEFDUEkgb24gaTM4NiBtYWNoaW5lLi4uCkNoZWNraW5n
+IFBBVENIIDgvMTA6IGhvc3RtZW06IGFkZCBhIGhvc3QgbWVtb3J5IGJhY2tlbmQgZm9yIFhlbi4u
+LgpDaGVja2luZyBQQVRDSCA5LzEwOiB4ZW4taHZtOiBjcmVhdGUgaG90cGx1ZyBtZW1vcnkgcmVn
+aW9uIG9uIFhlbi4uLgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1z
+IG9mIHRoaXMgc3RhdGVtZW50CiMyOTogRklMRTogaHcvaTM4Ni9wYy5jOjEzNjU6CisgICAgaWYg
+KCFwY21jLT5oYXNfcmVzZXJ2ZWRfbWVtb3J5IHx8IG1hY2hpbmUtPnJhbV9zaXplID49IG1hY2hp
+bmUtPm1heHJhbV9zaXplKQpbLi4uXQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMDkg
+bGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
+ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
+ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hl
+Y2tpbmcgUEFUQ0ggMTAvMTA6IHFhcGk6IGV4dGVuZCAncXVlcnktbWVtb3J5LWRldmljZXMnIHRv
+IGxpc3QgZGV2aWNlcyBvZiBzcGVjaWZpZWQgdHlwZS4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRl
+c3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
+bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5
+b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
