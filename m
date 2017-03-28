@@ -1,27 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59321)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1csld8-0003Ri-Po
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:33:28 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1csle3-0004BK-Pi
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:34:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1csld5-0007If-LZ
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:33:26 -0400
-Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:38424)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1csld5-0007H8-C8
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:33:23 -0400
-Received: from player718.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 29AEA78818
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 09:33:20 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Tue, 28 Mar 2017 09:32:32 +0200
-Message-Id: <1490686352-24017-9-git-send-email-clg@kaod.org>
-In-Reply-To: <1490686352-24017-1-git-send-email-clg@kaod.org>
-References: <1490686352-24017-1-git-send-email-clg@kaod.org>
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1csle0-0007Q1-LM
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:34:23 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49362)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1csle0-0007Px-Bv
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:34:20 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2S7Vosf145785
+	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 03:34:18 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 29fkh1g5xe-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 03:34:18 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Tue, 28 Mar 2017 08:34:15 +0100
+Date: Tue, 28 Mar 2017 09:34:11 +0200
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <20170327211728-mutt-send-email-mst@kernel.org>
+References: <149063674781.4447.14258971700726134711.stgit@bahia.lan>
+	<149063676337.4447.2095575576822297032.stgit@bahia.lan>
+	<20170327211728-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 8/8] ppc/pnv: add memory regions for the ICP
- registers
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170328093411.7535b59f.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/5] virtio: Error object based
+ virtio_error()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,194 +43,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>, Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org
 
-This provides to a PowerNV chip (POWER8) access to the Interrupt
-Management area, which contains the registers of the Interrupt Control
-Presenters of each thread. These are used to accept, return, forward
-interrupts in the system.
+On Mon, 27 Mar 2017 21:20:56 +0300
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-This area is modeled with a per-chip container memory region holding
-all the ICP registers. Each thread of a chip is then associated with
-its ICP registers using a memory subregion indexed by its PIR number
-in the overall region.
+> On Mon, Mar 27, 2017 at 07:46:03PM +0200, Greg Kurz wrote:
+> > This introduces an Error object based implementation of virtio_error(). It
+> > allows to implement virtio_error() wrappers in device-specific code.
+> > 
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  hw/virtio/virtio.c         |   21 ++++++++++++++++-----
+> >  include/hw/virtio/virtio.h |    1 +
+> >  2 files changed, 17 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> > index 03592c542a55..4036f4816038 100644
+> > --- a/hw/virtio/virtio.c
+> > +++ b/hw/virtio/virtio.c
+> > @@ -2443,6 +2443,16 @@ void virtio_device_set_child_bus_name(VirtIODevice *vdev, char *bus_name)
+> >      vdev->bus_name = g_strdup(bus_name);
+> >  }
+> >  
+> > +static void virtio_device_set_broken(VirtIODevice *vdev)
+> > +{
+> > +    vdev->broken = true;
+> > +
+> > +    if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
+> > +        virtio_set_status(vdev, vdev->status | VIRTIO_CONFIG_S_NEEDS_RESET);
+> > +        virtio_notify_config(vdev);
+> > +    }
+> > +}
+> > +
+> >  void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
+> >  {
+> >      va_list ap;
+> 
+> It's worth pondering whether we can set this for versions < 1.0 too.
 
-The device tree is populated accordingly.
+I'm a bit torn there. In theory, setting an unknown status bit should
+not really do harm; but we can't be sure that there aren't legacy
+drivers out there that will crash when they notice an unknown status
+bit, and I'm not sure we want that.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
----
+> 
+> 
+> > @@ -2451,12 +2461,13 @@ void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
+> >      error_vreport(fmt, ap);
+> >      va_end(ap);
+> >  
+> > -    vdev->broken = true;
+> > +    virtio_device_set_broken(vdev);
+> > +}
+> >  
+> > -    if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
+> > -        virtio_set_status(vdev, vdev->status | VIRTIO_CONFIG_S_NEEDS_RESET);
+> > -        virtio_notify_config(vdev);
+> > -    }
+> > +void virtio_error_err(VirtIODevice *vdev, Error *err)
+> > +{
+> > +    error_report_err(err);
+> > +    virtio_device_set_broken(vdev);
+> >  }
+> >  
+> >  static void virtio_memory_listener_commit(MemoryListener *listener)
+> 
+> Should this skip error report if device is already broken?
+> Otherwise we'll get a ton of errors in the log.
 
- Changes since v1:
+One would hope that qemu stops processing broken devices, but a check
+might be better.
 
- - added multichip support
- - adapted to use PnvICPState object
+> 
+> Also, whether to stop the device, or the VM, or just warn,
+> seems like a policy decision. Why not set it on command line
+> like we do for other storage?
 
- hw/ppc/pnv.c         | 81 ++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
- include/hw/ppc/pnv.h | 19 ++++++++++++
- 2 files changed, 100 insertions(+)
+I would trust the device implementation to make the decision: Can we
+recover, can we start using the device again after a reset, or are we
+so broken that we want to terminate the vm?
 
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index ae894834892f..534cf625e29c 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -218,6 +218,43 @@ static void powernv_create_core_node(PnvChip *chip, =
-PnvCore *pc, void *fdt)
-                        servers_prop, sizeof(servers_prop))));
- }
-=20
-+static void powernv_populate_icp(PnvChip *chip, void *fdt, uint32_t pir,
-+                                 uint32_t nr_threads)
-+{
-+    uint64_t addr =3D PNV_ICP_BASE(chip) | (pir << 12);
-+    char *name;
-+    const char compat[] =3D "IBM,power8-icp\0IBM,ppc-xicp";
-+    uint32_t irange[2], i, rsize;
-+    uint64_t *reg;
-+    int offset;
-+
-+    irange[0] =3D cpu_to_be32(pir);
-+    irange[1] =3D cpu_to_be32(nr_threads);
-+
-+    rsize =3D sizeof(uint64_t) * 2 * nr_threads;
-+    reg =3D g_malloc(rsize);
-+    for (i =3D 0; i < nr_threads; i++) {
-+        reg[i * 2] =3D cpu_to_be64(addr | ((pir + i) * 0x1000));
-+        reg[i * 2 + 1] =3D cpu_to_be64(0x1000);
-+    }
-+
-+    name =3D g_strdup_printf("interrupt-controller@%"PRIX64, addr);
-+    offset =3D fdt_add_subnode(fdt, 0, name);
-+    _FDT(offset);
-+    g_free(name);
-+
-+    _FDT((fdt_setprop(fdt, offset, "compatible", compat, sizeof(compat))=
-));
-+    _FDT((fdt_setprop(fdt, offset, "reg", reg, rsize)));
-+    _FDT((fdt_setprop_string(fdt, offset, "device_type",
-+                              "PowerPC-External-Interrupt-Presentation")=
-));
-+    _FDT((fdt_setprop(fdt, offset, "interrupt-controller", NULL, 0)));
-+    _FDT((fdt_setprop(fdt, offset, "ibm,interrupt-server-ranges",
-+                       irange, sizeof(irange))));
-+    _FDT((fdt_setprop_cell(fdt, offset, "#interrupt-cells", 1)));
-+    _FDT((fdt_setprop_cell(fdt, offset, "#address-cells", 0)));
-+    g_free(reg);
-+}
-+
- static void powernv_populate_chip(PnvChip *chip, void *fdt)
- {
-     PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-@@ -231,6 +268,10 @@ static void powernv_populate_chip(PnvChip *chip, voi=
-d *fdt)
-         PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
-=20
-         powernv_create_core_node(chip, pnv_core, fdt);
-+
-+        /* Interrupt Control Presenters (ICP). One per core. */
-+        powernv_populate_icp(chip, fdt, pnv_core->pir,
-+                             CPU_CORE(pnv_core)->nr_threads);
-     }
-=20
-     if (chip->ram_size) {
-@@ -660,6 +701,38 @@ static void pnv_chip_init(Object *obj)
-     object_property_add_child(obj, "lpc", OBJECT(&chip->lpc), NULL);
- }
-=20
-+static void pnv_chip_icp_realize(PnvChip *chip, Error **errp)
-+{
-+    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-+    char *typename =3D pnv_core_typename(pcc->cpu_model);
-+    size_t typesize =3D object_type_get_instance_size(typename);
-+    int i, j;
-+    char *name;
-+    XICSFabric *xi =3D XICS_FABRIC(qdev_get_machine());
-+
-+    name =3D g_strdup_printf("icp-%x", chip->chip_id);
-+    memory_region_init(&chip->icp_mmio, OBJECT(chip), name, PNV_ICP_SIZE=
-);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(chip), &chip->icp_mmio);
-+    g_free(name);
-+
-+    sysbus_mmio_map(SYS_BUS_DEVICE(chip), 1, PNV_ICP_BASE(chip));
-+
-+    /* Map the ICP registers for each thread */
-+    for (i =3D 0; i < chip->nr_cores; i++) {
-+        PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
-+        int core_hwid =3D CPU_CORE(pnv_core)->core_id;
-+
-+        for (j =3D 0; j < CPU_CORE(pnv_core)->nr_threads; j++) {
-+            uint32_t pir =3D pcc->core_pir(chip, core_hwid) + j;
-+            PnvICPState *icp =3D PNV_ICP(xics_icp_get(xi, pir));
-+
-+            memory_region_add_subregion(&chip->icp_mmio, pir << 12, &icp=
-->mmio);
-+        }
-+    }
-+
-+    g_free(typename);
-+}
-+
- static void pnv_chip_realize(DeviceState *dev, Error **errp)
- {
-     PnvChip *chip =3D PNV_CHIP(dev);
-@@ -730,6 +803,14 @@ static void pnv_chip_realize(DeviceState *dev, Error=
- **errp)
-     object_property_set_bool(OBJECT(&chip->lpc), true, "realized",
-                              &error_fatal);
-     pnv_xscom_add_subregion(chip, PNV_XSCOM_LPC_BASE, &chip->lpc.xscom_r=
-egs);
-+
-+    /* Interrupt Management Area. This is the memory region holding
-+     * all the Interrupt Control Presenter (ICP) registers */
-+    pnv_chip_icp_realize(chip, &error);
-+    if (error) {
-+        error_propagate(errp, error);
-+        return;
-+    }
- }
-=20
- static Property pnv_chip_properties[] =3D {
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index 4e28d5d8f03a..f5801034b920 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -55,6 +55,7 @@ typedef struct PnvChip {
-     MemoryRegion xscom_mmio;
-     MemoryRegion xscom;
-     AddressSpace xscom_as;
-+    MemoryRegion icp_mmio;
-=20
-     PnvLpcController lpc;
- } PnvChip;
-@@ -139,4 +140,22 @@ typedef struct PnvMachineState {
- #define PNV_XSCOM_BASE(chip)                                            =
-\
-     (chip->xscom_base + ((uint64_t)(chip)->chip_id) * PNV_XSCOM_SIZE)
-=20
-+/*
-+ * XSCOM 0x20109CA defines the ICP BAR:
-+ *
-+ * 0:29   : bits 14 to 43 of address to define 1 MB region.
-+ * 30     : 1 to enable ICP to receive loads/stores against its BAR regi=
-on
-+ * 31:63  : Constant 0
-+ *
-+ * Usually defined as :
-+ *
-+ *      0xffffe00200000000 -> 0x0003ffff80000000
-+ *      0xffffe00600000000 -> 0x0003ffff80100000
-+ *      0xffffe02200000000 -> 0x0003ffff80800000
-+ *      0xffffe02600000000 -> 0x0003ffff80900000
-+ */
-+#define PNV_ICP_SIZE         0x0000000000100000ull
-+#define PNV_ICP_BASE(chip)                                              =
-\
-+    (0x0003ffff80000000ull + (uint64_t) PNV_CHIP_INDEX(chip) * PNV_ICP_S=
-IZE)
-+
- #endif /* _PPC_PNV_H */
---=20
-2.7.4
+Note that all of this already applies to the existing virtio_error(); I
+think we should discuss this independently of this patch.
