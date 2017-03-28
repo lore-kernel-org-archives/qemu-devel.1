@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1cst43-0000Hn-1r
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 11:29:44 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1cstHT-00055a-6F
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 11:43:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1cst42-0007O7-BN
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 11:29:43 -0400
-Date: Tue, 28 Mar 2017 17:29:34 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20170328152934.rebdzsjfsfc6ajrh@eukaryote>
-References: <20170324123458.yk3rj3g47e5xr33i@eukaryote>
-	<6fb77120-dcab-042f-bb51-20ccbaa38354@redhat.com>
+	(envelope-from <eric.auger@redhat.com>) id 1cstHS-0005HG-AE
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 11:43:35 -0400
+References: <1490709513-7180-1-git-send-email-eric.auger@redhat.com>
+	<CALicx6t8ZsN96rqOb8ydh56FnO9mPog3QxhN_Sa3Apa85_9nUQ@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <7efb775a-9ca6-ae78-a4a9-4d6279c92cda@redhat.com>
+Date: Tue, 28 Mar 2017 17:43:24 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6fb77120-dcab-042f-bb51-20ccbaa38354@redhat.com>
-Subject: Re: [Qemu-devel] Making QMP 'block-job-cancel' transactionable
+In-Reply-To: <CALicx6t8ZsN96rqOb8ydh56FnO9mPog3QxhN_Sa3Apa85_9nUQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/intc/arm_gicv3_kvm: Check
+ KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS in reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,36 +24,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Vijay Kilari <vijay.kilari@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, drjones@redhat.com, QEMU Developers <qemu-devel@nongnu.org>, "Kumar, Vijaya" <Vijaya.Kumar@cavium.com>, qemu-arm <qemu-arm@nongnu.org>, eric.auger.pro@gmail.com
 
-On Tue, Mar 28, 2017 at 09:49:40AM -0500, Eric Blake wrote:
-> On 03/24/2017 07:34 AM, Kashyap Chamarthy wrote:
-> > While debugging some other issue, I happened to stumble across an old
-> > libvirt commit[*] that adds support for pivot (whether QEMU should
-> > switch to a target copy or not) operation as a result of issuing QMP
-> > 'block-job-cancel' to a 'drive-mirror' (in libvirt parlance, "block
-> > copy").
-> > 
-> > In the libvirt commit message[*] Eric Blake writes:
-> > 
-> >     "[...] There may be potential improvements to the snapshot code to
-> >     exploit block copy over multiple disks all at one point in time.
-> >     And, if 'block-job-cancel' were made part of 'transaction', you
-> >     could copy multiple disks at the same point in time without pausing
-> >     the domain. [...]"
-> > 
-> > I realize that 'block-job-cancel' is currently not part of the
-> > @TransactionAction.  Is it worthwhile to do so?
+Hi Vijay,
+
+On 28/03/2017 17:08, Vijay Kilari wrote:
+> Hi Eric,
 > 
-> Yes, it is still worthwhile to make that improvement, although it is
-> now 2.10 material.
+> On Tue, Mar 28, 2017 at 7:28 PM, Eric Auger <eric.auger@redhat.com> wrote:
+>> KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS needs to be checked before
+>> attempting to read ICC_CTLR_EL1; otherwise kernel versions not
+>> exposing this kvm device group will be incompatible with qemu 2.9.
+>>
+>> Fixes: 07a5628  ("hw/intc/arm_gicv3_kvm: Reset GICv3 cpu interface registers")
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Reported-by: Prakash B <bjsprakash.linux@gmail.com>
+>>
+>> ---
+>>
+>> I understand the ICC_CTLR_EL1 state only is used in the put() function
+>> which is used for migration
+>> ---
+>>  hw/intc/arm_gicv3_kvm.c | 17 +++++++++++------
+>>  1 file changed, 11 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+>> index 81f0403..4c3a88e 100644
+>> --- a/hw/intc/arm_gicv3_kvm.c
+>> +++ b/hw/intc/arm_gicv3_kvm.c
+>> @@ -614,12 +614,6 @@ static void arm_gicv3_icc_reset(CPUARMState *env, const ARMCPRegInfo *ri)
+>>      s = c->gic;
+>>      cpu = ARM_CPU(c->cpu);
+>>
+>> -    /* Initialize to actual HW supported configuration */
+>> -    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
+>> -                      KVM_VGIC_ATTR(ICC_CTLR_EL1, cpu->mp_affinity),
+>> -                      &c->icc_ctlr_el1[GICV3_NS], false);
+>> -
+>> -    c->icc_ctlr_el1[GICV3_S] = c->icc_ctlr_el1[GICV3_NS];
+>>      c->icc_pmr_el1 = 0;
+>>      c->icc_bpr[GICV3_G0] = GIC_MIN_BPR;
+>>      c->icc_bpr[GICV3_G1] = GIC_MIN_BPR;
+>> @@ -628,6 +622,17 @@ static void arm_gicv3_icc_reset(CPUARMState *env, const ARMCPRegInfo *ri)
+>>      c->icc_sre_el1 = 0x7;
+>>      memset(c->icc_apr, 0, sizeof(c->icc_apr));
+>>      memset(c->icc_igrpen, 0, sizeof(c->icc_igrpen));
+>> +
+>> +    if (!kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
+>> +                              KVM_VGIC_ATTR(ICC_CTLR_EL1, cpu->mp_affinity))) {
+>> +        return;
+>> +    }
+> 
+>  Can't we use gicv3 migration blocker provided if it is set before this reset.
+yes we could. I hesitated but eventually found the relationship between
+the blocker and this kvm device group access was maybe not obvious.
 
-Thanks for looking, didn't imply that it's for 2.9 (which is in Release
-Candidate phase) -- I realize most people are busy with it.  Further
-discussion could be had when 2.10 tree opens up.
+As preferred.
 
-[...]
+Thanks
 
--- 
-/kashyap
+Eric
+> 
+>> +    /* Initialize to actual HW supported configuration */
+>> +    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
+>> +                      KVM_VGIC_ATTR(ICC_CTLR_EL1, cpu->mp_affinity),
+>> +                      &c->icc_ctlr_el1[GICV3_NS], false);
+>> +
+>> +    c->icc_ctlr_el1[GICV3_S] = c->icc_ctlr_el1[GICV3_NS];
+>>  }
+>>
+>>  static void kvm_arm_gicv3_reset(DeviceState *dev)
+>> --
+>> 2.5.5
+>>
+> 
