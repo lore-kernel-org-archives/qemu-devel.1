@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57660)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1csgIt-0003be-B9
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 21:52:12 -0400
+	(envelope-from <jcody@redhat.com>) id 1csgcY-0005fp-7V
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 22:12:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1csgIp-0003zM-J6
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 21:52:11 -0400
-Received: from mga06.intel.com ([134.134.136.31]:6778)
+	(envelope-from <jcody@redhat.com>) id 1csgcV-00031B-0z
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 22:12:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59960)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
-	id 1csgIp-0003yr-B6
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 21:52:07 -0400
-From: "Liu, Changpeng" <changpeng.liu@intel.com>
-Date: Tue, 28 Mar 2017 01:52:02 +0000
-Message-ID: <FF7FC980937D6342B9D289F5F3C7C2625B56706B@SHSMSX103.ccr.corp.intel.com>
-References: <1490690365-21109-1-git-send-email-changpeng.liu@intel.com>
-	<00d28fcc-446b-eff6-a5a3-6675216802b9@redhat.com>
-In-Reply-To: <00d28fcc-446b-eff6-a5a3-6675216802b9@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1csgcU-00030v-O4
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 22:12:26 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A1442C054912
+	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 02:12:25 +0000 (UTC)
+Date: Mon, 27 Mar 2017 22:12:24 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170328021224.GK15423@localhost.localdomain>
+References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
+	<1490621195-2228-4-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [virtio-dev] [PATCH] virtio-blk: add DISCARD
- support to virtio-blk driver
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1490621195-2228-4-git-send-email-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v3 for-2.9 03/11] rbd: Don't limit
+ length of parameter values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +34,259 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "hch@lst.de" <hch@lst.de>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, jdurgin@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogdmlydGlvLWRldkBsaXN0
-cy5vYXNpcy1vcGVuLm9yZyBbbWFpbHRvOnZpcnRpby1kZXZAbGlzdHMub2FzaXMtb3Blbi5vcmdd
-IE9uDQo+IEJlaGFsZiBPZiBQYW9sbyBCb256aW5pDQo+IFNlbnQ6IE1vbmRheSwgTWFyY2ggMjcs
-IDIwMTcgNzozNCBQTQ0KPiBUbzogTGl1LCBDaGFuZ3BlbmcgPGNoYW5ncGVuZy5saXVAaW50ZWwu
-Y29tPjsgdmlydGlvLWRldkBsaXN0cy5vYXNpcy1vcGVuLm9yZzsNCj4gdmlydHVhbGl6YXRpb25A
-bGlzdHMubGludXgtZm91bmRhdGlvbi5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7
-IGhjaEBsc3QuZGUNCj4gQ2M6IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiBTdWJqZWN0OiBSZTog
-W3ZpcnRpby1kZXZdIFtQQVRDSF0gdmlydGlvLWJsazogYWRkIERJU0NBUkQgc3VwcG9ydCB0byB2
-aXJ0aW8tYmxrIGRyaXZlcg0KPiANCj4gDQo+IA0KPiBPbiAyOC8wMy8yMDE3IDEwOjM5LCBDaGFu
-Z3BlbmcgTGl1IHdyb3RlOg0KPiA+ICsJaWYgKHZpcnRpb19oYXNfZmVhdHVyZSh2ZGV2LCBWSVJU
-SU9fQkxLX0ZfRElTQ0FSRCkpIHsNCj4gPiArCQlxLT5saW1pdHMuZGlzY2FyZF96ZXJvZXNfZGF0
-YSA9IDA7DQo+IA0KPiBNYXliZSB5b3UgY291bGQgdXNlIGFub3RoZXIgZmVhdHVyZSBiaXQgdG8g
-cG9wdWxhdGUgZGlzY2FyZF96ZXJvZXNfZGF0YS4NCj4gDQo+IFBhb2xvDQo+IA0KU291bmRzIGdv
-b2QgdG8gbWUsIENocmlzdG9waCBIZWxsd2lnIG1lbnRpb25lZCB0aGlzIGZpZWxkIHdpbGwgYmUg
-cmVtb3ZlZCBpbiBuZXh0IHJlbGVhc2UsIGp1c3QgcmVtb3ZlZCB0aGlzIGxpbmUgbWFrZXMgY2xl
-YXIuDQo+ID4gKwkJcS0+bGltaXRzLmRpc2NhcmRfYWxpZ25tZW50ID0gYmxrX3NpemU7DQo+ID4g
-KwkJcS0+bGltaXRzLmRpc2NhcmRfZ3JhbnVsYXJpdHkgPSBibGtfc2l6ZTsNCj4gPiArCQlibGtf
-cXVldWVfbWF4X2Rpc2NhcmRfc2VjdG9ycyhxLCBVSU5UX01BWCk7DQo+ID4gKwkJYmxrX3F1ZXVl
-X21heF9kaXNjYXJkX3NlZ21lbnRzKHEsIDEpOw0KPiA+ICsJCXF1ZXVlX2ZsYWdfc2V0X3VubG9j
-a2VkKFFVRVVFX0ZMQUdfRElTQ0FSRCwgcSk7DQo+ID4gKwl9DQo+ID4gKw0KPiANCj4gLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tDQo+IFRvIHVuc3Vic2NyaWJlLCBlLW1haWw6IHZpcnRpby1kZXYtdW5zdWJzY3JpYmVA
-bGlzdHMub2FzaXMtb3Blbi5vcmcNCj4gRm9yIGFkZGl0aW9uYWwgY29tbWFuZHMsIGUtbWFpbDog
-dmlydGlvLWRldi1oZWxwQGxpc3RzLm9hc2lzLW9wZW4ub3JnDQoNCg==
+On Mon, Mar 27, 2017 at 03:26:27PM +0200, Markus Armbruster wrote:
+> We laboriously enforce parameter values are between one and some
+
+s/are/that are/
+
+or maybe just s/are//
+
+> arbitrary limit in length.  Only RBD_MAX_IMAGE_NAME_SIZE comes from
+> librbd.h, and I'm not sure it applies.  Where the other limits come
+> from is unclear.
+> 
+> Drop the length checking.  The limits librbd actually imposes must be
+> checked by librbd anyway.
+> 
+> There's one minor complication: BDRVRBDState member name is a
+> fixed-size array.  Depends on the length limit.  Make it a pointer to
+> a dynamically allocated string.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Reviewed-by: Jeff Cody <jcody@redhat.com>
+
+
+> ---
+>  block/rbd.c | 91 ++++++++++---------------------------------------------------
+>  1 file changed, 14 insertions(+), 77 deletions(-)
+> 
+> diff --git a/block/rbd.c b/block/rbd.c
+> index 5ba2a87..0fea348 100644
+> --- a/block/rbd.c
+> +++ b/block/rbd.c
+> @@ -56,11 +56,6 @@
+>  
+>  #define OBJ_MAX_SIZE (1UL << OBJ_DEFAULT_OBJ_ORDER)
+>  
+> -#define RBD_MAX_CONF_NAME_SIZE 128
+> -#define RBD_MAX_CONF_VAL_SIZE 512
+> -#define RBD_MAX_CONF_SIZE 1024
+> -#define RBD_MAX_POOL_NAME_SIZE 128
+> -#define RBD_MAX_SNAP_NAME_SIZE 128
+>  #define RBD_MAX_SNAPS 100
+>  
+>  /* The LIBRBD_SUPPORTS_IOVEC is defined in librbd.h */
+> @@ -99,16 +94,12 @@ typedef struct BDRVRBDState {
+>      rados_t cluster;
+>      rados_ioctx_t io_ctx;
+>      rbd_image_t image;
+> -    char name[RBD_MAX_IMAGE_NAME_SIZE];
+> +    char *name;
+>      char *snap;
+>  } BDRVRBDState;
+>  
+> -static char *qemu_rbd_next_tok(int max_len,
+> -                               char *src, char delim,
+> -                               const char *name,
+> -                               char **p, Error **errp)
+> +static char *qemu_rbd_next_tok(char *src, char delim, char **p)
+>  {
+> -    int l;
+>      char *end;
+>  
+>      *p = NULL;
+> @@ -127,15 +118,6 @@ static char *qemu_rbd_next_tok(int max_len,
+>              *end = '\0';
+>          }
+>      }
+> -    l = strlen(src);
+> -    if (l >= max_len) {
+> -        error_setg(errp, "%s too long", name);
+> -        return NULL;
+> -    } else if (l == 0) {
+> -        error_setg(errp, "%s too short", name);
+> -        return NULL;
+> -    }
+> -
+>      return src;
+>  }
+>  
+> @@ -159,7 +141,6 @@ static void qemu_rbd_parse_filename(const char *filename, QDict *options,
+>      char *p, *buf, *keypairs;
+>      char *found_str;
+>      size_t max_keypair_size;
+> -    Error *local_err = NULL;
+>  
+>      if (!strstart(filename, "rbd:", &start)) {
+>          error_setg(errp, "File name must start with 'rbd:'");
+> @@ -171,11 +152,7 @@ static void qemu_rbd_parse_filename(const char *filename, QDict *options,
+>      keypairs = g_malloc0(max_keypair_size);
+>      p = buf;
+>  
+> -    found_str = qemu_rbd_next_tok(RBD_MAX_POOL_NAME_SIZE, p,
+> -                                  '/', "pool name", &p, &local_err);
+> -    if (local_err) {
+> -        goto done;
+> -    }
+> +    found_str = qemu_rbd_next_tok(p, '/', &p);
+>      if (!p) {
+>          error_setg(errp, "Pool name is required");
+>          goto done;
+> @@ -184,27 +161,15 @@ static void qemu_rbd_parse_filename(const char *filename, QDict *options,
+>      qdict_put(options, "pool", qstring_from_str(found_str));
+>  
+>      if (strchr(p, '@')) {
+> -        found_str = qemu_rbd_next_tok(RBD_MAX_IMAGE_NAME_SIZE, p,
+> -                                      '@', "object name", &p, &local_err);
+> -        if (local_err) {
+> -            goto done;
+> -        }
+> +        found_str = qemu_rbd_next_tok(p, '@', &p);
+>          qemu_rbd_unescape(found_str);
+>          qdict_put(options, "image", qstring_from_str(found_str));
+>  
+> -        found_str = qemu_rbd_next_tok(RBD_MAX_SNAP_NAME_SIZE, p,
+> -                                      ':', "snap name", &p, &local_err);
+> -        if (local_err) {
+> -            goto done;
+> -        }
+> +        found_str = qemu_rbd_next_tok(p, ':', &p);
+>          qemu_rbd_unescape(found_str);
+>          qdict_put(options, "snapshot", qstring_from_str(found_str));
+>      } else {
+> -        found_str = qemu_rbd_next_tok(RBD_MAX_IMAGE_NAME_SIZE, p,
+> -                                      ':', "object name", &p, &local_err);
+> -        if (local_err) {
+> -            goto done;
+> -        }
+> +        found_str = qemu_rbd_next_tok(p, ':', &p);
+>          qemu_rbd_unescape(found_str);
+>          qdict_put(options, "image", qstring_from_str(found_str));
+>      }
+> @@ -212,11 +177,7 @@ static void qemu_rbd_parse_filename(const char *filename, QDict *options,
+>          goto done;
+>      }
+>  
+> -    found_str = qemu_rbd_next_tok(RBD_MAX_CONF_NAME_SIZE, p,
+> -                                  '\0', "configuration", &p, &local_err);
+> -    if (local_err) {
+> -        goto done;
+> -    }
+> +    found_str = qemu_rbd_next_tok(p, '\0', &p);
+>  
+>      p = found_str;
+>  
+> @@ -224,12 +185,7 @@ static void qemu_rbd_parse_filename(const char *filename, QDict *options,
+>       * 'id' and 'conf' a bit special.  Key/value pairs may be in any order. */
+>      while (p) {
+>          char *name, *value;
+> -        name = qemu_rbd_next_tok(RBD_MAX_CONF_NAME_SIZE, p,
+> -                                 '=', "conf option name", &p, &local_err);
+> -        if (local_err) {
+> -            break;
+> -        }
+> -
+> +        name = qemu_rbd_next_tok(p, '=', &p);
+>          if (!p) {
+>              error_setg(errp, "conf option %s has no value", name);
+>              break;
+> @@ -237,11 +193,7 @@ static void qemu_rbd_parse_filename(const char *filename, QDict *options,
+>  
+>          qemu_rbd_unescape(name);
+>  
+> -        value = qemu_rbd_next_tok(RBD_MAX_CONF_VAL_SIZE, p,
+> -                                  ':', "conf option value", &p, &local_err);
+> -        if (local_err) {
+> -            break;
+> -        }
+> +        value = qemu_rbd_next_tok(p, ':', &p);
+>          qemu_rbd_unescape(value);
+>  
+>          if (!strcmp(name, "conf")) {
+> @@ -274,9 +226,6 @@ static void qemu_rbd_parse_filename(const char *filename, QDict *options,
+>  
+>  
+>  done:
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> -    }
+>      g_free(buf);
+>      g_free(keypairs);
+>      return;
+> @@ -308,30 +257,20 @@ static int qemu_rbd_set_keypairs(rados_t cluster, const char *keypairs,
+>      char *p, *buf;
+>      char *name;
+>      char *value;
+> -    Error *local_err = NULL;
+>      int ret = 0;
+>  
+>      buf = g_strdup(keypairs);
+>      p = buf;
+>  
+>      while (p) {
+> -        name = qemu_rbd_next_tok(RBD_MAX_CONF_NAME_SIZE, p,
+> -                                 '=', "conf option name", &p, &local_err);
+> -        if (local_err) {
+> -            break;
+> -        }
+> -
+> +        name = qemu_rbd_next_tok(p, '=', &p);
+>          if (!p) {
+>              error_setg(errp, "conf option %s has no value", name);
+>              ret = -EINVAL;
+>              break;
+>          }
+>  
+> -        value = qemu_rbd_next_tok(RBD_MAX_CONF_VAL_SIZE, p,
+> -                                  ':', "conf option value", &p, &local_err);
+> -        if (local_err) {
+> -            break;
+> -        }
+> +        value = qemu_rbd_next_tok(p, ':', &p);
+>  
+>          ret = rados_conf_set(cluster, name, value);
+>          if (ret < 0) {
+> @@ -341,10 +280,6 @@ static int qemu_rbd_set_keypairs(rados_t cluster, const char *keypairs,
+>          }
+>      }
+>  
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> -        ret = -EINVAL;
+> -    }
+>      g_free(buf);
+>      return ret;
+>  }
+> @@ -724,7 +659,7 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+>      }
+>  
+>      s->snap = g_strdup(snap);
+> -    pstrcpy(s->name, RBD_MAX_IMAGE_NAME_SIZE, name);
+> +    s->name = g_strdup(name);
+>  
+>      /* try default location when conf=NULL, but ignore failure */
+>      r = rados_conf_read_file(s->cluster, conf);
+> @@ -798,6 +733,7 @@ failed_open:
+>  failed_shutdown:
+>      rados_shutdown(s->cluster);
+>      g_free(s->snap);
+> +    g_free(s->name);
+>  failed_opts:
+>      qemu_opts_del(opts);
+>      g_free(mon_host);
+> @@ -812,6 +748,7 @@ static void qemu_rbd_close(BlockDriverState *bs)
+>      rbd_close(s->image);
+>      rados_ioctx_destroy(s->io_ctx);
+>      g_free(s->snap);
+> +    g_free(s->name);
+>      rados_shutdown(s->cluster);
+>  }
+>  
+> -- 
+> 2.7.4
+> 
