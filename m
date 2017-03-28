@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cszzb-0000Q5-2l
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cszza-0000Pz-Hn
 	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 18:53:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cszzY-0000HH-18
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 18:53:35 -0400
-Received: from hera.aquilenet.fr ([141.255.128.1]:52515)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cszzZ-0000IE-I4
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 18:53:34 -0400
+Received: from hera.aquilenet.fr ([2a01:474::1]:53294)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cszzX-0000GO-Qt
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 18:53:31 -0400
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cszzZ-0000Hr-BX
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 18:53:33 -0400
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Wed, 29 Mar 2017 00:53:24 +0200
-Message-Id: <20170328225327.16707-1-samuel.thibault@ens-lyon.org>
+Date: Wed, 29 Mar 2017 00:53:25 +0200
+Message-Id: <20170328225327.16707-2-samuel.thibault@ens-lyon.org>
+In-Reply-To: <20170328225327.16707-1-samuel.thibault@ens-lyon.org>
+References: <20170328225327.16707-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/3] slirp updates
+Subject: [Qemu-devel] [PULL 1/3] slirp: fix compilation errors with DEBUG set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,33 +27,40 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, stefanha@redhat.com, jan.kiszka@siemens.com
+Cc: Laurent Vivier <laurent@vivier.eu>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-The following changes since commit df9046363220e57d45818312759b954c033c58=
-ab:
+From: Laurent Vivier <laurent@vivier.eu>
 
-  Update version for v2.9.0-rc2 release (2017-03-28 19:11:16 +0100)
+slirp/slirp.c: In function 'get_dns_addr_resolv_conf':
+slirp/slirp.c:202:29: error: initialization discards 'const' qualifier fr=
+om pointer target type [-Werror=3Ddiscarded-qualifiers]
+                 char *res =3D inet_ntop(af, tmp_addr, s, sizeof(s));
+                             ^~~~~~~~~
+slirp/slirp.c:204:25: error: assignment discards 'const' qualifier from p=
+ointer target type [-Werror=3Ddiscarded-qualifiers]
+                     res =3D "(string conversion error)";
 
-are available in the git repository at:
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+---
+ slirp/slirp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  http://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
-
-for you to fetch changes up to a2f80fdfc683019901cdf4c0863a5920c0ca7245:
-
-  slirp: Send RDNSS in RA only if host has an IPv6 DNS server (2017-03-29=
- 00:51:25 +0200)
-
-----------------------------------------------------------------
-slirp updates
-
-----------------------------------------------------------------
-Laurent Vivier (1):
-      slirp: fix compilation errors with DEBUG set
-
-Samuel Thibault (2):
-      slirp: Make RA build more flexible
-      slirp: Send RDNSS in RA only if host has an IPv6 DNS server
-
- slirp/ip6_icmp.c | 47 ++++++++++++++++++++++-------------------------
- slirp/slirp.c    |  2 +-
- 2 files changed, 23 insertions(+), 26 deletions(-)
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index 60539de7a3..5a94b06f5e 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -198,7 +198,7 @@ static int get_dns_addr_resolv_conf(int af, void *pdn=
+s_addr, void *cached_addr,
+ #ifdef DEBUG
+             else {
+                 char s[INET6_ADDRSTRLEN];
+-                char *res =3D inet_ntop(af, tmp_addr, s, sizeof(s));
++                const char *res =3D inet_ntop(af, tmp_addr, s, sizeof(s)=
+);
+                 if (!res) {
+                     res =3D "(string conversion error)";
+                 }
+--=20
+2.11.0
