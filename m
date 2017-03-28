@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1ct0wJ-0008Sb-6q
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 19:54:16 -0400
+	(envelope-from <mst@redhat.com>) id 1ct11a-0000sL-Dc
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 19:59:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1ct0wG-0006SS-3a
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 19:54:15 -0400
-Received: from mail.kernel.org ([198.145.29.136]:47858)
+	(envelope-from <mst@redhat.com>) id 1ct11X-0000lg-Ab
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 19:59:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44340)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1ct0wF-0006Qn-PZ
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 19:54:12 -0400
-Date: Tue, 28 Mar 2017 16:54:05 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <b0ef8967-302f-e308-4d2c-207299c250ef@suse.com>
-Message-ID: <alpine.DEB.2.10.1703281653340.27589@sstabellini-ThinkPad-X260>
-References: <alpine.DEB.2.10.1703201117560.23684@sstabellini-ThinkPad-X260>
-	<1490033952-26735-1-git-send-email-sstabellini@kernel.org>
-	<20170323140005.6b0853b3@bahia.lan>
-	<15207674-c5cd-3874-7ac9-5b23cdac8888@suse.com>
-	<28db5816-2ed9-0d92-a15d-af47b58a9da1@redhat.com>
-	<alpine.DEB.2.10.1703230953120.8001@sstabellini-ThinkPad-X260>
-	<3d94c0aa-6b18-5574-4034-110cc2cf4b90@suse.com>
-	<alpine.DEB.2.10.1703241030391.8001@sstabellini-ThinkPad-X260>
-	<d02897ba-88c6-f92e-ccf5-afab3c584f75@suse.com>
-	<alpine.DEB.2.10.1703271537330.8001@sstabellini-ThinkPad-X260>
-	<b0ef8967-302f-e308-4d2c-207299c250ef@suse.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ct11X-0000lH-1L
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 19:59:39 -0400
+Date: Wed, 29 Mar 2017 02:59:34 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170329025512-mutt-send-email-mst@kernel.org>
+References: <1490260163-6157-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+	<1490260163-6157-4-git-send-email-caoj.fnst@cn.fujitsu.com>
+	<20170324161224.270f334e@t450s.home>
+	<58DA69DD.2060203@cn.fujitsu.com>
+	<20170328101225.5772b33a@t450s.home>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v4 1/8] xen: import ring.h from xen
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170328101225.5772b33a@t450s.home>
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] vfio-pci: process non fatal error
+ of AER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,133 +31,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juergen Gross <jgross@suse.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, Stefano Stabellini <stefano@aporeto.com>, anthony.perard@citrix.com, xen-devel <xen-devel@lists.xenproject.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Cao jin <caoj.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org, izumi.taku@jp.fujitsu.com, Dou Liyang <douly.fnst@cn.fujitsu.com>
 
-On Tue, 28 Mar 2017, Juergen Gross wrote:
-> On 28/03/17 00:48, Stefano Stabellini wrote:
-> > On Mon, 27 Mar 2017, Juergen Gross wrote:
-> >> On 24/03/17 18:37, Stefano Stabellini wrote:
-> >>> On Fri, 24 Mar 2017, Juergen Gross wrote:
-> >>>> On 23/03/17 19:22, Stefano Stabellini wrote:
-> >>>>> On Thu, 23 Mar 2017, Paolo Bonzini wrote:
-> >>>>>> On 23/03/2017 14:55, Juergen Gross wrote:
-> >>>>>>> On 23/03/17 14:00, Greg Kurz wrote:
-> >>>>>>>> On Mon, 20 Mar 2017 11:19:05 -0700
-> >>>>>>>> Stefano Stabellini <sstabellini@kernel.org> wrote:
-> >>>>>>>>
-> >>>>>>>>> Do not use the ring.h header installed on the system. Instead, import
-> >>>>>>>>> the header into the QEMU codebase. This avoids problems when QEMU is
-> >>>>>>>>> built against a Xen version too old to provide all the ring macros.
-> >>>>>>>>>
-> >>>>>>>>> Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
-> >>>>>>>>> Reviewed-by: Greg Kurz <groug@kaod.org>
-> >>>>>>>>> CC: anthony.perard@citrix.com
-> >>>>>>>>> CC: jgross@suse.com
-> >>>>>>>>> ---
-> >>>>>>>>> NB: The new macros have not been committed to Xen yet. Do not apply this
-> >>>>>>>>> patch until they do.
-> >>>>>>>>> ---
-> >>>>>>>>
-> >>>>>>>> Looking at your other series for the kernel part of this feature:
-> >>>>>>>>
-> >>>>>>>> https://lkml.org/lkml/2017/3/22/761
-> >>>>>>>>
-> >>>>>>>> I realize that the ring.h header from Xen also exists in the kernel tree... 
-> >>>>>>>>
-> >>>>>>>> Shouldn't all the code that can be used in both kernel and userspace go to a
-> >>>>>>>> header file under include/uapi in the kernel tree ? And then we would import
-> >>>>>>>> it under include/standard-headers/linux in the QEMU tree and we could keep it
-> >>>>>>>> in sync using scripts/update-linux-headers.sh.
-> >>>>>>>>
-> >>>>>>>> Cc'ing Paolo for insights.
-> >>>>>>>
-> >>>>>>> As Xen isn't part of the kernel we don't want that. You can use and/or
-> >>>>>>> build qemu with xen-9pfs backend support on an old Linux kernel without
-> >>>>>>> the related frontend.
-> >>>>>>
-> >>>>>> As long as the header changes rarely, I guess it's fine not to go
-> >>>>>> through update-linux-headers.sh.
-> >>>>>
-> >>>>> Very rarely, last time ring.h was changed was 2015, and to introduce a
-> >>>>> new macro (which we don't necessarily need in QEMU).
-> >>>>>
-> >>>>>
-> >>>>>>> OTOH I don't see the advantage of not using the headers from Xen. This
-> >>>>>>> is working for qdisk and pvusb backends and for all the Xen libraries.
-> >>>>>>> Do you expect the 9pfs backend to be used for a qemu version built
-> >>>>>>> against a Xen version not supporting that backend?
-> >>>>>
-> >>>>> Yes, I think that is entirely possible: Xen and QEMU versions can mix
-> >>>>> and match.
-> >>>>>
-> >>>>> Keeping in mind that the 9pfs backend has actually no build dependencies
-> >>>>> on Xen, except for these new ring.h macros, we have the following
-> >>>>> options:
-> >>>>>
-> >>>>> 1) we build the 9pfs backend only for Xen >= 4.9, because of the new
-> >>>>>    macros in ring.h that we need
-> >>>>
-> >>>> Right. You have sent 9pfs support patches for Xen tools. So obviously
-> >>>> you need a proper Xen version to use 9pfs. Why not build qemu against
-> >>>> it? Do you really expect a new Xen being used with an old qemu while
-> >>>> wanting to use new features? That makes no sense for me.
-> >>>  
-> >>> Tools support is needed to setup the frontend/backend connection as
-> >>> usual, but that's not a requirement for building the 9pfs backend. In
-> >>> fact, the backend doesn't need any tools support for it to work. The
-> >>> macro themselves are just a convenience - the backend would work just
-> >>> fine without them. Why restrict the QEMU build gratuitously?
-> >>
-> >> You are duplicating a header without any real benefit I can see. This
-> >> is adding future work for keeping both versions of the header in sync.
-> >>
-> >> In which scenario would you want qemu to support xen-9pfs without being
-> >> built against a Xen version supporting xen-9pfs?
-> >>
-> >> I am not completely against copying the header, I just don't see an
-> >> advantage for any distro or user in doing it.
-> > 
-> > I understand your point of view, and honestly it wouldn't be a problem
-> > doing it the way you suggested either. However, I think that going
-> > forward it will be less of a maintenance pain to keep ring.h in sync,
-> > compared to maintaining a versioned build dependency between Xen and
-> > QEMU for the compilation of one PV backend. We do have version checks
-> > in QEMU for Xen compatibility, but not for PV backends or the xenpv
-> > machine yet.
+On Tue, Mar 28, 2017 at 10:12:25AM -0600, Alex Williamson wrote:
+> On Tue, 28 Mar 2017 21:49:17 +0800
+> Cao jin <caoj.fnst@cn.fujitsu.com> wrote:
 > 
-> For the pvUSB backend I just used a mandatory macro from the header for
-> the #ifdef. The backend will signal support when it was defined during
-> build and will refuse initialization otherwise. Xen tools are able to
-> recoginze qemu support of the backend by looking into Xenstore.
+> > On 03/25/2017 06:12 AM, Alex Williamson wrote:
+> > > On Thu, 23 Mar 2017 17:09:23 +0800
+> > > Cao jin <caoj.fnst@cn.fujitsu.com> wrote:
+> > >   
+> > >> Make use of the non fatal error eventfd that the kernel module provide
+> > >> to process the AER non fatal error. Fatal error still goes into the
+> > >> legacy way which results in VM stop.
+> > >>
+> > >> Register the handler, wait for notification. Construct aer message and
+> > >> pass it to root port on notification. Root port will trigger an interrupt
+> > >> to signal guest, then guest driver will do the recovery.  
+> > > 
+> > > Can we guarantee this is the better solution in all cases or could
+> > > there be guests without AER support where the VM stop is the better
+> > > solution?
+> > >   
+> > 
+> > Currently, we only have VM stop on errors, that looks the same as a
+> > sudden power down to me.  With this solution, we have about
+> > 50%(non-fatal) chance to reduce the sudden power-down risk.
+> 
+> If half of all faults are expected to be non-fatal, then you must have
+> some real examples of devices triggering non-fatal errors which can be
+> corrected in the guest driver that you can share to justify why it's a
+> good thing to enable this behavior.
+> 
+> > What if a guest doesn't support AER?  It looks the same as a host
+> > without AER support. Now I only can speculate the worst condition: guest
+> > crash, would that be quite different from a sudden power-down?
+> 
+> Yes, it's very different.  In one case we contain the fault by stopping
+> the guest, in the other case we allow the guest to continue operating
+> with a known fault in the device which may allow the fault to propagate
+> and perhaps go unnoticed.  We have established with the current
+> behavior that QEMU will prevent further propagation of a fault by
+> halting the VM.  To change QEMU's behavior here risks that a VM relying
+> on that behavior no longer has that protection.  So it seems we either
+> need to detect whether the VM is handling AER or we need to require the
+> VM administrator to opt-in to this new feature.
+
+An opt-in flag sounds very reasonable. It can also specify whether
+to log the errors. We have a similar flag for disk errors.
+
+>  Real hardware has
+> these same issues and I believe there are handshakes that can be done
+> through ACPI to allow the guest to take over error handling from the
+> system.
+
+No, that's only for error reporting IIUC. Driver needs to be
+aware of a chance for errors to trigger and be able to
+handle them.
+
+So yes, some guests might have benefitted from VM stop
+on AER but
+1. the stop happens asynchronously so if guest can't handle
+   errors there's a chance it is already crashed by the time we
+   try to do vm stop
+2. it's more of a chance by-product - we never promised
+   guests that VMs would be more robust than bare metal
 
 
-What do you think of the following:
 
-diff --git a/hw/9pfs/Makefile.objs b/hw/9pfs/Makefile.objs
-index cab5e94..42530b8 100644
---- a/hw/9pfs/Makefile.objs
-+++ b/hw/9pfs/Makefile.objs
-@@ -5,6 +5,8 @@ common-obj-y += coth.o cofs.o codir.o cofile.o
- common-obj-y += coxattr.o 9p-synth.o
- common-obj-$(CONFIG_OPEN_BY_HANDLE) +=  9p-handle.o
- common-obj-y += 9p-proxy.o
--common-obj-$(CONFIG_XEN) += xen-9p-backend.o
-+ifeq ($(shell test $(CONFIG_XEN_CTRL_INTERFACE_VERSION) -ge 40900; echo $$?),0)
-+common-obj-y += xen-9p-backend.o
-+endif
- 
- obj-y += virtio-9p-device.o
-diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
-index c85f163..defcbff 100644
---- a/hw/xen/xen_backend.c
-+++ b/hw/xen/xen_backend.c
-@@ -583,7 +583,7 @@ void xen_be_register_common(void)
-     xen_be_register("console", &xen_console_ops);
-     xen_be_register("vkbd", &xen_kbdmouse_ops);
-     xen_be_register("qdisk", &xen_blkdev_ops);
--#ifdef CONFIG_VIRTFS
-+#if defined(CONFIG_VIRTFS) && CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900
-     xen_be_register("9pfs", &xen_9pfs_ops);
- #endif
- #ifdef CONFIG_USB_LIBUSB
+> > >> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+> > >> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+> > >> ---
+> > >>  hw/vfio/pci.c              | 202 +++++++++++++++++++++++++++++++++++++++++++++
+> > >>  hw/vfio/pci.h              |   2 +
+> > >>  linux-headers/linux/vfio.h |   2 +
+> > >>  3 files changed, 206 insertions(+)
+> > >>
+> > >> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > >> index 3d0d005..c6786d5 100644
+> > >> --- a/hw/vfio/pci.c
+> > >> +++ b/hw/vfio/pci.c
+> > >> @@ -2432,6 +2432,200 @@ static void vfio_put_device(VFIOPCIDevice *vdev)
+> > >>      vfio_put_base_device(&vdev->vbasedev);
+> > >>  }
+> > >>  
+> > >> +static void vfio_non_fatal_err_notifier_handler(void *opaque)
+> > >> +{
+> > >> +    VFIOPCIDevice *vdev = opaque;
+> > >> +    PCIDevice *dev = &vdev->pdev;
+> > >> +    PCIEAERMsg msg = {
+> > >> +        .severity = PCI_ERR_ROOT_CMD_NONFATAL_EN,
+> > >> +        .source_id = pci_requester_id(dev),
+> > >> +    };
+> > >> +
+> > >> +    if (!event_notifier_test_and_clear(&vdev->non_fatal_err_notifier)) {
+> > >> +        return;
+> > >> +    }
+> > >> +
+> > >> +    /* Populate the aer msg and send it to root port */
+> > >> +    if (dev->exp.aer_cap) {  
+> > > 
+> > > Why would we have registered this notifier otherwise?
+> > >   
+> > >> +        uint8_t *aer_cap = dev->config + dev->exp.aer_cap;
+> > >> +        uint32_t uncor_status;
+> > >> +        bool isfatal;
+> > >> +
+> > >> +        uncor_status = vfio_pci_read_config(dev,
+> > >> +                            dev->exp.aer_cap + PCI_ERR_UNCOR_STATUS, 4);
+> > >> +        if (!uncor_status) {
+> > >> +            return;
+> > >> +        }
+> > >> +
+> > >> +        isfatal = uncor_status & pci_get_long(aer_cap + PCI_ERR_UNCOR_SEVER);
+> > >> +        if (isfatal) {
+> > >> +            goto stop;
+> > >> +        }  
+> > > 
+> > > Huh?  How can we get a non-fatal error notice for a fatal error?  (and
+> > > why are we saving this to a variable rather than testing it within the
+> > > 'if' condition?
+> > >  
+> > 
+> > Both of these are for the unsure corner cases.
+> > Is it possible that register reading shows a fatal error?
+> > Saving it into a variable just is personal taste: more neat.
+> 
+> Why are there unsure corner cases?  Shouldn't the kernel have done this
+> check if there was any doubt whether the error was fatal or not?
+> Signaling the user with a non-fatal trigger for a fatal error certainly
+> doesn't make me have much confidence in this code.
+> 
+> > >> +
+> > >> +        error_report("%s sending non fatal event to root port. uncor status = "
+> > >> +                     "0x%"PRIx32, vdev->vbasedev.name, uncor_status);
+> > >> +        pcie_aer_msg(dev, &msg);
+> > >> +        return;
+> > >> +    }
+> > >> +
+> > >> +stop:
+> > >> +    /* Terminate the guest in case of fatal error */
+> > >> +    error_report("%s: Device detected a fatal error. VM stopped",
+> > >> +	    vdev->vbasedev.name);
+> > >> +    vm_stop(RUN_STATE_INTERNAL_ERROR);  
+> > > 
+> > > Shouldn't we use the existing error index if we can't make use of
+> > > correctable errors?
+> > >   
+> > 
+> > Why? If register reading shows it is actually a fatal error, is it the
+> > same as fatal error handler is notified?  what we use the existing error
+> > index for?
+> 
+> See below.
+> 
+> > >> @@ -2860,6 +3054,8 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+> > >>          }
+> > >>      }
+> > >>  
+> > >> +    vfio_register_passive_reset_notifier(vdev);
+> > >> +    vfio_register_non_fatal_err_notifier(vdev);  
+> > > 
+> > > I think it's wrong that we configure these unconditionally.  Why do we
+> > > care about these unless we're configuring the guest to receive AER
+> > > events?
+> > >   
+> > 
+> > But do we have ways to know whether the guest has AER support? For now,
+> > I don't think so.
+> 
+> By unconditionally here, I'm referring to not even testing whether the
+> device is in a VM topology where it can receive AER events.  If we
+> cannot signal the device, we don't need these additional triggers and
+> therefore we don't need the aer_cap test in the non-fatal error
+> handler, we can use the existing error index instead.  Enabling these
+> triggers at the point where the guest takes over error handling from
+> the system would be even better.
+>  
+> > If guest don't have AER support, for the worst condition: guest crash,
+> > it is not worse than a sudden power-down.
+> 
+> Worst case is that a non-fatal error introduces a data corruption which
+> was previously noted via a VM stop (even if asynchronous notification
+> allowed some propagation) and now potentially goes unnoticed.  That's a
+> very big difference.  Thanks,
+> 
+> Alex
