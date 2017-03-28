@@ -1,18 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56832)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vfeenstr@redhat.com>) id 1cslRl-0008D2-GK
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:21:42 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cslWR-0001dF-GJ
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:26:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vfeenstr@redhat.com>) id 1cslRg-0003Xn-H6
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:21:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51186)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vfeenstr@redhat.com>) id 1cslRg-0003Xa-8R
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:21:36 -0400
-From: Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>
-Date: Tue, 28 Mar 2017 09:21:30 +0200
-Message-Id: <20170328072130.17142-1-vfeenstr@redhat.com>
-Subject: [Qemu-devel] [PATCH v1] qga: Add 'guest-get-users' command
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cslWM-0004vm-JK
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:26:31 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:45899
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1cslWM-0004sz-CA
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:26:26 -0400
+References: <d4c50e61-112c-1818-479e-494d58e361f2@ilande.co.uk>
+	<CAFEAcA_vArTuWDGpTeToFhjfSV1BC3BV8WhjDsZtO5uxWiarMQ@mail.gmail.com>
+	<d8a1ecfb-cce1-e855-9f0b-49dccd830155@weilnetz.de>
+	<9e2591a0-4c25-5f00-0fd3-9c175bfbab12@ilande.co.uk>
+	<25632d57-622c-e0b0-029a-28fdca0a427f@weilnetz.de>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <360a7047-6190-c006-e155-1166ab14b83a@ilande.co.uk>
+Date: Tue, 28 Mar 2017 08:25:51 +0100
+MIME-Version: 1.0
+In-Reply-To: <25632d57-622c-e0b0-029a-28fdca0a427f@weilnetz.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] Problems with native Mingw-w64 build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,195 +32,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, Vinzenz Feenstra <vfeenstr@redhat.com>
+To: Stefan Weil <sw@weilnetz.de>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-From: Vinzenz Feenstra <vfeenstr@redhat.com>
+On 27/03/17 21:19, Stefan Weil wrote:
 
-A command that will list all currenctly logged in users having running
-processes.
+> Am 27.03.2017 um 07:48 schrieb Mark Cave-Ayland:
+>> Right, I see cygwin has a much newer version of glib available which
+>> explains how the builds are produced.
+>>
+>> What was the exact issue with global symbols which prevents the
+>> pre-built Win64 binaries from glib > 2.22 being used? Or is that
+>> information now obsolete?
+> 
+> I remember a problem caused by a change in Mingw gcc name mangling,
+> maybe that's what you a referring to. That does not apply to the
+> libraries distributed with Cygwin.
+> 
+> There is a new problem with cross compiling on Cygwin caused by latest
+> changes in configure. I have just sent a patch to fix that regression.
 
-Examples:
+I ended up starting again from scratch last night and trying the build
+with MSYS2 instead. MSYS2 has really improved since I last looked at it
+a couple of years back, and I was able to get a working build
+environment all set and working without any issues, i.e. set up the
+build environment, run configure, make and make install.
 
-virsh # qemu-agent-command F25 '{ "execute": "guest-get-users" }'
-{"return":[{"user":"root"}]}
+I did make a few notes during installation so if people think it's
+useful I can work through them again and come up with something suitable
+for the wiki.
 
-virsh # qemu-agent-command Win2k12r2 '{ "execute": "guest-get-users" }'
-{"return":[{"domain":"LADIDA","user":"Administrator"}]}
 
-Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
----
- qga/commands-posix.c | 35 +++++++++++++++++++++++
- qga/commands-win32.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- qga/qapi-schema.json | 21 ++++++++++++++
- 3 files changed, 136 insertions(+)
+ATB,
 
-diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index 73d93eb..8cb2094 100644
---- a/qga/commands-posix.c
-+++ b/qga/commands-posix.c
-@@ -15,6 +15,7 @@
- #include <sys/ioctl.h>
- #include <sys/wait.h>
- #include <dirent.h>
-+#include <utmpx.h>
- #include "qga/guest-agent-core.h"
- #include "qga-qmp-commands.h"
- #include "qapi/qmp/qerror.h"
-@@ -2515,3 +2516,37 @@ void ga_command_state_init(GAState *s, GACommandState *cs)
-     ga_command_state_add(cs, NULL, guest_fsfreeze_cleanup);
- #endif
- }
-+
-+GuestUserList *qmp_guest_get_users(Error **err)
-+{
-+    GHashTable *cache = g_hash_table_new_full(g_str_hash, g_str_equal,
-+                                              NULL, NULL);
-+    GuestUserList *head = NULL, *cur_item = NULL;
-+    setutxent();
-+    for (;;) {
-+        struct utmpx *user_info = getutxent();
-+        if (user_info == NULL) {
-+            break;
-+        } else if (user_info->ut_type != USER_PROCESS) {
-+            continue;
-+        } else if (g_hash_table_contains(cache, user_info->ut_user)) {
-+            continue;
-+        }
-+
-+        g_hash_table_insert(cache, user_info->ut_user, NULL);
-+
-+        GuestUserList *item = g_new0(GuestUserList, 1);
-+        item->value = g_new0(GuestUser, 1);
-+        item->value->user = g_strdup(user_info->ut_user);
-+
-+        if (!cur_item) {
-+            head = cur_item = item;
-+        } else {
-+            cur_item->next = item;
-+            cur_item = item;
-+        }
-+    }
-+    endutxent();
-+    g_hash_table_unref(cache);
-+    return head;
-+}
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 19d72b2..46c038b 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -1536,3 +1536,83 @@ void ga_command_state_init(GAState *s, GACommandState *cs)
-         ga_command_state_add(cs, NULL, guest_fsfreeze_cleanup);
-     }
- }
-+
-+GuestUserList *qmp_guest_get_users(Error **err)
-+{
-+    GHashTable *cache = g_hash_table_new_full(g_str_hash, g_str_equal,
-+                                              NULL, NULL);
-+    GuestUserList *head = NULL, *cur_item = NULL;
-+
-+    LPWKSTA_USER_INFO_1 buffer = NULL, iter_buffer = 0;
-+    DWORD level = 1; /* Level 1 has more information */
-+    DWORD prefered_max_length = MAX_PREFERRED_LENGTH;
-+    DWORD entries_read = 0;
-+    DWORD total_entries = 0;
-+    DWORD resume_handle = 0;
-+    LPWSTR server_name = NULL;
-+    NET_API_STATUS result = ERROR_MORE_DATA;
-+
-+    while (result == ERROR_MORE_DATA) {
-+        result = NetWkstaUserEnum(
-+            server_name,
-+            level,
-+            (LPBYTE *)&buffer,
-+            prefered_max_length,
-+            &entries_read,
-+            &total_entries,
-+            &resume_handle);
-+
-+        if (result != ERROR_MORE_DATA && result != ERROR_SUCCESS) {
-+            error_setg_win32(err, result, "Failed to enumerate active users");
-+            goto error;
-+        }
-+
-+        iter_buffer = buffer;
-+        DWORD i = 0;
-+        for (i = 0; i < entries_read; ++i, ++iter_buffer) {
-+            gchar *name = g_utf16_to_utf8(
-+                iter_buffer->wkui1_username,
-+                -1, NULL, NULL, NULL
-+            );
-+
-+            if (name == NULL) {
-+                continue;
-+            }
-+
-+            if (g_hash_table_contains(cache, name)) {
-+                g_free(name);
-+                continue;
-+            }
-+
-+            gchar *domain = g_utf16_to_utf8(
-+                iter_buffer->wkui1_logon_domain,
-+                -1, NULL, NULL, NULL
-+            );
-+
-+            g_hash_table_insert(cache, name, NULL);
-+            GuestUserList *item = g_new0(GuestUserList, 1);
-+            item->value = g_new0(GuestUser, 1);
-+            item->value->user = name;
-+            item->value->domain = domain;
-+            item->value->has_domain = true;
-+
-+            if (!cur_item) {
-+                head = cur_item = item;
-+            } else {
-+                cur_item->next = item;
-+                cur_item = item;
-+            }
-+        }
-+    }
-+    NetApiBufferFree(buffer);
-+    g_hash_table_unref(cache);
-+    return head;
-+
-+error:
-+    if (buffer != NULL) {
-+        NetApiBufferFree(buffer);
-+    }
-+    g_hash_table_unref(cache);
-+    qapi_free_GuestUserList(head);
-+    return NULL;
-+}
-diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-index a02dbf2..190e8b4 100644
---- a/qga/qapi-schema.json
-+++ b/qga/qapi-schema.json
-@@ -1042,3 +1042,24 @@
-   'data':    { 'path': 'str', '*arg': ['str'], '*env': ['str'],
-                '*input-data': 'str', '*capture-output': 'bool' },
-   'returns': 'GuestExec' }
-+
-+##
-+# @GuestUser:
-+# @user:      Username
-+# @domain:    Logon domain (windows only)
-+#
-+# Since: 2.10
-+##
-+{ 'struct': 'GuestUser',
-+  'data': { 'user': 'str', '*domain': 'str' } }
-+
-+##
-+# @guest-get-users:
-+# Retrieves a list of currently active user accounts on the VM.
-+#
-+# Returns: A unique list of users.
-+#
-+# Since: 2.10
-+##
-+{ 'command': 'guest-get-users',
-+  'returns': ['GuestUser'] }
--- 
-2.9.3
+Mark.
