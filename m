@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1csfCI-000318-1m
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 20:41:19 -0400
+	(envelope-from <ashmit602@gmail.com>) id 1csfZ6-0005ne-Qr
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 21:04:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1csfCC-0001Q0-LO
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 20:41:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38728)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1csfCC-0001Ox-Bk
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 20:41:12 -0400
-Date: Mon, 27 Mar 2017 21:41:08 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170328004108.GP28530@thinpad.lan.raisama.net>
-References: <1490653177-131484-1-git-send-email-agraf@suse.de>
+	(envelope-from <ashmit602@gmail.com>) id 1csfZ4-00038N-SH
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 21:04:52 -0400
+Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:36116)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ashmit602@gmail.com>) id 1csfZ4-00038J-M7
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 21:04:50 -0400
+Received: by mail-it0-x243.google.com with SMTP id 190so538433itm.3
+	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 18:04:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1490653177-131484-1-git-send-email-agraf@suse.de>
-Subject: Re: [Qemu-devel] [PATCH] i386: Allow cpuid bit override
+In-Reply-To: <20170327172738.GG28620@stefanha-x1.localdomain>
+References: <1490583036-3683-1-git-send-email-Ashish.Mittal@veritas.com>
+	<20170327172738.GG28620@stefanha-x1.localdomain>
+From: ashish mittal <ashmit602@gmail.com>
+Date: Mon, 27 Mar 2017 18:04:49 -0700
+Message-ID: <CAAo6VWPPjX2UfU55rnR375jzmpMojUOHfmMafwBiZqBa80aBeQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v10 1/2] block/vxhs.c: Add support for a
+ new block device type called "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,167 +29,355 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Graf <agraf@suse.de>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Jeff Cody <jcody@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <ashish.mittal@veritas.com>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, "Venkatesha M.G." <venkatesha.mg@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>
 
-On Tue, Mar 28, 2017 at 12:19:37AM +0200, Alexander Graf wrote:
-> KVM has a feature bitmap of CPUID bits that it knows works for guests.
-> QEMU removes bits that are not part of that bitmap automatically on VM
-> start.
-> 
-> However, some times we just don't list features in that list because
-> they don't make sense for normal scenarios, but may be useful in specific,
-> targeted workloads.
-> 
-> For that purpose, add a new =force option to all CPUID feature flags in
-> the CPU property. With that we can override the accel filtering and give
-> users full control over the CPUID feature bits exposed into guests.
-> 
-> Signed-off-by: Alexander Graf <agraf@suse.de>
-> ---
->  target/i386/cpu.c | 30 ++++++++++++++++++++++++++----
->  target/i386/cpu.h |  3 +++
->  2 files changed, 29 insertions(+), 4 deletions(-)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 7aa7622..5a22f9a 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -2229,7 +2229,7 @@ void x86_cpu_list(FILE *f, fprintf_function cpu_fprintf)
->      g_slist_foreach(list, x86_cpu_list_entry, &s);
->      g_slist_free(list);
->  
-> -    (*cpu_fprintf)(f, "\nRecognized CPUID flags:\n");
-> +    (*cpu_fprintf)(f, "\nRecognized CPUID flags (=on|=off|=force):\n");
->      for (i = 0; i < ARRAY_SIZE(feature_word_info); i++) {
->          FeatureWordInfo *fw = &feature_word_info[i];
->  
-> @@ -3460,6 +3460,7 @@ static int x86_cpu_filter_features(X86CPU *cpu)
->              x86_cpu_get_supported_feature_word(w, false);
->          uint32_t requested_features = env->features[w];
->          env->features[w] &= host_feat;
-> +        env->features[w] |= cpu->forced_features[w];
->          cpu->filtered_features[w] = requested_features & ~env->features[w];
->          if (cpu->filtered_features[w]) {
->              rv = 1;
-> @@ -3693,6 +3694,7 @@ static void x86_cpu_unrealizefn(DeviceState *dev, Error **errp)
->  
->  typedef struct BitProperty {
->      uint32_t *ptr;
-> +    uint32_t *force_ptr;
->      uint32_t mask;
->  } BitProperty;
+On Mon, Mar 27, 2017 at 10:27 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> On Sun, Mar 26, 2017 at 07:50:35PM -0700, Ashish Mittal wrote:
+>
+> Have you tested live migration?
+>
+> If live migration is not supported then a migration blocker should be
+> added using migrate_add_blocker().
+>
 
-Please take a look at:
-  Subject: [PATCH for-2.9 v2 1/2] i386: Replace uint32_t* with FeatureWord on feature getter/setter
+We do support live migration. We have been testing a fork of this code
+(slightly different version) with live migration.
 
-I plan to include that series in 2.9, and it would make the
-force_ptr field unnecessary.
+>> v10 changelog:
+>> (1) Implemented accepting TLS creds per block device via the CLI
+>>     (see 3rd e.g in commit log). Corresponding changes made to the
+>>     libqnio library.
+>> (2) iio_open() changed to accept TLS creds and use these internally
+>>     to set up SSL connections.
+>> (3) Got rid of hard-coded VXHS_UUID_DEF. qemu_uuid is no longer used
+>>     for authentication in any way.
+>
+> Why does the code still access qemu_uuid and pass the UUID string to
+> iio_init()?
+>
 
->  
-> @@ -3701,7 +3703,15 @@ static void x86_cpu_get_bit_prop(Object *obj, Visitor *v, const char *name,
->  {
->      BitProperty *fp = opaque;
->      bool value = (*fp->ptr & fp->mask) == fp->mask;
-> -    visit_type_bool(v, name, &value, errp);
-> +    bool forced = (*fp->force_ptr & fp->mask) == fp->mask;
-> +    char str[] = "force";
-> +    char *strval = str;
-> +
-> +    if (!forced) {
-> +        strcpy(str, value ? "on" : "off");
-> +    }
-> +
-> +    visit_type_str(v, name, &strval, errp);
+I was of the opinion that knowing what instance (for qemu-kvm case)
+was opening a block device could be a useful piece of information for
+the block device to have in the future.
 
-You can define an enum type in qapi-schema.json, and use
-visit_type_<YourEnumType>(). You can grep for
-visit_type_OnOffAuto to find examples.
+> In libqnio.git (66698ca47bc594a9f623c240d63ea535f5a42b47) the 'instance'
+> field is unused and not sent over the wire.  Please drop it.
+>
 
-(But I suggest naming the enum something like
-"X86CPUFeatureSetting" instead of "OnOffForce", because we will
-probably add other enum values in the future).
+It is not used at present. I will drop it.
 
-However: we need to find a way to do this and not break
-compatibility with "feat=yes|true|no|false", that's supported by
-StringInputVisitor (which is used by object_property_parse()).
-Maybe fallback to visit_type_bool() in case
-visit_type_<YourEnumType>() fails?
+>> diff --git a/block/vxhs.c b/block/vxhs.c
+>> new file mode 100644
+>> index 0000000..b98b535
+>> --- /dev/null
+>> +++ b/block/vxhs.c
+>> @@ -0,0 +1,595 @@
+>> +/*
+>> + * QEMU Block driver for Veritas HyperScale (VxHS)
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+>> + * See the COPYING file in the top-level directory.
+>> + *
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include <qnio/qnio_api.h>
+>> +#include <sys/param.h>
+>> +#include "block/block_int.h"
+>> +#include "qapi/qmp/qerror.h"
+>> +#include "qapi/qmp/qdict.h"
+>> +#include "qapi/qmp/qstring.h"
+>> +#include "trace.h"
+>> +#include "qemu/uri.h"
+>> +#include "qapi/error.h"
+>> +#include "qemu/uuid.h"
+>> +#include "crypto/tlscredsx509.h"
+>> +
+>> +#define VXHS_OPT_FILENAME           "filename"
+>> +#define VXHS_OPT_VDISK_ID           "vdisk-id"
+>> +#define VXHS_OPT_SERVER             "server"
+>> +#define VXHS_OPT_HOST               "host"
+>> +#define VXHS_OPT_PORT               "port"
+>> +
+>> +QemuUUID qemu_uuid __attribute__ ((weak));
+>> +
+>> +static uint32_t vxhs_ref;
+>
+> It would be nice to add:
+> /* Only accessed under QEMU global mutex */
+>
+Will do.
 
-Except for that, the proposed logic looks good to me.
+>> +/*
+>> + * Parse the incoming URI and populate *options with the host information.
+>> + * URI syntax has the limitation of supporting only one host info.
+>> + * To pass multiple host information, use the JSON syntax.
+>
+> References to multiple hosts are out of date.  The driver only supports
+> a single host now.
+>
+Will change.
 
+>> + */
+>> +static int vxhs_parse_uri(const char *filename, QDict *options)
+>> +{
+>> +    URI *uri = NULL;
+>> +    char *hoststr, *portstr;
+>> +    char *port;
+>> +    int ret = 0;
+>> +
+>> +    trace_vxhs_parse_uri_filename(filename);
+>> +    uri = uri_parse(filename);
+>> +    if (!uri || !uri->server || !uri->path) {
+>> +        uri_free(uri);
+>> +        return -EINVAL;
+>> +    }
+>> +
+>> +    hoststr = g_strdup(VXHS_OPT_SERVER".host");
+>> +    qdict_put(options, hoststr, qstring_from_str(uri->server));
+>> +    g_free(hoststr);
+>> +
+>> +    portstr = g_strdup(VXHS_OPT_SERVER".port");
+>> +    if (uri->port) {
+>> +        port = g_strdup_printf("%d", uri->port);
+>> +        qdict_put(options, portstr, qstring_from_str(port));
+>> +        g_free(port);
+>> +    }
+>> +    g_free(portstr);
+>
+> The g_strdup()/g_free() isn't necessary for the qdict_put() key
+> argument.  The key belongs to the caller so we can pass a string
+> literal:
 
->  }
->  
->  static void x86_cpu_set_bit_prop(Object *obj, Visitor *v, const char *name,
-> @@ -3710,6 +3720,7 @@ static void x86_cpu_set_bit_prop(Object *obj, Visitor *v, const char *name,
->      DeviceState *dev = DEVICE(obj);
->      BitProperty *fp = opaque;
->      Error *local_err = NULL;
-> +    char *strval = NULL;
->      bool value;
->  
->      if (dev->realized) {
-> @@ -3717,7 +3728,15 @@ static void x86_cpu_set_bit_prop(Object *obj, Visitor *v, const char *name,
->          return;
->      }
->  
-> -    visit_type_bool(v, name, &value, &local_err);
-> +    visit_type_str(v, name, &strval, &local_err);
-> +    if (!local_err && !strcmp(strval, "force")) {
-> +        value = true;
-> +        *fp->force_ptr |= fp->mask;
-> +    } else {
-> +        local_err = NULL;
-> +        visit_type_bool(v, name, &value, &local_err);
-> +    }
-> +
->      if (local_err) {
->          error_propagate(errp, local_err);
->          return;
-> @@ -3746,6 +3765,7 @@ static void x86_cpu_release_bit_prop(Object *obj, const char *name,
->  static void x86_cpu_register_bit_prop(X86CPU *cpu,
->                                        const char *prop_name,
->                                        uint32_t *field,
-> +                                      uint32_t *force_field,
->                                        int bitnr)
->  {
->      BitProperty *fp;
-> @@ -3760,6 +3780,7 @@ static void x86_cpu_register_bit_prop(X86CPU *cpu,
->      } else {
->          fp = g_new0(BitProperty, 1);
->          fp->ptr = field;
-> +        fp->force_ptr = force_field;
->          fp->mask = mask;
->          object_property_add(OBJECT(cpu), prop_name, "bool",
->                              x86_cpu_get_bit_prop,
-> @@ -3787,7 +3808,8 @@ static void x86_cpu_register_feature_bit_props(X86CPU *cpu,
->      /* aliases don't use "|" delimiters anymore, they are registered
->       * manually using object_property_add_alias() */
->      assert(!strchr(name, '|'));
-> -    x86_cpu_register_bit_prop(cpu, name, &cpu->env.features[w], bitnr);
-> +    x86_cpu_register_bit_prop(cpu, name, &cpu->env.features[w],
-> +                              &cpu->forced_features[w], bitnr);
->  }
->  
->  static GuestPanicInformation *x86_cpu_get_crash_info(CPUState *cs)
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 07401ad..128530e 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1228,6 +1228,9 @@ struct X86CPU {
->      /* Features that were filtered out because of missing host capabilities */
->      uint32_t filtered_features[FEATURE_WORDS];
->  
-> +    /* Features that are force enabled despite incompatible accel */
-> +    uint32_t forced_features[FEATURE_WORDS];
-> +
->      /* Enable PMU CPUID bits. This can't be enabled by default yet because
->       * it doesn't have ABI stability guarantees, as it passes all PMU CPUID
->       * bits returned by GET_SUPPORTED_CPUID (that depend on host CPU and kernel
-> -- 
-> 1.8.5.6
-> 
+Will Change.
 
--- 
-Eduardo
+>
+>   qdict_put(options, VXHS_OPT_SERVER ".host", qstring_from_str(uri->server));
+>   if (uri->port) {
+>       port = g_strdup_printf("%d", uri->port);
+>       qdict_put(options, VXHS_OPT_SERVER ".port", qstring_from_str(port));
+>       g_free(port);
+>   }
+>
+>> +
+>> +    if (strstr(uri->path, "vxhs") == NULL) {
+>
+> What does this check do?
+>
+
+Not sure about the history, but it's been there since first code
+draft. Will check if it serves any purpose, or remove it.
+
+>> +static int vxhs_open(BlockDriverState *bs, QDict *options,
+>> +                     int bdrv_flags, Error **errp)
+>> +{
+>> +    BDRVVXHSState *s = bs->opaque;
+>> +    void *dev_handlep = NULL;
+>> +    QDict *backing_options = NULL;
+>> +    QemuOpts *opts, *tcp_opts;
+>> +    char *of_vsa_addr = NULL;
+>> +    Error *local_err = NULL;
+>> +    const char *vdisk_id_opt;
+>> +    const char *server_host_opt;
+>> +    char *str = NULL;
+>> +    int ret = 0;
+>> +    char *cacert = NULL;
+>> +    char *client_key = NULL;
+>> +    char *client_cert = NULL;
+>> +
+>> +    ret = vxhs_init_and_ref();
+>> +    if (ret < 0) {
+>> +        return ret;
+>> +    }
+>> +
+>> +    /* Create opts info from runtime_opts and runtime_tcp_opts list */
+>> +    opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+>> +    tcp_opts = qemu_opts_create(&runtime_tcp_opts, NULL, 0, &error_abort);
+>> +
+>> +    qemu_opts_absorb_qdict(opts, options, &local_err);
+>> +    if (local_err) {
+>> +        ret = -EINVAL;
+>> +        goto out;
+>> +    }
+>> +
+>> +    /* vdisk-id is the disk UUID */
+>> +    vdisk_id_opt = qemu_opt_get(opts, VXHS_OPT_VDISK_ID);
+>> +    if (!vdisk_id_opt) {
+>> +        error_setg(&local_err, QERR_MISSING_PARAMETER, VXHS_OPT_VDISK_ID);
+>> +        ret = -EINVAL;
+>> +        goto out;
+>> +    }
+>> +
+>> +    /* vdisk-id may contain a leading '/' */
+>> +    if (strlen(vdisk_id_opt) > UUID_FMT_LEN + 1) {
+>> +        error_setg(&local_err, "vdisk-id cannot be more than %d characters",
+>> +                   UUID_FMT_LEN);
+>> +        ret = -EINVAL;
+>> +        goto out;
+>> +    }
+>> +
+>> +    s->vdisk_guid = g_strdup(vdisk_id_opt);
+>> +    trace_vxhs_open_vdiskid(vdisk_id_opt);
+>> +
+>> +    /* get the 'server.' arguments */
+>> +    str = g_strdup_printf(VXHS_OPT_SERVER".");
+>> +    qdict_extract_subqdict(options, &backing_options, str);
+>
+> g_strdup_printf() is unnecessary.  You can eliminate the 'str' local
+> variable and just do:
+>
+>   qdict_extract_subqdict(options, &backing_options, VXHS_OPT_SERVER ".");
+>
+Will do. Thanks!
+
+>> +
+>> +    qemu_opts_absorb_qdict(tcp_opts, backing_options, &local_err);
+>> +    if (local_err != NULL) {
+>> +        ret = -EINVAL;
+>> +        goto out;
+>> +    }
+>> +
+>> +    server_host_opt = qemu_opt_get(tcp_opts, VXHS_OPT_HOST);
+>> +    if (!server_host_opt) {
+>> +        error_setg(&local_err, QERR_MISSING_PARAMETER,
+>> +                   VXHS_OPT_SERVER"."VXHS_OPT_HOST);
+>> +        ret = -EINVAL;
+>> +        goto out;
+>> +    }
+>> +
+>> +    if (strlen(server_host_opt) > MAXHOSTNAMELEN) {
+>> +        error_setg(&local_err, "server.host cannot be more than %d characters",
+>> +                   MAXHOSTNAMELEN);
+>> +        ret = -EINVAL;
+>> +        goto out;
+>> +    }
+>> +
+>> +    /* check if we got tls-creds via the --object argument */
+>> +    s->tlscredsid = g_strdup(qemu_opt_get(opts, "tls-creds"));
+>> +    if (s->tlscredsid) {
+>> +        vxhs_get_tls_creds(s->tlscredsid, &cacert, &client_key,
+>> +                           &client_cert, &local_err);
+>> +        if (local_err != NULL) {
+>> +            ret = -EINVAL;
+>> +            goto out;
+>> +        }
+>> +        trace_vxhs_get_creds(cacert, client_key, client_cert);
+>> +    }
+>> +
+>> +    s->vdisk_hostinfo.host = g_strdup(server_host_opt);
+>> +    s->vdisk_hostinfo.port = g_ascii_strtoll(qemu_opt_get(tcp_opts,
+>> +                                                          VXHS_OPT_PORT),
+>> +                                                          NULL, 0);
+>> +
+>> +    trace_vxhs_open_hostinfo(s->vdisk_hostinfo.host,
+>> +                             s->vdisk_hostinfo.port);
+>> +
+>> +    of_vsa_addr = g_strdup_printf("of://%s:%d",
+>> +                                  s->vdisk_hostinfo.host,
+>> +                                  s->vdisk_hostinfo.port);
+>> +
+>> +    /*
+>> +     * Open qnio channel to storage agent if not opened before
+>> +     */
+>> +    dev_handlep = iio_open(of_vsa_addr, s->vdisk_guid, 0,
+>> +                           cacert, client_key, client_cert);
+>> +    if (dev_handlep == NULL) {
+>> +        trace_vxhs_open_iio_open(of_vsa_addr);
+>> +        ret = -ENODEV;
+>> +        goto out;
+>> +    }
+>> +    s->vdisk_hostinfo.dev_handle = dev_handlep;
+>> +
+>> +out:
+>> +    g_free(str);
+>> +    g_free(of_vsa_addr);
+>> +    QDECREF(backing_options);
+>> +    qemu_opts_del(tcp_opts);
+>> +    qemu_opts_del(opts);
+>> +    g_free(cacert);
+>> +    g_free(client_key);
+>> +    g_free(client_cert);
+>> +
+>> +    if (ret < 0) {
+>> +        vxhs_unref();
+>> +        error_propagate(errp, local_err);
+>> +        g_free(s->vdisk_hostinfo.host);
+>> +        g_free(s->vdisk_guid);
+>> +        g_free(s->tlscredsid);
+>> +        s->vdisk_guid = NULL;
+>> +        errno = -ret;
+>
+> .bdrv_open() does not promise anything about errno.  This line can be
+> dropped.
+>
+Will do.
+
+>> +    }
+>> +
+>> +    return ret;
+>> +}
+>> +
+>> +static const AIOCBInfo vxhs_aiocb_info = {
+>> +    .aiocb_size = sizeof(VXHSAIOCB)
+>> +};
+>> +
+>> +/*
+>> + * This allocates QEMU-VXHS callback for each IO
+>> + * and is passed to QNIO. When QNIO completes the work,
+>> + * it will be passed back through the callback.
+>> + */
+>> +static BlockAIOCB *vxhs_aio_rw(BlockDriverState *bs, int64_t sector_num,
+>> +                               QEMUIOVector *qiov, int nb_sectors,
+>> +                               BlockCompletionFunc *cb, void *opaque,
+>> +                               VDISKAIOCmd iodir)
+>> +{
+>> +    VXHSAIOCB *acb = NULL;
+>> +    BDRVVXHSState *s = bs->opaque;
+>> +    size_t size;
+>> +    uint64_t offset;
+>> +    int iio_flags = 0;
+>> +    int ret = 0;
+>> +    void *dev_handle = s->vdisk_hostinfo.dev_handle;
+>> +
+>> +    offset = sector_num * BDRV_SECTOR_SIZE;
+>> +    size = nb_sectors * BDRV_SECTOR_SIZE;
+>> +    acb = qemu_aio_get(&vxhs_aiocb_info, bs, cb, opaque);
+>> +
+>> +    /*
+>> +     * Initialize VXHSAIOCB.
+>> +     */
+>> +    acb->err = 0;
+>> +    acb->qiov = qiov;
+>
+> This field is unused, please remove it.
+>
+Yes! Thanks!
+
+>> +static BlockDriver bdrv_vxhs = {
+>> +    .format_name                  = "vxhs",
+>> +    .protocol_name                = "vxhs",
+>> +    .instance_size                = sizeof(BDRVVXHSState),
+>> +    .bdrv_file_open               = vxhs_open,
+>> +    .bdrv_parse_filename          = vxhs_parse_filename,
+>> +    .bdrv_close                   = vxhs_close,
+>> +    .bdrv_getlength               = vxhs_getlength,
+>> +    .bdrv_aio_readv               = vxhs_aio_readv,
+>> +    .bdrv_aio_writev              = vxhs_aio_writev,
+>
+> Missing .bdrv_aio_flush().  Does VxHS promise that every completed write
+> request is persistent?
+>
+
+Yes, every acknowledged write request is persistent.
+
+> In that case it may be better to disable the emulated disk write cache
+> so the guest operating system and application know not to send flush
+> commands.
+
+We do pass "cache=none" on the qemu command line for every block
+device. Are there any other code changes necessary? Any pointers will
+help.
+
+Thanks,
+Ashish
