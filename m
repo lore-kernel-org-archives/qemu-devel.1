@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1csp3G-0006lq-8g
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:12:39 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1csp4A-0007Vc-Bz
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:13:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1csp3C-0004Gv-5K
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:12:38 -0400
-Received: from lhrrgout.huawei.com ([194.213.3.17]:9494)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1csp3B-0004Ez-PY
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:12:34 -0400
-References: <1490271635-19049-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1490271635-19049-2-git-send-email-pradeep.jagadeesh@huawei.com>
-	<29981b93-8870-eab7-bbc7-263448efb2ab@redhat.com>
-From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-Message-ID: <43d6c377-4c54-5c19-4d00-696c4f124a2b@huawei.com>
-Date: Tue, 28 Mar 2017 13:11:58 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1csp49-0004mU-Dw
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:13:34 -0400
+Date: Tue, 28 Mar 2017 12:13:15 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170328111315.GF2509@work-vm>
+References: <20170225193155.447462-1-vsementsov@virtuozzo.com>
+	<20170225193155.447462-4-vsementsov@virtuozzo.com>
+	<20170307095323.GB5871@noname.str.redhat.com>
+	<20170328105544.GE2509@work-vm>
+	<20170328110900.GB11725@noname.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <29981b93-8870-eab7-bbc7-263448efb2ab@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2 v1] throttle: factor out the redundant
- code
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170328110900.GB11725@noname.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/4] savevm: fix savevm after migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,174 +26,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, Greg Kurz <groug@kaod.org>
-Cc: Alberto Garcia <berto@igalia.com>, Jani Kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, quintela@redhat.com, mreitz@redhat.com, peter.maydell@linaro.org, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
 
-On 3/23/2017 3:46 PM, Eric Blake wrote:
-> On 03/23/2017 07:20 AM, Pradeep Jagadeesh wrote:
->> This patchset removes the throttle redundant code that was present
->> in block and fsdev files.
->>
->> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
->> ---
->
-> I think you want portions of this patch to come first; you want to
-> refactor out the IOThrottle portion of existing types, and then extend
-> IOThrottle to be used in more places.
-OK, I will do that.
->
->>  blockdev.c                      | 106 ++++-----------------------------------
->>  fsdev/Makefile.objs             |   1 +
->>  fsdev/qemu-fsdev-throttle.c     |  94 +---------------------------------
->>  fsdev/qemu-fsdev-throttle.h     |   3 +-
->>  hmp.c                           |  39 +++++++--------
->>  include/qemu/throttle-options.h |   5 ++
->>  qapi/block-core.json            |  76 +---------------------------
->>  qapi/iothrottle.json            |   4 +-
->>  util/Makefile.objs              |   1 +
->>  util/throttle-options.c         | 108 ++++++++++++++++++++++++++++++++++++++++
->>  10 files changed, 151 insertions(+), 286 deletions(-)
->>  create mode 100644 util/throttle-options.c
->>
->
->> +++ b/fsdev/qemu-fsdev-throttle.c
->> @@ -33,56 +33,7 @@ void fsdev_set_io_throttle(IOThrottle *arg, FsThrottle *fst, Error **errp)
->>  {
->>      ThrottleConfig cfg;
->>
->> -    throttle_config_init(&cfg);
->> -    cfg.buckets[THROTTLE_BPS_TOTAL].avg = arg->bps;
->> -    cfg.buckets[THROTTLE_BPS_READ].avg  = arg->bps_rd;
->> -    cfg.buckets[THROTTLE_BPS_WRITE].avg = arg->bps_wr;
->> -
->
-> This code was added in the last patch - which makes for a lot of
-> unnecessary churn.  Again, the best series does refactoring of existing
-> code first, then adds the new code that takes advantage of the
-> refactored entry points, so that the new code isn't churning.
->
-OK
->
->> +++ b/hmp.c
->> @@ -1554,20 +1554,25 @@ void hmp_change(Monitor *mon, const QDict *qdict)
->>      hmp_handle_error(mon, &err);
->>  }
->>
->> +static void hmp_initialize_io_throttle(IOThrottle *iot, const QDict *qdict)
->> +{
->> +    iot->has_device = true;
->> +    iot->device = (char *) qdict_get_str(qdict, "device");
->
-> Is casting away const going to result in a double free of memory later
-> on?  Or put another way, should this be a g_strdup'd copy (which you
-> then have to make sure is not leaked)?
-This code was there in block_set_io_throttle(). I have just moved to new 
-function. But I will think about it.
->
->> +    iot->bps = qdict_get_int(qdict, "bps");
->> +    iot->bps_rd = qdict_get_int(qdict, "bps_rd");
->> +    iot->bps_wr = qdict_get_int(qdict, "bps_wr");
->> +    iot->iops = qdict_get_int(qdict, "iops");
->> +    iot->iops_rd = qdict_get_int(qdict, "iops_rd");
->> +    iot->iops_wr = qdict_get_int(qdict, "iops_wr");
->> +}
->> +
->>  void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict)
->>  {
->>      Error *err = NULL;
->> -    BlockIOThrottle throttle = {
->> -        .has_device = true,
->> -        .device = (char *) qdict_get_str(qdict, "device"),
->
-> At any rate, I see it is just code motion.  You are refactoring too much
-> in one patch here; I'd consider splitting it along the lines of one
-> patch that adds hmp_initialize_io_throttle; and another patch that adds
-> parse_io_throttle_options(), so that it's easier to see just one piece
-> of code motion at a time, rather than trying to track multiple motions
-> in the same large patch.
-I will split the code into different patches.
->
->> +++ b/qapi/block-core.json
->> @@ -1758,86 +1758,14 @@
->>  #
->>  # A set of parameters describing block throttling.
->>  #
->
->> -# @iops_size: an I/O size in bytes (Since 1.7)
->> +# @iothrottle: throttle configuration (Since 1.7)
->
-> NACK. This is an incompatible change; you are breaking the QMP wire
-> structure (that is, where I used to pass "arguments":{"device":"foo",
-> "bps_rd":1, "group":"bar" }, your change would now require me to pass
-> "arguments":{"iothrottle":{"device":"foo", "bps_rd":1}, "group":"bar"};
-> the extra nesting is what breaks things).
->
->>  #
->>  # @group: throttle group name (Since 2.4)
->>  #
->>  # Since: 1.1
->>  ##
->>  { 'struct': 'BlockIOThrottle',
->> -  'data': { '*device': 'str', '*id': 'str', 'bps': 'int', 'bps_rd': 'int',
->> -            'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int', 'iops_wr': 'int',
->> -            '*bps_max': 'int', '*bps_rd_max': 'int',
->> -            '*bps_wr_max': 'int', '*iops_max': 'int',
->> -            '*iops_rd_max': 'int', '*iops_wr_max': 'int',
->> -            '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
->> -            '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
->> -            '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
->> -            '*iops_size': 'int', '*group': 'str' } }
->> +  'data': { '*iothrottle': 'IOThrottle', '*group': 'str' } }
->
-> What you REALLY want is a compatible change, namely:
->
-> { 'struct': 'BlockIOThrottle', 'base': 'IOThrottle',
->   'data': { '*group': 'str' } }
->
-> which says that all fields of IOThrottle are inherited at the same level
-> as the additional field 'group'.
->
-> For that matter, are you sure that 'group' is the only field that should
-> not be directly in IOThrottle, or should 'device' also be specific to
-> BlockIOThrottle (I'm not sure whether you were actually using 'device'
-> in the fsdev case, or if 'id' was sufficient).
+* Kevin Wolf (kwolf@redhat.com) wrote:
+> Am 28.03.2017 um 12:55 hat Dr. David Alan Gilbert geschrieben:
+> > * Kevin Wolf (kwolf@redhat.com) wrote:
+> > > Am 25.02.2017 um 20:31 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> > > > After migration all drives are inactive and savevm will fail with
+> > > > 
+> > > > qemu-kvm: block/io.c:1406: bdrv_co_do_pwritev:
+> > > >    Assertion `!(bs->open_flags & 0x0800)' failed.
+> > > > 
+> > > > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> > > 
+> > > What's the exact state you're in? I tried to reproduce this, but just
+> > > doing a live migration and then savevm on the destination works fine for
+> > > me.
+> > > 
+> > > Hm... Or do you mean on the source? In that case, I think the operation
+> > > must fail, but of course more gracefully than now.
+> > > 
+> > > Actually, the question that you're asking implicitly here is how the
+> > > source qemu process should be "reactivated" after a failed migration.
+> > > Currently, as far as I know, this is only with issuing a "cont" command.
+> > > It might make sense to provide a way to get control without resuming the
+> > > VM, but I doubt that adding automatic resume to every QMP command is the
+> > > right way to achieve it.
+> > > 
+> > > Dave, Juan, what do you think?
+> > 
+> > I'd only ever really thought of 'cont' or retrying the migration.
+> > However, it does make sense to me that you might want to do a savevm
+> > instead; if you can't migrate then perhaps a savevm is the best you
+> > can do before your machine dies.  Are there any other things that
+> > should be allowed?
+> 
+> I think we need to ask the other way round: Any reason _not_ to allow
+> certain operations that you can normally perform on a stopped VM?
+> 
+> > We would want to be careful not to accidentally reactivate the disks
+> > on the source after what was actually a succesful migration.
+> 
+> Yes, that's exactly my concern, even with savevm. That's why I suggested
+> we could have a 'cont'-like thing that just gets back control of the
+> images and moves into the normal paused state, but doesn't immediately
+> resume the actual VM.
 
-Yes, I just need id in case of fsdev. I will fix that. But if I do this 
-way, some of the code refactoring is not possible.Because they will have 
-different structures for fsdev and block.
->
->>
->>  ##
->>  # @block-stream:
->> diff --git a/qapi/iothrottle.json b/qapi/iothrottle.json
->> index f7b615d..58f4520 100644
->> --- a/qapi/iothrottle.json
->> +++ b/qapi/iothrottle.json
->> @@ -14,6 +14,8 @@
->>  #
->>  # @device: Block device name
->>  #
->> +# @id: The name or QOM path of the guest device (since: 2.8)
->> +#
->
-> You've missed 2.8 by a long shot.  Oh - this is an argument that it is
-> 'id' (and not 'device') that does not belong here, but should be placed
-> alongside 'group' in the BlockIOThrottle subtype.
-id is required for the fsdev/block both. This was part of the 
-BlockIOThrottle. So I just took it and kept the description as it is.
-What should I changed to? 2.10?
->
->>  # @bps: total throughput limit in bytes per second
->>  #
->>  # @bps_rd: read throughput limit in bytes per second
->> @@ -80,7 +82,7 @@
->>  # Since: 2.10
->>  ##
->>  { 'struct': 'IOThrottle',
->> -  'data': { '*device': 'str', 'bps': 'int', 'bps_rd': 'int',
->> +  'data': { '*device': 'str', '*id': 'str', 'bps': 'int', 'bps_rd': 'int',
->>              'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int', 'iops_wr': 'int',
->>              '*bps_max': 'int', '*bps_rd_max': 'int',
->>              '*bps_wr_max': 'int', '*iops_max': 'int',
->
->
+OK, lets say we had that block-reactivate (for want of a better name),
+how would we stop everything asserting if the user tried to do it 
+before they'd run block-reactivate?
+
+Dave
+
+> Kevin
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
