@@ -1,42 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1csmIt-00036p-HE
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:16:36 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1csmKJ-00044N-2V
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:18:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1csmIp-00027F-GW
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:16:35 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32934
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1csmIp-00026O-9b
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:16:31 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2S83p6s027049
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 04:16:30 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 29fkw7rwgk-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 04:16:30 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Tue, 28 Mar 2017 09:16:28 +0100
-Date: Tue, 28 Mar 2017 10:16:23 +0200
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <20170322023422.GP10704@bjsdjshi@linux.vnet.ibm.com>
-References: <20170317031743.40128-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170317031743.40128-15-bjsdjshi@linux.vnet.ibm.com>
-	<20170321124716.19f90fd6@t450s.home>
-	<20170322023422.GP10704@bjsdjshi@linux.vnet.ibm.com>
+	(envelope-from <dgilbert@redhat.com>) id 1csmKF-0002q6-1Z
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:18:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44648)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1csmKE-0002oM-Ot
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:17:58 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D3A50C05091A
+	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 08:17:57 +0000 (UTC)
+Date: Tue, 28 Mar 2017 09:17:54 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170328081753.GA2509@work-vm>
+References: <1490092792-30957-1-git-send-email-thuth@redhat.com>
+	<1490092792-30957-3-git-send-email-thuth@redhat.com>
+	<20170327142421.GF2373@work-vm>
+	<95bf59af-beeb-74bf-7819-f2a770b64263@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170328101623.1b07cf1f.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v4 14/16] docs: add documentation for
- vfio-ccw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <95bf59af-beeb-74bf-7819-f2a770b64263@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] libqtest: Add a generic function to
+ run a callback function for every machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,89 +36,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Wed, 22 Mar 2017 10:34:22 +0800
-Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-
-> * Alex Williamson <alex.williamson@redhat.com> [2017-03-21 12:47:16 -0600]:
-> 
+* Thomas Huth (thuth@redhat.com) wrote:
+> On 27.03.2017 16:24, Dr. David Alan Gilbert wrote:
+> > * Thomas Huth (thuth@redhat.com) wrote:
+> >> Some tests need to run single tests for every available machine of the
+> >> current QEMU binary. To avoid code duplication, let's extract this
+> >> code that deals with 'query-machines' into a separate function.
+> >>
+> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > 
+> > Having queued it, it's failing my test.
+> > 
+> > The reason is that qom-tests.c has a blacklist which blacklists Xen;
+> > however your new generic function doesn't have the blacklist, so when
+> > you run HMP commands on all machines it tries to run it on Xen since
+> > my PC has the Xen libraries installed (so builds with Xen support) but
+> > isn't a Xen guest.
+> > 
+> > It fails with:
+> > xen be core: xen be core: can't connect to xenstored
+> > can't connect to xenstored
+> > xen_init_pv: xen backend core setup failed
+> > Broken pipe
+> > 
+> > I suggest you probably need to share the blacklist as well.
+> > 
+> > (Unqueued)
+> > 
+> > Dave
+> > 
+> >> ---
+> >>  tests/libqtest.c    | 30 +++++++++++++++++
+> >>  tests/libqtest.h    |  8 +++++
+> >>  tests/pc-cpu-test.c | 95 ++++++++++++++++++++---------------------------------
+> >>  tests/qom-test.c    | 36 ++++----------------
+> >>  4 files changed, 80 insertions(+), 89 deletions(-)
+> >>
+> >> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> >> index c9b2d76..d8b8066 100644
+> >> --- a/tests/libqtest.c
+> >> +++ b/tests/libqtest.c
+> >> @@ -938,3 +938,33 @@ bool qtest_big_endian(QTestState *s)
+> >>  {
+> >>      return s->big_endian;
+> >>  }
+> >> +
+> >> +void qtest_cb_for_every_machine(void (*cb)(const char *machine))
+> >> +{
+> >> +    QDict *response, *minfo;
+> >> +    QList *list;
+> >> +    const QListEntry *p;
+> >> +    QObject *qobj;
+> >> +    QString *qstr;
+> >> +    const char *mname;
+> >> +
+> >> +    qtest_start("-machine none");
+> >> +    response = qmp("{ 'execute': 'query-machines' }");
+> >> +    g_assert(response);
+> >> +    list = qdict_get_qlist(response, "return");
+> >> +    g_assert(list);
+> >> +
+> >> +    for (p = qlist_first(list); p; p = qlist_next(p)) {
+> >> +        minfo = qobject_to_qdict(qlist_entry_obj(p));
+> >> +        g_assert(minfo);
+> >> +        qobj = qdict_get(minfo, "name");
+> >> +        g_assert(qobj);
+> >> +        qstr = qobject_to_qstring(qobj);
+> >> +        g_assert(qstr);
+> >> +        mname = qstring_get_str(qstr);
+> >> +        cb(mname);
+> >> +    }
+> >> +
+> >> +    qtest_end();
+> >> +    QDECREF(response);
+> >> +}
 > [...]
+> >> diff --git a/tests/qom-test.c b/tests/qom-test.c
+> >> index d48f890..ab0595d 100644
+> >> --- a/tests/qom-test.c
+> >> +++ b/tests/qom-test.c
+> >> @@ -107,46 +107,22 @@ static void test_machine(gconstpointer data)
+> >>      g_free((void *)machine);
+> >>  }
+> >>  
+> >> -static void add_machine_test_cases(void)
+> >> +static void add_machine_test_case(const char *mname)
+> >>  {
+> >>      const char *arch = qtest_get_arch();
+> >> -    QDict *response, *minfo;
+> >> -    QList *list;
+> >> -    const QListEntry *p;
+> >> -    QObject *qobj;
+> >> -    QString *qstr;
+> >> -    const char *mname;
+> >>  
+> >> -    qtest_start("-machine none");
+> >> -    response = qmp("{ 'execute': 'query-machines' }");
+> >> -    g_assert(response);
+> >> -    list = qdict_get_qlist(response, "return");
+> >> -    g_assert(list);
+> >> -
+> >> -    for (p = qlist_first(list); p; p = qlist_next(p)) {
+> >> -        minfo = qobject_to_qdict(qlist_entry_obj(p));
+> >> -        g_assert(minfo);
+> >> -        qobj = qdict_get(minfo, "name");
+> >> -        g_assert(qobj);
+> >> -        qstr = qobject_to_qstring(qobj);
+> >> -        g_assert(qstr);
+> >> -        mname = qstring_get_str(qstr);
+> >> -        if (!is_blacklisted(arch, mname)) {
+> >> -            char *path = g_strdup_printf("qom/%s", mname);
+> >> -            qtest_add_data_func(path, g_strdup(mname), test_machine);
+> >> -            g_free(path);
+> >> -        }
+> >> +    if (!is_blacklisted(arch, mname)) {
+> >> +        char *path = g_strdup_printf("qom/%s", mname);
+> >> +        qtest_add_data_func(path, g_strdup(mname), test_machine);
+> >> +        g_free(path);
+> >>      }
 > 
-> > > +vfio-ccw I/O region
-> > > +-------------------
-> > > +
-> > > +An I/O region is used to accept channel program request from user
-> > > +space and store I/O interrupt result for user space to retrieve. The
-> > > +defination of the region is:
-> > > +
-> > > +struct ccw_io_region {
-> > > +#define ORB_AREA_SIZE 12
-> > > +	__u8	orb_area[ORB_AREA_SIZE];
-> > > +#define SCSW_AREA_SIZE 12
-> > > +	__u8	scsw_area[SCSW_AREA_SIZE];
-> > > +#define IRB_AREA_SIZE 96
-> > > +	__u8	irb_area[IRB_AREA_SIZE];
-> > > +	__u32	ret_code;
-> > > +} __packed;
-> > > +
-> > > +While starting an I/O request, orb_area should be filled with the
-> > > +guest ORB, and scsw_area should be filled with the SCSW of the Virtual
-> > > +Subchannel.
-> > > +
-> > > +irb_area stores the I/O result.
-> > > +
-> > > +ret_code stores a return code for each access of the region.
-> Hi Alex,
-> 
-> > 
-> > Pardon if these questions expose my lack of familiarity with S390:
-> > 
-> > So I/O requests are asynchronous, the user is notified via interrupt
-> > when completed, can more than one request be queued at a time?
-> The answer is no. The subchannel will stay in a state that prohibiting
-> from a new request if there is processing for a previous request
-> ongoing. And we need to issue an explit I/O instruction to retrieve and
-> (or) clear the pending interruption before issue another I/O request.
-> 
-> > The communication format doesn't seem like it'd easily support that.
-> > Is it possible?  A future enhancement that we should design for now?
-> As the above statements said, it's not possible.
-> 
-> > 
-> > I'm also a little unclear what sort of I/O a user has access to via
-> > this interface and how the kernel polices that access. For instance,
-> > are multiple tape or disk devices available through a single I/O
-> > channel?
-> No. An I/O subchannel is dedicated to one device, and...
-> 
-> > How does the user configure which devices a user has access to when
-> > creating the vfio-ccw device?
-> ...this mapping is usually determined/configured before the machine
-> startup by the administrtor of the upper level hypervisor. So when
-> creating the vfio-ccw device, we do not configure/modify this mapping.
-> When the guest I/O subchannel driver probing, it will issue a SENSE
-> command on the subchannel to recognize/find what kind of device is
-> behind the subchannel, and then it uses corresponding CCW device driver
-> serving the I/O device.
-> 
-> @Conny, please correct me if my understanding is not right.
+> Not sure what is going wrong here ... the "!is_blacklisted" check is
+> still here, so why is it trying to start a xen machine here?
 
-No, it's fine.
+I don't think it's this test that fails, I think it's the new one you add
+in the last patch but for the same reason.
 
-FWIW:
-https://virtualpenguins.blogspot.com/2017/02/channel-io-demystified.html
+> Looks like I need to install those xen libraries here, too ...
 
-(I plan to write more in the future.)
+I think it's xen-libs and xen-devel you need.
+
+Dave
 
 > 
-> > 
-> > Otherwise I think the interface looks great.  Thanks,
-> This is good news. :>
+>  Thomas
 > 
-> Thanks!
-> > 
-> > Alex
-> > 
-> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
