@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40396)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cst32-0007ip-7C
+	(envelope-from <dgilbert@redhat.com>) id 1cst32-0007jN-Jo
 	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 11:28:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cst2y-00073U-4E
+	(envelope-from <dgilbert@redhat.com>) id 1cst31-00074P-Ot
 	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 11:28:40 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:38182
-	helo=v2201612906741603.powersrv.de)
+Received: from mx1.redhat.com ([209.132.183.28]:33124)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1cst2x-00072Y-UM
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 11:28:36 -0400
-References: <1490707129-12622-1-git-send-email-peter.maydell@linaro.org>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <8c1e5775-b088-0270-a919-588e074ff70b@weilnetz.de>
-Date: Tue, 28 Mar 2017 17:28:34 +0200
-MIME-Version: 1.0
-In-Reply-To: <1490707129-12622-1-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.9] configure: Don't claim
- 'unsupported host OS' when better message available
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cst31-000742-HZ
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 11:28:39 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9DF3CC03BD5A
+	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 15:28:38 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Tue, 28 Mar 2017 16:27:44 +0100
+Message-Id: <20170328152745.28186-6-dgilbert@redhat.com>
+In-Reply-To: <20170328152745.28186-1-dgilbert@redhat.com>
+References: <20170328152745.28186-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH 5/6] migration/announce: Document self-announce
+ mechanism
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +30,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: qemu-devel@nongnu.org, quintela@redhat.com, lvivier@redhat.com
+Cc: kashyap@redhat.com, germano@redhat.com, armbru@redhat.com, jasowang@redhat.com, jdenemar@redhat.com
 
-Am 28.03.2017 um 15:18 schrieb Peter Maydell:
-> The change in commit 898be3e0415c6d which made completely
-> unrecognized OSes cause an error_exit "Unsupported host OS"
-> has some unfortunate unintended effects:
->  * if you run 'configure --help' on an unsupported host OS
->    (eg if intending to use it as a build machine for a
->    cross compile to a supported host) then the message
->    is printed instead of --help
->  * if the C compiler doesn't work or is missing (eg if
->    you passed an incorrect --cross-prefix by mistake)
->    the message is printed instead of the more useful
->    'compiler does not exist or does not work' message
->
-> Fix this by postponing the error_exit in this situation
-> until later, when we have already identified the more
-> useful cases for this.
->
-> The long term fix for this would be to move handling
-> of --help much further up in the configure script,
-> and make its output not dependent on checks that configure
-> runs. However for 2.9 this would be too invasive.
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-That's true.
+Explain the timings and differences between the ARP and RARP
+streams we send.
 
-> Reported-by: Stefan Weil <sw@weilnetz.de>
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  configure | 14 +++++++++++++-
->  1 file changed, 13 insertions(+), 1 deletion(-)
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ docs/migration.txt | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
-Reviewed-by: Stefan Weil <sw@weilnetz.de>
-Tested-by: Stefan Weil <sw@weilnetz.de>
-
-Thanks.
-Stefan
+diff --git a/docs/migration.txt b/docs/migration.txt
+index 1b940a8..6f939e1 100644
+--- a/docs/migration.txt
++++ b/docs/migration.txt
+@@ -553,3 +553,43 @@ Postcopy now works with hugetlbfs backed memory:
+      hugepages works well, however 1GB hugepages are likely to be problematic
+      since it takes ~1 second to transfer a 1GB hugepage across a 10Gbps link,
+      and until the full page is transferred the destination thread is blocked.
++
++== Network self announce ==
++
++At the end of a migration QEMU sends a sequence of packets to 'announce' the VMs
++arrival on the new host in the hope that the L2 network will notice and start
++sending the packets to it.  This, 'self-announce' is split into two parts that
++happens at slightly different times:
++
++  a) RARP - a RARP sequence is sent when the last of the device data has been
++     received but before the guest CPUs are started.  Note that when -S is used
++     to stop QEMU starting the CPUs automatically, the RARPs are still sent
++     at the point where the device data is received and the guest CPUs are ready
++     to be started.
++
++  b) ARPs - for guests with virtio NICs and drivers new enough to support the
++     GUEST_ANNOUNCE feature, the guests are told to emit gratuitous ARPs just
++     after the guest CPUs are started after an incoming migration. Note the
++     packets are generated by the guest itself and have the advantage of knowing
++     the guests IP address.
++
++The two sets may overlap.
++
++In both cases a stream of packets are sent, the number and timing can be
++configured using the announce* migration parameters, which must be set prior
++to the end of the incoming migration.
++
++    <P> di <P> di+ds <P> di+2*ds <P> ..... <P>
++
++  'announce-rounds' packets are sent.
++  The gap between the 1st and 2nd packet is 'announce-initial'.
++  The gap between the 2nd and 3rd packet is increased by 'announce-step'
++  A maximum can be set such that the gap between subsequent packets stops
++  increasing.
++
++  The default is:
++   <P> 50ms <P> 150ms <P> 250ms <P> 350ms <P>
++
++Some complex network systems may take longer than this to reconfigure
++and thus it may be useful to increase the count or delays.
++
+-- 
+2.9.3
