@@ -1,15 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1csune-0006uv-6o
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 13:20:55 -0400
+	(envelope-from <agraf@suse.de>) id 1csurM-0008CX-WF
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 13:24:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1csund-0002Dp-EI
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 13:20:54 -0400
-From: Eric Auger <eric.auger@redhat.com>
-Date: Tue, 28 Mar 2017 19:20:40 +0200
-Message-Id: <1490721640-13052-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] hw/intc/arm_gicv3_kvm: Check
- KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS in reset
+	(envelope-from <agraf@suse.de>) id 1csurM-0004A7-6s
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 13:24:44 -0400
+References: <1487850673-26455-1-git-send-email-vijay.kilari@gmail.com>
+	<1487850673-26455-6-git-send-email-vijay.kilari@gmail.com>
+	<CAFEAcA-wQwM=g-geopcn+9Y28UL22ugTWKwUOqmdbV=YD5Q1Rg@mail.gmail.com>
+From: Alexander Graf <agraf@suse.de>
+Message-ID: <f25cd84c-30d4-5e57-aec5-dd37b84a1a6f@suse.de>
+Date: Tue, 28 Mar 2017 19:24:36 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-wQwM=g-geopcn+9Y28UL22ugTWKwUOqmdbV=YD5Q1Rg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v9 5/5] hw/intc/arm_gicv3_kvm: Reset GICv3
+ cpu interface registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,61 +25,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: vijay.kilari@gmail.com, Vijaya.Kumar@cavium.com, drjones@redhat.com, christoffer.dall@linaro.org, bjsprakash.linux@gmail.com, bprakash@caviumnetworks.com, sgoutham@cavium.com
+To: Peter Maydell <peter.maydell@linaro.org>, Vijay Kilari <vijay.kilari@gmail.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Pavel Fedin <p.fedin@samsung.com>, QEMU Developers <qemu-devel@nongnu.org>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, Eric Auger <eric.auger@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Christoffer Dall <christoffer.dall@linaro.org>
 
-KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS needs to be checked before
-attempting to read ICC_CTLR_EL1; otherwise kernel versions not
-exposing this kvm device group will be incompatible with qemu 2.9.
+On 02/23/2017 07:37 PM, Peter Maydell wrote:
+> On 23 February 2017 at 11:51,  <vijay.kilari@gmail.com> wrote:
+>> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+>>
+>> Reset CPU interface registers of GICv3 when CPU is reset.
+>> For this, ARMCPRegInfo struct is registered with one ICC
+>> register whose resetfn is called when cpu is reset.
+>>
+>> All the ICC registers are reset under one single register
+>> reset function instead of calling resetfn for each ICC
+>> register.
+>>
+>> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+>> ---
+>>   hw/intc/arm_gicv3_kvm.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 60 insertions(+)
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Fixes: 07a5628  ("hw/intc/arm_gicv3_kvm: Reset GICv3 cpu interface registers")
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reported-by: Prakash B <bjsprakash.linux@gmail.com>
+This patch breaks execution on 4.4 (SLES12 SP2) for me:
 
----
-v1 -> v2:
-- use migration_blocker instead of kvm_device_check_attr
+$ ./aarch64-softmmu/qemu-system-aarch64 -nographic -M 
+virt,gic-version=host -enable-kvm -cpu host -kernel /boot/Image
+qemu-system-aarch64: KVM_GET_DEVICE_ATTR failed: No such device or address
+Group 6 attr 0x000000000000c664
+Aborted (core dumped)
 
-I understand the ICC_CTLR_EL1 state only is used in the put() function
-which is used for migration
----
- hw/intc/arm_gicv3_kvm.c | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
+If I revert it, it works again. Is that device attr something only newer 
+kernels received? In that case, it needs to be guarded by a capability 
+check.
 
-diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-index 81f0403..19aab56 100644
---- a/hw/intc/arm_gicv3_kvm.c
-+++ b/hw/intc/arm_gicv3_kvm.c
-@@ -614,12 +614,6 @@ static void arm_gicv3_icc_reset(CPUARMState *env, const ARMCPRegInfo *ri)
-     s = c->gic;
-     cpu = ARM_CPU(c->cpu);
- 
--    /* Initialize to actual HW supported configuration */
--    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
--                      KVM_VGIC_ATTR(ICC_CTLR_EL1, cpu->mp_affinity),
--                      &c->icc_ctlr_el1[GICV3_NS], false);
--
--    c->icc_ctlr_el1[GICV3_S] = c->icc_ctlr_el1[GICV3_NS];
-     c->icc_pmr_el1 = 0;
-     c->icc_bpr[GICV3_G0] = GIC_MIN_BPR;
-     c->icc_bpr[GICV3_G1] = GIC_MIN_BPR;
-@@ -628,6 +622,17 @@ static void arm_gicv3_icc_reset(CPUARMState *env, const ARMCPRegInfo *ri)
-     c->icc_sre_el1 = 0x7;
-     memset(c->icc_apr, 0, sizeof(c->icc_apr));
-     memset(c->icc_igrpen, 0, sizeof(c->icc_igrpen));
-+
-+    if (s->migration_blocker) {
-+        return;
-+    }
-+
-+    /* Initialize to actual HW supported configuration */
-+    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
-+                      KVM_VGIC_ATTR(ICC_CTLR_EL1, cpu->mp_affinity),
-+                      &c->icc_ctlr_el1[GICV3_NS], false);
-+
-+    c->icc_ctlr_el1[GICV3_S] = c->icc_ctlr_el1[GICV3_NS];
- }
- 
- static void kvm_arm_gicv3_reset(DeviceState *dev)
--- 
-2.5.5
+
+Alex
