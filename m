@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1csqze-00046q-A2
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:17:05 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1csr1U-0004f4-UO
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:18:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1csqza-0003si-0V
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:17:02 -0400
-References: <20170225193155.447462-1-vsementsov@virtuozzo.com>
-	<20170225193155.447462-4-vsementsov@virtuozzo.com>
-	<20170307095323.GB5871@noname.str.redhat.com>
-	<20170328105544.GE2509@work-vm>
-	<20170328110900.GB11725@noname.redhat.com>
-	<20170328111315.GF2509@work-vm>
-	<20170328120900.GC11725@noname.redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <4ed9821c-d19e-70fe-c7e5-fc89756b59f5@virtuozzo.com>
-Date: Tue, 28 Mar 2017 16:16:37 +0300
-MIME-Version: 1.0
-In-Reply-To: <20170328120900.GC11725@noname.redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/4] savevm: fix savevm after migration
+	(envelope-from <pm215@archaic.org.uk>) id 1csr1Q-0004bG-Oh
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:18:56 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48958)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1csr1Q-0004aZ-Hy
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:18:52 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 28 Mar 2017 14:18:49 +0100
+Message-Id: <1490707129-12622-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH for-2.9] configure: Don't claim 'unsupported
+ host OS' when better message available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +23,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, quintela@redhat.com, mreitz@redhat.com, peter.maydell@linaro.org, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Stefan Weil <sw@weilnetz.de>
 
-28.03.2017 15:09, Kevin Wolf wrote:
-> Am 28.03.2017 um 13:13 hat Dr. David Alan Gilbert geschrieben:
->> * Kevin Wolf (kwolf@redhat.com) wrote:
->>> Am 28.03.2017 um 12:55 hat Dr. David Alan Gilbert geschrieben:
->>>> * Kevin Wolf (kwolf@redhat.com) wrote:
->>>>> Am 25.02.2017 um 20:31 hat Vladimir Sementsov-Ogievskiy geschrieben:
->>>>>> After migration all drives are inactive and savevm will fail with
->>>>>>
->>>>>> qemu-kvm: block/io.c:1406: bdrv_co_do_pwritev:
->>>>>>     Assertion `!(bs->open_flags & 0x0800)' failed.
->>>>>>
->>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>>> What's the exact state you're in? I tried to reproduce this, but just
->>>>> doing a live migration and then savevm on the destination works fine for
->>>>> me.
->>>>>
->>>>> Hm... Or do you mean on the source? In that case, I think the operation
->>>>> must fail, but of course more gracefully than now.
->>>>>
->>>>> Actually, the question that you're asking implicitly here is how the
->>>>> source qemu process should be "reactivated" after a failed migration.
->>>>> Currently, as far as I know, this is only with issuing a "cont" command.
->>>>> It might make sense to provide a way to get control without resuming the
->>>>> VM, but I doubt that adding automatic resume to every QMP command is the
->>>>> right way to achieve it.
->>>>>
->>>>> Dave, Juan, what do you think?
->>>> I'd only ever really thought of 'cont' or retrying the migration.
->>>> However, it does make sense to me that you might want to do a savevm
->>>> instead; if you can't migrate then perhaps a savevm is the best you
->>>> can do before your machine dies.  Are there any other things that
->>>> should be allowed?
->>> I think we need to ask the other way round: Any reason _not_ to allow
->>> certain operations that you can normally perform on a stopped VM?
->>>
->>>> We would want to be careful not to accidentally reactivate the disks
->>>> on the source after what was actually a succesful migration.
->>> Yes, that's exactly my concern, even with savevm. That's why I suggested
->>> we could have a 'cont'-like thing that just gets back control of the
->>> images and moves into the normal paused state, but doesn't immediately
->>> resume the actual VM.
->> OK, lets say we had that block-reactivate (for want of a better name),
->> how would we stop everything asserting if the user tried to do it
->> before they'd run block-reactivate?
-> We would have to add checks to the monitor commands that assume that the
-> image is activated and error out if it isn't.
->
-> Maybe just adding the check to blk_is_available() would be enough, but
-> we'd have to check carefully whether it covers all cases and causes no
-> false positives.
->
-> By the way, I wouldn't call this 'block-reactivate' because I don't
-> think this should be a block-specific command. It's a VM lifecycle
-> command that switches from a postmigrate state (that assumes we have no
-> control over the VM's resources any more) to a paused state (where we do
-> have this control). Maybe something like 'migration-abort'.
+The change in commit 898be3e0415c6d which made completely
+unrecognized OSes cause an error_exit "Unsupported host OS"
+has some unfortunate unintended effects:
+ * if you run 'configure --help' on an unsupported host OS
+   (eg if intending to use it as a build machine for a
+   cross compile to a supported host) then the message
+   is printed instead of --help
+ * if the C compiler doesn't work or is missing (eg if
+   you passed an incorrect --cross-prefix by mistake)
+   the message is printed instead of the more useful
+   'compiler does not exist or does not work' message
 
-'abort' is not very good too I think. migration is completed, nothing to 
-abort.. (may be successful migration to file for suspend, some kind of 
-vm cloning, etc)
+Fix this by postponing the error_exit in this situation
+until later, when we have already identified the more
+useful cases for this.
 
->
-> Kevin
+The long term fix for this would be to move handling
+of --help much further up in the configure script,
+and make its output not dependent on checks that configure
+runs. However for 2.9 this would be too invasive.
 
+Reported-by: Stefan Weil <sw@weilnetz.de>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ configure | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
+diff --git a/configure b/configure
+index 82966f7..8820036 100755
+--- a/configure
++++ b/configure
+@@ -323,6 +323,7 @@ replication="yes"
+ 
+ supported_cpu="no"
+ supported_os="no"
++bogus_os="no"
+ 
+ # parse CC options first
+ for opt do
+@@ -695,7 +696,10 @@ Linux)
+   supported_os="yes"
+ ;;
+ *)
+-  error_exit "Unsupported host OS $targetos"
++  # This is a fatal error, but don't report it yet, because we
++  # might be going to just print the --help text, or it might
++  # be the result of a missing compiler.
++  bogus_os="yes"
+ ;;
+ esac
+ 
+@@ -1461,6 +1465,14 @@ if ! compile_prog ; then
+     error_exit "\"$cc\" cannot build an executable (is your linker broken?)"
+ fi
+ 
++if test "$bogus_os" = "yes"; then
++    # Now that we know that we're not printing the help and that
++    # the compiler works (so the results of the check_defines we used
++    # to identify the OS are reliable), if we didn't recognize the
++    # host OS we should stop now.
++    error_exit "Unsupported host OS $targetos"
++fi
++
+ # Check that the C++ compiler exists and works with the C compiler
+ if has $cxx; then
+     cat > $TMPC <<EOF
 -- 
-Best regards,
-Vladimir
+2.7.4
