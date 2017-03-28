@@ -1,42 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1csmQc-0005ql-92
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:24:35 -0400
+	(envelope-from <prvs=25381d7d4=Paul.Durrant@citrix.com>)
+	id 1csmTv-000745-5I
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:28:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1csmQY-000541-Bb
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:24:34 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52631
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1csmQY-00053o-4c
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:24:30 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2S8NtcA093592
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 04:24:29 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 29fm690afg-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 04:24:29 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Tue, 28 Mar 2017 09:24:27 +0100
-Date: Tue, 28 Mar 2017 10:24:21 +0200
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <20170328101409.1aa23618@bahia.lan>
-References: <149063674781.4447.14258971700726134711.stgit@bahia.lan>
-	<149063676337.4447.2095575576822297032.stgit@bahia.lan>
-	<20170327211728-mutt-send-email-mst@kernel.org>
-	<20170328101409.1aa23618@bahia.lan>
+	(envelope-from <prvs=25381d7d4=Paul.Durrant@citrix.com>)
+	id 1csmTr-0006Gd-6x
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:27:59 -0400
+Received: from smtp.eu.citrix.com ([185.25.65.24]:22992)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=25381d7d4=Paul.Durrant@citrix.com>)
+	id 1csmTq-0006G8-RK
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:27:55 -0400
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Tue, 28 Mar 2017 08:27:52 +0000
+Message-ID: <2b0d6c084def417b8d8958440246a7ae@AMSPEX02CL03.citrite.net>
+References: <1490374688-488-1-git-send-email-paul.durrant@citrix.com>
+	<alpine.DEB.2.10.1703241730290.8001@sstabellini-ThinkPad-X260>
+	<7b2c8d7868db4d47a832524c304c84a5@AMSPEX02CL03.citrite.net>
+	<alpine.DEB.2.10.1703271045390.8001@sstabellini-ThinkPad-X260>
+In-Reply-To: <alpine.DEB.2.10.1703271045390.8001@sstabellini-ThinkPad-X260>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170328102421.2f4fbeec.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/5] virtio: Error object based
- virtio_error()
+Subject: Re: [Qemu-devel] [PATCH] xen: additionally restrict
+ xenforeignmemory operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,44 +34,226 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: 'Stefano Stabellini' <sstabellini@kernel.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Anthony
+	Perard <anthony.perard@citrix.com>
 
-On Tue, 28 Mar 2017 10:14:09 +0200
-Greg Kurz <groug@kaod.org> wrote:
+> -----Original Message-----
+> From: Stefano Stabellini [mailto:sstabellini@kernel.org]
+> Sent: 27 March 2017 18:46
+> To: Paul Durrant <Paul.Durrant@citrix.com>
+> Cc: 'Stefano Stabellini' <sstabellini@kernel.org>; qemu-devel@nongnu.org;
+> xen-devel@lists.xenproject.org; Anthony Perard
+> <anthony.perard@citrix.com>
+> Subject: RE: [PATCH] xen: additionally restrict xenforeignmemory operatio=
+ns
+>=20
+> On Mon, 27 Mar 2017, Paul Durrant wrote:
+> > > -----Original Message-----
+> > [snip]
+> > >
+> > > This is OK but the file is growing too entangled. What do you think o=
+f
+> > > the following, which moves the if
+> CONFIG_XEN_CTRL_INTERFACE_VERSION
+> > > <
+> > > 40701 at the top? This way we don't have to add yet another ifdef.
+> > >
+> >
+> > Yes, this looks better and appears to DTRT. I assume you will just appl=
+y this
+> version and don't want be to resubmit?
+>=20
+> Actually, I would prefer if you could test it properly and resubmit the
+> patch. Thanks!
+>=20
 
-> On Mon, 27 Mar 2017 21:20:56 +0300
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
-> > On Mon, Mar 27, 2017 at 07:46:03PM +0200, Greg Kurz wrote:
-> > > This introduces an Error object based implementation of virtio_error(). It
-> > > allows to implement virtio_error() wrappers in device-specific code.
-> > > 
-> > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > > ---
-> > >  hw/virtio/virtio.c         |   21 ++++++++++++++++-----
-> > >  include/hw/virtio/virtio.h |    1 +
-> > >  2 files changed, 17 insertions(+), 5 deletions(-)
-> > > 
+Ok, sure. I gave it a quick try yesterday but I'll send it as v2 later.
 
-> > Also, whether to stop the device, or the VM, or just warn,
-> > seems like a policy decision. Why not set it on command line
-> > like we do for other storage?
-> > 
-> 
-> Huh? This patch simply introduces a new API to a feature that underwent
-> several rounds of discussion and reached a reasonable consensus (even
-> your R-b).
-> 
-> I'm not sure this 9pfs series is the right place to talk about all the
-> behavior changes you're suggesting for virtio_error()... I'd rather
-> drop this patch and duplicate code in virtio-9p instead if I want the
-> fixes to go to 2.9.
+  Paul
 
-I agree that we should discuss this outside of this patch series. It's
-not like it is introducing a new error case.
-
-> 
-> Cc'ing Connie and Stefanha for insights.
-
-See my reply to Michael's mail.
+>=20
+> >
+> > > diff --git a/include/hw/xen/xen_common.h
+> > > b/include/hw/xen/xen_common.h
+> > > index 4f3bd35..624fb86 100644
+> > > --- a/include/hw/xen/xen_common.h
+> > > +++ b/include/hw/xen/xen_common.h
+> > > @@ -27,6 +27,58 @@ extern xc_interface *xen_xc;
+> > >   * We don't support Xen prior to 4.2.0.
+> > >   */
+> > >
+> > > +/* Xen 4.2 through 4.6 */
+> > > +#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40701
+> > > +
+> > > +typedef xc_interface xenforeignmemory_handle;
+> > > +typedef xc_evtchn xenevtchn_handle;
+> > > +typedef xc_gnttab xengnttab_handle;
+> > > +
+> > > +#define xenevtchn_open(l, f) xc_evtchn_open(l, f);
+> > > +#define xenevtchn_close(h) xc_evtchn_close(h)
+> > > +#define xenevtchn_fd(h) xc_evtchn_fd(h)
+> > > +#define xenevtchn_pending(h) xc_evtchn_pending(h)
+> > > +#define xenevtchn_notify(h, p) xc_evtchn_notify(h, p)
+> > > +#define xenevtchn_bind_interdomain(h, d, p)
+> > > xc_evtchn_bind_interdomain(h, d, p)
+> > > +#define xenevtchn_unmask(h, p) xc_evtchn_unmask(h, p)
+> > > +#define xenevtchn_unbind(h, p) xc_evtchn_unbind(h, p)
+> > > +
+> > > +#define xengnttab_open(l, f) xc_gnttab_open(l, f)
+> > > +#define xengnttab_close(h) xc_gnttab_close(h)
+> > > +#define xengnttab_set_max_grants(h, n)
+> xc_gnttab_set_max_grants(h, n)
+> > > +#define xengnttab_map_grant_ref(h, d, r, p)
+> xc_gnttab_map_grant_ref(h,
+> > > d, r, p)
+> > > +#define xengnttab_unmap(h, a, n) xc_gnttab_munmap(h, a, n)
+> > > +#define xengnttab_map_grant_refs(h, c, d, r, p) \
+> > > +    xc_gnttab_map_grant_refs(h, c, d, r, p)
+> > > +#define xengnttab_map_domain_grant_refs(h, c, d, r, p) \
+> > > +    xc_gnttab_map_domain_grant_refs(h, c, d, r, p)
+> > > +
+> > > +#define xenforeignmemory_open(l, f) xen_xc
+> > > +#define xenforeignmemory_close(h)
+> > > +
+> > > +static inline void *xenforeignmemory_map(xc_interface *h, uint32_t
+> dom,
+> > > +                                         int prot, size_t pages,
+> > > +                                         const xen_pfn_t arr[/*pages=
+*/],
+> > > +                                         int err[/*pages*/])
+> > > +{
+> > > +    if (err)
+> > > +        return xc_map_foreign_bulk(h, dom, prot, arr, err, pages);
+> > > +    else
+> > > +        return xc_map_foreign_pages(h, dom, prot, arr, pages);
+> > > +}
+> > > +
+> > > +#define xenforeignmemory_unmap(h, p, s) munmap(p, s *
+> XC_PAGE_SIZE)
+> > > +
+> > > +#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >=3D 40701 */
+> > > +
+> > > +#include <xenevtchn.h>
+> > > +#include <xengnttab.h>
+> > > +#include <xenforeignmemory.h>
+> > > +
+> > > +#endif
+> > > +
+> > > +extern xenforeignmemory_handle *xen_fmem;
+> > > +
+> > >  #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
+> > >
+> > >  typedef xc_interface xendevicemodel_handle;
+> > > @@ -159,6 +211,13 @@ static inline int xendevicemodel_restrict(
+> > >      return -1;
+> > >  }
+> > >
+> > > +static inline int xenforeignmemory_restrict(
+> > > +    xenforeignmemory_handle *fmem, domid_t domid)
+> > > +{
+> > > +    errno =3D ENOTTY;
+> > > +    return -1;
+> > > +}
+> > > +
+> > >  #else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >=3D 40900 */
+> > >
+> > >  #include <xendevicemodel.h>
+> > > @@ -215,69 +274,32 @@ static inline int xen_modified_memory(domid_t
+> > > domid, uint64_t first_pfn,
+> > >
+> > >  static inline int xen_restrict(domid_t domid)
+> > >  {
+> > > -    int rc =3D xendevicemodel_restrict(xen_dmod, domid);
+> > > +    int rc;
+> > >
+> > > -    trace_xen_domid_restrict(errno);
+> > > +    /* Attempt to restrict devicemodel operations */
+> > > +    rc =3D xendevicemodel_restrict(xen_dmod, domid);
+> > > +    trace_xen_domid_restrict(rc ? errno : 0);
+> > >
+> > > -    if (errno =3D=3D ENOTTY) {
+> > > -        return 0;
+> > > +    if (rc < 0) {
+> > > +        /*
+> > > +         * If errno is ENOTTY then restriction is not implemented so
+> > > +         * there's no point in trying to restrict other types of
+> > > +         * operation, but it should not be treated as a failure.
+> > > +         */
+> > > +        if (errno =3D=3D ENOTTY) {
+> > > +            return 0;
+> > > +        }
+> > > +
+> > > +        return rc;
+> > >      }
+> > >
+> > > -    return rc;
+> > > -}
+> > > -
+> > > -/* Xen 4.2 through 4.6 */
+> > > -#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40701
+> > > -
+> > > -typedef xc_interface xenforeignmemory_handle;
+> > > -typedef xc_evtchn xenevtchn_handle;
+> > > -typedef xc_gnttab xengnttab_handle;
+> > > -
+> > > -#define xenevtchn_open(l, f) xc_evtchn_open(l, f);
+> > > -#define xenevtchn_close(h) xc_evtchn_close(h)
+> > > -#define xenevtchn_fd(h) xc_evtchn_fd(h)
+> > > -#define xenevtchn_pending(h) xc_evtchn_pending(h)
+> > > -#define xenevtchn_notify(h, p) xc_evtchn_notify(h, p)
+> > > -#define xenevtchn_bind_interdomain(h, d, p)
+> > > xc_evtchn_bind_interdomain(h, d, p)
+> > > -#define xenevtchn_unmask(h, p) xc_evtchn_unmask(h, p)
+> > > -#define xenevtchn_unbind(h, p) xc_evtchn_unbind(h, p)
+> > > -
+> > > -#define xengnttab_open(l, f) xc_gnttab_open(l, f)
+> > > -#define xengnttab_close(h) xc_gnttab_close(h)
+> > > -#define xengnttab_set_max_grants(h, n) xc_gnttab_set_max_grants(h,
+> n)
+> > > -#define xengnttab_map_grant_ref(h, d, r, p)
+> xc_gnttab_map_grant_ref(h,
+> > > d, r, p)
+> > > -#define xengnttab_unmap(h, a, n) xc_gnttab_munmap(h, a, n)
+> > > -#define xengnttab_map_grant_refs(h, c, d, r, p) \
+> > > -    xc_gnttab_map_grant_refs(h, c, d, r, p)
+> > > -#define xengnttab_map_domain_grant_refs(h, c, d, r, p) \
+> > > -    xc_gnttab_map_domain_grant_refs(h, c, d, r, p)
+> > > -
+> > > -#define xenforeignmemory_open(l, f) xen_xc
+> > > -#define xenforeignmemory_close(h)
+> > > +    /* Restrict foreignmemory operations */
+> > > +    rc =3D xenforeignmemory_restrict(xen_fmem, domid);
+> > > +    trace_xen_domid_restrict(rc ? errno : 0);
+> > >
+> > > -static inline void *xenforeignmemory_map(xc_interface *h, uint32_t
+> dom,
+> > > -                                         int prot, size_t pages,
+> > > -                                         const xen_pfn_t arr[/*pages=
+*/],
+> > > -                                         int err[/*pages*/])
+> > > -{
+> > > -    if (err)
+> > > -        return xc_map_foreign_bulk(h, dom, prot, arr, err, pages);
+> > > -    else
+> > > -        return xc_map_foreign_pages(h, dom, prot, arr, pages);
+> > > +    return rc;
+> > >  }
+> > >
+> > > -#define xenforeignmemory_unmap(h, p, s) munmap(p, s *
+> XC_PAGE_SIZE)
+> > > -
+> > > -#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >=3D 40701 */
+> > > -
+> > > -#include <xenevtchn.h>
+> > > -#include <xengnttab.h>
+> > > -#include <xenforeignmemory.h>
+> > > -
+> > > -#endif
+> > > -
+> > > -extern xenforeignmemory_handle *xen_fmem;
+> > > -
+> > >  void destroy_hvm_domain(bool reboot);
+> > >
+> > >  /* shutdown/destroy current domain because of an error */
+> >
