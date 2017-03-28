@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cswuK-00052Q-37
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 15:35:57 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cswuz-0005RJ-Nd
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 15:36:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cswuJ-0002gJ-5j
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 15:35:56 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cswuy-00034g-NL
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 15:36:37 -0400
 References: <20170308191434.2413-1-mreitz@redhat.com>
-	<20170308191544.3025-2-mreitz@redhat.com>
-	<20170323180346.GE5344@noname.redhat.com>
+	<20170308191544.3025-1-mreitz@redhat.com>
+	<20170323180054.GD5344@noname.redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <97cd6a73-d174-4a83-8288-2f5b7af348f4@redhat.com>
-Date: Tue, 28 Mar 2017 21:35:47 +0200
+Message-ID: <bb562503-4d1f-34df-da78-3b034ec9a325@redhat.com>
+Date: Tue, 28 Mar 2017 21:36:28 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170323180346.GE5344@noname.redhat.com>
+In-Reply-To: <20170323180054.GD5344@noname.redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="c0197qT6mqHwnuVeRIDEVpKsqp8vaXdbo"
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 4/4] block: Add some
- bdrv_truncate() error messages
+	boundary="fum9uwwhBwCcnPAHcoAko3LpSe05f5L60"
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 3/4] block: Add errp to
+ BD.bdrv_truncate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,121 +30,81 @@ To: Kevin Wolf <kwolf@redhat.com>
 Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---c0197qT6mqHwnuVeRIDEVpKsqp8vaXdbo
+--fum9uwwhBwCcnPAHcoAko3LpSe05f5L60
 From: Max Reitz <mreitz@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>
 Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
  Eric Blake <eblake@redhat.com>
-Message-ID: <97cd6a73-d174-4a83-8288-2f5b7af348f4@redhat.com>
-Subject: Re: [PATCH v2 for-2.10 4/4] block: Add some bdrv_truncate() error
- messages
+Message-ID: <bb562503-4d1f-34df-da78-3b034ec9a325@redhat.com>
+Subject: Re: [PATCH v2 for-2.10 3/4] block: Add errp to BD.bdrv_truncate()
 References: <20170308191434.2413-1-mreitz@redhat.com>
- <20170308191544.3025-2-mreitz@redhat.com>
- <20170323180346.GE5344@noname.redhat.com>
-In-Reply-To: <20170323180346.GE5344@noname.redhat.com>
+ <20170308191544.3025-1-mreitz@redhat.com>
+ <20170323180054.GD5344@noname.redhat.com>
+In-Reply-To: <20170323180054.GD5344@noname.redhat.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: quoted-printable
 
-On 23.03.2017 19:03, Kevin Wolf wrote:
+On 23.03.2017 19:00, Kevin Wolf wrote:
 > Am 08.03.2017 um 20:15 hat Max Reitz geschrieben:
->> Add missing error messages for the drivers I am comfortable to do this=
-
->> in.
+>> Add an Error parameter to the block drivers' bdrv_truncate() interface=
+=2E
+>> If a block driver does not set this in case of an error, the generic
+>> bdrv_truncate() implementation will do so.
 >>
->> Since one of these changes touches a mis-indented block in
->> block/file-posix.c, this patch fixes that coding style issue along the=
+>> Where it is obvious, this patch also makes some block drivers set this=
 
->> way.
+>> value.
 >>
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >=20
->> diff --git a/block/qcow2.c b/block/qcow2.c
->> index 17585fbb89..53b0bd61a7 100644
->> --- a/block/qcow2.c
->> +++ b/block/qcow2.c
->> @@ -2550,6 +2550,7 @@ static int qcow2_truncate(BlockDriverState *bs, =
-int64_t offset, Error **errp)
->>      new_l1_size =3D size_to_l1(s, offset);
->>      ret =3D qcow2_grow_l1_table(bs, new_l1_size, true);
->>      if (ret < 0) {
->> +        error_setg(errp, "Failed to grow the L1 table");
+>> diff --git a/block/iscsi.c b/block/iscsi.c
+>> index 75d890538e..ab559a6f71 100644
+>> --- a/block/iscsi.c
+>> +++ b/block/iscsi.c
+>> @@ -2060,7 +2060,7 @@ static void iscsi_reopen_commit(BDRVReopenState =
+*reopen_state)
+>>      }
+>>  }
+>> =20
+>> -static int iscsi_truncate(BlockDriverState *bs, int64_t offset)
+>> +static int iscsi_truncate(BlockDriverState *bs, int64_t offset, Error=
+ **errp)
+>>  {
+>>      IscsiLun *iscsilun =3D bs->opaque;
+>>      Error *local_err =3D NULL;
+>> @@ -2071,7 +2071,7 @@ static int iscsi_truncate(BlockDriverState *bs, =
+int64_t offset)
+>> =20
+>>      iscsi_readcapacity_sync(iscsilun, &local_err);
+>>      if (local_err !=3D NULL) {
+>> -        error_free(local_err);
+>> +        error_propagate(errp, local_err);
+>>          return -EIO;
+>>      }
 >=20
-> Let's not throw away error codes, error_setg_errno() is your friend.
+> I think this function contains a few more cases for patch 4.
 
-:-)
-
-Will do. Not sure why I haven't.
+I'm probably going to follow Stefan's proposal of adding (even generic)
+error messages to all drivers anyway.
 
 Max
 
->>          return ret;
->>      }
->> =20
->> @@ -2558,6 +2559,7 @@ static int qcow2_truncate(BlockDriverState *bs, =
-int64_t offset, Error **errp)
->>      ret =3D bdrv_pwrite_sync(bs->file, offsetof(QCowHeader, size),
->>                             &offset, sizeof(uint64_t));
->>      if (ret < 0) {
->> +        error_setg(errp, "Failed to update the image size");
->=20
-> Here, too.
->=20
->>          return ret;
->>      }
->> =20
->> diff --git a/block/qed.c b/block/qed.c
->> index fa2aeee471..eb346d645b 100644
->> --- a/block/qed.c
->> +++ b/block/qed.c
->> @@ -1526,11 +1526,12 @@ static int bdrv_qed_truncate(BlockDriverState =
-*bs, int64_t offset, Error **errp)
->> =20
->>      if (!qed_is_image_size_valid(offset, s->header.cluster_size,
->>                                   s->header.table_size)) {
->> +        error_setg(errp, "Invalid image size specified");
->>          return -EINVAL;
->>      }
->> =20
->> -    /* Shrinking is currently not supported */
->>      if ((uint64_t)offset < s->header.image_size) {
->> +        error_setg(errp, "Shrinking images is currently not supported=
-");
->>          return -ENOTSUP;
->>      }
->> =20
->> @@ -1539,6 +1540,7 @@ static int bdrv_qed_truncate(BlockDriverState *b=
-s, int64_t offset, Error **errp)
->>      ret =3D qed_write_header_sync(s);
->>      if (ret < 0) {
->>          s->header.image_size =3D old_image_size;
->> +        error_setg(errp, "Failed to update the image size");
->=20
-> As well as here.
->=20
->>      }
->>      return ret;
->>  }
->=20
-> Kevin
->=20
 
-
-
---c0197qT6mqHwnuVeRIDEVpKsqp8vaXdbo
+--fum9uwwhBwCcnPAHcoAko3LpSe05f5L60
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljauxMSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9Ak5UH/i/rnox8N2p0sX+GlbXOfSccuoC/098h
-NfQG19qv9CnlgqXLxMD9dAQYVmEYoxMikgXbxioNCYvj8YioFd/4L668uuSzxgkz
-e8JSojEfaShMTp4mPyuuMWT+MwzvgYpGrZT99n1WLLng7dz4hcq04kKPhDgvCanQ
-OpnzSibwpUvmlZQ+Og/aCyOdnsKIunpy6ty93bnYvHcaiwMX98k8uopHYpsl1FJ+
-VePfAyBTP45AhKBdNwEgJgNxNz5U80iiIpY48NkOxxtOcAbJQFQgBVVnVZ6PEoBJ
-s2DsoBSqgSriWGIYuNDqmRagFX9mxrMrU8WDXx36Ipdqh/im0TyFV3g=
-=ceGx
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljauzwSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AUxQH/0u3racnxeLhyQIrTyMxp2uGpVCeqRZU
+TV2NEJlMCozKEcCQv2p88G6UB8arnEJYLCV5IbOapoAmT9t7GRKNurGKXY+zt6RZ
+jABdv/INbs2miSFZqJz82sb42CCQEug3GK3bUKHKIy+JFh+87RBmxCh+KWhUoTSZ
+qo6+zcl+EsSjFPECL1cjB6MM8TseO6u6UJreT1Lo21OQCtdVJtmq97XUO34JEmIz
+Z0bKn+3VwMBrOYqwEutZ4OTcDeWQCUCZKdfuJ3Abuk6c+9giv3zdQpH6jka954MW
+QN7OCKwuR36EC3XaEq+ra/I3dpkld4cXIoMyMV9UhHQ3c4oa8JoTBCE=
+=kkwM
 -----END PGP SIGNATURE-----
 
---c0197qT6mqHwnuVeRIDEVpKsqp8vaXdbo--
+--fum9uwwhBwCcnPAHcoAko3LpSe05f5L60--
