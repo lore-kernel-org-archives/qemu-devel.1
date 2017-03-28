@@ -1,24 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56225)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tejaswinipoluri3@gmail.com>) id 1cslQ5-0007LV-5X
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:19:57 -0400
+	(envelope-from <vfeenstr@redhat.com>) id 1cslRl-0008D2-GK
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:21:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tejaswinipoluri3@gmail.com>) id 1cslQ0-00032m-8A
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:19:57 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:35972)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tejaswinipoluri3@gmail.com>)
-	id 1cslQ0-00032Z-25
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:19:52 -0400
-Received: by mail-pg0-x242.google.com with SMTP id 81so19139703pgh.3
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 00:19:52 -0700 (PDT)
-From: Tejaswini <tejaswinipoluri3@gmail.com>
-Date: Tue, 28 Mar 2017 12:49:43 +0530
-Message-Id: <1490685583-16987-1-git-send-email-tejaswinipoluri3@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] target-i386: fix "info lapic" segfault on isapc
+	(envelope-from <vfeenstr@redhat.com>) id 1cslRg-0003Xn-H6
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:21:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51186)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vfeenstr@redhat.com>) id 1cslRg-0003Xa-8R
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:21:36 -0400
+From: Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>
+Date: Tue, 28 Mar 2017 09:21:30 +0200
+Message-Id: <20170328072130.17142-1-vfeenstr@redhat.com>
+Subject: [Qemu-devel] [PATCH v1] qga: Add 'guest-get-users' command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +22,194 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, Tejaswini Poluri <tejaswinipoluri3@gmail.com>
+Cc: mdroth@linux.vnet.ibm.com, Vinzenz Feenstra <vfeenstr@redhat.com>
 
-From: Tejaswini Poluri <tejaswinipoluri3@gmail.com>
+From: Vinzenz Feenstra <vfeenstr@redhat.com>
 
-Start QEMU with
-"qemu-system-x86_64 -nographic -M isapc -serial none-monitor stdio"
-and enter "info lapic" at the monitor prompt ⇒
-Segmentation fault
+A command that will list all currenctly logged in users having running
+processes.
 
-Signed-off-by: Tejaswini Poluri <tejaswinipoluri3@gmail.com>
+Examples:
+
+virsh # qemu-agent-command F25 '{ "execute": "guest-get-users" }'
+{"return":[{"user":"root"}]}
+
+virsh # qemu-agent-command Win2k12r2 '{ "execute": "guest-get-users" }'
+{"return":[{"domain":"LADIDA","user":"Administrator"}]}
+
+Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
 ---
- target/i386/helper.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ qga/commands-posix.c | 35 +++++++++++++++++++++++
+ qga/commands-win32.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ qga/qapi-schema.json | 21 ++++++++++++++
+ 3 files changed, 136 insertions(+)
 
-diff --git a/target/i386/helper.c b/target/i386/helper.c
-index e2af340..f11cac6 100644
---- a/target/i386/helper.c
-+++ b/target/i386/helper.c
-@@ -326,6 +326,10 @@ void x86_cpu_dump_local_apic_state(CPUState *cs, FILE *f,
- {
-     X86CPU *cpu = X86_CPU(cs);
-     APICCommonState *s = APIC_COMMON(cpu->apic_state);
-+    if (!s) {
-+        cpu_fprintf(f, "local apic state not available\n");
-+        return;
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 73d93eb..8cb2094 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -15,6 +15,7 @@
+ #include <sys/ioctl.h>
+ #include <sys/wait.h>
+ #include <dirent.h>
++#include <utmpx.h>
+ #include "qga/guest-agent-core.h"
+ #include "qga-qmp-commands.h"
+ #include "qapi/qmp/qerror.h"
+@@ -2515,3 +2516,37 @@ void ga_command_state_init(GAState *s, GACommandState *cs)
+     ga_command_state_add(cs, NULL, guest_fsfreeze_cleanup);
+ #endif
+ }
++
++GuestUserList *qmp_guest_get_users(Error **err)
++{
++    GHashTable *cache = g_hash_table_new_full(g_str_hash, g_str_equal,
++                                              NULL, NULL);
++    GuestUserList *head = NULL, *cur_item = NULL;
++    setutxent();
++    for (;;) {
++        struct utmpx *user_info = getutxent();
++        if (user_info == NULL) {
++            break;
++        } else if (user_info->ut_type != USER_PROCESS) {
++            continue;
++        } else if (g_hash_table_contains(cache, user_info->ut_user)) {
++            continue;
++        }
++
++        g_hash_table_insert(cache, user_info->ut_user, NULL);
++
++        GuestUserList *item = g_new0(GuestUserList, 1);
++        item->value = g_new0(GuestUser, 1);
++        item->value->user = g_strdup(user_info->ut_user);
++
++        if (!cur_item) {
++            head = cur_item = item;
++        } else {
++            cur_item->next = item;
++            cur_item = item;
++        }
 +    }
-     uint32_t *lvt = s->lvt;
- 
-     cpu_fprintf(f, "dumping local APIC state for CPU %-2u\n\n",
++    endutxent();
++    g_hash_table_unref(cache);
++    return head;
++}
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index 19d72b2..46c038b 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -1536,3 +1536,83 @@ void ga_command_state_init(GAState *s, GACommandState *cs)
+         ga_command_state_add(cs, NULL, guest_fsfreeze_cleanup);
+     }
+ }
++
++GuestUserList *qmp_guest_get_users(Error **err)
++{
++    GHashTable *cache = g_hash_table_new_full(g_str_hash, g_str_equal,
++                                              NULL, NULL);
++    GuestUserList *head = NULL, *cur_item = NULL;
++
++    LPWKSTA_USER_INFO_1 buffer = NULL, iter_buffer = 0;
++    DWORD level = 1; /* Level 1 has more information */
++    DWORD prefered_max_length = MAX_PREFERRED_LENGTH;
++    DWORD entries_read = 0;
++    DWORD total_entries = 0;
++    DWORD resume_handle = 0;
++    LPWSTR server_name = NULL;
++    NET_API_STATUS result = ERROR_MORE_DATA;
++
++    while (result == ERROR_MORE_DATA) {
++        result = NetWkstaUserEnum(
++            server_name,
++            level,
++            (LPBYTE *)&buffer,
++            prefered_max_length,
++            &entries_read,
++            &total_entries,
++            &resume_handle);
++
++        if (result != ERROR_MORE_DATA && result != ERROR_SUCCESS) {
++            error_setg_win32(err, result, "Failed to enumerate active users");
++            goto error;
++        }
++
++        iter_buffer = buffer;
++        DWORD i = 0;
++        for (i = 0; i < entries_read; ++i, ++iter_buffer) {
++            gchar *name = g_utf16_to_utf8(
++                iter_buffer->wkui1_username,
++                -1, NULL, NULL, NULL
++            );
++
++            if (name == NULL) {
++                continue;
++            }
++
++            if (g_hash_table_contains(cache, name)) {
++                g_free(name);
++                continue;
++            }
++
++            gchar *domain = g_utf16_to_utf8(
++                iter_buffer->wkui1_logon_domain,
++                -1, NULL, NULL, NULL
++            );
++
++            g_hash_table_insert(cache, name, NULL);
++            GuestUserList *item = g_new0(GuestUserList, 1);
++            item->value = g_new0(GuestUser, 1);
++            item->value->user = name;
++            item->value->domain = domain;
++            item->value->has_domain = true;
++
++            if (!cur_item) {
++                head = cur_item = item;
++            } else {
++                cur_item->next = item;
++                cur_item = item;
++            }
++        }
++    }
++    NetApiBufferFree(buffer);
++    g_hash_table_unref(cache);
++    return head;
++
++error:
++    if (buffer != NULL) {
++        NetApiBufferFree(buffer);
++    }
++    g_hash_table_unref(cache);
++    qapi_free_GuestUserList(head);
++    return NULL;
++}
+diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+index a02dbf2..190e8b4 100644
+--- a/qga/qapi-schema.json
++++ b/qga/qapi-schema.json
+@@ -1042,3 +1042,24 @@
+   'data':    { 'path': 'str', '*arg': ['str'], '*env': ['str'],
+                '*input-data': 'str', '*capture-output': 'bool' },
+   'returns': 'GuestExec' }
++
++##
++# @GuestUser:
++# @user:      Username
++# @domain:    Logon domain (windows only)
++#
++# Since: 2.10
++##
++{ 'struct': 'GuestUser',
++  'data': { 'user': 'str', '*domain': 'str' } }
++
++##
++# @guest-get-users:
++# Retrieves a list of currently active user accounts on the VM.
++#
++# Returns: A unique list of users.
++#
++# Since: 2.10
++##
++{ 'command': 'guest-get-users',
++  'returns': ['GuestUser'] }
 -- 
-2.7.4
+2.9.3
