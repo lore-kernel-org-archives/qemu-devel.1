@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1csw7q-0008Ey-Bn
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 14:45:51 -0400
+	(envelope-from <armbru@redhat.com>) id 1cswBV-0000gD-Fb
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 14:49:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1csw7k-00071q-CY
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 14:45:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48274)
+	(envelope-from <armbru@redhat.com>) id 1cswBS-0000NF-F3
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 14:49:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34302)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1csw7k-00070R-63
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 14:45:44 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170328171253.GE5740@work-vm> (David Alan Gilbert's message of
-	"Tue, 28 Mar 2017 18:12:54 +0100")
-References: <20170323204544.12015-1-quintela@redhat.com>
-	<20170323204544.12015-43-quintela@redhat.com>
-	<8b10b0bc-909e-d6e8-da76-72b20fbf7e32@huawei.com>
-	<87h92j84db.fsf@secure.mitica> <20170328171253.GE5740@work-vm>
-Reply-To: quintela@redhat.com
-Date: Tue, 28 Mar 2017 20:45:41 +0200
-Message-ID: <87y3vpp7e2.fsf@secure.mitica>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cswBS-0000N3-8k
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 14:49:34 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 269CD7E9DE
+	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 18:49:33 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <1490708752-26902-1-git-send-email-armbru@redhat.com>
+	<1490708752-26902-2-git-send-email-armbru@redhat.com>
+	<f3b944ed-303c-31fa-7379-78f5076086cf@redhat.com>
+Date: Tue, 28 Mar 2017 20:49:31 +0200
+In-Reply-To: <f3b944ed-303c-31fa-7379-78f5076086cf@redhat.com> (Paolo
+	Bonzini's message of "Tue, 28 Mar 2017 16:18:18 +0200")
+Message-ID: <87zig5s0ck.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 42/51] ram: Pass RAMBlock to bitmap_sync
+Subject: Re: [Qemu-devel] [PULL for-2.9] block: Declare blockdev-add and
+ blockdev-del supported
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +35,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Yang Hongyang <yanghongyang@huawei.com>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> * Juan Quintela (quintela@redhat.com) wrote:
->> Yang Hongyang <yanghongyang@huawei.com> wrote:
->> > On 2017/3/24 4:45, Juan Quintela wrote:
->> >> We change the meaning of start to be the offset from the beggining of
->> >> the block.
->> >> 
->> >> @@ -701,7 +701,7 @@ static void migration_bitmap_sync(RAMState *rs)
->> >>      qemu_mutex_lock(&rs->bitmap_mutex);
->> >>      rcu_read_lock();
->> >>      QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
->> >> -        migration_bitmap_sync_range(rs, block->offset, block->used_length);
->> >> +        migration_bitmap_sync_range(rs, block, 0, block->used_length);
->> If you have several terabytes of RAM that is too ineficient, because
->> when we arrive to the page_send(page), it is possible that it is already
->> dirty again, and we have to send it twice.  So, the idea is to change to
->> something like:
+Paolo Bonzini <pbonzini@redhat.com> writes:
+
+> On 28/03/2017 15:45, Markus Armbruster wrote:
+>> It's been a long journey, but here we are.
 >> 
->> while(true) {
->>             foreach(block)
->>                 bitmap_sync(block)
->>             foreach(block)
->>                 foreach(64pages)
->>                     bitmap_sync(64pages)
->>                     foreach(page of the 64)
->>                        if (dirty)
->>                           page_send(page)
+>> The supported blockdev-add is not compatible to its experimental
+>> predecessors; bump all Since: tags to 2.9.
 >
-> Yes, although it might be best to actually do the sync in a separate thread
-> so that the sync is always a bit ahead of the thread doing the writing.
+> Can you document the differences in the 2.9 changelog?
 
-Doing it synchronously shouldn't be a problem.  But we should be able to
-in smaller chucks.
-
-Thanks, Juan.
+Not sure I can before I drop off for a week of vacation.  Kevin, Max,
+can you chip in?
