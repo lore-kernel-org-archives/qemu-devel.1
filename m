@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1csnWH-000165-Vd
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 05:34:30 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1csnc1-0002gj-71
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 05:40:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1csnWE-0006ZU-Qb
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 05:34:30 -0400
-Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:41795)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1csnWE-0006ZH-KB
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 05:34:26 -0400
-Received: from player796.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 0416870723
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 11:34:22 +0200 (CEST)
-Date: Tue, 28 Mar 2017 11:34:15 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170328113415.7c1881ef@bahia.lan>
-In-Reply-To: <20170328102421.2f4fbeec.cornelia.huck@de.ibm.com>
-References: <149063674781.4447.14258971700726134711.stgit@bahia.lan>
-	<149063676337.4447.2095575576822297032.stgit@bahia.lan>
-	<20170327211728-mutt-send-email-mst@kernel.org>
-	<20170328101409.1aa23618@bahia.lan>
-	<20170328102421.2f4fbeec.cornelia.huck@de.ibm.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/YikKo.mtqHphTH9ONCm5vi/";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH 1/5] virtio: Error object based
- virtio_error()
+	(envelope-from <pm215@archaic.org.uk>) id 1csnc0-0000JK-9j
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 05:40:25 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48952)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1csnc0-0000Ii-20
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 05:40:24 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 28 Mar 2017 10:40:17 +0100
+Message-Id: <1490694017-7532-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH for-2.9 v2] tests/bios-tables-test: Don't pass
+ addresses of packed struct fields
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,77 +23,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
---Sig_/YikKo.mtqHphTH9ONCm5vi/
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Passing the address of a field in a packed struct to a function
+that expects a pointer to normally aligned data will result in
+a SEGBUS on architectures like SPARC that have strict alignment
+requirements.
 
-On Tue, 28 Mar 2017 10:24:21 +0200
-Cornelia Huck <cornelia.huck@de.ibm.com> wrote:
+Pass addresses of local variables rather than addresses of packed
+structure fields to glib functions like g_file_get_contents() to
+avoid this bug.
 
-> On Tue, 28 Mar 2017 10:14:09 +0200
-> Greg Kurz <groug@kaod.org> wrote:
->=20
-> > On Mon, 27 Mar 2017 21:20:56 +0300
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >  =20
-> > > On Mon, Mar 27, 2017 at 07:46:03PM +0200, Greg Kurz wrote: =20
-> > > > This introduces an Error object based implementation of virtio_erro=
-r(). It
-> > > > allows to implement virtio_error() wrappers in device-specific code.
-> > > >=20
-> > > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > > > ---
-> > > >  hw/virtio/virtio.c         |   21 ++++++++++++++++-----
-> > > >  include/hw/virtio/virtio.h |    1 +
-> > > >  2 files changed, 17 insertions(+), 5 deletions(-)
-> > > >  =20
->=20
-> > > Also, whether to stop the device, or the VM, or just warn,
-> > > seems like a policy decision. Why not set it on command line
-> > > like we do for other storage?
-> > >  =20
-> >=20
-> > Huh? This patch simply introduces a new API to a feature that underwent
-> > several rounds of discussion and reached a reasonable consensus (even
-> > your R-b).
-> >=20
-> > I'm not sure this 9pfs series is the right place to talk about all the
-> > behavior changes you're suggesting for virtio_error()... I'd rather
-> > drop this patch and duplicate code in virtio-9p instead if I want the
-> > fixes to go to 2.9. =20
->=20
-> I agree that we should discuss this outside of this patch series. It's
-> not like it is introducing a new error case.
->=20
-> >=20
-> > Cc'ing Connie and Stefanha for insights. =20
->=20
-> See my reply to Michael's mail.
->=20
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+v1->v2 changes: put the assignments after we check the error
+status of the glib function, rather than before (makes no
+practical difference since we will just assert out anyway,
+but logically the right way round.)
 
-Yeah, I saw that just after pressing the send button :)
+ tests/bios-tables-test.c | 28 ++++++++++++++++++++--------
+ 1 file changed, 20 insertions(+), 8 deletions(-)
 
-The points raised by Michael make a lot of sense anyway. Maybe we can
-discuss them for 2.10 ?
-
-Cheers.
-
---
-Greg
-
---Sig_/YikKo.mtqHphTH9ONCm5vi/
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAljaLhcACgkQAvw66wEB28LliwCfQq7qAihdTZ5TUgyu/0gKngHw
-IC0An0nIRYtMGmq4kFgwhQRLsudPkeAN
-=YXfe
------END PGP SIGNATURE-----
-
---Sig_/YikKo.mtqHphTH9ONCm5vi/--
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index 88dbf97..a519921 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -261,8 +261,11 @@ static void dump_aml_files(test_data *data, bool rebuild)
+             fd = g_open(aml_file, O_WRONLY|O_TRUNC|O_CREAT,
+                         S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+         } else {
+-            fd = g_file_open_tmp("aml-XXXXXX", &sdt->aml_file, &error);
++            gchar *name;
++
++            fd = g_file_open_tmp("aml-XXXXXX", &name, &error);
+             g_assert_no_error(error);
++            sdt->aml_file = name;
+         }
+         g_assert(fd >= 0);
+ 
+@@ -291,9 +294,11 @@ static bool load_asl(GArray *sdts, AcpiSdtTable *sdt)
+     gchar *out, *out_err;
+     gboolean ret;
+     int i;
++    gchar *name;
+ 
+-    fd = g_file_open_tmp("asl-XXXXXX.dsl", &sdt->asl_file, &error);
++    fd = g_file_open_tmp("asl-XXXXXX.dsl", &name, &error);
+     g_assert_no_error(error);
++    sdt->asl_file = name;
+     close(fd);
+ 
+     /* build command line */
+@@ -314,10 +319,14 @@ static bool load_asl(GArray *sdts, AcpiSdtTable *sdt)
+     ret = g_spawn_command_line_sync(command_line->str, &out, &out_err, NULL, &error);
+     g_assert_no_error(error);
+     if (ret) {
+-        ret = g_file_get_contents(sdt->asl_file, (gchar **)&sdt->asl,
+-                                  &sdt->asl_len, &error);
++        gchar *contents;
++        gsize len;
++
++        ret = g_file_get_contents(sdt->asl_file, &contents, &len, &error);
+         g_assert(ret);
+         g_assert_no_error(error);
++        sdt->asl = contents;
++        sdt->asl_len = len;
+         ret = (sdt->asl_len > 0);
+     }
+ 
+@@ -371,6 +380,8 @@ static GArray *load_expected_aml(test_data *data)
+         uint32_t signature;
+         gchar *aml_file = NULL;
+         const char *ext = data->variant ? data->variant : "";
++        gchar *aml_contents;
++        gsize aml_length;
+ 
+         sdt = &g_array_index(data->tables, AcpiSdtTable, i);
+ 
+@@ -397,12 +408,13 @@ try_again:
+         if (getenv("V")) {
+             fprintf(stderr, "\nUsing expected file '%s'\n", aml_file);
+         }
+-        ret = g_file_get_contents(aml_file, &exp_sdt.aml,
+-                                  &exp_sdt.aml_len, &error);
++        ret = g_file_get_contents(aml_file, &aml_contents, &aml_length, &error);
+         g_assert(ret);
+         g_assert_no_error(error);
+-        g_assert(exp_sdt.aml);
+-        g_assert(exp_sdt.aml_len);
++        g_assert(aml_contents);
++        g_assert(aml_length);
++        exp_sdt.aml = aml_contents;
++        exp_sdt.aml_len = aml_length;
+ 
+         g_array_append_val(exp_tables, exp_sdt);
+     }
+-- 
+2.7.4
