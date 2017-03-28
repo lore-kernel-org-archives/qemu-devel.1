@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1csr6b-0006pS-4S
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:24:14 -0400
+	(envelope-from <eblake@redhat.com>) id 1csr8o-0007Tg-Ru
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:26:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1csr6Y-0006dJ-1A
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:24:13 -0400
-Resent-Message-Id: <E1csr6Y-0006dJ-1A@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21414)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1csr6X-0006cp-RC
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:24:09 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <149070744194.135.14615459374848549426@6c512846dbc7>
-In-Reply-To: <1490015515-25851-1-git-send-email-armbru@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1csr8l-0007IS-OH
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:26:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37438)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1csr8l-0007Hq-F2
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:26:27 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 778924AEB1
+	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 13:26:25 +0000 (UTC)
+References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
+	<1490621195-2228-9-git-send-email-armbru@redhat.com>
+	<88f70b55-a43b-2515-7150-d0501557256c@redhat.com>
+	<8760it4xnf.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <16055e1c-4f48-2c22-bbbb-2d8ac50add65@redhat.com>
+Date: Tue, 28 Mar 2017 08:26:23 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 28 Mar 2017 06:24:02 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH for-2.9 0/6] qapi: Small qapi2texi fixes
- and addition tests
+In-Reply-To: <8760it4xnf.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="2U2lHR3tEHiSMVJdtJNk5PdPgAHwKqtbT"
+Subject: Re: [Qemu-devel] [PATCH RFC v3 for-2.9 08/11] rbd: Revert -blockdev
+ and -drive parameter auth-supported
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +37,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: armbru@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jdurgin@redhat.com, jcody@redhat.com, mreitz@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCBmb3ItMi45IDAvNl0gcWFwaTogU21hbGwgcWFwaTJ0ZXhpIGZpeGVzIGFu
-ZCBhZGRpdGlvbiB0ZXN0cwpNZXNzYWdlLWlkOiAxNDkwMDE1NTE1LTI1ODUxLTEtZ2l0LXNlbmQt
-ZW1haWwtYXJtYnJ1QHJlZGhhdC5jb20KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVH
-SU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxp
-bmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
-ZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJB
-U0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4v
-JHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBz
-aG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFj
-ayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChu
-KzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5n
-IDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBu
-ZXcgYnJhbmNoICd0ZXN0Jwo0ZmVhNWIyIHFhcGkydGV4aTogRml4IHRyYW5zbGF0aW9uIG9mICpz
-dHJvbmcqIGFuZCBfZW1waGFzaXplZF8KODI0YzIyYiB0ZXN0cy9xYXBpLXNjaGVtYTogU3lzdGVt
-YXRpYyBwb3NpdGl2ZSBkb2MgY29tbWVudCB0ZXN0cwozNjkwMTZiIHRlc3RzL3FhcGktc2NoZW1h
-OiBNYWtlIHRlc3QtcWFwaS5weSBwcmludCBkb2NzIGFnYWluCjgwNDA1NTcgcWFwaTogRHJvcCB1
-bnVzZWQgUUFQSURvYyBtZW1iZXIgb3B0aW9uYWwKNzhlZGQ5MiBxYXBpMnRleGk6IEZpeCB0byBh
-Y3R1YWxseSBmYWlsIHdoZW4gJ2RvYy1yZXF1aXJlZCcgaXMgZmFsc2UKZjY0ZTVmZiBxYXBpOiBE
-cm9wIGV4Y2Vzc2l2ZSBNYWtlIGRlcGVuZGVuY2llcyBvbiBxYXBpMnRleGkucHkKCj09PSBPVVRQ
-VVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNjogcWFwaTogRHJvcCBleGNlc3NpdmUgTWFr
-ZSBkZXBlbmRlbmNpZXMgb24gcWFwaTJ0ZXhpLnB5Li4uCkNoZWNraW5nIFBBVENIIDIvNjogcWFw
-aTJ0ZXhpOiBGaXggdG8gYWN0dWFsbHkgZmFpbCB3aGVuICdkb2MtcmVxdWlyZWQnIGlzIGZhbHNl
-Li4uCkNoZWNraW5nIFBBVENIIDMvNjogcWFwaTogRHJvcCB1bnVzZWQgUUFQSURvYyBtZW1iZXIg
-b3B0aW9uYWwuLi4KQ2hlY2tpbmcgUEFUQ0ggNC82OiB0ZXN0cy9xYXBpLXNjaGVtYTogTWFrZSB0
-ZXN0LXFhcGkucHkgcHJpbnQgZG9jcyBhZ2Fpbi4uLgpDaGVja2luZyBQQVRDSCA1LzY6IHRlc3Rz
-L3FhcGktc2NoZW1hOiBTeXN0ZW1hdGljIHBvc2l0aXZlIGRvYyBjb21tZW50IHRlc3RzLi4uCkVS
-Uk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMzODA6IEZJTEU6IHRlc3RzL3FhcGktc2NoZW1hL2Rv
-Yy1nb29kLnRleGk6NToKK0BlbXBoe3N0cm9uZ30gIEBlbXBoe3dpdGggZW1waGFzaXN9ICQKCnRv
-dGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNTY4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDYvNjogcWFwaTJ0ZXhp
-OiBGaXggdHJhbnNsYXRpb24gb2YgKnN0cm9uZyogYW5kIF9lbXBoYXNpemVkXy4uLgo9PT0gT1VU
-UFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWls
-IGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9d
-LgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9y
-Zw==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2U2lHR3tEHiSMVJdtJNk5PdPgAHwKqtbT
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jdurgin@redhat.com,
+ jcody@redhat.com, mreitz@redhat.com
+Message-ID: <16055e1c-4f48-2c22-bbbb-2d8ac50add65@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v3 for-2.9 08/11] rbd: Revert -blockdev
+ and -drive parameter auth-supported
+References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
+ <1490621195-2228-9-git-send-email-armbru@redhat.com>
+ <88f70b55-a43b-2515-7150-d0501557256c@redhat.com>
+ <8760it4xnf.fsf@dusky.pond.sub.org>
+In-Reply-To: <8760it4xnf.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 03/28/2017 03:24 AM, Markus Armbruster wrote:
+> Eric Blake <eblake@redhat.com> writes:
+>=20
+>> On 03/27/2017 08:26 AM, Markus Armbruster wrote:
+>>> This reverts half of commit 0a55679.  We're having second thoughts on=
+
+>>> the QAPI schema (and thus the external interface), and haven't reache=
+d
+>>> consensus, yet.  Issues include:
+>>>
+>>
+>>> Let's avoid painting ourselves into a corner now, and revert the
+>>> feature for 2.9.
+>>
+>> There may still be some tweaks to improve the commit message and/or co=
+de
+>> comments to clarify things that tripped me up until later in the
+>> subthread, but now that I understand the difference between pseudo-fil=
+e
+>> format (where the key-value pair backdoor still works for libvirt's
+>> usage of -drive file=3Drbd:...) and QemuOpts format (-drive driver=3Dr=
+bd,...
+>> which didn't really exist in 2.8, and where we don't want to bake in
+>> something we don't like in 2.9), I agree with the move.
+>=20
+> I'm inserting ...
+>=20
+>>> Note that users can still configure authentication methods with a
+>>> configuration file.  They probably do that anyway if they use Ceph
+>>> outside QEMU as well.
+>=20
+> ... this hint right here:
+>=20
+>    Further note that this doesn't affect use of key "auth-supported" in=
+
+>    -drive file=3Drbd:...:key=3Dvalue.
+>=20
+> Good enough?
+
+Yes, that does the trick.
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--2U2lHR3tEHiSMVJdtJNk5PdPgAHwKqtbT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY2mR/AAoJEKeha0olJ0NqijMIAJWqf5A2omf2Q4U9vD+8R5p6
+l9T6LPG+X3SKuYjc5vazZtCvK6yOHR4jrjFNdycjI1aOovdYQWDoD9hRDzMZ+DTa
+Q1Y+QYcgkK6DQ+2CYoIARfPLJMeCUInAvLGMD/csGv7Ycj+mssdRaP3EUK39nUsF
+a+89bPjZayxKDqfUVsUcoWiNxmq5AAk3fNEDbdmHNtKoRp/K99GF4kczA/+NM8E7
+THn/mjXzI3oWJqdvpCeG/Ymec6xsbgKLzjHQG+vUwPyFiObjlZK9I+piPu5bWMNu
+b1oR1+jJHesiVrYsS7c05buLtPMpa/+QzCt/ZS3RxQg4G3Y9k1VUaj/qdMCcidQ=
+=rz58
+-----END PGP SIGNATURE-----
+
+--2U2lHR3tEHiSMVJdtJNk5PdPgAHwKqtbT--
