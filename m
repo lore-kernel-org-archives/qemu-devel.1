@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1csm8D-0007ns-Ix
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:05:39 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1csmBx-0000jz-JA
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:09:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1csm88-0006fR-Lk
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:05:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56106)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1csm88-0006eo-Ga
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:05:28 -0400
-References: <1490685583-16987-1-git-send-email-tejaswinipoluri3@gmail.com>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1csmBs-0007rw-Ks
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:09:25 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:34332)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1csmBs-0007rb-FF
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:09:20 -0400
+Received: by mail-wr0-x244.google.com with SMTP id w43so17301761wrb.1
+	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 01:09:20 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20170325111424.21752-1-herongguang.he@huawei.com>
+	<58D8BD6D.8080404@huawei.com>
+	<4c9e0c46-ac81-a455-e2ed-530ad916ff71@redhat.com>
+	<58D9B791.2000905@huawei.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <627c8376-285e-f457-9506-9ab7d2f11ae4@redhat.com>
-Date: Tue, 28 Mar 2017 10:05:23 +0200
+Message-ID: <13d644c8-2a3b-e699-d6b5-8ec44afdba2e@redhat.com>
+Date: Tue, 28 Mar 2017 10:09:17 +0200
 MIME-Version: 1.0
-In-Reply-To: <1490685583-16987-1-git-send-email-tejaswinipoluri3@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] target-i386: fix "info lapic" segfault on
- isapc
+In-Reply-To: <58D9B791.2000905@huawei.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] KVM: pci-assign: do not map smm memory
+ slot pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +34,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tejaswini <tejaswinipoluri3@gmail.com>, qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, kwolf@redhat.com, rth@twiddle.net, ehabkost@redhat.com
+To: "Herongguang (Stephen)" <herongguang.he@huawei.com>, rkrcmar@redhat.com, kvm@vger.kernel.org
+Cc: qemu-devel@nongnu.org, wangxinxin.wang@huawei.com
 
 
 
-On 28/03/2017 09:19, Tejaswini wrote:
-> From: Tejaswini Poluri <tejaswinipoluri3@gmail.com>
->=20
-> Start QEMU with
-> "qemu-system-x86_64 -nographic -M isapc -serial none-monitor stdio"
-> and enter "info lapic" at the monitor prompt =E2=87=92
-> Segmentation fault
->=20
-> Signed-off-by: Tejaswini Poluri <tejaswinipoluri3@gmail.com>
+On 28/03/2017 03:08, Herongguang (Stephen) wrote:
+> From 8f5b9d2c2944ea7cd8149e9d3b4088f487217d20 Mon Sep 17 00:00:00 2001
+> From: herongguang <herongguang.he@huawei.com>
+> Date: Mon, 27 Mar 2017 15:08:59 +0800
+> Subject: [PATCH] KVM: pci-assign: do not map smm memory slot pages in vt-d
+>  page table
+> 
+> or VM memory are not put thus leaked in kvm_iommu_unmap_memslots() when
+> destroy VM.
+> 
+> This is consistent with current vfio implementation.
+> 
+> Signed-off-by: herongguang <herongguang.he@huawei.com>
 > ---
->  target/i386/helper.c | 4 ++++
->  1 file changed, 4 insertions(+)
->=20
-> diff --git a/target/i386/helper.c b/target/i386/helper.c
-> index e2af340..f11cac6 100644
-> --- a/target/i386/helper.c
-> +++ b/target/i386/helper.c
-> @@ -326,6 +326,10 @@ void x86_cpu_dump_local_apic_state(CPUState *cs, F=
-ILE *f,
->  {
->      X86CPU *cpu =3D X86_CPU(cs);
->      APICCommonState *s =3D APIC_COMMON(cpu->apic_state);
-> +    if (!s) {
-> +        cpu_fprintf(f, "local apic state not available\n");
-> +        return;
-> +    }
->      uint32_t *lvt =3D s->lvt;
-> =20
->      cpu_fprintf(f, "dumping local APIC state for CPU %-2u\n\n",
->=20
+>  virt/kvm/kvm_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 482612b..9018d06 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1052,7 +1052,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
+>       * changes) is disallowed above, so any other attribute changes
+> getting
+>       * here can be skipped.
+>       */
+> -    if ((change == KVM_MR_CREATE) || (change == KVM_MR_MOVE)) {
+> +    if ((as_id == 0) && ((change == KVM_MR_CREATE) || (change ==
+> KVM_MR_MOVE))) {
+>          r = kvm_iommu_map_pages(kvm, &new);
+>          return r;
+>      }
 
-Queued, thanks.
+Thanks!
 
 Paolo
