@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1csjNq-0008OJ-Rx
+	(envelope-from <dgibson@ozlabs.org>) id 1csjNq-0008O2-NC
 	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 01:09:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1csjNp-0000Pw-TW
+	(envelope-from <dgibson@ozlabs.org>) id 1csjNp-0000Pl-IY
 	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 01:09:30 -0400
-Date: Tue, 28 Mar 2017 15:54:55 +1100
+Date: Tue, 28 Mar 2017 15:55:18 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170328045455.GG21068@umbus.fritz.box>
+Message-ID: <20170328045518.GH21068@umbus.fritz.box>
 References: <1490189568-167621-1-git-send-email-imammedo@redhat.com>
-	<1490189568-167621-18-git-send-email-imammedo@redhat.com>
+	<1490189568-167621-19-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="oXNgvKVxGWJ0RPMJ"
+	protocol="application/pgp-signature"; boundary="K1n7F7fSdjvFAEnM"
 Content-Disposition: inline
-In-Reply-To: <1490189568-167621-18-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 17/23] numa: remove no longer used
- numa_get_node_for_cpu()
+In-Reply-To: <1490189568-167621-19-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 18/23] numa: remove no longer need
+ numa_post_machine_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +29,79 @@ To: Igor Mammedov <imammedo@redhat.com>
 Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
 
---oXNgvKVxGWJ0RPMJ
+--K1n7F7fSdjvFAEnM
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 22, 2017 at 02:32:42PM +0100, Igor Mammedov wrote:
-> it's been replaced by fetching mapping info from possible_cpus
+On Wed, Mar 22, 2017 at 02:32:43PM +0100, Igor Mammedov wrote:
+> CPUState::numa_node is still in use but now it's set by
+> board when it creates CPU objects. So there isn't any
+> need to set it again after all CPU's are created,
+> since it's been already set.
 >=20
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  include/sysemu/numa.h |  4 ----
->  numa.c                | 14 --------------
->  2 files changed, 18 deletions(-)
+>  include/sysemu/numa.h |  1 -
+>  numa.c                | 15 ---------------
+>  vl.c                  |  2 --
+>  3 files changed, 18 deletions(-)
 >=20
 > diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-> index 46ea6c7..c67763a 100644
+> index c67763a..345bb94 100644
 > --- a/include/sysemu/numa.h
 > +++ b/include/sysemu/numa.h
-> @@ -31,8 +31,4 @@ extern QemuOptsList qemu_numa_opts;
+> @@ -25,7 +25,6 @@ typedef struct node_info {
+> =20
+>  extern NodeInfo numa_info[MAX_NODES];
+>  void parse_numa_opts(MachineState *ms);
+> -void numa_post_machine_init(void);
+>  void query_numa_node_mem(uint64_t node_mem[]);
+>  extern QemuOptsList qemu_numa_opts;
 >  void numa_set_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node);
->  void numa_unset_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t nod=
-e);
->  uint32_t numa_get_node(ram_addr_t addr, Error **errp);
-> -
-> -/* on success returns node index in numa_info,
-> - * on failure returns nb_numa_nodes */
-> -int numa_get_node_for_cpu(int idx);
->  #endif
 > diff --git a/numa.c b/numa.c
-> index ab41776..187c93f 100644
+> index 187c93f..8461c96 100644
 > --- a/numa.c
 > +++ b/numa.c
-> @@ -583,20 +583,6 @@ MemdevList *qmp_query_memdev(Error **errp)
->      return list;
+> @@ -418,21 +418,6 @@ void parse_numa_opts(MachineState *ms)
+>      }
 >  }
 > =20
-> -int numa_get_node_for_cpu(int idx)
+> -void numa_post_machine_init(void)
 > -{
+> -    CPUState *cpu;
 > -    int i;
 > -
-> -    assert(idx < max_cpus);
-> -
-> -    for (i =3D 0; i < nb_numa_nodes; i++) {
-> -        if (test_bit(idx, numa_info[i].node_cpu)) {
-> -            break;
+> -    CPU_FOREACH(cpu) {
+> -        for (i =3D 0; i < nb_numa_nodes; i++) {
+> -            assert(cpu->cpu_index < max_cpus);
+> -            if (test_bit(cpu->cpu_index, numa_info[i].node_cpu)) {
+> -                cpu->numa_node =3D i;
+> -            }
 > -        }
 > -    }
-> -    return i;
 > -}
 > -
->  void ram_block_notifier_add(RAMBlockNotifier *n)
->  {
->      QLIST_INSERT_HEAD(&ram_list.ramblock_notifiers, n, next);
+>  static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *own=
+er,
+>                                             const char *name,
+>                                             uint64_t ram_size)
+> diff --git a/vl.c b/vl.c
+> index 5ffb9c3..e5c1620 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4587,8 +4587,6 @@ int main(int argc, char **argv, char **envp)
+> =20
+>      cpu_synchronize_all_post_init();
+> =20
+> -    numa_post_machine_init();
+> -
+>      rom_reset_order_override();
+> =20
+>      /*
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -92,25 +109,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---oXNgvKVxGWJ0RPMJ
+--K1n7F7fSdjvFAEnM
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJY2eyfAAoJEGw4ysog2bOS8ZgQANfS+SE+Gg9l3WMqnU76S8Uw
-cXPH9kpErHc2wBxn7lGmMm/uMon0FLUDkizuT79VNg/j5pPEPNoJw7TufqAYAIXk
-OPkJyPPiq3vmsUkDrrdlBmX9Y3ofNg6vKOVBpkh4J50VkuRTVNKX2dELangkXbuq
-cEeo/yx73UG+f/Ug+B9jVrUIYAsLwCh+XTbQiTi4boYlE3Y3Iv+LJuO6fJkD8RyV
-DK39Ogxkae+l4gxb4+UDicwK451Aoxoq0nUg9fRHVY9uCyyv8hJnzFXx5jc8OwEk
-WHYgP9gQcdNbTr57+jrd2DxBFqKD6ZGQbSh+bs8+qyyix44e56wDJLxEMUEw4Xio
-+EBogoXPj4oU4FCEcDUXC2n6EqmzGkKKAzRcEWrfCBSo07R3NwELWVKbsfgMv+Ik
-ov5QMdiZdTJNOTi5a0rX1P+KtNqxQ6R5HyoUPTy1o0eXBwXXmwQSgLEQcMO9YNb+
-AXYBGqanZkzQJbCSezHCTTKJmzP4t513TzrUUY0TBSoxKoRB6fJ4wWLGwUex5B0D
-EB+E4gyVYv3IlByY2wXoPlwXetxurr/Hg185pROrUbtnqtEXIWk1MvaDv0VkR72C
-DWvmo9dia7ulpOATUiJAoCBempYMsMGPzhWLvB95tLHPsEzutRr1HxxMTecAsmpe
-AOspgv6eBjkcC0lhbIU8
-=qg7v
+iQIcBAEBCAAGBQJY2ey2AAoJEGw4ysog2bOSkskQAJ2rSxN07Napljq3cYmxPGEl
+e6Lv214KlCKnOhIJW/BB3gSx6z+QwAdY+7Y30h5+/Rp+ATY59FMdDR6UgURfSLkb
+O4d+Rzxc1r0J2KPXqP0nGu68vMSPJhmFjDH6VfJ9zUigqTsmlC9Ti13osfm463ij
+nDAzu7Z0yoJLtbUkSYxuJA/od99hDyN8wrhZ6O9gfTzWciOFo7xe7M+n3dFq2siV
+FMEvZGdnt2syx4SrwM838s68WHMcUcYZK/nzMtskSX/P0Zlb/dxirEf4yX55bjD7
+nTRhvBt5XlZ2th8BryREEvktM+EMDjJ4zzuVIK9E1r0aBogymVRBzUbwy4ZImPT3
+lxCdDLNN5JL8auI03ylBgcuatIC+UOHIiFPFn58/SrDO7qOqETY5N0/i4FkXppaC
+tzXDN0DWG3pFq5dSXme77e6/n4v0SThzpEGJG4rNRAVNF78DmHgK4Bbew91GFjXH
+DMg8DgTJsdeOh6AtiC9jtEZOiQSBHK9qdFVUMasp4jAxt6q6MPx1xQyqaTJwOiT8
+H21nf4Dkhgv4AFHyOdgC5t+7AedQSWofgjsGNZxw/22QOpw0hkJBi/X2lCcYZHvF
+UGeJwFK2NYIGBUBUHq2i7AEsKOE8oALHnb7/U7uYu49a9N9EkX5TGWLkNv7fRFOt
+Sv3ZhAhXxMuLWZxh/bFR
+=Np6X
 -----END PGP SIGNATURE-----
 
---oXNgvKVxGWJ0RPMJ--
+--K1n7F7fSdjvFAEnM--
