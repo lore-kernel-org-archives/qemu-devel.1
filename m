@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1csrlH-0007jP-5j
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 10:06:18 -0400
+	(envelope-from <jcody@redhat.com>) id 1csrlM-0007ne-2f
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 10:06:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1csrlG-00082W-5R
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 10:06:15 -0400
+	(envelope-from <jcody@redhat.com>) id 1csrlK-00084x-Ub
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 10:06:20 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Tue, 28 Mar 2017 10:05:50 -0400
-Message-Id: <20170328140555.3001-6-jcody@redhat.com>
+Date: Tue, 28 Mar 2017 10:05:51 -0400
+Message-Id: <20170328140555.3001-7-jcody@redhat.com>
 In-Reply-To: <20170328140555.3001-1-jcody@redhat.com>
 References: <20170328140555.3001-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL for-2.9 05/10] rbd: Don't accept -drive
- driver=rbd, keyvalue-pairs=...
+Subject: [Qemu-devel] [PULL for-2.9 06/10] rbd: Clean up runtime_opts,
+ fix -drive to reject filename
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,64 +25,121 @@ Cc: peter.maydell@linaro.org, jcody@redhat.com, armbru@redhat.com, qemu-devel@no
 
 From: Markus Armbruster <armbru@redhat.com>
 
-The way we communicate extra key-value pairs from
-qemu_rbd_parse_filename() to qemu_rbd_open() exposes option parameter
-"keyvalue-pairs" on the command line.  It's not wanted there.  Hack:
-rename the parameter to "=keyvalue-pairs" to make it inaccessible.
+runtime_opts is used for three different purposes:
+
+* qemu_rbd_open() uses it to accept options it recognizes, such as
+  "pool" and "image".  Other .bdrv_open() methods do it similarly.
+
+* qemu_rbd_open() accepts additional list-valued options
+  auth-supported and server, with the help of qemu_rbd_array_opts().
+  The list elements are again dictionaries.  qemu_rbd_array_opts()
+  uses runtime_opts to accept their members.  Thus, runtime_opts
+  contains recognized sub-sub-options "auth", "host", "port" in
+  addition to recognized options.  No other block driver does that.
+
+* qemu_rbd_create() uses it to convert the QDict produced by
+  qemu_rbd_parse_filename() to QemuOpts.  No other block driver does
+  that.  The keys produced by qemu_rbd_parse_filename() are "pool",
+  "image", "snapshot", "conf", "user" and "keyvalue-pairs".
+  qemu_rbd_open() accepts these, so no additional ones here.
+
+This is a confusing mess.  Dates back to commit 0f9d252.  First step
+to clean it up is documenting runtime_opts.desc[]:
+
+* Reorder entries to match the QAPI schema, like we do in other block
+  drivers.
+
+* Document why the schema's "server" and "auth-supported" aren't in
+  .desc[].
+
+* Document why "keyvalue-pairs", "host", "port" and "auth" are in
+  .desc[], but not the schema.
+
+* Delete "filename", because none of the three users actually uses it.
+  This fixes -drive to reject parameter filename instead of silently
+  ignoring it.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Jeff Cody <jcody@redhat.com>
-Message-id: 1490691368-32099-6-git-send-email-armbru@redhat.com
+Message-id: 1490691368-32099-7-git-send-email-armbru@redhat.com
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- block/rbd.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ block/rbd.c | 40 +++++++++++++++++++++++++---------------
+ 1 file changed, 25 insertions(+), 15 deletions(-)
 
 diff --git a/block/rbd.c b/block/rbd.c
-index 182a5a3..2632533 100644
+index 2632533..b2afe07 100644
 --- a/block/rbd.c
 +++ b/block/rbd.c
-@@ -215,7 +215,7 @@ static void qemu_rbd_parse_filename(const char *filename, QDict *options,
-     }
- 
-     if (keypairs[0]) {
--        qdict_put(options, "keyvalue-pairs", qstring_from_str(keypairs));
-+        qdict_put(options, "=keyvalue-pairs", qstring_from_str(keypairs));
-     }
- 
- 
-@@ -330,7 +330,11 @@ static QemuOptsList runtime_opts = {
-             .help = "Rados id name",
+@@ -294,21 +294,6 @@ static QemuOptsList runtime_opts = {
+     .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
+     .desc = {
+         {
+-            .name = "filename",
+-            .type = QEMU_OPT_STRING,
+-            .help = "Specification of the rbd image",
+-        },
+-        {
+-            .name = "password-secret",
+-            .type = QEMU_OPT_STRING,
+-            .help = "ID of secret providing the password",
+-        },
+-        {
+-            .name = "conf",
+-            .type = QEMU_OPT_STRING,
+-            .help = "Rados config file location",
+-        },
+-        {
+             .name = "pool",
+             .type = QEMU_OPT_STRING,
+             .help = "Rados pool name",
+@@ -319,6 +304,11 @@ static QemuOptsList runtime_opts = {
+             .help = "Image name in the pool",
          },
          {
--            .name = "keyvalue-pairs",
-+            /*
-+             * HACK: name starts with '=' so that qemu_opts_parse()
-+             * can't set it
-+             */
-+            .name = "=keyvalue-pairs",
++            .name = "conf",
++            .type = QEMU_OPT_STRING,
++            .help = "Rados config file location",
++        },
++        {
+             .name = "snapshot",
+             .type = QEMU_OPT_STRING,
+             .help = "Ceph snapshot name",
+@@ -329,6 +319,19 @@ static QemuOptsList runtime_opts = {
+             .type = QEMU_OPT_STRING,
+             .help = "Rados id name",
+         },
++        /*
++         * server.* and auth-supported.* extracted manually, see
++         * qemu_rbd_array_opts()
++         */
++        {
++            .name = "password-secret",
++            .type = QEMU_OPT_STRING,
++            .help = "ID of secret providing the password",
++        },
++
++        /*
++         * Keys for qemu_rbd_parse_filename(), not in the QAPI schema
++         */
+         {
+             /*
+              * HACK: name starts with '=' so that qemu_opts_parse()
+@@ -338,6 +341,13 @@ static QemuOptsList runtime_opts = {
              .type = QEMU_OPT_STRING,
              .help = "Legacy rados key/value option parameters",
          },
-@@ -405,7 +409,7 @@ static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
-     conf       = qemu_opt_get(rbd_opts, "conf");
-     clientname = qemu_opt_get(rbd_opts, "user");
-     name       = qemu_opt_get(rbd_opts, "image");
--    keypairs   = qemu_opt_get(rbd_opts, "keyvalue-pairs");
-+    keypairs   = qemu_opt_get(rbd_opts, "=keyvalue-pairs");
- 
-     ret = rados_create(&cluster, clientname);
-     if (ret < 0) {
-@@ -638,7 +642,7 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-     snap           = qemu_opt_get(opts, "snapshot");
-     clientname     = qemu_opt_get(opts, "user");
-     name           = qemu_opt_get(opts, "image");
--    keypairs       = qemu_opt_get(opts, "keyvalue-pairs");
-+    keypairs       = qemu_opt_get(opts, "=keyvalue-pairs");
- 
-     if (!pool || !name) {
-         error_setg(errp, "Parameters 'pool' and 'image' are required");
++
++        /*
++         * The remainder aren't option keys, but option sub-sub-keys,
++         * so that qemu_rbd_array_opts() can abuse runtime_opts for
++         * its own purposes
++         * TODO clean this up
++         */
+         {
+             .name = "host",
+             .type = QEMU_OPT_STRING,
 -- 
 2.9.3
