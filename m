@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jgross@suse.com>) id 1cskDi-0007jg-TH
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 02:03:08 -0400
+	(envelope-from <thuth@redhat.com>) id 1cskiv-0001xM-1g
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 02:35:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jgross@suse.com>) id 1cskDe-0002d6-IU
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 02:03:06 -0400
-Received: from mx2.suse.de ([195.135.220.15]:59074)
+	(envelope-from <thuth@redhat.com>) id 1cskir-0005Jl-R1
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 02:35:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57688)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jgross@suse.com>) id 1cskDe-0002cU-8q
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 02:03:02 -0400
-References: <alpine.DEB.2.10.1703201117560.23684@sstabellini-ThinkPad-X260>
-	<1490033952-26735-1-git-send-email-sstabellini@kernel.org>
-	<20170323140005.6b0853b3@bahia.lan>
-	<15207674-c5cd-3874-7ac9-5b23cdac8888@suse.com>
-	<28db5816-2ed9-0d92-a15d-af47b58a9da1@redhat.com>
-	<alpine.DEB.2.10.1703230953120.8001@sstabellini-ThinkPad-X260>
-	<3d94c0aa-6b18-5574-4034-110cc2cf4b90@suse.com>
-	<alpine.DEB.2.10.1703241030391.8001@sstabellini-ThinkPad-X260>
-	<d02897ba-88c6-f92e-ccf5-afab3c584f75@suse.com>
-	<alpine.DEB.2.10.1703271537330.8001@sstabellini-ThinkPad-X260>
-From: Juergen Gross <jgross@suse.com>
-Message-ID: <b0ef8967-302f-e308-4d2c-207299c250ef@suse.com>
-Date: Tue, 28 Mar 2017 08:02:56 +0200
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cskir-0005Jd-Iw
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 02:35:17 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6F1ADC1C5E04
+	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 06:35:16 +0000 (UTC)
+References: <1490092792-30957-1-git-send-email-thuth@redhat.com>
+	<1490092792-30957-3-git-send-email-thuth@redhat.com>
+	<20170327142421.GF2373@work-vm>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <95bf59af-beeb-74bf-7819-f2a770b64263@redhat.com>
+Date: Tue, 28 Mar 2017 08:35:11 +0200
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.10.1703271537330.8001@sstabellini-ThinkPad-X260>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 1/8] xen: import ring.h from xen
+In-Reply-To: <20170327142421.GF2373@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/3] libqtest: Add a generic function to
+ run a callback function for every machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,104 +35,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, Stefano Stabellini <stefano@aporeto.com>, anthony.perard@citrix.com, xen-devel <xen-devel@lists.xenproject.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 28/03/17 00:48, Stefano Stabellini wrote:
-> On Mon, 27 Mar 2017, Juergen Gross wrote:
->> On 24/03/17 18:37, Stefano Stabellini wrote:
->>> On Fri, 24 Mar 2017, Juergen Gross wrote:
->>>> On 23/03/17 19:22, Stefano Stabellini wrote:
->>>>> On Thu, 23 Mar 2017, Paolo Bonzini wrote:
->>>>>> On 23/03/2017 14:55, Juergen Gross wrote:
->>>>>>> On 23/03/17 14:00, Greg Kurz wrote:
->>>>>>>> On Mon, 20 Mar 2017 11:19:05 -0700
->>>>>>>> Stefano Stabellini <sstabellini@kernel.org> wrote:
->>>>>>>>
->>>>>>>>> Do not use the ring.h header installed on the system. Instead, import
->>>>>>>>> the header into the QEMU codebase. This avoids problems when QEMU is
->>>>>>>>> built against a Xen version too old to provide all the ring macros.
->>>>>>>>>
->>>>>>>>> Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
->>>>>>>>> Reviewed-by: Greg Kurz <groug@kaod.org>
->>>>>>>>> CC: anthony.perard@citrix.com
->>>>>>>>> CC: jgross@suse.com
->>>>>>>>> ---
->>>>>>>>> NB: The new macros have not been committed to Xen yet. Do not apply this
->>>>>>>>> patch until they do.
->>>>>>>>> ---
->>>>>>>>
->>>>>>>> Looking at your other series for the kernel part of this feature:
->>>>>>>>
->>>>>>>> https://lkml.org/lkml/2017/3/22/761
->>>>>>>>
->>>>>>>> I realize that the ring.h header from Xen also exists in the kernel tree... 
->>>>>>>>
->>>>>>>> Shouldn't all the code that can be used in both kernel and userspace go to a
->>>>>>>> header file under include/uapi in the kernel tree ? And then we would import
->>>>>>>> it under include/standard-headers/linux in the QEMU tree and we could keep it
->>>>>>>> in sync using scripts/update-linux-headers.sh.
->>>>>>>>
->>>>>>>> Cc'ing Paolo for insights.
->>>>>>>
->>>>>>> As Xen isn't part of the kernel we don't want that. You can use and/or
->>>>>>> build qemu with xen-9pfs backend support on an old Linux kernel without
->>>>>>> the related frontend.
->>>>>>
->>>>>> As long as the header changes rarely, I guess it's fine not to go
->>>>>> through update-linux-headers.sh.
->>>>>
->>>>> Very rarely, last time ring.h was changed was 2015, and to introduce a
->>>>> new macro (which we don't necessarily need in QEMU).
->>>>>
->>>>>
->>>>>>> OTOH I don't see the advantage of not using the headers from Xen. This
->>>>>>> is working for qdisk and pvusb backends and for all the Xen libraries.
->>>>>>> Do you expect the 9pfs backend to be used for a qemu version built
->>>>>>> against a Xen version not supporting that backend?
->>>>>
->>>>> Yes, I think that is entirely possible: Xen and QEMU versions can mix
->>>>> and match.
->>>>>
->>>>> Keeping in mind that the 9pfs backend has actually no build dependencies
->>>>> on Xen, except for these new ring.h macros, we have the following
->>>>> options:
->>>>>
->>>>> 1) we build the 9pfs backend only for Xen >= 4.9, because of the new
->>>>>    macros in ring.h that we need
->>>>
->>>> Right. You have sent 9pfs support patches for Xen tools. So obviously
->>>> you need a proper Xen version to use 9pfs. Why not build qemu against
->>>> it? Do you really expect a new Xen being used with an old qemu while
->>>> wanting to use new features? That makes no sense for me.
->>>  
->>> Tools support is needed to setup the frontend/backend connection as
->>> usual, but that's not a requirement for building the 9pfs backend. In
->>> fact, the backend doesn't need any tools support for it to work. The
->>> macro themselves are just a convenience - the backend would work just
->>> fine without them. Why restrict the QEMU build gratuitously?
+On 27.03.2017 16:24, Dr. David Alan Gilbert wrote:
+> * Thomas Huth (thuth@redhat.com) wrote:
+>> Some tests need to run single tests for every available machine of the
+>> current QEMU binary. To avoid code duplication, let's extract this
+>> code that deals with 'query-machines' into a separate function.
 >>
->> You are duplicating a header without any real benefit I can see. This
->> is adding future work for keeping both versions of the header in sync.
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>=20
+> Having queued it, it's failing my test.
+>=20
+> The reason is that qom-tests.c has a blacklist which blacklists Xen;
+> however your new generic function doesn't have the blacklist, so when
+> you run HMP commands on all machines it tries to run it on Xen since
+> my PC has the Xen libraries installed (so builds with Xen support) but
+> isn't a Xen guest.
+>=20
+> It fails with:
+> xen be core: xen be core: can't connect to xenstored
+> can't connect to xenstored
+> xen_init_pv: xen backend core setup failed
+> Broken pipe
+>=20
+> I suggest you probably need to share the blacklist as well.
+>=20
+> (Unqueued)
+>=20
+> Dave
+>=20
+>> ---
+>>  tests/libqtest.c    | 30 +++++++++++++++++
+>>  tests/libqtest.h    |  8 +++++
+>>  tests/pc-cpu-test.c | 95 ++++++++++++++++++++------------------------=
+---------
+>>  tests/qom-test.c    | 36 ++++----------------
+>>  4 files changed, 80 insertions(+), 89 deletions(-)
 >>
->> In which scenario would you want qemu to support xen-9pfs without being
->> built against a Xen version supporting xen-9pfs?
->>
->> I am not completely against copying the header, I just don't see an
->> advantage for any distro or user in doing it.
-> 
-> I understand your point of view, and honestly it wouldn't be a problem
-> doing it the way you suggested either. However, I think that going
-> forward it will be less of a maintenance pain to keep ring.h in sync,
-> compared to maintaining a versioned build dependency between Xen and
-> QEMU for the compilation of one PV backend. We do have version checks
-> in QEMU for Xen compatibility, but not for PV backends or the xenpv
-> machine yet.
+>> diff --git a/tests/libqtest.c b/tests/libqtest.c
+>> index c9b2d76..d8b8066 100644
+>> --- a/tests/libqtest.c
+>> +++ b/tests/libqtest.c
+>> @@ -938,3 +938,33 @@ bool qtest_big_endian(QTestState *s)
+>>  {
+>>      return s->big_endian;
+>>  }
+>> +
+>> +void qtest_cb_for_every_machine(void (*cb)(const char *machine))
+>> +{
+>> +    QDict *response, *minfo;
+>> +    QList *list;
+>> +    const QListEntry *p;
+>> +    QObject *qobj;
+>> +    QString *qstr;
+>> +    const char *mname;
+>> +
+>> +    qtest_start("-machine none");
+>> +    response =3D qmp("{ 'execute': 'query-machines' }");
+>> +    g_assert(response);
+>> +    list =3D qdict_get_qlist(response, "return");
+>> +    g_assert(list);
+>> +
+>> +    for (p =3D qlist_first(list); p; p =3D qlist_next(p)) {
+>> +        minfo =3D qobject_to_qdict(qlist_entry_obj(p));
+>> +        g_assert(minfo);
+>> +        qobj =3D qdict_get(minfo, "name");
+>> +        g_assert(qobj);
+>> +        qstr =3D qobject_to_qstring(qobj);
+>> +        g_assert(qstr);
+>> +        mname =3D qstring_get_str(qstr);
+>> +        cb(mname);
+>> +    }
+>> +
+>> +    qtest_end();
+>> +    QDECREF(response);
+>> +}
+[...]
+>> diff --git a/tests/qom-test.c b/tests/qom-test.c
+>> index d48f890..ab0595d 100644
+>> --- a/tests/qom-test.c
+>> +++ b/tests/qom-test.c
+>> @@ -107,46 +107,22 @@ static void test_machine(gconstpointer data)
+>>      g_free((void *)machine);
+>>  }
+>> =20
+>> -static void add_machine_test_cases(void)
+>> +static void add_machine_test_case(const char *mname)
+>>  {
+>>      const char *arch =3D qtest_get_arch();
+>> -    QDict *response, *minfo;
+>> -    QList *list;
+>> -    const QListEntry *p;
+>> -    QObject *qobj;
+>> -    QString *qstr;
+>> -    const char *mname;
+>> =20
+>> -    qtest_start("-machine none");
+>> -    response =3D qmp("{ 'execute': 'query-machines' }");
+>> -    g_assert(response);
+>> -    list =3D qdict_get_qlist(response, "return");
+>> -    g_assert(list);
+>> -
+>> -    for (p =3D qlist_first(list); p; p =3D qlist_next(p)) {
+>> -        minfo =3D qobject_to_qdict(qlist_entry_obj(p));
+>> -        g_assert(minfo);
+>> -        qobj =3D qdict_get(minfo, "name");
+>> -        g_assert(qobj);
+>> -        qstr =3D qobject_to_qstring(qobj);
+>> -        g_assert(qstr);
+>> -        mname =3D qstring_get_str(qstr);
+>> -        if (!is_blacklisted(arch, mname)) {
+>> -            char *path =3D g_strdup_printf("qom/%s", mname);
+>> -            qtest_add_data_func(path, g_strdup(mname), test_machine);
+>> -            g_free(path);
+>> -        }
+>> +    if (!is_blacklisted(arch, mname)) {
+>> +        char *path =3D g_strdup_printf("qom/%s", mname);
+>> +        qtest_add_data_func(path, g_strdup(mname), test_machine);
+>> +        g_free(path);
+>>      }
 
-For the pvUSB backend I just used a mandatory macro from the header for
-the #ifdef. The backend will signal support when it was defined during
-build and will refuse initialization otherwise. Xen tools are able to
-recoginze qemu support of the backend by looking into Xenstore.
+Not sure what is going wrong here ... the "!is_blacklisted" check is
+still here, so why is it trying to start a xen machine here?
 
+Looks like I need to install those xen libraries here, too ...
 
-Juergen
+ Thomas
