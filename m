@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1csmc9-0008GP-9k
+	(envelope-from <alex.bennee@linaro.org>) id 1csmcC-0008Gz-Gc
 	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:36:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1csmc8-00015L-GM
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:36:29 -0400
-Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:33595)
+	(envelope-from <alex.bennee@linaro.org>) id 1csmcB-000175-EG
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:36:32 -0400
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:34802)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1csmc8-00014P-B9
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:36:28 -0400
-Received: by mail-wr0-x229.google.com with SMTP id w43so79528598wrb.0
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 01:36:28 -0700 (PDT)
+	id 1csmcB-00016a-9U
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:36:31 -0400
+Received: by mail-wr0-x22b.google.com with SMTP id l43so92603660wre.1
+	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 01:36:31 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 28 Mar 2017 09:36:19 +0100
-Message-Id: <20170328083623.10396-3-alex.bennee@linaro.org>
+Date: Tue, 28 Mar 2017 09:36:23 +0100
+Message-Id: <20170328083623.10396-7-alex.bennee@linaro.org>
 In-Reply-To: <20170328083623.10396-1-alex.bennee@linaro.org>
 References: <20170328083623.10396-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 2/6] bsd-user: align use of mmap_lock to
- that of linux-user
+Subject: [Qemu-devel] [PATCH v2 6/6] replay/replay.c: bump REPLAY_VERSION
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,66 +32,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, rth@twiddle.net, pbonzini@redhat.com, kraxel@redhat.com
 Cc: qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-The introduction of stricter mmap_lock checking in translate-all broke
-the BSD user build. The working mmap_lock functions were hidden behind
-CONFIG_USE_NPTL which is never defined. This patch brings them inline
-with linux-user.
-
-Despite the disapearence of the comment "We aren't threadsafe to start
-with..." this doesn't make bsd-user so. It will still need the rest of
-the fixes that have been done in linux-user ported over.
+A previous commit (3d4d16f4) added support for audio record/playback.
+However this breaks the logfile ABI due to the re-ordering of the
+ReplayEvents enum. The REPLAY_VERSION check is meant to prevent you
+from using old log files in newer QEMUs but this is currently broken.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 ---
- bsd-user/mmap.c | 13 +------------
- bsd-user/qemu.h |  2 --
- 2 files changed, 1 insertion(+), 14 deletions(-)
+ replay/replay.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/bsd-user/mmap.c b/bsd-user/mmap.c
-index 1ad018a127..7f2018ede0 100644
---- a/bsd-user/mmap.c
-+++ b/bsd-user/mmap.c
-@@ -24,8 +24,7 @@
+diff --git a/replay/replay.c b/replay/replay.c
+index 78e2a7e570..9e0724e756 100644
+--- a/replay/replay.c
++++ b/replay/replay.c
+@@ -22,7 +22,7 @@
  
- //#define DEBUG_MMAP
+ /* Current version of the replay mechanism.
+    Increase it when file format changes. */
+-#define REPLAY_VERSION              0xe02005
++#define REPLAY_VERSION              0xe02006
+ /* Size of replay log header */
+ #define HEADER_SIZE                 (sizeof(uint32_t) + sizeof(uint64_t))
  
--#if defined(CONFIG_USE_NPTL)
--pthread_mutex_t mmap_mutex;
-+static pthread_mutex_t mmap_mutex = PTHREAD_MUTEX_INITIALIZER;
- static int __thread mmap_lock_count;
- 
- void mmap_lock(void)
-@@ -62,16 +61,6 @@ void mmap_fork_end(int child)
-     else
-         pthread_mutex_unlock(&mmap_mutex);
- }
--#else
--/* We aren't threadsafe to start with, so no need to worry about locking.  */
--void mmap_lock(void)
--{
--}
--
--void mmap_unlock(void)
--{
--}
--#endif
- 
- /* NOTE: all the constants are the HOST ones, but addresses are target. */
- int target_mprotect(abi_ulong start, abi_ulong len, int prot)
-diff --git a/bsd-user/qemu.h b/bsd-user/qemu.h
-index 2b2b9184e0..b550cee0cb 100644
---- a/bsd-user/qemu.h
-+++ b/bsd-user/qemu.h
-@@ -209,10 +209,8 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
-                        abi_ulong new_addr);
- int target_msync(abi_ulong start, abi_ulong len, int flags);
- extern unsigned long last_brk;
--#if defined(CONFIG_USE_NPTL)
- void mmap_fork_start(void);
- void mmap_fork_end(int child);
--#endif
- 
- /* main.c */
- extern unsigned long x86_stack_size;
 -- 
 2.11.0
