@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cswEL-0002MQ-Db
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 14:52:34 -0400
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1cswH7-0003R6-El
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 14:55:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cswEI-00017A-B2
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 14:52:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57204)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cswEI-00016v-3D
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 14:52:30 -0400
-Date: Tue, 28 Mar 2017 19:52:25 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170328185224.GI5740@work-vm>
-References: <20170323210124.12300-1-quintela@redhat.com>
-	<5023e01f-ee47-d066-eb7b-0ac4b8837283@huawei.com>
-	<87d1d7844y.fsf@secure.mitica>
-	<31202c71-ced1-3cdd-e1a1-829daf5d2819@huawei.com>
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1cswH4-00027e-Cs
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 14:55:25 -0400
+Received: from mail-by2nam01on0098.outbound.protection.outlook.com
+	([104.47.34.98]:39744
+	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Andrew.Baumann@microsoft.com>)
+	id 1cswH3-000275-UT
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 14:55:22 -0400
+From: Andrew Baumann <Andrew.Baumann@microsoft.com>
+Date: Tue, 28 Mar 2017 18:55:19 +0000
+Message-ID: <DM2PR21MB0060C4ECE3B5CEF456AE03AB9E320@DM2PR21MB0060.namprd21.prod.outlook.com>
+References: <20170324234646.15264-1-Andrew.Baumann@microsoft.com>
+	<5b6dc1d9-996a-66fe-7142-2c9be4670540@weilnetz.de>
+In-Reply-To: <5b6dc1d9-996a-66fe-7142-2c9be4670540@weilnetz.de>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <31202c71-ced1-3cdd-e1a1-829daf5d2819@huawei.com>
-Subject: Re: [Qemu-devel] [RFC] Split migration bitmaps by ramblock
+Subject: Re: [Qemu-devel] [PATCH for 2.9?] tap-win32: don't abort in
+ tap_enable(); enables -netdev tap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,93 +32,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Hongyang <yanghongyang@huawei.com>
-Cc: quintela@redhat.com, qemu-devel@nongnu.org
+To: Stefan Weil <sw@weilnetz.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Jason Wang <jasowang@redhat.com>
 
-* Yang Hongyang (yanghongyang@huawei.com) wrote:
-> 
-> 
-> On 2017/3/24 16:34, Juan Quintela wrote:
-> > Yang Hongyang <yanghongyang@huawei.com> wrote:
-> >> Hi Juan,
-> >>
-> >>   First of all, I like the refactor patchset about RAMState, it makes
-> >> things clean, great!
-> > 
-> > Thanks.
-> > 
-> > The whole idea of the series was to make testing changes easier.
-> > 
-> >> On 2017/3/24 5:01, Juan Quintela wrote:
-> >>> Hi
-> >>>
-> >>> This series split the migration and unsent bitmaps by ramblock.  This
-> >>> makes it easier to synchronize in small bits.  This is on top of the
-> >>> RAMState and not-hotplug series.
-> >>>
-> >>> Why?
-> >>>
-> >>> reason 1:
-> >>>
-> >>> People have complained that by the time that we detect that a page is
-> >>> sent, it has already been marked dirty "again" inside kvm, so we are
-> >>> going to send it again.  On top of this patch, my idea is, for words
-> >>> of the bitmap that have any bit set, just synchonize the bitmap before
-> >>> sending the pages.  I have not looking into performance numbers yet,
-> >>> jsut asking for comments about how it is done.
-> >>
-> >> Here you said 'synchonize the bitmap before sending the pages', do you
-> >> mean synchronize the bitmap from kvm? If so, I doubt the performance...
-> >> because every synchronization will require a ioctl(). If not, the
-> >> synchronization of per block is useless.
-> >>
-> >> Currently, migration thread will synchronize the bitmap from kvm every
-> >> iter(migration_bitmap_sync()). The RAMBlock already has kind of per block
-> >> bitmap for this kind of sync. And the migration bitmap is used to put all
-> >> those per block bitmap together for data sending use.
-> > 
-> > Hi
-> > For huge memory machines, we are doing it always in one go.
-> > 
-> > 
-> > bitmap_sync(1TB RAM)
-> > walk bitmap for 512MB of RAM, at that point, it is very probable that
-> > this page is again dirty in the KVM bitmap, so, we send it, but as it is
-> > dirty again, we would have to send it in the next pass.  This sent is
-> > completely useless.
-> 
-> I got your point, the problem is KVM do not have the ability to sync in
-> small chunks currently, even it has, it will generate lots of ioctls:
-> KVM bitmap sync is per Memory Region IIRC, think we have a 1T mem
-> guest, 16 MRs for example, currently, every iter we need to do 16 ioctls.
-> But if we sync in small chunks, 64M for example, we might need to do
-> 16384 ioctls in the worst case. eg:mem press(dirty rate) is very high.
-
-Yes but I think people  have suggested it should have that ability for a long
-time; so hopefully we can add it.
-
-I'd assumed the sizes of these chunks would be a bit bigger, a few GB each maybe
-and also assumed we'd have a separate thread that was doing the syncing from
-a different thread to the one doing the writing, trying to keep ahead of the
-write pointer.
-
-Even with the structure Juan has here, we could get to syncing each NUMA
-node separately like that which would kind of makes some sense.
-
-Dave
-
-> 
-> > 
-> > So my idea is to split things in smaller chunks.  As we have to do an
-> > ioctl, we wouldn't want to synchronize page by page, but perhaps 16MB at
-> > a time, 64MB, anything less than the whole amount of memory.
-> > 
-> > Later, Juan.
-> > 
-> 
-> -- 
-> Thanks,
-> Yang
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+PiBGcm9tOiBTdGVmYW4gV2VpbCBbbWFpbHRvOnN3QHdlaWxuZXR6LmRlXQ0KPiBTZW50OiBUdWVz
+ZGF5LCAyOCBNYXJjaCAyMDE3IDExOjI4DQoNCj4gQW0gMjUuMDMuMjAxNyB1bSAwMDo0NiBzY2hy
+aWViIEFuZHJldyBCYXVtYW5uOg0KPiA+IFRoZSBkb2NzIGdlbmVyYWxseSBzdGVlciB1c2VycyBh
+d2F5IGZyb20gdXNpbmcgdGhlIGxlZ2FjeSAtbmV0DQo+ID4gcGFyYW1ldGVyLCBob3dldmVyIG9u
+IHdpbjMyIGF0dGVtcHRpbmcgdG8gZW5hYmxlIGEgdGFwIGRldmljZSB1c2luZw0KPiA+IC1uZXRk
+ZXYgdGFwIGZhaWxzIGF0IGFuIGFib3J0KCkgaW4gdGFwX2VuYWJsZSgpLiBSZW1vdmluZyB0aGUg
+YWJvcnQoKXMNCj4gPiBzZWVtcyB0byBiZSBlbm91Z2ggdG8gZ2V0IGV2ZXJ5dGhpbmcgd29ya2lu
+Zywgc28gZG8gdGhhdC4NCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IEFuZHJldyBCYXVtYW5uIDxB
+bmRyZXcuQmF1bWFubkBtaWNyb3NvZnQuY29tPg0KPiA+IC0tLQ0KPiA+ICBuZXQvdGFwLXdpbjMy
+LmMgfCA0ICsrLS0NCj4gPiAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMiBkZWxl
+dGlvbnMoLSkNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9uZXQvdGFwLXdpbjMyLmMgYi9uZXQvdGFw
+LXdpbjMyLmMNCj4gPiBpbmRleCA2NjJmOWI2Li4zNjIwODQzIDEwMDY0NA0KPiA+IC0tLSBhL25l
+dC90YXAtd2luMzIuYw0KPiA+ICsrKyBiL25ldC90YXAtd2luMzIuYw0KPiA+IEBAIC04MTEsMTAg
+KzgxMSwxMCBAQCBpbnQgbmV0X2luaXRfdGFwKGNvbnN0IE5ldGRldiAqbmV0ZGV2LCBjb25zdCBj
+aGFyDQo+ICpuYW1lLA0KPiA+DQo+ID4gIGludCB0YXBfZW5hYmxlKE5ldENsaWVudFN0YXRlICpu
+YykNCj4gPiAgew0KPiA+IC0gICAgYWJvcnQoKTsNCj4gPiArICAgIHJldHVybiAwOw0KPiA+ICB9
+DQo+ID4NCj4gPiAgaW50IHRhcF9kaXNhYmxlKE5ldENsaWVudFN0YXRlICpuYykNCj4gPiAgew0K
+PiA+IC0gICAgYWJvcnQoKTsNCj4gPiArICAgIHJldHVybiAwOw0KPiA+ICB9DQo+IA0KPiBBcyBJ
+IG5ldmVyIHdvcmtlZCB3aXRoIFRBUCBvbiBXaW5kb3dzLCBJIGNhbm5vdCBzYXkgbXVjaCB0byB0
+aGlzIGZpeC4NCj4gDQo+IEphc29uLCB3aGF0IGlzIHRoZSB1c2Ugb2YgdGFwX2VuYWJsZSwgdGFw
+X2Rpc2FibGU/IElzIGl0IGZpbmUNCj4gdG8gc2ltcGx5IGRvIG5vdGhpbmcgb24gV2luZG93cyBo
+ZXJlPw0KDQpJIHdhcyBhbHNvIGhvcGluZyBmb3IgYSByZXZpZXcgLS0gSSdtIG5vIGV4cGVydCBv
+biB0aGlzIHN0dWZmIGVpdGhlciwgYnV0IG15IHF1aWNrIHJlYWRpbmcgb2YgdGhvc2UgY29kZSBw
+YXRocyBpcyB0aGF0IHRoZXkgaXNzdWUgaW9jdGxzIHRvIGVuYWJsZS9kaXNhYmxlIHBhY2tldCBy
+ZWNlcHRpb24gb24gdGhlIHVuZGVybHlpbmcgdGFwIGRldmljZS4gQXMgd2luMzIgVEFQIGlzIGlt
+cGxlbWVudGVkLCB0aGF0IGlzIGFscmVhZHkgZW5hYmxlZCBmcm9tIHN0YXJ0IG9mIGRheS4NCg0K
+SXQncyBwb3NzaWJsZSB0aGlzIHBhdGNoIHN0aWxsIGRvZXMgbm90IHBlcm1pdCBkeW5hbWljIHJl
+Y29uZmlndXJhdGlvbiBvZiB0YXAgZGV2aWNlcyAoZS5nLiBmcm9tIHRoZSBtb25pdG9yIGNvbnNv
+bGUpLiBIb3dldmVyLCBpdCBkb2VzIHdvcmsgd2l0aCB0aGUgLW5ldGRldiB0YXAgb3B0aW9uIG9u
+IHRoZSBjb21tYW5kLWxpbmUuDQoNCj4gQW5kIGlzIHRoaXMgc29tZXRoaW5nIGZvciBRRU1V4oCM
+IDIuOSAoSSBhZGRlZCBxdWVzdGlvbiB0byBzdWJqZWN0IGxpbmUpPw0KDQpJZGVhbGx5LCB5ZXMu
+IElmIG5vdCwgLW5ldGRldiB0YXAgd2lsbCBjb250aW51ZSB0byBibG93IHVwIGluIHRoZSBhYm9y
+dCBhcyBpdCBkb2VzIHRvZGF5Li4uDQoNCkFuZHJldw0K
