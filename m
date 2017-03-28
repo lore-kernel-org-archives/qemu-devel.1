@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cstTW-00082D-Ju
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 11:56:08 -0400
+	(envelope-from <eblake@redhat.com>) id 1cstU5-0008JQ-Hl
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 11:56:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cstTV-0001HO-KM
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 11:56:02 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:35671)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cstTV-0001H6-B9
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 11:56:01 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id u132so43431429wmg.0
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 08:56:01 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1cstU2-0001Ud-Ul
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 11:56:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:29945)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cstU2-0001U3-Mi
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 11:56:34 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B592C8FCFE
+	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 15:56:31 +0000 (UTC)
+References: <20170328152745.28186-1-dgilbert@redhat.com>
+	<20170328152745.28186-2-dgilbert@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5c9d5d33-4d90-24de-9c15-ac5742079c87@redhat.com>
+Date: Tue, 28 Mar 2017 10:56:15 -0500
 MIME-Version: 1.0
-In-Reply-To: <3d738f84-7708-0578-0e83-5434f43aa928@amsat.org>
-References: <1490630670-15818-1-git-send-email-peter.maydell@linaro.org>
-	<1490630670-15818-2-git-send-email-peter.maydell@linaro.org>
-	<3d738f84-7708-0578-0e83-5434f43aa928@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Mar 2017 16:55:39 +0100
-Message-ID: <CAFEAcA-TJOhAuggEdjp0DezGc+H5nq4ftOsrMmq5XLrVMabdQA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.9 1/2] tcg/sparc: Zero extend data
- argument to store helpers
+In-Reply-To: <20170328152745.28186-2-dgilbert@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="IskwAHGu5VGHKeM1twCIQNdODrf2GeVd5"
+Subject: Re: [Qemu-devel] [PATCH 1/6] migration/announce: Add parameters for
+ self-announce
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,68 +35,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, "patches@linaro.org" <patches@linaro.org>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com, lvivier@redhat.com
+Cc: kashyap@redhat.com, germano@redhat.com, jasowang@redhat.com, armbru@redhat.com, jdenemar@redhat.com
 
-On 28 March 2017 at 16:52, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wr=
-ote:
-> On 03/27/2017 01:04 PM, Peter Maydell wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--IskwAHGu5VGHKeM1twCIQNdODrf2GeVd5
+From: Eric Blake <eblake@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
+ qemu-devel@nongnu.org, quintela@redhat.com, lvivier@redhat.com
+Cc: kashyap@redhat.com, germano@redhat.com, jasowang@redhat.com,
+ armbru@redhat.com, jdenemar@redhat.com
+Message-ID: <5c9d5d33-4d90-24de-9c15-ac5742079c87@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/6] migration/announce: Add parameters for
+ self-announce
+References: <20170328152745.28186-1-dgilbert@redhat.com>
+ <20170328152745.28186-2-dgilbert@redhat.com>
+In-Reply-To: <20170328152745.28186-2-dgilbert@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> it seems to me easier to read masking op:
->
->     switch (op & MO_SIZE) {
->     case MO_8:
->         tcg_out_arithi(s, r, r, 0xff, ARITH_AND);
->         break;
->     case MO_16:
->         tcg_out_arithi(s, r, r, 16, SHIFT_SLL);
->         tcg_out_arithi(s, r, r, 16, SHIFT_SRL);
->         break;
->     case MO_32:
->         if (SPARC64) {
->             tcg_out_arith(s, r, r, 0, SHIFT_SRL);
->         }
->         break;
->     case MO_64:
->         break;
->     }
+On 03/28/2017 10:27 AM, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>=20
+> Add the parameters and wire into the set/get routines.
+>=20
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  migration/migration.c | 52 +++++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  qapi-schema.json      | 34 +++++++++++++++++++++++++++++++--
+>  2 files changed, 84 insertions(+), 2 deletions(-)
+>=20
 
-Yes, agreed.
+> =20
+> +    if (params->has_announce_initial &&
+> +        (params->announce_initial < 1 || params->announce_initial > 10=
+0000)) {
+> +        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "announce_initi=
+al",
+> +                   "is invalid, it should be in the range of 1 to 1000=
+00 ms");
+> +    }
+> +    if (params->has_announce_max &&
+> +        (params->announce_max < 1 || params->announce_max > 100000)) {=
 
->> +}
->> +
->>  static void build_trampolines(TCGContext *s)
->>  {
->>      static void * const qemu_ld_helpers[16] =3D {
->> @@ -910,6 +935,7 @@ static void build_trampolines(TCGContext *s)
->>          qemu_st_trampoline[i] =3D s->code_ptr;
->>
->>          if (SPARC64) {
->> +            emit_extend(s, TCG_REG_O2, i);
->
->
-> shouldn't be inverting args?
 
->                emit_extend(s, i, TCG_REG_O2);
+You're doing range validation here...
 
-emit_extend() takes the TCG reg first and the 'op' second,
-so this call is correct...
+> +++ b/qapi-schema.json
+> @@ -960,6 +960,18 @@
+>  #
+>  # Migration parameters enumeration
+>  #
+> +# @announce-initial: The inital delay (in ms) before sending the first=
+ announce
+> +#          (Since 2.10)
 
->>              ra =3D TCG_REG_O4;
->>          } else {
->>              ra =3D TCG_REG_O1;
->> @@ -925,6 +951,7 @@ static void build_trampolines(TCGContext *s)
->>                  tcg_out_arithi(s, ra, ra + 1, 32, SHIFT_SRLX);
->>                  ra +=3D 2;
->>              } else {
->> +                emit_extend(s, i, ra);
+=2E..so it would be useful to mention the bounds here. Also, mentioning
+the defaults is a good idea.
 
-...but this one isn't; I don't have 32-bit sparc host to test
-with so I missed the error.
+s/inital/initial/
 
->>                  ra +=3D 1;
->>              }
->>              /* Skip the oi argument.  */
+> +#
+> +# @announce-max: The maximum delay (in ms) between packets in the anno=
+uncment
+> +#          (Since 2.10)
 
-thanks
--- PMM
+s/announcment/announcement/
+
+> +#
+> +# @announce-rounds: The number of self-announce packets sent after mig=
+ration
+> +#          (Since 2.10)
+> +#
+> +# @announce-step: The increase in delay (in ms) between subsequent pac=
+kets in
+> +#          the announcement (Since 2.10)
+> +#
+
+> @@ -1038,6 +1052,18 @@
+>  # ('query-migrate-parameters'), with the exception of tls-creds and
+>  # tls-hostname.
+>  #
+> +# @announce-initial: The inital delay (in ms) before sending the first=
+ announce
+> +#          (Since 2.10)
+> +#
+> +# @announce-max: The maximum delay (in ms) between packets in the anno=
+uncment
+> +#          (Since 2.10)
+
+same two typos
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--IskwAHGu5VGHKeM1twCIQNdODrf2GeVd5
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY2oefAAoJEKeha0olJ0NqFs0IAITO2DVWST7qft3OX2RcZ7p9
+3Bf/SUHHFx1LIrFz5Sd/dSxEPxJMQQfDkDhenRkL9E1CPAoQQuytq+dqpBmmITCz
+W45k6hBxKPTg+NzyLZiSo0dqdFRBOtMTasBnUlU3rmqrmQF6JticMK1lCVSbzhlz
+ccYzP4rTnO8YNj7JGuS+dQhHo1NcODE+tQrY+rHoQCxuPxuG+xVGIzjzntVso5JR
+5n9NFH9yLdTNhLat8/Y72/Z12s1J3ccUW+9mskL3eHbSUyuAyPDyf9/gCCvVt1Wv
+nf/wGYWdvgfZZO3oNgl2JEMzHiF804Pc8kzkufZ5Lwps/sJW3tTMIALmXA2YUC8=
+=SQXU
+-----END PGP SIGNATURE-----
+
+--IskwAHGu5VGHKeM1twCIQNdODrf2GeVd5--
