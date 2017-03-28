@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1csqrt-0000y5-F4
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:09:02 -0400
+	(envelope-from <eblake@redhat.com>) id 1csqvf-0002Oj-N1
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:13:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1csqrq-00007a-5l
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:09:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55070)
+	(envelope-from <eblake@redhat.com>) id 1csqvc-0001y6-EC
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:12:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39938)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1csqrp-00007H-TH
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:08:58 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 28 Mar 2017 14:08:43 +0100
-Message-Id: <20170328130843.1931-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH] configure: eliminate Python dependency for
- --help
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1csqvc-0001xi-5s
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:12:52 -0400
+References: <20170328072130.17142-1-vfeenstr@redhat.com>
+	<CAJ+F1CK0n7m+mPBeUOOD0TXNroogjK3iMWthyQhdDVwd=3G8fA@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b481c70f-3e0b-0b0f-a8f0-620b75e18a6d@redhat.com>
+Date: Tue, 28 Mar 2017 08:12:48 -0500
+MIME-Version: 1.0
+In-Reply-To: <CAJ+F1CK0n7m+mPBeUOOD0TXNroogjK3iMWthyQhdDVwd=3G8fA@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="25hnuaXgdiIh3MDvcgNVAT0262rg6KmPf"
+Subject: Re: [Qemu-devel] [PATCH v1] qga: Add 'guest-get-users' command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,81 +28,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com
 
-The ./configure script should produce --help output even if Python is
-not installed.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--25hnuaXgdiIh3MDvcgNVAT0262rg6KmPf
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
+ Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com
+Message-ID: <b481c70f-3e0b-0b0f-a8f0-620b75e18a6d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1] qga: Add 'guest-get-users' command
+References: <20170328072130.17142-1-vfeenstr@redhat.com>
+ <CAJ+F1CK0n7m+mPBeUOOD0TXNroogjK3iMWthyQhdDVwd=3G8fA@mail.gmail.com>
+In-Reply-To: <CAJ+F1CK0n7m+mPBeUOOD0TXNroogjK3iMWthyQhdDVwd=3G8fA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Listing trace backends is simple: show the names of all Python modules
-in scripts/tracetool/backend/ whose source code contains 'PUBLIC =
-True'.
+On 03/28/2017 04:34 AM, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>=20
+> On Tue, Mar 28, 2017 at 9:22 AM Vinzenz 'evilissimo' Feenstra <
+> vfeenstr@redhat.com> wrote:
+>=20
+>> From: Vinzenz Feenstra <vfeenstr@redhat.com>
+>>
+>> A command that will list all currenctly logged in users having running=
 
-Perform the backend enumeration in shell instead of Python so that we
-can move the Python check until after ./configure --help.
 
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- configure | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+s/currenctly/currently/
 
-diff --git a/configure b/configure
-index d1ce33b..52b6ab3 100755
---- a/configure
-+++ b/configure
-@@ -1186,21 +1186,6 @@ for opt do
-   esac
- done
- 
--if ! has $python; then
--  error_exit "Python not found. Use --python=/path/to/python"
--fi
--
--# Note that if the Python conditional here evaluates True we will exit
--# with status 1 which is a shell 'false' value.
--if ! $python -c 'import sys; sys.exit(sys.version_info < (2,6) or sys.version_info >= (3,))'; then
--  error_exit "Cannot use '$python', Python 2.6 or later is required." \
--      "Note that Python 3 or later is not yet supported." \
--      "Use --python=/path/to/python to specify a supported Python."
--fi
--
--# Suppress writing compiled files
--python="$python -B"
--
- case "$cpu" in
-     ppc)
-            CPU_CFLAGS="-m32"
-@@ -1328,7 +1313,7 @@ Advanced options (experts only):
-                            set block driver read-only whitelist
-                            (affects only QEMU, not qemu-img)
-   --enable-trace-backends=B Set trace backend
--                           Available backends: $($python $source_path/scripts/tracetool.py --list-backends)
-+                           Available backends: $(grep -le '^PUBLIC\s*=\s*True$' scripts/tracetool/backend/*.py | sed -e 's/^.*\/\(.*\)\.py$/\1/' | xargs echo)
-   --with-trace-file=NAME   Full PATH,NAME of file to store traces
-                            Default:trace-<pid>
-   --disable-slirp          disable SLIRP userspace network connectivity
-@@ -1428,6 +1413,21 @@ EOF
- exit 0
- fi
- 
-+if ! has $python; then
-+  error_exit "Python not found. Use --python=/path/to/python"
-+fi
-+
-+# Note that if the Python conditional here evaluates True we will exit
-+# with status 1 which is a shell 'false' value.
-+if ! $python -c 'import sys; sys.exit(sys.version_info < (2,6) or sys.version_info >= (3,))'; then
-+  error_exit "Cannot use '$python', Python 2.6 or later is required." \
-+      "Note that Python 3 or later is not yet supported." \
-+      "Use --python=/path/to/python to specify a supported Python."
-+fi
-+
-+# Suppress writing compiled files
-+python="$python -B"
-+
- # Now we have handled --enable-tcg-interpreter and know we're not just
- # printing the help message, bail out if the host CPU isn't supported.
- if test "$ARCH" = "unknown"; then
--- 
-2.9.3
+>> processes.
+
+Do you also want to include how long the user has been logged in, if
+available? (a 'num' for floating-point seconds may be the best unit for
+that).
+
+
+>> +++ b/qga/qapi-schema.json
+>> @@ -1042,3 +1042,24 @@
+>>    'data':    { 'path': 'str', '*arg': ['str'], '*env': ['str'],
+>>                 '*input-data': 'str', '*capture-output': 'bool' },
+>>    'returns': 'GuestExec' }
+>> +
+>> +##
+>> +# @GuestUser:
+>> +# @user:      Username
+>> +# @domain:    Logon domain (windows only)
+>>
+>=20
+> Or use a flat union? (like suggested for get-osinfo)
+
+Here, I don't see much benefit to a flat union. The field is present
+only when the guest can supply it, and there is no obvious discriminator
+to mention whether the field must be present.  I think the structure is
+just fine as proposed, unless you want to also add a duration parameter
+for how long the user has been logged in.
+
+
+>> +##
+>> +# @guest-get-users:
+>> +# Retrieves a list of currently active user accounts on the VM.
+
+Accounts that exist even if no one is logged in at the moment, or
+accounts that currently have someone logged in?
+
+>> +#
+>> +# Returns: A unique list of users.
+>> +#
+>> +# Since: 2.10
+>> +##
+>> +{ 'command': 'guest-get-users',
+>> +  'returns': ['GuestUser'] }
+>> --
+>> 2.9.3
+>>
+>>
+>> --
+> Marc-Andr=C3=A9 Lureau
+>=20
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--25hnuaXgdiIh3MDvcgNVAT0262rg6KmPf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY2mFQAAoJEKeha0olJ0NqKBEIAIewFHqmBBToEa1l4xH+nifD
+iTUu4xac8RyEC12GSXV/JjeyRlESGDofoNbsnNKC7uKFNiAKj+67H2awvzNQWr4o
+8OyLp/QAw+bmDlwYuMlwcwXzUurPNzeEtEoHqlfXC4rixlPwFLOoA4ho6GP1jjVN
+1uwuo/GvcjeOsw4q8f9LF4pS/sofL/5HY7mnvwFpROLApXJZAP9sTmVjy8LI45iy
+9C+nYyD3HFMC4uwLb8da6Za9xtMcLn+oPTsr4ORCwQQLfIolGUv5qEN0Wv3hQ0e3
+BIixG40Acf+coYybeScKVAG+LVnwkQ1stYD6gWMOyTJH0rMuEMJZDqOrPDHFUic=
+=M9H6
+-----END PGP SIGNATURE-----
+
+--25hnuaXgdiIh3MDvcgNVAT0262rg6KmPf--
