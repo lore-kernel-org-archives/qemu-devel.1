@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1csp0S-0004HB-Aa
+	(envelope-from <alex.bennee@linaro.org>) id 1csp0S-0004Gw-3y
 	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:09:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1csp0R-00038F-6q
+	(envelope-from <alex.bennee@linaro.org>) id 1csp0Q-00037y-GE
 	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:09:44 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:35827)
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:34529)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1csp0R-00037s-0V
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:09:43 -0400
-Received: by mail-wr0-x234.google.com with SMTP id u1so99371046wra.2
+	id 1csp0Q-00037S-9p
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:09:42 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id l43so98994392wre.1
 	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 04:09:42 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 28 Mar 2017 12:09:35 +0100
-Message-Id: <20170328110936.24806-6-alex.bennee@linaro.org>
+Date: Tue, 28 Mar 2017 12:09:34 +0100
+Message-Id: <20170328110936.24806-5-alex.bennee@linaro.org>
 In-Reply-To: <20170328110936.24806-1-alex.bennee@linaro.org>
 References: <20170328110936.24806-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 5/6] tcg: Add a new line after incompatibility
- warning
+Subject: [Qemu-devel] [PULL 4/6] ui/console: use exclusive mechanism directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,29 +30,64 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, Pranith Kumar <bobby.prani@gmail.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-From: Pranith Kumar <bobby.prani@gmail.com>
+The previous commit (8bb93c6f99) using async_safe_run_on_cpu() doesn't
+work on graphics sub-system which restrict which threads can do GUI
+updates. Rather the special casing MacOS we just directly call the
+helper and move all the exclusive handling into do_dafe_dpy_refresh().
 
-Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+The unfortunate bouncing of the BQL is to ensure there is no deadlock
+as vCPUs waiting on the BQL are kicked into their quiescent state.
+
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- cpus.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ ui/console.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
-diff --git a/cpus.c b/cpus.c
-index 167d9615e1..68fdbc40b9 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -209,7 +209,7 @@ void qemu_tcg_configure(QemuOpts *opts, Error **errp)
-                 if (!check_tcg_memory_orders_compatible()) {
-                     error_report("Guest expects a stronger memory ordering "
-                                  "than the host provides");
--                    error_printf("This may cause strange/hard to debug errors");
-+                    error_printf("This may cause strange/hard to debug errors\n");
-                 }
-                 mttcg_enabled = true;
+diff --git a/ui/console.c b/ui/console.c
+index dd27c9501b..419b098c11 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -1576,19 +1576,22 @@ bool dpy_gfx_check_format(QemuConsole *con,
+ }
+ 
+ /*
+- * Safe DPY refresh for TCG guests. This runs when the TCG vCPUs are
+- * quiescent so we can avoid races between dirty page tracking for
+- * direct frame-buffer access by the guest.
++ * Safe DPY refresh for TCG guests. We use the exclusive mechanism to
++ * ensure the TCG vCPUs are quiescent so we can avoid races between
++ * dirty page tracking for direct frame-buffer access by the guest.
+  *
+  * This is a temporary stopgap until we've fixed the dirty tracking
+  * races in display adapters.
+  */
+-static void do_safe_dpy_refresh(CPUState *cpu, run_on_cpu_data opaque)
++static void do_safe_dpy_refresh(DisplayChangeListener *dcl)
+ {
+-    DisplayChangeListener *dcl = opaque.host_ptr;
++    qemu_mutex_unlock_iothread();
++    start_exclusive();
+     qemu_mutex_lock_iothread();
+     dcl->ops->dpy_refresh(dcl);
+     qemu_mutex_unlock_iothread();
++    end_exclusive();
++    qemu_mutex_lock_iothread();
+ }
+ 
+ static void dpy_refresh(DisplayState *s)
+@@ -1598,8 +1601,7 @@ static void dpy_refresh(DisplayState *s)
+     QLIST_FOREACH(dcl, &s->listeners, next) {
+         if (dcl->ops->dpy_refresh) {
+             if (tcg_enabled()) {
+-                async_safe_run_on_cpu(first_cpu, do_safe_dpy_refresh,
+-                                      RUN_ON_CPU_HOST_PTR(dcl));
++                do_safe_dpy_refresh(dcl);
+             } else {
+                 dcl->ops->dpy_refresh(dcl);
              }
 -- 
 2.11.0
