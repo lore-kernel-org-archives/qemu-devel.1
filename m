@@ -1,32 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1csrMx-0005yA-SQ
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:41:08 -0400
+	(envelope-from <stefanha@redhat.com>) id 1csrQH-0007FF-Rc
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:44:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1csrMt-0006v0-0Y
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:41:07 -0400
-Message-ID: <1490708459.4704.101.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 28 Mar 2017 15:40:59 +0200
-In-Reply-To: <4fa44363-76fe-d33c-249c-b1af88f09f9f@redhat.com>
-References: <36e41adf-b0b3-3efa-51c4-f1a70cd05b98@ilande.co.uk>
-	<87wpbsp49a.fsf@linaro.org>
-	<6491a446-bf23-5ab9-3431-c67efaf83f71@ilande.co.uk>
-	<alpine.BSF.2.20.1703141450560.82811@zero.eik.bme.hu>
-	<87shmfq31b.fsf@linaro.org>
-	<b9006aa4-b606-61d5-6896-8c76a6a6f8f3@ilande.co.uk>
-	<87o9x3pzxe.fsf@linaro.org>
-	<alpine.BSF.2.20.1703141829440.39248@zero.eik.bme.hu>
-	<95e306ce-8b80-f3c7-c374-85def4f549ff@redhat.com>
-	<878to5psky.fsf@linaro.org>
-	<5d39e125-e0cf-5ecf-3564-9a6a5b3b0bb6@redhat.com>
-	<1489678462.15659.112.camel@redhat.com>
-	<4fa44363-76fe-d33c-249c-b1af88f09f9f@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [Qemu-ppc] qemu-system-ppc video artifacts since
- "tcg: drop global lock during TCG code execution"
+	(envelope-from <stefanha@redhat.com>) id 1csrQD-0008FM-5d
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:44:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47900)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1csrQC-0008FI-TI
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 09:44:29 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Tue, 28 Mar 2017 14:44:18 +0100
+Message-Id: <20170328134418.3426-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] configure: eliminate Python dependency for
+ --help
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,43 +22,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: jan.kiszka@siemens.com, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel <qemu-devel@nongnu.org>, cota@braap.org, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, bobby.prani@gmail.com, fred.konrad@greensocs.com, Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, rth@twiddle.net
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-  Hi,
+The ./configure script should produce --help output even if Python is
+not installed.
 
-> > Well, not *that* simple.  vga checks the dirty bitmap with scanline
-> > granularity, like that:
-> >=20
-> >   foreach (scanline) {
-> >      if (get_dirty(scanline))
-> >         update_scanline()
-> >   }
-> >   reset_dirty(framebuffer)
-> >=20
-> > I suspect simply transforming that to
-> >=20
-> >   foreach (scanline) {
-> >      if (test_and_clear_dirty(scanline))
-> >        update_scanline()
-> >   }
-> >=20
-> > is not going to fly due to page tracking working with page granularity.
-> > With two subsequent scanlines within one page the second scanline will
-> > never be updated because updating first clears the dirty bit of the
-> > page ...
+Listing trace backends is simple: show the names of all Python modules
+in scripts/tracetool/backend/ whose source code contains 'PUBLIC =
+True'.
 
-> You're right; an alternative is to copy the dirty bitmap to a local one
-> and clear the global one (the dirty bitmap for an 8 MB full HD frame
-> buffer is just 256 bytes).  With the right API to abstract the job, it
-> should be relatively easy to fix all adapters.
+Perform the backend enumeration in shell instead of Python so that we
+can move the Python check until after ./configure --help.
 
-Started looking into this.  So I guess you are thinking about a variant
-of memory_region_test_and_clear_dirty and/or
-cpu_physical_memory_test_and_clear_dirty
-which returns a bitmap instead of a bool?  Plus some helper function
-which use the returned bitmap to figure whenever a specific scanline has
-been touched or not?
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+v2:
+ * Make grep regex portable [Peter]
+ * Enumerate trace backends outside help text [Peter]
 
-cheers,
-  Gerd
+ configure | 35 +++++++++++++++++++----------------
+ 1 file changed, 19 insertions(+), 16 deletions(-)
+
+diff --git a/configure b/configure
+index d1ce33b..2c31665 100755
+--- a/configure
++++ b/configure
+@@ -1186,21 +1186,6 @@ for opt do
+   esac
+ done
+ 
+-if ! has $python; then
+-  error_exit "Python not found. Use --python=/path/to/python"
+-fi
+-
+-# Note that if the Python conditional here evaluates True we will exit
+-# with status 1 which is a shell 'false' value.
+-if ! $python -c 'import sys; sys.exit(sys.version_info < (2,6) or sys.version_info >= (3,))'; then
+-  error_exit "Cannot use '$python', Python 2.6 or later is required." \
+-      "Note that Python 3 or later is not yet supported." \
+-      "Use --python=/path/to/python to specify a supported Python."
+-fi
+-
+-# Suppress writing compiled files
+-python="$python -B"
+-
+ case "$cpu" in
+     ppc)
+            CPU_CFLAGS="-m32"
+@@ -1275,6 +1260,9 @@ for config in $mak_wilds; do
+     default_target_list="${default_target_list} $(basename "$config" .mak)"
+ done
+ 
++# Enumerate public trace backends for --help output
++trace_backend_list=$(echo $(grep -le '^PUBLIC = True$' scripts/tracetool/backend/*.py | sed -e 's/^.*\/\(.*\)\.py$/\1/'))
++
+ if test x"$show_help" = x"yes" ; then
+ cat << EOF
+ 
+@@ -1328,7 +1316,7 @@ Advanced options (experts only):
+                            set block driver read-only whitelist
+                            (affects only QEMU, not qemu-img)
+   --enable-trace-backends=B Set trace backend
+-                           Available backends: $($python $source_path/scripts/tracetool.py --list-backends)
++                           Available backends: $trace_backend_list
+   --with-trace-file=NAME   Full PATH,NAME of file to store traces
+                            Default:trace-<pid>
+   --disable-slirp          disable SLIRP userspace network connectivity
+@@ -1428,6 +1416,21 @@ EOF
+ exit 0
+ fi
+ 
++if ! has $python; then
++  error_exit "Python not found. Use --python=/path/to/python"
++fi
++
++# Note that if the Python conditional here evaluates True we will exit
++# with status 1 which is a shell 'false' value.
++if ! $python -c 'import sys; sys.exit(sys.version_info < (2,6) or sys.version_info >= (3,))'; then
++  error_exit "Cannot use '$python', Python 2.6 or later is required." \
++      "Note that Python 3 or later is not yet supported." \
++      "Use --python=/path/to/python to specify a supported Python."
++fi
++
++# Suppress writing compiled files
++python="$python -B"
++
+ # Now we have handled --enable-tcg-interpreter and know we're not just
+ # printing the help message, bail out if the host CPU isn't supported.
+ if test "$ARCH" = "unknown"; then
+-- 
+2.9.3
