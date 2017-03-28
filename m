@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1csw0w-00058i-FT
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 14:38:43 -0400
+	(envelope-from <eblake@redhat.com>) id 1csw3t-0006ja-Pe
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 14:41:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1csw0t-00045y-Ch
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 14:38:42 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:40550
-	helo=v2201612906741603.powersrv.de)
+	(envelope-from <eblake@redhat.com>) id 1csw3q-0005Z9-O8
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 14:41:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42334)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1csw0t-00045a-5g
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 14:38:39 -0400
-References: <20170324231943.18768-1-Andrew.Baumann@microsoft.com>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <bb0868d1-5c56-45e5-8b6c-ee08e77dfeaa@weilnetz.de>
-Date: Tue, 28 Mar 2017 20:38:35 +0200
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1csw3q-0005Yz-Fb
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 14:41:42 -0400
+References: <CAFEAcA_Dwky8Jr+y3JACdK5MVM82syrvzuVktnJF0cyZ-FjY0A@mail.gmail.com>
+	<20170328210014-mutt-send-email-mst@kernel.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <fb207ad9-0659-19c6-19cc-15fb8abd43c2@redhat.com>
+Date: Tue, 28 Mar 2017 13:41:36 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170324231943.18768-1-Andrew.Baumann@microsoft.com>
-Content-Type: text/plain; charset=iso-8859-15; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 for-2.9?] virtio: fix vring_align() on
- 64-bit windows
+In-Reply-To: <20170328210014-mutt-send-email-mst@kernel.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="l3hg9XcmeiCsHBqA03vr0iHCo5Pow1kWb"
+Subject: Re: [Qemu-devel] qemu-devel mailing list vs DMARC and
+ microsoft.com's p=reject policy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +29,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>
 
-Am 25.03.2017 um 00:19 schrieb Andrew Baumann:
-> long is 32-bits on 64-bit windows, which caused the top half of the
-> address to be truncated; this patch changes it to use the
-> QEMU_ALIGN_UP macro which does not suffer the same problem
->
-> Signed-off-by: Andrew Baumann <Andrew.Baumann@microsoft.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> ---
->  include/hw/virtio/virtio.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-> index 15efcf2..7b6edba 100644
-> --- a/include/hw/virtio/virtio.h
-> +++ b/include/hw/virtio/virtio.h
-> @@ -34,7 +34,7 @@ struct VirtQueue;
->  static inline hwaddr vring_align(hwaddr addr,
->                                               unsigned long align)
->  {
-> -    return (addr + align - 1) & ~(align - 1);
-> +    return QEMU_ALIGN_UP(addr, align);
->  }
->
->  typedef struct VirtQueue VirtQueue;
->
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--l3hg9XcmeiCsHBqA03vr0iHCo5Pow1kWb
+From: Eric Blake <eblake@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>
+Message-ID: <fb207ad9-0659-19c6-19cc-15fb8abd43c2@redhat.com>
+Subject: Re: [Qemu-devel] qemu-devel mailing list vs DMARC and microsoft.com's
+ p=reject policy
+References: <CAFEAcA_Dwky8Jr+y3JACdK5MVM82syrvzuVktnJF0cyZ-FjY0A@mail.gmail.com>
+ <20170328210014-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20170328210014-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Eric added "for-2.9" to the subject line of v2, but now it was
-missing again for v3.
+On 03/28/2017 01:28 PM, Michael S. Tsirkin wrote:
+>>  (2) I could reconfigure mailman to try to not rewrite anything that
+>>      we think is likely to be signed (in particular not the body or th=
+e
+>>      subject)
+>>    * this means dropping the [qemu-devel] tag from the subject, which =
+I'm
+>>      a bit reluctant to do (it seems likely at least some readers are
+>>      filtering on it, and personally I quite like it)
+>>    * if anybody DKIM-signs the Sender: header we're stuck anyway
+>=20
+> For the record I'd strongly prefer this option - I tag all list mail
+> and so "qemu-devel" appears twice: in subject and as a tag.
+> Also, if mail is copied to another list, qemu-devel will
+> still appear as gmail de-duplicates email by msg id.
+> I can remove tags I don't care about but can't remove
+> subject prefixes.
 
-Is this needed for 2.9? I wonder why I never before noticed
-a problem or got a bug report for this issue.
+I'm ambivalent - I like the prefixes, but don't mind if they are not
+present (it's easy enough to filter on List-Sender: when the prefix is
+not reliable).  It's especially nice that the prefix lets me tell the
+difference between mail sent to qemu-devel and qemu-block while still
+dumping both lists into the same folder.
 
-Regards
-Stefan
+> Is there a way not to munge the name? It's currently rewritten to
+> add "via qemu-devel" which confuses the clients which think
+> it's part of the name, and can't be easily stripped away.
+
+Not that I know of, but at least the munging only occurs for senders
+with restrictive DMARC and not for ALL senders.
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--l3hg9XcmeiCsHBqA03vr0iHCo5Pow1kWb
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY2q5gAAoJEKeha0olJ0NqUwMH/2PYEAlpuqVxu1mbnA8KupUv
+ks/KTJLDZjYUr0AptxlPaLaP9eIfiTJtGpfYDaUROx+EkspAYt/FznwZCwDsLbJP
+12V8W9LEOr11px54IeHlW4LXTTXCYfriJmYEpHoX0CNqJFtklPRTvIJU/BhpTF2z
+zcMHp68RKQVjxZowfyIuv+4+hQFx3NH75MGRm/stpB2RYtsB8xmsxDLj273SvHNt
+Fmx8gYffTvu6EKWWnUEgZeDYBejZQoZpqwyqLbUSE505cOVDx65Y9nmCq85dhNDW
+xKlqr25qcoGo9Cw28cv14gjyG1n5xBn1coce56GNuwKCwP+Q2v9KyKuoOkDdSGc=
+=RMT3
+-----END PGP SIGNATURE-----
+
+--l3hg9XcmeiCsHBqA03vr0iHCo5Pow1kWb--
