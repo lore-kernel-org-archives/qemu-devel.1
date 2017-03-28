@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48481)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1csp0T-0004I5-Ff
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:09:46 -0400
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1csp3G-0006lq-8g
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:12:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1csp0S-00039M-Bd
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:09:45 -0400
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:34549)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1csp0S-00038S-5C
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:09:44 -0400
-Received: by mail-wr0-x233.google.com with SMTP id l43so98995837wre.1
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 04:09:44 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 28 Mar 2017 12:09:36 +0100
-Message-Id: <20170328110936.24806-7-alex.bennee@linaro.org>
-In-Reply-To: <20170328110936.24806-1-alex.bennee@linaro.org>
-References: <20170328110936.24806-1-alex.bennee@linaro.org>
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1csp3C-0004Gv-5K
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:12:38 -0400
+Received: from lhrrgout.huawei.com ([194.213.3.17]:9494)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1csp3B-0004Ez-PY
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:12:34 -0400
+References: <1490271635-19049-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1490271635-19049-2-git-send-email-pradeep.jagadeesh@huawei.com>
+	<29981b93-8870-eab7-bbc7-263448efb2ab@redhat.com>
+From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Message-ID: <43d6c377-4c54-5c19-4d00-696c4f124a2b@huawei.com>
+Date: Tue, 28 Mar 2017 13:11:58 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 6/6] replay/replay.c: bump REPLAY_VERSION
+In-Reply-To: <29981b93-8870-eab7-bbc7-263448efb2ab@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2 v1] throttle: factor out the redundant
+ code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +29,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Eric Blake <eblake@redhat.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, Greg Kurz <groug@kaod.org>
+Cc: Alberto Garcia <berto@igalia.com>, Jani Kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-A previous commit (3d4d16f4) added support for audio record/playback.
-However this breaks the logfile ABI due to the re-ordering of the
-ReplayEvents enum. The REPLAY_VERSION check is meant to prevent you
-from using old log files in newer QEMUs but this is currently broken.
+On 3/23/2017 3:46 PM, Eric Blake wrote:
+> On 03/23/2017 07:20 AM, Pradeep Jagadeesh wrote:
+>> This patchset removes the throttle redundant code that was present
+>> in block and fsdev files.
+>>
+>> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+>> ---
+>
+> I think you want portions of this patch to come first; you want to
+> refactor out the IOThrottle portion of existing types, and then extend
+> IOThrottle to be used in more places.
+OK, I will do that.
+>
+>>  blockdev.c                      | 106 ++++-----------------------------------
+>>  fsdev/Makefile.objs             |   1 +
+>>  fsdev/qemu-fsdev-throttle.c     |  94 +---------------------------------
+>>  fsdev/qemu-fsdev-throttle.h     |   3 +-
+>>  hmp.c                           |  39 +++++++--------
+>>  include/qemu/throttle-options.h |   5 ++
+>>  qapi/block-core.json            |  76 +---------------------------
+>>  qapi/iothrottle.json            |   4 +-
+>>  util/Makefile.objs              |   1 +
+>>  util/throttle-options.c         | 108 ++++++++++++++++++++++++++++++++++++++++
+>>  10 files changed, 151 insertions(+), 286 deletions(-)
+>>  create mode 100644 util/throttle-options.c
+>>
+>
+>> +++ b/fsdev/qemu-fsdev-throttle.c
+>> @@ -33,56 +33,7 @@ void fsdev_set_io_throttle(IOThrottle *arg, FsThrottle *fst, Error **errp)
+>>  {
+>>      ThrottleConfig cfg;
+>>
+>> -    throttle_config_init(&cfg);
+>> -    cfg.buckets[THROTTLE_BPS_TOTAL].avg = arg->bps;
+>> -    cfg.buckets[THROTTLE_BPS_READ].avg  = arg->bps_rd;
+>> -    cfg.buckets[THROTTLE_BPS_WRITE].avg = arg->bps_wr;
+>> -
+>
+> This code was added in the last patch - which makes for a lot of
+> unnecessary churn.  Again, the best series does refactoring of existing
+> code first, then adds the new code that takes advantage of the
+> refactored entry points, so that the new code isn't churning.
+>
+OK
+>
+>> +++ b/hmp.c
+>> @@ -1554,20 +1554,25 @@ void hmp_change(Monitor *mon, const QDict *qdict)
+>>      hmp_handle_error(mon, &err);
+>>  }
+>>
+>> +static void hmp_initialize_io_throttle(IOThrottle *iot, const QDict *qdict)
+>> +{
+>> +    iot->has_device = true;
+>> +    iot->device = (char *) qdict_get_str(qdict, "device");
+>
+> Is casting away const going to result in a double free of memory later
+> on?  Or put another way, should this be a g_strdup'd copy (which you
+> then have to make sure is not leaked)?
+This code was there in block_set_io_throttle(). I have just moved to new 
+function. But I will think about it.
+>
+>> +    iot->bps = qdict_get_int(qdict, "bps");
+>> +    iot->bps_rd = qdict_get_int(qdict, "bps_rd");
+>> +    iot->bps_wr = qdict_get_int(qdict, "bps_wr");
+>> +    iot->iops = qdict_get_int(qdict, "iops");
+>> +    iot->iops_rd = qdict_get_int(qdict, "iops_rd");
+>> +    iot->iops_wr = qdict_get_int(qdict, "iops_wr");
+>> +}
+>> +
+>>  void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict)
+>>  {
+>>      Error *err = NULL;
+>> -    BlockIOThrottle throttle = {
+>> -        .has_device = true,
+>> -        .device = (char *) qdict_get_str(qdict, "device"),
+>
+> At any rate, I see it is just code motion.  You are refactoring too much
+> in one patch here; I'd consider splitting it along the lines of one
+> patch that adds hmp_initialize_io_throttle; and another patch that adds
+> parse_io_throttle_options(), so that it's easier to see just one piece
+> of code motion at a time, rather than trying to track multiple motions
+> in the same large patch.
+I will split the code into different patches.
+>
+>> +++ b/qapi/block-core.json
+>> @@ -1758,86 +1758,14 @@
+>>  #
+>>  # A set of parameters describing block throttling.
+>>  #
+>
+>> -# @iops_size: an I/O size in bytes (Since 1.7)
+>> +# @iothrottle: throttle configuration (Since 1.7)
+>
+> NACK. This is an incompatible change; you are breaking the QMP wire
+> structure (that is, where I used to pass "arguments":{"device":"foo",
+> "bps_rd":1, "group":"bar" }, your change would now require me to pass
+> "arguments":{"iothrottle":{"device":"foo", "bps_rd":1}, "group":"bar"};
+> the extra nesting is what breaks things).
+>
+>>  #
+>>  # @group: throttle group name (Since 2.4)
+>>  #
+>>  # Since: 1.1
+>>  ##
+>>  { 'struct': 'BlockIOThrottle',
+>> -  'data': { '*device': 'str', '*id': 'str', 'bps': 'int', 'bps_rd': 'int',
+>> -            'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int', 'iops_wr': 'int',
+>> -            '*bps_max': 'int', '*bps_rd_max': 'int',
+>> -            '*bps_wr_max': 'int', '*iops_max': 'int',
+>> -            '*iops_rd_max': 'int', '*iops_wr_max': 'int',
+>> -            '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
+>> -            '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
+>> -            '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
+>> -            '*iops_size': 'int', '*group': 'str' } }
+>> +  'data': { '*iothrottle': 'IOThrottle', '*group': 'str' } }
+>
+> What you REALLY want is a compatible change, namely:
+>
+> { 'struct': 'BlockIOThrottle', 'base': 'IOThrottle',
+>   'data': { '*group': 'str' } }
+>
+> which says that all fields of IOThrottle are inherited at the same level
+> as the additional field 'group'.
+>
+> For that matter, are you sure that 'group' is the only field that should
+> not be directly in IOThrottle, or should 'device' also be specific to
+> BlockIOThrottle (I'm not sure whether you were actually using 'device'
+> in the fsdev case, or if 'id' was sufficient).
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
----
- replay/replay.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/replay/replay.c b/replay/replay.c
-index 78e2a7e570..9e0724e756 100644
---- a/replay/replay.c
-+++ b/replay/replay.c
-@@ -22,7 +22,7 @@
- 
- /* Current version of the replay mechanism.
-    Increase it when file format changes. */
--#define REPLAY_VERSION              0xe02005
-+#define REPLAY_VERSION              0xe02006
- /* Size of replay log header */
- #define HEADER_SIZE                 (sizeof(uint32_t) + sizeof(uint64_t))
- 
--- 
-2.11.0
+Yes, I just need id in case of fsdev. I will fix that. But if I do this 
+way, some of the code refactoring is not possible.Because they will have 
+different structures for fsdev and block.
+>
+>>
+>>  ##
+>>  # @block-stream:
+>> diff --git a/qapi/iothrottle.json b/qapi/iothrottle.json
+>> index f7b615d..58f4520 100644
+>> --- a/qapi/iothrottle.json
+>> +++ b/qapi/iothrottle.json
+>> @@ -14,6 +14,8 @@
+>>  #
+>>  # @device: Block device name
+>>  #
+>> +# @id: The name or QOM path of the guest device (since: 2.8)
+>> +#
+>
+> You've missed 2.8 by a long shot.  Oh - this is an argument that it is
+> 'id' (and not 'device') that does not belong here, but should be placed
+> alongside 'group' in the BlockIOThrottle subtype.
+id is required for the fsdev/block both. This was part of the 
+BlockIOThrottle. So I just took it and kept the description as it is.
+What should I changed to? 2.10?
+>
+>>  # @bps: total throughput limit in bytes per second
+>>  #
+>>  # @bps_rd: read throughput limit in bytes per second
+>> @@ -80,7 +82,7 @@
+>>  # Since: 2.10
+>>  ##
+>>  { 'struct': 'IOThrottle',
+>> -  'data': { '*device': 'str', 'bps': 'int', 'bps_rd': 'int',
+>> +  'data': { '*device': 'str', '*id': 'str', 'bps': 'int', 'bps_rd': 'int',
+>>              'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int', 'iops_wr': 'int',
+>>              '*bps_max': 'int', '*bps_rd_max': 'int',
+>>              '*bps_wr_max': 'int', '*iops_max': 'int',
+>
+>
