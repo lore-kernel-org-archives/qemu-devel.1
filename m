@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41143)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1csoZU-0004WM-6L
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 06:41:53 -0400
+	(envelope-from <bounces@canonical.com>) id 1csodn-0005in-Oh
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 06:46:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1csoZT-0008E4-9d
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 06:41:52 -0400
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:35785)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1csoZT-0008Dq-1d
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 06:41:51 -0400
-Received: by mail-wr0-x22d.google.com with SMTP id u1so98185948wra.2
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 03:41:50 -0700 (PDT)
+	(envelope-from <bounces@canonical.com>) id 1csodi-0001GO-QB
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 06:46:19 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34198)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1csodi-0001FZ-KN
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 06:46:14 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1csodf-0003mQ-PG
+	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 10:46:12 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6D6842E80CC
+	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 10:46:11 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170328100713.28785-1-stefanha@redhat.com>
-References: <20170328100713.28785-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Mar 2017 11:41:29 +0100
-Message-ID: <CAFEAcA9eOuoYJV0J=2078hsmtONfDNfUEOwXBWYdVBUyca0Mig@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL for-2.9 0/1] Block patches
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 28 Mar 2017 10:34:54 -0000
+From: James Clarke <jrtc27@jrtc27.com>
+Reply-To: Bug 1258626 <1258626@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20131206191703.25702.91020.malonedeb@wampee.canonical.com>
+Message-Id: <20170328103454.30388.2125.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1258626] Re: Curses Keyboard Broken On OS X
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +36,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 28 March 2017 at 11:07, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> The following changes since commit eb06c9e2d3c8f026a206e8402b0ffa201060ec8e:
->
->   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2017-03-27 17:34:50 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/stefanha/qemu.git tags/block-pull-request
->
-> for you to fetch changes up to dc62da88b5d17477227a3563a6ad466129d416d6:
->
->   parallels: wrong call to bdrv_truncate (2017-03-28 11:06:00 +0100)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
->
-> Denis V. Lunev (1):
->   parallels: wrong call to bdrv_truncate
->
->  block/parallels.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+Yes, I can still reproduce this with 2.8.0, and it gives exactly the
+same output.
 
-Applied, thanks.
+** Changed in: qemu
+       Status: Expired =3D> New
 
--- PMM
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1258626
+
+Title:
+  Curses Keyboard Broken On OS X
+
+Status in QEMU:
+  New
+
+Bug description:
+  Whenever I run ``qemu-system-i386 -curses ...'' (with or without a
+  ``-k en-gb'') on OS X 10.9, the keyboard does not work properly. For
+  example, when attempting to switch to the QEMU console with Alt+2, I
+  get:
+
+  ``Warning: no scancode found for keysym 226
+  Warning: no scancode found for keysym 130
+  Warning: no scancode found for keysym 172''
+
+  I have checked and these scancodes are not mentioned in
+  ``share/qemu/keymaps/''. This is using QEMU 1.6.1, but the problem
+  also occurs with 1.3.1. Also, in case it makes a difference, I
+  installed QEMU using Homebrew.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1258626/+subscriptions
