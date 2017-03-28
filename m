@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1csmc9-0008GM-8P
+	(envelope-from <alex.bennee@linaro.org>) id 1csmcA-0008GY-IG
 	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:36:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1csmc7-000148-KK
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:36:29 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:33584)
+	(envelope-from <alex.bennee@linaro.org>) id 1csmc9-00015z-Fs
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:36:30 -0400
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:34775)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1csmc7-00013R-EC
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:36:27 -0400
-Received: by mail-wr0-x230.google.com with SMTP id w43so79527968wrb.0
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 01:36:27 -0700 (PDT)
+	id 1csmc9-00015R-AN
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:36:29 -0400
+Received: by mail-wr0-x232.google.com with SMTP id l43so92602043wre.1
+	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 01:36:29 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 28 Mar 2017 09:36:18 +0100
-Message-Id: <20170328083623.10396-2-alex.bennee@linaro.org>
+Date: Tue, 28 Mar 2017 09:36:21 +0100
+Message-Id: <20170328083623.10396-5-alex.bennee@linaro.org>
 In-Reply-To: <20170328083623.10396-1-alex.bennee@linaro.org>
 References: <20170328083623.10396-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 1/6] user-exec: handle synchronous signals
- from QEMU gracefully
+Subject: [Qemu-devel] [PATCH v2 4/6] ui/console: use exclusive mechanism
+ directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +31,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, rth@twiddle.net, pbonzini@redhat.com, kraxel@redhat.com
-Cc: qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Riku Voipio <riku.voipio@iki.fi>
+Cc: qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-When "tcg: enable thread-per-vCPU" (commit 3725794) was merged the
-lifetime of current_cpu was changed. Previously a broken linux-user
-call might abort() which can eventually escalate into a SIGSEGV which
-would then crash qemu as it attempted to deref a NULL current_cpu.
-After commit 3725794 it would attempt to fixup state and re-start the
-run-loop and much hilarity (i.e. a looping lockup) would ensue from
-jumping into a stale jmp_env.
+The previous commit (8bb93c6f99) using async_safe_run_on_cpu() doesn't
+work on graphics sub-system which restrict which threads can do GUI
+updates. Rather the special casing MacOS we just directly call the
+helper and move all the exclusive handling into do_dafe_dpy_refresh().
 
-As we can actually tell if we are in the run-loop from looking at the
-cpu->running flag we should catch this badness first and abort()
-cleanly rather than try to soldier on. There is a theoretical race
-between the flag being set and sigsetjmp refreshing the jump buffer
-but we can try really hard to not introduce crashes into that code.
+The unfortunate bouncing of the BQL is to ensure there is no deadlock
+as vCPUs waiting on the BQL are kicked into their quiescent state.
 
-[LV: setgroups03 fails on powerpc LTP]
-Reported-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
- user-exec.c | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
+ ui/console.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
-diff --git a/user-exec.c b/user-exec.c
-index 6db075884d..a8f95fa1e1 100644
---- a/user-exec.c
-+++ b/user-exec.c
-@@ -57,10 +57,23 @@ static void cpu_exit_tb_from_sighandler(CPUState *cpu, sigset_t *old_set)
- static inline int handle_cpu_signal(uintptr_t pc, unsigned long address,
-                                     int is_write, sigset_t *old_set)
+diff --git a/ui/console.c b/ui/console.c
+index dd27c9501b..419b098c11 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -1576,19 +1576,22 @@ bool dpy_gfx_check_format(QemuConsole *con,
+ }
+ 
+ /*
+- * Safe DPY refresh for TCG guests. This runs when the TCG vCPUs are
+- * quiescent so we can avoid races between dirty page tracking for
+- * direct frame-buffer access by the guest.
++ * Safe DPY refresh for TCG guests. We use the exclusive mechanism to
++ * ensure the TCG vCPUs are quiescent so we can avoid races between
++ * dirty page tracking for direct frame-buffer access by the guest.
+  *
+  * This is a temporary stopgap until we've fixed the dirty tracking
+  * races in display adapters.
+  */
+-static void do_safe_dpy_refresh(CPUState *cpu, run_on_cpu_data opaque)
++static void do_safe_dpy_refresh(DisplayChangeListener *dcl)
  {
--    CPUState *cpu;
-+    CPUState *cpu = current_cpu;
-     CPUClass *cc;
-     int ret;
+-    DisplayChangeListener *dcl = opaque.host_ptr;
++    qemu_mutex_unlock_iothread();
++    start_exclusive();
+     qemu_mutex_lock_iothread();
+     dcl->ops->dpy_refresh(dcl);
+     qemu_mutex_unlock_iothread();
++    end_exclusive();
++    qemu_mutex_lock_iothread();
+ }
  
-+    /* For synchronous signals we expect to be coming from the vCPU
-+     * thread (so current_cpu should be valid) and either from running
-+     * code or during translation which can fault as we cross pages.
-+     *
-+     * If neither is true then something has gone wrong and we should
-+     * abort rather than try and restart the vCPU execution.
-+     */
-+    if (!cpu || !cpu->running) {
-+        printf("qemu:%s received signal outside vCPU context @ pc=0x%"
-+               PRIxPTR "\n",  __func__, pc);
-+        abort();
-+    }
-+
- #if defined(DEBUG_SIGNAL)
-     printf("qemu: SIGSEGV pc=0x%08lx address=%08lx w=%d oldset=0x%08lx\n",
-            pc, address, is_write, *(unsigned long *)old_set);
-@@ -83,7 +96,7 @@ static inline int handle_cpu_signal(uintptr_t pc, unsigned long address,
-              * currently executing TB was modified and must be exited
-              * immediately.
-              */
--            cpu_exit_tb_from_sighandler(current_cpu, old_set);
-+            cpu_exit_tb_from_sighandler(cpu, old_set);
-             g_assert_not_reached();
-         default:
-             g_assert_not_reached();
-@@ -94,7 +107,6 @@ static inline int handle_cpu_signal(uintptr_t pc, unsigned long address,
-        are still valid segv ones */
-     address = h2g_nocheck(address);
- 
--    cpu = current_cpu;
-     cc = CPU_GET_CLASS(cpu);
-     /* see if it is an MMU fault */
-     g_assert(cc->handle_mmu_fault);
+ static void dpy_refresh(DisplayState *s)
+@@ -1598,8 +1601,7 @@ static void dpy_refresh(DisplayState *s)
+     QLIST_FOREACH(dcl, &s->listeners, next) {
+         if (dcl->ops->dpy_refresh) {
+             if (tcg_enabled()) {
+-                async_safe_run_on_cpu(first_cpu, do_safe_dpy_refresh,
+-                                      RUN_ON_CPU_HOST_PTR(dcl));
++                do_safe_dpy_refresh(dcl);
+             } else {
+                 dcl->ops->dpy_refresh(dcl);
+             }
 -- 
 2.11.0
