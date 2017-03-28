@@ -1,40 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cskn5-0003Lq-3N
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 02:39:40 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cslHU-0006GP-No
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:11:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cskn1-0006X5-To
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 02:39:39 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42744)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1cskn1-0006Ws-KV
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 02:39:35 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2S6XiG9025067
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 02:39:34 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29fje9h1wu-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 02:39:33 -0400
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Tue, 28 Mar 2017 02:39:32 -0400
-Date: Tue, 28 Mar 2017 14:39:25 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170327030518.37268-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170327030518.37268-2-bjsdjshi@linux.vnet.ibm.com>
-	<e81b598a-0746-5d18-5ed9-dd00f65cd77a@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cslHS-0008OU-SS
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:11:04 -0400
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:35366)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cslHS-0008ON-F1
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:11:02 -0400
+Received: by mail-wr0-x231.google.com with SMTP id u1so89424091wra.2
+	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 00:11:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e81b598a-0746-5d18-5ed9-dd00f65cd77a@redhat.com>
-Message-Id: <20170328063925.GB22108@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v2 1/1] block: pass the right options
- for BlockDriver.bdrv_open
+In-Reply-To: <20170327201146.1820-1-sw@weilnetz.de>
+References: <20170327201146.1820-1-sw@weilnetz.de>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 28 Mar 2017 08:10:40 +0100
+Message-ID: <CAFEAcA-Jb8uQsQcfFfaQdXp5+DkD84tCDtMyW1kXN1yZ45fLGQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH for-2.9] Fix check for target OS support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,146 +28,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-block@nongnu.org, kwolf@redhat.com, qemu-devel@nongnu.org, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com
+To: Stefan Weil <sw@weilnetz.de>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-* Max Reitz <mreitz@redhat.com> [2017-03-27 17:27:16 +0200]:
+On 27 March 2017 at 21:11, Stefan Weil <sw@weilnetz.de> wrote:
+> This check had several problems which are fixed here:
+>
+> * Calling "configure --help" was no longer possible on Cygwin.
+>   Fix  this by introducing a third state for supported_os and
+>   by moving the error handling code.
+>   Move the error handling code for supported_cpu, too.
+>
+> * Fix the error text. Use target cpu and target os because the
+>   build cpu and build host don't matter here.
 
-> On 27.03.2017 05:05, Dong Jia Shi wrote:
-> > raw_open() expects the caller always passing in the right actual
-> > @options parameter. But when trying to applying snapshot on a RBD
-> > image, bdrv_snapshot_goto() calls raw_open() (by calling the
-> > bdrv_open callback on the BlockDriver) with a NULL @options, and
-> > that will result in a Segmentation fault.
-> > 
-> > For the other non-raw format drivers, it also make sense to passing
-> > in the actual options, althought they don't trigger the problem so
-> > far.
-> > 
-> > Let's prepare a @options by adding the "file" key-value pair to a
-> > copy of the actual options that were given for the node (i.e.
-> > bs->options), and pass it to the callback.
-> > 
-> > Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> > ---
-> >  block/snapshot.c | 8 +++++++-
-> >  1 file changed, 7 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/block/snapshot.c b/block/snapshot.c
-> > index bf5c2ca..dfec139 100644
-> > --- a/block/snapshot.c
-> > +++ b/block/snapshot.c
-> > @@ -27,6 +27,7 @@
-> >  #include "block/block_int.h"
-> >  #include "qapi/error.h"
-> >  #include "qapi/qmp/qerror.h"
-> > +#include "qapi/qmp/qstring.h"
-> >  
-> >  QemuOptsList internal_snapshot_opts = {
-> >      .name = "snapshot",
-> > @@ -189,9 +190,14 @@ int bdrv_snapshot_goto(BlockDriverState *bs,
-> >      }
-> >  
-> >      if (bs->file) {
-> > +        QDict *options = qdict_clone_shallow(bs->options);
-> > +        qdict_put(options, "file",
-> > +                  qstring_from_str(bdrv_get_node_name(bs->file->bs)));
-> 
-> I don't think you're guaranteed that "file" is a a nested QDict (if it
-> has been specified as a nested dict). Then you'd have both options like
-> "file.driver" and "file" here which will break later on.
-> 
-> Compare:
-> 
-> $ ./qemu-img snapshot -a foo
-> "json:{'driver':'raw','file':{'driver':'qcow2','file':{'driver':'file','filename':'foo.qcow2'}}}"
-> qemu-img: Cannot reference an existing block device with additional
-> options or a new filename
-> 
-> $ ./qemu-img snapshot -a foo --image-opts
-> driver=raw,file.driver=qcow2,file.file.driver=file,file.file.filename=foo.qcow2
-> qemu-img: Cannot reference an existing block device with additional
-> options or a new filename
-> 
-> By the way, afterwards both commands segfault (and I had to add a manual
-Hi Max,
+I think it is important that we print the deprecation
+message last, after all the other configure output.
+Otherwise it will scroll off the screen and most people
+will miss it. That's why I put it where it is.
 
-You are right. Using your commands, I can easily reproduce the segfaults
-problem.
+> * Support cross compilation with the most common cross prefixes
+>   for Mingw-w64. Other cross builds are still broken!
+>
+> Signed-off-by: Stefan Weil <sw@weilnetz.de>
+> ---
+>
+> This fixes a regression: building QEMU for Windows with a cross
+> build under Cygwin is currently broken.
+>
+> Can the patch be applied directly, or who should send a pull request?
+>
+> Stefan
+>
+>  configure | 68 +++++++++++++++++++++++++++++++++++----------------------------
+>  1 file changed, 38 insertions(+), 30 deletions(-)
+>
+> diff --git a/configure b/configure
+> index d1ce33bc79..902bd20070 100755
+> --- a/configure
+> +++ b/configure
+> @@ -322,7 +322,7 @@ jemalloc="no"
+>  replication="yes"
+>
+>  supported_cpu="no"
+> -supported_os="no"
+> +supported_os="deprecated"
 
-> error_report_err() in this function to see the error message because
-> normally this just passes NULL for errp...). The segfault comes from...
-> 
-> > +
-> >          drv->bdrv_close(bs);
-> >          ret = bdrv_snapshot_goto(bs->file->bs, snapshot_id);
-> > -        open_ret = drv->bdrv_open(bs, NULL, bs->open_flags, NULL);
-> > +        open_ret = drv->bdrv_open(bs, options, bs->open_flags, NULL);
-> > +        QDECREF(options);
-> >          if (open_ret < 0) {
-> >              bdrv_unref(bs->file->bs);
-> 
-> ...here. bs->file is NULL. This is because BlockDriver.bdrv_open()
-> expects bs->file to be NULL and just overwrites it with the result from
-> bdrv_open_child().
-> 
-> Now if that bdrv_open_child() fails, the field becomes NULL, the old
-> child is leaked and the above bdrv_unref() fails.
-Nod.
+I don't see any need for anything other than 'yes' or 'no' ?
 
-> 
-> I get that this is never supposed to happen because bdrv_open_child()
-> should always succeed with the node name of the existing BDS given as a
-> reference... but we shouldn't rely on that, I guess.
-> 
-> 
-> All of this is a horrible mess. It kind of worked in the past when all
-> of this bdrv_open()/bdrv_close() stuff was a horrible mess but now it
-> stands out as exceptionally ugly (and obviously broken).
-> 
-> 
-> Of course, we can't fix all of this for 2.9, so what I'd propose for
-> this patch is:
-I definitely will listen to your suggestions on this.
+>
+>  # parse CC options first
+>  for opt do
+> @@ -440,7 +440,13 @@ int main(void) { return 0; }
+>  EOF
+>  }
+>
+> -if check_define __linux__ ; then
+> +if test "$cross_prefix" = "i686_64-w64-mingw32-" ; then
+> +  targetos='MINGW32'
+> +elif test "$cross_prefix" = "x86_64-w64-mingw32-" ; then
+> +  targetos='MINGW32'
+> +elif test -n "$cross_prefix" ; then
+> +  targetos="$cross_prefix"
 
-> 
-> (1) Remove every option in "options" that has a "file." prefix before
-> the qdict_put() call.
-> 
-> (2) Use bdrv_unref_child(bs->file) instead of bdrv_unref(bs->file->bs).
-:> You must mean:
-bdrv_unref_child(bs, bs->file);
+This doesn't look right. We already have too many
+cases where we determine the target OS by something
+other than looking at check_defines; one thing
+I'd like to do when we've got rid of unsupported
+OSes is to make sure that we determine the target
+OS by check_define and only by check_define.
 
-> 
-> I guess it should work with those changes. At least I hope it will.
-Yes, with my test results, it works!
+> +elif check_define __linux__ ; then
+>    targetos="Linux"
+>  elif check_define _WIN32 ; then
+>    targetos='MINGW32'
+> @@ -694,7 +700,7 @@ Linux)
+>    supported_os="yes"
+>  ;;
+>  *)
+> -  error_exit "Unsupported host OS $targetos"
+> +  supported_os="no"
 
-> 
-> By the way, the easiest way to do (1) is probably:
-> 
-> QDict *file_options;
-> 
-> qdict_extract_subqdict(options, &file_options, "file.");
-> QDECREF(file_options);
-Cool. I adopted your code and it works well.
+This was deliberately an error_exit because anything
+going down that path got the Linux defines/includes by
+accident and we thought that would not work on
+anything else. What was using it? If we need an extra
+entry in the case statement we can add one.
 
-Thanks for these very detailed analysis and the code example.
+>  ;;
+>  esac
+>
+> @@ -1428,6 +1434,34 @@ EOF
+>  exit 0
+>  fi
 
-Mind if I add a:
-Suggested-by: Max Reitz <mreitz@redhat.com>
-in the following version?
+>  config_host_mak="config-host.mak"
+>
+>  echo "# Automatically generated by configure - do not modify" >config-all-disas.mak
+> @@ -5212,7 +5220,7 @@ if test "$mingw32" = "yes" ; then
+>      echo "CONFIG_QGA_NTDDDISK=y" >> $config_host_mak
+>    fi
+>    if test "$guest_agent_msi" = "yes"; then
+> -    echo "QEMU_GA_MSI_ENABLED=yes" >> $config_host_mak
+> +    echo "QEMU_GA_MSI_ENABLED=yes" >> $config_host_mak
+>      echo "QEMU_GA_MSI_MINGW_DLL_PATH=${QEMU_GA_MSI_MINGW_DLL_PATH}" >> $config_host_mak
+>      echo "QEMU_GA_MSI_WITH_VSS=${QEMU_GA_MSI_WITH_VSS}" >> $config_host_mak
+>      echo "QEMU_GA_MSI_ARCH=${QEMU_GA_MSI_ARCH}" >> $config_host_mak
 
-> 
-> 
-> Max
-> 
-> >              bs->drv = NULL;
-> > 
-> 
-> 
+Stray unintended change?
 
+> --
+> 2.11.0
+>
 
-
-
--- 
-Dong Jia Shi
+thanks
+-- PMM
