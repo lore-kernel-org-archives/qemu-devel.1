@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cswvk-0006Ax-H8
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 15:37:25 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cswvp-0006F2-Oc
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 15:37:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cswvh-0003OD-B3
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 15:37:24 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:41416
-	helo=v2201612906741603.powersrv.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1cswvh-0003Nn-4M
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 15:37:21 -0400
-References: <54F1DEE8.3010903@weilnetz.de>
-	<20150302221228.GC4114@stefanha-thinkpad.redhat.com>
-	<3763fa56-5bba-b060-6ee8-120c9cc50dbb@weilnetz.de>
-	<20170123102810.GD29186@stefanha-x1.localdomain>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <a9de3032-de94-d0e3-945b-affe2d9fdc23@weilnetz.de>
-Date: Tue, 28 Mar 2017 21:37:17 +0200
+	(envelope-from <mreitz@redhat.com>) id 1cswvo-0003Rj-NU
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 15:37:29 -0400
+References: <20170308191434.2413-1-mreitz@redhat.com>
+	<20170323180523.GF5344@noname.redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <7b8f71c4-9b33-a2a4-2756-3641d1149153@redhat.com>
+Date: Tue, 28 Mar 2017 21:37:21 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170123102810.GD29186@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] QEMU website (wiki) improvements
+In-Reply-To: <20170323180523.GF5344@noname.redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="F6wOCammeXNiJellf1Cfpwaf4lp043VEn"
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 0/4] block: Add errp to b{lk,
+ drv}_truncate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,68 +25,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
 
-Am 23.01.2017 um 11:28 schrieb Stefan Hajnoczi:
-> On Sun, Jan 22, 2017 at 04:19:43PM +0100, Stefan Weil wrote:
->> On 03/02/15 23:12, Stefan Hajnoczi wrote:
->>> On Sat, Feb 28, 2015 at 04:29:44PM +0100, Stefan Weil wrote:
->>>> * It does not support secure access (https), so each login is insecure.
->>>>   Can we get a free server certificate?
->>>
->>> This is on my todo list.  I'm travelling right now but will work on it
->>> over the coming weeks.
->>>
->>> There are some gotchas:
->>>
->>> 1. qemu.org vs qemu-project.org.  Unless we get a SNI certificate, the
->>>    certificate will only be valid for one or the other.  Users will get
->>>    an untrusted certificate message if they go to the other domain name.
->>>
->>> 2. We use subdomains, so a wildcard certificate is necessary.  That's
->>>    not always offered for free so I need to compare the certificate
->>>    vendors.
->>>
->>> Stefan
->>
->>
->> Although this discussion thread is rather old, its subject
->> still applies.
->>
->> In the meantime there are free certificates available.
->> We could add https support with a certificate from
->> https://letsencrypt.org/. As long as there is only a
->> small number of host names (*), I'd simply add them all
->> to the primary certificate. In addition, SNI certificates
->> for the different names can be installed.
->
-> Good idea, Jeff and I have discussed Let's Encrypt and have experience
-> setting it up.
->
->> I can help with the installation if that is needed.
->>
->> Stefan
->>
->> (*)
->>
->> qemu.org
->> qemu.osuosl.org
->> qemu-project.org
->> wiki.qemu.org
->> wiki.qemu-project.org
->> www.qemu.org
->> www.qemu-project.org
->>
->> Are there more host names used?
->
-> git.qemu.org
-> git.qemu-project.org
->
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--F6wOCammeXNiJellf1Cfpwaf4lp043VEn
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Eric Blake <eblake@redhat.com>
+Message-ID: <7b8f71c4-9b33-a2a4-2756-3641d1149153@redhat.com>
+Subject: Re: [PATCH v2 for-2.10 0/4] block: Add errp to b{lk,drv}_truncate()
+References: <20170308191434.2413-1-mreitz@redhat.com>
+ <20170323180523.GF5344@noname.redhat.com>
+In-Reply-To: <20170323180523.GF5344@noname.redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-Update: Currently https://www.qemu-project.org/ supports secure
-connections, but uses a self-signed certificate which was issued
-for qemu.org, so it still cannot be simply used in most browsers.
+On 23.03.2017 19:05, Kevin Wolf wrote:
+> Am 08.03.2017 um 20:14 hat Max Reitz geschrieben:
+>> Having an Error parameter for these functions makes sense because we
+>> sometimes want a bit more information than just "Something failed". So=
+me
+>> drivers already use error_report() and the like to emit this additiona=
+l
+>> information, so it's rather obvious that we do want a real error objec=
+t
+>> here.
+>=20
+> I had only some minor comments about improving one error message or
+> another, so whether you fix them or not:
+>=20
+> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+>=20
+> (But if you don't fix them, you need to merge the patches yourself)
 
-Regards
-Stefan
+That sounds very fair, I like it. :-)
+
+Don't worry, though, I will address them. Thanks for reviewing!
+
+Max
+
+
+--F6wOCammeXNiJellf1Cfpwaf4lp043VEn
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljau3ESHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A7ZcH/3H6rEuSV/yOruZdiw1Obam1/UmFY5i9
+yi+Xv6TN1mIr23VVVXxYVb2fSqZ1L5SvB2xXZL/DluNwOVmdG57fyP81H8mKmKml
+Wg2SX+VlCAsCwI7UEQBBZIvw++mvNaoRFk1vGZwFiLC/mdM8YsaDogbKk4xl/wjW
+D4pGU4LV+jse6l0/6o5krtBDBQRpAdb2Ujas8W/sBRN49VJa3xjCEPgjygSCiL34
+Ws52SaBOq58ZKHYJ+eIO/1VBJLF3XHCPbkHlgf6Mc5m+qOyCwLEcSZjLlBSTTL97
+XFgAJvdgjDRVGn32lnv7LHKZd5o35Noyt8lkV0Y8r3PjLfP0ofNzx/A=
+=V3jT
+-----END PGP SIGNATURE-----
+
+--F6wOCammeXNiJellf1Cfpwaf4lp043VEn--
