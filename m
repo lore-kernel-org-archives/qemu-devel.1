@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1csgwB-00044N-TI
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 22:32:49 -0400
+	(envelope-from <mst@redhat.com>) id 1csgxJ-0004bD-8X
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 22:33:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1csgw7-0003A5-16
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 22:32:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37096)
+	(envelope-from <mst@redhat.com>) id 1csgxF-0003gz-Bi
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 22:33:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37558)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1csgw6-00039r-Rk
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 22:32:42 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C6FC680F9E
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 02:32:41 +0000 (UTC)
-Date: Mon, 27 Mar 2017 22:32:40 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170328023240.GP15423@localhost.localdomain>
-References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
-	<1490621195-2228-10-git-send-email-armbru@redhat.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1csgxF-0003gl-5r
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 22:33:53 -0400
+Date: Tue, 28 Mar 2017 05:33:48 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170328053258-mutt-send-email-mst@kernel.org>
+References: <20170327044030.31306-1-aik@ozlabs.ru>
+	<d474bbee-94aa-d8d2-7369-71058fb8a099@redhat.com>
+	<20170328000628.GA13461@umbus.fritz.box>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1490621195-2228-10-git-send-email-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v3 for-2.9 09/11] rbd: Revert -blockdev
- parameter password-secret
+In-Reply-To: <20170328000628.GA13461@umbus.fritz.box>
+Subject: Re: [Qemu-devel] [PATCH qemu] pci: Add missing drop of bus master
+ AS reference
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,63 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, jdurgin@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Jason Wang <jasowang@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On Mon, Mar 27, 2017 at 03:26:33PM +0200, Markus Armbruster wrote:
-> This reverts a part of commit 8a47e8e.  We're having second thoughts
-> on the QAPI schema (and thus the external interface), and haven't
-> reached consensus, yet.  Issues include:
+On Tue, Mar 28, 2017 at 11:06:28AM +1100, David Gibson wrote:
+> On Mon, Mar 27, 2017 at 05:28:17PM +0200, Paolo Bonzini wrote:
+> > 
+> > 
+> > On 27/03/2017 06:40, Alexey Kardashevskiy wrote:
+> > > The recent introduction of a bus master container added
+> > > memory_region_add_subregion() into the PCI device registering path but
+> > > missed memory_region_del_subregion() in the unregistering path leaving
+> > > a reference to the root memory region of the new container.
+> > > 
+> > > This adds missing memory_region_del_subregion().
+> > > 
+> > > Fixes: 3716d5902d743 ("pci: introduce a bus master container")
+> > > Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> > > ---
+> > >  hw/pci/pci.c | 2 ++
+> > >  1 file changed, 2 insertions(+)
+> > > 
+> > > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> > > index e6b08e1988..bd8043c460 100644
+> > > --- a/hw/pci/pci.c
+> > > +++ b/hw/pci/pci.c
+> > > @@ -869,6 +869,8 @@ static void do_pci_unregister_device(PCIDevice *pci_dev)
+> > >      pci_dev->bus->devices[pci_dev->devfn] = NULL;
+> > >      pci_config_free(pci_dev);
+> > >  
+> > > +    memory_region_del_subregion(&pci_dev->bus_master_container_region,
+> > > +                                &pci_dev->bus_master_enable_region);
+> > >      address_space_destroy(&pci_dev->bus_master_as);
+> > >  }
+> > >  
+> > > 
+> > 
+> > My own review fail.  The enable subregion would be deleted when a memory
+> > region is finalized, but the enable subregions is keeping the owner
+> > alive.  And until the owner is alive, the container region is not
+> > deleted either.  So there is a reference count cycle, which we need to
+> > break.
+> > 
+> > It's probably good to revisit commit 2e2b8eb ("memory: allow destroying
+> > a non-empty MemoryRegion", 2015-10-01).  For 2.9,
+> > 
+> > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 > 
-> * BlockdevOptionsRbd member @password-secret isn't actually a
->   password, it's a key generated by Ceph.
-> 
-> * We're not sure where member @password-secret belongs (see the
->   previous commit).
-> 
-> * How @password-secret interacts with settings from a configuration
->   file specified with @conf is undocumented.  I suspect it's untested,
->   too.
+> Merged to ppc-for-2.9.
 
-It's tested, at least to some extent -- it works on my setup; it will
-override whatever is set in the conf or the keyring.  I can alternate
-between /etc/ceph/keyring, or password-secret, or override the user present
-in /etc/cep/keyring with a different key via password-secret.
+I have it on pci branch, seems more appropriate.
 
-So I'd suggest dropping that blurb from the commit message.
-
-I agree with the overall reasoning though behind remove all parameters not
-needed for now, so:
-
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-
-> 
-> Let's avoid painting ourselves into a corner now, and revert the
-> feature for 2.9.
-> 
-> Note that users can still configure an authentication key with a
-> configuration file.  They probably do that anyway if they use Ceph
-> outside QEMU as well.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  qapi/block-core.json | 3 ---
->  1 file changed, 3 deletions(-)
-> 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 6a7ca0b..2e60ab5 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -2618,9 +2618,6 @@
->  # @server:             Monitor host address and port.  This maps
->  #                      to the "mon_host" Ceph option.
->  #
-> -# @password-secret:    The ID of a QCryptoSecret object providing
-> -#                      the password for the login.
-> -#
->  # Since: 2.9
->  ##
->  { 'struct': 'BlockdevOptionsRbd',
 > -- 
-> 2.7.4
-> 
+> David Gibson			| I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
