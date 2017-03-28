@@ -1,37 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cspjR-0001BD-Ot
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:56:15 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1cspme-0001uZ-8q
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:59:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cspjM-0004ju-U8
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:56:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49372)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1cspjM-0004jI-Lm
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:56:08 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4F3198B135
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 11:56:07 +0000 (UTC)
-Date: Tue, 28 Mar 2017 07:56:06 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170328115606.GC1135@localhost.localdomain>
-References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
-	<1490621195-2228-3-git-send-email-armbru@redhat.com>
-	<ba4b08e7-7e8d-5210-be2c-545be4cdeb99@redhat.com>
-	<abc2a347-5f42-59c0-5f51-0f03bb2b3c6d@redhat.com>
-	<87wpbaefzo.fsf@dusky.pond.sub.org>
-	<8737dybl7v.fsf@dusky.pond.sub.org>
-	<20170327213347.GF22342@localhost.localdomain>
-	<87r31h6dki.fsf@dusky.pond.sub.org>
+	(envelope-from <eric.auger@redhat.com>) id 1cspmd-0006bi-3n
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:59:32 -0400
+References: <CACJhumejPG6s_dewyHH=e5=QLcOUCzvzhakA7oSqm2Ms5cQvRA@mail.gmail.com>
+	<CAFEAcA-kKvS_6OZE1mKbFYgCzm4wPK2XJi_A03nFxu+K3ZA4hQ@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <43d097e6-a74a-ed22-0b28-3f151d3e51fb@redhat.com>
+Date: Tue, 28 Mar 2017 13:59:11 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87r31h6dki.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH RFC v3 for-2.9 02/11] rbd: Fix to cleanly
- reject -drive without pool or image
+In-Reply-To: <CAFEAcA-kKvS_6OZE1mKbFYgCzm4wPK2XJi_A03nFxu+K3ZA4hQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Aarch64: Qemu master or 2.9.0-rc1 breaks
+ compatibility with 4.10 kernel.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,89 +24,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: kwolf@redhat.com, jdurgin@redhat.com, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Prakash B <bjsprakash.linux@gmail.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, bprakash@caviumnetworks.com, QEMU Developers <qemu-devel@nongnu.org>, "Kumar, Vijaya" <Vijaya.Kumar@cavium.com>, qemu-arm <qemu-arm@nongnu.org>, sgoutham@cavium.com, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Christoffer Dall <christoffer.dall@linaro.org>
 
-On Tue, Mar 28, 2017 at 09:54:53AM +0200, Markus Armbruster wrote:
-> Jeff Cody <jcody@redhat.com> writes:
-> 
-> > On Mon, Mar 27, 2017 at 08:58:28PM +0200, Markus Armbruster wrote:
-> >> Markus Armbruster <armbru@redhat.com> writes:
-> >> 
-> >> > Max Reitz <mreitz@redhat.com> writes:
-> >> >
-> >> >> On 27.03.2017 18:10, Max Reitz wrote:
-> >> >>> On 27.03.2017 15:26, Markus Armbruster wrote:
-> >> >>>> qemu_rbd_open() neglects to check pool and image are present.
-> >> >>>> Reproducer:
-> >> >>>>
-> >> >>>>     $ qemu-system-x86_64 -nodefaults -drive if=none,driver=rbd,pool=p
-> >> >>>>     Segmentation fault (core dumped)
-> >> >>>>     $ qemu-system-x86_64 -nodefaults -drive if=none,driver=rbd,image=i
-> >> >>>>     qemu-system-x86_64: -drive if=none,driver=rbd,image=i: error opening pool (null)
-> >> >>>>
-> >> >>>> Doesn't affect -drive with file=..., because qemu_rbd_parse_filename()
-> >> >>>> always sets both pool and image.
-> >> >>>>
-> >> >>>> Doesn't affect -blockdev, because pool and image are mandatory in the
-> >> >>>> QAPI schema.
-> >> >>>>
-> >> >>>> Fix by adding the missing checks.
-> >> >>>>
-> >> >>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> >> >>>> Reviewed-by: Eric Blake <eblake@redhat.com>
-> >> >>>> ---
-> >> >>>>  block/rbd.c | 10 +++++++---
-> >> >>>>  1 file changed, 7 insertions(+), 3 deletions(-)
-> >> >>> 
-> >> >>> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> >> >>
-> >> >> That said, don't we have a similar issue with qemu_rbd_create()? It too
-> >> >> doesn't check whether those options are given but I guess they're just
-> >> >> as mandatory.
-> >> >
-> >> > Looks like it.  I'll try to stick a fix into v4.
-> >> 
-> >> Hmm, ignorant question: how can I reach qemu_rbd_create() without going
-> >> through qemu_rbd_parse_filename()?
-> >
-> > You can't -- commit c7cacb3e7 forces qemu_rbd_create() to call
-> > qemu_rbd_parse_filename().  And in qemu_rbd_parse_filename(), it will
-> > complain if pool is not provided (and that is what causes the abort, not the
-> > missing image parameter).  So I think we are safe, but a nicer error message
-> > for a missing 'image' parameter might be nice anyway.
-> 
-> I now see the "we are safe" part, but not the "want a nicer error
-> message for a missing 'image'" part.  How can 'image' be missing?
-> 
-> qemu_rbd_parse_filename() parses a pseudo-filename of the form
-> 
->     rbd:POOL/IMAGE[@SNAP][:KEY=VALUE:...]
-> 
-> It fails if
-> 
-> * the pseudo-filename doesn't start with "rbd:"
-> 
-> * doesn't contain '/' ("Pool name is required")
-> 
-> * POOL, IMAGE, SNAP, the KEY=VALUE:... part or any KEY in it is empty or
->   too long (until the next commit)
-> 
-> * a KEY=VALUE doesn't contain '='
-> 
-> If it succeeds, "pool" and "image" are both set in @options.
-> 
-> Can you give me a reproducer for the error message you'd like me to
-> improve?
+Hi Peter,
 
+On 28/03/2017 13:29, Peter Maydell wrote:
+> On 28 March 2017 at 12:22, Prakash B <bjsprakash.linux@gmail.com> wrote:
+>> Qemu master or v2.9.0-rc1 doesn't launch guest  when host kernel
+>> version 4.10 or  lower on Aarch64 (cavium ThunderX), its failing with
+>> abort  "qemu-system-aarch64: KVM_GET_DEVICE_ATTR failed: No such
+>> device or address"
+>>
+>> "GICv3 live migration support"  patch breaks the  compatibility b/w
+>> kernel and qemu.
+>>
+>> Is this expected behaviour,  can we provide a fix without  breaking
+>> compatibility b/w kernel and qemu .
+> 
+> This is indeed not supposed to happen. Eric, can you take a look?
 
-Sure: qemu-img info rbd:mypool/:mon_host=192.168.15.180
+Yes I start the investigations.
 
-'image' is technically present in the options, but it is an empty string.
+Thanks
 
-My thought was that it'd be nice to throw a similar error message for an
-empty string for 'image'.  As it is, the rbd library catches it, so it isn't
-catastrophic, but a nicer message would be helpful.
-
-(My comment here assumes an empty string is not an acceptable image name for
-rbd)
+Eric
+> 
+> thanks
+> -- PMM
+> 
