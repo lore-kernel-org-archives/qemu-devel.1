@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48156)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1css2f-0002a7-8C
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 10:24:17 -0400
+	(envelope-from <eblake@redhat.com>) id 1cssRR-0001F2-Ut
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 10:49:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1css2Z-0006nt-4g
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 10:24:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40250)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1css2Y-0006nh-Sc
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 10:24:07 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 28 Mar 2017 15:23:46 +0100
-Message-Id: <20170328142346.3899-2-stefanha@redhat.com>
-In-Reply-To: <20170328142346.3899-1-stefanha@redhat.com>
-References: <20170328142346.3899-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL for-2.9 1/1] trace: fix tcg tracing build
- breakage
+	(envelope-from <eblake@redhat.com>) id 1cssRQ-0007TL-Oe
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 10:49:50 -0400
+References: <20170324123458.yk3rj3g47e5xr33i@eukaryote>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6fb77120-dcab-042f-bb51-20ccbaa38354@redhat.com>
+Date: Tue, 28 Mar 2017 09:49:40 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170324123458.yk3rj3g47e5xr33i@eukaryote>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="pf7epeAqWdECpVQwouFEJKQSCntuKrxx2"
+Subject: Re: [Qemu-devel] Making QMP 'block-job-cancel' transactionable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,120 +23,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Kashyap Chamarthy <kchamart@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org
 
-Commit 0ab8ed18a6fe98bfc82705b0f041fbf2a8ca5b60 ("trace: switch to
-modular code generation for sub-directories") forgot to convert "tcg"
-trace events to the modular code generation approach where each
-sub-directory has its own trace-events file.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--pf7epeAqWdECpVQwouFEJKQSCntuKrxx2
+From: Eric Blake <eblake@redhat.com>
+To: Kashyap Chamarthy <kchamart@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org
+Message-ID: <6fb77120-dcab-042f-bb51-20ccbaa38354@redhat.com>
+Subject: Re: Making QMP 'block-job-cancel' transactionable
+References: <20170324123458.yk3rj3g47e5xr33i@eukaryote>
+In-Reply-To: <20170324123458.yk3rj3g47e5xr33i@eukaryote>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This patch fixes compilation for "tcg" trace events.  Currently they are
-only used in the root ./trace-events file.
+On 03/24/2017 07:34 AM, Kashyap Chamarthy wrote:
+> While debugging some other issue, I happened to stumble across an old
+> libvirt commit[*] that adds support for pivot (whether QEMU should
+> switch to a target copy or not) operation as a result of issuing QMP
+> 'block-job-cancel' to a 'drive-mirror' (in libvirt parlance, "block
+> copy").
+>=20
+> In the libvirt commit message[*] Eric Blake writes:
+>=20
+>     "[...] There may be potential improvements to the snapshot code to
+>     exploit block copy over multiple disks all at one point in time.
+>     And, if 'block-job-cancel' were made part of 'transaction', you
+>     could copy multiple disks at the same point in time without pausing=
 
-"tcg" trace events can only be used in the root ./trace-events file for
-the time being.
+>     the domain. [...]"
+>=20
+> I realize that 'block-job-cancel' is currently not part of the
+> @TransactionAction.  Is it worthwhile to do so?
 
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Tested-by: Emilio G. Cota <cota@braap.org>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-id: 20170327131718.18268-1-stefanha@redhat.com
-Suggested-by: Emilio G. Cota <cota@braap.org>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- docs/tracing.txt                         |  3 +++
- trace/Makefile.objs                      | 16 ++++++++--------
- scripts/tracetool/format/tcg_h.py        |  1 +
- scripts/tracetool/format/tcg_helper_c.py |  1 +
- 4 files changed, 13 insertions(+), 8 deletions(-)
+Yes, it is still worthwhile to make that improvement, although it is now
+2.10 material.
 
-diff --git a/docs/tracing.txt b/docs/tracing.txt
-index e14bb6d..8c0029b 100644
---- a/docs/tracing.txt
-+++ b/docs/tracing.txt
-@@ -405,6 +405,9 @@ information. If used together with the "tcg" property, it adds a second
- "TCGv_env" argument that must point to the per-target global TCG register that
- points to the vCPU when guest code is executed (usually the "cpu_env" variable).
- 
-+The "tcg" and "vcpu" properties are currently only honored in the root
-+./trace-events file.
-+
- The following example events:
- 
-     foo(uint32_t a) "a=%x"
-diff --git a/trace/Makefile.objs b/trace/Makefile.objs
-index 1b8eb4a..afd571c 100644
---- a/trace/Makefile.objs
-+++ b/trace/Makefile.objs
-@@ -9,27 +9,27 @@ $(BUILD_DIR)/trace-events-all: $(trace-events-files)
- 
- $(obj)/generated-helpers-wrappers.h: $(obj)/generated-helpers-wrappers.h-timestamp
- 	@cmp $< $@ >/dev/null 2>&1 || cp $< $@
--$(obj)/generated-helpers-wrappers.h-timestamp: $(trace-events-files) $(BUILD_DIR)/config-host.mak $(tracetool-y)
-+$(obj)/generated-helpers-wrappers.h-timestamp: $(SRC_PATH)/trace-events $(BUILD_DIR)/config-host.mak $(tracetool-y)
- 	$(call quiet-command,$(TRACETOOL) \
--		--group=all \
-+		--group=root \
- 		--format=tcg-helper-wrapper-h \
- 		--backend=$(TRACE_BACKENDS) \
- 		$< > $@,"GEN","$(patsubst %-timestamp,%,$@)")
- 
- $(obj)/generated-helpers.h: $(obj)/generated-helpers.h-timestamp
- 	@cmp $< $@ >/dev/null 2>&1 || cp $< $@
--$(obj)/generated-helpers.h-timestamp: $(trace-events-files) $(BUILD_DIR)/config-host.mak $(tracetool-y)
-+$(obj)/generated-helpers.h-timestamp: $(SRC_PATH)/trace-events $(BUILD_DIR)/config-host.mak $(tracetool-y)
- 	$(call quiet-command,$(TRACETOOL) \
--		--group=all \
-+		--group=root \
- 		--format=tcg-helper-h \
- 		--backend=$(TRACE_BACKENDS) \
- 		$< > $@,"GEN","$(patsubst %-timestamp,%,$@)")
- 
- $(obj)/generated-helpers.c: $(obj)/generated-helpers.c-timestamp
- 	@cmp $< $@ >/dev/null 2>&1 || cp $< $@
--$(obj)/generated-helpers.c-timestamp: $(trace-events-files) $(BUILD_DIR)/config-host.mak $(tracetool-y)
-+$(obj)/generated-helpers.c-timestamp: $(SRC_PATH)/trace-events $(BUILD_DIR)/config-host.mak $(tracetool-y)
- 	$(call quiet-command,$(TRACETOOL) \
--		--group=all \
-+		--group=root \
- 		--format=tcg-helper-c \
- 		--backend=$(TRACE_BACKENDS) \
- 		$< > $@,"GEN","$(patsubst %-timestamp,%,$@)")
-@@ -41,9 +41,9 @@ target-obj-y += generated-helpers.o
- 
- $(obj)/generated-tcg-tracers.h: $(obj)/generated-tcg-tracers.h-timestamp
- 	@cmp $< $@ >/dev/null 2>&1 || cp $< $@
--$(obj)/generated-tcg-tracers.h-timestamp: $(trace-events-files) $(BUILD_DIR)/config-host.mak $(tracetool-y)
-+$(obj)/generated-tcg-tracers.h-timestamp: $(SRC_PATH)/trace-events $(BUILD_DIR)/config-host.mak $(tracetool-y)
- 	$(call quiet-command,$(TRACETOOL) \
--		--group=all \
-+		--group=root \
- 		--format=tcg-h \
- 		--backend=$(TRACE_BACKENDS) \
- 		$< > $@,"GEN","$(patsubst %-timestamp,%,$@)")
-diff --git a/scripts/tracetool/format/tcg_h.py b/scripts/tracetool/format/tcg_h.py
-index 7ddc4a5..db55f52 100644
---- a/scripts/tracetool/format/tcg_h.py
-+++ b/scripts/tracetool/format/tcg_h.py
-@@ -40,6 +40,7 @@ def generate(events, backend, group):
-         '#define TRACE_%s_GENERATED_TCG_TRACERS_H' % group.upper(),
-         '',
-         '#include "exec/helper-proto.h"',
-+        '#include "%s"' % header,
-         '',
-         )
- 
-diff --git a/scripts/tracetool/format/tcg_helper_c.py b/scripts/tracetool/format/tcg_helper_c.py
-index 7dccd8c..ec7acbe 100644
---- a/scripts/tracetool/format/tcg_helper_c.py
-+++ b/scripts/tracetool/format/tcg_helper_c.py
-@@ -55,6 +55,7 @@ def generate(events, backend, group):
-         '#include "qemu-common.h"',
-         '#include "cpu.h"',
-         '#include "exec/helper-proto.h"',
-+        '#include "%s"' % header,
-         '',
-         )
- 
--- 
-2.9.3
+>=20
+> Given the current behavior of QMP 'drive-mirror':
+>=20
+>   - Upon 'block-job-complete', synchronization will end, and live QEMU
+>     pivots to the target (i.e. the copy)
+>=20
+>   - Upon 'block-job-cancel', a point-in-time (at the time of cancel)
+>     copy gets created, and live QEMU will _not_ pivot.
+>=20
+> I realize that it is not possible to perform a "block copy" of multiple=
+
+> disks at the same point in time without pausing QEMU.  From a brief cha=
+t
+> with Stefan Hajnoczi on IRC, he does confirm that there's no current AP=
+I
+> for doing it atomically across multiple disks.
+>=20
+> Since Stefan asked if a bug exists for adding 'transaction' support to
+> 'block-job-cancel', thought I might bring it up here first.
+>=20
+>=20
+> [*] https://libvirt.org/git/?p=3Dlibvirt.git;a=3Dcommit;h=3Deaba79d --
+>     blockjob: support pivot operation on cancel
+>=20
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--pf7epeAqWdECpVQwouFEJKQSCntuKrxx2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY2ngEAAoJEKeha0olJ0NqMqYH/RH26Rlsxd5rdibKc/Nch/VZ
+JjOib2FqL/pDvMPqXWsArX9s4jSp9cTZNnNAxDPk1Q3E82+2Y3VyjQeYND1pabA2
+bZ9qzVVcwcX4bP6vl9RL3bKAvOXupfosxOBUzqW1q8V3gUk2Yu9QPv1Eu13RpNyT
+b4hSszKA4AVJTY4S8dPrnaCzWcsq9vT88Co7PpY/hoA0nq81Hq3yCuDa2fszpHwu
+YE1xmIKEiUDXqTx16IMioP3au6lWZmbqiqXXjeoJYrxjNSWYRJFsuid5W3Xvjdq/
+vaYf4m4aKD4iMUYZvrijtiCCv9T/3ze31BNuyyr6rrAVIOQq8g36P/NIMbrymsc=
+=IpxG
+-----END PGP SIGNATURE-----
+
+--pf7epeAqWdECpVQwouFEJKQSCntuKrxx2--
