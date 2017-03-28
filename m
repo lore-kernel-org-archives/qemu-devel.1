@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cspzT-0007tz-Nu
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 08:12:48 -0400
+	(envelope-from <jcody@redhat.com>) id 1csq08-0008FX-TK
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 08:13:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cspzS-0003Iz-Rz
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 08:12:47 -0400
-Date: Tue, 28 Mar 2017 08:12:38 -0400
+	(envelope-from <jcody@redhat.com>) id 1csq07-0003P1-JF
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 08:13:28 -0400
+Date: Tue, 28 Mar 2017 08:13:22 -0400
 From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170328121238.GG22342@localhost.localdomain>
+Message-ID: <20170328121322.GH22342@localhost.localdomain>
 References: <1490691368-32099-1-git-send-email-armbru@redhat.com>
-	<1490691368-32099-8-git-send-email-armbru@redhat.com>
+	<1490691368-32099-11-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1490691368-32099-8-git-send-email-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 for-2.9 07/10] rbd: Clean up
- qemu_rbd_create()'s detour through QemuOpts
+In-Reply-To: <1490691368-32099-11-git-send-email-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 for-2.9 10/10] rbd: Fix bugs around
+ -drive parameter "server"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,65 +27,232 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Markus Armbruster <armbru@redhat.com>
 Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jdurgin@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com
 
-On Tue, Mar 28, 2017 at 10:56:05AM +0200, Markus Armbruster wrote:
-> The conversion from QDict to QemuOpts is pointless.  Simply get the
-> stuff straight from the QDict.
+On Tue, Mar 28, 2017 at 10:56:08AM +0200, Markus Armbruster wrote:
+> qemu_rbd_open() takes option parameters as a flattened QDict, with
+> keys of the form server.%d.host, server.%d.port, where %d counts up
+> from zero.
+> 
+> qemu_rbd_array_opts() extracts these values as follows.  First, it
+> calls qdict_array_entries() to find the list's length.  For each list
+> element, it formats the list's key prefix (e.g. "server.0."), then
+> creates a new QDict holding the options with that key prefix, then
+> converts that to a QemuOpts, so it can finally get the member values
+> from there.
+> 
+> If there's one surefire way to make code using QDict more awkward,
+> it's creating more of them and mixing in QemuOpts for good measure.
+> 
+> The extraction of keys starting with server.%d into another QDict
+> makes us ignore parameters like server.0.neither-host-nor-port
+> silently.
+> 
+> The conversion to QemuOpts abuses runtime_opts, as described a few
+> commits ago.
+> 
+> Rewrite to simply get the values straight from the options QDict.
+> 
+> Fixes -drive not to crash when server.*.* are present, but
+> server.*.host is absent.
+> 
+> Fixes -drive to reject invalid server.*.*.
+> 
+> Permits cleaning up runtime_opts.  Do that, and fix -drive to reject
+> bogus parameters host and port instead of silently ignoring them.
 > 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > Reviewed-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 
 Reviewed-by: Jeff Cody <jcody@redhat.com>
 
 > ---
->  block/rbd.c | 20 +++++---------------
->  1 file changed, 5 insertions(+), 15 deletions(-)
+>  block/rbd.c | 127 +++++++++++++++---------------------------------------------
+>  1 file changed, 32 insertions(+), 95 deletions(-)
 > 
 > diff --git a/block/rbd.c b/block/rbd.c
-> index b2afe07..16ea60a 100644
+> index 485cef4..498322b 100644
 > --- a/block/rbd.c
 > +++ b/block/rbd.c
-> @@ -376,7 +376,6 @@ static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
->      rados_t cluster;
->      rados_ioctx_t io_ctx;
->      QDict *options = NULL;
-> -    QemuOpts *rbd_opts = NULL;
->      int ret = 0;
+> @@ -13,6 +13,7 @@
 >  
->      secretid = qemu_opt_get(opts, "password-secret");
-> @@ -407,19 +406,11 @@ static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
->          goto exit;
->      }
+>  #include "qemu/osdep.h"
 >  
-> -    rbd_opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
-> -    qemu_opts_absorb_qdict(rbd_opts, options, &local_err);
-> -    if (local_err) {
-> -        error_propagate(errp, local_err);
-> -        ret = -EINVAL;
-> -        goto exit;
-> -    }
+> +#include <rbd/librbd.h>
+>  #include "qapi/error.h"
+>  #include "qemu/error-report.h"
+>  #include "block/block_int.h"
+> @@ -20,8 +21,6 @@
+>  #include "qemu/cutils.h"
+>  #include "qapi/qmp/qstring.h"
+>  
+> -#include <rbd/librbd.h>
 > -
-> -    pool       = qemu_opt_get(rbd_opts, "pool");
-> -    conf       = qemu_opt_get(rbd_opts, "conf");
-> -    clientname = qemu_opt_get(rbd_opts, "user");
-> -    name       = qemu_opt_get(rbd_opts, "image");
-> -    keypairs   = qemu_opt_get(rbd_opts, "=keyvalue-pairs");
-> +    pool       = qdict_get_try_str(options, "pool");
-> +    conf       = qdict_get_try_str(options, "conf");
-> +    clientname = qdict_get_try_str(options, "user");
-> +    name       = qdict_get_try_str(options, "image");
-> +    keypairs   = qdict_get_try_str(options, "=keyvalue-pairs");
->  
->      ret = rados_create(&cluster, clientname);
->      if (ret < 0) {
-> @@ -470,7 +461,6 @@ shutdown:
->  
->  exit:
->      QDECREF(options);
-> -    qemu_opts_del(rbd_opts);
->      return ret;
+>  /*
+>   * When specifying the image filename use:
+>   *
+> @@ -320,7 +319,7 @@ static QemuOptsList runtime_opts = {
+>              .help = "Rados id name",
+>          },
+>          /*
+> -         * server.* extracted manually, see qemu_rbd_array_opts()
+> +         * server.* extracted manually, see qemu_rbd_mon_host()
+>           */
+>          {
+>              .name = "password-secret",
+> @@ -340,21 +339,6 @@ static QemuOptsList runtime_opts = {
+>              .type = QEMU_OPT_STRING,
+>              .help = "Legacy rados key/value option parameters",
+>          },
+> -
+> -        /*
+> -         * The remainder aren't option keys, but option sub-sub-keys,
+> -         * so that qemu_rbd_array_opts() can abuse runtime_opts for
+> -         * its own purposes
+> -         * TODO clean this up
+> -         */
+> -        {
+> -            .name = "host",
+> -            .type = QEMU_OPT_STRING,
+> -        },
+> -        {
+> -            .name = "port",
+> -            .type = QEMU_OPT_STRING,
+> -        },
+>          { /* end of list */ }
+>      },
+>  };
+> @@ -505,89 +489,43 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)
+>      qemu_aio_unref(acb);
 >  }
 >  
+> -#define RBD_MON_HOST          0
+> -
+> -static char *qemu_rbd_array_opts(QDict *options, const char *prefix, int type,
+> -                                 Error **errp)
+> +static char *qemu_rbd_mon_host(QDict *options, Error **errp)
+>  {
+> -    int num_entries;
+> -    QemuOpts *opts = NULL;
+> -    QDict *sub_options;
+> -    const char *host;
+> -    const char *port;
+> -    char *str;
+> -    char *rados_str = NULL;
+> -    Error *local_err = NULL;
+> +    const char **vals = g_new(const char *, qdict_size(options) + 1);
+> +    char keybuf[32];
+> +    const char *host, *port;
+> +    char *rados_str;
+>      int i;
+>  
+> -    assert(type == RBD_MON_HOST);
+> -
+> -    num_entries = qdict_array_entries(options, prefix);
+> -
+> -    if (num_entries < 0) {
+> -        error_setg(errp, "Parse error on RBD QDict array");
+> -        return NULL;
+> -    }
+> -
+> -    for (i = 0; i < num_entries; i++) {
+> -        char *strbuf = NULL;
+> -        const char *value;
+> -        char *rados_str_tmp;
+> -
+> -        str = g_strdup_printf("%s%d.", prefix, i);
+> -        qdict_extract_subqdict(options, &sub_options, str);
+> -        g_free(str);
+> -
+> -        opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+> -        qemu_opts_absorb_qdict(opts, sub_options, &local_err);
+> -        QDECREF(sub_options);
+> -        if (local_err) {
+> -            error_propagate(errp, local_err);
+> -            g_free(rados_str);
+> +    for (i = 0;; i++) {
+> +        sprintf(keybuf, "server.%d.host", i);
+> +        host = qdict_get_try_str(options, keybuf);
+> +        qdict_del(options, keybuf);
+> +        sprintf(keybuf, "server.%d.port", i);
+> +        port = qdict_get_try_str(options, keybuf);
+> +        qdict_del(options, keybuf);
+> +        if (!host && !port) {
+> +            break;
+> +        }
+> +        if (!host) {
+> +            error_setg(errp, "Parameter server.%d.host is missing", i);
+>              rados_str = NULL;
+> -            goto exit;
+> +            goto out;
+>          }
+>  
+> -        if (type == RBD_MON_HOST) {
+> -            host = qemu_opt_get(opts, "host");
+> -            port = qemu_opt_get(opts, "port");
+> -
+> -            value = host;
+> -            if (port) {
+> -                /* check for ipv6 */
+> -                if (strchr(host, ':')) {
+> -                    strbuf = g_strdup_printf("[%s]:%s", host, port);
+> -                } else {
+> -                    strbuf = g_strdup_printf("%s:%s", host, port);
+> -                }
+> -                value = strbuf;
+> -            } else if (strchr(host, ':')) {
+> -                strbuf = g_strdup_printf("[%s]", host);
+> -                value = strbuf;
+> -            }
+> +        if (strchr(host, ':')) {
+> +            vals[i] = port ? g_strdup_printf("[%s]:%s", host, port)
+> +                : g_strdup_printf("[%s]", host);
+>          } else {
+> -            abort();
+> +            vals[i] = port ? g_strdup_printf("%s:%s", host, port)
+> +                : g_strdup(host);
+>          }
+> -
+> -        /* each iteration in the for loop will build upon the string, and if
+> -         * rados_str is NULL then it is our first pass */
+> -        if (rados_str) {
+> -            /* separate options with ';', as that  is what rados_conf_set()
+> -             * requires */
+> -            rados_str_tmp = rados_str;
+> -            rados_str = g_strdup_printf("%s;%s", rados_str_tmp, value);
+> -            g_free(rados_str_tmp);
+> -        } else {
+> -            rados_str = g_strdup(value);
+> -        }
+> -
+> -        g_free(strbuf);
+> -        qemu_opts_del(opts);
+> -        opts = NULL;
+>      }
+> +    vals[i] = NULL;
+>  
+> -exit:
+> -    qemu_opts_del(opts);
+> +    rados_str = i ? g_strjoinv(";", (char **)vals) : NULL;
+> +out:
+> +    g_strfreev((char **)vals);
+>      return rados_str;
+>  }
+>  
+> @@ -606,12 +544,11 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+>      qemu_opts_absorb_qdict(opts, options, &local_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+> -        qemu_opts_del(opts);
+> -        return -EINVAL;
+> +        r = -EINVAL;
+> +        goto failed_opts;
+>      }
+>  
+> -    mon_host = qemu_rbd_array_opts(options, "server.",
+> -                                   RBD_MON_HOST, &local_err);
+> +    mon_host = qemu_rbd_mon_host(options, &local_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+>          r = -EINVAL;
 > -- 
 > 2.7.4
 > 
