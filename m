@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1csrl9-0007dd-Rv
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 10:06:11 -0400
+	(envelope-from <jcody@redhat.com>) id 1csrlB-0007es-Sx
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 10:06:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1csrl3-0007wS-Oz
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 10:06:07 -0400
+	(envelope-from <jcody@redhat.com>) id 1csrlA-00080k-R7
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 10:06:09 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Tue, 28 Mar 2017 10:05:46 -0400
-Message-Id: <20170328140555.3001-2-jcody@redhat.com>
-In-Reply-To: <20170328140555.3001-1-jcody@redhat.com>
-References: <20170328140555.3001-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL for-2.9 01/10] rbd: Reject -blockdev
- server.*.{numeric, to, ipv4, ipv6}
+Date: Tue, 28 Mar 2017 10:05:45 -0400
+Message-Id: <20170328140555.3001-1-jcody@redhat.com>
+Subject: [Qemu-devel] [PULL for-2.9 00/10] Block patches for -rc2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,89 +20,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: peter.maydell@linaro.org, jcody@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-From: Markus Armbruster <armbru@redhat.com>
+The following changes since commit 142b9ca51d7260d20f6e87bd7f2020ac0a7d95d9:
 
-We use InetSocketAddress in the QAPI schema.  However, the code
-doesn't use inet_connect_saddr(), but formats "host" and "port" into a
-configuration string for rados_conf_set().  Thus, members "numeric",
-"to", "ipv4" and "ipv6" are silently ignored.  Not nice.  Example:
+  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2017-03-28 11:10:36 +0100)
 
-    -blockdev rbd,node-name=nn,pool=p,image=i,server.0.host=h0,server.0.port=12345,server.0.ipv4=off
+are available in the git repository at:
 
-Factor a suitable InetSocketAddressBase out of InetSocketAddress, and
-use that.  "numeric", "to", "ipv4" and "ipv6" are now rejected.
+  git://github.com/codyprime/qemu-kvm-jtc.git tags/block-pull-request
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-Message-id: 1490691368-32099-2-git-send-email-armbru@redhat.com
-Signed-off-by: Jeff Cody <jcody@redhat.com>
----
- qapi-schema.json     | 21 ++++++++++++++-------
- qapi/block-core.json |  2 +-
- 2 files changed, 15 insertions(+), 8 deletions(-)
+for you to fetch changes up to 2836284db603775af557e969d5a800efb0190324:
 
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 68a4327..b921994 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -4051,19 +4051,27 @@
-   'data': [ 'all', 'rx', 'tx' ] }
- 
- ##
-+# @InetSocketAddressBase:
-+#
-+# @host: host part of the address
-+# @port: port part of the address
-+##
-+{ 'struct': 'InetSocketAddressBase',
-+  'data': {
-+    'host': 'str',
-+    'port': 'str' } }
-+
-+##
- # @InetSocketAddress:
- #
- # Captures a socket address or address range in the Internet namespace.
- #
--# @host: host part of the address
--#
--# @port: port part of the address, or lowest port if @to is present
--#
- # @numeric: true if the host/port are guaranteed to be numeric,
- #           false if name resolution should be attempted. Defaults to false.
- #           (Since 2.9)
- #
--# @to: highest port to try
-+# @to: If present, this is range of possible addresses, with port
-+#      between @port and @to.
- #
- # @ipv4: whether to accept IPv4 addresses, default try both IPv4 and IPv6
- #
-@@ -4072,9 +4080,8 @@
- # Since: 1.3
- ##
- { 'struct': 'InetSocketAddress',
-+  'base': 'InetSocketAddressBase',
-   'data': {
--    'host': 'str',
--    'port': 'str',
-     '*numeric':  'bool',
-     '*to': 'uint16',
-     '*ipv4': 'bool',
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 0f132fc..5d2efe4 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2652,7 +2652,7 @@
-             '*conf': 'str',
-             '*snapshot': 'str',
-             '*user': 'str',
--            '*server': ['InetSocketAddress'],
-+            '*server': ['InetSocketAddressBase'],
-             '*auth-supported': ['RbdAuthMethod'],
-             '*password-secret': 'str' } }
- 
+  rbd: Fix bugs around -drive parameter "server" (2017-03-28 10:01:21 -0400)
+
+----------------------------------------------------------------
+Block patches for 2.9-rc2
+----------------------------------------------------------------
+
+Markus Armbruster (10):
+  rbd: Reject -blockdev server.*.{numeric, to, ipv4, ipv6}
+  rbd: Fix to cleanly reject -drive without pool or image
+  rbd: Don't limit length of parameter values
+  rbd: Clean up after the previous commit
+  rbd: Don't accept -drive driver=rbd, keyvalue-pairs=...
+  rbd: Clean up runtime_opts, fix -drive to reject filename
+  rbd: Clean up qemu_rbd_create()'s detour through QemuOpts
+  rbd: Revert -blockdev and -drive parameter auth-supported
+  rbd: Revert -blockdev parameter password-secret
+  rbd: Fix bugs around -drive parameter "server"
+
+ block/rbd.c          | 319 ++++++++++++++-------------------------------------
+ qapi-schema.json     |  21 ++--
+ qapi/block-core.json |  30 +----
+ 3 files changed, 100 insertions(+), 270 deletions(-)
+
 -- 
 2.9.3
