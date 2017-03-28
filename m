@@ -1,18 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1cspH1-0003U2-Nv
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:26:52 -0400
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1cspIH-0004K9-OJ
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:28:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1cspGy-00013I-FL
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:26:51 -0400
-Received: from mx2.suse.de ([195.135.220.15]:44391)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <agraf@suse.de>) id 1cspGy-00012s-55
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:26:48 -0400
-From: Alexander Graf <agraf@suse.de>
-Date: Tue, 28 Mar 2017 13:27:06 +0200
-Message-Id: <1490700426-222115-1-git-send-email-agraf@suse.de>
-Subject: [Qemu-devel] [PATCH v2] i386: Allow cpuid bit override
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1cspIE-0001nd-Du
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:28:09 -0400
+Received: from lhrrgout.huawei.com ([194.213.3.17]:9495)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1cspIE-0001n3-1f
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:28:06 -0400
+References: <1490271635-19049-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<63a3057f-59a2-ec92-2df8-af33ec152394@redhat.com>
+From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Message-ID: <3d9a09b5-56f5-a3f9-fdb3-7c20ade3924f@huawei.com>
+Date: Tue, 28 Mar 2017 13:27:38 +0200
+MIME-Version: 1.0
+In-Reply-To: <63a3057f-59a2-ec92-2df8-af33ec152394@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2 v1] fsdev: QMP interface for throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,111 +27,223 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Eric Blake <eblake@redhat.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, Greg Kurz <groug@kaod.org>, "Daniel P.Berrange" <berrange@redhat.com>
+Cc: Alberto Garcia <berto@igalia.com>, Jani Kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-KVM has a feature bitmap of CPUID bits that it knows works for guests.
-QEMU removes bits that are not part of that bitmap automatically on VM
-start.
+On 3/23/2017 3:32 PM, Eric Blake wrote:
+> On 03/23/2017 07:20 AM, Pradeep Jagadeesh wrote:
+>> This patchset enables qmp interfaces for the 9pfs
+>> devices (fsdev). This provides two interfaces one
+>
+> s/interfaces/interfaces,/
+>
+> Also, I just noticed you are using trailing spaces in your commit
+> message (not fatal, but unusual).
+>
+Will fix.
+>> for querying all the 9pfs devices info. The second one
+>> to set the IO limits for the required 9pfs device.
+>
+> When sending a multi-patch series, please remember to include the 0/2
+> cover letter ('git config format.coverletter auto' can help here).
+OK, I will have a look.
+>
+>>
+>> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+>> ---
+>>  Makefile                    |  5 ++-
+>>  fsdev/qemu-fsdev-throttle.c | 96 +++++++++++++++++++++++++++++++++++++++++++++
+>>  fsdev/qemu-fsdev-throttle.h | 11 ++++++
+>>  fsdev/qemu-fsdev.c          | 38 +++++++++++++++++-
+>>  fsdev/qemu-fsdev.h          |  2 +-
+>>  hmp-commands-info.hx        | 18 +++++++++
+>>  hmp-commands.hx             | 18 +++++++++
+>>  hmp.c                       | 74 ++++++++++++++++++++++++++++++++++
+>>  hmp.h                       |  5 +++
+>>  qapi-schema.json            |  6 +++
+>>  qapi/fsdev.json             | 87 ++++++++++++++++++++++++++++++++++++++++
+>>  qapi/iothrottle.json        | 93 +++++++++++++++++++++++++++++++++++++++++++
+>>  qmp.c                       | 14 +++++++
+>>  13 files changed, 464 insertions(+), 3 deletions(-)
+>
+> That's a big patch to review in one go. Does it make sense to break it
+> down into smaller chunks?
+>
+>>  create mode 100644 qapi/fsdev.json
+>>  create mode 100644 qapi/iothrottle.json
+>>
+>> v0 -> v1:
+>>
+>>    Addressed the comments by Erik Blake, Greg Kurz and Daniel P.Berrange
+>
+> It's Eric, but you're not the first (and probably not the last) to get
+> it wrong.
+:) will remember.
+>
+>>    Mainly renaming the functions and removing the redundant code
+>>
+>> diff --git a/Makefile b/Makefile
+>> index 73e0c12..c33b46d 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -413,7 +413,10 @@ qapi-modules = $(SRC_PATH)/qapi-schema.json $(SRC_PATH)/qapi/common.json \
+>>                 $(SRC_PATH)/qapi/block.json $(SRC_PATH)/qapi/block-core.json \
+>>                 $(SRC_PATH)/qapi/event.json $(SRC_PATH)/qapi/introspect.json \
+>>                 $(SRC_PATH)/qapi/crypto.json $(SRC_PATH)/qapi/rocker.json \
+>> -               $(SRC_PATH)/qapi/trace.json
+>> +               $(SRC_PATH)/qapi/trace.json  $(SRC_PATH)/qapi/iothrottle.json
+>
+> Why two spaces?
+>
+Will fix it.
+>
+>> +++ b/qapi-schema.json
+>> @@ -78,9 +78,15 @@
+>>  # QAPI crypto definitions
+>>  { 'include': 'qapi/crypto.json' }
+>>
+>> +# QAPI IOThrottle definitions
+>> +{ 'include': 'qapi/iothrottle.json' }
+>> +
+>>  # QAPI block definitions
+>>  { 'include': 'qapi/block.json' }
+>>
+>> +# QAPI fsdev definitions
+>> +{ 'include': 'qapi/fsdev.json' }
+>> +
+>
+> Adding two new files definitely feels like something that could be
+> split. Also, is it possible that existing code could take advantage of
+> qapi/iothrottle.json, rather than it just being additional code?
+I will check and remove unnecessary includes.
+>
+>>  # QAPI event definitions
+>>  { 'include': 'qapi/event.json' }
+>>
+>> diff --git a/qapi/fsdev.json b/qapi/fsdev.json
+>> new file mode 100644
+>> index 0000000..7fb3c25
+>> --- /dev/null
+>> +++ b/qapi/fsdev.json
+>> @@ -0,0 +1,87 @@
+>> +# -*- Mode: Python -*-
+>> +
+>> +##
+>> +# == QAPI fsdev definitions
+>> +##
+>> +
+>> +# QAPI common definitions
+>> +{ 'include': 'common.json' }
+>> +{ 'include': 'iothrottle.json' }
+>
+> Is this really necessary? Given that the top level already included
+> these, I think it serves more as a documentation purpose than something
+> you actually need.
+Not really, will fix this.
+>
+>> +
+>> +##
+>> +# @fsdev_set_io_throttle:
+>> +#
+>> +# Change I/O limits for a 9p/fsdev device.
+>> +#
+>> +# I/O limits can be enabled by setting throttle vaue to non-zero numbers.
+>
+> s/vaue/value/
+ok
+>
+>> +#
+>> +# I/O limits can be disabled by setting all of them to 0.
+>> +#
+>> +# Returns: Nothing on success
+>> +#          If @device is not a valid fsdev device, DeviceNotFound
+>> +#
+>> +# Since: 2.10
+>> +#
+>> +# Example:
+>> +#
+>> +# -> { "execute": "fsdev_set_io_throttle",
+>
+> Please name this fsdev-set-io-throttle.  New commands should favor the
+> use of '-' rather than '_'.
+>
+>
+ok
+>> +##
+>> +# @query-fsdev-io-throttle:
+>> +#
+>> +# Return a list of information about fsdev device
+>> +#
+>> +# Returns: @FsdevIOIOThrottle
+>
+> Typo in the type name, should be merely IOThrottle
+ok
+>
+>> +#
+>> +# Since: 2.10
+>> +#
+>> +# Example:
+>> +#
+>> +# -> { "Execute": "query-fsdev-io-throttle" }
+>
+>> +#
+>> +##
+>> +{ 'command': 'query-fsdev-io-throttle', 'returns': [ 'IOThrottle' ] }
+>> +
+>> diff --git a/qapi/iothrottle.json b/qapi/iothrottle.json
+>> new file mode 100644
+>> index 0000000..f7b615d
+>> --- /dev/null
+>> +++ b/qapi/iothrottle.json
+>> @@ -0,0 +1,93 @@
+>> +# -*- Mode: Python -*-
+>> +
+>> +##
+>> +# == QAPI IOThrottle definitions
+>> +##
+>> +
+>> +# QAPI common definitions
+>> +{ 'include': 'common.json' }
+>
+> Again, is this necessary?
+Removed.
+>
+>
+>> +# @iops_size: an I/O size in bytes (Since 1.7)
+>> +#
+>> +#
+>> +# Since: 2.10
+>
+> It's weird to state that this struct is since 2.10, but its members are
+> since 1.7.  Either you should list a 'since' for when the members of the
+> struct were first useful (0.14.0), or eliminate all the (since ...) tags
+> on the members and keep the overall struct at 2.10.  I'd lean towards
+> the former, at least if BlockDeviceInfo is properly refactored to
+> inherit from this type.
+Some members of this structure have Since, not all of them. So, shall I 
+remove since tag from all?
 
-However, some times we just don't list features in that list because
-they don't make sense for normal scenarios, but may be useful in specific,
-targeted workloads.
+As of now I used as it is from BlockIOThrottle. Not changed any since tags.
 
-For that purpose, add a new =force option to all CPUID feature flags in
-the CPU property. With that we can override the accel filtering and give
-users full control over the CPUID feature bits exposed into guests.
-
-Signed-off-by: Alexander Graf <agraf@suse.de>
-
----
-
-v1 -> v2:
-
-  - Base on "i386: Replace uint32_t* with FeatureWord on feature getter/setter"
----
- target/i386/cpu.c | 25 ++++++++++++++++++++++---
- target/i386/cpu.h |  3 +++
- 2 files changed, 25 insertions(+), 3 deletions(-)
-
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 13c0985..6105fc5 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2229,7 +2229,7 @@ void x86_cpu_list(FILE *f, fprintf_function cpu_fprintf)
-     g_slist_foreach(list, x86_cpu_list_entry, &s);
-     g_slist_free(list);
- 
--    (*cpu_fprintf)(f, "\nRecognized CPUID flags:\n");
-+    (*cpu_fprintf)(f, "\nRecognized CPUID flags (=on|=off|=force):\n");
-     for (i = 0; i < ARRAY_SIZE(feature_word_info); i++) {
-         FeatureWordInfo *fw = &feature_word_info[i];
- 
-@@ -3464,6 +3464,7 @@ static int x86_cpu_filter_features(X86CPU *cpu)
-             x86_cpu_get_supported_feature_word(w, false);
-         uint32_t requested_features = env->features[w];
-         env->features[w] &= host_feat;
-+        env->features[w] |= cpu->forced_features[w];
-         cpu->filtered_features[w] = requested_features & ~env->features[w];
-         if (cpu->filtered_features[w]) {
-             rv = 1;
-@@ -3706,8 +3707,17 @@ static void x86_cpu_get_bit_prop(Object *obj, Visitor *v, const char *name,
-     X86CPU *cpu = X86_CPU(obj);
-     BitProperty *fp = opaque;
-     uint32_t f = cpu->env.features[fp->w];
-+    uint32_t ff = cpu->forced_features[fp->w];
-     bool value = (f & fp->mask) == fp->mask;
--    visit_type_bool(v, name, &value, errp);
-+    bool forced = (ff & fp->mask) == fp->mask;
-+    char str[] = "force";
-+    char *strval = str;
-+
-+    if (forced) {
-+        visit_type_str(v, name, &strval, errp);
-+    } else {
-+        visit_type_bool(v, name, &value, errp);
-+    }
- }
- 
- static void x86_cpu_set_bit_prop(Object *obj, Visitor *v, const char *name,
-@@ -3717,6 +3727,7 @@ static void x86_cpu_set_bit_prop(Object *obj, Visitor *v, const char *name,
-     X86CPU *cpu = X86_CPU(obj);
-     BitProperty *fp = opaque;
-     Error *local_err = NULL;
-+    char *strval = NULL;
-     bool value;
- 
-     if (dev->realized) {
-@@ -3724,7 +3735,15 @@ static void x86_cpu_set_bit_prop(Object *obj, Visitor *v, const char *name,
-         return;
-     }
- 
--    visit_type_bool(v, name, &value, &local_err);
-+    visit_type_str(v, name, &strval, &local_err);
-+    if (!local_err && !strcmp(strval, "force")) {
-+        value = true;
-+        cpu->forced_features[fp->w] |= fp->mask;
-+    } else {
-+        local_err = NULL;
-+        visit_type_bool(v, name, &value, &local_err);
-+    }
-+
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index c4602ca..69efe6c 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1230,6 +1230,9 @@ struct X86CPU {
-     /* Features that were filtered out because of missing host capabilities */
-     uint32_t filtered_features[FEATURE_WORDS];
- 
-+    /* Features that are force enabled despite incompatible accel */
-+    uint32_t forced_features[FEATURE_WORDS];
-+
-     /* Enable PMU CPUID bits. This can't be enabled by default yet because
-      * it doesn't have ABI stability guarantees, as it passes all PMU CPUID
-      * bits returned by GET_SUPPORTED_CPUID (that depend on host CPU and kernel
--- 
-1.8.5.6
+OK, I will try to refactor the BlockDeviceInfo using this structure.
+>
+>> +##
+>> +{ 'struct': 'IOThrottle',
+>> +  'data': { '*device': 'str', 'bps': 'int', 'bps_rd': 'int',
+>> +            'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int', 'iops_wr': 'int',
+>> +            '*bps_max': 'int', '*bps_rd_max': 'int',
+>> +            '*bps_wr_max': 'int', '*iops_max': 'int',
+>> +            '*iops_rd_max': 'int', '*iops_wr_max': 'int',
+>> +            '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
+>> +            '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
+>> +            '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
+>> +            '*iops_size': 'int' } }
+>
+> So yeah, you definitely need to split this patch.  Your FIRST patch
+> should be the creation of IOThrottle, and fixing BlockDeviceInfo to
+> inherit from it; then a later patch would be the introduction of the
+> fsdev throttle commands that are additional clients of the new
+> IOThrottle type.
+OK
+>
+>
