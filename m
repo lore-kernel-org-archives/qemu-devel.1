@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cstYm-0002h8-O1
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 12:01:29 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1csteD-0005G5-Cg
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 12:07:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cstYh-0003wU-AM
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 12:01:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:63660)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cste9-0006RV-65
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 12:07:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37648)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cstYh-0003uu-5m
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 12:01:23 -0400
-Date: Tue, 28 Mar 2017 13:01:19 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170328160119.GA7295@thinpad.lan.raisama.net>
-References: <1490653177-131484-1-git-send-email-agraf@suse.de>
-	<20170328004108.GP28530@thinpad.lan.raisama.net>
-	<9d85e056-3331-9815-404b-9557ca5028cc@suse.de>
-	<39d88a40-727b-81e9-0577-27198457304e@redhat.com>
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1cste9-0006Qt-0O
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 12:07:01 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 293CF81235
+	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 16:06:59 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue, 28 Mar 2017 18:06:46 +0200
+Message-Id: <20170328160646.21250-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <39d88a40-727b-81e9-0577-27198457304e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] i386: Allow cpuid bit override
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] vnc: allow to connect with add_client when
+ -vnc none
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +32,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Tue, Mar 28, 2017 at 02:41:55PM +0200, Paolo Bonzini wrote:
-> 
-> 
-> On 28/03/2017 13:26, Alexander Graf wrote:
-> >> You can define an enum type in qapi-schema.json, and use
-> >> visit_type_<YourEnumType>(). You can grep for
-> >> visit_type_OnOffAuto to find examples.
-> >>
-> >> (But I suggest naming the enum something like
-> >> "X86CPUFeatureSetting" instead of "OnOffForce", because we will
-> >> probably add other enum values in the future).
-> >>
-> >> However: we need to find a way to do this and not break
-> >> compatibility with "feat=yes|true|no|false", that's supported by
-> >> StringInputVisitor (which is used by object_property_parse()).
-> >> Maybe fallback to visit_type_bool() in case
-> >> visit_type_<YourEnumType>() fails?
-> > 
-> > Putting it into a special enum sounds much more fragile than the current
-> > solution to me. We need to bool fallback either way, so I fail to see
-> > any benefit from having the enum.
-> 
-> Using an on/off/force enum sounds like the right thing to do.
-> 
-> However, I would open code the getters and setters completely (using
-> visit_type_str) instead of using visit_type_FooEnum+visit_type_bool.
-> Then you can easily map yes/true to on and no/false to off.
+Do not skip VNC initialization, in particular of auth method when vnc is
+configured without sockets, since we should still allow connections
+through QMP add_client.
 
-I am wondering if it isn't simpler to define the enum to be
-(on, off, force, yes, true, no, false), and document
-(yes, true, no, false) as deprecated.
+Fixes:
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1434551
 
--- 
-Eduardo
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ ui/vnc.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 821acdd8b0..243e99bb95 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -3786,10 +3786,6 @@ void vnc_display_open(const char *id, Error **errp=
+)
+         goto fail;
+     }
+=20
+-    if (saddr =3D=3D NULL) {
+-        return;
+-    }
+-
+     password =3D qemu_opt_get_bool(opts, "password", false);
+     if (password) {
+         if (fips_get_state()) {
+@@ -3974,6 +3970,10 @@ void vnc_display_open(const char *id, Error **errp=
+)
+         register_displaychangelistener(&vd->dcl);
+     }
+=20
++    if (saddr =3D=3D NULL) {
++        goto cleanup;
++    }
++
+     if (reverse) {
+         if (vnc_display_connect(vd, saddr, nsaddr, wsaddr, nwsaddr, errp=
+) < 0) {
+             goto fail;
+--=20
+2.12.0.191.gc5d8de91d
