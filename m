@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cspK2-00055U-5e
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:29:59 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cspNi-0005zm-VX
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:33:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cspK1-0002HW-9V
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:29:58 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:34550)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cspK1-0002HF-3T
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:29:57 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id l43so99843373wre.1
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 04:29:56 -0700 (PDT)
+	(envelope-from <mreitz@redhat.com>) id 1cspNi-0003M6-82
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 07:33:47 -0400
+References: <20170327030518.37268-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170327030518.37268-2-bjsdjshi@linux.vnet.ibm.com>
+	<e81b598a-0746-5d18-5ed9-dd00f65cd77a@redhat.com>
+	<20170328063925.GB22108@bjsdjshi@linux.vnet.ibm.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <8ff6f913-9903-daac-1099-65b5c4fc6dc5@redhat.com>
+Date: Tue, 28 Mar 2017 13:33:37 +0200
 MIME-Version: 1.0
-In-Reply-To: <CACJhumejPG6s_dewyHH=e5=QLcOUCzvzhakA7oSqm2Ms5cQvRA@mail.gmail.com>
-References: <CACJhumejPG6s_dewyHH=e5=QLcOUCzvzhakA7oSqm2Ms5cQvRA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Mar 2017 12:29:35 +0100
-Message-ID: <CAFEAcA-kKvS_6OZE1mKbFYgCzm4wPK2XJi_A03nFxu+K3ZA4hQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Aarch64: Qemu master or 2.9.0-rc1 breaks
- compatibility with 4.10 kernel.
+In-Reply-To: <20170328063925.GB22108@bjsdjshi@linux.vnet.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="rFNuufwkXOht8xLhhgBwawL9ab9Ne8d0P"
+Subject: Re: [Qemu-devel] [PATCH RFC v2 1/1] block: pass the right options
+ for BlockDriver.bdrv_open
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,23 +27,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Prakash B <bjsprakash.linux@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Eric Auger <eric.auger@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "Kumar,
-	Vijaya" <Vijaya.Kumar@cavium.com>, sgoutham@cavium.com, bprakash@caviumnetworks.com
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-block@nongnu.org, kwolf@redhat.com, qemu-devel@nongnu.org, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com
 
-On 28 March 2017 at 12:22, Prakash B <bjsprakash.linux@gmail.com> wrote:
-> Qemu master or v2.9.0-rc1 doesn't launch guest  when host kernel
-> version 4.10 or  lower on Aarch64 (cavium ThunderX), its failing with
-> abort  "qemu-system-aarch64: KVM_GET_DEVICE_ATTR failed: No such
-> device or address"
->
-> "GICv3 live migration support"  patch breaks the  compatibility b/w
-> kernel and qemu.
->
-> Is this expected behaviour,  can we provide a fix without  breaking
-> compatibility b/w kernel and qemu .
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--rFNuufwkXOht8xLhhgBwawL9ab9Ne8d0P
+From: Max Reitz <mreitz@redhat.com>
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-block@nongnu.org,
+ kwolf@redhat.com, qemu-devel@nongnu.org, cornelia.huck@de.ibm.com,
+ borntraeger@de.ibm.com
+Message-ID: <8ff6f913-9903-daac-1099-65b5c4fc6dc5@redhat.com>
+Subject: Re: [PATCH RFC v2 1/1] block: pass the right options for
+ BlockDriver.bdrv_open
+References: <20170327030518.37268-1-bjsdjshi@linux.vnet.ibm.com>
+ <20170327030518.37268-2-bjsdjshi@linux.vnet.ibm.com>
+ <e81b598a-0746-5d18-5ed9-dd00f65cd77a@redhat.com>
+ <20170328063925.GB22108@bjsdjshi@linux.vnet.ibm.com>
+In-Reply-To: <20170328063925.GB22108@bjsdjshi@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-This is indeed not supposed to happen. Eric, can you take a look?
+On 28.03.2017 08:39, Dong Jia Shi wrote:
+> * Max Reitz <mreitz@redhat.com> [2017-03-27 17:27:16 +0200]:
 
-thanks
--- PMM
+[...]
+
+>> (1) Remove every option in "options" that has a "file." prefix before
+>> the qdict_put() call.
+>>
+>> (2) Use bdrv_unref_child(bs->file) instead of bdrv_unref(bs->file->bs)=
+=2E
+> :> You must mean:
+> bdrv_unref_child(bs, bs->file);
+
+Yes, right. :-)
+
+>> I guess it should work with those changes. At least I hope it will.
+> Yes, with my test results, it works!
+>=20
+>>
+>> By the way, the easiest way to do (1) is probably:
+>>
+>> QDict *file_options;
+>>
+>> qdict_extract_subqdict(options, &file_options, "file.");
+>> QDECREF(file_options);
+> Cool. I adopted your code and it works well.
+>=20
+> Thanks for these very detailed analysis and the code example.
+
+No problem.
+
+> Mind if I add a:
+> Suggested-by: Max Reitz <mreitz@redhat.com>
+> in the following version?
+
+Feel free to, but it's not necessary. That was just normal reviewing work=
+=2E
+
+Max
+
+
+--rFNuufwkXOht8xLhhgBwawL9ab9Ne8d0P
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljaShESHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AiCsH/R6qCTKSbX62psQy+s5lt7Qy8DH4KXUy
+oDtRzzQbpr7B0xIQ977kW02PdWYUTFYgiDKExTkMRINybOgCYuODpZFkxr4Jn+Mn
++SAzzQKYv6tIGxF9vpdhK7RjPylsjySTn+v0ZbrPuSzakarLIbJRFiGj0QyUX0n1
+N6GfXvzgpUfbh5kyme6hMcPtspczE8T/ME9RkCXHXtKLb+awnSdoxi0HSrcNG+CE
+41OQZdEGiLgkPT47NVYhf5OkOKlxxjNoG51dwtWaSdv3UmIEebHtqqqdPTy2Gqm0
+RBMdsKVO99NmivUY4+XwdM/Vt7W3OpF7cqmCfKQwxt1YmWKDf43osZ0=
+=rE2T
+-----END PGP SIGNATURE-----
+
+--rFNuufwkXOht8xLhhgBwawL9ab9Ne8d0P--
