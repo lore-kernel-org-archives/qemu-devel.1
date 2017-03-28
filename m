@@ -1,33 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1csmKJ-00044N-2V
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:18:04 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1csmMh-0004vE-D3
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:20:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1csmKF-0002q6-1Z
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:18:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44648)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1csmKE-0002oM-Ot
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:17:58 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D3A50C05091A
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 08:17:57 +0000 (UTC)
-Date: Tue, 28 Mar 2017 09:17:54 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170328081753.GA2509@work-vm>
-References: <1490092792-30957-1-git-send-email-thuth@redhat.com>
-	<1490092792-30957-3-git-send-email-thuth@redhat.com>
-	<20170327142421.GF2373@work-vm>
-	<95bf59af-beeb-74bf-7819-f2a770b64263@redhat.com>
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1csmMd-0003WH-CS
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:20:31 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56597)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1csmMd-0003V1-2D
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:20:27 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2S8JLt3024755
+	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 04:20:25 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 29fktu9jbk-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 04:20:25 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Tue, 28 Mar 2017 09:20:22 +0100
+Date: Tue, 28 Mar 2017 10:20:16 +0200
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <20170317031743.40128-1-bjsdjshi@linux.vnet.ibm.com>
+References: <20170317031743.40128-1-bjsdjshi@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <95bf59af-beeb-74bf-7819-f2a770b64263@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/3] libqtest: Add a generic function to
- run a callback function for every machine
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170328102016.4926f21d.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v4 00/16] basic vfio-ccw infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,142 +40,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
 
-* Thomas Huth (thuth@redhat.com) wrote:
-> On 27.03.2017 16:24, Dr. David Alan Gilbert wrote:
-> > * Thomas Huth (thuth@redhat.com) wrote:
-> >> Some tests need to run single tests for every available machine of the
-> >> current QEMU binary. To avoid code duplication, let's extract this
-> >> code that deals with 'query-machines' into a separate function.
-> >>
-> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > 
-> > Having queued it, it's failing my test.
-> > 
-> > The reason is that qom-tests.c has a blacklist which blacklists Xen;
-> > however your new generic function doesn't have the blacklist, so when
-> > you run HMP commands on all machines it tries to run it on Xen since
-> > my PC has the Xen libraries installed (so builds with Xen support) but
-> > isn't a Xen guest.
-> > 
-> > It fails with:
-> > xen be core: xen be core: can't connect to xenstored
-> > can't connect to xenstored
-> > xen_init_pv: xen backend core setup failed
-> > Broken pipe
-> > 
-> > I suggest you probably need to share the blacklist as well.
-> > 
-> > (Unqueued)
-> > 
-> > Dave
-> > 
-> >> ---
-> >>  tests/libqtest.c    | 30 +++++++++++++++++
-> >>  tests/libqtest.h    |  8 +++++
-> >>  tests/pc-cpu-test.c | 95 ++++++++++++++++++++---------------------------------
-> >>  tests/qom-test.c    | 36 ++++----------------
-> >>  4 files changed, 80 insertions(+), 89 deletions(-)
-> >>
-> >> diff --git a/tests/libqtest.c b/tests/libqtest.c
-> >> index c9b2d76..d8b8066 100644
-> >> --- a/tests/libqtest.c
-> >> +++ b/tests/libqtest.c
-> >> @@ -938,3 +938,33 @@ bool qtest_big_endian(QTestState *s)
-> >>  {
-> >>      return s->big_endian;
-> >>  }
-> >> +
-> >> +void qtest_cb_for_every_machine(void (*cb)(const char *machine))
-> >> +{
-> >> +    QDict *response, *minfo;
-> >> +    QList *list;
-> >> +    const QListEntry *p;
-> >> +    QObject *qobj;
-> >> +    QString *qstr;
-> >> +    const char *mname;
-> >> +
-> >> +    qtest_start("-machine none");
-> >> +    response = qmp("{ 'execute': 'query-machines' }");
-> >> +    g_assert(response);
-> >> +    list = qdict_get_qlist(response, "return");
-> >> +    g_assert(list);
-> >> +
-> >> +    for (p = qlist_first(list); p; p = qlist_next(p)) {
-> >> +        minfo = qobject_to_qdict(qlist_entry_obj(p));
-> >> +        g_assert(minfo);
-> >> +        qobj = qdict_get(minfo, "name");
-> >> +        g_assert(qobj);
-> >> +        qstr = qobject_to_qstring(qobj);
-> >> +        g_assert(qstr);
-> >> +        mname = qstring_get_str(qstr);
-> >> +        cb(mname);
-> >> +    }
-> >> +
-> >> +    qtest_end();
-> >> +    QDECREF(response);
-> >> +}
-> [...]
-> >> diff --git a/tests/qom-test.c b/tests/qom-test.c
-> >> index d48f890..ab0595d 100644
-> >> --- a/tests/qom-test.c
-> >> +++ b/tests/qom-test.c
-> >> @@ -107,46 +107,22 @@ static void test_machine(gconstpointer data)
-> >>      g_free((void *)machine);
-> >>  }
-> >>  
-> >> -static void add_machine_test_cases(void)
-> >> +static void add_machine_test_case(const char *mname)
-> >>  {
-> >>      const char *arch = qtest_get_arch();
-> >> -    QDict *response, *minfo;
-> >> -    QList *list;
-> >> -    const QListEntry *p;
-> >> -    QObject *qobj;
-> >> -    QString *qstr;
-> >> -    const char *mname;
-> >>  
-> >> -    qtest_start("-machine none");
-> >> -    response = qmp("{ 'execute': 'query-machines' }");
-> >> -    g_assert(response);
-> >> -    list = qdict_get_qlist(response, "return");
-> >> -    g_assert(list);
-> >> -
-> >> -    for (p = qlist_first(list); p; p = qlist_next(p)) {
-> >> -        minfo = qobject_to_qdict(qlist_entry_obj(p));
-> >> -        g_assert(minfo);
-> >> -        qobj = qdict_get(minfo, "name");
-> >> -        g_assert(qobj);
-> >> -        qstr = qobject_to_qstring(qobj);
-> >> -        g_assert(qstr);
-> >> -        mname = qstring_get_str(qstr);
-> >> -        if (!is_blacklisted(arch, mname)) {
-> >> -            char *path = g_strdup_printf("qom/%s", mname);
-> >> -            qtest_add_data_func(path, g_strdup(mname), test_machine);
-> >> -            g_free(path);
-> >> -        }
-> >> +    if (!is_blacklisted(arch, mname)) {
-> >> +        char *path = g_strdup_printf("qom/%s", mname);
-> >> +        qtest_add_data_func(path, g_strdup(mname), test_machine);
-> >> +        g_free(path);
-> >>      }
+On Fri, 17 Mar 2017 04:17:27 +0100
+Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+
+> Dong Jia Shi (16):
+>   s390: cio: introduce cio_cancel_halt_clear
+>   s390: cio: export more interfaces
+>   vfio: ccw: define device_api strings
+>   vfio: ccw: basic implementation for vfio_ccw driver
+>   vfio: ccw: introduce channel program interfaces
+>   vfio: ccw: register vfio_ccw to the mediated device framework
+>   vfio: ccw: introduce ccw_io_region
+>   vfio: ccw: handle ccw command request
+>   vfio: ccw: realize VFIO_DEVICE_GET_REGION_INFO ioctl
+>   vfio: ccw: realize VFIO_DEVICE_RESET ioctl
+>   vfio: ccw: realize VFIO_DEVICE_G(S)ET_IRQ_INFO ioctls
+>   vfio: ccw: return I/O results asynchronously
+>   vfio: ccw: introduce a finite state machine
+>   docs: add documentation for vfio-ccw
+>   vfio: ccw: introduce support for ccw0
+>   MAINTAINERS: Add vfio-ccw maintainers
 > 
-> Not sure what is going wrong here ... the "!is_blacklisted" check is
-> still here, so why is it trying to start a xen machine here?
-
-I don't think it's this test that fails, I think it's the new one you add
-in the last patch but for the same reason.
-
-> Looks like I need to install those xen libraries here, too ...
-
-I think it's xen-libs and xen-devel you need.
-
-Dave
-
+>  Documentation/s390/00-INDEX         |   2 +
+>  Documentation/s390/vfio-ccw.txt     | 303 +++++++++++++
+>  MAINTAINERS                         |  10 +
+>  arch/s390/Kconfig                   |  10 +
+>  arch/s390/include/asm/cio.h         |  18 +
+>  arch/s390/include/asm/isc.h         |   1 +
+>  drivers/iommu/Kconfig               |   8 +
+>  drivers/s390/cio/Makefile           |   3 +
+>  drivers/s390/cio/cio.c              |  69 +++
+>  drivers/s390/cio/cio.h              |   1 +
+>  drivers/s390/cio/device_fsm.c       |  54 +--
+>  drivers/s390/cio/vfio_ccw_cp.c      | 842 ++++++++++++++++++++++++++++++++++++
+>  drivers/s390/cio/vfio_ccw_cp.h      |  42 ++
+>  drivers/s390/cio/vfio_ccw_drv.c     | 308 +++++++++++++
+>  drivers/s390/cio/vfio_ccw_fsm.c     | 207 +++++++++
+>  drivers/s390/cio/vfio_ccw_ops.c     | 447 +++++++++++++++++++
+>  drivers/s390/cio/vfio_ccw_private.h |  96 ++++
+>  include/uapi/linux/vfio.h           |  18 +
+>  include/uapi/linux/vfio_ccw.h       |  24 +
+>  19 files changed, 2417 insertions(+), 46 deletions(-)
+>  create mode 100644 Documentation/s390/vfio-ccw.txt
+>  create mode 100644 drivers/s390/cio/vfio_ccw_cp.c
+>  create mode 100644 drivers/s390/cio/vfio_ccw_cp.h
+>  create mode 100644 drivers/s390/cio/vfio_ccw_drv.c
+>  create mode 100644 drivers/s390/cio/vfio_ccw_fsm.c
+>  create mode 100644 drivers/s390/cio/vfio_ccw_ops.c
+>  create mode 100644 drivers/s390/cio/vfio_ccw_private.h
+>  create mode 100644 include/uapi/linux/vfio_ccw.h
 > 
->  Thomas
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+Patch set looks good to me, and I think we should target it for the
+next merge window (the interface looks fine, and we can iron out any
+other things later.)
+
+Question: Which tree should this go through? Vfio or kvm/s390?
