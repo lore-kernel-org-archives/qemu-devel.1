@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cssY2-0003Qm-Qx
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 10:56:39 -0400
+	(envelope-from <vijay.kilari@gmail.com>) id 1cssjr-00007f-4L
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 11:08:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cssY1-0001u7-Tu
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 10:56:38 -0400
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:36164)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cssY1-0001tl-MK
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 10:56:37 -0400
-Received: by mail-wm0-x230.google.com with SMTP id o81so798006wmb.1
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 07:56:37 -0700 (PDT)
+	(envelope-from <vijay.kilari@gmail.com>) id 1cssjq-0007UQ-4m
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 11:08:51 -0400
 MIME-Version: 1.0
-In-Reply-To: <1490708752-26902-1-git-send-email-armbru@redhat.com>
-References: <1490708752-26902-1-git-send-email-armbru@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Mar 2017 15:56:16 +0100
-Message-ID: <CAFEAcA8DU7fq_3Kds=vExn4oVr-7p2ZbnTV6C_BDfYh34vEGDQ@mail.gmail.com>
+In-Reply-To: <1490709513-7180-1-git-send-email-eric.auger@redhat.com>
+References: <1490709513-7180-1-git-send-email-eric.auger@redhat.com>
+From: Vijay Kilari <vijay.kilari@gmail.com>
+Date: Tue, 28 Mar 2017 20:38:46 +0530
+Message-ID: <CALicx6t8ZsN96rqOb8ydh56FnO9mPog3QxhN_Sa3Apa85_9nUQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL for-2.9] Block patches for 2017-03-28
+Subject: Re: [Qemu-devel] [PATCH] hw/intc/arm_gicv3_kvm: Check
+ KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS in reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +22,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Kumar, Vijaya" <Vijaya.Kumar@cavium.com>, drjones@redhat.com
 
-On 28 March 2017 at 14:45, Markus Armbruster <armbru@redhat.com> wrote:
-> The following changes since commit 0491c221547a38b58e41fade9953cd1cf015288b:
->
->   Merge remote-tracking branch 'remotes/stsquad/tags/pull-mttcg-fixups-for-rc2-280317-1' into staging (2017-03-28 12:34:23 +0100)
->
-> are available in the git repository at:
->
->   git://repo.or.cz/qemu/armbru.git tags/pull-block-2017-03-28
->
-> for you to fetch changes up to 79b7a77eda5118f2661d251820d5ee9ee080354a:
->
->   block: Declare blockdev-add and blockdev-del supported (2017-03-28 15:23:23 +0200)
->
-> ----------------------------------------------------------------
-> Block patches for 2017-03-28
->
+Hi Eric,
 
-Applied, thanks.
+On Tue, Mar 28, 2017 at 7:28 PM, Eric Auger <eric.auger@redhat.com> wrote:
+> KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS needs to be checked before
+> attempting to read ICC_CTLR_EL1; otherwise kernel versions not
+> exposing this kvm device group will be incompatible with qemu 2.9.
+>
+> Fixes: 07a5628  ("hw/intc/arm_gicv3_kvm: Reset GICv3 cpu interface registers")
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Reported-by: Prakash B <bjsprakash.linux@gmail.com>
+>
+> ---
+>
+> I understand the ICC_CTLR_EL1 state only is used in the put() function
+> which is used for migration
+> ---
+>  hw/intc/arm_gicv3_kvm.c | 17 +++++++++++------
+>  1 file changed, 11 insertions(+), 6 deletions(-)
+>
+> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+> index 81f0403..4c3a88e 100644
+> --- a/hw/intc/arm_gicv3_kvm.c
+> +++ b/hw/intc/arm_gicv3_kvm.c
+> @@ -614,12 +614,6 @@ static void arm_gicv3_icc_reset(CPUARMState *env, const ARMCPRegInfo *ri)
+>      s = c->gic;
+>      cpu = ARM_CPU(c->cpu);
+>
+> -    /* Initialize to actual HW supported configuration */
+> -    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
+> -                      KVM_VGIC_ATTR(ICC_CTLR_EL1, cpu->mp_affinity),
+> -                      &c->icc_ctlr_el1[GICV3_NS], false);
+> -
+> -    c->icc_ctlr_el1[GICV3_S] = c->icc_ctlr_el1[GICV3_NS];
+>      c->icc_pmr_el1 = 0;
+>      c->icc_bpr[GICV3_G0] = GIC_MIN_BPR;
+>      c->icc_bpr[GICV3_G1] = GIC_MIN_BPR;
+> @@ -628,6 +622,17 @@ static void arm_gicv3_icc_reset(CPUARMState *env, const ARMCPRegInfo *ri)
+>      c->icc_sre_el1 = 0x7;
+>      memset(c->icc_apr, 0, sizeof(c->icc_apr));
+>      memset(c->icc_igrpen, 0, sizeof(c->icc_igrpen));
+> +
+> +    if (!kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
+> +                              KVM_VGIC_ATTR(ICC_CTLR_EL1, cpu->mp_affinity))) {
+> +        return;
+> +    }
 
--- PMM
+ Can't we use gicv3 migration blocker provided if it is set before this reset.
+
+> +    /* Initialize to actual HW supported configuration */
+> +    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
+> +                      KVM_VGIC_ATTR(ICC_CTLR_EL1, cpu->mp_affinity),
+> +                      &c->icc_ctlr_el1[GICV3_NS], false);
+> +
+> +    c->icc_ctlr_el1[GICV3_S] = c->icc_ctlr_el1[GICV3_NS];
+>  }
+>
+>  static void kvm_arm_gicv3_reset(DeviceState *dev)
+> --
+> 2.5.5
+>
