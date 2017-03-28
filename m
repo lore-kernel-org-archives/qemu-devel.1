@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cslHU-0006GP-No
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:11:05 -0400
+	(envelope-from <tejaswinipoluri3@gmail.com>) id 1cslQ5-0007LV-5X
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:19:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cslHS-0008OU-SS
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:11:04 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:35366)
+	(envelope-from <tejaswinipoluri3@gmail.com>) id 1cslQ0-00032m-8A
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:19:57 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:35972)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cslHS-0008ON-F1
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:11:02 -0400
-Received: by mail-wr0-x231.google.com with SMTP id u1so89424091wra.2
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 00:11:01 -0700 (PDT)
+	(Exim 4.71) (envelope-from <tejaswinipoluri3@gmail.com>)
+	id 1cslQ0-00032Z-25
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:19:52 -0400
+Received: by mail-pg0-x242.google.com with SMTP id 81so19139703pgh.3
+	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 00:19:52 -0700 (PDT)
+From: Tejaswini <tejaswinipoluri3@gmail.com>
+Date: Tue, 28 Mar 2017 12:49:43 +0530
+Message-Id: <1490685583-16987-1-git-send-email-tejaswinipoluri3@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170327201146.1820-1-sw@weilnetz.de>
-References: <20170327201146.1820-1-sw@weilnetz.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Mar 2017 08:10:40 +0100
-Message-ID: <CAFEAcA-Jb8uQsQcfFfaQdXp5+DkD84tCDtMyW1kXN1yZ45fLGQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH for-2.9] Fix check for target OS support
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] target-i386: fix "info lapic" segfault on isapc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,118 +27,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, Tejaswini Poluri <tejaswinipoluri3@gmail.com>
 
-On 27 March 2017 at 21:11, Stefan Weil <sw@weilnetz.de> wrote:
-> This check had several problems which are fixed here:
->
-> * Calling "configure --help" was no longer possible on Cygwin.
->   Fix  this by introducing a third state for supported_os and
->   by moving the error handling code.
->   Move the error handling code for supported_cpu, too.
->
-> * Fix the error text. Use target cpu and target os because the
->   build cpu and build host don't matter here.
+From: Tejaswini Poluri <tejaswinipoluri3@gmail.com>
 
-I think it is important that we print the deprecation
-message last, after all the other configure output.
-Otherwise it will scroll off the screen and most people
-will miss it. That's why I put it where it is.
+Start QEMU with
+"qemu-system-x86_64 -nographic -M isapc -serial none-monitor stdio"
+and enter "info lapic" at the monitor prompt ⇒
+Segmentation fault
 
-> * Support cross compilation with the most common cross prefixes
->   for Mingw-w64. Other cross builds are still broken!
->
-> Signed-off-by: Stefan Weil <sw@weilnetz.de>
-> ---
->
-> This fixes a regression: building QEMU for Windows with a cross
-> build under Cygwin is currently broken.
->
-> Can the patch be applied directly, or who should send a pull request?
->
-> Stefan
->
->  configure | 68 +++++++++++++++++++++++++++++++++++----------------------------
->  1 file changed, 38 insertions(+), 30 deletions(-)
->
-> diff --git a/configure b/configure
-> index d1ce33bc79..902bd20070 100755
-> --- a/configure
-> +++ b/configure
-> @@ -322,7 +322,7 @@ jemalloc="no"
->  replication="yes"
->
->  supported_cpu="no"
-> -supported_os="no"
-> +supported_os="deprecated"
+Signed-off-by: Tejaswini Poluri <tejaswinipoluri3@gmail.com>
+---
+ target/i386/helper.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-I don't see any need for anything other than 'yes' or 'no' ?
-
->
->  # parse CC options first
->  for opt do
-> @@ -440,7 +440,13 @@ int main(void) { return 0; }
->  EOF
->  }
->
-> -if check_define __linux__ ; then
-> +if test "$cross_prefix" = "i686_64-w64-mingw32-" ; then
-> +  targetos='MINGW32'
-> +elif test "$cross_prefix" = "x86_64-w64-mingw32-" ; then
-> +  targetos='MINGW32'
-> +elif test -n "$cross_prefix" ; then
-> +  targetos="$cross_prefix"
-
-This doesn't look right. We already have too many
-cases where we determine the target OS by something
-other than looking at check_defines; one thing
-I'd like to do when we've got rid of unsupported
-OSes is to make sure that we determine the target
-OS by check_define and only by check_define.
-
-> +elif check_define __linux__ ; then
->    targetos="Linux"
->  elif check_define _WIN32 ; then
->    targetos='MINGW32'
-> @@ -694,7 +700,7 @@ Linux)
->    supported_os="yes"
->  ;;
->  *)
-> -  error_exit "Unsupported host OS $targetos"
-> +  supported_os="no"
-
-This was deliberately an error_exit because anything
-going down that path got the Linux defines/includes by
-accident and we thought that would not work on
-anything else. What was using it? If we need an extra
-entry in the case statement we can add one.
-
->  ;;
->  esac
->
-> @@ -1428,6 +1434,34 @@ EOF
->  exit 0
->  fi
-
->  config_host_mak="config-host.mak"
->
->  echo "# Automatically generated by configure - do not modify" >config-all-disas.mak
-> @@ -5212,7 +5220,7 @@ if test "$mingw32" = "yes" ; then
->      echo "CONFIG_QGA_NTDDDISK=y" >> $config_host_mak
->    fi
->    if test "$guest_agent_msi" = "yes"; then
-> -    echo "QEMU_GA_MSI_ENABLED=yes" >> $config_host_mak
-> +    echo "QEMU_GA_MSI_ENABLED=yes" >> $config_host_mak
->      echo "QEMU_GA_MSI_MINGW_DLL_PATH=${QEMU_GA_MSI_MINGW_DLL_PATH}" >> $config_host_mak
->      echo "QEMU_GA_MSI_WITH_VSS=${QEMU_GA_MSI_WITH_VSS}" >> $config_host_mak
->      echo "QEMU_GA_MSI_ARCH=${QEMU_GA_MSI_ARCH}" >> $config_host_mak
-
-Stray unintended change?
-
-> --
-> 2.11.0
->
-
-thanks
--- PMM
+diff --git a/target/i386/helper.c b/target/i386/helper.c
+index e2af340..f11cac6 100644
+--- a/target/i386/helper.c
++++ b/target/i386/helper.c
+@@ -326,6 +326,10 @@ void x86_cpu_dump_local_apic_state(CPUState *cs, FILE *f,
+ {
+     X86CPU *cpu = X86_CPU(cs);
+     APICCommonState *s = APIC_COMMON(cpu->apic_state);
++    if (!s) {
++        cpu_fprintf(f, "local apic state not available\n");
++        return;
++    }
+     uint32_t *lvt = s->lvt;
+ 
+     cpu_fprintf(f, "dumping local APIC state for CPU %-2u\n\n",
+-- 
+2.7.4
