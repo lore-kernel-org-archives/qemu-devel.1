@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47981)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cstQh-0006w1-Fk
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 11:53:08 -0400
+	(envelope-from <prvs=25381d7d4=Paul.Durrant@citrix.com>)
+	id 1cstSY-0007Uo-T0
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 11:55:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cstQb-0000W8-LG
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 11:53:07 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:35149)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cstQb-0000Vz-I5
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 11:53:01 -0400
-Received: by mail-qk0-x243.google.com with SMTP id f11so10038159qkb.2
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 08:53:01 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1490630670-15818-1-git-send-email-peter.maydell@linaro.org>
-	<1490630670-15818-2-git-send-email-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3d738f84-7708-0578-0e83-5434f43aa928@amsat.org>
-Date: Tue, 28 Mar 2017 12:52:54 -0300
+	(envelope-from <prvs=25381d7d4=Paul.Durrant@citrix.com>)
+	id 1cstSW-00011T-9M
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 11:55:02 -0400
+Received: from smtp.citrix.com ([66.165.176.89]:17427)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=25381d7d4=Paul.Durrant@citrix.com>)
+	id 1cstSW-00011D-0K
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 11:55:00 -0400
+From: Paul Durrant <paul.durrant@citrix.com>
+Date: Tue, 28 Mar 2017 16:54:55 +0100
+Message-ID: <1490716495-1685-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <1490630670-15818-2-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.9 1/2] tcg/sparc: Zero extend data
- argument to store helpers
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2] xen: additionally restrict xenforeignmemory
+ operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,107 +27,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, patches@linaro.org
+To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
 
-Hi Peter,
+Commit f0f272baf3a7 "xen: use libxendevice model to restrict operations"
+added a command-line option (-xen-domid-restrict) to limit operations
+using the libxendevicemodel API to a specified domid. The commit also
+noted that the restriction would be extended to cover operations issued
+via other xen libraries by subsequent patches.
 
-On 03/27/2017 01:04 PM, Peter Maydell wrote:
-> The C store helper functions take the data argument as a uint8_t,
-> uint16_t, etc depending on the store size. The SPARC calling
-> convention requires that data types smaller than the register
-> size must be extended by the caller. We weren't doing this,
-> which meant that if QEMU was compiled with optimizations enabled
-> we could end up storing incorrect values to guest memory.
-> (In particular the i386 guest BIOS would crash on startup.)
->
-> Add code to the trampolines that call the store helpers to
-> do the zero extension as required.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  tcg/sparc/tcg-target.inc.c | 27 +++++++++++++++++++++++++++
->  1 file changed, 27 insertions(+)
->
-> diff --git a/tcg/sparc/tcg-target.inc.c b/tcg/sparc/tcg-target.inc.c
-> index d1f4c0d..548bea2 100644
-> --- a/tcg/sparc/tcg-target.inc.c
-> +++ b/tcg/sparc/tcg-target.inc.c
-> @@ -843,6 +843,31 @@ static void tcg_out_mb(TCGContext *s, TCGArg a0)
->  static tcg_insn_unit *qemu_ld_trampoline[16];
->  static tcg_insn_unit *qemu_st_trampoline[16];
->
-> +static void emit_extend(TCGContext *s, TCGReg r, int op)
-> +{
-> +    /* Emit zero extend of 8, 16 or 32 bit data as
-> +     * required by the MO_* value op; do nothing for 64 bit.
-> +     */
-> +    switch (op) {
-> +    case MO_UB:
-> +        tcg_out_arithi(s, r, r, 0xff, ARITH_AND);
-> +        break;
-> +    case MO_LEUW:
-> +    case MO_BEUW:
-> +        tcg_out_arithi(s, r, r, 16, SHIFT_SLL);
-> +        tcg_out_arithi(s, r, r, 16, SHIFT_SRL);
-> +        break;
-> +    case MO_LEUL:
-> +    case MO_BEUL:
-> +        if (SPARC64) {
-> +            tcg_out_arith(s, r, r, 0, SHIFT_SRL);
-> +        }
-> +        break;
-> +    default:
-> +        break;
-> +    }
+My recent Xen patch [1] added a call to the xenforeignmemory API to allow
+it to be restricted. This patch now makes use of that new call when the
+-xen-domid-restrict option is passed.
 
-it seems to me easier to read masking op:
+[1] http://xenbits.xen.org/gitweb/?p=xen.git;a=commit;h=5823d6eb
 
-     switch (op & MO_SIZE) {
-     case MO_8:
-         tcg_out_arithi(s, r, r, 0xff, ARITH_AND);
-         break;
-     case MO_16:
-         tcg_out_arithi(s, r, r, 16, SHIFT_SLL);
-         tcg_out_arithi(s, r, r, 16, SHIFT_SRL);
-         break;
-     case MO_32:
-         if (SPARC64) {
-             tcg_out_arith(s, r, r, 0, SHIFT_SRL);
-         }
-         break;
-     case MO_64:
-         break;
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+---
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
+
+v2:
+ - Use Stefano's re-arrangement
+---
+ include/hw/xen/xen_common.h | 134 ++++++++++++++++++++++++++------------------
+ 1 file changed, 78 insertions(+), 56 deletions(-)
+
+diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+index 4f3bd35..624fb86 100644
+--- a/include/hw/xen/xen_common.h
++++ b/include/hw/xen/xen_common.h
+@@ -27,6 +27,58 @@ extern xc_interface *xen_xc;
+  * We don't support Xen prior to 4.2.0.
+  */
+ 
++/* Xen 4.2 through 4.6 */
++#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40701
++
++typedef xc_interface xenforeignmemory_handle;
++typedef xc_evtchn xenevtchn_handle;
++typedef xc_gnttab xengnttab_handle;
++
++#define xenevtchn_open(l, f) xc_evtchn_open(l, f);
++#define xenevtchn_close(h) xc_evtchn_close(h)
++#define xenevtchn_fd(h) xc_evtchn_fd(h)
++#define xenevtchn_pending(h) xc_evtchn_pending(h)
++#define xenevtchn_notify(h, p) xc_evtchn_notify(h, p)
++#define xenevtchn_bind_interdomain(h, d, p) xc_evtchn_bind_interdomain(h, d, p)
++#define xenevtchn_unmask(h, p) xc_evtchn_unmask(h, p)
++#define xenevtchn_unbind(h, p) xc_evtchn_unbind(h, p)
++
++#define xengnttab_open(l, f) xc_gnttab_open(l, f)
++#define xengnttab_close(h) xc_gnttab_close(h)
++#define xengnttab_set_max_grants(h, n) xc_gnttab_set_max_grants(h, n)
++#define xengnttab_map_grant_ref(h, d, r, p) xc_gnttab_map_grant_ref(h, d, r, p)
++#define xengnttab_unmap(h, a, n) xc_gnttab_munmap(h, a, n)
++#define xengnttab_map_grant_refs(h, c, d, r, p) \
++    xc_gnttab_map_grant_refs(h, c, d, r, p)
++#define xengnttab_map_domain_grant_refs(h, c, d, r, p) \
++    xc_gnttab_map_domain_grant_refs(h, c, d, r, p)
++
++#define xenforeignmemory_open(l, f) xen_xc
++#define xenforeignmemory_close(h)
++
++static inline void *xenforeignmemory_map(xc_interface *h, uint32_t dom,
++                                         int prot, size_t pages,
++                                         const xen_pfn_t arr[/*pages*/],
++                                         int err[/*pages*/])
++{
++    if (err)
++        return xc_map_foreign_bulk(h, dom, prot, arr, err, pages);
++    else
++        return xc_map_foreign_pages(h, dom, prot, arr, pages);
++}
++
++#define xenforeignmemory_unmap(h, p, s) munmap(p, s * XC_PAGE_SIZE)
++
++#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40701 */
++
++#include <xenevtchn.h>
++#include <xengnttab.h>
++#include <xenforeignmemory.h>
++
++#endif
++
++extern xenforeignmemory_handle *xen_fmem;
++
+ #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
+ 
+ typedef xc_interface xendevicemodel_handle;
+@@ -159,6 +211,13 @@ static inline int xendevicemodel_restrict(
+     return -1;
+ }
+ 
++static inline int xenforeignmemory_restrict(
++    xenforeignmemory_handle *fmem, domid_t domid)
++{
++    errno = ENOTTY;
++    return -1;
++}
++
+ #else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
+ 
+ #include <xendevicemodel.h>
+@@ -215,69 +274,32 @@ static inline int xen_modified_memory(domid_t domid, uint64_t first_pfn,
+ 
+ static inline int xen_restrict(domid_t domid)
+ {
+-    int rc = xendevicemodel_restrict(xen_dmod, domid);
++    int rc;
+ 
+-    trace_xen_domid_restrict(errno);
++    /* Attempt to restrict devicemodel operations */
++    rc = xendevicemodel_restrict(xen_dmod, domid);
++    trace_xen_domid_restrict(rc ? errno : 0);
+ 
+-    if (errno == ENOTTY) {
+-        return 0;
++    if (rc < 0) {
++        /*
++         * If errno is ENOTTY then restriction is not implemented so
++         * there's no point in trying to restrict other types of
++         * operation, but it should not be treated as a failure.
++         */
++        if (errno == ENOTTY) {
++            return 0;
++        }
++
++        return rc;
      }
-
-> +}
-> +
->  static void build_trampolines(TCGContext *s)
->  {
->      static void * const qemu_ld_helpers[16] = {
-> @@ -910,6 +935,7 @@ static void build_trampolines(TCGContext *s)
->          qemu_st_trampoline[i] = s->code_ptr;
->
->          if (SPARC64) {
-> +            emit_extend(s, TCG_REG_O2, i);
-
-shouldn't be inverting args?
-
-                emit_extend(s, i, TCG_REG_O2);
-
->              ra = TCG_REG_O4;
->          } else {
->              ra = TCG_REG_O1;
-> @@ -925,6 +951,7 @@ static void build_trampolines(TCGContext *s)
->                  tcg_out_arithi(s, ra, ra + 1, 32, SHIFT_SRLX);
->                  ra += 2;
->              } else {
-> +                emit_extend(s, i, ra);
->                  ra += 1;
->              }
->              /* Skip the oi argument.  */
->
-
-regards,
-
-Phil.
+ 
+-    return rc;
+-}
+-
+-/* Xen 4.2 through 4.6 */
+-#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40701
+-
+-typedef xc_interface xenforeignmemory_handle;
+-typedef xc_evtchn xenevtchn_handle;
+-typedef xc_gnttab xengnttab_handle;
+-
+-#define xenevtchn_open(l, f) xc_evtchn_open(l, f);
+-#define xenevtchn_close(h) xc_evtchn_close(h)
+-#define xenevtchn_fd(h) xc_evtchn_fd(h)
+-#define xenevtchn_pending(h) xc_evtchn_pending(h)
+-#define xenevtchn_notify(h, p) xc_evtchn_notify(h, p)
+-#define xenevtchn_bind_interdomain(h, d, p) xc_evtchn_bind_interdomain(h, d, p)
+-#define xenevtchn_unmask(h, p) xc_evtchn_unmask(h, p)
+-#define xenevtchn_unbind(h, p) xc_evtchn_unbind(h, p)
+-
+-#define xengnttab_open(l, f) xc_gnttab_open(l, f)
+-#define xengnttab_close(h) xc_gnttab_close(h)
+-#define xengnttab_set_max_grants(h, n) xc_gnttab_set_max_grants(h, n)
+-#define xengnttab_map_grant_ref(h, d, r, p) xc_gnttab_map_grant_ref(h, d, r, p)
+-#define xengnttab_unmap(h, a, n) xc_gnttab_munmap(h, a, n)
+-#define xengnttab_map_grant_refs(h, c, d, r, p) \
+-    xc_gnttab_map_grant_refs(h, c, d, r, p)
+-#define xengnttab_map_domain_grant_refs(h, c, d, r, p) \
+-    xc_gnttab_map_domain_grant_refs(h, c, d, r, p)
+-
+-#define xenforeignmemory_open(l, f) xen_xc
+-#define xenforeignmemory_close(h)
++    /* Restrict foreignmemory operations */
++    rc = xenforeignmemory_restrict(xen_fmem, domid);
++    trace_xen_domid_restrict(rc ? errno : 0);
+ 
+-static inline void *xenforeignmemory_map(xc_interface *h, uint32_t dom,
+-                                         int prot, size_t pages,
+-                                         const xen_pfn_t arr[/*pages*/],
+-                                         int err[/*pages*/])
+-{
+-    if (err)
+-        return xc_map_foreign_bulk(h, dom, prot, arr, err, pages);
+-    else
+-        return xc_map_foreign_pages(h, dom, prot, arr, pages);
++    return rc;
+ }
+ 
+-#define xenforeignmemory_unmap(h, p, s) munmap(p, s * XC_PAGE_SIZE)
+-
+-#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40701 */
+-
+-#include <xenevtchn.h>
+-#include <xengnttab.h>
+-#include <xenforeignmemory.h>
+-
+-#endif
+-
+-extern xenforeignmemory_handle *xen_fmem;
+-
+ void destroy_hvm_domain(bool reboot);
+ 
+ /* shutdown/destroy current domain because of an error */
+-- 
+2.1.4
