@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1csn4R-0007CX-Pu
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 05:05:44 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1csn4s-0007Pu-2Y
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 05:06:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1csn4N-0003no-5E
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 05:05:43 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1csn4n-0003wL-69
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 05:06:10 -0400
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Tue, 28 Mar 2017 20:05:29 +1100
-Message-Id: <20170328090530.20052-3-aik@ozlabs.ru>
-In-Reply-To: <20170328090530.20052-1-aik@ozlabs.ru>
-References: <20170328090530.20052-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [RFC PATCH qemu 2/3] vfio-pci: Reorder
- group-to-container attaching
+Date: Tue, 28 Mar 2017 20:05:27 +1100
+Message-Id: <20170328090530.20052-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [RFC PATCH qemu 0/3] vfio-pci,
+ spapr: Allow in-kernel acceleration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,94 +21,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>
 
-At the moment VFIO PCI device initialization works as follows:
-vfio_realize
-	vfio_get_group
-		vfio_connect_container
-			register memory listeners (1)
-			update QEMU groups lists
-		vfio_kvm_device_add_group
+This is my current working tree to support kernel's
+"powerpc/kvm/vfio: Enable in-kernel acceleration".
 
-Then (example for pseries) the machine reset hook triggers region_add()
-for all regions where listeners from (1) are listening:
+Please comment. Thanks.
 
-ppc_spapr_reset
-	spapr_phb_reset
-		spapr_tce_table_enable
-			memory_region_add_subregion
-				vfio_listener_region_add
-					vfio_spapr_create_window
 
-This scheme works fine until we need to handle VFIO PCI device hotplug
-_and_ we want to enable in-kernel acceleration on, i.e. after PCI hotplug
-we need a place to call
-ioctl(vfio_kvm_device_fd, KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE).
-Since the ioctl needs a LIOBN fd (from sPAPRTCETable) and a IOMMU group fd
-(from VFIOGroup), vfio_listener_region_add() seems to be the only place
-for this ioctl().
 
-However this only works during boot time because the machine reset
-happens strictly after all devices are finalized. When hotplug happens,
-vfio_listener_region_add() is called when a memory listener is registered
-but when this happens:
-1. new group is not added to the container->group_list yet;
-2. VFIO KVM device is unaware of the new IOMMU group.
+Alexey Kardashevskiy (3):
+  memory: Add get_fd() hook for IOMMU MR
+  vfio-pci: Reorder group-to-container attaching
+  vfio: Enable in-kernel acceleration via VFIO KVM device
 
-This moves bits around to have all necessary VFIO infrastructure
-in place for both initial startup and hotplug cases.
+ include/exec/memory.h         |  2 ++
+ include/hw/vfio/vfio-common.h |  1 +
+ target/ppc/kvm_ppc.h          |  6 ++++++
+ hw/ppc/spapr_iommu.c          | 12 ++++++++++++
+ hw/vfio/common.c              | 34 ++++++++++++++++++++++++----------
+ hw/vfio/spapr.c               | 26 ++++++++++++++++++++++++++
+ target/ppc/kvm.c              |  7 ++++++-
+ hw/vfio/trace-events          |  1 +
+ 8 files changed, 78 insertions(+), 11 deletions(-)
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
- hw/vfio/common.c | 21 +++++++++++----------
- 1 file changed, 11 insertions(+), 10 deletions(-)
-
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index f3ba9b9007..c75c7594d5 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -1086,6 +1086,16 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-         goto free_container_exit;
-     }
- 
-+    container->initialized = true;
-+
-+    vfio_kvm_device_add_group(group);
-+
-+    QLIST_INIT(&container->group_list);
-+    QLIST_INSERT_HEAD(&space->containers, container, next);
-+
-+    group->container = container;
-+    QLIST_INSERT_HEAD(&container->group_list, group, container_next);
-+
-     container->listener = vfio_memory_listener;
- 
-     memory_listener_register(&container->listener, container->space->as);
-@@ -1097,16 +1107,9 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-         goto listener_release_exit;
-     }
- 
--    container->initialized = true;
--
--    QLIST_INIT(&container->group_list);
--    QLIST_INSERT_HEAD(&space->containers, container, next);
--
--    group->container = container;
--    QLIST_INSERT_HEAD(&container->group_list, group, container_next);
--
-     return 0;
- listener_release_exit:
-+    vfio_kvm_device_del_group(group);
-     vfio_listener_release(container);
- 
- free_container_exit:
-@@ -1210,8 +1213,6 @@ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp)
- 
-     QLIST_INSERT_HEAD(&vfio_group_list, group, next);
- 
--    vfio_kvm_device_add_group(group);
--
-     return group;
- 
- close_fd_exit:
 -- 
 2.11.0
