@@ -1,14 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cspwV-00069J-Ae
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 08:09:44 -0400
+	(envelope-from <jcody@redhat.com>) id 1cspzT-0007tz-Nu
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 08:12:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cspwR-0002Qb-BT
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 08:09:43 -0400
-From: Laurent Vivier <lvivier@redhat.com>
-Date: Tue, 28 Mar 2017 14:09:34 +0200
-Message-Id: <20170328120934.29526-1-lvivier@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] spapr: fix memory hot-unplugging
+	(envelope-from <jcody@redhat.com>) id 1cspzS-0003Iz-Rz
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 08:12:47 -0400
+Date: Tue, 28 Mar 2017 08:12:38 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170328121238.GG22342@localhost.localdomain>
+References: <1490691368-32099-1-git-send-email-armbru@redhat.com>
+	<1490691368-32099-8-git-send-email-armbru@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1490691368-32099-8-git-send-email-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 for-2.9 07/10] rbd: Clean up
+ qemu_rbd_create()'s detour through QemuOpts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,121 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jdurgin@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com
 
-If, once the kernel has booted, we try to remove a memory
-hotplugged while the kernel was not started, QEMU crashes on
-an assert:
+On Tue, Mar 28, 2017 at 10:56:05AM +0200, Markus Armbruster wrote:
+> The conversion from QDict to QemuOpts is pointless.  Simply get the
+> stuff straight from the QDict.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 
-    qemu-system-ppc64: hw/virtio/vhost.c:651:
-                       vhost_commit: Assertion `r >= 0' failed.
-    ...
-    #4  in vhost_commit
-    #5  in memory_region_transaction_commit
-    #6  in pc_dimm_memory_unplug
-    #7  in spapr_memory_unplug
-    #8  spapr_machine_device_unplug
-    #9  in hotplug_handler_unplug
-    #10 in spapr_lmb_release
-    #11 in detach
-    #12 in set_allocation_state
-    #13 in rtas_set_indicator
-    ...
+Reviewed-by: Jeff Cody <jcody@redhat.com>
 
-If we take a closer look to the guest kernel log, we can see when
-we try to unplug the memory:
-
-    pseries-hotplug-mem: Attempting to hot-add 4 LMB(s)
-
-What happens:
-
-    1- The kernel has ignored the memory hotplug event because
-       it was not started when it was generated.
-
-    2- When we hot-unplug the memory,
-       QEMU starts to remove the memory,
-            generates an hot-unplug event,
-        and signals the kernel of the incoming new event
-
-    3- as the kernel is started, on the QEMU signal, it reads
-       the event list, decodes the hotplug event and tries to
-       finish the hotplugging.
-
-    4- QEMU receive the the hotplug notification while it
-       is trying to hot-unplug the memory. This moves the memory
-       DRC to an invalid state
-
-This patch prevents this by not allowing to set the allocation
-state to USABLE while the DRC is awaiting release.
-
-RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=1432382
-
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
----
-v2: Add awaiting_allocation_skippable flag
-    as suggested by Michael
-
- hw/ppc/spapr_drc.c         | 20 +++++++++++++++++---
- include/hw/ppc/spapr_drc.h |  1 +
- 2 files changed, 18 insertions(+), 3 deletions(-)
-
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index 150f6bf..a1cdc87 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -135,6 +135,17 @@ static uint32_t set_allocation_state(sPAPRDRConnector *drc,
-         if (!drc->dev) {
-             return RTAS_OUT_NO_SUCH_INDICATOR;
-         }
-+        if (drc->awaiting_release && drc->awaiting_allocation) {
-+            /* kernel is acknowledging a previous hotplug event
-+             * while we are already removing it.
-+             * it's safe to ignore awaiting_allocation here since we know the
-+             * situation is predicated on the guest either already having done
-+             * so (boot-time hotplug), or never being able to acquire in the
-+             * first place (hotplug followed by immediate unplug).
-+             */
-+            drc->awaiting_allocation_skippable = true;
-+            return RTAS_OUT_NO_SUCH_INDICATOR;
-+        }
-     }
- 
-     if (drc->type != SPAPR_DR_CONNECTOR_TYPE_PCI) {
-@@ -436,9 +447,11 @@ static void detach(sPAPRDRConnector *drc, DeviceState *d,
-     }
- 
-     if (drc->awaiting_allocation) {
--        drc->awaiting_release = true;
--        trace_spapr_drc_awaiting_allocation(get_index(drc));
--        return;
-+        if (!drc->awaiting_allocation_skippable) {
-+            drc->awaiting_release = true;
-+            trace_spapr_drc_awaiting_allocation(get_index(drc));
-+            return;
-+        }
-     }
- 
-     drc->indicator_state = SPAPR_DR_INDICATOR_STATE_INACTIVE;
-@@ -448,6 +461,7 @@ static void detach(sPAPRDRConnector *drc, DeviceState *d,
-     }
- 
-     drc->awaiting_release = false;
-+    drc->awaiting_allocation_skippable = false;
-     g_free(drc->fdt);
-     drc->fdt = NULL;
-     drc->fdt_start_offset = 0;
-diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-index fa531d5..5524247 100644
---- a/include/hw/ppc/spapr_drc.h
-+++ b/include/hw/ppc/spapr_drc.h
-@@ -154,6 +154,7 @@ typedef struct sPAPRDRConnector {
-     bool awaiting_release;
-     bool signalled;
-     bool awaiting_allocation;
-+    bool awaiting_allocation_skippable;
- 
-     /* device pointer, via link property */
-     DeviceState *dev;
--- 
-2.9.3
+> ---
+>  block/rbd.c | 20 +++++---------------
+>  1 file changed, 5 insertions(+), 15 deletions(-)
+> 
+> diff --git a/block/rbd.c b/block/rbd.c
+> index b2afe07..16ea60a 100644
+> --- a/block/rbd.c
+> +++ b/block/rbd.c
+> @@ -376,7 +376,6 @@ static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
+>      rados_t cluster;
+>      rados_ioctx_t io_ctx;
+>      QDict *options = NULL;
+> -    QemuOpts *rbd_opts = NULL;
+>      int ret = 0;
+>  
+>      secretid = qemu_opt_get(opts, "password-secret");
+> @@ -407,19 +406,11 @@ static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
+>          goto exit;
+>      }
+>  
+> -    rbd_opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+> -    qemu_opts_absorb_qdict(rbd_opts, options, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> -        ret = -EINVAL;
+> -        goto exit;
+> -    }
+> -
+> -    pool       = qemu_opt_get(rbd_opts, "pool");
+> -    conf       = qemu_opt_get(rbd_opts, "conf");
+> -    clientname = qemu_opt_get(rbd_opts, "user");
+> -    name       = qemu_opt_get(rbd_opts, "image");
+> -    keypairs   = qemu_opt_get(rbd_opts, "=keyvalue-pairs");
+> +    pool       = qdict_get_try_str(options, "pool");
+> +    conf       = qdict_get_try_str(options, "conf");
+> +    clientname = qdict_get_try_str(options, "user");
+> +    name       = qdict_get_try_str(options, "image");
+> +    keypairs   = qdict_get_try_str(options, "=keyvalue-pairs");
+>  
+>      ret = rados_create(&cluster, clientname);
+>      if (ret < 0) {
+> @@ -470,7 +461,6 @@ shutdown:
+>  
+>  exit:
+>      QDECREF(options);
+> -    qemu_opts_del(rbd_opts);
+>      return ret;
+>  }
+>  
+> -- 
+> 2.7.4
+> 
