@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1csvKf-0003gc-Tk
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 13:55:02 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1csvO2-0005Cj-QJ
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 13:58:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1csvKc-0008GJ-Rp
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 13:55:01 -0400
-Received: from mail-sn1nam01on0114.outbound.protection.outlook.com
-	([104.47.32.114]:17157
-	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Andrew.Baumann@microsoft.com>)
-	id 1csvKc-0008Fz-Ea
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 13:54:58 -0400
-From: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Date: Tue, 28 Mar 2017 17:53:57 +0000
-Message-ID: <DM2PR21MB006077BF2F5F3DDA94E83ABD9E320@DM2PR21MB0060.namprd21.prod.outlook.com>
-References: <CAFEAcA_Dwky8Jr+y3JACdK5MVM82syrvzuVktnJF0cyZ-FjY0A@mail.gmail.com>
-In-Reply-To: <CAFEAcA_Dwky8Jr+y3JACdK5MVM82syrvzuVktnJF0cyZ-FjY0A@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1csvO2-0001CA-3Y
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 13:58:30 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:38191)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1csvO1-0001BF-SL
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 13:58:30 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id t189so5373357wmt.1
+	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 10:58:29 -0700 (PDT)
 MIME-Version: 1.0
+In-Reply-To: <DM2PR21MB006077BF2F5F3DDA94E83ABD9E320@DM2PR21MB0060.namprd21.prod.outlook.com>
+References: <CAFEAcA_Dwky8Jr+y3JACdK5MVM82syrvzuVktnJF0cyZ-FjY0A@mail.gmail.com>
+	<DM2PR21MB006077BF2F5F3DDA94E83ABD9E320@DM2PR21MB0060.namprd21.prod.outlook.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 28 Mar 2017 18:58:08 +0100
+Message-ID: <CAFEAcA8VHA7_UZamqdaQkxdjgam8xcspwb0HZCVNPV+xLxoeEQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Subject: Re: [Qemu-devel] qemu-devel mailing list vs DMARC and
  microsoft.com's p=reject policy
 List-Id: <qemu-devel.nongnu.org>
@@ -31,66 +30,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Andrew Baumann <Andrew.Baumann@microsoft.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-PiBGcm9tOiBQZXRlciBNYXlkZWxsIFttYWlsdG86cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnXQ0K
-PiBTZW50OiBUdWVzZGF5LCAyOCBNYXJjaCAyMDE3IDEwOjM2DQo+IA0KPiBIaTsgaXQncyBiZWVu
-IHBvaW50ZWQgb3V0IHRvIG1lIHRoYXQgd2UgaGF2ZSBhIHByb2JsZW0gd2l0aCBxZW11LWRldmVs
-DQo+IHVuc3Vic2NyaWJpbmcgcGVvcGxlIGJlY2F1c2Ugb2YgRE1BUkMuIFNwZWNpZmljYWxseToN
-Cj4gICogbWljcm9zb2Z0LmNvbSBwdWJsaXNoZXMgYSBETUFSQyBwb2xpY3kgdGhhdCBoYXMgcD1y
-ZWplY3QNCj4gICogc29tZSBzdWJzY3JpYmVycyB1c2UgbWFpbCBzeXN0ZW1zIHRoYXQgaG9ub3Vy
-IHRoaXMgYW5kIHNlbmQgYm91bmNlcw0KPiAgICBmb3Igbm9uLXZlcmlmeWluZyBlbWFpbHMgZnJv
-bSB0aG9zZSBkb21haW5zDQo+ICAqIHRoZSBtYWlsaW5nIGxpc3Qgc29mdHdhcmUgKG1haWxtYW4p
-IG1vZGlmaWVzIGVtYWlscyB0aGF0IHBhc3MgdGhyb3VnaA0KPiAgICBpdCwgYW1vbmcgb3RoZXIg
-dGhpbmdzIGFkZGluZyB0aGUgIltxZW11LWRldmVsXSIgc3ViamVjdCB0YWcsIGluDQo+ICAgIGEg
-d2F5IHRoYXQgbWVhbnMgdGhhdCBzaWduYXR1cmVzIG5vIGxvbmdlciB2ZXJpZnkNCj4gICogYm91
-bmNlcyBiYWNrIHRvIG1haWxtYW4gYXMgYSByZXN1bHQgb2YgbWFpbGluZyBsaXN0IHBvc3Rpbmdz
-IGZyb20NCj4gICAgbWljcm9zb2Z0LmNvbSBwZW9wbGUgY2FuIHRoZW4gY2F1c2UgcGVvcGxlIHRv
-IGJlIHVuaW50ZW50aW9uYWxseQ0KPiAgICB1bnN1YnNjcmliZWQNCg0KVWdoLiBJIGFncmVlLCB0
-aGlzIGlzIHBhaW5mdWwuIFNvcnJ5IDooDQoNCj4gICgxKSBJIGNvdWxkIHNldCBkbWFyY19tb2Rl
-cmF0aW9uX2FjdGlvbj1SZWplY3QNCj4gICAgKiB0aGlzIG1lYW5zIG5vYm9keSBjYW4gc3Vic2Ny
-aWJlIGlmIHRoZXkndmUgc2V0IHRoZWlyIGRtYXJjIHBvbGljeQ0KPiAgICAgIHRvIHJlamVjdCAo
-dGhlICJpZiB5b3UgZG9uJ3QgYmVsaWV2ZSBpbiBtYWlsaW5nIGxpc3RzIHdlIGRvbid0DQo+ICAg
-ICAgYmVsaWV2ZSBpbiB5b3UiIHBvbGljeSkuDQoNCkNsYXJpZmljYXRpb246IGlmIEkndmUgdW5k
-ZXJzdG9vZCBjb3JyZWN0bHksIHRoaXMgbWVhbnMgbm9ib2R5IGNhbiAqcG9zdCosIHJpZ2h0PyBU
-aGUgcHJvYmxlbSBhcmlzZXMgd2hlbiBJIHBvc3QgdG8gdGhlIGxpc3QsIG5vdCB3aGVuIEkgc3Vi
-c2NyaWJlZCAoYW5kIHFlbXUtZGV2ZWwgZG9lc24ndCByZXF1aXJlIHN1YnNjcmlwdGlvbiB0byBw
-b3N0KS4NCg0KPiAgICAqIHRoZXJlIGlzIGEgY2VydGFpbiBwdXJpdHkgdG8gdGhpcyBvcHRpb24s
-IGluIHRoYXQgaXQgaXMgcHVzaGluZw0KPiAgICAgIHRoZSBjb3N0cyBvZiB0aGlzIHVuaGVscGZ1
-bCBtYWlsIGNvbmZpZyBiYWNrIG9uIHRoZSBvcmdhbmlzYXRpb25zDQo+ICAgICAgd2hpY2ggaGF2
-ZSBjaG9zZW4gaXQ7IG9uIHRoZSBvdGhlciBoYW5kIEknbSByZWx1Y3RhbnQgdG8gbWFrZQ0KPiAg
-ICAgIGxpZmUgaGFyZGVyIGZvciBwZW9wbGUgd2hvIGFyZSBjb250cmlidXRpbmcgdG8gdGhlIHBy
-b2plY3QNCj4gICAgICBhbmQgd2hvIHR5cGljYWxseSBkb24ndCBoYXZlIG11Y2ggc2F5IG92ZXIg
-Y29ycG9yYXRlIGVtYWlsIGNvbmZpZy4NCg0KVGhhdCB3b3VsZCBiZSBhbiB1cGhpbGwgYmF0dGxl
-LCBJJ20gc3VyZS4uLiBpbiBwcmFjdGljZSwgaXQncyBtb3JlIGxpa2VseSB0byBzaW1wbHkgZGlz
-Y291cmFnZSBjb250cmlidXRpb25zIGZyb20gZm9sa3MgbGlrZSBtZS4NCg0KPiAgKDIpIEkgY291
-bGQgcmVjb25maWd1cmUgbWFpbG1hbiB0byB0cnkgdG8gbm90IHJld3JpdGUgYW55dGhpbmcgdGhh
-dA0KPiAgICAgIHdlIHRoaW5rIGlzIGxpa2VseSB0byBiZSBzaWduZWQgKGluIHBhcnRpY3VsYXIg
-bm90IHRoZSBib2R5IG9yIHRoZQ0KPiAgICAgIHN1YmplY3QpDQo+ICAgICogdGhpcyBtZWFucyBk
-cm9wcGluZyB0aGUgW3FlbXUtZGV2ZWxdIHRhZyBmcm9tIHRoZSBzdWJqZWN0LCB3aGljaCBJJ20N
-Cj4gICAgICBhIGJpdCByZWx1Y3RhbnQgdG8gZG8gKGl0IHNlZW1zIGxpa2VseSBhdCBsZWFzdCBz
-b21lIHJlYWRlcnMgYXJlDQo+ICAgICAgZmlsdGVyaW5nIG9uIGl0LCBhbmQgcGVyc29uYWxseSBJ
-IHF1aXRlIGxpa2UgaXQpDQo+ICAgICogaWYgYW55Ym9keSBES0lNLXNpZ25zIHRoZSBTZW5kZXI6
-IGhlYWRlciB3ZSdyZSBzdHVjayBhbnl3YXkNCj4gICgzKSBJIGNvdWxkIHNldCBkbWFyY19tb2Rl
-cmF0aW9uX2FjdGlvbiB0byBNdW5nZSBGcm9tLCB3aGljaCBtZWFucyB0aGF0DQo+ICAgICAgdGhv
-c2Ugc2VuZGVycyB3aG8gaGF2ZSBhIHA9cmVqZWN0IHBvbGljeSB3aWxsIGdldCB0aGVpciBtYWls
-cw0KPiAgICAgIHJld3JpdHRlbiB0byBoYXZlIGEgRnJvbT0iV2hvZXZlciAodmlhIHRoZSBsaXN0
-KSA8cWVtdS1kZXZlbEAuLi4+Ig0KPiAgICAgIGFuZCB0aGVpciBhY3R1YWwgZW1haWwgaW4gdGhl
-IFJlcGx5LXRvOg0KPiAgICAqIGlmIGFueWJvZHkncyBtYWlsIGNsaWVudCBkb2Vzbid0IGhvbm91
-ciBSZXBseS10bzogdGhlbiB3aGF0IHRoZXkNCj4gICAgICB0aGluayBpcyBhIHBlcnNvbmFsIHJl
-cGx5IHdpbGwgZ28gdG8gdGhlIGxpc3QgYnkgYWNjaWRlbnQNCj4gICg0KSBJIGNvdWxkIGRvIG5v
-dGhpbmcsIGFuZCBob3BlIHRoYXQgd2UgZG9uJ3QgZ2V0IHNvIG1hbnkgb2YgdGhlc2UNCj4gICAg
-ICB0aGF0IHRoZXkgYWN0dWFsbHkgcmVzdWx0IGluIHVuc3Vic2NyaXB0aW9ucw0KPiAgICAqIGlu
-IGFueSBjYXNlIGVtYWlscyB3b24ndCBlbmQgdXAgZ29pbmcgdGhyb3VnaCB0byBzb21lIHJlY2lw
-aWVudHMsDQo+ICAgICAgc28gdGhpcyBpc24ndCBtdWNoIG9mIGFuIG9wdGlvbiBhbnl3YXkNCj4g
-ICg1KSBJIGNvdWxkIHNldCB0aGUgYm91bmNlIHByb2Nlc3NpbmcgY29uZmlnIHRvIGJlIChtdWNo
-KSBsZXNzIGFnZ3Jlc3NpdmUNCj4gICAgKiB0aGlzIHNlZW1zIGxpa2UgYSBiYWQgaWRlYQ0KPiAg
-ICAqIGluIGFueSBjYXNlIHBlb3BsZSB3aG9zZSBzeXN0ZW1zIGhvbm91ciBETUFSQyBzdGlsbCB3
-b3VsZG4ndCBnZXQNCj4gICAgICBtYWlscyBmcm9tIHRoZSBwPXJlamVjdCBzZW5kZXJzDQo+IA0K
-PiBJIGRvbid0IHJlYWxseSBsaWtlIGFueSBvZiB0aGVzZSBjaG9pY2VzLg0KPiANCj4gRm9yIHRo
-ZSBtb21lbnQgSSBoYXZlIHBpY2tlZCBvcHRpb24gKDMpLCBidXQgSSdtIG9wZW4gdG8gYXJndW1l
-bnQNCj4gdGhhdCB3ZSBzaG91bGQgcGljayBzb21ldGhpbmcgZWxzZS4NCg0KT3B0aW9uIDMgaXMg
-YSBmaW5lIG9uZSBmcm9tIG15IHBlcnNwZWN0aXZlIChJIGNvdWxkIGFsc28gbGl2ZSB3aXRoIDIp
-LiBUaGlzIGVtYWlsIHdpbGwgaG9wZWZ1bGx5IGhlbHAgeW91IHRlc3Qgd2hldGhlciBpdCdzIGVm
-ZmVjdGl2ZS4NCg0KQW5kcmV3DQo=
+On 28 March 2017 at 18:53, Andrew Baumann <Andrew.Baumann@microsoft.com> wrote:
+>> From: Peter Maydell [mailto:peter.maydell@linaro.org]
+>>  (1) I could set dmarc_moderation_action=Reject
+>>    * this means nobody can subscribe if they've set their dmarc policy
+>>      to reject (the "if you don't believe in mailing lists we don't
+>>      believe in you" policy).
+>
+> Clarification: if I've understood correctly, this means nobody can *post*,
+> right? The problem arises when I post to the list, not when I subscribed
+> (and qemu-devel doesn't require subscription to post).
+
+Yes, you're right. It wouldn't inconvenience mere lurkers at
+these domains.
+
+thanks
+-- PMM
