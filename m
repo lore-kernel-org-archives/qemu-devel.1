@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1csrlB-0007es-Sx
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 10:06:10 -0400
+	(envelope-from <jcody@redhat.com>) id 1csrlE-0007gW-2F
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 10:06:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1csrlA-00080k-R7
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 10:06:09 -0400
+	(envelope-from <jcody@redhat.com>) id 1csrlD-00081h-5m
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 10:06:12 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Tue, 28 Mar 2017 10:05:45 -0400
-Message-Id: <20170328140555.3001-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL for-2.9 00/10] Block patches for -rc2
+Date: Tue, 28 Mar 2017 10:05:49 -0400
+Message-Id: <20170328140555.3001-5-jcody@redhat.com>
+In-Reply-To: <20170328140555.3001-1-jcody@redhat.com>
+References: <20170328140555.3001-1-jcody@redhat.com>
+Subject: [Qemu-devel] [PULL for-2.9 04/10] rbd: Clean up after the previous
+ commit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,38 +23,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: peter.maydell@linaro.org, jcody@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-The following changes since commit 142b9ca51d7260d20f6e87bd7f2020ac0a7d95d9:
+From: Markus Armbruster <armbru@redhat.com>
 
-  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2017-03-28 11:10:36 +0100)
+This code in qemu_rbd_parse_filename()
 
-are available in the git repository at:
+    found_str = qemu_rbd_next_tok(p, '\0', &p);
+    p = found_str;
 
-  git://github.com/codyprime/qemu-kvm-jtc.git tags/block-pull-request
+has no effect.  Drop it, and simplify qemu_rbd_next_tok().
 
-for you to fetch changes up to 2836284db603775af557e969d5a800efb0190324:
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Jeff Cody <jcody@redhat.com>
+Message-id: 1490691368-32099-5-git-send-email-armbru@redhat.com
+Signed-off-by: Jeff Cody <jcody@redhat.com>
+---
+ block/rbd.c | 24 +++++++++---------------
+ 1 file changed, 9 insertions(+), 15 deletions(-)
 
-  rbd: Fix bugs around -drive parameter "server" (2017-03-28 10:01:21 -0400)
-
-----------------------------------------------------------------
-Block patches for 2.9-rc2
-----------------------------------------------------------------
-
-Markus Armbruster (10):
-  rbd: Reject -blockdev server.*.{numeric, to, ipv4, ipv6}
-  rbd: Fix to cleanly reject -drive without pool or image
-  rbd: Don't limit length of parameter values
-  rbd: Clean up after the previous commit
-  rbd: Don't accept -drive driver=rbd, keyvalue-pairs=...
-  rbd: Clean up runtime_opts, fix -drive to reject filename
-  rbd: Clean up qemu_rbd_create()'s detour through QemuOpts
-  rbd: Revert -blockdev and -drive parameter auth-supported
-  rbd: Revert -blockdev parameter password-secret
-  rbd: Fix bugs around -drive parameter "server"
-
- block/rbd.c          | 319 ++++++++++++++-------------------------------------
- qapi-schema.json     |  21 ++--
- qapi/block-core.json |  30 +----
- 3 files changed, 100 insertions(+), 270 deletions(-)
-
+diff --git a/block/rbd.c b/block/rbd.c
+index 0fea348..182a5a3 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -104,19 +104,17 @@ static char *qemu_rbd_next_tok(char *src, char delim, char **p)
+ 
+     *p = NULL;
+ 
+-    if (delim != '\0') {
+-        for (end = src; *end; ++end) {
+-            if (*end == delim) {
+-                break;
+-            }
+-            if (*end == '\\' && end[1] != '\0') {
+-                end++;
+-            }
+-        }
++    for (end = src; *end; ++end) {
+         if (*end == delim) {
+-            *p = end + 1;
+-            *end = '\0';
++            break;
+         }
++        if (*end == '\\' && end[1] != '\0') {
++            end++;
++        }
++    }
++    if (*end == delim) {
++        *p = end + 1;
++        *end = '\0';
+     }
+     return src;
+ }
+@@ -177,10 +175,6 @@ static void qemu_rbd_parse_filename(const char *filename, QDict *options,
+         goto done;
+     }
+ 
+-    found_str = qemu_rbd_next_tok(p, '\0', &p);
+-
+-    p = found_str;
+-
+     /* The following are essentially all key/value pairs, and we treat
+      * 'id' and 'conf' a bit special.  Key/value pairs may be in any order. */
+     while (p) {
 -- 
 2.9.3
