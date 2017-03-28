@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1csoHo-00007g-Ut
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 06:23:37 -0400
+	(envelope-from <imammedo@redhat.com>) id 1csoKK-0000vu-TH
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 06:26:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1csoHo-0001Nr-4z
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 06:23:36 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:34766)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1csoHn-0001NY-UV
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 06:23:36 -0400
-Received: by mail-wr0-x234.google.com with SMTP id l43so97042933wre.1
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 03:23:35 -0700 (PDT)
+	(envelope-from <imammedo@redhat.com>) id 1csoKG-0002S3-Ua
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 06:26:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40634)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1csoKG-0002Rm-MS
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 06:26:08 -0400
+Date: Tue, 28 Mar 2017 12:25:57 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170328122557.6e958e83@Igors-MacBook-Pro.local>
+In-Reply-To: <20170327144815.8043-2-ehabkost@redhat.com>
+References: <20170327144815.8043-1-ehabkost@redhat.com>
+	<20170327144815.8043-2-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1b4e550d-2a0a-e155-c78e-d6fd0a87cc08@physik.fu-berlin.de>
-References: <CAFEAcA-t7xRo-2CkipmYKE_vUxp8oUBML8ss7G8U_pVhM79H6w@mail.gmail.com>
-	<1b4e550d-2a0a-e155-c78e-d6fd0a87cc08@physik.fu-berlin.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Mar 2017 11:23:14 +0100
-Message-ID: <CAFEAcA82odNuxkA+QtYbm=3h+j9SZmMbWHiKrmU1bDbbM17KkQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] packed structures and unaligned accesses (sparc)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.9 v2 1/2] i386: Replace uint32_t*
+ with FeatureWord on feature getter/setter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +28,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Knut Omang <knut.omang@oracle.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, "Collin L . Walling" <walling@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>, "Jason J
+	. Herne" <jjherne@linux.vnet.ibm.com>
 
-On 28 March 2017 at 11:19, John Paul Adrian Glaubitz
-<glaubitz@physik.fu-berlin.de> wrote:
-> On 03/27/2017 07:34 PM, Peter Maydell wrote:
->> That all makes sense in isolation, but shouldn't something have
->> at least warned that "&h.size" isn't actually a uint32_t* in
->> the sense of being something you can validly pass to a
->> function that takes a uint32_t* ?
->
-> It turns out that clang actually emits a warning in this case:
->
-> root@deb4g:~# clang-4.0 packed.c -o packed
-> packed.c:18:18: warning: taking address of packed member 'size' of class or structure 'hdr' may result in an unaligned pointer value
->       [-Waddress-of-packed-member]
->   return getval(&h.size);
->                  ^~~~~~
-> 1 warning generated.
-> root@deb4g:~#
+On Mon, 27 Mar 2017 11:48:14 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-Ah, good. (Unfortunately my clang isn't new enough for that,
-being 3.8.)
+> Instead of passing a pointer to the feature property getter and
+> setter functions, pass a FeatureWord enum so they can perform
+> other actions related to the feature flag.
+> 
+> This will be used to add a new "user_features" field to keep
+> track of features that were explicitly set by the user.
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-thanks
--- PMM
+> ---
+>  target/i386/cpu.c | 19 +++++++++++--------
+>  1 file changed, 11 insertions(+), 8 deletions(-)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 7aa762245a..feefa5b8a4 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -3692,15 +3692,17 @@ static void x86_cpu_unrealizefn(DeviceState *dev, Error **errp)
+>  }
+>  
+>  typedef struct BitProperty {
+> -    uint32_t *ptr;
+> +    FeatureWord w;
+>      uint32_t mask;
+>  } BitProperty;
+>  
+>  static void x86_cpu_get_bit_prop(Object *obj, Visitor *v, const char *name,
+>                                   void *opaque, Error **errp)
+>  {
+> +    X86CPU *cpu = X86_CPU(obj);
+>      BitProperty *fp = opaque;
+> -    bool value = (*fp->ptr & fp->mask) == fp->mask;
+> +    uint32_t f = cpu->env.features[fp->w];
+> +    bool value = (f & fp->mask) == fp->mask;
+>      visit_type_bool(v, name, &value, errp);
+>  }
+>  
+> @@ -3708,6 +3710,7 @@ static void x86_cpu_set_bit_prop(Object *obj, Visitor *v, const char *name,
+>                                   void *opaque, Error **errp)
+>  {
+>      DeviceState *dev = DEVICE(obj);
+> +    X86CPU *cpu = X86_CPU(obj);
+>      BitProperty *fp = opaque;
+>      Error *local_err = NULL;
+>      bool value;
+> @@ -3724,9 +3727,9 @@ static void x86_cpu_set_bit_prop(Object *obj, Visitor *v, const char *name,
+>      }
+>  
+>      if (value) {
+> -        *fp->ptr |= fp->mask;
+> +        cpu->env.features[fp->w] |= fp->mask;
+>      } else {
+> -        *fp->ptr &= ~fp->mask;
+> +        cpu->env.features[fp->w] &= ~fp->mask;
+>      }
+>  }
+>  
+> @@ -3745,7 +3748,7 @@ static void x86_cpu_release_bit_prop(Object *obj, const char *name,
+>   */
+>  static void x86_cpu_register_bit_prop(X86CPU *cpu,
+>                                        const char *prop_name,
+> -                                      uint32_t *field,
+> +                                      FeatureWord w,
+>                                        int bitnr)
+>  {
+>      BitProperty *fp;
+> @@ -3755,11 +3758,11 @@ static void x86_cpu_register_bit_prop(X86CPU *cpu,
+>      op = object_property_find(OBJECT(cpu), prop_name, NULL);
+>      if (op) {
+>          fp = op->opaque;
+> -        assert(fp->ptr == field);
+> +        assert(fp->w == w);
+>          fp->mask |= mask;
+>      } else {
+>          fp = g_new0(BitProperty, 1);
+> -        fp->ptr = field;
+> +        fp->w = w;
+>          fp->mask = mask;
+>          object_property_add(OBJECT(cpu), prop_name, "bool",
+>                              x86_cpu_get_bit_prop,
+> @@ -3787,7 +3790,7 @@ static void x86_cpu_register_feature_bit_props(X86CPU *cpu,
+>      /* aliases don't use "|" delimiters anymore, they are registered
+>       * manually using object_property_add_alias() */
+>      assert(!strchr(name, '|'));
+> -    x86_cpu_register_bit_prop(cpu, name, &cpu->env.features[w], bitnr);
+> +    x86_cpu_register_bit_prop(cpu, name, w, bitnr);
+>  }
+>  
+>  static GuestPanicInformation *x86_cpu_get_crash_info(CPUState *cs)
