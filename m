@@ -1,40 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1csle3-0004BK-Pi
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:34:25 -0400
+	(envelope-from <armbru@redhat.com>) id 1cslxz-0003RD-Mv
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:55:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1csle0-0007Q1-LM
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:34:23 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49362)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1csle0-0007Px-Bv
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:34:20 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2S7Vosf145785
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 03:34:18 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29fkh1g5xe-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 03:34:18 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Tue, 28 Mar 2017 08:34:15 +0100
-Date: Tue, 28 Mar 2017 09:34:11 +0200
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <20170327211728-mutt-send-email-mst@kernel.org>
-References: <149063674781.4447.14258971700726134711.stgit@bahia.lan>
-	<149063676337.4447.2095575576822297032.stgit@bahia.lan>
-	<20170327211728-mutt-send-email-mst@kernel.org>
+	(envelope-from <armbru@redhat.com>) id 1cslxw-0007P0-Kl
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:54:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50770)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cslxw-0007OD-CJ
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 03:54:56 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 523726AAF4
+	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 07:54:55 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
+	<1490621195-2228-3-git-send-email-armbru@redhat.com>
+	<ba4b08e7-7e8d-5210-be2c-545be4cdeb99@redhat.com>
+	<abc2a347-5f42-59c0-5f51-0f03bb2b3c6d@redhat.com>
+	<87wpbaefzo.fsf@dusky.pond.sub.org>
+	<8737dybl7v.fsf@dusky.pond.sub.org>
+	<20170327213347.GF22342@localhost.localdomain>
+Date: Tue, 28 Mar 2017 09:54:53 +0200
+In-Reply-To: <20170327213347.GF22342@localhost.localdomain> (Jeff Cody's
+	message of "Mon, 27 Mar 2017 17:33:47 -0400")
+Message-ID: <87r31h6dki.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170328093411.7535b59f.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/5] virtio: Error object based
- virtio_error()
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH RFC v3 for-2.9 02/11] rbd: Fix to cleanly
+ reject -drive without pool or image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,87 +39,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Greg Kurz <groug@kaod.org>, Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org
+To: Jeff Cody <jcody@redhat.com>
+Cc: kwolf@redhat.com, jdurgin@redhat.com, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Mon, 27 Mar 2017 21:20:56 +0300
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+Jeff Cody <jcody@redhat.com> writes:
 
-> On Mon, Mar 27, 2017 at 07:46:03PM +0200, Greg Kurz wrote:
-> > This introduces an Error object based implementation of virtio_error(). It
-> > allows to implement virtio_error() wrappers in device-specific code.
-> > 
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >  hw/virtio/virtio.c         |   21 ++++++++++++++++-----
-> >  include/hw/virtio/virtio.h |    1 +
-> >  2 files changed, 17 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> > index 03592c542a55..4036f4816038 100644
-> > --- a/hw/virtio/virtio.c
-> > +++ b/hw/virtio/virtio.c
-> > @@ -2443,6 +2443,16 @@ void virtio_device_set_child_bus_name(VirtIODevice *vdev, char *bus_name)
-> >      vdev->bus_name = g_strdup(bus_name);
-> >  }
-> >  
-> > +static void virtio_device_set_broken(VirtIODevice *vdev)
-> > +{
-> > +    vdev->broken = true;
-> > +
-> > +    if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
-> > +        virtio_set_status(vdev, vdev->status | VIRTIO_CONFIG_S_NEEDS_RESET);
-> > +        virtio_notify_config(vdev);
-> > +    }
-> > +}
-> > +
-> >  void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
-> >  {
-> >      va_list ap;
-> 
-> It's worth pondering whether we can set this for versions < 1.0 too.
+> On Mon, Mar 27, 2017 at 08:58:28PM +0200, Markus Armbruster wrote:
+>> Markus Armbruster <armbru@redhat.com> writes:
+>> 
+>> > Max Reitz <mreitz@redhat.com> writes:
+>> >
+>> >> On 27.03.2017 18:10, Max Reitz wrote:
+>> >>> On 27.03.2017 15:26, Markus Armbruster wrote:
+>> >>>> qemu_rbd_open() neglects to check pool and image are present.
+>> >>>> Reproducer:
+>> >>>>
+>> >>>>     $ qemu-system-x86_64 -nodefaults -drive if=none,driver=rbd,pool=p
+>> >>>>     Segmentation fault (core dumped)
+>> >>>>     $ qemu-system-x86_64 -nodefaults -drive if=none,driver=rbd,image=i
+>> >>>>     qemu-system-x86_64: -drive if=none,driver=rbd,image=i: error opening pool (null)
+>> >>>>
+>> >>>> Doesn't affect -drive with file=..., because qemu_rbd_parse_filename()
+>> >>>> always sets both pool and image.
+>> >>>>
+>> >>>> Doesn't affect -blockdev, because pool and image are mandatory in the
+>> >>>> QAPI schema.
+>> >>>>
+>> >>>> Fix by adding the missing checks.
+>> >>>>
+>> >>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> >>>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> >>>> ---
+>> >>>>  block/rbd.c | 10 +++++++---
+>> >>>>  1 file changed, 7 insertions(+), 3 deletions(-)
+>> >>> 
+>> >>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>> >>
+>> >> That said, don't we have a similar issue with qemu_rbd_create()? It too
+>> >> doesn't check whether those options are given but I guess they're just
+>> >> as mandatory.
+>> >
+>> > Looks like it.  I'll try to stick a fix into v4.
+>> 
+>> Hmm, ignorant question: how can I reach qemu_rbd_create() without going
+>> through qemu_rbd_parse_filename()?
+>
+> You can't -- commit c7cacb3e7 forces qemu_rbd_create() to call
+> qemu_rbd_parse_filename().  And in qemu_rbd_parse_filename(), it will
+> complain if pool is not provided (and that is what causes the abort, not the
+> missing image parameter).  So I think we are safe, but a nicer error message
+> for a missing 'image' parameter might be nice anyway.
 
-I'm a bit torn there. In theory, setting an unknown status bit should
-not really do harm; but we can't be sure that there aren't legacy
-drivers out there that will crash when they notice an unknown status
-bit, and I'm not sure we want that.
+I now see the "we are safe" part, but not the "want a nicer error
+message for a missing 'image'" part.  How can 'image' be missing?
 
-> 
-> 
-> > @@ -2451,12 +2461,13 @@ void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
-> >      error_vreport(fmt, ap);
-> >      va_end(ap);
-> >  
-> > -    vdev->broken = true;
-> > +    virtio_device_set_broken(vdev);
-> > +}
-> >  
-> > -    if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
-> > -        virtio_set_status(vdev, vdev->status | VIRTIO_CONFIG_S_NEEDS_RESET);
-> > -        virtio_notify_config(vdev);
-> > -    }
-> > +void virtio_error_err(VirtIODevice *vdev, Error *err)
-> > +{
-> > +    error_report_err(err);
-> > +    virtio_device_set_broken(vdev);
-> >  }
-> >  
-> >  static void virtio_memory_listener_commit(MemoryListener *listener)
-> 
-> Should this skip error report if device is already broken?
-> Otherwise we'll get a ton of errors in the log.
+qemu_rbd_parse_filename() parses a pseudo-filename of the form
 
-One would hope that qemu stops processing broken devices, but a check
-might be better.
+    rbd:POOL/IMAGE[@SNAP][:KEY=VALUE:...]
 
-> 
-> Also, whether to stop the device, or the VM, or just warn,
-> seems like a policy decision. Why not set it on command line
-> like we do for other storage?
+It fails if
 
-I would trust the device implementation to make the decision: Can we
-recover, can we start using the device again after a reset, or are we
-so broken that we want to terminate the vm?
+* the pseudo-filename doesn't start with "rbd:"
 
-Note that all of this already applies to the existing virtio_error(); I
-think we should discuss this independently of this patch.
+* doesn't contain '/' ("Pool name is required")
+
+* POOL, IMAGE, SNAP, the KEY=VALUE:... part or any KEY in it is empty or
+  too long (until the next commit)
+
+* a KEY=VALUE doesn't contain '='
+
+If it succeeds, "pool" and "image" are both set in @options.
+
+Can you give me a reproducer for the error message you'd like me to
+improve?
