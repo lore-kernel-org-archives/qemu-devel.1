@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1csvER-0007VB-30
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 13:48:36 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1csvEV-0007YQ-4Q
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 13:48:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1csvEO-0005bZ-0P
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 13:48:35 -0400
-Date: Tue, 28 Mar 2017 11:48:29 -0600
+	(envelope-from <alex.williamson@redhat.com>) id 1csvEU-0005dG-4r
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 13:48:39 -0400
+Date: Tue, 28 Mar 2017 11:48:36 -0600
 From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170328114829.25656146@t450s.home>
-In-Reply-To: <20170328090530.20052-2-aik@ozlabs.ru>
+Message-ID: <20170328114836.63dcde23@t450s.home>
+In-Reply-To: <20170328090530.20052-3-aik@ozlabs.ru>
 References: <20170328090530.20052-1-aik@ozlabs.ru>
-	<20170328090530.20052-2-aik@ozlabs.ru>
+	<20170328090530.20052-3-aik@ozlabs.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH qemu 1/3] memory: Add get_fd() hook for
- IOMMU MR
+Subject: Re: [Qemu-devel] [RFC PATCH qemu 2/3] vfio-pci: Reorder
+ group-to-container attaching
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +27,106 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alexey Kardashevskiy <aik@ozlabs.ru>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Tue, 28 Mar 2017 20:05:28 +1100
+On Tue, 28 Mar 2017 20:05:29 +1100
 Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 
+> At the moment VFIO PCI device initialization works as follows:
+> vfio_realize
+> 	vfio_get_group
+> 		vfio_connect_container
+> 			register memory listeners (1)
+> 			update QEMU groups lists
+> 		vfio_kvm_device_add_group
+> 
+> Then (example for pseries) the machine reset hook triggers region_add()
+> for all regions where listeners from (1) are listening:
+> 
+> ppc_spapr_reset
+> 	spapr_phb_reset
+> 		spapr_tce_table_enable
+> 			memory_region_add_subregion
+> 				vfio_listener_region_add
+> 					vfio_spapr_create_window
+> 
+> This scheme works fine until we need to handle VFIO PCI device hotplug
+> _and_ we want to enable in-kernel acceleration on, i.e. after PCI hotplug
+> we need a place to call
+> ioctl(vfio_kvm_device_fd, KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE).
+> Since the ioctl needs a LIOBN fd (from sPAPRTCETable) and a IOMMU group fd
+> (from VFIOGroup), vfio_listener_region_add() seems to be the only place
+> for this ioctl().
+> 
+> However this only works during boot time because the machine reset
+> happens strictly after all devices are finalized. When hotplug happens,
+> vfio_listener_region_add() is called when a memory listener is registered
+> but when this happens:
+> 1. new group is not added to the container->group_list yet;
+> 2. VFIO KVM device is unaware of the new IOMMU group.
+> 
+> This moves bits around to have all necessary VFIO infrastructure
+> in place for both initial startup and hotplug cases.
+> 
 > Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 > ---
->  include/exec/memory.h | 2 ++
->  hw/ppc/spapr_iommu.c  | 8 ++++++++
->  2 files changed, 10 insertions(+)
+>  hw/vfio/common.c | 21 +++++++++++----------
+>  1 file changed, 11 insertions(+), 10 deletions(-)
 > 
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index e39256ad03..925c10b35b 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -174,6 +174,8 @@ struct MemoryRegionIOMMUOps {
->      void (*notify_flag_changed)(MemoryRegion *iommu,
->                                  IOMMUNotifierFlag old_flags,
->                                  IOMMUNotifierFlag new_flags);
-> +    /* Returns a kernel fd for IOMMU */
-> +    int (*get_fd)(MemoryRegion *iommu);
-
-What if we used this as a prototype:
-
-int (*get_fd)(IOMMUFdType type, MemoryRegion *iommu);
-
-And then we defined:
-
-typedef enum {
-    SPAPR_IOMMU_TABLE_FD = 0,
-} IOMMUFdType;
-
-Such that you're actually asking the IOMMUOps for a specific type of FD
-and it either has it or not, so the caller doesn't need to assume what
-it is they get back.
-
-Furthermore, add:
-
-int memory_region_iommu_get_fd(IOMMUFdType type, MemoryRegion *mr)
-{
-    assert(memory_region_is_iommu(mr));
-
-    if (mr->iommu_ops && mr->iommu_ops->get_fd) {
-        return mr->iommu_ops->get_fd(type, mr);
-    }
-
-    return -1;
-}
-
->  };
->
-
-This should be two patches, patch 1 above, patch 2 below
-  
->  typedef struct CoalescedMemoryRange CoalescedMemoryRange;
-> diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
-> index 9e30e148d6..b61c8f053e 100644
-> --- a/hw/ppc/spapr_iommu.c
-> +++ b/hw/ppc/spapr_iommu.c
-> @@ -170,6 +170,13 @@ static void spapr_tce_notify_flag_changed(MemoryRegion *iommu,
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index f3ba9b9007..c75c7594d5 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -1086,6 +1086,16 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+>          goto free_container_exit;
 >      }
->  }
 >  
-> +static int spapr_tce_get_fd(MemoryRegion *iommu)
-> +{
-> +    sPAPRTCETable *tcet = container_of(iommu, sPAPRTCETable, iommu);
+> +    container->initialized = true;
+
+This ignores the purpose of this variable, which is to make runtime
+mapping faults fatal, but device realize time faults simply cause the
+device to be rejected.  This cannot be moved above
+memory_listener_register().
+
 > +
-> +    return tcet->fd;
-
-
-This would then be:
-
-    return type == SPAPR_IOMMU_TABLE_FD ? tcet->fd : -1;
-
-> +}
+> +    vfio_kvm_device_add_group(group);
 > +
->  static int spapr_tce_table_post_load(void *opaque, int version_id)
->  {
->      sPAPRTCETable *tcet = SPAPR_TCE_TABLE(opaque);
-> @@ -251,6 +258,7 @@ static MemoryRegionIOMMUOps spapr_iommu_ops = {
->      .translate = spapr_tce_translate_iommu,
->      .get_min_page_size = spapr_tce_get_min_page_size,
->      .notify_flag_changed = spapr_tce_notify_flag_changed,
-> +    .get_fd = spapr_tce_get_fd,
->  };
+> +    QLIST_INIT(&container->group_list);
+> +    QLIST_INSERT_HEAD(&space->containers, container, next);
+> +
+> +    group->container = container;
+> +    QLIST_INSERT_HEAD(&container->group_list, group, container_next);
+> +
+>      container->listener = vfio_memory_listener;
 >  
->  static int spapr_tce_table_realize(DeviceState *dev)
+>      memory_listener_register(&container->listener, container->space->as);
+> @@ -1097,16 +1107,9 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+>          goto listener_release_exit;
+>      }
+>  
+> -    container->initialized = true;
+> -
+> -    QLIST_INIT(&container->group_list);
+> -    QLIST_INSERT_HEAD(&space->containers, container, next);
+> -
+> -    group->container = container;
+> -    QLIST_INSERT_HEAD(&container->group_list, group, container_next);
+> -
+>      return 0;
+>  listener_release_exit:
+> +    vfio_kvm_device_del_group(group);
+
+
+Where's the QLIST cleanup?
+
+
+>      vfio_listener_release(container);
+>  
+>  free_container_exit:
+> @@ -1210,8 +1213,6 @@ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp)
+>  
+>      QLIST_INSERT_HEAD(&vfio_group_list, group, next);
+>  
+> -    vfio_kvm_device_add_group(group);
+> -
+>      return group;
+>  
+>  close_fd_exit:
