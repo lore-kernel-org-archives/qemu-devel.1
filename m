@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cshJn-0007X1-BQ
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 22:57:12 -0400
+	(envelope-from <bobby.prani@gmail.com>) id 1cshQV-0000iQ-Nq
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 23:04:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cshJm-0005yT-2S
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 22:57:11 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:56027)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1cshJk-0005w6-Uz
-	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 22:57:09 -0400
-Date: Tue, 28 Mar 2017 13:47:01 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170328024701.GA21068@umbus.fritz.box>
-References: <20170327044030.31306-1-aik@ozlabs.ru>
-	<d474bbee-94aa-d8d2-7369-71058fb8a099@redhat.com>
-	<20170328000628.GA13461@umbus.fritz.box>
-	<20170328053258-mutt-send-email-mst@kernel.org>
+	(envelope-from <bobby.prani@gmail.com>) id 1cshQT-0007kt-TP
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 23:04:07 -0400
+Received: from mail-yw0-x232.google.com ([2607:f8b0:4002:c05::232]:33041)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1cshQT-0007km-ND
+	for qemu-devel@nongnu.org; Mon, 27 Mar 2017 23:04:05 -0400
+Received: by mail-yw0-x232.google.com with SMTP id v76so44956946ywg.0
+	for <qemu-devel@nongnu.org>; Mon, 27 Mar 2017 20:04:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="IJpNTDwzlM2Ie8A6"
-Content-Disposition: inline
-In-Reply-To: <20170328053258-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH qemu] pci: Add missing drop of bus master
- AS reference
+In-Reply-To: <1e67644b-4b30-887e-d329-1848e94c9484@twiddle.net>
+References: <CAJhHMCBwu-pVAyxN+w8SSo19wi3DW3JCRRF-K1Sj9zYqGYkFvQ@mail.gmail.com>
+	<1e67644b-4b30-887e-d329-1848e94c9484@twiddle.net>
+From: Pranith Kumar <bobby.prani@gmail.com>
+Date: Mon, 27 Mar 2017 23:03:34 -0400
+Message-ID: <CAJhHMCBVzqEsEMaNTvUEFx8v-VnbSa7qgQeanVXQTtHRrRW=Cw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] GSoC 2017 Proposal: TCG performance enhancements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,98 +29,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Jason Wang <jasowang@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, "Emilio G. Cota" <cota@braap.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, qemu-devel <qemu-devel@nongnu.org>
 
+Hi Richard,
 
---IJpNTDwzlM2Ie8A6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks for the feedback. Please find some comments inline.
 
-On Tue, Mar 28, 2017 at 05:33:48AM +0300, Michael S. Tsirkin wrote:
-> On Tue, Mar 28, 2017 at 11:06:28AM +1100, David Gibson wrote:
-> > On Mon, Mar 27, 2017 at 05:28:17PM +0200, Paolo Bonzini wrote:
-> > >=20
-> > >=20
-> > > On 27/03/2017 06:40, Alexey Kardashevskiy wrote:
-> > > > The recent introduction of a bus master container added
-> > > > memory_region_add_subregion() into the PCI device registering path =
-but
-> > > > missed memory_region_del_subregion() in the unregistering path leav=
-ing
-> > > > a reference to the root memory region of the new container.
-> > > >=20
-> > > > This adds missing memory_region_del_subregion().
-> > > >=20
-> > > > Fixes: 3716d5902d743 ("pci: introduce a bus master container")
-> > > > Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> > > > ---
-> > > >  hw/pci/pci.c | 2 ++
-> > > >  1 file changed, 2 insertions(+)
-> > > >=20
-> > > > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> > > > index e6b08e1988..bd8043c460 100644
-> > > > --- a/hw/pci/pci.c
-> > > > +++ b/hw/pci/pci.c
-> > > > @@ -869,6 +869,8 @@ static void do_pci_unregister_device(PCIDevice =
-*pci_dev)
-> > > >      pci_dev->bus->devices[pci_dev->devfn] =3D NULL;
-> > > >      pci_config_free(pci_dev);
-> > > > =20
-> > > > +    memory_region_del_subregion(&pci_dev->bus_master_container_reg=
-ion,
-> > > > +                                &pci_dev->bus_master_enable_region=
-);
-> > > >      address_space_destroy(&pci_dev->bus_master_as);
-> > > >  }
-> > > > =20
-> > > >=20
-> > >=20
-> > > My own review fail.  The enable subregion would be deleted when a mem=
-ory
-> > > region is finalized, but the enable subregions is keeping the owner
-> > > alive.  And until the owner is alive, the container region is not
-> > > deleted either.  So there is a reference count cycle, which we need to
-> > > break.
-> > >=20
-> > > It's probably good to revisit commit 2e2b8eb ("memory: allow destroyi=
-ng
-> > > a non-empty MemoryRegion", 2015-10-01).  For 2.9,
-> > >=20
-> > > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> >=20
-> > Merged to ppc-for-2.9.
->=20
-> I have it on pci branch, seems more appropriate.
+On Mon, Mar 27, 2017 at 6:57 AM, Richard Henderson <rth@twiddle.net> wrote:
+>
+> 128MB is really quite large.  I doubt doubling the cache size will really
+> help that much.  That said, it's really quite trivial to make this change,
+> if you'd like to experiment.
+>
+> FWIW, I rarely see TB flushes for alpha -- not one during an entire gcc
+> bootstrap.  Now, this is usually with 4GB ram, which by default implies
+> 512MB translation cache.  But it does mean that, given an ideal guest, TB
+> flushes should not dominate anything at all.
+>
+> If you're seeing multiple flushes during the startup of a browser, your
+> guest must be flushing for other reasons than the code_gen_buffer being
+> full.
+>
 
-Good point.  I've dropped it from my tree.
+This is indeed the case. From commit a9353fe897ca onwards, we are
+flushing the tb cache instead of invalidating a single TB from
+breakpoint_invalidate(). Now that MTTCG added proper tb/mmap locking,
+we can revert that commit. I will do so once the merge windows opens.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+>
+>> * Implement an LRU translation block code cache.
+>
+>
+> The major problem you'll encounter is how to manage allocation in this case.
+>
+> The current mechanism means that it is trivial to not know how much code is
+> going to be generated for a given set of TCG opcodes.  When we reach the
+> high-water mark, we've run out of room.  We then flush everything and start
+> over at the beginning of the buffer.
+>
+> If you manage the cache with an allocator, you'll need to know in advance
+> how much code is going to be generated.  This is going to require that you
+> either (1) severely over-estimate the space required (qemu_ld generates lots
+> more code than just add), (2) severely increase the time required, by
+> generating code twice, or (3) somewhat increase the time required, by
+> generating position-independent code into an external buffer and copying it
+> into place after determining the size.
+>
 
---IJpNTDwzlM2Ie8A6
-Content-Type: application/pgp-signature; name="signature.asc"
+3 seems to the only feasible options, but I am not sure how easy it is
+to generate position-independent code. Do you think it can be done as
+a GSoC project?
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+>
+>> * Avoid consistency overhead for strong memory model guests by generating
+>>   load-acquire and store-release instructions.
+>
+>
+> This is probably required for good performance of the user-only code path,
+> but considering the number of other insns required for the system tlb
+> lookup, I'm surprised that the memory barrier matters.
+>
 
-iQIcBAEBCAAGBQJY2c6jAAoJEGw4ysog2bOSooYP+gNdyl/T9xqZ9Gtkv+iROe/A
-0hBPSsc+tkAMOieDVFARFMYl7esOPyQZ0TKBxMmee6G1L9LLsPIte3hmEB7YGuCt
-wBmutosrKCyEaHe5lAyD2mw1vMrNb5rnmorJ97Y4kpvxM8vRKp+S1JMXRV048EfE
-fMnTvxxtydt7GrjtFU7Yix0sy/isUrpO/9JhEOOGFxHX9I6p1l3h2o5vyb+l4JYP
-NlOWQ3JXbKBPGun96bQTuDfa706EsDFARj02BS8VAlz5gmipldjW9QZB00pgwKHG
-lfmAfW+axBmTQB7D4N3VBzo0e44bCcHdtkiqLNypvjtq262OBxlI/AASsZ1nnEF6
-Bcg71Ff2/CZCZXy2emy+2rpGXOeLk3QlPgW9NaH7lGQuPfVTWraFAAFkt5CRHGe3
-F6/LMmMzisM3Pax3ZMJseQzO/4IbmoxGyfwq0qGrCYwB/c3Nr3o672rxTOhn62mr
-17Kcg7nAt4jwrIGTKALV9DMA7x46qSVbUs6QUtv1KZDBz9bxkhhy/kMmBBnN1yZ6
-cn24Y4tRqJXQJH8xk7weJ34KMmBFgk3XYk9RM71jkwyoK0uspPxtuv9/6qULydNA
-7YdFtWsxq9SYabuaKtk1bxxG04GO9HCKeMNGkapoMim7MgLdOK+09agkxluFhksc
-CITJL6L4muBgWMfTwgzG
-=GjZf
------END PGP SIGNATURE-----
+I know that having some experimental data will help to accurately show
+the benefit here, but my observation from generating store-release
+instruction instead of store+fence is that it helps make the system
+more usable. I will try to collect this data for a linux x86 guest.
 
---IJpNTDwzlM2Ie8A6--
+>
+> I think it would be interesting to place TranslationBlock structures into
+> the same memory block as code_gen_buffer, immediately before the code that
+> implements the TB.
+>
+> Consider what happens within every TB:
+>
+> (1) We have one or more references to the TB address, via exit_tb.
+>
+> For aarch64, this will normally require 2-4 insns.
+>
+> # alpha-softmmu
+> 0x7f75152114:  d0ffb320      adrp x0, #-0x99a000 (addr 0x7f747b8000)
+> 0x7f75152118:  91004c00      add x0, x0, #0x13 (19)
+> 0x7f7515211c:  17ffffc3      b #-0xf4 (addr 0x7f75152028)
+>
+> # alpha-linux-user
+> 0x00569500:  d2800260      mov x0, #0x13
+> 0x00569504:  f2b59820      movk x0, #0xacc1, lsl #16
+> 0x00569508:  f2c00fe0      movk x0, #0x7f, lsl #32
+> 0x0056950c:  17ffffdf      b #-0x84 (addr 0x569488)
+>
+> We would reduce this to one insn, always, if the TB were close by, since the
+> ADR instruction has a range of 1MB.
+>
+> (2) We have zero to two references to a linked TB, via goto_tb.
+>
+> Your stated goal above for eliminating the code_gen_buffer maximum of 128MB
+> can be done in two ways.
+>
+> (2A) Raise the maximum to 2GB.  For this we would align an instruction pair,
+> adrp+add, to compute the address; the following insn would branch.  The
+> update code would write a new destination by modifing the adrp+add with a
+> single 64-bit store.
+>
+> (2B) Eliminate the maximum altogether by referencing the destination
+> directly in the TB.  This is the !USE_DIRECT_JUMP path.  It is normally not
+> used on 64-bit targets because computing the full 64-bit address of the TB
+> is harder, or just as hard, as computing the full 64-bit address of the
+> destination.
+>
+> However, if the TB is nearby, aarch64 can load the address from
+> TB.jmp_target_addr in one insn, with LDR (literal).  This pc-relative load
+> also has a 1MB range.
+>
+> This has the side benefit that it is much quicker to re-link TBs, both in
+> the computation of the code for the destination as well as re-flushing the
+> icache.
+
+This(2B) is the idea I had in mind. If we could have a combination of
+both the above. If address range falls outside the 1MB range, we take
+the penalty and generate the full 64-bit address.
+
+>
+>
+> In addition, I strongly suspect the 1,342,177 entries (153MB) that we
+> currently allocate for tcg_ctx.tb_ctx.tbs, given a 512MB code_gen_buffer, is
+> excessive.
+>
+> If we co-allocate the TB and the code, then we get exactly the right number
+> of TBs allocated with no further effort.
+>
+> There will be some additional memory wastage, since we'll want to keep the
+> code and the data in different cache lines and that means padding, but I
+> don't think that'll be significant.  Indeed, given the above over-allocation
+> will probably still be a net savings.
+>
+
+If you think the project makes sense, I will add it to the GSoC wiki
+so that others can also apply for it. Please let me know if you are
+interested in mentoring it along with Alex.
+
+Thanks,
+-- 
+Pranith
