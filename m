@@ -1,32 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55757)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1csmHD-0001xg-Rc
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:14:52 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1csmIt-00036p-HE
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:16:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1csmHB-0001Uh-7z
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:14:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41842)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1csmHB-0001UO-1j
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:14:49 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E0E60C04B920
-	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 08:14:47 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
-	<1490621195-2228-4-git-send-email-armbru@redhat.com>
-	<20170328021224.GK15423@localhost.localdomain>
-Date: Tue, 28 Mar 2017 10:14:46 +0200
-In-Reply-To: <20170328021224.GK15423@localhost.localdomain> (Jeff Cody's
-	message of "Mon, 27 Mar 2017 22:12:24 -0400")
-Message-ID: <87bmsl4y2x.fsf@dusky.pond.sub.org>
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1csmIp-00027F-GW
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:16:35 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32934
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1csmIp-00026O-9b
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 04:16:31 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2S83p6s027049
+	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 04:16:30 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 29fkw7rwgk-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 04:16:30 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Tue, 28 Mar 2017 09:16:28 +0100
+Date: Tue, 28 Mar 2017 10:16:23 +0200
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <20170322023422.GP10704@bjsdjshi@linux.vnet.ibm.com>
+References: <20170317031743.40128-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170317031743.40128-15-bjsdjshi@linux.vnet.ibm.com>
+	<20170321124716.19f90fd6@t450s.home>
+	<20170322023422.GP10704@bjsdjshi@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH RFC v3 for-2.9 03/11] rbd: Don't limit
- length of parameter values
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170328101623.1b07cf1f.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v4 14/16] docs: add documentation for
+ vfio-ccw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,36 +45,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: kwolf@redhat.com, jdurgin@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
 
-Jeff Cody <jcody@redhat.com> writes:
+On Wed, 22 Mar 2017 10:34:22 +0800
+Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
 
-> On Mon, Mar 27, 2017 at 03:26:27PM +0200, Markus Armbruster wrote:
->> We laboriously enforce parameter values are between one and some
->
-> s/are/that are/
->
-> or maybe just s/are//
+> * Alex Williamson <alex.williamson@redhat.com> [2017-03-21 12:47:16 -0600]:
+> 
+> [...]
+> 
+> > > +vfio-ccw I/O region
+> > > +-------------------
+> > > +
+> > > +An I/O region is used to accept channel program request from user
+> > > +space and store I/O interrupt result for user space to retrieve. The
+> > > +defination of the region is:
+> > > +
+> > > +struct ccw_io_region {
+> > > +#define ORB_AREA_SIZE 12
+> > > +	__u8	orb_area[ORB_AREA_SIZE];
+> > > +#define SCSW_AREA_SIZE 12
+> > > +	__u8	scsw_area[SCSW_AREA_SIZE];
+> > > +#define IRB_AREA_SIZE 96
+> > > +	__u8	irb_area[IRB_AREA_SIZE];
+> > > +	__u32	ret_code;
+> > > +} __packed;
+> > > +
+> > > +While starting an I/O request, orb_area should be filled with the
+> > > +guest ORB, and scsw_area should be filled with the SCSW of the Virtual
+> > > +Subchannel.
+> > > +
+> > > +irb_area stores the I/O result.
+> > > +
+> > > +ret_code stores a return code for each access of the region.
+> Hi Alex,
+> 
+> > 
+> > Pardon if these questions expose my lack of familiarity with S390:
+> > 
+> > So I/O requests are asynchronous, the user is notified via interrupt
+> > when completed, can more than one request be queued at a time?
+> The answer is no. The subchannel will stay in a state that prohibiting
+> from a new request if there is processing for a previous request
+> ongoing. And we need to issue an explit I/O instruction to retrieve and
+> (or) clear the pending interruption before issue another I/O request.
+> 
+> > The communication format doesn't seem like it'd easily support that.
+> > Is it possible?  A future enhancement that we should design for now?
+> As the above statements said, it's not possible.
+> 
+> > 
+> > I'm also a little unclear what sort of I/O a user has access to via
+> > this interface and how the kernel polices that access. For instance,
+> > are multiple tape or disk devices available through a single I/O
+> > channel?
+> No. An I/O subchannel is dedicated to one device, and...
+> 
+> > How does the user configure which devices a user has access to when
+> > creating the vfio-ccw device?
+> ...this mapping is usually determined/configured before the machine
+> startup by the administrtor of the upper level hypervisor. So when
+> creating the vfio-ccw device, we do not configure/modify this mapping.
+> When the guest I/O subchannel driver probing, it will issue a SENSE
+> command on the subchannel to recognize/find what kind of device is
+> behind the subchannel, and then it uses corresponding CCW device driver
+> serving the I/O device.
+> 
+> @Conny, please correct me if my understanding is not right.
 
-What about:
+No, it's fine.
 
-   We laboriously enforce that parameter values are between one and some
+FWIW:
+https://virtualpenguins.blogspot.com/2017/02/channel-io-demystified.html
 
->> arbitrary limit in length.  Only RBD_MAX_IMAGE_NAME_SIZE comes from
->> librbd.h, and I'm not sure it applies.  Where the other limits come
->> from is unclear.
->> 
->> Drop the length checking.  The limits librbd actually imposes must be
->> checked by librbd anyway.
->> 
->> There's one minor complication: BDRVRBDState member name is a
->> fixed-size array.  Depends on the length limit.  Make it a pointer to
->> a dynamically allocated string.
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->
-> Reviewed-by: Jeff Cody <jcody@redhat.com>
+(I plan to write more in the future.)
 
-Thanks!
+> 
+> > 
+> > Otherwise I think the interface looks great.  Thanks,
+> This is good news. :>
+> 
+> Thanks!
+> > 
+> > Alex
+> > 
+> 
