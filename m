@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1ct8XF-0000Z4-0Z
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 04:00:54 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1ct8bA-0001mE-EE
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 04:04:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1ct8XB-0007xX-1l
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 04:00:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52644)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1ct8XA-0007xH-Ro
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 04:00:48 -0400
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <93cb45b7-feca-9340-5fbe-3cc1e60d9e7e@redhat.com>
-Date: Wed, 29 Mar 2017 16:00:37 +0800
+	(envelope-from <pbonzini@redhat.com>) id 1ct8b7-0001OJ-6y
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 04:04:56 -0400
+References: <20170328090530.20052-1-aik@ozlabs.ru>
+	<20170328090530.20052-2-aik@ozlabs.ru>
+	<20170328114829.25656146@t450s.home>
+	<8f7ad62d-0d1c-e917-5b87-f913dab6bb97@ozlabs.ru>
+	<20170328210410.3d6cb5d8@t450s.home>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0c5842ea-3c9f-94ee-27db-e1ee6ae3a449@redhat.com>
+Date: Wed, 29 Mar 2017 10:04:47 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20170328210410.3d6cb5d8@t450s.home>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] issues of region cache and iommu reset
+Subject: Re: [Qemu-devel] [RFC PATCH qemu 1/3] memory: Add get_fd() hook for
+ IOMMU MR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,25 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu devel <qemu-devel@nongnu.org>, Cornelia Huck <cornelia.huck@de.ibm.com>
-
-Hi:
-
-I meet an issue when doing reboot for a guest with two virtio-net-pci 
-cards when iommu is enabled. What happens is:
+To: Alex Williamson <alex.williamson@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
 
-1) vtd was reset first
 
-2) during the reset of virtio-net-pci #1, deletion of msix subregion 
-will cause a commit of all memory listeners
+On 29/03/2017 05:04, Alex Williamson wrote:
+>>> What if we used this as a prototype:
+>>>
+>>> int (*get_fd)(IOMMUFdType type, MemoryRegion *iommu);
+>>>
+>>> And then we defined:
+>>>
+>>> typedef enum {
+>>>     SPAPR_IOMMU_TABLE_FD = 0,
+>>> } IOMMUFdType;  
+>>
+>> Where do I put this enum definition? include/exec/memory.h? It does not
+>> have any mention of any platform yet...
+>  
+> I would assume memory.h, yes.  It seems like the enum is just an
+> abstraction, what does "get fd" mean generically to an IOMMU
+> MemoryRegion?  How can anyone else ever implement that callback if the
+> initial user is assuming that the returned fd is a specific, yet
+> unspecified type.  If the API is "give me an fd for this type of thing"
+> then the IOMMU driver can either provide it or indicate that type is not
+> supported.  There's really no platform knowledge at the memory API
+> level, it's just a type of thing that means something to the driver
+> providing the MemoryRegionIOMMUOps and the caller.
 
-3) virito-net-pci #2's region cache will be update, but since vtd has 
-already been reset, it can't get a valid mappings here
+I think we should move to a QOM hierarchy like
 
+   AbstractMemoryRegion
+      MemoryRegion                  << adds MemoryRegionOps
+      IOMMUMemoryRegion             << adds MemoryRegionIOMMUOps
+        sPAPR_IOMMUMemoryRegion     << adds get_fd
 
-Any ideas on how to fix this? Need region cache be aware of IOMMU/IOTLB 
-state in this case? Or can we simply reset IOMMU as the last one?
+but for now I'm okay with Alex's proposal.
 
-Thanks
+Paolo
