@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ctE3L-0006ht-2k
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 09:54:25 -0400
+	(envelope-from <clg@kaod.org>) id 1ctE3N-0006jk-5c
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 09:54:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ctE3H-0001Js-Tu
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 09:54:23 -0400
-Received: from 3.mo2.mail-out.ovh.net ([46.105.58.226]:37495)
+	(envelope-from <clg@kaod.org>) id 1ctE3J-0001MI-Vu
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 09:54:25 -0400
+Received: from 3.mo2.mail-out.ovh.net ([46.105.58.226]:34809)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ctE3H-0001It-NP
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 09:54:19 -0400
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ctE3J-0001LJ-P0
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 09:54:21 -0400
 Received: from player718.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 00D0069030
-	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 15:54:15 +0200 (CEST)
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 1FD8570362
+	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 15:54:20 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Wed, 29 Mar 2017 15:53:28 +0200
-Message-Id: <1490795611-4762-7-git-send-email-clg@kaod.org>
+Date: Wed, 29 Mar 2017 15:53:29 +0200
+Message-Id: <1490795611-4762-8-git-send-email-clg@kaod.org>
 In-Reply-To: <1490795611-4762-1-git-send-email-clg@kaod.org>
 References: <1490795611-4762-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 6/9] ppc/pnv: add a helper to calculate MMIO
- addresses registers
+Subject: [Qemu-devel] [PATCH v4 7/9] ppc/pnv: extend the machine with a
+ XICSFabric interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,44 +33,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Some controllers (ICP, PSI) have a base register address which is
-calculated using the chip id.
+A XICSFabric QOM interface is used by the XICS layer to manipulate the
+ICP and ICS objects. Let's define the associated handlers for the
+PowerNV machine. All handlers should be defined even if there is no
+ICS under the PowerNV machine yet.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- include/hw/ppc/pnv.h | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ hw/ppc/pnv.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index df98a72006e4..5693ba181d24 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -91,14 +91,24 @@ typedef struct PnvChipClass {
-     OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER9)
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 9505ca7dc09a..57560b09e04e 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -34,6 +34,7 @@
+ #include "qemu/cutils.h"
+ #include "qapi/visitor.h"
 =20
- /*
-- * This generates a HW chip id depending on an index:
-+ * This generates a HW chip id depending on an index, as found on a
-+ * two socket system with dual chip modules :
-  *
-  *    0x0, 0x1, 0x10, 0x11
-  *
-  * 4 chips should be the maximum
-+ *
-+ * TODO: use a machine property to define the chip ids
-  */
- #define PNV_CHIP_HWID(i) ((((i) & 0x3e) << 3) | ((i) & 0x1))
++#include "hw/ppc/xics.h"
+ #include "hw/ppc/pnv_xscom.h"
 =20
-+/*
-+ * Converts back a HW chip id to an index. This is useful to calculate
-+ * the MMIO addresses of some controllers which depend on the chip id.
-+ */
-+#define PNV_CHIP_INDEX(chip)                                    \
-+    (((chip)->chip_id >> 2) * 2 + ((chip)->chip_id & 0x3))
+ #include "hw/isa/isa.h"
+@@ -739,6 +740,39 @@ static const TypeInfo pnv_chip_info =3D {
+     .abstract      =3D true,
+ };
+=20
++/* The XICS layer needs valid handlers for the ICS objects also */
++static ICSState *pnv_ics_get(XICSFabric *xi, int irq)
++{
++    return NULL;
++}
 +
- #define TYPE_POWERNV_MACHINE       MACHINE_TYPE_NAME("powernv")
- #define POWERNV_MACHINE(obj) \
-     OBJECT_CHECK(PnvMachineState, (obj), TYPE_POWERNV_MACHINE)
++static void pnv_ics_resend(XICSFabric *xi)
++{
++}
++
++static PowerPCCPU *ppc_get_vcpu_by_pir(int pir)
++{
++    CPUState *cs;
++
++    CPU_FOREACH(cs) {
++        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
++        CPUPPCState *env =3D &cpu->env;
++
++        if (env->spr_cb[SPR_PIR].default_value =3D=3D pir) {
++            return cpu;
++        }
++    }
++
++    return NULL;
++}
++
++static ICPState *pnv_icp_get(XICSFabric *xi, int pir)
++{
++    PowerPCCPU *cpu =3D ppc_get_vcpu_by_pir(pir);
++
++    return cpu ? ICP(cpu->intc) : NULL;
++}
++
+ static void pnv_get_num_chips(Object *obj, Visitor *v, const char *name,
+                               void *opaque, Error **errp)
+ {
+@@ -789,6 +823,7 @@ static void powernv_machine_class_props_init(ObjectCl=
+ass *oc)
+ static void powernv_machine_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc =3D MACHINE_CLASS(oc);
++    XICSFabricClass *xic =3D XICS_FABRIC_CLASS(oc);
+=20
+     mc->desc =3D "IBM PowerNV (Non-Virtualized)";
+     mc->init =3D ppc_powernv_init;
+@@ -799,6 +834,9 @@ static void powernv_machine_class_init(ObjectClass *o=
+c, void *data)
+     mc->no_parallel =3D 1;
+     mc->default_boot_order =3D NULL;
+     mc->default_ram_size =3D 1 * G_BYTE;
++    xic->icp_get =3D pnv_icp_get;
++    xic->ics_get =3D pnv_ics_get;
++    xic->ics_resend =3D pnv_ics_resend;
+=20
+     powernv_machine_class_props_init(oc);
+ }
+@@ -809,6 +847,10 @@ static const TypeInfo powernv_machine_info =3D {
+     .instance_size =3D sizeof(PnvMachineState),
+     .instance_init =3D powernv_machine_initfn,
+     .class_init    =3D powernv_machine_class_init,
++    .interfaces =3D (InterfaceInfo[]) {
++        { TYPE_XICS_FABRIC },
++        { },
++    },
+ };
+=20
+ static void powernv_machine_register_types(void)
 --=20
 2.7.4
