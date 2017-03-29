@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ct4YE-0002M4-4s
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 23:45:39 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1ct4YF-0002M9-Kv
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 23:45:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ct4YD-0000mx-6x
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 23:45:38 -0400
-Date: Wed, 29 Mar 2017 14:35:42 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1ct4YC-0000mj-Ii
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 23:45:39 -0400
+Date: Wed, 29 Mar 2017 14:42:02 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170329033542.GP21068@umbus.fritz.box>
+Message-ID: <20170329034202.GQ21068@umbus.fritz.box>
 References: <20170328090530.20052-1-aik@ozlabs.ru>
-	<20170328090530.20052-2-aik@ozlabs.ru>
-	<20170328114829.25656146@t450s.home>
+	<20170328090530.20052-3-aik@ozlabs.ru>
+	<20170328114836.63dcde23@t450s.home>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="4IFtMBbmeqbTM/ox"
+	protocol="application/pgp-signature"; boundary="zywvytGCXzdVpkje"
 Content-Disposition: inline
-In-Reply-To: <20170328114829.25656146@t450s.home>
-Subject: Re: [Qemu-devel] [RFC PATCH qemu 1/3] memory: Add get_fd() hook for
- IOMMU MR
+In-Reply-To: <20170328114836.63dcde23@t450s.home>
+Subject: Re: [Qemu-devel] [RFC PATCH qemu 2/3] vfio-pci: Reorder
+ group-to-container attaching
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,103 +30,132 @@ To: Alex Williamson <alex.williamson@redhat.com>
 Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---4IFtMBbmeqbTM/ox
+--zywvytGCXzdVpkje
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 28, 2017 at 11:48:29AM -0600, Alex Williamson wrote:
-> On Tue, 28 Mar 2017 20:05:28 +1100
+On Tue, Mar 28, 2017 at 11:48:36AM -0600, Alex Williamson wrote:
+> On Tue, 28 Mar 2017 20:05:29 +1100
 > Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 >=20
+> > At the moment VFIO PCI device initialization works as follows:
+> > vfio_realize
+> > 	vfio_get_group
+> > 		vfio_connect_container
+> > 			register memory listeners (1)
+> > 			update QEMU groups lists
+> > 		vfio_kvm_device_add_group
+> >=20
+> > Then (example for pseries) the machine reset hook triggers region_add()
+> > for all regions where listeners from (1) are listening:
+> >=20
+> > ppc_spapr_reset
+> > 	spapr_phb_reset
+> > 		spapr_tce_table_enable
+> > 			memory_region_add_subregion
+> > 				vfio_listener_region_add
+> > 					vfio_spapr_create_window
+> >=20
+> > This scheme works fine until we need to handle VFIO PCI device hotplug
+> > _and_ we want to enable in-kernel acceleration on, i.e. after PCI hotpl=
+ug
+> > we need a place to call
+> > ioctl(vfio_kvm_device_fd, KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE).
+> > Since the ioctl needs a LIOBN fd (from sPAPRTCETable) and a IOMMU group=
+ fd
+> > (from VFIOGroup), vfio_listener_region_add() seems to be the only place
+> > for this ioctl().
+> >=20
+> > However this only works during boot time because the machine reset
+> > happens strictly after all devices are finalized. When hotplug happens,
+> > vfio_listener_region_add() is called when a memory listener is register=
+ed
+> > but when this happens:
+> > 1. new group is not added to the container->group_list yet;
+> > 2. VFIO KVM device is unaware of the new IOMMU group.
+> >=20
+> > This moves bits around to have all necessary VFIO infrastructure
+> > in place for both initial startup and hotplug cases.
+> >=20
 > > Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 > > ---
-> >  include/exec/memory.h | 2 ++
-> >  hw/ppc/spapr_iommu.c  | 8 ++++++++
-> >  2 files changed, 10 insertions(+)
+> >  hw/vfio/common.c | 21 +++++++++++----------
+> >  1 file changed, 11 insertions(+), 10 deletions(-)
 > >=20
-> > diff --git a/include/exec/memory.h b/include/exec/memory.h
-> > index e39256ad03..925c10b35b 100644
-> > --- a/include/exec/memory.h
-> > +++ b/include/exec/memory.h
-> > @@ -174,6 +174,8 @@ struct MemoryRegionIOMMUOps {
-> >      void (*notify_flag_changed)(MemoryRegion *iommu,
-> >                                  IOMMUNotifierFlag old_flags,
-> >                                  IOMMUNotifierFlag new_flags);
-> > +    /* Returns a kernel fd for IOMMU */
-> > +    int (*get_fd)(MemoryRegion *iommu);
->=20
-> What if we used this as a prototype:
->=20
-> int (*get_fd)(IOMMUFdType type, MemoryRegion *iommu);
->=20
-> And then we defined:
->=20
-> typedef enum {
->     SPAPR_IOMMU_TABLE_FD =3D 0,
-> } IOMMUFdType;
-
-Are we expecting any new types of fd?  Maybe it would be simpler just
-to name this spapr_tce_fd() or something more specific, and only
-generalize if we really need it for another fd type.
-
->=20
-> Such that you're actually asking the IOMMUOps for a specific type of FD
-> and it either has it or not, so the caller doesn't need to assume what
-> it is they get back.
->=20
-> Furthermore, add:
->=20
-> int memory_region_iommu_get_fd(IOMMUFdType type, MemoryRegion *mr)
-> {
->     assert(memory_region_is_iommu(mr));
->=20
->     if (mr->iommu_ops && mr->iommu_ops->get_fd) {
->         return mr->iommu_ops->get_fd(type, mr);
->     }
->=20
->     return -1;
-> }
->=20
-> >  };
-> >
->=20
-> This should be two patches, patch 1 above, patch 2 below
->  =20
-> >  typedef struct CoalescedMemoryRange CoalescedMemoryRange;
-> > diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
-> > index 9e30e148d6..b61c8f053e 100644
-> > --- a/hw/ppc/spapr_iommu.c
-> > +++ b/hw/ppc/spapr_iommu.c
-> > @@ -170,6 +170,13 @@ static void spapr_tce_notify_flag_changed(MemoryRe=
-gion *iommu,
+> > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> > index f3ba9b9007..c75c7594d5 100644
+> > --- a/hw/vfio/common.c
+> > +++ b/hw/vfio/common.c
+> > @@ -1086,6 +1086,16 @@ static int vfio_connect_container(VFIOGroup *gro=
+up, AddressSpace *as,
+> >          goto free_container_exit;
 > >      }
-> >  }
 > > =20
-> > +static int spapr_tce_get_fd(MemoryRegion *iommu)
-> > +{
-> > +    sPAPRTCETable *tcet =3D container_of(iommu, sPAPRTCETable, iommu);
+> > +    container->initialized =3D true;
+>=20
+> This ignores the purpose of this variable, which is to make runtime
+> mapping faults fatal, but device realize time faults simply cause the
+> device to be rejected.  This cannot be moved above
+> memory_listener_register().
+
+Apart from that, the rest of the code motion looks ok, though.  Even
+if it weren't for the hotplug case, have the container/group
+more-or-less initialized before registering the listener makes more
+logical sense to me.
+
+>=20
 > > +
-> > +    return tcet->fd;
->=20
->=20
-> This would then be:
->=20
->     return type =3D=3D SPAPR_IOMMU_TABLE_FD ? tcet->fd : -1;
->=20
-> > +}
+> > +    vfio_kvm_device_add_group(group);
 > > +
-> >  static int spapr_tce_table_post_load(void *opaque, int version_id)
-> >  {
-> >      sPAPRTCETable *tcet =3D SPAPR_TCE_TABLE(opaque);
-> > @@ -251,6 +258,7 @@ static MemoryRegionIOMMUOps spapr_iommu_ops =3D {
-> >      .translate =3D spapr_tce_translate_iommu,
-> >      .get_min_page_size =3D spapr_tce_get_min_page_size,
-> >      .notify_flag_changed =3D spapr_tce_notify_flag_changed,
-> > +    .get_fd =3D spapr_tce_get_fd,
-> >  };
+> > +    QLIST_INIT(&container->group_list);
+> > +    QLIST_INSERT_HEAD(&space->containers, container, next);
+> > +
+> > +    group->container =3D container;
+> > +    QLIST_INSERT_HEAD(&container->group_list, group, container_next);
+> > +
+> >      container->listener =3D vfio_memory_listener;
 > > =20
-> >  static int spapr_tce_table_realize(DeviceState *dev)
+> >      memory_listener_register(&container->listener, container->space->a=
+s);
+> > @@ -1097,16 +1107,9 @@ static int vfio_connect_container(VFIOGroup *gro=
+up, AddressSpace *as,
+> >          goto listener_release_exit;
+> >      }
+> > =20
+> > -    container->initialized =3D true;
+> > -
+> > -    QLIST_INIT(&container->group_list);
+> > -    QLIST_INSERT_HEAD(&space->containers, container, next);
+> > -
+> > -    group->container =3D container;
+> > -    QLIST_INSERT_HEAD(&container->group_list, group, container_next);
+> > -
+> >      return 0;
+> >  listener_release_exit:
+> > +    vfio_kvm_device_del_group(group);
+>=20
+>=20
+> Where's the QLIST cleanup?
+
+Moving it does introduce more intermediate cleanup cases which need to
+be handled, though..
+
+>=20
+>=20
+> >      vfio_listener_release(container);
+> > =20
+> >  free_container_exit:
+> > @@ -1210,8 +1213,6 @@ VFIOGroup *vfio_get_group(int groupid, AddressSpa=
+ce *as, Error **errp)
+> > =20
+> >      QLIST_INSERT_HEAD(&vfio_group_list, group, next);
+> > =20
+> > -    vfio_kvm_device_add_group(group);
+> > -
+> >      return group;
+> > =20
+> >  close_fd_exit:
 >=20
 
 --=20
@@ -135,25 +164,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---4IFtMBbmeqbTM/ox
+--zywvytGCXzdVpkje
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJY2yuOAAoJEGw4ysog2bOSxXUQAMfg9f/Ffhbu27gO2o3WUM3t
-JHfMCjoq5hsuC8aian3JXo+cnF0/bi24p468gqCmBi4oCfCfUag/q0Fc9N8QX86T
-U/IW8BPMdMmS+OYavhwdxBVyeUwVJtUr01Jxut2yMKRRhIEzxvkH3awKsLd4q+Ay
-TgrIJEGUarGmqSeGnE0uSQid7PHZeanpK5DBCPtCHhFGh/XAQ2DxjAp8pOYBb2a3
-I/4IzvEPQ8VGKN7OWnmok195S1jhdMkTs2NL0Tlb1cRBQ2M5o0waZU4qGIU6t4kq
-kJdZEjD2DdEsnMd9xutDeayMAgPOjCFhcqknTzNL+9RX6gtd6ZlOqtGZKim7+6ri
-RsExWOPUWv4PnDgBP3l1xbOPGdFEe21/VqX8p2cMhG/rqYnt6H5oq71xJ3xGuHIJ
-uq0qHqjPPw5CTRVEJr6XVRlNVz9ArQZaQ+6i0eZz71ly3mCWL0VI52PTVjLBqXwE
-yFihQnx3Y1EI6UgCIplZsPPyBGWVCOH4ty4wdIFVf8F/A3lUOjWleuRzTuP34Fq0
-F1c4FitQeC8Qbio360qnRfJUwGZq3AiyGMlsueXaPvERET/JdTsIhOELGZaYQJuC
-1feb3batkCxyLpB+kMQad8BCb9IlgaaDQE0vd6ut7n7rpZN//8lAtscChVT7tOOT
-JRHqWrkbAMJZYUty6bz3
-=nlDk
+iQIcBAEBCAAGBQJY2y0KAAoJEGw4ysog2bOSMAUP/i3S77Z+Z7/6s3nNA6Sodd0J
+83rYKZyd7HVc80zCR0J1Y39NTRwk2u20nNYG8/VjIKiJMv2bA+GYJ9CGEp3SYx6N
+20WZGrQRdvF4CGBBzEnpwXf5nk1ObjbsX8nDfBvl2vJeUAIku7krgopyNuWxTT2t
+duBhQzQ3gn8jCeUDgGdQJZeTNPFDECTwGQU7pk21rAqSHLINW2ub8GGv2bkJnLlY
+uYjWwK268qVwrjqshbgKGlLLDsXCsGXqDqI5IleOXgve6MN8F/6QcdRnjLEGrMmU
+tY9trVQp/lpIrsSi71u1Hv8wYNhPz/Z6xC2cph0mUJ1YxN2uhAJcFe2qyJYACu4l
+KO6vxtqqfRDW2VWegNfF5sCX0Og48oOC2GyNpRlGrckj1wY05FxS4FMW5kPmq+zv
+Q/JxCS0KuoB9Ea2uAw58QX16VfUYpHNdyKCQraInWzYzCbSHaBjPWPYlbX1Zf2cV
+i5Ex+hL2flzIDLw9YkUTIaKcQRkxhtiuIEajBWz4/stUr93v8OwOWS+NmkQLscl6
+jYtDd0hbV6VPrtIcWG3jEGHyspaVDb7xVxJLGOTxPSTngrBnAZNzWNqBxhkSx/sL
+ceBI9/YT/PktU9pntKEnWXWu9cqerQ2Rq6T6fCn7Nd2X0cpersOMDSHaZz6osNm1
+1mgZsN4940USNyfzrvd8
+=Ncl+
 -----END PGP SIGNATURE-----
 
---4IFtMBbmeqbTM/ox--
+--zywvytGCXzdVpkje--
