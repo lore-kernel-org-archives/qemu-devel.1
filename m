@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ctJUd-0001jk-H7
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:42:56 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1ctJV4-0001vm-40
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:43:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ctJUc-0008UA-QP
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:42:55 -0400
-References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
-	<1490805920-17029-7-git-send-email-armbru@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <dbf432c4-405c-9197-3795-8f2600edaf38@redhat.com>
-Date: Wed, 29 Mar 2017 21:42:44 +0200
-MIME-Version: 1.0
-In-Reply-To: <1490805920-17029-7-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="am9LrwvnP2FNxWVdP7TtX2jjDtngRh9KQ"
-Subject: Re: [Qemu-devel] [for-2.9 6/8] qapi-schema: SocketAddressFlat
- variants 'vsock' and 'fd'
+	(envelope-from <ehabkost@redhat.com>) id 1ctJV3-00007L-2S
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:43:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45250)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ctJV2-000078-Sd
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:43:20 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D712E7F3EC
+	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 19:43:19 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Wed, 29 Mar 2017 16:41:41 -0300
+Message-Id: <20170329194148.19015-3-ehabkost@redhat.com>
+In-Reply-To: <20170329194148.19015-1-ehabkost@redhat.com>
+References: <20170329194148.19015-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [RFC v2 2/9] Simplify code using *MACHINE_GET_CLASS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +29,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, eblake@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---am9LrwvnP2FNxWVdP7TtX2jjDtngRh9KQ
-From: Max Reitz <mreitz@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp,
- namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, eblake@redhat.com,
- pbonzini@redhat.com
-Message-ID: <dbf432c4-405c-9197-3795-8f2600edaf38@redhat.com>
-Subject: Re: [for-2.9 6/8] qapi-schema: SocketAddressFlat variants 'vsock' and
- 'fd'
-References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
- <1490805920-17029-7-git-send-email-armbru@redhat.com>
-In-Reply-To: <1490805920-17029-7-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+There's no need to use MACHINE_GET_CLASS/object_get_class()
+followed by a *MACHINE_CLASS cast. Use *MACHINE_GET_CLASS()
+directly.
 
-On 29.03.2017 18:45, Markus Armbruster wrote:
-> Note that the new variants are impossible in qemu_gluster_glfs_init(),
-> because the gconf->server can only come from qemu_gluster_parse_uri()
-> or qemu_gluster_parse_json(), and neither can create anything but
-> 'tcp' or 'unix'.
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ hw/core/machine.c     | 3 +--
+ hw/pci/pci.c          | 3 +--
+ hw/xen/xen_backend.c  | 3 +--
+ target/i386/machine.c | 3 +--
+ 4 files changed, 4 insertions(+), 8 deletions(-)
 
-s/tcp/inet/
-
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  block/gluster.c  |  2 ++
->  qapi-schema.json | 19 ++++++++-----------
->  2 files changed, 10 insertions(+), 11 deletions(-)
->=20
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---am9LrwvnP2FNxWVdP7TtX2jjDtngRh9KQ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljcDjQSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AHNEIAILlXJWM29Kb9TbtC2EGkM7Q8iFbks/q
-DmPl2Gy4WRYqEAzh2XClU2Mk4i2uDmOKMVbN34JSXHm66ESA8fb/ryD2hz8LhiqQ
-ljcFFlALJtJDO2DGe0Vn5jaMdNyZwQyzv7JSmTRUB//40KODKl39uGDaN92G2Twd
-hsGZq7WvVAzeTbWhr//onJjeDI6TFIi2ytdrvLLGoWoPZpak2e1BuFdjc9tO0A2y
-HTKHguKlhQCtwUScvQ/y9gf3kMS+NjyuYNLqjOT6aiJDY4wwNxv99x2G9ogteTun
-FoH4wgQ1IOBoRvLagi4E+CX3H41liTi0xz+SeFHFqP5Kk3Vlbb0Mdvg=
-=ORh0
------END PGP SIGNATURE-----
-
---am9LrwvnP2FNxWVdP7TtX2jjDtngRh9KQ--
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index ada9eea483..6aa452a792 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -342,8 +342,7 @@ static void error_on_sysbus_device(SysBusDevice *sbdev, void *opaque)
+ static void machine_init_notify(Notifier *notifier, void *data)
+ {
+     Object *machine = qdev_get_machine();
+-    ObjectClass *oc = object_get_class(machine);
+-    MachineClass *mc = MACHINE_CLASS(oc);
++    MachineClass *mc = MACHINE_GET_CLASS(machine);
+ 
+     if (mc->has_dynamic_sysbus) {
+         /* Our machine can handle dynamic sysbus devices, we're all good */
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index e6b08e1988..9151057bf5 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -1195,8 +1195,7 @@ static pcibus_t pci_bar_address(PCIDevice *d,
+     int bar = pci_bar(d, reg);
+     uint16_t cmd = pci_get_word(d->config + PCI_COMMAND);
+     Object *machine = qdev_get_machine();
+-    ObjectClass *oc = object_get_class(machine);
+-    MachineClass *mc = MACHINE_CLASS(oc);
++    MachineClass *mc = MACHINE_GET_CLASS(machine);
+     bool allow_0_address = mc->pci_allow_0_address;
+ 
+     if (type & PCI_BASE_ADDRESS_SPACE_IO) {
+diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
+index 6c21c37d68..6e530681f4 100644
+--- a/hw/xen/xen_backend.c
++++ b/hw/xen/xen_backend.c
+@@ -553,8 +553,7 @@ err:
+ static void xen_set_dynamic_sysbus(void)
+ {
+     Object *machine = qdev_get_machine();
+-    ObjectClass *oc = object_get_class(machine);
+-    MachineClass *mc = MACHINE_CLASS(oc);
++    MachineClass *mc = MACHINE_GET_CLASS(machine);
+ 
+     mc->has_dynamic_sysbus = true;
+ }
+diff --git a/target/i386/machine.c b/target/i386/machine.c
+index 78ae2f986b..5b9eb3a2f6 100644
+--- a/target/i386/machine.c
++++ b/target/i386/machine.c
+@@ -893,8 +893,7 @@ static bool tsc_khz_needed(void *opaque)
+ {
+     X86CPU *cpu = opaque;
+     CPUX86State *env = &cpu->env;
+-    MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
+-    PCMachineClass *pcmc = PC_MACHINE_CLASS(mc);
++    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(qdev_get_machine());
+     return env->tsc_khz && pcmc->save_tsc_khz;
+ }
+ 
+-- 
+2.11.0.259.g40922b1
