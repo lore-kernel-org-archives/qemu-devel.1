@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ctIYL-0008Hk-Ex
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 14:42:42 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1ctIZS-0000aM-Pc
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 14:43:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ctIYK-0003o8-Ls
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 14:42:41 -0400
-Date: Wed, 29 Mar 2017 19:42:16 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170329184216.GC18142@stefanha-x1.localdomain>
-References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
-	<1490805920-17029-3-git-send-email-armbru@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1ctIZQ-0004k8-6I
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 14:43:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45270)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ctIZP-0004jY-UI
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 14:43:48 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EAB07C05AA42
+	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 18:43:46 +0000 (UTC)
+Date: Wed, 29 Mar 2017 19:43:43 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170329184343.GH2501@work-vm>
+References: <20170323204544.12015-1-quintela@redhat.com>
+	<20170323204544.12015-44-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="8NvZYKFJsRX2Djef"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1490805920-17029-3-git-send-email-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [for-2.9 2/8] char: Fix socket with "type":
- "vsock" address
+In-Reply-To: <20170323204544.12015-44-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 43/51] ram: ram_discard_range() don't use
+ the mis parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,56 +34,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, pbonzini@redhat.com, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+* Juan Quintela (quintela@redhat.com) wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
---8NvZYKFJsRX2Djef
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Oh yeh, so it doesn't.
 
-On Wed, Mar 29, 2017 at 06:45:14PM +0200, Markus Armbruster wrote:
-> Watch this:
->=20
->     $ qemu-system-x86_64 -nodefaults -S -display none -qmp stdio
->     {"QMP": {"version": {"qemu": {"micro": 91, "minor": 8, "major": 2}, "=
-package": " (v2.8.0-1195-gf84141e-dirty)"}, "capabilities": []}}
->     { "execute": "qmp_capabilities" }
->     {"return": {}}
->     { "execute": "chardev-add", "arguments": { "id": "chr0", "backend": {=
- "type": "socket", "data": { "addr": { "type": "vsock", "data": { "cid": "C=
-ID", "port": "P" }}}}}}
->     Aborted (core dumped)
->=20
-> Crashes because SocketAddress_to_str() is blissfully unaware of
-> SOCKET_ADDRESS_KIND_VSOCK.  Fix that.  Pick the output format to match
-> socket_parse(), just like the existing formats.
->=20
-> Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
 > ---
->  chardev/char-socket.c | 4 ++++
->  1 file changed, 4 insertions(+)
-
-Thanks for the fix!
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---8NvZYKFJsRX2Djef
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJY3AAIAAoJEJykq7OBq3PI2zwH/1BpOwEx7E2CRdIocmt/Civi
-KRgj+GNiXJ4PXG18ejAodqf/L6VrqQuAt6TDvChLix8pfb0qXmMbpRNI+zxNZpoX
-c5KlbPZ3gWalNVVzH2J/6tyamrgjd6kRTI8YjYMB7F3A43AcnTZPdKPR9hnv9mxB
-7LhDDrsM+eNCXAkB41AUZb/ucoZijQ5Ymb7qov38n91YFAVcfMH7FWoG7Aw2Gzwg
-3+6vM5MyZg98HFZ2t6wpE1LkM0wQYtBX+WVKTfQCN1ZzMbrcKFQ3khvPN+XtdTE1
-xcG3Nye6t7Z89kH4OlceinQWewf9e5c0+eARHJiPpDo+/AWuEudJ4bq6KHWoAkg=
-=h+9s
------END PGP SIGNATURE-----
-
---8NvZYKFJsRX2Djef--
+>  include/migration/migration.h | 3 +--
+>  migration/postcopy-ram.c      | 6 ++----
+>  migration/ram.c               | 9 +++------
+>  migration/savevm.c            | 3 +--
+>  4 files changed, 7 insertions(+), 14 deletions(-)
+> 
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index 90849a5..39a8e7e 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -270,8 +270,7 @@ void ram_debug_dump_bitmap(unsigned long *todump, bool expected);
+>  /* For outgoing discard bitmap */
+>  int ram_postcopy_send_discard_bitmap(MigrationState *ms);
+>  /* For incoming postcopy discard */
+> -int ram_discard_range(MigrationIncomingState *mis, const char *block_name,
+> -                      uint64_t start, size_t length);
+> +int ram_discard_range(const char *block_name, uint64_t start, size_t length);
+>  int ram_postcopy_incoming_init(MigrationIncomingState *mis);
+>  void ram_postcopy_migrated_memory_release(MigrationState *ms);
+>  
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index 8756364..85fd8d7 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -213,8 +213,6 @@ out:
+>  static int init_range(const char *block_name, void *host_addr,
+>                        ram_addr_t offset, ram_addr_t length, void *opaque)
+>  {
+> -    MigrationIncomingState *mis = opaque;
+> -
+>      trace_postcopy_init_range(block_name, host_addr, offset, length);
+>  
+>      /*
+> @@ -223,7 +221,7 @@ static int init_range(const char *block_name, void *host_addr,
+>       * - we're going to get the copy from the source anyway.
+>       * (Precopy will just overwrite this data, so doesn't need the discard)
+>       */
+> -    if (ram_discard_range(mis, block_name, 0, length)) {
+> +    if (ram_discard_range(block_name, 0, length)) {
+>          return -1;
+>      }
+>  
+> @@ -271,7 +269,7 @@ static int cleanup_range(const char *block_name, void *host_addr,
+>   */
+>  int postcopy_ram_incoming_init(MigrationIncomingState *mis, size_t ram_pages)
+>  {
+> -    if (qemu_ram_foreach_block(init_range, mis)) {
+> +    if (qemu_ram_foreach_block(init_range, NULL)) {
+>          return -1;
+>      }
+>  
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 9772fd8..83c749c 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -784,7 +784,7 @@ static void ram_release_pages(const char *rbname, uint64_t offset, int pages)
+>          return;
+>      }
+>  
+> -    ram_discard_range(NULL, rbname, offset, pages << TARGET_PAGE_BITS);
+> +    ram_discard_range(rbname, offset, pages << TARGET_PAGE_BITS);
+>  }
+>  
+>  /**
+> @@ -1602,7 +1602,7 @@ void ram_postcopy_migrated_memory_release(MigrationState *ms)
+>  
+>          while (run_start < range) {
+>              unsigned long run_end = find_next_bit(bitmap, range, run_start + 1);
+> -            ram_discard_range(NULL, block->idstr, run_start << TARGET_PAGE_BITS,
+> +            ram_discard_range(block->idstr, run_start << TARGET_PAGE_BITS,
+>                                (run_end - run_start) << TARGET_PAGE_BITS);
+>              run_start = find_next_zero_bit(bitmap, range, run_end + 1);
+>          }
+> @@ -1942,15 +1942,12 @@ int ram_postcopy_send_discard_bitmap(MigrationState *ms)
+>   *
+>   * Returns zero on success
+>   *
+> - * @mis: current migration incoming state
+>   * @rbname: name of the RAMBLock of the request. NULL means the
+>   *          same that last one.
+>   * @start: RAMBlock starting page
+>   * @length: RAMBlock size
+>   */
+> -int ram_discard_range(MigrationIncomingState *mis,
+> -                      const char *rbname,
+> -                      uint64_t start, size_t length)
+> +int ram_discard_range(const char *rbname, uint64_t start, size_t length)
+>  {
+>      int ret = -1;
+>  
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index bbf055d..7cf387f 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1479,8 +1479,7 @@ static int loadvm_postcopy_ram_handle_discard(MigrationIncomingState *mis,
+>          block_length = qemu_get_be64(mis->from_src_file);
+>  
+>          len -= 16;
+> -        int ret = ram_discard_range(mis, ramid, start_addr,
+> -                                    block_length);
+> +        int ret = ram_discard_range(ramid, start_addr, block_length);
+>          if (ret) {
+>              return ret;
+>          }
+> -- 
+> 2.9.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
