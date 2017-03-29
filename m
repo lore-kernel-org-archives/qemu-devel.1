@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ctE2v-0006LJ-CI
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 09:53:58 -0400
+	(envelope-from <clg@kaod.org>) id 1ctE2z-0006NP-JC
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 09:54:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ctE2s-00016I-4H
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 09:53:57 -0400
-Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:51618)
+	(envelope-from <clg@kaod.org>) id 1ctE2y-00019Q-OD
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 09:54:01 -0400
+Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:60656)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ctE2r-00015q-Tp
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 09:53:54 -0400
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ctE2y-00018h-IP
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 09:54:00 -0400
 Received: from player718.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 5C25C78B6A
-	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 15:53:51 +0200 (CEST)
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 719B478B72
+	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 15:53:59 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Wed, 29 Mar 2017 15:53:22 +0200
-Message-Id: <1490795611-4762-1-git-send-email-clg@kaod.org>
+Date: Wed, 29 Mar 2017 15:53:24 +0200
+Message-Id: <1490795611-4762-3-git-send-email-clg@kaod.org>
+In-Reply-To: <1490795611-4762-1-git-send-email-clg@kaod.org>
+References: <1490795611-4762-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 0/9] ppc/pnv: interrupt controller (POWER8)
+Subject: [Qemu-devel] [PATCH v4 2/9] spapr: move the IRQ server number
+ mapping under the machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,83 +33,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Hello,
+This is the second step to abstract the IRQ 'server' number of the
+XICS layer. Now that the prereq cleanups have been done in the
+previous patch, we can move down the 'cpu_dt_id' to 'cpu_index'
+mapping in the sPAPR machine handler.
 
-Here is a series adding support for the interrupt controller as found
-on a POWER8 system. POWER9 uses a different interrupt controller
-called XIVE, still to be worked on.
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/intc/xics_spapr.c    | 5 ++---
+ hw/ppc/spapr.c          | 3 ++-
+ hw/ppc/spapr_cpu_core.c | 2 +-
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-The initial patches are more cleanups of the XICS layer which move the
-IRQ 'server' number mapping under the machine handlers.
-
-A new PnvICPState object based on MMIOs, which is specific to PowerNV,
-is introduced in XICS. These ICP objects are created for each thread
-of a core and linked to the associated PowerPCCPU object.
-
-Finally, to make use of the XICS layer, the PowerNV machine is
-extended with a QOM XICSFabric interface and with a global memory
-region acting as the Interrupt Management area.
-
-
-To test, grab a kernel and a rootfs image here :
-
-  https://openpower.xyz/job/openpower-op-build/distro=3Dubuntu,target=3Dp=
-almetto/lastSuccessfulBuild/artifact/images/zImage.epapr
-  https://openpower.xyz/job/openpower-op-build/distro=3Dubuntu,target=3Dp=
-almetto/lastSuccessfulBuild/artifact/images/rootfs.cpio.xz
-
-The full patchset is available here :
-
-   https://github.com/legoater/qemu/commits/powernv-ipmi-2.9
-
-Thanks,
-
-C.
-
-Changes since v3:
- - renamed 'icp' backlink to a more generic name 'intc'
- - removed the array of ICP objects from under the PowerNV machine and
-   handled the allocation of the PnvICPState object for each thread
-   when the PowerPCCPU object is realized.
-
-Changes since v2:
-
- - removed the ICS list from the PowerNV machine
- - changed the 'icp' backlink type to be an 'Object'
-
-Changes since v1:
-
- - introduced PnvICPState to hold the ICP memory region
- - handled pir-to-cpu_index mapping under the machine icp_get handler
- - added multichip support
- - removed ics_eoi handler (came from a bug in PHB3_MSI)
- - kept PSI and OCC model for later, when this part is done.
-
-C=C3=A9dric Le Goater (9):
-  ppc/xics: introduce an 'intc' backlink under PowerPCCPU
-  spapr: move the IRQ server number mapping under the machine
-  ppc/xics: add a realize() handler to ICPStateClass
-  ppc/pnv: add a PnvICPState object
-  ppc/pnv: create the ICP object under PnvCore
-  ppc/pnv: add a helper to calculate MMIO addresses registers
-  ppc/pnv: extend the machine with a XICSFabric interface
-  ppc/pnv: extend the machine with a InterruptStatsProvider interface
-  ppc/pnv: add memory regions for the ICP registers
-
- hw/intc/Makefile.objs   |   1 +
- hw/intc/xics.c          |  11 ++-
- hw/intc/xics_pnv.c      | 180 ++++++++++++++++++++++++++++++++++++++++++=
-++++++
- hw/intc/xics_spapr.c    |  25 ++-----
- hw/ppc/pnv.c            | 142 ++++++++++++++++++++++++++++++++++++++
- hw/ppc/pnv_core.c       |  30 ++++++--
- hw/ppc/spapr.c          |   3 +-
- hw/ppc/spapr_cpu_core.c |   4 +-
- include/hw/ppc/pnv.h    |  31 ++++++++-
- include/hw/ppc/xics.h   |  15 +++-
- target/ppc/cpu.h        |   1 +
- 11 files changed, 414 insertions(+), 29 deletions(-)
- create mode 100644 hw/intc/xics_pnv.c
-
+diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+index 58f100d379cb..f05308b897f2 100644
+--- a/hw/intc/xics_spapr.c
++++ b/hw/intc/xics_spapr.c
+@@ -52,9 +52,8 @@ static target_ulong h_cppr(PowerPCCPU *cpu, sPAPRMachin=
+eState *spapr,
+ static target_ulong h_ipi(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                           target_ulong opcode, target_ulong *args)
+ {
+-    target_ulong server =3D xics_get_cpu_index_by_dt_id(args[0]);
+     target_ulong mfrr =3D args[1];
+-    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), server);
++    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), args[0]);
+=20
+     if (!icp) {
+         return H_PARAMETER;
+@@ -122,7 +121,7 @@ static void rtas_set_xive(PowerPCCPU *cpu, sPAPRMachi=
+neState *spapr,
+     }
+=20
+     nr =3D rtas_ld(args, 0);
+-    server =3D xics_get_cpu_index_by_dt_id(rtas_ld(args, 1));
++    server =3D rtas_ld(args, 1);
+     priority =3D rtas_ld(args, 2);
+=20
+     if (!ics_valid_irq(ics, nr) || !xics_icp_get(XICS_FABRIC(spapr), ser=
+ver)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 8aecea3dd10c..b9f7f8607869 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3024,9 +3024,10 @@ static void spapr_ics_resend(XICSFabric *dev)
+     ics_resend(spapr->ics);
+ }
+=20
+-static ICPState *spapr_icp_get(XICSFabric *xi, int server)
++static ICPState *spapr_icp_get(XICSFabric *xi, int cpu_dt_id)
+ {
+     sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
++    int server =3D xics_get_cpu_index_by_dt_id(cpu_dt_id);
+=20
+     return (server < spapr->nr_servers) ? &spapr->icps[server] : NULL;
+ }
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 7db61bd72476..4e1a99591d19 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -64,7 +64,7 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, Po=
+werPCCPU *cpu,
+ {
+     CPUPPCState *env =3D &cpu->env;
+     XICSFabric *xi =3D XICS_FABRIC(spapr);
+-    ICPState *icp =3D xics_icp_get(xi, CPU(cpu)->cpu_index);
++    ICPState *icp =3D xics_icp_get(xi, cpu->cpu_dt_id);
+=20
+     /* Set time-base frequency to 512 MHz */
+     cpu_ppc_tb_init(env, SPAPR_TIMEBASE_FREQ);
 --=20
 2.7.4
