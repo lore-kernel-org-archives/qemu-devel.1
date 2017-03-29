@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ctK4W-0007f9-C7
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 16:20:01 -0400
+	(envelope-from <vyasevic@redhat.com>) id 1ctK4q-0007uy-HC
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 16:20:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ctK4S-0001sE-6N
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 16:20:00 -0400
-References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
-	<1490805920-17029-8-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <27410c8a-0213-6ede-e9a3-cbb248f3e7a4@redhat.com>
-Date: Wed, 29 Mar 2017 15:19:40 -0500
-MIME-Version: 1.0
-In-Reply-To: <1490805920-17029-8-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="N5Nw65dcbpuo9FkFr6hUKak6Gu74ciIfW"
-Subject: Re: [Qemu-devel] [for-2.9 7/8] nbd: Tidy up blockdev-add interface
+	(envelope-from <vyasevic@redhat.com>) id 1ctK4m-00023A-GA
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 16:20:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48762)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vyasevic@redhat.com>) id 1ctK4m-00022m-7o
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 16:20:16 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 86002C04D313
+	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 20:20:14 +0000 (UTC)
+From: Vladislav Yasevich <vyasevic@redhat.com>
+Date: Wed, 29 Mar 2017 16:19:50 -0400
+Message-Id: <1490818790-3100-1-git-send-email-vyasevic@redhat.com>
+Subject: [Qemu-devel] [PATCH] virtio-net: consolidate guest announcement
+ with qemu_announce_self
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,166 +28,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: gveitmic@redhat.com, mst@redhat.com, dgilbert@redhat.com, Vladislav Yasevich <vyasevic@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---N5Nw65dcbpuo9FkFr6hUKak6Gu74ciIfW
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp,
- namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
- pbonzini@redhat.com
-Message-ID: <27410c8a-0213-6ede-e9a3-cbb248f3e7a4@redhat.com>
-Subject: Re: [for-2.9 7/8] nbd: Tidy up blockdev-add interface
-References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
- <1490805920-17029-8-git-send-email-armbru@redhat.com>
-In-Reply-To: <1490805920-17029-8-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+virtio announcements seem to run on its own timer with it's own
+repetition loop and are invoked separately from qemu_announce_self.
+This patch consolidates announcements into a single location and
+allows other nics to provide it's own announcement capabilities, if
+necessary.
 
-On 03/29/2017 11:45 AM, Markus Armbruster wrote:
-> SocketAddress is a simple union, and simple unions are awkward: they
-> have their variant members wrapped in a "data" object on the wire, and
-> require additional indirections in C.  I intend to limit its use to
-> existing external interfaces, and convert all internal interfaces to
-> SocketAddressFlat.
->=20
-> BlockdevOptionsNbd is an external interface using SocketAddress, but
-> it's new in 2.9.  Replace it by SocketAddressFlat while we can.  This
-> simplifies
->=20
->     { "execute": "blockdev-add",
->       "arguments": { "node-name": "foo", "driver": "nbd",
->                      "server": { "type": "inet",
-> 		                 "data": { "host": "localhost",
-> 				           "port": "12345" } } } }
->=20
-> to
->=20
->     { "execute": "blockdev-add",
->       "arguments": { "node-name": "foo", "driver": "nbd",
->                      "server": { "type": "inet",
-> 		                 "host": "localhost", "port": "12345" } } }
+This is also usefull in support of exposing qemu_announce_self through
+qmp/hmp.
 
-This part makes sense, and means this has to go in 2.9.
+Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
+---
+ hw/net/virtio-net.c            | 30 ++++++++----------------------
+ include/hw/virtio/virtio-net.h |  2 --
+ include/net/net.h              |  2 ++
+ migration/savevm.c             |  6 ++++++
+ 4 files changed, 16 insertions(+), 24 deletions(-)
 
->=20
-> Since the internal interfaces still take SocketAddress, this requires
-> conversion function socket_address_crumple().  It'll go away when I
-> update the interfaces.
-
-This is probably the fastest way forward for 2.9, even if we rip it out
-later in 2.10.
-
->=20
-> Unfortunately, SocketAddress is also visible in -drive since 2.8.  Add
-> still more gunk to nbd_process_legacy_socket_options().  You can now
-> shorten
->=20
->     -drive if=3Dnone,driver=3Dnbd,server.type=3Dinet,server.data.host=3D=
-127.0.0.1,server.data.port=3D12345
->=20
-> to
->=20
->     -drive if=3Dnone,driver=3Dnbd,server.type=3Dinet,server.host=3D127.=
-0.0.1,server.port=3D12345
-
-Here, I'm 50/50 on whether the compatibility gunk is worth it, or
-whether to make a clean break of old configurations, as I'm not sure who
-is using the old configurations.  But given the lateness of the change
-(and my recent case of being burned on qom-type during freeze when I was
-not conservative), I agree with your conservative approach of remaining
-compatible, even if it means the patch is larger than desired, and even
-if we rip it out again in 2.10.
-
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  block/nbd.c          | 131 ++++++++++++++++++++++++++++++++++++++++---=
---------
->  qapi/block-core.json |   2 +-
->  2 files changed, 104 insertions(+), 29 deletions(-)
->=20
-
-> @@ -223,17 +224,45 @@ static bool nbd_process_legacy_socket_options(QDi=
-ct *output_options,
->      const char *path =3D qemu_opt_get(legacy_opts, "path");
->      const char *host =3D qemu_opt_get(legacy_opts, "host");
->      const char *port =3D qemu_opt_get(legacy_opts, "port");
-> +    const char *sd_path =3D qemu_opt_get(legacy_opts, "server.data.pat=
-h");
-> +    const char *sd_host =3D qemu_opt_get(legacy_opts, "server.data.hos=
-t");
-> +    const char *sd_port =3D qemu_opt_get(legacy_opts, "server.data.por=
-t");
-> +    bool no_server =3D path || host || port;
-> +    bool server_data =3D sd_path || sd_host || sd_port;
->      const QDictEntry *e;
-> =20
-> -    if (!path && !host && !port) {
-> +    if (!no_server && !server_data) {
-
-Feels like a double negative, although it's not really serving that
-role.  Maybe a better name would be s/no_server/bare/, so that 'bare' is
-now your counterpart to 'server_data'.
-
-> +        return true;
-> +    }
-> +
-> +    if (no_server && server_data) {
-> +        error_setg(errp, "Cannot use %s and %s at the same time",
-> +                   "path/host/port", "server.data.*");
-> +        return false;
-
-Again, 'bare' makes this conditional read a bit better.
-
-> +    }
-> +
-> +    if (server_data) {
-> +        if (sd_host) {
-> +            qdict_put(output_options, "server.host",
-> +                      qstring_from_str(sd_host));
-> +        }
-> +        if (sd_port) {
-> +            qdict_put(output_options, "server.port",
-> +                      qstring_from_str(sd_port));
-> +        }
-> +        if (sd_path) {
-> +            qdict_put(output_options, "server.path",
-> +                      qstring_from_str(sd_path));
-> +        }
-
-Wow, I need to rebase my qdict_put_str() stuff again - that ought to be
-something we include early in 2.10, as it touches a lot of stuff.
-Doesn't affect your patch for now, though.
-
-Renaming the local variable is trivial, so whether or not you
-incorporate my naming suggestion,
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---N5Nw65dcbpuo9FkFr6hUKak6Gu74ciIfW
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY3BbcAAoJEKeha0olJ0Nq/eYIAI6AZuCI/qoxRRVtpcZhPId0
-a357IEBk/IDRVU/oQ4rGtcdH1Jc1ycFsDBdks23hhqsuANYzRj+7D97kDFo/SMCW
-PgFjnXvzyqj5ooJ+zrxQXLzK+AW/7TNZmxQwBvuwL9OMp2+ux45Z/dUqBz2PSU1S
-VW9UW7roqmv9p0F8YpghI9XeveYBjO9m7vrue15w3AurSE4+vpbbv8NkcyNHB7D9
-SHiK0bLz9UQzU54MBGFuo5BHQB+DLtX+YJBu4onHWMyyBXl35z+sQ+jm/s1MoFAV
-5N88U0vx4SUW4GEHRUwSnvxzrKqMUcYDqnnebgyjd52RXvGc+tfUy4FIsDTIJzc=
-=iUdH
------END PGP SIGNATURE-----
-
---N5Nw65dcbpuo9FkFr6hUKak6Gu74ciIfW--
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index c321680..6e9ce4f 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -110,14 +110,16 @@ static bool virtio_net_started(VirtIONet *n, uint8_t status)
+         (n->status & VIRTIO_NET_S_LINK_UP) && vdev->vm_running;
+ }
+ 
+-static void virtio_net_announce_timer(void *opaque)
++static void virtio_net_announce(NetClientState *nc)
+ {
+-    VirtIONet *n = opaque;
++    VirtIONet *n = qemu_get_nic_opaque(nc);
+     VirtIODevice *vdev = VIRTIO_DEVICE(n);
+ 
+-    n->announce_counter--;
+-    n->status |= VIRTIO_NET_S_ANNOUNCE;
+-    virtio_notify_config(vdev);
++    if (virtio_vdev_has_feature(vdev, VIRTIO_NET_F_GUEST_ANNOUNCE) &&
++        virtio_vdev_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ)) {
++            n->status |= VIRTIO_NET_S_ANNOUNCE;
++            virtio_notify_config(vdev);
++    }
+ }
+ 
+ static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
+@@ -427,8 +429,6 @@ static void virtio_net_reset(VirtIODevice *vdev)
+     n->nobcast = 0;
+     /* multiqueue is disabled by default */
+     n->curr_queues = 1;
+-    timer_del(n->announce_timer);
+-    n->announce_counter = 0;
+     n->status &= ~VIRTIO_NET_S_ANNOUNCE;
+ 
+     /* Flush any MAC and VLAN filter table state */
+@@ -868,11 +868,6 @@ static int virtio_net_handle_announce(VirtIONet *n, uint8_t cmd,
+     if (cmd == VIRTIO_NET_CTRL_ANNOUNCE_ACK &&
+         n->status & VIRTIO_NET_S_ANNOUNCE) {
+         n->status &= ~VIRTIO_NET_S_ANNOUNCE;
+-        if (n->announce_counter) {
+-            timer_mod(n->announce_timer,
+-                      qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
+-                      self_announce_delay(n->announce_counter));
+-        }
+         return VIRTIO_NET_OK;
+     } else {
+         return VIRTIO_NET_ERR;
+@@ -1609,12 +1604,6 @@ static int virtio_net_post_load_device(void *opaque, int version_id)
+         qemu_get_subqueue(n->nic, i)->link_down = link_down;
+     }
+ 
+-    if (virtio_vdev_has_feature(vdev, VIRTIO_NET_F_GUEST_ANNOUNCE) &&
+-        virtio_vdev_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ)) {
+-        n->announce_counter = SELF_ANNOUNCE_ROUNDS;
+-        timer_mod(n->announce_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL));
+-    }
+-
+     return 0;
+ }
+ 
+@@ -1829,6 +1818,7 @@ static NetClientInfo net_virtio_info = {
+     .receive = virtio_net_receive,
+     .link_status_changed = virtio_net_set_link_status,
+     .query_rx_filter = virtio_net_query_rxfilter,
++    .announce = virtio_net_announce,
+ };
+ 
+ static bool virtio_net_guest_notifier_pending(VirtIODevice *vdev, int idx)
+@@ -1934,8 +1924,6 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+     qemu_macaddr_default_if_unset(&n->nic_conf.macaddr);
+     memcpy(&n->mac[0], &n->nic_conf.macaddr, sizeof(n->mac));
+     n->status = VIRTIO_NET_S_LINK_UP;
+-    n->announce_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL,
+-                                     virtio_net_announce_timer, n);
+ 
+     if (n->netclient_type) {
+         /*
+@@ -1997,8 +1985,6 @@ static void virtio_net_device_unrealize(DeviceState *dev, Error **errp)
+         virtio_net_del_queue(n, i);
+     }
+ 
+-    timer_del(n->announce_timer);
+-    timer_free(n->announce_timer);
+     g_free(n->vqs);
+     qemu_del_nic(n->nic);
+     virtio_cleanup(vdev);
+diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
+index 1eec9a2..0c597f4 100644
+--- a/include/hw/virtio/virtio-net.h
++++ b/include/hw/virtio/virtio-net.h
+@@ -94,8 +94,6 @@ typedef struct VirtIONet {
+     char *netclient_name;
+     char *netclient_type;
+     uint64_t curr_guest_offloads;
+-    QEMUTimer *announce_timer;
+-    int announce_counter;
+     bool needs_vnet_hdr_swap;
+ } VirtIONet;
+ 
+diff --git a/include/net/net.h b/include/net/net.h
+index 99b28d5..598f523 100644
+--- a/include/net/net.h
++++ b/include/net/net.h
+@@ -64,6 +64,7 @@ typedef int (SetVnetLE)(NetClientState *, bool);
+ typedef int (SetVnetBE)(NetClientState *, bool);
+ typedef struct SocketReadState SocketReadState;
+ typedef void (SocketReadStateFinalize)(SocketReadState *rs);
++typedef void (NetAnnounce)(NetClientState *);
+ 
+ typedef struct NetClientInfo {
+     NetClientDriver type;
+@@ -84,6 +85,7 @@ typedef struct NetClientInfo {
+     SetVnetHdrLen *set_vnet_hdr_len;
+     SetVnetLE *set_vnet_le;
+     SetVnetBE *set_vnet_be;
++    NetAnnounce *announce;
+ } NetClientInfo;
+ 
+ struct NetClientState {
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 3b19a4a..5c1d8dc 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -113,9 +113,15 @@ static void qemu_announce_self_iter(NICState *nic, void *opaque)
+     int len;
+ 
+     trace_qemu_announce_self_iter(qemu_ether_ntoa(&nic->conf->macaddr));
++
+     len = announce_self_create(buf, nic->conf->macaddr.a);
+ 
+     qemu_send_packet_raw(qemu_get_queue(nic), buf, len);
++
++    /* if the NIC provides it's own announcement support, use it as well */
++    if (nic->ncs->info->announce) {
++        nic->ncs->info->announce(nic->ncs);
++    }
+ }
+ 
+ 
+-- 
+2.7.4
