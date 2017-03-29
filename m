@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cdall@linaro.org>) id 1ctHdr-0006kV-B1
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 13:44:20 -0400
+	(envelope-from <mst@redhat.com>) id 1ctHiZ-000850-U6
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 13:49:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cdall@linaro.org>) id 1ctHdo-00032w-6X
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 13:44:19 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:35908)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <cdall@linaro.org>) id 1ctHdn-00032V-SJ
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 13:44:16 -0400
-Received: by mail-wr0-x234.google.com with SMTP id w11so24716860wrc.3
-	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 10:44:15 -0700 (PDT)
-Date: Wed, 29 Mar 2017 19:44:12 +0200
-From: Christoffer Dall <cdall@linaro.org>
-Message-ID: <20170329174412.GA4472@cbox>
-References: <58DA3F68.6090901@arm.com> <20170328112328.GA31156@cbox>
-	<20170328115413.GJ23682@e104320-lin>
-	<b1c6e747-2fa7-b7a1-60d5-4a9c480b9dc9@huawei.com>
-	<58DA67BA.8070404@arm.com>
-	<5b7352f4-4965-3ed5-3879-db871797be47@huawei.com>
-	<20170329103658.GQ23682@e104320-lin>
-	<CAMj-D2BT3ByY-iFrRVVK7y=G7zhRBtM031VgLn6JzwUE-WCdWQ@mail.gmail.com>
-	<20170329144822.GA1020@cbox>
-	<fa712d47-4f77-7710-c4f7-cd7eab9fed9e@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1ctHiW-0004pr-QF
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 13:49:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38532)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ctHiW-0004pF-Ib
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 13:49:08 -0400
+Date: Wed, 29 Mar 2017 20:48:59 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170329204418-mutt-send-email-mst@kernel.org>
+References: <1489648127-37282-1-git-send-email-wei.w.wang@intel.com>
+	<1489648127-37282-4-git-send-email-wei.w.wang@intel.com>
+	<20170316142842.69770813b98df70277431b1e@linux-foundation.org>
+	<58CB8865.5030707@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <fa712d47-4f77-7710-c4f7-cd7eab9fed9e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] kvm: pass the virtual SEI syndrome to
- guest OS
+In-Reply-To: <58CB8865.5030707@intel.com>
+Subject: Re: [Qemu-devel] [PATCH kernel v8 3/4] mm: add inerface to offer
+ info about unused pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,101 +30,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: gengdongjiu <gengdj.1984@gmail.com>, Achin Gupta <achin.gupta@arm.com>, gengdongjiu <gengdongjiu@huawei.com>, ard.biesheuvel@linaro.org, edk2-devel@lists.01.org, qemu-devel@nongnu.org, zhaoshenglong@huawei.com, James Morse <james.morse@arm.com>, xiexiuqi@huawei.com, Marc Zyngier <marc.zyngier@arm.com>, catalin.marinas@arm.com, will.deacon@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, suzuki.poulose@arm.com, andre.przywara@arm.com, mark.rutland@arm.com, vladimir.murzin@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, wangxiongfeng2@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com, Leif.Lindholm@linaro.comnd@arm.com
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, dave.hansen@intel.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com
 
-On Wed, Mar 29, 2017 at 05:37:49PM +0200, Laszlo Ersek wrote:
-> On 03/29/17 16:48, Christoffer Dall wrote:
-> > On Wed, Mar 29, 2017 at 10:36:51PM +0800, gengdongjiu wrote:
-> >> 2017-03-29 18:36 GMT+08:00, Achin Gupta <achin.gupta@arm.com>:
-> 
-> >>> Qemu is essentially fulfilling the role of secure firmware at the
-> >>> EL2/EL1 interface (as discussed with Christoffer below). So it
-> >>> should generate the CPER before injecting the error.
-> >>>
-> >>> This is corresponds to (1) above apart from notifying UEFI (I am
-> >>> assuming you mean guest UEFI). At this time, the guest OS already
-> >>> knows where to pick up the CPER from through the HEST. Qemu has
-> >>> to create the CPER and populate its address at the address
-> >>> exported in the HEST. Guest UEFI should not be involved in this 
-> >>> flow. Its job was to create the HEST at boot and that has been
-> >>> done by this stage.
-> >>
-> >> Sorry,  As I understand it, after Qemu generate the CPER table, it
-> >> should pass the CPER table to the guest UEFI, then Guest UEFI  place
-> >> this CPER table to the guest OS memory. In this flow, the Guest UEFI
-> >> should be involved, else the Guest OS can not see the CPER table.
-> >>
+On Fri, Mar 17, 2017 at 02:55:33PM +0800, Wei Wang wrote:
+> On 03/17/2017 05:28 AM, Andrew Morton wrote:
+> > On Thu, 16 Mar 2017 15:08:46 +0800 Wei Wang <wei.w.wang@intel.com> wrote:
 > > 
-> > I think you need to explain the "pass the CPER table to the guest UEFI"
-> > concept in terms of what really happens, step by step, and when you say
-> > "then Guest UEFI place the CPER table to the guest OS memory", I'm
-> > curious who is running what code on the hardware when doing that.
+> > > From: Liang Li <liang.z.li@intel.com>
+> > > 
+> > > This patch adds a function to provides a snapshot of the present system
+> > > unused pages. An important usage of this function is to provide the
+> > > unsused pages to the Live migration thread, which skips the transfer of
+> > > thoses unused pages. Newly used pages can be re-tracked by the dirty
+> > > page logging mechanisms.
+> > I don't think this will be useful for anything other than
+> > virtio-balloon.  I guess it would be better to keep this code in the
+> > virtio-balloon driver if possible, even though that's rather a layering
+> > violation :( What would have to be done to make that possible?  Perhaps
+> > we can put some *small* helpers into page_alloc.c to prevent things
+> > from becoming too ugly.
 > 
-> I strongly suggest to keep the guest firmware's runtime involvement to
-> zero. Two reasons:
+> The patch description was too narrowed and may have caused some
+> confusion, sorry about that. This function is aimed to be generic. I
+> agree with the description suggested by Michael.
 > 
-> (1) As you explained above (... which I conveniently snipped), when you
-> inject an interrupt to the guest, the handler registered for that
-> interrupt will come from the guest kernel.
-> 
-> The only exception to this is when the platform provides a type of
-> interrupt whose handler can be registered and then locked down by the
-> firmware. On x86, this is the SMI.
-> 
-> In practice though,
-> - in OVMF (x86), we only do synchronous (software-initiated) SMIs (for
-> privileged UEFI varstore access),
-> - and in ArmVirtQemu (ARM / aarch64), none of the management mode stuff
-> exists at all.
-> 
-> I understand that the Platform Init 1.5 (or 1.6?) spec abstracted away
-> the MM (management mode) protocols from Intel SMM, but at this point
-> there is zero code in ArmVirtQemu for that. (And I'm unsure how much of
-> any eligible underlying hw emulation exists in QEMU.)
-> 
-> So you can't get the guest firmware to react to the injected interrupt
-> without the guest OS coming between first.
-> 
-> (2) Achin's description matches really-really closely what is possible,
-> and what should be done with QEMU, ArmVirtQemu, and the guest kernel.
-> 
-> In any solution for this feature, the firmware has to reserve some
-> memory from the OS at boot. The current facilities we have enable this.
-> As I described previously, the ACPI linker/loader actions can be mapped
-> more or less 1:1 to Achin's design. From a practical perspective, you
-> really want to keep the guest firmware as dumb as possible (meaning: as
-> generic as possible), and keep the ACPI specifics to the QEMU and the
-> guest kernel sides.
-> 
-> The error serialization actions -- the co-operation between guest kernel
-> and QEMU on the special memory areas -- that were mentioned earlier by
-> Michael and Punit look like a complication. But, IMO, they don't differ
-> from any other device emulation -- DMA actions in particular -- that
-> QEMU already does. Device models are what QEMU *does*. Read the command
-> block that the guest driver placed in guest memory, parse it, sanity
-> check it, verify it, execute it, write back the status code, inject an
-> interrupt (and/or let any polling guest driver notice it "soon after" --
-> use barriers as necessary).
-> 
-> Thus, I suggest to rely on the generic ACPI linker/loader interface
-> (between QEMU and guest firmware) *only* to make the firmware lay out
-> stuff (= reserve buffers, set up pointers, install QEMU's ACPI tables)
-> *at boot*. Then, at runtime, let the guest kernel and QEMU (the "device
-> model") talk to each other directly. Keep runtime firmware involvement
-> to zero.
-> 
-> You *really* don't want to debug three components at runtime, when you
-> can solve the thing with two. (Two components whose build systems won't
-> drive you mad, I should add.)
-> 
-> IMO, Achin's design nailed it. We can do that.
-> 
-I completely agree.
+> Since the main body of the function is related to operating on the
+> free_list. I think it is better to have them located here.
+> Small helpers may be less efficient and thereby causing some
+> performance loss as well.
+> I think one improvement we can make is to remove the "chunk format"
+> related things from this function. The function can generally offer the
+> base pfn to the caller's recording buffer. Then it will be the caller's
+> responsibility to format the pfn if they need.
 
-My questions were intended for gengdongjiu to clarify his/her position
-and clear up any misunderstandings between what Achin suggested and what
-he/she wrote.
+Sounds good at a high level, but we'd have to see the implementation
+to judge it properly.
 
-Thanks,
--Christoffer
+> > > --- a/mm/page_alloc.c
+> > > +++ b/mm/page_alloc.c
+> > > @@ -4498,6 +4498,120 @@ void show_free_areas(unsigned int filter)
+> > >   	show_swap_cache_info();
+> > >   }
+> > > +static int __record_unused_pages(struct zone *zone, int order,
+> > > +				 __le64 *buf, unsigned int size,
+> > > +				 unsigned int *offset, bool part_fill)
+> > > +{
+> > > +	unsigned long pfn, flags;
+> > > +	int t, ret = 0;
+> > > +	struct list_head *curr;
+> > > +	__le64 *chunk;
+> > > +
+> > > +	if (zone_is_empty(zone))
+> > > +		return 0;
+> > > +
+> > > +	spin_lock_irqsave(&zone->lock, flags);
+> > > +
+> > > +	if (*offset + zone->free_area[order].nr_free > size && !part_fill) {
+> > > +		ret = -ENOSPC;
+> > > +		goto out;
+> > > +	}
+> > > +	for (t = 0; t < MIGRATE_TYPES; t++) {
+> > > +		list_for_each(curr, &zone->free_area[order].free_list[t]) {
+> > > +			pfn = page_to_pfn(list_entry(curr, struct page, lru));
+> > > +			chunk = buf + *offset;
+> > > +			if (*offset + 2 > size) {
+> > > +				ret = -ENOSPC;
+> > > +				goto out;
+> > > +			}
+> > > +			/* Align to the chunk format used in virtio-balloon */
+> > > +			*chunk = cpu_to_le64(pfn << 12);
+> > > +			*(chunk + 1) = cpu_to_le64((1 << order) << 12);
+> > > +			*offset += 2;
+> > > +		}
+> > > +	}
+> > > +
+> > > +out:
+> > > +	spin_unlock_irqrestore(&zone->lock, flags);
+> > > +
+> > > +	return ret;
+> > > +}
+> > This looks like it could disable interrupts for a long time.  Too long?
+> 
+> What do you think if we give "budgets" to the above function?
+> For example, budget=1000, and there are 2000 nodes on the list.
+> record() returns with "incomplete" status in the first round, along with the
+> status info, "*continue_node".
+> 
+> *continue_node: pointer to the starting node of the leftover. If
+> *continue_node
+> has been used at the time of the second call (i.e. continue_node->next ==
+> NULL),
+> which implies that the previous 1000 nodes have been used, then the record()
+> function can simply start from the head of the list.
+> 
+> It is up to the caller whether it needs to continue the second round
+> when getting "incomplete".
+
+It might be cleaner to add APIs to
+	- start iteration
+	- do one step
+	- end iteration
+
+caller can then iterate without too many issues
+
+> > 
+> > > +/*
+> > > + * The record_unused_pages() function is used to record the system unused
+> > > + * pages. The unused pages can be skipped to transfer during live migration.
+> > > + * Though the unused pages are dynamically changing, dirty page logging
+> > > + * mechanisms are able to capture the newly used pages though they were
+> > > + * recorded as unused pages via this function.
+> > > + *
+> > > + * This function scans the free page list of the specified order to record
+> > > + * the unused pages, and chunks those continuous pages following the chunk
+> > > + * format below:
+> > > + * --------------------------------------
+> > > + * |	Base (52-bit)	| Rsvd (12-bit) |
+> > > + * --------------------------------------
+> > > + * --------------------------------------
+> > > + * |	Size (52-bit)	| Rsvd (12-bit) |
+> > > + * --------------------------------------
+> > > + *
+> > > + * @start_zone: zone to start the record operation.
+> > > + * @order: order of the free page list to record.
+> > > + * @buf: buffer to record the unused page info in chunks.
+> > > + * @size: size of the buffer in __le64 to record
+> > > + * @offset: offset in the buffer to record.
+> > > + * @part_fill: indicate if partial fill is used.
+> > > + *
+> > > + * return -EINVAL if parameter is invalid
+> > > + * return -ENOSPC when the buffer is too small to record all the unsed pages
+> > > + * return 0 when sccess
+> > > + */
+> > It's a strange thing - it returns information which will instantly
+> > become incorrect.
+> 
+> I didn't get the point, could you please explain more? Thanks.
+> 
+> Best,
+> Wei
+
+I tried to explain it in my reply.  Once this function drops the lock,
+the pages can immediately be used so the returned value is wrong.
+balloon uses tricks to recover from this but this needs to be explicit
+at the API level.
+
+-- 
+MST
