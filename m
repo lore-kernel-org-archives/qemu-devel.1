@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ctDx0-0004j4-IZ
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 09:47:51 -0400
+	(envelope-from <clg@kaod.org>) id 1ctE2w-0006LL-2r
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 09:53:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ctDww-0006eL-4C
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 09:47:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53878)
+	(envelope-from <clg@kaod.org>) id 1ctE2u-00017B-QI
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 09:53:58 -0400
+Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:55873)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ctDwv-0006e6-RT
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 09:47:46 -0400
-Date: Wed, 29 Mar 2017 16:47:40 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170329161852-mutt-send-email-mst@kernel.org>
-References: <CAFEAcA_Dwky8Jr+y3JACdK5MVM82syrvzuVktnJF0cyZ-FjY0A@mail.gmail.com>
-	<20170328210014-mutt-send-email-mst@kernel.org>
-	<8737dwr35o.fsf@dusky.pond.sub.org>
-	<862ea872-423a-8394-3ed5-250b0a3d2ba2@redhat.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ctE2u-00016g-Gy
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 09:53:56 -0400
+Received: from player718.ha.ovh.net (b7.ovh.net [213.186.33.57])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 4FF1F78B5B
+	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 15:53:55 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Wed, 29 Mar 2017 15:53:23 +0200
+Message-Id: <1490795611-4762-2-git-send-email-clg@kaod.org>
+In-Reply-To: <1490795611-4762-1-git-send-email-clg@kaod.org>
+References: <1490795611-4762-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <862ea872-423a-8394-3ed5-250b0a3d2ba2@redhat.com>
-Subject: Re: [Qemu-devel] qemu-devel mailing list vs DMARC and
- microsoft.com's p=reject policy
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 1/9] ppc/xics: introduce an 'intc' backlink
+ under PowerPCCPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,75 +30,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-On Wed, Mar 29, 2017 at 12:44:27PM +0200, Thomas Huth wrote:
-> On 29.03.2017 08:46, Markus Armbruster wrote:
-> > "Michael S. Tsirkin" <mst@redhat.com> writes:
-> > 
-> >> On Tue, Mar 28, 2017 at 06:35:55PM +0100, Peter Maydell wrote:
-> >>> Hi; it's been pointed out to me that we have a problem with qemu-devel
-> >>> unsubscribing people because of DMARC. Specifically:
-> >>>  * microsoft.com publishes a DMARC policy that has p=reject
-> >>>  * some subscribers use mail systems that honour this and send bounces
-> >>>    for non-verifying emails from those domains
-> >>>  * the mailing list software (mailman) modifies emails that pass through
-> >>>    it, among other things adding the "[qemu-devel]" subject tag, in
-> >>>    a way that means that signatures no longer verify
-> >>>  * bounces back to mailman as a result of mailing list postings from
-> >>>    microsoft.com people can then cause people to be unintentionally
-> >>>    unsubscribed
-> >>>
-> >>> This is kind of painful. https://wiki.list.org/DEV/DMARC has the
-> >>> Mailman wiki information on the subject. In an ideal world nobody
-> >>> would use p=reject because it breaks mailing lists. In the actual
-> >>> world we have a few choices:
-> >>>
-> >>>  (1) I could set dmarc_moderation_action=Reject
-> >>>    * this means nobody can subscribe if they've set their dmarc policy
-> >>>      to reject (the "if you don't believe in mailing lists we don't
-> >>>      believe in you" policy).
-> >>>    * there is a certain purity to this option, in that it is pushing
-> >>>      the costs of this unhelpful mail config back on the organisations
-> >>>      which have chosen it; on the other hand I'm reluctant to make
-> >>>      life harder for people who are contributing to the project
-> >>>      and who typically don't have much say over corporate email config.
-> >>>  (2) I could reconfigure mailman to try to not rewrite anything that
-> >>>      we think is likely to be signed (in particular not the body or the
-> >>>      subject)
-> >>>    * this means dropping the [qemu-devel] tag from the subject, which I'm
-> >>>      a bit reluctant to do (it seems likely at least some readers are
-> >>>      filtering on it, and personally I quite like it)
-> >>>    * if anybody DKIM-signs the Sender: header we're stuck anyway
-> >>
-> >> For the record I'd strongly prefer this option - I tag all list mail
-> >> and so "qemu-devel" appears twice: in subject and as a tag.
-> >> Also, if mail is copied to another list, qemu-devel will
-> >> still appear as gmail de-duplicates email by msg id.
-> >> I can remove tags I don't care about but can't remove
-> >> subject prefixes.
-> > 
-> > Seconded.  Mailing lists messing with the subject to "help" users with
-> > filtering just complicate it.
-> > 
-> > Filtering on List-Id isn't any harder, and has the added advantage that
-> > it actually works.
-> 
-> The problem is that some mail clients are rather limited and you can
-> only filter via title there - so I guess some people would complain we
-> removed the tag from the subject.
+Today, the ICPState array of the sPAPR machine is indexed with
+'cpu_index' of the CPUState. This numbering of CPUs is internal to
+QEMU and the guest only knows about what is exposed in the device
+tree, that is the 'cpu_dt_id'. This is why sPAPR uses the helper
+xics_get_cpu_index_by_dt_id() to do the mapping in a couple of places.
 
-Do you mean gmail by any chance? In gmail you can filter using list:
-which isn't well known. This works even if you get same mail through
-multiple paths. filtering by subject in gmail is extermely unreliable:
-if you get a copy directly it discards others and so you get
-an inconsistent mix of messages with and without the subject prefix.
+To provide a more generic XICS layer, we need to abstract the IRQ
+'server' number and remove any assumption made on its nature. It
+should not be used as a 'cpu_index' for lookups like xics_cpu_setup()
+and xics_cpu_destroy() do.
 
-In short I suspect filtering by subject works only half-way and
-most people just don't notice.
+To reach that goal, we choose to introduce a generic 'intc' backlink
+under PowerPCCPU, and let the machine core init routine do the
+ICPState lookup. The resulting object is passed on to xics_cpu_setup()
+which does the store under PowerPCCPU. The IRQ 'server' number in XICS
+is now generic. sPAPR uses 'cpu_dt_id' and PowerNV will use 'PIR'
+number.
 
-> Apart from that, I've also seen mailman messing up white spaces in the
-> body of e-mails, so this likely would only solve parts of this problem.
-> 
->  Thomas
+This also has the benefit of simplifying the sPAPR hcall routines
+which do not need to do any ICPState lookups anymore.
+
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+
+Changes since v3:
+ - renamed 'icp' backlink to a more generic name 'intc'
+
+ Changes since v2:
+ - changed the 'icp' backlink type to be an 'Object'
+
+ hw/intc/xics.c          |  6 +++---
+ hw/intc/xics_spapr.c    | 20 +++++---------------
+ hw/ppc/spapr_cpu_core.c |  4 +++-
+ include/hw/ppc/xics.h   |  2 +-
+ target/ppc/cpu.h        |  1 +
+ 5 files changed, 13 insertions(+), 20 deletions(-)
+
+diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+index e740989a1162..56fe70cd10e9 100644
+--- a/hw/intc/xics.c
++++ b/hw/intc/xics.c
+@@ -52,7 +52,7 @@ int xics_get_cpu_index_by_dt_id(int cpu_dt_id)
+ void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu)
+ {
+     CPUState *cs =3D CPU(cpu);
+-    ICPState *icp =3D xics_icp_get(xi, cs->cpu_index);
++    ICPState *icp =3D ICP(cpu->intc);
+=20
+     assert(icp);
+     assert(cs =3D=3D icp->cs);
+@@ -61,15 +61,15 @@ void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu=
+)
+     icp->cs =3D NULL;
+ }
+=20
+-void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu)
++void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu, ICPState *icp)
+ {
+     CPUState *cs =3D CPU(cpu);
+     CPUPPCState *env =3D &cpu->env;
+-    ICPState *icp =3D xics_icp_get(xi, cs->cpu_index);
+     ICPStateClass *icpc;
+=20
+     assert(icp);
+=20
++    cpu->intc =3D OBJECT(icp);
+     icp->cs =3D cs;
+=20
+     icpc =3D ICP_GET_CLASS(icp);
+diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+index 84d24b2837a7..58f100d379cb 100644
+--- a/hw/intc/xics_spapr.c
++++ b/hw/intc/xics_spapr.c
+@@ -43,11 +43,9 @@
+ static target_ulong h_cppr(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                            target_ulong opcode, target_ulong *args)
+ {
+-    CPUState *cs =3D CPU(cpu);
+-    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
+     target_ulong cppr =3D args[0];
+=20
+-    icp_set_cppr(icp, cppr);
++    icp_set_cppr(ICP(cpu->intc), cppr);
+     return H_SUCCESS;
+ }
+=20
+@@ -69,9 +67,7 @@ static target_ulong h_ipi(PowerPCCPU *cpu, sPAPRMachine=
+State *spapr,
+ static target_ulong h_xirr(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                            target_ulong opcode, target_ulong *args)
+ {
+-    CPUState *cs =3D CPU(cpu);
+-    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
+-    uint32_t xirr =3D icp_accept(icp);
++    uint32_t xirr =3D icp_accept(ICP(cpu->intc));
+=20
+     args[0] =3D xirr;
+     return H_SUCCESS;
+@@ -80,9 +76,7 @@ static target_ulong h_xirr(PowerPCCPU *cpu, sPAPRMachin=
+eState *spapr,
+ static target_ulong h_xirr_x(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                              target_ulong opcode, target_ulong *args)
+ {
+-    CPUState *cs =3D CPU(cpu);
+-    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
+-    uint32_t xirr =3D icp_accept(icp);
++    uint32_t xirr =3D icp_accept(ICP(cpu->intc));
+=20
+     args[0] =3D xirr;
+     args[1] =3D cpu_get_host_ticks();
+@@ -92,21 +86,17 @@ static target_ulong h_xirr_x(PowerPCCPU *cpu, sPAPRMa=
+chineState *spapr,
+ static target_ulong h_eoi(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                           target_ulong opcode, target_ulong *args)
+ {
+-    CPUState *cs =3D CPU(cpu);
+-    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
+     target_ulong xirr =3D args[0];
+=20
+-    icp_eoi(icp, xirr);
++    icp_eoi(ICP(cpu->intc), xirr);
+     return H_SUCCESS;
+ }
+=20
+ static target_ulong h_ipoll(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                             target_ulong opcode, target_ulong *args)
+ {
+-    CPUState *cs =3D CPU(cpu);
+-    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
+     uint32_t mfrr;
+-    uint32_t xirr =3D icp_ipoll(icp, &mfrr);
++    uint32_t xirr =3D icp_ipoll(ICP(cpu->intc), &mfrr);
+=20
+     args[0] =3D xirr;
+     args[1] =3D mfrr;
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 6883f0991ae9..7db61bd72476 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -63,6 +63,8 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, Po=
+werPCCPU *cpu,
+                            Error **errp)
+ {
+     CPUPPCState *env =3D &cpu->env;
++    XICSFabric *xi =3D XICS_FABRIC(spapr);
++    ICPState *icp =3D xics_icp_get(xi, CPU(cpu)->cpu_index);
+=20
+     /* Set time-base frequency to 512 MHz */
+     cpu_ppc_tb_init(env, SPAPR_TIMEBASE_FREQ);
+@@ -80,7 +82,7 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, Po=
+werPCCPU *cpu,
+         }
+     }
+=20
+-    xics_cpu_setup(XICS_FABRIC(spapr), cpu);
++    xics_cpu_setup(xi, cpu, icp);
+=20
+     qemu_register_reset(spapr_cpu_reset, cpu);
+     spapr_cpu_reset(cpu);
+diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+index 9a5e715fe553..5e0244447fcd 100644
+--- a/include/hw/ppc/xics.h
++++ b/include/hw/ppc/xics.h
+@@ -168,7 +168,7 @@ void spapr_dt_xics(int nr_servers, void *fdt, uint32_=
+t phandle);
+=20
+ qemu_irq xics_get_qirq(XICSFabric *xi, int irq);
+ ICPState *xics_icp_get(XICSFabric *xi, int server);
+-void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu);
++void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu, ICPState *icp);
+ void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu);
+=20
+ /* Internal XICS interfaces */
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 5ee33b3fd315..b5f93272b839 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1196,6 +1196,7 @@ struct PowerPCCPU {
+     uint32_t max_compat;
+     uint32_t compat_pvr;
+     PPCVirtualHypervisor *vhyp;
++    Object *intc;
+=20
+     /* Fields related to migration compatibility hacks */
+     bool pre_2_8_migration;
+--=20
+2.7.4
