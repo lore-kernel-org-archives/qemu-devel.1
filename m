@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ct4NS-00084K-Jl
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 23:34:31 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1ct4YE-0002M4-4s
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 23:45:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ct4NP-0005fL-H2
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 23:34:30 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1ct4YD-0000mx-6x
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 23:45:38 -0400
+Date: Wed, 29 Mar 2017 14:35:42 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 29 Mar 2017 14:34:14 +1100
-Message-Id: <20170329033415.891-2-david@gibson.dropbear.id.au>
-In-Reply-To: <20170329033415.891-1-david@gibson.dropbear.id.au>
-References: <20170329033415.891-1-david@gibson.dropbear.id.au>
+Message-ID: <20170329033542.GP21068@umbus.fritz.box>
+References: <20170328090530.20052-1-aik@ozlabs.ru>
+	<20170328090530.20052-2-aik@ozlabs.ru>
+	<20170328114829.25656146@t450s.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/2] spapr: fix buffer-overflow
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="4IFtMBbmeqbTM/ox"
+Content-Disposition: inline
+In-Reply-To: <20170328114829.25656146@t450s.home>
+Subject: Re: [Qemu-devel] [RFC PATCH qemu 1/3] memory: Add get_fd() hook for
+ IOMMU MR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,99 +26,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, agraf@suse.de, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Running postcopy-test with ASAN produces the following error:
+--4IFtMBbmeqbTM/ox
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-QTEST_QEMU_BINARY=3Dppc64-softmmu/qemu-system-ppc64  tests/postcopy-test
-...
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-=3D=3D23641=3D=3DERROR: AddressSanitizer: heap-buffer-overflow on address=
- 0x7f1556600000 at pc 0x55b8e9d28208 bp 0x7f1555f4d3c0 sp 0x7f1555f4d3b0
-READ of size 8 at 0x7f1556600000 thread T6
-    #0 0x55b8e9d28207 in htab_save_first_pass /home/elmarco/src/qq/hw/ppc=
-/spapr.c:1528
-    #1 0x55b8e9d2939c in htab_save_iterate /home/elmarco/src/qq/hw/ppc/sp=
-apr.c:1665
-    #2 0x55b8e9beae3a in qemu_savevm_state_iterate /home/elmarco/src/qq/m=
-igration/savevm.c:1044
-    #3 0x55b8ea677733 in migration_thread /home/elmarco/src/qq/migration/=
-migration.c:1976
-    #4 0x7f15845f46c9 in start_thread (/lib64/libpthread.so.0+0x76c9)
-    #5 0x7f157d9d0f7e in clone (/lib64/libc.so.6+0x107f7e)
+On Tue, Mar 28, 2017 at 11:48:29AM -0600, Alex Williamson wrote:
+> On Tue, 28 Mar 2017 20:05:28 +1100
+> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+>=20
+> > Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> > ---
+> >  include/exec/memory.h | 2 ++
+> >  hw/ppc/spapr_iommu.c  | 8 ++++++++
+> >  2 files changed, 10 insertions(+)
+> >=20
+> > diff --git a/include/exec/memory.h b/include/exec/memory.h
+> > index e39256ad03..925c10b35b 100644
+> > --- a/include/exec/memory.h
+> > +++ b/include/exec/memory.h
+> > @@ -174,6 +174,8 @@ struct MemoryRegionIOMMUOps {
+> >      void (*notify_flag_changed)(MemoryRegion *iommu,
+> >                                  IOMMUNotifierFlag old_flags,
+> >                                  IOMMUNotifierFlag new_flags);
+> > +    /* Returns a kernel fd for IOMMU */
+> > +    int (*get_fd)(MemoryRegion *iommu);
+>=20
+> What if we used this as a prototype:
+>=20
+> int (*get_fd)(IOMMUFdType type, MemoryRegion *iommu);
+>=20
+> And then we defined:
+>=20
+> typedef enum {
+>     SPAPR_IOMMU_TABLE_FD =3D 0,
+> } IOMMUFdType;
 
-0x7f1556600000 is located 0 bytes to the right of 2097152-byte region [0x=
-7f1556400000,0x7f1556600000)
-allocated by thread T0 here:
-    #0 0x7f159bb76980 in posix_memalign (/lib64/libasan.so.3+0xc7980)
-    #1 0x55b8eab185b2 in qemu_try_memalign /home/elmarco/src/qq/util/osli=
-b-posix.c:106
-    #2 0x55b8eab186c8 in qemu_memalign /home/elmarco/src/qq/util/oslib-po=
-six.c:122
-    #3 0x55b8e9d268a8 in spapr_reallocate_hpt /home/elmarco/src/qq/hw/ppc=
-/spapr.c:1214
-    #4 0x55b8e9d26e04 in ppc_spapr_reset /home/elmarco/src/qq/hw/ppc/spap=
-r.c:1261
-    #5 0x55b8ea12e913 in qemu_system_reset /home/elmarco/src/qq/vl.c:1697
-    #6 0x55b8ea13fa40 in main /home/elmarco/src/qq/vl.c:4679
-    #7 0x7f157d8e9400 in __libc_start_main (/lib64/libc.so.6+0x20400)
+Are we expecting any new types of fd?  Maybe it would be simpler just
+to name this spapr_tce_fd() or something more specific, and only
+generalize if we really need it for another fd type.
 
-Thread T6 created by T0 here:
-    #0 0x7f159bae0488 in __interceptor_pthread_create (/lib64/libasan.so.=
-3+0x31488)
-    #1 0x55b8eab1d9cb in qemu_thread_create /home/elmarco/src/qq/util/qem=
-u-thread-posix.c:465
-    #2 0x55b8ea67874c in migrate_fd_connect /home/elmarco/src/qq/migratio=
-n/migration.c:2096
-    #3 0x55b8ea66cbb0 in migration_channel_connect /home/elmarco/src/qq/m=
-igration/migration.c:500
-    #4 0x55b8ea678f38 in socket_outgoing_migration /home/elmarco/src/qq/m=
-igration/socket.c:87
-    #5 0x55b8eaa5a03a in qio_task_complete /home/elmarco/src/qq/io/task.c=
-:142
-    #6 0x55b8eaa599cc in gio_task_thread_result /home/elmarco/src/qq/io/t=
-ask.c:88
-    #7 0x7f15823e38e6  (/lib64/libglib-2.0.so.0+0x468e6)
-SUMMARY: AddressSanitizer: heap-buffer-overflow /home/elmarco/src/qq/hw/p=
-pc/spapr.c:1528 in htab_save_first_pass
+>=20
+> Such that you're actually asking the IOMMUOps for a specific type of FD
+> and it either has it or not, so the caller doesn't need to assume what
+> it is they get back.
+>=20
+> Furthermore, add:
+>=20
+> int memory_region_iommu_get_fd(IOMMUFdType type, MemoryRegion *mr)
+> {
+>     assert(memory_region_is_iommu(mr));
+>=20
+>     if (mr->iommu_ops && mr->iommu_ops->get_fd) {
+>         return mr->iommu_ops->get_fd(type, mr);
+>     }
+>=20
+>     return -1;
+> }
+>=20
+> >  };
+> >
+>=20
+> This should be two patches, patch 1 above, patch 2 below
+>  =20
+> >  typedef struct CoalescedMemoryRange CoalescedMemoryRange;
+> > diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
+> > index 9e30e148d6..b61c8f053e 100644
+> > --- a/hw/ppc/spapr_iommu.c
+> > +++ b/hw/ppc/spapr_iommu.c
+> > @@ -170,6 +170,13 @@ static void spapr_tce_notify_flag_changed(MemoryRe=
+gion *iommu,
+> >      }
+> >  }
+> > =20
+> > +static int spapr_tce_get_fd(MemoryRegion *iommu)
+> > +{
+> > +    sPAPRTCETable *tcet =3D container_of(iommu, sPAPRTCETable, iommu);
+> > +
+> > +    return tcet->fd;
+>=20
+>=20
+> This would then be:
+>=20
+>     return type =3D=3D SPAPR_IOMMU_TABLE_FD ? tcet->fd : -1;
+>=20
+> > +}
+> > +
+> >  static int spapr_tce_table_post_load(void *opaque, int version_id)
+> >  {
+> >      sPAPRTCETable *tcet =3D SPAPR_TCE_TABLE(opaque);
+> > @@ -251,6 +258,7 @@ static MemoryRegionIOMMUOps spapr_iommu_ops =3D {
+> >      .translate =3D spapr_tce_translate_iommu,
+> >      .get_min_page_size =3D spapr_tce_get_min_page_size,
+> >      .notify_flag_changed =3D spapr_tce_notify_flag_changed,
+> > +    .get_fd =3D spapr_tce_get_fd,
+> >  };
+> > =20
+> >  static int spapr_tce_table_realize(DeviceState *dev)
+>=20
 
-index seems to be wrongly incremented, unless I miss something that
-would be worth a comment.
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/spapr.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 8aecea3..44c26e4 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1524,16 +1524,16 @@ static void htab_save_first_pass(QEMUFile *f, sPA=
-PRMachineState *spapr,
-         /* Consume invalid HPTEs */
-         while ((index < htabslots)
-                && !HPTE_VALID(HPTE(spapr->htab, index))) {
--            index++;
-             CLEAN_HPTE(HPTE(spapr->htab, index));
-+            index++;
-         }
-=20
-         /* Consume valid HPTEs */
-         chunkstart =3D index;
-         while ((index < htabslots) && (index - chunkstart < USHRT_MAX)
-                && HPTE_VALID(HPTE(spapr->htab, index))) {
--            index++;
-             CLEAN_HPTE(HPTE(spapr->htab, index));
-+            index++;
-         }
-=20
-         if (index > chunkstart) {
 --=20
-2.9.3
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--4IFtMBbmeqbTM/ox
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJY2yuOAAoJEGw4ysog2bOSxXUQAMfg9f/Ffhbu27gO2o3WUM3t
+JHfMCjoq5hsuC8aian3JXo+cnF0/bi24p468gqCmBi4oCfCfUag/q0Fc9N8QX86T
+U/IW8BPMdMmS+OYavhwdxBVyeUwVJtUr01Jxut2yMKRRhIEzxvkH3awKsLd4q+Ay
+TgrIJEGUarGmqSeGnE0uSQid7PHZeanpK5DBCPtCHhFGh/XAQ2DxjAp8pOYBb2a3
+I/4IzvEPQ8VGKN7OWnmok195S1jhdMkTs2NL0Tlb1cRBQ2M5o0waZU4qGIU6t4kq
+kJdZEjD2DdEsnMd9xutDeayMAgPOjCFhcqknTzNL+9RX6gtd6ZlOqtGZKim7+6ri
+RsExWOPUWv4PnDgBP3l1xbOPGdFEe21/VqX8p2cMhG/rqYnt6H5oq71xJ3xGuHIJ
+uq0qHqjPPw5CTRVEJr6XVRlNVz9ArQZaQ+6i0eZz71ly3mCWL0VI52PTVjLBqXwE
+yFihQnx3Y1EI6UgCIplZsPPyBGWVCOH4ty4wdIFVf8F/A3lUOjWleuRzTuP34Fq0
+F1c4FitQeC8Qbio360qnRfJUwGZq3AiyGMlsueXaPvERET/JdTsIhOELGZaYQJuC
+1feb3batkCxyLpB+kMQad8BCb9IlgaaDQE0vd6ut7n7rpZN//8lAtscChVT7tOOT
+JRHqWrkbAMJZYUty6bz3
+=nlDk
+-----END PGP SIGNATURE-----
+
+--4IFtMBbmeqbTM/ox--
