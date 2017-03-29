@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ctFyQ-0001hL-SU
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 11:57:27 -0400
+	(envelope-from <thuth@redhat.com>) id 1ctG12-0002XB-DE
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 12:00:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ctFyP-0003wa-TA
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 11:57:26 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <CAOGPPbeRrYfU71ezGB6cYkn8W9mwrSRgvmoj99Q4_q1Km67+gQ@mail.gmail.com>
-	(858585 jemmy's message of "Wed, 29 Mar 2017 21:21:55 +0800")
-References: <1490693009-10037-1-git-send-email-lidongchen@tencent.com>
-	<87efxhspgi.fsf@secure.mitica>
-	<CAOGPPbeRrYfU71ezGB6cYkn8W9mwrSRgvmoj99Q4_q1Km67+gQ@mail.gmail.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 29 Mar 2017 17:57:11 +0200
-Message-ID: <8737dwnkiw.fsf@secure.mitica>
+	(envelope-from <thuth@redhat.com>) id 1ctG0z-00052U-Az
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 12:00:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55454)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ctG0z-00051e-2e
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 12:00:05 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3A02A61BBA
+	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 16:00:03 +0000 (UTC)
+References: <1490092792-30957-1-git-send-email-thuth@redhat.com>
+	<1490092792-30957-3-git-send-email-thuth@redhat.com>
+	<20170327142421.GF2373@work-vm>
+	<95bf59af-beeb-74bf-7819-f2a770b64263@redhat.com>
+	<20170328081753.GA2509@work-vm>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <62b39b15-706f-8607-cfd9-667f0fff6e49@redhat.com>
+Date: Wed, 29 Mar 2017 17:59:58 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC] migration/block:limit the time used for
- block migration
+In-Reply-To: <20170328081753.GA2509@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/3] libqtest: Add a generic function to
+ run a callback function for every machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,72 +37,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 858585 jemmy <jemmy858585@gmail.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, Fam Zheng <famz@redhat.com>, dgilbert@redhat.com, qemu-block@nongnu.org, Lidong Chen <lidongchen@tencent.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-858585 jemmy <jemmy858585@gmail.com> wrote:
-> On Tue, Mar 28, 2017 at 5:47 PM, Juan Quintela <quintela@redhat.com> wrote:
->> Lidong Chen <jemmy858585@gmail.com> wrote:
->>> when migration with quick speed, mig_save_device_bulk invoke
->>> bdrv_is_allocated too frequently, and cause vnc reponse slowly.
->>> this patch limit the time used for bdrv_is_allocated.
+On 28.03.2017 10:17, Dr. David Alan Gilbert wrote:
+> * Thomas Huth (thuth@redhat.com) wrote:
+>> On 27.03.2017 16:24, Dr. David Alan Gilbert wrote:
+>>> * Thomas Huth (thuth@redhat.com) wrote:
+>>>> Some tests need to run single tests for every available machine of the
+>>>> current QEMU binary. To avoid code duplication, let's extract this
+>>>> code that deals with 'query-machines' into a separate function.
+>>>>
+>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
 >>>
->>> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
->>> ---
->>>  migration/block.c | 39 +++++++++++++++++++++++++++++++--------
->>>  1 file changed, 31 insertions(+), 8 deletions(-)
+>>> Having queued it, it's failing my test.
 >>>
->>> diff --git a/migration/block.c b/migration/block.c
->>> index 7734ff7..d3e81ca 100644
->>> --- a/migration/block.c
->>> +++ b/migration/block.c
->>> @@ -110,6 +110,7 @@ typedef struct BlkMigState {
->>>      int transferred;
->>>      int prev_progress;
->>>      int bulk_completed;
->>> +    int time_ns_used;
+>>> The reason is that qom-tests.c has a blacklist which blacklists Xen;
+>>> however your new generic function doesn't have the blacklist, so when
+>>> you run HMP commands on all machines it tries to run it on Xen since
+>>> my PC has the Xen libraries installed (so builds with Xen support) but
+>>> isn't a Xen guest.
+>>>
+>>> It fails with:
+>>> xen be core: xen be core: can't connect to xenstored
+>>> can't connect to xenstored
+>>> xen_init_pv: xen backend core setup failed
+>>> Broken pipe
+>>>
+>>> I suggest you probably need to share the blacklist as well.
+>>>
+>>> (Unqueued)
+>>>
+>>> Dave
+>>>
+>>>> ---
+>>>>  tests/libqtest.c    | 30 +++++++++++++++++
+>>>>  tests/libqtest.h    |  8 +++++
+>>>>  tests/pc-cpu-test.c | 95 ++++++++++++++++++++---------------------------------
+>>>>  tests/qom-test.c    | 36 ++++----------------
+>>>>  4 files changed, 80 insertions(+), 89 deletions(-)
+>>>>
+>>>> diff --git a/tests/libqtest.c b/tests/libqtest.c
+>>>> index c9b2d76..d8b8066 100644
+>>>> --- a/tests/libqtest.c
+>>>> +++ b/tests/libqtest.c
+>>>> @@ -938,3 +938,33 @@ bool qtest_big_endian(QTestState *s)
+>>>>  {
+>>>>      return s->big_endian;
+>>>>  }
+>>>> +
+>>>> +void qtest_cb_for_every_machine(void (*cb)(const char *machine))
+>>>> +{
+>>>> +    QDict *response, *minfo;
+>>>> +    QList *list;
+>>>> +    const QListEntry *p;
+>>>> +    QObject *qobj;
+>>>> +    QString *qstr;
+>>>> +    const char *mname;
+>>>> +
+>>>> +    qtest_start("-machine none");
+>>>> +    response = qmp("{ 'execute': 'query-machines' }");
+>>>> +    g_assert(response);
+>>>> +    list = qdict_get_qlist(response, "return");
+>>>> +    g_assert(list);
+>>>> +
+>>>> +    for (p = qlist_first(list); p; p = qlist_next(p)) {
+>>>> +        minfo = qobject_to_qdict(qlist_entry_obj(p));
+>>>> +        g_assert(minfo);
+>>>> +        qobj = qdict_get(minfo, "name");
+>>>> +        g_assert(qobj);
+>>>> +        qstr = qobject_to_qstring(qobj);
+>>>> +        g_assert(qstr);
+>>>> +        mname = qstring_get_str(qstr);
+>>>> +        cb(mname);
+>>>> +    }
+>>>> +
+>>>> +    qtest_end();
+>>>> +    QDECREF(response);
+>>>> +}
+>> [...]
+>>>> diff --git a/tests/qom-test.c b/tests/qom-test.c
+>>>> index d48f890..ab0595d 100644
+>>>> --- a/tests/qom-test.c
+>>>> +++ b/tests/qom-test.c
+>>>> @@ -107,46 +107,22 @@ static void test_machine(gconstpointer data)
+>>>>      g_free((void *)machine);
+>>>>  }
+>>>>  
+>>>> -static void add_machine_test_cases(void)
+>>>> +static void add_machine_test_case(const char *mname)
+>>>>  {
+>>>>      const char *arch = qtest_get_arch();
+>>>> -    QDict *response, *minfo;
+>>>> -    QList *list;
+>>>> -    const QListEntry *p;
+>>>> -    QObject *qobj;
+>>>> -    QString *qstr;
+>>>> -    const char *mname;
+>>>>  
+>>>> -    qtest_start("-machine none");
+>>>> -    response = qmp("{ 'execute': 'query-machines' }");
+>>>> -    g_assert(response);
+>>>> -    list = qdict_get_qlist(response, "return");
+>>>> -    g_assert(list);
+>>>> -
+>>>> -    for (p = qlist_first(list); p; p = qlist_next(p)) {
+>>>> -        minfo = qobject_to_qdict(qlist_entry_obj(p));
+>>>> -        g_assert(minfo);
+>>>> -        qobj = qdict_get(minfo, "name");
+>>>> -        g_assert(qobj);
+>>>> -        qstr = qobject_to_qstring(qobj);
+>>>> -        g_assert(qstr);
+>>>> -        mname = qstring_get_str(qstr);
+>>>> -        if (!is_blacklisted(arch, mname)) {
+>>>> -            char *path = g_strdup_printf("qom/%s", mname);
+>>>> -            qtest_add_data_func(path, g_strdup(mname), test_machine);
+>>>> -            g_free(path);
+>>>> -        }
+>>>> +    if (!is_blacklisted(arch, mname)) {
+>>>> +        char *path = g_strdup_printf("qom/%s", mname);
+>>>> +        qtest_add_data_func(path, g_strdup(mname), test_machine);
+>>>> +        g_free(path);
+>>>>      }
 >>
->> An int that can only take values 0/1 is called a bool O:-)
-> time_ns_used is used to store how many ns used by bdrv_is_allocated.
+>> Not sure what is going wrong here ... the "!is_blacklisted" check is
+>> still here, so why is it trying to start a xen machine here?
+> 
+> I don't think it's this test that fails, I think it's the new one you add
+> in the last patch but for the same reason.
 
-Oops, I really mean timeout_flag, sorry :-(
+Stupid me, I just read your reply way too fast (I just read qom-test.c
+there and then somehow thought you were talking about a problem in that
+file instead).
 
->> Do we really want to call clock_gettime each time that
->> bdrv_is_allocated() is called?  My understanding is that clock_gettime
->> is expensive, but I don't know how expensive is brdrv_is_allocated()
->
-> i write this code to measure the time used by  brdrv_is_allocated()
->
->  279     static int max_time = 0;
->  280     int tmp;
->
->  288             clock_gettime(CLOCK_MONOTONIC_RAW, &ts1);
->  289             ret = bdrv_is_allocated(blk_bs(bb), cur_sector,
->  290                                     MAX_IS_ALLOCATED_SEARCH, &nr_sectors);
->  291             clock_gettime(CLOCK_MONOTONIC_RAW, &ts2);
->  292
->  293
->  294             tmp =  (ts2.tv_sec - ts1.tv_sec)*1000000000L
->  295                            + (ts2.tv_nsec - ts1.tv_nsec);
->  296             if (tmp > max_time) {
->  297                max_time=tmp;
->  298                fprintf(stderr, "max_time is %d\n", max_time);
->  299             }
->
-> the test result is below:
->
->  max_time is 37014
->  max_time is 1075534
->  max_time is 17180913
->  max_time is 28586762
->  max_time is 49563584
->  max_time is 103085447
->  max_time is 110836833
->  max_time is 120331438
+>> Looks like I need to install those xen libraries here, too ...
+> 
+> I think it's xen-libs and xen-devel you need.
 
-this is around 120ms, no?  It is quite a lot, really :-(
+Thanks, I can reproduce the issue now ... I'll send a v2 with a fix.
 
-> so i think it's necessary to clock_gettime each time.
-> but clock_gettime only available on linux. maybe clock() is better.
-
-Thanks, Juan.
+ Thomas
