@@ -1,27 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35219)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ctBd7-0003YI-48
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 07:19:10 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1ctBwi-0006Ju-BE
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 07:39:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ctBd2-0004C2-9n
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 07:19:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56376)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ctBd2-00049c-1I
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 07:19:04 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <CAFEAcA_Dwky8Jr+y3JACdK5MVM82syrvzuVktnJF0cyZ-FjY0A@mail.gmail.com>
-	<20170328210014-mutt-send-email-mst@kernel.org>
-	<8737dwr35o.fsf@dusky.pond.sub.org>
-	<862ea872-423a-8394-3ed5-250b0a3d2ba2@redhat.com>
-Date: Wed, 29 Mar 2017 13:18:56 +0200
-In-Reply-To: <862ea872-423a-8394-3ed5-250b0a3d2ba2@redhat.com> (Thomas Huth's
-	message of "Wed, 29 Mar 2017 12:44:27 +0200")
-Message-ID: <87lgromiu7.fsf@dusky.pond.sub.org>
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1ctBwe-0007kT-Cp
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 07:39:24 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35557
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1ctBwe-0007j5-6u
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 07:39:20 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2TBcj1P143245
+	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 07:39:18 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 29gbdpa2v0-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 07:39:17 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Wed, 29 Mar 2017 12:39:16 +0100
+Date: Wed, 29 Mar 2017 13:39:11 +0200
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <da3b6453-650d-5f57-bab6-0b7b4b86d664@redhat.com>
+References: <93cb45b7-feca-9340-5fbe-3cc1e60d9e7e@redhat.com>
+	<aa8f8830-9426-7cf5-ec99-363035315aa3@redhat.com>
+	<20170329104511.6dfa132c.cornelia.huck@de.ibm.com>
+	<da3b6453-650d-5f57-bab6-0b7b4b86d664@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] qemu-devel mailing list vs DMARC and
- microsoft.com's p=reject policy
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <20170329133911.10581d99.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] issues of region cache and iommu reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,71 +44,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Peter Xu <peterx@redhat.com>, qemu devel <qemu-devel@nongnu.org>
 
-Thomas Huth <thuth@redhat.com> writes:
+On Wed, 29 Mar 2017 17:18:00 +0800
+Jason Wang <jasowang@redhat.com> wrote:
 
-> On 29.03.2017 08:46, Markus Armbruster wrote:
->> "Michael S. Tsirkin" <mst@redhat.com> writes:
->> 
->>> On Tue, Mar 28, 2017 at 06:35:55PM +0100, Peter Maydell wrote:
->>>> Hi; it's been pointed out to me that we have a problem with qemu-devel
->>>> unsubscribing people because of DMARC. Specifically:
->>>>  * microsoft.com publishes a DMARC policy that has p=reject
->>>>  * some subscribers use mail systems that honour this and send bounces
->>>>    for non-verifying emails from those domains
->>>>  * the mailing list software (mailman) modifies emails that pass through
->>>>    it, among other things adding the "[qemu-devel]" subject tag, in
->>>>    a way that means that signatures no longer verify
->>>>  * bounces back to mailman as a result of mailing list postings from
->>>>    microsoft.com people can then cause people to be unintentionally
->>>>    unsubscribed
->>>>
->>>> This is kind of painful. https://wiki.list.org/DEV/DMARC has the
->>>> Mailman wiki information on the subject. In an ideal world nobody
->>>> would use p=reject because it breaks mailing lists. In the actual
->>>> world we have a few choices:
->>>>
->>>>  (1) I could set dmarc_moderation_action=Reject
->>>>    * this means nobody can subscribe if they've set their dmarc policy
->>>>      to reject (the "if you don't believe in mailing lists we don't
->>>>      believe in you" policy).
->>>>    * there is a certain purity to this option, in that it is pushing
->>>>      the costs of this unhelpful mail config back on the organisations
->>>>      which have chosen it; on the other hand I'm reluctant to make
->>>>      life harder for people who are contributing to the project
->>>>      and who typically don't have much say over corporate email config.
->>>>  (2) I could reconfigure mailman to try to not rewrite anything that
->>>>      we think is likely to be signed (in particular not the body or the
->>>>      subject)
->>>>    * this means dropping the [qemu-devel] tag from the subject, which I'm
->>>>      a bit reluctant to do (it seems likely at least some readers are
->>>>      filtering on it, and personally I quite like it)
->>>>    * if anybody DKIM-signs the Sender: header we're stuck anyway
->>>
->>> For the record I'd strongly prefer this option - I tag all list mail
->>> and so "qemu-devel" appears twice: in subject and as a tag.
->>> Also, if mail is copied to another list, qemu-devel will
->>> still appear as gmail de-duplicates email by msg id.
->>> I can remove tags I don't care about but can't remove
->>> subject prefixes.
->> 
->> Seconded.  Mailing lists messing with the subject to "help" users with
->> filtering just complicate it.
->> 
->> Filtering on List-Id isn't any harder, and has the added advantage that
->> it actually works.
->
-> The problem is that some mail clients are rather limited and you can
-> only filter via title there - so I guess some people would complain we
-> removed the tag from the subject.
+> On 2017=E5=B9=B403=E6=9C=8829=E6=97=A5 16:45, Cornelia Huck wrote:
+> > On Wed, 29 Mar 2017 10:09:10 +0200
+> > Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >
+> >> On 29/03/2017 10:00, Jason Wang wrote:
+> >>>
+> >>> 1) vtd was reset first
+> >>>
+> >>> 2) during the reset of virtio-net-pci #1, deletion of msix subregion
+> >>> will cause a commit of all memory listeners
+> >>>
+> >>> 3) virito-net-pci #2's region cache will be update, but since vtd has
+> >>> already been reset, it can't get a valid mappings here
+> >>>
+> >>> Any ideas on how to fix this? Need region cache be aware of IOMMU/IOT=
+LB
+> >>> state in this case? Or can we simply reset IOMMU as the last one?
+> >> Something like this?
+> >>
+> >> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> >> index 03592c5..73e69ac 100644
+> >> --- a/hw/virtio/virtio.c
+> >> +++ b/hw/virtio/virtio.c
+> >> @@ -176,6 +176,10 @@ err_used:
+> >>       address_space_cache_destroy(&new->desc);
+> >>   err_desc:
+> >>       g_free(new);
+> >> +    atomic_rcu_set(&vq->vring.caches, NULL);
+> >> +    if (old) {
+> >> +        call_rcu(old, virtio_free_region_cache, rcu);
+> >> +    }
+> > Maybe I'm just confused here, but isn't ->broken enough to prevent
+> > further accesses?
+>=20
+> Looks not (e.g virtio_queue_update_used_idx() that was called by vhost).=
+=20
 
-Some people might have to switch to less crippled^W^Wmore capable
-software.  Thank me later.
+We probably should take care that we don't do things like that for
+broken devices. But that ties into the virtio_error() discussion, and
+we probably want to revisit that in that context.
 
-> Apart from that, I've also seen mailman messing up white spaces in the
-> body of e-mails, so this likely would only solve parts of this problem.
+> We only have pfn check for all helpers now.
 
-Assuming that's still the case, and not a mailman configuration issue:
-mailman bug.
+So we'll assert() after that change?
+
+>=20
+> > And a reset will unset both ->broken and the caches
+> > anyway? What am I missing?
+>=20
+> Yes, but is it good to store invalid or even wrong mappings in the cache?
+
+Not really; but I'd like to see ->broken as a kind of master indicator
+"this device does not work, do not trust/use anything until it has been
+reset".
