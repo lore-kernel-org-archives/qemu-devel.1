@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ct8mY-000577-Ln
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 04:16:43 -0400
+	(envelope-from <quintela@redhat.com>) id 1ct8w6-0006ZV-Lr
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 04:26:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ct8mV-0005lM-FD
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 04:16:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45318)
+	(envelope-from <quintela@redhat.com>) id 1ct8w3-0001cz-Hm
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 04:26:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37042)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ct8mV-0005lE-9L
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 04:16:39 -0400
-Date: Wed, 29 Mar 2017 16:16:30 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170329081630.GF3152@pxdev.xzpeter.org>
-References: <93cb45b7-feca-9340-5fbe-3cc1e60d9e7e@redhat.com>
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ct8w3-0001bp-8t
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 04:26:31 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1F5BC7E9F4
+	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 08:26:30 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170329070225.GE3152@pxdev.xzpeter.org> (Peter Xu's message of
+	"Wed, 29 Mar 2017 15:02:25 +0800")
+References: <20170323204544.12015-1-quintela@redhat.com>
+	<20170323204544.12015-12-quintela@redhat.com>
+	<20170327092350.GH11497@pxdev.xzpeter.org>
+	<8737dxqm1y.fsf@secure.mitica>
+	<20170329070225.GE3152@pxdev.xzpeter.org>
+Reply-To: quintela@redhat.com
+Date: Wed, 29 Mar 2017 10:26:25 +0200
+Message-ID: <87y3voo5e6.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <93cb45b7-feca-9340-5fbe-3cc1e60d9e7e@redhat.com>
-Subject: Re: [Qemu-devel] issues of region cache and iommu reset
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 11/51] ram: Move dup_pages into RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,65 +37,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu devel <qemu-devel@nongnu.org>, Cornelia Huck <cornelia.huck@de.ibm.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
 
-On Wed, Mar 29, 2017 at 04:00:37PM +0800, Jason Wang wrote:
-> Hi:
-> 
-> I meet an issue when doing reboot for a guest with two virtio-net-pci cards
-> when iommu is enabled. What happens is:
-> 
-> 
-> 1) vtd was reset first
+Peter Xu <peterx@redhat.com> wrote:
+> On Tue, Mar 28, 2017 at 08:43:37PM +0200, Juan Quintela wrote:
+>> Peter Xu <peterx@redhat.com> wrote:
+>> > On Thu, Mar 23, 2017 at 09:45:04PM +0100, Juan Quintela wrote:
+>> >> Once there rename it to its actual meaning, zero_pages.
+>> >> 
+>> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> >> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> >
+>> > Reviewed-by: Peter Xu <peterx@redhat.com>
+>> >
+>> > Will post a question below though (not directly related to this patch
+>> > but context-wide)...
+>> >>  {
+>> >>      int pages = -1;
+>> >>  
+>> >>      if (is_zero_range(p, TARGET_PAGE_SIZE)) {
+>> >> -        acct_info.dup_pages++;
+>> >> +        rs->zero_pages++;
+>> >>          *bytes_transferred += save_page_header(f, block,
+>> >>                                                 offset | RAM_SAVE_FLAG_COMPRESS);
+>> >>          qemu_put_byte(f, 0);
+>> >> @@ -822,11 +826,11 @@ static int ram_save_page(RAMState *rs, MigrationState *ms, QEMUFile *f,
+>> >>              if (bytes_xmit > 0) {
+>> >>                  acct_info.norm_pages++;
+>> >>              } else if (bytes_xmit == 0) {
+>> >> -                acct_info.dup_pages++;
+>> >> +                rs->zero_pages++;
+>> >
+>> > This code path looks suspicous... since iiuc currently it should only
+>> > be triggered by RDMA case, and I believe here qemu_rdma_save_page()
+>> > should have met something wrong (so that it didn't return with
+>> > RAM_SAVE_CONTROL_DELAYED). Then is it correct we do increase zero page
+>> > counting unconditionally here? (hmm, the default bytes_xmit is zero as
+>> > well...)
+>> 
+>> My head hurts at this point.
+>
+> Sorry about that! :(
 
-I'll add an extra question:
+Hahaha, it was a ""figure of speak" O:-)
 
-Currently with Q35 and VT-d, our system qtree looks like (simplified
-version):
+>> ok.  bytse_xmit can only be zero if we called qemu_rdma_save_page() with
+>> size=0 or there has been an RDMA error.  We ver call the function with
+>> size = 0.  And if there is one error, we are in very bady shape already.
+>> 
+>> > Another thing is that I see when RDMA is enabled we are updating
+>> > accounting info with acct_update_position(), while we updated it here
+>> > as well. Is this an issue of duplicated accounting?
+>> 
+>> I think stats and rdma are not right.  I have to check more that.
+>
+> Sorry to have led the discussion too far away from the topic. I guess
+> it'll be perfectly okay to just mark this as TODO item, and we can
+> just move on with current series (and I believe you have further
+> patches after this big one :).
 
-bus: system bus
-  dev: intel-iommu
-  dev: q35-pcihost
-    bus: pcie.0
-      dev: pci device 1
-      dev: pci device 2
-      ...
+Yeap.
 
-Not sure whether it'll be clearer to switch to:
+> Out of curiosity - to what extent are people using migration with
+> RDMA? Should that be "very rare"? Thanks,
 
-bus: system bus
-  dev: q35-pcihost
-    bus: iommu-scope 0
-      dev: intel-iommu
-        bus: pcie.0
-          dev: pci device 1
-          dev: pci device 2
-          ...
+I don't really have numbers.  Some customers find it very important, but
+I don't have a good idea of how to put it.
 
-since logically the IOMMU device should be part of q35 pci-host?
-
-Further, if we'll have more intel-iommus in the future in a single
-guest, we'll be able to have devices dangle under the specific iommu
-that it belongs. That'll be nice imho.
-
-(Btw, I see that we are using qbus-qdev-qbus-... iterations to
- describe the system tree. Why cannot we have qdev under another qdev?
- Sorry if the question is stupid... Any pointers on explanations to
- these qdev logics would be appreciated as well.)
-
-> 
-> 2) during the reset of virtio-net-pci #1, deletion of msix subregion will
-> cause a commit of all memory listeners
-> 
-> 3) virito-net-pci #2's region cache will be update, but since vtd has
-> already been reset, it can't get a valid mappings here
-> 
-> 
-> Any ideas on how to fix this? Need region cache be aware of IOMMU/IOTLB
-> state in this case? Or can we simply reset IOMMU as the last one?
-> 
-> Thanks
-> 
-
--- peterx
+Later, Juan.
