@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ctHuD-00015x-1q
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 14:01:14 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1ctHvj-0001mm-PG
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 14:02:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ctHuA-0001uS-0k
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 14:01:13 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40389)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ctHu9-0001uA-RY
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 14:01:09 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ctHu8-0006NK-Be
-	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 18:01:08 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 541232E80CB
-	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 18:01:08 +0000 (UTC)
+	(envelope-from <dgilbert@redhat.com>) id 1ctHvg-0002pd-LB
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 14:02:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50292)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ctHvg-0002pT-DS
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 14:02:44 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2E9BE80492
+	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 18:02:43 +0000 (UTC)
+Date: Wed, 29 Mar 2017 19:02:39 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170329180239.GG2501@work-vm>
+References: <20170323204544.12015-1-quintela@redhat.com>
+	<20170323204544.12015-38-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 29 Mar 2017 17:50:33 -0000
-From: Brendan Shanks <brendan@bslabs.net>
-Reply-To: Bug 1675108 <1675108@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170322172621.26186.61813.malonedeb@gac.canonical.com>
-Message-Id: <20170329175033.26095.62504.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1675108] Re: Cocoa UI always crashes on startup
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170323204544.12015-38-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 37/51] ram: Move compression_switch to
+ RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,61 +34,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Fixed in -rc2, closing.
+* Juan Quintela (quintela@redhat.com) wrote:
+> Rename it to preffer_xbzrle that is a more descriptive name.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  migration/ram.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 6a39704..591cf89 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -217,6 +217,9 @@ struct RAMState {
+>      uint64_t dirty_pages_rate;
+>      /* Count of requests incoming from destination */
+>      uint64_t postcopy_requests;
+> +    /* Should we move to xbzrle after the 1st round
+> +       of compression */
+> +    bool preffer_xbzrle;
 
-** Changed in: qemu
-       Status: New =3D> Fix Released
+That's 'prefer' - however, do we need it at all?
+How about just replacing it by:
+   !ram_bulk_stage && migrate_use_xbzrle()
 
--- =
+would that work?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1675108
+Dave
 
-Title:
-  Cocoa UI always crashes on startup
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  Commit 8bb93c6f99a42c2e0943bc904b283cd622d302c5 ("ui/console: ensure
-  graphic updates don't race with TCG vCPUs") causes the graphic update
-  to run on a non-main thread, which Cocoa is not happy with. It crashes
-  immediately after startup.
-
-  $ i386-softmmu/qemu-system-i386 =
-
-  2017-03-22 10:09:25.113 qemu-system-i386[15968:9538245] *** Terminating a=
-pp due to uncaught exception 'NSInternalInconsistencyException', reason: 'n=
-extEventMatchingMask should only be called from the Main Thread!'
-  *** First throw call stack:
-  (
-  	0   CoreFoundation                      0x00007fff91e72e7b __exceptionPr=
-eprocess + 171
-  	1   libobjc.A.dylib                     0x00007fffa6a5ccad objc_exceptio=
-n_throw + 48
-  	2   AppKit                              0x00007fff900953fd -[NSApplicati=
-on(NSEvent) _nextEventMatchingEventMask:untilDate:inMode:dequeue:] + 4471
-  	3   qemu-system-i386                    0x0000000104f75a49 cocoa_refresh=
- + 233
-  	4   qemu-system-i386                    0x0000000104e0312c process_queue=
-d_cpu_work + 140
-  	5   qemu-system-i386                    0x0000000104d1a73c qemu_tcg_rr_c=
-pu_thread_fn + 284
-  	6   libsystem_pthread.dylib             0x00007fffa7557aab _pthread_body=
- + 180
-  	7   libsystem_pthread.dylib             0x00007fffa75579f7 _pthread_body=
- + 0
-  	8   libsystem_pthread.dylib             0x00007fffa75571fd thread_start =
-+ 13
-  )
-  libc++abi.dylib: terminating with uncaught exception of type NSException
-  Abort trap: 6
-
-  System: macOS 10.12.3, Xcode 8.2.1
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1675108/+subscriptions
+>      /* protects modification of the bitmap */
+>      QemuMutex bitmap_mutex;
+>      /* Ram Bitmap protected by RCU */
+> @@ -335,7 +338,6 @@ static QemuCond comp_done_cond;
+>  /* The empty QEMUFileOps will be used by file in CompressParam */
+>  static const QEMUFileOps empty_ops = { };
+>  
+> -static bool compression_switch;
+>  static DecompressParam *decomp_param;
+>  static QemuThread *decompress_threads;
+>  static QemuMutex decomp_done_lock;
+> @@ -419,7 +421,6 @@ void migrate_compress_threads_create(void)
+>      if (!migrate_use_compression()) {
+>          return;
+>      }
+> -    compression_switch = true;
+>      thread_count = migrate_compress_threads();
+>      compress_threads = g_new0(QemuThread, thread_count);
+>      comp_param = g_new0(CompressParam, thread_count);
+> @@ -1091,7 +1092,7 @@ static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss,
+>                   * point. In theory, xbzrle can do better than compression.
+>                   */
+>                  flush_compressed_data(rs);
+> -                compression_switch = false;
+> +                rs->preffer_xbzrle = true;
+>              }
+>          }
+>          /* Didn't find anything this time, but try again on the new block */
+> @@ -1323,7 +1324,7 @@ static int ram_save_target_page(RAMState *rs, MigrationState *ms,
+>      /* Check the pages is dirty and if it is send it */
+>      if (migration_bitmap_clear_dirty(rs, dirty_ram_abs)) {
+>          unsigned long *unsentmap;
+> -        if (compression_switch && migrate_use_compression()) {
+> +        if (!rs->preffer_xbzrle && migrate_use_compression()) {
+>              res = ram_save_compressed_page(rs, ms, pss, last_stage);
+>          } else {
+>              res = ram_save_page(rs, ms, pss, last_stage);
+> -- 
+> 2.9.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
