@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ctBaV-0002qw-3C
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 07:16:28 -0400
+	(envelope-from <armbru@redhat.com>) id 1ctBd7-0003YI-48
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 07:19:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ctBaR-0002jI-W7
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 07:16:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35606)
+	(envelope-from <armbru@redhat.com>) id 1ctBd2-0004C2-9n
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 07:19:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56376)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ctBaR-0002iR-Po
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 07:16:23 -0400
-Date: Wed, 29 Mar 2017 12:16:20 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170329111620.GH10462@stefanha-x1.localdomain>
-References: <20170328225327.16707-1-samuel.thibault@ens-lyon.org>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ctBd2-00049c-1I
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 07:19:04 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <CAFEAcA_Dwky8Jr+y3JACdK5MVM82syrvzuVktnJF0cyZ-FjY0A@mail.gmail.com>
+	<20170328210014-mutt-send-email-mst@kernel.org>
+	<8737dwr35o.fsf@dusky.pond.sub.org>
+	<862ea872-423a-8394-3ed5-250b0a3d2ba2@redhat.com>
+Date: Wed, 29 Mar 2017 13:18:56 +0200
+In-Reply-To: <862ea872-423a-8394-3ed5-250b0a3d2ba2@redhat.com> (Thomas Huth's
+	message of "Wed, 29 Mar 2017 12:44:27 +0200")
+Message-ID: <87lgromiu7.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="bpVaumkpfGNUagdU"
-Content-Disposition: inline
-In-Reply-To: <20170328225327.16707-1-samuel.thibault@ens-lyon.org>
-Subject: Re: [Qemu-devel] [PULL 0/3] slirp updates
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] qemu-devel mailing list vs DMARC and
+ microsoft.com's p=reject policy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,59 +30,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Cc: qemu-devel@nongnu.org, jan.kiszka@siemens.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>
 
+Thomas Huth <thuth@redhat.com> writes:
 
---bpVaumkpfGNUagdU
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 29.03.2017 08:46, Markus Armbruster wrote:
+>> "Michael S. Tsirkin" <mst@redhat.com> writes:
+>> 
+>>> On Tue, Mar 28, 2017 at 06:35:55PM +0100, Peter Maydell wrote:
+>>>> Hi; it's been pointed out to me that we have a problem with qemu-devel
+>>>> unsubscribing people because of DMARC. Specifically:
+>>>>  * microsoft.com publishes a DMARC policy that has p=reject
+>>>>  * some subscribers use mail systems that honour this and send bounces
+>>>>    for non-verifying emails from those domains
+>>>>  * the mailing list software (mailman) modifies emails that pass through
+>>>>    it, among other things adding the "[qemu-devel]" subject tag, in
+>>>>    a way that means that signatures no longer verify
+>>>>  * bounces back to mailman as a result of mailing list postings from
+>>>>    microsoft.com people can then cause people to be unintentionally
+>>>>    unsubscribed
+>>>>
+>>>> This is kind of painful. https://wiki.list.org/DEV/DMARC has the
+>>>> Mailman wiki information on the subject. In an ideal world nobody
+>>>> would use p=reject because it breaks mailing lists. In the actual
+>>>> world we have a few choices:
+>>>>
+>>>>  (1) I could set dmarc_moderation_action=Reject
+>>>>    * this means nobody can subscribe if they've set their dmarc policy
+>>>>      to reject (the "if you don't believe in mailing lists we don't
+>>>>      believe in you" policy).
+>>>>    * there is a certain purity to this option, in that it is pushing
+>>>>      the costs of this unhelpful mail config back on the organisations
+>>>>      which have chosen it; on the other hand I'm reluctant to make
+>>>>      life harder for people who are contributing to the project
+>>>>      and who typically don't have much say over corporate email config.
+>>>>  (2) I could reconfigure mailman to try to not rewrite anything that
+>>>>      we think is likely to be signed (in particular not the body or the
+>>>>      subject)
+>>>>    * this means dropping the [qemu-devel] tag from the subject, which I'm
+>>>>      a bit reluctant to do (it seems likely at least some readers are
+>>>>      filtering on it, and personally I quite like it)
+>>>>    * if anybody DKIM-signs the Sender: header we're stuck anyway
+>>>
+>>> For the record I'd strongly prefer this option - I tag all list mail
+>>> and so "qemu-devel" appears twice: in subject and as a tag.
+>>> Also, if mail is copied to another list, qemu-devel will
+>>> still appear as gmail de-duplicates email by msg id.
+>>> I can remove tags I don't care about but can't remove
+>>> subject prefixes.
+>> 
+>> Seconded.  Mailing lists messing with the subject to "help" users with
+>> filtering just complicate it.
+>> 
+>> Filtering on List-Id isn't any harder, and has the added advantage that
+>> it actually works.
+>
+> The problem is that some mail clients are rather limited and you can
+> only filter via title there - so I guess some people would complain we
+> removed the tag from the subject.
 
-On Wed, Mar 29, 2017 at 12:53:24AM +0200, Samuel Thibault wrote:
-> The following changes since commit df9046363220e57d45818312759b954c033c58=
-ab:
->=20
->   Update version for v2.9.0-rc2 release (2017-03-28 19:11:16 +0100)
->=20
-> are available in the git repository at:
->=20
->   http://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
->=20
-> for you to fetch changes up to a2f80fdfc683019901cdf4c0863a5920c0ca7245:
->=20
->   slirp: Send RDNSS in RA only if host has an IPv6 DNS server (2017-03-29=
- 00:51:25 +0200)
->=20
-> ----------------------------------------------------------------
-> slirp updates
->=20
-> ----------------------------------------------------------------
-> Laurent Vivier (1):
->       slirp: fix compilation errors with DEBUG set
->=20
-> Samuel Thibault (2):
->       slirp: Make RA build more flexible
->       slirp: Send RDNSS in RA only if host has an IPv6 DNS server
->=20
->  slirp/ip6_icmp.c | 47 ++++++++++++++++++++++-------------------------
->  slirp/slirp.c    |  2 +-
->  2 files changed, 23 insertions(+), 26 deletions(-)
+Some people might have to switch to less crippled^W^Wmore capable
+software.  Thank me later.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Apart from that, I've also seen mailman messing up white spaces in the
+> body of e-mails, so this likely would only solve parts of this problem.
 
---bpVaumkpfGNUagdU
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJY25eEAAoJEJykq7OBq3PIUaAIAI8OaGi/4ZxZ+46dNb3T5ML5
-qYrgi9zCoKXEGmSLs3O3cDEEEL6DmyeMzSpV/AGtrw30ieBzORfMjuP/gYICwXuI
-VyWjuqJAMgKYmAYX4f+1vWndtAPCZOQ6xa6+PtOvGcF7dLeR8l1ScGel2o8xw02p
-UVlxrRTg6JoBrRhbZOvJu/39e7i0MXyR2Q1LDMVk55GBcMihiAwWy3J92wxQmExK
-zA035KzN/X3eDpkdhClJjVLzgtWktn229MMo2DjKcLh56wsBL0/F/0FwoY4rqzIG
-VlIRd3f0WQw7J6MMQxhCH0H7dIUtQ4gk5p/rrGAJv6yU5y0Ypj5gkq9PIWMYe9A=
-=iCxI
------END PGP SIGNATURE-----
-
---bpVaumkpfGNUagdU--
+Assuming that's still the case, and not a mailman configuration issue:
+mailman bug.
