@@ -1,35 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52586)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ctLMc-0007Ix-0d
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 17:42:47 -0400
+	(envelope-from <mreitz@redhat.com>) id 1ctLp5-0003Ey-CR
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 18:12:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ctLMX-00034u-Ul
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 17:42:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33906)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ctLMX-000341-PE
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 17:42:41 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9DBA480479
-	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 21:42:40 +0000 (UTC)
-Date: Thu, 30 Mar 2017 00:42:37 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170330003914-mutt-send-email-mst@kernel.org>
-References: <3d1c16a1-ec05-0367-e569-64a63b34f2e3@redhat.com>
-	<4a56f716-3528-ddd4-f8c4-f3f6b23c469a@redhat.com>
-	<bbc2671a-42dd-aa2a-0f03-6a4a487cb8f5@redhat.com>
-	<fddf5055-c458-3893-9a18-5b0701e5431a@redhat.com>
-	<3044459b-65a3-ca78-c009-15de9823704a@redhat.com>
-	<20170329164646.GD2501@work-vm>
-	<0eebf55d-aeb9-5426-001d-175b0cbfc60c@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1ctLp4-0008VC-6K
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 18:12:11 -0400
+References: <20170313214001.26339-1-mreitz@redhat.com>
+	<20170313214117.27350-4-mreitz@redhat.com>
+	<20170320112637.GM17887@stefanha-x1.localdomain>
+	<c84b9653-d89f-2baa-a92c-9332ce072b6d@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <ccebecca-53e1-61b7-e5ea-f28656f586c3@redhat.com>
+Date: Thu, 30 Mar 2017 00:12:01 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0eebf55d-aeb9-5426-001d-175b0cbfc60c@redhat.com>
-Subject: Re: [Qemu-devel] Deprecating old machine types
+In-Reply-To: <c84b9653-d89f-2baa-a92c-9332ce072b6d@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="msiNtiqlEEJrTuBjI5q3HKhStxp9S5eSJ"
+Subject: Re: [Qemu-devel] [PATCH for-2.10 13/16] block/qcow2:
+ qcow2_calc_size_usage() for truncate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,40 +27,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-On Wed, Mar 29, 2017 at 06:58:36PM +0200, Paolo Bonzini wrote:
-> 
-> 
-> On 29/03/2017 18:46, Dr. David Alan Gilbert wrote:
-> >> By the way, what about old machine types like "pc-0.10" ? Do we want to
-> >> carry them along forever (e.g. since it is not too complicated to
-> >> maintain?), or shall we get rid of those one day (e.g. with QEMU 3.0), too?
-> > It seems reasonable to slowly deprecate them.
-> > I'm just not sure how slowly.
-> 
-> Some data:
-> 
-> - dropping 0.12, 0.13 _and_ isapc would let us kill the code for
-> rombar=0 (i.e. where QEMU copies ROM BARs directly to low memory).
-> 
-> - the oldest versions in use are probably 0.12 (CentOS 6) and 1.0
-> (Ubuntu 12.04)
-> 
-> - migration from old versions is broken in various ways from at least
-> QEMU 1.2 and older.
-> 
-> Paolo
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--msiNtiqlEEJrTuBjI5q3HKhStxp9S5eSJ
+From: Max Reitz <mreitz@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ qemu-devel@nongnu.org
+Message-ID: <ccebecca-53e1-61b7-e5ea-f28656f586c3@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 13/16] block/qcow2:
+ qcow2_calc_size_usage() for truncate
+References: <20170313214001.26339-1-mreitz@redhat.com>
+ <20170313214117.27350-4-mreitz@redhat.com>
+ <20170320112637.GM17887@stefanha-x1.localdomain>
+ <c84b9653-d89f-2baa-a92c-9332ce072b6d@redhat.com>
+In-Reply-To: <c84b9653-d89f-2baa-a92c-9332ce072b6d@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-Live-migration, yes.
+On 20.03.2017 16:14, Max Reitz wrote:
+> On 20.03.2017 12:26, Stefan Hajnoczi wrote:
+>> On Mon, Mar 13, 2017 at 10:41:14PM +0100, Max Reitz wrote:
+>>> This patch extends qcow2_calc_size_usage() so it can calculate the
+>>> additional space needed for preallocating image growth.
+>>>
+>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>> ---
+>>>  block/qcow2.c | 137 +++++++++++++++++++++++++++++++++++++++++-------=
+----------
+>>>  1 file changed, 98 insertions(+), 39 deletions(-)
+>>>
+>>> diff --git a/block/qcow2.c b/block/qcow2.c
+>>> index 21b2b3cd53..80fb815b15 100644
+>>> --- a/block/qcow2.c
+>>> +++ b/block/qcow2.c
+>>> @@ -2101,7 +2101,15 @@ done:
+>>>      return ret;
+>>>  }
+>>> =20
+>>> -static uint64_t qcow2_calc_size_usage(uint64_t new_size,
+>>> +/**
+>>> + * Returns the number of bytes that must be allocated in the underly=
+ing file
+>>> + * to accomodate an image growth from @current_size to @new_size.
+>>> + *
+>>> + * @current_size must be 0 when creating a new image. In that case, =
+@bs is
+>>> + * ignored; otherwise it must be valid.
+>>> + */
+>>> +static uint64_t qcow2_calc_size_usage(BlockDriverState *bs,
+>>> +                                      uint64_t current_size, uint64_=
+t new_size,
+>>>                                        int cluster_bits, int refcount=
+_order)
+>>>  {
+>>>      size_t cluster_size =3D 1u << cluster_bits;
+>>> @@ -2122,47 +2130,97 @@ static uint64_t qcow2_calc_size_usage(uint64_=
+t new_size,
+>>>      refblock_bits =3D cluster_bits - (refcount_order - 3);
+>>>      refblock_size =3D 1 << refblock_bits;
+>>> =20
+>>> -    /* header: 1 cluster */
+>>> -    meta_size +=3D cluster_size;
+>>> -
+>>> -    /* total size of L2 tables */
+>>> -    nl2e =3D aligned_total_size / cluster_size;
+>>> -    nl2e =3D align_offset(nl2e, cluster_size / sizeof(uint64_t));
+>>> -    meta_size +=3D nl2e * sizeof(uint64_t);
+>>> +    if (!current_size) {
+>>
+>> This massive if statement effectively makes two functions: the old
+>> qcow2_calc_size_usage() and the new qcow2_calc_size_change(bs) functio=
+n.
+>>
+>> It might be nicer to split the two functions.
+>=20
+> Hm, yes, but at that point I might as well just write two completely
+> separate functions. I'll see what I can do, maybe I'll just put the new=
 
-But live-migrations are a minority, most people update qemu and restart
-it but do not want to reinstall their guests and that is only reliable
-if you keep the old machine type.
+> logic that's needed into a completely new function after all.
 
-And that seems to work reasonably well. So one way would be to
-mark 0.10 and 0.11 unmigrateable, and drop rombar=0 hacks.
+I'm having a bit of trouble with the split, due to a couple of reasons:
 
--- 
-MST
+First, I can't think of a good name for the new function.
+qcow2_calc_growth_size_usage() is a bit long and still not really
+meaningful...
+
+Second, having all the functionality in a single function means we can
+"share" the explanation of how nrefblocke is calculated. I don't really
+want to just put a reference comment there ("look it up in
+qcow2_create2()"), but I definitely don't want to duplicate it either.
+
+Finally, having it in a single function may not make much sense from the
+inside but it does very much so from the outside. Even though we have to
+follow much different code paths, from the outside it's pretty much the
+same thing.
+
+
+Therefore, I'm probably going to keep this patch as-is in v2 (for now),
+expecting more criticism and stronger wording than "might be nicer",
+forcing me to finally do the split in an eventual v3. O:-)
+
+Max
+
+
+--msiNtiqlEEJrTuBjI5q3HKhStxp9S5eSJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljcMTESHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9Ar5wH/3DDbWJLW+DDqHldTLRGImJpzsW1NqoV
+o75H4BlrElRSdaXX1mVP6UTaukHCRLagEGRIH3X0Nur2VpTn9vgyCNERwMH6W1Gn
+BTd5Fw/65nVQkgFZpO2qINflFlx27l48VBfhcccuVR9nd/zI6XFngVlU7OvNWS0p
+vttZlBVMiqxuM55i+1apjko93HL+6G3kf+agm3O0Vfe5TXTFvLHl41/sIFCXUFQx
+joh3tmICquiWrEXKK2SOfcWWQxkFTxV+mhn8ikJ3zWhtXplHNcOBT5lTv8B1lECo
+VWnFz0lmXCXOVKtbXgQIFv2OGEHrEPhDW4OJO21AtHgth9iXAENVLQc=
+=yMWM
+-----END PGP SIGNATURE-----
+
+--msiNtiqlEEJrTuBjI5q3HKhStxp9S5eSJ--
