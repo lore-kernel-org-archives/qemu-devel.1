@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ctKJp-0006CQ-1w
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 16:35:50 -0400
+	(envelope-from <mreitz@redhat.com>) id 1ctKJr-0006Cd-GW
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 16:35:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ctKJl-0000QU-Pe
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 16:35:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57958)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ctKJl-0000Py-CR
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 16:35:45 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8FCC77E9F4
-	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 20:35:43 +0000 (UTC)
-Date: Wed, 29 Mar 2017 23:35:42 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170329233031-mutt-send-email-mst@kernel.org>
-References: <1490818790-3100-1-git-send-email-vyasevic@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1ctKJq-0000Tr-GN
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 16:35:51 -0400
+References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
+	<1490805920-17029-9-git-send-email-armbru@redhat.com>
+	<a33b1054-201c-9f5e-2c0e-35a86b1262e1@redhat.com>
+	<f7c8116c-db13-4aaf-e5e4-60590705a134@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <7165e65d-c9bb-78b6-b286-956f55e2e5da@redhat.com>
+Date: Wed, 29 Mar 2017 22:35:41 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1490818790-3100-1-git-send-email-vyasevic@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio-net: consolidate guest announcement
- with qemu_announce_self
+In-Reply-To: <f7c8116c-db13-4aaf-e5e4-60590705a134@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="45Ppp5FpTDBU7krKvHu9Tj3ITefXJcAP3"
+Subject: Re: [Qemu-devel] [for-2.9 8/8] sheepdog: Fix blockdev-add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,195 +26,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladislav Yasevich <vyasevic@redhat.com>
-Cc: qemu-devel@nongnu.org, gveitmic@redhat.com, dgilbert@redhat.com
+To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, pbonzini@redhat.com
 
-On Wed, Mar 29, 2017 at 04:19:50PM -0400, Vladislav Yasevich wrote:
-> virtio announcements seem to run on its own timer with it's own
-> repetition loop and are invoked separately from qemu_announce_self.
-> This patch consolidates announcements into a single location and
-> allows other nics to provide it's own
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--45Ppp5FpTDBU7krKvHu9Tj3ITefXJcAP3
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp,
+ namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, pbonzini@redhat.com
+Message-ID: <7165e65d-c9bb-78b6-b286-956f55e2e5da@redhat.com>
+Subject: Re: [for-2.9 8/8] sheepdog: Fix blockdev-add
+References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
+ <1490805920-17029-9-git-send-email-armbru@redhat.com>
+ <a33b1054-201c-9f5e-2c0e-35a86b1262e1@redhat.com>
+ <f7c8116c-db13-4aaf-e5e4-60590705a134@redhat.com>
+In-Reply-To: <f7c8116c-db13-4aaf-e5e4-60590705a134@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-their own
+On 29.03.2017 22:32, Eric Blake wrote:
+> On 03/29/2017 02:59 PM, Max Reitz wrote:
+>> On 29.03.2017 18:45, Markus Armbruster wrote:
+>>> Commit 831acdc "sheepdog: Implement bdrv_parse_filename()" and commit=
 
-> announcement capabilities, if
-> necessary.
-> 
-> This is also usefull
+>>> d282f34 "sheepdog: Support blockdev-add" have different ideas on how
+>>> the QemuOpts parameters for the server address are named.  Fix that.
+>>> While there, rename BlockdevOptionsSheepdog member addr to server, fo=
+r
+>>> consistency with BlockdevOptionsSsh, BlockdevOptionsGluster,
+>>> BlockdevOptionsNbd.
+>>>
+>>> Commit 831acdc's example becomes
+>>>
+>>>     --drive driver=3Dsheepdog,server.host=3Dfido,vdi=3Ddolly
+>>>
+>>> instead of
+>>>
+>>>     --drive driver=3Dsheepdog,host=3Dfido,vdi=3Ddolly
+>>>
+>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>> ---
+>>>  block/sheepdog.c     | 18 +++++++++---------
+>>>  qapi/block-core.json |  4 ++--
+>>>  2 files changed, 11 insertions(+), 11 deletions(-)
+>>
+>> OK, so let me get this straight: Before this patch, @addr was advertis=
+ed
+>> as a runtime parameter that actually wasn't supported at all? (Because=
+ I
+>> can't see any place in block/sheepdog.c where it would be parsed.)
+>=20
+> Both commits mentioned in the commit message are new to 2.9, so we
+> aren't breaking any back-compat, but are avoiding cementing in a mistak=
+e.
+>=20
+> Before this patch, @addr was the QMP spelling (inconsistent with all th=
+e
+> others, where ssh, gluster, and nbd spelled it @server); and because it=
 
-or useful?
+> was NOT mentioned in the sheepdog.c QemuOpts code, it was impossible to=
 
-> in support of exposing qemu_announce_self through
-> qmp/hmp.
+> parse it through -drive.  Which means we have a needless difference
+> between -drive and -blockdev-add.
+>=20
+> After this patch, it is spelled @server for both -drive and
+> -blockdev-add, and QMP is consistent (both with the QemuOpts code, and
+> with the other network storage drivers).
 
-I'm guessing this is the real reason for the change.
-How is it helpful for that? Pls clarify in the commit log.
+Yes, right, which is why I agree that in principle this patch is
+necessary for 2.9.
 
-> Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
-> ---
->  hw/net/virtio-net.c            | 30 ++++++++----------------------
->  include/hw/virtio/virtio-net.h |  2 --
->  include/net/net.h              |  2 ++
->  migration/savevm.c             |  6 ++++++
->  4 files changed, 16 insertions(+), 24 deletions(-)
-> 
-> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> index c321680..6e9ce4f 100644
-> --- a/hw/net/virtio-net.c
-> +++ b/hw/net/virtio-net.c
-> @@ -110,14 +110,16 @@ static bool virtio_net_started(VirtIONet *n, uint8_t status)
->          (n->status & VIRTIO_NET_S_LINK_UP) && vdev->vm_running;
->  }
->  
-> -static void virtio_net_announce_timer(void *opaque)
-> +static void virtio_net_announce(NetClientState *nc)
->  {
-> -    VirtIONet *n = opaque;
-> +    VirtIONet *n = qemu_get_nic_opaque(nc);
->      VirtIODevice *vdev = VIRTIO_DEVICE(n);
->  
-> -    n->announce_counter--;
-> -    n->status |= VIRTIO_NET_S_ANNOUNCE;
-> -    virtio_notify_config(vdev);
-> +    if (virtio_vdev_has_feature(vdev, VIRTIO_NET_F_GUEST_ANNOUNCE) &&
-> +        virtio_vdev_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ)) {
-> +            n->status |= VIRTIO_NET_S_ANNOUNCE;
-> +            virtio_notify_config(vdev);
-> +    }
->  }
->  
->  static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
-> @@ -427,8 +429,6 @@ static void virtio_net_reset(VirtIODevice *vdev)
->      n->nobcast = 0;
->      /* multiqueue is disabled by default */
->      n->curr_queues = 1;
-> -    timer_del(n->announce_timer);
-> -    n->announce_counter = 0;
->      n->status &= ~VIRTIO_NET_S_ANNOUNCE;
->  
->      /* Flush any MAC and VLAN filter table state */
-> @@ -868,11 +868,6 @@ static int virtio_net_handle_announce(VirtIONet *n, uint8_t cmd,
->      if (cmd == VIRTIO_NET_CTRL_ANNOUNCE_ACK &&
->          n->status & VIRTIO_NET_S_ANNOUNCE) {
->          n->status &= ~VIRTIO_NET_S_ANNOUNCE;
-> -        if (n->announce_counter) {
-> -            timer_mod(n->announce_timer,
-> -                      qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
-> -                      self_announce_delay(n->announce_counter));
-> -        }
->          return VIRTIO_NET_OK;
->      } else {
->          return VIRTIO_NET_ERR;
+>> This patch now renames @addr to @server and instead of actually parsin=
+g
+>> the option, it just removes the so-far convenience[1] options @host,
+>> @port, and @path and just fetches the from @server?
+>=20
+> But the convenience options have not been released, so fixing them now
+> is the right way to go.
 
-you will notice that this runs at VM speeds with QEMU_CLOCK_VIRTUAL,
-while the self announce you are tying this to runs with
-QEMU_CLOCK_REALTIME.
+Right. My main point was that @server still isn't actually parsed.
 
-So this switch seems wrong to me: by the time VM is started
-on destination all timers might have expired.
+>> If that is true, I can't say I like it the least. I guess it works for=
 
+>> 2.9, but there should be a FIXME somewhere in this patch.
+>=20
+> A fixme to what? Unlike patch 7/8 which has to deal with legacy -drive
+> code, here, we have nothing released to break.
 
-> @@ -1609,12 +1604,6 @@ static int virtio_net_post_load_device(void *opaque, int version_id)
->          qemu_get_subqueue(n->nic, i)->link_down = link_down;
->      }
->  
-> -    if (virtio_vdev_has_feature(vdev, VIRTIO_NET_F_GUEST_ANNOUNCE) &&
-> -        virtio_vdev_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ)) {
-> -        n->announce_counter = SELF_ANNOUNCE_ROUNDS;
-> -        timer_mod(n->announce_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL));
-> -    }
-> -
->      return 0;
->  }
->  
-> @@ -1829,6 +1818,7 @@ static NetClientInfo net_virtio_info = {
->      .receive = virtio_net_receive,
->      .link_status_changed = virtio_net_set_link_status,
->      .query_rx_filter = virtio_net_query_rxfilter,
-> +    .announce = virtio_net_announce,
->  };
->  
->  static bool virtio_net_guest_notifier_pending(VirtIODevice *vdev, int idx)
-> @@ -1934,8 +1924,6 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
->      qemu_macaddr_default_if_unset(&n->nic_conf.macaddr);
->      memcpy(&n->mac[0], &n->nic_conf.macaddr, sizeof(n->mac));
->      n->status = VIRTIO_NET_S_LINK_UP;
-> -    n->announce_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL,
-> -                                     virtio_net_announce_timer, n);
->  
->      if (n->netclient_type) {
->          /*
-> @@ -1997,8 +1985,6 @@ static void virtio_net_device_unrealize(DeviceState *dev, Error **errp)
->          virtio_net_del_queue(n, i);
->      }
->  
-> -    timer_del(n->announce_timer);
-> -    timer_free(n->announce_timer);
->      g_free(n->vqs);
->      qemu_del_nic(n->nic);
->      virtio_cleanup(vdev);
-> diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
-> index 1eec9a2..0c597f4 100644
-> --- a/include/hw/virtio/virtio-net.h
-> +++ b/include/hw/virtio/virtio-net.h
-> @@ -94,8 +94,6 @@ typedef struct VirtIONet {
->      char *netclient_name;
->      char *netclient_type;
->      uint64_t curr_guest_offloads;
-> -    QEMUTimer *announce_timer;
-> -    int announce_counter;
->      bool needs_vnet_hdr_swap;
->  } VirtIONet;
->  
-> diff --git a/include/net/net.h b/include/net/net.h
-> index 99b28d5..598f523 100644
-> --- a/include/net/net.h
-> +++ b/include/net/net.h
-> @@ -64,6 +64,7 @@ typedef int (SetVnetLE)(NetClientState *, bool);
->  typedef int (SetVnetBE)(NetClientState *, bool);
->  typedef struct SocketReadState SocketReadState;
->  typedef void (SocketReadStateFinalize)(SocketReadState *rs);
-> +typedef void (NetAnnounce)(NetClientState *);
->  
->  typedef struct NetClientInfo {
->      NetClientDriver type;
-> @@ -84,6 +85,7 @@ typedef struct NetClientInfo {
->      SetVnetHdrLen *set_vnet_hdr_len;
->      SetVnetLE *set_vnet_le;
->      SetVnetBE *set_vnet_be;
-> +    NetAnnounce *announce;
->  } NetClientInfo;
->  
->  struct NetClientState {
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 3b19a4a..5c1d8dc 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -113,9 +113,15 @@ static void qemu_announce_self_iter(NICState *nic, void *opaque)
->      int len;
->  
->      trace_qemu_announce_self_iter(qemu_ether_ntoa(&nic->conf->macaddr));
-> +
->      len = announce_self_create(buf, nic->conf->macaddr.a);
->  
->      qemu_send_packet_raw(qemu_get_queue(nic), buf, len);
-> +
-> +    /* if the NIC provides it's own announcement support, use it as well */
-> +    if (nic->ncs->info->announce) {
-> +        nic->ncs->info->announce(nic->ncs);
-> +    }
->  }
+A FIXME for parsing @server.
+
+>> Also, if you set any of server.* in bdrv_parse_filename(), you also ha=
+ve
+>> to set server.type. It's a SocketAddressFlat, .type is a required fiel=
+d.
+>> I know it's just for internal use, but that doesn't change the fact th=
+at
+>> it's an invalid SocketAddressFlat object without.
+>=20
+> That part's true. Also, you can't set server.host and server.path at th=
+e
+> same time (compare to nbd_process_legacy_socket_options taking pains to=
+
+> make sure that a valid QAPI object is constructed).
+>=20
+>>
+>> Max
+>>
+>>
+>> [1] Originally there were apparently introduced for
+>> bdrv_parse_filename() -- but of course you can just use them in -drive=
+
+>> directly...
+>=20
+> There's a difference between the psuedo-file '-drive sheepdog:...'
+> (where you can use them directly, and that doesn't change in this
+> patch), and the structured '-drive driver=3Dsheepdog,...' (which didn't=
+
+> exist before 831acdc, and which we want to match to our QMP).
+>=20
+> I'm in favor of this patch, but think you found a real issue with not
+> constructing a valid qapi object.
+
+I agree that this patch is pretty much OK (and definitely necessary) for
+2.9, what I'm asking for is some form of acknowledgment that we want to
+actually make @server a valid SocketAddressFlat object and parse it as
+such in 2.10.
+
+Max
 
 
-Can we switch existing qemu announcements to QEMU_CLOCK_VIRTUAL?
+--45Ppp5FpTDBU7krKvHu9Tj3ITefXJcAP3
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-It's an interesting question, and I'm not sure.
+-----BEGIN PGP SIGNATURE-----
 
-I note that this seems to interact interestingly with recent dgilbert's
-patch sweaking announcement timing. Some coordination might be
-helpful here.
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljcGp0SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A7SsH/2D6k1GB7MrYtS+rf6xgaFiDHJRYcyGF
+ZBmj/ZYswU/oZ6H0jZV0AW8ZwxKsCbpgQrNlRPYBTW/RwwaH0us942aCrZ9yhxWr
+D3koBgDvNNyBg23HolRe0KgIO6LYO5bavlXoqD5XfLENHSlTMHbr7J01HJRwc61u
+nEfSzDlL8BewvT30WdVhZ9ZYWQPsKc/F7yI0U38YfvRZIgMCq+bBqNNiAZrpJ6Js
+4wEWLUwcD01hztXUDRZtCAOZh72NHRPH5bHk9uongbbKjZMAyw7jrklXbaIq1nLF
+TxVokIK4bN30SNdZe3blMCcea4nfWRIL8LSQtsOsBh068HmwQ18IiOA=
+=ccm2
+-----END PGP SIGNATURE-----
 
-
->  
-> -- 
-> 2.7.4
+--45Ppp5FpTDBU7krKvHu9Tj3ITefXJcAP3--
