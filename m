@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47877)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ctGiv-0004K5-ML
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 12:45:30 -0400
+	(envelope-from <armbru@redhat.com>) id 1ctGiw-0004Kc-5T
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 12:45:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ctGiu-00069Z-Tn
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 12:45:29 -0400
+	(envelope-from <armbru@redhat.com>) id 1ctGiv-0006A5-7I
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 12:45:30 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 29 Mar 2017 18:45:12 +0200
-Message-Id: <1490805920-17029-1-git-send-email-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [for-2.9 0/8] Fixes and cleanups around SocketAddress
+Date: Wed, 29 Mar 2017 18:45:17 +0200
+Message-Id: <1490805920-17029-6-git-send-email-armbru@redhat.com>
+In-Reply-To: <1490805920-17029-1-git-send-email-armbru@redhat.com>
+References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [for-2.9 5/8] gluster: Prepare for SocketAddressFlat
+ extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,39 +23,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, pbonzini@redhat.com
 
-What makes this 2.9 material is the crash bug fixed in PATCH 2 and the
-QAPI/QMP interface cleanups in PATCH 7+8.
+qemu_gluster_glfs_init() and qemu_gluster_parse_json() rely on the
+fact that SocketAddressFlatType has only two members
+SOCKET_ADDRESS_FLAT_TYPE_INET and SOCKET_ADDRESS_FLAT_TYPE_UNIX.
+Correct, but won't stay correct.  Make them more robust.
 
-Sheepdog tests still in progress (with Kashyap's help), but I'm
-sending this out now in the hope of getting a head start on review.
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ block/gluster.c | 26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
 
-Markus Armbruster (8):
-  nbd sockets vnc: Mark problematic address family tests TODO
-  char: Fix socket with "type": "vsock" address
-  io vnc sockets: Clean up SocketAddressKind switches
-  block: Document -drive problematic code and bugs
-  gluster: Prepare for SocketAddressFlat extension
-  qapi-schema: SocketAddressFlat variants 'vsock' and 'fd'
-  nbd: Tidy up blockdev-add interface
-  sheepdog: Fix blockdev-add
-
- block.c               |  41 ++++++++++++++-
- block/file-posix.c    |   6 +++
- block/gluster.c       |  28 ++++++----
- block/nbd.c           | 140 ++++++++++++++++++++++++++++++++++++++++----=
-------
- block/nfs.c           |   7 +++
- block/rbd.c           |   6 +++
- block/sheepdog.c      |  18 +++----
- block/ssh.c           |   8 +++
- blockdev-nbd.c        |   1 +
- chardev/char-socket.c |   9 ++--
- io/dns-resolver.c     |   6 ++-
- qapi-schema.json      |  19 +++----
- qapi/block-core.json  |   6 +--
- ui/vnc.c              |  11 +++-
- util/qemu-sockets.c   |   8 +--
- 15 files changed, 241 insertions(+), 73 deletions(-)
-
---=20
+diff --git a/block/gluster.c b/block/gluster.c
+index a577dae..fb0aafe 100644
+--- a/block/gluster.c
++++ b/block/gluster.c
+@@ -412,10 +412,12 @@ static struct glfs *qemu_gluster_glfs_init(BlockdevOptionsGluster *gconf,
+     glfs_set_preopened(gconf->volume, glfs);
+ 
+     for (server = gconf->server; server; server = server->next) {
+-        if (server->value->type  == SOCKET_ADDRESS_FLAT_TYPE_UNIX) {
++        switch (server->value->type) {
++        case SOCKET_ADDRESS_FLAT_TYPE_UNIX:
+             ret = glfs_set_volfile_server(glfs, "unix",
+                                    server->value->u.q_unix.path, 0);
+-        } else {
++            break;
++        case SOCKET_ADDRESS_FLAT_TYPE_INET:
+             if (parse_uint_full(server->value->u.inet.port, &port, 10) < 0 ||
+                 port > 65535) {
+                 error_setg(errp, "'%s' is not a valid port number",
+@@ -426,6 +428,9 @@ static struct glfs *qemu_gluster_glfs_init(BlockdevOptionsGluster *gconf,
+             ret = glfs_set_volfile_server(glfs, "tcp",
+                                    server->value->u.inet.host,
+                                    (int)port);
++            break;
++        default:
++            abort();
+         }
+ 
+         if (ret < 0) {
+@@ -487,7 +492,7 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+     char *str = NULL;
+     const char *ptr;
+     size_t num_servers;
+-    int i;
++    int i, type;
+ 
+     /* create opts info from runtime_json_opts list */
+     opts = qemu_opts_create(&runtime_json_opts, NULL, 0, &error_abort);
+@@ -539,16 +544,17 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+         if (!strcmp(ptr, "tcp")) {
+             ptr = "inet";       /* accept legacy "tcp" */
+         }
+-        gsconf->type = qapi_enum_parse(SocketAddressFlatType_lookup, ptr,
+-                                       SOCKET_ADDRESS_FLAT_TYPE__MAX, -1,
+-                                       &local_err);
+-        if (local_err) {
+-            error_append_hint(&local_err,
+-                              "Parameter '%s' may be 'inet' or 'unix'\n",
+-                              GLUSTER_OPT_TYPE);
++        type = qapi_enum_parse(SocketAddressFlatType_lookup, ptr,
++                               SOCKET_ADDRESS_FLAT_TYPE__MAX, -1, NULL);
++        if (type != SOCKET_ADDRESS_FLAT_TYPE_INET
++            && type != SOCKET_ADDRESS_FLAT_TYPE_UNIX) {
++            error_setg(&local_err,
++                       "Parameter '%s' may be 'inet' or 'unix'",
++                       GLUSTER_OPT_TYPE);
+             error_append_hint(&local_err, GERR_INDEX_HINT, i);
+             goto out;
+         }
++        gsconf->type = type;
+         qemu_opts_del(opts);
+ 
+         if (gsconf->type == SOCKET_ADDRESS_FLAT_TYPE_INET) {
+-- 
 2.7.4
