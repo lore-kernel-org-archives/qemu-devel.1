@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ctJiJ-0000cl-12
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:57:04 -0400
+	(envelope-from <mreitz@redhat.com>) id 1ctJke-0001Kt-UU
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:59:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ctJiF-00071E-S7
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:57:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54876)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1ctJiF-000709-JN
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:56:59 -0400
-References: <20170329194148.19015-1-ehabkost@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <04ec9702-6624-1ca3-4595-c22f482a3435@redhat.com>
-Date: Wed, 29 Mar 2017 21:56:54 +0200
+	(envelope-from <mreitz@redhat.com>) id 1ctJkd-000833-SO
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:59:29 -0400
+References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
+	<1490805920-17029-9-git-send-email-armbru@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <a33b1054-201c-9f5e-2c0e-35a86b1262e1@redhat.com>
+Date: Wed, 29 Mar 2017 21:59:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170329194148.19015-1-ehabkost@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 0/9] qom: Make
- object_get_class()/*_GET_CLASS return const pointers
+In-Reply-To: <1490805920-17029-9-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ae7b993c2UQabTKJqBXnflvEXjdoQcS3i"
+Subject: Re: [Qemu-devel] [for-2.9 8/8] sheepdog: Fix blockdev-add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,104 +24,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: Juergen Gross <jgross@suse.com>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, eblake@redhat.com, pbonzini@redhat.com
 
-On 03/29/17 21:41, Eduardo Habkost wrote:
-> The problem
-> -----------
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ae7b993c2UQabTKJqBXnflvEXjdoQcS3i
+From: Max Reitz <mreitz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp,
+ namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, eblake@redhat.com,
+ pbonzini@redhat.com
+Message-ID: <a33b1054-201c-9f5e-2c0e-35a86b1262e1@redhat.com>
+Subject: Re: [for-2.9 8/8] sheepdog: Fix blockdev-add
+References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
+ <1490805920-17029-9-git-send-email-armbru@redhat.com>
+In-Reply-To: <1490805920-17029-9-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
+
+On 29.03.2017 18:45, Markus Armbruster wrote:
+> Commit 831acdc "sheepdog: Implement bdrv_parse_filename()" and commit
+> d282f34 "sheepdog: Support blockdev-add" have different ideas on how
+> the QemuOpts parameters for the server address are named.  Fix that.
+> While there, rename BlockdevOptionsSheepdog member addr to server, for
+> consistency with BlockdevOptionsSsh, BlockdevOptionsGluster,
+> BlockdevOptionsNbd.
 >=20
-> QOM has a data model where class struct data is static: class
-> structs are initialized at class_init, and never changed again.
+> Commit 831acdc's example becomes
 >=20
-> ...except for a few rare cases where class data is changed
-> outside class_init. Those cases are:
+>     --drive driver=3Dsheepdog,server.host=3Dfido,vdi=3Ddolly
 >=20
->   qbus_realize(), code added by:
->   commit 61de36761b565a4138d8ad7ec75489ab28fe84b6
->   Date:   Thu Feb 6 16:08:15 2014 +0100
->       qdev: Keep global allocation counter per bus
+> instead of
 >=20
->   mips_jazz_init(), code added by:
->   commit 54e755588cf1e90f0b1460c4e8e6b6a54b6d3a32
->   Date:   Mon Nov 4 23:26:17 2013 +0100
->       mips jazz: do not raise data bus exception when accessing invalid=
- addresses
+>     --drive driver=3Dsheepdog,host=3Dfido,vdi=3Ddolly
 >=20
->   xen_set_dynamic_sysbus(), code added by:
->   commit 3a6c9172ac5951e6dac2b3f6cbce3cfccdec5894
->   Date:   Tue Nov 22 07:10:58 2016 +0100
->       xen: create qdev for each backend device
->=20
->   s390_cpu_realizefn(), code added by:
->   commit c6644fc88bed1176f67b4b7a9df691bcf25c0c5b
->   Date:   Fri Mar 4 12:34:31 2016 -0500
->       s390x/cpu: Get rid of side effects when creating a vcpu
->=20
-> I want to prevent that from happening again.
->=20
-> Proposal
-> --------
->=20
-> I propose we make object_get_class() and *_GET_CLASS macros
-> return const pointers. This way, anybody willing to change class
-> structs outside class_init will (hopefully) be aware that they
-> are doing something unexpected.
->=20
-> This would be very simple and trivial, except that:
-> * OBJECT_CLASS_CHECK cast its return value to a different
->   (non-const) pointer type.
-> * OBJECT_CLASS_CHECK-based macros are used everywhere to
->   cast class pointers to different class types.
->=20
-> I have addressed this problem using C11's _Generic keyword.
-> _Generic allows us to make OBJECT_CLASS_CHECK and other macros
-> return a const pointer if its argument is a const pointer, and a
-> non-const pointer otherwise.
->=20
-> This series changes OBJECT_CLASS, OBJECT_CLASS_CHECK,
-> object_class_dynamic_cast_assert(), object_class_dynamic_cast(),
-> and object_class_get_parent() to exhibit this const-aware
-> behavior.
->=20
-> If the compiler doesn't support _Generic, we keep the old
-> behavior, and the cast macros will keep returning non-const
-> pointers.
->=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
-> Cc: Alexander Graf <agraf@suse.de>
-> Cc: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
-> Cc: Juergen Gross <jgross@suse.com>
-> Cc: Matthew Rosato <mjrosato@linux.vnet.ibm.com>
-> Cc: Laszlo Ersek <lersek@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: Andreas F=C3=A4rber <afaerber@suse.de>
->=20
-> Eduardo Habkost (9):
->   configure: test if _Generic works as expected
->   Simplify code using *MACHINE_GET_CLASS
->   qom: QUALIFIED_CAST helper macro
->   qom: Make object_class_get_parent() const-aware
->   Make class parameter const at some functions
->   Explicitly cast the *_GET_CLASS() value when we break the rules
->   Use const variables for *_GET_CLASS values
->   qom: Make class cast macros/functions const-aware
->   qom: Make object_get_class() return const pointer
+>  block/sheepdog.c     | 18 +++++++++---------
+>  qapi/block-core.json |  4 ++--
+>  2 files changed, 11 insertions(+), 11 deletions(-)
 
-Only superficial comments:
+OK, so let me get this straight: Before this patch, @addr was advertised
+as a runtime parameter that actually wasn't supported at all? (Because I
+can't see any place in block/sheepdog.c where it would be parsed.)
 
-(1) HACKING has some notes on C99 and C11 usage; I think you should
-update them as well.
+This patch now renames @addr to @server and instead of actually parsing
+the option, it just removes the so-far convenience[1] options @host,
+@port, and @path and just fetches the from @server?
 
-(2) Can you CC the maintainers of the code being modified on each patch?
+If that is true, I can't say I like it the least. I guess it works for
+2.9, but there should be a FIXME somewhere in this patch.
 
-(3) (Corollary of the former -- I'm not seeing patch 7 yet, which I
-assume is the big one, from the cumulative diffstat) -- is it possible
-to split up patch 7 more fine-grained? To help reviewers. (I don't
-maintain anything in QEMU, so this is just a generic suggestion;
-everyone feel free to disagree.)
+Also, if you set any of server.* in bdrv_parse_filename(), you also have
+to set server.type. It's a SocketAddressFlat, .type is a required field.
+I know it's just for internal use, but that doesn't change the fact that
+it's an invalid SocketAddressFlat object without.
 
-Thanks
-Laszlo
+Max
+
+
+[1] Originally there were apparently introduced for
+bdrv_parse_filename() -- but of course you can just use them in -drive
+directly...
+
+
+--ae7b993c2UQabTKJqBXnflvEXjdoQcS3i
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljcEhYSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ABvMH/j03kIpA9s1KJ09MRBLt8wGMamDPAwz3
+nRqwewgSHEIqrwBVOcYOx59aakVj5b8Q6mDHomzcPy6pSOZAAPhcK4sc8VlAJF5k
+yzUacucsYcUkjguM4vBjnG8HLgoiQmafT4Aft9tzlZ18dM21wtzDRYg1OKPSDEpM
+vWm2Ca2YBEaqCFed5QbBC9p2x99kbJKFoq9q9we2M7azrnM40pB0OBJ6oZMqVElF
+sxtg/0amYWg1SdsqOEsqLg9UDC2TEltHGUCtk8J1tF9tJuO8AUwwMvrJOThsiIcs
+YBvAHBcrflzMnnfXTHtDuCwXDndrkhDXI6r2YRbc/e1zHQ2r0E7prBM=
+=K6B6
+-----END PGP SIGNATURE-----
+
+--ae7b993c2UQabTKJqBXnflvEXjdoQcS3i--
