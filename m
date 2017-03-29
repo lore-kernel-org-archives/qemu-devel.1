@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ct4gA-0004Pz-TS
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 23:53:52 -0400
+	(envelope-from <jasowang@redhat.com>) id 1ct4wD-0006MC-NF
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 00:10:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ct4g9-0003kY-9R
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 23:53:51 -0400
-Date: Wed, 29 Mar 2017 14:53:36 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170329035336.GT21068@umbus.fritz.box>
-References: <20170328090530.20052-1-aik@ozlabs.ru>
-	<20170328090530.20052-4-aik@ozlabs.ru>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="yypaS3FvPkEUiGyo"
-Content-Disposition: inline
-In-Reply-To: <20170328090530.20052-4-aik@ozlabs.ru>
-Subject: Re: [Qemu-devel] [RFC PATCH qemu 3/3] vfio: Enable in-kernel
- acceleration via VFIO KVM device
+	(envelope-from <jasowang@redhat.com>) id 1ct4w8-0003P1-NK
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 00:10:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58284)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1ct4w8-0003Of-Fr
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 00:10:20 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5C0FC81F03
+	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 04:10:19 +0000 (UTC)
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 29 Mar 2017 12:10:04 +0800
+Message-Id: <1490760604-9756-1-git-send-email-jasowang@redhat.com>
+Subject: [Qemu-devel] [PATCH for 2.9] vhost: generalize iommu memory region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,233 +27,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: mst@redhat.com, qemu-devel@nongnu.org
+Cc: maxime.coquelin@redhat.com, Jason Wang <jasowang@redhat.com>, Peter Xu <peterx@redhat.com>
 
+We assumes the iommu_ops were attached to the root region of address
+space. This may not be true for all kinds of IOMMU implementation and
+especially after commit 3716d5902d74 ("pci: introduce a bus master
+container"). So fix this by not assuming as->root has iommu_ops,
+instead depending on the regions reported by memory listener through:
 
---yypaS3FvPkEUiGyo
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+- register a memory listener to dma_as
+- during region_add, if it's a region of IOMMU, register a specific
+  IOMMU notifier, and store all notifiers in a list.
+- during region_del, compare and delete the IOMMU notifier from the list
 
-On Tue, Mar 28, 2017 at 08:05:30PM +1100, Alexey Kardashevskiy wrote:
-> This enables in-kernel acceleration of TCE update requests via
-> VFIO KVM device.
->=20
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
->  include/hw/vfio/vfio-common.h |  1 +
->  target/ppc/kvm_ppc.h          |  6 ++++++
->  hw/ppc/spapr_iommu.c          |  4 ++++
->  hw/vfio/common.c              | 13 +++++++++++++
->  hw/vfio/spapr.c               | 26 ++++++++++++++++++++++++++
->  target/ppc/kvm.c              |  7 ++++++-
->  hw/vfio/trace-events          |  1 +
->  7 files changed, 57 insertions(+), 1 deletion(-)
->=20
-> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> index c582de18c9..ee8c96cc4a 100644
-> --- a/include/hw/vfio/vfio-common.h
-> +++ b/include/hw/vfio/vfio-common.h
-> @@ -175,6 +175,7 @@ extern const MemoryListener vfio_prereg_listener;
->  int vfio_spapr_create_window(VFIOContainer *container,
->                               MemoryRegionSection *section,
->                               hwaddr *pgsize);
-> +int vfio_spapr_notify_kvm(int vfio_kvm_device_fd, int groupfd, int table=
-fd);
->  int vfio_spapr_remove_window(VFIOContainer *container,
->                               hwaddr offset_within_address_space);
-> =20
-> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-> index f48243d13f..ce7327a4e0 100644
-> --- a/target/ppc/kvm_ppc.h
-> +++ b/target/ppc/kvm_ppc.h
-> @@ -46,6 +46,7 @@ void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t =
-page_shift,
->  int kvmppc_remove_spapr_tce(void *table, int pfd, uint32_t window_size);
->  int kvmppc_reset_htab(int shift_hint);
->  uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift);
-> +bool kvmppc_has_cap_spapr_vfio(void);
->  #endif /* !CONFIG_USER_ONLY */
->  bool kvmppc_has_cap_epr(void);
->  int kvmppc_define_rtas_kernel_token(uint32_t token, const char *function=
-);
-> @@ -216,6 +217,11 @@ static inline bool kvmppc_is_mem_backend_page_size_o=
-k(char *obj_path)
->      return true;
->  }
-> =20
-> +static inline bool kvmppc_has_cap_spapr_vfio(void)
-> +{
-> +    return false;
-> +}
-> +
->  #endif /* !CONFIG_USER_ONLY */
-> =20
->  static inline bool kvmppc_has_cap_epr(void)
-> diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
-> index b61c8f053e..fc23d81645 100644
-> --- a/hw/ppc/spapr_iommu.c
-> +++ b/hw/ppc/spapr_iommu.c
-> @@ -293,6 +293,10 @@ void spapr_tce_set_need_vfio(sPAPRTCETable *tcet, bo=
-ol need_vfio)
-> =20
->      tcet->need_vfio =3D need_vfio;
-> =20
-> +    if (!need_vfio || (tcet->fd !=3D -1 && kvmppc_has_cap_spapr_vfio()))=
+This is also a must for making vhost device IOTLB works for all types
+of IOMMUs. Note, since we register one notifier during each
+.region_add, the IOTLB may be flushed more than one times, this is
+suboptimal and could be optimized in the future.
+
+Reported-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+Fixes: 3716d5902d74 ("pci: introduce a bus master container")
+Cc: Peter Xu <peterx@redhat.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ hw/virtio/vhost.c         | 84 ++++++++++++++++++++++++++++++++++++-----------
+ include/hw/virtio/vhost.h | 11 +++++++
+ 2 files changed, 75 insertions(+), 20 deletions(-)
+
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index febe519..613494d 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -425,10 +425,8 @@ static inline void vhost_dev_log_resize(struct vhost_dev *dev, uint64_t size)
+ static int vhost_dev_has_iommu(struct vhost_dev *dev)
  {
-> +        return;
-> +    }
-> +
->      oldtable =3D tcet->table;
-> =20
->      tcet->table =3D spapr_tce_alloc_table(tcet->liobn,
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index c75c7594d5..9aaf861904 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -440,6 +440,19 @@ static void vfio_listener_region_add(MemoryListener =
-*listener,
->              goto fail;
->          }
-> =20
-> +#ifdef CONFIG_KVM
-> +        if (kvm_enabled() && section->mr->iommu_ops->get_fd) {
-> +            VFIOGroup *group;
-> +            int tablefd =3D  section->mr->iommu_ops->get_fd(section->mr);
-> +
-> +            if (tablefd !=3D -1) {
-> +                QLIST_FOREACH(group, &container->group_list, container_n=
-ext) {
-> +                    vfio_spapr_notify_kvm(vfio_kvm_device_fd,
-> +                                          group->fd, tablefd);
-
-This is only going to make sense if we have both PAPR-style TCE tables
-on the guest and TCE-based IOMMU backend on the host.  In which case
-wouldn't it make more sense to explicitly verify that, and upcast,
-rather than adding a new vaguely-specified get_fd hook.
-
-> +                }
-> +            }
-> +        }
-> +#endif
->          vfio_host_win_add(container, section->offset_within_address_spac=
-e,
->                            section->offset_within_address_space +
->                            int128_get64(section->size) - 1, pgsize);
-> diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
-> index 4409bcc0d7..dffef3bd5f 100644
-> --- a/hw/vfio/spapr.c
-> +++ b/hw/vfio/spapr.c
-> @@ -17,6 +17,9 @@
->  #include "hw/hw.h"
->  #include "qemu/error-report.h"
->  #include "trace.h"
-> +#ifdef CONFIG_KVM
-> +#include "linux/kvm.h"
-> +#endif
-> =20
->  static bool vfio_prereg_listener_skipped_section(MemoryRegionSection *se=
-ction)
->  {
-> @@ -187,6 +190,29 @@ int vfio_spapr_create_window(VFIOContainer *containe=
-r,
->      return 0;
->  }
-> =20
-> +int vfio_spapr_notify_kvm(int vfio_kvm_device_fd, int groupfd, int table=
-fd)
-> +{
-> +#ifdef CONFIG_KVM
-> +    struct kvm_vfio_spapr_tce param =3D {
-> +        .groupfd =3D groupfd,
-> +        .tablefd =3D tablefd
-> +    };
-> +    struct kvm_device_attr attr =3D {
-> +        .group =3D KVM_DEV_VFIO_GROUP,
-> +        .attr =3D KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE,
-> +        .addr =3D (uint64_t)(unsigned long)&param,
-> +    };
-> +
-> +    if (ioctl(vfio_kvm_device_fd, KVM_SET_DEVICE_ATTR, &attr)) {
-> +        error_report("vfio: failed to setup fd %d for a group with fd %d=
-: %s",
-> +                     param.tablefd, param.groupfd, strerror(errno));
-> +        return -errno;
-> +    }
-> +    trace_vfio_spapr_notify_kvm(groupfd, tablefd);
-> +#endif
-> +    return 0;
-> +}
-> +
->  int vfio_spapr_remove_window(VFIOContainer *container,
->                               hwaddr offset_within_address_space)
->  {
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 560ce655c7..bca5fe7329 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -131,7 +131,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->      cap_spapr_tce =3D kvm_check_extension(s, KVM_CAP_SPAPR_TCE);
->      cap_spapr_tce_64 =3D kvm_check_extension(s, KVM_CAP_SPAPR_TCE_64);
->      cap_spapr_multitce =3D kvm_check_extension(s, KVM_CAP_SPAPR_MULTITCE=
-);
-> -    cap_spapr_vfio =3D false;
-> +    cap_spapr_vfio =3D kvm_check_extension(s, KVM_CAP_SPAPR_TCE_VFIO);
->      cap_one_reg =3D kvm_check_extension(s, KVM_CAP_ONE_REG);
->      cap_hior =3D kvm_check_extension(s, KVM_CAP_PPC_HIOR);
->      cap_epr =3D kvm_check_extension(s, KVM_CAP_PPC_EPR);
-> @@ -2416,6 +2416,11 @@ bool kvmppc_has_cap_mmu_hash_v3(void)
->      return cap_mmu_hash_v3;
->  }
-> =20
-> +bool kvmppc_has_cap_spapr_vfio(void)
-> +{
-> +    return cap_spapr_vfio;
-> +}
-> +
->  static PowerPCCPUClass *ppc_cpu_get_family_class(PowerPCCPUClass *pcc)
->  {
->      ObjectClass *oc =3D OBJECT_CLASS(pcc);
-> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-> index 2561c6d31a..084a92f7c2 100644
-> --- a/hw/vfio/trace-events
-> +++ b/hw/vfio/trace-events
-> @@ -123,3 +123,4 @@ vfio_prereg_register(uint64_t va, uint64_t size, int =
-ret) "va=3D%"PRIx64" size=3D%"P
->  vfio_prereg_unregister(uint64_t va, uint64_t size, int ret) "va=3D%"PRIx=
-64" size=3D%"PRIx64" ret=3D%d"
->  vfio_spapr_create_window(int ps, uint64_t ws, uint64_t off) "pageshift=
-=3D0x%x winsize=3D0x%"PRIx64" offset=3D0x%"PRIx64
->  vfio_spapr_remove_window(uint64_t off) "offset=3D%"PRIx64
-> +vfio_spapr_notify_kvm(int groupfd, int tablefd) "Attached groupfd %d to =
-liobn fd %d"
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---yypaS3FvPkEUiGyo
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJY2y/AAAoJEGw4ysog2bOSaScQAMm+qspAKiSd7Q4yraIr2ila
-xiL/isYraQnyuDnSxivTNFfB5UK+OxM7bhu2f2JqVXRcfG83vXDpTEf/4iQKf1SR
-5ArK2OHVYPkpqQkiAHSFCbzUjqvU+IyimTLuupDQ+3gK/xhNOgyH1Q2Wjz1go+R6
-ICVegbV+F1wth6eZRhK2i1j+RfrrJeAJndFiBHPRC50Evd76gcM2CMBPMcxG/ruW
-lkIWxKtWz9YM+l2HbqAHlaAHXEWEVWdqH+GGCUjKzfLTXTrOyh9D9krXjXJBHdg8
-8yJGhqPFZX66V+oVKJiakIOJbxN3xt2O6Wk92z/tqaXs6BJfc2IMf1vgGCMdGiDn
-3rvjms1knb02eMuNBlurz/TufFFdcZ7cQX9LXzzeeUUpnIan1ns41mEAiW9PDXbH
-n0aLbLusfO26ZZ8fKpPoAFGEdhfNBuTm/I9rxsNiDJmuBzkXEQZwQ5sqD+cQAfmq
-QU2sX1+oY1eQwsFZX887sUhhVS/EfoYzR0MSVGD90GWd8e3h5eRPpjja5fGoGr2C
-ClLGwERp4Pc9JQcm6ZrQ4ipFk93knbOa6fsYF7RW++Yk4p/nZlTnaZ2N+/+Gr1tD
-QEXtG7vwCi8J3ORW562+EFRrx1euFavGycA/3SKDmuC03Hpsx8GbOWuKmUNF+lX3
-Cfql/AKqtE8Wzxv5KAUu
-=5XzK
------END PGP SIGNATURE-----
-
---yypaS3FvPkEUiGyo--
+     VirtIODevice *vdev = dev->vdev;
+-    AddressSpace *dma_as = vdev->dma_as;
+ 
+-    return memory_region_is_iommu(dma_as->root) &&
+-           virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_PLATFORM);
++    return virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_PLATFORM);
+ }
+ 
+ static void *vhost_memory_map(struct vhost_dev *dev, hwaddr addr,
+@@ -720,6 +718,63 @@ static void vhost_region_del(MemoryListener *listener,
+     }
+ }
+ 
++static void vhost_iommu_unmap_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
++{
++    struct vhost_iommu *iommu = container_of(n, struct vhost_iommu, n);
++    struct vhost_dev *hdev = iommu->hdev;
++    hwaddr iova = iotlb->iova + iommu->iommu_offset;
++
++    if (hdev->vhost_ops->vhost_invalidate_device_iotlb(hdev, iova,
++                                                       iotlb->addr_mask + 1)) {
++        error_report("Fail to invalidate device iotlb");
++    }
++}
++
++static void vhost_iommu_region_add(MemoryListener *listener,
++                                   MemoryRegionSection *section)
++{
++    struct vhost_dev *dev = container_of(listener, struct vhost_dev,
++                                         iommu_listener);
++    struct vhost_iommu *iommu;
++
++    if (!memory_region_is_iommu(section->mr)) {
++        return;
++    }
++
++    iommu = g_malloc0(sizeof(*iommu));
++    iommu->n.notify = vhost_iommu_unmap_notify;
++    iommu->n.notifier_flags = IOMMU_NOTIFIER_UNMAP;
++    iommu->mr = section->mr;
++    iommu->iommu_offset = section->offset_within_address_space -
++                          section->offset_within_region;
++    iommu->hdev = dev;
++    memory_region_register_iommu_notifier(section->mr, &iommu->n);
++    QLIST_INSERT_HEAD(&dev->iommu_list, iommu, iommu_next);
++    /* TODO: can replay help performance here? */
++}
++
++static void vhost_iommu_region_del(MemoryListener *listener,
++                                   MemoryRegionSection *section)
++{
++    struct vhost_dev *dev = container_of(listener, struct vhost_dev,
++                                         iommu_listener);
++    struct vhost_iommu *iommu;
++
++    if (!memory_region_is_iommu(section->mr)) {
++        return;
++    }
++
++    QLIST_FOREACH(iommu, &dev->iommu_list, iommu_next) {
++        if (iommu->mr == section->mr) {
++            memory_region_unregister_iommu_notifier(iommu->mr,
++                                                    &iommu->n);
++            QLIST_REMOVE(iommu, iommu_next);
++            g_free(iommu);
++            break;
++        }
++    }
++}
++
+ static void vhost_region_nop(MemoryListener *listener,
+                              MemoryRegionSection *section)
+ {
+@@ -1161,17 +1216,6 @@ static void vhost_virtqueue_cleanup(struct vhost_virtqueue *vq)
+     event_notifier_cleanup(&vq->masked_notifier);
+ }
+ 
+-static void vhost_iommu_unmap_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+-{
+-    struct vhost_dev *hdev = container_of(n, struct vhost_dev, n);
+-
+-    if (hdev->vhost_ops->vhost_invalidate_device_iotlb(hdev,
+-                                                       iotlb->iova,
+-                                                       iotlb->addr_mask + 1)) {
+-        error_report("Fail to invalidate device iotlb");
+-    }
+-}
+-
+ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
+                    VhostBackendType backend_type, uint32_t busyloop_timeout)
+ {
+@@ -1244,8 +1288,10 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
+         .priority = 10
+     };
+ 
+-    hdev->n.notify = vhost_iommu_unmap_notify;
+-    hdev->n.notifier_flags = IOMMU_NOTIFIER_UNMAP;
++    hdev->iommu_listener = (MemoryListener) {
++        .region_add = vhost_iommu_region_add,
++        .region_del = vhost_iommu_region_del,
++    };
+ 
+     if (hdev->migration_blocker == NULL) {
+         if (!(hdev->features & (0x1ULL << VHOST_F_LOG_ALL))) {
+@@ -1455,8 +1501,7 @@ int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
+     }
+ 
+     if (vhost_dev_has_iommu(hdev)) {
+-        memory_region_register_iommu_notifier(vdev->dma_as->root,
+-                                              &hdev->n);
++        memory_listener_register(&hdev->iommu_listener, vdev->dma_as);
+     }
+ 
+     r = hdev->vhost_ops->vhost_set_mem_table(hdev, hdev->mem);
+@@ -1538,8 +1583,7 @@ void vhost_dev_stop(struct vhost_dev *hdev, VirtIODevice *vdev)
+ 
+     if (vhost_dev_has_iommu(hdev)) {
+         hdev->vhost_ops->vhost_set_iotlb_callback(hdev, false);
+-        memory_region_unregister_iommu_notifier(vdev->dma_as->root,
+-                                                &hdev->n);
++        memory_listener_unregister(&hdev->iommu_listener);
+     }
+     vhost_log_put(hdev, true);
+     hdev->started = false;
+diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
+index 52f633e..a450321 100644
+--- a/include/hw/virtio/vhost.h
++++ b/include/hw/virtio/vhost.h
+@@ -37,10 +37,20 @@ struct vhost_log {
+     vhost_log_chunk_t *log;
+ };
+ 
++struct vhost_dev;
++struct vhost_iommu {
++    struct vhost_dev *hdev;
++    MemoryRegion *mr;
++    hwaddr iommu_offset;
++    IOMMUNotifier n;
++    QLIST_ENTRY(vhost_iommu) iommu_next;
++};
++
+ struct vhost_memory;
+ struct vhost_dev {
+     VirtIODevice *vdev;
+     MemoryListener memory_listener;
++    MemoryListener iommu_listener;
+     struct vhost_memory *mem;
+     int n_mem_sections;
+     MemoryRegionSection *mem_sections;
+@@ -64,6 +74,7 @@ struct vhost_dev {
+     void *opaque;
+     struct vhost_log *log;
+     QLIST_ENTRY(vhost_dev) entry;
++    QLIST_HEAD(, vhost_iommu) iommu_list;
+     IOMMUNotifier n;
+ };
+ 
+-- 
+2.7.4
