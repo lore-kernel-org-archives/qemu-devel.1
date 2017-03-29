@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <iwona260909@gmail.com>) id 1ctF1a-0004ov-Nb
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 10:56:39 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1ctFXt-00036M-O1
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 11:30:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <iwona260909@gmail.com>) id 1ctF1Y-0002hY-50
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 10:56:38 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:36145)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <iwona260909@gmail.com>)
-	id 1ctF1X-0002hL-SV
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 10:56:36 -0400
-Received: by mail-lf0-x243.google.com with SMTP id n78so1924796lfi.3
-	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 07:56:35 -0700 (PDT)
-References: <20170316120110.11677-1-iwona260909@gmail.com>
-	<20170316120110.11677-2-iwona260909@gmail.com>
-	<CAFEAcA8ZBAAqYNbh_3J69W5SMXRsbW4S367Xe8ceF1C0M-RNnA@mail.gmail.com>
-	<1489673540.15659.93.camel@redhat.com>
-	<CAJSP0QX3z_Zn-jdi7=2qw795Ep2nG5xvWR9DqyWajnKjkCGd3g@mail.gmail.com>
-	<CAFEAcA-RH5zqJKAkzRaB-BJBMreLPDUiDtSE639dE_1K-FfBOw@mail.gmail.com>
-	<1490595820.31035.7.camel@redhat.com>
-From: Iwona Kotlarska <iwona260909@gmail.com>
-Message-ID: <cfc59a98-917b-280c-b09c-dcabe8aa10b7@gmail.com>
-Date: Wed, 29 Mar 2017 16:56:09 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1ctFXs-0000Xz-IF
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 11:30:01 -0400
+Date: Wed, 29 Mar 2017 16:29:42 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170329152941.GC2501@work-vm>
+References: <20170225193155.447462-1-vsementsov@virtuozzo.com>
+	<20170225193155.447462-4-vsementsov@virtuozzo.com>
+	<20170307095323.GB5871@noname.str.redhat.com>
+	<20170328105544.GE2509@work-vm>
+	<20170328110900.GB11725@noname.redhat.com>
+	<20170328111315.GF2509@work-vm>
+	<20170328120900.GC11725@noname.redhat.com>
+	<4ed9821c-d19e-70fe-c7e5-fc89756b59f5@virtuozzo.com>
+	<09db3476-b1e4-fa80-6d83-d5da0a06bdfc@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1490595820.31035.7.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Dead code removal: removing code for
- unsupported DEPTH.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <09db3476-b1e4-fa80-6d83-d5da0a06bdfc@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/4] savevm: fix savevm after migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,12 +30,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jsnow@redhat.co, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, quintela@redhat.com, mreitz@redhat.com, peter.maydell@linaro.org, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
 
-Hi,
-I wanted to say that I think this patch is beyond me, I tried working on 
-it having considered the additional feedback, but it needs a bit more 
-understanding of the code and I won't make it on time (I wanted to apply 
-to Outreachy internships), so I'm very sorry for bothering you without 
-reason.
-Iwona Kotlarska
+* Paolo Bonzini (pbonzini@redhat.com) wrote:
+> 
+> 
+> On 28/03/2017 15:16, Vladimir Sementsov-Ogievskiy wrote:
+> > 28.03.2017 15:09, Kevin Wolf wrote:
+> >> Am 28.03.2017 um 13:13 hat Dr. David Alan Gilbert geschrieben:
+> >>> * Kevin Wolf (kwolf@redhat.com) wrote:
+> >>>> Am 28.03.2017 um 12:55 hat Dr. David Alan Gilbert geschrieben:
+> >>>>> * Kevin Wolf (kwolf@redhat.com) wrote:
+> >>>>>> Am 25.02.2017 um 20:31 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> >>>>>>> After migration all drives are inactive and savevm will fail with
+> >>>>>>>
+> >>>>>>> qemu-kvm: block/io.c:1406: bdrv_co_do_pwritev:
+> >>>>>>>     Assertion `!(bs->open_flags & 0x0800)' failed.
+> >>>>>>>
+> >>>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy
+> >>>>>>> <vsementsov@virtuozzo.com>
+> >>>>>> What's the exact state you're in? I tried to reproduce this, but just
+> >>>>>> doing a live migration and then savevm on the destination works
+> >>>>>> fine for
+> >>>>>> me.
+> >>>>>>
+> >>>>>> Hm... Or do you mean on the source? In that case, I think the
+> >>>>>> operation
+> >>>>>> must fail, but of course more gracefully than now.
+> >>>>>>
+> >>>>>> Actually, the question that you're asking implicitly here is how the
+> >>>>>> source qemu process should be "reactivated" after a failed migration.
+> >>>>>> Currently, as far as I know, this is only with issuing a "cont"
+> >>>>>> command.
+> >>>>>> It might make sense to provide a way to get control without
+> >>>>>> resuming the
+> >>>>>> VM, but I doubt that adding automatic resume to every QMP command
+> >>>>>> is the
+> >>>>>> right way to achieve it.
+> >>>>>>
+> >>>>>> Dave, Juan, what do you think?
+> >>>>> I'd only ever really thought of 'cont' or retrying the migration.
+> >>>>> However, it does make sense to me that you might want to do a savevm
+> >>>>> instead; if you can't migrate then perhaps a savevm is the best you
+> >>>>> can do before your machine dies.  Are there any other things that
+> >>>>> should be allowed?
+> >>>> I think we need to ask the other way round: Any reason _not_ to allow
+> >>>> certain operations that you can normally perform on a stopped VM?
+> >>>>
+> >>>>> We would want to be careful not to accidentally reactivate the disks
+> >>>>> on the source after what was actually a succesful migration.
+> >>>> Yes, that's exactly my concern, even with savevm. That's why I
+> >>>> suggested
+> >>>> we could have a 'cont'-like thing that just gets back control of the
+> >>>> images and moves into the normal paused state, but doesn't immediately
+> >>>> resume the actual VM.
+> >>> OK, lets say we had that block-reactivate (for want of a better name),
+> >>> how would we stop everything asserting if the user tried to do it
+> >>> before they'd run block-reactivate?
+> >> We would have to add checks to the monitor commands that assume that the
+> >> image is activated and error out if it isn't.
+> >>
+> >> Maybe just adding the check to blk_is_available() would be enough, but
+> >> we'd have to check carefully whether it covers all cases and causes no
+> >> false positives.
+> >>
+> >> By the way, I wouldn't call this 'block-reactivate' because I don't
+> >> think this should be a block-specific command. It's a VM lifecycle
+> >> command that switches from a postmigrate state (that assumes we have no
+> >> control over the VM's resources any more) to a paused state (where we do
+> >> have this control). Maybe something like 'migration-abort'.
+> > 
+> > 'abort' is not very good too I think. migration is completed, nothing to
+> > abort.. (may be successful migration to file for suspend, some kind of
+> > vm cloning, etc)
+> 
+> There is already migrate_cancel.  Does it make sense to make it
+> reactivate fds if migration is completed?
+
+It's potentially racy to do that.
+Imagine if your migration is almost finished and you issue a migrate_cancel,
+what happens?
+Maybe it cancelled it.
+Maybe it just completed in time - and you really better not be accessing
+the disks on the source unless you're sure the destination isn't running.
+
+Dave
+
+> Paolo
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
