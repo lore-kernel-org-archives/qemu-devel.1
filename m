@@ -1,20 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42983)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1ctDXy-0006fu-N6
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 09:21:59 -0400
+	(envelope-from <lersek@redhat.com>) id 1ctDmq-0000gA-9B
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 09:37:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1ctDXx-0003wn-A9
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 09:21:58 -0400
+	(envelope-from <lersek@redhat.com>) id 1ctDmm-0002EI-9z
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 09:37:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45826)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1ctDmm-0002Dy-0y
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 09:37:16 -0400
+References: <58D17AF0.2010802@arm.com> <20170321193933.GB31111@cbox>
+	<58DA3F68.6090901@arm.com> <20170328112328.GA31156@cbox>
+	<20170328115413.GJ23682@e104320-lin>
+	<b1c6e747-2fa7-b7a1-60d5-4a9c480b9dc9@huawei.com>
+	<58DA67BA.8070404@arm.com>
+	<5b7352f4-4965-3ed5-3879-db871797be47@huawei.com>
+	<20170329103658.GQ23682@e104320-lin>
+	<2a427164-9b37-6711-3a56-906634ba7f12@redhat.com>
+	<20170329154539-mutt-send-email-mst@kernel.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <756e3032-e619-a70d-3e29-d2797e52fecf@redhat.com>
+Date: Wed, 29 Mar 2017 15:36:59 +0200
 MIME-Version: 1.0
-In-Reply-To: <87efxhspgi.fsf@secure.mitica>
-References: <1490693009-10037-1-git-send-email-lidongchen@tencent.com>
-	<87efxhspgi.fsf@secure.mitica>
-From: 858585 jemmy <jemmy858585@gmail.com>
-Date: Wed, 29 Mar 2017 21:21:55 +0800
-Message-ID: <CAOGPPbeRrYfU71ezGB6cYkn8W9mwrSRgvmoj99Q4_q1Km67+gQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [RFC] migration/block:limit the time used for
- block migration
+In-Reply-To: <20170329154539-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] kvm: pass the virtual SEI syndrome to
+ guest OS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,151 +35,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, Fam Zheng <famz@redhat.com>, dgilbert@redhat.com, qemu-block@nongnu.org, Lidong Chen <lidongchen@tencent.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Achin Gupta <achin.gupta@arm.com>, gengdongjiu <gengdongjiu@huawei.com>, ard.biesheuvel@linaro.org, edk2-devel@lists.01.org, qemu-devel@nongnu.org, zhaoshenglong@huawei.com, James Morse <james.morse@arm.com>, Christoffer Dall <cdall@linaro.org>, xiexiuqi@huawei.com, Marc Zyngier <marc.zyngier@arm.com>, catalin.marinas@arm.com, will.deacon@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, suzuki.poulose@arm.com, andre.przywara@arm.com, mark.rutland@arm.com, vladimir.murzin@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, wangxiongfeng2@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com, Leif.Lindholm@linaro.comnd@arm.com, Igor Mammedov <imammedo@redhat.com>
 
-On Tue, Mar 28, 2017 at 5:47 PM, Juan Quintela <quintela@redhat.com> wrote:
-> Lidong Chen <jemmy858585@gmail.com> wrote:
->> when migration with quick speed, mig_save_device_bulk invoke
->> bdrv_is_allocated too frequently, and cause vnc reponse slowly.
->> this patch limit the time used for bdrv_is_allocated.
->>
->> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
->> ---
->>  migration/block.c | 39 +++++++++++++++++++++++++++++++--------
->>  1 file changed, 31 insertions(+), 8 deletions(-)
->>
->> diff --git a/migration/block.c b/migration/block.c
->> index 7734ff7..d3e81ca 100644
->> --- a/migration/block.c
->> +++ b/migration/block.c
->> @@ -110,6 +110,7 @@ typedef struct BlkMigState {
->>      int transferred;
->>      int prev_progress;
->>      int bulk_completed;
->> +    int time_ns_used;
->
-> An int that can only take values 0/1 is called a bool O:-)
-time_ns_used is used to store how many ns used by bdrv_is_allocated.
+On 03/29/17 14:51, Michael S. Tsirkin wrote:
+> On Wed, Mar 29, 2017 at 01:58:29PM +0200, Laszlo Ersek wrote:
+>> (8) When QEMU gets SIGBUS from the kernel -- I hope that's going to come
+>> through a signalfd -- QEMU can format the CPER right into guest memory,
+>> and then inject whatever interrupt (or assert whatever GPIO line) is
+>> necessary for notifying the guest.
+> 
+> I think I see a race condition potential - what if guest accesses
+> CPER in guest memory while it's being written?
 
->
->
->>      if (bmds->shared_base) {
->>          qemu_mutex_lock_iothread();
->>          aio_context_acquire(blk_get_aio_context(bb));
->>          /* Skip unallocated sectors; intentionally treats failure as
->>           * an allocated sector */
->> -        while (cur_sector < total_sectors &&
->> -               !bdrv_is_allocated(blk_bs(bb), cur_sector,
->> -                                  MAX_IS_ALLOCATED_SEARCH, &nr_sectors)) {
->> -            cur_sector += nr_sectors;
->> +        while (cur_sector < total_sectors) {
->> +            clock_gettime(CLOCK_MONOTONIC_RAW, &ts1);
->> +            ret = bdrv_is_allocated(blk_bs(bb), cur_sector,
->> +                                    MAX_IS_ALLOCATED_SEARCH, &nr_sectors);
->> +            clock_gettime(CLOCK_MONOTONIC_RAW, &ts2);
->
-> Do we really want to call clock_gettime each time that
-> bdrv_is_allocated() is called?  My understanding is that clock_gettime
-> is expensive, but I don't know how expensive is brdrv_is_allocated()
+I'm not entirely sure about the data flow here (these parts of the ACPI
+spec are particularly hard to read...), but I thought the OS wouldn't
+look until it got a notification.
 
-i write this code to measure the time used by  brdrv_is_allocated()
+Or, are you concerned about the next CPER write by QEMU, while the OS is
+reading the last one (and maybe the CPER area could wrap around?)
 
- 279     static int max_time = 0;
- 280     int tmp;
+> 
+> We can probably use another level of indirection to fix this:
+> 
+> allocate twice the space, add a pointer to where the valid
+> table is located and update that after writing CPER completely.
+> The pointer can be written atomically but also needs to
+> be read atomically, so I suspect it should be a single byte
+> as we don't know how are OSPMs implementing this.
+> 
 
- 288             clock_gettime(CLOCK_MONOTONIC_RAW, &ts1);
- 289             ret = bdrv_is_allocated(blk_bs(bb), cur_sector,
- 290                                     MAX_IS_ALLOCATED_SEARCH, &nr_sectors);
- 291             clock_gettime(CLOCK_MONOTONIC_RAW, &ts2);
- 292
- 293
- 294             tmp =  (ts2.tv_sec - ts1.tv_sec)*1000000000L
- 295                            + (ts2.tv_nsec - ts1.tv_nsec);
- 296             if (tmp > max_time) {
- 297                max_time=tmp;
- 298                fprintf(stderr, "max_time is %d\n", max_time);
- 299             }
+A-B-A problem? (Is that usually solved with a cookie or a wider
+generation counter? But that would again require wider atomics.)
 
-the test result is below:
+I do wonder though how this is handled on physical hardware. Assuming
+the hardware error traps to the firmware first (which, on phys hw, is
+responsible for depositing the CPER), in that scenario the phys firmware
+would face the same issue (i.e., asynchronously interrupting the OS,
+which could be reading the previously stored CPER).
 
- max_time is 37014
- max_time is 1075534
- max_time is 17180913
- max_time is 28586762
- max_time is 49563584
- max_time is 103085447
- max_time is 110836833
- max_time is 120331438
-
-so i think it's necessary to clock_gettime each time.
-but clock_gettime only available on linux. maybe clock() is better.
-
->
-> And while we are at it, .... shouldn't we check since before the while?
-i also check it in block_save_iterate.
-+           MAX_INFLIGHT_IO &&
-+           block_mig_state.time_ns_used <= 100000) {
-
->
->
->> +
->> +            block_mig_state.time_ns_used += (ts2.tv_sec - ts1.tv_sec) * BILLION
->> +                          + (ts2.tv_nsec - ts1.tv_nsec);
->> +
->> +            if (!ret) {
->> +                cur_sector += nr_sectors;
->> +                if (block_mig_state.time_ns_used > 100000) {
->> +                    timeout_flag = 1;
->> +                    break;
->> +                }
->> +            } else {
->> +                break;
->> +            }
->>          }
->>          aio_context_release(blk_get_aio_context(bb));
->>          qemu_mutex_unlock_iothread();
->> @@ -292,6 +311,11 @@ static int mig_save_device_bulk(QEMUFile *f, BlkMigDevState *bmds)
->>          return 1;
->>      }
->>
->> +    if (timeout_flag == 1) {
->> +        bmds->cur_sector = bmds->completed_sectors = cur_sector;
->> +        return 0;
->> +    }
->> +
->>      bmds->completed_sectors = cur_sector;
->>
->>      cur_sector &= ~((int64_t)BDRV_SECTORS_PER_DIRTY_CHUNK - 1);
->> @@ -576,9 +600,6 @@ static int mig_save_device_dirty(QEMUFile *f, BlkMigDevState *bmds,
->>              }
->>
->>              bdrv_reset_dirty_bitmap(bmds->dirty_bitmap, sector, nr_sectors);
->> -            sector += nr_sectors;
->> -            bmds->cur_dirty = sector;
->> -
->>              break;
->>          }
->>          sector += BDRV_SECTORS_PER_DIRTY_CHUNK;
->> @@ -756,6 +777,7 @@ static int block_save_iterate(QEMUFile *f, void *opaque)
->>      }
->>
->>      blk_mig_reset_dirty_cursor();
->> +    block_mig_state.time_ns_used = 0;
->>
->>      /* control the rate of transfer */
->>      blk_mig_lock();
->> @@ -764,7 +786,8 @@ static int block_save_iterate(QEMUFile *f, void *opaque)
->>             qemu_file_get_rate_limit(f) &&
->>             (block_mig_state.submitted +
->>              block_mig_state.read_done) <
->> -           MAX_INFLIGHT_IO) {
->> +           MAX_INFLIGHT_IO &&
->> +           block_mig_state.time_ns_used <= 100000) {
->
-> changed this 10.000 (and the one used previously) to one constant that
-> says BIG_DELAY, 100MS or whatever you fancy.
-ok,i will change to BIG_DELAY.
-
->
-> Thanks, Juan.
+Thanks,
+Laszlo
