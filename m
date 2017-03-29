@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vyasevic@redhat.com>) id 1ctK4q-0007uy-HC
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 16:20:21 -0400
+	(envelope-from <mreitz@redhat.com>) id 1ctKG4-0003jv-5Y
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 16:31:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vyasevic@redhat.com>) id 1ctK4m-00023A-GA
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 16:20:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48762)
+	(envelope-from <mreitz@redhat.com>) id 1ctKG0-0006Zb-5o
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 16:31:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56378)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vyasevic@redhat.com>) id 1ctK4m-00022m-7o
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 16:20:16 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 86002C04D313
-	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 20:20:14 +0000 (UTC)
-From: Vladislav Yasevich <vyasevic@redhat.com>
-Date: Wed, 29 Mar 2017 16:19:50 -0400
-Message-Id: <1490818790-3100-1-git-send-email-vyasevic@redhat.com>
-Subject: [Qemu-devel] [PATCH] virtio-net: consolidate guest announcement
- with qemu_announce_self
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ctKFz-0006ZO-TI
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 16:31:52 -0400
+References: <1490717566-25516-1-git-send-email-den@openvz.org>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <0d2f0723-1fea-fb59-776b-1b569045fe11@redhat.com>
+Date: Wed, 29 Mar 2017 22:31:48 +0200
+MIME-Version: 1.0
+In-Reply-To: <1490717566-25516-1-git-send-email-den@openvz.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ArIUVHDEepJVHMXCEPifKp44W0W412RQB"
+Subject: Re: [Qemu-devel] [PATCH for 2.9 1/1] block: add missed
+ aio_context_acquire into release_drive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,164 +28,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: gveitmic@redhat.com, mst@redhat.com, dgilbert@redhat.com, Vladislav Yasevich <vyasevic@redhat.com>
+To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-virtio announcements seem to run on its own timer with it's own
-repetition loop and are invoked separately from qemu_announce_self.
-This patch consolidates announcements into a single location and
-allows other nics to provide it's own announcement capabilities, if
-necessary.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ArIUVHDEepJVHMXCEPifKp44W0W412RQB
+From: Max Reitz <mreitz@redhat.com>
+To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
+Message-ID: <0d2f0723-1fea-fb59-776b-1b569045fe11@redhat.com>
+Subject: Re: [PATCH for 2.9 1/1] block: add missed aio_context_acquire into
+ release_drive
+References: <1490717566-25516-1-git-send-email-den@openvz.org>
+In-Reply-To: <1490717566-25516-1-git-send-email-den@openvz.org>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-This is also usefull in support of exposing qemu_announce_self through
-qmp/hmp.
+On 28.03.2017 18:12, Denis V. Lunev wrote:
+> Recently we expirience hang with iothreads enabled with the following
+> call trace:
+> Thread 1 (Thread 0x7fa95efebc80 (LWP 177117)):
+> 0  ppoll () from /lib64/libc.so.6
+> 2  qemu_poll_ns () at qemu-timer.c:313
+> 3  aio_poll () at aio-posix.c:457
+> 4  bdrv_flush () at block/io.c:2641
+> 5  bdrv_close () at block.c:2143
+> 6  bdrv_delete () at block.c:2352
+> 7  bdrv_unref () at block.c:3429
+> 8  blk_remove_bs () at block/block-backend.c:427
+> 9  blk_delete () at block/block-backend.c:178
+> 10 blk_unref () at block/block-backend.c:226
+> 11 object_property_del_all () at qom/object.c:399
+> 12 object_finalize () at qom/object.c:461
+> 13 object_unref () at qom/object.c:898
+> 14 object_property_del_child () at qom/object.c:422
+> 15 qmp_marshal_device_del () at qmp-marshal.c:1145
+> 16 handle_qmp_command () at /usr/src/debug/qemu-2.6.0/monitor.c:3929
+>=20
+> Technically bdrv_flush() stucks in
+>     while (rwco.ret =3D=3D NOT_DONE) {
+>         aio_poll(aio_context, true);
+>     }
+> but rwco.ret is equal to 0 thus we have missed wakeup. Code investigati=
+on
+> reveals that we do not have performed aio_context_acquire() on this cal=
+l
+> stack.
+>=20
+> This patch adds missed lock.
+>=20
+> Signed-off-by: Denis V. Lunev <den@openvz.org>
+> CC: Kevin Wolf <kwolf@redhat.com>
+> CC: Max Reitz <mreitz@redhat.com>
+> CC: Eric Blake <eblake@redhat.com>
+> CC: Markus Armbruster <armbru@redhat.com>
+> ---
+>  hw/core/qdev-properties-system.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 
-Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
----
- hw/net/virtio-net.c            | 30 ++++++++----------------------
- include/hw/virtio/virtio-net.h |  2 --
- include/net/net.h              |  2 ++
- migration/savevm.c             |  6 ++++++
- 4 files changed, 16 insertions(+), 24 deletions(-)
+Since this file is unmaintained but this patch is mostly a matter of the
+block layer (and the subject starts with "block" :-)):
 
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index c321680..6e9ce4f 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -110,14 +110,16 @@ static bool virtio_net_started(VirtIONet *n, uint8_t status)
-         (n->status & VIRTIO_NET_S_LINK_UP) && vdev->vm_running;
- }
- 
--static void virtio_net_announce_timer(void *opaque)
-+static void virtio_net_announce(NetClientState *nc)
- {
--    VirtIONet *n = opaque;
-+    VirtIONet *n = qemu_get_nic_opaque(nc);
-     VirtIODevice *vdev = VIRTIO_DEVICE(n);
- 
--    n->announce_counter--;
--    n->status |= VIRTIO_NET_S_ANNOUNCE;
--    virtio_notify_config(vdev);
-+    if (virtio_vdev_has_feature(vdev, VIRTIO_NET_F_GUEST_ANNOUNCE) &&
-+        virtio_vdev_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ)) {
-+            n->status |= VIRTIO_NET_S_ANNOUNCE;
-+            virtio_notify_config(vdev);
-+    }
- }
- 
- static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
-@@ -427,8 +429,6 @@ static void virtio_net_reset(VirtIODevice *vdev)
-     n->nobcast = 0;
-     /* multiqueue is disabled by default */
-     n->curr_queues = 1;
--    timer_del(n->announce_timer);
--    n->announce_counter = 0;
-     n->status &= ~VIRTIO_NET_S_ANNOUNCE;
- 
-     /* Flush any MAC and VLAN filter table state */
-@@ -868,11 +868,6 @@ static int virtio_net_handle_announce(VirtIONet *n, uint8_t cmd,
-     if (cmd == VIRTIO_NET_CTRL_ANNOUNCE_ACK &&
-         n->status & VIRTIO_NET_S_ANNOUNCE) {
-         n->status &= ~VIRTIO_NET_S_ANNOUNCE;
--        if (n->announce_counter) {
--            timer_mod(n->announce_timer,
--                      qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
--                      self_announce_delay(n->announce_counter));
--        }
-         return VIRTIO_NET_OK;
-     } else {
-         return VIRTIO_NET_ERR;
-@@ -1609,12 +1604,6 @@ static int virtio_net_post_load_device(void *opaque, int version_id)
-         qemu_get_subqueue(n->nic, i)->link_down = link_down;
-     }
- 
--    if (virtio_vdev_has_feature(vdev, VIRTIO_NET_F_GUEST_ANNOUNCE) &&
--        virtio_vdev_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ)) {
--        n->announce_counter = SELF_ANNOUNCE_ROUNDS;
--        timer_mod(n->announce_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL));
--    }
--
-     return 0;
- }
- 
-@@ -1829,6 +1818,7 @@ static NetClientInfo net_virtio_info = {
-     .receive = virtio_net_receive,
-     .link_status_changed = virtio_net_set_link_status,
-     .query_rx_filter = virtio_net_query_rxfilter,
-+    .announce = virtio_net_announce,
- };
- 
- static bool virtio_net_guest_notifier_pending(VirtIODevice *vdev, int idx)
-@@ -1934,8 +1924,6 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
-     qemu_macaddr_default_if_unset(&n->nic_conf.macaddr);
-     memcpy(&n->mac[0], &n->nic_conf.macaddr, sizeof(n->mac));
-     n->status = VIRTIO_NET_S_LINK_UP;
--    n->announce_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL,
--                                     virtio_net_announce_timer, n);
- 
-     if (n->netclient_type) {
-         /*
-@@ -1997,8 +1985,6 @@ static void virtio_net_device_unrealize(DeviceState *dev, Error **errp)
-         virtio_net_del_queue(n, i);
-     }
- 
--    timer_del(n->announce_timer);
--    timer_free(n->announce_timer);
-     g_free(n->vqs);
-     qemu_del_nic(n->nic);
-     virtio_cleanup(vdev);
-diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
-index 1eec9a2..0c597f4 100644
---- a/include/hw/virtio/virtio-net.h
-+++ b/include/hw/virtio/virtio-net.h
-@@ -94,8 +94,6 @@ typedef struct VirtIONet {
-     char *netclient_name;
-     char *netclient_type;
-     uint64_t curr_guest_offloads;
--    QEMUTimer *announce_timer;
--    int announce_counter;
-     bool needs_vnet_hdr_swap;
- } VirtIONet;
- 
-diff --git a/include/net/net.h b/include/net/net.h
-index 99b28d5..598f523 100644
---- a/include/net/net.h
-+++ b/include/net/net.h
-@@ -64,6 +64,7 @@ typedef int (SetVnetLE)(NetClientState *, bool);
- typedef int (SetVnetBE)(NetClientState *, bool);
- typedef struct SocketReadState SocketReadState;
- typedef void (SocketReadStateFinalize)(SocketReadState *rs);
-+typedef void (NetAnnounce)(NetClientState *);
- 
- typedef struct NetClientInfo {
-     NetClientDriver type;
-@@ -84,6 +85,7 @@ typedef struct NetClientInfo {
-     SetVnetHdrLen *set_vnet_hdr_len;
-     SetVnetLE *set_vnet_le;
-     SetVnetBE *set_vnet_be;
-+    NetAnnounce *announce;
- } NetClientInfo;
- 
- struct NetClientState {
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 3b19a4a..5c1d8dc 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -113,9 +113,15 @@ static void qemu_announce_self_iter(NICState *nic, void *opaque)
-     int len;
- 
-     trace_qemu_announce_self_iter(qemu_ether_ntoa(&nic->conf->macaddr));
-+
-     len = announce_self_create(buf, nic->conf->macaddr.a);
- 
-     qemu_send_packet_raw(qemu_get_queue(nic), buf, len);
-+
-+    /* if the NIC provides it's own announcement support, use it as well */
-+    if (nic->ncs->info->announce) {
-+        nic->ncs->info->announce(nic->ncs);
-+    }
- }
- 
- 
--- 
-2.7.4
+Thanks, applied to my block tree:
+
+https://github.com/xanClic/qemu/commits/block
+
+Max
+
+
+--ArIUVHDEepJVHMXCEPifKp44W0W412RQB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljcGbQSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ALacH/1RUavs83fQZfft72zdMw7VZ0X7I1ce+
+v4FM06ZcEo1JrTH5SVvzr/l6ivL6QMiqH0urHCgrxpd+ke9qdnoKqWIp1bd++FzJ
+JM7fO8wyk/I/54smg/5XOF8YRObghEs55+U/KvdsTo1v9vcEXLf6H1YoDqXAc+jB
+REtUw7PLAAMPcAwWdDscAkf4S09nm1cuZhqkv7p2vBqM2jA5mOlJmUM1/2fnz5BU
+Fd6iEaQfirF/QijbubF/qWzFAXDlpfHTQeVpxxlHJrwJWtr4uHa8Oa1be7FRP+A0
+lbPjL5qK1vPhCYwqrMrNKWiOMHmCulQaVpTw5utNQyojGKExEIp3CA0=
+=XFlP
+-----END PGP SIGNATURE-----
+
+--ArIUVHDEepJVHMXCEPifKp44W0W412RQB--
