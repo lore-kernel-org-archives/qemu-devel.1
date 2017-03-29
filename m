@@ -1,21 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53038)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <iwona260909@gmail.com>) id 1ctIVe-00076q-Ui
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 14:39:56 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1ctIY2-00087y-IE
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 14:42:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <iwona260909@gmail.com>) id 1ctIVb-0001Ch-Tp
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 14:39:55 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:33655)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <iwona260909@gmail.com>)
-	id 1ctIVb-0001CK-Lo
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 14:39:51 -0400
-Received: by mail-lf0-x243.google.com with SMTP id r36so2525226lfi.0
-	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 11:39:51 -0700 (PDT)
-From: Iwona Kotlarska <iwona260909@gmail.com>
-Date: Wed, 29 Mar 2017 20:39:14 +0200
-Message-Id: <20170329183914.4197-1-iwona260909@gmail.com>
-Subject: [Qemu-devel] [PATCH v2] hmp: fix "info cpu" segfault
+	(envelope-from <sstabellini@kernel.org>) id 1ctIXz-0003U4-FC
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 14:42:22 -0400
+Received: from mail.kernel.org ([198.145.29.136]:54406)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1ctIXz-0003TI-95
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 14:42:19 -0400
+Date: Wed, 29 Mar 2017 11:42:13 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <25280fb4-5ffd-a523-b5c1-4725fa55e44b@redhat.com>
+Message-ID: <alpine.DEB.2.10.1703291141190.27589@sstabellini-ThinkPad-X260>
+References: <alpine.DEB.2.10.1703201117560.23684@sstabellini-ThinkPad-X260>
+	<1490033952-26735-1-git-send-email-sstabellini@kernel.org>
+	<20170323140005.6b0853b3@bahia.lan>
+	<15207674-c5cd-3874-7ac9-5b23cdac8888@suse.com>
+	<28db5816-2ed9-0d92-a15d-af47b58a9da1@redhat.com>
+	<alpine.DEB.2.10.1703230953120.8001@sstabellini-ThinkPad-X260>
+	<3d94c0aa-6b18-5574-4034-110cc2cf4b90@suse.com>
+	<alpine.DEB.2.10.1703241030391.8001@sstabellini-ThinkPad-X260>
+	<d02897ba-88c6-f92e-ccf5-afab3c584f75@suse.com>
+	<alpine.DEB.2.10.1703271537330.8001@sstabellini-ThinkPad-X260>
+	<b0ef8967-302f-e308-4d2c-207299c250ef@suse.com>
+	<alpine.DEB.2.10.1703281653340.27589@sstabellini-ThinkPad-X260>
+	<25280fb4-5ffd-a523-b5c1-4725fa55e44b@redhat.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v4 1/8] xen: import ring.h from xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,35 +38,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, marcel@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, Iwona Kotlarska <iwona260909@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, Juergen Gross <jgross@suse.com>, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, Stefano Stabellini <stefano@aporeto.com>, anthony.perard@citrix.com, xen-devel <xen-devel@lists.xenproject.org>
 
-Running QEMU with "qemu-system-x86_64 -M none -nographic -m 256" and executing
-"dump-guest-memory /dev/null 0 8192" results in segfault.
-Fix by checking if we have CPU.
+On Wed, 29 Mar 2017, Paolo Bonzini wrote:
+> On 29/03/2017 01:54, Stefano Stabellini wrote:
+> >>> I understand your point of view, and honestly it wouldn't be a problem
+> >>> doing it the way you suggested either. However, I think that going
+> >>> forward it will be less of a maintenance pain to keep ring.h in sync,
+> >>> compared to maintaining a versioned build dependency between Xen and
+> >>> QEMU for the compilation of one PV backend. We do have version checks
+> >>> in QEMU for Xen compatibility, but not for PV backends or the xenpv
+> >>> machine yet.
+> >> For the pvUSB backend I just used a mandatory macro from the header for
+> >> the #ifdef. The backend will signal support when it was defined during
+> >> build and will refuse initialization otherwise. Xen tools are able to
+> >> recoginze qemu support of the backend by looking into Xenstore.
+> > 
+> > What do you think of the following:
+> 
+> Let's just copy the header...
 
-Signed-off-by: Iwona Kotlarska <iwona260909@gmail.com>
----
- target/i386/arch_dump.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+It's settled.
 
-diff --git a/target/i386/arch_dump.c b/target/i386/arch_dump.c
-index 5a2e4be5d0..43992a440c 100644
---- a/target/i386/arch_dump.c
-+++ b/target/i386/arch_dump.c
-@@ -390,9 +390,11 @@ int cpu_get_dump_info(ArchDumpInfo *info,
-     GuestPhysBlock *block;
- 
- #ifdef TARGET_X86_64
--    X86CPU *first_x86_cpu = X86_CPU(first_cpu);
--
--    lma = !!(first_x86_cpu->env.hflags & HF_LMA_MASK);
-+    X86CPU *first_x86_cpu = NULL;
-+    first_x86_cpu = X86_CPU(first_cpu);
-+    if (first_cpu != NULL) {
-+        lma = !!(first_x86_cpu->env.hflags & HF_LMA_MASK);
-+    }
- #endif
- 
-     if (lma) {
--- 
-2.12.0
+Thanks,
+
+Stefano
