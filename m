@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1ctGmz-0007gO-GR
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 12:49:42 -0400
+	(envelope-from <iwona260909@gmail.com>) id 1ctGr3-0002Iv-Di
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 12:53:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1ctGmy-0007U5-Gg
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 12:49:41 -0400
-Date: Wed, 29 Mar 2017 12:49:31 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <1585753855.16940591.1490806170998.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1947286013.16940443.1490806123696.JavaMail.zimbra@redhat.com>
-References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
-	<1490805920-17029-3-git-send-email-armbru@redhat.com>
-	<1947286013.16940443.1490806123696.JavaMail.zimbra@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [for-2.9 2/8] char: Fix socket with "type":
- "vsock" address
+	(envelope-from <iwona260909@gmail.com>) id 1ctGqy-0000sS-8T
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 12:53:53 -0400
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:35291)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <iwona260909@gmail.com>)
+	id 1ctGqy-0000qE-0y
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 12:53:48 -0400
+Received: by mail-lf0-x241.google.com with SMTP id v2so2249724lfi.2
+	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 09:53:47 -0700 (PDT)
+From: Iwona Kotlarska <iwona260909@gmail.com>
+Date: Wed, 29 Mar 2017 18:52:51 +0200
+Message-Id: <20170329165251.28740-1-iwona260909@gmail.com>
+Subject: [Qemu-devel] [PATCH] hmp: fix "info cpu" segfault
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,67 +24,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mitake hitoshi <mitake.hitoshi@lab.ntt.co.jp>, namei unix <namei.unix@gmail.com>, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, pbonzini@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, marcel@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, Iwona Kotlarska <iwona260909@gmail.com>
 
+Running "dump-guest-memory /dev/null 0 8192" results in segfault.
+Fix by checking if we have CPU.
 
+Signed-off-by: Iwona Kotlarska <iwona260909@gmail.com>
+---
+ target/i386/arch_dump.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
------ Original Message -----
->=20
-> Hi
->=20
-> ----- Original Message -----
-> > Watch this:
-> >=20
-> >     $ qemu-system-x86_64 -nodefaults -S -display none -qmp stdio
-> >     {"QMP": {"version": {"qemu": {"micro": 91, "minor": 8, "major": 2},
-> >     "package": " (v2.8.0-1195-gf84141e-dirty)"}, "capabilities": []}}
-> >     { "execute": "qmp_capabilities" }
-> >     {"return": {}}
-> >     { "execute": "chardev-add", "arguments": { "id": "chr0", "backend":=
- {
-> >     "type": "socket", "data": { "addr": { "type": "vsock", "data": { "c=
-id":
-> >     "CID", "port": "P" }}}}}}
-> >     Aborted (core dumped)
-> >=20
-> > Crashes because SocketAddress_to_str() is blissfully unaware of
-> > SOCKET_ADDRESS_KIND_VSOCK.  Fix that.  Pick the output format to match
-> > socket_parse(), just like the existing formats.
-> >=20
-> > Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > Signed-off-by: Markus Armbruster <armbru@redhat.com>
->=20
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
-> > ---
-> >  chardev/char-socket.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >=20
-> > diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> > index 6344b07..36ab0d6 100644
-> > --- a/chardev/char-socket.c
-> > +++ b/chardev/char-socket.c
-> > @@ -357,6 +357,10 @@ static char *SocketAddress_to_str(const char *pref=
-ix,
-> > SocketAddress *addr,
-> >          return g_strdup_printf("%sfd:%s%s", prefix, addr->u.fd.data->s=
-tr,
-> >                                 is_listen ? ",server" : "");
-> >          break;
-> > +    case SOCKET_ADDRESS_KIND_VSOCK:
-> > +        return g_strdup_printf("%svsock:%s:%s", prefix,
-> > +                               addr->u.vsock.data->cid,
-> > +                               addr->u.vsock.data->port);
-> >      default:
-> >          abort();
->=20
-> ooch.. may I suggest we don't abort() here? g_return_val_if_fail() perhap=
-s a
-> more judicious choice?
-
--> g_return_if_reached()
-
->=20
+diff --git a/target/i386/arch_dump.c b/target/i386/arch_dump.c
+index 5a2e4be5d0..45cda6afb1 100644
+--- a/target/i386/arch_dump.c
++++ b/target/i386/arch_dump.c
+@@ -390,9 +390,10 @@ int cpu_get_dump_info(ArchDumpInfo *info,
+     GuestPhysBlock *block;
+ 
+ #ifdef TARGET_X86_64
+-    X86CPU *first_x86_cpu = X86_CPU(first_cpu);
+-
+-    lma = !!(first_x86_cpu->env.hflags & HF_LMA_MASK);
++    X86CPU *first_x86_cpu = NULL;
++    first_x86_cpu = X86_CPU(first_cpu);
++    if (first_cpu != NULL)
++        lma = !!(first_x86_cpu->env.hflags & HF_LMA_MASK);
+ #endif
+ 
+     if (lma) {
+-- 
+2.12.0
