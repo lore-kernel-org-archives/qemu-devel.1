@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ct8cV-0002Qw-Pu
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 04:06:20 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1ct8fO-0003Hk-NZ
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 04:09:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ct8cS-0001md-Jw
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 04:06:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55558)
+	(envelope-from <pbonzini@redhat.com>) id 1ct8fL-00039d-G2
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 04:09:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58208)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ct8cS-0001mU-DB
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 04:06:16 -0400
-References: <alpine.DEB.2.10.1703201117560.23684@sstabellini-ThinkPad-X260>
-	<1490033952-26735-1-git-send-email-sstabellini@kernel.org>
-	<20170323140005.6b0853b3@bahia.lan>
-	<15207674-c5cd-3874-7ac9-5b23cdac8888@suse.com>
-	<28db5816-2ed9-0d92-a15d-af47b58a9da1@redhat.com>
-	<alpine.DEB.2.10.1703230953120.8001@sstabellini-ThinkPad-X260>
-	<3d94c0aa-6b18-5574-4034-110cc2cf4b90@suse.com>
-	<alpine.DEB.2.10.1703241030391.8001@sstabellini-ThinkPad-X260>
-	<d02897ba-88c6-f92e-ccf5-afab3c584f75@suse.com>
-	<alpine.DEB.2.10.1703271537330.8001@sstabellini-ThinkPad-X260>
-	<b0ef8967-302f-e308-4d2c-207299c250ef@suse.com>
-	<alpine.DEB.2.10.1703281653340.27589@sstabellini-ThinkPad-X260>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ct8fL-00039E-Aa
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 04:09:15 -0400
+References: <93cb45b7-feca-9340-5fbe-3cc1e60d9e7e@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <25280fb4-5ffd-a523-b5c1-4725fa55e44b@redhat.com>
-Date: Wed, 29 Mar 2017 10:06:11 +0200
+Message-ID: <aa8f8830-9426-7cf5-ec99-363035315aa3@redhat.com>
+Date: Wed, 29 Mar 2017 10:09:10 +0200
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.10.1703281653340.27589@sstabellini-ThinkPad-X260>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <93cb45b7-feca-9340-5fbe-3cc1e60d9e7e@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 1/8] xen: import ring.h from xen
+Subject: Re: [Qemu-devel] issues of region cache and iommu reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,26 +26,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>, Juergen Gross <jgross@suse.com>
-Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, Stefano Stabellini <stefano@aporeto.com>, anthony.perard@citrix.com, xen-devel <xen-devel@lists.xenproject.org>
+To: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu devel <qemu-devel@nongnu.org>, Cornelia Huck <cornelia.huck@de.ibm.com>
 
 
 
-On 29/03/2017 01:54, Stefano Stabellini wrote:
->>> I understand your point of view, and honestly it wouldn't be a problem
->>> doing it the way you suggested either. However, I think that going
->>> forward it will be less of a maintenance pain to keep ring.h in sync,
->>> compared to maintaining a versioned build dependency between Xen and
->>> QEMU for the compilation of one PV backend. We do have version checks
->>> in QEMU for Xen compatibility, but not for PV backends or the xenpv
->>> machine yet.
->> For the pvUSB backend I just used a mandatory macro from the header for
->> the #ifdef. The backend will signal support when it was defined during
->> build and will refuse initialization otherwise. Xen tools are able to
->> recoginze qemu support of the backend by looking into Xenstore.
+On 29/03/2017 10:00, Jason Wang wrote:
 > 
-> What do you think of the following:
+> 
+> 1) vtd was reset first
+> 
+> 2) during the reset of virtio-net-pci #1, deletion of msix subregion
+> will cause a commit of all memory listeners
+> 
+> 3) virito-net-pci #2's region cache will be update, but since vtd has
+> already been reset, it can't get a valid mappings here
+>
+> Any ideas on how to fix this? Need region cache be aware of IOMMU/IOTLB
+> state in this case? Or can we simply reset IOMMU as the last one?
 
-Let's just copy the header...
+Something like this?
+
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 03592c5..73e69ac 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -176,6 +176,10 @@ err_used:
+     address_space_cache_destroy(&new->desc);
+ err_desc:
+     g_free(new);
++    atomic_rcu_set(&vq->vring.caches, NULL);
++    if (old) {
++        call_rcu(old, virtio_free_region_cache, rcu);
++    }
+ }
+
+ /* virt queue functions */
 
 Paolo
