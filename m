@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ctGkM-0005RY-6I
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 12:46:59 -0400
+	(envelope-from <mlureau@redhat.com>) id 1ctGmJ-00075r-WF
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 12:49:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ctGkJ-0006hn-37
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 12:46:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59192)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ctGkI-0006hZ-TP
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 12:46:55 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D70A2C04B310
-	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 16:46:53 +0000 (UTC)
-Date: Wed, 29 Mar 2017 17:46:46 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170329164646.GD2501@work-vm>
-References: <3d1c16a1-ec05-0367-e569-64a63b34f2e3@redhat.com>
-	<4a56f716-3528-ddd4-f8c4-f3f6b23c469a@redhat.com>
-	<bbc2671a-42dd-aa2a-0f03-6a4a487cb8f5@redhat.com>
-	<fddf5055-c458-3893-9a18-5b0701e5431a@redhat.com>
-	<3044459b-65a3-ca78-c009-15de9823704a@redhat.com>
+	(envelope-from <mlureau@redhat.com>) id 1ctGmI-0007Iu-Ta
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 12:49:00 -0400
+Date: Wed, 29 Mar 2017 12:48:43 -0400 (EDT)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <1947286013.16940443.1490806123696.JavaMail.zimbra@redhat.com>
+In-Reply-To: <1490805920-17029-3-git-send-email-armbru@redhat.com>
+References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
+	<1490805920-17029-3-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3044459b-65a3-ca78-c009-15de9823704a@redhat.com>
-Subject: Re: [Qemu-devel] Deprecating old machine types
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [for-2.9 2/8] char: Fix socket with "type":
+ "vsock" address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,36 +24,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mitake hitoshi <mitake.hitoshi@lab.ntt.co.jp>, namei unix <namei.unix@gmail.com>, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, pbonzini@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
 
-* Thomas Huth (thuth@redhat.com) wrote:
-> On 27.03.2017 21:04, John Snow wrote:
-> > 
-> > On 03/27/2017 04:06 AM, Thomas Huth wrote:
-> >> On 24.03.2017 23:10, John Snow wrote:
-> [...]
-> >>> I have a list of things I want to axe...
-> >>
-> >> I've started a Wiki page with such a list here:
-> >>
-> >> http://wiki.qemu-project.org/Features/LegacyRemoval
-> >>
-> >> Feel free to amend!
-> > 
-> > Absolutely!
-> 
-> By the way, what about old machine types like "pc-0.10" ? Do we want to
-> carry them along forever (e.g. since it is not too complicated to
-> maintain?), or shall we get rid of those one day (e.g. with QEMU 3.0), too?
 
-It seems reasonable to slowly deprecate them.
-I'm just not sure how slowly.
+Hi
 
-Dave
+----- Original Message -----
+> Watch this:
+>=20
+>     $ qemu-system-x86_64 -nodefaults -S -display none -qmp stdio
+>     {"QMP": {"version": {"qemu": {"micro": 91, "minor": 8, "major": 2},
+>     "package": " (v2.8.0-1195-gf84141e-dirty)"}, "capabilities": []}}
+>     { "execute": "qmp_capabilities" }
+>     {"return": {}}
+>     { "execute": "chardev-add", "arguments": { "id": "chr0", "backend": {
+>     "type": "socket", "data": { "addr": { "type": "vsock", "data": { "cid=
+":
+>     "CID", "port": "P" }}}}}}
+>     Aborted (core dumped)
+>=20
+> Crashes because SocketAddress_to_str() is blissfully unaware of
+> SOCKET_ADDRESS_KIND_VSOCK.  Fix that.  Pick the output format to match
+> socket_parse(), just like the existing formats.
+>=20
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-> 
->  Thomas
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+> ---
+>  chardev/char-socket.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>=20
+> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> index 6344b07..36ab0d6 100644
+> --- a/chardev/char-socket.c
+> +++ b/chardev/char-socket.c
+> @@ -357,6 +357,10 @@ static char *SocketAddress_to_str(const char *prefix=
+,
+> SocketAddress *addr,
+>          return g_strdup_printf("%sfd:%s%s", prefix, addr->u.fd.data->str=
+,
+>                                 is_listen ? ",server" : "");
+>          break;
+> +    case SOCKET_ADDRESS_KIND_VSOCK:
+> +        return g_strdup_printf("%svsock:%s:%s", prefix,
+> +                               addr->u.vsock.data->cid,
+> +                               addr->u.vsock.data->port);
+>      default:
+>          abort();
+
+ooch.. may I suggest we don't abort() here? g_return_val_if_fail() perhaps =
+a more judicious choice?
