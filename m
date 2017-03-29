@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ctJke-0001Kt-UU
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:59:29 -0400
+	(envelope-from <eblake@redhat.com>) id 1ctJo4-0002oo-Mp
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 16:03:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ctJkd-000833-SO
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:59:29 -0400
+	(envelope-from <eblake@redhat.com>) id 1ctJo3-0001oE-PQ
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 16:03:00 -0400
 References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
-	<1490805920-17029-9-git-send-email-armbru@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <a33b1054-201c-9f5e-2c0e-35a86b1262e1@redhat.com>
-Date: Wed, 29 Mar 2017 21:59:18 +0200
+	<1490805920-17029-7-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7caffda9-7cbb-4044-7b6a-e398ffa125a6@redhat.com>
+Date: Wed, 29 Mar 2017 15:02:51 -0500
 MIME-Version: 1.0
-In-Reply-To: <1490805920-17029-9-git-send-email-armbru@redhat.com>
+In-Reply-To: <1490805920-17029-7-git-send-email-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="ae7b993c2UQabTKJqBXnflvEXjdoQcS3i"
-Subject: Re: [Qemu-devel] [for-2.9 8/8] sheepdog: Fix blockdev-add
+	boundary="amuEHc5jFeOipUXuXdQvcd2O2FqsCk0b8"
+Subject: Re: [Qemu-devel] [for-2.9 6/8] qapi-schema: SocketAddressFlat
+ variants 'vsock' and 'fd'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,84 +26,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, eblake@redhat.com, pbonzini@redhat.com
+Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ae7b993c2UQabTKJqBXnflvEXjdoQcS3i
-From: Max Reitz <mreitz@redhat.com>
+--amuEHc5jFeOipUXuXdQvcd2O2FqsCk0b8
+From: Eric Blake <eblake@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp,
- namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, eblake@redhat.com,
+ namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
  pbonzini@redhat.com
-Message-ID: <a33b1054-201c-9f5e-2c0e-35a86b1262e1@redhat.com>
-Subject: Re: [for-2.9 8/8] sheepdog: Fix blockdev-add
+Message-ID: <7caffda9-7cbb-4044-7b6a-e398ffa125a6@redhat.com>
+Subject: Re: [for-2.9 6/8] qapi-schema: SocketAddressFlat variants 'vsock' and
+ 'fd'
 References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
- <1490805920-17029-9-git-send-email-armbru@redhat.com>
-In-Reply-To: <1490805920-17029-9-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
+ <1490805920-17029-7-git-send-email-armbru@redhat.com>
+In-Reply-To: <1490805920-17029-7-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 29.03.2017 18:45, Markus Armbruster wrote:
-> Commit 831acdc "sheepdog: Implement bdrv_parse_filename()" and commit
-> d282f34 "sheepdog: Support blockdev-add" have different ideas on how
-> the QemuOpts parameters for the server address are named.  Fix that.
-> While there, rename BlockdevOptionsSheepdog member addr to server, for
-> consistency with BlockdevOptionsSsh, BlockdevOptionsGluster,
-> BlockdevOptionsNbd.
->=20
-> Commit 831acdc's example becomes
->=20
->     --drive driver=3Dsheepdog,server.host=3Dfido,vdi=3Ddolly
->=20
-> instead of
->=20
->     --drive driver=3Dsheepdog,host=3Dfido,vdi=3Ddolly
+On 03/29/2017 11:45 AM, Markus Armbruster wrote:
+> Note that the new variants are impossible in qemu_gluster_glfs_init(),
+> because the gconf->server can only come from qemu_gluster_parse_uri()
+> or qemu_gluster_parse_json(), and neither can create anything but
+> 'tcp' or 'unix'.
 >=20
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  block/sheepdog.c     | 18 +++++++++---------
->  qapi/block-core.json |  4 ++--
->  2 files changed, 11 insertions(+), 11 deletions(-)
+>  block/gluster.c  |  2 ++
+>  qapi-schema.json | 19 ++++++++-----------
+>  2 files changed, 10 insertions(+), 11 deletions(-)
 
-OK, so let me get this straight: Before this patch, @addr was advertised
-as a runtime parameter that actually wasn't supported at all? (Because I
-can't see any place in block/sheepdog.c where it would be parsed.)
+> +# This is just like SocketAddress, except it's a flat union rather
+> +# than a simple union.  Nicer because it avoids nesting (i.e. more {})=
 
-This patch now renames @addr to @server and instead of actually parsing
-the option, it just removes the so-far convenience[1] options @host,
-@port, and @path and just fetches the from @server?
+> +# on the wire.
+>  #
+>  # Since: 2.9
+>  ##
+>  { 'union': 'SocketAddressFlat',
+>    'base': { 'type': 'SocketAddressFlatType' },
+>    'discriminator': 'type',
+> -  'data': { 'unix': 'UnixSocketAddress',
+> -            'inet': 'InetSocketAddress' } }
+> +  'data': { 'inet': 'InetSocketAddress',
+> +            'unix': 'UnixSocketAddress',
+> +            'vsock': 'VsockSocketAddress',
+> +            'fd': 'String' } }
 
-If that is true, I can't say I like it the least. I guess it works for
-2.9, but there should be a FIXME somewhere in this patch.
+Can we make 'fd':'str'?  That would be even less pointless nesting on
+the wire.
 
-Also, if you set any of server.* in bdrv_parse_filename(), you also have
-to set server.type. It's a SocketAddressFlat, .type is a required field.
-I know it's just for internal use, but that doesn't change the fact that
-it's an invalid SocketAddressFlat object without.
-
-Max
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
-[1] Originally there were apparently introduced for
-bdrv_parse_filename() -- but of course you can just use them in -drive
-directly...
-
-
---ae7b993c2UQabTKJqBXnflvEXjdoQcS3i
+--amuEHc5jFeOipUXuXdQvcd2O2FqsCk0b8
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljcEhYSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ABvMH/j03kIpA9s1KJ09MRBLt8wGMamDPAwz3
-nRqwewgSHEIqrwBVOcYOx59aakVj5b8Q6mDHomzcPy6pSOZAAPhcK4sc8VlAJF5k
-yzUacucsYcUkjguM4vBjnG8HLgoiQmafT4Aft9tzlZ18dM21wtzDRYg1OKPSDEpM
-vWm2Ca2YBEaqCFed5QbBC9p2x99kbJKFoq9q9we2M7azrnM40pB0OBJ6oZMqVElF
-sxtg/0amYWg1SdsqOEsqLg9UDC2TEltHGUCtk8J1tF9tJuO8AUwwMvrJOThsiIcs
-YBvAHBcrflzMnnfXTHtDuCwXDndrkhDXI6r2YRbc/e1zHQ2r0E7prBM=
-=K6B6
+iQEcBAEBCAAGBQJY3BLrAAoJEKeha0olJ0NqJvsH/iSwHGg9lvtad8jrH+rmG/VF
+JwJIoGDYdZPeDkC+aS3J/BVfPV+PnNtmOh9GRL/cwCSxT6LCrxJJT3R/XJN8jRDD
+FnCJDxDNQ8cLiiEmS8hhuOBwWzkQlz/P3bjLDfTapmXGUvpEWEcYX9ia8HM08uP8
+W5ecq2VGMDUycLsQAbFh3fF+3NOOU8lma2Y26S0mb3uP+mGYOOnP4ki4iw1g+VX5
+wAR8xSIuEa+Hl9U1R1w7fkEWBp0qb49hMI1tUSN5lQA60P3G3LvI6uKoGMD32ZWS
+cLdlb/z3mbOHKFt3/X71YIAFo+mXoiqQNIzo5eGx8gzbn7GuasOIm4YdUcqW5qc=
+=TFxa
 -----END PGP SIGNATURE-----
 
---ae7b993c2UQabTKJqBXnflvEXjdoQcS3i--
+--amuEHc5jFeOipUXuXdQvcd2O2FqsCk0b8--
