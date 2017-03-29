@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ctFXt-00036M-O1
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 11:30:02 -0400
+	(envelope-from <lersek@redhat.com>) id 1ctFfd-0004rE-NX
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 11:38:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ctFXs-0000Xz-IF
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 11:30:01 -0400
-Date: Wed, 29 Mar 2017 16:29:42 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170329152941.GC2501@work-vm>
-References: <20170225193155.447462-1-vsementsov@virtuozzo.com>
-	<20170225193155.447462-4-vsementsov@virtuozzo.com>
-	<20170307095323.GB5871@noname.str.redhat.com>
-	<20170328105544.GE2509@work-vm>
-	<20170328110900.GB11725@noname.redhat.com>
-	<20170328111315.GF2509@work-vm>
-	<20170328120900.GC11725@noname.redhat.com>
-	<4ed9821c-d19e-70fe-c7e5-fc89756b59f5@virtuozzo.com>
-	<09db3476-b1e4-fa80-6d83-d5da0a06bdfc@redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1ctFfa-0004D9-Vf
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 11:38:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60642)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1ctFfa-0004CO-NV
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 11:37:58 -0400
+References: <58D17AF0.2010802@arm.com> <20170321193933.GB31111@cbox>
+	<58DA3F68.6090901@arm.com> <20170328112328.GA31156@cbox>
+	<20170328115413.GJ23682@e104320-lin>
+	<b1c6e747-2fa7-b7a1-60d5-4a9c480b9dc9@huawei.com>
+	<58DA67BA.8070404@arm.com>
+	<5b7352f4-4965-3ed5-3879-db871797be47@huawei.com>
+	<20170329103658.GQ23682@e104320-lin>
+	<CAMj-D2BT3ByY-iFrRVVK7y=G7zhRBtM031VgLn6JzwUE-WCdWQ@mail.gmail.com>
+	<20170329144822.GA1020@cbox>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <fa712d47-4f77-7710-c4f7-cd7eab9fed9e@redhat.com>
+Date: Wed, 29 Mar 2017 17:37:49 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <09db3476-b1e4-fa80-6d83-d5da0a06bdfc@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/4] savevm: fix savevm after migration
+In-Reply-To: <20170329144822.GA1020@cbox>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] kvm: pass the virtual SEI syndrome to
+ guest OS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,93 +35,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, quintela@redhat.com, mreitz@redhat.com, peter.maydell@linaro.org, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
+To: Christoffer Dall <cdall@linaro.org>, gengdongjiu <gengdj.1984@gmail.com>
+Cc: Achin Gupta <achin.gupta@arm.com>, gengdongjiu <gengdongjiu@huawei.com>, ard.biesheuvel@linaro.org, edk2-devel@lists.01.org, qemu-devel@nongnu.org, zhaoshenglong@huawei.com, James Morse <james.morse@arm.com>, xiexiuqi@huawei.com, Marc Zyngier <marc.zyngier@arm.com>, catalin.marinas@arm.com, will.deacon@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, suzuki.poulose@arm.com, andre.przywara@arm.com, mark.rutland@arm.com, vladimir.murzin@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, wangxiongfeng2@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com, Leif.Lindholm@linaro.comnd@arm.com
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
+On 03/29/17 16:48, Christoffer Dall wrote:
+> On Wed, Mar 29, 2017 at 10:36:51PM +0800, gengdongjiu wrote:
+>> 2017-03-29 18:36 GMT+08:00, Achin Gupta <achin.gupta@arm.com>:
+
+>>> Qemu is essentially fulfilling the role of secure firmware at the
+>>> EL2/EL1 interface (as discussed with Christoffer below). So it
+>>> should generate the CPER before injecting the error.
+>>>
+>>> This is corresponds to (1) above apart from notifying UEFI (I am
+>>> assuming you mean guest UEFI). At this time, the guest OS already
+>>> knows where to pick up the CPER from through the HEST. Qemu has
+>>> to create the CPER and populate its address at the address
+>>> exported in the HEST. Guest UEFI should not be involved in this 
+>>> flow. Its job was to create the HEST at boot and that has been
+>>> done by this stage.
+>>
+>> Sorry,  As I understand it, after Qemu generate the CPER table, it
+>> should pass the CPER table to the guest UEFI, then Guest UEFI  place
+>> this CPER table to the guest OS memory. In this flow, the Guest UEFI
+>> should be involved, else the Guest OS can not see the CPER table.
+>>
 > 
-> 
-> On 28/03/2017 15:16, Vladimir Sementsov-Ogievskiy wrote:
-> > 28.03.2017 15:09, Kevin Wolf wrote:
-> >> Am 28.03.2017 um 13:13 hat Dr. David Alan Gilbert geschrieben:
-> >>> * Kevin Wolf (kwolf@redhat.com) wrote:
-> >>>> Am 28.03.2017 um 12:55 hat Dr. David Alan Gilbert geschrieben:
-> >>>>> * Kevin Wolf (kwolf@redhat.com) wrote:
-> >>>>>> Am 25.02.2017 um 20:31 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> >>>>>>> After migration all drives are inactive and savevm will fail with
-> >>>>>>>
-> >>>>>>> qemu-kvm: block/io.c:1406: bdrv_co_do_pwritev:
-> >>>>>>>     Assertion `!(bs->open_flags & 0x0800)' failed.
-> >>>>>>>
-> >>>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy
-> >>>>>>> <vsementsov@virtuozzo.com>
-> >>>>>> What's the exact state you're in? I tried to reproduce this, but just
-> >>>>>> doing a live migration and then savevm on the destination works
-> >>>>>> fine for
-> >>>>>> me.
-> >>>>>>
-> >>>>>> Hm... Or do you mean on the source? In that case, I think the
-> >>>>>> operation
-> >>>>>> must fail, but of course more gracefully than now.
-> >>>>>>
-> >>>>>> Actually, the question that you're asking implicitly here is how the
-> >>>>>> source qemu process should be "reactivated" after a failed migration.
-> >>>>>> Currently, as far as I know, this is only with issuing a "cont"
-> >>>>>> command.
-> >>>>>> It might make sense to provide a way to get control without
-> >>>>>> resuming the
-> >>>>>> VM, but I doubt that adding automatic resume to every QMP command
-> >>>>>> is the
-> >>>>>> right way to achieve it.
-> >>>>>>
-> >>>>>> Dave, Juan, what do you think?
-> >>>>> I'd only ever really thought of 'cont' or retrying the migration.
-> >>>>> However, it does make sense to me that you might want to do a savevm
-> >>>>> instead; if you can't migrate then perhaps a savevm is the best you
-> >>>>> can do before your machine dies.  Are there any other things that
-> >>>>> should be allowed?
-> >>>> I think we need to ask the other way round: Any reason _not_ to allow
-> >>>> certain operations that you can normally perform on a stopped VM?
-> >>>>
-> >>>>> We would want to be careful not to accidentally reactivate the disks
-> >>>>> on the source after what was actually a succesful migration.
-> >>>> Yes, that's exactly my concern, even with savevm. That's why I
-> >>>> suggested
-> >>>> we could have a 'cont'-like thing that just gets back control of the
-> >>>> images and moves into the normal paused state, but doesn't immediately
-> >>>> resume the actual VM.
-> >>> OK, lets say we had that block-reactivate (for want of a better name),
-> >>> how would we stop everything asserting if the user tried to do it
-> >>> before they'd run block-reactivate?
-> >> We would have to add checks to the monitor commands that assume that the
-> >> image is activated and error out if it isn't.
-> >>
-> >> Maybe just adding the check to blk_is_available() would be enough, but
-> >> we'd have to check carefully whether it covers all cases and causes no
-> >> false positives.
-> >>
-> >> By the way, I wouldn't call this 'block-reactivate' because I don't
-> >> think this should be a block-specific command. It's a VM lifecycle
-> >> command that switches from a postmigrate state (that assumes we have no
-> >> control over the VM's resources any more) to a paused state (where we do
-> >> have this control). Maybe something like 'migration-abort'.
-> > 
-> > 'abort' is not very good too I think. migration is completed, nothing to
-> > abort.. (may be successful migration to file for suspend, some kind of
-> > vm cloning, etc)
-> 
-> There is already migrate_cancel.  Does it make sense to make it
-> reactivate fds if migration is completed?
+> I think you need to explain the "pass the CPER table to the guest UEFI"
+> concept in terms of what really happens, step by step, and when you say
+> "then Guest UEFI place the CPER table to the guest OS memory", I'm
+> curious who is running what code on the hardware when doing that.
 
-It's potentially racy to do that.
-Imagine if your migration is almost finished and you issue a migrate_cancel,
-what happens?
-Maybe it cancelled it.
-Maybe it just completed in time - and you really better not be accessing
-the disks on the source unless you're sure the destination isn't running.
+I strongly suggest to keep the guest firmware's runtime involvement to
+zero. Two reasons:
 
-Dave
+(1) As you explained above (... which I conveniently snipped), when you
+inject an interrupt to the guest, the handler registered for that
+interrupt will come from the guest kernel.
 
-> Paolo
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+The only exception to this is when the platform provides a type of
+interrupt whose handler can be registered and then locked down by the
+firmware. On x86, this is the SMI.
+
+In practice though,
+- in OVMF (x86), we only do synchronous (software-initiated) SMIs (for
+privileged UEFI varstore access),
+- and in ArmVirtQemu (ARM / aarch64), none of the management mode stuff
+exists at all.
+
+I understand that the Platform Init 1.5 (or 1.6?) spec abstracted away
+the MM (management mode) protocols from Intel SMM, but at this point
+there is zero code in ArmVirtQemu for that. (And I'm unsure how much of
+any eligible underlying hw emulation exists in QEMU.)
+
+So you can't get the guest firmware to react to the injected interrupt
+without the guest OS coming between first.
+
+(2) Achin's description matches really-really closely what is possible,
+and what should be done with QEMU, ArmVirtQemu, and the guest kernel.
+
+In any solution for this feature, the firmware has to reserve some
+memory from the OS at boot. The current facilities we have enable this.
+As I described previously, the ACPI linker/loader actions can be mapped
+more or less 1:1 to Achin's design. From a practical perspective, you
+really want to keep the guest firmware as dumb as possible (meaning: as
+generic as possible), and keep the ACPI specifics to the QEMU and the
+guest kernel sides.
+
+The error serialization actions -- the co-operation between guest kernel
+and QEMU on the special memory areas -- that were mentioned earlier by
+Michael and Punit look like a complication. But, IMO, they don't differ
+from any other device emulation -- DMA actions in particular -- that
+QEMU already does. Device models are what QEMU *does*. Read the command
+block that the guest driver placed in guest memory, parse it, sanity
+check it, verify it, execute it, write back the status code, inject an
+interrupt (and/or let any polling guest driver notice it "soon after" --
+use barriers as necessary).
+
+Thus, I suggest to rely on the generic ACPI linker/loader interface
+(between QEMU and guest firmware) *only* to make the firmware lay out
+stuff (= reserve buffers, set up pointers, install QEMU's ACPI tables)
+*at boot*. Then, at runtime, let the guest kernel and QEMU (the "device
+model") talk to each other directly. Keep runtime firmware involvement
+to zero.
+
+You *really* don't want to debug three components at runtime, when you
+can solve the thing with two. (Two components whose build systems won't
+drive you mad, I should add.)
+
+IMO, Achin's design nailed it. We can do that.
+
+Laszlo
