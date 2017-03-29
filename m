@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ctJ2F-0007z8-M9
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:13:36 -0400
+	(envelope-from <bounces@canonical.com>) id 1ctJDh-0006N0-Uc
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:25:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ctJ2E-0003zZ-C5
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:13:35 -0400
-References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
-	<1490805920-17029-4-git-send-email-armbru@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <58b223ea-7e67-e5f9-9631-1b3c0dc79835@redhat.com>
-Date: Wed, 29 Mar 2017 21:13:24 +0200
+	(envelope-from <bounces@canonical.com>) id 1ctJDd-0000bE-19
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:25:25 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56345)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ctJDc-0000ax-SR
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:25:20 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1ctJDa-0001QI-R1
+	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 19:25:18 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id BFEAF2E80C8
+	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 19:25:18 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1490805920-17029-4-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="uUeunhEQJMdaar8l9udDqVpLuDSPDxeAB"
-Subject: Re: [Qemu-devel] [for-2.9 3/8] io vnc sockets: Clean up
- SocketAddressKind switches
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 29 Mar 2017 19:13:42 -0000
+From: John Snow <1390520@bugs.launchpad.net>
+Reply-To: Bug 1390520 <1390520@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20141107160655.5759.49372.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170329191343.26064.36547.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1390520] Re: virtual machine fails to start with
+ connected audio cd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,146 +37,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, eblake@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---uUeunhEQJMdaar8l9udDqVpLuDSPDxeAB
-From: Max Reitz <mreitz@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp,
- namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, eblake@redhat.com,
- pbonzini@redhat.com
-Message-ID: <58b223ea-7e67-e5f9-9631-1b3c0dc79835@redhat.com>
-Subject: Re: [for-2.9 3/8] io vnc sockets: Clean up SocketAddressKind switches
-References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
- <1490805920-17029-4-git-send-email-armbru@redhat.com>
-In-Reply-To: <1490805920-17029-4-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+There is currently no expectation that Audio CDs will work on an
+emulated CD drive; as long as audio CDs aren't causing QEMU to crash or
+anything of the sort, this is wishlist and not a bug.
 
-On 29.03.2017 18:45, Markus Armbruster wrote:
-> We have quite a few switches over SocketAddressKind.  Some have case
-> labels for all enumeration values, others rely on a default label.
-> Some abort when the value isn't a valid SocketAddressKind, others
-> report an error then.
->=20
-> Unify as follows.  Always provide case labels for all enumeration
-> values, to clarify intent.  Abort when the value isn't a valid
-> SocketAddressKind, because the program state is messed up then.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  io/dns-resolver.c   |  6 ++++--
->  ui/vnc.c            | 10 ++++++++--
->  util/qemu-sockets.c |  4 +---
->  3 files changed, 13 insertions(+), 7 deletions(-)
+Still, I'll try to take a look later and see if there's an easy win here
+or not. I imagine we don't support many of the Audio CD commands that
+ATAPI drives need in order to service audio requests, but there may be
+some difficulty in the pass-through as well.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+** Changed in: qemu
+     Assignee: (unassigned) =3D> John Snow (jnsnow)
 
-Nit-picks below, as can be expected of me.
+-- =
 
-> diff --git a/io/dns-resolver.c b/io/dns-resolver.c
-> index 0ac6b23..00fb575 100644
-> --- a/io/dns-resolver.c
-> +++ b/io/dns-resolver.c
-> @@ -164,9 +164,11 @@ int qio_dns_resolver_lookup_sync(QIODNSResolver *r=
-esolver,
->                                                  addrs,
->                                                  errp);
-> =20
-> +    case SOCKET_ADDRESS_KIND_FD:
-> +        error_setg(errp, "Unsupported socket address type 'fd'");
-> +        return -1;
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1390520
 
-Could do with an empty line here like the other cases have.
+Title:
+  virtual machine fails to start with connected audio cd
 
->      default:
-> -        error_setg(errp, "Unknown socket address kind");
-> -        return -1;
-> +        abort();
->      }
->  }
-> =20
-> diff --git a/ui/vnc.c b/ui/vnc.c
-> index fe0a46a..b6b58c4 100644
-> --- a/ui/vnc.c
-> +++ b/ui/vnc.c
-> @@ -129,10 +129,13 @@ static void vnc_init_basic_info(SocketAddress *ad=
-dr,
->          info->family =3D NETWORK_ADDRESS_FAMILY_UNIX;
->          break;
-> =20
-> -    default:
-> +    case SOCKET_ADDRESS_KIND_VSOCK:
-> +    case SOCKET_ADDRESS_KIND_FD:
->          error_setg(errp, "Unsupported socket kind %d",
->                     addr->type);
+Status in QEMU:
+  New
+Status in libvirt package in Ubuntu:
+  Confirmed
+Status in libvirt source package in Trusty:
+  Confirmed
 
-Pre-existing, but: %s and SocketAddressKind_lookup[addr->type] would be
-nicer.
+Bug description:
+  when connecting a data cd with a virtual machine (IDE CDROM 1), the virtu=
+al machine starts up and the data cd is accessable (for example to install =
+software package or drivers),
+  but connecting an audio cd the following error appears:
 
->          break;
-> +    default:
-> +        abort();
->      }
-> =20
->      return;
-> @@ -411,10 +414,13 @@ VncInfo *qmp_query_vnc(Error **errp)
->              info->family =3D NETWORK_ADDRESS_FAMILY_UNIX;
->              break;
-> =20
-> -        default:
-> +        case SOCKET_ADDRESS_KIND_VSOCK:
-> +        case SOCKET_ADDRESS_KIND_FD:
->              error_setg(errp, "Unsupported socket kind %d",
->                         addr->type);
+  -------------------------------------------------------------------------=
+------------------------------------------------------
+  cannot read header '/dev/sr0': Input/output error
 
-Same here.
+  Traceback (most recent call last):
+    File "/usr/share/virt-manager/virtManager/details.py", line 2530, in _c=
+hange_config_helper
+      func(*args)
+    File "/usr/share/virt-manager/virtManager/domain.py", line 850, in hotp=
+lug_storage_media
+      self.attach_device(devobj)
+    File "/usr/share/virt-manager/virtManager/domain.py", line 798, in atta=
+ch_device
+      self._backend.attachDevice(devxml)
+    File "/usr/lib/python2.7/dist-packages/libvirt.py", line 493, in attach=
+Device
+      if ret =3D=3D -1: raise libvirtError ('virDomainAttachDevice() failed=
+', dom=3Dself)
+  libvirtError: cannot read header '/dev/sr0': Input/output error
+  -------------------------------------------------------------------------=
+---------------------------------------------------
 
-Max
+  Description:    Ubuntu 14.04.1 LTS
+  Release:        14.04
 
->              goto out_error;
-> +        default:
-> +            abort();
->          }
-> =20
->          info->has_host =3D true;
-> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-> index 9b73681..4ae37bd 100644
-> --- a/util/qemu-sockets.c
-> +++ b/util/qemu-sockets.c
-> @@ -1337,9 +1337,7 @@ char *socket_address_to_string(struct SocketAddre=
-ss *addr, Error **errp)
->          break;
-> =20
->      default:
-> -        error_setg(errp, "socket family %d unsupported",
-> -                   addr->type);
-> -        return NULL;
-> +        abort();
->      }
->      return buf;
->  }
->=20
+  qemu:
+    Installiert:           2.0.0+dfsg-2ubuntu1.6
+    Installationskandidat: 2.0.0+dfsg-2ubuntu1.6
 
-
-
---uUeunhEQJMdaar8l9udDqVpLuDSPDxeAB
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljcB1QSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A61kIAKDoLj0ltUsmS0igw8pjB21IFB7U0i6y
-Xr7Sd25YE4aW4gclZq2EoEGkE0cWaoNYaKm4F1hFDPZbMGehTwgZdyx0tIcivlj+
-WhFUaQiCVMvUB+uWiW1VRHh9HQyzCygY2ZoewjKg91e4KNxgMbigIkdQ5A1fcEBL
-mSdk7LbUa8tpNydhZff4XERycCBKIg3xjLS2yHXjxUkqrYpjN+QrO8fqDJL9FB8q
-in5oHJmiFAQbMoGYjpl5+A2Jj/t7bPPcWASKFrKd3zVaQELvxJ74V5b9n/aFPINp
-YB1OUlXuMWAIaDFAVbQE/QP/OpBZG7/n6e0Ur+H8hpX9OnN7wHH6F7A=
-=uifD
------END PGP SIGNATURE-----
-
---uUeunhEQJMdaar8l9udDqVpLuDSPDxeAB--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1390520/+subscriptions
