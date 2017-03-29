@@ -1,32 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ctGLv-0008Tf-II
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 12:21:44 -0400
+	(envelope-from <armbru@redhat.com>) id 1ctGiw-0004Kr-CI
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 12:45:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ctGLr-0003k9-Kb
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 12:21:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37012)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ctGLr-0003jC-EQ
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 12:21:39 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 62EDE80490
-	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 16:21:38 +0000 (UTC)
-References: <3d1c16a1-ec05-0367-e569-64a63b34f2e3@redhat.com>
-	<4a56f716-3528-ddd4-f8c4-f3f6b23c469a@redhat.com>
-	<bbc2671a-42dd-aa2a-0f03-6a4a487cb8f5@redhat.com>
-	<fddf5055-c458-3893-9a18-5b0701e5431a@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <3044459b-65a3-ca78-c009-15de9823704a@redhat.com>
-Date: Wed, 29 Mar 2017 18:21:31 +0200
-MIME-Version: 1.0
-In-Reply-To: <fddf5055-c458-3893-9a18-5b0701e5431a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Deprecating old machine types
+	(envelope-from <armbru@redhat.com>) id 1ctGiv-00069l-2Z
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 12:45:30 -0400
+From: Markus Armbruster <armbru@redhat.com>
+Date: Wed, 29 Mar 2017 18:45:15 +0200
+Message-Id: <1490805920-17029-4-git-send-email-armbru@redhat.com>
+In-Reply-To: <1490805920-17029-1-git-send-email-armbru@redhat.com>
+References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [for-2.9 3/8] io vnc sockets: Clean up
+ SocketAddressKind switches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,26 +21,90 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: John Snow <jsnow@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
+Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, pbonzini@redhat.com
 
-On 27.03.2017 21:04, John Snow wrote:
->=20
-> On 03/27/2017 04:06 AM, Thomas Huth wrote:
->> On 24.03.2017 23:10, John Snow wrote:
-[...]
->>> I have a list of things I want to axe...
->>
->> I've started a Wiki page with such a list here:
->>
->> http://wiki.qemu-project.org/Features/LegacyRemoval
->>
->> Feel free to amend!
->=20
-> Absolutely!
+We have quite a few switches over SocketAddressKind.  Some have case
+labels for all enumeration values, others rely on a default label.
+Some abort when the value isn't a valid SocketAddressKind, others
+report an error then.
 
-By the way, what about old machine types like "pc-0.10" ? Do we want to
-carry them along forever (e.g. since it is not too complicated to
-maintain?), or shall we get rid of those one day (e.g. with QEMU 3.0), to=
-o?
+Unify as follows.  Always provide case labels for all enumeration
+values, to clarify intent.  Abort when the value isn't a valid
+SocketAddressKind, because the program state is messed up then.
 
- Thomas
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ io/dns-resolver.c   |  6 ++++--
+ ui/vnc.c            | 10 ++++++++--
+ util/qemu-sockets.c |  4 +---
+ 3 files changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/io/dns-resolver.c b/io/dns-resolver.c
+index 0ac6b23..00fb575 100644
+--- a/io/dns-resolver.c
++++ b/io/dns-resolver.c
+@@ -164,9 +164,11 @@ int qio_dns_resolver_lookup_sync(QIODNSResolver *resolver,
+                                                 addrs,
+                                                 errp);
+ 
++    case SOCKET_ADDRESS_KIND_FD:
++        error_setg(errp, "Unsupported socket address type 'fd'");
++        return -1;
+     default:
+-        error_setg(errp, "Unknown socket address kind");
+-        return -1;
++        abort();
+     }
+ }
+ 
+diff --git a/ui/vnc.c b/ui/vnc.c
+index fe0a46a..b6b58c4 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -129,10 +129,13 @@ static void vnc_init_basic_info(SocketAddress *addr,
+         info->family = NETWORK_ADDRESS_FAMILY_UNIX;
+         break;
+ 
+-    default:
++    case SOCKET_ADDRESS_KIND_VSOCK:
++    case SOCKET_ADDRESS_KIND_FD:
+         error_setg(errp, "Unsupported socket kind %d",
+                    addr->type);
+         break;
++    default:
++        abort();
+     }
+ 
+     return;
+@@ -411,10 +414,13 @@ VncInfo *qmp_query_vnc(Error **errp)
+             info->family = NETWORK_ADDRESS_FAMILY_UNIX;
+             break;
+ 
+-        default:
++        case SOCKET_ADDRESS_KIND_VSOCK:
++        case SOCKET_ADDRESS_KIND_FD:
+             error_setg(errp, "Unsupported socket kind %d",
+                        addr->type);
+             goto out_error;
++        default:
++            abort();
+         }
+ 
+         info->has_host = true;
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index 9b73681..4ae37bd 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -1337,9 +1337,7 @@ char *socket_address_to_string(struct SocketAddress *addr, Error **errp)
+         break;
+ 
+     default:
+-        error_setg(errp, "socket family %d unsupported",
+-                   addr->type);
+-        return NULL;
++        abort();
+     }
+     return buf;
+ }
+-- 
+2.7.4
