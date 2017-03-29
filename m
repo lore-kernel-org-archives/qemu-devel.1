@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ctJVJ-0002Ac-3Z
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:43:38 -0400
+	(envelope-from <mreitz@redhat.com>) id 1ctJYZ-0004wC-UT
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:47:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ctJVI-0000Cl-DO
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:43:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41152)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ctJVI-0000Cc-74
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:43:36 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 39C3FC04B945
-	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 19:43:35 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Wed, 29 Mar 2017 16:41:48 -0300
-Message-Id: <20170329194148.19015-10-ehabkost@redhat.com>
-In-Reply-To: <20170329194148.19015-1-ehabkost@redhat.com>
-References: <20170329194148.19015-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [RFC v2 9/9] qom: Make object_get_class() return const
- pointer
+	(envelope-from <mreitz@redhat.com>) id 1ctJYZ-0001l9-48
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:47:00 -0400
+References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
+	<1490805920-17029-8-git-send-email-armbru@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <b4d833b8-c6fd-567c-f500-354acf8c5cc7@redhat.com>
+Date: Wed, 29 Mar 2017 21:46:51 +0200
+MIME-Version: 1.0
+In-Reply-To: <1490805920-17029-8-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="L3DqXi60WBFri9j9v244jCf9THemTcsuS"
+Subject: Re: [Qemu-devel] [for-2.9 7/8] nbd: Tidy up blockdev-add interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +24,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, eblake@redhat.com, pbonzini@redhat.com
 
-To avoid having code accidentaly changing class structs outside
-class_init, make object_get_class() return a const pointer.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--L3DqXi60WBFri9j9v244jCf9THemTcsuS
+From: Max Reitz <mreitz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp,
+ namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, eblake@redhat.com,
+ pbonzini@redhat.com
+Message-ID: <b4d833b8-c6fd-567c-f500-354acf8c5cc7@redhat.com>
+Subject: Re: [for-2.9 7/8] nbd: Tidy up blockdev-add interface
+References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
+ <1490805920-17029-8-git-send-email-armbru@redhat.com>
+In-Reply-To: <1490805920-17029-8-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-This will automatically affect OBJECT_GET_CLASS,
-OBJECT_CLASS_CHECK, and the macros defined using them, because
-OBJECT_CLASS_CHECK is already const-aware.
+On 29.03.2017 18:45, Markus Armbruster wrote:
+> SocketAddress is a simple union, and simple unions are awkward: they
+> have their variant members wrapped in a "data" object on the wire, and
+> require additional indirections in C.  I intend to limit its use to
+> existing external interfaces, and convert all internal interfaces to
+> SocketAddressFlat.
+>=20
+> BlockdevOptionsNbd is an external interface using SocketAddress, but
+> it's new in 2.9.  Replace it by SocketAddressFlat while we can.  This
+> simplifies
+>=20
+>     { "execute": "blockdev-add",
+>       "arguments": { "node-name": "foo", "driver": "nbd",
+>                      "server": { "type": "inet",
+> 		                 "data": { "host": "localhost",
+> 				           "port": "12345" } } } }
+>=20
+> to
+>=20
+>     { "execute": "blockdev-add",
+>       "arguments": { "node-name": "foo", "driver": "nbd",
+>                      "server": { "type": "inet",
+> 		                 "host": "localhost", "port": "12345" } } }
+>=20
+> Since the internal interfaces still take SocketAddress, this requires
+> conversion function socket_address_crumple().  It'll go away when I
+> update the interfaces.
+>=20
+> Unfortunately, SocketAddress is also visible in -drive since 2.8.  Add
+> still more gunk to nbd_process_legacy_socket_options().  You can now
+> shorten
+>=20
+>     -drive if=3Dnone,driver=3Dnbd,server.type=3Dinet,server.data.host=3D=
+127.0.0.1,server.data.port=3D12345
+>=20
+> to
+>=20
+>     -drive if=3Dnone,driver=3Dnbd,server.type=3Dinet,server.host=3D127.=
+0.0.1,server.port=3D12345
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  block/nbd.c          | 131 ++++++++++++++++++++++++++++++++++++++++---=
+--------
+>  qapi/block-core.json |   2 +-
+>  2 files changed, 104 insertions(+), 29 deletions(-)
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- include/qom/object.h | 2 +-
- qom/object.c         | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+To be completely frank: If there is any drawback to using
+SocketAddressFlat instead of SocketAdress, I would be against using it.
+Less indirections in C is an argument, but less {} on the wire is not,
+in my opinion. QMP is a machine interface and machines don't care about
+that additional level.
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index 2b1513d2f2..de8ab70d13 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -803,7 +803,7 @@ Object *object_dynamic_cast_assert(Object *obj, const char *typename,
-  *
-  * Returns: The #ObjectClass of the type associated with @obj.
-  */
--ObjectClass *object_get_class(Object *obj);
-+const ObjectClass *object_get_class(Object *obj);
- 
- /**
-  * object_get_typename:
-diff --git a/qom/object.c b/qom/object.c
-index 9b6c990ac5..297cce8fc2 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -747,7 +747,7 @@ const char *object_get_typename(Object *obj)
-     return obj->class->type->name;
- }
- 
--ObjectClass *object_get_class(Object *obj)
-+const ObjectClass *object_get_class(Object *obj)
- {
-     return obj->class;
- }
--- 
-2.11.0.259.g40922b1
+Therefore, if you think this somehow affects compatibility, I would not
+want to do this change.
+
+I personally agree with Paolo that we can just break what we have, and
+in addition I think that we *should* break what we have or we should not
+do this change at all.
+
+Max
+
+
+--L3DqXi60WBFri9j9v244jCf9THemTcsuS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljcDysSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AlVUIALUrTlI91kAu6doddHD7dm80zsIDaSs4
+qkbJouq6c1eCeQFCzWRcG3LW3jqkoLQfUFXzUKQBcwdZ7se+pD3VMeWMknackaCo
+FCxMU5126/hNSrzHyGH/2dosbh1alBxPKVvq2wlg8ORj9pboCd07f8I8AbUMP6Cy
+JB8ISyseJNZry90Zp9XC7qa2j9l0Ms7U5kMbiG8FW8WRjHlQJzVo75zNiKHwvLjx
+hxxtsPWJjUkEsaxQysXT627IQkxLkvE0ZBsj7GhqVu3S9VF92+m7QfGPD/aeMzHb
+gTdpVy6lY99U1sfBaVcvBbCJkxPL8/snvVSpwAXI6ZH7QpnkD8fkZBQ=
+=QrIe
+-----END PGP SIGNATURE-----
+
+--L3DqXi60WBFri9j9v244jCf9THemTcsuS--
