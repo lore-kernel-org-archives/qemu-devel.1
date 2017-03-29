@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ct2Fr-0002rq-5l
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 21:18:34 -0400
+	(envelope-from <mst@redhat.com>) id 1ct2Fu-0002uY-BN
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 21:18:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ct2Fp-0006KW-SC
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 21:18:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36196)
+	(envelope-from <mst@redhat.com>) id 1ct2Fr-0006LH-D3
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 21:18:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51779)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ct2Fp-0006KC-Ls
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 21:18:29 -0400
-Date: Wed, 29 Mar 2017 04:18:24 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ct2Fr-0006Ko-6k
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 21:18:31 -0400
+Date: Wed, 29 Mar 2017 04:18:28 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1490750257-19907-3-git-send-email-mst@redhat.com>
+Message-ID: <1490750257-19907-4-git-send-email-mst@redhat.com>
 References: <1490750257-19907-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <1490750257-19907-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 2/3] pci: Add missing drop of bus master AS
- reference
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 3/3] virtio: fix vring_align() on 64-bit windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +28,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Eric Blake <eblake@redhat.com>, Stefan Weil <sw@weilnetz.de>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
+From: Andrew Baumann <Andrew.Baumann@microsoft.com>
 
-The recent introduction of a bus master container added
-memory_region_add_subregion() into the PCI device registering path but
-missed memory_region_del_subregion() in the unregistering path leaving
-a reference to the root memory region of the new container.
+long is 32-bits on 64-bit windows, which caused the top half of the
+address to be truncated; this patch changes it to use the
+QEMU_ALIGN_UP macro which does not suffer the same problem
 
-This adds missing memory_region_del_subregion().
-
-Fixes: 3716d5902d743 ("pci: introduce a bus master container")
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Signed-off-by: Andrew Baumann <Andrew.Baumann@microsoft.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Stefan Weil <sw@weilnetz.de>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- hw/pci/pci.c | 2 ++
- 1 file changed, 2 insertions(+)
+ include/hw/virtio/virtio.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index e6b08e1..bd8043c 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -869,6 +869,8 @@ static void do_pci_unregister_device(PCIDevice *pci_dev)
-     pci_dev->bus->devices[pci_dev->devfn] = NULL;
-     pci_config_free(pci_dev);
- 
-+    memory_region_del_subregion(&pci_dev->bus_master_container_region,
-+                                &pci_dev->bus_master_enable_region);
-     address_space_destroy(&pci_dev->bus_master_as);
+diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+index 15efcf2..7b6edba 100644
+--- a/include/hw/virtio/virtio.h
++++ b/include/hw/virtio/virtio.h
+@@ -34,7 +34,7 @@ struct VirtQueue;
+ static inline hwaddr vring_align(hwaddr addr,
+                                              unsigned long align)
+ {
+-    return (addr + align - 1) & ~(align - 1);
++    return QEMU_ALIGN_UP(addr, align);
  }
- 
--- 
+=20
+ typedef struct VirtQueue VirtQueue;
+--=20
 MST
