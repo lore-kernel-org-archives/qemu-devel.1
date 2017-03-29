@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ctFfd-0004rE-NX
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 11:38:03 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1ctFub-0007Os-Fx
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 11:53:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ctFfa-0004D9-Vf
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 11:38:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60642)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1ctFfa-0004CO-NV
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 11:37:58 -0400
-References: <58D17AF0.2010802@arm.com> <20170321193933.GB31111@cbox>
-	<58DA3F68.6090901@arm.com> <20170328112328.GA31156@cbox>
-	<20170328115413.GJ23682@e104320-lin>
-	<b1c6e747-2fa7-b7a1-60d5-4a9c480b9dc9@huawei.com>
-	<58DA67BA.8070404@arm.com>
-	<5b7352f4-4965-3ed5-3879-db871797be47@huawei.com>
-	<20170329103658.GQ23682@e104320-lin>
-	<CAMj-D2BT3ByY-iFrRVVK7y=G7zhRBtM031VgLn6JzwUE-WCdWQ@mail.gmail.com>
-	<20170329144822.GA1020@cbox>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <fa712d47-4f77-7710-c4f7-cd7eab9fed9e@redhat.com>
-Date: Wed, 29 Mar 2017 17:37:49 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1ctFua-0002eN-NN
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 11:53:29 -0400
+References: <20170225193155.447462-1-vsementsov@virtuozzo.com>
+	<20170225193155.447462-4-vsementsov@virtuozzo.com>
+	<20170307095323.GB5871@noname.str.redhat.com>
+	<20170328105544.GE2509@work-vm>
+	<20170328110900.GB11725@noname.redhat.com>
+	<20170328111315.GF2509@work-vm>
+	<20170328120900.GC11725@noname.redhat.com>
+	<4ed9821c-d19e-70fe-c7e5-fc89756b59f5@virtuozzo.com>
+	<09db3476-b1e4-fa80-6d83-d5da0a06bdfc@redhat.com>
+	<20170329152941.GC2501@work-vm>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <dd9b5dda-eb13-a184-9acc-839e966a103f@redhat.com>
+Date: Wed, 29 Mar 2017 17:53:15 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170329144822.GA1020@cbox>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170329152941.GC2501@work-vm>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] kvm: pass the virtual SEI syndrome to
- guest OS
+Subject: Re: [Qemu-devel] [PATCH 3/4] savevm: fix savevm after migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,93 +31,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christoffer Dall <cdall@linaro.org>, gengdongjiu <gengdj.1984@gmail.com>
-Cc: Achin Gupta <achin.gupta@arm.com>, gengdongjiu <gengdongjiu@huawei.com>, ard.biesheuvel@linaro.org, edk2-devel@lists.01.org, qemu-devel@nongnu.org, zhaoshenglong@huawei.com, James Morse <james.morse@arm.com>, xiexiuqi@huawei.com, Marc Zyngier <marc.zyngier@arm.com>, catalin.marinas@arm.com, will.deacon@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, suzuki.poulose@arm.com, andre.przywara@arm.com, mark.rutland@arm.com, vladimir.murzin@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, wangxiongfeng2@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com, Leif.Lindholm@linaro.comnd@arm.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, quintela@redhat.com, mreitz@redhat.com, peter.maydell@linaro.org, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
 
-On 03/29/17 16:48, Christoffer Dall wrote:
-> On Wed, Mar 29, 2017 at 10:36:51PM +0800, gengdongjiu wrote:
->> 2017-03-29 18:36 GMT+08:00, Achin Gupta <achin.gupta@arm.com>:
 
->>> Qemu is essentially fulfilling the role of secure firmware at the
->>> EL2/EL1 interface (as discussed with Christoffer below). So it
->>> should generate the CPER before injecting the error.
->>>
->>> This is corresponds to (1) above apart from notifying UEFI (I am
->>> assuming you mean guest UEFI). At this time, the guest OS already
->>> knows where to pick up the CPER from through the HEST. Qemu has
->>> to create the CPER and populate its address at the address
->>> exported in the HEST. Guest UEFI should not be involved in this 
->>> flow. Its job was to create the HEST at boot and that has been
->>> done by this stage.
->>
->> Sorry,  As I understand it, after Qemu generate the CPER table, it
->> should pass the CPER table to the guest UEFI, then Guest UEFI  place
->> this CPER table to the guest OS memory. In this flow, the Guest UEFI
->> should be involved, else the Guest OS can not see the CPER table.
->>
-> 
-> I think you need to explain the "pass the CPER table to the guest UEFI"
-> concept in terms of what really happens, step by step, and when you say
-> "then Guest UEFI place the CPER table to the guest OS memory", I'm
-> curious who is running what code on the hardware when doing that.
 
-I strongly suggest to keep the guest firmware's runtime involvement to
-zero. Two reasons:
+On 29/03/2017 17:29, Dr. David Alan Gilbert wrote:
+>>> 'abort' is not very good too I think. migration is completed, nothing to
+>>> abort.. (may be successful migration to file for suspend, some kind of
+>>> vm cloning, etc)
+>> There is already migrate_cancel.  Does it make sense to make it
+>> reactivate fds if migration is completed?
+> It's potentially racy to do that.
+> Imagine if your migration is almost finished and you issue a migrate_cancel,
+> what happens?
+> Maybe it cancelled it.
+> Maybe it just completed in time - and you really better not be accessing
+> the disks on the source unless you're sure the destination isn't running.
 
-(1) As you explained above (... which I conveniently snipped), when you
-inject an interrupt to the guest, the handler registered for that
-interrupt will come from the guest kernel.
+If you want to avoid races, you probably have to use -S anyway on the
+destination and do more handshaking between source and destination.  But
+yes, just to be safe it'd be better to add a new flag (-f for HMP,
+'cancel-completed-migration':true for QMP or something like that).
 
-The only exception to this is when the platform provides a type of
-interrupt whose handler can be registered and then locked down by the
-firmware. On x86, this is the SMI.
-
-In practice though,
-- in OVMF (x86), we only do synchronous (software-initiated) SMIs (for
-privileged UEFI varstore access),
-- and in ArmVirtQemu (ARM / aarch64), none of the management mode stuff
-exists at all.
-
-I understand that the Platform Init 1.5 (or 1.6?) spec abstracted away
-the MM (management mode) protocols from Intel SMM, but at this point
-there is zero code in ArmVirtQemu for that. (And I'm unsure how much of
-any eligible underlying hw emulation exists in QEMU.)
-
-So you can't get the guest firmware to react to the injected interrupt
-without the guest OS coming between first.
-
-(2) Achin's description matches really-really closely what is possible,
-and what should be done with QEMU, ArmVirtQemu, and the guest kernel.
-
-In any solution for this feature, the firmware has to reserve some
-memory from the OS at boot. The current facilities we have enable this.
-As I described previously, the ACPI linker/loader actions can be mapped
-more or less 1:1 to Achin's design. From a practical perspective, you
-really want to keep the guest firmware as dumb as possible (meaning: as
-generic as possible), and keep the ACPI specifics to the QEMU and the
-guest kernel sides.
-
-The error serialization actions -- the co-operation between guest kernel
-and QEMU on the special memory areas -- that were mentioned earlier by
-Michael and Punit look like a complication. But, IMO, they don't differ
-from any other device emulation -- DMA actions in particular -- that
-QEMU already does. Device models are what QEMU *does*. Read the command
-block that the guest driver placed in guest memory, parse it, sanity
-check it, verify it, execute it, write back the status code, inject an
-interrupt (and/or let any polling guest driver notice it "soon after" --
-use barriers as necessary).
-
-Thus, I suggest to rely on the generic ACPI linker/loader interface
-(between QEMU and guest firmware) *only* to make the firmware lay out
-stuff (= reserve buffers, set up pointers, install QEMU's ACPI tables)
-*at boot*. Then, at runtime, let the guest kernel and QEMU (the "device
-model") talk to each other directly. Keep runtime firmware involvement
-to zero.
-
-You *really* don't want to debug three components at runtime, when you
-can solve the thing with two. (Two components whose build systems won't
-drive you mad, I should add.)
-
-IMO, Achin's design nailed it. We can do that.
-
-Laszlo
+Paolo
