@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ct2Is-000572-MQ
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 21:21:39 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1ct2bm-0007yU-Rj
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 21:41:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ct2Ir-00087F-Br
-	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 21:21:38 -0400
-Date: Wed, 29 Mar 2017 11:35:32 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170329003532.GM21068@umbus.fritz.box>
-References: <20170328120934.29526-1-lvivier@redhat.com>
+	(envelope-from <aik@ozlabs.ru>) id 1ct2bj-0006wy-Op
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 21:41:10 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:36554)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ct2bj-0006wa-Ga
+	for qemu-devel@nongnu.org; Tue, 28 Mar 2017 21:41:07 -0400
+Received: by mail-pg0-x244.google.com with SMTP id 81so557055pgh.3
+	for <qemu-devel@nongnu.org>; Tue, 28 Mar 2017 18:41:06 -0700 (PDT)
+References: <20170328090530.20052-1-aik@ozlabs.ru>
+	<20170328090530.20052-2-aik@ozlabs.ru>
+	<20170328114829.25656146@t450s.home>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <8f7ad62d-0d1c-e917-5b87-f913dab6bb97@ozlabs.ru>
+Date: Wed, 29 Mar 2017 12:41:01 +1100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="6Mt39TZj+HFMr11E"
-Content-Disposition: inline
-In-Reply-To: <20170328120934.29526-1-lvivier@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] spapr: fix memory hot-unplugging
+In-Reply-To: <20170328114829.25656146@t450s.home>
+Content-Type: text/plain; charset=koi8-r
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH qemu 1/3] memory: Add get_fd() hook for
+ IOMMU MR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,164 +31,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>
+
+On 29/03/17 04:48, Alex Williamson wrote:
+> On Tue, 28 Mar 2017 20:05:28 +1100
+> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> 
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> ---
+>>  include/exec/memory.h | 2 ++
+>>  hw/ppc/spapr_iommu.c  | 8 ++++++++
+>>  2 files changed, 10 insertions(+)
+>>
+>> diff --git a/include/exec/memory.h b/include/exec/memory.h
+>> index e39256ad03..925c10b35b 100644
+>> --- a/include/exec/memory.h
+>> +++ b/include/exec/memory.h
+>> @@ -174,6 +174,8 @@ struct MemoryRegionIOMMUOps {
+>>      void (*notify_flag_changed)(MemoryRegion *iommu,
+>>                                  IOMMUNotifierFlag old_flags,
+>>                                  IOMMUNotifierFlag new_flags);
+>> +    /* Returns a kernel fd for IOMMU */
+>> +    int (*get_fd)(MemoryRegion *iommu);
+> 
+> What if we used this as a prototype:
+> 
+> int (*get_fd)(IOMMUFdType type, MemoryRegion *iommu);
+> 
+> And then we defined:
+> 
+> typedef enum {
+>     SPAPR_IOMMU_TABLE_FD = 0,
+> } IOMMUFdType;
 
 
---6Mt39TZj+HFMr11E
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Where do I put this enum definition? include/exec/memory.h? It does not
+have any mention of any platform yet...
 
-On Tue, Mar 28, 2017 at 02:09:34PM +0200, Laurent Vivier wrote:
-> If, once the kernel has booted, we try to remove a memory
-> hotplugged while the kernel was not started, QEMU crashes on
-> an assert:
->=20
->     qemu-system-ppc64: hw/virtio/vhost.c:651:
->                        vhost_commit: Assertion `r >=3D 0' failed.
->     ...
->     #4  in vhost_commit
->     #5  in memory_region_transaction_commit
->     #6  in pc_dimm_memory_unplug
->     #7  in spapr_memory_unplug
->     #8  spapr_machine_device_unplug
->     #9  in hotplug_handler_unplug
->     #10 in spapr_lmb_release
->     #11 in detach
->     #12 in set_allocation_state
->     #13 in rtas_set_indicator
->     ...
->=20
-> If we take a closer look to the guest kernel log, we can see when
-> we try to unplug the memory:
->=20
->     pseries-hotplug-mem: Attempting to hot-add 4 LMB(s)
->=20
-> What happens:
->=20
->     1- The kernel has ignored the memory hotplug event because
->        it was not started when it was generated.
->=20
->     2- When we hot-unplug the memory,
->        QEMU starts to remove the memory,
->             generates an hot-unplug event,
->         and signals the kernel of the incoming new event
->=20
->     3- as the kernel is started, on the QEMU signal, it reads
->        the event list, decodes the hotplug event and tries to
->        finish the hotplugging.
->=20
->     4- QEMU receive the the hotplug notification while it
->        is trying to hot-unplug the memory. This moves the memory
->        DRC to an invalid state
->=20
-> This patch prevents this by not allowing to set the allocation
-> state to USABLE while the DRC is awaiting release.
->=20
-> RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=3D1432382
->=20
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+I could pass char* instead of IOMMUFdType (and pass there something like
+TYPE_SPAPR_TCE_TABLE), would it be any better?
 
-Applied to ppc-for-2.9, thanks.
 
-> ---
-> v2: Add awaiting_allocation_skippable flag
->     as suggested by Michael
->=20
->  hw/ppc/spapr_drc.c         | 20 +++++++++++++++++---
->  include/hw/ppc/spapr_drc.h |  1 +
->  2 files changed, 18 insertions(+), 3 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-> index 150f6bf..a1cdc87 100644
-> --- a/hw/ppc/spapr_drc.c
-> +++ b/hw/ppc/spapr_drc.c
-> @@ -135,6 +135,17 @@ static uint32_t set_allocation_state(sPAPRDRConnecto=
-r *drc,
->          if (!drc->dev) {
->              return RTAS_OUT_NO_SUCH_INDICATOR;
->          }
-> +        if (drc->awaiting_release && drc->awaiting_allocation) {
-> +            /* kernel is acknowledging a previous hotplug event
-> +             * while we are already removing it.
-> +             * it's safe to ignore awaiting_allocation here since we kno=
-w the
-> +             * situation is predicated on the guest either already havin=
-g done
-> +             * so (boot-time hotplug), or never being able to acquire in=
- the
-> +             * first place (hotplug followed by immediate unplug).
-> +             */
-> +            drc->awaiting_allocation_skippable =3D true;
-> +            return RTAS_OUT_NO_SUCH_INDICATOR;
-> +        }
->      }
-> =20
->      if (drc->type !=3D SPAPR_DR_CONNECTOR_TYPE_PCI) {
-> @@ -436,9 +447,11 @@ static void detach(sPAPRDRConnector *drc, DeviceStat=
-e *d,
->      }
-> =20
->      if (drc->awaiting_allocation) {
-> -        drc->awaiting_release =3D true;
-> -        trace_spapr_drc_awaiting_allocation(get_index(drc));
-> -        return;
-> +        if (!drc->awaiting_allocation_skippable) {
-> +            drc->awaiting_release =3D true;
-> +            trace_spapr_drc_awaiting_allocation(get_index(drc));
-> +            return;
-> +        }
->      }
-> =20
->      drc->indicator_state =3D SPAPR_DR_INDICATOR_STATE_INACTIVE;
-> @@ -448,6 +461,7 @@ static void detach(sPAPRDRConnector *drc, DeviceState=
- *d,
->      }
-> =20
->      drc->awaiting_release =3D false;
-> +    drc->awaiting_allocation_skippable =3D false;
->      g_free(drc->fdt);
->      drc->fdt =3D NULL;
->      drc->fdt_start_offset =3D 0;
-> diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-> index fa531d5..5524247 100644
-> --- a/include/hw/ppc/spapr_drc.h
-> +++ b/include/hw/ppc/spapr_drc.h
-> @@ -154,6 +154,7 @@ typedef struct sPAPRDRConnector {
->      bool awaiting_release;
->      bool signalled;
->      bool awaiting_allocation;
-> +    bool awaiting_allocation_skippable;
-> =20
->      /* device pointer, via link property */
->      DeviceState *dev;
+> 
+> Such that you're actually asking the IOMMUOps for a specific type of FD
+> and it either has it or not, so the caller doesn't need to assume what
+> it is they get back.
+> 
+> Furthermore, add:
+> 
+> int memory_region_iommu_get_fd(IOMMUFdType type, MemoryRegion *mr)
+> {
+>     assert(memory_region_is_iommu(mr));
+> 
+>     if (mr->iommu_ops && mr->iommu_ops->get_fd) {
+>         return mr->iommu_ops->get_fd(type, mr);
+>     }
+> 
+>     return -1;
+> }
+> 
+>>  };
+>>
+> 
+> This should be two patches, patch 1 above, patch 2 below
+>   
+>>  typedef struct CoalescedMemoryRange CoalescedMemoryRange;
+>> diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
+>> index 9e30e148d6..b61c8f053e 100644
+>> --- a/hw/ppc/spapr_iommu.c
+>> +++ b/hw/ppc/spapr_iommu.c
+>> @@ -170,6 +170,13 @@ static void spapr_tce_notify_flag_changed(MemoryRegion *iommu,
+>>      }
+>>  }
+>>  
+>> +static int spapr_tce_get_fd(MemoryRegion *iommu)
+>> +{
+>> +    sPAPRTCETable *tcet = container_of(iommu, sPAPRTCETable, iommu);
+>> +
+>> +    return tcet->fd;
+> 
+> 
+> This would then be:
+> 
+>     return type == SPAPR_IOMMU_TABLE_FD ? tcet->fd : -1;
+> 
+>> +}
+>> +
+>>  static int spapr_tce_table_post_load(void *opaque, int version_id)
+>>  {
+>>      sPAPRTCETable *tcet = SPAPR_TCE_TABLE(opaque);
+>> @@ -251,6 +258,7 @@ static MemoryRegionIOMMUOps spapr_iommu_ops = {
+>>      .translate = spapr_tce_translate_iommu,
+>>      .get_min_page_size = spapr_tce_get_min_page_size,
+>>      .notify_flag_changed = spapr_tce_notify_flag_changed,
+>> +    .get_fd = spapr_tce_get_fd,
+>>  };
+>>  
+>>  static int spapr_tce_table_realize(DeviceState *dev)
+> 
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
 
---6Mt39TZj+HFMr11E
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJY2wFSAAoJEGw4ysog2bOSlgEP+gNyScw/2s0fryXXx+aApNPj
-8e4Kv6IneMcq9wEPN9nlgFtwwxCYkpSB6WKqYbQPC7/uwic6pnxOMerigAY4t3V/
-UHykGQU+Z1cTUEKi9sMdU26kVzLuBDEXdxDWa16QLcVtaOl48nx4FAv9d9m112kE
-BuuiHpz8Ily2x2Ppi4whtX9Fkz1lziyb1jAen1RExizZVCT5br99nyY1zcAac8rS
-Ry4oacuIzk3tRZC4mUMNNiuoIkOaMlOggDJg+0zOdsJFWM9VIW4vLlQB5EY40Qg4
-v2jaT4jCySeJ9v/H/ZdgSkUYI5egXPim5cUJvASavBx3r1/57k1Vt7/ZOSPaJMqp
-gwjPPXOGlHCOLafiWLmUaecHDZAOfQdiNUxdOyBr/dsc4OlNSAyDsCG1ixnslag+
-R9cfpfdtjpi8JYl537DcuGceyPwco0n8oYuxHt1KN2ge41/ZfTuCN7w4NX+yfF0N
-vKAyIfOyzyrErM9OIxZ9OQkuZLCC0HPsbg6cBW4LdECLItjR3kkxQIM8zVQMD7TA
-qzSrzyajHeFXU+tEA201bNs2Fq9ypJLdSSW37OntCZUNvAbRo4VwtDHPToOx3NdI
-s+zN7+iBodeM+S0iq+soAFSDqLWZN8Qmxmc90oTDX10fwfiMyqY7ayOQ0OkKZrjw
-L6l8aRdTlH45xy6v2pzS
-=mZut
------END PGP SIGNATURE-----
-
---6Mt39TZj+HFMr11E--
+-- 
+Alexey
