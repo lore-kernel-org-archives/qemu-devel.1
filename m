@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ct5JJ-0001rf-Fq
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 00:34:19 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1ct5JK-0001rg-GK
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 00:34:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ct5JH-0003b2-QJ
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 00:34:17 -0400
-Date: Wed, 29 Mar 2017 15:07:13 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1ct5JH-0003am-6P
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 00:34:18 -0400
+Date: Wed, 29 Mar 2017 15:11:52 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170329040713.GU21068@umbus.fritz.box>
-References: <20170328021651.19350-1-david@gibson.dropbear.id.au>
-	<20170328021651.19350-4-david@gibson.dropbear.id.au>
-	<72226418-5022-1ccc-9af4-6fce295db7d4@ozlabs.ru>
+Message-ID: <20170329041152.GV21068@umbus.fritz.box>
+References: <1490686352-24017-1-git-send-email-clg@kaod.org>
+	<1490686352-24017-2-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="iBHcHRCIarfY7C0j"
+	protocol="application/pgp-signature"; boundary="OlucDFihBVSxvK/7"
 Content-Disposition: inline
-In-Reply-To: <72226418-5022-1ccc-9af4-6fce295db7d4@ozlabs.ru>
-Subject: Re: [Qemu-devel] [RFC for-2.10 3/3] pseries: Allow PCIe virtio and
- XHCI on pseries machine type
+In-Reply-To: <1490686352-24017-2-git-send-email-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v3 1/8] ppc/xics: introduce an 'icp'
+ backlink under PowerPCCPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,149 +25,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: ehabkost@redhat.com, marcel@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lersek@redhat.com
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---iBHcHRCIarfY7C0j
-Content-Type: text/plain; charset=us-ascii
+--OlucDFihBVSxvK/7
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 29, 2017 at 01:20:50PM +1100, Alexey Kardashevskiy wrote:
-> On 28/03/17 13:16, David Gibson wrote:
-> > pseries now allows PCIe devices (both emulated and VFIO), although its
-> > PCI bus is in most respects a plain PCI bus - this uses paravirtualized
-> > access methods to PCIe extended config space defined in the PAPR spec.
-> >=20
-> > However, because the bus is not PCIe, it means that virtio-pci and XHCI
-> > devices will present themselves as plain PCI rather than PCIe, which wo=
-uld
-> > be preferable.
-> >=20
-> > This patch uses the new hook to override the behaviour for such PCI/PCIe
-> > "hybrid" devices to allow PCIe virtio-pci and XHCI on pseries.
+On Tue, Mar 28, 2017 at 09:32:25AM +0200, C=E9dric Le Goater wrote:
+> Today, the ICPState array of the sPAPR machine is indexed with
+> 'cpu_index' of the CPUState. This numbering of CPUs is internal to
+> QEMU and the guest only knows about what is exposed in the device
+> tree, that is the 'cpu_dt_id'. This is why sPAPR uses the helper
+> xics_get_cpu_index_by_dt_id() to do the mapping in a couple of places.
 >=20
+> To provide a more generic XICS layer, we need to abstract the IRQ
+> 'server' number and remove any assumption made on its nature. It
+> should not be used as a 'cpu_index' for lookups like xics_cpu_setup()
+> and xics_cpu_destroy() do.
 >=20
-> Not clear what all these tests/virtio-*.c changes are for and why here -
-> does "make check" break if you do not enforce disable-legacy=3Doff?
+> To reach that goal, we choose to introduce an 'icp' backlink under
+> PowerPCCPU, and let the machine core init routine do the ICPState
+> lookup. The resulting object is stored under PowerPCCPU which is
+> passed on to xics_cpu_setup(). The IRQ 'server' number in XICS is now
+> generic. sPAPR uses 'cpu_dt_id' and PowerNV will use 'PIR' number.
+>=20
+> This also has the benefit of simplifying the sPAPR hcall routines
+> which do not need to do any ICPState lookups anymore.
 
-Yes it does.  There's an explanation in the 0/3 message.
+Since you've changed the type to a generic Object *, the name needs to
+be changed to something generic as well.  Maybe 'intc' or
+'irq_private'.
 
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> >  hw/ppc/spapr_pci.c       | 9 +++++++++
-> >  tests/virtio-9p-test.c   | 2 +-
-> >  tests/virtio-blk-test.c  | 4 ++--
-> >  tests/virtio-net-test.c  | 2 +-
-> >  tests/virtio-scsi-test.c | 2 +-
-> >  5 files changed, 14 insertions(+), 5 deletions(-)
-> >=20
-> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> > index 98c52e4..7686f7f 100644
-> > --- a/hw/ppc/spapr_pci.c
-> > +++ b/hw/ppc/spapr_pci.c
-> > @@ -1979,6 +1979,14 @@ static const char *spapr_phb_root_bus_path(PCIHo=
-stState *host_bridge,
-> >      return sphb->dtbusname;
-> >  }
-> > =20
-> > +static bool spapr_phb_allow_hybrid_pcie(PCIHostState *host_bridge,
-> > +                                        PCIDevice *pci_dev)
-> > +{
-> > +    sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(host_bridge);
-> > +
-> > +    return sphb->pcie_ecs;
-> > +}
-> > +
-> >  static void spapr_phb_class_init(ObjectClass *klass, void *data)
-> >  {
-> >      PCIHostBridgeClass *hc =3D PCI_HOST_BRIDGE_CLASS(klass);
-> > @@ -1986,6 +1994,7 @@ static void spapr_phb_class_init(ObjectClass *kla=
-ss, void *data)
-> >      HotplugHandlerClass *hp =3D HOTPLUG_HANDLER_CLASS(klass);
-> > =20
-> >      hc->root_bus_path =3D spapr_phb_root_bus_path;
-> > +    hc->allow_hybrid_pcie =3D spapr_phb_allow_hybrid_pcie;
-> >      dc->realize =3D spapr_phb_realize;
-> >      dc->props =3D spapr_phb_properties;
-> >      dc->reset =3D spapr_phb_reset;
-> > diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
-> > index 43a1ad8..ae0d51e 100644
-> > --- a/tests/virtio-9p-test.c
-> > +++ b/tests/virtio-9p-test.c
-> > @@ -32,7 +32,7 @@ static QVirtIO9P *qvirtio_9p_start(const char *driver)
-> >  {
-> >      const char *arch =3D qtest_get_arch();
-> >      const char *cmd =3D "-fsdev local,id=3Dfsdev0,security_model=3Dnon=
-e,path=3D%s "
-> > -                      "-device %s,fsdev=3Dfsdev0,mount_tag=3D%s";
-> > +                      "-device %s,fsdev=3Dfsdev0,mount_tag=3D%s,disabl=
-e-legacy=3Doff";
-> >      QVirtIO9P *v9p =3D g_new0(QVirtIO9P, 1);
-> > =20
-> >      v9p->test_share =3D g_strdup("/tmp/qtest.XXXXXX");
-> > diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-> > index 1eee95d..5fb7882 100644
-> > --- a/tests/virtio-blk-test.c
-> > +++ b/tests/virtio-blk-test.c
-> > @@ -65,7 +65,7 @@ static QOSState *pci_test_start(void)
-> >      const char *cmd =3D "-drive if=3Dnone,id=3Ddrive0,file=3D%s,format=
-=3Draw "
-> >                        "-drive if=3Dnone,id=3Ddrive1,file=3D/dev/null,f=
-ormat=3Draw "
-> >                        "-device virtio-blk-pci,id=3Ddrv0,drive=3Ddrive0=
-,"
-> > -                      "addr=3D%x.%x";
-> > +                      "addr=3D%x.%x,disable-legacy=3Doff";
-> > =20
-> >      tmp_path =3D drive_create();
-> > =20
-> > @@ -656,7 +656,7 @@ static void pci_hotplug(void)
-> > =20
-> >      /* plug secondary disk */
-> >      qpci_plug_device_test("virtio-blk-pci", "drv1", PCI_SLOT_HP,
-> > -                          "'drive': 'drive1'");
-> > +                          "'drive': 'drive1', 'disable-legacy': 'off'"=
-);
-> > =20
-> >      dev =3D virtio_blk_pci_init(qs->pcibus, PCI_SLOT_HP);
-> >      g_assert(dev);
-> > diff --git a/tests/virtio-net-test.c b/tests/virtio-net-test.c
-> > index 8f94360..a35d87b 100644
-> > --- a/tests/virtio-net-test.c
-> > +++ b/tests/virtio-net-test.c
-> > @@ -55,7 +55,7 @@ static QOSState *pci_test_start(int socket)
-> >  {
-> >      const char *arch =3D qtest_get_arch();
-> >      const char *cmd =3D "-netdev socket,fd=3D%d,id=3Dhs0 -device "
-> > -                      "virtio-net-pci,netdev=3Dhs0";
-> > +                      "virtio-net-pci,netdev=3Dhs0,disable-legacy=3Dof=
-f";
-> > =20
-> >      if (strcmp(arch, "i386") =3D=3D 0 || strcmp(arch, "x86_64") =3D=3D=
- 0) {
-> >          return qtest_pc_boot(cmd, socket);
-> > diff --git a/tests/virtio-scsi-test.c b/tests/virtio-scsi-test.c
-> > index 0eabd56..5a802d9 100644
-> > --- a/tests/virtio-scsi-test.c
-> > +++ b/tests/virtio-scsi-test.c
-> > @@ -36,7 +36,7 @@ static QOSState *qvirtio_scsi_start(const char *extra=
-_opts)
-> >  {
-> >      const char *arch =3D qtest_get_arch();
-> >      const char *cmd =3D "-drive id=3Ddrv0,if=3Dnone,file=3D/dev/null,f=
-ormat=3Draw "
-> > -                      "-device virtio-scsi-pci,id=3Dvs0 "
-> > +                      "-device virtio-scsi-pci,id=3Dvs0,disable-legacy=
-=3Doff "
-> >                        "-device scsi-hd,bus=3Dvs0.0,drive=3Ddrv0 %s";
-> > =20
-> >      if (strcmp(arch, "i386") =3D=3D 0 || strcmp(arch, "x86_64") =3D=3D=
- 0) {
-> >=20
 >=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> ---
 >=20
+> Changes since v2:
+>=20
+>  - changed the 'icp' backlink type to be an 'Object'
+>=20
+>  hw/intc/xics.c          |  4 ++--
+>  hw/intc/xics_spapr.c    | 20 +++++---------------
+>  hw/ppc/spapr_cpu_core.c |  5 ++++-
+>  target/ppc/cpu.h        |  1 +
+>  4 files changed, 12 insertions(+), 18 deletions(-)
+>=20
+> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> index e740989a1162..bb485cc5b078 100644
+> --- a/hw/intc/xics.c
+> +++ b/hw/intc/xics.c
+> @@ -52,7 +52,7 @@ int xics_get_cpu_index_by_dt_id(int cpu_dt_id)
+>  void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu)
+>  {
+>      CPUState *cs =3D CPU(cpu);
+> -    ICPState *icp =3D xics_icp_get(xi, cs->cpu_index);
+> +    ICPState *icp =3D ICP(cpu->icp);
+> =20
+>      assert(icp);
+>      assert(cs =3D=3D icp->cs);
+> @@ -65,7 +65,7 @@ void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu)
+>  {
+>      CPUState *cs =3D CPU(cpu);
+>      CPUPPCState *env =3D &cpu->env;
+> -    ICPState *icp =3D xics_icp_get(xi, cs->cpu_index);
+> +    ICPState *icp =3D ICP(cpu->icp);
+>      ICPStateClass *icpc;
+> =20
+>      assert(icp);
+> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+> index 84d24b2837a7..6144f9876ae3 100644
+> --- a/hw/intc/xics_spapr.c
+> +++ b/hw/intc/xics_spapr.c
+> @@ -43,11 +43,9 @@
+>  static target_ulong h_cppr(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+>                             target_ulong opcode, target_ulong *args)
+>  {
+> -    CPUState *cs =3D CPU(cpu);
+> -    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
+>      target_ulong cppr =3D args[0];
+> =20
+> -    icp_set_cppr(icp, cppr);
+> +    icp_set_cppr(ICP(cpu->icp), cppr);
+>      return H_SUCCESS;
+>  }
+> =20
+> @@ -69,9 +67,7 @@ static target_ulong h_ipi(PowerPCCPU *cpu, sPAPRMachine=
+State *spapr,
+>  static target_ulong h_xirr(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+>                             target_ulong opcode, target_ulong *args)
+>  {
+> -    CPUState *cs =3D CPU(cpu);
+> -    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
+> -    uint32_t xirr =3D icp_accept(icp);
+> +    uint32_t xirr =3D icp_accept(ICP(cpu->icp));
+> =20
+>      args[0] =3D xirr;
+>      return H_SUCCESS;
+> @@ -80,9 +76,7 @@ static target_ulong h_xirr(PowerPCCPU *cpu, sPAPRMachin=
+eState *spapr,
+>  static target_ulong h_xirr_x(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+>                               target_ulong opcode, target_ulong *args)
+>  {
+> -    CPUState *cs =3D CPU(cpu);
+> -    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
+> -    uint32_t xirr =3D icp_accept(icp);
+> +    uint32_t xirr =3D icp_accept(ICP(cpu->icp));
+> =20
+>      args[0] =3D xirr;
+>      args[1] =3D cpu_get_host_ticks();
+> @@ -92,21 +86,17 @@ static target_ulong h_xirr_x(PowerPCCPU *cpu, sPAPRMa=
+chineState *spapr,
+>  static target_ulong h_eoi(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+>                            target_ulong opcode, target_ulong *args)
+>  {
+> -    CPUState *cs =3D CPU(cpu);
+> -    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
+>      target_ulong xirr =3D args[0];
+> =20
+> -    icp_eoi(icp, xirr);
+> +    icp_eoi(ICP(cpu->icp), xirr);
+>      return H_SUCCESS;
+>  }
+> =20
+>  static target_ulong h_ipoll(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+>                              target_ulong opcode, target_ulong *args)
+>  {
+> -    CPUState *cs =3D CPU(cpu);
+> -    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
+>      uint32_t mfrr;
+> -    uint32_t xirr =3D icp_ipoll(icp, &mfrr);
+> +    uint32_t xirr =3D icp_ipoll(ICP(cpu->icp), &mfrr);
+> =20
+>      args[0] =3D xirr;
+>      args[1] =3D mfrr;
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index 6883f0991ae9..f9ca3f09a0f8 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -63,6 +63,8 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, Po=
+werPCCPU *cpu,
+>                             Error **errp)
+>  {
+>      CPUPPCState *env =3D &cpu->env;
+> +    XICSFabric *xi =3D XICS_FABRIC(spapr);
+> +    ICPState *icp =3D xics_icp_get(xi, CPU(cpu)->cpu_index);
+> =20
+>      /* Set time-base frequency to 512 MHz */
+>      cpu_ppc_tb_init(env, SPAPR_TIMEBASE_FREQ);
+> @@ -80,7 +82,8 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, Po=
+werPCCPU *cpu,
+>          }
+>      }
+> =20
+> -    xics_cpu_setup(XICS_FABRIC(spapr), cpu);
+> +    cpu->icp =3D OBJECT(icp);
+> +    xics_cpu_setup(xi, cpu);
+> =20
+>      qemu_register_reset(spapr_cpu_reset, cpu);
+>      spapr_cpu_reset(cpu);
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 5ee33b3fd315..774f2d717831 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1196,6 +1196,7 @@ struct PowerPCCPU {
+>      uint32_t max_compat;
+>      uint32_t compat_pvr;
+>      PPCVirtualHypervisor *vhyp;
+> +    Object *icp;
+> =20
+>      /* Fields related to migration compatibility hacks */
+>      bool pre_2_8_migration;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -176,25 +205,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---iBHcHRCIarfY7C0j
+--OlucDFihBVSxvK/7
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJY2zLvAAoJEGw4ysog2bOSC1YQAJEt6Hy5zUUD4NI9SV5pg3Is
-3xUs0zaqhTbThPiEQxBF29uce2QeikEfi9i+U/EQjFHJBONkU2XwQ8vWAEeg8dPG
-2tZpbGo05A0MfBhnekc8R45zKe4uQK+q/zdmtqRqdmJAlwlaWGbbSKdhPYBL6G8j
-sklQDFEQJ8rGsuVjXEAljmwgsX2FAXjwmerST+38QtAhP3ypWfbvOly4sYpSVO4H
-twc0EDEKXNU4avp8fZi0W1QDfP3ta21/dVzqiOLZZO6fjAGWa1MGzSMYU3N+hKmf
-xUM4kbjzp2lRBq9y6OhKOeXs7HajyVBj76SNziJqnWM0DW6B0H3TSEVpfoCDUi4G
-ptdCvwkPKxgSjW5/A3SK4jDHC8Qo5vZBYbs/ZIMVyLSRvzz4p2N43HiBcoLe3kay
-dLqzNzl3hXz9R18WgQ77/ZDv08QtOJM0IkPHXPOz04x0YZn3SDlbtE4o33sYJNwJ
-3yff8sJHkRFp7oUafps0a7QeKxAPyDwroht5xnmnKH7eLejL+3w+j4t99sDXasFw
-fICJF6zLWRHPk0b44e1zSSpNRkPvtL+i5qfUYrm+H7LfP6TPWHbGAd8VX3kAzfSF
-RrsD44S7hnsJTXidTHFB1pyXtQ5uJPXDdLw0VlRm5m6P1Eb6GOSk0V39D4YEAKv6
-snFum9icbvoEQ3I0ds6Y
-=jbA/
+iQIcBAEBCAAGBQJY2zQIAAoJEGw4ysog2bOSwtgQAOJc+qPMF/abbBF3n8NBrYpv
+ZBirjhKPdwPNctgYTG25Zd9oxqNezOvtDqlRQmxYjxYXefFxjFzJEOFGeIYV0eiz
+mbRqUV2rJiLfUQfWUdlwpKKjfhNaWRaDp+VTUxa6dYiFwjVLUg8g8HBJmZMHQ86j
+5F8L4xjRp2UJnbsWVwUQhNoy1WZOfJzw8enX4EA2IUaOZxRbjXURJjow1xHyhcTe
+zWdMhOX2A3wqwTxUtTybq0nP15s/wy4dSdAnIJUKNKX03jtQRR7DNn94y47hh146
+s6Cm955zjNCi3RcOOeVj3Ka/gZKx5Nia45DqAwiGAolEVmtg3WdtSMGsafQ5+5qm
+BmLPJGSQQu2zCmuRghGZpfRZk+7Jx7nwCuILFzODpaeEA/UtgDXsnIKhR0Nrs6DA
+2OW17unc+FM9hbm/DsggTb/CPe4/x9IcS36/VTZnZoPwESTJX1KfVKsCV2Yq1qj2
+tpVllzLphMEWcmivXAHIEyoAiffZ+eRgfv+40jOM6dqanv5azYowp5xgHEcKf1G9
+2BNk6x/qRghOHLNkjldGqElLUG36kcgMgDFxqZmJmxXKJW5ouSjTormCX22KlODK
+w0Pnuw5KUI2DOuM3n0niurlI/t26uIP3xq982ZE5GahRqr+nHTPR2OXHuFVLde3f
+xlgJXnRwEAc0Pc3MhsdQ
+=JVLS
 -----END PGP SIGNATURE-----
 
---iBHcHRCIarfY7C0j--
+--OlucDFihBVSxvK/7--
