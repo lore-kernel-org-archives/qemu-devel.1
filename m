@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ctL7M-0002AA-Db
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 17:27:01 -0400
+	(envelope-from <mst@redhat.com>) id 1ctL92-00034r-Vt
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 17:28:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ctL7H-0004sJ-BR
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 17:27:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44752)
+	(envelope-from <mst@redhat.com>) id 1ctL8y-0005qb-2L
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 17:28:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47818)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ctL7H-0004rx-2p
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 17:26:55 -0400
-Date: Thu, 30 Mar 2017 00:26:52 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ctL8x-0005qB-St
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 17:28:40 -0400
+Date: Thu, 30 Mar 2017 00:28:36 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170330002612-mutt-send-email-mst@kernel.org>
-References: <1490767970-23689-1-git-send-email-jasowang@redhat.com>
+Message-ID: <20170330002755-mutt-send-email-mst@kernel.org>
+References: <93cb45b7-feca-9340-5fbe-3cc1e60d9e7e@redhat.com>
+	<aa8f8830-9426-7cf5-ec99-363035315aa3@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1490767970-23689-1-git-send-email-jasowang@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] exec: don't return int64_t in
- address_space_cache_init()
+In-Reply-To: <aa8f8830-9426-7cf5-ec99-363035315aa3@redhat.com>
+Subject: Re: [Qemu-devel] issues of region cache and iommu reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,126 +27,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Peter Xu <peterx@redhat.com>, qemu devel <qemu-devel@nongnu.org>, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-On Wed, Mar 29, 2017 at 02:12:50PM +0800, Jason Wang wrote:
-> We return int64_t as the length of region cache but accept hwaddr as
-> the required length. This is wrong and may confuse the caller since
-> the it can lead comparison between signed and unsigned types. The
-> caller can not catch the failure in this case. Fixing this by
-> returning hwaddr and return zero on failure.
+On Wed, Mar 29, 2017 at 10:09:10AM +0200, Paolo Bonzini wrote:
 > 
-> Fixes: 5eba0404b9829 ("virtio: use MemoryRegionCache to access descriptors")
-> Fixes: e45da65322386 ("virtio: validate address space cache during init")
-> Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-
-Can you be more specific about the symptoms this fixes in the
-commit log?
-E.g. "This actually triggers on XYZ when using ABC".
-
-
-> ---
->  exec.c                | 12 ++++++------
->  hw/virtio/virtio.c    |  7 +++----
->  include/exec/memory.h | 13 ++++++-------
->  3 files changed, 15 insertions(+), 17 deletions(-)
 > 
-> diff --git a/exec.c b/exec.c
-> index e57a8a2..9b71174 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -3230,11 +3230,11 @@ void cpu_physical_memory_unmap(void *buffer, hwaddr len,
->  #define RCU_READ_UNLOCK(...)     rcu_read_unlock()
->  #include "memory_ldst.inc.c"
->  
-> -int64_t address_space_cache_init(MemoryRegionCache *cache,
-> -                                 AddressSpace *as,
-> -                                 hwaddr addr,
-> -                                 hwaddr len,
-> -                                 bool is_write)
-> +hwaddr address_space_cache_init(MemoryRegionCache *cache,
-> +                                AddressSpace *as,
-> +                                hwaddr addr,
-> +                                hwaddr len,
-> +                                bool is_write)
->  {
->      hwaddr l, xlat;
->      MemoryRegion *mr;
-> @@ -3245,7 +3245,7 @@ int64_t address_space_cache_init(MemoryRegionCache *cache,
->      l = len;
->      mr = address_space_translate(as, addr, &xlat, &l, is_write);
->      if (!memory_access_is_direct(mr, is_write)) {
-> -        return -EINVAL;
-> +        return 0;
->      }
->  
->      l = address_space_extend_translation(as, addr, len, mr, xlat, l, is_write);
+> On 29/03/2017 10:00, Jason Wang wrote:
+> > 
+> > 
+> > 1) vtd was reset first
+> > 
+> > 2) during the reset of virtio-net-pci #1, deletion of msix subregion
+> > will cause a commit of all memory listeners
+> > 
+> > 3) virito-net-pci #2's region cache will be update, but since vtd has
+> > already been reset, it can't get a valid mappings here
+> >
+> > Any ideas on how to fix this? Need region cache be aware of IOMMU/IOTLB
+> > state in this case? Or can we simply reset IOMMU as the last one?
+> 
+> Something like this?
+> 
 > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 03592c5..3482be2 100644
+> index 03592c5..73e69ac 100644
 > --- a/hw/virtio/virtio.c
 > +++ b/hw/virtio/virtio.c
-> @@ -129,9 +129,8 @@ static void virtio_init_region_cache(VirtIODevice *vdev, int n)
->      VirtQueue *vq = &vdev->vq[n];
->      VRingMemoryRegionCaches *old = vq->vring.caches;
->      VRingMemoryRegionCaches *new;
-> -    hwaddr addr, size;
-> +    hwaddr addr, size, len;
->      int event_size;
-> -    int64_t len;
->  
->      event_size = virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0;
->  
-> @@ -586,7 +585,7 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, unsigned int *in_bytes,
->      unsigned int total_bufs, in_total, out_total;
->      VRingMemoryRegionCaches *caches;
->      MemoryRegionCache indirect_desc_cache = MEMORY_REGION_CACHE_INVALID;
-> -    int64_t len = 0;
-> +    hwaddr len = 0;
->      int rc;
->  
->      if (unlikely(!vq->vring.desc)) {
-> @@ -831,7 +830,7 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)
->      VRingMemoryRegionCaches *caches;
->      MemoryRegionCache indirect_desc_cache = MEMORY_REGION_CACHE_INVALID;
->      MemoryRegionCache *desc_cache;
-> -    int64_t len;
-> +    hwaddr len;
->      VirtIODevice *vdev = vq->vdev;
->      VirtQueueElement *elem = NULL;
->      unsigned out_num, in_num;
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index e39256a..932dd00 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -1444,8 +1444,7 @@ struct MemoryRegionCache {
->   * @is_write: indicates the transfer direction
->   *
->   * Will only work with RAM, and may map a subset of the requested range by
-> - * returning a value that is less than @len.  On failure, return a negative
-> - * errno value.
-> + * returning a value that is less than @len.  On failure, return zero.
->   *
->   * Because it only works with RAM, this function can be used for
->   * read-modify-write operations.  In this case, is_write should be %true.
-> @@ -1453,11 +1452,11 @@ struct MemoryRegionCache {
->   * Note that addresses passed to the address_space_*_cached functions
->   * are relative to @addr.
->   */
-> -int64_t address_space_cache_init(MemoryRegionCache *cache,
-> -                                 AddressSpace *as,
-> -                                 hwaddr addr,
-> -                                 hwaddr len,
-> -                                 bool is_write);
-> +hwaddr address_space_cache_init(MemoryRegionCache *cache,
-> +                                AddressSpace *as,
-> +                                hwaddr addr,
-> +                                hwaddr len,
-> +                                bool is_write);
->  
->  /**
->   * address_space_cache_invalidate: complete a write to a #MemoryRegionCache
-> -- 
-> 2.7.4
+> @@ -176,6 +176,10 @@ err_used:
+>      address_space_cache_destroy(&new->desc);
+>  err_desc:
+>      g_free(new);
+> +    atomic_rcu_set(&vq->vring.caches, NULL);
+> +    if (old) {
+> +        call_rcu(old, virtio_free_region_cache, rcu);
+> +    }
+>  }
+> 
+>  /* virt queue functions */
+
+I would be worried about call_rcu here - this means
+something can hang on to and use the old cache,
+and reset really must act as a sync/flush point.
+
+
+> Paolo
