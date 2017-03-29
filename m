@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ctJo4-0002oo-Mp
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 16:03:01 -0400
+	(envelope-from <jcody@redhat.com>) id 1ctJsE-0004Pl-MC
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 16:07:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ctJo3-0001oE-PQ
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 16:03:00 -0400
+	(envelope-from <jcody@redhat.com>) id 1ctJsD-0003SQ-MF
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 16:07:18 -0400
+Date: Wed, 29 Mar 2017 16:07:08 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170329200708.GA28870@localhost.localdomain>
 References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
-	<1490805920-17029-7-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7caffda9-7cbb-4044-7b6a-e398ffa125a6@redhat.com>
-Date: Wed, 29 Mar 2017 15:02:51 -0500
+	<1490805920-17029-6-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1490805920-17029-7-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="amuEHc5jFeOipUXuXdQvcd2O2FqsCk0b8"
-Subject: Re: [Qemu-devel] [for-2.9 6/8] qapi-schema: SocketAddressFlat
- variants 'vsock' and 'fd'
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1490805920-17029-6-git-send-email-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [for-2.9 5/8] gluster: Prepare for
+ SocketAddressFlat extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,79 +24,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, pbonzini@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---amuEHc5jFeOipUXuXdQvcd2O2FqsCk0b8
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp,
- namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
- pbonzini@redhat.com
-Message-ID: <7caffda9-7cbb-4044-7b6a-e398ffa125a6@redhat.com>
-Subject: Re: [for-2.9 6/8] qapi-schema: SocketAddressFlat variants 'vsock' and
- 'fd'
-References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
- <1490805920-17029-7-git-send-email-armbru@redhat.com>
-In-Reply-To: <1490805920-17029-7-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 03/29/2017 11:45 AM, Markus Armbruster wrote:
-> Note that the new variants are impossible in qemu_gluster_glfs_init(),
-> because the gconf->server can only come from qemu_gluster_parse_uri()
-> or qemu_gluster_parse_json(), and neither can create anything but
-> 'tcp' or 'unix'.
->=20
+On Wed, Mar 29, 2017 at 06:45:17PM +0200, Markus Armbruster wrote:
+> qemu_gluster_glfs_init() and qemu_gluster_parse_json() rely on the
+> fact that SocketAddressFlatType has only two members
+> SOCKET_ADDRESS_FLAT_TYPE_INET and SOCKET_ADDRESS_FLAT_TYPE_UNIX.
+> Correct, but won't stay correct.  Make them more robust.
+> 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  block/gluster.c  |  2 ++
->  qapi-schema.json | 19 ++++++++-----------
->  2 files changed, 10 insertions(+), 11 deletions(-)
+>  block/gluster.c | 26 ++++++++++++++++----------
+>  1 file changed, 16 insertions(+), 10 deletions(-)
+> 
+> diff --git a/block/gluster.c b/block/gluster.c
+> index a577dae..fb0aafe 100644
+> --- a/block/gluster.c
+> +++ b/block/gluster.c
+> @@ -412,10 +412,12 @@ static struct glfs *qemu_gluster_glfs_init(BlockdevOptionsGluster *gconf,
+>      glfs_set_preopened(gconf->volume, glfs);
+>  
+>      for (server = gconf->server; server; server = server->next) {
+> -        if (server->value->type  == SOCKET_ADDRESS_FLAT_TYPE_UNIX) {
+> +        switch (server->value->type) {
+> +        case SOCKET_ADDRESS_FLAT_TYPE_UNIX:
+>              ret = glfs_set_volfile_server(glfs, "unix",
+>                                     server->value->u.q_unix.path, 0);
+> -        } else {
+> +            break;
+> +        case SOCKET_ADDRESS_FLAT_TYPE_INET:
+>              if (parse_uint_full(server->value->u.inet.port, &port, 10) < 0 ||
+>                  port > 65535) {
+>                  error_setg(errp, "'%s' is not a valid port number",
+> @@ -426,6 +428,9 @@ static struct glfs *qemu_gluster_glfs_init(BlockdevOptionsGluster *gconf,
+>              ret = glfs_set_volfile_server(glfs, "tcp",
+>                                     server->value->u.inet.host,
+>                                     (int)port);
+> +            break;
+> +        default:
+> +            abort();
 
-> +# This is just like SocketAddress, except it's a flat union rather
-> +# than a simple union.  Nicer because it avoids nesting (i.e. more {})=
+If type is not either _UNIX or _INET, something is broken, make sense.
 
-> +# on the wire.
->  #
->  # Since: 2.9
->  ##
->  { 'union': 'SocketAddressFlat',
->    'base': { 'type': 'SocketAddressFlatType' },
->    'discriminator': 'type',
-> -  'data': { 'unix': 'UnixSocketAddress',
-> -            'inet': 'InetSocketAddress' } }
-> +  'data': { 'inet': 'InetSocketAddress',
-> +            'unix': 'UnixSocketAddress',
-> +            'vsock': 'VsockSocketAddress',
-> +            'fd': 'String' } }
+>          }
+>  
+>          if (ret < 0) {
+> @@ -487,7 +492,7 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+>      char *str = NULL;
+>      const char *ptr;
+>      size_t num_servers;
+> -    int i;
+> +    int i, type;
+>  
+>      /* create opts info from runtime_json_opts list */
+>      opts = qemu_opts_create(&runtime_json_opts, NULL, 0, &error_abort);
+> @@ -539,16 +544,17 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+>          if (!strcmp(ptr, "tcp")) {
+>              ptr = "inet";       /* accept legacy "tcp" */
+>          }
+> -        gsconf->type = qapi_enum_parse(SocketAddressFlatType_lookup, ptr,
+> -                                       SOCKET_ADDRESS_FLAT_TYPE__MAX, -1,
+> -                                       &local_err);
+> -        if (local_err) {
+> -            error_append_hint(&local_err,
+> -                              "Parameter '%s' may be 'inet' or 'unix'\n",
+> -                              GLUSTER_OPT_TYPE);
+> +        type = qapi_enum_parse(SocketAddressFlatType_lookup, ptr,
+> +                               SOCKET_ADDRESS_FLAT_TYPE__MAX, -1, NULL);
+> +        if (type != SOCKET_ADDRESS_FLAT_TYPE_INET
+> +            && type != SOCKET_ADDRESS_FLAT_TYPE_UNIX) {
+> +            error_setg(&local_err,
+> +                       "Parameter '%s' may be 'inet' or 'unix'",
+> +                       GLUSTER_OPT_TYPE);
+>              error_append_hint(&local_err, GERR_INDEX_HINT, i);
+>              goto out;
+>          }
+> +        gsconf->type = type;
+>          qemu_opts_del(opts);
+>  
+>          if (gsconf->type == SOCKET_ADDRESS_FLAT_TYPE_INET) {
+> -- 
+> 2.7.4
+>
 
-Can we make 'fd':'str'?  That would be even less pointless nesting on
-the wire.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---amuEHc5jFeOipUXuXdQvcd2O2FqsCk0b8
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY3BLrAAoJEKeha0olJ0NqJvsH/iSwHGg9lvtad8jrH+rmG/VF
-JwJIoGDYdZPeDkC+aS3J/BVfPV+PnNtmOh9GRL/cwCSxT6LCrxJJT3R/XJN8jRDD
-FnCJDxDNQ8cLiiEmS8hhuOBwWzkQlz/P3bjLDfTapmXGUvpEWEcYX9ia8HM08uP8
-W5ecq2VGMDUycLsQAbFh3fF+3NOOU8lma2Y26S0mb3uP+mGYOOnP4ki4iw1g+VX5
-wAR8xSIuEa+Hl9U1R1w7fkEWBp0qb49hMI1tUSN5lQA60P3G3LvI6uKoGMD32ZWS
-cLdlb/z3mbOHKFt3/X71YIAFo+mXoiqQNIzo5eGx8gzbn7GuasOIm4YdUcqW5qc=
-=TFxa
------END PGP SIGNATURE-----
-
---amuEHc5jFeOipUXuXdQvcd2O2FqsCk0b8--
+Reviewed-by: Jeff Cody <jcody@redhat.com>
