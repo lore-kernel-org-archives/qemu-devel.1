@@ -1,30 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52494)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ct9ZA-0007VX-N3
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 05:06:57 -0400
+	(envelope-from <peterx@redhat.com>) id 1ct9Zp-0007sg-Lb
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 05:07:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ct9Z5-0002hb-PA
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 05:06:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45224)
+	(envelope-from <peterx@redhat.com>) id 1ct9Zo-00033V-MW
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 05:07:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49440)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ct9Z5-0002hT-Jk
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 05:06:51 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ct9Zo-00032I-GF
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 05:07:36 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6F4C580469
-	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 09:06:50 +0000 (UTC)
-Date: Wed, 29 Mar 2017 17:06:44 +0800
+	by mx1.redhat.com (Postfix) with ESMTPS id 96F3481250
+	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 09:07:35 +0000 (UTC)
+Date: Wed, 29 Mar 2017 17:07:29 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170329090644.GG3152@pxdev.xzpeter.org>
+Message-ID: <20170329090729.GH3152@pxdev.xzpeter.org>
 References: <20170323204544.12015-1-quintela@redhat.com>
-	<20170323204544.12015-32-quintela@redhat.com>
+	<20170323204544.12015-6-quintela@redhat.com>
+	<20170327073407.GB11497@pxdev.xzpeter.org>
+	<87wpb9r7p5.fsf@secure.mitica>
+	<20170329065533.GD3152@pxdev.xzpeter.org>
+	<87poh0o409.fsf@secure.mitica>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170323204544.12015-32-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 31/51] ram: Create ram_dirty_sync_count()
+In-Reply-To: <87poh0o409.fsf@secure.mitica>
+Subject: Re: [Qemu-devel] [PATCH 05/51] ram: Move bitmap_sync_count into
+ RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,12 +41,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Juan Quintela <quintela@redhat.com>
 Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
 
-On Thu, Mar 23, 2017 at 09:45:24PM +0100, Juan Quintela wrote:
-> This is a ram field that was inside MigrationState.  Move it to
-> RAMState and make it the same that the other ram stats.
+On Wed, Mar 29, 2017 at 10:56:22AM +0200, Juan Quintela wrote:
+> Peter Xu <peterx@redhat.com> wrote:
+> > On Tue, Mar 28, 2017 at 12:56:06PM +0200, Juan Quintela wrote:
+> >> Peter Xu <peterx@redhat.com> wrote:
+> >> > On Thu, Mar 23, 2017 at 09:44:58PM +0100, Juan Quintela wrote:
+> >> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> >> >> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> >> >
+> >> > Reviewed-by: Peter Xu <peterx@redhat.com>
+> >> >
+> >> > (I see that we have MigrationStats.dirty_pages_rate which looks
+> >> >  similar to this one. Maybe one day we can merge these two?)
+> >> 
+> >> no, this one is how many times we have synchronized the dirty bitmap
+> >> with kvm/rest of qemu.
+> >> dirty_pages_rame is the pages we have dirtied in some <period>.
+> >> 
+> >> Period is not clear, it tries to be around one second, but that part is
+> >> not specially well done.
+> >
+> > Oh, sorry... I was trying to mean MigrationStats.dirty_sync_count, not
+> > MigrationStats.dirty_pages_rate. I think it was introduced in:
+> >
+> >     commit 58570ed894631904bcdbcd1e8b34479cebe2aae9
+> >     Author: ChenLiang <chenliang88@huawei.com>
+> >     Date:   Fri Apr 4 17:57:55 2014 +0800
+> >
+> >     migration: expose the bitmap_sync_count to the end
+> >
+> > And these two variables are synchronized every time in
+> > migration_bitmap_sync(), so looks the same. Thanks,
 > 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> Ah, now I understand you.  See this patch, it does what you suggest, no?
+> 
+> [PATCH 31/51] ram: Create ram_dirty_sync_count()
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Yes, it is. :)
 
 -- peterx
