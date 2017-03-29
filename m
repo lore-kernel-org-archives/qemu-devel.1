@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ctJVA-00022Q-4b
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:43:32 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1ctJVE-00025u-69
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:43:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ctJV9-00009w-72
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:43:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45310)
+	(envelope-from <ehabkost@redhat.com>) id 1ctJVB-0000Ad-7a
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:43:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45336)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ctJV8-00009Z-V5
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:43:27 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ctJVA-0000AN-VX
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 15:43:29 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E6D258AE72
-	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 19:43:25 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id EBF8A7F3EB
+	for <qemu-devel@nongnu.org>; Wed, 29 Mar 2017 19:43:27 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Wed, 29 Mar 2017 16:41:44 -0300
-Message-Id: <20170329194148.19015-6-ehabkost@redhat.com>
+Date: Wed, 29 Mar 2017 16:41:45 -0300
+Message-Id: <20170329194148.19015-7-ehabkost@redhat.com>
 In-Reply-To: <20170329194148.19015-1-ehabkost@redhat.com>
 References: <20170329194148.19015-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [RFC v2 5/9] Make class parameter const at some
- functions
+Subject: [Qemu-devel] [RFC v2 6/9] Explicitly cast the *_GET_CLASS() value
+ when we break the rules
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,147 +32,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-There are many functions that don't need a non-const class
-pointer argument. Change them to accept a const argument. This
-will allow us to change class pointer variables to const in most
-of the code.
+object_get_class() and *_GET_CLASS() macros are going to be
+changed to return const pointers because the class structs are
+supposed to be initialized at class_init and not be changed
+later.
+
+However, there are a few places the code still break the
+(proposed) rules, and change class data outside class_init. On
+those cases, add an explicit cast to the *_GET_CLASS() return
+value.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/qom/object.h        |  7 ++++---
- gdbstub.c                   |  2 +-
- qdev-monitor.c              |  4 ++--
- qom/object.c                | 10 +++++-----
- target/i386/cpu.c           |  2 +-
- target/ppc/translate_init.c |  2 +-
- 6 files changed, 14 insertions(+), 13 deletions(-)
+ hw/core/bus.c        | 2 +-
+ hw/mips/mips_jazz.c  | 2 +-
+ hw/xen/xen_backend.c | 2 +-
+ target/s390x/cpu.c   | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index 674a45862d..bb0be22ac7 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -885,7 +885,7 @@ const ObjectClass *object_class_get_parent_const(const ObjectClass *klass);
-  *
-  * Returns: The QOM typename for @klass.
-  */
--const char *object_class_get_name(ObjectClass *klass);
-+const char *object_class_get_name(const ObjectClass *klass);
+diff --git a/hw/core/bus.c b/hw/core/bus.c
+index 4651f24486..9233f8723b 100644
+--- a/hw/core/bus.c
++++ b/hw/core/bus.c
+@@ -90,7 +90,7 @@ static void qbus_realize(BusState *bus, DeviceState *parent, const char *name)
+         bus->name = g_strdup_printf("%s.%d", bus->parent->id, bus_id);
+     } else {
+         /* no id -> use lowercase bus type plus global bus-id for bus name */
+-        bc = BUS_GET_CLASS(bus);
++        bc = (BusClass *)BUS_GET_CLASS(bus);
+         bus_id = bc->automatic_ids++;
+         bus->name = g_strdup_printf("%s.%d", typename, bus_id);
+         for (i = 0; bus->name[i]; i++) {
+diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
+index 1cef581878..0407d998f1 100644
+--- a/hw/mips/mips_jazz.c
++++ b/hw/mips/mips_jazz.c
+@@ -166,7 +166,7 @@ static void mips_jazz_init(MachineState *machine,
+      * CPU, which raise an exception.
+      * Handle that case by hijacking the do_unassigned_access method on
+      * the CPU, and do not raise exceptions for data access. */
+-    cc = CPU_GET_CLASS(cpu);
++    cc = (CPUClass *)CPU_GET_CLASS(cpu);
+     real_do_unassigned_access = cc->do_unassigned_access;
+     cc->do_unassigned_access = mips_jazz_do_unassigned_access;
  
- /**
-  * object_class_is_abstract:
-@@ -893,7 +893,7 @@ const char *object_class_get_name(ObjectClass *klass);
-  *
-  * Returns: %true if @klass is abstract, %false otherwise.
-  */
--bool object_class_is_abstract(ObjectClass *klass);
-+bool object_class_is_abstract(const ObjectClass *klass);
- 
- /**
-  * object_class_by_name:
-@@ -984,7 +984,8 @@ ObjectProperty *object_class_property_add(ObjectClass *klass, const char *name,
-  */
- ObjectProperty *object_property_find(Object *obj, const char *name,
-                                      Error **errp);
--ObjectProperty *object_class_property_find(ObjectClass *klass, const char *name,
-+ObjectProperty *object_class_property_find(const ObjectClass *klass,
-+                                           const char *name,
-                                            Error **errp);
- 
- typedef struct ObjectPropertyIterator {
-diff --git a/gdbstub.c b/gdbstub.c
-index 991115361e..3c7e5f3a96 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -573,7 +573,7 @@ static int memtox(char *buf, const char *mem, int len)
- }
- 
- static const char *get_feature_xml(const char *p, const char **newp,
--                                   CPUClass *cc)
-+                                   const CPUClass *cc)
+diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
+index 6e530681f4..541ebb226c 100644
+--- a/hw/xen/xen_backend.c
++++ b/hw/xen/xen_backend.c
+@@ -553,7 +553,7 @@ err:
+ static void xen_set_dynamic_sysbus(void)
  {
-     size_t len;
-     int i;
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index 5f2fcdfc45..339775e49d 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -77,7 +77,7 @@ static const QDevAlias qdev_alias_table[] = {
-     { }
- };
+     Object *machine = qdev_get_machine();
+-    MachineClass *mc = MACHINE_GET_CLASS(machine);
++    MachineClass *mc = (MachineClass *)MACHINE_GET_CLASS(machine);
  
--static const char *qdev_class_get_alias(DeviceClass *dc)
-+static const char *qdev_class_get_alias(const DeviceClass *dc)
+     mc->has_dynamic_sysbus = true;
+ }
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index 066dcd17df..07eb8b745f 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -174,7 +174,7 @@ static void s390_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
+ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
  {
-     const char *typename = object_class_get_name(OBJECT_CLASS(dc));
-     int i;
-@@ -96,7 +96,7 @@ static const char *qdev_class_get_alias(DeviceClass *dc)
-     return NULL;
- }
- 
--static bool qdev_class_has_alias(DeviceClass *dc)
-+static bool qdev_class_has_alias(const DeviceClass *dc)
- {
-     return (qdev_class_get_alias(dc) != NULL);
- }
-diff --git a/qom/object.c b/qom/object.c
-index 8f60ad9b8e..a25b1fffad 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -751,12 +751,12 @@ ObjectClass *object_get_class(Object *obj)
-     return obj->class;
- }
- 
--bool object_class_is_abstract(ObjectClass *klass)
-+bool object_class_is_abstract(const ObjectClass *klass)
- {
-     return klass->type->abstract;
- }
- 
--const char *object_class_get_name(ObjectClass *klass)
-+const char *object_class_get_name(const ObjectClass *klass)
- {
-     return klass->type->name;
- }
-@@ -1029,11 +1029,11 @@ ObjectProperty *object_property_iter_next(ObjectPropertyIterator *iter)
-     return val;
- }
- 
--ObjectProperty *object_class_property_find(ObjectClass *klass, const char *name,
--                                           Error **errp)
-+ObjectProperty *object_class_property_find(const ObjectClass *klass,
-+                                           const char *name, Error **errp)
- {
-     ObjectProperty *prop;
--    ObjectClass *parent_klass;
-+    const ObjectClass *parent_klass;
- 
-     parent_klass = object_class_get_parent(klass);
-     if (parent_klass) {
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 7aa762245a..b1d6252ae0 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -735,7 +735,7 @@ static ObjectClass *x86_cpu_class_by_name(const char *cpu_model)
-     return oc;
- }
- 
--static char *x86_cpu_class_get_model_name(X86CPUClass *cc)
-+static char *x86_cpu_class_get_model_name(const X86CPUClass *cc)
- {
-     const char *class_name = object_class_get_name(OBJECT_CLASS(cc));
-     assert(g_str_has_suffix(class_name, X86_CPU_TYPE_SUFFIX));
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index c1a901455c..ee8ff04fd2 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -9773,7 +9773,7 @@ static int ppc_fixup_cpu(PowerPCCPU *cpu)
-     return 0;
- }
- 
--static inline bool ppc_cpu_is_valid(PowerPCCPUClass *pcc)
-+static inline bool ppc_cpu_is_valid(const PowerPCCPUClass *pcc)
- {
- #ifdef TARGET_PPCEMB
-     return pcc->mmu_model == POWERPC_MMU_BOOKE ||
+     CPUState *cs = CPU(dev);
+-    S390CPUClass *scc = S390_CPU_GET_CLASS(dev);
++    S390CPUClass *scc = (S390CPUClass *)S390_CPU_GET_CLASS(dev);
+     S390CPU *cpu = S390_CPU(dev);
+     CPUS390XState *env = &cpu->env;
+     Error *err = NULL;
 -- 
 2.11.0.259.g40922b1
