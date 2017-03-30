@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50745)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1ctZU4-0000Vn-8z
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 08:47:25 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1ctZTz-0005yQ-L0
+	(envelope-from <aik@ozlabs.ru>) id 1ctZU3-0000Vl-IJ
 	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 08:47:24 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <aik@ozlabs.ru>) id 1ctZU2-0005yo-3c
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 08:47:23 -0400
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Thu, 30 Mar 2017 23:47:05 +1100
-Message-Id: <20170330124707.28142-4-aik@ozlabs.ru>
+Date: Thu, 30 Mar 2017 23:47:07 +1100
+Message-Id: <20170330124707.28142-6-aik@ozlabs.ru>
 In-Reply-To: <20170330124707.28142-1-aik@ozlabs.ru>
 References: <20170330124707.28142-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [RFC PATCH qemu 3/5] vfio-pci: Reorder
- group-to-container attaching
+Subject: [Qemu-devel] [RFC PATCH qemu 5/5] spapr/iommu: Enable in-kernel TCE
+ acceleration via VFIO KVM device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,97 +23,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-At the moment VFIO PCI device initialization works as follows:
-vfio_realize
-	vfio_get_group
-		vfio_connect_container
-			register memory listeners (1)
-			update QEMU groups lists
-		vfio_kvm_device_add_group
-
-Then (example for pseries) the machine reset hook triggers region_add()
-for all regions where listeners from (1) are listening:
-
-ppc_spapr_reset
-	spapr_phb_reset
-		spapr_tce_table_enable
-			memory_region_add_subregion
-				vfio_listener_region_add
-					vfio_spapr_create_window
-
-This scheme works fine until we need to handle VFIO PCI device hotplug
-_and_ we want to enable in-kernel acceleration on, i.e. after PCI hotplug
-we need a place to call
-ioctl(vfio_kvm_device_fd, KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE).
-Since the ioctl needs a LIOBN fd (from sPAPRTCETable) and a IOMMU group fd
-(from VFIOGroup), vfio_listener_region_add() seems to be the only place
-for this ioctl().
-
-However this only works during boot time because the machine reset
-happens strictly after all devices are finalized. When hotplug happens,
-vfio_listener_region_add() is called when a memory listener is registered
-but when this happens:
-1. new group is not added to the container->group_list yet;
-2. VFIO KVM device is unaware of the new IOMMU group.
-
-This moves bits around to have all necessary VFIO infrastructure
-in place for both initial startup and hotplug cases.
+This uses new kernel KVM_CAP_SPAPR_TCE_VFIO capability to enable
+in-kernel acceleration of TCE update requests which will go via
+the VFIO KVM device.
 
 Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
-Changes:
-v2:
-* moved container->initialized back to its correct location
-* added missing QLIST_REMOVE()
----
- hw/vfio/common.c | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
+ target/ppc/kvm_ppc.h | 6 ++++++
+ hw/ppc/spapr_iommu.c | 4 ++++
+ target/ppc/kvm.c     | 7 ++++++-
+ 3 files changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index ab95db689c..e8188eb3d5 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -1087,6 +1087,14 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-         goto free_container_exit;
-     }
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index f48243d13f..ce7327a4e0 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -46,6 +46,7 @@ void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
+ int kvmppc_remove_spapr_tce(void *table, int pfd, uint32_t window_size);
+ int kvmppc_reset_htab(int shift_hint);
+ uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift);
++bool kvmppc_has_cap_spapr_vfio(void);
+ #endif /* !CONFIG_USER_ONLY */
+ bool kvmppc_has_cap_epr(void);
+ int kvmppc_define_rtas_kernel_token(uint32_t token, const char *function);
+@@ -216,6 +217,11 @@ static inline bool kvmppc_is_mem_backend_page_size_ok(char *obj_path)
+     return true;
+ }
  
-+    vfio_kvm_device_add_group(group);
++static inline bool kvmppc_has_cap_spapr_vfio(void)
++{
++    return false;
++}
 +
-+    QLIST_INIT(&container->group_list);
-+    QLIST_INSERT_HEAD(&space->containers, container, next);
+ #endif /* !CONFIG_USER_ONLY */
+ 
+ static inline bool kvmppc_has_cap_epr(void)
+diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
+index 5b0eee1be4..bfc2b71ca3 100644
+--- a/hw/ppc/spapr_iommu.c
++++ b/hw/ppc/spapr_iommu.c
+@@ -295,6 +295,10 @@ void spapr_tce_set_need_vfio(sPAPRTCETable *tcet, bool need_vfio)
+ 
+     tcet->need_vfio = need_vfio;
+ 
++    if (!need_vfio || (tcet->fd != -1 && kvmppc_has_cap_spapr_vfio())) {
++        return;
++    }
 +
-+    group->container = container;
-+    QLIST_INSERT_HEAD(&container->group_list, group, container_next);
+     oldtable = tcet->table;
+ 
+     tcet->table = spapr_tce_alloc_table(tcet->liobn,
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index abf4cb23b1..82886b669f 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -131,7 +131,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     cap_spapr_tce = kvm_check_extension(s, KVM_CAP_SPAPR_TCE);
+     cap_spapr_tce_64 = kvm_check_extension(s, KVM_CAP_SPAPR_TCE_64);
+     cap_spapr_multitce = kvm_check_extension(s, KVM_CAP_SPAPR_MULTITCE);
+-    cap_spapr_vfio = false;
++    cap_spapr_vfio = kvm_check_extension(s, KVM_CAP_SPAPR_TCE_VFIO);
+     cap_one_reg = kvm_check_extension(s, KVM_CAP_ONE_REG);
+     cap_hior = kvm_check_extension(s, KVM_CAP_PPC_HIOR);
+     cap_epr = kvm_check_extension(s, KVM_CAP_PPC_EPR);
+@@ -2418,6 +2418,11 @@ bool kvmppc_has_cap_mmu_hash_v3(void)
+     return cap_mmu_hash_v3;
+ }
+ 
++bool kvmppc_has_cap_spapr_vfio(void)
++{
++    return cap_spapr_vfio;
++}
 +
-     container->listener = vfio_memory_listener;
- 
-     memory_listener_register(&container->listener, container->space->as);
-@@ -1100,14 +1108,11 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
- 
-     container->initialized = true;
- 
--    QLIST_INIT(&container->group_list);
--    QLIST_INSERT_HEAD(&space->containers, container, next);
--
--    group->container = container;
--    QLIST_INSERT_HEAD(&container->group_list, group, container_next);
--
-     return 0;
- listener_release_exit:
-+    QLIST_REMOVE(group, container_next);
-+    QLIST_REMOVE(container, next);
-+    vfio_kvm_device_del_group(group);
-     vfio_listener_release(container);
- 
- free_container_exit:
-@@ -1212,8 +1217,6 @@ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp)
- 
-     QLIST_INSERT_HEAD(&vfio_group_list, group, next);
- 
--    vfio_kvm_device_add_group(group);
--
-     return group;
- 
- close_fd_exit:
+ static PowerPCCPUClass *ppc_cpu_get_family_class(PowerPCCPUClass *pcc)
+ {
+     ObjectClass *oc = OBJECT_CLASS(pcc);
 -- 
 2.11.0
