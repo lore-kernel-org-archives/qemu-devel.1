@@ -1,18 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1ctayF-000806-RJ
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 10:22:40 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1ctayM-00085m-Aw
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 10:22:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1ctayC-0003FX-HO
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 10:22:39 -0400
-Received: from mx2.suse.de ([195.135.220.15]:36840)
+	(envelope-from <ehabkost@redhat.com>) id 1ctayJ-0003Jv-1m
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 10:22:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35374)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <agraf@suse.de>) id 1ctayC-0003F0-BZ
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 10:22:36 -0400
-From: Alexander Graf <agraf@suse.de>
-Date: Thu, 30 Mar 2017 16:22:55 +0200
-Message-Id: <1490883775-94658-1-git-send-email-agraf@suse.de>
-Subject: [Qemu-devel] [PATCH] input: Add trace event for empty keyboard queue
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ctayI-0003JL-S8
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 10:22:42 -0400
+Date: Thu, 30 Mar 2017 11:22:40 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170330142240.GH3709@thinpad.lan.raisama.net>
+References: <1490653177-131484-1-git-send-email-agraf@suse.de>
+	<20170328004108.GP28530@thinpad.lan.raisama.net>
+	<9d85e056-3331-9815-404b-9557ca5028cc@suse.de>
+	<20170328123105.GA4418@thinpad.lan.raisama.net>
+	<5d929569-8deb-2de0-4894-ec50ef98c8b9@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5d929569-8deb-2de0-4894-ec50ef98c8b9@suse.de>
+Subject: Re: [Qemu-devel] [PATCH] i386: Allow cpuid bit override
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,49 +30,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Alexander Graf <agraf@suse.de>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-When driving QEMU from the outside, we have basically no chance to
-determine how quickly the guest OS picks up key events, so we usually
-have to limit ourselves to very slow keyboard presses to make sure
-the guest always has enough chance to pick them up.
+On Tue, Mar 28, 2017 at 02:35:57PM +0200, Alexander Graf wrote:
+> On 03/28/2017 02:31 PM, Eduardo Habkost wrote:
+> > On Tue, Mar 28, 2017 at 01:26:04PM +0200, Alexander Graf wrote:
+[...]
+> > > Putting it into a special enum sounds much more fragile than the current
+> > > solution to me. We need to bool fallback either way, so I fail to see any
+> > > benefit from having the enum.
+> > I don't see why the enum would be more fragile. With the QAPI
+> > enum, we:
+> > * Have a meaningful value for the QOM property 'type' field,
+> >    and have some hope to make type information for QOM properties
+> >    really useful one day;
+> > * Have the possible values for the property well-documented in
+> >    the QAPI schema;
+> > * Have the string<->enum translation code automatically generated
+> >    for us;
+> > * Can easily add other values later (I have been planning to
+> >    support "feat=host" so "-cpu host/max" aren't special cases in
+> >    the code.
+> > 
+> 
+> Ok, can you create the boilerplate for an OnOff enum type for me and I'll
+> plug =force into that? All that visitor stuff scares me :).
 
-This patch adds a trace events when the keyboarde queue is drained.
-An external driver can use that as hint that new keys can be pressed.
+I can do it, if you don't mind waiting for a few days. :)
 
-Signed-off-by: Alexander Graf <agraf@suse.de>
----
- hw/input/hid.c        | 4 ++++
- hw/input/trace-events | 1 +
- 2 files changed, 5 insertions(+)
-
-diff --git a/hw/input/hid.c b/hw/input/hid.c
-index fa9cc4c..93887ec 100644
---- a/hw/input/hid.c
-+++ b/hw/input/hid.c
-@@ -256,6 +256,10 @@ static void hid_keyboard_process_keycode(HIDState *hs)
-     slot = hs->head & QUEUE_MASK; QUEUE_INCR(hs->head); hs->n--;
-     keycode = hs->kbd.keycodes[slot];
- 
-+    if (!hs->n) {
-+        trace_hid_kbd_queue_empty();
-+    }
-+
-     key = keycode & 0x7f;
-     index = key | ((hs->kbd.modifiers & (1 << 8)) >> 1);
-     hid_code = hid_usage_keys[index];
-diff --git a/hw/input/trace-events b/hw/input/trace-events
-index f3bfbed..5a87818 100644
---- a/hw/input/trace-events
-+++ b/hw/input/trace-events
-@@ -24,6 +24,7 @@ milkymist_softusb_pulse_irq(void) "Pulse IRQ"
- 
- # hw/input/hid.c
- hid_kbd_queue_full(void) "queue full"
-+hid_kbd_queue_empty(void) "queue empty"
- 
- # hw/input/virtio
- virtio_input_queue_full(void) "queue full"
 -- 
-1.8.5.6
+Eduardo
