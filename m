@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cthDE-0004ZF-Hy
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 17:02:33 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cthZZ-000130-9n
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 17:25:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cthDA-0002Iu-Gp
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 17:02:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42544)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cthDA-0002IQ-8v
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 17:02:28 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0A73E80464
-	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 21:02:27 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 30 Mar 2017 18:01:05 -0300
-Message-Id: <20170330210105.32434-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [RHEL-7.4 qemu-kvm PATCH] target-i386: get/set/migrate
- XSAVES state
+	(envelope-from <mreitz@redhat.com>) id 1cthZY-0000Ld-Dp
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 17:25:37 -0400
+References: <20170308025428.1037-1-eblake@redhat.com>
+	<20170308025428.1037-3-eblake@redhat.com>
+	<f4cbc108-a91f-6d52-b46e-3c1332199779@redhat.com>
+	<4de9047a-0c0f-3653-e470-ce1715816f49@redhat.com>
+	<4b120de9-55fe-0527-8ed3-753dceea3b3e@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <e845695c-fd1a-c614-f742-1213382e00fd@redhat.com>
+Date: Thu, 30 Mar 2017 23:25:28 +0200
+MIME-Version: 1.0
+In-Reply-To: <4b120de9-55fe-0527-8ed3-753dceea3b3e@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="rEq0gmX70HH39w7HDEHlvPXVHaqk5Aqa6"
+Subject: Re: [Qemu-devel] [PATCH v6 02/10] iotests: Improve image-clear
+ tests on non-aligned image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,160 +28,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: David Hildenbrand <david@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Bandan Das <bsd@redhat.com>, plai@redhat.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org
 
-From: Wanpeng Li <wanpeng.li@linux.intel.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--rEq0gmX70HH39w7HDEHlvPXVHaqk5Aqa6
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org
+Message-ID: <e845695c-fd1a-c614-f742-1213382e00fd@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 02/10] iotests: Improve image-clear tests
+ on non-aligned image
+References: <20170308025428.1037-1-eblake@redhat.com>
+ <20170308025428.1037-3-eblake@redhat.com>
+ <f4cbc108-a91f-6d52-b46e-3c1332199779@redhat.com>
+ <4de9047a-0c0f-3653-e470-ce1715816f49@redhat.com>
+ <4b120de9-55fe-0527-8ed3-753dceea3b3e@redhat.com>
+In-Reply-To: <4b120de9-55fe-0527-8ed3-753dceea3b3e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1327593
-Brew: https://brewweb.engineering.redhat.com/brew/taskinfo?taskID=12913269
+On 30.03.2017 20:39, Eric Blake wrote:
+> On 03/29/2017 09:13 PM, Eric Blake wrote:
+>> On 03/13/2017 05:00 PM, Max Reitz wrote:
+>>> On 08.03.2017 03:54, Eric Blake wrote:
+>>>> Tweak 097 and 176 to operate on an image that is not cluster-aligned=
+,
+>>>> to give further coverage of clearing out an entire image.
+>>>>
+>>>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>>>
+>>>> ---
+>>>> v6: new patch
+>>>> ---
+>>>>  tests/qemu-iotests/097     |  7 ++++---
+>>>>  tests/qemu-iotests/097.out | 24 ++++++++++++------------
+>>>>  tests/qemu-iotests/176     |  7 ++++---
+>>>>  tests/qemu-iotests/176.out | 24 ++++++++++++------------
+>>>>  4 files changed, 32 insertions(+), 30 deletions(-)
+>>>
+>>> I don't have anything against this patch, but maybe it would be even
+>>> more useful if it wrote some data to the final partial cluster (just =
+an
+>>> idea).
+>>
+>> And not a bad one.  Kevin said patch 1 and 2 are okay for freeze (if
+>> wanted; but not essential if they miss it), so I'll post v7 soon.
+>=20
+> Urrgh. Doing this uncovered the fact that we have a latent bug: we STIL=
+L
+> leave the unaligned tail cluster allocated, when using the slow path; o=
+r
+> put another way, commit a3e1505 is an incomplete fix.
+>=20
+> Do I say "thanks" for your suggestion being the cause for me to find th=
+e
+> problem, or "no thanks" for it turning into more work? ;)
 
-Add xsaves related definition, it also adds corresponding part
-to kvm_get/put, and vmstate.
+Just pretend you didn't see any problem. Whoops, you've already posted a
+mail to the list, this will make it a bit awkward. ;-)
 
-Backport notes:
-* As we didn't have unmigratable_flags yet, our backport
-  of upstream commit 0bb0b2d2fe7f645ddaf1f0ff40ac669c9feb4aa1
-  (commit 5fcaf5176d7545518c76f3aa8ea7ce6fb063c62d) didn't
-  include "xsaves" cpuid_xsave_feature_name[]. This patch now
-  adds "xsave" to cpuid_xsave_feature_name[].
+Max
 
-Signed-off-by: Wanpeng Li <wanpeng.li@linux.intel.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-(cherry picked from commit 18cd2c17b5370369a886155c001da0a7f54bbcca)
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- target-i386/cpu.h     |  2 ++
- target-i386/cpu.c     |  2 +-
- target-i386/kvm.c     | 15 +++++++++++++++
- target-i386/machine.c | 21 +++++++++++++++++++++
- 4 files changed, 39 insertions(+), 1 deletion(-)
 
-diff --git a/target-i386/cpu.h b/target-i386/cpu.h
-index f04deb411d..ac60309b25 100644
---- a/target-i386/cpu.h
-+++ b/target-i386/cpu.h
-@@ -384,6 +384,7 @@
- #define MSR_VM_HSAVE_PA                 0xc0010117
- 
- #define MSR_IA32_BNDCFGS                0x00000d90
-+#define MSR_IA32_XSS                    0x00000da0
- 
- #define XSTATE_FP                       (1ULL << 0)
- #define XSTATE_SSE                      (1ULL << 1)
-@@ -1026,6 +1027,7 @@ typedef struct CPUX86State {
-     uint64_t xstate_bv;
- 
-     uint64_t xcr0;
-+    uint64_t xss;
- 
-     TPRAccess tpr_access_type;
- } CPUX86State;
-diff --git a/target-i386/cpu.c b/target-i386/cpu.c
-index 33f0997c49..ae56995beb 100644
---- a/target-i386/cpu.c
-+++ b/target-i386/cpu.c
-@@ -177,7 +177,7 @@ static const char *cpuid_7_0_edx_feature_name[] = {
- };
- 
- static const char *cpuid_xsave_feature_name[] = {
--    "xsaveopt", "xsavec", "xgetbv1", NULL,
-+    "xsaveopt", "xsavec", "xgetbv1", "xsaves",
-     NULL, NULL, NULL, NULL,
-     NULL, NULL, NULL, NULL,
-     NULL, NULL, NULL, NULL,
-diff --git a/target-i386/kvm.c b/target-i386/kvm.c
-index e1b0ca2f6d..6a479f46c3 100644
---- a/target-i386/kvm.c
-+++ b/target-i386/kvm.c
-@@ -76,6 +76,7 @@ static bool has_msr_hv_hypercall;
- static bool has_msr_hv_vapic;
- static bool has_msr_hv_tsc;
- static bool has_msr_mtrr;
-+static bool has_msr_xss;
- 
- static bool has_msr_architectural_pmu;
- static uint32_t num_architectural_pmu_counters;
-@@ -795,6 +796,10 @@ static int kvm_get_supported_msrs(KVMState *s)
-                     has_msr_bndcfgs = true;
-                     continue;
-                 }
-+                if (kvm_msr_list->indices[i] == MSR_IA32_XSS) {
-+                    has_msr_xss = true;
-+                    continue;
-+                }
-             }
-         }
- 
-@@ -1177,6 +1182,9 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-     if (has_msr_bndcfgs) {
-         kvm_msr_entry_set(&msrs[n++], MSR_IA32_BNDCFGS, env->msr_bndcfgs);
-     }
-+    if (has_msr_xss) {
-+        kvm_msr_entry_set(&msrs[n++], MSR_IA32_XSS, env->xss);
-+    }
- #ifdef TARGET_X86_64
-     if (lm_capable_kernel) {
-         kvm_msr_entry_set(&msrs[n++], MSR_CSTAR, env->cstar);
-@@ -1530,6 +1538,10 @@ static int kvm_get_msrs(X86CPU *cpu)
-     if (has_msr_bndcfgs) {
-         msrs[n++].index = MSR_IA32_BNDCFGS;
-     }
-+    if (has_msr_xss) {
-+        msrs[n++].index = MSR_IA32_XSS;
-+    }
-+
- 
-     if (!env->tsc_valid) {
-         msrs[n++].index = MSR_IA32_TSC;
-@@ -1677,6 +1689,9 @@ static int kvm_get_msrs(X86CPU *cpu)
-         case MSR_IA32_BNDCFGS:
-             env->msr_bndcfgs = msrs[i].data;
-             break;
-+        case MSR_IA32_XSS:
-+            env->xss = msrs[i].data;
-+            break;
-         default:
-             if (msrs[i].index >= MSR_MC0_CTL &&
-                 msrs[i].index < MSR_MC0_CTL + (env->mcg_cap & 0xff) * 4) {
-diff --git a/target-i386/machine.c b/target-i386/machine.c
-index 2c970024ac..ce7fcd3996 100644
---- a/target-i386/machine.c
-+++ b/target-i386/machine.c
-@@ -704,6 +704,24 @@ static const VMStateDescription vmstate_avx512 = {
-     }
- };
- 
-+static bool xss_needed(void *opaque)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+
-+    return env->xss != 0;
-+}
-+
-+static const VMStateDescription vmstate_xss = {
-+    .name = "cpu/xss",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(env.xss, X86CPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- const VMStateDescription vmstate_x86_cpu = {
-     .name = "cpu",
-     .version_id = 12,
-@@ -850,6 +868,9 @@ const VMStateDescription vmstate_x86_cpu = {
-         }, {
-             .vmsd = &vmstate_avx512,
-             .needed = avx512_needed,
-+         }, {
-+            .vmsd = &vmstate_xss,
-+            .needed = xss_needed,
-         } , {
-             /* empty */
-         }
--- 
-2.11.0.259.g40922b1
+--rEq0gmX70HH39w7HDEHlvPXVHaqk5Aqa6
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljdd8gSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ACekH/iSkbEqz+iJYadiBx7wIVAfW3RYN7NYm
+kqi02XVHrQHiX1AhoWoLlJjoLr0b6DZoRyMsf5XVXbSRhTd+H90JoyOkr35k2Ga0
+WxGJ4HT77cYf8jWJfx6F+f6/vXdb3Uf7/KhMPEBrhBqJo+ftmEFLzU9kPsQCUAc5
+7l824KEcYvgxDTdUqk3Tn+RZ3j1yGaAADJXFU0UTUiHD3kpxSWMCMMWgizoVmNHV
+QzpP8uNEMqjmCEYWepQfrOMJ2VfUWaBSi7NcV7aWDEjO41clOVFQwYBhf5Jd7fkn
+Ph+61Xq05DbwWmbnP6KpDf9jwcm2sNypfe+do9vM8EzX4fTD2HGHX28=
+=sWqF
+-----END PGP SIGNATURE-----
+
+--rEq0gmX70HH39w7HDEHlvPXVHaqk5Aqa6--
