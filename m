@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ctOEc-0007uM-3g
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 20:46:42 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1ctOo9-0002cC-5V
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 21:23:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ctOEZ-00016f-2B
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 20:46:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46978)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ctOEY-00015a-Se
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 20:46:38 -0400
-Date: Wed, 29 Mar 2017 21:46:32 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170330004632.GE3709@thinpad.lan.raisama.net>
-References: <20170329210439.18062-1-iwona260909@gmail.com>
+	(envelope-from <gengdongjiu@huawei.com>) id 1ctOo5-0005sI-Ug
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 21:23:25 -0400
+Received: from [45.249.212.189] (port=2887 helo=dggrg03-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <gengdongjiu@huawei.com>) id 1ctOo4-0005n2-4U
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 21:23:21 -0400
+References: <58DA3F68.6090901@arm.com> <20170328112328.GA31156@cbox>
+	<20170328115413.GJ23682@e104320-lin>
+	<b1c6e747-2fa7-b7a1-60d5-4a9c480b9dc9@huawei.com>
+	<58DA67BA.8070404@arm.com>
+	<5b7352f4-4965-3ed5-3879-db871797be47@huawei.com>
+	<20170329103658.GQ23682@e104320-lin>
+	<CAMj-D2BT3ByY-iFrRVVK7y=G7zhRBtM031VgLn6JzwUE-WCdWQ@mail.gmail.com>
+	<20170329144822.GA1020@cbox>
+	<fa712d47-4f77-7710-c4f7-cd7eab9fed9e@redhat.com>
+	<20170329174412.GA4472@cbox>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <59037bde-e950-570b-4571-376589379308@huawei.com>
+Date: Thu, 30 Mar 2017 09:22:47 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170329210439.18062-1-iwona260909@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH RESEND v2] hmp: fix "info cpu" segfault
+In-Reply-To: <20170329174412.GA4472@cbox>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] kvm: pass the virtual SEI syndrome to
+ guest OS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,58 +36,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Iwona Kotlarska <iwona260909@gmail.com>
-Cc: qemu-devel@nongnu.org, marcel@redhat.com, pbonzini@redhat.com, rth@twiddle.net
+To: Christoffer Dall <cdall@linaro.org>, Laszlo Ersek <lersek@redhat.com>
+Cc: gengdongjiu <gengdj.1984@gmail.com>, Achin Gupta <achin.gupta@arm.com>, ard.biesheuvel@linaro.org, edk2-devel@lists.01.org, qemu-devel@nongnu.org, zhaoshenglong@huawei.com, James Morse <james.morse@arm.com>, xiexiuqi@huawei.com, Marc Zyngier <marc.zyngier@arm.com>, catalin.marinas@arm.com, will.deacon@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, suzuki.poulose@arm.com, andre.przywara@arm.com, mark.rutland@arm.com, vladimir.murzin@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, wangxiongfeng2@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com, Leif.Lindholm@linaro.comnd@arm.com
 
-On Wed, Mar 29, 2017 at 11:04:39PM +0200, Iwona Kotlarska wrote:
-> Running QEMU with "qemu-system-x86_64 -M none -nographic -m 256" and executing
-> "dump-guest-memory /dev/null 0 8192" results in segfault.
-> Fix by checking if we have CPU.
+Hi Christoffer/Laszlo,
+
+On 2017/3/30 1:44, Christoffer Dall wrote:
+> On Wed, Mar 29, 2017 at 05:37:49PM +0200, Laszlo Ersek wrote:
+>> On 03/29/17 16:48, Christoffer Dall wrote:
+>>> On Wed, Mar 29, 2017 at 10:36:51PM +0800, gengdongjiu wrote:
+>>>> 2017-03-29 18:36 GMT+08:00, Achin Gupta <achin.gupta@arm.com>:
+>>
+>>>>> Qemu is essentially fulfilling the role of secure firmware at the
+>>>>> EL2/EL1 interface (as discussed with Christoffer below). So it
+>>>>> should generate the CPER before injecting the error.
+>>>>>
+>>>>> This is corresponds to (1) above apart from notifying UEFI (I am
+>>>>> assuming you mean guest UEFI). At this time, the guest OS already
+>>>>> knows where to pick up the CPER from through the HEST. Qemu has
+>>>>> to create the CPER and populate its address at the address
+>>>>> exported in the HEST. Guest UEFI should not be involved in this 
+>>>>> flow. Its job was to create the HEST at boot and that has been
+>>>>> done by this stage.
+>>>>
+>>>> Sorry,  As I understand it, after Qemu generate the CPER table, it
+>>>> should pass the CPER table to the guest UEFI, then Guest UEFI  place
+>>>> this CPER table to the guest OS memory. In this flow, the Guest UEFI
+>>>> should be involved, else the Guest OS can not see the CPER table.
+>>>>
+>>>
+>>> I think you need to explain the "pass the CPER table to the guest UEFI"
+>>> concept in terms of what really happens, step by step, and when you say
+>>> "then Guest UEFI place the CPER table to the guest OS memory", I'm
+>>> curious who is running what code on the hardware when doing that.
+>>
+>> I strongly suggest to keep the guest firmware's runtime involvement to
+>> zero. Two reasons:
+>>
+>> (1) As you explained above (... which I conveniently snipped), when you
+>> inject an interrupt to the guest, the handler registered for that
+>> interrupt will come from the guest kernel.
+>>
+>> The only exception to this is when the platform provides a type of
+>> interrupt whose handler can be registered and then locked down by the
+>> firmware. On x86, this is the SMI.
+>>
+>> In practice though,
+>> - in OVMF (x86), we only do synchronous (software-initiated) SMIs (for
+>> privileged UEFI varstore access),
+>> - and in ArmVirtQemu (ARM / aarch64), none of the management mode stuff
+>> exists at all.
+>>
+>> I understand that the Platform Init 1.5 (or 1.6?) spec abstracted away
+>> the MM (management mode) protocols from Intel SMM, but at this point
+>> there is zero code in ArmVirtQemu for that. (And I'm unsure how much of
+>> any eligible underlying hw emulation exists in QEMU.)
+>>
+>> So you can't get the guest firmware to react to the injected interrupt
+>> without the guest OS coming between first.
+>>
+>> (2) Achin's description matches really-really closely what is possible,
+>> and what should be done with QEMU, ArmVirtQemu, and the guest kernel.
+>>
+>> In any solution for this feature, the firmware has to reserve some
+>> memory from the OS at boot. The current facilities we have enable this.
+>> As I described previously, the ACPI linker/loader actions can be mapped
+>> more or less 1:1 to Achin's design. From a practical perspective, you
+>> really want to keep the guest firmware as dumb as possible (meaning: as
+>> generic as possible), and keep the ACPI specifics to the QEMU and the
+>> guest kernel sides.
+>>
+>> The error serialization actions -- the co-operation between guest kernel
+>> and QEMU on the special memory areas -- that were mentioned earlier by
+>> Michael and Punit look like a complication. But, IMO, they don't differ
+>> from any other device emulation -- DMA actions in particular -- that
+>> QEMU already does. Device models are what QEMU *does*. Read the command
+>> block that the guest driver placed in guest memory, parse it, sanity
+>> check it, verify it, execute it, write back the status code, inject an
+>> interrupt (and/or let any polling guest driver notice it "soon after" --
+>> use barriers as necessary).
+>>
+>> Thus, I suggest to rely on the generic ACPI linker/loader interface
+>> (between QEMU and guest firmware) *only* to make the firmware lay out
+>> stuff (= reserve buffers, set up pointers, install QEMU's ACPI tables)
+>> *at boot*. Then, at runtime, let the guest kernel and QEMU (the "device
+>> model") talk to each other directly. Keep runtime firmware involvement
+>> to zero.
+>>
+>> You *really* don't want to debug three components at runtime, when you
+>> can solve the thing with two. (Two components whose build systems won't
+>> drive you mad, I should add.)
+>>
+>> IMO, Achin's design nailed it. We can do that.
+>>
+> I completely agree.
 > 
-> Signed-off-by: Iwona Kotlarska <iwona260909@gmail.com>
-> ---
-> v1 --> v2
-> Added brackets around if body.
-> Changed subject.
->  target/i386/arch_dump.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
+> My questions were intended for gengdongjiu to clarify his/her 
+> and clear up any misunderstandings between what Achin suggested and what
+> he/she wrote.
+
+  Achin and Laszlo's understanding are right. thanks for your suggestion.
+
 > 
-> diff --git a/target/i386/arch_dump.c b/target/i386/arch_dump.c
-> index 5a2e4be5d0..43992a440c 100644
-> --- a/target/i386/arch_dump.c
-> +++ b/target/i386/arch_dump.c
-> @@ -390,9 +390,11 @@ int cpu_get_dump_info(ArchDumpInfo *info,
->      GuestPhysBlock *block;
->  
->  #ifdef TARGET_X86_64
-[Reordering the diff a little bit to make my comments clearer]
-> -    X86CPU *first_x86_cpu = X86_CPU(first_cpu);
-> +    X86CPU *first_x86_cpu = NULL;
-> +    first_x86_cpu = X86_CPU(first_cpu);
-
-There's no reason to replace that single line with these ones.
-
-> -
-> -    lma = !!(first_x86_cpu->env.hflags & HF_LMA_MASK);
-> +    if (first_cpu != NULL) {
-> +        lma = !!(first_x86_cpu->env.hflags & HF_LMA_MASK);
-> +    }
-
-This part looks OK, although personally I would prefer to write it as:
-    lma = first_cpu && (first_x86_cpu->env.hflags & HF_LMA_MASK);
-so this can become a single-line patch.
-
-I also wonder if the TARGET_X86_64 #ifdef is really necessary. Is
-it possible to ever have HF_LMA_MASK set if the target is not
-x86_64? But that's something for a separate patch, and unrelated
-to the bug you are fixing.
-
->  #endif
->  
->      if (lma) {
-> -- 
-> 2.12.0
+> Thanks,
+> -Christoffer
 > 
-
--- 
-Eduardo
+> .
+> 
