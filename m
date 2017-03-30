@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ctcyE-0000vi-9h
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:30:47 -0400
+	(envelope-from <mreitz@redhat.com>) id 1ctcyx-0001QA-OK
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:31:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ctcyA-00031Y-47
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:30:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42690)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ctcy9-00030N-SM
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:30:42 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E4AF980518
-	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 16:30:40 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170330075206.GA21915@pxdev.xzpeter.org> (Peter Xu's message of
-	"Thu, 30 Mar 2017 15:52:06 +0800")
-References: <20170323204544.12015-1-quintela@redhat.com>
-	<20170323204544.12015-38-quintela@redhat.com>
-	<20170330075206.GA21915@pxdev.xzpeter.org>
-Reply-To: quintela@redhat.com
-Date: Thu, 30 Mar 2017 18:30:36 +0200
-Message-ID: <87shlulob7.fsf@secure.mitica>
+	(envelope-from <mreitz@redhat.com>) id 1ctcyw-0003nH-Vt
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:31:31 -0400
+References: <1490879707-6060-1-git-send-email-armbru@redhat.com>
+	<1490879707-6060-9-git-send-email-armbru@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <dfc2b733-ae8e-6786-7f41-cd6857486801@redhat.com>
+Date: Thu, 30 Mar 2017 18:31:18 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 37/51] ram: Move compression_switch to
- RAMState
+In-Reply-To: <1490879707-6060-9-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="eedWgEkQLMi8ggUdps7fIuiiihTNLn6rP"
+Subject: Re: [Qemu-devel] [RFC v2 for-2.9 08/10] nbd: Tidy up blockdev-add
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,95 +25,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, eblake@redhat.com, pbonzini@redhat.com
 
-Peter Xu <peterx@redhat.com> wrote:
-> On Thu, Mar 23, 2017 at 09:45:30PM +0100, Juan Quintela wrote:
->> Rename it to preffer_xbzrle that is a more descriptive name.
->
-> s/preffer/prefer/?
->        
->> 
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> ---
->>  migration/ram.c | 9 +++++----
->>  1 file changed, 5 insertions(+), 4 deletions(-)
->> 
->> diff --git a/migration/ram.c b/migration/ram.c
->> index 6a39704..591cf89 100644
->> --- a/migration/ram.c
->> +++ b/migration/ram.c
->> @@ -217,6 +217,9 @@ struct RAMState {
->>      uint64_t dirty_pages_rate;
->>      /* Count of requests incoming from destination */
->>      uint64_t postcopy_requests;
->> +    /* Should we move to xbzrle after the 1st round
->> +       of compression */
->> +    bool preffer_xbzrle;
->>      /* protects modification of the bitmap */
->>      QemuMutex bitmap_mutex;
->>      /* Ram Bitmap protected by RCU */
->> @@ -335,7 +338,6 @@ static QemuCond comp_done_cond;
->>  /* The empty QEMUFileOps will be used by file in CompressParam */
->>  static const QEMUFileOps empty_ops = { };
->>  
->> -static bool compression_switch;
->>  static DecompressParam *decomp_param;
->>  static QemuThread *decompress_threads;
->>  static QemuMutex decomp_done_lock;
->> @@ -419,7 +421,6 @@ void migrate_compress_threads_create(void)
->>      if (!migrate_use_compression()) {
->>          return;
->>      }
->> -    compression_switch = true;
->>      thread_count = migrate_compress_threads();
->>      compress_threads = g_new0(QemuThread, thread_count);
->>      comp_param = g_new0(CompressParam, thread_count);
->> @@ -1091,7 +1092,7 @@ static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss,
->>                   * point. In theory, xbzrle can do better than compression.
->>                   */
->>                  flush_compressed_data(rs);
->> -                compression_switch = false;
->> +                rs->preffer_xbzrle = true;
->>              }
->>          }
->>          /* Didn't find anything this time, but try again on the new block */
->> @@ -1323,7 +1324,7 @@ static int ram_save_target_page(RAMState *rs, MigrationState *ms,
->>      /* Check the pages is dirty and if it is send it */
->>      if (migration_bitmap_clear_dirty(rs, dirty_ram_abs)) {
->>          unsigned long *unsentmap;
->> -        if (compression_switch && migrate_use_compression()) {
->> +        if (!rs->preffer_xbzrle && migrate_use_compression()) {
->
-> IIUC this prefer_xbzrle can be dynamically calculated by existing
-> states:
->
-> static inline bool ram_compression_active(RAMState *rs)
-> {
->     /*
->      * If xbzrle is on, stop using the data compression after first
->      * round of migration even if compression is enabled. In theory,
->      * xbzrle can do better than compression.
->      */
->     return migrate_use_compression() && \
->            (rs->ram_bulk_stage || !migrate_use_xbzrle());
-> }
->
-> Then this line can be written as:
->
->     if (ram_compression_active(rs)) {
->
-> And if so, we can get rid of prefer_xbzrle, right?
->
-> Having prefer_xbzrle should be slightly faster though, since it'll at
-> least cache the above calculation.
->
-> Thanks,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--eedWgEkQLMi8ggUdps7fIuiiihTNLn6rP
+From: Max Reitz <mreitz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp,
+ namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, eblake@redhat.com,
+ pbonzini@redhat.com
+Message-ID: <dfc2b733-ae8e-6786-7f41-cd6857486801@redhat.com>
+Subject: Re: [RFC v2 for-2.9 08/10] nbd: Tidy up blockdev-add interface
+References: <1490879707-6060-1-git-send-email-armbru@redhat.com>
+ <1490879707-6060-9-git-send-email-armbru@redhat.com>
+In-Reply-To: <1490879707-6060-9-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-You arrived to the same conclusion than Dave.  As it was only used once,
-I didn't create the extra function.
+On 30.03.2017 15:15, Markus Armbruster wrote:
+> SocketAddress is a simple union, and simple unions are awkward: they
+> have their variant members wrapped in a "data" object on the wire, and
+> require additional indirections in C.  I intend to limit its use to
+> existing external interfaces, and convert all internal interfaces to
+> SocketAddressFlat.
+>=20
+> BlockdevOptionsNbd is an external interface using SocketAddress.  We
+> already use SocketAddressFlat elsewhere in blockdev=3Dadd.  Replace it
 
-I stole your comment verbatim O:-)
+s/=3D/-/
 
-Later, Juan.
+> by SocketAddressFlat while we can (it's new in 2.9) for simplicity and
+> consistency.  For example,
+>=20
+>     { "execute": "blockdev-add",
+>       "arguments": { "node-name": "foo", "driver": "nbd",
+>                      "server": { "type": "inet",
+> 		                 "data": { "host": "localhost",
+> 				           "port": "12345" } } } }
+>=20
+> becomes
+>=20
+>     { "execute": "blockdev-add",
+>       "arguments": { "node-name": "foo", "driver": "nbd",
+>                      "server": { "type": "inet",
+> 		                 "host": "localhost", "port": "12345" } } }
+>=20
+> Since the internal interfaces still take SocketAddress, this requires
+> conversion function socket_address_crumple().  It'll go away when I
+> update the interfaces.
+>=20
+> Unfortunately, SocketAddress is also visible in -drive since 2.8.  Add
+> still more gunk to nbd_process_legacy_socket_options().  You can now
+> shorten
+>=20
+>     -drive if=3Dnone,driver=3Dnbd,server.type=3Dinet,server.data.host=3D=
+127.0.0.1,server.data.port=3D12345
+>=20
+> to
+>=20
+>     -drive if=3Dnone,driver=3Dnbd,server.type=3Dinet,server.host=3D127.=
+0.0.1,server.port=3D12345
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  block/nbd.c          | 94 +++++++++++++++++++++++++++++++++++++-------=
+--------
+>  qapi/block-core.json |  2 +-
+>  2 files changed, 69 insertions(+), 27 deletions(-)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+(Hoping the next patch gets squashed in)
+
+
+--eedWgEkQLMi8ggUdps7fIuiiihTNLn6rP
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljdMtYSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ADPkH/RAw9HcP1kaZjBxrwTZS6x6JxQsT92aB
+GyIIk/gladrSon/eLZdADyK7Ry1Fo3KyBP5mZZ0jWUplWpJz5jZe31w2zQD9tu7q
+fbo7RS4C1nJAym3lTmDh09yqiSSKAJQg3SbLMNEhVvgzdfRRd7Gd/ZKeuSc9ILc2
+rOAzbTKg+41iDma1wP73c6flWAxMuqCTp6rNWoTamx5ixrjy/IOUststARONvBXb
+TqNzYboFdeF4eiPnuc5N5Ybs07MxLIriv/qUgxvjKO4W7fI3RY08DiTM/ETkWAa1
+D1ISZApdR4MOFCUpYxuTzI8hnLOQxC/QRziVWppSKl5PS0+7RPgebN8=
+=lY8c
+-----END PGP SIGNATURE-----
+
+--eedWgEkQLMi8ggUdps7fIuiiihTNLn6rP--
