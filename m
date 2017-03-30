@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ctbZL-0000bx-Gw
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:01:00 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1ctbaE-00019j-NY
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:02:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ctbZK-0004vm-Lu
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:00:59 -0400
-Date: Thu, 30 Mar 2017 12:00:48 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170330150048.GL3709@thinpad.lan.raisama.net>
-References: <1490175166-19785-1-git-send-email-he.chen@linux.intel.com>
-	<20170323102955.5e2d1c65@nial.brq.redhat.com>
-	<20170329085000.GA20377@he>
-	<20170329134458.793e882d@nial.brq.redhat.com>
-	<20170329123038.u6ebwn2xazbzr4nv@kamzik.brq.redhat.com>
+	(envelope-from <alex.williamson@redhat.com>) id 1ctbaB-0005RD-Le
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:01:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42818)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1ctbaB-0005PF-DL
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:01:51 -0400
+Date: Thu, 30 Mar 2017 09:01:48 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170330090148.16048141@t450s.home>
+In-Reply-To: <1490869641-29873-1-git-send-email-xiong.y.zhang@intel.com>
+References: <1490869641-29873-1-git-send-email-xiong.y.zhang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170329123038.u6ebwn2xazbzr4nv@kamzik.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] Allow setting NUMA distance for
- different NUMA nodes
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Revert "vfio/pci-quirks.c: Disable stolen
+ memory for igd VFIO"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +28,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, He Chen <he.chen@linux.intel.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-arm@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Xiong Zhang <xiong.y.zhang@intel.com>
+Cc: qemu-devel@nongnu.org
 
-On Wed, Mar 29, 2017 at 02:30:38PM +0200, Andrew Jones wrote:
-> On Wed, Mar 29, 2017 at 01:44:58PM +0200, Igor Mammedov wrote:
-> > On Wed, 29 Mar 2017 16:50:00 +0800
-> > He Chen <he.chen@linux.intel.com> wrote:
-> > > > > +static void default_numa_distance(void)
-> > > > > +{
-> > > > > +    int src, dst;
-> > > > > +  
-> > > > fill in defaults only if there weren't any '-numa dist' on CLI
-> > > > and refuse to start if partial filled table were explicitly provided on CLI
-> > > >   
-> > > I am afraid that I may have a bad function name here, fill_numa_distance
-> > > might be a better name?
-> > > 
-> > > Also, since the distance can be asymmetric, IMHO, providing a partial
-> > > filled table looks fine. If we set many NUMA nodes e.g. 8 nodes for
-> > > guest, the whole filled table would require many command lines which
-> > > might be inconvenient and less flexible.
-> > asymmetric doesn't imply sparse, so one has to specify full matrix
-> > it might be inconvenient /long/ but is very flexible.
+On Thu, 30 Mar 2017 18:27:21 +0800
+Xiong Zhang <xiong.y.zhang@intel.com> wrote:
+
+> This reverts commit c2b2e158cc7b1cb431bd6039824ec13c3184a775.
 > 
-> This makes me realize that a user only inputting one of A -> B or B -> A
-> command line inputs doesn't imply symmetry.  It could be that the user
-> just forgot to input the opposite.  To avoid the ambiguity we either need
-> to force both to be input (as it was before I suggested otherwise), or
-> add a '-numa symmetric' type of property to enable the shortcut.  I guess
-> we should just avoid the shortcut, at least for now.
+> The original patch intend to prevent linux i915 driver from using
+> stolen meory. But this patch breaks windows IGD driver loading on
+> Gen9+, as IGD HW will use stolen memory on Gen9+, once windows IGD
+> driver see zero size stolen memory, it will unload.
+> Meanwhile stolen memory will be disabled in 915 when i915 run as
+> a guest.
 
-Is protecting the user from one very specific (and very rare[1])
-mistake a good reason for making the automatic default less
-useful? Requiring an explicit '-numa symmetric' option to enable
-the automatic default seems to defeat the purpose of having an
-automatic default, to me.
+Does this mean that legacy mode IGD assignment is not going to work
+on Gen9+ with Windows?  Will it continue to work with Gen8-?
 
-I bet people would just specify the distances for both
-directions, instead of having to read the documentation for
-"-numa symmetric" to be sure if that's exactly what they want.
+Please clarify Gen9+, is this Kaby Lake?
 
-[1] I mean: forgetting an option isn't rare, but asymmetric NUMA
-    distances are so rare that most people who reviewed those
-    patches were surprised when they learned that the specs allow
-    asymmetric distances.
+I assume this patch is intended for QEMU 2.9, it's helpful to make that
+explicit during the rc freeze.  Thanks,
 
--- 
-Eduardo
+Alex
+
+> Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
+> ---
+>  hw/vfio/pci-quirks.c | 65 ++++++++++++++++++++++------------------------------
+>  1 file changed, 27 insertions(+), 38 deletions(-)
+> 
+> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+> index e995e32..e9b493b 100644
+> --- a/hw/vfio/pci-quirks.c
+> +++ b/hw/vfio/pci-quirks.c
+> @@ -1367,45 +1367,14 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+>      uint16_t cmd_orig, cmd;
+>      Error *err = NULL;
+>  
+> -    /* This must be an Intel VGA device. */
+> -    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, PCI_ANY_ID) ||
+> -        !vfio_is_vga(vdev) || nr != 4) {
+> -        return;
+> -    }
+> -
+> -    /*
+> -     * IGD is not a standard, they like to change their specs often.  We
+> -     * only attempt to support back to SandBridge and we hope that newer
+> -     * devices maintain compatibility with generation 8.
+> -     */
+> -    gen = igd_gen(vdev);
+> -    if (gen != 6 && gen != 8) {
+> -        error_report("IGD device %s is unsupported by IGD quirks, "
+> -                     "try SandyBridge or newer", vdev->vbasedev.name);
+> -        return;
+> -    }
+> -
+> -    /*
+> -     * Regardless of running in UPT or legacy mode, the guest graphics
+> -     * driver may attempt to use stolen memory, however only legacy mode
+> -     * has BIOS support for reserving stolen memory in the guest VM.
+> -     * Emulate the GMCH register in all cases and zero out the stolen
+> -     * memory size here. Legacy mode may request allocation and re-write
+> -     * this below.
+> -     */
+> -    gmch = vfio_pci_read_config(&vdev->pdev, IGD_GMCH, 4);
+> -    gmch &= ~((gen < 8 ? 0x1f : 0xff) << (gen < 8 ? 3 : 8));
+> -
+> -    /* GMCH is read-only, emulated */
+> -    pci_set_long(vdev->pdev.config + IGD_GMCH, gmch);
+> -    pci_set_long(vdev->pdev.wmask + IGD_GMCH, 0);
+> -    pci_set_long(vdev->emulated_config_bits + IGD_GMCH, ~0);
+> -
+>      /*
+> -     * This must be at address 00:02.0 for us to even onsider enabling
+> -     * legacy mode.  The vBIOS has dependencies on the PCI bus address.
+> +     * This must be an Intel VGA device at address 00:02.0 for us to even
+> +     * consider enabling legacy mode.  The vBIOS has dependencies on the
+> +     * PCI bus address.
+>       */
+> -    if (&vdev->pdev != pci_find_device(pci_device_root_bus(&vdev->pdev),
+> +    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, PCI_ANY_ID) ||
+> +        !vfio_is_vga(vdev) || nr != 4 ||
+> +        &vdev->pdev != pci_find_device(pci_device_root_bus(&vdev->pdev),
+>                                         0, PCI_DEVFN(0x2, 0))) {
+>          return;
+>      }
+> @@ -1425,6 +1394,18 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+>      }
+>  
+>      /*
+> +     * IGD is not a standard, they like to change their specs often.  We
+> +     * only attempt to support back to SandBridge and we hope that newer
+> +     * devices maintain compatibility with generation 8.
+> +     */
+> +    gen = igd_gen(vdev);
+> +    if (gen != 6 && gen != 8) {
+> +        error_report("IGD device %s is unsupported in legacy mode, "
+> +                     "try SandyBridge or newer", vdev->vbasedev.name);
+> +        return;
+> +    }
+> +
+> +    /*
+>       * Most of what we're doing here is to enable the ROM to run, so if
+>       * there's no ROM, there's no point in setting up this quirk.
+>       * NB. We only seem to get BIOS ROMs, so a UEFI VM would need CSM support.
+> @@ -1479,6 +1460,8 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+>          goto out;
+>      }
+>  
+> +    gmch = vfio_pci_read_config(&vdev->pdev, IGD_GMCH, 4);
+> +
+>      /*
+>       * If IGD VGA Disable is clear (expected) and VGA is not already enabled,
+>       * try to enable it.  Probably shouldn't be using legacy mode without VGA,
+> @@ -1549,11 +1532,12 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+>       * when IVD (IGD VGA Disable) is clear, but the claim is that it's unused,
+>       * so let's not waste VM memory for it.
+>       */
+> +    gmch &= ~((gen < 8 ? 0x1f : 0xff) << (gen < 8 ? 3 : 8));
+> +
+>      if (vdev->igd_gms) {
+>          if (vdev->igd_gms <= 0x10) {
+>              gms_mb = vdev->igd_gms * 32;
+>              gmch |= vdev->igd_gms << (gen < 8 ? 3 : 8);
+> -            pci_set_long(vdev->pdev.config + IGD_GMCH, gmch);
+>          } else {
+>              error_report("Unsupported IGD GMS value 0x%x", vdev->igd_gms);
+>              vdev->igd_gms = 0;
+> @@ -1573,6 +1557,11 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+>      fw_cfg_add_file(fw_cfg_find(), "etc/igd-bdsm-size",
+>                      bdsm_size, sizeof(*bdsm_size));
+>  
+> +    /* GMCH is read-only, emulated */
+> +    pci_set_long(vdev->pdev.config + IGD_GMCH, gmch);
+> +    pci_set_long(vdev->pdev.wmask + IGD_GMCH, 0);
+> +    pci_set_long(vdev->emulated_config_bits + IGD_GMCH, ~0);
+> +
+>      /* BDSM is read-write, emulated.  The BIOS needs to be able to write it */
+>      pci_set_long(vdev->pdev.config + IGD_BDSM, 0);
+>      pci_set_long(vdev->pdev.wmask + IGD_BDSM, ~0);
