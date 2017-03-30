@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58765)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ctZv8-0002cu-25
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:15:27 -0400
+	(envelope-from <armbru@redhat.com>) id 1ctZvD-0002jd-5c
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:15:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ctZv7-0002V1-10
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:15:22 -0400
+	(envelope-from <armbru@redhat.com>) id 1ctZvA-0002bG-Os
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:15:27 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 30 Mar 2017 15:15:03 +0200
-Message-Id: <1490879707-6060-7-git-send-email-armbru@redhat.com>
+Date: Thu, 30 Mar 2017 15:15:04 +0200
+Message-Id: <1490879707-6060-8-git-send-email-armbru@redhat.com>
 In-Reply-To: <1490879707-6060-1-git-send-email-armbru@redhat.com>
 References: <1490879707-6060-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [RFC v2 for-2.9 06/10] qapi-schema: SocketAddressFlat
- variants 'vsock' and 'fd'
+Subject: [Qemu-devel] [RFC v2 for-2.9 07/10] sockets: New helper
+ socket_address_crumple()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,73 +23,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, pbonzini@redhat.com
 
-Note that the new variants are impossible in qemu_gluster_glfs_init(),
-because the gconf->server can only come from qemu_gluster_parse_uri()
-or qemu_gluster_parse_json(), and neither can create anything but
-'inet' or 'unix'.
+SocketAddress is a simple union, and simple unions are awkward: they
+have their variant members wrapped in a "data" object on the wire, and
+require additional indirections in C.  I intend to limit its use to
+existing external interfaces.  New ones should use SocketAddressFlat.
+I further intend to convert all internal interfaces to
+SocketAddressFlat.  This helper should go away then.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/gluster.c  |  2 ++
- qapi-schema.json | 19 ++++++++-----------
- 2 files changed, 10 insertions(+), 11 deletions(-)
+ include/qemu/sockets.h | 11 +++++++++++
+ util/qemu-sockets.c    | 29 +++++++++++++++++++++++++++++
+ 2 files changed, 40 insertions(+)
 
-diff --git a/block/gluster.c b/block/gluster.c
-index fb0aafe..cf29b5f 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -429,6 +429,8 @@ static struct glfs *qemu_gluster_glfs_init(BlockdevOptionsGluster *gconf,
-                                    server->value->u.inet.host,
-                                    (int)port);
-             break;
-+        case SOCKET_ADDRESS_FLAT_TYPE_VSOCK:
-+        case SOCKET_ADDRESS_FLAT_TYPE_FD:
-         default:
-             abort();
-         }
-diff --git a/qapi-schema.json b/qapi-schema.json
-index b921994..927c9a2 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -4144,7 +4144,7 @@
- # Since: 2.9
- ##
- { 'enum': 'SocketAddressFlatType',
--  'data': [ 'unix', 'inet' ] }
-+  'data': [ 'inet', 'unix', 'vsock', 'fd' ] }
+diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
+index 5f1bab9..cef05a5 100644
+--- a/include/qemu/sockets.h
++++ b/include/qemu/sockets.h
+@@ -119,4 +119,15 @@ SocketAddress *socket_remote_address(int fd, Error **errp);
+  */
+ char *socket_address_to_string(struct SocketAddress *addr, Error **errp);
  
- ##
- # @SocketAddressFlat:
-@@ -4153,22 +4153,19 @@
- #
- # @type:       Transport type
- #
--# This is similar to SocketAddress, only distinction:
--#
--# 1. SocketAddressFlat is a flat union, SocketAddress is a simple union.
--#    A flat union is nicer than simple because it avoids nesting
--#    (i.e. more {}) on the wire.
--#
--# 2. SocketAddressFlat supports only types 'unix' and 'inet', because
--#    that's what its current users need.
-+# This is just like SocketAddress, except it's a flat union rather
-+# than a simple union.  Nicer because it avoids nesting (i.e. more {})
-+# on the wire.
- #
- # Since: 2.9
- ##
- { 'union': 'SocketAddressFlat',
-   'base': { 'type': 'SocketAddressFlatType' },
-   'discriminator': 'type',
--  'data': { 'unix': 'UnixSocketAddress',
--            'inet': 'InetSocketAddress' } }
-+  'data': { 'inet': 'InetSocketAddress',
-+            'unix': 'UnixSocketAddress',
-+            'vsock': 'VsockSocketAddress',
-+            'fd': 'String' } }
- 
- ##
- # @getfd:
++/**
++ * socket_address_crumple:
++ * @addr_flat: the socket addres to crumple
++ *
++ * Convert SocketAddressFlat to SocketAddress.  Caller is responsible
++ * for freeing with qapi_free_SocketAddress().
++ *
++ * Returns: the argument converted to SocketAddress.
++ */
++SocketAddress *socket_address_crumple(SocketAddressFlat *addr_flat);
++
+ #endif /* QEMU_SOCKETS_H */
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index 4ae37bd..03a2a47 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -25,6 +25,7 @@
+ #include "qapi/error.h"
+ #include "qemu/sockets.h"
+ #include "qemu/main-loop.h"
++#include "qapi/clone-visitor.h"
+ #include "qapi/qobject-input-visitor.h"
+ #include "qapi/qobject-output-visitor.h"
+ #include "qapi-visit.h"
+@@ -1341,3 +1342,31 @@ char *socket_address_to_string(struct SocketAddress *addr, Error **errp)
+     }
+     return buf;
+ }
++
++SocketAddress *socket_address_crumple(SocketAddressFlat *addr_flat)
++{
++    SocketAddress *addr = g_new(SocketAddress, 1);
++
++    addr->type = addr_flat->type;
++    switch (addr->type) {
++    case SOCKET_ADDRESS_FLAT_TYPE_INET:
++        addr->u.inet.data = QAPI_CLONE(InetSocketAddress,
++                                        &addr_flat->u.inet);
++        break;
++    case SOCKET_ADDRESS_FLAT_TYPE_UNIX:
++        addr->u.q_unix.data = QAPI_CLONE(UnixSocketAddress, &
++                                          addr_flat->u.q_unix);
++        break;
++    case SOCKET_ADDRESS_FLAT_TYPE_VSOCK:
++        addr->u.vsock.data = QAPI_CLONE(VsockSocketAddress,
++                                         &addr_flat->u.vsock);
++        break;
++    case SOCKET_ADDRESS_FLAT_TYPE_FD:
++        addr->u.fd.data = QAPI_CLONE(String, &addr_flat->u.fd);
++        break;
++    default:
++        abort();
++    }
++
++    return addr;
++}
 -- 
 2.7.4
