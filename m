@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ctTu0-0003GM-O7
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 02:49:52 -0400
+	(envelope-from <armbru@redhat.com>) id 1ctTwO-00043k-Em
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 02:52:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ctTtv-00060Q-CL
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 02:49:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45014)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ctTtv-0005yP-0Q
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 02:49:43 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 96DE780463
-	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 06:49:41 +0000 (UTC)
-Date: Thu, 30 Mar 2017 14:49:34 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170330064934.GG20667@pxdev.xzpeter.org>
-References: <20170323204544.12015-1-quintela@redhat.com>
-	<20170323204544.12015-30-quintela@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1ctTwM-0000tN-TX
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 02:52:16 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
+	<1490805920-17029-5-git-send-email-armbru@redhat.com>
+	<5e1790e7-5e12-adc6-a049-ca004682025d@redhat.com>
+Date: Thu, 30 Mar 2017 08:52:05 +0200
+In-Reply-To: <5e1790e7-5e12-adc6-a049-ca004682025d@redhat.com> (Max Reitz's
+	message of "Wed, 29 Mar 2017 21:33:35 +0200")
+Message-ID: <87fuhvfe96.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170323204544.12015-30-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 29/51] ram: Move last_req_rb to RAMState
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [for-2.9 4/8] block: Document -drive problematic
+ code and bugs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,63 +25,248 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, pbonzini@redhat.com, namei.unix@gmail.com
 
-On Thu, Mar 23, 2017 at 09:45:22PM +0100, Juan Quintela wrote:
-> It was on MigrationState when it is only used inside ram.c for
-> postcopy.  Problem is that we need to access it without being able to
-> pass it RAMState directly.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  include/migration/migration.h | 2 --
->  migration/migration.c         | 1 -
->  migration/ram.c               | 7 +++++--
->  3 files changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/include/migration/migration.h b/include/migration/migration.h
-> index 84cef4b..e032fb0 100644
-> --- a/include/migration/migration.h
-> +++ b/include/migration/migration.h
-> @@ -189,8 +189,6 @@ struct MigrationState
->      /* Queue of outstanding page requests from the destination */
->      QemuMutex src_page_req_mutex;
->      QSIMPLEQ_HEAD(src_page_requests, MigrationSrcPageRequest) src_page_requests;
-> -    /* The RAMBlock used in the last src_page_request */
-> -    RAMBlock *last_req_rb;
->      /* The semaphore is used to notify COLO thread that failover is finished */
->      QemuSemaphore colo_exit_sem;
->  
-> diff --git a/migration/migration.c b/migration/migration.c
-> index e532430..b220941 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1118,7 +1118,6 @@ MigrationState *migrate_init(const MigrationParams *params)
->      s->postcopy_after_devices = false;
->      s->postcopy_requests = 0;
->      s->migration_thread_running = false;
-> -    s->last_req_rb = NULL;
->      error_free(s->error);
->      s->error = NULL;
->  
-> diff --git a/migration/ram.c b/migration/ram.c
-> index dd5a453..325a0f3 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -203,6 +203,8 @@ struct RAMState {
->      QemuMutex bitmap_mutex;
->      /* Ram Bitmap protected by RCU */
->      RAMBitmap *ram_bitmap;
-> +    /* The RAMBlock used in the last src_page_request */
-                                                        ^ "s" missing
+Max Reitz <mreitz@redhat.com> writes:
 
-Besides:
+> On 29.03.2017 18:45, Markus Armbruster wrote:
+>> -blockdev and blockdev_add convert their arguments via QObject to
+>> BlockdevOptions for qmp_blockdev_add(), which converts them back to
+>> QObject, then to a flattened QDict.  The QDict's members are typed
+>> according to the QAPI schema.
+>> 
+>> -drive converts its argument via QemuOpts to a (flat) QDict.  This
+>> QDict's members are all QString.
+>> 
+>> Thus, the QType of a flat QDict member depends on whether it comes
+>> from -drive or -blockdev/blockdev_add, except when the QAPI type maps
+>> to QString, which is the case for 'str' and enumeration types.
+>> 
+>> The block layer core extracts generic configuration from the flat
+>> QDict, and the block driver extracts driver-specific configuration.
+>> 
+>> Both commonly do so by converting (parts of) the flat QDict to
+>> QemuOpts, which turns all values into strings.  Not exactly elegant,
+>> but correct.
+>> 
+>> However, A few places access the flat QDict directly:
+>> 
+>> * Most of them access members that are always QString.  Correct.
+>> 
+>> * bdrv_open_inherit() accesses a boolean, carefully.  Correct.
+>> 
+>> * nfs_config() uses a QObject input visitor.  Correct only because the
+>>   visited type contains nothing but QStrings.
+>> 
+>> * nbd_config() and ssh_config() use a QObject input visitor, and the
+>>   visited types contain non-QStrings: InetSocketAddress members
+>>   @numeric, @to, @ipv4, @ipv6.  -drive works as long as you don't try
+>>   to use them (they're all optional).  @to is ignored anyway.
+>> 
+>>   Reproducer:
+>>   -drive driver=ssh,server.host=h,server.port=22,server.ipv4,path=p
+>>   -drive driver=nbd,server.type=inet,server.data.host=h,server.data.port=22,server.data.ipv4
+>>   both fail with "Invalid parameter type for 'data.ipv4', expected: boolean"
+>> 
+>> Add suitable comments to all these places.  Mark the buggy ones FIXME.
+>> 
+>> "Fortunately", -drive's driver-specific options are entirely
+>> undocumented.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  block.c            | 41 +++++++++++++++++++++++++++++++++++++++--
+>>  block/file-posix.c |  6 ++++++
+>>  block/nbd.c        |  8 ++++++++
+>>  block/nfs.c        |  7 +++++++
+>>  block/rbd.c        |  6 ++++++
+>>  block/ssh.c        |  8 ++++++++
+>>  6 files changed, 74 insertions(+), 2 deletions(-)
+>
+> I have to say I don't like how the comments in block.c are completely
+> generic.
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+I'm afraid they reflect my rather "generic" understanding of block.c.
 
-> +    RAMBlock *last_req_rb;
->  };
->  typedef struct RAMState RAMState;
+>> diff --git a/block.c b/block.c
+>> index 6e906ec..b3ce23f 100644
+>> --- a/block.c
+>> +++ b/block.c
+>> @@ -1157,6 +1157,12 @@ static int bdrv_open_common(BlockDriverState *bs, BlockBackend *file,
+>>      if (file != NULL) {
+>>          filename = blk_bs(file)->filename;
+>>      } else {
+>> +       /*
+>> +        * Caution: direct use of non-string @options members is
+>> +        * problematic.  When they come from -blockdev or blockdev_add,
+>> +        * members are typed according to the QAPI schema, but when
+>> +        * they come from -drive, they're all QString.
+>> +        */
+>>          filename = qdict_get_try_str(options, "filename");
+>
+> For instance this one: Well, yes, for -drive, this will always be a
+> QString. Which is OK, because that's what we're trying to get.
+>
+> The comment makes this confusing, IMO. If you really want a comment here
+> it should at least contain a mention that it's totally fine in practice
+> here. Calling the code "problematic" sounds like this could blow up when
+> it reality it can't; and I would think it actually is the most sane
+> solution given the current state of the whole infrastructure (i.e. how
+> -drive and -blockdev work).
 
--- peterx
+Well, if it could blow up, I'd call it wrong, and start the comment with
+FIXME :)
+
+Even though qdict_get_try_str() is indeed fine, I propose to have a
+comment, because someone with less detailed understanding of how the
+configuration machine works (me, until yesterday, and probably again
+after next month) could conclude that qdict_get_try_bool() would be just
+as fine.
+
+What about:
+
+   /*
+    * Caution: while qdict_get_try_str() is fine, getting non-string
+    * types would require more care.  When @options come from -blockdev
+    * or blockdev_add, its members are typed according to the QAPI
+    * schema, but when they come from -drive, they're all QString.
+    */
+
+If you don't like this comment either, care to suggest one you do?
+
+> Same for all the other plain qdict_get_try_str() calls (in block.c, at
+> least).
+>
+>>      }
+>>  
+>> @@ -1324,6 +1330,12 @@ static int bdrv_fill_options(QDict **options, const char *filename,
+>>      BlockDriver *drv = NULL;
+>>      Error *local_err = NULL;
+>>  
+>> +    /*
+>> +     * Caution: direct use of non-string @options members is
+>> +     * problematic.  When they come from -blockdev or blockdev_add,
+>> +     * members are typed according to the QAPI schema, but when they
+>> +     * come from -drive, they're all QString.
+>> +     */
+>>      drvname = qdict_get_try_str(*options, "driver");
+>>      if (drvname) {
+>>          drv = bdrv_find_format(drvname);
+>> @@ -1358,6 +1370,7 @@ static int bdrv_fill_options(QDict **options, const char *filename,
+>>      }
+>>  
+>>      /* Find the right block driver */
+>> +    /* Direct use of @options members is problematic, see note above */
+>>      filename = qdict_get_try_str(*options, "filename");
+>>  
+>>      if (!drvname && protocol) {
+>> @@ -1987,6 +2000,12 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
+>>      qdict_extract_subqdict(parent_options, &options, bdref_key_dot);
+>>      g_free(bdref_key_dot);
+>>  
+>> +    /*
+>> +     * Caution: direct use of non-string @parent_options members is
+>> +     * problematic.  When they come from -blockdev or blockdev_add,
+>> +     * members are typed according to the QAPI schema, but when they
+>> +     * come from -drive, they're all QString.
+>> +     */
+>>      reference = qdict_get_try_str(parent_options, bdref_key);
+>>      if (reference || qdict_haskey(options, "file.filename")) {
+>>          backing_filename[0] = '\0';
+>> @@ -2059,6 +2078,12 @@ bdrv_open_child_bs(const char *filename, QDict *options, const char *bdref_key,
+>>      qdict_extract_subqdict(options, &image_options, bdref_key_dot);
+>>      g_free(bdref_key_dot);
+>>  
+>> +    /*
+>> +     * Caution: direct use of non-string @options members is
+>> +     * problematic.  When they come from -blockdev or blockdev_add,
+>> +     * members are typed according to the QAPI schema, but when they
+>> +     * come from -drive, they're all QString.
+>> +     */
+>>      reference = qdict_get_try_str(options, bdref_key);
+>>      if (!filename && !reference && !qdict_size(image_options)) {
+>>          if (!allow_none) {
+>> @@ -2275,8 +2300,11 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+>>      }
+>>  
+>>      /* Set the BDRV_O_RDWR and BDRV_O_ALLOW_RDWR flags.
+>> -     * FIXME: we're parsing the QDict to avoid having to create a
+>> -     * QemuOpts just for this, but neither option is optimal. */
+>> +     * Caution: direct use of non-string @options members is
+>> +     * problematic.  When they come from -blockdev or blockdev_add,
+>> +     * members are typed according to the QAPI schema, but when they
+>> +     * come from -drive, they're all QString.
+>> +     */
+>
+> Now this one should mention that this is the very reason why we are
+> attempting parsing the QDict string before getting a boolean value directly.
+
+What about:
+
+        /*
+         * Set the BDRV_O_RDWR and BDRV_O_ALLOW_RDWR flags.
+         * Caution: getting a boolean member of @options requires care.
+         * When @options come from -blockdev or blockdev_add, members
+         * are typed according to the QAPI schema, but when they come
+         * from -drive, they're all QString.
+         */
+
+>>      if (g_strcmp0(qdict_get_try_str(options, BDRV_OPT_READ_ONLY), "on") &&
+>>          !qdict_get_try_bool(options, BDRV_OPT_READ_ONLY, false)) {
+>>          flags |= (BDRV_O_RDWR | BDRV_O_ALLOW_RDWR);
+>> @@ -2298,6 +2326,7 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+>>      options = qdict_clone_shallow(options);
+>>  
+>>      /* Find the right image format driver */
+>> +    /* Direct use of @options members is problematic, see note above */
+>>      drvname = qdict_get_try_str(options, "driver");
+>>      if (drvname) {
+>>          drv = bdrv_find_format(drvname);
+>> @@ -2309,6 +2338,7 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+>>  
+>>      assert(drvname || !(flags & BDRV_O_PROTOCOL));
+>>  
+>> +    /* Direct use of @options members is problematic, see note above */
+>>      backing = qdict_get_try_str(options, "backing");
+>>      if (backing && *backing == '\0') {
+>>          flags |= BDRV_O_NO_BACKING;
+>> @@ -2787,6 +2817,13 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+>>          do {
+>>              QString *new_obj = qobject_to_qstring(entry->value);
+>>              const char *new = qstring_get_str(new_obj);
+>> +           /*
+>> +            * Caution: direct use of non-string bs->options members is
+>> +            * problematic.  When they come from -blockdev or
+>> +            * blockdev_add, members are typed according to the QAPI
+>> +            * schema, but when they come from -drive, they're all
+>> +            * QString.
+>> +            */
+>>              const char *old = qdict_get_try_str(reopen_state->bs->options,
+>>                                                  entry->key);
+>>  
+>> diff --git a/block/file-posix.c b/block/file-posix.c
+>> index 0841a08..738541e 100644
+>> --- a/block/file-posix.c
+>> +++ b/block/file-posix.c
+>> @@ -2193,6 +2193,12 @@ static int hdev_open(BlockDriverState *bs, QDict *options, int flags,
+>>      int ret;
+>>  
+>>  #if defined(__APPLE__) && defined(__MACH__)
+>> +    /*
+>> +     * Caution: direct use of non-string @options members is
+>> +     * problematic.  When they come from -blockdev or blockdev_add,
+>> +     * members are typed according to the QAPI schema, but when they
+>> +     * come from -drive, they're all QString.
+>> +     */
+>>      const char *filename = qdict_get_str(options, "filename");
+>
+> This comment I'm very much OK with, though, because we should not
+> retrieve runtime options directly from the QDict.
+>
+> (Same for the comments in the other block drivers.)
+>
+> Max
+>
+>>      char bsd_path[MAXPATHLEN] = "";
+>>      bool error_occurred = false;
