@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ctbYF-0008Mp-Q7
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 10:59:52 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1ctbZL-0000bx-Gw
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:01:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ctbYF-0004Bt-1Q
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 10:59:51 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1490879707-6060-1-git-send-email-armbru@redhat.com>
-	<1490879707-6060-7-git-send-email-armbru@redhat.com>
-	<88188f21-a5b3-2e0f-99f1-66b13d772b96@redhat.com>
-Date: Thu, 30 Mar 2017 16:59:43 +0200
-In-Reply-To: <88188f21-a5b3-2e0f-99f1-66b13d772b96@redhat.com> (Eric Blake's
-	message of "Thu, 30 Mar 2017 09:36:40 -0500")
-Message-ID: <87mvc2zu74.fsf@dusky.pond.sub.org>
+	(envelope-from <ehabkost@redhat.com>) id 1ctbZK-0004vm-Lu
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:00:59 -0400
+Date: Thu, 30 Mar 2017 12:00:48 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170330150048.GL3709@thinpad.lan.raisama.net>
+References: <1490175166-19785-1-git-send-email-he.chen@linux.intel.com>
+	<20170323102955.5e2d1c65@nial.brq.redhat.com>
+	<20170329085000.GA20377@he>
+	<20170329134458.793e882d@nial.brq.redhat.com>
+	<20170329123038.u6ebwn2xazbzr4nv@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC v2 for-2.9 06/10] qapi-schema:
- SocketAddressFlat variants 'vsock' and 'fd'
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170329123038.u6ebwn2xazbzr4nv@kamzik.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] Allow setting NUMA distance for
+ different NUMA nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,37 +27,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, namei.unix@gmail.com
+To: Andrew Jones <drjones@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, He Chen <he.chen@linux.intel.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-arm@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Eric Blake <eblake@redhat.com> writes:
+On Wed, Mar 29, 2017 at 02:30:38PM +0200, Andrew Jones wrote:
+> On Wed, Mar 29, 2017 at 01:44:58PM +0200, Igor Mammedov wrote:
+> > On Wed, 29 Mar 2017 16:50:00 +0800
+> > He Chen <he.chen@linux.intel.com> wrote:
+> > > > > +static void default_numa_distance(void)
+> > > > > +{
+> > > > > +    int src, dst;
+> > > > > +  
+> > > > fill in defaults only if there weren't any '-numa dist' on CLI
+> > > > and refuse to start if partial filled table were explicitly provided on CLI
+> > > >   
+> > > I am afraid that I may have a bad function name here, fill_numa_distance
+> > > might be a better name?
+> > > 
+> > > Also, since the distance can be asymmetric, IMHO, providing a partial
+> > > filled table looks fine. If we set many NUMA nodes e.g. 8 nodes for
+> > > guest, the whole filled table would require many command lines which
+> > > might be inconvenient and less flexible.
+> > asymmetric doesn't imply sparse, so one has to specify full matrix
+> > it might be inconvenient /long/ but is very flexible.
+> 
+> This makes me realize that a user only inputting one of A -> B or B -> A
+> command line inputs doesn't imply symmetry.  It could be that the user
+> just forgot to input the opposite.  To avoid the ambiguity we either need
+> to force both to be input (as it was before I suggested otherwise), or
+> add a '-numa symmetric' type of property to enable the shortcut.  I guess
+> we should just avoid the shortcut, at least for now.
 
-> On 03/30/2017 08:15 AM, Markus Armbruster wrote:
->> Note that the new variants are impossible in qemu_gluster_glfs_init(),
->> because the gconf->server can only come from qemu_gluster_parse_uri()
->> or qemu_gluster_parse_json(), and neither can create anything but
->> 'inet' or 'unix'.
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> Reviewed-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  block/gluster.c  |  2 ++
->>  qapi-schema.json | 19 ++++++++-----------
->>  2 files changed, 10 insertions(+), 11 deletions(-)
->
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->
->
->> -# 2. SocketAddressFlat supports only types 'unix' and 'inet', because
->> -#    that's what its current users need.
->> +# This is just like SocketAddress, except it's a flat union rather
->> +# than a simple union.  Nicer because it avoids nesting (i.e. more {})
->> +# on the wire.
->
-> I know that you are explaining that it is "nesting" which means "more
-> {}", but it is SocketAddress that has the extra {}, not
-> SocketAddressFlat.  I wonder if it reads any better as:
->
-> Nicer because it avoids nesting on the wire (i.e. this form has fewer {}).
+Is protecting the user from one very specific (and very rare[1])
+mistake a good reason for making the automatic default less
+useful? Requiring an explicit '-numa symmetric' option to enable
+the automatic default seems to defeat the purpose of having an
+automatic default, to me.
 
-Sold!  (Except I'm peeling off the parenthesis)
+I bet people would just specify the distances for both
+directions, instead of having to read the documentation for
+"-numa symmetric" to be sure if that's exactly what they want.
+
+[1] I mean: forgetting an option isn't rare, but asymmetric NUMA
+    distances are so rare that most people who reviewed those
+    patches were surprised when they learned that the specs allow
+    asymmetric distances.
+
+-- 
+Eduardo
