@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ctZyL-0005IN-ST
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:18:42 -0400
+	(envelope-from <vyasevic@redhat.com>) id 1cta1r-0008Cz-4u
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:22:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ctZyH-0005wx-E0
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:18:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54934)
+	(envelope-from <vyasevic@redhat.com>) id 1cta1n-0007pA-14
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:22:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:3057)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ctZyH-0005wc-4u
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:18:37 -0400
-References: <149086238428.3338.4129463785289801461.stgit@bahia.lan>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5402615e-7085-4cac-1eb9-15f1f62b8c73@redhat.com>
-Date: Thu, 30 Mar 2017 08:18:34 -0500
+	(Exim 4.71) (envelope-from <vyasevic@redhat.com>) id 1cta1m-0007oF-Oc
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:22:14 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A9ED77AE92
+	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 13:22:13 +0000 (UTC)
+Reply-To: vyasevic@redhat.com
+References: <1490818790-3100-1-git-send-email-vyasevic@redhat.com>
+	<20170329233031-mutt-send-email-mst@kernel.org>
+From: Vlad Yasevich <vyasevic@redhat.com>
+Message-ID: <1bb924df-e020-ce89-ab77-8f09136fd6fa@redhat.com>
+Date: Thu, 30 Mar 2017 09:22:07 -0400
 MIME-Version: 1.0
-In-Reply-To: <149086238428.3338.4129463785289801461.stgit@bahia.lan>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="fL8oJHq5Wo9v2KPgbKqGc0HfJPsKvTBQ4"
-Subject: Re: [Qemu-devel] [PATCH for-2.9?] 9pfs: fix multiple flush for same
- request
+In-Reply-To: <20170329233031-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] virtio-net: consolidate guest announcement
+ with qemu_announce_self
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,90 +35,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: Li Qiang <liqiang6-s@360.cn>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, gveitmic@redhat.com, dgilbert@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fL8oJHq5Wo9v2KPgbKqGc0HfJPsKvTBQ4
-From: Eric Blake <eblake@redhat.com>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: Li Qiang <liqiang6-s@360.cn>
-Message-ID: <5402615e-7085-4cac-1eb9-15f1f62b8c73@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9?] 9pfs: fix multiple flush for same
- request
-References: <149086238428.3338.4129463785289801461.stgit@bahia.lan>
-In-Reply-To: <149086238428.3338.4129463785289801461.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 03/29/2017 04:35 PM, Michael S. Tsirkin wrote:
+> On Wed, Mar 29, 2017 at 04:19:50PM -0400, Vladislav Yasevich wrote:
+>> virtio announcements seem to run on its own timer with it's own
+>> repetition loop and are invoked separately from qemu_announce_self.
+>> This patch consolidates announcements into a single location and
+>> allows other nics to provide it's own
+> 
+> their own
+> 
+>> announcement capabilities, if
+>> necessary.
+>>
+>> This is also usefull
+> 
+> or useful?
+> 
+>> in support of exposing qemu_announce_self through
+>> qmp/hmp.
+> 
+> I'm guessing this is the real reason for the change.
+> How is it helpful for that? Pls clarify in the commit log.
 
-On 03/30/2017 03:26 AM, Greg Kurz wrote:
-> If a client tries to flush the same outstanding request several times, =
-only
-> the first flush completes. Subsequent ones keep waiting for the request=
+Ok
 
-> completion in v9fs_flush() and, therefore, leak a PDU. This will cause =
-QEMU
-> to hang when draining active PDUs the next time the device is reset.
+> 
+>> Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
+>> ---
+>>  hw/net/virtio-net.c            | 30 ++++++++----------------------
+>>  include/hw/virtio/virtio-net.h |  2 --
+>>  include/net/net.h              |  2 ++
+>>  migration/savevm.c             |  6 ++++++
+>>  4 files changed, 16 insertions(+), 24 deletions(-)
+>>
+>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+>> index c321680..6e9ce4f 100644
+>> --- a/hw/net/virtio-net.c
+>> +++ b/hw/net/virtio-net.c
+>> @@ -110,14 +110,16 @@ static bool virtio_net_started(VirtIONet *n, uint8_t status)
+>>          (n->status & VIRTIO_NET_S_LINK_UP) && vdev->vm_running;
+>>  }
+>>  
+>> -static void virtio_net_announce_timer(void *opaque)
+>> +static void virtio_net_announce(NetClientState *nc)
+>>  {
+>> -    VirtIONet *n = opaque;
+>> +    VirtIONet *n = qemu_get_nic_opaque(nc);
+>>      VirtIODevice *vdev = VIRTIO_DEVICE(n);
+>>  
+>> -    n->announce_counter--;
+>> -    n->status |= VIRTIO_NET_S_ANNOUNCE;
+>> -    virtio_notify_config(vdev);
+>> +    if (virtio_vdev_has_feature(vdev, VIRTIO_NET_F_GUEST_ANNOUNCE) &&
+>> +        virtio_vdev_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ)) {
+>> +            n->status |= VIRTIO_NET_S_ANNOUNCE;
+>> +            virtio_notify_config(vdev);
+>> +    }
+>>  }
+>>  
+>>  static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
+>> @@ -427,8 +429,6 @@ static void virtio_net_reset(VirtIODevice *vdev)
+>>      n->nobcast = 0;
+>>      /* multiqueue is disabled by default */
+>>      n->curr_queues = 1;
+>> -    timer_del(n->announce_timer);
+>> -    n->announce_counter = 0;
+>>      n->status &= ~VIRTIO_NET_S_ANNOUNCE;
+>>  
+>>      /* Flush any MAC and VLAN filter table state */
+>> @@ -868,11 +868,6 @@ static int virtio_net_handle_announce(VirtIONet *n, uint8_t cmd,
+>>      if (cmd == VIRTIO_NET_CTRL_ANNOUNCE_ACK &&
+>>          n->status & VIRTIO_NET_S_ANNOUNCE) {
+>>          n->status &= ~VIRTIO_NET_S_ANNOUNCE;
+>> -        if (n->announce_counter) {
+>> -            timer_mod(n->announce_timer,
+>> -                      qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
+>> -                      self_announce_delay(n->announce_counter));
+>> -        }
+>>          return VIRTIO_NET_OK;
+>>      } else {
+>>          return VIRTIO_NET_ERR;
+> 
+> you will notice that this runs at VM speeds with QEMU_CLOCK_VIRTUAL,
+> while the self announce you are tying this to runs with
+> QEMU_CLOCK_REALTIME.
+> 
+> So this switch seems wrong to me: by the time VM is started
+> on destination all timers might have expired.
+> 
 
-Since this fixes a hang, is it 2.9 material?
+That explains what I am seeing now.  Hmm... may be combining them this way
+isn't the right approach.  I think I'll leave RARPs alone and export an ability
+to start the a nic provided announce feature.
 
->=20
-> Let have each flush request wake up the next one if any. The last waite=
-r
-> frees the cancelled PDU.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/9pfs/9p.c |    6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->=20
+Then Germano's qmp command would be able to call this one if available and the old
+one if not.  That way, on user-triggered announcements, we wouldn't need to do the
+RARPs, if a better announcement capability is present.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+That way current behavior is preserved for migrations.
 
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index 48babce836b6..ef47a0a5ad6f 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -2387,8 +2387,10 @@ static void coroutine_fn v9fs_flush(void *opaque=
-)
->           * Wait for pdu to complete.
->           */
->          qemu_co_queue_wait(&cancel_pdu->complete, NULL);
-> -        cancel_pdu->cancelled =3D 0;
-> -        pdu_free(cancel_pdu);
-> +        if (!qemu_co_queue_next(&cancel_pdu->complete)) {
-> +            cancel_pdu->cancelled =3D 0;
-> +            pdu_free(cancel_pdu);
-> +        }
->      }
->      pdu_complete(pdu, 7);
->  }
->=20
->=20
->=20
+Thanks
+-vlad
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---fL8oJHq5Wo9v2KPgbKqGc0HfJPsKvTBQ4
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY3QWqAAoJEKeha0olJ0Nqa3QH/jYvz/JGtinPmnKxW/6heiEe
-pUt1GHhymZj4PPeoUhavc0pct2jhR4KtLiqRofD1nUiWre8cR9t1pni3Ja3ylwe5
-Bq1WeKAHRvPaqU+2ZjMdlEHAA5yzbv6SCm1XbDi9ns0YsbJZLD7BPIykZysJkoRM
-TAymJ0Tey9V3CVe+H1mCdQjDMn2OWUVW2ZWMCthnHCnSgijcsApmb8ELL6uGRof1
-7w95gVz17tb87mTFLfkR/oa7KRo+VZ+TpdaHeI2EvLnzYYFnReSpA2tXViP+qKhL
-c3PzSJiUEXZqAej+3dBSl1F3eGZ9DzJzwwjlUl6WwvoCnsaObN/kOatzY6ctIpo=
-=C5Mv
------END PGP SIGNATURE-----
-
---fL8oJHq5Wo9v2KPgbKqGc0HfJPsKvTBQ4--
+> 
+>> @@ -1609,12 +1604,6 @@ static int virtio_net_post_load_device(void *opaque, int version_id)
+>>          qemu_get_subqueue(n->nic, i)->link_down = link_down;
+>>      }
+>>  
+>> -    if (virtio_vdev_has_feature(vdev, VIRTIO_NET_F_GUEST_ANNOUNCE) &&
+>> -        virtio_vdev_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ)) {
+>> -        n->announce_counter = SELF_ANNOUNCE_ROUNDS;
+>> -        timer_mod(n->announce_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL));
+>> -    }
+>> -
+>>      return 0;
+>>  }
+>>  
+>> @@ -1829,6 +1818,7 @@ static NetClientInfo net_virtio_info = {
+>>      .receive = virtio_net_receive,
+>>      .link_status_changed = virtio_net_set_link_status,
+>>      .query_rx_filter = virtio_net_query_rxfilter,
+>> +    .announce = virtio_net_announce,
+>>  };
+>>  
+>>  static bool virtio_net_guest_notifier_pending(VirtIODevice *vdev, int idx)
+>> @@ -1934,8 +1924,6 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+>>      qemu_macaddr_default_if_unset(&n->nic_conf.macaddr);
+>>      memcpy(&n->mac[0], &n->nic_conf.macaddr, sizeof(n->mac));
+>>      n->status = VIRTIO_NET_S_LINK_UP;
+>> -    n->announce_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL,
+>> -                                     virtio_net_announce_timer, n);
+>>  
+>>      if (n->netclient_type) {
+>>          /*
+>> @@ -1997,8 +1985,6 @@ static void virtio_net_device_unrealize(DeviceState *dev, Error **errp)
+>>          virtio_net_del_queue(n, i);
+>>      }
+>>  
+>> -    timer_del(n->announce_timer);
+>> -    timer_free(n->announce_timer);
+>>      g_free(n->vqs);
+>>      qemu_del_nic(n->nic);
+>>      virtio_cleanup(vdev);
+>> diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
+>> index 1eec9a2..0c597f4 100644
+>> --- a/include/hw/virtio/virtio-net.h
+>> +++ b/include/hw/virtio/virtio-net.h
+>> @@ -94,8 +94,6 @@ typedef struct VirtIONet {
+>>      char *netclient_name;
+>>      char *netclient_type;
+>>      uint64_t curr_guest_offloads;
+>> -    QEMUTimer *announce_timer;
+>> -    int announce_counter;
+>>      bool needs_vnet_hdr_swap;
+>>  } VirtIONet;
+>>  
+>> diff --git a/include/net/net.h b/include/net/net.h
+>> index 99b28d5..598f523 100644
+>> --- a/include/net/net.h
+>> +++ b/include/net/net.h
+>> @@ -64,6 +64,7 @@ typedef int (SetVnetLE)(NetClientState *, bool);
+>>  typedef int (SetVnetBE)(NetClientState *, bool);
+>>  typedef struct SocketReadState SocketReadState;
+>>  typedef void (SocketReadStateFinalize)(SocketReadState *rs);
+>> +typedef void (NetAnnounce)(NetClientState *);
+>>  
+>>  typedef struct NetClientInfo {
+>>      NetClientDriver type;
+>> @@ -84,6 +85,7 @@ typedef struct NetClientInfo {
+>>      SetVnetHdrLen *set_vnet_hdr_len;
+>>      SetVnetLE *set_vnet_le;
+>>      SetVnetBE *set_vnet_be;
+>> +    NetAnnounce *announce;
+>>  } NetClientInfo;
+>>  
+>>  struct NetClientState {
+>> diff --git a/migration/savevm.c b/migration/savevm.c
+>> index 3b19a4a..5c1d8dc 100644
+>> --- a/migration/savevm.c
+>> +++ b/migration/savevm.c
+>> @@ -113,9 +113,15 @@ static void qemu_announce_self_iter(NICState *nic, void *opaque)
+>>      int len;
+>>  
+>>      trace_qemu_announce_self_iter(qemu_ether_ntoa(&nic->conf->macaddr));
+>> +
+>>      len = announce_self_create(buf, nic->conf->macaddr.a);
+>>  
+>>      qemu_send_packet_raw(qemu_get_queue(nic), buf, len);
+>> +
+>> +    /* if the NIC provides it's own announcement support, use it as well */
+>> +    if (nic->ncs->info->announce) {
+>> +        nic->ncs->info->announce(nic->ncs);
+>> +    }
+>>  }
+> 
+> 
+> Can we switch existing qemu announcements to QEMU_CLOCK_VIRTUAL?
+> 
+> It's an interesting question, and I'm not sure.
+> 
+> I note that this seems to interact interestingly with recent dgilbert's
+> patch sweaking announcement timing. Some coordination might be
+> helpful here.
+> 
+> 
+>>  
+>> -- 
+>> 2.7.4
