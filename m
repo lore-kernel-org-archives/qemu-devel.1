@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cte6Y-0004Nv-8P
+	(envelope-from <armbru@redhat.com>) id 1cte6Y-0004Ny-A7
 	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 13:43:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cte6W-0002za-Tn
+	(envelope-from <armbru@redhat.com>) id 1cte6X-00030W-AA
 	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 13:43:26 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 30 Mar 2017 19:43:11 +0200
-Message-Id: <1490895797-29094-4-git-send-email-armbru@redhat.com>
+Date: Thu, 30 Mar 2017 19:43:15 +0200
+Message-Id: <1490895797-29094-8-git-send-email-armbru@redhat.com>
 In-Reply-To: <1490895797-29094-1-git-send-email-armbru@redhat.com>
 References: <1490895797-29094-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 for-2.9 3/9] io vnc sockets: Clean up
- SocketAddressKind switches
+Subject: [Qemu-devel] [PATCH v3 for-2.9 7/9] sockets: New helper
+ socket_address_crumple()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,96 +23,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, pbonzini@redhat.com
 
-We have quite a few switches over SocketAddressKind.  Some have case
-labels for all enumeration values, others rely on a default label.
-Some abort when the value isn't a valid SocketAddressKind, others
-report an error then.
-
-Unify as follows.  Always provide case labels for all enumeration
-values, to clarify intent.  Abort when the value isn't a valid
-SocketAddressKind, because the program state is messed up then.
-
-Improve a few error messages while there.
+SocketAddress is a simple union, and simple unions are awkward: they
+have their variant members wrapped in a "data" object on the wire, and
+require additional indirections in C.  I intend to limit its use to
+existing external interfaces.  New ones should use SocketAddressFlat.
+I further intend to convert all internal interfaces to
+SocketAddressFlat.  This helper should go away then.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- io/dns-resolver.c   |  7 +++++--
- ui/vnc.c            | 18 ++++++++++++------
- util/qemu-sockets.c |  4 +---
- 3 files changed, 18 insertions(+), 11 deletions(-)
+ include/qemu/sockets.h | 11 +++++++++++
+ util/qemu-sockets.c    | 32 ++++++++++++++++++++++++++++++++
+ 2 files changed, 43 insertions(+)
 
-diff --git a/io/dns-resolver.c b/io/dns-resolver.c
-index 0ac6b23..a407075 100644
---- a/io/dns-resolver.c
-+++ b/io/dns-resolver.c
-@@ -164,9 +164,12 @@ int qio_dns_resolver_lookup_sync(QIODNSResolver *resolver,
-                                                 addrs,
-                                                 errp);
+diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
+index 5f1bab9..7842f6d 100644
+--- a/include/qemu/sockets.h
++++ b/include/qemu/sockets.h
+@@ -119,4 +119,15 @@ SocketAddress *socket_remote_address(int fd, Error **errp);
+  */
+ char *socket_address_to_string(struct SocketAddress *addr, Error **errp);
  
-+    case SOCKET_ADDRESS_KIND_FD:
-+        error_setg(errp, "Unsupported socket address type 'fd'");
-+        return -1;
++/**
++ * socket_address_crumple:
++ * @addr_flat: the socket address to crumple
++ *
++ * Convert SocketAddressFlat to SocketAddress.  Caller is responsible
++ * for freeing with qapi_free_SocketAddress().
++ *
++ * Returns: the argument converted to SocketAddress.
++ */
++SocketAddress *socket_address_crumple(SocketAddressFlat *addr_flat);
 +
-     default:
--        error_setg(errp, "Unknown socket address kind");
--        return -1;
-+        abort();
-     }
- }
- 
-diff --git a/ui/vnc.c b/ui/vnc.c
-index fe0a46a..0be77ba 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -129,10 +129,13 @@ static void vnc_init_basic_info(SocketAddress *addr,
-         info->family = NETWORK_ADDRESS_FAMILY_UNIX;
-         break;
- 
--    default:
--        error_setg(errp, "Unsupported socket kind %d",
--                   addr->type);
-+    case SOCKET_ADDRESS_KIND_VSOCK:
-+    case SOCKET_ADDRESS_KIND_FD:
-+        error_setg(errp, "Unsupported socket address type %s",
-+                   SocketAddressKind_lookup[addr->type]);
-         break;
-+    default:
-+        abort();
-     }
- 
-     return;
-@@ -411,10 +414,13 @@ VncInfo *qmp_query_vnc(Error **errp)
-             info->family = NETWORK_ADDRESS_FAMILY_UNIX;
-             break;
- 
--        default:
--            error_setg(errp, "Unsupported socket kind %d",
--                       addr->type);
-+        case SOCKET_ADDRESS_KIND_VSOCK:
-+        case SOCKET_ADDRESS_KIND_FD:
-+            error_setg(errp, "Unsupported socket address type %s",
-+                       SocketAddressKind_lookup[addr->type]);
-             goto out_error;
-+        default:
-+            abort();
-         }
- 
-         info->has_host = true;
+ #endif /* QEMU_SOCKETS_H */
 diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index 9b73681..4ae37bd 100644
+index 4ae37bd..21442c3 100644
 --- a/util/qemu-sockets.c
 +++ b/util/qemu-sockets.c
-@@ -1337,9 +1337,7 @@ char *socket_address_to_string(struct SocketAddress *addr, Error **errp)
-         break;
- 
-     default:
--        error_setg(errp, "socket family %d unsupported",
--                   addr->type);
--        return NULL;
-+        abort();
+@@ -25,6 +25,7 @@
+ #include "qapi/error.h"
+ #include "qemu/sockets.h"
+ #include "qemu/main-loop.h"
++#include "qapi/clone-visitor.h"
+ #include "qapi/qobject-input-visitor.h"
+ #include "qapi/qobject-output-visitor.h"
+ #include "qapi-visit.h"
+@@ -1341,3 +1342,34 @@ char *socket_address_to_string(struct SocketAddress *addr, Error **errp)
      }
      return buf;
  }
++
++SocketAddress *socket_address_crumple(SocketAddressFlat *addr_flat)
++{
++    SocketAddress *addr = g_new(SocketAddress, 1);
++
++    switch (addr_flat->type) {
++    case SOCKET_ADDRESS_FLAT_TYPE_INET:
++        addr->type = SOCKET_ADDRESS_KIND_INET;
++        addr->u.inet.data = QAPI_CLONE(InetSocketAddress,
++                                       &addr_flat->u.inet);
++        break;
++    case SOCKET_ADDRESS_FLAT_TYPE_UNIX:
++        addr->type = SOCKET_ADDRESS_KIND_UNIX;
++        addr->u.q_unix.data = QAPI_CLONE(UnixSocketAddress,
++                                         &addr_flat->u.q_unix);
++        break;
++    case SOCKET_ADDRESS_FLAT_TYPE_VSOCK:
++        addr->type = SOCKET_ADDRESS_KIND_VSOCK;
++        addr->u.vsock.data = QAPI_CLONE(VsockSocketAddress,
++                                        &addr_flat->u.vsock);
++        break;
++    case SOCKET_ADDRESS_FLAT_TYPE_FD:
++        addr->type = SOCKET_ADDRESS_KIND_FD;
++        addr->u.fd.data = QAPI_CLONE(String, &addr_flat->u.fd);
++        break;
++    default:
++        abort();
++    }
++
++    return addr;
++}
 -- 
 2.7.4
