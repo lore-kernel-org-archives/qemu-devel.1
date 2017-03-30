@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cthja-0003wi-Oi
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 17:36:00 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cthpx-0005Ht-Fr
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 17:42:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cthjZ-0007bU-Us
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 17:35:58 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cthpw-0002ja-C5
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 17:42:33 -0400
 References: <1490895797-29094-1-git-send-email-armbru@redhat.com>
-	<1490895797-29094-9-git-send-email-armbru@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <e6382858-ec9e-233e-74b4-4b3197a35039@redhat.com>
-Date: Thu, 30 Mar 2017 23:35:48 +0200
+Message-ID: <07160c3a-a9e5-ad4c-a600-5edbb5afa738@redhat.com>
+Date: Thu, 30 Mar 2017 23:42:21 +0200
 MIME-Version: 1.0
-In-Reply-To: <1490895797-29094-9-git-send-email-armbru@redhat.com>
+In-Reply-To: <1490895797-29094-1-git-send-email-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="7vaOxeCWl7EmEBtfqHPApEe2c6WDqxgIG"
-Subject: Re: [Qemu-devel] [PATCH v3 for-2.9 8/9] nbd: Tidy up blockdev-add
- interface
+	boundary="2D2ssDu2n63rQmrukSW9tIaIcWe49HegU"
+Subject: Re: [Qemu-devel] [PATCH v3 for-2.9 0/9] Fixes and cleanups around
+ SocketAddress
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,92 +28,91 @@ To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, eblake@redhat.com, pbonzini@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7vaOxeCWl7EmEBtfqHPApEe2c6WDqxgIG
+--2D2ssDu2n63rQmrukSW9tIaIcWe49HegU
 From: Max Reitz <mreitz@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp,
  namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, eblake@redhat.com,
  pbonzini@redhat.com
-Message-ID: <e6382858-ec9e-233e-74b4-4b3197a35039@redhat.com>
-Subject: Re: [PATCH v3 for-2.9 8/9] nbd: Tidy up blockdev-add interface
+Message-ID: <07160c3a-a9e5-ad4c-a600-5edbb5afa738@redhat.com>
+Subject: Re: [PATCH v3 for-2.9 0/9] Fixes and cleanups around SocketAddress
 References: <1490895797-29094-1-git-send-email-armbru@redhat.com>
- <1490895797-29094-9-git-send-email-armbru@redhat.com>
-In-Reply-To: <1490895797-29094-9-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
+In-Reply-To: <1490895797-29094-1-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 30.03.2017 19:43, Markus Armbruster wrote:
-> SocketAddress is a simple union, and simple unions are awkward: they
-> have their variant members wrapped in a "data" object on the wire, and
-> require additional indirections in C.  I intend to limit its use to
-> existing external interfaces, and convert all internal interfaces to
-> SocketAddressFlat.
+> What makes this 2.9 material is the crash bug fixed in PATCH 2 and the
+> QAPI/QMP interface cleanups in PATCH 7+8.
 >=20
-> BlockdevOptionsNbd is an external interface using SocketAddress.  We
-> already use SocketAddressFlat elsewhere in blockdev=3Dadd.  Replace it
+> v3:
+> * PATCH 1-3,5 unchanged
+> * PATCH 4 comments reworded [Max, Eric]
+> * PATCH 6 comment tweak [Eric]
+> * PATCH 7 comment typo, don't rely on enum equivalence [Eric]
+> * PATCH 8 is PATCH v2 08+09 squashed together
+> * PATCH 9 sd_parse_filename() fixed to again supply defaults for
+>   omitted host and port, whitespace tidied up [Max]
+> v2:
+> * PATCH 01+02+04+05 unchanged
+> * PATCH 03 error message improved, blank line [Max]
+> * PATCH 06 commit message typo [Max]
+> * PATCH 07 new, factored out of old PATCH 7
+> * PATCH 08-10 updated, please re-review
+>=20
+> Markus Armbruster (9):
+>   nbd sockets vnc: Mark problematic address family tests TODO
+>   char: Fix socket with "type": "vsock" address
+>   io vnc sockets: Clean up SocketAddressKind switches
+>   block: Document -drive problematic code and bugs
+>   gluster: Prepare for SocketAddressFlat extension
+>   qapi-schema: SocketAddressFlat variants 'vsock' and 'fd'
+>   sockets: New helper socket_address_crumple()
+>   nbd: Tidy up blockdev-add interface
+>   sheepdog: Fix blockdev-add
+>=20
+>  block.c                | 48 +++++++++++++++++++++++++--
+>  block/file-posix.c     |  6 ++++
+>  block/gluster.c        | 28 ++++++++++------
+>  block/nbd.c            | 62 ++++++++++++++++++++--------------
+>  block/nfs.c            |  7 ++++
+>  block/rbd.c            |  6 ++++
+>  block/sheepdog.c       | 90 ++++++++++++++++++++++++++++++++----------=
+--------
+>  block/ssh.c            |  8 +++++
+>  blockdev-nbd.c         |  1 +
+>  chardev/char-socket.c  |  9 +++--
+>  include/qemu/sockets.h | 11 ++++++
+>  io/dns-resolver.c      |  7 ++--
+>  qapi-schema.json       | 19 +++++------
+>  qapi/block-core.json   |  6 ++--
+>  ui/vnc.c               | 19 +++++++----
+>  util/qemu-sockets.c    | 40 ++++++++++++++++++++--
+>  16 files changed, 269 insertions(+), 98 deletions(-)
 
-Still s/=3D/-/, but nothing I can't fix. ;-)
+Thanks, fixed the typos in patch 4 and in the commit message of patch 8
+and applied the series to my block branch:
+
+https://github.com/XanClic/qemu/commits/block
 
 Max
 
-> by SocketAddressFlat while we can (it's new in 2.9) for simplicity and
-> consistency.  For example,
->=20
->     { "execute": "blockdev-add",
->       "arguments": { "node-name": "foo", "driver": "nbd",
->                      "server": { "type": "inet",
-> 		                 "data": { "host": "localhost",
-> 				           "port": "12345" } } } }
->=20
-> becomes
->=20
->     { "execute": "blockdev-add",
->       "arguments": { "node-name": "foo", "driver": "nbd",
->                      "server": { "type": "inet",
-> 		                 "host": "localhost", "port": "12345" } } }
->=20
-> Since the internal interfaces still take SocketAddress, this requires
-> conversion function socket_address_crumple().  It'll go away when I
-> update the interfaces.
->=20
-> Unfortunately, SocketAddress is also visible in -drive since 2.8:
->=20
->     -drive if=3Dnone,driver=3Dnbd,server.type=3Dinet,server.data.host=3D=
-127.0.0.1,server.data.port=3D12345
->=20
-> Nobody should be using it, as it's fairly new and has never been
-> documented, so adding still more compatibility gunk to keep it working
-> isn't worth the trouble.  You now have to use
->=20
->     -drive if=3Dnone,driver=3Dnbd,server.type=3Dinet,server.host=3D127.=
-0.0.1,server.port=3D12345
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> ---
->  block/nbd.c          | 53 +++++++++++++++++++++++++++-----------------=
---------
->  qapi/block-core.json |  2 +-
->  2 files changed, 29 insertions(+), 26 deletions(-)
 
-
-
---7vaOxeCWl7EmEBtfqHPApEe2c6WDqxgIG
+--2D2ssDu2n63rQmrukSW9tIaIcWe49HegU
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljdejQSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AsXwIAKmuBLZEgAIEFBN59QLoRSG522JqRXim
-e6SVbPXhJjGmMaoxxPNp1mXe50PdAJy0sezmWqohR4OCX8xrga8U3+5eRaCY0ns1
-Cgj45d4sATdb1Ald+sm5myVCPEtizi72fR2/MupoZCBYd+7nkgZnAlDAiRgoGoHM
-vqC/C1q+l4QeFiaiFEu7G3xaT8921m8RM//JB9FuuO3zFVXzckC+U7v48CRL8y0v
-zOWrMkZdCWmeycZ72qZOdCBpbSZPxWp/iDNumlXvsIMoMEUDSZRFAZTxMFkbtNDR
-FmDnaFGnaMXYAgYsHaTcanFgcT65QlRG/tQIw3Ekck0Sxry+1qZeZig=
-=dKC/
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljde70SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AG+MH/1hVIsk0Pmg0rvHS4daE6aiyuScRF4G0
+ObaQQmKiPUaqtIJo57KHskYnUZ23BYdD4jU0GnPHCrKQc7Jl/9qhT03gT6LA9vpF
+m5OjEkVg2hXZI8cAIg7trirhny91qN3zmSe3fHJHTQzgq59xuZQLOAXx6kTAhUa5
+5CgXFEzmTiq5xQ/oREuiCHOIuSOeqQb/Kcwn9czK5lQuSc/oeKiIWxy3BNDCoaTk
+tcXC77rbEkB1xo68fH3IVExovKmp2YSc/C4jBN22rAnjzMh+rtCdVRiJgNgUsWqT
+kx4v4RapRQt22gCn25RrRaVBlgFSjKAeYlYxktVnW2pR+tMBRYAWT18=
+=11F4
 -----END PGP SIGNATURE-----
 
---7vaOxeCWl7EmEBtfqHPApEe2c6WDqxgIG--
+--2D2ssDu2n63rQmrukSW9tIaIcWe49HegU--
