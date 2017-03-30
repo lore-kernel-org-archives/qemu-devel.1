@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ctUAb-0002KF-NS
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 03:06:58 -0400
+	(envelope-from <armbru@redhat.com>) id 1ctUUK-0005W6-SZ
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 03:27:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ctUAa-0008Ks-Iw
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 03:06:57 -0400
+	(envelope-from <armbru@redhat.com>) id 1ctUUJ-00072q-L0
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 03:27:20 -0400
 From: Markus Armbruster <armbru@redhat.com>
 References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
 	<1490805920-17029-8-git-send-email-armbru@redhat.com>
-	<27410c8a-0213-6ede-e9a3-cbb248f3e7a4@redhat.com>
-Date: Thu, 30 Mar 2017 09:06:48 +0200
-In-Reply-To: <27410c8a-0213-6ede-e9a3-cbb248f3e7a4@redhat.com> (Eric Blake's
-	message of "Wed, 29 Mar 2017 15:19:40 -0500")
-Message-ID: <87zig3dz07.fsf@dusky.pond.sub.org>
+	<b4d833b8-c6fd-567c-f500-354acf8c5cc7@redhat.com>
+Date: Thu, 30 Mar 2017 09:27:09 +0200
+In-Reply-To: <b4d833b8-c6fd-567c-f500-354acf8c5cc7@redhat.com> (Max Reitz's
+	message of "Wed, 29 Mar 2017 21:46:51 +0200")
+Message-ID: <87shlvdy2a.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 Subject: Re: [Qemu-devel] [for-2.9 7/8] nbd: Tidy up blockdev-add interface
@@ -24,12 +24,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, namei.unix@gmail.com
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, pbonzini@redhat.com, namei.unix@gmail.com
 
-Eric Blake <eblake@redhat.com> writes:
+Max Reitz <mreitz@redhat.com> writes:
 
-> On 03/29/2017 11:45 AM, Markus Armbruster wrote:
+> On 29.03.2017 18:45, Markus Armbruster wrote:
 >> SocketAddress is a simple union, and simple unions are awkward: they
 >> have their variant members wrapped in a "data" object on the wire, and
 >> require additional indirections in C.  I intend to limit its use to
@@ -52,17 +52,10 @@ Eric Blake <eblake@redhat.com> writes:
 >>       "arguments": { "node-name": "foo", "driver": "nbd",
 >>                      "server": { "type": "inet",
 >> 		                 "host": "localhost", "port": "12345" } } }
->
-> This part makes sense, and means this has to go in 2.9.
->
 >> 
 >> Since the internal interfaces still take SocketAddress, this requires
 >> conversion function socket_address_crumple().  It'll go away when I
 >> update the interfaces.
->
-> This is probably the fastest way forward for 2.9, even if we rip it out
-> later in 2.10.
->
 >> 
 >> Unfortunately, SocketAddress is also visible in -drive since 2.8.  Add
 >> still more gunk to nbd_process_legacy_socket_options().  You can now
@@ -73,81 +66,57 @@ Eric Blake <eblake@redhat.com> writes:
 >> to
 >> 
 >>     -drive if=none,driver=nbd,server.type=inet,server.host=127.0.0.1,server.port=12345
->
-> Here, I'm 50/50 on whether the compatibility gunk is worth it, or
-> whether to make a clean break of old configurations, as I'm not sure who
-> is using the old configurations.  But given the lateness of the change
-> (and my recent case of being burned on qom-type during freeze when I was
-> not conservative), I agree with your conservative approach of remaining
-> compatible, even if it means the patch is larger than desired, and even
-> if we rip it out again in 2.10.
-
-Ripping out becomes harder the long we wait.
-
-Since both Paolo and Max prefer to go without the compatibility gunk,
-I'll drop it.
-
 >> 
 >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 >> ---
 >>  block/nbd.c          | 131 ++++++++++++++++++++++++++++++++++++++++-----------
 >>  qapi/block-core.json |   2 +-
 >>  2 files changed, 104 insertions(+), 29 deletions(-)
->> 
 >
->> @@ -223,17 +224,45 @@ static bool nbd_process_legacy_socket_options(QDict *output_options,
->>      const char *path = qemu_opt_get(legacy_opts, "path");
->>      const char *host = qemu_opt_get(legacy_opts, "host");
->>      const char *port = qemu_opt_get(legacy_opts, "port");
->> +    const char *sd_path = qemu_opt_get(legacy_opts, "server.data.path");
->> +    const char *sd_host = qemu_opt_get(legacy_opts, "server.data.host");
->> +    const char *sd_port = qemu_opt_get(legacy_opts, "server.data.port");
->> +    bool no_server = path || host || port;
->> +    bool server_data = sd_path || sd_host || sd_port;
->>      const QDictEntry *e;
->>  
->> -    if (!path && !host && !port) {
->> +    if (!no_server && !server_data) {
+> To be completely frank: If there is any drawback to using
+> SocketAddressFlat instead of SocketAdress, I would be against using it.
+> Less indirections in C is an argument, but less {} on the wire is not,
+> in my opinion. QMP is a machine interface and machines don't care about
+> that additional level.
 >
-> Feels like a double negative, although it's not really serving that
-> role.  Maybe a better name would be s/no_server/bare/, so that 'bare' is
-> now your counterpart to 'server_data'.
+> Therefore, if you think this somehow affects compatibility, I would not
+> want to do this change.
 
-If we change our mind and keep the gunk, I'll rename to @bare.
+PRO:
 
->> +        return true;
->> +    }
->> +
->> +    if (no_server && server_data) {
->> +        error_setg(errp, "Cannot use %s and %s at the same time",
->> +                   "path/host/port", "server.data.*");
->> +        return false;
->
-> Again, 'bare' makes this conditional read a bit better.
->
->> +    }
->> +
->> +    if (server_data) {
->> +        if (sd_host) {
->> +            qdict_put(output_options, "server.host",
->> +                      qstring_from_str(sd_host));
->> +        }
->> +        if (sd_port) {
->> +            qdict_put(output_options, "server.port",
->> +                      qstring_from_str(sd_port));
->> +        }
->> +        if (sd_path) {
->> +            qdict_put(output_options, "server.path",
->> +                      qstring_from_str(sd_path));
->> +        }
->
-> Wow, I need to rebase my qdict_put_str() stuff again - that ought to be
-> something we include early in 2.10, as it touches a lot of stuff.
-> Doesn't affect your patch for now, though.
->
-> Renaming the local variable is trivial, so whether or not you
-> incorporate my naming suggestion,
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+1. Less nesting on the wire
 
-Need to drop the R-by along with the compatibility gunk, but thanks
-anyway!
+   You think this isn't a valid argument.  I think it is, just a weak
+   one.
+
+2. Less indirection in C
+
+   Makes dealing with the data type annoying.  In other words, the C
+   interface is poor.  Poor C interfaces hiding in generated code is one
+   thing, but SocketAddress is used in C interfaces between handwritten
+   code.  Needs to go.
+
+   Once its gone, all uses of SocketAddress we can't change for
+   compatibility reasons need to go through a conversion function.  No
+   biggie, but still, the fewer we have, the better.
+
+3. Consistency within blockdev-add
+
+   Nowhere else in blockdev-add do we wrap parts of socket addresses in
+   "data".  I guess I should mention this in the commit message.
+
+CON:
+
+1. Renames -drive server.data.* to server.*.  These are new in 2.8.
+   Libvirt doesn't use them.  I doubt anyone does.  My patch adds
+   compatibility gunk anyway.
+
+> I personally agree with Paolo that we can just break what we have, and
+> in addition I think that we *should* break what we have or we should not
+> do this change at all.
+
+I'm totally fine with ripping out the compatibility gunk.
+
+I put it in v1 so reviewers can like it or shoot it down.  Better than
+not having it in v1, and have reviewers demand it for v2 just so they
+can decide whether they want it.
