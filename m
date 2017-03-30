@@ -1,21 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48069)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ctdW5-0005a4-49
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 13:05:50 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ctdXD-000683-J0
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 13:06:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ctdW0-0000dl-LI
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 13:05:45 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1490879707-6060-1-git-send-email-armbru@redhat.com>
-	<1490879707-6060-11-git-send-email-armbru@redhat.com>
-	<b65b4a5a-bb31-8b15-f35f-b55ffd10b4c3@redhat.com>
-Date: Thu, 30 Mar 2017 19:05:29 +0200
-In-Reply-To: <b65b4a5a-bb31-8b15-f35f-b55ffd10b4c3@redhat.com> (Max Reitz's
-	message of "Thu, 30 Mar 2017 18:42:47 +0200")
-Message-ID: <871ste4rvq.fsf@dusky.pond.sub.org>
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ctdX4-0001Td-Nk
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 13:06:55 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37132
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1ctdX4-0001RY-HQ
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 13:06:46 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2UGwlD0114895
+	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 13:06:43 -0400
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 29h4cnwr9j-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 13:06:43 -0400
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Thu, 30 Mar 2017 11:06:41 -0600
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC v2 for-2.9 10/10] sheepdog: Fix blockdev-add
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <CAFEAcA8Yhm-vaf+AYfNTZG5jR6tVv1mtt_tGCiRD+SVBZ5mFJA@mail.gmail.com>
+References: <CAFEAcA8EgBp8=xjyfR+nuYw5KvdptNC++o39nAJiwu-SWWM+yw@mail.gmail.com>
+	<149029914932.3910.14105127854664571409@loki>
+	<CAFEAcA8Yhm-vaf+AYfNTZG5jR6tVv1mtt_tGCiRD+SVBZ5mFJA@mail.gmail.com>
+Date: Thu, 30 Mar 2017 12:05:29 -0500
+Message-Id: <149089352985.3776.13525112292689981413@loki>
+Subject: Re: [Qemu-devel] qga-test failure on Linux/sparc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,183 +43,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, pbonzini@redhat.com, namei.unix@gmail.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Max Reitz <mreitz@redhat.com> writes:
+Quoting Peter Maydell (2017-03-30 10:13:17)
+> On 23 March 2017 at 19:59, Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+> > Quoting Peter Maydell (2017-03-23 10:13:13)
+> >> Hi; I find that qga-test fails on Linux/sparc host:
+> =
 
-> On 30.03.2017 15:15, Markus Armbruster wrote:
->> Commit 831acdc "sheepdog: Implement bdrv_parse_filename()" and commit
->> d282f34 "sheepdog: Support blockdev-add" have different ideas on how
->> the QemuOpts parameters for the server address are named.  Fix that.
->> While there, rename BlockdevOptionsSheepdog member addr to server, for
->> consistency with BlockdevOptionsSsh, BlockdevOptionsGluster,
->> BlockdevOptionsNbd.
->> 
->> Commit 831acdc's example becomes
->> 
->>     --drive driver=sheepdog,server.type=inet,server.host=fido,server.port=7000,vdi=dolly
->> 
->> instead of
->> 
->>     --drive driver=sheepdog,host=fido,vdi=dolly
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  block/sheepdog.c     | 84 ++++++++++++++++++++++++++++++++++------------------
->>  qapi/block-core.json |  4 +--
->>  2 files changed, 58 insertions(+), 30 deletions(-)
->
-> There's trailing whitespace somewhere in this patch (git-am complained).
+> > I think the code is assuming that it'll be the virtual block device
+> > itself that's mounted, rather than a partition within it. This is
+> > certainly a false assumption, so we shouldn't be making this a
+> > fatal error.
+> >
+> > It does make me wonder if we *should* be looking at the parent to
+> > get the slave/device information though, which in turn means we
+> > might want logic to traverse up the whole tree for nested cases.
+> > But the GuestDiskAddress field of GuestFilesystemInfo is documented
+> > as possibly being empty for certain disk types, so I think for now
+> > we can simply relax the error. Will send a patch for 2.9.
+> =
 
-Fixe in my tree.
+> Did you find time to write a patch for this yet?
+> It would be nice to be able to add the sparc machine to the
+> build test set for 2.9.
 
->> diff --git a/block/sheepdog.c b/block/sheepdog.c
->> index 89e98ed..c81013d 100644
->> --- a/block/sheepdog.c
->> +++ b/block/sheepdog.c
->> @@ -13,9 +13,11 @@
->>   */
->>  
->>  #include "qemu/osdep.h"
->> +#include "qapi-visit.h"
->>  #include "qapi/error.h"
->>  #include "qapi/qmp/qdict.h"
->>  #include "qapi/qmp/qint.h"
->> +#include "qapi/qobject-input-visitor.h"
->>  #include "qemu/uri.h"
->>  #include "qemu/error-report.h"
->>  #include "qemu/sockets.h"
->> @@ -547,6 +549,47 @@ static SocketAddress *sd_socket_address(const char *path,
->>      return addr;
->>  }
->>  
->> +static SocketAddress *sd_server_config(QDict *options, Error **errp)
->> +{
->> +    QDict *server = NULL;
->> +    QObject *crumpled_server = NULL;
->> +    Visitor *iv = NULL;
->> +    SocketAddressFlat *saddr_flat = NULL;
->> +    SocketAddress *saddr = NULL;
->> +    Error *local_err = NULL;
->> +
->> +    qdict_extract_subqdict(options, &server, "server.");
->
-> server may be empty:
->
-> $ ./qemu-img info sheepdog:vdi
-> qemu-img: Could not open 'sheepdog:vdi': Parameter 'type' is missing
->
-> I'd propose creating an 'inet' SocketAddress object then for
-> SD_DEFAULT_ADDR and SD_DEFAULT_PORT so that existing behavior won't change.
+Sorry, the patch was trivial, but I'd gotten distracted before I had a chan=
+ce
+to test. I think I've recreated the scenario with loopback devices though,
+but you might want to give it a run just to double-check (I've cc'd you on
+the patch). Either way, I will send a pull by EOD.
 
-Makes sense.
+> =
 
-In my working tree:
-
-    $ upstream-qemu-img info sheepdog:vdi
-    @@@ server.host=localhost
-    @@@ server.port=7000
-    @@@ tag=
-    @@@ server.type=inet
-    @@@ vdi=vdi
-    ### vdi=vdi addr=localhost:7000 snap-id=(null) tag=
-    upstream-qemu-img: Could not open 'sheepdog:vdi': Failed to connect socket: Connection refused
-
->> +
->> +    crumpled_server = qdict_crumple(server, errp);
->> +    if (!crumpled_server) {
->> +        goto done;
->> +    }
->> +
->> +    /*
->> +     * FIXME .numeric, .to, .ipv4 or .ipv6 don't work with -drive
->> +     * server.type=inet.  .to doesn't matter, it's ignored anyway.
->> +     * That's because when @options come from -blockdev or
->> +     * blockdev_add, members are typed according to the QAPI schema,
->> +     * but when they come from -drive, they're all QString.  The
->> +     * visitor expects the former.
->> +     */
->> +    iv = qobject_input_visitor_new(crumpled_server);
->> +    visit_type_SocketAddressFlat(iv, NULL, &saddr_flat, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        goto done;
->> +    }
->> +
->> +    saddr = socket_address_crumple(saddr_flat);
->> +
->> +done:
->> +    qapi_free_SocketAddressFlat(saddr_flat);
->> +    visit_free(iv);
->> +    qobject_decref(crumpled_server);
->> +    QDECREF(server);
->> +    return saddr;
->> +}
->> +
->>  /* Return -EIO in case of error, file descriptor on success */
->>  static int connect_to_sdog(BDRVSheepdogState *s, Error **errp)
->>  {
->> @@ -1175,15 +1218,17 @@ static void sd_parse_filename(const char *filename, QDict *options,
->>      }
->>  
->>      if (cfg.host) {
->> -        qdict_set_default_str(options, "host", cfg.host);
->> +        qdict_set_default_str(options, "server.host", cfg.host);
->> +        qdict_set_default_str(options, "server.type", "inet");
->>      }
->>      if (cfg.port) {
->>          snprintf(buf, sizeof(buf), "%d", cfg.port);
->> -        qdict_set_default_str(options, "port", buf);
->> +        qdict_set_default_str(options, "server.port", buf);
->
-> .port is mandatory, so doing this optionally results in:
->
-> $ ./qemu-img info sheepdog://localhost/foo
-> qemu-img: Could not open 'sheepdog://localhost/foo': Parameter 'port' is
-> missing
-
-In my working tree:
-
-    $ upstream-qemu-img info sheepdog://localhost6/foo
-    @@@ server.host=localhost6
-    @@@ server.port=7000
-    @@@ tag=
-    @@@ server.type=inet
-    @@@ vdi=foo
-    ### vdi=foo addr=localhost6:7000 snap-id=(null) tag=
-    upstream-qemu-img: Could not open 'sheepdog://localhost6/foo': Failed to connect socket: Connection refused
-    $ upstream-qemu-img info sheepdog://:123/foo
-    @@@ server.host=localhost
-    @@@ server.port=123
-    @@@ tag=
-    @@@ server.type=inet
-    @@@ vdi=foo
-    ### vdi=foo addr=localhost:123 snap-id=(null) tag=
-    upstream-qemu-img: Could not open 'sheepdog://:123/foo': Failed to connect socket: Connection refused
-    $ upstream-qemu-img info sheepdog:///foo
-    @@@ server.host=localhost
-    @@@ server.port=7000
-    @@@ tag=
-    @@@ server.type=inet
-    @@@ vdi=foo
-    ### vdi=foo addr=localhost:7000 snap-id=(null) tag=
-    upstream-qemu-img: Could not open 'sheepdog:///foo': Failed to connect socket: Connection refused
-
->>      }
->>      if (cfg.path) {
->> -        qdict_set_default_str(options, "path", cfg.path);
->> -    }
->> +        qdict_set_default_str(options, "server.path", cfg.path); 
->> +        qdict_set_default_str(options, "server.type", "unix");
->> +   }
->
-> Indentation is off.
-
-Fixing...
-
-> Max
-
-Thanks!
-
-[...]
+> thanks
+> -- PMM
+>=20
