@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ctcem-0007l5-MQ
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:10:45 -0400
+	(envelope-from <tcminyard@gmail.com>) id 1ctcgR-0000YL-L7
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:12:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ctceg-0005KL-Tq
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:10:40 -0400
-References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
-	<1490805920-17029-5-git-send-email-armbru@redhat.com>
-	<5e1790e7-5e12-adc6-a049-ca004682025d@redhat.com>
-	<87fuhvfe96.fsf@dusky.pond.sub.org>
-	<2e07453b-4d48-3acb-91bd-526de637c5c2@redhat.com>
-	<871ste4yi9.fsf@dusky.pond.sub.org>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <b97d1a29-f3ac-8209-f895-a28458d78e1c@redhat.com>
-Date: Thu, 30 Mar 2017 18:10:23 +0200
+	(envelope-from <tcminyard@gmail.com>) id 1ctcgQ-0007Qu-IU
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:12:23 -0400
+Reply-To: minyard@acm.org
+References: <20170330232236.8272-1-emaste@freebsd.org>
+From: Corey Minyard <tcminyard@gmail.com>
+Message-ID: <3ba002c2-9a57-05fe-c93c-62f279a2381c@gmail.com>
+Date: Thu, 30 Mar 2017 11:12:13 -0500
 MIME-Version: 1.0
-In-Reply-To: <871ste4yi9.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="a6R0ABIxLv1sFVSaS1LAal66SUNTjR5Tc"
-Subject: Re: [Qemu-devel] [for-2.9 4/8] block: Document -drive problematic
- code and bugs
+In-Reply-To: <20170330232236.8272-1-emaste@freebsd.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] ipmi: use parens to avoid unexpected macro
+ var evaluation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,113 +24,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, namei.unix@gmail.com
+To: Ed Maste <emaste@freebsd.org>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---a6R0ABIxLv1sFVSaS1LAal66SUNTjR5Tc
-From: Max Reitz <mreitz@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp,
- jcody@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com,
- namei.unix@gmail.com
-Message-ID: <b97d1a29-f3ac-8209-f895-a28458d78e1c@redhat.com>
-Subject: Re: [Qemu-devel] [for-2.9 4/8] block: Document -drive problematic
- code and bugs
-References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
- <1490805920-17029-5-git-send-email-armbru@redhat.com>
- <5e1790e7-5e12-adc6-a049-ca004682025d@redhat.com>
- <87fuhvfe96.fsf@dusky.pond.sub.org>
- <2e07453b-4d48-3acb-91bd-526de637c5c2@redhat.com>
- <871ste4yi9.fsf@dusky.pond.sub.org>
-In-Reply-To: <871ste4yi9.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+This isn't quite right, a lot of these need parenthesis around the whole
+thing, and some of the macros are unused and need to be removed.
+I had submitted something for this a while ago, but it hadn't been
+taken.  I will re-submit.
 
-On 30.03.2017 16:42, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
->=20
->> On 03/30/2017 01:52 AM, Markus Armbruster wrote:
->>
->>>>> +++ b/block.c
->>>>> @@ -1157,6 +1157,12 @@ static int bdrv_open_common(BlockDriverState=
- *bs, BlockBackend *file,
->>>>>      if (file !=3D NULL) {
->>>>>          filename =3D blk_bs(file)->filename;
->>>>>      } else {
->>>>> +       /*
->>>>> +        * Caution: direct use of non-string @options members is
->>>>> +        * problematic.  When they come from -blockdev or blockdev_=
-add,
->>>>> +        * members are typed according to the QAPI schema, but when=
+-corey
 
->>>>> +        * they come from -drive, they're all QString.
->>>>> +        */
->>>>>          filename =3D qdict_get_try_str(options, "filename");
->>>>
->>>> For instance this one: Well, yes, for -drive, this will always be a
->>>> QString. Which is OK, because that's what we're trying to get.
->>>>
->>>> The comment makes this confusing, IMO. If you really want a comment =
-here
->>>> it should at least contain a mention that it's totally fine in pract=
-ice
->>>> here. Calling the code "problematic" sounds like this could blow up =
-when
->>>> it reality it can't; and I would think it actually is the most sane
->>>> solution given the current state of the whole infrastructure (i.e. h=
-ow
->>>> -drive and -blockdev work).
->>>
->>> Well, if it could blow up, I'd call it wrong, and start the comment w=
-ith
->>> FIXME :)
->>>
->>> Even though qdict_get_try_str() is indeed fine, I propose to have a
->>> comment, because someone with less detailed understanding of how the
->>> configuration machine works (me, until yesterday, and probably again
->>> after next month) could conclude that qdict_get_try_bool() would be j=
-ust
->>> as fine.
->>>
->>> What about:
->>>
->>>    /*
->>>     * Caution: while qdict_get_try_str() is fine, getting non-string
->>>     * types would require more care.  When @options come from -blockd=
-ev
->>>     * or blockdev_add, its members are typed according to the QAPI
->>>     * schema, but when they come from -drive, they're all QString.
->>>     */
->>
->> Yes, that's better - it makes it obvious that our current usage works,=
-
->> but that the code must not be carelessly edited if we add another fiel=
-d
->> in the future.
->=20
-> If Max is also happy with it, I'll put it in v3.
-
-Yes, more than happy, thanks! (Same for the other comment.)
-
-Max
-
-
---a6R0ABIxLv1sFVSaS1LAal66SUNTjR5Tc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljdLfASHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A9x4IAJ4Ls0bdZYqgsjO1zBFT67cFxL8Hx1tu
-0ZicYfbRhvNgnQmT5HEdZNJoB2l2FCLnXRS+FF5f29DgPg8nQMRxfmhrU8TVBtda
-K0JcWuNRalRB43JW4NVTxhjToMd+rhZexdnX28cnThjbBvC0s4B5Ht66NK9R7bek
-OSlndpHFgNBcOxyNrBIz/J4QFVEUFnYgj1ssz6iax58DPpYAeNRrsrnN9+7RyAVP
-W5Czr9/NvAuZvSxtw1tiL6c/Hw1v313RaNtUaFDWMkY6sAbumjnZfdFVDaxog/vH
-YY1CUz2R5KULpJelW2I8htuJZm6llCEDj23sfrn9bI970wUvY+KJYOA=
-=4i2l
------END PGP SIGNATURE-----
-
---a6R0ABIxLv1sFVSaS1LAal66SUNTjR5Tc--
+On 03/30/2017 06:22 PM, Ed Maste wrote:
+> Found via Clang warning: logical not is only applied to the left hand
+> side of this bitwise operator [-Wlogical-not-parentheses]
+>
+>                                !IPMI_BT_GET_HBUSY(ib->control_reg));
+>                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>
+> expanded from macro 'IPMI_BT_SET_HBUSY'
+>                                         (((v & 1) << IPMI_BT_HBUSY_BIT)))
+>                                            ^ ~
+>
+> Signed-off-by: Ed Maste <emaste@freebsd.org>
+> ---
+>   hw/ipmi/isa_ipmi_bt.c | 18 +++++++++---------
+>   1 file changed, 9 insertions(+), 9 deletions(-)
+>
+> diff --git a/hw/ipmi/isa_ipmi_bt.c b/hw/ipmi/isa_ipmi_bt.c
+> index 1c69cb33f8..c1dea503a2 100644
+> --- a/hw/ipmi/isa_ipmi_bt.c
+> +++ b/hw/ipmi/isa_ipmi_bt.c
+> @@ -40,37 +40,37 @@
+>   #define IPMI_BT_CLR_WR_MASK        (1 << IPMI_BT_CLR_WR_BIT)
+>   #define IPMI_BT_GET_CLR_WR(d)      (((d) >> IPMI_BT_CLR_WR_BIT) & 0x1)
+>   #define IPMI_BT_SET_CLR_WR(d, v)   (d) = (((d) & ~IPMI_BT_CLR_WR_MASK) | \
+> -                                       (((v & 1) << IPMI_BT_CLR_WR_BIT)))
+> +                                       ((((v) & 1) << IPMI_BT_CLR_WR_BIT)))
+>   
+>   #define IPMI_BT_CLR_RD_MASK        (1 << IPMI_BT_CLR_RD_BIT)
+>   #define IPMI_BT_GET_CLR_RD(d)      (((d) >> IPMI_BT_CLR_RD_BIT) & 0x1)
+>   #define IPMI_BT_SET_CLR_RD(d, v)   (d) = (((d) & ~IPMI_BT_CLR_RD_MASK) | \
+> -                                       (((v & 1) << IPMI_BT_CLR_RD_BIT)))
+> +                                       ((((v) & 1) << IPMI_BT_CLR_RD_BIT)))
+>   
+>   #define IPMI_BT_H2B_ATN_MASK       (1 << IPMI_BT_H2B_ATN_BIT)
+>   #define IPMI_BT_GET_H2B_ATN(d)     (((d) >> IPMI_BT_H2B_ATN_BIT) & 0x1)
+>   #define IPMI_BT_SET_H2B_ATN(d, v)  (d) = (((d) & ~IPMI_BT_H2B_ATN_MASK) | \
+> -                                        (((v & 1) << IPMI_BT_H2B_ATN_BIT)))
+> +                                        ((((v) & 1) << IPMI_BT_H2B_ATN_BIT)))
+>   
+>   #define IPMI_BT_B2H_ATN_MASK       (1 << IPMI_BT_B2H_ATN_BIT)
+>   #define IPMI_BT_GET_B2H_ATN(d)     (((d) >> IPMI_BT_B2H_ATN_BIT) & 0x1)
+>   #define IPMI_BT_SET_B2H_ATN(d, v)  (d) = (((d) & ~IPMI_BT_B2H_ATN_MASK) | \
+> -                                        (((v & 1) << IPMI_BT_B2H_ATN_BIT)))
+> +                                        ((((v) & 1) << IPMI_BT_B2H_ATN_BIT)))
+>   
+>   #define IPMI_BT_SMS_ATN_MASK       (1 << IPMI_BT_SMS_ATN_BIT)
+>   #define IPMI_BT_GET_SMS_ATN(d)     (((d) >> IPMI_BT_SMS_ATN_BIT) & 0x1)
+>   #define IPMI_BT_SET_SMS_ATN(d, v)  (d) = (((d) & ~IPMI_BT_SMS_ATN_MASK) | \
+> -                                        (((v & 1) << IPMI_BT_SMS_ATN_BIT)))
+> +                                        ((((v) & 1) << IPMI_BT_SMS_ATN_BIT)))
+>   
+>   #define IPMI_BT_HBUSY_MASK         (1 << IPMI_BT_HBUSY_BIT)
+>   #define IPMI_BT_GET_HBUSY(d)       (((d) >> IPMI_BT_HBUSY_BIT) & 0x1)
+>   #define IPMI_BT_SET_HBUSY(d, v)    (d) = (((d) & ~IPMI_BT_HBUSY_MASK) | \
+> -                                       (((v & 1) << IPMI_BT_HBUSY_BIT)))
+> +                                       ((((v) & 1) << IPMI_BT_HBUSY_BIT)))
+>   
+>   #define IPMI_BT_BBUSY_MASK         (1 << IPMI_BT_BBUSY_BIT)
+>   #define IPMI_BT_GET_BBUSY(d)       (((d) >> IPMI_BT_BBUSY_BIT) & 0x1)
+>   #define IPMI_BT_SET_BBUSY(d, v)    (d) = (((d) & ~IPMI_BT_BBUSY_MASK) | \
+> -                                       (((v & 1) << IPMI_BT_BBUSY_BIT)))
+> +                                       ((((v) & 1) << IPMI_BT_BBUSY_BIT)))
+>   
+>   
+>   /* Mask register */
+> @@ -80,12 +80,12 @@
+>   #define IPMI_BT_B2H_IRQ_EN_MASK      (1 << IPMI_BT_B2H_IRQ_EN_BIT)
+>   #define IPMI_BT_GET_B2H_IRQ_EN(d)    (((d) >> IPMI_BT_B2H_IRQ_EN_BIT) & 0x1)
+>   #define IPMI_BT_SET_B2H_IRQ_EN(d, v) (d) = (((d) & ~IPMI_BT_B2H_IRQ_EN_MASK) | \
+> -                                        (((v & 1) << IPMI_BT_B2H_IRQ_EN_BIT)))
+> +                                        ((((v) & 1) << IPMI_BT_B2H_IRQ_EN_BIT)))
+>   
+>   #define IPMI_BT_B2H_IRQ_MASK         (1 << IPMI_BT_B2H_IRQ_BIT)
+>   #define IPMI_BT_GET_B2H_IRQ(d)       (((d) >> IPMI_BT_B2H_IRQ_BIT) & 0x1)
+>   #define IPMI_BT_SET_B2H_IRQ(d, v)    (d) = (((d) & ~IPMI_BT_B2H_IRQ_MASK) | \
+> -                                        (((v & 1) << IPMI_BT_B2H_IRQ_BIT)))
+> +                                        ((((v) & 1) << IPMI_BT_B2H_IRQ_BIT)))
+>   
+>   typedef struct IPMIBT {
+>       IPMIBmc *bmc;
