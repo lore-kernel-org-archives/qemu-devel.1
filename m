@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ctTxl-0004g6-MW
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 02:53:42 -0400
+	(envelope-from <armbru@redhat.com>) id 1ctTzH-0005Nl-Th
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 02:55:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ctTxk-0002dQ-UN
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 02:53:41 -0400
+	(envelope-from <armbru@redhat.com>) id 1ctTzH-0004oK-4Y
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 02:55:15 -0400
 From: Markus Armbruster <armbru@redhat.com>
 References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
 	<1490805920-17029-7-git-send-email-armbru@redhat.com>
-	<dbf432c4-405c-9197-3795-8f2600edaf38@redhat.com>
-Date: Thu, 30 Mar 2017 08:53:34 +0200
-In-Reply-To: <dbf432c4-405c-9197-3795-8f2600edaf38@redhat.com> (Max Reitz's
-	message of "Wed, 29 Mar 2017 21:42:44 +0200")
-Message-ID: <87bmsjfe6p.fsf@dusky.pond.sub.org>
+	<7caffda9-7cbb-4044-7b6a-e398ffa125a6@redhat.com>
+Date: Thu, 30 Mar 2017 08:55:07 +0200
+In-Reply-To: <7caffda9-7cbb-4044-7b6a-e398ffa125a6@redhat.com> (Eric Blake's
+	message of "Wed, 29 Mar 2017 15:02:51 -0500")
+Message-ID: <877f37fe44.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 Subject: Re: [Qemu-devel] [for-2.9 6/8] qapi-schema: SocketAddressFlat
@@ -25,28 +25,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, pbonzini@redhat.com, namei.unix@gmail.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, namei.unix@gmail.com
 
-Max Reitz <mreitz@redhat.com> writes:
+Eric Blake <eblake@redhat.com> writes:
 
-> On 29.03.2017 18:45, Markus Armbruster wrote:
+> On 03/29/2017 11:45 AM, Markus Armbruster wrote:
 >> Note that the new variants are impossible in qemu_gluster_glfs_init(),
 >> because the gconf->server can only come from qemu_gluster_parse_uri()
 >> or qemu_gluster_parse_json(), and neither can create anything but
 >> 'tcp' or 'unix'.
->
-> s/tcp/inet/
-
-Fixing...
-
+>> 
 >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 >> ---
 >>  block/gluster.c  |  2 ++
 >>  qapi-schema.json | 19 ++++++++-----------
 >>  2 files changed, 10 insertions(+), 11 deletions(-)
->> 
 >
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>> +# This is just like SocketAddress, except it's a flat union rather
+>> +# than a simple union.  Nicer because it avoids nesting (i.e. more {})
+>> +# on the wire.
+>>  #
+>>  # Since: 2.9
+>>  ##
+>>  { 'union': 'SocketAddressFlat',
+>>    'base': { 'type': 'SocketAddressFlatType' },
+>>    'discriminator': 'type',
+>> -  'data': { 'unix': 'UnixSocketAddress',
+>> -            'inet': 'InetSocketAddress' } }
+>> +  'data': { 'inet': 'InetSocketAddress',
+>> +            'unix': 'UnixSocketAddress',
+>> +            'vsock': 'VsockSocketAddress',
+>> +            'fd': 'String' } }
+>
+> Can we make 'fd':'str'?  That would be even less pointless nesting on
+> the wire.
 
-Thanks!
+I guess it's wrapped in an object here to keep the door open for
+future extensions.  Perhaps also for symmetry.
