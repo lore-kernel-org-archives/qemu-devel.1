@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37869)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ctcoN-0005UQ-0j
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:20:36 -0400
+	(envelope-from <prvs=2553b504f=anthony.perard@citrix.com>)
+	id 1ctcsf-0006fM-2i
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:25:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ctcoL-00058K-Vx
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:20:35 -0400
-References: <1490879707-6060-1-git-send-email-armbru@redhat.com>
-	<1490879707-6060-8-git-send-email-armbru@redhat.com>
-	<b3bf3853-d19f-0886-5dd8-166ace2d29ec@redhat.com>
-	<87inmqzu1b.fsf@dusky.pond.sub.org>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <c97fe415-31a7-d9c0-a647-56c4e94eb376@redhat.com>
-Date: Thu, 30 Mar 2017 18:20:11 +0200
+	(envelope-from <prvs=2553b504f=anthony.perard@citrix.com>)
+	id 1ctcsb-0007Gt-5l
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:25:01 -0400
+Received: from smtp02.citrix.com ([66.165.176.63]:4109)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=2553b504f=anthony.perard@citrix.com>)
+	id 1ctcsb-0007Bi-0N
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:24:57 -0400
+Date: Thu, 30 Mar 2017 17:24:52 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20170330162452.GB1864@perard.uk.xensource.com>
+References: <1489750157-17401-1-git-send-email-tianyu.lan@intel.com>
+	<1489750157-17401-3-git-send-email-tianyu.lan@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <87inmqzu1b.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="I9ep1JtCTJE6ggqWvi9PCgSntJ6qGTCT3"
-Subject: Re: [Qemu-devel] [RFC v2 for-2.9 07/10] sockets: New helper
- socket_address_crumple()
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1489750157-17401-3-git-send-email-tianyu.lan@intel.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 2/4] Xen: add a dummy vIOMMU to
+ create/destroy vIOMMU in Xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,171 +31,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, pbonzini@redhat.com, namei.unix@gmail.com
+To: Lan Tianyu <tianyu.lan@intel.com>
+Cc: xen-devel@lists.xensource.com, qemu-devel@nongnu.org, chao.gao@intel.com, kevin.tian@intel.com, sstabellini@kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---I9ep1JtCTJE6ggqWvi9PCgSntJ6qGTCT3
-From: Max Reitz <mreitz@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org,
- mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, pbonzini@redhat.com,
- namei.unix@gmail.com
-Message-ID: <c97fe415-31a7-d9c0-a647-56c4e94eb376@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2 for-2.9 07/10] sockets: New helper
- socket_address_crumple()
-References: <1490879707-6060-1-git-send-email-armbru@redhat.com>
- <1490879707-6060-8-git-send-email-armbru@redhat.com>
- <b3bf3853-d19f-0886-5dd8-166ace2d29ec@redhat.com>
- <87inmqzu1b.fsf@dusky.pond.sub.org>
-In-Reply-To: <87inmqzu1b.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-On 30.03.2017 17:03, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
->=20
->> On 03/30/2017 08:15 AM, Markus Armbruster wrote:
->>> SocketAddress is a simple union, and simple unions are awkward: they
->>> have their variant members wrapped in a "data" object on the wire, an=
-d
->>> require additional indirections in C.  I intend to limit its use to
->>> existing external interfaces.  New ones should use SocketAddressFlat.=
+On Fri, Mar 17, 2017 at 07:29:15PM +0800, Lan Tianyu wrote:
+> From: Chao Gao <chao.gao@intel.com>
+> 
+> Since adding a dynamic sysbus device is forbidden, so choose TYPE_DEVICE
+> as parent class.
+> 
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
+> Signed-off-by: Lan Tianyu <tianyu.lan@intel.com>
+> ---
+>  hw/xen/Makefile.objs |   1 +
+>  hw/xen/xen_viommu.c  | 116 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 117 insertions(+)
+>  create mode 100644 hw/xen/xen_viommu.c
+> 
+> diff --git a/hw/xen/Makefile.objs b/hw/xen/Makefile.objs
+> index d367094..e37d808 100644
+> --- a/hw/xen/Makefile.objs
+> +++ b/hw/xen/Makefile.objs
+> @@ -3,3 +3,4 @@ common-obj-$(CONFIG_XEN_BACKEND) += xen_backend.o xen_devconfig.o
+>  
+>  obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen-host-pci-device.o
+>  obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen_pt.o xen_pt_config_init.o xen_pt_graphics.o xen_pt_msi.o
+> +obj-$(CONFIG_XEN) += xen_viommu.o
+> diff --git a/hw/xen/xen_viommu.c b/hw/xen/xen_viommu.c
+> new file mode 100644
+> index 0000000..9bf9158
+> --- /dev/null
+> +++ b/hw/xen/xen_viommu.c
+> @@ -0,0 +1,116 @@
+> +/*
+> + * Xen virtual IOMMU (virtual VT-D)
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License as published by
+> + * the Free Software Foundation; either version 2 of the License, or
+> + * (at your option) any later version.
+> +
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> +
+> + * You should have received a copy of the GNU General Public License along
+> + * with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu/error-report.h"
+> +
+> +#include "hw/qdev-core.h"
+> +#include "hw/sysbus.h"
+> +#include "hw/xen/xen.h"
+> +#include "hw/xen/xen_backend.h"
+> +
+> +#define TYPE_XEN_VIOMMU_DEVICE "xen_viommu"
+> +#define  XEN_VIOMMU_DEVICE(obj) \
+> +    OBJECT_CHECK(XenVIOMMUState, (obj), TYPE_XEN_VIOMMU_DEVICE)
+> +
+> +typedef struct XenVIOMMUState XenVIOMMUState;
+> +
+> +struct XenVIOMMUState {
+> +    DeviceState dev;
+> +    uint32_t id;
+> +    uint64_t cap;
+> +    uint64_t base_addr;
+> +};
+> +
+> +static void xen_viommu_realize(DeviceState *dev, Error **errp)
+> +{
+> +    int rc;
+> +    uint64_t cap;
+> +    char *dom;
+> +    char viommu_path[1024];
+> +    XenVIOMMUState *s = XEN_VIOMMU_DEVICE(dev);
+> +
+> +    s->id = -1;
+> +    
+> +    /* Read vIOMMU attributes from Xenstore. */
+> +    dom = xs_get_domain_path(xenstore, xen_domid);
+> +    snprintf(viommu_path, sizeof(viommu_path), "%s/viommu", dom);
+> +    rc = xenstore_read_uint64(viommu_path, "base_addr", &s->base_addr);  
 
->>> I further intend to convert all internal interfaces to
->>> SocketAddressFlat.  This helper should go away then.
->>>
->>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>> ---
->>>  include/qemu/sockets.h | 11 +++++++++++
->>>  util/qemu-sockets.c    | 29 +++++++++++++++++++++++++++++
->>>  2 files changed, 40 insertions(+)
->>>
->>> diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
->>> index 5f1bab9..cef05a5 100644
->>> --- a/include/qemu/sockets.h
->>> +++ b/include/qemu/sockets.h
->>> @@ -119,4 +119,15 @@ SocketAddress *socket_remote_address(int fd, Err=
-or **errp);
->>>   */
->>>  char *socket_address_to_string(struct SocketAddress *addr, Error **e=
-rrp);
->>> =20
->>> +/**
->>> + * socket_address_crumple:
->>> + * @addr_flat: the socket addres to crumple
->>
->> s/addres/address/
->=20
-> Fixing...
->=20
->>> +SocketAddress *socket_address_crumple(SocketAddressFlat *addr_flat)
->>> +{
->>> +    SocketAddress *addr =3D g_new(SocketAddress, 1);
->>> +
->>> +    addr->type =3D addr_flat->type;
->>
->> Works only because our enum is defined in the same order as the simple=
+Could these informations (base_addr and cap) be read from the command
+line instead of via xenstore?
+Any reason for these informations to be on xenstore?
 
->> union's members.  A bit fragile, so maybe we want to comment in the
->> .json file that we can't reorder members of either the enum or the
->> simple union's 'data'?  Or it might even tickle a picky compiler to wa=
-rn
->> about assignment between incompatible enum types.  Another option woul=
-d
->> be making it robust by instead doing switch(addr_flat->type) and
->> assigning to addr->type in each branch of the switch.
->=20
-> Sold.
->=20
->>> +    switch (addr->type) {
->>> +    case SOCKET_ADDRESS_FLAT_TYPE_INET:
->>> +        addr->u.inet.data =3D QAPI_CLONE(InetSocketAddress,
->>> +                                        &addr_flat->u.inet);
->>
->> Indentation is off.
->=20
->>> +        break;
->>> +    case SOCKET_ADDRESS_FLAT_TYPE_UNIX:
->>> +        addr->u.q_unix.data =3D QAPI_CLONE(UnixSocketAddress, &
->>> +                                          addr_flat->u.q_unix);
->>
->> Why is the unary & split from its argument?
->=20
-> Editing accident.
->=20
->>> +        break;
->>> +    case SOCKET_ADDRESS_FLAT_TYPE_VSOCK:
->>> +        addr->u.vsock.data =3D QAPI_CLONE(VsockSocketAddress,
->>> +                                         &addr_flat->u.vsock);
->>
->> More indentation problems.
->>
->>> +        break;
->>> +    case SOCKET_ADDRESS_FLAT_TYPE_FD:
->>> +        addr->u.fd.data =3D QAPI_CLONE(String, &addr_flat->u.fd);
->>> +        break;
->>> +    default:
->>> +        abort();
->>> +    }
->>> +
->>> +    return addr;
->>> +}
->>>
->=20
-> Now looks like this:
->=20
-> SocketAddress *socket_address_crumple(SocketAddressFlat *addr_flat)
-> {
->     SocketAddress *addr =3D g_new(SocketAddress, 1);
->=20
->     switch (addr_flat->type) {
->     case SOCKET_ADDRESS_FLAT_TYPE_INET:
->         addr->type =3D SOCKET_ADDRESS_KIND_INET;
->         addr->u.inet.data =3D QAPI_CLONE(InetSocketAddress,
->                                        &addr_flat->u.inet);
->         break;
->     case SOCKET_ADDRESS_FLAT_TYPE_UNIX:
->         addr->type =3D SOCKET_ADDRESS_KIND_UNIX;
->         addr->u.q_unix.data =3D QAPI_CLONE(UnixSocketAddress,
->                                          &addr_flat->u.q_unix);
->         break;
->     case SOCKET_ADDRESS_FLAT_TYPE_VSOCK:
->         addr->type =3D SOCKET_ADDRESS_KIND_VSOCK;
->         addr->u.vsock.data =3D QAPI_CLONE(VsockSocketAddress,
->                                         &addr_flat->u.vsock);
->         break;
->     case SOCKET_ADDRESS_FLAT_TYPE_FD:
->         addr->type =3D SOCKET_ADDRESS_KIND_FD;
->         addr->u.fd.data =3D QAPI_CLONE(String, &addr_flat->u.fd);
->         break;
->     default:
->         abort();
->     }
->=20
->     return addr;
-> }
+> +    if (rc) {
+> +        error_report("Can't get base address of vIOMMU");
 
-Looks good!
+I think error_setg should be used instead of error_report.
 
-Max
+> +        exit(1);
+
+Also, exit should be remove, and return instead. error_setg would be
+enough to signal that the device can not work.
+
+> +    }
+> +
+> +    rc = xenstore_read_uint64(viommu_path, "cap", &s->cap);
+> +    if (rc) {
+> +        error_report("Can't get capabilities of vIOMMU");
+> +        exit(1);
+> +    }
+> +
+> +    rc = xc_viommu_query_cap(xen_xc, xen_domid, &cap);
+
+Since xc_viommu_* seems to be new, you should use
+xendevicemodel_viommu_* instead, also you will need to define a stub for
+them to be able to compile QEMU against older version of Xen.
 
 
---I9ep1JtCTJE6ggqWvi9PCgSntJ6qGTCT3
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+The patch looks good otherwise.
 
------BEGIN PGP SIGNATURE-----
+Thanks,
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljdMDsSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AjhAIALiW+ZKtHZu0l68zgpxhOIwO7ReK4JO7
-0qlJJyGosbj71Hf+R1QC1xj4KBc/Hmt/SPMFPerOvct0fHxGK3yn+ntcMEf2OqUz
-FIm7ln7osWNPywcIgWu7h1WZNR4Hva9jJx2sVXxmNfeICtBkUCAeOOQtOzXllkPy
-JTDrEOMLy9IFKAdc1lu8fdBoJFqF2GJFs1Oy/1wfpXNKuS/UypkTfBo9CzfxIZYD
-IZ3Ru8kVgoz2vbBdj09Fg2gSbux7jMR8CJMgEdWGD5PEOAQcfIa9lHXbc5RxY94w
-rrIRG4MuKoTtVPNWyJXe4yzsvX2tH6fa3mXNX/KVto3GidZVK27BgAM=
-=mGLq
------END PGP SIGNATURE-----
-
---I9ep1JtCTJE6ggqWvi9PCgSntJ6qGTCT3--
+-- 
+Anthony PERARD
