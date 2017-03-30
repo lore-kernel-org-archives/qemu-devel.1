@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ctaXb-0002jW-RC
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:55:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1ctaXf-0002qM-Cq
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:55:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ctaXa-0000YY-R1
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:55:07 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45383)
+	(envelope-from <bounces@canonical.com>) id 1ctaXe-0000d5-8X
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:55:11 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45418)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ctaXa-0000Xt-MS
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:55:06 -0400
+	id 1ctaXe-0000cf-2X
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:55:10 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ctaXZ-0000Ua-RS
-	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 13:55:05 +0000
+	id 1ctaXd-0000p1-71
+	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 13:55:09 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CA8AD2E8043
-	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 13:55:05 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 33BCB2E80AF
+	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 13:55:09 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 30 Mar 2017 13:41:02 -0000
+Date: Thu, 30 Mar 2017 13:39:58 -0000
 From: luigiburdo <intermediadc@hotmail.com>
-Reply-To: Bug 1588473 <1588473@bugs.launchpad.net>
+Reply-To: Bug 1569491 <1569491@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20160602175533.6605.97992.malonedeb@chaenomeles.canonical.com>
-Message-Id: <20170330134104.26304.71236.launchpad@chaenomeles.canonical.com>
+References: <20160412175749.2128.24352.malonedeb@wampee.canonical.com>
+Message-Id: <20170330133959.26414.71832.launchpad@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1588473] Re: Qemu Mate 16.10 and Gtk dont build
+Subject: [Qemu-devel] [Bug 1569491] Re: qemu system i386 poor performance on
+ e5500 core
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,48 +40,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 
 ** Changed in: qemu
-       Status: New =3D> Fix Released
+       Status: New =3D> Opinion
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1588473
+https://bugs.launchpad.net/bugs/1569491
 
 Title:
-  Qemu Mate 16.10 and Gtk dont build
+  qemu system i386 poor performance on e5500 core
 
 Status in QEMU:
-  Fix Released
+  Opinion
 
 Bug description:
-  when i try to build last qemu 2.6 on 16.10 of ubuntu mate i have this.
-  note on 16.04 was building without problem
-    =
+  I had been tested with generic core net building or with mtune e5500 but =
+i have the same result: performances =
 
-  LINK  i386-softmmu/qemu-system-i386
-  ../ui/gtk.o: In function `gd_get_pointer':
-  /home/amigaone/src/qemu/ui/gtk.c:486: undefined reference to `gdk_display=
-_get_default_seat'
-  /home/amigaone/src/qemu/ui/gtk.c:486: undefined reference to `gdk_seat_ge=
-t_pointer'
-  ../ui/gtk.o: In function `gd_grab_update':
-  /home/amigaone/src/qemu/ui/gtk.c:1339: undefined reference to `gdk_displa=
-y_get_default_seat'
-  /home/amigaone/src/qemu/ui/gtk.c:1353: undefined reference to `gdk_seat_g=
-rab'
-  /home/amigaone/src/qemu/ui/gtk.c:1356: undefined reference to `gdk_seat_u=
-ngrab'
-  ../ui/gtk.o: In function `gd_get_pointer':
-  /home/amigaone/src/qemu/ui/gtk.c:486: undefined reference to `gdk_display=
-_get_default_seat'
-  /home/amigaone/src/qemu/ui/gtk.c:486: undefined reference to `gdk_seat_ge=
-t_pointer'
-  /home/amigaone/src/qemu/ui/gtk.c:486: undefined reference to `gdk_display=
-_get_default_seat'
-  /home/amigaone/src/qemu/ui/gtk.c:486: undefined reference to `gdk_seat_ge=
-t_pointer'
-  collect2: error: ld returned 1 exit status
+  are extremly low compared with other classes of powerpc cpu.
+  The strange is the 5020 2ghz in all emulators been tested by me is compar=
+able with a 970MP 2.7 ghz in speed and benchmarks but im facing the half of=
+ performance in i386-soft-mmu compared with a 2.5 ghz 970MP.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1588473/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1569491/+subscriptions
