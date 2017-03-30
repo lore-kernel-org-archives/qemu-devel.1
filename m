@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ctbaE-00019j-NY
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:02:00 -0400
+	(envelope-from <armbru@redhat.com>) id 1ctbbi-00024k-Bz
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:03:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ctbaB-0005RD-Le
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:01:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42818)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1ctbaB-0005PF-DL
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:01:51 -0400
-Date: Thu, 30 Mar 2017 09:01:48 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170330090148.16048141@t450s.home>
-In-Reply-To: <1490869641-29873-1-git-send-email-xiong.y.zhang@intel.com>
-References: <1490869641-29873-1-git-send-email-xiong.y.zhang@intel.com>
+	(envelope-from <armbru@redhat.com>) id 1ctbbh-0006Qz-A5
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:03:26 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1490879707-6060-1-git-send-email-armbru@redhat.com>
+	<1490879707-6060-8-git-send-email-armbru@redhat.com>
+	<b3bf3853-d19f-0886-5dd8-166ace2d29ec@redhat.com>
+Date: Thu, 30 Mar 2017 17:03:12 +0200
+In-Reply-To: <b3bf3853-d19f-0886-5dd8-166ace2d29ec@redhat.com> (Eric Blake's
+	message of "Thu, 30 Mar 2017 09:42:00 -0500")
+Message-ID: <87inmqzu1b.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Revert "vfio/pci-quirks.c: Disable stolen
- memory for igd VFIO"
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC v2 for-2.9 07/10] sockets: New helper
+ socket_address_crumple()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,143 +25,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiong Zhang <xiong.y.zhang@intel.com>
-Cc: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, namei.unix@gmail.com
 
-On Thu, 30 Mar 2017 18:27:21 +0800
-Xiong Zhang <xiong.y.zhang@intel.com> wrote:
+Eric Blake <eblake@redhat.com> writes:
 
-> This reverts commit c2b2e158cc7b1cb431bd6039824ec13c3184a775.
-> 
-> The original patch intend to prevent linux i915 driver from using
-> stolen meory. But this patch breaks windows IGD driver loading on
-> Gen9+, as IGD HW will use stolen memory on Gen9+, once windows IGD
-> driver see zero size stolen memory, it will unload.
-> Meanwhile stolen memory will be disabled in 915 when i915 run as
-> a guest.
+> On 03/30/2017 08:15 AM, Markus Armbruster wrote:
+>> SocketAddress is a simple union, and simple unions are awkward: they
+>> have their variant members wrapped in a "data" object on the wire, and
+>> require additional indirections in C.  I intend to limit its use to
+>> existing external interfaces.  New ones should use SocketAddressFlat.
+>> I further intend to convert all internal interfaces to
+>> SocketAddressFlat.  This helper should go away then.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  include/qemu/sockets.h | 11 +++++++++++
+>>  util/qemu-sockets.c    | 29 +++++++++++++++++++++++++++++
+>>  2 files changed, 40 insertions(+)
+>> 
+>> diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
+>> index 5f1bab9..cef05a5 100644
+>> --- a/include/qemu/sockets.h
+>> +++ b/include/qemu/sockets.h
+>> @@ -119,4 +119,15 @@ SocketAddress *socket_remote_address(int fd, Error **errp);
+>>   */
+>>  char *socket_address_to_string(struct SocketAddress *addr, Error **errp);
+>>  
+>> +/**
+>> + * socket_address_crumple:
+>> + * @addr_flat: the socket addres to crumple
+>
+> s/addres/address/
 
-Does this mean that legacy mode IGD assignment is not going to work
-on Gen9+ with Windows?  Will it continue to work with Gen8-?
+Fixing...
 
-Please clarify Gen9+, is this Kaby Lake?
+>> +SocketAddress *socket_address_crumple(SocketAddressFlat *addr_flat)
+>> +{
+>> +    SocketAddress *addr = g_new(SocketAddress, 1);
+>> +
+>> +    addr->type = addr_flat->type;
+>
+> Works only because our enum is defined in the same order as the simple
+> union's members.  A bit fragile, so maybe we want to comment in the
+> .json file that we can't reorder members of either the enum or the
+> simple union's 'data'?  Or it might even tickle a picky compiler to warn
+> about assignment between incompatible enum types.  Another option would
+> be making it robust by instead doing switch(addr_flat->type) and
+> assigning to addr->type in each branch of the switch.
 
-I assume this patch is intended for QEMU 2.9, it's helpful to make that
-explicit during the rc freeze.  Thanks,
+Sold.
 
-Alex
+>> +    switch (addr->type) {
+>> +    case SOCKET_ADDRESS_FLAT_TYPE_INET:
+>> +        addr->u.inet.data = QAPI_CLONE(InetSocketAddress,
+>> +                                        &addr_flat->u.inet);
+>
+> Indentation is off.
 
-> Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
-> ---
->  hw/vfio/pci-quirks.c | 65 ++++++++++++++++++++++------------------------------
->  1 file changed, 27 insertions(+), 38 deletions(-)
-> 
-> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-> index e995e32..e9b493b 100644
-> --- a/hw/vfio/pci-quirks.c
-> +++ b/hw/vfio/pci-quirks.c
-> @@ -1367,45 +1367,14 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
->      uint16_t cmd_orig, cmd;
->      Error *err = NULL;
->  
-> -    /* This must be an Intel VGA device. */
-> -    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, PCI_ANY_ID) ||
-> -        !vfio_is_vga(vdev) || nr != 4) {
-> -        return;
-> -    }
-> -
-> -    /*
-> -     * IGD is not a standard, they like to change their specs often.  We
-> -     * only attempt to support back to SandBridge and we hope that newer
-> -     * devices maintain compatibility with generation 8.
-> -     */
-> -    gen = igd_gen(vdev);
-> -    if (gen != 6 && gen != 8) {
-> -        error_report("IGD device %s is unsupported by IGD quirks, "
-> -                     "try SandyBridge or newer", vdev->vbasedev.name);
-> -        return;
-> -    }
-> -
-> -    /*
-> -     * Regardless of running in UPT or legacy mode, the guest graphics
-> -     * driver may attempt to use stolen memory, however only legacy mode
-> -     * has BIOS support for reserving stolen memory in the guest VM.
-> -     * Emulate the GMCH register in all cases and zero out the stolen
-> -     * memory size here. Legacy mode may request allocation and re-write
-> -     * this below.
-> -     */
-> -    gmch = vfio_pci_read_config(&vdev->pdev, IGD_GMCH, 4);
-> -    gmch &= ~((gen < 8 ? 0x1f : 0xff) << (gen < 8 ? 3 : 8));
-> -
-> -    /* GMCH is read-only, emulated */
-> -    pci_set_long(vdev->pdev.config + IGD_GMCH, gmch);
-> -    pci_set_long(vdev->pdev.wmask + IGD_GMCH, 0);
-> -    pci_set_long(vdev->emulated_config_bits + IGD_GMCH, ~0);
-> -
->      /*
-> -     * This must be at address 00:02.0 for us to even onsider enabling
-> -     * legacy mode.  The vBIOS has dependencies on the PCI bus address.
-> +     * This must be an Intel VGA device at address 00:02.0 for us to even
-> +     * consider enabling legacy mode.  The vBIOS has dependencies on the
-> +     * PCI bus address.
->       */
-> -    if (&vdev->pdev != pci_find_device(pci_device_root_bus(&vdev->pdev),
-> +    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, PCI_ANY_ID) ||
-> +        !vfio_is_vga(vdev) || nr != 4 ||
-> +        &vdev->pdev != pci_find_device(pci_device_root_bus(&vdev->pdev),
->                                         0, PCI_DEVFN(0x2, 0))) {
->          return;
->      }
-> @@ -1425,6 +1394,18 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
->      }
->  
->      /*
-> +     * IGD is not a standard, they like to change their specs often.  We
-> +     * only attempt to support back to SandBridge and we hope that newer
-> +     * devices maintain compatibility with generation 8.
-> +     */
-> +    gen = igd_gen(vdev);
-> +    if (gen != 6 && gen != 8) {
-> +        error_report("IGD device %s is unsupported in legacy mode, "
-> +                     "try SandyBridge or newer", vdev->vbasedev.name);
-> +        return;
-> +    }
-> +
-> +    /*
->       * Most of what we're doing here is to enable the ROM to run, so if
->       * there's no ROM, there's no point in setting up this quirk.
->       * NB. We only seem to get BIOS ROMs, so a UEFI VM would need CSM support.
-> @@ -1479,6 +1460,8 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
->          goto out;
->      }
->  
-> +    gmch = vfio_pci_read_config(&vdev->pdev, IGD_GMCH, 4);
-> +
->      /*
->       * If IGD VGA Disable is clear (expected) and VGA is not already enabled,
->       * try to enable it.  Probably shouldn't be using legacy mode without VGA,
-> @@ -1549,11 +1532,12 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
->       * when IVD (IGD VGA Disable) is clear, but the claim is that it's unused,
->       * so let's not waste VM memory for it.
->       */
-> +    gmch &= ~((gen < 8 ? 0x1f : 0xff) << (gen < 8 ? 3 : 8));
-> +
->      if (vdev->igd_gms) {
->          if (vdev->igd_gms <= 0x10) {
->              gms_mb = vdev->igd_gms * 32;
->              gmch |= vdev->igd_gms << (gen < 8 ? 3 : 8);
-> -            pci_set_long(vdev->pdev.config + IGD_GMCH, gmch);
->          } else {
->              error_report("Unsupported IGD GMS value 0x%x", vdev->igd_gms);
->              vdev->igd_gms = 0;
-> @@ -1573,6 +1557,11 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
->      fw_cfg_add_file(fw_cfg_find(), "etc/igd-bdsm-size",
->                      bdsm_size, sizeof(*bdsm_size));
->  
-> +    /* GMCH is read-only, emulated */
-> +    pci_set_long(vdev->pdev.config + IGD_GMCH, gmch);
-> +    pci_set_long(vdev->pdev.wmask + IGD_GMCH, 0);
-> +    pci_set_long(vdev->emulated_config_bits + IGD_GMCH, ~0);
-> +
->      /* BDSM is read-write, emulated.  The BIOS needs to be able to write it */
->      pci_set_long(vdev->pdev.config + IGD_BDSM, 0);
->      pci_set_long(vdev->pdev.wmask + IGD_BDSM, ~0);
+>> +        break;
+>> +    case SOCKET_ADDRESS_FLAT_TYPE_UNIX:
+>> +        addr->u.q_unix.data = QAPI_CLONE(UnixSocketAddress, &
+>> +                                          addr_flat->u.q_unix);
+>
+> Why is the unary & split from its argument?
+
+Editing accident.
+
+>> +        break;
+>> +    case SOCKET_ADDRESS_FLAT_TYPE_VSOCK:
+>> +        addr->u.vsock.data = QAPI_CLONE(VsockSocketAddress,
+>> +                                         &addr_flat->u.vsock);
+>
+> More indentation problems.
+>
+>> +        break;
+>> +    case SOCKET_ADDRESS_FLAT_TYPE_FD:
+>> +        addr->u.fd.data = QAPI_CLONE(String, &addr_flat->u.fd);
+>> +        break;
+>> +    default:
+>> +        abort();
+>> +    }
+>> +
+>> +    return addr;
+>> +}
+>> 
+
+Now looks like this:
+
+SocketAddress *socket_address_crumple(SocketAddressFlat *addr_flat)
+{
+    SocketAddress *addr = g_new(SocketAddress, 1);
+
+    switch (addr_flat->type) {
+    case SOCKET_ADDRESS_FLAT_TYPE_INET:
+        addr->type = SOCKET_ADDRESS_KIND_INET;
+        addr->u.inet.data = QAPI_CLONE(InetSocketAddress,
+                                       &addr_flat->u.inet);
+        break;
+    case SOCKET_ADDRESS_FLAT_TYPE_UNIX:
+        addr->type = SOCKET_ADDRESS_KIND_UNIX;
+        addr->u.q_unix.data = QAPI_CLONE(UnixSocketAddress,
+                                         &addr_flat->u.q_unix);
+        break;
+    case SOCKET_ADDRESS_FLAT_TYPE_VSOCK:
+        addr->type = SOCKET_ADDRESS_KIND_VSOCK;
+        addr->u.vsock.data = QAPI_CLONE(VsockSocketAddress,
+                                        &addr_flat->u.vsock);
+        break;
+    case SOCKET_ADDRESS_FLAT_TYPE_FD:
+        addr->type = SOCKET_ADDRESS_KIND_FD;
+        addr->u.fd.data = QAPI_CLONE(String, &addr_flat->u.fd);
+        break;
+    default:
+        abort();
+    }
+
+    return addr;
+}
