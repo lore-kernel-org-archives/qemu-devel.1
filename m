@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1ctc0o-0006jz-Eg
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:29:26 -0400
+	(envelope-from <eblake@redhat.com>) id 1ctc3v-0008Jv-Kp
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:32:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1ctc0n-00027k-27
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:29:22 -0400
-Date: Thu, 30 Mar 2017 17:29:13 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20170330152913.orppqht62xrl2rmw@eukaryote>
+	(envelope-from <eblake@redhat.com>) id 1ctc3u-0005SE-LM
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:32:35 -0400
 References: <1490879707-6060-1-git-send-email-armbru@redhat.com>
+	<1490879707-6060-11-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1855940b-6459-965a-988e-9662e79dc4b4@redhat.com>
+Date: Thu, 30 Mar 2017 10:32:20 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1490879707-6060-1-git-send-email-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC v2 for-2.9 00/10] Fixes and
- cleanups around SocketAddress
+In-Reply-To: <1490879707-6060-11-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="MKdfkmSf8sRQwN46aFS3AQWkjaDodai1W"
+Subject: Re: [Qemu-devel] [RFC v2 for-2.9 10/10] sheepdog: Fix blockdev-add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,130 +24,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, mreitz@redhat.com, pbonzini@redhat.com, namei.unix@gmail.com
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com
 
-On Thu, Mar 30, 2017 at 03:14:57PM +0200, Markus Armbruster wrote:
-> What makes this 2.9 material is the crash bug fixed in PATCH 2 and the
-> QAPI/QMP interface cleanups in PATCH 7+8.
-> 
-> This is RFC because:
-> 
-> 1. To give you one more chance to ask for undocumented -drive
->    driver=nbd usage compatibility [PATCH 08+09].
-> 
-> 2. Another round of sheepdog tests is still in progress (with
->    Kashyap's help).
-> 
-> Max, please have a close look at PATCH 11, I hope this is what you
-> meant when you asked for "parsing @server".
-> 
-> v2:
-> * PATCH 01+02+04+05 unchanged.
-> * PATCH 03 error message improved, blank line [Max]
-> * PATCH 06 commit message typo [Max]
-> * PATCH 07 new, factored out of old PATCH 7
-> * PATCH 08-10 updated, please re-review
-> 
-> Markus Armbruster (10):
->   nbd sockets vnc: Mark problematic address family tests TODO
->   char: Fix socket with "type": "vsock" address
->   io vnc sockets: Clean up SocketAddressKind switches
->   block: Document -drive problematic code and bugs
->   gluster: Prepare for SocketAddressFlat extension
->   qapi-schema: SocketAddressFlat variants 'vsock' and 'fd'
->   sockets: New helper socket_address_crumple()
->   nbd: Tidy up blockdev-add interface
->   squash! nbd: Tidy up blockdev-add interface
->   sheepdog: Fix blockdev-add
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--MKdfkmSf8sRQwN46aFS3AQWkjaDodai1W
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp,
+ namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
+ pbonzini@redhat.com
+Message-ID: <1855940b-6459-965a-988e-9662e79dc4b4@redhat.com>
+Subject: Re: [RFC v2 for-2.9 10/10] sheepdog: Fix blockdev-add
+References: <1490879707-6060-1-git-send-email-armbru@redhat.com>
+ <1490879707-6060-11-git-send-email-armbru@redhat.com>
+In-Reply-To: <1490879707-6060-11-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-FWIW:
+On 03/30/2017 08:15 AM, Markus Armbruster wrote:
+> Commit 831acdc "sheepdog: Implement bdrv_parse_filename()" and commit
+> d282f34 "sheepdog: Support blockdev-add" have different ideas on how
+> the QemuOpts parameters for the server address are named.  Fix that.
+> While there, rename BlockdevOptionsSheepdog member addr to server, for
+> consistency with BlockdevOptionsSsh, BlockdevOptionsGluster,
+> BlockdevOptionsNbd.
+>=20
+> Commit 831acdc's example becomes
+>=20
+>     --drive driver=3Dsheepdog,server.type=3Dinet,server.host=3Dfido,ser=
+ver.port=3D7000,vdi=3Ddolly
+>=20
+> instead of
+>=20
+>     --drive driver=3Dsheepdog,host=3Dfido,vdi=3Ddolly
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  block/sheepdog.c     | 84 ++++++++++++++++++++++++++++++++++----------=
+--------
+>  qapi/block-core.json |  4 +--
+>  2 files changed, 58 insertions(+), 30 deletions(-)
+>=20
 
-Tested-by: Kashyap Chamarthy <kchamart@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Details:
-
-Env
-~~~
-
-I prepared a two-node Sheepdog cluster with Corosync.  Setup info:
-
-	https://kashyapc.fedorapeople.org/virt/sheepdog-qemu-corosync.txt
-
-And used Markus' branch 'blockdev-fixes-debug':
-
-    http://repo.or.cz/qemu/armbru.git/tree/refs/heads/blockdev-fixes-dbg
-
-    $ git describe
-    pull-misc-2017-03-28-27-g885750d
-    
-    $ ./qemu-system-x86_64 -version
-    QEMU emulator version 2.8.92 (v2.9.0-rc1-110-g885750d)
-    Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-Tests
-~~~~~
-
-There are four of them (thanks Markus):
-
-[OK] Test-1: Syntax: sheepdog:hostname:port:Alice
-[OK] Test-2: Syntax: sheepdog://hostname:port/Alice
-[OK] Test-3: Syntax: -drive if=none,driver=sheepdog,server.type=inet,server.host=hostname,server.port=port,vdi=Alice
-[OK] Test-4: Syntax: -blockdev node-name=nn,driver=sheepdog,server.type=inet,server.host=host,server.port=port,vdi=Alice
-
-Complete test invocation 
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-Test-1: Syntax: sheepdog:hostname:port:Alice
------------------------------------------------------------------------
-$ ./qemu-system-x86_64 -display none -nodefconfig -nodefaults sheepdog:192.168.122.84:7000:Alice
-@@@ server.host=192.168.122.84
-@@@ server.port=7000
-@@@ tag=
-@@@ server.type=inet
-@@@ vdi=Alice
-### vdi=Alice addr=192.168.122.84:7000 snap-id=(null) tag=
-WARNING: Image format was not specified for 'json:{"server.host": "192.168.122.84", "server.port": "7000", "tag": "", "driver": "sheepdog", "server.type": "inet", "vdi": "Alice"}' and probing guessed raw.
-         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
-         Specify the 'raw' format explicitly to remove the restrictions.
------------------------------------------------------------------------
-
-Test-2: Syntax: sheepdog://hostname:port/Alice
------------------------------------------------------------------------
-$ ./qemu-system-x86_64 -display none -nodefconfig -nodefaults sheepdog://192.168.122.84:7000/Alice
-@@@ server.host=192.168.122.84
-@@@ server.port=7000
-@@@ tag=
-@@@ server.type=inet
-@@@ vdi=Alice
-### vdi=Alice addr=192.168.122.84:7000 snap-id=(null) tag=
-WARNING: Image format was not specified for 'json:{"server.host": "192.168.122.84", "server.port": "7000", "tag": "", "driver": "sheepdog", "server.type": "inet", "vdi": "Alice"}' and probing guessed raw.
-         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
-         Specify the 'raw' format explicitly to remove the restrictions.
------------------------------------------------------------------------
-
-Test-3: Syntax: -drive \
-if=none,driver=sheepdog,server.type=inet,server.host=hostname,server.port=port,vdi=Alice
------------------------------------------------------------------------
-$ ./qemu-system-x86_64 -display none -nodefconfig -nodefaults -drive if=none,driver=sheepdog,server.type=inet,server.host=192.168.122.84,server.port=7000,vdi=Alice
-@@@ server.host=192.168.122.84
-@@@ server.port=7000
-@@@ server.type=inet
-@@@ vdi=Alice
-### vdi=Alice addr=192.168.122.84:7000 snap-id=(null) tag=
------------------------------------------------------------------------
-
-Test-4: Syntax: -blockdev \
-node-name=nn,driver=sheepdog,server.type=inet,server.host=host,server.port=port,vdi=Alice
------------------------------------------------------------------------
-$ ./qemu-system-x86_64 -display none -nodefconfig -nodefaults -blockdev node-name=nn,driver=sheepdog,server.type=inet,server.host=192.168.122.84,server.port=7000,vdi=Alice
-@@@ server.port=7000
-@@@ server.host=192.168.122.84
-@@@ server.type=inet
-@@@ vdi=Alice
-### vdi=Alice addr=192.168.122.84:7000 snap-id=(null) tag=
------------------------------------------------------------------------
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
--- 
-/kashyap
+--MKdfkmSf8sRQwN46aFS3AQWkjaDodai1W
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEbBAEBCAAGBQJY3SUEAAoJEKeha0olJ0NqO84H+Of6knD+gmoEHiFxC5tZJjcx
+tE+5BwvzRdWBeU+NG0uqA6jbLdQ1EyDgYtfGPY+L9NL/7eaVbfaTuVbBWmKhgjUh
+l38r6t55bnpqRzncFHK6SKtLcJEv0nhQL60quHgZBOphhCyiYBpoOIr5ZB/PJVfp
+P2m88ZJjqogrA5BHQM6GHFunNGSIW4KXVv4o4wGA4AnbJ0XzE20JotSAFk5dT2DR
+KkZef1u4/ZFlTE1nN3nztvsrpbKRjnw4/COmI1j8beWcBdVkulAwBKZoHpb3GSRV
+g4eRDS7+rPFvTKXhQhDCun8fZ7guO4yRo2u5Tqtnkqbm04NYOr8JvAY4D+Nq3g==
+=5UmT
+-----END PGP SIGNATURE-----
+
+--MKdfkmSf8sRQwN46aFS3AQWkjaDodai1W--
