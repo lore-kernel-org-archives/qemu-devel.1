@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ctd3I-0004Ck-Ly
+	(envelope-from <bounces@canonical.com>) id 1ctd3I-0004Cj-Lv
 	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:36:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ctd3F-0006Of-JL
+	(envelope-from <bounces@canonical.com>) id 1ctd3E-0006O4-Pf
 	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:36:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48394)
+Received: from indium.canonical.com ([91.189.90.7]:48362)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ctd3F-0006OA-D0
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:35:57 -0400
+	id 1ctd3E-0006NS-Ip
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:35:56 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ctd3C-0000ik-RY
-	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 16:35:55 +0000
+	id 1ctd3C-0000iw-H0
+	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 16:35:54 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 54A262E80E7
-	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 16:35:52 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id CC01E2E81A9
+	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 16:35:51 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 30 Mar 2017 16:29:06 -0000
+Date: Thu, 30 Mar 2017 16:25:28 -0000
 From: luigiburdo <intermediadc@hotmail.com>
 Reply-To: Bug 1674925 <1674925@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20170322092818.25605.49354.malonedeb@gac.canonical.com>
-Message-Id: <20170330162906.823.79504.malone@gac.canonical.com>
+Message-Id: <20170330162528.9785.86429.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1674925] Re: Qemu PPC64 kvm no display if
  --device virtio-gpu-pci is selected
@@ -39,19 +39,16 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-attched the booted mate 16.10 Qemu system ppc64 --kvm on Qoriq without vide=
-o initialized
-only way i have to see something is with --serial stdio =
+hi thomas on Qoriq Xics isnt present and cant be selected and i dont have v=
+ideo output too
+this is a shot of the kernel config.
+On G5 Quad i will made a shoot too i thinks screenshots is better then may =
+english knowledge :P
 
 
-here i post the log of Qemu-system-ppc64 i filed a new bug about
-https://bugs.launchpad.net/qemu/+bug/1677247
-
-soon the G5 Quad shots
-
-** Attachment added: "Screenshot_2017-03-29_21-15-08.png"
-   https://bugs.launchpad.net/qemu/+bug/1674925/+attachment/4850658/+files/=
-Screenshot_2017-03-29_21-15-08.png
+** Attachment added: "Qoriq kenel cofig"
+   https://bugs.launchpad.net/qemu/+bug/1674925/+attachment/4850656/+files/=
+Screenshot_2017-03-30_18-23-26.png
 
 -- =
 
