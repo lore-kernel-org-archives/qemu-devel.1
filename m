@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47821)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chao.gao@intel.com>) id 1ctn8z-0000Id-Pm
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 23:22:34 -0400
+	(envelope-from <chao.gao@intel.com>) id 1ctnKS-0001iT-KM
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 23:34:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chao.gao@intel.com>) id 1ctn8w-0002Bd-L3
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 23:22:33 -0400
-Received: from mga06.intel.com ([134.134.136.31]:63178)
+	(envelope-from <chao.gao@intel.com>) id 1ctnKP-0001tH-Fk
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 23:34:24 -0400
+Received: from mga09.intel.com ([134.134.136.24]:1964)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <chao.gao@intel.com>) id 1ctn8w-00029q-D2
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 23:22:30 -0400
-Date: Fri, 31 Mar 2017 04:19:56 +0800
+	(Exim 4.71) (envelope-from <chao.gao@intel.com>) id 1ctnKP-0001qe-2Y
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 23:34:21 -0400
+Date: Fri, 31 Mar 2017 04:31:41 +0800
 From: Chao Gao <chao.gao@intel.com>
-Message-ID: <20170330201955.GA98879@skl-2s3.sh.intel.com>
+Message-ID: <20170330203141.GB98879@skl-2s3.sh.intel.com>
 References: <1489750157-17401-1-git-send-email-tianyu.lan@intel.com>
-	<1489750157-17401-3-git-send-email-tianyu.lan@intel.com>
-	<20170330162452.GB1864@perard.uk.xensource.com>
+	<1489750157-17401-4-git-send-email-tianyu.lan@intel.com>
+	<20170330165145.GC1864@perard.uk.xensource.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170330162452.GB1864@perard.uk.xensource.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 2/4] Xen: add a dummy vIOMMU to
- create/destroy vIOMMU in Xen
+In-Reply-To: <20170330165145.GC1864@perard.uk.xensource.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 3/4] xen-pt: bind/unbind interrupt
+ remapping format MSI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,81 +30,126 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Anthony PERARD <anthony.perard@citrix.com>
-Cc: Lan Tianyu <tianyu.lan@intel.com>, xen-devel@lists.xensource.com, qemu-devel@nongnu.org, kevin.tian@intel.com, sstabellini@kernel.org
+Cc: Lan Tianyu <tianyu.lan@intel.com>, xen-devel@lists.xensource.com, qemu-devel@nongnu.org, kevin.tian@intel.com, sstabellini@kernel.org, mst@redhat.com
 
-On Thu, Mar 30, 2017 at 05:24:52PM +0100, Anthony PERARD wrote:
->Hi,
->
->On Fri, Mar 17, 2017 at 07:29:15PM +0800, Lan Tianyu wrote:
+On Thu, Mar 30, 2017 at 05:51:45PM +0100, Anthony PERARD wrote:
+>On Fri, Mar 17, 2017 at 07:29:16PM +0800, Lan Tianyu wrote:
 >> From: Chao Gao <chao.gao@intel.com>
 >> 
->> Since adding a dynamic sysbus device is forbidden, so choose TYPE_DEVICE
->> as parent class.
+>> If a vIOMMU is exposed to guest, guest will configure the msi to remapping
+>> format. The original code isn't suitable to the new format. A new pair
+>> bind/unbind interfaces are added for this usage. This patch recognizes
+>> this case and use new interfaces to bind/unbind msi.
 >> 
 >> Signed-off-by: Chao Gao <chao.gao@intel.com>
 >> Signed-off-by: Lan Tianyu <tianyu.lan@intel.com>
 >> ---
->>  hw/xen/Makefile.objs |   1 +
->>  hw/xen/xen_viommu.c  | 116 +++++++++++++++++++++++++++++++++++++++++++++++++++
->>  2 files changed, 117 insertions(+)
->>  create mode 100644 hw/xen/xen_viommu.c
+>>  hw/xen/xen_pt_msi.c           | 36 ++++++++++++++++++++++++++++--------
+>>  include/hw/i386/apic-msidef.h |  1 +
+>>  2 files changed, 29 insertions(+), 8 deletions(-)
 >> 
->> +static void xen_viommu_realize(DeviceState *dev, Error **errp)
->> +{
->> +    int rc;
->> +    uint64_t cap;
->> +    char *dom;
->> +    char viommu_path[1024];
->> +    XenVIOMMUState *s = XEN_VIOMMU_DEVICE(dev);
->> +
->> +    s->id = -1;
->> +    
->> +    /* Read vIOMMU attributes from Xenstore. */
->> +    dom = xs_get_domain_path(xenstore, xen_domid);
->> +    snprintf(viommu_path, sizeof(viommu_path), "%s/viommu", dom);
->> +    rc = xenstore_read_uint64(viommu_path, "base_addr", &s->base_addr);  
+>> diff --git a/hw/xen/xen_pt_msi.c b/hw/xen/xen_pt_msi.c
+>> index 62add06..8b0d7fc 100644
+>> --- a/hw/xen/xen_pt_msi.c
+>> +++ b/hw/xen/xen_pt_msi.c
+>> @@ -161,6 +161,7 @@ static int msi_msix_update(XenPCIPassthroughState *s,
+>>      uint8_t gvec = msi_vector(data);
+>>      uint32_t gflags = msi_gflags(data, addr);
+>>      int rc = 0;
+>> +    bool ir = !!(addr & MSI_ADDR_IM_MASK);
+>>      uint64_t table_addr = 0;
+>>  
+>>      XEN_PT_LOG(d, "Updating MSI%s with pirq %d gvec %#x gflags %#x"
+>> @@ -171,8 +172,14 @@ static int msi_msix_update(XenPCIPassthroughState *s,
+>>          table_addr = s->msix->mmio_base_addr;
+>>      }
+>>  
+>> -    rc = xc_domain_update_msi_irq(xen_xc, xen_domid, gvec,
+>> +    if (ir) {
 >
->Could these informations (base_addr and cap) be read from the command
->line instead of via xenstore?
->Any reason for these informations to be on xenstore?
+>You could maybe use add&MSI_ADDR_IM_MASK instead of going through a
+>variable.
+>
+>> +        rc = xc_domain_update_msi_irq_remapping(xen_xc, xen_domid, pirq,
+>> +                                    d->devfn, data, addr, table_addr);
+>
+>Do you also want to update the XEN_PT_LOG above? Since it does not
+>always reflect the update_msi call anymore.
 
-Actually, we passed both via command line at first. We just concerned
-whether it was ok to pass a address through command line since
-we find no device does the similar thing.
+Yes. I adjust the output.
 
->
->> +    if (rc) {
->> +        error_report("Can't get base address of vIOMMU");
->
->I think error_setg should be used instead of error_report.
->
->> +        exit(1);
->
->Also, exit should be remove, and return instead. error_setg would be
->enough to signal that the device can not work.
 >
 >> +    }
->> +
->> +    rc = xenstore_read_uint64(viommu_path, "cap", &s->cap);
->> +    if (rc) {
->> +        error_report("Can't get capabilities of vIOMMU");
->> +        exit(1);
+>> +    else {
+>> +        rc = xc_domain_update_msi_irq(xen_xc, xen_domid, gvec,
+>>                                    pirq, gflags, table_addr);
 >> +    }
->> +
->> +    rc = xc_viommu_query_cap(xen_xc, xen_domid, &cap);
+>>  
+>>      if (rc) {
+>>          XEN_PT_ERR(d, "Updating of MSI%s failed. (err: %d)\n",
+>> @@ -204,13 +211,26 @@ static int msi_msix_disable(XenPCIPassthroughState *s,
+>>      }
+>>  
+>>      if (is_binded) {
+>> -        XEN_PT_LOG(d, "Unbind MSI%s with pirq %d, gvec %#x\n",
+>> -                   is_msix ? "-X" : "", pirq, gvec);
+>> -        rc = xc_domain_unbind_msi_irq(xen_xc, xen_domid, gvec, pirq, gflags);
+>> -        if (rc) {
+>> -            XEN_PT_ERR(d, "Unbinding of MSI%s failed. (err: %d, pirq: %d, gvec: %#x)\n",
+>> -                       is_msix ? "-X" : "", errno, pirq, gvec);
+>> -            return rc;
+>> +        if ( addr & MSI_ADDR_IM_MASK ) {
+>> +            XEN_PT_LOG(d, "Unbinding of MSI%s . ( pirq: %d, data: %x, addr: %lx)\n",
 >
->Since xc_viommu_* seems to be new, you should use
->xendevicemodel_viommu_* instead, also you will need to define a stub for
->them to be able to compile QEMU against older version of Xen.
+>For addr, it should be PRIx64 instead of %lx.
+>
+>> +                       is_msix ? "-X" : "", pirq, data, addr);
+>> +            rc = xc_domain_unbind_msi_irq_remapping(xen_xc, xen_domid, pirq,
+>> +                                                    d->devfn, data, addr);
+>> +            if (rc) {
+>> +                XEN_PT_ERR(d, "Unbinding of MSI%s . (error: %d, pirq: %d, data: %x, addr: %lx)\n",
+>> +                           is_msix ? "-X" : "", rc, pirq, data, addr);
+>> +                return rc;
+>> +            }
+>> +
+>> +        } else {
+>> +            XEN_PT_LOG(d, "Unbind MSI%s with pirq %d, gvec %#x\n",
+>> +                       is_msix ? "-X" : "", pirq, gvec);
+>> +            rc = xc_domain_unbind_msi_irq(xen_xc, xen_domid, gvec, pirq, gflags);
+>> +            if (rc) {
+>> +                XEN_PT_ERR(d, "Unbinding of MSI%s failed. (err: %d, pirq: %d, gvec: %#x)\n",
+>> +                           is_msix ? "-X" : "", errno, pirq, gvec);
+>> +                return rc;
+>> +            }
+>>          }
+>>      }
+>>  
+>> diff --git a/include/hw/i386/apic-msidef.h b/include/hw/i386/apic-msidef.h
+>> index 8b4d4cc..08b584f 100644
+>> --- a/include/hw/i386/apic-msidef.h
+>> +++ b/include/hw/i386/apic-msidef.h
+>> @@ -27,5 +27,6 @@
+>>  #define MSI_ADDR_DEST_ID_SHIFT          12
+>>  #define MSI_ADDR_DEST_IDX_SHIFT         4
+>>  #define  MSI_ADDR_DEST_ID_MASK          0x00ffff0
+>
+>Could you add a 0 to dest_id here? So their will be 8 digit and it those
+>not look weird when compared to the next define.
+>
 
-Will follow your suggestions above.
+Will do.
+
+>> +#define  MSI_ADDR_IM_MASK               0x00000010
+>
+>Is the definition of MSI_ADDR_IM_MASK available somewhere? In the Intel
+>SDM I've only found this bit to be reserved.
+
+Yes, it is defined in VT-d spec 5.1.5.2 MSI and MSI-X Register Programming.
+I made a mistake here. I should use MSI_ADDR_IF_MASK. 
 
 Thanks
 Chao
 
->
->
->The patch looks good otherwise.
 >
 >Thanks,
 >
