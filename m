@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ctXh4-0000Wm-UR
+	(envelope-from <pm215@archaic.org.uk>) id 1ctXh5-0000X0-FC
 	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 06:52:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ctXh3-00069J-UY
+	(envelope-from <pm215@archaic.org.uk>) id 1ctXh4-00069R-Mb
 	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 06:52:43 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48981)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ctXh3-00062x-Nl
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 06:52:41 -0400
+	id 1ctXh4-00062x-G0
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 06:52:42 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 30 Mar 2017 11:52:30 +0100
-Message-Id: <1490871151-29029-2-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 30 Mar 2017 11:52:31 +0100
+Message-Id: <1490871151-29029-3-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1490871151-29029-1-git-send-email-peter.maydell@linaro.org>
 References: <1490871151-29029-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 for-2.9 1/2] tcg/sparc: Zero extend data
- argument to store helpers
+Subject: [Qemu-devel] [PATCH v2 for-2.9 2/2] tcg/sparc: Zero extend address
+ argument to ld/st helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +28,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-The C store helper functions take the data argument as a uint8_t,
-uint16_t, etc depending on the store size. The SPARC calling
-convention requires that data types smaller than the register
-size must be extended by the caller. We weren't doing this,
-which meant that if QEMU was compiled with optimizations enabled
-we could end up storing incorrect values to guest memory.
-(In particular the i386 guest BIOS would crash on startup.)
-
-Add code to the trampolines that call the store helpers to
-do the zero extension as required.
+The C store helper functions take the address argument as a
+target_ulong type; if this is 32 bit but the host is 64 bit
+then the SPARC calling convention requires that the caller
+must zero extend the value. We weren't doing this, which
+meant we could pass values to the caller with high bits set
+and QEMU would crash if it was compiled with optimizations.
+In particular, the i386 BIOS would not start.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
-v1->v2: fix incorrect argument order to emit_extend() for
-sparc32 codepath; switch on op & MO_SIZE rather than just op.
----
- tcg/sparc/tcg-target.inc.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ tcg/sparc/tcg-target.inc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/tcg/sparc/tcg-target.inc.c b/tcg/sparc/tcg-target.inc.c
-index d1f4c0d..ab34039 100644
+index ab34039..3785d77 100644
 --- a/tcg/sparc/tcg-target.inc.c
 +++ b/tcg/sparc/tcg-target.inc.c
-@@ -843,6 +843,29 @@ static void tcg_out_mb(TCGContext *s, TCGArg a0)
- static tcg_insn_unit *qemu_ld_trampoline[16];
- static tcg_insn_unit *qemu_st_trampoline[16];
+@@ -1144,7 +1144,7 @@ static void tcg_out_qemu_ld(TCGContext *s, TCGReg data, TCGReg addr,
+         /* Skip the high-part; we'll perform the extract in the trampoline.  */
+         param++;
+     }
+-    tcg_out_mov(s, TCG_TYPE_REG, param++, addr);
++    tcg_out_mov(s, TCG_TYPE_REG, param++, addrz);
  
-+static void emit_extend(TCGContext *s, TCGReg r, int op)
-+{
-+    /* Emit zero extend of 8, 16 or 32 bit data as
-+     * required by the MO_* value op; do nothing for 64 bit.
-+     */
-+    switch (op & MO_SIZE) {
-+    case MO_8:
-+        tcg_out_arithi(s, r, r, 0xff, ARITH_AND);
-+        break;
-+    case MO_16:
-+        tcg_out_arithi(s, r, r, 16, SHIFT_SLL);
-+        tcg_out_arithi(s, r, r, 16, SHIFT_SRL);
-+        break;
-+    case MO_32:
-+        if (SPARC64) {
-+            tcg_out_arith(s, r, r, 0, SHIFT_SRL);
-+        }
-+        break;
-+    case MO_64:
-+        break;
-+    }
-+}
-+
- static void build_trampolines(TCGContext *s)
- {
-     static void * const qemu_ld_helpers[16] = {
-@@ -910,6 +933,7 @@ static void build_trampolines(TCGContext *s)
-         qemu_st_trampoline[i] = s->code_ptr;
- 
-         if (SPARC64) {
-+            emit_extend(s, TCG_REG_O2, i);
-             ra = TCG_REG_O4;
-         } else {
-             ra = TCG_REG_O1;
-@@ -925,6 +949,7 @@ static void build_trampolines(TCGContext *s)
-                 tcg_out_arithi(s, ra, ra + 1, 32, SHIFT_SRLX);
-                 ra += 2;
-             } else {
-+                emit_extend(s, ra, i);
-                 ra += 1;
-             }
-             /* Skip the oi argument.  */
+     /* We use the helpers to extend SB and SW data, leaving the case
+        of SL needing explicit extending below.  */
+@@ -1224,7 +1224,7 @@ static void tcg_out_qemu_st(TCGContext *s, TCGReg data, TCGReg addr,
+         /* Skip the high-part; we'll perform the extract in the trampoline.  */
+         param++;
+     }
+-    tcg_out_mov(s, TCG_TYPE_REG, param++, addr);
++    tcg_out_mov(s, TCG_TYPE_REG, param++, addrz);
+     if (!SPARC64 && (memop & MO_SIZE) == MO_64) {
+         /* Skip the high-part; we'll perform the extract in the trampoline.  */
+         param++;
 -- 
 2.7.4
