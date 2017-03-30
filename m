@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ctc3v-0008Jv-Kp
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:32:36 -0400
+	(envelope-from <mst@redhat.com>) id 1ctc7C-0001Eb-UB
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:35:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ctc3u-0005SE-LM
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:32:35 -0400
-References: <1490879707-6060-1-git-send-email-armbru@redhat.com>
-	<1490879707-6060-11-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1855940b-6459-965a-988e-9662e79dc4b4@redhat.com>
-Date: Thu, 30 Mar 2017 10:32:20 -0500
+	(envelope-from <mst@redhat.com>) id 1ctc78-0007wp-PE
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:35:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51224)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ctc78-0007vw-CW
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:35:54 -0400
+Date: Thu, 30 Mar 2017 18:35:51 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <1490888143-31601-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1490879707-6060-11-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="MKdfkmSf8sRQwN46aFS3AQWkjaDodai1W"
-Subject: Re: [Qemu-devel] [RFC v2 for-2.9 10/10] sheepdog: Fix blockdev-add
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH] tests/acpi: don't pack a structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,73 +24,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---MKdfkmSf8sRQwN46aFS3AQWkjaDodai1W
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp,
- namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
- pbonzini@redhat.com
-Message-ID: <1855940b-6459-965a-988e-9662e79dc4b4@redhat.com>
-Subject: Re: [RFC v2 for-2.9 10/10] sheepdog: Fix blockdev-add
-References: <1490879707-6060-1-git-send-email-armbru@redhat.com>
- <1490879707-6060-11-git-send-email-armbru@redhat.com>
-In-Reply-To: <1490879707-6060-11-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+There's no reason to pack structures where we don't care about size or
+padding, this applies to AcpiStdTable in tests/acpi-utils.h.
 
-On 03/30/2017 08:15 AM, Markus Armbruster wrote:
-> Commit 831acdc "sheepdog: Implement bdrv_parse_filename()" and commit
-> d282f34 "sheepdog: Support blockdev-add" have different ideas on how
-> the QemuOpts parameters for the server address are named.  Fix that.
-> While there, rename BlockdevOptionsSheepdog member addr to server, for
-> consistency with BlockdevOptionsSsh, BlockdevOptionsGluster,
-> BlockdevOptionsNbd.
->=20
-> Commit 831acdc's example becomes
->=20
->     --drive driver=3Dsheepdog,server.type=3Dinet,server.host=3Dfido,ser=
-ver.port=3D7000,vdi=3Ddolly
->=20
-> instead of
->=20
->     --drive driver=3Dsheepdog,host=3Dfido,vdi=3Ddolly
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  block/sheepdog.c     | 84 ++++++++++++++++++++++++++++++++++----------=
---------
->  qapi/block-core.json |  4 +--
->  2 files changed, 58 insertions(+), 30 deletions(-)
->=20
+OTOH bios-tables-test happens to be passing the address of a field in
+this  struct to a function that expects a pointer to normally aligned
+data which results in a SIGBUS on architectures like SPARC that have
+strict alignment requirements.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Fixes: 9e8458c02 ("acpi unit-test: compare DSDT and SSDT tables against expected values")
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ tests/acpi-utils.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---MKdfkmSf8sRQwN46aFS3AQWkjaDodai1W
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEbBAEBCAAGBQJY3SUEAAoJEKeha0olJ0NqO84H+Of6knD+gmoEHiFxC5tZJjcx
-tE+5BwvzRdWBeU+NG0uqA6jbLdQ1EyDgYtfGPY+L9NL/7eaVbfaTuVbBWmKhgjUh
-l38r6t55bnpqRzncFHK6SKtLcJEv0nhQL60quHgZBOphhCyiYBpoOIr5ZB/PJVfp
-P2m88ZJjqogrA5BHQM6GHFunNGSIW4KXVv4o4wGA4AnbJ0XzE20JotSAFk5dT2DR
-KkZef1u4/ZFlTE1nN3nztvsrpbKRjnw4/COmI1j8beWcBdVkulAwBKZoHpb3GSRV
-g4eRDS7+rPFvTKXhQhDCun8fZ7guO4yRo2u5Tqtnkqbm04NYOr8JvAY4D+Nq3g==
-=5UmT
------END PGP SIGNATURE-----
-
---MKdfkmSf8sRQwN46aFS3AQWkjaDodai1W--
+diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
+index 9f9a2d5..348e4d7 100644
+--- a/tests/acpi-utils.h
++++ b/tests/acpi-utils.h
+@@ -26,7 +26,7 @@ typedef struct {
+     gsize asl_len;
+     gchar *asl_file;
+     bool tmp_files_retain;   /* do not delete the temp asl/aml */
+-} QEMU_PACKED AcpiSdtTable;
++} AcpiSdtTable;
+ 
+ #define ACPI_READ_FIELD(field, addr)           \
+     do {                                       \
+-- 
+MST
