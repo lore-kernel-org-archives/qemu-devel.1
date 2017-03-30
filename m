@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ctVEq-0002bc-TX
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 04:15:26 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1ctVNf-0004jq-SK
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 04:24:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ctVEl-0002gi-UY
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 04:15:24 -0400
-Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:34570)
+	(envelope-from <dgilbert@redhat.com>) id 1ctVNb-00022k-T0
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 04:24:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45130)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ctVEl-0002gX-La
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 04:15:19 -0400
-Received: from player718.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 7049075D47
-	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 10:15:16 +0200 (CEST)
-References: <1490686352-24017-1-git-send-email-clg@kaod.org>
-	<1490686352-24017-6-git-send-email-clg@kaod.org>
-	<20170329051845.GZ21068@umbus.fritz.box>
-	<2ff53243-d4ca-7a98-8aa2-aefc8343f495@kaod.org>
-	<20170330015520.GF21068@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <79f4fe6a-e918-2236-fdaa-73d3b5be7e6b@kaod.org>
-Date: Thu, 30 Mar 2017 10:15:11 +0200
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ctVNb-00020P-LK
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 04:24:27 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 561E880F90
+	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 08:24:26 +0000 (UTC)
+Date: Thu, 30 Mar 2017 09:24:20 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170330082419.GA2585@work-vm>
+References: <1490818790-3100-1-git-send-email-vyasevic@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170330015520.GF21068@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 5/8] ppc/pnv: create the ICP and ICS
- objects under the machine
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1490818790-3100-1-git-send-email-vyasevic@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] virtio-net: consolidate guest announcement
+ with qemu_announce_self
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,300 +33,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Vladislav Yasevich <vyasevic@redhat.com>
+Cc: qemu-devel@nongnu.org, gveitmic@redhat.com, mst@redhat.com
 
-On 03/30/2017 03:55 AM, David Gibson wrote:
-> On Wed, Mar 29, 2017 at 10:13:59AM +0200, C=E9dric Le Goater wrote:
->> On 03/29/2017 07:18 AM, David Gibson wrote:
->>> On Tue, Mar 28, 2017 at 09:32:29AM +0200, C=E9dric Le Goater wrote:
->>>> Like this is done for the sPAPR machine, we use a simple array under
->>>> the PowerNV machine to store the Interrupt Control Presenters (ICP)
->>>> objects, one for each vCPU. This array is indexed by 'cpu_index' of
->>>> the CPUState but the users will provide a core PIR number. The mappi=
-ng
->>>> is done in the icp_get() handler of the machine and is transparent t=
-o
->>>> XICS.
->>>>
->>>> The Interrupt Control Sources (ICS), Processor Service Interface and
->>>> PCI-E interface models, will be introduced in subsequent patches. Fo=
-r
->>>> now, we have none, so we just prepare ground with place holders.
->>>>
->>>> Finally, to interface with the XICS layer which manipulates the ICP
->>>> and ICS objects, we extend the PowerNV machine with an XICSFabric
->>>> interface and its associated handlers.
->>>>
->>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->>>> ---
->>>>
->>>>  Changes since v2:
->>>>
->>>>  - removed the list of ICS. The handlers will iterate on the chips t=
-o
->>>>    use the available ICS.
->>>>
->>>>  Changes since v1:
->>>>
->>>>  - handled pir-to-cpu_index mapping under icp_get=20
->>>>  - removed ics_eio handler
->>>>  - changed ICP name indexing
->>>>  - removed sysbus parenting of the ICP object
->>>>
->>>>  hw/ppc/pnv.c         | 96 +++++++++++++++++++++++++++++++++++++++++=
-+++++++++++
->>>>  include/hw/ppc/pnv.h |  3 ++
->>>>  2 files changed, 99 insertions(+)
->>>>
->>>> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
->>>> index 3fa722af82e6..e441b8ac1cad 100644
->>>> --- a/hw/ppc/pnv.c
->>>> +++ b/hw/ppc/pnv.c
->>>> @@ -33,7 +33,10 @@
->>>>  #include "exec/address-spaces.h"
->>>>  #include "qemu/cutils.h"
->>>>  #include "qapi/visitor.h"
->>>> +#include "monitor/monitor.h"
->>>> +#include "hw/intc/intc.h"
->>>> =20
->>>> +#include "hw/ppc/xics.h"
->>>>  #include "hw/ppc/pnv_xscom.h"
->>>> =20
->>>>  #include "hw/isa/isa.h"
->>>> @@ -417,6 +420,23 @@ static void ppc_powernv_init(MachineState *mach=
-ine)
->>>>          machine->cpu_model =3D "POWER8";
->>>>      }
->>>> =20
->>>> +    /* Create the Interrupt Control Presenters before the vCPUs */
->>>> +    pnv->nr_servers =3D pnv->num_chips * smp_cores * smp_threads;
->>>> +    pnv->icps =3D g_new0(PnvICPState, pnv->nr_servers);
->>>> +    for (i =3D 0; i < pnv->nr_servers; i++) {
->>>> +        PnvICPState *icp =3D &pnv->icps[i];
->>>> +        char name[32];
->>>> +
->>>> +        /* TODO: fix ICP object name to be in sync with the core na=
-me */
->>>> +        snprintf(name, sizeof(name), "icp[%d]", i);
->>>
->>> It may end up being the same value, but since the qom name is exposed
->>> to the outside, it would be better to have it be the PIR, rather than
->>> the cpu_index.
->>
->> The problem is that the ICPState objects are created before the PnvChi=
-p
->> objects. The PnvChip sanitizes the core layout in terms HW id and then=
-=20
->> creates the PnvCore objects. The core creates a PowerPCCPU object per=20
->> thread and, in the realize function, uses the XICSFabric to look for
->> a matching ICP to link the CPU with.=20
->>
->> So it is a little complex to do what you ask for ...
->>
->> What would really simplify the code, would be to allocate a TYPE_PNV_I=
-CP
->> object when the PowerPCCPU object is realized and store it under the=20
->> 'icp/intc' backlink. The XICSFabric handler icp_get() would not need=20
->> the 'icps' array anymore.=20
->>
->> How's that proposal ?
->=20
-> Sounds workable.  You could do that from the core realize function,
-> couldn't you?
+* Vladislav Yasevich (vyasevic@redhat.com) wrote:
+> virtio announcements seem to run on its own timer with it's own
+> repetition loop and are invoked separately from qemu_announce_self.
+> This patch consolidates announcements into a single location and
+> allows other nics to provide it's own announcement capabilities, if
+> necessary.
+> 
+> This is also usefull in support of exposing qemu_announce_self through
+> qmp/hmp.
+> 
+> Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
+> ---
+>  hw/net/virtio-net.c            | 30 ++++++++----------------------
+>  include/hw/virtio/virtio-net.h |  2 --
+>  include/net/net.h              |  2 ++
+>  migration/savevm.c             |  6 ++++++
+>  4 files changed, 16 insertions(+), 24 deletions(-)
+> 
+> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> index c321680..6e9ce4f 100644
+> --- a/hw/net/virtio-net.c
+> +++ b/hw/net/virtio-net.c
+> @@ -110,14 +110,16 @@ static bool virtio_net_started(VirtIONet *n, uint8_t status)
+>          (n->status & VIRTIO_NET_S_LINK_UP) && vdev->vm_running;
+>  }
+>  
+> -static void virtio_net_announce_timer(void *opaque)
+> +static void virtio_net_announce(NetClientState *nc)
+>  {
+> -    VirtIONet *n = opaque;
+> +    VirtIONet *n = qemu_get_nic_opaque(nc);
+>      VirtIODevice *vdev = VIRTIO_DEVICE(n);
+>  
+> -    n->announce_counter--;
+> -    n->status |= VIRTIO_NET_S_ANNOUNCE;
+> -    virtio_notify_config(vdev);
+> +    if (virtio_vdev_has_feature(vdev, VIRTIO_NET_F_GUEST_ANNOUNCE) &&
+> +        virtio_vdev_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ)) {
+> +            n->status |= VIRTIO_NET_S_ANNOUNCE;
+> +            virtio_notify_config(vdev);
+> +    }
+>  }
+>  
+>  static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
+> @@ -427,8 +429,6 @@ static void virtio_net_reset(VirtIODevice *vdev)
+>      n->nobcast = 0;
+>      /* multiqueue is disabled by default */
+>      n->curr_queues = 1;
+> -    timer_del(n->announce_timer);
+> -    n->announce_counter = 0;
+>      n->status &= ~VIRTIO_NET_S_ANNOUNCE;
+>  
+>      /* Flush any MAC and VLAN filter table state */
+> @@ -868,11 +868,6 @@ static int virtio_net_handle_announce(VirtIONet *n, uint8_t cmd,
+>      if (cmd == VIRTIO_NET_CTRL_ANNOUNCE_ACK &&
+>          n->status & VIRTIO_NET_S_ANNOUNCE) {
+>          n->status &= ~VIRTIO_NET_S_ANNOUNCE;
+> -        if (n->announce_counter) {
+> -            timer_mod(n->announce_timer,
+> -                      qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
+> -                      self_announce_delay(n->announce_counter));
+> -        }
+>          return VIRTIO_NET_OK;
+>      } else {
+>          return VIRTIO_NET_ERR;
+> @@ -1609,12 +1604,6 @@ static int virtio_net_post_load_device(void *opaque, int version_id)
+>          qemu_get_subqueue(n->nic, i)->link_down = link_down;
+>      }
+>  
+> -    if (virtio_vdev_has_feature(vdev, VIRTIO_NET_F_GUEST_ANNOUNCE) &&
+> -        virtio_vdev_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ)) {
+> -        n->announce_counter = SELF_ANNOUNCE_ROUNDS;
+> -        timer_mod(n->announce_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL));
+> -    }
+> -
+>      return 0;
+>  }
+>  
+> @@ -1829,6 +1818,7 @@ static NetClientInfo net_virtio_info = {
+>      .receive = virtio_net_receive,
+>      .link_status_changed = virtio_net_set_link_status,
+>      .query_rx_filter = virtio_net_query_rxfilter,
+> +    .announce = virtio_net_announce,
+>  };
+>  
+>  static bool virtio_net_guest_notifier_pending(VirtIODevice *vdev, int idx)
+> @@ -1934,8 +1924,6 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+>      qemu_macaddr_default_if_unset(&n->nic_conf.macaddr);
+>      memcpy(&n->mac[0], &n->nic_conf.macaddr, sizeof(n->mac));
+>      n->status = VIRTIO_NET_S_LINK_UP;
+> -    n->announce_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL,
+> -                                     virtio_net_announce_timer, n);
+>  
+>      if (n->netclient_type) {
+>          /*
+> @@ -1997,8 +1985,6 @@ static void virtio_net_device_unrealize(DeviceState *dev, Error **errp)
+>          virtio_net_del_queue(n, i);
+>      }
+>  
+> -    timer_del(n->announce_timer);
+> -    timer_free(n->announce_timer);
+>      g_free(n->vqs);
+>      qemu_del_nic(n->nic);
+>      virtio_cleanup(vdev);
+> diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
+> index 1eec9a2..0c597f4 100644
+> --- a/include/hw/virtio/virtio-net.h
+> +++ b/include/hw/virtio/virtio-net.h
+> @@ -94,8 +94,6 @@ typedef struct VirtIONet {
+>      char *netclient_name;
+>      char *netclient_type;
+>      uint64_t curr_guest_offloads;
+> -    QEMUTimer *announce_timer;
+> -    int announce_counter;
+>      bool needs_vnet_hdr_swap;
+>  } VirtIONet;
+>  
+> diff --git a/include/net/net.h b/include/net/net.h
+> index 99b28d5..598f523 100644
+> --- a/include/net/net.h
+> +++ b/include/net/net.h
+> @@ -64,6 +64,7 @@ typedef int (SetVnetLE)(NetClientState *, bool);
+>  typedef int (SetVnetBE)(NetClientState *, bool);
+>  typedef struct SocketReadState SocketReadState;
+>  typedef void (SocketReadStateFinalize)(SocketReadState *rs);
+> +typedef void (NetAnnounce)(NetClientState *);
+>  
+>  typedef struct NetClientInfo {
+>      NetClientDriver type;
+> @@ -84,6 +85,7 @@ typedef struct NetClientInfo {
+>      SetVnetHdrLen *set_vnet_hdr_len;
+>      SetVnetLE *set_vnet_le;
+>      SetVnetBE *set_vnet_be;
+> +    NetAnnounce *announce;
+>  } NetClientInfo;
+>  
+>  struct NetClientState {
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 3b19a4a..5c1d8dc 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -113,9 +113,15 @@ static void qemu_announce_self_iter(NICState *nic, void *opaque)
+>      int len;
+>  
+>      trace_qemu_announce_self_iter(qemu_ether_ntoa(&nic->conf->macaddr));
+> +
+>      len = announce_self_create(buf, nic->conf->macaddr.a);
+>  
+>      qemu_send_packet_raw(qemu_get_queue(nic), buf, len);
+> +
+> +    /* if the NIC provides it's own announcement support, use it as well */
+> +    if (nic->ncs->info->announce) {
+> +        nic->ncs->info->announce(nic->ncs);
+> +    }
+>  }
 
-OK, it would look better from a QOM perspective, I agree, as we would=20
-not "realize" the PowerPCCPU object before creating the ICP object.
-I will send an update of this patch for you to review :=20
+Combining them doesn't necessarily seem like a bad thing; but
+it does change the timing quite a bit - at the moment the QEMU RARPs
+are sent at the end of migration, while the Virtio ARPs are sent
+when the guest starts running which is quite a bit later.
 
-	[PATCH v4 5/9] ppc/pnv: create the ICP object under PnvCore
+In many ways the 'when the guest starts' is better, given that libvirt
+etc has had a chance to reconfigure the networking,  but I'm not that
+sure if it's safe to move the existing one - I had considered *adding*
+another shot of the current mechanism after the guest is started.
 
+I certainly think it's wrong to do the virtio announce at the earlier
+point.
 
-We could follow the exact same pattern for the sPAPR machine if we=20
-knew which ICP type to use (KVM or not). May be a new XICSFabric=20
-handler :
+See also Germano's thread of being able to retrigger the announce
+at arbitrary points, and the series I posted a couple of days ago
+to extend the length/timing of the announce.
 
-	const char *icp_type(XICSFabric *xi)
+Dave
 
-would help for that ? I don't think we can use a property because of=20
-the hotplug mechanism.
-
-=20
->>>> +        object_initialize(icp, sizeof(*icp), TYPE_PNV_ICP);
->>>> +        object_property_add_child(OBJECT(pnv), name, OBJECT(icp),
->>>> +                                  &error_fatal);
->>>> +        object_property_add_const_link(OBJECT(icp), "xics", OBJECT(=
-pnv),
->>>> +                                       &error_fatal);
->>>> +        object_property_set_bool(OBJECT(icp), true, "realized", &er=
-ror_fatal);
->>>> +    }
->>>> +
->>>>      /* Create the processor chips */
->>>>      chip_typename =3D g_strdup_printf(TYPE_PNV_CHIP "-%s", machine-=
->cpu_model);
->>>>      if (!object_class_by_name(chip_typename)) {
->>>> @@ -737,6 +757,71 @@ static const TypeInfo pnv_chip_info =3D {
->>>>      .abstract      =3D true,
->>>>  };
->>>> =20
->>>> +static ICSState *pnv_ics_get(XICSFabric *xi, int irq)
->>>> +{
->>>> +    PnvMachineState *pnv =3D POWERNV_MACHINE(xi);
->>>> +    int i;
->>>> +
->>>> +    for (i =3D 0; i < pnv->num_chips; i++) {
->>>> +        /* place holder */
->>>> +    }
->>>> +    return NULL;
->>>> +}
->>>> +
->>>> +static void pnv_ics_resend(XICSFabric *xi)
->>>> +{
->>>> +    PnvMachineState *pnv =3D POWERNV_MACHINE(xi);
->>>> +    int i;
->>>> +
->>>> +    for (i =3D 0; i < pnv->num_chips; i++) {
->>>> +        /* place holder */
->>>> +    }
->>>> +}
->>>
->>> Seems like the above two functions belong in a later patch.
->>
->> OK. I guess we can add these handlers in the next patchset introducing=
- PSI.=20
->> I will check that the tests still run because the XICS layer uses the=20
->> XICSFabric handlers blindly without any checks.
->=20
-> Well, sure, but the whole XICS isn't going to work without real
-> implementations of the ICS callbacks, so I don't see that it matters.
-
-Just to be very clear, what I meant is that we need to define all
-the handlers at once because the XICS layer does not check the=20
-handler validity and we would end up calling NULL. In patchset v4,
-the handlers are empty routines.=20
-
-Thanks,
-
-C.=20
-=20
->> =20
->>>> +
->>>> +static PowerPCCPU *ppc_get_vcpu_by_pir(int pir)
->>>> +{
->>>> +    CPUState *cs;
->>>> +
->>>> +    CPU_FOREACH(cs) {
->>>> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
->>>> +        CPUPPCState *env =3D &cpu->env;
->>>> +
->>>> +        if (env->spr_cb[SPR_PIR].default_value =3D=3D pir) {
->>>> +            return cpu;
->>>> +        }
->>>> +    }
->>>> +
->>>> +    return NULL;
->>>> +}
->>>> +
->>>> +static ICPState *pnv_icp_get(XICSFabric *xi, int pir)
->>>> +{
->>>> +    PnvMachineState *pnv =3D POWERNV_MACHINE(xi);
->>>> +    PowerPCCPU *cpu =3D ppc_get_vcpu_by_pir(pir);
->>>> +
->>>> +    if (!cpu) {
->>>> +        return NULL;
->>>> +    }
->>>> +
->>>> +    assert(cpu->parent_obj.cpu_index < pnv->nr_servers);
->>>> +    return ICP(&pnv->icps[cpu->parent_obj.cpu_index]);
->>>
->>> Should use CPU() instead of parent_obj here.
->>
->> OK. I might just remove the array though.
->>
->> Thanks,
->>
->> C.
->>
->>
->>>> +}
->>>> +
->>>> +static void pnv_pic_print_info(InterruptStatsProvider *obj,
->>>> +                               Monitor *mon)
->>>> +{
->>>> +    PnvMachineState *pnv =3D POWERNV_MACHINE(obj);
->>>> +    int i;
->>>> +
->>>> +    for (i =3D 0; i < pnv->nr_servers; i++) {
->>>> +        icp_pic_print_info(ICP(&pnv->icps[i]), mon);
->>>> +    }
->>>> +
->>>> +    for (i =3D 0; i < pnv->num_chips; i++) {
->>>> +        /* place holder */
->>>> +    }
->>>> +}
->>>> +
->>>>  static void pnv_get_num_chips(Object *obj, Visitor *v, const char *=
-name,
->>>>                                void *opaque, Error **errp)
->>>>  {
->>>> @@ -787,6 +872,8 @@ static void powernv_machine_class_props_init(Obj=
-ectClass *oc)
->>>>  static void powernv_machine_class_init(ObjectClass *oc, void *data)
->>>>  {
->>>>      MachineClass *mc =3D MACHINE_CLASS(oc);
->>>> +    XICSFabricClass *xic =3D XICS_FABRIC_CLASS(oc);
->>>> +    InterruptStatsProviderClass *ispc =3D INTERRUPT_STATS_PROVIDER_=
-CLASS(oc);
->>>> =20
->>>>      mc->desc =3D "IBM PowerNV (Non-Virtualized)";
->>>>      mc->init =3D ppc_powernv_init;
->>>> @@ -797,6 +884,10 @@ static void powernv_machine_class_init(ObjectCl=
-ass *oc, void *data)
->>>>      mc->no_parallel =3D 1;
->>>>      mc->default_boot_order =3D NULL;
->>>>      mc->default_ram_size =3D 1 * G_BYTE;
->>>> +    xic->icp_get =3D pnv_icp_get;
->>>> +    xic->ics_get =3D pnv_ics_get;
->>>> +    xic->ics_resend =3D pnv_ics_resend;
->>>> +    ispc->print_info =3D pnv_pic_print_info;
->>>> =20
->>>>      powernv_machine_class_props_init(oc);
->>>>  }
->>>> @@ -807,6 +898,11 @@ static const TypeInfo powernv_machine_info =3D =
-{
->>>>      .instance_size =3D sizeof(PnvMachineState),
->>>>      .instance_init =3D powernv_machine_initfn,
->>>>      .class_init    =3D powernv_machine_class_init,
->>>> +    .interfaces =3D (InterfaceInfo[]) {
->>>> +        { TYPE_XICS_FABRIC },
->>>> +        { TYPE_INTERRUPT_STATS_PROVIDER },
->>>> +        { },
->>>> +    },
->>>>  };
->>>> =20
->>>>  static void powernv_machine_register_types(void)
->>>> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
->>>> index df98a72006e4..1ca197d2ec83 100644
->>>> --- a/include/hw/ppc/pnv.h
->>>> +++ b/include/hw/ppc/pnv.h
->>>> @@ -22,6 +22,7 @@
->>>>  #include "hw/boards.h"
->>>>  #include "hw/sysbus.h"
->>>>  #include "hw/ppc/pnv_lpc.h"
->>>> +#include "hw/ppc/xics.h"
->>>> =20
->>>>  #define TYPE_PNV_CHIP "powernv-chip"
->>>>  #define PNV_CHIP(obj) OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP)
->>>> @@ -114,6 +115,8 @@ typedef struct PnvMachineState {
->>>>      PnvChip      **chips;
->>>> =20
->>>>      ISABus       *isa_bus;
->>>> +    PnvICPState  *icps;
->>>> +    uint32_t     nr_servers;
->>>>  } PnvMachineState;
->>>> =20
->>>>  #define PNV_FDT_ADDR          0x01000000
->>>
->>
->=20
+> -- 
+> 2.7.4
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
