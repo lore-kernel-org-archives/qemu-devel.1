@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ctZv5-0002a2-FH
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:15:20 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ctZv3-0002Qd-RF
+	(envelope-from <armbru@redhat.com>) id 1ctZv4-0002ZM-TW
 	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:15:19 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <armbru@redhat.com>) id 1ctZv4-0002Qm-2j
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:15:18 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 30 Mar 2017 15:15:07 +0200
-Message-Id: <1490879707-6060-11-git-send-email-armbru@redhat.com>
+Date: Thu, 30 Mar 2017 15:15:00 +0200
+Message-Id: <1490879707-6060-4-git-send-email-armbru@redhat.com>
 In-Reply-To: <1490879707-6060-1-git-send-email-armbru@redhat.com>
 References: <1490879707-6060-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [RFC v2 for-2.9 10/10] sheepdog: Fix blockdev-add
+Subject: [Qemu-devel] [RFC v2 for-2.9 03/10] io vnc sockets: Clean up
+ SocketAddressKind switches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,198 +23,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, pbonzini@redhat.com
 
-Commit 831acdc "sheepdog: Implement bdrv_parse_filename()" and commit
-d282f34 "sheepdog: Support blockdev-add" have different ideas on how
-the QemuOpts parameters for the server address are named.  Fix that.
-While there, rename BlockdevOptionsSheepdog member addr to server, for
-consistency with BlockdevOptionsSsh, BlockdevOptionsGluster,
-BlockdevOptionsNbd.
+We have quite a few switches over SocketAddressKind.  Some have case
+labels for all enumeration values, others rely on a default label.
+Some abort when the value isn't a valid SocketAddressKind, others
+report an error then.
 
-Commit 831acdc's example becomes
+Unify as follows.  Always provide case labels for all enumeration
+values, to clarify intent.  Abort when the value isn't a valid
+SocketAddressKind, because the program state is messed up then.
 
-    --drive driver=sheepdog,server.type=inet,server.host=fido,server.port=7000,vdi=dolly
-
-instead of
-
-    --drive driver=sheepdog,host=fido,vdi=dolly
+Improve a few error messages while there.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/sheepdog.c     | 84 ++++++++++++++++++++++++++++++++++------------------
- qapi/block-core.json |  4 +--
- 2 files changed, 58 insertions(+), 30 deletions(-)
+ io/dns-resolver.c   |  7 +++++--
+ ui/vnc.c            | 18 ++++++++++++------
+ util/qemu-sockets.c |  4 +---
+ 3 files changed, 18 insertions(+), 11 deletions(-)
 
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index 89e98ed..c81013d 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -13,9 +13,11 @@
-  */
+diff --git a/io/dns-resolver.c b/io/dns-resolver.c
+index 0ac6b23..a407075 100644
+--- a/io/dns-resolver.c
++++ b/io/dns-resolver.c
+@@ -164,9 +164,12 @@ int qio_dns_resolver_lookup_sync(QIODNSResolver *resolver,
+                                                 addrs,
+                                                 errp);
  
- #include "qemu/osdep.h"
-+#include "qapi-visit.h"
- #include "qapi/error.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qint.h"
-+#include "qapi/qobject-input-visitor.h"
- #include "qemu/uri.h"
- #include "qemu/error-report.h"
- #include "qemu/sockets.h"
-@@ -547,6 +549,47 @@ static SocketAddress *sd_socket_address(const char *path,
-     return addr;
++    case SOCKET_ADDRESS_KIND_FD:
++        error_setg(errp, "Unsupported socket address type 'fd'");
++        return -1;
++
+     default:
+-        error_setg(errp, "Unknown socket address kind");
+-        return -1;
++        abort();
+     }
  }
  
-+static SocketAddress *sd_server_config(QDict *options, Error **errp)
-+{
-+    QDict *server = NULL;
-+    QObject *crumpled_server = NULL;
-+    Visitor *iv = NULL;
-+    SocketAddressFlat *saddr_flat = NULL;
-+    SocketAddress *saddr = NULL;
-+    Error *local_err = NULL;
-+
-+    qdict_extract_subqdict(options, &server, "server.");
-+
-+    crumpled_server = qdict_crumple(server, errp);
-+    if (!crumpled_server) {
-+        goto done;
-+    }
-+
-+    /*
-+     * FIXME .numeric, .to, .ipv4 or .ipv6 don't work with -drive
-+     * server.type=inet.  .to doesn't matter, it's ignored anyway.
-+     * That's because when @options come from -blockdev or
-+     * blockdev_add, members are typed according to the QAPI schema,
-+     * but when they come from -drive, they're all QString.  The
-+     * visitor expects the former.
-+     */
-+    iv = qobject_input_visitor_new(crumpled_server);
-+    visit_type_SocketAddressFlat(iv, NULL, &saddr_flat, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        goto done;
-+    }
-+
-+    saddr = socket_address_crumple(saddr_flat);
-+
-+done:
-+    qapi_free_SocketAddressFlat(saddr_flat);
-+    visit_free(iv);
-+    qobject_decref(crumpled_server);
-+    QDECREF(server);
-+    return saddr;
-+}
-+
- /* Return -EIO in case of error, file descriptor on success */
- static int connect_to_sdog(BDRVSheepdogState *s, Error **errp)
- {
-@@ -1175,15 +1218,17 @@ static void sd_parse_filename(const char *filename, QDict *options,
+diff --git a/ui/vnc.c b/ui/vnc.c
+index fe0a46a..0be77ba 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -129,10 +129,13 @@ static void vnc_init_basic_info(SocketAddress *addr,
+         info->family = NETWORK_ADDRESS_FAMILY_UNIX;
+         break;
+ 
+-    default:
+-        error_setg(errp, "Unsupported socket kind %d",
+-                   addr->type);
++    case SOCKET_ADDRESS_KIND_VSOCK:
++    case SOCKET_ADDRESS_KIND_FD:
++        error_setg(errp, "Unsupported socket address type %s",
++                   SocketAddressKind_lookup[addr->type]);
+         break;
++    default:
++        abort();
      }
  
-     if (cfg.host) {
--        qdict_set_default_str(options, "host", cfg.host);
-+        qdict_set_default_str(options, "server.host", cfg.host);
-+        qdict_set_default_str(options, "server.type", "inet");
-     }
-     if (cfg.port) {
-         snprintf(buf, sizeof(buf), "%d", cfg.port);
--        qdict_set_default_str(options, "port", buf);
-+        qdict_set_default_str(options, "server.port", buf);
-     }
-     if (cfg.path) {
--        qdict_set_default_str(options, "path", cfg.path);
--    }
-+        qdict_set_default_str(options, "server.path", cfg.path); 
-+        qdict_set_default_str(options, "server.type", "unix");
-+   }
-     qdict_set_default_str(options, "vdi", cfg.vdi);
-     qdict_set_default_str(options, "tag", cfg.tag);
-     if (cfg.snap_id) {
-@@ -1510,18 +1555,6 @@ static QemuOptsList runtime_opts = {
-     .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
-     .desc = {
-         {
--            .name = "host",
--            .type = QEMU_OPT_STRING,
--        },
--        {
--            .name = "port",
--            .type = QEMU_OPT_STRING,
--        },
--        {
--            .name = "path",
--            .type = QEMU_OPT_STRING,
--        },
--        {
-             .name = "vdi",
-             .type = QEMU_OPT_STRING,
-         },
-@@ -1543,7 +1576,7 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
-     int ret, fd;
-     uint32_t vid = 0;
-     BDRVSheepdogState *s = bs->opaque;
--    const char *host, *port, *path, *vdi, *snap_id_str, *tag;
-+    const char *vdi, *snap_id_str, *tag;
-     uint64_t snap_id;
-     char *buf = NULL;
-     QemuOpts *opts;
-@@ -1560,20 +1593,17 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
-         goto err_no_fd;
-     }
+     return;
+@@ -411,10 +414,13 @@ VncInfo *qmp_query_vnc(Error **errp)
+             info->family = NETWORK_ADDRESS_FAMILY_UNIX;
+             break;
  
--    host = qemu_opt_get(opts, "host");
--    port = qemu_opt_get(opts, "port");
--    path = qemu_opt_get(opts, "path");
-+    s->addr = sd_server_config(options, errp);
-+    if (!s->addr) {
-+        ret = -EINVAL;
-+        goto err_no_fd;
-+    }
-+        
-     vdi = qemu_opt_get(opts, "vdi");
-     snap_id_str = qemu_opt_get(opts, "snap-id");
-     snap_id = qemu_opt_get_number(opts, "snap-id", CURRENT_VDI_ID);
-     tag = qemu_opt_get(opts, "tag");
+-        default:
+-            error_setg(errp, "Unsupported socket kind %d",
+-                       addr->type);
++        case SOCKET_ADDRESS_KIND_VSOCK:
++        case SOCKET_ADDRESS_KIND_FD:
++            error_setg(errp, "Unsupported socket address type %s",
++                       SocketAddressKind_lookup[addr->type]);
+             goto out_error;
++        default:
++            abort();
+         }
  
--    if ((host || port) && path) {
--        error_setg(errp, "can't use 'path' together with 'host' or 'port'");
--        ret = -EINVAL;
--        goto err_no_fd;
--    }
--
-     if (!vdi) {
-         error_setg(errp, "parameter 'vdi' is missing");
-         ret = -EINVAL;
-@@ -1604,8 +1634,6 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
-         goto err_no_fd;
+         info->has_host = true;
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index 9b73681..4ae37bd 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -1337,9 +1337,7 @@ char *socket_address_to_string(struct SocketAddress *addr, Error **errp)
+         break;
+ 
+     default:
+-        error_setg(errp, "socket family %d unsupported",
+-                   addr->type);
+-        return NULL;
++        abort();
      }
- 
--    s->addr = sd_socket_address(path, host, port);
--
-     QLIST_INIT(&s->inflight_aio_head);
-     QLIST_INIT(&s->failed_aio_head);
-     QLIST_INIT(&s->inflight_aiocb_head);
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 8d87962..b5f0e99 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2623,7 +2623,7 @@
- # Driver specific block device options for sheepdog
- #
- # @vdi:         Virtual disk image name
--# @addr:        The Sheepdog server to connect to
-+# @server:      The Sheepdog server to connect to
- # @snap-id:     Snapshot ID
- # @tag:         Snapshot tag name
- #
-@@ -2632,7 +2632,7 @@
- # Since: 2.9
- ##
- { 'struct': 'BlockdevOptionsSheepdog',
--  'data': { 'addr': 'SocketAddressFlat',
-+  'data': { 'server': 'SocketAddressFlat',
-             'vdi': 'str',
-             '*snap-id': 'uint32',
-             '*tag': 'str' } }
+     return buf;
+ }
 -- 
 2.7.4
