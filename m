@@ -1,31 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ctfT8-0004bC-I1
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 15:10:51 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1ctfxs-0003Ay-AN
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 15:42:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ctfT5-0005ie-63
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 15:10:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50468)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ctfT4-0005hm-WF
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 15:10:47 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E24007E9CE
-	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 19:10:45 +0000 (UTC)
-Date: Thu, 30 Mar 2017 20:10:42 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170330191042.GN2800@work-vm>
-References: <20170323204544.12015-1-quintela@redhat.com>
-	<20170323204544.12015-43-quintela@redhat.com>
-	<20170330090705.GC2800@work-vm> <87tw6bm1u9.fsf@secure.mitica>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87tw6bm1u9.fsf@secure.mitica>
-Subject: Re: [Qemu-devel] [PATCH 42/51] ram: Pass RAMBlock to bitmap_sync
+	(envelope-from <eric.auger@redhat.com>) id 1ctfxr-00078v-Ho
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 15:42:36 -0400
+From: Eric Auger <eric.auger@redhat.com>
+Date: Thu, 30 Mar 2017 21:42:14 +0200
+Message-Id: <1490902938-9009-2-git-send-email-eric.auger@redhat.com>
+In-Reply-To: <1490902938-9009-1-git-send-email-eric.auger@redhat.com>
+References: <1490902938-9009-1-git-send-email-eric.auger@redhat.com>
+Subject: [Qemu-devel] [RFC v3 1/5] log: Add new IOMMU type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,41 +19,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, edgar.iglesias@gmail.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, prem.mallappa@gmail.com
+Cc: drjones@redhat.com, christoffer.dall@linaro.org, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > * Juan Quintela (quintela@redhat.com) wrote:
-> >> We change the meaning of start to be the offset from the beggining of
-> >> the block.
-> >
-> > s/beggining/beginning/
-> >
-> > Why do this?
-> > We have:
-> >    migration_bitmap_sync (all blocks)
-> >    migration_bitmap_sync_range - called per block
-> >    cpu_physical_memory_sync_dirty_bitmap
-> >
-> > Why keep migration_bitmap_sync_range having start/length as well as the block
-> > if you could just rename it to migration_bitmap_sync_block and just give it the rb?
-> > And since cpu_physical_memory_clear_dirty_range is lower level, why give it
-> > the rb?
-> 
-> I did it on the previous series, then I remembered that I was not going
-> to be able to sync only part of the range, as I will want in the future.
-> 
-> If you preffer as an intermediate meassure to just move to blocks, I can
-> do, but change is really small and not sure if it makes sense.
+From: Prem Mallappa <prem.mallappa@broadcom.com>
 
-OK then, but just comment it to say you want to.
-I'm still not sure if cpu_physical_memory_clear_dirty_range should have the RB;
-it feels that it's lower level, kvm stuff rather than things that know about RAMBlocks.
+Add CPU_LOG_IOMMU to log traces related to the IOMMU.
 
-Dave
+Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-> 
-> Later, Juan.
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+---
+
+This may be replaced by dynamic traces later on
+---
+ include/qemu/log.h | 1 +
+ util/log.c         | 2 ++
+ 2 files changed, 3 insertions(+)
+
+diff --git a/include/qemu/log.h b/include/qemu/log.h
+index a50e994..906913b 100644
+--- a/include/qemu/log.h
++++ b/include/qemu/log.h
+@@ -43,6 +43,7 @@ static inline bool qemu_log_separate(void)
+ #define CPU_LOG_PAGE       (1 << 14)
+ #define LOG_TRACE          (1 << 15)
+ #define CPU_LOG_TB_OP_IND  (1 << 16)
++#define CPU_LOG_IOMMU      (1 << 17)
+ 
+ /* Returns true if a bit is set in the current loglevel mask
+  */
+diff --git a/util/log.c b/util/log.c
+index 96f30dd..76968d6 100644
+--- a/util/log.c
++++ b/util/log.c
+@@ -258,6 +258,8 @@ const QEMULogItem qemu_log_items[] = {
+       "show CPU registers before entering a TB (lots of logs)" },
+     { CPU_LOG_MMU, "mmu",
+       "log MMU-related activities" },
++    { CPU_LOG_IOMMU, "iommu",
++      "log IOMMU-related activities" },
+     { CPU_LOG_PCALL, "pcall",
+       "x86 only: show protected mode far calls/returns/exceptions" },
+     { CPU_LOG_RESET, "cpu_reset",
+-- 
+2.5.5
