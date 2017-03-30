@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1ctLra-0003zo-Pm
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 18:14:47 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1ctOEc-0007uM-3g
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 20:46:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1ctLrX-0001sU-Lt
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 18:14:46 -0400
-Received: from mail-sn1nam01on0106.outbound.protection.outlook.com
-	([104.47.32.106]:13280
-	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <felipe@nutanix.com>) id 1ctLrX-0001pW-3O
-	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 18:14:43 -0400
-From: Felipe Franciosi <felipe@nutanix.com>
-Date: Wed, 29 Mar 2017 22:14:37 +0000
-Message-ID: <04DA7E29-9321-40AF-A313-EF6D374BD670@nutanix.com>
-References: <1488472983-9108-1-git-send-email-felipe@nutanix.com>
-	<20170329124035.GC21803@redhat.com>
-In-Reply-To: <20170329124035.GC21803@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <0422F016D4E14D41AFAB24DEFB2383DC@namprd02.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <ehabkost@redhat.com>) id 1ctOEZ-00016f-2B
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 20:46:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46978)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ctOEY-00015a-Se
+	for qemu-devel@nongnu.org; Wed, 29 Mar 2017 20:46:38 -0400
+Date: Wed, 29 Mar 2017 21:46:32 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170330004632.GE3709@thinpad.lan.raisama.net>
+References: <20170329210439.18062-1-iwona260909@gmail.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 0/3] Introduce vhost-user-scsi and
- sample application
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170329210439.18062-1-iwona260909@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH RESEND v2] hmp: fix "info cpu" segfault
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,94 +26,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "yuanhan.liu@linux.intel.com" <yuanhan.liu@linux.intel.com>, Jason Wang <jasowang@redhat.com>
+To: Iwona Kotlarska <iwona260909@gmail.com>
+Cc: qemu-devel@nongnu.org, marcel@redhat.com, pbonzini@redhat.com, rth@twiddle.net
 
+On Wed, Mar 29, 2017 at 11:04:39PM +0200, Iwona Kotlarska wrote:
+> Running QEMU with "qemu-system-x86_64 -M none -nographic -m 256" and executing
+> "dump-guest-memory /dev/null 0 8192" results in segfault.
+> Fix by checking if we have CPU.
+> 
+> Signed-off-by: Iwona Kotlarska <iwona260909@gmail.com>
+> ---
+> v1 --> v2
+> Added brackets around if body.
+> Changed subject.
+>  target/i386/arch_dump.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
+> 
+> diff --git a/target/i386/arch_dump.c b/target/i386/arch_dump.c
+> index 5a2e4be5d0..43992a440c 100644
+> --- a/target/i386/arch_dump.c
+> +++ b/target/i386/arch_dump.c
+> @@ -390,9 +390,11 @@ int cpu_get_dump_info(ArchDumpInfo *info,
+>      GuestPhysBlock *block;
+>  
+>  #ifdef TARGET_X86_64
+[Reordering the diff a little bit to make my comments clearer]
+> -    X86CPU *first_x86_cpu = X86_CPU(first_cpu);
+> +    X86CPU *first_x86_cpu = NULL;
+> +    first_x86_cpu = X86_CPU(first_cpu);
 
-> On 29 Mar 2017, at 13:40, Michael S. Tsirkin <mst@redhat.com> wrote:
->=20
-> On Thu, Mar 02, 2017 at 08:43:00AM -0800, Felipe Franciosi wrote:
->> Based on various discussions on the 2016 KVM Forum, I'm sending over a
->> vhost-user-scsi implementation for your consideration.
->>=20
->> This patchset introduces a new vhost-user SCSI device. While heavily
->> based on vhost-scsi, it is implemented using vhost's userspace
->> counterpart. The device has been coded and tested to work with live
->> migration.
->>=20
->> As part of this work, a new vhost-scsi-common device was created and
->> the existing vhost-scsi device moved underneath it. The new
->> vhost-user-scsi device is also placed underneath it.
->>=20
->> A sample application based on the newly introduced libvhost-user is
->> also included. It makes use of libiscsi for simplicity.
->>=20
->> For convenience, I'm maintaining an up-to-date version of these
->> patches (including some necessary fixes for libvhost-user) on:
->>=20
->> https://github.com/franciozzy/qemu/tree/vus-upstream-v4
->>=20
->> See the individual patches for build and use instructions.
->>=20
->> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
->=20
-> Cc Yuanhan who was interested in this topic.
+There's no reason to replace that single line with these ones.
 
-Thanks for looping this in, mst.
+> -
+> -    lma = !!(first_x86_cpu->env.hflags & HF_LMA_MASK);
+> +    if (first_cpu != NULL) {
+> +        lma = !!(first_x86_cpu->env.hflags & HF_LMA_MASK);
+> +    }
 
-The latest is v5 which has a libvhost-user fix for the build:
-http://lists.nongnu.org/archive/html/qemu-devel/2017-03/msg00417.html
+This part looks OK, although personally I would prefer to write it as:
+    lma = first_cpu && (first_x86_cpu->env.hflags & HF_LMA_MASK);
+so this can become a single-line patch.
 
-F.
+I also wonder if the TARGET_X86_64 #ifdef is really necessary. Is
+it possible to ever have HF_LMA_MASK set if the target is not
+x86_64? But that's something for a separate patch, and unrelated
+to the bug you are fixing.
 
->=20
->> v3 -> v4:
->> - Drop configure switches and build vus by default.
->> - Add sample application to .gitignore.
->> - Removed a whitespace error.
->> - Rebase on master.
->>=20
->> v2 -> v3:
->> - Rebase after vhost notifier fixes by Paolo.
->> - Exposed F_HOTPLUG and F_CHANGE on vhost-user-scsi.
->>=20
->> v1 -> v2:
->> - Introduce new vhost-scsi-common device type.
->> - Move vhost-scsi device underneath vhost-scsi-common.
->> - Move sample application from tests/ to contrib/.
->> - Make sample application use the glib event loop.
->> - Minor fixes.
->>=20
->> Felipe Franciosi (3):
->>  vhost-scsi: create a vhost-scsi-common abstraction
->>  vus: Introduce vhost-user-scsi host device
->>  vus: Introduce a vhost-user-scsi sample application
->>=20
->> .gitignore                                |   1 +
->> Makefile                                  |   3 +
->> Makefile.objs                             |   4 +
->> configure                                 |   1 +
->> contrib/vhost-user-scsi/Makefile.objs     |   1 +
->> contrib/vhost-user-scsi/vhost-user-scsi.c | 886 ++++++++++++++++++++++++=
-++++++
->> default-configs/pci.mak                   |   1 +
->> hw/scsi/Makefile.objs                     |   3 +-
->> hw/scsi/vhost-scsi-common.c               | 143 +++++
->> hw/scsi/vhost-scsi.c                      | 194 ++-----
->> hw/scsi/vhost-user-scsi.c                 | 215 ++++++++
->> hw/virtio/virtio-pci.c                    |  54 ++
->> hw/virtio/virtio-pci.h                    |  11 +
->> include/hw/virtio/vhost-scsi-common.h     |  48 ++
->> include/hw/virtio/vhost-scsi.h            |  11 +-
->> include/hw/virtio/vhost-user-scsi.h       |  35 ++
->> include/hw/virtio/virtio-scsi.h           |   5 +
->> 17 files changed, 1468 insertions(+), 148 deletions(-)
->> create mode 100644 contrib/vhost-user-scsi/Makefile.objs
->> create mode 100644 contrib/vhost-user-scsi/vhost-user-scsi.c
->> create mode 100644 hw/scsi/vhost-scsi-common.c
->> create mode 100644 hw/scsi/vhost-user-scsi.c
->> create mode 100644 include/hw/virtio/vhost-scsi-common.h
->> create mode 100644 include/hw/virtio/vhost-user-scsi.h
->>=20
->> --=20
->> 1.9.4
+>  #endif
+>  
+>      if (lma) {
+> -- 
+> 2.12.0
+> 
+
+-- 
+Eduardo
