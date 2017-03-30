@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1ctcgR-0000YL-L7
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:12:24 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1ctciu-0001jU-Ac
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:14:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1ctcgQ-0007Qu-IU
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:12:23 -0400
-Reply-To: minyard@acm.org
-References: <20170330232236.8272-1-emaste@freebsd.org>
-From: Corey Minyard <tcminyard@gmail.com>
-Message-ID: <3ba002c2-9a57-05fe-c93c-62f279a2381c@gmail.com>
-Date: Thu, 30 Mar 2017 11:12:13 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ctcip-0000wU-4n
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:14:56 -0400
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:33158)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ctcio-0000vU-Sb
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:14:51 -0400
+Received: by mail-wr0-x22b.google.com with SMTP id w43so67146520wrb.0
+	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 09:14:50 -0700 (PDT)
+References: <20170330164657.50c75e8c@nial.brq.redhat.com>
+	<87k2764xex.fsf@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <87k2764xex.fsf@linaro.org>
+Date: Thu, 30 Mar 2017 17:14:47 +0100
+Message-ID: <87inmq4u88.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170330232236.8272-1-emaste@freebsd.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] ipmi: use parens to avoid unexpected macro
- var evaluation
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] qemu-2.9 crashes in tcg_handle_interrupt() during
+ winx64 boot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,93 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ed Maste <emaste@freebsd.org>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Jan Kiszka <jan.kiszka@siemens.com>, KONRAD Frederic <fred.konrad@greensocs.com>, "Emilio G. Cota" <cota@braap.org>, Richard Henderson <rth@twiddle.net>, Pranith Kumar <bobby.prani@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-This isn't quite right, a lot of these need parenthesis around the whole
-thing, and some of the macros are unused and need to be removed.
-I had submitted something for this a while ago, but it hadn't been
-taken.  I will re-submit.
 
--corey
+Alex Bennée <alex.bennee@linaro.org> writes:
 
-On 03/30/2017 06:22 PM, Ed Maste wrote:
-> Found via Clang warning: logical not is only applied to the left hand
-> side of this bitwise operator [-Wlogical-not-parentheses]
+> Igor Mammedov <imammedo@redhat.com> writes:
 >
->                                !IPMI_BT_GET_HBUSY(ib->control_reg));
->                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> (PS: resend due to wrong qemu-devel mail list address in original
+>> email)
 >
-> expanded from macro 'IPMI_BT_SET_HBUSY'
->                                         (((v & 1) << IPMI_BT_HBUSY_BIT)))
->                                            ^ ~
+> Le *sigh* another way of x86 generating IRQs ;-)
 >
-> Signed-off-by: Ed Maste <emaste@freebsd.org>
-> ---
->   hw/ipmi/isa_ipmi_bt.c | 18 +++++++++---------
->   1 file changed, 9 insertions(+), 9 deletions(-)
+> Could you test this please?
+
+Sorry I missed you'll also need a:
+
+#include "qemu/main-loop.h"
+
+At the top of misc_helper.c
+
 >
-> diff --git a/hw/ipmi/isa_ipmi_bt.c b/hw/ipmi/isa_ipmi_bt.c
-> index 1c69cb33f8..c1dea503a2 100644
-> --- a/hw/ipmi/isa_ipmi_bt.c
-> +++ b/hw/ipmi/isa_ipmi_bt.c
-> @@ -40,37 +40,37 @@
->   #define IPMI_BT_CLR_WR_MASK        (1 << IPMI_BT_CLR_WR_BIT)
->   #define IPMI_BT_GET_CLR_WR(d)      (((d) >> IPMI_BT_CLR_WR_BIT) & 0x1)
->   #define IPMI_BT_SET_CLR_WR(d, v)   (d) = (((d) & ~IPMI_BT_CLR_WR_MASK) | \
-> -                                       (((v & 1) << IPMI_BT_CLR_WR_BIT)))
-> +                                       ((((v) & 1) << IPMI_BT_CLR_WR_BIT)))
->   
->   #define IPMI_BT_CLR_RD_MASK        (1 << IPMI_BT_CLR_RD_BIT)
->   #define IPMI_BT_GET_CLR_RD(d)      (((d) >> IPMI_BT_CLR_RD_BIT) & 0x1)
->   #define IPMI_BT_SET_CLR_RD(d, v)   (d) = (((d) & ~IPMI_BT_CLR_RD_MASK) | \
-> -                                       (((v & 1) << IPMI_BT_CLR_RD_BIT)))
-> +                                       ((((v) & 1) << IPMI_BT_CLR_RD_BIT)))
->   
->   #define IPMI_BT_H2B_ATN_MASK       (1 << IPMI_BT_H2B_ATN_BIT)
->   #define IPMI_BT_GET_H2B_ATN(d)     (((d) >> IPMI_BT_H2B_ATN_BIT) & 0x1)
->   #define IPMI_BT_SET_H2B_ATN(d, v)  (d) = (((d) & ~IPMI_BT_H2B_ATN_MASK) | \
-> -                                        (((v & 1) << IPMI_BT_H2B_ATN_BIT)))
-> +                                        ((((v) & 1) << IPMI_BT_H2B_ATN_BIT)))
->   
->   #define IPMI_BT_B2H_ATN_MASK       (1 << IPMI_BT_B2H_ATN_BIT)
->   #define IPMI_BT_GET_B2H_ATN(d)     (((d) >> IPMI_BT_B2H_ATN_BIT) & 0x1)
->   #define IPMI_BT_SET_B2H_ATN(d, v)  (d) = (((d) & ~IPMI_BT_B2H_ATN_MASK) | \
-> -                                        (((v & 1) << IPMI_BT_B2H_ATN_BIT)))
-> +                                        ((((v) & 1) << IPMI_BT_B2H_ATN_BIT)))
->   
->   #define IPMI_BT_SMS_ATN_MASK       (1 << IPMI_BT_SMS_ATN_BIT)
->   #define IPMI_BT_GET_SMS_ATN(d)     (((d) >> IPMI_BT_SMS_ATN_BIT) & 0x1)
->   #define IPMI_BT_SET_SMS_ATN(d, v)  (d) = (((d) & ~IPMI_BT_SMS_ATN_MASK) | \
-> -                                        (((v & 1) << IPMI_BT_SMS_ATN_BIT)))
-> +                                        ((((v) & 1) << IPMI_BT_SMS_ATN_BIT)))
->   
->   #define IPMI_BT_HBUSY_MASK         (1 << IPMI_BT_HBUSY_BIT)
->   #define IPMI_BT_GET_HBUSY(d)       (((d) >> IPMI_BT_HBUSY_BIT) & 0x1)
->   #define IPMI_BT_SET_HBUSY(d, v)    (d) = (((d) & ~IPMI_BT_HBUSY_MASK) | \
-> -                                       (((v & 1) << IPMI_BT_HBUSY_BIT)))
-> +                                       ((((v) & 1) << IPMI_BT_HBUSY_BIT)))
->   
->   #define IPMI_BT_BBUSY_MASK         (1 << IPMI_BT_BBUSY_BIT)
->   #define IPMI_BT_GET_BBUSY(d)       (((d) >> IPMI_BT_BBUSY_BIT) & 0x1)
->   #define IPMI_BT_SET_BBUSY(d, v)    (d) = (((d) & ~IPMI_BT_BBUSY_MASK) | \
-> -                                       (((v & 1) << IPMI_BT_BBUSY_BIT)))
-> +                                       ((((v) & 1) << IPMI_BT_BBUSY_BIT)))
->   
->   
->   /* Mask register */
-> @@ -80,12 +80,12 @@
->   #define IPMI_BT_B2H_IRQ_EN_MASK      (1 << IPMI_BT_B2H_IRQ_EN_BIT)
->   #define IPMI_BT_GET_B2H_IRQ_EN(d)    (((d) >> IPMI_BT_B2H_IRQ_EN_BIT) & 0x1)
->   #define IPMI_BT_SET_B2H_IRQ_EN(d, v) (d) = (((d) & ~IPMI_BT_B2H_IRQ_EN_MASK) | \
-> -                                        (((v & 1) << IPMI_BT_B2H_IRQ_EN_BIT)))
-> +                                        ((((v) & 1) << IPMI_BT_B2H_IRQ_EN_BIT)))
->   
->   #define IPMI_BT_B2H_IRQ_MASK         (1 << IPMI_BT_B2H_IRQ_BIT)
->   #define IPMI_BT_GET_B2H_IRQ(d)       (((d) >> IPMI_BT_B2H_IRQ_BIT) & 0x1)
->   #define IPMI_BT_SET_B2H_IRQ(d, v)    (d) = (((d) & ~IPMI_BT_B2H_IRQ_MASK) | \
-> -                                        (((v & 1) << IPMI_BT_B2H_IRQ_BIT)))
-> +                                        ((((v) & 1) << IPMI_BT_B2H_IRQ_BIT)))
->   
->   typedef struct IPMIBT {
->       IPMIBmc *bmc;
+> target/i386/misc_helper: wrap BQL around another IRQ generator
+>
+> Anything that calls into HW emulation must be protected by the BQL.
+>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>
+> 1 file changed, 2 insertions(+)
+> target/i386/misc_helper.c | 2 ++
+>
+> modified   target/i386/misc_helper.c
+> @@ -156,7 +156,9 @@ void helper_write_crN(CPUX86State *env, int reg, target_ulong t0)
+>          break;
+>      case 8:
+>          if (!(env->hflags2 & HF2_VINTR_MASK)) {
+> +            qemu_mutex_lock_iothread();
+>              cpu_set_apic_tpr(x86_env_get_cpu(env)->apic_state, t0);
+> +            qemu_mutex_unlock_iothread();
+>          }
+>          env->v_tpr = t0 & 0x0f;
+>          break;
+
+
+--
+Alex Bennée
