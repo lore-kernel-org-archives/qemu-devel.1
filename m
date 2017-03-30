@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ctckN-0002Mn-I1
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:16:28 -0400
+	(envelope-from <mst@redhat.com>) id 1ctckP-0002N5-4d
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:16:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ctckI-00023O-Fz
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:16:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46334)
+	(envelope-from <mst@redhat.com>) id 1ctckO-0002Bt-Ao
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:16:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58442)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ctckI-00021J-AU
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:16:22 -0400
-Date: Thu, 30 Mar 2017 19:16:20 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ctckO-0002B1-5Q
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:16:28 -0400
+Date: Thu, 30 Mar 2017 19:16:26 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1490890571-2786-1-git-send-email-mst@redhat.com>
+Message-ID: <1490890571-2786-3-git-send-email-mst@redhat.com>
+References: <1490890571-2786-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Subject: [Qemu-devel] [PULL 0/2] vhost, pc: fixes
+In-Reply-To: <1490890571-2786-1-git-send-email-mst@redhat.com>
+Subject: [Qemu-devel] [PULL 2/2] tests/acpi: don't pack a structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +27,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>
 
-The following changes since commit e839001d5bb6c84932e2d82bd383477b2023f407:
+There's no reason to pack structures where we don't care about size or
+padding, this applies to AcpiStdTable in tests/acpi-utils.h.
 
-  Merge remote-tracking branch 'remotes/thibault/tags/samuel-thibault' into staging (2017-03-30 15:28:19 +0100)
+OTOH bios-tables-test happens to be passing the address of a field in
+this  struct to a function that expects a pointer to normally aligned
+data which results in a SIGBUS on architectures like SPARC that have
+strict alignment requirements.
 
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-
-for you to fetch changes up to 0d876080a394993a8dea494ebf2d806dc0983107:
-
-  tests/acpi: don't pack a structure (2017-03-30 19:12:44 +0300)
-
-----------------------------------------------------------------
-vhost, pc: fixes
-
-More fixes for 2.9. Region caching is still causing
-issues around reset, but we seem to be getting there.
-
+Fixes: 9e8458c02 ("acpi unit-test: compare DSDT and SSDT tables against expected values")
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Tested-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ tests/acpi-utils.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-----------------------------------------------------------------
-Jason Wang (1):
-      vhost: generalize iommu memory region
-
-Michael S. Tsirkin (1):
-      tests/acpi: don't pack a structure
-
- include/hw/virtio/vhost.h | 11 +++++++
- tests/acpi-utils.h        |  2 +-
- hw/virtio/vhost.c         | 84 ++++++++++++++++++++++++++++++++++++-----------
- 3 files changed, 76 insertions(+), 21 deletions(-)
+diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
+index 9f9a2d5..348e4d7 100644
+--- a/tests/acpi-utils.h
++++ b/tests/acpi-utils.h
+@@ -26,7 +26,7 @@ typedef struct {
+     gsize asl_len;
+     gchar *asl_file;
+     bool tmp_files_retain;   /* do not delete the temp asl/aml */
+-} QEMU_PACKED AcpiSdtTable;
++} AcpiSdtTable;
+ 
+ #define ACPI_READ_FIELD(field, addr)           \
+     do {                                       \
+-- 
+MST
