@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35038)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ctUO1-0004VR-NA
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 03:20:53 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ctamP-0002cS-Rj
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 10:10:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ctUNv-0002Wv-LH
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 03:20:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34869)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ctUNv-0002V4-F6
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 03:20:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ctUNu-0007Ll-Jy
-	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 07:20:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 89FCB2E80C3
-	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 07:20:42 +0000 (UTC)
+	(envelope-from <peter.maydell@linaro.org>) id 1ctamP-0000x3-5c
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 10:10:25 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:35987)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ctamO-0000wl-Q2
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 10:10:25 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id w11so61392059wrc.3
+	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 07:10:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 30 Mar 2017 07:14:36 -0000
-From: dE <de.techno@gmail.com>
-Reply-To: Bug 1677492 <1677492@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20170330071437.1125.65090.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1677492] [NEW] block_set_io_throttle complaints
- Need exactly one of 'device' and 'id'
+In-Reply-To: <1490880938-90331-1-git-send-email-agraf@suse.de>
+References: <1490880938-90331-1-git-send-email-agraf@suse.de>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 30 Mar 2017 15:10:03 +0100
+Message-ID: <CAFEAcA-qOqEW5t_=yG3pssetX3kDowoWwp52_MQBdBc2K8b0RA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] input: Add trace events for polled
+ keyboard input
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,47 +29,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alexander Graf <agraf@suse.de>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-Public bug reported:
+On 30 March 2017 at 14:35, Alexander Graf <agraf@suse.de> wrote:
+> When driving QEMU from the outside, we have basically no chance to
+> determine how quickly the guest OS picks up key events, so we usually
+> have to limit ourselves to very slow keyboard presses to make sure
+> the guest always has enough chance to pick them up.
+>
+> This patch adds trace events for when the guest polls for HID keyboard
+> events. That way we can be reasonably safely assume that the guest
+> handled that one key event and can type the next.
 
-All of sudden, after a qemu update, block_set_io_throttle does not work
-anymore.
+This feels like the wrong way to solve the problem to me.
+Maybe we should have something like the network and
+UART device models do where they can say "my queue is
+full, I cannot accept any more data from the outside
+world" ?
 
-Full command to QEMU monitor --
-
-(qemu) block_set_io_throttle db 0 0 0 0 0 0
-Need exactly one of 'device' and 'id'
-
-The help text still point to the same old syntax, which no longer works.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1677492
-
-Title:
-  block_set_io_throttle complaints Need exactly one of 'device' and 'id'
-
-Status in QEMU:
-  New
-
-Bug description:
-  All of sudden, after a qemu update, block_set_io_throttle does not
-  work anymore.
-
-  Full command to QEMU monitor --
-
-  (qemu) block_set_io_throttle db 0 0 0 0 0 0
-  Need exactly one of 'device' and 'id'
-
-  The help text still point to the same old syntax, which no longer
-  works.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1677492/+subscriptions
+thanks
+-- PMM
