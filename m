@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cteNH-0005b0-Mv
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 14:00:45 -0400
+	(envelope-from <eblake@redhat.com>) id 1cteNc-0005jp-JQ
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 14:01:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cteNE-00082Y-Jh
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 14:00:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56578)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cteNE-00082F-B5
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 14:00:40 -0400
-Date: Thu, 30 Mar 2017 21:00:35 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170330205823-mutt-send-email-mst@kernel.org>
-References: <1490260051-6046-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-	<20170324161238.366ce6a7@t450s.home>
-	<58DA6954.2000601@cn.fujitsu.com>
-	<20170328101233.74f50a92@t450s.home>
-	<20170329000148.GA18849@redhat.com>
-	<20170328205513.21b97381@t450s.home>
+	(envelope-from <eblake@redhat.com>) id 1cteNb-0008EO-NV
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 14:01:04 -0400
+References: <1490895797-29094-1-git-send-email-armbru@redhat.com>
+	<1490895797-29094-5-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <21a9cc9f-03f4-382f-2816-b0c40c9c267a@redhat.com>
+Date: Thu, 30 Mar 2017 13:00:55 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170328205513.21b97381@t450s.home>
-Subject: Re: [Qemu-devel] [PATCH v6] vfio error recovery: kernel support
+In-Reply-To: <1490895797-29094-5-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Ff4o7RQuFkHGo6GVFDTn2skofJ99PH6bk"
+Subject: Re: [Qemu-devel] [PATCH v3 for-2.9 4/9] block: Document -drive
+ problematic code and bugs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,281 +25,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Cao jin <caoj.fnst@cn.fujitsu.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, izumi.taku@jp.fujitsu.com
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com
 
-On Tue, Mar 28, 2017 at 08:55:13PM -0600, Alex Williamson wrote:
-> On Wed, 29 Mar 2017 03:01:48 +0300
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
-> > On Tue, Mar 28, 2017 at 10:12:33AM -0600, Alex Williamson wrote:
-> > > On Tue, 28 Mar 2017 21:47:00 +0800
-> > > Cao jin <caoj.fnst@cn.fujitsu.com> wrote:
-> > >   
-> > > > On 03/25/2017 06:12 AM, Alex Williamson wrote:  
-> > > > > On Thu, 23 Mar 2017 17:07:31 +0800
-> > > > > Cao jin <caoj.fnst@cn.fujitsu.com> wrote:
-> > > > > 
-> > > > > A more appropriate patch subject would be:
-> > > > > 
-> > > > > vfio-pci: Report correctable errors and slot reset events to user
-> > > > >    
-> > > > 
-> > > > Correctable? It is confusing to me. Correctable error has its clear
-> > > > definition in PCIe spec, shouldn't it be "non-fatal"?  
-> > > 
-> > > My mistake, non-fatal.
-> > >    
-> > > > >> From: "Michael S. Tsirkin" <mst@redhat.com>    
-> > > > > 
-> > > > > This hardly seems accurate anymore.  You could say Suggested-by and let
-> > > > > Michael add a sign-off, but it's changed since he sent it.
-> > > > >     
-> > > > >>
-> > > > >> 0. What happens now (PCIE AER only)
-> > > > >>    Fatal errors cause a link reset. Non fatal errors don't.
-> > > > >>    All errors stop the QEMU guest eventually, but not immediately,
-> > > > >>    because it's detected and reported asynchronously.
-> > > > >>    Interrupts are forwarded as usual.
-> > > > >>    Correctable errors are not reported to user at all.
-> > > > >>
-> > > > >>    Note:
-> > > > >>    PPC EEH is different, but this approach won't affect EEH. EEH treat
-> > > > >>    all errors as fatal ones in AER, so they will still be signalled to user
-> > > > >>    via the legacy eventfd.  Besides, all devices/functions in a PE belongs
-> > > > >>    to the same IOMMU group, so the slot_reset handler in this approach
-> > > > >>    won't affect EEH either.
-> > > > >>
-> > > > >> 1. Correctable errors
-> > > > >>    Hardware can correct these errors without software intervention,
-> > > > >>    clear the error status is enough, this is what already done now.
-> > > > >>    No need to recover it, nothing changed, leave it as it is.
-> > > > >>
-> > > > >> 2. Fatal errors
-> > > > >>    They will induce a link reset. This is troublesome when user is
-> > > > >>    a QEMU guest. This approach doesn't touch the existing mechanism.
-> > > > >>
-> > > > >> 3. Non-fatal errors
-> > > > >>    Before this patch, they are signalled to user the same way as fatal ones.
-> > > > >>    With this patch, a new eventfd is introduced only for non-fatal error
-> > > > >>    notification. By splitting non-fatal ones out, it will benefit AER
-> > > > >>    recovery of a QEMU guest user.
-> > > > >>
-> > > > >>    To maintain backwards compatibility with userspace, non-fatal errors
-> > > > >>    will continue to trigger via the existing error interrupt index if a
-> > > > >>    non-fatal signaling mechanism has not been registered.
-> > > > >>
-> > > > >>    Note:
-> > > > >>    In case of PCI Express errors, kernel might request a slot reset
-> > > > >>    affecting our device (from our point of view this is a passive device
-> > > > >>    reset as opposed to an active one requested by vfio itself).
-> > > > >>    This might currently happen if a slot reset is requested by a driver
-> > > > >>    (other than vfio) bound to another device function in the same slot.
-> > > > >>    This will cause our device to lose its state so report this event to
-> > > > >>    userspace.    
-> > > > > 
-> > > > > I tried to convey this in my last comments, I don't think this is an
-> > > > > appropriate commit log.  Lead with what is the problem you're trying to
-> > > > > fix and why, what is the benefit to the user, and how is the change
-> > > > > accomplished.  If you want to provide a State of Error Handling in
-> > > > > VFIO, append it after the main points of the commit log.    
-> > > > 
-> > > > ok.
-> > > >   
-> > > > > 
-> > > > > I also asked in my previous comments to provide examples of errors that
-> > > > > might trigger correctable errors to the user, this comment seems to
-> > > > > have been missed.  In my experience, AERs generated during device
-> > > > > assignment are generally hardware faults or induced by bad guest
-> > > > > drivers.  These are cases where a single fatal error is an appropriate
-> > > > > and sufficient response.  We've scaled back this support to the point
-> > > > > where we're only improving the situation of correctable errors and I'm
-> > > > > not convinced this is worthwhile and we're not simply checking a box on
-> > > > > an ill-conceived marketing requirements document.    
-> > > > 
-> > > > Sorry. I noticed that question: "what actual errors do we expect
-> > > > userspace to see as non-fatal errors?", but I am confused about it.
-> > > > Correctable, non-fatal, fatal errors are clearly defined in PCIe spec,
-> > > > and Uncorrectable Error Severity Register will tell which is fatal, and
-> > > > which is non-fatal, this register is configurable, they are device
-> > > > specific as I guess. AER core driver distinguish them by
-> > > > pci_channel_io_normal/pci_channel_io_frozen,  So I don't understand your
-> > > > question. Or
-> > > > 
-> > > > Or, Do you mean we could list the default non-fatal error of
-> > > > Uncorrectable Error Severity Register which is provided by PCIe spec?  
-> > > 
-> > > I'm trying to ask why is this patch series useful.  It's clearly
-> > > possible for us to signal non-fatal errors for a device to a guest, but
-> > > why is it necessarily a good idea to do so?  What additional RAS
-> > > feature is gained by this?  Can we give a single example of a real
-> > > world scenario where a guest has been shutdown due to a non-fatal error
-> > > that the guest driver would have handled?  
-> > 
-> > We've been discussing AER for months if not years.
-> > Isn't it a bit too late to ask whether AER recovery
-> > by guests it useful at all?
-> 
-> 
-> Years, but I think that is more indicative of the persistence of the
-> developers rather than growing acceptance on my part.  For the majority
-> of that we were headed down the path of full AER support with the guest
-> able to invoke bus resets.  It was a complicated solution, but it was
-> more clear that it had some value.   Of course that's been derailed
-> due to various issues and we're now on this partial implementation that
-> only covers non-fatal errors that we assume the guest can recover from
-> without providing it mechanisms to do bus resets.  Is there actual
-> value to this or are we just trying to fill an AER checkbox on
-> someone's marketing sheet?  I don't think it's too much to ask for a
-> commit log to include evidence or discussion about how a feature is
-> actually a benefit to implement.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Ff4o7RQuFkHGo6GVFDTn2skofJ99PH6bk
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp,
+ namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
+ pbonzini@redhat.com
+Message-ID: <21a9cc9f-03f4-382f-2816-b0c40c9c267a@redhat.com>
+Subject: Re: [PATCH v3 for-2.9 4/9] block: Document -drive problematic code
+ and bugs
+References: <1490895797-29094-1-git-send-email-armbru@redhat.com>
+ <1490895797-29094-5-git-send-email-armbru@redhat.com>
+In-Reply-To: <1490895797-29094-5-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Seems rather self evident but ok.  So something like
+On 03/30/2017 12:43 PM, Markus Armbruster wrote:
+> -blockdev and blockdev_add convert their arguments via QObject to
+> BlockdevOptions for qmp_blockdev_add(), which converts them back to
+> QObject, then to a flattened QDict.  The QDict's members are typed
+> according to the QAPI schema.
+>=20
+> -drive converts its argument via QemuOpts to a (flat) QDict.  This
+> QDict's members are all QString.
+>=20
+> Thus, the QType of a flat QDict member depends on whether it comes
+> from -drive or -blockdev/blockdev_add, except when the QAPI type maps
+> to QString, which is the case for 'str' and enumeration types.
+>=20
 
-With this patch, guest is able to recover from non-fatal correctable
-errors - as opposed to stopping the guest with no ability to
-recover which was the only option previously.
+> +++ b/block/file-posix.c
+> @@ -2193,6 +2193,12 @@ static int hdev_open(BlockDriverState *bs, QDict=
+ *options, int flags,
+>      int ret;
+> =20
+>  #if defined(__APPLE__) && defined(__MACH__)
+> +    /*
+> +     * Caution: while qdict_get_try_str() is fine, getting non-string
+> +     * types would require more care.  When @options come from -blockd=
+ev
+> +     * or blockdev_add, its members are typed according to the QAPI
+> +     * schema, but when they come from -drive, they're all QString.
+> +     */
+>      const char *filename =3D qdict_get_str(options, "filename");
 
-Would this address your question?
+Comment mentions (via copy-and-past) qdict_get_try_str(), but this
+instance uses qdict_get_str().  Doesn't bother me enough to withhold
+review if you leave it, though.
 
-> 
-> > > > > I had also commented asking how the hypervisor is expected to know
-> > > > > whether the guest supports AER.  With the existing support of a single
-> > > > > fatal error, the hypervisor halts the VM regardless of the error
-> > > > > severity or guest support.  Now we have the opportunity that the
-> > > > > hypervisor can forward a correctable error to the guest... and hope the
-> > > > > right thing occurs?  I never saw any response to this comment.
-> > > > >     
-> > > > 
-> > > > I noticed this question, you said: "That doesn't imply a problem with
-> > > > this approach, the user (hypervisor) would be at fault for any
-> > > > difference in handling in that case.". Maybe I understand you wrong.
-> > > > 
-> > > > From my limit understanding, QEMU doesn't has a way to know whether a
-> > > > guest has AER support, AER support need several kbuild configuration, I
-> > > > don't know how qemu is expected to know these.  
-> > > 
-> > > 
-> > > Isn't that a problem?  See my reply to QEMU patch 3/3.  
-> > 
-> > Yes but it's the same with bare metal IIUC.
-> 
-> 
-> I'll defer again to the thread on patch 3/3.  Thanks,
-> 
-> Alex
-> 
-> > > > >>
-> > > > >> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > > > >> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
-> > > > >> ---
-> > > > >> v6 changelog:
-> > > > >> Address all the comments from MST.
-> > > > >>
-> > > > >>  drivers/vfio/pci/vfio_pci.c         | 49 +++++++++++++++++++++++++++++++++++--
-> > > > >>  drivers/vfio/pci/vfio_pci_intrs.c   | 38 ++++++++++++++++++++++++++++
-> > > > >>  drivers/vfio/pci/vfio_pci_private.h |  2 ++
-> > > > >>  include/uapi/linux/vfio.h           |  2 ++
-> > > > >>  4 files changed, 89 insertions(+), 2 deletions(-)
-> > > > >>
-> > > > >> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> > > > >> index 324c52e..71f9a8a 100644
-> > > > >> --- a/drivers/vfio/pci/vfio_pci.c
-> > > > >> +++ b/drivers/vfio/pci/vfio_pci.c
-> > > > >> @@ -441,7 +441,9 @@ static int vfio_pci_get_irq_count(struct vfio_pci_device *vdev, int irq_type)
-> > > > >>  
-> > > > >>  			return (flags & PCI_MSIX_FLAGS_QSIZE) + 1;
-> > > > >>  		}
-> > > > >> -	} else if (irq_type == VFIO_PCI_ERR_IRQ_INDEX) {
-> > > > >> +	} else if (irq_type == VFIO_PCI_ERR_IRQ_INDEX ||
-> > > > >> +		   irq_type == VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX ||
-> > > > >> +		   irq_type == VFIO_PCI_PASSIVE_RESET_IRQ_INDEX) {    
-> > > > > 
-> > > > > Should we add a typdef to alias VFIO_PCI_ERR_IRQ_INDEX to
-> > > > > VFIO_PCI_FATAL_ERR_IRQ?
-> > > > >     
-> > > > >>  		if (pci_is_pcie(vdev->pdev))
-> > > > >>  			return 1;
-> > > > >>  	} else if (irq_type == VFIO_PCI_REQ_IRQ_INDEX) {
-> > > > >> @@ -796,6 +798,8 @@ static long vfio_pci_ioctl(void *device_data,
-> > > > >>  		case VFIO_PCI_REQ_IRQ_INDEX:
-> > > > >>  			break;
-> > > > >>  		case VFIO_PCI_ERR_IRQ_INDEX:
-> > > > >> +		case VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX:
-> > > > >> +		case VFIO_PCI_PASSIVE_RESET_IRQ_INDEX:
-> > > > >>  			if (pci_is_pcie(vdev->pdev))
-> > > > >>  				break;
-> > > > >>  		/* pass thru to return error */
-> > > > >> @@ -1282,7 +1286,9 @@ static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
-> > > > >>  
-> > > > >>  	mutex_lock(&vdev->igate);
-> > > > >>  
-> > > > >> -	if (vdev->err_trigger)
-> > > > >> +	if (state == pci_channel_io_normal && vdev->non_fatal_err_trigger)
-> > > > >> +		eventfd_signal(vdev->non_fatal_err_trigger, 1);
-> > > > >> +	else if (vdev->err_trigger)
-> > > > >>  		eventfd_signal(vdev->err_trigger, 1);    
-> > > > > 
-> > > > > Should another patch rename err_trigger to fatal_err_trigger to better
-> > > > > describe its new function?
-> > > > >     
-> > > > >>  
-> > > > >>  	mutex_unlock(&vdev->igate);
-> > > > >> @@ -1292,8 +1298,47 @@ static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
-> > > > >>  	return PCI_ERS_RESULT_CAN_RECOVER;
-> > > > >>  }
-> > > > >>  
-> > > > >> +/*
-> > > > >> + * In case of PCI Express errors, kernel might request a slot reset
-> > > > >> + * affecting our device (from our point of view, this is a passive device
-> > > > >> + * reset as opposed to an active one requested by vfio itself).
-> > > > >> + * This might currently happen if a slot reset is requested by a driver
-> > > > >> + * (other than vfio) bound to another device function in the same slot.
-> > > > >> + * This will cause our device to lose its state, so report this event to
-> > > > >> + * userspace.
-> > > > >> + */    
-> > > > > 
-> > > > > I really dislike "passive reset".  I expect you avoided "slot reset"
-> > > > > because we have other sources where vfio itself initiates a slot
-> > > > > reset.  Is "spurious" more appropriate?  "Collateral"?
-> > > > >     
-> > > > >> +static pci_ers_result_t vfio_pci_aer_slot_reset(struct pci_dev *pdev)
-> > > > >> +{
-> > > > >> +	struct vfio_pci_device *vdev;
-> > > > >> +	struct vfio_device *device;
-> > > > >> +	static pci_ers_result_t err = PCI_ERS_RESULT_NONE;
-> > > > >> +
-> > > > >> +	device = vfio_device_get_from_dev(&pdev->dev);
-> > > > >> +	if (!device)
-> > > > >> +		goto err_dev;
-> > > > >> +
-> > > > >> +	vdev = vfio_device_data(device);
-> > > > >> +	if (!vdev)
-> > > > >> +		goto err_data;
-> > > > >> +
-> > > > >> +	mutex_lock(&vdev->igate);
-> > > > >> +
-> > > > >> +	if (vdev->passive_reset_trigger)
-> > > > >> +		eventfd_signal(vdev->passive_reset_trigger, 1);    
-> > > > > 
-> > > > > What are the exact user requirements here, we now have:
-> > > > > 
-> > > > > A) err_trigger
-> > > > > B) non_fatal_err_trigger
-> > > > > C) passive_reset_trigger
-> > > > > 
-> > > > > Currently we only have A, which makes things very simple, we notify on
-> > > > > errors and assume the user doesn't care otherwise.
-> > > > > 
-> > > > > The expectation here seems to be that A, B, and C are all registered,
-> > > > > but what if they're not?  What if in the above function, only A & B are
-> > > > > registered, do we trigger A here?  Are B & C really intrinsic to each
-> > > > > other and we should continue to issue only A unless both B & C are
-> > > > > registered?  In that case, should we be exposing a single IRQ INDEX to
-> > > > > the user with two sub-indexes, defined as sub-index 0 is correctable
-> > > > > error, sub-index 1 is slot reset, and promote any error to A if they
-> > > > > are not both registered?
-> > > > >     
-> > > > 
-> > > > I will see how to implement these.
-> > > >   
+
+> +++ b/block/nfs.c
+> @@ -474,6 +474,13 @@ static NFSServer *nfs_config(QDict *options, Error=
+ **errp)
+>          goto out;
+>      }
+> =20
+> +    /*
+> +     * Caution: this works only because all scalar members of
+> +     * NFSServer are QString in @crumpled_addr.  The visitor expects
+> +     * @crumpled_addr to be typed according to the QAPI scherma.  It
+
+s/scherma/schema/
+
+> +     * is when @options come from -blockdev or blockdev_add.  But when=
+
+> +     * they come from -drive, they're all QString.
+> +     */
+
+With the typo fix,
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--Ff4o7RQuFkHGo6GVFDTn2skofJ99PH6bk
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY3UfXAAoJEKeha0olJ0NqWvoH/23h92FDHpDQmxJOO5VHRvuO
+18NLJgIcXBqzyH4ngc4KW3qtYDjp2gCiimnjrJL6vhDeWdpxJiwP2g3w4jObmkCt
+wSnho4mxuX+cZSQDSLrYd1ooRTwz3F99aMSydu060z+gqWbxDk51bl25fzF4Y5Zf
+HLxF8gl/Auh5UXVjdP2ZtT04AXxkw1bWJUvIYNDqKxAJZRpWzwhhfIBHfR85AWEK
+hhHnBSMYUlvLGJtBOFv5bpk36mBQ8gPPi0UGmCjivAAQkwxbwN8uDZrd6/Z86wP4
+GdZIM/FI8ALhEzVHvK/A/xqM7Ov8s+9z+NlCewAEr7gBj5ZEPpA4sfGalklYIr0=
+=rsMJ
+-----END PGP SIGNATURE-----
+
+--Ff4o7RQuFkHGo6GVFDTn2skofJ99PH6bk--
