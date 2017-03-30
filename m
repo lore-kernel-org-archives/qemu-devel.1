@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34970)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ctaCC-0003F0-VW
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:33:02 -0400
+	(envelope-from <agraf@suse.de>) id 1ctaEX-0003xY-2j
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:35:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ctaC5-00009K-Pk
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:33:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55216)
+	(envelope-from <agraf@suse.de>) id 1ctaET-00027I-0v
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:35:25 -0400
+Received: from mx2.suse.de ([195.135.220.15]:58476)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ctaC5-00007G-HI
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:32:53 -0400
-Date: Thu, 30 Mar 2017 10:32:48 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170330133248.GF3709@thinpad.lan.raisama.net>
-References: <20170329194148.19015-1-ehabkost@redhat.com>
-	<afd04dba-4ebd-24a7-d149-2e6f079c2868@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <afd04dba-4ebd-24a7-d149-2e6f079c2868@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2 0/9] qom: Make
- object_get_class()/*_GET_CLASS return const pointers
+	(Exim 4.71) (envelope-from <agraf@suse.de>) id 1ctaES-00025C-RM
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:35:20 -0400
+From: Alexander Graf <agraf@suse.de>
+Date: Thu, 30 Mar 2017 15:35:38 +0200
+Message-Id: <1490880938-90331-1-git-send-email-agraf@suse.de>
+Subject: [Qemu-devel] [PATCH] input: Add trace events for polled keyboard
+ input
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,105 +22,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Juergen Gross <jgross@suse.com>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, Laszlo Ersek <lersek@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On Thu, Mar 30, 2017 at 10:59:10AM +0200, Paolo Bonzini wrote:
-> 
-> 
-> On 29/03/2017 21:41, Eduardo Habkost wrote:
-> > QOM has a data model where class struct data is static: class
-> > structs are initialized at class_init, and never changed again.
-> 
-> Isn't that just the way class data is being used?  There's no reason for
-> class data to be static.  It happens to be that way because our
-> hierarchies are pretty shallow and global static variables are used
-> instead of class data.  But it doesn't _have_ to be like that.
+When driving QEMU from the outside, we have basically no chance to
+determine how quickly the guest OS picks up key events, so we usually
+have to limit ourselves to very slow keyboard presses to make sure
+the guest always has enough chance to pick them up.
 
-I disagree. I believe this is how class data is meant to be used.
-if we change per-class data at runtime outside class_init, we
-have a hard time providing querying and introspection mechanisms
-for types. If something really needs to be changed at runtime
-outside class_init, it belongs to object instance fields, not
-class data fields.
+This patch adds trace events for when the guest polls for HID keyboard
+events. That way we can be reasonably safely assume that the guest
+handled that one key event and can type the next.
 
-e.g. the main benefit we got from eliminating the compat_* global
-variables in machine/pc code wasn't simply the global variable
-elimination: it was making the compat data static and available
-at the MachineClass structs, instead of burying it inside
-machine_init functions. If we kept the old model where
-class-specific data was initialized at machine_init-time,
-extending query-machines with that info, and writing new machine
-data queries would still be impossible.
+Signed-off-by: Alexander Graf <agraf@suse.de>
+---
+ hw/input/hid.c         | 26 +++++++++++++++++++++++++-
+ hw/input/trace-events  |  2 ++
+ include/hw/input/hid.h |  6 ++++++
+ 3 files changed, 33 insertions(+), 1 deletion(-)
 
-
-For reference, this is how I think we could have dealt with the
-existing cases of non-const class variables:
-
-> >   qbus_realize(), code added by:
-> >   commit 61de36761b565a4138d8ad7ec75489ab28fe84b6
-> >   Date:   Thu Feb 6 16:08:15 2014 +0100
-> >       qdev: Keep global allocation counter per bus
-
-This one might make sense: it's easier to keep data in a BusClass
-field than a automatic_id[bus_type] dictionary somewhere else.
-
-But I would still prefer to have a automatic_id[bus_type]
-dictionary inside MachineState instead of this.
-
-> > 
-> >   mips_jazz_init(), code added by:
-> >   commit 54e755588cf1e90f0b1460c4e8e6b6a54b6d3a32
-> >   Date:   Mon Nov 4 23:26:17 2013 +0100
-> >       mips jazz: do not raise data bus exception when accessing invalid addresses
-
-IMO, a simple MIPSCPU::ignore_invalid_exec_access boolean flag
-would be better than hijacking TYPE_MIPS_CPU's
-do_unassigned_access() method on the fly.
-
-> > 
-> >   xen_set_dynamic_sysbus(), code added by:
-> >   commit 3a6c9172ac5951e6dac2b3f6cbce3cfccdec5894
-> >   Date:   Tue Nov 22 07:10:58 2016 +0100
-> >       xen: create qdev for each backend device
-
-Here, setting has_dynamic_sysbus for all PC classes would be
-better, so a future supported-device-types/device-slot querying
-mechanism wouldn't incorrectly report xen-backend as unsupported.
-But there are additional problems I want to sove regarding sysbus
-before doing that.
-
-BTW, this is the case that prompted me to write this series in
-the first place. I believe changing
-MachineClass::has_dynamic_sysbus at runtime was a mistake, and a
-const object_get_class() would have helped us catch that.
-
-> > 
-> >   s390_cpu_realizefn(), code added by:
-> >   commit c6644fc88bed1176f67b4b7a9df691bcf25c0c5b
-> >   Date:   Fri Mar 4 12:34:31 2016 -0500
-> >       s390x/cpu: Get rid of side effects when creating a vcpu
-
-Here, I see no reason for a per-cpu-class field at all. Even a
-static next_cpu_id variable wouldn't hurt.
-
-Also, this is the only remaining code still using cpu_exists(),
-and the same logic probably can be implemented using
-MachineClass::possible_cpu_arch_ids() instead.
-
-> 
-> That said, the QUALIFIED_CAST concept is very interesting and I'd even
-> extend it to OBJECT_CHECK, object_dynamic_cast and
-> object_dynamic_cast_assert.  I'm just not sure about returning const
-> from object_get_class()/*_GET_CLASS, which ironically is the thing that
-> prompted you to write the series. :)
-
-Makes sense. I will send extra patches to change the object cast
-macros, too.
-
-> 
-> Paolo
-> 
-
+diff --git a/hw/input/hid.c b/hw/input/hid.c
+index fa9cc4c..b68f597 100644
+--- a/hw/input/hid.c
++++ b/hw/input/hid.c
+@@ -228,7 +228,7 @@ static void hid_keyboard_event(DeviceState *dev, QemuConsole *src,
+ {
+     HIDState *hs = (HIDState *)dev;
+     int scancodes[3], i, count;
+-    int slot;
++    int slot = -1;
+     InputKeyEvent *key = evt->u.key.data;
+ 
+     count = qemu_input_key_value_to_scancode(key->key,
+@@ -241,6 +241,13 @@ static void hid_keyboard_event(DeviceState *dev, QemuConsole *src,
+     for (i = 0; i < count; i++) {
+         slot = (hs->head + hs->n) & QUEUE_MASK; hs->n++;
+         hs->kbd.keycodes[slot] = scancodes[i];
++        hs->kbd.poll_trigger[slot] = NULL;
++    }
++
++    if (slot != -1) {
++        hs->kbd.poll_trigger[slot] = g_new(HIDPollTrigger, 1);
++        hs->kbd.poll_trigger[slot]->key = *key->key;
++        hs->kbd.poll_trigger[slot]->down = key->down;
+     }
+     hs->event(hs);
+ }
+@@ -256,6 +263,23 @@ static void hid_keyboard_process_keycode(HIDState *hs)
+     slot = hs->head & QUEUE_MASK; QUEUE_INCR(hs->head); hs->n--;
+     keycode = hs->kbd.keycodes[slot];
+ 
++    /* Trace polled key events */
++    if (hs->kbd.poll_trigger[slot]) {
++        HIDPollTrigger *t = hs->kbd.poll_trigger[slot];
++        switch (t->key.type) {
++        case KEY_VALUE_KIND_NUMBER:
++            trace_hid_kbd_key_nr_polled(t->key.u.number.data, t->down);
++            break;
++        case KEY_VALUE_KIND_QCODE:
++            trace_hid_kbd_key_qt_polled(t->key.u.qcode.data, t->down);
++            break;
++        default:
++            break;
++        }
++        g_free(t);
++        hs->kbd.poll_trigger[slot] = NULL;
++    }
++
+     key = keycode & 0x7f;
+     index = key | ((hs->kbd.modifiers & (1 << 8)) >> 1);
+     hid_code = hid_usage_keys[index];
+diff --git a/hw/input/trace-events b/hw/input/trace-events
+index f3bfbed..7a6b5ff 100644
+--- a/hw/input/trace-events
++++ b/hw/input/trace-events
+@@ -24,6 +24,8 @@ milkymist_softusb_pulse_irq(void) "Pulse IRQ"
+ 
+ # hw/input/hid.c
+ hid_kbd_queue_full(void) "queue full"
++hid_kbd_key_nr_polled(uint64_t value, bool down) "val %#"PRIx64" down %d"
++hid_kbd_key_qt_polled(uint64_t value, bool down) "val %#"PRIx64" down %d"
+ 
+ # hw/input/virtio
+ virtio_input_queue_full(void) "queue full"
+diff --git a/include/hw/input/hid.h b/include/hw/input/hid.h
+index 2127c7c..ff9541e 100644
+--- a/include/hw/input/hid.h
++++ b/include/hw/input/hid.h
+@@ -25,8 +25,14 @@ typedef struct HIDMouseState {
+     int mouse_grabbed;
+ } HIDMouseState;
+ 
++typedef struct HIDPollTrigger {
++    KeyValue key;
++    bool down;
++} HIDPollTrigger;
++
+ typedef struct HIDKeyboardState {
+     uint32_t keycodes[QUEUE_LENGTH];
++    HIDPollTrigger *poll_trigger[QUEUE_LENGTH];
+     uint16_t modifiers;
+     uint8_t leds;
+     uint8_t key[16];
 -- 
-Eduardo
+1.8.5.6
