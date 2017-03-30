@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ctfFF-0001uY-Ky
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 14:56:30 -0400
+	(envelope-from <tcminyard@gmail.com>) id 1ctfT1-0004YZ-SP
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 15:10:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ctfFE-00067g-PL
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 14:56:29 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1490895797-29094-1-git-send-email-armbru@redhat.com>
-	<1490895797-29094-5-git-send-email-armbru@redhat.com>
-	<21a9cc9f-03f4-382f-2816-b0c40c9c267a@redhat.com>
-Date: Thu, 30 Mar 2017 20:56:18 +0200
-In-Reply-To: <21a9cc9f-03f4-382f-2816-b0c40c9c267a@redhat.com> (Eric Blake's
-	message of "Thu, 30 Mar 2017 13:00:55 -0500")
-Message-ID: <87r31ewq3x.fsf@dusky.pond.sub.org>
+	(envelope-from <tcminyard@gmail.com>) id 1ctfSy-0005dW-Lk
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 15:10:43 -0400
+Sender: Corey Minyard <tcminyard@gmail.com>
+Reply-To: minyard@acm.org
+References: <1490894892-8055-1-git-send-email-minyard@acm.org>
+	<0715ab2d-f367-03ef-1674-4c1e67756f85@redhat.com>
+From: Corey Minyard <minyard@acm.org>
+Message-ID: <71b59e1b-caf0-d7b0-0648-b98d62e66c6b@acm.org>
+Date: Thu, 30 Mar 2017 14:10:35 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 for-2.9 4/9] block: Document -drive
- problematic code and bugs
+In-Reply-To: <0715ab2d-f367-03ef-1674-4c1e67756f85@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.9? v2 resend] ipmi: Fix macro issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,63 +25,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, namei.unix@gmail.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Ed Maste <emaste@freebsd.org>, Corey Minyard <cminyard@mvista.com>
 
-Eric Blake <eblake@redhat.com> writes:
+On 03/30/2017 12:53 PM, Eric Blake wrote:
+> On 03/30/2017 12:28 PM, minyard@acm.org wrote:
+>> From: Corey Minyard <cminyard@mvista.com>
+>>
+>> Macro parameters should almost always have () around them when used.
+>> llvm reported an error on this.
+>>
+>> Remove redundant parenthesis and put parenthesis around the entire
+>> macros with assignments in case they are used in an expression.
+>>
+>> Remove some unused macros.
+>>
+>> Reported in https://bugs.launchpad.net/bugs/1651167
+>>
+>> Signed-off-by: Corey Minyard <cminyard@mvista.com>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> ---
+>>   hw/ipmi/isa_ipmi_bt.c | 34 ++++++++++++----------------------
+>>   1 file changed, 12 insertions(+), 22 deletions(-)
+> Already reviewed by me, so now I'm just adding commentary: Is this still
+> 2.9 material?  It silences a build warning under clang, although I
+> didn't analyze whether the unpatched code actually caused an observable
+> behavior bug or just compiler noise.
+>
+I don't believe the code has a bug, going through all the uses there is
+no expression used as a parameter or set used in an expression.
 
-> On 03/30/2017 12:43 PM, Markus Armbruster wrote:
->> -blockdev and blockdev_add convert their arguments via QObject to
->> BlockdevOptions for qmp_blockdev_add(), which converts them back to
->> QObject, then to a flattened QDict.  The QDict's members are typed
->> according to the QAPI schema.
->> 
->> -drive converts its argument via QemuOpts to a (flat) QDict.  This
->> QDict's members are all QString.
->> 
->> Thus, the QType of a flat QDict member depends on whether it comes
->> from -drive or -blockdev/blockdev_add, except when the QAPI type maps
->> to QString, which is the case for 'str' and enumeration types.
->> 
->
->> +++ b/block/file-posix.c
->> @@ -2193,6 +2193,12 @@ static int hdev_open(BlockDriverState *bs, QDict *options, int flags,
->>      int ret;
->>  
->>  #if defined(__APPLE__) && defined(__MACH__)
->> +    /*
->> +     * Caution: while qdict_get_try_str() is fine, getting non-string
->> +     * types would require more care.  When @options come from -blockdev
->> +     * or blockdev_add, its members are typed according to the QAPI
->> +     * schema, but when they come from -drive, they're all QString.
->> +     */
->>      const char *filename = qdict_get_str(options, "filename");
->
-> Comment mentions (via copy-and-past) qdict_get_try_str(), but this
-> instance uses qdict_get_str().  Doesn't bother me enough to withhold
-> review if you leave it, though.
->
->
->> +++ b/block/nfs.c
->> @@ -474,6 +474,13 @@ static NFSServer *nfs_config(QDict *options, Error **errp)
->>          goto out;
->>      }
->>  
->> +    /*
->> +     * Caution: this works only because all scalar members of
->> +     * NFSServer are QString in @crumpled_addr.  The visitor expects
->> +     * @crumpled_addr to be typed according to the QAPI scherma.  It
->
-> s/scherma/schema/
+That said, it's also not going to hurt anything and it's nice to silence the
+warnings.
 
-In case nothing else comes up, I hope both can be touched up on commit.
-Max?
-
->> +     * is when @options come from -blockdev or blockdev_add.  But when
->> +     * they come from -drive, they're all QString.
->> +     */
->
-> With the typo fix,
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks!
+-corey
