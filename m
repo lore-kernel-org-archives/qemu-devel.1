@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ctTiy-0001Xx-MC
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 02:38:25 -0400
+	(envelope-from <peterx@redhat.com>) id 1ctTu0-0003GM-O7
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 02:49:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ctTix-0005le-O3
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 02:38:24 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1490805920-17029-1-git-send-email-armbru@redhat.com>
-	<1490805920-17029-4-git-send-email-armbru@redhat.com>
-	<58b223ea-7e67-e5f9-9631-1b3c0dc79835@redhat.com>
-Date: Thu, 30 Mar 2017 08:38:13 +0200
-In-Reply-To: <58b223ea-7e67-e5f9-9631-1b3c0dc79835@redhat.com> (Max Reitz's
-	message of "Wed, 29 Mar 2017 21:13:24 +0200")
-Message-ID: <87r31ffewa.fsf@dusky.pond.sub.org>
+	(envelope-from <peterx@redhat.com>) id 1ctTtv-00060Q-CL
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 02:49:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45014)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ctTtv-0005yP-0Q
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 02:49:43 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 96DE780463
+	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 06:49:41 +0000 (UTC)
+Date: Thu, 30 Mar 2017 14:49:34 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170330064934.GG20667@pxdev.xzpeter.org>
+References: <20170323204544.12015-1-quintela@redhat.com>
+	<20170323204544.12015-30-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [for-2.9 3/8] io vnc sockets: Clean up
- SocketAddressKind switches
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170323204544.12015-30-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 29/51] ram: Move last_req_rb to RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,119 +33,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, pbonzini@redhat.com, namei.unix@gmail.com
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
 
-Max Reitz <mreitz@redhat.com> writes:
+On Thu, Mar 23, 2017 at 09:45:22PM +0100, Juan Quintela wrote:
+> It was on MigrationState when it is only used inside ram.c for
+> postcopy.  Problem is that we need to access it without being able to
+> pass it RAMState directly.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  include/migration/migration.h | 2 --
+>  migration/migration.c         | 1 -
+>  migration/ram.c               | 7 +++++--
+>  3 files changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index 84cef4b..e032fb0 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -189,8 +189,6 @@ struct MigrationState
+>      /* Queue of outstanding page requests from the destination */
+>      QemuMutex src_page_req_mutex;
+>      QSIMPLEQ_HEAD(src_page_requests, MigrationSrcPageRequest) src_page_requests;
+> -    /* The RAMBlock used in the last src_page_request */
+> -    RAMBlock *last_req_rb;
+>      /* The semaphore is used to notify COLO thread that failover is finished */
+>      QemuSemaphore colo_exit_sem;
+>  
+> diff --git a/migration/migration.c b/migration/migration.c
+> index e532430..b220941 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1118,7 +1118,6 @@ MigrationState *migrate_init(const MigrationParams *params)
+>      s->postcopy_after_devices = false;
+>      s->postcopy_requests = 0;
+>      s->migration_thread_running = false;
+> -    s->last_req_rb = NULL;
+>      error_free(s->error);
+>      s->error = NULL;
+>  
+> diff --git a/migration/ram.c b/migration/ram.c
+> index dd5a453..325a0f3 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -203,6 +203,8 @@ struct RAMState {
+>      QemuMutex bitmap_mutex;
+>      /* Ram Bitmap protected by RCU */
+>      RAMBitmap *ram_bitmap;
+> +    /* The RAMBlock used in the last src_page_request */
+                                                        ^ "s" missing
 
-> On 29.03.2017 18:45, Markus Armbruster wrote:
->> We have quite a few switches over SocketAddressKind.  Some have case
->> labels for all enumeration values, others rely on a default label.
->> Some abort when the value isn't a valid SocketAddressKind, others
->> report an error then.
->> 
->> Unify as follows.  Always provide case labels for all enumeration
->> values, to clarify intent.  Abort when the value isn't a valid
->> SocketAddressKind, because the program state is messed up then.
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  io/dns-resolver.c   |  6 ++++--
->>  ui/vnc.c            | 10 ++++++++--
->>  util/qemu-sockets.c |  4 +---
->>  3 files changed, 13 insertions(+), 7 deletions(-)
->
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
+Besides:
 
-Thanks!
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-> Nit-picks below, as can be expected of me.
+> +    RAMBlock *last_req_rb;
+>  };
+>  typedef struct RAMState RAMState;
 
-Bring 'em on!
-
->> diff --git a/io/dns-resolver.c b/io/dns-resolver.c
->> index 0ac6b23..00fb575 100644
->> --- a/io/dns-resolver.c
->> +++ b/io/dns-resolver.c
->> @@ -164,9 +164,11 @@ int qio_dns_resolver_lookup_sync(QIODNSResolver *resolver,
->>                                                  addrs,
->>                                                  errp);
->>  
->> +    case SOCKET_ADDRESS_KIND_FD:
->> +        error_setg(errp, "Unsupported socket address type 'fd'");
->> +        return -1;
->
-> Could do with an empty line here like the other cases have.
-
-Indeed.
-
->>      default:
->> -        error_setg(errp, "Unknown socket address kind");
->> -        return -1;
->> +        abort();
->>      }
->>  }
->>  
->> diff --git a/ui/vnc.c b/ui/vnc.c
->> index fe0a46a..b6b58c4 100644
->> --- a/ui/vnc.c
->> +++ b/ui/vnc.c
->> @@ -129,10 +129,13 @@ static void vnc_init_basic_info(SocketAddress *addr,
->>          info->family = NETWORK_ADDRESS_FAMILY_UNIX;
->>          break;
->>  
->> -    default:
->> +    case SOCKET_ADDRESS_KIND_VSOCK:
->> +    case SOCKET_ADDRESS_KIND_FD:
->>          error_setg(errp, "Unsupported socket kind %d",
->>                     addr->type);
->
-> Pre-existing, but: %s and SocketAddressKind_lookup[addr->type] would be
-> nicer.
-
-Can do.
-
->>          break;
->> +    default:
->> +        abort();
->>      }
->>  
->>      return;
->> @@ -411,10 +414,13 @@ VncInfo *qmp_query_vnc(Error **errp)
->>              info->family = NETWORK_ADDRESS_FAMILY_UNIX;
->>              break;
->>  
->> -        default:
->> +        case SOCKET_ADDRESS_KIND_VSOCK:
->> +        case SOCKET_ADDRESS_KIND_FD:
->>              error_setg(errp, "Unsupported socket kind %d",
->>                         addr->type);
->
-> Same here.
-
-Yup.
-
-> Max
->
->>              goto out_error;
->> +        default:
->> +            abort();
->>          }
->>  
->>          info->has_host = true;
->> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
->> index 9b73681..4ae37bd 100644
->> --- a/util/qemu-sockets.c
->> +++ b/util/qemu-sockets.c
->> @@ -1337,9 +1337,7 @@ char *socket_address_to_string(struct SocketAddress *addr, Error **errp)
->>          break;
->>  
->>      default:
->> -        error_setg(errp, "socket family %d unsupported",
->> -                   addr->type);
->> -        return NULL;
->> +        abort();
->>      }
->>      return buf;
->>  }
->> 
+-- peterx
