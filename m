@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ctUqV-0001Vz-1X
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 03:50:17 -0400
+	(envelope-from <thuth@redhat.com>) id 1ctUqY-0001Y7-0O
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 03:50:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ctUqT-0006g6-NH
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 03:50:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44352)
+	(envelope-from <thuth@redhat.com>) id 1ctUqU-0006l4-Tl
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 03:50:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42964)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ctUqT-0006e0-FQ
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 03:50:13 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ctUqU-0006h4-KI
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 03:50:14 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7C41B7FD68
-	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 07:50:12 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 856BF3DBC1
+	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 07:50:13 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 30 Mar 2017 09:50:06 +0200
-Message-Id: <1490860207-8302-3-git-send-email-thuth@redhat.com>
+Date: Thu, 30 Mar 2017 09:50:07 +0200
+Message-Id: <1490860207-8302-4-git-send-email-thuth@redhat.com>
 In-Reply-To: <1490860207-8302-1-git-send-email-thuth@redhat.com>
 References: <1490860207-8302-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/3] libqtest: Add a generic function to run
- a callback function for every machine
+Subject: [Qemu-devel] [PATCH v2 3/3] tests: Add a tester for HMP commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,247 +32,204 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
 Cc: Markus Armbruster <armbru@redhat.com>
 
-Some tests need to run single tests for every available machine of the
-current QEMU binary. To avoid code duplication, let's extract this
-code that deals with 'query-machines' into a separate function.
+HMP commands do not get any automatic testing yet, so on certain
+QEMU machines, some HMP commands were causing crashes in the past.
+Thus we should test HMP commands in our test suite, too, to avoid
+that such problems creep in again in the future.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/libqtest.c    | 30 +++++++++++++++++
- tests/libqtest.h    |  8 +++++
- tests/pc-cpu-test.c | 95 ++++++++++++++++++++---------------------------------
- tests/qom-test.c    | 36 ++++----------------
- 4 files changed, 80 insertions(+), 89 deletions(-)
+ tests/Makefile.include |   2 +
+ tests/test-hmp.c       | 161 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 163 insertions(+)
+ create mode 100644 tests/test-hmp.c
 
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index c9b2d76..d8b8066 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -938,3 +938,33 @@ bool qtest_big_endian(QTestState *s)
- {
-     return s->big_endian;
- }
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index f3de81f..0e754ac 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -331,6 +331,7 @@ check-qtest-xtensaeb-y = $(check-qtest-xtensa-y)
+ check-qtest-s390x-y = tests/boot-serial-test$(EXESUF)
+ 
+ check-qtest-generic-y += tests/qom-test$(EXESUF)
++check-qtest-generic-y += tests/test-hmp$(EXESUF)
+ 
+ qapi-schema += alternate-any.json
+ qapi-schema += alternate-array.json
+@@ -720,6 +721,7 @@ tests/tpci200-test$(EXESUF): tests/tpci200-test.o
+ tests/display-vga-test$(EXESUF): tests/display-vga-test.o
+ tests/ipoctal232-test$(EXESUF): tests/ipoctal232-test.o
+ tests/qom-test$(EXESUF): tests/qom-test.o
++tests/test-hmp$(EXESUF): tests/test-hmp.o
+ tests/drive_del-test$(EXESUF): tests/drive_del-test.o $(libqos-pc-obj-y)
+ tests/qdev-monitor-test$(EXESUF): tests/qdev-monitor-test.o $(libqos-pc-obj-y)
+ tests/nvme-test$(EXESUF): tests/nvme-test.o
+diff --git a/tests/test-hmp.c b/tests/test-hmp.c
+new file mode 100644
+index 0000000..339ed41
+--- /dev/null
++++ b/tests/test-hmp.c
+@@ -0,0 +1,161 @@
++/*
++ * Test HMP commands.
++ *
++ * Copyright (c) 2017 Red Hat Inc.
++ *
++ * Author:
++ *    Thomas Huth <thuth@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2
++ * or later. See the COPYING file in the top-level directory.
++ *
++ * This test calls some HMP commands for all machines that the current
++ * QEMU binary provides, to check whether they terminate successfully
++ * (i.e. do not crash QEMU).
++ */
 +
-+void qtest_cb_for_every_machine(void (*cb)(const char *machine))
++#include "qemu/osdep.h"
++#include "libqtest.h"
++
++static int verbose;
++
++static const char *hmp_cmds[] = {
++    "boot_set ndc",
++    "chardev-add null,id=testchardev1",
++    "chardev-remove testchardev1",
++    "commit all",
++    "cpu-add 1",
++    "cpu 0",
++    "device_add ?",
++    "device_add usb-mouse,id=mouse1",
++    "mouse_button 7",
++    "mouse_move 10 10",
++    "mouse_button 0",
++    "device_del mouse1",
++    "dump-guest-memory /dev/null 0 4096",
++    "gdbserver",
++    "host_net_add user id=net0",
++    "hostfwd_add tcp::43210-:43210",
++    "hostfwd_remove tcp::43210-:43210",
++    "host_net_remove 0 net0",
++    "i /w 0",
++    "log all",
++    "log none",
++    "memsave 0 4096 \"/dev/null\"",
++    "migrate_set_cache_size 1",
++    "migrate_set_downtime 1",
++    "migrate_set_speed 1",
++    "netdev_add user,id=net1",
++    "set_link net1 off",
++    "set_link net1 on",
++    "netdev_del net1",
++    "nmi",
++    "o /w 0 0x1234",
++    "object_add memory-backend-ram,id=mem1,size=256M",
++    "object_del mem1",
++    "pmemsave 0 4096 \"/dev/null\"",
++    "p $pc + 8",
++    "qom-list /",
++    "qom-set /machine initrd test",
++    "screendump /dev/null",
++    "sendkey x",
++    "singlestep on",
++    "wavcapture /dev/null",
++    "stopcapture 0",
++    "sum 0 512",
++    "x /8i 0x100",
++    "xp /16x 0",
++    NULL
++};
++
++/* Run through the list of pre-defined commands */
++static void test_commands(void)
 +{
-+    QDict *response, *minfo;
-+    QList *list;
-+    const QListEntry *p;
-+    QObject *qobj;
-+    QString *qstr;
-+    const char *mname;
++    char *response;
++    int i;
 +
-+    qtest_start("-machine none");
-+    response = qmp("{ 'execute': 'query-machines' }");
-+    g_assert(response);
-+    list = qdict_get_qlist(response, "return");
-+    g_assert(list);
-+
-+    for (p = qlist_first(list); p; p = qlist_next(p)) {
-+        minfo = qobject_to_qdict(qlist_entry_obj(p));
-+        g_assert(minfo);
-+        qobj = qdict_get(minfo, "name");
-+        g_assert(qobj);
-+        qstr = qobject_to_qstring(qobj);
-+        g_assert(qstr);
-+        mname = qstring_get_str(qstr);
-+        cb(mname);
++    for (i = 0; hmp_cmds[i] != NULL; i++) {
++        if (verbose) {
++            fprintf(stderr, "\t%s\n", hmp_cmds[i]);
++        }
++        response = hmp(hmp_cmds[i]);
++        g_free(response);
 +    }
++
++}
++
++/* Run through all info commands and call them blindly (without arguments) */
++static void test_info_commands(void)
++{
++    char *resp, *info, *info_buf, *endp;
++
++    info_buf = info = hmp("help info");
++
++    while (*info) {
++        /* Extract the info command, ignore parameters and description */
++        g_assert(strncmp(info, "info ", 5) == 0);
++        endp = strchr(&info[5], ' ');
++        g_assert(endp != NULL);
++        *endp = '\0';
++        /* Now run the info command */
++        if (verbose) {
++            fprintf(stderr, "\t%s\n", info);
++        }
++        resp = hmp(info);
++        g_free(resp);
++        /* And move forward to the next line */
++        info = strchr(endp + 1, '\n');
++        if (!info) {
++            break;
++        }
++        info += 1;
++    }
++
++    g_free(info_buf);
++}
++
++static void test_machine(gconstpointer data)
++{
++    const char *machine = data;
++    char *args;
++
++    args = g_strdup_printf("-S -M %s", machine);
++    qtest_start(args);
++
++    test_info_commands();
++    test_commands();
 +
 +    qtest_end();
-+    QDECREF(response);
++    g_free(args);
++    g_free((void *)data);
 +}
-diff --git a/tests/libqtest.h b/tests/libqtest.h
-index 2c9962d..43ffadd 100644
---- a/tests/libqtest.h
-+++ b/tests/libqtest.h
-@@ -917,4 +917,12 @@ void qmp_fd_send(int fd, const char *fmt, ...);
- QDict *qmp_fdv(int fd, const char *fmt, va_list ap);
- QDict *qmp_fd(int fd, const char *fmt, ...);
- 
-+/**
-+ * qtest_cb_for_every_machine:
-+ * @cb: Pointer to the callback function
-+ *
-+ *  Call a callback function for every name of all available machines.
-+ */
-+void qtest_cb_for_every_machine(void (*cb)(const char *machine));
 +
- #endif
-diff --git a/tests/pc-cpu-test.c b/tests/pc-cpu-test.c
-index c3a2633..c4211a4 100644
---- a/tests/pc-cpu-test.c
-+++ b/tests/pc-cpu-test.c
-@@ -79,69 +79,46 @@ static void test_data_free(gpointer data)
-     g_free(pc);
- }
- 
--static void add_pc_test_cases(void)
-+static void add_pc_test_case(const char *mname)
- {
--    QDict *response, *minfo;
--    QList *list;
--    const QListEntry *p;
--    QObject *qobj;
--    QString *qstr;
--    const char *mname;
-     char *path;
-     PCTestData *data;
- 
--    qtest_start("-machine none");
--    response = qmp("{ 'execute': 'query-machines' }");
--    g_assert(response);
--    list = qdict_get_qlist(response, "return");
--    g_assert(list);
--
--    for (p = qlist_first(list); p; p = qlist_next(p)) {
--        minfo = qobject_to_qdict(qlist_entry_obj(p));
--        g_assert(minfo);
--        qobj = qdict_get(minfo, "name");
--        g_assert(qobj);
--        qstr = qobject_to_qstring(qobj);
--        g_assert(qstr);
--        mname = qstring_get_str(qstr);
--        if (!g_str_has_prefix(mname, "pc-")) {
--            continue;
--        }
--        data = g_malloc(sizeof(PCTestData));
--        data->machine = g_strdup(mname);
--        data->cpu_model = "Haswell"; /* 1.3+ theoretically */
--        data->sockets = 1;
--        data->cores = 3;
--        data->threads = 2;
--        data->maxcpus = data->sockets * data->cores * data->threads * 2;
--        if (g_str_has_suffix(mname, "-1.4") ||
--            (strcmp(mname, "pc-1.3") == 0) ||
--            (strcmp(mname, "pc-1.2") == 0) ||
--            (strcmp(mname, "pc-1.1") == 0) ||
--            (strcmp(mname, "pc-1.0") == 0) ||
--            (strcmp(mname, "pc-0.15") == 0) ||
--            (strcmp(mname, "pc-0.14") == 0) ||
--            (strcmp(mname, "pc-0.13") == 0) ||
--            (strcmp(mname, "pc-0.12") == 0) ||
--            (strcmp(mname, "pc-0.11") == 0) ||
--            (strcmp(mname, "pc-0.10") == 0)) {
--            path = g_strdup_printf("cpu/%s/init/%ux%ux%u&maxcpus=%u",
--                                   mname, data->sockets, data->cores,
--                                   data->threads, data->maxcpus);
--            qtest_add_data_func_full(path, data, test_pc_without_cpu_add,
--                                     test_data_free);
--            g_free(path);
--        } else {
--            path = g_strdup_printf("cpu/%s/add/%ux%ux%u&maxcpus=%u",
--                                   mname, data->sockets, data->cores,
--                                   data->threads, data->maxcpus);
--            qtest_add_data_func_full(path, data, test_pc_with_cpu_add,
--                                     test_data_free);
--            g_free(path);
--        }
-+    if (!g_str_has_prefix(mname, "pc-")) {
++static void add_machine_test_case(const char *mname)
++{
++    char *path = g_strdup_printf("hmp/%s", mname);
++
++    /* Ignore blacklisted machines that have known problems */
++    if (!strcmp("isapc", mname) == 0 ||  !strcmp("puv3", mname)
++        || !strcmp("tricore_testboard", mname)
++        || !strcmp("xenfv", mname) == 0 || !strcmp("xenpv", mname)) {
 +        return;
 +    }
-+    data = g_malloc(sizeof(PCTestData));
-+    data->machine = g_strdup(mname);
-+    data->cpu_model = "Haswell"; /* 1.3+ theoretically */
-+    data->sockets = 1;
-+    data->cores = 3;
-+    data->threads = 2;
-+    data->maxcpus = data->sockets * data->cores * data->threads * 2;
-+    if (g_str_has_suffix(mname, "-1.4") ||
-+        (strcmp(mname, "pc-1.3") == 0) ||
-+        (strcmp(mname, "pc-1.2") == 0) ||
-+        (strcmp(mname, "pc-1.1") == 0) ||
-+        (strcmp(mname, "pc-1.0") == 0) ||
-+        (strcmp(mname, "pc-0.15") == 0) ||
-+        (strcmp(mname, "pc-0.14") == 0) ||
-+        (strcmp(mname, "pc-0.13") == 0) ||
-+        (strcmp(mname, "pc-0.12") == 0) ||
-+        (strcmp(mname, "pc-0.11") == 0) ||
-+        (strcmp(mname, "pc-0.10") == 0)) {
-+        path = g_strdup_printf("cpu/%s/init/%ux%ux%u&maxcpus=%u",
-+                               mname, data->sockets, data->cores,
-+                               data->threads, data->maxcpus);
-+        qtest_add_data_func_full(path, data, test_pc_without_cpu_add,
-+                                 test_data_free);
-+        g_free(path);
-+    } else {
-+        path = g_strdup_printf("cpu/%s/add/%ux%ux%u&maxcpus=%u",
-+                               mname, data->sockets, data->cores,
-+                               data->threads, data->maxcpus);
-+        qtest_add_data_func_full(path, data, test_pc_with_cpu_add,
-+                                 test_data_free);
-+        g_free(path);
-     }
--    QDECREF(response);
--    qtest_end();
- }
- 
- int main(int argc, char **argv)
-@@ -151,7 +128,7 @@ int main(int argc, char **argv)
-     g_test_init(&argc, &argv, NULL);
- 
-     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
--        add_pc_test_cases();
-+        qtest_cb_for_every_machine(add_pc_test_case);
-     }
- 
-     return g_test_run();
-diff --git a/tests/qom-test.c b/tests/qom-test.c
-index d48f890..ab0595d 100644
---- a/tests/qom-test.c
-+++ b/tests/qom-test.c
-@@ -107,46 +107,22 @@ static void test_machine(gconstpointer data)
-     g_free((void *)machine);
- }
- 
--static void add_machine_test_cases(void)
-+static void add_machine_test_case(const char *mname)
- {
-     const char *arch = qtest_get_arch();
--    QDict *response, *minfo;
--    QList *list;
--    const QListEntry *p;
--    QObject *qobj;
--    QString *qstr;
--    const char *mname;
- 
--    qtest_start("-machine none");
--    response = qmp("{ 'execute': 'query-machines' }");
--    g_assert(response);
--    list = qdict_get_qlist(response, "return");
--    g_assert(list);
--
--    for (p = qlist_first(list); p; p = qlist_next(p)) {
--        minfo = qobject_to_qdict(qlist_entry_obj(p));
--        g_assert(minfo);
--        qobj = qdict_get(minfo, "name");
--        g_assert(qobj);
--        qstr = qobject_to_qstring(qobj);
--        g_assert(qstr);
--        mname = qstring_get_str(qstr);
--        if (!is_blacklisted(arch, mname)) {
--            char *path = g_strdup_printf("qom/%s", mname);
--            qtest_add_data_func(path, g_strdup(mname), test_machine);
--            g_free(path);
--        }
-+    if (!is_blacklisted(arch, mname)) {
-+        char *path = g_strdup_printf("qom/%s", mname);
-+        qtest_add_data_func(path, g_strdup(mname), test_machine);
-+        g_free(path);
-     }
--
--    qtest_end();
--    QDECREF(response);
- }
- 
- int main(int argc, char **argv)
- {
-     g_test_init(&argc, &argv, NULL);
- 
--    add_machine_test_cases();
++
++    qtest_add_data_func(path, g_strdup(mname), test_machine);
++    g_free(path);
++}
++
++int main(int argc, char **argv)
++{
++    char *v_env = getenv("V");
++
++    if (v_env && *v_env >= '2') {
++        verbose = true;
++    }
++
++    g_test_init(&argc, &argv, NULL);
++
 +    qtest_cb_for_every_machine(add_machine_test_case);
- 
-     return g_test_run();
- }
++
++    return g_test_run();
++}
 -- 
 1.8.3.1
