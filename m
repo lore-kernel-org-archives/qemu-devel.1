@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ctgF9-0000fO-7w
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 16:00:28 -0400
+	(envelope-from <gabriele.galeotti.xyz@gmail.com>) id 1ctfft-0006qp-RK
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 15:24:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ctgF4-0001Ao-Ey
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 16:00:27 -0400
-References: <1490894892-8055-1-git-send-email-minyard@acm.org>
-	<0715ab2d-f367-03ef-1674-4c1e67756f85@redhat.com>
-	<71b59e1b-caf0-d7b0-0648-b98d62e66c6b@acm.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f99214c2-6a18-5ab0-c6af-75590cc8d5fd@redhat.com>
-Date: Thu, 30 Mar 2017 15:00:18 -0500
+	(envelope-from <gabriele.galeotti.xyz@gmail.com>) id 1ctffo-00063e-Tx
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 15:24:01 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:35676)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <gabriele.galeotti.xyz@gmail.com>)
+	id 1ctffo-000622-NP
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 15:23:56 -0400
+Received: by mail-wr0-x244.google.com with SMTP id p52so14842870wrc.2
+	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 12:23:56 -0700 (PDT)
+From: Gabriele Galeotti <gabriele.galeotti.xyz@gmail.com>
+Message-ID: <e72bc20d-9da1-255b-bc44-e6e8786799be@gmail.com>
+Date: Thu, 30 Mar 2017 21:30:13 +0200
 MIME-Version: 1.0
-In-Reply-To: <71b59e1b-caf0-d7b0-0648-b98d62e66c6b@acm.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="uhFfLPoIsWWwRTW5gFaKc8MwAucgN42cd"
-Subject: Re: [Qemu-devel] [PATCH for-2.9? v2 resend] ipmi: Fix macro issues
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] LEON3 timer patch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,156 +27,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: minyard@acm.org, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Ed Maste <emaste@freebsd.org>, Corey Minyard <cminyard@mvista.com>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---uhFfLPoIsWWwRTW5gFaKc8MwAucgN42cd
-From: Eric Blake <eblake@redhat.com>
-To: minyard@acm.org, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Ed Maste <emaste@freebsd.org>,
- Corey Minyard <cminyard@mvista.com>
-Message-ID: <f99214c2-6a18-5ab0-c6af-75590cc8d5fd@redhat.com>
-Subject: Re: [PATCH for-2.9? v2 resend] ipmi: Fix macro issues
-References: <1490894892-8055-1-git-send-email-minyard@acm.org>
- <0715ab2d-f367-03ef-1674-4c1e67756f85@redhat.com>
- <71b59e1b-caf0-d7b0-0648-b98d62e66c6b@acm.org>
-In-Reply-To: <71b59e1b-caf0-d7b0-0648-b98d62e66c6b@acm.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 03/30/2017 02:10 PM, Corey Minyard wrote:
-
->> Already reviewed by me, so now I'm just adding commentary: Is this sti=
-ll
->> 2.9 material?  It silences a build warning under clang, although I
->> didn't analyze whether the unpatched code actually caused an observabl=
-e
->> behavior bug or just compiler noise.
->>
-> I don't believe the code has a bug, going through all the uses there is=
-
-> no expression used as a parameter or set used in an expression.
-
-Actually, let's re-read the clang warning, posted by Ed - we DO have an
-expression used as a parameter:
-
-> Found via Clang warning: logical not is only applied to the left hand
-> side of this bitwise operator [-Wlogical-not-parentheses]
->=20
->                               !IPMI_BT_GET_HBUSY(ib->control_reg));
->                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->=20
-> expanded from macro 'IPMI_BT_SET_HBUSY'
->                                        (((v & 1) << IPMI_BT_HBUSY_BIT))=
-)
->                                           ^ ~
-
-But we STILL have to audit to see if that expression used as a parameter
-causes a bug:
-
-        if (IPMI_BT_GET_HBUSY(val)) {
-            /* Toggle */
-            IPMI_BT_SET_HBUSY(ib->control_reg,
-                              !IPMI_BT_GET_HBUSY(ib->control_reg));
-        }
-
-with the expectation that it will toggle the bit.  But does it really?
-
-Unpatched, it expands to this:
-
-(ib->control_reg) =3D (((ib->control_reg) & ~IPMI_BT_HBUSY_MASK) |
-  (((!IPMI_BT_GET_HBUSY(ib->control_reg) & 1) << IPMI_BT_HBUSY_BIT)))
-
-Everything left of the | is okay, but to the right, this further expands =
-to:
-
-(((!(((ib->control_reg) >> IPMI_BT_HBUSY_BIT) & 0x1) & 1) <<
-IPMI_BT_HBUSY_BIT))
-
-Since the inner expression of IPMI_BT_GET_HBUSY(ib->control_reg) is
-properly parenthesized and always 0 or 1, it boils down to either:
-
-(!0 & 1) << shift // 1 & 1, results in changing the HBUSY from 0 to 1
-(!1 & 1) << shift // 0 & 1, results in changing the HBUSY from 1 to 0
-
-so we actually achieve the toggle we wanted.  If I'm reading it
-correctly, the clang warning is asking if we instead meant:
-
-(!(0 & 1)) << shift // !0, results in changing the HBUSY from 0 to 1
-(!(1 & 1)) << shift // !1, results in changing the HBUSY from 1 to 0
-
-which, perhaps surprisingly, would have the same end results for all our
-inputs (but ONLY because the value we are passing to ! is already
-limited to the range of 0 and 1).
-
-Post-patch, we are changing to an expansion of:
-
-((ib->control_reg) =3D (((ib->control_reg) & ~IPMI_BT_HBUSY_MASK) |
-  (((!IPMI_BT_GET_HBUSY(ib->control_reg)) & 1) << IPMI_BT_HBUSY_BIT)))
-
-Again, everything to the left of | is okay, to the right further expands =
-to:
-
-(((!(((ib->control_reg) >> IPMI_BT_HBUSY_BIT) & 0x1)) & 1) <<
-IPMI_BT_HBUSY_BIT)
-
-which now boils down to either:
-
-(!(0) & 1) << shift
-(!(1) & 1) << shift
-
-where we are now being explicit that we want the ! bound only to the
-left argument, and not to the overall (a&b) expression.  But we are not
-changing semantics, and therefore not fixing an observable bug.
-
-Note, on the other hand, that a call such as
-IPMI_BT_SET_HBUSY(ib->control_reg, 2) would result in writing 0 to the
-HBUSY bit. In other words, the IPMI_BT_SET_HBUSY() macro is rather weird
-in that it sets or clears the HBUSY bit based solely on whether its v
-parameter is even or odd, rather than the more usual semantics of
-whether the v parameter is 0 or non-zero.  We could change that if we
-wanted - by having the macro expand to "(left | (!!(v) << shift))"
-instead of our current expansion of "(left | (((v) & 1) << shift))" -
-but I still don't think it would change the semantics of any existing
-caller.
-
->=20
-> That said, it's also not going to hurt anything and it's nice to silenc=
-e
-> the
-> warnings.
-
-I don't know if there were other warnings or just the one on the use of
-IPMI_BT_SET_BUSY(); it may well be that auditing one of the other
-warnings may turn up an actual behavioral change, but at this point, I'm
-doubting that we are doing any more than shutting up the compiler, and
-working around compiler noise is not the same level of bug fix as an
-actual behavior change.  I'm not opposed to this patch going into 2.9,
-but I don't see any problem if it slips to 2.10.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+To: qemu-devel@nongnu.org
+Cc: chouteau@adacore.com
 
 
---uhFfLPoIsWWwRTW5gFaKc8MwAucgN42cd
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Hi all.
+According to "GR712RC Dual-Core LEON3FT SPARC V8 Processor User’s Manual",
+"11.3 Registers", pg 87-88, Table 55 Timer control register, the IP 
+"interrupt pending"
+bit:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Interrupt Pending (IP): The core sets this bit to ‘1’ when an interrupt 
+is signalled. This bit remains ‘1’
+until cleared by writing ‘0’ to this bit.
 
-iQEcBAEBCAAGBQJY3WPSAAoJEKeha0olJ0NqVS8IAIkpAXVKjmvTbYzcv57dOabf
-mbNDc1Vl0eU8V+OPPoJZzGSa28NZDH99VJ7G7SfESb9s3VEZd1GWo5yrY3TogHqb
-XGgCx6rohEOSq0QMKpqn4/VfyJTzqs2jHvUaAJUGIpBHbes5O7/4R1Hv1BHEN6tW
-syJCD6KNqTVAR4DrNf+Gxn4XRQ/jUmTENlFa9yVnlhEkW4FEpFseN/8ytJ/eUYKc
-j/mALpzRGpaWlyHGxcF7aVjOn3Qb/VdnyJ+q459z3Im7SfulZlPnULAyH4OFqPMS
-DYi7129HgBd5vBoZQVB+lB2oUJojSLTrLEVZ519QR76da19wXMG+2TZYPG539lk=
-=qbvS
------END PGP SIGNATURE-----
+Thus  the code handling should changed so that the pending bit is 
+mantained when "value" has a 1
+in that position.
 
---uhFfLPoIsWWwRTW5gFaKc8MwAucgN42cd--
+
+Signed-off-by: Gabriele Galeotti <gabriele.galeotti.xyz@gmail.com>
+---
+  hw/timer/grlib_gptimer.c | 3 ---
+  1 file changed, 3 deletions(-)
+
+diff --git a/hw/timer/grlib_gptimer.c b/hw/timer/grlib_gptimer.c
+index 4ed96e9..c555ae8 100644
+--- a/hw/timer/grlib_gptimer.c
++++ b/hw/timer/grlib_gptimer.c
+@@ -276,9 +276,6 @@ static void grlib_gptimer_write(void *opaque, hwaddr 
+addr,
+              trace_grlib_gptimer_writel(id, addr, value);
+.
+              if (value & GPTIMER_INT_PENDING) {
+-                /* clear pending bit */
+-                value &= ~GPTIMER_INT_PENDING;
+-            } else {
+                  /* keep pending bit */
+                  value |= unit->timers[id].config & GPTIMER_INT_PENDING;
+              }
+--.
+2.9.0
