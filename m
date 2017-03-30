@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ctbgX-0005NX-3B
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:08:29 -0400
+	(envelope-from <eblake@redhat.com>) id 1ctbhL-0005qY-9L
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:09:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ctbgS-0001ec-32
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:08:25 -0400
-Received: from 2.mo2.mail-out.ovh.net ([188.165.53.149]:36072)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ctbgR-0001d6-PX
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:08:20 -0400
-Received: from player718.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 5E31B79466
-	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 17:08:18 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 30 Mar 2017 17:08:04 +0200
-Message-Id: <1490886484-6147-1-git-send-email-clg@kaod.org>
-In-Reply-To: <1490795611-4762-3-git-send-email-clg@kaod.org>
-References: <1490795611-4762-3-git-send-email-clg@kaod.org>
+	(envelope-from <eblake@redhat.com>) id 1ctbhJ-0002Nr-Jd
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:09:15 -0400
+References: <1490879707-6060-1-git-send-email-armbru@redhat.com>
+	<1490879707-6060-9-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <bf9194b9-0dde-bbd7-c0f4-2799ade58204@redhat.com>
+Date: Thu, 30 Mar 2017 10:09:02 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 2+/9] spapr: allocate the ICPState object
- from under sPAPRCPUCore
+In-Reply-To: <1490879707-6060-9-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="QKJpL18hAWefDII1E5aRASNdhDcdNrcEa"
+Subject: Re: [Qemu-devel] [RFC v2 for-2.9 08/10] nbd: Tidy up blockdev-add
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,238 +25,240 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com
 
-Today, all the ICPs are created before the CPUs, stored in an array
-under the sPAPR machine and linked to the CPU when the core threads
-are realized. This modeling brings some complexity when a lookup in
-the array is required and it can be simplified by allocating the ICPs
-when the CPUs are.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--QKJpL18hAWefDII1E5aRASNdhDcdNrcEa
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp,
+ namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
+ pbonzini@redhat.com
+Message-ID: <bf9194b9-0dde-bbd7-c0f4-2799ade58204@redhat.com>
+Subject: Re: [RFC v2 for-2.9 08/10] nbd: Tidy up blockdev-add interface
+References: <1490879707-6060-1-git-send-email-armbru@redhat.com>
+ <1490879707-6060-9-git-send-email-armbru@redhat.com>
+In-Reply-To: <1490879707-6060-9-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This is the purpose of this proposal which introduces a new 'icp_type'
-field under the machine and creates the ICP objects of the right type
-(KVM or not) before the PowerPCCPU object are.
+On 03/30/2017 08:15 AM, Markus Armbruster wrote:
+> SocketAddress is a simple union, and simple unions are awkward: they
+> have their variant members wrapped in a "data" object on the wire, and
+> require additional indirections in C.  I intend to limit its use to
+> existing external interfaces, and convert all internal interfaces to
+> SocketAddressFlat.
+>=20
+> BlockdevOptionsNbd is an external interface using SocketAddress.  We
+> already use SocketAddressFlat elsewhere in blockdev=3Dadd.  Replace it
+> by SocketAddressFlat while we can (it's new in 2.9) for simplicity and
+> consistency.  For example,
+>=20
+>     { "execute": "blockdev-add",
+>       "arguments": { "node-name": "foo", "driver": "nbd",
+>                      "server": { "type": "inet",
+> 		                 "data": { "host": "localhost",
+> 				           "port": "12345" } } } }
+>=20
+> becomes
+>=20
+>     { "execute": "blockdev-add",
+>       "arguments": { "node-name": "foo", "driver": "nbd",
+>                      "server": { "type": "inet",
+> 		                 "host": "localhost", "port": "12345" } } }
+>=20
+> Since the internal interfaces still take SocketAddress, this requires
+> conversion function socket_address_crumple().  It'll go away when I
+> update the interfaces.
+>=20
 
-This change allows more cleanups : the removal of the icps array under
-the sPAPR machine and the removal xics_get_cpu_index_by_dt_id() helper.
+So far, so good.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
+> Unfortunately, SocketAddress is also visible in -drive since 2.8.  Add
+> still more gunk to nbd_process_legacy_socket_options().  You can now
+> shorten
 
- Tested with KVM and TCG. migration is fine.
+Dead commit message comment?  Or did you still leave it in here, with
+one last chance to approve it before ripping it out in v3 for comparison?=
 
- hw/intc/xics.c          | 11 -----------
- hw/ppc/spapr.c          | 47 ++++++++++++++-----------------------------=
-----
- hw/ppc/spapr_cpu_core.c | 18 ++++++++++++++----
- include/hw/ppc/spapr.h  |  2 +-
- include/hw/ppc/xics.h   |  2 --
- 5 files changed, 29 insertions(+), 51 deletions(-)
 
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index 56fe70cd10e9..d4428b41b03a 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -38,17 +38,6 @@
- #include "monitor/monitor.h"
- #include "hw/intc/intc.h"
-=20
--int xics_get_cpu_index_by_dt_id(int cpu_dt_id)
--{
--    PowerPCCPU *cpu =3D ppc_get_vcpu_by_dt_id(cpu_dt_id);
--
--    if (cpu) {
--        return cpu->parent_obj.cpu_index;
--    }
--
--    return -1;
--}
--
- void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu)
- {
-     CPUState *cs =3D CPU(cpu);
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index b9f7f8607869..18d8fe7458c1 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -103,7 +103,6 @@ static int try_create_xics(sPAPRMachineState *spapr, =
-const char *type_ics,
-     XICSFabric *xi =3D XICS_FABRIC(spapr);
-     Error *err =3D NULL, *local_err =3D NULL;
-     ICSState *ics =3D NULL;
--    int i;
-=20
-     ics =3D ICS_SIMPLE(object_new(type_ics));
-     object_property_add_child(OBJECT(spapr), "ics", OBJECT(ics), NULL);
-@@ -112,34 +111,14 @@ static int try_create_xics(sPAPRMachineState *spapr=
-, const char *type_ics,
-     object_property_set_bool(OBJECT(ics), true, "realized", &local_err);
-     error_propagate(&err, local_err);
-     if (err) {
--        goto error;
-+        error_propagate(errp, err);
-+        return -1;
-     }
-=20
--    spapr->icps =3D g_malloc0(nr_servers * sizeof(ICPState));
-     spapr->nr_servers =3D nr_servers;
--
--    for (i =3D 0; i < nr_servers; i++) {
--        ICPState *icp =3D &spapr->icps[i];
--
--        object_initialize(icp, sizeof(*icp), type_icp);
--        object_property_add_child(OBJECT(spapr), "icp[*]", OBJECT(icp), =
-NULL);
--        object_property_add_const_link(OBJECT(icp), "xics", OBJECT(xi), =
-NULL);
--        object_property_set_bool(OBJECT(icp), true, "realized", &err);
--        if (err) {
--            goto error;
--        }
--        object_unref(OBJECT(icp));
--    }
--
-     spapr->ics =3D ics;
-+    spapr->icp_type =3D type_icp;
-     return 0;
--
--error:
--    error_propagate(errp, err);
--    if (ics) {
--        object_unparent(OBJECT(ics));
--    }
--    return -1;
- }
-=20
- static int xics_system_init(MachineState *machine,
-@@ -1366,9 +1345,10 @@ static int spapr_post_load(void *opaque, int versi=
-on_id)
-     int err =3D 0;
-=20
-     if (!object_dynamic_cast(OBJECT(spapr->ics), TYPE_ICS_KVM)) {
--        int i;
--        for (i =3D 0; i < spapr->nr_servers; i++) {
--            icp_resend(&spapr->icps[i]);
-+        CPUState *cs;
-+        CPU_FOREACH(cs) {
-+            PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-+            icp_resend(ICP(cpu->intc));
-         }
-     }
-=20
-@@ -3026,20 +3006,21 @@ static void spapr_ics_resend(XICSFabric *dev)
-=20
- static ICPState *spapr_icp_get(XICSFabric *xi, int cpu_dt_id)
- {
--    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
--    int server =3D xics_get_cpu_index_by_dt_id(cpu_dt_id);
-+    PowerPCCPU *cpu =3D ppc_get_vcpu_by_dt_id(cpu_dt_id);
-=20
--    return (server < spapr->nr_servers) ? &spapr->icps[server] : NULL;
-+    return cpu ? ICP(cpu->intc) : NULL;
- }
-=20
- static void spapr_pic_print_info(InterruptStatsProvider *obj,
-                                  Monitor *mon)
- {
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
--    int i;
-+    CPUState *cs;
-+
-+    CPU_FOREACH(cs) {
-+        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-=20
--    for (i =3D 0; i < spapr->nr_servers; i++) {
--        icp_pic_print_info(&spapr->icps[i], mon);
-+        icp_pic_print_info(ICP(cpu->intc), mon);
-     }
-=20
-     ics_pic_print_info(spapr->ics, mon);
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 4e1a99591d19..c80eb7c34f9f 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -63,8 +63,6 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, Po=
-werPCCPU *cpu,
-                            Error **errp)
- {
-     CPUPPCState *env =3D &cpu->env;
--    XICSFabric *xi =3D XICS_FABRIC(spapr);
--    ICPState *icp =3D xics_icp_get(xi, cpu->cpu_dt_id);
-=20
-     /* Set time-base frequency to 512 MHz */
-     cpu_ppc_tb_init(env, SPAPR_TIMEBASE_FREQ);
-@@ -82,8 +80,6 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, Po=
-werPCCPU *cpu,
-         }
-     }
-=20
--    xics_cpu_setup(xi, cpu, icp);
--
-     qemu_register_reset(spapr_cpu_reset, cpu);
-     spapr_cpu_reset(cpu);
- }
-@@ -143,18 +139,32 @@ static void spapr_cpu_core_realize_child(Object *ch=
-ild, Error **errp)
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-     CPUState *cs =3D CPU(child);
-     PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-+    Object *obj;
-+
-+    obj =3D object_new(spapr->icp_type);
-+    object_property_add_child(OBJECT(spapr), "icp[*]", obj, NULL);
-+    object_property_add_const_link(obj, "xics", OBJECT(spapr), NULL);
-+    object_property_set_bool(obj, true, "realized", &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-=20
-     object_property_set_bool(child, true, "realized", &local_err);
-     if (local_err) {
-+        object_unparent(obj);
-         error_propagate(errp, local_err);
-         return;
-     }
-=20
-     spapr_cpu_init(spapr, cpu, &local_err);
-     if (local_err) {
-+        object_unparent(obj);
-         error_propagate(errp, local_err);
-         return;
-     }
-+
-+    xics_cpu_setup(XICS_FABRIC(spapr), cpu, ICP(obj));
- }
-=20
- static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 808aac870359..db3d4acb18a6 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -96,7 +96,7 @@ struct sPAPRMachineState {
-     MemoryHotplugState hotplug_memory;
-=20
-     uint32_t nr_servers;
--    ICPState *icps;
-+    const char *icp_type;
- };
-=20
- #define H_SUCCESS         0
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 5e0244447fcd..88e0f021b168 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -172,8 +172,6 @@ void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu, =
-ICPState *icp);
- void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu);
-=20
- /* Internal XICS interfaces */
--int xics_get_cpu_index_by_dt_id(int cpu_dt_id);
--
- void icp_set_cppr(ICPState *icp, uint8_t cppr);
- void icp_set_mfrr(ICPState *icp, uint8_t mfrr);
- uint32_t icp_accept(ICPState *ss);
+/me reads patch - looks like you did not remove the gunk yet on this
+revision
+
+>=20
+>     -drive if=3Dnone,driver=3Dnbd,server.type=3Dinet,server.data.host=3D=
+127.0.0.1,server.data.port=3D12345
+>=20
+> to
+>=20
+>     -drive if=3Dnone,driver=3Dnbd,server.type=3Dinet,server.host=3D127.=
+0.0.1,server.port=3D12345
+
+The example is useful, but if you drop the compatibility gunk, you'll
+want to reword this as an intentional change in (heretofore
+undocumented) behavior.
+
+I'm ambivalent on whether to keep or remove the server.* gunk (the
+conservative approach is to keep it for at least 2.9, even if we rip it
+out in 2.10, as we already found out with qom-type that not being
+conservative during hard freeze risks unintentional breakage - but the
+counter-argument is that -drive parameters have been undocumented and
+that libvirt is not using 2.8's server.data, so it is unlikely anyone
+else is either).  Or put another way, we've already taken care of
+back-compat to make sure that the legacy 'host' works, whether or not
+the new form is spelled 'server.host' or 'server.data.host', so breaking
+back-compat with 'server.data.host' should not impact clients that are
+only using the older 'host'.
+
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  block/nbd.c          | 94 +++++++++++++++++++++++++++++++++++++-------=
+--------
+>  qapi/block-core.json |  2 +-
+>  2 files changed, 69 insertions(+), 27 deletions(-)
+>=20
+
+> @@ -223,12 +223,51 @@ static bool nbd_process_legacy_socket_options(QDi=
+ct *output_options,
+>      const char *path =3D qemu_opt_get(legacy_opts, "path");
+>      const char *host =3D qemu_opt_get(legacy_opts, "host");
+>      const char *port =3D qemu_opt_get(legacy_opts, "port");
+> +    const char *sd_path =3D qdict_get_try_str(output_options,
+> +                                            "server.data.path");
+> +    const char *sd_host =3D qdict_get_try_str(output_options,
+> +                                            "server.data.host");
+> +    const char *sd_port =3D qdict_get_try_str(output_options,
+> +                                            "server.data.port");
+> +    bool bare =3D path || host || port;
+> +    bool server_data =3D sd_path || sd_host || sd_port;
+
+Ah, so diff from v1 is that you took my suggestion of 'bare' for making
+the compatibility gunk checks easier to read.
+
+
+> +    if (bare && server_data) {
+> +        error_setg(errp, "Cannot use 'server' and path/host/port at th=
+e "
+> +                   "same time");
+> +        return false;
+> +    }
+> +
+> +    if (server_data) {
+> +        if (sd_host) {
+> +            val =3D qdict_get(output_options, "server.data.host");
+> +            qobject_incref(val);
+> +            qdict_put_obj(output_options, "server.host", val);
+> +            qdict_del(output_options, "server.data.host");
+> +        }
+> +        if (sd_port) {
+> +            val =3D qdict_get(output_options, "server.data.port");
+> +            qobject_incref(val);
+> +            qdict_put_obj(output_options, "server.port", val);
+> +            qdict_del(output_options, "server.data.port");
+> +        }
+> +        if (sd_path) {
+> +            val =3D qdict_get(output_options, "server.data.path");
+> +            qobject_incref(val);
+> +            qdict_put_obj(output_options, "server.path", val);
+> +            qdict_del(output_options, "server.data.path");
+> +        }
+> +        return true;
+
+This exits early, possibly setting both server.host and server.path, and
+misses out on the fact that 'bare' mode flags:
+
+    if (path && host) {
+        error_setg(errp, "path and host may not be used at the same time"=
+);
+        return false;
+
+If I'm understanding it right, this will still be flagged later during
+the QAPI type visit as invalid, although the error message quality may
+be different.
+
+Would it be any better to just use the same validation logic for both,
+by instead writing:
+
+if (server_data) {
+    if (sd_host) {
+        host =3D sd_host;
+    }
+    if (sd_port) {
+        port =3D sd_port;
+    }
+    if (sd_path) {
+        path =3D sd_path;
+    }
+} else {
+
+> +    }
+> +
+> +    assert(bare);
+> +
+>      for (e =3D qdict_first(output_options); e; e =3D qdict_next(output=
+_options, e))
+>      {
+>          if (strstart(e->key, "server.", NULL)) {
+
+to enclose this for loop to only happen on the bare branch, having both
+branches then fall into the validation code?
+
+> @@ -248,20 +287,21 @@ static bool nbd_process_legacy_socket_options(QDi=
+ct *output_options,
+>          }
+> =20
+>          qdict_put(output_options, "server.type", qstring_from_str("uni=
+x"));
+> -        qdict_put(output_options, "server.data.path", qstring_from_str=
+(path));
+> +        qdict_put(output_options, "server.path", qstring_from_str(path=
+));
+>      } else if (host) {
+>          qdict_put(output_options, "server.type", qstring_from_str("ine=
+t"));
+> -        qdict_put(output_options, "server.data.host", qstring_from_str=
+(host));
+> -        qdict_put(output_options, "server.data.port",
+> +        qdict_put(output_options, "server.host", qstring_from_str(host=
+));
+> +        qdict_put(output_options, "server.port",
+>                    qstring_from_str(port ?: stringify(NBD_DEFAULT_PORT)=
+));
+
+Perhaps another reason to fall through: server.port is mandatory in the
+schema (for the 'inet' branch of the union), but 'port' is optional on
+the command line by populating the default here.  Returning early on the
+server_data form makes 'server.data.port' mandatory, if you use the
+server.* form; I guess it's a question of whether we want the server.*
+form to match the bare form, or whether it can be as strict as the QMP
+form and only the bare form has to have compatibility gunk.  Or maybe,
+as argued by others, we don't want 'server.data'*' back-compat at all.
+
+
 --=20
-2.7.4
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--QKJpL18hAWefDII1E5aRASNdhDcdNrcEa
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY3R+OAAoJEKeha0olJ0Nqz0YH/iHCYktwDejAf1VMVAvSsA5A
+JsG38QzJuCqaQYLr2LmmrGk7rqqlvTJvI3k8o0W8XsKm62sq6NoDTCm1db5XV+BL
+npiTniZgfCmXXVfoGvGpGo7KF8HJWWWcRxnvzzZMNcgyOzErH3O6U7v+YkX5QurJ
+xhyxp/V8FASf1o4Rwk6zc0wc0QdsP8sHdKzw1nVK6Fspb89DXy2uAnNgaoFmIyXf
+8LuQw/taid7CwKZfnIEjwo7rtQ4V3kSdiAm3UrCCEb9cM5f2kJlxtAxthSqU7vM6
+0AslDxBjZqogJUxcMT0/LtfEj3G9JpjynLgU9GgHQ95VCbmlUV+gpL7TN4CHe5o=
+=ctwy
+-----END PGP SIGNATURE-----
+
+--QKJpL18hAWefDII1E5aRASNdhDcdNrcEa--
