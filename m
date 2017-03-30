@@ -1,21 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cthpx-0005Ht-Fr
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 17:42:34 -0400
+	(envelope-from <mreitz@redhat.com>) id 1ctiJK-0001v1-Mf
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 18:12:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cthpw-0002ja-C5
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 17:42:33 -0400
-References: <1490895797-29094-1-git-send-email-armbru@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1ctiJJ-0000fR-Gd
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 18:12:54 -0400
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <07160c3a-a9e5-ad4c-a600-5edbb5afa738@redhat.com>
-Date: Thu, 30 Mar 2017 23:42:21 +0200
-MIME-Version: 1.0
-In-Reply-To: <1490895797-29094-1-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="2D2ssDu2n63rQmrukSW9tIaIcWe49HegU"
-Subject: Re: [Qemu-devel] [PATCH v3 for-2.9 0/9] Fixes and cleanups around
- SocketAddress
+Date: Fri, 31 Mar 2017 00:12:43 +0200
+Message-Id: <20170330221243.17333-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.9] iotests: Fix test 147
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,95 +17,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, eblake@redhat.com, pbonzini@redhat.com
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2D2ssDu2n63rQmrukSW9tIaIcWe49HegU
-From: Max Reitz <mreitz@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp,
- namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, eblake@redhat.com,
- pbonzini@redhat.com
-Message-ID: <07160c3a-a9e5-ad4c-a600-5edbb5afa738@redhat.com>
-Subject: Re: [PATCH v3 for-2.9 0/9] Fixes and cleanups around SocketAddress
-References: <1490895797-29094-1-git-send-email-armbru@redhat.com>
-In-Reply-To: <1490895797-29094-1-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This test has been broken by changing NBD's blockdev-add interface (from
+taking a SocketAddress to taking a SocketAddressFlat). This patch makes
+it work again.
 
-On 30.03.2017 19:43, Markus Armbruster wrote:
-> What makes this 2.9 material is the crash bug fixed in PATCH 2 and the
-> QAPI/QMP interface cleanups in PATCH 7+8.
->=20
-> v3:
-> * PATCH 1-3,5 unchanged
-> * PATCH 4 comments reworded [Max, Eric]
-> * PATCH 6 comment tweak [Eric]
-> * PATCH 7 comment typo, don't rely on enum equivalence [Eric]
-> * PATCH 8 is PATCH v2 08+09 squashed together
-> * PATCH 9 sd_parse_filename() fixed to again supply defaults for
->   omitted host and port, whitespace tidied up [Max]
-> v2:
-> * PATCH 01+02+04+05 unchanged
-> * PATCH 03 error message improved, blank line [Max]
-> * PATCH 06 commit message typo [Max]
-> * PATCH 07 new, factored out of old PATCH 7
-> * PATCH 08-10 updated, please re-review
->=20
-> Markus Armbruster (9):
->   nbd sockets vnc: Mark problematic address family tests TODO
->   char: Fix socket with "type": "vsock" address
->   io vnc sockets: Clean up SocketAddressKind switches
->   block: Document -drive problematic code and bugs
->   gluster: Prepare for SocketAddressFlat extension
->   qapi-schema: SocketAddressFlat variants 'vsock' and 'fd'
->   sockets: New helper socket_address_crumple()
->   nbd: Tidy up blockdev-add interface
->   sheepdog: Fix blockdev-add
->=20
->  block.c                | 48 +++++++++++++++++++++++++--
->  block/file-posix.c     |  6 ++++
->  block/gluster.c        | 28 ++++++++++------
->  block/nbd.c            | 62 ++++++++++++++++++++--------------
->  block/nfs.c            |  7 ++++
->  block/rbd.c            |  6 ++++
->  block/sheepdog.c       | 90 ++++++++++++++++++++++++++++++++----------=
---------
->  block/ssh.c            |  8 +++++
->  blockdev-nbd.c         |  1 +
->  chardev/char-socket.c  |  9 +++--
->  include/qemu/sockets.h | 11 ++++++
->  io/dns-resolver.c      |  7 ++--
->  qapi-schema.json       | 19 +++++------
->  qapi/block-core.json   |  6 ++--
->  ui/vnc.c               | 19 +++++++----
->  util/qemu-sockets.c    | 40 ++++++++++++++++++++--
->  16 files changed, 269 insertions(+), 98 deletions(-)
+Unfortunately, we cannot just flatten all of the addresses because
+nbd-server-start still takes a plain SocketAddress. Therefore, we need
+both and this is most easily achieved by writing the SocketAddress into
+the code and flattening it where necessary.
 
-Thanks, fixed the typos in patch 4 and in the commit message of patch 8
-and applied the series to my block branch:
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+I can be convinced to squash this into Markus' patch "nbd: Tidy up
+blockdev-add interface" which is the reason this test broke. I
+personally don't have a strong opinion on the matter other than "We
+won't get Markus to send a v4".
+---
+ tests/qemu-iotests/147 | 25 +++++++++++++++++--------
+ 1 file changed, 17 insertions(+), 8 deletions(-)
 
-https://github.com/XanClic/qemu/commits/block
-
-Max
-
-
---2D2ssDu2n63rQmrukSW9tIaIcWe49HegU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljde70SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AG+MH/1hVIsk0Pmg0rvHS4daE6aiyuScRF4G0
-ObaQQmKiPUaqtIJo57KHskYnUZ23BYdD4jU0GnPHCrKQc7Jl/9qhT03gT6LA9vpF
-m5OjEkVg2hXZI8cAIg7trirhny91qN3zmSe3fHJHTQzgq59xuZQLOAXx6kTAhUa5
-5CgXFEzmTiq5xQ/oREuiCHOIuSOeqQb/Kcwn9czK5lQuSc/oeKiIWxy3BNDCoaTk
-tcXC77rbEkB1xo68fH3IVExovKmp2YSc/C4jBN22rAnjzMh+rtCdVRiJgNgUsWqT
-kx4v4RapRQt22gCn25RrRaVBlgFSjKAeYlYxktVnW2pR+tMBRYAWT18=
-=11F4
------END PGP SIGNATURE-----
-
---2D2ssDu2n63rQmrukSW9tIaIcWe49HegU--
+diff --git a/tests/qemu-iotests/147 b/tests/qemu-iotests/147
+index cca75c562c..32afea63d4 100755
+--- a/tests/qemu-iotests/147
++++ b/tests/qemu-iotests/147
+@@ -30,6 +30,13 @@ NBD_PORT = 10811
+ test_img = os.path.join(iotests.test_dir, 'test.img')
+ unix_socket = os.path.join(iotests.test_dir, 'nbd.socket')
+ 
++
++def flatten_sock_addr(crumpled_address):
++    result = { 'type': crumpled_address['type'] }
++    result.update(crumpled_address['data'])
++    return result
++
++
+ class NBDBlockdevAddBase(iotests.QMPTestCase):
+     def blockdev_add_options(self, address, export=None):
+         options = { 'node-name': 'nbd-blockdev',
+@@ -85,13 +92,15 @@ class QemuNBD(NBDBlockdevAddBase):
+                         'host': 'localhost',
+                         'port': str(NBD_PORT)
+                     } }
+-        self.client_test('nbd://localhost:%i' % NBD_PORT, address)
++        self.client_test('nbd://localhost:%i' % NBD_PORT,
++                         flatten_sock_addr(address))
+ 
+     def test_unix(self):
+         self._server_up('-k', unix_socket)
+         address = { 'type': 'unix',
+                     'data': { 'path': unix_socket } }
+-        self.client_test('nbd+unix://?socket=' + unix_socket, address)
++        self.client_test('nbd+unix://?socket=' + unix_socket,
++                         flatten_sock_addr(address))
+ 
+ 
+ class BuiltinNBD(NBDBlockdevAddBase):
+@@ -134,7 +143,7 @@ class BuiltinNBD(NBDBlockdevAddBase):
+                     } }
+         self._server_up(address)
+         self.client_test('nbd://localhost:%i/nbd-export' % NBD_PORT,
+-                         address, 'nbd-export')
++                         flatten_sock_addr(address), 'nbd-export')
+         self._server_down()
+ 
+     def test_inet6(self):
+@@ -149,10 +158,10 @@ class BuiltinNBD(NBDBlockdevAddBase):
+                      'file': {
+                          'driver': 'nbd',
+                          'export': 'nbd-export',
+-                         'server': address
++                         'server': flatten_sock_addr(address)
+                      } }
+         self._server_up(address)
+-        self.client_test(filename, address, 'nbd-export')
++        self.client_test(filename, flatten_sock_addr(address), 'nbd-export')
+         self._server_down()
+ 
+     def test_unix(self):
+@@ -160,7 +169,7 @@ class BuiltinNBD(NBDBlockdevAddBase):
+                     'data': { 'path': unix_socket } }
+         self._server_up(address)
+         self.client_test('nbd+unix:///nbd-export?socket=' + unix_socket,
+-                         address, 'nbd-export')
++                         flatten_sock_addr(address), 'nbd-export')
+         self._server_down()
+ 
+     def test_fd(self):
+@@ -182,9 +191,9 @@ class BuiltinNBD(NBDBlockdevAddBase):
+                      'file': {
+                          'driver': 'nbd',
+                          'export': 'nbd-export',
+-                         'server': address
++                         'server': flatten_sock_addr(address)
+                      } }
+-        self.client_test(filename, address, 'nbd-export')
++        self.client_test(filename, flatten_sock_addr(address), 'nbd-export')
+ 
+         self._server_down()
+ 
+-- 
+2.12.1
