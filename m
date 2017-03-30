@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54355)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ctZhF-0005W3-3k
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:01:02 -0400
+	(envelope-from <berto@igalia.com>) id 1ctZhw-000603-Kk
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:01:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ctZhC-0007LV-18
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:01:01 -0400
-References: <20170330124707.28142-1-aik@ozlabs.ru>
-	<20170330124707.28142-2-aik@ozlabs.ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <183be420-3192-56b7-eb76-29a2830c7244@redhat.com>
-Date: Thu, 30 Mar 2017 15:00:52 +0200
+	(envelope-from <berto@igalia.com>) id 1ctZht-0007rs-J9
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:01:44 -0400
+Received: from fanzine.igalia.com ([91.117.99.155]:46626)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1ctZht-0007py-5w
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:01:41 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170322111608.31230-5-stefanha@redhat.com>
+References: <20170322111608.31230-1-stefanha@redhat.com>
+	<20170322111608.31230-5-stefanha@redhat.com>
+Date: Thu, 30 Mar 2017 15:01:37 +0200
+Message-ID: <w51vaqqvrym.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20170330124707.28142-2-aik@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH qemu 1/5] memory/iommu: QOM'fy IOMMU
- MemoryRegion
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 4/8] qcow2: extract image creation
+ option parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,27 +27,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Nir Soffer <nsoffer@redhat.com>, John Snow <jsnow@redhat.com>
 
+On Wed 22 Mar 2017 12:16:04 PM CET, Stefan Hajnoczi wrote:
+> The image creation options parsed by qcow2_create() are also needed to
+> implement .bdrv_measure().  Extract the parsing code, including input
+> validation.
+>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-On 30/03/2017 14:47, Alexey Kardashevskiy wrote:
-> @@ -633,7 +663,7 @@ static inline bool memory_region_is_iommu(MemoryReg=
-ion *mr)
->      if (mr->alias) {
->          return memory_region_is_iommu(mr->alias);
->      }
-> -    return mr->iommu_ops;
-> +    return object_dynamic_cast(OBJECT(mr), TYPE_IOMMU_MEMORY_REGION) !=
-=3D NULL;
->  }
-
-This is going to be too slow for all the places where fast paths use
-address_space_translate.  You need a (slightly hackish) bool iommu flag
-in MemoryRegion, and a regular C cast rather than the type-safe
-IOMMU_MEMORY_REGION(mr) in address_space_translate.
-
-You can set the flag in iommu_memory_region_instance_init for example.
-
-Paolo
+Berto
