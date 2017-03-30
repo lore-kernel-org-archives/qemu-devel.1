@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ctU8G-0001cs-LM
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 03:04:33 -0400
+	(envelope-from <peterx@redhat.com>) id 1ctUAa-0002II-SH
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 03:06:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ctU8C-000603-N6
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 03:04:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53050)
+	(envelope-from <peterx@redhat.com>) id 1ctUAa-0008KK-8I
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 03:06:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42318)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ctU8C-0005zk-I2
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 03:04:28 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ctUAa-0008Iq-2R
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 03:06:56 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 94986C054905
-	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 07:04:27 +0000 (UTC)
-Date: Thu, 30 Mar 2017 15:04:21 +0800
+	by mx1.redhat.com (Postfix) with ESMTPS id 2E856811A7
+	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 07:06:55 +0000 (UTC)
+Date: Thu, 30 Mar 2017 15:06:49 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170330070421.GJ20667@pxdev.xzpeter.org>
+Message-ID: <20170330070649.GK20667@pxdev.xzpeter.org>
 References: <20170323204544.12015-1-quintela@redhat.com>
-	<20170323204544.12015-34-quintela@redhat.com>
+	<20170323204544.12015-35-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170323204544.12015-34-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 33/51] ram: Move dirty_pages_rate to
+In-Reply-To: <20170323204544.12015-35-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 34/51] ram: Move postcopy_requests into
  RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -37,15 +37,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Juan Quintela <quintela@redhat.com>
 Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
 
-On Thu, Mar 23, 2017 at 09:45:26PM +0100, Juan Quintela wrote:
-> Treat it like the rest of ram stats counters.  Export its value the
-> same way.  As an added bonus, no more MigrationState used in
-> migration_bitmap_sync();
-> 
+On Thu, Mar 23, 2017 at 09:45:27PM +0100, Juan Quintela wrote:
 > Signed-off-by: Juan Quintela <quintela@redhat.com>
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
-
-(I strongly suspect above r-b is for Dave)
 
 Reviewed-by: Peter Xu <peterx@redhat.com>
 
