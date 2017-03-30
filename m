@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ctdJc-0001Rd-Tl
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:52:54 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ctdLp-0002z2-GI
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:55:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ctdJX-0001Q0-PS
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:52:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36886)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1ctdJX-0001Pe-JG
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:52:47 -0400
-References: <20170330165008.26419-1-shah.suramya@gmail.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <0a3e3590-a641-8ad2-4404-6fc93a19f1ff@redhat.com>
-Date: Thu, 30 Mar 2017 19:52:39 +0300
-MIME-Version: 1.0
-In-Reply-To: <20170330165008.26419-1-shah.suramya@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5] hw/unicore32: remove wrong assertion in
- puv machine init
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ctdLk-0002QH-Hd
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:55:09 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50943)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1ctdLk-0002Ph-8M
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 12:55:04 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2UGs7ln019050
+	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 12:55:01 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 29h4bn5e23-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 12:55:01 -0400
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Thu, 30 Mar 2017 10:55:00 -0600
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+Date: Thu, 30 Mar 2017 11:54:12 -0500
+Message-Id: <1490892852-6771-1-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH for-2.9] qga: don't fail if mount doesn't have
+ slave devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +36,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suramya Shah <shah.suramya@gmail.com>, qemu-devel@nongnu.org
-Cc: gxt@mprc.pku.edu.cn
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-On 03/30/2017 07:50 PM, Suramya Shah wrote:
-> Running QEMU with qemu-system-unicore32 without the kernel parameter results in an assertion error.
-> Assert should not be used to check user provided parameters. Report an error and exit instead
-> Signed-off-by: Suramya Shah <shah.suramya@gmail.com>
-> ---
->  hw/unicore32/puv3.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/unicore32/puv3.c b/hw/unicore32/puv3.c
-> index 032078f..2c17cc9 100644
-> --- a/hw/unicore32/puv3.c
-> +++ b/hw/unicore32/puv3.c
-> @@ -93,8 +93,11 @@ static void puv3_load_kernel(const char *kernel_filename)
->      if (kernel_filename == NULL && qtest_enabled()) {
->          return;
->      }
-> -    assert(kernel_filename != NULL);
-> -
-> +    if (kernel_filename == NULL) {
-> +        error_report("No kernel found");
-> +        exit(1);
-> +    }
-> +
->      /* only zImage format supported */
->      size = load_image_targphys(kernel_filename, KERNEL_LOAD_ADDR,
->              KERNEL_MAX_SIZE);
->
+In some cases the slave devices of a virtual block device are tracked
+by the parent in the corresponding sysfs node. For instance, if we
+have a loop-back mount of the form:
 
-Hi,
+  /dev/loop3p1 on /home/mdroth/mnt type ext4 (rw,relatime,data=ordered)
 
-The patch looks good to me.
+this will be reflected in sysfs as:
 
-Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+  /sys/devices/virtual/block/loop3/
+  ...
+  /sys/devices/virtual/block/loop3/slaves
+  /sys/devices/virtual/block/loop3/loop3p1
 
-Thanks,
-Marcel
+The current code however assumes the mounted virtual block device,
+loop3p1 in this case, contains the slaves directory, and reports an
+error otherwise. This breaks 'make check' in certain environments.
+
+Fix this by simply skipping attempts to generate disk topology
+information in these cases. Since this information is documented
+in QAPI as optionally-reported, this should be ok from an API
+perspective.
+
+In the future, this can possibly be improved upon by collecting
+topology information from the parent in these cases.
+
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+---
+ qga/commands-posix.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 73d93eb..915df9e 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -999,7 +999,9 @@ static void build_guest_fsinfo_for_virtual_device(char const *syspath,
+     dirpath = g_strdup_printf("%s/slaves", syspath);
+     dir = opendir(dirpath);
+     if (!dir) {
+-        error_setg_errno(errp, errno, "opendir(\"%s\")", dirpath);
++        if (errno != ENOENT) {
++            error_setg_errno(errp, errno, "opendir(\"%s\")", dirpath);
++        }
+         g_free(dirpath);
+         return;
+     }
+-- 
+2.7.4
