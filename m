@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shah.suramya@gmail.com>) id 1ctbWh-0007KN-G4
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 10:58:16 -0400
+	(envelope-from <armbru@redhat.com>) id 1ctbYF-0008Mp-Q7
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 10:59:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shah.suramya@gmail.com>) id 1ctbWe-0002p1-Gb
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 10:58:15 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:35547)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shah.suramya@gmail.com>)
-	id 1ctbWe-0002od-Ai
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 10:58:12 -0400
-Received: by mail-pg0-x241.google.com with SMTP id g2so10654324pge.2
-	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 07:58:11 -0700 (PDT)
-From: Suramya Shah <shah.suramya@gmail.com>
-Date: Thu, 30 Mar 2017 20:27:19 +0530
-Message-Id: <20170330145719.12068-1-shah.suramya@gmail.com>
-Subject: [Qemu-devel] [PATCH] hw/unicore32: fix a kernel_filename!=NULL
- assertion error in puv3.c
+	(envelope-from <armbru@redhat.com>) id 1ctbYF-0004Bt-1Q
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 10:59:51 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1490879707-6060-1-git-send-email-armbru@redhat.com>
+	<1490879707-6060-7-git-send-email-armbru@redhat.com>
+	<88188f21-a5b3-2e0f-99f1-66b13d772b96@redhat.com>
+Date: Thu, 30 Mar 2017 16:59:43 +0200
+In-Reply-To: <88188f21-a5b3-2e0f-99f1-66b13d772b96@redhat.com> (Eric Blake's
+	message of "Thu, 30 Mar 2017 09:36:40 -0500")
+Message-ID: <87mvc2zu74.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC v2 for-2.9 06/10] qapi-schema:
+ SocketAddressFlat variants 'vsock' and 'fd'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,33 +25,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: marcel@redhat.com, Suramya Shah <shah.suramya@gmail.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, namei.unix@gmail.com
 
-Signed-off-by: Suramya Shah <shah.suramya@gmail.com>
----
-Running QEMU with qemu-system-unicore32 without the kernel parameter results in an assertion error.
-Fix this by..
- hw/unicore32/puv3.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+Eric Blake <eblake@redhat.com> writes:
 
-diff --git a/hw/unicore32/puv3.c b/hw/unicore32/puv3.c
-index 032078f..2c17cc9 100644
---- a/hw/unicore32/puv3.c
-+++ b/hw/unicore32/puv3.c
-@@ -93,8 +93,11 @@ static void puv3_load_kernel(const char *kernel_filename)
-     if (kernel_filename == NULL && qtest_enabled()) {
-         return;
-     }
--    assert(kernel_filename != NULL);
--
-+    if (kernel_filename == NULL) {
-+        error_report("No kernel found");
-+        exit(1);
-+    }
-+
-     /* only zImage format supported */
-     size = load_image_targphys(kernel_filename, KERNEL_LOAD_ADDR,
-             KERNEL_MAX_SIZE);
--- 
-2.9.3
+> On 03/30/2017 08:15 AM, Markus Armbruster wrote:
+>> Note that the new variants are impossible in qemu_gluster_glfs_init(),
+>> because the gconf->server can only come from qemu_gluster_parse_uri()
+>> or qemu_gluster_parse_json(), and neither can create anything but
+>> 'inet' or 'unix'.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>  block/gluster.c  |  2 ++
+>>  qapi-schema.json | 19 ++++++++-----------
+>>  2 files changed, 10 insertions(+), 11 deletions(-)
+>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>
+>
+>> -# 2. SocketAddressFlat supports only types 'unix' and 'inet', because
+>> -#    that's what its current users need.
+>> +# This is just like SocketAddress, except it's a flat union rather
+>> +# than a simple union.  Nicer because it avoids nesting (i.e. more {})
+>> +# on the wire.
+>
+> I know that you are explaining that it is "nesting" which means "more
+> {}", but it is SocketAddress that has the extra {}, not
+> SocketAddressFlat.  I wonder if it reads any better as:
+>
+> Nicer because it avoids nesting on the wire (i.e. this form has fewer {}).
+
+Sold!  (Except I'm peeling off the parenthesis)
