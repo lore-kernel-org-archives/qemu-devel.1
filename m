@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ctVRh-0006Rp-W5
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 04:28:43 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1ctVm5-0003R5-OG
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 04:49:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ctVRe-00055b-0z
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 04:28:42 -0400
-Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:49540)
+	(envelope-from <dgilbert@redhat.com>) id 1ctVm2-0006KL-JE
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 04:49:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43466)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ctVRd-00054e-Qe
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 04:28:37 -0400
-Received: from player718.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 483307916F
-	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 10:28:36 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 30 Mar 2017 10:28:20 +0200
-Message-Id: <1490862500-26192-1-git-send-email-clg@kaod.org>
-In-Reply-To: <1490795611-4762-6-git-send-email-clg@kaod.org>
-References: <1490795611-4762-6-git-send-email-clg@kaod.org>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ctVm2-0006KE-AH
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 04:49:42 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EB0CB80478
+	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 08:49:40 +0000 (UTC)
+Date: Thu, 30 Mar 2017 09:49:37 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170330084936.GA2800@work-vm>
+References: <20170323204544.12015-1-quintela@redhat.com>
+	<20170323204544.12015-25-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4.1 5/9] ppc/pnv: create the ICP object under
- PnvCore
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170323204544.12015-25-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 24/51] ram: Move migration_bitmap_mutex
+ into RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,130 +34,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Each thread of a core is linked to an ICP. This allocates a PnvICPState
-object before the PowerPCCPU object is realized and lets the XICSFabric
-do the store under the 'intc' backlink when xics_cpu_setup() is
-called.
+* Juan Quintela (quintela@redhat.com) wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-This modeling removes the need of maintaining an array of ICP objects
-under the PowerNV machine and also simplifies the XICSFabric icp_get()
-handler.
+I'm still pretty convinced that there's an existing problem with
+this mutex can get init'd twice with no destroy on a second migration,
+however you're not changing that (and it's not actually failed as 
+far as I can tell):
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
- Changes since v4:
-
- - moved the creation of PnvICPState object before the PowerPCCPU
-   object is realized to handle correctly errors.
-=20
- Changes since v3:
-
- - removed the array of ICP objects from under the PowerNV machine and
-   handled the allocation of the PnvICPState object for each thread
-   when the PowerPCCPU object is realized.
-
- hw/ppc/pnv.c      |  2 ++
- hw/ppc/pnv_core.c | 27 +++++++++++++++++++++++++--
- 2 files changed, 27 insertions(+), 2 deletions(-)
-
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 3fa722af82e6..9505ca7dc09a 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -691,6 +691,8 @@ static void pnv_chip_realize(DeviceState *dev, Error =
-**errp)
-         object_property_set_int(OBJECT(pnv_core),
-                                 pcc->core_pir(chip, core_hwid),
-                                 "pir", &error_fatal);
-+        object_property_add_const_link(OBJECT(pnv_core), "xics",
-+                                       qdev_get_machine(), &error_fatal)=
-;
-         object_property_set_bool(OBJECT(pnv_core), true, "realized",
-                                  &error_fatal);
-         object_unref(OBJECT(pnv_core));
-diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index d79d530b4881..1b7ec70f033d 100644
---- a/hw/ppc/pnv_core.c
-+++ b/hw/ppc/pnv_core.c
-@@ -25,6 +25,7 @@
- #include "hw/ppc/pnv.h"
- #include "hw/ppc/pnv_core.h"
- #include "hw/ppc/pnv_xscom.h"
-+#include "hw/ppc/xics.h"
-=20
- static void powernv_cpu_reset(void *opaque)
- {
-@@ -110,23 +111,37 @@ static const MemoryRegionOps pnv_core_xscom_ops =3D=
- {
-     .endianness =3D DEVICE_BIG_ENDIAN,
- };
-=20
--static void pnv_core_realize_child(Object *child, Error **errp)
-+static void pnv_core_realize_child(Object *child, XICSFabric *xi, Error =
-**errp)
- {
-     Error *local_err =3D NULL;
-     CPUState *cs =3D CPU(child);
-     PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-+    Object *obj;
-+
-+    obj =3D object_new(TYPE_PNV_ICP);
-+    object_property_add_child(OBJECT(cpu), "icp", obj, NULL);
-+    object_property_add_const_link(obj, "xics", OBJECT(xi), &error_abort=
-);
-+    object_property_set_bool(obj, true, "realized", &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-=20
-     object_property_set_bool(child, true, "realized", &local_err);
-     if (local_err) {
-+        object_unparent(obj);
-         error_propagate(errp, local_err);
-         return;
-     }
-=20
-     powernv_cpu_init(cpu, &local_err);
-     if (local_err) {
-+        object_unparent(obj);
-         error_propagate(errp, local_err);
-         return;
-     }
-+
-+    xics_cpu_setup(xi, cpu, ICP(obj));
- }
-=20
- static void pnv_core_realize(DeviceState *dev, Error **errp)
-@@ -140,6 +155,14 @@ static void pnv_core_realize(DeviceState *dev, Error=
- **errp)
-     void *obj;
-     int i, j;
-     char name[32];
-+    Object *xi;
-+
-+    xi =3D object_property_get_link(OBJECT(dev), "xics", &local_err);
-+    if (!xi) {
-+        error_setg(errp, "%s: required link 'xics' not found: %s",
-+                   __func__, error_get_pretty(local_err));
-+        return;
-+    }
-=20
-     pc->threads =3D g_malloc0(size * cc->nr_threads);
-     for (i =3D 0; i < cc->nr_threads; i++) {
-@@ -160,7 +183,7 @@ static void pnv_core_realize(DeviceState *dev, Error =
-**errp)
-     for (j =3D 0; j < cc->nr_threads; j++) {
-         obj =3D pc->threads + j * size;
-=20
--        pnv_core_realize_child(obj, &local_err);
-+        pnv_core_realize_child(obj, XICS_FABRIC(xi), &local_err);
-         if (local_err) {
-             goto err;
-         }
---=20
-2.7.4
+> ---
+>  migration/ram.c | 15 ++++++++-------
+>  1 file changed, 8 insertions(+), 7 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index a890179..ae2b89f 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -184,6 +184,8 @@ struct RAMState {
+>      uint64_t xbzrle_overflows;
+>      /* number of dirty bits in the bitmap */
+>      uint64_t migration_dirty_pages;
+> +    /* protects modification of the bitmap */
+> +    QemuMutex bitmap_mutex;
+>  };
+>  typedef struct RAMState RAMState;
+>  
+> @@ -229,8 +231,6 @@ static ram_addr_t ram_save_remaining(void)
+>      return ram_state.migration_dirty_pages;
+>  }
+>  
+> -static QemuMutex migration_bitmap_mutex;
+> -
+>  /* used by the search for pages to send */
+>  struct PageSearchStatus {
+>      /* Current block being searched */
+> @@ -652,13 +652,13 @@ static void migration_bitmap_sync(RAMState *rs)
+>      trace_migration_bitmap_sync_start();
+>      memory_global_dirty_log_sync();
+>  
+> -    qemu_mutex_lock(&migration_bitmap_mutex);
+> +    qemu_mutex_lock(&rs->bitmap_mutex);
+>      rcu_read_lock();
+>      QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+>          migration_bitmap_sync_range(rs, block->offset, block->used_length);
+>      }
+>      rcu_read_unlock();
+> -    qemu_mutex_unlock(&migration_bitmap_mutex);
+> +    qemu_mutex_unlock(&rs->bitmap_mutex);
+>  
+>      trace_migration_bitmap_sync_end(rs->num_dirty_pages_period);
+>  
+> @@ -1524,6 +1524,7 @@ static void ram_state_reset(RAMState *rs)
+>  void migration_bitmap_extend(ram_addr_t old, ram_addr_t new)
+>  {
+>      RAMState *rs = &ram_state;
+> +
+>      /* called in qemu main thread, so there is
+>       * no writing race against this migration_bitmap
+>       */
+> @@ -1537,7 +1538,7 @@ void migration_bitmap_extend(ram_addr_t old, ram_addr_t new)
+>           * it is safe to migration if migration_bitmap is cleared bit
+>           * at the same time.
+>           */
+> -        qemu_mutex_lock(&migration_bitmap_mutex);
+> +        qemu_mutex_lock(&rs->bitmap_mutex);
+>          bitmap_copy(bitmap->bmap, old_bitmap->bmap, old);
+>          bitmap_set(bitmap->bmap, old, new - old);
+>  
+> @@ -1548,7 +1549,7 @@ void migration_bitmap_extend(ram_addr_t old, ram_addr_t new)
+>          bitmap->unsentmap = NULL;
+>  
+>          atomic_rcu_set(&migration_bitmap_rcu, bitmap);
+> -        qemu_mutex_unlock(&migration_bitmap_mutex);
+> +        qemu_mutex_unlock(&rs->bitmap_mutex);
+>          rs->migration_dirty_pages += new - old;
+>          call_rcu(old_bitmap, migration_bitmap_free, rcu);
+>      }
+> @@ -1980,7 +1981,7 @@ static int ram_state_init(RAMState *rs)
+>      int64_t ram_bitmap_pages; /* Size of bitmap in pages, including gaps */
+>  
+>      memset(rs, 0, sizeof(*rs));
+> -    qemu_mutex_init(&migration_bitmap_mutex);
+> +    qemu_mutex_init(&rs->bitmap_mutex);
+>  
+>      if (migrate_use_xbzrle()) {
+>          XBZRLE_cache_lock();
+> -- 
+> 2.9.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
