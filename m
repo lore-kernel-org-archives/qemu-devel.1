@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54729)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ctcJm-00069p-9Z
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:48:59 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56512)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <emaste@nuc>)
+	id 1ctcOz-0007wC-R3
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:54:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ctcJl-00083z-Fg
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:48:58 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:34904)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ctcJl-00083W-AG
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:48:57 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id k6so60616235wre.2
-	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 08:48:57 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1490888143-31601-1-git-send-email-mst@redhat.com>
-References: <1490888143-31601-1-git-send-email-mst@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 30 Mar 2017 16:48:35 +0100
-Message-ID: <CAFEAcA_zNqsSg+BObVBHHrFVi7phYoZvOToVhypA9R8ovwS7sQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] tests/acpi: don't pack a structure
+	(envelope-from <emaste@nuc>) id 1ctcOw-0002yA-NS
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:54:21 -0400
+Received: from mail3.start.ca ([2600:1611:1::e:3]:42159)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <emaste@nuc>) id 1ctcOw-0002xS-JB
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:54:18 -0400
+Received: from nuc (ip-45-3-6-97.user.start.ca [45.3.6.97])
+	by mail3.start.ca (8.14.4/8.14.4/) with ESMTP id v2UFOQew009279
+	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 11:24:28 -0400
+From: Ed Maste <emaste@freebsd.org>
+Date: Thu, 30 Mar 2017 19:22:36 -0400
+Message-Id: <20170330232236.8272-1-emaste@freebsd.org>
+Subject: [Qemu-devel] [PATCH] ipmi: use parens to avoid unexpected macro var
+ evaluation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +25,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Ed Maste <emaste@freebsd.org>
 
-On 30 March 2017 at 16:35, Michael S. Tsirkin <mst@redhat.com> wrote:
-> There's no reason to pack structures where we don't care about size or
-> padding, this applies to AcpiStdTable in tests/acpi-utils.h.
->
-> OTOH bios-tables-test happens to be passing the address of a field in
-> this  struct to a function that expects a pointer to normally aligned
-> data which results in a SIGBUS on architectures like SPARC that have
-> strict alignment requirements.
->
-> Fixes: 9e8458c02 ("acpi unit-test: compare DSDT and SSDT tables against expected values")
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  tests/acpi-utils.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
-> index 9f9a2d5..348e4d7 100644
-> --- a/tests/acpi-utils.h
-> +++ b/tests/acpi-utils.h
-> @@ -26,7 +26,7 @@ typedef struct {
->      gsize asl_len;
->      gchar *asl_file;
->      bool tmp_files_retain;   /* do not delete the temp asl/aml */
-> -} QEMU_PACKED AcpiSdtTable;
-> +} AcpiSdtTable;
->
->  #define ACPI_READ_FIELD(field, addr)           \
->      do {                                       \
+Found via Clang warning: logical not is only applied to the left hand
+side of this bitwise operator [-Wlogical-not-parentheses]
 
-Yes, this fixes the SPARC crashes.
+                              !IPMI_BT_GET_HBUSY(ib->control_reg));
+                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Tested-by: Peter Maydell <peter.maydell@linaro.org>
+expanded from macro 'IPMI_BT_SET_HBUSY'
+                                       (((v & 1) << IPMI_BT_HBUSY_BIT)))
+                                          ^ ~
 
-thanks
--- PMM
+Signed-off-by: Ed Maste <emaste@freebsd.org>
+---
+ hw/ipmi/isa_ipmi_bt.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/hw/ipmi/isa_ipmi_bt.c b/hw/ipmi/isa_ipmi_bt.c
+index 1c69cb33f8..c1dea503a2 100644
+--- a/hw/ipmi/isa_ipmi_bt.c
++++ b/hw/ipmi/isa_ipmi_bt.c
+@@ -40,37 +40,37 @@
+ #define IPMI_BT_CLR_WR_MASK        (1 << IPMI_BT_CLR_WR_BIT)
+ #define IPMI_BT_GET_CLR_WR(d)      (((d) >> IPMI_BT_CLR_WR_BIT) & 0x1)
+ #define IPMI_BT_SET_CLR_WR(d, v)   (d) = (((d) & ~IPMI_BT_CLR_WR_MASK) | \
+-                                       (((v & 1) << IPMI_BT_CLR_WR_BIT)))
++                                       ((((v) & 1) << IPMI_BT_CLR_WR_BIT)))
+ 
+ #define IPMI_BT_CLR_RD_MASK        (1 << IPMI_BT_CLR_RD_BIT)
+ #define IPMI_BT_GET_CLR_RD(d)      (((d) >> IPMI_BT_CLR_RD_BIT) & 0x1)
+ #define IPMI_BT_SET_CLR_RD(d, v)   (d) = (((d) & ~IPMI_BT_CLR_RD_MASK) | \
+-                                       (((v & 1) << IPMI_BT_CLR_RD_BIT)))
++                                       ((((v) & 1) << IPMI_BT_CLR_RD_BIT)))
+ 
+ #define IPMI_BT_H2B_ATN_MASK       (1 << IPMI_BT_H2B_ATN_BIT)
+ #define IPMI_BT_GET_H2B_ATN(d)     (((d) >> IPMI_BT_H2B_ATN_BIT) & 0x1)
+ #define IPMI_BT_SET_H2B_ATN(d, v)  (d) = (((d) & ~IPMI_BT_H2B_ATN_MASK) | \
+-                                        (((v & 1) << IPMI_BT_H2B_ATN_BIT)))
++                                        ((((v) & 1) << IPMI_BT_H2B_ATN_BIT)))
+ 
+ #define IPMI_BT_B2H_ATN_MASK       (1 << IPMI_BT_B2H_ATN_BIT)
+ #define IPMI_BT_GET_B2H_ATN(d)     (((d) >> IPMI_BT_B2H_ATN_BIT) & 0x1)
+ #define IPMI_BT_SET_B2H_ATN(d, v)  (d) = (((d) & ~IPMI_BT_B2H_ATN_MASK) | \
+-                                        (((v & 1) << IPMI_BT_B2H_ATN_BIT)))
++                                        ((((v) & 1) << IPMI_BT_B2H_ATN_BIT)))
+ 
+ #define IPMI_BT_SMS_ATN_MASK       (1 << IPMI_BT_SMS_ATN_BIT)
+ #define IPMI_BT_GET_SMS_ATN(d)     (((d) >> IPMI_BT_SMS_ATN_BIT) & 0x1)
+ #define IPMI_BT_SET_SMS_ATN(d, v)  (d) = (((d) & ~IPMI_BT_SMS_ATN_MASK) | \
+-                                        (((v & 1) << IPMI_BT_SMS_ATN_BIT)))
++                                        ((((v) & 1) << IPMI_BT_SMS_ATN_BIT)))
+ 
+ #define IPMI_BT_HBUSY_MASK         (1 << IPMI_BT_HBUSY_BIT)
+ #define IPMI_BT_GET_HBUSY(d)       (((d) >> IPMI_BT_HBUSY_BIT) & 0x1)
+ #define IPMI_BT_SET_HBUSY(d, v)    (d) = (((d) & ~IPMI_BT_HBUSY_MASK) | \
+-                                       (((v & 1) << IPMI_BT_HBUSY_BIT)))
++                                       ((((v) & 1) << IPMI_BT_HBUSY_BIT)))
+ 
+ #define IPMI_BT_BBUSY_MASK         (1 << IPMI_BT_BBUSY_BIT)
+ #define IPMI_BT_GET_BBUSY(d)       (((d) >> IPMI_BT_BBUSY_BIT) & 0x1)
+ #define IPMI_BT_SET_BBUSY(d, v)    (d) = (((d) & ~IPMI_BT_BBUSY_MASK) | \
+-                                       (((v & 1) << IPMI_BT_BBUSY_BIT)))
++                                       ((((v) & 1) << IPMI_BT_BBUSY_BIT)))
+ 
+ 
+ /* Mask register */
+@@ -80,12 +80,12 @@
+ #define IPMI_BT_B2H_IRQ_EN_MASK      (1 << IPMI_BT_B2H_IRQ_EN_BIT)
+ #define IPMI_BT_GET_B2H_IRQ_EN(d)    (((d) >> IPMI_BT_B2H_IRQ_EN_BIT) & 0x1)
+ #define IPMI_BT_SET_B2H_IRQ_EN(d, v) (d) = (((d) & ~IPMI_BT_B2H_IRQ_EN_MASK) | \
+-                                        (((v & 1) << IPMI_BT_B2H_IRQ_EN_BIT)))
++                                        ((((v) & 1) << IPMI_BT_B2H_IRQ_EN_BIT)))
+ 
+ #define IPMI_BT_B2H_IRQ_MASK         (1 << IPMI_BT_B2H_IRQ_BIT)
+ #define IPMI_BT_GET_B2H_IRQ(d)       (((d) >> IPMI_BT_B2H_IRQ_BIT) & 0x1)
+ #define IPMI_BT_SET_B2H_IRQ(d, v)    (d) = (((d) & ~IPMI_BT_B2H_IRQ_MASK) | \
+-                                        (((v & 1) << IPMI_BT_B2H_IRQ_BIT)))
++                                        ((((v) & 1) << IPMI_BT_B2H_IRQ_BIT)))
+ 
+ typedef struct IPMIBT {
+     IPMIBmc *bmc;
+-- 
+2.11.1
