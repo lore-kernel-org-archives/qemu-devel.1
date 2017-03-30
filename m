@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=2553b504f=anthony.perard@citrix.com>)
-	id 1ctdt9-0001ch-Hj
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 13:29:36 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1cte63-00044u-CF
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 13:42:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=2553b504f=anthony.perard@citrix.com>)
-	id 1ctdt6-0001GV-A4
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 13:29:35 -0400
-Received: from smtp.citrix.com ([66.165.176.89]:5998)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=2553b504f=anthony.perard@citrix.com>)
-	id 1ctdt6-0001GL-2D
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 13:29:32 -0400
-Date: Thu, 30 Mar 2017 18:29:29 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20170330172929.GD1864@perard.uk.xensource.com>
-References: <1489750157-17401-1-git-send-email-tianyu.lan@intel.com>
-	<1489750157-17401-5-git-send-email-tianyu.lan@intel.com>
+	(envelope-from <dgilbert@redhat.com>) id 1cte60-0002QG-K0
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 13:42:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59986)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cte60-0002HL-BU
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 13:42:52 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 28FBF437F4D
+	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 17:42:48 +0000 (UTC)
+Date: Thu, 30 Mar 2017 18:42:42 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170330174242.GM2800@work-vm>
+References: <20170330122354.GF2800@work-vm>
+	<1490883039.28523.25.camel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1489750157-17401-5-git-send-email-tianyu.lan@intel.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 4/4] msi: taking interrupt format into
- consideration during judging a pirq is binded with a event channel
+In-Reply-To: <1490883039.28523.25.camel@redhat.com>
+Subject: Re: [Qemu-devel] xhci migration breakage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,142 +33,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lan Tianyu <tianyu.lan@intel.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xensource.com, chao.gao@intel.com, kevin.tian@intel.com, mst@redhat.com, marcel@redhat.com, sstabellini@kernel.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Fri, Mar 17, 2017 at 07:29:17PM +0800, Lan Tianyu wrote:
-> From: Chao Gao <chao.gao@intel.com>
-> Subject: msi: taking interrupt format into consideration during
-> judging a pirq is binded with a event channel
-
-This is quite a long title, I think we can make it shorter. Maybe "msi:
-Handle MSI remapping format.
-
+* Gerd Hoffmann (kraxel@redhat.com) wrote:
+>   Hi,
 > 
-> As remapping format interrupt has been introduced, the vector in msi remapping
-> format can also be 0, same as a interrupt is binded with a event channel.
-> So we can't just use whether vector is 0 or not to judge a msi is binded
-> to a event channel or not.
+> > I guess maybe there's a kick needed pre/post migrate?
 > 
-> This patch takes the msi interrupt format into consideration.
+> Sure, but it is there already (post_load arms kick_timer for active
+> endpoints), so it isn't *that* simple.
 > 
-> Signed-off-by: Chao Gao <chao.gao@intel.com>
-> Signed-off-by: Lan Tianyu <tianyu.lan@intel.com>
-> ---
->  hw/pci/msi.c         | 5 +++--
->  hw/pci/msix.c        | 4 +++-
->  hw/xen/xen_pt_msi.c  | 2 +-
->  include/hw/xen/xen.h | 2 +-
->  xen-hvm-stub.c       | 2 +-
->  xen-hvm.c            | 7 ++++++-
->  6 files changed, 15 insertions(+), 7 deletions(-)
+> Looking at this I have no idea offhand, guess I have to schedule some
+> debugging for tomorrow.  Keep me posted in case you continue digging.
+
+OK, I don't know any of this code, but my poking about so far is:
+
+source
+....
+xhci: setup packet pid 0x69 addr 1 ep 1
+20095@1490894271.183259:usb_xhci_ep_kick slotid 1, epid 4, streamid 0
+xhci: set epctx: 35497080 state=1 dequeue=0000000230cf2f61
+20095@1490894271.183284:usb_xhci_xfer_start 0x7f302931fef0: slotid 1, epid 4, streamid 0
+xhci_submit(slotid=1,epid=4)
+xhci: setup packet pid 0xe1 addr 1 ep 2
+20095@1490894271.183404:usb_xhci_ep_kick slotid 1, epid 3, streamid 0
+xhci: set epctx: 35497060 state=1 dequeue=0000000230cf3331
+20095@1490894271.183420:usb_xhci_xfer_start 0x7f302931fef0: slotid 1, epid 3, streamid 0
+xhci_submit(slotid=1,epid=3)
+xhci: setup packet pid 0x69 addr 1 ep 1
+inputs_connect: inputs channel client create
+red_dispatcher_set_cursor_peer: 
+
+(qemu) migra
+migrate                 migrate_cancel          migrate_incoming        
+migrate_set_cache_size  migrate_set_capability  migrate_set_downtime    
+migrate_set_parameter   migrate_set_speed       migrate_start_postcopy  
+(qemu) migrate_set_speed 1G
+(qemu) migrate tcp:0:4444
+usb-storage msd pre_save 0x7f3044627960 sig=0 tag=0
+(qemu) q
+
+dest:
+(qemu) red_dispatcher_loadvm_commands: 
+usb-storage msd post_load 0x7f45f510ee50 sig=0 tag=0
+
+I added these as debug on the 'usb-storage' vmsd element; but
+the signature/tag being 0 I assume they're not the culprit.
+
+(qemu) c
+(qemu) 20107@1490894287.479732:usb_xhci_ep_kick slotid 1, epid 1, streamid 0
+xhci: set epctx: 35497020 state=1 dequeue=0000000035499231
+20107@1490894287.479763:usb_xhci_xfer_start 0x7f45f556a800: slotid 1, epid 1, streamid 0
+xhci: setup packet pid 0x69 addr 1 ep 0
+20107@1490894287.479799:usb_xhci_ep_kick slotid 1, epid 3, streamid 0
+xhci: set epctx: 35497060 state=1 dequeue=0000000230cf3331
+20107@1490894287.479812:usb_xhci_xfer_start 0x7f45f556a800: slotid 1, epid 3, streamid 0
+xhci_submit(slotid=1,epid=3)
+xhci: setup packet pid 0x69 addr 1 ep 1
+xhci: set epctx: 35497060 state=2 dequeue=0000000230cf3331
+20107@1490894287.479837:usb_xhci_ep_kick slotid 1, epid 4, streamid 0
+xhci: set epctx: 35497080 state=1 dequeue=0000000230cf2f61
+20107@1490894287.479848:usb_xhci_xfer_start 0x7f45f556a800: slotid 1, epid 4, streamid 0
+xhci_submit(slotid=1,epid=4)
+xhci: setup packet pid 0xe1 addr 1 ep 2
+qemu-system-x86_64: usb-msd: Bad signature 53425300
+
+given the bottom byte is 0 - is anything supposed to poison these things when
+they're finished with them?
+
+
+The backtrace (where I added an assert) shows it is coming off the timer
+(Note I think this is a different run from that above):
+#3  0x00007feba72c91f2 in __GI___assert_fail (assertion=assertion@entry=0x7febabcc1f3a "0", file=file@entry=0x7febabcb1f90 "/root/1436616/qemu/hw/usb/dev-storage.c", line=line@entry=429, function=function@entry=0x7febabcb20f0 <__PRETTY_FUNCTION__.30660> "usb_msd_handle_data") at assert.c:101
+#4  0x00007febabad00e1 in usb_msd_handle_data (dev=0x7febae693e50, p=0x7febaeaef808)
+    at /root/1436616/qemu/hw/usb/dev-storage.c:429
+#5  0x00007febabab2b58 in usb_handle_packet (dev=<optimized out>, p=p@entry=0x7febaeaef808)
+    at /root/1436616/qemu/hw/usb/core.c:412
+#6  0x00007febabacae27 in xhci_kick_epctx (epctx=<optimized out>, xfer=<optimized out>, xhci=<optimized out>)
+    at /root/1436616/qemu/hw/usb/hcd-xhci.c:2103 <- right at the end of xhci_submit
+#7  0x00007febabacae27 in xhci_kick_epctx (epctx=<optimized out>, xfer=<optimized out>, xhci=<optimized out>)
+    at /root/1436616/qemu/hw/usb/hcd-xhci.c:2112 right at end of xhci_fire_transfer
+#8  0x00007febabacae27 in xhci_kick_epctx (epctx=0x7febaec395a0, streamid=0)
+    at /root/1436616/qemu/hw/usb/hcd-xhci.c:2240
+#9  0x00007febabb4c8b9 in timerlist_run_timers (timer_list=0x7febad2ad790) at /root/1436616/qemu/qemu-timer.c:540
+#10 0x00007febabb4cb20 in qemu_clock_run_all_timers (type=<optimized out>) at /root/1436616/qemu/qemu-timer.c:551
+#11 0x00007febabb4cb20 in qemu_clock_run_all_timers () at /root/1436616/qemu/qemu-timer.c:665
+#12 0x00007febabb4bae7 in main_loop_wait (nonblocking=<optimized out>) at /root/1436616/qemu/main-loop.c:516
+#13 0x00007febab8855e2 in main () at /root/1436616/qemu/vl.c:1888
+#14 0x00007febab8855e2 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>)
+    at /root/1436616/qemu/vl.c:4630
+
+Dave
+
+> cheers,
+>   Gerd
 > 
-> diff --git a/hw/pci/msi.c b/hw/pci/msi.c
-> index a87b227..8d1ac9e 100644
-> --- a/hw/pci/msi.c
-> +++ b/hw/pci/msi.c
-> @@ -289,7 +289,7 @@ void msi_reset(PCIDevice *dev)
->  static bool msi_is_masked(const PCIDevice *dev, unsigned int vector)
->  {
->      uint16_t flags = pci_get_word(dev->config + msi_flags_off(dev));
-> -    uint32_t mask, data;
-> +    uint32_t mask, data, addr_lo;
->      bool msi64bit = flags & PCI_MSI_FLAGS_64BIT;
->      assert(vector < PCI_MSI_VECTORS_MAX);
->  
-> @@ -298,7 +298,8 @@ static bool msi_is_masked(const PCIDevice *dev, unsigned int vector)
->      }
->  
->      data = pci_get_word(dev->config + msi_data_off(dev, msi64bit));
-> -    if (xen_is_pirq_msi(data)) {
-> +    addr_lo = pci_get_word(dev->config + msi_address_lo_off(dev));
-
-This could be get_long, so addr_lo will actually have the all low bits
-of the addr.
-
-> +    if (xen_is_pirq_msi(data, addr_lo)) {
->          return false;
->      }
->  
-> diff --git a/hw/pci/msix.c b/hw/pci/msix.c
-> index 0ec1cb1..6b8045a 100644
-> --- a/hw/pci/msix.c
-> +++ b/hw/pci/msix.c
-> @@ -81,9 +81,11 @@ static bool msix_vector_masked(PCIDevice *dev, unsigned int vector, bool fmask)
->  {
->      unsigned offset = vector * PCI_MSIX_ENTRY_SIZE;
->      uint8_t *data = &dev->msix_table[offset + PCI_MSIX_ENTRY_DATA];
-> +    uint8_t *addr_lo = &dev->msix_table[offset + PCI_MSIX_ENTRY_LOWER_ADDR];
->      /* MSIs on Xen can be remapped into pirqs. In those cases, masking
->       * and unmasking go through the PV evtchn path. */
-> -    if (xen_enabled() && xen_is_pirq_msi(pci_get_long(data))) {
-> +    if (xen_enabled() && xen_is_pirq_msi(pci_get_long(data),
-> +                                         pci_get_long(addr_lo))) {
->          return false;
->      }
->      return fmask || dev->msix_table[offset + PCI_MSIX_ENTRY_VECTOR_CTRL] &
-> diff --git a/hw/xen/xen_pt_msi.c b/hw/xen/xen_pt_msi.c
-> index 8b0d7fc..f799fed 100644
-> --- a/hw/xen/xen_pt_msi.c
-> +++ b/hw/xen/xen_pt_msi.c
-> @@ -114,7 +114,7 @@ static int msi_msix_setup(XenPCIPassthroughState *s,
->  
->      assert((!is_msix && msix_entry == 0) || is_msix);
->  
-> -    if (xen_is_pirq_msi(data)) {
-> +    if (xen_is_pirq_msi(data, (uint32_t)(addr & 0xffffffff))) {
-
-I don't think the cast is necessary. Also the & 0xffffffff is probably
-not needed as well.
-
->          *ppirq = msi_ext_dest_id(addr >> 32) | msi_dest_id(addr);
->          if (!*ppirq) {
->              /* this probably identifies an misconfiguration of the guest,
-> diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
-> index a8f3afb..c15beb5 100644
-> --- a/include/hw/xen/xen.h
-> +++ b/include/hw/xen/xen.h
-> @@ -33,7 +33,7 @@ int xen_pci_slot_get_pirq(PCIDevice *pci_dev, int irq_num);
->  void xen_piix3_set_irq(void *opaque, int irq_num, int level);
->  void xen_piix_pci_write_config_client(uint32_t address, uint32_t val, int len);
->  void xen_hvm_inject_msi(uint64_t addr, uint32_t data);
-> -int xen_is_pirq_msi(uint32_t msi_data);
-> +int xen_is_pirq_msi(uint32_t msi_data, uint32_t msi_addr_lo);
->  
->  qemu_irq *xen_interrupt_controller_init(void);
->  
-> diff --git a/xen-hvm-stub.c b/xen-hvm-stub.c
-> index c500325..dae421c 100644
-> --- a/xen-hvm-stub.c
-> +++ b/xen-hvm-stub.c
-> @@ -31,7 +31,7 @@ void xen_hvm_inject_msi(uint64_t addr, uint32_t data)
->  {
->  }
->  
-> -int xen_is_pirq_msi(uint32_t msi_data)
-> +int xen_is_pirq_msi(uint32_t msi_data, uint32_t msi_addr_lo)
->  {
->      return 0;
->  }
-> diff --git a/xen-hvm.c b/xen-hvm.c
-> index 2f348ed..9e78b23 100644
-> --- a/xen-hvm.c
-> +++ b/xen-hvm.c
-> @@ -146,8 +146,13 @@ void xen_piix_pci_write_config_client(uint32_t address, uint32_t val, int len)
->      }
->  }
->  
-> -int xen_is_pirq_msi(uint32_t msi_data)
-> +int xen_is_pirq_msi(uint32_t msi_data, uint32_t msi_addr_lo)
->  {
-> +    /* If msi address is configurate to remapping format, the msi will not
-> +     * remapped into a pirq.
-> +     */
-> +    if ( msi_addr_lo & 0x10 )
-
-That's a magic number, is 0x10 MSI_ADDR_IM_MASK?
-
-Thanks,
-
--- 
-Anthony PERARD
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
