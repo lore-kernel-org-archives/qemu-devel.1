@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ctbhS-0005vK-8M
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:09:23 -0400
+	(envelope-from <shah.suramya@gmail.com>) id 1ctbim-00073y-Hl
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:10:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ctbhR-0002Ut-AZ
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:09:22 -0400
-Received: from mail-lf0-x236.google.com ([2a00:1450:4010:c07::236]:34818)
+	(envelope-from <shah.suramya@gmail.com>) id 1ctbil-0003GQ-4B
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:10:44 -0400
+Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:34793)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ctbhR-0002UZ-33
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:09:21 -0400
-Received: by mail-lf0-x236.google.com with SMTP id j90so29264174lfk.2
-	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 08:09:21 -0700 (PDT)
+	(Exim 4.71) (envelope-from <shah.suramya@gmail.com>)
+	id 1ctbik-0003GG-VZ
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 11:10:43 -0400
+Received: by mail-it0-x243.google.com with SMTP id e75so13357956itd.1
+	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 08:10:42 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <a08258bf-9da9-7d90-bcfd-5e4156805557@amsat.org>
-References: <1490694017-7532-1-git-send-email-peter.maydell@linaro.org>
-	<a08258bf-9da9-7d90-bcfd-5e4156805557@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 30 Mar 2017 16:08:59 +0100
-Message-ID: <CAFEAcA_VSavXRVr=z1kDuxUu6Jy3OG6DKQJ_xrify_OMT7TeEA@mail.gmail.com>
+In-Reply-To: <20170330145719.12068-1-shah.suramya@gmail.com>
+References: <20170330145719.12068-1-shah.suramya@gmail.com>
+From: Suramya Shah <shah.suramya@gmail.com>
+Date: Thu, 30 Mar 2017 20:40:42 +0530
+Message-ID: <CABH=oPx91VFrT-DR+5L+WK8rOunjEZUmuvuaLT89UqjHMZmBwQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.9 v2] tests/bios-tables-test: Don't
- pass addresses of packed struct fields
+Subject: Re: [Qemu-devel] [PATCH] hw/unicore32: fix a kernel_filename!=NULL
+ assertion error in puv3.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,22 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "patches@linaro.org" <patches@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel@redhat.com>, gxt@mprc.pku.edu.cn
 
-On 28 March 2017 at 14:30, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wr=
-ote:
-> should we add some comment like /* local variable used to avoid alignment
-> issues */ in case later one find it clever to save few bytes on stack
-> without reading git history?
+Kindly have a look at the forwarded patch.
 
-Hmm. There's no obvious single place where that could be put,
-and I tend to think that if you're going to use packed structures
-then "caution needed" is implicit. When we have these bug fixes
-in then the plan is to add sparc to the set of standard merge
-build tests, which will catch accidental reversions of this
-fix (and eventually clang 4 will be more widespread which will
-warn about this.)
+On 30-Mar-2017 8:28 PM, "Suramya Shah" <shah.suramya@gmail.com> wrote:
 
-thanks
--- PMM
+> Signed-off-by: Suramya Shah <shah.suramya@gmail.com>
+> ---
+> Running QEMU with qemu-system-unicore32 without the kernel parameter
+> results in an assertion error.
+> Fix this by..
+>  hw/unicore32/puv3.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/unicore32/puv3.c b/hw/unicore32/puv3.c
+> index 032078f..2c17cc9 100644
+> --- a/hw/unicore32/puv3.c
+> +++ b/hw/unicore32/puv3.c
+> @@ -93,8 +93,11 @@ static void puv3_load_kernel(const char
+> *kernel_filename)
+>      if (kernel_filename == NULL && qtest_enabled()) {
+>          return;
+>      }
+> -    assert(kernel_filename != NULL);
+> -
+> +    if (kernel_filename == NULL) {
+> +        error_report("No kernel found");
+> +        exit(1);
+> +    }
+> +
+>      /* only zImage format supported */
+>      size = load_image_targphys(kernel_filename, KERNEL_LOAD_ADDR,
+>              KERNEL_MAX_SIZE);
+> --
+> 2.9.3
+>
+>
