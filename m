@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ctXpk-0002sS-1r
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 07:01:44 -0400
+	(envelope-from <yi.l.liu@intel.com>) id 1ctXv7-0004tX-Cf
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 07:07:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ctXpe-0008NA-4R
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 07:01:40 -0400
-Date: Thu, 30 Mar 2017 17:46:05 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170330064605.GF22163@umbus>
-References: <1490795611-4762-1-git-send-email-clg@kaod.org>
-	<1490795611-4762-3-git-send-email-clg@kaod.org>
+	(envelope-from <yi.l.liu@intel.com>) id 1ctXv3-0001nR-BN
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 07:07:13 -0400
+Received: from mga02.intel.com ([134.134.136.20]:40044)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1ctXv3-0001mC-0f
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 07:07:09 -0400
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+Date: Thu, 30 Mar 2017 11:06:42 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743903553F@shsmsx102.ccr.corp.intel.com>
+References: <1486456099-7345-1-git-send-email-peterx@redhat.com>
+	<1486456099-7345-15-git-send-email-peterx@redhat.com>
+	<A2975661238FB949B60364EF0F2C257439032C79@shsmsx102.ccr.corp.intel.com>
+	<20170327091208.GG11497@pxdev.xzpeter.org>
+	<A2975661238FB949B60364EF0F2C257439032D78@shsmsx102.ccr.corp.intel.com>
+In-Reply-To: <A2975661238FB949B60364EF0F2C257439032D78@shsmsx102.ccr.corp.intel.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="924gEkU1VlJlwnwX"
-Content-Disposition: inline
-In-Reply-To: <1490795611-4762-3-git-send-email-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v4 2/9] spapr: move the IRQ server number
- mapping under the machine
+Subject: Re: [Qemu-devel] [PATCH v7 14/17] memory: add
+ MemoryRegionIOMMUOps.replay() callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,120 +32,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: 'Peter Xu' <peterx@redhat.com>
+Cc: "'alex.williamson@redhat.com'" <alex.williamson@redhat.com>, "Lan, Tianyu" <tianyu.lan@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, "'mst@redhat.com'" <mst@redhat.com>, "'jan.kiszka@siemens.com'" <jan.kiszka@siemens.com>, "'jasowang@redhat.com'" <jasowang@redhat.com>, "'bd.aviv@gmail.com'" <bd.aviv@gmail.com>, 'David Gibson' <david@gibson.dropbear.id.au>, "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>
 
-
---924gEkU1VlJlwnwX
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Mar 29, 2017 at 03:53:24PM +0200, C=E9dric Le Goater wrote:
-> This is the second step to abstract the IRQ 'server' number of the
-> XICS layer. Now that the prereq cleanups have been done in the
-> previous patch, we can move down the 'cpu_dt_id' to 'cpu_index'
-> mapping in the sPAPR machine handler.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/intc/xics_spapr.c    | 5 ++---
->  hw/ppc/spapr.c          | 3 ++-
->  hw/ppc/spapr_cpu_core.c | 2 +-
->  3 files changed, 5 insertions(+), 5 deletions(-)
->=20
-> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-> index 58f100d379cb..f05308b897f2 100644
-> --- a/hw/intc/xics_spapr.c
-> +++ b/hw/intc/xics_spapr.c
-> @@ -52,9 +52,8 @@ static target_ulong h_cppr(PowerPCCPU *cpu, sPAPRMachin=
-eState *spapr,
->  static target_ulong h_ipi(PowerPCCPU *cpu, sPAPRMachineState *spapr,
->                            target_ulong opcode, target_ulong *args)
->  {
-> -    target_ulong server =3D xics_get_cpu_index_by_dt_id(args[0]);
->      target_ulong mfrr =3D args[1];
-> -    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), server);
-> +    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), args[0]);
-> =20
->      if (!icp) {
->          return H_PARAMETER;
-> @@ -122,7 +121,7 @@ static void rtas_set_xive(PowerPCCPU *cpu, sPAPRMachi=
-neState *spapr,
->      }
-> =20
->      nr =3D rtas_ld(args, 0);
-> -    server =3D xics_get_cpu_index_by_dt_id(rtas_ld(args, 1));
-> +    server =3D rtas_ld(args, 1);
->      priority =3D rtas_ld(args, 2);
-> =20
->      if (!ics_valid_irq(ics, nr) || !xics_icp_get(XICS_FABRIC(spapr), ser=
-ver)
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 8aecea3dd10c..b9f7f8607869 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -3024,9 +3024,10 @@ static void spapr_ics_resend(XICSFabric *dev)
->      ics_resend(spapr->ics);
->  }
-> =20
-> -static ICPState *spapr_icp_get(XICSFabric *xi, int server)
-> +static ICPState *spapr_icp_get(XICSFabric *xi, int cpu_dt_id)
->  {
->      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
-> +    int server =3D xics_get_cpu_index_by_dt_id(cpu_dt_id);
-
-The idea is good, but this is a bad name (as it was in the original
-version, too).  The whole point here is that the XICS server number
-(as it appears in the ICS registers) is the input to this function,
-and we no longer assume that is equal to cpu_index.
-
-Seems we could just get the cpu object by dt_id here, then go to ICP(cpu->i=
-ntc).
-
->      return (server < spapr->nr_servers) ? &spapr->icps[server] : NULL;
->  }
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 7db61bd72476..4e1a99591d19 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -64,7 +64,7 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, Po=
-werPCCPU *cpu,
->  {
->      CPUPPCState *env =3D &cpu->env;
->      XICSFabric *xi =3D XICS_FABRIC(spapr);
-> -    ICPState *icp =3D xics_icp_get(xi, CPU(cpu)->cpu_index);
-> +    ICPState *icp =3D xics_icp_get(xi, cpu->cpu_dt_id);
-> =20
->      /* Set time-base frequency to 512 MHz */
->      cpu_ppc_tb_init(env, SPAPR_TIMEBASE_FREQ);
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---924gEkU1VlJlwnwX
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJY3KmqAAoJEGw4ysog2bOSTUIP/35Bx1ogQbBQHIHCQ7tPZF69
-ElVr7xU0jmbE9kMRnmoGT0kdkBoe8/1makdm+oYTg9uxJqGGPbrrPtUjVBfa0Cr/
-bJcdx0uLhECkpcqQNp3Sl8qekBTU0mo6wCO1sNr/XnXcelQdYfRdbNanNWY9tbua
-bHUetqOemzkBt5Bo0OjwvbpS+qbnOGdSsOtpoYkE8uWumXmTaRlGCcSkEd178N4X
-5iicleteYQ/TcZXAZ174ponne2xe61iysbuRkTlXPUb/w0Fct/FLhIrST3Vfa1vF
-GcJr47ClBTualUQ+Torlwabpiqkff13/EIhMGIceRGxcqvGg/m/L1WvJ5RFhaCT/
-aMXp1VwXQXyixIcrIwXj5iMSf6pRjhjU3ey6vXjKQKXoEG2BWxz3QTYvoqTUD+JF
-kKTTR1tbEZuX6G923KZR5cXqwPgqL3tggOaY2zK/hqv4OoS7TOSHMYXCheRWm/FZ
-0Cd7afAQVgzPjylMmWyY5vZ40jeqBe4hzSik76pOG70JVABIGSCyc3/1EUPK0QKc
-q6AQBakHbF4WMOwXfCiTT8Kc6kHWmYDiRdZF1FVbdsNH6hy14itMEbI0WRhw34o4
-H40XW01KKTXW5Qj0kC65e9R/g3ZqsJsc9QmgEhtvmEZoI0rcV64RN7f5kDFW2mmj
-VAQjcSeCas5mMRkHni1D
-=r9po
------END PGP SIGNATURE-----
-
---924gEkU1VlJlwnwX--
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBMaXUsIFlpIEwNCj4gU2VudDog
+TW9uZGF5LCBNYXJjaCAyNywgMjAxNyA1OjIyIFBNDQo+IFRvOiBQZXRlciBYdSA8cGV0ZXJ4QHJl
+ZGhhdC5jb20+DQo+IENjOiBhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbTsgTGFuLCBUaWFueXUg
+PHRpYW55dS5sYW5AaW50ZWwuY29tPjsgVGlhbiwgS2V2aW4NCj4gPGtldmluLnRpYW5AaW50ZWwu
+Y29tPjsgbXN0QHJlZGhhdC5jb207IGphbi5raXN6a2FAc2llbWVucy5jb207DQo+IGphc293YW5n
+QHJlZGhhdC5jb207IGJkLmF2aXZAZ21haWwuY29tOyBEYXZpZCBHaWJzb24NCj4gPGRhdmlkQGdp
+YnNvbi5kcm9wYmVhci5pZC5hdT47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiBTdWJqZWN0OiBS
+RTogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NyAxNC8xN10gbWVtb3J5OiBhZGQNCj4gTWVtb3J5UmVn
+aW9uSU9NTVVPcHMucmVwbGF5KCkgY2FsbGJhY2sNCj4gDQo+ID4gLS0tLS1PcmlnaW5hbCBNZXNz
+YWdlLS0tLS0NCj4gPiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBldGVyeEByZWRoYXQuY29tXQ0K
+PiA+IFNlbnQ6IE1vbmRheSwgTWFyY2ggMjcsIDIwMTcgNToxMiBQTQ0KPiA+IFRvOiBMaXUsIFlp
+IEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gPiBDYzogYWxleC53aWxsaWFtc29uQHJlZGhhdC5j
+b207IExhbiwgVGlhbnl1IDx0aWFueXUubGFuQGludGVsLmNvbT47DQo+ID4gVGlhbiwgS2V2aW4g
+PGtldmluLnRpYW5AaW50ZWwuY29tPjsgbXN0QHJlZGhhdC5jb207DQo+ID4gamFuLmtpc3prYUBz
+aWVtZW5zLmNvbTsgamFzb3dhbmdAcmVkaGF0LmNvbTsgYmQuYXZpdkBnbWFpbC5jb207IERhdmlk
+DQo+ID4gR2lic29uIDxkYXZpZEBnaWJzb24uZHJvcGJlYXIuaWQuYXU+OyBxZW11LWRldmVsQG5v
+bmdudS5vcmcNCj4gPiBTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NyAxNC8xN10g
+bWVtb3J5OiBhZGQNCj4gPiBNZW1vcnlSZWdpb25JT01NVU9wcy5yZXBsYXkoKSBjYWxsYmFjaw0K
+PiA+DQo+ID4gT24gTW9uLCBNYXIgMjcsIDIwMTcgYXQgMDg6MzU6MDVBTSArMDAwMCwgTGl1LCBZ
+aSBMIHdyb3RlOg0KPiA+ID4gPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+ID4gPiBG
+cm9tOiBRZW11LWRldmVsDQo+ID4gPiA+IFttYWlsdG86cWVtdS1kZXZlbC1ib3VuY2VzK3lpLmwu
+bGl1PWludGVsLmNvbUBub25nbnUub3JnXSBPbg0KPiA+ID4gPiBCZWhhbGYgT2YgUGV0ZXIgWHUN
+Cj4gPiA+ID4gU2VudDogVHVlc2RheSwgRmVicnVhcnkgNywgMjAxNyA0OjI4IFBNDQo+ID4gPiA+
+IFRvOiBxZW11LWRldmVsQG5vbmdudS5vcmcNCj4gPiA+ID4gQ2M6IExhbiwgVGlhbnl1IDx0aWFu
+eXUubGFuQGludGVsLmNvbT47IFRpYW4sIEtldmluDQo+ID4gPiA+IDxrZXZpbi50aWFuQGludGVs
+LmNvbT47IG1zdEByZWRoYXQuY29tOyBqYW4ua2lzemthQHNpZW1lbnMuY29tOw0KPiA+ID4gPiBq
+YXNvd2FuZ0ByZWRoYXQuY29tOyBwZXRlcnhAcmVkaGF0LmNvbTsNCj4gPiA+ID4gYWxleC53aWxs
+aWFtc29uQHJlZGhhdC5jb207IGJkLmF2aXZAZ21haWwuY29tOyBEYXZpZCBHaWJzb24NCj4gPiA+
+ID4gPGRhdmlkQGdpYnNvbi5kcm9wYmVhci5pZC5hdT4NCj4gPiA+ID4gU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCB2NyAxNC8xN10gbWVtb3J5OiBhZGQNCj4gPiA+ID4gTWVtb3J5UmVnaW9u
+SU9NTVVPcHMucmVwbGF5KCkgY2FsbGJhY2sNCj4gPiA+ID4NCj4gPiA+ID4gT3JpZ2luYWxseSB3
+ZSBoYXZlIG9uZSBtZW1vcnlfcmVnaW9uX2lvbW11X3JlcGxheSgpIGZ1bmN0aW9uLA0KPiA+ID4g
+PiB3aGljaCBpcyB0aGUgZGVmYXVsdCBiZWhhdmlvciB0byByZXBsYXkgdGhlIHRyYW5zbGF0aW9u
+cyBvZiB0aGUNCj4gPiA+ID4gd2hvbGUgSU9NTVUgcmVnaW9uLiBIb3dldmVyLCBvbiBzb21lIHBs
+YXRmb3JtIGxpa2UgeDg2LCB3ZSBtYXkNCj4gPiA+ID4gd2FudCBvdXIgb3duDQo+ID4gcmVwbGF5
+IGxvZ2ljIGZvciBJT01NVSByZWdpb25zLg0KPiA+ID4gPiBUaGlzIHBhdGNoIGFkZCBvbmUgbW9y
+ZSBob29rIGZvciBJT01NVU9wcyBmb3IgdGhlIGNhbGxiYWNrLCBhbmQNCj4gPiA+ID4gaXQnbGwg
+b3ZlcnJpZGUgdGhlIGRlZmF1bHQgaWYgc2V0Lg0KPiA+ID4gPg0KPiA+ID4gPiBTaWduZWQtb2Zm
+LWJ5OiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+ID4gPiA+IC0tLQ0KPiA+ID4gPiAg
+aW5jbHVkZS9leGVjL21lbW9yeS5oIHwgMiArKw0KPiA+ID4gPiAgbWVtb3J5LmMgICAgICAgICAg
+ICAgIHwgNiArKysrKysNCj4gPiA+ID4gIDIgZmlsZXMgY2hhbmdlZCwgOCBpbnNlcnRpb25zKCsp
+DQo+ID4gPiA+DQo+ID4gPiA+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2V4ZWMvbWVtb3J5LmggYi9p
+bmNsdWRlL2V4ZWMvbWVtb3J5LmggaW5kZXgNCj4gPiA+ID4gMDc2Nzg4OC4uMzBiMmE3NCAxMDA2
+NDQNCj4gPiA+ID4gLS0tIGEvaW5jbHVkZS9leGVjL21lbW9yeS5oDQo+ID4gPiA+ICsrKyBiL2lu
+Y2x1ZGUvZXhlYy9tZW1vcnkuaA0KPiA+ID4gPiBAQCAtMTkxLDYgKzE5MSw4IEBAIHN0cnVjdCBN
+ZW1vcnlSZWdpb25JT01NVU9wcyB7DQo+ID4gPiA+ICAgICAgdm9pZCAoKm5vdGlmeV9mbGFnX2No
+YW5nZWQpKE1lbW9yeVJlZ2lvbiAqaW9tbXUsDQo+ID4gPiA+ICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIElPTU1VTm90aWZpZXJGbGFnIG9sZF9mbGFncywNCj4gPiA+ID4gICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgSU9NTVVOb3RpZmllckZsYWcgbmV3X2ZsYWdzKTsN
+Cj4gPiA+ID4gKyAgICAvKiBTZXQgdGhpcyB1cCB0byBwcm92aWRlIGN1c3RvbWl6ZWQgSU9NTVUg
+cmVwbGF5IGZ1bmN0aW9uICovDQo+ID4gPiA+ICsgICAgdm9pZCAoKnJlcGxheSkoTWVtb3J5UmVn
+aW9uICppb21tdSwgSU9NTVVOb3RpZmllciAqbm90aWZpZXIpOw0KPiA+ID4gPiAgfTsNCj4gPiA+
+ID4NCj4gPiA+ID4gIHR5cGVkZWYgc3RydWN0IENvYWxlc2NlZE1lbW9yeVJhbmdlIENvYWxlc2Nl
+ZE1lbW9yeVJhbmdlOyBkaWZmDQo+ID4gPiA+IC0tZ2l0IGEvbWVtb3J5LmMgYi9tZW1vcnkuYyBp
+bmRleCA3YTRmMmY5Li45YzI1M2NjIDEwMDY0NA0KPiA+ID4gPiAtLS0gYS9tZW1vcnkuYw0KPiA+
+ID4gPiArKysgYi9tZW1vcnkuYw0KPiA+ID4gPiBAQCAtMTYzMCw2ICsxNjMwLDEyIEBAIHZvaWQN
+Cj4gPiA+ID4gbWVtb3J5X3JlZ2lvbl9pb21tdV9yZXBsYXkoTWVtb3J5UmVnaW9uDQo+ID4gPiA+
+ICptciwgSU9NTVVOb3RpZmllciAqbiwNCj4gPiA+ID4gICAgICBod2FkZHIgYWRkciwgZ3JhbnVs
+YXJpdHk7DQo+ID4gPiA+ICAgICAgSU9NTVVUTEJFbnRyeSBpb3RsYjsNCj4gPiA+ID4gKyAgICAv
+KiBJZiB0aGUgSU9NTVUgaGFzIGl0cyBvd24gcmVwbGF5IGNhbGxiYWNrLCBvdmVycmlkZSAqLw0K
+PiA+ID4gPiArICAgIGlmIChtci0+aW9tbXVfb3BzLT5yZXBsYXkpIHsNCj4gPiA+ID4gKyAgICAg
+ICAgbXItPmlvbW11X29wcy0+cmVwbGF5KG1yLCBuKTsNCj4gPiA+ID4gKyAgICAgICAgcmV0dXJu
+Ow0KPiA+ID4gPiArICAgIH0NCj4gPiA+DQo+ID4gPiBIaSBBbGV4LCBQZXRlciwNCj4gPiA+DQo+
+ID4gPiBXaWxsIGFsbCB0aGUgb3RoZXIgdmVuZG9ycyhlLmcuIFBQQywgczM5MCwgQVJNKSBhZGQg
+dGhlaXIgb3duIHJlcGxheQ0KPiA+ID4gY2FsbGJhY2sgYXMgd2VsbD8gSSBndWVzcyBpdCBkZXBl
+bmRzIG9uIHdoZXRoZXIgdGhlIG9yaWdpbmFsIHJlcGxheQ0KPiA+ID4gYWxnb3JpdGhtIHdvcmsg
+d2VsbCBmb3IgdGhlbT8gRG8geW91IGhhdmUgc3VjaCBrbm93bGVkZ2U/DQo+ID4NCj4gPiBJIGd1
+ZXNzIHNvLiBBdCBsZWFzdCBmb3IgVlQtZCB3ZSBoYWQgdGhpcyBjYWxsYmFjayBzaW5jZSB0aGUg
+ZGVmYXVsdA0KPiA+IHJlcGxheSBtZWNoYW5pc20gZGlkIG5vdCB3b3JrIHdlbGwgb24geDg2IGR1
+ZSB0byBpdHMgZXh0cmVtZWx5IGxhcmdlDQo+ID4gbWVtb3J5IHJlZ2lvbiBzaXplLiBUaGFua3Ms
+DQo+IA0KPiB0aHguIHRoYXQgd291bGQgbWFrZSBzZW5zZS4NCg0KUGV0ZXIsDQoNCkp1c3QgY29t
+ZSB0byBtaW5kIHRoYXQgdGhlcmUgbWF5IGJlIGEgY29ybmVyIGNhc2UgaGVyZS4NCg0KSW50ZWwg
+VlQtZCBhY3R1YWxseSBoYXMgYSAicHQiIG1vZGUgd2hpY2ggYWxsb3dzIGRldmljZSB1c2UgcGh5
+c2ljYWwgYWRkcmVzcw0KZXZlbiB3aGVuIFZULWQgaXMgZW5hYmxlZC4gSW4ga2VybmVsLCB0aGVy
+ZSBpcyBhIGlvbW11X2lkZW50aXR5X21hcHBpbmcuIA0KSWYgYSBkZXZpY2UgaXMgaW4gdGhpcyBt
+YXAsIHRoZW4gaXQgd291bGQgdXNlICJwdCIgbW9kZS4gU28gdGhhdCBJT01NVSBkcml2ZXINCndv
+dWxkIG5vdCBidWlsZCBzZWNvbmQtbGV2ZWwgcGFnZSB0YWJsZSBmb3IgaXQuDQoNCkJhY2sgdG8g
+dGhlIHZpcnR1YWwgSU9WQSBpbXBsZW1lbnRhdGlvbiwgaWYgYW4gYXNzaWduZWQgZGV2aWNlIGlz
+IGluIHRoZSANCmlvbW11X2lkZW50aXR5X21hcHBpbmcoZS5nLiBWR0EgY29udHJvbGxlciksIGl0
+IHVzZXMgR1BBIGRpcmVjdGx5IHRvIGRvIERNQS4NClNvIGl0IGRlbWFuZHMgYSBHUEEtPkhQQSBt
+YXBwaW5nIGluIGhvc3QuIEhvd2V2ZXIsIHRoZSBpb21tdS0+b3BzLnJlcGxheQ0KaXMgbm90IGFi
+bGUgdG8gYnVpbGQgaXQgd2hlbiBndWVzdCBTTCBwYWdlIHRhYmxlIGlzIGVtcHR5Lg0KDQpTbyBJ
+IHRoaW5rIGJ1aWxkaW5nIGFuIGVudGlyZSBndWVzdCBQQS0+SFBBIG1hcHBpbmcgYmVmb3JlIGd1
+ZXN0IGtlcm5lbCBib290DQp3b3VsZCBiZSByZWNvbW1lbmRlZC4gQW55IHRob3VnaHRzPw0KDQpS
+ZWdhcmRzLA0KWWkgTA0K
