@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ctige-0007A0-CR
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 18:37:05 -0400
+	(envelope-from <jsnow@redhat.com>) id 1ctj9J-0004Bk-6Y
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 19:06:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ctigb-0000rY-Id
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 18:37:00 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Thu, 30 Mar 2017 17:36:44 -0500
-Message-Id: <20170330223645.349-3-eblake@redhat.com>
-In-Reply-To: <20170330223645.349-1-eblake@redhat.com>
-References: <20170330223645.349-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 2/3] iotests: Improve image-clear tests on
- non-aligned image
+	(envelope-from <jsnow@redhat.com>) id 1ctj9H-000357-OD
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 19:06:37 -0400
+References: <CAO_EM_=wECMYRRaDyPtY8sKFZF8owp0u2sE4k_oeS=BLF9B2Mw@mail.gmail.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <dd90d073-5a24-4d89-5be4-1c51af748091@redhat.com>
+Date: Thu, 30 Mar 2017 19:06:08 -0400
+MIME-Version: 1.0
+In-Reply-To: <CAO_EM_=wECMYRRaDyPtY8sKFZF8owp0u2sE4k_oeS=BLF9B2Mw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] New iotest repros failures on virtio external
+ snapshot with iothread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,461 +23,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: Ed Swierk <eswierk@skyportsystems.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-Tweak 097 and 176 to operate on an image that is not cluster-aligned,
-to give further coverage of clearing out an entire image.
 
-Tested for qcow (97) and qcow2 (97 and 176).
 
-The fact that there is a subtle difference between the expected
-outputs of 97 and 176 on pass 0 is evidence that we still don't
-always clear out the full image in qcow2.  Commit a3e1505 fixed
-the case of clusters stranded at the 2G mark, but did not fix
-stranding an unaligned tail.  That will be the next patch, kept
-separate to make it easier to see the impact.
+On 03/29/2017 10:01 PM, Ed Swierk via Qemu-devel wrote:
+> Parts of qemu's block code have changed a lot in recent months but are
+> not well exercised by current tests.
+> 
+> Subtle bugs have crept in causing assertion failures, hangs and other
+> crashes in a variety of situations: immediately on start, on first
+> guest activity, on external snapshot create or commit, on qmp quit
+> command.
+> 
+> Reproducing these bugs has proved tricky, as each may occur only with
+> a specific combination of qemu version, block device type (virtio-blk
+> or virtio-scsi) and iothread enabled or not. In some cases the bug
+> occurs only after several external snapshot operations. And in some
+> cases the bug only manifests when a guest is accessing the block
+> device simultaneously.
+> 
+> I've written an iotest (number 176, for now) that attempts to cover
+> many of these configurations. Currently it only exercises the external
+> snapshot create and commit lifted from iotest 118. The new iotest does
+> this repeatedly in each of 16 combinations:
+> - no guest / guest
+> - virtio-blk / virtio-scsi
+> - no iothread / iothread
+> - single / repeated external snapshot create+commit
+> 
+> I made some minor changes to the test infrastructure so the new iotest
+> can deal gracefully with qemu hanging--the test script itself
+> shouldn't hang. And in all failure modes the test needs to expose
+> enough console output and other information to diagnose the problem.
+> 
+> The main departure from existing iotests is running a real guest. I
+> used buildroot to generate a small (~4 MB) Linux kernel with built-in
+> initrd containing a busybox-based userland. After the iotest launches
+> qemu, the guest loops writing to the block device, while the test
+> performs snapshot operations.
+> 
+> I ran the new iotest on 3 qemu versions: 2.7.1, stable-2.8-staging and
+> 2.9.0-rc2. The latter two fail several test cases, all
+> iothread-enabled. Only 2.7.1 passes all the cases.
+> 
+> Here is the code for the new iotest (I didn't dare email patches with
+> a 4 MB blob):
+> https://github.com/skyportsystems/qemu-1/commits/eswierk-iotests-2.7
+> https://github.com/skyportsystems/qemu-1/commits/eswierk-iotests-2.8
+> https://github.com/skyportsystems/qemu-1/commits/eswierk-iotests-2.9
+> 
+> And here is the buildroot I used to generate the guest Linux kernel+initrd:
+> https://github.com/skyportsystems/buildroot-1/commits/qemu-iotests
+> 
+> Please check out the code and try the new test--particularly anyone
+> who can also help figure out these failures. (Note that since half the
+> test cases use an iothread, /dev/kvm must be readable and writable.)
+> 
+> * stable-2.8-staging
+> - guest, virtio-blk, iothread, single snapshot create+commit: hang on
+> quit (intermittent)
+> - guest, virtio-blk, iothread, repeated snapshot create+commit: hang
+> after 1 iteration
+> - guest, virtio-scsi, iothread, single snapshot create+commit: hang on
+> quit (intermittent)
+> - guest, virtio-scsi, iothread, repeated snapshot create+commit: hang
+> after 1 iteration
+> 
+> * 2.9.0-rc2
+> - guest, virtio-blk, iothread, single snapshot create+commit:
+> "include/block/aio.h:457: aio_enable_external: Assertion
+> `ctx->external_disable_cnt > 0' failed." after snapshot create
+> - guest, virtio-blk, iothread, repeated snapshot create+commit: same as above
+> - guest, virtio-scsi, iothread, single snapshot create+commit: same as above
+> - guest, virtio-scsi, iothread, repeated snapshot create+commit: same as above
+> - no guest, virtio-blk, iothread, repeated snapshot create+commit: same as above
+> - no guest, virtio-scsi, iothread, single snapshot create+commit: same as above
+> - no guest, virtio-scsi, iothread, repeated snapshot create+commit:
+> same as above
+> 
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
+Do you mean to say that all of these 2.9.0-rc2 cases produce the same
+aio.h assertion?
 
----
-v7: also write data in the unaligned cluster, and document bug it exposes
-v6: new patch
----
- tests/qemu-iotests/097     | 17 +++++++++-----
- tests/qemu-iotests/097.out | 55 ++++++++++++++++++++++++++++++++++++----------
- tests/qemu-iotests/176     | 17 +++++++++-----
- tests/qemu-iotests/176.out | 55 ++++++++++++++++++++++++++++++++++++----------
- 4 files changed, 108 insertions(+), 36 deletions(-)
-
-diff --git a/tests/qemu-iotests/097 b/tests/qemu-iotests/097
-index 1d28aff..e22670c 100755
---- a/tests/qemu-iotests/097
-+++ b/tests/qemu-iotests/097
-@@ -66,13 +66,15 @@ echo
- echo "=== Test pass $i ==="
- echo
-
--TEST_IMG="$TEST_IMG.base" _make_test_img 2100M
--TEST_IMG="$TEST_IMG.itmd" _make_test_img -b "$TEST_IMG.base" 2100M
--_make_test_img -b "$TEST_IMG.itmd" 2100M
-+len=$((2100 * 1024 * 1024 + 512)) # larger than 2G, and not cluster aligned
-+TEST_IMG="$TEST_IMG.base" _make_test_img $len
-+TEST_IMG="$TEST_IMG.itmd" _make_test_img -b "$TEST_IMG.base" $len
-+_make_test_img -b "$TEST_IMG.itmd" $len
-
--$QEMU_IO -c 'write -P 1 0x7ffd0000 192k' "$TEST_IMG.base" | _filter_qemu_io
--$QEMU_IO -c 'write -P 2 0x7ffe0000 128k' "$TEST_IMG.itmd" | _filter_qemu_io
--$QEMU_IO -c 'write -P 3 0x7fff0000 64k' "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "write -P 1 0x7ffd0000 192k" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IO -c "write -P 2 0x7ffe0000 128k" "$TEST_IMG.itmd" | _filter_qemu_io
-+$QEMU_IO -c "write -P 3 0x7fff0000 64k" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "write -P 4 $(($len - 512)) 512" "$TEST_IMG" | _filter_qemu_io
-
- if [ $i -lt 3 ]; then
-     if [ $i == 0 ]; then
-@@ -90,11 +92,13 @@ if [ $i -lt 3 ]; then
-
-     # Bottom should be unchanged
-     $QEMU_IO -c 'read -P 1 0x7ffd0000 192k' "$TEST_IMG.base" | _filter_qemu_io
-+    $QEMU_IO -c "read -P 0 $((len - 512)) 512" "$TEST_IMG.base" | _filter_qemu_io
-
-     # Intermediate should contain changes from top
-     $QEMU_IO -c 'read -P 1 0x7ffd0000 64k' "$TEST_IMG.itmd" | _filter_qemu_io
-     $QEMU_IO -c 'read -P 2 0x7ffe0000 64k' "$TEST_IMG.itmd" | _filter_qemu_io
-     $QEMU_IO -c 'read -P 3 0x7fff0000 64k' "$TEST_IMG.itmd" | _filter_qemu_io
-+    $QEMU_IO -c "read -P 4 $((len - 512)) 512" "$TEST_IMG.itmd" | _filter_qemu_io
-
-     # And in pass 0, the top image should be empty, whereas in both other passes
-     # it should be unchanged (which is both checked by qemu-img map)
-@@ -105,6 +109,7 @@ else
-     $QEMU_IO -c 'read -P 1 0x7ffd0000 64k' "$TEST_IMG.base" | _filter_qemu_io
-     $QEMU_IO -c 'read -P 2 0x7ffe0000 64k' "$TEST_IMG.base" | _filter_qemu_io
-     $QEMU_IO -c 'read -P 3 0x7fff0000 64k' "$TEST_IMG.base" | _filter_qemu_io
-+    $QEMU_IO -c "read -P 4 $((len - 512)) 512" "$TEST_IMG.base" | _filter_qemu_io
-
-     # Both top and intermediate should be unchanged
- fi
-diff --git a/tests/qemu-iotests/097.out b/tests/qemu-iotests/097.out
-index 81fc225..f6705a1 100644
---- a/tests/qemu-iotests/097.out
-+++ b/tests/qemu-iotests/097.out
-@@ -2,104 +2,130 @@ QA output created by 097
-
- === Test pass 0 ===
-
--Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202009600
--Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.base
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.itmd
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
-+Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.itmd
- wrote 196608/196608 bytes at offset 2147287040
- 192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- wrote 131072/131072 bytes at offset 2147352576
- 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- wrote 65536/65536 bytes at offset 2147418112
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- Image committed.
- read 196608/196608 bytes at offset 2147287040
- 192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 65536/65536 bytes at offset 2147287040
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 65536/65536 bytes at offset 2147352576
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 65536/65536 bytes at offset 2147418112
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- Offset          Length          File
- 0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
- Offset          Length          File
- 0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
- 0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
-+0x83400000      0x200           TEST_DIR/t.IMGFMT.itmd
- Offset          Length          File
- 0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
- 0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
-+0x83400000      0x200           TEST_DIR/t.IMGFMT.itmd
-
- === Test pass 1 ===
-
--Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202009600
--Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.base
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.itmd
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
-+Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.itmd
- wrote 196608/196608 bytes at offset 2147287040
- 192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- wrote 131072/131072 bytes at offset 2147352576
- 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- wrote 65536/65536 bytes at offset 2147418112
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- Image committed.
- read 196608/196608 bytes at offset 2147287040
- 192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 65536/65536 bytes at offset 2147287040
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 65536/65536 bytes at offset 2147352576
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 65536/65536 bytes at offset 2147418112
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- Offset          Length          File
- 0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
- Offset          Length          File
- 0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
- 0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
-+0x83400000      0x200           TEST_DIR/t.IMGFMT.itmd
- Offset          Length          File
- 0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
- 0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
- 0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
-+0x83400000      0x200           TEST_DIR/t.IMGFMT
-
- === Test pass 2 ===
-
--Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202009600
--Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.base
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.itmd
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
-+Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.itmd
- wrote 196608/196608 bytes at offset 2147287040
- 192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- wrote 131072/131072 bytes at offset 2147352576
- 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- wrote 65536/65536 bytes at offset 2147418112
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- Image committed.
- read 196608/196608 bytes at offset 2147287040
- 192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 65536/65536 bytes at offset 2147287040
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 65536/65536 bytes at offset 2147352576
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 65536/65536 bytes at offset 2147418112
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- Offset          Length          File
- 0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
- Offset          Length          File
- 0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
- 0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
-+0x83400000      0x200           TEST_DIR/t.IMGFMT.itmd
- Offset          Length          File
- 0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
- 0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
- 0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
-+0x83400000      0x200           TEST_DIR/t.IMGFMT
-
- === Test pass 3 ===
-
--Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202009600
--Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.base
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.itmd
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
-+Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.itmd
- wrote 196608/196608 bytes at offset 2147287040
- 192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- wrote 131072/131072 bytes at offset 2147352576
- 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- wrote 65536/65536 bytes at offset 2147418112
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- Image committed.
- read 65536/65536 bytes at offset 2147287040
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-@@ -107,13 +133,18 @@ read 65536/65536 bytes at offset 2147352576
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 65536/65536 bytes at offset 2147418112
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- Offset          Length          File
- 0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
-+0x83400000      0x200           TEST_DIR/t.IMGFMT.base
- Offset          Length          File
- 0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
- 0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
-+0x83400000      0x200           TEST_DIR/t.IMGFMT.base
- Offset          Length          File
- 0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
- 0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
- 0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
-+0x83400000      0x200           TEST_DIR/t.IMGFMT
- *** done
-diff --git a/tests/qemu-iotests/176 b/tests/qemu-iotests/176
-index 9a70a87..950b287 100755
---- a/tests/qemu-iotests/176
-+++ b/tests/qemu-iotests/176
-@@ -69,14 +69,16 @@ echo
- echo "=== Test pass $i ==="
- echo
-
--TEST_IMG="$TEST_IMG.base" _make_test_img 2100M
--TEST_IMG="$TEST_IMG.itmd" _make_test_img -b "$TEST_IMG.base" 2100M
--_make_test_img -b "$TEST_IMG.itmd" 2100M
-+len=$((2100 * 1024 * 1024 + 512)) # larger than 2G, and not cluster aligned
-+TEST_IMG="$TEST_IMG.base" _make_test_img $len
-+TEST_IMG="$TEST_IMG.itmd" _make_test_img -b "$TEST_IMG.base" $len
-+_make_test_img -b "$TEST_IMG.itmd" $len
- $QEMU_IMG snapshot -c snap "$TEST_IMG"
-
--$QEMU_IO -c 'write -P 1 0x7ffd0000 192k' "$TEST_IMG.base" | _filter_qemu_io
--$QEMU_IO -c 'write -P 2 0x7ffe0000 128k' "$TEST_IMG.itmd" | _filter_qemu_io
--$QEMU_IO -c 'write -P 3 0x7fff0000 64k' "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "write -P 1 0x7ffd0000 192k" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IO -c "write -P 2 0x7ffe0000 128k" "$TEST_IMG.itmd" | _filter_qemu_io
-+$QEMU_IO -c "write -P 3 0x7fff0000 64k" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "write -P 4 $(($len - 512)) 512" "$TEST_IMG" | _filter_qemu_io
-
- if [ $i -lt 3 ]; then
-     if [ $i == 0 ]; then
-@@ -94,11 +96,13 @@ if [ $i -lt 3 ]; then
-
-     # Bottom should be unchanged
-     $QEMU_IO -c 'read -P 1 0x7ffd0000 192k' "$TEST_IMG.base" | _filter_qemu_io
-+    $QEMU_IO -c "read -P 0 $((len - 512)) 512" "$TEST_IMG.base" | _filter_qemu_io
-
-     # Intermediate should contain changes from top
-     $QEMU_IO -c 'read -P 1 0x7ffd0000 64k' "$TEST_IMG.itmd" | _filter_qemu_io
-     $QEMU_IO -c 'read -P 2 0x7ffe0000 64k' "$TEST_IMG.itmd" | _filter_qemu_io
-     $QEMU_IO -c 'read -P 3 0x7fff0000 64k' "$TEST_IMG.itmd" | _filter_qemu_io
-+    $QEMU_IO -c "read -P 4 $((len - 512)) 512" "$TEST_IMG.itmd" | _filter_qemu_io
-
-     # And in pass 0, the top image should be empty, whereas in both other passes
-     # it should be unchanged (which is both checked by qemu-img map)
-@@ -109,6 +113,7 @@ else
-     $QEMU_IO -c 'read -P 1 0x7ffd0000 64k' "$TEST_IMG.base" | _filter_qemu_io
-     $QEMU_IO -c 'read -P 2 0x7ffe0000 64k' "$TEST_IMG.base" | _filter_qemu_io
-     $QEMU_IO -c 'read -P 3 0x7fff0000 64k' "$TEST_IMG.base" | _filter_qemu_io
-+    $QEMU_IO -c "read -P 4 $((len - 512)) 512" "$TEST_IMG.base" | _filter_qemu_io
-
-     # Both top and intermediate should be unchanged
- fi
-diff --git a/tests/qemu-iotests/176.out b/tests/qemu-iotests/176.out
-index fc63653..990a41c 100644
---- a/tests/qemu-iotests/176.out
-+++ b/tests/qemu-iotests/176.out
-@@ -2,104 +2,130 @@ QA output created by 176
-
- === Test pass 0 ===
-
--Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202009600
--Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.base
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.itmd
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
-+Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.itmd
- wrote 196608/196608 bytes at offset 2147287040
- 192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- wrote 131072/131072 bytes at offset 2147352576
- 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- wrote 65536/65536 bytes at offset 2147418112
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- Image committed.
- read 196608/196608 bytes at offset 2147287040
- 192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 65536/65536 bytes at offset 2147287040
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 65536/65536 bytes at offset 2147352576
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 65536/65536 bytes at offset 2147418112
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- Offset          Length          File
- 0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
- Offset          Length          File
- 0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
- 0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
-+0x83400000      0x200           TEST_DIR/t.IMGFMT.itmd
- Offset          Length          File
- 0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
- 0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
-+0x83400000      0x200           TEST_DIR/t.IMGFMT
-
- === Test pass 1 ===
-
--Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202009600
--Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.base
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.itmd
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
-+Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.itmd
- wrote 196608/196608 bytes at offset 2147287040
- 192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- wrote 131072/131072 bytes at offset 2147352576
- 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- wrote 65536/65536 bytes at offset 2147418112
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- Image committed.
- read 196608/196608 bytes at offset 2147287040
- 192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 65536/65536 bytes at offset 2147287040
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 65536/65536 bytes at offset 2147352576
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 65536/65536 bytes at offset 2147418112
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- Offset          Length          File
- 0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
- Offset          Length          File
- 0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
- 0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
-+0x83400000      0x200           TEST_DIR/t.IMGFMT.itmd
- Offset          Length          File
- 0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
- 0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
- 0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
-+0x83400000      0x200           TEST_DIR/t.IMGFMT
-
- === Test pass 2 ===
-
--Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202009600
--Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.base
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.itmd
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
-+Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.itmd
- wrote 196608/196608 bytes at offset 2147287040
- 192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- wrote 131072/131072 bytes at offset 2147352576
- 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- wrote 65536/65536 bytes at offset 2147418112
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- Image committed.
- read 196608/196608 bytes at offset 2147287040
- 192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 65536/65536 bytes at offset 2147287040
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 65536/65536 bytes at offset 2147352576
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 65536/65536 bytes at offset 2147418112
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- Offset          Length          File
- 0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
- Offset          Length          File
- 0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
- 0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
-+0x83400000      0x200           TEST_DIR/t.IMGFMT.itmd
- Offset          Length          File
- 0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
- 0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
- 0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
-+0x83400000      0x200           TEST_DIR/t.IMGFMT
-
- === Test pass 3 ===
-
--Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202009600
--Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.base
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202009600 backing_file=TEST_DIR/t.IMGFMT.itmd
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
-+Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.itmd
- wrote 196608/196608 bytes at offset 2147287040
- 192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- wrote 131072/131072 bytes at offset 2147352576
- 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- wrote 65536/65536 bytes at offset 2147418112
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- Image committed.
- read 65536/65536 bytes at offset 2147287040
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-@@ -107,13 +133,18 @@ read 65536/65536 bytes at offset 2147352576
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 65536/65536 bytes at offset 2147418112
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- Offset          Length          File
- 0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
-+0x83400000      0x200           TEST_DIR/t.IMGFMT.base
- Offset          Length          File
- 0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
- 0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
-+0x83400000      0x200           TEST_DIR/t.IMGFMT.base
- Offset          Length          File
- 0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
- 0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
- 0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
-+0x83400000      0x200           TEST_DIR/t.IMGFMT
- *** done
--- 
-2.9.3
+> --Ed
+> 
