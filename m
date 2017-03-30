@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ctZl4-0007qz-Jl
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:05:08 -0400
+	(envelope-from <vyasevic@redhat.com>) id 1ctZmM-00006b-ND
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:06:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ctZl1-0001vV-D6
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:04:58 -0400
-Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:40479)
+	(envelope-from <vyasevic@redhat.com>) id 1ctZmJ-0002xD-7o
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:06:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51182)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ctZl1-0001uM-4D
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:04:55 -0400
-Received: from player718.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 898E077DBA
-	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 15:04:52 +0200 (CEST)
-References: <1490795611-4762-1-git-send-email-clg@kaod.org>
-	<1490795611-4762-3-git-send-email-clg@kaod.org>
-	<20170330064605.GF22163@umbus>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <3e6f5e93-6b87-1304-98f7-73c828fe14af@kaod.org>
-Date: Thu, 30 Mar 2017 15:04:47 +0200
+	(Exim 4.71) (envelope-from <vyasevic@redhat.com>) id 1ctZmI-0002wA-Uo
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 09:06:15 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DFD9C7AEA7
+	for <qemu-devel@nongnu.org>; Thu, 30 Mar 2017 13:06:13 +0000 (UTC)
+Reply-To: vyasevic@redhat.com
+References: <1490818790-3100-1-git-send-email-vyasevic@redhat.com>
+	<20170330082419.GA2585@work-vm>
+From: Vlad Yasevich <vyasevic@redhat.com>
+Message-ID: <161e7bfe-2d0a-d69f-44ac-94fb62db1b4a@redhat.com>
+Date: Thu, 30 Mar 2017 09:06:06 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170330064605.GF22163@umbus>
+In-Reply-To: <20170330082419.GA2585@work-vm>
 Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 2/9] spapr: move the IRQ server number
- mapping under the machine
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] virtio-net: consolidate guest announcement
+ with qemu_announce_self
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,134 +35,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, gveitmic@redhat.com, mst@redhat.com, Jason Wang <jasowang@redhat.com>
 
-On 03/30/2017 08:46 AM, David Gibson wrote:
-> On Wed, Mar 29, 2017 at 03:53:24PM +0200, C=E9dric Le Goater wrote:
->> This is the second step to abstract the IRQ 'server' number of the
->> XICS layer. Now that the prereq cleanups have been done in the
->> previous patch, we can move down the 'cpu_dt_id' to 'cpu_index'
->> mapping in the sPAPR machine handler.
+On 03/30/2017 04:24 AM, Dr. David Alan Gilbert wrote:
+> * Vladislav Yasevich (vyasevic@redhat.com) wrote:
+>> virtio announcements seem to run on its own timer with it's own
+>> repetition loop and are invoked separately from qemu_announce_self.
+>> This patch consolidates announcements into a single location and
+>> allows other nics to provide it's own announcement capabilities, if
+>> necessary.
 >>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>> This is also usefull in support of exposing qemu_announce_self through
+>> qmp/hmp.
+>>
+>> Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
 >> ---
->>  hw/intc/xics_spapr.c    | 5 ++---
->>  hw/ppc/spapr.c          | 3 ++-
->>  hw/ppc/spapr_cpu_core.c | 2 +-
->>  3 files changed, 5 insertions(+), 5 deletions(-)
+>>  hw/net/virtio-net.c            | 30 ++++++++----------------------
+>>  include/hw/virtio/virtio-net.h |  2 --
+>>  include/net/net.h              |  2 ++
+>>  migration/savevm.c             |  6 ++++++
+>>  4 files changed, 16 insertions(+), 24 deletions(-)
 >>
->> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
->> index 58f100d379cb..f05308b897f2 100644
->> --- a/hw/intc/xics_spapr.c
->> +++ b/hw/intc/xics_spapr.c
->> @@ -52,9 +52,8 @@ static target_ulong h_cppr(PowerPCCPU *cpu, sPAPRMac=
-hineState *spapr,
->>  static target_ulong h_ipi(PowerPCCPU *cpu, sPAPRMachineState *spapr,
->>                            target_ulong opcode, target_ulong *args)
+>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+>> index c321680..6e9ce4f 100644
+>> --- a/hw/net/virtio-net.c
+>> +++ b/hw/net/virtio-net.c
+>> @@ -110,14 +110,16 @@ static bool virtio_net_started(VirtIONet *n, uint8_t status)
+>>          (n->status & VIRTIO_NET_S_LINK_UP) && vdev->vm_running;
+>>  }
+>>  
+>> -static void virtio_net_announce_timer(void *opaque)
+>> +static void virtio_net_announce(NetClientState *nc)
 >>  {
->> -    target_ulong server =3D xics_get_cpu_index_by_dt_id(args[0]);
->>      target_ulong mfrr =3D args[1];
->> -    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), server);
->> +    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), args[0]);
->> =20
->>      if (!icp) {
->>          return H_PARAMETER;
->> @@ -122,7 +121,7 @@ static void rtas_set_xive(PowerPCCPU *cpu, sPAPRMa=
-chineState *spapr,
+>> -    VirtIONet *n = opaque;
+>> +    VirtIONet *n = qemu_get_nic_opaque(nc);
+>>      VirtIODevice *vdev = VIRTIO_DEVICE(n);
+>>  
+>> -    n->announce_counter--;
+>> -    n->status |= VIRTIO_NET_S_ANNOUNCE;
+>> -    virtio_notify_config(vdev);
+>> +    if (virtio_vdev_has_feature(vdev, VIRTIO_NET_F_GUEST_ANNOUNCE) &&
+>> +        virtio_vdev_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ)) {
+>> +            n->status |= VIRTIO_NET_S_ANNOUNCE;
+>> +            virtio_notify_config(vdev);
+>> +    }
+>>  }
+>>  
+>>  static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
+>> @@ -427,8 +429,6 @@ static void virtio_net_reset(VirtIODevice *vdev)
+>>      n->nobcast = 0;
+>>      /* multiqueue is disabled by default */
+>>      n->curr_queues = 1;
+>> -    timer_del(n->announce_timer);
+>> -    n->announce_counter = 0;
+>>      n->status &= ~VIRTIO_NET_S_ANNOUNCE;
+>>  
+>>      /* Flush any MAC and VLAN filter table state */
+>> @@ -868,11 +868,6 @@ static int virtio_net_handle_announce(VirtIONet *n, uint8_t cmd,
+>>      if (cmd == VIRTIO_NET_CTRL_ANNOUNCE_ACK &&
+>>          n->status & VIRTIO_NET_S_ANNOUNCE) {
+>>          n->status &= ~VIRTIO_NET_S_ANNOUNCE;
+>> -        if (n->announce_counter) {
+>> -            timer_mod(n->announce_timer,
+>> -                      qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
+>> -                      self_announce_delay(n->announce_counter));
+>> -        }
+>>          return VIRTIO_NET_OK;
+>>      } else {
+>>          return VIRTIO_NET_ERR;
+>> @@ -1609,12 +1604,6 @@ static int virtio_net_post_load_device(void *opaque, int version_id)
+>>          qemu_get_subqueue(n->nic, i)->link_down = link_down;
 >>      }
->> =20
->>      nr =3D rtas_ld(args, 0);
->> -    server =3D xics_get_cpu_index_by_dt_id(rtas_ld(args, 1));
->> +    server =3D rtas_ld(args, 1);
->>      priority =3D rtas_ld(args, 2);
->> =20
->>      if (!ics_valid_irq(ics, nr) || !xics_icp_get(XICS_FABRIC(spapr), =
-server)
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index 8aecea3dd10c..b9f7f8607869 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -3024,9 +3024,10 @@ static void spapr_ics_resend(XICSFabric *dev)
->>      ics_resend(spapr->ics);
+>>  
+>> -    if (virtio_vdev_has_feature(vdev, VIRTIO_NET_F_GUEST_ANNOUNCE) &&
+>> -        virtio_vdev_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ)) {
+>> -        n->announce_counter = SELF_ANNOUNCE_ROUNDS;
+>> -        timer_mod(n->announce_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL));
+>> -    }
+>> -
+>>      return 0;
 >>  }
->> =20
->> -static ICPState *spapr_icp_get(XICSFabric *xi, int server)
->> +static ICPState *spapr_icp_get(XICSFabric *xi, int cpu_dt_id)
->>  {
->>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
->> +    int server =3D xics_get_cpu_index_by_dt_id(cpu_dt_id);
->=20
-> The idea is good, but this is a bad name (as it was in the original
-> version, too).  The whole point here is that the XICS server number
-> (as it appears in the ICS registers) is the input to this function,
-> and we no longer assume that is equal to cpu_index.
->=20
-> Seems we could just get the cpu object by dt_id here, then go to ICP(cp=
-u->intc).
-
-yes that would be nice and this is exactly what pnv does now, but=20
-this is only possible because the PnvICPState objects are allocated=20
-from under PnvCore. This is not the case for sPAPR yet.
-
-Currently, when the sPAPR core are realized, we call spapr_cpu_init()=20
-which first gets its ICP with :
-
-	xics_icp_get(xi, cpu->cpu_dt_id);
-
-so we cannot use ICP(cpu->intc) in this XICSFabric handler, it is not
-assigned yet. It only will be at the end of spapr_cpu_init() when=20
-
-	xics_cpu_setup(xi, cpu, icp);
-
-is called.=20
-
-
-As suggested in an email this morning, I think we could allocate=20
-the ICP from under the sPAPR core if we knew which ICP type to use=20
-(KVM or not). =20
-
-For that, we could use a new XICSFabric handler :
-
-	const char *icp_type(XICSFabric *xi)
-
-or a machine attribute to get the type. The ICP type would be chosen=20
-in xics_system_init() a bit like it is done today but we would not=20
-create the ICP object.=20
-
-or we could use a machine helper (probably better) : =20
-
-	ICPState *spapr_icp_create(MachineState *machine);  =20
-
-which would only do the ICP part of xics_system_init(). The ICS
-object can be created later on, it is not a problem.=20
-
-We have kind of a chicken and egg problem with the Core and the=20
-ICP objects today that it would be nice to untangle.=20
-
-Suggestions ?
-
-
-C.=20
-
-
->=20
->>      return (server < spapr->nr_servers) ? &spapr->icps[server] : NULL=
-;
+>>  
+>> @@ -1829,6 +1818,7 @@ static NetClientInfo net_virtio_info = {
+>>      .receive = virtio_net_receive,
+>>      .link_status_changed = virtio_net_set_link_status,
+>>      .query_rx_filter = virtio_net_query_rxfilter,
+>> +    .announce = virtio_net_announce,
+>>  };
+>>  
+>>  static bool virtio_net_guest_notifier_pending(VirtIODevice *vdev, int idx)
+>> @@ -1934,8 +1924,6 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+>>      qemu_macaddr_default_if_unset(&n->nic_conf.macaddr);
+>>      memcpy(&n->mac[0], &n->nic_conf.macaddr, sizeof(n->mac));
+>>      n->status = VIRTIO_NET_S_LINK_UP;
+>> -    n->announce_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL,
+>> -                                     virtio_net_announce_timer, n);
+>>  
+>>      if (n->netclient_type) {
+>>          /*
+>> @@ -1997,8 +1985,6 @@ static void virtio_net_device_unrealize(DeviceState *dev, Error **errp)
+>>          virtio_net_del_queue(n, i);
+>>      }
+>>  
+>> -    timer_del(n->announce_timer);
+>> -    timer_free(n->announce_timer);
+>>      g_free(n->vqs);
+>>      qemu_del_nic(n->nic);
+>>      virtio_cleanup(vdev);
+>> diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
+>> index 1eec9a2..0c597f4 100644
+>> --- a/include/hw/virtio/virtio-net.h
+>> +++ b/include/hw/virtio/virtio-net.h
+>> @@ -94,8 +94,6 @@ typedef struct VirtIONet {
+>>      char *netclient_name;
+>>      char *netclient_type;
+>>      uint64_t curr_guest_offloads;
+>> -    QEMUTimer *announce_timer;
+>> -    int announce_counter;
+>>      bool needs_vnet_hdr_swap;
+>>  } VirtIONet;
+>>  
+>> diff --git a/include/net/net.h b/include/net/net.h
+>> index 99b28d5..598f523 100644
+>> --- a/include/net/net.h
+>> +++ b/include/net/net.h
+>> @@ -64,6 +64,7 @@ typedef int (SetVnetLE)(NetClientState *, bool);
+>>  typedef int (SetVnetBE)(NetClientState *, bool);
+>>  typedef struct SocketReadState SocketReadState;
+>>  typedef void (SocketReadStateFinalize)(SocketReadState *rs);
+>> +typedef void (NetAnnounce)(NetClientState *);
+>>  
+>>  typedef struct NetClientInfo {
+>>      NetClientDriver type;
+>> @@ -84,6 +85,7 @@ typedef struct NetClientInfo {
+>>      SetVnetHdrLen *set_vnet_hdr_len;
+>>      SetVnetLE *set_vnet_le;
+>>      SetVnetBE *set_vnet_be;
+>> +    NetAnnounce *announce;
+>>  } NetClientInfo;
+>>  
+>>  struct NetClientState {
+>> diff --git a/migration/savevm.c b/migration/savevm.c
+>> index 3b19a4a..5c1d8dc 100644
+>> --- a/migration/savevm.c
+>> +++ b/migration/savevm.c
+>> @@ -113,9 +113,15 @@ static void qemu_announce_self_iter(NICState *nic, void *opaque)
+>>      int len;
+>>  
+>>      trace_qemu_announce_self_iter(qemu_ether_ntoa(&nic->conf->macaddr));
+>> +
+>>      len = announce_self_create(buf, nic->conf->macaddr.a);
+>>  
+>>      qemu_send_packet_raw(qemu_get_queue(nic), buf, len);
+>> +
+>> +    /* if the NIC provides it's own announcement support, use it as well */
+>> +    if (nic->ncs->info->announce) {
+>> +        nic->ncs->info->announce(nic->ncs);
+>> +    }
 >>  }
->> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
->> index 7db61bd72476..4e1a99591d19 100644
->> --- a/hw/ppc/spapr_cpu_core.c
->> +++ b/hw/ppc/spapr_cpu_core.c
->> @@ -64,7 +64,7 @@ static void spapr_cpu_init(sPAPRMachineState *spapr,=
- PowerPCCPU *cpu,
->>  {
->>      CPUPPCState *env =3D &cpu->env;
->>      XICSFabric *xi =3D XICS_FABRIC(spapr);
->> -    ICPState *icp =3D xics_icp_get(xi, CPU(cpu)->cpu_index);
->> +    ICPState *icp =3D xics_icp_get(xi, cpu->cpu_dt_id);
->> =20
->>      /* Set time-base frequency to 512 MHz */
->>      cpu_ppc_tb_init(env, SPAPR_TIMEBASE_FREQ);
->=20
+> 
+> Combining them doesn't necessarily seem like a bad thing; but
+> it does change the timing quite a bit - at the moment the QEMU RARPs
+> are sent at the end of migration, while the Virtio ARPs are sent
+> when the guest starts running which is quite a bit later.
+> 
+> In many ways the 'when the guest starts' is better, given that libvirt
+> etc has had a chance to reconfigure the networking,  but I'm not that
+> sure if it's safe to move the existing one - I had considered *adding*
+> another shot of the current mechanism after the guest is started.
+> 
+
+Yes, the timing of things have been giving me some issues, but I wanted to post
+this patch to get some comments just like this one..
+
+I've wondered why they qemu one happens before the guest starts running.
+
+> I certainly think it's wrong to do the virtio announce at the earlier
+> point.
+>
+
+I see.
+
+> See also Germano's thread of being able to retrigger the announce
+> at arbitrary points, and the series I posted a couple of days ago
+> to extend the length/timing of the announce.
+> 
+
+That's kind of what prompted me to do try this.  The issue with just
+exposing qemu_announce_self() is that RARPS just aren't enough in
+some cases (vlans, multicast).  This attempts to add the callback
+like Jason mentioned, but then we get timer interactions between the
+virtio-net timers and qemu one.
+
+-vlad
+
+> Dave
+> 
+>> -- 
+>> 2.7.4
+>>
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
