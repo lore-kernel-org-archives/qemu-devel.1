@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1ctyxf-0005zI-Kx
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 11:59:40 -0400
+	(envelope-from <Ciprian.Barbu@enea.com>) id 1ctz24-00010H-Eg
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 12:04:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1ctyxc-0006Pd-GO
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 11:59:39 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:34609)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1ctyxc-0006OS-7w
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 11:59:36 -0400
-Received: by mail-wr0-x244.google.com with SMTP id w43so21470713wrb.1
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 08:59:35 -0700 (PDT)
-Date: Fri, 31 Mar 2017 17:59:33 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20170331155933.GG9606@toto>
-References: <1490970671-20560-1-git-send-email-peter.maydell@linaro.org>
+	(envelope-from <Ciprian.Barbu@enea.com>) id 1ctz21-0002F9-B1
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 12:04:12 -0400
+Received: from smtp-out11.electric.net ([185.38.181.35]:55984)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Ciprian.Barbu@enea.com>)
+	id 1ctz21-00021d-16
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 12:04:09 -0400
+From: Ciprian Barbu <Ciprian.Barbu@enea.com>
+Date: Fri, 31 Mar 2017 16:03:53 +0000
+Message-ID: <C885D0FF6A27744DB0B822E32DF6EF029B1CA14A@SESTOEX04.enea.se>
+Content-Language: en-US
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1490970671-20560-1-git-send-email-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH] disas/cris.c: Avoid unintentional sign
- extension
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel]  nbd: Possible regression in 2.9 RCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +26,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, patches@linaro.org
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Alexandru Avadanii <Alexandru.Avadanii@enea.com>
+Cc: Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>, svc-armband <armband@enea.com>
 
-On Fri, Mar 31, 2017 at 03:31:11PM +0100, Peter Maydell wrote:
-> Commit 001ebaca7b11 fixed some unintended sign extension issues
-> spotted by Coverity (CID 1005402, 1005403), but didn't catch
-> all of them. Fix the rest, so we behave consistently whether
-> 'long' is 32 bit or 64 bit.
+Hello,
 
-Thanks!
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Similar to the other thread about possible regression with rbd, there might=
+ be a regression with nbd.
+This time we are launching an instance from an image (not volume) and try t=
+o live migrate it:
 
+nova live-migration <test_instance>
 
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  disas/cris.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/disas/cris.c b/disas/cris.c
-> index 30217f1..2dd56de 100644
-> --- a/disas/cris.c
-> +++ b/disas/cris.c
-> @@ -2048,7 +2048,7 @@ print_with_operands (const struct cris_opcode *opcodep,
->  	  {
->  	    /* We're looking at [pc+], i.e. we need to output an immediate
->  	       number, where the size can depend on different things.  */
-> -	    long number;
-> +	    int32_t number;
->  	    int signedp
->  	      = ((*cs == 'z' && (insn & 0x20))
->  		 || opcodep->match == BDAP_QUICK_OPCODE);
-> @@ -2290,7 +2290,7 @@ print_with_operands (const struct cris_opcode *opcodep,
->  
->  		    if ((prefix_insn & 0x400) && (prefix_insn & 15) == 15)
->  		      {
-> -			long number;
-> +			int32_t number;
->  			unsigned int nbytes;
->  
->  			/* It's a value.  Get its size.  */
-> -- 
-> 2.7.4
-> 
+The nova-compute service complains with:
+
+2017-03-31 15:32:56.179 7806 INFO nova.virt.libvirt.driver [req-15d79cbe-59=
+56-4738-92df-3624e6b993ee d795de59fb9a4ea38776a11d20ae8469 cee03e74881f4ccb=
+a3b83345fb652b2c - - -] [instance: 6a04508f-5d79-4582-8e2c-4cc368753f6c] Mi=
+gration running for 0 secs, memory 100% remaining; (bytes processed=3D0, re=
+maining=3D0, total=3D0)
+2017-03-31 15:32:58.029 7806 WARNING stevedore.named [req-73bc0113-5555-4dd=
+8-8903-d3540cc61b47 b9fbceeadd2d4d1bab9c90ae104db1f7 7e7db99b32c6467184701e=
+9a0c2f1de7 - - -] Could not load instance_network_info
+2017-03-31 15:32:59.038 7806 ERROR nova.virt.libvirt.driver [req-15d79cbe-5=
+956-4738-92df-3624e6b993ee d795de59fb9a4ea38776a11d20ae8469 cee03e74881f4cc=
+ba3b83345fb652b2c - - -] [instance: 6a04508f-5d79-4582-8e2c-4cc368753f6c] L=
+ive Migration failure: internal error: unable to execute QEMU command 'nbd-=
+server-add': Conflicts with use by drive-virtio-disk0 as 'root', which does=
+ not allow 'write' on #block143
+2017-03-31 15:32:59.190 7806 ERROR nova.virt.libvirt.driver [req-15d79cbe-5=
+956-4738-92df-3624e6b993ee d795de59fb9a4ea38776a11d20ae8469 cee03e74881f4cc=
+ba3b83345fb652b2c - - -] [instance: 6a04508f-5d79-4582-8e2c-4cc368753f6c] M=
+igration operation has aborted
+
+I will try and bisect it myself, but I thought I would paste this here firs=
+t, just so you know there is this issue too.
+
+Regards,
+/Ciprian
