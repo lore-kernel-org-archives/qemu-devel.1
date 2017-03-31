@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ctqev-0004Da-CY
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 03:07:46 -0400
+	(envelope-from <xiong.y.zhang@intel.com>) id 1ctqf0-0004F2-54
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 03:07:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ctqes-0004Ke-47
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 03:07:45 -0400
-Received: from 2.mo179.mail-out.ovh.net ([178.33.250.45]:40525)
+	(envelope-from <xiong.y.zhang@intel.com>) id 1ctqex-0004OX-0L
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 03:07:50 -0400
+Received: from mga07.intel.com ([134.134.136.100]:43780)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ctqer-0004JR-UB
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 03:07:42 -0400
-Received: from player755.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 4F12A33F12
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 09:07:38 +0200 (CEST)
-Date: Fri, 31 Mar 2017 09:07:31 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170331090731.27b10c0c@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <CAKXe6SKEbvxLWiCjSo7AYzAQmzdEGOeeYL47BYkcFPGx8VA20g@mail.gmail.com>
-References: <1490876834-61392-1-git-send-email-liqiang6-s@360.cn>
-	<c65ce78e-9a33-ee17-0a49-2a28390060f0@redhat.com>
-	<20170330174608.0ed57618@bahia.lab.toulouse-stg.fr.ibm.com>
-	<CAKXe6SKEbvxLWiCjSo7AYzAQmzdEGOeeYL47BYkcFPGx8VA20g@mail.gmail.com>
+	(Exim 4.71) (envelope-from <xiong.y.zhang@intel.com>)
+	id 1ctqew-0004NO-Nl
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 03:07:46 -0400
+From: "Zhang, Xiong Y" <xiong.y.zhang@intel.com>
+Date: Fri, 31 Mar 2017 07:07:37 +0000
+Message-ID: <8082FF9BCB2B054996454E47167FF4EC1C494944@SHSMSX104.ccr.corp.intel.com>
+References: <1490869641-29873-1-git-send-email-xiong.y.zhang@intel.com>
+	<20170330090148.16048141@t450s.home>
+	<8082FF9BCB2B054996454E47167FF4EC1C4930B3@SHSMSX104.ccr.corp.intel.com>
+	<20170330205511.28be6306@t450s.home>
+In-Reply-To: <20170330205511.28be6306@t450s.home>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/ra+Ot=Y2mYfnsN0b5S2.rOz";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH for-2.9?] 9pfs: fix migration_block leak
+Subject: Re: [Qemu-devel] [PATCH] Revert "vfio/pci-quirks.c: Disable stolen
+ memory for igd VFIO"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,151 +32,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>
-Cc: Eric Blake <eblake@redhat.com>, Li Qiang <liqiang6-s@360.cn>, Qemu Developers <qemu-devel@nongnu.org>, P J P <ppandit@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Zhang, Xiong Y" <xiong.y.zhang@intel.com>
 
---Sig_/ra+Ot=Y2mYfnsN0b5S2.rOz
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, 31 Mar 2017 09:26:35 +0800
-Li Qiang <liq3ea@gmail.com> wrote:
-
-> Hello,
+> On Fri, 31 Mar 2017 02:27:11 +0000
+> "Zhang, Xiong Y" <xiong.y.zhang@intel.com> wrote:
 >=20
-> 2017-03-30 23:46 GMT+08:00 Greg Kurz <groug@kaod.org>:
->=20
-> > On Thu, 30 Mar 2017 08:25:25 -0500
-> > Eric Blake <eblake@redhat.com> wrote:
-> >
-> > > On 03/30/2017 07:27 AM, Li Qiang wrote:
-> > > > The guest can leave the pdu->s->migration_blocker exists by attach
+> > > On Thu, 30 Mar 2017 18:27:21 +0800
+> > > Xiong Zhang <xiong.y.zhang@intel.com> wrote:
 > > >
-> > > s/exists/in place/
-> > > s/attach/attaching/
-> > >
-> >
->=20
-> Eric,
-> Thanks for pointing my mistakes!
->=20
->=20
-> > > > but not remove a fid. Then if we hot unplug the 9pfs device, the
-> > >
-> >
-> > In theory you're right, but the current 9p client in linux won't let you
-> > hot
-> > unplug the device unless you unmount the 9p share first, hence freeing =
-the
-> > blocker.
-> >
-> >
-> I think we should consider every possible situation.
->=20
->=20
-> > > s/remove/removing/
-> > >
-> > > > v9fs_reset() just free the fids, but not free the migration_blocker.
-> > > > This will leak a memory leak. This patch avoid this.
-> >
-> > I had a similar issue sitting my TODO list for quite a time: the blocker
-> > survives a system_reset. It doesn't cause a memory leak but it prevents
-> > migration until the guest mounts/unmounts the 9p share again.
-> >
-> > This boils down to virtfs_reset() calling free_fid() instead of put_fid=
-()
-> > IIRC.
-> >
-> > >
-> > > s/leak a/cause a/
-> > > s/avoid/avoids/
-> > >
+> > > > This reverts commit c2b2e158cc7b1cb431bd6039824ec13c3184a775.
 > > > >
-> > > > Signed-off-by: Li Qiang <liqiang6-s@360.cn>
-> > > > ---
-> > > >  hw/9pfs/9p.c | 6 ++++++
-> > > >  1 file changed, 6 insertions(+)
+> > > > The original patch intend to prevent linux i915 driver from using
+> > > > stolen meory. But this patch breaks windows IGD driver loading on
+> > > > Gen9+, as IGD HW will use stolen memory on Gen9+, once windows IGD
+> > > > driver see zero size stolen memory, it will unload.
+> > > > Meanwhile stolen memory will be disabled in 915 when i915 run as
+> > > > a guest.
 > > >
-> > > Probably worth including in 2.9 as a bug fix.
-> > >
-> > > Reviewed-by: Eric Blake <eblake@redhat.com>
-> > >
-> > > >
-> > > > diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> > > > index 48babce..b55c02d 100644
-> > > > --- a/hw/9pfs/9p.c
-> > > > +++ b/hw/9pfs/9p.c
-> > > > @@ -548,6 +548,12 @@ static void coroutine_fn virtfs_reset(V9fsPDU
-> > *pdu)
-> > > >              free_fid(pdu, fidp);
-> > > >          }
-> > > >      }
-> > > > +
-> > > > +    if (pdu->s->migration_blocker) {
-> > > > +        migrate_del_blocker(pdu->s->migration_blocker);
-> > > > +        error_free(pdu->s->migration_blocker);
-> > > > +        pdu->s->migration_blocker =3D NULL;
-> > > > +    }
+> > > Does this mean that legacy mode IGD assignment is not going to work
+> > > on Gen9+ with Windows?  Will it continue to work with Gen8-?
+> > [Zhang, Xiong Y] I try to use the following qemu command to enable lega=
+cy
+> mode on SKyLake, but It seems the entry point of wins IGD driver isn't ca=
+lled(I
+> couldn't confirm this as I don't have the source code, but I didn't see a=
+ny IGD
+> driver info from windbg while I could see many info in upt mode), so driv=
+er
+> doesn't bind to IGD after win 8.1 boot up.
+> >   #qemu-system-x86_64 -M pc -enable-kvm -smp 2 -m 2G  -vga none
+> -nographic -cpu host -hda "$IMAGE" -device
+> vfio-pci,host=3D00:02.0,x-vga=3Dtrue,id=3Dhostdev0,bus=3Dpci.0,addr=3D0x2
+> > Is this the right method to enable legacy mode ?
+>=20
+> Yeah, that should do it.  x-vga should not be necessary, but shouldn't
+> hurt IIRC.  Any dmesg errors regarding the ROM?  I think we have
+> trouble with the ROM if the host is booted in UEFI mode.
+[Zhang, Xiong Y] My host boot in legacy bios mode. After adding x-igd-gms i=
+n legacy mode, win 8.1 IGD driver could bind to IGD, and win 8.1 runs good.=
+=20
+thanks
+>=20
 > >
-> > I'd prefer to drain all PDUs in virtfs_reset() and have the loop above
-> > to call put_fid() instead of free_fid(). If this isn't doable for 2.9,
-> > I'll apply this patch with a comment.
-> >
-> >
-> Yes, I have considered to use put_fid() to fix this. But I'm not sure the
-> 'fidp->ref' is  at most 1 in virtfs_reset() function(I think it is).
+> > > Please clarify Gen9+, is this Kaby Lake?
+> > [Zhang, Xiong Y] Gen 9+ is SkyLake and later.
 >=20
-
-And indeed, if the fid is involved in an I/O then its ref will be !=3D 0.
-
-> IIUC I think omit the 'else' branch, and call put_fid() directly like thi=
-s.
+> Ok, then I cannot test since I only have access to BDW.  We do have
+> users that might start complaining if this is a new change in the
+> Windows driver for SKL+.
 >=20
-
-This won't work: we must ensure that fidp->ref reaches zero (ie, drain
-all PDUs), then we can fidp->ref++ (ie, get a ref on the fid) and call
-put_fid(), which will drop the last ref of the fid and clear the blocker
-if this is the root fid.
-
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index 48babce..ae97e79 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -544,9 +544,8 @@ static void coroutine_fn virtfs_reset(V9fsPDU *pdu)
+> > > I assume this patch is intended for QEMU 2.9, it's helpful to make th=
+at
+> > > explicit during the rc freeze.  Thanks,
+> > [Zhang, Xiong Y] Yes, as the original patch has entered into Qemu 2.9 r=
+c1. So
+> this reverted patch should be entered into the later 2.9 rc.
+> > Sorry for the troubles.
 >=20
->          if (fidp->ref) {
->              fidp->clunked =3D 1;
-> -        } else {
-> -            free_fid(pdu, fidp);
->          }
-> +        put_fid(pdu, fidp);
->      }
->  }
+> Ok, no problem.  Thanks,
 >=20
->=20
-> If you agree, I will send a formal patch.
->=20
->=20
->=20
-> > > >  }
-> > > >
-> > > >  #define P9_QID_TYPE_DIR         0x80
-> > > >
-> > >
-> >
-> >
-
-
---Sig_/ra+Ot=Y2mYfnsN0b5S2.rOz
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAljeADMACgkQAvw66wEB28KQJwCfRQFVm1hlPR6lmCxcFJExX6HJ
-pJgAoJdR8u3oumm+qF14RFZjic50kHdQ
-=+F/n
------END PGP SIGNATURE-----
-
---Sig_/ra+Ot=Y2mYfnsN0b5S2.rOz--
+> Alex
