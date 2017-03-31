@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ctoyX-0001Qa-I9
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 01:19:55 -0400
+	(envelope-from <peterx@redhat.com>) id 1ctp6j-0002aO-Tj
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 01:28:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ctoyW-0004zg-02
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 01:19:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40762)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ctoyV-0004zT-O5
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 01:19:51 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ctoyU-00020a-8N
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 05:19:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B6E1A2E80C8
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 05:19:49 +0000 (UTC)
+	(envelope-from <peterx@redhat.com>) id 1ctp6g-0000Sm-JM
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 01:28:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55974)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ctp6g-0000SJ-Aq
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 01:28:18 -0400
+Date: Fri, 31 Mar 2017 13:28:04 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170331052804.GG3981@pxdev.xzpeter.org>
+References: <1486456099-7345-15-git-send-email-peterx@redhat.com>
+	<A2975661238FB949B60364EF0F2C257439032C79@shsmsx102.ccr.corp.intel.com>
+	<20170327091208.GG11497@pxdev.xzpeter.org>
+	<A2975661238FB949B60364EF0F2C257439032D78@shsmsx102.ccr.corp.intel.com>
+	<A2975661238FB949B60364EF0F2C25743903553F@shsmsx102.ccr.corp.intel.com>
+	<9c3cda64-b4a3-6f9b-f951-bf73f6613faa@redhat.com>
+	<20170331025618.GB3981@pxdev.xzpeter.org>
+	<23619b9a-b671-75ff-ffc5-01a61ea9d8c5@redhat.com>
+	<20170331050101.GF3981@pxdev.xzpeter.org>
+	<9a5bfd93-2d61-96c8-7a95-bccb5a0c819d@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <9a5bfd93-2d61-96c8-7a95-bccb5a0c819d@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 31 Mar 2017 05:02:56 -0000
-From: Launchpad Bug Tracker <1490611@bugs.launchpad.net>
-Reply-To: Bug 1490611 <1490611@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150831152901.21817.58033.malonedeb@gac.canonical.com>
-Message-Id: <20170331050259.15713.75918.malone@ackee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1490611] Re: Using qemu >=2.2.1 to convert
- raw->VHD (fixed) adds extra padding to the result file,
- which Microsoft Azure rejects as invalid
+Subject: Re: [Qemu-devel] [PATCH v7 14/17] memory: add
+ MemoryRegionIOMMUOps.replay() callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,137 +37,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Liu, Yi L" <yi.l.liu@intel.com>, "'alex.williamson@redhat.com'" <alex.williamson@redhat.com>, "Lan, Tianyu" <tianyu.lan@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, "'mst@redhat.com'" <mst@redhat.com>, "'jan.kiszka@siemens.com'" <jan.kiszka@siemens.com>, "'bd.aviv@gmail.com'" <bd.aviv@gmail.com>, 'David Gibson' <david@gibson.dropbear.id.au>, "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>
 
-This bug was fixed in the package qemu - 1:2.5+dfsg-5ubuntu10.10
+On Fri, Mar 31, 2017 at 01:12:56PM +0800, Jason Wang wrote:
+>=20
+>=20
+> On 2017=E5=B9=B403=E6=9C=8831=E6=97=A5 13:01, Peter Xu wrote:
+> >On Fri, Mar 31, 2017 at 12:21:23PM +0800, Jason Wang wrote:
+> >>
+> >>On 2017=E5=B9=B403=E6=9C=8831=E6=97=A5 10:56, Peter Xu wrote:
+> >>>>>Just come to mind that there may be a corner case here.
+> >>>>>
+> >>>>>Intel VT-d actually has a "pt" mode which allows device use physic=
+al address
+> >>>>>even when VT-d is enabled. In kernel, there is a iommu_identity_ma=
+pping.
+> >>>>>If a device is in this map, then it would use "pt" mode. So that I=
+OMMU driver
+> >>>>>would not build second-level page table for it.
+> >>>>Yes, but qemu does not support ECAP_PT now, so guest will still hav=
+e a page
+> >>>>table in this case.
+> >>>>
+> >>>>>Back to the virtual IOVA implementation, if an assigned device is =
+in the
+> >>>>>iommu_identity_mapping(e.g. VGA controller), it uses GPA directly =
+to do DMA.
+> >>>>>So it demands a GPA->HPA mapping in host. However, the iommu->ops.=
+replay
+> >>>>>is not able to build it when guest SL page table is empty.
+> >>>>>
+> >>>>>So I think building an entire guest PA->HPA mapping before guest k=
+ernel boot
+> >>>>>would be recommended. Any thoughts?
+> >>>>We plan to add PT in 2.10, a possible rough idea is disabled iommu =
+dmar
+> >>>>region and use another region without iommu_ops. Then
+> >>>>vfio_listener_region_add() will just do the correct mappings.
+> >>>Even without any new region. With the patch 16/17 ("intel_iommu: all=
+ow
+> >>>dynamic switch of IOMMU region"), we can just turn the IOMMU region
+> >>>on/off, following the device's PT bit, maybe using the new
+> >>>vtd_switch_address_space() interface. That should be enough.
+> >>Right. For vhost it was probably need more works, e.g setting up stat=
+ic
+> >>mappings during region_add().
+> >Do we need to?
+>=20
+> Not a must if we don't care about performance.
+>=20
+> >
+> >VFIO will need it for building up shadow page table, even without a
+> >vIOMMU. But imho that should not be needed by vhost, right?
+>=20
+> Device IOTLB will be enabled unconditionally if iommu_platform is speci=
+fied.
+> If we don't set static mappings, vhost will send IOTLB miss request. Th=
+e
+> performance will be horrible in this case.
 
----------------
-qemu (1:2.5+dfsg-5ubuntu10.10) xenial; urgency=3Dmedium
+I see, thanks. So looks like we will need one more patch for PT
+support now. :)
 
-  [Nishanth Aravamudan]
-  * debian/patches/ubuntu/add_force_size_option.patch:
-    block/vpc: fix VHD size calculation. (LP: #1490611)
-
- -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Mon, 20 Feb
-2017 13:09:53 +0100
-
-** Changed in: qemu (Ubuntu Xenial)
-       Status: Fix Committed =3D> Fix Released
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1490611
-
-Title:
-  Using qemu >=3D2.2.1 to convert raw->VHD (fixed) adds extra padding to
-  the result file, which Microsoft Azure rejects as invalid
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Xenial:
-  Fix Released
-
-Bug description:
-  [Impact]
-
-  =C2=A0* Starting with a raw disk image, using "qemu-img convert" to conve=
-rt
-  from raw to VHD results in the output VHD file's virtual size being
-  aligned to the nearest 516096 bytes (16 heads x 63 sectors per head x
-  512 bytes per sector), instead of preserving the input file's size as
-  the output VHD's virtual disk size.
-
-  =C2=A0* Microsoft Azure requires that disk images (VHDs) submitted for
-  upload have virtual sizes aligned to a megabyte boundary. (Ex. 4096MB,
-  4097MB, 4098MB, etc. are OK, 4096.5MB is rejected with an error.) This
-  is reflected in Microsoft's documentation: https://azure.microsoft.com
-  /en-us/documentation/articles/virtual-machines-linux-create-upload-
-  vhd-generic/
-
-  =C2=A0* The fix for this bug is a backport from upstream.
-  http://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Dfb9245c2610932d33ce14
-
-  [Test Case]
-
-  =C2=A0* This is reproducible with the following set of commands (including
-  the Azure command line tools from https://github.com/Azure/azure-
-  xplat-cli). For the following example, I used qemu version 2.2.1:
-
-  $ dd if=3D/dev/zero of=3Dsource-disk.img bs=3D1M count=3D4096
-
-  $ stat source-disk.img
-  =C2=A0=C2=A0File: =E2=80=98source-disk.img=E2=80=99
-  =C2=A0=C2=A0Size: 4294967296      Blocks: 798656     IO Block: 4096   reg=
-ular file
-  Device: fc01h/64513d    Inode: 13247963    Links: 1
-  Access: (0644/-rw-r--r--)  Uid: ( 1000/  smkent)   Gid: ( 1000/  smkent)
-  Access: 2015-08-18 09:48:02.613988480 -0700
-  Modify: 2015-08-18 09:48:02.825985646 -0700
-  Change: 2015-08-18 09:48:02.825985646 -0700
-  =C2=A0Birth: -
-
-  $ qemu-img convert -f raw -o subformat=3Dfixed -O vpc source-disk.img
-  dest-disk.vhd
-
-  $ stat dest-disk.vhd
-  =C2=A0=C2=A0File: =E2=80=98dest-disk.vhd=E2=80=99
-  =C2=A0=C2=A0Size: 4296499712      Blocks: 535216     IO Block: 4096   reg=
-ular file
-  Device: fc01h/64513d    Inode: 13247964    Links: 1
-  Access: (0644/-rw-r--r--)  Uid: ( 1000/  smkent)   Gid: ( 1000/  smkent)
-  Access: 2015-08-18 09:50:22.252077624 -0700
-  Modify: 2015-08-18 09:49:24.424868868 -0700
-  Change: 2015-08-18 09:49:24.424868868 -0700
-  =C2=A0Birth: -
-
-  $ azure vm image create testimage1 dest-disk.vhd -o linux -l "West US"
-  info:    Executing command vm image create
-  + Retrieving storage accounts
-  info:    VHD size : 4097 MB
-  info:    Uploading 4195800.5 KB
-  Requested:100.0% Completed:100.0% Running:   0 Time: 1m 0s Speed:  6744 K=
-B/s
-  info:    https://[redacted].blob.core.windows.net/vm-images/dest-disk.vhd=
- was uploaded successfully
-  error:   The VHD https://[redacted].blob.core.windows.net/vm-images/dest-=
-disk.vhd has an unsupported virtual size of 4296499200 bytes.  The size mus=
-t be a whole number (in MBs).
-  info:    Error information has been recorded to /home/smkent/.azure/azure=
-.err
-  error:   vm image create command failed
-
-  =C2=A0* A fixed qemu-img will not result in an error during azure image
-  creation. It will require passing -o force_size, which will leverage
-  the backported functionality.
-
-  [Regression Potential]
-
-  =C2=A0* The upstream fix introduces a qemu-img option (-o force_size) whi=
-ch
-  is unset by default. The regression potential is very low, as a
-  result.
-
-  ...
-
-  I also ran the above commands using qemu 2.4.0, which resulted in the
-  same error as the conversion behavior is the same.
-
-  However, qemu 2.1.1 and earlier (including qemu 2.0.0 installed by
-  Ubuntu 14.04) does not pad the virtual disk size during conversion.
-  Using qemu-img convert from qemu versions <=3D2.1.1 results in a VHD
-  that is exactly the size of the raw input file plus 512 bytes (for the
-  VHD footer). Those qemu versions do not attempt to realign the disk.
-  As a result, Azure accepts VHD files created using those versions of
-  qemu-img convert for upload.
-
-  Is there a reason why newer qemu realigns the converted VHD file? It
-  would be useful if an option were added to disable this feature, as
-  current versions of qemu cannot be used to create VHD files for Azure
-  using Microsoft's official instructions.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1490611/+subscriptions
+-- peterx
