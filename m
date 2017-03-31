@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ctu0P-0003l7-Dc
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 06:42:10 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1ctuKR-00062y-Fd
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 07:02:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ctu0O-0001FX-L4
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 06:42:09 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:34138)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ctu0O-0001EZ-D5
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 06:42:08 -0400
-Received: by mail-wr0-x234.google.com with SMTP id l43so101396609wre.1
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 03:42:08 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1490932869-31217-1-git-send-email-mdroth@linux.vnet.ibm.com>
-References: <1490932869-31217-1-git-send-email-mdroth@linux.vnet.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 31 Mar 2017 11:41:46 +0100
-Message-ID: <CAFEAcA8eVkUk1C8-opQ3hp1e3sWqDTU-HV3TWfQxe2iEdaBXOA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL for-2.9 0/2] qemu-ga patch queue for 2.9
+	(envelope-from <dgilbert@redhat.com>) id 1ctuKN-0005qp-De
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 07:02:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44746)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ctuKN-0005qD-8N
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 07:02:47 -0400
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Fri, 31 Mar 2017 12:02:43 +0100
+Message-Id: <20170331110244.9439-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PULL 0/1] hmp queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +21,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: iwona260909@gmail.com
 
-On 31 March 2017 at 05:01, Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
-> The following changes since commit df9046363220e57d45818312759b954c033c58ab:
->
->   Update version for v2.9.0-rc2 release (2017-03-28 19:11:16 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/mdroth/qemu.git tags/qga-pull-2017-03-30-tag
->
-> for you to fetch changes up to 4eaf72029446ba693c63429475ce46348f65bf01:
->
->   qga: Make qemu-ga compile statically for Windows (2017-03-30 21:47:25 -0500)
->
-> ----------------------------------------------------------------
-> qemu-ga patch queue for 2.9
->
-> * fix make check failure of guest-get-fsinfo when nested virtual block
->   device partitions are mounted in the test environment
-> * fix static compilation for mingw builds
->
-> ----------------------------------------------------------------
-> Michael Roth (1):
->       qga: don't fail if mount doesn't have slave devices
->
-> Sameeh Jubran (1):
->       qga: Make qemu-ga compile statically for Windows
->
->  configure            | 7 +++++++
->  qga/commands-posix.c | 4 +++-
->  2 files changed, 10 insertions(+), 1 deletion(-)
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Applied, thanks.
+The following changes since commit 05a6f451eb0e3224a8e6d98089379f20ec06c787:
 
--- PMM
+  Merge remote-tracking branch 'remotes/mdroth/tags/qga-pull-2017-03-30-tag' into staging (2017-03-31 11:09:51 +0100)
+
+are available in the git repository at:
+
+  git://github.com/dagrh/qemu.git tags/pull-hmp-20170331
+
+for you to fetch changes up to fd5d23babf9838c1b099a9e8020e778aac0ebb4d:
+
+  hmp: fix "dump-quest-memory" segfault (2017-03-31 11:53:42 +0100)
+
+----------------------------------------------------------------
+HMP pull (one bugfix)
+
+----------------------------------------------------------------
+Iwona Kotlarska (1):
+      hmp: fix "dump-quest-memory" segfault
+
+ target/i386/arch_dump.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
