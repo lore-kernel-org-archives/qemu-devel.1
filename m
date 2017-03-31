@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cu1lg-00062E-Dl
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 14:59:29 -0400
+	(envelope-from <jcody@redhat.com>) id 1cu1mQ-0006VL-AK
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:00:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cu1ld-0001DH-CO
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 14:59:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48522)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cu1ld-0001D3-3y
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 14:59:25 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 22FF583F3E
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 18:59:23 +0000 (UTC)
-Date: Fri, 31 Mar 2017 19:59:19 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170331185918.GF2408@work-vm>
-References: <1490599288-11751-1-git-send-email-peterx@redhat.com>
-	<1490599288-11751-3-git-send-email-peterx@redhat.com>
+	(envelope-from <jcody@redhat.com>) id 1cu1mP-0001Zd-FL
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:00:14 -0400
+Date: Fri, 31 Mar 2017 15:00:03 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170331190003.GH1135@localhost.localdomain>
+References: <20170331120431.1767-1-mreitz@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1490599288-11751-3-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/5] migration: rename max_size to
- threshold_size
+In-Reply-To: <20170331120431.1767-1-mreitz@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.9 0/2] curl: Extend and
+ fix blockdev-add schema
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,129 +23,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-* Peter Xu (peterx@redhat.com) wrote:
-> In migration codes (especially in migration_thread()), max_size is used
-> in many place for the threshold value that we will start to do the final
-> flush and jump to the next stage to dump the whole rest things to
-> destination. However its name is confusing to first readers. Let's
-> rename it to "threshold_size" when proper and add a comment for it. No
-> functional change is made.
+On Fri, Mar 31, 2017 at 02:04:29PM +0200, Max Reitz wrote:
+> Yes, it's yet another episode in our popular
+> get-blockdev-add-ready-for-2.9 drama!
 > 
-> CC: Juan Quintela <quintela@redhat.com>
-> CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  include/migration/vmstate.h |  3 ++-
->  migration/migration.c       | 17 +++++++++--------
->  migration/savevm.c          |  4 ++--
->  3 files changed, 13 insertions(+), 11 deletions(-)
+> Right now, the schema for the curl block driver is seriously lacking.
+> This series improves things at least a bit.
 > 
-> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-> index f2dbf84..dad3984 100644
-> --- a/include/migration/vmstate.h
-> +++ b/include/migration/vmstate.h
-> @@ -56,7 +56,8 @@ typedef struct SaveVMHandlers {
->  
->      /* This runs outside the iothread lock!  */
->      int (*save_live_setup)(QEMUFile *f, void *opaque);
-> -    void (*save_live_pending)(QEMUFile *f, void *opaque, uint64_t max_size,
-> +    void (*save_live_pending)(QEMUFile *f, void *opaque,
-> +                              uint64_t threshold_size,
->                                uint64_t *non_postcopiable_pending,
->                                uint64_t *postcopiable_pending);
->      LoadStateHandler *load_state;
-> diff --git a/migration/migration.c b/migration/migration.c
-> index f9f4d98..b065fe4 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1907,7 +1907,8 @@ static void *migration_thread(void *opaque)
->      int64_t initial_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
->      int64_t setup_start = qemu_clock_get_ms(QEMU_CLOCK_HOST);
->      int64_t initial_bytes = 0;
-> -    int64_t max_size = 0;
-> +    /* We'll do the final flush when reachs threshold_size */
-
-I think that's 'reaches' - however perhaps we should make a more
-explicit comment:
-   'The final stage happens when the remaining data is smaller than
-    this threshold; it's calculated from the requested downtime
-    and measured bandwidth'
-
-other than that:
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-Dave
-
-> +    int64_t threshold_size = 0;
->      int64_t start_time = initial_time;
->      int64_t end_time;
->      bool old_vm_running = false;
-> @@ -1951,17 +1952,17 @@ static void *migration_thread(void *opaque)
->          if (!qemu_file_rate_limit(s->to_dst_file)) {
->              uint64_t pend_post, pend_nonpost;
->  
-> -            qemu_savevm_state_pending(s->to_dst_file, max_size, &pend_nonpost,
-> -                                      &pend_post);
-> +            qemu_savevm_state_pending(s->to_dst_file, threshold_size,
-> +                                      &pend_nonpost, &pend_post);
->              pending_size = pend_nonpost + pend_post;
-> -            trace_migrate_pending(pending_size, max_size,
-> +            trace_migrate_pending(pending_size, threshold_size,
->                                    pend_post, pend_nonpost);
-> -            if (pending_size && pending_size >= max_size) {
-> +            if (pending_size && pending_size >= threshold_size) {
->                  /* Still a significant amount to transfer */
->  
->                  if (migrate_postcopy_ram() &&
->                      s->state != MIGRATION_STATUS_POSTCOPY_ACTIVE &&
-> -                    pend_nonpost <= max_size &&
-> +                    pend_nonpost <= threshold_size &&
->                      atomic_read(&s->start_postcopy)) {
->  
->                      if (!postcopy_start(s, &old_vm_running)) {
-> @@ -1993,13 +1994,13 @@ static void *migration_thread(void *opaque)
->                                           initial_bytes;
->              uint64_t time_spent = current_time - initial_time;
->              double bandwidth = (double)transferred_bytes / time_spent;
-> -            max_size = bandwidth * s->parameters.downtime_limit;
-> +            threshold_size = bandwidth * s->parameters.downtime_limit;
->  
->              s->mbps = (((double) transferred_bytes * 8.0) /
->                      ((double) time_spent / 1000.0)) / 1000.0 / 1000.0;
->  
->              trace_migrate_transferred(transferred_bytes, time_spent,
-> -                                      bandwidth, max_size);
-> +                                      bandwidth, threshold_size);
->              /* if we haven't sent anything, we don't want to recalculate
->                 10000 is a small enough number for our purposes */
->              if (s->dirty_bytes_rate && transferred_bytes > 10000) {
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 3b19a4a..59c04eb 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -1197,7 +1197,7 @@ void qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only)
->   * the result is split into the amount for units that can and
->   * for units that can't do postcopy.
->   */
-> -void qemu_savevm_state_pending(QEMUFile *f, uint64_t max_size,
-> +void qemu_savevm_state_pending(QEMUFile *f, uint64_t threshold_size,
->                                 uint64_t *res_non_postcopiable,
->                                 uint64_t *res_postcopiable)
->  {
-> @@ -1216,7 +1216,7 @@ void qemu_savevm_state_pending(QEMUFile *f, uint64_t max_size,
->                  continue;
->              }
->          }
-> -        se->ops->save_live_pending(f, se->opaque, max_size,
-> +        se->ops->save_live_pending(f, se->opaque, threshold_size,
->                                     res_non_postcopiable, res_postcopiable);
->      }
->  }
+> To improve things seriously, we might want to structure the URL instead
+> of it being just a plain string, and we might want to split the cookie
+> string into a list of dicts or something similar. However, strictly
+> speaking our curl block driver is *not* an (ht|f)tps? block driver but
+> just a curl driver. All it does is pass some options to libcurl and then
+> send and receive data from it. (We really should have just named it
+> "curl" from the start.)
+> 
+> Therefore, it probably is for the best to leave these options rather
+> opaque and let libcurl do the interpretation.
+> 
+> 
+> Max Reitz (2):
+>   qapi/curl: Extend and fix blockdev-add schema
+>   block/curl: Check protocol prefix
+> 
+>  qapi/block-core.json | 103 ++++++++++++++++++++++++++++++++++++++++++++++-----
+>  block/curl.c         |  10 +++++
+>  2 files changed, 104 insertions(+), 9 deletions(-)
+> 
 > -- 
-> 2.7.4
+> 2.12.1
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+
+Thanks,
+
+Applied to my block branch:
+
+git://github.com/codyprime/qemu-kvm-jtc.git block
+
+-Jeff
