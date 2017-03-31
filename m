@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ctneN-0005Ea-R4
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 23:55:01 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ctnl3-0006Y8-1r
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 00:01:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ctneK-0005Hp-Oo
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 23:54:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57062)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1ctneK-0005Hi-GX
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 23:54:56 -0400
-Date: Thu, 30 Mar 2017 23:54:52 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170331035452.GL22342@localhost.localdomain>
-References: <058D52979F67BF47BCD9EA78EAECA6DC7779F2D5@SESTOEX04.enea.se>
-	<de0d3d40-833b-f24b-7689-b23eb9c78244@redhat.com>
-	<058D52979F67BF47BCD9EA78EAECA6DC7779F35F@SESTOEX04.enea.se>
-	<153e27df-ed6d-f562-9831-9790b584beb1@redhat.com>
-	<fd465426-e057-a68b-de02-1c244132ecc8@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fd465426-e057-a68b-de02-1c244132ecc8@redhat.com>
-Subject: Re: [Qemu-devel] rbd: Possible regression in 2.9 RCs
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ctnl0-00082N-0q
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 00:01:53 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34486
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1ctnkz-00081J-Qx
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 00:01:49 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2V40363063745
+	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 00:01:48 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 29h4d1bxsx-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 00:01:48 -0400
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Thu, 30 Mar 2017 22:01:47 -0600
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+Date: Thu, 30 Mar 2017 23:01:07 -0500
+Message-Id: <1490932869-31217-1-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PULL for-2.9 0/2] qemu-ga patch queue for 2.9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +36,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Alexandru Avadanii <Alexandru.Avadanii@enea.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, svc-armband <armband@enea.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On Thu, Mar 30, 2017 at 09:08:20PM -0500, Eric Blake wrote:
-> On 03/30/2017 08:22 PM, Eric Blake wrote:
-> > On 03/30/2017 08:05 PM, Alexandru Avadanii wrote:
-> >> c7cacb3e7a2e9fdf929c993b98268e4179147cbb is the first bad commit
-> >>     block/rbd: parse all options via bdrv_parse_filename
-> > 
-> > Yep, my bisect finished about 2 minutes after your email on the same
-> > spot. I'm working on a patch.  I can reproduce the problem with a mere:
-> > 
-> > ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio
-> > -drive
-> > 'file=rbd:volumes/volume-ea141b5c-cdb3-4765-910d-e7008b209a70:id=compute:key=AQAVkvxXAAAAABAA9ZxWFYdRmV+DSwKr7BKKXg==:auth_supported=cephx\;none:mon_host=192.168.1.2\:6789,format=raw,if=none,id=drive-virtio-disk0,serial=ea141b5c-cdb3-4765-910d-e7008b209a70,cache=writeback'
-> > 
-> > the good behavior (on my setup) just hangs trying to connect to a
-> > non-existent machine, the bad behavior gets rather-badly misparsed
-> > (splitting the escaped : in the host:port portion as if the port were
-> > the next key-value pair) resulting in an instant error message. I don't
-> > have an actual RBD setup for testing the fix, but will cc you on the
-> > patch that I propose once I have something.
-> 
-> I found the culprit, but the patch is taking me longer.
-> 
-> We are unescaping key="mon_host", value="192.168.1.2\:6789" when we
-> first parse the key/value pairs in qemu_rbd_parse_filename(), then we
-> slam the unescaped values back into a single string with ':' separators
-> resulting in "mon_host=192.168.1.2:6789" for stuffing through the QDict,
-> then we pass that string BACK through qemu_rbd_next_tok() inside
-> qemu_rbd_set_keypairs(), and since we no longer have the \: escape, we
-> are trying to treat 6789 as a new key on the second pass.  Moral of the
-> story: don't parse stuff twice.
-> 
-> My patch will be to use a QList instead of a QString for the hidden
-> "=keyvalue-pairs" object that we use to pass things around between
-> parsing the filename and actually passing parameters to RBD, matching
-> the fact that we already have this telling comment:
-> 
->             /* FIXME: This is pretty ugly, and not the right way to do this.
->              *        These should be contained in a structure, and then
->              *        passed explicitly as individual key/value pairs to
->              *        rados.  Consider this legacy code that needs to be
->              *        updated. */
+The following changes since commit df9046363220e57d45818312759b954c033c58ab:
 
+  Update version for v2.9.0-rc2 release (2017-03-28 19:11:16 +0100)
 
-Ugh.  Yep, I just got done coming to the same conclusion, only to hop on the
-email list to see that you did as well.  A QList sounds like a good choice.
+are available in the git repository at:
 
-Jeff
+  git://github.com/mdroth/qemu.git tags/qga-pull-2017-03-30-tag
+
+for you to fetch changes up to 4eaf72029446ba693c63429475ce46348f65bf01:
+
+  qga: Make qemu-ga compile statically for Windows (2017-03-30 21:47:25 -0500)
+
+----------------------------------------------------------------
+qemu-ga patch queue for 2.9
+
+* fix make check failure of guest-get-fsinfo when nested virtual block
+  device partitions are mounted in the test environment
+* fix static compilation for mingw builds
+
+----------------------------------------------------------------
+Michael Roth (1):
+      qga: don't fail if mount doesn't have slave devices
+
+Sameeh Jubran (1):
+      qga: Make qemu-ga compile statically for Windows
+
+ configure            | 7 +++++++
+ qga/commands-posix.c | 4 +++-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
