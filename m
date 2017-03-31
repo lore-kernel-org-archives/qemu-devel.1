@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cts2Y-0005WE-8z
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 04:36:15 -0400
+	(envelope-from <groug@kaod.org>) id 1cts4L-0006oW-Vm
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 04:38:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cts2V-000754-61
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 04:36:14 -0400
-Date: Fri, 31 Mar 2017 10:36:04 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170331103604.256f4840@nial.brq.redhat.com>
-In-Reply-To: <CAGZKiBrsiFgwuFx4CjasWAg8+qXAiA10w9cMP6MhBec3iRouLA@mail.gmail.com>
-References: <20170331045144.9307-1-david@gibson.dropbear.id.au>
-	<CAGZKiBrsiFgwuFx4CjasWAg8+qXAiA10w9cMP6MhBec3iRouLA@mail.gmail.com>
+	(envelope-from <groug@kaod.org>) id 1cts4I-0007pZ-Rf
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 04:38:06 -0400
+Received: from 8.mo179.mail-out.ovh.net ([46.105.75.26]:41699)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cts4I-0007mn-HV
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 04:38:02 -0400
+Received: from player755.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 0AC2C341C3
+	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 10:37:53 +0200 (CEST)
+Date: Fri, 31 Mar 2017 10:37:31 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170331103731.67fa5bf9@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <CAKXe6SJhBAjRm_BWQEombeApxbdvVdNnpEc53SfFwWDPT1bQGA@mail.gmail.com>
+References: <1490876834-61392-1-git-send-email-liqiang6-s@360.cn>
+	<c65ce78e-9a33-ee17-0a49-2a28390060f0@redhat.com>
+	<20170330174608.0ed57618@bahia.lab.toulouse-stg.fr.ibm.com>
+	<CAKXe6SKEbvxLWiCjSo7AYzAQmzdEGOeeYL47BYkcFPGx8VA20g@mail.gmail.com>
+	<20170331090731.27b10c0c@bahia.lab.toulouse-stg.fr.ibm.com>
+	<CAKXe6SJhBAjRm_BWQEombeApxbdvVdNnpEc53SfFwWDPT1bQGA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.9] pseries: Enforce homogeneous
- threads-per-core
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/vFq+iJcHqoyOq0mRrLob8P2";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH for-2.9?] 9pfs: fix migration_block leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,77 +35,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bharata B Rao <bharata.rao@gmail.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, lvivier@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
+To: Li Qiang <liq3ea@gmail.com>
+Cc: Eric Blake <eblake@redhat.com>, Li Qiang <liqiang6-s@360.cn>, Qemu Developers <qemu-devel@nongnu.org>, P J P <ppandit@redhat.com>
 
-On Fri, 31 Mar 2017 11:04:55 +0530
-Bharata B Rao <bharata.rao@gmail.com> wrote:
+--Sig_/vFq+iJcHqoyOq0mRrLob8P2
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> On Fri, Mar 31, 2017 at 10:21 AM, David Gibson <david@gibson.dropbear.id.au>
-> wrote:
-> 
-> > For reasons that may be useful in future, CPU core objects, as used on the
-> > pseries machine type have their own nr-threads property, potentially
-> > allowing cores with different numbers of threads in the same system.
-> >  
-> 
-> I remember we retained this flexibility to support heterogenous systems in
-> future ? I think we can go with this enforcement now and relax it later if
-> we ever reach there.
-> 
-> 
-> >
-> > If the user/management uses the values specified in query-hotpluggable-cpus
-> > as they're expected to do, this will never matter in pratice.  But that's
-> > not actually enforced - it's possible to manually specify a core with
-> > a different number of threads from that in -smp.  That will confuse the
-> > platform - most immediately, this can be used to create a CPU thread with
-> > index above max_cpus which leads to an assertion failure in
-> > spapr_cpu_core_realize().
-> >
-> > For now, enforce that all cores must have the same, standard, number of
-> > threads.  While we're at it, also enforce that the core ids are correctly
-> > aligned based on that number of threads.
-> >
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> >  hw/ppc/spapr_cpu_core.c | 12 ++++++++++++
-> >  1 file changed, 12 insertions(+)
-> >
-> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> > index 6883f09..935ee62 100644
-> > --- a/hw/ppc/spapr_cpu_core.c
-> > +++ b/hw/ppc/spapr_cpu_core.c
-> > @@ -167,6 +167,18 @@ static void spapr_cpu_core_realize(DeviceState *dev,
-> > Error **errp)
-> >      void *obj;
-> >      int i, j;
-> >
-> > +    if (cc->nr_threads != smp_threads) {
-> > +        error_setg(errp,
-> > +                   "Invalid nr-threads=%d of CPU[core-id: %d], must be
-> > %d",
-> > +                   cc->nr_threads, cc->core_id, smp_threads);
-> > +        return;
-> > +    }
-> >  
-> 
-> The above check should move to pre_plug handler.
-Agreed,
-this property validation should be done at machine level (pre_plug)
+On Fri, 31 Mar 2017 16:01:15 +0800
+Li Qiang <liq3ea@gmail.com> wrote:
 
-> 
-> 
-> > +    if ((cc->core_id % smp_threads) != 0) {
-> > +        error_setg(errp, "Invalid CPU core-id=%d, must be a multiple of
-> > %d",
-> > +                   cc->core_id, smp_threads);
-> > +        return;
-> > +    }
-> >  
-> 
-> Not sure when you will hit this as the same check is already  present in
-> pre_plug handler.
-> 
-> Regards,
-> Bharata.
+> 2017-03-31 15:07 GMT+08:00 Greg Kurz <groug@kaod.org>:
+>=20
+> > On Fri, 31 Mar 2017 09:26:35 +0800
+> > Li Qiang <liq3ea@gmail.com> wrote:
+> >
+> > > Hello,
+> > >
+> > > 2017-03-30 23:46 GMT+08:00 Greg Kurz <groug@kaod.org>:
+> > >
+> > > > On Thu, 30 Mar 2017 08:25:25 -0500
+> > > > Eric Blake <eblake@redhat.com> wrote:
+> > > >
+> > > > > On 03/30/2017 07:27 AM, Li Qiang wrote:
+> > > > > > The guest can leave the pdu->s->migration_blocker exists by att=
+ach
+> > > > >
+> > > > > s/exists/in place/
+> > > > > s/attach/attaching/
+> > > > >
+> > > >
+> > >
+> > > Eric,
+> > > Thanks for pointing my mistakes!
+> > >
+> > >
+> > > > > > but not remove a fid. Then if we hot unplug the 9pfs device, the
+> > > > >
+> > > >
+> > > > In theory you're right, but the current 9p client in linux won't let
+> > you
+> > > > hot
+> > > > unplug the device unless you unmount the 9p share first, hence free=
+ing
+> > the
+> > > > blocker.
+> > > >
+> > > >
+> > > I think we should consider every possible situation.
+> > >
+> > >
+> > > > > s/remove/removing/
+> > > > >
+> > > > > > v9fs_reset() just free the fids, but not free the
+> > migration_blocker.
+> > > > > > This will leak a memory leak. This patch avoid this.
+> > > >
+> > > > I had a similar issue sitting my TODO list for quite a time: the
+> > blocker
+> > > > survives a system_reset. It doesn't cause a memory leak but it prev=
+ents
+> > > > migration until the guest mounts/unmounts the 9p share again.
+> > > >
+> > > > This boils down to virtfs_reset() calling free_fid() instead of
+> > put_fid()
+> > > > IIRC.
+> > > >
+> > > > >
+> > > > > s/leak a/cause a/
+> > > > > s/avoid/avoids/
+> > > > >
+> > > > > >
+> > > > > > Signed-off-by: Li Qiang <liqiang6-s@360.cn>
+> > > > > > ---
+> > > > > >  hw/9pfs/9p.c | 6 ++++++
+> > > > > >  1 file changed, 6 insertions(+)
+> > > > >
+> > > > > Probably worth including in 2.9 as a bug fix.
+> > > > >
+> > > > > Reviewed-by: Eric Blake <eblake@redhat.com>
+> > > > >
+> > > > > >
+> > > > > > diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> > > > > > index 48babce..b55c02d 100644
+> > > > > > --- a/hw/9pfs/9p.c
+> > > > > > +++ b/hw/9pfs/9p.c
+> > > > > > @@ -548,6 +548,12 @@ static void coroutine_fn virtfs_reset(V9fs=
+PDU
+> > > > *pdu)
+> > > > > >              free_fid(pdu, fidp);
+> > > > > >          }
+> > > > > >      }
+> > > > > > +
+> > > > > > +    if (pdu->s->migration_blocker) {
+> > > > > > +        migrate_del_blocker(pdu->s->migration_blocker);
+> > > > > > +        error_free(pdu->s->migration_blocker);
+> > > > > > +        pdu->s->migration_blocker =3D NULL;
+> > > > > > +    }
+> > > >
+> > > > I'd prefer to drain all PDUs in virtfs_reset() and have the loop ab=
+ove
+> > > > to call put_fid() instead of free_fid(). If this isn't doable for 2=
+.9,
+> > > > I'll apply this patch with a comment.
+> > > >
+> > > >
+> > > Yes, I have considered to use put_fid() to fix this. But I'm not sure=
+ the
+> > > 'fidp->ref' is  at most 1 in virtfs_reset() function(I think it is).
+> > >
+> >
+> > And indeed, if the fid is involved in an I/O then its ref will be !=3D =
+0.
+> >
+> > > IIUC I think omit the 'else' branch, and call put_fid() directly like
+> > this.
+> > >
+> >
+> > This won't work: we must ensure that fidp->ref reaches zero (ie, drain
+> > all PDUs), then we can fidp->ref++ (ie, get a ref on the fid) and call
+> > put_fid(), which will drop the last ref of the fid and clear the blocker
+> > if this is the root fid.
+> >
+> >
+> Right, but how can we ensure we have drained all PDUs? Any idea?
+>=20
+
+Yep, I'll send patches shorty and Cc you.
+
+> Thanks.
+>=20
+>=20
+>=20
+> > > diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> > > index 48babce..ae97e79 100644
+> > > --- a/hw/9pfs/9p.c
+> > > +++ b/hw/9pfs/9p.c
+> > > @@ -544,9 +544,8 @@ static void coroutine_fn virtfs_reset(V9fsPDU *pd=
+u)
+> > >
+> > >          if (fidp->ref) {
+> > >              fidp->clunked =3D 1;
+> > > -        } else {
+> > > -            free_fid(pdu, fidp);
+> > >          }
+> > > +        put_fid(pdu, fidp);
+> > >      }
+> > >  }
+> > >
+> > >
+> > > If you agree, I will send a formal patch.
+> > >
+> > >
+> > >
+> > > > > >  }
+> > > > > >
+> > > > > >  #define P9_QID_TYPE_DIR         0x80
+> > > > > >
+> > > > >
+> > > >
+> > > >
+> >
+> >
+
+
+--Sig_/vFq+iJcHqoyOq0mRrLob8P2
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAljeFUsACgkQAvw66wEB28I3+gCgngaxgtPbpyNGZUQZhqY5IBdp
+/N0An2Y/hIGFY3T//NsNXjdLFwSbRVFZ
+=lnQj
+-----END PGP SIGNATURE-----
+
+--Sig_/vFq+iJcHqoyOq0mRrLob8P2--
