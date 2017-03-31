@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cu1gT-0002xm-5C
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 14:54:06 -0400
+	(envelope-from <eblake@redhat.com>) id 1cu1gV-0002zB-Cq
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 14:54:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cu1gS-00070M-Cg
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 14:54:05 -0400
+	(envelope-from <eblake@redhat.com>) id 1cu1gU-00071Y-Gz
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 14:54:07 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Fri, 31 Mar 2017 13:53:53 -0500
-Message-Id: <20170331185356.2479-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9 v8 0/3] Fix wipe of unaligned qcow2
- image [was add blkdebug tests]
+Date: Fri, 31 Mar 2017 13:53:55 -0500
+Message-Id: <20170331185356.2479-3-eblake@redhat.com>
+In-Reply-To: <20170331185356.2479-1-eblake@redhat.com>
+References: <20170331185356.2479-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v8 2/3] qcow2: Discard unaligned tail when
+ wiping image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,39 +23,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-Available as a tag at:
-git fetch git://repo.or.cz/qemu/ericb.git nbd-blkdebug-v8
+There is a subtle difference between the fast (qcow2v3 with no
+extra data) and slow path (qcow2v2 format [aka 0.10], or when a
+snapshot is present) of qcow2_make_empty().  The slow path fails
+to discard the final (partial) cluster of an unaligned image.
 
-(which is somewhat of a misnomer for this current version of the
-series, but historically correct)
+The problem stems from the fact that qcow2_discard_clusters() was
+silently ignoring sub-cluster head and tail on unaligned requests.
+A quick audit of all callers shows that qcow2_snapshot_create() has
+always passed a cluster-aligned request since the call was added
+in commit 1ebf561; qcow2_co_pdiscard() has passed a cluster-aligned
+request since commit ecdbead taught the block layer about preferred
+discard alignment; and qcow2_make_empty() was fixed to pass an
+aligned start (but not necessarily end) in commit a3e1505.
 
-v6 was:
-https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg01562.html
-v7 was:
-https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg06175.html
+Asserting that the start is always aligned also points out that we
+now have a dead check: rounding the end offset down can never result
+in a value less than the aligned start offset (the check was rendered
+dead with commit ecdbead).  Meanwhile, we do not want to round the
+end cluster down in the one case of the end offset matching the
+(unaligned) file size - that final partial cluster should still be
+discarded.
 
-Since then: reorder patches 2 and 3, and update commit messages to match
+With those fixes in place, the fast and slow paths are back in sync
+at discarding an entire image; the next patch will update
+qemu-iotests to ensure we don't regress.
 
-001/3:[----] [--] 'iotests: fix 097 when run with qcow'
-002/3:[0002] [FC] 'qcow2: Discard unaligned tail when wiping image'
-003/3:[0002] [FC] 'iotests: Improve image-clear tests on non-aligned image'
+Note that bdrv_co_pdiscard ignores ALL partial cluster requests,
+including the partial cluster at the end of an image; it can be
+argued that the partial cluster at the end should be special-cased
+so that a guest issuing discard requests at proper alignments
+everywhere else can likewise empty the entire image.  But that
+optimization is left for another day.
 
-Daniel P. Berrange (1):
-  iotests: fix 097 when run with qcow
+Signed-off-by: Eric Blake <eblake@redhat.com>
 
-Eric Blake (2):
-  qcow2: Discard unaligned tail when wiping image
-  iotests: Improve image-clear tests on non-aligned image
+---
+v8: swap patch order
+v7: new patch
+---
+ block/qcow2-cluster.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
- block/qcow2-cluster.c      |  10 +--
- tests/qemu-iotests/097     |  27 +++----
- tests/qemu-iotests/097.out | 180 ++++++++++++---------------------------------
- tests/qemu-iotests/176     | 131 +++++++++++++++++++++++++++++++++
- tests/qemu-iotests/176.out | 150 +++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/group   |   1 +
- 6 files changed, 345 insertions(+), 154 deletions(-)
- create mode 100755 tests/qemu-iotests/176
- create mode 100644 tests/qemu-iotests/176.out
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 78c11d4..100398c 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -1519,12 +1519,10 @@ int qcow2_discard_clusters(BlockDriverState *bs, uint64_t offset,
 
+     end_offset = offset + (nb_sectors << BDRV_SECTOR_BITS);
+
+-    /* Round start up and end down */
+-    offset = align_offset(offset, s->cluster_size);
+-    end_offset = start_of_cluster(s, end_offset);
+-
+-    if (offset > end_offset) {
+-        return 0;
++    /* The caller must cluster-align start; round end down except at EOF */
++    assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
++    if (end_offset != bs->total_sectors * BDRV_SECTOR_SIZE) {
++        end_offset = start_of_cluster(s, end_offset);
+     }
+
+     nb_clusters = size_to_clusters(s, end_offset - offset);
 -- 
 2.9.3
