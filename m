@@ -1,36 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50049)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cttfJ-0006k8-UZ
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 06:20:22 -0400
+	(envelope-from <kraxel@redhat.com>) id 1cttkP-0008NS-W4
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 06:25:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cttfJ-0004nB-19
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 06:20:21 -0400
-References: <bd7cb196-0779-42ad-ce9c-5871d307adce@kamp.de>
-	<82d604c8-068a-aff4-6037-e3cd247b3588@redhat.com>
-	<819af057-3777-dffc-4670-895b8265fd01@kamp.de>
-	<d41d1428-4c8b-7e2f-b197-8d45b834776d@redhat.com>
-	<32e1e781-f0b0-ac67-a5ce-74ccc64071a0@kamp.de>
-	<20170320024649.GA18938@lemon.lan>
-	<37879546-cf6e-01fa-adc6-c777e14eab0e@redhat.com>
-	<20170320114926.GB17020@lemon.lan>
-	<b3bf1d26-7caa-1d0d-c8a1-02f4c80e51e4@kamp.de>
-	<fc755658-8d1d-db71-1f4d-2e18f5c3c4b2@kamp.de>
-	<ff4b36e6-cf69-5b32-77b7-285adf4aaca0@redhat.com>
-	<4aa3e0fc-1176-af7d-bef9-2b881a984605@kamp.de>
-	<f0e9decf-7b92-9218-a43f-d7d6eee10208@redhat.com>
-	<a7b9b590-a0b5-5b2f-3efa-bfafefc5037c@kamp.de>
-	<df268a18-9b31-61d7-c449-e36f6ca12930@redhat.com>
-	<293a74e1-f355-6969-9b76-9913e7f56930@kamp.de>
-	<5cb7f3f5-cd3f-b54c-3109-140dee3b2cad@redhat.com>
-	<3c972a26-18a1-2636-ed80-6b73b972401d@kamp.de>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b5f8ef2d-b014-c5c5-f3a2-cd6aee8116ca@redhat.com>
-Date: Fri, 31 Mar 2017 12:20:10 +0200
-MIME-Version: 1.0
-In-Reply-To: <3c972a26-18a1-2636-ed80-6b73b972401d@kamp.de>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] callout to *file in bdrv_co_get_block_status
+	(envelope-from <kraxel@redhat.com>) id 1cttkK-00072l-EH
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 06:25:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39866)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cttkK-00071e-8Q
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 06:25:32 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4C8D8437F50
+	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 10:25:29 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri, 31 Mar 2017 12:25:21 +0200
+Message-Id: <20170331102521.29253-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] xhci: flush dequeue pointer to endpoint context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,23 +27,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>, Fam Zheng <famz@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
+When done processing a endpoint ring we must update the dequeue pointer
+in the endpoint context in guest memory.  This is needed to make sure
+the guest has a correct view of things and also to make live migration
+work properly, because xhci post_load restores alot of the state from
+xhci data structures in guest memory.
 
+Add xhci_set_ep_state() call to do that.
 
-On 31/03/2017 09:55, Peter Lieven wrote:
->>> Would it be an idea to introduce an inverse flag live BDRV_BLOCK_NOT_ZERO
->>> for cases where we know that there is really DATA and thus can avoid the
->>> second callout?
->> How would you know that a block is nonzero?
-> I would trust the metadata. At least for VMDK and QCOW2v3.
-> Bad idea?
+The recursive calls stopped by commit
+ddb603ab6c981c1d67cb42266fc700c33e5b2d8f had the (unintentional) side
+effect to hiding this bug.  xhci_set_ep_state() was called before
+processing, to set the state to running, which updated the dequeue
+pointer too.
 
-The metadata only tells you that a block is zero, not that it's nonzero.
- What you are suggesting is really the same as removing the recursion.
-However, I still haven't understood clearly if it's a QEMU or tmpfs bug;
-if it's a tmpfs bug your suggestion would not fix tmpfs slowness on raw
-images.
+Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/usb/hcd-xhci.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Paolo
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index 8958f95..a6929e5 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -2063,7 +2063,7 @@ static void xhci_kick_ep(XHCIState *xhci, unsigned int slotid,
+ static void xhci_kick_epctx(XHCIEPContext *epctx, unsigned int streamid)
+ {
+     XHCIState *xhci = epctx->xhci;
+-    XHCIStreamContext *stctx;
++    XHCIStreamContext *stctx = NULL;
+     XHCITransfer *xfer;
+     XHCIRing *ring;
+     USBEndpoint *ep = NULL;
+@@ -2192,6 +2192,8 @@ static void xhci_kick_epctx(XHCIEPContext *epctx, unsigned int streamid)
+             break;
+         }
+     }
++    /* update ring dequeue ptr */
++    xhci_set_ep_state(xhci, epctx, stctx, epctx->state);
+     epctx->kick_active--;
+ 
+     ep = xhci_epid_to_usbep(epctx);
+-- 
+2.9.3
