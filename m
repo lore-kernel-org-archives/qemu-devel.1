@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cu1pE-00008O-NV
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:03:11 -0400
+	(envelope-from <Alexandru.Avadanii@enea.com>) id 1cu1tC-0002Ei-Ff
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:07:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cu1pB-0003Ra-K3
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:03:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57212)
+	(envelope-from <Alexandru.Avadanii@enea.com>) id 1cu1t9-0005M4-8Z
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:07:14 -0400
+Received: from smtp-out10.electric.net ([185.38.180.38]:58723)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cu1pB-0003Qb-BU
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:03:05 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4BEDE61BB0
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 19:03:04 +0000 (UTC)
-Date: Fri, 31 Mar 2017 20:02:58 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170331190258.GH2408@work-vm>
-References: <1490599288-11751-1-git-send-email-peterx@redhat.com>
-	<1490599288-11751-5-git-send-email-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <Alexandru.Avadanii@enea.com>)
+	id 1cu1t9-0005Lv-0y
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:07:11 -0400
+From: Alexandru Avadanii <Alexandru.Avadanii@enea.com>
+Date: Fri, 31 Mar 2017 19:07:06 +0000
+Message-ID: <058D52979F67BF47BCD9EA78EAECA6DC777A015E@SESTOEX04.enea.se>
+References: <C885D0FF6A27744DB0B822E32DF6EF029B1CA14A@SESTOEX04.enea.se>
+	<9b05e60a-f8c2-ea4f-6be4-f17c0adec510@redhat.com>
+	<C885D0FF6A27744DB0B822E32DF6EF029B1CA282@SESTOEX04.enea.se>
+	<d3ab5208-b9a6-6e83-2c87-f988a9031ebc@redhat.com>
+In-Reply-To: <d3ab5208-b9a6-6e83-2c87-f988a9031ebc@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1490599288-11751-5-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/5] hmp: info migrate_parameters format
- tunes
+Subject: Re: [Qemu-devel] nbd: Possible regression in 2.9 RCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,84 +31,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, Ciprian Barbu <Ciprian.Barbu@enea.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>
+Cc: Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>, svc-armband <armband@enea.com>, Kevin Wolf <kwolf@redhat.com>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Do the same (one per line) to the parameter list.
-> 
-> CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+Hi,
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> -----Original Message-----
+> From: Max Reitz [mailto:mreitz@redhat.com]
+> Sent: Friday, March 31, 2017 8:57 PM
+> To: Ciprian Barbu; qemu-devel@nongnu.org; Eric Blake; Alexandru Avadanii
+> Cc: Jeff Cody; Markus Armbruster; svc-armband; Kevin Wolf
+> Subject: Re: [Qemu-devel] nbd: Possible regression in 2.9 RCs
+>=20
+> On 31.03.2017 19:49, Ciprian Barbu wrote:
+> > Hi,
+> >
+> > Thank you for getting back!
+> >
+> > I'm trying to follow you, but I don't understand all the details. I wou=
+ld like to
+> ask this question though:
+> >
+> > What is the difference between v2.8.0 and this commit? With v2.8.0 the
+> same qemu command worked, but I admit it doesn't request sharing.
+>=20
+> The difference is that we now make sure there are for example not two
+> writers for the same block device (unless both agree that it's OK to have
+> shared writers). We haven't done that before.
+>=20
+> The built-in NBD server is completely OK with writes by other parties (su=
+ch as
+> guest devices), but guest devices generally are not (because the guest OS
+> should know about this).
+>=20
+> Therefore, you'd now have to set the share-rw flag for guest devices whic=
+h
+> should allow shared writers. Otherwise you cannot set up an NBD server on=
+ a
+> block device that is in use by the guest device.
 
-> ---
->  hmp.c | 22 ++++++++++------------
->  1 file changed, 10 insertions(+), 12 deletions(-)
-> 
-> diff --git a/hmp.c b/hmp.c
-> index 95eef8c..b33e39e 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -282,46 +282,44 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
->      params = qmp_query_migrate_parameters(NULL);
->  
->      if (params) {
-> -        monitor_printf(mon, "parameters:");
->          assert(params->has_compress_level);
-> -        monitor_printf(mon, " %s: %" PRId64,
-> +        monitor_printf(mon, "%s: %" PRId64 "\n",
->              MigrationParameter_lookup[MIGRATION_PARAMETER_COMPRESS_LEVEL],
->              params->compress_level);
->          assert(params->has_compress_threads);
-> -        monitor_printf(mon, " %s: %" PRId64,
-> +        monitor_printf(mon, "%s: %" PRId64 "\n",
->              MigrationParameter_lookup[MIGRATION_PARAMETER_COMPRESS_THREADS],
->              params->compress_threads);
->          assert(params->has_decompress_threads);
-> -        monitor_printf(mon, " %s: %" PRId64,
-> +        monitor_printf(mon, "%s: %" PRId64 "\n",
->              MigrationParameter_lookup[MIGRATION_PARAMETER_DECOMPRESS_THREADS],
->              params->decompress_threads);
->          assert(params->has_cpu_throttle_initial);
-> -        monitor_printf(mon, " %s: %" PRId64,
-> +        monitor_printf(mon, "%s: %" PRId64 "\n",
->              MigrationParameter_lookup[MIGRATION_PARAMETER_CPU_THROTTLE_INITIAL],
->              params->cpu_throttle_initial);
->          assert(params->has_cpu_throttle_increment);
-> -        monitor_printf(mon, " %s: %" PRId64,
-> +        monitor_printf(mon, "%s: %" PRId64 "\n",
->              MigrationParameter_lookup[MIGRATION_PARAMETER_CPU_THROTTLE_INCREMENT],
->              params->cpu_throttle_increment);
-> -        monitor_printf(mon, " %s: '%s'",
-> +        monitor_printf(mon, "%s: '%s'\n",
->              MigrationParameter_lookup[MIGRATION_PARAMETER_TLS_CREDS],
->              params->has_tls_creds ? params->tls_creds : "");
-> -        monitor_printf(mon, " %s: '%s'",
-> +        monitor_printf(mon, "%s: '%s'\n",
->              MigrationParameter_lookup[MIGRATION_PARAMETER_TLS_HOSTNAME],
->              params->has_tls_hostname ? params->tls_hostname : "");
->          assert(params->has_max_bandwidth);
-> -        monitor_printf(mon, " %s: %" PRId64 " bytes/second",
-> +        monitor_printf(mon, "%s: %" PRId64 " bytes/second\n",
->              MigrationParameter_lookup[MIGRATION_PARAMETER_MAX_BANDWIDTH],
->              params->max_bandwidth);
->          assert(params->has_downtime_limit);
-> -        monitor_printf(mon, " %s: %" PRId64 " milliseconds",
-> +        monitor_printf(mon, "%s: %" PRId64 " milliseconds\n",
->              MigrationParameter_lookup[MIGRATION_PARAMETER_DOWNTIME_LIMIT],
->              params->downtime_limit);
->          assert(params->has_x_checkpoint_delay);
-> -        monitor_printf(mon, " %s: %" PRId64,
-> +        monitor_printf(mon, "%s: %" PRId64 "\n",
->              MigrationParameter_lookup[MIGRATION_PARAMETER_X_CHECKPOINT_DELAY],
->              params->x_checkpoint_delay);
-> -        monitor_printf(mon, "\n");
->      }
->  
->      qapi_free_MigrationParameters(params);
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Thank you for the detailed explanation!
+
+>=20
+> > We also use libvirt v1.3.4, which might be a problem, but at least we w=
+ant
+> to understand if the commit in question introduced an obvious problem or =
+if
+> it's all in the details.
+>=20
+> Well, I don't think there is any libvirt version that knows about this fl=
+ag yet.
+>=20
+> ...maybe another way to resolve the issue would be to set share-rw to tru=
+e
+> by default for now, noting that this will be changed in the future.
+> In any case, I'm afraid we'll have to wait until Kevin is around on Monda=
+y.
+
+Ciprian is gone for the week-end too, so next week it is :)
+I think we will change the default for now in our builds, and wait for the =
+proper support in Libvirt.
+Ty for the default suggestion, btw!
+
+BR,
+Alex
+
+>=20
+> > Btw, the qemu command generated by libvirt is this one, sorry about tha=
+t:
+>=20
+> And sorry about not yet having thanked you for reporting this issue. :-)
+>=20
+> Max
+>=20
+> > 2017-03-31 17:40:10.956+0000: starting up libvirt version: 1.3.4,
+> > package: 0+amos3~u16.04 (Enea Armband Devops Team
+> <armband@enea.com>
+> > Fri, 13 Jan 2017 02:06:05 +0100), qemu version: 2.8.50(Debian
+> > 1:2.9+amos2~u16.04), hostname: node-2.domain.tld LC_ALL=3DC
+> > PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+> > QEMU_AUDIO_DRV=3Dnone /usr/bin/kvm -name
+> > instance-00000076,debug-threads=3Don -S -object
+> > secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain=
+-14-i
+> > nstance-00000076/master-key.aes -machine
+> > virt-2.8,accel=3Dkvm,usb=3Doff,gic-version=3D3 -cpu host -m 256 -realti=
+me
+> > mlock=3Doff -smp 1,sockets=3D1,cores=3D1,threads=3D1 -uuid
+> > 2812f3c9-f564-499b-a8c7-e9e7ccf24143 -no-user-config -nodefaults -
+> chardev socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-14-
+> instance-00000076/monitor.sock,server,nowait -mon
+> chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc,driftfi=
+x=3Dslew -
+> no-shutdown -boot strict=3Don -kernel /var/lib/nova/instances/2812f3c9-f5=
+64-
+> 499b-a8c7-e9e7ccf24143/kernel -initrd /var/lib/nova/instances/2812f3c9-
+> f564-499b-a8c7-e9e7ccf24143/ramdisk -append 'root=3D/dev/vda1 rw rootwait
+> console=3Dtty0 console=3DttyS0 console=3DttyAMA0' -device i82801b11-
+> bridge,id=3Dpci.1,bus=3Dpcie.0,addr=3D0x1 -device pci-
+> bridge,chassis_nr=3D2,id=3Dpci.2,bus=3Dpci.1,addr=3D0x0 -usb -drive
+> file=3D/var/lib/nova/instances/2812f3c9-f564-499b-a8c7-
+> e9e7ccf24143/disk,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-
+> disk0,cache=3Dnone,aio=3Dnative -device virtio-blk-device,scsi=3Doff,driv=
+e=3Ddrive-
+> virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1 -drive
+> file=3D/var/lib/nova/instances/2812f3c9-f564-499b-a8c7-
+> e9e7ccf24143/disk.config,format=3Draw,if=3Dnone,id=3Ddrive-virtio-
+> disk1,cache=3Dnone,aio=3Dnative -device virtio-blk-device,scsi=3Doff,driv=
+e=3Ddrive-
+> virtio-disk1,id=3Dvirtio-disk1 -netdev tap,fd=3D27,id=3Dhostnet0 -device =
+virtio-net-
+> device,netdev=3Dhostnet0,id=3Dnet0,mac=3Dfa:16:3e:82:0a:2b -serial
+> file:/var/lib/nova/instances/2812f3c9-f564-499b-a8c7-
+> e9e7ccf24143/console.log -serial pty -vnc 0.0.0.0:0 -k en-us -device
+> VGA,id=3Dvideo0,vgamem_mb=3D16,bus=3Dpci.2,addr=3D0x1 -device virtio-ball=
+oon-
+> device,id=3Dballoon0 -msg timestamp=3Don Domain id=3D14 is tainted: high-
+> privileges
+> >
+> > Regards,
+> > /Ciprian
+> >
