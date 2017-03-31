@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1ctt3M-0006Vd-KB
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:41:09 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1cttDU-0008PU-A9
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:51:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1ctt3L-0005RP-IF
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:41:08 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1cttDQ-0003J2-AC
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:51:36 -0400
+Received: from mga06.intel.com ([134.134.136.31]:4782)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1cttDQ-0003IQ-1w
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:51:32 -0400
+Message-ID: <58DE26FC.7090403@intel.com>
+Date: Fri, 31 Mar 2017 17:53:00 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20170331090806.GH11195@lemon.lan>
-References: <1490440701-12037-1-git-send-email-ashijeetacharya@gmail.com>
-	<1490440701-12037-8-git-send-email-ashijeetacharya@gmail.com>
-	<20170331072609.GE11195@lemon.lan>
-	<CAC2QTZaL2aDatNoKoxEWn0XYxtfD6RDpB9gWn9h4+QE0vg2mMw@mail.gmail.com>
-	<20170331090806.GH11195@lemon.lan>
-From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Fri, 31 Mar 2017 15:11:02 +0530
-Message-ID: <CAC2QTZZQDVnxOisnobkEM+=Bu30doLJ01zLB1fVPjq8HZY11qQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2 7/7] vmdk: Update metadata for multiple
- clusters
+References: <1489648127-37282-1-git-send-email-wei.w.wang@intel.com>
+	<1489648127-37282-4-git-send-email-wei.w.wang@intel.com>
+	<20170316142842.69770813b98df70277431b1e@linux-foundation.org>
+	<58CB8865.5030707@intel.com>
+	<20170329204418-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20170329204418-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH kernel v8 3/4] mm: add inerface to offer
+ info about unused pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,162 +32,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, dave.hansen@intel.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com
 
-On Fri, Mar 31, 2017 at 2:38 PM, Fam Zheng <famz@redhat.com> wrote:
-> On Fri, 03/31 14:17, Ashijeet Acharya wrote:
->> On Fri, Mar 31, 2017 at 12:56 PM, Fam Zheng <famz@redhat.com> wrote:
->> > On Sat, 03/25 16:48, Ashijeet Acharya wrote:
->> >> Include a next pointer in VmdkMetaData struct to point to the previous
->> >> allocated L2 table. Modify vmdk_L2update to start updating metadata for
->> >> allocation of multiple clusters at once.
->> >>
->> >> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
->> >> ---
->> >>  block/vmdk.c | 131 ++++++++++++++++++++++++++++++++++++++++++++++-------------
->> >>  1 file changed, 102 insertions(+), 29 deletions(-)
->> >>
->> >> diff --git a/block/vmdk.c b/block/vmdk.c
->> >> index 3de8b8f..4517409 100644
->> >> --- a/block/vmdk.c
->> >> +++ b/block/vmdk.c
->> >> @@ -137,6 +137,8 @@ typedef struct VmdkMetaData {
->> >>      int valid;
->> >>      uint32_t *l2_cache_entry;
->> >>      uint32_t nb_clusters;
->> >> +    uint32_t offset;
->> >> +    struct VmdkMetaData *next;
->> >>  } VmdkMetaData;
->> >>
->> >>  typedef struct VmdkGrainMarker {
->> >> @@ -1037,29 +1039,81 @@ static void vmdk_refresh_limits(BlockDriverState *bs, Error **errp)
->> >>      }
->> >>  }
->> >>
->> >> -static int vmdk_L2update(VmdkExtent *extent, VmdkMetaData *m_data,
->> >> -                         uint32_t offset)
->> >> +static int vmdk_alloc_cluster_link_l2(VmdkExtent *extent,
->> >> +                                      VmdkMetaData *m_data, bool zeroed)
->> >>  {
->> >> -    offset = cpu_to_le32(offset);
->> >> +    int i;
->> >> +    uint32_t offset, temp_offset;
->> >> +
->> >> +    if (zeroed) {
->> >> +        temp_offset = VMDK_GTE_ZEROED;
->> >> +    } else {
->> >> +        temp_offset = m_data->offset;
->> >> +    }
->> >> +
->> >> +    temp_offset = cpu_to_le32(temp_offset);
->> >> +
->> >>      /* update L2 table */
->> >> -    if (bdrv_pwrite_sync(extent->file,
->> >> +    offset = temp_offset;
->> >> +    for (i = 0; i < m_data->nb_clusters; i++) {
->> >> +        if (bdrv_pwrite_sync(extent->file,
->> >>                  ((int64_t)m_data->l2_offset * 512)
->> >> -                    + (m_data->l2_index * sizeof(offset)),
->> >> -                &offset, sizeof(offset)) < 0) {
->> >> -        return VMDK_ERROR;
->> >> +                    + ((m_data->l2_index + i) * sizeof(offset)),
->> >> +                &(offset), sizeof(offset)) < 0) {
->> >> +            return VMDK_ERROR;
->> >> +        }
->> >> +        if (!zeroed) {
->> >> +            offset += 128;
->> >> +        }
->> >>      }
->> >> +
->> >>      /* update backup L2 table */
->> >> +    offset = temp_offset;
->> >>      if (extent->l1_backup_table_offset != 0) {
->> >>          m_data->l2_offset = extent->l1_backup_table[m_data->l1_index];
->> >> -        if (bdrv_pwrite_sync(extent->file,
->> >> -                    ((int64_t)m_data->l2_offset * 512)
->> >> -                        + (m_data->l2_index * sizeof(offset)),
->> >> -                    &offset, sizeof(offset)) < 0) {
->> >> -            return VMDK_ERROR;
->> >> +        for (i = 0; i < m_data->nb_clusters; i++) {
->> >> +            if (bdrv_pwrite_sync(extent->file,
->> >> +                        ((int64_t)m_data->l2_offset * 512)
->> >> +                            + ((m_data->l2_index + i) * sizeof(offset)),
->> >> +                        &(offset), sizeof(offset)) < 0) {
->> >> +                return VMDK_ERROR;
->> >> +            }
->> >> +            if (!zeroed) {
->> >> +                offset += 128;
->> >> +            }
->> >>          }
->> >>      }
->> >> +
->> >> +    offset = temp_offset;
->> >>      if (m_data->l2_cache_entry) {
->> >> -        *m_data->l2_cache_entry = offset;
->> >> +        for (i = 0; i < m_data->nb_clusters; i++) {
->> >> +            *m_data->l2_cache_entry = offset;
->> >> +            m_data->l2_cache_entry++;
->> >> +
->> >> +            if (!zeroed) {
->> >> +                offset += 128;
->> >> +            }
->> >> +        }
->> >> +    }
->> >> +
->> >> +    return VMDK_OK;
->> >> +}
->> >> +
->> >> +static int vmdk_L2update(VmdkExtent *extent, VmdkMetaData *m_data,
->> >> +                         bool zeroed)
->> >> +{
->> >> +    int ret;
->> >> +
->> >> +    while (m_data->next != NULL) {
->> >> +        VmdkMetaData *next;
->> >> +
->> >> +        ret = vmdk_alloc_cluster_link_l2(extent, m_data, zeroed);
->> >> +        if (ret < 0) {
->> >> +            return ret;
->> >> +        }
->> >> +
->> >> +        next = m_data->next;
->> >> +        m_data = next;
->> >
->> > I don't see why the next pointer is necessary.  Also the tail is always unused,
->> > why do you need to allocate it?
+On 03/30/2017 01:48 AM, Michael S. Tsirkin wrote:
+> On Fri, Mar 17, 2017 at 02:55:33PM +0800, Wei Wang wrote:
+>> On 03/17/2017 05:28 AM, Andrew Morton wrote:
+>>> On Thu, 16 Mar 2017 15:08:46 +0800 Wei Wang <wei.w.wang@intel.com> wrote:
+>>>
+>>>> From: Liang Li <liang.z.li@intel.com>
+>>>>
+>>>> This patch adds a function to provides a snapshot of the present system
+>>>> unused pages. An important usage of this function is to provide the
+>>>> unsused pages to the Live migration thread, which skips the transfer of
+>>>> thoses unused pages. Newly used pages can be re-tracked by the dirty
+>>>> page logging mechanisms.
+>>> I don't think this will be useful for anything other than
+>>> virtio-balloon.  I guess it would be better to keep this code in the
+>>> virtio-balloon driver if possible, even though that's rather a layering
+>>> violation :( What would have to be done to make that possible?  Perhaps
+>>> we can put some *small* helpers into page_alloc.c to prevent things
+>>> from becoming too ugly.
+>> The patch description was too narrowed and may have caused some
+>> confusion, sorry about that. This function is aimed to be generic. I
+>> agree with the description suggested by Michael.
 >>
->> If I don't allocate the tail, I was getting a segfault in vmdk_pwritev().
+>> Since the main body of the function is related to operating on the
+>> free_list. I think it is better to have them located here.
+>> Small helpers may be less efficient and thereby causing some
+>> performance loss as well.
+>> I think one improvement we can make is to remove the "chunk format"
+>> related things from this function. The function can generally offer the
+>> base pfn to the caller's recording buffer. Then it will be the caller's
+>> responsibility to format the pfn if they need.
+> Sounds good at a high level, but we'd have to see the implementation
+> to judge it properly.
 >
-> That may be because the way you interate the linked list in vmdk_pwritev is:
->
->>        while (m_data->next != NULL) {
->>            VmdkMetaData *next;
->>            next = m_data->next;
->>            g_free(m_data);
->>            m_data = next;
->>        }
+>>>> --- a/mm/page_alloc.c
+>>>> +++ b/mm/page_alloc.c
+>>>> @@ -4498,6 +4498,120 @@ void show_free_areas(unsigned int filter)
+>>>>    	show_swap_cache_info();
+>>>>    }
+>>>> +static int __record_unused_pages(struct zone *zone, int order,
+>>>> +				 __le64 *buf, unsigned int size,
+>>>> +				 unsigned int *offset, bool part_fill)
+>>>> +{
+>>>> +	unsigned long pfn, flags;
+>>>> +	int t, ret = 0;
+>>>> +	struct list_head *curr;
+>>>> +	__le64 *chunk;
+>>>> +
+>>>> +	if (zone_is_empty(zone))
+>>>> +		return 0;
+>>>> +
+>>>> +	spin_lock_irqsave(&zone->lock, flags);
+>>>> +
+>>>> +	if (*offset + zone->free_area[order].nr_free > size && !part_fill) {
+>>>> +		ret = -ENOSPC;
+>>>> +		goto out;
+>>>> +	}
+>>>> +	for (t = 0; t < MIGRATE_TYPES; t++) {
+>>>> +		list_for_each(curr, &zone->free_area[order].free_list[t]) {
+>>>> +			pfn = page_to_pfn(list_entry(curr, struct page, lru));
+>>>> +			chunk = buf + *offset;
+>>>> +			if (*offset + 2 > size) {
+>>>> +				ret = -ENOSPC;
+>>>> +				goto out;
+>>>> +			}
+>>>> +			/* Align to the chunk format used in virtio-balloon */
+>>>> +			*chunk = cpu_to_le64(pfn << 12);
+>>>> +			*(chunk + 1) = cpu_to_le64((1 << order) << 12);
+>>>> +			*offset += 2;
+>>>> +		}
+>>>> +	}
+>>>> +
+>>>> +out:
+>>>> +	spin_unlock_irqrestore(&zone->lock, flags);
+>>>> +
+>>>> +	return ret;
+>>>> +}
+>>> This looks like it could disable interrupts for a long time.  Too long?
+>> What do you think if we give "budgets" to the above function?
+>> For example, budget=1000, and there are 2000 nodes on the list.
+>> record() returns with "incomplete" status in the first round, along with the
+>> status info, "*continue_node".
 >>
+>> *continue_node: pointer to the starting node of the leftover. If
+>> *continue_node
+>> has been used at the time of the second call (i.e. continue_node->next ==
+>> NULL),
+>> which implies that the previous 1000 nodes have been used, then the record()
+>> function can simply start from the head of the list.
+>>
+>> It is up to the caller whether it needs to continue the second round
+>> when getting "incomplete".
+> It might be cleaner to add APIs to
+> 	- start iteration
+> 	- do one step
+> 	- end iteration
 >
-> which does require a dummy tail.
-
-No, I remember it segfaulting even before I inserted that piece of
-code. I think the reason is that I try to access m_data->valid inside
-vmdk_pwritev()...
-
+> caller can then iterate without too many issues
 >
-> But after all it's still not clear to me why you cannot keep m_data on stack,
 
-...and by using malloc and moving it to the heap solved my problem,
-plus for constructing the linked list.
+OK. I will re-implement it with this simple one - get only one node(page 
+block) from the list in each call, and check if the time would increase 
+a lot in comparison to v8.
 
-> and why you need the next pointer at all.
-
-If I don't segregate them in batches of 512, I will need to increment
-the l2_offset manually...right? If I don't use the next pointer, what
-solution do you recommend?
-
-Ashijeet
-
->
-> Fam
+Best,
+Wei
