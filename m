@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cu2Ck-0006nT-Jv
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:27:27 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1cu2Cs-0006sH-Hn
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:27:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cu2Cj-0004Cl-B5
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:27:26 -0400
-Date: Fri, 31 Mar 2017 15:27:16 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170331192716.GI1135@localhost.localdomain>
-References: <20170331120431.1767-1-mreitz@redhat.com>
-	<20170331120431.1767-2-mreitz@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170331120431.1767-2-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.9 1/2] qapi/curl: Extend
- and fix blockdev-add schema
+	(envelope-from <ehabkost@redhat.com>) id 1cu2Co-0004IU-NC
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:27:34 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Fri, 31 Mar 2017 16:27:22 -0300
+Message-Id: <20170331192724.14339-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.10 0/2] etsec: (TYPE_)ETSEC_COMMON macro
+ cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,156 +18,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Alexander Graf <agraf@suse.de>, Scott Wood <scottwood@freescale.com>, qemu-ppc@nongnu.org, Fabien Chouteau <chouteau@adacore.com>, Jason Wang <jasowang@redhat.com>
 
-On Fri, Mar 31, 2017 at 02:04:30PM +0200, Max Reitz wrote:
-> The curl block driver accepts more options than just "filename"; also,
-> the URL is actually expected to be passed through the "url" option
-> instead of "filename".
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  qapi/block-core.json | 103 ++++++++++++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 94 insertions(+), 9 deletions(-)
-> 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index b5f0e9958c..033457ce86 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -2737,16 +2737,101 @@
->              '*debug': 'int' } }
->  
->  ##
-> -# @BlockdevOptionsCurl:
-> +# @BlockdevOptionsCurlBase:
->  #
-> -# Driver specific block device options for the curl backend.
-> +# Driver specific block device options shared by all protocols supported by the
-> +# curl backend.
->  #
-> -# @filename:    path to the image file
-> +# @url:                     URL of the image file
-> +#
-> +# @readahead:               Size of the read-ahead cache; must be a multiple of
-> +#                           512 (defaults to 256 kB)
-> +#
-> +# @timeout:                 Timeout for connections, in seconds (defaults to 5)
-> +#
-> +# @username:                Username for authentication (defaults to none)
-> +#
-> +# @password-secret:         ID of a QCryptoSecret object providing a password
-> +#                           for authentication (defaults to no password)
-> +#
-> +# @proxy-username:          Username for proxy authentication (defaults to none)
-> +#
-> +# @proxy-password-secret:   ID of a QCryptoSecret object providing a password
-> +#                           for proxy authentication (defaults to no password)
-> +#
-> +# Since: 2.9
-> +##
-> +{ 'struct': 'BlockdevOptionsCurlBase',
-> +  'data': { 'url': 'str',
-> +            '*readahead': 'int',
-> +            '*timeout': 'int',
-> +            '*username': 'str',
-> +            '*password-secret': 'str',
-> +            '*proxy-username': 'str',
-> +            '*proxy-password-secret': 'str' } }
-> +
-> +##
-> +# @BlockdevOptionsCurlHttp:
-> +#
-> +# Driver specific block device options for HTTP connections over the curl
-> +# backend.  URLs must start with "http://".
-> +#
-> +# @cookie:      List of cookies to set; format is
-> +#               "name1=content1; name2=content2;" as explained by
-> +#               CURLOPT_COOKIE(3). Defaults to no cookies.
-> +#
-> +# Since: 2.9
-> +##
-> +{ 'struct': 'BlockdevOptionsCurlHttp',
-> +  'base': 'BlockdevOptionsCurlBase',
-> +  'data': { '*cookie': 'str' } }
-> +
-> +##
-> +# @BlockdevOptionsCurlHttps:
-> +#
-> +# Driver specific block device options for HTTPS connections over the curl
-> +# backend.  URLs must start with "https://".
-> +#
-> +# @cookie:      List of cookies to set; format is
-> +#               "name1=content1; name2=content2;" as explained by
-> +#               CURLOPT_COOKIE(3). Defaults to no cookies.
-> +#
-> +# @sslverify:   Whether to verify the SSL certificate's validity (defaults to
-> +#               true)
-> +#
-> +# Since: 2.9
-> +##
-> +{ 'struct': 'BlockdevOptionsCurlHttps',
-> +  'base': 'BlockdevOptionsCurlBase',
-> +  'data': { '*cookie': 'str',
-> +            '*sslverify': 'bool' } }
-> +
-> +##
-> +# @BlockdevOptionsCurlFtp:
-> +#
-> +# Driver specific block device options for FTP connections over the curl
-> +# backend.  URLs must start with "ftp://".
-> +#
-> +# Since: 2.9
-> +##
-> +{ 'struct': 'BlockdevOptionsCurlFtp',
-> +  'base': 'BlockdevOptionsCurlBase',
-> +  'data': { } }
-> +
-> +##
-> +# @BlockdevOptionsCurlFtps:
-> +#
-> +# Driver specific block device options for FTPS connections over the curl
-> +# backend.  URLs must start with "ftps://".
-> +#
-> +# @sslverify:   Whether to verify the SSL certificate's validity (defaults to
-> +#               true)
->  #
->  # Since: 2.9
->  ##
-> -{ 'struct': 'BlockdevOptionsCurl',
-> -  'data': { 'filename': 'str' } }
-> +{ 'struct': 'BlockdevOptionsCurlFtps',
-> +  'base': 'BlockdevOptionsCurlBase',
-> +  'data': { '*sslverify': 'bool' } }
->  
->  ##
->  # @BlockdevOptionsNbd:
-> @@ -2815,13 +2900,13 @@
->        'cloop':      'BlockdevOptionsGenericFormat',
->        'dmg':        'BlockdevOptionsGenericFormat',
->        'file':       'BlockdevOptionsFile',
-> -      'ftp':        'BlockdevOptionsCurl',
-> -      'ftps':       'BlockdevOptionsCurl',
-> +      'ftp':        'BlockdevOptionsCurlFtp',
-> +      'ftps':       'BlockdevOptionsCurlFtps',
->        'gluster':    'BlockdevOptionsGluster',
->        'host_cdrom': 'BlockdevOptionsFile',
->        'host_device':'BlockdevOptionsFile',
-> -      'http':       'BlockdevOptionsCurl',
-> -      'https':      'BlockdevOptionsCurl',
-> +      'http':       'BlockdevOptionsCurlHttp',
-> +      'https':      'BlockdevOptionsCurlHttps',
->        'iscsi':      'BlockdevOptionsIscsi',
->        'luks':       'BlockdevOptionsLUKS',
->        'nbd':        'BlockdevOptionsNbd',
-> -- 
-> 2.12.1
-> 
->
+When working on other things, I got confused by the etsec code,
+that didn't use the TYPE_ETSEC_COMMON macro in its type
+declaration, and had no subclasses despite being named
+ETSEC_COMMON.
 
-I already applied this to my branch, but it occured to me that it would be
-good to get a r-b from someone in the libvirt team (like Eric), with respect
-to the schema.  So I'll hold off on sending a pull req for this series
-for a bit.
+This is a very simple cleanup to remove the _COMMON suffix from
+the macros, and to use the TYPE_ETSEC macro when registering and
+creating devices instead of hardcoding the "eTSEC" name.
 
--Jeff
+Cc: Alexander Graf <agraf@suse.de>
+Cc: Scott Wood <scottwood@freescale.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Fabien Chouteau <chouteau@adacore.com>
+Cc: qemu-ppc@nongnu.org
+
+Eduardo Habkost (2):
+  etsec: Rename (TYPE_)ETSEC_COMMON to (TYPE_)ETSEC
+  etsec: Use TYPE_ETSEC macro when registering/creating device
+
+ hw/net/fsl_etsec/etsec.h |  6 +++---
+ hw/net/fsl_etsec/etsec.c | 10 +++++-----
+ hw/ppc/e500.c            |  4 ++--
+ 3 files changed, 10 insertions(+), 10 deletions(-)
+
+-- 
+2.11.0.259.g40922b1
