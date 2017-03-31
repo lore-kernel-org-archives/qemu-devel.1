@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57013)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ctjjd-00026l-3a
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 19:44:10 -0400
+	(envelope-from <eblake@redhat.com>) id 1ctkbd-0001U6-De
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 20:39:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ctjjb-0007BU-M1
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 19:44:09 -0400
-References: <CAO_EM_=wECMYRRaDyPtY8sKFZF8owp0u2sE4k_oeS=BLF9B2Mw@mail.gmail.com>
-	<67b441ce-ee18-c6d5-df5f-224439214ab8@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <17228443-4187-8922-05a9-12e771eaff03@redhat.com>
-Date: Fri, 31 Mar 2017 01:43:53 +0200
+	(envelope-from <eblake@redhat.com>) id 1ctkba-0003Fk-Bo
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 20:39:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43518)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ctkba-0003FF-30
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 20:39:54 -0400
+References: <058D52979F67BF47BCD9EA78EAECA6DC7779F2D5@SESTOEX04.enea.se>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <de0d3d40-833b-f24b-7689-b23eb9c78244@redhat.com>
+Date: Thu, 30 Mar 2017 19:39:50 -0500
 MIME-Version: 1.0
-In-Reply-To: <67b441ce-ee18-c6d5-df5f-224439214ab8@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] New iotest repros failures on virtio external
- snapshot with iothread
+In-Reply-To: <058D52979F67BF47BCD9EA78EAECA6DC7779F2D5@SESTOEX04.enea.se>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="mpm1g2FgAeAqX6E7ceCpqbDMLgvrjxWjk"
+Subject: Re: [Qemu-devel] rbd: Possible regression in 2.9 RCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,115 +27,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Ed Swierk <eswierk@skyportsystems.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Alexandru Avadanii <Alexandru.Avadanii@enea.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: svc-armband <armband@enea.com>, Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On 03/30/17 04:16, Eric Blake wrote:
-> On 03/29/2017 09:01 PM, Ed Swierk via Qemu-devel wrote:
->> Parts of qemu's block code have changed a lot in recent months but are
->> not well exercised by current tests.
->>
->> Subtle bugs have crept in causing assertion failures, hangs and other
->> crashes in a variety of situations: immediately on start, on first
->> guest activity, on external snapshot create or commit, on qmp quit
->> command.
->>
->> Reproducing these bugs has proved tricky, as each may occur only with
->> a specific combination of qemu version, block device type (virtio-blk
->> or virtio-scsi) and iothread enabled or not. In some cases the bug
->> occurs only after several external snapshot operations. And in some
->> cases the bug only manifests when a guest is accessing the block
->> device simultaneously.
->>
->> I've written an iotest (number 176, for now) that attempts to cover
-> 
-> At least one other thread has already proposed a test 176.  It's
-> somewhat straightforward to renumber things, but I'm wondering if there
-> is some even-more-efficient way of reserving test numbers, perhaps
-> through the wiki, since we are finding that test numbers get reserved
-> several weeks before actually getting merged into the tree.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--mpm1g2FgAeAqX6E7ceCpqbDMLgvrjxWjk
+From: Eric Blake <eblake@redhat.com>
+To: Alexandru Avadanii <Alexandru.Avadanii@enea.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: svc-armband <armband@enea.com>, Jeff Cody <jcody@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
+Message-ID: <de0d3d40-833b-f24b-7689-b23eb9c78244@redhat.com>
+Subject: Re: [Qemu-devel] rbd: Possible regression in 2.9 RCs
+References: <058D52979F67BF47BCD9EA78EAECA6DC7779F2D5@SESTOEX04.enea.se>
+In-Reply-To: <058D52979F67BF47BCD9EA78EAECA6DC7779F2D5@SESTOEX04.enea.se>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-UEFI / edk2 solves this problem elegantly by naming everything with
-globally unique identifiers, so if you need a new thing, just run
-"uuidgen". No coordination required.
+On 03/30/2017 06:42 PM, Alexandru Avadanii wrote:
+> Hi,
+> While testing out 2.9.0-rc2 on AArch64, we noticed a possible regressio=
+n in QEMU, related to parsing -drive 'file=3Drbd/...':
+>> "conf option 6789 has no value".
+>=20
+> Instance logs [1].
 
-In practice it would result in subjects like
+Pastebins don't last forever; it helps to paste the actual error message
+in the email for archival purposes, and to make it easier for readers to
+see your problem without having to chase URLs:
 
-[Qemu-devel] [PATCH for-2.9] iotests: Fix test
-3dec30b6-f69b-4eb0-8f89-87063433c830
+2017-03-30T20:02:27.499695Z qemu-system-aarch64: -drive
+file=3Drbd:volumes/volume-ea141b5c-cdb3-4765-910d-e7008b209a70:id=3Dcompu=
+te:key=3DAQAVkvxXAAAAABAA9ZxWFYdRmV+DSwKr7BKKXg=3D=3D:auth_supported=3Dce=
+phx\;none:mon_host=3D192.168.1.2\:6789,format=3Draw,if=3Dnone,id=3Ddrive-=
+virtio-disk0,serial=3Dea141b5c-cdb3-4765-910d-e7008b209a70,cache=3Dwriteb=
+ack:
+conf option 6789 has no value
 
-I shall now retreat to my cave.
+Looking at that, the only instance of 6789 that I see is the
+'mon_host=3D192.168.1.2\:6789,' portion.  I bet what is happening is that=
 
-Laszlo
-;)
+we are mis-parsing the string, and trying to treat it as a key-values
+pair.  In other words, it's probably an unintended regression introduced
+in the range of 7830f909..0a55679b by Jeff [3] or in Markus' cleanups
+between f51c363c..2836284d [4].
 
-> 
->> many of these configurations. Currently it only exercises the external
->> snapshot create and commit lifted from iotest 118. The new iotest does
->> this repeatedly in each of 16 combinations:
->> - no guest / guest
->> - virtio-blk / virtio-scsi
->> - no iothread / iothread
->> - single / repeated external snapshot create+commit
->>
->> I made some minor changes to the test infrastructure so the new iotest
->> can deal gracefully with qemu hanging--the test script itself
->> shouldn't hang. And in all failure modes the test needs to expose
->> enough console output and other information to diagnose the problem.
-> 
-> Some of those changes sound like they are worth posting to the list
-> as-is, separate from the actual new test.
-> 
->>
->> The main departure from existing iotests is running a real guest. I
->> used buildroot to generate a small (~4 MB) Linux kernel with built-in
->> initrd containing a busybox-based userland. After the iotest launches
->> qemu, the guest loops writing to the block device, while the test
->> performs snapshot operations.
->>
->> I ran the new iotest on 3 qemu versions: 2.7.1, stable-2.8-staging and
->> 2.9.0-rc2. The latter two fail several test cases, all
->> iothread-enabled. Only 2.7.1 passes all the cases.
->>
->> Here is the code for the new iotest (I didn't dare email patches with
->> a 4 MB blob):
->> https://github.com/skyportsystems/qemu-1/commits/eswierk-iotests-2.7
->> https://github.com/skyportsystems/qemu-1/commits/eswierk-iotests-2.8
->> https://github.com/skyportsystems/qemu-1/commits/eswierk-iotests-2.9
->>
->> And here is the buildroot I used to generate the guest Linux kernel+initrd:
->> https://github.com/skyportsystems/buildroot-1/commits/qemu-iotests
->>
->> Please check out the code and try the new test--particularly anyone
->> who can also help figure out these failures. (Note that since half the
->> test cases use an iothread, /dev/kvm must be readable and writable.)
->>
->> * stable-2.8-staging
->> - guest, virtio-blk, iothread, single snapshot create+commit: hang on
->> quit (intermittent)
->> - guest, virtio-blk, iothread, repeated snapshot create+commit: hang
->> after 1 iteration
->> - guest, virtio-scsi, iothread, single snapshot create+commit: hang on
->> quit (intermittent)
->> - guest, virtio-scsi, iothread, repeated snapshot create+commit: hang
->> after 1 iteration
->>
->> * 2.9.0-rc2
->> - guest, virtio-blk, iothread, single snapshot create+commit:
->> "include/block/aio.h:457: aio_enable_external: Assertion
->> `ctx->external_disable_cnt > 0' failed." after snapshot create
-> 
-> It would be nice if we could get to the root cause and squash that one
-> before 2.9.
-> 
->> - guest, virtio-blk, iothread, repeated snapshot create+commit: same as above
->> - guest, virtio-scsi, iothread, single snapshot create+commit: same as above
->> - guest, virtio-scsi, iothread, repeated snapshot create+commit: same as above
->> - no guest, virtio-blk, iothread, repeated snapshot create+commit: same as above
->> - no guest, virtio-scsi, iothread, single snapshot create+commit: same as above
->> - no guest, virtio-scsi, iothread, repeated snapshot create+commit:
->> same as above
->>
->> --Ed
->>
->>
-> 
+On the bright side, we still have time to fix it before 2.9 goes final,
+now that you called it to our attention.
+
+> Occasionally, we get "conf option too long", with the same effect.
+>=20
+> We bisected this manually between 2.8.0 (working ok with the above cmd)=
+ and 2.9.0-rc2, and the problematic change seems to be the merge point [2=
+].
+
+I suspect you didn't run the bisect quite correctly, as that merge point
+has nothing to do with block/rbd.c.
+
+>=20
+> [1] http://paste.openstack.org/show/604938/
+> [2] https://github.com/qemu/qemu/commit/9a81b79
+>=20
+
+[3] https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg07506.html
+[4] https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg05565.html
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--mpm1g2FgAeAqX6E7ceCpqbDMLgvrjxWjk
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY3aVWAAoJEKeha0olJ0NqcQ0H/1g+fiPErb3PndckAIncEyD5
+90NY1XWppMrxWIvvMFEcvJfeTDE5Cd00Y9rbpWULRL0c/me0zGgkc9Z8hkjOgfxR
+c6uydC0td0XNCeHo6GMdanAwnjT0Ji0mTeja1dzeXwFI4FrpIGa1N4Upum1YxkKm
+E+JU2W3SIJQCpQ+BGx3gtOQQyJeHFWiTtN9VbIDrey4QpqcVNROMPQq5b+08ijHC
+IepDTcah4fJ5hCkOu+/hQlrCU9kxKWYA1oiEe0PuIBCu/WD6WX87ibV4TCMlhqlU
+JHpQQoQF2qnO/Aja1kztXObZWhfhFH0XvNdTQx3+gXBo4gEGFuo6UhoqBdCO4j4=
+=FV80
+-----END PGP SIGNATURE-----
+
+--mpm1g2FgAeAqX6E7ceCpqbDMLgvrjxWjk--
