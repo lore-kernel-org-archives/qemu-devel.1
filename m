@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cts4L-0006oW-Vm
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 04:38:07 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1cts6y-0007Sn-Kv
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 04:40:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cts4I-0007pZ-Rf
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 04:38:06 -0400
-Received: from 8.mo179.mail-out.ovh.net ([46.105.75.26]:41699)
+	(envelope-from <dgilbert@redhat.com>) id 1cts6t-0000vv-I7
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 04:40:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49794)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cts4I-0007mn-HV
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 04:38:02 -0400
-Received: from player755.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 0AC2C341C3
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 10:37:53 +0200 (CEST)
-Date: Fri, 31 Mar 2017 10:37:31 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170331103731.67fa5bf9@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <CAKXe6SJhBAjRm_BWQEombeApxbdvVdNnpEc53SfFwWDPT1bQGA@mail.gmail.com>
-References: <1490876834-61392-1-git-send-email-liqiang6-s@360.cn>
-	<c65ce78e-9a33-ee17-0a49-2a28390060f0@redhat.com>
-	<20170330174608.0ed57618@bahia.lab.toulouse-stg.fr.ibm.com>
-	<CAKXe6SKEbvxLWiCjSo7AYzAQmzdEGOeeYL47BYkcFPGx8VA20g@mail.gmail.com>
-	<20170331090731.27b10c0c@bahia.lab.toulouse-stg.fr.ibm.com>
-	<CAKXe6SJhBAjRm_BWQEombeApxbdvVdNnpEc53SfFwWDPT1bQGA@mail.gmail.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cts6t-0000v3-8u
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 04:40:43 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 09672C00B8F9
+	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 08:40:42 +0000 (UTC)
+Date: Fri, 31 Mar 2017 09:40:38 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170331084038.GA2408@work-vm>
+References: <20170323204544.12015-1-quintela@redhat.com>
+	<20170323204544.12015-45-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/vFq+iJcHqoyOq0mRrLob8P2";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH for-2.9?] 9pfs: fix migration_block leak
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170323204544.12015-45-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 44/51] ram: reorganize last_sent_block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,180 +33,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>
-Cc: Eric Blake <eblake@redhat.com>, Li Qiang <liqiang6-s@360.cn>, Qemu Developers <qemu-devel@nongnu.org>, P J P <ppandit@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org
 
---Sig_/vFq+iJcHqoyOq0mRrLob8P2
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+* Juan Quintela (quintela@redhat.com) wrote:
+> We were setting it far away of when we changed it.  Now everything is
+> done inside save_page_header.  Once there, reorganize code to pass
+> RAMState.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-On Fri, 31 Mar 2017 16:01:15 +0800
-Li Qiang <liq3ea@gmail.com> wrote:
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-> 2017-03-31 15:07 GMT+08:00 Greg Kurz <groug@kaod.org>:
->=20
-> > On Fri, 31 Mar 2017 09:26:35 +0800
-> > Li Qiang <liq3ea@gmail.com> wrote:
-> >
-> > > Hello,
-> > >
-> > > 2017-03-30 23:46 GMT+08:00 Greg Kurz <groug@kaod.org>:
-> > >
-> > > > On Thu, 30 Mar 2017 08:25:25 -0500
-> > > > Eric Blake <eblake@redhat.com> wrote:
-> > > >
-> > > > > On 03/30/2017 07:27 AM, Li Qiang wrote:
-> > > > > > The guest can leave the pdu->s->migration_blocker exists by att=
-ach
-> > > > >
-> > > > > s/exists/in place/
-> > > > > s/attach/attaching/
-> > > > >
-> > > >
-> > >
-> > > Eric,
-> > > Thanks for pointing my mistakes!
-> > >
-> > >
-> > > > > > but not remove a fid. Then if we hot unplug the 9pfs device, the
-> > > > >
-> > > >
-> > > > In theory you're right, but the current 9p client in linux won't let
-> > you
-> > > > hot
-> > > > unplug the device unless you unmount the 9p share first, hence free=
-ing
-> > the
-> > > > blocker.
-> > > >
-> > > >
-> > > I think we should consider every possible situation.
-> > >
-> > >
-> > > > > s/remove/removing/
-> > > > >
-> > > > > > v9fs_reset() just free the fids, but not free the
-> > migration_blocker.
-> > > > > > This will leak a memory leak. This patch avoid this.
-> > > >
-> > > > I had a similar issue sitting my TODO list for quite a time: the
-> > blocker
-> > > > survives a system_reset. It doesn't cause a memory leak but it prev=
-ents
-> > > > migration until the guest mounts/unmounts the 9p share again.
-> > > >
-> > > > This boils down to virtfs_reset() calling free_fid() instead of
-> > put_fid()
-> > > > IIRC.
-> > > >
-> > > > >
-> > > > > s/leak a/cause a/
-> > > > > s/avoid/avoids/
-> > > > >
-> > > > > >
-> > > > > > Signed-off-by: Li Qiang <liqiang6-s@360.cn>
-> > > > > > ---
-> > > > > >  hw/9pfs/9p.c | 6 ++++++
-> > > > > >  1 file changed, 6 insertions(+)
-> > > > >
-> > > > > Probably worth including in 2.9 as a bug fix.
-> > > > >
-> > > > > Reviewed-by: Eric Blake <eblake@redhat.com>
-> > > > >
-> > > > > >
-> > > > > > diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> > > > > > index 48babce..b55c02d 100644
-> > > > > > --- a/hw/9pfs/9p.c
-> > > > > > +++ b/hw/9pfs/9p.c
-> > > > > > @@ -548,6 +548,12 @@ static void coroutine_fn virtfs_reset(V9fs=
-PDU
-> > > > *pdu)
-> > > > > >              free_fid(pdu, fidp);
-> > > > > >          }
-> > > > > >      }
-> > > > > > +
-> > > > > > +    if (pdu->s->migration_blocker) {
-> > > > > > +        migrate_del_blocker(pdu->s->migration_blocker);
-> > > > > > +        error_free(pdu->s->migration_blocker);
-> > > > > > +        pdu->s->migration_blocker =3D NULL;
-> > > > > > +    }
-> > > >
-> > > > I'd prefer to drain all PDUs in virtfs_reset() and have the loop ab=
-ove
-> > > > to call put_fid() instead of free_fid(). If this isn't doable for 2=
-.9,
-> > > > I'll apply this patch with a comment.
-> > > >
-> > > >
-> > > Yes, I have considered to use put_fid() to fix this. But I'm not sure=
- the
-> > > 'fidp->ref' is  at most 1 in virtfs_reset() function(I think it is).
-> > >
-> >
-> > And indeed, if the fid is involved in an I/O then its ref will be !=3D =
-0.
-> >
-> > > IIUC I think omit the 'else' branch, and call put_fid() directly like
-> > this.
-> > >
-> >
-> > This won't work: we must ensure that fidp->ref reaches zero (ie, drain
-> > all PDUs), then we can fidp->ref++ (ie, get a ref on the fid) and call
-> > put_fid(), which will drop the last ref of the fid and clear the blocker
-> > if this is the root fid.
-> >
-> >
-> Right, but how can we ensure we have drained all PDUs? Any idea?
->=20
-
-Yep, I'll send patches shorty and Cc you.
-
-> Thanks.
->=20
->=20
->=20
-> > > diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> > > index 48babce..ae97e79 100644
-> > > --- a/hw/9pfs/9p.c
-> > > +++ b/hw/9pfs/9p.c
-> > > @@ -544,9 +544,8 @@ static void coroutine_fn virtfs_reset(V9fsPDU *pd=
-u)
-> > >
-> > >          if (fidp->ref) {
-> > >              fidp->clunked =3D 1;
-> > > -        } else {
-> > > -            free_fid(pdu, fidp);
-> > >          }
-> > > +        put_fid(pdu, fidp);
-> > >      }
-> > >  }
-> > >
-> > >
-> > > If you agree, I will send a formal patch.
-> > >
-> > >
-> > >
-> > > > > >  }
-> > > > > >
-> > > > > >  #define P9_QID_TYPE_DIR         0x80
-> > > > > >
-> > > > >
-> > > >
-> > > >
-> >
-> >
-
-
---Sig_/vFq+iJcHqoyOq0mRrLob8P2
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAljeFUsACgkQAvw66wEB28I3+gCgngaxgtPbpyNGZUQZhqY5IBdp
-/N0An2Y/hIGFY3T//NsNXjdLFwSbRVFZ
-=lnQj
------END PGP SIGNATURE-----
-
---Sig_/vFq+iJcHqoyOq0mRrLob8P2--
+> ---
+>  migration/ram.c | 36 +++++++++++++++---------------------
+>  1 file changed, 15 insertions(+), 21 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 83c749c..6cd77b5 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -453,18 +453,22 @@ void migrate_compress_threads_create(void)
+>   * @offset: offset inside the block for the page
+>   *          in the lower bits, it contains flags
+>   */
+> -static size_t save_page_header(QEMUFile *f, RAMBlock *block, ram_addr_t offset)
+> +static size_t save_page_header(RAMState *rs, RAMBlock *block, ram_addr_t offset)
+>  {
+>      size_t size, len;
+>  
+> -    qemu_put_be64(f, offset);
+> +    if (block == rs->last_sent_block) {
+> +        offset |= RAM_SAVE_FLAG_CONTINUE;
+> +    }
+> +    qemu_put_be64(rs->f, offset);
+>      size = 8;
+>  
+>      if (!(offset & RAM_SAVE_FLAG_CONTINUE)) {
+>          len = strlen(block->idstr);
+> -        qemu_put_byte(f, len);
+> -        qemu_put_buffer(f, (uint8_t *)block->idstr, len);
+> +        qemu_put_byte(rs->f, len);
+> +        qemu_put_buffer(rs->f, (uint8_t *)block->idstr, len);
+>          size += 1 + len;
+> +        rs->last_sent_block = block;
+>      }
+>      return size;
+>  }
+> @@ -584,7 +588,7 @@ static int save_xbzrle_page(RAMState *rs, uint8_t **current_data,
+>      }
+>  
+>      /* Send XBZRLE based compressed page */
+> -    bytes_xbzrle = save_page_header(rs->f, block,
+> +    bytes_xbzrle = save_page_header(rs, block,
+>                                      offset | RAM_SAVE_FLAG_XBZRLE);
+>      qemu_put_byte(rs->f, ENCODING_FLAG_XBZRLE);
+>      qemu_put_be16(rs->f, encoded_len);
+> @@ -769,7 +773,7 @@ static int save_zero_page(RAMState *rs, RAMBlock *block, ram_addr_t offset,
+>      if (is_zero_range(p, TARGET_PAGE_SIZE)) {
+>          rs->zero_pages++;
+>          rs->bytes_transferred +=
+> -            save_page_header(rs->f, block, offset | RAM_SAVE_FLAG_COMPRESS);
+> +            save_page_header(rs, block, offset | RAM_SAVE_FLAG_COMPRESS);
+>          qemu_put_byte(rs->f, 0);
+>          rs->bytes_transferred += 1;
+>          pages = 1;
+> @@ -826,9 +830,6 @@ static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
+>  
+>      current_addr = block->offset + offset;
+>  
+> -    if (block == rs->last_sent_block) {
+> -        offset |= RAM_SAVE_FLAG_CONTINUE;
+> -    }
+>      if (ret != RAM_SAVE_CONTROL_NOT_SUPP) {
+>          if (ret != RAM_SAVE_CONTROL_DELAYED) {
+>              if (bytes_xmit > 0) {
+> @@ -860,8 +861,8 @@ static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
+>  
+>      /* XBZRLE overflow or normal page */
+>      if (pages == -1) {
+> -        rs->bytes_transferred += save_page_header(rs->f, block,
+> -                                               offset | RAM_SAVE_FLAG_PAGE);
+> +        rs->bytes_transferred += save_page_header(rs, block,
+> +                                                  offset | RAM_SAVE_FLAG_PAGE);
+>          if (send_async) {
+>              qemu_put_buffer_async(rs->f, p, TARGET_PAGE_SIZE,
+>                                    migrate_release_ram() &
+> @@ -882,10 +883,11 @@ static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
+>  static int do_compress_ram_page(QEMUFile *f, RAMBlock *block,
+>                                  ram_addr_t offset)
+>  {
+> +    RAMState *rs = &ram_state;
+>      int bytes_sent, blen;
+>      uint8_t *p = block->host + (offset & TARGET_PAGE_MASK);
+>  
+> -    bytes_sent = save_page_header(f, block, offset |
+> +    bytes_sent = save_page_header(rs, block, offset |
+>                                    RAM_SAVE_FLAG_COMPRESS_PAGE);
+>      blen = qemu_put_compression_data(f, p, TARGET_PAGE_SIZE,
+>                                       migrate_compress_level());
+> @@ -1016,7 +1018,7 @@ static int ram_save_compressed_page(RAMState *rs, PageSearchStatus *pss,
+>              pages = save_zero_page(rs, block, offset, p);
+>              if (pages == -1) {
+>                  /* Make sure the first page is sent out before other pages */
+> -                bytes_xmit = save_page_header(rs->f, block, offset |
+> +                bytes_xmit = save_page_header(rs, block, offset |
+>                                                RAM_SAVE_FLAG_COMPRESS_PAGE);
+>                  blen = qemu_put_compression_data(rs->f, p, TARGET_PAGE_SIZE,
+>                                                   migrate_compress_level());
+> @@ -1033,7 +1035,6 @@ static int ram_save_compressed_page(RAMState *rs, PageSearchStatus *pss,
+>                  ram_release_pages(block->idstr, pss->offset, pages);
+>              }
+>          } else {
+> -            offset |= RAM_SAVE_FLAG_CONTINUE;
+>              pages = save_zero_page(rs, block, offset, p);
+>              if (pages == -1) {
+>                  pages = compress_page_with_multi_thread(rs, block, offset);
+> @@ -1330,13 +1331,6 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
+>          if (unsentmap) {
+>              clear_bit(dirty_ram_abs >> TARGET_PAGE_BITS, unsentmap);
+>          }
+> -        /* Only update last_sent_block if a block was actually sent; xbzrle
+> -         * might have decided the page was identical so didn't bother writing
+> -         * to the stream.
+> -         */
+> -        if (res > 0) {
+> -            rs->last_sent_block = pss->block;
+> -        }
+>      }
+>  
+>      return res;
+> -- 
+> 2.9.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
