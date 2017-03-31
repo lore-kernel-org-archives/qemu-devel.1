@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ctwmV-0003Tl-0s
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 09:39:59 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1ctwnD-00040t-Uh
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 09:40:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ctwmR-0002z5-QB
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 09:39:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:21743)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ctwmR-0002yF-Hz
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 09:39:55 -0400
-References: <20170331101947.2046-1-vfeenstr@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9bdac750-f62d-b010-db4b-0f42cb1d0a21@redhat.com>
-Date: Fri, 31 Mar 2017 08:39:53 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ctwnC-0003iL-Vk
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 09:40:43 -0400
+Date: Fri, 31 Mar 2017 10:40:33 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170331134033.GY3709@thinpad.lan.raisama.net>
+References: <1490965980-513-1-git-send-email-peter.maydell@linaro.org>
+	<5979a675-6077-50f8-0714-7e509a9bc492@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20170331101947.2046-1-vfeenstr@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Sh9KH7abNicCf9wwLtkRuQp4i8DEVjnhe"
-Subject: Re: [Qemu-devel] [PATCH v3] qemu-ga: add guest-get-osrelease command
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <5979a675-6077-50f8-0714-7e509a9bc492@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] block/parallels.c: avoid integer overflow
+ in allocate_clusters()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,66 +25,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@gmail.com
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, patches@linaro.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Sh9KH7abNicCf9wwLtkRuQp4i8DEVjnhe
-From: Eric Blake <eblake@redhat.com>
-To: Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@gmail.com
-Message-ID: <9bdac750-f62d-b010-db4b-0f42cb1d0a21@redhat.com>
-Subject: Re: [PATCH v3] qemu-ga: add guest-get-osrelease command
-References: <20170331101947.2046-1-vfeenstr@redhat.com>
-In-Reply-To: <20170331101947.2046-1-vfeenstr@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 03/31/2017 05:19 AM, Vinzenz 'evilissimo' Feenstra wrote:
-> From: Vinzenz Feenstra <vfeenstr@redhat.com>
+On Fri, Mar 31, 2017 at 10:27:44AM -0300, Philippe Mathieu-Daud=E9 wrote:
+> Hi,
 >=20
-> This is a concept change over v2 of the guest-get-osinfo command.
-> The command now adds all information in the os-release format.
+> Eduardo you seem skilled regarding Coccinelle scripts, is it possible t=
+o
+> write one to find those overflows?
 
-Cover letters are not necessary (but don't hurt) for one-patch series -
-but if you DO use a cover letter, please also turn on numbering, so that
-the subject lines can be distinguished between the 0/1 cover letter and
-1/1 patch.  'git config format.coverletter auto' will make the creation
-of cover letters happen only when you send multi-patch series.
+Probably not. AFAIK, Coccinelle rules are based on local code
+syntax only. This means it doesn't know the data type of
+expressions like (s->tracks).
 
 >=20
-> Vinzenz Feenstra (1):
->   qemu-ga: add guest-get-osrelease command
+> Peter having one more macro might help or confuses more?
 >=20
->  qga/commands-posix.c |  41 +++++++++++++++++
->  qga/commands-win32.c | 127 +++++++++++++++++++++++++++++++++++++++++++=
-++++++++
->  qga/qapi-schema.json |  29 ++++++++++++
->  3 files changed, 197 insertions(+)
+> #define MULTIPLY64(a32, b32) ((int64_t)a32 * b32)
 >=20
+> On 03/31/2017 10:13 AM, Peter Maydell wrote:
+> > Coverity (CID 1307776) points out that in the multiply:
+> >   space =3D to_allocate * s->tracks;
+> > we are trying to calculate a 64 bit result but the types
+> > of to_allocate and s->tracks mean that we actually calculate
+> > a 32 bit result. Add an explicit cast to force a 64 bit
+> > multiply.
+> >=20
+> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>=20
+> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+>=20
+> > ---
+> > NB: compile-and-make-check tested only...
+> > ---
+> >  block/parallels.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >=20
+> > diff --git a/block/parallels.c b/block/parallels.c
+> > index 4173b3f..3886c30 100644
+> > --- a/block/parallels.c
+> > +++ b/block/parallels.c
+> > @@ -206,7 +206,7 @@ static int64_t allocate_clusters(BlockDriverState=
+ *bs, int64_t sector_num,
+> >      }
+> >=20
+> >      to_allocate =3D DIV_ROUND_UP(sector_num + *pnum, s->tracks) - id=
+x;
+> > -    space =3D to_allocate * s->tracks;
+> > +    space =3D (int64_t)to_allocate * s->tracks;
+> >      if (s->data_end + space > bdrv_getlength(bs->file->bs) >> BDRV_S=
+ECTOR_BITS) {
+> >          int ret;
+> >          space +=3D s->prealloc_size;
+> >=20
 
 --=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---Sh9KH7abNicCf9wwLtkRuQp4i8DEVjnhe
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY3lwpAAoJEKeha0olJ0NqgjIIAILAdI0u1RnsyrGbo1IcXq8x
-2kY+Nyp21g3oAddAqIK+0S+WeO4QVUqea9xKZChuDw09MgsqQo1/8czPRVjFiuMl
-n1ggGRk0p0E5R7o8rCXUfyu2+00s8zXOKmwHZTgYmz03kKB1AfsQKclUcgKUeiSq
-DvWxcEhZDkzggZtkYQ4wWRChIRQ2NGp/CHgBNVNfMtUM4vkFnUZaoBAG5qHKcmii
-qdTTjLzSoqQ3Rcf0vY6tm8Gr/ADgJdIzWetXDA5stFG+8wRpSyGe/uuaxLBBckiy
-i4W8U3GyU4kbF9lHJHRcfqhsySfZ8upPssjyX/xpLyYonCnxzray0xZOQa7bcnM=
-=uejK
------END PGP SIGNATURE-----
-
---Sh9KH7abNicCf9wwLtkRuQp4i8DEVjnhe--
+Eduardo
