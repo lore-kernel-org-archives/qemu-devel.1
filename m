@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60506)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ctsSn-0006mb-3q
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:03:22 -0400
+	(envelope-from <famz@redhat.com>) id 1ctsXa-00087N-Ew
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:08:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ctsSm-0005Xf-Ac
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:03:21 -0400
-Date: Fri, 31 Mar 2017 10:03:09 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170331090309.GB2199@stefanha-x1.localdomain>
-References: <1490895797-29094-1-git-send-email-armbru@redhat.com>
-	<1490895797-29094-3-git-send-email-armbru@redhat.com>
+	(envelope-from <famz@redhat.com>) id 1ctsXZ-0007bV-DT
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:08:18 -0400
+Date: Fri, 31 Mar 2017 17:08:06 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170331090806.GH11195@lemon.lan>
+References: <1490440701-12037-1-git-send-email-ashijeetacharya@gmail.com>
+	<1490440701-12037-8-git-send-email-ashijeetacharya@gmail.com>
+	<20170331072609.GE11195@lemon.lan>
+	<CAC2QTZaL2aDatNoKoxEWn0XYxtfD6RDpB9gWn9h4+QE0vg2mMw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="PmA2V3Z32TCmWXqI"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1490895797-29094-3-git-send-email-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 for-2.9 2/9] char: Fix socket with
- "type": "vsock" address
+In-Reply-To: <CAC2QTZaL2aDatNoKoxEWn0XYxtfD6RDpB9gWn9h4+QE0vg2mMw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 7/7] vmdk: Update metadata for multiple
+ clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,56 +26,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, pbonzini@redhat.com, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+To: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 
+On Fri, 03/31 14:17, Ashijeet Acharya wrote:
+> On Fri, Mar 31, 2017 at 12:56 PM, Fam Zheng <famz@redhat.com> wrote:
+> > On Sat, 03/25 16:48, Ashijeet Acharya wrote:
+> >> Include a next pointer in VmdkMetaData struct to point to the previous
+> >> allocated L2 table. Modify vmdk_L2update to start updating metadata for
+> >> allocation of multiple clusters at once.
+> >>
+> >> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+> >> ---
+> >>  block/vmdk.c | 131 ++++++++++++++++++++++++++++++++++++++++++++++-------------
+> >>  1 file changed, 102 insertions(+), 29 deletions(-)
+> >>
+> >> diff --git a/block/vmdk.c b/block/vmdk.c
+> >> index 3de8b8f..4517409 100644
+> >> --- a/block/vmdk.c
+> >> +++ b/block/vmdk.c
+> >> @@ -137,6 +137,8 @@ typedef struct VmdkMetaData {
+> >>      int valid;
+> >>      uint32_t *l2_cache_entry;
+> >>      uint32_t nb_clusters;
+> >> +    uint32_t offset;
+> >> +    struct VmdkMetaData *next;
+> >>  } VmdkMetaData;
+> >>
+> >>  typedef struct VmdkGrainMarker {
+> >> @@ -1037,29 +1039,81 @@ static void vmdk_refresh_limits(BlockDriverState *bs, Error **errp)
+> >>      }
+> >>  }
+> >>
+> >> -static int vmdk_L2update(VmdkExtent *extent, VmdkMetaData *m_data,
+> >> -                         uint32_t offset)
+> >> +static int vmdk_alloc_cluster_link_l2(VmdkExtent *extent,
+> >> +                                      VmdkMetaData *m_data, bool zeroed)
+> >>  {
+> >> -    offset = cpu_to_le32(offset);
+> >> +    int i;
+> >> +    uint32_t offset, temp_offset;
+> >> +
+> >> +    if (zeroed) {
+> >> +        temp_offset = VMDK_GTE_ZEROED;
+> >> +    } else {
+> >> +        temp_offset = m_data->offset;
+> >> +    }
+> >> +
+> >> +    temp_offset = cpu_to_le32(temp_offset);
+> >> +
+> >>      /* update L2 table */
+> >> -    if (bdrv_pwrite_sync(extent->file,
+> >> +    offset = temp_offset;
+> >> +    for (i = 0; i < m_data->nb_clusters; i++) {
+> >> +        if (bdrv_pwrite_sync(extent->file,
+> >>                  ((int64_t)m_data->l2_offset * 512)
+> >> -                    + (m_data->l2_index * sizeof(offset)),
+> >> -                &offset, sizeof(offset)) < 0) {
+> >> -        return VMDK_ERROR;
+> >> +                    + ((m_data->l2_index + i) * sizeof(offset)),
+> >> +                &(offset), sizeof(offset)) < 0) {
+> >> +            return VMDK_ERROR;
+> >> +        }
+> >> +        if (!zeroed) {
+> >> +            offset += 128;
+> >> +        }
+> >>      }
+> >> +
+> >>      /* update backup L2 table */
+> >> +    offset = temp_offset;
+> >>      if (extent->l1_backup_table_offset != 0) {
+> >>          m_data->l2_offset = extent->l1_backup_table[m_data->l1_index];
+> >> -        if (bdrv_pwrite_sync(extent->file,
+> >> -                    ((int64_t)m_data->l2_offset * 512)
+> >> -                        + (m_data->l2_index * sizeof(offset)),
+> >> -                    &offset, sizeof(offset)) < 0) {
+> >> -            return VMDK_ERROR;
+> >> +        for (i = 0; i < m_data->nb_clusters; i++) {
+> >> +            if (bdrv_pwrite_sync(extent->file,
+> >> +                        ((int64_t)m_data->l2_offset * 512)
+> >> +                            + ((m_data->l2_index + i) * sizeof(offset)),
+> >> +                        &(offset), sizeof(offset)) < 0) {
+> >> +                return VMDK_ERROR;
+> >> +            }
+> >> +            if (!zeroed) {
+> >> +                offset += 128;
+> >> +            }
+> >>          }
+> >>      }
+> >> +
+> >> +    offset = temp_offset;
+> >>      if (m_data->l2_cache_entry) {
+> >> -        *m_data->l2_cache_entry = offset;
+> >> +        for (i = 0; i < m_data->nb_clusters; i++) {
+> >> +            *m_data->l2_cache_entry = offset;
+> >> +            m_data->l2_cache_entry++;
+> >> +
+> >> +            if (!zeroed) {
+> >> +                offset += 128;
+> >> +            }
+> >> +        }
+> >> +    }
+> >> +
+> >> +    return VMDK_OK;
+> >> +}
+> >> +
+> >> +static int vmdk_L2update(VmdkExtent *extent, VmdkMetaData *m_data,
+> >> +                         bool zeroed)
+> >> +{
+> >> +    int ret;
+> >> +
+> >> +    while (m_data->next != NULL) {
+> >> +        VmdkMetaData *next;
+> >> +
+> >> +        ret = vmdk_alloc_cluster_link_l2(extent, m_data, zeroed);
+> >> +        if (ret < 0) {
+> >> +            return ret;
+> >> +        }
+> >> +
+> >> +        next = m_data->next;
+> >> +        m_data = next;
+> >
+> > I don't see why the next pointer is necessary.  Also the tail is always unused,
+> > why do you need to allocate it?
+> 
+> If I don't allocate the tail, I was getting a segfault in vmdk_pwritev().
 
---PmA2V3Z32TCmWXqI
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+That may be because the way you interate the linked list in vmdk_pwritev is:
 
-On Thu, Mar 30, 2017 at 07:43:10PM +0200, Markus Armbruster wrote:
-> Watch this:
->=20
->     $ qemu-system-x86_64 -nodefaults -S -display none -qmp stdio
->     {"QMP": {"version": {"qemu": {"micro": 91, "minor": 8, "major": 2}, "=
-package": " (v2.8.0-1195-gf84141e-dirty)"}, "capabilities": []}}
->     { "execute": "qmp_capabilities" }
->     {"return": {}}
->     { "execute": "chardev-add", "arguments": { "id": "chr0", "backend": {=
- "type": "socket", "data": { "addr": { "type": "vsock", "data": { "cid": "C=
-ID", "port": "P" }}}}}}
->     Aborted (core dumped)
->=20
-> Crashes because SocketAddress_to_str() is blissfully unaware of
-> SOCKET_ADDRESS_KIND_VSOCK.  Fix that.  Pick the output format to match
-> socket_parse(), just like the existing formats.
->=20
-> Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> ---
->  chardev/char-socket.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>        while (m_data->next != NULL) {
+>            VmdkMetaData *next;
+>            next = m_data->next;
+>            g_free(m_data);
+>            m_data = next;
+>        }
+>
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+which does require a dummy tail.
 
---PmA2V3Z32TCmWXqI
-Content-Type: application/pgp-signature; name="signature.asc"
+But after all it's still not clear to me why you cannot keep m_data on stack,
+and why you need the next pointer at all.
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJY3htNAAoJEJykq7OBq3PI9dMH/jtjTYX81KoGpsI+d9K9T9NY
-KZqQ1C0cneFhmR3mbestKAp7H93CQbdOPzdHPRs2+fdan2jcpoQz08BC+x6Whyml
-FRbcyc/AwHngKor1GL92ph7ww+XWMxdyUCTZzfS+ooHRdTdvCt6lmowIcIPeaxWT
-8mtEPLsdaEoLquf/UqWBrSRglhnv4h3suzWADmJX9X4ULTdh24eoQZ0XGM1roei/
-BPzVHsdfpQdUr3672dgwewWDVt4IO2nR2cdElYrW+5P9QVveRl+78mos5QhK+gsO
-yJ834hWnCHe45fSQGTPtInEv1NgxPZLLecHCvOXvHT2eT7BXlO+Ogz1RkpQ13IY=
-=rypu
------END PGP SIGNATURE-----
-
---PmA2V3Z32TCmWXqI--
+Fam
