@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cu0BM-00010d-VI
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:17:54 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1cu0Kk-0003dw-Fw
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:27:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cu0BJ-0001sP-PM
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:17:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55013)
+	(envelope-from <alex.williamson@redhat.com>) id 1cu0Kg-00030O-3O
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:27:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40918)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cu0BJ-0001rp-H9
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:17:49 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7B76CC04B94F
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 17:17:48 +0000 (UTC)
-Date: Fri, 31 Mar 2017 18:17:45 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170331171744.GQ4514@work-vm>
-References: <20170323204544.12015-1-quintela@redhat.com>
-	<20170323204544.12015-49-quintela@redhat.com>
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1cu0Kf-0002us-RL
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:27:30 -0400
+Date: Fri, 31 Mar 2017 11:27:26 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170331112726.69625d03@t450s.home>
+In-Reply-To: <20170331190349.493158f3@Igors-MacBook-Pro.local>
+References: <1490869641-29873-1-git-send-email-xiong.y.zhang@intel.com>
+	<20170330090148.16048141@t450s.home>
+	<8082FF9BCB2B054996454E47167FF4EC1C4930B3@SHSMSX104.ccr.corp.intel.com>
+	<20170330205511.28be6306@t450s.home>
+	<20170331190349.493158f3@Igors-MacBook-Pro.local>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170323204544.12015-49-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 48/51] ram: Use ramblock and page offset
- instead of absolute offset
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Revert "vfio/pci-quirks.c: Disable stolen
+ memory for igd VFIO"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,223 +32,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>, "Zhang, Xiong Y" <xiong.y.zhang@intel.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> This removes the needto pass also the absolute offset.
+On Fri, 31 Mar 2017 19:03:49 +0200
+Igor Mammedov <imammedo@redhat.com> wrote:
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  migration/ram.c        | 56 ++++++++++++++++++++++----------------------------
->  migration/trace-events |  2 +-
->  2 files changed, 26 insertions(+), 32 deletions(-)
+> On Thu, 30 Mar 2017 20:55:11 -0600
+> Alex Williamson <alex.williamson@redhat.com> wrote:
 > 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index ef3b428..3f283ba 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -611,12 +611,10 @@ static int save_xbzrle_page(RAMState *rs, uint8_t **current_data,
->   * @rs: current RAM state
->   * @rb: RAMBlock where to search for dirty pages
->   * @start: page where we start the search
-> - * @page: pointer into where to store the dirty page
->   */
->  static inline
->  unsigned long migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
-> -                                          unsigned long start,
-> -                                          unsigned long *page)
-> +                                          unsigned long start)
->  {
->      unsigned long base = rb->offset >> TARGET_PAGE_BITS;
->      unsigned long nr = base + start;
-> @@ -633,17 +631,18 @@ unsigned long migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
->          next = find_next_bit(bitmap, size, nr);
->      }
->  
-> -    *page = next;
->      return next - base;
->  }
->  
->  static inline bool migration_bitmap_clear_dirty(RAMState *rs,
-> +                                                RAMBlock *rb,
->                                                  unsigned long page)
->  {
->      bool ret;
->      unsigned long *bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
-> +    unsigned long nr = (rb->offset >> TARGET_PAGE_BITS) + page;
->  
-> -    ret = test_and_clear_bit(page, bitmap);
-> +    ret = test_and_clear_bit(nr, bitmap);
->  
->      if (ret) {
->          rs->migration_dirty_pages--;
-> @@ -1057,10 +1056,9 @@ static int ram_save_compressed_page(RAMState *rs, PageSearchStatus *pss,
->   * @again: set to false if the search has scanned the whole of RAM
->   * @page: pointer into where to store the dirty page
->   */
-> -static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss,
-> -                             bool *again, unsigned long *page)
-> +static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss, bool *again)
->  {
-> -    pss->page = migration_bitmap_find_dirty(rs, pss->block, pss->page, page);
-> +    pss->page = migration_bitmap_find_dirty(rs, pss->block, pss->page);
->      if (pss->complete_round && pss->block == rs->last_seen_block &&
->          pss->page >= rs->last_page) {
->          /*
-> @@ -1110,8 +1108,7 @@ static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss,
->   * @offset: used to return the offset within the RAMBlock
->   * @page: pointer into where to store the dirty page
->   */
-> -static RAMBlock *unqueue_page(RAMState *rs, ram_addr_t *offset,
-> -                              unsigned long *page)
-> +static RAMBlock *unqueue_page(RAMState *rs, ram_addr_t *offset)
->  {
->      RAMBlock *block = NULL;
->  
-> @@ -1121,7 +1118,6 @@ static RAMBlock *unqueue_page(RAMState *rs, ram_addr_t *offset,
->                                  QSIMPLEQ_FIRST(&rs->src_page_requests);
->          block = entry->rb;
->          *offset = entry->offset;
-> -        *page = (entry->offset + entry->rb->offset) >> TARGET_PAGE_BITS;
->  
->          if (entry->len > TARGET_PAGE_SIZE) {
->              entry->len -= TARGET_PAGE_SIZE;
-> @@ -1148,15 +1144,14 @@ static RAMBlock *unqueue_page(RAMState *rs, ram_addr_t *offset,
->   * @pss: data about the state of the current dirty page scan
->   * @page: pointer into where to store the dirty page
->   */
-> -static bool get_queued_page(RAMState *rs, PageSearchStatus *pss,
-> -                            unsigned long *page)
-> +static bool get_queued_page(RAMState *rs, PageSearchStatus *pss)
->  {
->      RAMBlock  *block;
->      ram_addr_t offset;
->      bool dirty;
->  
->      do {
-> -        block = unqueue_page(rs, &offset, page);
-> +        block = unqueue_page(rs, &offset);
->          /*
->           * We're sending this page, and since it's postcopy nothing else
->           * will dirty it, and we must make sure it doesn't get sent again
-> @@ -1165,16 +1160,18 @@ static bool get_queued_page(RAMState *rs, PageSearchStatus *pss,
->           */
->          if (block) {
->              unsigned long *bitmap;
-> +            unsigned long page;
-> +
->              bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
-> -            dirty = test_bit(*page, bitmap);
-> +            page = (block->offset + offset) >> TARGET_PAGE_BITS;
-> +            dirty = test_bit(page, bitmap);
->              if (!dirty) {
->                  trace_get_queued_page_not_dirty(block->idstr, (uint64_t)offset,
-> -                    *page,
-> -                    test_bit(*page,
-> +                    page,
-> +                    test_bit(page,
->                               atomic_rcu_read(&rs->ram_bitmap)->unsentmap));
->              } else {
-> -                trace_get_queued_page(block->idstr, (uint64_t)offset,
-> -                                     *page);
-> +                trace_get_queued_page(block->idstr, (uint64_t)offset, page);
->              }
->          }
->  
-> @@ -1300,16 +1297,17 @@ err:
->   * @ms: current migration state
->   * @pss: data about the page we want to send
->   * @last_stage: if we are at the completion stage
-> - * @page: page number of the dirty page
->   */
->  static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
-> -                                bool last_stage, unsigned long page)
-> +                                bool last_stage)
->  {
->      int res = 0;
->  
->      /* Check the pages is dirty and if it is send it */
-> -    if (migration_bitmap_clear_dirty(rs, page)) {
-> +    if (migration_bitmap_clear_dirty(rs, pss->block, pss->page)) {
->          unsigned long *unsentmap;
-> +        unsigned long page =
-> +            (pss->block->offset >> TARGET_PAGE_BITS) + pss->page;
->          if (!rs->preffer_xbzrle && migrate_use_compression()) {
->              res = ram_save_compressed_page(rs, pss, last_stage);
->          } else {
-> @@ -1343,25 +1341,22 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
->   * @ms: current migration state
->   * @pss: data about the page we want to send
->   * @last_stage: if we are at the completion stage
-> - * @page: Page number of the dirty page
->   */
->  static int ram_save_host_page(RAMState *rs, PageSearchStatus *pss,
-> -                              bool last_stage,
-> -                              unsigned long page)
-> +                              bool last_stage)
->  {
->      int tmppages, pages = 0;
->      size_t pagesize_bits =
->          qemu_ram_pagesize(pss->block) >> TARGET_PAGE_BITS;
->  
->      do {
-> -        tmppages = ram_save_target_page(rs, pss, last_stage, page);
-> +        tmppages = ram_save_target_page(rs, pss, last_stage);
->          if (tmppages < 0) {
->              return tmppages;
->          }
->  
->          pages += tmppages;
->          pss->page++;
-> -        page++;
->      } while (pss->page & (pagesize_bits - 1));
->  
->      /* The offset we leave with is the last one we looked at */
-> @@ -1388,7 +1383,6 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
->      PageSearchStatus pss;
->      int pages = 0;
->      bool again, found;
-> -    unsigned long page; /* Page number of the dirty page */
->  
->      /* No dirty page as there is zero RAM */
->      if (!ram_bytes_total()) {
-> @@ -1405,15 +1399,15 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
->  
->      do {
->          again = true;
-> -        found = get_queued_page(rs, &pss, &page);
-> +        found = get_queued_page(rs, &pss);
->  
->          if (!found) {
->              /* priority queue empty, so just search for something dirty */
-> -            found = find_dirty_block(rs, &pss, &again, &page);
-> +            found = find_dirty_block(rs, &pss, &again);
->          }
->  
->          if (found) {
-> -            pages = ram_save_host_page(rs, &pss, last_stage, page);
-> +            pages = ram_save_host_page(rs, &pss, last_stage);
->          }
->      } while (!pages && again);
->  
-> diff --git a/migration/trace-events b/migration/trace-events
-> index 7372ce2..0a3f033 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -63,7 +63,7 @@ put_qtailq_end(const char *name, const char *reason) "%s %s"
->  qemu_file_fclose(void) ""
->  
->  # migration/ram.c
-> -get_queued_page(const char *block_name, uint64_t tmp_offset, uint64_t ram_addr) "%s/%" PRIx64 " ram_addr=%" PRIx64
-> +get_queued_page(const char *block_name, uint64_t tmp_offset, unsigned long page) "%s/%" PRIx64 " page=%lu"
->  get_queued_page_not_dirty(const char *block_name, uint64_t tmp_offset, uint64_t ram_addr, int sent) "%s/%" PRIx64 " ram_addr=%" PRIx64 " (sent=%d)"
->  migration_bitmap_sync_start(void) ""
->  migration_bitmap_sync_end(uint64_t dirty_pages) "dirty_pages %" PRIu64
-> -- 
-> 2.9.3
+> > On Fri, 31 Mar 2017 02:27:11 +0000
+> > "Zhang, Xiong Y" <xiong.y.zhang@intel.com> wrote:
+> >   
+> > > > On Thu, 30 Mar 2017 18:27:21 +0800
+> > > > Xiong Zhang <xiong.y.zhang@intel.com> wrote:
+> > > >     
+> > > > > This reverts commit c2b2e158cc7b1cb431bd6039824ec13c3184a775.
+> > > > >
+> > > > > The original patch intend to prevent linux i915 driver from using
+> > > > > stolen meory. But this patch breaks windows IGD driver loading on
+> > > > > Gen9+, as IGD HW will use stolen memory on Gen9+, once windows IGD
+> > > > > driver see zero size stolen memory, it will unload.
+> > > > > Meanwhile stolen memory will be disabled in 915 when i915 run as
+> > > > > a guest.    
+> > > > 
+> > > > Does this mean that legacy mode IGD assignment is not going to work
+> > > > on Gen9+ with Windows?  Will it continue to work with Gen8-?    
+> > > [Zhang, Xiong Y] I try to use the following qemu command to enable legacy mode on SKyLake, but It seems the entry point of wins IGD driver isn't called(I couldn't confirm this as I don't have the source code, but I didn't see any IGD driver info from windbg while I could see many info in upt mode), so driver doesn't bind to IGD after win 8.1 boot up.
+> > >   #qemu-system-x86_64 -M pc -enable-kvm -smp 2 -m 2G  -vga none -nographic -cpu host -hda "$IMAGE" -device vfio-pci,host=00:02.0,x-vga=true,id=hostdev0,bus=pci.0,addr=0x2
+> > > Is this the right method to enable legacy mode ?  
+> > 
+> > Yeah, that should do it.  x-vga should not be necessary, but shouldn't
+> > hurt IIRC.  Any dmesg errors regarding the ROM?  I think we have
+> > trouble with the ROM if the host is booted in UEFI mode.  
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 1.
+> here is dmesg messages when host is booted with CSM mode enabled
+> and host's bios load option rom on boot:
+> 
+> [165041.359929] vfio-pci 0000:00:02.0: vgaarb: changed VGA decodes: olddecodes=io+mem,decodes=io+mem:owns=io+mem
+> [165073.898940] vfio-pci 0000:00:02.0: vgaarb: changed VGA decodes: olddecodes=io+mem,decodes=io+mem:owns=io+mem
+> [165074.687515] vfio-pci 0000:00:02.0: enabling device (0400 -> 0403)
+> [165074.791598] vfio_ecap_init: 0000:00:02.0 hiding ecap 0x1b@0x100
+> 
+> have output on monitor connected via HDMI
+> 
+> 2.
+> and here is dmesg in pure UEFI mode (where host's bios doesn't load option rom):
+> 
+> [   21.034983] vfio-pci 0000:00:02.0: vgaarb: changed VGA decodes: olddecodes=io+mem,decodes=io+mem:owns=io+mem
+> [   22.025361] vfio_ecap_init: 0000:00:02.0 hiding ecap 0x1b@0x100
+> [   22.030970] vfio-pci 0000:00:02.0: Invalid PCI ROM header signature: expecting 0xaa55, got 0xffff
+> [   22.031036] vfio-pci 0000:00:02.0: Invalid PCI ROM header signature: expecting 0xaa55, got 0xffff
+> [   24.738793] vfio-pci 0000:00:02.0: Invalid PCI ROM header signature: expecting 0xaa55, got 0xffff
+> [   27.776904] vfio-pci 0000:00:02.0: vgaarb: changed VGA decodes: olddecodes=io+mem,decodes=io+mem:owns=io+mem
+> 
+> no output on monitor connected via HDMI when using Kabylake CPU (HD630)
+> but pure UEFI mode used to work (external output) with Skylake CPU (HD510)
+
+In my limited experience, I've never been able to use IGD assignment on
+a pure UEFI host unless I provide the ROM via file.  For instance on my
+laptop I switched to CSM and booted a live CD to dump the ROM, which I
+can then use regardless of the host BIOS mode.
+
+I just updated my rom-parser to include a version to fixup ROMs for
+vendor/device ID and checksum which should help with this:
+
+https://github.com/awilliam/rom-parser
+
+Update the device ID to match your ROM and let it fix the checksum.
+Maybe Xiong has some insight into why the VGA ROM often doesn't seem to
+exist on native pure UEFI hosts.
+
+> > ---
+> my test config is Win10 guest + IGD drivers 4534 build (installed by win update)
+> i3-7100T on C236 chipset with following libvirt config
+> 
+>   <devices>
+>     ...
+>     <hostdev mode='subsystem' type='pci' managed='yes'>
+>       <driver name='vfio'/>
+>       <source>
+>         <address domain='0x0000' bus='0x00' slot='0x02' function='0x0'/>
+>       </source>
+>       <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x0'/>
+>     </hostdev>
+>     <hostdev mode='subsystem' type='pci' managed='yes'>
+>       <driver name='vfio'/>
+>       <source>
+>         <address domain='0x0000' bus='0x00' slot='0x1f' function='0x3'/>
+>       </source>
+>       <address type='pci' domain='0x0000' bus='0x00' slot='0x0a' function='0x0'/>
+>     </hostdev>
+>   </devices>
+>   <qemu:commandline>
+>     <qemu:arg value='-set'/>
+>     <qemu:arg value='device.hostdev0.x-igd-opregion=on'/>
+>     <qemu:arg value='-set'/>
+>     <qemu:arg value='device.hostdev0.x-vga=on'/>
+
+Hmm, neither of these should be necessary, legacy mode IGD support
+should active both automatically.  Thanks,
+
+Alex
