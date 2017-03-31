@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cu0it-0005Vj-D6
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:52:32 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cu0nY-0007uW-81
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:57:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cu0ip-0005uE-Ff
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:52:31 -0400
-Date: Fri, 31 Mar 2017 13:52:21 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170331175221.GN22342@localhost.localdomain>
-References: <20170331152730.12514-1-eblake@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1cu0nV-0001Og-3b
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:57:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55608)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1cu0nU-0001NQ-R5
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:57:17 -0400
+References: <C885D0FF6A27744DB0B822E32DF6EF029B1CA14A@SESTOEX04.enea.se>
+	<9b05e60a-f8c2-ea4f-6be4-f17c0adec510@redhat.com>
+	<C885D0FF6A27744DB0B822E32DF6EF029B1CA282@SESTOEX04.enea.se>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <d3ab5208-b9a6-6e83-2c87-f988a9031ebc@redhat.com>
+Date: Fri, 31 Mar 2017 19:57:11 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170331152730.12514-1-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9] rbd: Fix regression in legacy
- key/values containing escaped :
+In-Reply-To: <C885D0FF6A27744DB0B822E32DF6EF029B1CA282@SESTOEX04.enea.se>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="UnjfK2kJmtDx9bvKIIhFg5dX9XgcA8X7w"
+Subject: Re: [Qemu-devel] nbd: Possible regression in 2.9 RCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,203 +29,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, Alexandru.Avadanii@enea.com, Josh Durgin <jdurgin@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Ciprian Barbu <Ciprian.Barbu@enea.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Alexandru Avadanii <Alexandru.Avadanii@enea.com>
+Cc: Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>, svc-armband <armband@enea.com>, Kevin Wolf <kwolf@redhat.com>
 
-On Fri, Mar 31, 2017 at 10:27:30AM -0500, Eric Blake wrote:
-> Commit c7cacb3 accidentally broke legacy key-value parsing through
-> pseudo-filename parsing of -drive file=rbd://..., for any key that
-> contains an escaped ':'.  Such a key is surprisingly common, thanks
-> to mon_host specifying a 'host:port' string.  The break happens
-> because passing things from QDict through QemuOpts back to another
-> QDict requires that we pack our parsed key/value pairs into a string,
-> and then reparse that string, but the intermediate string that we
-> created ("key1=value1:key2=value2") lost the \: escaping that was
-> present in the original, so that we could no longer see which : were
-> used as separators vs. those used as part of the original input.
-> 
-> Fix it by collecting the key/value pairs through a QList, and
-> sending that list on a round trip through a JSON QString (as in
-> '["key1","value1","key2","value2"]') on its way through QemuOpts,
-> rather than hand-rolling our own string.  Since the string is only
-> handled internally, this was faster than creating a full-blown
-> struct of '[{"key1":"value1"},{"key2":"value2"}]', and safer at
-> guaranteeing order compared to '{"key1":"value1","key2":"value2"}'.
-> 
-> It would be nicer if we didn't have to round-trip through QemuOpts
-> in the first place, but that's a much bigger task for later.
-> 
-> Reproducer:
-> ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio \
-> -drive 'file=rbd:volumes/volume-ea141b5c-cdb3-4765-910d-e7008b209a70'\
-> ':id=compute:key=AQAVkvxXAAAAABAA9ZxWFYdRmV+DSwKr7BKKXg=='\
-> ':auth_supported=cephx\;none:mon_host=192.168.1.2\:6789'\
-> ',format=raw,if=none,id=drive-virtio-disk0,'\
-> 'serial=ea141b5c-cdb3-4765-910d-e7008b209a70,cache=writeback'
-> 
-> Even without an RBD setup, this serves a test of whether we get
-> the incorrect parser error of:
-> qemu-system-x86_64: -drive file=rbd:...cache=writeback: conf option 6789 has no value
-> or the correct behavior of hanging while trying to connect to
-> the requested mon_host of 192.168.1.2:6789.
-> 
-> Reported-by: Alexandru Avadanii <Alexandru.Avadanii@enea.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  block/rbd.c | 83 +++++++++++++++++++++++++++++++------------------------------
->  1 file changed, 42 insertions(+), 41 deletions(-)
-> 
-> diff --git a/block/rbd.c b/block/rbd.c
-> index 498322b..fbdb131 100644
-> --- a/block/rbd.c
-> +++ b/block/rbd.c
-> @@ -20,6 +20,7 @@
->  #include "crypto/secret.h"
->  #include "qemu/cutils.h"
->  #include "qapi/qmp/qstring.h"
-> +#include "qapi/qmp/qjson.h"
-> 
->  /*
->   * When specifying the image filename use:
-> @@ -135,18 +136,16 @@ static void qemu_rbd_parse_filename(const char *filename, QDict *options,
->                                      Error **errp)
->  {
->      const char *start;
-> -    char *p, *buf, *keypairs;
-> +    char *p, *buf;
-> +    QList *keypairs = NULL;
->      char *found_str;
-> -    size_t max_keypair_size;
-> 
->      if (!strstart(filename, "rbd:", &start)) {
->          error_setg(errp, "File name must start with 'rbd:'");
->          return;
->      }
-> 
-> -    max_keypair_size = strlen(start) + 1;
->      buf = g_strdup(start);
-> -    keypairs = g_malloc0(max_keypair_size);
->      p = buf;
-> 
->      found_str = qemu_rbd_next_tok(p, '/', &p);
-> @@ -194,33 +193,30 @@ static void qemu_rbd_parse_filename(const char *filename, QDict *options,
->          } else if (!strcmp(name, "id")) {
->              qdict_put(options, "user" , qstring_from_str(value));
->          } else {
-> -            /* FIXME: This is pretty ugly, and not the right way to do this.
-> -             *        These should be contained in a structure, and then
-> -             *        passed explicitly as individual key/value pairs to
-> -             *        rados.  Consider this legacy code that needs to be
-> -             *        updated. */
-> -            char *tmp = g_malloc0(max_keypair_size);
-> -            /* only use a delimiter if it is not the first keypair found */
-> -            /* These are sets of unknown key/value pairs we'll pass along
-> -             * to ceph */
-> -            if (keypairs[0]) {
-> -                snprintf(tmp, max_keypair_size, ":%s=%s", name, value);
-> -                pstrcat(keypairs, max_keypair_size, tmp);
-> -            } else {
-> -                snprintf(keypairs, max_keypair_size, "%s=%s", name, value);
-> +            /*
-> +             * We pass these internally to qemu_rbd_set_keypairs(), so
-> +             * we can get away with the simpler list of [ "key1",
-> +             * "value1", "key2", "value2" ] rather than a raw dict
-> +             * { "key1": "value1", "key2": "value2" } where we can't
-> +             * guarantee order, or even a more correct but complex
-> +             * [ { "key1": "value1" }, { "key2": "value2" } ]
-> +             */
-> +            if (!keypairs) {
-> +                keypairs = qlist_new();
->              }
-> -            g_free(tmp);
-> +            qlist_append(keypairs, qstring_from_str(name));
-> +            qlist_append(keypairs, qstring_from_str(value));
->          }
->      }
-> 
-> -    if (keypairs[0]) {
-> -        qdict_put(options, "=keyvalue-pairs", qstring_from_str(keypairs));
-> +    if (keypairs) {
-> +        qdict_put(options, "=keyvalue-pairs",
-> +                  qobject_to_json(QOBJECT(keypairs)));
->      }
-> 
-> -
->  done:
->      g_free(buf);
-> -    g_free(keypairs);
-> +    QDECREF(keypairs);
->      return;
->  }
-> 
-> @@ -244,36 +240,41 @@ static int qemu_rbd_set_auth(rados_t cluster, const char *secretid,
->      return 0;
->  }
-> 
-> -static int qemu_rbd_set_keypairs(rados_t cluster, const char *keypairs,
-> +static int qemu_rbd_set_keypairs(rados_t cluster, const char *keypairs_json,
->                                   Error **errp)
->  {
-> -    char *p, *buf;
-> -    char *name;
-> -    char *value;
-> +    QList *keypairs;
-> +    QString *name;
-> +    QString *value;
-> +    const char *key;
-> +    size_t remaining;
->      int ret = 0;
-> 
-> -    buf = g_strdup(keypairs);
-> -    p = buf;
-> +    if (!keypairs_json) {
-> +        return ret;
-> +    }
-> +    keypairs = qobject_to_qlist(qobject_from_json(keypairs_json,
-> +                                                  &error_abort));
-> +    remaining = qlist_size(keypairs) / 2;
-> +    assert(remaining);
-> 
-> -    while (p) {
-> -        name = qemu_rbd_next_tok(p, '=', &p);
-> -        if (!p) {
-> -            error_setg(errp, "conf option %s has no value", name);
-> -            ret = -EINVAL;
-> -            break;
-> -        }
-> +    while (remaining--) {
-> +        name = qobject_to_qstring(qlist_pop(keypairs));
-> +        value = qobject_to_qstring(qlist_pop(keypairs));
-> +        assert(name && value);
-> +        key = qstring_get_str(name);
-> 
-> -        value = qemu_rbd_next_tok(p, ':', &p);
-> -
-> -        ret = rados_conf_set(cluster, name, value);
-> +        ret = rados_conf_set(cluster, key, qstring_get_str(value));
-> +        QDECREF(name);
-> +        QDECREF(value);
->          if (ret < 0) {
-> -            error_setg_errno(errp, -ret, "invalid conf option %s", name);
-> +            error_setg_errno(errp, -ret, "invalid conf option %s", key);
->              ret = -EINVAL;
->              break;
->          }
->      }
-> 
-> -    g_free(buf);
-> +    QDECREF(keypairs);
->      return ret;
->  }
-> 
-> -- 
-> 2.9.3
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--UnjfK2kJmtDx9bvKIIhFg5dX9XgcA8X7w
+From: Max Reitz <mreitz@redhat.com>
+To: Ciprian Barbu <Ciprian.Barbu@enea.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Eric Blake <eblake@redhat.com>,
+ Alexandru Avadanii <Alexandru.Avadanii@enea.com>
+Cc: Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ svc-armband <armband@enea.com>, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <d3ab5208-b9a6-6e83-2c87-f988a9031ebc@redhat.com>
+Subject: Re: [Qemu-devel] nbd: Possible regression in 2.9 RCs
+References: <C885D0FF6A27744DB0B822E32DF6EF029B1CA14A@SESTOEX04.enea.se>
+ <9b05e60a-f8c2-ea4f-6be4-f17c0adec510@redhat.com>
+ <C885D0FF6A27744DB0B822E32DF6EF029B1CA282@SESTOEX04.enea.se>
+In-Reply-To: <C885D0FF6A27744DB0B822E32DF6EF029B1CA282@SESTOEX04.enea.se>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
+On 31.03.2017 19:49, Ciprian Barbu wrote:
+> Hi,
+>=20
+> Thank you for getting back!
+>=20
+> I'm trying to follow you, but I don't understand all the details. I wou=
+ld like to ask this question though:
+>=20
+> What is the difference between v2.8.0 and this commit? With v2.8.0 the =
+same qemu command worked, but I admit it doesn't request sharing.
 
-Applied to my block branch:
+The difference is that we now make sure there are for example not two
+writers for the same block device (unless both agree that it's OK to
+have shared writers). We haven't done that before.
 
-git://github.com/codyprime/qemu-kvm-jtc.git block
+The built-in NBD server is completely OK with writes by other parties
+(such as guest devices), but guest devices generally are not (because
+the guest OS should know about this).
 
--Jeff
+Therefore, you'd now have to set the share-rw flag for guest devices
+which should allow shared writers. Otherwise you cannot set up an NBD
+server on a block device that is in use by the guest device.
+
+> We also use libvirt v1.3.4, which might be a problem, but at least we w=
+ant to understand if the commit in question introduced an obvious problem=
+ or if it's all in the details.
+
+Well, I don't think there is any libvirt version that knows about this
+flag yet.
+
+=2E..maybe another way to resolve the issue would be to set share-rw to
+true by default for now, noting that this will be changed in the future.
+In any case, I'm afraid we'll have to wait until Kevin is around on Monda=
+y.
+
+> Btw, the qemu command generated by libvirt is this one, sorry about tha=
+t:
+
+And sorry about not yet having thanked you for reporting this issue. :-)
+
+Max
+
+> 2017-03-31 17:40:10.956+0000: starting up libvirt version: 1.3.4, packa=
+ge: 0+amos3~u16.04 (Enea Armband Devops Team <armband@enea.com> Fri, 13 J=
+an 2017 02:06:05 +0100), qemu version: 2.8.50(Debian 1:2.9+amos2~u16.04),=
+ hostname: node-2.domain.tld
+> LC_ALL=3DC PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sb=
+in:/bin QEMU_AUDIO_DRV=3Dnone /usr/bin/kvm -name instance-00000076,debug-=
+threads=3Don -S -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/l=
+ib/libvirt/qemu/domain-14-instance-00000076/master-key.aes -machine virt-=
+2.8,accel=3Dkvm,usb=3Doff,gic-version=3D3 -cpu host -m 256 -realtime mloc=
+k=3Doff -smp 1,sockets=3D1,cores=3D1,threads=3D1 -uuid 2812f3c9-f564-499b=
+-a8c7-e9e7ccf24143 -no-user-config -nodefaults -chardev socket,id=3Dcharm=
+onitor,path=3D/var/lib/libvirt/qemu/domain-14-instance-00000076/monitor.s=
+ock,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol =
+-rtc base=3Dutc,driftfix=3Dslew -no-shutdown -boot strict=3Don -kernel /v=
+ar/lib/nova/instances/2812f3c9-f564-499b-a8c7-e9e7ccf24143/kernel -initrd=
+ /var/lib/nova/instances/2812f3c9-f564-499b-a8c7-e9e7ccf24143/ramdisk -ap=
+pend 'root=3D/dev/vda1 rw rootwait console=3Dtty0 console=3DttyS0 console=
+=3DttyAMA0' -device i82801b11-bridge,id=3Dpci.1,bus=3Dpcie.0,addr=3D0x1 -=
+device pci-bridge,chassis_nr=3D2,id=3Dpci.2,bus=3Dpci.1,addr=3D0x0 -usb -=
+drive file=3D/var/lib/nova/instances/2812f3c9-f564-499b-a8c7-e9e7ccf24143=
+/disk,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0,cache=3Dnone,aio=3D=
+native -device virtio-blk-device,scsi=3Doff,drive=3Ddrive-virtio-disk0,id=
+=3Dvirtio-disk0,bootindex=3D1 -drive file=3D/var/lib/nova/instances/2812f=
+3c9-f564-499b-a8c7-e9e7ccf24143/disk.config,format=3Draw,if=3Dnone,id=3Dd=
+rive-virtio-disk1,cache=3Dnone,aio=3Dnative -device virtio-blk-device,scs=
+i=3Doff,drive=3Ddrive-virtio-disk1,id=3Dvirtio-disk1 -netdev tap,fd=3D27,=
+id=3Dhostnet0 -device virtio-net-device,netdev=3Dhostnet0,id=3Dnet0,mac=3D=
+fa:16:3e:82:0a:2b -serial file:/var/lib/nova/instances/2812f3c9-f564-499b=
+-a8c7-e9e7ccf24143/console.log -serial pty -vnc 0.0.0.0:0 -k en-us -devic=
+e VGA,id=3Dvideo0,vgamem_mb=3D16,bus=3Dpci.2,addr=3D0x1 -device virtio-ba=
+lloon-device,id=3Dballoon0 -msg timestamp=3Don
+> Domain id=3D14 is tainted: high-privileges
+>=20
+> Regards,
+> /Ciprian
+>
+
+
+--UnjfK2kJmtDx9bvKIIhFg5dX9XgcA8X7w
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljemHcSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AnIoH/1RdzUfZg9ZgkXvFZOU3UWH06YTKyUnc
+LsPj7ipTlpK5GBT3EDuUTgLb1r4tZNu6rbNFiCAxcGJBec8TgcAliu69dvezJBBz
+bkMjZxUXzQ00b1PVnQh0LSdzVw0O/rn5qUfsiQ6jwO88CdAum8KIOfKpvPi9vqhO
+zxj1qTH0eR095quprts17YM+5Zn4mcwavuyVA+RL4j0/j7L16fAty9Bre5VCLwut
+xUiHaFlHCZZKS/0x7l+l+dySskGklH/3RPaBXxFSjO5OQr2bAQ+jqucc9tRQ5TGt
+cjSr0dTVz7KfS20xWkBjF7zAeNuFfhENjVvA603X894LN40YKDKpN6Y=
+=iGWj
+-----END PGP SIGNATURE-----
+
+--UnjfK2kJmtDx9bvKIIhFg5dX9XgcA8X7w--
