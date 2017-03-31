@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46983)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Ciprian.Barbu@enea.com>) id 1cu0T9-00083X-Kk
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:36:19 -0400
+	(envelope-from <rjones@redhat.com>) id 1cu0XB-0000lB-SM
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:40:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Ciprian.Barbu@enea.com>) id 1cu0T4-0003QB-Vq
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:36:15 -0400
-Received: from smtp-out10.electric.net ([185.38.180.40]:55061)
+	(envelope-from <rjones@redhat.com>) id 1cu0X6-0005Lk-Vo
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:40:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55112)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Ciprian.Barbu@enea.com>)
-	id 1cu0T4-0003P5-Kf
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:36:10 -0400
-From: Ciprian Barbu <Ciprian.Barbu@enea.com>
-Date: Fri, 31 Mar 2017 17:36:08 +0000
-Message-ID: <C885D0FF6A27744DB0B822E32DF6EF029B1CA253@SESTOEX04.enea.se>
-References: <C885D0FF6A27744DB0B822E32DF6EF029B1CA14A@SESTOEX04.enea.se>
-	<C885D0FF6A27744DB0B822E32DF6EF029B1CA239@SESTOEX04.enea.se>
-In-Reply-To: <C885D0FF6A27744DB0B822E32DF6EF029B1CA239@SESTOEX04.enea.se>
-Content-Language: en-US
+	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1cu0X6-0005La-PR
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:40:20 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 83E48437F4C
+	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 17:40:19 +0000 (UTC)
+Date: Fri, 31 Mar 2017 18:40:14 +0100
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20170331174014.GK13825@redhat.com>
+References: <20170331164322.24020-1-stefanha@redhat.com>
+	<4de63a1a-e385-e22f-9bc4-f29d90cbdc30@redhat.com>
+	<20170331173101.GL30620@redhat.com>
+	<692126d8-68ad-d546-1adb-32e041976683@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] nbd: Possible regression in 2.9 RCs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <692126d8-68ad-d546-1adb-32e041976683@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] char: kick main loop after adding a watch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +35,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Alexandru Avadanii <Alexandru.Avadanii@enea.com>
-Cc: Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>, svc-armband <armband@enea.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Frediano Ziglio <fziglio@redhat.com>
 
-Sorry, I think this one is more likely the cause, it's about migration:
+On Fri, Mar 31, 2017 at 07:31:57PM +0200, Paolo Bonzini wrote:
+> 
+> 
+> On 31/03/2017 19:31, Richard W.M. Jones wrote:
+> > On Fri, Mar 31, 2017 at 06:53:56PM +0200, Paolo Bonzini wrote:
+> >> glib is expecting QEMU to use g_main_context_acquire around accesses to 
+> >> GMainContext.  However QEMU is not doing that, instead it is taking its 
+> >> own mutex.  So we should add g_main_context_acquire and
+> >> g_main_context_release in the two implementations of 
+> >> os_host_main_loop_wait; these should undo the effect of Frediano's 
+> >> glib patch.
+> > 
+> > Based on this paragraph, I'm testing the attached patch, and it does
+> > also appear to solve the hanging serial port problem.
+> 
+> Great, can you do more testing and/or send the patch formally as a
+> toplevel message?
 
-https://github.com/qemu/qemu/commit/6f5ef23a3ff09919b73eef8196969685cb2383e=
-e
+Sure, I'm going to test it a lot more overnight, and then
+if it survives all that I'll post it properly.
 
-From: Ciprian Barbu
-Sent: Friday, March 31, 2017 8:33 PM
-To: Ciprian Barbu <Ciprian.Barbu@enea.com>; qemu-devel@nongnu.org; Eric Bla=
-ke <eblake@redhat.com>; Alexandru Avadanii <Alexandru.Avadanii@enea.com>
-Cc: Jeff Cody <jcody@redhat.com>; Markus Armbruster <armbru@redhat.com>; sv=
-c-armband <armband@enea.com>
-Subject: RE: [Qemu-devel] nbd: Possible regression in 2.9 RCs
+Thanks,
 
-I suspect the culprit here is [1]. I've started a git bisect between this c=
-ommit and v2.8.0 and during this time I found similar erros "/root/qemu/nbd=
-/server.c:nbd_receive_request():L706: read failed"
+Rich.
 
-I suspect this fix tried to solve a bunch of these read fails, but broke wr=
-ite requests.
-
-[1] https://github.com/qemu/qemu/commit/8a7ce4f9338c475df1afc12502af704e430=
-0a3e0
-
-From: cosnos-bounces@list.enea.se<mailto:cosnos-bounces@list.enea.se> [mail=
-to:cosnos-bounces@list.enea.se] On Behalf Of Ciprian Barbu
-Sent: Friday, March 31, 2017 7:04 PM
-To: qemu-devel@nongnu.org<mailto:qemu-devel@nongnu.org>; Eric Blake <eblake=
-@redhat.com<mailto:eblake@redhat.com>>; Alexandru Avadanii <Alexandru.Avada=
-nii@enea.com<mailto:Alexandru.Avadanii@enea.com>>
-Cc: Jeff Cody <jcody@redhat.com<mailto:jcody@redhat.com>>; Markus Armbruste=
-r <armbru@redhat.com<mailto:armbru@redhat.com>>; svc-armband <armband@enea.=
-com<mailto:armband@enea.com>>
-Subject: [Cosnos] [Qemu-devel] nbd: Possible regression in 2.9 RCs
-
-Hello,
-
-Similar to the other thread about possible regression with rbd, there might=
- be a regression with nbd.
-This time we are launching an instance from an image (not volume) and try t=
-o live migrate it:
-
-nova live-migration <test_instance>
-
-The nova-compute service complains with:
-
-2017-03-31 15:32:56.179 7806 INFO nova.virt.libvirt.driver [req-15d79cbe-59=
-56-4738-92df-3624e6b993ee d795de59fb9a4ea38776a11d20ae8469 cee03e74881f4ccb=
-a3b83345fb652b2c - - -] [instance: 6a04508f-5d79-4582-8e2c-4cc368753f6c] Mi=
-gration running for 0 secs, memory 100% remaining; (bytes processed=3D0, re=
-maining=3D0, total=3D0)
-2017-03-31 15:32:58.029 7806 WARNING stevedore.named [req-73bc0113-5555-4dd=
-8-8903-d3540cc61b47 b9fbceeadd2d4d1bab9c90ae104db1f7 7e7db99b32c6467184701e=
-9a0c2f1de7 - - -] Could not load instance_network_info
-2017-03-31 15:32:59.038 7806 ERROR nova.virt.libvirt.driver [req-15d79cbe-5=
-956-4738-92df-3624e6b993ee d795de59fb9a4ea38776a11d20ae8469 cee03e74881f4cc=
-ba3b83345fb652b2c - - -] [instance: 6a04508f-5d79-4582-8e2c-4cc368753f6c] L=
-ive Migration failure: internal error: unable to execute QEMU command 'nbd-=
-server-add': Conflicts with use by drive-virtio-disk0 as 'root', which does=
- not allow 'write' on #block143
-2017-03-31 15:32:59.190 7806 ERROR nova.virt.libvirt.driver [req-15d79cbe-5=
-956-4738-92df-3624e6b993ee d795de59fb9a4ea38776a11d20ae8469 cee03e74881f4cc=
-ba3b83345fb652b2c - - -] [instance: 6a04508f-5d79-4582-8e2c-4cc368753f6c] M=
-igration operation has aborted
-
-I will try and bisect it myself, but I thought I would paste this here firs=
-t, just so you know there is this issue too.
-
-Regards,
-/Ciprian
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-top is 'top' for virtual machines.  Tiny program with many
+powerful monitoring features, net stats, disk stats, logging, etc.
+http://people.redhat.com/~rjones/virt-top
