@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ctsOW-0005jf-IK
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 04:58:57 -0400
+	(envelope-from <stefanha@redhat.com>) id 1ctsSn-0006mb-3q
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:03:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ctsOS-0003LP-LV
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 04:58:56 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:35674)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ctsOS-0003LB-ET
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 04:58:52 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id k6so90579018wre.2
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 01:58:52 -0700 (PDT)
-References: <20170330164657.50c75e8c@nial.brq.redhat.com>
-	<87k2764xex.fsf@linaro.org>
-	<20170331102125.52405cd2@nial.brq.redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170331102125.52405cd2@nial.brq.redhat.com>
-Date: Fri, 31 Mar 2017 09:58:49 +0100
-Message-ID: <87h9294yba.fsf@linaro.org>
+	(envelope-from <stefanha@redhat.com>) id 1ctsSm-0005Xf-Ac
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:03:21 -0400
+Date: Fri, 31 Mar 2017 10:03:09 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170331090309.GB2199@stefanha-x1.localdomain>
+References: <1490895797-29094-1-git-send-email-armbru@redhat.com>
+	<1490895797-29094-3-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] qemu-2.9 crashes in tcg_handle_interrupt() during
- winx64 boot
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="PmA2V3Z32TCmWXqI"
+Content-Disposition: inline
+In-Reply-To: <1490895797-29094-3-git-send-email-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 for-2.9 2/9] char: Fix socket with
+ "type": "vsock" address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,58 +25,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, Paolo Bonzini <pbonzini@redhat.com>, Pranith Kumar <bobby.prani@gmail.com>, KONRAD Frederic <fred.konrad@greensocs.com>, Richard Henderson <rth@twiddle.net>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, pbonzini@redhat.com, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
 
 
-Igor Mammedov <imammedo@redhat.com> writes:
+--PmA2V3Z32TCmWXqI
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> On Thu, 30 Mar 2017 16:05:58 +0100
-> Alex Bennée <alex.bennee@linaro.org> wrote:
->
->> Igor Mammedov <imammedo@redhat.com> writes:
->>
->> > (PS: resend due to wrong qemu-devel mail list address in original
->> > email)
->>
->> Le *sigh* another way of x86 generating IRQs ;-)
->>
->> Could you test this please?
->>
->> target/i386/misc_helper: wrap BQL around another IRQ generator
->>
->> Anything that calls into HW emulation must be protected by the BQL.
->>
->> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> it doesn't help,
-> it asserts in the same place anyway
+On Thu, Mar 30, 2017 at 07:43:10PM +0200, Markus Armbruster wrote:
+> Watch this:
+>=20
+>     $ qemu-system-x86_64 -nodefaults -S -display none -qmp stdio
+>     {"QMP": {"version": {"qemu": {"micro": 91, "minor": 8, "major": 2}, "=
+package": " (v2.8.0-1195-gf84141e-dirty)"}, "capabilities": []}}
+>     { "execute": "qmp_capabilities" }
+>     {"return": {}}
+>     { "execute": "chardev-add", "arguments": { "id": "chr0", "backend": {=
+ "type": "socket", "data": { "addr": { "type": "vsock", "data": { "cid": "C=
+ID", "port": "P" }}}}}}
+>     Aborted (core dumped)
+>=20
+> Crashes because SocketAddress_to_str() is blissfully unaware of
+> SOCKET_ADDRESS_KIND_VSOCK.  Fix that.  Pick the output format to match
+> socket_parse(), just like the existing formats.
+>=20
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  chardev/char-socket.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 
-That's weird. If the lock was already held I could see it failing higher
-up but this seems to imply we are dropping a lock as we descend into
-hardware emulation.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-How often does this leg of the helper get called?
+--PmA2V3Z32TCmWXqI
+Content-Type: application/pgp-signature; name="signature.asc"
 
->
->>
->> 1 file changed, 2 insertions(+)
->> target/i386/misc_helper.c | 2 ++
->>
->> modified   target/i386/misc_helper.c
->> @@ -156,7 +156,9 @@ void helper_write_crN(CPUX86State *env, int reg, target_ulong t0)
->>          break;
->>      case 8:
->>          if (!(env->hflags2 & HF2_VINTR_MASK)) {
->> +            qemu_mutex_lock_iothread();
->>              cpu_set_apic_tpr(x86_env_get_cpu(env)->apic_state, t0);
->> +            qemu_mutex_unlock_iothread();
->>          }
->>          env->v_tpr = t0 & 0x0f;
->>          break;
->> --
->> Alex Bennée
->>
+-----BEGIN PGP SIGNATURE-----
 
+iQEcBAEBAgAGBQJY3htNAAoJEJykq7OBq3PI9dMH/jtjTYX81KoGpsI+d9K9T9NY
+KZqQ1C0cneFhmR3mbestKAp7H93CQbdOPzdHPRs2+fdan2jcpoQz08BC+x6Whyml
+FRbcyc/AwHngKor1GL92ph7ww+XWMxdyUCTZzfS+ooHRdTdvCt6lmowIcIPeaxWT
+8mtEPLsdaEoLquf/UqWBrSRglhnv4h3suzWADmJX9X4ULTdh24eoQZ0XGM1roei/
+BPzVHsdfpQdUr3672dgwewWDVt4IO2nR2cdElYrW+5P9QVveRl+78mos5QhK+gsO
+yJ834hWnCHe45fSQGTPtInEv1NgxPZLLecHCvOXvHT2eT7BXlO+Ogz1RkpQ13IY=
+=rypu
+-----END PGP SIGNATURE-----
 
---
-Alex Bennée
+--PmA2V3Z32TCmWXqI--
