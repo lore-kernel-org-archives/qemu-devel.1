@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ctzvL-0000H9-Ak
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:01:20 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1ctzw1-0000eg-Kj
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:02:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ctzvH-0001O4-Gs
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:01:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40894)
+	(envelope-from <alex.williamson@redhat.com>) id 1ctzvx-0001qa-PC
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:02:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34177)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1ctzvH-0001MP-9w
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:01:15 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0266E76F6
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 17:01:13 +0000 (UTC)
+	id 1ctzvx-0001pd-Fq
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:01:57 -0400
 From: Alex Williamson <alex.williamson@redhat.com>
-Date: Fri, 31 Mar 2017 11:01:08 -0600
-Message-ID: <20170331170018.11643.80499.stgit@gimli.home>
+Date: Fri, 31 Mar 2017 11:01:52 -0600
+Message-ID: <20170331170118.11643.44585.stgit@gimli.home>
+In-Reply-To: <20170331170018.11643.80499.stgit@gimli.home>
+References: <20170331170018.11643.80499.stgit@gimli.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PULL 0/1] VFIO fixes 2017-03-31
+Subject: [Qemu-devel] [PULL 1/1] Revert "vfio/pci-quirks.c: Disable stolen
+ memory for igd VFIO"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,32 +29,133 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Xiong Zhang <xiong.y.zhang@intel.com>
 
-The following changes since commit 37c4a85cd256a51c5f58ee7e531f25f0e89b2c87:
+From: Xiong Zhang <xiong.y.zhang@intel.com>
 
-  Merge remote-tracking branch 'remotes/dgilbert/tags/pull-hmp-20170331' into
-staging (2017-03-31 12:43:27 +0100)
+This reverts commit c2b2e158cc7b1cb431bd6039824ec13c3184a775.
 
-are available in the git repository at:
+The original patch intend to prevent linux i915 driver from using
+stolen meory. But this patch breaks windows IGD driver loading on
+Gen9+, as IGD HW will use stolen memory on Gen9+, once windows IGD
+driver see zero size stolen memory, it will unload.
+Meanwhile stolen memory will be disabled in 915 when i915 run as
+a guest.
 
-
-  git://github.com/awilliam/qemu-vfio.git tags/vfio-updates-20170331.0
-
-for you to fetch changes up to 93587e3af3a259deac89c12863d93653d69d22b8:
-
-  Revert "vfio/pci-quirks.c: Disable stolen memory for igd VFIO" (2017-03-31
-10:04:41 -0600)
-
-----------------------------------------------------------------
-VFIO fixes 2017-03-31
-
- - We can't disable stolen memory for UPT mode, it breaks Windows
-   drivers on Gen9+ IGD (Xiong Zhang)
-
-----------------------------------------------------------------
-Xiong Zhang (1):
-      Revert "vfio/pci-quirks.c: Disable stolen memory for igd VFIO"
-
- hw/vfio/pci-quirks.c | 65
-++++++++++++++++++++++------------------------------
+Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
+[aw: Gen9+ is SkyLake and newer]
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
+ hw/vfio/pci-quirks.c |   65 +++++++++++++++++++++-----------------------------
  1 file changed, 27 insertions(+), 38 deletions(-)
+
+diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+index e995e32deedf..e9b493b939db 100644
+--- a/hw/vfio/pci-quirks.c
++++ b/hw/vfio/pci-quirks.c
+@@ -1367,45 +1367,14 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+     uint16_t cmd_orig, cmd;
+     Error *err = NULL;
+ 
+-    /* This must be an Intel VGA device. */
+-    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, PCI_ANY_ID) ||
+-        !vfio_is_vga(vdev) || nr != 4) {
+-        return;
+-    }
+-
+-    /*
+-     * IGD is not a standard, they like to change their specs often.  We
+-     * only attempt to support back to SandBridge and we hope that newer
+-     * devices maintain compatibility with generation 8.
+-     */
+-    gen = igd_gen(vdev);
+-    if (gen != 6 && gen != 8) {
+-        error_report("IGD device %s is unsupported by IGD quirks, "
+-                     "try SandyBridge or newer", vdev->vbasedev.name);
+-        return;
+-    }
+-
+-    /*
+-     * Regardless of running in UPT or legacy mode, the guest graphics
+-     * driver may attempt to use stolen memory, however only legacy mode
+-     * has BIOS support for reserving stolen memory in the guest VM.
+-     * Emulate the GMCH register in all cases and zero out the stolen
+-     * memory size here. Legacy mode may request allocation and re-write
+-     * this below.
+-     */
+-    gmch = vfio_pci_read_config(&vdev->pdev, IGD_GMCH, 4);
+-    gmch &= ~((gen < 8 ? 0x1f : 0xff) << (gen < 8 ? 3 : 8));
+-
+-    /* GMCH is read-only, emulated */
+-    pci_set_long(vdev->pdev.config + IGD_GMCH, gmch);
+-    pci_set_long(vdev->pdev.wmask + IGD_GMCH, 0);
+-    pci_set_long(vdev->emulated_config_bits + IGD_GMCH, ~0);
+-
+     /*
+-     * This must be at address 00:02.0 for us to even onsider enabling
+-     * legacy mode.  The vBIOS has dependencies on the PCI bus address.
++     * This must be an Intel VGA device at address 00:02.0 for us to even
++     * consider enabling legacy mode.  The vBIOS has dependencies on the
++     * PCI bus address.
+      */
+-    if (&vdev->pdev != pci_find_device(pci_device_root_bus(&vdev->pdev),
++    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, PCI_ANY_ID) ||
++        !vfio_is_vga(vdev) || nr != 4 ||
++        &vdev->pdev != pci_find_device(pci_device_root_bus(&vdev->pdev),
+                                        0, PCI_DEVFN(0x2, 0))) {
+         return;
+     }
+@@ -1425,6 +1394,18 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+     }
+ 
+     /*
++     * IGD is not a standard, they like to change their specs often.  We
++     * only attempt to support back to SandBridge and we hope that newer
++     * devices maintain compatibility with generation 8.
++     */
++    gen = igd_gen(vdev);
++    if (gen != 6 && gen != 8) {
++        error_report("IGD device %s is unsupported in legacy mode, "
++                     "try SandyBridge or newer", vdev->vbasedev.name);
++        return;
++    }
++
++    /*
+      * Most of what we're doing here is to enable the ROM to run, so if
+      * there's no ROM, there's no point in setting up this quirk.
+      * NB. We only seem to get BIOS ROMs, so a UEFI VM would need CSM support.
+@@ -1479,6 +1460,8 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+         goto out;
+     }
+ 
++    gmch = vfio_pci_read_config(&vdev->pdev, IGD_GMCH, 4);
++
+     /*
+      * If IGD VGA Disable is clear (expected) and VGA is not already enabled,
+      * try to enable it.  Probably shouldn't be using legacy mode without VGA,
+@@ -1549,11 +1532,12 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+      * when IVD (IGD VGA Disable) is clear, but the claim is that it's unused,
+      * so let's not waste VM memory for it.
+      */
++    gmch &= ~((gen < 8 ? 0x1f : 0xff) << (gen < 8 ? 3 : 8));
++
+     if (vdev->igd_gms) {
+         if (vdev->igd_gms <= 0x10) {
+             gms_mb = vdev->igd_gms * 32;
+             gmch |= vdev->igd_gms << (gen < 8 ? 3 : 8);
+-            pci_set_long(vdev->pdev.config + IGD_GMCH, gmch);
+         } else {
+             error_report("Unsupported IGD GMS value 0x%x", vdev->igd_gms);
+             vdev->igd_gms = 0;
+@@ -1573,6 +1557,11 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+     fw_cfg_add_file(fw_cfg_find(), "etc/igd-bdsm-size",
+                     bdsm_size, sizeof(*bdsm_size));
+ 
++    /* GMCH is read-only, emulated */
++    pci_set_long(vdev->pdev.config + IGD_GMCH, gmch);
++    pci_set_long(vdev->pdev.wmask + IGD_GMCH, 0);
++    pci_set_long(vdev->emulated_config_bits + IGD_GMCH, ~0);
++
+     /* BDSM is read-write, emulated.  The BIOS needs to be able to write it */
+     pci_set_long(vdev->pdev.config + IGD_BDSM, 0);
+     pci_set_long(vdev->pdev.wmask + IGD_BDSM, ~0);
