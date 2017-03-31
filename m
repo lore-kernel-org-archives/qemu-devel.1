@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1ctsfy-0001Jd-PD
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:17:00 -0400
+	(envelope-from <ashijeetacharya@gmail.com>) id 1ctt3M-0006Vd-KB
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:41:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1ctsfv-0003Pm-Hq
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:16:58 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:54374)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1ctsfv-0003PB-3j
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:16:55 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20170307155054.5833-1-alex.bennee@linaro.org>
-	<001801d29bf5$dcba37d0$962ea770$@ru> <8760jdqpv2.fsf@linaro.org>
-	<000101d29cbc$b8df1ca0$2a9d55e0$@ru> <87tw6vq43b.fsf@linaro.org>
-	<000001d29e30$138e5700$3aab0500$@ru> <871stxpdzz.fsf@linaro.org>
-	<002501d29e64$27b383c0$771a8b40$@ru> <87inn1xunu.fsf@linaro.org>
-	<000601d2a852$ac5211d0$04f63570$@ru> <87vaqs4dxc.fsf@linaro.org>
-	<001b01d2a94a$fe5c46a0$fb14d3e0$@ru> <87o9wj3phd.fsf@linaro.org>
-In-Reply-To: <87o9wj3phd.fsf@linaro.org>
-Date: Fri, 31 Mar 2017 12:16:53 +0300
-Message-ID: <000901d2a9ff$89fcdad0$9df69070$@ru>
+	(envelope-from <ashijeetacharya@gmail.com>) id 1ctt3L-0005RP-IF
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:41:08 -0400
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH v3 00/11] MTTCG fix-ups for 2.9
+In-Reply-To: <20170331090806.GH11195@lemon.lan>
+References: <1490440701-12037-1-git-send-email-ashijeetacharya@gmail.com>
+	<1490440701-12037-8-git-send-email-ashijeetacharya@gmail.com>
+	<20170331072609.GE11195@lemon.lan>
+	<CAC2QTZaL2aDatNoKoxEWn0XYxtfD6RDpB9gWn9h4+QE0vg2mMw@mail.gmail.com>
+	<20170331090806.GH11195@lemon.lan>
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Date: Fri, 31 Mar 2017 15:11:02 +0530
+Message-ID: <CAC2QTZZQDVnxOisnobkEM+=Bu30doLJ01zLB1fVPjq8HZY11qQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2 7/7] vmdk: Update metadata for multiple
+ clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,114 +26,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
-Cc: peter.maydell@linaro.org, rth@twiddle.net, pbonzini@redhat.com, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com
+To: Fam Zheng <famz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 
-> From: mttcg-request@listserver.greensocs.com [mailto:mttcg-request@listserver.greensocs.com]
-> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
-> >> From: mttcg-request@listserver.greensocs.com [mailto:mttcg-
-> request@listserver.greensocs.com]
-> >> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
-> >> >> From: mttcg-request@listserver.greensocs.com [mailto:mttcg-
-> >> request@listserver.greensocs.com]
-> >> >> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
-> <snip>
-> >> >> > I tested on vexpress-a9 platform with Debian wheezy.
-> >> >>
-> >> >> Thanks for that. I now have a test case that I can reproduce failures on
-> >> >> without needing graphics.
-> >> >>
-> >> >> I've been investigating if there are any problems with the timer
-> >> >> processing now they have been moved into the TCG thread. The record
-> >> >> stage seems to work fine but I'm having difficulty figuring out why
-> >> >> playback freezes. It seems we get to a point where we are stuck waiting
-> >> >> for a suspiciously exact timer deadline:
-> >> >
-> >> > I've encountered the following behavior at replay stage:
-> >> > - replay takes some instructions to execute (qemu_icount += counter)
-> >> > - virtual timer is fired
-> >>
-> >> This is the virtual timer based on icount not the virtual rt timer? So
-> >
-> > Regular virtual timer. It's value is based on icount.
-> > virtual_rt is used for internal icount purposes.
-> 
-> And this is where the clock warps come in? The bias brings the
-> virtual_rt time forward because execution is waiting for some external
-> event to fire (e.g. a timer IRQ)?
+On Fri, Mar 31, 2017 at 2:38 PM, Fam Zheng <famz@redhat.com> wrote:
+> On Fri, 03/31 14:17, Ashijeet Acharya wrote:
+>> On Fri, Mar 31, 2017 at 12:56 PM, Fam Zheng <famz@redhat.com> wrote:
+>> > On Sat, 03/25 16:48, Ashijeet Acharya wrote:
+>> >> Include a next pointer in VmdkMetaData struct to point to the previous
+>> >> allocated L2 table. Modify vmdk_L2update to start updating metadata for
+>> >> allocation of multiple clusters at once.
+>> >>
+>> >> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+>> >> ---
+>> >>  block/vmdk.c | 131 ++++++++++++++++++++++++++++++++++++++++++++++-------------
+>> >>  1 file changed, 102 insertions(+), 29 deletions(-)
+>> >>
+>> >> diff --git a/block/vmdk.c b/block/vmdk.c
+>> >> index 3de8b8f..4517409 100644
+>> >> --- a/block/vmdk.c
+>> >> +++ b/block/vmdk.c
+>> >> @@ -137,6 +137,8 @@ typedef struct VmdkMetaData {
+>> >>      int valid;
+>> >>      uint32_t *l2_cache_entry;
+>> >>      uint32_t nb_clusters;
+>> >> +    uint32_t offset;
+>> >> +    struct VmdkMetaData *next;
+>> >>  } VmdkMetaData;
+>> >>
+>> >>  typedef struct VmdkGrainMarker {
+>> >> @@ -1037,29 +1039,81 @@ static void vmdk_refresh_limits(BlockDriverState *bs, Error **errp)
+>> >>      }
+>> >>  }
+>> >>
+>> >> -static int vmdk_L2update(VmdkExtent *extent, VmdkMetaData *m_data,
+>> >> -                         uint32_t offset)
+>> >> +static int vmdk_alloc_cluster_link_l2(VmdkExtent *extent,
+>> >> +                                      VmdkMetaData *m_data, bool zeroed)
+>> >>  {
+>> >> -    offset = cpu_to_le32(offset);
+>> >> +    int i;
+>> >> +    uint32_t offset, temp_offset;
+>> >> +
+>> >> +    if (zeroed) {
+>> >> +        temp_offset = VMDK_GTE_ZEROED;
+>> >> +    } else {
+>> >> +        temp_offset = m_data->offset;
+>> >> +    }
+>> >> +
+>> >> +    temp_offset = cpu_to_le32(temp_offset);
+>> >> +
+>> >>      /* update L2 table */
+>> >> -    if (bdrv_pwrite_sync(extent->file,
+>> >> +    offset = temp_offset;
+>> >> +    for (i = 0; i < m_data->nb_clusters; i++) {
+>> >> +        if (bdrv_pwrite_sync(extent->file,
+>> >>                  ((int64_t)m_data->l2_offset * 512)
+>> >> -                    + (m_data->l2_index * sizeof(offset)),
+>> >> -                &offset, sizeof(offset)) < 0) {
+>> >> -        return VMDK_ERROR;
+>> >> +                    + ((m_data->l2_index + i) * sizeof(offset)),
+>> >> +                &(offset), sizeof(offset)) < 0) {
+>> >> +            return VMDK_ERROR;
+>> >> +        }
+>> >> +        if (!zeroed) {
+>> >> +            offset += 128;
+>> >> +        }
+>> >>      }
+>> >> +
+>> >>      /* update backup L2 table */
+>> >> +    offset = temp_offset;
+>> >>      if (extent->l1_backup_table_offset != 0) {
+>> >>          m_data->l2_offset = extent->l1_backup_table[m_data->l1_index];
+>> >> -        if (bdrv_pwrite_sync(extent->file,
+>> >> -                    ((int64_t)m_data->l2_offset * 512)
+>> >> -                        + (m_data->l2_index * sizeof(offset)),
+>> >> -                    &offset, sizeof(offset)) < 0) {
+>> >> -            return VMDK_ERROR;
+>> >> +        for (i = 0; i < m_data->nb_clusters; i++) {
+>> >> +            if (bdrv_pwrite_sync(extent->file,
+>> >> +                        ((int64_t)m_data->l2_offset * 512)
+>> >> +                            + ((m_data->l2_index + i) * sizeof(offset)),
+>> >> +                        &(offset), sizeof(offset)) < 0) {
+>> >> +                return VMDK_ERROR;
+>> >> +            }
+>> >> +            if (!zeroed) {
+>> >> +                offset += 128;
+>> >> +            }
+>> >>          }
+>> >>      }
+>> >> +
+>> >> +    offset = temp_offset;
+>> >>      if (m_data->l2_cache_entry) {
+>> >> -        *m_data->l2_cache_entry = offset;
+>> >> +        for (i = 0; i < m_data->nb_clusters; i++) {
+>> >> +            *m_data->l2_cache_entry = offset;
+>> >> +            m_data->l2_cache_entry++;
+>> >> +
+>> >> +            if (!zeroed) {
+>> >> +                offset += 128;
+>> >> +            }
+>> >> +        }
+>> >> +    }
+>> >> +
+>> >> +    return VMDK_OK;
+>> >> +}
+>> >> +
+>> >> +static int vmdk_L2update(VmdkExtent *extent, VmdkMetaData *m_data,
+>> >> +                         bool zeroed)
+>> >> +{
+>> >> +    int ret;
+>> >> +
+>> >> +    while (m_data->next != NULL) {
+>> >> +        VmdkMetaData *next;
+>> >> +
+>> >> +        ret = vmdk_alloc_cluster_link_l2(extent, m_data, zeroed);
+>> >> +        if (ret < 0) {
+>> >> +            return ret;
+>> >> +        }
+>> >> +
+>> >> +        next = m_data->next;
+>> >> +        m_data = next;
+>> >
+>> > I don't see why the next pointer is necessary.  Also the tail is always unused,
+>> > why do you need to allocate it?
+>>
+>> If I don't allocate the tail, I was getting a segfault in vmdk_pwritev().
+>
+> That may be because the way you interate the linked list in vmdk_pwritev is:
+>
+>>        while (m_data->next != NULL) {
+>>            VmdkMetaData *next;
+>>            next = m_data->next;
+>>            g_free(m_data);
+>>            m_data = next;
+>>        }
+>>
+>
+> which does require a dummy tail.
 
-I guess so. But bias is not updated when the vCPU works.
-vCPU thread updates only qemu_icount which is used for virtual clock calculation.
+No, I remember it segfaulting even before I inserted that piece of
+code. I think the reason is that I try to access m_data->valid inside
+vmdk_pwritev()...
 
-> >> under the new scheme of being processed in the vCPU loop we should only
-> >> fire this one once all execution is done (although you may exit the loop
-> >> early before icount is exhausted).
-> >
-> > We should stop the vCPU before processing virtual timers because:
-> > - virtual clock depends on instruction counter
-> > - virtual timers may change virtual hardware state
-> 
-> If we do the processing in the top of main vCPU loop this should be
-> equivalent. The instruction counter cannot run because we haven't
-> entered tcg_exec_cpu. We also process virtual timers in this thread
-> outside the loop so nothing else can be poking the hardware state.
+>
+> But after all it's still not clear to me why you cannot keep m_data on stack,
 
-This is how qemu worked in older version - it switched between
-processing tasks (vCPU and timers) in one thread.
-But how we'll join this behavior with the current design and MTTCG?
+...and by using malloc and moving it to the heap solved my problem,
+plus for constructing the linked list.
 
-> 
-> >> > - replay puts back unexecuted instructions (qemu_icount -= counter)
-> >> >
-> >> > But virtual timer cannot take in account non-executed instructions (counter) and
-> >> > therefore it reads only qemu_icount, which provides incorrect time.
-> >> >
-> >> >> But the timers are all enabled:
-> >> >>
-> >> >>   (gdb) qemu timers
-> >> >>   Processing Realtime timers
-> >> >>     clock QEMU_CLOCK_REALTIME is enabled:true, last:-9223372036854775808
-> >> >>   Processing Virtual timers
-> >> >>     clock QEMU_CLOCK_VIRTUAL is enabled:true, last:-9223372036854775808
-> >> >>       timer 34297350016/1 (cb:0x555555a2e952 <ptimer_tick>)
-> >> >>       timer 503290000000/1000000 (cb:0x555555bd4d1d <ra_timer_handler>)
-> >> >>   Processing Host timers
-> >> >>     clock QEMU_CLOCK_HOST is enabled:true, last:1490191319270134000
-> >> >>   Processing Virtual RT timers
-> >> >>     clock QEMU_CLOCK_VIRTUAL_RT is enabled:true, last:-9223372036854775808
-> >> >
-> >> > Timers are processed only at checkpoints recorded in the log.
-> >> > When replay is stuck, probably there is a pending checkpoint in the log
-> >> > and pending instructions in CPU (because iothread breaks its
-> >> > synchronization).
-> >>
-> >> How does this work for instructions that sleep (like WFI)? The WFI will
-> >> cause us to exit the loop but I assume we need a "real" timer to trigger
-> >> a firing of whatever the WFI is waiting for as time according to icount
-> >> isn't advancing.
-> >
-> > This is virtual_rt for. It advances even when vCPU is stopped.
-> 
-> So I'm not seeing this happen:
-> 
->   process_icount_data: icount not increased 117302332749=>117302332749 RT:-1
-> 
-> I wonder if the advance of virtual_rt has been deadlocked? The -1
-> suggests its not even setup.
+> and why you need the next pointer at all.
 
-qemu_start_warp_timer says that it is setup only when there are active virtual timers.
+If I don't segregate them in batches of 512, I will need to increment
+the l2_offset manually...right? If I don't use the next pointer, what
+solution do you recommend?
 
+Ashijeet
 
-> > By the way, I made small description of the replay log format
-> > to be later included into docs/replay.txt:
-> >
-> Thanks. That's really useful.
-> 
-> Do you think it would be worth including the dumper script I wrote in
-> ./scripts/? I mainly wrote it to aid my understanding of the code flow
-> but it might be useful in future investigations?
-
-Usually I get human-readable logs in record and replay modes to find
-divergence between them, but I think your script might be useful in some cases.
-
-Pavel Dovgalyuk
+>
+> Fam
