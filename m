@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cu1RH-0007gd-9c
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 14:38:24 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1cu1dB-0002EE-2p
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 14:50:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cu1RD-0005q2-98
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 14:38:23 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:54666
-	helo=v2201612906741603.powersrv.de)
+	(envelope-from <dgilbert@redhat.com>) id 1cu1d7-0005A9-TT
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 14:50:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42730)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1cu1RD-0005pV-1X
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 14:38:19 -0400
-References: <d4c50e61-112c-1818-479e-494d58e361f2@ilande.co.uk>
-	<CAFEAcA_vArTuWDGpTeToFhjfSV1BC3BV8WhjDsZtO5uxWiarMQ@mail.gmail.com>
-	<d8a1ecfb-cce1-e855-9f0b-49dccd830155@weilnetz.de>
-	<9e2591a0-4c25-5f00-0fd3-9c175bfbab12@ilande.co.uk>
-	<25632d57-622c-e0b0-029a-28fdca0a427f@weilnetz.de>
-	<360a7047-6190-c006-e155-1166ab14b83a@ilande.co.uk>
-	<e776dac5-ea72-efaf-c9d5-6b98f49e47e7@redhat.com>
-	<fb90c304-7f13-083f-37d8-7e2b569b15fe@ilande.co.uk>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <a4957051-8f41-cdbf-b51a-9aa0bf5ff836@weilnetz.de>
-Date: Fri, 31 Mar 2017 20:38:14 +0200
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cu1d7-00059w-NH
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 14:50:37 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4B00B83F3E
+	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 18:50:36 +0000 (UTC)
+Date: Fri, 31 Mar 2017 19:50:31 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170331185030.GE2408@work-vm>
+References: <1490599288-11751-1-git-send-email-peterx@redhat.com>
+	<1490599288-11751-2-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <fb90c304-7f13-083f-37d8-7e2b569b15fe@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Problems with native Mingw-w64 build
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1490599288-11751-2-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/5] migration: set current_active_state
+ once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,27 +34,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel <qemu-devel@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
-Am 31.03.2017 um 19:08 schrieb Mark Cave-Ayland:
-> On 28/03/17 16:16, Thomas Huth wrote:
->> We've already got a page with instructions for building with MingW:
->>
->>  http://wiki.qemu-project.org/Hosts/W32
->>
->> So that might be a good place to add your experience with MSYS, I guess?
->
-> Done. See
-> http://wiki.qemu-project.org/Hosts/W32#Native_builds_with_MSYS2 for
-> details of how to build on W64 with MSYS2.
->
->
-> ATB,
->
-> Mark.
+* Peter Xu (peterx@redhat.com) wrote:
+> We set it right above this one. No need to set it twice.
+
+Ah good spot, yes set in the declaration of current_active_state.
+
+> CC: Juan Quintela <quintela@redhat.com>
+> CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  migration/migration.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 54060f7..f9f4d98 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1938,7 +1938,6 @@ static void *migration_thread(void *opaque)
+>      qemu_savevm_state_begin(s->to_dst_file, &s->params);
+>  
+>      s->setup_time = qemu_clock_get_ms(QEMU_CLOCK_HOST) - setup_start;
+> -    current_active_state = MIGRATION_STATUS_ACTIVE;
+>      migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
+>                        MIGRATION_STATUS_ACTIVE);
 
 
-Great, thank you. I added some notes on Intel HAXM, too.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Stefan
+>  
+> -- 
+> 2.7.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
