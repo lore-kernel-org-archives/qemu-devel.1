@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ctuxA-0007hh-OQ
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 07:42:53 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1ctuzC-0008I7-TT
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 07:44:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ctuxA-0007u4-2O
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 07:42:52 -0400
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:32923)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ctux9-0007tX-Qx
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 07:42:51 -0400
-Received: by mail-wr0-x22e.google.com with SMTP id w43so101924922wrb.0
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 04:42:51 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1ctuz9-0000x9-Tu
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 07:44:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47760)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ctuz9-0000wE-Nr
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 07:44:55 -0400
+References: <1490856931-21732-1-git-send-email-kraxel@redhat.com>
+	<1490856931-21732-3-git-send-email-kraxel@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0985e06f-87c0-19bf-2c84-e63f990158b9@redhat.com>
+Date: Fri, 31 Mar 2017 13:44:51 +0200
 MIME-Version: 1.0
-In-Reply-To: <1490721640-13052-1-git-send-email-eric.auger@redhat.com>
-References: <1490721640-13052-1-git-send-email-eric.auger@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 31 Mar 2017 12:42:28 +0100
-Message-ID: <CAFEAcA8Or3XtKwRudnf5jc=bH_OTwqWrvbPivNf49zYg-RgaeA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2] hw/intc/arm_gicv3_kvm: Check
- KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS in reset
+In-Reply-To: <1490856931-21732-3-git-send-email-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RfC PATCH 2/4] memory: add support getting and
+ using a dirty bitmap copy.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +28,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Vijay Kilari <vijay.kilari@gmail.com>, "Kumar, Vijaya" <Vijaya.Kumar@cavium.com>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Prakash B <bjsprakash.linux@gmail.com>, bprakash@caviumnetworks.com, Sunil Goutham <sgoutham@cavium.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On 28 March 2017 at 18:20, Eric Auger <eric.auger@redhat.com> wrote:
-> KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS needs to be checked before
-> attempting to read ICC_CTLR_EL1; otherwise kernel versions not
-> exposing this kvm device group will be incompatible with qemu 2.9.
->
-> Fixes: 07a5628  ("hw/intc/arm_gicv3_kvm: Reset GICv3 cpu interface registers")
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Reported-by: Prakash B <bjsprakash.linux@gmail.com>
 
-Applied to master, thanks.
 
--- PMM
+On 30/03/2017 08:55, Gerd Hoffmann wrote:
+>  
+> +struct DirtyCopy {
+> +    ram_addr_t start;
+> +    ram_addr_t end;
+> +    unsigned long dirty[];
+> +};
+> +
+>  #endif
+
+Maybe DirtyBitmapSnapshot (and s/copy/snapshot/ in the rest of the API too)?
+
+Paolo
