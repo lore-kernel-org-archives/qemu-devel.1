@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cu0bc-0002RJ-JH
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:45:01 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cu0bt-0002dx-0T
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:45:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cu0bY-0007uF-GD
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:45:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55214)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1cu0bY-0007tV-9j
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:44:56 -0400
-References: <20170331044711.21749-1-aik@ozlabs.ru>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <ad2e87d5-f8bc-7abf-a376-bc6972c03fd5@redhat.com>
-Date: Fri, 31 Mar 2017 13:44:48 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cu0br-0008As-SW
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:45:17 -0400
+References: <20170331152730.12514-1-eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <8fc29f2c-9741-0f8d-da95-cbf663ef5573@redhat.com>
+Date: Fri, 31 Mar 2017 19:45:05 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170331044711.21749-1-aik@ozlabs.ru>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu] pci: Only unmap
- bus_master_enabled_region if was added previously
+In-Reply-To: <20170331152730.12514-1-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="x3VQj3bXA7RHNgHG3JchIwHWlObCPhlBf"
+Subject: Re: [Qemu-devel] [PATCH for-2.9] rbd: Fix regression in legacy
+ key/values containing escaped :
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +24,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, jcody@redhat.com, armbru@redhat.com, Alexandru.Avadanii@enea.com, Josh Durgin <jdurgin@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--x3VQj3bXA7RHNgHG3JchIwHWlObCPhlBf
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, jcody@redhat.com, armbru@redhat.com,
+ Alexandru.Avadanii@enea.com, Josh Durgin <jdurgin@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <8fc29f2c-9741-0f8d-da95-cbf663ef5573@redhat.com>
+Subject: Re: [PATCH for-2.9] rbd: Fix regression in legacy key/values
+ containing escaped :
+References: <20170331152730.12514-1-eblake@redhat.com>
+In-Reply-To: <20170331152730.12514-1-eblake@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
 
+On 31.03.2017 17:27, Eric Blake wrote:
+> Commit c7cacb3 accidentally broke legacy key-value parsing through
+> pseudo-filename parsing of -drive file=3Drbd://..., for any key that
+> contains an escaped ':'.  Such a key is surprisingly common, thanks
+> to mon_host specifying a 'host:port' string.  The break happens
+> because passing things from QDict through QemuOpts back to another
+> QDict requires that we pack our parsed key/value pairs into a string,
+> and then reparse that string, but the intermediate string that we
+> created ("key1=3Dvalue1:key2=3Dvalue2") lost the \: escaping that was
+> present in the original, so that we could no longer see which : were
+> used as separators vs. those used as part of the original input.
+>=20
+> Fix it by collecting the key/value pairs through a QList, and
+> sending that list on a round trip through a JSON QString (as in
+> '["key1","value1","key2","value2"]') on its way through QemuOpts,
+> rather than hand-rolling our own string.  Since the string is only
+> handled internally, this was faster than creating a full-blown
+> struct of '[{"key1":"value1"},{"key2":"value2"}]', and safer at
+> guaranteeing order compared to '{"key1":"value1","key2":"value2"}'.
+>=20
+> It would be nicer if we didn't have to round-trip through QemuOpts
+> in the first place, but that's a much bigger task for later.
+>=20
+> Reproducer:
+> ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio \=
 
-On 03/31/2017 12:47 AM, Alexey Kardashevskiy wrote:
-> Normally pci_init_bus_master() would be called either via
-> bus->machine_done.notify or directly from do_pci_register_device().
-> 
-> However if a device's realize() failed, pci_init_bus_master() is not
-> called, and do_pci_unregister_device() fails on
-> memory_region_del_subregion() as it was not mapped.
-> 
-> This adds a check that subregion was mapped before unmapping it.
-> 
-> Fixes: c53598ed18e4 ("pci: Add missing drop of bus master AS reference")
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> -drive 'file=3Drbd:volumes/volume-ea141b5c-cdb3-4765-910d-e7008b209a70'=
+\
+> ':id=3Dcompute:key=3DAQAVkvxXAAAAABAA9ZxWFYdRmV+DSwKr7BKKXg=3D=3D'\
+> ':auth_supported=3Dcephx\;none:mon_host=3D192.168.1.2\:6789'\
+> ',format=3Draw,if=3Dnone,id=3Ddrive-virtio-disk0,'\
+> 'serial=3Dea141b5c-cdb3-4765-910d-e7008b209a70,cache=3Dwriteback'
+>=20
+> Even without an RBD setup, this serves a test of whether we get
+> the incorrect parser error of:
+> qemu-system-x86_64: -drive file=3Drbd:...cache=3Dwriteback: conf option=
+ 6789 has no value
+> or the correct behavior of hanging while trying to connect to
+> the requested mon_host of 192.168.1.2:6789.
+>=20
+> Reported-by: Alexandru Avadanii <Alexandru.Avadanii@enea.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 > ---
-> This is to pass iotest 051 which does run QEMU like this:
-> 
-> ppc64-softmmu/qemu-system-ppc64 -nodefaults -machine accel=qtest -nographic -monitor stdio -serial none -drive if=virtio
-> 
-> which normally fails with:
-> 
-> qemu-system-ppc64: -drive if=virtio: Device needs media, but drive is empty
-> 
-> or asserts (without this patch):
-> 
-> qemu-system-ppc64: /home/aik/p/qemu-kvm/memory.c:2118: memory_region_del_subregion: Assertion `subregion->container == mr' failed.
-> ---
->  hw/pci/pci.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index bd8043c460..259483b1c0 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -869,8 +869,10 @@ static void do_pci_unregister_device(PCIDevice *pci_dev)
->      pci_dev->bus->devices[pci_dev->devfn] = NULL;
->      pci_config_free(pci_dev);
->  
-> -    memory_region_del_subregion(&pci_dev->bus_master_container_region,
-> -                                &pci_dev->bus_master_enable_region);
-> +    if (memory_region_is_mapped(&pci_dev->bus_master_enable_region)) {
-> +        memory_region_del_subregion(&pci_dev->bus_master_container_region,
-> +                                    &pci_dev->bus_master_enable_region);
-> +    }
->      address_space_destroy(&pci_dev->bus_master_as);
->  }
->  
-> 
+>  block/rbd.c | 83 +++++++++++++++++++++++++++++++----------------------=
+--------
+>  1 file changed, 42 insertions(+), 41 deletions(-)
 
-Thanks for the quick turnaround!
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-Tested-by: John Snow <jsnow@redhat.com>
+
+--x3VQj3bXA7RHNgHG3JchIwHWlObCPhlBf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljelaESHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AGbsH/0mCQQ9h+fEZJ5EMxOfz3wD2HtgGE03D
+8lvLVjYeimGno+W4Eo1SLGwU2710fWy3Q/iGYg6kjGDo0jKrfqI7RiBOF6R12aDX
+h/RCvrahS/wx2f6ECVlJLf7LbV7EnAt1XrypoZcx7K+sU8KWjWL0RTmTyjqnz7eq
+DrIw4O8gNJK+ErrvrRc2rr+UoCJrxVaKAMIJmyRM7qo7G5v/ds8nLRkHMgAWFgwx
+n7KRNfDkfqYr81cNaZSK4+zCU22D7OaBLEzeCv/eyASXuzmVUIyW6ia6S9LoWFiC
+c1VNzCUbFFffGo6fk+51kZD+I/J/eyFKCFPN/QvaRVfwsk5yBg47lSA=
+=6aoY
+-----END PGP SIGNATURE-----
+
+--x3VQj3bXA7RHNgHG3JchIwHWlObCPhlBf--
