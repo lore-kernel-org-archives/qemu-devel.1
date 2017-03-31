@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ctvM6-00017c-F9
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 08:08:39 -0400
+	(envelope-from <marcel@redhat.com>) id 1ctvMg-0001bs-Td
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 08:09:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ctvM3-0008GX-9l
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 08:08:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49996)
+	(envelope-from <marcel@redhat.com>) id 1ctvMe-0000Nk-3r
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 08:09:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43048)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ctvM3-0008En-3Q
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 08:08:35 -0400
-References: <20170330164657.50c75e8c@nial.brq.redhat.com>
-	<87k2764xex.fsf@linaro.org>
-	<20170331102125.52405cd2@nial.brq.redhat.com>
-	<87h9294yba.fsf@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4a80467b-016d-0fef-6ab5-4e50a96bad1f@redhat.com>
-Date: Fri, 31 Mar 2017 14:08:28 +0200
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1ctvMd-0000Mb-TS
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 08:09:12 -0400
+References: <20170331044711.21749-1-aik@ozlabs.ru>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <fa70d4f5-dd30-aa83-b853-7504c2350023@redhat.com>
+Date: Fri, 31 Mar 2017 15:08:49 +0300
 MIME-Version: 1.0
-In-Reply-To: <87h9294yba.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] qemu-2.9 crashes in tcg_handle_interrupt() during
- winx64 boot
+In-Reply-To: <20170331044711.21749-1-aik@ozlabs.ru>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu] pci: Only unmap
+ bus_master_enabled_region if was added previously
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +27,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Igor Mammedov <imammedo@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, Pranith Kumar <bobby.prani@gmail.com>, Richard Henderson <rth@twiddle.net>, KONRAD Frederic <fred.konrad@greensocs.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
+On 03/31/2017 07:47 AM, Alexey Kardashevskiy wrote:
+> Normally pci_init_bus_master() would be called either via
+> bus->machine_done.notify or directly from do_pci_register_device().
+>
+> However if a device's realize() failed, pci_init_bus_master() is not
+> called, and do_pci_unregister_device() fails on
+> memory_region_del_subregion() as it was not mapped.
+>
+> This adds a check that subregion was mapped before unmapping it.
+>
+> Fixes: c53598ed18e4 ("pci: Add missing drop of bus master AS reference")
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+> This is to pass iotest 051 which does run QEMU like this:
+>
+> ppc64-softmmu/qemu-system-ppc64 -nodefaults -machine accel=qtest -nographic -monitor stdio -serial none -drive if=virtio
+>
+> which normally fails with:
+>
+> qemu-system-ppc64: -drive if=virtio: Device needs media, but drive is empty
+>
+> or asserts (without this patch):
+>
+> qemu-system-ppc64: /home/aik/p/qemu-kvm/memory.c:2118: memory_region_del_subregion: Assertion `subregion->container == mr' failed.
+> ---
+>  hw/pci/pci.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index bd8043c460..259483b1c0 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -869,8 +869,10 @@ static void do_pci_unregister_device(PCIDevice *pci_dev)
+>      pci_dev->bus->devices[pci_dev->devfn] = NULL;
+>      pci_config_free(pci_dev);
+>
+> -    memory_region_del_subregion(&pci_dev->bus_master_container_region,
+> -                                &pci_dev->bus_master_enable_region);
+> +    if (memory_region_is_mapped(&pci_dev->bus_master_enable_region)) {
+> +        memory_region_del_subregion(&pci_dev->bus_master_container_region,
+> +                                    &pci_dev->bus_master_enable_region);
+> +    }
+>      address_space_destroy(&pci_dev->bus_master_as);
+>  }
+>
+>
 
+Hi,
 
-On 31/03/2017 10:58, Alex Benn=C3=A9e wrote:
->=20
-> Igor Mammedov <imammedo@redhat.com> writes:
->=20
->> On Thu, 30 Mar 2017 16:05:58 +0100
->> Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
->>
->>> Igor Mammedov <imammedo@redhat.com> writes:
->>>
->>>> (PS: resend due to wrong qemu-devel mail list address in original
->>>> email)
->>>
->>> Le *sigh* another way of x86 generating IRQs ;-)
->>>
->>> Could you test this please?
->>>
->>> target/i386/misc_helper: wrap BQL around another IRQ generator
->>>
->>> Anything that calls into HW emulation must be protected by the BQL.
->>>
->>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> it doesn't help,
->> it asserts in the same place anyway
->=20
-> That's weird. If the lock was already held I could see it failing highe=
-r
-> up but this seems to imply we are dropping a lock as we descend into
-> hardware emulation.
-
-Seems weird to me too.
-
-> How often does this leg of the helper get called?
-
-Continuously under Windows, never on Linux.  But you can also try
-kvm-unit-tests probably to trigger it:
-
-$ qemu-system-x86_64 \
-   -kernel x86/vmexit.flat -serial stdio \
-   --append 'cpuid mov_to_cr8' -device isa-debug-exit,iobase=3D0xf4
-
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 
 Thanks,
-
-paolo
+Marcel
