@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Ciprian.Barbu@enea.com>) id 1cu0Pn-0005w0-5f
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:32:50 -0400
+	(envelope-from <Ciprian.Barbu@enea.com>) id 1cu0T9-00083X-Kk
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:36:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Ciprian.Barbu@enea.com>) id 1cu0Pi-0001LS-Fc
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:32:47 -0400
-Received: from smtp-out10.electric.net ([185.38.180.47]:54622)
+	(envelope-from <Ciprian.Barbu@enea.com>) id 1cu0T4-0003QB-Vq
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:36:15 -0400
+Received: from smtp-out10.electric.net ([185.38.180.40]:55061)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <Ciprian.Barbu@enea.com>)
-	id 1cu0Pi-0001Kn-6N
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:32:42 -0400
+	id 1cu0T4-0003P5-Kf
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:36:10 -0400
 From: Ciprian Barbu <Ciprian.Barbu@enea.com>
-Date: Fri, 31 Mar 2017 17:32:37 +0000
-Message-ID: <C885D0FF6A27744DB0B822E32DF6EF029B1CA239@SESTOEX04.enea.se>
+Date: Fri, 31 Mar 2017 17:36:08 +0000
+Message-ID: <C885D0FF6A27744DB0B822E32DF6EF029B1CA253@SESTOEX04.enea.se>
 References: <C885D0FF6A27744DB0B822E32DF6EF029B1CA14A@SESTOEX04.enea.se>
-In-Reply-To: <C885D0FF6A27744DB0B822E32DF6EF029B1CA14A@SESTOEX04.enea.se>
+	<C885D0FF6A27744DB0B822E32DF6EF029B1CA239@SESTOEX04.enea.se>
+In-Reply-To: <C885D0FF6A27744DB0B822E32DF6EF029B1CA239@SESTOEX04.enea.se>
 Content-Language: en-US
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -28,8 +29,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ciprian Barbu <Ciprian.Barbu@enea.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Alexandru Avadanii <Alexandru.Avadanii@enea.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Alexandru Avadanii <Alexandru.Avadanii@enea.com>
 Cc: Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>, svc-armband <armband@enea.com>
+
+Sorry, I think this one is more likely the cause, it's about migration:
+
+https://github.com/qemu/qemu/commit/6f5ef23a3ff09919b73eef8196969685cb2383e=
+e
+
+From: Ciprian Barbu
+Sent: Friday, March 31, 2017 8:33 PM
+To: Ciprian Barbu <Ciprian.Barbu@enea.com>; qemu-devel@nongnu.org; Eric Bla=
+ke <eblake@redhat.com>; Alexandru Avadanii <Alexandru.Avadanii@enea.com>
+Cc: Jeff Cody <jcody@redhat.com>; Markus Armbruster <armbru@redhat.com>; sv=
+c-armband <armband@enea.com>
+Subject: RE: [Qemu-devel] nbd: Possible regression in 2.9 RCs
 
 I suspect the culprit here is [1]. I've started a git bisect between this c=
 ommit and v2.8.0 and during this time I found similar erros "/root/qemu/nbd=
@@ -41,13 +55,15 @@ ite requests.
 [1] https://github.com/qemu/qemu/commit/8a7ce4f9338c475df1afc12502af704e430=
 0a3e0
 
-From: cosnos-bounces@list.enea.se [mailto:cosnos-bounces@list.enea.se] On B=
-ehalf Of Ciprian Barbu
+From: cosnos-bounces@list.enea.se<mailto:cosnos-bounces@list.enea.se> [mail=
+to:cosnos-bounces@list.enea.se] On Behalf Of Ciprian Barbu
 Sent: Friday, March 31, 2017 7:04 PM
-To: qemu-devel@nongnu.org; Eric Blake <eblake@redhat.com>; Alexandru Avadan=
-ii <Alexandru.Avadanii@enea.com>
-Cc: Jeff Cody <jcody@redhat.com>; Markus Armbruster <armbru@redhat.com>; sv=
-c-armband <armband@enea.com>
+To: qemu-devel@nongnu.org<mailto:qemu-devel@nongnu.org>; Eric Blake <eblake=
+@redhat.com<mailto:eblake@redhat.com>>; Alexandru Avadanii <Alexandru.Avada=
+nii@enea.com<mailto:Alexandru.Avadanii@enea.com>>
+Cc: Jeff Cody <jcody@redhat.com<mailto:jcody@redhat.com>>; Markus Armbruste=
+r <armbru@redhat.com<mailto:armbru@redhat.com>>; svc-armband <armband@enea.=
+com<mailto:armband@enea.com>>
 Subject: [Cosnos] [Qemu-devel] nbd: Possible regression in 2.9 RCs
 
 Hello,
