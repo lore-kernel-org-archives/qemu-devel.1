@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1cts8d-0008QP-CI
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 04:42:32 -0400
+	(envelope-from <haozhong.zhang@intel.com>) id 1cts8g-0008SX-8l
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 04:42:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1cts8Y-00021s-F1
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 04:42:31 -0400
+	(envelope-from <haozhong.zhang@intel.com>) id 1cts8e-00028w-Py
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 04:42:34 -0400
 Received: from mga03.intel.com ([134.134.136.65]:21496)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1cts8Y-00020h-3W
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 04:42:26 -0400
+	id 1cts8e-00020h-Df
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 04:42:32 -0400
 From: Haozhong Zhang <haozhong.zhang@intel.com>
-Date: Fri, 31 Mar 2017 16:41:44 +0800
-Message-Id: <20170331084147.32716-2-haozhong.zhang@intel.com>
+Date: Fri, 31 Mar 2017 16:41:47 +0800
+Message-Id: <20170331084147.32716-5-haozhong.zhang@intel.com>
 In-Reply-To: <20170331084147.32716-1-haozhong.zhang@intel.com>
 References: <20170331084147.32716-1-haozhong.zhang@intel.com>
-Subject: [Qemu-devel] [RFC PATCH 1/4] pc-dimm: add 'reserved-size' to
- reserve address range after the ending address
+Subject: [Qemu-devel] [RFC PATCH 4/4] nvdimm acpi: build flush hint address
+ structure if required
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,148 +26,248 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dan.j.williams@intel.com, Haozhong Zhang <haozhong.zhang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Cc: dan.j.williams@intel.com, Haozhong Zhang <haozhong.zhang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-If option 'reserved-size=RSVD' is present, QEMU will reserve an
-address range of size 'RSVD' after the ending address of pc-dimm
+
+Add an boolean option 'flush-hint' to device 'nvdimm'. If it's on, a
+flush hint address structure will be constructed for each nvdimm
 device.
-
-For the following example,
-    -object memory-backend-file,id=mem0,size=4G,...
-    -device nvdimm,id=dimm0,memdev=mem0,reserved-size=4K,...
-    -device pc-dimm,id=dimm1,...
-if dimm0 is allocated to address N ~ N+4G, the address range of
-dimm1 will start from N+4G+4K or higher.
-
-Its current usage is to reserve spaces for flush hint addresses
-of nvdimm devices.
 
 Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
 ---
- hw/mem/pc-dimm.c         | 48 +++++++++++++++++++++++++++++++++++++++++++++---
- include/hw/mem/pc-dimm.h |  2 ++
- 2 files changed, 47 insertions(+), 3 deletions(-)
+ hw/acpi/nvdimm.c        | 106 +++++++++++++++++++++++++++++++++++++++++++++---
+ hw/i386/pc.c            |   5 ++-
+ hw/mem/nvdimm.c         |  26 ++++++++++++
+ include/hw/mem/nvdimm.h |   2 +-
+ 4 files changed, 132 insertions(+), 7 deletions(-)
 
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index 9e8dab0..13dcd71 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -28,6 +28,7 @@
- #include "sysemu/kvm.h"
- #include "trace.h"
- #include "hw/virtio/vhost.h"
+diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
+index ea2ac3e..a7ff0b2 100644
+--- a/hw/acpi/nvdimm.c
++++ b/hw/acpi/nvdimm.c
+@@ -32,6 +32,8 @@
+ #include "hw/acpi/bios-linker-loader.h"
+ #include "hw/nvram/fw_cfg.h"
+ #include "hw/mem/nvdimm.h"
 +#include "exec/address-spaces.h"
++#include "qapi/error.h"
  
- typedef struct pc_dimms_capacity {
-      uint64_t size;
-@@ -44,7 +45,12 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
-     MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm);
-     Error *local_err = NULL;
-     uint64_t existing_dimms_capacity = 0;
--    uint64_t addr;
-+    uint64_t addr, size = memory_region_size(mr);
+ static int nvdimm_device_list(Object *obj, void *opaque)
+ {
+@@ -168,6 +170,22 @@ struct NvdimmNfitControlRegion {
+ typedef struct NvdimmNfitControlRegion NvdimmNfitControlRegion;
+ 
+ /*
++ * NVDIMM Flush Hint Address Structure
++ *
++ * It enables the data durability mechanism via ACPI.
++ */
++struct NvdimmNfitFlushHintAddress {
++    uint16_t type;
++    uint16_t length;
++    uint32_t nfit_handle;
++    uint16_t nr_flush_hint_addr;
++    uint8_t  reserved[6];
++#define NR_FLUSH_HINT_ADDR 1
++    uint64_t flush_hint_addr[NR_FLUSH_HINT_ADDR];
++} QEMU_PACKED;
++typedef struct NvdimmNfitFlushHintAddress NvdimmNfitFlushHintAddress;
 +
-+    size += object_property_get_int(OBJECT(dimm), PC_DIMM_RSVD_PROP, &local_err);
-+    if (local_err) {
-+        goto out;
-+    }
- 
-     addr = object_property_get_int(OBJECT(dimm), PC_DIMM_ADDR_PROP, &local_err);
-     if (local_err) {
-@@ -54,7 +60,7 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
-     addr = pc_dimm_get_free_addr(hpms->base,
-                                  memory_region_size(&hpms->mr),
-                                  !addr ? NULL : &addr, align,
--                                 memory_region_size(mr), &local_err);
-+                                 size, &local_err);
-     if (local_err) {
-         goto out;
-     }
-@@ -64,7 +70,7 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
-         goto out;
-     }
- 
--    if (existing_dimms_capacity + memory_region_size(mr) >
-+    if (existing_dimms_capacity + size >
-         machine->maxram_size - machine->ram_size) {
-         error_setg(&local_err, "not enough space, currently 0x%" PRIx64
-                    " in use of total hot pluggable 0x" RAM_ADDR_FMT,
-@@ -315,6 +321,9 @@ uint64_t pc_dimm_get_free_addr(uint64_t address_space_start,
-         PCDIMMDevice *dimm = item->data;
-         uint64_t dimm_size = object_property_get_int(OBJECT(dimm),
-                                                      PC_DIMM_SIZE_PROP,
-+                                                     errp) +
-+                             object_property_get_int(OBJECT(dimm),
-+                                                     PC_DIMM_RSVD_PROP,
-                                                      errp);
-         if (errp && *errp) {
-             goto out;
-@@ -382,6 +391,37 @@ static void pc_dimm_check_memdev_is_busy(Object *obj, const char *name,
-     error_propagate(errp, local_err);
++/*
+  * Module serial number is a unique number for each device. We use the
+  * slot id of NVDIMM device to generate this number so that each device
+  * associates with a different number.
+@@ -343,10 +361,79 @@ static void nvdimm_build_structure_dcr(GArray *structures, DeviceState *dev)
+                                          (DSM) in DSM Spec Rev1.*/);
  }
  
-+static void pc_dimm_get_reserved_size(Object *obj, Visitor *v, const char *name,
-+                                      void *opaque, Error **errp)
+-static GArray *nvdimm_build_device_structure(void)
++static uint64_t nvdimm_flush_hint_read(void *opaque, hwaddr addr, unsigned size)
 +{
-+    PCDIMMDevice *dimm = PC_DIMM(obj);
-+    uint64_t value = dimm->reserved_size;
-+
-+    visit_type_size(v, name, &value, errp);
++    return 0;
 +}
 +
-+static void pc_dimm_set_reserved_size(Object *obj, Visitor *v, const char *name,
-+                                      void *opaque, Error **errp)
++static void nvdimm_flush_hint_write(void *opaque, hwaddr addr,
++                                    uint64_t data, unsigned size)
 +{
-+    PCDIMMDevice *dimm = PC_DIMM(obj);
++    nvdimm_debug("Write Flush Hint: offset 0x%"HWADDR_PRIx", data 0x%"PRIx64"\n",
++                 addr, data);
++    nvdimm_flush((NVDIMMDevice *)opaque);
++}
++
++static const MemoryRegionOps nvdimm_flush_hint_ops = {
++    .read = nvdimm_flush_hint_read,
++    .write = nvdimm_flush_hint_write,
++};
++
++/*
++ * ACPI 6.0: 5.2.25.7 Flush Hint Address Structure
++ */
++static void nvdimm_build_structure_flush_hint(GArray *structures,
++                                              DeviceState *dev,
++                                              unsigned int cache_line_size,
++                                              Error **errp)
++{
++    NvdimmNfitFlushHintAddress *flush_hint;
++    int slot = object_property_get_int(OBJECT(dev), PC_DIMM_SLOT_PROP, NULL);
++    PCDIMMDevice *dimm = PC_DIMM(dev);
++    NVDIMMDevice *nvdimm = NVDIMM(dev);
++    uint64_t addr;
++    unsigned int i;
++    MemoryRegion *mr;
 +    Error *local_err = NULL;
-+    uint64_t value;
 +
-+    if (dimm->reserved_size) {
-+        error_setg(&local_err, "cannot change 'reserved-size'");
++    if (!nvdimm->flush_hint_enabled) {
++        return;
++    }
++
++    if (cache_line_size * NR_FLUSH_HINT_ADDR > dimm->reserved_size) {
++        error_setg(&local_err,
++                   "insufficient reserved space for flush hint buffers");
 +        goto out;
 +    }
 +
-+    visit_type_size(v, name, &value, &local_err);
-+    if (local_err) {
-+        goto out;
++    addr = object_property_get_int(OBJECT(dev), PC_DIMM_ADDR_PROP, NULL);
++    addr += object_property_get_int(OBJECT(dev), PC_DIMM_SIZE_PROP, NULL);
++
++    flush_hint = acpi_data_push(structures, sizeof(*flush_hint));
++    flush_hint->type = cpu_to_le16(6 /* Flush Hint Address Structure */);
++    flush_hint->length = cpu_to_le16(sizeof(*flush_hint));
++    flush_hint->nfit_handle = cpu_to_le32(nvdimm_slot_to_handle(slot));
++    flush_hint->nr_flush_hint_addr = cpu_to_le16(NR_FLUSH_HINT_ADDR);
++
++    for (i = 0; i < NR_FLUSH_HINT_ADDR; i++, addr += cache_line_size) {
++        flush_hint->flush_hint_addr[i] = cpu_to_le64(addr);
++
++        mr = g_new0(MemoryRegion, 1);
++        memory_region_init_io(mr, OBJECT(dev), &nvdimm_flush_hint_ops, nvdimm,
++                              "nvdimm-flush-hint", cache_line_size);
++        memory_region_add_subregion(get_system_memory(), addr, mr);
 +    }
-+    dimm->reserved_size = value;
 +
 + out:
 +    error_propagate(errp, local_err);
 +}
 +
- static void pc_dimm_init(Object *obj)
++static GArray *nvdimm_build_device_structure(AcpiNVDIMMState *state,
++                                             Error **errp)
  {
-     PCDIMMDevice *dimm = PC_DIMM(obj);
-@@ -393,6 +433,8 @@ static void pc_dimm_init(Object *obj)
-                              pc_dimm_check_memdev_is_busy,
-                              OBJ_PROP_LINK_UNREF_ON_RELEASE,
-                              &error_abort);
-+    object_property_add(obj, PC_DIMM_RSVD_PROP, "int", pc_dimm_get_reserved_size,
-+                        pc_dimm_set_reserved_size, NULL, NULL, &error_abort);
+     GSList *device_list = nvdimm_get_device_list();
+     GArray *structures = g_array_new(false, true /* clear */, 1);
++    Error *local_err = NULL;
+ 
+     for (; device_list; device_list = device_list->next) {
+         DeviceState *dev = device_list->data;
+@@ -362,9 +449,17 @@ static GArray *nvdimm_build_device_structure(void)
+ 
+         /* build NVDIMM Control Region Structure. */
+         nvdimm_build_structure_dcr(structures, dev);
++
++        /* build Flush Hint Address Structure */
++        nvdimm_build_structure_flush_hint(structures, dev,
++                                          state->cache_line_size, &local_err);
++        if (local_err) {
++            break;
++        }
+     }
+     g_slist_free(device_list);
+ 
++    error_propagate(errp, local_err);
+     return structures;
  }
  
- static void pc_dimm_realize(DeviceState *dev, Error **errp)
-diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-index 1e483f2..99c4dfd 100644
---- a/include/hw/mem/pc-dimm.h
-+++ b/include/hw/mem/pc-dimm.h
-@@ -33,6 +33,7 @@
- #define PC_DIMM_NODE_PROP "node"
- #define PC_DIMM_SIZE_PROP "size"
- #define PC_DIMM_MEMDEV_PROP "memdev"
-+#define PC_DIMM_RSVD_PROP "reserved-size"
+@@ -373,16 +468,17 @@ static void nvdimm_init_fit_buffer(NvdimmFitBuffer *fit_buf)
+     fit_buf->fit = g_array_new(false, true /* clear */, 1);
+ }
  
- #define PC_DIMM_UNASSIGNED_SLOT -1
+-static void nvdimm_build_fit_buffer(NvdimmFitBuffer *fit_buf)
++static void nvdimm_build_fit_buffer(AcpiNVDIMMState *state, Error **errp)
+ {
++    NvdimmFitBuffer *fit_buf = &state->fit_buf;
+     g_array_free(fit_buf->fit, true);
+-    fit_buf->fit = nvdimm_build_device_structure();
++    fit_buf->fit = nvdimm_build_device_structure(state, errp);
+     fit_buf->dirty = true;
+ }
  
-@@ -53,6 +54,7 @@ typedef struct PCDIMMDevice {
-     uint64_t addr;
-     uint32_t node;
-     int32_t slot;
-+    uint64_t reserved_size;
-     HostMemoryBackend *hostmem;
- } PCDIMMDevice;
+-void nvdimm_plug(AcpiNVDIMMState *state)
++void nvdimm_plug(AcpiNVDIMMState *state, Error **errp)
+ {
+-    nvdimm_build_fit_buffer(&state->fit_buf);
++    nvdimm_build_fit_buffer(state, errp);
+ }
  
+ static void nvdimm_build_nfit(AcpiNVDIMMState *state, GArray *table_offsets,
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index d24388e..da4a5d7 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1718,7 +1718,10 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
+                        "nvdimm is not enabled: missing 'nvdimm' in '-M'");
+             goto out;
+         }
+-        nvdimm_plug(&pcms->acpi_nvdimm_state);
++        nvdimm_plug(&pcms->acpi_nvdimm_state, &local_err);
++        if (local_err) {
++            goto out;
++        }
+     }
+ 
+     hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
+diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+index 484ab8b..a26908b 100644
+--- a/hw/mem/nvdimm.c
++++ b/hw/mem/nvdimm.c
+@@ -64,11 +64,37 @@ out:
+     error_propagate(errp, local_err);
+ }
+ 
++static bool nvdimm_get_flush_hint(Object *obj, Error **errp)
++{
++    NVDIMMDevice *nvdimm = NVDIMM(obj);
++
++    return nvdimm->flush_hint_enabled;
++}
++
++static void nvdimm_set_flush_hint(Object *obj, bool val, Error **errp)
++{
++    NVDIMMDevice *nvdimm = NVDIMM(obj);
++    Error *local_err = NULL;
++
++    if (nvdimm->flush_hint_enabled) {
++        error_setg(&local_err, "cannot change property value");
++        goto out;
++    }
++
++    nvdimm->flush_hint_enabled = val;
++
++ out:
++    error_propagate(errp, local_err);
++}
++
+ static void nvdimm_init(Object *obj)
+ {
+     object_property_add(obj, "label-size", "int",
+                         nvdimm_get_label_size, nvdimm_set_label_size, NULL,
+                         NULL, NULL);
++    object_property_add_bool(obj, "flush-hint",
++                             nvdimm_get_flush_hint, nvdimm_set_flush_hint,
++                             NULL);
+ }
+ 
+ static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm)
+diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
+index 888def6..726f4d9 100644
+--- a/include/hw/mem/nvdimm.h
++++ b/include/hw/mem/nvdimm.h
+@@ -145,7 +145,7 @@ void nvdimm_init_acpi_state(AcpiNVDIMMState *state, MemoryRegion *io,
+ void nvdimm_build_acpi(GArray *table_offsets, GArray *table_data,
+                        BIOSLinker *linker, AcpiNVDIMMState *state,
+                        uint32_t ram_slots);
+-void nvdimm_plug(AcpiNVDIMMState *state);
++void nvdimm_plug(AcpiNVDIMMState *state, Error **errp);
+ void nvdimm_acpi_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev);
+ void nvdimm_flush(NVDIMMDevice *nvdimm);
+ #endif
 -- 
 2.10.1
