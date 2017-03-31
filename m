@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Alexandru.Avadanii@enea.com>) id 1cu1tC-0002Ei-Ff
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:07:15 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1cu1zI-0003OX-Uh
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:13:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Alexandru.Avadanii@enea.com>) id 1cu1t9-0005M4-8Z
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:07:14 -0400
-Received: from smtp-out10.electric.net ([185.38.180.38]:58723)
+	(envelope-from <dgilbert@redhat.com>) id 1cu1zF-0000eS-PL
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:13:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40076)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Alexandru.Avadanii@enea.com>)
-	id 1cu1t9-0005Lv-0y
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:07:11 -0400
-From: Alexandru Avadanii <Alexandru.Avadanii@enea.com>
-Date: Fri, 31 Mar 2017 19:07:06 +0000
-Message-ID: <058D52979F67BF47BCD9EA78EAECA6DC777A015E@SESTOEX04.enea.se>
-References: <C885D0FF6A27744DB0B822E32DF6EF029B1CA14A@SESTOEX04.enea.se>
-	<9b05e60a-f8c2-ea4f-6be4-f17c0adec510@redhat.com>
-	<C885D0FF6A27744DB0B822E32DF6EF029B1CA282@SESTOEX04.enea.se>
-	<d3ab5208-b9a6-6e83-2c87-f988a9031ebc@redhat.com>
-In-Reply-To: <d3ab5208-b9a6-6e83-2c87-f988a9031ebc@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cu1zF-0000da-H3
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:13:29 -0400
+Date: Fri, 31 Mar 2017 20:13:22 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170331191321.GI2408@work-vm>
+References: <1490599288-11751-1-git-send-email-peterx@redhat.com>
+	<1490599288-11751-6-git-send-email-peterx@redhat.com>
+	<aa26e76e-e5fd-c205-8919-6cc927a6d3ce@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] nbd: Possible regression in 2.9 RCs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aa26e76e-e5fd-c205-8919-6cc927a6d3ce@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 5/5] cpu: throttle: fix throttle time slice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,124 +28,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Ciprian Barbu <Ciprian.Barbu@enea.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>
-Cc: Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>, svc-armband <armband@enea.com>, Kevin Wolf <kwolf@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, Richard Henderson <rth@twiddle.net>, jjherne@linux.vnet.ibm.com
 
-Hi,
+Ignoring the details below for a minute, this patch belongs in a separate
+series; all the rest of the patches in this set are nice simple ones.
 
-> -----Original Message-----
-> From: Max Reitz [mailto:mreitz@redhat.com]
-> Sent: Friday, March 31, 2017 8:57 PM
-> To: Ciprian Barbu; qemu-devel@nongnu.org; Eric Blake; Alexandru Avadanii
-> Cc: Jeff Cody; Markus Armbruster; svc-armband; Kevin Wolf
-> Subject: Re: [Qemu-devel] nbd: Possible regression in 2.9 RCs
->=20
-> On 31.03.2017 19:49, Ciprian Barbu wrote:
-> > Hi,
-> >
-> > Thank you for getting back!
-> >
-> > I'm trying to follow you, but I don't understand all the details. I wou=
-ld like to
-> ask this question though:
-> >
-> > What is the difference between v2.8.0 and this commit? With v2.8.0 the
-> same qemu command worked, but I admit it doesn't request sharing.
->=20
-> The difference is that we now make sure there are for example not two
-> writers for the same block device (unless both agree that it's OK to have
-> shared writers). We haven't done that before.
->=20
-> The built-in NBD server is completely OK with writes by other parties (su=
-ch as
-> guest devices), but guest devices generally are not (because the guest OS
-> should know about this).
->=20
-> Therefore, you'd now have to set the share-rw flag for guest devices whic=
-h
-> should allow shared writers. Otherwise you cannot set up an NBD server on=
- a
-> block device that is in use by the guest device.
+* Paolo Bonzini (pbonzini@redhat.com) wrote:
+> 
+> 
+> On 27/03/2017 09:21, Peter Xu wrote:
+> > @@ -641,8 +640,7 @@ static void cpu_throttle_thread(CPUState *cpu, run_on_cpu_data opaque)
+> >      }
+> >  
+> >      pct = (double)cpu_throttle_get_percentage()/100;
+> > -    throttle_ratio = pct / (1 - pct);
+> > -    sleeptime_ns = (long)(throttle_ratio * CPU_THROTTLE_TIMESLICE_NS);
+> 
+> Say pct = 0.25, then throttle_ratio = 0.25/0.75 = 1/3.
+> 
+> > +    sleeptime_ns = (long)((1 - pct) * CPU_THROTTLE_TIMESLICE_NS);
+> >  
+> >      qemu_mutex_unlock_iothread();
+> >      atomic_set(&cpu->throttle_thread_scheduled, 0);
+> > @@ -668,7 +666,7 @@ static void cpu_throttle_timer_tick(void *opaque)
+> >  
+> >      pct = (double)cpu_throttle_get_percentage()/100;
+> >      timer_mod(throttle_timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL_RT) +
+> > -                                   CPU_THROTTLE_TIMESLICE_NS / (1-pct));
+> 
+> And the timer is running every 1/0.75 = 4/3 * CPU_THROTTLE_TIMESLICE_NS.
+> 
+> Of these, 1/3 is spent sleeping (3.33 ms), while 1 (10 ms) is spent not
+> sleeping.
+> 
+> When pct = 0.75, throttle_ratio = 3 and the timer is running every 4 *
+> CPU_THROTTLE_TIMESLICE_NS (40 ms).  Of these, 3 slices (30 ms) are spent
+> sleeping, while 10 ms are spent not sleeping.
+> 
+> The rationale _could_ be (I don't remember) that a CPU with a very high
+> throttling frequency leaves little time for the migration thread to do
+> any work.  So QEMU keeps the "on" phase always the same and lengthens
+> the "off" phase, which as you found out can be unsatisfactory.
+> 
+> However, I think your patch has the opposite problem: the frequency is
+> constant, but with high throttling all time reserved for the CPU will be
+> lost in overhead.  For example, at 99% throttling you only have 100
+> microseconds to wake up, do work and go back to sleep.
 
-Thank you for the detailed explanation!
+Yes, and I'm worried that with the 10ms timeslice it is a lot of overhead,
+especially if your timer that wakes you have that much higher resolution than
+that.
 
->=20
-> > We also use libvirt v1.3.4, which might be a problem, but at least we w=
-ant
-> to understand if the commit in question introduced an obvious problem or =
-if
-> it's all in the details.
->=20
-> Well, I don't think there is any libvirt version that knows about this fl=
-ag yet.
->=20
-> ...maybe another way to resolve the issue would be to set share-rw to tru=
-e
-> by default for now, noting that this will be changed in the future.
-> In any case, I'm afraid we'll have to wait until Kevin is around on Monda=
-y.
+> So I'm inclined _not_ to take your patch.  One possibility could be to
+> do the following:
+> 
+> - for throttling between 0% and 80%, use the current algorithm.  At 66%,
+> the CPU will work for 10 ms and sleep for 40 ms.
+> 
+> - for throttling above 80% adapt your algorithm to have a variable
+> timeslice, going from 50 ms at 66% to 100 ms at 100%.  This way, the CPU
+> time will shrink below 10 ms and the sleep time will grow.
 
-Ciprian is gone for the week-end too, so next week it is :)
-I think we will change the default for now in our builds, and wait for the =
-proper support in Libvirt.
-Ty for the default suggestion, btw!
+It seems odd to have a threshold like that on something that's supposedly
+a linear scale.
 
-BR,
-Alex
+> It looks like this: http://i.imgur.com/lyFie04.png
+> 
+> So at 99% the timeslice will be 97.5 ms; the CPU will work for 975 us
+> and sleep for the rest (10x more than with just your patch).  But I'm
+> not sure it's really worth it.
 
->=20
-> > Btw, the qemu command generated by libvirt is this one, sorry about tha=
-t:
->=20
-> And sorry about not yet having thanked you for reporting this issue. :-)
->=20
-> Max
->=20
-> > 2017-03-31 17:40:10.956+0000: starting up libvirt version: 1.3.4,
-> > package: 0+amos3~u16.04 (Enea Armband Devops Team
-> <armband@enea.com>
-> > Fri, 13 Jan 2017 02:06:05 +0100), qemu version: 2.8.50(Debian
-> > 1:2.9+amos2~u16.04), hostname: node-2.domain.tld LC_ALL=3DC
-> > PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-> > QEMU_AUDIO_DRV=3Dnone /usr/bin/kvm -name
-> > instance-00000076,debug-threads=3Don -S -object
-> > secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain=
--14-i
-> > nstance-00000076/master-key.aes -machine
-> > virt-2.8,accel=3Dkvm,usb=3Doff,gic-version=3D3 -cpu host -m 256 -realti=
-me
-> > mlock=3Doff -smp 1,sockets=3D1,cores=3D1,threads=3D1 -uuid
-> > 2812f3c9-f564-499b-a8c7-e9e7ccf24143 -no-user-config -nodefaults -
-> chardev socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-14-
-> instance-00000076/monitor.sock,server,nowait -mon
-> chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc,driftfi=
-x=3Dslew -
-> no-shutdown -boot strict=3Don -kernel /var/lib/nova/instances/2812f3c9-f5=
-64-
-> 499b-a8c7-e9e7ccf24143/kernel -initrd /var/lib/nova/instances/2812f3c9-
-> f564-499b-a8c7-e9e7ccf24143/ramdisk -append 'root=3D/dev/vda1 rw rootwait
-> console=3Dtty0 console=3DttyS0 console=3DttyAMA0' -device i82801b11-
-> bridge,id=3Dpci.1,bus=3Dpcie.0,addr=3D0x1 -device pci-
-> bridge,chassis_nr=3D2,id=3Dpci.2,bus=3Dpci.1,addr=3D0x0 -usb -drive
-> file=3D/var/lib/nova/instances/2812f3c9-f564-499b-a8c7-
-> e9e7ccf24143/disk,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-
-> disk0,cache=3Dnone,aio=3Dnative -device virtio-blk-device,scsi=3Doff,driv=
-e=3Ddrive-
-> virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1 -drive
-> file=3D/var/lib/nova/instances/2812f3c9-f564-499b-a8c7-
-> e9e7ccf24143/disk.config,format=3Draw,if=3Dnone,id=3Ddrive-virtio-
-> disk1,cache=3Dnone,aio=3Dnative -device virtio-blk-device,scsi=3Doff,driv=
-e=3Ddrive-
-> virtio-disk1,id=3Dvirtio-disk1 -netdev tap,fd=3D27,id=3Dhostnet0 -device =
-virtio-net-
-> device,netdev=3Dhostnet0,id=3Dnet0,mac=3Dfa:16:3e:82:0a:2b -serial
-> file:/var/lib/nova/instances/2812f3c9-f564-499b-a8c7-
-> e9e7ccf24143/console.log -serial pty -vnc 0.0.0.0:0 -k en-us -device
-> VGA,id=3Dvideo0,vgamem_mb=3D16,bus=3Dpci.2,addr=3D0x1 -device virtio-ball=
-oon-
-> device,id=3Dballoon0 -msg timestamp=3Don Domain id=3D14 is tainted: high-
-> privileges
-> >
-> > Regards,
-> > /Ciprian
-> >
+Can you really run a CPU for 975us ?
+
+Dave
+
+> Paolo
+> 
+> > +                                   CPU_THROTTLE_TIMESLICE_NS * pct);
+> >  }
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
