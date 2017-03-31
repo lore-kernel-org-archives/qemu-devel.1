@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ctzhp-0004Nb-8B
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 12:47:22 -0400
+	(envelope-from <gsomlo@gmail.com>) id 1ctzjN-0004v8-CV
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 12:48:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ctzhk-0002z9-C3
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 12:47:21 -0400
-Received: from 1.mo179.mail-out.ovh.net ([178.33.111.220]:39909)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ctzhk-0002ya-5N
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 12:47:16 -0400
-Received: from player755.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 91004342F2
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 18:47:14 +0200 (CEST)
-Date: Fri, 31 Mar 2017 18:46:55 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170331184655.39e413e8@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <50a94a08-4200-71ea-d74a-f28df015d2c6@redhat.com>
-References: <149096834395.26958.7919143982719167728.stgit@bahia.lan>
-	<50a94a08-4200-71ea-d74a-f28df015d2c6@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/o/jgvbWOStB8wOTVdL5UAwO";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [for-2.10 PATCH] fsdev: move stub to libqemustub.a
+	(envelope-from <gsomlo@gmail.com>) id 1ctzjJ-0004qN-MX
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 12:48:57 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:36859)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <gsomlo@gmail.com>) id 1ctzjJ-0004pv-I7
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 12:48:53 -0400
+Received: by mail-qt0-x243.google.com with SMTP id n37so10938424qtb.3
+	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 09:48:53 -0700 (PDT)
+From: "Gabriel L. Somlo" <gsomlo@gmail.com>
+Date: Fri, 31 Mar 2017 12:48:40 -0400
+Message-Id: <1490978921-3782-3-git-send-email-gsomlo@gmail.com>
+In-Reply-To: <1490978921-3782-1-git-send-email-gsomlo@gmail.com>
+References: <1490978921-3782-1-git-send-email-gsomlo@gmail.com>
+Subject: [Qemu-devel] [PATCH v1 2/3] applesmc: consolidate port i/o into
+ single contiguous region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,139 +26,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+To: qemu-devel@nongnu.org
+Cc: agraf@suse.de, eshelton@pobox.com
 
---Sig_/o/jgvbWOStB8wOTVdL5UAwO
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Newer AppleSMC revisions support an error status (read) port
+in addition to the data and command ports currently supported.
 
-On Fri, 31 Mar 2017 16:06:35 +0200
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+Register the full 32-bit region at once, and handle individual
+ports at various offsets within the region from the top-level
+applesmc_io_[write|read]() methods (ctual support for reading
+the error status port to be added by a subsequent patch).
 
-> On 31/03/2017 15:52, Greg Kurz wrote:
-> > The qemu_fsdev_add() stub is used by targets that don't build VirtFS, l=
-ike
-> > CRIS for example. This can be handled by libqemustub.a. =20
->=20
-> It can, the question is do we want them to. :)
->=20
-> The original purpose of the stubs was for function residing in files
-> that aren't easily separated from the rest of the build.  Putting
-> everything in stubs/ easily leads to dead code in libqemustub.a, though
-> I understand that it's somewhat easier (no need to use if/else and
-> CONFIG_ALL).
->=20
+Originally proposed by Eric Shelton <eshelton@pobox.com>
 
-Fair enough :)
+Signed-off-by: Gabriel Somlo <gsomlo@gmail.com>
+---
+ hw/misc/applesmc.c | 56 ++++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 33 insertions(+), 23 deletions(-)
 
-> Paolo
->=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >  fsdev/Makefile.objs      |    6 ------
-> >  fsdev/qemu-fsdev-dummy.c |   21 ---------------------
-> >  stubs/Makefile.objs      |    1 +
-> >  stubs/qemu-fsdev-dummy.c |   21 +++++++++++++++++++++
-> >  4 files changed, 22 insertions(+), 27 deletions(-)
-> >  delete mode 100644 fsdev/qemu-fsdev-dummy.c
-> >  create mode 100644 stubs/qemu-fsdev-dummy.c
-> >=20
-> > diff --git a/fsdev/Makefile.objs b/fsdev/Makefile.objs
-> > index 659df6e18767..e2eea86d680a 100644
-> > --- a/fsdev/Makefile.objs
-> > +++ b/fsdev/Makefile.objs
-> > @@ -2,11 +2,5 @@ ifeq ($(CONFIG_VIRTIO)$(CONFIG_VIRTFS)$(CONFIG_PCI),yy=
-y)
-> >  # Lots of the fsdev/9pcode is pulled in by vl.c via qemu_fsdev_add.
-> >  # only pull in the actual virtio-9p device if we also enabled virtio.
-> >  common-obj-y =3D qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
-> > -else
-> > -common-obj-y =3D qemu-fsdev-dummy.o
-> >  endif
-> >  common-obj-y +=3D qemu-fsdev-opts.o qemu-fsdev-throttle.o
-> > -
-> > -# Toplevel always builds this; targets without virtio will put it in
-> > -# common-obj-y
-> > -common-obj-$(CONFIG_ALL) +=3D qemu-fsdev-dummy.o
-> > diff --git a/fsdev/qemu-fsdev-dummy.c b/fsdev/qemu-fsdev-dummy.c
-> > deleted file mode 100644
-> > index 6dc0fbc4c402..000000000000
-> > --- a/fsdev/qemu-fsdev-dummy.c
-> > +++ /dev/null
-> > @@ -1,21 +0,0 @@
-> > -/*
-> > - * 9p
-> > - *
-> > - * Copyright IBM, Corp. 2010
-> > - *
-> > - * Authors:
-> > - *  Gautham R Shenoy <ego@in.ibm.com>
-> > - *
-> > - * This work is licensed under the terms of the GNU GPL, version 2.  S=
-ee
-> > - * the COPYING file in the top-level directory.
-> > - *
-> > - */
-> > -#include "qemu/osdep.h"
-> > -#include "qemu-fsdev.h"
-> > -#include "qemu/config-file.h"
-> > -#include "qemu/module.h"
-> > -
-> > -int qemu_fsdev_add(QemuOpts *opts)
-> > -{
-> > -    return 0;
-> > -}
-> > diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-> > index 224f04ba6970..f67943da20e9 100644
-> > --- a/stubs/Makefile.objs
-> > +++ b/stubs/Makefile.objs
-> > @@ -37,3 +37,4 @@ stub-obj-y +=3D target-monitor-defs.o
-> >  stub-obj-y +=3D target-get-monitor-def.o
-> >  stub-obj-y +=3D pc_madt_cpu_entry.o
-> >  stub-obj-y +=3D vmgenid.o
-> > +stub-obj-$(CONFIG_VIRTFS) +=3D qemu-fsdev-dummy.o
-> > diff --git a/stubs/qemu-fsdev-dummy.c b/stubs/qemu-fsdev-dummy.c
-> > new file mode 100644
-> > index 000000000000..12f2be21f915
-> > --- /dev/null
-> > +++ b/stubs/qemu-fsdev-dummy.c
-> > @@ -0,0 +1,21 @@
-> > +/*
-> > + * 9p
-> > + *
-> > + * Copyright IBM, Corp. 2010
-> > + *
-> > + * Authors:
-> > + *  Gautham R Shenoy <ego@in.ibm.com>
-> > + *
-> > + * This work is licensed under the terms of the GNU GPL, version 2.  S=
-ee
-> > + * the COPYING file in the top-level directory.
-> > + *
-> > + */
-> > +#include "qemu/osdep.h"
-> > +#include "fsdev/qemu-fsdev.h"
-> > +#include "qemu/config-file.h"
-> > +#include "qemu/module.h"
-> > +
-> > +int qemu_fsdev_add(QemuOpts *opts)
-> > +{
-> > +    return 0;
-> > +}
-> >  =20
-
-
---Sig_/o/jgvbWOStB8wOTVdL5UAwO
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAljeh/8ACgkQAvw66wEB28Jw3ACdFY5c6dXGgkjC2W0BeCShhKK6
-HtMAoIoAQ8aB9Fz0ZABc+LVkUi02NXme
-=lpBC
------END PGP SIGNATURE-----
-
---Sig_/o/jgvbWOStB8wOTVdL5UAwO--
+diff --git a/hw/misc/applesmc.c b/hw/misc/applesmc.c
+index 986f2ac..e581e02 100644
+--- a/hw/misc/applesmc.c
++++ b/hw/misc/applesmc.c
+@@ -75,8 +75,7 @@ typedef struct AppleSMCState AppleSMCState;
+ struct AppleSMCState {
+     ISADevice parent_obj;
+ 
+-    MemoryRegion io_data;
+-    MemoryRegion io_cmd;
++    MemoryRegion io_reg;
+     uint32_t iobase;
+     uint8_t cmd;
+     uint8_t status;
+@@ -207,19 +206,36 @@ static void qdev_applesmc_isa_reset(DeviceState *dev)
+     applesmc_add_key(s, "MSSD", 1, "\0x3");
+ }
+ 
+-static const MemoryRegionOps applesmc_data_io_ops = {
+-    .write = applesmc_io_data_write,
+-    .read = applesmc_io_data_read,
+-    .endianness = DEVICE_NATIVE_ENDIAN,
+-    .impl = {
+-        .min_access_size = 1,
+-        .max_access_size = 1,
+-    },
+-};
++static void applesmc_io_write(void *opaque, hwaddr addr, uint64_t val,
++                              unsigned size)
++{
++    switch (addr) {
++    case APPLESMC_DATA_PORT:
++        applesmc_io_data_write(opaque, addr, val, size);
++        break;
++    case APPLESMC_CMD_PORT:
++        applesmc_io_cmd_write(opaque, addr, val, size);
++        break;
++    default:
++        break;
++    }
++}
+ 
+-static const MemoryRegionOps applesmc_cmd_io_ops = {
+-    .write = applesmc_io_cmd_write,
+-    .read = applesmc_io_cmd_read,
++static uint64_t applesmc_io_read(void *opaque, hwaddr addr, unsigned size)
++{
++    switch (addr) {
++    case APPLESMC_DATA_PORT:
++        return applesmc_io_data_read(opaque, addr, size);
++    case APPLESMC_CMD_PORT:
++        return applesmc_io_cmd_read(opaque, addr, size);
++    default:
++        return 0xff;
++    }
++}
++
++static const MemoryRegionOps applesmc_io_ops = {
++    .write = applesmc_io_write,
++    .read = applesmc_io_read,
+     .endianness = DEVICE_NATIVE_ENDIAN,
+     .impl = {
+         .min_access_size = 1,
+@@ -231,15 +247,9 @@ static void applesmc_isa_realize(DeviceState *dev, Error **errp)
+ {
+     AppleSMCState *s = APPLE_SMC(dev);
+ 
+-    memory_region_init_io(&s->io_data, OBJECT(s), &applesmc_data_io_ops, s,
+-                          "applesmc-data", 4);
+-    isa_register_ioport(&s->parent_obj, &s->io_data,
+-                        s->iobase + APPLESMC_DATA_PORT);
+-
+-    memory_region_init_io(&s->io_cmd, OBJECT(s), &applesmc_cmd_io_ops, s,
+-                          "applesmc-cmd", 4);
+-    isa_register_ioport(&s->parent_obj, &s->io_cmd,
+-                        s->iobase + APPLESMC_CMD_PORT);
++    memory_region_init_io(&s->io_reg, OBJECT(s), &applesmc_io_ops, s,
++                          "applesmc", APPLESMC_NUM_PORTS);
++    isa_register_ioport(&s->parent_obj, &s->io_reg, s->iobase);
+ 
+     if (!s->osk || (strlen(s->osk) != 64)) {
+         fprintf(stderr, "WARNING: Using AppleSMC with invalid key\n");
+-- 
+2.7.4
