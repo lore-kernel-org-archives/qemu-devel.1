@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ctsYd-0000BJ-Ef
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:09:24 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1ctsfy-0001Jd-PD
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:17:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ctsYZ-000882-EA
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:09:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48134)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ctsYZ-00087O-5d
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:09:19 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3226C22BA0B
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 09:09:18 +0000 (UTC)
-Date: Fri, 31 Mar 2017 10:09:15 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170331090914.GC2408@work-vm>
-References: <20170323204544.12015-1-quintela@redhat.com>
-	<20170323204544.12015-47-quintela@redhat.com>
+	(envelope-from <dovgaluk@ispras.ru>) id 1ctsfv-0003Pm-Hq
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:16:58 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:54374)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1ctsfv-0003PB-3j
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:16:55 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20170307155054.5833-1-alex.bennee@linaro.org>
+	<001801d29bf5$dcba37d0$962ea770$@ru> <8760jdqpv2.fsf@linaro.org>
+	<000101d29cbc$b8df1ca0$2a9d55e0$@ru> <87tw6vq43b.fsf@linaro.org>
+	<000001d29e30$138e5700$3aab0500$@ru> <871stxpdzz.fsf@linaro.org>
+	<002501d29e64$27b383c0$771a8b40$@ru> <87inn1xunu.fsf@linaro.org>
+	<000601d2a852$ac5211d0$04f63570$@ru> <87vaqs4dxc.fsf@linaro.org>
+	<001b01d2a94a$fe5c46a0$fb14d3e0$@ru> <87o9wj3phd.fsf@linaro.org>
+In-Reply-To: <87o9wj3phd.fsf@linaro.org>
+Date: Fri, 31 Mar 2017 12:16:53 +0300
+Message-ID: <000901d2a9ff$89fcdad0$9df69070$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170323204544.12015-47-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 46/51] ram: Remember last_page instead of
- last_offset
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v3 00/11] MTTCG fix-ups for 2.9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,86 +34,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
+Cc: peter.maydell@linaro.org, rth@twiddle.net, pbonzini@redhat.com, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  migration/ram.c | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
+> From: mttcg-request@listserver.greensocs.com [mailto:mttcg-request@listserver.greensocs.com]
+> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
+> >> From: mttcg-request@listserver.greensocs.com [mailto:mttcg-
+> request@listserver.greensocs.com]
+> >> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
+> >> >> From: mttcg-request@listserver.greensocs.com [mailto:mttcg-
+> >> request@listserver.greensocs.com]
+> >> >> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
+> <snip>
+> >> >> > I tested on vexpress-a9 platform with Debian wheezy.
+> >> >>
+> >> >> Thanks for that. I now have a test case that I can reproduce failures on
+> >> >> without needing graphics.
+> >> >>
+> >> >> I've been investigating if there are any problems with the timer
+> >> >> processing now they have been moved into the TCG thread. The record
+> >> >> stage seems to work fine but I'm having difficulty figuring out why
+> >> >> playback freezes. It seems we get to a point where we are stuck waiting
+> >> >> for a suspiciously exact timer deadline:
+> >> >
+> >> > I've encountered the following behavior at replay stage:
+> >> > - replay takes some instructions to execute (qemu_icount += counter)
+> >> > - virtual timer is fired
+> >>
+> >> This is the virtual timer based on icount not the virtual rt timer? So
+> >
+> > Regular virtual timer. It's value is based on icount.
+> > virtual_rt is used for internal icount purposes.
 > 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index b1a031e..57b776b 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -171,8 +171,8 @@ struct RAMState {
->      RAMBlock *last_seen_block;
->      /* Last block from where we have sent data */
->      RAMBlock *last_sent_block;
-> -    /* Last offset we have sent data from */
-> -    ram_addr_t last_offset;
-> +    /* Last dirty page we have sent */
+> And this is where the clock warps come in? The bias brings the
+> virtual_rt time forward because execution is waiting for some external
+> event to fire (e.g. a timer IRQ)?
 
-Can you make that 'Last dirty target page we have sent' 
-just so we know which shape page we're dealing with.
+I guess so. But bias is not updated when the vCPU works.
+vCPU thread updates only qemu_icount which is used for virtual clock calculation.
 
-> +    ram_addr_t last_page;
->      /* last ram version we have seen */
->      uint32_t last_version;
->      /* We are in the first round */
-> @@ -1063,7 +1063,7 @@ static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss,
->      pss->offset = migration_bitmap_find_dirty(rs, pss->block, pss->offset,
->                                                page);
->      if (pss->complete_round && pss->block == rs->last_seen_block &&
-> -        pss->offset >= rs->last_offset) {
-> +        pss->offset >= rs->last_page) {
-
-That's odd; isn't pss->offset still in bytes?
-
-Dave
-
->          /*
->           * We've been once around the RAM and haven't found anything.
->           * Give up.
-> @@ -1396,7 +1396,7 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
->      }
->  
->      pss.block = rs->last_seen_block;
-> -    pss.offset = rs->last_offset;
-> +    pss.offset = rs->last_page << TARGET_PAGE_BITS;
->      pss.complete_round = false;
->  
->      if (!pss.block) {
-> @@ -1418,7 +1418,7 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
->      } while (!pages && again);
->  
->      rs->last_seen_block = pss.block;
-> -    rs->last_offset = pss.offset;
-> +    rs->last_page = pss.offset >> TARGET_PAGE_BITS;
->  
->      return pages;
->  }
-> @@ -1493,7 +1493,7 @@ static void ram_state_reset(RAMState *rs)
->  {
->      rs->last_seen_block = NULL;
->      rs->last_sent_block = NULL;
-> -    rs->last_offset = 0;
-> +    rs->last_page = 0;
->      rs->last_version = ram_list.version;
->      rs->ram_bulk_stage = true;
->  }
-> @@ -1838,7 +1838,7 @@ static int postcopy_chunk_hostpages(MigrationState *ms)
->      /* Easiest way to make sure we don't resume in the middle of a host-page */
->      rs->last_seen_block = NULL;
->      rs->last_sent_block = NULL;
-> -    rs->last_offset     = 0;
-> +    rs->last_page = 0;
->  
->      QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
->          unsigned long first = block->offset >> TARGET_PAGE_BITS;
-> -- 
-> 2.9.3
+> >> under the new scheme of being processed in the vCPU loop we should only
+> >> fire this one once all execution is done (although you may exit the loop
+> >> early before icount is exhausted).
+> >
+> > We should stop the vCPU before processing virtual timers because:
+> > - virtual clock depends on instruction counter
+> > - virtual timers may change virtual hardware state
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> If we do the processing in the top of main vCPU loop this should be
+> equivalent. The instruction counter cannot run because we haven't
+> entered tcg_exec_cpu. We also process virtual timers in this thread
+> outside the loop so nothing else can be poking the hardware state.
+
+This is how qemu worked in older version - it switched between
+processing tasks (vCPU and timers) in one thread.
+But how we'll join this behavior with the current design and MTTCG?
+
+> 
+> >> > - replay puts back unexecuted instructions (qemu_icount -= counter)
+> >> >
+> >> > But virtual timer cannot take in account non-executed instructions (counter) and
+> >> > therefore it reads only qemu_icount, which provides incorrect time.
+> >> >
+> >> >> But the timers are all enabled:
+> >> >>
+> >> >>   (gdb) qemu timers
+> >> >>   Processing Realtime timers
+> >> >>     clock QEMU_CLOCK_REALTIME is enabled:true, last:-9223372036854775808
+> >> >>   Processing Virtual timers
+> >> >>     clock QEMU_CLOCK_VIRTUAL is enabled:true, last:-9223372036854775808
+> >> >>       timer 34297350016/1 (cb:0x555555a2e952 <ptimer_tick>)
+> >> >>       timer 503290000000/1000000 (cb:0x555555bd4d1d <ra_timer_handler>)
+> >> >>   Processing Host timers
+> >> >>     clock QEMU_CLOCK_HOST is enabled:true, last:1490191319270134000
+> >> >>   Processing Virtual RT timers
+> >> >>     clock QEMU_CLOCK_VIRTUAL_RT is enabled:true, last:-9223372036854775808
+> >> >
+> >> > Timers are processed only at checkpoints recorded in the log.
+> >> > When replay is stuck, probably there is a pending checkpoint in the log
+> >> > and pending instructions in CPU (because iothread breaks its
+> >> > synchronization).
+> >>
+> >> How does this work for instructions that sleep (like WFI)? The WFI will
+> >> cause us to exit the loop but I assume we need a "real" timer to trigger
+> >> a firing of whatever the WFI is waiting for as time according to icount
+> >> isn't advancing.
+> >
+> > This is virtual_rt for. It advances even when vCPU is stopped.
+> 
+> So I'm not seeing this happen:
+> 
+>   process_icount_data: icount not increased 117302332749=>117302332749 RT:-1
+> 
+> I wonder if the advance of virtual_rt has been deadlocked? The -1
+> suggests its not even setup.
+
+qemu_start_warp_timer says that it is setup only when there are active virtual timers.
+
+
+> > By the way, I made small description of the replay log format
+> > to be later included into docs/replay.txt:
+> >
+> Thanks. That's really useful.
+> 
+> Do you think it would be worth including the dumper script I wrote in
+> ./scripts/? I mainly wrote it to aid my understanding of the code flow
+> but it might be useful in future investigations?
+
+Usually I get human-readable logs in record and replay modes to find
+divergence between them, but I think your script might be useful in some cases.
+
+Pavel Dovgalyuk
