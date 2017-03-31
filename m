@@ -1,15 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ctySm-0007rf-Tt
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 11:27:48 -0400
+	(envelope-from <jhanley@dgtlrift.com>) id 1ctyTa-0008HU-9E
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 11:28:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ctySl-0003VC-HP
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 11:27:44 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Fri, 31 Mar 2017 10:27:30 -0500
-Message-Id: <20170331152730.12514-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9] rbd: Fix regression in legacy
- key/values containing escaped :
+	(envelope-from <jhanley@dgtlrift.com>) id 1ctyTZ-0004D6-8J
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 11:28:34 -0400
+Received: from mail-vk0-x244.google.com ([2607:f8b0:400c:c05::244]:33900)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jhanley@dgtlrift.com>)
+	id 1ctyTY-0004CP-Uw
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 11:28:33 -0400
+Received: by mail-vk0-x244.google.com with SMTP id y16so11904207vky.1
+	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 08:28:32 -0700 (PDT)
+MIME-Version: 1.0
+From: James Hanley <jhanley@dgtlrift.com>
+Date: Fri, 31 Mar 2017 11:28:31 -0400
+Message-ID: <CAF++6AOLSd0SYyv_LmnjinEj-jHBbyNZv_hxvdksGqCoDcpmjA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: [Qemu-devel] MTD timeout on bootup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,193 +26,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, jcody@redhat.com, armbru@redhat.com, Alexandru.Avadanii@enea.com, Josh Durgin <jdurgin@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel <qemu-devel@nongnu.org>
 
-Commit c7cacb3 accidentally broke legacy key-value parsing through
-pseudo-filename parsing of -drive file=rbd://..., for any key that
-contains an escaped ':'.  Such a key is surprisingly common, thanks
-to mon_host specifying a 'host:port' string.  The break happens
-because passing things from QDict through QemuOpts back to another
-QDict requires that we pack our parsed key/value pairs into a string,
-and then reparse that string, but the intermediate string that we
-created ("key1=value1:key2=value2") lost the \: escaping that was
-present in the original, so that we could no longer see which : were
-used as separators vs. those used as part of the original input.
+When trying to bootup a pristine zync image from the zc702 tarball, it
+would always fail with the MTD detection of the serial flash device type
+command over the SPI.  I believe this section of code may have the logic
+flipped.  Once I changed it to the following, I was able to detect the
+flash type when booting the pristine image from Xilinx.
+-Jim
 
-Fix it by collecting the key/value pairs through a QList, and
-sending that list on a round trip through a JSON QString (as in
-'["key1","value1","key2","value2"]') on its way through QemuOpts,
-rather than hand-rolling our own string.  Since the string is only
-handled internally, this was faster than creating a full-blown
-struct of '[{"key1":"value1"},{"key2":"value2"}]', and safer at
-guaranteeing order compared to '{"key1":"value1","key2":"value2"}'.
 
-It would be nicer if we didn't have to round-trip through QemuOpts
-in the first place, but that's a much bigger task for later.
+>From baaaacca370c13526fd2b8c7b33c7d9e8a6d7b8d Mon Sep 17 00:00:00 2001
+From: Jim Hanley <Jim.Hanley@LandisGyr.com>
+Date: Thu, 23 Mar 2017 10:29:34 -0400
+Subject: [PATCH] MTD writes from the SPI were never being dequeue...
+Signed-off-by:
 
-Reproducer:
-./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio \
--drive 'file=rbd:volumes/volume-ea141b5c-cdb3-4765-910d-e7008b209a70'\
-':id=compute:key=AQAVkvxXAAAAABAA9ZxWFYdRmV+DSwKr7BKKXg=='\
-':auth_supported=cephx\;none:mon_host=192.168.1.2\:6789'\
-',format=raw,if=none,id=drive-virtio-disk0,'\
-'serial=ea141b5c-cdb3-4765-910d-e7008b209a70,cache=writeback'
-
-Even without an RBD setup, this serves a test of whether we get
-the incorrect parser error of:
-qemu-system-x86_64: -drive file=rbd:...cache=writeback: conf option 6789 has no value
-or the correct behavior of hanging while trying to connect to
-the requested mon_host of 192.168.1.2:6789.
-
-Reported-by: Alexandru Avadanii <Alexandru.Avadanii@enea.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- block/rbd.c | 83 +++++++++++++++++++++++++++++++------------------------------
- 1 file changed, 42 insertions(+), 41 deletions(-)
+ hw/ssi/xilinx_spips.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/rbd.c b/block/rbd.c
-index 498322b..fbdb131 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -20,6 +20,7 @@
- #include "crypto/secret.h"
- #include "qemu/cutils.h"
- #include "qapi/qmp/qstring.h"
-+#include "qapi/qmp/qjson.h"
-
- /*
-  * When specifying the image filename use:
-@@ -135,18 +136,16 @@ static void qemu_rbd_parse_filename(const char *filename, QDict *options,
-                                     Error **errp)
- {
-     const char *start;
--    char *p, *buf, *keypairs;
-+    char *p, *buf;
-+    QList *keypairs = NULL;
-     char *found_str;
--    size_t max_keypair_size;
-
-     if (!strstart(filename, "rbd:", &start)) {
-         error_setg(errp, "File name must start with 'rbd:'");
-         return;
+diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+index da8adfa..a3af1f7 100644
+--- a/hw/ssi/xilinx_spips.c
++++ b/hw/ssi/xilinx_spips.c
+@@ -482,8 +482,8 @@ static void xilinx_spips_write(void *opaque, hwaddr
+addr,
+     s->regs[addr] = (s->regs[addr] & ~mask) | (value & mask);
+ no_reg_update:
+     xilinx_spips_update_cs_lines(s);
+-    if ((man_start_com && s->regs[R_CONFIG] & MAN_START_EN) ||
+-            (fifo8_is_empty(&s->tx_fifo) && s->regs[R_CONFIG] &
+MAN_START_EN)) {
++    if (!((man_start_com && s->regs[R_CONFIG] & MAN_START_EN) ||
++            (fifo8_is_empty(&s->tx_fifo) && s->regs[R_CONFIG] &
+MAN_START_EN))) {
+         xilinx_spips_flush_txfifo(s);
      }
-
--    max_keypair_size = strlen(start) + 1;
-     buf = g_strdup(start);
--    keypairs = g_malloc0(max_keypair_size);
-     p = buf;
-
-     found_str = qemu_rbd_next_tok(p, '/', &p);
-@@ -194,33 +193,30 @@ static void qemu_rbd_parse_filename(const char *filename, QDict *options,
-         } else if (!strcmp(name, "id")) {
-             qdict_put(options, "user" , qstring_from_str(value));
-         } else {
--            /* FIXME: This is pretty ugly, and not the right way to do this.
--             *        These should be contained in a structure, and then
--             *        passed explicitly as individual key/value pairs to
--             *        rados.  Consider this legacy code that needs to be
--             *        updated. */
--            char *tmp = g_malloc0(max_keypair_size);
--            /* only use a delimiter if it is not the first keypair found */
--            /* These are sets of unknown key/value pairs we'll pass along
--             * to ceph */
--            if (keypairs[0]) {
--                snprintf(tmp, max_keypair_size, ":%s=%s", name, value);
--                pstrcat(keypairs, max_keypair_size, tmp);
--            } else {
--                snprintf(keypairs, max_keypair_size, "%s=%s", name, value);
-+            /*
-+             * We pass these internally to qemu_rbd_set_keypairs(), so
-+             * we can get away with the simpler list of [ "key1",
-+             * "value1", "key2", "value2" ] rather than a raw dict
-+             * { "key1": "value1", "key2": "value2" } where we can't
-+             * guarantee order, or even a more correct but complex
-+             * [ { "key1": "value1" }, { "key2": "value2" } ]
-+             */
-+            if (!keypairs) {
-+                keypairs = qlist_new();
-             }
--            g_free(tmp);
-+            qlist_append(keypairs, qstring_from_str(name));
-+            qlist_append(keypairs, qstring_from_str(value));
-         }
-     }
-
--    if (keypairs[0]) {
--        qdict_put(options, "=keyvalue-pairs", qstring_from_str(keypairs));
-+    if (keypairs) {
-+        qdict_put(options, "=keyvalue-pairs",
-+                  qobject_to_json(QOBJECT(keypairs)));
-     }
-
--
- done:
-     g_free(buf);
--    g_free(keypairs);
-+    QDECREF(keypairs);
-     return;
- }
-
-@@ -244,36 +240,41 @@ static int qemu_rbd_set_auth(rados_t cluster, const char *secretid,
-     return 0;
- }
-
--static int qemu_rbd_set_keypairs(rados_t cluster, const char *keypairs,
-+static int qemu_rbd_set_keypairs(rados_t cluster, const char *keypairs_json,
-                                  Error **errp)
- {
--    char *p, *buf;
--    char *name;
--    char *value;
-+    QList *keypairs;
-+    QString *name;
-+    QString *value;
-+    const char *key;
-+    size_t remaining;
-     int ret = 0;
-
--    buf = g_strdup(keypairs);
--    p = buf;
-+    if (!keypairs_json) {
-+        return ret;
-+    }
-+    keypairs = qobject_to_qlist(qobject_from_json(keypairs_json,
-+                                                  &error_abort));
-+    remaining = qlist_size(keypairs) / 2;
-+    assert(remaining);
-
--    while (p) {
--        name = qemu_rbd_next_tok(p, '=', &p);
--        if (!p) {
--            error_setg(errp, "conf option %s has no value", name);
--            ret = -EINVAL;
--            break;
--        }
-+    while (remaining--) {
-+        name = qobject_to_qstring(qlist_pop(keypairs));
-+        value = qobject_to_qstring(qlist_pop(keypairs));
-+        assert(name && value);
-+        key = qstring_get_str(name);
-
--        value = qemu_rbd_next_tok(p, ':', &p);
--
--        ret = rados_conf_set(cluster, name, value);
-+        ret = rados_conf_set(cluster, key, qstring_get_str(value));
-+        QDECREF(name);
-+        QDECREF(value);
-         if (ret < 0) {
--            error_setg_errno(errp, -ret, "invalid conf option %s", name);
-+            error_setg_errno(errp, -ret, "invalid conf option %s", key);
-             ret = -EINVAL;
-             break;
-         }
-     }
-
--    g_free(buf);
-+    QDECREF(keypairs);
-     return ret;
- }
-
+     xilinx_spips_update_cs_lines(s);
 -- 
-2.9.3
+2.7.4
