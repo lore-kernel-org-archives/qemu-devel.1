@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Alexandru.Avadanii@enea.com>) id 1ctl0U-0006TP-PI
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 21:05:40 -0400
+	(envelope-from <jasowang@redhat.com>) id 1ctlAc-0007mU-L9
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 21:16:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Alexandru.Avadanii@enea.com>) id 1ctl0R-0006uv-Jk
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 21:05:38 -0400
-Received: from smtp-out11.electric.net ([185.38.181.39]:53868)
+	(envelope-from <jasowang@redhat.com>) id 1ctlAX-00067Q-T0
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 21:16:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42726)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Alexandru.Avadanii@enea.com>)
-	id 1ctl0R-0006t1-DB
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 21:05:35 -0400
-From: Alexandru Avadanii <Alexandru.Avadanii@enea.com>
-Date: Fri, 31 Mar 2017 01:05:29 +0000
-Message-ID: <058D52979F67BF47BCD9EA78EAECA6DC7779F35F@SESTOEX04.enea.se>
-References: <058D52979F67BF47BCD9EA78EAECA6DC7779F2D5@SESTOEX04.enea.se>
-	<de0d3d40-833b-f24b-7689-b23eb9c78244@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1ctlAX-00066d-No
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 21:16:01 -0400
+From: Jason Wang <jasowang@redhat.com>
+Date: Fri, 31 Mar 2017 09:15:53 +0800
+Message-Id: <1490922956-19731-1-git-send-email-jasowang@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] rbd: Possible regression in 2.9 RCs
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/2] Net patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +24,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: svc-armband <armband@enea.com>, Jeff Cody <jcody@redhat.com>, Markus
-	Armbruster <armbru@redhat.com>
+To: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: Jason Wang <jasowang@redhat.com>
 
-YzdjYWNiM2U3YTJlOWZkZjkyOWM5OTNiOTgyNjhlNDE3OTE0N2NiYiBpcyB0aGUgZmlyc3QgYmFk
-IGNvbW1pdA0KICAgIGJsb2NrL3JiZDogcGFyc2UgYWxsIG9wdGlvbnMgdmlhIGJkcnZfcGFyc2Vf
-ZmlsZW5hbWUNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBbGV4YW5k
-cnUgQXZhZGFuaWkNCj4gU2VudDogRnJpZGF5LCBNYXJjaCAzMSwgMjAxNyAzOjUyIEFNDQo+IFRv
-OiAnRXJpYyBCbGFrZSc7IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiBDYzogc3ZjLWFybWJhbmQ7
-IEplZmYgQ29keTsgTWFya3VzIEFybWJydXN0ZXINCj4gU3ViamVjdDogUkU6IFtRZW11LWRldmVs
-XSByYmQ6IFBvc3NpYmxlIHJlZ3Jlc3Npb24gaW4gMi45IFJDcw0KPiANCj4gSGksIEVyaWMsDQo+
-IFRoYW5rIHlvdSBmb3IgbG9va2luZyBpbnRvIHRoaXMhDQo+IA0KPiA+IC0tLS0tT3JpZ2luYWwg
-TWVzc2FnZS0tLS0tDQo+ID4gRnJvbTogRXJpYyBCbGFrZSBbbWFpbHRvOmVibGFrZUByZWRoYXQu
-Y29tXQ0KPiA+IFNlbnQ6IEZyaWRheSwgTWFyY2ggMzEsIDIwMTcgMzo0MCBBTQ0KPiA+IFRvOiBB
-bGV4YW5kcnUgQXZhZGFuaWk7IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiA+IENjOiBzdmMtYXJt
-YmFuZDsgSmVmZiBDb2R5OyBNYXJrdXMgQXJtYnJ1c3Rlcg0KPiA+IFN1YmplY3Q6IFJlOiBbUWVt
-dS1kZXZlbF0gcmJkOiBQb3NzaWJsZSByZWdyZXNzaW9uIGluIDIuOSBSQ3MNCj4gPg0KPiA+IE9u
-IDAzLzMwLzIwMTcgMDY6NDIgUE0sIEFsZXhhbmRydSBBdmFkYW5paSB3cm90ZToNCj4gPiA+IEhp
-LA0KPiA+ID4gV2hpbGUgdGVzdGluZyBvdXQgMi45LjAtcmMyIG9uIEFBcmNoNjQsIHdlIG5vdGlj
-ZWQgYSBwb3NzaWJsZQ0KPiA+ID4gcmVncmVzc2lvbiBpbg0KPiA+IFFFTVUsIHJlbGF0ZWQgdG8g
-cGFyc2luZyAtZHJpdmUgJ2ZpbGU9cmJkLy4uLic6DQo+ID4gPj4gImNvbmYgb3B0aW9uIDY3ODkg
-aGFzIG5vIHZhbHVlIi4NCj4gPiA+DQo+ID4gPiBJbnN0YW5jZSBsb2dzIFsxXS4NCj4gPg0KPiA+
-IFBhc3RlYmlucyBkb24ndCBsYXN0IGZvcmV2ZXI7IGl0IGhlbHBzIHRvIHBhc3RlIHRoZSBhY3R1
-YWwgZXJyb3INCj4gPiBtZXNzYWdlIGluIHRoZSBlbWFpbCBmb3IgYXJjaGl2YWwgcHVycG9zZXMs
-IGFuZCB0byBtYWtlIGl0IGVhc2llciBmb3INCj4gPiByZWFkZXJzIHRvIHNlZSB5b3VyIHByb2Js
-ZW0gd2l0aG91dCBoYXZpbmcgdG8gY2hhc2UgVVJMczoNCj4gPg0KPiA+IDIwMTctMDMtMzBUMjA6
-MDI6MjcuNDk5Njk1WiBxZW11LXN5c3RlbS1hYXJjaDY0OiAtZHJpdmUNCj4gPiBmaWxlPXJiZDp2
-b2x1bWVzL3ZvbHVtZS1lYTE0MWI1Yy1jZGIzLTQ3NjUtOTEwZC0NCj4gPg0KPiBlNzAwOGIyMDlh
-NzA6aWQ9Y29tcHV0ZTprZXk9QVFBVmt2eFhBQUFBQUJBQTlaeFdGWWRSbVYrRFN3S3INCj4gPg0K
-PiA3QktLWGc9PTphdXRoX3N1cHBvcnRlZD1jZXBoeFw7bm9uZTptb25faG9zdD0xOTIuMTY4LjEu
-Mlw6Njc4OSxmb3JtDQo+ID4gYXQ9cmF3LGlmPW5vbmUsaWQ9ZHJpdmUtdmlydGlvLWRpc2swLHNl
-cmlhbD1lYTE0MWI1Yy1jZGIzLTQ3NjUtOTEwZC0NCj4gPiBlNzAwOGIyMDlhNzAsY2FjaGU9d3Jp
-dGViYWNrOg0KPiA+IGNvbmYgb3B0aW9uIDY3ODkgaGFzIG5vIHZhbHVlDQo+ID4NCj4gPiBMb29r
-aW5nIGF0IHRoYXQsIHRoZSBvbmx5IGluc3RhbmNlIG9mIDY3ODkgdGhhdCBJIHNlZSBpcyB0aGUN
-Cj4gPiAnbW9uX2hvc3Q9MTkyLjE2OC4xLjJcOjY3ODksJyBwb3J0aW9uLiAgSSBiZXQgd2hhdCBp
-cyBoYXBwZW5pbmcgaXMNCj4gPiB0aGF0IHdlIGFyZSBtaXMtcGFyc2luZyB0aGUgc3RyaW5nLCBh
-bmQgdHJ5aW5nIHRvIHRyZWF0IGl0IGFzIGENCj4gPiBrZXktdmFsdWVzIHBhaXIuICBJbiBvdGhl
-ciB3b3JkcywgaXQncyBwcm9iYWJseSBhbiB1bmludGVuZGVkDQo+ID4gcmVncmVzc2lvbiBpbnRy
-b2R1Y2VkIGluIHRoZSByYW5nZSBvZiA3ODMwZjkwOS4uMGE1NTY3OWIgYnkgSmVmZiBbM10NCj4g
-PiBvciBpbiBNYXJrdXMnIGNsZWFudXBzIGJldHdlZW4gZjUxYzM2M2MuLjI4MzYyODRkIFs0XS4N
-Cj4gPg0KPiA+IE9uIHRoZSBicmlnaHQgc2lkZSwgd2Ugc3RpbGwgaGF2ZSB0aW1lIHRvIGZpeCBp
-dCBiZWZvcmUgMi45IGdvZXMNCj4gPiBmaW5hbCwgbm93IHRoYXQgeW91IGNhbGxlZCBpdCB0byBv
-dXIgYXR0ZW50aW9uLg0KPiA+DQo+ID4gPiBPY2Nhc2lvbmFsbHksIHdlIGdldCAiY29uZiBvcHRp
-b24gdG9vIGxvbmciLCB3aXRoIHRoZSBzYW1lIGVmZmVjdC4NCj4gPiA+DQo+ID4gPiBXZSBiaXNl
-Y3RlZCB0aGlzIG1hbnVhbGx5IGJldHdlZW4gMi44LjAgKHdvcmtpbmcgb2sgd2l0aCB0aGUgYWJv
-dmUNCj4gPiA+IGNtZCkNCj4gPiBhbmQgMi45LjAtcmMyLCBhbmQgdGhlIHByb2JsZW1hdGljIGNo
-YW5nZSBzZWVtcyB0byBiZSB0aGUgbWVyZ2UgcG9pbnQgWzJdLg0KPiA+DQo+ID4gSSBzdXNwZWN0
-IHlvdSBkaWRuJ3QgcnVuIHRoZSBiaXNlY3QgcXVpdGUgY29ycmVjdGx5LCBhcyB0aGF0IG1lcmdl
-DQo+ID4gcG9pbnQgaGFzIG5vdGhpbmcgdG8gZG8gd2l0aCBibG9jay9yYmQuYy4NCj4gDQo+IEkg
-c3VzcGVjdCB0aGF0IHRvbywgc29ycnkuIEknbGwgcmVkbyB0aGlzIHRvbW9ycm93IGFuZCBnZXQg
-YmFjay4NCj4gDQo+ID4NCj4gPiA+DQo+ID4gPiBbMV0gaHR0cDovL3Bhc3RlLm9wZW5zdGFjay5v
-cmcvc2hvdy82MDQ5MzgvDQo+ID4gPiBbMl0gaHR0cHM6Ly9naXRodWIuY29tL3FlbXUvcWVtdS9j
-b21taXQvOWE4MWI3OQ0KPiA+ID4NCj4gPg0KPiA+IFszXQ0KPiA+IGh0dHBzOi8vbGlzdHMuZ251
-Lm9yZy9hcmNoaXZlL2h0bWwvcWVtdS1kZXZlbC8yMDE3LTAyL21zZzA3NTA2Lmh0bWwNCj4gPiBb
-NF0NCj4gPiBodHRwczovL2xpc3RzLmdudS5vcmcvYXJjaGl2ZS9odG1sL3FlbXUtZGV2ZWwvMjAx
-Ny0wMy9tc2cwNTU2NS5odG1sDQo+ID4NCj4gPiAtLQ0KPiA+IEVyaWMgQmxha2UgICBlYmxha2Ug
-cmVkaGF0IGNvbSAgICArMS05MTktMzAxLTMyNjYNCj4gPiBMaWJ2aXJ0IHZpcnR1YWxpemF0aW9u
-IGxpYnJhcnkgaHR0cDovL2xpYnZpcnQub3JnDQoNCg==
+The following changes since commit ddc2c3a57e0752c0650fdb735a8b8322542d42=
+48:
+
+  Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into stagi=
+ng (2017-03-30 18:02:33 +0100)
+
+are available in the git repository at:
+
+  https://github.com/jasowang/qemu.git tags/net-pull-request
+
+for you to fetch changes up to b4053c64833762f1249b2d704d2da30b5b10c8ff:
+
+  e1000: disable debug by default (2017-03-31 08:48:13 +0800)
+
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+Jason Wang (2):
+      virtio-net: avoid call tap_enable when there's only one queue
+      e1000: disable debug by default
+
+ hw/net/e1000.c      | 2 +-
+ hw/net/virtio-net.c | 4 ++++
+ 2 files changed, 5 insertions(+), 1 deletion(-)
