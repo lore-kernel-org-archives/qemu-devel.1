@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ctkbd-0001U6-De
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 20:39:58 -0400
+	(envelope-from <Alexandru.Avadanii@enea.com>) id 1ctknV-0004k6-MO
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 20:52:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ctkba-0003Fk-Bo
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 20:39:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43518)
+	(envelope-from <Alexandru.Avadanii@enea.com>) id 1ctknS-00047F-KT
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 20:52:13 -0400
+Received: from smtp-out10.electric.net ([185.38.180.43]:58335)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ctkba-0003FF-30
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 20:39:54 -0400
+	(Exim 4.71) (envelope-from <Alexandru.Avadanii@enea.com>)
+	id 1ctknS-00046A-Dt
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 20:52:10 -0400
+From: Alexandru Avadanii <Alexandru.Avadanii@enea.com>
+Date: Fri, 31 Mar 2017 00:52:04 +0000
+Message-ID: <058D52979F67BF47BCD9EA78EAECA6DC7779F341@SESTOEX04.enea.se>
 References: <058D52979F67BF47BCD9EA78EAECA6DC7779F2D5@SESTOEX04.enea.se>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <de0d3d40-833b-f24b-7689-b23eb9c78244@redhat.com>
-Date: Thu, 30 Mar 2017 19:39:50 -0500
+	<de0d3d40-833b-f24b-7689-b23eb9c78244@redhat.com>
+In-Reply-To: <de0d3d40-833b-f24b-7689-b23eb9c78244@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <058D52979F67BF47BCD9EA78EAECA6DC7779F2D5@SESTOEX04.enea.se>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="mpm1g2FgAeAqX6E7ceCpqbDMLgvrjxWjk"
 Subject: Re: [Qemu-devel] rbd: Possible regression in 2.9 RCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -27,93 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexandru Avadanii <Alexandru.Avadanii@enea.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: svc-armband <armband@enea.com>, Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: svc-armband <armband@enea.com>, Jeff Cody <jcody@redhat.com>, Markus
+	Armbruster <armbru@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mpm1g2FgAeAqX6E7ceCpqbDMLgvrjxWjk
-From: Eric Blake <eblake@redhat.com>
-To: Alexandru Avadanii <Alexandru.Avadanii@enea.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: svc-armband <armband@enea.com>, Jeff Cody <jcody@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-Message-ID: <de0d3d40-833b-f24b-7689-b23eb9c78244@redhat.com>
-Subject: Re: [Qemu-devel] rbd: Possible regression in 2.9 RCs
-References: <058D52979F67BF47BCD9EA78EAECA6DC7779F2D5@SESTOEX04.enea.se>
-In-Reply-To: <058D52979F67BF47BCD9EA78EAECA6DC7779F2D5@SESTOEX04.enea.se>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 03/30/2017 06:42 PM, Alexandru Avadanii wrote:
-> Hi,
-> While testing out 2.9.0-rc2 on AArch64, we noticed a possible regressio=
-n in QEMU, related to parsing -drive 'file=3Drbd/...':
->> "conf option 6789 has no value".
->=20
-> Instance logs [1].
-
-Pastebins don't last forever; it helps to paste the actual error message
-in the email for archival purposes, and to make it easier for readers to
-see your problem without having to chase URLs:
-
-2017-03-30T20:02:27.499695Z qemu-system-aarch64: -drive
-file=3Drbd:volumes/volume-ea141b5c-cdb3-4765-910d-e7008b209a70:id=3Dcompu=
-te:key=3DAQAVkvxXAAAAABAA9ZxWFYdRmV+DSwKr7BKKXg=3D=3D:auth_supported=3Dce=
-phx\;none:mon_host=3D192.168.1.2\:6789,format=3Draw,if=3Dnone,id=3Ddrive-=
-virtio-disk0,serial=3Dea141b5c-cdb3-4765-910d-e7008b209a70,cache=3Dwriteb=
-ack:
-conf option 6789 has no value
-
-Looking at that, the only instance of 6789 that I see is the
-'mon_host=3D192.168.1.2\:6789,' portion.  I bet what is happening is that=
-
-we are mis-parsing the string, and trying to treat it as a key-values
-pair.  In other words, it's probably an unintended regression introduced
-in the range of 7830f909..0a55679b by Jeff [3] or in Markus' cleanups
-between f51c363c..2836284d [4].
-
-On the bright side, we still have time to fix it before 2.9 goes final,
-now that you called it to our attention.
-
-> Occasionally, we get "conf option too long", with the same effect.
->=20
-> We bisected this manually between 2.8.0 (working ok with the above cmd)=
- and 2.9.0-rc2, and the problematic change seems to be the merge point [2=
-].
-
-I suspect you didn't run the bisect quite correctly, as that merge point
-has nothing to do with block/rbd.c.
-
->=20
-> [1] http://paste.openstack.org/show/604938/
-> [2] https://github.com/qemu/qemu/commit/9a81b79
->=20
-
-[3] https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg07506.html
-[4] https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg05565.html
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---mpm1g2FgAeAqX6E7ceCpqbDMLgvrjxWjk
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY3aVWAAoJEKeha0olJ0NqcQ0H/1g+fiPErb3PndckAIncEyD5
-90NY1XWppMrxWIvvMFEcvJfeTDE5Cd00Y9rbpWULRL0c/me0zGgkc9Z8hkjOgfxR
-c6uydC0td0XNCeHo6GMdanAwnjT0Ji0mTeja1dzeXwFI4FrpIGa1N4Upum1YxkKm
-E+JU2W3SIJQCpQ+BGx3gtOQQyJeHFWiTtN9VbIDrey4QpqcVNROMPQq5b+08ijHC
-IepDTcah4fJ5hCkOu+/hQlrCU9kxKWYA1oiEe0PuIBCu/WD6WX87ibV4TCMlhqlU
-JHpQQoQF2qnO/Aja1kztXObZWhfhFH0XvNdTQx3+gXBo4gEGFuo6UhoqBdCO4j4=
-=FV80
------END PGP SIGNATURE-----
-
---mpm1g2FgAeAqX6E7ceCpqbDMLgvrjxWjk--
+SGksIEVyaWMsDQpUaGFuayB5b3UgZm9yIGxvb2tpbmcgaW50byB0aGlzIQ0KDQo+IC0tLS0tT3Jp
+Z2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEVyaWMgQmxha2UgW21haWx0bzplYmxha2VAcmVk
+aGF0LmNvbV0NCj4gU2VudDogRnJpZGF5LCBNYXJjaCAzMSwgMjAxNyAzOjQwIEFNDQo+IFRvOiBB
+bGV4YW5kcnUgQXZhZGFuaWk7IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiBDYzogc3ZjLWFybWJh
+bmQ7IEplZmYgQ29keTsgTWFya3VzIEFybWJydXN0ZXINCj4gU3ViamVjdDogUmU6IFtRZW11LWRl
+dmVsXSByYmQ6IFBvc3NpYmxlIHJlZ3Jlc3Npb24gaW4gMi45IFJDcw0KPiANCj4gT24gMDMvMzAv
+MjAxNyAwNjo0MiBQTSwgQWxleGFuZHJ1IEF2YWRhbmlpIHdyb3RlOg0KPiA+IEhpLA0KPiA+IFdo
+aWxlIHRlc3Rpbmcgb3V0IDIuOS4wLXJjMiBvbiBBQXJjaDY0LCB3ZSBub3RpY2VkIGEgcG9zc2li
+bGUgcmVncmVzc2lvbiBpbg0KPiBRRU1VLCByZWxhdGVkIHRvIHBhcnNpbmcgLWRyaXZlICdmaWxl
+PXJiZC8uLi4nOg0KPiA+PiAiY29uZiBvcHRpb24gNjc4OSBoYXMgbm8gdmFsdWUiLg0KPiA+DQo+
+ID4gSW5zdGFuY2UgbG9ncyBbMV0uDQo+IA0KPiBQYXN0ZWJpbnMgZG9uJ3QgbGFzdCBmb3JldmVy
+OyBpdCBoZWxwcyB0byBwYXN0ZSB0aGUgYWN0dWFsIGVycm9yIG1lc3NhZ2UgaW4gdGhlDQo+IGVt
+YWlsIGZvciBhcmNoaXZhbCBwdXJwb3NlcywgYW5kIHRvIG1ha2UgaXQgZWFzaWVyIGZvciByZWFk
+ZXJzIHRvIHNlZSB5b3VyDQo+IHByb2JsZW0gd2l0aG91dCBoYXZpbmcgdG8gY2hhc2UgVVJMczoN
+Cj4gDQo+IDIwMTctMDMtMzBUMjA6MDI6MjcuNDk5Njk1WiBxZW11LXN5c3RlbS1hYXJjaDY0OiAt
+ZHJpdmUNCj4gZmlsZT1yYmQ6dm9sdW1lcy92b2x1bWUtZWExNDFiNWMtY2RiMy00NzY1LTkxMGQt
+DQo+IGU3MDA4YjIwOWE3MDppZD1jb21wdXRlOmtleT1BUUFWa3Z4WEFBQUFBQkFBOVp4V0ZZZFJt
+VitEU3dLcg0KPiA3QktLWGc9PTphdXRoX3N1cHBvcnRlZD1jZXBoeFw7bm9uZTptb25faG9zdD0x
+OTIuMTY4LjEuMlw6Njc4OSxmb3JtDQo+IGF0PXJhdyxpZj1ub25lLGlkPWRyaXZlLXZpcnRpby1k
+aXNrMCxzZXJpYWw9ZWExNDFiNWMtY2RiMy00NzY1LTkxMGQtDQo+IGU3MDA4YjIwOWE3MCxjYWNo
+ZT13cml0ZWJhY2s6DQo+IGNvbmYgb3B0aW9uIDY3ODkgaGFzIG5vIHZhbHVlDQo+IA0KPiBMb29r
+aW5nIGF0IHRoYXQsIHRoZSBvbmx5IGluc3RhbmNlIG9mIDY3ODkgdGhhdCBJIHNlZSBpcyB0aGUN
+Cj4gJ21vbl9ob3N0PTE5Mi4xNjguMS4yXDo2Nzg5LCcgcG9ydGlvbi4gIEkgYmV0IHdoYXQgaXMg
+aGFwcGVuaW5nIGlzIHRoYXQgd2UNCj4gYXJlIG1pcy1wYXJzaW5nIHRoZSBzdHJpbmcsIGFuZCB0
+cnlpbmcgdG8gdHJlYXQgaXQgYXMgYSBrZXktdmFsdWVzIHBhaXIuICBJbiBvdGhlcg0KPiB3b3Jk
+cywgaXQncyBwcm9iYWJseSBhbiB1bmludGVuZGVkIHJlZ3Jlc3Npb24gaW50cm9kdWNlZCBpbiB0
+aGUgcmFuZ2Ugb2YNCj4gNzgzMGY5MDkuLjBhNTU2NzliIGJ5IEplZmYgWzNdIG9yIGluIE1hcmt1
+cycgY2xlYW51cHMgYmV0d2Vlbg0KPiBmNTFjMzYzYy4uMjgzNjI4NGQgWzRdLg0KPiANCj4gT24g
+dGhlIGJyaWdodCBzaWRlLCB3ZSBzdGlsbCBoYXZlIHRpbWUgdG8gZml4IGl0IGJlZm9yZSAyLjkg
+Z29lcyBmaW5hbCwgbm93IHRoYXQNCj4geW91IGNhbGxlZCBpdCB0byBvdXIgYXR0ZW50aW9uLg0K
+PiANCj4gPiBPY2Nhc2lvbmFsbHksIHdlIGdldCAiY29uZiBvcHRpb24gdG9vIGxvbmciLCB3aXRo
+IHRoZSBzYW1lIGVmZmVjdC4NCj4gPg0KPiA+IFdlIGJpc2VjdGVkIHRoaXMgbWFudWFsbHkgYmV0
+d2VlbiAyLjguMCAod29ya2luZyBvayB3aXRoIHRoZSBhYm92ZSBjbWQpDQo+IGFuZCAyLjkuMC1y
+YzIsIGFuZCB0aGUgcHJvYmxlbWF0aWMgY2hhbmdlIHNlZW1zIHRvIGJlIHRoZSBtZXJnZSBwb2lu
+dCBbMl0uDQo+IA0KPiBJIHN1c3BlY3QgeW91IGRpZG4ndCBydW4gdGhlIGJpc2VjdCBxdWl0ZSBj
+b3JyZWN0bHksIGFzIHRoYXQgbWVyZ2UgcG9pbnQgaGFzDQo+IG5vdGhpbmcgdG8gZG8gd2l0aCBi
+bG9jay9yYmQuYy4NCg0KSSBzdXNwZWN0IHRoYXQgdG9vLCBzb3JyeS4gSSdsbCByZWRvIHRoaXMg
+dG9tb3Jyb3cgYW5kIGdldCBiYWNrLg0KDQo+IA0KPiA+DQo+ID4gWzFdIGh0dHA6Ly9wYXN0ZS5v
+cGVuc3RhY2sub3JnL3Nob3cvNjA0OTM4Lw0KPiA+IFsyXSBodHRwczovL2dpdGh1Yi5jb20vcWVt
+dS9xZW11L2NvbW1pdC85YTgxYjc5DQo+ID4NCj4gDQo+IFszXSBodHRwczovL2xpc3RzLmdudS5v
+cmcvYXJjaGl2ZS9odG1sL3FlbXUtZGV2ZWwvMjAxNy0wMi9tc2cwNzUwNi5odG1sDQo+IFs0XSBo
+dHRwczovL2xpc3RzLmdudS5vcmcvYXJjaGl2ZS9odG1sL3FlbXUtZGV2ZWwvMjAxNy0wMy9tc2cw
+NTU2NS5odG1sDQo+IA0KPiAtLQ0KPiBFcmljIEJsYWtlICAgZWJsYWtlIHJlZGhhdCBjb20gICAg
+KzEtOTE5LTMwMS0zMjY2DQo+IExpYnZpcnQgdmlydHVhbGl6YXRpb24gbGlicmFyeSBodHRwOi8v
+bGlidmlydC5vcmcNCg0K
