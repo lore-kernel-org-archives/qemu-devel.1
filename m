@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51439)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cu0hF-0004Us-Nw
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:50:50 -0400
+	(envelope-from <jcody@redhat.com>) id 1cu0it-0005Vj-D6
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:52:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cu0hB-0004gZ-G7
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:50:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58500)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cu0hB-0004fb-6q
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:50:45 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 52AC481233
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 17:50:43 +0000 (UTC)
-Date: Fri, 31 Mar 2017 18:50:40 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170331175039.GD2408@work-vm>
-References: <20170323210124.12300-1-quintela@redhat.com>
-	<20170328190507.GJ5740@work-vm> <87tw6co47w.fsf@secure.mitica>
+	(envelope-from <jcody@redhat.com>) id 1cu0ip-0005uE-Ff
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:52:31 -0400
+Date: Fri, 31 Mar 2017 13:52:21 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170331175221.GN22342@localhost.localdomain>
+References: <20170331152730.12514-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87tw6co47w.fsf@secure.mitica>
-Subject: Re: [Qemu-devel] [RFC] Split migration bitmaps by ramblock
+In-Reply-To: <20170331152730.12514-1-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.9] rbd: Fix regression in legacy
+ key/values containing escaped :
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,80 +23,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, Alexandru.Avadanii@enea.com, Josh Durgin <jdurgin@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > * Juan Quintela (quintela@redhat.com) wrote:
-> >> Note that there are two reason for this, ARM and PPC do things like
-> >> guests with 4kb pages on hosts with 16/64kb hosts, and then we have
-> >> HugePages.  Note all the workarounds that postcopy has to do because
-> >> to work in HugePages size.
-> >
-> > There are some fun problems with changing the bitmap page size;
-> > off the top of my head, the ones I can remember include:
-> >     a) I'm sure I've seen rare cases where a target page is marked as
-> >        dirty inside a hostpage; I'm guessing that was qemu's doing, but
-> >        there are more subtle cases, e.g. running a 4kb guest on a 64kb host;
-> >        it's legal - and 4kb power guests used to exist;  I think in those
-> >        cases you see KVM only marking one target page as dirty.
+On Fri, Mar 31, 2017 at 10:27:30AM -0500, Eric Blake wrote:
+> Commit c7cacb3 accidentally broke legacy key-value parsing through
+> pseudo-filename parsing of -drive file=rbd://..., for any key that
+> contains an escaped ':'.  Such a key is surprisingly common, thanks
+> to mon_host specifying a 'host:port' string.  The break happens
+> because passing things from QDict through QemuOpts back to another
+> QDict requires that we pack our parsed key/value pairs into a string,
+> and then reparse that string, but the intermediate string that we
+> created ("key1=value1:key2=value2") lost the \: escaping that was
+> present in the original, so that we could no longer see which : were
+> used as separators vs. those used as part of the original input.
 > 
->         /*
->          * bitmap-traveling is faster than memory-traveling (for addr...)
->          * especially when most of the memory is not dirty.
->          */
->         for (i = 0; i < len; i++) {
->             if (bitmap[i] != 0) {
->                 c = leul_to_cpu(bitmap[i]);
->                 do {
->                     j = ctzl(c);
->                     c &= ~(1ul << j);
->                     page_number = (i * HOST_LONG_BITS + j) * hpratio;
->                     addr = page_number * TARGET_PAGE_SIZE;
->                     ram_addr = start + addr;
->                     cpu_physical_memory_set_dirty_range(ram_addr,
->                                        TARGET_PAGE_SIZE * hpratio, clients);
->                 } while (c != 0);
->             }
->         }
+> Fix it by collecting the key/value pairs through a QList, and
+> sending that list on a round trip through a JSON QString (as in
+> '["key1","value1","key2","value2"]') on its way through QemuOpts,
+> rather than hand-rolling our own string.  Since the string is only
+> handled internally, this was faster than creating a full-blown
+> struct of '[{"key1":"value1"},{"key2":"value2"}]', and safer at
+> guaranteeing order compared to '{"key1":"value1","key2":"value2"}'.
 > 
+> It would be nicer if we didn't have to round-trip through QemuOpts
+> in the first place, but that's a much bigger task for later.
 > 
-> Thisis the code that we end using when we are synchronizing from kvm, so
-> if we don't have all pages of a host page set to one (or zero)  I think
-> we are doing something wrong, no?  Or I am missunderstanding the code?
+> Reproducer:
+> ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio \
+> -drive 'file=rbd:volumes/volume-ea141b5c-cdb3-4765-910d-e7008b209a70'\
+> ':id=compute:key=AQAVkvxXAAAAABAA9ZxWFYdRmV+DSwKr7BKKXg=='\
+> ':auth_supported=cephx\;none:mon_host=192.168.1.2\:6789'\
+> ',format=raw,if=none,id=drive-virtio-disk0,'\
+> 'serial=ea141b5c-cdb3-4765-910d-e7008b209a70,cache=writeback'
+> 
+> Even without an RBD setup, this serves a test of whether we get
+> the incorrect parser error of:
+> qemu-system-x86_64: -drive file=rbd:...cache=writeback: conf option 6789 has no value
+> or the correct behavior of hanging while trying to connect to
+> the requested mon_host of 192.168.1.2:6789.
+> 
+> Reported-by: Alexandru Avadanii <Alexandru.Avadanii@enea.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  block/rbd.c | 83 +++++++++++++++++++++++++++++++------------------------------
+>  1 file changed, 42 insertions(+), 41 deletions(-)
+> 
+> diff --git a/block/rbd.c b/block/rbd.c
+> index 498322b..fbdb131 100644
+> --- a/block/rbd.c
+> +++ b/block/rbd.c
+> @@ -20,6 +20,7 @@
+>  #include "crypto/secret.h"
+>  #include "qemu/cutils.h"
+>  #include "qapi/qmp/qstring.h"
+> +#include "qapi/qmp/qjson.h"
+> 
+>  /*
+>   * When specifying the image filename use:
+> @@ -135,18 +136,16 @@ static void qemu_rbd_parse_filename(const char *filename, QDict *options,
+>                                      Error **errp)
+>  {
+>      const char *start;
+> -    char *p, *buf, *keypairs;
+> +    char *p, *buf;
+> +    QList *keypairs = NULL;
+>      char *found_str;
+> -    size_t max_keypair_size;
+> 
+>      if (!strstart(filename, "rbd:", &start)) {
+>          error_setg(errp, "File name must start with 'rbd:'");
+>          return;
+>      }
+> 
+> -    max_keypair_size = strlen(start) + 1;
+>      buf = g_strdup(start);
+> -    keypairs = g_malloc0(max_keypair_size);
+>      p = buf;
+> 
+>      found_str = qemu_rbd_next_tok(p, '/', &p);
+> @@ -194,33 +193,30 @@ static void qemu_rbd_parse_filename(const char *filename, QDict *options,
+>          } else if (!strcmp(name, "id")) {
+>              qdict_put(options, "user" , qstring_from_str(value));
+>          } else {
+> -            /* FIXME: This is pretty ugly, and not the right way to do this.
+> -             *        These should be contained in a structure, and then
+> -             *        passed explicitly as individual key/value pairs to
+> -             *        rados.  Consider this legacy code that needs to be
+> -             *        updated. */
+> -            char *tmp = g_malloc0(max_keypair_size);
+> -            /* only use a delimiter if it is not the first keypair found */
+> -            /* These are sets of unknown key/value pairs we'll pass along
+> -             * to ceph */
+> -            if (keypairs[0]) {
+> -                snprintf(tmp, max_keypair_size, ":%s=%s", name, value);
+> -                pstrcat(keypairs, max_keypair_size, tmp);
+> -            } else {
+> -                snprintf(keypairs, max_keypair_size, "%s=%s", name, value);
+> +            /*
+> +             * We pass these internally to qemu_rbd_set_keypairs(), so
+> +             * we can get away with the simpler list of [ "key1",
+> +             * "value1", "key2", "value2" ] rather than a raw dict
+> +             * { "key1": "value1", "key2": "value2" } where we can't
+> +             * guarantee order, or even a more correct but complex
+> +             * [ { "key1": "value1" }, { "key2": "value2" } ]
+> +             */
+> +            if (!keypairs) {
+> +                keypairs = qlist_new();
+>              }
+> -            g_free(tmp);
+> +            qlist_append(keypairs, qstring_from_str(name));
+> +            qlist_append(keypairs, qstring_from_str(value));
+>          }
+>      }
+> 
+> -    if (keypairs[0]) {
+> -        qdict_put(options, "=keyvalue-pairs", qstring_from_str(keypairs));
+> +    if (keypairs) {
+> +        qdict_put(options, "=keyvalue-pairs",
+> +                  qobject_to_json(QOBJECT(keypairs)));
+>      }
+> 
+> -
+>  done:
+>      g_free(buf);
+> -    g_free(keypairs);
+> +    QDECREF(keypairs);
+>      return;
+>  }
+> 
+> @@ -244,36 +240,41 @@ static int qemu_rbd_set_auth(rados_t cluster, const char *secretid,
+>      return 0;
+>  }
+> 
+> -static int qemu_rbd_set_keypairs(rados_t cluster, const char *keypairs,
+> +static int qemu_rbd_set_keypairs(rados_t cluster, const char *keypairs_json,
+>                                   Error **errp)
+>  {
+> -    char *p, *buf;
+> -    char *name;
+> -    char *value;
+> +    QList *keypairs;
+> +    QString *name;
+> +    QString *value;
+> +    const char *key;
+> +    size_t remaining;
+>      int ret = 0;
+> 
+> -    buf = g_strdup(keypairs);
+> -    p = buf;
+> +    if (!keypairs_json) {
+> +        return ret;
+> +    }
+> +    keypairs = qobject_to_qlist(qobject_from_json(keypairs_json,
+> +                                                  &error_abort));
+> +    remaining = qlist_size(keypairs) / 2;
+> +    assert(remaining);
+> 
+> -    while (p) {
+> -        name = qemu_rbd_next_tok(p, '=', &p);
+> -        if (!p) {
+> -            error_setg(errp, "conf option %s has no value", name);
+> -            ret = -EINVAL;
+> -            break;
+> -        }
+> +    while (remaining--) {
+> +        name = qobject_to_qstring(qlist_pop(keypairs));
+> +        value = qobject_to_qstring(qlist_pop(keypairs));
+> +        assert(name && value);
+> +        key = qstring_get_str(name);
+> 
+> -        value = qemu_rbd_next_tok(p, ':', &p);
+> -
+> -        ret = rados_conf_set(cluster, name, value);
+> +        ret = rados_conf_set(cluster, key, qstring_get_str(value));
+> +        QDECREF(name);
+> +        QDECREF(value);
+>          if (ret < 0) {
+> -            error_setg_errno(errp, -ret, "invalid conf option %s", name);
+> +            error_setg_errno(errp, -ret, "invalid conf option %s", key);
+>              ret = -EINVAL;
+>              break;
+>          }
+>      }
+> 
+> -    g_free(buf);
+> +    QDECREF(keypairs);
+>      return ret;
+>  }
+> 
+> -- 
+> 2.9.3
+> 
 
-Hmm, that does look like that - so perhaps the case I was seeing was just
-qemu setting it somewhere?
-(I definitely remember seeing it because I remember dumping the bitmaps
-and checking for them; but I can't remember the circumstance)
+Thanks,
 
-> >     b) Are we required to support migration across hosts of different pagesize;
-> >        and if we do that what size should a bit represent?
-> >        People asked about it during postcopy but I think it's restricted to
-> >        matching sizes.  I don't think precopy has any requirement for matching
-> >        host pagesize at the moment.  64bit ARM does 4k, 64k and I think 16k was
-> >        added later.
-> 
-> With current precopy, we should work independently of the host page size
-> (famous last words), and in a 1st step, I will only send pages of the
-> size TARGET_PAGE_SIZE.  I will only change the bitmaps.  We can add
-> bigger pages later.
-> 
-> >     c) Hugepages have similar issues; precopy doesn't currently have any
-> >        requirement for the hugepage selection on the two hosts to match,
-> >        but it does on postcopy.  Also you don't want to have a single dirty
-> >        bit for a 1GB host hugepage if you can handle detecting changes at
-> >        a finer grain level.
-> 
-> I agree here, I was thinking more on the Power/ARM case than the
-> HugePage case.  For the 2MB page, we could think about doing it, for the
-> 1GB case, it is not gonna work.
+Applied to my block branch:
 
-Yep,
+git://github.com/codyprime/qemu-kvm-jtc.git block
 
-Dave
-
-> Later, Juan.
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-Jeff
