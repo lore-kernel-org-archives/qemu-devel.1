@@ -1,20 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ctwIW-00036a-I9
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 09:09:01 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1ctwMV-00040W-Ct
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 09:13:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ctwIV-0008E5-LP
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 09:09:00 -0400
-References: <20170330221243.17333-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <68601720-203d-9b96-b4e3-41caa39e9872@redhat.com>
-Date: Fri, 31 Mar 2017 15:08:49 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170330221243.17333-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="9VUDB8gp7KnB464NMTkLcHGl9nO0ldbkK"
-Subject: Re: [Qemu-devel] [PATCH for-2.9] iotests: Fix test 147
+	(envelope-from <pm215@archaic.org.uk>) id 1ctwMU-0001sz-JA
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 09:13:07 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 31 Mar 2017 14:13:00 +0100
+Message-Id: <1490965980-513-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] block/parallels.c: avoid integer overflow in
+ allocate_clusters()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,69 +18,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9VUDB8gp7KnB464NMTkLcHGl9nO0ldbkK
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>
-Message-ID: <68601720-203d-9b96-b4e3-41caa39e9872@redhat.com>
-Subject: Re: [PATCH for-2.9] iotests: Fix test 147
-References: <20170330221243.17333-1-mreitz@redhat.com>
-In-Reply-To: <20170330221243.17333-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+Coverity (CID 1307776) points out that in the multiply:
+  space = to_allocate * s->tracks;
+we are trying to calculate a 64 bit result but the types
+of to_allocate and s->tracks mean that we actually calculate
+a 32 bit result. Add an explicit cast to force a 64 bit
+multiply.
 
-On 31.03.2017 00:12, Max Reitz wrote:
-> This test has been broken by changing NBD's blockdev-add interface (fro=
-m
-> taking a SocketAddress to taking a SocketAddressFlat). This patch makes=
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+NB: compile-and-make-check tested only...
+---
+ block/parallels.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> it work again.
->=20
-> Unfortunately, we cannot just flatten all of the addresses because
-> nbd-server-start still takes a plain SocketAddress. Therefore, we need
-> both and this is most easily achieved by writing the SocketAddress into=
-
-> the code and flattening it where necessary.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
-> I can be convinced to squash this into Markus' patch "nbd: Tidy up
-> blockdev-add interface" which is the reason this test broke. I
-> personally don't have a strong opinion on the matter other than "We
-> won't get Markus to send a v4".
-> ---
->  tests/qemu-iotests/147 | 25 +++++++++++++++++--------
->  1 file changed, 17 insertions(+), 8 deletions(-)
-
-Squashed into said patch:
-
-https://github.com/XanClic/qemu/commit/block^
-
-(on my block branch: https://github.com/XanClic/qemu/commits/block)
-
-Max
-
-
---9VUDB8gp7KnB464NMTkLcHGl9nO0ldbkK
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljeVOESHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ApfkIAJ5E5VwPPQUYVYtXPYcez1m2c/mZ/Oah
-/oqxm5PIHR35YVD862ZtBIe+10JJVey4ZM0kYkl6ABasBCDG7Jg9Iia7iucaeWHk
-jXTTag3uRQGYffFkSHqUP6lyhhB8x8/FDw1EZuvj/IOCsIEPXg0tEQbe4yA+6s6m
-phJD+jkLRs04sqdVQzMfMYoMYnQV11rO0Ctqs/2vySnFkUzPjwndtwqVYhxluWuu
-IrT2Pu9/MR41lxNqfcDGdjZlmbR+LUFNVOi9uCldBjtx0jQxDCF6gan58PlaAxJG
-MX9gBM8K1eIVV2ttCb9uZT7rK8RFw+WZZL2y56GkbqPDVGcJCcuObq4=
-=xDTo
------END PGP SIGNATURE-----
-
---9VUDB8gp7KnB464NMTkLcHGl9nO0ldbkK--
+diff --git a/block/parallels.c b/block/parallels.c
+index 4173b3f..3886c30 100644
+--- a/block/parallels.c
++++ b/block/parallels.c
+@@ -206,7 +206,7 @@ static int64_t allocate_clusters(BlockDriverState *bs, int64_t sector_num,
+     }
+ 
+     to_allocate = DIV_ROUND_UP(sector_num + *pnum, s->tracks) - idx;
+-    space = to_allocate * s->tracks;
++    space = (int64_t)to_allocate * s->tracks;
+     if (s->data_end + space > bdrv_getlength(bs->file->bs) >> BDRV_SECTOR_BITS) {
+         int ret;
+         space += s->prealloc_size;
+-- 
+2.7.4
