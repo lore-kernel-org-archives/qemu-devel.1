@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52372)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ctwy3-0006sd-0D
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 09:51:55 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ctwyR-00074E-KI
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 09:52:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ctwy2-0000XG-5A
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 09:51:55 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:49014)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ctwy1-0000WC-UC
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 09:51:54 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 31 Mar 2017 14:51:49 +0100
-Message-Id: <1490968309-13672-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] main_loop: Make main_loop_wait() return void
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ctwyO-0000gs-UX
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 09:52:19 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170331120431.1767-1-mreitz@redhat.com>
+	<20170331120431.1767-3-mreitz@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <0c5a595d-ff5b-f1f9-d64b-ed94bd9af410@amsat.org>
+Date: Fri, 31 Mar 2017 10:52:12 -0300
+MIME-Version: 1.0
+In-Reply-To: <20170331120431.1767-3-mreitz@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-2.9 2/2] block/curl: Check protocol
+ prefix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,66 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-In commit e330c118f2a5a the last usage of main_loop_wait() that cared
-about the return value was changed to no longer use it. Drop the
-now-useless return value and make the function return void.
+On 03/31/2017 09:04 AM, Max Reitz wrote:
+> If the user has explicitly specified a block driver and thus a protocol,
+> we have to make sure the URL's protocol prefix matches. Otherwise the
+> latter will silently override the former which might catch some users by
+> surprise.
+>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-Coverity complains (CID 1372464) about main_loop() calling
-main_loop_wait() and ignoring its return value. I suspect
-this change will just displace that to within main_loop_wait()
-itself since the underlying issue there is "the ppoll() that
-gets called to poll fds can return an error code, but what
-do we do if it does?". Suggestions on that point welcome.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-I guess this will make the compiler warn about ret being
-set and never used if CONFIG_SLIRP is not defined, which
-is irritating. I'm postponing messing about with fixing
-that in favour of seeing whether anybody has a good answer
-to the question above (which might make it moot).
----
- include/qemu/main-loop.h | 2 +-
- util/main-loop.c         | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/include/qemu/main-loop.h b/include/qemu/main-loop.h
-index d7e24af..6b4b60b 100644
---- a/include/qemu/main-loop.h
-+++ b/include/qemu/main-loop.h
-@@ -79,7 +79,7 @@ int qemu_init_main_loop(Error **errp);
-  *
-  * @nonblocking: Whether the caller should block until an event occurs.
-  */
--int main_loop_wait(int nonblocking);
-+void main_loop_wait(int nonblocking);
- 
- /**
-  * qemu_get_aio_context: Return the main loop's AioContext
-diff --git a/util/main-loop.c b/util/main-loop.c
-index 4534c89..d0e27f3 100644
---- a/util/main-loop.c
-+++ b/util/main-loop.c
-@@ -476,7 +476,7 @@ static int os_host_main_loop_wait(int64_t timeout)
- }
- #endif
- 
--int main_loop_wait(int nonblocking)
-+void main_loop_wait(int nonblocking)
- {
-     int ret;
-     uint32_t timeout = UINT32_MAX;
-@@ -513,7 +513,7 @@ int main_loop_wait(int nonblocking)
-     qemu_start_warp_timer();
-     qemu_clock_run_all_timers();
- 
--    return ret;
-+    return;
- }
- 
- /* Functions to operate on the main QEMU AioContext.  */
--- 
-2.7.4
+> ---
+>  block/curl.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+>
+> diff --git a/block/curl.c b/block/curl.c
+> index 34dbd335f4..2708d57c2f 100644
+> --- a/block/curl.c
+> +++ b/block/curl.c
+> @@ -659,6 +659,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+>      const char *cookie;
+>      double d;
+>      const char *secretid;
+> +    const char *protocol_delimiter;
+>
+>      static int inited = 0;
+>
+> @@ -700,6 +701,15 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+>          goto out_noclean;
+>      }
+>
+> +    if (!strstart(file, bs->drv->protocol_name, &protocol_delimiter) ||
+> +        !strstart(protocol_delimiter, "://", NULL))
+> +    {
+> +        error_setg(errp, "%s curl driver cannot handle the URL '%s' (does not "
+> +                   "start with '%s://')", bs->drv->protocol_name, file,
+> +                   bs->drv->protocol_name);
+> +        goto out_noclean;
+> +    }
+> +
+>      s->username = g_strdup(qemu_opt_get(opts, CURL_BLOCK_OPT_USERNAME));
+>      secretid = qemu_opt_get(opts, CURL_BLOCK_OPT_PASSWORD_SECRET);
+>
+>
