@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37673)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46609)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1cu3WI-0004bm-V5
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 16:51:44 -0400
+	(envelope-from <den@virtuozzo.com>) id 1cu42P-0000yh-2G
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 17:24:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1cu3WF-0005lZ-RZ
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 16:51:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59828)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1cu3WF-0005l4-Ih
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 16:51:39 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 83A29CB32A
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 20:51:38 +0000 (UTC)
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Date: Fri, 31 Mar 2017 21:51:33 +0100
-Message-Id: <20170331205133.23906-1-rjones@redhat.com>
-Subject: [Qemu-devel] [PATCH] main-loop: Acquire main_context lock around
- os_host_main_loop_wait.
+	(envelope-from <den@virtuozzo.com>) id 1cu42K-0003CL-3k
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 17:24:53 -0400
+Received: from mail-db5eur01on0097.outbound.protection.outlook.com
+	([104.47.2.97]:61312
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1cu42J-0003BW-IY
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 17:24:48 -0400
+References: <1490965980-513-1-git-send-email-peter.maydell@linaro.org>
+	<9e359c38-a2aa-64e8-6c7c-0b793d2f2bb4@redhat.com>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <682f7310-d197-70e5-075a-2bec7a3e5c62@openvz.org>
+Date: Fri, 31 Mar 2017 17:54:30 +0300
+MIME-Version: 1.0
+In-Reply-To: <9e359c38-a2aa-64e8-6c7c-0b793d2f2bb4@redhat.com>
+Content-Type: text/plain; charset="iso-8859-15"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] block/parallels.c: avoid integer overflow
+ in allocate_clusters()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,106 +30,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, rjones@redhat.com, marcandre.lureau@redhat.com, fziglio@redhat.com
+To: Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-When running virt-rescue the serial console hangs from time to time.
-Virt-rescue runs an ordinary Linux kernel "appliance", but there is
-only a single idle process running inside, so the qemu main loop is
-largely idle.  With virt-rescue >= 1.37 you may be able to observe the
-hang by doing:
+On 03/31/2017 04:47 PM, Max Reitz wrote:
+> On 31.03.2017 15:13, Peter Maydell wrote:
+>> Coverity (CID 1307776) points out that in the multiply:
+>>   space =3D to_allocate * s->tracks;
+>> we are trying to calculate a 64 bit result but the types
+>> of to_allocate and s->tracks mean that we actually calculate
+>> a 32 bit result. Add an explicit cast to force a 64 bit
+>> multiply.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>> NB: compile-and-make-check tested only...
+>> ---
+>>  block/parallels.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/block/parallels.c b/block/parallels.c
+>> index 4173b3f..3886c30 100644
+>> --- a/block/parallels.c
+>> +++ b/block/parallels.c
+>> @@ -206,7 +206,7 @@ static int64_t allocate_clusters(BlockDriverState =
+*bs, int64_t sector_num,
+>>      }
+>> =20
+>>      to_allocate =3D DIV_ROUND_UP(sector_num + *pnum, s->tracks) - idx=
+;
+>> -    space =3D to_allocate * s->tracks;
+>> +    space =3D (int64_t)to_allocate * s->tracks;
+>>      if (s->data_end + space > bdrv_getlength(bs->file->bs) >> BDRV_SE=
+CTOR_BITS) {
+>>          int ret;
+>>          space +=3D s->prealloc_size;
+> I think the division is technically fine because to_allocate will
+> roughly be *pnum / s->tracks (and since *pnum is an int, the
+> multiplication cannot overflow).
+>
+> However, it's still good to fix this, but I would do it differently:
+> Make idx, to_allocate, and i all uint64_t or int64_t instead of
+> uint32_t. This would also prevent accidental overflow when storing the
+> result of the division in:
+>
+> idx =3D sector_num / s->tracks;
+> if (idx >=3D s->bat_size) {
+>     [...]
+>
+> The much greater problem to me appears to be that we don't check that
+> idx + to_allocate <=3D s->bat_size. I'm not sure whether there can be a=
 
-  $ virt-rescue -e ^] --scratch
-  ><rescue> while true; do ls -l /usr/bin; done
+> buffer overflow in the for loop below, but I'm not sure I really want t=
+o
+> know either... I think the block_status() call limits *pnum so that
+> there will not be an overflow, but then we should at least assert this.=
 
-The hang in virt-rescue can be resolved by pressing a key on the
-serial console.
+>
+> Max
+>
+technically we are protected by the check in
 
-Possibly with the same root cause, we also observed hangs during very
-early boot of regular Linux VMs with a serial console.  Those hangs
-are extremely rare, but you may be able to observe them by running
-this command on baremetal for a sufficiently long time:
+static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
+    BdrvTrackedRequest *req, int64_t offset, unsigned int bytes,
+    int64_t align, QEMUIOVector *qiov, int flags)
+=2E..
+    /* Forward the request to the BlockDriver, possibly fragmenting it */=
 
-  $ while libguestfs-test-tool -t 60 >& /tmp/log ; do echo -n . ; done
+    total_bytes =3D bdrv_getlength(bs);
+    if (total_bytes < 0) {
+        ret =3D total_bytes;
+        goto out;
+    }
 
-(Check in /tmp/log that the failure was caused by a hang during early
-boot, and not some other reason)
+    max_bytes =3D ROUND_UP(MAX(0, total_bytes - offset), align);
+    if (bytes <=3D max_bytes && bytes <=3D max_transfer) {
+        ret =3D bdrv_driver_preadv(bs, offset, bytes, qiov, 0);
+        goto out;
+    }
 
-During investigation of this bug, Paolo Bonzini wrote:
+which guarantees that the request is always inside the length of the
+device. Thus we should be on the safe side with the mentioned
+access as bat_size is calculated from the size of the entire virtual
+disk.
 
-> glib is expecting QEMU to use g_main_context_acquire around accesses to
-> GMainContext.  However QEMU is not doing that, instead it is taking its
-> own mutex.  So we should add g_main_context_acquire and
-> g_main_context_release in the two implementations of
-> os_host_main_loop_wait; these should undo the effect of Frediano's
-> glib patch.
-
-This patch exactly implements Paolo's suggestion in that paragraph.
-
-This fixes the serial console hang in my testing, across 3 different
-physical machines (AMD, Intel Core i7 and Intel Xeon), over many hours
-of automated testing.  I wasn't able to reproduce the early boot hangs
-(but as noted above, these are extremely rare in any case).
-
-Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1435432
-Reported-by: Richard W.M. Jones <rjones@redhat.com>
-Tested-by: Richard W.M. Jones <rjones@redhat.com>
-Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
----
- util/main-loop.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/util/main-loop.c b/util/main-loop.c
-index 4534c89..19cad6b 100644
---- a/util/main-loop.c
-+++ b/util/main-loop.c
-@@ -218,9 +218,12 @@ static void glib_pollfds_poll(void)
- 
- static int os_host_main_loop_wait(int64_t timeout)
- {
-+    GMainContext *context = g_main_context_default();
-     int ret;
-     static int spin_counter;
- 
-+    g_main_context_acquire(context);
-+
-     glib_pollfds_fill(&timeout);
- 
-     /* If the I/O thread is very busy or we are incorrectly busy waiting in
-@@ -256,6 +259,9 @@ static int os_host_main_loop_wait(int64_t timeout)
-     }
- 
-     glib_pollfds_poll();
-+
-+    g_main_context_release(context);
-+
-     return ret;
- }
- #else
-@@ -412,12 +418,15 @@ static int os_host_main_loop_wait(int64_t timeout)
-     fd_set rfds, wfds, xfds;
-     int nfds;
- 
-+    g_main_context_acquire(context);
-+
-     /* XXX: need to suppress polling by better using win32 events */
-     ret = 0;
-     for (pe = first_polling_entry; pe != NULL; pe = pe->next) {
-         ret |= pe->func(pe->opaque);
-     }
-     if (ret != 0) {
-+        g_main_context_release(context);
-         return ret;
-     }
- 
-@@ -472,6 +481,8 @@ static int os_host_main_loop_wait(int64_t timeout)
-         g_main_context_dispatch(context);
-     }
- 
-+    g_main_context_release(context);
-+
-     return select_ret || g_poll_ret;
- }
- #endif
--- 
-2.9.3
+Den
