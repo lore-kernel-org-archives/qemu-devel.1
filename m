@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ctxCY-0004pc-Vl
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 10:06:56 -0400
+	(envelope-from <mreitz@redhat.com>) id 1ctxDL-0005Q6-H8
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 10:07:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ctxCU-0002ka-Qt
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 10:06:54 -0400
-Received: from 4.mo179.mail-out.ovh.net ([46.105.36.149]:33867)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ctxCU-0002jO-K9
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 10:06:50 -0400
-Received: from player755.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 2BE4E33DA9
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 16:06:49 +0200 (CEST)
-Date: Fri, 31 Mar 2017 16:06:35 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170331160635.1b4217a0@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20170328121459.23edec49.cornelia.huck@de.ibm.com>
-References: <149063674781.4447.14258971700726134711.stgit@bahia.lan>
-	<149063676337.4447.2095575576822297032.stgit@bahia.lan>
-	<20170327211728-mutt-send-email-mst@kernel.org>
-	<20170328101409.1aa23618@bahia.lan>
-	<20170328102421.2f4fbeec.cornelia.huck@de.ibm.com>
-	<20170328113415.7c1881ef@bahia.lan>
-	<20170328121459.23edec49.cornelia.huck@de.ibm.com>
+	(envelope-from <mreitz@redhat.com>) id 1ctxDH-0003gG-DC
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 10:07:43 -0400
+References: <1490967529-4767-1-git-send-email-peter.maydell@linaro.org>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <2a187f00-1dc9-b633-887c-f6909ccb1617@redhat.com>
+Date: Fri, 31 Mar 2017 16:07:32 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/Vd4CA.dmzU_PHEmgHOmRSWz";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH 1/5] virtio: Error object based
- virtio_error()
+In-Reply-To: <1490967529-4767-1-git-send-email-peter.maydell@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="CXPeqkTSAM0cNuQpQ4MAKooC4lMPcXhG6"
+Subject: Re: [Qemu-devel] [PATCH] qemu-io-cmds: Assert that global and
+ nofile commands don't use ct->perms
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,100 +24,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
---Sig_/Vd4CA.dmzU_PHEmgHOmRSWz
-Content-Type: text/plain; charset=US-ASCII
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--CXPeqkTSAM0cNuQpQ4MAKooC4lMPcXhG6
+From: Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Message-ID: <2a187f00-1dc9-b633-887c-f6909ccb1617@redhat.com>
+Subject: Re: [PATCH] qemu-io-cmds: Assert that global and nofile commands
+ don't use ct->perms
+References: <1490967529-4767-1-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1490967529-4767-1-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=iso-8859-15
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 28 Mar 2017 12:14:59 +0200
-Cornelia Huck <cornelia.huck@de.ibm.com> wrote:
-
-> On Tue, 28 Mar 2017 11:34:15 +0200
-> Greg Kurz <groug@kaod.org> wrote:
+On 31.03.2017 15:38, Peter Maydell wrote:
+> It would be a bug for a command with the CMD_NOFILE_OK or
+> CMD_FLAG_GLOBAL flags set to also set the ct->perms field,
+> because the former says "OK for a file not to be open"
+> but the latter is a check on a file.
 >=20
-> > On Tue, 28 Mar 2017 10:24:21 +0200
-> > Cornelia Huck <cornelia.huck@de.ibm.com> wrote:
-> >  =20
-> > > On Tue, 28 Mar 2017 10:14:09 +0200
-> > > Greg Kurz <groug@kaod.org> wrote:
-> > >  =20
-> > > > On Mon, 27 Mar 2017 21:20:56 +0300
-> > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > >    =20
-> > > > > On Mon, Mar 27, 2017 at 07:46:03PM +0200, Greg Kurz wrote:   =20
-> > > > > > This introduces an Error object based implementation of virtio_=
-error(). It
-> > > > > > allows to implement virtio_error() wrappers in device-specific =
-code.
-> > > > > >=20
-> > > > > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > > > > > ---
-> > > > > >  hw/virtio/virtio.c         |   21 ++++++++++++++++-----
-> > > > > >  include/hw/virtio/virtio.h |    1 +
-> > > > > >  2 files changed, 17 insertions(+), 5 deletions(-)
-> > > > > >    =20
-> > >  =20
-> > > > > Also, whether to stop the device, or the VM, or just warn,
-> > > > > seems like a policy decision. Why not set it on command line
-> > > > > like we do for other storage?
-> > > > >    =20
-> > > >=20
-> > > > Huh? This patch simply introduces a new API to a feature that under=
-went
-> > > > several rounds of discussion and reached a reasonable consensus (ev=
-en
-> > > > your R-b).
-> > > >=20
-> > > > I'm not sure this 9pfs series is the right place to talk about all =
-the
-> > > > behavior changes you're suggesting for virtio_error()... I'd rather
-> > > > drop this patch and duplicate code in virtio-9p instead if I want t=
-he
-> > > > fixes to go to 2.9.   =20
-> > >=20
-> > > I agree that we should discuss this outside of this patch series. It's
-> > > not like it is introducing a new error case.
-> > >  =20
-> > > >=20
-> > > > Cc'ing Connie and Stefanha for insights.   =20
-> > >=20
-> > > See my reply to Michael's mail.
-> > >  =20
-> >=20
-> > Yeah, I saw that just after pressing the send button :) =20
+> Add an assertion in qemuio_add_command() so we can catch that
+> sort of buggy command definition immediately rather than it
+> being a bug that only manifests when a particular set of
+> command line options is used.
 >=20
-> :)
+> (Coverity gets confused about this (CID 1371723) and reports
+> that we might dereference a NULL blk pointer in this case,
+> because it can't tell that that code path never happens with
+> the cmdinfo_t that we have. This commit won't help unconfuse
+> it, but it does fix the underlying issue.)
 >=20
-> >=20
-> > The points raised by Michael make a lot of sense anyway. Maybe we can
-> > discuss them for 2.10 ? =20
->=20
-> Certainly. We should not delay any fixes for 2.9, though.
->=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> We could also try to add some kind of assert in command() to
+> persuade coverity that it can't get there with a NULL block
+> and ct->perms non-zero, but I think I'd rather just mark the
+> issue as a false-positive and move on.
 
-Michael,
+I think having the assertion in qemuio_add_command() is nicer because if
+we break it we will definitely notice just by launching qemu-io.
 
-Your comments call for some more discussion to take place during 2.10 devel.
+>  qemu-io-cmds.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 
-Can you please ack this patch and I'll take it through my tree for 2.9 ?
+Thanks, applied to my block branch:
 
-Cheers.
+https://github.com/XanClic/qemu/commits/block
 
---
-Greg
+Max
 
---Sig_/Vd4CA.dmzU_PHEmgHOmRSWz
-Content-Type: application/pgp-signature
+
+--CXPeqkTSAM0cNuQpQ4MAKooC4lMPcXhG6
+Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
 
-iEYEARECAAYFAljeYmsACgkQAvw66wEB28LTEgCdHm8sCHADuLtfWu4/1nG33TXj
-FhYAoKHj+W8n83llgWIBgW2Gd6k+a1be
-=bCrP
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljeYqUSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AxiUH/Rb9ndNCHUCpaSD3XlTzZGKyv8e3xO9S
+njFrP3WfSaYWYN87V5mObtMNybMKGQ7ioj+c2AuPwMf9vuW0DvTUUP0D0KMC+pXa
+qyFNzNqOB9JMnnTUof2i9aZzy6srX49PWC2nr5OItHZpmo1xkj8Za3NUocI5aTBN
+U0J/N1szxozSjXMwQaLayIWMO/o63OVzCWIWuRbQl8AFXPJN2Dj5mmwPyYUITxZO
+LugtDfG8diPEfUA5KUJy8uitzg6UtxOOvsgO9zUjGAkbV5PtNJ3jVN9x+orX9MPV
++jNeEzM2IAFLN9C9bpnTrkn7oX0WNOJMBRz2aJw8D0JK54H9jOxq/Wk=
+=A7QK
 -----END PGP SIGNATURE-----
 
---Sig_/Vd4CA.dmzU_PHEmgHOmRSWz--
+--CXPeqkTSAM0cNuQpQ4MAKooC4lMPcXhG6--
