@@ -1,35 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ctoyV-0001QS-KK
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 01:19:53 -0400
+	(envelope-from <bounces@canonical.com>) id 1ctoya-0001Qx-KT
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 01:19:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ctoyS-0004xf-CZ
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 01:19:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40662)
+	(envelope-from <bounces@canonical.com>) id 1ctoyZ-00050Y-6E
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 01:19:56 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40869)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ctoyS-0004vz-6S
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 01:19:48 -0400
+	id 1ctoyZ-00050H-04
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 01:19:55 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ctoyQ-0001wU-EG
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 05:19:46 +0000
+	id 1ctoyX-00020F-Gn
+	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 05:19:53 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 452352E8029
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 05:19:46 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id A49222E80E6
+	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 05:19:52 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 31 Mar 2017 05:01:01 -0000
+Date: Fri, 31 Mar 2017 05:03:04 -0000
 From: Steve Langasek <steve.langasek@canonical.com>
 Reply-To: Bug 1490611 <1490611@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20150831152901.21817.58033.malonedeb@gac.canonical.com>
-Message-Id: <20170331050103.25630.7183.launchpad@chaenomeles.canonical.com>
+Message-Id: <20170331050304.25659.14419.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1490611] Re: Using qemu >=2.2.1 to convert
- raw->VHD (fixed) adds extra padding to the result file,
- which Microsoft Azure rejects as invalid
+Subject: [Qemu-devel] [Bug 1490611] Update Released
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,8 +38,13 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Changed in: qemu (Ubuntu Xenial)
-   Importance: Medium =3D> Wishlist
+The verification of the Stable Release Update for qemu has completed
+successfully and the package has now been released to -updates.
+Subsequently, the Ubuntu Stable Release Updates Team is being
+unsubscribed and will not receive messages about this bug report.  In
+the event that you encounter a regression using the package from
+-updates please report a new bug using ubuntu-bug and tag the bug report
+regression-update so we can easily find any regressions.
 
 -- =
 
