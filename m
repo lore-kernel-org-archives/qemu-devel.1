@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ctzZi-0001Py-D4
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 12:38:59 -0400
+	(envelope-from <mreitz@redhat.com>) id 1ctzc6-0002QY-8K
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 12:41:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ctzZf-0006xf-9y
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 12:38:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35476)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ctzZf-0006xP-1m
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 12:38:55 -0400
-References: <1490599288-11751-1-git-send-email-peterx@redhat.com>
-	<1490599288-11751-6-git-send-email-peterx@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <aa26e76e-e5fd-c205-8919-6cc927a6d3ce@redhat.com>
-Date: Fri, 31 Mar 2017 18:38:50 +0200
+	(envelope-from <mreitz@redhat.com>) id 1ctzc5-0008MG-Bu
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 12:41:26 -0400
+References: <1490965980-513-1-git-send-email-peter.maydell@linaro.org>
+	<9e359c38-a2aa-64e8-6c7c-0b793d2f2bb4@redhat.com>
+	<20170331162043.GB18974@stefanha-x1.localdomain>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <41840a4e-54e4-d2f4-296d-ad016717a0fb@redhat.com>
+Date: Fri, 31 Mar 2017 18:41:09 +0200
 MIME-Version: 1.0
-In-Reply-To: <1490599288-11751-6-git-send-email-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 5/5] cpu: throttle: fix throttle time slice
+In-Reply-To: <20170331162043.GB18974@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="0ENmfWtXul5f32WqdPfnIufsdc4f5Ir55"
+Subject: Re: [Qemu-devel] [PATCH] block/parallels.c: avoid integer overflow
+ in allocate_clusters()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,73 +26,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Richard Henderson <rth@twiddle.net>, jjherne@linux.vnet.ibm.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, patches@linaro.org, "Denis V. Lunev" <den@openvz.org>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--0ENmfWtXul5f32WqdPfnIufsdc4f5Ir55
+From: Max Reitz <mreitz@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ patches@linaro.org, "Denis V. Lunev" <den@openvz.org>,
+ Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Message-ID: <41840a4e-54e4-d2f4-296d-ad016717a0fb@redhat.com>
+Subject: Re: [PATCH] block/parallels.c: avoid integer overflow in
+ allocate_clusters()
+References: <1490965980-513-1-git-send-email-peter.maydell@linaro.org>
+ <9e359c38-a2aa-64e8-6c7c-0b793d2f2bb4@redhat.com>
+ <20170331162043.GB18974@stefanha-x1.localdomain>
+In-Reply-To: <20170331162043.GB18974@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+
+On 31.03.2017 18:20, Stefan Hajnoczi wrote:
+> On Fri, Mar 31, 2017 at 03:47:39PM +0200, Max Reitz wrote:
+>> On 31.03.2017 15:13, Peter Maydell wrote:
+>>> Coverity (CID 1307776) points out that in the multiply:
+>>>   space =3D to_allocate * s->tracks;
+>>> we are trying to calculate a 64 bit result but the types
+>>> of to_allocate and s->tracks mean that we actually calculate
+>>> a 32 bit result. Add an explicit cast to force a 64 bit
+>>> multiply.
+>>>
+>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>>> ---
+>>> NB: compile-and-make-check tested only...
+>>> ---
+>>>  block/parallels.c | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/block/parallels.c b/block/parallels.c
+>>> index 4173b3f..3886c30 100644
+>>> --- a/block/parallels.c
+>>> +++ b/block/parallels.c
+>>> @@ -206,7 +206,7 @@ static int64_t allocate_clusters(BlockDriverState=
+ *bs, int64_t sector_num,
+>>>      }
+>>> =20
+>>>      to_allocate =3D DIV_ROUND_UP(sector_num + *pnum, s->tracks) - id=
+x;
+>>> -    space =3D to_allocate * s->tracks;
+>>> +    space =3D (int64_t)to_allocate * s->tracks;
+>>>      if (s->data_end + space > bdrv_getlength(bs->file->bs) >> BDRV_S=
+ECTOR_BITS) {
+>>>          int ret;
+>>>          space +=3D s->prealloc_size;
+>>
+>> I think the division is technically fine because to_allocate will
+>> roughly be *pnum / s->tracks (and since *pnum is an int, the
+>> multiplication cannot overflow).
+>>
+>> However, it's still good to fix this, but I would do it differently:
+>> Make idx, to_allocate, and i all uint64_t or int64_t instead of
+>> uint32_t. This would also prevent accidental overflow when storing the=
+
+>> result of the division in:
+>>
+>> idx =3D sector_num / s->tracks;
+>> if (idx >=3D s->bat_size) {
+>>     [...]
+>>
+>> The much greater problem to me appears to be that we don't check that
+>> idx + to_allocate <=3D s->bat_size. I'm not sure whether there can be =
+a
+>> buffer overflow in the for loop below, but I'm not sure I really want =
+to
+>> know either... I think the block_status() call limits *pnum so that
+>> there will not be an overflow, but then we should at least assert this=
+=2E
+>=20
+> Will you send a new patch that supercedes this one?
+
+Well, since you're asking so nicely...
+
+Max
 
 
+--0ENmfWtXul5f32WqdPfnIufsdc4f5Ir55
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 27/03/2017 09:21, Peter Xu wrote:
-> @@ -641,8 +640,7 @@ static void cpu_throttle_thread(CPUState *cpu, run_=
-on_cpu_data opaque)
->      }
-> =20
->      pct =3D (double)cpu_throttle_get_percentage()/100;
-> -    throttle_ratio =3D pct / (1 - pct);
-> -    sleeptime_ns =3D (long)(throttle_ratio * CPU_THROTTLE_TIMESLICE_NS=
-);
+-----BEGIN PGP SIGNATURE-----
 
-Say pct =3D 0.25, then throttle_ratio =3D 0.25/0.75 =3D 1/3.
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljehqYSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AZ9EH+gNPqWTVe7UXyw0zc81pzfpLHtSJgeJT
+E7ry31aAYUQY6ICJ0smoElOp/JvA5W62G+s+k9ngiuwoBkNLRm7IBhAHmePwceuX
+eKhNsVYsy+zlw5icixRitWwcoWgsEBrA3aUmHtOpaM8FH1Hj1z7nqz/gVtBULjLy
+7HVgKN4FA7JUzkK5wiDy2GklutrtTPwIjGW9spNdLs7maMAELIF0pV2aLB4qOf0L
+cNT88/GFy+gFJB04KB753PPijvmSbg5c+RiQiidhR/l0IrAIcRAuHHG+AwL1qGoK
+MYLcriRtrR1qb/4NQX9mbmKYPGFPFdQ04O41oNHNSG+2WLCOkrUKqfg=
+=NqzU
+-----END PGP SIGNATURE-----
 
-> +    sleeptime_ns =3D (long)((1 - pct) * CPU_THROTTLE_TIMESLICE_NS);
-> =20
->      qemu_mutex_unlock_iothread();
->      atomic_set(&cpu->throttle_thread_scheduled, 0);
-> @@ -668,7 +666,7 @@ static void cpu_throttle_timer_tick(void *opaque)
-> =20
->      pct =3D (double)cpu_throttle_get_percentage()/100;
->      timer_mod(throttle_timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL_RT)=
- +
-> -                                   CPU_THROTTLE_TIMESLICE_NS / (1-pct)=
-);
-
-And the timer is running every 1/0.75 =3D 4/3 * CPU_THROTTLE_TIMESLICE_NS=
-.
-
-Of these, 1/3 is spent sleeping (3.33 ms), while 1 (10 ms) is spent not
-sleeping.
-
-When pct =3D 0.75, throttle_ratio =3D 3 and the timer is running every 4 =
-*
-CPU_THROTTLE_TIMESLICE_NS (40 ms).  Of these, 3 slices (30 ms) are spent
-sleeping, while 10 ms are spent not sleeping.
-
-The rationale _could_ be (I don't remember) that a CPU with a very high
-throttling frequency leaves little time for the migration thread to do
-any work.  So QEMU keeps the "on" phase always the same and lengthens
-the "off" phase, which as you found out can be unsatisfactory.
-
-However, I think your patch has the opposite problem: the frequency is
-constant, but with high throttling all time reserved for the CPU will be
-lost in overhead.  For example, at 99% throttling you only have 100
-microseconds to wake up, do work and go back to sleep.
-
-So I'm inclined _not_ to take your patch.  One possibility could be to
-do the following:
-
-- for throttling between 0% and 80%, use the current algorithm.  At 66%,
-the CPU will work for 10 ms and sleep for 40 ms.
-
-- for throttling above 80% adapt your algorithm to have a variable
-timeslice, going from 50 ms at 66% to 100 ms at 100%.  This way, the CPU
-time will shrink below 10 ms and the sleep time will grow.
-
-It looks like this: http://i.imgur.com/lyFie04.png
-
-So at 99% the timeslice will be 97.5 ms; the CPU will work for 975 us
-and sleep for the rest (10x more than with just your patch).  But I'm
-not sure it's really worth it.
-
-Paolo
-
-> +                                   CPU_THROTTLE_TIMESLICE_NS * pct);
->  }
+--0ENmfWtXul5f32WqdPfnIufsdc4f5Ir55--
