@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1cu03R-000454-CH
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:09:42 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1cu04V-0004vy-Qe
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:10:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1cu03N-0005kk-Bg
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:09:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51148)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1cu03N-0005k5-5C
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:09:37 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2B6F87F3EC
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 17:09:35 +0000 (UTC)
-Date: Fri, 31 Mar 2017 18:09:30 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20170331170930.GJ13825@redhat.com>
-References: <20170331164322.24020-1-stefanha@redhat.com>
+	(envelope-from <ehabkost@redhat.com>) id 1cu04U-0006GW-JJ
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:10:47 -0400
+Date: Fri, 31 Mar 2017 14:10:39 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170331171039.GB3709@thinpad.lan.raisama.net>
+References: <1490965980-513-1-git-send-email-peter.maydell@linaro.org>
+	<5979a675-6077-50f8-0714-7e509a9bc492@amsat.org>
+	<20170331134033.GY3709@thinpad.lan.raisama.net>
+	<20170331161839.GA18974@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20170331164322.24020-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] char: kick main loop after adding a watch
+In-Reply-To: <20170331161839.GA18974@stefanha-x1.localdomain>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] block/parallels.c: avoid integer overflow
+ in allocate_clusters()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,59 +28,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, patches@linaro.org, Max Reitz <mreitz@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 
-On Fri, Mar 31, 2017 at 05:43:22PM +0100, Stefan Hajnoczi wrote:
-> The ISA serial port device's output can hang when the pipe on stdout
-> becomes full.  This is a race condition where the vcpu thread executing
-> serial emulation code adds a watch on stdout while the main loop thread
-> is blocked in ppoll(2).  If no timer or other event wakes up the main
-> loop, there will be no further output from the serial device even when
-> the pipe becomes writable.
-> 
-> Richard W. M. Jones was able to reproduce the hang on recent versions of
-> guestfs-tools-c and libglib2 on Fedora 26 hosts.
-> 
-> This patch kicks the main loop so the next iteration invokes ppoll(2)
-> with the watch fd.
-> 
-> Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1435432
-> Reported-by: Richard W. M. Jones <rjones@redhat.com>
-> Tested-by: Richard W. M. Jones <rjones@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  chardev/char.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/chardev/char.c b/chardev/char.c
-> index 3df1163..6c99c34 100644
-> --- a/chardev/char.c
-> +++ b/chardev/char.c
-> @@ -1059,6 +1059,11 @@ guint qemu_chr_fe_add_watch(CharBackend *be, GIOCondition cond,
->      tag = g_source_attach(src, NULL);
->      g_source_unref(src);
->  
-> +    /* The main loop may be in blocked waiting on events in another thread.
-> +     * Kick it so the new watch will be added.
-> +     */
-> +    qemu_notify_event();
-> +
->      return tag;
->  }
->  
+On Fri, Mar 31, 2017 at 05:18:39PM +0100, Stefan Hajnoczi wrote:
+> On Fri, Mar 31, 2017 at 10:40:33AM -0300, Eduardo Habkost wrote:
+> > On Fri, Mar 31, 2017 at 10:27:44AM -0300, Philippe Mathieu-Daud=E9 wr=
+ote:
+> > > Hi,
+> > >=20
+> > > Eduardo you seem skilled regarding Coccinelle scripts, is it possib=
+le to
+> > > write one to find those overflows?
+> >=20
+> > Probably not. AFAIK, Coccinelle rules are based on local code
+> > syntax only. This means it doesn't know the data type of
+> > expressions like (s->tracks).
+>=20
+> I'm surprised by that statement.  Coccinelle isn't a text matcher, it's
+> a proper C compiler frontend that parses the all code in the compilatio=
+n
+> unit.  Therefore it must have the type information even for s->tracks.
 
-Obviously Paolo has provided further insights in the other part of
-this thread, but from my point of view this does appear to fix the
-problem.  I tested it on 3 different physical machines which
-previously showed hangs, and on all 3 the test ran for > 30 mins
-[before I killed the test] which is far longer than seen before.
+You are probably not wrong about it not being just a text
+matcher. But I'm not sure about it being able to have type
+information for s->tracks. The documentation isn't clear about
+that.
 
-Therefore: ACK.
+The 'idexpression' declarations seems to accept some kind of C
+type annotations (I didn't know that!), but the documentation
+also says: "A more complex description of a location, such as
+a->b is considered to be an expression, not an idexpression".
+And 'expression' metavariables don't seem to support type
+annotations.
 
-Rich.
+My impression is that Coccinelle has limited support to
+understand simple variable declarations, but not the full set of
+C type declarations and type system rules that would allow it to
+figure out the type of an expression like s->tracks.
 
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-libguestfs lets you edit virtual machines.  Supports shell scripting,
-bindings from many languages.  http://libguestfs.org
+But I really hope to be wrong, because that would be very useful. :)
+
+> Disclaimer: This should in no way be considered a volunteer offer to
+> write cocci scripts now or at any time in the future :).  I'm not fluen=
+t
+> in the semantic patch syntax.
+
+I don't believe there's anybody in the world fluent in the SmPL
+syntax. Maybe its authors are, but I wouldn't be so sure. :)
+
+--=20
+Eduardo
