@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cu2DG-0007CC-4s
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:27:59 -0400
+	(envelope-from <eblake@redhat.com>) id 1cu2GG-0001A4-SU
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:31:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cu2DF-0004Sl-1T
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:27:58 -0400
+	(envelope-from <eblake@redhat.com>) id 1cu2GF-0005WX-V0
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:31:04 -0400
 References: <20170331120431.1767-1-mreitz@redhat.com>
-	<20170331120431.1767-2-mreitz@redhat.com>
+	<20170331120431.1767-3-mreitz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <f516884a-771f-39f0-db29-f71557dd7250@redhat.com>
-Date: Fri, 31 Mar 2017 14:27:47 -0500
+Message-ID: <6d0d11fc-1849-9acb-fc53-3c46c13878ab@redhat.com>
+Date: Fri, 31 Mar 2017 14:30:55 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170331120431.1767-2-mreitz@redhat.com>
+In-Reply-To: <20170331120431.1767-3-mreitz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="fvpomFbR8RRAQHqfQ1S9HlKAophe3KLIQ"
-Subject: Re: [Qemu-devel] [PATCH for-2.9 1/2] qapi/curl: Extend and fix
- blockdev-add schema
+	boundary="7UKK09r1RbAVCjnxTdj5swExJHx3iAD4c"
+Subject: Re: [Qemu-devel] [PATCH for-2.9 2/2] block/curl: Check protocol
+ prefix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +29,52 @@ To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fvpomFbR8RRAQHqfQ1S9HlKAophe3KLIQ
+--7UKK09r1RbAVCjnxTdj5swExJHx3iAD4c
 From: Eric Blake <eblake@redhat.com>
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <f516884a-771f-39f0-db29-f71557dd7250@redhat.com>
-Subject: Re: [PATCH for-2.9 1/2] qapi/curl: Extend and fix blockdev-add schema
+Message-ID: <6d0d11fc-1849-9acb-fc53-3c46c13878ab@redhat.com>
+Subject: Re: [PATCH for-2.9 2/2] block/curl: Check protocol prefix
 References: <20170331120431.1767-1-mreitz@redhat.com>
- <20170331120431.1767-2-mreitz@redhat.com>
-In-Reply-To: <20170331120431.1767-2-mreitz@redhat.com>
+ <20170331120431.1767-3-mreitz@redhat.com>
+In-Reply-To: <20170331120431.1767-3-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 03/31/2017 07:04 AM, Max Reitz wrote:
-> The curl block driver accepts more options than just "filename"; also,
-> the URL is actually expected to be passed through the "url" option
-> instead of "filename".
+> If the user has explicitly specified a block driver and thus a protocol=
+,
+> we have to make sure the URL's protocol prefix matches. Otherwise the
+> latter will silently override the former which might catch some users b=
+y
+> surprise.
 >=20
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  qapi/block-core.json | 103 +++++++++++++++++++++++++++++++++++++++++++=
-+++-----
->  1 file changed, 94 insertions(+), 9 deletions(-)
+>  block/curl.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
 >=20
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index b5f0e9958c..033457ce86 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -2737,16 +2737,101 @@
->              '*debug': 'int' } }
-> =20
->  ##
-> -# @BlockdevOptionsCurl:
-> +# @BlockdevOptionsCurlBase:
->  #
-> -# Driver specific block device options for the curl backend.
-> +# Driver specific block device options shared by all protocols support=
-ed by the
-> +# curl backend.
->  #
-> -# @filename:    path to the image file
-> +# @url:                     URL of the image file
-> +#
-> +# @readahead:               Size of the read-ahead cache; must be a mu=
-ltiple of
-> +#                           512 (defaults to 256 kB)
-> +#
-> +# @timeout:                 Timeout for connections, in seconds (defau=
-lts to 5)
-> +#
-> +# @username:                Username for authentication (defaults to n=
-one)
-> +#
-> +# @password-secret:         ID of a QCryptoSecret object providing a p=
-assword
-> +#                           for authentication (defaults to no passwor=
-d)
-> +#
-> +# @proxy-username:          Username for proxy authentication (default=
-s to none)
-> +#
-> +# @proxy-password-secret:   ID of a QCryptoSecret object providing a p=
-assword
-> +#                           for proxy authentication (defaults to no p=
-assword)
-> +#
 
-Matches runtime_opts of block/curl.c, modulo the fields that you
-restricted to specific protocols by creating subtypes. Looks like you
-covered everything correctly.
+It feels a little bit dirty that we are parsing the URL rather than
+having a distinct discriminator, but I'm okay with the approach (with a
+distinct discriminator, we would have to reconstruct a URL from the
+discriminator + the rest of the server/path information, and that's more
+work to libvirt to split a URL into the distinct JSON fields just to
+have qemu rebuild a URL).
+
+> +    if (!strstart(file, bs->drv->protocol_name, &protocol_delimiter) |=
+|
+> +        !strstart(protocol_delimiter, "://", NULL))
+> +    {
+> +        error_setg(errp, "%s curl driver cannot handle the URL '%s' (d=
+oes not "
+> +                   "start with '%s://')", bs->drv->protocol_name, file=
+,
+> +                   bs->drv->protocol_name);
+
+Perhaps splitting the message with an error_append_hint() for the
+parenthetical half would also be appropriate, but the line is not too
+terribly long so I won't insist on a respin.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -106,7 +83,7 @@ Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---fvpomFbR8RRAQHqfQ1S9HlKAophe3KLIQ
+--7UKK09r1RbAVCjnxTdj5swExJHx3iAD4c
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -116,13 +93,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJY3q2zAAoJEKeha0olJ0NqxUYIAI5hdqHXUfI218t8wz1xRYRK
-d84u2xiqyJAV3X+aEfAx6WKiWGuFZqNC13A6hyBlP83ns+85kgIe/hTpoqnEuDv5
-ovbTIc+8w2e/wSv3sOkGBnSDk5tDR4850moivdCB17vSNcLcEM9rNdDuw2nJ8Vjr
-kC5xRD9UKCZZN5lAVTtJXrswlHnvpJqvm9ifmOgpTYjBH/n/1mBuhinRnneuBWaa
-R5lJ1Cy+atyJTn5hX8M/cNguFjriESkxmDy9rCcIjNRIVckwz7PxNQduNGLcWocp
-G/Vwh3oirZc0QH8jdbr40kNzdnVD6wiP8wgwo5VOER0o8DQ+t6JrXbCiV/mrQeI=
-=9Bb/
+iQEcBAEBCAAGBQJY3q5vAAoJEKeha0olJ0NqxMEH/As1CqWrqh5oeV4zHnxSY7D1
+oKhfiGzcK/rLPS+ViwftvmWututCLmItCTSLiOXkBUcUhdooEBYc7CzkKQE9ZqOG
+2JQa9TABKkN211XI8g0PLb8W7mtCZB+i/h+Mayl0Aim7xgdrtOJHJ2T+pshldzra
+fLIiVKCt3Qgumz7yaJo/bb+CW6p+lq7e0z22Bx9TOi0Fsr1gS9kWEK0kNB1dOvkk
+5CT/mA3XGYj7BFUFLOXeJRAbfv7HJZKVzNR2W5d39HJyl0nEFxPS5SOadJhQ6zO+
+/85QB1w64DAs3lLOYFYEvi93wmcemgxRXombwfoAlI+NJUAst0gOeRL0v4v6KrY=
+=6aMF
 -----END PGP SIGNATURE-----
 
---fvpomFbR8RRAQHqfQ1S9HlKAophe3KLIQ--
+--7UKK09r1RbAVCjnxTdj5swExJHx3iAD4c--
