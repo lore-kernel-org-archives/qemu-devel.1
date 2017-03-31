@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cu2GG-0001A4-SU
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:31:05 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1cu2Vl-0003SW-3d
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:47:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cu2GF-0005WX-V0
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:31:04 -0400
-References: <20170331120431.1767-1-mreitz@redhat.com>
-	<20170331120431.1767-3-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6d0d11fc-1849-9acb-fc53-3c46c13878ab@redhat.com>
-Date: Fri, 31 Mar 2017 14:30:55 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cu2Vi-0005tP-00
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:47:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:29630)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cu2Vh-0005sP-Pd
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:47:01 -0400
+Date: Fri, 31 Mar 2017 15:46:57 -0400 (EDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3171819.10011849.1490989617665.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20170331191321.GI2408@work-vm>
+References: <1490599288-11751-1-git-send-email-peterx@redhat.com>
+	<1490599288-11751-6-git-send-email-peterx@redhat.com>
+	<aa26e76e-e5fd-c205-8919-6cc927a6d3ce@redhat.com>
+	<20170331191321.GI2408@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20170331120431.1767-3-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="7UKK09r1RbAVCjnxTdj5swExJHx3iAD4c"
-Subject: Re: [Qemu-devel] [PATCH for-2.9 2/2] block/curl: Check protocol
- prefix
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 5/5] cpu: throttle: fix throttle time slice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,81 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7UKK09r1RbAVCjnxTdj5swExJHx3iAD4c
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <6d0d11fc-1849-9acb-fc53-3c46c13878ab@redhat.com>
-Subject: Re: [PATCH for-2.9 2/2] block/curl: Check protocol prefix
-References: <20170331120431.1767-1-mreitz@redhat.com>
- <20170331120431.1767-3-mreitz@redhat.com>
-In-Reply-To: <20170331120431.1767-3-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 03/31/2017 07:04 AM, Max Reitz wrote:
-> If the user has explicitly specified a block driver and thus a protocol=
-,
-> we have to make sure the URL's protocol prefix matches. Otherwise the
-> latter will silently override the former which might catch some users b=
-y
-> surprise.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  block/curl.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
->=20
-
-It feels a little bit dirty that we are parsing the URL rather than
-having a distinct discriminator, but I'm okay with the approach (with a
-distinct discriminator, we would have to reconstruct a URL from the
-discriminator + the rest of the server/path information, and that's more
-work to libvirt to split a URL into the distinct JSON fields just to
-have qemu rebuild a URL).
-
-> +    if (!strstart(file, bs->drv->protocol_name, &protocol_delimiter) |=
-|
-> +        !strstart(protocol_delimiter, "://", NULL))
-> +    {
-> +        error_setg(errp, "%s curl driver cannot handle the URL '%s' (d=
-oes not "
-> +                   "start with '%s://')", bs->drv->protocol_name, file=
-,
-> +                   bs->drv->protocol_name);
-
-Perhaps splitting the message with an error_append_hint() for the
-parenthetical half would also be appropriate, but the line is not too
-terribly long so I won't insist on a respin.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>, jjherne@linux.vnet.ibm.com, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>
 
 
---7UKK09r1RbAVCjnxTdj5swExJHx3iAD4c
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+> > So I'm inclined _not_ to take your patch.  One possibility could be to
+> > do the following:
+> > 
+> > - for throttling between 0% and 80%, use the current algorithm.  At 66%,
+> > the CPU will work for 10 ms and sleep for 40 ms.
+> > 
+> > - for throttling above 80% adapt your algorithm to have a variable
+> > timeslice, going from 50 ms at 66% to 100 ms at 100%.  This way, the CPU
+> > time will shrink below 10 ms and the sleep time will grow.
 
-iQEcBAEBCAAGBQJY3q5vAAoJEKeha0olJ0NqxMEH/As1CqWrqh5oeV4zHnxSY7D1
-oKhfiGzcK/rLPS+ViwftvmWututCLmItCTSLiOXkBUcUhdooEBYc7CzkKQE9ZqOG
-2JQa9TABKkN211XI8g0PLb8W7mtCZB+i/h+Mayl0Aim7xgdrtOJHJ2T+pshldzra
-fLIiVKCt3Qgumz7yaJo/bb+CW6p+lq7e0z22Bx9TOi0Fsr1gS9kWEK0kNB1dOvkk
-5CT/mA3XGYj7BFUFLOXeJRAbfv7HJZKVzNR2W5d39HJyl0nEFxPS5SOadJhQ6zO+
-/85QB1w64DAs3lLOYFYEvi93wmcemgxRXombwfoAlI+NJUAst0gOeRL0v4v6KrY=
-=6aMF
------END PGP SIGNATURE-----
+Oops, all the 66% should be 80%.
 
---7UKK09r1RbAVCjnxTdj5swExJHx3iAD4c--
+> It seems odd to have a threshold like that on something that's supposedly
+> a linear scale.
+
+I futzed a bit with the threshold until the first derivative of the CPU
+time was zero at the threshold, and the result was 80%.  That is, if you
+switch before 80%, the CPU time slice can grow to more than 10 ms right
+after the threshold, and then start shrinking.
+
+> > It looks like this: http://i.imgur.com/lyFie04.png
+> > 
+> > So at 99% the timeslice will be 97.5 ms; the CPU will work for 975 us
+> > and sleep for the rest (10x more than with just your patch).  But I'm
+> > not sure it's really worth it.
+> 
+> Can you really run a CPU for 975us ?
+
+It's 2-3 million clock cycles, should be doable.
+
+Paolo
