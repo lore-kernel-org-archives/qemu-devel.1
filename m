@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gxt@mprc.pku.edu.cn>) id 1ctmPB-0002K6-MC
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 22:35:14 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1ctmib-00047c-HC
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 22:55:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gxt@mprc.pku.edu.cn>) id 1ctmPA-0003Pi-Hy
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 22:35:13 -0400
-Received: from [2001:da8:201:1203:21a:92ff:fef0:87aa] (port=46483
-	helo=mprc.pku.edu.cn)
+	(envelope-from <alex.williamson@redhat.com>) id 1ctmiY-0000DG-EX
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 22:55:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52672)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <gxt@mprc.pku.edu.cn>) id 1ctmPA-0003I7-0v
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 22:35:12 -0400
-Message-ID: <63185.203.187.182.140.1490924822.squirrel@mprc.pku.edu.cn>
-In-Reply-To: <0a3e3590-a641-8ad2-4404-6fc93a19f1ff@redhat.com>
-References: <20170330165008.26419-1-shah.suramya@gmail.com>
-	<0a3e3590-a641-8ad2-4404-6fc93a19f1ff@redhat.com>
-Date: Fri, 31 Mar 2017 09:47:02 +0800 (CST)
-From: "Xuetao Guan" <gxt@mprc.pku.edu.cn>
-Reply-To: gxt@mprc.pku.edu.cn
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1ctmiY-0000CZ-8k
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 22:55:14 -0400
+Date: Thu, 30 Mar 2017 20:55:11 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170330205511.28be6306@t450s.home>
+In-Reply-To: <8082FF9BCB2B054996454E47167FF4EC1C4930B3@SHSMSX104.ccr.corp.intel.com>
+References: <1490869641-29873-1-git-send-email-xiong.y.zhang@intel.com>
+	<20170330090148.16048141@t450s.home>
+	<8082FF9BCB2B054996454E47167FF4EC1C4930B3@SHSMSX104.ccr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain;charset=gb2312
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5] hw/unicore32: remove wrong assertion in
- puv machine init
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Revert "vfio/pci-quirks.c: Disable stolen
+ memory for igd VFIO"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +30,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Suramya Shah <shah.suramya@gmail.com>, qemu-devel@nongnu.org, gxt@mprc.pku.edu.cn
+To: "Zhang, Xiong Y" <xiong.y.zhang@intel.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-> On 03/30/2017 07:50 PM, Suramya Shah wrote:
->> Running QEMU with qemu-system-unicore32 without the kernel parameter
->> results in an assertion error.
->> Assert should not be used to check user provided parameters. Report an
->> error and exit instead
->> Signed-off-by: Suramya Shah <shah.suramya@gmail.com>
+On Fri, 31 Mar 2017 02:27:11 +0000
+"Zhang, Xiong Y" <xiong.y.zhang@intel.com> wrote:
 
-Thanks Suramya
-Acked-by: Guan Xuetao <gxt@mprc.pku.edu.cn>
+> > On Thu, 30 Mar 2017 18:27:21 +0800
+> > Xiong Zhang <xiong.y.zhang@intel.com> wrote:
+> >   
+> > > This reverts commit c2b2e158cc7b1cb431bd6039824ec13c3184a775.
+> > >
+> > > The original patch intend to prevent linux i915 driver from using
+> > > stolen meory. But this patch breaks windows IGD driver loading on
+> > > Gen9+, as IGD HW will use stolen memory on Gen9+, once windows IGD
+> > > driver see zero size stolen memory, it will unload.
+> > > Meanwhile stolen memory will be disabled in 915 when i915 run as
+> > > a guest.  
+> > 
+> > Does this mean that legacy mode IGD assignment is not going to work
+> > on Gen9+ with Windows?  Will it continue to work with Gen8-?  
+> [Zhang, Xiong Y] I try to use the following qemu command to enable legacy mode on SKyLake, but It seems the entry point of wins IGD driver isn't called(I couldn't confirm this as I don't have the source code, but I didn't see any IGD driver info from windbg while I could see many info in upt mode), so driver doesn't bind to IGD after win 8.1 boot up.
+>   #qemu-system-x86_64 -M pc -enable-kvm -smp 2 -m 2G  -vga none -nographic -cpu host -hda "$IMAGE" -device vfio-pci,host=00:02.0,x-vga=true,id=hostdev0,bus=pci.0,addr=0x2
+> Is this the right method to enable legacy mode ?
 
->> ---
->>  hw/unicore32/puv3.c | 7 +++++--
->>  1 file changed, 5 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/unicore32/puv3.c b/hw/unicore32/puv3.c
->> index 032078f..2c17cc9 100644
->> --- a/hw/unicore32/puv3.c
->> +++ b/hw/unicore32/puv3.c
->> @@ -93,8 +93,11 @@ static void puv3_load_kernel(const char
->> *kernel_filename)
->>      if (kernel_filename == NULL && qtest_enabled()) {
->>          return;
->>      }
->> -    assert(kernel_filename != NULL);
->> -
->> +    if (kernel_filename == NULL) {
->> +        error_report("No kernel found");
->> +        exit(1);
->> +    }
->> +
->>      /* only zImage format supported */
->>      size = load_image_targphys(kernel_filename, KERNEL_LOAD_ADDR,
->>              KERNEL_MAX_SIZE);
->>
->
-> Hi,
->
-> The patch looks good to me.
->
-> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
->
-> Thanks,
-> Marcel
->
+Yeah, that should do it.  x-vga should not be necessary, but shouldn't
+hurt IIRC.  Any dmesg errors regarding the ROM?  I think we have
+trouble with the ROM if the host is booted in UEFI mode.
+
+> 
+> > Please clarify Gen9+, is this Kaby Lake?  
+> [Zhang, Xiong Y] Gen 9+ is SkyLake and later.
+
+Ok, then I cannot test since I only have access to BDW.  We do have
+users that might start complaining if this is a new change in the
+Windows driver for SKL+.
+ 
+> > I assume this patch is intended for QEMU 2.9, it's helpful to make that
+> > explicit during the rc freeze.  Thanks,  
+> [Zhang, Xiong Y] Yes, as the original patch has entered into Qemu 2.9 rc1. So this reverted patch should be entered into the later 2.9 rc.
+> Sorry for the troubles.
+
+Ok, no problem.  Thanks,
+
+Alex 
