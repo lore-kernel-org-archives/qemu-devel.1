@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ctsXa-00087N-Ew
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:08:19 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1ctsYd-0000BJ-Ef
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:09:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ctsXZ-0007bV-DT
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:08:18 -0400
-Date: Fri, 31 Mar 2017 17:08:06 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170331090806.GH11195@lemon.lan>
-References: <1490440701-12037-1-git-send-email-ashijeetacharya@gmail.com>
-	<1490440701-12037-8-git-send-email-ashijeetacharya@gmail.com>
-	<20170331072609.GE11195@lemon.lan>
-	<CAC2QTZaL2aDatNoKoxEWn0XYxtfD6RDpB9gWn9h4+QE0vg2mMw@mail.gmail.com>
+	(envelope-from <dgilbert@redhat.com>) id 1ctsYZ-000882-EA
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:09:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48134)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ctsYZ-00087O-5d
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 05:09:19 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3226C22BA0B
+	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 09:09:18 +0000 (UTC)
+Date: Fri, 31 Mar 2017 10:09:15 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170331090914.GC2408@work-vm>
+References: <20170323204544.12015-1-quintela@redhat.com>
+	<20170323204544.12015-47-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAC2QTZaL2aDatNoKoxEWn0XYxtfD6RDpB9gWn9h4+QE0vg2mMw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 7/7] vmdk: Update metadata for multiple
- clusters
+In-Reply-To: <20170323204544.12015-47-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 46/51] ram: Remember last_page instead of
+ last_offset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,145 +34,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Fri, 03/31 14:17, Ashijeet Acharya wrote:
-> On Fri, Mar 31, 2017 at 12:56 PM, Fam Zheng <famz@redhat.com> wrote:
-> > On Sat, 03/25 16:48, Ashijeet Acharya wrote:
-> >> Include a next pointer in VmdkMetaData struct to point to the previous
-> >> allocated L2 table. Modify vmdk_L2update to start updating metadata for
-> >> allocation of multiple clusters at once.
-> >>
-> >> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
-> >> ---
-> >>  block/vmdk.c | 131 ++++++++++++++++++++++++++++++++++++++++++++++-------------
-> >>  1 file changed, 102 insertions(+), 29 deletions(-)
-> >>
-> >> diff --git a/block/vmdk.c b/block/vmdk.c
-> >> index 3de8b8f..4517409 100644
-> >> --- a/block/vmdk.c
-> >> +++ b/block/vmdk.c
-> >> @@ -137,6 +137,8 @@ typedef struct VmdkMetaData {
-> >>      int valid;
-> >>      uint32_t *l2_cache_entry;
-> >>      uint32_t nb_clusters;
-> >> +    uint32_t offset;
-> >> +    struct VmdkMetaData *next;
-> >>  } VmdkMetaData;
-> >>
-> >>  typedef struct VmdkGrainMarker {
-> >> @@ -1037,29 +1039,81 @@ static void vmdk_refresh_limits(BlockDriverState *bs, Error **errp)
-> >>      }
-> >>  }
-> >>
-> >> -static int vmdk_L2update(VmdkExtent *extent, VmdkMetaData *m_data,
-> >> -                         uint32_t offset)
-> >> +static int vmdk_alloc_cluster_link_l2(VmdkExtent *extent,
-> >> +                                      VmdkMetaData *m_data, bool zeroed)
-> >>  {
-> >> -    offset = cpu_to_le32(offset);
-> >> +    int i;
-> >> +    uint32_t offset, temp_offset;
-> >> +
-> >> +    if (zeroed) {
-> >> +        temp_offset = VMDK_GTE_ZEROED;
-> >> +    } else {
-> >> +        temp_offset = m_data->offset;
-> >> +    }
-> >> +
-> >> +    temp_offset = cpu_to_le32(temp_offset);
-> >> +
-> >>      /* update L2 table */
-> >> -    if (bdrv_pwrite_sync(extent->file,
-> >> +    offset = temp_offset;
-> >> +    for (i = 0; i < m_data->nb_clusters; i++) {
-> >> +        if (bdrv_pwrite_sync(extent->file,
-> >>                  ((int64_t)m_data->l2_offset * 512)
-> >> -                    + (m_data->l2_index * sizeof(offset)),
-> >> -                &offset, sizeof(offset)) < 0) {
-> >> -        return VMDK_ERROR;
-> >> +                    + ((m_data->l2_index + i) * sizeof(offset)),
-> >> +                &(offset), sizeof(offset)) < 0) {
-> >> +            return VMDK_ERROR;
-> >> +        }
-> >> +        if (!zeroed) {
-> >> +            offset += 128;
-> >> +        }
-> >>      }
-> >> +
-> >>      /* update backup L2 table */
-> >> +    offset = temp_offset;
-> >>      if (extent->l1_backup_table_offset != 0) {
-> >>          m_data->l2_offset = extent->l1_backup_table[m_data->l1_index];
-> >> -        if (bdrv_pwrite_sync(extent->file,
-> >> -                    ((int64_t)m_data->l2_offset * 512)
-> >> -                        + (m_data->l2_index * sizeof(offset)),
-> >> -                    &offset, sizeof(offset)) < 0) {
-> >> -            return VMDK_ERROR;
-> >> +        for (i = 0; i < m_data->nb_clusters; i++) {
-> >> +            if (bdrv_pwrite_sync(extent->file,
-> >> +                        ((int64_t)m_data->l2_offset * 512)
-> >> +                            + ((m_data->l2_index + i) * sizeof(offset)),
-> >> +                        &(offset), sizeof(offset)) < 0) {
-> >> +                return VMDK_ERROR;
-> >> +            }
-> >> +            if (!zeroed) {
-> >> +                offset += 128;
-> >> +            }
-> >>          }
-> >>      }
-> >> +
-> >> +    offset = temp_offset;
-> >>      if (m_data->l2_cache_entry) {
-> >> -        *m_data->l2_cache_entry = offset;
-> >> +        for (i = 0; i < m_data->nb_clusters; i++) {
-> >> +            *m_data->l2_cache_entry = offset;
-> >> +            m_data->l2_cache_entry++;
-> >> +
-> >> +            if (!zeroed) {
-> >> +                offset += 128;
-> >> +            }
-> >> +        }
-> >> +    }
-> >> +
-> >> +    return VMDK_OK;
-> >> +}
-> >> +
-> >> +static int vmdk_L2update(VmdkExtent *extent, VmdkMetaData *m_data,
-> >> +                         bool zeroed)
-> >> +{
-> >> +    int ret;
-> >> +
-> >> +    while (m_data->next != NULL) {
-> >> +        VmdkMetaData *next;
-> >> +
-> >> +        ret = vmdk_alloc_cluster_link_l2(extent, m_data, zeroed);
-> >> +        if (ret < 0) {
-> >> +            return ret;
-> >> +        }
-> >> +
-> >> +        next = m_data->next;
-> >> +        m_data = next;
-> >
-> > I don't see why the next pointer is necessary.  Also the tail is always unused,
-> > why do you need to allocate it?
+* Juan Quintela (quintela@redhat.com) wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  migration/ram.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
 > 
-> If I don't allocate the tail, I was getting a segfault in vmdk_pwritev().
+> diff --git a/migration/ram.c b/migration/ram.c
+> index b1a031e..57b776b 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -171,8 +171,8 @@ struct RAMState {
+>      RAMBlock *last_seen_block;
+>      /* Last block from where we have sent data */
+>      RAMBlock *last_sent_block;
+> -    /* Last offset we have sent data from */
+> -    ram_addr_t last_offset;
+> +    /* Last dirty page we have sent */
 
-That may be because the way you interate the linked list in vmdk_pwritev is:
+Can you make that 'Last dirty target page we have sent' 
+just so we know which shape page we're dealing with.
 
->        while (m_data->next != NULL) {
->            VmdkMetaData *next;
->            next = m_data->next;
->            g_free(m_data);
->            m_data = next;
->        }
->
+> +    ram_addr_t last_page;
+>      /* last ram version we have seen */
+>      uint32_t last_version;
+>      /* We are in the first round */
+> @@ -1063,7 +1063,7 @@ static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss,
+>      pss->offset = migration_bitmap_find_dirty(rs, pss->block, pss->offset,
+>                                                page);
+>      if (pss->complete_round && pss->block == rs->last_seen_block &&
+> -        pss->offset >= rs->last_offset) {
+> +        pss->offset >= rs->last_page) {
 
-which does require a dummy tail.
+That's odd; isn't pss->offset still in bytes?
 
-But after all it's still not clear to me why you cannot keep m_data on stack,
-and why you need the next pointer at all.
+Dave
 
-Fam
+>          /*
+>           * We've been once around the RAM and haven't found anything.
+>           * Give up.
+> @@ -1396,7 +1396,7 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
+>      }
+>  
+>      pss.block = rs->last_seen_block;
+> -    pss.offset = rs->last_offset;
+> +    pss.offset = rs->last_page << TARGET_PAGE_BITS;
+>      pss.complete_round = false;
+>  
+>      if (!pss.block) {
+> @@ -1418,7 +1418,7 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
+>      } while (!pages && again);
+>  
+>      rs->last_seen_block = pss.block;
+> -    rs->last_offset = pss.offset;
+> +    rs->last_page = pss.offset >> TARGET_PAGE_BITS;
+>  
+>      return pages;
+>  }
+> @@ -1493,7 +1493,7 @@ static void ram_state_reset(RAMState *rs)
+>  {
+>      rs->last_seen_block = NULL;
+>      rs->last_sent_block = NULL;
+> -    rs->last_offset = 0;
+> +    rs->last_page = 0;
+>      rs->last_version = ram_list.version;
+>      rs->ram_bulk_stage = true;
+>  }
+> @@ -1838,7 +1838,7 @@ static int postcopy_chunk_hostpages(MigrationState *ms)
+>      /* Easiest way to make sure we don't resume in the middle of a host-page */
+>      rs->last_seen_block = NULL;
+>      rs->last_sent_block = NULL;
+> -    rs->last_offset     = 0;
+> +    rs->last_page = 0;
+>  
+>      QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+>          unsigned long first = block->offset >> TARGET_PAGE_BITS;
+> -- 
+> 2.9.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
