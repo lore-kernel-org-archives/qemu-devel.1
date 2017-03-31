@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ctqwv-0007AN-It
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 03:26:23 -0400
+	(envelope-from <yi.l.liu@intel.com>) id 1ctr15-000840-EW
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 03:30:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ctqwt-00032C-Ru
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 03:26:21 -0400
-Date: Fri, 31 Mar 2017 15:26:09 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170331072609.GE11195@lemon.lan>
-References: <1490440701-12037-1-git-send-email-ashijeetacharya@gmail.com>
-	<1490440701-12037-8-git-send-email-ashijeetacharya@gmail.com>
+	(envelope-from <yi.l.liu@intel.com>) id 1ctr12-0004aM-8V
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 03:30:39 -0400
+Received: from mga04.intel.com ([192.55.52.120]:60758)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1ctr11-0004YV-PT
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 03:30:36 -0400
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+Date: Fri, 31 Mar 2017 07:30:22 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C257439036DF7@shsmsx102.ccr.corp.intel.com>
+References: <1486456099-7345-1-git-send-email-peterx@redhat.com>
+	<1486456099-7345-15-git-send-email-peterx@redhat.com>
+	<A2975661238FB949B60364EF0F2C257439032C79@shsmsx102.ccr.corp.intel.com>
+	<20170327091208.GG11497@pxdev.xzpeter.org>
+	<A2975661238FB949B60364EF0F2C257439032D78@shsmsx102.ccr.corp.intel.com>
+	<A2975661238FB949B60364EF0F2C25743903553F@shsmsx102.ccr.corp.intel.com>
+	<9c3cda64-b4a3-6f9b-f951-bf73f6613faa@redhat.com>
+	<A2975661238FB949B60364EF0F2C257439036D0F@shsmsx102.ccr.corp.intel.com>
+	<81e79982-4af0-3b46-552c-eea4db05a362@redhat.com>
+In-Reply-To: <81e79982-4af0-3b46-552c-eea4db05a362@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1490440701-12037-8-git-send-email-ashijeetacharya@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 7/7] vmdk: Update metadata for multiple
- clusters
+Subject: Re: [Qemu-devel] [PATCH v7 14/17] memory: add
+ MemoryRegionIOMMUOps.replay() callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,268 +36,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, stefanha@gmail.com, qemu-devel@nongnu.org, mreitz@redhat.com, jsnow@redhat.com
+To: Jason Wang <jasowang@redhat.com>, 'Peter Xu' <peterx@redhat.com>
+Cc: "Lan, Tianyu" <tianyu.lan@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, "'mst@redhat.com'" <mst@redhat.com>, "'jan.kiszka@siemens.com'" <jan.kiszka@siemens.com>, "'bd.aviv@gmail.com'" <bd.aviv@gmail.com>, "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>, "'alex.williamson@redhat.com'" <alex.williamson@redhat.com>, 'David Gibson' <david@gibson.dropbear.id.au>
 
-On Sat, 03/25 16:48, Ashijeet Acharya wrote:
-> Include a next pointer in VmdkMetaData struct to point to the previous
-> allocated L2 table. Modify vmdk_L2update to start updating metadata for
-> allocation of multiple clusters at once.
-> 
-> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
-> ---
->  block/vmdk.c | 131 ++++++++++++++++++++++++++++++++++++++++++++++-------------
->  1 file changed, 102 insertions(+), 29 deletions(-)
-> 
-> diff --git a/block/vmdk.c b/block/vmdk.c
-> index 3de8b8f..4517409 100644
-> --- a/block/vmdk.c
-> +++ b/block/vmdk.c
-> @@ -137,6 +137,8 @@ typedef struct VmdkMetaData {
->      int valid;
->      uint32_t *l2_cache_entry;
->      uint32_t nb_clusters;
-> +    uint32_t offset;
-> +    struct VmdkMetaData *next;
->  } VmdkMetaData;
->  
->  typedef struct VmdkGrainMarker {
-> @@ -1037,29 +1039,81 @@ static void vmdk_refresh_limits(BlockDriverState *bs, Error **errp)
->      }
->  }
->  
-> -static int vmdk_L2update(VmdkExtent *extent, VmdkMetaData *m_data,
-> -                         uint32_t offset)
-> +static int vmdk_alloc_cluster_link_l2(VmdkExtent *extent,
-> +                                      VmdkMetaData *m_data, bool zeroed)
->  {
-> -    offset = cpu_to_le32(offset);
-> +    int i;
-> +    uint32_t offset, temp_offset;
-> +
-> +    if (zeroed) {
-> +        temp_offset = VMDK_GTE_ZEROED;
-> +    } else {
-> +        temp_offset = m_data->offset;
-> +    }
-> +
-> +    temp_offset = cpu_to_le32(temp_offset);
-> +
->      /* update L2 table */
-> -    if (bdrv_pwrite_sync(extent->file,
-> +    offset = temp_offset;
-> +    for (i = 0; i < m_data->nb_clusters; i++) {
-> +        if (bdrv_pwrite_sync(extent->file,
->                  ((int64_t)m_data->l2_offset * 512)
-> -                    + (m_data->l2_index * sizeof(offset)),
-> -                &offset, sizeof(offset)) < 0) {
-> -        return VMDK_ERROR;
-> +                    + ((m_data->l2_index + i) * sizeof(offset)),
-> +                &(offset), sizeof(offset)) < 0) {
-> +            return VMDK_ERROR;
-> +        }
-> +        if (!zeroed) {
-> +            offset += 128;
-> +        }
->      }
-> +
->      /* update backup L2 table */
-> +    offset = temp_offset;
->      if (extent->l1_backup_table_offset != 0) {
->          m_data->l2_offset = extent->l1_backup_table[m_data->l1_index];
-> -        if (bdrv_pwrite_sync(extent->file,
-> -                    ((int64_t)m_data->l2_offset * 512)
-> -                        + (m_data->l2_index * sizeof(offset)),
-> -                    &offset, sizeof(offset)) < 0) {
-> -            return VMDK_ERROR;
-> +        for (i = 0; i < m_data->nb_clusters; i++) {
-> +            if (bdrv_pwrite_sync(extent->file,
-> +                        ((int64_t)m_data->l2_offset * 512)
-> +                            + ((m_data->l2_index + i) * sizeof(offset)),
-> +                        &(offset), sizeof(offset)) < 0) {
-> +                return VMDK_ERROR;
-> +            }
-> +            if (!zeroed) {
-> +                offset += 128;
-> +            }
->          }
->      }
-> +
-> +    offset = temp_offset;
->      if (m_data->l2_cache_entry) {
-> -        *m_data->l2_cache_entry = offset;
-> +        for (i = 0; i < m_data->nb_clusters; i++) {
-> +            *m_data->l2_cache_entry = offset;
-> +            m_data->l2_cache_entry++;
-> +
-> +            if (!zeroed) {
-> +                offset += 128;
-> +            }
-> +        }
-> +    }
-> +
-> +    return VMDK_OK;
-> +}
-> +
-> +static int vmdk_L2update(VmdkExtent *extent, VmdkMetaData *m_data,
-> +                         bool zeroed)
-> +{
-> +    int ret;
-> +
-> +    while (m_data->next != NULL) {
-> +        VmdkMetaData *next;
-> +
-> +        ret = vmdk_alloc_cluster_link_l2(extent, m_data, zeroed);
-> +        if (ret < 0) {
-> +            return ret;
-> +        }
-> +
-> +        next = m_data->next;
-> +        m_data = next;
-
-I don't see why the next pointer is necessary.  Also the tail is always unused,
-why do you need to allocate it? 
-
-But more importantly, I think you could further batch multiple updates in the
-same L2 table and only do one bdrv_pwrite_sync.
-
-Fam
-
->      }
->  
->      return VMDK_OK;
-> @@ -1271,7 +1325,7 @@ exit:
->   */
->  static int handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
->                          uint64_t offset, uint64_t *cluster_offset,
-> -                        int64_t *bytes, VmdkMetaData *m_data,
-> +                        int64_t *bytes, VmdkMetaData **m_data,
->                          bool allocate, uint32_t *total_alloc_clusters)
->  {
->      int l1_index, l2_offset, l2_index;
-> @@ -1280,6 +1334,7 @@ static int handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
->      uint32_t nb_clusters;
->      bool zeroed = false;
->      uint64_t skip_start_bytes, skip_end_bytes;
-> +    VmdkMetaData *old_m_data;
->      int ret;
->  
->      ret = get_cluster_table(extent, offset, &l1_index, &l2_offset,
-> @@ -1330,13 +1385,21 @@ static int handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
->          if (ret < 0) {
->              return ret;
->          }
-> -        if (m_data) {
-> -            m_data->valid = 1;
-> -            m_data->l1_index = l1_index;
-> -            m_data->l2_index = l2_index;
-> -            m_data->l2_offset = l2_offset;
-> -            m_data->l2_cache_entry = &l2_table[l2_index];
-> -            m_data->nb_clusters = nb_clusters;
-> +
-> +        if (*m_data) {
-> +            old_m_data = *m_data;
-> +            *m_data = g_malloc0(sizeof(**m_data));
-> +
-> +            **m_data = (VmdkMetaData) {
-> +                .valid            =    1,
-> +                .l1_index         =    l1_index,
-> +                .l2_index         =    l2_index,
-> +                .l2_offset        =    l2_offset,
-> +                .l2_cache_entry   =    &l2_table[l2_index],
-> +                .nb_clusters      =    nb_clusters,
-> +                .offset           =    cluster_sector,
-> +                .next             =    old_m_data,
-> +            };
->          }
->      }
->      *cluster_offset = cluster_sector << BDRV_SECTOR_BITS;
-> @@ -1365,7 +1428,7 @@ static int handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
->   */
->  static int vmdk_alloc_cluster_offset(BlockDriverState *bs,
->                                       VmdkExtent *extent,
-> -                                     VmdkMetaData *m_data, uint64_t offset,
-> +                                     VmdkMetaData **m_data, uint64_t offset,
->                                       bool allocate, uint64_t *cluster_offset,
->                                       int64_t bytes,
->                                       uint32_t *total_alloc_clusters)
-> @@ -1385,8 +1448,8 @@ static int vmdk_alloc_cluster_offset(BlockDriverState *bs,
->      new_cluster_offset = 0;
->      *cluster_offset = 0;
->      n_bytes = 0;
-> -    if (m_data) {
-> -        m_data->valid = 0;
-> +    if (*m_data) {
-> +        (*m_data)->valid = 0;
->      }
->  
->      /* due to L2 table margins all bytes may not get allocated at once */
-> @@ -1768,9 +1831,11 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
->      uint64_t cluster_offset;
->      uint64_t bytes_done = 0;
->      uint64_t extent_size;
-> -    VmdkMetaData m_data;
-> +    VmdkMetaData *m_data;
->      uint32_t total_alloc_clusters = 0;
->  
-> +    m_data = g_malloc0(sizeof(*m_data));
-> +
->      if (DIV_ROUND_UP(offset, BDRV_SECTOR_SIZE) > bs->total_sectors) {
->          error_report("Wrong offset: offset=0x%" PRIx64
->                       " total_sectors=0x%" PRIx64,
-> @@ -1779,6 +1844,7 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
->      }
->  
->      while (bytes > 0) {
-> +        m_data->next = NULL;
->          extent = find_extent(s, offset >> BDRV_SECTOR_BITS, extent);
->          if (!extent) {
->              return -EIO;
-> @@ -1825,7 +1891,7 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
->                                          total_alloc_clusters;
->                  if (!zero_dry_run) {
->                      /* update L2 tables */
-> -                    if (vmdk_L2update(extent, &m_data, VMDK_GTE_ZEROED)
-> +                    if (vmdk_L2update(extent, m_data, zeroed)
->                              != VMDK_OK) {
->                          return -EIO;
->                      }
-> @@ -1839,10 +1905,9 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
->              if (ret) {
->                  return ret;
->              }
-> -            if (m_data.valid) {
-> +            if (m_data->valid) {
->                  /* update L2 tables */
-> -                if (vmdk_L2update(extent, &m_data,
-> -                                  cluster_offset >> BDRV_SECTOR_BITS)
-> +                if (vmdk_L2update(extent, m_data, zeroed)
->                          != VMDK_OK) {
->                      return -EIO;
->                  }
-> @@ -1852,6 +1917,13 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
->          offset += n_bytes;
->          bytes_done += n_bytes;
->  
-> +        while (m_data->next != NULL) {
-> +            VmdkMetaData *next;
-> +            next = m_data->next;
-> +            g_free(m_data);
-> +            m_data = next;
-> +        }
-> +
->          /* update CID on the first write every time the virtual disk is
->           * opened */
->          if (!s->cid_updated) {
-> @@ -1862,6 +1934,7 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
->              s->cid_updated = true;
->          }
->      }
-> +    g_free(m_data);
->      return 0;
->  }
->  
-> -- 
-> 2.6.2
-> 
-> 
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBKYXNvbiBXYW5nIFttYWlsdG86
+amFzb3dhbmdAcmVkaGF0LmNvbV0NCj4gU2VudDogRnJpZGF5LCBNYXJjaCAzMSwgMjAxNyAzOjE3
+IFBNDQo+IFRvOiBMaXUsIFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT47ICdQZXRlciBYdScgPHBl
+dGVyeEByZWRoYXQuY29tPg0KPiBDYzogTGFuLCBUaWFueXUgPHRpYW55dS5sYW5AaW50ZWwuY29t
+PjsgVGlhbiwgS2V2aW4gPGtldmluLnRpYW5AaW50ZWwuY29tPjsNCj4gJ21zdEByZWRoYXQuY29t
+JyA8bXN0QHJlZGhhdC5jb20+OyAnamFuLmtpc3prYUBzaWVtZW5zLmNvbScNCj4gPGphbi5raXN6
+a2FAc2llbWVucy5jb20+OyAnYmQuYXZpdkBnbWFpbC5jb20nIDxiZC5hdml2QGdtYWlsLmNvbT47
+ICdxZW11LQ0KPiBkZXZlbEBub25nbnUub3JnJyA8cWVtdS1kZXZlbEBub25nbnUub3JnPjsgJ2Fs
+ZXgud2lsbGlhbXNvbkByZWRoYXQuY29tJw0KPiA8YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20+
+OyAnRGF2aWQgR2lic29uJyA8ZGF2aWRAZ2lic29uLmRyb3BiZWFyLmlkLmF1Pg0KPiBTdWJqZWN0
+OiBSZTogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NyAxNC8xN10gbWVtb3J5OiBhZGQNCj4gTWVtb3J5
+UmVnaW9uSU9NTVVPcHMucmVwbGF5KCkgY2FsbGJhY2sNCj4gDQo+IA0KPiANCj4gT24gMjAxN+W5
+tDAz5pyIMzHml6UgMTM6MzQsIExpdSwgWWkgTCB3cm90ZToNCj4gPj4gLS0tLS1PcmlnaW5hbCBN
+ZXNzYWdlLS0tLS0NCj4gPj4gRnJvbTogSmFzb24gV2FuZyBbbWFpbHRvOmphc293YW5nQHJlZGhh
+dC5jb21dDQo+ID4+IFNlbnQ6IFRodXJzZGF5LCBNYXJjaCAzMCwgMjAxNyA3OjU4IFBNDQo+ID4+
+IFRvOiBMaXUsIFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT47ICdQZXRlciBYdScgPHBldGVyeEBy
+ZWRoYXQuY29tPg0KPiA+PiBDYzogJ2FsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tJyA8YWxleC53
+aWxsaWFtc29uQHJlZGhhdC5jb20+OyBMYW4sDQo+ID4+IFRpYW55dSA8dGlhbnl1LmxhbkBpbnRl
+bC5jb20+OyBUaWFuLCBLZXZpbiA8a2V2aW4udGlhbkBpbnRlbC5jb20+Ow0KPiAnbXN0QHJlZGhh
+dC5jb20nDQo+ID4+IDxtc3RAcmVkaGF0LmNvbT47ICdqYW4ua2lzemthQHNpZW1lbnMuY29tJyA8
+amFuLmtpc3prYUBzaWVtZW5zLmNvbT47DQo+ID4+ICdiZC5hdml2QGdtYWlsLmNvbScgPGJkLmF2
+aXZAZ21haWwuY29tPjsgJ0RhdmlkIEdpYnNvbicNCj4gPj4gPGRhdmlkQGdpYnNvbi5kcm9wYmVh
+ci5pZC5hdT47ICdxZW11LWRldmVsQG5vbmdudS5vcmcnIDxxZW11LQ0KPiA+PiBkZXZlbEBub25n
+bnUub3JnPg0KPiA+PiBTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NyAxNC8xN10g
+bWVtb3J5OiBhZGQNCj4gPj4gTWVtb3J5UmVnaW9uSU9NTVVPcHMucmVwbGF5KCkgY2FsbGJhY2sN
+Cj4gPj4NCj4gPj4NCj4gPj4NCj4gPj4gT24gMjAxN+W5tDAz5pyIMzDml6UgMTk6MDYsIExpdSwg
+WWkgTCB3cm90ZToNCj4gPj4+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+Pj4+IEZy
+b206IExpdSwgWWkgTA0KPiA+Pj4+IFNlbnQ6IE1vbmRheSwgTWFyY2ggMjcsIDIwMTcgNToyMiBQ
+TQ0KPiA+Pj4+IFRvOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+ID4+Pj4gQ2M6IGFs
+ZXgud2lsbGlhbXNvbkByZWRoYXQuY29tOyBMYW4sIFRpYW55dSA8dGlhbnl1LmxhbkBpbnRlbC5j
+b20+Ow0KPiA+Pj4+IFRpYW4sIEtldmluIDxrZXZpbi50aWFuQGludGVsLmNvbT47IG1zdEByZWRo
+YXQuY29tOw0KPiA+Pj4+IGphbi5raXN6a2FAc2llbWVucy5jb207IGphc293YW5nQHJlZGhhdC5j
+b207IGJkLmF2aXZAZ21haWwuY29tOw0KPiA+Pj4+IERhdmlkIEdpYnNvbiA8ZGF2aWRAZ2lic29u
+LmRyb3BiZWFyLmlkLmF1PjsgcWVtdS1kZXZlbEBub25nbnUub3JnDQo+ID4+Pj4gU3ViamVjdDog
+UkU6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjcgMTQvMTddIG1lbW9yeTogYWRkDQo+ID4+Pj4gTWVt
+b3J5UmVnaW9uSU9NTVVPcHMucmVwbGF5KCkgY2FsbGJhY2sNCj4gPj4+Pg0KPiA+Pj4+PiAtLS0t
+LU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+Pj4+PiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBl
+dGVyeEByZWRoYXQuY29tXQ0KPiA+Pj4+PiBTZW50OiBNb25kYXksIE1hcmNoIDI3LCAyMDE3IDU6
+MTIgUE0NCj4gPj4+Pj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVAaW50ZWwuY29tPg0KPiA+Pj4+
+PiBDYzogYWxleC53aWxsaWFtc29uQHJlZGhhdC5jb207IExhbiwgVGlhbnl1DQo+ID4+Pj4+IDx0
+aWFueXUubGFuQGludGVsLmNvbT47IFRpYW4sIEtldmluIDxrZXZpbi50aWFuQGludGVsLmNvbT47
+DQo+ID4+Pj4+IG1zdEByZWRoYXQuY29tOyBqYW4ua2lzemthQHNpZW1lbnMuY29tOyBqYXNvd2Fu
+Z0ByZWRoYXQuY29tOw0KPiA+Pj4+PiBiZC5hdml2QGdtYWlsLmNvbTsgRGF2aWQgR2lic29uIDxk
+YXZpZEBnaWJzb24uZHJvcGJlYXIuaWQuYXU+Ow0KPiA+Pj4+PiBxZW11LWRldmVsQG5vbmdudS5v
+cmcNCj4gPj4+Pj4gU3ViamVjdDogUmU6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjcgMTQvMTddIG1l
+bW9yeTogYWRkDQo+ID4+Pj4+IE1lbW9yeVJlZ2lvbklPTU1VT3BzLnJlcGxheSgpIGNhbGxiYWNr
+DQo+ID4+Pj4+DQo+ID4+Pj4+IE9uIE1vbiwgTWFyIDI3LCAyMDE3IGF0IDA4OjM1OjA1QU0gKzAw
+MDAsIExpdSwgWWkgTCB3cm90ZToNCj4gPj4+Pj4+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0t
+LQ0KPiA+Pj4+Pj4+IEZyb206IFFlbXUtZGV2ZWwNCj4gPj4+Pj4+PiBbbWFpbHRvOnFlbXUtZGV2
+ZWwtYm91bmNlcyt5aS5sLmxpdT1pbnRlbC5jb21Abm9uZ251Lm9yZ10gT24NCj4gPj4+Pj4+PiBC
+ZWhhbGYgT2YgUGV0ZXIgWHUNCj4gPj4+Pj4+PiBTZW50OiBUdWVzZGF5LCBGZWJydWFyeSA3LCAy
+MDE3IDQ6MjggUE0NCj4gPj4+Pj4+PiBUbzogcWVtdS1kZXZlbEBub25nbnUub3JnDQo+ID4+Pj4+
+Pj4gQ2M6IExhbiwgVGlhbnl1IDx0aWFueXUubGFuQGludGVsLmNvbT47IFRpYW4sIEtldmluDQo+
+ID4+Pj4+Pj4gPGtldmluLnRpYW5AaW50ZWwuY29tPjsgbXN0QHJlZGhhdC5jb207IGphbi5raXN6
+a2FAc2llbWVucy5jb207DQo+ID4+Pj4+Pj4gamFzb3dhbmdAcmVkaGF0LmNvbTsgcGV0ZXJ4QHJl
+ZGhhdC5jb207DQo+ID4+Pj4+Pj4gYWxleC53aWxsaWFtc29uQHJlZGhhdC5jb207IGJkLmF2aXZA
+Z21haWwuY29tOyBEYXZpZCBHaWJzb24NCj4gPj4+Pj4+PiA8ZGF2aWRAZ2lic29uLmRyb3BiZWFy
+LmlkLmF1Pg0KPiA+Pj4+Pj4+IFN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjcgMTQvMTdd
+IG1lbW9yeTogYWRkDQo+ID4+Pj4+Pj4gTWVtb3J5UmVnaW9uSU9NTVVPcHMucmVwbGF5KCkgY2Fs
+bGJhY2sNCj4gPj4+Pj4+Pg0KPiA+Pj4+Pj4+IE9yaWdpbmFsbHkgd2UgaGF2ZSBvbmUgbWVtb3J5
+X3JlZ2lvbl9pb21tdV9yZXBsYXkoKSBmdW5jdGlvbiwNCj4gPj4+Pj4+PiB3aGljaCBpcyB0aGUg
+ZGVmYXVsdCBiZWhhdmlvciB0byByZXBsYXkgdGhlIHRyYW5zbGF0aW9ucyBvZiB0aGUNCj4gPj4+
+Pj4+PiB3aG9sZSBJT01NVSByZWdpb24uIEhvd2V2ZXIsIG9uIHNvbWUgcGxhdGZvcm0gbGlrZSB4
+ODYsIHdlIG1heQ0KPiA+Pj4+Pj4+IHdhbnQgb3VyIG93bg0KPiA+Pj4+PiByZXBsYXkgbG9naWMg
+Zm9yIElPTU1VIHJlZ2lvbnMuDQo+ID4+Pj4+Pj4gVGhpcyBwYXRjaCBhZGQgb25lIG1vcmUgaG9v
+ayBmb3IgSU9NTVVPcHMgZm9yIHRoZSBjYWxsYmFjaywgYW5kDQo+ID4+Pj4+Pj4gaXQnbGwgb3Zl
+cnJpZGUgdGhlIGRlZmF1bHQgaWYgc2V0Lg0KPiA+Pj4+Pj4+DQo+ID4+Pj4+Pj4gU2lnbmVkLW9m
+Zi1ieTogUGV0ZXIgWHUgPHBldGVyeEByZWRoYXQuY29tPg0KPiA+Pj4+Pj4+IC0tLQ0KPiA+Pj4+
+Pj4+ICAgIGluY2x1ZGUvZXhlYy9tZW1vcnkuaCB8IDIgKysNCj4gPj4+Pj4+PiAgICBtZW1vcnku
+YyAgICAgICAgICAgICAgfCA2ICsrKysrKw0KPiA+Pj4+Pj4+ICAgIDIgZmlsZXMgY2hhbmdlZCwg
+OCBpbnNlcnRpb25zKCspDQo+ID4+Pj4+Pj4NCj4gPj4+Pj4+PiBkaWZmIC0tZ2l0IGEvaW5jbHVk
+ZS9leGVjL21lbW9yeS5oIGIvaW5jbHVkZS9leGVjL21lbW9yeS5oIGluZGV4DQo+ID4+Pj4+Pj4g
+MDc2Nzg4OC4uMzBiMmE3NCAxMDA2NDQNCj4gPj4+Pj4+PiAtLS0gYS9pbmNsdWRlL2V4ZWMvbWVt
+b3J5LmgNCj4gPj4+Pj4+PiArKysgYi9pbmNsdWRlL2V4ZWMvbWVtb3J5LmgNCj4gPj4+Pj4+PiBA
+QCAtMTkxLDYgKzE5MSw4IEBAIHN0cnVjdCBNZW1vcnlSZWdpb25JT01NVU9wcyB7DQo+ID4+Pj4+
+Pj4gICAgICAgIHZvaWQgKCpub3RpZnlfZmxhZ19jaGFuZ2VkKShNZW1vcnlSZWdpb24gKmlvbW11
+LA0KPiA+Pj4+Pj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgSU9NTVVOb3Rp
+ZmllckZsYWcgb2xkX2ZsYWdzLA0KPiA+Pj4+Pj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgSU9NTVVOb3RpZmllckZsYWcgbmV3X2ZsYWdzKTsNCj4gPj4+Pj4+PiArICAgIC8q
+IFNldCB0aGlzIHVwIHRvIHByb3ZpZGUgY3VzdG9taXplZCBJT01NVSByZXBsYXkgZnVuY3Rpb24g
+Ki8NCj4gPj4+Pj4+PiArICAgIHZvaWQgKCpyZXBsYXkpKE1lbW9yeVJlZ2lvbiAqaW9tbXUsIElP
+TU1VTm90aWZpZXINCj4gPj4+Pj4+PiArICpub3RpZmllcik7DQo+ID4+Pj4+Pj4gICAgfTsNCj4g
+Pj4+Pj4+Pg0KPiA+Pj4+Pj4+ICAgIHR5cGVkZWYgc3RydWN0IENvYWxlc2NlZE1lbW9yeVJhbmdl
+IENvYWxlc2NlZE1lbW9yeVJhbmdlOw0KPiA+Pj4+Pj4+IGRpZmYgLS1naXQgYS9tZW1vcnkuYyBi
+L21lbW9yeS5jIGluZGV4IDdhNGYyZjkuLjljMjUzY2MgMTAwNjQ0DQo+ID4+Pj4+Pj4gLS0tIGEv
+bWVtb3J5LmMNCj4gPj4+Pj4+PiArKysgYi9tZW1vcnkuYw0KPiA+Pj4+Pj4+IEBAIC0xNjMwLDYg
+KzE2MzAsMTIgQEAgdm9pZA0KPiA+Pj4+Pj4+IG1lbW9yeV9yZWdpb25faW9tbXVfcmVwbGF5KE1l
+bW9yeVJlZ2lvbg0KPiA+Pj4+Pj4+ICptciwgSU9NTVVOb3RpZmllciAqbiwNCj4gPj4+Pj4+PiAg
+ICAgICAgaHdhZGRyIGFkZHIsIGdyYW51bGFyaXR5Ow0KPiA+Pj4+Pj4+ICAgICAgICBJT01NVVRM
+QkVudHJ5IGlvdGxiOw0KPiA+Pj4+Pj4+ICsgICAgLyogSWYgdGhlIElPTU1VIGhhcyBpdHMgb3du
+IHJlcGxheSBjYWxsYmFjaywgb3ZlcnJpZGUgKi8NCj4gPj4+Pj4+PiArICAgIGlmIChtci0+aW9t
+bXVfb3BzLT5yZXBsYXkpIHsNCj4gPj4+Pj4+PiArICAgICAgICBtci0+aW9tbXVfb3BzLT5yZXBs
+YXkobXIsIG4pOw0KPiA+Pj4+Pj4+ICsgICAgICAgIHJldHVybjsNCj4gPj4+Pj4+PiArICAgIH0N
+Cj4gPj4+Pj4+IEhpIEFsZXgsIFBldGVyLA0KPiA+Pj4+Pj4NCj4gPj4+Pj4+IFdpbGwgYWxsIHRo
+ZSBvdGhlciB2ZW5kb3JzKGUuZy4gUFBDLCBzMzkwLCBBUk0pIGFkZCB0aGVpciBvd24NCj4gPj4+
+Pj4+IHJlcGxheSBjYWxsYmFjayBhcyB3ZWxsPyBJIGd1ZXNzIGl0IGRlcGVuZHMgb24gd2hldGhl
+ciB0aGUNCj4gPj4+Pj4+IG9yaWdpbmFsIHJlcGxheSBhbGdvcml0aG0gd29yayB3ZWxsIGZvciB0
+aGVtPyBEbyB5b3UgaGF2ZSBzdWNoIGtub3dsZWRnZT8NCj4gPj4+Pj4gSSBndWVzcyBzby4gQXQg
+bGVhc3QgZm9yIFZULWQgd2UgaGFkIHRoaXMgY2FsbGJhY2sgc2luY2UgdGhlDQo+ID4+Pj4+IGRl
+ZmF1bHQgcmVwbGF5IG1lY2hhbmlzbSBkaWQgbm90IHdvcmsgd2VsbCBvbiB4ODYgZHVlIHRvIGl0
+cw0KPiA+Pj4+PiBleHRyZW1lbHkgbGFyZ2UgbWVtb3J5IHJlZ2lvbiBzaXplLiBUaGFua3MsDQo+
+ID4+Pj4gdGh4LiB0aGF0IHdvdWxkIG1ha2Ugc2Vuc2UuDQo+ID4+PiBQZXRlciwNCj4gPj4+DQo+
+ID4+PiBKdXN0IGNvbWUgdG8gbWluZCB0aGF0IHRoZXJlIG1heSBiZSBhIGNvcm5lciBjYXNlIGhl
+cmUuDQo+ID4+Pg0KPiA+Pj4gSW50ZWwgVlQtZCBhY3R1YWxseSBoYXMgYSAicHQiIG1vZGUgd2hp
+Y2ggYWxsb3dzIGRldmljZSB1c2UgcGh5c2ljYWwNCj4gPj4+IGFkZHJlc3MgZXZlbiB3aGVuIFZU
+LWQgaXMgZW5hYmxlZC4gSW4ga2VybmVsLCB0aGVyZSBpcyBhDQo+IGlvbW11X2lkZW50aXR5X21h
+cHBpbmcuDQo+ID4+PiBJZiBhIGRldmljZSBpcyBpbiB0aGlzIG1hcCwgdGhlbiBpdCB3b3VsZCB1
+c2UgInB0IiBtb2RlLiBTbyB0aGF0DQo+ID4+PiBJT01NVSBkcml2ZXIgd291bGQgbm90IGJ1aWxk
+IHNlY29uZC1sZXZlbCBwYWdlIHRhYmxlIGZvciBpdC4NCj4gPj4gWWVzLCBidXQgcWVtdSBkb2Vz
+IG5vdCBzdXBwb3J0IEVDQVBfUFQgbm93LCBzbyBndWVzdCB3aWxsIHN0aWxsIGhhdmUNCj4gPj4g
+YSBwYWdlIHRhYmxlIGluIHRoaXMgY2FzZS4NCj4gPiBUaGF0J3MgdHJ1ZS4gV2l0aG91dCBFQ0FQ
+X1BULCBJT01NVSBkcml2ZXIgd291bGQgY3JlYXRlIGEgMToxIG1hcC4gU28NCj4gPiB0aGlzIHNv
+bHV0aW9uIGNhbiB3b3JrIHdlbGwgZXZlbiBhIGRldmljZSBpcyBpbiBpZGVudGlmeV9tYXAuDQo+
+ID4NCj4gPj4+IEJhY2sgdG8gdGhlIHZpcnR1YWwgSU9WQSBpbXBsZW1lbnRhdGlvbiwgaWYgYW4g
+YXNzaWduZWQgZGV2aWNlIGlzIGluDQo+ID4+PiB0aGUgaW9tbXVfaWRlbnRpdHlfbWFwcGluZyhl
+LmcuIFZHQSBjb250cm9sbGVyKSwgaXQgdXNlcyBHUEEgZGlyZWN0bHkgdG8gZG8NCj4gRE1BLg0K
+PiA+Pj4gU28gaXQgZGVtYW5kcyBhIEdQQS0+SFBBIG1hcHBpbmcgaW4gaG9zdC4gSG93ZXZlciwg
+dGhlDQo+ID4+PiBpb21tdS0+b3BzLnJlcGxheSBpcyBub3QgYWJsZSB0byBidWlsZCBpdCB3aGVu
+IGd1ZXN0IFNMIHBhZ2UgdGFibGUgaXMgZW1wdHkuDQo+ID4+Pg0KPiA+Pj4gU28gSSB0aGluayBi
+dWlsZGluZyBhbiBlbnRpcmUgZ3Vlc3QgUEEtPkhQQSBtYXBwaW5nIGJlZm9yZSBndWVzdA0KPiA+
+Pj4ga2VybmVsIGJvb3Qgd291bGQgYmUgcmVjb21tZW5kZWQuIEFueSB0aG91Z2h0cz8NCj4gPj4g
+V2UgcGxhbiB0byBhZGQgUFQgaW4gMi4xMCwgYSBwb3NzaWJsZSByb3VnaCBpZGVhIGlzIGRpc2Fi
+bGVkIGlvbW11DQo+ID4+IGRtYXIgcmVnaW9uIGFuZCB1c2UgYW5vdGhlciByZWdpb24gd2l0aG91
+dCBpb21tdV9vcHMuIFRoZW4NCj4gPj4gdmZpb19saXN0ZW5lcl9yZWdpb25fYWRkKCkgd2lsbCBq
+dXN0IGRvIHRoZSBjb3JyZWN0IG1hcHBpbmdzLg0KPiA+IEdvb2QgdG8ga25vdyBpdC4gQWN0dWFs
+bHksIEkgYWxzbyBuZWVkIHRvIGV4cG9zZSBFQ0FQX1BUIGZvciB2U1ZNLiBTbw0KPiA+IGp1c3Qg
+Y29tZXMgdG8gcmVhbGl6ZSB0aGF0IHRoZSBjdXJyZW50IHJlcGxheSBzb2x1dGlvbiBtYXkgbm90
+IHdvcmsgd2VsbCB3aGVuIEkNCj4gZXhwb3NlIEVDQVBfUFQgdG8gZ3Vlc3QuDQo+ID4gSSBhbHNv
+IGhhdmUgYSByb3VnaCBpZGVhIGhlcmUuIFRoZSBjdXJyZW50IGxpc3RlbmVyIGluIGNvbnRhaW5l
+cg0KPiA+IGxpc3RlbnMgdG8gYWRkcmVzcyBzcGFjZSBuYW1lZCB3aXRoIGRldmZuIGlmIHZpcnR1
+YWwgVlRkIGlzIGFkZGVkLiBIb3cNCj4gPiBhYm91dCBhZGRpbmcgb25lIG1vcmUgbGlzdGVuZXIg
+dG8gbGlzdGVuIG1lbW9yeSBhZGRyZXNzIHNwYWNlLiBTbyB0aGF0IHRoZQ0KPiBsaXN0ZW5lciBj
+YW4gYnVpbGQgZW50aXJlIGd1ZXN0IFBBLT5IUEEgbWFwcGluZy4NCj4gDQo+IFRoaXMgaXMgb25s
+eSBuZWVkZWQgZm9yIFBULiBTbyBsb29rcyBsaWtlIGN1cnJlbnQgY29kZSBpcyBzdWZmaWNpZW50
+IHRvIGRvIHRoaXMgSSB0aGluay4NCj4gU2VlIHRoZSBlbHNlIHBhcnQgb2YgaWYgKG1lbW9yeV9y
+ZWdpb25faXNfaW9tbXUoKSkgb2YgdmZpb19saXN0ZW5lcl9yZWdpb25fYWRkKCkuDQoNCkphc29u
+LCB3aGVuIHRoZSBsaXN0ZW5lciBsaXN0ZW4gdG8gZGV2aWNlIGFkZHJlc3Mgc3BhY2UsIHRoZSAi
+ZWxzZSBwYXJ0IiBtYXkgbm90IHdvcmsNCmV2ZW4gd2Ugc2V0IHRoZSBtci0+aW9tbXVfb3BzID0g
+TlVMTC4gVGhlIG1yIHdvdWxkIGJlIGEgbm9uLXJhbSByZWdpb24gd2hlbiB0aGUNCnRpbWUgcmVn
+aW9uX2FkZCBpcyBjYWxsZWQgc2luY2UgaXQgaXMgYWN0dWFsbHkgbGlzdGVuIHRvIGNoYW5nZXMg
+ZnJvbSBkZXZpY2UgYWRkcmVzcyBzcGFjZS4NCg0KUmVnYXJkcywNCllpIEwNCg0K
