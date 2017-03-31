@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ctpSf-0008UP-4T
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 01:51:02 -0400
+	(envelope-from <famz@redhat.com>) id 1ctpU3-0000fd-JS
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 01:52:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ctpSc-0004M5-2e
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 01:51:01 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44853)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ctpSb-0004Jw-Rg
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 01:50:57 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ctpSZ-0004cs-1u
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 05:50:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5AF092E80D0
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 05:50:51 +0000 (UTC)
+	(envelope-from <famz@redhat.com>) id 1ctpU2-00065Q-OH
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 01:52:27 -0400
+Date: Fri, 31 Mar 2017 13:52:15 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170331055215.GB11195@lemon.lan>
+References: <1490440701-12037-1-git-send-email-ashijeetacharya@gmail.com>
+	<1490440701-12037-2-git-send-email-ashijeetacharya@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 31 Mar 2017 05:36:36 -0000
-From: baoxue <1675333@bugs.launchpad.net>
-Reply-To: Bug 1675333 <1675333@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170323092535.30899.661.malonedeb@wampee.canonical.com>
-Message-Id: <20170331053636.627.20081.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1675333] Re: qemu-system crashes when use
- sheepdog driver
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1490440701-12037-2-git-send-email-ashijeetacharya@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/7] vmdk: Refactor and introduce new
+ helper functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,25 +24,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, stefanha@gmail.com, qemu-devel@nongnu.org, mreitz@redhat.com, jsnow@redhat.com
 
-why this bug is Invalid?
-U can view my upload file and qemu/block/sheepdog.c differences.
+On Sat, 03/25 16:48, Ashijeet Acharya wrote:
+> Move the existing vmdk_find_offset_in_cluster() function to the top of
+> the driver. Also, introduce a new helper function size_to_clusters()
+> which returns the number of clusters for a given size in bytes. Here,
+> we leave the last cluster as we need to perform COW for that one.
+> 
+> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+> ---
+>  block/vmdk.c | 32 ++++++++++++++++++++------------
+>  1 file changed, 20 insertions(+), 12 deletions(-)
+> 
+> diff --git a/block/vmdk.c b/block/vmdk.c
+> index a9bd22b..7795c5f 100644
+> --- a/block/vmdk.c
+> +++ b/block/vmdk.c
+> @@ -242,6 +242,26 @@ static void vmdk_free_last_extent(BlockDriverState *bs)
+>      s->extents = g_renew(VmdkExtent, s->extents, s->num_extents);
+>  }
+>  
+> +static inline uint64_t vmdk_find_offset_in_cluster(VmdkExtent *extent,
+> +                                                   int64_t offset)
+> +{
+> +    uint64_t extent_begin_offset, extent_relative_offset;
+> +    uint64_t cluster_size = extent->cluster_sectors * BDRV_SECTOR_SIZE;
+> +
+> +    extent_begin_offset =
+> +        (extent->end_sector - extent->sectors) * BDRV_SECTOR_SIZE;
+> +    extent_relative_offset = offset - extent_begin_offset;
+> +    return extent_relative_offset % cluster_size;
+> +}
 
--- =
+Code movement and new code are usually in separate patches.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1675333
+> +
+> +static inline uint64_t size_to_clusters(VmdkExtent *extent, uint64_t size)
+> +{
+> +    uint64_t cluster_size, round_off_size;
+> +    cluster_size = extent->cluster_sectors * BDRV_SECTOR_SIZE;
+> +    round_off_size = cluster_size - (size % cluster_size);
+> +    return ((size + round_off_size) >> 16) - 1;
 
-Title:
-  qemu-system crashes when use sheepdog driver
+Why hardcode 16? You can use DIV_ROUND_UP().
 
-Status in QEMU:
-  Invalid
+> +}
+> +
 
-Bug description:
-  Already solved.
+Usually a static function is added in the patch that actually uses it, which
+makes reviewing easier.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1675333/+subscriptions
+Fam
+
+>  static uint32_t vmdk_read_cid(BlockDriverState *bs, int parent)
+>  {
+>      char *desc;
+> @@ -1266,18 +1286,6 @@ static VmdkExtent *find_extent(BDRVVmdkState *s,
+>      return NULL;
+>  }
+>  
+> -static inline uint64_t vmdk_find_offset_in_cluster(VmdkExtent *extent,
+> -                                                   int64_t offset)
+> -{
+> -    uint64_t extent_begin_offset, extent_relative_offset;
+> -    uint64_t cluster_size = extent->cluster_sectors * BDRV_SECTOR_SIZE;
+> -
+> -    extent_begin_offset =
+> -        (extent->end_sector - extent->sectors) * BDRV_SECTOR_SIZE;
+> -    extent_relative_offset = offset - extent_begin_offset;
+> -    return extent_relative_offset % cluster_size;
+> -}
+> -
+>  static inline uint64_t vmdk_find_index_in_cluster(VmdkExtent *extent,
+>                                                    int64_t sector_num)
+>  {
+> -- 
+> 2.6.2
+> 
+> 
