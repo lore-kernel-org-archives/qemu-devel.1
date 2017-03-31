@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cttsh-0001y9-6Y
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 06:34:12 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1cttxh-000372-5I
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 06:39:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cttse-0004Pj-1m
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 06:34:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51025)
+	(envelope-from <dgilbert@redhat.com>) id 1cttxe-00086X-0v
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 06:39:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56896)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1cttsd-0004OF-Ph
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 06:34:07 -0400
-References: <20170331044711.21749-1-aik@ozlabs.ru>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <c436e7e1-83be-e30f-5ce9-aa3b993d6be2@redhat.com>
-Date: Fri, 31 Mar 2017 12:33:56 +0200
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cttxd-00086D-RG
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 06:39:17 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 730E6C0567B5
+	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 10:39:16 +0000 (UTC)
+Date: Fri, 31 Mar 2017 11:39:11 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170331103911.GB4514@work-vm>
+References: <20170331102521.29253-1-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170331044711.21749-1-aik@ozlabs.ru>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="XTUR26Uen7UkshC5klaqV6h9wVEluGbeU"
-Subject: Re: [Qemu-devel] [PATCH qemu] pci: Only unmap
- bus_master_enabled_region if was added previously
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170331102521.29253-1-kraxel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] xhci: flush dequeue pointer to endpoint
+ context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,102 +33,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, John Snow <jsnow@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XTUR26Uen7UkshC5klaqV6h9wVEluGbeU
-From: Max Reitz <mreitz@redhat.com>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
- Marcel Apfelbaum <marcel@redhat.com>, John Snow <jsnow@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c436e7e1-83be-e30f-5ce9-aa3b993d6be2@redhat.com>
-Subject: Re: [PATCH qemu] pci: Only unmap bus_master_enabled_region if was
- added previously
-References: <20170331044711.21749-1-aik@ozlabs.ru>
-In-Reply-To: <20170331044711.21749-1-aik@ozlabs.ru>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+* Gerd Hoffmann (kraxel@redhat.com) wrote:
+> When done processing a endpoint ring we must update the dequeue pointer
+> in the endpoint context in guest memory.  This is needed to make sure
+> the guest has a correct view of things and also to make live migration
+> work properly, because xhci post_load restores alot of the state from
+> xhci data structures in guest memory.
+> 
+> Add xhci_set_ep_state() call to do that.
+> 
+> The recursive calls stopped by commit
+> ddb603ab6c981c1d67cb42266fc700c33e5b2d8f had the (unintentional) side
+> effect to hiding this bug.  xhci_set_ep_state() was called before
+> processing, to set the state to running, which updated the dequeue
+> pointer too.
+> 
+> Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
-On 31.03.2017 06:47, Alexey Kardashevskiy wrote:
-> Normally pci_init_bus_master() would be called either via
-> bus->machine_done.notify or directly from do_pci_register_device().
->=20
-> However if a device's realize() failed, pci_init_bus_master() is not
-> called, and do_pci_unregister_device() fails on
-> memory_region_del_subregion() as it was not mapped.
->=20
-> This adds a check that subregion was mapped before unmapping it.
->=20
-> Fixes: c53598ed18e4 ("pci: Add missing drop of bus master AS reference"=
-)
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Tested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+Thanks, that passes the basic test reported in the bz; boot the VM,
+lsblk, migrate, fdisk -l
+
+Dave
+
 > ---
-> This is to pass iotest 051 which does run QEMU like this:
->=20
-> ppc64-softmmu/qemu-system-ppc64 -nodefaults -machine accel=3Dqtest -nog=
-raphic -monitor stdio -serial none -drive if=3Dvirtio
->=20
-> which normally fails with:
->=20
-> qemu-system-ppc64: -drive if=3Dvirtio: Device needs media, but drive is=
- empty
->=20
-> or asserts (without this patch):
->=20
-> qemu-system-ppc64: /home/aik/p/qemu-kvm/memory.c:2118: memory_region_de=
-l_subregion: Assertion `subregion->container =3D=3D mr' failed.
-> ---
->  hw/pci/pci.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index bd8043c460..259483b1c0 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -869,8 +869,10 @@ static void do_pci_unregister_device(PCIDevice *pc=
-i_dev)
->      pci_dev->bus->devices[pci_dev->devfn] =3D NULL;
->      pci_config_free(pci_dev);
-> =20
-> -    memory_region_del_subregion(&pci_dev->bus_master_container_region,=
-
-> -                                &pci_dev->bus_master_enable_region);
-> +    if (memory_region_is_mapped(&pci_dev->bus_master_enable_region)) {=
-
-> +        memory_region_del_subregion(&pci_dev->bus_master_container_reg=
-ion,
-> +                                    &pci_dev->bus_master_enable_region=
-);
-> +    }
->      address_space_destroy(&pci_dev->bus_master_as);
->  }
-
-I'm not sure whether it's generally assumed to be safe to call
-memory_region_is_mapped() on "uninitialized" memory regions
-(bus_master_enable_region is just completely zeroed out before
-pci_init_bus_master(), as far as I can see and guess), but it certainly
-works in practice, so:
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---XTUR26Uen7UkshC5klaqV6h9wVEluGbeU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljeMJQSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A5p8H/29iUT81dpJNSXSlj2zKp8pOqYcKutB+
-ocRUhxHz/+1CUXAFyGSsklkw30DVOGWkPlwrvy0Ly7oUhnMsTWEll4kIFVDy7d8B
-oCYFCKD3bu2A7UDdzCKTEvV2v3eFHXvBntdBZlx2c7iyTOjdbDQSBlW+EhGKq0qN
-NoYyUJpVruskBJ+LXGbrlL7zkGYaH3rsESkaWpL/pH1Dvcf7UiuOMftKOhdeAiLu
-g2BnB0qqzYjFwDqSOFxunshwmW5htXjWSGeZBcxH9AR+KVPTHvh7oHZY52SJWubn
-Op1Iaq4KzgO/NAk6HKttLX5r4oLgcjrTx7/Nf20HpRzfb8eaYu4Mfuk=
-=fBtq
------END PGP SIGNATURE-----
-
---XTUR26Uen7UkshC5klaqV6h9wVEluGbeU--
+>  hw/usb/hcd-xhci.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+> index 8958f95..a6929e5 100644
+> --- a/hw/usb/hcd-xhci.c
+> +++ b/hw/usb/hcd-xhci.c
+> @@ -2063,7 +2063,7 @@ static void xhci_kick_ep(XHCIState *xhci, unsigned int slotid,
+>  static void xhci_kick_epctx(XHCIEPContext *epctx, unsigned int streamid)
+>  {
+>      XHCIState *xhci = epctx->xhci;
+> -    XHCIStreamContext *stctx;
+> +    XHCIStreamContext *stctx = NULL;
+>      XHCITransfer *xfer;
+>      XHCIRing *ring;
+>      USBEndpoint *ep = NULL;
+> @@ -2192,6 +2192,8 @@ static void xhci_kick_epctx(XHCIEPContext *epctx, unsigned int streamid)
+>              break;
+>          }
+>      }
+> +    /* update ring dequeue ptr */
+> +    xhci_set_ep_state(xhci, epctx, stctx, epctx->state);
+>      epctx->kick_active--;
+>  
+>      ep = xhci_epid_to_usbep(epctx);
+> -- 
+> 2.9.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
