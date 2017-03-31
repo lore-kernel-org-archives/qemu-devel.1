@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ctmna-0005zI-V9
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 23:00:27 -0400
+	(envelope-from <peterx@redhat.com>) id 1ctmrX-0006nX-6Q
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 23:04:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ctmnX-0003Zv-TV
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 23:00:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50364)
+	(envelope-from <peterx@redhat.com>) id 1ctmrU-00065U-1Y
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 23:04:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41282)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ctmnX-0003ZZ-MA
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 23:00:23 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ctmrT-000652-Q5
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 23:04:27 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6C7B2C04B951
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 03:00:22 +0000 (UTC)
-Date: Fri, 31 Mar 2017 11:00:15 +0800
+	by mx1.redhat.com (Postfix) with ESMTPS id D09A56AAC0
+	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 03:04:26 +0000 (UTC)
+Date: Fri, 31 Mar 2017 11:04:19 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170331030015.GD3981@pxdev.xzpeter.org>
+Message-ID: <20170331030419.GE3981@pxdev.xzpeter.org>
 References: <20170323204544.12015-1-quintela@redhat.com>
-	<20170323204544.12015-30-quintela@redhat.com>
-	<20170330064934.GG20667@pxdev.xzpeter.org>
-	<87d1cyn3w2.fsf@secure.mitica>
+	<20170323204544.12015-38-quintela@redhat.com>
+	<20170330075206.GA21915@pxdev.xzpeter.org>
+	<87shlulob7.fsf@secure.mitica>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <87d1cyn3w2.fsf@secure.mitica>
-Subject: Re: [Qemu-devel] [PATCH 29/51] ram: Move last_req_rb to RAMState
+In-Reply-To: <87shlulob7.fsf@secure.mitica>
+Subject: Re: [Qemu-devel] [PATCH 37/51] ram: Move compression_switch to
+ RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,63 +39,102 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Juan Quintela <quintela@redhat.com>
 Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
 
-On Thu, Mar 30, 2017 at 06:08:45PM +0200, Juan Quintela wrote:
+On Thu, Mar 30, 2017 at 06:30:36PM +0200, Juan Quintela wrote:
 > Peter Xu <peterx@redhat.com> wrote:
-> > On Thu, Mar 23, 2017 at 09:45:22PM +0100, Juan Quintela wrote:
-> >> It was on MigrationState when it is only used inside ram.c for
-> >> postcopy.  Problem is that we need to access it without being able to
-> >> pass it RAMState directly.
+> > On Thu, Mar 23, 2017 at 09:45:30PM +0100, Juan Quintela wrote:
+> >> Rename it to preffer_xbzrle that is a more descriptive name.
+> >
+> > s/preffer/prefer/?
+> >        
 > >> 
 > >> Signed-off-by: Juan Quintela <quintela@redhat.com>
 > >> ---
-> >>  include/migration/migration.h | 2 --
-> >>  migration/migration.c         | 1 -
-> >>  migration/ram.c               | 7 +++++--
-> >>  3 files changed, 5 insertions(+), 5 deletions(-)
+> >>  migration/ram.c | 9 +++++----
+> >>  1 file changed, 5 insertions(+), 4 deletions(-)
 > >> 
-> >> diff --git a/include/migration/migration.h b/include/migration/migration.h
-> >> index 84cef4b..e032fb0 100644
-> >> --- a/include/migration/migration.h
-> >> +++ b/include/migration/migration.h
-> >> @@ -189,8 +189,6 @@ struct MigrationState
-> >>      /* Queue of outstanding page requests from the destination */
-> >>      QemuMutex src_page_req_mutex;
-> >>      QSIMPLEQ_HEAD(src_page_requests, MigrationSrcPageRequest) src_page_requests;
-> >> -    /* The RAMBlock used in the last src_page_request */
-> >> -    RAMBlock *last_req_rb;
-> >>      /* The semaphore is used to notify COLO thread that failover is finished */
-> >>      QemuSemaphore colo_exit_sem;
-> >>  
-> >> diff --git a/migration/migration.c b/migration/migration.c
-> >> index e532430..b220941 100644
-> >> --- a/migration/migration.c
-> >> +++ b/migration/migration.c
-> >> @@ -1118,7 +1118,6 @@ MigrationState *migrate_init(const MigrationParams *params)
-> >>      s->postcopy_after_devices = false;
-> >>      s->postcopy_requests = 0;
-> >>      s->migration_thread_running = false;
-> >> -    s->last_req_rb = NULL;
-> >>      error_free(s->error);
-> >>      s->error = NULL;
-> >>  
 > >> diff --git a/migration/ram.c b/migration/ram.c
-> >> index dd5a453..325a0f3 100644
+> >> index 6a39704..591cf89 100644
 > >> --- a/migration/ram.c
 > >> +++ b/migration/ram.c
-> >> @@ -203,6 +203,8 @@ struct RAMState {
+> >> @@ -217,6 +217,9 @@ struct RAMState {
+> >>      uint64_t dirty_pages_rate;
+> >>      /* Count of requests incoming from destination */
+> >>      uint64_t postcopy_requests;
+> >> +    /* Should we move to xbzrle after the 1st round
+> >> +       of compression */
+> >> +    bool preffer_xbzrle;
+> >>      /* protects modification of the bitmap */
 > >>      QemuMutex bitmap_mutex;
 > >>      /* Ram Bitmap protected by RCU */
-> >>      RAMBitmap *ram_bitmap;
-> >> +    /* The RAMBlock used in the last src_page_request */
-> >                                                         ^ "s" missing
+> >> @@ -335,7 +338,6 @@ static QemuCond comp_done_cond;
+> >>  /* The empty QEMUFileOps will be used by file in CompressParam */
+> >>  static const QEMUFileOps empty_ops = { };
+> >>  
+> >> -static bool compression_switch;
+> >>  static DecompressParam *decomp_param;
+> >>  static QemuThread *decompress_threads;
+> >>  static QemuMutex decomp_done_lock;
+> >> @@ -419,7 +421,6 @@ void migrate_compress_threads_create(void)
+> >>      if (!migrate_use_compression()) {
+> >>          return;
+> >>      }
+> >> -    compression_switch = true;
+> >>      thread_count = migrate_compress_threads();
+> >>      compress_threads = g_new0(QemuThread, thread_count);
+> >>      comp_param = g_new0(CompressParam, thread_count);
+> >> @@ -1091,7 +1092,7 @@ static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss,
+> >>                   * point. In theory, xbzrle can do better than compression.
+> >>                   */
+> >>                  flush_compressed_data(rs);
+> >> -                compression_switch = false;
+> >> +                rs->preffer_xbzrle = true;
+> >>              }
+> >>          }
+> >>          /* Didn't find anything this time, but try again on the new block */
+> >> @@ -1323,7 +1324,7 @@ static int ram_save_target_page(RAMState *rs, MigrationState *ms,
+> >>      /* Check the pages is dirty and if it is send it */
+> >>      if (migration_bitmap_clear_dirty(rs, dirty_ram_abs)) {
+> >>          unsigned long *unsentmap;
+> >> -        if (compression_switch && migrate_use_compression()) {
+> >> +        if (!rs->preffer_xbzrle && migrate_use_compression()) {
 > >
-> > Besides:
+> > IIUC this prefer_xbzrle can be dynamically calculated by existing
+> > states:
+> >
+> > static inline bool ram_compression_active(RAMState *rs)
+> > {
+> >     /*
+> >      * If xbzrle is on, stop using the data compression after first
+> >      * round of migration even if compression is enabled. In theory,
+> >      * xbzrle can do better than compression.
+> >      */
+> >     return migrate_use_compression() && \
+> >            (rs->ram_bulk_stage || !migrate_use_xbzrle());
+> > }
+> >
+> > Then this line can be written as:
+> >
+> >     if (ram_compression_active(rs)) {
+> >
+> > And if so, we can get rid of prefer_xbzrle, right?
+> >
+> > Having prefer_xbzrle should be slightly faster though, since it'll at
+> > least cache the above calculation.
+> >
+> > Thanks,
 > 
-> The important one is only the last one, we don't really care about the
-> previous here, no?
+> You arrived to the same conclusion than Dave.  As it was only used once,
+> I didn't create the extra function.
 
-I preferred "src_page_requests" since that's the variable name (so
-then people can do symbol search on that). Anyway, that's trivial, so
-please feel free to ignore it. :-)
+I would still slightly prefer an extra function (of course I think
+it'll be definitely inlined) for readability, or in case we'll use it
+somewhere else in the future, then no need to think it twice.
+
+But I'm okay without it as well. :)
+
+> 
+> I stole your comment verbatim O:-)
+
+My pleasure!
 
 -- peterx
