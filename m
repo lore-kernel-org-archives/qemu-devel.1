@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ctmib-00047c-HC
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 22:55:18 -0400
+	(envelope-from <peterx@redhat.com>) id 1ctmjr-0004iQ-NE
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 22:56:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ctmiY-0000DG-EX
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 22:55:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52672)
+	(envelope-from <peterx@redhat.com>) id 1ctmjo-0001AB-Tv
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 22:56:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56556)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1ctmiY-0000CZ-8k
-	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 22:55:14 -0400
-Date: Thu, 30 Mar 2017 20:55:11 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170330205511.28be6306@t450s.home>
-In-Reply-To: <8082FF9BCB2B054996454E47167FF4EC1C4930B3@SHSMSX104.ccr.corp.intel.com>
-References: <1490869641-29873-1-git-send-email-xiong.y.zhang@intel.com>
-	<20170330090148.16048141@t450s.home>
-	<8082FF9BCB2B054996454E47167FF4EC1C4930B3@SHSMSX104.ccr.corp.intel.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ctmjo-00019V-Kp
+	for qemu-devel@nongnu.org; Thu, 30 Mar 2017 22:56:32 -0400
+Date: Fri, 31 Mar 2017 10:56:18 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170331025618.GB3981@pxdev.xzpeter.org>
+References: <1486456099-7345-1-git-send-email-peterx@redhat.com>
+	<1486456099-7345-15-git-send-email-peterx@redhat.com>
+	<A2975661238FB949B60364EF0F2C257439032C79@shsmsx102.ccr.corp.intel.com>
+	<20170327091208.GG11497@pxdev.xzpeter.org>
+	<A2975661238FB949B60364EF0F2C257439032D78@shsmsx102.ccr.corp.intel.com>
+	<A2975661238FB949B60364EF0F2C25743903553F@shsmsx102.ccr.corp.intel.com>
+	<9c3cda64-b4a3-6f9b-f951-bf73f6613faa@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Revert "vfio/pci-quirks.c: Disable stolen
- memory for igd VFIO"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <9c3cda64-b4a3-6f9b-f951-bf73f6613faa@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 14/17] memory: add
+ MemoryRegionIOMMUOps.replay() callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +34,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Zhang, Xiong Y" <xiong.y.zhang@intel.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Liu, Yi L" <yi.l.liu@intel.com>, "'alex.williamson@redhat.com'" <alex.williamson@redhat.com>, "Lan, Tianyu" <tianyu.lan@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, "'mst@redhat.com'" <mst@redhat.com>, "'jan.kiszka@siemens.com'" <jan.kiszka@siemens.com>, "'bd.aviv@gmail.com'" <bd.aviv@gmail.com>, 'David Gibson' <david@gibson.dropbear.id.au>, "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>
 
-On Fri, 31 Mar 2017 02:27:11 +0000
-"Zhang, Xiong Y" <xiong.y.zhang@intel.com> wrote:
+On Thu, Mar 30, 2017 at 07:57:38PM +0800, Jason Wang wrote:
+>=20
+>=20
+> On 2017=E5=B9=B403=E6=9C=8830=E6=97=A5 19:06, Liu, Yi L wrote:
+> >>-----Original Message-----
+> >>From: Liu, Yi L
+> >>Sent: Monday, March 27, 2017 5:22 PM
+> >>To: Peter Xu <peterx@redhat.com>
+> >>Cc: alex.williamson@redhat.com; Lan, Tianyu <tianyu.lan@intel.com>; T=
+ian, Kevin
+> >><kevin.tian@intel.com>; mst@redhat.com; jan.kiszka@siemens.com;
+> >>jasowang@redhat.com; bd.aviv@gmail.com; David Gibson
+> >><david@gibson.dropbear.id.au>; qemu-devel@nongnu.org
+> >>Subject: RE: [Qemu-devel] [PATCH v7 14/17] memory: add
+> >>MemoryRegionIOMMUOps.replay() callback
+> >>
+> >>>-----Original Message-----
+> >>>From: Peter Xu [mailto:peterx@redhat.com]
+> >>>Sent: Monday, March 27, 2017 5:12 PM
+> >>>To: Liu, Yi L <yi.l.liu@intel.com>
+> >>>Cc: alex.williamson@redhat.com; Lan, Tianyu <tianyu.lan@intel.com>;
+> >>>Tian, Kevin <kevin.tian@intel.com>; mst@redhat.com;
+> >>>jan.kiszka@siemens.com; jasowang@redhat.com; bd.aviv@gmail.com; Davi=
+d
+> >>>Gibson <david@gibson.dropbear.id.au>; qemu-devel@nongnu.org
+> >>>Subject: Re: [Qemu-devel] [PATCH v7 14/17] memory: add
+> >>>MemoryRegionIOMMUOps.replay() callback
+> >>>
+> >>>On Mon, Mar 27, 2017 at 08:35:05AM +0000, Liu, Yi L wrote:
+> >>>>>-----Original Message-----
+> >>>>>From: Qemu-devel
+> >>>>>[mailto:qemu-devel-bounces+yi.l.liu=3Dintel.com@nongnu.org] On
+> >>>>>Behalf Of Peter Xu
+> >>>>>Sent: Tuesday, February 7, 2017 4:28 PM
+> >>>>>To: qemu-devel@nongnu.org
+> >>>>>Cc: Lan, Tianyu <tianyu.lan@intel.com>; Tian, Kevin
+> >>>>><kevin.tian@intel.com>; mst@redhat.com; jan.kiszka@siemens.com;
+> >>>>>jasowang@redhat.com; peterx@redhat.com;
+> >>>>>alex.williamson@redhat.com; bd.aviv@gmail.com; David Gibson
+> >>>>><david@gibson.dropbear.id.au>
+> >>>>>Subject: [Qemu-devel] [PATCH v7 14/17] memory: add
+> >>>>>MemoryRegionIOMMUOps.replay() callback
+> >>>>>
+> >>>>>Originally we have one memory_region_iommu_replay() function,
+> >>>>>which is the default behavior to replay the translations of the
+> >>>>>whole IOMMU region. However, on some platform like x86, we may
+> >>>>>want our own
+> >>>replay logic for IOMMU regions.
+> >>>>>This patch add one more hook for IOMMUOps for the callback, and
+> >>>>>it'll override the default if set.
+> >>>>>
+> >>>>>Signed-off-by: Peter Xu <peterx@redhat.com>
+> >>>>>---
+> >>>>>  include/exec/memory.h | 2 ++
+> >>>>>  memory.c              | 6 ++++++
+> >>>>>  2 files changed, 8 insertions(+)
+> >>>>>
+> >>>>>diff --git a/include/exec/memory.h b/include/exec/memory.h index
+> >>>>>0767888..30b2a74 100644
+> >>>>>--- a/include/exec/memory.h
+> >>>>>+++ b/include/exec/memory.h
+> >>>>>@@ -191,6 +191,8 @@ struct MemoryRegionIOMMUOps {
+> >>>>>      void (*notify_flag_changed)(MemoryRegion *iommu,
+> >>>>>                                  IOMMUNotifierFlag old_flags,
+> >>>>>                                  IOMMUNotifierFlag new_flags);
+> >>>>>+    /* Set this up to provide customized IOMMU replay function */
+> >>>>>+    void (*replay)(MemoryRegion *iommu, IOMMUNotifier *notifier);
+> >>>>>  };
+> >>>>>
+> >>>>>  typedef struct CoalescedMemoryRange CoalescedMemoryRange; diff
+> >>>>>--git a/memory.c b/memory.c index 7a4f2f9..9c253cc 100644
+> >>>>>--- a/memory.c
+> >>>>>+++ b/memory.c
+> >>>>>@@ -1630,6 +1630,12 @@ void
+> >>>>>memory_region_iommu_replay(MemoryRegion
+> >>>>>*mr, IOMMUNotifier *n,
+> >>>>>      hwaddr addr, granularity;
+> >>>>>      IOMMUTLBEntry iotlb;
+> >>>>>+    /* If the IOMMU has its own replay callback, override */
+> >>>>>+    if (mr->iommu_ops->replay) {
+> >>>>>+        mr->iommu_ops->replay(mr, n);
+> >>>>>+        return;
+> >>>>>+    }
+> >>>>Hi Alex, Peter,
+> >>>>
+> >>>>Will all the other vendors(e.g. PPC, s390, ARM) add their own repla=
+y
+> >>>>callback as well? I guess it depends on whether the original replay
+> >>>>algorithm work well for them? Do you have such knowledge?
+> >>>I guess so. At least for VT-d we had this callback since the default
+> >>>replay mechanism did not work well on x86 due to its extremely large
+> >>>memory region size. Thanks,
+> >>thx. that would make sense.
+> >Peter,
+> >
+> >Just come to mind that there may be a corner case here.
+> >
+> >Intel VT-d actually has a "pt" mode which allows device use physical a=
+ddress
+> >even when VT-d is enabled. In kernel, there is a iommu_identity_mappin=
+g.
+> >If a device is in this map, then it would use "pt" mode. So that IOMMU=
+ driver
+> >would not build second-level page table for it.
+>=20
+> Yes, but qemu does not support ECAP_PT now, so guest will still have a =
+page
+> table in this case.
+>=20
+> >
+> >Back to the virtual IOVA implementation, if an assigned device is in t=
+he
+> >iommu_identity_mapping(e.g. VGA controller), it uses GPA directly to d=
+o DMA.
+> >So it demands a GPA->HPA mapping in host. However, the iommu->ops.repl=
+ay
+> >is not able to build it when guest SL page table is empty.
+> >
+> >So I think building an entire guest PA->HPA mapping before guest kerne=
+l boot
+> >would be recommended. Any thoughts?
+>=20
+> We plan to add PT in 2.10, a possible rough idea is disabled iommu dmar
+> region and use another region without iommu_ops. Then
+> vfio_listener_region_add() will just do the correct mappings.
 
-> > On Thu, 30 Mar 2017 18:27:21 +0800
-> > Xiong Zhang <xiong.y.zhang@intel.com> wrote:
-> >   
-> > > This reverts commit c2b2e158cc7b1cb431bd6039824ec13c3184a775.
-> > >
-> > > The original patch intend to prevent linux i915 driver from using
-> > > stolen meory. But this patch breaks windows IGD driver loading on
-> > > Gen9+, as IGD HW will use stolen memory on Gen9+, once windows IGD
-> > > driver see zero size stolen memory, it will unload.
-> > > Meanwhile stolen memory will be disabled in 915 when i915 run as
-> > > a guest.  
-> > 
-> > Does this mean that legacy mode IGD assignment is not going to work
-> > on Gen9+ with Windows?  Will it continue to work with Gen8-?  
-> [Zhang, Xiong Y] I try to use the following qemu command to enable legacy mode on SKyLake, but It seems the entry point of wins IGD driver isn't called(I couldn't confirm this as I don't have the source code, but I didn't see any IGD driver info from windbg while I could see many info in upt mode), so driver doesn't bind to IGD after win 8.1 boot up.
->   #qemu-system-x86_64 -M pc -enable-kvm -smp 2 -m 2G  -vga none -nographic -cpu host -hda "$IMAGE" -device vfio-pci,host=00:02.0,x-vga=true,id=hostdev0,bus=pci.0,addr=0x2
-> Is this the right method to enable legacy mode ?
+Even without any new region. With the patch 16/17 ("intel_iommu: allow
+dynamic switch of IOMMU region"), we can just turn the IOMMU region
+on/off, following the device's PT bit, maybe using the new
+vtd_switch_address_space() interface. That should be enough.
 
-Yeah, that should do it.  x-vga should not be necessary, but shouldn't
-hurt IIRC.  Any dmesg errors regarding the ROM?  I think we have
-trouble with the ROM if the host is booted in UEFI mode.
+Again, we just need to wait until current series merged.
 
-> 
-> > Please clarify Gen9+, is this Kaby Lake?  
-> [Zhang, Xiong Y] Gen 9+ is SkyLake and later.
+(Oh, then I found why I had an extra "on/off" parameter in previous
+ versions in vtd_switch_address_space(), but it was removed.)
 
-Ok, then I cannot test since I only have access to BDW.  We do have
-users that might start complaining if this is a new change in the
-Windows driver for SKL+.
- 
-> > I assume this patch is intended for QEMU 2.9, it's helpful to make that
-> > explicit during the rc freeze.  Thanks,  
-> [Zhang, Xiong Y] Yes, as the original patch has entered into Qemu 2.9 rc1. So this reverted patch should be entered into the later 2.9 rc.
-> Sorry for the troubles.
+Thanks,
 
-Ok, no problem.  Thanks,
-
-Alex 
+-- peterx
