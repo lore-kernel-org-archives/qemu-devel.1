@@ -1,31 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cu1dB-0002EE-2p
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 14:50:42 -0400
+	(envelope-from <eblake@redhat.com>) id 1cu1gT-0002xm-5C
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 14:54:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cu1d7-0005A9-TT
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 14:50:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42730)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cu1d7-00059w-NH
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 14:50:37 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4B00B83F3E
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 18:50:36 +0000 (UTC)
-Date: Fri, 31 Mar 2017 19:50:31 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170331185030.GE2408@work-vm>
-References: <1490599288-11751-1-git-send-email-peterx@redhat.com>
-	<1490599288-11751-2-git-send-email-peterx@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1490599288-11751-2-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/5] migration: set current_active_state
- once
+	(envelope-from <eblake@redhat.com>) id 1cu1gS-00070M-Cg
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 14:54:05 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Fri, 31 Mar 2017 13:53:53 -0500
+Message-Id: <20170331185356.2479-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.9 v8 0/3] Fix wipe of unaligned qcow2
+ image [was add blkdebug tests]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,39 +18,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-* Peter Xu (peterx@redhat.com) wrote:
-> We set it right above this one. No need to set it twice.
+Available as a tag at:
+git fetch git://repo.or.cz/qemu/ericb.git nbd-blkdebug-v8
 
-Ah good spot, yes set in the declaration of current_active_state.
+(which is somewhat of a misnomer for this current version of the
+series, but historically correct)
 
-> CC: Juan Quintela <quintela@redhat.com>
-> CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  migration/migration.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 54060f7..f9f4d98 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1938,7 +1938,6 @@ static void *migration_thread(void *opaque)
->      qemu_savevm_state_begin(s->to_dst_file, &s->params);
->  
->      s->setup_time = qemu_clock_get_ms(QEMU_CLOCK_HOST) - setup_start;
-> -    current_active_state = MIGRATION_STATUS_ACTIVE;
->      migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
->                        MIGRATION_STATUS_ACTIVE);
+v6 was:
+https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg01562.html
+v7 was:
+https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg06175.html
 
+Since then: reorder patches 2 and 3, and update commit messages to match
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+001/3:[----] [--] 'iotests: fix 097 when run with qcow'
+002/3:[0002] [FC] 'qcow2: Discard unaligned tail when wiping image'
+003/3:[0002] [FC] 'iotests: Improve image-clear tests on non-aligned image'
 
->  
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Daniel P. Berrange (1):
+  iotests: fix 097 when run with qcow
+
+Eric Blake (2):
+  qcow2: Discard unaligned tail when wiping image
+  iotests: Improve image-clear tests on non-aligned image
+
+ block/qcow2-cluster.c      |  10 +--
+ tests/qemu-iotests/097     |  27 +++----
+ tests/qemu-iotests/097.out | 180 ++++++++++++---------------------------------
+ tests/qemu-iotests/176     | 131 +++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/176.out | 150 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 6 files changed, 345 insertions(+), 154 deletions(-)
+ create mode 100755 tests/qemu-iotests/176
+ create mode 100644 tests/qemu-iotests/176.out
+
+-- 
+2.9.3
