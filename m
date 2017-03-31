@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Ciprian.Barbu@enea.com>) id 1cu0gU-0003w6-FQ
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:50:04 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1cu0hF-0004Us-Nw
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:50:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Ciprian.Barbu@enea.com>) id 1cu0gQ-0003wI-Gr
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:50:02 -0400
-Received: from smtp-out11.electric.net ([185.38.181.32]:53399)
+	(envelope-from <dgilbert@redhat.com>) id 1cu0hB-0004gZ-G7
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:50:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58500)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Ciprian.Barbu@enea.com>)
-	id 1cu0gQ-0003v8-6G
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:49:58 -0400
-From: Ciprian Barbu <Ciprian.Barbu@enea.com>
-Date: Fri, 31 Mar 2017 17:49:52 +0000
-Message-ID: <C885D0FF6A27744DB0B822E32DF6EF029B1CA282@SESTOEX04.enea.se>
-References: <C885D0FF6A27744DB0B822E32DF6EF029B1CA14A@SESTOEX04.enea.se>
-	<9b05e60a-f8c2-ea4f-6be4-f17c0adec510@redhat.com>
-In-Reply-To: <9b05e60a-f8c2-ea4f-6be4-f17c0adec510@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cu0hB-0004fb-6q
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 13:50:45 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 52AC481233
+	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 17:50:43 +0000 (UTC)
+Date: Fri, 31 Mar 2017 18:50:40 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170331175039.GD2408@work-vm>
+References: <20170323210124.12300-1-quintela@redhat.com>
+	<20170328190507.GJ5740@work-vm> <87tw6co47w.fsf@secure.mitica>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] nbd: Possible regression in 2.9 RCs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87tw6co47w.fsf@secure.mitica>
+Subject: Re: [Qemu-devel] [RFC] Split migration bitmaps by ramblock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,167 +33,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Alexandru Avadanii <Alexandru.Avadanii@enea.com>
-Cc: Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>, svc-armband <armband@enea.com>, Kevin Wolf <kwolf@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Hi,
+* Juan Quintela (quintela@redhat.com) wrote:
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > * Juan Quintela (quintela@redhat.com) wrote:
+> >> Note that there are two reason for this, ARM and PPC do things like
+> >> guests with 4kb pages on hosts with 16/64kb hosts, and then we have
+> >> HugePages.  Note all the workarounds that postcopy has to do because
+> >> to work in HugePages size.
+> >
+> > There are some fun problems with changing the bitmap page size;
+> > off the top of my head, the ones I can remember include:
+> >     a) I'm sure I've seen rare cases where a target page is marked as
+> >        dirty inside a hostpage; I'm guessing that was qemu's doing, but
+> >        there are more subtle cases, e.g. running a 4kb guest on a 64kb host;
+> >        it's legal - and 4kb power guests used to exist;  I think in those
+> >        cases you see KVM only marking one target page as dirty.
+> 
+>         /*
+>          * bitmap-traveling is faster than memory-traveling (for addr...)
+>          * especially when most of the memory is not dirty.
+>          */
+>         for (i = 0; i < len; i++) {
+>             if (bitmap[i] != 0) {
+>                 c = leul_to_cpu(bitmap[i]);
+>                 do {
+>                     j = ctzl(c);
+>                     c &= ~(1ul << j);
+>                     page_number = (i * HOST_LONG_BITS + j) * hpratio;
+>                     addr = page_number * TARGET_PAGE_SIZE;
+>                     ram_addr = start + addr;
+>                     cpu_physical_memory_set_dirty_range(ram_addr,
+>                                        TARGET_PAGE_SIZE * hpratio, clients);
+>                 } while (c != 0);
+>             }
+>         }
+> 
+> 
+> Thisis the code that we end using when we are synchronizing from kvm, so
+> if we don't have all pages of a host page set to one (or zero)  I think
+> we are doing something wrong, no?  Or I am missunderstanding the code?
 
-Thank you for getting back!
+Hmm, that does look like that - so perhaps the case I was seeing was just
+qemu setting it somewhere?
+(I definitely remember seeing it because I remember dumping the bitmaps
+and checking for them; but I can't remember the circumstance)
 
-I'm trying to follow you, but I don't understand all the details. I would l=
-ike to ask this question though:
+> >     b) Are we required to support migration across hosts of different pagesize;
+> >        and if we do that what size should a bit represent?
+> >        People asked about it during postcopy but I think it's restricted to
+> >        matching sizes.  I don't think precopy has any requirement for matching
+> >        host pagesize at the moment.  64bit ARM does 4k, 64k and I think 16k was
+> >        added later.
+> 
+> With current precopy, we should work independently of the host page size
+> (famous last words), and in a 1st step, I will only send pages of the
+> size TARGET_PAGE_SIZE.  I will only change the bitmaps.  We can add
+> bigger pages later.
+> 
+> >     c) Hugepages have similar issues; precopy doesn't currently have any
+> >        requirement for the hugepage selection on the two hosts to match,
+> >        but it does on postcopy.  Also you don't want to have a single dirty
+> >        bit for a 1GB host hugepage if you can handle detecting changes at
+> >        a finer grain level.
+> 
+> I agree here, I was thinking more on the Power/ARM case than the
+> HugePage case.  For the 2MB page, we could think about doing it, for the
+> 1GB case, it is not gonna work.
 
-What is the difference between v2.8.0 and this commit? With v2.8.0 the same=
- qemu command worked, but I admit it doesn't request sharing.
+Yep,
 
-We also use libvirt v1.3.4, which might be a problem, but at least we want =
-to understand if the commit in question introduced an obvious problem or if=
- it's all in the details.
+Dave
 
-Btw, the qemu command generated by libvirt is this one, sorry about that:
-
-2017-03-31 17:40:10.956+0000: starting up libvirt version: 1.3.4, package: =
-0+amos3~u16.04 (Enea Armband Devops Team <armband@enea.com> Fri, 13 Jan 201=
-7 02:06:05 +0100), qemu version: 2.8.50(Debian 1:2.9+amos2~u16.04), hostnam=
-e: node-2.domain.tld
-LC_ALL=3DC PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/=
-bin QEMU_AUDIO_DRV=3Dnone /usr/bin/kvm -name instance-00000076,debug-thread=
-s=3Don -S -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvi=
-rt/qemu/domain-14-instance-00000076/master-key.aes -machine virt-2.8,accel=
-=3Dkvm,usb=3Doff,gic-version=3D3 -cpu host -m 256 -realtime mlock=3Doff -sm=
-p 1,sockets=3D1,cores=3D1,threads=3D1 -uuid 2812f3c9-f564-499b-a8c7-e9e7ccf=
-24143 -no-user-config -nodefaults -chardev socket,id=3Dcharmonitor,path=3D/=
-var/lib/libvirt/qemu/domain-14-instance-00000076/monitor.sock,server,nowait=
- -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc,dri=
-ftfix=3Dslew -no-shutdown -boot strict=3Don -kernel /var/lib/nova/instances=
-/2812f3c9-f564-499b-a8c7-e9e7ccf24143/kernel -initrd /var/lib/nova/instance=
-s/2812f3c9-f564-499b-a8c7-e9e7ccf24143/ramdisk -append 'root=3D/dev/vda1 rw=
- rootwait console=3Dtty0 console=3DttyS0 console=3DttyAMA0' -device i82801b=
-11-bridge,id=3Dpci.1,bus=3Dpcie.0,addr=3D0x1 -device pci-bridge,chassis_nr=
-=3D2,id=3Dpci.2,bus=3Dpci.1,addr=3D0x0 -usb -drive file=3D/var/lib/nova/ins=
-tances/2812f3c9-f564-499b-a8c7-e9e7ccf24143/disk,format=3Dqcow2,if=3Dnone,i=
-d=3Ddrive-virtio-disk0,cache=3Dnone,aio=3Dnative -device virtio-blk-device,=
-scsi=3Doff,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1 -driv=
-e file=3D/var/lib/nova/instances/2812f3c9-f564-499b-a8c7-e9e7ccf24143/disk.=
-config,format=3Draw,if=3Dnone,id=3Ddrive-virtio-disk1,cache=3Dnone,aio=3Dna=
-tive -device virtio-blk-device,scsi=3Doff,drive=3Ddrive-virtio-disk1,id=3Dv=
-irtio-disk1 -netdev tap,fd=3D27,id=3Dhostnet0 -device virtio-net-device,net=
-dev=3Dhostnet0,id=3Dnet0,mac=3Dfa:16:3e:82:0a:2b -serial file:/var/lib/nova=
-/instances/2812f3c9-f564-499b-a8c7-e9e7ccf24143/console.log -serial pty -vn=
-c 0.0.0.0:0 -k en-us -device VGA,id=3Dvideo0,vgamem_mb=3D16,bus=3Dpci.2,add=
-r=3D0x1 -device virtio-balloon-device,id=3Dballoon0 -msg timestamp=3Don
-Domain id=3D14 is tainted: high-privileges
-
-Regards,
-/Ciprian
-
------Original Message-----
-From: Max Reitz [mailto:mreitz@redhat.com]=20
-Sent: Friday, March 31, 2017 8:43 PM
-To: Ciprian Barbu <Ciprian.Barbu@enea.com>; qemu-devel@nongnu.org; Eric Bla=
-ke <eblake@redhat.com>; Alexandru Avadanii <Alexandru.Avadanii@enea.com>
-Cc: Jeff Cody <jcody@redhat.com>; Markus Armbruster <armbru@redhat.com>; sv=
-c-armband <armband@enea.com>; Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [Qemu-devel] nbd: Possible regression in 2.9 RCs
-
-On 31.03.2017 18:03, Ciprian Barbu wrote:
-> Hello,
->=20
-> Similar to the other thread about possible regression with rbd, there mig=
-ht be a regression with nbd.
-> This time we are launching an instance from an image (not volume) and try=
- to live migrate it:
->=20
-> nova live-migration <test_instance>
->=20
-> The nova-compute service complains with:
->=20
-> 2017-03-31 15:32:56.179 7806 INFO nova.virt.libvirt.driver=20
-> [req-15d79cbe-5956-4738-92df-3624e6b993ee=20
-> d795de59fb9a4ea38776a11d20ae8469 cee03e74881f4ccba3b83345fb652b2c - -=20
-> -] [instance: 6a04508f-5d79-4582-8e2c-4cc368753f6c] Migration running=20
-> for 0 secs, memory 100% remaining; (bytes processed=3D0, remaining=3D0,=20
-> total=3D0)
-> 2017-03-31 15:32:58.029 7806 WARNING stevedore.named=20
-> [req-73bc0113-5555-4dd8-8903-d3540cc61b47=20
-> b9fbceeadd2d4d1bab9c90ae104db1f7 7e7db99b32c6467184701e9a0c2f1de7 - -=20
-> -] Could not load instance_network_info
-> 2017-03-31 15:32:59.038 7806 ERROR nova.virt.libvirt.driver=20
-> [req-15d79cbe-5956-4738-92df-3624e6b993ee=20
-> d795de59fb9a4ea38776a11d20ae8469 cee03e74881f4ccba3b83345fb652b2c - -=20
-> -] [instance: 6a04508f-5d79-4582-8e2c-4cc368753f6c] Live Migration=20
-> failure: internal error: unable to execute QEMU command=20
-> 'nbd-server-add': Conflicts with use by drive-virtio-disk0 as 'root',=20
-> which does not allow 'write' on #block143
-> 2017-03-31 15:32:59.190 7806 ERROR nova.virt.libvirt.driver=20
-> [req-15d79cbe-5956-4738-92df-3624e6b993ee=20
-> d795de59fb9a4ea38776a11d20ae8469 cee03e74881f4ccba3b83345fb652b2c - -=20
-> -] [instance: 6a04508f-5d79-4582-8e2c-4cc368753f6c] Migration=20
-> operation has aborted
->=20
-> I will try and bisect it myself, but I thought I would paste this here fi=
-rst, just so you know there is this issue too.
-
-Well, I already know the commit in question. It's
-8a7ce4f9338c475df1afc12502af704e4300a3e0 ("nbd/server: Use real permissions=
- for NBD exports").
-
-Whether this is a bug depends on the standpoint. I would very much consider=
- it a bug fix because as of this commit you can no longer create a writable=
- NBD server on a block device that is in use by a guest device without the =
-guest device being aware of this.
-
-The problem is that the functionality to "make" the guest device "aware"
-of it was introduced only a couple of commits before, and it's called "shar=
-e-rw".
-
-So this doesn't work:
-
-$ x86_64-softmmu/qemu-system-x86_64 \
-    -blockdev node-name=3Dimage,driver=3Dqcow2,\
-file.driver=3Dfile,file.filename=3Dfoo.qcow2 \
-    -device virtio-blk,drive=3Dimage \
-    -qmp stdio
-{"QMP": {"version": {"qemu": {"micro": 92, "minor": 8, "major": 2},
-"package": " (v2.8.0-2038-g6604c893d0)"}, "capabilities": []}} {'execute':'=
-qmp_capabilities'}
-{"return": {}}
-{'execute':'nbd-server-start','arguments':{'addr':{'type':'inet','data':{'h=
-ost':'localhost','port':'10809'}}}}
-{"return": {}}
-{'execute':'nbd-server-add','arguments':{'device':'image','writable':true}}
-{"error": {"class": "GenericError", "desc": "Conflicts with use by /machine=
-/peripheral-anon/device[0]/virtio-backend as 'root', which does not allow '=
-write' on image"}
-
-But this works:
-
-$ x86_64-softmmu/qemu-system-x86_64 \
-    -blockdev node-name=3Dimage,driver=3Dqcow2,\
-file.driver=3Dfile,file.filename=3Dfoo.qcow2 \
-    -device virtio-blk,drive=3Dimage,share-rw=3Don \
-    -qmp stdio
-{"QMP": {"version": {"qemu": {"micro": 92, "minor": 8, "major": 2},
-"package": " (v2.8.0-2038-g6604c893d0)"}, "capabilities": []}} {'execute':'=
-qmp_capabilities'}
-{"return": {}}
-{'execute':'nbd-server-start','arguments':{'addr':{'type':'inet','data':{'h=
-ost':'localhost','port':'10809'}}}}
-{"return": {}}
-{'execute':'nbd-server-add','arguments':{'device':'image','writable':true}}
-{"return": {}}
-
-(The difference is the share-rw=3Don in the -device parameter.)
-
-
-So in theory all that's necessary is to set share-rw=3Don for the device in=
- the management layer. But I'm not sure whether that's practical.
-
-As for just allowing the NBD server write access to the device... To me tha=
-t appears pretty difficult from an implementation perspective. We assert th=
-at nobody can write without having requested write access and we make sure =
-that nobody can request write access without it being allowed. Making an ex=
-ception for NBD seems very difficult and would probably mean we'd have to d=
-rop the assertion for write accesses altogether.
-
-Max
+> Later, Juan.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
