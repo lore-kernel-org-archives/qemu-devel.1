@@ -1,23 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ctvH5-00069r-Bz
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 08:03:28 -0400
+	(envelope-from <mreitz@redhat.com>) id 1ctvIF-0006mN-ON
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 08:04:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ctvH2-0004nu-9n
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 08:03:27 -0400
-References: <20170330124707.28142-1-aik@ozlabs.ru>
-	<20170330124707.28142-3-aik@ozlabs.ru>
-	<82c140ad-da36-5c2a-3f10-567d3108b15a@redhat.com>
-	<a08e4150-6a3b-b6d3-efc6-16def8517b59@ozlabs.ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <306e1353-2a82-79e3-7001-5933efbf01f3@redhat.com>
-Date: Fri, 31 Mar 2017 14:03:20 +0200
-MIME-Version: 1.0
-In-Reply-To: <a08e4150-6a3b-b6d3-efc6-16def8517b59@ozlabs.ru>
-Content-Type: text/plain; charset=koi8-r
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH qemu 2/5] spapr-iommu: Subclass
- TYPE_IOMMU_MEMORY_REGION
+	(envelope-from <mreitz@redhat.com>) id 1ctvIE-0005Sj-Uv
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 08:04:39 -0400
+From: Max Reitz <mreitz@redhat.com>
+Date: Fri, 31 Mar 2017 14:04:29 +0200
+Message-Id: <20170331120431.1767-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.9 0/2] curl: Extend and fix blockdev-add
+ schema
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,38 +18,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+
+Yes, it's yet another episode in our popular
+get-blockdev-add-ready-for-2.9 drama!
+
+Right now, the schema for the curl block driver is seriously lacking.
+This series improves things at least a bit.
+
+To improve things seriously, we might want to structure the URL instead
+of it being just a plain string, and we might want to split the cookie
+string into a list of dicts or something similar. However, strictly
+speaking our curl block driver is *not* an (ht|f)tps? block driver but
+just a curl driver. All it does is pass some options to libcurl and then
+send and receive data from it. (We really should have just named it
+"curl" from the start.)
+
+Therefore, it probably is for the best to leave these options rather
+opaque and let libcurl do the interpretation.
 
 
+Max Reitz (2):
+  qapi/curl: Extend and fix blockdev-add schema
+  block/curl: Check protocol prefix
 
-On 31/03/2017 13:47, Alexey Kardashevskiy wrote:
->>> =20
->>> +static void spapr_iommu_memory_region_class_init(ObjectClass *k, voi=
-d *data)
->>> +{
->>> +    sPAPRIOMMUMemoryRegionClass *smrc =3D SPAPR_IOMMU_MEMORY_REGION_=
-CLASS(k);
->>> +
->>> +    smrc->get_fd =3D spapr_tce_get_fd;
->>> +}
->>> +
->> You don't even need the virtual function.  Rather, make spapr_tce_get_=
-fd
->> public and give it a sPAPRTCETable argument.  Then vfio_spapr_notify_k=
-vm
->> can use SPAPR_IOMMU_MEMORY_REGION(iommumr).
-> Well, if I make spapr_tce_get_fd() public, vfio_spapr_notify_kvm() coul=
-d
-> just take MemoryRegion and cast it to sPAPRTCETable without all these
-> dances with MemoryRegion, IOMMUMemoryRegion, what do I miss here? I hav=
-e
-> made a big patch with IOMMUMemoryRegion though, post it?
+ qapi/block-core.json | 103 ++++++++++++++++++++++++++++++++++++++++++++++-----
+ block/curl.c         |  10 +++++
+ 2 files changed, 104 insertions(+), 9 deletions(-)
 
-*I* was missing that the call was inside an "if (container->iommu_type =3D=
-=3D TCE)".
-
-So the hierarchy is good to have, but the virtual function can be removed=
-.
-
-Paolo
+-- 
+2.12.1
