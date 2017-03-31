@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Chris.Friesen@windriver.com>) id 1cu5hn-00059p-Gx
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 19:11:45 -0400
+	(envelope-from <mohun106@gmail.com>) id 1cu5mV-00065m-GH
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 19:16:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Chris.Friesen@windriver.com>) id 1cu5hj-0008I8-EJ
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 19:11:43 -0400
-Received: from mail1.windriver.com ([147.11.146.13]:45903)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Chris.Friesen@windriver.com>)
-	id 1cu5hj-0008GD-4W
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 19:11:39 -0400
-Received: from ALA-HCA.corp.ad.wrs.com (ala-hca.corp.ad.wrs.com
-	[147.11.189.40])
-	by mail1.windriver.com (8.15.2/8.15.1) with ESMTPS id v2VKCdMm007232
-	(version=TLSv1 cipher=AES128-SHA bits=128 verify=FAIL)
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 13:12:42 -0700 (PDT)
-Message-ID: <58DEB834.6060405@windriver.com>
-Date: Fri, 31 Mar 2017 14:12:36 -0600
-From: Chris Friesen <chris.friesen@windriver.com>
+	(envelope-from <mohun106@gmail.com>) id 1cu5mT-00034F-EO
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 19:16:35 -0400
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:35477)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mohun106@gmail.com>) id 1cu5mT-00033s-61
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 19:16:33 -0400
+Received: by mail-pg0-x243.google.com with SMTP id g2so20249654pge.2
+	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 16:16:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] hitting intermittent issue with live migration from
- qemu-kvm-ev 2.3.0 to qemu-kvm-ev 2.6.0
+In-Reply-To: <62b3784e-4c10-cf42-f2d2-285d314b23cd@redhat.com>
+References: <CAC8NTUUWuH4k7SZSus_hz6a6V+OLGYUFcSOUwVbji2YDAZbVdQ@mail.gmail.com>
+	<20170328201623.GD20211@cbox>
+	<CAC8NTUVPoH=ZiJ51EoOLPKhsyGKo5iszkhHzb5K8Heax3n2KuA@mail.gmail.com>
+	<20170329185630.GA4908@cbox>
+	<62b3784e-4c10-cf42-f2d2-285d314b23cd@redhat.com>
+From: Radha Mohan <mohun106@gmail.com>
+Date: Fri, 31 Mar 2017 16:16:31 -0700
+Message-ID: <CAC8NTUW26hTqys0_46rxiv=uj1Kk20nzS9B5AQLw3Anmre_y6w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] host stalls when qemu-system-aarch64 with kvm and
+ pflash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,155 +32,232 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Christoffer Dall <cdall@linaro.org>, qemu-devel@nongnu.org, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Wei Huang <wei@redhat.com>, Drew Jones <drjones@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-Hi,
+On Thu, Mar 30, 2017 at 9:47 AM, Laszlo Ersek <lersek@redhat.com> wrote:
+> On 03/29/17 20:56, Christoffer Dall wrote:
+>> On Tue, Mar 28, 2017 at 01:24:15PM -0700, Radha Mohan wrote:
+>>> On Tue, Mar 28, 2017 at 1:16 PM, Christoffer Dall <cdall@linaro.org> wrote:
+>>>> Hi Radha,
+>>>>
+>>>> On Tue, Mar 28, 2017 at 12:58:24PM -0700, Radha Mohan wrote:
+>>>>> Hi,
+>>>>> I am seeing an issue with qemu-system-aarch64 when using pflash
+>>>>> (booting kernel via UEFI bios).
+>>>>>
+>>>>> Host kernel: 4.11.0-rc3-next-20170323
+>>>>> Qemu version: v2.9.0-rc1
+>>>>>
+>>>>> Command used:
+>>>>> ./aarch64-softmmu/qemu-system-aarch64 -cpu host -enable-kvm -M
+>>>>> virt,gic_version=3 -nographic -smp 1 -m 2048 -drive
+>>>>> if=none,id=hd0,file=/root/zesty-server-cloudimg-arm64.img,id=0 -device
+>>>>> virtio-blk-device,drive=hd0 -pflash /root/flash0.img -pflash
+>>>>> /root/flash1.img
+>>>>>
+>>>>>
+>>>>> As soon as the guest kernel boots the host starts to stall and prints
+>>>>> the below messages. And the system never recovers. I can neither
+>>>>> poweroff the guest nor the host. So I have resort to external power
+>>>>> reset of the host.
+>>>>>
+>>>>> ==================
+>>>>> [  116.199077] NMI watchdog: BUG: soft lockup - CPU#25 stuck for 23s!
+>>>>> [kworker/25:1:454]
+>>>>> [  116.206901] Modules linked in: binfmt_misc nls_iso8859_1 aes_ce_blk
+>>>>> shpchp crypto_simd gpio_keys cryptd aes_ce_cipher ghash_ce sha2_ce
+>>>>> sha1_ce uio_pdrv_genirq uio autofs4 btrfs raid10 rai
+>>>>> d456 async_raid6_recov async_memcpy async_pq async_xor async_tx xor
+>>>>> raid6_pq libcrc32c raid1 raid0 multipath linear ast i2c_algo_bit ttm
+>>>>> drm_kms_helper syscopyarea sysfillrect sysimgblt fb_s
+>>>>> ys_fops drm nicvf ahci nicpf libahci thunder_bgx thunder_xcv
+>>>>> mdio_thunder mdio_cavium
+>>>>>
+>>>>> [  116.206995] CPU: 25 PID: 454 Comm: kworker/25:1 Not tainted
+>>>>> 4.11.0-rc3-next-20170323 #1
+>>>>> [  116.206997] Hardware name: www.cavium.com crb-1s/crb-1s, BIOS 0.3 Feb 23 2017
+>>>>> [  116.207010] Workqueue: events netstamp_clear
+>>>>> [  116.207015] task: ffff801f906b5400 task.stack: ffff801f901a4000
+>>>>> [  116.207020] PC is at smp_call_function_many+0x284/0x2e8
+>>>>> [  116.207023] LR is at smp_call_function_many+0x244/0x2e8
+>>>>> [  116.207026] pc : [<ffff000008156ecc>] lr : [<ffff000008156e8c>]
+>>>>> pstate: 80000145
+>>>>> [  116.207028] sp : ffff801f901a7be0
+>>>>> [  116.207030] x29: ffff801f901a7be0 x28: ffff000009139000
+>>>>> [  116.207036] x27: ffff000009139434 x26: 0000000000000080
+>>>>> [  116.207041] x25: 0000000000000000 x24: ffff0000081565d0
+>>>>> [  116.207047] x23: 0000000000000001 x22: ffff000008e11e00
+>>>>> [  116.207052] x21: ffff801f6d5cff00 x20: ffff801f6d5cff08
+>>>>> [  116.207057] x19: ffff000009138e38 x18: 0000000000000a03
+>>>>> [  116.207063] x17: 0000ffffb77c9028 x16: ffff0000082e81d8
+>>>>> [  116.207068] x15: 00003d0d6dd44d08 x14: 0036312196549b4a
+>>>>> [  116.207073] x13: 0000000058dabe4c x12: 0000000000000018
+>>>>> [  116.207079] x11: 00000000366e2f04 x10: 00000000000009f0
+>>>>> [  116.207084] x9 : ffff801f901a7d30 x8 : 0000000000000002
+>>>>> [  116.207089] x7 : 0000000000000000 x6 : 0000000000000000
+>>>>> [  116.207095] x5 : ffffffff00000000 x4 : 0000000000000020
+>>>>> [  116.207100] x3 : 0000000000000020 x2 : 0000000000000000
+>>>>> [  116.207105] x1 : ffff801f6d682578 x0 : 0000000000000003
+>>>>>
+>>>>> [  150.443116] INFO: rcu_sched self-detected stall on CPU
+>>>>> [  150.448261]  25-...: (14997 ticks this GP)
+>>>>> idle=47a/140000000000001/0 softirq=349/349 fqs=7495
+>>>>> [  150.451115] INFO: rcu_sched detected stalls on CPUs/tasks:
+>>>>> [  150.451123]  25-...: (14997 ticks this GP)
+>>>>> idle=47a/140000000000001/0 softirq=349/349 fqs=7495
+>>>>> [  150.451124]  (detected by 13, t=15002 jiffies, g=805, c=804, q=8384)
+>>>>> [  150.451136] Task dump for CPU 25:
+>>>>> [  150.451138] kworker/25:1    R  running task        0   454      2 0x00000002
+>>>>> [  150.451155] Workqueue: events netstamp_clear
+>>>>> [  150.451158] Call trace:
+>>>>> [  150.451164] [<ffff000008086188>] __switch_to+0x90/0xa8
+>>>>> [  150.451172] [<ffff0000081f6240>] static_key_slow_inc+0x128/0x138
+>>>>> [  150.451175] [<ffff0000081f6284>] static_key_enable+0x34/0x60
+>>>>> [  150.451178] [<ffff000008843268>] netstamp_clear+0x68/0x80
+>>>>> [  150.451181] [<ffff0000080e49a0>] process_one_work+0x158/0x478
+>>>>> [  150.451183] [<ffff0000080e4d10>] worker_thread+0x50/0x4a8
+>>>>> [  150.451187] [<ffff0000080ebd78>] kthread+0x108/0x138
+>>>>> [  150.451190] [<ffff0000080836c0>] ret_from_fork+0x10/0x50
+>>>>> [  150.477451]   (t=15008 jiffies g=805 c=804 q=8384)
+>>>>> [  150.482242] Task dump for CPU 25:
+>>>>> [  150.482245] kworker/25:1    R  running task        0   454      2 0x00000002
+>>>>> [  150.482259] Workqueue: events netstamp_clear
+>>>>> [  150.482264] Call trace:
+>>>>> [  150.482271] [<ffff00000808a530>] dump_backtrace+0x0/0x2b0
+>>>>> [  150.482277] [<ffff00000808a804>] show_stack+0x24/0x30
+>>>>> [  150.482281] [<ffff0000080fb750>] sched_show_task+0x128/0x178
+>>>>> [  150.482285] [<ffff0000080fd298>] dump_cpu_task+0x48/0x58
+>>>>> [  150.482288] [<ffff0000081f81e4>] rcu_dump_cpu_stacks+0xa0/0xe8
+>>>>> [  150.482297] [<ffff00000813983c>] rcu_check_callbacks+0x774/0x938
+>>>>> [  150.482305] [<ffff00000813fcb4>] update_process_times+0x34/0x60
+>>>>> [  150.482314] [<ffff000008151b80>] tick_sched_handle.isra.7+0x38/0x70
+>>>>> [  150.482319] [<ffff000008151c04>] tick_sched_timer+0x4c/0x98
+>>>>> [  150.482324] [<ffff000008140510>] __hrtimer_run_queues+0xd8/0x2b8
+>>>>> [  150.482328] [<ffff000008141180>] hrtimer_interrupt+0xa8/0x228
+>>>>> [  150.482334] [<ffff0000087f2a2c>] arch_timer_handler_phys+0x3c/0x50
+>>>>> [  150.482341] [<ffff00000812c194>] handle_percpu_devid_irq+0x8c/0x230
+>>>>> [  150.482344] [<ffff000008126174>] generic_handle_irq+0x34/0x50
+>>>>> [  150.482347] [<ffff000008126898>] __handle_domain_irq+0x68/0xc0
+>>>>> [  150.482351] [<ffff0000080817e4>] gic_handle_irq+0xc4/0x170
+>>>>> [  150.482356] Exception stack(0xffff801f901a7ab0 to 0xffff801f901a7be0)
+>>>>> [  150.482360] 7aa0:
+>>>>> 0000000000000003 ffff801f6d682578
+>>>>> [  150.482364] 7ac0: 0000000000000000 0000000000000020
+>>>>> 0000000000000020 ffffffff00000000
+>>>>> [  150.482367] 7ae0: 0000000000000000 0000000000000000
+>>>>> 0000000000000002 ffff801f901a7d30
+>>>>> [  150.482371] 7b00: 00000000000009f0 00000000366e2f04
+>>>>> 0000000000000018 0000000058dabe4c
+>>>>> [  150.482375] 7b20: 0036312196549b4a 00003d0d6dd44d08
+>>>>> ffff0000082e81d8 0000ffffb77c9028
+>>>>> [  150.482378] 7b40: 0000000000000a03 ffff000009138e38
+>>>>> ffff801f6d5cff08 ffff801f6d5cff00
+>>>>> [  150.482382] 7b60: ffff000008e11e00 0000000000000001
+>>>>> ffff0000081565d0 0000000000000000
+>>>>> [  150.482386] 7b80: 0000000000000080 ffff000009139434
+>>>>> ffff000009139000 ffff801f901a7be0
+>>>>> [  150.482390] 7ba0: ffff000008156e8c ffff801f901a7be0
+>>>>> ffff000008156ecc 0000000080000145
+>>>>> [  150.482394] 7bc0: ffff801f901a7be0 ffff000008156e68
+>>>>> ffffffffffffffff ffff000008156e8c
+>>>>> [  150.482397] [<ffff000008082ff4>] el1_irq+0xb4/0x140
+>>>>> [  150.482401] [<ffff000008156ecc>] smp_call_function_many+0x284/0x2e8
+>>>>> [  150.482405] [<ffff000008157020>] kick_all_cpus_sync+0x30/0x38
+>>>>> [  150.482409] [<ffff00000897c6cc>] aarch64_insn_patch_text+0xec/0xf8
+>>>>> [  150.482415] [<ffff000008095978>] arch_jump_label_transform+0x60/0x98
+>>>>> [  150.482420] [<ffff0000081f593c>] __jump_label_update+0x8c/0xa8
+>>>>> [  150.482423] [<ffff0000081f6088>] jump_label_update+0x58/0xe8
+>>>>> [  150.482429] [<ffff0000081f6240>] static_key_slow_inc+0x128/0x138
+>>>>> [  150.482434] [<ffff0000081f6284>] static_key_enable+0x34/0x60
+>>>>> [  150.482438] [<ffff000008843268>] netstamp_clear+0x68/0x80
+>>>>> [  150.482441] [<ffff0000080e49a0>] process_one_work+0x158/0x478
+>>>>> [  150.482444] [<ffff0000080e4d10>] worker_thread+0x50/0x4a8
+>>>>> [  150.482448] [<ffff0000080ebd78>] kthread+0x108/0x138
+>>>>> [  150.482451] [<ffff0000080836c0>] ret_from_fork+0x10/0x50
+>>>>>
+>>>>> ====================================
+>>>>>
+>>>>> I am observing that this usually happens when the guest tries to
+>>>>> bringup or use the default virtio-net interface.
+>>>>> And I am unable to reproduce this when directly booting the guest
+>>>>> kernel without UEFI BIOS.
+>>>>> So anyone observed similar issue ?
+>>>>>
+>>>>
+>>>> I haven't seen this myself.
+>>>>
+>>>> Have you tried with other versions of QEMU and the host kernel by any
+>>>> chance using the same setup?
+>>>
+>>> The earlier qemu version (atleast 2.5 which is default on ubuntu
+>>> 16.04) have different issue. The same thing happens when I use
+>>> vhost=on but without vhost and with virtio-net didn't see the issue.
+>>> The Armband folks have also reported the vhost issue here
+>>> https://bugs.launchpad.net/ubuntu/+source/edk2/+bug/1673564
+>>
+>> So I just ran your setup using the flash emulation on the ThunderX in
+>> packet.net and my host is happily continuing to run hackbench.
+>>
+>>>
+>>> So I am beginning to think the issue could be related to the flash
+>>> emulation but wanted to check on ml if anyone else is seeing it. But
+>>> if it is flash emulation how can it hose the host like this ?
+>>
+>> Why do you think it's related to the flash emulation?
+>>
+>> From what you're telling me it sounds much more like a vhost regression.
+>>
+>> Can you try with v4.10 of the kernel with vhost=on ?
+>
+> Does this QEMU pull req help by any chance?
 
-I'm running into an issue with live-migrating a guest from a host running 
-qemu-kvm-ev 2.3.0-31 to a host running qemu-kvm-ev 2.6.0-27.1.  This is a 
-libvirt-tunnelled migration, in the context of upgrading an OpenStack install to 
-newer software.  The source host is running CentOS 7.2.1511, while the dest host 
-is running CentOS 7.3.1611.
+I will try all the suggestions above and get back. It would take few
+days as I have few priority things to clear off my plate.
 
-I'll include the qemu commandlines for the source/dest at the bottom.
-
-Initially we have a bunch of guests running on compute-2 (which is running 
-qemu-kvm-ev 2.3.0).  We then started live-migrating them one at a time to 
-compute-0 (which is running qemu-kvm-ev 2.6.0).  Three of them migrated 
-successfully.  The fourth (which was essentially identical in configuration to 
-the first three) failed, as per the following logs in 
-/var/log/libvirt/qemu/instance-0000000e.log:
-
-
-2017-03-29T06:38:37.886940Z qemu-kvm: VQ 2 size 0x80 < last_avail_idx 0x47b - 
-used_idx 0x47c
-2017-03-29T06:38:37.886974Z qemu-kvm: error while loading state for instance 0x0 
-of device '0000:00:07.0/virtio-balloon'
-2017-03-29T06:38:37.888684Z qemu-kvm: load of migration failed: Operation not 
-permitted
-2017-03-29 06:38:37.896+0000: shutting down
-
-
-Does anyone know of an existing bug report covering this issue?  (I took a look 
-and didn't see anything obviously related.)
-
-
-The qemu commandline on the source compute node is:
-
-
-/usr/libexec/qemu-kvm -c 0x00000000000000000000000000000001 -n 4 
---proc-type=secondary --file-prefix=vs -- -enable-dpdk -name instance-0000000e 
--S -machine pc-i440fx-rhel7.2.0,accel=kvm,usb=off -m 512 -realtime mlock=off 
--smp 1,sockets=1,cores=1,threads=1 -object 
-memory-backend-file,id=ram-node0,prealloc=yes,mem-path=/mnt/huge-2048kB/libvirt/qemu,share=yes,size=536870912,host-nodes=1,policy=bind 
--numa node,nodeid=0,cpus=0,memdev=ram-node0 -uuid 
-57ae849f-aa66-422a-90a2-62db6c59db29 -smbios type=1,manufacturer=Fedora 
-Project,product=OpenStack 
-Nova,version=13.0.0-0.tis.4,serial=4c8121f1-d927-424e-8712-88b1de45be37,uuid=57ae849f-aa66-422a-90a2-62db6c59db29,family=Virtual 
-Machine -no-user-config -nodefaults -chardev 
-socket,id=charmonitor,path=/var/lib/libvirt/qemu/domain-instance-0000000e/monitor.sock,server,nowait 
--mon chardev=charmonitor,id=monitor,mode=control -rtc base=utc,driftfix=slew 
--global kvm-pit.lost_tick_policy=discard -no-hpet -no-shutdown -boot 
-reboot-timeout=5000,strict=on -device 
-piix3-usb-uhci,id=usb,bus=pci.0,addr=0x1.0x2 -drive 
-file=/dev/disk/by-path/ip-192.168.205.6:3260-iscsi-iqn.2010-10.org.openstack:volume-ac57fcaa-7ecd-4d3b-8671-3bc740337a42-lun-0,if=none,id=drive-virtio-disk0,format=raw,serial=ac57fcaa-7ecd-4d3b-8671-3bc740337a42,cache=none,aio=native 
--device 
-virtio-blk-pci,scsi=off,bus=pci.0,addr=0x6,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1 
--chardev 
-socket,id=charnet0,path=/var/run/vswitch/usvhost-9e574d3c-32dd-4d39-97e6-447b15fb00b4 
--netdev type=vhost-user,id=hostnet0,chardev=charnet0 -device 
-virtio-net-pci,netdev=hostnet0,id=net0,mac=fa:16:3e:b0:59:a9,bus=pci.0,addr=0x3 
--chardev 
-socket,id=charnet1,path=/var/run/vswitch/usvhost-7bc48d91-f215-4394-99ff-eb7f20d9ff1e 
--netdev type=vhost-user,id=hostnet1,chardev=charnet1 -device 
-virtio-net-pci,netdev=hostnet1,id=net1,mac=fa:16:3e:8b:6f:09,bus=pci.0,addr=0x4 
--chardev 
-socket,id=charnet2,path=/var/run/vswitch/usvhost-c32e2d0d-9ed4-4f4b-abc9-539a12a86008 
--netdev type=vhost-user,id=hostnet2,chardev=charnet2 -device 
-virtio-net-pci,netdev=hostnet2,id=net2,mac=fa:16:3e:07:ca:a0,bus=pci.0,addr=0x5 
--chardev 
-file,id=charserial0,path=/etc/nova/instances/57ae849f-aa66-422a-90a2-62db6c59db29/console.log 
--device isa-serial,chardev=charserial0,id=serial0 -chardev pty,id=charserial1 
--device isa-serial,chardev=charserial1,id=serial1 -device usb-tablet,id=input0 
--vnc 0.0.0.0:11 -k en-us -device cirrus-vga,id=video0,bus=pci.0,addr=0x2 
--incoming fd:25 -device virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x7 -msg 
-timestamp=on
-
-
-
-The complete instance-0000000e.log file on the destination is:
-
-2017-03-29 06:38:35.962+0000: starting up libvirt version: 2.0.0, package: 
-10.el7_3.2.tis.24 (Unknown, 2017-03-15-14:59:22, yow-dsulliva-lx-vm1.wrs.com), 
-qemu version: 2.6.0 (qemu-kvm-ev-2.6.0-27.1.el7.tis.31), hostname: compute-0
-LC_ALL=C PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin 
-QEMU_AUDIO_DRV=none /usr/libexec/qemu-kvm '-c 
-0x00000000000000000000000000000001' '-n 4' --proc-type=secondary 
---file-prefix=vs -- -enable-dpdk -name guest=instance-0000000e,debug-threads=on 
--S -object 
-secret,id=masterKey0,format=raw,file=/var/lib/libvirt/qemu/domain-10-instance-0000000e/master-key.aes 
--machine pc-i440fx-rhel7.2.0,accel=kvm,usb=off -m 512 -realtime mlock=off -smp 
-1,sockets=1,cores=1,threads=1 -object 
-memory-backend-file,id=ram-node0,prealloc=yes,mem-path=/mnt/huge-2048kB/libvirt/qemu,share=yes,size=536870912,host-nodes=0,policy=bind 
--numa node,nodeid=0,cpus=0,memdev=ram-node0 -uuid 
-57ae849f-aa66-422a-90a2-62db6c59db29 -smbios 'type=1,manufacturer=Fedora 
-Project,product=OpenStack 
-Nova,version=13.0.0-0.tis.4,serial=4c8121f1-d927-424e-8712-88b1de45be37,uuid=57ae849f-aa66-422a-90a2-62db6c59db29,family=Virtual 
-Machine' -no-user-config -nodefaults -chardev 
-socket,id=charmonitor,path=/var/lib/libvirt/qemu/domain-10-instance-0000000e/monitor.sock,server,nowait 
--mon chardev=charmonitor,id=monitor,mode=control -rtc base=utc,driftfix=slew 
--global kvm-pit.lost_tick_policy=discard -no-hpet -no-shutdown -boot 
-reboot-timeout=5000,strict=on -device 
-piix3-usb-uhci,id=usb,bus=pci.0,addr=0x1.0x2 -drive 
-file=/dev/disk/by-path/ip-192.168.205.6:3260-iscsi-iqn.2010-10.org.openstack:volume-ac57fcaa-7ecd-4d3b-8671-3bc740337a42-lun-0,format=raw,if=none,id=drive-virtio-disk0,serial=ac57fcaa-7ecd-4d3b-8671-3bc740337a42,cache=none,aio=native 
--device 
-virtio-blk-pci,scsi=off,bus=pci.0,addr=0x6,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1 
--chardev 
-socket,id=charnet0,path=/var/run/vswitch/usvhost-9e574d3c-32dd-4d39-97e6-447b15fb00b4 
--netdev type=vhost-user,id=hostnet0,chardev=charnet0 -device 
-virtio-net-pci,netdev=hostnet0,id=net0,mac=fa:16:3e:b0:59:a9,bus=pci.0,addr=0x3 
--chardev 
-socket,id=charnet1,path=/var/run/vswitch/usvhost-7bc48d91-f215-4394-99ff-eb7f20d9ff1e 
--netdev type=vhost-user,id=hostnet1,chardev=charnet1 -device 
-virtio-net-pci,netdev=hostnet1,id=net1,mac=fa:16:3e:8b:6f:09,bus=pci.0,addr=0x4 
--chardev 
-socket,id=charnet2,path=/var/run/vswitch/usvhost-c32e2d0d-9ed4-4f4b-abc9-539a12a86008 
--netdev type=vhost-user,id=hostnet2,chardev=charnet2 -device 
-virtio-net-pci,netdev=hostnet2,id=net2,mac=fa:16:3e:07:ca:a0,bus=pci.0,addr=0x5 
--add-fd set=0,fd=51 -chardev file,id=charserial0,path=/dev/fdset/0,append=on 
--device isa-serial,chardev=charserial0,id=serial0 -chardev pty,id=charserial1 
--device isa-serial,chardev=charserial1,id=serial1 -device usb-tablet,id=input0 
--vnc 0.0.0.0:9 -k en-us -device cirrus-vga,id=video0,bus=pci.0,addr=0x2 
--incoming defer -device virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x7 -msg 
-timestamp=on
-Domain id=10 is tainted: high-privileges
-EAL:eal_memory.c:1591: WARNING: Address Space Layout Randomization (ASLR) is 
-enabled in the kernel.
-EAL:eal_memory.c:1593:    This may cause issues with mapping memory into 
-secondary processes
-char device redirected to /dev/pts/9 (label charserial1)
-2017-03-29T06:38:37.886940Z qemu-kvm: VQ 2 size 0x80 < last_avail_idx 0x47b - 
-used_idx 0x47c
-2017-03-29T06:38:37.886974Z qemu-kvm: error while loading state for instance 0x0 
-of device '0000:00:07.0/virtio-balloon'
-2017-03-29T06:38:37.888684Z qemu-kvm: load of migration failed: Operation not 
-permitted
-2017-03-29 06:38:37.896+0000: shutting down
-
-
-For what it's worth, the differences between the two qemu command lines are as 
-follows:
-
-source:
--name instance-0000000e -chardev 
-file,id=charserial0,path=/etc/nova/instances/57ae849f-aa66-422a-90a2-62db6c59db29/console.log 
--vnc 0.0.0.0:9 -incoming fd:25
-
-destination:
--name guest=instance-0000000e,debug-threads=on -object 
-secret,id=masterKey0,format=raw,file=/var/lib/libvirt/qemu/domain-10-instance-0000000e/master-key.aes 
--add-fd set=0,fd=51 -chardev file,id=charserial0,path=/dev/fdset/0,append=on 
--vnc 0.0.0.0:11 -incoming defer
-
-Thanks,
-Chris
+>
+>   [Qemu-devel] [PULL 0/2] vhost, pc: fixes
+>   http://lists.nongnu.org/archive/html/qemu-devel/2017-03/msg06103.html
+>
+> It says "Region caching is still causing issues around reset". (Region
+> caching was a recent, very intrusive, virtio change in QEMU that sort of
+> blew up everything and developers have been dealing with the fallout
+> ever since. <-- my personal account anyway)
+>
+> In another (separate, downstream) discussion, I explained that the
+> VirtioNetDxe driver in OVMF and ArmVirtQemu does a virtio reset on the
+> virtio network device in an ExitBootServices() callback; that is, when
+> the kernel's UEFI stub takes control of the system. Resetting the virtio
+> device is supposed to cause the host to de-configure the device and to
+> forget all about it. If that doesn't occur correctly, the guest kernel
+> can definitely end up in a crappy state (the host might still consider
+> memory areas belong to the virtio device that were originally allocated
+> by the firmware, but are now overwritten by the guest kernel).
+>
+> In addition, I found some relevant-looking, recent vhost commits in the
+> kernel:
+>
+> 275bf960ac69 vhost: better detection of available buffers
+> 0ed005ce02fa vhost_net: tx batching
+> 635b8c8ecdd2 tap: Renaming tap related APIs, data structures, macros
+> 9a393b5d5988 tap: tap as an independent module
+> e3b56cdd4351 vhost: try avoiding avail index access when getting
+>              descriptor
+> f88949138058 vhost: introduce O(1) vq metadata cache
+>
+> I think the symptoms could be a strange interplay between recent QEMU
+> and kernel changes that are tickled by the firmware's virtio-net driver
+> the wrong way.
+>
+> Thanks
+> Laszlo
+>
+>>
+>> Thanks,
+>> -Christoffer
+>> _______________________________________________
+>> kvmarm mailing list
+>> kvmarm@lists.cs.columbia.edu
+>> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+>>
+>
