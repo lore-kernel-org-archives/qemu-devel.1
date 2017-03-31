@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cu2Yg-0004O2-4d
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:50:07 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cu3Cr-0001r2-2v
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 16:31:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cu2Yc-0000JX-SU
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:50:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36298)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cu2Yc-0000IU-K6
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 15:50:02 -0400
-Date: Fri, 31 Mar 2017 15:49:55 -0400 (EDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <537494730.10012113.1490989795569.JavaMail.zimbra@redhat.com>
-In-Reply-To: <ad2e87d5-f8bc-7abf-a376-bc6972c03fd5@redhat.com>
-References: <20170331044711.21749-1-aik@ozlabs.ru>
-	<ad2e87d5-f8bc-7abf-a376-bc6972c03fd5@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cu3Cn-0002da-4P
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 16:31:37 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170331170512.10381-1-mreitz@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a2b7c6b1-d73a-40f7-bf92-fe5a2662d0b2@amsat.org>
+Date: Fri, 31 Mar 2017 17:31:27 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu] pci: Only unmap
- bus_master_enabled_region if was added previously
+In-Reply-To: <20170331170512.10381-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-2.9] block/parallels: Avoid overflows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,62 +26,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V . Lunev" <den@openvz.org>
 
-> On 03/31/2017 12:47 AM, Alexey Kardashevskiy wrote:
-> > Normally pci_init_bus_master() would be called either via
-> > bus->machine_done.notify or directly from do_pci_register_device().
-> > 
-> > However if a device's realize() failed, pci_init_bus_master() is not
-> > called, and do_pci_unregister_device() fails on
-> > memory_region_del_subregion() as it was not mapped.
-> > 
-> > This adds a check that subregion was mapped before unmapping it.
-> > 
-> > Fixes: c53598ed18e4 ("pci: Add missing drop of bus master AS reference")
-> > Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> > ---
-> > This is to pass iotest 051 which does run QEMU like this:
-> > 
-> > ppc64-softmmu/qemu-system-ppc64 -nodefaults -machine accel=qtest -nographic
-> > -monitor stdio -serial none -drive if=virtio
-> > 
-> > which normally fails with:
-> > 
-> > qemu-system-ppc64: -drive if=virtio: Device needs media, but drive is empty
-> > 
-> > or asserts (without this patch):
-> > 
-> > qemu-system-ppc64: /home/aik/p/qemu-kvm/memory.c:2118:
-> > memory_region_del_subregion: Assertion `subregion->container == mr'
-> > failed.
-> > ---
-> >  hw/pci/pci.c | 6 ++++--
-> >  1 file changed, 4 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> > index bd8043c460..259483b1c0 100644
-> > --- a/hw/pci/pci.c
-> > +++ b/hw/pci/pci.c
-> > @@ -869,8 +869,10 @@ static void do_pci_unregister_device(PCIDevice
-> > *pci_dev)
-> >      pci_dev->bus->devices[pci_dev->devfn] = NULL;
-> >      pci_config_free(pci_dev);
-> >  
-> > -    memory_region_del_subregion(&pci_dev->bus_master_container_region,
-> > -                                &pci_dev->bus_master_enable_region);
-> > +    if (memory_region_is_mapped(&pci_dev->bus_master_enable_region)) {
-> > +        memory_region_del_subregion(&pci_dev->bus_master_container_region,
-> > +                                    &pci_dev->bus_master_enable_region);
-> > +    }
-> >      address_space_destroy(&pci_dev->bus_master_as);
-> >  }
-> >  
-> > 
-> 
-> Thanks for the quick turnaround!
-> 
-> Tested-by: John Snow <jsnow@redhat.com>
+On 03/31/2017 02:05 PM, Max Reitz wrote:
+> Change the types of variables in allocate_clusters() to int64_t so we do
+> not have to worry about potential overflows.
+>
+> Add an assertion that our accesses to s->bat[] do not result in a buffer
+> overflow and that the implicit conversion performed when invoking
+> bat_entry_off() does not result in an integer overflow.
+>
+> Coverity-id: 1307776
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+> This supercedes Peter's patch "block/parallels.c: avoid integer overflow
+> in allocate_clusters()".
+> ---
+>  block/parallels.c | 19 +++++++++++++------
+>  1 file changed, 13 insertions(+), 6 deletions(-)
+>
+> diff --git a/block/parallels.c b/block/parallels.c
+> index 4173b3fb9d..90acf79687 100644
+> --- a/block/parallels.c
+> +++ b/block/parallels.c
+> @@ -192,8 +192,7 @@ static int64_t allocate_clusters(BlockDriverState *bs, int64_t sector_num,
+>                                   int nb_sectors, int *pnum)
+>  {
+>      BDRVParallelsState *s = bs->opaque;
+> -    uint32_t idx, to_allocate, i;
+> -    int64_t pos, space;
+> +    int64_t pos, space, idx, to_allocate, i;
+>
+>      pos = block_status(s, sector_num, nb_sectors, pnum);
+>      if (pos > 0) {
+> @@ -201,11 +200,19 @@ static int64_t allocate_clusters(BlockDriverState *bs, int64_t sector_num,
+>      }
+>
+>      idx = sector_num / s->tracks;
+> -    if (idx >= s->bat_size) {
+> -        return -EINVAL;
+> -    }
+> -
+>      to_allocate = DIV_ROUND_UP(sector_num + *pnum, s->tracks) - idx;
+> +
+> +    /* This function is called only by parallels_co_writev(), which will never
+> +     * pass a sector_num at or beyond the end of the image (because the block
+> +     * layer never passes such a sector_num to that function). Therefore, idx
+> +     * is always below s->bat_size.
+> +     * block_status() will limit *pnum so that sector_num + *pnum will not
+> +     * exceed the image end. Therefore, idx + to_allocate cannot exceed
+> +     * s->bat_size.
+> +     * Note that s->bat_size is an unsigned int, therefore idx + to_allocate
+> +     * will always fit into a uint32_t. */
+> +    assert(idx < s->bat_size && idx + to_allocate <= s->bat_size);
+> +
+>      space = to_allocate * s->tracks;
+>      if (s->data_end + space > bdrv_getlength(bs->file->bs) >> BDRV_SECTOR_BITS) {
+>          int ret;
+>
