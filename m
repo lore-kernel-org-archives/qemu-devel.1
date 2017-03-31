@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jhanley@dgtlrift.com>) id 1ctyTa-0008HU-9E
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 11:28:35 -0400
+	(envelope-from <den@virtuozzo.com>) id 1ctyXH-0000xZ-OP
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 11:32:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jhanley@dgtlrift.com>) id 1ctyTZ-0004D6-8J
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 11:28:34 -0400
-Received: from mail-vk0-x244.google.com ([2607:f8b0:400c:c05::244]:33900)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jhanley@dgtlrift.com>)
-	id 1ctyTY-0004CP-Uw
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 11:28:33 -0400
-Received: by mail-vk0-x244.google.com with SMTP id y16so11904207vky.1
-	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 08:28:32 -0700 (PDT)
+	(envelope-from <den@virtuozzo.com>) id 1ctyXG-0007t6-M9
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 11:32:23 -0400
+References: <1490965980-513-1-git-send-email-peter.maydell@linaro.org>
+	<9e359c38-a2aa-64e8-6c7c-0b793d2f2bb4@redhat.com>
+	<682f7310-d197-70e5-075a-2bec7a3e5c62@openvz.org>
+	<3fcf3715-3db4-acd4-52a2-6b74c6c2b495@redhat.com>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <563123d5-67c1-30af-c1d3-619433c817e5@openvz.org>
+Date: Fri, 31 Mar 2017 18:00:00 +0300
 MIME-Version: 1.0
-From: James Hanley <jhanley@dgtlrift.com>
-Date: Fri, 31 Mar 2017 11:28:31 -0400
-Message-ID: <CAF++6AOLSd0SYyv_LmnjinEj-jHBbyNZv_hxvdksGqCoDcpmjA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: [Qemu-devel] MTD timeout on bootup
+In-Reply-To: <3fcf3715-3db4-acd4-52a2-6b74c6c2b495@redhat.com>
+Content-Type: text/plain; charset="iso-8859-15"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] block/parallels.c: avoid integer overflow
+ in allocate_clusters()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,43 +26,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel <qemu-devel@nongnu.org>
+To: Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-When trying to bootup a pristine zync image from the zc702 tarball, it
-would always fail with the MTD detection of the serial flash device type
-command over the SPI.  I believe this section of code may have the logic
-flipped.  Once I changed it to the following, I was able to detect the
-flash type when booting the pristine image from Xilinx.
--Jim
+On 03/31/2017 05:56 PM, Max Reitz wrote:
+> On 31.03.2017 16:54, Denis V. Lunev wrote:
+>> On 03/31/2017 04:47 PM, Max Reitz wrote:
+>>> On 31.03.2017 15:13, Peter Maydell wrote:
+>>>> Coverity (CID 1307776) points out that in the multiply:
+>>>>   space =3D to_allocate * s->tracks;
+>>>> we are trying to calculate a 64 bit result but the types
+>>>> of to_allocate and s->tracks mean that we actually calculate
+>>>> a 32 bit result. Add an explicit cast to force a 64 bit
+>>>> multiply.
+>>>>
+>>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>>>> ---
+>>>> NB: compile-and-make-check tested only...
+>>>> ---
+>>>>  block/parallels.c | 2 +-
+>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/block/parallels.c b/block/parallels.c
+>>>> index 4173b3f..3886c30 100644
+>>>> --- a/block/parallels.c
+>>>> +++ b/block/parallels.c
+>>>> @@ -206,7 +206,7 @@ static int64_t allocate_clusters(BlockDriverStat=
+e *bs, int64_t sector_num,
+>>>>      }
+>>>> =20
+>>>>      to_allocate =3D DIV_ROUND_UP(sector_num + *pnum, s->tracks) - i=
+dx;
+>>>> -    space =3D to_allocate * s->tracks;
+>>>> +    space =3D (int64_t)to_allocate * s->tracks;
+>>>>      if (s->data_end + space > bdrv_getlength(bs->file->bs) >> BDRV_=
+SECTOR_BITS) {
+>>>>          int ret;
+>>>>          space +=3D s->prealloc_size;
+>>> I think the division is technically fine because to_allocate will
+>>> roughly be *pnum / s->tracks (and since *pnum is an int, the
+>>> multiplication cannot overflow).
+>>>
+>>> However, it's still good to fix this, but I would do it differently:
+>>> Make idx, to_allocate, and i all uint64_t or int64_t instead of
+>>> uint32_t. This would also prevent accidental overflow when storing th=
+e
+>>> result of the division in:
+>>>
+>>> idx =3D sector_num / s->tracks;
+>>> if (idx >=3D s->bat_size) {
+>>>     [...]
+>>>
+>>> The much greater problem to me appears to be that we don't check that=
 
+>>> idx + to_allocate <=3D s->bat_size. I'm not sure whether there can be=
+ a
+>>> buffer overflow in the for loop below, but I'm not sure I really want=
+ to
+>>> know either... I think the block_status() call limits *pnum so that
+>>> there will not be an overflow, but then we should at least assert thi=
+s.
+>>>
+>>> Max
+>>>
+>> technically we are protected by the check in
+>>
+>> static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
+>>     BdrvTrackedRequest *req, int64_t offset, unsigned int bytes,
+>>     int64_t align, QEMUIOVector *qiov, int flags)
+>> ...
+>>     /* Forward the request to the BlockDriver, possibly fragmenting it=
+ */
+>>     total_bytes =3D bdrv_getlength(bs);
+>>     if (total_bytes < 0) {
+>>         ret =3D total_bytes;
+>>         goto out;
+>>     }
+>>
+>>     max_bytes =3D ROUND_UP(MAX(0, total_bytes - offset), align);
+>>     if (bytes <=3D max_bytes && bytes <=3D max_transfer) {
+>>         ret =3D bdrv_driver_preadv(bs, offset, bytes, qiov, 0);
+>>         goto out;
+>>     }
+>>
+>> which guarantees that the request is always inside the length of the
+>> device. Thus we should be on the safe side with the mentioned
+>> access as bat_size is calculated from the size of the entire virtual
+>> disk.
+> Right, but then we wouldn't need the check on idx. With the way things
+> are, it looks a bit confusing. Maybe we should just make it an assertio=
+n?
+>
+> assert(idx < s->bat_size && idx + to_allocate <=3D s->bat_size);
+>
+> Max
+>
+>
 
->From baaaacca370c13526fd2b8c7b33c7d9e8a6d7b8d Mon Sep 17 00:00:00 2001
-From: Jim Hanley <Jim.Hanley@LandisGyr.com>
-Date: Thu, 23 Mar 2017 10:29:34 -0400
-Subject: [PATCH] MTD writes from the SPI were never being dequeue...
-Signed-off-by:
-
----
- hw/ssi/xilinx_spips.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index da8adfa..a3af1f7 100644
---- a/hw/ssi/xilinx_spips.c
-+++ b/hw/ssi/xilinx_spips.c
-@@ -482,8 +482,8 @@ static void xilinx_spips_write(void *opaque, hwaddr
-addr,
-     s->regs[addr] = (s->regs[addr] & ~mask) | (value & mask);
- no_reg_update:
-     xilinx_spips_update_cs_lines(s);
--    if ((man_start_com && s->regs[R_CONFIG] & MAN_START_EN) ||
--            (fifo8_is_empty(&s->tx_fifo) && s->regs[R_CONFIG] &
-MAN_START_EN)) {
-+    if (!((man_start_com && s->regs[R_CONFIG] & MAN_START_EN) ||
-+            (fifo8_is_empty(&s->tx_fifo) && s->regs[R_CONFIG] &
-MAN_START_EN))) {
-         xilinx_spips_flush_txfifo(s);
-     }
-     xilinx_spips_update_cs_lines(s);
--- 
-2.7.4
+good idea!
