@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cu3Ve-0004JM-HY
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 16:51:03 -0400
+	(envelope-from <rjones@redhat.com>) id 1cu3WI-0004bm-V5
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 16:51:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cu3Vd-0005PI-Li
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 16:51:02 -0400
-References: <20170331120431.1767-1-mreitz@redhat.com>
-	<20170331120431.1767-3-mreitz@redhat.com>
-	<6d0d11fc-1849-9acb-fc53-3c46c13878ab@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <9821ca21-32fd-6054-05cc-2b505db402e2@redhat.com>
-Date: Fri, 31 Mar 2017 22:50:52 +0200
-MIME-Version: 1.0
-In-Reply-To: <6d0d11fc-1849-9acb-fc53-3c46c13878ab@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="LFe4lWTs7VPVLd1fu1BuxedE6M58sLe2P"
-Subject: Re: [Qemu-devel] [PATCH for-2.9 2/2] block/curl: Check protocol
- prefix
+	(envelope-from <rjones@redhat.com>) id 1cu3WF-0005lZ-RZ
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 16:51:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59828)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1cu3WF-0005l4-Ih
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 16:51:39 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 83A29CB32A
+	for <qemu-devel@nongnu.org>; Fri, 31 Mar 2017 20:51:38 +0000 (UTC)
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Fri, 31 Mar 2017 21:51:33 +0100
+Message-Id: <20170331205133.23906-1-rjones@redhat.com>
+Subject: [Qemu-devel] [PATCH] main-loop: Acquire main_context lock around
+ os_host_main_loop_wait.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,110 +28,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, rjones@redhat.com, marcandre.lureau@redhat.com, fziglio@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---LFe4lWTs7VPVLd1fu1BuxedE6M58sLe2P
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <9821ca21-32fd-6054-05cc-2b505db402e2@redhat.com>
-Subject: Re: [PATCH for-2.9 2/2] block/curl: Check protocol prefix
-References: <20170331120431.1767-1-mreitz@redhat.com>
- <20170331120431.1767-3-mreitz@redhat.com>
- <6d0d11fc-1849-9acb-fc53-3c46c13878ab@redhat.com>
-In-Reply-To: <6d0d11fc-1849-9acb-fc53-3c46c13878ab@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+When running virt-rescue the serial console hangs from time to time.
+Virt-rescue runs an ordinary Linux kernel "appliance", but there is
+only a single idle process running inside, so the qemu main loop is
+largely idle.  With virt-rescue >= 1.37 you may be able to observe the
+hang by doing:
 
-On 31.03.2017 21:30, Eric Blake wrote:
-> On 03/31/2017 07:04 AM, Max Reitz wrote:
->> If the user has explicitly specified a block driver and thus a protoco=
-l,
->> we have to make sure the URL's protocol prefix matches. Otherwise the
->> latter will silently override the former which might catch some users =
-by
->> surprise.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  block/curl.c | 10 ++++++++++
->>  1 file changed, 10 insertions(+)
->>
->=20
-> It feels a little bit dirty that we are parsing the URL rather than
-> having a distinct discriminator, but I'm okay with the approach (with a=
+  $ virt-rescue -e ^] --scratch
+  ><rescue> while true; do ls -l /usr/bin; done
 
-> distinct discriminator, we would have to reconstruct a URL from the
-> discriminator + the rest of the server/path information, and that's mor=
-e
-> work to libvirt to split a URL into the distinct JSON fields just to
-> have qemu rebuild a URL).
+The hang in virt-rescue can be resolved by pressing a key on the
+serial console.
 
-Yes, you're right, there are a couple of points where the interface
-could be nicer. Another thing is the cookie string which could be a list
-of dicts or something similar. But in the end all of this block driver
-really is just an interface for libcurl, so I thought it best to just
-behave as such (i.e. take "blob" strings that are then just piped into
-libcurl).
+Possibly with the same root cause, we also observed hangs during very
+early boot of regular Linux VMs with a serial console.  Those hangs
+are extremely rare, but you may be able to observe them by running
+this command on baremetal for a sufficiently long time:
 
-(The distinct discriminator would probably be just the block driver
-name. But then every user would have to strip the protocol part from the
-URL...)
+  $ while libguestfs-test-tool -t 60 >& /tmp/log ; do echo -n . ; done
 
->> +    if (!strstart(file, bs->drv->protocol_name, &protocol_delimiter) =
-||
->> +        !strstart(protocol_delimiter, "://", NULL))
+(Check in /tmp/log that the failure was caused by a hang during early
+boot, and not some other reason)
 
-Regarding case sensitivity: I have to say that I actually can't remember
-when I saw a not full lower-cased protocol specified in a URL, and I'm
-glad about that. :-)
+During investigation of this bug, Paolo Bonzini wrote:
 
-I also think we can wait until someone files a bug (at which point we
-can always ask them how hard it would be to just write the protocol in
-lower case...).
+> glib is expecting QEMU to use g_main_context_acquire around accesses to
+> GMainContext.  However QEMU is not doing that, instead it is taking its
+> own mutex.  So we should add g_main_context_acquire and
+> g_main_context_release in the two implementations of
+> os_host_main_loop_wait; these should undo the effect of Frediano's
+> glib patch.
 
->> +    {
->> +        error_setg(errp, "%s curl driver cannot handle the URL '%s' (=
-does not "
->> +                   "start with '%s://')", bs->drv->protocol_name, fil=
-e,
->> +                   bs->drv->protocol_name);
->=20
-> Perhaps splitting the message with an error_append_hint() for the
-> parenthetical half would also be appropriate, but the line is not too
-> terribly long so I won't insist on a respin.
+This patch exactly implements Paolo's suggestion in that paragraph.
 
-Good idea. But I don't think it's quite worth a respin either at this poi=
-nt.
+This fixes the serial console hang in my testing, across 3 different
+physical machines (AMD, Intel Core i7 and Intel Xeon), over many hours
+of automated testing.  I wasn't able to reproduce the early boot hangs
+(but as noted above, these are extremely rare in any case).
 
-(Also, it can be argued that the part in parentheses is in fact the
-actual error source, so it kind of makes sense to keep it in the main
-error message.)
+Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1435432
+Reported-by: Richard W.M. Jones <rjones@redhat.com>
+Tested-by: Richard W.M. Jones <rjones@redhat.com>
+Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
+---
+ util/main-loop.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks!
-
-Max
-
-
---LFe4lWTs7VPVLd1fu1BuxedE6M58sLe2P
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljewSwSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A/40IAKcqlpReSWhtIqqvtr7lmmR5hO2HMlh8
-XmIowPpCcrjenURNYM+e1z43ZAvDX3eQ8vpVWsQk7YoskOzQOkNvbC4ErsI2GdxI
-fMOxrjlnt71KtsUz2BIkV8X/BUZ7AUn6JjROaYhVczLHPoTLJb1AYSOB1F4qULkE
-2F1NkbOdwIhmBG7Ts7lRcfFWDwzYyKoeCTVohZvWygU+4p3M3FC0xiIdRSkZ7x+S
-ovbV8wBSfw6bkEb5re5qfNobA3349Gq56IwNgNFlIMJ13yu4kEKGEurcXMUIn51h
-kqZkkuygJXN3wZh4+4WYdXMqFbzfkbwhmqR3kQnWdoCz9/j7QYZoVE0=
-=AK6z
------END PGP SIGNATURE-----
-
---LFe4lWTs7VPVLd1fu1BuxedE6M58sLe2P--
+diff --git a/util/main-loop.c b/util/main-loop.c
+index 4534c89..19cad6b 100644
+--- a/util/main-loop.c
++++ b/util/main-loop.c
+@@ -218,9 +218,12 @@ static void glib_pollfds_poll(void)
+ 
+ static int os_host_main_loop_wait(int64_t timeout)
+ {
++    GMainContext *context = g_main_context_default();
+     int ret;
+     static int spin_counter;
+ 
++    g_main_context_acquire(context);
++
+     glib_pollfds_fill(&timeout);
+ 
+     /* If the I/O thread is very busy or we are incorrectly busy waiting in
+@@ -256,6 +259,9 @@ static int os_host_main_loop_wait(int64_t timeout)
+     }
+ 
+     glib_pollfds_poll();
++
++    g_main_context_release(context);
++
+     return ret;
+ }
+ #else
+@@ -412,12 +418,15 @@ static int os_host_main_loop_wait(int64_t timeout)
+     fd_set rfds, wfds, xfds;
+     int nfds;
+ 
++    g_main_context_acquire(context);
++
+     /* XXX: need to suppress polling by better using win32 events */
+     ret = 0;
+     for (pe = first_polling_entry; pe != NULL; pe = pe->next) {
+         ret |= pe->func(pe->opaque);
+     }
+     if (ret != 0) {
++        g_main_context_release(context);
+         return ret;
+     }
+ 
+@@ -472,6 +481,8 @@ static int os_host_main_loop_wait(int64_t timeout)
+         g_main_context_dispatch(context);
+     }
+ 
++    g_main_context_release(context);
++
+     return select_ret || g_poll_ret;
+ }
+ #endif
+-- 
+2.9.3
