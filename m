@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <g.danil.anto@gmail.com>) id 1cuJAa-0002vH-Fh
-	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 09:34:21 -0400
+	(envelope-from <g.danil.anto@gmail.com>) id 1cuJC5-0003vH-Qt
+	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 09:35:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <g.danil.anto@gmail.com>) id 1cuJAZ-00074L-FL
-	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 09:34:20 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:36143)
+	(envelope-from <g.danil.anto@gmail.com>) id 1cuJC4-0007nG-Po
+	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 09:35:53 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:35618)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <g.danil.anto@gmail.com>)
-	id 1cuJAZ-000745-AL
-	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 09:34:19 -0400
-Received: by mail-oi0-x243.google.com with SMTP id b187so13162216oif.3
-	for <qemu-devel@nongnu.org>; Sat, 01 Apr 2017 06:34:19 -0700 (PDT)
+	id 1cuJC4-0007mz-K8
+	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 09:35:52 -0400
+Received: by mail-oi0-x241.google.com with SMTP id d2so5824630oig.2
+	for <qemu-devel@nongnu.org>; Sat, 01 Apr 2017 06:35:52 -0700 (PDT)
 MIME-Version: 1.0
 From: Danil Antonov <g.danil.anto@gmail.com>
-Date: Sat, 1 Apr 2017 16:34:18 +0300
-Message-ID: <CA+KKJYBUqfm4W4sOJyVEzN=AjSSC=xnFYtnNg1=cObyaVn2k7A@mail.gmail.com>
+Date: Sat, 1 Apr 2017 16:35:51 +0300
+Message-ID: <CA+KKJYBMk15mHZ3jNYVAwRmDy6Z65-5Jf__sDE6=FFZLwXx3Nw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: [Qemu-devel] [PATCH 04/43] xen-hvm: made printf always compile in
- debug output
+Subject: [Qemu-devel] [PATCH 05/43] xen-mapcache: made printf always compile
+ in debug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,10 +29,11 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, sstabellini@kernel.org, anthony.perard@citrix.com
 
->From 05d558842b0a10ee3f0606eb54068b6ba03906a3 Mon Sep 17 00:00:00 2001
+>From 0e4a8a20c9c05e547d42be1b9ef868d12e7b43a9 Mon Sep 17 00:00:00 2001
 From: Danil Antonov <g.danil.anto@gmail.com>
-Date: Wed, 29 Mar 2017 02:13:13 +0300
-Subject: [PATCH 04/43] xen-hvm: made printf always compile in debug output
+Date: Wed, 29 Mar 2017 02:14:06 +0300
+Subject: [PATCH 05/43] xen-mapcache: made printf always compile in debug
+ output
 
 Wrapped printf calls inside debug macros (DPRINTF) in `if` statement.
 This will ensure that printf function will always compile even if debug
@@ -41,37 +42,37 @@ strings.
 
 Signed-off-by: Danil Antonov <g.danil.anto@gmail.com>
 ---
- xen-hvm.c | 18 +++++++++---------
+ xen-mapcache.c | 18 +++++++++---------
  1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/xen-hvm.c b/xen-hvm.c
-index 5043beb..abf0f72 100644
---- a/xen-hvm.c
-+++ b/xen-hvm.c
-@@ -29,15 +29,15 @@
- #include <xen/hvm/params.h>
- #include <xen/hvm/e820.h>
+diff --git a/xen-mapcache.c b/xen-mapcache.c
+index 1a96d2e..c2d1e6f 100644
+--- a/xen-mapcache.c
++++ b/xen-mapcache.c
+@@ -22,15 +22,15 @@
+ #include "trace-root.h"
 
--//#define DEBUG_XEN_HVM
+
+-//#define MAPCACHE_DEBUG
 -
--#ifdef DEBUG_XEN_HVM
--#define DPRINTF(fmt, ...) \
--    do { fprintf(stderr, "xen: " fmt, ## __VA_ARGS__); } while (0)
+-#ifdef MAPCACHE_DEBUG
+-#  define DPRINTF(fmt, ...) do { \
+-    fprintf(stderr, "xen_mapcache: " fmt, ## __VA_ARGS__); \
+-} while (0)
 -#else
--#define DPRINTF(fmt, ...) \
--    do { } while (0)
+-#  define DPRINTF(fmt, ...) do { } while (0)
 -#endif
-+#ifndef DEBUG_XEN_HVM
-+#define DEBUG_XEN_HVM 0
++#ifndef MAPCACHE_DEBUG
++#define MAPCACHE_DEBUG 0
 +#endif
 +
-+#define DPRINTF(fmt, ...) do {                        \
-+    if (DEBUG_XEN_HVM) {                              \
-+        fprintf(stderr, "xen: " fmt, ## __VA_ARGS__); \
-+    }                                                 \
++#define DPRINTF(fmt, ...) do {                                 \
++    if (MAPCACHE_DEBUG) {                                      \
++        fprintf(stderr, "xen_mapcache: " fmt, ## __VA_ARGS__); \
++    }                                                          \
 +} while (0);
 
- static MemoryRegion ram_memory, ram_640k, ram_lo, ram_hi;
- static MemoryRegion *framebuffer;
+ #if HOST_LONG_BITS == 32
+ #  define MCACHE_BUCKET_SHIFT 16
 -- 
 2.8.0.rc3
