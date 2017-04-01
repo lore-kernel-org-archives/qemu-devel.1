@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <g.danil.anto@gmail.com>) id 1cuJE7-0005IR-9s
-	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 09:38:00 -0400
+	(envelope-from <g.danil.anto@gmail.com>) id 1cuJFY-00064F-Q2
+	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 09:39:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <g.danil.anto@gmail.com>) id 1cuJE5-0000XH-OV
-	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 09:37:59 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:33434)
+	(envelope-from <g.danil.anto@gmail.com>) id 1cuJFX-0001Yi-DV
+	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 09:39:28 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:35822)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <g.danil.anto@gmail.com>)
-	id 1cuJE5-0000Wf-Gl
-	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 09:37:57 -0400
-Received: by mail-oi0-x244.google.com with SMTP id f193so13181880oib.0
-	for <qemu-devel@nongnu.org>; Sat, 01 Apr 2017 06:37:57 -0700 (PDT)
+	id 1cuJFX-0001YP-6M
+	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 09:39:27 -0400
+Received: by mail-oi0-x241.google.com with SMTP id d2so5833507oig.2
+	for <qemu-devel@nongnu.org>; Sat, 01 Apr 2017 06:39:27 -0700 (PDT)
 MIME-Version: 1.0
 From: Danil Antonov <g.danil.anto@gmail.com>
-Date: Sat, 1 Apr 2017 16:37:56 +0300
-Message-ID: <CA+KKJYCpD-O-1S6SrC3Ce4zteWRAhjROKKknnod2xLtoNoNrfw@mail.gmail.com>
+Date: Sat, 1 Apr 2017 16:39:26 +0300
+Message-ID: <CA+KKJYAayURWSAcsjXXszSbOn3k3az8jdpXnfz971hfRV4prhQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Subject: [Qemu-devel] [PATCH 07/43] ldst_helper: made printf always compile
  in debug output
@@ -27,7 +27,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mark.cave-ayland@ilande.co.uk, atar4qemu@gmail.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, pbonzini@redhat.com, mtosatti@redhat.com, rth@twiddle.net, ehabkost@redhat.com
 
 >From a827e069c46b272ab952dfde370c1954decdf3dd Mon Sep 17 00:00:00 2001
 From: Danil Antonov <g.danil.anto@gmail.com>
