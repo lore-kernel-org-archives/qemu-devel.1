@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <g.danil.anto@gmail.com>) id 1cuJRZ-0002yX-NP
-	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 09:51:57 -0400
+	(envelope-from <g.danil.anto@gmail.com>) id 1cuJSM-0003Kl-5k
+	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 09:52:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <g.danil.anto@gmail.com>) id 1cuJRX-00022J-Gl
-	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 09:51:53 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:33398)
+	(envelope-from <g.danil.anto@gmail.com>) id 1cuJSJ-0002Nb-1o
+	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 09:52:42 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:35714)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <g.danil.anto@gmail.com>)
-	id 1cuJRX-00021p-9O
-	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 09:51:51 -0400
-Received: by mail-oi0-x242.google.com with SMTP id f193so13214170oib.0
-	for <qemu-devel@nongnu.org>; Sat, 01 Apr 2017 06:51:51 -0700 (PDT)
+	id 1cuJSI-0002NM-QN
+	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 09:52:38 -0400
+Received: by mail-oi0-x241.google.com with SMTP id d2so5864131oig.2
+	for <qemu-devel@nongnu.org>; Sat, 01 Apr 2017 06:52:38 -0700 (PDT)
 MIME-Version: 1.0
 From: Danil Antonov <g.danil.anto@gmail.com>
-Date: Sat, 1 Apr 2017 16:51:50 +0300
-Message-ID: <CA+KKJYC5XSQRAGXd7_ahr-6tydukz-pcqoKioQr7Lk2moqSumQ@mail.gmail.com>
+Date: Sat, 1 Apr 2017 16:52:37 +0300
+Message-ID: <CA+KKJYCUmxtb7o7Fg-DLFaEqhjZk5MhfBjSMt6L146PYmnGWxw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: [Qemu-devel] [PATCH 16/43] intc: made printf always compile in
- debug output
+Subject: [Qemu-devel] [PATCH 17/43] net: made printf always compile in debug
+ output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,12 +27,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org, i.mitsyanko@gmail.com, agraf@suse.de, mst@redhat.com, pbonzini@redhat.com, gxt@mprc.pku.edu.cn
+To: qemu-devel@nongnu.org, jasowang@redhat.com, huth@tuxfamily.org, peter.maydell@linaro.org
 
->From 3985e3226a996f019649b6b7a4d6e3e64f81ea8d Mon Sep 17 00:00:00 2001
+>From d01cd76d0b20ee8fa67c07da64b0e2301e510247 Mon Sep 17 00:00:00 2001
 From: Danil Antonov <g.danil.anto@gmail.com>
-Date: Wed, 29 Mar 2017 12:30:06 +0300
-Subject: [PATCH 16/43] intc: made printf always compile in debug output
+Date: Wed, 29 Mar 2017 12:30:42 +0300
+Subject: [PATCH 17/43] net: made printf always compile in debug output
 
 Wrapped printf calls inside debug macros (DPRINTF) in `if` statement.
 This will ensure that printf function will always compile even if debug
@@ -41,190 +41,186 @@ strings.
 
 Signed-off-by: Danil Antonov <g.danil.anto@gmail.com>
 ---
- hw/intc/arm_gicv3_kvm.c       | 16 +++++++++-------
- hw/intc/exynos4210_combiner.c | 18 +++++++++---------
- hw/intc/heathrow_pic.c        | 17 ++++++++++-------
- hw/intc/i8259.c               | 16 +++++++++-------
- hw/intc/ioapic.c              | 16 +++++++++-------
- hw/intc/puv3_intc.c           |  4 ++--
- 6 files changed, 48 insertions(+), 39 deletions(-)
+ hw/net/dp8393x.c        | 15 ++++++++++-----
+ hw/net/lan9118.c        | 20 ++++++++++++++------
+ hw/net/mcf_fec.c        | 18 +++++++++++-------
+ hw/net/stellaris_enet.c | 28 ++++++++++++++++++----------
+ 4 files changed, 53 insertions(+), 28 deletions(-)
 
-diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-index 81f0403..32e75c0 100644
---- a/hw/intc/arm_gicv3_kvm.c
-+++ b/hw/intc/arm_gicv3_kvm.c
-@@ -30,13 +30,15 @@
- #include "vgic_common.h"
- #include "migration/migration.h"
+diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
+index efa33ad..1236990 100644
+--- a/hw/net/dp8393x.c
++++ b/hw/net/dp8393x.c
+@@ -25,13 +25,13 @@
+ #include "qemu/timer.h"
+ #include <zlib.h>
 
--#ifdef DEBUG_GICV3_KVM
--#define DPRINTF(fmt, ...) \
--    do { fprintf(stderr, "kvm_gicv3: " fmt, ## __VA_ARGS__); } while (0)
--#else
--#define DPRINTF(fmt, ...) \
--    do { } while (0)
--#endif
-+#ifndef DEBUG_GICV3_KVM
-+#define DEBUG_GICV3_KVM 0
+-//#define DEBUG_SONIC
++#ifndef DEBUG_SONIC
++#define DEBUG_SONIC  0
 +#endif
-+
-+#define DPRINTF(fmt, ...) do {                               \
-+    if (DEBUG_GICV3_KVM) {                                   \
-+        fprintf(stderr, "kvm_gicv3: " fmt , ## __VA_ARGS__); \
-+    }                                                        \
-+} while (0);
 
- #define TYPE_KVM_ARM_GICV3 "kvm-arm-gicv3"
- #define KVM_ARM_GICV3(obj) \
-diff --git a/hw/intc/exynos4210_combiner.c b/hw/intc/exynos4210_combiner.c
-index f19a706..512fda6 100644
---- a/hw/intc/exynos4210_combiner.c
-+++ b/hw/intc/exynos4210_combiner.c
-@@ -32,15 +32,15 @@
+ #define SONIC_PROM_SIZE 0x1000
 
- #include "hw/arm/exynos4210.h"
-
--//#define DEBUG_COMBINER
--
--#ifdef DEBUG_COMBINER
+ #ifdef DEBUG_SONIC
 -#define DPRINTF(fmt, ...) \
--        do { fprintf(stdout, "COMBINER: [%s:%d] " fmt, __func__ ,
-__LINE__, \
--                ## __VA_ARGS__); } while (0)
+-do { printf("sonic: " fmt , ##  __VA_ARGS__); } while (0)
+ static const char* reg_names[] = {
+     "CR", "DCR", "RCR", "TCR", "IMR", "ISR", "UTDA", "CTDA",
+     "TPS", "TFC", "TSA0", "TSA1", "TFS", "URDA", "CRDA", "CRBA0",
+@@ -41,10 +41,15 @@ static const char* reg_names[] = {
+     "SR", "WT0", "WT1", "RSC", "CRCT", "FAET", "MPT", "MDT",
+     "0x30", "0x31", "0x32", "0x33", "0x34", "0x35", "0x36", "0x37",
+     "0x38", "0x39", "0x3a", "0x3b", "0x3c", "0x3d", "0x3e", "DCR2" };
 -#else
 -#define DPRINTF(fmt, ...) do {} while (0)
--#endif
-+#ifndef DEBUG_COMBINER
-+#define DEBUG_COMBINER 0
+ #endif
+
++#define DPRINTF(fmt, ...)                                   \
++    do {                                                    \
++        if (DEBUG_SONIC) {                                  \
++            fprintf(stderr, "sonic: " fmt, ## __VA_ARGS__); \
++        }                                                   \
++    } while (0)
++
+ #define SONIC_ERROR(fmt, ...) \
+ do { printf("sonic ERROR: %s: " fmt, __func__ , ## __VA_ARGS__); } while
+(0)
+
+diff --git a/hw/net/lan9118.c b/hw/net/lan9118.c
+index 3db8937..427160a 100644
+--- a/hw/net/lan9118.c
++++ b/hw/net/lan9118.c
+@@ -22,17 +22,25 @@
+
+ //#define DEBUG_LAN9118
+
++#ifndef DEBUG_LAN9118
++#define DEBUG_LAN9118 0
 +#endif
 +
-+#define DPRINTF(fmt, ...) do
-{                                                          \
-+    if (DEBUG_COMBINER)
-{                                                               \
-+        fprintf(stdout, "COMBINER: [%s:%d] " fmt, __func__ , __LINE__, ##
-__VA_ARGS__); \
+ #ifdef DEBUG_LAN9118
+-#define DPRINTF(fmt, ...) \
+-do { printf("lan9118: " fmt , ## __VA_ARGS__); } while (0)
+ #define BADF(fmt, ...) \
+ do { hw_error("lan9118: error: " fmt , ## __VA_ARGS__);} while (0)
+ #else
+-#define DPRINTF(fmt, ...) do {} while(0)
+ #define BADF(fmt, ...) \
+ do { fprintf(stderr, "lan9118: error: " fmt , ## __VA_ARGS__);} while (0)
+ #endif
+
++#define DPRINTF(fmt, ...)                                     \
++    do {                                                      \
++        if (DEBUG_LAN9118) {                                  \
++            fprintf(stderr, "lan9118: " fmt, ## __VA_ARGS__); \
++        }                                                     \
++    } while (0)
 +
-}
-\
-+} while (0);
-
- #define    IIC_NGRP        64            /* Internal Interrupt Combiner
-                                             Groups number */
-diff --git a/hw/intc/heathrow_pic.c b/hw/intc/heathrow_pic.c
-index 171f5ed..b9593f7 100644
---- a/hw/intc/heathrow_pic.c
-+++ b/hw/intc/heathrow_pic.c
-@@ -29,12 +29,15 @@
- /* debug PIC */
- //#define DEBUG_PIC
-
--#ifdef DEBUG_PIC
--#define PIC_DPRINTF(fmt, ...)                                   \
--    do { printf("PIC: " fmt , ## __VA_ARGS__); } while (0)
--#else
--#define PIC_DPRINTF(fmt, ...)
--#endif
-+#ifndef DEBUG_PIC
-+#define DEBUG_PIC 0
-+#endif
-+
-+#define PIC_DPRINTF(fmt, ...) do {                    \
-+    if (DEBUG_PIC) {                          \
-+        fprintf(stderr, "PIC: " fmt , ## __VA_ARGS__); \
-+    }                                             \
-+} while (0);
-
- typedef struct HeathrowPIC {
-     uint32_t events;
-@@ -72,7 +75,7 @@ static void pic_write(void *opaque, hwaddr addr,
-     unsigned int n;
-
-     n = ((addr & 0xfff) - 0x10) >> 4;
--    PIC_DPRINTF("writel: " TARGET_FMT_plx " %u: %08x\n", addr, n, value);
-+    PIC_DPRINTF("writel: " TARGET_FMT_plx " %u: %08x\n", addr, n, (int)
-value);
-     if (n >= 2)
-         return;
-     pic = &s->pics[n];
-diff --git a/hw/intc/i8259.c b/hw/intc/i8259.c
-index fe9ecd6..43a20ce 100644
---- a/hw/intc/i8259.c
-+++ b/hw/intc/i8259.c
-@@ -32,14 +32,16 @@
- #include "hw/intc/intc.h"
-
- /* debug PIC */
--//#define DEBUG_PIC
-
--#ifdef DEBUG_PIC
--#define DPRINTF(fmt, ...)                                       \
--    do { printf("pic: " fmt , ## __VA_ARGS__); } while (0)
--#else
--#define DPRINTF(fmt, ...)
--#endif
-+#ifndef DEBUG_PIC
-+#define DEBUG_PIC 0
-+#endif
-+
-+#define DPRINTF(fmt, ...) do {                         \
-+    if (DEBUG_PIC) {                                   \
-+        fprintf(stderr, "pic: " fmt , ## __VA_ARGS__); \
-+    }                                                  \
-+} while (0);
-
- //#define DEBUG_IRQ_LATENCY
- //#define DEBUG_IRQ_COUNT
-diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
-index 37c4386..684401a 100644
---- a/hw/intc/ioapic.c
-+++ b/hw/intc/ioapic.c
-@@ -35,14 +35,16 @@
- #include "hw/i386/x86-iommu.h"
- #include "trace.h"
-
--//#define DEBUG_IOAPIC
-
--#ifdef DEBUG_IOAPIC
--#define DPRINTF(fmt, ...)                                       \
--    do { printf("ioapic: " fmt , ## __VA_ARGS__); } while (0)
--#else
--#define DPRINTF(fmt, ...)
--#endif
-+#ifndef DEBUG_IOAPIC
-+#define DEBUG_IOAPIC 0
-+#endif
-+
-+#define DPRINTF(fmt, ...) do {                            \
-+    if (DEBUG_IOAPIC) {                                   \
-+        fprintf(stderr, "ioapic: " fmt , ## __VA_ARGS__); \
-+    }                                                     \
-+} while (0);
-
- #define APIC_DELIVERY_MODE_SHIFT 8
- #define APIC_POLARITY_SHIFT 14
-diff --git a/hw/intc/puv3_intc.c b/hw/intc/puv3_intc.c
-index ef8488a..80934f2 100644
---- a/hw/intc/puv3_intc.c
-+++ b/hw/intc/puv3_intc.c
-@@ -67,7 +67,7 @@ static uint64_t puv3_intc_read(void *opaque, hwaddr
+ #define CSR_ID_REV      0x50
+ #define CSR_IRQ_CFG     0x54
+ #define CSR_INT_STS     0x58
+@@ -1033,7 +1041,7 @@ static void lan9118_writel(void *opaque, hwaddr
 offset,
-     default:
-         DPRINTF("Bad offset %x\n", (int)offset);
+         s->int_sts |= val & SW_INT;
+         break;
+     case CSR_FIFO_INT:
+-        DPRINTF("FIFO INT levels %08x\n", val);
++        DPRINTF("FIFO INT levels %08x\n", (int)val);
+         s->fifo_int = val;
+         break;
+     case CSR_RX_CFG:
+@@ -1114,9 +1122,9 @@ static void lan9118_writel(void *opaque, hwaddr
+offset,
+         if (val & 0x80000000) {
+             if (val & 0x40000000) {
+                 s->mac_data = do_mac_read(s, val & 0xf);
+-                DPRINTF("MAC read %d = 0x%08x\n", val & 0xf, s->mac_data);
++                DPRINTF("MAC read %lx = 0x%08x\n", val & 0xf, s->mac_data);
+             } else {
+-                DPRINTF("MAC write %d = 0x%08x\n", val & 0xf, s->mac_data);
++                DPRINTF("MAC write %lx = 0x%08x\n", val & 0xf,
+s->mac_data);
+                 do_mac_write(s, val & 0xf, s->mac_data);
+             }
+         }
+diff --git a/hw/net/mcf_fec.c b/hw/net/mcf_fec.c
+index bfa6b4b..b1430ee 100644
+--- a/hw/net/mcf_fec.c
++++ b/hw/net/mcf_fec.c
+@@ -18,12 +18,16 @@
+
+ //#define DEBUG_FEC 1
+
+-#ifdef DEBUG_FEC
+-#define DPRINTF(fmt, ...) \
+-do { printf("mcf_fec: " fmt , ## __VA_ARGS__); } while (0)
+-#else
+-#define DPRINTF(fmt, ...) do {} while(0)
+-#endif
++#ifndef DEBUG_FEC
++#define DEBUG_FEC 0
++#endif
++
++#define DPRINTF(fmt, ...)                                     \
++    do {                                                      \
++        if (DEBUG_FEC) {                                      \
++            fprintf(stderr, "mcf_fec: " fmt, ## __VA_ARGS__); \
++        }                                                     \
++    } while (0)
+
+ #define FEC_MAX_DESC 1024
+ #define FEC_MAX_FRAME_SIZE 2032
+@@ -557,7 +561,7 @@ static ssize_t mcf_fec_receive(NetClientState *nc,
+const uint8_t *buf, size_t si
+     unsigned int buf_len;
+     size_t retsize;
+
+-    DPRINTF("do_rx len %d\n", size);
++    DPRINTF("do_rx len %lx\n", size);
+     if (!s->rx_enabled) {
+         return -1;
      }
--    DPRINTF("offset 0x%x, value 0x%x\n", offset, ret);
-+    DPRINTF("offset 0x%lx, value 0x%x\n", offset, ret);
-     return ret;
- }
+diff --git a/hw/net/stellaris_enet.c b/hw/net/stellaris_enet.c
+index 04bd10a..e6f5e28 100644
+--- a/hw/net/stellaris_enet.c
++++ b/hw/net/stellaris_enet.c
+@@ -13,16 +13,24 @@
 
-@@ -76,7 +76,7 @@ static void puv3_intc_write(void *opaque, hwaddr offset,
- {
-     PUV3INTCState *s = opaque;
+ //#define DEBUG_STELLARIS_ENET 1
 
--    DPRINTF("offset 0x%x, value 0x%x\n", offset, value);
-+    DPRINTF("offset 0x%lx, value 0x%lx\n", offset, value);
-     switch (offset) {
-     case 0x00: /* INTC_ICLR */
-     case 0x14: /* INTC_ICCR */
+-#ifdef DEBUG_STELLARIS_ENET
+-#define DPRINTF(fmt, ...) \
+-do { printf("stellaris_enet: " fmt , ## __VA_ARGS__); } while (0)
+-#define BADF(fmt, ...) \
+-do { fprintf(stderr, "stellaris_enet: error: " fmt , ## __VA_ARGS__);
+exit(1);} while (0)
+-#else
+-#define DPRINTF(fmt, ...) do {} while(0)
+-#define BADF(fmt, ...) \
+-do { fprintf(stderr, "stellaris_enet: error: " fmt , ## __VA_ARGS__);}
+while (0)
+-#endif
++#ifndef DEBUG_STELLARIS_ENET
++#define DEBUG_STELLARIS_ENET 0
++#endif
++
++#define DPRINTF(fmt, ...)                                            \
++    do {                                                             \
++        if (DEBUG_STELLARIS_ENET) {                                  \
++            fprintf(stderr, "stellaris_enet: " fmt, ## __VA_ARGS__); \
++        }                                                            \
++    } while (0)
++
++#define BADF(fmt, ...)                                                   \
++    do {                                                                 \
++        fprintf(stderr, "stellaris_enet: error: " fmt , ## __VA_ARGS__); \
++        if (DEBUG_STELLARIS_ENET) {                                      \
++            exit(1);                                                     \
++        }                                                                \
++    } while (0)
+
+ #define SE_INT_RX       0x01
+ #define SE_INT_TXER     0x02
 -- 
 2.8.0.rc3
