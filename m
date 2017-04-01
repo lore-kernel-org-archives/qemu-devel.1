@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <he.chen@linux.intel.com>) id 1cuGDt-0000Un-W4
-	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 06:25:35 -0400
+	(envelope-from <bounces@canonical.com>) id 1cuHwX-0002L4-LA
+	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 08:15:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <he.chen@linux.intel.com>) id 1cuGDo-0000lN-U5
-	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 06:25:34 -0400
-Received: from mga14.intel.com ([192.55.52.115]:13598)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <he.chen@linux.intel.com>)
-	id 1cuGDo-0000gd-DO
-	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 06:25:28 -0400
-From: He Chen <he.chen@linux.intel.com>
-Date: Sat,  1 Apr 2017 18:25:26 +0800
-Message-Id: <1491042326-24335-1-git-send-email-he.chen@linux.intel.com>
-Subject: [Qemu-devel] [PATCH v4] Allow setting NUMA distance for different
- NUMA nodes
+	(envelope-from <bounces@canonical.com>) id 1cuHwT-0002BA-Kx
+	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 08:15:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60227)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cuHwT-0002At-5r
+	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 08:15:41 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cuHwR-0001ss-Tz
+	for <qemu-devel@nongnu.org>; Sat, 01 Apr 2017 12:15:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id CA1D42E80C9
+	for <qemu-devel@nongnu.org>; Sat,  1 Apr 2017 12:15:39 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 01 Apr 2017 12:02:01 -0000
+From: sh-dvl <1678466@bugs.launchpad.net>
+Reply-To: Bug 1678466 <1678466@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170401120201.1125.46046.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1678466] [NEW] using x-vga=on with vfio-pci leads
+ to segfault
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,367 +37,174 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Andrew Jones <drjones@redhat.com>
 
-Current, QEMU does not provide a clear command to set vNUMA distance for
-guest although we already have `-numa` command to set vNUMA nodes.
+Public bug reported:
 
-vNUMA distance makes sense in certain scenario.
-But now, if we create a guest that has 4 vNUMA nodes, when we check NUMA
-info via `numactl -H`, we will see:
+bug occures at least with qemu 2.8.0 and 2.8.1 in 64bit-system
 
-node distance:
-node    0    1    2    3
-  0:   10   20   20   20
-  1:   20   10   20   20
-  2:   20   20   10   20
-  3:   20   20   20   10
+stripped cmd for minimal config:
+qemu-system-i386 -m 2048 -M q35  -enable-kvm -nodefaults -nodefconfig -devi=
+ce ioh3420,bus=3Dpcie.0,addr=3D0x9,multifunction=3Don,port=3D1,chassis=3D1,=
+id=3Droot.1 -device vfio-pci,host=3D01:00.0,bus=3Droot.1,addr=3D01.0,x-vga=
+=3Don
 
-Guest kernel regards all local node as distance 10, and all remote node
-as distance 20 when there is no SLIT table since QEMU doesn't build it.
-It looks like a little strange when you have seen the distance in an
-actual physical machine that contains 4 NUMA nodes. My machine shows:
+Backtrace is:
+#0  0x00005555557ca836 in memory_region_update_container_subregions (subreg=
+ion=3D0x55555828f2f0) at qemu-2.8.1/memory.c:2030
+#1  0x00005555557ca9dc in memory_region_add_subregion_common (mr=3D0x0, off=
+set=3D8, subregion=3D0x55555828f2f0) at qemu-2.8.1/memory.c:2049
+#2  0x00005555557caa9a in memory_region_add_subregion_overlap (mr=3D0x0, of=
+fset=3D8, subregion=3D0x55555828f2f0, priority=3D1) at qemu-2.8.1/memory.c:=
+2066
+#3  0x0000555555832e48 in vfio_probe_nvidia_bar5_quirk (vdev=3D0x55555805ae=
+f0, nr=3D5) at qemu-2.8.1/hw/vfio/pci-quirks.c:689
+#4  0x0000555555835433 in vfio_bar_quirk_setup (vdev=3D0x55555805aef0, nr=
+=3D5) at qemu-2.8.1/hw/vfio/pci-quirks.c:1652
+#5  0x000055555582f122 in vfio_realize (pdev=3D0x55555805aef0, errp=3D0x7ff=
+fffffdc78) at qemu-2.8.1/hw/vfio/pci.c:2777
+#6  0x0000555555a86195 in pci_qdev_realize (qdev=3D0x55555805aef0, errp=3D0=
+x7fffffffdcf0) at hw/pci/pci.c:1966
+#7  0x00005555559be7b7 in device_set_realized (obj=3D0x55555805aef0, value=
+=3Dtrue, errp=3D0x7fffffffdeb0) at hw/core/qdev.c:918
+#8  0x0000555555bb017f in property_set_bool (obj=3D0x55555805aef0, v=3D0x55=
+555805ced0, name=3D0x555556071b56 "realized", opaque=3D0x555557f15860, errp=
+=3D0x7fffffffdeb0) at qom/object.c:1854
+#9  0x0000555555bae2e6 in object_property_set (obj=3D0x55555805aef0, v=3D0x=
+55555805ced0, name=3D0x555556071b56 "realized", errp=3D0x7fffffffdeb0) at q=
+om/object.c:1088
+#10 0x0000555555bb184f in object_property_set_qobject (obj=3D0x55555805aef0=
+, value=3D0x55555805cd70, name=3D0x555556071b56 "realized", errp=3D0x7fffff=
+ffdeb0) at qom/qom-qobject.c:27
+#11 0x0000555555bae637 in object_property_set_bool (obj=3D0x55555805aef0, v=
+alue=3Dtrue, name=3D0x555556071b56 "realized", errp=3D0x7fffffffdeb0) at qo=
+m/object.c:1157
+#12 0x00005555558fee4b in qdev_device_add (opts=3D0x555556b15160, errp=3D0x=
+7fffffffdf28) at qdev-monitor.c:623
+#13 0x00005555559142c1 in device_init_func (opaque=3D0x0, opts=3D0x555556b1=
+5160, errp=3D0x0) at vl.c:2373
+#14 0x0000555555cc3bb7 in qemu_opts_foreach (list=3D0x555556548b80 <qemu_de=
+vice_opts>, func=3D0x555555914283 <device_init_func>, opaque=3D0x0, errp=3D=
+0x0) at util/qemu-option.c:1116
+#15 0x00005555559198aa in main (argc=3D12, argv=3D0x7fffffffe388, envp=3D0x=
+7fffffffe3f0) at vl.c:4574
 
-node distance:
-node    0    1    2    3
-  0:   10   21   31   41
-  1:   21   10   21   31
-  2:   31   21   10   21
-  3:   41   31   21   10
+as I can see, it happens during initialization of the device-option.
 
-To set vNUMA distance, guest should see a complete SLIT table.
-I found QEMU has provide `-acpitable` command that allows users to add
-a ACPI table into guest, but it requires users building ACPI table by
-themselves first. Using `-acpitable` to add a SLIT table may be not so
-straightforward or flexible, imagine that when the vNUMA configuration
-is changes and we need to generate another SLIT table manually. It may
-not be friendly to users or upper software like libvirt.
+seems that the code tries to loop over a memory-region mr, which is null
+from at least three calls before it crashes.
 
-This patch is going to add SLIT table support in QEMU, and provides
-additional option `dist` for command `-numa` to allow user set vNUMA
-distance by QEMU command.
+because there seems to be special handling for nvidia-cards, here're the pc=
+i-infos of the card:
+01:00.0 VGA compatible controller [0300]: NVIDIA Corporation G72 [GeForce 7=
+300 GS] [10de:01df] (rev a1) (prog-if 00 [VGA controller])
+	Subsystem: Gigabyte Technology Co., Ltd Device [1458:342a]
+	Flags: fast devsel, IRQ 16
+	Memory at de000000 (32-bit, non-prefetchable) [disabled] [size=3D16M]
+	Memory at c0000000 (64-bit, prefetchable) [disabled] [size=3D256M]
+	Memory at dd000000 (64-bit, non-prefetchable) [disabled] [size=3D16M]
+	Expansion ROM at df000000 [disabled] [size=3D128K]
+	Capabilities: [60] Power Management version 2
+	Capabilities: [68] MSI: Enable- Count=3D1/1 Maskable- 64bit+
+	Capabilities: [78] Express Endpoint, MSI 00
+	Capabilities: [100] Virtual Channel
+	Capabilities: [128] Power Budgeting <?>
+	Kernel driver in use: vfio-pci
 
-With this patch, when a user wants to create a guest that contains
-several vNUMA nodes and also wants to set distance among those nodes,
-the QEMU command would like:
+at least with a similar card in another slot the crash does not occure.
+(sorry, can't change the slots at the moment)
 
-```
--numa node,nodeid=0,cpus=0 \
--numa node,nodeid=1,cpus=1 \
--numa node,nodeid=2,cpus=2 \
--numa node,nodeid=3,cpus=3 \
--numa dist,src=0,dst=0,val=10 \
--numa dist,src=0,dst=1,val=21 \
--numa dist,src=0,dst=2,val=31 \
--numa dist,src=0,dst=3,val=41 \
--numa dist,src=1,dst=0,val=21 \
--numa dist,src=1,dst=1,val=10 \
--numa dist,src=1,dst=2,val=21 \
--numa dist,src=1,dst=3,val=31 \
--numa dist,src=2,dst=0,val=31 \
--numa dist,src=2,dst=1,val=21 \
--numa dist,src=2,dst=2,val=10 \
--numa dist,src=2,dst=3,val=21 \
--numa dist,src=3,dst=0,val=41 \
--numa dist,src=3,dst=1,val=31 \
--numa dist,src=3,dst=2,val=21 \
--numa dist,src=3,dst=3,val=10 \
-```
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-Signed-off-by: He Chen <he.chen@linux.intel.com>
----
- hw/acpi/aml-build.c         | 26 +++++++++++++++++
- hw/i386/acpi-build.c        |  2 ++
- include/hw/acpi/aml-build.h |  1 +
- include/sysemu/numa.h       |  1 +
- include/sysemu/sysemu.h     |  4 +++
- numa.c                      | 70 +++++++++++++++++++++++++++++++++++++++++++++
- qapi-schema.json            | 28 ++++++++++++++++--
- qemu-options.hx             | 11 ++++++-
- 8 files changed, 140 insertions(+), 3 deletions(-)
 
-diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-index c6f2032..410b30e 100644
---- a/hw/acpi/aml-build.c
-+++ b/hw/acpi/aml-build.c
-@@ -24,6 +24,7 @@
- #include "hw/acpi/aml-build.h"
- #include "qemu/bswap.h"
- #include "qemu/bitops.h"
-+#include "sysemu/numa.h"
- 
- static GArray *build_alloc_array(void)
- {
-@@ -1609,3 +1610,28 @@ void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
-     numamem->base_addr = cpu_to_le64(base);
-     numamem->range_length = cpu_to_le64(len);
- }
-+
-+/*
-+ * ACPI spec 5.2.17 System Locality Distance Information Table
-+ * (Revision 2.0 or later)
-+ */
-+void build_slit(GArray *table_data, BIOSLinker *linker)
-+{
-+    int slit_start, i, j;
-+    slit_start = table_data->len;
-+
-+    acpi_data_push(table_data, sizeof(AcpiTableHeader));
-+
-+    build_append_int_noprefix(table_data, nb_numa_nodes, 8);
-+    for (i = 0; i < nb_numa_nodes; i++) {
-+        for (j = 0; j < nb_numa_nodes; j++) {
-+            build_append_int_noprefix(table_data, numa_info[i].distance[j], 1);
-+        }
-+    }
-+
-+    build_header(linker, table_data,
-+                 (void *)(table_data->data + slit_start),
-+                 "SLIT",
-+                 table_data->len - slit_start, 1, NULL, NULL);
-+}
-+
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 2073108..12730ea 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2678,6 +2678,8 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-     if (pcms->numa_nodes) {
-         acpi_add_table(table_offsets, tables_blob);
-         build_srat(tables_blob, tables->linker, machine);
-+        acpi_add_table(table_offsets, tables_blob);
-+        build_slit(tables_blob, tables->linker);
-     }
-     if (acpi_get_mcfg(&mcfg)) {
-         acpi_add_table(table_offsets, tables_blob);
-diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-index 00c21f1..329a0d0 100644
---- a/include/hw/acpi/aml-build.h
-+++ b/include/hw/acpi/aml-build.h
-@@ -389,4 +389,5 @@ GCC_FMT_ATTR(2, 3);
- void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
-                        uint64_t len, int node, MemoryAffinityFlags flags);
- 
-+void build_slit(GArray *table_data, BIOSLinker *linker);
- #endif
-diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index 8f09dcf..2f7a941 100644
---- a/include/sysemu/numa.h
-+++ b/include/sysemu/numa.h
-@@ -21,6 +21,7 @@ typedef struct node_info {
-     struct HostMemoryBackend *node_memdev;
-     bool present;
-     QLIST_HEAD(, numa_addr_range) addr; /* List to store address ranges */
-+    uint8_t distance[MAX_NODES];
- } NodeInfo;
- 
- extern NodeInfo numa_info[MAX_NODES];
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 576c7ce..6999545 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -169,6 +169,10 @@ extern int mem_prealloc;
- 
- #define MAX_NODES 128
- #define NUMA_NODE_UNASSIGNED MAX_NODES
-+#define NUMA_DISTANCE_MIN         10
-+#define NUMA_DISTANCE_DEFAULT     20
-+#define NUMA_DISTANCE_MAX         254
-+#define NUMA_DISTANCE_UNREACHABLE 255
- 
- #define MAX_OPTION_ROMS 16
- typedef struct QEMUOptionRom {
-diff --git a/numa.c b/numa.c
-index e01cb54..421c383 100644
---- a/numa.c
-+++ b/numa.c
-@@ -212,6 +212,40 @@ static void numa_node_parse(NumaNodeOptions *node, QemuOpts *opts, Error **errp)
-     max_numa_nodeid = MAX(max_numa_nodeid, nodenr + 1);
- }
- 
-+static void numa_distance_parse(NumaDistOptions *dist, QemuOpts *opts, Error **errp)
-+{
-+    uint16_t src = dist->src;
-+    uint16_t dst = dist->dst;
-+    uint8_t val = dist->val;
-+
-+    if (!numa_info[src].present || !numa_info[dst].present) {
-+        error_setg(errp, "Source/Destination NUMA node is missing. "
-+                   "Please use '-numa node' option to declare it first.");
-+        return;
-+    }
-+
-+    if (src >= MAX_NODES || dst >= MAX_NODES) {
-+        error_setg(errp, "Max number of NUMA nodes reached: %"
-+                   PRIu16 "", src > dst ? src : dst);
-+        return;
-+    }
-+
-+    if (val < NUMA_DISTANCE_MIN) {
-+        error_setg(errp, "NUMA distance (%" PRIu8 ") is invalid, "
-+                   "it should be larger than %d.",
-+                   val, NUMA_DISTANCE_MIN);
-+        return;
-+    }
-+
-+    if (src == dst && val != NUMA_DISTANCE_MIN) {
-+        error_setg(errp, "Local distance of node %d should be %d.",
-+                   src, NUMA_DISTANCE_MIN);
-+        return;
-+    }
-+
-+    numa_info[src].distance[dst] = val;
-+}
-+
- static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
- {
-     NumaOptions *object = NULL;
-@@ -235,6 +269,12 @@ static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
-         }
-         nb_numa_nodes++;
-         break;
-+    case NUMA_OPTIONS_TYPE_DIST:
-+        numa_distance_parse(&object->u.dist, opts, &err);
-+        if (err) {
-+            goto end;
-+        }
-+        break;
-     default:
-         abort();
-     }
-@@ -294,6 +334,35 @@ static void validate_numa_cpus(void)
-     g_free(seen_cpus);
- }
- 
-+static void validate_numa_distance(void)
-+{
-+    int src, dst;
-+    bool have_distance = false;
-+
-+    for (src = 0; src < nb_numa_nodes; src++) {
-+        for (dst = 0; dst < nb_numa_nodes; dst++) {
-+            if (numa_info[src].present &&
-+                numa_info[src].distance[dst] != 0)
-+                have_distance = true;
-+        }
-+    }
-+
-+    if (!have_distance)
-+        return;
-+
-+    for (src = 0; src < nb_numa_nodes; src++) {
-+        for (dst = 0; dst < nb_numa_nodes; dst++) {
-+            if (numa_info[src].present &&
-+                numa_info[src].distance[dst] == 0) {
-+                error_report("The distance between node %d and %d is missing, "
-+                             "please provide the complete NUMA distance information.",
-+                             src, dst);
-+                exit(EXIT_FAILURE);
-+            }
-+        }
-+    }
-+}
-+
- void parse_numa_opts(MachineClass *mc)
- {
-     int i;
-@@ -390,6 +459,7 @@ void parse_numa_opts(MachineClass *mc)
-         }
- 
-         validate_numa_cpus();
-+        validate_numa_distance();
-     } else {
-         numa_set_mem_node_id(0, ram_size, 0);
-     }
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 32b4a4b..b432e13 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -5644,10 +5644,14 @@
- ##
- # @NumaOptionsType:
- #
-+# @node: NUMA nodes configuration
-+#
-+# @dist: NUMA distance configuration
-+#
- # Since: 2.1
- ##
- { 'enum': 'NumaOptionsType',
--  'data': [ 'node' ] }
-+  'data': [ 'node', 'dist' ] }
- 
- ##
- # @NumaOptions:
-@@ -5660,7 +5664,8 @@
-   'base': { 'type': 'NumaOptionsType' },
-   'discriminator': 'type',
-   'data': {
--    'node': 'NumaNodeOptions' }}
-+    'node': 'NumaNodeOptions',
-+    'dist': 'NumaDistOptions' }}
- 
- ##
- # @NumaNodeOptions:
-@@ -5689,6 +5694,25 @@
-    '*memdev': 'str' }}
- 
- ##
-+# @NumaDistOptions:
-+#
-+# Set the distance between 2 NUMA nodes.
-+#
-+# @src: source NUMA node.
-+#
-+# @dst: destination NUMA node.
-+#
-+# @val: NUMA distance from source node to destination node.
-+#
-+# Since: 2.10
-+##
-+{ 'struct': 'NumaDistOptions',
-+  'data': {
-+   'src': 'uint16',
-+   'dst': 'uint16',
-+   'val': 'uint8' }}
-+
-+##
- # @HostMemPolicy:
- #
- # Host memory policy types
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 8dd8ee3..ce1a8ad 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -139,12 +139,15 @@ ETEXI
- 
- DEF("numa", HAS_ARG, QEMU_OPTION_numa,
-     "-numa node[,mem=size][,cpus=firstcpu[-lastcpu]][,nodeid=node]\n"
--    "-numa node[,memdev=id][,cpus=firstcpu[-lastcpu]][,nodeid=node]\n", QEMU_ARCH_ALL)
-+    "-numa node[,memdev=id][,cpus=firstcpu[-lastcpu]][,nodeid=node]\n"
-+    "-numa dist,src=source,dst=destination,val=distance\n", QEMU_ARCH_ALL)
- STEXI
- @item -numa node[,mem=@var{size}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}]
- @itemx -numa node[,memdev=@var{id}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}]
-+@itemx -numa dist,src=@var{source},dst=@var{destination},val=@var{distance}
- @findex -numa
- Define a NUMA node and assign RAM and VCPUs to it.
-+Set the NUMA distance from a source node to a destination node.
- 
- @var{firstcpu} and @var{lastcpu} are CPU indexes. Each
- @samp{cpus} option represent a contiguous range of CPU indexes
-@@ -167,6 +170,12 @@ split equally between them.
- @samp{mem} and @samp{memdev} are mutually exclusive. Furthermore,
- if one node uses @samp{memdev}, all of them have to use it.
- 
-+@var{source} and @var{destination} are NUMA node IDs.
-+@var{distance} is the NUMA distance from @var{source} to @var{destination}.
-+The distance from node A to node B may be different from the distance from
-+node B to node A as the distance can to be asymmetrical. If a node is
-+unreachable, set 255 as distance.
-+
- Note that the -@option{numa} option doesn't allocate any of the
- specified resources, it just assigns existing resources to NUMA
- nodes. This means that one still has to use the @option{-m},
--- 
-2.7.4
+** Tags: nvidia segfault vfio x-vga
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1678466
+
+Title:
+  using x-vga=3Don with vfio-pci leads to segfault
+
+Status in QEMU:
+  New
+
+Bug description:
+  bug occures at least with qemu 2.8.0 and 2.8.1 in 64bit-system
+
+  stripped cmd for minimal config:
+  qemu-system-i386 -m 2048 -M q35  -enable-kvm -nodefaults -nodefconfig -de=
+vice ioh3420,bus=3Dpcie.0,addr=3D0x9,multifunction=3Don,port=3D1,chassis=3D=
+1,id=3Droot.1 -device vfio-pci,host=3D01:00.0,bus=3Droot.1,addr=3D01.0,x-vg=
+a=3Don
+
+  Backtrace is:
+  #0  0x00005555557ca836 in memory_region_update_container_subregions (subr=
+egion=3D0x55555828f2f0) at qemu-2.8.1/memory.c:2030
+  #1  0x00005555557ca9dc in memory_region_add_subregion_common (mr=3D0x0, o=
+ffset=3D8, subregion=3D0x55555828f2f0) at qemu-2.8.1/memory.c:2049
+  #2  0x00005555557caa9a in memory_region_add_subregion_overlap (mr=3D0x0, =
+offset=3D8, subregion=3D0x55555828f2f0, priority=3D1) at qemu-2.8.1/memory.=
+c:2066
+  #3  0x0000555555832e48 in vfio_probe_nvidia_bar5_quirk (vdev=3D0x55555805=
+aef0, nr=3D5) at qemu-2.8.1/hw/vfio/pci-quirks.c:689
+  #4  0x0000555555835433 in vfio_bar_quirk_setup (vdev=3D0x55555805aef0, nr=
+=3D5) at qemu-2.8.1/hw/vfio/pci-quirks.c:1652
+  #5  0x000055555582f122 in vfio_realize (pdev=3D0x55555805aef0, errp=3D0x7=
+fffffffdc78) at qemu-2.8.1/hw/vfio/pci.c:2777
+  #6  0x0000555555a86195 in pci_qdev_realize (qdev=3D0x55555805aef0, errp=
+=3D0x7fffffffdcf0) at hw/pci/pci.c:1966
+  #7  0x00005555559be7b7 in device_set_realized (obj=3D0x55555805aef0, valu=
+e=3Dtrue, errp=3D0x7fffffffdeb0) at hw/core/qdev.c:918
+  #8  0x0000555555bb017f in property_set_bool (obj=3D0x55555805aef0, v=3D0x=
+55555805ced0, name=3D0x555556071b56 "realized", opaque=3D0x555557f15860, er=
+rp=3D0x7fffffffdeb0) at qom/object.c:1854
+  #9  0x0000555555bae2e6 in object_property_set (obj=3D0x55555805aef0, v=3D=
+0x55555805ced0, name=3D0x555556071b56 "realized", errp=3D0x7fffffffdeb0) at=
+ qom/object.c:1088
+  #10 0x0000555555bb184f in object_property_set_qobject (obj=3D0x55555805ae=
+f0, value=3D0x55555805cd70, name=3D0x555556071b56 "realized", errp=3D0x7fff=
+ffffdeb0) at qom/qom-qobject.c:27
+  #11 0x0000555555bae637 in object_property_set_bool (obj=3D0x55555805aef0,=
+ value=3Dtrue, name=3D0x555556071b56 "realized", errp=3D0x7fffffffdeb0) at =
+qom/object.c:1157
+  #12 0x00005555558fee4b in qdev_device_add (opts=3D0x555556b15160, errp=3D=
+0x7fffffffdf28) at qdev-monitor.c:623
+  #13 0x00005555559142c1 in device_init_func (opaque=3D0x0, opts=3D0x555556=
+b15160, errp=3D0x0) at vl.c:2373
+  #14 0x0000555555cc3bb7 in qemu_opts_foreach (list=3D0x555556548b80 <qemu_=
+device_opts>, func=3D0x555555914283 <device_init_func>, opaque=3D0x0, errp=
+=3D0x0) at util/qemu-option.c:1116
+  #15 0x00005555559198aa in main (argc=3D12, argv=3D0x7fffffffe388, envp=3D=
+0x7fffffffe3f0) at vl.c:4574
+
+  as I can see, it happens during initialization of the device-option.
+
+  seems that the code tries to loop over a memory-region mr, which is
+  null from at least three calls before it crashes.
+
+  because there seems to be special handling for nvidia-cards, here're the =
+pci-infos of the card:
+  01:00.0 VGA compatible controller [0300]: NVIDIA Corporation G72 [GeForce=
+ 7300 GS] [10de:01df] (rev a1) (prog-if 00 [VGA controller])
+  	Subsystem: Gigabyte Technology Co., Ltd Device [1458:342a]
+  	Flags: fast devsel, IRQ 16
+  	Memory at de000000 (32-bit, non-prefetchable) [disabled] [size=3D16M]
+  	Memory at c0000000 (64-bit, prefetchable) [disabled] [size=3D256M]
+  	Memory at dd000000 (64-bit, non-prefetchable) [disabled] [size=3D16M]
+  	Expansion ROM at df000000 [disabled] [size=3D128K]
+  	Capabilities: [60] Power Management version 2
+  	Capabilities: [68] MSI: Enable- Count=3D1/1 Maskable- 64bit+
+  	Capabilities: [78] Express Endpoint, MSI 00
+  	Capabilities: [100] Virtual Channel
+  	Capabilities: [128] Power Budgeting <?>
+  	Kernel driver in use: vfio-pci
+
+  at least with a similar card in another slot the crash does not occure.
+  (sorry, can't change the slots at the moment)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1678466/+subscriptions
