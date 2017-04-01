@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36494)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xiong.y.zhang@intel.com>) id 1cu8sw-00035x-LF
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 22:35:28 -0400
+	(envelope-from <jasowang@redhat.com>) id 1cuB9q-0005Nn-PF
+	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 01:01:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xiong.y.zhang@intel.com>) id 1cu8st-0007Ng-Db
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 22:35:26 -0400
-Received: from mga02.intel.com ([134.134.136.20]:24788)
+	(envelope-from <jasowang@redhat.com>) id 1cuB9n-0007Pd-Ku
+	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 01:01:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48466)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <xiong.y.zhang@intel.com>)
-	id 1cu8ss-0007M8-WF
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 22:35:23 -0400
-From: "Zhang, Xiong Y" <xiong.y.zhang@intel.com>
-Date: Sat, 1 Apr 2017 02:35:14 +0000
-Message-ID: <8082FF9BCB2B054996454E47167FF4EC1C495DAF@SHSMSX104.ccr.corp.intel.com>
-References: <1490869641-29873-1-git-send-email-xiong.y.zhang@intel.com>
-	<20170330090148.16048141@t450s.home>
-	<8082FF9BCB2B054996454E47167FF4EC1C4930B3@SHSMSX104.ccr.corp.intel.com>
-	<20170330205511.28be6306@t450s.home>
-	<20170331190349.493158f3@Igors-MacBook-Pro.local>
-	<20170331112726.69625d03@t450s.home>
-In-Reply-To: <20170331112726.69625d03@t450s.home>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cuB9n-0007H9-87
+	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 01:00:59 -0400
+References: <1486456099-7345-1-git-send-email-peterx@redhat.com>
+	<1486456099-7345-15-git-send-email-peterx@redhat.com>
+	<A2975661238FB949B60364EF0F2C257439032C79@shsmsx102.ccr.corp.intel.com>
+	<20170327091208.GG11497@pxdev.xzpeter.org>
+	<A2975661238FB949B60364EF0F2C257439032D78@shsmsx102.ccr.corp.intel.com>
+	<A2975661238FB949B60364EF0F2C25743903553F@shsmsx102.ccr.corp.intel.com>
+	<9c3cda64-b4a3-6f9b-f951-bf73f6613faa@redhat.com>
+	<A2975661238FB949B60364EF0F2C257439036D0F@shsmsx102.ccr.corp.intel.com>
+	<81e79982-4af0-3b46-552c-eea4db05a362@redhat.com>
+	<A2975661238FB949B60364EF0F2C257439036DF7@shsmsx102.ccr.corp.intel.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <216e2666-bd00-7f04-439b-0ed95a566feb@redhat.com>
+Date: Sat, 1 Apr 2017 13:00:43 +0800
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] Revert "vfio/pci-quirks.c: Disable stolen
- memory for igd VFIO"
+In-Reply-To: <A2975661238FB949B60364EF0F2C257439036DF7@shsmsx102.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 14/17] memory: add
+ MemoryRegionIOMMUOps.replay() callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,158 +36,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Zhang, Xiong Y" <xiong.y.zhang@intel.com>
+To: "Liu, Yi L" <yi.l.liu@intel.com>, 'Peter Xu' <peterx@redhat.com>
+Cc: "Lan, Tianyu" <tianyu.lan@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, "'mst@redhat.com'" <mst@redhat.com>, "'jan.kiszka@siemens.com'" <jan.kiszka@siemens.com>, "'bd.aviv@gmail.com'" <bd.aviv@gmail.com>, "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>, "'alex.williamson@redhat.com'" <alex.williamson@redhat.com>, 'David Gibson' <david@gibson.dropbear.id.au>
 
-> On Fri, 31 Mar 2017 19:03:49 +0200
-> Igor Mammedov <imammedo@redhat.com> wrote:
->=20
-> > On Thu, 30 Mar 2017 20:55:11 -0600
-> > Alex Williamson <alex.williamson@redhat.com> wrote:
-> >
-> > > On Fri, 31 Mar 2017 02:27:11 +0000
-> > > "Zhang, Xiong Y" <xiong.y.zhang@intel.com> wrote:
-> > >
-> > > > > On Thu, 30 Mar 2017 18:27:21 +0800
-> > > > > Xiong Zhang <xiong.y.zhang@intel.com> wrote:
-> > > > >
-> > > > > > This reverts commit
-> c2b2e158cc7b1cb431bd6039824ec13c3184a775.
-> > > > > >
-> > > > > > The original patch intend to prevent linux i915 driver from usi=
-ng
-> > > > > > stolen meory. But this patch breaks windows IGD driver loading =
-on
-> > > > > > Gen9+, as IGD HW will use stolen memory on Gen9+, once windows
-> IGD
-> > > > > > driver see zero size stolen memory, it will unload.
-> > > > > > Meanwhile stolen memory will be disabled in 915 when i915 run a=
-s
-> > > > > > a guest.
-> > > > >
-> > > > > Does this mean that legacy mode IGD assignment is not going to wo=
-rk
-> > > > > on Gen9+ with Windows?  Will it continue to work with Gen8-?
-> > > > [Zhang, Xiong Y] I try to use the following qemu command to enable
-> legacy mode on SKyLake, but It seems the entry point of wins IGD driver i=
-sn't
-> called(I couldn't confirm this as I don't have the source code, but I did=
-n't see
-> any IGD driver info from windbg while I could see many info in upt mode),=
- so
-> driver doesn't bind to IGD after win 8.1 boot up.
-> > > >   #qemu-system-x86_64 -M pc -enable-kvm -smp 2 -m 2G  -vga none
-> -nographic -cpu host -hda "$IMAGE" -device
-> vfio-pci,host=3D00:02.0,x-vga=3Dtrue,id=3Dhostdev0,bus=3Dpci.0,addr=3D0x2
-> > > > Is this the right method to enable legacy mode ?
-> > >
-> > > Yeah, that should do it.  x-vga should not be necessary, but shouldn'=
-t
-> > > hurt IIRC.  Any dmesg errors regarding the ROM?  I think we have
-> > > trouble with the ROM if the host is booted in UEFI mode.
-> >
-> > 1.
-> > here is dmesg messages when host is booted with CSM mode enabled
-> > and host's bios load option rom on boot:
-> >
-> > [165041.359929] vfio-pci 0000:00:02.0: vgaarb: changed VGA decodes:
-> olddecodes=3Dio+mem,decodes=3Dio+mem:owns=3Dio+mem
-> > [165073.898940] vfio-pci 0000:00:02.0: vgaarb: changed VGA decodes:
-> olddecodes=3Dio+mem,decodes=3Dio+mem:owns=3Dio+mem
-> > [165074.687515] vfio-pci 0000:00:02.0: enabling device (0400 -> 0403)
-> > [165074.791598] vfio_ecap_init: 0000:00:02.0 hiding ecap 0x1b@0x100
-> >
-> > have output on monitor connected via HDMI
-> >
-> > 2.
-> > and here is dmesg in pure UEFI mode (where host's bios doesn't load opt=
-ion
-> rom):
-> >
-> > [   21.034983] vfio-pci 0000:00:02.0: vgaarb: changed VGA decodes:
-> olddecodes=3Dio+mem,decodes=3Dio+mem:owns=3Dio+mem
-> > [   22.025361] vfio_ecap_init: 0000:00:02.0 hiding ecap 0x1b@0x100
-> > [   22.030970] vfio-pci 0000:00:02.0: Invalid PCI ROM header signature:
-> expecting 0xaa55, got 0xffff
-> > [   22.031036] vfio-pci 0000:00:02.0: Invalid PCI ROM header signature:
-> expecting 0xaa55, got 0xffff
-> > [   24.738793] vfio-pci 0000:00:02.0: Invalid PCI ROM header signature:
-> expecting 0xaa55, got 0xffff
-> > [   27.776904] vfio-pci 0000:00:02.0: vgaarb: changed VGA decodes:
-> olddecodes=3Dio+mem,decodes=3Dio+mem:owns=3Dio+mem
-> >
-> > no output on monitor connected via HDMI when using Kabylake CPU
-> (HD630)
-> > but pure UEFI mode used to work (external output) with Skylake CPU
-> (HD510)
->=20
-> In my limited experience, I've never been able to use IGD assignment on
-> a pure UEFI host unless I provide the ROM via file.  For instance on my
-> laptop I switched to CSM and booted a live CD to dump the ROM, which I
-> can then use regardless of the host BIOS mode.
->=20
-> I just updated my rom-parser to include a version to fixup ROMs for
-> vendor/device ID and checksum which should help with this:
->=20
-> https://github.com/awilliam/rom-parser
->=20
-> Update the device ID to match your ROM and let it fix the checksum.
-> Maybe Xiong has some insight into why the VGA ROM often doesn't seem to
-> exist on native pure UEFI hosts.
->=20
-[Zhang, Xiong Y] According to my limited UEFI knowledge, I could explain th=
-is, but it may be wrong.
-VGA ROM seems a graphic driver in bios, and supply graphic service to grub =
-and the early phase of OS.
-The content of IGD VGA ROM is filled by system bios.
-1. turn on csm, bios supply legacy bios intxx service to grub and OS. VGA R=
-OM contain a 16 bit image as a vga bios.=20
-This image is what we want in vfio legacy mode.=20
-2. turn off csm, it is native uefi mode and supply uefi runtime service to =
-grub and OS, the interface is gst->ConOut and gst->RuntimeServices.
-The backend of gst->ConOut for graphic card is GOP(graphics output protocol=
-). How to implement IGD GOP, it could be a 32 bit image in VGA ROM, or a ue=
-fi driver. So in native uefi, VGA ROM could be one of three form:
-a. no contents,  GOP uefi driver in bios could implement all the function.
-b. 32 bit image   supply driver for GOP
-c. 16 bit image + 32 bit image
 
-Attach UEFI GOP definition:
-11.9 Graphics Output Protocol
-The goal of this section is to replace the functionality that currently exi=
-sts with VGA hardware and
-its corresponding video BIOS. The Graphics Output Protocol is a software ab=
-straction and its goal is
-to support any foreseeable graphics hardware and not require VGA hardware, =
-while at the same time
-also lending itself to implementation on the current generation of VGA hard=
-ware.
-Graphics output is important in the pre-boot space to support modern firmwa=
-re features. These
-features include the display of logos, the localization of output to any la=
-nguage, and setup and
-configuration screens.
-Graphics output may also be required as part of the startup of an operating=
- system. There are
-potentially times in modern operating systems prior to the loading of a hig=
-h performance OS
-graphics driver where access to graphics output device is required. The Gra=
-phics Output Protocol
-supports this capability by providing the EFI OS loader access to a hardwar=
-e frame buffer and
-enough information to allow the OS to draw directly to the graphics output =
-device.
-The EFI_GRAPHICS_OUTPUT_PROTOCOL supports three member functions to support=
- the
-limited graphics needs of the pre-boot environment. These member functions =
-allow the caller to
-draw to a virtualized frame buffer, retrieve the supported video modes, and=
- to set a video mode.
-These simple primitives are sufficient to support the general needs of pre-=
-OS firmware code.
-The EFI_GRAPHICS_OUTPUT_PROTOCOL also exports enough information about the =
-current
-mode for operating system startup software to access the linear frame buffe=
-r directly.
-thanks
-> Alex
+
+On 2017=E5=B9=B403=E6=9C=8831=E6=97=A5 15:30, Liu, Yi L wrote:
+>> -----Original Message-----
+>> From: Jason Wang [mailto:jasowang@redhat.com]
+>> Sent: Friday, March 31, 2017 3:17 PM
+>> To: Liu, Yi L <yi.l.liu@intel.com>; 'Peter Xu' <peterx@redhat.com>
+>> Cc: Lan, Tianyu <tianyu.lan@intel.com>; Tian, Kevin <kevin.tian@intel.=
+com>;
+>> 'mst@redhat.com' <mst@redhat.com>; 'jan.kiszka@siemens.com'
+>> <jan.kiszka@siemens.com>; 'bd.aviv@gmail.com' <bd.aviv@gmail.com>; 'qe=
+mu-
+>> devel@nongnu.org' <qemu-devel@nongnu.org>; 'alex.williamson@redhat.com=
+'
+>> <alex.williamson@redhat.com>; 'David Gibson' <david@gibson.dropbear.id=
+.au>
+>> Subject: Re: [Qemu-devel] [PATCH v7 14/17] memory: add
+>> MemoryRegionIOMMUOps.replay() callback
+>>
+>>
+>>
+>> On 2017=E5=B9=B403=E6=9C=8831=E6=97=A5 13:34, Liu, Yi L wrote:
+>>>> -----Original Message-----
+>>>> From: Jason Wang [mailto:jasowang@redhat.com]
+>>>> Sent: Thursday, March 30, 2017 7:58 PM
+>>>> To: Liu, Yi L <yi.l.liu@intel.com>; 'Peter Xu' <peterx@redhat.com>
+>>>> Cc: 'alex.williamson@redhat.com' <alex.williamson@redhat.com>; Lan,
+>>>> Tianyu <tianyu.lan@intel.com>; Tian, Kevin <kevin.tian@intel.com>;
+>> 'mst@redhat.com'
+>>>> <mst@redhat.com>; 'jan.kiszka@siemens.com' <jan.kiszka@siemens.com>;
+>>>> 'bd.aviv@gmail.com' <bd.aviv@gmail.com>; 'David Gibson'
+>>>> <david@gibson.dropbear.id.au>; 'qemu-devel@nongnu.org' <qemu-
+>>>> devel@nongnu.org>
+>>>> Subject: Re: [Qemu-devel] [PATCH v7 14/17] memory: add
+>>>> MemoryRegionIOMMUOps.replay() callback
+>>>>
+>>>>
+>>>>
+>>>> On 2017=E5=B9=B403=E6=9C=8830=E6=97=A5 19:06, Liu, Yi L wrote:
+>>>>>> -----Original Message-----
+>>>>>> From: Liu, Yi L
+>>>>>> Sent: Monday, March 27, 2017 5:22 PM
+>>>>>> To: Peter Xu <peterx@redhat.com>
+>>>>>> Cc: alex.williamson@redhat.com; Lan, Tianyu <tianyu.lan@intel.com>=
+;
+>>>>>> Tian, Kevin <kevin.tian@intel.com>; mst@redhat.com;
+>>>>>> jan.kiszka@siemens.com; jasowang@redhat.com; bd.aviv@gmail.com;
+>>>>>> David Gibson <david@gibson.dropbear.id.au>; qemu-devel@nongnu.org
+>>>>>> Subject: RE: [Qemu-devel] [PATCH v7 14/17] memory: add
+>>>>>> MemoryRegionIOMMUOps.replay() callback
+>>>>>>
+>>>>>>> -----Original Message-----
+>>>>>>> From: Peter Xu [mailto:peterx@redhat.com]
+>>>>>>> Sent: Monday, March 27, 2017 5:12 PM
+>>>>>>> To: Liu, Yi L <yi.l.liu@intel.com>
+>>>>>>> Cc: alex.williamson@redhat.com; Lan, Tianyu
+>>>>>>> <tianyu.lan@intel.com>; Tian, Kevin <kevin.tian@intel.com>;
+>>>>>>> mst@redhat.com; jan.kiszka@siemens.com; jasowang@redhat.com;
+>>>>>>> bd.aviv@gmail.com; David Gibson <david@gibson.dropbear.id.au>;
+>>>>>>> qemu-devel@nongnu.org
+>>>>>>> Subject: Re: [Qemu-devel] [PATCH v7 14/17] memory: add
+>>>>>>> MemoryRegionIOMMUOps.replay() callback
+>>>>>>>
+>>>>>>> On Mon, Mar 27, 2017 at 08:35:05AM +0000, Liu, Yi L wrote:
+>>>>>>>>> -----Original Message-----
+>>>>>>>>> From: Qemu-devel
+>>>>>>>>> [mailto:qemu-devel-bounces+yi.l.liu=3Dintel.com@nongnu.org] On
+>>>>>>>>> Behalf Of Peter Xu
+>>>>>>>>> Sent: Tuesday, February 7, 2017 4:28 PM
+>>>>>>>>> To: qemu-devel@nongnu.org
+>>>>>>>>> Cc: Lan, Tianyu <tianyu.lan@intel.com>; Tian, Kevin
+>>>>>>>>> <kevin.tian@intel.com>; mst@redhat.com; jan.kiszka@siemens.com;
+>>>>>>>>> jasowang@redhat.com; peterx@redhat.com;
+>>>>>>>>> alex.williamson@redhat.com; bd.aviv@gmail.com; David Gibson
+>>>>>>>>> <david@gibson.dropbear.id.au>
+>>>>>>>>> Subject: [Qemu-devel] [PATCH v7 14/17] memory: add
+>>>>>>>>> MemoryRegionIOMMUOps.replay() callback
+>>>>>>>>>
+>>>>>>>>> Originally we have one memory_region_iommu_replay() function,
+>>>>>>>>> which is the default behavior to replay the translations of the
+>>>>>>>>> whole IOMMU region. However, on some platform like x86, we may
+>>>>>>>>> want our own
+>>>>>>> replay logic for IOMMU regions.
+>>>>>>>>> This patch add one more hook for IOMMUOps for the callback, and
+>>>>>>>>> it'll override the default if set.
+>>>>>>>>>
+>>>>>>>>> Signed-off-by: Peter Xu <peterx@redhat.com>
+>>>>>>>>> ---
+>>>>>>>>>     include/exec/memory.h | 2 ++
+>>>>>>>>>     memory.c              | 6 ++++++
+>>>>>>>>>     2 files changed, 8 insertions(+)
+>>>>>>>>>
+>>>>>>>>> diff --git a/include/exec/memory.h b/include/exec/memory.h inde=
+x
+>>>>>>>>> 0767888..30b2a74 100644
+>>>>>>>>> --- a/include/exec/memory.h
+>>>>>>>>> +++ b/include/exec/memory.h
+>>>>>>>>> @@ -191,6 +191,8 @@ struct MemoryRegionIOMMUOps {
+>>>>>>>>>         void (*notify_flag_changed)(MemoryRegion *iommu,
+>>>>>>>>>                                     IOMMUNotifierFlag old_flags=
+,
+>>>>>>>>>                                     IOMMUNotifierFlag new_flags=
+);
+>>>>>>>>> +    /* Set this up to provide customized IOMMU replay function=
+ */
+>>>>>>>>> +    void (*replay)(MemoryRegion *iommu, IOMMUNotifier
+>>>>>>>>> + *notifier);
+>>>>>>>>>     };
+>>>>>>>>>
+>>>>>>>>>     typedef struct CoalescedMemoryRange CoalescedMemoryRange;
+>>>>>>>>> diff --git a/memory.c b/memory.c index 7a4f2f9..9c253cc 100644
+>>>>>>>>> --- a/memory.c
+>>>>>>>>> +++ b/memory.c
+>>>>>>>>> @@ -1630,6 +1630,12 @@ void
+>>>>>>>>> memory_region_iommu_replay(MemoryRegion
+>>>>>>>>> *mr, IOMMUNotifier *n,
+>>>>>>>>>         hwaddr addr, granularity;
+>>>>>>>>>         IOMMUTLBEntry iotlb;
+>>>>>>>>> +    /* If the IOMMU has its own replay callback, override */
+>>>>>>>>> +    if (mr->iommu_ops->replay) {
+>>>>>>>>> +        mr->iommu_ops->replay(mr, n);
+>>>>>>>>> +        return;
+>>>>>>>>> +    }
+>>>>>>>> Hi Alex, Peter,
+>>>>>>>>
+>>>>>>>> Will all the other vendors(e.g. PPC, s390, ARM) add their own
+>>>>>>>> replay callback as well? I guess it depends on whether the
+>>>>>>>> original replay algorithm work well for them? Do you have such k=
+nowledge?
+>>>>>>> I guess so. At least for VT-d we had this callback since the
+>>>>>>> default replay mechanism did not work well on x86 due to its
+>>>>>>> extremely large memory region size. Thanks,
+>>>>>> thx. that would make sense.
+>>>>> Peter,
+>>>>>
+>>>>> Just come to mind that there may be a corner case here.
+>>>>>
+>>>>> Intel VT-d actually has a "pt" mode which allows device use physica=
+l
+>>>>> address even when VT-d is enabled. In kernel, there is a
+>> iommu_identity_mapping.
+>>>>> If a device is in this map, then it would use "pt" mode. So that
+>>>>> IOMMU driver would not build second-level page table for it.
+>>>> Yes, but qemu does not support ECAP_PT now, so guest will still have
+>>>> a page table in this case.
+>>> That's true. Without ECAP_PT, IOMMU driver would create a 1:1 map. So
+>>> this solution can work well even a device is in identify_map.
+>>>
+>>>>> Back to the virtual IOVA implementation, if an assigned device is i=
+n
+>>>>> the iommu_identity_mapping(e.g. VGA controller), it uses GPA direct=
+ly to do
+>> DMA.
+>>>>> So it demands a GPA->HPA mapping in host. However, the
+>>>>> iommu->ops.replay is not able to build it when guest SL page table =
+is empty.
+>>>>>
+>>>>> So I think building an entire guest PA->HPA mapping before guest
+>>>>> kernel boot would be recommended. Any thoughts?
+>>>> We plan to add PT in 2.10, a possible rough idea is disabled iommu
+>>>> dmar region and use another region without iommu_ops. Then
+>>>> vfio_listener_region_add() will just do the correct mappings.
+>>> Good to know it. Actually, I also need to expose ECAP_PT for vSVM. So
+>>> just comes to realize that the current replay solution may not work w=
+ell when I
+>> expose ECAP_PT to guest.
+>>> I also have a rough idea here. The current listener in container
+>>> listens to address space named with devfn if virtual VTd is added. Ho=
+w
+>>> about adding one more listener to listen memory address space. So tha=
+t the
+>> listener can build entire guest PA->HPA mapping.
+>>
+>> This is only needed for PT. So looks like current code is sufficient t=
+o do this I think.
+>> See the else part of if (memory_region_is_iommu()) of vfio_listener_re=
+gion_add().
+> Jason, when the listener listen to device address space, the "else part=
+" may not work
+> even we set the mr->iommu_ops =3D NULL. The mr would be a non-ram regio=
+n when the
+> time region_add is called since it is actually listen to changes from d=
+evice address space.
+>
+> Regards,
+> Yi L
+>
+
+See Peter's patch ("intel_iommu: allow dynamic switch of IOMMU region").=20
+It has
+
++        memory_region_init_alias(&vtd_dev_as->sys_alias, OBJECT(s),
++                                 "vtd_sys_alias", get_system_memory(),
++                                 0,=20
+memory_region_size(get_system_memory()));
+
+We can enable sys_alias in when PT is used which should work I think.
+
+Thanks
