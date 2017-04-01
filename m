@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1cuKGi-0006CR-P3
-	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 10:44:48 -0400
+	(envelope-from <eblake@redhat.com>) id 1cuKMy-0002K2-2M
+	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 10:51:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1cuKGh-00045o-HX
-	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 10:44:44 -0400
-From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Sat,  1 Apr 2017 20:14:38 +0530
-Message-Id: <1491057878-27868-7-git-send-email-ashijeetacharya@gmail.com>
-In-Reply-To: <1491057878-27868-1-git-send-email-ashijeetacharya@gmail.com>
-References: <1491057878-27868-1-git-send-email-ashijeetacharya@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 6/6] vmdk: Update metadata for multiple
- clusters
+	(envelope-from <eblake@redhat.com>) id 1cuKMt-0000MU-0U
+	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 10:51:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46252)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cuKMs-0000LJ-NX
+	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 10:51:06 -0400
+References: <CA+KKJYBN3Gu5jzToi61Qf2Un7jOTzB0HcfREnniUQhTe9B=GGg@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4a433007-eced-0128-f6c9-adffa2d88a9e@redhat.com>
+Date: Sat, 1 Apr 2017 09:51:03 -0500
+MIME-Version: 1.0
+In-Reply-To: <CA+KKJYBN3Gu5jzToi61Qf2Un7jOTzB0HcfREnniUQhTe9B=GGg@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="stpv6UHqAftlW4tnKEqG05b0FtNAjGRuV"
+Subject: Re: [Qemu-devel] [PATCH 02/43] arm: made printf always compile in
+ debug output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,272 +28,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com
-Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com, stefanha@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, Ashijeet Acharya <ashijeetacharya@gmail.com>
+To: Danil Antonov <g.danil.anto@gmail.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, balrogg@gmail.com
 
-Include a next pointer in VmdkMetaData struct to point to the previous
-allocated L2 table. Modify vmdk_L2update to start updating metadata for
-allocation of multiple clusters at once.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--stpv6UHqAftlW4tnKEqG05b0FtNAjGRuV
+From: Eric Blake <eblake@redhat.com>
+To: Danil Antonov <g.danil.anto@gmail.com>, qemu-devel@nongnu.org,
+ peter.maydell@linaro.org, balrogg@gmail.com
+Message-ID: <4a433007-eced-0128-f6c9-adffa2d88a9e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 02/43] arm: made printf always compile in
+ debug output
+References: <CA+KKJYBN3Gu5jzToi61Qf2Un7jOTzB0HcfREnniUQhTe9B=GGg@mail.gmail.com>
+In-Reply-To: <CA+KKJYBN3Gu5jzToi61Qf2Un7jOTzB0HcfREnniUQhTe9B=GGg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
----
- block/vmdk.c | 136 ++++++++++++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 111 insertions(+), 25 deletions(-)
+On 04/01/2017 08:32 AM, Danil Antonov wrote:
+>>From 1671b92e5a4a59d5e38ce754d1d0dde2401c8236 Mon Sep 17 00:00:00 2001
+> From: Danil Antonov <g.danil.anto@gmail.com>
+> Date: Wed, 29 Mar 2017 02:09:33 +0300
+> Subject: [PATCH 02/43] arm: made printf always compile in debug output
+>=20
+> Wrapped printf calls inside debug macros (DPRINTF) in `if` statement.
+> This will ensure that printf function will always compile even if debug=
 
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 9456ddd..c7675db 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -137,6 +137,8 @@ typedef struct VmdkMetaData {
-     int valid;
-     uint32_t *l2_cache_entry;
-     uint32_t nb_clusters;
-+    uint32_t offset;
-+    struct VmdkMetaData *next;
- } VmdkMetaData;
- 
- typedef struct VmdkGrainMarker {
-@@ -263,6 +265,12 @@ static inline uint64_t size_to_clusters(VmdkExtent *extent, uint64_t size)
-     return (DIV_ROUND_UP(size + round_off_size, BDRV_SECTOR_SIZE * 128) - 1);
- }
- 
-+static inline int64_t vmdk_align_offset(int64_t offset, int n)
-+{
-+    offset = (offset + n - 1) & ~(n - 1);
-+    return offset;
-+}
-+
- static uint32_t vmdk_read_cid(BlockDriverState *bs, int parent)
- {
-     char *desc;
-@@ -1037,29 +1045,88 @@ static void vmdk_refresh_limits(BlockDriverState *bs, Error **errp)
-     }
- }
- 
--static int vmdk_L2update(VmdkExtent *extent, VmdkMetaData *m_data,
--                         uint32_t offset)
-+static int vmdk_alloc_cluster_link_l2(VmdkExtent *extent,
-+                                      VmdkMetaData *m_data, bool zeroed)
- {
--    offset = cpu_to_le32(offset);
-+    int i;
-+    uint32_t offset, temp_offset;
-+    int *l2_table_array;
-+    int l2_array_size;
-+
-+    if (zeroed) {
-+        temp_offset = VMDK_GTE_ZEROED;
-+    } else {
-+        temp_offset = m_data->offset;
-+    }
-+
-+    temp_offset = cpu_to_le32(temp_offset);
-+
-+    l2_array_size = sizeof(uint32_t) * m_data->nb_clusters;
-+    l2_table_array = qemu_try_blockalign(extent->file->bs,
-+                                    vmdk_align_offset(l2_array_size, 512));
-+    if (l2_table_array == NULL) {
-+        return VMDK_ERROR;
-+    }
-+    memset(l2_table_array, 0, vmdk_align_offset(l2_array_size, 512));
-+
-     /* update L2 table */
-+    offset = temp_offset;
-+    for (i = 0; i < m_data->nb_clusters; i++) {
-+        l2_table_array[i] = offset;
-+        if (!zeroed) {
-+            offset += 128;
-+        }
-+    }
-+
-     if (bdrv_pwrite_sync(extent->file,
--                ((int64_t)m_data->l2_offset * 512)
--                    + (m_data->l2_index * sizeof(offset)),
--                &offset, sizeof(offset)) < 0) {
-+            ((int64_t)m_data->l2_offset * 512)
-+                + ((m_data->l2_index) * sizeof(offset)),
-+                         l2_table_array, l2_array_size) < 0) {
-         return VMDK_ERROR;
-     }
-+
-     /* update backup L2 table */
-     if (extent->l1_backup_table_offset != 0) {
-         m_data->l2_offset = extent->l1_backup_table[m_data->l1_index];
-         if (bdrv_pwrite_sync(extent->file,
-                     ((int64_t)m_data->l2_offset * 512)
--                        + (m_data->l2_index * sizeof(offset)),
--                    &offset, sizeof(offset)) < 0) {
-+                        + ((m_data->l2_index) * sizeof(offset)),
-+                                l2_table_array, l2_array_size) < 0) {
-             return VMDK_ERROR;
-         }
-     }
-+
-+    offset = temp_offset;
-     if (m_data->l2_cache_entry) {
--        *m_data->l2_cache_entry = offset;
-+        for (i = 0; i < m_data->nb_clusters; i++) {
-+            *m_data->l2_cache_entry = offset;
-+            m_data->l2_cache_entry++;
-+
-+            if (!zeroed) {
-+                offset += 128;
-+            }
-+        }
-+    }
-+
-+    qemu_vfree(l2_table_array);
-+    return VMDK_OK;
-+}
-+
-+static int vmdk_L2update(VmdkExtent *extent, VmdkMetaData *m_data,
-+                         bool zeroed)
-+{
-+    int ret;
-+
-+    while (m_data->next != NULL) {
-+        VmdkMetaData *next;
-+
-+        ret = vmdk_alloc_cluster_link_l2(extent, m_data, zeroed);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+
-+        next = m_data->next;
-+        m_data = next;
-     }
- 
-     return VMDK_OK;
-@@ -1271,7 +1338,7 @@ exit:
-  */
- static int handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
-                         uint64_t offset, uint64_t *cluster_offset,
--                        int64_t *bytes, VmdkMetaData *m_data,
-+                        int64_t *bytes, VmdkMetaData **m_data,
-                         bool allocate, uint32_t *total_alloc_clusters)
- {
-     int l1_index, l2_offset, l2_index;
-@@ -1280,6 +1347,7 @@ static int handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
-     uint32_t nb_clusters;
-     bool zeroed = false;
-     uint64_t skip_start_bytes, skip_end_bytes;
-+    VmdkMetaData *old_m_data;
-     int ret;
- 
-     ret = get_cluster_table(extent, offset, &l1_index, &l2_offset,
-@@ -1330,13 +1398,21 @@ static int handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
-         if (ret < 0) {
-             return ret;
-         }
--        if (m_data) {
--            m_data->valid = 1;
--            m_data->l1_index = l1_index;
--            m_data->l2_index = l2_index;
--            m_data->l2_offset = l2_offset;
--            m_data->l2_cache_entry = &l2_table[l2_index];
--            m_data->nb_clusters = nb_clusters;
-+
-+        if (*m_data) {
-+            old_m_data = *m_data;
-+            *m_data = g_malloc0(sizeof(**m_data));
-+
-+            **m_data = (VmdkMetaData) {
-+                .valid            =    1,
-+                .l1_index         =    l1_index,
-+                .l2_index         =    l2_index,
-+                .l2_offset        =    l2_offset,
-+                .l2_cache_entry   =    &l2_table[l2_index],
-+                .nb_clusters      =    nb_clusters,
-+                .offset           =    cluster_sector,
-+                .next             =    old_m_data,
-+            };
-         }
-     }
-     *cluster_offset = cluster_sector << BDRV_SECTOR_BITS;
-@@ -1365,7 +1441,7 @@ static int handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
-  */
- static int vmdk_alloc_cluster_offset(BlockDriverState *bs,
-                                      VmdkExtent *extent,
--                                     VmdkMetaData *m_data, uint64_t offset,
-+                                     VmdkMetaData **m_data, uint64_t offset,
-                                      bool allocate, uint64_t *cluster_offset,
-                                      int64_t bytes,
-                                      uint32_t *total_alloc_clusters)
-@@ -1385,8 +1461,8 @@ static int vmdk_alloc_cluster_offset(BlockDriverState *bs,
-     new_cluster_offset = 0;
-     *cluster_offset = 0;
-     n_bytes = 0;
--    if (m_data) {
--        m_data->valid = 0;
-+    if (*m_data) {
-+        (*m_data)->valid = 0;
-     }
- 
-     /* due to L2 table margins all bytes may not get allocated at once */
-@@ -1768,9 +1844,11 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
-     uint64_t cluster_offset;
-     uint64_t bytes_done = 0;
-     uint64_t extent_size;
--    VmdkMetaData m_data;
-+    VmdkMetaData *m_data;
-     uint32_t total_alloc_clusters = 0;
- 
-+    m_data = g_malloc0(sizeof(*m_data));
-+
-     if (DIV_ROUND_UP(offset, BDRV_SECTOR_SIZE) > bs->total_sectors) {
-         error_report("Wrong offset: offset=0x%" PRIx64
-                      " total_sectors=0x%" PRIx64,
-@@ -1779,6 +1857,7 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
-     }
- 
-     while (bytes > 0) {
-+        m_data->next = NULL;
-         extent = find_extent(s, offset >> BDRV_SECTOR_BITS, extent);
-         if (!extent) {
-             return -EIO;
-@@ -1825,7 +1904,7 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
-                                         total_alloc_clusters;
-                 if (!zero_dry_run) {
-                     /* update L2 tables */
--                    if (vmdk_L2update(extent, &m_data, VMDK_GTE_ZEROED)
-+                    if (vmdk_L2update(extent, m_data, zeroed)
-                             != VMDK_OK) {
-                         return -EIO;
-                     }
-@@ -1839,10 +1918,9 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
-             if (ret) {
-                 return ret;
-             }
--            if (m_data.valid) {
-+            if (m_data->valid) {
-                 /* update L2 tables */
--                if (vmdk_L2update(extent, &m_data,
--                                  cluster_offset >> BDRV_SECTOR_BITS)
-+                if (vmdk_L2update(extent, m_data, zeroed)
-                         != VMDK_OK) {
-                     return -EIO;
-                 }
-@@ -1852,6 +1930,13 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
-         offset += n_bytes;
-         bytes_done += n_bytes;
- 
-+        while (m_data->next != NULL) {
-+            VmdkMetaData *next;
-+            next = m_data->next;
-+            g_free(m_data);
-+            m_data = next;
-+        }
-+
-         /* update CID on the first write every time the virtual disk is
-          * opened */
-         if (!s->cid_updated) {
-@@ -1862,6 +1947,7 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
-             s->cid_updated = true;
-         }
-     }
-+    g_free(m_data);
-     return 0;
- }
- 
--- 
-2.6.2
+> output is turned off and, in turn, will prevent bitrot of the format
+> strings.
+
+Again, prefer present tense over past tense in the commit message.
+
+>=20
+> Signed-off-by: Danil Antonov <g.danil.anto@gmail.com>
+> ---
+>  hw/arm/strongarm.c | 17 +++++++++++------
+>  hw/arm/z2.c        | 16 ++++++++++------
+>  2 files changed, 21 insertions(+), 12 deletions(-)
+>=20
+> diff --git a/hw/arm/strongarm.c b/hw/arm/strongarm.c
+> index 3311cc3..88368ac 100644
+> --- a/hw/arm/strongarm.c
+> +++ b/hw/arm/strongarm.c
+> @@ -59,11 +59,16 @@
+>   - Enhance UART with modem signals
+>   */
+>=20
+> -#ifdef DEBUG
+> -# define DPRINTF(format, ...) printf(format , ## __VA_ARGS__)
+> -#else
+> -# define DPRINTF(format, ...) do { } while (0)
+> -#endif
+> +#ifndef DEBUG
+> +#define DEBUG 0
+> +#endif
+> +
+> +#define DPRINTF(fmt, ...)                         \
+> +    do {                                          \
+> +        if (DEBUG) {                              \
+> +            fprintf(stderr, fmt, ## __VA_ARGS__); \
+
+Again, changing from stdout to stderr should be mentioned as intentional
+in the commit message.
+
+Note that your change breaks the case of someone that used to do:
+
+make CFLAGS=3D-DDEBUG=3D
+
+because now it results in 'if ()' which is not valid syntax; likewise
+for someone that used to do CFLAGS=3D-DDEBUG=3Dyes.  (Or put another way,=
+ as
+written, your patch forces someone to use -DDEBUG=3D0 or -DDEBUG=3D1).  A=
+
+safer way is to make the 'if' condition a separate variable than the
+command-line trigger, as in the following, so that regardless of what
+DEBUG is defined to (including the empty string), you are only using
+DEBUG in the preprocessor, while the if conditional is under your
+complete control:
+
+#ifdef DEBUG
+# define DEBUG_PRINT 1
+#else
+# define DEBUG_PRINT 0
+#endif
+
+#definde DPRINTF()... if (DEBUG_PRINT)
+
+> @@ -1022,7 +1027,7 @@ static void
+> strongarm_uart_update_parameters(StrongARMUARTState
+> *s)
+>      s->char_transmit_time =3D  (NANOSECONDS_PER_SECOND / speed) * fram=
+e_size;
+>      qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_SET_PARAMS, &ssp);
+>=20
+> -    DPRINTF(stderr, "%s speed=3D%d parity=3D%c data=3D%d stop=3D%d\n",=
+
+> s->chr->label,
+
+Oh gross - the old code couldn't even compile correctly when DEBUG was
+defined (since printf(stderr) tries to treat the stderr pointer as a
+format string)!  This is a definite cleanup, and an argument that your
+switch from stdout to stderr is correct.
+
+
+> +++ b/hw/arm/z2.c
+> @@ -27,12 +27,16 @@
+>  #include "exec/address-spaces.h"
+>  #include "sysemu/qtest.h"
+>=20
+> -#ifdef DEBUG_Z2
+> -#define DPRINTF(fmt, ...) \
+> -        printf(fmt, ## __VA_ARGS__)
+> -#else
+> -#define DPRINTF(fmt, ...)
+> -#endif
+> +#ifndef DEBUG_Z2
+> +#define DEBUG_Z2 0
+> +#endif
+> +
+> +#define DPRINTF(fmt, ...)                                \
+> +    do {                                                 \
+> +        if (DEBUG_Z2) {                                  \
+
+Again, it's best to separate your conditional to be something completely
+under you control, while still allowing the command line freedom to
+define DEBUG_Z2 to anything (whether an empty string or a non-numeric
+value).
+
+These types of comments probably apply throughout your entire series, so
+it may be better if I wait for a v2 before reviewing too many more.
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--stpv6UHqAftlW4tnKEqG05b0FtNAjGRuV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY375XAAoJEKeha0olJ0NqsuEH+gJEVYlfiY+6kOI1jHjxw7gy
+0ewe7L1MW4PqlNEqa3B62S8bItqQXe8Z0XRPa1nxcj2LrWPSV7pzIz5g6w3K3C+F
+ouooWSHtKgFVFUBhM1KcoscEfSsADmR7DpezpxSF7dZPq83Dr7nIxqF4YtoOWjFy
+/mPpMAABn+SsWrytAItvMBVkT08cbtO95DRTao1VUUywscfK2Fj43RgbvtagsZBQ
+06L8mapAszXVZi/CydhId38aLuWJ4Fkty9vud4tzZr/we2QLKzgYZ7UC1c1901+/
+jjdGInNvbdWSrP0vt2gnxi3+DmGMd4huf3A3xwZRqIueEY/PY+20JBtC1t5InxU=
+=uZCi
+-----END PGP SIGNATURE-----
+
+--stpv6UHqAftlW4tnKEqG05b0FtNAjGRuV--
