@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58254)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liqiang6-s@360.cn>) id 1cu7uO-0004OW-Gw
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 21:32:53 -0400
+	(envelope-from <liqiang6-s@360.cn>) id 1cu80J-0005kq-8D
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 21:39:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liqiang6-s@360.cn>) id 1cu7uJ-0001Dl-N3
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 21:32:52 -0400
-Received: from mtabjsc2.360.cn ([123.125.82.7]:51583)
+	(envelope-from <liqiang6-s@360.cn>) id 1cu80E-0004mM-Rr
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 21:38:59 -0400
+Received: from mtabjsc2.360.cn ([123.125.82.7]:60010)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liqiang6-s@360.cn>) id 1cu7uJ-0001AX-1t
-	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 21:32:47 -0400
+	(Exim 4.71) (envelope-from <liqiang6-s@360.cn>) id 1cu80E-0004jt-6K
+	for qemu-devel@nongnu.org; Fri, 31 Mar 2017 21:38:54 -0400
 From: =?utf-8?B?5p2O5by6?= <liqiang6-s@360.cn>
-Date: Sat, 1 Apr 2017 01:32:38 +0000
-Message-ID: <143C0AFC63FC204CB0C55BB88F3A8ABB3339E708@EX02.corp.qihoo.net>
+Date: Sat, 1 Apr 2017 01:38:48 +0000
+Message-ID: <143C0AFC63FC204CB0C55BB88F3A8ABB3339E743@EX02.corp.qihoo.net>
 References: <149095959109.26233.3201018420228514740.stgit@bahia>
-	<149095962044.26233.2156597686399438923.stgit@bahia.lan>
-In-Reply-To: <149095962044.26233.2156597686399438923.stgit@bahia.lan>
+	<149095963571.26233.9370507789591510204.stgit@bahia.lan>
+In-Reply-To: <149095963571.26233.9370507789591510204.stgit@bahia.lan>
 Content-Language: zh-CN
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [for-2.9 PATCH 1/3] 9pfs: clear migration blocker
- at session reset
+Subject: Re: [Qemu-devel] [for-2.9 PATCH 2/3] 9pfs: cancel active PDUs in
+ virtfs_reset()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +29,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Greg Kurz <groug@kaod.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
 DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogR3JlZyBLdXJ6IFttYWls
 dG86Z3JvdWdAa2FvZC5vcmddDQo+IFNlbnQ6IEZyaWRheSwgTWFyY2ggMzEsIDIwMTcgNzoyNyBQ
 TQ0KPiBUbzogcWVtdS1kZXZlbEBub25nbnUub3JnDQo+IENjOiBFcmljIEJsYWtlOyDmnY7lvLo7
-IEdyZWcgS3Vyeg0KPiBTdWJqZWN0OiBbZm9yLTIuOSBQQVRDSCAxLzNdIDlwZnM6IGNsZWFyIG1p
-Z3JhdGlvbiBibG9ja2VyIGF0IHNlc3Npb24gcmVzZXQNCj4gDQo+IFRoZSBtaWdyYXRpb24gYmxv
-Y2tlciBzdXJ2aXZlcyBhIGRldmljZSByZXNldDogaWYgdGhlIGd1ZXN0IG1vdW50cyBhIDlwIHNo
-YXJlDQo+IGFuZCB0aGVuIGdldHMgcmVib290ZWQgd2l0aCBzeXN0ZW1fcmVzZXQsIGl0IHdpbGwg
-YmUgdW5taWdyYXRhYmxlIHVudGlsIGl0DQo+IHJlbW91bnRzIGFuZCB1bW91bnRzIHRoZSA5cCBz
-aGFyZSBhZ2Fpbi4NCj4gDQo+IFRoaXMgaGFwcGVucyBiZWNhdXNlIHRoZSBtaWdyYXRpb24gYmxv
-Y2tlciBpcyBzdXBwb3NlZCB0byBiZSBjbGVhcmVkIHdoZW4gd2UNCj4gcHV0IHRoZSBsYXN0IHJl
-ZmVyZW5jZSBvbiB0aGUgcm9vdCBmaWQsIGJ1dCB2aXJ0ZnNfcmVzZXQoKSB3cm9uZ2x5IGNhbGxz
-DQo+IGZyZWVfZmlkKCkgaW5zdGVhZCBvZiBwdXRfZmlkKCkuDQo+IA0KPiBUaGlzIHBhdGNoIGZp
-eGVzIHZpcnRmc19yZXNldCgpIHNvIHRoYXQgaXQgaG9ub3IgdGhlIHdheSBmaWRzIGFyZSBzdXBw
-b3NlZCB0byBiZQ0KPiBtYW5pcHVsYXRlZDogZmlyc3QgZ2V0IGEgcmVmZXJlbmNlIGFuZCBsYXRl
-ciBwdXQgaXQgYmFjayB3aGVuIHlvdSdyZSBkb25lLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogR3Jl
-ZyBLdXJ6IDxncm91Z0BrYW9kLm9yZz4NCj4gLS0tDQoNClJldmlld2VkLWJ5OiBMaSBRaWFuZyA8
-bGlxaWFuZzYtc0AzNjAuY24+DQoNCj4gIGh3LzlwZnMvOXAuYyB8ICAgMTEgKysrKysrLS0tLS0N
-Cj4gIDEgZmlsZSBjaGFuZ2VkLCA2IGluc2VydGlvbnMoKyksIDUgZGVsZXRpb25zKC0pDQo+IA0K
-PiBkaWZmIC0tZ2l0IGEvaHcvOXBmcy85cC5jIGIvaHcvOXBmcy85cC5jIGluZGV4IDQ4YmFiY2U4
-MzZiNi4uY2MxMDkzNjdiMDMwDQo+IDEwMDY0NA0KPiAtLS0gYS9ody85cGZzLzlwLmMNCj4gKysr
-IGIvaHcvOXBmcy85cC5jDQo+IEBAIC01MzksMTQgKzUzOSwxNSBAQCBzdGF0aWMgdm9pZCBjb3Jv
-dXRpbmVfZm4gdmlydGZzX3Jlc2V0KFY5ZnNQRFUgKnBkdSkNCj4gDQo+ICAgICAgLyogRnJlZSBh
-bGwgZmlkcyAqLw0KPiAgICAgIHdoaWxlIChzLT5maWRfbGlzdCkgew0KPiArICAgICAgICAvKiBH
-ZXQgZmlkICovDQo+ICAgICAgICAgIGZpZHAgPSBzLT5maWRfbGlzdDsNCj4gKyAgICAgICAgZmlk
-cC0+cmVmKys7DQo+ICsNCj4gKyAgICAgICAgLyogQ2x1bmsgZmlkICovDQo+ICAgICAgICAgIHMt
-PmZpZF9saXN0ID0gZmlkcC0+bmV4dDsNCj4gKyAgICAgICAgZmlkcC0+Y2x1bmtlZCA9IDE7DQo+
-IA0KPiAtICAgICAgICBpZiAoZmlkcC0+cmVmKSB7DQo+IC0gICAgICAgICAgICBmaWRwLT5jbHVu
-a2VkID0gMTsNCj4gLSAgICAgICAgfSBlbHNlIHsNCj4gLSAgICAgICAgICAgIGZyZWVfZmlkKHBk
-dSwgZmlkcCk7DQo+IC0gICAgICAgIH0NCj4gKyAgICAgICAgcHV0X2ZpZChwZHUsIGZpZHApOw0K
-PiAgICAgIH0NCj4gIH0NCj4gDQoNCg==
+IEdyZWcgS3Vyeg0KPiBTdWJqZWN0OiBbZm9yLTIuOSBQQVRDSCAyLzNdIDlwZnM6IGNhbmNlbCBh
+Y3RpdmUgUERVcyBpbiB2aXJ0ZnNfcmVzZXQoKQ0KPiANCj4gQWNjb3JkaW5nIHRvIHRoZSA5UCBz
+cGVjIFsxXSwgdGhlIHZlcnNpb24gb3BlcmF0aW9uIHNob3VsZCBhYm9ydCBhbnkNCj4gb3V0c3Rh
+bmRpbmcgSS9PIGFuZCBjbHVuayBhbGwgZmlkcywgc28gdGhhdCBhIG5ldyBzZXNzaW9uIG1heSBi
+ZSBzdGFydGVkIGluIGENCj4gY2xlYW4gc3RhdGUuDQo+IA0KPiBUaGUgY3VycmVudCBjb2RlIHRy
+aWVzIHRvIGNsdW5rIGFuZCBmcmVlIGZpZHMsIGJ1dCBpdCBkb2Vzbid0IHdhaXQgZm9yIGFjdGl2
+ZSBQRFVzDQo+IHRvIGNvbXBsZXRlLiBUaGlzIGNhbiBjYXVzZSBhbiBJL08gdG8gYWN0dWFsbHkg
+Y29tcGxldGUgYWZ0ZXIgdGhlIG5ldyBzZXNzaW9uDQo+IGhhcyBiZWd1biwgYW5kIGNvbmZ1c2Ug
+dGhlIGNsaWVudC4NCj4gDQo+IFRoaXMgcGF0Y2ggbW9kaWZpZXMgdmlydGZzX3Jlc2V0KCkgc28g
+dGhhdCBpdCBleHBsaWNpdGVseSBjYW5jZWxzIGFuZCB3YWl0cyBmb3INCj4gaW5mbGlnaHQgcmVx
+dWVzdHMgdG8gdGVybWluYXRlLiBBbGwgZmlkcyBzaG91bGQgdGh1cyBiZSB1bnJlZmVyZW5jZWQg
+YW5kIHJlYWR5IHRvDQo+IGJlIGZyZWVkLiBMZXQncyBtYWtlIGl0IGNsZWFyIHdpdGggYSBhbiBh
+c3NlcnRpb24uDQo+IA0KPiBbMV0gaHR0cDovL21hbi5jYXQtdi5vcmcvcGxhbl85LzUvdmVyc2lv
+bg0KPiANCj4gU2lnbmVkLW9mZi1ieTogR3JlZyBLdXJ6IDxncm91Z0BrYW9kLm9yZz4NCj4gLS0t
+DQoNClJldmlld2VkLWJ5OiBMaSBRaWFuZyA8bGlxaWFuZzYtc0AzNjAuY24+DQoNCj4gIGh3Lzlw
+ZnMvOXAuYyB8ICAgMjIgKysrKysrKysrKysrKysrKysrKysrLQ0KPiAgMSBmaWxlIGNoYW5nZWQs
+IDIxIGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9ody85
+cGZzLzlwLmMgYi9ody85cGZzLzlwLmMgaW5kZXggY2MxMDkzNjdiMDMwLi44NmVkOTA2NWM0ZTIN
+Cj4gMTAwNjQ0DQo+IC0tLSBhL2h3LzlwZnMvOXAuYw0KPiArKysgYi9ody85cGZzLzlwLmMNCj4g
+QEAgLTUzNiw5ICs1MzYsMjkgQEAgc3RhdGljIHZvaWQgY29yb3V0aW5lX2ZuIHZpcnRmc19yZXNl
+dChWOWZzUERVICpwZHUpDQo+IHsNCj4gICAgICBWOWZzU3RhdGUgKnMgPSBwZHUtPnM7DQo+ICAg
+ICAgVjlmc0ZpZFN0YXRlICpmaWRwOw0KPiArICAgIGJvb2wgZG9uZSA9IGZhbHNlOw0KPiArDQo+
+ICsgICAgLyogRHJhaW4gYW55IG91dHN0YW5kaW5nIEkvTyAqLw0KPiArICAgIHdoaWxlICghZG9u
+ZSkgew0KPiArICAgICAgICBWOWZzUERVICpjYW5jZWxfcGR1Ow0KPiArDQo+ICsgICAgICAgIGRv
+bmUgPSB0cnVlOw0KPiArICAgICAgICBRTElTVF9GT1JFQUNIKGNhbmNlbF9wZHUsICZzLT5hY3Rp
+dmVfbGlzdCwgbmV4dCkgew0KPiArICAgICAgICAgICAgaWYgKGNhbmNlbF9wZHUgIT0gcGR1KSB7
+DQo+ICsgICAgICAgICAgICAgICAgZG9uZSA9IGZhbHNlOw0KPiArICAgICAgICAgICAgICAgIGNh
+bmNlbF9wZHUtPmNhbmNlbGxlZCA9IDE7DQo+ICsgICAgICAgICAgICAgICAgcWVtdV9jb19xdWV1
+ZV93YWl0KCZjYW5jZWxfcGR1LT5jb21wbGV0ZSwgTlVMTCk7DQo+ICsgICAgICAgICAgICAgICAg
+Y2FuY2VsX3BkdS0+Y2FuY2VsbGVkID0gMDsNCj4gKyAgICAgICAgICAgICAgICBwZHVfZnJlZShj
+YW5jZWxfcGR1KTsNCj4gKyAgICAgICAgICAgICAgICBicmVhazsNCj4gKyAgICAgICAgICAgIH0N
+Cj4gKyAgICAgICAgfQ0KPiArICAgIH0NCj4gDQo+ICAgICAgLyogRnJlZSBhbGwgZmlkcyAqLw0K
+PiAgICAgIHdoaWxlIChzLT5maWRfbGlzdCkgew0KPiArICAgICAgICBhc3NlcnQoIWZpZHAtPnJl
+Zik7DQo+ICsNCj4gICAgICAgICAgLyogR2V0IGZpZCAqLw0KPiAgICAgICAgICBmaWRwID0gcy0+
+ZmlkX2xpc3Q7DQo+ICAgICAgICAgIGZpZHAtPnJlZisrOw0KPiBAQCAtNjcwLDcgKzY5MCw3IEBA
+IHN0YXRpYyB2b2lkIGNvcm91dGluZV9mbiBwZHVfY29tcGxldGUoVjlmc1BEVSAqcGR1LA0KPiBz
+c2l6ZV90IGxlbikNCj4gDQo+ICAgICAgcGR1X3B1c2hfYW5kX25vdGlmeShwZHUpOw0KPiANCj4g
+LSAgICAvKiBOb3cgd2FrZXVwIGFueWJvZHkgd2FpdGluZyBpbiBmbHVzaCBmb3IgdGhpcyByZXF1
+ZXN0ICovDQo+ICsgICAgLyogTm93IHdha2V1cCBhbnlib2R5IHdhaXRpbmcgaW4gZmx1c2ggb3Ig
+cmVzZXQgZm9yIHRoaXMgcmVxdWVzdCAqLw0KPiAgICAgIGlmICghcWVtdV9jb19xdWV1ZV9uZXh0
+KCZwZHUtPmNvbXBsZXRlKSkgew0KPiAgICAgICAgICBwZHVfZnJlZShwZHUpOw0KPiAgICAgIH0N
+Cg0K
