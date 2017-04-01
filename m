@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34032)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1cuHxP-0002gn-Fr
-	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 08:16:40 -0400
+	(envelope-from <konrad.r.wilk@gmail.com>) id 1cuI5u-0004gH-LH
+	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 08:25:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1cuHxM-0002jV-5U
-	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 08:16:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43446)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1cuHxL-0002iM-T8
-	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 08:16:36 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C6847C001601
-	for <qemu-devel@nongnu.org>; Sat,  1 Apr 2017 12:16:34 +0000 (UTC)
-Date: Sat, 1 Apr 2017 13:16:31 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20170401121631.GM30620@redhat.com>
-References: <20170331205133.23906-1-rjones@redhat.com>
+	(envelope-from <konrad.r.wilk@gmail.com>) id 1cuI5r-0007kx-IN
+	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 08:25:26 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:35088)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <konrad.r.wilk@gmail.com>)
+	id 1cuI5r-0007jP-Do
+	for qemu-devel@nongnu.org; Sat, 01 Apr 2017 08:25:23 -0400
+Received: by mail-qt0-x244.google.com with SMTP id r5so13414219qtb.2
+	for <qemu-devel@nongnu.org>; Sat, 01 Apr 2017 05:25:21 -0700 (PDT)
+Sender: Konrad Rzeszutek Wilk <konrad.r.wilk@gmail.com>
+Date: Sat, 1 Apr 2017 08:25:18 -0400
+From: Konrad Rzeszutek Wilk <konrad@darnok.org>
+Message-ID: <20170401122517.GB5293@localhost.localdomain>
+References: <20170320001249.25521-1-haozhong.zhang@intel.com>
+	<20170320001249.25521-2-haozhong.zhang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170331205133.23906-1-rjones@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] main-loop: Acquire main_context lock
- around os_host_main_loop_wait.
+In-Reply-To: <20170320001249.25521-2-haozhong.zhang@intel.com>
+Subject: Re: [Qemu-devel] [RFC QEMU PATCH v2 01/10] nvdimm xen: disable
+ label support on Xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,72 +32,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, marcandre.lureau@redhat.com, fziglio@redhat.com
+To: Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xen.org, Dan Williams <dan.j.williams@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <guangrong.xiao@linux.intel.com>
 
-On Fri, Mar 31, 2017 at 09:51:33PM +0100, Richard W.M. Jones wrote:
-> When running virt-rescue the serial console hangs from time to time.
-> Virt-rescue runs an ordinary Linux kernel "appliance", but there is
-> only a single idle process running inside, so the qemu main loop is
-> largely idle.  With virt-rescue >=3D 1.37 you may be able to observe th=
-e
-> hang by doing:
->=20
->   $ virt-rescue -e ^] --scratch
->   ><rescue> while true; do ls -l /usr/bin; done
+On Mon, Mar 20, 2017 at 08:12:40AM +0800, Haozhong Zhang wrote:
+> If xen_enabled(), memory_region_get_ram_ptr() always returns NULL and
+> nvdimm_realize() cannot get the correct pointer to the label area. This
+> commit disables the label support for Xen accelerator to workaround
+> this issue.
+> 
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> ---
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: Xiao Guangrong <guangrong.xiao@linux.intel.com>
+> ---
+>  hw/mem/nvdimm.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+> index db896b0bb6..0d3e17e94c 100644
+> --- a/hw/mem/nvdimm.c
+> +++ b/hw/mem/nvdimm.c
+> @@ -87,7 +87,11 @@ static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
+>      align = memory_region_get_alignment(mr);
+>  
+>      pmem_size = size - nvdimm->label_size;
+> -    nvdimm->label_data = memory_region_get_ram_ptr(mr) + pmem_size;
+> +    /*
+> +     * TODO: explain the reason
 
-I know that people have had problems reproducing this bug.
-
-It's easily reproducible, *if* you have the newest version of
-virt-rescue.  Both the old and new versions of virt-rescue run qemu
-with `-serial stdio', but in the old version the qemu chardev was
-literally connected to stdio (the tty), and in the new version
-virt-rescue has its own poll loop connected to the qemu chardev.  For
-some reason this changes the scheduling in some way to make the bug
-much more evident.
-
-Unfortunately the new version was only available in Fedora Rawhide.
-
-So what I have done for Fedora users is to backport the new
-virt-rescue to the version of libguestfs available in Fedora 25 and
-Fedora 26, in these versions:
-
-  Fedora 25:
-  libguestfs-tools-c >=3D 1.36.3-2.fc25
-  https://bodhi.fedoraproject.org/updates/FEDORA-2017-0a9af45644
-  or https://koji.fedoraproject.org/koji/taskinfo?taskID=3D18714553
-
-  Fedora 26:
-  libguestfs-tools-c >=3D 1.36.3-2.fc26
-  https://bodhi.fedoraproject.org/updates/?packages=3Dlibguestfs (coming)
-  or https://koji.fedoraproject.org/koji/taskinfo?taskID=3D18714548
-
-You can tell if you have the old or new version of virt-rescue: The
-new version has new options `-e' and `-i' (these were not present in
-the old version), and also prints the following message when starting up:
-
-  The virt-rescue escape key is =E2=80=98^]=E2=80=99.  Type =E2=80=98^] h=
-=E2=80=99 for help.
-
-After ensuring you have the new version of virt-rescue installed,
-reproducing the bug should be as simple as:
-
-  $ virt-rescue --scratch
-  ><rescue> while true; do ls -l /usr/bin; done
-
-If you want to run virt-rescue against a different version of qemu:
-
-  $ LIBGUESTFS_BACKEND=3Ddirect LIBGUESTFS_HV=3D/path/to/qemu \
-        virt-rescue --scratch
-
-HTH,
-
-Rich.
-
---=20
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rj=
-ones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-Fedora Windows cross-compiler. Compile Windows programs, test, and
-build Windows installers. Over 100 libraries supported.
-http://fedoraproject.org/wiki/MinGW
+Ahem?
+> +     */
+> +    if (nvdimm->label_size)
+> +        nvdimm->label_data = memory_region_get_ram_ptr(mr) + pmem_size;
+>      pmem_size = QEMU_ALIGN_DOWN(pmem_size, align);
+>  
+>      if (size <= nvdimm->label_size || !pmem_size) {
+> -- 
+> 2.12.0
+> 
