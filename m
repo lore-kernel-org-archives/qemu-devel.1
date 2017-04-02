@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cuZe7-0000wL-Ea
-	for qemu-devel@nongnu.org; Sun, 02 Apr 2017 03:09:56 -0400
+	(envelope-from <sameeh@daynix.com>) id 1cuZxo-0003Iq-Vq
+	for qemu-devel@nongnu.org; Sun, 02 Apr 2017 03:30:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cuZe4-0000Gv-7I
-	for qemu-devel@nongnu.org; Sun, 02 Apr 2017 03:09:55 -0400
-Date: Sun, 2 Apr 2017 16:48:50 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170402064850.GG16790@umbus.fritz.box>
-References: <1490795611-4762-1-git-send-email-clg@kaod.org>
-	<1490795611-4762-3-git-send-email-clg@kaod.org>
-	<20170330064605.GF22163@umbus>
-	<3e6f5e93-6b87-1304-98f7-73c828fe14af@kaod.org>
+	(envelope-from <sameeh@daynix.com>) id 1cuZxl-0007i9-Ok
+	for qemu-devel@nongnu.org; Sun, 02 Apr 2017 03:30:16 -0400
+Received: from mail-vk0-x243.google.com ([2607:f8b0:400c:c05::243]:32786)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1cuZxl-0007dg-IB
+	for qemu-devel@nongnu.org; Sun, 02 Apr 2017 03:30:13 -0400
+Received: by mail-vk0-x243.google.com with SMTP id j137so14607099vke.0
+	for <qemu-devel@nongnu.org>; Sun, 02 Apr 2017 00:30:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="4eRLI4hEmsdu6Npr"
-Content-Disposition: inline
-In-Reply-To: <3e6f5e93-6b87-1304-98f7-73c828fe14af@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v4 2/9] spapr: move the IRQ server number
- mapping under the machine
+In-Reply-To: <20170323162650.16973-2-sameeh@daynix.com>
+References: <20170323162650.16973-1-sameeh@daynix.com>
+	<20170323162650.16973-2-sameeh@daynix.com>
+From: Sameeh Jubran <sameeh@daynix.com>
+Date: Sun, 2 Apr 2017 10:30:09 +0300
+Message-ID: <CAKPgXcHt-SDE8ObvpTXm3KaQvrxqKCcHy9TUcFvbnq+gHSDMww@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH qemu-ga v2] qemu-ga: Make QGA VSS provider
+ service run only when needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,125 +29,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Yan Vugenfirer <yan@daynix.com>
+
+Ping.
+
+On Thu, Mar 23, 2017 at 7:26 PM, Sameeh Jubran <sameeh@daynix.com> wrote:
+
+> Currently the service runs in background on boot even though it is not
+> needed and once it is running it never stops. The service needs to be
+> running only during freeze operation and it should be stopped after
+> executing thaw.
+>
+> Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
+> ---
+>  qga/vss-win32/install.cpp   | 28 ++++++++++++++++++++++++++--
+>  qga/vss-win32/install.h     | 20 ++++++++++++++++++++
+>  qga/vss-win32/requester.cpp |  2 ++
+>  3 files changed, 48 insertions(+), 2 deletions(-)
+>  create mode 100644 qga/vss-win32/install.h
+>
+> diff --git a/qga/vss-win32/install.cpp b/qga/vss-win32/install.cpp
+> index f4160a3..f41fcdf 100644
+> --- a/qga/vss-win32/install.cpp
+> +++ b/qga/vss-win32/install.cpp
+> @@ -14,7 +14,7 @@
+>
+>  #include "vss-common.h"
+>  #include <inc/win2003/vscoordint.h>
+> -#include <comadmin.h>
+> +#include "install.h"
+>  #include <wbemidl.h>
+>  #include <comdef.h>
+>  #include <comutil.h>
+> @@ -276,7 +276,7 @@ STDAPI COMRegister(void)
+>
+>      chk(pCatalog->CreateServiceForApplication(
+>              _bstr_t(QGA_PROVIDER_LNAME), _bstr_t(QGA_PROVIDER_LNAME),
+> -            _bstr_t(L"SERVICE_AUTO_START"), _bstr_t(L"SERVICE_ERROR_
+> NORMAL"),
+> +            _bstr_t(L"SERVICE_DEMAND_START"), _bstr_t(L"SERVICE_ERROR_
+> NORMAL"),
+>              _bstr_t(L""), _bstr_t(L".\\localsystem"), _bstr_t(L""),
+> FALSE));
+>      chk(pCatalog->InstallComponent(_bstr_t(QGA_PROVIDER_LNAME),
+>                                     _bstr_t(dllPath), _bstr_t(tlbPath),
+> @@ -461,3 +461,27 @@ namespace _com_util
+>          return bstr;
+>      }
+>  }
+> +
+> +/* Stop QGA VSS provider service from COM+ Application Admin Catalog */
+> +
+> +STDAPI StopService(void)
+> +{
+> +    HRESULT hr;
+> +    COMInitializer initializer;
+> +    COMPointer<IUnknown> pUnknown;
+> +    COMPointer<ICOMAdminCatalog2> pCatalog;
+> +
+> +    int count = 0;
+> +
+> +    chk(QGAProviderFind(QGAProviderCount, (void *)&count));
+> +    if (count) {
+> +        chk(CoCreateInstance(CLSID_COMAdminCatalog, NULL,
+> CLSCTX_INPROC_SERVER,
+> +            IID_IUnknown, (void **)pUnknown.replace()));
+> +        chk(pUnknown->QueryInterface(IID_ICOMAdminCatalog2,
+> +            (void **)pCatalog.replace()));
+> +        chk(pCatalog->ShutdownApplication(_bstr_t(QGA_PROVIDER_LNAME)));
+> +    }
+> +
+> +out:
+> +    return hr;
+> +}
+> diff --git a/qga/vss-win32/install.h b/qga/vss-win32/install.h
+> new file mode 100644
+> index 0000000..35364af
+> --- /dev/null
+> +++ b/qga/vss-win32/install.h
+> @@ -0,0 +1,20 @@
+> +/*
+> + * QEMU Guest Agent VSS requester declarations
+> + *
+> + * Copyright Hitachi Data Systems Corp. 2013
+> + *
+> + * Authors:
+> + *  Tomoki Sekiyama   <tomoki.sekiyama@hds.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or
+> later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef INSTALL_H
+> +#define INSTALL_H
+> +
+> +#include <comadmin.h>
+> +
+> +STDAPI StopService(void);
+> +
+> +#endif
+> diff --git a/qga/vss-win32/requester.cpp b/qga/vss-win32/requester.cpp
+> index 272e71b..27308ad 100644
+> --- a/qga/vss-win32/requester.cpp
+> +++ b/qga/vss-win32/requester.cpp
+> @@ -13,6 +13,7 @@
+>  #include "qemu/osdep.h"
+>  #include "vss-common.h"
+>  #include "requester.h"
+> +#include "install.h"
+>  #include <inc/win2003/vswriter.h>
+>  #include <inc/win2003/vsbackup.h>
+>
+> @@ -501,4 +502,5 @@ void requester_thaw(int *num_vols, ErrorSet *errset)
+>      requester_cleanup();
+>
+>      CoUninitialize();
+> +    StopService();
+>  }
+> --
+> 2.9.3
+>
+>
 
 
---4eRLI4hEmsdu6Npr
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Mar 30, 2017 at 03:04:47PM +0200, C=E9dric Le Goater wrote:
-> On 03/30/2017 08:46 AM, David Gibson wrote:
-> > On Wed, Mar 29, 2017 at 03:53:24PM +0200, C=E9dric Le Goater wrote:
-> >> This is the second step to abstract the IRQ 'server' number of the
-> >> XICS layer. Now that the prereq cleanups have been done in the
-> >> previous patch, we can move down the 'cpu_dt_id' to 'cpu_index'
-> >> mapping in the sPAPR machine handler.
-> >>
-> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> >> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> >> ---
-> >>  hw/intc/xics_spapr.c    | 5 ++---
-> >>  hw/ppc/spapr.c          | 3 ++-
-> >>  hw/ppc/spapr_cpu_core.c | 2 +-
-> >>  3 files changed, 5 insertions(+), 5 deletions(-)
-> >>
-> >> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-> >> index 58f100d379cb..f05308b897f2 100644
-> >> --- a/hw/intc/xics_spapr.c
-> >> +++ b/hw/intc/xics_spapr.c
-> >> @@ -52,9 +52,8 @@ static target_ulong h_cppr(PowerPCCPU *cpu, sPAPRMac=
-hineState *spapr,
-> >>  static target_ulong h_ipi(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-> >>                            target_ulong opcode, target_ulong *args)
-> >>  {
-> >> -    target_ulong server =3D xics_get_cpu_index_by_dt_id(args[0]);
-> >>      target_ulong mfrr =3D args[1];
-> >> -    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), server);
-> >> +    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), args[0]);
-> >> =20
-> >>      if (!icp) {
-> >>          return H_PARAMETER;
-> >> @@ -122,7 +121,7 @@ static void rtas_set_xive(PowerPCCPU *cpu, sPAPRMa=
-chineState *spapr,
-> >>      }
-> >> =20
-> >>      nr =3D rtas_ld(args, 0);
-> >> -    server =3D xics_get_cpu_index_by_dt_id(rtas_ld(args, 1));
-> >> +    server =3D rtas_ld(args, 1);
-> >>      priority =3D rtas_ld(args, 2);
-> >> =20
-> >>      if (!ics_valid_irq(ics, nr) || !xics_icp_get(XICS_FABRIC(spapr), =
-server)
-> >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> >> index 8aecea3dd10c..b9f7f8607869 100644
-> >> --- a/hw/ppc/spapr.c
-> >> +++ b/hw/ppc/spapr.c
-> >> @@ -3024,9 +3024,10 @@ static void spapr_ics_resend(XICSFabric *dev)
-> >>      ics_resend(spapr->ics);
-> >>  }
-> >> =20
-> >> -static ICPState *spapr_icp_get(XICSFabric *xi, int server)
-> >> +static ICPState *spapr_icp_get(XICSFabric *xi, int cpu_dt_id)
-> >>  {
-> >>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
-> >> +    int server =3D xics_get_cpu_index_by_dt_id(cpu_dt_id);
-> >=20
-> > The idea is good, but this is a bad name (as it was in the original
-> > version, too).  The whole point here is that the XICS server number
-> > (as it appears in the ICS registers) is the input to this function,
-> > and we no longer assume that is equal to cpu_index.
-> >=20
-> > Seems we could just get the cpu object by dt_id here, then go to ICP(cp=
-u->intc).
->=20
-> yes that would be nice and this is exactly what pnv does now, but=20
-> this is only possible because the PnvICPState objects are allocated=20
-> from under PnvCore. This is not the case for sPAPR yet.
->=20
-> Currently, when the sPAPR core are realized, we call spapr_cpu_init()=20
-> which first gets its ICP with :
->=20
-> 	xics_icp_get(xi, cpu->cpu_dt_id);
->=20
-> so we cannot use ICP(cpu->intc) in this XICSFabric handler, it is not
-> assigned yet. It only will be at the end of spapr_cpu_init() when=20
->=20
-> 	xics_cpu_setup(xi, cpu, icp);
->=20
-> is called.
-
-Uh.. but spapr_cpu_init() has the spapr pointer and can obviously get
-the cpu_index.  So it could look up the right ICP in the array easily
-enough instead of using xics_icp_get().
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---4eRLI4hEmsdu6Npr
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJY4J7RAAoJEGw4ysog2bOSCREQAIlOQfp41vruqoFdfBZvqes+
-CbjIdmLxXwIdYXXxV3OeAoZFCjbhzhqoCMelZMCvwkXwJ0lar9OibXKYOGOpoJHC
-5NgO5r54eGcolUhSbeTIIh5CODKtDRO3MaleU9avvQ/MPQWqEC1e/AxCsMz6rhGc
-iv8LrIyarsNRPjuxMdiDnQYJw3Vnbk7JbYjQhtC/ujP+O7UFFuWVQq3i61VifboG
-hOD+APyx6ghWpoLo/SCraNm1zY38UO9hu/mpQ5XaP632vk0uPv5JLSmjCLtgcqkw
-diud1aQnXTaLts9i4FKv3TF4/XUhd37YYAE14Om7UpQ0Aho0H5lY4b3CEgMqH2id
-0YAhYmrGwoWfFw4uqjJNctBh/j/kWCv+qqS96laMWbMEoabsz66WhO9+p+afoMWw
-Mhccg9PnFY+YbaQI/J0Mgc72bdiKS5aaF1j6YuhRStphooFg3CPCtpIb6SXcSfSq
-nUTdKmQc13Wrsre1cssKIqqHG19s3buDfiuSUl9yeT21hVWln1cAre1Ri/d3nqP9
-vs6hRZAUaezYSGDR9QrZyWO7bNGUAXV6ri/HHFOlq5zvh0pJrMfSyskhCTTssgTG
-NOezHM/S08KUa/XPv+yCi7akUfsFWQk+oBbEw3K166PIJQCKWeUKMrMnvpZnz74e
-YU6ZCpjrWzuIb6TzHl0R
-=duZS
------END PGP SIGNATURE-----
-
---4eRLI4hEmsdu6Npr--
+-- 
+Respectfully,
+*Sameeh Jubran*
+*Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
+*Software Engineer @ Daynix <http://www.daynix.com>.*
