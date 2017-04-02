@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1cuZyq-0003jy-Gf
-	for qemu-devel@nongnu.org; Sun, 02 Apr 2017 03:31:22 -0400
+	(envelope-from <sameeh@daynix.com>) id 1cuZzw-0004LN-FU
+	for qemu-devel@nongnu.org; Sun, 02 Apr 2017 03:32:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1cuZyn-0008Pm-8c
-	for qemu-devel@nongnu.org; Sun, 02 Apr 2017 03:31:20 -0400
-Received: from mail-ua0-x229.google.com ([2607:f8b0:400c:c08::229]:36645)
+	(envelope-from <sameeh@daynix.com>) id 1cuZzt-0000i1-87
+	for qemu-devel@nongnu.org; Sun, 02 Apr 2017 03:32:28 -0400
+Received: from mail-ua0-x241.google.com ([2607:f8b0:400c:c08::241]:36355)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1cuZyn-0008PC-2j
-	for qemu-devel@nongnu.org; Sun, 02 Apr 2017 03:31:17 -0400
-Received: by mail-ua0-x229.google.com with SMTP id 97so14034098uaz.3
-	for <qemu-devel@nongnu.org>; Sun, 02 Apr 2017 00:31:17 -0700 (PDT)
+	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1cuZzt-0000hv-3j
+	for qemu-devel@nongnu.org; Sun, 02 Apr 2017 03:32:25 -0400
+Received: by mail-ua0-x241.google.com with SMTP id j29so2176500uaa.3
+	for <qemu-devel@nongnu.org>; Sun, 02 Apr 2017 00:32:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAKPgXcFgZ4PA4d8SqFTe1quk16jFnXVWsx8Lody1Z60B0wRXqA@mail.gmail.com>
-References: <20170321104952.6236-1-sameeh@daynix.com>
-	<149011257708.3910.6427658788264808225@loki>
-	<CAKPgXcFgZ4PA4d8SqFTe1quk16jFnXVWsx8Lody1Z60B0wRXqA@mail.gmail.com>
+In-Reply-To: <20170321135911.22731-1-sameeh@daynix.com>
+References: <20170321135911.22731-1-sameeh@daynix.com>
 From: Sameeh Jubran <sameeh@daynix.com>
-Date: Sun, 2 Apr 2017 10:31:16 +0300
-Message-ID: <CAKPgXcG4QSYUv1Jbxgwcn7ayzU=icMCTt07hK=MQX0GFSga9Cg@mail.gmail.com>
+Date: Sun, 2 Apr 2017 10:32:24 +0300
+Message-ID: <CAKPgXcE6XOpgJ=PEYTydf8TbFXzOpPF4daeaq9pn+1Ds4ZbTXg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] Fix Event Viewer errors caused by qemu-ga
+Subject: Re: [Qemu-devel] [PATCH qemu-ga] Fix a bug where qemu-ga service is
+ stuck during stop operation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,144 +28,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Yan Vugenfirer <yan@daynix.com>
+To: QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Yan Vugenfirer <yan@daynix.com>
 
 Ping.
 
-On Wed, Mar 22, 2017 at 11:14 AM, Sameeh Jubran <sameeh@daynix.com> wrote:
+On Tue, Mar 21, 2017 at 4:59 PM, Sameeh Jubran <sameeh@daynix.com> wrote:
 
+> After triggering a freeze command without any following thaw command,
+> qemu-ga will not respond to stop operation. This behaviour is wanted on
+> Linux
+> as there is no time limit for a freeze command and we want to prevent
+> quitting in the middle of freeze, on the other hand on Windows the time
+> limit for freeze is 10 seconds, so we should wait for the timeout, thaw
+> the file system and quit.
 >
+> Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
+> ---
+>  qga/main.c                 | 20 ++++++++++++++++++++
+>  qga/vss-win32.h            |  1 +
+>  qga/vss-win32/vss-common.h |  5 +++++
+>  3 files changed, 26 insertions(+)
 >
-> On Tue, Mar 21, 2017 at 6:09 PM, Michael Roth <mdroth@linux.vnet.ibm.com>
-> wrote:
+> diff --git a/qga/main.c b/qga/main.c
+> index 92658bc..de37c85 100644
+> --- a/qga/main.c
+> +++ b/qga/main.c
+> @@ -130,9 +130,29 @@ static void quit_handler(int sig)
+>       * unless all log/pid files are on unfreezable filesystems. there's
+>       * also a very likely chance killing the agent before unfreezing
+>       * the filesystems is a mistake (or will be viewed as one later).
+> +     * On Windows the freeze interval is limited to 10 seconds, so
+> +     * we should quit, but first we should wait for the timeout, thaw
+> +     * the filesystem and quit.
+>       */
+>      if (ga_is_frozen(ga_state)) {
+> +#ifdef _WIN32
+> +        int i = 0;
+> +        Error *err = NULL;
+> +        HANDLE hEventTimeout;
+> +
+> +        hEventTimeout = OpenEvent(EVENT_ALL_ACCESS, FALSE,
+> EVENT_NAME_TIMEOUT);
+> +        if (hEventTimeout) {
+> +            WaitForSingleObject(hEventTimeout, 0);
+> +            CloseHandle(hEventTimeout);
+> +        }
+> +        qga_vss_fsfreeze(&i, &err, false);
+> +        if (err) {
+> +            g_debug("Error: %s", error_get_pretty(err));
+> +            error_free(err);
+> +        }
+> +#else
+>          return;
+> +#endif
+>      }
+>      g_debug("received signal num %d, quitting", sig);
 >
->> Quoting Sameeh Jubran (2017-03-21 05:49:52)
->> > When the command "guest-fsfreeze-freeze" is executed it causes
->> > the VSS service to log the errors below in the Event Viewer.
->> >
->> > These errors are caused by two issues in the function "CommitSnapshots"
->> in
->> > provider.cpp:
->> >
->> > 1. When VSS_TIMEOUT_MSEC expires the funtion returns E_ABORT. This
->> causes
->> > the error #12293.
->> >
->> > 2. The VSS_TIMEOUT_MSEC value is too big. According to msdn the
->> > "Flush & Hold" operation has 10 seconds timeout not configurable, The
->> > "CommitSnapshots" is a part of the "Flush & Hold" process and thus any
->> > timeout bigger than 10 seconds would cause the error #12298 and anything
->> > bigger than 40 seconds causes the error #12340. All this info can be
->> found here:
->> > https://msdn.microsoft.com/en-us/library/windows/desktop/aa3
->> 84589(v=vs.85).aspx
->>
->> Not sure how best to deal with this. Technically our CommitSnapshots
->> interface is driven by the backup job being run by QGA/QEMU management
->> side. If that amount of time exceeds the VSS limits then I think it's
->> appropriate for VSS to log the error accordingly. VSS_TIMEOUT_MSEC here
->> doesn't actually have too much correlation with the VSS-set timeout,
->> IIRC it's specifically picked to exceed both the 10 and 40 second
->> timeouts and acts more as a fail-safe timeout.
+> diff --git a/qga/vss-win32.h b/qga/vss-win32.h
+> index 4d1d150..5f4ea70 100644
+> --- a/qga/vss-win32.h
+> +++ b/qga/vss-win32.h
+> @@ -13,6 +13,7 @@
+>  #ifndef VSS_WIN32_H
+>  #define VSS_WIN32_H
 >
-> The timeout was added in #commit: b39297aedfabe9b2c426cd540413be991500da25
-> There is no point in setting the TIMEOUT for this long as the actual
-> freeze - Fush and Hold Writes -
-> is limited to 10 seconds ( not configurable) according to msdn
-> https://msdn.microsoft.com/en-us/library/windows/
-> desktop/aa384589%28v=vs.85%29.aspx
+> +#include "qga/vss-win32/vss-common.h"
 >
->>
->> Are the event logs causing issues? FWIW, on the posix side we also opt
->> for gratuitous logging to syslog and such, the idea there being that
->> cooperative guests would prefer transparency on how the agent is being
->> used.
->>
-> Apparently, these error logs are annoying to some (
-> https://bugzilla.redhat.com/show_bug.cgi?id=1387125),
-> moreover I don't think that our implementation to the freeze operation -
-> which is a workaround in a way -
-> should log errors even though we know they are false alarm.
+>  bool vss_init(bool init_requester);
+>  void vss_deinit(bool deinit_requester);
+> diff --git a/qga/vss-win32/vss-common.h b/qga/vss-win32/vss-common.h
+> index c81a856..5756d00 100644
+> --- a/qga/vss-win32/vss-common.h
+> +++ b/qga/vss-win32/vss-common.h
+> @@ -12,6 +12,7 @@
 >
->>
->> That said, I do think error 12293 is unecessary, since IIUC it would
->> always be paired with the actual VSS-reported error. So avoiding the
->> E_ABORT seems reasonable either way.
->>
->> >
->> > |event id|                           error
->>  |
->> > * 12293  : Volume Shadow Copy Service error: Error calling a routine on
->> a
->> >            Shadow Copy Provider {00000000-0000-0000-0000-000000000000}.
->> >        Routine details CommitSnapshots [hr = 0x80004004, Operation
->> >        aborted.
->> >
->> > * 12340  : Volume Shadow Copy Error: VSS waited more than 40 seconds for
->> >            all volumes to be flushed.  This caused volume
->> >        \\?\Volume{62a171da-32ec-11e4-80b1-806e6f6e6963}\ to timeout
->> >        while waiting for the release-writes phase of shadow copy
->> >        creation. Trying again when disk activity is lower may solve
->> >        this problem.
->> >
->> > * 12298  : Volume Shadow Copy Service error: The I/O writes cannot be
->> held
->> >            during the shadow copy creation period on volume
->> >            \\?\Volume{62a171d9-32ec-11e4-80b1-806e6f6e6963}\. The
->> volume
->> >        index in the shadow copy set is 0. Error details:
->> >        Open[0x00000000, The operation completed successfully. ],
->> >        Flush[0x00000000, The operation completed successfully.],
->> >        Release[0x00000000, The operation completed successfully.],
->> >        OnRun[0x80042314, The shadow copy provider timed out while
->> >        holding writes to the volume being shadow copied. This is
->> >        probably due to excessive activity on the volume by an
->> >        application or a system service. Try again later when activity
->> >        on the volume is reduced.
->> >
->> > Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
->> > ---
->> >  qga/vss-win32/provider.cpp | 3 +--
->> >  1 file changed, 1 insertion(+), 2 deletions(-)
->> >
->> > diff --git a/qga/vss-win32/provider.cpp b/qga/vss-win32/provider.cpp
->> > index ef94669..d72f4d4 100644
->> > --- a/qga/vss-win32/provider.cpp
->> > +++ b/qga/vss-win32/provider.cpp
->> > @@ -15,7 +15,7 @@
->> >  #include <inc/win2003/vscoordint.h>
->> >  #include <inc/win2003/vsprov.h>
->> >
->> > -#define VSS_TIMEOUT_MSEC (60*1000)
->> > +#define VSS_TIMEOUT_MSEC (9 * 1000)
->> >
->> >  static long g_nComObjsInUse;
->> >  HINSTANCE g_hinstDll;
->> > @@ -377,7 +377,6 @@ STDMETHODIMP CQGAVssProvider::CommitSnapshots(VSS_ID
->> SnapshotSetId)
->> >      if (WaitForSingleObject(hEventThaw, VSS_TIMEOUT_MSEC) !=
->> WAIT_OBJECT_0) {
->> >          /* Send event to qemu-ga to notify the provider is timed out */
->> >          SetEvent(hEventTimeout);
->> > -        hr = E_ABORT;
->> >      }
->> >
->> >      CloseHandle(hEventThaw);
->> > --
->> > 2.9.3
->> >
->>
->>
+>  #ifndef VSS_COMMON_H
+>  #define VSS_COMMON_H
+> +#ifndef VSS_WIN32_H
 >
+>  #define __MIDL_user_allocate_free_DEFINED__
+>  #include <windows.h>
+> @@ -57,6 +58,7 @@
+>  #define L(a) _L(a)
 >
+>  /* Constants for QGA VSS Provider */
+> +#endif
+>
+>  #define QGA_PROVIDER_NAME "QEMU Guest Agent VSS Provider"
+>  #define QGA_PROVIDER_LNAME L(QGA_PROVIDER_NAME)
+> @@ -66,6 +68,8 @@
+>  #define EVENT_NAME_THAW    "Global\\QGAVSSEvent-thaw"
+>  #define EVENT_NAME_TIMEOUT "Global\\QGAVSSEvent-timeout"
+>
+> +#ifndef VSS_WIN32_H
+> +
+>  const GUID g_gProviderId = { 0x3629d4ed, 0xee09, 0x4e0e,
+>      {0x9a, 0x5c, 0x6d, 0x8b, 0xa2, 0x87, 0x2a, 0xef} };
+>  const GUID g_gProviderVersion = { 0x11ef8b15, 0xcac6, 0x40d6,
+> @@ -126,3 +130,4 @@ public:
+>  };
+>
+>  #endif
+> +#endif
 > --
-> Respectfully,
-> *Sameeh Jubran*
-> *Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
-> *Software Engineer @ Daynix <http://www.daynix.com>.*
+> 2.9.3
 >
-
+>
 
 
 -- 
