@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cuwhY-0002Hf-U8
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 03:47:06 -0400
+	(envelope-from <kwolf@redhat.com>) id 1cux9g-0003is-CX
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 04:16:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cuwhU-0000Fq-9s
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 03:47:00 -0400
-Received: from 4.mo2.mail-out.ovh.net ([87.98.172.75]:52753)
+	(envelope-from <kwolf@redhat.com>) id 1cux9d-0004dD-6n
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 04:16:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50782)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cuwhU-0000EV-0P
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 03:46:56 -0400
-Received: from player796.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id B3C0F7B125
-	for <qemu-devel@nongnu.org>; Mon,  3 Apr 2017 09:46:54 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Mon,  3 Apr 2017 09:46:05 +0200
-Message-Id: <1491205565-12831-10-git-send-email-clg@kaod.org>
-In-Reply-To: <1491205565-12831-1-git-send-email-clg@kaod.org>
-References: <1491205565-12831-1-git-send-email-clg@kaod.org>
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1cux9c-0004aN-UA
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 04:16:01 -0400
+Date: Mon, 3 Apr 2017 10:15:42 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170403081542.GA5036@noname.str.redhat.com>
+References: <C885D0FF6A27744DB0B822E32DF6EF029B1CA14A@SESTOEX04.enea.se>
+	<9b05e60a-f8c2-ea4f-6be4-f17c0adec510@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 9/9] ppc/pnv: add memory regions for the ICP
- registers
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="ZPt4rx8FFjLCG7dd"
+Content-Disposition: inline
+In-Reply-To: <9b05e60a-f8c2-ea4f-6be4-f17c0adec510@redhat.com>
+Subject: Re: [Qemu-devel] nbd: Possible regression in 2.9 RCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,193 +28,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Max Reitz <mreitz@redhat.com>
+Cc: Ciprian Barbu <Ciprian.Barbu@enea.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, pkrempa@redhat.com, Alexandru Avadanii <Alexandru.Avadanii@enea.com>, Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>, svc-armband <armband@enea.com>
 
-This provides to a PowerNV chip (POWER8) access to the Interrupt
-Management area, which contains the registers of the Interrupt Control
-Presenters of each thread. These are used to accept, return, forward
-interrupts in the system.
 
-This area is modeled with a per-chip container memory region holding
-all the ICP registers. Each thread of a chip is then associated with
-its ICP registers using a memory subregion indexed by its PIR number
-in the overall region.
+--ZPt4rx8FFjLCG7dd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The device tree is populated accordingly.
+Am 31.03.2017 um 19:43 hat Max Reitz geschrieben:
+> On 31.03.2017 18:03, Ciprian Barbu wrote:
+> > Hello,
+> >=20
+> > Similar to the other thread about possible regression with rbd, there m=
+ight be a regression with nbd.
+> > This time we are launching an instance from an image (not volume) and t=
+ry to live migrate it:
+> >=20
+> > nova live-migration <test_instance>
+> >=20
+> > The nova-compute service complains with:
+> >=20
+> > 2017-03-31 15:32:56.179 7806 INFO nova.virt.libvirt.driver [req-15d79cb=
+e-5956-4738-92df-3624e6b993ee d795de59fb9a4ea38776a11d20ae8469 cee03e74881f=
+4ccba3b83345fb652b2c - - -] [instance: 6a04508f-5d79-4582-8e2c-4cc368753f6c=
+] Migration running for 0 secs, memory 100% remaining; (bytes processed=3D0=
+, remaining=3D0, total=3D0)
+> > 2017-03-31 15:32:58.029 7806 WARNING stevedore.named [req-73bc0113-5555=
+-4dd8-8903-d3540cc61b47 b9fbceeadd2d4d1bab9c90ae104db1f7 7e7db99b32c6467184=
+701e9a0c2f1de7 - - -] Could not load instance_network_info
+> > 2017-03-31 15:32:59.038 7806 ERROR nova.virt.libvirt.driver [req-15d79c=
+be-5956-4738-92df-3624e6b993ee d795de59fb9a4ea38776a11d20ae8469 cee03e74881=
+f4ccba3b83345fb652b2c - - -] [instance: 6a04508f-5d79-4582-8e2c-4cc368753f6=
+c] Live Migration failure: internal error: unable to execute QEMU command '=
+nbd-server-add': Conflicts with use by drive-virtio-disk0 as 'root', which =
+does not allow 'write' on #block143
+> > 2017-03-31 15:32:59.190 7806 ERROR nova.virt.libvirt.driver [req-15d79c=
+be-5956-4738-92df-3624e6b993ee d795de59fb9a4ea38776a11d20ae8469 cee03e74881=
+f4ccba3b83345fb652b2c - - -] [instance: 6a04508f-5d79-4582-8e2c-4cc368753f6=
+c] Migration operation has aborted
+> >=20
+> > I will try and bisect it myself, but I thought I would paste this here =
+first, just so you know there is this issue too.
+>=20
+> Well, I already know the commit in question. It's
+> 8a7ce4f9338c475df1afc12502af704e4300a3e0 ("nbd/server: Use real
+> permissions for NBD exports").
+>=20
+> Whether this is a bug depends on the standpoint. I would very much
+> consider it a bug fix because as of this commit you can no longer create
+> a writable NBD server on a block device that is in use by a guest device
+> without the guest device being aware of this.
+>=20
+> The problem is that the functionality to "make" the guest device "aware"
+> of it was introduced only a couple of commits before, and it's called
+> "share-rw".
+>=20
+> So this doesn't work:
+>=20
+> $ x86_64-softmmu/qemu-system-x86_64 \
+>     -blockdev node-name=3Dimage,driver=3Dqcow2,\
+> file.driver=3Dfile,file.filename=3Dfoo.qcow2 \
+>     -device virtio-blk,drive=3Dimage \
+>     -qmp stdio
+> {"QMP": {"version": {"qemu": {"micro": 92, "minor": 8, "major": 2},
+> "package": " (v2.8.0-2038-g6604c893d0)"}, "capabilities": []}}
+> {'execute':'qmp_capabilities'}
+> {"return": {}}
+> {'execute':'nbd-server-start','arguments':{'addr':{'type':'inet','data':{=
+'host':'localhost','port':'10809'}}}}
+> {"return": {}}
+> {'execute':'nbd-server-add','arguments':{'device':'image','writable':true=
+}}
+> {"error": {"class": "GenericError", "desc": "Conflicts with use by
+> /machine/peripheral-anon/device[0]/virtio-backend as 'root', which does
+> not allow 'write' on image"}
+>=20
+> But this works:
+>=20
+> $ x86_64-softmmu/qemu-system-x86_64 \
+>     -blockdev node-name=3Dimage,driver=3Dqcow2,\
+> file.driver=3Dfile,file.filename=3Dfoo.qcow2 \
+>     -device virtio-blk,drive=3Dimage,share-rw=3Don \
+>     -qmp stdio
+> {"QMP": {"version": {"qemu": {"micro": 92, "minor": 8, "major": 2},
+> "package": " (v2.8.0-2038-g6604c893d0)"}, "capabilities": []}}
+> {'execute':'qmp_capabilities'}
+> {"return": {}}
+> {'execute':'nbd-server-start','arguments':{'addr':{'type':'inet','data':{=
+'host':'localhost','port':'10809'}}}}
+> {"return": {}}
+> {'execute':'nbd-server-add','arguments':{'device':'image','writable':true=
+}}
+> {"return": {}}
+>=20
+> (The difference is the share-rw=3Don in the -device parameter.)
+>=20
+> So in theory all that's necessary is to set share-rw=3Don for the device
+> in the management layer. But I'm not sure whether that's practical.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
----
- Changes since v1:
+Yes, libvirt needs to provide this option if the guest supports sharing.
+If it doesn't support sharing, rejecting a read-write NBD client seems
+correct to me.
 
- - added multichip support
- - adapted to use PnvICPState object
+Peter, Eric, what is the status on the libvirt side here?
 
- hw/ppc/pnv.c         | 81 ++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
- include/hw/ppc/pnv.h | 19 ++++++++++++
- 2 files changed, 100 insertions(+)
+> As for just allowing the NBD server write access to the device... To me
+> that appears pretty difficult from an implementation perspective. We
+> assert that nobody can write without having requested write access and
+> we make sure that nobody can request write access without it being
+> allowed. Making an exception for NBD seems very difficult and would
+> probably mean we'd have to drop the assertion for write accesses altogeth=
+er.
 
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index ab079ac60af5..903bbac03fcc 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -218,6 +218,43 @@ static void powernv_create_core_node(PnvChip *chip, =
-PnvCore *pc, void *fdt)
-                        servers_prop, sizeof(servers_prop))));
- }
-=20
-+static void powernv_populate_icp(PnvChip *chip, void *fdt, uint32_t pir,
-+                                 uint32_t nr_threads)
-+{
-+    uint64_t addr =3D PNV_ICP_BASE(chip) | (pir << 12);
-+    char *name;
-+    const char compat[] =3D "IBM,power8-icp\0IBM,ppc-xicp";
-+    uint32_t irange[2], i, rsize;
-+    uint64_t *reg;
-+    int offset;
-+
-+    irange[0] =3D cpu_to_be32(pir);
-+    irange[1] =3D cpu_to_be32(nr_threads);
-+
-+    rsize =3D sizeof(uint64_t) * 2 * nr_threads;
-+    reg =3D g_malloc(rsize);
-+    for (i =3D 0; i < nr_threads; i++) {
-+        reg[i * 2] =3D cpu_to_be64(addr | ((pir + i) * 0x1000));
-+        reg[i * 2 + 1] =3D cpu_to_be64(0x1000);
-+    }
-+
-+    name =3D g_strdup_printf("interrupt-controller@%"PRIX64, addr);
-+    offset =3D fdt_add_subnode(fdt, 0, name);
-+    _FDT(offset);
-+    g_free(name);
-+
-+    _FDT((fdt_setprop(fdt, offset, "compatible", compat, sizeof(compat))=
-));
-+    _FDT((fdt_setprop(fdt, offset, "reg", reg, rsize)));
-+    _FDT((fdt_setprop_string(fdt, offset, "device_type",
-+                              "PowerPC-External-Interrupt-Presentation")=
-));
-+    _FDT((fdt_setprop(fdt, offset, "interrupt-controller", NULL, 0)));
-+    _FDT((fdt_setprop(fdt, offset, "ibm,interrupt-server-ranges",
-+                       irange, sizeof(irange))));
-+    _FDT((fdt_setprop_cell(fdt, offset, "#interrupt-cells", 1)));
-+    _FDT((fdt_setprop_cell(fdt, offset, "#address-cells", 0)));
-+    g_free(reg);
-+}
-+
- static void powernv_populate_chip(PnvChip *chip, void *fdt)
- {
-     PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-@@ -231,6 +268,10 @@ static void powernv_populate_chip(PnvChip *chip, voi=
-d *fdt)
-         PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
-=20
-         powernv_create_core_node(chip, pnv_core, fdt);
-+
-+        /* Interrupt Control Presenters (ICP). One per core. */
-+        powernv_populate_icp(chip, fdt, pnv_core->pir,
-+                             CPU_CORE(pnv_core)->nr_threads);
-     }
-=20
-     if (chip->ram_size) {
-@@ -643,6 +684,38 @@ static void pnv_chip_init(Object *obj)
-     object_property_add_child(obj, "lpc", OBJECT(&chip->lpc), NULL);
- }
-=20
-+static void pnv_chip_icp_realize(PnvChip *chip, Error **errp)
-+{
-+    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-+    char *typename =3D pnv_core_typename(pcc->cpu_model);
-+    size_t typesize =3D object_type_get_instance_size(typename);
-+    int i, j;
-+    char *name;
-+    XICSFabric *xi =3D XICS_FABRIC(qdev_get_machine());
-+
-+    name =3D g_strdup_printf("icp-%x", chip->chip_id);
-+    memory_region_init(&chip->icp_mmio, OBJECT(chip), name, PNV_ICP_SIZE=
-);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(chip), &chip->icp_mmio);
-+    g_free(name);
-+
-+    sysbus_mmio_map(SYS_BUS_DEVICE(chip), 1, PNV_ICP_BASE(chip));
-+
-+    /* Map the ICP registers for each thread */
-+    for (i =3D 0; i < chip->nr_cores; i++) {
-+        PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
-+        int core_hwid =3D CPU_CORE(pnv_core)->core_id;
-+
-+        for (j =3D 0; j < CPU_CORE(pnv_core)->nr_threads; j++) {
-+            uint32_t pir =3D pcc->core_pir(chip, core_hwid) + j;
-+            PnvICPState *icp =3D PNV_ICP(xics_icp_get(xi, pir));
-+
-+            memory_region_add_subregion(&chip->icp_mmio, pir << 12, &icp=
-->mmio);
-+        }
-+    }
-+
-+    g_free(typename);
-+}
-+
- static void pnv_chip_realize(DeviceState *dev, Error **errp)
- {
-     PnvChip *chip =3D PNV_CHIP(dev);
-@@ -713,6 +786,14 @@ static void pnv_chip_realize(DeviceState *dev, Error=
- **errp)
-     object_property_set_bool(OBJECT(&chip->lpc), true, "realized",
-                              &error_fatal);
-     pnv_xscom_add_subregion(chip, PNV_XSCOM_LPC_BASE, &chip->lpc.xscom_r=
-egs);
-+
-+    /* Interrupt Management Area. This is the memory region holding
-+     * all the Interrupt Control Presenter (ICP) registers */
-+    pnv_chip_icp_realize(chip, &error);
-+    if (error) {
-+        error_propagate(errp, error);
-+        return;
-+    }
- }
-=20
- static Property pnv_chip_properties[] =3D {
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index 5693ba181d24..96231c1ff708 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -54,6 +54,7 @@ typedef struct PnvChip {
-     MemoryRegion xscom_mmio;
-     MemoryRegion xscom;
-     AddressSpace xscom_as;
-+    MemoryRegion icp_mmio;
-=20
-     PnvLpcController lpc;
- } PnvChip;
-@@ -136,4 +137,22 @@ typedef struct PnvMachineState {
- #define PNV_XSCOM_BASE(chip)                                            =
-\
-     (chip->xscom_base + ((uint64_t)(chip)->chip_id) * PNV_XSCOM_SIZE)
-=20
-+/*
-+ * XSCOM 0x20109CA defines the ICP BAR:
-+ *
-+ * 0:29   : bits 14 to 43 of address to define 1 MB region.
-+ * 30     : 1 to enable ICP to receive loads/stores against its BAR regi=
-on
-+ * 31:63  : Constant 0
-+ *
-+ * Usually defined as :
-+ *
-+ *      0xffffe00200000000 -> 0x0003ffff80000000
-+ *      0xffffe00600000000 -> 0x0003ffff80100000
-+ *      0xffffe02200000000 -> 0x0003ffff80800000
-+ *      0xffffe02600000000 -> 0x0003ffff80900000
-+ */
-+#define PNV_ICP_SIZE         0x0000000000100000ull
-+#define PNV_ICP_BASE(chip)                                              =
-\
-+    (0x0003ffff80000000ull + (uint64_t) PNV_CHIP_INDEX(chip) * PNV_ICP_S=
-IZE)
-+
- #endif /* _PPC_PNV_H */
---=20
-2.7.4
+Making an exception would simply be wrong.
+
+Kevin
+
+--ZPt4rx8FFjLCG7dd
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJY4gSuAAoJEH8JsnLIjy/W/KEQAKzXwNkY++XtKmM/L0D2zdSa
+JyCHHCzwak2xrs1+C938O+XqrcpJhrCgOlhmbRUwagwpts/DAG1e+OPM8H17DfH3
+oT4OUprfnAtGrbFIGkBk4M181Pr5EYYF+L2UGeanifz27igRu+ZGb+H7FRK1QKwg
+mu7p+tRYcGSVk9FS5XS1uamdL64D+WeEs3lUWOlY/4q3CK8jBiPBWcTv/pN0w1mk
+b2z/gTP+MAumgAd2wMxVUhJyNwxfDPQhgiPWpH1PARousgSWTaVURUKFlEveqHG3
+sEXV1Vn02nZfMC3BI/ro1iV6Yk4bD6QqOJUhIRkxhpBqdAK1dAFdDYFxv+X2822N
+eFleqz+cjJA/Gfijbz9hRZ+UVzLRHKMtqoa03krDRdNLyOjTRhE7vSlYEsLWJEFr
+viZF++AJVjm6wDkWKHbgXGcwlSesPhzLRS/cbBb+7Cx0pkun+Cx4o8tPOCCLq2bu
+Rc4MQH5E3X0W6ZxFUwbDdfgMKBKFA/HkJLhLs9D5nbF+mGTCp6L2kJZMkznV/IE0
+ZISu3eBkMHzVTNh6owzP0Q1eYyYzgTpPUVzDNnLSGwi0ZmL6lR3yiojH2BnM2yjq
+317hlSCUpXayqoyxGVyElo9OAenhdGAiFfs42aOwcPHjDj9uIarGxaoJUmkJCvYm
+lQqVijGorceS2kso02DH
+=Vt83
+-----END PGP SIGNATURE-----
+
+--ZPt4rx8FFjLCG7dd--
