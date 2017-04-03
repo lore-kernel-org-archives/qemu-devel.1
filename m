@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cv7Wc-00071d-Sb
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:20:28 -0400
+	(envelope-from <eblake@redhat.com>) id 1cv7ao-0008Kq-Ot
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:24:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cv7WY-00074U-U0
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:20:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51080)
+	(envelope-from <eblake@redhat.com>) id 1cv7ak-0001EO-IS
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:24:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58714)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cv7WY-00073x-LT
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:20:22 -0400
-Date: Mon, 3 Apr 2017 16:20:11 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170403192011.GH1910@thinpad.lan.raisama.net>
-References: <20170401004624.30886-1-ehabkost@redhat.com>
-	<20170401004624.30886-3-ehabkost@redhat.com>
-	<20170403105538.606f5ca9.cornelia.huck@de.ibm.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cv7ak-0001E4-9L
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:24:42 -0400
+References: <1490965817-16913-1-git-send-email-amarnath.valluri@intel.com>
+	<1490965817-16913-6-git-send-email-amarnath.valluri@intel.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5f0ecef1-1e43-ffff-2060-7f0da40dc7c5@redhat.com>
+Date: Mon, 3 Apr 2017 14:24:39 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170403105538.606f5ca9.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [RFC 02/19] s390: Add FIXME for unexplained
- user_creatable=false line
+In-Reply-To: <1490965817-16913-6-git-send-email-amarnath.valluri@intel.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="eK5JONJnP0hPLB72XhROc5L5oemVSVquw"
+Subject: Re: [Qemu-devel] [PATCH 5/7] tmp backend: Add new api to read
+ backend tpm options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +29,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Richard Henderson <rth@twiddle.net>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>
+To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
+Cc: patrick.ohly@intel.com, stefanb@linux.vnet.ibm.com
 
-On Mon, Apr 03, 2017 at 10:55:38AM +0200, Cornelia Huck wrote:
-> On Fri, 31 Mar 2017 21:46:07 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
-> 
-> > TYPE_S390_PCI_HOST_BRIDGE has user_creatable=false but has
-> > no comment explaining why. Add a FIXME to document that.
-> > 
-> > Cc: Frank Blaschka <frank.blaschka@de.ibm.com>
-> > Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
-> > Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-> > Cc: Alexander Graf <agraf@suse.de>
-> > Cc: Richard Henderson <rth@twiddle.net>
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> >  hw/s390x/s390-pci-bus.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> > index 1ec30c45ce..2c3b960bdf 100644
-> > --- a/hw/s390x/s390-pci-bus.c
-> > +++ b/hw/s390x/s390-pci-bus.c
-> > @@ -867,7 +867,7 @@ static void s390_pcihost_class_init(ObjectClass *klass, void *data)
-> >      DeviceClass *dc = DEVICE_CLASS(klass);
-> >      HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
-> >  
-> > -    dc->user_creatable = false;
-> > +    dc->user_creatable = false; /*FIXME: explain why */
-> >      dc->reset = s390_pcihost_reset;
-> >      k->init = s390_pcihost_init;
-> >      hc->plug = s390_pcihost_hot_plug;
-> 
-> (adding some more possibly interested parties)
-> 
-> We currently have one master s390 phb (and it's been that way since
-> s390 pci was introduced). Recently, there has been some remodelling
-> going on to make this more similar to what sPAPR does. I think we could
-> make this even more similar to sPAPR and have this user createable; but
-> I'm currently not sure it's worth the effort. Opinions?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--eK5JONJnP0hPLB72XhROc5L5oemVSVquw
+From: Eric Blake <eblake@redhat.com>
+To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
+Cc: patrick.ohly@intel.com, stefanb@linux.vnet.ibm.com
+Message-ID: <5f0ecef1-1e43-ffff-2060-7f0da40dc7c5@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 5/7] tmp backend: Add new api to read backend
+ tpm options
+References: <1490965817-16913-1-git-send-email-amarnath.valluri@intel.com>
+ <1490965817-16913-6-git-send-email-amarnath.valluri@intel.com>
+In-Reply-To: <1490965817-16913-6-git-send-email-amarnath.valluri@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-It looks -device s390-pcihost was never possible, anyway, because
-no s390x machine has has_dynamic_sysbus=1, and TYPE_PCI_HOST_BRIDGE
-is a sys-bus-device.
+On 03/31/2017 08:10 AM, Amarnath Valluri wrote:
+> TPM configuration options are backend implementation details and shall =
+not be
+> part of base TPMBackend object, and these shall not be accessed directl=
+y outside
+> of the class, hence added a new tpm backend api, tpm_backend_get_tpm_op=
+tions()
+> to read the backend configured options.
+>=20
+> Added new method, get_tpm_options() to TPMDriverOps., which shall be im=
+plemented
+> by the derived classes to return configured tpm options.
+>=20
+> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
+> ---
 
-Also, patch 03/19 on this series would make the explicit
-user_creatable=false assignment in s390_pcihost_class_init()
-unnecessary.
+Just an interface review for now:
 
-I don't think it is worth the effort to change that, unless you
-have a specific use case that would benefit from it.
 
--- 
-Eduardo
+> +++ b/qapi-schema.json
+> @@ -5140,6 +5140,14 @@
+>  { 'command': 'query-tpm-types', 'returns': ['TpmType'] }
+> =20
+>  ##
+> +# @TPMOptions:
+> +#
+> +# Base type for TPM options
+> +##
+
+Missing a 'Since: 2.10' designation
+
+> +{ 'struct': 'TPMOptions',
+> +  'data': { } }
+
+This class feels pointless (at least for now; I haven't checked if you
+expand it later in the series - but if so, define it where you first
+need it). It has no members, and you are only using it...
+
+> +
+> +##
+>  # @TPMPassthroughOptions:
+>  #
+>  # Information about the TPM passthrough type
+> @@ -5151,8 +5159,8 @@
+>  #
+>  # Since: 1.5
+>  ##
+> -{ 'struct': 'TPMPassthroughOptions', 'data': { '*path' : 'str',
+> -                                             '*cancel-path' : 'str'} }=
+
+> +{ 'struct': 'TPMPassthroughOptions', 'base': 'TPMOptions',
+
+=2E..as a base class. A base class makes sense only if it is consolidatin=
+g
+common members, or if it is the base to at least two different
+structures where having a common C type to pass around is handy.
+
+> +  'data': { '*path' : 'str', '*cancel-path' : 'str'} }
+> =20
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--eK5JONJnP0hPLB72XhROc5L5oemVSVquw
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY4qF3AAoJEKeha0olJ0Nq4k8IAKH3tQF0n52GAglUsqT7SwVH
+qsaapN96ODZhh83mIl3lSz3pS7eFrjrSa3epCQJVYtouFI2KhF+xcd51KeMlPAVR
+dIYmBitNG/FRW6/gZ8TQKIYDGiEY+gp8/dxozjiR/6inZVL3beAusujssiHbg/6b
+KsC0dmeIjBaJfuWamql0pOn4bvd8FygRRQKlIJTd93okiCnBzGhEK11/rrCLnIlS
+twYrxeGIEg6Hs1vH8QxwqgoD3RJPy9wt3ZlF4yj9idMQYycnHa4HLQb5S1HKWg3D
+dgSiFuorLamDsJrq7FLea/rUvfbPbGSDr/oM69MU0+hVuYN+yg/FGyg738iFDrk=
+=BFXj
+-----END PGP SIGNATURE-----
+
+--eK5JONJnP0hPLB72XhROc5L5oemVSVquw--
