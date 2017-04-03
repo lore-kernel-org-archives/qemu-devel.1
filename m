@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48034)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cv15f-0002gV-Fo
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:28:12 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cv15u-0002mp-8F
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:28:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cv15c-0002FO-4Q
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:28:11 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170403114044.15762-1-lvivier@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ef70b4ab-f71a-8235-dc63-ae34097436af@amsat.org>
-Date: Mon, 3 Apr 2017 09:28:02 -0300
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cv15t-0002J6-8P
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:28:26 -0400
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:35048)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cv15s-0002Im-TM
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:28:25 -0400
+Received: by mail-lf0-x241.google.com with SMTP id v2so12707260lfi.2
+	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 05:28:24 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170403114044.15762-1-lvivier@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] virtio-gpu: replace PIXMAN_* by PIXMAN_BE_*
+References: <20170403105238.23262-1-kraxel@redhat.com>
+In-Reply-To: <20170403105238.23262-1-kraxel@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 03 Apr 2017 12:28:12 +0000
+Message-ID: <CAJ+F1CJTyHh77iUz1_zqj9i89US2Gff1NndP=Fn4Ck-nHLYAvA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] usb-host: switch to LIBUSB_API_VERSION
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,73 +29,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-On 04/03/2017 08:40 AM, Laurent Vivier wrote:
-> This avoids a "#ifdef HOST_WORDS_BIGENDIAN" and this is the purpose
-> of PIXMAN_BE_* macros.
+Hi
+
+On Mon, Apr 3, 2017 at 12:53 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
+
+> libusbx doesn't exist any more, the fork got merged back to libusb.  So
+> stop using LIBUSBX_API_VERSION and use LIBUSB_API_VERSION instead.  For
+> backward compatibility alias LIBUSB_API_VERSION to LIBUSBX_API_VERSION
+> in case we figure LIBUSB_API_VERSION isn't defined.
 >
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+looks good
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+
 
 > ---
->  hw/display/virtio-gpu.c | 35 ++++++++---------------------------
->  1 file changed, 8 insertions(+), 27 deletions(-)
+>  hw/usb/host-libusb.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
 >
-> diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-> index 9b530ab..7befcef 100644
-> --- a/hw/display/virtio-gpu.c
-> +++ b/hw/display/virtio-gpu.c
-> @@ -258,41 +258,22 @@ void virtio_gpu_get_display_info(VirtIOGPU *g,
->  static pixman_format_code_t get_pixman_format(uint32_t virtio_gpu_format)
->  {
->      switch (virtio_gpu_format) {
-> -#ifdef HOST_WORDS_BIGENDIAN
->      case VIRTIO_GPU_FORMAT_B8G8R8X8_UNORM:
-> -        return PIXMAN_b8g8r8x8;
-> +        return PIXMAN_BE_b8g8r8x8;
->      case VIRTIO_GPU_FORMAT_B8G8R8A8_UNORM:
-> -        return PIXMAN_b8g8r8a8;
-> +        return PIXMAN_BE_b8g8r8a8;
->      case VIRTIO_GPU_FORMAT_X8R8G8B8_UNORM:
-> -        return PIXMAN_x8r8g8b8;
-> +        return PIXMAN_BE_x8r8g8b8;
->      case VIRTIO_GPU_FORMAT_A8R8G8B8_UNORM:
-> -        return PIXMAN_a8r8g8b8;
-> +        return PIXMAN_BE_a8r8g8b8;
->      case VIRTIO_GPU_FORMAT_R8G8B8X8_UNORM:
-> -        return PIXMAN_r8g8b8x8;
-> +        return PIXMAN_BE_r8g8b8x8;
->      case VIRTIO_GPU_FORMAT_R8G8B8A8_UNORM:
-> -        return PIXMAN_r8g8b8a8;
-> +        return PIXMAN_BE_r8g8b8a8;
->      case VIRTIO_GPU_FORMAT_X8B8G8R8_UNORM:
-> -        return PIXMAN_x8b8g8r8;
-> +        return PIXMAN_BE_x8b8g8r8;
->      case VIRTIO_GPU_FORMAT_A8B8G8R8_UNORM:
-> -        return PIXMAN_a8b8g8r8;
-> -#else
-> -    case VIRTIO_GPU_FORMAT_B8G8R8X8_UNORM:
-> -        return PIXMAN_x8r8g8b8;
-> -    case VIRTIO_GPU_FORMAT_B8G8R8A8_UNORM:
-> -        return PIXMAN_a8r8g8b8;
-> -    case VIRTIO_GPU_FORMAT_X8R8G8B8_UNORM:
-> -        return PIXMAN_b8g8r8x8;
-> -    case VIRTIO_GPU_FORMAT_A8R8G8B8_UNORM:
-> -        return PIXMAN_b8g8r8a8;
-> -    case VIRTIO_GPU_FORMAT_R8G8B8X8_UNORM:
-> -        return PIXMAN_x8b8g8r8;
-> -    case VIRTIO_GPU_FORMAT_R8G8B8A8_UNORM:
-> -        return PIXMAN_a8b8g8r8;
-> -    case VIRTIO_GPU_FORMAT_X8B8G8R8_UNORM:
-> -        return PIXMAN_r8g8b8x8;
-> -    case VIRTIO_GPU_FORMAT_A8B8G8R8_UNORM:
-> -        return PIXMAN_r8g8b8a8;
-> -#endif
-> +        return PIXMAN_BE_a8b8g8r8;
->      default:
->          return 0;
->      }
+> diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
+> index c9876a5..f9c8eaf 100644
+> --- a/hw/usb/host-libusb.c
+> +++ b/hw/usb/host-libusb.c
+> @@ -159,7 +159,10 @@ static void usb_host_attach_kernel(USBHostDevice *s)=
+;
+>  #define BULK_TIMEOUT         0        /* unlimited */
+>  #define INTR_TIMEOUT         0        /* unlimited */
 >
+> -#if LIBUSBX_API_VERSION >=3D 0x01000103
+> +#ifndef LIBUSB_API_VERSION
+> +# define LIBUSB_API_VERSION LIBUSBX_API_VERSION
+> +#endif
+> +#if LIBUSB_API_VERSION >=3D 0x01000103
+>  # define HAVE_STREAMS 1
+>  #endif
+>
+> @@ -269,7 +272,7 @@ static int usb_host_get_port(libusb_device *dev, char
+> *port, size_t len)
+>      size_t off;
+>      int rc, i;
+>
+> -#if LIBUSBX_API_VERSION >=3D 0x01000102
+> +#if LIBUSB_API_VERSION >=3D 0x01000102
+>      rc =3D libusb_get_port_numbers(dev, path, 7);
+>  #else
+>      rc =3D libusb_get_port_path(ctx, dev, path, 7);
+> --
+> 2.9.3
+>
+>
+> --
+Marc-Andr=C3=A9 Lureau
