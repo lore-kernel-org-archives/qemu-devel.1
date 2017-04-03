@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cv4YE-0000jz-IU
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 12:09:57 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cv4YM-0000q5-2Q
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 12:10:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cv4YC-0008Nd-Ll
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 12:09:54 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cv4YK-0008Ts-3U
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 12:10:02 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon,  3 Apr 2017 18:09:21 +0200
-Message-Id: <20170403160936.28293-2-mreitz@redhat.com>
+Date: Mon,  3 Apr 2017 18:09:23 +0200
+Message-Id: <20170403160936.28293-4-mreitz@redhat.com>
 In-Reply-To: <20170403160936.28293-1-mreitz@redhat.com>
 References: <20170403160936.28293-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 for-2.10 01/16] block: Add PreallocMode to
- BD.bdrv_truncate()
+Subject: [Qemu-devel] [PATCH v2 for-2.10 03/16] block: Add PreallocMode to
+ blk_truncate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,352 +23,280 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Add a PreallocMode parameter to the bdrv_truncate() function implemented
-by each block driver. Currently, we always pass PREALLOC_MODE_OFF and no
-driver accepts anything else.
+blk_truncate() itself will pass that value to bdrv_truncate(), and all
+callers of blk_truncate() just set the parameter to PREALLOC_MODE_OFF
+for now.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- include/block/block_int.h |  3 ++-
- block.c                   |  2 +-
- block/blkdebug.c          |  9 ++++++++-
- block/crypto.c            |  8 +++++++-
- block/file-posix.c        |  9 ++++++++-
- block/file-win32.c        |  9 ++++++++-
- block/gluster.c           |  8 +++++++-
- block/iscsi.c             |  9 ++++++++-
- block/nfs.c               |  9 ++++++++-
- block/qcow2.c             |  9 ++++++++-
- block/qed.c               |  9 ++++++++-
- block/raw-format.c        |  9 ++++++++-
- block/rbd.c               |  9 ++++++++-
- block/sheepdog.c          | 11 +++++++++--
- 14 files changed, 98 insertions(+), 15 deletions(-)
+ include/sysemu/block-backend.h | 3 ++-
+ block/block-backend.c          | 5 +++--
+ block/commit.c                 | 4 ++--
+ block/mirror.c                 | 3 ++-
+ block/parallels.c              | 2 +-
+ block/qcow.c                   | 2 +-
+ block/qcow2.c                  | 4 ++--
+ block/qed.c                    | 2 +-
+ block/vdi.c                    | 3 ++-
+ block/vhdx.c                   | 5 +++--
+ block/vmdk.c                   | 7 ++++---
+ block/vpc.c                    | 2 +-
+ blockdev.c                     | 2 +-
+ qemu-img.c                     | 2 +-
+ qemu-io-cmds.c                 | 2 +-
+ 15 files changed, 27 insertions(+), 21 deletions(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 08063c10c8..10a2bef5b0 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -196,7 +196,8 @@ struct BlockDriver {
-     int coroutine_fn (*bdrv_co_flush_to_os)(BlockDriverState *bs);
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+index 840ad6134c..1f63ec36d7 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -225,7 +225,8 @@ int coroutine_fn blk_co_pwrite_zeroes(BlockBackend *blk, int64_t offset,
+                                       int count, BdrvRequestFlags flags);
+ int blk_pwrite_compressed(BlockBackend *blk, int64_t offset, const void *buf,
+                           int count);
+-int blk_truncate(BlockBackend *blk, int64_t offset, Error **errp);
++int blk_truncate(BlockBackend *blk, int64_t offset, PreallocMode prealloc,
++                 Error **errp);
+ int blk_pdiscard(BlockBackend *blk, int64_t offset, int count);
+ int blk_save_vmstate(BlockBackend *blk, const uint8_t *buf,
+                      int64_t pos, int size);
+diff --git a/block/block-backend.c b/block/block-backend.c
+index a88dd00af5..03d2972dfc 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -1705,14 +1705,15 @@ int blk_pwrite_compressed(BlockBackend *blk, int64_t offset, const void *buf,
+                    BDRV_REQ_WRITE_COMPRESSED);
+ }
  
-     const char *protocol_name;
--    int (*bdrv_truncate)(BlockDriverState *bs, int64_t offset, Error **errp);
-+    int (*bdrv_truncate)(BlockDriverState *bs, int64_t offset,
-+                         PreallocMode prealloc, Error **errp);
- 
-     int64_t (*bdrv_getlength)(BlockDriverState *bs);
-     bool has_variable_length;
-diff --git a/block.c b/block.c
-index 6df9723da7..30aed5ffb5 100644
---- a/block.c
-+++ b/block.c
-@@ -3285,7 +3285,7 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, Error **errp)
-         return -EACCES;
+-int blk_truncate(BlockBackend *blk, int64_t offset, Error **errp)
++int blk_truncate(BlockBackend *blk, int64_t offset, PreallocMode prealloc,
++                 Error **errp)
+ {
+     if (!blk_is_available(blk)) {
+         error_setg(errp, "No medium inserted");
+         return -ENOMEDIUM;
      }
  
--    ret = drv->bdrv_truncate(bs, offset, errp);
-+    ret = drv->bdrv_truncate(bs, offset, PREALLOC_MODE_OFF, errp);
-     if (ret == 0) {
-         ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
-         bdrv_dirty_bitmap_truncate(bs);
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index c795ae9e72..31a71a34d3 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -661,8 +661,15 @@ static int64_t blkdebug_getlength(BlockDriverState *bs)
-     return bdrv_getlength(bs->file->bs);
+-    return bdrv_truncate(blk->root, offset, PREALLOC_MODE_OFF, errp);
++    return bdrv_truncate(blk->root, offset, prealloc, errp);
  }
  
--static int blkdebug_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
-+static int blkdebug_truncate(BlockDriverState *bs, int64_t offset,
-+                             PreallocMode prealloc, Error **errp)
- {
-+    if (prealloc != PREALLOC_MODE_OFF) {
-+        error_setg(errp, "Unsupported preallocation mode '%s'",
-+                   PreallocMode_lookup[prealloc]);
-+        return -ENOTSUP;
-+    }
-+
-     return bdrv_truncate(bs->file, offset, errp);
- }
- 
-diff --git a/block/crypto.c b/block/crypto.c
-index 17b3140998..fa61aef380 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -382,12 +382,18 @@ static int block_crypto_create_generic(QCryptoBlockFormat format,
- }
- 
- static int block_crypto_truncate(BlockDriverState *bs, int64_t offset,
--                                 Error **errp)
-+                                 PreallocMode prealloc, Error **errp)
- {
-     BlockCrypto *crypto = bs->opaque;
-     size_t payload_offset =
-         qcrypto_block_get_payload_offset(crypto->block);
- 
-+    if (prealloc != PREALLOC_MODE_OFF) {
-+        error_setg(errp, "Unsupported preallocation mode '%s'",
-+                   PreallocMode_lookup[prealloc]);
-+        return -ENOTSUP;
-+    }
-+
-     offset += payload_offset;
- 
-     return bdrv_truncate(bs->file, offset, errp);
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 1941fb6749..3e9c416668 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1407,12 +1407,19 @@ static void raw_close(BlockDriverState *bs)
+ static void blk_pdiscard_entry(void *opaque)
+diff --git a/block/commit.c b/block/commit.c
+index bfdd1b4142..9a32338b82 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -151,7 +151,7 @@ static void coroutine_fn commit_run(void *opaque)
      }
- }
  
--static int raw_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
-+static int raw_truncate(BlockDriverState *bs, int64_t offset,
-+                        PreallocMode prealloc, Error **errp)
- {
-     BDRVRawState *s = bs->opaque;
-     struct stat st;
-     int ret;
+     if (base_len < s->common.len) {
+-        ret = blk_truncate(s->base, s->common.len, NULL);
++        ret = blk_truncate(s->base, s->common.len, PREALLOC_MODE_OFF, NULL);
+         if (ret) {
+             goto out;
+         }
+@@ -508,7 +508,7 @@ int bdrv_commit(BlockDriverState *bs)
+      * grow the backing file image if possible.  If not possible,
+      * we must return an error */
+     if (length > backing_length) {
+-        ret = blk_truncate(backing, length, &local_err);
++        ret = blk_truncate(backing, length, PREALLOC_MODE_OFF, &local_err);
+         if (ret < 0) {
+             error_report_err(local_err);
+             goto ro_cleanup;
+diff --git a/block/mirror.c b/block/mirror.c
+index d40e199761..0a089e46b0 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -724,7 +724,8 @@ static void coroutine_fn mirror_run(void *opaque)
+         }
  
-+    if (prealloc != PREALLOC_MODE_OFF) {
-+        error_setg(errp, "Unsupported preallocation mode '%s'",
-+                   PreallocMode_lookup[prealloc]);
-+        return -ENOTSUP;
-+    }
-+
-     if (fstat(s->fd, &st)) {
-         ret = -errno;
-         error_setg_errno(errp, -ret, "Failed to fstat() the file");
-diff --git a/block/file-win32.c b/block/file-win32.c
-index 7872e00a21..cd5033371c 100644
---- a/block/file-win32.c
-+++ b/block/file-win32.c
-@@ -460,12 +460,19 @@ static void raw_close(BlockDriverState *bs)
-     }
- }
+         if (s->bdev_length > base_length) {
+-            ret = blk_truncate(s->target, s->bdev_length, NULL);
++            ret = blk_truncate(s->target, s->bdev_length, PREALLOC_MODE_OFF,
++                               NULL);
+             if (ret < 0) {
+                 goto immediate_exit;
+             }
+diff --git a/block/parallels.c b/block/parallels.c
+index 5a38998cbb..5bbdfabb7a 100644
+--- a/block/parallels.c
++++ b/block/parallels.c
+@@ -508,7 +508,7 @@ static int parallels_create(const char *filename, QemuOpts *opts, Error **errp)
  
--static int raw_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
-+static int raw_truncate(BlockDriverState *bs, int64_t offset,
-+                        PreallocMode prealloc, Error **errp)
- {
-     BDRVRawState *s = bs->opaque;
-     LONG low, high;
-     DWORD dwPtrLow;
+     blk_set_allow_write_beyond_eof(file, true);
  
-+    if (prealloc != PREALLOC_MODE_OFF) {
-+        error_setg(errp, "Unsupported preallocation mode '%s'",
-+                   PreallocMode_lookup[prealloc]);
-+        return -ENOTSUP;
-+    }
-+
-     low = offset;
-     high = offset >> 32;
- 
-diff --git a/block/gluster.c b/block/gluster.c
-index 1d4e2f7c52..8634ca3eff 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -1093,11 +1093,17 @@ static coroutine_fn int qemu_gluster_co_rw(BlockDriverState *bs,
- }
- 
- static int qemu_gluster_truncate(BlockDriverState *bs, int64_t offset,
--                                 Error **errp)
-+                                 PreallocMode prealloc, Error **errp)
- {
-     int ret;
-     BDRVGlusterState *s = bs->opaque;
- 
-+    if (prealloc != PREALLOC_MODE_OFF) {
-+        error_setg(errp, "Unsupported preallocation mode '%s'",
-+                   PreallocMode_lookup[prealloc]);
-+        return -ENOTSUP;
-+    }
-+
-     ret = glfs_ftruncate(s->fd, offset);
+-    ret = blk_truncate(file, 0, errp);
++    ret = blk_truncate(file, 0, PREALLOC_MODE_OFF, errp);
      if (ret < 0) {
-         ret = -errno;
-diff --git a/block/iscsi.c b/block/iscsi.c
-index 036f5b6930..ca619fc337 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -2060,11 +2060,18 @@ static void iscsi_reopen_commit(BDRVReopenState *reopen_state)
+         goto exit;
      }
- }
+diff --git a/block/qcow.c b/block/qcow.c
+index 45e3ff1a89..20d160a9ac 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -834,7 +834,7 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
  
--static int iscsi_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
-+static int iscsi_truncate(BlockDriverState *bs, int64_t offset,
-+                          PreallocMode prealloc, Error **errp)
- {
-     IscsiLun *iscsilun = bs->opaque;
-     Error *local_err = NULL;
+     blk_set_allow_write_beyond_eof(qcow_blk, true);
  
-+    if (prealloc != PREALLOC_MODE_OFF) {
-+        error_setg(errp, "Unsupported preallocation mode '%s'",
-+                   PreallocMode_lookup[prealloc]);
-+        return -ENOTSUP;
-+    }
-+
-     if (iscsilun->type != TYPE_DISK) {
-         error_setg(errp, "Cannot resize non-disk iSCSI devices");
-         return -ENOTSUP;
-diff --git a/block/nfs.c b/block/nfs.c
-index 8d5a4ac14b..268a860bcc 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -764,11 +764,18 @@ static int64_t nfs_get_allocated_file_size(BlockDriverState *bs)
-     return (task.ret < 0 ? task.ret : st.st_blocks * 512);
- }
- 
--static int nfs_file_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
-+static int nfs_file_truncate(BlockDriverState *bs, int64_t offset,
-+                             PreallocMode prealloc, Error **errp)
- {
-     NFSClient *client = bs->opaque;
-     int ret;
- 
-+    if (prealloc != PREALLOC_MODE_OFF) {
-+        error_setg(errp, "Unsupported preallocation mode '%s'",
-+                   PreallocMode_lookup[prealloc]);
-+        return -ENOTSUP;
-+    }
-+
-     ret = nfs_ftruncate(client->context, client->fh, offset);
+-    ret = blk_truncate(qcow_blk, 0, errp);
++    ret = blk_truncate(qcow_blk, 0, PREALLOC_MODE_OFF, errp);
      if (ret < 0) {
-         error_setg_errno(errp, -ret, "Failed to truncate file");
+         goto exit;
+     }
 diff --git a/block/qcow2.c b/block/qcow2.c
-index 4ca4cf04b0..25d98e23dc 100644
+index 2b55809771..9fd220ec34 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -2525,12 +2525,19 @@ static coroutine_fn int qcow2_co_pdiscard(BlockDriverState *bs,
-     return ret;
- }
- 
--static int qcow2_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
-+static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
-+                          PreallocMode prealloc, Error **errp)
- {
-     BDRVQcow2State *s = bs->opaque;
-     int64_t new_l1_size;
-     int ret;
- 
-+    if (prealloc != PREALLOC_MODE_OFF) {
-+        error_setg(errp, "Unsupported preallocation mode '%s'",
-+                   PreallocMode_lookup[prealloc]);
-+        return -ENOTSUP;
-+    }
-+
-     if (offset & 511) {
-         error_setg(errp, "The new size must be a multiple of 512");
-         return -EINVAL;
-diff --git a/block/qed.c b/block/qed.c
-index fd76817cbb..6d460ce0fd 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -1518,12 +1518,19 @@ static int coroutine_fn bdrv_qed_co_pwrite_zeroes(BlockDriverState *bs,
-     return cb.ret;
- }
- 
--static int bdrv_qed_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
-+static int bdrv_qed_truncate(BlockDriverState *bs, int64_t offset,
-+                             PreallocMode prealloc, Error **errp)
- {
-     BDRVQEDState *s = bs->opaque;
-     uint64_t old_image_size;
-     int ret;
- 
-+    if (prealloc != PREALLOC_MODE_OFF) {
-+        error_setg(errp, "Unsupported preallocation mode '%s'",
-+                   PreallocMode_lookup[prealloc]);
-+        return -ENOTSUP;
-+    }
-+
-     if (!qed_is_image_size_valid(offset, s->header.cluster_size,
-                                  s->header.table_size)) {
-         error_setg(errp, "Invalid image size specified");
-diff --git a/block/raw-format.c b/block/raw-format.c
-index 36e65036f0..aeaa13e3f5 100644
---- a/block/raw-format.c
-+++ b/block/raw-format.c
-@@ -327,10 +327,17 @@ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
+@@ -2294,7 +2294,7 @@ static int qcow2_create2(const char *filename, int64_t total_size,
      }
- }
  
--static int raw_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
-+static int raw_truncate(BlockDriverState *bs, int64_t offset,
-+                        PreallocMode prealloc, Error **errp)
- {
-     BDRVRawState *s = bs->opaque;
- 
-+    if (prealloc != PREALLOC_MODE_OFF) {
-+        error_setg(errp, "Unsupported preallocation mode '%s'",
-+                   PreallocMode_lookup[prealloc]);
-+        return -ENOTSUP;
-+    }
-+
-     if (s->has_size) {
-         error_setg(errp, "Cannot resize fixed-size raw disks");
-         return -ENOTSUP;
-diff --git a/block/rbd.c b/block/rbd.c
-index 397917c096..aaf4a686a4 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -886,11 +886,18 @@ static int64_t qemu_rbd_getlength(BlockDriverState *bs)
-     return info.size;
- }
- 
--static int qemu_rbd_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
-+static int qemu_rbd_truncate(BlockDriverState *bs, int64_t offset,
-+                             PreallocMode prealloc, Error **errp)
- {
-     BDRVRBDState *s = bs->opaque;
-     int r;
- 
-+    if (prealloc != PREALLOC_MODE_OFF) {
-+        error_setg(errp, "Unsupported preallocation mode '%s'",
-+                   PreallocMode_lookup[prealloc]);
-+        return -ENOTSUP;
-+    }
-+
-     r = rbd_resize(s->image, offset);
-     if (r < 0) {
-         error_setg_errno(errp, -r, "Failed to resize file");
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index d81a1f063b..eefae5332b 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -2159,13 +2159,20 @@ static int64_t sd_getlength(BlockDriverState *bs)
-     return s->inode.vdi_size;
- }
- 
--static int sd_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
-+static int sd_truncate(BlockDriverState *bs, int64_t offset,
-+                       PreallocMode prealloc, Error **errp)
- {
-     BDRVSheepdogState *s = bs->opaque;
-     int ret, fd;
-     unsigned int datalen;
-     uint64_t max_vdi_size;
- 
-+    if (prealloc != PREALLOC_MODE_OFF) {
-+        error_setg(errp, "Unsupported preallocation mode '%s'",
-+                   PreallocMode_lookup[prealloc]);
-+        return -ENOTSUP;
-+    }
-+
-     max_vdi_size = (UINT64_C(1) << s->inode.block_size_shift) * MAX_DATA_OBJS;
-     if (offset < s->inode.vdi_size) {
-         error_setg(errp, "shrinking is not supported");
-@@ -2454,7 +2461,7 @@ static coroutine_fn int sd_co_writev(BlockDriverState *bs, int64_t sector_num,
-     BDRVSheepdogState *s = bs->opaque;
- 
-     if (offset > s->inode.vdi_size) {
--        ret = sd_truncate(bs, offset, NULL);
-+        ret = sd_truncate(bs, offset, PREALLOC_MODE_OFF, NULL);
-         if (ret < 0) {
+     /* Okay, now that we have a valid image, let's give it the right size */
+-    ret = blk_truncate(blk, total_size, errp);
++    ret = blk_truncate(blk, total_size, PREALLOC_MODE_OFF, errp);
+     if (ret < 0) {
+         error_prepend(errp, "Could not resize image: ");
+         goto out;
+@@ -3285,7 +3285,7 @@ static int qcow2_amend_options(BlockDriverState *bs, QemuOpts *opts,
              return ret;
          }
+ 
+-        ret = blk_truncate(blk, new_size, &local_err);
++        ret = blk_truncate(blk, new_size, PREALLOC_MODE_OFF, &local_err);
+         blk_unref(blk);
+         if (ret < 0) {
+             error_report_err(local_err);
+diff --git a/block/qed.c b/block/qed.c
+index 6d460ce0fd..2feaba373c 100644
+--- a/block/qed.c
++++ b/block/qed.c
+@@ -635,7 +635,7 @@ static int qed_create(const char *filename, uint32_t cluster_size,
+     blk_set_allow_write_beyond_eof(blk, true);
+ 
+     /* File must start empty and grow, check truncate is supported */
+-    ret = blk_truncate(blk, 0, errp);
++    ret = blk_truncate(blk, 0, PREALLOC_MODE_OFF, errp);
+     if (ret < 0) {
+         goto out;
+     }
+diff --git a/block/vdi.c b/block/vdi.c
+index d12d9cdc79..2434a9cd8d 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -832,7 +832,8 @@ static int vdi_create(const char *filename, QemuOpts *opts, Error **errp)
+     }
+ 
+     if (image_type == VDI_TYPE_STATIC) {
+-        ret = blk_truncate(blk, offset + blocks * block_size, errp);
++        ret = blk_truncate(blk, offset + blocks * block_size,
++                           PREALLOC_MODE_OFF, errp);
+         if (ret < 0) {
+             error_prepend(errp, "Failed to statically allocate %s", filename);
+             goto exit;
+diff --git a/block/vhdx.c b/block/vhdx.c
+index 967c93e996..96933ed2f0 100644
+--- a/block/vhdx.c
++++ b/block/vhdx.c
+@@ -1608,12 +1608,13 @@ static int vhdx_create_bat(BlockBackend *blk, BDRVVHDXState *s,
+     if (type == VHDX_TYPE_DYNAMIC) {
+         /* All zeroes, so we can just extend the file - the end of the BAT
+          * is the furthest thing we have written yet */
+-        ret = blk_truncate(blk, data_file_offset, errp);
++        ret = blk_truncate(blk, data_file_offset, PREALLOC_MODE_OFF, errp);
+         if (ret < 0) {
+             goto exit;
+         }
+     } else if (type == VHDX_TYPE_FIXED) {
+-        ret = blk_truncate(blk, data_file_offset + image_size, errp);
++        ret = blk_truncate(blk, data_file_offset + image_size,
++                           PREALLOC_MODE_OFF, errp);
+         if (ret < 0) {
+             goto exit;
+         }
+diff --git a/block/vmdk.c b/block/vmdk.c
+index c61b9cc8e0..7decd3ed44 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -1714,7 +1714,7 @@ static int vmdk_create_extent(const char *filename, int64_t filesize,
+     blk_set_allow_write_beyond_eof(blk, true);
+ 
+     if (flat) {
+-        ret = blk_truncate(blk, filesize, errp);
++        ret = blk_truncate(blk, filesize, PREALLOC_MODE_OFF, errp);
+         goto exit;
+     }
+     magic = cpu_to_be32(VMDK4_MAGIC);
+@@ -1777,7 +1777,8 @@ static int vmdk_create_extent(const char *filename, int64_t filesize,
+         goto exit;
+     }
+ 
+-    ret = blk_truncate(blk, le64_to_cpu(header.grain_offset) << 9, errp);
++    ret = blk_truncate(blk, le64_to_cpu(header.grain_offset) << 9,
++                       PREALLOC_MODE_OFF, errp);
+     if (ret < 0) {
+         goto exit;
+     }
+@@ -2086,7 +2087,7 @@ static int vmdk_create(const char *filename, QemuOpts *opts, Error **errp)
+     /* bdrv_pwrite write padding zeros to align to sector, we don't need that
+      * for description file */
+     if (desc_offset == 0) {
+-        ret = blk_truncate(new_blk, desc_len, errp);
++        ret = blk_truncate(new_blk, desc_len, PREALLOC_MODE_OFF, errp);
+     }
+ exit:
+     if (new_blk) {
+diff --git a/block/vpc.c b/block/vpc.c
+index ecfee77149..de71398eb4 100644
+--- a/block/vpc.c
++++ b/block/vpc.c
+@@ -858,7 +858,7 @@ static int create_fixed_disk(BlockBackend *blk, uint8_t *buf,
+     /* Add footer to total size */
+     total_size += HEADER_SIZE;
+ 
+-    ret = blk_truncate(blk, total_size, errp);
++    ret = blk_truncate(blk, total_size, PREALLOC_MODE_OFF, errp);
+     if (ret < 0) {
+         return ret;
+     }
+diff --git a/blockdev.c b/blockdev.c
+index 9afd1e97c3..3080aa2c03 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -2930,7 +2930,7 @@ void qmp_block_resize(bool has_device, const char *device,
+     /* complete all in-flight operations before resizing the device */
+     bdrv_drain_all();
+ 
+-    ret = blk_truncate(blk, size, errp);
++    ret = blk_truncate(blk, size, PREALLOC_MODE_OFF, errp);
+ 
+ out:
+     blk_unref(blk);
+diff --git a/qemu-img.c b/qemu-img.c
+index 37c2894678..cb4837dc71 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -3500,7 +3500,7 @@ static int img_resize(int argc, char **argv)
+         goto out;
+     }
+ 
+-    ret = blk_truncate(blk, total_size, &err);
++    ret = blk_truncate(blk, total_size, PREALLOC_MODE_OFF, &err);
+     if (!ret) {
+         qprintf(quiet, "Image resized.\n");
+     } else {
+diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+index 9e023a4d07..729548aa41 100644
+--- a/qemu-io-cmds.c
++++ b/qemu-io-cmds.c
+@@ -1577,7 +1577,7 @@ static int truncate_f(BlockBackend *blk, int argc, char **argv)
+         return 0;
+     }
+ 
+-    ret = blk_truncate(blk, offset, &local_err);
++    ret = blk_truncate(blk, offset, PREALLOC_MODE_OFF, &local_err);
+     if (ret < 0) {
+         error_report_err(local_err);
+         return 0;
 -- 
 2.12.1
