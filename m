@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37379)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cv7mj-0002Wb-DY
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:37:06 -0400
+	(envelope-from <patrick.ohly@intel.com>) id 1cv7rJ-00041E-3a
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:41:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cv7mi-0008OE-GQ
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:37:05 -0400
-References: <20170403175150.15253-1-mreitz@redhat.com>
-	<20170403175150.15253-3-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f8de8ac5-845d-90de-1ed1-7ad8ee11fa0c@redhat.com>
-Date: Mon, 3 Apr 2017 14:36:55 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170403175150.15253-3-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="G0ckjOGJ5mi81krQtQJXh0jGenFjpnw1P"
-Subject: Re: [Qemu-devel] [PATCH for-2.9 2/2] iotests: Add mirror tests for
- orphaned source
+	(envelope-from <patrick.ohly@intel.com>) id 1cv7rF-0002N2-Tu
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:41:49 -0400
+Received: from mail-io0-x22a.google.com ([2607:f8b0:4001:c06::22a]:35591)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <patrick.ohly@intel.com>)
+	id 1cv7rF-0002Mp-OJ
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:41:45 -0400
+Received: by mail-io0-x22a.google.com with SMTP id z13so82773683iof.2
+	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 12:41:45 -0700 (PDT)
+Message-ID: <1491248498.10884.16.camel@intel.com>
+From: Patrick Ohly <patrick.ohly@intel.com>
+Date: Mon, 03 Apr 2017 21:41:38 +0200
+In-Reply-To: <20170403173823.GD2112@work-vm>
+References: <1490965817-16913-1-git-send-email-amarnath.valluri@intel.com>
+	<20170403170738.GC2768@redhat.com>
+	<1491240750.10884.10.camel@intel.com>
+	<20170403173823.GD2112@work-vm>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/7] Provide support for the software TPM
+ emulator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,56 +33,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org, stefanb@linux.vnet.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---G0ckjOGJ5mi81krQtQJXh0jGenFjpnw1P
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <f8de8ac5-845d-90de-1ed1-7ad8ee11fa0c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9 2/2] iotests: Add mirror tests for
- orphaned source
-References: <20170403175150.15253-1-mreitz@redhat.com>
- <20170403175150.15253-3-mreitz@redhat.com>
-In-Reply-To: <20170403175150.15253-3-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, 2017-04-03 at 18:38 +0100, Dr. David Alan Gilbert wrote:
+> Or you could just remove the spawning code and use existing sockets; less code!
 
-On 04/03/2017 12:51 PM, Max Reitz wrote:
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/041        | 46 +++++++++++++++++++++++++++++++++++=
-++++++++
->  tests/qemu-iotests/041.out    |  4 ++--
->  tests/qemu-iotests/iotests.py | 15 ++++++++++++++
->  3 files changed, 63 insertions(+), 2 deletions(-)
+That would be harder to use reliably in the automated testing that this
+feature is targeting.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+With this mechanism, it is guaranteed that both processes notice when
+the other dies because the connection gets disconnected. There's never a
+time period where one process listens for a connection from a process
+that might have died already, or never got started.
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+It's also easier that the scripts calling qemu only need to deal with
+one process, as before, and just need to pass some additional
+parameters.
 
+Can we agree that both usage models are valid and thus support both?
 
---G0ckjOGJ5mi81krQtQJXh0jGenFjpnw1P
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+-- 
+Best Regards, Patrick Ohly
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY4qRYAAoJEKeha0olJ0NqSfkH+wSVrn0n5IamljBzQm6vzk86
-3kkSDpO6wdeqfoOw1JqTlyqqZ5ErKilvlTOSxhqDQlKiBN83txWrYtPVbJf3vH4A
-fyNniFsv7j3ewhPdCkTSKMBpQ7Pif7cXuBoSQJNbXQt7dDXGXc9ZcFK4CKoCtnOE
-VUHRZOODeScGTHqzYgY0waaw5okBjDRsAfQuJei8v3gsNFgJZgtNeEP0wfBvKVXS
-S+UAZ5bZDX9IvBX2aaMAT5TOyo/MdCMQveb1kJql8lBo9Fj4PfE0Cltq9f8K2Gyp
-0IhMtNdRcXayY1nOI/BSnuYEPVaTsAgUcrEhbTw6rxYan6DuJeuxEN15hAuUi6g=
-=baOL
------END PGP SIGNATURE-----
-
---G0ckjOGJ5mi81krQtQJXh0jGenFjpnw1P--
+The content of this message is my personal opinion only and although
+I am an employee of Intel, the statements I make here in no way
+represent Intel's position on the issue, nor am I authorized to speak
+on behalf of Intel on this matter.
