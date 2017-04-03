@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49470)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cv6q7-0004Nl-Ik
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:36:32 -0400
+	id 1cv6vK-0005Pb-FO
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:41:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cv6q3-0003Xi-KA
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:36:31 -0400
+	id 1cv6vG-0006Yy-In
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:41:54 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:34296)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cv6vG-0006Yj-EY
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:41:50 -0400
+Received: by mail-qk0-x244.google.com with SMTP id p68so161610qke.1
+	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 11:41:50 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20170403175150.15253-1-mreitz@redhat.com>
-	<20170403175150.15253-2-mreitz@redhat.com>
+References: <20170403171843.3363-1-dgilbert@redhat.com>
+	<20170403171843.3363-4-dgilbert@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a464e950-f251-e148-1af9-bdad271571b4@amsat.org>
-Date: Mon, 3 Apr 2017 15:36:22 -0300
+Message-ID: <246e17c1-001e-0aba-8849-86c253350280@amsat.org>
+Date: Mon, 3 Apr 2017 15:41:46 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170403175150.15253-2-mreitz@redhat.com>
+In-Reply-To: <20170403171843.3363-4-dgilbert@redhat.com>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-2.9 1/2] block/mirror: Fix
- use-after-free
+Subject: Re: [Qemu-devel] [PATCH v5 3/5] slirp: Common lhost/fhost union
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,83 +34,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, samuel.thibault@gnu.org, jan.kiszka@siemens.com
+Cc: quintela@redhat.com
 
-nice analysis/catch
-
-On 04/03/2017 02:51 PM, Max Reitz wrote:
-> If @bs does not have any parents, the only reference to @mirror_top_bs
-> will be held by the BlockJob object after the bdrv_unref() following
-> block_job_create(). However, if block_job_create() fails, this reference
-> will not exist and @mirror_top_bs will have been deleted when we
-> goto fail.
+On 04/03/2017 02:18 PM, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >
-> The issue comes back at all later entries to the fail label: We delete
-> the BlockJob object before rolling back our changes to the node graph.
-> This means that we will delete @mirror_top_bs in the process.
+> The socket structure has a pair of unions for lhost and fhost
+> addresses; the unions are identical so split them out into
+> a separate union declaration.
 >
-> All in all, whenever @bs does not have any parents and we go down the
-> fail path we will dereference @mirror_top_bs after it has been deleted.
->
-> Fix this by invoking bdrv_unref() only when block_job_create() was
-> successful and by bdrv_ref()'ing @mirror_top_bs in the fail path before
-> deleting the BlockJob object. Finally, bdrv_unref() it at the end of the
-> fail path after we actually no longer need it.
->
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  block/mirror.c | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
+>  slirp/socket.h | 18 ++++++++----------
+>  1 file changed, 8 insertions(+), 10 deletions(-)
 >
-> diff --git a/block/mirror.c b/block/mirror.c
-> index 9e2fecc15e..46ecd38ef0 100644
-> --- a/block/mirror.c
-> +++ b/block/mirror.c
-> @@ -1150,7 +1150,7 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
->      mirror_top_bs->total_sectors = bs->total_sectors;
+> diff --git a/slirp/socket.h b/slirp/socket.h
+> index 8feed2a..c1be77e 100644
+> --- a/slirp/socket.h
+> +++ b/slirp/socket.h
+> @@ -15,6 +15,12 @@
+>   * Our socket structure
+>   */
 >
->      /* bdrv_append takes ownership of the mirror_top_bs reference, need to keep
-> -     * it alive until block_job_create() even if bs has no parent. */
-> +     * it alive until block_job_create() succeeds even if bs has no parent. */
->      bdrv_ref(mirror_top_bs);
->      bdrv_drained_begin(bs);
->      bdrv_append(mirror_top_bs, bs, &local_err);
-> @@ -1168,10 +1168,12 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
->                           BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
->                           BLK_PERM_WRITE | BLK_PERM_GRAPH_MOD, speed,
->                           creation_flags, cb, opaque, errp);
-> -    bdrv_unref(mirror_top_bs);
->      if (!s) {
->          goto fail;
->      }
-> +    /* The block job now has a reference to this node */
-> +    bdrv_unref(mirror_top_bs);
+> +union slirp_sockaddr {
+> +    struct sockaddr_storage ss;
+> +    struct sockaddr_in sin;
+> +    struct sockaddr_in6 sin6;
+> +};
 > +
->      s->source = bs;
->      s->mirror_top_bs = mirror_top_bs;
+>  struct socket {
+>    struct socket *so_next,*so_prev;      /* For a linked list of sockets */
 >
-> @@ -1242,6 +1244,10 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
+> @@ -31,22 +37,14 @@ struct socket {
+>    struct tcpiphdr *so_ti;	   /* Pointer to the original ti within
+>  				    * so_mconn, for non-blocking connections */
+>    int so_urgc;
+> -  union {   /* foreign host */
+> -      struct sockaddr_storage ss;
+> -      struct sockaddr_in sin;
+> -      struct sockaddr_in6 sin6;
+> -  } fhost;
+> +  union slirp_sockaddr fhost;      /* Foreign host */
+>  #define so_faddr fhost.sin.sin_addr
+>  #define so_fport fhost.sin.sin_port
+>  #define so_faddr6 fhost.sin6.sin6_addr
+>  #define so_fport6 fhost.sin6.sin6_port
+>  #define so_ffamily fhost.ss.ss_family
 >
->  fail:
->      if (s) {
-> +        /* Make sure this BDS does not go away until we have completed the graph
-> +         * changes below */
-> +        bdrv_ref(mirror_top_bs);
-> +
->          g_free(s->replaces);
->          blk_unref(s->target);
->          block_job_unref(&s->common);
-> @@ -1250,6 +1256,8 @@ fail:
->      bdrv_child_try_set_perm(mirror_top_bs->backing, 0, BLK_PERM_ALL,
->                              &error_abort);
->      bdrv_replace_node(mirror_top_bs, backing_bs(mirror_top_bs), &error_abort);
-> +
-> +    bdrv_unref(mirror_top_bs);
->  }
->
->  void mirror_start(const char *job_id, BlockDriverState *bs,
+> -  union {   /* local host */
+> -      struct sockaddr_storage ss;
+> -      struct sockaddr_in sin;
+> -      struct sockaddr_in6 sin6;
+> -  } lhost;
+> +  union slirp_sockaddr lhost;      /* Local host */
+>  #define so_laddr lhost.sin.sin_addr
+>  #define so_lport lhost.sin.sin_port
+>  #define so_laddr6 lhost.sin6.sin6_addr
 >
