@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49676)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cv1CD-0004o2-1H
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:34:57 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cv1DN-0005Pc-WC
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:36:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cv1CC-0004Xy-1H
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:34:56 -0400
-Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:34442)
+	(envelope-from <peter.maydell@linaro.org>) id 1cv1DM-0004uL-QW
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:36:10 -0400
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:33701)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cv1CB-0004Xp-Qn
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:34:55 -0400
-Received: by mail-wr0-x236.google.com with SMTP id l43so169409323wre.1
-	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 05:34:55 -0700 (PDT)
+	id 1cv1DM-0004uB-K9
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:36:08 -0400
+Received: by mail-wr0-x22d.google.com with SMTP id w43so167204784wrb.0
+	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 05:36:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <421c5729-f0d2-1c1b-bbd0-ebeb5584e082@twiddle.net>
-References: <1490630670-15818-1-git-send-email-peter.maydell@linaro.org>
-	<421c5729-f0d2-1c1b-bbd0-ebeb5584e082@twiddle.net>
+In-Reply-To: <1490698718-23762-1-git-send-email-peter.maydell@linaro.org>
+References: <1490698718-23762-1-git-send-email-peter.maydell@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 3 Apr 2017 13:34:34 +0100
-Message-ID: <CAFEAcA-ZyNpFm35qajdFwZzfoQj5_R6owbPU+ZR0mz7GT==BVQ@mail.gmail.com>
+Date: Mon, 3 Apr 2017 13:35:46 +0100
+Message-ID: <CAFEAcA-BW_FyUdBgZHaFeGJRir7DQ4S+7Oj429OY=yOL1XLveQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH for-2.9 0/2] tcg/sparc: zero extend ld/st
- helper args
+Subject: Re: [Qemu-devel] [PATCH for-2.9] configure: Mark SPARC as supported
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: "patches@linaro.org" <patches@linaro.org>
 
-On 28 March 2017 at 00:35, Richard Henderson <rth@twiddle.net> wrote:
-> On 03/28/2017 02:04 AM, Peter Maydell wrote:
->>
->> These patches fix problems with the SPARC TCG backend code
->> which calls the load and store helpers. Where the argument
->> being passed to the helper is narrower than the size of the
->> native register, the SPARC calling convention requires that
->> we extend it to the register size, but we weren't doing that.
->> This meant we passed the host code registers which might have
->> garbage in the high parts, and if the host code was built
->> with optimization this resulted in wrong behaviour.
->>
->> I still see problems trying to run the bits of 'make check'
->> that run guest code, but at least with these patches we can
->> run the i386 bios code enough to try to do PXE boot and not
->> find a server.
->>
->>
->> Peter Maydell (2):
->>   tcg/sparc: Zero extend data argument to store helpers
->>   tcg/sparc: Zero extend address argument to ld/st helpers
->>
->>  tcg/sparc/tcg-target.inc.c | 31 +++++++++++++++++++++++++++++--
->>  1 file changed, 29 insertions(+), 2 deletions(-)
->>
+On 28 March 2017 at 11:58, Peter Maydell <peter.maydell@linaro.org> wrote:
+> Thanks to John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+> and the Debian Project, we now have access to a SPARC Linux
+> system we can use for build testing. Move SPARC back into
+> the "supported" list.
 >
-> Reviewed-by: Richard Henderson <rth@twiddle.net>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> We should also at least apply the TCG fixes:
+>  http://patchwork.ozlabs.org/patch/743890/
+>  http://patchwork.ozlabs.org/patch/743890/
+> and ideally the bios-tables-test fix, but that's a testsuite bug:
+>  http://patchwork.ozlabs.org/patch/744178/
+>
+> There are 'make check' failures in qga-test on this box but
+> they don't seem architecture related:
+>  https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg04712.html
+>
+> I also see some failures in ppc64 guests which might just be
+> timeout issues and which I haven't investigated yet.
+> I don't think those are severe enough to worry about for this
+> release.
 
-Applied to master, thanks.
-
-(PS: your mail system seems to have sat on your reviewed-by
-email for the best part of a week.)
+Applied to master since the TCG fixes have now gone in.
 
 thanks
 -- PMM
