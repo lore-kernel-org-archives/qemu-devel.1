@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cv5Oy-00055u-91
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:04:25 -0400
+	(envelope-from <berrange@redhat.com>) id 1cv5SD-0006gQ-H4
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:07:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cv5Ox-0004ur-9J
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:04:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41800)
+	(envelope-from <berrange@redhat.com>) id 1cv5SA-0006YL-Qc
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:07:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33740)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cv5Ox-0004uB-0Y
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:04:23 -0400
-References: <20170403124524.10824-1-alex.bennee@linaro.org>
-	<20170403124524.10824-9-alex.bennee@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c6a9971c-688e-71e4-8bc7-c051784e0173@redhat.com>
-Date: Mon, 3 Apr 2017 19:04:12 +0200
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cv5SA-0006Xz-La
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:07:42 -0400
+Date: Mon, 3 Apr 2017 18:07:38 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170403170738.GC2768@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1490965817-16913-1-git-send-email-amarnath.valluri@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20170403124524.10824-9-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v1 8/9] cpus: don't credit executed
- instructions before they have run
+Content-Disposition: inline
+In-Reply-To: <1490965817-16913-1-git-send-email-amarnath.valluri@intel.com>
+Subject: Re: [Qemu-devel] [PATCH 0/7] Provide support for the software TPM
+ emulator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,109 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, dovgaluk@ispras.ru, rth@twiddle.net
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Amarnath Valluri <amarnath.valluri@intel.com>
+Cc: qemu-devel@nongnu.org, patrick.ohly@intel.com, stefanb@linux.vnet.ibm.com
 
+On Fri, Mar 31, 2017 at 04:10:09PM +0300, Amarnath Valluri wrote:
+> Briefly, Theses set of patches introduces:
+>  - new TPM backend driver to support software TPM emulators(swtpm(1)).
+>  - and few supported fixes/enhancements/cleanup to existing tpm backend code.
+> 
+> The similar idea was initiated earliar(2) by Stefan Berger(CCed) with slightly
+> different approach, using CUSE. As swtpm has excellent support for unix domain
+> sockets, hence this implementation uses unix domain sockets to communicate with
+> swtpm.
+> 
+> When Qemu is configured with 'emulator' tpm backend, it spawns 'swtpm' and
+> communicates its via Unix domain sockets.
 
+I'm not convinced that having QEMU spawning swtpm itself is a desirable
+approach, as it means QEMU needs to have all the privileges that swtpm
+will need, so that swtpm can inherit them. At the very least I think we
+need to have a way to disable this spawning, so it can connect to a
+pre-existing swtpm process that's been spawned ahead of time. This will
+let us have stricter privilege separation.
 
-On 03/04/2017 14:45, Alex Benn=C3=A9e wrote:
-> Outside of the vCPU thread icount time will only be tracked against
-> timers_state.qemu_icount. We no longer credit cycles until they have
-> completed the run. Inside the vCPU thread we adjust for passage of
-> time by looking at how many have run so far. This is only valid inside
-> the vCPU thread while it is running.
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-I suspect icount_budget and icount_extra could be merged into one, but
-not for 2.9.  For now this looks nice!
-
-Paolo
-
-> ---
->  cpus.c            | 27 +++++++++++++++++++++------
->  include/qom/cpu.h |  1 +
->  2 files changed, 22 insertions(+), 6 deletions(-)
->=20
-> diff --git a/cpus.c b/cpus.c
-> index 87638a75d2..3d18374b0e 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -223,6 +223,15 @@ void qemu_tcg_configure(QemuOpts *opts, Error **er=
-rp)
->      }
->  }
-> =20
-> +/* The current number of executed instructions is based on what we
-> + * originally budgeted minus the current state of the decrementing
-> + * icount counters in extra/u16.low.
-> + */
-> +static int64_t cpu_get_icount_executed(CPUState *cpu)
-> +{
-> +    return cpu->icount_budget - (cpu->icount_decr.u16.low + cpu->icoun=
-t_extra);
-> +}
-> +
->  int64_t cpu_get_icount_raw(void)
->  {
->      int64_t icount;
-> @@ -234,7 +243,8 @@ int64_t cpu_get_icount_raw(void)
->              fprintf(stderr, "Bad icount read\n");
->              exit(1);
->          }
-> -        icount -=3D (cpu->icount_decr.u16.low + cpu->icount_extra);
-> +        /* Take into account what has run */
-> +        icount +=3D cpu_get_icount_executed(cpu);
->      }
->      return icount;
->  }
-> @@ -1195,7 +1205,10 @@ static void prepare_icount_for_run(CPUState *cpu=
-)
-> =20
->          count =3D tcg_get_icount_limit();
-> =20
-> -        timers_state.qemu_icount +=3D count;
-> +        /* To calculate what we have executed so far we need to know
-> +         * what we originally budgeted to run this cycle */
-> +        cpu->icount_budget =3D count;
-> +
->          decr =3D (count > 0xffff) ? 0xffff : count;
->          count -=3D decr;
->          cpu->icount_decr.u16.low =3D decr;
-> @@ -1206,16 +1219,18 @@ static void prepare_icount_for_run(CPUState *cp=
-u)
->  static void process_icount_data(CPUState *cpu)
->  {
->      if (use_icount) {
-> -        /* Fold pending instructions back into the
-> -           instruction counter, and clear the interrupt flag.  */
-> -        timers_state.qemu_icount -=3D (cpu->icount_decr.u16.low
-> -                        + cpu->icount_extra);
-> +        /* Account for executed instructions */
-> +        timers_state.qemu_icount +=3D cpu_get_icount_executed(cpu);
-> =20
->          /* We must be under BQL here as cpu_exit can tweak
->             icount_decr.u32 */
->          g_assert(qemu_mutex_iothread_locked());
-> +
-> +        /* Reset the counters */
->          cpu->icount_decr.u32 =3D 0;
->          cpu->icount_extra =3D 0;
-> +        cpu->icount_budget =3D 0;
-> +
->          replay_account_executed_instructions();
->      }
->  }
-> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-> index c3292efe1c..5d10359c8f 100644
-> --- a/include/qom/cpu.h
-> +++ b/include/qom/cpu.h
-> @@ -332,6 +332,7 @@ struct CPUState {
->      /* updates protected by BQL */
->      uint32_t interrupt_request;
->      int singlestep_enabled;
-> +    int64_t icount_budget;
->      int64_t icount_extra;
->      sigjmp_buf jmp_env;
-> =20
->=20
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
