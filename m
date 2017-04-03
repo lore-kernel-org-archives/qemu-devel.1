@@ -1,25 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cv61U-0000yG-GV
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:44:13 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cv691-0002XG-R8
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:52:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cv61T-0000G4-E7
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:44:12 -0400
-Resent-Message-Id: <E1cv61T-0000G4-E7@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21433)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cv61T-0000Fk-4s
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:44:11 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <149124144091.20118.8616163572397788829@6c512846dbc7>
-In-Reply-To: <20170403171843.3363-1-dgilbert@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 3 Apr 2017 10:44:01 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v5 0/5 for 2.10] SLIRP VMStatification
+	(envelope-from <mreitz@redhat.com>) id 1cv691-000496-6i
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:51:59 -0400
+From: Max Reitz <mreitz@redhat.com>
+Date: Mon,  3 Apr 2017 19:51:48 +0200
+Message-Id: <20170403175150.15253-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.9 0/2] block/mirror: Fix use-after-free
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +17,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: dgilbert@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, samuel.thibault@gnu.org, jan.kiszka@siemens.com, quintela@redhat.com
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA0MDMxNzE4NDMuMzM2My0xLWRnaWxiZXJ0QHJlZGhhdC5jb20KVHlwZTogc2VyaWVzClN1Ympl
-Y3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjUgMC81IGZvciAyLjEwXSBTTElSUCBWTVN0YXRpZmlj
-YXRpb24KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpu
-PTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgoj
-IFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
-CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9n
-IC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAg
-ICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0
-PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Njcmlw
-dHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAg
-ICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVT
-VCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRi
-ZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQog
-LSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTcwNDAxMDA0NjI0LjMwODg2LTEtZWhhYmtv
-c3RAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTcwNDAxMDA0NjI0LjMwODg2LTEtZWhhYmtvc3RA
-cmVkaGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwNDAzMTcxODQzLjMz
-NjMtMS1kZ2lsYmVydEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxNzA0MDMxNzE4NDMuMzM2My0x
-LWRnaWxiZXJ0QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpiODVm
-MGQwIHNsaXJwOiBWTVN0YXRpZnkgcmVtYWluaW5nIGV4Y2VwdCBmb3IgbG9vcAo2NjY0ZTVlIHNs
-aXJwOiBWTVN0YXRpZnkgc29ja2V0IGxldmVsCmI3MzVhOTggc2xpcnA6IENvbW1vbiBsaG9zdC9m
-aG9zdCB1bmlvbgowNDk4MzZjIHNsaXJwOiBWTVN0YXRpZnkgc2J1Zgo0M2NiZDE4IHNsaXJwOiBW
-TVN0YXRlIGNvbnZlcnNpb247IHRjcGNiCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQ
-QVRDSCAxLzU6IHNsaXJwOiBWTVN0YXRlIGNvbnZlcnNpb247IHRjcGNiLi4uCkVSUk9SOiBjb2Rl
-IGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzIxMTogRklMRTogc2xpcnAvdGNwX3Zhci5o
-OjUxOgorXkl1aW50OF90IHRfZm9yY2U7XkleSS8qIDEgaWYgZm9yY2luZyBvdXQgYSBieXRlICov
-JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjIxOiBGSUxFOiBz
-bGlycC90Y3BfdmFyLmg6MTEyOgorXkl1aW50OF90Xkl0X29vYmZsYWdzO15JXkkvKiBoYXZlIHNv
-bWUgKi8kCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMyMjI6IEZJ
-TEU6IHNsaXJwL3RjcF92YXIuaDoxMTM6CiteSXVpbnQ4X3ReSXRfaW9iYzteSV5JXkkvKiBpbnB1
-dCBjaGFyYWN0ZXIgKi8kCgp0b3RhbDogMyBlcnJvcnMsIDAgd2FybmluZ3MsIDE5NSBsaW5lcyBj
-aGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQ
-QVRDSCAyLzU6IHNsaXJwOiBWTVN0YXRpZnkgc2J1Zi4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hv
-dWxkIG5ldmVyIHVzZSB0YWJzCiMyNjogRklMRTogc2xpcnAvc2J1Zi5oOjE1OgorXkl1aW50MzJf
-dCBzYl9jYzteSV5JLyogYWN0dWFsIGNoYXJzIGluIGJ1ZmZlciAqLyQKCkVSUk9SOiBjb2RlIGlu
-ZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzI3OiBGSUxFOiBzbGlycC9zYnVmLmg6MTY6Cite
-SXVpbnQzMl90IHNiX2RhdGFsZW47XkkvKiBMZW5ndGggb2YgZGF0YSAgKi8kCgp0b3RhbDogMiBl
-cnJvcnMsIDAgd2FybmluZ3MsIDE1NSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzLzU6IHNsaXJwOiBDb21tb24gbGhv
-c3QvZmhvc3QgdW5pb24uLi4KQ2hlY2tpbmcgUEFUQ0ggNC81OiBzbGlycDogVk1TdGF0aWZ5IHNv
-Y2tldCBsZXZlbC4uLgpFUlJPUjogaWYgdGhpcyBjb2RlIGlzIHJlZHVuZGFudCBjb25zaWRlciBy
-ZW1vdmluZyBpdAojMTQ4OiBGSUxFOiBzbGlycC9zbGlycC5jOjEzNTI6CisjaWYgMAoKdG90YWw6
-IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNjkgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNS81OiBzbGlycDogVk1TdGF0
-aWZ5IHJlbWFpbmluZyBleGNlcHQgZm9yIGxvb3AuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
-IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+And the exciting 2.9 ride continues!
+
+When mirroring from a BDS with no parents at all (such as those added
+with -blockdev or blockdev-add), we have a use-after-free in mirror's
+error path. The first patch of this series fixes that, the other adds a
+patch so we don't regress.
+
+What issue will we find next? Stay tuned!
+
+
+Max Reitz (2):
+  block/mirror: Fix use-after-free
+  iotests: Add mirror tests for orphaned source
+
+ block/mirror.c                | 12 +++++++++--
+ tests/qemu-iotests/041        | 46 +++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/041.out    |  4 ++--
+ tests/qemu-iotests/iotests.py | 15 ++++++++++++++
+ 4 files changed, 73 insertions(+), 4 deletions(-)
+
+-- 
+2.12.1
