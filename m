@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1cv9Bb-0001GS-LD
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 17:06:53 -0400
+	(envelope-from <ashmit602@gmail.com>) id 1cv9Cy-00027G-8a
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 17:08:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1cv9BW-0007r6-Pa
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 17:06:51 -0400
-Received: from mail-by2nam01on0085.outbound.protection.outlook.com
-	([104.47.34.85]:30720
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1cv9BW-0007pI-Ah
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 17:06:46 -0400
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Mon, 3 Apr 2017 17:32:46 +0000
-Message-ID: <74004942B5DA03468B2B76399A14BF2ED54A885F@XSJ-PSEXMBX01.xlnx.xilinx.com>
-References: <CAF++6AOLSd0SYyv_LmnjinEj-jHBbyNZv_hxvdksGqCoDcpmjA@mail.gmail.com>
-In-Reply-To: <CAF++6AOLSd0SYyv_LmnjinEj-jHBbyNZv_hxvdksGqCoDcpmjA@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <ashmit602@gmail.com>) id 1cv9Cw-0000Bh-TP
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 17:08:16 -0400
+Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:36621)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ashmit602@gmail.com>) id 1cv9Cw-0000B3-Ky
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 17:08:14 -0400
+Received: by mail-io0-x242.google.com with SMTP id 68so13350279ioh.3
+	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 14:08:14 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] MTD timeout on bootup
+In-Reply-To: <20170403151154.GD3539@stefanha-x1.localdomain>
+References: <1490583036-3683-1-git-send-email-Ashish.Mittal@veritas.com>
+	<20170327172738.GG28620@stefanha-x1.localdomain>
+	<CAAo6VWPPjX2UfU55rnR375jzmpMojUOHfmMafwBiZqBa80aBeQ@mail.gmail.com>
+	<CAAo6VWNShCJDYkRSC-qCZ_X002ud5QLpHgP7V-51XaPqaRcggA@mail.gmail.com>
+	<20170403151154.GD3539@stefanha-x1.localdomain>
+From: ashish mittal <ashmit602@gmail.com>
+Date: Mon, 3 Apr 2017 14:08:13 -0700
+Message-ID: <CAAo6VWP505CgV_CyGwSbMj_oidkhjeQWO3XtHhSyThVwLh-d7A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v10 1/2] block/vxhs.c: Add support for a
+ new block device type called "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +32,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: James Hanley <jhanley@dgtlrift.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "alistair23@gmail.com" <alistair23@gmail.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Jeff Cody <jcody@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <ashish.mittal@veritas.com>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, "Venkatesha M.G." <venkatesha.mg@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBKYW1lcyBIYW5sZXkgW21haWx0
-bzpqaGFubGV5QGRndGxyaWZ0LmNvbV0NCj4gU2VudDogRnJpZGF5LCAzMSBNYXJjaCAyMDE3IDg6
-MjkgQU0NCj4gVG86IEFsaXN0YWlyIEZyYW5jaXMgPGFsaXN0YWlAeGlsaW54LmNvbT47IFBldGVy
-IENyb3N0aHdhaXRlDQo+IDxjcm9zdGh3YWl0ZS5wZXRlckBnbWFpbC5jb20+OyBxZW11LWRldmVs
-IDxxZW11LWRldmVsQG5vbmdudS5vcmc+DQo+IFN1YmplY3Q6IE1URCB0aW1lb3V0IG9uIGJvb3R1
-cA0KPg0KPiBXaGVuIHRyeWluZyB0byBib290dXAgYSBwcmlzdGluZSB6eW5jIGltYWdlIGZyb20g
-dGhlIHpjNzAyIHRhcmJhbGwsIGl0IHdvdWxkIGFsd2F5cw0KPiBmYWlsIHdpdGggdGhlIE1URCBk
-ZXRlY3Rpb24gb2YgdGhlIHNlcmlhbCBmbGFzaCBkZXZpY2UgdHlwZSBjb21tYW5kIG92ZXIgdGhl
-IFNQSS4gIEkNCj4gYmVsaWV2ZSB0aGlzIHNlY3Rpb24gb2YgY29kZSBtYXkgaGF2ZSB0aGUgbG9n
-aWMgZmxpcHBlZC4gIE9uY2UgSSBjaGFuZ2VkIGl0IHRvIHRoZQ0KPiBmb2xsb3dpbmcsIEkgd2Fz
-IGFibGUgdG8gZGV0ZWN0IHRoZSBmbGFzaCB0eXBlIHdoZW4gYm9vdGluZyB0aGUgcHJpc3RpbmUg
-aW1hZ2UgZnJvbQ0KPiBYaWxpbnguDQoNCkhleSBKaW0sDQoNCkZpcnN0IG9mZiwgdGhhbmtzIGZv
-ciB0aGUgcGF0Y2guDQoNCkluIHRoZSBmdXR1cmUgZG8geW91IG1pbmQgZm9sbG93aW5nIHRoZSBn
-dWlkZWxpbmVzIGhlcmU6DQpodHRwOi8vd2lraS5xZW11LXByb2plY3Qub3JnL0NvbnRyaWJ1dGUv
-U3VibWl0QVBhdGNoDQoNCklmIHlvdSB1c2UgZ2l0IGZvcm1hdC1wYXRjaCBhbmQgZ2l0IHNlbmQt
-ZW1haWwgdG8gZ2VuZXJhdGUgdGhlIHBhdGNoIGFuZCBzZW5kIHRoZSByZXN1bHQNCnRvIHRoZSBt
-YWlsaW5nIGxpc3QgaXQgaXMgbXVjaCBlYXNpZXIgZm9yIHBlb3BsZSB0byByZXZpZXcgYW5kIGFw
-cGx5Lg0KDQpMb29raW5nIGF0IHRoZSBYaWxpbnggWnlucS03MDAgVFJNIChwYWdlIDE3NTQpIEkg
-c2VlIHRoYXQgdGhlIE1hbl9zdGFydF9jb20gYml0DQpzcGVjaWZpZXMgdG8gbWFudWFsbHkgc3Rh
-cnQgdGhlIHRyYW5zbWlzc2lvbiBvZiBkYXRhLCBzbyBpdCBsb29rcyBsaWtlIHRoZSBsb2dpYyBh
-bHJlYWR5IGluDQp0aGUgUUVNVSBtb2RlbCBpcyBjb3JyZWN0LiBXaGF0IGlzc3VlIGFyZSB5b3Ug
-c2VlaW5nIHRoYXQgdGhpcyBmaXhlcz8gTWF5YmUgdGhlIGxvZ2ljDQpzb21ld2hlcmUgZWxzZSBp
-cyBpbmNvcnJlY3QuDQoNClBTOiBTb3JyeSBhYm91dCB0aGUgZm9vdGVyLCBJIGhhZCB0byByZXBs
-eSBmcm9tIG15IGNvcnBvcmF0ZSBlbWFpbCBhY2NvdW50Lg0KDQpUaGFua3MsDQoNCkFsaXN0YWly
-DQoNCj4gLUppbQ0KPg0KPg0KPiBGcm9tIGJhYWFhY2NhMzcwYzEzNTI2ZmQyYjhjN2IzM2M3ZDll
-OGE2ZDdiOGQgTW9uIFNlcCAxNyAwMDowMDowMCAyMDAxDQo+IEZyb206IEppbSBIYW5sZXkgPEpp
-bS5IYW5sZXlATGFuZGlzR3lyLmNvbT4NCj4gRGF0ZTogVGh1LCAyMyBNYXIgMjAxNyAxMDoyOToz
-NCAtMDQwMA0KPiBTdWJqZWN0OiBbUEFUQ0hdIE1URCB3cml0ZXMgZnJvbSB0aGUgU1BJIHdlcmUg
-bmV2ZXIgYmVpbmcgZGVxdWV1ZS4uLg0KPiBTaWduZWQtb2ZmLWJ5Og0KPg0KPiAtLS0NCj4gIGh3
-L3NzaS94aWxpbnhfc3BpcHMuYyB8IDQgKystLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0
-aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4NCj4gZGlmZiAtLWdpdCBhL2h3L3NzaS94aWxpbnhf
-c3BpcHMuYyBiL2h3L3NzaS94aWxpbnhfc3BpcHMuYw0KPiBpbmRleCBkYThhZGZhLi5hM2FmMWY3
-IDEwMDY0NA0KPiAtLS0gYS9ody9zc2kveGlsaW54X3NwaXBzLmMNCj4gKysrIGIvaHcvc3NpL3hp
-bGlueF9zcGlwcy5jDQo+IEBAIC00ODIsOCArNDgyLDggQEAgc3RhdGljIHZvaWQgeGlsaW54X3Nw
-aXBzX3dyaXRlKHZvaWQgKm9wYXF1ZSwgaHdhZGRyIGFkZHIsDQo+ICAgICAgcy0+cmVnc1thZGRy
-XSA9IChzLT5yZWdzW2FkZHJdICYgfm1hc2spIHwgKHZhbHVlICYgbWFzayk7DQo+ICBub19yZWdf
-dXBkYXRlOg0KPiAgICAgIHhpbGlueF9zcGlwc191cGRhdGVfY3NfbGluZXMocyk7DQo+IC0gICAg
-aWYgKChtYW5fc3RhcnRfY29tICYmIHMtPnJlZ3NbUl9DT05GSUddICYgTUFOX1NUQVJUX0VOKSB8
-fA0KPiAtICAgICAgICAgICAgKGZpZm84X2lzX2VtcHR5KCZzLT50eF9maWZvKSAmJiBzLT5yZWdz
-W1JfQ09ORklHXSAmIE1BTl9TVEFSVF9FTikpIHsNCj4gKyAgICBpZiAoISgobWFuX3N0YXJ0X2Nv
-bSAmJiBzLT5yZWdzW1JfQ09ORklHXSAmIE1BTl9TVEFSVF9FTikgfHwNCj4gKyAgICAgICAgICAg
-IChmaWZvOF9pc19lbXB0eSgmcy0+dHhfZmlmbykgJiYgcy0+cmVnc1tSX0NPTkZJR10gJiBNQU5f
-U1RBUlRfRU4pKSkgew0KPiAgICAgICAgICB4aWxpbnhfc3BpcHNfZmx1c2hfdHhmaWZvKHMpOw0K
-PiAgICAgIH0NCj4gICAgICB4aWxpbnhfc3BpcHNfdXBkYXRlX2NzX2xpbmVzKHMpOw0KPiAtLQ0K
-PiAyLjcuNA0KDQoNCg0KVGhpcyBlbWFpbCBhbmQgYW55IGF0dGFjaG1lbnRzIGFyZSBpbnRlbmRl
-ZCBmb3IgdGhlIHNvbGUgdXNlIG9mIHRoZSBuYW1lZCByZWNpcGllbnQocykgYW5kIGNvbnRhaW4o
-cykgY29uZmlkZW50aWFsIGluZm9ybWF0aW9uIHRoYXQgbWF5IGJlIHByb3ByaWV0YXJ5LCBwcml2
-aWxlZ2VkIG9yIGNvcHlyaWdodGVkIHVuZGVyIGFwcGxpY2FibGUgbGF3LiBJZiB5b3UgYXJlIG5v
-dCB0aGUgaW50ZW5kZWQgcmVjaXBpZW50LCBkbyBub3QgcmVhZCwgY29weSwgb3IgZm9yd2FyZCB0
-aGlzIGVtYWlsIG1lc3NhZ2Ugb3IgYW55IGF0dGFjaG1lbnRzLiBEZWxldGUgdGhpcyBlbWFpbCBt
-ZXNzYWdlIGFuZCBhbnkgYXR0YWNobWVudHMgaW1tZWRpYXRlbHkuDQoNCg==
+On Mon, Apr 3, 2017 at 8:11 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> On Fri, Mar 31, 2017 at 11:25:02AM -0700, ashish mittal wrote:
+>> On Mon, Mar 27, 2017 at 6:04 PM, ashish mittal <ashmit602@gmail.com> wrote:
+>> > On Mon, Mar 27, 2017 at 10:27 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>> >> On Sun, Mar 26, 2017 at 07:50:35PM -0700, Ashish Mittal wrote:
+>> >>
+>> >> Have you tested live migration?
+>> >>
+>> >> If live migration is not supported then a migration blocker should be
+>> >> added using migrate_add_blocker().
+>> >>
+>> >
+>> > We do support live migration. We have been testing a fork of this code
+>> > (slightly different version) with live migration.
+>
+> The reason I ask is because this patch doesn't implement the
+> BlockDriver bdrv_invalidate_cache()/bdrv_inactivate() callbacks.  These
+> functions are invoked during live migration so that the block driver can
+> ensure data consistency.
+>
+> Since the destination QEMU process is launched while the source QEMU is
+> still running and making changes to the disk, some block drivers need to
+> discard metadata at migration handover time that was read upon opening
+> the image on the destination.  The guarantees that they see the latest
+> metadata.
+>
+
+Thanks! During live migration, we point the vdisks to the same host as
+the migration source (specified on the vxhs command line), thereby
+insuring consistent view of data.
+
+> Not sure if libvxhs caches anything that might get stale during live
+> migration, but I wanted to raise this question?
+>
+> Regarding a fork of this code that you haven't posted to the mailing
+> list, it doesn't exist as far as anyone here is concerned :).  Therefore
+> either the code on the mailing list needs to support migration or it
+> must register a migration blocker to prevent migration.
+>
+
+The code on the mailing list does support live migration. Live
+migration requires the support of proprietary vxhs bits and also our
+orchestration code within OpenStack. We have been testing live
+migration and it works without any data consistency issues.
+
+>> >>> +static BlockDriver bdrv_vxhs = {
+>> >>> +    .format_name                  = "vxhs",
+>> >>> +    .protocol_name                = "vxhs",
+>> >>> +    .instance_size                = sizeof(BDRVVXHSState),
+>> >>> +    .bdrv_file_open               = vxhs_open,
+>> >>> +    .bdrv_parse_filename          = vxhs_parse_filename,
+>> >>> +    .bdrv_close                   = vxhs_close,
+>> >>> +    .bdrv_getlength               = vxhs_getlength,
+>> >>> +    .bdrv_aio_readv               = vxhs_aio_readv,
+>> >>> +    .bdrv_aio_writev              = vxhs_aio_writev,
+>> >>
+>> >> Missing .bdrv_aio_flush().  Does VxHS promise that every completed write
+>> >> request is persistent?
+>> >>
+>> >
+>> > Yes, every acknowledged write request is persistent.
+>> >
+>> >> In that case it may be better to disable the emulated disk write cache
+>> >> so the guest operating system and application know not to send flush
+>> >> commands.
+>> >
+>> > We do pass "cache=none" on the qemu command line for every block
+>> > device. Are there any other code changes necessary? Any pointers will
+>> > help.
+>> >
+>>
+>> Upon further reading, I now understand that cache=none will not
+>> disable the emulated disk write cache. I am trying to understand if -
+>> (1) It should still not be a problem since flush will just be a no-op for us.
+>
+> The guest operating system and applications may take different code
+> paths depending on the state of the disk write cache.
+>
+> Useless vmexits can be eliminated if the guest doesn't need to send
+> flush commands.  Hence the file system and applications may perform
+> better.
+>
+>> (2) Is there a way, or reason, to disable the emulated disk write
+>> cache in the code for vxhs? I think passing WCE=0 to the guest has
+>> something to do with this, although I have yet to figure out what that
+>> means.
+>
+> Right, WCE == "Write Cache Enable".  If you disable the write cache then
+> the guest's SCSI disk or virtio-blk drivers will notice that the disk
+> does not require flush commands.
+>
+> Try launching a guest with -drive if=none,id=drive0,cache=directsync,...
+> and you should see that the write cache is disabled:
+>
+>   # cat /sys/block/vda/queue/write_cache
+>
+
+Thanks! Will try this. As you mentioned, this might give us a slightly
+better performance as it will avoid unnecessary flush from the guest
+OS/app. I was wondering if there was a separate command line option
+(other than cache=directsync) for passing WCE=0? Reading some of the
+articles out there almost suggested as if there was! Maybe I was just
+confused.
+
+>> (3) Is this a must for merge?
+>
+> This doesn't affect the block driver code so no change is necessary.
