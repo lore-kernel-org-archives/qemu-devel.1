@@ -1,38 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cv2qN-0005K6-AN
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 10:20:32 -0400
+	(envelope-from <stefanha@gmail.com>) id 1cv38A-0008EJ-HT
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 10:38:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cv2qI-0001qu-Ck
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 10:20:31 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55462)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cv2qI-0001qi-3A
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 10:20:26 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v33EJAe2135138
-	for <qemu-devel@nongnu.org>; Mon, 3 Apr 2017 10:20:24 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29kqbp326d-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 10:20:23 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Mon, 3 Apr 2017 15:20:21 +0100
-Date: Mon, 3 Apr 2017 16:20:16 +0200
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <20170324220141.10104-1-Andrew.Baumann@microsoft.com>
-References: <20170324220141.10104-1-Andrew.Baumann@microsoft.com>
+	(envelope-from <stefanha@gmail.com>) id 1cv387-0001KV-Dp
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 10:38:54 -0400
+Date: Mon, 3 Apr 2017 15:38:47 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170403143847.GB3539@stefanha-x1.localdomain>
+References: <20170324123458.yk3rj3g47e5xr33i@eukaryote>
+	<6fb77120-dcab-042f-bb51-20ccbaa38354@redhat.com>
+	<20170328152934.rebdzsjfsfc6ajrh@eukaryote>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170403162016.6c033dd8.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] win32: replace custom mutex and condition
- variable with native primitives
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="cmJC7u66zC7hs+87"
+Content-Disposition: inline
+In-Reply-To: <20170328152934.rebdzsjfsfc6ajrh@eukaryote>
+Subject: Re: [Qemu-devel] [Qemu-block] Making QMP 'block-job-cancel'
+ transactionable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,41 +26,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Cc: qemu-devel@nongnu.org, Andrey Shedel <ashedel@microsoft.com>, Stefan Weil <sw@weilnetz.de>, Paolo Bonzini <pbonzini@redhat.com>
+To: Kashyap Chamarthy <kchamart@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Fri, 24 Mar 2017 15:01:41 -0700
-Andrew Baumann <Andrew.Baumann@microsoft.com> wrote:
 
-> From: Andrey Shedel <ashedel@microsoft.com>
-> 
-> The multithreaded TCG implementation exposed deadlocks in the win32
-> condition variables: as implemented, qemu_cond_broadcast waited on
-> receivers, whereas the pthreads API it was intended to emulate does
-> not. This was causing a deadlock because broadcast was called while
-> holding the IO lock, as well as all possible waiters blocked on the
-> same lock.
-> 
-> This patch replaces all the custom synchronisation code for mutexes
-> and condition variables with native Windows primitives (SRWlocks and
-> condition variables) with the same semantics as their POSIX
-> equivalents. To enable that, it requires a Windows Vista or newer host
-> OS.
-> 
-> [AB: edited commit message]
-> Signed-off-by: Andrew Baumann <Andrew.Baumann@microsoft.com>
-> ---
-> The major implication of this patch is that it drops support for
-> pre-Vista versions of Windows. However, those OSes are past their end
-> of life, and other OSS projects have dropped support. e.g.; the last
-> Cygwin release supporting XP was in Jun 2016. It doesn't seem like a
-> good tradeoff to invest effort in fixing broken code needed to support
-> them, so hopefully this isn't too controversial.
+--cmJC7u66zC7hs+87
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Just a quick question:
+On Tue, Mar 28, 2017 at 05:29:34PM +0200, Kashyap Chamarthy wrote:
+> On Tue, Mar 28, 2017 at 09:49:40AM -0500, Eric Blake wrote:
+> > On 03/24/2017 07:34 AM, Kashyap Chamarthy wrote:
+> > > While debugging some other issue, I happened to stumble across an old
+> > > libvirt commit[*] that adds support for pivot (whether QEMU should
+> > > switch to a target copy or not) operation as a result of issuing QMP
+> > > 'block-job-cancel' to a 'drive-mirror' (in libvirt parlance, "block
+> > > copy").
+> > >=20
+> > > In the libvirt commit message[*] Eric Blake writes:
+> > >=20
+> > >     "[...] There may be potential improvements to the snapshot code to
+> > >     exploit block copy over multiple disks all at one point in time.
+> > >     And, if 'block-job-cancel' were made part of 'transaction', you
+> > >     could copy multiple disks at the same point in time without pausi=
+ng
+> > >     the domain. [...]"
+> > >=20
+> > > I realize that 'block-job-cancel' is currently not part of the
+> > > @TransactionAction.  Is it worthwhile to do so?
+> >=20
+> > Yes, it is still worthwhile to make that improvement, although it is
+> > now 2.10 material.
+>=20
+> Thanks for looking, didn't imply that it's for 2.9 (which is in Release
+> Candidate phase) -- I realize most people are busy with it.  Further
+> discussion could be had when 2.10 tree opens up.
 
-I noticed that this breaks builds on an old fc20-based installation I
-run some mingw cross builds on (getting an undefined reference to
-`_imp__TryAcquireSRWLockExclusive@4'). I should probably take that as a
-trigger to update that installation ;), but wanted to confirm that this
-is expected.
+Thanks for the discussion.  I have added this task to the block layer
+todo list:
+
+http://wiki.qemu-project.org/ToDo/Block#Atomic_block-job-cancel
+
+--cmJC7u66zC7hs+87
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJY4l53AAoJEJykq7OBq3PI4FUH/3dfKOkuJURhjER5dlxtOuHO
+v46g70ExlUpZGSRZ8YMt/irdmrrpsM2qvEsG2+AIYRzCgw7BQDBD/GgoUlDrD1z6
+2QnNWrPlIEBmgpaybsLLi09cYmEWY8cWdN4CkodKi3tqxq868uiCref7tKSRLPgC
+ICR1Lm/eSnzukB0awHI83Q4YOFZvYOZnorGXfpx+CD6HybrlHqfNlJgnwqQPghSk
+Q1TjxdNLoAuKrS1I4WUO/x/eJRjvZ8bXxRaiF/CjdGvhEnaVAYibGvYAlgMnDqG+
+zpXUqJdpU5kJe9OnGvQYLnRq2YFzDlLgFdPUhVEqeJcLa8aJ5X5yc6JI6ooP68M=
+=xM8m
+-----END PGP SIGNATURE-----
+
+--cmJC7u66zC7hs+87--
