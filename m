@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cv6vK-0005Pb-FO
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:41:55 -0400
+	(envelope-from <kchamart@redhat.com>) id 1cv75l-0006ls-5M
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:52:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cv6vG-0006Yy-In
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:41:54 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:34296)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cv6vG-0006Yj-EY
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:41:50 -0400
-Received: by mail-qk0-x244.google.com with SMTP id p68so161610qke.1
-	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 11:41:50 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170403171843.3363-1-dgilbert@redhat.com>
-	<20170403171843.3363-4-dgilbert@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <246e17c1-001e-0aba-8849-86c253350280@amsat.org>
-Date: Mon, 3 Apr 2017 15:41:46 -0300
+	(envelope-from <kchamart@redhat.com>) id 1cv75h-0002P2-Va
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:52:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53290)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1cv75h-0002O7-MD
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:52:37 -0400
+Date: Mon, 3 Apr 2017 20:52:32 +0200
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20170403185232.jjiuesfxhbfzfivv@eukaryote>
+References: <C885D0FF6A27744DB0B822E32DF6EF029B1CA14A@SESTOEX04.enea.se>
+	<9b05e60a-f8c2-ea4f-6be4-f17c0adec510@redhat.com>
+	<C885D0FF6A27744DB0B822E32DF6EF029B1CA282@SESTOEX04.enea.se>
 MIME-Version: 1.0
-In-Reply-To: <20170403171843.3363-4-dgilbert@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 3/5] slirp: Common lhost/fhost union
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <C885D0FF6A27744DB0B822E32DF6EF029B1CA282@SESTOEX04.enea.se>
+Subject: Re: [Qemu-devel] nbd: Possible regression in 2.9 RCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,64 +29,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, samuel.thibault@gnu.org, jan.kiszka@siemens.com
-Cc: quintela@redhat.com
+To: Ciprian Barbu <Ciprian.Barbu@enea.com>
+Cc: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Alexandru Avadanii <Alexandru.Avadanii@enea.com>, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>, svc-armband <armband@enea.com>
 
-On 04/03/2017 02:18 PM, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> The socket structure has a pair of unions for lhost and fhost
-> addresses; the unions are identical so split them out into
-> a separate union declaration.
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On Fri, Mar 31, 2017 at 05:49:52PM +0000, Ciprian Barbu wrote:
+> Hi,
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+[...]
 
-> ---
->  slirp/socket.h | 18 ++++++++----------
->  1 file changed, 8 insertions(+), 10 deletions(-)
->
-> diff --git a/slirp/socket.h b/slirp/socket.h
-> index 8feed2a..c1be77e 100644
-> --- a/slirp/socket.h
-> +++ b/slirp/socket.h
-> @@ -15,6 +15,12 @@
->   * Our socket structure
->   */
->
-> +union slirp_sockaddr {
-> +    struct sockaddr_storage ss;
-> +    struct sockaddr_in sin;
-> +    struct sockaddr_in6 sin6;
-> +};
-> +
->  struct socket {
->    struct socket *so_next,*so_prev;      /* For a linked list of sockets */
->
-> @@ -31,22 +37,14 @@ struct socket {
->    struct tcpiphdr *so_ti;	   /* Pointer to the original ti within
->  				    * so_mconn, for non-blocking connections */
->    int so_urgc;
-> -  union {   /* foreign host */
-> -      struct sockaddr_storage ss;
-> -      struct sockaddr_in sin;
-> -      struct sockaddr_in6 sin6;
-> -  } fhost;
-> +  union slirp_sockaddr fhost;      /* Foreign host */
->  #define so_faddr fhost.sin.sin_addr
->  #define so_fport fhost.sin.sin_port
->  #define so_faddr6 fhost.sin6.sin6_addr
->  #define so_fport6 fhost.sin6.sin6_port
->  #define so_ffamily fhost.ss.ss_family
->
-> -  union {   /* local host */
-> -      struct sockaddr_storage ss;
-> -      struct sockaddr_in sin;
-> -      struct sockaddr_in6 sin6;
-> -  } lhost;
-> +  union slirp_sockaddr lhost;      /* Local host */
->  #define so_laddr lhost.sin.sin_addr
->  #define so_lport lhost.sin.sin_port
->  #define so_laddr6 lhost.sin6.sin6_addr
->
+> We also use libvirt v1.3.4, which might be a problem, but at least we
+> want to understand if the commit in question introduced an obvious
+> problem or if it's all in the details.
+
+A tangential question -- Just curious, your environment
+seems...interesting: given you are using a bit old (but above the
+MIN_LIBVIRT_VERSION for Nova, which is currently 1.2.1) libvirt version,
+with *RC2* of QEMU 2.9 with Nova, and testing live migration.  Me
+wonders if this some kind of a custom OpenStack environment, or an
+official upstream release that you're simply testing with a newer
+version of QEMU...
+
+
+[1]
+http://git.openstack.org/cgit/openstack/nova/tree/nova/virt/libvirt/driver.=
+py?id=3D068d851#n198
+
+>=20
+> Btw, the qemu command generated by libvirt is this one, sorry about that:
+>=20
+> 2017-03-31 17:40:10.956+0000: starting up libvirt version: 1.3.4, package=
+: 0+amos3~u16.04 (Enea Armband Devops Team <armband@enea.com> Fri, 13 Jan 2=
+017 02:06:05 +0100), qemu version: 2.8.50(Debian 1:2.9+amos2~u16.04), hostn=
+ame: node-2.domain.tld
+> LC_ALL=3DC PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin=
+:/bin QEMU_AUDIO_DRV=3Dnone /usr/bin/kvm -name instance-00000076,debug-thre=
+ads=3Don -S -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/lib=
+virt/qemu/domain-14-instance-00000076/master-key.aes -machine virt-2.8,acce=
+l=3Dkvm,usb=3Doff,gic-version=3D3 -cpu host -m 256 -realtime mlock=3Doff -s=
+mp 1,sockets=3D1,cores=3D1,threads=3D1 -uuid 2812f3c9-f564-499b-a8c7-e9e7cc=
+f24143 -no-user-config -nodefaults -chardev socket,id=3Dcharmonitor,path=3D=
+/var/lib/libvirt/qemu/domain-14-instance-00000076/monitor.sock,server,nowai=
+t -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc,dr=
+iftfix=3Dslew -no-shutdown -boot strict=3Don -kernel /var/lib/nova/instance=
+s/2812f3c9-f564-499b-a8c7-e9e7ccf24143/kernel -initrd /var/lib/nova/instanc=
+es/2812f3c9-f564-499b-a8c7-e9e7ccf24143/ramdisk -append 'root=3D/dev/vda1 r=
+w rootwait console=3Dtty0 console=3DttyS0 console=3DttyAMA0' -device i82801=
+b11-bridge,id=3Dpci.1,bus=3Dpcie.0,addr=3D0x1 -device pci-bridge,chassis_nr=
+=3D2,id=3Dpci.2,bus=3Dpci.1,addr=3D0x0 -usb -drive file=3D/var/lib/nova/ins=
+tances/2812f3c9-f564-499b-a8c7-e9e7ccf24143/disk,format=3Dqcow2,if=3Dnone,i=
+d=3Ddrive-virtio-disk0,cache=3Dnone,aio=3Dnative -device virtio-blk-device,=
+scsi=3Doff,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1 -driv=
+e file=3D/var/lib/nova/instances/2812f3c9-f564-499b-a8c7-e9e7ccf24143/disk.=
+config,format=3Draw,if=3Dnone,id=3Ddrive-virtio-disk1,cache=3Dnone,aio=3Dna=
+tive -device virtio-blk-device,scsi=3Doff,drive=3Ddrive-virtio-disk1,id=3Dv=
+irtio-disk1 -netdev tap,fd=3D27,id=3Dhostnet0 -device virtio-net-device,net=
+dev=3Dhostnet0,id=3Dnet0,mac=3Dfa:16:3e:82:0a:2b -serial file:/var/lib/nova=
+/instances/2812f3c9-f564-499b-a8c7-e9e7ccf24143/console.log -serial pty -vn=
+c 0.0.0.0:0 -k en-us -device VGA,id=3Dvideo0,vgamem_mb=3D16,bus=3Dpci.2,add=
+r=3D0x1 -device virtio-balloon-device,id=3Dballoon0 -msg timestamp=3Don
+> Domain id=3D14 is tainted: high-privileges
+
+[...]
+
+
+--=20
+/kashyap
