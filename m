@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1curxT-0004dC-6h
-	for qemu-devel@nongnu.org; Sun, 02 Apr 2017 22:43:08 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1curxV-0004dI-2R
+	for qemu-devel@nongnu.org; Sun, 02 Apr 2017 22:43:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1curxR-0005jr-T0
-	for qemu-devel@nongnu.org; Sun, 02 Apr 2017 22:43:07 -0400
-Date: Mon, 3 Apr 2017 12:18:56 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1curxR-0005ji-Sm
+	for qemu-devel@nongnu.org; Sun, 02 Apr 2017 22:43:09 -0400
+Date: Mon, 3 Apr 2017 12:27:58 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170403021856.GA12906@umbus.fritz.box>
-References: <1490795611-4762-6-git-send-email-clg@kaod.org>
-	<1490862500-26192-1-git-send-email-clg@kaod.org>
+Message-ID: <20170403022758.GA10997@umbus.fritz.box>
+References: <20170401123741.38469-1-aik@ozlabs.ru>
+	<20170401123741.38469-3-aik@ozlabs.ru>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="zhXaljGHf11kAtnf"
+	protocol="application/pgp-signature"; boundary="/04w6evG8XlLl3ft"
 Content-Disposition: inline
-In-Reply-To: <1490862500-26192-1-git-send-email-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v4.1 5/9] ppc/pnv: create the ICP object
- under PnvCore
+In-Reply-To: <20170401123741.38469-3-aik@ozlabs.ru>
+Subject: Re: [Qemu-devel] [RFC PATCH qemu v3 2/4] vfio-pci: Reorder
+ group-to-container attaching
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,140 +25,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 
---zhXaljGHf11kAtnf
-Content-Type: text/plain; charset=iso-8859-1
+--/04w6evG8XlLl3ft
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 30, 2017 at 10:28:20AM +0200, C=E9dric Le Goater wrote:
-> Each thread of a core is linked to an ICP. This allocates a PnvICPState
-> object before the PowerPCCPU object is realized and lets the XICSFabric
-> do the store under the 'intc' backlink when xics_cpu_setup() is
-> called.
+On Sat, Apr 01, 2017 at 11:37:39PM +1100, Alexey Kardashevskiy wrote:
+> At the moment VFIO PCI device initialization works as follows:
+> vfio_realize
+> 	vfio_get_group
+> 		vfio_connect_container
+> 			register memory listeners (1)
+> 			update QEMU groups lists
+> 		vfio_kvm_device_add_group
 >=20
-> This modeling removes the need of maintaining an array of ICP objects
-> under the PowerNV machine and also simplifies the XICSFabric icp_get()
-> handler.
+> Then (example for pseries) the machine reset hook triggers region_add()
+> for all regions where listeners from (1) are listening:
 >=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> ppc_spapr_reset
+> 	spapr_phb_reset
+> 		spapr_tce_table_enable
+> 			memory_region_add_subregion
+> 				vfio_listener_region_add
+> 					vfio_spapr_create_window
+>=20
+> This scheme works fine until we need to handle VFIO PCI device hotplug
+> _and_ we want to enable in-kernel acceleration on, i.e. after PCI hotplug
+> we need a place to call
+> ioctl(vfio_kvm_device_fd, KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE).
+> Since the ioctl needs a LIOBN fd (from sPAPRTCETable) and a IOMMU group fd
+> (from VFIOGroup), vfio_listener_region_add() seems to be the only place
+> for this ioctl().
+>=20
+> However this only works during boot time because the machine reset
+> happens strictly after all devices are finalized. When hotplug happens,
+> vfio_listener_region_add() is called when a memory listener is registered
+> but when this happens:
+> 1. new group is not added to the container->group_list yet;
+> 2. VFIO KVM device is unaware of the new IOMMU group.
+>=20
+> This moves bits around to have all necessary VFIO infrastructure
+> in place for both initial startup and hotplug cases.
+>=20
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
+> Changes:
+> v2:
+> * moved container->initialized back to its correct location
+> * added missing QLIST_REMOVE()
+> ---
+>  hw/vfio/common.c | 19 +++++++++++--------
+>  1 file changed, 11 insertions(+), 8 deletions(-)
 >=20
->  Changes since v4:
->=20
->  - moved the creation of PnvICPState object before the PowerPCCPU
->    object is realized to handle correctly errors.
-> =20
->  Changes since v3:
->=20
->  - removed the array of ICP objects from under the PowerNV machine and
->    handled the allocation of the PnvICPState object for each thread
->    when the PowerPCCPU object is realized.
->=20
->  hw/ppc/pnv.c      |  2 ++
->  hw/ppc/pnv_core.c | 27 +++++++++++++++++++++++++--
->  2 files changed, 27 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index 3fa722af82e6..9505ca7dc09a 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -691,6 +691,8 @@ static void pnv_chip_realize(DeviceState *dev, Error =
-**errp)
->          object_property_set_int(OBJECT(pnv_core),
->                                  pcc->core_pir(chip, core_hwid),
->                                  "pir", &error_fatal);
-> +        object_property_add_const_link(OBJECT(pnv_core), "xics",
-> +                                       qdev_get_machine(), &error_fatal);
->          object_property_set_bool(OBJECT(pnv_core), true, "realized",
->                                   &error_fatal);
->          object_unref(OBJECT(pnv_core));
-> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-> index d79d530b4881..1b7ec70f033d 100644
-> --- a/hw/ppc/pnv_core.c
-> +++ b/hw/ppc/pnv_core.c
-> @@ -25,6 +25,7 @@
->  #include "hw/ppc/pnv.h"
->  #include "hw/ppc/pnv_core.h"
->  #include "hw/ppc/pnv_xscom.h"
-> +#include "hw/ppc/xics.h"
-> =20
->  static void powernv_cpu_reset(void *opaque)
->  {
-> @@ -110,23 +111,37 @@ static const MemoryRegionOps pnv_core_xscom_ops =3D=
- {
->      .endianness =3D DEVICE_BIG_ENDIAN,
->  };
-> =20
-> -static void pnv_core_realize_child(Object *child, Error **errp)
-> +static void pnv_core_realize_child(Object *child, XICSFabric *xi, Error =
-**errp)
->  {
->      Error *local_err =3D NULL;
->      CPUState *cs =3D CPU(child);
->      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> +    Object *obj;
-> +
-> +    obj =3D object_new(TYPE_PNV_ICP);
-> +    object_property_add_child(OBJECT(cpu), "icp", obj, NULL);
-> +    object_property_add_const_link(obj, "xics", OBJECT(xi), &error_abort=
-);
-> +    object_property_set_bool(obj, true, "realized", &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> =20
->      object_property_set_bool(child, true, "realized", &local_err);
->      if (local_err) {
-> +        object_unparent(obj);
->          error_propagate(errp, local_err);
->          return;
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index ab95db689c..e8188eb3d5 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -1087,6 +1087,14 @@ static int vfio_connect_container(VFIOGroup *group=
+, AddressSpace *as,
+>          goto free_container_exit;
 >      }
 > =20
->      powernv_cpu_init(cpu, &local_err);
->      if (local_err) {
-> +        object_unparent(obj);
->          error_propagate(errp, local_err);
->          return;
->      }
+> +    vfio_kvm_device_add_group(group);
 > +
-> +    xics_cpu_setup(xi, cpu, ICP(obj));
->  }
-> =20
->  static void pnv_core_realize(DeviceState *dev, Error **errp)
-> @@ -140,6 +155,14 @@ static void pnv_core_realize(DeviceState *dev, Error=
- **errp)
->      void *obj;
->      int i, j;
->      char name[32];
-> +    Object *xi;
+> +    QLIST_INIT(&container->group_list);
+> +    QLIST_INSERT_HEAD(&space->containers, container, next);
 > +
-> +    xi =3D object_property_get_link(OBJECT(dev), "xics", &local_err);
-> +    if (!xi) {
-> +        error_setg(errp, "%s: required link 'xics' not found: %s",
-> +                   __func__, error_get_pretty(local_err));
-> +        return;
-> +    }
+> +    group->container =3D container;
+> +    QLIST_INSERT_HEAD(&container->group_list, group, container_next);
+> +
+>      container->listener =3D vfio_memory_listener;
 > =20
->      pc->threads =3D g_malloc0(size * cc->nr_threads);
->      for (i =3D 0; i < cc->nr_threads; i++) {
-> @@ -160,7 +183,7 @@ static void pnv_core_realize(DeviceState *dev, Error =
-**errp)
->      for (j =3D 0; j < cc->nr_threads; j++) {
->          obj =3D pc->threads + j * size;
+>      memory_listener_register(&container->listener, container->space->as);
+> @@ -1100,14 +1108,11 @@ static int vfio_connect_container(VFIOGroup *grou=
+p, AddressSpace *as,
 > =20
-> -        pnv_core_realize_child(obj, &local_err);
-> +        pnv_core_realize_child(obj, XICS_FABRIC(xi), &local_err);
->          if (local_err) {
->              goto err;
->          }
+>      container->initialized =3D true;
+> =20
+> -    QLIST_INIT(&container->group_list);
+> -    QLIST_INSERT_HEAD(&space->containers, container, next);
+> -
+> -    group->container =3D container;
+> -    QLIST_INSERT_HEAD(&container->group_list, group, container_next);
+> -
+>      return 0;
+>  listener_release_exit:
+> +    QLIST_REMOVE(group, container_next);
+> +    QLIST_REMOVE(container, next);
+> +    vfio_kvm_device_del_group(group);
+>      vfio_listener_release(container);
+> =20
+>  free_container_exit:
+> @@ -1212,8 +1217,6 @@ VFIOGroup *vfio_get_group(int groupid, AddressSpace=
+ *as, Error **errp)
+> =20
+>      QLIST_INSERT_HEAD(&vfio_group_list, group, next);
+> =20
+> -    vfio_kvm_device_add_group(group);
+> -
+>      return group;
+> =20
+>  close_fd_exit:
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -166,25 +140,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---zhXaljGHf11kAtnf
+--/04w6evG8XlLl3ft
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJY4bENAAoJEGw4ysog2bOS4nwQAOcL7f2szXzIOX0h+WeItFk+
-5/1LPVbwq+7gFGGCb1hAe8hWjdeDs1YEbGPeFZkkZMzKeFkpmXKyRRh7rT5WXOep
-uMGvetkNXY5Xj4jQ9cUi1NktQKQjc6MLRTAwALC+UXw9TPr6ep7wfPZfw8B73h/8
-XDFiBBHtvYiKUWmHGbVfrZ8OfNTps+WvkKhhdadqJCZMPWLrR9jgNA46ZbMoIDL7
-rEzc/ZU34Ovt8L0CEwismyU2Jb61XmIudo9XCkaO6OdpEDz0PRnibF75C3DJGT7y
-RdEfrtGdoIBeQKPnwO2ULHn3LNrurnxF0SHx25brXjFK4sb77JC63AlEa7MVt+yK
-Ci7iPyS6HzCh9CxOow9Jjd5AyAJMEnxZvzpVIWY7IiMAidn6ZFafnKKe4NFEnBUh
-pG9mRfyL1Z/jLaOWWlHep8fvYM1EvwAmOTJBFLUXwvADcBO5uXghbEWMtV7iX/OY
-j72jdsGEY34CAxQAUktioREzmaIqWCngdmR3W3yikmQGjA26U/rt9edwDeNoPy5G
-MZDSHkiY1if5hhM/cLLclzEC6iNtzbDVdtR6OhIvdu4VAFNX29uZG/fEHzhIMOiq
-DPG6tnfZEelOaHTovbC6TMh3YbxT6PngRjlzSoxU4crgWDXNSF6MpNSvmOmfbYvh
-C3PCZZmfGWDKtWeIML/H
-=CTYE
+iQIcBAEBCAAGBQJY4bMuAAoJEGw4ysog2bOSrAsQAOXOjkOQgX9tlDv8Q84M2Fvd
+w7zXVb3fNUJ0txQufJJmIrOB23UEs1PtwgF30ZgOh9n1uPSzrK+dwpC2hr9ZGXvz
+RapHUVb3tuzxpdTsDn89Jt/KM77OtBrJaGhN8d89HP9ki99RSdXcP5MLV9WPmat6
+f4V6KHx4V+/uCOze8JEJB66mKb06q2KyQMFNYI212KGGs1y11xtcnqQovXRb5K0O
+wjbhDO+BJA5ivGOlEnbFnXgw7yhwzrpDRKi8+ExbEGgSk3a5TAyRC8/jGMRW+0UD
+HHRbG5KqUsheU7JMki3i6AaRJeWZIFbMkmfq4hBt6ihdDJ9uR2pqjkpmPt/MKiVQ
+iwfQ/X1lrAlWps5r1AdiuTF0v+e6k3qtGxFtYGy9v/SQgo5aQuhZ2kkUcMU21hSt
+1r/lTn+xfZ5k0M+TIiJVJ+BrLHIZLdxtU5rSuPj+8AbhnsHsLaWndmyLgZKIv6Ih
+tXMR4Q8orqznVR+HBiFKfluIWPj94rFA7LmdcyGEGsik+8PMOrbgtUyJKJxSkrMG
+95OEy7v73cumf3YvXAvtpIxKDCWntmmfhBK1J+a1IOs9jEuQ/lvdsptfrkiFiVcw
+4+cOKI1dSDfGeHBop5bGtqOpwEWUsPaIE6I/ZzDtqsLt52CEHK+MdvOdCG9ul109
+X8WWX0DhYuXRQAO8WpRd
+=jabP
 -----END PGP SIGNATURE-----
 
---zhXaljGHf11kAtnf--
+--/04w6evG8XlLl3ft--
