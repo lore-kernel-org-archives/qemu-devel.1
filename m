@@ -1,34 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cv9sF-0000Pr-SL
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 17:50:57 -0400
+	(envelope-from <laurent@vivier.eu>) id 1cvBq9-0007kP-F6
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 19:56:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cv9sA-0005iH-Tl
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 17:50:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49342)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cv9sA-0005hA-Mt
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 17:50:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cv9s7-0003vr-Mw
-	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 21:50:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2A8632E8197
-	for <qemu-devel@nongnu.org>; Mon,  3 Apr 2017 21:50:45 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 03 Apr 2017 21:40:56 -0000
-From: sh-dvl <1678466@bugs.launchpad.net>
-Reply-To: Bug 1678466 <1678466@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170401120201.1125.46046.malonedeb@gac.canonical.com>
-Message-Id: <20170403214056.25630.82621.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1678466] Re: using x-vga=on with vfio-pci leads
- to segfault
+	(envelope-from <laurent@vivier.eu>) id 1cvBq4-0002ST-KC
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 19:56:53 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:52740)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cvBq4-0002Rd-9x
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 19:56:48 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Tue,  4 Apr 2017 01:56:35 +0200
+Message-Id: <20170403235636.5647-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH v3 0/1] slirp: add SOCKS5 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,140 +21,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, Laurent Vivier <laurent@vivier.eu>
 
-well but even if it's unsupported it shouldn't segfault...
+This patch implements the SOCKS5 client part for "-net user" backend.
 
-the other card is nearly the same
-this one is a GeForce 7300 GS, the other a GeForce 7300 GT
+It allows to route all internet traffic of the virtual machine
+to a SOCKS5 server.
 
-I think, the above output was done with "lspci -vv", but I've do it again:
-lspci -vv for the "bad card" is:
+But all the local traffic (to the host) is sent to the host.
+It is needed because this SOCKS5 client doesn't route UDP traffic,
+and this allows to use the host DNS server.
 
-01:00.0 VGA compatible controller: NVIDIA Corporation G72 [GeForce 7300 GS]=
- (rev a1) (prog-if 00 [VGA controller])
-	Subsystem: Gigabyte Technology Co., Ltd Device 342a
-	Flags: fast devsel, IRQ 16
-	Memory at de000000 (32-bit, non-prefetchable) [disabled] [size=3D16M]
-	Memory at c0000000 (64-bit, prefetchable) [disabled] [size=3D256M]
-	Memory at dd000000 (64-bit, non-prefetchable) [disabled] [size=3D16M]
-	Expansion ROM at df000000 [disabled] [size=3D128K]
-	Capabilities: [60] Power Management version 2
-	Capabilities: [68] MSI: Enable- Count=3D1/1 Maskable- 64bit+
-	Capabilities: [78] Express Endpoint, MSI 00
-	Capabilities: [100] Virtual Channel
-	Capabilities: [128] Power Budgeting <?>
-	Kernel driver in use: vfio-pci
+I've tested this using public SOCKS5 proxy list found on the WEB, and
+using TOR server on my host.
 
+Used with TOR, all the TCP connections are sent to the TOR network and
+this allows to insert a virtual machine directly in the TOR network
+without needing more configuration in the virtual machine.
 
-and for the "good" card:
-07:00.0 VGA compatible controller: NVIDIA Corporation G73 [GeForce 7300 GT]=
- (rev a1) (prog-if 00 [VGA controller])
-	Subsystem: CardExpert Technology Device 1401
-	Flags: fast devsel, IRQ 16
-	Memory at db000000 (32-bit, non-prefetchable) [disabled] [size=3D16M]
-	Memory at b0000000 (64-bit, prefetchable) [disabled] [size=3D256M]
-	Memory at da000000 (64-bit, non-prefetchable) [disabled] [size=3D16M]
-	I/O ports at e000 [disabled] [size=3D128]
-	Expansion ROM at dc000000 [disabled] [size=3D128K]
-	Capabilities: [60] Power Management version 2
-	Capabilities: [68] MSI: Enable- Count=3D1/1 Maskable- 64bit+
-	Capabilities: [78] Express Endpoint, MSI 00
-	Capabilities: [100] Virtual Channel
-	Capabilities: [128] Power Budgeting <?>
-	Kernel driver in use: vfio-pci
+But be aware that all DNS requests will be sent to the host that can
+forward them to internet with its own IP address. So confidentiality
+will not be as good as with the TOR browser which hides in the TOR
+network all the DNS requests.
 
-your're right that the I/O-Port is not shown for the "bad" card, even I
-don't know why. Maybe because the card's bios-routine saw the other or
-vice versa.
+If you want to test this:
 
-nevertheless, segfaults are not nice...
+- with a public SOCKS5 server, ask google for "socks5 proxy address"
+  and start QEMU with, for instance:
 
--- =
+  qemu-system-x86_64 -net nic,model=e1000 -net user,proxy-server=46.105.121.37:63066 ...
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1678466
+  if needed, you can provide user/password using secret objects framework:
+  "-object secret,id=sec0,data=password,format=raw \
+   -net user,...,proxy-user=user,proxy-secretid=sec0"
 
-Title:
-  using x-vga=3Don with vfio-pci leads to segfault
+- with a local TOR proxy:
 
-Status in QEMU:
-  New
+  sudo systemctl start tor
+  qemu-system-x86_64 -net nic,model=e1000 -net user,proxy-server=localhost:9050 ...
 
-Bug description:
-  bug occures at least with qemu 2.8.0 and 2.8.1 in 64bit-system
+You can check your IP address is the one of the proxy by connecting
+to http://check.torproject.org with a browser inside the VM.
 
-  stripped cmd for minimal config:
-  qemu-system-i386 -m 2048 -M q35  -enable-kvm -nodefaults -nodefconfig -de=
-vice ioh3420,bus=3Dpcie.0,addr=3D0x9,multifunction=3Don,port=3D1,chassis=3D=
-1,id=3Droot.1 -device vfio-pci,host=3D01:00.0,bus=3Droot.1,addr=3D01.0,x-vg=
-a=3Don
+v3:
+  - rewrite SOCKS5 functions from scratch and drop code from nmap/ncat
+  - don't drop the IPv6 UDP local traffic
+  - don't pass to the proxy the IPv6 TCP local traffic
+  - add some comments...
 
-  Backtrace is:
-  #0  0x00005555557ca836 in memory_region_update_container_subregions (subr=
-egion=3D0x55555828f2f0) at qemu-2.8.1/memory.c:2030
-  #1  0x00005555557ca9dc in memory_region_add_subregion_common (mr=3D0x0, o=
-ffset=3D8, subregion=3D0x55555828f2f0) at qemu-2.8.1/memory.c:2049
-  #2  0x00005555557caa9a in memory_region_add_subregion_overlap (mr=3D0x0, =
-offset=3D8, subregion=3D0x55555828f2f0, priority=3D1) at qemu-2.8.1/memory.=
-c:2066
-  #3  0x0000555555832e48 in vfio_probe_nvidia_bar5_quirk (vdev=3D0x55555805=
-aef0, nr=3D5) at qemu-2.8.1/hw/vfio/pci-quirks.c:689
-  #4  0x0000555555835433 in vfio_bar_quirk_setup (vdev=3D0x55555805aef0, nr=
-=3D5) at qemu-2.8.1/hw/vfio/pci-quirks.c:1652
-  #5  0x000055555582f122 in vfio_realize (pdev=3D0x55555805aef0, errp=3D0x7=
-fffffffdc78) at qemu-2.8.1/hw/vfio/pci.c:2777
-  #6  0x0000555555a86195 in pci_qdev_realize (qdev=3D0x55555805aef0, errp=
-=3D0x7fffffffdcf0) at hw/pci/pci.c:1966
-  #7  0x00005555559be7b7 in device_set_realized (obj=3D0x55555805aef0, valu=
-e=3Dtrue, errp=3D0x7fffffffdeb0) at hw/core/qdev.c:918
-  #8  0x0000555555bb017f in property_set_bool (obj=3D0x55555805aef0, v=3D0x=
-55555805ced0, name=3D0x555556071b56 "realized", opaque=3D0x555557f15860, er=
-rp=3D0x7fffffffdeb0) at qom/object.c:1854
-  #9  0x0000555555bae2e6 in object_property_set (obj=3D0x55555805aef0, v=3D=
-0x55555805ced0, name=3D0x555556071b56 "realized", errp=3D0x7fffffffdeb0) at=
- qom/object.c:1088
-  #10 0x0000555555bb184f in object_property_set_qobject (obj=3D0x55555805ae=
-f0, value=3D0x55555805cd70, name=3D0x555556071b56 "realized", errp=3D0x7fff=
-ffffdeb0) at qom/qom-qobject.c:27
-  #11 0x0000555555bae637 in object_property_set_bool (obj=3D0x55555805aef0,=
- value=3Dtrue, name=3D0x555556071b56 "realized", errp=3D0x7fffffffdeb0) at =
-qom/object.c:1157
-  #12 0x00005555558fee4b in qdev_device_add (opts=3D0x555556b15160, errp=3D=
-0x7fffffffdf28) at qdev-monitor.c:623
-  #13 0x00005555559142c1 in device_init_func (opaque=3D0x0, opts=3D0x555556=
-b15160, errp=3D0x0) at vl.c:2373
-  #14 0x0000555555cc3bb7 in qemu_opts_foreach (list=3D0x555556548b80 <qemu_=
-device_opts>, func=3D0x555555914283 <device_init_func>, opaque=3D0x0, errp=
-=3D0x0) at util/qemu-option.c:1116
-  #15 0x00005555559198aa in main (argc=3D12, argv=3D0x7fffffffe388, envp=3D=
-0x7fffffffe3f0) at vl.c:4574
+v2:
+  - use secret objects framework to provide password
+  - add documentation for new parameters in qapi-schema.json
+  - s/passwd/password/g
+  - I didn't move proxy paramaters to a substruct as I didn't
+    find a way to set them from the command line :(
 
-  as I can see, it happens during initialization of the device-option.
+Laurent Vivier (1):
+  slirp: add SOCKS5 support
 
-  seems that the code tries to loop over a memory-region mr, which is
-  null from at least three calls before it crashes.
+ net/slirp.c         |  39 ++++++-
+ qapi-schema.json    |   9 ++
+ qemu-options.hx     |  11 ++
+ slirp/Makefile.objs |   2 +-
+ slirp/ip_icmp.c     |   2 +-
+ slirp/libslirp.h    |   3 +
+ slirp/slirp.c       |  68 ++++++++++-
+ slirp/slirp.h       |   6 +
+ slirp/socket.h      |   4 +
+ slirp/socks5.c      | 328 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ slirp/socks5.h      |  24 ++++
+ slirp/tcp_subr.c    |  22 +++-
+ slirp/udp.c         |   9 ++
+ slirp/udp6.c        |   8 ++
+ 14 files changed, 524 insertions(+), 11 deletions(-)
+ create mode 100644 slirp/socks5.c
+ create mode 100644 slirp/socks5.h
 
-  because there seems to be special handling for nvidia-cards, here're the =
-pci-infos of the card:
-  01:00.0 VGA compatible controller [0300]: NVIDIA Corporation G72 [GeForce=
- 7300 GS] [10de:01df] (rev a1) (prog-if 00 [VGA controller])
-  	Subsystem: Gigabyte Technology Co., Ltd Device [1458:342a]
-  	Flags: fast devsel, IRQ 16
-  	Memory at de000000 (32-bit, non-prefetchable) [disabled] [size=3D16M]
-  	Memory at c0000000 (64-bit, prefetchable) [disabled] [size=3D256M]
-  	Memory at dd000000 (64-bit, non-prefetchable) [disabled] [size=3D16M]
-  	Expansion ROM at df000000 [disabled] [size=3D128K]
-  	Capabilities: [60] Power Management version 2
-  	Capabilities: [68] MSI: Enable- Count=3D1/1 Maskable- 64bit+
-  	Capabilities: [78] Express Endpoint, MSI 00
-  	Capabilities: [100] Virtual Channel
-  	Capabilities: [128] Power Budgeting <?>
-  	Kernel driver in use: vfio-pci
-
-  at least with a similar card in another slot the crash does not occure.
-  (sorry, can't change the slots at the moment)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1678466/+subscriptions
+-- 
+2.9.3
