@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cv5w1-0008DP-2V
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:38:34 -0400
+	(envelope-from <no-reply@patchew.org>) id 1cv61U-0000yG-GV
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:44:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cv5vx-0005P4-JA
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:38:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57822)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cv5vx-0005N8-61
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:38:29 -0400
-Date: Mon, 3 Apr 2017 18:38:23 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170403173823.GD2112@work-vm>
-References: <1490965817-16913-1-git-send-email-amarnath.valluri@intel.com>
-	<20170403170738.GC2768@redhat.com>
-	<1491240750.10884.10.camel@intel.com>
+	(envelope-from <no-reply@patchew.org>) id 1cv61T-0000G4-E7
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:44:12 -0400
+Resent-Message-Id: <E1cv61T-0000G4-E7@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21433)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cv61T-0000Fk-4s
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:44:11 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <149124144091.20118.8616163572397788829@6c512846dbc7>
+In-Reply-To: <20170403171843.3363-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1491240750.10884.10.camel@intel.com>
-Subject: Re: [Qemu-devel] [PATCH 0/7] Provide support for the software TPM
- emulator
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 3 Apr 2017 10:44:01 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v5 0/5 for 2.10] SLIRP VMStatification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,68 +28,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Patrick Ohly <patrick.ohly@intel.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org, stefanb@linux.vnet.ibm.com
+To: dgilbert@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, samuel.thibault@gnu.org, jan.kiszka@siemens.com, quintela@redhat.com
 
-* Patrick Ohly (patrick.ohly@intel.com) wrote:
-> On Mon, 2017-04-03 at 18:07 +0100, Daniel P. Berrange wrote:
-> > On Fri, Mar 31, 2017 at 04:10:09PM +0300, Amarnath Valluri wrote:
-> > > Briefly, Theses set of patches introduces:
-> > >  - new TPM backend driver to support software TPM emulators(swtpm(1)).
-> > >  - and few supported fixes/enhancements/cleanup to existing tpm backend code.
-> > > 
-> > > The similar idea was initiated earliar(2) by Stefan Berger(CCed) with slightly
-> > > different approach, using CUSE. As swtpm has excellent support for unix domain
-> > > sockets, hence this implementation uses unix domain sockets to communicate with
-> > > swtpm.
-> > > 
-> > > When Qemu is configured with 'emulator' tpm backend, it spawns 'swtpm' and
-> > > communicates its via Unix domain sockets.
-> > 
-> > I'm not convinced that having QEMU spawning swtpm itself is a desirable
-> > approach, as it means QEMU needs to have all the privileges that swtpm
-> > will need, so that swtpm can inherit them.
-> 
-> The intended usage is for emulating a TPM in software, for example to do
-> automated testing of an OS which requires a TPM or to do software
-> development in an environment were it is easy to reset the TPM. That
-> doesn't require any privileges, because swtpm just reads and writes
-> files owned by the user who calls qemu.
-
-Being able to do fancier permissions would let you use it in a real VM
-situation so that the virtual guest sees it's own TPM; you would then
-want to protect the TPM data files pretty carefully - for example stop
-one compromised guest sniffing around the TPM data for another.
-
-> >  At the very least I think we
-> > need to have a way to disable this spawning, so it can connect to a
-> > pre-existing swtpm process that's been spawned ahead of time. This will
-> > let us have stricter privilege separation.
-> 
-> Which privileges and use cases did you have in mind?
-> 
-> swtpm already can be started so that it listens on a Unix domain socket,
-> instead of inheriting something from the parent. It shouldn't be hard to
-> add that as an alternative to the existing spawning code.
-> 
-> I can think of one use case: spawning swtpm in advance under debugging
-> tools like gdb or valgrind. Is that enough justification for adding more
-> code?
-
-Or you could just remove the spawning code and use existing sockets; less code!
-
-Dave
-
-> -- 
-> Best Regards, Patrick Ohly
-> 
-> The content of this message is my personal opinion only and although
-> I am an employee of Intel, the statements I make here in no way
-> represent Intel's position on the issue, nor am I authorized to speak
-> on behalf of Intel on this matter.
-> 
-> 
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzA0MDMxNzE4NDMuMzM2My0xLWRnaWxiZXJ0QHJlZGhhdC5jb20KVHlwZTogc2VyaWVzClN1Ympl
+Y3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjUgMC81IGZvciAyLjEwXSBTTElSUCBWTVN0YXRpZmlj
+YXRpb24KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpu
+PTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgoj
+IFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
+CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9n
+IC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAg
+ICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0
+PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Njcmlw
+dHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAg
+ICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVT
+VCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRi
+ZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQog
+LSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTcwNDAxMDA0NjI0LjMwODg2LTEtZWhhYmtv
+c3RAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTcwNDAxMDA0NjI0LjMwODg2LTEtZWhhYmtvc3RA
+cmVkaGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwNDAzMTcxODQzLjMz
+NjMtMS1kZ2lsYmVydEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxNzA0MDMxNzE4NDMuMzM2My0x
+LWRnaWxiZXJ0QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpiODVm
+MGQwIHNsaXJwOiBWTVN0YXRpZnkgcmVtYWluaW5nIGV4Y2VwdCBmb3IgbG9vcAo2NjY0ZTVlIHNs
+aXJwOiBWTVN0YXRpZnkgc29ja2V0IGxldmVsCmI3MzVhOTggc2xpcnA6IENvbW1vbiBsaG9zdC9m
+aG9zdCB1bmlvbgowNDk4MzZjIHNsaXJwOiBWTVN0YXRpZnkgc2J1Zgo0M2NiZDE4IHNsaXJwOiBW
+TVN0YXRlIGNvbnZlcnNpb247IHRjcGNiCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQ
+QVRDSCAxLzU6IHNsaXJwOiBWTVN0YXRlIGNvbnZlcnNpb247IHRjcGNiLi4uCkVSUk9SOiBjb2Rl
+IGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzIxMTogRklMRTogc2xpcnAvdGNwX3Zhci5o
+OjUxOgorXkl1aW50OF90IHRfZm9yY2U7XkleSS8qIDEgaWYgZm9yY2luZyBvdXQgYSBieXRlICov
+JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjIxOiBGSUxFOiBz
+bGlycC90Y3BfdmFyLmg6MTEyOgorXkl1aW50OF90Xkl0X29vYmZsYWdzO15JXkkvKiBoYXZlIHNv
+bWUgKi8kCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMyMjI6IEZJ
+TEU6IHNsaXJwL3RjcF92YXIuaDoxMTM6CiteSXVpbnQ4X3ReSXRfaW9iYzteSV5JXkkvKiBpbnB1
+dCBjaGFyYWN0ZXIgKi8kCgp0b3RhbDogMyBlcnJvcnMsIDAgd2FybmluZ3MsIDE5NSBsaW5lcyBj
+aGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
+IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
+aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQ
+QVRDSCAyLzU6IHNsaXJwOiBWTVN0YXRpZnkgc2J1Zi4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hv
+dWxkIG5ldmVyIHVzZSB0YWJzCiMyNjogRklMRTogc2xpcnAvc2J1Zi5oOjE1OgorXkl1aW50MzJf
+dCBzYl9jYzteSV5JLyogYWN0dWFsIGNoYXJzIGluIGJ1ZmZlciAqLyQKCkVSUk9SOiBjb2RlIGlu
+ZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzI3OiBGSUxFOiBzbGlycC9zYnVmLmg6MTY6Cite
+SXVpbnQzMl90IHNiX2RhdGFsZW47XkkvKiBMZW5ndGggb2YgZGF0YSAgKi8kCgp0b3RhbDogMiBl
+cnJvcnMsIDAgd2FybmluZ3MsIDE1NSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzLzU6IHNsaXJwOiBDb21tb24gbGhv
+c3QvZmhvc3QgdW5pb24uLi4KQ2hlY2tpbmcgUEFUQ0ggNC81OiBzbGlycDogVk1TdGF0aWZ5IHNv
+Y2tldCBsZXZlbC4uLgpFUlJPUjogaWYgdGhpcyBjb2RlIGlzIHJlZHVuZGFudCBjb25zaWRlciBy
+ZW1vdmluZyBpdAojMTQ4OiBGSUxFOiBzbGlycC9zbGlycC5jOjEzNTI6CisjaWYgMAoKdG90YWw6
+IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNjkgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
+ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
+S1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNS81OiBzbGlycDogVk1TdGF0
+aWZ5IHJlbWFpbmluZyBleGNlcHQgZm9yIGxvb3AuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
+IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
+dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
+ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
