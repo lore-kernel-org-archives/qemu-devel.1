@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cv1Y1-0001gb-CA
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:57:30 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cv1YP-0001xZ-UP
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:57:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cv1Y0-0005mq-Nc
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:57:29 -0400
-Received: from mail-lf0-x22d.google.com ([2a00:1450:4010:c07::22d]:32923)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cv1YM-0005xH-2a
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:57:54 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:35941)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cv1Y0-0005mA-H4
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:57:28 -0400
-Received: by mail-lf0-x22d.google.com with SMTP id h125so72648607lfe.0
-	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 05:57:28 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cv1YL-0005wl-VY
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:57:50 -0400
+Received: by mail-qk0-x244.google.com with SMTP id r140so7889391qke.3
+	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 05:57:49 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1491034725-23968-1-git-send-email-peterx@redhat.com>
+	<1491034725-23968-2-git-send-email-peterx@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <998cd006-532d-513c-38d1-6b0a638b1850@amsat.org>
+Date: Mon, 3 Apr 2017 09:57:45 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170401004624.30886-14-ehabkost@redhat.com>
-References: <20170401004624.30886-1-ehabkost@redhat.com>
-	<20170401004624.30886-14-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 3 Apr 2017 13:57:06 +0100
-Message-ID: <CAFEAcA9bRwneynDYg6Lgowe21=rh8+miSZhqzmW81VLWrxafhQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [RFC 13/19] unimplemented-device: Remove
- user_creatable flag
+In-Reply-To: <1491034725-23968-2-git-send-email-peterx@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] migration: set current_active_state
+ once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +35,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Laszlo Ersek <lersek@redhat.com>, Alexander Graf <agraf@suse.de>, Marcel Apfelbaum <marcel@redhat.com>, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-On 1 April 2017 at 01:46, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> unimplemented-device needs to be created and mapped using
-> create_unimplemented_device()
+On 04/01/2017 05:18 AM, Peter Xu wrote:
+> We set it right above this one. No need to set it twice.
+>
+> CC: Juan Quintela <quintela@redhat.com>
+> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-This isn't correct -- create_unimplemented_device() is
-just a utility function; you can create, configure, initialize
-and map it "by hand" if you want.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> and won't work with -device.
-
-This is true, though, as with any sysbus device that has
-a memory region.
-
-> Remove the user_creatable flag from the device class.
-
-I'm obviously missing context, because in master it doesn't
-have code to set the user_creatable flag in the first place.
-Wouldn't it be better to just not add that, rather than
-add it and then delete it?
-
-thanks
--- PMM
+> ---
+>  migration/migration.c | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 54060f7..f9f4d98 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1938,7 +1938,6 @@ static void *migration_thread(void *opaque)
+>      qemu_savevm_state_begin(s->to_dst_file, &s->params);
+>
+>      s->setup_time = qemu_clock_get_ms(QEMU_CLOCK_HOST) - setup_start;
+> -    current_active_state = MIGRATION_STATUS_ACTIVE;
+>      migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
+>                        MIGRATION_STATUS_ACTIVE);
+>
+>
