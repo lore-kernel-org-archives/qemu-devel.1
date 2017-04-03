@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <patrick.ohly@intel.com>) id 1cv5qK-0006Y5-8S
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:32:42 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1cv5s0-0007Df-BA
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:34:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <patrick.ohly@intel.com>) id 1cv5qG-0002zk-S5
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:32:40 -0400
-Received: from mail-it0-x230.google.com ([2607:f8b0:4001:c0b::230]:37933)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <patrick.ohly@intel.com>)
-	id 1cv5qG-0002xj-Iu
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:32:36 -0400
-Received: by mail-it0-x230.google.com with SMTP id y18so46775527itc.1
-	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 10:32:35 -0700 (PDT)
-Message-ID: <1491240750.10884.10.camel@intel.com>
-From: Patrick Ohly <patrick.ohly@intel.com>
-Date: Mon, 03 Apr 2017 19:32:30 +0200
-In-Reply-To: <20170403170738.GC2768@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1cv5rw-0003x8-TM
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:34:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57628)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cv5rw-0003wP-NH
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:34:20 -0400
+Date: Mon, 3 Apr 2017 18:34:15 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170403173415.GC2112@work-vm>
 References: <1490965817-16913-1-git-send-email-amarnath.valluri@intel.com>
 	<20170403170738.GC2768@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170403170738.GC2768@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH 0/7] Provide support for the software TPM
  emulator
 List-Id: <qemu-devel.nongnu.org>
@@ -32,9 +29,9 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org, stefanb@linux.vnet.ibm.com
+Cc: Amarnath Valluri <amarnath.valluri@intel.com>, patrick.ohly@intel.com, qemu-devel@nongnu.org, stefanb@linux.vnet.ibm.com
 
-On Mon, 2017-04-03 at 18:07 +0100, Daniel P. Berrange wrote:
+* Daniel P. Berrange (berrange@redhat.com) wrote:
 > On Fri, Mar 31, 2017 at 04:10:09PM +0300, Amarnath Valluri wrote:
 > > Briefly, Theses set of patches introduces:
 > >  - new TPM backend driver to support software TPM emulators(swtpm(1)).
@@ -50,33 +47,25 @@ On Mon, 2017-04-03 at 18:07 +0100, Daniel P. Berrange wrote:
 > 
 > I'm not convinced that having QEMU spawning swtpm itself is a desirable
 > approach, as it means QEMU needs to have all the privileges that swtpm
-> will need, so that swtpm can inherit them.
-
-The intended usage is for emulating a TPM in software, for example to do
-automated testing of an OS which requires a TPM or to do software
-development in an environment were it is easy to reset the TPM. That
-doesn't require any privileges, because swtpm just reads and writes
-files owned by the user who calls qemu.
-
->  At the very least I think we
+> will need, so that swtpm can inherit them. At the very least I think we
 > need to have a way to disable this spawning, so it can connect to a
 > pre-existing swtpm process that's been spawned ahead of time. This will
 > let us have stricter privilege separation.
 
-Which privileges and use cases did you have in mind?
+I agree, just letting something external start the swtpm and using
+a chardev to talk to it would seem to work wouldn't it?
 
-swtpm already can be started so that it listens on a Unix domain socket,
-instead of inheriting something from the parent. It shouldn't be hard to
-add that as an alternative to the existing spawning code.
+However, generally I prefer this mechanism of avoiding CUSE.
 
-I can think of one use case: spawning swtpm in advance under debugging
-tools like gdb or valgrind. Is that enough justification for adding more
-code?
+Dave
 
--- 
-Best Regards, Patrick Ohly
 
-The content of this message is my personal opinion only and although
-I am an employee of Intel, the statements I make here in no way
-represent Intel's position on the issue, nor am I authorized to speak
-on behalf of Intel on this matter.
+> Regards,
+> Daniel
+> -- 
+> |: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+> |: http://libvirt.org              -o-             http://virt-manager.org :|
+> |: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
