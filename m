@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cv1fv-00083A-Ut
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:05:41 -0400
+	(envelope-from <jcody@redhat.com>) id 1cv1gZ-00006E-8P
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:06:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cv1fu-0002g7-KF
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:05:39 -0400
-Date: Mon, 3 Apr 2017 14:05:17 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170403130517.GX2768@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1490879707-6060-1-git-send-email-armbru@redhat.com>
-	<1490879707-6060-4-git-send-email-armbru@redhat.com>
-	<20170403114855.GV2768@redhat.com>
-	<6516cecc-4f5f-9255-3890-7fed57ab7eb4@redhat.com>
+	(envelope-from <jcody@redhat.com>) id 1cv1gW-00031c-2k
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:06:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43804)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1cv1gV-00030T-T1
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:06:16 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3ECB27E9F2
+	for <qemu-devel@nongnu.org>; Mon,  3 Apr 2017 13:06:14 +0000 (UTC)
+Date: Mon, 3 Apr 2017 09:06:12 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170403130612.GB3117@localhost.localdomain>
+References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
+	<1490621195-2228-10-git-send-email-armbru@redhat.com>
+	<20170403113703.GS2768@redhat.com>
+	<44b23727-f5d4-0d64-0694-85c6dd601431@redhat.com>
+	<20170403130442.GW2768@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6516cecc-4f5f-9255-3890-7fed57ab7eb4@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2 for-2.9 03/10] io vnc sockets: Clean up
- SocketAddressKind switches
+In-Reply-To: <20170403130442.GW2768@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v3 for-2.9 09/11] rbd: Revert -blockdev
+ parameter password-secret
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,62 +37,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, pbonzini@redhat.com, namei.unix@gmail.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, jdurgin@redhat.com
 
-On Mon, Apr 03, 2017 at 02:50:12PM +0200, Max Reitz wrote:
-> On 03.04.2017 13:48, Daniel P. Berrange wrote:
-> > On Thu, Mar 30, 2017 at 03:15:00PM +0200, Markus Armbruster wrote:
-> >> We have quite a few switches over SocketAddressKind.  Some have case
-> >> labels for all enumeration values, others rely on a default label.
-> >> Some abort when the value isn't a valid SocketAddressKind, others
-> >> report an error then.
-> >>
-> >> Unify as follows.  Always provide case labels for all enumeration
-> >> values, to clarify intent.  Abort when the value isn't a valid
-> >> SocketAddressKind, because the program state is messed up then.
-> >>
-> >> Improve a few error messages while there.
-> >>
-> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> >> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> >> ---
-> >>  io/dns-resolver.c   |  7 +++++--
-> >>  ui/vnc.c            | 18 ++++++++++++------
-> >>  util/qemu-sockets.c |  4 +---
-> >>  3 files changed, 18 insertions(+), 11 deletions(-)
-> >>
-> >> diff --git a/io/dns-resolver.c b/io/dns-resolver.c
-> >> index 0ac6b23..a407075 100644
-> >> --- a/io/dns-resolver.c
-> >> +++ b/io/dns-resolver.c
-> >> @@ -164,9 +164,12 @@ int qio_dns_resolver_lookup_sync(QIODNSResolver *resolver,
-> >>                                                  addrs,
-> >>                                                  errp);
-> >>  
-> >> +    case SOCKET_ADDRESS_KIND_FD:
-> >> +        error_setg(errp, "Unsupported socket address type 'fd'");
-> >> +        return -1;
-> >> +
-> >>      default:
-> >> -        error_setg(errp, "Unknown socket address kind");
-> >> -        return -1;
-> >> +        abort();
-> >>      }
-> >>  }
+On Mon, Apr 03, 2017 at 02:04:42PM +0100, Daniel P. Berrange wrote:
+> On Mon, Apr 03, 2017 at 02:42:48PM +0200, Max Reitz wrote:
+> > On 03.04.2017 13:37, Daniel P. Berrange wrote:
+> > > On Mon, Mar 27, 2017 at 03:26:33PM +0200, Markus Armbruster wrote:
+> > >> This reverts a part of commit 8a47e8e.  We're having second thoughts
+> > >> on the QAPI schema (and thus the external interface), and haven't
+> > >> reached consensus, yet.  Issues include:
+> > >>
+> > >> * BlockdevOptionsRbd member @password-secret isn't actually a
+> > >>   password, it's a key generated by Ceph.
+> > >>
+> > >> * We're not sure where member @password-secret belongs (see the
+> > >>   previous commit).
+> > >>
+> > >> * How @password-secret interacts with settings from a configuration
+> > >>   file specified with @conf is undocumented.  I suspect it's untested,
+> > >>   too.
+> > >>
+> > >> Let's avoid painting ourselves into a corner now, and revert the
+> > >> feature for 2.9.
+> > >>
+> > >> Note that users can still configure an authentication key with a
+> > >> configuration file.  They probably do that anyway if they use Ceph
+> > >> outside QEMU as well.
+> > > 
+> > > NB, this makes blockdev-add largely useless for RBD from libvirt's POV,
+> > > since we rely on the password-secret facility working to support apps
+> > > like openstack which won't configure the global config file for RBD.
+> > > 
+> > > Not a regression though, since blockdev-add is new - just means we won't
+> > > be able to use the new feature yet :-(
 > > 
-> > Just repeating my v1 comments - this needs to be treating KIND_FD as a no-op,
-> > rather than raising an error.
+> > How does it make blockdev-add totally useless? The only thing you cannot
+> > do is set passwords for rbd. Can this not be added as a new feature in
+> > the future?
 > 
-> Do you want to write a patch? Markus is on vacation and since this is
-> not a regression, dropping this patch from my queue wouldn't do any good
-> either.
+> Sure, if you want to run an rbd server without any auth its usable, just
+> that isn't something you really want todo from a security pov.
+>
 
-Ok, i'll do a follow up.
-
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+What about using a keyring for rbd?
