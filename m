@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cv1bR-0004W8-LG
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:01:11 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cv1ea-0006wf-Mu
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:04:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cv1bN-0007vY-LO
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:01:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40438)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1cv1bN-0007ty-CX
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:00:57 -0400
-Date: Mon, 3 Apr 2017 15:00:41 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170403130041.GD5036@noname.str.redhat.com>
-References: <C885D0FF6A27744DB0B822E32DF6EF029B1CA14A@SESTOEX04.enea.se>
-	<9b05e60a-f8c2-ea4f-6be4-f17c0adec510@redhat.com>
-	<20170403081542.GA5036@noname.str.redhat.com>
-	<33ced3d3-acd7-2945-518d-465a4621b151@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1cv1eX-0001wZ-HC
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:04:16 -0400
+References: <20170331170512.10381-1-mreitz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <c38b9069-a2e9-961a-6201-c44b25a5c906@redhat.com>
+Date: Mon, 3 Apr 2017 15:03:40 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="mvpLiMfbWzRoNl4x"
-Content-Disposition: inline
-In-Reply-To: <33ced3d3-acd7-2945-518d-465a4621b151@redhat.com>
-Subject: Re: [Qemu-devel] nbd: Possible regression in 2.9 RCs
+In-Reply-To: <20170331170512.10381-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="QrEKjglNbaOimQPtgbo8druFvrroBVusK"
+Subject: Re: [Qemu-devel] [PATCH for-2.9] block/parallels: Avoid overflows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,80 +23,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Ciprian Barbu <Ciprian.Barbu@enea.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, pkrempa@redhat.com, Alexandru Avadanii <Alexandru.Avadanii@enea.com>, Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>, svc-armband <armband@enea.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-
---mvpLiMfbWzRoNl4x
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--QrEKjglNbaOimQPtgbo8druFvrroBVusK
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ "Denis V . Lunev" <den@openvz.org>, Kevin Wolf <kwolf@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c38b9069-a2e9-961a-6201-c44b25a5c906@redhat.com>
+Subject: Re: [PATCH for-2.9] block/parallels: Avoid overflows
+References: <20170331170512.10381-1-mreitz@redhat.com>
+In-Reply-To: <20170331170512.10381-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
 Content-Transfer-Encoding: quoted-printable
 
-Am 03.04.2017 um 14:39 hat Max Reitz geschrieben:
-> On 03.04.2017 10:15, Kevin Wolf wrote:
-> > Am 31.03.2017 um 19:43 hat Max Reitz geschrieben:
+On 31.03.2017 19:05, Max Reitz wrote:
+> Change the types of variables in allocate_clusters() to int64_t so we d=
+o
+> not have to worry about potential overflows.
 >=20
-> [...]
+> Add an assertion that our accesses to s->bat[] do not result in a buffe=
+r
+> overflow and that the implicit conversion performed when invoking
+> bat_entry_off() does not result in an integer overflow.
 >=20
-> >> So in theory all that's necessary is to set share-rw=3Don for the devi=
-ce
-> >> in the management layer. But I'm not sure whether that's practical.
-> >=20
-> > Yes, libvirt needs to provide this option if the guest supports sharing.
-> > If it doesn't support sharing, rejecting a read-write NBD client seems
-> > correct to me.
-> >=20
-> > Peter, Eric, what is the status on the libvirt side here?
-> >=20
-> >> As for just allowing the NBD server write access to the device... To me
-> >> that appears pretty difficult from an implementation perspective. We
-> >> assert that nobody can write without having requested write access and
-> >> we make sure that nobody can request write access without it being
-> >> allowed. Making an exception for NBD seems very difficult and would
-> >> probably mean we'd have to drop the assertion for write accesses altog=
-ether.
-> >=20
-> > Making an exception would simply be wrong.
->=20
-> Indeed. That is why it would be so difficult.
->=20
-> The question remains whether it is practical not to make an exception.
-> As far as I know, libvirt is only guaranteed to support older qemu
-> versions, not necessarily future ones. So we should be allowed to break
-> existing use cases here until libvirt is updated (assuming it is
-> possible for libvirt to express "guest device allows shared writes" as
-> an option for its next release).
+> Coverity-id: 1307776
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+> This supercedes Peter's patch "block/parallels.c: avoid integer overflo=
+w
+> in allocate_clusters()".
+> ---
+>  block/parallels.c | 19 +++++++++++++------
+>  1 file changed, 13 insertions(+), 6 deletions(-)
 
-If I understand correctly, this is a case of incoming live migration,
-i.e. the virtio-blk device which is blocking the writes to the image
-doesn't really belong to a running guest yet.
+Thanks for reviewing, applied to my block branch:
 
-So if we need to make an exception (and actually reading the context
-makes it appear so), I guess it would have to be that devices actually
-can share the write permission during incoming migration, but not any
-more later (unless the share-rw flag is set).
+https://github.com/XanClic/qemu/commits/block
 
-Kevin
+Max
 
---mvpLiMfbWzRoNl4x
-Content-Type: application/pgp-signature
+
+--QrEKjglNbaOimQPtgbo8druFvrroBVusK
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
 
-iQIcBAEBAgAGBQJY4kd4AAoJEH8JsnLIjy/W9o4P/RUqjBEhMbYj2bSeUmRVAYmp
-0JUtIUiggO21DIr14CXzcRAi3ZNV1eMReWeRtV7WeC+oBioIzFr+p8QPp98C6JfP
-+kvBedh7aJ/2IaqgOR0IjUdfmWewjg4yfdal+afyoRRTpFP7XMWoyjx/D5DJiStt
-YXiplkn5pOqTGSy4+nhKOPc36a/8qemkLnfq4zRluLLz19voaXaDAy7FLcoF/n2K
-blIw+77P3Mi1XG0LzaQCWZUl2py9xaqgC7l2/f09lm3pZ19+MGh3k5Jr2dISIy/u
-KQ4sLBrhsB8CgeT1YjjiBlESyUblo7vQ9X0GAcHveDIMt4UQUZED1rz+08jpXY/A
-y/04Hr7z3vKnzD96E/VUHdSkMPDHRl1FYC46XFxEyCYMSxhYiBBmHlMUibpLfmqQ
-VRPD/9wOzg6RHhEuwL9jK9sPqQfEmaUfukEbQ0GEiW5a24m+2EbBo5/NnORuEvyG
-KFMnEbnlsslpLKWkiAzroNMYk21sAsSIn6G4d3vc+7D6aFLA9wH2975W41sM3tmh
-G/oOt3kVGAU2S0ioqMkMT0nHS1F7w1OG68t/UvYfhvgI/c7/1+3V4WnrrXRh/Gwt
-guXP6WRkP0XMIFCoFwGAMAUNXu3dcTe1sl/5WS7ANwot2pWU4pCYFypfpDRAbfxo
-FIh8y56Sg/XRp6Ogck4i
-=DOEa
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljiSCwSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A34wH/3O2LzhinzV7zV1NnwM3O7l5pQEOB7Fs
+zcUGkEXzM7rYhQGWfzyboXPevYdLzUqYwMW+f4zwe4vUtkFdbppWKN3VarwH+oIu
+slAU1OHRYzMQGIqBlSYqCfMo4QBzppDoR9KyQLnQiWUfTeAz6lGL0ZPm2vGDPcHo
+a20bD7x5uSBqJeB4vys75PFX+wWpDKrRioJbXZzwXjVbh22MOaTcWfEVCgZd2sa5
+g42TdEBl2lHG5MOcZcIRia0OodpxHe+EO2RnPoeOwwnxKXjm0iIOvC1aCtTylhax
+++Qu9N1BHDnjUTY7r7XdosSkRxPTJ8vUOI3SHbp788fl9BlGgZ1z4AM=
+=pn1x
 -----END PGP SIGNATURE-----
 
---mvpLiMfbWzRoNl4x--
+--QrEKjglNbaOimQPtgbo8druFvrroBVusK--
