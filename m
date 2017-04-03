@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cv408-0006St-BA
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 11:34:44 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cv40H-0006ZC-TN
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 11:34:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cv406-0007Tw-RO
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 11:34:40 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cv40C-0007WC-Sy
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 11:34:49 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon,  3 Apr 2017 17:33:50 +0200
-Message-Id: <20170403153355.19722-11-mreitz@redhat.com>
+Date: Mon,  3 Apr 2017 17:33:53 +0200
+Message-Id: <20170403153355.19722-14-mreitz@redhat.com>
 In-Reply-To: <20170403153355.19722-1-mreitz@redhat.com>
 References: <20170403153355.19722-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 10/15] sheepdog: Fix blockdev-add
+Subject: [Qemu-devel] [PULL 13/15] qcow2: Discard unaligned tail when wiping
+ image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,206 +23,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-From: Markus Armbruster <armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
 
-Commit 831acdc "sheepdog: Implement bdrv_parse_filename()" and commit
-d282f34 "sheepdog: Support blockdev-add" have different ideas on how
-the QemuOpts parameters for the server address are named.  Fix that.
-While there, rename BlockdevOptionsSheepdog member addr to server, for
-consistency with BlockdevOptionsSsh, BlockdevOptionsGluster,
-BlockdevOptionsNbd.
+There is a subtle difference between the fast (qcow2v3 with no
+extra data) and slow path (qcow2v2 format [aka 0.10], or when a
+snapshot is present) of qcow2_make_empty().  The slow path fails
+to discard the final (partial) cluster of an unaligned image.
 
-Commit 831acdc's example becomes
+The problem stems from the fact that qcow2_discard_clusters() was
+silently ignoring sub-cluster head and tail on unaligned requests.
+A quick audit of all callers shows that qcow2_snapshot_create() has
+always passed a cluster-aligned request since the call was added
+in commit 1ebf561; qcow2_co_pdiscard() has passed a cluster-aligned
+request since commit ecdbead taught the block layer about preferred
+discard alignment; and qcow2_make_empty() was fixed to pass an
+aligned start (but not necessarily end) in commit a3e1505.
 
-    --drive driver=sheepdog,server.type=inet,server.host=fido,server.port=7000,vdi=dolly
+Asserting that the start is always aligned also points out that we
+now have a dead check: rounding the end offset down can never result
+in a value less than the aligned start offset (the check was rendered
+dead with commit ecdbead).  Meanwhile, we do not want to round the
+end cluster down in the one case of the end offset matching the
+(unaligned) file size - that final partial cluster should still be
+discarded.
 
-instead of
+With those fixes in place, the fast and slow paths are back in sync
+at discarding an entire image; the next patch will update
+qemu-iotests to ensure we don't regress.
 
-    --drive driver=sheepdog,host=fido,vdi=dolly
+Note that bdrv_co_pdiscard ignores ALL partial cluster requests,
+including the partial cluster at the end of an image; it can be
+argued that the partial cluster at the end should be special-cased
+so that a guest issuing discard requests at proper alignments
+everywhere else can likewise empty the entire image.  But that
+optimization is left for another day.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Tested-by: Kashyap Chamarthy <kchamart@redhat.com>
-Message-id: 1490895797-29094-10-git-send-email-armbru@redhat.com
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-id: 20170331185356.2479-3-eblake@redhat.com
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qapi/block-core.json |  4 +--
- block/sheepdog.c     | 90 +++++++++++++++++++++++++++++++++-------------------
- 2 files changed, 60 insertions(+), 34 deletions(-)
+ block/qcow2-cluster.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index e4d8a63575..033457ce86 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2623,7 +2623,7 @@
- # Driver specific block device options for sheepdog
- #
- # @vdi:         Virtual disk image name
--# @addr:        The Sheepdog server to connect to
-+# @server:      The Sheepdog server to connect to
- # @snap-id:     Snapshot ID
- # @tag:         Snapshot tag name
- #
-@@ -2632,7 +2632,7 @@
- # Since: 2.9
- ##
- { 'struct': 'BlockdevOptionsSheepdog',
--  'data': { 'addr': 'SocketAddressFlat',
-+  'data': { 'server': 'SocketAddressFlat',
-             'vdi': 'str',
-             '*snap-id': 'uint32',
-             '*tag': 'str' } }
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index 89e98edab6..1b71fc81ec 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -13,9 +13,11 @@
-  */
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 78c11d4948..100398c565 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -1519,12 +1519,10 @@ int qcow2_discard_clusters(BlockDriverState *bs, uint64_t offset,
  
- #include "qemu/osdep.h"
-+#include "qapi-visit.h"
- #include "qapi/error.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qint.h"
-+#include "qapi/qobject-input-visitor.h"
- #include "qemu/uri.h"
- #include "qemu/error-report.h"
- #include "qemu/sockets.h"
-@@ -547,6 +549,47 @@ static SocketAddress *sd_socket_address(const char *path,
-     return addr;
- }
+     end_offset = offset + (nb_sectors << BDRV_SECTOR_BITS);
  
-+static SocketAddress *sd_server_config(QDict *options, Error **errp)
-+{
-+    QDict *server = NULL;
-+    QObject *crumpled_server = NULL;
-+    Visitor *iv = NULL;
-+    SocketAddressFlat *saddr_flat = NULL;
-+    SocketAddress *saddr = NULL;
-+    Error *local_err = NULL;
-+
-+    qdict_extract_subqdict(options, &server, "server.");
-+
-+    crumpled_server = qdict_crumple(server, errp);
-+    if (!crumpled_server) {
-+        goto done;
-+    }
-+
-+    /*
-+     * FIXME .numeric, .to, .ipv4 or .ipv6 don't work with -drive
-+     * server.type=inet.  .to doesn't matter, it's ignored anyway.
-+     * That's because when @options come from -blockdev or
-+     * blockdev_add, members are typed according to the QAPI schema,
-+     * but when they come from -drive, they're all QString.  The
-+     * visitor expects the former.
-+     */
-+    iv = qobject_input_visitor_new(crumpled_server);
-+    visit_type_SocketAddressFlat(iv, NULL, &saddr_flat, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        goto done;
-+    }
-+
-+    saddr = socket_address_crumple(saddr_flat);
-+
-+done:
-+    qapi_free_SocketAddressFlat(saddr_flat);
-+    visit_free(iv);
-+    qobject_decref(crumpled_server);
-+    QDECREF(server);
-+    return saddr;
-+}
-+
- /* Return -EIO in case of error, file descriptor on success */
- static int connect_to_sdog(BDRVSheepdogState *s, Error **errp)
- {
-@@ -1174,15 +1217,15 @@ static void sd_parse_filename(const char *filename, QDict *options,
-         return;
-     }
- 
--    if (cfg.host) {
--        qdict_set_default_str(options, "host", cfg.host);
--    }
--    if (cfg.port) {
--        snprintf(buf, sizeof(buf), "%d", cfg.port);
--        qdict_set_default_str(options, "port", buf);
--    }
-     if (cfg.path) {
--        qdict_set_default_str(options, "path", cfg.path);
-+        qdict_set_default_str(options, "server.path", cfg.path);
-+        qdict_set_default_str(options, "server.type", "unix");
-+    } else {
-+        qdict_set_default_str(options, "server.type", "inet");
-+        qdict_set_default_str(options, "server.host",
-+                              cfg.host ?: SD_DEFAULT_ADDR);
-+        snprintf(buf, sizeof(buf), "%d", cfg.port ?: SD_DEFAULT_PORT);
-+        qdict_set_default_str(options, "server.port", buf);
-     }
-     qdict_set_default_str(options, "vdi", cfg.vdi);
-     qdict_set_default_str(options, "tag", cfg.tag);
-@@ -1510,18 +1553,6 @@ static QemuOptsList runtime_opts = {
-     .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
-     .desc = {
-         {
--            .name = "host",
--            .type = QEMU_OPT_STRING,
--        },
--        {
--            .name = "port",
--            .type = QEMU_OPT_STRING,
--        },
--        {
--            .name = "path",
--            .type = QEMU_OPT_STRING,
--        },
--        {
-             .name = "vdi",
-             .type = QEMU_OPT_STRING,
-         },
-@@ -1543,7 +1574,7 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
-     int ret, fd;
-     uint32_t vid = 0;
-     BDRVSheepdogState *s = bs->opaque;
--    const char *host, *port, *path, *vdi, *snap_id_str, *tag;
-+    const char *vdi, *snap_id_str, *tag;
-     uint64_t snap_id;
-     char *buf = NULL;
-     QemuOpts *opts;
-@@ -1560,20 +1591,17 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
-         goto err_no_fd;
-     }
- 
--    host = qemu_opt_get(opts, "host");
--    port = qemu_opt_get(opts, "port");
--    path = qemu_opt_get(opts, "path");
-+    s->addr = sd_server_config(options, errp);
-+    if (!s->addr) {
-+        ret = -EINVAL;
-+        goto err_no_fd;
-+    }
-+
-     vdi = qemu_opt_get(opts, "vdi");
-     snap_id_str = qemu_opt_get(opts, "snap-id");
-     snap_id = qemu_opt_get_number(opts, "snap-id", CURRENT_VDI_ID);
-     tag = qemu_opt_get(opts, "tag");
- 
--    if ((host || port) && path) {
--        error_setg(errp, "can't use 'path' together with 'host' or 'port'");
--        ret = -EINVAL;
--        goto err_no_fd;
--    }
+-    /* Round start up and end down */
+-    offset = align_offset(offset, s->cluster_size);
+-    end_offset = start_of_cluster(s, end_offset);
 -
-     if (!vdi) {
-         error_setg(errp, "parameter 'vdi' is missing");
-         ret = -EINVAL;
-@@ -1604,8 +1632,6 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
-         goto err_no_fd;
+-    if (offset > end_offset) {
+-        return 0;
++    /* The caller must cluster-align start; round end down except at EOF */
++    assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
++    if (end_offset != bs->total_sectors * BDRV_SECTOR_SIZE) {
++        end_offset = start_of_cluster(s, end_offset);
      }
  
--    s->addr = sd_socket_address(path, host, port);
--
-     QLIST_INIT(&s->inflight_aio_head);
-     QLIST_INIT(&s->failed_aio_head);
-     QLIST_INIT(&s->inflight_aiocb_head);
+     nb_clusters = size_to_clusters(s, end_offset - offset);
 -- 
 2.12.1
