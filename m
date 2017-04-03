@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1cv6T4-0008Mh-RP
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:12:44 -0400
+	(envelope-from <stefanha@gmail.com>) id 1cv6TW-0000EK-8A
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:13:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1cv6T1-0000ZZ-NO
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:12:42 -0400
-Received: from mail-bl2nam02on0112.outbound.protection.outlook.com
-	([104.47.38.112]:48303
-	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Andrew.Baumann@microsoft.com>)
-	id 1cv6T1-0000Xr-AY
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:12:39 -0400
-From: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Date: Mon, 3 Apr 2017 18:12:34 +0000
-Message-ID: <CY1PR21MB005570FEDC849D13F608915B9E080@CY1PR21MB0055.namprd21.prod.outlook.com>
-References: <20170324220141.10104-1-Andrew.Baumann@microsoft.com>
-	<20170403162016.6c033dd8.cornelia.huck@de.ibm.com>
-In-Reply-To: <20170403162016.6c033dd8.cornelia.huck@de.ibm.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <stefanha@gmail.com>) id 1cv6TT-0000z4-2i
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:13:10 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:33961)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cv6TS-0000yX-Rn
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:13:06 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id t20so1651042wra.1
+	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 11:13:06 -0700 (PDT)
+Date: Mon, 3 Apr 2017 19:13:03 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170403181303.GH3539@stefanha-x1.localdomain>
+References: <1490984431.18559.2.camel@yandex.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] win32: replace custom mutex and condition
- variable with native primitives
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="oyqLL/JqMvClXZi1"
+Content-Disposition: inline
+In-Reply-To: <1490984431.18559.2.camel@yandex.com>
+Subject: Re: [Qemu-devel] Project idea
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,49 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Andrey Shedel <ashedel@microsoft.com>, Stefan Weil <sw@weilnetz.de>, Paolo Bonzini <pbonzini@redhat.com>
+To: Mihai-Drosi Caju <cajum.bugs@yandex.com>
+Cc: qemu-devel@nongnu.org
 
-> From: Cornelia Huck [mailto:cornelia.huck@de.ibm.com]
-> Sent: Monday, 3 April 2017 7:20
->=20
-> On Fri, 24 Mar 2017 15:01:41 -0700
-> Andrew Baumann <Andrew.Baumann@microsoft.com> wrote:
->=20
-> > From: Andrey Shedel <ashedel@microsoft.com>
-> >
-> > The multithreaded TCG implementation exposed deadlocks in the win32
-> > condition variables: as implemented, qemu_cond_broadcast waited on
-> > receivers, whereas the pthreads API it was intended to emulate does
-> > not. This was causing a deadlock because broadcast was called while
-> > holding the IO lock, as well as all possible waiters blocked on the
-> > same lock.
-> >
-> > This patch replaces all the custom synchronisation code for mutexes
-> > and condition variables with native Windows primitives (SRWlocks and
-> > condition variables) with the same semantics as their POSIX
-> > equivalents. To enable that, it requires a Windows Vista or newer host
-> > OS.
-> >
-> > [AB: edited commit message]
-> > Signed-off-by: Andrew Baumann <Andrew.Baumann@microsoft.com>
-> > ---
-> > The major implication of this patch is that it drops support for
-> > pre-Vista versions of Windows. However, those OSes are past their end
-> > of life, and other OSS projects have dropped support. e.g.; the last
-> > Cygwin release supporting XP was in Jun 2016. It doesn't seem like a
-> > good tradeoff to invest effort in fixing broken code needed to support
-> > them, so hopefully this isn't too controversial.
->=20
-> Just a quick question:
->=20
-> I noticed that this breaks builds on an old fc20-based installation I
-> run some mingw cross builds on (getting an undefined reference to
-> `_imp__TryAcquireSRWLockExclusive@4'). I should probably take that as a
-> trigger to update that installation ;), but wanted to confirm that this
-> is expected.
 
-Yes, please try updating your mingw headers. I've done x64 cross-builds fro=
-m Ubuntu 16.04 (WSL) using mingw-w64 4.0.4.
+--oyqLL/JqMvClXZi1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Andrew
+On Fri, Mar 31, 2017 at 09:20:31PM +0300, Mihai-Drosi Caju wrote:
+> I'd be interested in submitting the following ideas:
+> I'd like to enchance qemu's debugging capabilities.
+> I was thinking to add an option to qemu to disable cpu reset on
+> tripple-fault.
+> Or adding support for breakpoints in the GDB stub while using kvm or
+> another accelerator.
+> Or emulating a JTAG port on a pty that would interface with the virtual
+> CPU.
+
+If you wanted to propose a custom project idea for Google Summer of Code
+I'm afraid the application deadline has passed.
+
+Custom project ideas require finding a mentor.  It usually takes at
+least 2 weeks and also requires discussing the details of the project
+idea.
+
+You are welcome to contribute to QEMU outside of GSoC.  Guidelines on
+submitting a patch are here:
+http://wiki.qemu-project.org/Contribute/SubmitAPatch
+
+Stefan
+
+--oyqLL/JqMvClXZi1
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJY4pCvAAoJEJykq7OBq3PIE64H/0CYV6rMRpCEkzM5iAaSdUIn
+GvmgBxS/VMEAL7YPxhbqVE98LupLUgmff0XlYc3VFSLDbJKls+pFhu7C8vHacH3H
+KTGatxYdjdpWRb4j8bzd9ksiXCvvZZn5ZmeXn9d243kumfYYe1C07Nw6YYDZ3Yhm
+zW+NIm/Mu9LUZvN8+N+ZFCdIZsV67L2abeNsnx03I/2ujRFY0gTLihyVpWdgOXvz
+wVO3U5alHxXdycgMIkXNj9v1CmVhRneuOHjwNPm61PIUbvqxc9Z28VVAqwv4nYJN
+7GkgyJZewZxojO8TCnS0cTOGC6cQvVQN/d9QCdwnsRHZ0C5ewGPQzEhruRhFM7I=
+=Oiaj
+-----END PGP SIGNATURE-----
+
+--oyqLL/JqMvClXZi1--
