@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cv7xW-0000D3-Sd
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:48:16 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cv7yt-0001HH-Fj
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:49:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cv7xV-0004tf-TY
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:48:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54100)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cv7xV-0004t3-KL
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:48:13 -0400
-References: <C885D0FF6A27744DB0B822E32DF6EF029B1CA14A@SESTOEX04.enea.se>
-	<9b05e60a-f8c2-ea4f-6be4-f17c0adec510@redhat.com>
-	<20170403081542.GA5036@noname.str.redhat.com>
-	<33ced3d3-acd7-2945-518d-465a4621b151@redhat.com>
-	<20170403130041.GD5036@noname.str.redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3e72904f-c9f9-0ec0-5a32-49be400b7ac3@redhat.com>
-Date: Mon, 3 Apr 2017 14:48:10 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cv7ys-0005f3-F4
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:49:39 -0400
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:34193)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cv7ys-0005eb-7K
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:49:38 -0400
+Received: by mail-wr0-x233.google.com with SMTP id t20so5486948wra.1
+	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 12:49:38 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170403130041.GD5036@noname.str.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="DDLxTc1wMM1ewo2f0OjJm9kdaCD7xmvof"
-Subject: Re: [Qemu-devel] nbd: Possible regression in 2.9 RCs
+In-Reply-To: <20170401004624.30886-4-ehabkost@redhat.com>
+References: <20170401004624.30886-1-ehabkost@redhat.com>
+	<20170401004624.30886-4-ehabkost@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 3 Apr 2017 20:49:16 +0100
+Message-ID: <CAFEAcA_uRHZR0N-=h=eWsDKjZpN4csua1j++wLVfZbsNVpaH5Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [RFC 03/19] sysbus: Set user_creatable=false by
+ default on TYPE_SYS_BUS_DEVICE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,76 +30,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: Ciprian Barbu <Ciprian.Barbu@enea.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, pkrempa@redhat.com, Alexandru Avadanii <Alexandru.Avadanii@enea.com>, Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>, svc-armband <armband@enea.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Laszlo Ersek <lersek@redhat.com>, Alexander Graf <agraf@suse.de>, Marcel Apfelbaum <marcel@redhat.com>, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, Scott Wood <scottwood@freescale.com>, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Gerd Hoffmann <kraxel@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Qemu-block <qemu-block@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Beniamino Galvani <b.galvani@gmail.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "Gabriel L . Somlo" <somlo@cmu.edu>, Igor Mammedov <imammedo@redhat.com>, Prasad J Pandit <pjp@fedoraproject.org>, qemu-arm <qemu-arm@nongnu.org>, Shannon Zhao <zhaoshenglong@huawei.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DDLxTc1wMM1ewo2f0OjJm9kdaCD7xmvof
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: Ciprian Barbu <Ciprian.Barbu@enea.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, pkrempa@redhat.com,
- Alexandru Avadanii <Alexandru.Avadanii@enea.com>,
- Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- svc-armband <armband@enea.com>
-Message-ID: <3e72904f-c9f9-0ec0-5a32-49be400b7ac3@redhat.com>
-Subject: Re: [Qemu-devel] nbd: Possible regression in 2.9 RCs
-References: <C885D0FF6A27744DB0B822E32DF6EF029B1CA14A@SESTOEX04.enea.se>
- <9b05e60a-f8c2-ea4f-6be4-f17c0adec510@redhat.com>
- <20170403081542.GA5036@noname.str.redhat.com>
- <33ced3d3-acd7-2945-518d-465a4621b151@redhat.com>
- <20170403130041.GD5036@noname.str.redhat.com>
-In-Reply-To: <20170403130041.GD5036@noname.str.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 1 April 2017 at 01:46, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> commit 33cd52b5d7b9adfd009e95f07e6c64dd88ae2a31 unset
+> cannot_instantiate_with_device_add_yet in TYPE_SYSBUS, making
+> all kinds of untested devices available to -device and
+> device_add.
+>
+> The problem with that is: setting has_dynamic_sysbus on a
+> machine-type lets it accept all the 288 sysbus device types we
+> have in QEMU, and most of them were never meant to be used with
+> -device. That's a lot of untested code.
+>
+> Fortunately today we have just a few has_dynamic_sysbus=1
+> machines: virt, pc-q35-*, ppce500, and spapr.
+>
+> virt, ppce500, and spapr have extra checks to ensure just a few
+> device types can be instantiated:
+>
+> * virt supports only TYPE_VFIO_CALXEDA_XGMAC, TYPE_VFIO_AMD_XGBE.
+> * ppce500 supports only TYPE_ETSEC_COMMON.
+> * spapr supports only TYPE_SPAPR_PCI_HOST_BRIDGE.
+>
+> q35 has no code to block unsupported sysbus devices, however, and
+> accepts all device types. Fortunately, only the following 20
+> device types are compiled into the qemu-system-x86_64 and
+> qemu-system-i386 binaries:
+>
+> * allwinner-ahci
+> * amd-iommu
+> * cfi.pflash01
+> * esp
+> * fw_cfg_io
+> * fw_cfg_mem
+> * generic-sdhci
+> * hpet
+> * intel-iommu
+> * ioapic
+> * isabus-bridge
+> * kvmclock
+> * kvm-ioapic
+> * kvmvapic
+> * SUNW,fdtwo
+> * sysbus-ahci
+> * sysbus-fdc
+> * sysbus-ohci
+> * unimplemented-device
+> * virtio-mmio
+>
+> Instead of requiring each machine-type with has_dynamic_sysbus=1
+> to implement its own mechanism to block unsupported devices, we
+> can use the user_creatable flag to ensure we won't let the user
+> plug anything that will never work.
 
-On 04/03/2017 08:00 AM, Kevin Wolf wrote:
->> The question remains whether it is practical not to make an exception.=
+How does this work? Which devices can be dynamically
+plugged is machine dependent. You can't dynamically-plug
+an intel-iommu on the ARM virt board, and you can't
+dynamically-plug the vfio-calxeda-xgmac on the spapr
+board, and so on. So I don't see how we can just have
+a flag on the device itself that controls whether
+it can be dynamically plugged.
 
->> As far as I know, libvirt is only guaranteed to support older qemu
->> versions, not necessarily future ones. So we should be allowed to brea=
-k
->> existing use cases here until libvirt is updated (assuming it is
->> possible for libvirt to express "guest device allows shared writes" as=
+So I'm definitely coming around to the opinion that
+it's just a bug in the q35 board that it doesn't have
+any device whitelisting, and we should fix that.
 
->> an option for its next release).
->=20
-> If I understand correctly, this is a case of incoming live migration,
-> i.e. the virtio-blk device which is blocking the writes to the image
-> doesn't really belong to a running guest yet.
->=20
-> So if we need to make an exception (and actually reading the context
-> makes it appear so), I guess it would have to be that devices actually
-> can share the write permission during incoming migration, but not any
-> more later (unless the share-rw flag is set).
-
-That sounds like the right approach - if nbd-server-add can detect that
-it is being invoked during the window between 'qemu -S' and before
-'migrate', and allow the shared-rw at that time, then revoke it at the
-time the migrate command hits.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---DDLxTc1wMM1ewo2f0OjJm9kdaCD7xmvof
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY4qb6AAoJEKeha0olJ0NqKI4H/jK5M60FjzlL7059F2P912TD
-KT8EsLbhCofAohA3N9evJe0ccOzngifCFse8ILDrEIFCpfPEo9IW7B1o5MnBXqVV
-oOvHLhl0lMSN+M/x2trmZ2AMfiXY9HBpoNJGOusKsnXaDP5B2E+hyyua1dMVViok
-NSIANTDLpIG7meODlb4iV/9YzBAAV/CF5EJHDaIRnBJA3bJgox8qTm5BGm0oonyW
-lPxN0rEe4xoveYu4Dswlz01JTnnjcCwLvj328OmVBQWILB2pGz7HTNWEQ4q2/pFM
-zZUAUkRPsr03+mM0wgRBiDaMcHSiHEb4FlTAKIkFBKduSITU/r+TnOibepnhjcM=
-=aQNg
------END PGP SIGNATURE-----
-
---DDLxTc1wMM1ewo2f0OjJm9kdaCD7xmvof--
+thanks
+-- PMM
