@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cv6kk-0002mu-0N
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:30:59 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cv6q7-0004Nl-Ik
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:36:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cv6kf-0000xu-45
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:30:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42734)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cv6ke-0000wt-VT
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:30:53 -0400
-Date: Mon, 3 Apr 2017 15:30:43 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170403183043.GF1910@thinpad.lan.raisama.net>
-References: <20170401004624.30886-1-ehabkost@redhat.com>
-	<20170401004624.30886-14-ehabkost@redhat.com>
-	<CAFEAcA9bRwneynDYg6Lgowe21=rh8+miSZhqzmW81VLWrxafhQ@mail.gmail.com>
-	<20170403133416.GB1910@thinpad.lan.raisama.net>
-	<CAFEAcA-9r=Qktj1Oa6kvCPQrQ4XpPcxb2L4xNcPSfHeB9Ogt6A@mail.gmail.com>
-	<20170403135445.GD1910@thinpad.lan.raisama.net>
-	<CAFEAcA-+imjX_kfxPo6Vue-bX8HZo8ZV8s7XmyTNj7_GTd4Lrg@mail.gmail.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cv6q3-0003Xi-KA
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:36:31 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170403175150.15253-1-mreitz@redhat.com>
+	<20170403175150.15253-2-mreitz@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a464e950-f251-e148-1af9-bdad271571b4@amsat.org>
+Date: Mon, 3 Apr 2017 15:36:22 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-+imjX_kfxPo6Vue-bX8HZo8ZV8s7XmyTNj7_GTd4Lrg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [RFC 13/19] unimplemented-device: Remove
- user_creatable flag
+In-Reply-To: <20170403175150.15253-2-mreitz@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-2.9 1/2] block/mirror: Fix
+ use-after-free
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,50 +28,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Laszlo Ersek <lersek@redhat.com>, Alexander Graf <agraf@suse.de>, Marcel Apfelbaum <marcel@redhat.com>, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-On Mon, Apr 03, 2017 at 03:08:06PM +0100, Peter Maydell wrote:
-> On 3 April 2017 at 14:54, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > On Mon, Apr 03, 2017 at 02:38:15PM +0100, Peter Maydell wrote:
-> >> On 3 April 2017 at 14:34, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >> >> Wouldn't it be better to just not add that, rather than
-> >> >> add it and then delete it?
-> >> >
-> >> > The device was already user-creatable
-> >>
-> >> It doesn't seem to be:
-> >>
-> >>  ./build/x86/arm-softmmu/qemu-system-arm -M virt -device
-> >> unimplemented-device,size=1024,name=foo
-> >> qemu-system-arm: Device unimplemented-device can not be dynamically instantiated
-> >
-> > This restriction is implemented by the "virt" machine, not by the
-> > device type itself.
-> >
-> > This, on the other hand, currently works:
-> >   $ qemu-system-x86_64 -M q35 -device unimplemented-device,size=1024,name=foo
-> 
-> That's a bug in the q35 machine or the handling of -device
-> on non-platform-bus systems, though, isn't it? The default
-> for all sysbus devices has always been "you can't use
-> -device with this", [...]
+nice analysis/catch
 
-This was true until 2014, only. commit
-33cd52b5d7b9adfd009e95f07e6c64dd88ae2a31 changed sys-bus-device
-to have cannot_instantiate_with_device_add_yet=false. See patch
-03/19 for more detailed info.
+On 04/03/2017 02:51 PM, Max Reitz wrote:
+> If @bs does not have any parents, the only reference to @mirror_top_bs
+> will be held by the BlockJob object after the bdrv_unref() following
+> block_job_create(). However, if block_job_create() fails, this reference
+> will not exist and @mirror_top_bs will have been deleted when we
+> goto fail.
+>
+> The issue comes back at all later entries to the fail label: We delete
+> the BlockJob object before rolling back our changes to the node graph.
+> This means that we will delete @mirror_top_bs in the process.
+>
+> All in all, whenever @bs does not have any parents and we go down the
+> fail path we will dereference @mirror_top_bs after it has been deleted.
+>
+> Fix this by invoking bdrv_unref() only when block_job_create() was
+> successful and by bdrv_ref()'ing @mirror_top_bs in the fail path before
+> deleting the BlockJob object. Finally, bdrv_unref() it at the end of the
+> fail path after we actually no longer need it.
+>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 
->               [...] there's never been a requirement to
-> mark them as such separately (because it would require
-> touching the files for a huge number of devices for no
-> particularly good reason when you can default the whole
-> set of devices subclassing SysBusDevice).
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Yes, and this is the whole point of this series. At the end of
-this series, only the few devices that are actually usable with
-some machine will have an explicit user_creatable=true
-assignment. See cover letter for details.
-
--- 
-Eduardo
+> ---
+>  block/mirror.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
+>
+> diff --git a/block/mirror.c b/block/mirror.c
+> index 9e2fecc15e..46ecd38ef0 100644
+> --- a/block/mirror.c
+> +++ b/block/mirror.c
+> @@ -1150,7 +1150,7 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
+>      mirror_top_bs->total_sectors = bs->total_sectors;
+>
+>      /* bdrv_append takes ownership of the mirror_top_bs reference, need to keep
+> -     * it alive until block_job_create() even if bs has no parent. */
+> +     * it alive until block_job_create() succeeds even if bs has no parent. */
+>      bdrv_ref(mirror_top_bs);
+>      bdrv_drained_begin(bs);
+>      bdrv_append(mirror_top_bs, bs, &local_err);
+> @@ -1168,10 +1168,12 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
+>                           BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
+>                           BLK_PERM_WRITE | BLK_PERM_GRAPH_MOD, speed,
+>                           creation_flags, cb, opaque, errp);
+> -    bdrv_unref(mirror_top_bs);
+>      if (!s) {
+>          goto fail;
+>      }
+> +    /* The block job now has a reference to this node */
+> +    bdrv_unref(mirror_top_bs);
+> +
+>      s->source = bs;
+>      s->mirror_top_bs = mirror_top_bs;
+>
+> @@ -1242,6 +1244,10 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
+>
+>  fail:
+>      if (s) {
+> +        /* Make sure this BDS does not go away until we have completed the graph
+> +         * changes below */
+> +        bdrv_ref(mirror_top_bs);
+> +
+>          g_free(s->replaces);
+>          blk_unref(s->target);
+>          block_job_unref(&s->common);
+> @@ -1250,6 +1256,8 @@ fail:
+>      bdrv_child_try_set_perm(mirror_top_bs->backing, 0, BLK_PERM_ALL,
+>                              &error_abort);
+>      bdrv_replace_node(mirror_top_bs, backing_bs(mirror_top_bs), &error_abort);
+> +
+> +    bdrv_unref(mirror_top_bs);
+>  }
+>
+>  void mirror_start(const char *job_id, BlockDriverState *bs,
+>
