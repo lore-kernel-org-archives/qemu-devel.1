@@ -1,14 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cv0MA-0007zO-A5
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 07:41:11 -0400
+	(envelope-from <berrange@redhat.com>) id 1cv0Mt-0008M0-CX
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 07:41:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cv0M6-0003jX-Ul
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 07:41:10 -0400
-From: Laurent Vivier <lvivier@redhat.com>
-Date: Mon,  3 Apr 2017 13:40:44 +0200
-Message-Id: <20170403114044.15762-1-lvivier@redhat.com>
-Subject: [Qemu-devel] [PATCH] virtio-gpu: replace PIXMAN_* by PIXMAN_BE_*
+	(envelope-from <berrange@redhat.com>) id 1cv0Mq-00044w-0u
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 07:41:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39666)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cv0Mp-00044j-Rl
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 07:41:51 -0400
+Date: Mon, 3 Apr 2017 12:41:30 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170403114130.GT2768@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170327182137.7006-1-laurent@vivier.eu>
+	<20170327182137.7006-2-laurent@vivier.eu>
+	<237b2650-da58-c844-d594-390f41e23e65@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <237b2650-da58-c844-d594-390f41e23e65@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] slirp: add SOCKS5 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,70 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Laurent Vivier <laurent@vivier.eu>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
 
-This avoids a "#ifdef HOST_WORDS_BIGENDIAN" and this is the purpose
-of PIXMAN_BE_* macros.
+On Mon, Mar 27, 2017 at 01:41:36PM -0500, Eric Blake wrote:
+> On 03/27/2017 01:21 PM, Laurent Vivier wrote:
+> > When the VM is used behind a firewall, This allows
+> > to use a SOCKS5 proxy server to connect the VM IP stack
+> 
+> "allows to $verb" is not idiomatic English; the correct forms are
+> generally "allows $subject to $verb" or "allows ${verb}ing".  In this
+> case, I'd lean towards "this allows the use of a SOCKS5 proxy server"
+> 
+> > directly to the Internet.
+> > 
+> > This implementation doesn't manage UDP packets, so they
+> > are simply dropped (as with restrict=on), except for
+> > the localhost as we need it for DNS.
+> > 
+> > Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> > ---
+> 
+> > +++ b/qapi-schema.json
+> > @@ -3680,6 +3680,9 @@
+> >      '*ipv6-dns':         'str',
+> >      '*smb':       'str',
+> >      '*smbserver': 'str',
+> > +    '*proxy-server': 'str',
+> > +    '*proxy-user':   'str',
+> > +    '*proxy-passwd': 'str',
+> 
+> Why can't we spell this out as password, instead of abbreviating?
+> Should this hook into the "secrets object" framework so that someone
+> does not have to pass the password in plaintext?
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
----
- hw/display/virtio-gpu.c | 35 ++++++++---------------------------
- 1 file changed, 8 insertions(+), 27 deletions(-)
+Yes.
 
-diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-index 9b530ab..7befcef 100644
---- a/hw/display/virtio-gpu.c
-+++ b/hw/display/virtio-gpu.c
-@@ -258,41 +258,22 @@ void virtio_gpu_get_display_info(VirtIOGPU *g,
- static pixman_format_code_t get_pixman_format(uint32_t virtio_gpu_format)
- {
-     switch (virtio_gpu_format) {
--#ifdef HOST_WORDS_BIGENDIAN
-     case VIRTIO_GPU_FORMAT_B8G8R8X8_UNORM:
--        return PIXMAN_b8g8r8x8;
-+        return PIXMAN_BE_b8g8r8x8;
-     case VIRTIO_GPU_FORMAT_B8G8R8A8_UNORM:
--        return PIXMAN_b8g8r8a8;
-+        return PIXMAN_BE_b8g8r8a8;
-     case VIRTIO_GPU_FORMAT_X8R8G8B8_UNORM:
--        return PIXMAN_x8r8g8b8;
-+        return PIXMAN_BE_x8r8g8b8;
-     case VIRTIO_GPU_FORMAT_A8R8G8B8_UNORM:
--        return PIXMAN_a8r8g8b8;
-+        return PIXMAN_BE_a8r8g8b8;
-     case VIRTIO_GPU_FORMAT_R8G8B8X8_UNORM:
--        return PIXMAN_r8g8b8x8;
-+        return PIXMAN_BE_r8g8b8x8;
-     case VIRTIO_GPU_FORMAT_R8G8B8A8_UNORM:
--        return PIXMAN_r8g8b8a8;
-+        return PIXMAN_BE_r8g8b8a8;
-     case VIRTIO_GPU_FORMAT_X8B8G8R8_UNORM:
--        return PIXMAN_x8b8g8r8;
-+        return PIXMAN_BE_x8b8g8r8;
-     case VIRTIO_GPU_FORMAT_A8B8G8R8_UNORM:
--        return PIXMAN_a8b8g8r8;
--#else
--    case VIRTIO_GPU_FORMAT_B8G8R8X8_UNORM:
--        return PIXMAN_x8r8g8b8;
--    case VIRTIO_GPU_FORMAT_B8G8R8A8_UNORM:
--        return PIXMAN_a8r8g8b8;
--    case VIRTIO_GPU_FORMAT_X8R8G8B8_UNORM:
--        return PIXMAN_b8g8r8x8;
--    case VIRTIO_GPU_FORMAT_A8R8G8B8_UNORM:
--        return PIXMAN_b8g8r8a8;
--    case VIRTIO_GPU_FORMAT_R8G8B8X8_UNORM:
--        return PIXMAN_x8b8g8r8;
--    case VIRTIO_GPU_FORMAT_R8G8B8A8_UNORM:
--        return PIXMAN_a8b8g8r8;
--    case VIRTIO_GPU_FORMAT_X8B8G8R8_UNORM:
--        return PIXMAN_r8g8b8x8;
--    case VIRTIO_GPU_FORMAT_A8B8G8R8_UNORM:
--        return PIXMAN_r8g8b8a8;
--#endif
-+        return PIXMAN_BE_a8b8g8r8;
-     default:
-         return 0;
-     }
+> > +@item proxy-server=@var{addr}:@var{port}[,proxy-user=@var{user},proxy-passwd=@var{passwd}]]
+> 
+> Yes, you DEFINITELY need to hook into the "secrets object" framework to
+> avoid having to pass a password in plaintext on the command line.  Dan
+> Berrange may have more advice on doing that.
+
+Agreed, this needs to use the secrets framework.
+
+Rename 'proxy-password' to 'proxy-password-secret'. It'll provide the ID of
+a secret's object. Given that you can use qcrypto_secret_lookup_as_utf8()
+to get the associated password data. There's a few examples in the code
+eg crypto/tlscredsx509.c is a fairly simple example. Ping me if you want
+more help
+
+Regards,
+Daniel
 -- 
-2.9.3
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
