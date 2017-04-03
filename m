@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1cv75l-0006ls-5M
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:52:42 -0400
+	(envelope-from <eblake@redhat.com>) id 1cv7Bc-0007sk-Ea
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:58:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1cv75h-0002P2-Va
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:52:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53290)
+	(envelope-from <eblake@redhat.com>) id 1cv7BZ-0003za-D9
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:58:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39268)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1cv75h-0002O7-MD
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:52:37 -0400
-Date: Mon, 3 Apr 2017 20:52:32 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20170403185232.jjiuesfxhbfzfivv@eukaryote>
-References: <C885D0FF6A27744DB0B822E32DF6EF029B1CA14A@SESTOEX04.enea.se>
-	<9b05e60a-f8c2-ea4f-6be4-f17c0adec510@redhat.com>
-	<C885D0FF6A27744DB0B822E32DF6EF029B1CA282@SESTOEX04.enea.se>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cv7BZ-0003zO-4C
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 14:58:41 -0400
+References: <1491042326-24335-1-git-send-email-he.chen@linux.intel.com>
+	<20170403083851.u6f7ktakdqtmzwhj@kamzik.brq.redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3d69719c-914e-0538-e816-7a613a6af95e@redhat.com>
+Date: Mon, 3 Apr 2017 13:58:34 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <C885D0FF6A27744DB0B822E32DF6EF029B1CA282@SESTOEX04.enea.se>
-Subject: Re: [Qemu-devel] nbd: Possible regression in 2.9 RCs
+In-Reply-To: <20170403083851.u6f7ktakdqtmzwhj@kamzik.brq.redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="F1vHlx4PkDE7M6pUBnAbom5htDa42LvRo"
+Subject: Re: [Qemu-devel] [PATCH v4] Allow setting NUMA distance for
+ different NUMA nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,68 +29,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ciprian Barbu <Ciprian.Barbu@enea.com>
-Cc: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Alexandru Avadanii <Alexandru.Avadanii@enea.com>, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>, svc-armband <armband@enea.com>
+To: Andrew Jones <drjones@redhat.com>, He Chen <he.chen@linux.intel.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Fri, Mar 31, 2017 at 05:49:52PM +0000, Ciprian Barbu wrote:
-> Hi,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--F1vHlx4PkDE7M6pUBnAbom5htDa42LvRo
+From: Eric Blake <eblake@redhat.com>
+To: Andrew Jones <drjones@redhat.com>, He Chen <he.chen@linux.intel.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster
+ <armbru@redhat.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
+Message-ID: <3d69719c-914e-0538-e816-7a613a6af95e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4] Allow setting NUMA distance for different
+ NUMA nodes
+References: <1491042326-24335-1-git-send-email-he.chen@linux.intel.com>
+ <20170403083851.u6f7ktakdqtmzwhj@kamzik.brq.redhat.com>
+In-Reply-To: <20170403083851.u6f7ktakdqtmzwhj@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-[...]
+On 04/03/2017 03:38 AM, Andrew Jones wrote:
+> On Sat, Apr 01, 2017 at 06:25:26PM +0800, He Chen wrote:
+>> Current, QEMU does not provide a clear command to set vNUMA distance f=
+or
+>> guest although we already have `-numa` command to set vNUMA nodes.
+>>
 
-> We also use libvirt v1.3.4, which might be a problem, but at least we
-> want to understand if the commit in question introduced an obvious
-> problem or if it's all in the details.
+>> +++ b/qapi-schema.json
+>> @@ -5644,10 +5644,14 @@
+>>  ##
+>>  # @NumaOptionsType:
+>>  #
+>> +# @node: NUMA nodes configuration
+>> +#
+>> +# @dist: NUMA distance configuration
+>> +#
 
-A tangential question -- Just curious, your environment
-seems...interesting: given you are using a bit old (but above the
-MIN_LIBVIRT_VERSION for Nova, which is currently 1.2.1) libvirt version,
-with *RC2* of QEMU 2.9 with Nova, and testing live migration.  Me
-wonders if this some kind of a custom OpenStack environment, or an
-official upstream release that you're simply testing with a newer
-version of QEMU...
+Missing a '(since 2.10)' tag on @dist.
 
 
-[1]
-http://git.openstack.org/cgit/openstack/nova/tree/nova/virt/libvirt/driver.=
-py?id=3D068d851#n198
+>>  ##
+>> +# @NumaDistOptions:
+>> +#
+>> +# Set the distance between 2 NUMA nodes.
+>> +#
+>> +# @src: source NUMA node.
+>> +#
+>> +# @dst: destination NUMA node.
+>> +#
+>> +# @val: NUMA distance from source node to destination node.
 
+Missing mention of the magic of 255.
+
+>> +#
+>> +# Since: 2.10
+>> +##
+>> +{ 'struct': 'NumaDistOptions',
+>> +  'data': {
+>> +   'src': 'uint16',
+>> +   'dst': 'uint16',
+>> +   'val': 'uint8' }}
+>> +
+
+Is a user allowed to pass { "src":0, "dst":0, "val":11 }, or do you
+hard-validate that the diagonal of the matrix is always 10 (the user can
+omit it, but if specified it must be 10).  Do you enforce that no
+distance is less than 10?
+
+>> +@var{source} and @var{destination} are NUMA node IDs.
+>> +@var{distance} is the NUMA distance from @var{source} to @var{destina=
+tion}.
+>> +The distance from node A to node B may be different from the distance=
+ from
+>> +node B to node A as the distance can to be asymmetrical. If a node is=
+
+>> +unreachable, set 255 as distance.
 >=20
-> Btw, the qemu command generated by libvirt is this one, sorry about that:
->=20
-> 2017-03-31 17:40:10.956+0000: starting up libvirt version: 1.3.4, package=
-: 0+amos3~u16.04 (Enea Armband Devops Team <armband@enea.com> Fri, 13 Jan 2=
-017 02:06:05 +0100), qemu version: 2.8.50(Debian 1:2.9+amos2~u16.04), hostn=
-ame: node-2.domain.tld
-> LC_ALL=3DC PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin=
-:/bin QEMU_AUDIO_DRV=3Dnone /usr/bin/kvm -name instance-00000076,debug-thre=
-ads=3Don -S -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/lib=
-virt/qemu/domain-14-instance-00000076/master-key.aes -machine virt-2.8,acce=
-l=3Dkvm,usb=3Doff,gic-version=3D3 -cpu host -m 256 -realtime mlock=3Doff -s=
-mp 1,sockets=3D1,cores=3D1,threads=3D1 -uuid 2812f3c9-f564-499b-a8c7-e9e7cc=
-f24143 -no-user-config -nodefaults -chardev socket,id=3Dcharmonitor,path=3D=
-/var/lib/libvirt/qemu/domain-14-instance-00000076/monitor.sock,server,nowai=
-t -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc,dr=
-iftfix=3Dslew -no-shutdown -boot strict=3Don -kernel /var/lib/nova/instance=
-s/2812f3c9-f564-499b-a8c7-e9e7ccf24143/kernel -initrd /var/lib/nova/instanc=
-es/2812f3c9-f564-499b-a8c7-e9e7ccf24143/ramdisk -append 'root=3D/dev/vda1 r=
-w rootwait console=3Dtty0 console=3DttyS0 console=3DttyAMA0' -device i82801=
-b11-bridge,id=3Dpci.1,bus=3Dpcie.0,addr=3D0x1 -device pci-bridge,chassis_nr=
-=3D2,id=3Dpci.2,bus=3Dpci.1,addr=3D0x0 -usb -drive file=3D/var/lib/nova/ins=
-tances/2812f3c9-f564-499b-a8c7-e9e7ccf24143/disk,format=3Dqcow2,if=3Dnone,i=
-d=3Ddrive-virtio-disk0,cache=3Dnone,aio=3Dnative -device virtio-blk-device,=
-scsi=3Doff,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1 -driv=
-e file=3D/var/lib/nova/instances/2812f3c9-f564-499b-a8c7-e9e7ccf24143/disk.=
-config,format=3Draw,if=3Dnone,id=3Ddrive-virtio-disk1,cache=3Dnone,aio=3Dna=
-tive -device virtio-blk-device,scsi=3Doff,drive=3Ddrive-virtio-disk1,id=3Dv=
-irtio-disk1 -netdev tap,fd=3D27,id=3Dhostnet0 -device virtio-net-device,net=
-dev=3Dhostnet0,id=3Dnet0,mac=3Dfa:16:3e:82:0a:2b -serial file:/var/lib/nova=
-/instances/2812f3c9-f564-499b-a8c7-e9e7ccf24143/console.log -serial pty -vn=
-c 0.0.0.0:0 -k en-us -device VGA,id=3Dvideo0,vgamem_mb=3D16,bus=3Dpci.2,add=
-r=3D0x1 -device virtio-balloon-device,id=3Dballoon0 -msg timestamp=3Don
-> Domain id=3D14 is tainted: high-privileges
+> The distance from a node to itself is always 10.  If no distance values=
 
-[...]
+> are given for node pairs, then the default distance of 20 is used for e=
+ach
+> pair.  If any pair of nodes is given a distance, then all pairs must be=
 
+> given distances.  Although, when distances are only given in one direct=
+ion
+> for each pair of nodes, then the distances in the opposite directions a=
+re
+> assumed to be the same.  If, however, an asymmetrical pair of distances=
+ is
+> given for even one node pair, then all node pairs must be provided
+> distance values for both directions, even when they are symmetrical.  W=
+hen
+> a node is unreachable from another node, set the pair's distance to 255=
+=2E
+
+I don't like duplication where it is not necessary, but don't know if
+there's an easy way to make the .json file and qemu-options.hx refer to
+one another, since they both feed separate user-visible documentation.
+So you may have to repeat some of this in the .json file (such as my
+mention above that at least documenting that 255 is special).
 
 --=20
-/kashyap
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--F1vHlx4PkDE7M6pUBnAbom5htDa42LvRo
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY4ptbAAoJEKeha0olJ0NqHQEIAKEOB0aIKYDYNhy/z5/6g86C
+n2+hssSICimWDodKHpMIwi99FrmVsjkIHTTkPARMcF1WbsA0wQEiWyGe1lWgLaq6
+RyvLS88sVKi2w6uzXGzlsMDeMcoriKAGEhWmip/wavGIwl3EGmdXywQMIq6Io0dk
+YaNEtGz9yWgZwHwrj7NqhDaRH+U5DGgvbDvmZWwGPyiyTAldSdc6vOpqsOhH4+Fz
+i5YYWd9iRJbDNce+sBuaZ46oRFT+HYjeVWlnSu3LHbzH8QcXV2QrJsK4vD2t+sVX
+e96rH3zBmm1kstw1+neCw76Ofll+9T97PgxOcNZZTBX7tUiKHbh1gv558X4FcfA=
+=3uiu
+-----END PGP SIGNATURE-----
+
+--F1vHlx4PkDE7M6pUBnAbom5htDa42LvRo--
