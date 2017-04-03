@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cv1hP-0000qQ-UF
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:07:15 -0400
+	(envelope-from <stefanha@redhat.com>) id 1cv1uL-0005XT-V3
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:20:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cv1hL-0003Xh-5H
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:07:11 -0400
-References: <1490879707-6060-1-git-send-email-armbru@redhat.com>
-	<1490879707-6060-4-git-send-email-armbru@redhat.com>
-	<20170403114855.GV2768@redhat.com>
-	<6516cecc-4f5f-9255-3890-7fed57ab7eb4@redhat.com>
-	<20170403130517.GX2768@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <4616469d-a3cc-e78a-0c4a-578814eec65d@redhat.com>
-Date: Mon, 3 Apr 2017 15:06:54 +0200
+	(envelope-from <stefanha@redhat.com>) id 1cv1uF-0001H1-Ru
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:20:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35754)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cv1uF-0001GX-JI
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:20:27 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B1C507E9E2
+	for <qemu-devel@nongnu.org>; Mon,  3 Apr 2017 13:20:24 +0000 (UTC)
+Date: Mon, 3 Apr 2017 14:20:11 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170403132011.GG32407@stefanha-x1.localdomain>
+References: <20170331164322.24020-1-stefanha@redhat.com>
+	<4de63a1a-e385-e22f-9bc4-f29d90cbdc30@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170403130517.GX2768@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="LD6fBhrKJoVqtHKIthc5OFTXFqXKbfrcK"
-Subject: Re: [Qemu-devel] [RFC v2 for-2.9 03/10] io vnc sockets: Clean up
- SocketAddressKind switches
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="0z5c7mBtSy1wdr4F"
+Content-Disposition: inline
+In-Reply-To: <4de63a1a-e385-e22f-9bc4-f29d90cbdc30@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] char: kick main loop after adding a watch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,103 +34,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, pbonzini@redhat.com, namei.unix@gmail.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, "Richard W.M. Jones" <rjones@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Frediano Ziglio <fziglio@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---LD6fBhrKJoVqtHKIthc5OFTXFqXKbfrcK
-From: Max Reitz <mreitz@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp,
- jcody@redhat.com, pbonzini@redhat.com, namei.unix@gmail.com
-Message-ID: <4616469d-a3cc-e78a-0c4a-578814eec65d@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2 for-2.9 03/10] io vnc sockets: Clean up
- SocketAddressKind switches
-References: <1490879707-6060-1-git-send-email-armbru@redhat.com>
- <1490879707-6060-4-git-send-email-armbru@redhat.com>
- <20170403114855.GV2768@redhat.com>
- <6516cecc-4f5f-9255-3890-7fed57ab7eb4@redhat.com>
- <20170403130517.GX2768@redhat.com>
-In-Reply-To: <20170403130517.GX2768@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--0z5c7mBtSy1wdr4F
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 03.04.2017 15:05, Daniel P. Berrange wrote:
-> On Mon, Apr 03, 2017 at 02:50:12PM +0200, Max Reitz wrote:
->> On 03.04.2017 13:48, Daniel P. Berrange wrote:
->>> On Thu, Mar 30, 2017 at 03:15:00PM +0200, Markus Armbruster wrote:
->>>> We have quite a few switches over SocketAddressKind.  Some have case=
-
->>>> labels for all enumeration values, others rely on a default label.
->>>> Some abort when the value isn't a valid SocketAddressKind, others
->>>> report an error then.
->>>>
->>>> Unify as follows.  Always provide case labels for all enumeration
->>>> values, to clarify intent.  Abort when the value isn't a valid
->>>> SocketAddressKind, because the program state is messed up then.
->>>>
->>>> Improve a few error messages while there.
->>>>
->>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>>> Reviewed-by: Max Reitz <mreitz@redhat.com>
->>>> ---
->>>>  io/dns-resolver.c   |  7 +++++--
->>>>  ui/vnc.c            | 18 ++++++++++++------
->>>>  util/qemu-sockets.c |  4 +---
->>>>  3 files changed, 18 insertions(+), 11 deletions(-)
->>>>
->>>> diff --git a/io/dns-resolver.c b/io/dns-resolver.c
->>>> index 0ac6b23..a407075 100644
->>>> --- a/io/dns-resolver.c
->>>> +++ b/io/dns-resolver.c
->>>> @@ -164,9 +164,12 @@ int qio_dns_resolver_lookup_sync(QIODNSResolver=
- *resolver,
->>>>                                                  addrs,
->>>>                                                  errp);
->>>> =20
->>>> +    case SOCKET_ADDRESS_KIND_FD:
->>>> +        error_setg(errp, "Unsupported socket address type 'fd'");
->>>> +        return -1;
->>>> +
->>>>      default:
->>>> -        error_setg(errp, "Unknown socket address kind");
->>>> -        return -1;
->>>> +        abort();
->>>>      }
->>>>  }
->>>
->>> Just repeating my v1 comments - this needs to be treating KIND_FD as =
-a no-op,
->>> rather than raising an error.
->>
->> Do you want to write a patch? Markus is on vacation and since this is
->> not a regression, dropping this patch from my queue wouldn't do any go=
-od
->> either.
+On Fri, Mar 31, 2017 at 06:53:56PM +0200, Paolo Bonzini wrote:
 >=20
-> Ok, i'll do a follow up.
+>=20
+> On 31/03/2017 18:43, Stefan Hajnoczi wrote:
+> > The ISA serial port device's output can hang when the pipe on stdout
+> > becomes full.  This is a race condition where the vcpu thread executing
+> > serial emulation code adds a watch on stdout while the main loop thread
+> > is blocked in ppoll(2).  If no timer or other event wakes up the main
+> > loop, there will be no further output from the serial device even when
+> > the pipe becomes writable.
+> >=20
+> > Richard W. M. Jones was able to reproduce the hang on recent versions of
+> > guestfs-tools-c and libglib2 on Fedora 26 hosts.
+> >=20
+> > This patch kicks the main loop so the next iteration invokes ppoll(2)
+> > with the watch fd.
+> >=20
+> > Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=3D1435432
+> > Reported-by: Richard W. M. Jones <rjones@redhat.com>
+> > Tested-by: Richard W. M. Jones <rjones@redhat.com>
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+> >  chardev/char.c | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> >=20
+> > diff --git a/chardev/char.c b/chardev/char.c
+> > index 3df1163..6c99c34 100644
+> > --- a/chardev/char.c
+> > +++ b/chardev/char.c
+> > @@ -1059,6 +1059,11 @@ guint qemu_chr_fe_add_watch(CharBackend *be, GIO=
+Condition cond,
+> >      tag =3D g_source_attach(src, NULL);
+> >      g_source_unref(src);
+> > =20
+> > +    /* The main loop may be in blocked waiting on events in another th=
+read.
+> > +     * Kick it so the new watch will be added.
+> > +     */
+> > +    qemu_notify_event();
+> > +
+> >      return tag;
+> >  }
+> > =20
+> >=20
+>=20
+> Thanks for looking at this, I was quite stuck and now I understand=20
+> what's going on.  However, I don't believe your patch is the right=20
+> solution.
+>=20
+> According to Richard's bisection, the bug was introduced by the patch=20
+> at https://bug761102.bugzilla-attachments.gnome.org/attachment.cgi?id=3D3=
+19699.
+>=20
+> The g_wakeup_signal that is removed (actually made conditional) in that=
+=20
+> patch is doing exactly the same thing as qemu_notify_event, which is
+> fishy...  It would still be a QEMU bug according to the theory below but,
+> depending on how they handle backwards-compatibility, they might=20
+> consider undoing this change.
+>=20
+> glib is expecting QEMU to use g_main_context_acquire around accesses to=
+=20
+> GMainContext.  However QEMU is not doing that, instead it is taking its=
+=20
+> own mutex.  So we should add g_main_context_acquire and
+> g_main_context_release in the two implementations of=20
+> os_host_main_loop_wait; these should undo the effect of Frediano's=20
+> glib patch.
+>=20
+> In all fairness, the docs do say "You must be the owner of a context=20
+> before you can call g_main_context_prepare(), g_main_context_query(),=20
+> g_main_context_check(), g_main_context_dispatch()".  However, it has
+> worked until now and the documentation does not say exactly why that
+> is necessary.
 
-Thanks a lot!
+Thanks Paolo, very interesting.  I never realized that glib has its own
+inter-thread signal.
 
-Max
+NACK
 
+Stefan
 
---LD6fBhrKJoVqtHKIthc5OFTXFqXKbfrcK
+--0z5c7mBtSy1wdr4F
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljiSO4SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AI+cH/1E08TvK4dskIxR4divEy6C9tddmuEQk
-NSDGxWTn6xfN/NhhweAtc9zkOjDp/3dg1fyC9FWva9/ZA+9lh9sbj1CZjXCFmpMV
-RmkdGy0htB8hsZVmfJt/esK8zzjh4akmrTZ0oSEO2lItwXbPd70PMMRS1oSsGdzE
-C/Fvt/JpBxLHD/PCxsE5/NKChpkwcuuULXccgb0EHTD6agmBUYinUxhNFZbQK4VM
-O43MJR1ohrWfDSN62njvDOCT4LxKz+8ZB3dj8CKYqTYNPGIZtVns8QBVu/x2SkPe
-3MPi78Zh0+je2qljyQSLiZDDbU10oEg3GM+trovIaaxV+kl2EOdv+BM=
-=+/h/
+iQEcBAEBAgAGBQJY4kwLAAoJEJykq7OBq3PIORgIAKioel7HkNms+v9JPhxZXBz3
+6Gc8USDdE27HDQwSqH5KxhQLTo4Hio8Y79akFHyxymomLo9uYMsvk7WHUNKkpeC0
+BOr56Os0XAi1vA8VakqOs9jwSwqvPKsUe1kam5XGB3MTeY6tDNee/HheMys8ijyR
+DLlwXZL3EWGRWbTxfMzw8gFtx2qq7yOnJR3G6QkCqzit2aaFjHyWK3YIscUevWab
+QPOnM7blLLisF2wtSHmwJrTFkXoe8OZS044NQlFHyxIHIggQaQjUz0OOVTRkj13e
+OQ/Azxea2B61A/4XBtgf2Y1M00AWFYPb11pl8vq+xq6dxtvFBgKwyvhd249uGq8=
+=49Sk
 -----END PGP SIGNATURE-----
 
---LD6fBhrKJoVqtHKIthc5OFTXFqXKbfrcK--
+--0z5c7mBtSy1wdr4F--
