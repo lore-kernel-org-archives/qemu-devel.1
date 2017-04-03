@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cv3ze-00062Q-1F
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 11:34:14 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cv3zl-00068D-7v
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 11:34:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cv3zd-0007AQ-05
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 11:34:10 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cv3zk-0007Ht-C3
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 11:34:17 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon,  3 Apr 2017 17:33:41 +0200
-Message-Id: <20170403153355.19722-2-mreitz@redhat.com>
+Date: Mon,  3 Apr 2017 17:33:43 +0200
+Message-Id: <20170403153355.19722-4-mreitz@redhat.com>
 In-Reply-To: <20170403153355.19722-1-mreitz@redhat.com>
 References: <20170403153355.19722-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 01/15] block: add missed aio_context_acquire
- into release_drive
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 03/15] char: Fix socket with "type": "vsock"
+ address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,66 +26,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-From: "Denis V. Lunev" <den@openvz.org>
+From: Markus Armbruster <armbru@redhat.com>
 
-Recently we expirience hang with iothreads enabled with the following
-call trace:
-Thread 1 (Thread 0x7fa95efebc80 (LWP 177117)):
-0  ppoll () from /lib64/libc.so.6
-2  qemu_poll_ns () at qemu-timer.c:313
-3  aio_poll () at aio-posix.c:457
-4  bdrv_flush () at block/io.c:2641
-5  bdrv_close () at block.c:2143
-6  bdrv_delete () at block.c:2352
-7  bdrv_unref () at block.c:3429
-8  blk_remove_bs () at block/block-backend.c:427
-9  blk_delete () at block/block-backend.c:178
-10 blk_unref () at block/block-backend.c:226
-11 object_property_del_all () at qom/object.c:399
-12 object_finalize () at qom/object.c:461
-13 object_unref () at qom/object.c:898
-14 object_property_del_child () at qom/object.c:422
-15 qmp_marshal_device_del () at qmp-marshal.c:1145
-16 handle_qmp_command () at /usr/src/debug/qemu-2.6.0/monitor.c:3929
+Watch this:
 
-Technically bdrv_flush() stucks in
-    while (rwco.ret == NOT_DONE) {
-        aio_poll(aio_context, true);
-    }
-but rwco.ret is equal to 0 thus we have missed wakeup. Code investigation
-reveals that we do not have performed aio_context_acquire() on this call
-stack.
+    $ qemu-system-x86_64 -nodefaults -S -display none -qmp stdio
+    {"QMP": {"version": {"qemu": {"micro": 91, "minor": 8, "major": 2}, "=
+package": " (v2.8.0-1195-gf84141e-dirty)"}, "capabilities": []}}
+    { "execute": "qmp_capabilities" }
+    {"return": {}}
+    { "execute": "chardev-add", "arguments": { "id": "chr0", "backend": {=
+ "type": "socket", "data": { "addr": { "type": "vsock", "data": { "cid": =
+"CID", "port": "P" }}}}}}
+    Aborted (core dumped)
 
-This patch adds missed lock.
+Crashes because SocketAddress_to_str() is blissfully unaware of
+SOCKET_ADDRESS_KIND_VSOCK.  Fix that.  Pick the output format to match
+socket_parse(), just like the existing formats.
 
-Signed-off-by: Denis V. Lunev <den@openvz.org>
-CC: Kevin Wolf <kwolf@redhat.com>
-CC: Max Reitz <mreitz@redhat.com>
-CC: Eric Blake <eblake@redhat.com>
-CC: Markus Armbruster <armbru@redhat.com>
-Message-id: 1490717566-25516-1-git-send-email-den@openvz.org
-Reviewed-by: Fam Zheng <famz@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Message-id: 1490895797-29094-3-git-send-email-armbru@redhat.com
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- hw/core/qdev-properties-system.c | 4 ++++
+ chardev/char-socket.c | 4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
-index c34be1c1ba..e885e650fb 100644
---- a/hw/core/qdev-properties-system.c
-+++ b/hw/core/qdev-properties-system.c
-@@ -124,8 +124,12 @@ static void release_drive(Object *obj, const char *name, void *opaque)
-     BlockBackend **ptr = qdev_get_prop_ptr(dev, prop);
- 
-     if (*ptr) {
-+        AioContext *ctx = blk_get_aio_context(*ptr);
-+
-+        aio_context_acquire(ctx);
-         blockdev_auto_del(*ptr);
-         blk_detach_dev(*ptr, dev);
-+        aio_context_release(ctx);
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index 6344b07822..36ab0d633a 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -357,6 +357,10 @@ static char *SocketAddress_to_str(const char *prefix=
+, SocketAddress *addr,
+         return g_strdup_printf("%sfd:%s%s", prefix, addr->u.fd.data->str=
+,
+                                is_listen ? ",server" : "");
+         break;
++    case SOCKET_ADDRESS_KIND_VSOCK:
++        return g_strdup_printf("%svsock:%s:%s", prefix,
++                               addr->u.vsock.data->cid,
++                               addr->u.vsock.data->port);
+     default:
+         abort();
      }
- }
- 
--- 
+--=20
 2.12.1
