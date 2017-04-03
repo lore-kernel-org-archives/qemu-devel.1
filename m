@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cv38A-0008EJ-HT
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 10:38:55 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cv3BQ-0000Xn-1z
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 10:42:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cv387-0001KV-Dp
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 10:38:54 -0400
-Date: Mon, 3 Apr 2017 15:38:47 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170403143847.GB3539@stefanha-x1.localdomain>
-References: <20170324123458.yk3rj3g47e5xr33i@eukaryote>
-	<6fb77120-dcab-042f-bb51-20ccbaa38354@redhat.com>
-	<20170328152934.rebdzsjfsfc6ajrh@eukaryote>
+	(envelope-from <peter.maydell@linaro.org>) id 1cv3BP-0002hP-2e
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 10:42:16 -0400
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:34149)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cv3BO-0002gv-RM
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 10:42:14 -0400
+Received: by mail-wr0-x229.google.com with SMTP id l43so174325033wre.1
+	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 07:42:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="cmJC7u66zC7hs+87"
-Content-Disposition: inline
-In-Reply-To: <20170328152934.rebdzsjfsfc6ajrh@eukaryote>
-Subject: Re: [Qemu-devel] [Qemu-block] Making QMP 'block-job-cancel'
- transactionable
+In-Reply-To: <20170403073550.29162-1-shah.suramya@gmail.com>
+References: <20170403073550.29162-1-shah.suramya@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 3 Apr 2017 15:41:53 +0100
+Message-ID: <CAFEAcA8S_h+2jT0P_ZoJX3QYHmgf=6ufsrpNguZifErCqqZBeQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] hw/net: convert "dma" property type from
+ ptr to link
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,60 +29,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kashyap Chamarthy <kchamart@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Suramya Shah <shah.suramya@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
 
+On 3 April 2017 at 08:35, Suramya Shah <shah.suramya@gmail.com> wrote:
+> The lance device needs pointer to ISA DMA device to operate. But according to
+> qdev-properties.h, properties of pointer type should be avoided.
+> A link type property is a good substitution.
+>
+> Signed-off-by: Suramya Shah <shah.suramya@gmail.com>
+> ---
+>  hw/net/lance.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/net/lance.c b/hw/net/lance.c
+> index 573d724..3996b9c 100644
+> --- a/hw/net/lance.c
+> +++ b/hw/net/lance.c
+> @@ -44,6 +44,7 @@
+>  #include "pcnet.h"
+>  #include "trace.h"
+>  #include "sysemu/sysemu.h"
+> +#include "qapi/error.h"
+>
+>  #define TYPE_LANCE "lance"
+>  #define SYSBUS_PCNET(obj) \
+> @@ -145,10 +146,14 @@ static void lance_instance_init(Object *obj)
+>      device_add_bootindex_property(obj, &s->conf.bootindex,
+>                                    "bootindex", "/ethernet-phy@0",
+>                                    DEVICE(obj), NULL);
+> +
+> +    object_property_add_link(obj, "dma", TYPE_LANCE,
+> +                             (Object **)&d->state.dma_opaque,
+> +                             qdev_prop_allow_set_link_before_realize,
+> +                             0, &error_abort);
+>  }
+>
+>  static Property lance_properties[] = {
+> -    DEFINE_PROP_PTR("dma", SysBusPCNetState, state.dma_opaque),
+>      DEFINE_NIC_PROPERTIES(SysBusPCNetState, state.conf),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
 
---cmJC7u66zC7hs+87
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi. I'm afraid that this doesn't pass "make check":
 
-On Tue, Mar 28, 2017 at 05:29:34PM +0200, Kashyap Chamarthy wrote:
-> On Tue, Mar 28, 2017 at 09:49:40AM -0500, Eric Blake wrote:
-> > On 03/24/2017 07:34 AM, Kashyap Chamarthy wrote:
-> > > While debugging some other issue, I happened to stumble across an old
-> > > libvirt commit[*] that adds support for pivot (whether QEMU should
-> > > switch to a target copy or not) operation as a result of issuing QMP
-> > > 'block-job-cancel' to a 'drive-mirror' (in libvirt parlance, "block
-> > > copy").
-> > >=20
-> > > In the libvirt commit message[*] Eric Blake writes:
-> > >=20
-> > >     "[...] There may be potential improvements to the snapshot code to
-> > >     exploit block copy over multiple disks all at one point in time.
-> > >     And, if 'block-job-cancel' were made part of 'transaction', you
-> > >     could copy multiple disks at the same point in time without pausi=
-ng
-> > >     the domain. [...]"
-> > >=20
-> > > I realize that 'block-job-cancel' is currently not part of the
-> > > @TransactionAction.  Is it worthwhile to do so?
-> >=20
-> > Yes, it is still worthwhile to make that improvement, although it is
-> > now 2.10 material.
->=20
-> Thanks for looking, didn't imply that it's for 2.9 (which is in Release
-> Candidate phase) -- I realize most people are busy with it.  Further
-> discussion could be had when 2.10 tree opens up.
+TEST: tests/qom-test... (pid=5185)
+  /sparc/qom/SS-10:
+qemu-system-sparc:
+/home/petmay01/linaro/qemu-from-laptop/qemu/hw/core/qdev-properties.c:1037:
+qdev_prop_set_ptr: Assertion `prop && prop->info == &qdev_prop_ptr'
+failed.
+Broken pipe
+FAIL
 
-Thanks for the discussion.  I have added this task to the block layer
-todo list:
+This is because you've changed the device implementation from
+a pointer property to a link, but you haven't changed the code
+that uses it, so now when that code tries to set the pointer
+property it crashes.
 
-http://wiki.qemu-project.org/ToDo/Block#Atomic_block-job-cancel
+It's always a good idea to use "make check" to do at least
+a basic test of your changes (and if you can find test images
+that exercise the devices you're changing that's also good,
+because 'make check' often doesn't cover as much as we'd like).
 
---cmJC7u66zC7hs+87
-Content-Type: application/pgp-signature; name="signature.asc"
+> @@ -164,7 +169,6 @@ static void lance_class_init(ObjectClass *klass, void *data)
+>      dc->reset = lance_reset;
+>      dc->vmsd = &vmstate_lance;
+>      dc->props = lance_properties;
+> -    /* Reason: pointer property "dma" */
+>      dc->cannot_instantiate_with_device_add_yet = true;
 
------BEGIN PGP SIGNATURE-----
+This comment is describing the reason why the line below it
+sets dc->cannot_instantiate_with_device_add_yet, so you
+can't remove only the comment. Either:
+ (1) this change means it is now possible to instantiate with
+device-add, in which case remove both the comment and the
+setting of the flag, or
+ (2) it's still not possible to instantiate with device-add,
+in which case update the comment to give the new reason.
 
-iQEcBAEBAgAGBQJY4l53AAoJEJykq7OBq3PI4FUH/3dfKOkuJURhjER5dlxtOuHO
-v46g70ExlUpZGSRZ8YMt/irdmrrpsM2qvEsG2+AIYRzCgw7BQDBD/GgoUlDrD1z6
-2QnNWrPlIEBmgpaybsLLi09cYmEWY8cWdN4CkodKi3tqxq868uiCref7tKSRLPgC
-ICR1Lm/eSnzukB0awHI83Q4YOFZvYOZnorGXfpx+CD6HybrlHqfNlJgnwqQPghSk
-Q1TjxdNLoAuKrS1I4WUO/x/eJRjvZ8bXxRaiF/CjdGvhEnaVAYibGvYAlgMnDqG+
-zpXUqJdpU5kJe9OnGvQYLnRq2YFzDlLgFdPUhVEqeJcLa8aJ5X5yc6JI6ooP68M=
-=xM8m
------END PGP SIGNATURE-----
-
---cmJC7u66zC7hs+87--
+thanks
+-- PMM
