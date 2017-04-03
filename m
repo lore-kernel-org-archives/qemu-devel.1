@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cv1JC-0007Qg-9b
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:42:11 -0400
+	(envelope-from <kraxel@redhat.com>) id 1cv1JZ-0007dQ-5K
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:42:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cv1J7-0006c5-7q
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:42:10 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51108)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cv1J7-0006bw-2L
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:42:05 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cv1J5-0006NA-5W
-	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 12:42:03 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0593D2E80DD
-	for <qemu-devel@nongnu.org>; Mon,  3 Apr 2017 12:41:54 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <kraxel@redhat.com>) id 1cv1JU-0006kQ-8I
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:42:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45844)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cv1JU-0006kE-1q
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:42:28 -0400
+Message-ID: <1491223335.17505.48.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 03 Apr 2017 14:42:15 +0200
+In-Reply-To: <b8daec8e-86ed-56e6-d42d-d948508e5b6f@ilande.co.uk>
+References: <1490856931-21732-1-git-send-email-kraxel@redhat.com>
+	<e1ccd5bc-f683-93b7-374d-0707765a8715@ilande.co.uk>
+	<1490881315.28523.11.camel@redhat.com>
+	<e0df6143-81f2-a0e7-2c23-90dd01724e9f@redhat.com>
+	<1491221026.17505.39.camel@redhat.com>
+	<b8daec8e-86ed-56e6-d42d-d948508e5b6f@ilande.co.uk>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 03 Apr 2017 12:35:34 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1679126 <1679126@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170403115539.1125.50319.malonedeb@gac.canonical.com>
-Message-Id: <20170403123534.484.99945.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1679126] Re: null pointer access on migration
- resume of systemrescuecd boot menu with qxl-vga
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [RfC PATCH 0/4] make display updates thread safe.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,90 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 
-Yep, I can repeat this here on qemu head; crash at:
+On Mo, 2017-04-03 at 13:24 +0100, Mark Cave-Ayland wrote:
+> On 03/04/17 13:03, Gerd Hoffmann wrote:
+>=20
+> >   Hi,
+> >=20
+> >> I checked the branch, is bitmap_copy_and_clear_atomic correct when you
+> >> have partial updates?  Maybe you need to handle partial updates of the
+> >> first and last word?
+> >=20
+> > Should not be a problem.  We might clear some more bits, but these are
+> > outsize the visible area so they should cause visible corruption (and i=
+f
+> > the visible area changes the display code needs to do a full refresh
+> > anyway).
+>=20
+> Right. Also is there a reason that
+> cpu_physical_memory_snapshot_and_clear_dirty() uses BITS_PER_LEVEL when
+> calculating the alignment used for the first/last addresses?
 
-pixman_image_get_data (image=3D0x0) at pixman-image.c:845
-845	    if (image->type =3D=3D BITS)
+The code copy doesn't operate on bits but on bitmap longs, so I can just
+copy the whole long instead of fiddeling with bits.  So I round down to
+a bitmap long start.  On 64bit hosts that are units of 64 pages.
 
-(gdb) p image
-$1 =3D (pixman_image_t *) 0x0
+Actually querying the copied bitmap operates on page granularity of
+course.
 
+> Otherwise you end up expanding the range of your last address
+> considerably beyond the next page alignment.
 
-** Changed in: qemu
-       Status: New =3D> Confirmed
+Yes, it's larger, but as it expands to the start of the long word I
+expect the penalty is almost zero (same cache line) and being able to
+just copy the whole long instead of dealing with individual bits should
+be a win.
 
--- =
+> And also in the main page
+> loop why is BITS_PER_LEVEL used? I see that several of the internal
+> bitmap routines appear to use BITS_PER_LONG for compressing into the
+> bitmap which might be more appropriate?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1679126
+shift by BITS_PER_LEVEL is the same as division by BITS_PER_LONG
 
-Title:
-  null pointer access on migration resume of systemrescuecd boot menu
-  with qxl-vga
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  With qemu-2.8.0 up to 2.9.0-rc2 and git master (6954cdc), when
-  resuming from a migration state file created from a VM suspended while
-  showing the System Rescue CD 4.9.2 boot menu and using the QXL VGA
-  device, I get a null point access in pixman_image_get_data called from
-  qemu_spice_create_update (spice-display.c:215).  When I added
-  assert(ssd->mirror !=3D NULL) above that line, assert failed.  I don't
-  get the crash when using standard VGA or cirrus-vga.  I am using
-  gcc-4.9.3 on Gentoo x86_64 with Intel i7-4700HQ CPU and kernel:
-  4.9.15-gentoo.
-
-  Here is the valgrind trace from the git version:
-  =3D=3D2634=3D=3D Thread 1:
-  =3D=3D2634=3D=3D Invalid read of size 4
-  =3D=3D3516=3D=3D    at 0x65F3050: pixman_image_get_data (in /usr/lib64/li=
-bpixman-1.so.0.34.0)
-  =3D=3D3516=3D=3D    by 0x6F0CEB: qemu_spice_create_update (spice-display.=
-c:215)
-  =3D=3D3516=3D=3D    by 0x6F1CC7: qemu_spice_display_refresh (spice-displa=
-y.c:502)
-  =3D=3D3516=3D=3D    by 0x58CF77: display_refresh (qxl.c:1948)
-  =3D=3D3516=3D=3D    by 0x6E8084: do_safe_dpy_refresh (console.c:1591)
-  =3D=3D3516=3D=3D    by 0x6E80D5: dpy_refresh (console.c:1604)
-  =3D=3D3516=3D=3D    by 0x6E4508: gui_update (console.c:201)
-  =3D=3D3516=3D=3D    by 0x81898E: timerlist_run_timers (qemu-timer.c:536)
-  =3D=3D3516=3D=3D    by 0x8189D6: qemu_clock_run_timers (qemu-timer.c:547)
-  =3D=3D3516=3D=3D    by 0x818D98: qemu_clock_run_all_timers (qemu-timer.c:=
-662)
-  =3D=3D3516=3D=3D    by 0x81952A: main_loop_wait (main-loop.c:514)
-  =3D=3D3516=3D=3D    by 0x4ADD29: main_loop (vl.c:1898)
-
-  Minimal steps to reproduce:
-
-  Compile (debug compile flags are just so valgrind works, the crash occurs=
- with non-debug compile flags as well):
-  CFLAGS=3D"-g -O0" CXXFLAGS=3D"-g -O0" ./configure --target-list=3Di386-so=
-ftmmu,x86_64-softmmu
-  ./configure
-  make
-
-  Start VM and leave it on the System Rescue CD graphical boot menu:
-  x86_64-softmmu/qemu-system-x86_64 -nodefaults -machine pc -drive file=3Ds=
-ystemrescuecd-x86-4.9.2.iso,if=3Dnone,id=3Dcdrom-cd,readonly=3Don -device i=
-de-cd,bus=3Dide.0,drive=3Dcdrom-cd,bootindex=3D1 -device qxl-vga -monitor u=
-nix:monitor.sock,server,nowait -display gtk
-
-  Suspend VM and save state:
-  socat - unix:monitor.sock
-    stop
-    migrate "exec:cat > vm.state"
-    quit
-
-  Attempt to resume VM (but this crashes):
-  x86_64-softmmu/qemu-system-x86_64 -nodefaults -machine pc -drive file=3Ds=
-ystemrescuecd-x86-4.9.2.iso,if=3Dnone,id=3Dcdrom-cd,readonly=3Don -device i=
-de-cd,bus=3Dide.0,drive=3Dcdrom-cd,bootindex=3D1 -device qxl-vga -monitor u=
-nix:monitor.sock,server,nowait -display gtk -incoming exec:"cat vm.state"
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1679126/+subscriptions
+cheers,
+  Gerd
