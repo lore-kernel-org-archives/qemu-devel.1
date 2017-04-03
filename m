@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cv1MU-0001LX-1M
+	(envelope-from <alex.bennee@linaro.org>) id 1cv1MT-0001LJ-PU
 	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:45:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cv1MP-00011u-Lw
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:45:34 -0400
-Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:35071)
+	(envelope-from <alex.bennee@linaro.org>) id 1cv1MP-00011j-41
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:45:33 -0400
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:36715)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cv1MP-000118-FS
+	id 1cv1MO-00011O-TK
 	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:45:29 -0400
-Received: by mail-wr0-x229.google.com with SMTP id k6so162836978wre.2
-	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 05:45:27 -0700 (PDT)
+Received: by mail-wr0-x232.google.com with SMTP id w11so166918693wrc.3
+	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 05:45:28 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon,  3 Apr 2017 13:45:16 +0100
-Message-Id: <20170403124524.10824-2-alex.bennee@linaro.org>
+Date: Mon,  3 Apr 2017 13:45:17 +0100
+Message-Id: <20170403124524.10824-3-alex.bennee@linaro.org>
 In-Reply-To: <20170403124524.10824-1-alex.bennee@linaro.org>
 References: <20170403124524.10824-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH v1 1/9] scripts/qemugdb/mtree.py: fix up
- mtree dump
+Subject: [Qemu-devel] [RFC PATCH v1 2/9] scripts/qemu-gdb/timers.py: new
+ helper to dump timer state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,45 +33,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: dovgaluk@ispras.ru, rth@twiddle.net, pbonzini@redhat.com
 Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Since QEMU has been able to build with native Int128 support this was
-broken as it attempts to fish values out of the non-existent
-structure. Also the alias print was trying to make a %x out of
-gdb.ValueType directly which didn't seem to work.
+This introduces the qemu-gdb command "qemu timers" which will dump the
+state of the main timers in the system.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- scripts/qemugdb/mtree.py | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ scripts/qemu-gdb.py       |  3 ++-
+ scripts/qemugdb/timers.py | 54 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 56 insertions(+), 1 deletion(-)
+ create mode 100644 scripts/qemugdb/timers.py
 
-diff --git a/scripts/qemugdb/mtree.py b/scripts/qemugdb/mtree.py
-index cc8131c2e7..e6791b7885 100644
---- a/scripts/qemugdb/mtree.py
-+++ b/scripts/qemugdb/mtree.py
-@@ -21,7 +21,15 @@ def isnull(ptr):
-     return ptr == gdb.Value(0).cast(ptr.type)
+diff --git a/scripts/qemu-gdb.py b/scripts/qemu-gdb.py
+index b3f8e04f77..3e7adb87dc 100644
+--- a/scripts/qemu-gdb.py
++++ b/scripts/qemu-gdb.py
+@@ -26,7 +26,7 @@ import os, sys
  
- def int128(p):
--    return int(p['lo']) + (int(p['hi']) << 64)
-+    '''Read an Int128 type to a python integer.
+ sys.path.append(os.path.dirname(__file__))
+ 
+-from qemugdb import aio, mtree, coroutine
++from qemugdb import aio, mtree, coroutine, timers
+ 
+ class QemuCommand(gdb.Command):
+     '''Prefix for QEMU debug support commands'''
+@@ -38,6 +38,7 @@ QemuCommand()
+ coroutine.CoroutineCommand()
+ mtree.MtreeCommand()
+ aio.HandlersCommand()
++timers.TimersCommand()
+ 
+ coroutine.CoroutineSPFunction()
+ coroutine.CoroutinePCFunction()
+diff --git a/scripts/qemugdb/timers.py b/scripts/qemugdb/timers.py
+new file mode 100644
+index 0000000000..be71a001e3
+--- /dev/null
++++ b/scripts/qemugdb/timers.py
+@@ -0,0 +1,54 @@
++#!/usr/bin/python
++# GDB debugging support
++#
++# Copyright 2017 Linaro Ltd
++#
++# Author: Alex Bennée <alex.bennee@linaro.org>
++#
++# This work is licensed under the terms of the GNU GPL, version 2.  See
++# the COPYING file in the top-level directory.
 +
-+    QEMU can be built with native Int128 support so we need to detect
-+    if the value is a structure or the native type.
-+    '''
-+    if p.type.code == gdb.TYPE_CODE_STRUCT:
-+        return int(p['lo']) + (int(p['hi']) << 64)
-+    else:
-+        return int(("%s" % p), 16)
- 
- class MtreeCommand(gdb.Command):
-     '''Display the memory tree hierarchy'''
-@@ -69,7 +77,7 @@ class MtreeCommand(gdb.Command):
-             gdb.write('%s    alias: %s@%016x (@ %s)\n' %
-                       ('  ' * level,
-                        alias['name'].string(),
--                       ptr['alias_offset'],
-+                       int(ptr['alias_offset']),
-                        alias,
-                        ),
-                       gdb.STDOUT)
++# 'qemu timers' -- display the current timerlists
++
++import gdb
++
++class TimersCommand(gdb.Command):
++    '''Display the current QEMU timers'''
++
++    def __init__(self):
++        'Register the class as a gdb command'
++        gdb.Command.__init__(self, 'qemu timers', gdb.COMMAND_DATA,
++                             gdb.COMPLETE_NONE)
++
++    def dump_timers(self, timer):
++        "Follow a timer and recursively dump each one in the list."
++        # timer should be of type QemuTimer
++        gdb.write("    timer %s/%s (cb:%s,opq:%s)\n" % (
++            timer['expire_time'],
++            timer['scale'],
++            timer['cb'],
++            timer['opaque']))
++
++        if int(timer['next']) > 0:
++            self.dump_timers(timer['next'])
++
++
++    def process_timerlist(self, tlist, ttype):
++        gdb.write("Processing %s timers\n" % (ttype))
++        gdb.write("  clock %s is enabled:%s, last:%s\n" % (
++            tlist['clock']['type'],
++            tlist['clock']['enabled'],
++            tlist['clock']['last']))
++        if int(tlist['active_timers']) > 0:
++            self.dump_timers(tlist['active_timers'])
++
++
++    def invoke(self, arg, from_tty):
++        'Run the command'
++        main_timers = gdb.parse_and_eval("main_loop_tlg")
++
++        # This will break if QEMUClockType in timer.h is redfined
++        self.process_timerlist(main_timers['tl'][0], "Realtime")
++        self.process_timerlist(main_timers['tl'][1], "Virtual")
++        self.process_timerlist(main_timers['tl'][2], "Host")
++        self.process_timerlist(main_timers['tl'][3], "Virtual RT")
 -- 
 2.11.0
