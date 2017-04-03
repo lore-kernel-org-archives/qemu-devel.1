@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cv1DN-0005Pc-WC
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:36:15 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cv1HE-0006AQ-06
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:40:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cv1DM-0004uL-QW
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:36:10 -0400
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:33701)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cv1H8-0005tX-E9
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:40:08 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:34974)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cv1DM-0004uB-K9
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:36:08 -0400
-Received: by mail-wr0-x22d.google.com with SMTP id w43so167204784wrb.0
-	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 05:36:08 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cv1H8-0005s1-8T
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:40:02 -0400
+Received: by mail-qk0-x243.google.com with SMTP id k139so7583716qke.2
+	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 05:40:00 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170403105238.23262-1-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <3797efbb-bd41-c051-f781-f709ea9cb6e5@amsat.org>
+Date: Mon, 3 Apr 2017 09:39:57 -0300
 MIME-Version: 1.0
-In-Reply-To: <1490698718-23762-1-git-send-email-peter.maydell@linaro.org>
-References: <1490698718-23762-1-git-send-email-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 3 Apr 2017 13:35:46 +0100
-Message-ID: <CAFEAcA-BW_FyUdBgZHaFeGJRir7DQ4S+7Oj429OY=yOL1XLveQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH for-2.9] configure: Mark SPARC as supported
+In-Reply-To: <20170403105238.23262-1-kraxel@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] usb-host: switch to LIBUSB_API_VERSION
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +33,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: "patches@linaro.org" <patches@linaro.org>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-On 28 March 2017 at 11:58, Peter Maydell <peter.maydell@linaro.org> wrote:
-> Thanks to John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-> and the Debian Project, we now have access to a SPARC Linux
-> system we can use for build testing. Move SPARC back into
-> the "supported" list.
+On 04/03/2017 07:52 AM, Gerd Hoffmann wrote:
+> libusbx doesn't exist any more, the fork got merged back to libusb.  So
+> stop using LIBUSBX_API_VERSION and use LIBUSB_API_VERSION instead.  For
+> backward compatibility alias LIBUSB_API_VERSION to LIBUSBX_API_VERSION
+> in case we figure LIBUSB_API_VERSION isn't defined.
 >
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 > ---
-> We should also at least apply the TCG fixes:
->  http://patchwork.ozlabs.org/patch/743890/
->  http://patchwork.ozlabs.org/patch/743890/
-> and ideally the bios-tables-test fix, but that's a testsuite bug:
->  http://patchwork.ozlabs.org/patch/744178/
+>  hw/usb/host-libusb.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
 >
-> There are 'make check' failures in qga-test on this box but
-> they don't seem architecture related:
->  https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg04712.html
+> diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
+> index c9876a5..f9c8eaf 100644
+> --- a/hw/usb/host-libusb.c
+> +++ b/hw/usb/host-libusb.c
+> @@ -159,7 +159,10 @@ static void usb_host_attach_kernel(USBHostDevice *s);
+>  #define BULK_TIMEOUT         0        /* unlimited */
+>  #define INTR_TIMEOUT         0        /* unlimited */
 >
-> I also see some failures in ppc64 guests which might just be
-> timeout issues and which I haven't investigated yet.
-> I don't think those are severe enough to worry about for this
-> release.
-
-Applied to master since the TCG fixes have now gone in.
-
-thanks
--- PMM
+> -#if LIBUSBX_API_VERSION >= 0x01000103
+> +#ifndef LIBUSB_API_VERSION
+> +# define LIBUSB_API_VERSION LIBUSBX_API_VERSION
+> +#endif
+> +#if LIBUSB_API_VERSION >= 0x01000103
+>  # define HAVE_STREAMS 1
+>  #endif
+>
+> @@ -269,7 +272,7 @@ static int usb_host_get_port(libusb_device *dev, char *port, size_t len)
+>      size_t off;
+>      int rc, i;
+>
+> -#if LIBUSBX_API_VERSION >= 0x01000102
+> +#if LIBUSB_API_VERSION >= 0x01000102
+>      rc = libusb_get_port_numbers(dev, path, 7);
+>  #else
+>      rc = libusb_get_port_path(ctx, dev, path, 7);
+>
