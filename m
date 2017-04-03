@@ -1,18 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45781)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cv2dT-0001dw-Vp
-	for Qemu-devel@nongnu.org; Mon, 03 Apr 2017 10:07:13 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cv2ek-0002GS-15
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 10:08:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cv2dQ-0005NL-SF
-	for Qemu-devel@nongnu.org; Mon, 03 Apr 2017 10:07:11 -0400
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <13fddf65-e573-cf01-593d-6b02a3071721@redhat.com>
-Date: Mon, 3 Apr 2017 09:07:02 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cv2ei-000682-Vo
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 10:08:29 -0400
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:33504)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cv2ei-00067m-O0
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 10:08:28 -0400
+Received: by mail-wr0-x231.google.com with SMTP id w43so170650025wrb.0
+	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 07:08:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="NAIUsWaQ3DL3qQJ1d5u0XSsOMjjQ0mXrd"
-Subject: [Qemu-devel] help debugging throttle crash
+In-Reply-To: <20170403135445.GD1910@thinpad.lan.raisama.net>
+References: <20170401004624.30886-1-ehabkost@redhat.com>
+	<20170401004624.30886-14-ehabkost@redhat.com>
+	<CAFEAcA9bRwneynDYg6Lgowe21=rh8+miSZhqzmW81VLWrxafhQ@mail.gmail.com>
+	<20170403133416.GB1910@thinpad.lan.raisama.net>
+	<CAFEAcA-9r=Qktj1Oa6kvCPQrQ4XpPcxb2L4xNcPSfHeB9Ogt6A@mail.gmail.com>
+	<20170403135445.GD1910@thinpad.lan.raisama.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 3 Apr 2017 15:08:06 +0100
+Message-ID: <CAFEAcA-+imjX_kfxPo6Vue-bX8HZo8ZV8s7XmyTNj7_GTd4Lrg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [RFC 13/19] unimplemented-device: Remove
+ user_creatable flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,70 +34,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Qemu-devel@nongnu.org" <Qemu-devel@nongnu.org>, Alberto Garcia <berto@igalia.com>, qemu block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Laszlo Ersek <lersek@redhat.com>, Alexander Graf <agraf@suse.de>, Marcel Apfelbaum <marcel@redhat.com>, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---NAIUsWaQ3DL3qQJ1d5u0XSsOMjjQ0mXrd
-From: Eric Blake <eblake@redhat.com>
-To: "Qemu-devel@nongnu.org" <Qemu-devel@nongnu.org>,
- Alberto Garcia <berto@igalia.com>, qemu block <qemu-block@nongnu.org>,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <13fddf65-e573-cf01-593d-6b02a3071721@redhat.com>
-Subject: help debugging throttle crash
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 3 April 2017 at 14:54, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> On Mon, Apr 03, 2017 at 02:38:15PM +0100, Peter Maydell wrote:
+>> On 3 April 2017 at 14:34, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>> >> Wouldn't it be better to just not add that, rather than
+>> >> add it and then delete it?
+>> >
+>> > The device was already user-creatable
+>>
+>> It doesn't seem to be:
+>>
+>>  ./build/x86/arm-softmmu/qemu-system-arm -M virt -device
+>> unimplemented-device,size=1024,name=foo
+>> qemu-system-arm: Device unimplemented-device can not be dynamically instantiated
+>
+> This restriction is implemented by the "virt" machine, not by the
+> device type itself.
+>
+> This, on the other hand, currently works:
+>   $ qemu-system-x86_64 -M q35 -device unimplemented-device,size=1024,name=foo
 
-I'm trying to investigate
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1428810, which is a crash
-that can be easily reproduced with the following steps:
+That's a bug in the q35 machine or the handling of -device
+on non-platform-bus systems, though, isn't it? The default
+for all sysbus devices has always been "you can't use
+-device with this", there's never been a requirement to
+mark them as such separately (because it would require
+touching the files for a huge number of devices for no
+particularly good reason when you can default the whole
+set of devices subclassing SysBusDevice).
 
-$ ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio
--device virtio-scsi-pci,bus=3Dpci.0  -drive
-id=3Ddrive_image2,if=3Dnone,format=3Draw,file=3Dfile2,bps=3D512000,iops=3D=
-100,group=3Dfoo
--device scsi-hd,id=3Dimage2,drive=3Ddrive_image2 -drive
-id=3Ddrive_image3,if=3Dnone,format=3Draw,file=3Dfile3,bps=3D512000,iops=3D=
-100,group=3Dfoo
--device scsi-hd,id=3Dimage3,drive=3Ddrive_image3
-{'execute':'qmp_capabilities'}
-{'execute':'device_del','arguments':{'id':'image3'}}
-{'execute':'system_reset'}
-
-At this point, it looks like no one is calling
-throttle_group_unregister_blk() as a result of the 'device_del', which
-leaves stale memory around (I was able to confirm this under gcc - a
-breakpoint on that function never fires); then the 'system_reset' causes
-next_throttle_token() to dereference the stale memory and crash.
-However, I have no idea where the unplug action should be removing the
-BB from the throttle group.  Is it as simple as adding it to
-blk_io_unplug(), or will that be violating other constraints on making
-sure the throttle group is first drained before removing the BB from the
-group as one of the final steps during its hot unplug?
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
-
-
---NAIUsWaQ3DL3qQJ1d5u0XSsOMjjQ0mXrd
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY4lcGAAoJEKeha0olJ0NqeZYIAKYQiFot11WYfmIv/xwsqpqV
-1djf0F/mc1GQR7eeiRv9jvgk/PBnChcYX8+AGeLCitjCZ9bfRHBgr0YNbFEFpxUo
-F/tzE227GGzjeW6abSX7nAu8JB/nf2Bd8M6UXyHmCfqG0yngPBgziv0mSdyvHTF9
-w80NS0ueQ2JnqQHGSgWJuvYvHW2RQUrQ8vCv4o6jFm6V84tQQujiDzZFKuwRJR3Q
-sTWskExyX8WAI1mCBmByCBwwoJ1FWTkhB7qpaC7F5T0KHL2aR1wi0eIuXZ0/XdlC
-yF8/jj1HxJJzBqVDD3G+FrSGkXYlGSj2AqHw1BQvwb/BMP2o7gQTzF8m420aD04=
-=h6Hl
------END PGP SIGNATURE-----
-
---NAIUsWaQ3DL3qQJ1d5u0XSsOMjjQ0mXrd--
+thanks
+-- PMM
