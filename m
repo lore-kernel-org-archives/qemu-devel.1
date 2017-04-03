@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cuz1s-0001UR-LK
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 06:16:09 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1cuzCp-0004Us-6o
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 06:27:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cuz1r-00076C-RH
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 06:16:08 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:34154)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cuz1r-000747-KP
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 06:16:07 -0400
-Received: by mail-wr0-x231.google.com with SMTP id l43so164036559wre.1
-	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 03:16:05 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1cuzCm-0003eV-Kq
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 06:27:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34818)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cuzCm-0003bX-Ed
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 06:27:24 -0400
+References: <1490978921-3782-1-git-send-email-gsomlo@gmail.com>
+	<1490978921-3782-3-git-send-email-gsomlo@gmail.com>
+	<31b4d051-cc87-41c8-f568-8299f758bfe3@suse.de>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c1daa1a8-05e9-a42a-7f22-50600942a093@redhat.com>
+Date: Mon, 3 Apr 2017 12:27:15 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170401012508.24665-1-jcody@redhat.com>
-References: <20170401012508.24665-1-jcody@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 3 Apr 2017 11:15:44 +0100
-Message-ID: <CAFEAcA81XBm9Yxd6o+RQu3J6d3uzrkUMcG-hzkxVdhiwCx5GLg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL for-2.9 0/3] Block patches
+In-Reply-To: <31b4d051-cc87-41c8-f568-8299f758bfe3@suse.de>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 2/3] applesmc: consolidate port i/o into
+ single contiguous region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Alexander Graf <agraf@suse.de>, "Gabriel L. Somlo" <gsomlo@gmail.com>, qemu-devel@nongnu.org
+Cc: eshelton@pobox.com
 
-On 1 April 2017 at 02:25, Jeff Cody <jcody@redhat.com> wrote:
-> The following changes since commit 95b31d709ba343ad237c3630047ee7438bac4065:
->
->   Merge remote-tracking branch 'remotes/awilliam/tags/vfio-updates-20170331.0' into staging (2017-03-31 18:06:13 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/codyprime/qemu-kvm-jtc.git tags/block-pull-request
->
-> for you to fetch changes up to 34634ca28688652198f77d7001c0f1e204434663:
->
->   block/curl: Check protocol prefix (2017-03-31 15:53:22 -0400)
->
-> ----------------------------------------------------------------
-> Block patches for -rc3
-> ----------------------------------------------------------------
->
-> Eric Blake (1):
->   rbd: Fix regression in legacy key/values containing escaped :
->
-> Max Reitz (2):
->   qapi/curl: Extend and fix blockdev-add schema
->   block/curl: Check protocol prefix
->
->  block/curl.c         |  10 +++++
->  block/rbd.c          |  83 +++++++++++++++++++++--------------------
->  qapi/block-core.json | 103 ++++++++++++++++++++++++++++++++++++++++++++++-----
->  3 files changed, 146 insertions(+), 50 deletions(-)
 
-Applied, thanks.
 
--- PMM
+On 03/04/2017 11:32, Alexander Graf wrote:
+> 
+>> Newer AppleSMC revisions support an error status (read) port
+>> in addition to the data and command ports currently supported.
+>>
+>> Register the full 32-bit region at once, and handle individual
+>> ports at various offsets within the region from the top-level
+>> applesmc_io_[write|read]() methods (ctual support for reading
+>> the error status port to be added by a subsequent patch).
+>>
+>> Originally proposed by Eric Shelton <eshelton@pobox.com>
+>>
+>> Signed-off-by: Gabriel Somlo <gsomlo@gmail.com>
+> 
+> I would prefer if we could leave the multiplexing to the layer that
+> knows how to do that the best: Memory Regions.
+> 
+> Why don't you just define a big region that ecompasses all of the IO
+> space (with fallback I/O handlers for warnings) and then just sprinkle
+> the ones we handle on top with higher prio?
+
+You don't need priority at all, "contained" regions always win over the
+container (docs/memory.txt just before "Region names").
+
+Both what you propose and what Gabriel did makes sense.  In general QEMU
+does things more like in this patch, but there are exceptions (e.g. ACPI).
+
+Paolo
