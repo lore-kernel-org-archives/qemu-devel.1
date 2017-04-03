@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56268)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cv3Be-0000c3-5u
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 10:42:31 -0400
+	(envelope-from <laurent@vivier.eu>) id 1cv3Tw-0003Xu-Qx
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 11:01:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cv3Bb-0002mD-0p
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 10:42:30 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:33697)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cv3Ba-0002m1-Q7
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 10:42:26 -0400
-Received: by mail-wr0-x244.google.com with SMTP id u18so34179997wrc.0
-	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 07:42:26 -0700 (PDT)
-Date: Mon, 3 Apr 2017 15:42:23 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170403144223.GC3539@stefanha-x1.localdomain>
-References: <4712D8F4B26E034E80552F30A67BE0B1A3D97E@ORSMSX112.amr.corp.intel.com>
-	<20170327132454.GD28620@stefanha-x1.localdomain>
-	<4712D8F4B26E034E80552F30A67BE0B1A40E6D@ORSMSX112.amr.corp.intel.com>
-	<339080cc-c86d-93be-9c13-596eb43d56dd@redhat.com>
-	<4712D8F4B26E034E80552F30A67BE0B1A42954@ORSMSX112.amr.corp.intel.com>
+	(envelope-from <laurent@vivier.eu>) id 1cv3Ts-00009R-R8
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 11:01:24 -0400
+References: <20170328190756.28984-1-laurent@vivier.eu>
+	<20170328190756.28984-2-laurent@vivier.eu>
+	<20170402201911.cmosyih6w6knznfu@var.youpi.perso.aquilenet.fr>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <0df633af-8820-2d7a-a853-aa16d88de7cf@vivier.eu>
+Date: Mon, 3 Apr 2017 17:01:09 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="UFHRwCdBEJvubb2X"
-Content-Disposition: inline
-In-Reply-To: <4712D8F4B26E034E80552F30A67BE0B1A42954@ORSMSX112.amr.corp.intel.com>
-Subject: Re: [Qemu-devel] [PATCH] Create libqemutrace.a for all trace.o
+In-Reply-To: <20170402201911.cmosyih6w6knznfu@var.youpi.perso.aquilenet.fr>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] slirp: add SOCKS5 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,65 +24,250 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Xu, Anthony" <anthony.xu@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Daniel Berrange <berrange@redhat.com>
+To: Samuel Thibault <samuel.thibault@gnu.org>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
 
+Le 02/04/2017 à 22:19, Samuel Thibault a écrit :
+> Hello,
 
---UFHRwCdBEJvubb2X
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-On Tue, Mar 28, 2017 at 07:00:34PM +0000, Xu, Anthony wrote:
-> > >>> ./trace.o, ./qapi/trace.o and ./util/trace.o are added into
-> > >>> libqemuutil.a  to avoid recursive dependencies between
-> > >>> libqemuutil.a and libqemutrace.a.
-> > >> Why would libqemutrace.a depend on libqemuutil.a?
-> > > Each trace.c calls trace_event_register_group to register events,
-> > > trace_event_register_group is defined in trace/control.c , which
-> > > is linked into libqemuutil.a.
-> >=20
-> > Ah:
-> >=20
-> > util-obj-$(CONFIG_TRACE_SIMPLE) +=3D simple.o
-> > util-obj-$(CONFIG_TRACE_FTRACE) +=3D ftrace.o
-> > util-obj-y +=3D control.o
-> > util-obj-y +=3D qmp.o
-> >=20
-> > With the introduction of libqemutrace.a, I believe these should be moved
-> > into libqemutrace.a.
->=20
-> Agreed,
-> But it doesn't solve infinite recursion issue. register_module_init is=20
-> needed by libqemutrace.a, which is defined util/module.c.
->=20
-> it is hard to remove libqemutrace.a dependency on libqemuutil.a.
->=20
-> Removing libqemuutil.a dependency on libqemutrace.a is feasible.
-> Just like what I did in this patch, include all util related trace.o=20
-> to libqemuutila.
->=20
-> The other simple way is to include all trace.o into libqemuutil.a
->=20
-> What's your opinion?
+> Thanks for the patch!
+> 
+> Laurent Vivier, on mar. 28 mars 2017 21:07:56 +0200, wrote:
+>> @@ -617,6 +621,10 @@ void slirp_pollfds_poll(GArray *pollfds, int select_error)
+>>                   * Check sockets for reading
+>>                   */
+>>                  else if (revents & (G_IO_IN | G_IO_HUP | G_IO_ERR)) {
+>> +                    if (so->so_state & SS_ISFCONNECTING) {
+>> +                        socks5_recv(so->s, &so->so_proxy_state);
+>> +                        continue;
+>> +                    }
+> 
+> It looks odd to be calling socks5_recv in all cases.  Shouldn't this
+> check for so_proxy_state != 0?
+> 
 
-There's no harm in adding all trace objects into libqemuutil.a.  I'd go
-that route.
+We don't need, because we poll for G_IO_IN in SS_ISFCONNECTING state
+only if so_proxy_state != 0 (see slirp_pollfds_fill() part)
 
-Stefan
+>> @@ -645,11 +653,19 @@ void slirp_pollfds_poll(GArray *pollfds, int select_error)
+>>                      /*
+>>                       * Check for non-blocking, still-connecting sockets
+>>                       */
+>> -                    if (so->so_state & SS_ISFCONNECTING) {
+>> -                        /* Connected */
+>> -                        so->so_state &= ~SS_ISFCONNECTING;
+>>  
+>> -                        ret = send(so->s, (const void *) &ret, 0, 0);
+>> +                    if (so->so_state & SS_ISFCONNECTING) {
+>> +                        ret = socks5_send(so->s, slirp->proxy_user,
+> 
+> Ditto. Socks5 and non-socks5 code should be properly separated I guess.
 
---UFHRwCdBEJvubb2X
-Content-Type: application/pgp-signature; name="signature.asc"
+The socks5_send() behavior is based on so_proxy_state, and once the
+proxy is connected all must be as if we don't have a proxy, so it seems
+logic to interleave it there.
 
------BEGIN PGP SIGNATURE-----
+>> @@ -1069,6 +1085,48 @@ int slirp_add_exec(Slirp *slirp, int do_pty, const void *args,
+>>                      htons(guest_port));
+>>  }
+>>  
+>> +int slirp_add_proxy(Slirp *slirp, const char *server, int port,
+>> +                    const char *user, const char *password)
+>> +{
+>> +    int fd;
+>> +    socks5_state_t state;
+>> +    struct sockaddr_storage addr;
+>> +
+>> +    /* check the connection */
+> 
+> Please be a bit more verbose :) For instance:
+> 
+>> + /* just check that the connection to the socks5 server works with
+>> the given credentials, and close without doing anything with it. */
+> 
 
-iQEcBAEBAgAGBQJY4l9PAAoJEJykq7OBq3PIY8UH/3BlaKdXV1foYg+Uoo8dBMLT
-KD9hpXLBOXz0FhXaqgn3LqXcNZ4jVUjX+5Gu87uEK3ewazdAKCJfqKBz8tIlFGVg
-jfJeopybKRsH2H18rmwxu2KHYmw590OxsY10EvKLA2vZkpwO3BoBqqWDwIXPnDZr
-vpc1ZjXlVlOKsRNK8NH5g8zK2LTduxf9tmBA0U/Dsy7Hi0Z9nawKwpRrEEICpXbw
-Zv1G4gaNCVBcpCTBIndUyh5XKXFJTUmmNf6egsHmWXiqzjScne9/l4uo0iuFfY4P
-VQ1us0//NIhIoxzF94OnA/Db3QihFhfOC3UWXEr9BHAW3P5pdyyv4slh+UJa1zk=
-=d0yQ
------END PGP SIGNATURE-----
+OK
 
---UFHRwCdBEJvubb2X--
+> 
+>> diff --git a/slirp/socks5.c b/slirp/socks5.c
+>> new file mode 100644
+>> index 0000000..1c5e071
+>> --- /dev/null
+>> +++ b/slirp/socks5.c
+>> @@ -0,0 +1,284 @@
+>> +/* some parts from nmap/ncat GPLv2 */
+> 
+> 
+> One can't just steal code like this.  You *have* to copy over the
+> copyright notice, since there's notably the author information.
+
+Sorry, I've been naive...
+
+Well, for ncat.h license is 281 lines long (with clarifications and
+extensions) for 60 lines copied... I think it is better to rewrite this
+part from the RFC1928.
+
+>> +static int socks5_proxy_connect(int fd, const char *server, int port)
+>> +{
+>> +    struct sockaddr_in saddr;
+>> +    struct hostent *he;
+>> +
+>> +    he = gethostbyname(server);
+>> +    if (he == NULL) {
+>> +        errno = EINVAL;
+>> +        return -1;
+>> +    }
+>> +    saddr.sin_family = AF_INET;
+>> +    saddr.sin_addr = *(struct in_addr *)he->h_addr;
+>> +    saddr.sin_port = htons(port);
+> 
+> Please add a TODO: v6 version
+
+OK
+
+> 
+>> +static int socks5_recv_authenticate(int fd)
+>> +{
+>> +    char socksbuf[2];
+>> +    if (recv(fd, socksbuf, 2, 0) != 2) {
+>> +        return -1;
+>> +    }
+>> +    if (socksbuf[0] != 1 || socksbuf[1] != 0) {
+> 
+> These look like magic numbers :) Please document what they represent.
+
+OK
+
+> 
+>> +    int len;
+>> +
+>> +    memset(&socks5msg, 0, sizeof(socks5msg));
+>> +
+>> +    socks5msg.ver = SOCKS5_VERSION;
+>> +    socks5msg.cmd = SOCKS_CONNECT;
+>> +    socks5msg.rsv = 0;
+> 
+> Please rather set len to 4 here, and increment later on
+> 
+>> +    switch (addr->ss_family) {
+>> +    case AF_INET: {
+>> +            struct sockaddr_in *a = (struct sockaddr_in *)addr;
+>> +
+>> +            socks5msg.atyp = SOCKS5_ATYP_IPv4;
+>> +            memcpy(socks5msg.dst, &a->sin_addr, sizeof(a->sin_addr));
+>> +            len = sizeof(a->sin_addr);
+> 
+> here
+> 
+>> +            memcpy(socks5msg.dst + len, &a->sin_port, sizeof(a->sin_port));
+>> +            len += sizeof(a->sin_port);
+>> +        }
+>> +        break;
+>> +    case AF_INET6: {
+>> +            struct sockaddr_in6 *a = (struct sockaddr_in6 *)addr;
+>> +
+>> +            socks5msg.atyp = SOCKS5_ATYP_IPv6;
+>> +            memcpy(socks5msg.dst, &a->sin6_addr, sizeof(a->sin6_addr));
+>> +            len = sizeof(a->sin6_addr);
+> 
+> and there.
+> 
+>> +            memcpy(socks5msg.dst + len, &a->sin6_port, sizeof(a->sin6_port));
+>> +            len += sizeof(a->sin6_port);
+>> +        }
+>> +        break;
+>> +    default:
+>> +        errno = EINVAL;
+>> +        return -1;
+>> +    }
+>> +    len += 4;
+> 
+> and not have this here, where people wonder what that is :)
+
+OK
+
+> 
+>> +static int socks5_recv_connect(int fd)
+>> +{
+>> +    struct socks5_request socks5msg;
+>> +
+>> +    if (recv(fd, &socks5msg, 4, 0) != 4) {
+> 
+> Thinking about it (there are more like that above and below). You can
+> theoretically have a short read here... So please at least leave a note
+> that we actually should manage buffering of recv()s.
+
+OK
+
+> 
+>> +++ b/slirp/socks5.h
+>> +struct socks4_data {
+>> +    char version;
+>> +    char type;
+>> +    unsigned short port;
+>> +    uint32_t address;
+>> +    char data[SOCKS_BUFF_SIZE]; /* to hold FQDN and username */
+>> +} __attribute__((packed));
+>> +
+>> +/* SOCKS4 protocol responses */
+>> +#define SOCKS4_VERSION          4
+>> +#define SOCKS_CONNECT           1
+>> +#define SOCKS_BIND              2
+>> +#define SOCKS4_CONN_ACC         90
+>> +#define SOCKS4_CONN_REF         91
+>> +#define SOCKS4_CONN_IDENT       92
+>> +#define SOCKS4_CONN_IDENTDIFF   93
+> 
+> These are unused, better just drop them?
+
+I will rewrite this to avoid copy from ncat.
+
+> 
+>> @@ -394,11 +395,21 @@ tcp_sockclosed(struct tcpcb *tp)
+>>  int tcp_fconnect(struct socket *so, unsigned short af)
+>>  {
+>>    int ret=0;
+>> +  Slirp *slirp = so->slirp;
+>>  
+>>    DEBUG_CALL("tcp_fconnect");
+>>    DEBUG_ARG("so = %p", so);
+>>  
+>> -  ret = so->s = qemu_socket(af, SOCK_STREAM, 0);
+>> +  /* local traffic doesn't go to the proxy */
+> 
+> Please fix the comment into "only pass local traffic through the proxy",
+> to actually reflect what the following "if" does :)
+> 
+>> +  if (slirp->proxy_server &&
+>> +      !(af == AF_INET &&
+>> +        (so->so_faddr.s_addr & slirp->vnetwork_mask.s_addr) ==
+>> +        slirp->vnetwork_addr.s_addr)) {
+>> +    ret = so->s = socks5_socket(&so->so_proxy_state);
+> 
+> Please do support AF_INET6 too here, otherwise when working with an ipv6
+> host setup it will break.
+
+OK
+
+> 
+>> diff --git a/slirp/udp6.c b/slirp/udp6.c
+>> index 9fa314b..995181d 100644
+>> --- a/slirp/udp6.c
+>> +++ b/slirp/udp6.c
+>> @@ -22,7 +22,7 @@ void udp6_input(struct mbuf *m)
+>>      DEBUG_CALL("udp6_input");
+>>      DEBUG_ARG("m = %lx", (long)m);
+>>  
+>> -    if (slirp->restricted) {
+>> +    if (slirp->restricted || slirp->proxy_server) {
+>>          goto bad;
+> 
+> Ditto: please do support ipv6 here. It shouldn't be hard, it should be a
+> matter of using the same test as v4 :)
+
+OK
+
+Thanks,
+Laurent
