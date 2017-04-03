@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cv95o-0007wD-1w
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 17:00:55 -0400
+	(envelope-from <alistai@xilinx.com>) id 1cv9Bb-0001GS-LD
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 17:06:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cv95m-0004rc-JL
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 17:00:51 -0400
-Date: Mon, 3 Apr 2017 18:00:30 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170403210030.GK1910@thinpad.lan.raisama.net>
-References: <20170401004624.30886-1-ehabkost@redhat.com>
-	<20170401004624.30886-4-ehabkost@redhat.com>
-	<CAFEAcA_uRHZR0N-=h=eWsDKjZpN4csua1j++wLVfZbsNVpaH5Q@mail.gmail.com>
-	<20170403201026.GJ1910@thinpad.lan.raisama.net>
-	<f612e8c0-0f2a-d373-12c1-a20d6dccc7d0@suse.de>
+	(envelope-from <alistai@xilinx.com>) id 1cv9BW-0007r6-Pa
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 17:06:51 -0400
+Received: from mail-by2nam01on0085.outbound.protection.outlook.com
+	([104.47.34.85]:30720
+	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1cv9BW-0007pI-Ah
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 17:06:46 -0400
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Mon, 3 Apr 2017 17:32:46 +0000
+Message-ID: <74004942B5DA03468B2B76399A14BF2ED54A885F@XSJ-PSEXMBX01.xlnx.xilinx.com>
+References: <CAF++6AOLSd0SYyv_LmnjinEj-jHBbyNZv_hxvdksGqCoDcpmjA@mail.gmail.com>
+In-Reply-To: <CAF++6AOLSd0SYyv_LmnjinEj-jHBbyNZv_hxvdksGqCoDcpmjA@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f612e8c0-0f2a-d373-12c1-a20d6dccc7d0@suse.de>
-Subject: Re: [Qemu-devel] [RFC 03/19] sysbus: Set user_creatable=false by
- default on TYPE_SYS_BUS_DEVICE
+Subject: Re: [Qemu-devel] MTD timeout on bootup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,112 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Graf <agraf@suse.de>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, Scott Wood <scottwood@freescale.com>, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Gerd Hoffmann <kraxel@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Qemu-block <qemu-block@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Beniamino Galvani <b.galvani@gmail.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "Gabriel L . Somlo" <somlo@cmu.edu>, Igor Mammedov <imammedo@redhat.com>, Prasad J Pandit <pjp@fedoraproject.org>, qemu-arm <qemu-arm@nongnu.org>, Shannon Zhao <zhaoshenglong@huawei.com>
+To: James Hanley <jhanley@dgtlrift.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "alistair23@gmail.com" <alistair23@gmail.com>
 
-On Mon, Apr 03, 2017 at 10:15:44PM +0200, Alexander Graf wrote:
-> 
-> 
-> On 03.04.17 22:10, Eduardo Habkost wrote:
-> > On Mon, Apr 03, 2017 at 08:49:16PM +0100, Peter Maydell wrote:
-> > > On 1 April 2017 at 01:46, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > > > commit 33cd52b5d7b9adfd009e95f07e6c64dd88ae2a31 unset
-> > > > cannot_instantiate_with_device_add_yet in TYPE_SYSBUS, making
-> > > > all kinds of untested devices available to -device and
-> > > > device_add.
-> > > > 
-> > > > The problem with that is: setting has_dynamic_sysbus on a
-> > > > machine-type lets it accept all the 288 sysbus device types we
-> > > > have in QEMU, and most of them were never meant to be used with
-> > > > -device. That's a lot of untested code.
-> > > > 
-> > > > Fortunately today we have just a few has_dynamic_sysbus=1
-> > > > machines: virt, pc-q35-*, ppce500, and spapr.
-> > > > 
-> > > > virt, ppce500, and spapr have extra checks to ensure just a few
-> > > > device types can be instantiated:
-> > > > 
-> > > > * virt supports only TYPE_VFIO_CALXEDA_XGMAC, TYPE_VFIO_AMD_XGBE.
-> > > > * ppce500 supports only TYPE_ETSEC_COMMON.
-> > > > * spapr supports only TYPE_SPAPR_PCI_HOST_BRIDGE.
-> > > > 
-> > > > q35 has no code to block unsupported sysbus devices, however, and
-> > > > accepts all device types. Fortunately, only the following 20
-> > > > device types are compiled into the qemu-system-x86_64 and
-> > > > qemu-system-i386 binaries:
-> > > > 
-> > > > * allwinner-ahci
-> > > > * amd-iommu
-> > > > * cfi.pflash01
-> > > > * esp
-> > > > * fw_cfg_io
-> > > > * fw_cfg_mem
-> > > > * generic-sdhci
-> > > > * hpet
-> > > > * intel-iommu
-> > > > * ioapic
-> > > > * isabus-bridge
-> > > > * kvmclock
-> > > > * kvm-ioapic
-> > > > * kvmvapic
-> > > > * SUNW,fdtwo
-> > > > * sysbus-ahci
-> > > > * sysbus-fdc
-> > > > * sysbus-ohci
-> > > > * unimplemented-device
-> > > > * virtio-mmio
-> > > > 
-> > > > Instead of requiring each machine-type with has_dynamic_sysbus=1
-> > > > to implement its own mechanism to block unsupported devices, we
-> > > > can use the user_creatable flag to ensure we won't let the user
-> > > > plug anything that will never work.
-> > > 
-> > > How does this work? Which devices can be dynamically
-> > > plugged is machine dependent. You can't dynamically-plug
-> > > an intel-iommu on the ARM virt board, and you can't
-> > > dynamically-plug the vfio-calxeda-xgmac on the spapr
-> > > board, and so on. So I don't see how we can just have
-> > > a flag on the device itself that controls whether
-> > > it can be dynamically plugged.
-> > > 
-> > > So I'm definitely coming around to the opinion that
-> > > it's just a bug in the q35 board that it doesn't have
-> > > any device whitelisting, and we should fix that.
-> > 
-> > OK, let's assume q35 must implement a whitelist:
-> > 
-> > To build that whitelist, we need to be able to know what should
-> > be in the whitelist, or not. And nobody knew for sure what was
-> > user-creatable in q35 by accident, and what was really supposed
-> > to be user-creatable in q35. See the "q35 and sysbus devices"
-> > thread I started ~2 weeks ago.
-> > 
-> > Building a q35 whitelist will be much easier if make
-> > sys-bus-devices non-user-creatable by default.
-> 
-> So why are they user creatable in the first place?
-> 
-> We used to have boards that were dynamic sysbus aware (ppce500, virt) that
-> allowed dynamic creation and every other board did not. I don't remember the
-> exact mechanism behind it though.
-> 
-> When did that behavior change? It sounds like a regression somewhere.
-
-See patch description:
-
-> > > > commit 33cd52b5d7b9adfd009e95f07e6c64dd88ae2a31 unset
-> > > > cannot_instantiate_with_device_add_yet in TYPE_SYSBUS,
-
-Note that the commit above is not a regression[1] (because q35
-didn't have has_dynamic_sysbus=1 yet), but having sysbus devices
-have cannot_instantiate_with_device_add_yet=false/user_creatable=true
-by default makes it harder to build the whitelist for q35 (or
-other machines that will have has_dynamic_sysbus=1 in the
-future).
-
-[1] Well, it was a regression on the "info qdm" HMP command
-    output, which is a minor bug. But it's still a bug we still
-    want to fix anyway.
-
--- 
-Eduardo
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBKYW1lcyBIYW5sZXkgW21haWx0
+bzpqaGFubGV5QGRndGxyaWZ0LmNvbV0NCj4gU2VudDogRnJpZGF5LCAzMSBNYXJjaCAyMDE3IDg6
+MjkgQU0NCj4gVG86IEFsaXN0YWlyIEZyYW5jaXMgPGFsaXN0YWlAeGlsaW54LmNvbT47IFBldGVy
+IENyb3N0aHdhaXRlDQo+IDxjcm9zdGh3YWl0ZS5wZXRlckBnbWFpbC5jb20+OyBxZW11LWRldmVs
+IDxxZW11LWRldmVsQG5vbmdudS5vcmc+DQo+IFN1YmplY3Q6IE1URCB0aW1lb3V0IG9uIGJvb3R1
+cA0KPg0KPiBXaGVuIHRyeWluZyB0byBib290dXAgYSBwcmlzdGluZSB6eW5jIGltYWdlIGZyb20g
+dGhlIHpjNzAyIHRhcmJhbGwsIGl0IHdvdWxkIGFsd2F5cw0KPiBmYWlsIHdpdGggdGhlIE1URCBk
+ZXRlY3Rpb24gb2YgdGhlIHNlcmlhbCBmbGFzaCBkZXZpY2UgdHlwZSBjb21tYW5kIG92ZXIgdGhl
+IFNQSS4gIEkNCj4gYmVsaWV2ZSB0aGlzIHNlY3Rpb24gb2YgY29kZSBtYXkgaGF2ZSB0aGUgbG9n
+aWMgZmxpcHBlZC4gIE9uY2UgSSBjaGFuZ2VkIGl0IHRvIHRoZQ0KPiBmb2xsb3dpbmcsIEkgd2Fz
+IGFibGUgdG8gZGV0ZWN0IHRoZSBmbGFzaCB0eXBlIHdoZW4gYm9vdGluZyB0aGUgcHJpc3RpbmUg
+aW1hZ2UgZnJvbQ0KPiBYaWxpbnguDQoNCkhleSBKaW0sDQoNCkZpcnN0IG9mZiwgdGhhbmtzIGZv
+ciB0aGUgcGF0Y2guDQoNCkluIHRoZSBmdXR1cmUgZG8geW91IG1pbmQgZm9sbG93aW5nIHRoZSBn
+dWlkZWxpbmVzIGhlcmU6DQpodHRwOi8vd2lraS5xZW11LXByb2plY3Qub3JnL0NvbnRyaWJ1dGUv
+U3VibWl0QVBhdGNoDQoNCklmIHlvdSB1c2UgZ2l0IGZvcm1hdC1wYXRjaCBhbmQgZ2l0IHNlbmQt
+ZW1haWwgdG8gZ2VuZXJhdGUgdGhlIHBhdGNoIGFuZCBzZW5kIHRoZSByZXN1bHQNCnRvIHRoZSBt
+YWlsaW5nIGxpc3QgaXQgaXMgbXVjaCBlYXNpZXIgZm9yIHBlb3BsZSB0byByZXZpZXcgYW5kIGFw
+cGx5Lg0KDQpMb29raW5nIGF0IHRoZSBYaWxpbnggWnlucS03MDAgVFJNIChwYWdlIDE3NTQpIEkg
+c2VlIHRoYXQgdGhlIE1hbl9zdGFydF9jb20gYml0DQpzcGVjaWZpZXMgdG8gbWFudWFsbHkgc3Rh
+cnQgdGhlIHRyYW5zbWlzc2lvbiBvZiBkYXRhLCBzbyBpdCBsb29rcyBsaWtlIHRoZSBsb2dpYyBh
+bHJlYWR5IGluDQp0aGUgUUVNVSBtb2RlbCBpcyBjb3JyZWN0LiBXaGF0IGlzc3VlIGFyZSB5b3Ug
+c2VlaW5nIHRoYXQgdGhpcyBmaXhlcz8gTWF5YmUgdGhlIGxvZ2ljDQpzb21ld2hlcmUgZWxzZSBp
+cyBpbmNvcnJlY3QuDQoNClBTOiBTb3JyeSBhYm91dCB0aGUgZm9vdGVyLCBJIGhhZCB0byByZXBs
+eSBmcm9tIG15IGNvcnBvcmF0ZSBlbWFpbCBhY2NvdW50Lg0KDQpUaGFua3MsDQoNCkFsaXN0YWly
+DQoNCj4gLUppbQ0KPg0KPg0KPiBGcm9tIGJhYWFhY2NhMzcwYzEzNTI2ZmQyYjhjN2IzM2M3ZDll
+OGE2ZDdiOGQgTW9uIFNlcCAxNyAwMDowMDowMCAyMDAxDQo+IEZyb206IEppbSBIYW5sZXkgPEpp
+bS5IYW5sZXlATGFuZGlzR3lyLmNvbT4NCj4gRGF0ZTogVGh1LCAyMyBNYXIgMjAxNyAxMDoyOToz
+NCAtMDQwMA0KPiBTdWJqZWN0OiBbUEFUQ0hdIE1URCB3cml0ZXMgZnJvbSB0aGUgU1BJIHdlcmUg
+bmV2ZXIgYmVpbmcgZGVxdWV1ZS4uLg0KPiBTaWduZWQtb2ZmLWJ5Og0KPg0KPiAtLS0NCj4gIGh3
+L3NzaS94aWxpbnhfc3BpcHMuYyB8IDQgKystLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0
+aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4NCj4gZGlmZiAtLWdpdCBhL2h3L3NzaS94aWxpbnhf
+c3BpcHMuYyBiL2h3L3NzaS94aWxpbnhfc3BpcHMuYw0KPiBpbmRleCBkYThhZGZhLi5hM2FmMWY3
+IDEwMDY0NA0KPiAtLS0gYS9ody9zc2kveGlsaW54X3NwaXBzLmMNCj4gKysrIGIvaHcvc3NpL3hp
+bGlueF9zcGlwcy5jDQo+IEBAIC00ODIsOCArNDgyLDggQEAgc3RhdGljIHZvaWQgeGlsaW54X3Nw
+aXBzX3dyaXRlKHZvaWQgKm9wYXF1ZSwgaHdhZGRyIGFkZHIsDQo+ICAgICAgcy0+cmVnc1thZGRy
+XSA9IChzLT5yZWdzW2FkZHJdICYgfm1hc2spIHwgKHZhbHVlICYgbWFzayk7DQo+ICBub19yZWdf
+dXBkYXRlOg0KPiAgICAgIHhpbGlueF9zcGlwc191cGRhdGVfY3NfbGluZXMocyk7DQo+IC0gICAg
+aWYgKChtYW5fc3RhcnRfY29tICYmIHMtPnJlZ3NbUl9DT05GSUddICYgTUFOX1NUQVJUX0VOKSB8
+fA0KPiAtICAgICAgICAgICAgKGZpZm84X2lzX2VtcHR5KCZzLT50eF9maWZvKSAmJiBzLT5yZWdz
+W1JfQ09ORklHXSAmIE1BTl9TVEFSVF9FTikpIHsNCj4gKyAgICBpZiAoISgobWFuX3N0YXJ0X2Nv
+bSAmJiBzLT5yZWdzW1JfQ09ORklHXSAmIE1BTl9TVEFSVF9FTikgfHwNCj4gKyAgICAgICAgICAg
+IChmaWZvOF9pc19lbXB0eSgmcy0+dHhfZmlmbykgJiYgcy0+cmVnc1tSX0NPTkZJR10gJiBNQU5f
+U1RBUlRfRU4pKSkgew0KPiAgICAgICAgICB4aWxpbnhfc3BpcHNfZmx1c2hfdHhmaWZvKHMpOw0K
+PiAgICAgIH0NCj4gICAgICB4aWxpbnhfc3BpcHNfdXBkYXRlX2NzX2xpbmVzKHMpOw0KPiAtLQ0K
+PiAyLjcuNA0KDQoNCg0KVGhpcyBlbWFpbCBhbmQgYW55IGF0dGFjaG1lbnRzIGFyZSBpbnRlbmRl
+ZCBmb3IgdGhlIHNvbGUgdXNlIG9mIHRoZSBuYW1lZCByZWNpcGllbnQocykgYW5kIGNvbnRhaW4o
+cykgY29uZmlkZW50aWFsIGluZm9ybWF0aW9uIHRoYXQgbWF5IGJlIHByb3ByaWV0YXJ5LCBwcml2
+aWxlZ2VkIG9yIGNvcHlyaWdodGVkIHVuZGVyIGFwcGxpY2FibGUgbGF3LiBJZiB5b3UgYXJlIG5v
+dCB0aGUgaW50ZW5kZWQgcmVjaXBpZW50LCBkbyBub3QgcmVhZCwgY29weSwgb3IgZm9yd2FyZCB0
+aGlzIGVtYWlsIG1lc3NhZ2Ugb3IgYW55IGF0dGFjaG1lbnRzLiBEZWxldGUgdGhpcyBlbWFpbCBt
+ZXNzYWdlIGFuZCBhbnkgYXR0YWNobWVudHMgaW1tZWRpYXRlbHkuDQoNCg==
