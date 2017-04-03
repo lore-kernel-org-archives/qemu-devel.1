@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cv1K7-00086U-2l
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:43:08 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cv1Kq-00006n-FT
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:43:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cv1K2-0007G5-75
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:43:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40502)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1cv1K1-0007Ff-Um
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:43:02 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F31D880464
-	for <qemu-devel@nongnu.org>; Mon,  3 Apr 2017 12:42:55 +0000 (UTC)
-References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
-	<1490621195-2228-10-git-send-email-armbru@redhat.com>
-	<20170403113703.GS2768@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <44b23727-f5d4-0d64-0694-85c6dd601431@redhat.com>
-Date: Mon, 3 Apr 2017 14:42:48 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cv1Kp-0008CF-NA
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:43:52 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170401004624.30886-1-ehabkost@redhat.com>
+	<20170401004624.30886-6-ehabkost@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <8eafa845-6623-af22-30c7-427083d6ee31@amsat.org>
+Date: Mon, 3 Apr 2017 09:43:36 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170403113703.GS2768@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="CRAumLDN30DcbIBeV0AE5TohInraVuBRk"
-Subject: Re: [Qemu-devel] [PATCH RFC v3 for-2.9 09/11] rbd: Revert -blockdev
- parameter password-secret
+In-Reply-To: <20170401004624.30886-6-ehabkost@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC 05/19] pflash_cfi01: Remove user_creatable
+ flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,81 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jdurgin@redhat.com, jcody@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Max Reitz <mreitz@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---CRAumLDN30DcbIBeV0AE5TohInraVuBRk
-From: Max Reitz <mreitz@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jdurgin@redhat.com,
- jcody@redhat.com
-Message-ID: <44b23727-f5d4-0d64-0694-85c6dd601431@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v3 for-2.9 09/11] rbd: Revert -blockdev
- parameter password-secret
-References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
- <1490621195-2228-10-git-send-email-armbru@redhat.com>
- <20170403113703.GS2768@redhat.com>
-In-Reply-To: <20170403113703.GS2768@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 03/31/2017 09:46 PM, Eduardo Habkost wrote:
+> TYPE_CFI_PFLASH01 devices need to be mapped by
+> pflash_cfi01_register() and can't be used with -device. Remove
+> user_creatable from the device class.
+>
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: Max Reitz <mreitz@redhat.com>
+> Cc: qemu-block@nongnu.org
+> Cc: Laszlo Ersek <lersek@redhat.com>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-On 03.04.2017 13:37, Daniel P. Berrange wrote:
-> On Mon, Mar 27, 2017 at 03:26:33PM +0200, Markus Armbruster wrote:
->> This reverts a part of commit 8a47e8e.  We're having second thoughts
->> on the QAPI schema (and thus the external interface), and haven't
->> reached consensus, yet.  Issues include:
->>
->> * BlockdevOptionsRbd member @password-secret isn't actually a
->>   password, it's a key generated by Ceph.
->>
->> * We're not sure where member @password-secret belongs (see the
->>   previous commit).
->>
->> * How @password-secret interacts with settings from a configuration
->>   file specified with @conf is undocumented.  I suspect it's untested,=
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
->>   too.
->>
->> Let's avoid painting ourselves into a corner now, and revert the
->> feature for 2.9.
->>
->> Note that users can still configure an authentication key with a
->> configuration file.  They probably do that anyway if they use Ceph
->> outside QEMU as well.
->=20
-> NB, this makes blockdev-add largely useless for RBD from libvirt's POV,=
-
-> since we rely on the password-secret facility working to support apps
-> like openstack which won't configure the global config file for RBD.
->=20
-> Not a regression though, since blockdev-add is new - just means we won'=
-t
-> be able to use the new feature yet :-(
-
-How does it make blockdev-add totally useless? The only thing you cannot
-do is set passwords for rbd. Can this not be added as a new feature in
-the future?
-
-Max
-
-
---CRAumLDN30DcbIBeV0AE5TohInraVuBRk
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljiQ0gSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ArKwIAIhEEwn0RmNh+wv4fYH9erv+jgROTZPV
-cVBHczo5q3HbqwYd4BrVKRNOO+X0hauod3xJTmvWYX+Z1jZrmdY/ok9hjianUfN1
-woexxWMcrDioosikZRf3ITgadLDcpiERUlHwFDcifHF9JtVh29pT/z9fFleJXAu7
-WBelUX7B/xYZQnWqwXiSGto2cetAKsgWnwe6reJjnYwtrnvoMs3uQkX6V3r6FRQG
-sOLra3f1kJR7/f1PVxYlIenMcaNLe6BaDq3HYf9UfMNKUL6z6eV7woLiatt4U5PQ
-11ZmpSB0bcIEwlvVkTvI6I/eeZqQLN1LzPfU3LTi0fcjloPIw1ClfpA=
-=IRES
------END PGP SIGNATURE-----
-
---CRAumLDN30DcbIBeV0AE5TohInraVuBRk--
+> ---
+>  hw/block/pflash_cfi01.c | 5 -----
+>  1 file changed, 5 deletions(-)
+>
+> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+> index f48dc20035..594d4cf6fe 100644
+> --- a/hw/block/pflash_cfi01.c
+> +++ b/hw/block/pflash_cfi01.c
+> @@ -927,11 +927,6 @@ static void pflash_cfi01_class_init(ObjectClass *klass, void *data)
+>      dc->props = pflash_cfi01_properties;
+>      dc->vmsd = &vmstate_pflash;
+>      set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+> -    /*
+> -     * FIXME: Set only for compatibility on q35 machine-type.
+> -     * Probably never meant to be user-creatable
+> -     */
+> -    dc->user_creatable = true;
+>  }
+>
+>
+>
