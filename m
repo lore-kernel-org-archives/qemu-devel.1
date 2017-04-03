@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cv3Tw-0003Xu-Qx
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 11:01:26 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cv3Ze-0004x8-6F
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 11:07:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cv3Ts-00009R-R8
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 11:01:24 -0400
-References: <20170328190756.28984-1-laurent@vivier.eu>
-	<20170328190756.28984-2-laurent@vivier.eu>
-	<20170402201911.cmosyih6w6knznfu@var.youpi.perso.aquilenet.fr>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <0df633af-8820-2d7a-a853-aa16d88de7cf@vivier.eu>
-Date: Mon, 3 Apr 2017 17:01:09 +0200
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cv3Za-0002ob-49
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 11:07:18 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:37012
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1cv3ZZ-0002mX-St
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 11:07:14 -0400
+References: <1490856931-21732-1-git-send-email-kraxel@redhat.com>
+	<e1ccd5bc-f683-93b7-374d-0707765a8715@ilande.co.uk>
+	<1490881315.28523.11.camel@redhat.com>
+	<e0df6143-81f2-a0e7-2c23-90dd01724e9f@redhat.com>
+	<1491221026.17505.39.camel@redhat.com>
+	<b8daec8e-86ed-56e6-d42d-d948508e5b6f@ilande.co.uk>
+	<1491223335.17505.48.camel@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <81c92413-024a-5448-1160-b24ca944e88e@ilande.co.uk>
+Date: Mon, 3 Apr 2017 16:06:46 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170402201911.cmosyih6w6knznfu@var.youpi.perso.aquilenet.fr>
+In-Reply-To: <1491223335.17505.48.camel@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] slirp: add SOCKS5 support
+Subject: Re: [Qemu-devel] [RfC PATCH 0/4] make display updates thread safe.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,250 +34,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@gnu.org>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 
-Le 02/04/2017 à 22:19, Samuel Thibault a écrit :
-> Hello,
+On 03/04/17 13:42, Gerd Hoffmann wrote:
 
-Hi,
+> On Mo, 2017-04-03 at 13:24 +0100, Mark Cave-Ayland wrote:
+>> On 03/04/17 13:03, Gerd Hoffmann wrote:
+>>
+>>>   Hi,
+>>>
+>>>> I checked the branch, is bitmap_copy_and_clear_atomic correct when you
+>>>> have partial updates?  Maybe you need to handle partial updates of the
+>>>> first and last word?
+>>>
+>>> Should not be a problem.  We might clear some more bits, but these are
+>>> outsize the visible area so they should cause visible corruption (and if
+>>> the visible area changes the display code needs to do a full refresh
+>>> anyway).
+>>
+>> Right. Also is there a reason that
+>> cpu_physical_memory_snapshot_and_clear_dirty() uses BITS_PER_LEVEL when
+>> calculating the alignment used for the first/last addresses?
+> 
+> The code copy doesn't operate on bits but on bitmap longs, so I can just
+> copy the whole long instead of fiddeling with bits.  So I round down to
+> a bitmap long start.  On 64bit hosts that are units of 64 pages.
+> 
+> Actually querying the copied bitmap operates on page granularity of
+> course.
+> 
+>> Otherwise you end up expanding the range of your last address
+>> considerably beyond the next page alignment.
+> 
+> Yes, it's larger, but as it expands to the start of the long word I
+> expect the penalty is almost zero (same cache line) and being able to
+> just copy the whole long instead of dealing with individual bits should
+> be a win.
+> 
+>> And also in the main page
+>> loop why is BITS_PER_LEVEL used? I see that several of the internal
+>> bitmap routines appear to use BITS_PER_LONG for compressing into the
+>> bitmap which might be more appropriate?
+> 
+> shift by BITS_PER_LEVEL is the same as division by BITS_PER_LONG
 
-> Thanks for the patch!
-> 
-> Laurent Vivier, on mar. 28 mars 2017 21:07:56 +0200, wrote:
->> @@ -617,6 +621,10 @@ void slirp_pollfds_poll(GArray *pollfds, int select_error)
->>                   * Check sockets for reading
->>                   */
->>                  else if (revents & (G_IO_IN | G_IO_HUP | G_IO_ERR)) {
->> +                    if (so->so_state & SS_ISFCONNECTING) {
->> +                        socks5_recv(so->s, &so->so_proxy_state);
->> +                        continue;
->> +                    }
-> 
-> It looks odd to be calling socks5_recv in all cases.  Shouldn't this
-> check for so_proxy_state != 0?
-> 
+Right hopefully I understand this now. The following diff appears to fix
+CG3/TCX for me:
 
-We don't need, because we poll for G_IO_IN in SS_ISFCONNECTING state
-only if so_proxy_state != 0 (see slirp_pollfds_fill() part)
+diff --git a/exec.c b/exec.c
+index 000af18..66bdcf4 100644
+--- a/exec.c
++++ b/exec.c
+@@ -1071,7 +1071,7 @@ DirtyBitmapSnapshot
+*cpu_physical_memory_snapshot_and_clear_dirty
+      (ram_addr_t start, ram_addr_t length, unsigned client)
+ {
+     DirtyMemoryBlocks *blocks;
+-    unsigned long align = 1 << (TARGET_PAGE_BITS + BITS_PER_LEVEL);
++    unsigned long align = 1UL << (TARGET_PAGE_BITS + BITS_PER_LEVEL);
+     ram_addr_t first = QEMU_ALIGN_DOWN(start, align);
+     ram_addr_t last  = QEMU_ALIGN_UP(start + length, align);
+     DirtyBitmapSnapshot *snap;
+@@ -1097,7 +1097,6 @@ DirtyBitmapSnapshot
+*cpu_physical_memory_snapshot_and_clear_dirty
 
->> @@ -645,11 +653,19 @@ void slirp_pollfds_poll(GArray *pollfds, int select_error)
->>                      /*
->>                       * Check for non-blocking, still-connecting sockets
->>                       */
->> -                    if (so->so_state & SS_ISFCONNECTING) {
->> -                        /* Connected */
->> -                        so->so_state &= ~SS_ISFCONNECTING;
->>  
->> -                        ret = send(so->s, (const void *) &ret, 0, 0);
->> +                    if (so->so_state & SS_ISFCONNECTING) {
->> +                        ret = socks5_send(so->s, slirp->proxy_user,
-> 
-> Ditto. Socks5 and non-socks5 code should be properly separated I guess.
+         assert(QEMU_IS_ALIGNED(offset, (1 << BITS_PER_LEVEL)));
+         assert(QEMU_IS_ALIGNED(num,    (1 << BITS_PER_LEVEL)));
+-        offset >>= BITS_PER_LEVEL;
 
-The socks5_send() behavior is based on so_proxy_state, and once the
-proxy is connected all must be as if we don't have a proxy, so it seems
-logic to interleave it there.
+         bitmap_copy_and_clear_atomic(snap->dirty + dest,
+                                      blocks->blocks[idx] + (offset >>
+BITS_PER_LEVEL),
 
->> @@ -1069,6 +1085,48 @@ int slirp_add_exec(Slirp *slirp, int do_pty, const void *args,
->>                      htons(guest_port));
->>  }
->>  
->> +int slirp_add_proxy(Slirp *slirp, const char *server, int port,
->> +                    const char *user, const char *password)
->> +{
->> +    int fd;
->> +    socks5_state_t state;
->> +    struct sockaddr_storage addr;
->> +
->> +    /* check the connection */
-> 
-> Please be a bit more verbose :) For instance:
-> 
->> + /* just check that the connection to the socks5 server works with
->> the given credentials, and close without doing anything with it. */
-> 
 
-OK
+There were 2 issues here: without the UL suffix on align I was getting
+incorrect first/last addresses since the high bits of align weren't
+being cleared, and then offset appeared to be shifted twice.
 
-> 
->> diff --git a/slirp/socks5.c b/slirp/socks5.c
->> new file mode 100644
->> index 0000000..1c5e071
->> --- /dev/null
->> +++ b/slirp/socks5.c
->> @@ -0,0 +1,284 @@
->> +/* some parts from nmap/ncat GPLv2 */
-> 
-> 
-> One can't just steal code like this.  You *have* to copy over the
-> copyright notice, since there's notably the author information.
+Does this look reasonable to you?
 
-Sorry, I've been naive...
 
-Well, for ncat.h license is 281 lines long (with clarifications and
-extensions) for 60 lines copied... I think it is better to rewrite this
-part from the RFC1928.
+ATB,
 
->> +static int socks5_proxy_connect(int fd, const char *server, int port)
->> +{
->> +    struct sockaddr_in saddr;
->> +    struct hostent *he;
->> +
->> +    he = gethostbyname(server);
->> +    if (he == NULL) {
->> +        errno = EINVAL;
->> +        return -1;
->> +    }
->> +    saddr.sin_family = AF_INET;
->> +    saddr.sin_addr = *(struct in_addr *)he->h_addr;
->> +    saddr.sin_port = htons(port);
-> 
-> Please add a TODO: v6 version
-
-OK
-
-> 
->> +static int socks5_recv_authenticate(int fd)
->> +{
->> +    char socksbuf[2];
->> +    if (recv(fd, socksbuf, 2, 0) != 2) {
->> +        return -1;
->> +    }
->> +    if (socksbuf[0] != 1 || socksbuf[1] != 0) {
-> 
-> These look like magic numbers :) Please document what they represent.
-
-OK
-
-> 
->> +    int len;
->> +
->> +    memset(&socks5msg, 0, sizeof(socks5msg));
->> +
->> +    socks5msg.ver = SOCKS5_VERSION;
->> +    socks5msg.cmd = SOCKS_CONNECT;
->> +    socks5msg.rsv = 0;
-> 
-> Please rather set len to 4 here, and increment later on
-> 
->> +    switch (addr->ss_family) {
->> +    case AF_INET: {
->> +            struct sockaddr_in *a = (struct sockaddr_in *)addr;
->> +
->> +            socks5msg.atyp = SOCKS5_ATYP_IPv4;
->> +            memcpy(socks5msg.dst, &a->sin_addr, sizeof(a->sin_addr));
->> +            len = sizeof(a->sin_addr);
-> 
-> here
-> 
->> +            memcpy(socks5msg.dst + len, &a->sin_port, sizeof(a->sin_port));
->> +            len += sizeof(a->sin_port);
->> +        }
->> +        break;
->> +    case AF_INET6: {
->> +            struct sockaddr_in6 *a = (struct sockaddr_in6 *)addr;
->> +
->> +            socks5msg.atyp = SOCKS5_ATYP_IPv6;
->> +            memcpy(socks5msg.dst, &a->sin6_addr, sizeof(a->sin6_addr));
->> +            len = sizeof(a->sin6_addr);
-> 
-> and there.
-> 
->> +            memcpy(socks5msg.dst + len, &a->sin6_port, sizeof(a->sin6_port));
->> +            len += sizeof(a->sin6_port);
->> +        }
->> +        break;
->> +    default:
->> +        errno = EINVAL;
->> +        return -1;
->> +    }
->> +    len += 4;
-> 
-> and not have this here, where people wonder what that is :)
-
-OK
-
-> 
->> +static int socks5_recv_connect(int fd)
->> +{
->> +    struct socks5_request socks5msg;
->> +
->> +    if (recv(fd, &socks5msg, 4, 0) != 4) {
-> 
-> Thinking about it (there are more like that above and below). You can
-> theoretically have a short read here... So please at least leave a note
-> that we actually should manage buffering of recv()s.
-
-OK
-
-> 
->> +++ b/slirp/socks5.h
->> +struct socks4_data {
->> +    char version;
->> +    char type;
->> +    unsigned short port;
->> +    uint32_t address;
->> +    char data[SOCKS_BUFF_SIZE]; /* to hold FQDN and username */
->> +} __attribute__((packed));
->> +
->> +/* SOCKS4 protocol responses */
->> +#define SOCKS4_VERSION          4
->> +#define SOCKS_CONNECT           1
->> +#define SOCKS_BIND              2
->> +#define SOCKS4_CONN_ACC         90
->> +#define SOCKS4_CONN_REF         91
->> +#define SOCKS4_CONN_IDENT       92
->> +#define SOCKS4_CONN_IDENTDIFF   93
-> 
-> These are unused, better just drop them?
-
-I will rewrite this to avoid copy from ncat.
-
-> 
->> @@ -394,11 +395,21 @@ tcp_sockclosed(struct tcpcb *tp)
->>  int tcp_fconnect(struct socket *so, unsigned short af)
->>  {
->>    int ret=0;
->> +  Slirp *slirp = so->slirp;
->>  
->>    DEBUG_CALL("tcp_fconnect");
->>    DEBUG_ARG("so = %p", so);
->>  
->> -  ret = so->s = qemu_socket(af, SOCK_STREAM, 0);
->> +  /* local traffic doesn't go to the proxy */
-> 
-> Please fix the comment into "only pass local traffic through the proxy",
-> to actually reflect what the following "if" does :)
-> 
->> +  if (slirp->proxy_server &&
->> +      !(af == AF_INET &&
->> +        (so->so_faddr.s_addr & slirp->vnetwork_mask.s_addr) ==
->> +        slirp->vnetwork_addr.s_addr)) {
->> +    ret = so->s = socks5_socket(&so->so_proxy_state);
-> 
-> Please do support AF_INET6 too here, otherwise when working with an ipv6
-> host setup it will break.
-
-OK
-
-> 
->> diff --git a/slirp/udp6.c b/slirp/udp6.c
->> index 9fa314b..995181d 100644
->> --- a/slirp/udp6.c
->> +++ b/slirp/udp6.c
->> @@ -22,7 +22,7 @@ void udp6_input(struct mbuf *m)
->>      DEBUG_CALL("udp6_input");
->>      DEBUG_ARG("m = %lx", (long)m);
->>  
->> -    if (slirp->restricted) {
->> +    if (slirp->restricted || slirp->proxy_server) {
->>          goto bad;
-> 
-> Ditto: please do support ipv6 here. It shouldn't be hard, it should be a
-> matter of using the same test as v4 :)
-
-OK
-
-Thanks,
-Laurent
+Mark.
