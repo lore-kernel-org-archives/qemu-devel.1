@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cv1ea-0006wf-Mu
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:04:20 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1cv1ek-00074N-Tj
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:04:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cv1eX-0001wZ-HC
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:04:16 -0400
-References: <20170331170512.10381-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <c38b9069-a2e9-961a-6201-c44b25a5c906@redhat.com>
-Date: Mon, 3 Apr 2017 15:03:40 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170331170512.10381-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="QrEKjglNbaOimQPtgbo8druFvrroBVusK"
-Subject: Re: [Qemu-devel] [PATCH for-2.9] block/parallels: Avoid overflows
+	(envelope-from <pm215@archaic.org.uk>) id 1cv1ej-00024s-U2
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:04:26 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:49057)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1cv1ej-0001yW-OB
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:04:25 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon,  3 Apr 2017 14:04:15 +0100
+Message-Id: <1491224655-5776-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH for-2.9] configure: on Windows minimum glib
+ version must be 2.30
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,66 +23,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Stefan Weil <sw@weilnetz.de>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---QrEKjglNbaOimQPtgbo8druFvrroBVusK
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
- "Denis V . Lunev" <den@openvz.org>, Kevin Wolf <kwolf@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c38b9069-a2e9-961a-6201-c44b25a5c906@redhat.com>
-Subject: Re: [PATCH for-2.9] block/parallels: Avoid overflows
-References: <20170331170512.10381-1-mreitz@redhat.com>
-In-Reply-To: <20170331170512.10381-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+In the 2.7 release we stated in the ChangeLog that the
+minimum glib version for Windows hosts was 2.30, but we
+didn't update configure to enforce this because we were
+very close to the release at the point where we noticed
+the issue, and it only affected building the test suite.
+We then forgot that we needed to do it. Fix the omission.
 
-On 31.03.2017 19:05, Max Reitz wrote:
-> Change the types of variables in allocate_clusters() to int64_t so we d=
-o
-> not have to worry about potential overflows.
->=20
-> Add an assertion that our accesses to s->bat[] do not result in a buffe=
-r
-> overflow and that the implicit conversion performed when invoking
-> bat_entry_off() does not result in an integer overflow.
->=20
-> Coverity-id: 1307776
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
-> This supercedes Peter's patch "block/parallels.c: avoid integer overflo=
-w
-> in allocate_clusters()".
-> ---
->  block/parallels.c | 19 +++++++++++++------
->  1 file changed, 13 insertions(+), 6 deletions(-)
+(The reason for the 2.30 requirement is use of
+g_dir_make_tmp() -- our fallback implementation uses
+mkdtemp(), which isn't available on Windows.)
 
-Thanks for reviewing, applied to my block branch:
+Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ configure | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-https://github.com/XanClic/qemu/commits/block
-
-Max
-
-
---QrEKjglNbaOimQPtgbo8druFvrroBVusK
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljiSCwSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A34wH/3O2LzhinzV7zV1NnwM3O7l5pQEOB7Fs
-zcUGkEXzM7rYhQGWfzyboXPevYdLzUqYwMW+f4zwe4vUtkFdbppWKN3VarwH+oIu
-slAU1OHRYzMQGIqBlSYqCfMo4QBzppDoR9KyQLnQiWUfTeAz6lGL0ZPm2vGDPcHo
-a20bD7x5uSBqJeB4vys75PFX+wWpDKrRioJbXZzwXjVbh22MOaTcWfEVCgZd2sa5
-g42TdEBl2lHG5MOcZcIRia0OodpxHe+EO2RnPoeOwwnxKXjm0iIOvC1aCtTylhax
-++Qu9N1BHDnjUTY7r7XdosSkRxPTJ8vUOI3SHbp788fl9BlGgZ1z4AM=
-=pn1x
------END PGP SIGNATURE-----
-
---QrEKjglNbaOimQPtgbo8druFvrroBVusK--
+diff --git a/configure b/configure
+index 4b3b5cd..be4d326 100755
+--- a/configure
++++ b/configure
+@@ -3073,7 +3073,11 @@ fi
+ ##########################################
+ # glib support probe
+ 
+-glib_req_ver=2.22
++if test "$mingw32" = yes; then
++    glib_req_ver=2.30
++else
++    glib_req_ver=2.22
++fi
+ glib_modules=gthread-2.0
+ if test "$modules" = yes; then
+     glib_modules="$glib_modules gmodule-2.0"
+-- 
+2.7.4
