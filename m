@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55072)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cv5d1-0000RS-6T
+	(envelope-from <dgilbert@redhat.com>) id 1cv5d0-0000Qw-MP
 	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:18:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cv5d0-0003mg-6k
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:18:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40858)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cv5d0-0003mR-1T
+	(envelope-from <dgilbert@redhat.com>) id 1cv5cy-0003lp-Sh
 	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:18:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40820)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cv5cy-0003kx-Kl
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 13:18:52 -0400
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon,  3 Apr 2017 18:18:43 +0100
-Message-Id: <20170403171843.3363-6-dgilbert@redhat.com>
+Date: Mon,  3 Apr 2017 18:18:42 +0100
+Message-Id: <20170403171843.3363-5-dgilbert@redhat.com>
 In-Reply-To: <20170403171843.3363-1-dgilbert@redhat.com>
 References: <20170403171843.3363-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 5/5] slirp: VMStatify remaining except for
- loop
+Subject: [Qemu-devel] [PATCH v5 4/5] slirp: VMStatify socket level
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,89 +28,300 @@ Cc: quintela@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-This converts the remaining components, except for the top level
-loop, to VMState.
+Working up the stack, this replaces the slirp_socket_load/save
+with VMState definitions.
+
+A place holder for IPv6 support is added as a comment; it needs
+testing once the rest of the IPv6 code is there.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- slirp/slirp.c | 48 +++++++++++++++++++-----------------------------
- 1 file changed, 19 insertions(+), 29 deletions(-)
+ slirp/slirp.c  | 219 +++++++++++++++++++++++++++++++++++++--------------------
+ slirp/socket.h |   6 +-
+ 2 files changed, 145 insertions(+), 80 deletions(-)
 
 diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 2de97b6..701eb7e 100644
+index 2b834af..2de97b6 100644
 --- a/slirp/slirp.c
 +++ b/slirp/slirp.c
-@@ -1398,15 +1398,25 @@ static const VMStateDescription vmstate_slirp_socket = {
+@@ -1250,40 +1250,154 @@ static const VMStateDescription vmstate_slirp_sbuf = {
      }
  };
  
--static void slirp_bootp_save(QEMUFile *f, Slirp *slirp)
--{
--    int i;
-+static const VMStateDescription vmstate_slirp_bootp_client = {
-+    .name = "slirp_bootpclient",
++static bool slirp_older_than_v4(void *opaque, int version_id)
++{
++    return version_id < 4;
++}
+ 
+-static void slirp_socket_save(QEMUFile *f, struct socket *so)
++static bool slirp_family_inet(void *opaque, int version_id)
+ {
+-    qemu_put_be32(f, so->so_urgc);
+-    qemu_put_be16(f, so->so_ffamily);
+-    switch (so->so_ffamily) {
+-    case AF_INET:
+-        qemu_put_be32(f, so->so_faddr.s_addr);
+-        qemu_put_be16(f, so->so_fport);
+-        break;
+-    default:
+-        error_report("so_ffamily unknown, unable to save so_faddr and"
+-                     " so_fport");
++    union slirp_sockaddr *ssa = (union slirp_sockaddr *)opaque;
++    return ssa->ss.ss_family == AF_INET;
++}
++
++static int slirp_socket_pre_load(void *opaque)
++{
++    struct socket *so = opaque;
++    if (tcp_attach(so) < 0) {
++        return -ENOMEM;
+     }
+-    qemu_put_be16(f, so->so_lfamily);
+-    switch (so->so_lfamily) {
+-    case AF_INET:
+-        qemu_put_be32(f, so->so_laddr.s_addr);
+-        qemu_put_be16(f, so->so_lport);
++    /* Older versions don't load these fields */
++    so->so_ffamily = AF_INET;
++    so->so_lfamily = AF_INET;
++    return 0;
++}
++
++#ifndef _WIN32
++#define VMSTATE_SIN4_ADDR(f, s, t) VMSTATE_UINT32_TEST(f, s, t)
++#else
++/* Win uses u_long rather than uint32_t - but it's still 32bits long */
++#define VMSTATE_SIN4_ADDR(f, s, t) VMSTATE_SINGLE_TEST(f, s, t, 0, \
++                                       vmstate_info_uint32, u_long)
++#endif
++
++/* The OS provided ss_family field isn't that portable; it's size
++ * and type varies (16/8 bit, signed, unsigned)
++ * and the values it contains aren't fully portable.
++ */
++typedef struct SS_FamilyTmpStruct {
++    union slirp_sockaddr    *parent;
++    uint16_t                 portable_family;
++} SS_FamilyTmpStruct;
++
++#define SS_FAMILY_MIG_IPV4   2  /* Linux, BSD, Win... */
++#define SS_FAMILY_MIG_IPV6  10  /* Linux */
++#define SS_FAMILY_MIG_OTHER 0xffff
++
++static void ss_family_pre_save(void *opaque)
++{
++    SS_FamilyTmpStruct *tss = opaque;
++
++    tss->portable_family = SS_FAMILY_MIG_OTHER;
++
++    if (tss->parent->ss.ss_family == AF_INET) {
++        tss->portable_family = SS_FAMILY_MIG_IPV4;
++    } else if (tss->parent->ss.ss_family == AF_INET6) {
++        tss->portable_family = SS_FAMILY_MIG_IPV6;
++    }
++}
++
++static int ss_family_post_load(void *opaque, int version_id)
++{
++    SS_FamilyTmpStruct *tss = opaque;
++
++    switch (tss->portable_family) {
++    case SS_FAMILY_MIG_IPV4:
++        tss->parent->ss.ss_family = AF_INET;
++        break;
++    case SS_FAMILY_MIG_IPV6:
++    case 23: /* compatibility: AF_INET6 from mingw */
++    case 28: /* compatibility: AF_INET6 from FreeBSD sys/socket.h */
++        tss->parent->ss.ss_family = AF_INET6;
+         break;
+     default:
+-        error_report("so_ffamily unknown, unable to save so_laddr and"
+-                     " so_lport");
++        error_report("invalid ss_family type %x", tss->portable_family);
++        return -EINVAL;
+     }
+-    qemu_put_byte(f, so->so_iptos);
+-    qemu_put_byte(f, so->so_emu);
+-    qemu_put_byte(f, so->so_type);
+-    qemu_put_be32(f, so->so_state);
+-    /* TODO: Build vmstate at this level */
+-    vmstate_save_state(f, &vmstate_slirp_sbuf, &so->so_rcv, 0);
+-    vmstate_save_state(f, &vmstate_slirp_sbuf, &so->so_snd, 0);
+-    vmstate_save_state(f, &vmstate_slirp_tcp, so->so_tcpcb, 0);
++
++    return 0;
+ }
+ 
++static const VMStateDescription vmstate_slirp_ss_family = {
++    .name = "slirp-socket-addr/ss_family",
++    .pre_save  = ss_family_pre_save,
++    .post_load = ss_family_post_load,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_UINT16(allocated, BOOTPClient),
-+        VMSTATE_BUFFER(macaddr, BOOTPClient),
++        VMSTATE_UINT16(portable_family, SS_FamilyTmpStruct),
 +        VMSTATE_END_OF_LIST()
 +    }
 +};
- 
--    for (i = 0; i < NB_BOOTP_CLIENTS; i++) {
--        qemu_put_be16(f, slirp->bootp_clients[i].allocated);
--        qemu_put_buffer(f, slirp->bootp_clients[i].macaddr, 6);
-+static const VMStateDescription vmstate_slirp = {
-+    .name = "slirp",
++
++static const VMStateDescription vmstate_slirp_socket_addr = {
++    .name = "slirp-socket-addr",
 +    .version_id = 4,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_UINT16_V(ip_id, Slirp, 2),
-+        VMSTATE_STRUCT_ARRAY(bootp_clients, Slirp, NB_BOOTP_CLIENTS, 3,
-+                             vmstate_slirp_bootp_client, BOOTPClient),
++        VMSTATE_WITH_TMP(union slirp_sockaddr, SS_FamilyTmpStruct,
++                            vmstate_slirp_ss_family),
++        VMSTATE_SIN4_ADDR(sin.sin_addr.s_addr, union slirp_sockaddr,
++                            slirp_family_inet),
++        VMSTATE_UINT16_TEST(sin.sin_port, union slirp_sockaddr,
++                            slirp_family_inet),
++
++#if 0
++        /* Untested: Needs checking by someone with IPv6 test */
++        VMSTATE_BUFFER_TEST(sin6.sin6_addr, union slirp_sockaddr,
++                            slirp_family_inet6),
++        VMSTATE_UINT16_TEST(sin6.sin6_port, union slirp_sockaddr,
++                            slirp_family_inet6),
++        VMSTATE_UINT32_TEST(sin6.sin6_flowinfo, union slirp_sockaddr,
++                            slirp_family_inet6),
++        VMSTATE_UINT32_TEST(sin6.sin6_scope_id, union slirp_sockaddr,
++                            slirp_family_inet6),
++#endif
++
 +        VMSTATE_END_OF_LIST()
-     }
--}
++    }
 +};
- 
- static void slirp_state_save(QEMUFile *f, void *opaque)
++
++static const VMStateDescription vmstate_slirp_socket = {
++    .name = "slirp-socket",
++    .version_id = 4,
++    .pre_load = slirp_socket_pre_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(so_urgc, struct socket),
++        /* Pre-v4 versions */
++        VMSTATE_SIN4_ADDR(so_faddr.s_addr, struct socket,
++                            slirp_older_than_v4),
++        VMSTATE_SIN4_ADDR(so_laddr.s_addr, struct socket,
++                            slirp_older_than_v4),
++        VMSTATE_UINT16_TEST(so_fport, struct socket, slirp_older_than_v4),
++        VMSTATE_UINT16_TEST(so_lport, struct socket, slirp_older_than_v4),
++        /* v4 and newer */
++        VMSTATE_STRUCT(fhost, struct socket, 4, vmstate_slirp_socket_addr,
++                       union slirp_sockaddr),
++        VMSTATE_STRUCT(lhost, struct socket, 4, vmstate_slirp_socket_addr,
++                       union slirp_sockaddr),
++
++        VMSTATE_UINT8(so_iptos, struct socket),
++        VMSTATE_UINT8(so_emu, struct socket),
++        VMSTATE_UINT8(so_type, struct socket),
++        VMSTATE_INT32(so_state, struct socket),
++        VMSTATE_STRUCT(so_rcv, struct socket, 0, vmstate_slirp_sbuf,
++                       struct sbuf),
++        VMSTATE_STRUCT(so_snd, struct socket, 0, vmstate_slirp_sbuf,
++                       struct sbuf),
++        VMSTATE_STRUCT_POINTER(so_tcpcb, struct socket, vmstate_slirp_tcp,
++                       struct tcpcb),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static void slirp_bootp_save(QEMUFile *f, Slirp *slirp)
  {
-@@ -1426,22 +1436,10 @@ static void slirp_state_save(QEMUFile *f, void *opaque)
+     int i;
+@@ -1308,7 +1422,7 @@ static void slirp_state_save(QEMUFile *f, void *opaque)
+                 continue;
+ 
+             qemu_put_byte(f, 42);
+-            slirp_socket_save(f, so);
++            vmstate_save_state(f, &vmstate_slirp_socket, so, NULL);
          }
      qemu_put_byte(f, 0);
  
--    qemu_put_be16(f, slirp->ip_id);
--
--    slirp_bootp_save(f, slirp);
-+    vmstate_save_state(f, &vmstate_slirp, slirp, NULL);
+@@ -1317,55 +1431,6 @@ static void slirp_state_save(QEMUFile *f, void *opaque)
+     slirp_bootp_save(f, slirp);
  }
  
- 
--static void slirp_bootp_load(QEMUFile *f, Slirp *slirp)
+-static int slirp_socket_load(QEMUFile *f, struct socket *so, int version_id)
 -{
--    int i;
+-    int ret = 0;
+-    if (tcp_attach(so) < 0)
+-        return -ENOMEM;
 -
--    for (i = 0; i < NB_BOOTP_CLIENTS; i++) {
--        slirp->bootp_clients[i].allocated = qemu_get_be16(f);
--        qemu_get_buffer(f, slirp->bootp_clients[i].macaddr, 6);
+-    so->so_urgc = qemu_get_be32(f);
+-    if (version_id <= 3) {
+-        so->so_ffamily = AF_INET;
+-        so->so_faddr.s_addr = qemu_get_be32(f);
+-        so->so_laddr.s_addr = qemu_get_be32(f);
+-        so->so_fport = qemu_get_be16(f);
+-        so->so_lport = qemu_get_be16(f);
+-    } else {
+-        so->so_ffamily = qemu_get_be16(f);
+-        switch (so->so_ffamily) {
+-        case AF_INET:
+-            so->so_faddr.s_addr = qemu_get_be32(f);
+-            so->so_fport = qemu_get_be16(f);
+-            break;
+-        default:
+-            error_report(
+-                "so_ffamily unknown, unable to restore so_faddr and so_lport");
+-        }
+-        so->so_lfamily = qemu_get_be16(f);
+-        switch (so->so_lfamily) {
+-        case AF_INET:
+-            so->so_laddr.s_addr = qemu_get_be32(f);
+-            so->so_lport = qemu_get_be16(f);
+-            break;
+-        default:
+-            error_report(
+-                "so_ffamily unknown, unable to restore so_laddr and so_lport");
+-        }
 -    }
+-    so->so_iptos = qemu_get_byte(f);
+-    so->so_emu = qemu_get_byte(f);
+-    so->so_type = qemu_get_byte(f);
+-    so->so_state = qemu_get_be32(f);
+-    /* TODO: VMState at this level */
+-    ret = vmstate_load_state(f, &vmstate_slirp_sbuf, &so->so_rcv, 0);
+-    if (!ret) {
+-        ret = vmstate_load_state(f, &vmstate_slirp_sbuf, &so->so_snd, 0);
+-    }
+-    if (!ret) {
+-        ret = vmstate_load_state(f, &vmstate_slirp_tcp, so->so_tcpcb, 0);
+-    }
+-    return ret;
 -}
--
- static int slirp_state_load(QEMUFile *f, void *opaque, int version_id)
- {
-     Slirp *slirp = opaque;
-@@ -1476,13 +1474,5 @@ static int slirp_state_load(QEMUFile *f, void *opaque, int version_id)
-         so->extra = (void *)ex_ptr->ex_exec;
-     }
  
--    if (version_id >= 2) {
--        slirp->ip_id = qemu_get_be16(f);
--    }
--
--    if (version_id >= 3) {
--        slirp_bootp_load(f, slirp);
--    }
--
--    return 0;
-+    return vmstate_load_state(f, &vmstate_slirp, slirp, version_id);
- }
+ static void slirp_bootp_load(QEMUFile *f, Slirp *slirp)
+ {
+@@ -1389,7 +1454,7 @@ static int slirp_state_load(QEMUFile *f, void *opaque, int version_id)
+         if (!so)
+             return -ENOMEM;
+ 
+-        ret = slirp_socket_load(f, so, version_id);
++        ret = vmstate_load_state(f, &vmstate_slirp_socket, so, version_id);
+ 
+         if (ret < 0)
+             return ret;
+diff --git a/slirp/socket.h b/slirp/socket.h
+index c1be77e..2f224bc 100644
+--- a/slirp/socket.h
++++ b/slirp/socket.h
+@@ -36,7 +36,7 @@ struct socket {
+ 				    * PING reply's */
+   struct tcpiphdr *so_ti;	   /* Pointer to the original ti within
+ 				    * so_mconn, for non-blocking connections */
+-  int so_urgc;
++  uint32_t      so_urgc;
+   union slirp_sockaddr fhost;      /* Foreign host */
+ #define so_faddr fhost.sin.sin_addr
+ #define so_fport fhost.sin.sin_port
+@@ -54,8 +54,8 @@ struct socket {
+   uint8_t	so_iptos;	/* Type of service */
+   uint8_t	so_emu;		/* Is the socket emulated? */
+ 
+-  u_char	so_type;		/* Type of socket, UDP or TCP */
+-  int	so_state;		/* internal state flags SS_*, below */
++  uint8_t       so_type;        /* Type of socket, UDP or TCP */
++  int32_t       so_state;       /* internal state flags SS_*, below */
+ 
+   struct 	tcpcb *so_tcpcb;	/* pointer to TCP protocol control block */
+   u_int	so_expire;		/* When the socket will expire */
 -- 
 2.9.3
