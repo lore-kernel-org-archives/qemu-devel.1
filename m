@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56553)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cv1ZH-0002fh-HG
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:58:48 -0400
+	id 1cv1aD-0003Ss-Lu
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:59:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cv1ZD-0006SG-Ii
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:58:47 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:35439)
+	id 1cv1a9-00078V-Po
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:59:45 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:36604)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cv1ZD-0006S9-Dq
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:58:43 -0400
-Received: by mail-qt0-x244.google.com with SMTP id r5so18721719qtb.2
-	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 05:58:43 -0700 (PDT)
+	id 1cv1a9-00077y-LQ
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 08:59:41 -0400
+Received: by mail-qt0-x243.google.com with SMTP id n37so18726235qtb.3
+	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 05:59:41 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <1491034725-23968-1-git-send-email-peterx@redhat.com>
-	<1491034725-23968-3-git-send-email-peterx@redhat.com>
+	<1491034725-23968-4-git-send-email-peterx@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3f2992b6-5a6d-6d31-e953-b83c70c35955@amsat.org>
-Date: Mon, 3 Apr 2017 09:58:39 -0300
+Message-ID: <1215273a-1811-f307-d331-51c6d839412e@amsat.org>
+Date: Mon, 3 Apr 2017 09:59:37 -0300
 MIME-Version: 1.0
-In-Reply-To: <1491034725-23968-3-git-send-email-peterx@redhat.com>
+In-Reply-To: <1491034725-23968-4-git-send-email-peterx@redhat.com>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] migration: rename max_size to
- threshold_size
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] hmp: info migrate_capability format
+ tunes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,14 +39,9 @@ To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
 Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
 
 On 04/01/2017 05:18 AM, Peter Xu wrote:
-> In migration codes (especially in migration_thread()), max_size is used
-> in many place for the threshold value that we will start to do the final
-> flush and jump to the next stage to dump the whole rest things to
-> destination. However its name is confusing to first readers. Let's
-> rename it to "threshold_size" when proper and add a comment for it. No
-> functional change is made.
+> Dump the info in a single line is hard to read. Do it one per line.
+> Also, the first "capabilities:" didn't help much. Let's remove it.
 >
-> CC: Juan Quintela <quintela@redhat.com>
 > CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > Reviewed-by: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > Signed-off-by: Peter Xu <peterx@redhat.com>
@@ -54,102 +49,26 @@ On 04/01/2017 05:18 AM, Peter Xu wrote:
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  include/migration/vmstate.h |  3 ++-
->  migration/migration.c       | 21 +++++++++++++--------
->  migration/savevm.c          |  4 ++--
->  3 files changed, 17 insertions(+), 11 deletions(-)
+>  hmp.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
 >
-> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-> index f2dbf84..dad3984 100644
-> --- a/include/migration/vmstate.h
-> +++ b/include/migration/vmstate.h
-> @@ -56,7 +56,8 @@ typedef struct SaveVMHandlers {
+> diff --git a/hmp.c b/hmp.c
+> index edb8970..95eef8c 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -265,13 +265,11 @@ void hmp_info_migrate_capabilities(Monitor *mon, const QDict *qdict)
+>      caps = qmp_query_migrate_capabilities(NULL);
 >
->      /* This runs outside the iothread lock!  */
->      int (*save_live_setup)(QEMUFile *f, void *opaque);
-> -    void (*save_live_pending)(QEMUFile *f, void *opaque, uint64_t max_size,
-> +    void (*save_live_pending)(QEMUFile *f, void *opaque,
-> +                              uint64_t threshold_size,
->                                uint64_t *non_postcopiable_pending,
->                                uint64_t *postcopiable_pending);
->      LoadStateHandler *load_state;
-> diff --git a/migration/migration.c b/migration/migration.c
-> index f9f4d98..2785c6c 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1907,7 +1907,12 @@ static void *migration_thread(void *opaque)
->      int64_t initial_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
->      int64_t setup_start = qemu_clock_get_ms(QEMU_CLOCK_HOST);
->      int64_t initial_bytes = 0;
-> -    int64_t max_size = 0;
-> +    /*
-> +     * The final stage happens when the remaining data is smaller than
-> +     * this threshold; it's calculated from the requested downtime and
-> +     * measured bandwidth
-> +     */
-> +    int64_t threshold_size = 0;
->      int64_t start_time = initial_time;
->      int64_t end_time;
->      bool old_vm_running = false;
-> @@ -1951,17 +1956,17 @@ static void *migration_thread(void *opaque)
->          if (!qemu_file_rate_limit(s->to_dst_file)) {
->              uint64_t pend_post, pend_nonpost;
->
-> -            qemu_savevm_state_pending(s->to_dst_file, max_size, &pend_nonpost,
-> -                                      &pend_post);
-> +            qemu_savevm_state_pending(s->to_dst_file, threshold_size,
-> +                                      &pend_nonpost, &pend_post);
->              pending_size = pend_nonpost + pend_post;
-> -            trace_migrate_pending(pending_size, max_size,
-> +            trace_migrate_pending(pending_size, threshold_size,
->                                    pend_post, pend_nonpost);
-> -            if (pending_size && pending_size >= max_size) {
-> +            if (pending_size && pending_size >= threshold_size) {
->                  /* Still a significant amount to transfer */
->
->                  if (migrate_postcopy_ram() &&
->                      s->state != MIGRATION_STATUS_POSTCOPY_ACTIVE &&
-> -                    pend_nonpost <= max_size &&
-> +                    pend_nonpost <= threshold_size &&
->                      atomic_read(&s->start_postcopy)) {
->
->                      if (!postcopy_start(s, &old_vm_running)) {
-> @@ -1993,13 +1998,13 @@ static void *migration_thread(void *opaque)
->                                           initial_bytes;
->              uint64_t time_spent = current_time - initial_time;
->              double bandwidth = (double)transferred_bytes / time_spent;
-> -            max_size = bandwidth * s->parameters.downtime_limit;
-> +            threshold_size = bandwidth * s->parameters.downtime_limit;
->
->              s->mbps = (((double) transferred_bytes * 8.0) /
->                      ((double) time_spent / 1000.0)) / 1000.0 / 1000.0;
->
->              trace_migrate_transferred(transferred_bytes, time_spent,
-> -                                      bandwidth, max_size);
-> +                                      bandwidth, threshold_size);
->              /* if we haven't sent anything, we don't want to recalculate
->                 10000 is a small enough number for our purposes */
->              if (s->dirty_bytes_rate && transferred_bytes > 10000) {
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 3b19a4a..59c04eb 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -1197,7 +1197,7 @@ void qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only)
->   * the result is split into the amount for units that can and
->   * for units that can't do postcopy.
->   */
-> -void qemu_savevm_state_pending(QEMUFile *f, uint64_t max_size,
-> +void qemu_savevm_state_pending(QEMUFile *f, uint64_t threshold_size,
->                                 uint64_t *res_non_postcopiable,
->                                 uint64_t *res_postcopiable)
->  {
-> @@ -1216,7 +1216,7 @@ void qemu_savevm_state_pending(QEMUFile *f, uint64_t max_size,
->                  continue;
->              }
+>      if (caps) {
+> -        monitor_printf(mon, "capabilities: ");
+>          for (cap = caps; cap; cap = cap->next) {
+> -            monitor_printf(mon, "%s: %s ",
+> +            monitor_printf(mon, "%s: %s\n",
+>                             MigrationCapability_lookup[cap->value->capability],
+>                             cap->value->state ? "on" : "off");
 >          }
-> -        se->ops->save_live_pending(f, se->opaque, max_size,
-> +        se->ops->save_live_pending(f, se->opaque, threshold_size,
->                                     res_non_postcopiable, res_postcopiable);
+> -        monitor_printf(mon, "\n");
 >      }
->  }
+>
+>      qapi_free_MigrationCapabilityStatusList(caps);
 >
