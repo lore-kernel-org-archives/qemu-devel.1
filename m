@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chouteau@adacore.com>) id 1cuyb0-00047U-Td
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 05:48:23 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cuyhJ-0005YL-LI
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 05:54:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chouteau@adacore.com>) id 1cuyax-0002HN-6R
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 05:48:22 -0400
-References: <20170331192724.14339-1-ehabkost@redhat.com>
-	<58cc8898-70fc-6e35-4666-c2a023d3e66a@amsat.org>
-From: Fabien Chouteau <chouteau@adacore.com>
-Message-ID: <d9dc8fd5-fab3-6878-f027-d836baa71da8@adacore.com>
-Date: Mon, 3 Apr 2017 11:48:16 +0200
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cuyhF-0006DB-Lr
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 05:54:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35628)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1cuyhF-0006Cz-H0
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 05:54:49 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Mon,  3 Apr 2017 11:54:38 +0200
+Message-Id: <20170403095438.15423-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <58cc8898-70fc-6e35-4666-c2a023d3e66a@amsat.org>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.10 0/2] etsec: (TYPE_)ETSEC_COMMON
- macro cleanup
+Subject: [Qemu-devel] [PATCH] qga: improve fsfreeze documentations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,34 +25,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: Scott Wood <scottwood@freescale.com>, Jason Wang <jasowang@redhat.com>, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
+To: qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 02/04/2017 14:42, Philippe Mathieu-Daud=E9 wrote:
-> On 03/31/2017 04:27 PM, Eduardo Habkost wrote:
->> When working on other things, I got confused by the etsec code,
->> that didn't use the TYPE_ETSEC_COMMON macro in its type
->> declaration, and had no subclasses despite being named
->> ETSEC_COMMON.
->>
->> This is a very simple cleanup to remove the _COMMON suffix from
->> the macros, and to use the TYPE_ETSEC macro when registering and
->> creating devices instead of hardcoding the "eTSEC" name.
->>
->> Cc: Alexander Graf <agraf@suse.de>
->> Cc: Scott Wood <scottwood@freescale.com>
->> Cc: Jason Wang <jasowang@redhat.com>
->> Cc: Fabien Chouteau <chouteau@adacore.com>
->> Cc: qemu-ppc@nongnu.org
->>
->> Eduardo Habkost (2):
->>   etsec: Rename (TYPE_)ETSEC_COMMON to (TYPE_)ETSEC
->>   etsec: Use TYPE_ETSEC macro when registering/creating device
->=20
-> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
->=20
+Some users find the fsfreeze behaviour confusing. Add some notes about
+invalid mount points and Windows usage.
 
-Reviewed-by: Fabien Chouteau <chouteau@adacore.com>
+Related to:
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1436976
 
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ qga/qapi-schema.json | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-Thanks Eduardo,
+diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+index a02dbf2d18..8d901f556a 100644
+--- a/qga/qapi-schema.json
++++ b/qga/qapi-schema.json
+@@ -426,7 +426,13 @@
+ ##
+ # @guest-fsfreeze-freeze:
+ #
+-# Sync and freeze all freezable, local guest filesystems
++# Sync and freeze all freezable, local guest filesystems. If this
++# command succeeded, you may call @guest-fsfreeze-thaw later to
++# unfreeze.
++#
++# Note: On Windows, the command is implemented with the help of a
++# Volume Shadow-copy Service DLL helper. The frozen state is limited
++# for up to 10 seconds by VSS.
+ #
+ # Returns: Number of file systems currently frozen. On error, all filesy=
+stems
+ # will be thawed.
+@@ -439,10 +445,12 @@
+ ##
+ # @guest-fsfreeze-freeze-list:
+ #
+-# Sync and freeze specified guest filesystems
++# Sync and freeze specified guest filesystems.
++# See also @guest-fsfreeze-freeze.
+ #
+ # @mountpoints: an array of mountpoints of filesystems to be frozen.
+ #               If omitted, every mounted filesystem is frozen.
++#               Invalid mount points are ignored.
+ #
+ # Returns: Number of file systems currently frozen. On error, all filesy=
+stems
+ # will be thawed.
+--=20
+2.12.0.191.gc5d8de91d
