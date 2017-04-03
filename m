@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cv7tj-0005HI-Lc
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:44:21 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cv7tl-0005JF-QK
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:44:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cv7ti-0003BB-Hi
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:44:19 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:34005)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cv7tj-0003Bd-9M
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:44:21 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:34972)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cv7ti-0003Ad-8c
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:44:18 -0400
-Received: by mail-wr0-x243.google.com with SMTP id w43so36363335wrb.1
+	id 1cv7tj-0003B4-2A
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:44:19 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id k6so179297808wre.2
 	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 12:44:18 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  3 Apr 2017 21:44:06 +0200
-Message-Id: <20170403194409.21276-4-pbonzini@redhat.com>
+Date: Mon,  3 Apr 2017 21:44:07 +0200
+Message-Id: <20170403194409.21276-5-pbonzini@redhat.com>
 In-Reply-To: <20170403194409.21276-1-pbonzini@redhat.com>
 References: <20170403194409.21276-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 3/6] ipmi: Fix macro issues
+Subject: [Qemu-devel] [PULL 4/6] nbd: fix memory leak on socket_connect
+ failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,98 +29,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Corey Minyard <cminyard@mvista.com>
+Cc: yaolujing <yaolujing@huawei.com>
 
-From: Corey Minyard <cminyard@mvista.com>
+From: yaolujing <yaolujing@huawei.com>
 
-Macro parameters should almost always have () around them when used.
-llvm reported an error on this.
+When TCP connection fails between nbd server and client,
+the local var, sioc, memory leak.
 
-Remove redundant parenthesis and put parenthesis around the entire
-macros with assignments in case they are used in an expression.
+This patch fixes the memory leak.
 
-Remove some unused macros.
-
-Reported in https://bugs.launchpad.net/bugs/1651167
-
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
+Signed-off-by: yaolujing <yaolujing@huawei.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <1490894892-8055-1-git-send-email-minyard@acm.org>
+Message-Id: <1491005709-29989-1-git-send-email-yaolujing@huawei.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/ipmi/isa_ipmi_bt.c | 34 ++++++++++++----------------------
- 1 file changed, 12 insertions(+), 22 deletions(-)
+ block/nbd.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/ipmi/isa_ipmi_bt.c b/hw/ipmi/isa_ipmi_bt.c
-index 1c69cb3..2fcc3d2 100644
---- a/hw/ipmi/isa_ipmi_bt.c
-+++ b/hw/ipmi/isa_ipmi_bt.c
-@@ -37,40 +37,30 @@
- #define IPMI_BT_HBUSY_BIT          6
- #define IPMI_BT_BBUSY_BIT          7
- 
--#define IPMI_BT_CLR_WR_MASK        (1 << IPMI_BT_CLR_WR_BIT)
- #define IPMI_BT_GET_CLR_WR(d)      (((d) >> IPMI_BT_CLR_WR_BIT) & 0x1)
--#define IPMI_BT_SET_CLR_WR(d, v)   (d) = (((d) & ~IPMI_BT_CLR_WR_MASK) | \
--                                       (((v & 1) << IPMI_BT_CLR_WR_BIT)))
- 
--#define IPMI_BT_CLR_RD_MASK        (1 << IPMI_BT_CLR_RD_BIT)
- #define IPMI_BT_GET_CLR_RD(d)      (((d) >> IPMI_BT_CLR_RD_BIT) & 0x1)
--#define IPMI_BT_SET_CLR_RD(d, v)   (d) = (((d) & ~IPMI_BT_CLR_RD_MASK) | \
--                                       (((v & 1) << IPMI_BT_CLR_RD_BIT)))
- 
--#define IPMI_BT_H2B_ATN_MASK       (1 << IPMI_BT_H2B_ATN_BIT)
- #define IPMI_BT_GET_H2B_ATN(d)     (((d) >> IPMI_BT_H2B_ATN_BIT) & 0x1)
--#define IPMI_BT_SET_H2B_ATN(d, v)  (d) = (((d) & ~IPMI_BT_H2B_ATN_MASK) | \
--                                        (((v & 1) << IPMI_BT_H2B_ATN_BIT)))
- 
- #define IPMI_BT_B2H_ATN_MASK       (1 << IPMI_BT_B2H_ATN_BIT)
- #define IPMI_BT_GET_B2H_ATN(d)     (((d) >> IPMI_BT_B2H_ATN_BIT) & 0x1)
--#define IPMI_BT_SET_B2H_ATN(d, v)  (d) = (((d) & ~IPMI_BT_B2H_ATN_MASK) | \
--                                        (((v & 1) << IPMI_BT_B2H_ATN_BIT)))
-+#define IPMI_BT_SET_B2H_ATN(d, v)  ((d) = (((d) & ~IPMI_BT_B2H_ATN_MASK) | \
-+                                        (((v) & 1) << IPMI_BT_B2H_ATN_BIT)))
- 
- #define IPMI_BT_SMS_ATN_MASK       (1 << IPMI_BT_SMS_ATN_BIT)
- #define IPMI_BT_GET_SMS_ATN(d)     (((d) >> IPMI_BT_SMS_ATN_BIT) & 0x1)
--#define IPMI_BT_SET_SMS_ATN(d, v)  (d) = (((d) & ~IPMI_BT_SMS_ATN_MASK) | \
--                                        (((v & 1) << IPMI_BT_SMS_ATN_BIT)))
-+#define IPMI_BT_SET_SMS_ATN(d, v)  ((d) = (((d) & ~IPMI_BT_SMS_ATN_MASK) | \
-+                                        (((v) & 1) << IPMI_BT_SMS_ATN_BIT)))
- 
- #define IPMI_BT_HBUSY_MASK         (1 << IPMI_BT_HBUSY_BIT)
- #define IPMI_BT_GET_HBUSY(d)       (((d) >> IPMI_BT_HBUSY_BIT) & 0x1)
--#define IPMI_BT_SET_HBUSY(d, v)    (d) = (((d) & ~IPMI_BT_HBUSY_MASK) | \
--                                       (((v & 1) << IPMI_BT_HBUSY_BIT)))
-+#define IPMI_BT_SET_HBUSY(d, v)    ((d) = (((d) & ~IPMI_BT_HBUSY_MASK) | \
-+                                       (((v) & 1) << IPMI_BT_HBUSY_BIT)))
- 
- #define IPMI_BT_BBUSY_MASK         (1 << IPMI_BT_BBUSY_BIT)
--#define IPMI_BT_GET_BBUSY(d)       (((d) >> IPMI_BT_BBUSY_BIT) & 0x1)
--#define IPMI_BT_SET_BBUSY(d, v)    (d) = (((d) & ~IPMI_BT_BBUSY_MASK) | \
--                                       (((v & 1) << IPMI_BT_BBUSY_BIT)))
-+#define IPMI_BT_SET_BBUSY(d, v)    ((d) = (((d) & ~IPMI_BT_BBUSY_MASK) | \
-+                                       (((v) & 1) << IPMI_BT_BBUSY_BIT)))
- 
- 
- /* Mask register */
-@@ -79,13 +69,13 @@
- 
- #define IPMI_BT_B2H_IRQ_EN_MASK      (1 << IPMI_BT_B2H_IRQ_EN_BIT)
- #define IPMI_BT_GET_B2H_IRQ_EN(d)    (((d) >> IPMI_BT_B2H_IRQ_EN_BIT) & 0x1)
--#define IPMI_BT_SET_B2H_IRQ_EN(d, v) (d) = (((d) & ~IPMI_BT_B2H_IRQ_EN_MASK) | \
--                                        (((v & 1) << IPMI_BT_B2H_IRQ_EN_BIT)))
-+#define IPMI_BT_SET_B2H_IRQ_EN(d, v) ((d) = (((d) & ~IPMI_BT_B2H_IRQ_EN_MASK) |\
-+                                        (((v) & 1) << IPMI_BT_B2H_IRQ_EN_BIT)))
- 
- #define IPMI_BT_B2H_IRQ_MASK         (1 << IPMI_BT_B2H_IRQ_BIT)
- #define IPMI_BT_GET_B2H_IRQ(d)       (((d) >> IPMI_BT_B2H_IRQ_BIT) & 0x1)
--#define IPMI_BT_SET_B2H_IRQ(d, v)    (d) = (((d) & ~IPMI_BT_B2H_IRQ_MASK) | \
--                                        (((v & 1) << IPMI_BT_B2H_IRQ_BIT)))
-+#define IPMI_BT_SET_B2H_IRQ(d, v)    ((d) = (((d) & ~IPMI_BT_B2H_IRQ_MASK) | \
-+                                        (((v) & 1) << IPMI_BT_B2H_IRQ_BIT)))
- 
- typedef struct IPMIBT {
-     IPMIBmc *bmc;
+diff --git a/block/nbd.c b/block/nbd.c
+index 1b832c2..3150712 100644
+--- a/block/nbd.c
++++ b/block/nbd.c
+@@ -311,6 +311,7 @@ static QIOChannelSocket *nbd_establish_connection(SocketAddress *saddr,
+                                     saddr,
+                                     &local_err);
+     if (local_err) {
++        object_unref(OBJECT(sioc));
+         error_propagate(errp, local_err);
+         return NULL;
+     }
 -- 
 1.8.3.1
