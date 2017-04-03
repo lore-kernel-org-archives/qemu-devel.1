@@ -1,32 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cv2ZW-0000dO-BM
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 10:03:07 -0400
+	(envelope-from <eblake@redhat.com>) id 1cv2dT-0001dw-Vp
+	for Qemu-devel@nongnu.org; Mon, 03 Apr 2017 10:07:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cv2ZT-0003pK-6a
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 10:03:06 -0400
-Received: from mail-qt0-x229.google.com ([2607:f8b0:400d:c0d::229]:33929)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cv2ZT-0003p7-2R
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 10:03:03 -0400
-Received: by mail-qt0-x229.google.com with SMTP id n21so112677121qta.1
-	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 07:03:02 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170403124524.10824-1-alex.bennee@linaro.org>
-	<20170403124524.10824-3-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e5d3193c-fa8a-c270-c62c-f19138f8adcb@amsat.org>
-Date: Mon, 3 Apr 2017 11:02:56 -0300
+	(envelope-from <eblake@redhat.com>) id 1cv2dQ-0005NL-SF
+	for Qemu-devel@nongnu.org; Mon, 03 Apr 2017 10:07:11 -0400
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <13fddf65-e573-cf01-593d-6b02a3071721@redhat.com>
+Date: Mon, 3 Apr 2017 09:07:02 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170403124524.10824-3-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH v1 2/9] scripts/qemu-gdb/timers.py: new
- helper to dump timer state
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="NAIUsWaQ3DL3qQJ1d5u0XSsOMjjQ0mXrd"
+Subject: [Qemu-devel] help debugging throttle crash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,102 +21,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, dovgaluk@ispras.ru, rth@twiddle.net, pbonzini@redhat.com
-Cc: mttcg@listserver.greensocs.com, peter.maydell@linaro.org, nikunj@linux.vnet.ibm.com, a.rigo@virtualopensystems.com, qemu-devel@nongnu.org, cota@braap.org, bobby.prani@gmail.com, fred.konrad@greensocs.com
+To: "Qemu-devel@nongnu.org" <Qemu-devel@nongnu.org>, Alberto Garcia <berto@igalia.com>, qemu block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>
 
-On 04/03/2017 09:45 AM, Alex Bennée wrote:
-> This introduces the qemu-gdb command "qemu timers" which will dump the
-> state of the main timers in the system.
->
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NAIUsWaQ3DL3qQJ1d5u0XSsOMjjQ0mXrd
+From: Eric Blake <eblake@redhat.com>
+To: "Qemu-devel@nongnu.org" <Qemu-devel@nongnu.org>,
+ Alberto Garcia <berto@igalia.com>, qemu block <qemu-block@nongnu.org>,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <13fddf65-e573-cf01-593d-6b02a3071721@redhat.com>
+Subject: help debugging throttle crash
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+I'm trying to investigate
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1428810, which is a crash
+that can be easily reproduced with the following steps:
 
-> ---
->  scripts/qemu-gdb.py       |  3 ++-
->  scripts/qemugdb/timers.py | 54 +++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 56 insertions(+), 1 deletion(-)
->  create mode 100644 scripts/qemugdb/timers.py
->
-> diff --git a/scripts/qemu-gdb.py b/scripts/qemu-gdb.py
-> index b3f8e04f77..3e7adb87dc 100644
-> --- a/scripts/qemu-gdb.py
-> +++ b/scripts/qemu-gdb.py
-> @@ -26,7 +26,7 @@ import os, sys
->
->  sys.path.append(os.path.dirname(__file__))
->
-> -from qemugdb import aio, mtree, coroutine
-> +from qemugdb import aio, mtree, coroutine, timers
->
->  class QemuCommand(gdb.Command):
->      '''Prefix for QEMU debug support commands'''
-> @@ -38,6 +38,7 @@ QemuCommand()
->  coroutine.CoroutineCommand()
->  mtree.MtreeCommand()
->  aio.HandlersCommand()
-> +timers.TimersCommand()
->
->  coroutine.CoroutineSPFunction()
->  coroutine.CoroutinePCFunction()
-> diff --git a/scripts/qemugdb/timers.py b/scripts/qemugdb/timers.py
-> new file mode 100644
-> index 0000000000..be71a001e3
-> --- /dev/null
-> +++ b/scripts/qemugdb/timers.py
-> @@ -0,0 +1,54 @@
-> +#!/usr/bin/python
-> +# GDB debugging support
-> +#
-> +# Copyright 2017 Linaro Ltd
-> +#
-> +# Author: Alex Bennée <alex.bennee@linaro.org>
-> +#
-> +# This work is licensed under the terms of the GNU GPL, version 2.  See
-> +# the COPYING file in the top-level directory.
-> +
-> +# 'qemu timers' -- display the current timerlists
-> +
-> +import gdb
-> +
-> +class TimersCommand(gdb.Command):
-> +    '''Display the current QEMU timers'''
-> +
-> +    def __init__(self):
-> +        'Register the class as a gdb command'
-> +        gdb.Command.__init__(self, 'qemu timers', gdb.COMMAND_DATA,
-> +                             gdb.COMPLETE_NONE)
-> +
-> +    def dump_timers(self, timer):
-> +        "Follow a timer and recursively dump each one in the list."
-> +        # timer should be of type QemuTimer
-> +        gdb.write("    timer %s/%s (cb:%s,opq:%s)\n" % (
-> +            timer['expire_time'],
-> +            timer['scale'],
-> +            timer['cb'],
-> +            timer['opaque']))
-> +
-> +        if int(timer['next']) > 0:
-> +            self.dump_timers(timer['next'])
-> +
-> +
-> +    def process_timerlist(self, tlist, ttype):
-> +        gdb.write("Processing %s timers\n" % (ttype))
-> +        gdb.write("  clock %s is enabled:%s, last:%s\n" % (
-> +            tlist['clock']['type'],
-> +            tlist['clock']['enabled'],
-> +            tlist['clock']['last']))
-> +        if int(tlist['active_timers']) > 0:
-> +            self.dump_timers(tlist['active_timers'])
-> +
-> +
-> +    def invoke(self, arg, from_tty):
-> +        'Run the command'
-> +        main_timers = gdb.parse_and_eval("main_loop_tlg")
-> +
-> +        # This will break if QEMUClockType in timer.h is redfined
-> +        self.process_timerlist(main_timers['tl'][0], "Realtime")
-> +        self.process_timerlist(main_timers['tl'][1], "Virtual")
-> +        self.process_timerlist(main_timers['tl'][2], "Host")
-> +        self.process_timerlist(main_timers['tl'][3], "Virtual RT")
->
+$ ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio
+-device virtio-scsi-pci,bus=3Dpci.0  -drive
+id=3Ddrive_image2,if=3Dnone,format=3Draw,file=3Dfile2,bps=3D512000,iops=3D=
+100,group=3Dfoo
+-device scsi-hd,id=3Dimage2,drive=3Ddrive_image2 -drive
+id=3Ddrive_image3,if=3Dnone,format=3Draw,file=3Dfile3,bps=3D512000,iops=3D=
+100,group=3Dfoo
+-device scsi-hd,id=3Dimage3,drive=3Ddrive_image3
+{'execute':'qmp_capabilities'}
+{'execute':'device_del','arguments':{'id':'image3'}}
+{'execute':'system_reset'}
+
+At this point, it looks like no one is calling
+throttle_group_unregister_blk() as a result of the 'device_del', which
+leaves stale memory around (I was able to confirm this under gcc - a
+breakpoint on that function never fires); then the 'system_reset' causes
+next_throttle_token() to dereference the stale memory and crash.
+However, I have no idea where the unplug action should be removing the
+BB from the throttle group.  Is it as simple as adding it to
+blk_io_unplug(), or will that be violating other constraints on making
+sure the throttle group is first drained before removing the BB from the
+group as one of the final steps during its hot unplug?
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+
+
+--NAIUsWaQ3DL3qQJ1d5u0XSsOMjjQ0mXrd
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY4lcGAAoJEKeha0olJ0NqeZYIAKYQiFot11WYfmIv/xwsqpqV
+1djf0F/mc1GQR7eeiRv9jvgk/PBnChcYX8+AGeLCitjCZ9bfRHBgr0YNbFEFpxUo
+F/tzE227GGzjeW6abSX7nAu8JB/nf2Bd8M6UXyHmCfqG0yngPBgziv0mSdyvHTF9
+w80NS0ueQ2JnqQHGSgWJuvYvHW2RQUrQ8vCv4o6jFm6V84tQQujiDzZFKuwRJR3Q
+sTWskExyX8WAI1mCBmByCBwwoJ1FWTkhB7qpaC7F5T0KHL2aR1wi0eIuXZ0/XdlC
+yF8/jj1HxJJzBqVDD3G+FrSGkXYlGSj2AqHw1BQvwb/BMP2o7gQTzF8m420aD04=
+=h6Hl
+-----END PGP SIGNATURE-----
+
+--NAIUsWaQ3DL3qQJ1d5u0XSsOMjjQ0mXrd--
