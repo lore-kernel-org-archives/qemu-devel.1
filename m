@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cuyXN-0002y2-0D
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 05:44:38 -0400
+	(envelope-from <chouteau@adacore.com>) id 1cuyb0-00047U-Td
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 05:48:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cuyXI-0000Wm-1g
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 05:44:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53826)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cuyXH-0000WE-Rk
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 05:44:31 -0400
-References: <20170329194148.19015-1-ehabkost@redhat.com>
-	<afd04dba-4ebd-24a7-d149-2e6f079c2868@redhat.com>
-	<20170402133153.GA1910@thinpad.lan.raisama.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <97f00822-e8f8-cd25-7e8f-33522d4d4834@redhat.com>
-Date: Mon, 3 Apr 2017 11:44:22 +0200
+	(envelope-from <chouteau@adacore.com>) id 1cuyax-0002HN-6R
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 05:48:22 -0400
+References: <20170331192724.14339-1-ehabkost@redhat.com>
+	<58cc8898-70fc-6e35-4666-c2a023d3e66a@amsat.org>
+From: Fabien Chouteau <chouteau@adacore.com>
+Message-ID: <d9dc8fd5-fab3-6878-f027-d836baa71da8@adacore.com>
+Date: Mon, 3 Apr 2017 11:48:16 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170402133153.GA1910@thinpad.lan.raisama.net>
+In-Reply-To: <58cc8898-70fc-6e35-4666-c2a023d3e66a@amsat.org>
 Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 0/9] qom: Make
- object_get_class()/*_GET_CLASS return const pointers
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.10 0/2] etsec: (TYPE_)ETSEC_COMMON
+ macro cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +24,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Juergen Gross <jgross@suse.com>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, Laszlo Ersek <lersek@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: Scott Wood <scottwood@freescale.com>, Jason Wang <jasowang@redhat.com>, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
+
+On 02/04/2017 14:42, Philippe Mathieu-Daud=E9 wrote:
+> On 03/31/2017 04:27 PM, Eduardo Habkost wrote:
+>> When working on other things, I got confused by the etsec code,
+>> that didn't use the TYPE_ETSEC_COMMON macro in its type
+>> declaration, and had no subclasses despite being named
+>> ETSEC_COMMON.
+>>
+>> This is a very simple cleanup to remove the _COMMON suffix from
+>> the macros, and to use the TYPE_ETSEC macro when registering and
+>> creating devices instead of hardcoding the "eTSEC" name.
+>>
+>> Cc: Alexander Graf <agraf@suse.de>
+>> Cc: Scott Wood <scottwood@freescale.com>
+>> Cc: Jason Wang <jasowang@redhat.com>
+>> Cc: Fabien Chouteau <chouteau@adacore.com>
+>> Cc: qemu-ppc@nongnu.org
+>>
+>> Eduardo Habkost (2):
+>>   etsec: Rename (TYPE_)ETSEC_COMMON to (TYPE_)ETSEC
+>>   etsec: Use TYPE_ETSEC macro when registering/creating device
+>=20
+> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+>=20
+
+Reviewed-by: Fabien Chouteau <chouteau@adacore.com>
 
 
-
-On 02/04/2017 15:31, Eduardo Habkost wrote:
-> When trying to change OBJECT and OBJECT_CHECK, I've found a
-> problem: gcc 6.2.1 can't evaluate typeof(*a) if *a has an
-> incomplete type, even inside the (const typeof(*(t)0) *)
-> expression used in QUALIFIED_CAST. It works on clang, though.
-> 
-> I'm not sure we want to introduce something that would report
-> errors only on clang only[1]. Especially when the error messages
-> look like this:
->   hw/mem/pc-dimm.c:248:23: error: passing 'typeof (_Generic((const typeof (*((typeof ((a)))0)) *)0, typeof ((a)): (const Object *)(0), default: (Object *)(0)))' (aka 'const struct Object *') to parameter of type 'Object *' (aka 'struct Object *') discards qualifiers [-Werror,-Wincompatible-pointer-types-discards-qualifiers]
->       PCDIMMDevice *x = PC_DIMM(a);
-> 
-> Lucikly all the OBJECT_CLASS usage I've found never involved
-> incomplete types, but they are more common when dealing with
-> object pointers.
-> 
-> We could also require all users of OBJECT(x) to include the
-> header that defines the struct type of x. But I'm not sure it's
-> worth the effort.
-
-Fair enough!  Thanks for trying.
-
-Paolo
+Thanks Eduardo,
