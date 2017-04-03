@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cv9fm-000784-AQ
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 17:38:03 -0400
+	(envelope-from <bounces@canonical.com>) id 1cv9sF-0000Pr-SL
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 17:50:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cv9fi-0006yE-Vi
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 17:38:02 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:34763)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cv9fi-0006xk-Qb
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 17:37:58 -0400
-Received: by mail-qk0-x243.google.com with SMTP id p68so853335qke.1
-	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 14:37:58 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1490978921-3782-1-git-send-email-gsomlo@gmail.com>
-	<1490978921-3782-2-git-send-email-gsomlo@gmail.com>
-	<bef9b06c-c29e-4259-96c1-88c0c5950c41@amsat.org>
-	<20170403211234.GA31854@foober.ini.cmu.edu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e3bc887f-0332-677d-259f-0bbfedcf5561@amsat.org>
-Date: Mon, 3 Apr 2017 18:37:54 -0300
+	(envelope-from <bounces@canonical.com>) id 1cv9sA-0005iH-Tl
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 17:50:55 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49342)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cv9sA-0005hA-Mt
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 17:50:50 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cv9s7-0003vr-Mw
+	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 21:50:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2A8632E8197
+	for <qemu-devel@nongnu.org>; Mon,  3 Apr 2017 21:50:45 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170403211234.GA31854@foober.ini.cmu.edu>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 1/3] applesmc: cosmetic whitespace and
- indentation cleanup
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 03 Apr 2017 21:40:56 -0000
+From: sh-dvl <1678466@bugs.launchpad.net>
+Reply-To: Bug 1678466 <1678466@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170401120201.1125.46046.malonedeb@gac.canonical.com>
+Message-Id: <20170403214056.25630.82621.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1678466] Re: using x-vga=on with vfio-pci leads
+ to segfault
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,236 +37,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gabriel L. Somlo" <gsomlo@gmail.com>
-Cc: qemu-devel@nongnu.org, agraf@suse.de, eshelton@pobox.com
+To: qemu-devel@nongnu.org
 
-On 04/03/2017 06:12 PM, Gabriel L. Somlo wrote:
-> On Mon, Apr 03, 2017 at 10:34:09AM -0300, Philippe Mathieu-Daudé wrote:
->> Hi Gabriel,
->>
->> On 03/31/2017 01:48 PM, Gabriel L. Somlo wrote:
->>> Signed-off-by: Gabriel Somlo <gsomlo@gmail.com>
->>> ---
->>>  hw/misc/applesmc.c | 100 +++++++++++++++++++++++++++--------------------------
->>>  1 file changed, 51 insertions(+), 49 deletions(-)
->>>
->>> diff --git a/hw/misc/applesmc.c b/hw/misc/applesmc.c
->>> index 77fab5b..986f2ac 100644
->>> --- a/hw/misc/applesmc.c
->>> +++ b/hw/misc/applesmc.c
->>> @@ -39,24 +39,27 @@
->>>  /* #define DEBUG_SMC */
->>>
->>>  #define APPLESMC_DEFAULT_IOBASE        0x300
->>> -/* data port used by Apple SMC */
->>> -#define APPLESMC_DATA_PORT             0x0
->>> -/* command/status port used by Apple SMC */
->>> -#define APPLESMC_CMD_PORT              0x4
->>> -#define APPLESMC_NR_PORTS              32
->>>
->>> -#define APPLESMC_READ_CMD              0x10
->>> -#define APPLESMC_WRITE_CMD             0x11
->>> -#define APPLESMC_GET_KEY_BY_INDEX_CMD  0x12
->>> -#define APPLESMC_GET_KEY_TYPE_CMD      0x13
->>> +enum {
->>> +    APPLESMC_DATA_PORT               = 0x00,
->>> +    APPLESMC_CMD_PORT                = 0x04,
->>> +    APPLESMC_NUM_PORTS               = 0x20,
->>> +};
->>> +
->>> +enum {
->>> +    APPLESMC_READ_CMD                = 0x10,
->>> +    APPLESMC_WRITE_CMD               = 0x11,
->>> +    APPLESMC_GET_KEY_BY_INDEX_CMD    = 0x12,
->>> +    APPLESMC_GET_KEY_TYPE_CMD        = 0x13,
->>> +};
->>>
->>>  #ifdef DEBUG_SMC
->>>  #define smc_debug(...) fprintf(stderr, "AppleSMC: " __VA_ARGS__)
->>>  #else
->>> -#define smc_debug(...) do { } while(0)
->>> +#define smc_debug(...) do { } while (0)
->>>  #endif
->>>
->>> -static char default_osk[64] = "This is a dummy key. Enter the real key "
->>> +static char default_osk[65] = "This is a dummy key. Enter the real key "
->>
->> Here is more than a cosmetic change.
->
-> You're right, that was my mistake (should have left it 64.
->>
->> Since this array is initialized you can declare it without specify the size:
->> static char default_osk[] = ...
->
-> It's initialized to something that's not necessarily 64 characters, so
-> (I assume) the size specification is there to reserve the appropriate
-> amount of space, which is precisely 64 bytes.
+well but even if it's unsupported it shouldn't segfault...
 
-Since 'default_osk' is used read-only, it could be 'const' but since it 
-is assigned as `s->osk = default_osk` which is a PROP_STRING it can not 
-be const. For this read-only reason I think it is safer to let the cpp 
-calculate the size to allocate to this buffer (without specifying 64 
-which lead to confusion).
+the other card is nearly the same
+this one is a GeForce 7300 GS, the other a GeForce 7300 GT
 
->
->> OSK0 + OSK1 is 64, why need an extra byte?
->
-> Right, I undid that part of the patch, will resubmit everything minus
-> that hunk as part of v2.
->
->> Can yoy add some self-explanatory #define and use them later in this file:
->>
->>     applesmc_add_key(s, "OSK0", 32, s->osk);
->>     applesmc_add_key(s, "OSK1", 32, s->osk + 32);
->>
->> and
->>
->>     if (!s->osk || (strlen(s->osk) != 64)) {
->>         fprintf(stderr, "WARNING: Using AppleSMC with invalid key\n");
->
-> Do I have to, now that I'm staying away from touching that bit in the
-> first place ? :)
->
-> The original patch Eric Shelton proposed (inspired by FakeSMC)
-> completely reworks how keys are initialized, adds write support (and
-> access permissions) for select keys, and generally implements a much
-> more complete emulation of the AppleSMC. Since this is just about
-> getting OS X to keep working, I figured I'd keep changes to a minimum.
->
-> Reworking key initialization, adding write support, etc. could
-> (should?) be part of a separate series, if we decide we want a more
-> realistically emulated AppleSMC. In that case, minimizing churn and
-> leaving things as-is in this particular case would be preferable.
->
-> Let me know what you think.
+I think, the above output was done with "lspci -vv", but I've do it again:
+lspci -vv for the "bad card" is:
 
-Let keep it simple enough for this serie :)
+01:00.0 VGA compatible controller: NVIDIA Corporation G72 [GeForce 7300 GS]=
+ (rev a1) (prog-if 00 [VGA controller])
+	Subsystem: Gigabyte Technology Co., Ltd Device 342a
+	Flags: fast devsel, IRQ 16
+	Memory at de000000 (32-bit, non-prefetchable) [disabled] [size=3D16M]
+	Memory at c0000000 (64-bit, prefetchable) [disabled] [size=3D256M]
+	Memory at dd000000 (64-bit, non-prefetchable) [disabled] [size=3D16M]
+	Expansion ROM at df000000 [disabled] [size=3D128K]
+	Capabilities: [60] Power Management version 2
+	Capabilities: [68] MSI: Enable- Count=3D1/1 Maskable- 64bit+
+	Capabilities: [78] Express Endpoint, MSI 00
+	Capabilities: [100] Virtual Channel
+	Capabilities: [128] Power Budgeting <?>
+	Kernel driver in use: vfio-pci
 
-Either with the 64B array size back or without:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
->
-> Thanks,
-> --Gabriel
->
->>
->>>                                "using the -osk parameter";
->>>
->>>  struct AppleSMCData {
->>> @@ -77,12 +80,11 @@ struct AppleSMCState {
->>>      uint32_t iobase;
->>>      uint8_t cmd;
->>>      uint8_t status;
->>> -    uint8_t key[4];
->>> +    char key[4];
->>>      uint8_t read_pos;
->>>      uint8_t data_len;
->>>      uint8_t data_pos;
->>>      uint8_t data[255];
->>> -    uint8_t charactic[4];
->>>      char *osk;
->>>      QLIST_HEAD(, AppleSMCData) data_def;
->>>  };
->>> @@ -93,10 +95,10 @@ static void applesmc_io_cmd_write(void *opaque, hwaddr addr, uint64_t val,
->>>      AppleSMCState *s = opaque;
->>>
->>>      smc_debug("CMD Write B: %#x = %#x\n", addr, val);
->>> -    switch(val) {
->>> -        case APPLESMC_READ_CMD:
->>> -            s->status = 0x0c;
->>> -            break;
->>> +    switch (val) {
->>> +    case APPLESMC_READ_CMD:
->>> +        s->status = 0x0c;
->>> +        break;
->>>      }
->>>      s->cmd = val;
->>>      s->read_pos = 0;
->>> @@ -123,54 +125,54 @@ static void applesmc_io_data_write(void *opaque, hwaddr addr, uint64_t val,
->>>      AppleSMCState *s = opaque;
->>>
->>>      smc_debug("DATA Write B: %#x = %#x\n", addr, val);
->>> -    switch(s->cmd) {
->>> -        case APPLESMC_READ_CMD:
->>> -            if(s->read_pos < 4) {
->>> -                s->key[s->read_pos] = val;
->>> -                s->status = 0x04;
->>> -            } else if(s->read_pos == 4) {
->>> -                s->data_len = val;
->>> -                s->status = 0x05;
->>> -                s->data_pos = 0;
->>> -                smc_debug("Key = %c%c%c%c Len = %d\n", s->key[0],
->>> -                          s->key[1], s->key[2], s->key[3], val);
->>> -                applesmc_fill_data(s);
->>> -            }
->>> -            s->read_pos++;
->>> -            break;
->>> +    switch (s->cmd) {
->>> +    case APPLESMC_READ_CMD:
->>> +        if (s->read_pos < 4) {
->>> +            s->key[s->read_pos] = val;
->>> +            s->status = 0x04;
->>> +        } else if (s->read_pos == 4) {
->>> +            s->data_len = val;
->>> +            s->status = 0x05;
->>> +            s->data_pos = 0;
->>> +            smc_debug("Key = %c%c%c%c Len = %d\n", s->key[0],
->>> +                      s->key[1], s->key[2], s->key[3], val);
->>> +            applesmc_fill_data(s);
->>> +        }
->>> +        s->read_pos++;
->>> +        break;
->>>      }
->>>  }
->>>
->>> -static uint64_t applesmc_io_data_read(void *opaque, hwaddr addr1,
->>> -                                      unsigned size)
->>> +static uint64_t applesmc_io_data_read(void *opaque, hwaddr addr, unsigned size)
->>>  {
->>>      AppleSMCState *s = opaque;
->>>      uint8_t retval = 0;
->>>
->>> -    switch(s->cmd) {
->>> -        case APPLESMC_READ_CMD:
->>> -            if(s->data_pos < s->data_len) {
->>> -                retval = s->data[s->data_pos];
->>> -                smc_debug("READ_DATA[%d] = %#hhx\n", s->data_pos,
->>> -                          retval);
->>> -                s->data_pos++;
->>> -                if(s->data_pos == s->data_len) {
->>> -                    s->status = 0x00;
->>> -                    smc_debug("EOF\n");
->>> -                } else
->>> -                    s->status = 0x05;
->>> +    switch (s->cmd) {
->>> +    case APPLESMC_READ_CMD:
->>> +        if (s->data_pos < s->data_len) {
->>> +            retval = s->data[s->data_pos];
->>> +            smc_debug("READ_DATA[%d] = %#hhx\n", s->data_pos,
->>> +                      retval);
->>> +            s->data_pos++;
->>> +            if (s->data_pos == s->data_len) {
->>> +                s->status = 0x00;
->>> +                smc_debug("EOF\n");
->>> +            } else {
->>> +                s->status = 0x05;
->>>              }
->>> +        }
->>>      }
->>> -    smc_debug("DATA Read b: %#x = %#x\n", addr1, retval);
->>> +    smc_debug("DATA Read b: %#x = %#x\n", addr, retval);
->>>
->>>      return retval;
->>>  }
->>>
->>> -static uint64_t applesmc_io_cmd_read(void *opaque, hwaddr addr1, unsigned size)
->>> +static uint64_t applesmc_io_cmd_read(void *opaque, hwaddr addr, unsigned size)
->>>  {
->>>      AppleSMCState *s = opaque;
->>>
->>> -    smc_debug("CMD Read B: %#x\n", addr1);
->>> +    smc_debug("CMD Read B: %#x\n", addr);
->>>      return s->status;
->>>  }
->>>
->>>
+and for the "good" card:
+07:00.0 VGA compatible controller: NVIDIA Corporation G73 [GeForce 7300 GT]=
+ (rev a1) (prog-if 00 [VGA controller])
+	Subsystem: CardExpert Technology Device 1401
+	Flags: fast devsel, IRQ 16
+	Memory at db000000 (32-bit, non-prefetchable) [disabled] [size=3D16M]
+	Memory at b0000000 (64-bit, prefetchable) [disabled] [size=3D256M]
+	Memory at da000000 (64-bit, non-prefetchable) [disabled] [size=3D16M]
+	I/O ports at e000 [disabled] [size=3D128]
+	Expansion ROM at dc000000 [disabled] [size=3D128K]
+	Capabilities: [60] Power Management version 2
+	Capabilities: [68] MSI: Enable- Count=3D1/1 Maskable- 64bit+
+	Capabilities: [78] Express Endpoint, MSI 00
+	Capabilities: [100] Virtual Channel
+	Capabilities: [128] Power Budgeting <?>
+	Kernel driver in use: vfio-pci
+
+your're right that the I/O-Port is not shown for the "bad" card, even I
+don't know why. Maybe because the card's bios-routine saw the other or
+vice versa.
+
+nevertheless, segfaults are not nice...
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1678466
+
+Title:
+  using x-vga=3Don with vfio-pci leads to segfault
+
+Status in QEMU:
+  New
+
+Bug description:
+  bug occures at least with qemu 2.8.0 and 2.8.1 in 64bit-system
+
+  stripped cmd for minimal config:
+  qemu-system-i386 -m 2048 -M q35  -enable-kvm -nodefaults -nodefconfig -de=
+vice ioh3420,bus=3Dpcie.0,addr=3D0x9,multifunction=3Don,port=3D1,chassis=3D=
+1,id=3Droot.1 -device vfio-pci,host=3D01:00.0,bus=3Droot.1,addr=3D01.0,x-vg=
+a=3Don
+
+  Backtrace is:
+  #0  0x00005555557ca836 in memory_region_update_container_subregions (subr=
+egion=3D0x55555828f2f0) at qemu-2.8.1/memory.c:2030
+  #1  0x00005555557ca9dc in memory_region_add_subregion_common (mr=3D0x0, o=
+ffset=3D8, subregion=3D0x55555828f2f0) at qemu-2.8.1/memory.c:2049
+  #2  0x00005555557caa9a in memory_region_add_subregion_overlap (mr=3D0x0, =
+offset=3D8, subregion=3D0x55555828f2f0, priority=3D1) at qemu-2.8.1/memory.=
+c:2066
+  #3  0x0000555555832e48 in vfio_probe_nvidia_bar5_quirk (vdev=3D0x55555805=
+aef0, nr=3D5) at qemu-2.8.1/hw/vfio/pci-quirks.c:689
+  #4  0x0000555555835433 in vfio_bar_quirk_setup (vdev=3D0x55555805aef0, nr=
+=3D5) at qemu-2.8.1/hw/vfio/pci-quirks.c:1652
+  #5  0x000055555582f122 in vfio_realize (pdev=3D0x55555805aef0, errp=3D0x7=
+fffffffdc78) at qemu-2.8.1/hw/vfio/pci.c:2777
+  #6  0x0000555555a86195 in pci_qdev_realize (qdev=3D0x55555805aef0, errp=
+=3D0x7fffffffdcf0) at hw/pci/pci.c:1966
+  #7  0x00005555559be7b7 in device_set_realized (obj=3D0x55555805aef0, valu=
+e=3Dtrue, errp=3D0x7fffffffdeb0) at hw/core/qdev.c:918
+  #8  0x0000555555bb017f in property_set_bool (obj=3D0x55555805aef0, v=3D0x=
+55555805ced0, name=3D0x555556071b56 "realized", opaque=3D0x555557f15860, er=
+rp=3D0x7fffffffdeb0) at qom/object.c:1854
+  #9  0x0000555555bae2e6 in object_property_set (obj=3D0x55555805aef0, v=3D=
+0x55555805ced0, name=3D0x555556071b56 "realized", errp=3D0x7fffffffdeb0) at=
+ qom/object.c:1088
+  #10 0x0000555555bb184f in object_property_set_qobject (obj=3D0x55555805ae=
+f0, value=3D0x55555805cd70, name=3D0x555556071b56 "realized", errp=3D0x7fff=
+ffffdeb0) at qom/qom-qobject.c:27
+  #11 0x0000555555bae637 in object_property_set_bool (obj=3D0x55555805aef0,=
+ value=3Dtrue, name=3D0x555556071b56 "realized", errp=3D0x7fffffffdeb0) at =
+qom/object.c:1157
+  #12 0x00005555558fee4b in qdev_device_add (opts=3D0x555556b15160, errp=3D=
+0x7fffffffdf28) at qdev-monitor.c:623
+  #13 0x00005555559142c1 in device_init_func (opaque=3D0x0, opts=3D0x555556=
+b15160, errp=3D0x0) at vl.c:2373
+  #14 0x0000555555cc3bb7 in qemu_opts_foreach (list=3D0x555556548b80 <qemu_=
+device_opts>, func=3D0x555555914283 <device_init_func>, opaque=3D0x0, errp=
+=3D0x0) at util/qemu-option.c:1116
+  #15 0x00005555559198aa in main (argc=3D12, argv=3D0x7fffffffe388, envp=3D=
+0x7fffffffe3f0) at vl.c:4574
+
+  as I can see, it happens during initialization of the device-option.
+
+  seems that the code tries to loop over a memory-region mr, which is
+  null from at least three calls before it crashes.
+
+  because there seems to be special handling for nvidia-cards, here're the =
+pci-infos of the card:
+  01:00.0 VGA compatible controller [0300]: NVIDIA Corporation G72 [GeForce=
+ 7300 GS] [10de:01df] (rev a1) (prog-if 00 [VGA controller])
+  	Subsystem: Gigabyte Technology Co., Ltd Device [1458:342a]
+  	Flags: fast devsel, IRQ 16
+  	Memory at de000000 (32-bit, non-prefetchable) [disabled] [size=3D16M]
+  	Memory at c0000000 (64-bit, prefetchable) [disabled] [size=3D256M]
+  	Memory at dd000000 (64-bit, non-prefetchable) [disabled] [size=3D16M]
+  	Expansion ROM at df000000 [disabled] [size=3D128K]
+  	Capabilities: [60] Power Management version 2
+  	Capabilities: [68] MSI: Enable- Count=3D1/1 Maskable- 64bit+
+  	Capabilities: [78] Express Endpoint, MSI 00
+  	Capabilities: [100] Virtual Channel
+  	Capabilities: [128] Power Budgeting <?>
+  	Kernel driver in use: vfio-pci
+
+  at least with a similar card in another slot the crash does not occure.
+  (sorry, can't change the slots at the moment)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1678466/+subscriptions
