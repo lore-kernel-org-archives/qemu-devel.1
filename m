@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cv7gQ-0000ze-Pe
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:30:39 -0400
+	(envelope-from <bounces@canonical.com>) id 1cv7gj-000164-AE
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:30:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cv7gM-0004Lv-QT
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:30:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44040)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cv7gM-0004LH-Hi
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:30:30 -0400
-References: <1490965817-16913-1-git-send-email-amarnath.valluri@intel.com>
-	<1490965817-16913-8-git-send-email-amarnath.valluri@intel.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a22cfed1-49db-48d1-c204-132ece5f27ed@redhat.com>
-Date: Mon, 3 Apr 2017 14:30:26 -0500
+	(envelope-from <bounces@canonical.com>) id 1cv7gf-0004Wu-54
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:30:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44588)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cv7ge-0004W1-VH
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:30:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cv7gc-0007QJ-Qk
+	for <qemu-devel@nongnu.org>; Mon, 03 Apr 2017 19:30:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9CE582E80C7
+	for <qemu-devel@nongnu.org>; Mon,  3 Apr 2017 19:30:46 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1490965817-16913-8-git-send-email-amarnath.valluri@intel.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="D8HIQFnAbuPu2FW6KMWPPJaFHgvaJ9XPd"
-Subject: Re: [Qemu-devel] [PATCH 7/7] Added support for TPM emulator
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 03 Apr 2017 19:15:38 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1679126 <1679126@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170403115539.1125.50319.malonedeb@gac.canonical.com>
+Message-Id: <20170403191538.594.92343.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1679126] Re: null pointer access on migration
+ resume of systemrescuecd boot menu with qxl-vga
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,147 +37,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
-Cc: patrick.ohly@intel.com, stefanb@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---D8HIQFnAbuPu2FW6KMWPPJaFHgvaJ9XPd
-From: Eric Blake <eblake@redhat.com>
-To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
-Cc: patrick.ohly@intel.com, stefanb@linux.vnet.ibm.com
-Message-ID: <a22cfed1-49db-48d1-c204-132ece5f27ed@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 7/7] Added support for TPM emulator
-References: <1490965817-16913-1-git-send-email-amarnath.valluri@intel.com>
- <1490965817-16913-8-git-send-email-amarnath.valluri@intel.com>
-In-Reply-To: <1490965817-16913-8-git-send-email-amarnath.valluri@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+I think this is actually anything that's in text mode grub; I've had a
+RHEL5 and 6 VM do it as well.
 
-On 03/31/2017 08:10 AM, Amarnath Valluri wrote:
-> This change introduces a new TPM backend driver that can communicates w=
-ith
-> swtpm(software TPM emulator) using unix domain socket interface.
->=20
-> Swtpm uses two unix sockets, one for plain TPM commands and responses, =
-and one
-> for out-of-band control messages.
->=20
-> The swtpm and associated tools can be found here:
->     https://github.com/stefanberger/swtpm
->=20
-> Usage:
->     # setup TPM state directory
->     mkdir /tmp/mytpm
->     chown -R tss:root /tmp/mytpm
->     /usr/bin/swtpm_setup --tpm-state /tmp/mytpm --createek
->=20
->     # Ask qeum to use TPM emulator with given tpm state directory
->     qemu-system-x86_64 \
->         [...] \
->         -tpmdev emulator,id=3Dtpm0,tpmstatedir=3D/tmp/mytpm,logfile=3D/=
-tmp/swtpm.log \
->         -device tpm-tis,tpmdev=3Dtpm0 \
->         [...]
->=20
-> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
-> ---
+Thanks for reporting it.
 
-Just an interface review for now:
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1679126
 
-> +++ b/qapi-schema.json
-> @@ -5117,10 +5117,11 @@
->  # An enumeration of TPM types
->  #
->  # @passthrough: TPM passthrough type
-> +# @emulator: Software Emulator TPM type
+Title:
+  null pointer access on migration resume of systemrescuecd boot menu
+  with qxl-vga
 
-Missing a '(since 2.10)' designator on @emulator
+Status in QEMU:
+  Confirmed
 
->  #
->  # Since: 1.5
->  ##
-> -{ 'enum': 'TpmType', 'data': [ 'passthrough' ] }
-> +{ 'enum': 'TpmType', 'data': [ 'passthrough', 'emulator' ] }
-> =20
->  ##
->  # @query-tpm-types:
-> @@ -5163,6 +5164,22 @@
->    'data': { '*path' : 'str', '*cancel-path' : 'str'} }
-> =20
->  ##
-> +# @TPMEmulatorOptions:
-> +#
-> +# Information about the TPM emulator
-> +#
-> +# @tpmstatedir: TPM emilator state dir
+Bug description:
+  With qemu-2.8.0 up to 2.9.0-rc2 and git master (6954cdc), when
+  resuming from a migration state file created from a VM suspended while
+  showing the System Rescue CD 4.9.2 boot menu and using the QXL VGA
+  device, I get a null point access in pixman_image_get_data called from
+  qemu_spice_create_update (spice-display.c:215).  When I added
+  assert(ssd->mirror !=3D NULL) above that line, assert failed.  I don't
+  get the crash when using standard VGA or cirrus-vga.  I am using
+  gcc-4.9.3 on Gentoo x86_64 with Intel i7-4700HQ CPU and kernel:
+  4.9.15-gentoo.
 
-s/emilator/emulator/
+  Here is the valgrind trace from the git version:
+  =3D=3D2634=3D=3D Thread 1:
+  =3D=3D2634=3D=3D Invalid read of size 4
+  =3D=3D3516=3D=3D    at 0x65F3050: pixman_image_get_data (in /usr/lib64/li=
+bpixman-1.so.0.34.0)
+  =3D=3D3516=3D=3D    by 0x6F0CEB: qemu_spice_create_update (spice-display.=
+c:215)
+  =3D=3D3516=3D=3D    by 0x6F1CC7: qemu_spice_display_refresh (spice-displa=
+y.c:502)
+  =3D=3D3516=3D=3D    by 0x58CF77: display_refresh (qxl.c:1948)
+  =3D=3D3516=3D=3D    by 0x6E8084: do_safe_dpy_refresh (console.c:1591)
+  =3D=3D3516=3D=3D    by 0x6E80D5: dpy_refresh (console.c:1604)
+  =3D=3D3516=3D=3D    by 0x6E4508: gui_update (console.c:201)
+  =3D=3D3516=3D=3D    by 0x81898E: timerlist_run_timers (qemu-timer.c:536)
+  =3D=3D3516=3D=3D    by 0x8189D6: qemu_clock_run_timers (qemu-timer.c:547)
+  =3D=3D3516=3D=3D    by 0x818D98: qemu_clock_run_all_timers (qemu-timer.c:=
+662)
+  =3D=3D3516=3D=3D    by 0x81952A: main_loop_wait (main-loop.c:514)
+  =3D=3D3516=3D=3D    by 0x4ADD29: main_loop (vl.c:1898)
 
-> +# @path: TPM emulator binary path to use
-> +# @logfile: file to use to place TPM emulator logs
+  Minimal steps to reproduce:
 
-What's the default when logfile is omitted?
+  Compile (debug compile flags are just so valgrind works, the crash occurs=
+ with non-debug compile flags as well):
+  CFLAGS=3D"-g -O0" CXXFLAGS=3D"-g -O0" ./configure --target-list=3Di386-so=
+ftmmu,x86_64-softmmu
+  ./configure
+  make
 
-> +# @loglevel: log level number
+  Start VM and leave it on the System Rescue CD graphical boot menu:
+  x86_64-softmmu/qemu-system-x86_64 -nodefaults -machine pc -drive file=3Ds=
+ystemrescuecd-x86-4.9.2.iso,if=3Dnone,id=3Dcdrom-cd,readonly=3Don -device i=
+de-cd,bus=3Dide.0,drive=3Dcdrom-cd,bootindex=3D1 -device qxl-vga -monitor u=
+nix:monitor.sock,server,nowait -display gtk
 
-What's the default, or even the valid range of values? Is a larger
-number noisier?
+  Suspend VM and save state:
+  socat - unix:monitor.sock
+    stop
+    migrate "exec:cat > vm.state"
+    quit
 
-> +#
-> +# Since: 2.6
+  Attempt to resume VM (but this crashes):
+  x86_64-softmmu/qemu-system-x86_64 -nodefaults -machine pc -drive file=3Ds=
+ystemrescuecd-x86-4.9.2.iso,if=3Dnone,id=3Dcdrom-cd,readonly=3Don -device i=
+de-cd,bus=3Dide.0,drive=3Dcdrom-cd,bootindex=3D1 -device qxl-vga -monitor u=
+nix:monitor.sock,server,nowait -display gtk -incoming exec:"cat vm.state"
 
-You've missed 2.6 by a long shot. We are now working on 2.10 interfaces.
-
-> +##
-> +{ 'struct': 'TPMEmulatorOptions', 'base': 'TPMOptions',
-
-Okay, the base class you added in 5/7 makes a bit more sense now, even
-if it remains empty.  But then that means you need to update the commit
-message to call it out as intentional that it is empty and a second
-derived class will be added later.
-
-> +  'data': { 'tpmstatedir' : 'str', '*path': 'str',
-> +            '*logfile' : 'str', '*loglevel' : 'int' } }
-> +
-> +##
->  # @TpmTypeOptions:
->  #
->  # A union referencing different TPM backend types' configuration optio=
-ns
-> @@ -5172,7 +5189,8 @@
->  # Since: 1.5
->  ##
->  { 'union': 'TpmTypeOptions',
-> -   'data': { 'passthrough' : 'TPMPassthroughOptions' } }
-> +  'data': { 'passthrough' : 'TPMPassthroughOptions',
-> +            'emulator' : 'TPMEmulatorOptions' } }
-> =20
->  ##
->  # @TPMInfo:
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---D8HIQFnAbuPu2FW6KMWPPJaFHgvaJ9XPd
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY4qLSAAoJEKeha0olJ0NqcakH+wYmlUIhnlzLujPfLQlhJZJS
-hD0OeweMLaedGYw+YRFWVwUJ+9tZ5597XUDoebaJ4lafo4WgR1anrGSIOU2io0yv
-dVypCzYqixY3t+ZpZdBIbA4JU9exjBUYpwrGc+DQld/MSlFLrlLJXR0uOlWA76gy
-xzDkrjYVLm2fBSZSjLxkKVVR3QqLQeSCmkDvKkbMVrtsGADz9UlHrsai5UJLl24N
-2ZgYmL8xXEBsg8rP4i0SyVeQNjBurYczYFJf/k0bU8XlW5lDiFzSjqDJqYygB5OM
-gQOnAOjAvN6KNjLs+2CniqvYPO2Z7kdGdMbzCZDziZS1kWKdnc532kqfPdDn4tE=
-=hrT9
------END PGP SIGNATURE-----
-
---D8HIQFnAbuPu2FW6KMWPPJaFHgvaJ9XPd--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1679126/+subscriptions
