@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45438)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cv3za-000612-TG
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 11:34:07 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cv3zc-00061f-6w
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 11:34:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cv3za-00079C-0L
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 11:34:06 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cv3zb-00079Y-A7
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 11:34:08 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon,  3 Apr 2017 17:33:40 +0200
-Message-Id: <20170403153355.19722-1-mreitz@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/15] Block patches for rc3
+Date: Mon,  3 Apr 2017 17:33:42 +0200
+Message-Id: <20170403153355.19722-3-mreitz@redhat.com>
+In-Reply-To: <20170403153355.19722-1-mreitz@redhat.com>
+References: <20170403153355.19722-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PULL 02/15] nbd sockets vnc: Mark problematic address
+ family tests TODO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,81 +23,113 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-The following changes since commit 102a3d847891f48c0b13cace19d189217b05a7=
-25:
+From: Markus Armbruster <armbru@redhat.com>
 
-  usb-host: switch to LIBUSB_API_VERSION (2017-04-03 14:41:23 +0100)
+Certain features make sense only with certain address families.  For
+instance, passing file descriptors requires AF_UNIX.  Testing
+SocketAddress's saddr->type == SOCKET_ADDRESS_KIND_UNIX is obvious,
+but problematic: it can't recognize AF_UNIX when type ==
+SOCKET_ADDRESS_KIND_FD.
 
-are available in the git repository at:
+Mark such tests of saddr->type TODO.  We may want to check the address
+family with getsockname() there.
 
-  git://github.com/XanClic/qemu.git tags/pull-block-2017-04-03
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Daniel P. Berrange <berrange@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-id: 1490895797-29094-2-git-send-email-armbru@redhat.com
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block/nbd.c           | 1 +
+ blockdev-nbd.c        | 1 +
+ chardev/char-socket.c | 5 ++---
+ ui/vnc.c              | 1 +
+ util/qemu-sockets.c   | 4 ++++
+ 5 files changed, 9 insertions(+), 3 deletions(-)
 
-for you to fetch changes up to 86d1bd70987cd11d85d01f52aa5824c63d910471:
-
-  block/parallels: Avoid overflows (2017-04-03 17:11:40 +0200)
-
-----------------------------------------------------------------
-Block patches for 2.9-rc3
-
-----------------------------------------------------------------
-Daniel P. Berrange (1):
-      iotests: fix 097 when run with qcow
-
-Denis V. Lunev (1):
-      block: add missed aio_context_acquire into release_drive
-
-Eric Blake (2):
-      qcow2: Discard unaligned tail when wiping image
-      iotests: Improve image-clear tests on non-aligned image
-
-Markus Armbruster (9):
-      nbd sockets vnc: Mark problematic address family tests TODO
-      char: Fix socket with "type": "vsock" address
-      io vnc sockets: Clean up SocketAddressKind switches
-      block: Document -drive problematic code and bugs
-      gluster: Prepare for SocketAddressFlat extension
-      qapi-schema: SocketAddressFlat variants 'vsock' and 'fd'
-      sockets: New helper socket_address_crumple()
-      nbd: Tidy up blockdev-add interface
-      sheepdog: Fix blockdev-add
-
-Max Reitz (1):
-      block/parallels: Avoid overflows
-
-Peter Maydell (1):
-      qemu-io-cmds: Assert that global and nofile commands don't use ct->=
-perms
-
- qapi-schema.json                 |  19 ++---
- qapi/block-core.json             |   6 +-
- include/qemu/sockets.h           |  11 +++
- block.c                          |  48 ++++++++++-
- block/file-posix.c               |   6 ++
- block/gluster.c                  |  28 +++---
- block/nbd.c                      |  62 ++++++++------
- block/nfs.c                      |   7 ++
- block/parallels.c                |  19 +++--
- block/qcow2-cluster.c            |  10 +--
- block/rbd.c                      |   6 ++
- block/sheepdog.c                 |  90 +++++++++++++-------
- block/ssh.c                      |   8 ++
- blockdev-nbd.c                   |   1 +
- chardev/char-socket.c            |   9 +-
- hw/core/qdev-properties-system.c |   4 +
- io/dns-resolver.c                |   7 +-
- qemu-io-cmds.c                   |   7 ++
- ui/vnc.c                         |  19 +++--
- util/qemu-sockets.c              |  40 ++++++++-
- tests/qemu-iotests/097           |  27 +++---
- tests/qemu-iotests/097.out       | 180 ++++++++++-----------------------=
-------
- tests/qemu-iotests/147           |  25 ++++--
- tests/qemu-iotests/176           | 131 ++++++++++++++++++++++++++++
- tests/qemu-iotests/176.out       | 150 ++++++++++++++++++++++++++++++++
- tests/qemu-iotests/group         |   1 +
- 26 files changed, 655 insertions(+), 266 deletions(-)
- create mode 100755 tests/qemu-iotests/176
- create mode 100644 tests/qemu-iotests/176.out
-
---=20
+diff --git a/block/nbd.c b/block/nbd.c
+index 1b832c2132..36ea617989 100644
+--- a/block/nbd.c
++++ b/block/nbd.c
+@@ -421,6 +421,7 @@ static int nbd_open(BlockDriverState *bs, QDict *options, int flags,
+             goto error;
+         }
+ 
++        /* TODO SOCKET_ADDRESS_KIND_FD where fd has AF_INET or AF_INET6 */
+         if (s->saddr->type != SOCKET_ADDRESS_KIND_INET) {
+             error_setg(errp, "TLS only supported over IP sockets");
+             goto error;
+diff --git a/blockdev-nbd.c b/blockdev-nbd.c
+index 7ea836b46e..8a11807df3 100644
+--- a/blockdev-nbd.c
++++ b/blockdev-nbd.c
+@@ -124,6 +124,7 @@ void qmp_nbd_server_start(SocketAddress *addr,
+             goto error;
+         }
+ 
++        /* TODO SOCKET_ADDRESS_KIND_FD where fd has AF_INET or AF_INET6 */
+         if (addr->type != SOCKET_ADDRESS_KIND_INET) {
+             error_setg(errp, "TLS is only supported with IPv4/IPv6");
+             goto error;
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index d7e92e1bd3..6344b07822 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -47,7 +47,6 @@ typedef struct {
+     int max_size;
+     int do_telnetopt;
+     int do_nodelay;
+-    int is_unix;
+     int *read_msgfds;
+     size_t read_msgfds_num;
+     int *write_msgfds;
+@@ -825,7 +824,6 @@ static void qmp_chardev_open_socket(Chardev *chr,
+     int64_t reconnect   = sock->has_reconnect ? sock->reconnect : 0;
+     QIOChannelSocket *sioc = NULL;
+ 
+-    s->is_unix = addr->type == SOCKET_ADDRESS_KIND_UNIX;
+     s->is_listen = is_listen;
+     s->is_telnet = is_telnet;
+     s->do_nodelay = do_nodelay;
+@@ -865,7 +863,8 @@ static void qmp_chardev_open_socket(Chardev *chr,
+     s->addr = QAPI_CLONE(SocketAddress, sock->addr);
+ 
+     qemu_chr_set_feature(chr, QEMU_CHAR_FEATURE_RECONNECTABLE);
+-    if (s->is_unix) {
++    /* TODO SOCKET_ADDRESS_FD where fd has AF_UNIX */
++    if (addr->type == SOCKET_ADDRESS_KIND_UNIX) {
+         qemu_chr_set_feature(chr, QEMU_CHAR_FEATURE_FD_PASS);
+     }
+ 
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 243e99bb95..1095f9de68 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -3642,6 +3642,7 @@ static int vnc_display_connect(VncDisplay *vd,
+         error_setg(errp, "Expected a single address in reverse mode");
+         return -1;
+     }
++    /* TODO SOCKET_ADDRESS_KIND_FD when fd has AF_UNIX */
+     vd->is_unix = saddr[0]->type == SOCKET_ADDRESS_KIND_UNIX;
+     sioc = qio_channel_socket_new();
+     qio_channel_set_name(QIO_CHANNEL(sioc), "vnc-reverse");
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index 40164bf681..9b7368113c 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -1154,6 +1154,10 @@ int socket_dgram(SocketAddress *remote, SocketAddress *local, Error **errp)
+ {
+     int fd;
+ 
++    /*
++     * TODO SOCKET_ADDRESS_KIND_FD when fd is AF_INET or AF_INET6
++     * (although other address families can do SOCK_DGRAM, too)
++     */
+     switch (remote->type) {
+     case SOCKET_ADDRESS_KIND_INET:
+         fd = inet_dgram_saddr(remote->u.inet.data,
+-- 
 2.12.1
