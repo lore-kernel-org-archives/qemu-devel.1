@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cv7ao-0008Kq-Ot
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:24:47 -0400
+	(envelope-from <eblake@redhat.com>) id 1cv7gQ-0000ze-Pe
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:30:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cv7ak-0001EO-IS
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:24:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58714)
+	(envelope-from <eblake@redhat.com>) id 1cv7gM-0004Lv-QT
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:30:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44040)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cv7ak-0001E4-9L
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:24:42 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cv7gM-0004LH-Hi
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 15:30:30 -0400
 References: <1490965817-16913-1-git-send-email-amarnath.valluri@intel.com>
-	<1490965817-16913-6-git-send-email-amarnath.valluri@intel.com>
+	<1490965817-16913-8-git-send-email-amarnath.valluri@intel.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <5f0ecef1-1e43-ffff-2060-7f0da40dc7c5@redhat.com>
-Date: Mon, 3 Apr 2017 14:24:39 -0500
+Message-ID: <a22cfed1-49db-48d1-c204-132ece5f27ed@redhat.com>
+Date: Mon, 3 Apr 2017 14:30:26 -0500
 MIME-Version: 1.0
-In-Reply-To: <1490965817-16913-6-git-send-email-amarnath.valluri@intel.com>
+In-Reply-To: <1490965817-16913-8-git-send-email-amarnath.valluri@intel.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="eK5JONJnP0hPLB72XhROc5L5oemVSVquw"
-Subject: Re: [Qemu-devel] [PATCH 5/7] tmp backend: Add new api to read
- backend tpm options
+	boundary="D8HIQFnAbuPu2FW6KMWPPJaFHgvaJ9XPd"
+Subject: Re: [Qemu-devel] [PATCH 7/7] Added support for TPM emulator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,31 +32,43 @@ To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
 Cc: patrick.ohly@intel.com, stefanb@linux.vnet.ibm.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---eK5JONJnP0hPLB72XhROc5L5oemVSVquw
+--D8HIQFnAbuPu2FW6KMWPPJaFHgvaJ9XPd
 From: Eric Blake <eblake@redhat.com>
 To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
 Cc: patrick.ohly@intel.com, stefanb@linux.vnet.ibm.com
-Message-ID: <5f0ecef1-1e43-ffff-2060-7f0da40dc7c5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 5/7] tmp backend: Add new api to read backend
- tpm options
+Message-ID: <a22cfed1-49db-48d1-c204-132ece5f27ed@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 7/7] Added support for TPM emulator
 References: <1490965817-16913-1-git-send-email-amarnath.valluri@intel.com>
- <1490965817-16913-6-git-send-email-amarnath.valluri@intel.com>
-In-Reply-To: <1490965817-16913-6-git-send-email-amarnath.valluri@intel.com>
+ <1490965817-16913-8-git-send-email-amarnath.valluri@intel.com>
+In-Reply-To: <1490965817-16913-8-git-send-email-amarnath.valluri@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 03/31/2017 08:10 AM, Amarnath Valluri wrote:
-> TPM configuration options are backend implementation details and shall =
-not be
-> part of base TPMBackend object, and these shall not be accessed directl=
-y outside
-> of the class, hence added a new tpm backend api, tpm_backend_get_tpm_op=
-tions()
-> to read the backend configured options.
+> This change introduces a new TPM backend driver that can communicates w=
+ith
+> swtpm(software TPM emulator) using unix domain socket interface.
 >=20
-> Added new method, get_tpm_options() to TPMDriverOps., which shall be im=
-plemented
-> by the derived classes to return configured tpm options.
+> Swtpm uses two unix sockets, one for plain TPM commands and responses, =
+and one
+> for out-of-band control messages.
+>=20
+> The swtpm and associated tools can be found here:
+>     https://github.com/stefanberger/swtpm
+>=20
+> Usage:
+>     # setup TPM state directory
+>     mkdir /tmp/mytpm
+>     chown -R tss:root /tmp/mytpm
+>     /usr/bin/swtpm_setup --tpm-state /tmp/mytpm --createek
+>=20
+>     # Ask qeum to use TPM emulator with given tpm state directory
+>     qemu-system-x86_64 \
+>         [...] \
+>         -tpmdev emulator,id=3Dtpm0,tpmstatedir=3D/tmp/mytpm,logfile=3D/=
+tmp/swtpm.log \
+>         -device tpm-tis,tpmdev=3Dtpm0 \
+>         [...]
 >=20
 > Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
 > ---
@@ -66,52 +77,82 @@ Just an interface review for now:
 
 
 > +++ b/qapi-schema.json
-> @@ -5140,6 +5140,14 @@
->  { 'command': 'query-tpm-types', 'returns': ['TpmType'] }
-> =20
->  ##
-> +# @TPMOptions:
-> +#
-> +# Base type for TPM options
-> +##
-
-Missing a 'Since: 2.10' designation
-
-> +{ 'struct': 'TPMOptions',
-> +  'data': { } }
-
-This class feels pointless (at least for now; I haven't checked if you
-expand it later in the series - but if so, define it where you first
-need it). It has no members, and you are only using it...
-
-> +
-> +##
->  # @TPMPassthroughOptions:
+> @@ -5117,10 +5117,11 @@
+>  # An enumeration of TPM types
 >  #
->  # Information about the TPM passthrough type
-> @@ -5151,8 +5159,8 @@
+>  # @passthrough: TPM passthrough type
+> +# @emulator: Software Emulator TPM type
+
+Missing a '(since 2.10)' designator on @emulator
+
 >  #
 >  # Since: 1.5
 >  ##
-> -{ 'struct': 'TPMPassthroughOptions', 'data': { '*path' : 'str',
-> -                                             '*cancel-path' : 'str'} }=
-
-> +{ 'struct': 'TPMPassthroughOptions', 'base': 'TPMOptions',
-
-=2E..as a base class. A base class makes sense only if it is consolidatin=
-g
-common members, or if it is the base to at least two different
-structures where having a common C type to pass around is handy.
-
-> +  'data': { '*path' : 'str', '*cancel-path' : 'str'} }
+> -{ 'enum': 'TpmType', 'data': [ 'passthrough' ] }
+> +{ 'enum': 'TpmType', 'data': [ 'passthrough', 'emulator' ] }
 > =20
+>  ##
+>  # @query-tpm-types:
+> @@ -5163,6 +5164,22 @@
+>    'data': { '*path' : 'str', '*cancel-path' : 'str'} }
+> =20
+>  ##
+> +# @TPMEmulatorOptions:
+> +#
+> +# Information about the TPM emulator
+> +#
+> +# @tpmstatedir: TPM emilator state dir
+
+s/emilator/emulator/
+
+> +# @path: TPM emulator binary path to use
+> +# @logfile: file to use to place TPM emulator logs
+
+What's the default when logfile is omitted?
+
+> +# @loglevel: log level number
+
+What's the default, or even the valid range of values? Is a larger
+number noisier?
+
+> +#
+> +# Since: 2.6
+
+You've missed 2.6 by a long shot. We are now working on 2.10 interfaces.
+
+> +##
+> +{ 'struct': 'TPMEmulatorOptions', 'base': 'TPMOptions',
+
+Okay, the base class you added in 5/7 makes a bit more sense now, even
+if it remains empty.  But then that means you need to update the commit
+message to call it out as intentional that it is empty and a second
+derived class will be added later.
+
+> +  'data': { 'tpmstatedir' : 'str', '*path': 'str',
+> +            '*logfile' : 'str', '*loglevel' : 'int' } }
+> +
+> +##
+>  # @TpmTypeOptions:
+>  #
+>  # A union referencing different TPM backend types' configuration optio=
+ns
+> @@ -5172,7 +5189,8 @@
+>  # Since: 1.5
+>  ##
+>  { 'union': 'TpmTypeOptions',
+> -   'data': { 'passthrough' : 'TPMPassthroughOptions' } }
+> +  'data': { 'passthrough' : 'TPMPassthroughOptions',
+> +            'emulator' : 'TPMEmulatorOptions' } }
+> =20
+>  ##
+>  # @TPMInfo:
 
 --=20
 Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---eK5JONJnP0hPLB72XhROc5L5oemVSVquw
+--D8HIQFnAbuPu2FW6KMWPPJaFHgvaJ9XPd
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -121,13 +162,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJY4qF3AAoJEKeha0olJ0Nq4k8IAKH3tQF0n52GAglUsqT7SwVH
-qsaapN96ODZhh83mIl3lSz3pS7eFrjrSa3epCQJVYtouFI2KhF+xcd51KeMlPAVR
-dIYmBitNG/FRW6/gZ8TQKIYDGiEY+gp8/dxozjiR/6inZVL3beAusujssiHbg/6b
-KsC0dmeIjBaJfuWamql0pOn4bvd8FygRRQKlIJTd93okiCnBzGhEK11/rrCLnIlS
-twYrxeGIEg6Hs1vH8QxwqgoD3RJPy9wt3ZlF4yj9idMQYycnHa4HLQb5S1HKWg3D
-dgSiFuorLamDsJrq7FLea/rUvfbPbGSDr/oM69MU0+hVuYN+yg/FGyg738iFDrk=
-=BFXj
+iQEcBAEBCAAGBQJY4qLSAAoJEKeha0olJ0NqcakH+wYmlUIhnlzLujPfLQlhJZJS
+hD0OeweMLaedGYw+YRFWVwUJ+9tZ5597XUDoebaJ4lafo4WgR1anrGSIOU2io0yv
+dVypCzYqixY3t+ZpZdBIbA4JU9exjBUYpwrGc+DQld/MSlFLrlLJXR0uOlWA76gy
+xzDkrjYVLm2fBSZSjLxkKVVR3QqLQeSCmkDvKkbMVrtsGADz9UlHrsai5UJLl24N
+2ZgYmL8xXEBsg8rP4i0SyVeQNjBurYczYFJf/k0bU8XlW5lDiFzSjqDJqYygB5OM
+gQOnAOjAvN6KNjLs+2CniqvYPO2Z7kdGdMbzCZDziZS1kWKdnc532kqfPdDn4tE=
+=hrT9
 -----END PGP SIGNATURE-----
 
---eK5JONJnP0hPLB72XhROc5L5oemVSVquw--
+--D8HIQFnAbuPu2FW6KMWPPJaFHgvaJ9XPd--
