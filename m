@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cv1h5-0000W8-HN
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:06:55 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cv1hP-0000qQ-UF
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:07:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cv1gz-0003JL-KO
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:06:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40866)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1cv1gz-0003J3-B7
-	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:06:45 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 60C593B71B
-	for <qemu-devel@nongnu.org>; Mon,  3 Apr 2017 13:06:44 +0000 (UTC)
-References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
-	<1490621195-2228-10-git-send-email-armbru@redhat.com>
-	<20170403113703.GS2768@redhat.com>
-	<44b23727-f5d4-0d64-0694-85c6dd601431@redhat.com>
-	<20170403130442.GW2768@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1cv1hL-0003Xh-5H
+	for qemu-devel@nongnu.org; Mon, 03 Apr 2017 09:07:11 -0400
+References: <1490879707-6060-1-git-send-email-armbru@redhat.com>
+	<1490879707-6060-4-git-send-email-armbru@redhat.com>
+	<20170403114855.GV2768@redhat.com>
+	<6516cecc-4f5f-9255-3890-7fed57ab7eb4@redhat.com>
+	<20170403130517.GX2768@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <eeae3032-1e84-9f0b-f96b-7ca58e1e293b@redhat.com>
-Date: Mon, 3 Apr 2017 15:06:39 +0200
+Message-ID: <4616469d-a3cc-e78a-0c4a-578814eec65d@redhat.com>
+Date: Mon, 3 Apr 2017 15:06:54 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170403130442.GW2768@redhat.com>
+In-Reply-To: <20170403130517.GX2768@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="j33eaSbfwe671WpL0bb5L7ugT7MNilHEk"
-Subject: Re: [Qemu-devel] [PATCH RFC v3 for-2.9 09/11] rbd: Revert -blockdev
- parameter password-secret
+	boundary="LD6fBhrKJoVqtHKIthc5OFTXFqXKbfrcK"
+Subject: Re: [Qemu-devel] [RFC v2 for-2.9 03/10] io vnc sockets: Clean up
+ SocketAddressKind switches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,99 +29,102 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, jdurgin@redhat.com, jcody@redhat.com
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, pbonzini@redhat.com, namei.unix@gmail.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---j33eaSbfwe671WpL0bb5L7ugT7MNilHEk
+--LD6fBhrKJoVqtHKIthc5OFTXFqXKbfrcK
 From: Max Reitz <mreitz@redhat.com>
 To: "Daniel P. Berrange" <berrange@redhat.com>
 Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- kwolf@redhat.com, jdurgin@redhat.com, jcody@redhat.com
-Message-ID: <eeae3032-1e84-9f0b-f96b-7ca58e1e293b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v3 for-2.9 09/11] rbd: Revert -blockdev
- parameter password-secret
-References: <1490621195-2228-1-git-send-email-armbru@redhat.com>
- <1490621195-2228-10-git-send-email-armbru@redhat.com>
- <20170403113703.GS2768@redhat.com>
- <44b23727-f5d4-0d64-0694-85c6dd601431@redhat.com>
- <20170403130442.GW2768@redhat.com>
-In-Reply-To: <20170403130442.GW2768@redhat.com>
+ kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp,
+ jcody@redhat.com, pbonzini@redhat.com, namei.unix@gmail.com
+Message-ID: <4616469d-a3cc-e78a-0c4a-578814eec65d@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 for-2.9 03/10] io vnc sockets: Clean up
+ SocketAddressKind switches
+References: <1490879707-6060-1-git-send-email-armbru@redhat.com>
+ <1490879707-6060-4-git-send-email-armbru@redhat.com>
+ <20170403114855.GV2768@redhat.com>
+ <6516cecc-4f5f-9255-3890-7fed57ab7eb4@redhat.com>
+ <20170403130517.GX2768@redhat.com>
+In-Reply-To: <20170403130517.GX2768@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 03.04.2017 15:04, Daniel P. Berrange wrote:
-> On Mon, Apr 03, 2017 at 02:42:48PM +0200, Max Reitz wrote:
->> On 03.04.2017 13:37, Daniel P. Berrange wrote:
->>> On Mon, Mar 27, 2017 at 03:26:33PM +0200, Markus Armbruster wrote:
->>>> This reverts a part of commit 8a47e8e.  We're having second thoughts=
+On 03.04.2017 15:05, Daniel P. Berrange wrote:
+> On Mon, Apr 03, 2017 at 02:50:12PM +0200, Max Reitz wrote:
+>> On 03.04.2017 13:48, Daniel P. Berrange wrote:
+>>> On Thu, Mar 30, 2017 at 03:15:00PM +0200, Markus Armbruster wrote:
+>>>> We have quite a few switches over SocketAddressKind.  Some have case=
 
->>>> on the QAPI schema (and thus the external interface), and haven't
->>>> reached consensus, yet.  Issues include:
+>>>> labels for all enumeration values, others rely on a default label.
+>>>> Some abort when the value isn't a valid SocketAddressKind, others
+>>>> report an error then.
 >>>>
->>>> * BlockdevOptionsRbd member @password-secret isn't actually a
->>>>   password, it's a key generated by Ceph.
+>>>> Unify as follows.  Always provide case labels for all enumeration
+>>>> values, to clarify intent.  Abort when the value isn't a valid
+>>>> SocketAddressKind, because the program state is messed up then.
 >>>>
->>>> * We're not sure where member @password-secret belongs (see the
->>>>   previous commit).
+>>>> Improve a few error messages while there.
 >>>>
->>>> * How @password-secret interacts with settings from a configuration
->>>>   file specified with @conf is undocumented.  I suspect it's unteste=
-d,
->>>>   too.
+>>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>>>> ---
+>>>>  io/dns-resolver.c   |  7 +++++--
+>>>>  ui/vnc.c            | 18 ++++++++++++------
+>>>>  util/qemu-sockets.c |  4 +---
+>>>>  3 files changed, 18 insertions(+), 11 deletions(-)
 >>>>
->>>> Let's avoid painting ourselves into a corner now, and revert the
->>>> feature for 2.9.
->>>>
->>>> Note that users can still configure an authentication key with a
->>>> configuration file.  They probably do that anyway if they use Ceph
->>>> outside QEMU as well.
+>>>> diff --git a/io/dns-resolver.c b/io/dns-resolver.c
+>>>> index 0ac6b23..a407075 100644
+>>>> --- a/io/dns-resolver.c
+>>>> +++ b/io/dns-resolver.c
+>>>> @@ -164,9 +164,12 @@ int qio_dns_resolver_lookup_sync(QIODNSResolver=
+ *resolver,
+>>>>                                                  addrs,
+>>>>                                                  errp);
+>>>> =20
+>>>> +    case SOCKET_ADDRESS_KIND_FD:
+>>>> +        error_setg(errp, "Unsupported socket address type 'fd'");
+>>>> +        return -1;
+>>>> +
+>>>>      default:
+>>>> -        error_setg(errp, "Unknown socket address kind");
+>>>> -        return -1;
+>>>> +        abort();
+>>>>      }
+>>>>  }
 >>>
->>> NB, this makes blockdev-add largely useless for RBD from libvirt's PO=
-V,
->>> since we rely on the password-secret facility working to support apps=
-
->>> like openstack which won't configure the global config file for RBD.
->>>
->>> Not a regression though, since blockdev-add is new - just means we wo=
-n't
->>> be able to use the new feature yet :-(
+>>> Just repeating my v1 comments - this needs to be treating KIND_FD as =
+a no-op,
+>>> rather than raising an error.
 >>
->> How does it make blockdev-add totally useless? The only thing you cann=
-ot
->> do is set passwords for rbd. Can this not be added as a new feature in=
-
->> the future?
+>> Do you want to write a patch? Markus is on vacation and since this is
+>> not a regression, dropping this patch from my queue wouldn't do any go=
+od
+>> either.
 >=20
-> Sure, if you want to run an rbd server without any auth its usable, jus=
-t
-> that isn't something you really want todo from a security pov.
+> Ok, i'll do a follow up.
 
-Indeed, but that's at least an rbd-specific issues. You can still use
-blockdev-add for other block drivers just fine.
-
-=2E..and I just noticed that I have read your response the wrong way. I
-didn't notice the "for RBD" and just read "this makes blockdev-add
-largely useless from libvirt's POV" which sounded wrong. OK, I get it
-then, sorry. :-)
+Thanks a lot!
 
 Max
 
 
---j33eaSbfwe671WpL0bb5L7ugT7MNilHEk
+--LD6fBhrKJoVqtHKIthc5OFTXFqXKbfrcK
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljiSN8SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ACb8IAKrB6jvQvipdeuflca1TaGFin0sGp+fc
-4irlO9cBRSXPKzm1keuCZsSapMYaNAX3In+46Mn8svnmDuh4TRUsQDtEaOygRmx7
-Wsk2eN00d2gUz1IQyXbMm4as9PUD350tpjg68peKKloecvoBvJ7lJT3QmJ3dql8I
-tHBIBaot6nvhNFEk3ONcCjTenM5ErXaGSZ9k4bSlYLenpEnwA0I8Qv6aNR4XTVji
-hEO6/o9HKLTL0ISj8r303z9zRtO2AL6s/mmf0ftkDQAYtSZU20ykcWgXFd2hUV4o
-Wh86v1F0TOJFYjb8sZqdT+3NsVvlYgSulSW4Fwoav1pgUMdpvz9EiYw=
-=DZWY
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljiSO4SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AI+cH/1E08TvK4dskIxR4divEy6C9tddmuEQk
+NSDGxWTn6xfN/NhhweAtc9zkOjDp/3dg1fyC9FWva9/ZA+9lh9sbj1CZjXCFmpMV
+RmkdGy0htB8hsZVmfJt/esK8zzjh4akmrTZ0oSEO2lItwXbPd70PMMRS1oSsGdzE
+C/Fvt/JpBxLHD/PCxsE5/NKChpkwcuuULXccgb0EHTD6agmBUYinUxhNFZbQK4VM
+O43MJR1ohrWfDSN62njvDOCT4LxKz+8ZB3dj8CKYqTYNPGIZtVns8QBVu/x2SkPe
+3MPi78Zh0+je2qljyQSLiZDDbU10oEg3GM+trovIaaxV+kl2EOdv+BM=
+=+/h/
 -----END PGP SIGNATURE-----
 
---j33eaSbfwe671WpL0bb5L7ugT7MNilHEk--
+--LD6fBhrKJoVqtHKIthc5OFTXFqXKbfrcK--
