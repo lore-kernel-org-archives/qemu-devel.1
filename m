@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cvPqG-0006lH-Ij
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 10:53:58 -0400
+	(envelope-from <lprosek@redhat.com>) id 1cvQ3q-0002X6-Gq
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:07:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cvPqC-0008Jt-Mq
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 10:53:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47242)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1cvPqC-0008J2-DP
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 10:53:52 -0400
-Date: Tue, 4 Apr 2017 16:53:48 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170404145348.GD4536@noname.str.redhat.com>
-References: <C885D0FF6A27744DB0B822E32DF6EF029B1CA14A@SESTOEX04.enea.se>
-	<9b05e60a-f8c2-ea4f-6be4-f17c0adec510@redhat.com>
-	<20170403081542.GA5036@noname.str.redhat.com>
-	<33ced3d3-acd7-2945-518d-465a4621b151@redhat.com>
-	<20170403130041.GD5036@noname.str.redhat.com>
-	<20170403135012.GY26598@andariel.pipo.sk>
-	<20170404121624.GA4536@noname.str.redhat.com>
-	<d270f1a4-5814-9b23-61f6-745c73ecaadd@redhat.com>
+	(envelope-from <lprosek@redhat.com>) id 1cvQ3m-0007iC-Cr
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:07:58 -0400
+Received: from mail-vk0-f50.google.com ([209.85.213.50]:34540)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1cvQ3m-0007he-9K
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:07:54 -0400
+Received: by mail-vk0-f50.google.com with SMTP id z204so178927798vkd.1
+	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 08:07:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="AbQceqfdZEv+FvjW"
-Content-Disposition: inline
-In-Reply-To: <d270f1a4-5814-9b23-61f6-745c73ecaadd@redhat.com>
-Subject: Re: [Qemu-devel] nbd: Possible regression in 2.9 RCs
+In-Reply-To: <58E3ADA3.2040305@windriver.com>
+References: <58DEB834.6060405@windriver.com>
+	<20170403191158.GI3539@stefanha-x1.localdomain>
+	<CABdb737NXTBJGvk+nuyFTccK_-g=N=PHO+ZRd1qSZcTgai=feQ@mail.gmail.com>
+	<58E3ADA3.2040305@windriver.com>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Tue, 4 Apr 2017 17:07:52 +0200
+Message-ID: <CABdb73636afMA97hXZo9sP1Rg1zw0Z+Obbjse8F-DFOrs5+PKw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] hitting intermittent issue with live migration
+ from qemu-kvm-ev 2.3.0 to qemu-kvm-ev 2.6.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,78 +31,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Krempa <pkrempa@redhat.com>, svc-armband <armband@enea.com>, Markus Armbruster <armbru@redhat.com>, Jeff Cody <jcody@redhat.com>, Ciprian Barbu <Ciprian.Barbu@enea.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Alexandru Avadanii <Alexandru.Avadanii@enea.com>
+To: Chris Friesen <chris.friesen@windriver.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
+On Tue, Apr 4, 2017 at 4:28 PM, Chris Friesen
+<chris.friesen@windriver.com> wrote:
+> On 04/04/2017 07:56 AM, Ladi Prosek wrote:
+>>
+>> On Mon, Apr 3, 2017 at 9:11 PM, Stefan Hajnoczi <stefanha@gmail.com>
+>> wrote:
+>>>
+>>> On Fri, Mar 31, 2017 at 02:12:36PM -0600, Chris Friesen wrote:
+>
+>
+>>>> Initially we have a bunch of guests running on compute-2 (which is
+>>>> running
+>>>> qemu-kvm-ev 2.3.0).  We then started live-migrating them one at a time
+>>>> to
+>>>> compute-0 (which is running qemu-kvm-ev 2.6.0).  Three of them migrated
+>>>> successfully.  The fourth (which was essentially identical in
+>>>> configuration
+>>>> to the first three) failed, as per the following logs in
+>>>> /var/log/libvirt/qemu/instance-0000000e.log:
+>>>>
+>>>>
+>>>> 2017-03-29T06:38:37.886940Z qemu-kvm: VQ 2 size 0x80 < last_avail_idx
+>>>> 0x47b
+>>>> - used_idx 0x47c
+>>>> 2017-03-29T06:38:37.886974Z qemu-kvm: error while loading state for
+>>>> instance
+>>>> 0x0 of device '0000:00:07.0/virtio-balloon'
+>>>> 2017-03-29T06:38:37.888684Z qemu-kvm: load of migration failed:
+>>>> Operation
+>>>> not permitted
+>>>> 2017-03-29 06:38:37.896+0000: shutting down
+>>>>
+>>>>
+>>>> Does anyone know of an existing bug report covering this issue?  (I took
+>>>> a
+>>>> look and didn't see anything obviously related.)
+>>>
+>>>
+>>> This is the virtio-balloon device.  If you remove the device the live
+>>> migration should work reliably.
+>>>
+>>> Alternatively, you can temporarily rmmod virtio_balloon inside the guest
+>>> for live migration.  After migration you can modprobe virtio_balloon
+>>> again.
+>>>
+>>> last_avail_idx 0x47b with used_idx 0x47c is an invalid device state.
+>>> I've diffed qemu-kvm-ev 2.6.0-27.1 hw/virtio/virtio-balloon.c against
+>>> qemu.git/master and do not see an obvious bug.  I also compared
+>>> qemu-kvm-ev 2.3.0-31 with qemu-kvm-ev 2.6.0-27.1.
+>>
+>>
+>> The device likely got into the invalid state as part of a previous
+>> migration to an unfixed QEMU. I second Stefan's suggestion to
+>> temporarily remove the device or unload the driver.
+>
+>
+> I'll give that a try (been busy with a separate issue).
+>
+> If I have a guest already running, can I unilaterally hot-remove the device
+> from the host side or does the guest need to be involved as well?  (I'm just
+> trying to figure out how to deal with existing guests.)
 
---AbQceqfdZEv+FvjW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hot-remove should be fine.
 
-Am 04.04.2017 um 16:04 hat Paolo Bonzini geschrieben:
-> On 04/04/2017 14:16, Kevin Wolf wrote:
-> > Just not requesting the
-> > write permission initially if runstate_check(RUN_STATE_INMIGRATE) is
-> > easy. But we need to find a place to actually request it later, after
-> > the mirror has completed, and before the VM is running.
->=20
-> Isn't there already a bdrv_invalidate_cache_all or something like that
-> called when the VM is started?
-
-bdrv_invalidate_cache_all() is different in two aspects.
-
-First, it starts at the BDS level and propagates down to children, but
-not up to the parents, where the permissions are set.
-
-Second, bdrv_invalidate_cache_all() is called immediately when migration
-completes. This is before the NBD server is shut down, so we can't
-actually request write permissions at this point yet.
-
-> Having to touch all devices would be ugly.  Maybe some permissions could
-> be marked as "deferred".
-
-Yes, BlockDevOps for it wasn't that great an idea.
-
-We have a common function blkconf_apply_backend_options() that sets the
-permissions for any devices that we care about with storage migration.
-This function can be changed not to do this during incoming migration,
-and then we would need a way to find the BlockConf later when trying to
-resume the VM. Failing that, we could try to make it register a notifier
-or something.
-
-Or we could mark BlockBackends as "enforce permissions only after
-migration has completed" and do this for all BlockBackends of devices.
-
-> The big question is how this fits into release management.  We have
-> another important regression from the op blocker work and only a week
-> to go before the last rc.  Are we going to delay 2.9 arbitrarily?  Are
-> we going to shorten the 2.10 development period correspondingly?  (I
-> vote yes and yes, FWIW).
-
-Which is the other regression?
-
-Kevin
-
---AbQceqfdZEv+FvjW
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJY47N8AAoJEH8JsnLIjy/WUrMP/2+E8JWm/6qrdCA6/UzUFEqK
-VggFyswRWi6T5ux/Pt17zJoloq4Whyqm0PflA8N6heN4dAW+UhEXeAaHpvcjGrgK
-DVg7LWmfQ7BNsqwgHE69poIe4g3OHGW3C1l0WLBD/WqarYXF+GqGk9J8BxyqqJDj
-8iMuePxie5Qx260IoSwavFqsoaQGCTlDadxJqBjqYuKibFY6gB8n7ezg7c8eMN4x
-J6w/gtmGbdFDyvWRU95TydUbtefDhLaVVxfL1IK93w9YL20Puo6zbfOzMRewQeAA
-PKbu59xl0s7dRPC//HpybWPz++rHLe01MWwn5jBzEMmQZz5hixob3LNMH6HWnebh
-9KIlHCza1MEiWrudSb6ik7DJr0+Je02b5EQYYgjyVXVKcXG7NXPakqRJrxWlQSIu
-lPkSKYxqYMcP+hSqkUZUM2+RDuFuZ1qiflikp62P6oXk7JsNF7PxOTl6QqP5lR3P
-5ugAmn5oxIC9u/50btZrOiSFbzDgYJ3dO6aeU0afbqzYgcs9MO45wodzPfHdQMWZ
-izsrPUoJrMAKRla87vpkhi6+m71E5tBWemaXKWWNTQM4NCeCjZtGAPG09BVbd+Z2
-t6IiM7Zb74rxpCdO4K1d1/VlSqhC2waTrEKLRtyKGYWuBGQO+7FWhaRZiYH6rzvq
-4/z12zktbpuLB4nE5j4k
-=zPbP
------END PGP SIGNATURE-----
-
---AbQceqfdZEv+FvjW--
+> Thanks,
+> Chris
