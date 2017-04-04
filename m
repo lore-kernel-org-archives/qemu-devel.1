@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ryo_on@yk.rim.or.jp>) id 1cvVuu-0005Ni-7s
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 17:23:09 -0400
+	(envelope-from <anthony.xu@intel.com>) id 1cvWB3-0008KY-KE
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 17:39:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ryo_on@yk.rim.or.jp>) id 1cvVur-0002E1-20
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 17:23:08 -0400
-Received: from mail102.siriuscloud.jp ([219.118.72.102]:39079
-	helo=mail02.SiriusCloud.jp) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ryo_on@yk.rim.or.jp>) id 1cvVuq-0002C7-Nt
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 17:23:04 -0400
-Date: Wed, 05 Apr 2017 06:22:59 +0900 (JST)
-Message-Id: <20170405.062259.994335017099386017.ryo_on@yk.rim.or.jp>
-From: Ryo ONODERA <ryo_on@yk.rim.or.jp>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] How to provide build/CI environment for NetBSD host
+	(envelope-from <anthony.xu@intel.com>) id 1cvWAy-0002Yy-Kw
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 17:39:49 -0400
+Received: from mga01.intel.com ([192.55.52.88]:37968)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
+	id 1cvWAy-0002Xy-8c
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 17:39:44 -0400
+From: "Xu, Anthony" <anthony.xu@intel.com>
+Date: Tue, 4 Apr 2017 21:39:39 +0000
+Message-ID: <4712D8F4B26E034E80552F30A67BE0B1A4E5F6@ORSMSX112.amr.corp.intel.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: [Qemu-devel]  [PATCH] Put all trace.o into libqemuutil.a
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,27 +26,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>
+Cc: 'Stefan Hajnoczi' <stefanha@gmail.com>, 'Daniel Berrange' <berrange@redhat.com>, 'Paolo Bonzini' <pbonzini@redhat.com>
 
-Hi,
+Put all trace.o into libqemuutil.a
 
-I saw "Warning of unsupported host systems"
-in http://wiki.qemu-project.org/ChangeLog/2.9 wiki page.
+Currently all trace.o are linked into qemu-system, qemu-img,=20
+qemu-nbd, qemu-io etc., even the corresponding components=20
+are not included.
+Put all trace.o into libqemuutil.a that the linker would only pull in .o=20
+files containing symbols that are actually referenced by the=20
+program.
 
-I would like to contribute to qemu's NetBSD host support.
 
-I can provide NetBSD/amd64(x86_64) 7-stable build
-environment as build/CI machine to the qemu project
-if nobody provides it to the project yet.
+Signed-off -by: Anthony Xu <anthony.xu@intel.com>
 
-How to provide build/CI environment to the qemu project?
 
-Thank you.
 
-P.S.
-I am not on the qemu-devel@nongnu.org list.
-Please add me to CC.
+diff --git a/Makefile b/Makefile
+index 6c359b2..31d41a7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -346,7 +346,7 @@ dtc/%:
+        mkdir -p $@
 
---
-Ryo ONODERA // ryo_on@yk.rim.or.jp
-PGP fingerprint = 82A2 DC91 76E0 A10A 8ABB  FD1B F404 27FA C7D1 15F3
+ $(SUBDIR_RULES): libqemuutil.a libqemustub.a $(common-obj-y) $(chardev-obj=
+-y) \
+-       $(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY)) $(trace-obj-y)
++       $(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY))
+
+ ROMSUBDIR_RULES=3D$(patsubst %,romsubdir-%, $(ROMS))
+ # Only keep -O and -g cflags
+@@ -366,11 +366,11 @@ Makefile: $(version-obj-y)
+ # Build libraries
+
+ libqemustub.a: $(stub-obj-y)
+-libqemuutil.a: $(util-obj-y)
++libqemuutil.a: $(util-obj-y) $(trace-obj-y)
+
+ ######################################################################
+
+-COMMON_LDADDS =3D $(trace-obj-y) libqemuutil.a libqemustub.a
++COMMON_LDADDS =3D libqemuutil.a libqemustub.a
+
+ qemu-img.o: qemu-img-cmds.h
+
+diff --git a/Makefile.target b/Makefile.target
+index d5ff0c7..69239e0 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -185,8 +185,7 @@ dummy :=3D $(call unnest-vars,.., \
+                qom-obj-y \
+                io-obj-y \
+                common-obj-y \
+-               common-obj-m \
+-               trace-obj-y)
++               common-obj-m)
+ target-obj-y :=3D $(target-obj-y-save)
+ all-obj-y +=3D $(common-obj-y)
+ all-obj-y +=3D $(target-obj-y)
+@@ -198,7 +197,7 @@ all-obj-$(CONFIG_SOFTMMU) +=3D $(io-obj-y)
+
+ $(QEMU_PROG_BUILD): config-devices.mak
+
+-COMMON_LDADDS =3D $(trace-obj-y) ../libqemuutil.a ../libqemustub.a
++COMMON_LDADDS =3D ../libqemuutil.a ../libqemustub.a
+
+ # build either PROG or PROGW
+ $(QEMU_PROG_BUILD): $(all-obj-y) $(COMMON_LDADDS)
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index f3de81f..579ec07 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -519,7 +519,7 @@ QEMU_CFLAGS +=3D -I$(SRC_PATH)/tests
+
+
+ # Deps that are common to various different sets of tests below
+-test-util-obj-y =3D $(trace-obj-y) libqemuutil.a libqemustub.a
++test-util-obj-y =3D libqemuutil.a libqemustub.a
+ test-qom-obj-y =3D $(qom-obj-y) $(test-util-obj-y)
+ test-qapi-obj-y =3D tests/test-qapi-visit.o tests/test-qapi-types.o \
+        tests/test-qapi-event.o tests/test-qmp-introspect.o \
