@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cvKAP-00063E-JV
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 04:50:22 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1cvKGg-0006zd-Jw
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 04:56:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cvKAM-0003F9-GL
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 04:50:21 -0400
-Received: from mail-lf0-x22e.google.com ([2a00:1450:4010:c07::22e]:35747)
+	(envelope-from <alex.bennee@linaro.org>) id 1cvKGd-0007fO-Gy
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 04:56:50 -0400
+Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:36847)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cvKAM-0003E3-8E
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 04:50:18 -0400
-Received: by mail-lf0-x22e.google.com with SMTP id j90so88519589lfk.2
-	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 01:50:18 -0700 (PDT)
+	id 1cvKGd-0007fE-5I
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 04:56:47 -0400
+Received: by mail-wr0-x230.google.com with SMTP id w11so203387615wrc.3
+	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 01:56:46 -0700 (PDT)
 References: <20170403124524.10824-1-alex.bennee@linaro.org>
-	<e6b326dd-fbc6-250d-26a2-4483db009b7d@redhat.com>
+	<20170403124524.10824-8-alex.bennee@linaro.org>
+	<000201d2ad05$e28626d0$a7927470$@ru>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <e6b326dd-fbc6-250d-26a2-4483db009b7d@redhat.com>
-Date: Tue, 04 Apr 2017 09:50:16 +0100
-Message-ID: <877f30blpz.fsf@linaro.org>
+In-reply-to: <000201d2ad05$e28626d0$a7927470$@ru>
+Date: Tue, 04 Apr 2017 09:56:44 +0100
+Message-ID: <8760ikblf7.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH v1 0/9] MTTCG and record/replay fixes
- for rc3
+Subject: Re: [Qemu-devel] [RFC PATCH v1 7/9] cpus: move icount preparation
+ out of tcg_exec_cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +32,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: dovgaluk@ispras.ru, rth@twiddle.net, peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: rth@twiddle.net, pbonzini@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, 'Peter Crosthwaite' <crosthwaite.peter@gmail.com>
 
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
 
-> On 03/04/2017 14:45, Alex Bennée wrote:
->>   cpus: check cpu->running in cpu_get_icount_raw()
+> I guess you are trying to fix the sympthoms of the case
+> when iothread is trying to access instruction count.
+
+In theory the main-loop should be sequenced before or after vCPU events
+because of the BQL. I'm not sure why this is not currently the case.
+
+> Maybe the solution is providing access to current_cpu for the iothread
+> coupled with your patch 8?
+
+Providing cross-thread access to CPU structures brings its own
+challenges.
+
+But it does occur to me we should probably ensure
+timer_state.qemu_icount has appropriate barriers. This should be ensured
+by the BQL but if it is ever accessed by 2 threads without a BQL
+transition in-between then it is potentially racey.
+
+>
+> Pavel Dovgalyuk
+>
+>
+>> -----Original Message-----
+>> From: Alex Bennée [mailto:alex.bennee@linaro.org]
+>> Sent: Monday, April 03, 2017 3:45 PM
+>> To: dovgaluk@ispras.ru; rth@twiddle.net; pbonzini@redhat.com
+>> Cc: peter.maydell@linaro.org; qemu-devel@nongnu.org; mttcg@listserver.greensocs.com;
+>> fred.konrad@greensocs.com; a.rigo@virtualopensystems.com; cota@braap.org;
+>> bobby.prani@gmail.com; nikunj@linux.vnet.ibm.com; Alex Bennée; Peter Crosthwaite
+>> Subject: [RFC PATCH v1 7/9] cpus: move icount preparation out of tcg_exec_cpu
 >>
->>   I'm not sure the race happens and once outside of cpu->running the
->>   icount counters should be zero. However it seems a sensible
->>   precaution.
->
-> Yeah, I think this is unnecessary with patch 7's new assertions.
+>> As icount is only supported for single-threaded execution due to the
+>> requirement for determinism let's remove it from the common
+>> tcg_exec_cpu path.
+>>
+>> Also remove the additional fiddling which shouldn't be required as the
+>> icount counters should all be rectified as you enter the loop.
+>>
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> ---
+>>  cpus.c | 67 +++++++++++++++++++++++++++++++++++++++++++++---------------------
+>>  1 file changed, 46 insertions(+), 21 deletions(-)
+>>
+>> diff --git a/cpus.c b/cpus.c
+>> index 18b1746770..87638a75d2 100644
+>> --- a/cpus.c
+>> +++ b/cpus.c
+>> @@ -1179,47 +1179,66 @@ static void handle_icount_deadline(void)
+>>      }
+>>  }
+>>
+>> -static int tcg_cpu_exec(CPUState *cpu)
+>> +static void prepare_icount_for_run(CPUState *cpu)
+>>  {
+>> -    int ret;
+>> -#ifdef CONFIG_PROFILER
+>> -    int64_t ti;
+>> -#endif
+>> -
+>> -#ifdef CONFIG_PROFILER
+>> -    ti = profile_getclock();
+>> -#endif
+>>      if (use_icount) {
+>>          int64_t count;
+>>          int decr;
+>> -        timers_state.qemu_icount -= (cpu->icount_decr.u16.low
+>> -                                    + cpu->icount_extra);
+>> -        cpu->icount_decr.u16.low = 0;
+>> -        cpu->icount_extra = 0;
+>> +
+>> +        /* These should always be cleared by process_icount_data after
+>> +         * each vCPU execution. However u16.high can be raised
+>> +         * asynchronously by cpu_exit/cpu_interrupt/tcg_handle_interrupt
+>> +         */
+>> +        g_assert(cpu->icount_decr.u16.low == 0);
+>> +        g_assert(cpu->icount_extra == 0);
+>> +
+>> +
+>>          count = tcg_get_icount_limit();
+>> +
+>>          timers_state.qemu_icount += count;
+>>          decr = (count > 0xffff) ? 0xffff : count;
+>>          count -= decr;
+>>          cpu->icount_decr.u16.low = decr;
+>>          cpu->icount_extra = count;
+>>      }
+>> -    qemu_mutex_unlock_iothread();
+>> -    cpu_exec_start(cpu);
+>> -    ret = cpu_exec(cpu);
+>> -    cpu_exec_end(cpu);
+>> -    qemu_mutex_lock_iothread();
+>> -#ifdef CONFIG_PROFILER
+>> -    tcg_time += profile_getclock() - ti;
+>> -#endif
+>> +}
+>> +
+>> +static void process_icount_data(CPUState *cpu)
+>> +{
+>>      if (use_icount) {
+>>          /* Fold pending instructions back into the
+>>             instruction counter, and clear the interrupt flag.  */
+>>          timers_state.qemu_icount -= (cpu->icount_decr.u16.low
+>>                          + cpu->icount_extra);
+>> +
+>> +        /* We must be under BQL here as cpu_exit can tweak
+>> +           icount_decr.u32 */
+>> +        g_assert(qemu_mutex_iothread_locked());
+>>          cpu->icount_decr.u32 = 0;
+>>          cpu->icount_extra = 0;
+>>          replay_account_executed_instructions();
+>>      }
+>> +}
+>> +
+>> +
+>> +static int tcg_cpu_exec(CPUState *cpu)
+>> +{
+>> +    int ret;
+>> +#ifdef CONFIG_PROFILER
+>> +    int64_t ti;
+>> +#endif
+>> +
+>> +#ifdef CONFIG_PROFILER
+>> +    ti = profile_getclock();
+>> +#endif
+>> +    qemu_mutex_unlock_iothread();
+>> +    cpu_exec_start(cpu);
+>> +    ret = cpu_exec(cpu);
+>> +    cpu_exec_end(cpu);
+>> +    qemu_mutex_lock_iothread();
+>> +#ifdef CONFIG_PROFILER
+>> +    tcg_time += profile_getclock() - ti;
+>> +#endif
+>>      return ret;
+>>  }
+>>
+>> @@ -1306,7 +1325,13 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+>>
+>>              if (cpu_can_run(cpu)) {
+>>                  int r;
+>> +
+>> +                prepare_icount_for_run(cpu);
+>> +
+>>                  r = tcg_cpu_exec(cpu);
+>> +
+>> +                process_icount_data(cpu);
+>> +
+>>                  if (r == EXCP_DEBUG) {
+>>                      cpu_handle_guest_debug(cpu);
+>>                      break;
+>> --
+>> 2.11.0
 
-I can drop the patch.
-
->> I think the cpus: patches should probably go into the next
->> pull-request while we see if we can come up with a better final
->> solution for fixing record/replay. However given how long this
->> regression has run during the release candidate process I wanted to
->> update everyone on the current status and get feedback ASAP.
->
-> I agree.  I'm not sure exactly how the final race happens, but if it
-> causes divergence it would be caught later by the record/replay
-> mechanism, I think.
-
-It's odd because everything should be sequenced by the BQL. The
-main-loop holds the BQL while writing out checkpoints and everything
-that can trigger output to the replay stream should be under BQL as
-well:
-
-  - VIRTUAL timers in the outer loop
-  - MMIO triggered events (block, char, audio)
-  - Interrupt processing
-
-In fact I wonder if replay_mutex could just be dropped and the BQL used
-to protect all of this stuff.
-
-I'll have to experiment with some asserts to see if this is every not
-the case.
 
 --
 Alex Bennée
