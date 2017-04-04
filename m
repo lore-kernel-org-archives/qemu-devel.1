@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cvSNI-0005gG-9N
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 13:36:13 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1cvSNw-00060A-8W
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 13:36:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cvSNF-0004mZ-7U
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 13:36:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52932)
+	(envelope-from <ehabkost@redhat.com>) id 1cvSNt-0005AT-6e
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 13:36:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52854)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cvSNF-0004m5-1j
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 13:36:09 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DF66B770E
-	for <qemu-devel@nongnu.org>; Tue,  4 Apr 2017 17:36:07 +0000 (UTC)
-Date: Tue, 4 Apr 2017 18:36:04 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170404173604.GK2147@work-vm>
-References: <20170323204544.12015-1-quintela@redhat.com>
-	<20170331143438.GJ4514@work-vm> <87vaqk3x5y.fsf@secure.mitica>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cvSNt-0005AL-1O
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 13:36:49 -0400
+Date: Tue, 4 Apr 2017 14:36:45 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170404173645.GX1910@thinpad.lan.raisama.net>
+References: <20170403124524.10824-1-alex.bennee@linaro.org>
+	<20170403124524.10824-5-alex.bennee@linaro.org>
+	<ac3d8bc5-d4e1-6313-f1a2-7cc4867cd153@twiddle.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <87vaqk3x5y.fsf@secure.mitica>
-Subject: Re: [Qemu-devel] [PATCH v2 00/51] Creating RAMState for migration
+In-Reply-To: <ac3d8bc5-d4e1-6313-f1a2-7cc4867cd153@twiddle.net>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v1 4/9] target/i386/misc_helper: wrap
+ BQL around another IRQ generator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,41 +30,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Richard Henderson <rth@twiddle.net>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, dovgaluk@ispras.ru, pbonzini@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > * Juan Quintela (quintela@redhat.com) wrote:
-> >> Hi
-> >
-> > Some high level points:
-> >
-> >> Continuation of previous series, all review comments addressed. New things:
-> >> - Consolidate all function comments in the same style (yes, docs)
-> >> - Be much more careful with maintaining comments correct
-> >> - Move all postcopy fields to RAMState
-> >
-> >> - Move QEMUFile to RAMState
-> >> - rename qemu_target_page_bits() to qemu_target_page_size() to reflect use
-> >> - Remove MigrationState from functions that don't need it
-> >> - reorganize last_sent_block to the place where it is used/needed
-> >> - Move several places from offsets to pages
-> >> - Rename last_ram_offset() to last_ram_page() to refect use
-> >
-> > An interesting question is what happens if we ever have multiple threads
-> > working on RAM at once, I assume you're thinking there will be multiple
-> > RAMStates?  It'll be interesting to see whether everything we have now got
-> > in RAMState is stuff that wants to be replicated that way.
-> 
-> Working on paolo suggestion on sending everyhting through multiplefd's.
-> That requires multiple FD's.
+On Tue, Apr 04, 2017 at 09:53:15AM -0700, Richard Henderson wrote:
+> On 04/03/2017 05:45 AM, Alex Benn=E9e wrote:
+> > Anything that calls into HW emulation must be protected by the BQL.
+> >=20
+> > Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> > ---
+> >  target/i386/misc_helper.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+>=20
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
 
-Yes, but for example do we want multiple postcopy request queues?
-Do we have one reverse stream for requests or multiple?
+In case somebody is going to queue the whole series in one take:
 
-Dave
+Acked-by: Eduardo Habkost <ehabkost@redhat.com>
 
-> Thanks, Juan.
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--=20
+Eduardo
