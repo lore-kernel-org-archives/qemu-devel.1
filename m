@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cvPc7-0003iY-SL
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 10:39:21 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1cvPhW-0005Qm-Be
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 10:44:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cvPc1-000274-Rl
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 10:39:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55390)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cvPc1-00026f-Jc
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 10:39:13 -0400
-References: <20170403124524.10824-1-alex.bennee@linaro.org>
-	<20170403124524.10824-9-alex.bennee@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1561a885-6b16-3dd8-de77-fc9e221e3729@redhat.com>
-Date: Tue, 4 Apr 2017 16:39:07 +0200
+	(envelope-from <ehabkost@redhat.com>) id 1cvPhR-0004EO-DK
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 10:44:54 -0400
+Date: Tue, 4 Apr 2017 11:44:17 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170404144417.GT1910@thinpad.lan.raisama.net>
+References: <20170401004624.30886-4-ehabkost@redhat.com>
+	<CAFEAcA_uRHZR0N-=h=eWsDKjZpN4csua1j++wLVfZbsNVpaH5Q@mail.gmail.com>
+	<20170403201026.GJ1910@thinpad.lan.raisama.net>
+	<f612e8c0-0f2a-d373-12c1-a20d6dccc7d0@suse.de>
+	<20170403210030.GK1910@thinpad.lan.raisama.net>
+	<522a3489-2e8c-b31a-c592-391fe5cf3b5f@suse.de>
+	<40848cee-6a6b-75fa-c395-2ba4705d5bf0@redhat.com>
+	<cab14f30-929d-c5ab-143e-07e63009f808@suse.de>
+	<20170404125904.GQ1910@thinpad.lan.raisama.net>
+	<9d0341ca-6713-3d1f-4d91-0818957c28fb@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <20170403124524.10824-9-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v1 8/9] cpus: don't credit executed
- instructions before they have run
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9d0341ca-6713-3d1f-4d91-0818957c28fb@suse.de>
+Subject: Re: [Qemu-devel] [RFC 03/19] sysbus: Set user_creatable=false by
+ default on TYPE_SYS_BUS_DEVICE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,111 +32,236 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, dovgaluk@ispras.ru, rth@twiddle.net
-Cc: mttcg@listserver.greensocs.com, peter.maydell@linaro.org, nikunj@linux.vnet.ibm.com, Peter Crosthwaite <crosthwaite.peter@gmail.com>, a.rigo@virtualopensystems.com, qemu-devel@nongnu.org, cota@braap.org, bobby.prani@gmail.com, fred.konrad@greensocs.com
+To: Alexander Graf <agraf@suse.de>
+Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, Scott Wood <scottwood@freescale.com>, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Gerd Hoffmann <kraxel@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Qemu-block <qemu-block@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Beniamino Galvani <b.galvani@gmail.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "Gabriel L . Somlo" <somlo@cmu.edu>, Igor Mammedov <imammedo@redhat.com>, Prasad J Pandit <pjp@fedoraproject.org>, qemu-arm <qemu-arm@nongnu.org>, Shannon Zhao <zhaoshenglong@huawei.com>
+
+On Tue, Apr 04, 2017 at 03:06:30PM +0200, Alexander Graf wrote:
+> On 04/04/2017 02:59 PM, Eduardo Habkost wrote:
+> > On Tue, Apr 04, 2017 at 09:02:28AM +0200, Alexander Graf wrote:
+> > > 
+> > > On 04.04.17 08:58, Thomas Huth wrote:
+> > > > On 04.04.2017 08:53, Alexander Graf wrote:
+> > > > > 
+> > > > > On 03.04.17 23:00, Eduardo Habkost wrote:
+> > > > > > On Mon, Apr 03, 2017 at 10:15:44PM +0200, Alexander Graf wrote:
+> > > > > > > 
+> > > > > > > On 03.04.17 22:10, Eduardo Habkost wrote:
+> > > > > > > > On Mon, Apr 03, 2017 at 08:49:16PM +0100, Peter Maydell wrote:
+> > > > > > > > > On 1 April 2017 at 01:46, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > > > > > > > > > commit 33cd52b5d7b9adfd009e95f07e6c64dd88ae2a31 unset
+> > > > > > > > > > cannot_instantiate_with_device_add_yet in TYPE_SYSBUS, making
+> > > > > > > > > > all kinds of untested devices available to -device and
+> > > > > > > > > > device_add.
+> > > > > > > > > > 
+> > > > > > > > > > The problem with that is: setting has_dynamic_sysbus on a
+> > > > > > > > > > machine-type lets it accept all the 288 sysbus device types we
+> > > > > > > > > > have in QEMU, and most of them were never meant to be used with
+> > > > > > > > > > -device. That's a lot of untested code.
+> > > > > > > > > > 
+> > > > > > > > > > Fortunately today we have just a few has_dynamic_sysbus=1
+> > > > > > > > > > machines: virt, pc-q35-*, ppce500, and spapr.
+> > > > > > > > > > 
+> > > > > > > > > > virt, ppce500, and spapr have extra checks to ensure just a few
+> > > > > > > > > > device types can be instantiated:
+> > > > > > > > > > 
+> > > > > > > > > > * virt supports only TYPE_VFIO_CALXEDA_XGMAC, TYPE_VFIO_AMD_XGBE.
+> > > > > > > > > > * ppce500 supports only TYPE_ETSEC_COMMON.
+> > > > > > > > > > * spapr supports only TYPE_SPAPR_PCI_HOST_BRIDGE.
+> > > > > > > > > > 
+> > > > > > > > > > q35 has no code to block unsupported sysbus devices, however, and
+> > > > > > > > > > accepts all device types. Fortunately, only the following 20
+> > > > > > > > > > device types are compiled into the qemu-system-x86_64 and
+> > > > > > > > > > qemu-system-i386 binaries:
+> > > > > > > > > > 
+> > > > > > > > > > * allwinner-ahci
+> > > > > > > > > > * amd-iommu
+> > > > > > > > > > * cfi.pflash01
+> > > > > > > > > > * esp
+> > > > > > > > > > * fw_cfg_io
+> > > > > > > > > > * fw_cfg_mem
+> > > > > > > > > > * generic-sdhci
+> > > > > > > > > > * hpet
+> > > > > > > > > > * intel-iommu
+> > > > > > > > > > * ioapic
+> > > > > > > > > > * isabus-bridge
+> > > > > > > > > > * kvmclock
+> > > > > > > > > > * kvm-ioapic
+> > > > > > > > > > * kvmvapic
+> > > > > > > > > > * SUNW,fdtwo
+> > > > > > > > > > * sysbus-ahci
+> > > > > > > > > > * sysbus-fdc
+> > > > > > > > > > * sysbus-ohci
+> > > > > > > > > > * unimplemented-device
+> > > > > > > > > > * virtio-mmio
+> > > > > > > > > > 
+> > > > > > > > > > Instead of requiring each machine-type with has_dynamic_sysbus=1
+> > > > > > > > > > to implement its own mechanism to block unsupported devices, we
+> > > > > > > > > > can use the user_creatable flag to ensure we won't let the user
+> > > > > > > > > > plug anything that will never work.
+> > > > > > > > > How does this work? Which devices can be dynamically
+> > > > > > > > > plugged is machine dependent. You can't dynamically-plug
+> > > > > > > > > an intel-iommu on the ARM virt board, and you can't
+> > > > > > > > > dynamically-plug the vfio-calxeda-xgmac on the spapr
+> > > > > > > > > board, and so on. So I don't see how we can just have
+> > > > > > > > > a flag on the device itself that controls whether
+> > > > > > > > > it can be dynamically plugged.
+> > > > > > > > > 
+> > > > > > > > > So I'm definitely coming around to the opinion that
+> > > > > > > > > it's just a bug in the q35 board that it doesn't have
+> > > > > > > > > any device whitelisting, and we should fix that.
+> > > > > > > > OK, let's assume q35 must implement a whitelist:
+> > > > > > > > 
+> > > > > > > > To build that whitelist, we need to be able to know what should
+> > > > > > > > be in the whitelist, or not. And nobody knew for sure what was
+> > > > > > > > user-creatable in q35 by accident, and what was really supposed
+> > > > > > > > to be user-creatable in q35. See the "q35 and sysbus devices"
+> > > > > > > > thread I started ~2 weeks ago.
+> > > > > > > > 
+> > > > > > > > Building a q35 whitelist will be much easier if make
+> > > > > > > > sys-bus-devices non-user-creatable by default.
+> > > > > > > So why are they user creatable in the first place?
+> > > > > > > 
+> > > > > > > We used to have boards that were dynamic sysbus aware (ppce500, virt)
+> > > > > > > that
+> > > > > > > allowed dynamic creation and every other board did not. I don't
+> > > > > > > remember the
+> > > > > > > exact mechanism behind it though.
+> > > > > > > 
+> > > > > > > When did that behavior change? It sounds like a regression somewhere.
+> > > > > > See patch description:
+> > > > > > 
+> > > > > > > > > > commit 33cd52b5d7b9adfd009e95f07e6c64dd88ae2a31 unset
+> > > > > > > > > > cannot_instantiate_with_device_add_yet in TYPE_SYSBUS,
+> > > > > > Note that the commit above is not a regression[1] (because q35
+> > > > > > didn't have has_dynamic_sysbus=1 yet), but having sysbus devices
+> > > > > > have cannot_instantiate_with_device_add_yet=false/user_creatable=true
+> > > > > > by default makes it harder to build the whitelist for q35 (or
+> > > > > > other machines that will have has_dynamic_sysbus=1 in the
+> > > > > > future).
+> > > > > I seem to miss the bigger picture.
+> > > > > 
+> > > > > Why would anyone set has_dynamic_sysbus=1 in a board file without an
+> > > > > explicit whitelist? The whitelist is *not* device specific. It's board
+> > > > > specific, because your board needs to know how to wire up a device and
+> > > > > how to expose the fact that it exists to the OS.
+> > > > > 
+> > > > > So the real bug is that someone set has_dynamic_sysbus=1 in q35 without
+> > > > > implementing all of the dynamic sysbus logic, no?
+> > > > According to commit bf8d492405feaee2c1685b3b9d5e03228ed3e47f this was
+> > > > just introduced for allowing the "intel-iommu" device, so I guess this
+> > > > is the device that we want to have in a whitelist there?
+> > > If you want a dynamic intel-iommu, you also need to have dynamic ACPI
+> > > generation to create DMAR tables the OS can use to drive the IOMMU, no? At
+> > > last at that point, someone should have realized that a "whitelist" is
+> > > mandatory.
+> > > 
+> > > But yes, please just only add a whitelist for intel-iommu to the q35 board.
+> > > That is the real bug.
+> > Look, I don't disagree that we need a whitelist on q35. But I
+> > don't know why you assume it is as simple as adding intel-iommu.
+> 
+> So why has intel-iommu worked in the first place?
+
+Most of the code required to make it work is simply triggered by
+its realize() method (that only works with TYPE_PC_MACHINE
+machines).
+
+> Who wired up its memory regions?
+
+Its realize() method (vtd_realize()).
+
+> Who wired up fault IRQs?
+
+I don't know the answer for that, but probably it is at the
+apic_get_class()->send_msi() call at vtd_generate_interrupt().
+
+> Who added the DMAR table to ACPI when it was created?
+
+acpi-build.c code calls calls x86_iommu_get_default(), which
+returns the value set by x86_iommu_set_default(), which is called
+by TYPE_X86_IOMMU_DEVICE's realize() method
+(x86_iommu_realize()).
+
+> 
+> > We *don't know* what should be on q35 whitelist until we review
+> > each device that is accepted by q35 today, and make sure it
+> > really is not supposed to be supported on -device.
+> 
+> If in doubt, not a single sysbus device should have ever worked without
+> explicit code around it. Really :).
+
+If by "code around it", you mean something as clear as a
+foreach_dynamic_sysbus_device() call somewhere that handles each
+type of sysbus device, then that's not true in practice.
+
+If by "code around it" you mean code buried inside board-specific
+code (like the x86_iommu_get_default() calls inside
+hw/i386/acpi-build.c), then you're right.
+
+(Don't ask me why it works that way, I didn't write that code, I
+am just trying to clean up the q35 mess. :) )
+
+> 
+> > Making has_dynamic_sysbus/user_creatable consistent on sysbus
+> > devices helps on that. It is not necessary nor sufficient to fix
+> > q35, that's true, but it helps *a lot*.
+> > 
+> > See, after I start this series, I already found two exceptions to
+> > the "just add intel-iommu" rule:
+> > 
+> > 1) amd-iommu
+> > 2) xen-backend
+> > 
+> > I'm not sure yet if we have others, until people review the other
+> > "Remove user_creatable from <device>" patches in this
+> > series.
+> 
+> Same question as above there. How do they get mapped? How does the OS learn
+> they exist?
+
+In the case of *-iommu, the realize() method seems to trigger
+everything we need. In the case of xen-backend, I guess the Xen
+magic is triggered by the xen_backend.c code.
+
+Some cases may be more subtle, like kvmclock:
+
+kvmclock _could_ work using -device already, because it simply
+provides a few MSRs to the guest. The only thing that let me
+conclude that -device kvmclock is not useful is that it doesn't
+set the kvmclock CPUID bits in the VCPU.
+
+If kvmclock added the CPUID bits from its realize() method,
+-device kvmclock would already working out of the box and I
+wouldn't be able to remove it from the whitelist.
 
 
+> > 
+> > > The basic idea behind dynamic sysbus is that you move the responsibility of
+> > > sysbus spawnability checks from the sysbus layer to the board file. If the
+> > > board file ignores to do those checks, it's at fault.
+> > I think I will do this:
+> > 
+> > I will submit v2 of this thread pretending it is just going to
+> > fix the "info qdm" regression introduced by commit
+> > bf8d492405feaee2c1685b3b9d5e03228ed3e47f, and remove any mention
+> > of the q35 bug from the series and patch description.
+> > 
+> > I hopt this will make us stop diverging the discussion to "you
+> > should add a whitelist to q35 first", and stop ignoring that:
+> > 1) cannot_instantiate_with_device_add_yet is being set
+> >     incorrectly on the sysbus device classes and that's a bad
+> >     idea;
+> > 2) cannot_instantiate_with_device_add_yet is an awful name.
+> 
+> 
+> We need to make sure that the board has control over which devices are
+> spawnable. I fail to see how this series helps or achieves that, but I'm
+> happy to learn.
 
-On 03/04/2017 14:45, Alex Benn=C3=A9e wrote:
-> Outside of the vCPU thread icount time will only be tracked against
-> timers_state.qemu_icount. We no longer credit cycles until they have
-> completed the run. Inside the vCPU thread we adjust for passage of
-> time by looking at how many have run so far. This is only valid inside
-> the vCPU thread while it is running.
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  cpus.c            | 27 +++++++++++++++++++++------
->  include/qom/cpu.h |  1 +
->  2 files changed, 22 insertions(+), 6 deletions(-)
->=20
-> diff --git a/cpus.c b/cpus.c
-> index 87638a75d2..3d18374b0e 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -223,6 +223,15 @@ void qemu_tcg_configure(QemuOpts *opts, Error **er=
-rp)
->      }
->  }
-> =20
-> +/* The current number of executed instructions is based on what we
-> + * originally budgeted minus the current state of the decrementing
-> + * icount counters in extra/u16.low.
-> + */
-> +static int64_t cpu_get_icount_executed(CPUState *cpu)
-> +{
-> +    return cpu->icount_budget - (cpu->icount_decr.u16.low + cpu->icoun=
-t_extra);
-> +}
-> +
->  int64_t cpu_get_icount_raw(void)
->  {
->      int64_t icount;
-> @@ -234,7 +243,8 @@ int64_t cpu_get_icount_raw(void)
->              fprintf(stderr, "Bad icount read\n");
->              exit(1);
->          }
-> -        icount -=3D (cpu->icount_decr.u16.low + cpu->icount_extra);
-> +        /* Take into account what has run */
-> +        icount +=3D cpu_get_icount_executed(cpu);
->      }
->      return icount;
->  }
-> @@ -1195,7 +1205,10 @@ static void prepare_icount_for_run(CPUState *cpu=
-)
-> =20
->          count =3D tcg_get_icount_limit();
-> =20
-> -        timers_state.qemu_icount +=3D count;
-> +        /* To calculate what we have executed so far we need to know
-> +         * what we originally budgeted to run this cycle */
-> +        cpu->icount_budget =3D count;
-> +
->          decr =3D (count > 0xffff) ? 0xffff : count;
->          count -=3D decr;
->          cpu->icount_decr.u16.low =3D decr;
-> @@ -1206,16 +1219,18 @@ static void prepare_icount_for_run(CPUState *cp=
-u)
->  static void process_icount_data(CPUState *cpu)
->  {
->      if (use_icount) {
-> -        /* Fold pending instructions back into the
-> -           instruction counter, and clear the interrupt flag.  */
-> -        timers_state.qemu_icount -=3D (cpu->icount_decr.u16.low
-> -                        + cpu->icount_extra);
-> +        /* Account for executed instructions */
-> +        timers_state.qemu_icount +=3D cpu_get_icount_executed(cpu);
-> =20
->          /* We must be under BQL here as cpu_exit can tweak
->             icount_decr.u32 */
->          g_assert(qemu_mutex_iothread_locked());
-> +
-> +        /* Reset the counters */
->          cpu->icount_decr.u32 =3D 0;
+The series doesn't help the board have control over which devices
+are spawnable. In addition to fixing (1) and (2) above, the
+series helps us (humans) reduce the list of candidates for the
+q35 whitelist we need to build.
 
-If you only reset u16.low, then the assertion can be removed.  After all
-prepare_icount_for_run is also checking for u16.low to be zero.
-
-Thanks,
-
-Paolo
-
->          cpu->icount_extra =3D 0;
-> +        cpu->icount_budget =3D 0;
-> +
->          replay_account_executed_instructions();
->      }
->  }
-> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-> index c3292efe1c..5d10359c8f 100644
-> --- a/include/qom/cpu.h
-> +++ b/include/qom/cpu.h
-> @@ -332,6 +332,7 @@ struct CPUState {
->      /* updates protected by BQL */
->      uint32_t interrupt_request;
->      int singlestep_enabled;
-> +    int64_t icount_budget;
->      int64_t icount_extra;
->      sigjmp_buf jmp_env;
-> =20
->=20
+-- 
+Eduardo
