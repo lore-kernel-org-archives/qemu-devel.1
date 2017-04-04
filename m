@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cvMqK-0004LD-SH
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 07:41:49 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cvMu5-0005Bn-US
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 07:45:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cvMqK-0008HV-1i
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 07:41:48 -0400
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:36512)
+	(envelope-from <peter.maydell@linaro.org>) id 1cvMu4-0001iM-Mv
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 07:45:41 -0400
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:34082)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cvMqJ-0008Gg-Rt
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 07:41:47 -0400
-Received: by mail-wr0-x22d.google.com with SMTP id w11so209250706wrc.3
-	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 04:41:47 -0700 (PDT)
+	id 1cvMu4-0001i7-Fh
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 07:45:40 -0400
+Received: by mail-wr0-x233.google.com with SMTP id t20so6399138wra.1
+	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 04:45:40 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170403194409.21276-1-pbonzini@redhat.com>
-References: <20170403194409.21276-1-pbonzini@redhat.com>
+In-Reply-To: <CAFEAcA8o15m5PgRPdGtHRgP=t4EZf5EPZKnJ7J=G0dosBHZXBA@mail.gmail.com>
+References: <1489414630-21609-1-git-send-email-ard.biesheuvel@linaro.org>
+	<CAFEAcA8o15m5PgRPdGtHRgP=t4EZf5EPZKnJ7J=G0dosBHZXBA@mail.gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 4 Apr 2017 12:41:25 +0100
-Message-ID: <CAFEAcA_at0jSHTQqMAP8Ryy_-4a9hjnui6+1Q_jp1o=1Bfgfbw@mail.gmail.com>
+Date: Tue, 4 Apr 2017 12:45:18 +0100
+Message-ID: <CAFEAcA-NxhpE_23Ec=+iWSzPeee6aEvj70dU0G26CETd5bofig@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 0/6] Misc patches for QEMU 2.9.0-rc3
+Subject: Re: [Qemu-devel] [PATCH v2] hw/arm/boot: take Linux/arm64
+ TEXT_OFFSET header field into account
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Mark Rutland <mark.rutland@arm.com>
 
-On 3 April 2017 at 20:44, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> The following changes since commit 95b31d709ba343ad237c3630047ee7438bac4065:
+On 20 March 2017 at 11:13, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 13 March 2017 at 14:17, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+>> The arm64 boot protocol stipulates that the kernel must be loaded
+>> TEXT_OFFSET bytes beyond a 2 MB aligned base address, where TEXT_OFFSET
+>> could be any 4 KB multiple between 0 and 2 MB, and whose value can be
+>> found in the header of the Image file.
+>>
+>> So after attempts to load the arm64 kernel image as an ELF file or as a
+>> U-Boot image have failed (both of which have their own way of specifying
+>> the load offset), try to determine the TEXT_OFFSET from the image after
+>> loading it but before mapping it as a ROM mapping into the guest address
+>> space.
+>>
+>> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>> ---
+>> v2: split off AArch64 specific loader logic regarding gzipped/raw and variable
+>>     load offset into a separate helper function, which removes the need for
+>>     loading the image twice
 >
->   Merge remote-tracking branch 'remotes/awilliam/tags/vfio-updates-20170331.0' into staging (2017-03-31 18:06:13 +0100)
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 >
-> are available in the git repository at:
->
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to ecbddbb106114f90008024b4e6c3ba1c38d7ca0e:
->
->   main-loop: Acquire main_context lock around os_host_main_loop_wait. (2017-04-03 19:13:12 +0200)
->
-> ----------------------------------------------------------------
-> * MemoryRegionCache revert
-> * glib optimization workaround
-> * fix "info lapic" segfault on isapc
-> * fix QIOChannel memory leak
->
+> Since we're due to tag rc1 tomorrow and this is kind of on the
+> border between bugfix and new feature, I think I'd rather
+> defer it to 2.10, unless you have a strong view that it should
+> go into 2.9.
 
-Applied, thanks.
+Since we're now at rc3 and I don't expect to need to do another
+arm pull request before 2.9, I've put this patch into target-arm.next
+for 2.10.
 
+thanks
 -- PMM
