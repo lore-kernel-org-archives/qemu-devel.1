@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cvNcJ-0007Qb-Op
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 08:31:24 -0400
+	(envelope-from <ali.saeedi56@gmail.com>) id 1cvNcM-0007SH-8K
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 08:31:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cvNcG-00087Q-Jr
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 08:31:23 -0400
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:34332)
+	(envelope-from <ali.saeedi56@gmail.com>) id 1cvNcL-0008DO-G8
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 08:31:26 -0400
+Received: from mail-qt0-x230.google.com ([2607:f8b0:400d:c0d::230]:34043)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cvNcG-00085k-DP
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 08:31:20 -0400
-Received: by mail-wr0-x22e.google.com with SMTP id t20so8371905wra.1
-	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 05:31:20 -0700 (PDT)
-References: <20170403124524.10824-1-alex.bennee@linaro.org>
-	<20170403124524.10824-8-alex.bennee@linaro.org>
-	<000201d2ad05$e28626d0$a7927470$@ru>
-	<8760ikblf7.fsf@linaro.org> <874ly4bgbu.fsf@linaro.org>
-	<3c4f3f42-3b33-8e0a-b3f4-0963670b47de@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <3c4f3f42-3b33-8e0a-b3f4-0963670b47de@redhat.com>
-Date: Tue, 04 Apr 2017 13:31:17 +0100
-Message-ID: <8737dobbhm.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <ali.saeedi56@gmail.com>)
+	id 1cvNcL-0008D8-Cr
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 08:31:25 -0400
+Received: by mail-qt0-x230.google.com with SMTP id n21so136902841qta.1
+	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 05:31:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH v1 7/9] cpus: move icount preparation
- out of tcg_exec_cpu
+From: ali saeedi <ali.saeedi56@gmail.com>
+Date: Tue, 4 Apr 2017 17:01:24 +0430
+Message-ID: <CAGKXQydiJJO7Kg3tDZfx4q8zrK=BEZLQZkdaOOM0hEEN_tUMKg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: [Qemu-devel] bytes_xfer and xfer_limit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,35 +26,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Pavel Dovgalyuk <dovgaluk@ispras.ru>, rth@twiddle.net, peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, 'Peter Crosthwaite' <crosthwaite.peter@gmail.com>
+To: qemu-devel@nongnu.org
 
-
-Paolo Bonzini <pbonzini@redhat.com> writes:
-
-> On 04/04/2017 12:46, Alex Bennée wrote:
->>> In theory the main-loop should be sequenced before or after vCPU events
->>> because of the BQL. I'm not sure why this is not currently the case.
->>
->> It seems cpu_handle_exception doesn't take the BQL until
->> replay_exception() has done its thing. This is fixable but the function
->> is a mess so I'm trying to neaten that up first.
->
-> Long term neither cpu_handle_exception nor cpu_handle_interrupt need the
-> BQL at all.
-
-Well for record/replay they might. Otherwise we end up moving the record
-stream on even though a checkpoint might be being written by the
-main-loop.
-
-As far as the cc->do_interrupt() stuff is concerned it will be guest
-dependant because you could end up in device emulation code down this
-path which must be protected by the BQL - the arm_gic code being a good
-example.
-
->
-> Paolo
-
-
---
-Alex Bennée
+Hi
+What are the variables 'bytes_xfer' and 'xfer_limit' in qemu-file.c ?
+what does the function 'qemu_file_rate_limit' do?
+thanks
