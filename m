@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Chris.Friesen@windriver.com>) id 1cvPSJ-0008Qr-CU
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 10:29:12 -0400
+	(envelope-from <k.kozlowski.k@gmail.com>) id 1cvPUg-0000iB-Gr
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 10:31:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Chris.Friesen@windriver.com>) id 1cvPSG-0004vi-93
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 10:29:11 -0400
-Received: from mail.windriver.com ([147.11.1.11]:58797)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Chris.Friesen@windriver.com>)
-	id 1cvPSG-0004tB-05
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 10:29:08 -0400
-Message-ID: <58E3ADA3.2040305@windriver.com>
-Date: Tue, 4 Apr 2017 08:28:51 -0600
-From: Chris Friesen <chris.friesen@windriver.com>
+	(envelope-from <k.kozlowski.k@gmail.com>) id 1cvPUd-0005qk-Bl
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 10:31:38 -0400
+Date: Tue, 4 Apr 2017 16:31:21 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Message-ID: <20170404143121.GA6421@kozik-book>
+References: <20170318192509.15499-1-krzk@kernel.org>
+	<CAFEAcA8WGoa=DYXRH4MHfnHmUR_5-xERdmcuqrsk=bmS7GBCmg@mail.gmail.com>
+	<20170404134402.GA4196@kozik-book>
+	<CAFEAcA9UGEVVUfL3--goP4mVU+ezegWPcoka41XM8d_E2yyJkQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <58DEB834.6060405@windriver.com>
-	<20170403191158.GI3539@stefanha-x1.localdomain>
-	<CABdb737NXTBJGvk+nuyFTccK_-g=N=PHO+ZRd1qSZcTgai=feQ@mail.gmail.com>
-In-Reply-To: <CABdb737NXTBJGvk+nuyFTccK_-g=N=PHO+ZRd1qSZcTgai=feQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] hitting intermittent issue with live migration
- from qemu-kvm-ev 2.3.0 to qemu-kvm-ev 2.6.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9UGEVVUfL3--goP4mVU+ezegWPcoka41XM8d_E2yyJkQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2] hw/misc: Add Exynos4210 Pseudo Random
+ Number Generator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +26,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 04/04/2017 07:56 AM, Ladi Prosek wrote:
-> On Mon, Apr 3, 2017 at 9:11 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->> On Fri, Mar 31, 2017 at 02:12:36PM -0600, Chris Friesen wrote:
+On Tue, Apr 04, 2017 at 03:05:09PM +0100, Peter Maydell wrote:
+> On 4 April 2017 at 14:44, Krzysztof Kozlowski <krzk@kernel.org> wrote:
+> > On Tue, Apr 04, 2017 at 01:09:08PM +0100, Peter Maydell wrote:
+> >> On 18 March 2017 at 19:25, Krzysztof Kozlowski <krzk@kernel.org> wrote:
+> >> > Add emulation for Exynos4210 Pseudo Random Number Generator which could
+> >> > work on fixed seeds or with seeds provided by True Random Number
+> >> > Generator block inside the SoC.
+> >> >
+> >> > Implement only the fixed seeds part of it in polling mode (no
+> >> > interrupts).  Simple testing:
+> >> >     # echo "exynos" > /sys/class/misc/hw_random/rng_current
+> >> >     # dd if=/dev/hwrng of=/dev/null bs=1 count=16
+> >> >
+> >> > Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+> >> >
+> >> > ---
+> >> >
+> >> > Changes since v1:
+> >> > 1. Use GRand-like functions to fix build on MingW32 (this adds also
+> >> >    finalize).
+> >> > 2. Add DPRINTF macro.
+> >> > 3. Use HWADDR_PRIx and family for printing values.
+> >>
+> >> Is there a data sheet that describes this RNG? I had a quick google
+> >> but couldn't find anything in the 4210 manual you can get from Samsung.
+> >
+> > Official and public datasheet - I never heard about it... AFAIK, Samsung
+> > never released any datasheet... But recently I found a copy of
+> > Exynos4412 datasheet published on FriendlyArm website:
+> > http://wiki.friendlyarm.com/wiki/index.php/NanoPC-T1
+> > (at the bottom in "Resources").
+> >
+> > Some blocks in Exynos4412, including the RNG, are the same as in
+> > Exynos4210. However, you should not expect too much data about the RNG
+> > in the datasheet...
+> >
+> >> In particular I'm not sure we want to use GRand here.
+> >
+> > Now, I am not sure neither. :)
+> 
+> The last RNG we added was hw/misc/bcm2835_rng.c, which uses
+> qcrypto_random_bytes() to get cryptographically-random bytes
+> from the host. On the other hand it sounds like this Exynos
+> hardware is a PRNG without true-random input...
 
->>> Initially we have a bunch of guests running on compute-2 (which is running
->>> qemu-kvm-ev 2.3.0).  We then started live-migrating them one at a time to
->>> compute-0 (which is running qemu-kvm-ev 2.6.0).  Three of them migrated
->>> successfully.  The fourth (which was essentially identical in configuration
->>> to the first three) failed, as per the following logs in
->>> /var/log/libvirt/qemu/instance-0000000e.log:
->>>
->>>
->>> 2017-03-29T06:38:37.886940Z qemu-kvm: VQ 2 size 0x80 < last_avail_idx 0x47b
->>> - used_idx 0x47c
->>> 2017-03-29T06:38:37.886974Z qemu-kvm: error while loading state for instance
->>> 0x0 of device '0000:00:07.0/virtio-balloon'
->>> 2017-03-29T06:38:37.888684Z qemu-kvm: load of migration failed: Operation
->>> not permitted
->>> 2017-03-29 06:38:37.896+0000: shutting down
->>>
->>>
->>> Does anyone know of an existing bug report covering this issue?  (I took a
->>> look and didn't see anything obviously related.)
->>
->> This is the virtio-balloon device.  If you remove the device the live
->> migration should work reliably.
->>
->> Alternatively, you can temporarily rmmod virtio_balloon inside the guest
->> for live migration.  After migration you can modprobe virtio_balloon
->> again.
->>
->> last_avail_idx 0x47b with used_idx 0x47c is an invalid device state.
->> I've diffed qemu-kvm-ev 2.6.0-27.1 hw/virtio/virtio-balloon.c against
->> qemu.git/master and do not see an obvious bug.  I also compared
->> qemu-kvm-ev 2.3.0-31 with qemu-kvm-ev 2.6.0-27.1.
->
-> The device likely got into the invalid state as part of a previous
-> migration to an unfixed QEMU. I second Stefan's suggestion to
-> temporarily remove the device or unload the driver.
+Yes, I think that is the case. The PRNG block looks the same on all
+Exynos SoCs. At least from datasheet perspective and registers.
+The difference came with Exynos5420 with introducing another block -
+True RNG - which could be chained to PRNG as seed. However the PRNG
+stays the same (according to datasheet).
 
-I'll give that a try (been busy with a separate issue).
+Unfortunately I could not verify too much of this because on Exynos5420
+apparently the PRNG block is locked by SecureMonitor.
 
-If I have a guest already running, can I unilaterally hot-remove the device from 
-the host side or does the guest need to be involved as well?  (I'm just trying 
-to figure out how to deal with existing guests.)
+At some point I will probably get back to Exynos5420 (and True RNG) but
+till then, the choice of GRand repeatable random sequences makes some
+sense to me.
 
-Thanks,
-Chris
+The remaining issue with this QEMU patch, brought to light during
+discussions on LKML, is that it does not accept multiple seeds. From
+what I understood, a good PRNG should be able to consume more seeds
+at one pass (into same registers) thus. In other words these cases
+should produce different results:
+1. Seed(a), random
+2. Seed(b), Seed(a), random
+
+As of now, I think GRand will not allow this.
+
+The hardware on Exynos4412 behaves like this plus it generates random
+numbers even for the same seed after reboot (which could mean that it
+was seeded by bootloader or Secure OS).
+
+Best regards,
+Krzysztof
