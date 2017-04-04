@@ -1,24 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cvX8h-0004Yv-EE
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 18:41:28 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cvXxV-0003Ci-9R
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 19:33:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cvX8g-0003HZ-D5
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 18:41:27 -0400
-References: <20170118161653.19296-1-eblake@redhat.com>
-	<20170118161653.19296-3-eblake@redhat.com>
-	<87lgu7flkc.fsf@dusky.pond.sub.org>
-	<9e16eb02-dc8b-b25f-0aba-d4a9ff3b5a02@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <274218e6-5539-9eef-56bc-c2de4d11a593@redhat.com>
-Date: Tue, 4 Apr 2017 17:41:08 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cvXxR-0002XL-AW
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 19:33:57 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47062
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1cvXxR-0002X5-4J
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 19:33:53 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v34NXeVo078734
+	for <qemu-devel@nongnu.org>; Tue, 4 Apr 2017 19:33:52 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 29m24bfmpx-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 19:33:51 -0400
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Tue, 4 Apr 2017 17:33:51 -0600
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <9e16eb02-dc8b-b25f-0aba-d4a9ff3b5a02@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="CC8q7utnXC2rDTsL2oMBJU1QCquFOrQGv"
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] qdict: Add convenience helpers for
- wrapped puts
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20170321141435.23701-1-sameeh@daynix.com>
+References: <20170321141435.23701-1-sameeh@daynix.com>
+Date: Tue, 04 Apr 2017 17:55:47 -0500
+Message-Id: <149134654744.1924.4586865323465702075@loki>
+Subject: Re: [Qemu-devel] [PATCH qemu-ga] qemu-ga: Don't display errors to
+ the user on thaw command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,97 +42,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Alberto Garcia <berto@igalia.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Anthony Perard <anthony.perard@citrix.com>, Fam Zheng <famz@redhat.com>, Chrysostomos Nanakos <chris@include.gr>, Stefan Weil <sw@weilnetz.de>, Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "open list:X86" <xen-devel@lists.xensource.com>, Stefan Hajnoczi <stefanha@redhat.com>, Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Sameeh Jubran <sameeh@daynix.com>, qemu-devel@nongnu.org
+Cc: Yan Vugenfirer <yan@daynix.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---CC8q7utnXC2rDTsL2oMBJU1QCquFOrQGv
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>, Jeff Cody <jcody@redhat.com>,
- qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>,
- Gerd Hoffmann <kraxel@redhat.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Alberto Garcia <berto@igalia.com>,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Anthony Perard <anthony.perard@citrix.com>, Fam Zheng <famz@redhat.com>,
- Chrysostomos Nanakos <chris@include.gr>, Stefan Weil <sw@weilnetz.de>,
- Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- "open list:X86" <xen-devel@lists.xensource.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Kevin Wolf <kwolf@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <274218e6-5539-9eef-56bc-c2de4d11a593@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] qdict: Add convenience helpers for
- wrapped puts
-References: <20170118161653.19296-1-eblake@redhat.com>
- <20170118161653.19296-3-eblake@redhat.com>
- <87lgu7flkc.fsf@dusky.pond.sub.org>
- <9e16eb02-dc8b-b25f-0aba-d4a9ff3b5a02@redhat.com>
-In-Reply-To: <9e16eb02-dc8b-b25f-0aba-d4a9ff3b5a02@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Quoting Sameeh Jubran (2017-03-21 09:14:35)
+> Errors that are related to ur inner implementation for the thaw command
+> shouldn't be displayed to the user.
+> =
 
-On 01/19/2017 08:38 AM, Eric Blake wrote:
-> On 01/19/2017 03:25 AM, Markus Armbruster wrote:
->> Eric Blake <eblake@redhat.com> writes:
->>
->>> Quite a few users of qdict_put() were manually wrapping a
->>> non-QObject. We can make such call-sites shorter, by providing
->>> common macros to do the tedious work.  Also shorten nearby
->>> qdict_put_obj(,,QOBJECT()) sequences.
->>>
->>> Signed-off-by: Eric Blake <eblake@redhat.com>
->>> Reviewed-by: Alberto Garcia <berto@igalia.com>
->>>
->>> ---
->>>
->>> v2: rebase to current master
->>>
->>> I'm okay if you want me to break this patch into smaller pieces.
->>
->> I guess I'm okay with a single piece, but I'd like to know how you did=
+> Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
+> ---
+>  qga/vss-win32/requester.cpp | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> =
 
->> the conversion.  Coccinelle?  Manually?
+> diff --git a/qga/vss-win32/requester.cpp b/qga/vss-win32/requester.cpp
+> index 0cd2f0e..272e71b 100644
+> --- a/qga/vss-win32/requester.cpp
+> +++ b/qga/vss-win32/requester.cpp
+> @@ -463,7 +463,7 @@ void requester_thaw(int *num_vols, ErrorSet *errset)
+>              hr =3D WaitForAsync(pAsync);
+>          }
+>          if (FAILED(hr)) {
+> -            err_set(errset, hr, "failed to complete backup");
+
+We cannot do this. If the freeze operation didn't successfully maintain
+the frozen state for entire duration we *must* report an error to the
+user, otherwise users have no way to know that their snapshot might be
+completely corrupted. Well, I suppose they can look at
+guest-fsfreeze-thaw's return value and check that it matches the number
+of volumes that were originally frozen, but that aspect is intended as a
+sanity check to identify situations outside of qemu-ga's control, like
+another user/application unfreezing the filesystems before qemu-ga. This
+situation *is* within qemu-ga's control, and should be reported as an
+error. Same for the other failures below.
+
+> +            fprintf(stderr, "failed to complete backup");
+>          }
+>          break;
+> =
+
+> @@ -480,18 +480,18 @@ void requester_thaw(int *num_vols, ErrorSet *errset)
+> =
+
+>      case VSS_E_UNEXPECTED_PROVIDER_ERROR:
+>          if (WaitForSingleObject(vss_ctx.hEventTimeout, 0) !=3D WAIT_OBJE=
+CT_0) {
+> -            err_set(errset, hr, "unexpected error in VSS provider");
+> +            fprintf(stderr, "unexpected error in VSS provider");
+>              break;
+>          }
+>          /* fall through if hEventTimeout is signaled */
+> =
+
+>      case (HRESULT)VSS_E_HOLD_WRITES_TIMEOUT:
+> -        err_set(errset, hr, "couldn't hold writes: "
+> +        fprintf(stderr, "couldn't hold writes: "
+>                  "fsfreeze is limited up to 10 seconds");
+>          break;
+> =
+
+>      default:
+> -        err_set(errset, hr, "failed to do snapshot set");
+> +        fprintf(stderr, "failed to do snapshot set");
+>      }
+> =
+
+>      if (err_is_set(errset)) {
+> -- =
+
+> 2.9.3
 >=20
-> Manual, via grepping for put_obj.*QOBJECT. I'll see if I can do the sam=
-e
-> under Coccinelle (at which point, committing the script will make it
-> easier to rerun cleanups if later code reintroduces poor usage
-> patterns), so maybe I have a v3 coming up.
-
-I've got a Coccinelle patch (mostly) working now - but it has one
-shortfall - I found places in tests/check-qdict.c that coccinelle
-didn't, and traced it to the fact that our use of g_assert_cmpint(expr,
-=3D=3D, expr) throws off the coccinelle parser so badly that it silently
-ignores the entire function body containing the use of that macro.  v3
-will be posted soon, with the best of both worlds (coccinelle caught
-spots that I missed, not to mention recent code base changes; and my
-manual search found the spots in tests/ that coccinelle missed).
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---CC8q7utnXC2rDTsL2oMBJU1QCquFOrQGv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY5CEEAAoJEKeha0olJ0Nq3EkH/0Oq+K4IoD5nqLL4pz2vb4k0
-X8G+asQgxxSI0B8QNRDZa3zyZmUPSNCO1ADwELy+GtrJVnlm/eAirrs+3idFvu8a
-Z4ijZZ2gnnagXq3vaOSLVYNg0TLddjvJv/Mud3kZO7JdTTTie+RukgCOSp/1M81v
-EjssWuSsKOFw40vxFIQM5JvxIeYrdJxEpl57z/WmemQRd/V61dYiDMwd3nixMUr3
-sFcxwdJeAOBHtIHaZGIHBo/TRQomJL8lz84BXNFJ9RnBOVNvH4TgCtcF0c1ax0xk
-t09WOGiPCvifeLKTJ+yNNA2FW9ons3rhCUoYFBEYUIEJ6yl2LKGFndXHAg4fSeA=
-=Ewpr
------END PGP SIGNATURE-----
-
---CC8q7utnXC2rDTsL2oMBJU1QCquFOrQGv--
