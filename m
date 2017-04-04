@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cvQGE-0007K1-E0
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:20:47 -0400
+	(envelope-from <jcody@redhat.com>) id 1cvQPa-0001sj-KS
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:30:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cvQG9-0005kl-39
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:20:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53047)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cvQG8-0005kK-Mw
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:20:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cvQG7-0004PY-Bw
-	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 15:20:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 15A422E80C0
-	for <qemu-devel@nongnu.org>; Tue,  4 Apr 2017 15:20:39 +0000 (UTC)
+	(envelope-from <jcody@redhat.com>) id 1cvQPV-0002dc-WE
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:30:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55115)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1cvQPV-0002cl-RJ
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:30:21 -0400
+Date: Tue, 4 Apr 2017 11:30:13 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170404153013.GQ15423@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 04 Apr 2017 15:14:49 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1679358 <1679358@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170403221712.26304.98856.malonedeb@chaenomeles.canonical.com>
-Message-Id: <20170404151449.9940.24128.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1679358] Re: ARM: SCTLR fields not being preserved
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] PCI regression in 2.9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,28 +25,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, mst@redhat.com, aik@ozlabs.ru, alex.williamson@redhat.com
 
-Well, I wouldn't object to a patch to fix it (it would have to correctly
-handle the various different versions of the CPU architecture we
-implement, etc), but I'm not planning on writing one today myself.
 
--- =
+I ran into this while running qemu iotests, and it looks like it is a
+regression from 2.8.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1679358
+Here is the reproducer:
 
-Title:
-  ARM: SCTLR fields not being preserved
+$ ./x86_64-softmmu/qemu-system-x86_64 -drive if=virtio
+qemu-system-x86_64: qemu-kvm/memory.c:2078: memory_region_del_subregion: Assertion `subregion->container == mr' failed
+Aborted (core dumped)
 
-Status in QEMU:
-  New
+The proper output is (with no abort):
+qemu-system-x86_64: -drive if=virtio: Device needs media, but drive is empty
 
-Bug description:
-  There are fields in SCTLR that are RAO/SBOP or WI or in the case of
-  the RR field, accessible only in secure mode. Currently it seems that
-  qemu just propagates any write to SCTLR to the register and this
-  screwed up in a bootloader that I am debugging.
+I bisected it down to this commit:
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1679358/+subscriptions
+commit c53598ed18e40a9609573b21f2a361221ca0f806
+Author: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date:   Mon Mar 27 15:40:30 2017 +1100
+
+    pci: Add missing drop of bus master AS reference
+    
+    The recent introduction of a bus master container added
+    memory_region_add_subregion() into the PCI device registering path but
+    missed memory_region_del_subregion() in the unregistering path leaving
+    a reference to the root memory region of the new container.
+    
+    This adds missing memory_region_del_subregion().
+    
+    Fixes: 3716d5902d743 ("pci: introduce a bus master container")
+    Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+    Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+    Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+    Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
