@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jgunthorpe@obsidianresearch.com>) id 1cvQuE-0002uw-2z
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 12:02:07 -0400
+	(envelope-from <groug@kaod.org>) id 1cvR5e-0006V8-37
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 12:13:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jgunthorpe@obsidianresearch.com>) id 1cvQuA-00081w-Tv
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 12:02:06 -0400
-Received: from quartz.orcorp.ca ([184.70.90.242]:33911)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jgunthorpe@obsidianresearch.com>)
-	id 1cvQuA-00081I-Kv
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 12:02:02 -0400
-Date: Tue, 4 Apr 2017 10:01:55 -0600
-From: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
-Message-ID: <20170404160155.GA1750@obsidianresearch.com>
-References: <1490872341-9959-1-git-send-email-marcel@redhat.com>
-	<20170330141314.GM20443@mtr-leonro.local>
-	<5e952524-7c2d-b4da-4bd7-6437830a40d8@redhat.com>
-	<f7f3fc0e-0a75-2fdc-b3c2-6c3d34ff2978@redhat.com>
-	<20170403062314.GO20443@mtr-leonro.local>
-	<aa400244-426a-ea62-0ccf-ac5adb76fdd1@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aa400244-426a-ea62-0ccf-ac5adb76fdd1@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC] hw/pvrdma: Proposal of a new pvrdma
- device
+	(envelope-from <groug@kaod.org>) id 1cvR5b-0005iN-D3
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 12:13:54 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51893)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cvR5b-0005hv-3Y
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 12:13:51 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v34G9IVw103079
+	for <qemu-devel@nongnu.org>; Tue, 4 Apr 2017 12:13:48 -0400
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 29m259y0ma-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 12:13:48 -0400
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Tue, 4 Apr 2017 17:13:46 +0100
+From: Greg Kurz <groug@kaod.org>
+Date: Tue,  4 Apr 2017 18:13:28 +0200
+Message-Id: <1491322410-24532-1-git-send-email-groug@kaod.org>
+Subject: [Qemu-devel] [PULL 0/2] 9pfs fixes for 2.9 2017-04-04
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,54 +34,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Leon Romanovsky <leon@kernel.org>, Doug Ledford <dledford@redhat.com>, qemu-devel@nongnu.org, linux-rdma@vger.kernel.org, yuval.shaia@oracle.com
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
 
-On Tue, Apr 04, 2017 at 04:38:40PM +0300, Marcel Apfelbaum wrote:
+The following changes since commit 87cc4c61020addea6a001b94b662596b1896d1b3:
 
-> Here are some thoughts regarding the Soft RoCE usage in our project.
-> We thought about using it as backend for QEMU pvrdma device
-> we didn't how it will support our requirements.
-> 
-> 1. Does Soft RoCE support inter process (VM) fast path ? The KDBR
->    removes the need for hw resources, emulated or not, concentrating
->    on one copy from a VM to another.
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2017-04-04 11:40:55 +0100)
 
-I'd rather see someone optimize the loopback path of soft roce than
-see KDBR :)
+are available in the git repository at:
 
-> 3. Our intention is for KDBR to be used in other contexts as well when we need
->    inter VM data exchange, e.g. backend for virtio devices. We didn't see how this
->    kind of requirement can be implemented inside SoftRoce as we don't see any
->    connection between them.
+  https://github.com/gkurz/qemu.git tags/for-upstream
 
-KDBR looks like weak RDMA to me, so it is reasonable question why not
-use full RDMA with loopback optimization instead of creating something
-unique.
+for you to fetch changes up to 6d54af0ea9eeee70b4c0eb48bd2ae1d22b207dd4:
 
-IMHO, it also makes more sense for something like KDBR to live as a
-RDMA transport, not as a unique char device, it is obviously very
-RDMA-like.
+  9pfs: clear migration blocker at session reset (2017-04-04 18:06:01 +0200)
 
-.. and the char dev really can't be used when implementing user space
-RDMA, that would just make a big mess..
+----------------------------------------------------------------
+Some 9pfs bugs fixes: potential hang at reset, migration blocker leak.
 
-> 4. We don't want all the VM memory to be pinned since it disable memory-over-commit
->    which in turn will make the pvrdma device useless.
->    We weren't sure how nice would play Soft RoCE with memory pinning and we wanted
->    more control on memory management. It may be a solvable issue, but combined
->    with the others lead us to our decision to come up with our kernel bridge (char
+----------------------------------------------------------------
+Greg Kurz (2):
+      9pfs: fix multiple flush for same request
+      9pfs: clear migration blocker at session reset
 
-soft roce certainly can be optimized to remove the page pin and always
-run in an ODP-like mode.
-
-But obviously if you connect pvrdma to real hardware then the page pin
-comes back.
-
->    device or not, we went for it since it was the easiest to
->    implement for a POC)
-
-I can see why it would be easy to implement, but not sure how this
-really improves the kernel..
-
-Jason
+ hw/9pfs/9p.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
+-- 
+2.7.4
