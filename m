@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Ciprian.Barbu@enea.com>) id 1cvJVf-0007N4-R9
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 04:08:17 -0400
+	(envelope-from <Ciprian.Barbu@enea.com>) id 1cvJeS-0000Za-Al
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 04:17:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Ciprian.Barbu@enea.com>) id 1cvJVc-0007su-LQ
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 04:08:15 -0400
-Received: from smtp-out11.electric.net ([185.38.181.37]:64797)
+	(envelope-from <Ciprian.Barbu@enea.com>) id 1cvJeP-0004xV-6b
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 04:17:20 -0400
+Received: from smtp-out10.electric.net ([185.38.180.44]:56380)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <Ciprian.Barbu@enea.com>)
-	id 1cvJVc-0007oj-E9
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 04:08:12 -0400
+	id 1cvJeO-0004wZ-VK
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 04:17:17 -0400
 References: <C885D0FF6A27744DB0B822E32DF6EF029B1CA14A@SESTOEX04.enea.se>
 	<9b05e60a-f8c2-ea4f-6be4-f17c0adec510@redhat.com>
-	<C885D0FF6A27744DB0B822E32DF6EF029B1CA282@SESTOEX04.enea.se>
-	<20170403185232.jjiuesfxhbfzfivv@eukaryote>
+	<20170403081542.GA5036@noname.str.redhat.com>
+	<33ced3d3-acd7-2945-518d-465a4621b151@redhat.com>
+	<4d684062-be31-153e-3f94-b1193440c8e3@redhat.com>
 From: ciprian.barbu <ciprian.barbu@enea.com>
-Message-ID: <cb5a0bf0-b279-6329-875a-49a69e64506c@enea.com>
-Date: Tue, 4 Apr 2017 11:07:53 +0300
+Message-ID: <e2fb3ffd-006c-5908-9201-d3182edc4c04@enea.com>
+Date: Tue, 4 Apr 2017 11:17:11 +0300
 MIME-Version: 1.0
-In-Reply-To: <20170403185232.jjiuesfxhbfzfivv@eukaryote>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: base64
+In-Reply-To: <4d684062-be31-153e-3f94-b1193440c8e3@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] nbd: Possible regression in 2.9 RCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,77 +31,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kashyap Chamarthy <kchamart@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Alexandru Avadanii <Alexandru.Avadanii@enea.com>, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>, svc-armband <armband@enea.com>
+To: Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, pkrempa@redhat.com, Alexandru Avadanii <Alexandru.Avadanii@enea.com>, Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>, svc-armband <armband@enea.com>
 
-SGksDQoNCk9uIDAzLjA0LjIwMTcgMjE6NTIsIEthc2h5YXAgQ2hhbWFydGh5IHdyb3RlOg0K
-PiBPbiBGcmksIE1hciAzMSwgMjAxNyBhdCAwNTo0OTo1MlBNICswMDAwLCBDaXByaWFuIEJh
-cmJ1IHdyb3RlOg0KPj4gSGksDQo+DQo+IFsuLi5dDQo+DQo+PiBXZSBhbHNvIHVzZSBsaWJ2
-aXJ0IHYxLjMuNCwgd2hpY2ggbWlnaHQgYmUgYSBwcm9ibGVtLCBidXQgYXQgbGVhc3Qgd2UN
-Cj4+IHdhbnQgdG8gdW5kZXJzdGFuZCBpZiB0aGUgY29tbWl0IGluIHF1ZXN0aW9uIGludHJv
-ZHVjZWQgYW4gb2J2aW91cw0KPj4gcHJvYmxlbSBvciBpZiBpdCdzIGFsbCBpbiB0aGUgZGV0
-YWlscy4NCj4NCj4gQSB0YW5nZW50aWFsIHF1ZXN0aW9uIC0tIEp1c3QgY3VyaW91cywgeW91
-ciBlbnZpcm9ubWVudA0KPiBzZWVtcy4uLmludGVyZXN0aW5nOiBnaXZlbiB5b3UgYXJlIHVz
-aW5nIGEgYml0IG9sZCAoYnV0IGFib3ZlIHRoZQ0KPiBNSU5fTElCVklSVF9WRVJTSU9OIGZv
-ciBOb3ZhLCB3aGljaCBpcyBjdXJyZW50bHkgMS4yLjEpIGxpYnZpcnQgdmVyc2lvbiwNCj4g
-d2l0aCAqUkMyKiBvZiBRRU1VIDIuOSB3aXRoIE5vdmEsIGFuZCB0ZXN0aW5nIGxpdmUgbWln
-cmF0aW9uLiAgTWUNCj4gd29uZGVycyBpZiB0aGlzIHNvbWUga2luZCBvZiBhIGN1c3RvbSBP
-cGVuU3RhY2sgZW52aXJvbm1lbnQsIG9yIGFuDQo+IG9mZmljaWFsIHVwc3RyZWFtIHJlbGVh
-c2UgdGhhdCB5b3UncmUgc2ltcGx5IHRlc3Rpbmcgd2l0aCBhIG5ld2VyDQo+IHZlcnNpb24g
-b2YgUUVNVS4uLg0KDQpIZXJlIGluIHRoZSBPUE5GViBBUk1CQU5EIFRlYW0sIHRoZSBwcmlt
-YXJ5IGdvYWwgaXMgdG8gbWFrZSB0aGUgT1BORlYgDQpyZWxlYXNlIHdvcmsgb24gQVJNIGFh
-cmNoNjQgc2VydmVycy4gV2UgaGF2ZSBjbHVzdGVycyBvZiBzZXJ2ZXJzIGZyb20gDQpkaWZm
-ZXJlbnQgdmVuZG9ycywgdGhpcyBvbiBpbiBwYXJ0aWN1bGFyIGlzIGJhc2VkIG9uIHRoZSBU
-aHVuZGVyWCBjbjg4OTAgDQpTb0MsIHdoaWNoIGhhcyByZWNlaXZlZCB3b3JrIGZvciBsaXZl
-IG1pZ3JhdGlvbiBmcm9tIGRpZmZlcmVudCBzb3VyY2VzLiANClRoZSBwcm9ibGVtIGlzIHRo
-ZXkgaGF2ZSBvbmx5IGJlZW4gdXBzdHJlYW1lZCBpbiBuZXcgdmVyc2lvbnMgb2Yga2VybmVs
-IA0KYW5kIHFlbXUuIFdlIHRyaWVkIHRvIGJhY2twb3J0IHRoZSBjaGFuZ2VzIHRvIGVhcmxp
-ZXIgdmVyc2lvbnMsIA0KcHJldmlvdXNseSB3ZSB3ZXJlIHJ1bm5pbmcga2VybmVsIDQuNCBh
-bmQgcWVtdSB2Mi42LjEuDQoNCkJ1dCBhbGwgb2YgdGhpcyBpcyBvbiB0b3Agb2YgT3BlbnN0
-YWNrIE5ld3RvbiwgYW5kIHllcywgd2UgYmFzaWNhbGx5IA0KYnVtcGVkIHRoZSBrZXJuZWws
-IHFlbXUgYW5kIG1vcmUgcmVjZW50bHkgbGlidmlydCB0b28gKHYxLjMuNCkuIEJ1dCBhcyAN
-CmRlc2NyaWJlZCBlYXJsaWVyIHdlIHdlcmUga2luZCBvZiBmb3JjZWQgaW50byB0aGlzIHNp
-dHVhdGlvbi4NCg0KDQo+DQo+DQo+IFsxXQ0KPiBodHRwOi8vZ2l0Lm9wZW5zdGFjay5vcmcv
-Y2dpdC9vcGVuc3RhY2svbm92YS90cmVlL25vdmEvdmlydC9saWJ2aXJ0L2RyaXZlci5weT9p
-ZD0wNjhkODUxI24xOTgNCj4NCj4+DQo+PiBCdHcsIHRoZSBxZW11IGNvbW1hbmQgZ2VuZXJh
-dGVkIGJ5IGxpYnZpcnQgaXMgdGhpcyBvbmUsIHNvcnJ5IGFib3V0IHRoYXQ6DQo+Pg0KPj4g
-MjAxNy0wMy0zMSAxNzo0MDoxMC45NTYrMDAwMDogc3RhcnRpbmcgdXAgbGlidmlydCB2ZXJz
-aW9uOiAxLjMuNCwgcGFja2FnZTogMCthbW9zM351MTYuMDQgKEVuZWEgQXJtYmFuZCBEZXZv
-cHMgVGVhbSA8YXJtYmFuZEBlbmVhLmNvbT4gRnJpLCAxMyBKYW4gMjAxNyAwMjowNjowNSAr
-MDEwMCksIHFlbXUgdmVyc2lvbjogMi44LjUwKERlYmlhbiAxOjIuOSthbW9zMn51MTYuMDQp
-LCBob3N0bmFtZTogbm9kZS0yLmRvbWFpbi50bGQNCj4+IExDX0FMTD1DIFBBVEg9L3Vzci9s
-b2NhbC9zYmluOi91c3IvbG9jYWwvYmluOi91c3Ivc2JpbjovdXNyL2Jpbjovc2JpbjovYmlu
-IFFFTVVfQVVESU9fRFJWPW5vbmUgL3Vzci9iaW4va3ZtIC1uYW1lIGluc3RhbmNlLTAwMDAw
-MDc2LGRlYnVnLXRocmVhZHM9b24gLVMgLW9iamVjdCBzZWNyZXQsaWQ9bWFzdGVyS2V5MCxm
-b3JtYXQ9cmF3LGZpbGU9L3Zhci9saWIvbGlidmlydC9xZW11L2RvbWFpbi0xNC1pbnN0YW5j
-ZS0wMDAwMDA3Ni9tYXN0ZXIta2V5LmFlcyAtbWFjaGluZSB2aXJ0LTIuOCxhY2NlbD1rdm0s
-dXNiPW9mZixnaWMtdmVyc2lvbj0zIC1jcHUgaG9zdCAtbSAyNTYgLXJlYWx0aW1lIG1sb2Nr
-PW9mZiAtc21wIDEsc29ja2V0cz0xLGNvcmVzPTEsdGhyZWFkcz0xIC11dWlkIDI4MTJmM2M5
-LWY1NjQtNDk5Yi1hOGM3LWU5ZTdjY2YyNDE0MyAtbm8tdXNlci1jb25maWcgLW5vZGVmYXVs
-dHMgLWNoYXJkZXYgc29ja2V0LGlkPWNoYXJtb25pdG9yLHBhdGg9L3Zhci9saWIvbGlidmly
-dC9xZW11L2RvbWFpbi0xNC1pbnN0YW5jZS0wMDAwMDA3Ni9tb25pdG9yLnNvY2ssc2VydmVy
-LG5vd2FpdCAtbW9uIGNoYXJkZXY9Y2hhcm1vbml0b3IsaWQ9bW9uaXRvcixtb2RlPWNvbnRy
-b2wgLXJ0YyBiYXNlPXV0YyxkcmlmdGZpeD1zbGV3IC1uby1zaHV0ZG93biAtYm9vdCBzdHJp
-Y3Q9b24gLWtlcm5lbCAvdmFyL2xpYi9ub3ZhL2luc3RhbmNlcy8yODEyZjNjOS1mNTY0LTQ5
-OWItYThjNy1lOWU3Y2NmMjQxNDMva2VybmVsIC1pbml0cmQgL3Zhci9saWIvbm92YS9pbnN0
-YW5jZXMvMjgxMmYzYzktZjU2NC00OTliLWE4YzctZTllN2NjZjI0MTQzL3JhbWRpc2sgLWFw
-cGVuZCAncm9vdD0vZGV2L3ZkYTEgcncgcm9vdHdhaXQgY29uc29sZT10dHkwIGNvbnNvbGU9
-dHR5UzAgY29uc29sZT10dHlBTUEwJyAtZGV2aWNlIGk4MjgwMWIxMS1icmlkZ2UsaWQ9cGNp
-LjEsYnVzPXBjaWUuMCxhZGRyPTB4MSAtZGV2aWNlIHBjaS1icmlkZ2UsY2hhc3Npc19ucj0y
-LGlkPXBjaS4yLGJ1cz1wY2kuMSxhZGRyPTB4MCAtdXNiIC1kcml2ZSBmaWxlPS92YXIvbGli
-L25vdmEvaW5zdGFuY2VzLzI4MTJmM2M5LWY1NjQtNDk5Yi1hOGM3LWU5ZTdjY2YyNDE0My9k
-aXNrLGZvcm1hdD1xY293MixpZj1ub25lLGlkPWRyaXZlLXZpcnRpby1kaXNrMCxjYWNoZT1u
-b25lLGFpbz1uYXRpdmUgLWRldmljZSB2aXJ0aW8tYmxrLWRldmljZSxzY3NpPW9mZixkcml2
-ZT1kcml2ZS12aXJ0aW8tZGlzazAsaWQ9dmlydGlvLWRpc2swLGJvb3RpbmRleD0xIC1kcml2
-ZSBmaWxlPS92YXIvbGliL25vdmEvaW5zdGFuY2VzLzI4MTJmM2M5LWY1NjQtNDk5Yi1hOGM3
-LWU5ZTdjY2YyNDE0My9kaXNrLmNvbmZpZyxmb3JtYXQ9cmF3LGlmPW5vbmUsaWQ9ZHJpdmUt
-dmlydGlvLWRpc2sxLGNhY2hlPW5vbmUsYWlvPW5hdGl2ZSAtZGV2aWNlIHZpcnRpby1ibGst
-ZGV2aWNlLHNjc2k9b2ZmLGRyaXZlPWRyaXZlLXZpcnRpby1kaXNrMSxpZD12aXJ0aW8tZGlz
-azEgLW5ldGRldiB0YXAsZmQ9MjcsaWQ9aG9zdG5ldDAgLWRldmljZSB2aXJ0aW8tbmV0LWRl
-dmljZSxuZXRkZXY9aG9zdG5ldDAsaWQ9bmV0MCxtYWM9ZmE6MTY6M2U6ODI6MGE6MmIgLXNl
-cmlhbCBmaWxlOi92YXIvbGliL25vdmEvaW5zdGFuY2VzLzI4MTJmM2M5LWY1NjQtNDk5Yi1h
-OGM3LWU5ZTdjY2YyNDE0My9jb25zb2xlLmxvZyAtc2VyaWFsIHB0eSAtdm5jIDAuMC4wLjA6
-MCAtayBlbi11cyAtZGV2aWNlIFZHQSxpZD12aWRlbzAsdmdhbWVtX21iPTE2LGJ1cz1wY2ku
-MixhZGRyPTB4MSAtZGV2aWNlIHZpcnRpby1iYWxsb29uLWRldmljZSxpZD1iYWxsb29uMCAt
-bXNnIHRpbWVzdGFtcD1vbg0KPj4gRG9tYWluIGlkPTE0IGlzIHRhaW50ZWQ6IGhpZ2gtcHJp
-dmlsZWdlcw0KPg0KPiBbLi4uXQ0KPg0KPg0K
+Hi,
+
+On 03.04.2017 22:44, Eric Blake wrote:
+> On 04/03/2017 07:39 AM, Max Reitz wrote:
+>>>> As for just allowing the NBD server write access to the device... To me
+>>>> that appears pretty difficult from an implementation perspective. We
+>>>> assert that nobody can write without having requested write access and
+>>>> we make sure that nobody can request write access without it being
+>>>> allowed. Making an exception for NBD seems very difficult and would
+>>>> probably mean we'd have to drop the assertion for write accesses altogether.
+>>>
+>>> Making an exception would simply be wrong.
+>>
+>> Indeed. That is why it would be so difficult.
+>>
+>> The question remains whether it is practical not to make an exception.
+>> As far as I know, libvirt is only guaranteed to support older qemu
+>> versions, not necessarily future ones. So we should be allowed to break
+>> existing use cases here until libvirt is updated (assuming it is
+>> possible for libvirt to express "guest device allows shared writes" as
+>> an option for its next release).
+>
+> In general, we support:
+>
+> old qemu, old libvirt (well, as long as those versions are supported)
+> old qemu, new libvirt
+> new qemu, new libvirt
+>
+> but we do NOT make any guarantees of supporting
+>
+> new qemu, old libvirt
+
+Sounds reasonable enough, I guess we didn't look at it this way.
+
+>
+> In other words, this may be a failure where new qemu requires extra care
+> and thus a new libvirt for it to be useful.  It's not nice to break qemu
+> back-compat if any other solution is possible (new qemu and old libvirt
+> should work more often than not), but it is the one scenario that no one
+> supports (whether here, upstream libvirt, or in downstream backports).
+>
+> Or, put another way, it's perfectly fine if we require that the use of
+> qemu 2.9 requires that you also use libvirt 3.3.0 or newer (since we
+> missed the boat on fixing libvirt 3.2 to pass shared-rw or any other
+> handshaking we come up with), although it's also nice if we figure out
+> how to make qemu work with what existing libvirt wants to do (the NBD
+> export needs to be writable by the source pre-migration, and by the
+> destination post-migration; so there is that aspect of two clients both
+> wanting to write - but the destination doesn't need to write until after
+> the source no longer has anything to write, so if we have a clean way to
+> turn writes off for the source, then turn writes on for the destination,
+> all before migrating which host is writing, that would be even cleaner).
+>
+
+Ok, this sounds like you are saying that there isn't much reasoning 
+behind this usecase, and also we might be the only ones complaining 
+about new qemu not working with an old libvirt.
+
+I think we could do with a 'clean' (as clean as it gets) workaround, 
+since it might be very difficult to bump libvirt in our Openstack 
+environment, skipping one major versions and several minors. But we 
+would be willing to do it as long as there are good chances it should 
+work ok. In the mean time we are using a less clean workaround and we 
+rely on you guys to help us find a good solution.
+
+Thanks and regards,
+/Ciprian
