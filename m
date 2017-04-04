@@ -1,41 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cvI3o-0006tD-Iq
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 02:35:25 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cvIEK-0008P4-Ck
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 02:46:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cvI3k-0001X9-Kh
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 02:35:24 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43968
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cvIEG-0007Ck-GY
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 02:46:16 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42853)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cvI3k-0001Wq-EI
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 02:35:20 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	id 1cvIEG-0007C9-5g
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 02:46:12 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v346SeRP117501
-	for <qemu-devel@nongnu.org>; Tue, 4 Apr 2017 02:35:17 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29m1njc67n-1
+	v346hc1m050947
+	for <qemu-devel@nongnu.org>; Tue, 4 Apr 2017 02:46:10 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 29m4e4wuk1-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 02:35:17 -0400
+	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 02:46:10 -0400
 Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Tue, 4 Apr 2017 07:35:15 +0100
-Date: Tue, 4 Apr 2017 08:35:11 +0200
+	Tue, 4 Apr 2017 07:46:07 +0100
+Date: Tue, 4 Apr 2017 08:46:01 +0200
 From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <CY1PR21MB005570FEDC849D13F608915B9E080@CY1PR21MB0055.namprd21.prod.outlook.com>
-References: <20170324220141.10104-1-Andrew.Baumann@microsoft.com>
-	<20170403162016.6c033dd8.cornelia.huck@de.ibm.com>
-	<CY1PR21MB005570FEDC849D13F608915B9E080@CY1PR21MB0055.namprd21.prod.outlook.com>
+In-Reply-To: <20170403192011.GH1910@thinpad.lan.raisama.net>
+References: <20170401004624.30886-1-ehabkost@redhat.com>
+	<20170401004624.30886-3-ehabkost@redhat.com>
+	<20170403105538.606f5ca9.cornelia.huck@de.ibm.com>
+	<20170403192011.GH1910@thinpad.lan.raisama.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20170404083511.31d921c5.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] win32: replace custom mutex and condition
- variable with native primitives
+Message-Id: <20170404084601.33ef7db6.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [RFC 02/19] s390: Add FIXME for unexplained
+ user_creatable=false line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,52 +44,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Andrey Shedel <ashedel@microsoft.com>, Stefan Weil <sw@weilnetz.de>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Richard Henderson <rth@twiddle.net>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>
 
-On Mon, 3 Apr 2017 18:12:34 +0000
-Andrew Baumann <Andrew.Baumann@microsoft.com> wrote:
+On Mon, 3 Apr 2017 16:20:11 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-> > From: Cornelia Huck [mailto:cornelia.huck@de.ibm.com]
-> > Sent: Monday, 3 April 2017 7:20
+> On Mon, Apr 03, 2017 at 10:55:38AM +0200, Cornelia Huck wrote:
+> > On Fri, 31 Mar 2017 21:46:07 -0300
+> > Eduardo Habkost <ehabkost@redhat.com> wrote:
 > > 
-> > On Fri, 24 Mar 2017 15:01:41 -0700
-> > Andrew Baumann <Andrew.Baumann@microsoft.com> wrote:
-> > 
-> > > From: Andrey Shedel <ashedel@microsoft.com>
-> > >
-> > > The multithreaded TCG implementation exposed deadlocks in the win32
-> > > condition variables: as implemented, qemu_cond_broadcast waited on
-> > > receivers, whereas the pthreads API it was intended to emulate does
-> > > not. This was causing a deadlock because broadcast was called while
-> > > holding the IO lock, as well as all possible waiters blocked on the
-> > > same lock.
-> > >
-> > > This patch replaces all the custom synchronisation code for mutexes
-> > > and condition variables with native Windows primitives (SRWlocks and
-> > > condition variables) with the same semantics as their POSIX
-> > > equivalents. To enable that, it requires a Windows Vista or newer host
-> > > OS.
-> > >
-> > > [AB: edited commit message]
-> > > Signed-off-by: Andrew Baumann <Andrew.Baumann@microsoft.com>
+> > > TYPE_S390_PCI_HOST_BRIDGE has user_creatable=false but has
+> > > no comment explaining why. Add a FIXME to document that.
+> > > 
+> > > Cc: Frank Blaschka <frank.blaschka@de.ibm.com>
+> > > Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
+> > > Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> > > Cc: Alexander Graf <agraf@suse.de>
+> > > Cc: Richard Henderson <rth@twiddle.net>
+> > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > > > ---
-> > > The major implication of this patch is that it drops support for
-> > > pre-Vista versions of Windows. However, those OSes are past their end
-> > > of life, and other OSS projects have dropped support. e.g.; the last
-> > > Cygwin release supporting XP was in Jun 2016. It doesn't seem like a
-> > > good tradeoff to invest effort in fixing broken code needed to support
-> > > them, so hopefully this isn't too controversial.
+> > >  hw/s390x/s390-pci-bus.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > 
+> > > diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> > > index 1ec30c45ce..2c3b960bdf 100644
+> > > --- a/hw/s390x/s390-pci-bus.c
+> > > +++ b/hw/s390x/s390-pci-bus.c
+> > > @@ -867,7 +867,7 @@ static void s390_pcihost_class_init(ObjectClass *klass, void *data)
+> > >      DeviceClass *dc = DEVICE_CLASS(klass);
+> > >      HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
+> > >  
+> > > -    dc->user_creatable = false;
+> > > +    dc->user_creatable = false; /*FIXME: explain why */
+> > >      dc->reset = s390_pcihost_reset;
+> > >      k->init = s390_pcihost_init;
+> > >      hc->plug = s390_pcihost_hot_plug;
 > > 
-> > Just a quick question:
+> > (adding some more possibly interested parties)
 > > 
-> > I noticed that this breaks builds on an old fc20-based installation I
-> > run some mingw cross builds on (getting an undefined reference to
-> > `_imp__TryAcquireSRWLockExclusive@4'). I should probably take that as a
-> > trigger to update that installation ;), but wanted to confirm that this
-> > is expected.
+> > We currently have one master s390 phb (and it's been that way since
+> > s390 pci was introduced). Recently, there has been some remodelling
+> > going on to make this more similar to what sPAPR does. I think we could
+> > make this even more similar to sPAPR and have this user createable; but
+> > I'm currently not sure it's worth the effort. Opinions?
 > 
-> Yes, please try updating your mingw headers. I've done x64 cross-builds from Ubuntu 16.04 (WSL) using mingw-w64 4.0.4.
+> It looks -device s390-pcihost was never possible, anyway, because
+> no s390x machine has has_dynamic_sysbus=1, and TYPE_PCI_HOST_BRIDGE
+> is a sys-bus-device.
 
-Yes, another, more modern cross-build setup works fine. I just was a
-bit surprised that this mingw setup did not go back to Vista level.
+Yes.
+
+> 
+> Also, patch 03/19 on this series would make the explicit
+> user_creatable=false assignment in s390_pcihost_class_init()
+> unnecessary.
+
+If we switch to "sysbus devices are never user creatable, except for a
+select few" anyway, I think we can just get rid of this.
+
+> 
+> I don't think it is worth the effort to change that, unless you
+> have a specific use case that would benefit from it.
+
+Not really. We're building a highly artificical "topology" that does
+not exist on real hardware (and is not seen by the guest) here, so we
+can basically do whatever works best. We _might_ want to be more
+similar to sPAPR, so that we're not the complete oddball, but it seems
+that we can make everything work with the current setup already.
