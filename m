@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cvOIk-0003Ja-Ep
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 09:15:15 -0400
+	(envelope-from <bounces@canonical.com>) id 1cvOLF-0004Lt-4j
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 09:17:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cvOIj-0002jU-3z
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 09:15:14 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:33970)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cvOIi-0002iu-Ni
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 09:15:13 -0400
-Received: by mail-lf0-x243.google.com with SMTP id x137so15508464lff.1
-	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 06:15:12 -0700 (PDT)
+	(envelope-from <bounces@canonical.com>) id 1cvOLA-0003gx-Bd
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 09:17:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47094)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cvOLA-0003gQ-6C
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 09:17:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cvOL6-0006j5-QI
+	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 13:17:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9C4B12E80C9
+	for <qemu-devel@nongnu.org>; Tue,  4 Apr 2017 13:17:40 +0000 (UTC)
 MIME-Version: 1.0
-References: <1490965817-16913-1-git-send-email-amarnath.valluri@intel.com>
-	<1490965817-16913-5-git-send-email-amarnath.valluri@intel.com>
-In-Reply-To: <1490965817-16913-5-git-send-email-amarnath.valluri@intel.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 04 Apr 2017 13:15:00 +0000
-Message-ID: <CAJ+F1CK1BO_+CW2g=reLgRCO5f8m6vbxtppEEtFZkPwZF4eziw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/7] tpm-backend: Call interface methods
- only if backend implements them
+Date: Tue, 04 Apr 2017 13:01:34 -0000
+From: Kirill Tkhai <tkhai@yandex.ru>
+Reply-To: Bug 1131757 <1131757@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130222143343.3624.57532.malonedeb@soybean.canonical.com>
+Message-Id: <1623133635.20170404160134@yandex.ru>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1131757] wow, look at that stuff!
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,158 +36,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
-Cc: patrick.ohly@intel.com, stefanb@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
 
-Hi
+Hi friend!
 
-On Fri, Mar 31, 2017 at 4:57 PM Amarnath Valluri <amarnath.valluri@intel.co=
-m>
-wrote:
+Have you ever seen such a cool  thing before! I swear you haven't! Check
+it out http://junifeup.pt/please.php?b2b3
 
-> This allows backend implementations left optional interface methods.
->
->
-Does that make sense to make them optional? instead I would add asserts.
+Thanks for your consideration, tkhai
 
-Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
-> ---
->  backends/tpm.c           | 22 ++++++++++++++--------
->  hw/tpm/tpm_passthrough.c | 16 ----------------
->  2 files changed, 14 insertions(+), 24 deletions(-)
->
-> diff --git a/backends/tpm.c b/backends/tpm.c
-> index 00c82d7..0bdc5af 100644
-> --- a/backends/tpm.c
-> +++ b/backends/tpm.c
-> @@ -50,14 +50,16 @@ const char *tpm_backend_get_desc(TPMBackend *s)
->  {
->      TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
->
-> -    return k->ops->desc();
-> +    return k->ops->desc ? k->ops->desc() : "";
->  }
->
->  void tpm_backend_destroy(TPMBackend *s)
->  {
->      TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
->
-> -    k->ops->destroy(s);
-> +    if (k->ops->destroy) {
-> +        k->ops->destroy(s);
-> +    }
->
->      object_unref(OBJECT(s));
->  }
-> @@ -70,7 +72,7 @@ int tpm_backend_init(TPMBackend *s, TPMState *state,
->      s->tpm_state =3D state;
->      s->recv_data_callback =3D datacb;
->
-> -    return k->ops->init(s);
-> +    return k->ops->init ? k->ops->init(s) : 0;
->  }
->
->  int tpm_backend_startup_tpm(TPMBackend *s)
-> @@ -87,21 +89,21 @@ int tpm_backend_startup_tpm(TPMBackend *s)
->                             NULL);
->      }
->
-> -    return k->ops->startup_tpm(s);
-> +    return k->ops->startup_tpm ? k->ops->startup_tpm(s) : 0;
->  }
->
->  bool tpm_backend_had_startup_error(TPMBackend *s)
->  {
->      TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
->
-> -    return k->ops->had_startup_error(s);
-> +    return k->ops->had_startup_error ? k->ops->had_startup_error(s) : 0;
->  }
->
->  size_t tpm_backend_realloc_buffer(TPMBackend *s, TPMSizedBuffer *sb)
->  {
->      TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
->
-> -    return k->ops->realloc_buffer(sb);
-> +    return k->ops->realloc_buffer ? k->ops->realloc_buffer(sb) :
-> (size_t)0;
->  }
->
->  void tpm_backend_deliver_request(TPMBackend *s)
-> @@ -114,7 +116,9 @@ void tpm_backend_reset(TPMBackend *s)
->  {
->      TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
->
-> -    k->ops->reset(s);
-> +    if (k->ops->reset) {
-> +        k->ops->reset(s);
-> +    }
->
->      tpm_backend_thread_end(s);
->  }
-> @@ -123,7 +127,9 @@ void tpm_backend_cancel_cmd(TPMBackend *s)
->  {
->      TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
->
-> -    k->ops->cancel_cmd(s);
-> +    if (k->ops->cancel_cmd) {
-> +        k->ops->cancel_cmd(s);
-> +    }
->  }
->
->  bool tpm_backend_get_tpm_established_flag(TPMBackend *s)
-> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-> index cb63079..5b3bf1c 100644
-> --- a/hw/tpm/tpm_passthrough.c
-> +++ b/hw/tpm/tpm_passthrough.c
-> @@ -228,15 +228,6 @@ static void tpm_passthrough_handle_request(TPMBacken=
-d
-> *tb, TPMBackendCmd cmd)
->      }
->  }
->
-> -/*
-> - * Start the TPM (thread). If it had been started before, then terminate
-> - * and start it again.
-> - */
-> -static int tpm_passthrough_startup_tpm(TPMBackend *tb)
-> -{
-> -    return 0;
-> -}
-> -
->  static void tpm_passthrough_reset(TPMBackend *tb)
->  {
->      TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
-> @@ -248,11 +239,6 @@ static void tpm_passthrough_reset(TPMBackend *tb)
->      tpm_pt->had_startup_error =3D false;
->  }
->
-> -static int tpm_passthrough_init(TPMBackend *tb)
-> -{
-> -    return 0;
-> -}
-> -
->
+-- =
 
-These two hunks could be squashed in earlier patch
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1131757
 
+Title:
+  QEMU 1.4.0 fails to boot sparc64 linux image
 
->  static bool tpm_passthrough_get_tpm_established_flag(TPMBackend *tb)
->  {
->      return false;
-> @@ -468,8 +454,6 @@ static const TPMDriverOps tpm_passthrough_driver =3D =
-{
->      .desc                     =3D tpm_passthrough_create_desc,
->      .create                   =3D tpm_passthrough_create,
->      .destroy                  =3D tpm_passthrough_destroy,
-> -    .init                     =3D tpm_passthrough_init,
-> -    .startup_tpm              =3D tpm_passthrough_startup_tpm,
->      .realloc_buffer           =3D tpm_passthrough_realloc_buffer,
->      .reset                    =3D tpm_passthrough_reset,
->      .had_startup_error        =3D tpm_passthrough_get_startup_error,
-> --
-> 2.7.4
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+Status in QEMU:
+  Invalid
+
+Bug description:
+  Hi!
+
+  I tried to boot sparc64 linux image
+  (http://packages.debian.org/sid/sparc64/linux-
+  image-2.6-sparc64-smp/download) with qemu and received the  error.
+
+  host:~$qemu-system-sparc64 -nographic -kernel vmlinuz-3.2.0-4-sparc64-smp
+  OpenBIOS for Sparc64
+  Configuration device id QEMU version tion device id QEMUkernel addr n dev=
+ice id QEMUkernel cmdline =
+
+  CPUs:  cmdline =
+
+   x SUNW,UltraSPARC-IIi
+  UUID: 00UltraSPARC-IIi
+  Welcome to OpenBIOS v1.0 built on Aug 19 2012 13:06
+    Type 'help' for detailed information
+  [sparc64] Kernel already loaded
+  Unhandled Exception 0x0000000000000020
+  PC =3D 0x0000000000404000 NPC =3D 0x0000000000404004
+  Stopping execution
+
+  Also, I tried to follow instruction from Artyom Tarasenko blog
+  (http://tyom.blogspot.ru/2012/05/booting-linuxsparc64-on-todays-
+  openbios.html), but it's still impossible to boot linux.
+
+  Regards,
+  Kirill
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1131757/+subscriptions
