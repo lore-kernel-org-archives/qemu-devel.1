@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cvQUQ-0005iG-DK
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:35:27 -0400
+	(envelope-from <kwolf@redhat.com>) id 1cvQVK-0006YZ-Kd
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:36:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cvQUP-0006rl-9g
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:35:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48170)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cvQUP-0006rA-4U
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:35:25 -0400
-Date: Tue, 4 Apr 2017 18:35:18 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1491320063-12719-2-git-send-email-mst@redhat.com>
-References: <1491320063-12719-1-git-send-email-mst@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1491320063-12719-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 1/1] pci: Only unmap bus_master_enabled_region
- if was added previously
+	(envelope-from <kwolf@redhat.com>) id 1cvQVI-0007lq-5E
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:36:22 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue,  4 Apr 2017 17:35:56 +0200
+Message-Id: <1491320156-4629-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [RFC PATCH for-2.9] block: Ignore guest dev
+ permissions during incoming migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +18,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Max Reitz <mreitz@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>, jcody@redhat.com
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, jcody@redhat.com, Ciprian.Barbu@enea.com, Alexandru.Avadanii@enea.com, armband@enea.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Usually guest devices don't like other writers to the same image, so
+they use blk_set_perm() to prevent this from happening. In the migration
+phase before the VM is actually running, though, they don't have a
+problem with writes to the image. On the other hand, storage migration
+needs to be able to write to the image in this phase, so the restrictive
+blk_set_perm() call of qdev devices breaks it.
 
-Normally pci_init_bus_master() would be called either via
-bus->machine_done.notify or directly from do_pci_register_device().
+This patch flags all BlockBackends with a qdev device as
+blk->disable_perm during incoming migration, which means that the
+requested permissions are stored in the BlockBackend, but not actually
+applied to its root node yet.
 
-However if a device's realize() failed, pci_init_bus_master() is not
-called, and do_pci_unregister_device() fails on
-memory_region_del_subregion() as it was not mapped.
+Once migration has finished and the VM should be resumed, the
+permissions are applied. If they cannot be applied (e.g. because the NBD
+server used for block migration hasn't been shut down), resuming the VM
+fails.
 
-This adds a check that subregion was mapped before unmapping it.
-
-Fixes: c53598ed18e4 ("pci: Add missing drop of bus master AS reference")
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Tested-by: John Snow <jsnow@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- hw/pci/pci.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ block/block-backend.c | 40 +++++++++++++++++++++++++++++++++++++++-
+ include/block/block.h |  2 ++
+ migration/migration.c |  8 ++++++++
+ qmp.c                 |  6 ++++++
+ 4 files changed, 55 insertions(+), 1 deletion(-)
 
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index bd8043c..259483b 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -869,8 +869,10 @@ static void do_pci_unregister_device(PCIDevice *pci_dev)
-     pci_dev->bus->devices[pci_dev->devfn] = NULL;
-     pci_config_free(pci_dev);
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 0b63773..f817040 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -61,6 +61,7 @@ struct BlockBackend {
  
--    memory_region_del_subregion(&pci_dev->bus_master_container_region,
--                                &pci_dev->bus_master_enable_region);
-+    if (memory_region_is_mapped(&pci_dev->bus_master_enable_region)) {
-+        memory_region_del_subregion(&pci_dev->bus_master_container_region,
-+                                    &pci_dev->bus_master_enable_region);
-+    }
-     address_space_destroy(&pci_dev->bus_master_as);
+     uint64_t perm;
+     uint64_t shared_perm;
++    bool disable_perm;
+ 
+     bool allow_write_beyond_eof;
+ 
+@@ -578,7 +579,7 @@ int blk_set_perm(BlockBackend *blk, uint64_t perm, uint64_t shared_perm,
+ {
+     int ret;
+ 
+-    if (blk->root) {
++    if (blk->root && !blk->disable_perm) {
+         ret = bdrv_child_try_set_perm(blk->root, perm, shared_perm, errp);
+         if (ret < 0) {
+             return ret;
+@@ -597,15 +598,52 @@ void blk_get_perm(BlockBackend *blk, uint64_t *perm, uint64_t *shared_perm)
+     *shared_perm = blk->shared_perm;
  }
  
++/*
++ * Notifies the user of all BlockBackends that migration has completed. qdev
++ * devices can tighten their permissions in response (specifically revoke
++ * shared write permissions that we needed for storage migration).
++ *
++ * If an error is returned, the VM cannot be allowed to be resumed.
++ */
++void blk_resume_after_migration(Error **errp)
++{
++    BlockBackend *blk;
++    Error *local_err = NULL;
++
++    for (blk = blk_next(NULL); blk; blk = blk_next(blk)) {
++        if (!blk->disable_perm) {
++            continue;
++        }
++
++        blk->disable_perm = false;
++
++        blk_set_perm(blk, blk->perm, blk->shared_perm, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            blk->disable_perm = true;
++            return;
++        }
++    }
++}
++
+ static int blk_do_attach_dev(BlockBackend *blk, void *dev)
+ {
+     if (blk->dev) {
+         return -EBUSY;
+     }
++
++    /* While migration is still incoming, we don't need to apply the
++     * permissions of guest device BlockBackends. We might still have a block
++     * job or NBD server writing to the image for storage migration. */
++    if (runstate_check(RUN_STATE_INMIGRATE)) {
++        blk->disable_perm = true;
++    }
++
+     blk_ref(blk);
+     blk->dev = dev;
+     blk->legacy_dev = false;
+     blk_iostatus_reset(blk);
++
+     return 0;
+ }
+ 
+diff --git a/include/block/block.h b/include/block/block.h
+index 5149260..3e09222 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -366,6 +366,8 @@ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp);
+ void bdrv_invalidate_cache_all(Error **errp);
+ int bdrv_inactivate_all(void);
+ 
++void blk_resume_after_migration(Error **errp);
++
+ /* Ensure contents are flushed to disk.  */
+ int bdrv_flush(BlockDriverState *bs);
+ int coroutine_fn bdrv_co_flush(BlockDriverState *bs);
+diff --git a/migration/migration.c b/migration/migration.c
+index 54060f7..ad4036f 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -349,6 +349,14 @@ static void process_incoming_migration_bh(void *opaque)
+         exit(EXIT_FAILURE);
+     }
+ 
++    /* If we get an error here, just don't restart the VM yet. */
++    blk_resume_after_migration(&local_err);
++    if (local_err) {
++        error_free(local_err);
++        local_err = NULL;
++        autostart = false;
++    }
++
+     /*
+      * This must happen after all error conditions are dealt with and
+      * we're sure the VM is going to be running on this host.
+diff --git a/qmp.c b/qmp.c
+index fa82b59..a744e44 100644
+--- a/qmp.c
++++ b/qmp.c
+@@ -207,6 +207,12 @@ void qmp_cont(Error **errp)
+         }
+     }
+ 
++    blk_resume_after_migration(&local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
+     if (runstate_check(RUN_STATE_INMIGRATE)) {
+         autostart = 1;
+     } else {
 -- 
-MST
+1.8.3.1
