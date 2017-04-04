@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cvOrt-0005O6-AE
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 09:51:34 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cvOty-00062v-Mc
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 09:53:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cvOrq-0002D4-8t
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 09:51:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51086)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cvOrp-0002Co-WC
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 09:51:30 -0400
-References: <C885D0FF6A27744DB0B822E32DF6EF029B1CA14A@SESTOEX04.enea.se>
-	<9b05e60a-f8c2-ea4f-6be4-f17c0adec510@redhat.com>
-	<20170403081542.GA5036@noname.str.redhat.com>
-	<33ced3d3-acd7-2945-518d-465a4621b151@redhat.com>
-	<20170403130041.GD5036@noname.str.redhat.com>
-	<20170403135012.GY26598@andariel.pipo.sk>
-	<20170404121624.GA4536@noname.str.redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0563cea6-064b-5151-f23b-74fa394242c1@redhat.com>
-Date: Tue, 4 Apr 2017 08:51:13 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cvOtw-0003CN-Qv
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 09:53:42 -0400
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:35201)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cvOtw-0003Bt-At
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 09:53:40 -0400
+Received: by mail-lf0-x244.google.com with SMTP id v2so15601368lfi.2
+	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 06:53:40 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170404121624.GA4536@noname.str.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Jh8pEP7viTUV3LhNXdVoSP4iEJFgeTqmq"
-Subject: Re: [Qemu-devel] nbd: Possible regression in 2.9 RCs
+References: <1490965817-16913-1-git-send-email-amarnath.valluri@intel.com>
+	<1490965817-16913-7-git-send-email-amarnath.valluri@intel.com>
+In-Reply-To: <1490965817-16913-7-git-send-email-amarnath.valluri@intel.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 04 Apr 2017 13:53:28 +0000
+Message-ID: <CAJ+F1CJyHiLs=NMynZB=dadqJsRzoWwthY6gP5Pfrd3qwKHgzg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 6/7] tpm-passthrough: move reusable code to
+ utils
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,82 +31,262 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, Ciprian Barbu <Ciprian.Barbu@enea.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Alexandru Avadanii <Alexandru.Avadanii@enea.com>, Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>, svc-armband <armband@enea.com>
+To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
+Cc: patrick.ohly@intel.com, stefanb@linux.vnet.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Jh8pEP7viTUV3LhNXdVoSP4iEJFgeTqmq
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, Ciprian Barbu <Ciprian.Barbu@enea.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Alexandru Avadanii <Alexandru.Avadanii@enea.com>,
- Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- svc-armband <armband@enea.com>
-Message-ID: <0563cea6-064b-5151-f23b-74fa394242c1@redhat.com>
-Subject: Re: [Qemu-devel] nbd: Possible regression in 2.9 RCs
-References: <C885D0FF6A27744DB0B822E32DF6EF029B1CA14A@SESTOEX04.enea.se>
- <9b05e60a-f8c2-ea4f-6be4-f17c0adec510@redhat.com>
- <20170403081542.GA5036@noname.str.redhat.com>
- <33ced3d3-acd7-2945-518d-465a4621b151@redhat.com>
- <20170403130041.GD5036@noname.str.redhat.com>
- <20170403135012.GY26598@andariel.pipo.sk>
- <20170404121624.GA4536@noname.str.redhat.com>
-In-Reply-To: <20170404121624.GA4536@noname.str.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi
 
-On 04/04/2017 07:16 AM, Kevin Wolf wrote:
+On Fri, Mar 31, 2017 at 4:57 PM Amarnath Valluri <amarnath.valluri@intel.co=
+m>
+wrote:
 
->=20
-> Now the big question is how to implement this. Just not requesting the
-> write permission initially if runstate_check(RUN_STATE_INMIGRATE) is
-> easy. But we need to find a place to actually request it later, after
-> the mirror has completed, and before the VM is running.
->=20
-> My first thought was that we could add a VMChangeStateHandler and just
-> request the permission in there. However, requesting the permission can=
+> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
+>
 
-> fail (e.g. because the NBD server hasn't been shut down) and we can't
-> let a state transition fail from a VMChangeStateHandler.
->=20
-> Maybe the next best thing we could do is to have a BlockDevOps callback=
-
-> for invalidate_cache/inactivate and get the permissions there. This one=
-
-> could return an error, which would be passed up the stack and eventuall=
-y
-> cause qmp_cont() to fail (i.e. it would refuse to resume the VM). This
-> sounds workable to me.
-
-Having 'cont' refuse when write permissions can't be grabbed after all
-sounds reasonable (assuming, of course, that the common case is that the
-invalidate_cache/inactivate call that triggers the callback will
-normally succeed, because it means the source is now done and the
-destination _should_ be able to get write access at that point).
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+Nothing really controversial here. You could point out in the commit
+message that those functions will be used in the new backend perhaps.
 
 
---Jh8pEP7viTUV3LhNXdVoSP4iEJFgeTqmq
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> ---
+>  hw/tpm/tpm_passthrough.c | 77
+> ++++--------------------------------------------
+>  hw/tpm/tpm_util.c        | 60 +++++++++++++++++++++++++++++++++++++
+>  hw/tpm/tpm_util.h        |  8 +++++
+>  3 files changed, 73 insertions(+), 72 deletions(-)
+>
+> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+> index fce1163..fc60914 100644
+> --- a/hw/tpm/tpm_passthrough.c
+> +++ b/hw/tpm/tpm_passthrough.c
+> @@ -69,73 +69,6 @@ typedef struct TPMPassthruState TPMPassthruState;
+>
+>  static void tpm_passthrough_cancel_cmd(TPMBackend *tb);
+>
+> -static int tpm_passthrough_unix_write(int fd, const uint8_t *buf,
+> uint32_t len)
+> -{
+> -    int ret, remain;
+> -
+> -    remain =3D len;
+> -    while (remain > 0) {
+> -        ret =3D write(fd, buf, remain);
+> -        if (ret < 0) {
+> -            if (errno !=3D EINTR && errno !=3D EAGAIN) {
+> -                return -1;
+> -            }
+> -        } else if (ret =3D=3D 0) {
+> -            break;
+> -        } else {
+> -            buf +=3D ret;
+> -            remain -=3D ret;
+> -        }
+> -    }
+> -    return len - remain;
+> -}
+>
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+that looks like qemu_write_full()
 
-iQEcBAEBCAAGBQJY46TcAAoJEKeha0olJ0NqvRAIAJBWrVWoRwNiuOZrEnKdGK91
-YXpqg4fIZZkXP5OQrUTrLRF1a58wHH4qnq3xLOh9AVXS/GuzUVFKPyR5XvYOk7e9
-eSionmtO9TB1PBJrw1pwwQO+2SymDiK0VqRhcnW/f12IF6QFu8LGbS/C6hHUXB7J
-bgv821qyUSP/klZq8ZNlHUPJwsSUYDbSCMw8DdpkaMrieaWWL+LXZRxCNdPXdqB+
-cEpjrRQswzR7yIr5xxtPSpB1rnt/H/9hU0E0pIAhnhR5ulMZ2pyrtU5y9Fci8V10
-GLcP2u2PFdMNANuua9LpKxoNa9mOhn8zKpTbfSFwKWQqgDsWBqqs9lV7BP8dqtk=
-=en1I
------END PGP SIGNATURE-----
 
---Jh8pEP7viTUV3LhNXdVoSP4iEJFgeTqmq--
+> -
+> -static int tpm_passthrough_unix_read(int fd, uint8_t *buf, uint32_t len)
+> -{
+> -    int ret;
+> - reread:
+> -    ret =3D read(fd, buf, len);
+> -    if (ret < 0) {
+> -        if (errno !=3D EINTR && errno !=3D EAGAIN) {
+> -            return -1;
+> -        }
+> -        goto reread;
+> -    }
+> -    return ret;
+> -}
+> -
+>
+
+Eventually, we may want to switch to QIOChannel.. just some thoughts
+
+-static uint32_t tpm_passthrough_get_size_from_buffer(const uint8_t *buf)
+> -{
+> -    struct tpm_resp_hdr *resp =3D (struct tpm_resp_hdr *)buf;
+> -
+> -    return be32_to_cpu(resp->len);
+> -}
+> -
+> -/*
+> - * Write an error message in the given output buffer.
+> - */
+> -static void tpm_write_fatal_error_response(uint8_t *out, uint32_t out_le=
+n)
+> -{
+> -    if (out_len >=3D sizeof(struct tpm_resp_hdr)) {
+> -        struct tpm_resp_hdr *resp =3D (struct tpm_resp_hdr *)out;
+> -
+> -        resp->tag =3D cpu_to_be16(TPM_TAG_RSP_COMMAND);
+> -        resp->len =3D cpu_to_be32(sizeof(struct tpm_resp_hdr));
+> -        resp->errcode =3D cpu_to_be32(TPM_FAIL);
+> -    }
+> -}
+> -
+> -static bool tpm_passthrough_is_selftest(const uint8_t *in, uint32_t
+> in_len)
+> -{
+> -    struct tpm_req_hdr *hdr =3D (struct tpm_req_hdr *)in;
+> -
+> -    if (in_len >=3D sizeof(*hdr)) {
+> -        return (be32_to_cpu(hdr->ordinal) =3D=3D TPM_ORD_ContinueSelfTes=
+t);
+> -    }
+> -
+> -    return false;
+> -}
+> -
+>  static int tpm_passthrough_unix_tx_bufs(TPMPassthruState *tpm_pt,
+>                                          const uint8_t *in, uint32_t
+> in_len,
+>                                          uint8_t *out, uint32_t out_len,
+> @@ -149,9 +82,9 @@ static int
+> tpm_passthrough_unix_tx_bufs(TPMPassthruState *tpm_pt,
+>      tpm_pt->tpm_executing =3D true;
+>      *selftest_done =3D false;
+>
+> -    is_selftest =3D tpm_passthrough_is_selftest(in, in_len);
+> +    is_selftest =3D tpm_util_is_selftest(in, in_len);
+>
+> -    ret =3D tpm_passthrough_unix_write(tpm_pt->tpm_fd, in, in_len);
+> +    ret =3D tpm_util_unix_write(tpm_pt->tpm_fd, in, in_len);
+>      if (ret !=3D in_len) {
+>          if (!tpm_pt->tpm_op_canceled || errno !=3D ECANCELED) {
+>              error_report("tpm_passthrough: error while transmitting data=
+ "
+> @@ -163,7 +96,7 @@ static int
+> tpm_passthrough_unix_tx_bufs(TPMPassthruState *tpm_pt,
+>
+>      tpm_pt->tpm_executing =3D false;
+>
+> -    ret =3D tpm_passthrough_unix_read(tpm_pt->tpm_fd, out, out_len);
+> +    ret =3D tpm_util_unix_read(tpm_pt->tpm_fd, out, out_len);
+>      if (ret < 0) {
+>          if (!tpm_pt->tpm_op_canceled || errno !=3D ECANCELED) {
+>              error_report("tpm_passthrough: error while reading data from=
+ "
+> @@ -171,7 +104,7 @@ static int
+> tpm_passthrough_unix_tx_bufs(TPMPassthruState *tpm_pt,
+>                           strerror(errno), errno);
+>          }
+>      } else if (ret < sizeof(struct tpm_resp_hdr) ||
+> -               tpm_passthrough_get_size_from_buffer(out) !=3D ret) {
+> +               ((struct tpm_resp_hdr *)out)->len !=3D ret) {
+>          ret =3D -1;
+>          error_report("tpm_passthrough: received invalid response "
+>                       "packet from TPM");
+> @@ -184,7 +117,7 @@ static int
+> tpm_passthrough_unix_tx_bufs(TPMPassthruState *tpm_pt,
+>
+>  err_exit:
+>      if (ret < 0) {
+> -        tpm_write_fatal_error_response(out, out_len);
+> +        tpm_util_write_fatal_error_response(out, out_len);
+>      }
+>
+>      tpm_pt->tpm_executing =3D false;
+> diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
+> index 7b35429..5475acf 100644
+> --- a/hw/tpm/tpm_util.c
+> +++ b/hw/tpm/tpm_util.c
+> @@ -23,6 +23,66 @@
+>  #include "tpm_util.h"
+>  #include "tpm_int.h"
+>
+> +int tpm_util_unix_write(int fd, const uint8_t *buf, uint32_t len)
+> +{
+> +    int ret, remain;
+> +
+> +    remain =3D len;
+> +    while (remain > 0) {
+> +        ret =3D write(fd, buf, remain);
+> +        if (ret < 0) {
+> +            if (errno !=3D EINTR && errno !=3D EAGAIN) {
+> +                return -1;
+> +            }
+> +        } else if (ret =3D=3D 0) {
+> +            break;
+> +        } else {
+> +            buf +=3D ret;
+> +            remain -=3D ret;
+> +        }
+> +    }
+> +    return len - remain;
+> +}
+> +
+> +int tpm_util_unix_read(int fd, uint8_t *buf, uint32_t len)
+> +{
+> +    int ret;
+> + reread:
+> +    ret =3D read(fd, buf, len);
+> +    if (ret < 0) {
+> +        if (errno !=3D EINTR && errno !=3D EAGAIN) {
+> +            return -1;
+> +        }
+> +        goto reread;
+> +    }
+> +    return ret;
+> +}
+> +
+> +/*
+> + * Write an error message in the given output buffer.
+> + */
+> +void tpm_util_write_fatal_error_response(uint8_t *out, uint32_t out_len)
+> +{
+> +    if (out_len >=3D sizeof(struct tpm_resp_hdr)) {
+> +        struct tpm_resp_hdr *resp =3D (struct tpm_resp_hdr *)out;
+> +
+> +        resp->tag =3D cpu_to_be16(TPM_TAG_RSP_COMMAND);
+> +        resp->len =3D cpu_to_be32(sizeof(struct tpm_resp_hdr));
+> +        resp->errcode =3D cpu_to_be32(TPM_FAIL);
+> +    }
+> +}
+> +
+> +bool tpm_util_is_selftest(const uint8_t *in, uint32_t in_len)
+> +{
+> +    struct tpm_req_hdr *hdr =3D (struct tpm_req_hdr *)in;
+> +
+> +    if (in_len >=3D sizeof(*hdr)) {
+> +        return (be32_to_cpu(hdr->ordinal) =3D=3D TPM_ORD_ContinueSelfTes=
+t);
+> +    }
+> +
+> +    return false;
+> +}
+> +
+>  /*
+>   * A basic test of a TPM device. We expect a well formatted response
+> header
+>   * (error response is fine) within one second.
+> diff --git a/hw/tpm/tpm_util.h b/hw/tpm/tpm_util.h
+> index df76245..c2feca7 100644
+> --- a/hw/tpm/tpm_util.h
+> +++ b/hw/tpm/tpm_util.h
+> @@ -24,6 +24,14 @@
+>
+>  #include "sysemu/tpm_backend.h"
+>
+> +int tpm_util_unix_write(int fd, const uint8_t *buf, uint32_t len);
+> +
+> +int tpm_util_unix_read(int fd, uint8_t *buf, uint32_t len);
+> +
+> +void tpm_util_write_fatal_error_response(uint8_t *out, uint32_t out_len)=
+;
+> +
+> +bool tpm_util_is_selftest(const uint8_t *in, uint32_t in_len);
+> +
+>  int tpm_util_test_tpmdev(int tpm_fd, TPMVersion *tpm_version);
+>
+>  #endif /* TPM_TPM_UTIL_H */
+> --
+> 2.7.4
+>
+>
+> --
+Marc-Andr=C3=A9 Lureau
