@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cvNYv-0005j9-Ft
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 08:27:54 -0400
+	(envelope-from <ali.saeedi56@gmail.com>) id 1cvNZD-0005sR-17
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 08:28:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cvNYu-0006Ol-MS
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 08:27:53 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:33221)
+	(envelope-from <ali.saeedi56@gmail.com>) id 1cvNZC-0006SI-0I
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 08:28:11 -0400
+Received: from mail-qk0-x235.google.com ([2607:f8b0:400d:c09::235]:33024)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cvNYu-0006OX-GN
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 08:27:52 -0400
-Received: by mail-wr0-x231.google.com with SMTP id w43so212041402wrb.0
-	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 05:27:52 -0700 (PDT)
+	(Exim 4.71) (envelope-from <ali.saeedi56@gmail.com>)
+	id 1cvNZB-0006SD-RV
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 08:28:09 -0400
+Received: by mail-qk0-x235.google.com with SMTP id h67so40695783qke.0
+	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 05:28:09 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1490276212-32008-2-git-send-email-diana.craciun@nxp.com>
-References: <1490276212-32008-1-git-send-email-diana.craciun@nxp.com>
-	<1490276212-32008-2-git-send-email-diana.craciun@nxp.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 4 Apr 2017 13:27:29 +0100
-Message-ID: <CAFEAcA8s9aR4rbJzd=9-oRashOGvUtSL4xxqbu2M1Cv2YFND7Q@mail.gmail.com>
+From: ali saeedi <ali.saeedi56@gmail.com>
+Date: Tue, 4 Apr 2017 16:58:08 +0430
+Message-ID: <CAGKXQycuTMYj2UrhWStNpj4ziDdHNd=JQwTQZgqJ2n9bshCd3w@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH RFC 1/2] Increased the size of requester_id
- field from MemTxAttrs
+Subject: [Qemu-devel] Qemu VM Live Migration Code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +26,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Diana Craciun <diana.craciun@nxp.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Eric Auger <eric.auger@redhat.com>, Mihai Claudiu Caraman <mike.caraman@nxp.com>, bharat.bhushan@nxp.com, Christoffer Dall <christoffer.dall@linaro.org>, laurentiu.tudor@nxp.com
+To: qemu-devel@nongnu.org
 
-On 23 March 2017 at 13:36, Diana Craciun <diana.craciun@nxp.com> wrote:
-> The PCI requester ID field is 16 bits. The requester_id field
-> from MemTxAttrs is used for MSIs to specify the device ID for
-> the platforms where this device ID is needed (e.g virt machine + GICv3
-> ITS). However, if more entities that uses MSIs in the system are used,
-> 16 bit is no longer enough to represent the device ID. Increased the size
-> of this field to 24 bits in order to accomodate 256 entities.
-> Also the name requester_id does no longer reflect the content, so
-> the name was changed to stream_id.
-
-This name change would be reverting the name change in
-commit a05f686ff3, which says:
-    MemTxAttrs.stream_id also renamed to requester_id in order to better
-    reflect semantics of the field.
-
-I don't have a strong opinion about the name myself, but flipping
-backwards and forwards doesn't seem like a great plan :-)
-
-thanks
--- PMM
+Hello
+I am a student who is interested in vm live migration. I want to understand
+vm live migration code in qemu. so I tried to understand the code that is
+available in 'migration.c' but it is very difficult for me to understand (I
+have started from migration_thread function). I also has studied
+migration.txt doc in docs folder. but i need more simple document to understand
+the code. I know the basic for precopy, postcopy and hybrid algorithms of
+vm live migration. I want to understand this implementation and implement
+myown  idea by changing this code but I have problems for understanding it.
+I also studied this link:
+https://developers.redhat.com/blog/2015/03/24/live-
+migrating-qemu-kvm-virtual-machines/
+but i need more detail to  understand. I will be so grateful if anybody
+recommend me a document, resource or any advice that help me for realizing
+migration code in 'migration.c' ?
+thanks a lot
