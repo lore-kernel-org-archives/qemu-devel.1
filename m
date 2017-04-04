@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cvMu5-0005Bn-US
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 07:45:42 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cvN1P-0006ts-8j
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 07:53:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cvMu4-0001iM-Mv
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 07:45:41 -0400
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:34082)
+	(envelope-from <peter.maydell@linaro.org>) id 1cvN1O-0006Dr-HA
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 07:53:15 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:35772)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cvMu4-0001i7-Fh
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 07:45:40 -0400
-Received: by mail-wr0-x233.google.com with SMTP id t20so6399138wra.1
-	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 04:45:40 -0700 (PDT)
+	id 1cvN1O-0006Dl-9W
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 07:53:14 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id k6so206960816wre.2
+	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 04:53:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8o15m5PgRPdGtHRgP=t4EZf5EPZKnJ7J=G0dosBHZXBA@mail.gmail.com>
-References: <1489414630-21609-1-git-send-email-ard.biesheuvel@linaro.org>
-	<CAFEAcA8o15m5PgRPdGtHRgP=t4EZf5EPZKnJ7J=G0dosBHZXBA@mail.gmail.com>
+In-Reply-To: <20170313184750.429-1-krzk@kernel.org>
+References: <20170313184750.429-1-krzk@kernel.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 4 Apr 2017 12:45:18 +0100
-Message-ID: <CAFEAcA-NxhpE_23Ec=+iWSzPeee6aEvj70dU0G26CETd5bofig@mail.gmail.com>
+Date: Tue, 4 Apr 2017 12:52:51 +0100
+Message-ID: <CAFEAcA8ErNnDj9XsJGG0ziDyeCA+T_N-HZf1DhXSAVTvzG=wPg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2] hw/arm/boot: take Linux/arm64
- TEXT_OFFSET header field into account
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] hw/arm/exynos: Minor cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Mark Rutland <mark.rutland@arm.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-On 20 March 2017 at 11:13, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 13 March 2017 at 14:17, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->> The arm64 boot protocol stipulates that the kernel must be loaded
->> TEXT_OFFSET bytes beyond a 2 MB aligned base address, where TEXT_OFFSET
->> could be any 4 KB multiple between 0 and 2 MB, and whose value can be
->> found in the header of the Image file.
->>
->> So after attempts to load the arm64 kernel image as an ELF file or as a
->> U-Boot image have failed (both of which have their own way of specifying
->> the load offset), try to determine the TEXT_OFFSET from the image after
->> loading it but before mapping it as a ROM mapping into the guest address
->> space.
->>
->> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->> ---
->> v2: split off AArch64 specific loader logic regarding gzipped/raw and variable
->>     load offset into a separate helper function, which removes the need for
->>     loading the image twice
+On 13 March 2017 at 18:47, Krzysztof Kozlowski <krzk@kernel.org> wrote:
+> Hi,
 >
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Minor cleanups, no dependencies.
 >
-> Since we're due to tag rc1 tomorrow and this is kind of on the
-> border between bugfix and new feature, I think I'd rather
-> defer it to 2.10, unless you have a strong view that it should
-> go into 2.9.
+> Changes since v1
+> ================
+> 1. Patch 1/3: Address missed Philippe's comments about error reporting
+>    verbosity.
+>
+> Changes since v2
+> ================
+> 1. Patch 1/3: Address Eric's comment.
+> 2. Patch 2/3: Address Peter's comments about "const".
+> 3. Patch 3/3: Use "unsigned int". I had impression that no consensus was
+>    reached during discussion. If that is wrong impression, let me know.
 
-Since we're now at rc3 and I don't expect to need to do another
-arm pull request before 2.9, I've put this patch into target-arm.next
-for 2.10.
+Applied to target-arm.next for 2.10, thanks.
+
+(I wrapped a long line in patch 1 that checkpatch complains about.)
 
 thanks
 -- PMM
