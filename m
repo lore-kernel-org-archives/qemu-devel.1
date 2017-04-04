@@ -1,32 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cvQB2-0005fk-CP
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:15:25 -0400
+	(envelope-from <berrange@redhat.com>) id 1cvQG0-0007BT-EU
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:20:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cvQAz-0003us-5A
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:15:24 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:35524)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cvQAz-0003ug-27
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:15:21 -0400
-Received: by mail-qk0-x244.google.com with SMTP id k139so12722955qke.2
-	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 08:15:21 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170316092121.25672-1-marcandre.lureau@redhat.com>
-	<20170316092121.25672-4-marcandre.lureau@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <20bc59c7-9270-7f26-1448-3cf9f392205f@amsat.org>
-Date: Tue, 4 Apr 2017 12:15:16 -0300
-MIME-Version: 1.0
-In-Reply-To: <20170316092121.25672-4-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 03/21] xen: use a better chardev type
- check
+	(envelope-from <berrange@redhat.com>) id 1cvQFv-0005fB-M2
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:20:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37900)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cvQFv-0005eh-Gj
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:20:27 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Tue,  4 Apr 2017 16:20:09 +0100
+Message-Id: <20170404152011.16119-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PULL v1 0/2] Merge qio 2017/04/04 v1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,30 +21,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On 03/16/2017 06:21 AM, Marc-André Lureau wrote:
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+The following changes since commit 87cc4c61020addea6a001b94b662596b1896d1b3:
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2017-04-04 11:40:55 +0100)
 
-> ---
->  xen-common.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/xen-common.c b/xen-common.c
-> index fd2c92847e..d46685ef4e 100644
-> --- a/xen-common.c
-> +++ b/xen-common.c
-> @@ -34,7 +34,7 @@ static int store_dev_info(int domid, Chardev *cs, const char *string)
->      int ret = -1;
->
->      /* Only continue if we're talking to a pty. */
-> -    if (strncmp(cs->filename, "pty:", 4)) {
-> +    if (!CHARDEV_IS_PTY(cs)) {
->          return 0;
->      }
->      pts = cs->filename + 4;
->
+are available in the git repository at:
+
+  git://github.com/berrange/qemu tags/pull-qio-2017-04-04-1
+
+for you to fetch changes up to b8a68728b6a3fad86f15aa5efdc31ea0b3cb8a62:
+
+  io: fix FD socket handling in DNS lookup (2017-04-04 16:17:03 +0100)
+
+----------------------------------------------------------------
+Merge qio 2017/04/04 v1
+
+----------------------------------------------------------------
+
+Daniel P. Berrange (1):
+  io: fix FD socket handling in DNS lookup
+
+Wang guang (1):
+  io: fix incoming client socket initialization
+
+ io/channel-socket.c            | 8 +-------
+ io/dns-resolver.c              | 5 +----
+ tests/test-io-channel-socket.c | 8 ++++++++
+ 3 files changed, 10 insertions(+), 11 deletions(-)
+
+-- 
+2.9.3
