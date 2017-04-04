@@ -1,15 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cvQVK-0006YZ-Kd
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:36:24 -0400
+	(envelope-from <berrange@redhat.com>) id 1cvQcm-0005Cd-FG
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:44:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cvQVI-0007lq-5E
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:36:22 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue,  4 Apr 2017 17:35:56 +0200
-Message-Id: <1491320156-4629-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH for-2.9] block: Ignore guest dev
- permissions during incoming migration
+	(envelope-from <berrange@redhat.com>) id 1cvQci-0006r4-N7
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:44:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44254)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cvQci-0006pP-EO
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:44:00 -0400
+Date: Tue, 4 Apr 2017 16:43:55 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170404154355.GY25661@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1490965817-16913-1-git-send-email-amarnath.valluri@intel.com>
+	<20170403170738.GC2768@redhat.com>
+	<CAJ+F1CKVU+bgyE2Z7v3kECZ-GVLj+gMiiRoSZt7yWGMj0UkfgA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CKVU+bgyE2Z7v3kECZ-GVLj+gMiiRoSZt7yWGMj0UkfgA@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/7] Provide support for the software TPM
+ emulator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,156 +31,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, jcody@redhat.com, Ciprian.Barbu@enea.com, Alexandru.Avadanii@enea.com, armband@enea.com, eblake@redhat.com, qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Amarnath Valluri <amarnath.valluri@intel.com>, patrick.ohly@intel.com, qemu-devel@nongnu.org, stefanb@linux.vnet.ibm.com
 
-Usually guest devices don't like other writers to the same image, so
-they use blk_set_perm() to prevent this from happening. In the migration
-phase before the VM is actually running, though, they don't have a
-problem with writes to the image. On the other hand, storage migration
-needs to be able to write to the image in this phase, so the restrictive
-blk_set_perm() call of qdev devices breaks it.
+On Mon, Apr 03, 2017 at 05:18:37PM +0000, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>=20
+> On Mon, Apr 3, 2017 at 7:08 PM Daniel P. Berrange <berrange@redhat.com>
+> wrote:
+>=20
+> > On Fri, Mar 31, 2017 at 04:10:09PM +0300, Amarnath Valluri wrote:
+> > > Briefly, Theses set of patches introduces:
+> > >  - new TPM backend driver to support software TPM emulators(swtpm(1=
+)).
+> > >  - and few supported fixes/enhancements/cleanup to existing tpm bac=
+kend
+> > code.
+> > >
+> > > The similar idea was initiated earliar(2) by Stefan Berger(CCed) wi=
+th
+> > slightly
+> > > different approach, using CUSE. As swtpm has excellent support for =
+unix
+> > domain
+> > > sockets, hence this implementation uses unix domain sockets to
+> > communicate with
+> > > swtpm.
+> > >
+> > > When Qemu is configured with 'emulator' tpm backend, it spawns 'swt=
+pm'
+> > and
+> > > communicates its via Unix domain sockets.
+> >
+> > I'm not convinced that having QEMU spawning swtpm itself is a desirab=
+le
+> > approach, as it means QEMU needs to have all the privileges that swtp=
+m
+> > will need, so that swtpm can inherit them. At the very least I think =
+we
+> > need to have a way to disable this spawning, so it can connect to a
+> > pre-existing swtpm process that's been spawned ahead of time. This wi=
+ll
+> > let us have stricter privilege separation.
+> >
+>=20
+> Could the security contexts be given as arguments to qemu for the
+> subprocesses? The reason to have qemu spawn its own subprocess is that =
+it
+> would leave more flexibility on how and when to do it, or even to use
+> multiple subprcesses if some day that makes sense. If there is no reaso=
+n to
+> make this interface public or shared by various other processes, I woul=
+d
+> rather see it as internal to qemu rather than managed by other tools. I=
+t
+> also makes command line & testing easier.
 
-This patch flags all BlockBackends with a qdev device as
-blk->disable_perm during incoming migration, which means that the
-requested permissions are stored in the BlockBackend, but not actually
-applied to its root node yet.
+If QEMU is responsible for spawning it, then swtpm would have to run as t=
+he
+same user/group as QEMU, as we do not want QEMU to have ability to invoke
+programs with setuid. This means any state files / config / devices that
+swtpm has to access would also be accessible by QEMU directly (assuming j=
+ust
+DAC controls, no MAC like SELinux). It also means that swtpm would be abl=
+e
+to access QEMU resources - so a bug in swtpm would allow swtpm to comprom=
+ise
+the guest disk image and other resources QEMU access.
 
-Once migration has finished and the VM should be resumed, the
-permissions are applied. If they cannot be applied (e.g. because the NBD
-server used for block migration hasn't been shut down), resuming the VM
-fails.
+If by contrast, libvirtd is responsible for spawning it, or an even a hig=
+her
+level mgmt app like OpenStack/oVirt, then swtpm can be run with completel=
+y
+isolated user / group privileges. The only resource that QEMU needs acces=
+s
+to is the UNIX domain socket, and swtpm doesn't need to access anything
+belonging to QEMU. This will give us much stronger security separation
+between swtpm & QEMU.  It will also allow us to write a more useful secco=
+mp
+policy that entirey blocks exec() from QEMU, further mitigating damage fr=
+om
+potential QEMU exploits.=20
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/block-backend.c | 40 +++++++++++++++++++++++++++++++++++++++-
- include/block/block.h |  2 ++
- migration/migration.c |  8 ++++++++
- qmp.c                 |  6 ++++++
- 4 files changed, 55 insertions(+), 1 deletion(-)
-
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 0b63773..f817040 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -61,6 +61,7 @@ struct BlockBackend {
- 
-     uint64_t perm;
-     uint64_t shared_perm;
-+    bool disable_perm;
- 
-     bool allow_write_beyond_eof;
- 
-@@ -578,7 +579,7 @@ int blk_set_perm(BlockBackend *blk, uint64_t perm, uint64_t shared_perm,
- {
-     int ret;
- 
--    if (blk->root) {
-+    if (blk->root && !blk->disable_perm) {
-         ret = bdrv_child_try_set_perm(blk->root, perm, shared_perm, errp);
-         if (ret < 0) {
-             return ret;
-@@ -597,15 +598,52 @@ void blk_get_perm(BlockBackend *blk, uint64_t *perm, uint64_t *shared_perm)
-     *shared_perm = blk->shared_perm;
- }
- 
-+/*
-+ * Notifies the user of all BlockBackends that migration has completed. qdev
-+ * devices can tighten their permissions in response (specifically revoke
-+ * shared write permissions that we needed for storage migration).
-+ *
-+ * If an error is returned, the VM cannot be allowed to be resumed.
-+ */
-+void blk_resume_after_migration(Error **errp)
-+{
-+    BlockBackend *blk;
-+    Error *local_err = NULL;
-+
-+    for (blk = blk_next(NULL); blk; blk = blk_next(blk)) {
-+        if (!blk->disable_perm) {
-+            continue;
-+        }
-+
-+        blk->disable_perm = false;
-+
-+        blk_set_perm(blk, blk->perm, blk->shared_perm, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            blk->disable_perm = true;
-+            return;
-+        }
-+    }
-+}
-+
- static int blk_do_attach_dev(BlockBackend *blk, void *dev)
- {
-     if (blk->dev) {
-         return -EBUSY;
-     }
-+
-+    /* While migration is still incoming, we don't need to apply the
-+     * permissions of guest device BlockBackends. We might still have a block
-+     * job or NBD server writing to the image for storage migration. */
-+    if (runstate_check(RUN_STATE_INMIGRATE)) {
-+        blk->disable_perm = true;
-+    }
-+
-     blk_ref(blk);
-     blk->dev = dev;
-     blk->legacy_dev = false;
-     blk_iostatus_reset(blk);
-+
-     return 0;
- }
- 
-diff --git a/include/block/block.h b/include/block/block.h
-index 5149260..3e09222 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -366,6 +366,8 @@ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp);
- void bdrv_invalidate_cache_all(Error **errp);
- int bdrv_inactivate_all(void);
- 
-+void blk_resume_after_migration(Error **errp);
-+
- /* Ensure contents are flushed to disk.  */
- int bdrv_flush(BlockDriverState *bs);
- int coroutine_fn bdrv_co_flush(BlockDriverState *bs);
-diff --git a/migration/migration.c b/migration/migration.c
-index 54060f7..ad4036f 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -349,6 +349,14 @@ static void process_incoming_migration_bh(void *opaque)
-         exit(EXIT_FAILURE);
-     }
- 
-+    /* If we get an error here, just don't restart the VM yet. */
-+    blk_resume_after_migration(&local_err);
-+    if (local_err) {
-+        error_free(local_err);
-+        local_err = NULL;
-+        autostart = false;
-+    }
-+
-     /*
-      * This must happen after all error conditions are dealt with and
-      * we're sure the VM is going to be running on this host.
-diff --git a/qmp.c b/qmp.c
-index fa82b59..a744e44 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -207,6 +207,12 @@ void qmp_cont(Error **errp)
-         }
-     }
- 
-+    blk_resume_after_migration(&local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-     if (runstate_check(RUN_STATE_INMIGRATE)) {
-         autostart = 1;
-     } else {
--- 
-1.8.3.1
+Regards,
+Daniel
+--=20
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange=
+/ :|
+|: http://libvirt.org              -o-             http://virt-manager.or=
+g :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr=
+/ :|
