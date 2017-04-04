@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cvOty-00062v-Mc
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 09:53:44 -0400
+	(envelope-from <kwolf@redhat.com>) id 1cvOug-0006QS-4s
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 09:54:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cvOtw-0003CN-Qv
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 09:53:42 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:35201)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cvOtw-0003Bt-At
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 09:53:40 -0400
-Received: by mail-lf0-x244.google.com with SMTP id v2so15601368lfi.2
-	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 06:53:40 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1cvOud-0003fJ-34
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 09:54:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54984)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1cvOuc-0003eu-O6
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 09:54:23 -0400
+Date: Tue, 4 Apr 2017 15:54:14 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170404135414.GC4536@noname.str.redhat.com>
+References: <C885D0FF6A27744DB0B822E32DF6EF029B1CA14A@SESTOEX04.enea.se>
+	<9b05e60a-f8c2-ea4f-6be4-f17c0adec510@redhat.com>
+	<20170403081542.GA5036@noname.str.redhat.com>
+	<20170403125148.GX26598@andariel.pipo.sk>
+	<20170404131902.GB4536@noname.str.redhat.com>
+	<20170404132705.GE26598@andariel.pipo.sk>
 MIME-Version: 1.0
-References: <1490965817-16913-1-git-send-email-amarnath.valluri@intel.com>
-	<1490965817-16913-7-git-send-email-amarnath.valluri@intel.com>
-In-Reply-To: <1490965817-16913-7-git-send-email-amarnath.valluri@intel.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 04 Apr 2017 13:53:28 +0000
-Message-ID: <CAJ+F1CJyHiLs=NMynZB=dadqJsRzoWwthY6gP5Pfrd3qwKHgzg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 6/7] tpm-passthrough: move reusable code to
- utils
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="B4IIlcmfBL/1gGOG"
+Content-Disposition: inline
+In-Reply-To: <20170404132705.GE26598@andariel.pipo.sk>
+Subject: Re: [Qemu-devel] nbd: Possible regression in 2.9 RCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,262 +32,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
-Cc: patrick.ohly@intel.com, stefanb@linux.vnet.ibm.com
-
-Hi
-
-On Fri, Mar 31, 2017 at 4:57 PM Amarnath Valluri <amarnath.valluri@intel.co=
-m>
-wrote:
-
-> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
->
-
-Nothing really controversial here. You could point out in the commit
-message that those functions will be used in the new backend perhaps.
+To: Peter Krempa <pkrempa@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, Ciprian Barbu <Ciprian.Barbu@enea.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Alexandru Avadanii <Alexandru.Avadanii@enea.com>, Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>, svc-armband <armband@enea.com>
 
 
-> ---
->  hw/tpm/tpm_passthrough.c | 77
-> ++++--------------------------------------------
->  hw/tpm/tpm_util.c        | 60 +++++++++++++++++++++++++++++++++++++
->  hw/tpm/tpm_util.h        |  8 +++++
->  3 files changed, 73 insertions(+), 72 deletions(-)
->
-> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-> index fce1163..fc60914 100644
-> --- a/hw/tpm/tpm_passthrough.c
-> +++ b/hw/tpm/tpm_passthrough.c
-> @@ -69,73 +69,6 @@ typedef struct TPMPassthruState TPMPassthruState;
->
->  static void tpm_passthrough_cancel_cmd(TPMBackend *tb);
->
-> -static int tpm_passthrough_unix_write(int fd, const uint8_t *buf,
-> uint32_t len)
-> -{
-> -    int ret, remain;
-> -
-> -    remain =3D len;
-> -    while (remain > 0) {
-> -        ret =3D write(fd, buf, remain);
-> -        if (ret < 0) {
-> -            if (errno !=3D EINTR && errno !=3D EAGAIN) {
-> -                return -1;
-> -            }
-> -        } else if (ret =3D=3D 0) {
-> -            break;
-> -        } else {
-> -            buf +=3D ret;
-> -            remain -=3D ret;
-> -        }
-> -    }
-> -    return len - remain;
-> -}
->
+--B4IIlcmfBL/1gGOG
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-that looks like qemu_write_full()
+Am 04.04.2017 um 15:27 hat Peter Krempa geschrieben:
+> On Tue, Apr 04, 2017 at 15:19:02 +0200, Kevin Wolf wrote:
+> > Am 03.04.2017 um 14:51 hat Peter Krempa geschrieben:
+> > > On Mon, Apr 03, 2017 at 10:15:42 +0200, Kevin Wolf wrote:
+> > > > Am 31.03.2017 um 19:43 hat Max Reitz geschrieben:
+> > > > > On 31.03.2017 18:03, Ciprian Barbu wrote:
+>=20
+> [...]
+>=20
+> > > > Peter, Eric, what is the status on the libvirt side here?
+> > >=20
+> > > Libvirt currently uses the NBD server only for non-shared storage
+> > > migration. At that point the disk is not shared (while qemu may think
+> > > so) since the other side is not actually running until the mirror
+> > > reaches synchronized state.
+> >=20
+> > Yes, I misunderstood the situation at first.
+> >=20
+> > Anyway, is there already a libvirt patch for the cases where the image
+> > is actually shared?
+>=20
+> As said, we use the nbd server only for migration. There's no other
+> usage I know of and thus no patch.
 
+I mean two VMs sharing the same image file, and both expose it as a
+guest device. The situation for which we discussed before that libvirt
+needs to pass share-rw=3Don. I understand that this isn't related to this
+report, but I want to make sure that it's not forgotten.
 
-> -
-> -static int tpm_passthrough_unix_read(int fd, uint8_t *buf, uint32_t len)
-> -{
-> -    int ret;
-> - reread:
-> -    ret =3D read(fd, buf, len);
-> -    if (ret < 0) {
-> -        if (errno !=3D EINTR && errno !=3D EAGAIN) {
-> -            return -1;
-> -        }
-> -        goto reread;
-> -    }
-> -    return ret;
-> -}
-> -
->
+Kevin
 
-Eventually, we may want to switch to QIOChannel.. just some thoughts
+--B4IIlcmfBL/1gGOG
+Content-Type: application/pgp-signature
 
--static uint32_t tpm_passthrough_get_size_from_buffer(const uint8_t *buf)
-> -{
-> -    struct tpm_resp_hdr *resp =3D (struct tpm_resp_hdr *)buf;
-> -
-> -    return be32_to_cpu(resp->len);
-> -}
-> -
-> -/*
-> - * Write an error message in the given output buffer.
-> - */
-> -static void tpm_write_fatal_error_response(uint8_t *out, uint32_t out_le=
-n)
-> -{
-> -    if (out_len >=3D sizeof(struct tpm_resp_hdr)) {
-> -        struct tpm_resp_hdr *resp =3D (struct tpm_resp_hdr *)out;
-> -
-> -        resp->tag =3D cpu_to_be16(TPM_TAG_RSP_COMMAND);
-> -        resp->len =3D cpu_to_be32(sizeof(struct tpm_resp_hdr));
-> -        resp->errcode =3D cpu_to_be32(TPM_FAIL);
-> -    }
-> -}
-> -
-> -static bool tpm_passthrough_is_selftest(const uint8_t *in, uint32_t
-> in_len)
-> -{
-> -    struct tpm_req_hdr *hdr =3D (struct tpm_req_hdr *)in;
-> -
-> -    if (in_len >=3D sizeof(*hdr)) {
-> -        return (be32_to_cpu(hdr->ordinal) =3D=3D TPM_ORD_ContinueSelfTes=
-t);
-> -    }
-> -
-> -    return false;
-> -}
-> -
->  static int tpm_passthrough_unix_tx_bufs(TPMPassthruState *tpm_pt,
->                                          const uint8_t *in, uint32_t
-> in_len,
->                                          uint8_t *out, uint32_t out_len,
-> @@ -149,9 +82,9 @@ static int
-> tpm_passthrough_unix_tx_bufs(TPMPassthruState *tpm_pt,
->      tpm_pt->tpm_executing =3D true;
->      *selftest_done =3D false;
->
-> -    is_selftest =3D tpm_passthrough_is_selftest(in, in_len);
-> +    is_selftest =3D tpm_util_is_selftest(in, in_len);
->
-> -    ret =3D tpm_passthrough_unix_write(tpm_pt->tpm_fd, in, in_len);
-> +    ret =3D tpm_util_unix_write(tpm_pt->tpm_fd, in, in_len);
->      if (ret !=3D in_len) {
->          if (!tpm_pt->tpm_op_canceled || errno !=3D ECANCELED) {
->              error_report("tpm_passthrough: error while transmitting data=
- "
-> @@ -163,7 +96,7 @@ static int
-> tpm_passthrough_unix_tx_bufs(TPMPassthruState *tpm_pt,
->
->      tpm_pt->tpm_executing =3D false;
->
-> -    ret =3D tpm_passthrough_unix_read(tpm_pt->tpm_fd, out, out_len);
-> +    ret =3D tpm_util_unix_read(tpm_pt->tpm_fd, out, out_len);
->      if (ret < 0) {
->          if (!tpm_pt->tpm_op_canceled || errno !=3D ECANCELED) {
->              error_report("tpm_passthrough: error while reading data from=
- "
-> @@ -171,7 +104,7 @@ static int
-> tpm_passthrough_unix_tx_bufs(TPMPassthruState *tpm_pt,
->                           strerror(errno), errno);
->          }
->      } else if (ret < sizeof(struct tpm_resp_hdr) ||
-> -               tpm_passthrough_get_size_from_buffer(out) !=3D ret) {
-> +               ((struct tpm_resp_hdr *)out)->len !=3D ret) {
->          ret =3D -1;
->          error_report("tpm_passthrough: received invalid response "
->                       "packet from TPM");
-> @@ -184,7 +117,7 @@ static int
-> tpm_passthrough_unix_tx_bufs(TPMPassthruState *tpm_pt,
->
->  err_exit:
->      if (ret < 0) {
-> -        tpm_write_fatal_error_response(out, out_len);
-> +        tpm_util_write_fatal_error_response(out, out_len);
->      }
->
->      tpm_pt->tpm_executing =3D false;
-> diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
-> index 7b35429..5475acf 100644
-> --- a/hw/tpm/tpm_util.c
-> +++ b/hw/tpm/tpm_util.c
-> @@ -23,6 +23,66 @@
->  #include "tpm_util.h"
->  #include "tpm_int.h"
->
-> +int tpm_util_unix_write(int fd, const uint8_t *buf, uint32_t len)
-> +{
-> +    int ret, remain;
-> +
-> +    remain =3D len;
-> +    while (remain > 0) {
-> +        ret =3D write(fd, buf, remain);
-> +        if (ret < 0) {
-> +            if (errno !=3D EINTR && errno !=3D EAGAIN) {
-> +                return -1;
-> +            }
-> +        } else if (ret =3D=3D 0) {
-> +            break;
-> +        } else {
-> +            buf +=3D ret;
-> +            remain -=3D ret;
-> +        }
-> +    }
-> +    return len - remain;
-> +}
-> +
-> +int tpm_util_unix_read(int fd, uint8_t *buf, uint32_t len)
-> +{
-> +    int ret;
-> + reread:
-> +    ret =3D read(fd, buf, len);
-> +    if (ret < 0) {
-> +        if (errno !=3D EINTR && errno !=3D EAGAIN) {
-> +            return -1;
-> +        }
-> +        goto reread;
-> +    }
-> +    return ret;
-> +}
-> +
-> +/*
-> + * Write an error message in the given output buffer.
-> + */
-> +void tpm_util_write_fatal_error_response(uint8_t *out, uint32_t out_len)
-> +{
-> +    if (out_len >=3D sizeof(struct tpm_resp_hdr)) {
-> +        struct tpm_resp_hdr *resp =3D (struct tpm_resp_hdr *)out;
-> +
-> +        resp->tag =3D cpu_to_be16(TPM_TAG_RSP_COMMAND);
-> +        resp->len =3D cpu_to_be32(sizeof(struct tpm_resp_hdr));
-> +        resp->errcode =3D cpu_to_be32(TPM_FAIL);
-> +    }
-> +}
-> +
-> +bool tpm_util_is_selftest(const uint8_t *in, uint32_t in_len)
-> +{
-> +    struct tpm_req_hdr *hdr =3D (struct tpm_req_hdr *)in;
-> +
-> +    if (in_len >=3D sizeof(*hdr)) {
-> +        return (be32_to_cpu(hdr->ordinal) =3D=3D TPM_ORD_ContinueSelfTes=
-t);
-> +    }
-> +
-> +    return false;
-> +}
-> +
->  /*
->   * A basic test of a TPM device. We expect a well formatted response
-> header
->   * (error response is fine) within one second.
-> diff --git a/hw/tpm/tpm_util.h b/hw/tpm/tpm_util.h
-> index df76245..c2feca7 100644
-> --- a/hw/tpm/tpm_util.h
-> +++ b/hw/tpm/tpm_util.h
-> @@ -24,6 +24,14 @@
->
->  #include "sysemu/tpm_backend.h"
->
-> +int tpm_util_unix_write(int fd, const uint8_t *buf, uint32_t len);
-> +
-> +int tpm_util_unix_read(int fd, uint8_t *buf, uint32_t len);
-> +
-> +void tpm_util_write_fatal_error_response(uint8_t *out, uint32_t out_len)=
-;
-> +
-> +bool tpm_util_is_selftest(const uint8_t *in, uint32_t in_len);
-> +
->  int tpm_util_test_tpmdev(int tpm_fd, TPMVersion *tpm_version);
->
->  #endif /* TPM_TPM_UTIL_H */
-> --
-> 2.7.4
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJY46WGAAoJEH8JsnLIjy/WdD0P/10xh6ngPQE0Wn4x7JtgwEwh
+hAOJOMfJ7V3hcbUVDnp00rVJc636cXpTUXLyX6OtNDGlOrMOXBBJ01UqLrcqkdUX
+rMMsp2urMScG9WLiEm7YF9BYdvtIUL70EXS1ro1RbFw/aXpsfC8VdG1ZfVvi4Vt4
+6GCV39O71n1KkP9HD5897vArox+4DZa8XzfNcxB8aNkXthstpvDm3+OAXJt24nuL
+uRPIwc8i8nTIhdhb2GfHBRgP4e6UESR5RHilmQpPRAkcGg38PJGnoArUiBgDiMSG
+JcBWhNk4gFGneWJ4jwMkh2oSzvITh08mFboBbwbxMhoEP7xvUQSpnz26FdHlJhnh
+iI0iA5akxkz7+OMTd62LjhyVcS85PPyjWHQoWZS3lErOmnukQ+KbyvaqvHP8kSpw
+PCotWIIDcHUvgmcsfdxNsoke+CWlIQ8tG6sEJW/iqOfQ5DdtwVktMI1Gl6M7Yj4f
+ZSeDfvLYnGmlLWYCAm02obaAh++8t5Ce8ZYkaEi/fLdDSajHF1WS/5q+FhyDXGEY
+tJ5bFdqLoxRP9BgrfsrfhK7a3PvUm7NWhqYobMAzQzWpNPQ84LSreIVmLXq34Mab
+aT6YjJDafGo9lXv2gCIJoYrGzoIIZrArA93lDV7r4Z1hRGmZqXaCto5EKBvjuy+q
+sFQV0njgUvWu9oLLk1Ru
+=B1JR
+-----END PGP SIGNATURE-----
+
+--B4IIlcmfBL/1gGOG--
