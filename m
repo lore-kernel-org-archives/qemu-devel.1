@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cvKGg-0006zd-Jw
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 04:56:52 -0400
+	(envelope-from <git@kirschju.re>) id 1cvKqO-00026F-4D
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 05:33:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cvKGd-0007fO-Gy
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 04:56:50 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:36847)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cvKGd-0007fE-5I
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 04:56:47 -0400
-Received: by mail-wr0-x230.google.com with SMTP id w11so203387615wrc.3
-	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 01:56:46 -0700 (PDT)
-References: <20170403124524.10824-1-alex.bennee@linaro.org>
-	<20170403124524.10824-8-alex.bennee@linaro.org>
-	<000201d2ad05$e28626d0$a7927470$@ru>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <000201d2ad05$e28626d0$a7927470$@ru>
-Date: Tue, 04 Apr 2017 09:56:44 +0100
-Message-ID: <8760ikblf7.fsf@linaro.org>
+	(envelope-from <git@kirschju.re>) id 1cvKqJ-0004EY-7T
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 05:33:44 -0400
+Received: from h2042504.stratoserver.net ([85.214.107.226]:39100)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <git@kirschju.re>) id 1cvKqJ-0004Dm-0S
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 05:33:39 -0400
+References: <20170329183017.14026-1-git@kirschju.re>
+From: Julian Kirsch <git@kirschju.re>
+Message-ID: <f3547873-feaa-0d77-abb7-79140bd74cdb@kirschju.re>
+Date: Tue, 4 Apr 2017 11:33:33 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH v1 7/9] cpus: move icount preparation
- out of tcg_exec_cpu
+In-Reply-To: <20170329183017.14026-1-git@kirschju.re>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 0/4] X86/HMP: Expose x86 model specific
+ registers via human monitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,163 +27,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: rth@twiddle.net, pbonzini@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, 'Peter Crosthwaite' <crosthwaite.peter@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>
 
+ping
 
-Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
+I kindly request your comments.
 
-> I guess you are trying to fix the sympthoms of the case
-> when iothread is trying to access instruction count.
-
-In theory the main-loop should be sequenced before or after vCPU events
-because of the BQL. I'm not sure why this is not currently the case.
-
-> Maybe the solution is providing access to current_cpu for the iothread
-> coupled with your patch 8?
-
-Providing cross-thread access to CPU structures brings its own
-challenges.
-
-But it does occur to me we should probably ensure
-timer_state.qemu_icount has appropriate barriers. This should be ensured
-by the BQL but if it is ever accessed by 2 threads without a BQL
-transition in-between then it is potentially racey.
-
->
-> Pavel Dovgalyuk
->
->
->> -----Original Message-----
->> From: Alex Bennée [mailto:alex.bennee@linaro.org]
->> Sent: Monday, April 03, 2017 3:45 PM
->> To: dovgaluk@ispras.ru; rth@twiddle.net; pbonzini@redhat.com
->> Cc: peter.maydell@linaro.org; qemu-devel@nongnu.org; mttcg@listserver.greensocs.com;
->> fred.konrad@greensocs.com; a.rigo@virtualopensystems.com; cota@braap.org;
->> bobby.prani@gmail.com; nikunj@linux.vnet.ibm.com; Alex Bennée; Peter Crosthwaite
->> Subject: [RFC PATCH v1 7/9] cpus: move icount preparation out of tcg_exec_cpu
->>
->> As icount is only supported for single-threaded execution due to the
->> requirement for determinism let's remove it from the common
->> tcg_exec_cpu path.
->>
->> Also remove the additional fiddling which shouldn't be required as the
->> icount counters should all be rectified as you enter the loop.
->>
->> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->> ---
->>  cpus.c | 67 +++++++++++++++++++++++++++++++++++++++++++++---------------------
->>  1 file changed, 46 insertions(+), 21 deletions(-)
->>
->> diff --git a/cpus.c b/cpus.c
->> index 18b1746770..87638a75d2 100644
->> --- a/cpus.c
->> +++ b/cpus.c
->> @@ -1179,47 +1179,66 @@ static void handle_icount_deadline(void)
->>      }
->>  }
->>
->> -static int tcg_cpu_exec(CPUState *cpu)
->> +static void prepare_icount_for_run(CPUState *cpu)
->>  {
->> -    int ret;
->> -#ifdef CONFIG_PROFILER
->> -    int64_t ti;
->> -#endif
->> -
->> -#ifdef CONFIG_PROFILER
->> -    ti = profile_getclock();
->> -#endif
->>      if (use_icount) {
->>          int64_t count;
->>          int decr;
->> -        timers_state.qemu_icount -= (cpu->icount_decr.u16.low
->> -                                    + cpu->icount_extra);
->> -        cpu->icount_decr.u16.low = 0;
->> -        cpu->icount_extra = 0;
->> +
->> +        /* These should always be cleared by process_icount_data after
->> +         * each vCPU execution. However u16.high can be raised
->> +         * asynchronously by cpu_exit/cpu_interrupt/tcg_handle_interrupt
->> +         */
->> +        g_assert(cpu->icount_decr.u16.low == 0);
->> +        g_assert(cpu->icount_extra == 0);
->> +
->> +
->>          count = tcg_get_icount_limit();
->> +
->>          timers_state.qemu_icount += count;
->>          decr = (count > 0xffff) ? 0xffff : count;
->>          count -= decr;
->>          cpu->icount_decr.u16.low = decr;
->>          cpu->icount_extra = count;
->>      }
->> -    qemu_mutex_unlock_iothread();
->> -    cpu_exec_start(cpu);
->> -    ret = cpu_exec(cpu);
->> -    cpu_exec_end(cpu);
->> -    qemu_mutex_lock_iothread();
->> -#ifdef CONFIG_PROFILER
->> -    tcg_time += profile_getclock() - ti;
->> -#endif
->> +}
->> +
->> +static void process_icount_data(CPUState *cpu)
->> +{
->>      if (use_icount) {
->>          /* Fold pending instructions back into the
->>             instruction counter, and clear the interrupt flag.  */
->>          timers_state.qemu_icount -= (cpu->icount_decr.u16.low
->>                          + cpu->icount_extra);
->> +
->> +        /* We must be under BQL here as cpu_exit can tweak
->> +           icount_decr.u32 */
->> +        g_assert(qemu_mutex_iothread_locked());
->>          cpu->icount_decr.u32 = 0;
->>          cpu->icount_extra = 0;
->>          replay_account_executed_instructions();
->>      }
->> +}
->> +
->> +
->> +static int tcg_cpu_exec(CPUState *cpu)
->> +{
->> +    int ret;
->> +#ifdef CONFIG_PROFILER
->> +    int64_t ti;
->> +#endif
->> +
->> +#ifdef CONFIG_PROFILER
->> +    ti = profile_getclock();
->> +#endif
->> +    qemu_mutex_unlock_iothread();
->> +    cpu_exec_start(cpu);
->> +    ret = cpu_exec(cpu);
->> +    cpu_exec_end(cpu);
->> +    qemu_mutex_lock_iothread();
->> +#ifdef CONFIG_PROFILER
->> +    tcg_time += profile_getclock() - ti;
->> +#endif
->>      return ret;
->>  }
->>
->> @@ -1306,7 +1325,13 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
->>
->>              if (cpu_can_run(cpu)) {
->>                  int r;
->> +
->> +                prepare_icount_for_run(cpu);
->> +
->>                  r = tcg_cpu_exec(cpu);
->> +
->> +                process_icount_data(cpu);
->> +
->>                  if (r == EXCP_DEBUG) {
->>                      cpu_handle_guest_debug(cpu);
->>                      break;
->> --
->> 2.11.0
-
-
---
-Alex Bennée
+On 29.03.2017 20:30, Julian Kirsch wrote:
+> Provide read/write access to x86 model specific registers (MSRs) by means of
+> two new HMP commands "msr_get" and "msr_set". The rationale behind this
+> is to improve introspection capabilities for system virtualization mode.
+> For instance, many modern x86-64 operating systems maintain access to internal
+> data structures via the MSR_GSBASE/MSR_KERNELGSBASE MSRs. Giving
+> introspection utilities (such as a remotely attached gdb via "monitor msr_get")
+> a way of accessing these registers improves analysis results drastically.
+> 
+> This iteration addresses Eduardo's comments of splitting the patch up into
+> movement, reordering and addition of new MSRs.
+> 
+> Changes v3 -> v4:
+> * Split up x86-related parts of the patch into three distinct patches performing
+>   movement, reordering and addition of new MSRs.
+> 
+> Changes v2 -> v3:
+> * Rename HMP commands to "msr_get" and "msr_set"
+> 
+> Changes v1 -> v2:
+> * Rename HMP commands to "msr-get" and "msr-set"
+> * HMP commands Operate on the current default CPU only
+>   (removes need for cpu_index argument)
+> * Remove QMP command alltogether
+> * Implement HMP command in target/i386/monitor.c
+> * Add #ifdef TARGET_I386 around msr-get/msr-set in hmp-commands.hx
+> 
+> Julian Kirsch (4):
+>   X86: Move rdmsr/wrmsr functionality to standalone functions
+>   X86: Reorder MSRs in rdmsr/wrmsr to follow the order used by KVM
+>   X86: Add MSRs supported by KVM to rdmsr/wrmsr
+>   HMP: Introduce msr_get and msr_set HMP commands
+> 
+>  hmp-commands.hx              |  38 ++++
+>  include/monitor/hmp-target.h |   2 +
+>  target/i386/cpu.h            |   3 +
+>  target/i386/helper.c         | 524 +++++++++++++++++++++++++++++++++++++++++++
+>  target/i386/misc_helper.c    | 297 +-----------------------
+>  target/i386/monitor.c        |  76 +++++++
+>  6 files changed, 654 insertions(+), 286 deletions(-)
+> 
