@@ -1,39 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1cvNGe-0001Cw-7k
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 08:09:01 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cvNH9-0001Ve-BS
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 08:09:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1cvNGa-0007TU-92
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 08:09:00 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33019)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1cvNGa-0007Su-0M
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 08:08:56 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v34C58oV058862
-	for <qemu-devel@nongnu.org>; Tue, 4 Apr 2017 08:08:53 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29kydg82mn-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 08:08:52 -0400
-Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Tue, 4 Apr 2017 08:08:51 -0400
-References: <1490965817-16913-1-git-send-email-amarnath.valluri@intel.com>
-	<20170403170738.GC2768@redhat.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Tue, 4 Apr 2017 08:08:47 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cvNH8-0007cy-Eh
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 08:09:31 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:36114)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cvNH8-0007cc-7R
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 08:09:30 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id w11so210275346wrc.3
+	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 05:09:30 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170403170738.GC2768@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-Id: <f2a9a90b-c4ed-56f0-7ee9-608d29088b68@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 0/7] Provide support for the software TPM
- emulator
+In-Reply-To: <20170318192509.15499-1-krzk@kernel.org>
+References: <20170318192509.15499-1-krzk@kernel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 4 Apr 2017 13:09:08 +0100
+Message-ID: <CAFEAcA8WGoa=DYXRH4MHfnHmUR_5-xERdmcuqrsk=bmS7GBCmg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2] hw/misc: Add Exynos4210 Pseudo Random
+ Number Generator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,30 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Amarnath Valluri <amarnath.valluri@intel.com>
-Cc: patrick.ohly@intel.com, qemu-devel@nongnu.org
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 04/03/2017 01:07 PM, Daniel P. Berrange wrote:
-> On Fri, Mar 31, 2017 at 04:10:09PM +0300, Amarnath Valluri wrote:
->> Briefly, Theses set of patches introduces:
->>   - new TPM backend driver to support software TPM emulators(swtpm(1)).
->>   - and few supported fixes/enhancements/cleanup to existing tpm backend code.
->>
->> The similar idea was initiated earliar(2) by Stefan Berger(CCed) with slightly
->> different approach, using CUSE. As swtpm has excellent support for unix domain
->> sockets, hence this implementation uses unix domain sockets to communicate with
->> swtpm.
->>
->> When Qemu is configured with 'emulator' tpm backend, it spawns 'swtpm' and
->> communicates its via Unix domain sockets.
-> I'm not convinced that having QEMU spawning swtpm itself is a desirable
-> approach, as it means QEMU needs to have all the privileges that swtpm
-> will need, so that swtpm can inherit them. At the very least I think we
-> need to have a way to disable this spawning, so it can connect to a
-> pre-existing swtpm process that's been spawned ahead of time. This will
-> let us have stricter privilege separation.
-I had implemented it like that. For this I have a libvirt driver that 
-starts swtpm, sets up cgroups for swtpm (e.g., CPU consumption limits), 
-and drops unnecessary Linux capabilities...
+On 18 March 2017 at 19:25, Krzysztof Kozlowski <krzk@kernel.org> wrote:
+> Add emulation for Exynos4210 Pseudo Random Number Generator which could
+> work on fixed seeds or with seeds provided by True Random Number
+> Generator block inside the SoC.
+>
+> Implement only the fixed seeds part of it in polling mode (no
+> interrupts).  Simple testing:
+>     # echo "exynos" > /sys/class/misc/hw_random/rng_current
+>     # dd if=/dev/hwrng of=/dev/null bs=1 count=16
+>
+> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+>
+> ---
+>
+> Changes since v1:
+> 1. Use GRand-like functions to fix build on MingW32 (this adds also
+>    finalize).
+> 2. Add DPRINTF macro.
+> 3. Use HWADDR_PRIx and family for printing values.
 
-    Stefan
+Is there a data sheet that describes this RNG? I had a quick google
+but couldn't find anything in the 4210 manual you can get from Samsung.
+
+In particular I'm not sure we want to use GRand here.
+
+thanks
+-- PMM
