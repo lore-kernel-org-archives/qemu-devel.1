@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55676)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cvJQ9-0006IA-Df
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 04:02:38 -0400
+	(envelope-from <Ciprian.Barbu@enea.com>) id 1cvJVf-0007N4-R9
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 04:08:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cvJQ4-0004Rt-Ez
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 04:02:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40244)
+	(envelope-from <Ciprian.Barbu@enea.com>) id 1cvJVc-0007su-LQ
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 04:08:15 -0400
+Received: from smtp-out11.electric.net ([185.38.181.37]:64797)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cvJQ4-0004RV-9C
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 04:02:28 -0400
-Date: Tue, 4 Apr 2017 09:02:19 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170404080219.GA2147@work-vm>
-References: <1490965817-16913-1-git-send-email-amarnath.valluri@intel.com>
-	<20170403170738.GC2768@redhat.com>
-	<1491240750.10884.10.camel@intel.com>
-	<20170403173823.GD2112@work-vm>
-	<1491248498.10884.16.camel@intel.com>
+	(Exim 4.71) (envelope-from <Ciprian.Barbu@enea.com>)
+	id 1cvJVc-0007oj-E9
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 04:08:12 -0400
+References: <C885D0FF6A27744DB0B822E32DF6EF029B1CA14A@SESTOEX04.enea.se>
+	<9b05e60a-f8c2-ea4f-6be4-f17c0adec510@redhat.com>
+	<C885D0FF6A27744DB0B822E32DF6EF029B1CA282@SESTOEX04.enea.se>
+	<20170403185232.jjiuesfxhbfzfivv@eukaryote>
+From: ciprian.barbu <ciprian.barbu@enea.com>
+Message-ID: <cb5a0bf0-b279-6329-875a-49a69e64506c@enea.com>
+Date: Tue, 4 Apr 2017 11:07:53 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1491248498.10884.16.camel@intel.com>
-Subject: Re: [Qemu-devel] [PATCH 0/7] Provide support for the software TPM
- emulator
+In-Reply-To: <20170403185232.jjiuesfxhbfzfivv@eukaryote>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] nbd: Possible regression in 2.9 RCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +30,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Patrick Ohly <patrick.ohly@intel.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org, stefanb@linux.vnet.ibm.com
+To: Kashyap Chamarthy <kchamart@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Alexandru Avadanii <Alexandru.Avadanii@enea.com>, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>, svc-armband <armband@enea.com>
 
-* Patrick Ohly (patrick.ohly@intel.com) wrote:
-> On Mon, 2017-04-03 at 18:38 +0100, Dr. David Alan Gilbert wrote:
-> > Or you could just remove the spawning code and use existing sockets; less code!
-> 
-> That would be harder to use reliably in the automated testing that this
-> feature is targeting.
-> 
-> With this mechanism, it is guaranteed that both processes notice when
-> the other dies because the connection gets disconnected. There's never a
-> time period where one process listens for a connection from a process
-> that might have died already, or never got started.
-> 
-> It's also easier that the scripts calling qemu only need to deal with
-> one process, as before, and just need to pass some additional
-> parameters.
-> 
-> Can we agree that both usage models are valid and thus support both?
-
-Yep, that's fine.
-
-Dave
-
-> -- 
-> Best Regards, Patrick Ohly
-> 
-> The content of this message is my personal opinion only and although
-> I am an employee of Intel, the statements I make here in no way
-> represent Intel's position on the issue, nor am I authorized to speak
-> on behalf of Intel on this matter.
-> 
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+SGksDQoNCk9uIDAzLjA0LjIwMTcgMjE6NTIsIEthc2h5YXAgQ2hhbWFydGh5IHdyb3RlOg0K
+PiBPbiBGcmksIE1hciAzMSwgMjAxNyBhdCAwNTo0OTo1MlBNICswMDAwLCBDaXByaWFuIEJh
+cmJ1IHdyb3RlOg0KPj4gSGksDQo+DQo+IFsuLi5dDQo+DQo+PiBXZSBhbHNvIHVzZSBsaWJ2
+aXJ0IHYxLjMuNCwgd2hpY2ggbWlnaHQgYmUgYSBwcm9ibGVtLCBidXQgYXQgbGVhc3Qgd2UN
+Cj4+IHdhbnQgdG8gdW5kZXJzdGFuZCBpZiB0aGUgY29tbWl0IGluIHF1ZXN0aW9uIGludHJv
+ZHVjZWQgYW4gb2J2aW91cw0KPj4gcHJvYmxlbSBvciBpZiBpdCdzIGFsbCBpbiB0aGUgZGV0
+YWlscy4NCj4NCj4gQSB0YW5nZW50aWFsIHF1ZXN0aW9uIC0tIEp1c3QgY3VyaW91cywgeW91
+ciBlbnZpcm9ubWVudA0KPiBzZWVtcy4uLmludGVyZXN0aW5nOiBnaXZlbiB5b3UgYXJlIHVz
+aW5nIGEgYml0IG9sZCAoYnV0IGFib3ZlIHRoZQ0KPiBNSU5fTElCVklSVF9WRVJTSU9OIGZv
+ciBOb3ZhLCB3aGljaCBpcyBjdXJyZW50bHkgMS4yLjEpIGxpYnZpcnQgdmVyc2lvbiwNCj4g
+d2l0aCAqUkMyKiBvZiBRRU1VIDIuOSB3aXRoIE5vdmEsIGFuZCB0ZXN0aW5nIGxpdmUgbWln
+cmF0aW9uLiAgTWUNCj4gd29uZGVycyBpZiB0aGlzIHNvbWUga2luZCBvZiBhIGN1c3RvbSBP
+cGVuU3RhY2sgZW52aXJvbm1lbnQsIG9yIGFuDQo+IG9mZmljaWFsIHVwc3RyZWFtIHJlbGVh
+c2UgdGhhdCB5b3UncmUgc2ltcGx5IHRlc3Rpbmcgd2l0aCBhIG5ld2VyDQo+IHZlcnNpb24g
+b2YgUUVNVS4uLg0KDQpIZXJlIGluIHRoZSBPUE5GViBBUk1CQU5EIFRlYW0sIHRoZSBwcmlt
+YXJ5IGdvYWwgaXMgdG8gbWFrZSB0aGUgT1BORlYgDQpyZWxlYXNlIHdvcmsgb24gQVJNIGFh
+cmNoNjQgc2VydmVycy4gV2UgaGF2ZSBjbHVzdGVycyBvZiBzZXJ2ZXJzIGZyb20gDQpkaWZm
+ZXJlbnQgdmVuZG9ycywgdGhpcyBvbiBpbiBwYXJ0aWN1bGFyIGlzIGJhc2VkIG9uIHRoZSBU
+aHVuZGVyWCBjbjg4OTAgDQpTb0MsIHdoaWNoIGhhcyByZWNlaXZlZCB3b3JrIGZvciBsaXZl
+IG1pZ3JhdGlvbiBmcm9tIGRpZmZlcmVudCBzb3VyY2VzLiANClRoZSBwcm9ibGVtIGlzIHRo
+ZXkgaGF2ZSBvbmx5IGJlZW4gdXBzdHJlYW1lZCBpbiBuZXcgdmVyc2lvbnMgb2Yga2VybmVs
+IA0KYW5kIHFlbXUuIFdlIHRyaWVkIHRvIGJhY2twb3J0IHRoZSBjaGFuZ2VzIHRvIGVhcmxp
+ZXIgdmVyc2lvbnMsIA0KcHJldmlvdXNseSB3ZSB3ZXJlIHJ1bm5pbmcga2VybmVsIDQuNCBh
+bmQgcWVtdSB2Mi42LjEuDQoNCkJ1dCBhbGwgb2YgdGhpcyBpcyBvbiB0b3Agb2YgT3BlbnN0
+YWNrIE5ld3RvbiwgYW5kIHllcywgd2UgYmFzaWNhbGx5IA0KYnVtcGVkIHRoZSBrZXJuZWws
+IHFlbXUgYW5kIG1vcmUgcmVjZW50bHkgbGlidmlydCB0b28gKHYxLjMuNCkuIEJ1dCBhcyAN
+CmRlc2NyaWJlZCBlYXJsaWVyIHdlIHdlcmUga2luZCBvZiBmb3JjZWQgaW50byB0aGlzIHNp
+dHVhdGlvbi4NCg0KDQo+DQo+DQo+IFsxXQ0KPiBodHRwOi8vZ2l0Lm9wZW5zdGFjay5vcmcv
+Y2dpdC9vcGVuc3RhY2svbm92YS90cmVlL25vdmEvdmlydC9saWJ2aXJ0L2RyaXZlci5weT9p
+ZD0wNjhkODUxI24xOTgNCj4NCj4+DQo+PiBCdHcsIHRoZSBxZW11IGNvbW1hbmQgZ2VuZXJh
+dGVkIGJ5IGxpYnZpcnQgaXMgdGhpcyBvbmUsIHNvcnJ5IGFib3V0IHRoYXQ6DQo+Pg0KPj4g
+MjAxNy0wMy0zMSAxNzo0MDoxMC45NTYrMDAwMDogc3RhcnRpbmcgdXAgbGlidmlydCB2ZXJz
+aW9uOiAxLjMuNCwgcGFja2FnZTogMCthbW9zM351MTYuMDQgKEVuZWEgQXJtYmFuZCBEZXZv
+cHMgVGVhbSA8YXJtYmFuZEBlbmVhLmNvbT4gRnJpLCAxMyBKYW4gMjAxNyAwMjowNjowNSAr
+MDEwMCksIHFlbXUgdmVyc2lvbjogMi44LjUwKERlYmlhbiAxOjIuOSthbW9zMn51MTYuMDQp
+LCBob3N0bmFtZTogbm9kZS0yLmRvbWFpbi50bGQNCj4+IExDX0FMTD1DIFBBVEg9L3Vzci9s
+b2NhbC9zYmluOi91c3IvbG9jYWwvYmluOi91c3Ivc2JpbjovdXNyL2Jpbjovc2JpbjovYmlu
+IFFFTVVfQVVESU9fRFJWPW5vbmUgL3Vzci9iaW4va3ZtIC1uYW1lIGluc3RhbmNlLTAwMDAw
+MDc2LGRlYnVnLXRocmVhZHM9b24gLVMgLW9iamVjdCBzZWNyZXQsaWQ9bWFzdGVyS2V5MCxm
+b3JtYXQ9cmF3LGZpbGU9L3Zhci9saWIvbGlidmlydC9xZW11L2RvbWFpbi0xNC1pbnN0YW5j
+ZS0wMDAwMDA3Ni9tYXN0ZXIta2V5LmFlcyAtbWFjaGluZSB2aXJ0LTIuOCxhY2NlbD1rdm0s
+dXNiPW9mZixnaWMtdmVyc2lvbj0zIC1jcHUgaG9zdCAtbSAyNTYgLXJlYWx0aW1lIG1sb2Nr
+PW9mZiAtc21wIDEsc29ja2V0cz0xLGNvcmVzPTEsdGhyZWFkcz0xIC11dWlkIDI4MTJmM2M5
+LWY1NjQtNDk5Yi1hOGM3LWU5ZTdjY2YyNDE0MyAtbm8tdXNlci1jb25maWcgLW5vZGVmYXVs
+dHMgLWNoYXJkZXYgc29ja2V0LGlkPWNoYXJtb25pdG9yLHBhdGg9L3Zhci9saWIvbGlidmly
+dC9xZW11L2RvbWFpbi0xNC1pbnN0YW5jZS0wMDAwMDA3Ni9tb25pdG9yLnNvY2ssc2VydmVy
+LG5vd2FpdCAtbW9uIGNoYXJkZXY9Y2hhcm1vbml0b3IsaWQ9bW9uaXRvcixtb2RlPWNvbnRy
+b2wgLXJ0YyBiYXNlPXV0YyxkcmlmdGZpeD1zbGV3IC1uby1zaHV0ZG93biAtYm9vdCBzdHJp
+Y3Q9b24gLWtlcm5lbCAvdmFyL2xpYi9ub3ZhL2luc3RhbmNlcy8yODEyZjNjOS1mNTY0LTQ5
+OWItYThjNy1lOWU3Y2NmMjQxNDMva2VybmVsIC1pbml0cmQgL3Zhci9saWIvbm92YS9pbnN0
+YW5jZXMvMjgxMmYzYzktZjU2NC00OTliLWE4YzctZTllN2NjZjI0MTQzL3JhbWRpc2sgLWFw
+cGVuZCAncm9vdD0vZGV2L3ZkYTEgcncgcm9vdHdhaXQgY29uc29sZT10dHkwIGNvbnNvbGU9
+dHR5UzAgY29uc29sZT10dHlBTUEwJyAtZGV2aWNlIGk4MjgwMWIxMS1icmlkZ2UsaWQ9cGNp
+LjEsYnVzPXBjaWUuMCxhZGRyPTB4MSAtZGV2aWNlIHBjaS1icmlkZ2UsY2hhc3Npc19ucj0y
+LGlkPXBjaS4yLGJ1cz1wY2kuMSxhZGRyPTB4MCAtdXNiIC1kcml2ZSBmaWxlPS92YXIvbGli
+L25vdmEvaW5zdGFuY2VzLzI4MTJmM2M5LWY1NjQtNDk5Yi1hOGM3LWU5ZTdjY2YyNDE0My9k
+aXNrLGZvcm1hdD1xY293MixpZj1ub25lLGlkPWRyaXZlLXZpcnRpby1kaXNrMCxjYWNoZT1u
+b25lLGFpbz1uYXRpdmUgLWRldmljZSB2aXJ0aW8tYmxrLWRldmljZSxzY3NpPW9mZixkcml2
+ZT1kcml2ZS12aXJ0aW8tZGlzazAsaWQ9dmlydGlvLWRpc2swLGJvb3RpbmRleD0xIC1kcml2
+ZSBmaWxlPS92YXIvbGliL25vdmEvaW5zdGFuY2VzLzI4MTJmM2M5LWY1NjQtNDk5Yi1hOGM3
+LWU5ZTdjY2YyNDE0My9kaXNrLmNvbmZpZyxmb3JtYXQ9cmF3LGlmPW5vbmUsaWQ9ZHJpdmUt
+dmlydGlvLWRpc2sxLGNhY2hlPW5vbmUsYWlvPW5hdGl2ZSAtZGV2aWNlIHZpcnRpby1ibGst
+ZGV2aWNlLHNjc2k9b2ZmLGRyaXZlPWRyaXZlLXZpcnRpby1kaXNrMSxpZD12aXJ0aW8tZGlz
+azEgLW5ldGRldiB0YXAsZmQ9MjcsaWQ9aG9zdG5ldDAgLWRldmljZSB2aXJ0aW8tbmV0LWRl
+dmljZSxuZXRkZXY9aG9zdG5ldDAsaWQ9bmV0MCxtYWM9ZmE6MTY6M2U6ODI6MGE6MmIgLXNl
+cmlhbCBmaWxlOi92YXIvbGliL25vdmEvaW5zdGFuY2VzLzI4MTJmM2M5LWY1NjQtNDk5Yi1h
+OGM3LWU5ZTdjY2YyNDE0My9jb25zb2xlLmxvZyAtc2VyaWFsIHB0eSAtdm5jIDAuMC4wLjA6
+MCAtayBlbi11cyAtZGV2aWNlIFZHQSxpZD12aWRlbzAsdmdhbWVtX21iPTE2LGJ1cz1wY2ku
+MixhZGRyPTB4MSAtZGV2aWNlIHZpcnRpby1iYWxsb29uLWRldmljZSxpZD1iYWxsb29uMCAt
+bXNnIHRpbWVzdGFtcD1vbg0KPj4gRG9tYWluIGlkPTE0IGlzIHRhaW50ZWQ6IGhpZ2gtcHJp
+dmlsZWdlcw0KPg0KPiBbLi4uXQ0KPg0KPg0K
