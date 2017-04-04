@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cvLcY-00026p-LS
+	(envelope-from <kraxel@redhat.com>) id 1cvLcY-00026h-KN
 	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 06:23:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cvLcT-0002Cy-Px
+	(envelope-from <kraxel@redhat.com>) id 1cvLcT-0002Ck-Kx
 	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 06:23:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:27575)
+Received: from mx1.redhat.com ([209.132.183.28]:44418)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cvLcT-0002Bp-Ko
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cvLcT-0002Bb-Fi
 	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 06:23:25 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue,  4 Apr 2017 12:23:13 +0200
-Message-Id: <20170404102315.24923-9-kraxel@redhat.com>
+Date: Tue,  4 Apr 2017 12:23:10 +0200
+Message-Id: <20170404102315.24923-6-kraxel@redhat.com>
 In-Reply-To: <20170404102315.24923-1-kraxel@redhat.com>
 References: <20170404102315.24923-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 08/10] tcx: introduce tcx_check_dirty() function
+Subject: [Qemu-devel] [PATCH 05/10] cg3: remove TARGET_PAGE_SIZE rounding on
+ dirty page detection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +29,36 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilan
 
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-This is similar to the existing tcx24_check_dirty() function and will aid
-with the transition to thread-safe updates.
+This was an artifact from very early versions of the code from before the
+memory API and is no longer needed.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/display/tcx.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ hw/display/cg3.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/hw/display/tcx.c b/hw/display/tcx.c
-index 8e26aae..15172f0 100644
---- a/hw/display/tcx.c
-+++ b/hw/display/tcx.c
-@@ -98,6 +98,12 @@ static void tcx_set_dirty(TCXState *s)
-     memory_region_set_dirty(&s->vram_mem, 0, MAXX * MAXY);
- }
+diff --git a/hw/display/cg3.c b/hw/display/cg3.c
+index 1174220..e05ca92 100644
+--- a/hw/display/cg3.c
++++ b/hw/display/cg3.c
+@@ -114,7 +114,7 @@ static void cg3_update_display(void *opaque)
+     for (y = 0; y < height; y++) {
+         int update = s->full_update;
  
-+static inline int tcx_check_dirty(TCXState *s, ram_addr_t page)
-+{
-+    return memory_region_get_dirty(&s->vram_mem, page, TARGET_PAGE_SIZE,
-+                                   DIRTY_MEMORY_VGA);
-+}
-+
- static inline int tcx24_check_dirty(TCXState *s, ram_addr_t page,
-                                     ram_addr_t page24, ram_addr_t cpage)
- {
-@@ -359,8 +365,7 @@ static void tcx_update_display(void *opaque)
- 
-     memory_region_sync_dirty_bitmap(&ts->vram_mem);
-     for (y = 0; y < ts->height; page += TARGET_PAGE_SIZE) {
--        if (memory_region_get_dirty(&ts->vram_mem, page, TARGET_PAGE_SIZE,
--                                    DIRTY_MEMORY_VGA)) {
-+        if (tcx_check_dirty(ts, page)) {
-             if (y_start < 0)
-                 y_start = y;
-             if (page < page_min)
+-        page = (y * width) & TARGET_PAGE_MASK;
++        page = y * width;
+         update |= memory_region_get_dirty(&s->vram_mem, page, page + width,
+                                           DIRTY_MEMORY_VGA);
+         if (update) {
+@@ -148,8 +148,7 @@ static void cg3_update_display(void *opaque)
+     }
+     if (page_max >= page_min) {
+         memory_region_reset_dirty(&s->vram_mem,
+-                              page_min, page_max - page_min + TARGET_PAGE_SIZE,
+-                              DIRTY_MEMORY_VGA);
++                              page_min, page_max - page_min, DIRTY_MEMORY_VGA);
+     }
+     /* vsync interrupt? */
+     if (s->regs[0] & CG3_CR_ENABLE_INTS) {
 -- 
 2.9.3
