@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gsomlo@gmail.com>) id 1cvRpU-0003xE-QT
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 13:01:18 -0400
+	(envelope-from <quintela@redhat.com>) id 1cvS0S-0000Fs-K2
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 13:12:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gsomlo@gmail.com>) id 1cvRpT-000304-KI
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 13:01:16 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33021)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <gsomlo@gmail.com>) id 1cvRpT-0002zi-GD
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 13:01:15 -0400
-Received: by mail-qk0-x244.google.com with SMTP id p22so24561606qka.0
-	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 10:01:15 -0700 (PDT)
-From: "Gabriel L. Somlo" <gsomlo@gmail.com>
-Date: Tue,  4 Apr 2017 13:01:03 -0400
-Message-Id: <1491325264-14502-3-git-send-email-gsomlo@gmail.com>
-In-Reply-To: <1491325264-14502-1-git-send-email-gsomlo@gmail.com>
-References: <1491325264-14502-1-git-send-email-gsomlo@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 2/3] applesmc: implement error status port
+	(envelope-from <quintela@redhat.com>) id 1cvS0P-000216-8o
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 13:12:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:9488)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cvS0P-00020p-30
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 13:12:33 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 53A623D97C
+	for <qemu-devel@nongnu.org>; Tue,  4 Apr 2017 17:12:31 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170331155155.GO4514@work-vm> (David Alan Gilbert's message of
+	"Fri, 31 Mar 2017 16:51:56 +0100")
+References: <20170323204544.12015-1-quintela@redhat.com>
+	<20170323204544.12015-2-quintela@redhat.com>
+	<20170331155155.GO4514@work-vm>
+Reply-To: quintela@redhat.com
+Date: Tue, 04 Apr 2017 19:12:27 +0200
+Message-ID: <87zifw3xms.fsf@secure.mitica>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 01/51] ram: Update all functions comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,277 +35,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, f4bug@amsat.org, agraf@suse.de, eshelton@pobox.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-As of release 10.12.4, OS X (Sierra) refuses to boot unless the
-AppleSMC supports an additional I/O port, expected to provide an
-error status code.
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Juan Quintela (quintela@redhat.com) wrote:
+>> Added doc comments for existing functions comment and rewrite them in
+>> a common style.
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> ---
+>>  migration/ram.c | 348 ++++++++++++++++++++++++++++++++++++--------------------
+>>  1 file changed, 227 insertions(+), 121 deletions(-)
+>> 
 
-Update the [cmd|data]_write() and data_read() methods to implement
-the required state machine, and add I/O region & methods to handle
-access to the error port.
+>>   *
+>>   * If this is the 1st block, it also writes the block identification
+>>   *
+>> - * Returns: Number of bytes written
+>> + * Returns the number of bytes written
+>
+> Do the doc tools recognise that to pick up the explanation
+> for the return value?
 
-Originally proposed by Eric Shelton <eshelton@pobox.com>
+No clue.  Following qemu/include/exec/memory.h
 
-Signed-off-by: Gabriel Somlo <gsomlo@gmail.com>
----
- hw/misc/applesmc.c | 141 +++++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 115 insertions(+), 26 deletions(-)
+>> @@ -459,8 +474,8 @@ static void xbzrle_cache_zero_page(ram_addr_t current_addr)
+>>   *          -1 means that xbzrle would be longer than normal
+>>   *
+>>   * @f: QEMUFile where to send the data
+>> - * @current_data:
+>> - * @current_addr:
+>> + * @current_data: contents of the page
+>
+> That's wrong.  The point of current_data is that it gets updated by this
+> function to point to the cache page whenever the data ends up in the cache.
+> It's important then that the caller uses that pointer to save the data to
+> disk/network rather than the original pointer, since the data that's saved
+> must exactly match the cache contents even if the guest is still writing to it.
 
-diff --git a/hw/misc/applesmc.c b/hw/misc/applesmc.c
-index 6381197..0d882e8 100644
---- a/hw/misc/applesmc.c
-+++ b/hw/misc/applesmc.c
-@@ -43,6 +43,7 @@
- enum {
-     APPLESMC_DATA_PORT               = 0x00,
-     APPLESMC_CMD_PORT                = 0x04,
-+    APPLESMC_ERR_PORT                = 0x1e,
-     APPLESMC_NUM_PORTS               = 0x20,
- };
- 
-@@ -53,6 +54,24 @@ enum {
-     APPLESMC_GET_KEY_TYPE_CMD        = 0x13,
- };
- 
-+enum {
-+    APPLESMC_ST_CMD_DONE             = 0x00,
-+    APPLESMC_ST_DATA_READY           = 0x01,
-+    APPLESMC_ST_BUSY                 = 0x02,
-+    APPLESMC_ST_ACK                  = 0x04,
-+    APPLESMC_ST_NEW_CMD              = 0x08,
-+};
-+
-+enum {
-+    APPLESMC_ST_1E_CMD_INTRUPTED     = 0x80,
-+    APPLESMC_ST_1E_STILL_BAD_CMD     = 0x81,
-+    APPLESMC_ST_1E_BAD_CMD           = 0x82,
-+    APPLESMC_ST_1E_NOEXIST           = 0x84,
-+    APPLESMC_ST_1E_WRITEONLY         = 0x85,
-+    APPLESMC_ST_1E_READONLY          = 0x86,
-+    APPLESMC_ST_1E_BAD_INDEX         = 0xb8,
-+};
-+
- #ifdef DEBUG_SMC
- #define smc_debug(...) fprintf(stderr, "AppleSMC: " __VA_ARGS__)
- #else
-@@ -77,9 +96,12 @@ struct AppleSMCState {
- 
-     MemoryRegion io_data;
-     MemoryRegion io_cmd;
-+    MemoryRegion io_err;
-     uint32_t iobase;
-     uint8_t cmd;
-     uint8_t status;
-+    uint8_t status_1e;
-+    uint8_t last_ret;
-     char key[4];
-     uint8_t read_pos;
-     uint8_t data_len;
-@@ -93,89 +115,138 @@ static void applesmc_io_cmd_write(void *opaque, hwaddr addr, uint64_t val,
-                                   unsigned size)
- {
-     AppleSMCState *s = opaque;
-+    uint8_t status = s->status & 0x0f;
- 
--    smc_debug("CMD Write B: %#x = %#x\n", addr, val);
-+    smc_debug("CMD received: 0x%02x\n", (uint8_t)val);
-     switch (val) {
-     case APPLESMC_READ_CMD:
--        s->status = 0x0c;
-+        /* did last command run through OK? */
-+        if (status == APPLESMC_ST_CMD_DONE || status == APPLESMC_ST_NEW_CMD) {
-+            s->cmd = val;
-+            s->status = APPLESMC_ST_NEW_CMD | APPLESMC_ST_ACK;
-+        } else {
-+            smc_debug("ERROR: previous command interrupted!\n");
-+            s->status = APPLESMC_ST_NEW_CMD;
-+            s->status_1e = APPLESMC_ST_1E_CMD_INTRUPTED;
-+        }
-         break;
-+    default:
-+        smc_debug("UNEXPECTED CMD 0x%02x\n", (uint8_t)val);
-+        s->status = APPLESMC_ST_NEW_CMD;
-+        s->status_1e = APPLESMC_ST_1E_BAD_CMD;
-     }
--    s->cmd = val;
-     s->read_pos = 0;
-     s->data_pos = 0;
- }
- 
--static void applesmc_fill_data(AppleSMCState *s)
-+static struct AppleSMCData *applesmc_find_key(AppleSMCState *s)
- {
-     struct AppleSMCData *d;
- 
-     QLIST_FOREACH(d, &s->data_def, node) {
-         if (!memcmp(d->key, s->key, 4)) {
--            smc_debug("Key matched (%s Len=%d Data=%s)\n", d->key,
--                      d->len, d->data);
--            memcpy(s->data, d->data, d->len);
--            return;
-+            return d;
-         }
-     }
-+    return NULL;
- }
- 
- static void applesmc_io_data_write(void *opaque, hwaddr addr, uint64_t val,
-                                    unsigned size)
- {
-     AppleSMCState *s = opaque;
-+    struct AppleSMCData *d;
- 
--    smc_debug("DATA Write B: %#x = %#x\n", addr, val);
-+    smc_debug("DATA received: 0x%02x\n", (uint8_t)val);
-     switch (s->cmd) {
-     case APPLESMC_READ_CMD:
-+        if ((s->status & 0x0f) == APPLESMC_ST_CMD_DONE) {
-+            break;
-+        }
-         if (s->read_pos < 4) {
-             s->key[s->read_pos] = val;
--            s->status = 0x04;
-+            s->status = APPLESMC_ST_ACK;
-         } else if (s->read_pos == 4) {
--            s->data_len = val;
--            s->status = 0x05;
--            s->data_pos = 0;
--            smc_debug("Key = %c%c%c%c Len = %d\n", s->key[0],
--                      s->key[1], s->key[2], s->key[3], val);
--            applesmc_fill_data(s);
-+            d = applesmc_find_key(s);
-+            if (d != NULL) {
-+                memcpy(s->data, d->data, d->len);
-+                s->data_len = d->len;
-+                s->data_pos = 0;
-+                s->status = APPLESMC_ST_ACK | APPLESMC_ST_DATA_READY;
-+                s->status_1e = APPLESMC_ST_CMD_DONE;  /* clear on valid key */
-+            } else {
-+                smc_debug("READ_CMD: key '%c%c%c%c' not found!\n",
-+                          s->key[0], s->key[1], s->key[2], s->key[3]);
-+                s->status = APPLESMC_ST_CMD_DONE;
-+                s->status_1e = APPLESMC_ST_1E_NOEXIST;
-+            }
-         }
-         s->read_pos++;
-         break;
-+    default:
-+        s->status = APPLESMC_ST_CMD_DONE;
-+        s->status_1e = APPLESMC_ST_1E_STILL_BAD_CMD;
-     }
- }
- 
-+static void applesmc_io_err_write(void *opaque, hwaddr addr, uint64_t val,
-+                                  unsigned size)
-+{
-+    smc_debug("ERR_CODE received: 0x%02x, ignoring!\n", (uint8_t)val);
-+    /* NOTE: writing to the error port not supported! */
-+}
-+
- static uint64_t applesmc_io_data_read(void *opaque, hwaddr addr, unsigned size)
- {
-     AppleSMCState *s = opaque;
--    uint8_t retval = 0;
- 
-     switch (s->cmd) {
-     case APPLESMC_READ_CMD:
-+        if (!(s->status & APPLESMC_ST_DATA_READY)) {
-+            break;
-+        }
-         if (s->data_pos < s->data_len) {
--            retval = s->data[s->data_pos];
--            smc_debug("READ_DATA[%d] = %#hhx\n", s->data_pos,
--                      retval);
-+            s->last_ret = s->data[s->data_pos];
-+            smc_debug("READ '%c%c%c%c'[%d] = %02x\n",
-+                      s->key[0], s->key[1], s->key[2], s->key[3],
-+                      s->data_pos, s->last_ret);
-             s->data_pos++;
-             if (s->data_pos == s->data_len) {
--                s->status = 0x00;
--                smc_debug("EOF\n");
-+                s->status = APPLESMC_ST_CMD_DONE;
-+                smc_debug("READ '%c%c%c%c' Len=%d complete!\n",
-+                          s->key[0], s->key[1], s->key[2], s->key[3],
-+                          s->data_len);
-             } else {
--                s->status = 0x05;
-+                s->status = APPLESMC_ST_ACK | APPLESMC_ST_DATA_READY;
-             }
-         }
-+        break;
-+    default:
-+        s->status = APPLESMC_ST_CMD_DONE;
-+        s->status_1e = APPLESMC_ST_1E_STILL_BAD_CMD;
-     }
--    smc_debug("DATA Read b: %#x = %#x\n", addr, retval);
-+    smc_debug("DATA sent: 0x%02x\n", s->last_ret);
- 
--    return retval;
-+    return s->last_ret;
- }
- 
- static uint64_t applesmc_io_cmd_read(void *opaque, hwaddr addr, unsigned size)
- {
-     AppleSMCState *s = opaque;
- 
--    smc_debug("CMD Read B: %#x\n", addr);
-+    smc_debug("CMD sent: 0x%02x\n", s->status);
-     return s->status;
- }
- 
-+static uint64_t applesmc_io_err_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    AppleSMCState *s = opaque;
-+
-+    /* NOTE: read does not clear the 1e status */
-+    smc_debug("ERR_CODE sent: 0x%02x\n", s->status_1e);
-+    return s->status_1e;
-+}
-+
- static void applesmc_add_key(AppleSMCState *s, const char *key,
-                              int len, const char *data)
- {
-@@ -198,6 +269,9 @@ static void qdev_applesmc_isa_reset(DeviceState *dev)
-     QLIST_FOREACH_SAFE(d, &s->data_def, node, next) {
-         QLIST_REMOVE(d, node);
-     }
-+    s->status = 0x00;
-+    s->status_1e = 0x00;
-+    s->last_ret = 0x00;
- 
-     applesmc_add_key(s, "REV ", 6, "\x01\x13\x0f\x00\x00\x03");
-     applesmc_add_key(s, "OSK0", 32, s->osk);
-@@ -227,6 +301,16 @@ static const MemoryRegionOps applesmc_cmd_io_ops = {
-     },
- };
- 
-+static const MemoryRegionOps applesmc_err_io_ops = {
-+    .write = applesmc_io_err_write,
-+    .read = applesmc_io_err_read,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .impl = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
-+};
-+
- static void applesmc_isa_realize(DeviceState *dev, Error **errp)
- {
-     AppleSMCState *s = APPLE_SMC(dev);
-@@ -241,6 +325,11 @@ static void applesmc_isa_realize(DeviceState *dev, Error **errp)
-     isa_register_ioport(&s->parent_obj, &s->io_cmd,
-                         s->iobase + APPLESMC_CMD_PORT);
- 
-+    memory_region_init_io(&s->io_err, OBJECT(s), &applesmc_err_io_ops, s,
-+                          "applesmc-err", 1);
-+    isa_register_ioport(&s->parent_obj, &s->io_err,
-+                        s->iobase + APPLESMC_ERR_PORT);
-+
-     if (!s->osk || (strlen(s->osk) != 64)) {
-         fprintf(stderr, "WARNING: Using AppleSMC with invalid key\n");
-         s->osk = default_osk;
--- 
-2.7.4
+this is the current text:
+
+* @current_data: pointer to the address of the page contents
+
+This was Peter suggestion.
+
+Rest of suggestions included. 
+
+Thanks, Juan.
