@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cvQG3-0007CK-A2
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:20:36 -0400
+	(envelope-from <berrange@redhat.com>) id 1cvQG5-0007Dg-B7
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:20:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cvQG1-0005ho-Tw
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:20:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54316)
+	(envelope-from <berrange@redhat.com>) id 1cvQG4-0005j1-Kn
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:20:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44230)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cvQG1-0005hS-MZ
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:20:33 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cvQG4-0005iT-EJ
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 11:20:36 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue,  4 Apr 2017 16:20:10 +0100
-Message-Id: <20170404152011.16119-2-berrange@redhat.com>
+Date: Tue,  4 Apr 2017 16:20:11 +0100
+Message-Id: <20170404152011.16119-3-berrange@redhat.com>
 In-Reply-To: <20170404152011.16119-1-berrange@redhat.com>
 References: <20170404152011.16119-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PULL v1 1/2] io: fix incoming client socket
- initialization
+Subject: [Qemu-devel] [PULL v1 2/2] io: fix FD socket handling in DNS lookup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,85 +24,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Wang guang <wang.guang55@zte.com.cn>, zhanghailiang <zhang.zhanghailiang@huawei.com>, "Daniel P . Berrange" <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
-From: Wang guang <wang.guang55@zte.com.cn>
+The qio_dns_resolver_lookup_sync() method is required to be a no-op
+for socket kinds that don't require name resolution. Thus the KIND_FD
+handling should not return an error.
 
-The channel socket was initialized manually, but forgot to set
-QIO_CHANNEL_FEATURE_SHUTDOWN. Thus, the colo_process_incoming_thread
-would hang at recvmsg. This patch just call qio_channel_socket_new to
-get channel, Which set QIO_CHANNEL_FEATURE_SHUTDOWN already.
-
-Signed-off-by: Wang Guang<wang.guang55@zte.com.cn>
-Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- io/channel-socket.c            | 8 +-------
- tests/test-io-channel-socket.c | 8 ++++++++
- 2 files changed, 9 insertions(+), 7 deletions(-)
+ io/dns-resolver.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/io/channel-socket.c b/io/channel-socket.c
-index f546c68..64b36f5 100644
---- a/io/channel-socket.c
-+++ b/io/channel-socket.c
-@@ -331,16 +331,10 @@ qio_channel_socket_accept(QIOChannelSocket *ioc,
- {
-     QIOChannelSocket *cioc;
+diff --git a/io/dns-resolver.c b/io/dns-resolver.c
+index a407075..759d1b4 100644
+--- a/io/dns-resolver.c
++++ b/io/dns-resolver.c
+@@ -158,16 +158,13 @@ int qio_dns_resolver_lookup_sync(QIODNSResolver *resolver,
  
--    cioc = QIO_CHANNEL_SOCKET(object_new(TYPE_QIO_CHANNEL_SOCKET));
--    cioc->fd = -1;
-+    cioc = qio_channel_socket_new();
-     cioc->remoteAddrLen = sizeof(ioc->remoteAddr);
-     cioc->localAddrLen = sizeof(ioc->localAddr);
+     case SOCKET_ADDRESS_KIND_UNIX:
+     case SOCKET_ADDRESS_KIND_VSOCK:
++    case SOCKET_ADDRESS_KIND_FD:
+         return qio_dns_resolver_lookup_sync_nop(resolver,
+                                                 addr,
+                                                 naddrs,
+                                                 addrs,
+                                                 errp);
  
--#ifdef WIN32
--    QIO_CHANNEL(cioc)->event = CreateEvent(NULL, FALSE, FALSE, NULL);
--#endif
+-    case SOCKET_ADDRESS_KIND_FD:
+-        error_setg(errp, "Unsupported socket address type 'fd'");
+-        return -1;
 -
--
-  retry:
-     trace_qio_channel_socket_accept(ioc);
-     cioc->fd = qemu_accept(ioc->fd, (struct sockaddr *)&cioc->remoteAddr,
-diff --git a/tests/test-io-channel-socket.c b/tests/test-io-channel-socket.c
-index aaa9116..c5c1314 100644
---- a/tests/test-io-channel-socket.c
-+++ b/tests/test-io-channel-socket.c
-@@ -234,6 +234,8 @@ static void test_io_channel(bool async,
-                  qio_channel_has_feature(src, QIO_CHANNEL_FEATURE_FD_PASS));
-         g_assert(!passFD ||
-                  qio_channel_has_feature(dst, QIO_CHANNEL_FEATURE_FD_PASS));
-+        g_assert(qio_channel_has_feature(src, QIO_CHANNEL_FEATURE_SHUTDOWN));
-+        g_assert(qio_channel_has_feature(dst, QIO_CHANNEL_FEATURE_SHUTDOWN));
- 
-         test = qio_channel_test_new();
-         qio_channel_test_run_threads(test, true, src, dst);
-@@ -248,6 +250,8 @@ static void test_io_channel(bool async,
-                  qio_channel_has_feature(src, QIO_CHANNEL_FEATURE_FD_PASS));
-         g_assert(!passFD ||
-                  qio_channel_has_feature(dst, QIO_CHANNEL_FEATURE_FD_PASS));
-+        g_assert(qio_channel_has_feature(src, QIO_CHANNEL_FEATURE_SHUTDOWN));
-+        g_assert(qio_channel_has_feature(dst, QIO_CHANNEL_FEATURE_SHUTDOWN));
- 
-         test = qio_channel_test_new();
-         qio_channel_test_run_threads(test, false, src, dst);
-@@ -262,6 +266,8 @@ static void test_io_channel(bool async,
-                  qio_channel_has_feature(src, QIO_CHANNEL_FEATURE_FD_PASS));
-         g_assert(!passFD ||
-                  qio_channel_has_feature(dst, QIO_CHANNEL_FEATURE_FD_PASS));
-+        g_assert(qio_channel_has_feature(src, QIO_CHANNEL_FEATURE_SHUTDOWN));
-+        g_assert(qio_channel_has_feature(dst, QIO_CHANNEL_FEATURE_SHUTDOWN));
- 
-         test = qio_channel_test_new();
-         qio_channel_test_run_threads(test, true, src, dst);
-@@ -276,6 +282,8 @@ static void test_io_channel(bool async,
-                  qio_channel_has_feature(src, QIO_CHANNEL_FEATURE_FD_PASS));
-         g_assert(!passFD ||
-                  qio_channel_has_feature(dst, QIO_CHANNEL_FEATURE_FD_PASS));
-+        g_assert(qio_channel_has_feature(src, QIO_CHANNEL_FEATURE_SHUTDOWN));
-+        g_assert(qio_channel_has_feature(dst, QIO_CHANNEL_FEATURE_SHUTDOWN));
- 
-         test = qio_channel_test_new();
-         qio_channel_test_run_threads(test, false, src, dst);
+     default:
+         abort();
+     }
 -- 
 2.9.3
