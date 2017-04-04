@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cvLcY-00026m-LM
+	(envelope-from <kraxel@redhat.com>) id 1cvLcY-00026p-LS
 	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 06:23:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cvLcT-0002CH-He
+	(envelope-from <kraxel@redhat.com>) id 1cvLcT-0002Cy-Px
 	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 06:23:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34224)
+Received: from mx1.redhat.com ([209.132.183.28]:27575)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cvLcT-0002A4-An
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cvLcT-0002Bp-Ko
 	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 06:23:25 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue,  4 Apr 2017 12:23:08 +0200
-Message-Id: <20170404102315.24923-4-kraxel@redhat.com>
+Date: Tue,  4 Apr 2017 12:23:13 +0200
+Message-Id: <20170404102315.24923-9-kraxel@redhat.com>
 In-Reply-To: <20170404102315.24923-1-kraxel@redhat.com>
 References: <20170404102315.24923-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 03/10] vga: add vga_scanline_invalidated helper
+Subject: [Qemu-devel] [PATCH 08/10] tcx: introduce tcx_check_dirty() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,60 +24,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Add vga_scanline_invalidated helper to check whenever a scanline was
-invalidated.  Add a sanity check to fix OOB read access for display
-heights larger than 2048.
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Only cirrus uses this, for hardware cursor rendering, so having this
-work properly for the first 2048 scanlines only shouldn't be a problem
-as the cirrus can't handle large resolutions anyway.  Also changing the
-invalidated_y_table size would break live migration.
+This is similar to the existing tcx24_check_dirty() function and will aid
+with the transition to thread-safe updates.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/display/vga.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ hw/display/tcx.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/hw/display/vga.c b/hw/display/vga.c
-index 69c3e1d..f320946 100644
---- a/hw/display/vga.c
-+++ b/hw/display/vga.c
-@@ -1434,6 +1434,14 @@ void vga_invalidate_scanlines(VGACommonState *s, int y1, int y2)
-     }
+diff --git a/hw/display/tcx.c b/hw/display/tcx.c
+index 8e26aae..15172f0 100644
+--- a/hw/display/tcx.c
++++ b/hw/display/tcx.c
+@@ -98,6 +98,12 @@ static void tcx_set_dirty(TCXState *s)
+     memory_region_set_dirty(&s->vram_mem, 0, MAXX * MAXY);
  }
  
-+static bool vga_scanline_invalidated(VGACommonState *s, int y)
++static inline int tcx_check_dirty(TCXState *s, ram_addr_t page)
 +{
-+    if (y >= VGA_MAX_HEIGHT) {
-+        return false;
-+    }
-+    return s->invalidated_y_table[y >> 5] |= 1 << (y & 0x1f);
++    return memory_region_get_dirty(&s->vram_mem, page, TARGET_PAGE_SIZE,
++                                   DIRTY_MEMORY_VGA);
 +}
 +
- void vga_sync_dirty_bitmap(VGACommonState *s)
+ static inline int tcx24_check_dirty(TCXState *s, ram_addr_t page,
+                                     ram_addr_t page24, ram_addr_t cpage)
  {
-     memory_region_sync_dirty_bitmap(&s->vram);
-@@ -1638,8 +1646,8 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
-         page1 = addr + bwidth - 1;
-         update |= memory_region_get_dirty(&s->vram, page0, page1 - page0,
-                                           DIRTY_MEMORY_VGA);
--        /* explicit invalidation for the hardware cursor */
--        update |= (s->invalidated_y_table[y >> 5] >> (y & 0x1f)) & 1;
-+        /* explicit invalidation for the hardware cursor (cirrus only) */
-+        update |= vga_scanline_invalidated(s, y);
-         if (update) {
+@@ -359,8 +365,7 @@ static void tcx_update_display(void *opaque)
+ 
+     memory_region_sync_dirty_bitmap(&ts->vram_mem);
+     for (y = 0; y < ts->height; page += TARGET_PAGE_SIZE) {
+-        if (memory_region_get_dirty(&ts->vram_mem, page, TARGET_PAGE_SIZE,
+-                                    DIRTY_MEMORY_VGA)) {
++        if (tcx_check_dirty(ts, page)) {
              if (y_start < 0)
                  y_start = y;
-@@ -1686,7 +1694,7 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
-                                   page_max - page_min,
-                                   DIRTY_MEMORY_VGA);
-     }
--    memset(s->invalidated_y_table, 0, ((height + 31) >> 5) * 4);
-+    memset(s->invalidated_y_table, 0, sizeof(s->invalidated_y_table));
- }
- 
- static void vga_draw_blank(VGACommonState *s, int full_update)
+             if (page < page_min)
 -- 
 2.9.3
