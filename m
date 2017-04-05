@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cvkGg-000873-AY
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 08:42:36 -0400
+	(envelope-from <clg@kaod.org>) id 1cvkGq-0008G8-TS
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 08:42:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cvkGf-00015I-KM
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 08:42:34 -0400
-Received: from 4.mo177.mail-out.ovh.net ([46.105.37.72]:33034)
+	(envelope-from <clg@kaod.org>) id 1cvkGm-00017Y-V7
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 08:42:44 -0400
+Received: from 3.mo177.mail-out.ovh.net ([46.105.36.172]:36315)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cvkGf-00015C-E9
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 08:42:33 -0400
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cvkGm-00017I-P2
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 08:42:40 -0400
 Received: from player688.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 5622F49D4C
-	for <qemu-devel@nongnu.org>; Wed,  5 Apr 2017 14:42:32 +0200 (CEST)
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 82DA33C3E8
+	for <qemu-devel@nongnu.org>; Wed,  5 Apr 2017 14:42:39 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Wed,  5 Apr 2017 14:41:30 +0200
-Message-Id: <1491396106-26376-6-git-send-email-clg@kaod.org>
+Date: Wed,  5 Apr 2017 14:41:31 +0200
+Message-Id: <1491396106-26376-7-git-send-email-clg@kaod.org>
 In-Reply-To: <1491396106-26376-1-git-send-email-clg@kaod.org>
 References: <1491396106-26376-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 05/21] ppc: add IPMI support
+Subject: [Qemu-devel] [PATCH 06/21] ipmi: use a file to load SDRs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,31 +30,144 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>
 
-OpenPOWER systems use a BT device to communicate with the BMC.
-Provide support for it.
+The IPMI BMC simulator populates the sdr/sensor tables with a minimal
+set of entries (Watchdog). But some qemu platforms might want to use
+extra entries for their custom needs.
+
+This patch modifies slighty the initializing routine to take into
+account a larger set read from a file. The name of the file to use is
+defined through a new 'sdr' property of the simulator device.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Acked-by: Corey Minyard <cminyard@mvista.com>
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 ---
- default-configs/ppc64-softmmu.mak | 4 ++++
- 1 file changed, 4 insertions(+)
 
-diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-so=
-ftmmu.mak
-index 05c83356e12a..7f5b56cbbe9e 100644
---- a/default-configs/ppc64-softmmu.mak
-+++ b/default-configs/ppc64-softmmu.mak
-@@ -6,6 +6,10 @@ include usb.mak
- CONFIG_VIRTIO_VGA=3Dy
- CONFIG_ESCC=3Dy
- CONFIG_M48T59=3Dy
-+CONFIG_IPMI=3Dy
-+CONFIG_IPMI_LOCAL=3Dy
-+CONFIG_IPMI_EXTERN=3Dy
-+CONFIG_ISA_IPMI_BT=3Dy
- CONFIG_SERIAL=3Dy
- CONFIG_PARALLEL=3Dy
- CONFIG_I8254=3Dy
+ Changes since v1:
+
+ - log an error if file does not exist.
+ - change property name to 'sdrfile'
+ - add documentation of new properties
+=20
+ hw/ipmi/ipmi_bmc_sim.c | 23 +++++++++++++++++++++--
+ hw/ipmi/ipmi_bmc_sim.c | 23 +++++++++++++++++++++--
+ qemu-options.hx        | 11 ++++++++++-
+ 2 files changed, 31 insertions(+), 3 deletions(-)
+
+diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
+index c7883d6f5e6a..1142c0caae66 100644
+--- a/hw/ipmi/ipmi_bmc_sim.c
++++ b/hw/ipmi/ipmi_bmc_sim.c
+@@ -27,6 +27,7 @@
+ #include "qemu/timer.h"
+ #include "hw/ipmi/ipmi.h"
+ #include "qemu/error-report.h"
++#include "hw/loader.h"
+=20
+ #define IPMI_NETFN_CHASSIS            0x00
+=20
+@@ -213,6 +214,7 @@ struct IPMIBmcSim {
+     IPMISel sel;
+     IPMISdr sdr;
+     IPMISensor sensors[MAX_SENSORS];
++    char *sdr_filename;
+=20
+     /* Odd netfns are for responses, so we only need the even ones. */
+     const IPMINetfn *netfns[MAX_NETFNS / 2];
+@@ -1696,22 +1698,33 @@ static void ipmi_sdr_init(IPMIBmcSim *ibs)
+=20
+     sdrs_size =3D sizeof(init_sdrs);
+     sdrs =3D init_sdrs;
++    if (ibs->sdr_filename &&
++        !g_file_get_contents(ibs->sdr_filename, (gchar **) &sdrs, &sdrs_=
+size,
++                             NULL)) {
++        error_report("failed to load sdr file '%s'", ibs->sdr_filename);
++        sdrs_size =3D sizeof(init_sdrs);
++        sdrs =3D init_sdrs;
++    }
+=20
+     for (i =3D 0; i < sdrs_size; i +=3D len) {
+         struct ipmi_sdr_header *sdrh;
+=20
+         if (i + IPMI_SDR_HEADER_SIZE > sdrs_size) {
+             error_report("Problem with recid 0x%4.4x", i);
+-            return;
++            break;
+         }
+         sdrh =3D (struct ipmi_sdr_header *) &sdrs[i];
+         len =3D ipmi_sdr_length(sdrh);
+         if (i + len > sdrs_size) {
+             error_report("Problem with recid 0x%4.4x", i);
+-            return;
++            break;
+         }
+         sdr_add_entry(ibs, sdrh, len, NULL);
+     }
++
++    if (sdrs !=3D init_sdrs) {
++        g_free(sdrs);
++    }
+ }
+=20
+ static const VMStateDescription vmstate_ipmi_sim =3D {
+@@ -1780,6 +1793,11 @@ static void ipmi_sim_realize(DeviceState *dev, Err=
+or **errp)
+     vmstate_register(NULL, 0, &vmstate_ipmi_sim, ibs);
+ }
+=20
++static Property ipmi_sim_properties[] =3D {
++    DEFINE_PROP_STRING("sdrfile", IPMIBmcSim, sdr_filename),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void ipmi_sim_class_init(ObjectClass *oc, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(oc);
+@@ -1787,6 +1805,7 @@ static void ipmi_sim_class_init(ObjectClass *oc, vo=
+id *data)
+=20
+     dc->hotpluggable =3D false;
+     dc->realize =3D ipmi_sim_realize;
++    dc->props =3D ipmi_sim_properties;
+     bk->handle_command =3D ipmi_sim_handle_command;
+ }
+=20
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 99af8edf5f30..10b755ee4a5e 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -425,7 +425,7 @@ possible drivers and properties, use @code{-device he=
+lp} and
+ @code{-device @var{driver},help}.
+=20
+ Some drivers are:
+-@item -device ipmi-bmc-sim,id=3D@var{id}[,slave_addr=3D@var{val}]
++@item -device ipmi-bmc-sim,id=3D@var{id}[,slave_addr=3D@var{val}][,sdrfi=
+le=3D@var{file}]
+=20
+ Add an IPMI BMC.  This is a simulation of a hardware management
+ interface processor that normally sits on a system.  It provides
+@@ -437,6 +437,15 @@ This address is the BMC's address on the I2C network=
+ of management
+ controllers.  If you don't know what this means, it is safe to ignore
+ it.
+=20
++@table @option
++@item bmc=3D@var{id}
++The BMC to connect to, one of ipmi-bmc-sim or ipmi-bmc-extern above.
++@item slave_addr=3D@var{val}
++Define slave address to use for the BMC.  The default is 0x20.
++@item sdrfile=3D@var{file}
++file containing raw Sensor Data Records (SDR) data.  The default is none=
+.
++@end table
++
+ @item -device ipmi-bmc-extern,id=3D@var{id},chardev=3D@var{id}[,slave_ad=
+dr=3D@var{val}]
+=20
+ Add a connection to an external IPMI BMC simulator.  Instead of
 --=20
 2.7.4
