@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cvkHi-0000lh-8C
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 08:43:42 -0400
+	(envelope-from <clg@kaod.org>) id 1cvkHm-0000rB-Ge
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 08:43:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cvkHe-0001Vf-AC
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 08:43:38 -0400
-Received: from 1.mo177.mail-out.ovh.net ([178.33.107.143]:44274)
+	(envelope-from <clg@kaod.org>) id 1cvkHl-0001Ym-G7
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 08:43:42 -0400
+Received: from 8.mo177.mail-out.ovh.net ([46.105.61.98]:40253)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cvkHe-0001VX-3x
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 08:43:34 -0400
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cvkHl-0001YC-AQ
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 08:43:41 -0400
 Received: from player688.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 16C1148163
-	for <qemu-devel@nongnu.org>; Wed,  5 Apr 2017 14:43:33 +0200 (CEST)
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 4206749B6D
+	for <qemu-devel@nongnu.org>; Wed,  5 Apr 2017 14:43:40 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Wed,  5 Apr 2017 14:41:41 +0200
-Message-Id: <1491396106-26376-17-git-send-email-clg@kaod.org>
+Date: Wed,  5 Apr 2017 14:41:42 +0200
+Message-Id: <1491396106-26376-18-git-send-email-clg@kaod.org>
 In-Reply-To: <1491396106-26376-1-git-send-email-clg@kaod.org>
 References: <1491396106-26376-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 16/21] ppc/pnv: generate an OEM SEL event on
- shutdown
+Subject: [Qemu-devel] [PATCH 17/21] qdev: Add a hook for a bus to device if
+ it can add devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,125 +31,97 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-OpenPOWER systems expect to be notified with such an event before a
-shutdown or a reboot. An OEM SEL message is sent with specific
-identifiers and a user data containing the request : OFF or REBOOT.
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
+This allows a bus class to tell whether a given bus has room for
+any new device. max_dev isn't sufficient as the rules can depend
+on some arguments or can differ between instances of a bus. This
+will be used by PCI in subsequent patches
+
+Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+[clg: updated for qemu-2.9 ]
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/ppc/pnv.c         | 14 ++++++++++++++
- hw/ppc/pnv_bmc.c     | 42 ++++++++++++++++++++++++++++++++++++++++++
- include/hw/ppc/pnv.h |  3 +++
- 3 files changed, 59 insertions(+)
+ include/hw/qdev-core.h |  1 +
+ qdev-monitor.c         | 14 +++++++++-----
+ 2 files changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index c7caecad0aa6..df0a88c3e252 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -467,6 +467,15 @@ static void *powernv_create_fdt(MachineState *machin=
-e)
-     return fdt;
- }
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index b44b47676576..867662ba5352 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -201,6 +201,7 @@ struct BusClass {
+      */
+     char *(*get_fw_dev_path)(DeviceState *dev);
+     void (*reset)(BusState *bus);
++    bool (*can_add_device)(BusState *bus, QemuOpts *opts);
+     BusRealize realize;
+     BusUnrealize unrealize;
 =20
-+static void pnv_powerdown_notify(Notifier *n, void *opaque)
-+{
-+    PnvMachineState *pnv =3D POWERNV_MACHINE(qdev_get_machine());
-+
-+    if (pnv->bmc) {
-+        pnv_bmc_powerdown(pnv->bmc);
-+    }
-+}
-+
- static void ppc_powernv_reset(void)
- {
-     MachineState *machine =3D MACHINE(qdev_get_machine());
-@@ -662,6 +671,11 @@ static void ppc_powernv_init(MachineState *machine)
-=20
-     /* Create an RTC ISA device too */
-     rtc_init(pnv->isa_bus, 2000, NULL);
-+
-+    /* OpenPOWER systems use a IPMI SEL Event message to notify the
-+     * host to powerdown */
-+    pnv->powerdown_notifier.notify =3D pnv_powerdown_notify;
-+    qemu_register_powerdown_notifier(&pnv->powerdown_notifier);
- }
-=20
- /*
-diff --git a/hw/ppc/pnv_bmc.c b/hw/ppc/pnv_bmc.c
-index 2998530dc4c0..d9ed774acbac 100644
---- a/hw/ppc/pnv_bmc.c
-+++ b/hw/ppc/pnv_bmc.c
-@@ -32,6 +32,48 @@
- /* TODO: include definition in ipmi.h */
- #define IPMI_SDR_FULL_TYPE 1
-=20
-+/*
-+ * OEM SEL Event data packet sent by BMC in response of a Read Event
-+ * Message Buffer command
-+ */
-+typedef struct OemSel {
-+    /* SEL header */
-+    uint8_t id[2];
-+    uint8_t type;
-+    uint8_t timestamp[4];
-+    uint8_t manuf_id[3];
-+
-+    /* OEM SEL data (6 bytes) follows */
-+    uint8_t netfun;
-+    uint8_t cmd;
-+    uint8_t data[4];
-+} OemSel;
-+
-+#define SOFT_OFF        0x00
-+#define SOFT_REBOOT     0x01
-+
-+static void pnv_gen_oem_sel(Object *obj, uint8_t reboot)
-+{
-+    /* IPMI SEL Event are 16 bytes long */
-+    OemSel sel =3D {
-+        .id        =3D { 0x55 , 0x55 },
-+        .type      =3D 0xC0, /* OEM */
-+        .manuf_id  =3D { 0x0, 0x0, 0x0 },
-+        .timestamp =3D { 0x0, 0x0, 0x0, 0x0 },
-+        .netfun    =3D 0x3A, /* IBM */
-+        .cmd       =3D 0x04, /* AMI OEM SEL Power Notification */
-+        .data      =3D { reboot, 0xFF, 0xFF, 0xFF },
-+    };
-+
-+    ipmi_bmc_gen_event(IPMI_BMC(obj), (uint8_t *) &sel,
-+                       0 /* do not log the event */);
-+}
-+
-+void pnv_bmc_powerdown(Object *obj)
-+{
-+    pnv_gen_oem_sel(obj, SOFT_OFF);
-+}
-+
- void pnv_bmc_populate_sensors(Object *bmc, void *fdt)
- {
-     int offset;
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index 050763f6cf54..b70a13bd4175 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -132,6 +132,8 @@ typedef struct PnvMachineState {
-     uint32_t     cpld_irqstate;
-=20
-     Object       *bmc;
-+
-+    Notifier     powerdown_notifier;
- } PnvMachineState;
-=20
- #define PNV_FDT_ADDR          0x01000000
-@@ -141,6 +143,7 @@ typedef struct PnvMachineState {
-  * BMC helpers
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index 5f2fcdfc4551..c6eca929c473 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -415,7 +415,7 @@ static inline bool qbus_is_full(BusState *bus)
+  * Return the bus if found, else %NULL.
   */
- void pnv_bmc_populate_sensors(Object *objbmc, void *fdt);
-+void pnv_bmc_powerdown(Object *objbmc);
+ static BusState *qbus_find_recursive(BusState *bus, const char *name,
+-                                     const char *bus_typename)
++                                     const char *bus_typename, QemuOpts =
+*opts)
+ {
+     BusChild *kid;
+     BusState *pick, *child, *ret;
+@@ -429,7 +429,10 @@ static BusState *qbus_find_recursive(BusState *bus, =
+const char *name,
+     }
 =20
- /*
-  * POWER8 MMIO base addresses
+     if (match && !qbus_is_full(bus)) {
+-        return bus;             /* root matches and isn't full */
++        BusClass *bc =3D BUS_GET_CLASS(bus);
++        if (!bc->can_add_device || bc->can_add_device(bus, opts)) {
++            return bus;             /* root matches and isn't full */
++        }
+     }
+=20
+     pick =3D match ? bus : NULL;
+@@ -437,7 +440,7 @@ static BusState *qbus_find_recursive(BusState *bus, c=
+onst char *name,
+     QTAILQ_FOREACH(kid, &bus->children, sibling) {
+         DeviceState *dev =3D kid->child;
+         QLIST_FOREACH(child, &dev->child_bus, sibling) {
+-            ret =3D qbus_find_recursive(child, name, bus_typename);
++            ret =3D qbus_find_recursive(child, name, bus_typename, opts)=
+;
+             if (ret && !qbus_is_full(ret)) {
+                 return ret;     /* a descendant matches and isn't full *=
+/
+             }
+@@ -467,7 +470,7 @@ static BusState *qbus_find(const char *path, Error **=
+errp)
+             assert(!path[0]);
+             elem[0] =3D len =3D 0;
+         }
+-        bus =3D qbus_find_recursive(sysbus_get_default(), elem, NULL);
++        bus =3D qbus_find_recursive(sysbus_get_default(), elem, NULL, NU=
+LL);
+         if (!bus) {
+             error_setg(errp, "Bus '%s' not found", elem);
+             return NULL;
+@@ -591,7 +594,8 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **=
+errp)
+             return NULL;
+         }
+     } else if (dc->bus_type !=3D NULL) {
+-        bus =3D qbus_find_recursive(sysbus_get_default(), NULL, dc->bus_=
+type);
++        bus =3D qbus_find_recursive(sysbus_get_default(), NULL, dc->bus_=
+type,
++                                  opts);
+         if (!bus || qbus_is_full(bus)) {
+             error_setg(errp, "No '%s' bus found for device '%s'",
+                        dc->bus_type, driver);
 --=20
 2.7.4
