@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cviQK-0001uo-Dm
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 06:44:25 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1cviQo-00029w-47
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 06:44:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cviQH-0004Vb-Of
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 06:44:24 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:35216)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cviQH-0004Ug-BN
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 06:44:21 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20170403124524.10824-1-alex.bennee@linaro.org>
-	<20170403124524.10824-8-alex.bennee@linaro.org>
-	<000201d2ad05$e28626d0$a7927470$@ru>
-	<8760ikblf7.fsf@linaro.org> <874ly4bgbu.fsf@linaro.org>
-	<3c4f3f42-3b33-8e0a-b3f4-0963670b47de@redhat.com>
-	<8737dobbhm.fsf@linaro.org>
-	<fe4ee48e-9a96-bcc4-54ec-86d53212d75b@redhat.com>
-	<871st8b8ta.fsf@linaro.org>
-In-Reply-To: <871st8b8ta.fsf@linaro.org>
-Date: Wed, 5 Apr 2017 13:44:17 +0300
-Message-ID: <000f01d2adf9$938d0400$baa70c00$@ru>
+	(envelope-from <jemmy858585@gmail.com>) id 1cviQm-0004hh-M5
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 06:44:54 -0400
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Content-Language: ru
-Subject: Re: [Qemu-devel] [RFC PATCH v1 7/9] cpus: move icount preparation
- out of tcg_exec_cpu
+In-Reply-To: <20170405093441.GH21911@redhat.com>
+References: <1491384478-12325-1-git-send-email-lidongchen@tencent.com>
+	<20170405093441.GH21911@redhat.com>
+From: 858585 jemmy <jemmy858585@gmail.com>
+Date: Wed, 5 Apr 2017 18:44:51 +0800
+Message-ID: <CAOGPPbcNAL4D7d8m+6vTyAwMAeZZ+F0cva8c2YwyheWjXdDQ3w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v3] migration/block:limit the time used for
+ block migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,101 +23,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>, 'Paolo Bonzini' <pbonzini@redhat.com>
-Cc: rth@twiddle.net, peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, 'Peter Crosthwaite' <crosthwaite.peter@gmail.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, Lidong Chen <lidongchen@tencent.com>
 
-> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
-> Paolo Bonzini <pbonzini@redhat.com> writes:
->=20
-> > On 04/04/2017 14:31, Alex Benn=C3=A9e wrote:
-> >>
-> >> Paolo Bonzini <pbonzini@redhat.com> writes:
-> >>
-> >>> On 04/04/2017 12:46, Alex Benn=C3=A9e wrote:
-> >>>>> In theory the main-loop should be sequenced before or after vCPU =
-events
-> >>>>> because of the BQL. I'm not sure why this is not currently the =
-case.
-> >>>>
-> >>>> It seems cpu_handle_exception doesn't take the BQL until
-> >>>> replay_exception() has done its thing. This is fixable but the =
-function
-> >>>> is a mess so I'm trying to neaten that up first.
-> >>>
-> >>> Long term neither cpu_handle_exception nor cpu_handle_interrupt =
-need the
-> >>> BQL at all.
-> >>
-> >> Well for record/replay they might. Otherwise we end up moving the =
-record
-> >> stream on even though a checkpoint might be being written by the
-> >> main-loop.
-> >>
-> >> As far as the cc->do_interrupt() stuff is concerned it will be =
-guest
-> >> dependant because you could end up in device emulation code down =
-this
-> >> path which must be protected by the BQL - the arm_gic code being a =
-good
-> >> example.
-> >
-> > I think recording an event could be split in two parts:
-> >
-> > - recording the (icount, event) tuple and getting back a unique =
-event id
-> >
-> > - waiting for all events with lower event id to be complete before
-> > starting to process this one
-> >
-> > This doesn't require the BQL, you can use a condition variable on
-> > replay_lock (but you do need to unlock/lock the BQL around it if
-> > currently taken).
->=20
-> Would you then leave the recording to the stream to the main-loop
-> thread? I guess it would marshal all events that occurred before the
-> checkpoint first and then finish draining the queue after recording =
-its
-> checkpoint?
->=20
-> Wrapping the exception stuff in the BQL does improve the =
-repeat-ability
-> but of course it breaks if I take away the graceful handling of time
-> differences because there is a race between recording the exception
-> event (with current_step+insns so far) and getting back to the main =
-loop
-> where insns is finally credited to timers_state.qemu_icount.
->=20
-> I guess we could improve the situation by updating
-> timers_state.qemu_icount (under BQL) as we record events. I don't know
-> how clunky that would get.
+On Wed, Apr 5, 2017 at 5:34 PM, Daniel P. Berrange <berrange@redhat.com> wrote:
+> On Wed, Apr 05, 2017 at 05:27:58PM +0800, jemmy858585@gmail.com wrote:
+>> From: Lidong Chen <lidongchen@tencent.com>
+>>
+>> when migration with high speed, mig_save_device_bulk invoke
+>> bdrv_is_allocated too frequently, and cause vnc reponse slowly.
+>> this patch limit the time used for bdrv_is_allocated.
+>
+> Can you explain why calling bdrv_is_allocated is impacting VNC performance ?
+>
 
-Does io instructions make some lock to prevent races in virtual =
-hardware?
+bdrv_is_allocated is called after qemu_mutex_lock_iothread.
 
-vCPU thread updates icount in the beginning of the TB execution.
-It means that checkpoints in the replay log will appear only at the =
-boundaries
-of TBs. However, the same log may be generated by different scenarios.
-Consider the following cases:
+    if (bmds->shared_base) {
+        qemu_mutex_lock_iothread();
+        aio_context_acquire(blk_get_aio_context(bb));
+        /* Skip unallocated sectors; intentionally treats failure as
+         * an allocated sector */
+        while (cur_sector < total_sectors &&
+               !bdrv_is_allocated(blk_bs(bb), cur_sector,
+                                  MAX_IS_ALLOCATED_SEARCH, &nr_sectors)) {
+            cur_sector += nr_sectors;
+        }
+        aio_context_release(blk_get_aio_context(bb));
+        qemu_mutex_unlock_iothread();
+    }
 
-1. Sequence: vCPU-block-begin vCPU-update-icount iothread-io vCPU-io =
-vCPU-block-end
-2. Sequence: vCPU-block-begin vCPU-update-icount vCPU-io iothread-io =
-vCPU-block-end
+and the main thread is also call qemu_mutex_lock_iothread.
 
-These sequences will generate the same order of replay events, but =
-different
-states of virtual hardware.
+#0  0x00007f107322f264 in __lll_lock_wait () from /lib64/libpthread.so.0
+#1  0x00007f107322a508 in _L_lock_854 () from /lib64/libpthread.so.0
+#2  0x00007f107322a3d7 in pthread_mutex_lock () from /lib64/libpthread.so.0
+#3  0x0000000000949ecb in qemu_mutex_lock (mutex=0xfc51a0) at
+util/qemu-thread-posix.c:60
+#4  0x0000000000459e58 in qemu_mutex_lock_iothread () at /root/qemu/cpus.c:1516
+#5  0x0000000000945322 in os_host_main_loop_wait (timeout=28911939) at
+util/main-loop.c:258
+#6  0x00000000009453f2 in main_loop_wait (nonblocking=0) at util/main-loop.c:517
+#7  0x00000000005c76b4 in main_loop () at vl.c:1898
+#8  0x00000000005ceb77 in main (argc=49, argv=0x7fff921182b8,
+envp=0x7fff92118448) at vl.c:4709
 
-Therefore we need some lock for the time while vCPU executes translation =
-block
-(or the whole sequence of blocks as in old times).
-
-> > The complicated part is ensuring that there are no deadlocks where =
-the
-> > I/O thread needs the VCPU thread to proceed, but the VCPU thread is
-> > waiting on the I/O thread's event processing.
->=20
-> This sort of update sounds more like 2.10 material though.
-
-Pavel Dovgalyuk
+> Migration is running in a background thread, so shouldn't be impacting the
+> main thread which handles VNC, unless the block layer is perhaps acquiring
+> the global qemu lock ? I wouldn't expect such a lock to be held for just
+> the bdrv_is_allocated call though.
+>
+> Regards,
+> Daniel
+> --
+> |: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+> |: http://libvirt.org              -o-             http://virt-manager.org :|
+> |: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
