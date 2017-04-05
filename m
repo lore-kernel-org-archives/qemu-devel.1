@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cvktj-0003MM-3i
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:22:56 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1cvkvq-0004VS-Pw
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:25:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cvkth-00084D-Ue
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:22:55 -0400
-References: <1491320156-4629-1-git-send-email-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <d74fad45-9f89-6f34-020f-87e6b20ea59b@redhat.com>
-Date: Wed, 5 Apr 2017 15:22:40 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1cvkvn-0000CV-LI
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:25:06 -0400
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:34132)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cvkvn-0000CH-DZ
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:25:03 -0400
+Received: by mail-wr0-x229.google.com with SMTP id t20so14810844wra.1
+	for <qemu-devel@nongnu.org>; Wed, 05 Apr 2017 06:25:03 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Wed,  5 Apr 2017 14:24:51 +0100
+Message-Id: <20170405132503.32125-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1491320156-4629-1-git-send-email-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="RDaplxxgiSheQMkDWjjhCbv9HuMXCMLb4"
-Subject: Re: [Qemu-devel] [RFC PATCH for-2.9] block: Ignore guest dev
- permissions during incoming migration
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 00/12] icount and misc MTTCG fixes for
+ 2.9-rc4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,126 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: pbonzini@redhat.com, jcody@redhat.com, Ciprian.Barbu@enea.com, Alexandru.Avadanii@enea.com, armband@enea.com, eblake@redhat.com, qemu-devel@nongnu.org
+To: dovgaluk@ispras.ru, rth@twiddle.net, pbonzini@redhat.com
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RDaplxxgiSheQMkDWjjhCbv9HuMXCMLb4
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: pbonzini@redhat.com, jcody@redhat.com, Ciprian.Barbu@enea.com,
- Alexandru.Avadanii@enea.com, armband@enea.com, eblake@redhat.com,
- qemu-devel@nongnu.org
-Message-ID: <d74fad45-9f89-6f34-020f-87e6b20ea59b@redhat.com>
-Subject: Re: [RFC PATCH for-2.9] block: Ignore guest dev permissions during
- incoming migration
-References: <1491320156-4629-1-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1491320156-4629-1-git-send-email-kwolf@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-On 04.04.2017 17:35, Kevin Wolf wrote:
-> Usually guest devices don't like other writers to the same image, so
-> they use blk_set_perm() to prevent this from happening. In the migratio=
-n
-> phase before the VM is actually running, though, they don't have a
-> problem with writes to the image. On the other hand, storage migration
-> needs to be able to write to the image in this phase, so the restrictiv=
-e
-> blk_set_perm() call of qdev devices breaks it.
->=20
-> This patch flags all BlockBackends with a qdev device as
-> blk->disable_perm during incoming migration, which means that the
-> requested permissions are stored in the BlockBackend, but not actually
-> applied to its root node yet.
->=20
-> Once migration has finished and the VM should be resumed, the
-> permissions are applied. If they cannot be applied (e.g. because the NB=
-D
-> server used for block migration hasn't been shut down), resuming the VM=
+Here is my current queue for icount and miscellaneous MTTCG related
+fixes. The main difference from the RFC series is I have dropped the
+graceful handling of backward time events in the replay log in favour
+of updating the global qemu_icount more frequently. The graceful
+handling is now replaced with an assertion about the arrow of time.
 
-> fails.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/block-backend.c | 40 +++++++++++++++++++++++++++++++++++++++-
->  include/block/block.h |  2 ++
->  migration/migration.c |  8 ++++++++
->  qmp.c                 |  6 ++++++
->  4 files changed, 55 insertions(+), 1 deletion(-)
->=20
-> diff --git a/block/block-backend.c b/block/block-backend.c
-> index 0b63773..f817040 100644
-> --- a/block/block-backend.c
-> +++ b/block/block-backend.c
+With these changes I was able to dispenses with additional BQL locking
+which I had been applying during cpu_handle_exception.
 
-[...]
+It doesn't completely solve the problem of keeping the main-loop and
+vCPU events stream in sync but it works pretty reliably in my test
+case. Given the current release time-line I think this is the best
+solution for now. Options for post-2.9 include either replacing the
+BQL mediated sequencing with a new lock (pushing replay_lock up the
+tree?) or marshalling events through a single thread which can then
+keep things in order.
 
-> @@ -597,15 +598,52 @@ void blk_get_perm(BlockBackend *blk, uint64_t *pe=
-rm, uint64_t *shared_perm)
->      *shared_perm =3D blk->shared_perm;
->  }
-> =20
-> +/*
-> + * Notifies the user of all BlockBackends that migration has completed=
-=2E qdev
-> + * devices can tighten their permissions in response (specifically rev=
-oke
-> + * shared write permissions that we needed for storage migration).
-> + *
-> + * If an error is returned, the VM cannot be allowed to be resumed.
-> + */
-> +void blk_resume_after_migration(Error **errp)
-> +{
-> +    BlockBackend *blk;
-> +    Error *local_err =3D NULL;
-> +
-> +    for (blk =3D blk_next(NULL); blk; blk =3D blk_next(blk)) {
+Aside from that other patches have had various r-b and a-b tags
+applied from the original posting.
 
-Shouldn't we use blk_all_next()?
+I hope to roll a pull request with these fixes by the end of the week
+so we there isn't a rush for next Tuesday's rc4. Expedient comments
+and reviews are therefor gratefully received ;-)
 
-Trusting you that silently disabling autostart is something the upper
-layers can deal with, the rest looks good to me.
-
-(The only other runtime changes of autostart apart from stop/cont appear
-to be in blockdev_init() (if (bdrv_key_required()), but I don't think
-that can happen anymore) and in migration/colo.c (which enables it and
-emits an error message).)
-
-Max
-
-> +        if (!blk->disable_perm) {
-> +            continue;
-> +        }
-> +
-> +        blk->disable_perm =3D false;
-> +
-> +        blk_set_perm(blk, blk->perm, blk->shared_perm, &local_err);
-> +        if (local_err) {
-> +            error_propagate(errp, local_err);
-> +            blk->disable_perm =3D true;
-> +            return;
-> +        }
-> +    }
-> +}
-> +
+Regards,
 
 
---RDaplxxgiSheQMkDWjjhCbv9HuMXCMLb4
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Alex Bennée (12):
+  scripts/qemugdb/mtree.py: fix up mtree dump
+  scripts/qemu-gdb/timers.py: new helper to dump timer state
+  scripts/replay-dump.py: replay log dumper
+  target/i386/misc_helper: wrap BQL around another IRQ generator
+  cpus: remove icount handling from qemu_tcg_cpu_thread_fn
+  cpus: check cpu->running in cpu_get_icount_raw()
+  cpus: move icount preparation out of tcg_exec_cpu
+  cpus: don't credit executed instructions before they have run
+  cpus: introduce cpu_update_icount helper
+  cpu-exec: update icount after each TB_EXIT
+  cpus: call cpu_update_icount on read
+  replay: assert time only goes forward
 
------BEGIN PGP SIGNATURE-----
+ cpu-exec.c                |  14 +--
+ cpus.c                    |  98 ++++++++++++-----
+ include/qemu/timer.h      |   1 +
+ include/qom/cpu.h         |   1 +
+ replay/replay-internal.c  |   4 +
+ replay/replay.c           |   4 +
+ scripts/qemu-gdb.py       |   3 +-
+ scripts/qemugdb/mtree.py  |  12 +-
+ scripts/qemugdb/timers.py |  54 +++++++++
+ scripts/replay-dump.py    | 272 ++++++++++++++++++++++++++++++++++++++++++++++
+ target/i386/misc_helper.c |   3 +
+ 11 files changed, 426 insertions(+), 40 deletions(-)
+ create mode 100644 scripts/qemugdb/timers.py
+ create mode 100755 scripts/replay-dump.py
 
-iQFFBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljk76ASHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AXqcH93T/LFhJXRRn7sR2U70JkxHalqsYkHGB
-N7xzNL9xeeeDWkUNuBbQaNSPXRi3OGk1N1QNZJANeNC7f7sjb83C7n8ArucAmWvt
-6sxAXyki0LOGBLL05mMEwNOcEANIagac4rnRPXxnjQppzXwqpVHSq9AdcKT+AP9L
-ElltVofkSJONlK+WvNXebc/hNJ5k5aEH4MoHA/sII8zaFXoPCjmbCdlvc4fSCHAX
-ocDFR0tGm1nO2CZkBl01ggKi+R0ZK8CP7nQcRbL5g2izxhiDFeOEsh2E0Y5xOgdQ
-l8M5yRnL5bDty2bRn4+ZC1OA+7+EudBramwqjwgMH8d+UMSVE0xnww==
-=YrZt
------END PGP SIGNATURE-----
-
---RDaplxxgiSheQMkDWjjhCbv9HuMXCMLb4--
+-- 
+2.11.0
