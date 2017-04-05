@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36156)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cvmpT-0001DM-Ll
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 11:26:40 -0400
+	(envelope-from <berrange@redhat.com>) id 1cvmtb-0003vy-6p
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 11:30:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cvmpR-0004sE-IQ
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 11:26:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54802)
+	(envelope-from <berrange@redhat.com>) id 1cvmtY-0006wC-2f
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 11:30:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:61337)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cvmpR-0004ry-CU
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 11:26:37 -0400
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5633AC059754
-	for <qemu-devel@nongnu.org>; Wed,  5 Apr 2017 15:26:36 +0000 (UTC)
-Received: from donizetti.redhat.com (unknown [10.36.118.26])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B513A2D653
-	for <qemu-devel@nongnu.org>; Wed,  5 Apr 2017 15:26:35 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed,  5 Apr 2017 17:26:33 +0200
-Message-Id: <20170405152633.6824-2-pbonzini@redhat.com>
-In-Reply-To: <20170405152633.6824-1-pbonzini@redhat.com>
-References: <20170405152633.6824-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 1/1] tco: do not generate an NMI
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cvmtX-0006vC-R7
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 11:30:52 -0400
+Date: Wed, 5 Apr 2017 16:30:44 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170405153044.GA17970@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1490965817-16913-1-git-send-email-amarnath.valluri@intel.com>
+	<1490965817-16913-9-git-send-email-amarnath.valluri@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1490965817-16913-9-git-send-email-amarnath.valluri@intel.com>
+Subject: Re: [Qemu-devel] [PATCH 7/7] tpm: New backend driver to support TPM
+ emulator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,60 +29,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Amarnath Valluri <amarnath.valluri@intel.com>
+Cc: qemu-devel@nongnu.org, patrick.ohly@intel.com, stefanb@linux.vnet.ibm.com
 
-This behavior is not indicated in the datasheet and can confuse the OS.
-The TCO can trap NMIs from SERR# or IOCHK# and convert them to SMIs; but
-any other TCO event is either delivered as an SMI or completely disabled.
+On Fri, Mar 31, 2017 at 04:10:17PM +0300, Amarnath Valluri wrote:
+> +static int tpm_emulator_spawn_emulator(TPMEmulator *tpm_pt)
+> +{
+> +    int fds[2];
+> +    int ctrl_fds[2];
+> +    pid_t cpid;
+> +
+> +    if (socketpair(AF_UNIX, SOCK_SEQPACKET, 0, fds) < 0) {
+> +        return -1;
+> +    }
+> +
+> +    if (socketpair(AF_UNIX, SOCK_SEQPACKET, 0, ctrl_fds) < 0) {
+> +        closesocket(fds[0]);
+> +        closesocket(fds[1]);
+> +        return -1;
+> +    }
+> +
+> +    cpid = fork();
 
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/acpi/tco.c          | 2 --
- hw/isa/lpc_ich9.c      | 5 -----
- include/hw/i386/ich9.h | 1 -
- 3 files changed, 8 deletions(-)
+You must use  qemu_fork() to ensure signals are put into a sane state
+and also to avoid signal handler races which can hit between fork & exec.
 
-diff --git a/hw/acpi/tco.c b/hw/acpi/tco.c
-index b4adac8..05b9d7b 100644
---- a/hw/acpi/tco.c
-+++ b/hw/acpi/tco.c
-@@ -75,8 +75,6 @@ static void tco_timer_expired(void *opaque)
- 
-     if (pm->smi_en & ICH9_PMIO_SMI_EN_TCO_EN) {
-         ich9_generate_smi();
--    } else {
--        ich9_generate_nmi();
-     }
-     tr->tco.rld = tr->tco.tmr;
-     tco_timer_reload(tr);
-diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
-index 59930dd..a0866c3 100644
---- a/hw/isa/lpc_ich9.c
-+++ b/hw/isa/lpc_ich9.c
-@@ -312,11 +312,6 @@ void ich9_generate_smi(void)
-     cpu_interrupt(first_cpu, CPU_INTERRUPT_SMI);
- }
- 
--void ich9_generate_nmi(void)
--{
--    cpu_interrupt(first_cpu, CPU_INTERRUPT_NMI);
--}
--
- static int ich9_lpc_sci_irq(ICH9LPCState *lpc)
- {
-     switch (lpc->d.config[ICH9_LPC_ACPI_CTRL] &
-diff --git a/include/hw/i386/ich9.h b/include/hw/i386/ich9.h
-index 18dcca7..673d13d 100644
---- a/include/hw/i386/ich9.h
-+++ b/include/hw/i386/ich9.h
-@@ -21,7 +21,6 @@ void ich9_lpc_pm_init(PCIDevice *pci_lpc, bool smm_enabled);
- I2CBus *ich9_smb_init(PCIBus *bus, int devfn, uint32_t smb_io_base);
- 
- void ich9_generate_smi(void);
--void ich9_generate_nmi(void);
- 
- #define ICH9_CC_SIZE (16 * 1024) /* 16KB. Chipset configuration registers */
- 
+> +    if (cpid < 0) {
+> +        error_report("tpm-emulator: Fork failure: %s", strerror(errno));
+> +        closesocket(fds[0]); closesocket(fds[1]);
+> +        closesocket(ctrl_fds[0]); closesocket(ctrl_fds[1]);
+> +        return -1;
+> +    }
+> +
+> +    if (cpid == 0) { /* CHILD */
+> +        int i;
+> +        char fd_str[128] = "";
+> +        char ctrl_fd_str[128] = "";
+> +        char tpmstate_str[1024] = "";
+> +        char log_str[1024] = "";
+> +        const char *params[] = {
+> +            tpm_pt->ops.path, "socket",
+> +            "--fd", fd_str,
+> +            "--ctrl", ctrl_fd_str,
+> +            "--tpmstate", tpmstate_str,
+> +            "--log", log_str,
+> +            NULL /* End */
+> +        };
+> +
+> +        /* close all unused inherited sockets */
+> +        closesocket(fds[0]);
+> +        closesocket(ctrl_fds[0]);
+> +        for (i = STDERR_FILENO + 1; i < fds[1]; i++) {
+> +            closesocket(i);
+> +        }
+
+So you're assuming that fds[1] is the most highest open file descriptor
+in QEMU, since you opened it a few lines earlier. Unfortunately this is not
+valid, as QEMU is multi-threaded and so other threads may have opened FDs
+in this time window. In addition there may be previously opened FDs with
+high numbers. If you want to close all open FDs, you need to use sysconf
+to query _SC_OPEN_MAX and iterate upto that value.
+
+> +
+> +        sprintf(fd_str, "%d", fds[1]);
+> +        sprintf(ctrl_fd_str, "type=unixio,clientfd=%d", ctrl_fds[1]);
+> +        sprintf(tpmstate_str, "dir=%s", tpm_pt->ops.tpmstatedir);
+
+All these unchecked sprintfs into fixed buffers are bad and the directory
+based ones are in fact buffer overflows if the user gives a tpmstatedir
+path longer than 1020 characters. Use g_strdup_printf() to malloc strings
+on the stack and free them when done.
+
+> +        if (tpm_pt->ops.has_logfile) {
+> +            sprintf(log_str, "file=%s,level=%d", tpm_pt->ops.logfile,
+> +                    (int)tpm_pt->ops.loglevel);
+> +        } else {
+> +            /* truncate logs */
+> +            params[8] = NULL;
+> +        }
+> +        DPRINT("Running cmd: ")
+> +        for (i = 0; params[i]; i++) {
+> +            DPRINT(" %s", params[i])
+> +        }
+> +        DPRINT("\n")
+> +        if (execv(tpm_pt->ops.path, (char * const *)params) < 0) {
+> +            error_report("execv() failure : %s", strerror(errno));
+> +        }
+> +        closesocket(fds[1]);
+> +        closesocket(ctrl_fds[1]);
+> +        exit(0);
+> +    } else { /* self */
+> +        DPRINTF("tpm-emulator: child pid: %d", cpid);
+> +        /* FIXME: find better way of finding swtpm ready
+> +                  maybe write 'ready'bit on socket ?
+> +           give some time to child to get ready */
+> +        sleep(1);
+> +
+> +        tpm_pt->tpm_fd = fds[0];
+> +        tpm_pt->tpm_ctrl_fd = ctrl_fds[0];
+
+Unless you switch over to using QEMU Chardevs backends as the I/O mechanism,
+you should uses QIOChannelSocket for I/O and event handlers, rather than using
+raw sockets directly.
+
+ie, create one with qio_channel_socket_new_fd(fds[0]);
+
+....
+
+> +        tpm_pt->child_running = true;
+> +
+> +        qemu_add_child_watch(cpid);
+> +
+> +        fcntl(tpm_pt->tpm_fd, F_SETFL, O_NONBLOCK);
+
+
+..then
+
+qio_channel_set_blocking
+
+> +        qemu_set_fd_handler(tpm_pt->tpm_fd, tpm_emulator_fd_handler, NULL,
+> +                            tpm_pt);
+
+and use qio_channel_add_watch,
+
+etc, likewise in the places where you do actual I/O
+
+> +
+> +        /* close unsed sockets */
+> +        closesocket(fds[1]);
+> +        closesocket(ctrl_fds[1]);
+> +    }
+> +
+> +    return 0;
+> +}
+
+Regards,
+Daniel
 -- 
-2.9.3
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
