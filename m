@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cvmbp-0006fT-Dw
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 11:12:37 -0400
+	(envelope-from <stefanha@redhat.com>) id 1cvmbu-0006nJ-0G
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 11:12:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cvmbm-0007mB-8A
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 11:12:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54280)
+	(envelope-from <stefanha@redhat.com>) id 1cvmbr-0007oT-TV
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 11:12:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38340)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cvmbl-0007lt-VX
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 11:12:30 -0400
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cvmbr-0007o7-KT
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 11:12:35 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed,  5 Apr 2017 16:11:45 +0100
-Message-Id: <20170405151148.16363-7-stefanha@redhat.com>
+Date: Wed,  5 Apr 2017 16:11:46 +0100
+Message-Id: <20170405151148.16363-8-stefanha@redhat.com>
 In-Reply-To: <20170405151148.16363-1-stefanha@redhat.com>
 References: <20170405151148.16363-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 6/9] qcow2: add bdrv_measure() support
+Subject: [Qemu-devel] [PATCH v4 7/9] qemu-img: add measure subcommand
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,152 +26,316 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Nir Soffer <nsoffer@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Use qcow2_calc_prealloc_size() to get the required file size.
+The measure subcommand calculates the size required by a new image file.
+This can be used by users or management tools that need to allocate
+space on an LVM volume, SAN LUN, etc before creating or converting an
+image file.
 
+Suggested-by: Maor Lipchuk <mlipchuk@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/qcow2.c | 122 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 122 insertions(+)
+ qemu-img.c       | 227 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ qemu-img-cmds.hx |   6 ++
+ qemu-img.texi    |  25 ++++++
+ 3 files changed, 258 insertions(+)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 0181d72..a2c7f97 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2942,6 +2942,127 @@ static coroutine_fn int qcow2_co_flush_to_os(BlockDriverState *bs)
+diff --git a/qemu-img.c b/qemu-img.c
+index b220cf7..e2fd2c3 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -59,6 +59,7 @@ enum {
+     OPTION_PATTERN = 260,
+     OPTION_FLUSH_INTERVAL = 261,
+     OPTION_NO_DRAIN = 262,
++    OPTION_SIZE = 263,
+ };
+ 
+ typedef enum OutputFormat {
+@@ -4359,6 +4360,232 @@ out:
      return 0;
  }
  
-+static void qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
-+                          BlockMeasureInfo *info, Error **errp)
++static void dump_json_block_measure_info(BlockMeasureInfo *info)
 +{
-+    Error *local_err = NULL;
-+    uint64_t required = 0; /* bytes that contribute to required size */
-+    uint64_t virtual_size; /* disk size as seen by guest */
-+    uint64_t refcount_bits;
-+    size_t cluster_size;
-+    int version;
-+    char *optstr;
-+    PreallocMode prealloc;
-+    bool has_backing_file;
++    QString *str;
++    QObject *obj;
++    Visitor *v = qobject_output_visitor_new(&obj);
 +
-+    /* Parse image creation options */
-+    cluster_size = qcow2_opt_get_cluster_size_del(opts, &local_err);
-+    if (local_err) {
-+        goto err;
-+    }
-+
-+    version = qcow2_opt_get_version_del(opts, &local_err);
-+    if (local_err) {
-+        goto err;
-+    }
-+
-+    refcount_bits = qcow2_opt_get_refcount_bits_del(opts, version, &local_err);
-+    if (local_err) {
-+        goto err;
-+    }
-+
-+    optstr = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
-+    prealloc = qapi_enum_parse(PreallocMode_lookup, optstr,
-+                               PREALLOC_MODE__MAX, PREALLOC_MODE_OFF,
-+                               &local_err);
-+    g_free(optstr);
-+    if (local_err) {
-+        goto err;
-+    }
-+
-+    optstr = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
-+    has_backing_file = !!optstr;
-+    g_free(optstr);
-+
-+    virtual_size = align_offset(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
-+                                cluster_size);
-+
-+    /* Account for input image */
-+    if (in_bs) {
-+        int64_t ssize = bdrv_getlength(in_bs);
-+        if (ssize < 0) {
-+            error_setg_errno(errp, -ssize, "Unable to get image virtual_size");
-+            return;
-+        }
-+
-+        virtual_size = align_offset(ssize, cluster_size);
-+
-+        if (has_backing_file) {
-+            /* We don't how much of the backing chain is shared by the input
-+             * image and the new image file.  In the worst case the new image's
-+             * backing file has nothing in common with the input image.  Be
-+             * conservative and assume all clusters need to be written.
-+             */
-+            required = virtual_size;
-+        } else {
-+            int cluster_sectors = cluster_size / BDRV_SECTOR_SIZE;
-+            int64_t sector_num;
-+            int pnum = 0;
-+
-+            for (sector_num = 0;
-+                 sector_num < ssize / BDRV_SECTOR_SIZE;
-+                 sector_num += pnum) {
-+                int nb_sectors = MAX(ssize / BDRV_SECTOR_SIZE - sector_num,
-+                                     INT_MAX);
-+                BlockDriverState *file;
-+                int64_t ret;
-+
-+                ret = bdrv_get_block_status_above(in_bs, NULL,
-+                                                  sector_num, nb_sectors,
-+                                                  &pnum, &file);
-+                if (ret < 0) {
-+                    error_setg_errno(errp, -ret, "Unable to get block status");
-+                    return;
-+                }
-+
-+                if (ret & BDRV_BLOCK_ZERO) {
-+                    /* Skip zero regions (safe with no backing file) */
-+                } else if ((ret & (BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED)) ==
-+                           (BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED)) {
-+                    /* Extend pnum to end of cluster for next iteration */
-+                    pnum = ROUND_UP(sector_num + pnum, cluster_sectors) -
-+                           sector_num;
-+
-+                    /* Count clusters we've seen */
-+                    required += (sector_num % cluster_sectors + pnum) *
-+                                BDRV_SECTOR_SIZE;
-+                }
-+            }
-+        }
-+    }
-+
-+    /* Take into account preallocation.  Nothing special is needed for
-+     * PREALLOC_MODE_METADATA since metadata is always counted.
-+     */
-+    if (prealloc == PREALLOC_MODE_FULL || prealloc == PREALLOC_MODE_FALLOC) {
-+        required = virtual_size;
-+    }
-+
-+    info->fully_allocated =
-+        qcow2_calc_prealloc_size(virtual_size, cluster_size,
-+                                 ctz32(refcount_bits));
-+
-+    /* Remove data clusters that are not required.  This overestimates the
-+     * required size because metadata needed for the fully allocated file is
-+     * still counted.
-+     */
-+    info->required = info->fully_allocated - virtual_size + required;
-+    return;
-+
-+err:
-+    error_propagate(errp, local_err);
++    visit_type_BlockMeasureInfo(v, NULL, &info, &error_abort);
++    visit_complete(v, &obj);
++    str = qobject_to_json_pretty(obj);
++    assert(str != NULL);
++    printf("%s\n", qstring_get_str(str));
++    qobject_decref(obj);
++    visit_free(v);
++    QDECREF(str);
 +}
 +
- static int qcow2_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
- {
-     BDRVQcow2State *s = bs->opaque;
-@@ -3489,6 +3610,7 @@ BlockDriver bdrv_qcow2 = {
-     .bdrv_snapshot_delete   = qcow2_snapshot_delete,
-     .bdrv_snapshot_list     = qcow2_snapshot_list,
-     .bdrv_snapshot_load_tmp = qcow2_snapshot_load_tmp,
-+    .bdrv_measure           = qcow2_measure,
-     .bdrv_get_info          = qcow2_get_info,
-     .bdrv_get_specific_info = qcow2_get_specific_info,
++static int img_measure(int argc, char **argv)
++{
++    static const struct option long_options[] = {
++        {"help", no_argument, 0, 'h'},
++        {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
++        {"object", required_argument, 0, OPTION_OBJECT},
++        {"output", required_argument, 0, OPTION_OUTPUT},
++        {"size", required_argument, 0, OPTION_SIZE},
++        {0, 0, 0, 0}
++    };
++    OutputFormat output_format = OFORMAT_HUMAN;
++    BlockBackend *in_blk = NULL;
++    BlockDriver *drv;
++    const char *filename = NULL;
++    const char *fmt = NULL;
++    const char *out_fmt = "raw";
++    char *options = NULL;
++    char *snapshot_name = NULL;
++    QemuOpts *opts = NULL;
++    QemuOpts *object_opts = NULL;
++    QemuOpts *sn_opts = NULL;
++    QemuOptsList *create_opts = NULL;
++    bool image_opts = false;
++    uint64_t img_size = ~0ULL;
++    BlockMeasureInfo info;
++    Error *local_err = NULL;
++    int ret = 1;
++    int c;
++
++    while ((c = getopt_long(argc, argv, "hf:O:o:l:",
++                            long_options, NULL)) != -1) {
++        switch (c) {
++        case '?':
++        case 'h':
++            help();
++            break;
++        case 'f':
++            fmt = optarg;
++            break;
++        case 'O':
++            out_fmt = optarg;
++            break;
++        case 'o':
++            if (!is_valid_option_list(optarg)) {
++                error_report("Invalid option list: %s", optarg);
++                goto out;
++            }
++            if (!options) {
++                options = g_strdup(optarg);
++            } else {
++                char *old_options = options;
++                options = g_strdup_printf("%s,%s", options, optarg);
++                g_free(old_options);
++            }
++            break;
++        case 'l':
++            if (strstart(optarg, SNAPSHOT_OPT_BASE, NULL)) {
++                sn_opts = qemu_opts_parse_noisily(&internal_snapshot_opts,
++                                                  optarg, false);
++                if (!sn_opts) {
++                    error_report("Failed in parsing snapshot param '%s'",
++                                 optarg);
++                    goto out;
++                }
++            } else {
++                snapshot_name = optarg;
++            }
++            break;
++        case OPTION_OBJECT:
++            object_opts = qemu_opts_parse_noisily(&qemu_object_opts,
++                                                  optarg, true);
++            if (!object_opts) {
++                goto out;
++            }
++            break;
++        case OPTION_IMAGE_OPTS:
++            image_opts = true;
++            break;
++        case OPTION_OUTPUT:
++            if (!strcmp(optarg, "json")) {
++                output_format = OFORMAT_JSON;
++            } else if (!strcmp(optarg, "human")) {
++                output_format = OFORMAT_HUMAN;
++            } else {
++                error_report("--output must be used with human or json "
++                             "as argument.");
++                goto out;
++            }
++            break;
++        case OPTION_SIZE:
++        {
++            int64_t sval;
++
++            sval = cvtnum(optarg);
++            if (sval < 0) {
++                if (sval == -ERANGE) {
++                    error_report("Image size must be less than 8 EiB!");
++                } else {
++                    error_report("Invalid image size specified! You may use "
++                                 "k, M, G, T, P or E suffixes for ");
++                    error_report("kilobytes, megabytes, gigabytes, terabytes, "
++                                 "petabytes and exabytes.");
++                }
++                goto out;
++            }
++            img_size = (uint64_t)sval;
++        }
++        break;
++        }
++    }
++
++    if (qemu_opts_foreach(&qemu_object_opts,
++                          user_creatable_add_opts_foreach,
++                          NULL, NULL)) {
++        goto out;
++    }
++
++    if (argc - optind > 1) {
++        error_report("At most one filename argument is allowed.");
++        goto out;
++    } else if (argc - optind == 1) {
++        filename = argv[optind];
++    }
++
++    if (!filename &&
++        (object_opts || image_opts || fmt || snapshot_name || sn_opts)) {
++        error_report("--object, --image-opts, -f, and -l "
++                     "require a filename argument.");
++        goto out;
++    }
++    if (filename && img_size != ~0ULL) {
++        error_report("--size N cannot be used together with a filename.");
++        goto out;
++    }
++    if (!filename && img_size == ~0ULL) {
++        error_report("Either --size N or one filename must be specified.");
++        goto out;
++    }
++
++    if (filename) {
++        in_blk = img_open(image_opts, filename, fmt, 0, false, false);
++        if (!in_blk) {
++            goto out;
++        }
++
++        if (sn_opts) {
++            bdrv_snapshot_load_tmp(blk_bs(in_blk),
++                    qemu_opt_get(sn_opts, SNAPSHOT_OPT_ID),
++                    qemu_opt_get(sn_opts, SNAPSHOT_OPT_NAME),
++                    &local_err);
++        } else if (snapshot_name != NULL) {
++            bdrv_snapshot_load_tmp_by_id_or_name(blk_bs(in_blk),
++                    snapshot_name, &local_err);
++        }
++        if (local_err) {
++            error_reportf_err(local_err, "Failed to load snapshot: ");
++            goto out;
++        }
++    }
++
++    drv = bdrv_find_format(out_fmt);
++    if (!drv) {
++        error_report("Unknown file format '%s'", out_fmt);
++        goto out;
++    }
++    if (!drv->create_opts) {
++        error_report("Format driver '%s' does not support image creation",
++                     drv->format_name);
++        goto out;
++    }
++
++    create_opts = qemu_opts_append(create_opts, drv->create_opts);
++    create_opts = qemu_opts_append(create_opts, bdrv_file.create_opts);
++    opts = qemu_opts_create(create_opts, NULL, 0, &error_abort);
++    if (options) {
++        qemu_opts_do_parse(opts, options, NULL, &local_err);
++        if (local_err) {
++            error_report_err(local_err);
++            error_report("Invalid options for file format '%s'", out_fmt);
++            goto out;
++        }
++    }
++    if (img_size != ~0ULL) {
++        qemu_opt_set_number(opts, BLOCK_OPT_SIZE, img_size, &error_abort);
++    }
++
++    bdrv_measure(drv, opts, in_blk ? blk_bs(in_blk) : NULL, &info, &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++        goto out;
++    }
++
++    if (output_format == OFORMAT_HUMAN) {
++        printf("required size: %" PRIu64 "\n", info.required);
++        printf("fully allocated size: %" PRIu64 "\n", info.fully_allocated);
++    } else {
++        dump_json_block_measure_info(&info);
++    }
++
++    ret = 0;
++
++out:
++    qemu_opts_del(object_opts);
++    qemu_opts_del(opts);
++    qemu_opts_del(sn_opts);
++    qemu_opts_free(create_opts);
++    g_free(options);
++    blk_unref(in_blk);
++    return ret;
++}
  
+ static const img_cmd_t img_cmds[] = {
+ #define DEF(option, callback, arg_string)        \
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index 9c9702c..291bc2c 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -63,6 +63,12 @@ STEXI
+ @item map [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [--output=@var{ofmt}] @var{filename}
+ ETEXI
+ 
++DEF("measure", img_measure,
++"measure [--output=ofmt] [-O output_fmt] [-o options] [--size N | [--object objectdef] [--image-opts] [-f fmt] [-l snapshot_param] filename]")
++STEXI
++@item measure [--output=@var{ofmt}] [-O @var{output_fmt}] [-o @var{options}] [--size @var{N} | [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [-l @var{snapshot_param}] @var{filename}]
++ETEXI
++
+ DEF("snapshot", img_snapshot,
+     "snapshot [--object objectdef] [--image-opts] [-q] [-l | -a snapshot | -c snapshot | -d snapshot] filename")
+ STEXI
+diff --git a/qemu-img.texi b/qemu-img.texi
+index c81db3e..030b074 100644
+--- a/qemu-img.texi
++++ b/qemu-img.texi
+@@ -429,6 +429,31 @@ preallocated.
+ For more information, consult @file{include/block/block.h} in QEMU's
+ source code.
+ 
++@item measure [--output=@var{ofmt}] [-O @var{output_fmt}] [-o @var{options}] [--size @var{N} | [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [-l @var{snapshot_param}] @var{filename}]
++
++Calculate the file size required for a new image.  This information can be used
++to size logical volumes or SAN LUNs appropriately for the image that will be
++placed in them.  The values reported are guaranteed to be large enough to fit
++the image.
++
++If the size @var{N} is given then act as if creating a new empty image file
++using @command{qemu-img create}.  If @var{filename} is given then act as if
++converting an existing image file using @command{qemu-img convert}.
++
++The following fields are reported:
++@example
++required size: 524288
++fully allocated size: 1074069504
++@end example
++
++The @code{required size} is the file size of the new image.  It may be smaller
++than the virtual disk size if the image format supports compact representation.
++
++The @code{fully allocated size} is the file size of the new image once data has
++been written to all sectors.  This is the maximum size that the image file can
++occupy with the exception of internal snapshots, dirty bitmaps, vmstate data,
++and other advanced image format features.
++
+ @item snapshot [-l | -a @var{snapshot} | -c @var{snapshot} | -d @var{snapshot} ] @var{filename}
+ 
+ List, apply, create or delete snapshots in image @var{filename}.
 -- 
 2.9.3
