@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@openvz.org>) id 1cvmhb-00032s-6v
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 11:18:32 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1cvmpT-0001DN-Lw
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 11:26:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@openvz.org>) id 1cvmhY-0001gE-30
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 11:18:31 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:38114 helo=relay.sw.ru)
+	(envelope-from <pbonzini@redhat.com>) id 1cvmpQ-0004ro-IP
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 11:26:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33872)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <den@openvz.org>) id 1cvmhX-0001eW-OB
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 11:18:28 -0400
-From: "Denis V. Lunev" <den@openvz.org>
-Date: Wed,  5 Apr 2017 18:18:25 +0300
-Message-Id: <1491405505-31620-3-git-send-email-den@openvz.org>
-In-Reply-To: <1491405505-31620-1-git-send-email-den@openvz.org>
-References: <1491405505-31620-1-git-send-email-den@openvz.org>
-Subject: [Qemu-devel] [PATCH 2/2] block: assert no image modification under
- BDRV_O_INACTIVE
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cvmpQ-0004rT-CF
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 11:26:36 -0400
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6C9AE19D24E
+	for <qemu-devel@nongnu.org>; Wed,  5 Apr 2017 15:26:35 +0000 (UTC)
+Received: from donizetti.redhat.com (unknown [10.36.118.26])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C73D42D653
+	for <qemu-devel@nongnu.org>; Wed,  5 Apr 2017 15:26:34 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed,  5 Apr 2017 17:26:32 +0200
+Message-Id: <20170405152633.6824-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 0/1] PC fix for 2.9.0-rc4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,34 +31,29 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Denis V. Lunev" <den@openvz.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-As long as BDRV_O_INACTIVE is set, the image file is only opened so we
-have a file descriptor for it. We're definitely not supposed to modify
-the image, it's still owned by the migration source.
+The following changes since commit 87cc4c61020addea6a001b94b662596b1896d1b3:
 
-This commit is an addition to 09e0c771 but the assert() is added to
-bdrv_truncate().
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2017-04-04 11:40:55 +0100)
 
-Signed-off-by: Denis V. Lunev <den@openvz.org>
-CC: Kevin Wolf <kwolf@redhat.com>
-CC: Max Reitz <mreitz@redhat.com>
----
- block.c | 2 ++
- 1 file changed, 2 insertions(+)
+are available in the git repository at:
 
-diff --git a/block.c b/block.c
-index 927ba89..9273741 100644
---- a/block.c
-+++ b/block.c
-@@ -3279,6 +3279,8 @@ int bdrv_truncate(BdrvChild *child, int64_t offset)
-     if (bs->read_only)
-         return -EACCES;
- 
-+    assert(!(bs->open_flags & BDRV_O_INACTIVE));
-+
-     ret = drv->bdrv_truncate(bs, offset);
-     if (ret == 0) {
-         ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
+  git://github.com/bonzini/qemu.git tags/for-upstream
+
+for you to fetch changes up to 8c9f42f3cf3598e8bb612b3f81cd12632efd3ca4:
+
+  tco: do not generate an NMI (2017-04-05 17:23:52 +0200)
+
+----------------------------------------------------------------
+* TCO watchdog fix
+
+----------------------------------------------------------------
+Paolo Bonzini (1):
+      tco: do not generate an NMI
+
+ hw/acpi/tco.c          | 2 --
+ hw/isa/lpc_ich9.c      | 5 -----
+ include/hw/i386/ich9.h | 1 -
+ 3 files changed, 8 deletions(-)
 -- 
-2.7.4
+2.9.3
