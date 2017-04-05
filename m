@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cvih2-0006hD-QM
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 07:01:41 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1cvixS-0000gN-TQ
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 07:18:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cvigy-0002h2-L3
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 07:01:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51228)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1cvigy-0002gs-CU
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 07:01:36 -0400
-Date: Wed, 5 Apr 2017 13:01:31 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170405110131.GA5161@noname.redhat.com>
-References: <C885D0FF6A27744DB0B822E32DF6EF029B1CA14A@SESTOEX04.enea.se>
-	<9b05e60a-f8c2-ea4f-6be4-f17c0adec510@redhat.com>
-	<20170403081542.GA5036@noname.str.redhat.com>
-	<33ced3d3-acd7-2945-518d-465a4621b151@redhat.com>
-	<20170403130041.GD5036@noname.str.redhat.com>
-	<20170403135012.GY26598@andariel.pipo.sk>
-	<20170404121624.GA4536@noname.str.redhat.com>
-	<d270f1a4-5814-9b23-61f6-745c73ecaadd@redhat.com>
-	<20170404145348.GD4536@noname.str.redhat.com>
-	<b58edec8-b383-5079-77f2-6f194701ce52@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1cvixP-0002mT-NU
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 07:18:38 -0400
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:33978)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cvixP-0002lj-Cc
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 07:18:35 -0400
+Received: by mail-wr0-x229.google.com with SMTP id t20so9506441wra.1
+	for <qemu-devel@nongnu.org>; Wed, 05 Apr 2017 04:18:35 -0700 (PDT)
+References: <20170403124524.10824-1-alex.bennee@linaro.org>
+	<20170403124524.10824-8-alex.bennee@linaro.org>
+	<000201d2ad05$e28626d0$a7927470$@ru>
+	<8760ikblf7.fsf@linaro.org> <874ly4bgbu.fsf@linaro.org>
+	<3c4f3f42-3b33-8e0a-b3f4-0963670b47de@redhat.com>
+	<8737dobbhm.fsf@linaro.org>
+	<fe4ee48e-9a96-bcc4-54ec-86d53212d75b@redhat.com>
+	<871st8b8ta.fsf@linaro.org> <000f01d2adf9$938d0400$baa70c00$@ru>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <000f01d2adf9$938d0400$baa70c00$@ru>
+Date: Wed, 05 Apr 2017 12:18:29 +0100
+Message-ID: <87y3vf9k6y.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="AhhlLboLdkugWU4S"
-Content-Disposition: inline
-In-Reply-To: <b58edec8-b383-5079-77f2-6f194701ce52@redhat.com>
-Subject: Re: [Qemu-devel] nbd: Possible regression in 2.9 RCs
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH v1 7/9] cpus: move icount preparation
+ out of tcg_exec_cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,56 +37,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Krempa <pkrempa@redhat.com>, svc-armband <armband@enea.com>, Markus Armbruster <armbru@redhat.com>, Jeff Cody <jcody@redhat.com>, Ciprian Barbu <Ciprian.Barbu@enea.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Alexandru Avadanii <Alexandru.Avadanii@enea.com>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: 'Paolo Bonzini' <pbonzini@redhat.com>, rth@twiddle.net, peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, 'Peter Crosthwaite' <crosthwaite.peter@gmail.com>
 
 
---AhhlLboLdkugWU4S
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
 
-Am 04.04.2017 um 17:09 hat Paolo Bonzini geschrieben:
-> On 04/04/2017 16:53, Kevin Wolf wrote:
-> >> The big question is how this fits into release management.  We have
-> >> another important regression from the op blocker work and only a week
-> >> to go before the last rc.  Are we going to delay 2.9 arbitrarily?  Are
-> >> we going to shorten the 2.10 development period correspondingly?  (I
-> >> vote yes and yes, FWIW).
-> > Which is the other regression?
->=20
-> The assertion failure for snapshot_blkdev with iothreads.
+>> From: Alex Bennée [mailto:alex.bennee@linaro.org]
+>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>>
+>> > On 04/04/2017 14:31, Alex Bennée wrote:
+>> >>
+>> >> Paolo Bonzini <pbonzini@redhat.com> writes:
+>> >>
+>> >>> On 04/04/2017 12:46, Alex Bennée wrote:
+>> >>>>> In theory the main-loop should be sequenced before or after vCPU events
+>> >>>>> because of the BQL. I'm not sure why this is not currently the case.
+>> >>>>
+>> >>>> It seems cpu_handle_exception doesn't take the BQL until
+>> >>>> replay_exception() has done its thing. This is fixable but the function
+>> >>>> is a mess so I'm trying to neaten that up first.
+>> >>>
+>> >>> Long term neither cpu_handle_exception nor cpu_handle_interrupt need the
+>> >>> BQL at all.
+>> >>
+>> >> Well for record/replay they might. Otherwise we end up moving the record
+>> >> stream on even though a checkpoint might be being written by the
+>> >> main-loop.
+>> >>
+>> >> As far as the cc->do_interrupt() stuff is concerned it will be guest
+>> >> dependant because you could end up in device emulation code down this
+>> >> path which must be protected by the BQL - the arm_gic code being a good
+>> >> example.
+>> >
+>> > I think recording an event could be split in two parts:
+>> >
+>> > - recording the (icount, event) tuple and getting back a unique event id
+>> >
+>> > - waiting for all events with lower event id to be complete before
+>> > starting to process this one
+>> >
+>> > This doesn't require the BQL, you can use a condition variable on
+>> > replay_lock (but you do need to unlock/lock the BQL around it if
+>> > currently taken).
+>>
+>> Would you then leave the recording to the stream to the main-loop
+>> thread? I guess it would marshal all events that occurred before the
+>> checkpoint first and then finish draining the queue after recording its
+>> checkpoint?
+>>
+>> Wrapping the exception stuff in the BQL does improve the repeat-ability
+>> but of course it breaks if I take away the graceful handling of time
+>> differences because there is a race between recording the exception
+>> event (with current_step+insns so far) and getting back to the main loop
+>> where insns is finally credited to timers_state.qemu_icount.
+>>
+>> I guess we could improve the situation by updating
+>> timers_state.qemu_icount (under BQL) as we record events. I don't know
+>> how clunky that would get.
+>
+> Does io instructions make some lock to prevent races in virtual
+> hardware?
 
-Ah, right, I keep forgetting that this started appearing with the op
-blocker series because the failure mode is completely different, so it
-seems to have been a latent bug somewhere else that was uncovered by it.
+Yes the BQL is taken for MMIO operations unless the hardware explicitly
+does its own locking. Other operations that trigger hardware emulation
+(for example changing ARM_CP_IO registers) should also take the BQL.
 
-If we're sure that the change of the order in bdrv_append() is what
-caused the bug to appear, we can just undo that for 2.9, at the cost of
-a messed up graph in the error case when bdrv_set_backing_hd() fails
-(because we have no way to undo bdrv_replace_node()).
+> vCPU thread updates icount in the beginning of the TB execution.
+> It means that checkpoints in the replay log will appear only at the boundaries
+> of TBs.
 
-Kevin
+Not quite. The vCPU thread takes into account "in flight" instructions
+when calculating the icount. In the next series I'm about to post I've
+ensured this reflects an update to the main-loop icount when we read the
+value.
 
---AhhlLboLdkugWU4S
-Content-Type: application/pgp-signature
+> However, the same log may be generated by different scenarios.
+> Consider the following cases:
+>
+> 1. Sequence: vCPU-block-begin vCPU-update-icount iothread-io vCPU-io vCPU-block-end
+> 2. Sequence: vCPU-block-begin vCPU-update-icount vCPU-io iothread-io vCPU-block-end
+>
+> These sequences will generate the same order of replay events, but different
+> states of virtual hardware.
+>
+> Therefore we need some lock for the time while vCPU executes translation block
+> (or the whole sequence of blocks as in old times).
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
+Well this can't be the BQL anymore. Using it for serialisation of
+multiple threads conflicts with the general aim of reducing BQL
+contention across the code-base.
 
-iQIcBAEBAgAGBQJY5M6LAAoJEH8JsnLIjy/WXG8QAJobcZmz/zc1EgfCH3nwumru
-C/oiOI8RQkBUPPQftONbJRMBSoNu5I3omtxLc/06W6CqYbxUjyphQLL4U2tJAZDs
-mWHBahk3B5Gp99PkcWEvhsXeP1mdBlNMuYRFfTbO8hxZzPPUCP2ig7sN90CZO5Ug
-mzf1xVHU9L9pAVPzHh76tsaWHDlBt68p7KEsGl6cwbFBxL30XBuUKxlFSYu3/iGd
-FcLY//FInXVREqCprk4KbjirVNMvhe0oVFSu5nE8q+7lnjEJKPfpHoS0LzfFtepe
-IS2n53a2sRs+Ridj3VwK1UhefO/zTpZJmOF5Z7AbdpA/Z68HZ2OJAgtnOI/cnmW+
-4815kK9oBKNMUkT+SfGNIKeqMtE6TSAvXVXJvXCU3RqzavleRIi0ThaxcziCHSI5
-e7XUyKfOTt9FGRe4PYoD2Mrxd6AtlUW1uY0XDRjKSUDlkML0h/0xptboYyj3AlVu
-qJp6qTXfe0DH0Nd8P8FXgNw/3AW7arWek/zE/in9/TT5MZ/ZSghAPPB+pJI/zPbd
-5NSPJX++xdF0eKjPOPjR3+K1aPgeot91WbSYc1yLGhfh8zKpv3fLpP1HdaWhPLss
-SAwkX+q5Jt1WKdEudYoj4r3itN4/4G5K/lWlWOsDKqErAxAt4tdi2hXUm9FvjHBp
-BR0Vtw4KZGnhIx9jq9mE
-=9CsH
------END PGP SIGNATURE-----
+Perhaps we should just push replay_lock up the call-stack to
+prepare/process_icount_data take and release the lock and we do the same
+in the checkpoint code?
 
---AhhlLboLdkugWU4S--
+>
+>> > The complicated part is ensuring that there are no deadlocks where the
+>> > I/O thread needs the VCPU thread to proceed, but the VCPU thread is
+>> > waiting on the I/O thread's event processing.
+>>
+>> This sort of update sounds more like 2.10 material though.
+>
+> Pavel Dovgalyuk
+
+
+--
+Alex Bennée
