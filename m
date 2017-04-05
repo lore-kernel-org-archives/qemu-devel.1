@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cvkvq-0004VS-Pw
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:25:07 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1cvkvr-0004Wg-Rc
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:25:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cvkvn-0000CV-LI
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:25:06 -0400
-Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:34132)
+	(envelope-from <alex.bennee@linaro.org>) id 1cvkvq-0000E7-C7
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:25:07 -0400
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:35396)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cvkvn-0000CH-DZ
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:25:03 -0400
-Received: by mail-wr0-x229.google.com with SMTP id t20so14810844wra.1
-	for <qemu-devel@nongnu.org>; Wed, 05 Apr 2017 06:25:03 -0700 (PDT)
+	id 1cvkvq-0000DH-5n
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:25:06 -0400
+Received: by mail-wr0-x234.google.com with SMTP id k6so14519350wre.2
+	for <qemu-devel@nongnu.org>; Wed, 05 Apr 2017 06:25:06 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed,  5 Apr 2017 14:24:51 +0100
-Message-Id: <20170405132503.32125-1-alex.bennee@linaro.org>
+Date: Wed,  5 Apr 2017 14:24:53 +0100
+Message-Id: <20170405132503.32125-3-alex.bennee@linaro.org>
+In-Reply-To: <20170405132503.32125-1-alex.bennee@linaro.org>
+References: <20170405132503.32125-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 00/12] icount and misc MTTCG fixes for
- 2.9-rc4
+Subject: [Qemu-devel] [PATCH v2 02/12] scripts/qemu-gdb/timers.py: new
+ helper to dump timer state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,63 +33,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: dovgaluk@ispras.ru, rth@twiddle.net, pbonzini@redhat.com
 Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Hi,
+This introduces the qemu-gdb command "qemu timers" which will dump the
+state of the main timers in the system.
 
-Here is my current queue for icount and miscellaneous MTTCG related
-fixes. The main difference from the RFC series is I have dropped the
-graceful handling of backward time events in the replay log in favour
-of updating the global qemu_icount more frequently. The graceful
-handling is now replaced with an assertion about the arrow of time.
-
-With these changes I was able to dispenses with additional BQL locking
-which I had been applying during cpu_handle_exception.
-
-It doesn't completely solve the problem of keeping the main-loop and
-vCPU events stream in sync but it works pretty reliably in my test
-case. Given the current release time-line I think this is the best
-solution for now. Options for post-2.9 include either replacing the
-BQL mediated sequencing with a new lock (pushing replay_lock up the
-tree?) or marshalling events through a single thread which can then
-keep things in order.
-
-Aside from that other patches have had various r-b and a-b tags
-applied from the original posting.
-
-I hope to roll a pull request with these fixes by the end of the week
-so we there isn't a rush for next Tuesday's rc4. Expedient comments
-and reviews are therefor gratefully received ;-)
-
-Regards,
-
-
-Alex Bennée (12):
-  scripts/qemugdb/mtree.py: fix up mtree dump
-  scripts/qemu-gdb/timers.py: new helper to dump timer state
-  scripts/replay-dump.py: replay log dumper
-  target/i386/misc_helper: wrap BQL around another IRQ generator
-  cpus: remove icount handling from qemu_tcg_cpu_thread_fn
-  cpus: check cpu->running in cpu_get_icount_raw()
-  cpus: move icount preparation out of tcg_exec_cpu
-  cpus: don't credit executed instructions before they have run
-  cpus: introduce cpu_update_icount helper
-  cpu-exec: update icount after each TB_EXIT
-  cpus: call cpu_update_icount on read
-  replay: assert time only goes forward
-
- cpu-exec.c                |  14 +--
- cpus.c                    |  98 ++++++++++++-----
- include/qemu/timer.h      |   1 +
- include/qom/cpu.h         |   1 +
- replay/replay-internal.c  |   4 +
- replay/replay.c           |   4 +
- scripts/qemu-gdb.py       |   3 +-
- scripts/qemugdb/mtree.py  |  12 +-
- scripts/qemugdb/timers.py |  54 +++++++++
- scripts/replay-dump.py    | 272 ++++++++++++++++++++++++++++++++++++++++++++++
- target/i386/misc_helper.c |   3 +
- 11 files changed, 426 insertions(+), 40 deletions(-)
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ scripts/qemu-gdb.py       |  3 ++-
+ scripts/qemugdb/timers.py | 54 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 56 insertions(+), 1 deletion(-)
  create mode 100644 scripts/qemugdb/timers.py
- create mode 100755 scripts/replay-dump.py
 
+diff --git a/scripts/qemu-gdb.py b/scripts/qemu-gdb.py
+index b3f8e04f77..3e7adb87dc 100644
+--- a/scripts/qemu-gdb.py
++++ b/scripts/qemu-gdb.py
+@@ -26,7 +26,7 @@ import os, sys
+ 
+ sys.path.append(os.path.dirname(__file__))
+ 
+-from qemugdb import aio, mtree, coroutine
++from qemugdb import aio, mtree, coroutine, timers
+ 
+ class QemuCommand(gdb.Command):
+     '''Prefix for QEMU debug support commands'''
+@@ -38,6 +38,7 @@ QemuCommand()
+ coroutine.CoroutineCommand()
+ mtree.MtreeCommand()
+ aio.HandlersCommand()
++timers.TimersCommand()
+ 
+ coroutine.CoroutineSPFunction()
+ coroutine.CoroutinePCFunction()
+diff --git a/scripts/qemugdb/timers.py b/scripts/qemugdb/timers.py
+new file mode 100644
+index 0000000000..be71a001e3
+--- /dev/null
++++ b/scripts/qemugdb/timers.py
+@@ -0,0 +1,54 @@
++#!/usr/bin/python
++# GDB debugging support
++#
++# Copyright 2017 Linaro Ltd
++#
++# Author: Alex Bennée <alex.bennee@linaro.org>
++#
++# This work is licensed under the terms of the GNU GPL, version 2.  See
++# the COPYING file in the top-level directory.
++
++# 'qemu timers' -- display the current timerlists
++
++import gdb
++
++class TimersCommand(gdb.Command):
++    '''Display the current QEMU timers'''
++
++    def __init__(self):
++        'Register the class as a gdb command'
++        gdb.Command.__init__(self, 'qemu timers', gdb.COMMAND_DATA,
++                             gdb.COMPLETE_NONE)
++
++    def dump_timers(self, timer):
++        "Follow a timer and recursively dump each one in the list."
++        # timer should be of type QemuTimer
++        gdb.write("    timer %s/%s (cb:%s,opq:%s)\n" % (
++            timer['expire_time'],
++            timer['scale'],
++            timer['cb'],
++            timer['opaque']))
++
++        if int(timer['next']) > 0:
++            self.dump_timers(timer['next'])
++
++
++    def process_timerlist(self, tlist, ttype):
++        gdb.write("Processing %s timers\n" % (ttype))
++        gdb.write("  clock %s is enabled:%s, last:%s\n" % (
++            tlist['clock']['type'],
++            tlist['clock']['enabled'],
++            tlist['clock']['last']))
++        if int(tlist['active_timers']) > 0:
++            self.dump_timers(tlist['active_timers'])
++
++
++    def invoke(self, arg, from_tty):
++        'Run the command'
++        main_timers = gdb.parse_and_eval("main_loop_tlg")
++
++        # This will break if QEMUClockType in timer.h is redfined
++        self.process_timerlist(main_timers['tl'][0], "Realtime")
++        self.process_timerlist(main_timers['tl'][1], "Virtual")
++        self.process_timerlist(main_timers['tl'][2], "Host")
++        self.process_timerlist(main_timers['tl'][3], "Virtual RT")
 -- 
 2.11.0
