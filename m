@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53372)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cvnWU-0001Vm-Ph
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 12:11:08 -0400
+	(envelope-from <berrange@redhat.com>) id 1cvnYS-00038z-3A
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 12:13:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cvnWR-000157-IE
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 12:11:06 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60046)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cvnWR-00013p-Cu
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 12:11:03 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cvnWP-0006uT-AB
-	for <qemu-devel@nongnu.org>; Wed, 05 Apr 2017 16:11:01 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 48E572E80C1
-	for <qemu-devel@nongnu.org>; Wed,  5 Apr 2017 16:11:01 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1cvnYO-0003Ha-Q3
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 12:13:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:27572)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cvnYO-0003Gs-H5
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 12:13:04 -0400
+Date: Wed, 5 Apr 2017 17:12:56 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170405161256.GA25291@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170311132256.22951-1-marcandre.lureau@redhat.com>
+	<20170311132256.22951-18-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170311132256.22951-18-marcandre.lureau@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 05 Apr 2017 16:03:49 -0000
-From: elmarco <marcandre.lureau@gmail.com>
-Reply-To: Bug 1679126 <1679126@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170403115539.1125.50319.malonedeb@gac.canonical.com>
-Message-Id: <20170405160349.25998.79074.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1679126] Re: null pointer access on migration
- resume of systemrescuecd boot menu with qxl-vga
+Subject: Re: [Qemu-devel] [PATCH 17/21] virtio-channel: parse qga stream for
+ VMDUMP_INFO event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,115 +30,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, armbru@redhat.com, anderson@redhat.com, pbonzini@redhat.com, lersek@redhat.com
 
-Interesting, the culprit is:
+On Sat, Mar 11, 2017 at 05:22:52PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> On virtio channel "org.qemu.guest_agent.0", parse the json stream until
+> the VMDUMP_INFO is received and retrieve the dump details.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  include/sysemu/dump-info.h | 15 +++++++++++++
+>  dump.c                     |  3 +++
+>  hw/char/virtio-console.c   | 53 ++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  3 files changed, 71 insertions(+)
+>  create mode 100644 include/sysemu/dump-info.h
+>=20
+> diff --git a/include/sysemu/dump-info.h b/include/sysemu/dump-info.h
+> new file mode 100644
+> index 0000000000..fb1ddff9af
+> --- /dev/null
+> +++ b/include/sysemu/dump-info.h
+> @@ -0,0 +1,15 @@
+> +#ifndef DUMP_INFO_H
+> +#define DUMP_INFO_H
+> +
+> +typedef struct DumpInfo {
+> +    bool received;
+> +    bool has_phys_base;
+> +    uint64_t phys_base;
+> +    bool has_text;
+> +    uint64_t text;
+> +    char *vmcoreinfo;
+> +} DumpInfo;
+> +
+> +extern DumpInfo dump_info;
+> +
+> +#endif /* DUMP_INFO_H */
+> diff --git a/dump.c b/dump.c
+> index f7b80d856b..68b406459e 100644
+> --- a/dump.c
+> +++ b/dump.c
+> @@ -20,6 +20,7 @@
+>  #include "monitor/monitor.h"
+>  #include "sysemu/kvm.h"
+>  #include "sysemu/dump.h"
+> +#include "sysemu/dump-info.h"
+>  #include "sysemu/sysemu.h"
+>  #include "sysemu/memory_mapping.h"
+>  #include "sysemu/cpus.h"
+> @@ -38,6 +39,8 @@
+>  #define ELF_MACHINE_UNAME "Unknown"
+>  #endif
+> =20
+> +DumpInfo dump_info =3D { 0, };
+> +
+>  uint16_t cpu_to_dump16(DumpState *s, uint16_t val)
+>  {
+>      if (s->dump_info.d_endian =3D=3D ELFDATA2LSB) {
+> diff --git a/hw/char/virtio-console.c b/hw/char/virtio-console.c
+> index 798d9b69fd..796b7c85aa 100644
+> --- a/hw/char/virtio-console.c
+> +++ b/hw/char/virtio-console.c
+> @@ -16,6 +16,9 @@
+>  #include "trace.h"
+>  #include "hw/virtio/virtio-serial.h"
+>  #include "qapi-event.h"
+> +#include "qapi/qmp/json-streamer.h"
+> +#include "qapi/qmp/json-parser.h"
+> +#include "sysemu/dump-info.h"
+> =20
+>  #define TYPE_VIRTIO_CONSOLE_SERIAL_PORT "virtserialport"
+>  #define VIRTIO_CONSOLE(obj) \
+> @@ -26,6 +29,7 @@ typedef struct VirtConsole {
+> =20
+>      CharBackend chr;
+>      guint watch;
+> +    JSONMessageParser parser;
+>  } VirtConsole;
+> =20
+>  /*
+> @@ -49,6 +53,11 @@ static ssize_t flush_buf(VirtIOSerialPort *port,
+>      VirtConsole *vcon =3D VIRTIO_CONSOLE(port);
+>      ssize_t ret;
+> =20
+> +    if (vcon->parser.emit &&
+> +        !dump_info.received) {
+> +        json_message_parser_feed(&vcon->parser, (const char *)buf, len=
+);
+> +    }
 
-commit cd958edb1fae85d0c7d1e1acbff82d22724e8d64
-Author: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Date:   Fri Aug 26 13:47:11 2016 +0400
+[snip]
 
-    console: skip same-size resize
-    =
+so we just continually feed data into the json parser until we see the
+event we care about....
 
-    virtio-gpu does a set-scanout at each frame (it might be a driver
-    regression). qemu_console_resize() recreate a surface even if the size
-    didn't change, and this shows up in profiling reports because the
-    surface is cleared. With this patch, I get a +15-20% glmark2
-    improvement.
-    =
+What kind of denial of service protection does our JSON parser have. Now
+that QEMU is directly parsing JSON from QEMU guest agent, it is exposed
+to malicious attack by the guest agent.
 
-    Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-    Message-id: 20160826094711.14470-1-marcandre.lureau@redhat.com
-    Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+eg what happens if the 'vmcoreinfo' string in the JSON doc received from
+the guest ends up being 10GB in size ? Is that going to cause our JSON
+parser to allocate QString which is 10GB in size which we'll further
+try to strdup just below too...
 
-diff --git a/ui/console.c b/ui/console.c
-index 3940762851..394786b3c7 100644
---- a/ui/console.c
-+++ b/ui/console.c
-@@ -2101,6 +2101,13 @@ void qemu_console_resize(QemuConsole *s, int width, =
-int height)
-     DisplaySurface *surface;
- =
 
-     assert(s->console_type =3D=3D GRAPHIC_CONSOLE);
-+
-+    if (s->surface &&
-+        pixman_image_get_width(s->surface->image) =3D=3D width &&
-+        pixman_image_get_height(s->surface->image) =3D=3D height) {
-+        return;
-+    }
+> @@ -163,6 +177,37 @@ static void chr_event(void *opaque, int event)
+>      }
+>  }
+> =20
+> +
+> +static void qga_message(JSONMessageParser *parser, GQueue *tokens)
+> +{
+> +    /* VirtConsole *vcon =3D container_of(parser, VirtConsole, parser)=
+; */
+> +    QObject *obj;
+> +    QDict *msg, *data;
+> +    const char *event;
+> +
+> +    obj =3D json_parser_parse(tokens, NULL);
+> +    msg =3D qobject_to_qdict(obj);
+> +    if (!msg) {
+> +        error_report("JSON parsing failed");
+> +        return;
+> +    }
+> +
+> +    event =3D qdict_get_try_str(msg, "event");
+> +    data =3D qdict_get_qdict(msg, "data");
+> +    if (event && g_str_equal(event, "VMDUMP_INFO") && data) {
+> +        dump_info.received =3D true;
+> +        if (qdict_haskey(data, "phys-base")) {
+> +            dump_info.has_phys_base =3D true;
+> +            dump_info.phys_base =3D qdict_get_try_uint(data, "phys-bas=
+e", 0);
+> +        }
+> +        if (qdict_haskey(data, "text")) {
+> +            dump_info.has_text =3D true;
+> +            dump_info.text =3D qdict_get_try_uint(data, "text", 0);
+> +        }
+> +        dump_info.vmcoreinfo =3D g_strdup(qdict_get_try_str(data, "vmc=
+oreinfo"));
+> +    }
+> +}
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1679126
-
-Title:
-  null pointer access on migration resume of systemrescuecd boot menu
-  with qxl-vga
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  With qemu-2.8.0 up to 2.9.0-rc2 and git master (6954cdc), when
-  resuming from a migration state file created from a VM suspended while
-  showing the System Rescue CD 4.9.2 boot menu and using the QXL VGA
-  device, I get a null point access in pixman_image_get_data called from
-  qemu_spice_create_update (spice-display.c:215).  When I added
-  assert(ssd->mirror !=3D NULL) above that line, assert failed.  I don't
-  get the crash when using standard VGA or cirrus-vga.  I am using
-  gcc-4.9.3 on Gentoo x86_64 with Intel i7-4700HQ CPU and kernel:
-  4.9.15-gentoo.
-
-  Here is the valgrind trace from the git version:
-  =3D=3D2634=3D=3D Thread 1:
-  =3D=3D2634=3D=3D Invalid read of size 4
-  =3D=3D3516=3D=3D    at 0x65F3050: pixman_image_get_data (in /usr/lib64/li=
-bpixman-1.so.0.34.0)
-  =3D=3D3516=3D=3D    by 0x6F0CEB: qemu_spice_create_update (spice-display.=
-c:215)
-  =3D=3D3516=3D=3D    by 0x6F1CC7: qemu_spice_display_refresh (spice-displa=
-y.c:502)
-  =3D=3D3516=3D=3D    by 0x58CF77: display_refresh (qxl.c:1948)
-  =3D=3D3516=3D=3D    by 0x6E8084: do_safe_dpy_refresh (console.c:1591)
-  =3D=3D3516=3D=3D    by 0x6E80D5: dpy_refresh (console.c:1604)
-  =3D=3D3516=3D=3D    by 0x6E4508: gui_update (console.c:201)
-  =3D=3D3516=3D=3D    by 0x81898E: timerlist_run_timers (qemu-timer.c:536)
-  =3D=3D3516=3D=3D    by 0x8189D6: qemu_clock_run_timers (qemu-timer.c:547)
-  =3D=3D3516=3D=3D    by 0x818D98: qemu_clock_run_all_timers (qemu-timer.c:=
-662)
-  =3D=3D3516=3D=3D    by 0x81952A: main_loop_wait (main-loop.c:514)
-  =3D=3D3516=3D=3D    by 0x4ADD29: main_loop (vl.c:1898)
-
-  Minimal steps to reproduce:
-
-  Compile (debug compile flags are just so valgrind works, the crash occurs=
- with non-debug compile flags as well):
-  CFLAGS=3D"-g -O0" CXXFLAGS=3D"-g -O0" ./configure --target-list=3Di386-so=
-ftmmu,x86_64-softmmu
-  ./configure
-  make
-
-  Start VM and leave it on the System Rescue CD graphical boot menu:
-  x86_64-softmmu/qemu-system-x86_64 -nodefaults -machine pc -drive file=3Ds=
-ystemrescuecd-x86-4.9.2.iso,if=3Dnone,id=3Dcdrom-cd,readonly=3Don -device i=
-de-cd,bus=3Dide.0,drive=3Dcdrom-cd,bootindex=3D1 -device qxl-vga -monitor u=
-nix:monitor.sock,server,nowait -display gtk
-
-  Suspend VM and save state:
-  socat - unix:monitor.sock
-    stop
-    migrate "exec:cat > vm.state"
-    quit
-
-  Attempt to resume VM (but this crashes):
-  x86_64-softmmu/qemu-system-x86_64 -nodefaults -machine pc -drive file=3Ds=
-ystemrescuecd-x86-4.9.2.iso,if=3Dnone,id=3Dcdrom-cd,readonly=3Don -device i=
-de-cd,bus=3Dide.0,drive=3Dcdrom-cd,bootindex=3D1 -device qxl-vga -monitor u=
-nix:monitor.sock,server,nowait -display gtk -incoming exec:"cat vm.state"
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1679126/+subscriptions
+Regards,
+Daniel
+--=20
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange=
+/ :|
+|: http://libvirt.org              -o-             http://virt-manager.or=
+g :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr=
+/ :|
