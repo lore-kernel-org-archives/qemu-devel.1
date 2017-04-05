@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gsomlo@gmail.com>) id 1cvZ3t-0007aT-Uh
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 20:44:38 -0400
+	(envelope-from <anthony.xu@intel.com>) id 1cvZBZ-0000Qf-9H
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 20:52:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gsomlo@gmail.com>) id 1cvZ3q-0005VW-1q
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 20:44:38 -0400
-Received: from mail-qt0-x22c.google.com ([2607:f8b0:400d:c0d::22c]:34556)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <gsomlo@gmail.com>) id 1cvZ3p-0005VJ-Ta
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 20:44:33 -0400
-Received: by mail-qt0-x22c.google.com with SMTP id n21so153466967qta.1
-	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 17:44:33 -0700 (PDT)
-Date: Tue, 4 Apr 2017 20:44:27 -0400
-From: "Gabriel L. Somlo" <gsomlo@gmail.com>
-Message-ID: <20170405004416.GA4911@foober.ini.cmu.edu>
-References: <1491325264-14502-1-git-send-email-gsomlo@gmail.com>
-	<c092a170-7c72-2999-5bc4-1b7504f66177@suse.de>
+	(envelope-from <anthony.xu@intel.com>) id 1cvZBW-0002FQ-84
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 20:52:33 -0400
+Received: from mga14.intel.com ([192.55.52.115]:54964)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
+	id 1cvZBV-0002Eu-E9
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 20:52:30 -0400
+From: "Xu, Anthony" <anthony.xu@intel.com>
+Date: Wed, 5 Apr 2017 00:52:25 +0000
+Message-ID: <4712D8F4B26E034E80552F30A67BE0B1A4E842@ORSMSX112.amr.corp.intel.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c092a170-7c72-2999-5bc4-1b7504f66177@suse.de>
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] Update AppleSMC for OS X Sierra
- 10.12.4 guests
+Subject: [Qemu-devel] [PATCH]Enable kvmvapic only when host doesn't support
+ VAPIC capability in KVM mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +27,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Graf <agraf@suse.de>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, f4bug@amsat.org, eshelton@pobox.com
+To: "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>
+Cc: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Stefan Hajnoczi' <stefanha@gmail.com>
 
-On Tue, Apr 04, 2017 at 09:35:00PM +0200, Alexander Graf wrote:
-> On 04/04/2017 07:01 PM, Gabriel L. Somlo wrote:
-> > As of 10.12.4 (currently the latest Sierra update), OS X refuses to boot
-> > unless the AppleSMC supports a third I/O port, which provides the current
-> > error status when read.
-> 
-> Looks much nicer after this series :). Thanks a lot!
-> 
-> Reviewed-by: Alexander Graf <agraf@suse.de>
+In KVM mode, enable kvmvapic only when host doesn't support=20
+VAPIC capability.
 
-Thanks! Thinking about it, we should probably drop the last (3/3)
-patch, once again to minimize useless churn -- Doing that part (or
-not, as the case may turn out to be) should be part of a future
-series implementing more accurate emulation, including key write
-support...
+Save the time to set up kvmvapic in some hosts.
 
-Thanks,
---Gabriel
+
+Signed-off -by: Anthony Xu <anthony.xu@intel.com>
+
+
+diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
+index c3829e3..d5c53af 100644
+--- a/hw/intc/apic_common.c
++++ b/hw/intc/apic_common.c
+@@ -317,8 +317,11 @@ static void apic_common_realize(DeviceState *dev, Erro=
+r **errp)
+     info =3D APIC_COMMON_GET_CLASS(s);
+     info->realize(dev, errp);
+=20
+-    /* Note: We need at least 1M to map the VAPIC option ROM */
++    /* Note: We need at least 1M to map the VAPIC option ROM,
++       if it is KVM, enable kvmvapic only when KVM doesn't have=20
++       VAPIC capability                */=20
+     if (!vapic && s->vapic_control & VAPIC_ENABLE_MASK &&
++        (!kvm_enabled() || (kvm_enabled() && !kvm_has_vapic())) &&
+         !hax_enabled() && ram_size >=3D 1024 * 1024) {
+         vapic =3D sysbus_create_simple("kvmvapic", -1, NULL);
+     }
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 24281fc..43e0e4c 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -215,6 +215,7 @@ extern KVMState *kvm_state;
+=20
+ bool kvm_has_free_slot(MachineState *ms);
+ int kvm_has_sync_mmu(void);
++int kvm_has_vapic(void);
+ int kvm_has_vcpu_events(void);
+ int kvm_has_robust_singlestep(void);
+ int kvm_has_debugregs(void);
+diff --git a/kvm-all.c b/kvm-all.c
+index 90b8573..edcb6ea 100644
+--- a/kvm-all.c
++++ b/kvm-all.c
+@@ -2232,6 +2232,10 @@ int kvm_has_sync_mmu(void)
+     return kvm_check_extension(kvm_state, KVM_CAP_SYNC_MMU);
+ }
+=20
++int kvm_has_vapic(void){
++    return !kvm_check_extension(kvm_state, KVM_CAP_VAPIC);
++}
++
+ int kvm_has_vcpu_events(void)
+ {
+     return kvm_state->vcpu_events;
