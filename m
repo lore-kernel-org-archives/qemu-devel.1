@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cvqZz-0005H0-SS
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:26:56 -0400
+	(envelope-from <eblake@redhat.com>) id 1cvqa9-0005MV-U4
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:27:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cvqZv-000388-UQ
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:26:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:14612)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cvqZv-00034n-OM
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:26:51 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170405190024.27581-3-dgilbert@redhat.com> (David Alan
-	Gilbert's message of "Wed, 5 Apr 2017 20:00:23 +0100")
-References: <20170405190024.27581-1-dgilbert@redhat.com>
-	<20170405190024.27581-3-dgilbert@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 05 Apr 2017 21:26:46 +0200
-Message-ID: <87wpay3bbd.fsf@secure.mitica>
+	(envelope-from <eblake@redhat.com>) id 1cvqa5-0003Ee-Vd
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:27:05 -0400
+References: <cover.1491416061.git.jcody@redhat.com>
+	<6c82b83fae72a5b5909993f0cf65a90f12efb669.1491416061.git.jcody@redhat.com>
+	<4a5f39ab-50ad-6071-130a-fe77493221ec@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a0d3bd42-682c-fe21-eeaa-28e189386e57@redhat.com>
+Date: Wed, 5 Apr 2017 14:26:53 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/3] vmstatification: i386 FPReg
+In-Reply-To: <4a5f39ab-50ad-6071-130a-fe77493221ec@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Uhue2XggQhMllNNodKBuCoF3nWdm5bJtN"
+Subject: Re: [Qemu-devel] [PATCH for-2.10 3/9] block: honor
+ BDRV_O_ALLOW_RDWR when clearing bs->read_only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,27 +26,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
+To: John Snow <jsnow@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com
 
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> Convert the fpreg save/restore to use VMSTATE_ macros rather than
-> .get/.put.
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Uhue2XggQhMllNNodKBuCoF3nWdm5bJtN
+From: Eric Blake <eblake@redhat.com>
+To: John Snow <jsnow@redhat.com>, Jeff Cody <jcody@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com
+Message-ID: <a0d3bd42-682c-fe21-eeaa-28e189386e57@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 3/9] block: honor BDRV_O_ALLOW_RDWR
+ when clearing bs->read_only
+References: <cover.1491416061.git.jcody@redhat.com>
+ <6c82b83fae72a5b5909993f0cf65a90f12efb669.1491416061.git.jcody@redhat.com>
+ <4a5f39ab-50ad-6071-130a-fe77493221ec@redhat.com>
+In-Reply-To: <4a5f39ab-50ad-6071-130a-fe77493221ec@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+On 04/05/2017 02:20 PM, John Snow wrote:
 
-But if you have to respin
+> Conceptually straightforward.
+>=20
+> looks like this might change behavior for... RBD and vvfat, right?
+> RBD is the subject of this series so we'll just assume that was broken
+> and stupid.
+>=20
+> What's vvfat's story? It always set the read-only property to false
+> regardless of what you asked for?
 
-> +typedef struct x86_FPReg_tmp {
-> +    FPReg *parent;
-> +    uint64_t tmp_mant;
-> +    uint16_t tmp_exp;
-> +} x86_FPReg_tmp;
+vvfat is even stupider than that - it has its own independent property
+'rw' that determines whether to allow write operations, separate from
+the inherited BDS readonly property.
 
-Too many tmp's?  I am pretty sure that you can call the fields mant and exp.
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-Later, Juan.
+
+--Uhue2XggQhMllNNodKBuCoF3nWdm5bJtN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY5UT9AAoJEKeha0olJ0NqQ3QH/RhdgTDRXQOYA3l1NmM7sRBr
+0PTZZsh+env7hF0eNz6zYdE52o4XdC5n78qcmtFlyUn1tltwXDn9nzaMT15TsD6h
+ALIIYWPf0plxnuVVGjX17xcj0bWLykcVw/cljIK1jsEvx27AcgO0EYg3onWBzUzO
+adoBlhMfSDOyDnF9qQ+QmeSOuJ1guZxdtUlhbhRDptg3+UGoP4TA/aAxLaTbnO6d
+Leb80bCuqJZh5r2b8g6bYj1egIKByOSonO0hZy3zNZQbhuRtIYrTvtR83Y0QBuCU
+NaM3Lt7+hKxN3G4kopTCDWpbFIU2yP25PyGZx7NROeRZf1xnguPd/d6BbziQnzw=
+=+Wob
+-----END PGP SIGNATURE-----
+
+--Uhue2XggQhMllNNodKBuCoF3nWdm5bJtN--
