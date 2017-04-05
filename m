@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flypie1@yahoo.com>) id 1cvtNV-0007qJ-2Z
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 18:26:14 -0400
+	(envelope-from <Michael.Wu@ngc.com>) id 1cvs6r-0002jK-OY
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 17:05:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flypie1@yahoo.com>) id 1cvtNR-0002ro-S1
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 18:26:13 -0400
-Received: from nm39.bullet.mail.ir2.yahoo.com ([212.82.96.64]:50873)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <flypie1@yahoo.com>) id 1cvtNR-0002rU-HZ
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 18:26:09 -0400
-Date: Wed, 5 Apr 2017 22:26:07 +0000 (UTC)
-From: John Bradley <flypie1@yahoo.com>
-Reply-To: John Bradley <flypie1@yahoo.com>
-Message-ID: <1512100976.248694.1491431167294@mail.yahoo.com>
-In-Reply-To: <5bd3c81b-c887-3121-241f-4da6414df370@redhat.com>
-References: <1980722825.15261554.1491163199130.ref@mail.yahoo.com>
-	<1980722825.15261554.1491163199130@mail.yahoo.com>
-	<b0e2ad51-afd8-01d7-39a4-8a87be1a15ac@redhat.com>
-	<417382753.16744475.1491243461395@mail.yahoo.com>
-	<5bd3c81b-c887-3121-241f-4da6414df370@redhat.com>
+	(envelope-from <Michael.Wu@ngc.com>) id 1cvs6o-0003Q3-Hp
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 17:04:57 -0400
+Received: from xspc0103.northgrum.com ([157.127.149.150]:12868)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Michael.Wu@ngc.com>) id 1cvs6o-0003Ow-7v
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 17:04:54 -0400
+From: "Wu, Michael Y [US] (MS)" <Michael.Wu@ngc.com>
+Date: Wed, 5 Apr 2017 21:03:30 +0000
+Message-ID: <7a623fb8d2284ee28ddbd6e1ccf277e0@XCGC3021.northgrum.com>
+Content-Language: en-US
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] Fw:  Raspberry PI
+Subject: [Qemu-devel] Emulating external registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,83 +27,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-=C2=A0John BradleyTel: 07896 839635Skype: flypie125 125B Grove StreetEdge H=
-ill Liverpool L7 7AF
+Hi,
 
-     On Wednesday, 5 April 2017, 23:20, John Snow <jsnow@redhat.com> wrote:
-=20
+I've been doing some bare metal programming using the powerpc system emulat=
+or. I was able to run some of my code using the g3beige system emulation. I=
+ am now currently trying emulate some external registers. Simply a powerpc =
+address will be mapped to a register. My plan is to write a bare metal  C p=
+rogram that will access the contents of a given powerpc address via pointer=
+s.
 
-=20
+My current approach is to create a new MemoryRegion in the init function of=
+ the g3beige source code (mac_oldworld.c). My idea is to set up some mmio t=
+o certain address to represent those registers. For now I only care about r=
+eading and writing, but in the future I hope to add additional logic when t=
+he registers are written.
+I added the following lines:
+MemoryRegion *reg =3D g_new(MemoryRegion, 1);
+memory_region_init_alias(reg, NULL, "reg_mmio",
+                            get_system_io(), 0, 0x00200000);
+memory_region_add_subregion(sysmem, 0xfc000000, reg);
 
-On 04/03/2017 02:17 PM, John Bradley wrote:
-> Hi,
->=20
-> Not sure what I am doing at the moment.
->=20
-> It is very little of my code, there are various Rasp version out of
-> there, most of which are old forks that do not run on windows.
-> I created this be merging in several sources to get one that worked, the
-> current plan is to keep it up to date with the current master release,
-> if I can work out how.
->=20
-> The link is flypie/qemu <https://github.com/flypie/qemu.git>
->=20
+In my bare metal program I used the following lines to see  if it works usi=
+ng GDB. The issue is that GDB hangs when the pointer is either read or writ=
+ten. This makes me think I am doing something incorrectly.
+volatile unsigned int  * const test =3D (unsigned int *) 0xFC000000;
+  *test =3D 5640;
 
-Share with the list, not just me!
+  //read from register to confirm
+  if (5640 =3D=3D *test) //seems to pause as well...
+  {
+    breakpoint_hit();
+  }
 
---js
+I have very little limited experience with emulators so I thought I would a=
+sk to see if anyone has tips or suggestions.
 
-> =C2=A0=C2=A0=C2=A0=20
->=20
-> =C2=A0=C2=A0=C2=A0=20
->=20
->=20
->=C2=A0 =C2=A0 flypie/qemu
->=20
-> Official QEMU mirror. Please see
-> http://wiki.qemu.org/Contribute/SubmitAPatch for how to submit changes
-> to QEMU....
-> =C2=A0=C2=A0=C2=A0=20
->=20
-> <https://github.com/flypie/qemu.git>
->=20
->=20
->=C2=A0=20
-> John Bradley
-> Tel: 07896 839635
-> Skype: flypie125
-> 125B Grove Street
-> Edge Hill
-> Liverpool L7 7AF
->=20
->=20
-> On Monday, 3 April 2017, 19:12, John Snow <jsnow@redhat.com> wrote:
->=20
->=20
->=20
->=20
-> On 04/02/2017 03:59 PM, John Bradley via Qemu-devel wrote:
->> Hi,
->> I've just pulled together a collection of patches from various sources
-> to get the Raspberry PI emulation working on the March 27 source. Is it
-> worth sending it in as a patch for inclusion. It allows some of the
-> Circle low level demo to run.
->>
->>
->>=C2=A0 John BradleyTel: 07896 839635Skype: flypie125 125B Grove StreetEdg=
-e
-> Hill Liverpool L7 7AF
->=20
->>
->=20
-> If you are willing to commit to the review process of upstreaming this
-> code and creating revisions and so on, please do send patches!
->=20
-> If you're feeling like you're already done with the project, it may
-> still be useful to get a link to a git tree so others can at least see
-> the code, but without a steward they'll almost certainly not get merged.
->=20
-> --js
-
-
-  =20
+Thanks!
