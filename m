@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cvtXc-0001xc-6V
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 18:36:41 -0400
+	(envelope-from <flypie1@yahoo.com>) id 1cvtNV-0007qJ-2Z
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 18:26:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cvtXZ-0007TL-3J
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 18:36:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57822)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cvtXY-0007TE-TO
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 18:36:37 -0400
-Date: Thu, 6 Apr 2017 01:36:31 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170406013534-mutt-send-email-mst@kernel.org>
-References: <58DA6954.2000601@cn.fujitsu.com>
-	<20170328101233.74f50a92@t450s.home>
-	<20170329000148.GA18849@redhat.com>
-	<20170328205513.21b97381@t450s.home>
-	<20170330205823-mutt-send-email-mst@kernel.org>
-	<20170330121652.2ac8fa62@t450s.home>
-	<58E4B0C9.50109@cn.fujitsu.com>
-	<20170405133822.76cda620@t450s.home>
-	<20170406004845-mutt-send-email-mst@kernel.org>
-	<20170405161910.26fee7d1@t450s.home>
+	(envelope-from <flypie1@yahoo.com>) id 1cvtNR-0002ro-S1
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 18:26:13 -0400
+Received: from nm39.bullet.mail.ir2.yahoo.com ([212.82.96.64]:50873)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <flypie1@yahoo.com>) id 1cvtNR-0002rU-HZ
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 18:26:09 -0400
+Date: Wed, 5 Apr 2017 22:26:07 +0000 (UTC)
+From: John Bradley <flypie1@yahoo.com>
+Reply-To: John Bradley <flypie1@yahoo.com>
+Message-ID: <1512100976.248694.1491431167294@mail.yahoo.com>
+In-Reply-To: <5bd3c81b-c887-3121-241f-4da6414df370@redhat.com>
+References: <1980722825.15261554.1491163199130.ref@mail.yahoo.com>
+	<1980722825.15261554.1491163199130@mail.yahoo.com>
+	<b0e2ad51-afd8-01d7-39a4-8a87be1a15ac@redhat.com>
+	<417382753.16744475.1491243461395@mail.yahoo.com>
+	<5bd3c81b-c887-3121-241f-4da6414df370@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170405161910.26fee7d1@t450s.home>
-Subject: Re: [Qemu-devel] [PATCH v6] vfio error recovery: kernel support
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] Fw:  Raspberry PI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,42 +31,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Cao jin <caoj.fnst@cn.fujitsu.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, izumi.taku@jp.fujitsu.com
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Wed, Apr 05, 2017 at 04:19:10PM -0600, Alex Williamson wrote:
-> On Thu, 6 Apr 2017 00:50:22 +0300
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
-> > On Wed, Apr 05, 2017 at 01:38:22PM -0600, Alex Williamson wrote:
-> > > The previous intention of trying to handle all sorts of AER faults
-> > > clearly had more value, though even there the implementation and
-> > > configuration requirements restricted the practicality.  For instance
-> > > is AER support actually useful to a customer if it requires all ports
-> > > of a multifunction device assigned to the VM?  This seems more like a
-> > > feature targeting whole system partitioning rather than general VM
-> > > device assignment use cases.  Maybe that's ok, but it should be a clear
-> > > design decision.  
-> > 
-> > Alex, what kind of testing do you expect to be necessary?
-> > Would you say testing on real hardware and making it trigger
-> > AER errors is a requirement?
-> 
-> Testing various fatal, non-fatal, and corrected errors with aer-inject,
-> especially in multfunction configurations (where more than one port
-> is actually usable) would certainly be required.  If we have cases where
-> the driver for a companion function can escalate a non-fatal error to a
-> bus reset, that should be tested, even if it requires temporary hacks to
-> the host driver for the companion function to trigger that case.  AER
-> handling is not something that the typical user is going to experience,
-> so it should to be thoroughly tested to make sure it works when needed
-> or there's little point to doing it at all.  Thanks,
-> 
-> Alex
+=C2=A0John BradleyTel: 07896 839635Skype: flypie125 125B Grove StreetEdge H=
+ill Liverpool L7 7AF
 
-Some things can be tested within a VM. What would you
-say would be sufficient on a VM and what has to be
-tested on bare metal?
+     On Wednesday, 5 April 2017, 23:20, John Snow <jsnow@redhat.com> wrote:
+=20
 
--- 
-MST
+=20
+
+On 04/03/2017 02:17 PM, John Bradley wrote:
+> Hi,
+>=20
+> Not sure what I am doing at the moment.
+>=20
+> It is very little of my code, there are various Rasp version out of
+> there, most of which are old forks that do not run on windows.
+> I created this be merging in several sources to get one that worked, the
+> current plan is to keep it up to date with the current master release,
+> if I can work out how.
+>=20
+> The link is flypie/qemu <https://github.com/flypie/qemu.git>
+>=20
+
+Share with the list, not just me!
+
+--js
+
+> =C2=A0=C2=A0=C2=A0=20
+>=20
+> =C2=A0=C2=A0=C2=A0=20
+>=20
+>=20
+>=C2=A0 =C2=A0 flypie/qemu
+>=20
+> Official QEMU mirror. Please see
+> http://wiki.qemu.org/Contribute/SubmitAPatch for how to submit changes
+> to QEMU....
+> =C2=A0=C2=A0=C2=A0=20
+>=20
+> <https://github.com/flypie/qemu.git>
+>=20
+>=20
+>=C2=A0=20
+> John Bradley
+> Tel: 07896 839635
+> Skype: flypie125
+> 125B Grove Street
+> Edge Hill
+> Liverpool L7 7AF
+>=20
+>=20
+> On Monday, 3 April 2017, 19:12, John Snow <jsnow@redhat.com> wrote:
+>=20
+>=20
+>=20
+>=20
+> On 04/02/2017 03:59 PM, John Bradley via Qemu-devel wrote:
+>> Hi,
+>> I've just pulled together a collection of patches from various sources
+> to get the Raspberry PI emulation working on the March 27 source. Is it
+> worth sending it in as a patch for inclusion. It allows some of the
+> Circle low level demo to run.
+>>
+>>
+>>=C2=A0 John BradleyTel: 07896 839635Skype: flypie125 125B Grove StreetEdg=
+e
+> Hill Liverpool L7 7AF
+>=20
+>>
+>=20
+> If you are willing to commit to the review process of upstreaming this
+> code and creating revisions and so on, please do send patches!
+>=20
+> If you're feeling like you're already done with the project, it may
+> still be useful to get a link to a git tree so others can at least see
+> the code, but without a steward they'll almost certainly not get merged.
+>=20
+> --js
+
+
+  =20
