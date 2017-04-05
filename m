@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1cvfWj-0004v3-5j
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 03:38:50 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1cvffl-0006qo-Nn
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 03:48:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1cvfWh-00026u-TS
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 03:38:49 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1cvffh-0005YA-QV
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 03:48:09 -0400
+Received: from mga04.intel.com ([192.55.52.120]:7501)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1cvffh-0005Xi-Ea
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 03:48:05 -0400
+From: "Wang, Wei W" <wei.w.wang@intel.com>
+Date: Wed, 5 Apr 2017 07:47:33 +0000
+Message-ID: <286AC319A985734F985F78AFA26841F7391E1AFC@shsmsx102.ccr.corp.intel.com>
+References: <1489648127-37282-1-git-send-email-wei.w.wang@intel.com>
+	<1489648127-37282-3-git-send-email-wei.w.wang@intel.com>
+	<286AC319A985734F985F78AFA26841F7391E1962@shsmsx102.ccr.corp.intel.com>
+	<20170405065313-mutt-send-email-mst@kernel.org>
+	<286AC319A985734F985F78AFA26841F7391E19B9@shsmsx102.ccr.corp.intel.com>
+In-Reply-To: <286AC319A985734F985F78AFA26841F7391E19B9@shsmsx102.ccr.corp.intel.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <CAOGPPbeRrYfU71ezGB6cYkn8W9mwrSRgvmoj99Q4_q1Km67+gQ@mail.gmail.com>
-References: <1490693009-10037-1-git-send-email-lidongchen@tencent.com>
-	<87efxhspgi.fsf@secure.mitica>
-	<CAOGPPbeRrYfU71ezGB6cYkn8W9mwrSRgvmoj99Q4_q1Km67+gQ@mail.gmail.com>
-From: 858585 jemmy <jemmy858585@gmail.com>
-Date: Wed, 5 Apr 2017 15:38:46 +0800
-Message-ID: <CAOGPPbc9N3uD_VSpnwC=Tcvbex2+qx34ANU2xXsumjWM_TsHow@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [RFC] migration/block:limit the time used for
- block migration
+Subject: Re: [Qemu-devel] [PATCH kernel v8 2/4]
+	virtio-balloon:	VIRTIO_BALLOON_F_CHUNK_TRANSFER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,158 +33,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, Fam Zheng <famz@redhat.com>, dgilbert@redhat.com, qemu-block@nongnu.org, Lidong Chen <lidongchen@tencent.com>
+To: "Wang, Wei W" <wei.w.wang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "aarcange@redhat.com" <aarcange@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "Hansen,
+	Dave" <dave.hansen@intel.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>
 
-On Wed, Mar 29, 2017 at 9:21 PM, 858585 jemmy <jemmy858585@gmail.com> wrote:
-> On Tue, Mar 28, 2017 at 5:47 PM, Juan Quintela <quintela@redhat.com> wrote:
->> Lidong Chen <jemmy858585@gmail.com> wrote:
->>> when migration with quick speed, mig_save_device_bulk invoke
->>> bdrv_is_allocated too frequently, and cause vnc reponse slowly.
->>> this patch limit the time used for bdrv_is_allocated.
->>>
->>> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
->>> ---
->>>  migration/block.c | 39 +++++++++++++++++++++++++++++++--------
->>>  1 file changed, 31 insertions(+), 8 deletions(-)
->>>
->>> diff --git a/migration/block.c b/migration/block.c
->>> index 7734ff7..d3e81ca 100644
->>> --- a/migration/block.c
->>> +++ b/migration/block.c
->>> @@ -110,6 +110,7 @@ typedef struct BlkMigState {
->>>      int transferred;
->>>      int prev_progress;
->>>      int bulk_completed;
->>> +    int time_ns_used;
->>
->> An int that can only take values 0/1 is called a bool O:-)
-> time_ns_used is used to store how many ns used by bdrv_is_allocated.
->
->>
->>
->>>      if (bmds->shared_base) {
->>>          qemu_mutex_lock_iothread();
->>>          aio_context_acquire(blk_get_aio_context(bb));
->>>          /* Skip unallocated sectors; intentionally treats failure as
->>>           * an allocated sector */
->>> -        while (cur_sector < total_sectors &&
->>> -               !bdrv_is_allocated(blk_bs(bb), cur_sector,
->>> -                                  MAX_IS_ALLOCATED_SEARCH, &nr_sectors)) {
->>> -            cur_sector += nr_sectors;
->>> +        while (cur_sector < total_sectors) {
->>> +            clock_gettime(CLOCK_MONOTONIC_RAW, &ts1);
->>> +            ret = bdrv_is_allocated(blk_bs(bb), cur_sector,
->>> +                                    MAX_IS_ALLOCATED_SEARCH, &nr_sectors);
->>> +            clock_gettime(CLOCK_MONOTONIC_RAW, &ts2);
->>
->> Do we really want to call clock_gettime each time that
->> bdrv_is_allocated() is called?  My understanding is that clock_gettime
->> is expensive, but I don't know how expensive is brdrv_is_allocated()
->
-> i write this code to measure the time used by  brdrv_is_allocated()
->
->  279     static int max_time = 0;
->  280     int tmp;
->
->  288             clock_gettime(CLOCK_MONOTONIC_RAW, &ts1);
->  289             ret = bdrv_is_allocated(blk_bs(bb), cur_sector,
->  290                                     MAX_IS_ALLOCATED_SEARCH, &nr_sectors);
->  291             clock_gettime(CLOCK_MONOTONIC_RAW, &ts2);
->  292
->  293
->  294             tmp =  (ts2.tv_sec - ts1.tv_sec)*1000000000L
->  295                            + (ts2.tv_nsec - ts1.tv_nsec);
->  296             if (tmp > max_time) {
->  297                max_time=tmp;
->  298                fprintf(stderr, "max_time is %d\n", max_time);
->  299             }
->
-> the test result is below:
->
->  max_time is 37014
->  max_time is 1075534
->  max_time is 17180913
->  max_time is 28586762
->  max_time is 49563584
->  max_time is 103085447
->  max_time is 110836833
->  max_time is 120331438
->
-> so i think it's necessary to clock_gettime each time.
-> but clock_gettime only available on linux. maybe clock() is better.
->
->>
->> And while we are at it, .... shouldn't we check since before the while?
-> i also check it in block_save_iterate.
-> +           MAX_INFLIGHT_IO &&
-> +           block_mig_state.time_ns_used <= 100000) {
->
->>
->>
->>> +
->>> +            block_mig_state.time_ns_used += (ts2.tv_sec - ts1.tv_sec) * BILLION
->>> +                          + (ts2.tv_nsec - ts1.tv_nsec);
->>> +
->>> +            if (!ret) {
->>> +                cur_sector += nr_sectors;
->>> +                if (block_mig_state.time_ns_used > 100000) {
->>> +                    timeout_flag = 1;
->>> +                    break;
->>> +                }
->>> +            } else {
->>> +                break;
->>> +            }
->>>          }
->>>          aio_context_release(blk_get_aio_context(bb));
->>>          qemu_mutex_unlock_iothread();
->>> @@ -292,6 +311,11 @@ static int mig_save_device_bulk(QEMUFile *f, BlkMigDevState *bmds)
->>>          return 1;
->>>      }
->>>
->>> +    if (timeout_flag == 1) {
->>> +        bmds->cur_sector = bmds->completed_sectors = cur_sector;
->>> +        return 0;
->>> +    }
->>> +
->>>      bmds->completed_sectors = cur_sector;
->>>
->>>      cur_sector &= ~((int64_t)BDRV_SECTORS_PER_DIRTY_CHUNK - 1);
->>> @@ -576,9 +600,6 @@ static int mig_save_device_dirty(QEMUFile *f, BlkMigDevState *bmds,
->>>              }
->>>
->>>              bdrv_reset_dirty_bitmap(bmds->dirty_bitmap, sector, nr_sectors);
->>> -            sector += nr_sectors;
->>> -            bmds->cur_dirty = sector;
->>> -
->>>              break;
->>>          }
->>>          sector += BDRV_SECTORS_PER_DIRTY_CHUNK;
->>> @@ -756,6 +777,7 @@ static int block_save_iterate(QEMUFile *f, void *opaque)
->>>      }
->>>
->>>      blk_mig_reset_dirty_cursor();
->>> +    block_mig_state.time_ns_used = 0;
->>>
->>>      /* control the rate of transfer */
->>>      blk_mig_lock();
->>> @@ -764,7 +786,8 @@ static int block_save_iterate(QEMUFile *f, void *opaque)
->>>             qemu_file_get_rate_limit(f) &&
->>>             (block_mig_state.submitted +
->>>              block_mig_state.read_done) <
->>> -           MAX_INFLIGHT_IO) {
->>> +           MAX_INFLIGHT_IO &&
->>> +           block_mig_state.time_ns_used <= 100000) {
->>
->> changed this 10.000 (and the one used previously) to one constant that
->> says BIG_DELAY, 100MS or whatever you fancy.
-> ok,i will change to BIG_DELAY.
+On Wednesday, April 5, 2017 12:31 PM, Wei Wang wrote:
+> On Wednesday, April 5, 2017 11:54 AM, Michael S. Tsirkin wrote:
+> > On Wed, Apr 05, 2017 at 03:31:36AM +0000, Wang, Wei W wrote:
+> > > On Thursday, March 16, 2017 3:09 PM Wei Wang wrote:
+> > > > The implementation of the current virtio-balloon is not very
+> > > > efficient, because the ballooned pages are transferred to the host
+> > > > one by one. Here is the breakdown of the time in percentage spent
+> > > > on each step of the balloon inflating process (inflating 7GB of an =
+8GB idle
+> guest).
+> > > >
+> > > > 1) allocating pages (6.5%)
+> > > > 2) sending PFNs to host (68.3%)
+> > > > 3) address translation (6.1%)
+> > > > 4) madvise (19%)
+> > > >
+> > > > It takes about 4126ms for the inflating process to complete.
+> > > > The above profiling shows that the bottlenecks are stage 2) and sta=
+ge 4).
+> > > >
+> > > > This patch optimizes step 2) by transferring pages to the host in
+> > > > chunks. A chunk consists of guest physically continuous pages, and
+> > > > it is offered to the host via a base PFN (i.e. the start PFN of
+> > > > those physically continuous pages) and the size (i.e. the total
+> > > > number of the
+> > pages). A chunk is formated as below:
+> > > >
+> > > > --------------------------------------------------------
+> > > > |                 Base (52 bit)        | Rsvd (12 bit) |
+> > > > --------------------------------------------------------
+> > > > --------------------------------------------------------
+> > > > |                 Size (52 bit)        | Rsvd (12 bit) |
+> > > > --------------------------------------------------------
+> > > >
+> > > > By doing so, step 4) can also be optimized by doing address
+> > > > translation and
+> > > > madvise() in chunks rather than page by page.
+> > > >
+> > > > This optimization requires the negotiation of a new feature bit,
+> > > > VIRTIO_BALLOON_F_CHUNK_TRANSFER.
+> > > >
+> > > > With this new feature, the above ballooning process takes ~590ms
+> > > > resulting in an improvement of ~85%.
+> > > >
+> > > > TODO: optimize stage 1) by allocating/freeing a chunk of pages
+> > > > instead of a single page each time.
+> > > >
+> > > > Signed-off-by: Liang Li <liang.z.li@intel.com>
+> > > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> > > > Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+> > > > ---
+> > > >  drivers/virtio/virtio_balloon.c     | 371
+> > +++++++++++++++++++++++++++++++++-
+> > > > --
+> > > >  include/uapi/linux/virtio_balloon.h |   9 +
+> > > >  2 files changed, 353 insertions(+), 27 deletions(-)
+> > > >
+> > > > diff --git a/drivers/virtio/virtio_balloon.c
+> > > > b/drivers/virtio/virtio_balloon.c index
+> > > > f59cb4f..3f4a161 100644
+> > > > --- a/drivers/virtio/virtio_balloon.c
+> > > > +++ b/drivers/virtio/virtio_balloon.c
+> > > > @@ -42,6 +42,10 @@
+> > > >  #define OOM_VBALLOON_DEFAULT_PAGES 256  #define
+> > > > VIRTBALLOON_OOM_NOTIFY_PRIORITY 80
+> > > >
+> > > > +#define PAGE_BMAP_SIZE	(8 * PAGE_SIZE)
+> > > > +#define PFNS_PER_PAGE_BMAP	(PAGE_BMAP_SIZE * BITS_PER_BYTE)
+> > > > +#define PAGE_BMAP_COUNT_MAX	32
+> > > > +
+> > > >  static int oom_pages =3D OOM_VBALLOON_DEFAULT_PAGES;
+> > > > module_param(oom_pages, int, S_IRUSR | S_IWUSR);
+> > > > MODULE_PARM_DESC(oom_pages, "pages to free on OOM"); @@ -50,6
+> > +54,14
+> > > > @@ MODULE_PARM_DESC(oom_pages, "pages to free on OOM");  static
+> > > > struct vfsmount *balloon_mnt;  #endif
+> > > >
+> > > > +#define BALLOON_CHUNK_BASE_SHIFT 12 #define
+> > > > +BALLOON_CHUNK_SIZE_SHIFT 12 struct balloon_page_chunk {
+> > > > +	__le64 base;
+> > > > +	__le64 size;
+> > > > +};
+> > > > +
+> > > > +typedef __le64 resp_data_t;
+> > > >  struct virtio_balloon {
+> > > >  	struct virtio_device *vdev;
+> > > >  	struct virtqueue *inflate_vq, *deflate_vq, *stats_vq; @@ -67,6
+> > > > +79,31 @@ struct virtio_balloon {
+> > > >
+> > > >  	/* Number of balloon pages we've told the Host we're not using. *=
+/
+> > > >  	unsigned int num_pages;
+> > > > +	/* Pointer to the response header. */
+> > > > +	struct virtio_balloon_resp_hdr *resp_hdr;
+> > > > +	/* Pointer to the start address of response data. */
+> > > > +	resp_data_t *resp_data;
+> > >
+> > > I think the implementation has an issue here - both the balloon
+> > > pages and the
+> > unused pages use the same buffer ("resp_data" above) to store chunks.
+> > It would cause a race in this case: live migration starts while balloon=
+ing is also
+> in progress.
+> > I plan to use separate buffers for CHUNKS_OF_BALLOON_PAGES and
+> > CHUNKS_OF_UNUSED_PAGES. Please let me know if you have a different
+> > suggestion. Thanks.
+> > >
+> > > Best,
+> > > Wei
+> >
+> > Is only one resp data ever in flight for each kind?
+> > If not you want as many buffers as vq allows.
+> >
+>=20
+> No, all the kinds were using only one resp_data. I will make it one resp_=
+data for
+> each kind.
+>=20
 
-i find 10000 ns is too small, and will reduce the migration speed.
-i will change BIG_DELAY to 500000. and the migration speed will not be effected.
+Just in case it wasn't well explained - it is one resp data in flight for e=
+ach kind, but the two kinds share the one resp data under the balloon_lock.=
+  I'm thinking would it be worthwhile to have them use separate resp data, =
+so that when live migration begins, it doesn't need to wait to get unused p=
+ages (in the case when "inflating" is using resp data and not sure how long=
+ would it take to finish). The unused pages are useful for the first round =
+of ram transfer, so I think it is important to get them as soon as possible=
+.
 
-i will resubmit this patch.
-
->
->>
->> Thanks, Juan.
+Best,
+Wei
