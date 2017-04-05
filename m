@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cvlOC-0002MQ-TD
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:54:25 -0400
+	(envelope-from <lersek@redhat.com>) id 1cvlVb-0003pt-S6
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 10:02:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cvlOB-0006U4-Vj
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:54:24 -0400
-References: <20170405091909.36357-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170405091909.36357-2-bjsdjshi@linux.vnet.ibm.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <0910cdba-6e7b-169f-784a-a0e064f2c71d@redhat.com>
-Date: Wed, 5 Apr 2017 15:54:14 +0200
+	(envelope-from <lersek@redhat.com>) id 1cvlVV-0001AQ-SK
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 10:02:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37978)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cvlVV-000185-ME
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 10:01:57 -0400
+References: <20170405081209.26814-1-pbonzini@redhat.com>
+	<10ed2863-e925-a0cc-46a2-52f752f37218@redhat.com>
+	<d6c7f116-cc33-053e-17c6-fa277c4c17f7@redhat.com>
+	<d54a867b-6d49-ee37-e182-431c1b611c7c@redhat.com>
+	<5283fe25-9b12-eb71-8f55-6e2c30274eee@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <e2bd1d4f-75f6-1695-1abd-ef094dc41b43@redhat.com>
+Date: Wed, 5 Apr 2017 16:01:53 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170405091909.36357-2-bjsdjshi@linux.vnet.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="AUDnR11W1UaRjpLOCawFfe9lTIIvfvsGP"
-Subject: Re: [Qemu-devel] [PATCH v4 1/1] block: pass the right options for
- BlockDriver.bdrv_open()
+In-Reply-To: <5283fe25-9b12-eb71-8f55-6e2c30274eee@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.9] tco: do not generate an NMI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,76 +30,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-block@nongnu.org, kwolf@redhat.com
-Cc: qemu-devel@nongnu.org, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Paulo Alcantara <pcacjr@gmail.com>, Paulo Alcantara <pcacjr@zytor.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---AUDnR11W1UaRjpLOCawFfe9lTIIvfvsGP
-From: Max Reitz <mreitz@redhat.com>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-block@nongnu.org,
- kwolf@redhat.com
-Cc: qemu-devel@nongnu.org, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com
-Message-ID: <0910cdba-6e7b-169f-784a-a0e064f2c71d@redhat.com>
-Subject: Re: [PATCH v4 1/1] block: pass the right options for
- BlockDriver.bdrv_open()
-References: <20170405091909.36357-1-bjsdjshi@linux.vnet.ibm.com>
- <20170405091909.36357-2-bjsdjshi@linux.vnet.ibm.com>
-In-Reply-To: <20170405091909.36357-2-bjsdjshi@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+On 04/05/17 15:49, Paolo Bonzini wrote:
+> 
+> 
+> On 05/04/2017 15:35, Laszlo Ersek wrote:
+>> Yes, I did track it back to SERR#/IOCHK#.
+>>
+>> What wasn't obvious to me why the TCO watchdog couldn't activate SERR#.
+>>
+>> I guess I missed the "SERR#" explanation in Table-2.6 "PCI Interface
+>> Signals", where it is described as
+>>
+>>   System Error: SERR# can be pulsed active by any PCI device that
+>>   detects a system error condition. Upon sampling SERR# active, the
+>>   ICH9 has the ability to generate an NMI, SMI#, or interrupt.
+>>
+>> ... Well, I still don't see why the watchdog cannot activate SERR#. Why
+>> can't it? :)
+> 
+> Because that's not what SERR# is for? :)  And especially because the
+> effect of a watchdog timeout is described elsewhere without including
+> SERR# in the picture.
 
-On 05.04.2017 11:19, Dong Jia Shi wrote:
-> raw_open() expects the caller always passing in the right actual
-> @options parameter. But when trying to applying snapshot on a RBD
-> image, bdrv_snapshot_goto() calls raw_open() (by calling the
-> bdrv_open callback on the BlockDriver) with a NULL @options, and
-> that will result in a Segmentation fault.
->=20
-> For the other non-raw format drivers, it also makes sense to passing
-> in the actual options, althought they don't trigger the problem so
-> far.
->=20
-> Let's prepare a @options by adding the "file" key-value pair to a
-> copy of the actual options that were given for the node (i.e.
-> bs->options), and pass it to the callback.
->=20
-> BlockDriver.bdrv_open() expects bs->file to be NULL and just
-> overwrites it with the result from bdrv_open_child(). That means we
-> should actually make sure it's NULL because otherwise the child BDS
-> will have a reference count that is 1 too high. So we unconditionally
-> invoke bdrv_unref_child() before calling BlockDriver.bdrv_open(), and
-> we wrap everything in bdrv_ref()/bdrv_unref() so the BDS isn't
-> deleted in the meantime.
->=20
-> Suggested-by: Max Reitz <mreitz@redhat.com>
-> Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> ---
->  block/snapshot.c | 26 +++++++++++++++++++++++---
->  1 file changed, 23 insertions(+), 3 deletions(-)
+That's a valid argument.
 
-Thank you, I've applied the patch to my block branch (for inclusion in 2.=
-9):
+> 
+>>> so that the watchdog does reboot the machine), everything works without
+>>> ugly messages.
+>>
+>> Thanks for the explanation. I now wonder why Paulo decided to add the
+>> NMI in the first place -- was he too confused by the SERR# definition?
+> 
+> Both Paulo and Paolo were confused. :)
+> 
+>>>> (Idea taken from "Documentation/sysctl/kernel.txt", near "nmi_watchdog"
+>>>> -- "The NMI watchdog is disabled by default if the kernel is running as
+>>>> a guest in a KVM virtual machine.")
+>>>
+>>> The Linux NMI watchdog is something else, it is obtained by programming
+>>> a hardware performance counter on every processor.  On Linux,
+>>> performance counters raise NMIs.
+>>
+>> Namely, for whatever reason it was wrong to raise an NMI in a KVM guest
+>> through those performance counters, the same reason would be enough to
+>> not raise an NMI through the iTCO_wdt driver either.
+> 
+> I think the reason is not that it's wrong; it's that by default KVM
+> guests do not have performance counters at all.
 
-https://github.com/XanClic/qemu/commits/block
+Makes sense.
 
-Max
+Thank you for taking the time to explain it all.
 
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 
---AUDnR11W1UaRjpLOCawFfe9lTIIvfvsGP
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljk9wYSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ANZcH/itA+gzSBzInH/kFo74x9gcoSakuhR1m
-v8sZvfC3MHODC9A9uiaO4JyjlRkySA2fdGka1edOxerjRDYiJlmLB+Di/Ced4Hou
-wc8V8KvABLjZCB6rwZ8SOttz3+gLVFirAsZxzzJYHbnrOKHwaxhXElyG8OWTJozE
-9UuCIm4OyEKcjganyNiaTAoFThivmWiRHCBITPg6c4/jxhC/BluyGWncZgvyeAN2
-UxYUEUvz9BrEVTd4YgAgi7ee+y3ARICiC1un1NVyNrXc/H+rJrvCX7C3yQv+xpw/
-dckkD8ja7FGWf5YyEMMvT7BRCdO+WYdfK/qV/+vVPOyXz3QnCg66IY4=
-=cC4Y
------END PGP SIGNATURE-----
-
---AUDnR11W1UaRjpLOCawFfe9lTIIvfvsGP--
+Cheers!
+Laszlo
