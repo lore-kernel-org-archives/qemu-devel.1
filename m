@@ -1,23 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cvdro-0002LF-7i
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 01:52:29 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cveEq-0005Nr-Lv
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 02:16:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cvdrm-0006fg-Rh
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 01:52:28 -0400
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Wed, 5 Apr 2017 05:52:02 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA21F688@DGGEMA505-MBS.china.huawei.com>
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cveEn-00062r-C0
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 02:16:16 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47854
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1cveEn-00062i-6K
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 02:16:13 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v356E0cx070768
+	for <qemu-devel@nongnu.org>; Wed, 5 Apr 2017 02:16:12 -0400
+Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 29msknb7wd-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 05 Apr 2017 02:16:11 -0400
+Received: from localhost
+	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Wed, 5 Apr 2017 02:16:11 -0400
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA21F688@DGGEMA505-MBS.china.huawei.com>
 References: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
 	<33183CC9F5247A488A2544077AF19020DA21F457@DGGEMA505-MBS.china.huawei.com>
 	<149136531491.1924.11146384618293052077@loki>
 	<33183CC9F5247A488A2544077AF19020DA21F625@DGGEMA505-MBS.china.huawei.com>
 	<149136966442.1924.13997608075876307088@loki>
-In-Reply-To: <149136966442.1924.13997608075876307088@loki>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+	<33183CC9F5247A488A2544077AF19020DA21F688@DGGEMA505-MBS.china.huawei.com>
+Date: Wed, 05 Apr 2017 01:16:04 -0500
+Message-Id: <149137296462.1924.7432819972453249661@loki>
 Subject: Re: [Qemu-devel] [Qemu-stable] [PATCH 00/81] Patch Round-up for
  stable 2.8.1, freeze on 2017-03-27
 List-Id: <qemu-devel.nongnu.org>
@@ -28,47 +47,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Cc: "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>
 
-Pg0KPiA+DQo+ID4NCj4gPiA+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4gPiBGcm9t
-OiBNaWNoYWVsIFJvdGggW21haWx0bzptZHJvdGhAbGludXgudm5ldC5pYm0uY29tXQ0KPiA+ID4g
-U2VudDogV2VkbmVzZGF5LCBBcHJpbCAwNSwgMjAxNyAxMjowOSBQTQ0KPiA+ID4gVG86IEdvbmds
-ZWkgKEFyZWkpOyBxZW11LWRldmVsQG5vbmdudS5vcmcNCj4gPiA+IENjOiBxZW11LXN0YWJsZUBu
-b25nbnUub3JnDQo+ID4gPiBTdWJqZWN0OiBSRTogW1FlbXUtc3RhYmxlXSBbUEFUQ0ggMDAvODFd
-IFBhdGNoIFJvdW5kLXVwIGZvciBzdGFibGUgMi44LjEsDQo+ID4gPiBmcmVlemUgb24gMjAxNy0w
-My0yNw0KPiA+ID4NCj4gPiA+IFF1b3RpbmcgR29uZ2xlaSAoQXJlaSkgKDIwMTctMDQtMDQgMjE6
-MDE6NTQpDQo+ID4gPiA+IEhpLA0KPiA+ID4gPg0KPiA+ID4gPiBJJ2QgbGlrZSB0byBhc2sgd2hl
-biBRRU1VIDIuOC4xIHJlbGVhc2U/IEFjY29yZGluZyB0byB0aGUgcHJldmlvdXMNCj4gcGxhbm5p
-bmcsDQo+ID4gPiA+IEl0IHNob3VsZCByZWxlYXNlIGluIE1hciAzMC4NCj4gPiA+DQo+ID4gPiBJ
-dCdzIGFscmVhZHkgYmVlbiByZWxlYXNlZCA6KQ0KPiA+ID4NCj4gPiA+DQo+IGh0dHBzOi8vbGlz
-dHMubm9uZ251Lm9yZy9hcmNoaXZlL2h0bWwvcWVtdS1kZXZlbC8yMDE3LTAzL21zZzA2MzMyLmh0
-bWwNCj4gPiA+DQo+ID4gVGhhbmtzIGZvciB5b3VyIGZlZWRiYWNrIQ0KPiA+DQo+ID4gSSBtaXNz
-ZWQgdGhhdCBtYWlsIDooICAgQnV0IHdoeSBkb24ndCBJIGZpbmQgdGhlIHYyLjguMSB0YWcgaW4g
-UUVNVSB0cmVlPw0KPiANCj4gV2hlcmUgYXJlIHlvdSBwdWxsaW5nIGZyb20/IEZyb20gYSByZXBv
-IEkgaGF2ZW4ndCB1cGRhdGVkIHJlY2VudGx5Og0KPiANCj4gbWRyb3RoQGxva2k6fi93L3FlbXUu
-Z2l0JCBnaXQgcmVtb3RlIGdldC11cmwgb3JpZ2luDQo+IGdpdDovL2dpdC5xZW11Lm9yZy9xZW11
-LmdpdA0KPiBtZHJvdGhAbG9raTp+L3cvcWVtdS5naXQkIGdpdCBmZXRjaCBvcmlnaW4NCj4gcmVt
-b3RlOiBDb3VudGluZyBvYmplY3RzOiAzMTk4LCBkb25lLg0KPiByZW1vdGU6IENvbXByZXNzaW5n
-IG9iamVjdHM6IDEwMCUgKDE3MjUvMTcyNSksIGRvbmUuDQo+IHJlbW90ZTogVG90YWwgMjUwMiAo
-ZGVsdGEgMTk2MyksIHJldXNlZCA5NjIgKGRlbHRhIDc3MikNCj4gUmVjZWl2aW5nIG9iamVjdHM6
-IDEwMCUgKDI1MDIvMjUwMiksIDYwNy41MyBLaUIgfCA3OTEuMDAgS2lCL3MsIGRvbmUuDQo+IFJl
-c29sdmluZyBkZWx0YXM6IDEwMCUgKDE5NjMvMTk2MyksIGNvbXBsZXRlZCB3aXRoIDQyNCBsb2Nh
-bCBvYmplY3RzLg0KPiBGcm9tIGdpdDovL2dpdC5xZW11Lm9yZy9xZW11DQo+ICAgIGI2NDg0MmQu
-LjFmZGU2ZWUgIG1hc3RlciAgICAgLT4gb3JpZ2luL21hc3Rlcg0KPiAgKiBbbmV3IGJyYW5jaF0g
-ICAgICBzdGFibGUtMi44IC0+IG9yaWdpbi9zdGFibGUtMi44DQo+ICAqIFtuZXcgdGFnXSAgICAg
-ICAgIHYyLjguMSAgICAgLT4gdjIuOC4xDQo+ICAqIFtuZXcgdGFnXSAgICAgICAgIHYyLjkuMC1y
-YzMgLT4gdjIuOS4wLXJjMw0KPiAgKiBbbmV3IHRhZ10gICAgICAgICB2Mi45LjAtcmMwIC0+IHYy
-LjkuMC1yYzANCj4gICogW25ldyB0YWddICAgICAgICAgdjIuOS4wLXJjMSAtPiB2Mi45LjAtcmMx
-DQo+ICAqIFtuZXcgdGFnXSAgICAgICAgIHYyLjkuMC1yYzIgLT4gdjIuOS4wLXJjMg0KPiAuLi4N
-Cj4gDQo+IElmIHlvdSdyZSBwdWxsaW5nIGZyb20gdGhlIGdpdGh1YiBtaXJyb3IgSSBkbyBzZWUg
-dGhhdCBpdCBoYXNuJ3QgYmVlbiB1cGRhdGVkDQo+IHlldCB3aXRoIHN0YWJsZS0yLjggYnJhbmNo
-IG9yIHRhZy4gVGhhdCBwcm9jZXNzIHdhcyBwcmV2aW91c2x5IGF1dG9tYXRlZA0KPiBBRkFJSywN
-Cj4gYnV0IG1heWJlIHNvbWV0aGluZyBoYXMgY2hhbmdlZCBzaW5jZSB0aGUgcmVjZW50IHNlcnZl
-ciBzd2l0Y2gtb3Zlci4gV2lsbA0KPiBsb29rDQo+IGludG8gaXQgbW9yZSB0b21vcnJvdy4NCj4g
-DQpZZXMsIEkgcHVsbCBpdCBmcm9tIGdpdGh1YiBtaXJyb3Igc2luY2UgdGhlIGZpcmV3YWxsIG9m
-IG15IGZpcm0uDQpBbmQgSSBub3RpY2UgdGhhdCB0aGUgbGF0ZXN0IHRhZyBpcyB2Mi44LjAsIG5v
-IHYyLjguMSBhbmQgdjIuOS4wLXJjWDoNCg0KbGludXgtYXJlaTovbW50L3NkYi9nb25nbGVpL3Fl
-bXUgIyBnaXQgdGFnIHwgdGFpbA0KdjIuNy4wLXJjMw0KdjIuNy4wLXJjNA0KdjIuNy4wLXJjNQ0K
-djIuNy4xDQp2Mi44LjANCnYyLjguMC1yYzANCnYyLjguMC1yYzENCnYyLjguMC1yYzINCnYyLjgu
-MC1yYzMNCnYyLjguMC1yYzQNCg0KVGhhbmtzLA0KLUdvbmdsZWkNCg0K
+Quoting Gonglei (Arei) (2017-04-05 00:52:02)
+> >
+> > >
+> > >
+> > > > -----Original Message-----
+> > > > From: Michael Roth [mailto:mdroth@linux.vnet.ibm.com]
+> > > > Sent: Wednesday, April 05, 2017 12:09 PM
+> > > > To: Gonglei (Arei); qemu-devel@nongnu.org
+> > > > Cc: qemu-stable@nongnu.org
+> > > > Subject: RE: [Qemu-stable] [PATCH 00/81] Patch Round-up for stable =
+2.8.1,
+> > > > freeze on 2017-03-27
+> > > >
+> > > > Quoting Gonglei (Arei) (2017-04-04 21:01:54)
+> > > > > Hi,
+> > > > >
+> > > > > I'd like to ask when QEMU 2.8.1 release? According to the previous
+> > planning,
+> > > > > It should release in Mar 30.
+> > > >
+> > > > It's already been released :)
+> > > >
+> > > >
+> > https://lists.nongnu.org/archive/html/qemu-devel/2017-03/msg06332.html
+> > > >
+> > > Thanks for your feedback!
+> > >
+> > > I missed that mail :(   But why don't I find the v2.8.1 tag in QEMU t=
+ree?
+> > =
+
+> > Where are you pulling from? From a repo I haven't updated recently:
+> > =
+
+> > mdroth@loki:~/w/qemu.git$ git remote get-url origin
+> > git://git.qemu.org/qemu.git
+> > mdroth@loki:~/w/qemu.git$ git fetch origin
+> > remote: Counting objects: 3198, done.
+> > remote: Compressing objects: 100% (1725/1725), done.
+> > remote: Total 2502 (delta 1963), reused 962 (delta 772)
+> > Receiving objects: 100% (2502/2502), 607.53 KiB | 791.00 KiB/s, done.
+> > Resolving deltas: 100% (1963/1963), completed with 424 local objects.
+> > From git://git.qemu.org/qemu
+> >    b64842d..1fde6ee  master     -> origin/master
+> >  * [new branch]      stable-2.8 -> origin/stable-2.8
+> >  * [new tag]         v2.8.1     -> v2.8.1
+> >  * [new tag]         v2.9.0-rc3 -> v2.9.0-rc3
+> >  * [new tag]         v2.9.0-rc0 -> v2.9.0-rc0
+> >  * [new tag]         v2.9.0-rc1 -> v2.9.0-rc1
+> >  * [new tag]         v2.9.0-rc2 -> v2.9.0-rc2
+> > ...
+> > =
+
+> > If you're pulling from the github mirror I do see that it hasn't been u=
+pdated
+> > yet with stable-2.8 branch or tag. That process was previously automated
+> > AFAIK,
+> > but maybe something has changed since the recent server switch-over. Wi=
+ll
+> > look
+> > into it more tomorrow.
+> > =
+
+> Yes, I pull it from github mirror since the firewall of my firm.
+> And I notice that the latest tag is v2.8.0, no v2.8.1 and v2.9.0-rcX:
+> =
+
+> linux-arei:/mnt/sdb/gonglei/qemu # git tag | tail
+> v2.7.0-rc3
+> v2.7.0-rc4
+> v2.7.0-rc5
+> v2.7.1
+> v2.8.0
+> v2.8.0-rc0
+> v2.8.0-rc1
+> v2.8.0-rc2
+> v2.8.0-rc3
+> v2.8.0-rc4
+
+Thanks for confirming. I've pinged the admins about it, I'm sure it'll
+get sorted out soon.
+
+The tags might be missing on the github mirror, but the master branch seems
+up to date at least. I've also pushed stable-2.8 branch and v2.8.1 to my
+tree in case you need to grab them in the meantime:
+
+  https://github.com/mdroth/qemu/releases/tag/v2.8.1
+
+> =
+
+> Thanks,
+> -Gonglei
+>=20
