@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cvqlE-0000aV-Rl
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:38:34 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1cvqoz-0001bd-Qn
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:42:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cvqlA-0002Sy-Sk
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:38:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50632)
+	(envelope-from <ehabkost@redhat.com>) id 1cvqow-0005DM-MO
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:42:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57272)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cvqlA-0002Rc-JY
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:38:28 -0400
-Date: Wed, 5 Apr 2017 13:38:22 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170405133822.76cda620@t450s.home>
-In-Reply-To: <58E4B0C9.50109@cn.fujitsu.com>
-References: <1490260051-6046-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-	<20170324161238.366ce6a7@t450s.home>
-	<58DA6954.2000601@cn.fujitsu.com>
-	<20170328101233.74f50a92@t450s.home>
-	<20170329000148.GA18849@redhat.com>
-	<20170328205513.21b97381@t450s.home>
-	<20170330205823-mutt-send-email-mst@kernel.org>
-	<20170330121652.2ac8fa62@t450s.home>
-	<58E4B0C9.50109@cn.fujitsu.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cvqow-0005D6-E5
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:42:22 -0400
+Date: Wed, 5 Apr 2017 16:42:16 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170405194216.GA15566@thinpad.lan.raisama.net>
+References: <20170404202429.14643-1-ehabkost@redhat.com>
+	<20170404202429.14643-2-ehabkost@redhat.com>
+	<9ae31b10-0f8c-69fc-c53b-089f89beda3e@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6] vfio error recovery: kernel support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9ae31b10-0f8c-69fc-c53b-089f89beda3e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 01/21] qdev: Replace
+ cannot_instantiate_with_device_add_yet with !user_creatable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,130 +29,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cao jin <caoj.fnst@cn.fujitsu.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, izumi.taku@jp.fujitsu.com
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>
 
-On Wed, 5 Apr 2017 16:54:33 +0800
-Cao jin <caoj.fnst@cn.fujitsu.com> wrote:
-
-> Sorry for late. Distracted by other problem for a while.
-> 
-> On 03/31/2017 02:16 AM, Alex Williamson wrote:
-> > On Thu, 30 Mar 2017 21:00:35 +0300  
-> 
-> >>>>>>       
-> >>>>>>>
-> >>>>>>> I also asked in my previous comments to provide examples of errors that
-> >>>>>>> might trigger correctable errors to the user, this comment seems to
-> >>>>>>> have been missed.  In my experience, AERs generated during device
-> >>>>>>> assignment are generally hardware faults or induced by bad guest
-> >>>>>>> drivers.  These are cases where a single fatal error is an appropriate
-> >>>>>>> and sufficient response.  We've scaled back this support to the point
-> >>>>>>> where we're only improving the situation of correctable errors and I'm
-> >>>>>>> not convinced this is worthwhile and we're not simply checking a box on
-> >>>>>>> an ill-conceived marketing requirements document.        
-> >>>>>>
-> >>>>>> Sorry. I noticed that question: "what actual errors do we expect
-> >>>>>> userspace to see as non-fatal errors?", but I am confused about it.
-> >>>>>> Correctable, non-fatal, fatal errors are clearly defined in PCIe spec,
-> >>>>>> and Uncorrectable Error Severity Register will tell which is fatal, and
-> >>>>>> which is non-fatal, this register is configurable, they are device
-> >>>>>> specific as I guess. AER core driver distinguish them by
-> >>>>>> pci_channel_io_normal/pci_channel_io_frozen,  So I don't understand your
-> >>>>>> question. Or
-> >>>>>>
-> >>>>>> Or, Do you mean we could list the default non-fatal error of
-> >>>>>> Uncorrectable Error Severity Register which is provided by PCIe spec?      
-> >>>>>
-> >>>>> I'm trying to ask why is this patch series useful.  It's clearly
-> >>>>> possible for us to signal non-fatal errors for a device to a guest, but
-> >>>>> why is it necessarily a good idea to do so?  What additional RAS
-> >>>>> feature is gained by this?  Can we give a single example of a real
-> >>>>> world scenario where a guest has been shutdown due to a non-fatal error
-> >>>>> that the guest driver would have handled?      
-> >>>>
-> >>>> We've been discussing AER for months if not years.
-> >>>> Isn't it a bit too late to ask whether AER recovery
-> >>>> by guests it useful at all?    
-> >>>
-> >>>
-> >>> Years, but I think that is more indicative of the persistence of the
-> >>> developers rather than growing acceptance on my part.  For the majority
-> >>> of that we were headed down the path of full AER support with the guest
-> >>> able to invoke bus resets.  It was a complicated solution, but it was
-> >>> more clear that it had some value.   Of course that's been derailed
-> >>> due to various issues and we're now on this partial implementation that
-> >>> only covers non-fatal errors that we assume the guest can recover from
-> >>> without providing it mechanisms to do bus resets.  Is there actual
-> >>> value to this or are we just trying to fill an AER checkbox on
-> >>> someone's marketing sheet?  I don't think it's too much to ask for a
-> >>> commit log to include evidence or discussion about how a feature is
-> >>> actually a benefit to implement.    
-> >>
-> >> Seems rather self evident but ok.  So something like
-> >>
-> >> With this patch, guest is able to recover from non-fatal correctable
-> >> errors - as opposed to stopping the guest with no ability to
-> >> recover which was the only option previously.
-> >>
-> >> Would this address your question?  
+On Wed, Apr 05, 2017 at 10:01:29PM +0300, Marcel Apfelbaum wrote:
+> On 04/04/2017 11:24 PM, Eduardo Habkost wrote:
+> > cannot_instantiate_with_device_add_yet was introduced by commit
+> > 837d37167dc446af8a91189108b363c04609e296 to replace no_user. It
+> > was supposed to be a temporary measure.
 > > 
+> 
+> 
+> Hi Eduardo,
+> 
+> > When it was introduced, we had 54
+> > cannot_instantiate_with_device_add_yet=true lines in the code.
+> > Today (3 years later) this number has not shrinked: we now have
+> > 57 cannot_instantiate_with_device_add_yet=true lines. I think it
+> > is safe to say it is not a temporary measure, and we won't see
+> > the flag go away soon.
 > > 
-> > No, that's just restating the theoretical usefulness of this.  Have you
-> > ever seen a non-fatal error?  Does it ever trigger?  If we can't
-> > provide a real world case of this being useful, can we at least discuss
-> > the types of things that might trigger a non-fatal error for which the
-> > guest could recover?  In patch 3/3 Cao Jin claimed we have a 50% chance
-> > of reducing VM stop conditions, but I suspect this is just a misuse of
-> > statistics, just because there are two choices, fatal vs non-fatal,
-> > does not make them equally likely.  Do we have any idea of the
-> > incidence rate of non-fatal errors?  Is it non-zero?  Thanks,
-> >   
+> > Instead of a long field name that misleads people to believe it
+> > is temporary, replace it a shorter and less misleading field:
+> > user_creatable.
 > 
-> Apparently, I don't have experience to induce non-fatal error, device
-> error is more of a chance related with the environment(temperature,
-> humidity, etc) as I understand.
+> I completely agree with you. I never liked "negation" fields
+> and especially the ones ending with "_yet".
 > 
-> After reading the discussion, can I construe that the old design with
-> full AER support is preferred than this new one?  The core issue of the
-> old design is that the second host link reset make the subsequent
-> guest's register reading fail, and I think this can be solved by test
-> the device's accessibility(read device' register, all F's means
-> unaccessible. IIRC, EEH of Power also use this way to test device's
-> accessiblity) and delay guest's reading if device is temporarily
-> unaccessible.
+> I also don't understand why "user_creatable" can't be used for white-listing *Q35*.
+> I do understand that on some archs we need a white-list per board,
+> but I don't think x86 needs it.
+> 
+> > 
+> > Except for code comments, changes were generated using the
+> > following Coccinelle patch:
+> > 
+> >   @@
+> >   expression DC;
+> >   @@
+> >   (
+> >   -DC->cannot_instantiate_with_device_add_yet = false;
+> >   +DC->user_creatable = true;
+> 
+> Is it necessary? Isn't "creatable = true" the default?
 
-What is the actual AER handling requirement you're trying to solve?  Is
-it simply to check a box on a marketing spec sheet for anything related
-to AER with device assignment or is it to properly handle a specific
-class of errors which a user might actually see and thus provide some
-tangible RAS benefit?  Without even anecdotal incidence rates of
-non-fatal errors and no plan for later incorporating fatal error
-handling, this feels like we're just trying to implement anything to do
-with AER with no long term vision.
+cannot_instantiate_with_device_add_yet is also false by default,
+but if there's code explicitly setting it to false somewhere, it
+is probably necessary for some reason. The script doesn't care
+what's the reason, because this is a 100% mechanical translation
+from the old logic to equivalent logic using the new field.
 
-The previous intention of trying to handle all sorts of AER faults
-clearly had more value, though even there the implementation and
-configuration requirements restricted the practicality.  For instance
-is AER support actually useful to a customer if it requires all ports
-of a multifunction device assigned to the VM?  This seems more like a
-feature targeting whole system partitioning rather than general VM
-device assignment use cases.  Maybe that's ok, but it should be a clear
-design decision.
+If you are still curious about specific cases: explicit
+cannot_instantiate_with_device_add_yet=false/user_creatable=true
+is necessary at x86_cpu_common_class_init(), because TYPE_CPU has
+cannot_instantiate_with_device_add_yet=true (most CPU types don't
+support device_add), but TYPE_X86_CPU sets it back to false
+(because x86 supports CPU hotplug).
 
-I think perhaps the specific issue of the device being in reset while
-the guest tries to access it is only a symptom of deeper problems.  Who
-owns resetting the bus on error?  My position was that we can't make
-the user solely responsible for that since we should never trust the
-user.  If the host handles the reset, then does that imply we have both
-host and guest triggered resets and how do we handle the device during
-the host reset.  It's not clear how we can necessarily correlate a
-guest reset to a specific host reset.  Would it make more sense to
-allow the host AER handling to release some control to the user with
-vfio doing cleanup at the end.  These are hard problems that need to be
-thought through.  I don't want to continue on a path of "can I just fix
-this one next thing and it will be ok?".  The entire previous design is
-suspect.  If you want to move this area forward, take ownership of it
-and propose a complete, end-to-end solution.  Thanks,
+> 
+> >   |
+> >   -DC->cannot_instantiate_with_device_add_yet = true;
+> >   +DC->user_creatable = false;
+> >   )
+> > 
+> >   @@
+> >   typedef ObjectClass;
+> >   expression dc;
+> >   identifier class, data;
+> >   @@
+> >    static void device_class_init(ObjectClass *class, void *data)
+> >    {
+> >    ...
+> >    dc->hotpluggable = true;
+> >   +dc->user_creatable = true;
+> 
+> OK... it seems risky :). Is true that "hotpluggable" => creatable,
+> but the prev rule should work, right?
 
-Alex
+Note that this part is only changing device_class_init(), and no
+other function. dc->hotpluggable=true appears here by pure
+chance: it's just because this is the spot where the new
+dc->user_creatable=true line is being added.
+
+This explicit line addition is required because there's no
+explicit dc->user_creatable=false line in device_class_init
+because QOM objects are always zeroed on creation)
+
+> 
+> >    ...
+> >    }
+> > 
+> >   @@
+> >   @@
+> >    struct DeviceClass {
+> >    ...
+> >   -bool cannot_instantiate_with_device_add_yet;
+> >   +bool user_creatable;
+> >    ...
+> >   }
+> > 
+> >   @@
+> >   expression DC;
+> >   @@
+> >   (
+> >   -!DC->cannot_instantiate_with_device_add_yet
+> >   +DC->user_creatable
+> >   |
+> >   -DC->cannot_instantiate_with_device_add_yet
+> >   +!DC->user_creatable
+> >   )
+> > 
+> 
+> Nice script!
+
+Thanks!
+
+-- 
+Eduardo
