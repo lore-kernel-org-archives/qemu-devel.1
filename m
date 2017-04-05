@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1cviQo-00029w-47
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 06:44:55 -0400
+	(envelope-from <sameeh@daynix.com>) id 1cviST-00038i-DI
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 06:46:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1cviQm-0004hh-M5
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 06:44:54 -0400
-MIME-Version: 1.0
-In-Reply-To: <20170405093441.GH21911@redhat.com>
-References: <1491384478-12325-1-git-send-email-lidongchen@tencent.com>
-	<20170405093441.GH21911@redhat.com>
-From: 858585 jemmy <jemmy858585@gmail.com>
-Date: Wed, 5 Apr 2017 18:44:51 +0800
-Message-ID: <CAOGPPbcNAL4D7d8m+6vTyAwMAeZZ+F0cva8c2YwyheWjXdDQ3w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v3] migration/block:limit the time used for
- block migration
+	(envelope-from <sameeh@daynix.com>) id 1cviSQ-0005YI-MQ
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 06:46:37 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:36328)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1cviSQ-0005Xm-Dg
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 06:46:34 -0400
+Received: by mail-wr0-x242.google.com with SMTP id k6so1483444wre.3
+	for <qemu-devel@nongnu.org>; Wed, 05 Apr 2017 03:46:34 -0700 (PDT)
+From: Sameeh Jubran <sameeh@daynix.com>
+Date: Wed,  5 Apr 2017 13:46:27 +0300
+Message-Id: <20170405104627.18140-1-sameeh@daynix.com>
+Subject: [Qemu-devel] [PATCH v2] qga-win: Fix a bug where qemu-ga service is
+ stuck during stop operation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,59 +24,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, Lidong Chen <lidongchen@tencent.com>
+To: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Yan Vugenfirer <yan@daynix.com>
 
-On Wed, Apr 5, 2017 at 5:34 PM, Daniel P. Berrange <berrange@redhat.com> wrote:
-> On Wed, Apr 05, 2017 at 05:27:58PM +0800, jemmy858585@gmail.com wrote:
->> From: Lidong Chen <lidongchen@tencent.com>
->>
->> when migration with high speed, mig_save_device_bulk invoke
->> bdrv_is_allocated too frequently, and cause vnc reponse slowly.
->> this patch limit the time used for bdrv_is_allocated.
->
-> Can you explain why calling bdrv_is_allocated is impacting VNC performance ?
->
+After triggering a freeze command without any following thaw command,
+qemu-ga will not respond to stop operation. This behaviour is wanted on Linux
+as there is no time limit for a freeze command and we want to prevent
+quitting in the middle of freeze, on the other hand on Windows the time
+limit for freeze is 10 seconds, so we should wait for the timeout, thaw
+the file system and quit.
 
-bdrv_is_allocated is called after qemu_mutex_lock_iothread.
+Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
+---
+ qga/main.c                  | 22 ++++++++++++++++++++++
+ qga/vss-win32.h             |  1 +
+ qga/vss-win32/vss-common.h  | 11 +----------
+ qga/vss-win32/vss-handles.h | 14 ++++++++++++++
+ 4 files changed, 38 insertions(+), 10 deletions(-)
+ create mode 100644 qga/vss-win32/vss-handles.h
 
-    if (bmds->shared_base) {
-        qemu_mutex_lock_iothread();
-        aio_context_acquire(blk_get_aio_context(bb));
-        /* Skip unallocated sectors; intentionally treats failure as
-         * an allocated sector */
-        while (cur_sector < total_sectors &&
-               !bdrv_is_allocated(blk_bs(bb), cur_sector,
-                                  MAX_IS_ALLOCATED_SEARCH, &nr_sectors)) {
-            cur_sector += nr_sectors;
-        }
-        aio_context_release(blk_get_aio_context(bb));
-        qemu_mutex_unlock_iothread();
-    }
-
-and the main thread is also call qemu_mutex_lock_iothread.
-
-#0  0x00007f107322f264 in __lll_lock_wait () from /lib64/libpthread.so.0
-#1  0x00007f107322a508 in _L_lock_854 () from /lib64/libpthread.so.0
-#2  0x00007f107322a3d7 in pthread_mutex_lock () from /lib64/libpthread.so.0
-#3  0x0000000000949ecb in qemu_mutex_lock (mutex=0xfc51a0) at
-util/qemu-thread-posix.c:60
-#4  0x0000000000459e58 in qemu_mutex_lock_iothread () at /root/qemu/cpus.c:1516
-#5  0x0000000000945322 in os_host_main_loop_wait (timeout=28911939) at
-util/main-loop.c:258
-#6  0x00000000009453f2 in main_loop_wait (nonblocking=0) at util/main-loop.c:517
-#7  0x00000000005c76b4 in main_loop () at vl.c:1898
-#8  0x00000000005ceb77 in main (argc=49, argv=0x7fff921182b8,
-envp=0x7fff92118448) at vl.c:4709
-
-> Migration is running in a background thread, so shouldn't be impacting the
-> main thread which handles VNC, unless the block layer is perhaps acquiring
-> the global qemu lock ? I wouldn't expect such a lock to be held for just
-> the bdrv_is_allocated call though.
->
-> Regards,
-> Daniel
-> --
-> |: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-> |: http://libvirt.org              -o-             http://virt-manager.org :|
-> |: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+diff --git a/qga/main.c b/qga/main.c
+index 07c2953..96072fb 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -131,9 +131,31 @@ static void quit_handler(int sig)
+      * unless all log/pid files are on unfreezable filesystems. there's
+      * also a very likely chance killing the agent before unfreezing
+      * the filesystems is a mistake (or will be viewed as one later).
++     * On Windows the freeze interval is limited to 10 seconds, so
++     * we should quit, but first we should wait for the timeout, thaw
++     * the filesystem and quit.
+      */
+     if (ga_is_frozen(ga_state)) {
++#ifdef _WIN32
++        int i = 0;
++        Error *err = NULL;
++        HANDLE hEventTimeout;
++
++        g_debug("Thawing filesystems before exiting");
++
++        hEventTimeout = OpenEvent(EVENT_ALL_ACCESS, FALSE, EVENT_NAME_TIMEOUT);
++        if (hEventTimeout) {
++            WaitForSingleObject(hEventTimeout, 0);
++            CloseHandle(hEventTimeout);
++        }
++        qga_vss_fsfreeze(&i, &err, false);
++        if (err) {
++            g_debug("Error unfreezing filesystems prior to exiting: %s", error_get_pretty(err));
++            error_free(err);
++        }
++#else
+         return;
++#endif
+     }
+     g_debug("received signal num %d, quitting", sig);
+ 
+diff --git a/qga/vss-win32.h b/qga/vss-win32.h
+index 4d1d150..cd9f26e 100644
+--- a/qga/vss-win32.h
++++ b/qga/vss-win32.h
+@@ -13,6 +13,7 @@
+ #ifndef VSS_WIN32_H
+ #define VSS_WIN32_H
+ 
++#include "qga/vss-win32/vss-handles.h"
+ 
+ bool vss_init(bool init_requester);
+ void vss_deinit(bool deinit_requester);
+diff --git a/qga/vss-win32/vss-common.h b/qga/vss-win32/vss-common.h
+index c81a856..61c170b 100644
+--- a/qga/vss-win32/vss-common.h
++++ b/qga/vss-win32/vss-common.h
+@@ -51,21 +51,12 @@
+  * http://www.microsoft.com/en-us/download/details.aspx?id=23490
+  */
+ #include <inc/win2003/vss.h>
++#include "vss-handles.h"
+ 
+ /* Macros to convert char definitions to wchar */
+ #define _L(a) L##a
+ #define L(a) _L(a)
+ 
+-/* Constants for QGA VSS Provider */
+-
+-#define QGA_PROVIDER_NAME "QEMU Guest Agent VSS Provider"
+-#define QGA_PROVIDER_LNAME L(QGA_PROVIDER_NAME)
+-#define QGA_PROVIDER_VERSION L(QEMU_VERSION)
+-
+-#define EVENT_NAME_FROZEN  "Global\\QGAVSSEvent-frozen"
+-#define EVENT_NAME_THAW    "Global\\QGAVSSEvent-thaw"
+-#define EVENT_NAME_TIMEOUT "Global\\QGAVSSEvent-timeout"
+-
+ const GUID g_gProviderId = { 0x3629d4ed, 0xee09, 0x4e0e,
+     {0x9a, 0x5c, 0x6d, 0x8b, 0xa2, 0x87, 0x2a, 0xef} };
+ const GUID g_gProviderVersion = { 0x11ef8b15, 0xcac6, 0x40d6,
+diff --git a/qga/vss-win32/vss-handles.h b/qga/vss-win32/vss-handles.h
+new file mode 100644
+index 0000000..ff399dd
+--- /dev/null
++++ b/qga/vss-win32/vss-handles.h
+@@ -0,0 +1,14 @@
++#ifndef VSS_HANDLES
++#define VSS_HANDLES
++
++/* Constants for QGA VSS Provider */
++
++#define QGA_PROVIDER_NAME "QEMU Guest Agent VSS Provider"
++#define QGA_PROVIDER_LNAME L(QGA_PROVIDER_NAME)
++#define QGA_PROVIDER_VERSION L(QEMU_VERSION)
++
++#define EVENT_NAME_FROZEN  "Global\\QGAVSSEvent-frozen"
++#define EVENT_NAME_THAW    "Global\\QGAVSSEvent-thaw"
++#define EVENT_NAME_TIMEOUT "Global\\QGAVSSEvent-timeout"
++
++#endif
+-- 
+2.9.3
