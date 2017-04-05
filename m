@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cvkGQ-0007x9-Es
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 08:42:22 -0400
+	(envelope-from <clg@kaod.org>) id 1cvkGV-00080K-FX
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 08:42:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cvkGM-0000zF-Ga
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 08:42:18 -0400
-Received: from 3.mo177.mail-out.ovh.net ([46.105.36.172]:34571)
+	(envelope-from <clg@kaod.org>) id 1cvkGR-00010b-GJ
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 08:42:23 -0400
+Received: from 5.mo177.mail-out.ovh.net ([46.105.39.154]:49504)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cvkGM-0000yp-4E
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 08:42:14 -0400
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cvkGR-00010A-6t
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 08:42:19 -0400
 Received: from player688.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id AA78549BCD
-	for <qemu-devel@nongnu.org>; Wed,  5 Apr 2017 14:42:12 +0200 (CEST)
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id CDD9149BCD
+	for <qemu-devel@nongnu.org>; Wed,  5 Apr 2017 14:42:17 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Wed,  5 Apr 2017 14:41:26 +0200
-Message-Id: <1491396106-26376-2-git-send-email-clg@kaod.org>
+Date: Wed,  5 Apr 2017 14:41:27 +0200
+Message-Id: <1491396106-26376-3-git-send-email-clg@kaod.org>
 In-Reply-To: <1491396106-26376-1-git-send-email-clg@kaod.org>
 References: <1491396106-26376-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 01/21] ppc/pnv: Add cut down PSI bridge model
- and hookup external interrupt
+Subject: [Qemu-devel] [PATCH 02/21] ppc/pnv: Add OCC model stub with
+ interrupt support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +31,40 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-The Processor Service Interface (PSI) Controller is one of the engines
-of the "Bridge" unit which connects the different interfaces to the
-Power Processor.
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-This adds just enough of the PSI bridge to handle various on-chip and
-the one external interrupt. The rest of PSI has to do with the link to
-the IBM FSP service processor which we don't plan to emulate (not used
-on OpenPower machines).
+The OCC is an on-chip microcontroller based on a ppc405 core used
+for various power management tasks. It comes with a pile of additional
+hardware sitting on the PIB (aka XSCOM bus). At this point we don't
+emulate it (nor plan to do so). However there is one facility which
+is provided by the surrounding hardware that we do need, which is the
+interrupt generation facility. OPAL uses it to send itself interrupts
+under some circumstances and there are other uses around the corner.
 
-The ics_get() and ics_resend() handlers of the XICSFabric interface of
-the PowerNV machine are now defined to handle the Interrupt Control
-Source of PSI. The InterruptStatsProvider interface is also modified
-to dump the new ICS.
+So this implement just enough to support this.
 
-Originally from Benjamin Herrenschmidt <benh@kernel.crashing.org>
-
+Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+[clg: - updated for qemu-2.9
+      - changed the XSCOM interface to fit new model
+      - QOMified the model ]
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 ---
-
- The fact that the FSP and PSI interrupts are muxed makes the routine
- pnv_psi_irq_set() a little difficult to follow. I didn't do any
- better when I tried to be more explicit.
-
- Changes since last version (I lost track) :
-
- - took ownership
- - introduced the ics_get() and ics_resend() handlers for the
-   XICSFabric interface  =20
- - introduced the handler for the InterruptStatsProvider interface
-=20
- - add more comments on the register definitions
- - removed the PSIHB_MMIO_ definitions which were not used=20
- - fixed mask in pnv_psi_set_cr()
- - fixed mask in pnv_psi_set_irsn()
- - removed pnv_psi_irq_bits() and introduced per-irq number arrays to
-   retrieve the xivr, the control register and the status bit in
-   pnv_psi_irq_set().  =20
- - pnv_psi_set_xivr() :=20
-   . simplified the checks done on the server number, now that the
-     XICSFabric handles PIR CPU numbers  =20
-   . handled pending bit when IRQ is masked
-   . removed FW workaround. Not needed anymore.  =20
- - added some more error handling in case of bad register usage and
-   off the limits IRQ numbers=20
- - improved initial settings of the XIVR
- - QOM'ified the ICS creation
- - changed to become a SysBusDevice
- - added properties to set the BAR
- - added multi chip support
-
  hw/ppc/Makefile.objs       |   2 +-
- hw/ppc/pnv.c               |  65 +++++-
- hw/ppc/pnv_psi.c           | 571 +++++++++++++++++++++++++++++++++++++++=
+ hw/ppc/pnv.c               |  13 +++++
+ hw/ppc/pnv_occ.c           | 136 +++++++++++++++++++++++++++++++++++++++=
 ++++++
- include/hw/ppc/pnv.h       |  13 ++
- include/hw/ppc/pnv_psi.h   |  67 ++++++
+ include/hw/ppc/pnv.h       |   2 +
+ include/hw/ppc/pnv_occ.h   |  38 +++++++++++++
  include/hw/ppc/pnv_xscom.h |   3 +
- 6 files changed, 714 insertions(+), 7 deletions(-)
- create mode 100644 hw/ppc/pnv_psi.c
- create mode 100644 include/hw/ppc/pnv_psi.h
+ 6 files changed, 193 insertions(+), 1 deletion(-)
+ create mode 100644 hw/ppc/pnv_occ.c
+ create mode 100644 include/hw/ppc/pnv_occ.h
 
 diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
-index 001293423c8d..dc19ee17fa57 100644
+index dc19ee17fa57..ef67ea820158 100644
 --- a/hw/ppc/Makefile.objs
 +++ b/hw/ppc/Makefile.objs
 @@ -6,7 +6,7 @@ obj-$(CONFIG_PSERIES) +=3D spapr_hcall.o spapr_iommu.o sp=
@@ -104,796 +73,221 @@ apr_rtas.o
 .o
  obj-$(CONFIG_PSERIES) +=3D spapr_cpu_core.o spapr_ovec.o
  # IBM PowerNV
--obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o
-+obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_ps=
+-obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_ps=
 i.o
++obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_ps=
+i.o pnv_occ.o
  ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)
  obj-y +=3D spapr_pci_vfio.o
  endif
 diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 903bbac03fcc..5c90ac6ad950 100644
+index 5c90ac6ad950..24e523f554c6 100644
 --- a/hw/ppc/pnv.c
 +++ b/hw/ppc/pnv.c
-@@ -353,15 +353,22 @@ static void ppc_powernv_reset(void)
-  * have a CPLD that will collect the SerIRQ and shoot them as a
-  * single level interrupt to the P8 chip. So let's setup a hook
-  * for doing just that.
-- *
-- * Note: The actual interrupt input isn't emulated yet, this will
-- * come with the PSI bridge model.
-  */
- static void pnv_lpc_isa_irq_handler_cpld(void *opaque, int n, int level)
- {
--    /* We don't yet emulate the PSI bridge which provides the external
--     * interrupt, so just drop interrupts on the floor
--     */
-+    PnvMachineState *pnv =3D POWERNV_MACHINE(qdev_get_machine());
-+    uint32_t old_state =3D pnv->cpld_irqstate;
-+    PnvChip *chip =3D opaque;
-+
-+    if (level) {
-+        pnv->cpld_irqstate |=3D 1u << n;
-+    } else {
-+        pnv->cpld_irqstate &=3D ~(1u << n);
-+    }
-+    if (pnv->cpld_irqstate !=3D old_state) {
-+        pnv_psi_irq_set(&chip->psi, PSIHB_IRQ_EXTERNAL,
-+                        pnv->cpld_irqstate !=3D 0);
-+    }
- }
-=20
- static void pnv_lpc_isa_irq_handler(void *opaque, int n, int level)
-@@ -682,6 +689,11 @@ static void pnv_chip_init(Object *obj)
-=20
-     object_initialize(&chip->lpc, sizeof(chip->lpc), TYPE_PNV_LPC);
-     object_property_add_child(obj, "lpc", OBJECT(&chip->lpc), NULL);
-+
-+    object_initialize(&chip->psi, sizeof(chip->psi), TYPE_PNV_PSI);
-+    object_property_add_child(obj, "psi", OBJECT(&chip->psi), NULL);
-+    object_property_add_const_link(OBJECT(&chip->psi), "xics",
-+                                   OBJECT(qdev_get_machine()), &error_ab=
+@@ -694,6 +694,11 @@ static void pnv_chip_init(Object *obj)
+     object_property_add_child(obj, "psi", OBJECT(&chip->psi), NULL);
+     object_property_add_const_link(OBJECT(&chip->psi), "xics",
+                                    OBJECT(qdev_get_machine()), &error_ab=
 ort);
++
++    object_initialize(&chip->occ, sizeof(chip->occ), TYPE_PNV_OCC);
++    object_property_add_child(obj, "occ", OBJECT(&chip->occ), NULL);
++    object_property_add_const_link(OBJECT(&chip->occ), "psi",
++                                   OBJECT(&chip->psi), &error_abort);
  }
 =20
  static void pnv_chip_icp_realize(PnvChip *chip, Error **errp)
-@@ -794,6 +806,16 @@ static void pnv_chip_realize(DeviceState *dev, Error=
+@@ -816,6 +821,14 @@ static void pnv_chip_realize(DeviceState *dev, Error=
  **errp)
-         error_propagate(errp, error);
          return;
      }
+     pnv_xscom_add_subregion(chip, PNV_XSCOM_PSIHB_BASE, &chip->psi.xscom=
+_regs);
 +
-+    /* Processor Service Interface (PSI) Host Bridge */
-+    object_property_set_int(OBJECT(&chip->psi), PNV_PSIHB_BASE(chip),
-+                            "bar", &error_fatal);
-+    object_property_set_bool(OBJECT(&chip->psi), true, "realized", &erro=
++    /* Create the simplified OCC model */
++    object_property_set_bool(OBJECT(&chip->occ), true, "realized", &erro=
 r);
 +    if (error) {
 +        error_propagate(errp, error);
 +        return;
 +    }
-+    pnv_xscom_add_subregion(chip, PNV_XSCOM_PSIHB_BASE, &chip->psi.xscom=
-_regs);
++    pnv_xscom_add_subregion(chip, PNV_XSCOM_OCC_BASE, &chip->occ.xscom_r=
+egs);
  }
 =20
  static Property pnv_chip_properties[] =3D {
-@@ -823,6 +845,29 @@ static const TypeInfo pnv_chip_info =3D {
-     .abstract      =3D true,
- };
-=20
-+static ICSState *pnv_ics_get(XICSFabric *xi, int irq)
-+{
-+    PnvMachineState *pnv =3D POWERNV_MACHINE(xi);
-+    int i;
-+
-+    for (i =3D 0; i < pnv->num_chips; i++) {
-+        if (ics_valid_irq(&pnv->chips[i]->psi.ics, irq)) {
-+            return &pnv->chips[i]->psi.ics;
-+        }
-+    }
-+    return NULL;
-+}
-+
-+static void pnv_ics_resend(XICSFabric *xi)
-+{
-+    PnvMachineState *pnv =3D POWERNV_MACHINE(xi);
-+    int i;
-+
-+    for (i =3D 0; i < pnv->num_chips; i++) {
-+        ics_resend(&pnv->chips[i]->psi.ics);
-+    }
-+}
-+
- static PowerPCCPU *ppc_get_vcpu_by_pir(int pir)
- {
-     CPUState *cs;
-@@ -849,6 +894,8 @@ static ICPState *pnv_icp_get(XICSFabric *xi, int pir)
- static void pnv_pic_print_info(InterruptStatsProvider *obj,
-                                Monitor *mon)
- {
-+    PnvMachineState *pnv =3D POWERNV_MACHINE(obj);
-+    int i;
-     CPUState *cs;
-=20
-     CPU_FOREACH(cs) {
-@@ -856,6 +903,10 @@ static void pnv_pic_print_info(InterruptStatsProvide=
-r *obj,
-=20
-         icp_pic_print_info(ICP(cpu->intc), mon);
-     }
-+
-+    for (i =3D 0; i < pnv->num_chips; i++) {
-+        ics_pic_print_info(&pnv->chips[i]->psi.ics, mon);
-+    }
- }
-=20
- static void pnv_get_num_chips(Object *obj, Visitor *v, const char *name,
-@@ -921,6 +972,8 @@ static void powernv_machine_class_init(ObjectClass *o=
-c, void *data)
-     mc->default_boot_order =3D NULL;
-     mc->default_ram_size =3D 1 * G_BYTE;
-     xic->icp_get =3D pnv_icp_get;
-+    xic->ics_get =3D pnv_ics_get;
-+    xic->ics_resend =3D pnv_ics_resend;
-     ispc->print_info =3D pnv_pic_print_info;
-=20
-     powernv_machine_class_props_init(oc);
-diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
+diff --git a/hw/ppc/pnv_occ.c b/hw/ppc/pnv_occ.c
 new file mode 100644
-index 000000000000..2bf5bfe3fdd6
+index 000000000000..04880f26d612
 --- /dev/null
-+++ b/hw/ppc/pnv_psi.c
-@@ -0,0 +1,571 @@
++++ b/hw/ppc/pnv_occ.c
+@@ -0,0 +1,136 @@
 +/*
-+ * QEMU PowerPC PowerNV Processor Service Interface (PSI) model
++ * QEMU PowerPC PowerNV Emulation of a few OCC related registers
 + *
 + * Copyright (c) 2015-2017, IBM Corporation.
 + *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License, version 2, as
++ * published by the Free Software Foundation.
 + *
-+ * This library is distributed in the hope that it will be useful,
++ * This program is distributed in the hope that it will be useful,
 + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
 + *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
 + */
 +
 +#include "qemu/osdep.h"
 +#include "hw/hw.h"
++#include "sysemu/sysemu.h"
 +#include "target/ppc/cpu.h"
-+#include "qemu/log.h"
 +#include "qapi/error.h"
++#include "qemu/log.h"
 +
-+#include "exec/address-spaces.h"
-+
-+#include "hw/ppc/fdt.h"
 +#include "hw/ppc/pnv.h"
 +#include "hw/ppc/pnv_xscom.h"
-+#include "hw/ppc/pnv_psi.h"
++#include "hw/ppc/pnv_occ.h"
 +
-+#include <libfdt.h>
++#define OCB_OCI_OCCMISC         0x4020
++#define OCB_OCI_OCCMISC_AND     0x4021
++#define OCB_OCI_OCCMISC_OR      0x4022
 +
-+#define PSIHB_XSCOM_FIR_RW      0x00
-+#define PSIHB_XSCOM_FIR_AND     0x01
-+#define PSIHB_XSCOM_FIR_OR      0x02
-+#define PSIHB_XSCOM_FIRMASK_RW  0x03
-+#define PSIHB_XSCOM_FIRMASK_AND 0x04
-+#define PSIHB_XSCOM_FIRMASK_OR  0x05
-+#define PSIHB_XSCOM_FIRACT0     0x06
-+#define PSIHB_XSCOM_FIRACT1     0x07
-+
-+/* Host Bridge Base Address Register */
-+#define PSIHB_XSCOM_BAR         0x0a
-+#define   PSIHB_BAR_EN                  0x0000000000000001ull
-+
-+/* FSP Base Address Register */
-+#define PSIHB_XSCOM_FSPBAR      0x0b
-+
-+/* PSI Host Bridge Control/Status Register */
-+#define PSIHB_XSCOM_CR          0x0e
-+#define   PSIHB_CR_FSP_CMD_ENABLE       0x8000000000000000ull
-+#define   PSIHB_CR_FSP_MMIO_ENABLE      0x4000000000000000ull
-+#define   PSIHB_CR_FSP_IRQ_ENABLE       0x1000000000000000ull
-+#define   PSIHB_CR_FSP_ERR_RSP_ENABLE   0x0800000000000000ull
-+#define   PSIHB_CR_PSI_LINK_ENABLE      0x0400000000000000ull
-+#define   PSIHB_CR_FSP_RESET            0x0200000000000000ull
-+#define   PSIHB_CR_PSIHB_RESET          0x0100000000000000ull
-+#define   PSIHB_CR_PSI_IRQ              0x0000800000000000ull
-+#define   PSIHB_CR_FSP_IRQ              0x0000400000000000ull
-+#define   PSIHB_CR_FSP_LINK_ACTIVE      0x0000200000000000ull
-+#define   PSIHB_CR_IRQ_CMD_EXPECT       0x0000010000000000ull
-+          /* and more ... */
-+
-+/* PSIHB Status / Error Mask Register */
-+#define PSIHB_XSCOM_SEMR        0x0f
-+
-+/* XIVR, to signal interrupts to the CEC firmware. more XIVR below. */
-+#define PSIHB_XSCOM_XIVR_FSP    0x10
-+#define   PSIHB_XIVR_SERVER_SH          40
-+#define   PSIHB_XIVR_SERVER_MSK         (0xffffull << PSIHB_XIVR_SERVER_=
-SH)
-+#define   PSIHB_XIVR_PRIO_SH            32
-+#define   PSIHB_XIVR_PRIO_MSK           (0xffull << PSIHB_XIVR_PRIO_SH)
-+#define   PSIHB_XIVR_SRC_SH             29
-+#define   PSIHB_XIVR_SRC_MSK            (0x7ull << PSIHB_XIVR_SRC_SH)
-+#define   PSIHB_XIVR_PENDING            0x01000000ull
-+
-+/* PSI Host Bridge Set Control/ Status Register */
-+#define PSIHB_XSCOM_SCR         0x12
-+
-+/* PSI Host Bridge Clear Control/ Status Register */
-+#define PSIHB_XSCOM_CCR         0x13
-+
-+/* DMA Upper Address Register */
-+#define PSIHB_XSCOM_DMA_UPADD   0x14
-+
-+/* Interrupt Status */
-+#define PSIHB_XSCOM_IRQ_STAT    0x15
-+#define   PSIHB_IRQ_STAT_OCC            0x0000001000000000ull
-+#define   PSIHB_IRQ_STAT_FSI            0x0000000800000000ull
-+#define   PSIHB_IRQ_STAT_LPCI2C         0x0000000400000000ull
-+#define   PSIHB_IRQ_STAT_LOCERR         0x0000000200000000ull
-+#define   PSIHB_IRQ_STAT_EXT            0x0000000100000000ull
-+
-+/* remaining XIVR */
-+#define PSIHB_XSCOM_XIVR_OCC    0x16
-+#define PSIHB_XSCOM_XIVR_FSI    0x17
-+#define PSIHB_XSCOM_XIVR_LPCI2C 0x18
-+#define PSIHB_XSCOM_XIVR_LOCERR 0x19
-+#define PSIHB_XSCOM_XIVR_EXT    0x1a
-+
-+/* Interrupt Requester Source Compare Register */
-+#define PSIHB_XSCOM_IRSN        0x1b
-+#define   PSIHB_IRSN_COMP_SH            45
-+#define   PSIHB_IRSN_COMP_MSK           (0x7ffffull << PSIHB_IRSN_COMP_S=
-H)
-+#define   PSIHB_IRSN_IRQ_MUX            0x0000000800000000ull
-+#define   PSIHB_IRSN_IRQ_RESET          0x0000000400000000ull
-+#define   PSIHB_IRSN_DOWNSTREAM_EN      0x0000000200000000ull
-+#define   PSIHB_IRSN_UPSTREAM_EN        0x0000000100000000ull
-+#define   PSIHB_IRSN_COMPMASK_SH        13
-+#define   PSIHB_IRSN_COMPMASK_MSK       (0x7ffffull << PSIHB_IRSN_COMPMA=
-SK_SH)
-+
-+#define PSIHB_BAR_MASK                  0x0003fffffff00000ull
-+#define PSIHB_FSPBAR_MASK               0x0003ffff00000000ull
-+
-+static void pnv_psi_set_bar(PnvPsi *psi, uint64_t bar)
++static void pnv_occ_set_misc(PnvOCC *occ, uint64_t val)
 +{
-+    MemoryRegion *sysmem =3D get_system_memory();
-+    uint64_t old =3D psi->regs[PSIHB_XSCOM_BAR];
++    bool irq_state;
 +
-+    psi->regs[PSIHB_XSCOM_BAR] =3D bar & (PSIHB_BAR_MASK | PSIHB_BAR_EN)=
-;
++    val &=3D 0xffff000000000000ull;
 +
-+    /* Update MR, always remove it first */
-+    if (old & PSIHB_BAR_EN) {
-+        memory_region_del_subregion(sysmem, &psi->regs_mr);
-+    }
-+
-+    /* Then add it back if needed */
-+    if (bar & PSIHB_BAR_EN) {
-+        uint64_t addr =3D bar & PSIHB_BAR_MASK;
-+        memory_region_add_subregion(sysmem, addr, &psi->regs_mr);
-+    }
++    occ->occmisc =3D val;
++    irq_state =3D !!(val >> 63);
++    pnv_psi_irq_set(occ->psi, PSIHB_IRQ_OCC, irq_state);
 +}
 +
-+static void pnv_psi_update_fsp_mr(PnvPsi *psi)
++static uint64_t pnv_occ_xscom_read(void *opaque, hwaddr addr, unsigned s=
+ize)
 +{
-+    /* TODO: Update FSP MR if/when we support FSP BAR */
-+}
-+
-+static void pnv_psi_set_cr(PnvPsi *psi, uint64_t cr)
-+{
-+    uint64_t old =3D psi->regs[PSIHB_XSCOM_CR];
-+
-+    psi->regs[PSIHB_XSCOM_CR] =3D cr;
-+
-+    /* Check some bit changes */
-+    if ((old ^ psi->regs[PSIHB_XSCOM_CR]) & PSIHB_CR_FSP_MMIO_ENABLE) {
-+        pnv_psi_update_fsp_mr(psi);
-+    }
-+}
-+
-+static void pnv_psi_set_irsn(PnvPsi *psi, uint64_t val)
-+{
-+    ICSState *ics =3D &psi->ics;
-+
-+    /* In this model we ignore the up/down enable bits for now
-+     * as SW doesn't use them (other than setting them at boot).
-+     * We ignore IRQ_MUX, its meaning isn't clear and we don't use
-+     * it and finally we ignore reset (XXX fix that ?)
-+     */
-+    psi->regs[PSIHB_XSCOM_IRSN] =3D val & (PSIHB_IRSN_COMP_MSK |
-+                                         PSIHB_IRSN_IRQ_MUX |
-+                                         PSIHB_IRSN_IRQ_RESET |
-+                                         PSIHB_IRSN_DOWNSTREAM_EN |
-+                                         PSIHB_IRSN_UPSTREAM_EN);
-+
-+    /* We ignore the compare mask as well, our ICS emulation is too
-+     * simplistic to make any use if it, and we extract the offset
-+     * from the compare value
-+     */
-+    ics->offset =3D (val & PSIHB_IRSN_COMP_MSK) >> PSIHB_IRSN_COMP_SH;
-+}
-+
-+/*
-+ * FSP and PSI interrupts are muxed under the same number.
-+ */
-+static const uint32_t xivr_regs[] =3D {
-+    [PSIHB_IRQ_PSI]       =3D PSIHB_XSCOM_XIVR_FSP,
-+    [PSIHB_IRQ_FSP]       =3D PSIHB_XSCOM_XIVR_FSP,
-+    [PSIHB_IRQ_OCC]       =3D PSIHB_XSCOM_XIVR_OCC,
-+    [PSIHB_IRQ_FSI]       =3D PSIHB_XSCOM_XIVR_FSI,
-+    [PSIHB_IRQ_LPC_I2C]   =3D PSIHB_XSCOM_XIVR_LPCI2C,
-+    [PSIHB_IRQ_LOCAL_ERR] =3D PSIHB_XSCOM_XIVR_LOCERR,
-+    [PSIHB_IRQ_EXTERNAL]  =3D PSIHB_XSCOM_XIVR_EXT,
-+};
-+
-+static const uint32_t stat_regs[] =3D {
-+    [PSIHB_IRQ_PSI]       =3D PSIHB_XSCOM_CR,
-+    [PSIHB_IRQ_FSP]       =3D PSIHB_XSCOM_CR,
-+    [PSIHB_IRQ_OCC]       =3D PSIHB_XSCOM_IRQ_STAT,
-+    [PSIHB_IRQ_FSI]       =3D PSIHB_XSCOM_IRQ_STAT,
-+    [PSIHB_IRQ_LPC_I2C]   =3D PSIHB_XSCOM_IRQ_STAT,
-+    [PSIHB_IRQ_LOCAL_ERR] =3D PSIHB_XSCOM_IRQ_STAT,
-+    [PSIHB_IRQ_EXTERNAL]  =3D PSIHB_XSCOM_IRQ_STAT,
-+};
-+
-+static const uint64_t stat_bits[] =3D {
-+    [PSIHB_IRQ_PSI]       =3D PSIHB_CR_PSI_IRQ,
-+    [PSIHB_IRQ_FSP]       =3D PSIHB_CR_FSP_IRQ,
-+    [PSIHB_IRQ_OCC]       =3D PSIHB_IRQ_STAT_OCC,
-+    [PSIHB_IRQ_FSI]       =3D PSIHB_IRQ_STAT_FSI,
-+    [PSIHB_IRQ_LPC_I2C]   =3D PSIHB_IRQ_STAT_LPCI2C,
-+    [PSIHB_IRQ_LOCAL_ERR] =3D PSIHB_IRQ_STAT_LOCERR,
-+    [PSIHB_IRQ_EXTERNAL]  =3D PSIHB_IRQ_STAT_EXT,
-+};
-+
-+void pnv_psi_irq_set(PnvPsi *psi, PnvPsiIrq irq, bool state)
-+{
-+    ICSState *ics =3D &psi->ics;
-+    uint32_t xivr_reg;
-+    uint32_t stat_reg;
-+    uint32_t src;
-+    bool masked;
-+
-+    if (irq > PSIHB_IRQ_EXTERNAL) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "PSI: Unsupported irq %d\n", irq)=
-;
-+        return;
-+    }
-+
-+    xivr_reg =3D xivr_regs[irq];
-+    stat_reg =3D stat_regs[irq];
-+
-+    src =3D (psi->regs[xivr_reg] & PSIHB_XIVR_SRC_MSK) >> PSIHB_XIVR_SRC=
-_SH;
-+    if (state) {
-+        psi->regs[stat_reg] |=3D stat_bits[irq];
-+        /* TODO: optimization, check mask here. That means
-+         * re-evaluating when unmasking
-+         */
-+        qemu_irq_raise(ics->qirqs[src]);
-+    } else {
-+        psi->regs[stat_reg] &=3D ~stat_bits[irq];
-+
-+        /* FSP and PSI are muxed so don't lower if either is still set *=
-/
-+        if (stat_reg !=3D PSIHB_XSCOM_CR ||
-+            !(psi->regs[stat_reg] & (PSIHB_CR_PSI_IRQ | PSIHB_CR_FSP_IRQ=
-))) {
-+            qemu_irq_lower(ics->qirqs[src]);
-+        } else {
-+            state =3D true;
-+        }
-+    }
-+
-+    /* Note about the emulation of the pending bit: This isn't
-+     * entirely correct. The pending bit should be cleared when the
-+     * EOI has been received. However, we don't have callbacks on EOI
-+     * (especially not under KVM) so no way to emulate that properly,
-+     * so instead we just set that bit as the logical "output" of the
-+     * XIVR (ie pending & !masked)
-+     *
-+     * CLG: We could define a new ICS object with a custom eoi()
-+     * handler to clear the pending bit. But I am not sure this would
-+     * be useful for the software anyhow.
-+     */
-+    masked =3D (psi->regs[xivr_reg] & PSIHB_XIVR_PRIO_MSK) =3D=3D PSIHB_=
-XIVR_PRIO_MSK;
-+    if (state && !masked) {
-+        psi->regs[xivr_reg] |=3D PSIHB_XIVR_PENDING;
-+    } else {
-+        psi->regs[xivr_reg] &=3D ~PSIHB_XIVR_PENDING;
-+    }
-+}
-+
-+static void pnv_psi_set_xivr(PnvPsi *psi, uint32_t reg, uint64_t val)
-+{
-+    ICSState *ics =3D &psi->ics;
-+    uint16_t server;
-+    uint8_t prio;
-+    uint8_t src;
-+
-+    psi->regs[reg] =3D (psi->regs[reg] & PSIHB_XIVR_PENDING) |
-+            (val & (PSIHB_XIVR_SERVER_MSK |
-+                    PSIHB_XIVR_PRIO_MSK |
-+                    PSIHB_XIVR_SRC_MSK));
-+    val =3D psi->regs[reg];
-+    server =3D (val & PSIHB_XIVR_SERVER_MSK) >> PSIHB_XIVR_SERVER_SH;
-+    prio =3D (val & PSIHB_XIVR_PRIO_MSK) >> PSIHB_XIVR_PRIO_SH;
-+    src =3D (val & PSIHB_XIVR_SRC_MSK) >> PSIHB_XIVR_SRC_SH;
-+
-+    if (src >=3D PSI_NUM_INTERRUPTS) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "PSI: Unsupported irq %d\n", src)=
-;
-+        return;
-+    }
-+
-+    /* Remove pending bit if the IRQ is masked */
-+    if ((psi->regs[reg] & PSIHB_XIVR_PRIO_MSK) =3D=3D PSIHB_XIVR_PRIO_MS=
-K) {
-+        psi->regs[reg] &=3D ~PSIHB_XIVR_PENDING;
-+    }
-+
-+    /* The low order 2 bits are the link pointer (Type II interrupts).
-+     * Shift back to get a valid IRQ server.
-+     */
-+    server >>=3D 2;
-+
-+    /* Now because of source remapping, weird things can happen
-+     * if you change the source number dynamically, our simple ICS
-+     * doesn't deal with remapping. So we just poke a different
-+     * ICS entry based on what source number was written. This will
-+     * do for now but a more accurate implementation would instead
-+     * use a fixed server/prio and a remapper of the generated irq.
-+     */
-+    ics_simple_write_xive(ics, src, server, prio, prio);
-+}
-+
-+static uint64_t pnv_psi_reg_read(PnvPsi *psi, uint32_t offset, bool mmio=
-)
-+{
-+    uint64_t val =3D 0xffffffffffffffffull;
++    PnvOCC *occ =3D PNV_OCC(opaque);
++    uint32_t offset =3D addr >> 3;
++    uint64_t val =3D 0;
 +
 +    switch (offset) {
-+    case PSIHB_XSCOM_FIR_RW:
-+    case PSIHB_XSCOM_FIRACT0:
-+    case PSIHB_XSCOM_FIRACT1:
-+    case PSIHB_XSCOM_BAR:
-+    case PSIHB_XSCOM_FSPBAR:
-+    case PSIHB_XSCOM_CR:
-+    case PSIHB_XSCOM_XIVR_FSP:
-+    case PSIHB_XSCOM_XIVR_OCC:
-+    case PSIHB_XSCOM_XIVR_FSI:
-+    case PSIHB_XSCOM_XIVR_LPCI2C:
-+    case PSIHB_XSCOM_XIVR_LOCERR:
-+    case PSIHB_XSCOM_XIVR_EXT:
-+    case PSIHB_XSCOM_IRQ_STAT:
-+    case PSIHB_XSCOM_SEMR:
-+    case PSIHB_XSCOM_DMA_UPADD:
-+    case PSIHB_XSCOM_IRSN:
-+        val =3D psi->regs[offset];
++    case OCB_OCI_OCCMISC:
++        val =3D occ->occmisc;
 +        break;
 +    default:
-+        qemu_log_mask(LOG_UNIMP, "PSI: read at Ox%" PRIx32 "\n", offset)=
-;
++        qemu_log_mask(LOG_UNIMP, "OCC Unimplemented register: Ox%"
++                      HWADDR_PRIx "\n", addr);
 +    }
 +    return val;
 +}
 +
-+static void pnv_psi_reg_write(PnvPsi *psi, uint32_t offset, uint64_t val=
-,
-+                              bool mmio)
-+{
-+    switch (offset) {
-+    case PSIHB_XSCOM_FIR_RW:
-+    case PSIHB_XSCOM_FIRACT0:
-+    case PSIHB_XSCOM_FIRACT1:
-+    case PSIHB_XSCOM_SEMR:
-+    case PSIHB_XSCOM_DMA_UPADD:
-+        psi->regs[offset] =3D val;
-+        break;
-+    case PSIHB_XSCOM_FIR_OR:
-+        psi->regs[PSIHB_XSCOM_FIR_RW] |=3D val;
-+        break;
-+    case PSIHB_XSCOM_FIR_AND:
-+        psi->regs[PSIHB_XSCOM_FIR_RW] &=3D val;
-+        break;
-+    case PSIHB_XSCOM_BAR:
-+        /* Only XSCOM can write this one */
-+        if (!mmio) {
-+            pnv_psi_set_bar(psi, val);
-+        } else {
-+            qemu_log_mask(LOG_GUEST_ERROR, "PSI: invalid write of BAR\n"=
-);
-+        }
-+        break;
-+    case PSIHB_XSCOM_FSPBAR:
-+        psi->regs[PSIHB_XSCOM_FSPBAR] =3D val & PSIHB_FSPBAR_MASK;
-+        pnv_psi_update_fsp_mr(psi);
-+        break;
-+    case PSIHB_XSCOM_CR:
-+        pnv_psi_set_cr(psi, val);
-+        break;
-+    case PSIHB_XSCOM_SCR:
-+        pnv_psi_set_cr(psi, psi->regs[PSIHB_XSCOM_CR] | val);
-+        break;
-+    case PSIHB_XSCOM_CCR:
-+        pnv_psi_set_cr(psi, psi->regs[PSIHB_XSCOM_CR] & ~val);
-+        break;
-+    case PSIHB_XSCOM_XIVR_FSP:
-+    case PSIHB_XSCOM_XIVR_OCC:
-+    case PSIHB_XSCOM_XIVR_FSI:
-+    case PSIHB_XSCOM_XIVR_LPCI2C:
-+    case PSIHB_XSCOM_XIVR_LOCERR:
-+    case PSIHB_XSCOM_XIVR_EXT:
-+        pnv_psi_set_xivr(psi, offset, val);
-+        break;
-+    case PSIHB_XSCOM_IRQ_STAT:
-+        /* Read only */
-+        qemu_log_mask(LOG_GUEST_ERROR, "PSI: invalid write of IRQ_STAT\n=
-");
-+        break;
-+    case PSIHB_XSCOM_IRSN:
-+        pnv_psi_set_irsn(psi, val);
-+        break;
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "PSI: write at Ox%" PRIx32 "\n", offset=
-);
-+    }
-+}
-+
-+/*
-+ * The values of the registers when accessed through the MMIO region
-+ * follow the relation : xscom =3D (mmio + 0x50) >> 3
-+ */
-+static uint64_t pnv_psi_mmio_read(void *opaque, hwaddr addr, unsigned si=
-ze)
-+{
-+    return pnv_psi_reg_read(opaque, (addr >> 3) + PSIHB_XSCOM_BAR, true)=
-;
-+}
-+
-+static void pnv_psi_mmio_write(void *opaque, hwaddr addr,
-+                              uint64_t val, unsigned size)
-+{
-+    pnv_psi_reg_write(opaque, (addr >> 3) + PSIHB_XSCOM_BAR, val, true);
-+}
-+
-+static const MemoryRegionOps psi_mmio_ops =3D {
-+    .read =3D pnv_psi_mmio_read,
-+    .write =3D pnv_psi_mmio_write,
-+    .endianness =3D DEVICE_BIG_ENDIAN,
-+    .valid =3D {
-+        .min_access_size =3D 8,
-+        .max_access_size =3D 8,
-+    },
-+    .impl =3D {
-+        .min_access_size =3D 8,
-+        .max_access_size =3D 8,
-+    },
-+};
-+
-+static uint64_t pnv_psi_xscom_read(void *opaque, hwaddr addr, unsigned s=
-ize)
-+{
-+    return pnv_psi_reg_read(opaque, addr >> 3, false);
-+}
-+
-+static void pnv_psi_xscom_write(void *opaque, hwaddr addr,
++static void pnv_occ_xscom_write(void *opaque, hwaddr addr,
 +                                uint64_t val, unsigned size)
 +{
-+    pnv_psi_reg_write(opaque, addr >> 3, val, false);
++    PnvOCC *occ =3D PNV_OCC(opaque);
++    uint32_t offset =3D addr >> 3;
++
++    switch (offset) {
++    case OCB_OCI_OCCMISC_AND:
++        pnv_occ_set_misc(occ, occ->occmisc & val);
++        break;
++    case OCB_OCI_OCCMISC_OR:
++        pnv_occ_set_misc(occ, occ->occmisc | val);
++        break;
++    case OCB_OCI_OCCMISC:
++        pnv_occ_set_misc(occ, val);
++        break;
++    default:
++        qemu_log_mask(LOG_UNIMP, "OCC Unimplemented register: Ox%"
++                      HWADDR_PRIx "\n", addr);
++    }
 +}
 +
-+static const MemoryRegionOps pnv_psi_xscom_ops =3D {
-+    .read =3D pnv_psi_xscom_read,
-+    .write =3D pnv_psi_xscom_write,
++static const MemoryRegionOps pnv_occ_xscom_ops =3D {
++    .read =3D pnv_occ_xscom_read,
++    .write =3D pnv_occ_xscom_write,
++    .valid.min_access_size =3D 8,
++    .valid.max_access_size =3D 8,
++    .impl.min_access_size =3D 8,
++    .impl.max_access_size =3D 8,
 +    .endianness =3D DEVICE_BIG_ENDIAN,
-+    .valid =3D {
-+        .min_access_size =3D 8,
-+        .max_access_size =3D 8,
-+    },
-+    .impl =3D {
-+        .min_access_size =3D 8,
-+        .max_access_size =3D 8,
-+    }
 +};
 +
-+static void pnv_psi_init(Object *obj)
++
++static void pnv_occ_realize(DeviceState *dev, Error **errp)
 +{
-+    PnvPsi *psi =3D PNV_PSI(obj);
-+
-+    object_initialize(&psi->ics, sizeof(psi->ics), TYPE_ICS_SIMPLE);
-+    object_property_add_child(obj, "ics-psi", OBJECT(&psi->ics), NULL);
-+}
-+
-+static const uint8_t irq_to_xivr[] =3D {
-+    PSIHB_XSCOM_XIVR_FSP,
-+    PSIHB_XSCOM_XIVR_OCC,
-+    PSIHB_XSCOM_XIVR_FSI,
-+    PSIHB_XSCOM_XIVR_LPCI2C,
-+    PSIHB_XSCOM_XIVR_LOCERR,
-+    PSIHB_XSCOM_XIVR_EXT,
-+};
-+
-+static void pnv_psi_realize(DeviceState *dev, Error **errp)
-+{
-+    PnvPsi *psi =3D PNV_PSI(dev);
-+    ICSState *ics =3D &psi->ics;
++    PnvOCC *occ =3D PNV_OCC(dev);
 +    Object *obj;
-+    Error *err =3D NULL;
-+    unsigned int i;
++    Error *error =3D NULL;
 +
-+    obj =3D object_property_get_link(OBJECT(dev), "xics", &err);
++    occ->occmisc =3D 0;
++
++    /* get PSI object from chip */
++    obj =3D object_property_get_link(OBJECT(dev), "psi", &error);
 +    if (!obj) {
-+        error_setg(errp, "%s: required link 'xics' not found: %s",
-+                   __func__, error_get_pretty(err));
++        error_setg(errp, "%s: required link 'psi' not found: %s",
++                   __func__, error_get_pretty(error));
 +        return;
 +    }
++    occ->psi =3D PNV_PSI(obj);
 +
-+    /* Create PSI interrupt control source */
-+    object_property_add_const_link(OBJECT(ics), "xics", obj,  &error_abo=
-rt);
-+    object_property_set_int(OBJECT(ics), PSI_NUM_INTERRUPTS, "nr-irqs", =
-&err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    object_property_set_bool(OBJECT(ics), true, "realized",  &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+
-+    for (i =3D 0; i < ics->nr_irqs; i++) {
-+        ics_set_irq_type(ics, i, true);
-+    }
-+
-+    /* XSCOM region for PSI registers */
-+    pnv_xscom_region_init(&psi->xscom_regs, OBJECT(dev), &pnv_psi_xscom_=
++    /* XScom region for OCC registers */
++    pnv_xscom_region_init(&occ->xscom_regs, OBJECT(dev), &pnv_occ_xscom_=
 ops,
-+                psi, "xscom-psi", PNV_XSCOM_PSIHB_SIZE);
-+
-+    /* Initialize MMIO region */
-+    memory_region_init_io(&psi->regs_mr, OBJECT(dev), &psi_mmio_ops, psi=
-,
-+                          "psihb", PNV_PSIHB_SIZE);
-+
-+    /* Default BAR for MMIO region */
-+    pnv_psi_set_bar(psi, psi->bar | PSIHB_BAR_EN);
-+
-+    /* Default sources in XIVR */
-+    for (i =3D 0; i < PSI_NUM_INTERRUPTS; i++) {
-+        uint8_t xivr =3D irq_to_xivr[i];
-+        psi->regs[xivr] =3D PSIHB_XIVR_PRIO_MSK |
-+            ((uint64_t) i << PSIHB_XIVR_SRC_SH);
-+    }
++                  occ, "xscom-occ", PNV_XSCOM_OCC_SIZE);
 +}
 +
-+static int pnv_psi_populate(PnvXScomInterface *dev, void *fdt, int xscom=
-_offset)
-+{
-+    const char compat[] =3D "ibm,power8-psihb-x\0ibm,psihb-x";
-+    char *name;
-+    int offset;
-+    uint32_t lpc_pcba =3D PNV_XSCOM_PSIHB_BASE;
-+    uint32_t reg[] =3D {
-+        cpu_to_be32(lpc_pcba),
-+        cpu_to_be32(PNV_XSCOM_PSIHB_SIZE)
-+    };
-+
-+    name =3D g_strdup_printf("psihb@%x", lpc_pcba);
-+    offset =3D fdt_add_subnode(fdt, xscom_offset, name);
-+    _FDT(offset);
-+    g_free(name);
-+
-+    _FDT((fdt_setprop(fdt, offset, "reg", reg, sizeof(reg))));
-+
-+    _FDT((fdt_setprop_cell(fdt, offset, "#address-cells", 2)));
-+    _FDT((fdt_setprop_cell(fdt, offset, "#size-cells", 1)));
-+    _FDT((fdt_setprop(fdt, offset, "compatible", compat,
-+                      sizeof(compat))));
-+    return 0;
-+}
-+
-+static Property pnv_psi_properties[] =3D {
-+    DEFINE_PROP_UINT64("bar", PnvPsi, bar, 0),
-+    DEFINE_PROP_UINT64("fsp-bar", PnvPsi, fsp_bar, 0),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void pnv_psi_class_init(ObjectClass *klass, void *data)
++static void pnv_occ_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    PnvXScomInterfaceClass *xdc =3D PNV_XSCOM_INTERFACE_CLASS(klass);
 +
-+    xdc->populate =3D pnv_psi_populate;
-+
-+    dc->realize =3D pnv_psi_realize;
-+    dc->props =3D pnv_psi_properties;
++    dc->realize =3D pnv_occ_realize;
 +}
 +
-+static const TypeInfo pnv_psi_info =3D {
-+    .name          =3D TYPE_PNV_PSI,
-+    .parent        =3D TYPE_SYS_BUS_DEVICE,
-+    .instance_size =3D sizeof(PnvPsi),
-+    .instance_init =3D pnv_psi_init,
-+    .class_init    =3D pnv_psi_class_init,
-+    .interfaces    =3D (InterfaceInfo[]) {
-+        { TYPE_PNV_XSCOM_INTERFACE },
-+        { }
-+    }
++static const TypeInfo pnv_occ_type_info =3D {
++    .name          =3D TYPE_PNV_OCC,
++    .parent        =3D TYPE_DEVICE,
++    .instance_size =3D sizeof(PnvOCC),
++    .class_init    =3D pnv_occ_class_init,
 +};
 +
-+static void pnv_psi_register_types(void)
++static void pnv_occ_register_types(void)
 +{
-+    type_register_static(&pnv_psi_info);
++    type_register_static(&pnv_occ_type_info);
 +}
 +
-+type_init(pnv_psi_register_types)
++type_init(pnv_occ_register_types)
 diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index 96231c1ff708..a3ed2ee647b9 100644
+index a3ed2ee647b9..b45a0d91c813 100644
 --- a/include/hw/ppc/pnv.h
 +++ b/include/hw/ppc/pnv.h
-@@ -22,6 +22,7 @@
- #include "hw/boards.h"
+@@ -23,6 +23,7 @@
  #include "hw/sysbus.h"
  #include "hw/ppc/pnv_lpc.h"
-+#include "hw/ppc/pnv_psi.h"
+ #include "hw/ppc/pnv_psi.h"
++#include "hw/ppc/pnv_occ.h"
 =20
  #define TYPE_PNV_CHIP "powernv-chip"
  #define PNV_CHIP(obj) OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP)
-@@ -57,6 +58,7 @@ typedef struct PnvChip {
-     MemoryRegion icp_mmio;
+@@ -59,6 +60,7 @@ typedef struct PnvChip {
 =20
      PnvLpcController lpc;
-+    PnvPsi       psi;
+     PnvPsi       psi;
++    PnvOCC       occ;
  } PnvChip;
 =20
  typedef struct PnvChipClass {
-@@ -125,6 +127,7 @@ typedef struct PnvMachineState {
-     PnvChip      **chips;
-=20
-     ISABus       *isa_bus;
-+    uint32_t     cpld_irqstate;
- } PnvMachineState;
-=20
- #define PNV_FDT_ADDR          0x01000000
-@@ -155,4 +158,14 @@ typedef struct PnvMachineState {
- #define PNV_ICP_BASE(chip)                                              =
-\
-     (0x0003ffff80000000ull + (uint64_t) PNV_CHIP_INDEX(chip) * PNV_ICP_S=
-IZE)
-=20
-+
-+#define PNV_PSIHB_SIZE       0x0000000000100000ull
-+#define PNV_PSIHB_BASE(chip) \
-+    (0x0003fffe80000000ull + (uint64_t)PNV_CHIP_INDEX(chip) * PNV_PSIHB_=
-SIZE)
-+
-+#define PNV_PSIHB_FSP_SIZE   0x0000000100000000ull
-+#define PNV_PSIHB_FSP_BASE(chip) \
-+    (0x0003ffe000000000ull + (uint64_t)PNV_CHIP_INDEX(chip) * \
-+     PNV_PSIHB_FSP_SIZE)
-+
- #endif /* _PPC_PNV_H */
-diff --git a/include/hw/ppc/pnv_psi.h b/include/hw/ppc/pnv_psi.h
+diff --git a/include/hw/ppc/pnv_occ.h b/include/hw/ppc/pnv_occ.h
 new file mode 100644
-index 000000000000..11d83e43f8ad
+index 000000000000..f8ec330abfd7
 --- /dev/null
-+++ b/include/hw/ppc/pnv_psi.h
-@@ -0,0 +1,67 @@
++++ b/include/hw/ppc/pnv_occ.h
+@@ -0,0 +1,38 @@
 +/*
-+ * QEMU PowerPC PowerNV Processor Service Interface (PSI) model
++ * QEMU PowerPC PowerNV Emulation of a few OCC related registers
 + *
 + * Copyright (c) 2015-2017, IBM Corporation.
 + *
@@ -911,65 +305,36 @@ index 000000000000..11d83e43f8ad
 + * License along with this library; if not, see <http://www.gnu.org/lice=
 nses/>.
 + */
-+#ifndef _PPC_PNV_PSI_H
-+#define _PPC_PNV_PSI_H
++#ifndef _PPC_PNV_OCC_H
++#define _PPC_PNV_OCC_H
 +
-+#include "hw/sysbus.h"
-+#include "hw/ppc/xics.h"
++#define TYPE_PNV_OCC "pnv-occ"
++#define PNV_OCC(obj) OBJECT_CHECK(PnvOCC, (obj), TYPE_PNV_OCC)
 +
-+#define TYPE_PNV_PSI "pnv-psi"
-+#define PNV_PSI(obj) \
-+     OBJECT_CHECK(PnvPsi, (obj), TYPE_PNV_PSI)
++typedef struct PnvPsi PnvPsi;
 +
-+#define PSIHB_XSCOM_MAX         0x20
++typedef struct PnvOCC {
++    DeviceState xd;
 +
-+typedef struct XICSState XICSState;
++    /* OCC Misc interrupt */
++    uint64_t occmisc;
 +
-+typedef struct PnvPsi {
-+    SysBusDevice parent;
-+
-+    MemoryRegion regs_mr;
-+    uint64_t bar;
-+
-+    /* FSP region not supported */
-+    /* MemoryRegion fsp_mr; */
-+    uint64_t fsp_bar;
-+
-+    /* Interrupt generation */
-+    ICSState ics;
-+
-+    /* Registers */
-+    uint64_t regs[PSIHB_XSCOM_MAX];
++    PnvPsi *psi;
 +
 +    MemoryRegion xscom_regs;
-+} PnvPsi;
++} PnvOCC;
 +
-+/* The PSI and FSP interrupts are muxed on the same IRQ number */
-+typedef enum PnvPsiIrq {
-+    PSIHB_IRQ_PSI, /* internal use only */
-+    PSIHB_IRQ_FSP, /* internal use only */
-+    PSIHB_IRQ_OCC,
-+    PSIHB_IRQ_FSI,
-+    PSIHB_IRQ_LPC_I2C,
-+    PSIHB_IRQ_LOCAL_ERR,
-+    PSIHB_IRQ_EXTERNAL,
-+} PnvPsiIrq;
-+
-+#define PSI_NUM_INTERRUPTS 6
-+
-+extern void pnv_psi_irq_set(PnvPsi *psi, PnvPsiIrq irq, bool state);
-+
-+#endif /* _PPC_PNV_PSI_H */
++#endif /* _PPC_PNV_OCC_H */
 diff --git a/include/hw/ppc/pnv_xscom.h b/include/hw/ppc/pnv_xscom.h
-index 0faa1847bf13..15f7fdb147ee 100644
+index 15f7fdb147ee..3757b2cab94b 100644
 --- a/include/hw/ppc/pnv_xscom.h
 +++ b/include/hw/ppc/pnv_xscom.h
-@@ -60,6 +60,9 @@ typedef struct PnvXScomInterfaceClass {
- #define PNV_XSCOM_LPC_BASE        0xb0020
- #define PNV_XSCOM_LPC_SIZE        0x4
+@@ -63,6 +63,9 @@ typedef struct PnvXScomInterfaceClass {
+ #define PNV_XSCOM_PSIHB_BASE      0x2010900
+ #define PNV_XSCOM_PSIHB_SIZE      0x20
 =20
-+#define PNV_XSCOM_PSIHB_BASE      0x2010900
-+#define PNV_XSCOM_PSIHB_SIZE      0x20
++#define PNV_XSCOM_OCC_BASE        0x0066000
++#define PNV_XSCOM_OCC_SIZE        0x6000
 +
  extern void pnv_xscom_realize(PnvChip *chip, Error **errp);
  extern int pnv_xscom_populate(PnvChip *chip, void *fdt, int offset);
