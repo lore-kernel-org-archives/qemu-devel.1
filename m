@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cvpgr-0007Bs-HT
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 14:30:02 -0400
+	(envelope-from <anthony.xu@intel.com>) id 1cvpqH-0005n7-Rz
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 14:39:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cvpgm-0002KK-8o
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 14:29:53 -0400
-From: Jeff Cody <jcody@redhat.com>
-Date: Wed,  5 Apr 2017 14:28:50 -0400
-Message-Id: <613303fd54633f005eeea485e32f590994eb299f.1491416061.git.jcody@redhat.com>
-In-Reply-To: <cover.1491416061.git.jcody@redhat.com>
-References: <cover.1491416061.git.jcody@redhat.com>
-In-Reply-To: <cover.1491416061.git.jcody@redhat.com>
-References: <cover.1491416061.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10 8/9] block/rbd: do not blindly set
- bs->read_only
+	(envelope-from <anthony.xu@intel.com>) id 1cvpqD-00005M-W7
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 14:39:41 -0400
+Received: from mga01.intel.com ([192.55.52.88]:1231)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
+	id 1cvpqD-0008WJ-LG
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 14:39:37 -0400
+From: "Xu, Anthony" <anthony.xu@intel.com>
+Date: Wed, 5 Apr 2017 18:39:34 +0000
+Message-ID: <4712D8F4B26E034E80552F30A67BE0B1A4F5CF@ORSMSX112.amr.corp.intel.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: [Qemu-devel] [PATCH 0/3] move xen related files to corresponding
+ xen directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,48 +27,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, jsnow@redhat.com, stefanha@redhat.com, kwolf@redhat.com
+To: "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>
+Cc: "sstabellini@kernel.org" <sstabellini@kernel.org>, "anthony.perard@citrix.com" <anthony.perard@citrix.com>, 'Paolo Bonzini' <pbonzini@redhat.com>
 
-We do not want to just blindly set bs->read_only.  The only time
-we need to set it with the current rbd driver, is if we are using an
-rbd snapshot.  In that case, we must set it to read-only.
+move xen related files to corresponding xen directory.
 
-Signed-off-by: Jeff Cody <jcody@redhat.com>
----
- block/rbd.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+move xen-common.c to hw/xen/
+move xen-hvm.c to hw/i386/xen/
+move xen-mapcache.c to hw/i386/xen/
 
-diff --git a/block/rbd.c b/block/rbd.c
-index c5e1aeb..35853c9 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -635,6 +635,7 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-         goto failed_shutdown;
-     }
- 
-+    /* rbd_open is always r/w */
-     r = rbd_open(s->io_ctx, s->image_name, &s->image, s->snap);
-     if (r < 0) {
-         error_setg_errno(errp, -r, "error reading header from %s",
-@@ -642,10 +643,14 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-         goto failed_open;
-     }
- 
--    r = bdrv_set_read_only(bs, (s->snap != NULL), &local_err);
--    if (r < 0) {
--        error_propagate(errp, local_err);
--        goto failed_open;
-+    /* If we are using an rbd snapshot, we must be r/o, otherwise
-+     * leave as-is */
-+    if (s->snap != NULL) {
-+        r = bdrv_set_read_only(bs, true, &local_err);
-+        if (r < 0) {
-+            error_propagate(errp, local_err);
-+            goto failed_open;
-+        }
-     }
- 
-     qemu_opts_del(opts);
--- 
-2.9.3
+
+Signed-off -by: Anthony Xu <anthony.xu@intel.com>
+
+
+
+Makefile.target                    |    6 -
+ default-configs/i386-softmmu.mak   |    1 -
+ default-configs/x86_64-softmmu.mak |    1 -
+ hw/i386/xen/Makefile.objs          |    2 +-
+ hw/i386/xen/trace-events           |   17 +
+ hw/i386/xen/xen-hvm.c              | 1422 ++++++++++++++++++++++++++++++++=
+++++
+ hw/i386/xen/xen-mapcache.c         |  459 ++++++++++++
+ hw/xen/Makefile.objs               |    2 +-
+ hw/xen/xen-common.c                |  158 ++++
+ stubs/Makefile.objs                |    2 +
+ stubs/xen-common.c                 |   14 +
+ stubs/xen-hvm.c                    |   63 ++
+ trace-events                       |   16 -
+ xen-common-stub.c                  |   14 -
+ xen-common.c                       |  158 ----
+ xen-hvm-stub.c                     |   63 --
+ xen-hvm.c                          | 1422 --------------------------------=
+----
+ xen-mapcache.c                     |  459 ------------
+ 18 files changed, 2137 insertions(+), 2142 deletions(-)
+ create mode 100644 hw/i386/xen/xen-hvm.c
+ create mode 100644 hw/i386/xen/xen-mapcache.c
+ create mode 100644 hw/xen/xen-common.c
+ create mode 100644 stubs/xen-common.c
+ create mode 100644 stubs/xen-hvm.c
+ delete mode 100644 xen-common-stub.c
+ delete mode 100644 xen-common.c
+ delete mode 100644 xen-hvm-stub.c
+ delete mode 100644 xen-hvm.c
+ delete mode 100644 xen-mapcache.c
