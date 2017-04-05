@@ -1,42 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42781)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cvdNf-0005o4-04
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 01:21:20 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1cvdqs-0001i9-Ox
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 01:51:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cvdNb-0003zk-Sz
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 01:21:19 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51237
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cvdNb-0003zb-Mn
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 01:21:15 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v355JU6P054969
-	for <qemu-devel@nongnu.org>; Wed, 5 Apr 2017 01:21:14 -0400
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 29mry4auke-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 05 Apr 2017 01:21:14 -0400
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 4 Apr 2017 23:21:13 -0600
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <dgibson@ozlabs.org>) id 1cvdqr-0006J5-HX
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 01:51:30 -0400
+Date: Wed, 5 Apr 2017 15:51:15 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170405055115.GC13614@umbus.fritz.box>
+References: <1491205565-12831-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA21F625@DGGEMA505-MBS.china.huawei.com>
-References: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DA21F457@DGGEMA505-MBS.china.huawei.com>
-	<149136531491.1924.11146384618293052077@loki>
-	<33183CC9F5247A488A2544077AF19020DA21F625@DGGEMA505-MBS.china.huawei.com>
-Date: Wed, 05 Apr 2017 00:21:04 -0500
-Message-Id: <149136966442.1924.13997608075876307088@loki>
-Subject: Re: [Qemu-devel] [Qemu-stable] [PATCH 00/81] Patch Round-up for
- stable 2.8.1, freeze on 2017-03-27
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="ZmUaFz6apKcXQszQ"
+Content-Disposition: inline
+In-Reply-To: <1491205565-12831-1-git-send-email-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v5 0/9] ppc/pnv: interrupt controller
+ (POWER8)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,74 +24,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Quoting Gonglei (Arei) (2017-04-04 23:51:26)
-> Hi Michael,
-> =
 
-> =
+--ZmUaFz6apKcXQszQ
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > -----Original Message-----
-> > From: Michael Roth [mailto:mdroth@linux.vnet.ibm.com]
-> > Sent: Wednesday, April 05, 2017 12:09 PM
-> > To: Gonglei (Arei); qemu-devel@nongnu.org
-> > Cc: qemu-stable@nongnu.org
-> > Subject: RE: [Qemu-stable] [PATCH 00/81] Patch Round-up for stable 2.8.=
-1,
-> > freeze on 2017-03-27
-> > =
-
-> > Quoting Gonglei (Arei) (2017-04-04 21:01:54)
-> > > Hi,
-> > >
-> > > I'd like to ask when QEMU 2.8.1 release? According to the previous pl=
-anning,
-> > > It should release in Mar 30.
-> > =
-
-> > It's already been released :)
-> > =
-
-> >   https://lists.nongnu.org/archive/html/qemu-devel/2017-03/msg06332.html
-> > =
-
-> Thanks for your feedback!
-> =
-
-> I missed that mail :(   But why don't I find the v2.8.1 tag in QEMU tree?
-
-Where are you pulling from? From a repo I haven't updated recently:
-
-mdroth@loki:~/w/qemu.git$ git remote get-url origin
-git://git.qemu.org/qemu.git
-mdroth@loki:~/w/qemu.git$ git fetch origin
-remote: Counting objects: 3198, done.
-remote: Compressing objects: 100% (1725/1725), done.
-remote: Total 2502 (delta 1963), reused 962 (delta 772)
-Receiving objects: 100% (2502/2502), 607.53 KiB | 791.00 KiB/s, done.
-Resolving deltas: 100% (1963/1963), completed with 424 local objects.
-From=20git://git.qemu.org/qemu
-   b64842d..1fde6ee  master     -> origin/master
- * [new branch]      stable-2.8 -> origin/stable-2.8
- * [new tag]         v2.8.1     -> v2.8.1
- * [new tag]         v2.9.0-rc3 -> v2.9.0-rc3
- * [new tag]         v2.9.0-rc0 -> v2.9.0-rc0
- * [new tag]         v2.9.0-rc1 -> v2.9.0-rc1
- * [new tag]         v2.9.0-rc2 -> v2.9.0-rc2
-...
-
-If you're pulling from the github mirror I do see that it hasn't been updat=
-ed
-yet with stable-2.8 branch or tag. That process was previously automated AF=
-AIK,
-but maybe something has changed since the recent server switch-over. Will l=
-ook
-into it more tomorrow.
-
-> =
-
-> Thanks,
-> -Gonglei
+On Mon, Apr 03, 2017 at 09:45:56AM +0200, C=E9dric Le Goater wrote:
+> Hello,
 >=20
+> Here is a series adding support for the interrupt controller as found
+> on a POWER8 system. POWER9 uses a different interrupt controller
+> called XIVE, still to be worked on.
+>=20
+> The initial patches are more cleanups of the XICS layer which move the
+> IRQ 'server' number mapping under the machine handlers.
+>=20
+> A new PnvICPState object based on MMIOs, which is specific to PowerNV,
+> is introduced in XICS. These ICP objects are created for each thread
+> of a core and linked to the associated PowerPCCPU object.
+>=20
+> Finally, to make use of the XICS layer, the PowerNV machine is
+> extended with a QOM XICSFabric interface and with a global memory
+> region acting as the Interrupt Management area.
+>=20
+>=20
+> To test, grab a kernel and a rootfs image here :
+>=20
+>   https://openpower.xyz/job/openpower-op-build/distro=3Dubuntu,target=3Dp=
+almetto/lastSuccessfulBuild/artifact/images/zImage.epapr
+>   https://openpower.xyz/job/openpower-op-build/distro=3Dubuntu,target=3Dp=
+almetto/lastSuccessfulBuild/artifact/images/rootfs.cpio.xz
+>=20
+> The full patchset is available here :
+>=20
+>    https://github.com/legoater/qemu/commits/powernv-ipmi-2.9
+>=20
+> Thanks,
+
+I've applied the series to my ppc-for-2.10 branch.  A couple of things
+to think about for follow up cleanups:
+
+1) The spapr->nr_servers field has very little remaining use; can you
+   go a bit further and remove it entirely?
+
+2) At the moment you're creating (and realizing) the ICP objects just
+before you realize the core objects.  I'm not entirely sure if
+creating new objects at realize time is QOMishly correct.  Maybe do
+some more enquiries to see if it is or not, and if not update.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--ZmUaFz6apKcXQszQ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJY5IXRAAoJEGw4ysog2bOSP8kP/jEWBCHhtY0Lx7Nk4KPYMepI
+tim6Bs4BuPfA/pOv6q97RbnnCYaW6jRBemKSX2E33McMMl0wZCLjN5fTDsE25273
+mJnk8PCuw39o7pNXkPccmRpeY3/EDVD0jl2/yxKtklTsoRtgJjvH+xoCxr6N/Upu
+zptN1YfFlL4uyaWKPKEHMjYiNy5iNp2xQYreRt6cti7Tl2e0UnXv50F+MBYB8J70
+p/wr/VpJzXwycLpltiuqh9kTOa4SsQDIgMnEgxqX2kboP0cZyLz5onzjmUH2lHn0
+exrSaYcQd8j2na6ZmrTqBqSJOEf67zerpCw+QXvSga1q6MU9peI2Pzbsq4aXMK98
+jhyBVvqiBiAb9IKqZlOshpkQhJTD0QHgLPVGdsWQPrRzgkYu3EKK2BRc6aWU999/
+ed+BqkU8DetehBQnQoYUs27A5lv4cX9QtrBYNoDmFQx6GxwC8yE6K3YEo52uFojV
+FacAwheDSHH0fovS3Yl84RJsa7KXhG6x+0wc8vMBBTFuou8JvprTXutONZHFNIBA
+CTvlcM7hM5D0K7fcD7vvxJZb6XvuwnBeMCq07w6Hzdjkp0fQhfhuLyAhLlhQRGXG
+m51q96ePX01a0S0FSgqYTUQXa5lRVul4VqFavmHkZ1Drzx5gzJNIGEu70jVHF8aw
+fuzWkgxbYR1aX+ShUN+s
+=kTZh
+-----END PGP SIGNATURE-----
+
+--ZmUaFz6apKcXQszQ--
