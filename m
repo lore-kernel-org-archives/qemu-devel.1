@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54588)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cvkvv-0004dO-ID
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:25:12 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1cvkvw-0004ec-Oe
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:25:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cvkvu-0000Ja-Es
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:25:11 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:36429)
+	(envelope-from <alex.bennee@linaro.org>) id 1cvkvv-0000KM-Oo
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:25:12 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:36445)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cvkvu-0000Iz-8I
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:25:10 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id w11so13735154wrc.3
-	for <qemu-devel@nongnu.org>; Wed, 05 Apr 2017 06:25:10 -0700 (PDT)
+	id 1cvkvv-0000Jy-Hj
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:25:11 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id w11so13736044wrc.3
+	for <qemu-devel@nongnu.org>; Wed, 05 Apr 2017 06:25:11 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed,  5 Apr 2017 14:24:59 +0100
-Message-Id: <20170405132503.32125-9-alex.bennee@linaro.org>
+Date: Wed,  5 Apr 2017 14:24:58 +0100
+Message-Id: <20170405132503.32125-8-alex.bennee@linaro.org>
 In-Reply-To: <20170405132503.32125-1-alex.bennee@linaro.org>
 References: <20170405132503.32125-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 08/12] cpus: don't credit executed
- instructions before they have run
+Subject: [Qemu-devel] [PATCH v2 07/12] cpus: move icount preparation out of
+ tcg_exec_cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,90 +33,127 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: dovgaluk@ispras.ru, rth@twiddle.net, pbonzini@redhat.com
 Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-Outside of the vCPU thread icount time will only be tracked against
-timers_state.qemu_icount. We no longer credit cycles until they have
-completed the run. Inside the vCPU thread we adjust for passage of
-time by looking at how many have run so far. This is only valid inside
-the vCPU thread while it is running.
+As icount is only supported for single-threaded execution due to the
+requirement for determinism let's remove it from the common
+tcg_exec_cpu path.
+
+Also remove the additional fiddling which shouldn't be required as the
+icount counters should all be rectified as you enter the loop.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+
 ---
- cpus.c            | 25 +++++++++++++++++++------
- include/qom/cpu.h |  1 +
- 2 files changed, 20 insertions(+), 6 deletions(-)
+v2
+  - only clear u16.low
+  - drop BQL assert
+---
+ cpus.c | 67 ++++++++++++++++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 45 insertions(+), 22 deletions(-)
 
 diff --git a/cpus.c b/cpus.c
-index d9cb9407a2..88eabdc19f 100644
+index 18b1746770..d9cb9407a2 100644
 --- a/cpus.c
 +++ b/cpus.c
-@@ -223,6 +223,15 @@ void qemu_tcg_configure(QemuOpts *opts, Error **errp)
+@@ -1179,47 +1179,64 @@ static void handle_icount_deadline(void)
      }
  }
  
-+/* The current number of executed instructions is based on what we
-+ * originally budgeted minus the current state of the decrementing
-+ * icount counters in extra/u16.low.
-+ */
-+static int64_t cpu_get_icount_executed(CPUState *cpu)
-+{
-+    return cpu->icount_budget - (cpu->icount_decr.u16.low + cpu->icount_extra);
-+}
-+
- int64_t cpu_get_icount_raw(void)
+-static int tcg_cpu_exec(CPUState *cpu)
++static void prepare_icount_for_run(CPUState *cpu)
  {
-     int64_t icount;
-@@ -234,7 +243,8 @@ int64_t cpu_get_icount_raw(void)
-             fprintf(stderr, "Bad icount read\n");
-             exit(1);
-         }
--        icount -= (cpu->icount_decr.u16.low + cpu->icount_extra);
-+        /* Take into account what has run */
-+        icount += cpu_get_icount_executed(cpu);
-     }
-     return icount;
- }
-@@ -1195,7 +1205,10 @@ static void prepare_icount_for_run(CPUState *cpu)
- 
-         count = tcg_get_icount_limit();
- 
--        timers_state.qemu_icount += count;
-+        /* To calculate what we have executed so far we need to know
-+         * what we originally budgeted to run this cycle */
-+        cpu->icount_budget = count;
+-    int ret;
+-#ifdef CONFIG_PROFILER
+-    int64_t ti;
+-#endif
+-
+-#ifdef CONFIG_PROFILER
+-    ti = profile_getclock();
+-#endif
+     if (use_icount) {
+         int64_t count;
+         int decr;
+-        timers_state.qemu_icount -= (cpu->icount_decr.u16.low
+-                                    + cpu->icount_extra);
+-        cpu->icount_decr.u16.low = 0;
+-        cpu->icount_extra = 0;
 +
++        /* These should always be cleared by process_icount_data after
++         * each vCPU execution. However u16.high can be raised
++         * asynchronously by cpu_exit/cpu_interrupt/tcg_handle_interrupt
++         */
++        g_assert(cpu->icount_decr.u16.low == 0);
++        g_assert(cpu->icount_extra == 0);
++
++
+         count = tcg_get_icount_limit();
++
+         timers_state.qemu_icount += count;
          decr = (count > 0xffff) ? 0xffff : count;
          count -= decr;
          cpu->icount_decr.u16.low = decr;
-@@ -1206,14 +1219,14 @@ static void prepare_icount_for_run(CPUState *cpu)
- static void process_icount_data(CPUState *cpu)
- {
-     if (use_icount) {
--        /* Fold pending instructions back into the
--           instruction counter, and clear the interrupt flag.  */
--        timers_state.qemu_icount -= (cpu->icount_decr.u16.low
--                        + cpu->icount_extra);
-+        /* Account for executed instructions */
-+        timers_state.qemu_icount += cpu_get_icount_executed(cpu);
- 
-         /* Reset the counters */
-         cpu->icount_decr.u16.low = 0;
-         cpu->icount_extra = 0;
-+        cpu->icount_budget = 0;
+         cpu->icount_extra = count;
+     }
+-    qemu_mutex_unlock_iothread();
+-    cpu_exec_start(cpu);
+-    ret = cpu_exec(cpu);
+-    cpu_exec_end(cpu);
+-    qemu_mutex_lock_iothread();
+-#ifdef CONFIG_PROFILER
+-    tcg_time += profile_getclock() - ti;
+-#endif
++}
 +
++static void process_icount_data(CPUState *cpu)
++{
+     if (use_icount) {
+         /* Fold pending instructions back into the
+            instruction counter, and clear the interrupt flag.  */
+         timers_state.qemu_icount -= (cpu->icount_decr.u16.low
+                         + cpu->icount_extra);
+-        cpu->icount_decr.u32 = 0;
++
++        /* Reset the counters */
++        cpu->icount_decr.u16.low = 0;
+         cpu->icount_extra = 0;
          replay_account_executed_instructions();
      }
++}
++
++
++static int tcg_cpu_exec(CPUState *cpu)
++{
++    int ret;
++#ifdef CONFIG_PROFILER
++    int64_t ti;
++#endif
++
++#ifdef CONFIG_PROFILER
++    ti = profile_getclock();
++#endif
++    qemu_mutex_unlock_iothread();
++    cpu_exec_start(cpu);
++    ret = cpu_exec(cpu);
++    cpu_exec_end(cpu);
++    qemu_mutex_lock_iothread();
++#ifdef CONFIG_PROFILER
++    tcg_time += profile_getclock() - ti;
++#endif
+     return ret;
  }
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index c3292efe1c..5d10359c8f 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -332,6 +332,7 @@ struct CPUState {
-     /* updates protected by BQL */
-     uint32_t interrupt_request;
-     int singlestep_enabled;
-+    int64_t icount_budget;
-     int64_t icount_extra;
-     sigjmp_buf jmp_env;
  
+@@ -1306,7 +1323,13 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+ 
+             if (cpu_can_run(cpu)) {
+                 int r;
++
++                prepare_icount_for_run(cpu);
++
+                 r = tcg_cpu_exec(cpu);
++
++                process_icount_data(cpu);
++
+                 if (r == EXCP_DEBUG) {
+                     cpu_handle_guest_debug(cpu);
+                     break;
 -- 
 2.11.0
