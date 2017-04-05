@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54094)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cvnYS-00038z-3A
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 12:13:09 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1cvnbR-0004KT-Td
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 12:16:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cvnYO-0003Ha-Q3
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 12:13:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:27572)
+	(envelope-from <pbonzini@redhat.com>) id 1cvnbO-0004mV-M0
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 12:16:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57296)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cvnYO-0003Gs-H5
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 12:13:04 -0400
-Date: Wed, 5 Apr 2017 17:12:56 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170405161256.GA25291@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170311132256.22951-1-marcandre.lureau@redhat.com>
-	<20170311132256.22951-18-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cvnbO-0004mF-G5
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 12:16:10 -0400
+References: <58CFE56E.9090303@huawei.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <135b6663-b65c-b5ba-d3a8-b2a2127a07fa@redhat.com>
+Date: Wed, 5 Apr 2017 18:16:05 +0200
 MIME-Version: 1.0
+In-Reply-To: <58CFE56E.9090303@huawei.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170311132256.22951-18-marcandre.lureau@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 17/21] virtio-channel: parse qga stream for
- VMDUMP_INFO event
+Subject: Re: [Qemu-devel] [BUG/RFC] INIT IPI lost when VM starts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,156 +26,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, armbru@redhat.com, anderson@redhat.com, pbonzini@redhat.com, lersek@redhat.com
+To: "Herongguang (Stephen)" <herongguang.he@huawei.com>, rkrcmar@redhat.com, afaerber@suse.de, jan.kiszka@siemens.com, qemu-devel@nongnu.org, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, wangxinxin.wang@huawei.com, "weidong.huang@huawei.com >> Huangweidong (C)" <weidong.huang@huawei.com>
 
-On Sat, Mar 11, 2017 at 05:22:52PM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> On virtio channel "org.qemu.guest_agent.0", parse the json stream until
-> the VMDUMP_INFO is received and retrieve the dump details.
+
+
+On 20/03/2017 15:21, Herongguang (Stephen) wrote:
 >=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  include/sysemu/dump-info.h | 15 +++++++++++++
->  dump.c                     |  3 +++
->  hw/char/virtio-console.c   | 53 ++++++++++++++++++++++++++++++++++++++=
-++++++++
->  3 files changed, 71 insertions(+)
->  create mode 100644 include/sysemu/dump-info.h
+> We encountered a problem that when a domain starts, seabios failed to
+> online a vCPU.
 >=20
-> diff --git a/include/sysemu/dump-info.h b/include/sysemu/dump-info.h
-> new file mode 100644
-> index 0000000000..fb1ddff9af
-> --- /dev/null
-> +++ b/include/sysemu/dump-info.h
-> @@ -0,0 +1,15 @@
-> +#ifndef DUMP_INFO_H
-> +#define DUMP_INFO_H
-> +
-> +typedef struct DumpInfo {
-> +    bool received;
-> +    bool has_phys_base;
-> +    uint64_t phys_base;
-> +    bool has_text;
-> +    uint64_t text;
-> +    char *vmcoreinfo;
-> +} DumpInfo;
-> +
-> +extern DumpInfo dump_info;
-> +
-> +#endif /* DUMP_INFO_H */
-> diff --git a/dump.c b/dump.c
-> index f7b80d856b..68b406459e 100644
-> --- a/dump.c
-> +++ b/dump.c
-> @@ -20,6 +20,7 @@
->  #include "monitor/monitor.h"
->  #include "sysemu/kvm.h"
->  #include "sysemu/dump.h"
-> +#include "sysemu/dump-info.h"
->  #include "sysemu/sysemu.h"
->  #include "sysemu/memory_mapping.h"
->  #include "sysemu/cpus.h"
-> @@ -38,6 +39,8 @@
->  #define ELF_MACHINE_UNAME "Unknown"
->  #endif
-> =20
-> +DumpInfo dump_info =3D { 0, };
-> +
->  uint16_t cpu_to_dump16(DumpState *s, uint16_t val)
->  {
->      if (s->dump_info.d_endian =3D=3D ELFDATA2LSB) {
-> diff --git a/hw/char/virtio-console.c b/hw/char/virtio-console.c
-> index 798d9b69fd..796b7c85aa 100644
-> --- a/hw/char/virtio-console.c
-> +++ b/hw/char/virtio-console.c
-> @@ -16,6 +16,9 @@
->  #include "trace.h"
->  #include "hw/virtio/virtio-serial.h"
->  #include "qapi-event.h"
-> +#include "qapi/qmp/json-streamer.h"
-> +#include "qapi/qmp/json-parser.h"
-> +#include "sysemu/dump-info.h"
-> =20
->  #define TYPE_VIRTIO_CONSOLE_SERIAL_PORT "virtserialport"
->  #define VIRTIO_CONSOLE(obj) \
-> @@ -26,6 +29,7 @@ typedef struct VirtConsole {
-> =20
->      CharBackend chr;
->      guint watch;
-> +    JSONMessageParser parser;
->  } VirtConsole;
-> =20
->  /*
-> @@ -49,6 +53,11 @@ static ssize_t flush_buf(VirtIOSerialPort *port,
->      VirtConsole *vcon =3D VIRTIO_CONSOLE(port);
->      ssize_t ret;
-> =20
-> +    if (vcon->parser.emit &&
-> +        !dump_info.received) {
-> +        json_message_parser_feed(&vcon->parser, (const char *)buf, len=
-);
-> +    }
+> After investigation, we found that the reason is in kvm-kmod,
+> KVM_APIC_INIT bit in
+> vcpu->arch.apic->pending_events was overwritten by qemu, and thus an
+> INIT IPI sent
+> to AP was lost. Qemu does this since libvirtd sends a =E2=80=98query-cp=
+us=E2=80=99 qmp
+> command to qemu
+> on VM start.
+>=20
+> In qemu, qmp_query_cpus-> cpu_synchronize_state->
+> kvm_cpu_synchronize_state->
+> do_kvm_cpu_synchronize_state, qemu gets registers/vcpu_events from
+> kvm-kmod and
+> sets cpu->kvm_vcpu_dirty to true, and vcpu thread in qemu will call
+> kvm_arch_put_registers if cpu->kvm_vcpu_dirty is true, thus
+> pending_events is
+> overwritten by qemu.
+>=20
+> I think there is no need for qemu to set cpu->kvm_vcpu_dirty to true
+> after =E2=80=98query-cpus=E2=80=99,
+> and  kvm-kmod should not clear KVM_APIC_INIT unconditionally. And I am
+> not sure whether
+> it is OK for qemu to set cpu->kvm_vcpu_dirty in
+> do_kvm_cpu_synchronize_state in each caller.
+>=20
+> What=E2=80=99s your opinion?
 
-[snip]
+Hi Rongguang,
 
-so we just continually feed data into the json parser until we see the
-event we care about....
+sorry for the late response.
 
-What kind of denial of service protection does our JSON parser have. Now
-that QEMU is directly parsing JSON from QEMU guest agent, it is exposed
-to malicious attack by the guest agent.
+Where exactly is KVM_APIC_INIT dropped?  kvm_get_mp_state does clear the
+bit, but the result of the INIT is stored in mp_state.
 
-eg what happens if the 'vmcoreinfo' string in the JSON doc received from
-the guest ends up being 10GB in size ? Is that going to cause our JSON
-parser to allocate QString which is 10GB in size which we'll further
-try to strdup just below too...
+kvm_get_vcpu_events is called after kvm_get_mp_state; it retrieves
+KVM_APIC_INIT in events.smi.latched_init and kvm_set_vcpu_events passes
+it back.  Maybe it should ignore events.smi.latched_init if not in SMM,
+but I would like to understand the exact sequence of events.
 
+Thanks,
 
-> @@ -163,6 +177,37 @@ static void chr_event(void *opaque, int event)
->      }
->  }
-> =20
-> +
-> +static void qga_message(JSONMessageParser *parser, GQueue *tokens)
-> +{
-> +    /* VirtConsole *vcon =3D container_of(parser, VirtConsole, parser)=
-; */
-> +    QObject *obj;
-> +    QDict *msg, *data;
-> +    const char *event;
-> +
-> +    obj =3D json_parser_parse(tokens, NULL);
-> +    msg =3D qobject_to_qdict(obj);
-> +    if (!msg) {
-> +        error_report("JSON parsing failed");
-> +        return;
-> +    }
-> +
-> +    event =3D qdict_get_try_str(msg, "event");
-> +    data =3D qdict_get_qdict(msg, "data");
-> +    if (event && g_str_equal(event, "VMDUMP_INFO") && data) {
-> +        dump_info.received =3D true;
-> +        if (qdict_haskey(data, "phys-base")) {
-> +            dump_info.has_phys_base =3D true;
-> +            dump_info.phys_base =3D qdict_get_try_uint(data, "phys-bas=
-e", 0);
-> +        }
-> +        if (qdict_haskey(data, "text")) {
-> +            dump_info.has_text =3D true;
-> +            dump_info.text =3D qdict_get_try_uint(data, "text", 0);
-> +        }
-> +        dump_info.vmcoreinfo =3D g_strdup(qdict_get_try_str(data, "vmc=
-oreinfo"));
-> +    }
-> +}
-
-
-Regards,
-Daniel
---=20
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange=
-/ :|
-|: http://libvirt.org              -o-             http://virt-manager.or=
-g :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr=
-/ :|
+paolo
