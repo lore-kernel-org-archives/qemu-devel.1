@@ -1,21 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cvcvD-0001fi-7H
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 00:51:56 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cvdNf-0005o4-04
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 01:21:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cvcvC-00025J-DA
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 00:51:55 -0400
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Wed, 5 Apr 2017 04:51:26 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA21F625@DGGEMA505-MBS.china.huawei.com>
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cvdNb-0003zk-Sz
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 01:21:19 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51237
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1cvdNb-0003zb-Mn
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 01:21:15 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v355JU6P054969
+	for <qemu-devel@nongnu.org>; Wed, 5 Apr 2017 01:21:14 -0400
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 29mry4auke-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 05 Apr 2017 01:21:14 -0400
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Tue, 4 Apr 2017 23:21:13 -0600
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA21F625@DGGEMA505-MBS.china.huawei.com>
 References: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
 	<33183CC9F5247A488A2544077AF19020DA21F457@DGGEMA505-MBS.china.huawei.com>
 	<149136531491.1924.11146384618293052077@loki>
-In-Reply-To: <149136531491.1924.11146384618293052077@loki>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+	<33183CC9F5247A488A2544077AF19020DA21F625@DGGEMA505-MBS.china.huawei.com>
+Date: Wed, 05 Apr 2017 00:21:04 -0500
+Message-Id: <149136966442.1924.13997608075876307088@loki>
 Subject: Re: [Qemu-devel] [Qemu-stable] [PATCH 00/81] Patch Round-up for
  stable 2.8.1, freeze on 2017-03-27
 List-Id: <qemu-devel.nongnu.org>
@@ -26,20 +45,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Cc: "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>
 
-SGkgTWljaGFlbCwNCg0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IE1p
-Y2hhZWwgUm90aCBbbWFpbHRvOm1kcm90aEBsaW51eC52bmV0LmlibS5jb21dDQo+IFNlbnQ6IFdl
-ZG5lc2RheSwgQXByaWwgMDUsIDIwMTcgMTI6MDkgUE0NCj4gVG86IEdvbmdsZWkgKEFyZWkpOyBx
-ZW11LWRldmVsQG5vbmdudS5vcmcNCj4gQ2M6IHFlbXUtc3RhYmxlQG5vbmdudS5vcmcNCj4gU3Vi
-amVjdDogUkU6IFtRZW11LXN0YWJsZV0gW1BBVENIIDAwLzgxXSBQYXRjaCBSb3VuZC11cCBmb3Ig
-c3RhYmxlIDIuOC4xLA0KPiBmcmVlemUgb24gMjAxNy0wMy0yNw0KPiANCj4gUXVvdGluZyBHb25n
-bGVpIChBcmVpKSAoMjAxNy0wNC0wNCAyMTowMTo1NCkNCj4gPiBIaSwNCj4gPg0KPiA+IEknZCBs
-aWtlIHRvIGFzayB3aGVuIFFFTVUgMi44LjEgcmVsZWFzZT8gQWNjb3JkaW5nIHRvIHRoZSBwcmV2
-aW91cyBwbGFubmluZywNCj4gPiBJdCBzaG91bGQgcmVsZWFzZSBpbiBNYXIgMzAuDQo+IA0KPiBJ
-dCdzIGFscmVhZHkgYmVlbiByZWxlYXNlZCA6KQ0KPiANCj4gICBodHRwczovL2xpc3RzLm5vbmdu
-dS5vcmcvYXJjaGl2ZS9odG1sL3FlbXUtZGV2ZWwvMjAxNy0wMy9tc2cwNjMzMi5odG1sDQo+IA0K
-VGhhbmtzIGZvciB5b3VyIGZlZWRiYWNrIQ0KDQpJIG1pc3NlZCB0aGF0IG1haWwgOiggICBCdXQg
-d2h5IGRvbid0IEkgZmluZCB0aGUgdjIuOC4xIHRhZyBpbiBRRU1VIHRyZWU/DQoNClRoYW5rcywN
-Ci1Hb25nbGVpDQoNCg==
+Quoting Gonglei (Arei) (2017-04-04 23:51:26)
+> Hi Michael,
+> =
+
+> =
+
+> > -----Original Message-----
+> > From: Michael Roth [mailto:mdroth@linux.vnet.ibm.com]
+> > Sent: Wednesday, April 05, 2017 12:09 PM
+> > To: Gonglei (Arei); qemu-devel@nongnu.org
+> > Cc: qemu-stable@nongnu.org
+> > Subject: RE: [Qemu-stable] [PATCH 00/81] Patch Round-up for stable 2.8.=
+1,
+> > freeze on 2017-03-27
+> > =
+
+> > Quoting Gonglei (Arei) (2017-04-04 21:01:54)
+> > > Hi,
+> > >
+> > > I'd like to ask when QEMU 2.8.1 release? According to the previous pl=
+anning,
+> > > It should release in Mar 30.
+> > =
+
+> > It's already been released :)
+> > =
+
+> >   https://lists.nongnu.org/archive/html/qemu-devel/2017-03/msg06332.html
+> > =
+
+> Thanks for your feedback!
+> =
+
+> I missed that mail :(   But why don't I find the v2.8.1 tag in QEMU tree?
+
+Where are you pulling from? From a repo I haven't updated recently:
+
+mdroth@loki:~/w/qemu.git$ git remote get-url origin
+git://git.qemu.org/qemu.git
+mdroth@loki:~/w/qemu.git$ git fetch origin
+remote: Counting objects: 3198, done.
+remote: Compressing objects: 100% (1725/1725), done.
+remote: Total 2502 (delta 1963), reused 962 (delta 772)
+Receiving objects: 100% (2502/2502), 607.53 KiB | 791.00 KiB/s, done.
+Resolving deltas: 100% (1963/1963), completed with 424 local objects.
+From=20git://git.qemu.org/qemu
+   b64842d..1fde6ee  master     -> origin/master
+ * [new branch]      stable-2.8 -> origin/stable-2.8
+ * [new tag]         v2.8.1     -> v2.8.1
+ * [new tag]         v2.9.0-rc3 -> v2.9.0-rc3
+ * [new tag]         v2.9.0-rc0 -> v2.9.0-rc0
+ * [new tag]         v2.9.0-rc1 -> v2.9.0-rc1
+ * [new tag]         v2.9.0-rc2 -> v2.9.0-rc2
+...
+
+If you're pulling from the github mirror I do see that it hasn't been updat=
+ed
+yet with stable-2.8 branch or tag. That process was previously automated AF=
+AIK,
+but maybe something has changed since the recent server switch-over. Will l=
+ook
+into it more tomorrow.
+
+> =
+
+> Thanks,
+> -Gonglei
+>=20
