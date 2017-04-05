@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54525)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cvkvr-0004Wg-Rc
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:25:09 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1cvkvs-0004Wt-D6
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:25:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cvkvq-0000E7-C7
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:25:07 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:35396)
+	(envelope-from <alex.bennee@linaro.org>) id 1cvkvq-0000Dl-3J
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:25:08 -0400
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:36374)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cvkvq-0000DH-5n
+	id 1cvkvp-0000D7-Q3
 	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:25:06 -0400
-Received: by mail-wr0-x234.google.com with SMTP id k6so14519350wre.2
-	for <qemu-devel@nongnu.org>; Wed, 05 Apr 2017 06:25:06 -0700 (PDT)
+Received: by mail-wr0-x236.google.com with SMTP id w11so13731963wrc.3
+	for <qemu-devel@nongnu.org>; Wed, 05 Apr 2017 06:25:05 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed,  5 Apr 2017 14:24:53 +0100
-Message-Id: <20170405132503.32125-3-alex.bennee@linaro.org>
+Date: Wed,  5 Apr 2017 14:24:54 +0100
+Message-Id: <20170405132503.32125-4-alex.bennee@linaro.org>
 In-Reply-To: <20170405132503.32125-1-alex.bennee@linaro.org>
 References: <20170405132503.32125-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 02/12] scripts/qemu-gdb/timers.py: new
- helper to dump timer state
+Subject: [Qemu-devel] [PATCH v2 03/12] scripts/replay-dump.py: replay log
+ dumper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,97 +33,297 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: dovgaluk@ispras.ru, rth@twiddle.net, pbonzini@redhat.com
 Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This introduces the qemu-gdb command "qemu timers" which will dump the
-state of the main timers in the system.
+This script is a debugging tool for looking through the contents of a
+replay log file. It is incomplete but should fail gracefully at events
+it doesn't understand.
+
+It currently understands two different log formats as the audio
+record/replay support was merged during since MTTCG. It was written to
+help debug what has caused the BQL changes to break replay support.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- scripts/qemu-gdb.py       |  3 ++-
- scripts/qemugdb/timers.py | 54 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 56 insertions(+), 1 deletion(-)
- create mode 100644 scripts/qemugdb/timers.py
+ scripts/replay-dump.py | 272 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 272 insertions(+)
+ create mode 100755 scripts/replay-dump.py
 
-diff --git a/scripts/qemu-gdb.py b/scripts/qemu-gdb.py
-index b3f8e04f77..3e7adb87dc 100644
---- a/scripts/qemu-gdb.py
-+++ b/scripts/qemu-gdb.py
-@@ -26,7 +26,7 @@ import os, sys
- 
- sys.path.append(os.path.dirname(__file__))
- 
--from qemugdb import aio, mtree, coroutine
-+from qemugdb import aio, mtree, coroutine, timers
- 
- class QemuCommand(gdb.Command):
-     '''Prefix for QEMU debug support commands'''
-@@ -38,6 +38,7 @@ QemuCommand()
- coroutine.CoroutineCommand()
- mtree.MtreeCommand()
- aio.HandlersCommand()
-+timers.TimersCommand()
- 
- coroutine.CoroutineSPFunction()
- coroutine.CoroutinePCFunction()
-diff --git a/scripts/qemugdb/timers.py b/scripts/qemugdb/timers.py
-new file mode 100644
-index 0000000000..be71a001e3
+diff --git a/scripts/replay-dump.py b/scripts/replay-dump.py
+new file mode 100755
+index 0000000000..fdd178aba0
 --- /dev/null
-+++ b/scripts/qemugdb/timers.py
-@@ -0,0 +1,54 @@
-+#!/usr/bin/python
-+# GDB debugging support
++++ b/scripts/replay-dump.py
+@@ -0,0 +1,272 @@
++#!/usr/bin/env python
++# -*- coding: utf-8 -*-
 +#
-+# Copyright 2017 Linaro Ltd
++# Dump the contents of a recorded execution stream
 +#
-+# Author: Alex Bennée <alex.bennee@linaro.org>
++#  Copyright (c) 2017 Alex Bennée <alex.bennee@linaro.org>
 +#
-+# This work is licensed under the terms of the GNU GPL, version 2.  See
-+# the COPYING file in the top-level directory.
++# This library is free software; you can redistribute it and/or
++# modify it under the terms of the GNU Lesser General Public
++# License as published by the Free Software Foundation; either
++# version 2 of the License, or (at your option) any later version.
++#
++# This library is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# Lesser General Public License for more details.
++#
++# You should have received a copy of the GNU Lesser General Public
++# License along with this library; if not, see <http://www.gnu.org/licenses/>.
 +
-+# 'qemu timers' -- display the current timerlists
++import argparse
++import struct
++from collections import namedtuple
 +
-+import gdb
++# This mirrors some of the global replay state which some of the
++# stream loading refers to. Some decoders may read the next event so
++# we need handle that case. Calling reuse_event will ensure the next
++# event is read from the cache rather than advancing the file.
 +
-+class TimersCommand(gdb.Command):
-+    '''Display the current QEMU timers'''
-+
++class ReplayState(object):
 +    def __init__(self):
-+        'Register the class as a gdb command'
-+        gdb.Command.__init__(self, 'qemu timers', gdb.COMMAND_DATA,
-+                             gdb.COMPLETE_NONE)
++        self.event = -1
++        self.event_count = 0
++        self.already_read = False
++        self.current_checkpoint = 0
++        self.checkpoint = 0
 +
-+    def dump_timers(self, timer):
-+        "Follow a timer and recursively dump each one in the list."
-+        # timer should be of type QemuTimer
-+        gdb.write("    timer %s/%s (cb:%s,opq:%s)\n" % (
-+            timer['expire_time'],
-+            timer['scale'],
-+            timer['cb'],
-+            timer['opaque']))
++    def set_event(self, ev):
++        self.event = ev
++        self.event_count += 1
 +
-+        if int(timer['next']) > 0:
-+            self.dump_timers(timer['next'])
++    def get_event(self):
++        self.already_read = False
++        return self.event
++
++    def reuse_event(self, ev):
++        self.event = ev
++        self.already_read = True
++
++    def set_checkpoint(self):
++        self.checkpoint = self.event - self.checkpoint_start
++
++    def get_checkpoint(self):
++        return self.checkpoint
++
++replay_state = ReplayState()
++
++# Simple read functions that mirror replay-internal.c
++# The file-stream is big-endian and manually written out a byte at a time.
++
++def read_byte(fin):
++    "Read a single byte"
++    return struct.unpack('>B', fin.read(1))[0]
++
++def read_event(fin):
++    "Read a single byte event, but save some state"
++    if replay_state.already_read:
++        return replay_state.get_event()
++    else:
++        replay_state.set_event(read_byte(fin))
++        return replay_state.event
++
++def read_word(fin):
++    "Read a 16 bit word"
++    return struct.unpack('>H', fin.read(2))[0]
++
++def read_dword(fin):
++    "Read a 32 bit word"
++    return struct.unpack('>I', fin.read(4))[0]
++
++def read_qword(fin):
++    "Read a 64 bit word"
++    return struct.unpack('>Q', fin.read(8))[0]
++
++# Generic decoder structure
++Decoder = namedtuple("Decoder", "eid name fn")
++
++def call_decode(table, index, dumpfile):
++    "Search decode table for next step"
++    decoder = next((d for d in table if d.eid == index), None)
++    if not decoder:
++        print "Could not decode index: %d" % (index)
++        print "Entry is: %s" % (decoder)
++        print "Decode Table is:\n%s" % (table)
++        return False
++    else:
++        return decoder.fn(decoder.eid, decoder.name, dumpfile)
++
++# Print event
++def print_event(eid, name, string=None, event_count=None):
++    "Print event with count"
++    if not event_count:
++        event_count = replay_state.event_count
++
++    if string:
++        print "%d:%s(%d) %s" % (event_count, name, eid, string)
++    else:
++        print "%d:%s(%d)" % (event_count, name, eid)
 +
 +
-+    def process_timerlist(self, tlist, ttype):
-+        gdb.write("Processing %s timers\n" % (ttype))
-+        gdb.write("  clock %s is enabled:%s, last:%s\n" % (
-+            tlist['clock']['type'],
-+            tlist['clock']['enabled'],
-+            tlist['clock']['last']))
-+        if int(tlist['active_timers']) > 0:
-+            self.dump_timers(tlist['active_timers'])
++# Decoders for each event type
++
++def decode_unimp(eid, name, _unused_dumpfile):
++    "Unimplimented decoder, will trigger exit"
++    print "%s not handled - will now stop" % (name)
++    return False
++
++# Checkpoint decoder
++def swallow_async_qword(eid, name, dumpfile):
++    "Swallow a qword of data without looking at it"
++    step_id = read_qword(dumpfile)
++    print "  %s(%d) @ %d" % (name, eid, step_id)
++    return True
++
++async_decode_table = [ Decoder(0, "REPLAY_ASYNC_EVENT_BH", swallow_async_qword),
++                       Decoder(1, "REPLAY_ASYNC_INPUT", decode_unimp),
++                       Decoder(2, "REPLAY_ASYNC_INPUT_SYNC", decode_unimp),
++                       Decoder(3, "REPLAY_ASYNC_CHAR_READ", decode_unimp),
++                       Decoder(4, "REPLAY_ASYNC_EVENT_BLOCK", decode_unimp),
++                       Decoder(5, "REPLAY_ASYNC_EVENT_NET", decode_unimp),
++]
++# See replay_read_events/replay_read_event
++def decode_async(eid, name, dumpfile):
++    """Decode an ASYNC event"""
++
++    print_event(eid, name)
++
++    async_event_kind = read_byte(dumpfile)
++    async_event_checkpoint = read_byte(dumpfile)
++
++    if async_event_checkpoint != replay_state.current_checkpoint:
++        print "  mismatch between checkpoint %d and async data %d" % (
++            replay_state.current_checkpoint, async_event_checkpoint)
++        return True
++
++    return call_decode(async_decode_table, async_event_kind, dumpfile)
 +
 +
-+    def invoke(self, arg, from_tty):
-+        'Run the command'
-+        main_timers = gdb.parse_and_eval("main_loop_tlg")
++def decode_instruction(eid, name, dumpfile):
++    ins_diff = read_dword(dumpfile)
++    print_event(eid, name, "0x%x" % (ins_diff))
++    return True
 +
-+        # This will break if QEMUClockType in timer.h is redfined
-+        self.process_timerlist(main_timers['tl'][0], "Realtime")
-+        self.process_timerlist(main_timers['tl'][1], "Virtual")
-+        self.process_timerlist(main_timers['tl'][2], "Host")
-+        self.process_timerlist(main_timers['tl'][3], "Virtual RT")
++def decode_audio_out(eid, name, dumpfile):
++    audio_data = read_dword(dumpfile)
++    print_event(eid, name, "%d" % (audio_data))
++    return True
++
++def decode_checkpoint(eid, name, dumpfile):
++    """Decode a checkpoint.
++
++    Checkpoints contain a series of async events with their own specific data.
++    """
++    replay_state.set_checkpoint()
++    # save event count as we peek ahead
++    event_number = replay_state.event_count
++    next_event = read_event(dumpfile)
++
++    # if the next event is EVENT_ASYNC there are a bunch of
++    # async events to read, otherwise we are done
++    if next_event != 3:
++        print_event(eid, name, "no additional data", event_number)
++    else:
++        print_event(eid, name, "more data follows", event_number)
++
++    replay_state.reuse_event(next_event)
++    return True
++
++def decode_checkpoint_init(eid, name, dumpfile):
++    print_event(eid, name)
++    return True
++
++def decode_interrupt(eid, name, dumpfile):
++    print_event(eid, name)
++    return True
++
++def decode_clock(eid, name, dumpfile):
++    clock_data = read_qword(dumpfile)
++    print_event(eid, name, "0x%x" % (clock_data))
++    return True
++
++
++# pre-MTTCG merge
++v5_event_table = [Decoder(0, "EVENT_INSTRUCTION", decode_instruction),
++                  Decoder(1, "EVENT_INTERRUPT", decode_interrupt),
++                  Decoder(2, "EVENT_EXCEPTION", decode_unimp),
++                  Decoder(3, "EVENT_ASYNC", decode_async),
++                  Decoder(4, "EVENT_SHUTDOWN", decode_unimp),
++                  Decoder(5, "EVENT_CHAR_WRITE", decode_unimp),
++                  Decoder(6, "EVENT_CHAR_READ_ALL", decode_unimp),
++                  Decoder(7, "EVENT_CHAR_READ_ALL_ERROR", decode_unimp),
++                  Decoder(8, "EVENT_CLOCK_HOST", decode_clock),
++                  Decoder(9, "EVENT_CLOCK_VIRTUAL_RT", decode_clock),
++                  Decoder(10, "EVENT_CP_CLOCK_WARP_START", decode_checkpoint),
++                  Decoder(11, "EVENT_CP_CLOCK_WARP_ACCOUNT", decode_checkpoint),
++                  Decoder(12, "EVENT_CP_RESET_REQUESTED", decode_checkpoint),
++                  Decoder(13, "EVENT_CP_SUSPEND_REQUESTED", decode_checkpoint),
++                  Decoder(14, "EVENT_CP_CLOCK_VIRTUAL", decode_checkpoint),
++                  Decoder(15, "EVENT_CP_CLOCK_HOST", decode_checkpoint),
++                  Decoder(16, "EVENT_CP_CLOCK_VIRTUAL_RT", decode_checkpoint),
++                  Decoder(17, "EVENT_CP_INIT", decode_checkpoint_init),
++                  Decoder(18, "EVENT_CP_RESET", decode_checkpoint),
++]
++
++# post-MTTCG merge, AUDIO support added
++v6_event_table = [Decoder(0, "EVENT_INSTRUCTION", decode_instruction),
++                  Decoder(1, "EVENT_INTERRUPT", decode_interrupt),
++                  Decoder(2, "EVENT_EXCEPTION", decode_unimp),
++                  Decoder(3, "EVENT_ASYNC", decode_async),
++                  Decoder(4, "EVENT_SHUTDOWN", decode_unimp),
++                  Decoder(5, "EVENT_CHAR_WRITE", decode_unimp),
++                  Decoder(6, "EVENT_CHAR_READ_ALL", decode_unimp),
++                  Decoder(7, "EVENT_CHAR_READ_ALL_ERROR", decode_unimp),
++                  Decoder(8, "EVENT_AUDIO_OUT", decode_audio_out),
++                  Decoder(9, "EVENT_AUDIO_IN", decode_unimp),
++                  Decoder(10, "EVENT_CLOCK_HOST", decode_clock),
++                  Decoder(11, "EVENT_CLOCK_VIRTUAL_RT", decode_clock),
++                  Decoder(12, "EVENT_CP_CLOCK_WARP_START", decode_checkpoint),
++                  Decoder(13, "EVENT_CP_CLOCK_WARP_ACCOUNT", decode_checkpoint),
++                  Decoder(14, "EVENT_CP_RESET_REQUESTED", decode_checkpoint),
++                  Decoder(15, "EVENT_CP_SUSPEND_REQUESTED", decode_checkpoint),
++                  Decoder(16, "EVENT_CP_CLOCK_VIRTUAL", decode_checkpoint),
++                  Decoder(17, "EVENT_CP_CLOCK_HOST", decode_checkpoint),
++                  Decoder(18, "EVENT_CP_CLOCK_VIRTUAL_RT", decode_checkpoint),
++                  Decoder(19, "EVENT_CP_INIT", decode_checkpoint_init),
++                  Decoder(20, "EVENT_CP_RESET", decode_checkpoint),
++]
++
++def parse_arguments():
++    "Grab arguments for script"
++    parser = argparse.ArgumentParser()
++    parser.add_argument("-f", "--file", help='record/replay dump to read from',
++                        required=True)
++    return parser.parse_args()
++
++def decode_file(filename):
++    "Decode a record/replay dump"
++    dumpfile = open(filename, "rb")
++
++    # read and throwaway the header
++    version = read_dword(dumpfile)
++    junk = read_qword(dumpfile)
++
++    print "HEADER: version 0x%x" % (version)
++    if version == 0xe02006:
++        event_decode_table = v6_event_table
++        replay_state.checkpoint_start = 12
++    else:
++        event_decode_table = v5_event_table
++        replay_state.checkpoint_start = 10
++
++    try:
++        decode_ok = True
++        while decode_ok:
++            event = read_event(dumpfile)
++            decode_ok = call_decode(event_decode_table, event, dumpfile)
++    finally:
++        dumpfile.close()
++
++if __name__ == "__main__":
++    args = parse_arguments()
++    decode_file(args.file)
 -- 
 2.11.0
