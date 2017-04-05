@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55067)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cvkxI-0005lF-Kz
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:26:37 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1cvl45-0003DC-0h
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:33:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cvkxH-0000p3-OT
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:26:36 -0400
-Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:34296)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cvkxH-0000om-I7
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:26:35 -0400
-Received: by mail-wr0-x22a.google.com with SMTP id t20so14878104wra.1
-	for <qemu-devel@nongnu.org>; Wed, 05 Apr 2017 06:26:35 -0700 (PDT)
-References: <20170330164657.50c75e8c@nial.brq.redhat.com>
-	<87k2764xex.fsf@linaro.org>
-	<20170331102125.52405cd2@nial.brq.redhat.com>
-	<87h9294yba.fsf@linaro.org>
-	<20170405145142.0a417119@nial.brq.redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170405145142.0a417119@nial.brq.redhat.com>
-Date: Wed, 05 Apr 2017 14:26:35 +0100
-Message-ID: <87wpaz9e9g.fsf@linaro.org>
+	(envelope-from <dovgaluk@ispras.ru>) id 1cvl41-0004Fj-LG
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:33:37 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:54784)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1cvl41-0004FB-Cx
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 09:33:33 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20170405132503.32125-1-alex.bennee@linaro.org>
+	<20170405132503.32125-13-alex.bennee@linaro.org>
+In-Reply-To: <20170405132503.32125-13-alex.bennee@linaro.org>
+Date: Wed, 5 Apr 2017 16:33:32 +0300
+Message-ID: <001001d2ae11$386f9700$a94ec500$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] qemu-2.9 crashes in tcg_handle_interrupt() during
- winx64 boot
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v2 12/12] replay: assert time only goes
+ forward
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,50 +30,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, Paolo Bonzini <pbonzini@redhat.com>, Pranith Kumar <bobby.prani@gmail.com>, KONRAD Frederic <fred.konrad@greensocs.com>, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>, rth@twiddle.net, pbonzini@redhat.com
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com
+
+> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
+>=20
+> If we find ourselves trying to add an event to the log where time has
+> gone backwards it is because a vCPU event has occurred and the
+> main-loop is not yet aware of time moving forward. This should not
+> happen and if it does its better to fail early than generate a log
+> that will have weird behaviour.
+>=20
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  replay/replay-internal.c | 4 ++++
+>  replay/replay.c          | 4 ++++
+>  2 files changed, 8 insertions(+)
+>=20
+> diff --git a/replay/replay-internal.c b/replay/replay-internal.c
+> index bea7b4aa6b..fca8514012 100644
+> --- a/replay/replay-internal.c
+> +++ b/replay/replay-internal.c
+> @@ -195,6 +195,10 @@ void replay_save_instructions(void)
+>      if (replay_file && replay_mode =3D=3D REPLAY_MODE_RECORD) {
+>          replay_mutex_lock();
+>          int diff =3D (int)(replay_get_current_step() - =
+replay_state.current_step);
+> +
+> +        /* Time can only go forward */
+> +        assert(diff >=3D 0);
+> +
+>          if (diff > 0) {
+
+This "if" is useless then.
+
+>              replay_put_event(EVENT_INSTRUCTION);
+>              replay_put_dword(diff);
+> diff --git a/replay/replay.c b/replay/replay.c
+> index 9e0724e756..f810628cac 100644
+> --- a/replay/replay.c
+> +++ b/replay/replay.c
+> @@ -84,6 +84,10 @@ void replay_account_executed_instructions(void)
+>          if (replay_state.instructions_count > 0) {
+>              int count =3D (int)(replay_get_current_step()
+>                                - replay_state.current_step);
+> +
+> +            /* Time can only go forward */
+> +            assert(count >=3D 0);
+> +
+>              replay_state.instructions_count -=3D count;
+>              replay_state.current_step +=3D count;
+>              if (replay_state.instructions_count =3D=3D 0) {
+> --
+> 2.11.0
 
 
-Igor Mammedov <imammedo@redhat.com> writes:
-
-> On Fri, 31 Mar 2017 09:58:49 +0100
-> Alex Bennée <alex.bennee@linaro.org> wrote:
->
->> Igor Mammedov <imammedo@redhat.com> writes:
->>
->> > On Thu, 30 Mar 2017 16:05:58 +0100
->> > Alex Bennée <alex.bennee@linaro.org> wrote:
->> >
->> >> Igor Mammedov <imammedo@redhat.com> writes:
->> >>
->> >> > (PS: resend due to wrong qemu-devel mail list address in original
->> >> > email)
->> >>
->> >> Le *sigh* another way of x86 generating IRQs ;-)
->> >>
->> >> Could you test this please?
->> >>
->> >> target/i386/misc_helper: wrap BQL around another IRQ generator
->> >>
->> >> Anything that calls into HW emulation must be protected by the BQL.
->> >>
->> >> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->> > it doesn't help,
->> > it asserts in the same place anyway
->>
->> That's weird. If the lock was already held I could see it failing higher
->> up but this seems to imply we are dropping a lock as we descend into
->> hardware emulation.
-> I'm sorry,
-> when testing it I've misplaced locking into helper_read_crN(),
-> left write path untouched and went hunting for weird behavior.
->
-> Anyway,
-> I've tested you patch again and windows guest boots fine with it.
-
-No problem - I've done the same before ;-)
-
-Can I have a Tested-by?
-
---
-Alex Bennée
+Pavel Dovgalyuk
