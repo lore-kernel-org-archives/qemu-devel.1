@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cvovE-0004FI-GB
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 13:40:45 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cvp3m-0006Yn-I2
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 13:49:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cvovA-0006yx-IV
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 13:40:44 -0400
-Resent-Message-Id: <E1cvovA-0006yx-IV@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21307)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cvovA-0006yL-62
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 13:40:40 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <149141402579.31515.1127470305239424205@6c512846dbc7>
-In-Reply-To: <20170405104627.18140-1-sameeh@daynix.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cvp3k-0001yZ-SX
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 13:49:34 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:35472)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cvp3k-0001yP-FW
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 13:49:32 -0400
+Received: by mail-lf0-x242.google.com with SMTP id v2so1794224lfi.2
+	for <qemu-devel@nongnu.org>; Wed, 05 Apr 2017 10:49:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 5 Apr 2017 10:40:26 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2] qga-win: Fix a bug where qemu-ga
- service is stuck during stop operation
+References: <1490965817-16913-1-git-send-email-amarnath.valluri@intel.com>
+	<20170403170738.GC2768@redhat.com>
+	<6a70868f-8831-54ce-5c67-c325acf03fec@intel.com>
+	<b894f5b7-64ad-7696-b3fe-82941e2d6c5b@linux.vnet.ibm.com>
+	<CAJ+F1C+XKOWyqse2L+4sYPOOnSfqX89+tVGtHhOqwc-GP0eZKQ@mail.gmail.com>
+	<090205a2-2246-5fd1-2d60-d78848eb8af5@linux.vnet.ibm.com>
+In-Reply-To: <090205a2-2246-5fd1-2d60-d78848eb8af5@linux.vnet.ibm.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 05 Apr 2017 17:49:20 +0000
+Message-ID: <CAJ+F1CLxZ15CnOxEwha6=NQyUSyLmoWh62ZAmr2OJT8TQDOB+A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/7] Provide support for the software TPM
+ emulator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +35,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sameeh@daynix.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, yan@daynix.com
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCB2Ml0gcWdhLXdpbjogRml4IGEgYnVnIHdoZXJlIHFlbXUtZ2Egc2Vydmlj
-ZSBpcyBzdHVjayBkdXJpbmcgc3RvcCBvcGVyYXRpb24KTWVzc2FnZS1pZDogMjAxNzA0MDUxMDQ2
-MjcuMTgxNDAtMS1zYW1lZWhAZGF5bml4LmNvbQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0t
-b25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJz
-ZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRD
-SCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEg
-Z2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
-aWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBu
-PSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
-YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0
-byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmRiZGViNzQgcWdhLXdpbjogRml4IGEgYnVnIHdoZXJlIHFl
-bXUtZ2Egc2VydmljZSBpcyBzdHVjayBkdXJpbmcgc3RvcCBvcGVyYXRpb24KCj09PSBPVVRQVVQg
-QkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogcWdhLXdpbjogRml4IGEgYnVnIHdoZXJlIHFl
-bXUtZ2Egc2VydmljZSBpcyBzdHVjayBkdXJpbmcgc3RvcCBvcGVyYXRpb24uLi4KRVJST1I6IGxp
-bmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0NDogRklMRTogcWdhL21haW4uYzoxNTM6CisgICAgICAg
-ICAgICBnX2RlYnVnKCJFcnJvciB1bmZyZWV6aW5nIGZpbGVzeXN0ZW1zIHByaW9yIHRvIGV4aXRp
-bmc6ICVzIiwgZXJyb3JfZ2V0X3ByZXR0eShlcnIpKTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJu
-aW5ncywgNzQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
-ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
-cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
-RVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTog
-MQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8v
-cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
-QGZyZWVsaXN0cy5vcmc=
+Hi
+
+On Wed, Apr 5, 2017 at 7:32 PM Stefan Berger <stefanb@linux.vnet.ibm.com>
+wrote:
+
+> On 04/05/2017 11:08 AM, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi
+> >
+> > On Wed, Apr 5, 2017 at 5:04 PM Stefan Berger <stefanb@linux.vnet.ibm.co=
+m
+> >
+> > wrote:
+> >
+> >> On 04/05/2017 03:09 AM, Amarnath Valluri wrote:
+> >>>
+> >>> On 03.04.2017 20 <03%2004%2020%2017%2020>
+> <03%2004%2020%2017%2020>:07, Daniel P. Berrange wrote:
+> >>>> On Fri, Mar 31, 2017 at 04:10:09PM +0300, Amarnath Valluri wrote:
+> >>>>> Briefly, Theses set of patches introduces:
+> >>>>>    - new TPM backend driver to support software TPM
+> emulators(swtpm(1)).
+> >>>>>    - and few supported fixes/enhancements/cleanup to existing tpm
+> >>>>> backend code.
+> >>>>>
+> >>>>> The similar idea was initiated earliar(2) by Stefan Berger(CCed)
+> >>>>> with slightly
+> >>>>> different approach, using CUSE. As swtpm has excellent support for
+> >>>>> unix domain
+> >>>>> sockets, hence this implementation uses unix domain sockets to
+> >>>>> communicate with
+> >>>>> swtpm.
+> >>>>>
+> >>>>> When Qemu is configured with 'emulator' tpm backend, it spawns
+> >>>>> 'swtpm' and
+> >>>>> communicates its via Unix domain sockets.
+> >>>> I'm not convinced that having QEMU spawning swtpm itself is a
+> desirable
+> >>>> approach, as it means QEMU needs to have all the privileges that swt=
+pm
+> >>>> will need, so that swtpm can inherit them. At the very least I think
+> we
+> >>>> need to have a way to disable this spawning, so it can connect to a
+> >>>> pre-existing swtpm process that's been spawned ahead of time. This
+> will
+> >>>> let us have stricter privilege separation.
+> >>> Both spawning inside qemu and connecting to already running swtpm has
+> >>> its own pros, Hence we can make this spawning as backend configuratio=
+n
+> >>> detail, So it looks like this:
+> >>>
+> >>> -tpmdev
+> >>>
+> >>
+> emulator,id=3Did,tpmstatedir=3Ddir[,spawn=3D[on|off],data-path=3Dpath,ctr=
+l-path=3Dpath,logfile=3Dpath,loglevel=3Dnumber]
+> >>>    Options details:
+> >>>       tpmstatedir - Directory path, which swtpm should  use for
+> >>> storing  TPM state
+> >>>       *spawn      - should spawn new process, defaults to 'off'
+> >>>       *path         - swtpm binary path to spawn, ignored if spawn is
+> off
+> >>>       *data-path - Socket path to use/connect for data messages
+> >>>       *ctrl-path   - Socket path to use/connect for out-of-band contr=
+ol
+> >>> messages
+> >> FD passing would work?
+> >>
+> > Could with /dev/fdset in theory, but it would be better to use chardevs
+> > instead.
+> >
+> > Is there any reason left to have 2 sockets? Couldn't the data be sent a=
+s
+> > another message on the "ctrl-path" ?
+>
+> Better to keep them separate so whatever comes out of a VM will never be
+> mistaken for a control command.
+>
+
+This is a moot argument, there is no reason the code would mix the two,
+
+An alternative to make the setup easier is to pass the data socket through
+the ctrl socket, perhaps.
+
+
+> >
+> >
+> >>>       *logfile       - File path to use for swtpm logs
+> >>>       *loglevel    - log level number, defaults to 5 (ignored if no
+> >>> logfile provided)
+> >>>
+> >>> -  If spawn is off, data-path and ctrl-path must be provided to qemu,
+> >>> where to connect already running swtpm
+> >>> -  If spawn if on, both data-path and ctrl-path are optional. If not
+> >>> provided, qemu uses socket pairs to communicates with swptm, as it is
+> >>> doing now.
+> >>>
+> >>> Hope this satisfies all usecases, if everyone here happy with this i
+> >>> can submit the new patch with these changes.
+> >>>
+> >>> - Amarnath
+> >>>
+> >>
+> >> --
+> > Marc-Andr=C3=A9 Lureau
+> >
+>
+>
+> --
+Marc-Andr=C3=A9 Lureau
