@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54103)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cvqTt-0003Nx-Gg
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:20:38 -0400
+	(envelope-from <quintela@redhat.com>) id 1cvqZz-0005H0-SS
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:26:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cvqTs-0000Ai-LQ
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:20:37 -0400
-References: <cover.1491416061.git.jcody@redhat.com>
-	<6c82b83fae72a5b5909993f0cf65a90f12efb669.1491416061.git.jcody@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <4a5f39ab-50ad-6071-130a-fe77493221ec@redhat.com>
-Date: Wed, 5 Apr 2017 15:20:24 -0400
+	(envelope-from <quintela@redhat.com>) id 1cvqZv-000388-UQ
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:26:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:14612)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cvqZv-00034n-OM
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:26:51 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170405190024.27581-3-dgilbert@redhat.com> (David Alan
+	Gilbert's message of "Wed, 5 Apr 2017 20:00:23 +0100")
+References: <20170405190024.27581-1-dgilbert@redhat.com>
+	<20170405190024.27581-3-dgilbert@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 05 Apr 2017 21:26:46 +0200
+Message-ID: <87wpay3bbd.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <6c82b83fae72a5b5909993f0cf65a90f12efb669.1491416061.git.jcody@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.10 3/9] block: honor
- BDRV_O_ALLOW_RDWR when clearing bs->read_only
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 2/3] vmstatification: i386 FPReg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,47 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
 
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> Convert the fpreg save/restore to use VMSTATE_ macros rather than
+> .get/.put.
+>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 
-On 04/05/2017 02:28 PM, Jeff Cody wrote:
-> The BDRV_O_ALLOW_RDWR flag allows / prohibits the changing of
-> the BDS 'read_only' state, but there are a few places where it
-> is ignored.  In the bdrv_set_read_only() helper, make sure to
-> honor the flag.
-> 
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
-> ---
->  block.c | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/block.c b/block.c
-> index f60d5ea..4a61ff0 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -201,6 +201,13 @@ int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
->          return -EINVAL;
->      }
->  
-> +    /* Do not clear read_only if it is prohibited */
-> +    if (!read_only && !(bs->open_flags & BDRV_O_ALLOW_RDWR)) {
-> +        error_setg(errp, "Node '%s' is read only",
-> +                   bdrv_get_device_or_node_name(bs));
-> +        return -EPERM;
-> +    }
-> +
->      bs->read_only = read_only;
->      return 0;
->  }
-> 
+But if you have to respin
 
-Conceptually straightforward.
+> +typedef struct x86_FPReg_tmp {
+> +    FPReg *parent;
+> +    uint64_t tmp_mant;
+> +    uint16_t tmp_exp;
+> +} x86_FPReg_tmp;
 
-looks like this might change behavior for... RBD and vvfat, right?
-RBD is the subject of this series so we'll just assume that was broken
-and stupid.
+Too many tmp's?  I am pretty sure that you can call the fields mant and exp.
 
-What's vvfat's story? It always set the read-only property to false
-regardless of what you asked for?
+Later, Juan.
