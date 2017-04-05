@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cvgW9-0007gr-AB
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cvgW9-0007gs-AP
 	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 04:42:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cvgW8-0008Rs-7T
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cvgW5-0008ON-By
 	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 04:42:17 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:42862
+Received: from chuckie.co.uk ([82.165.15.123]:42861
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1cvgW7-0008QB-Pd
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 04:42:16 -0400
+	id 1cvgW5-0008NG-4S
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 04:42:13 -0400
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Wed,  5 Apr 2017 09:35:29 +0100
-Message-Id: <1491381329-3995-15-git-send-email-mark.cave-ayland@ilande.co.uk>
+Date: Wed,  5 Apr 2017 09:35:28 +0100
+Message-Id: <1491381329-3995-14-git-send-email-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <1491381329-3995-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 References: <1491381329-3995-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 14/14] tcx: switch to load_image_mr() and
- remove prom_addr hack
+Subject: [Qemu-devel] [PATCH 13/14] tcx: use tcx_set_dirty() for accelerated
+ ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +28,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: kraxel@redhat.com, qemu-devel@nongnu.org
 
-Previous to the existence of load_image_mr(), the only way to load in the
-FCode ROM image was to pass in its physical address via qdev properties
-and use load_image_targphys().
+Rather than calling memory_region_set_dirty() directly, make sure that we call
+tcx_set_dirty() instead. This ensures that the 24-bit plane and cplane are
+also invalidated correctly.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/display/tcx.c |    4 +---
- hw/sparc/sun4m.c |    1 -
- 2 files changed, 1 insertion(+), 4 deletions(-)
+ hw/display/tcx.c |   10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/hw/display/tcx.c b/hw/display/tcx.c
-index 3f00735..5a1115c 100644
+index 6da6dfb..3f00735 100644
 --- a/hw/display/tcx.c
 +++ b/hw/display/tcx.c
-@@ -843,8 +843,7 @@ static void tcx_realizefn(DeviceState *dev, Error **errp)
-     vmstate_register_ram_global(&s->rom);
-     fcode_filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, TCX_ROM_FILE);
-     if (fcode_filename) {
--        ret = load_image_targphys(fcode_filename, s->prom_addr,
--                                  FCODE_MAX_ROM_SIZE);
-+        ret = load_image_mr(fcode_filename, &s->rom);
-         g_free(fcode_filename);
-         if (ret < 0 || ret > FCODE_MAX_ROM_SIZE) {
-             error_report("tcx: could not load prom '%s'", TCX_ROM_FILE);
-@@ -902,7 +901,6 @@ static Property tcx_properties[] = {
-     DEFINE_PROP_UINT16("width",    TCXState, width,     -1),
-     DEFINE_PROP_UINT16("height",   TCXState, height,    -1),
-     DEFINE_PROP_UINT16("depth",    TCXState, depth,     -1),
--    DEFINE_PROP_UINT64("prom_addr", TCXState, prom_addr, -1),
-     DEFINE_PROP_END_OF_LIST(),
- };
+@@ -525,7 +525,7 @@ static void tcx_stip_writel(void *opaque, hwaddr addr,
+                 val <<= 1;
+             }
+         }
+-        memory_region_set_dirty(&s->vram_mem, addr, 32);
++        tcx_set_dirty(s, addr, 32);
+     }
+ }
  
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index 7a0922b..5f022cc 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -491,7 +491,6 @@ static void tcx_init(hwaddr addr, qemu_irq irq, int vram_size, int width,
-     qdev_prop_set_uint16(dev, "width", width);
-     qdev_prop_set_uint16(dev, "height", height);
-     qdev_prop_set_uint16(dev, "depth", depth);
--    qdev_prop_set_uint64(dev, "prom_addr", addr);
-     qdev_init_nofail(dev);
-     s = SYS_BUS_DEVICE(dev);
+@@ -558,7 +558,7 @@ static void tcx_rstip_writel(void *opaque, hwaddr addr,
+                 val <<= 1;
+             }
+         }
+-        memory_region_set_dirty(&s->vram_mem, addr, 32);
++        tcx_set_dirty(s, addr, 32);
+     }
+ }
  
+@@ -616,7 +616,7 @@ static void tcx_blit_writel(void *opaque, hwaddr addr,
+                 memcpy(&s->vram24[addr], &s->vram24[adsr], len * 4);
+             }
+         }
+-        memory_region_set_dirty(&s->vram_mem, addr, len);
++        tcx_set_dirty(s, addr, len);
+     }
+ }
+ 
+@@ -650,7 +650,7 @@ static void tcx_rblit_writel(void *opaque, hwaddr addr,
+                 memcpy(&s->cplane[addr], &s->cplane[adsr], len * 4);
+             }
+         }
+-        memory_region_set_dirty(&s->vram_mem, addr, len);
++        tcx_set_dirty(s, addr, len);
+     }
+ }
+ 
+@@ -687,7 +687,7 @@ static void tcx_invalidate_cursor_position(TCXState *s)
+     start = ymin * 1024;
+     end   = ymax * 1024;
+ 
+-    memory_region_set_dirty(&s->vram_mem, start, end-start);
++    tcx_set_dirty(s, start, end - start);
+ }
+ 
+ static uint64_t tcx_thc_readl(void *opaque, hwaddr addr,
 -- 
 1.7.10.4
