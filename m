@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cveL0-00072g-Iu
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 02:22:39 -0400
+	(envelope-from <clg@kaod.org>) id 1cvePk-00089m-B9
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 02:27:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cveKz-0008Cq-C4
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 02:22:38 -0400
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Wed, 5 Apr 2017 06:22:13 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA21F6C1@DGGEMA505-MBS.china.huawei.com>
-References: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DA21F457@DGGEMA505-MBS.china.huawei.com>
-	<149136531491.1924.11146384618293052077@loki>
-	<33183CC9F5247A488A2544077AF19020DA21F625@DGGEMA505-MBS.china.huawei.com>
-	<149136966442.1924.13997608075876307088@loki>
-	<33183CC9F5247A488A2544077AF19020DA21F688@DGGEMA505-MBS.china.huawei.com>
-	<149137296462.1924.7432819972453249661@loki>
-In-Reply-To: <149137296462.1924.7432819972453249661@loki>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <clg@kaod.org>) id 1cvePf-0001FL-8t
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 02:27:32 -0400
+Received: from 8.mo177.mail-out.ovh.net ([46.105.61.98]:38062)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cvePf-0001EY-2c
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 02:27:27 -0400
+Received: from player688.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 18F0A4A17E
+	for <qemu-devel@nongnu.org>; Wed,  5 Apr 2017 08:27:23 +0200 (CEST)
+References: <1491205565-12831-1-git-send-email-clg@kaod.org>
+	<20170405055115.GC13614@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <590d0aa7-6d77-d6eb-c93e-75f2e8e9a506@kaod.org>
+Date: Wed, 5 Apr 2017 08:27:15 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Qemu-stable] [PATCH 00/81] Patch Round-up for
- stable 2.8.1, freeze on 2017-03-27
+In-Reply-To: <20170405055115.GC13614@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 0/9] ppc/pnv: interrupt controller
+ (POWER8)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +31,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Pg0KPiA+ID4NCj4gPiA+ID4NCj4gPiA+ID4NCj4gPiA+ID4gPiAtLS0tLU9yaWdpbmFsIE1lc3Nh
-Z2UtLS0tLQ0KPiA+ID4gPiA+IEZyb206IE1pY2hhZWwgUm90aCBbbWFpbHRvOm1kcm90aEBsaW51
-eC52bmV0LmlibS5jb21dDQo+ID4gPiA+ID4gU2VudDogV2VkbmVzZGF5LCBBcHJpbCAwNSwgMjAx
-NyAxMjowOSBQTQ0KPiA+ID4gPiA+IFRvOiBHb25nbGVpIChBcmVpKTsgcWVtdS1kZXZlbEBub25n
-bnUub3JnDQo+ID4gPiA+ID4gQ2M6IHFlbXUtc3RhYmxlQG5vbmdudS5vcmcNCj4gPiA+ID4gPiBT
-dWJqZWN0OiBSRTogW1FlbXUtc3RhYmxlXSBbUEFUQ0ggMDAvODFdIFBhdGNoIFJvdW5kLXVwIGZv
-ciBzdGFibGUNCj4gMi44LjEsDQo+ID4gPiA+ID4gZnJlZXplIG9uIDIwMTctMDMtMjcNCj4gPiA+
-ID4gPg0KPiA+ID4gPiA+IFF1b3RpbmcgR29uZ2xlaSAoQXJlaSkgKDIwMTctMDQtMDQgMjE6MDE6
-NTQpDQo+ID4gPiA+ID4gPiBIaSwNCj4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiBJJ2QgbGlrZSB0
-byBhc2sgd2hlbiBRRU1VIDIuOC4xIHJlbGVhc2U/IEFjY29yZGluZyB0byB0aGUgcHJldmlvdXMN
-Cj4gPiA+IHBsYW5uaW5nLA0KPiA+ID4gPiA+ID4gSXQgc2hvdWxkIHJlbGVhc2UgaW4gTWFyIDMw
-Lg0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gSXQncyBhbHJlYWR5IGJlZW4gcmVsZWFzZWQgOikNCj4g
-PiA+ID4gPg0KPiA+ID4gPiA+DQo+ID4gPiBodHRwczovL2xpc3RzLm5vbmdudS5vcmcvYXJjaGl2
-ZS9odG1sL3FlbXUtZGV2ZWwvMjAxNy0wMy9tc2cwNjMzMi5odG1sDQo+ID4gPiA+ID4NCj4gPiA+
-ID4gVGhhbmtzIGZvciB5b3VyIGZlZWRiYWNrIQ0KPiA+ID4gPg0KPiA+ID4gPiBJIG1pc3NlZCB0
-aGF0IG1haWwgOiggICBCdXQgd2h5IGRvbid0IEkgZmluZCB0aGUgdjIuOC4xIHRhZyBpbiBRRU1V
-IHRyZWU/DQo+ID4gPg0KPiA+ID4gV2hlcmUgYXJlIHlvdSBwdWxsaW5nIGZyb20/IEZyb20gYSBy
-ZXBvIEkgaGF2ZW4ndCB1cGRhdGVkIHJlY2VudGx5Og0KPiA+ID4NCj4gPiA+IG1kcm90aEBsb2tp
-On4vdy9xZW11LmdpdCQgZ2l0IHJlbW90ZSBnZXQtdXJsIG9yaWdpbg0KPiA+ID4gZ2l0Oi8vZ2l0
-LnFlbXUub3JnL3FlbXUuZ2l0DQo+ID4gPiBtZHJvdGhAbG9raTp+L3cvcWVtdS5naXQkIGdpdCBm
-ZXRjaCBvcmlnaW4NCj4gPiA+IHJlbW90ZTogQ291bnRpbmcgb2JqZWN0czogMzE5OCwgZG9uZS4N
-Cj4gPiA+IHJlbW90ZTogQ29tcHJlc3Npbmcgb2JqZWN0czogMTAwJSAoMTcyNS8xNzI1KSwgZG9u
-ZS4NCj4gPiA+IHJlbW90ZTogVG90YWwgMjUwMiAoZGVsdGEgMTk2MyksIHJldXNlZCA5NjIgKGRl
-bHRhIDc3MikNCj4gPiA+IFJlY2VpdmluZyBvYmplY3RzOiAxMDAlICgyNTAyLzI1MDIpLCA2MDcu
-NTMgS2lCIHwgNzkxLjAwIEtpQi9zLCBkb25lLg0KPiA+ID4gUmVzb2x2aW5nIGRlbHRhczogMTAw
-JSAoMTk2My8xOTYzKSwgY29tcGxldGVkIHdpdGggNDI0IGxvY2FsIG9iamVjdHMuDQo+ID4gPiBG
-cm9tIGdpdDovL2dpdC5xZW11Lm9yZy9xZW11DQo+ID4gPiAgICBiNjQ4NDJkLi4xZmRlNmVlICBt
-YXN0ZXIgICAgIC0+IG9yaWdpbi9tYXN0ZXINCj4gPiA+ICAqIFtuZXcgYnJhbmNoXSAgICAgIHN0
-YWJsZS0yLjggLT4gb3JpZ2luL3N0YWJsZS0yLjgNCj4gPiA+ICAqIFtuZXcgdGFnXSAgICAgICAg
-IHYyLjguMSAgICAgLT4gdjIuOC4xDQo+ID4gPiAgKiBbbmV3IHRhZ10gICAgICAgICB2Mi45LjAt
-cmMzIC0+IHYyLjkuMC1yYzMNCj4gPiA+ICAqIFtuZXcgdGFnXSAgICAgICAgIHYyLjkuMC1yYzAg
-LT4gdjIuOS4wLXJjMA0KPiA+ID4gICogW25ldyB0YWddICAgICAgICAgdjIuOS4wLXJjMSAtPiB2
-Mi45LjAtcmMxDQo+ID4gPiAgKiBbbmV3IHRhZ10gICAgICAgICB2Mi45LjAtcmMyIC0+IHYyLjku
-MC1yYzINCj4gPiA+IC4uLg0KPiA+ID4NCj4gPiA+IElmIHlvdSdyZSBwdWxsaW5nIGZyb20gdGhl
-IGdpdGh1YiBtaXJyb3IgSSBkbyBzZWUgdGhhdCBpdCBoYXNuJ3QgYmVlbiB1cGRhdGVkDQo+ID4g
-PiB5ZXQgd2l0aCBzdGFibGUtMi44IGJyYW5jaCBvciB0YWcuIFRoYXQgcHJvY2VzcyB3YXMgcHJl
-dmlvdXNseSBhdXRvbWF0ZWQNCj4gPiA+IEFGQUlLLA0KPiA+ID4gYnV0IG1heWJlIHNvbWV0aGlu
-ZyBoYXMgY2hhbmdlZCBzaW5jZSB0aGUgcmVjZW50IHNlcnZlciBzd2l0Y2gtb3Zlci4gV2lsbA0K
-PiA+ID4gbG9vaw0KPiA+ID4gaW50byBpdCBtb3JlIHRvbW9ycm93Lg0KPiA+ID4NCj4gPiBZZXMs
-IEkgcHVsbCBpdCBmcm9tIGdpdGh1YiBtaXJyb3Igc2luY2UgdGhlIGZpcmV3YWxsIG9mIG15IGZp
-cm0uDQo+ID4gQW5kIEkgbm90aWNlIHRoYXQgdGhlIGxhdGVzdCB0YWcgaXMgdjIuOC4wLCBubyB2
-Mi44LjEgYW5kIHYyLjkuMC1yY1g6DQo+ID4NCj4gPiBsaW51eC1hcmVpOi9tbnQvc2RiL2dvbmds
-ZWkvcWVtdSAjIGdpdCB0YWcgfCB0YWlsDQo+ID4gdjIuNy4wLXJjMw0KPiA+IHYyLjcuMC1yYzQN
-Cj4gPiB2Mi43LjAtcmM1DQo+ID4gdjIuNy4xDQo+ID4gdjIuOC4wDQo+ID4gdjIuOC4wLXJjMA0K
-PiA+IHYyLjguMC1yYzENCj4gPiB2Mi44LjAtcmMyDQo+ID4gdjIuOC4wLXJjMw0KPiA+IHYyLjgu
-MC1yYzQNCj4gDQo+IFRoYW5rcyBmb3IgY29uZmlybWluZy4gSSd2ZSBwaW5nZWQgdGhlIGFkbWlu
-cyBhYm91dCBpdCwgSSdtIHN1cmUgaXQnbGwNCj4gZ2V0IHNvcnRlZCBvdXQgc29vbi4NCj4gDQo+
-IFRoZSB0YWdzIG1pZ2h0IGJlIG1pc3Npbmcgb24gdGhlIGdpdGh1YiBtaXJyb3IsIGJ1dCB0aGUg
-bWFzdGVyIGJyYW5jaCBzZWVtcw0KPiB1cCB0byBkYXRlIGF0IGxlYXN0LiBJJ3ZlIGFsc28gcHVz
-aGVkIHN0YWJsZS0yLjggYnJhbmNoIGFuZCB2Mi44LjEgdG8gbXkNCj4gdHJlZSBpbiBjYXNlIHlv
-dSBuZWVkIHRvIGdyYWIgdGhlbSBpbiB0aGUgbWVhbnRpbWU6DQo+IA0KPiAgIGh0dHBzOi8vZ2l0
-aHViLmNvbS9tZHJvdGgvcWVtdS9yZWxlYXNlcy90YWcvdjIuOC4xDQo+IA0KVGhhbmtzIGZvciB5
-b3VyIHdvcmshDQoNCi1Hb25nbGVpDQoNCg==
+On 04/05/2017 07:51 AM, David Gibson wrote:
+> On Mon, Apr 03, 2017 at 09:45:56AM +0200, C=E9dric Le Goater wrote:
+>> Hello,
+>>
+>> Here is a series adding support for the interrupt controller as found
+>> on a POWER8 system. POWER9 uses a different interrupt controller
+>> called XIVE, still to be worked on.
+>>
+>> The initial patches are more cleanups of the XICS layer which move the
+>> IRQ 'server' number mapping under the machine handlers.
+>>
+>> A new PnvICPState object based on MMIOs, which is specific to PowerNV,
+>> is introduced in XICS. These ICP objects are created for each thread
+>> of a core and linked to the associated PowerPCCPU object.
+>>
+>> Finally, to make use of the XICS layer, the PowerNV machine is
+>> extended with a QOM XICSFabric interface and with a global memory
+>> region acting as the Interrupt Management area.
+>>
+>>
+>> To test, grab a kernel and a rootfs image here :
+>>
+>>   https://openpower.xyz/job/openpower-op-build/distro=3Dubuntu,target=3D=
+palmetto/lastSuccessfulBuild/artifact/images/zImage.epapr
+>>   https://openpower.xyz/job/openpower-op-build/distro=3Dubuntu,target=3D=
+palmetto/lastSuccessfulBuild/artifact/images/rootfs.cpio.xz
+>>
+>> The full patchset is available here :
+>>
+>>    https://github.com/legoater/qemu/commits/powernv-ipmi-2.9
+>>
+>> Thanks,
+>=20
+> I've applied the series to my ppc-for-2.10 branch.  A couple of things
+> to think about for follow up cleanups:
+>=20
+> 1) The spapr->nr_servers field has very little remaining use; can you
+>    go a bit further and remove it entirely?
+
+yes. I have a patch for it already, reshuffling the xics_system_init
+routine again to make it look a little better :=20
+
+	https://github.com/legoater/qemu/commit/94e90b4b660d521ad4806a5496dd89f3=
+51995810
+=20
+> 2) At the moment you're creating (and realizing) the ICP objects=20
+
+yes. This is because the number of ICPState objects depends=20
+on 'nr_threads' which is only known at realize time.
+
+We could also define an array of icps in the core:
+
+	PnvICPState icps[MAX_THREADS]
+
+initialize them in an init routine and only realize a subset=20
+depending on 'nr_threads'.=20
+
+This is possible because the size of TYPE_PNV_ICP and TYPE_ICP
+are the same.=20
+
+But, the current method is safer I think.=20
+
+> just  before you realize the core objects.=20
+
+yes. this is to not complete the core realization if the ICP=20
+creation fails. Else the core would be fully realized before=20
+the ICP, which feels incorrect as the ICP is an attribute=20
+of the core now.=20
+
+> I'm not entirely sure if
+> creating new objects at realize time is QOMishly correct.  Maybe do
+> some more enquiries to see if it is or not, and if not update.
+
+Yes.
+
+Thanks,
+
+C.=20
+  =20
