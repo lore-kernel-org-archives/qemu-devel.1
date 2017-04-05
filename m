@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cvrY0-00023R-Qn
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 16:28:57 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1cvrd5-0003Bj-Bs
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 16:34:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cvrXz-0005Uf-VJ
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 16:28:56 -0400
-References: <cover.1491416061.git.jcody@redhat.com>
-	<1eeddeba3dc5775183bd1e44ecae616c233b932d.1491416061.git.jcody@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <4c0fc97d-ca5a-4952-570b-f7598f2aec9d@redhat.com>
-Date: Wed, 5 Apr 2017 16:28:44 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1cvrd0-000798-Kh
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 16:34:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40146)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1cvrd0-000792-FK
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 16:34:06 -0400
+From: Alex Williamson <alex.williamson@redhat.com>
+Date: Wed, 05 Apr 2017 14:34:02 -0600
+Message-ID: <20170405203345.12539.45427.stgit@gimli.home>
 MIME-Version: 1.0
-In-Reply-To: <1eeddeba3dc5775183bd1e44ecae616c233b932d.1491416061.git.jcody@redhat.com>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.10 5/9] block: introduce
- bdrv_try_set_read_only()
+Subject: [Qemu-devel] [PATCH] vfio/pci-quirks: Exclude non-ioport BAR from
+ NVIDIA quirk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,67 +26,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
+To: alex.williamson@redhat.com
+Cc: qemu-devel@nongnu.org, 1678466@bugs.launchpad.net
 
+The NVIDIA BAR5 quirk is targeting an ioport BAR.  Some older devices
+have a BAR5 which is not ioport and can induce a segfault here.  Test
+the BAR type to skip these devices.
 
+Link: https://bugs.launchpad.net/qemu/+bug/1678466
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
+ hw/vfio/pci-quirks.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 04/05/2017 02:28 PM, Jeff Cody wrote:
-> Introduce try function for setting read_only flags.  Will return < 0 on
-> error, with appropriate Error value set.  Does not alter any flags.
-> 
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
-> ---
->  block.c               | 14 +++++++++++++-
->  include/block/block.h |  1 +
->  2 files changed, 14 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block.c b/block.c
-> index 8bfe7f4..ad958b9 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -197,7 +197,7 @@ bool bdrv_is_read_only(BlockDriverState *bs)
->      return bs->read_only;
->  }
->  
-> -int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
-> +int bdrv_try_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
->  {
->      /* Do not set read_only if copy_on_read is enabled */
->      if (bs->copy_on_read && read_only) {
-> @@ -213,6 +213,18 @@ int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
->          return -EPERM;
->      }
->  
-> +    return 0;
-> +}
-> +
-> +int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
-> +{
-> +    int ret = 0;
-> +
-> +    ret = bdrv_try_set_read_only(bs, read_only, errp);
-> +    if (ret < 0) {
-> +        return ret;
-> +    }
-> +
->      bs->read_only = read_only;
->      return 0;
->  }
-> diff --git a/include/block/block.h b/include/block/block.h
-> index beb563a..0049b57 100644
-> --- a/include/block/block.h
-> +++ b/include/block/block.h
-> @@ -426,6 +426,7 @@ int bdrv_is_allocated_above(BlockDriverState *top, BlockDriverState *base,
->                              int64_t sector_num, int nb_sectors, int *pnum);
->  
->  bool bdrv_is_read_only(BlockDriverState *bs);
-> +int bdrv_try_set_read_only(BlockDriverState *bs, bool read_only, Error **errp);
->  int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp);
->  bool bdrv_is_sg(BlockDriverState *bs);
->  bool bdrv_is_inserted(BlockDriverState *bs);
-> 
-
-Maybe I'm just green, but I find it weird that the function is named
-try_x when we aren't actually trying to do anything, we're checking to
-see if we can.
+diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+index e9b493b939db..349085ea12bc 100644
+--- a/hw/vfio/pci-quirks.c
++++ b/hw/vfio/pci-quirks.c
+@@ -660,7 +660,7 @@ static void vfio_probe_nvidia_bar5_quirk(VFIOPCIDevice *vdev, int nr)
+     VFIOConfigWindowQuirk *window;
+ 
+     if (!vfio_pci_is(vdev, PCI_VENDOR_ID_NVIDIA, PCI_ANY_ID) ||
+-        !vdev->vga || nr != 5) {
++        !vdev->vga || nr != 5 || !vdev->bars[5].ioport) {
+         return;
+     }
+ 
