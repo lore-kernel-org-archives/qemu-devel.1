@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60653)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cvquI-0002Zg-WA
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:47:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1cvquP-0002eT-OK
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:48:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cvquI-0007xi-07
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:47:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54492)
+	(envelope-from <eblake@redhat.com>) id 1cvquN-000811-Au
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:48:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47342)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cvquH-0007x6-Qh
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:47:53 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cvquN-00080T-2n
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:47:59 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EFBA4F80C
+	for <qemu-devel@nongnu.org>; Wed,  5 Apr 2017 19:47:57 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Date: Wed,  5 Apr 2017 14:47:31 -0500
-Message-Id: <20170405194741.18956-4-eblake@redhat.com>
+Date: Wed,  5 Apr 2017 14:47:34 -0500
+Message-Id: <20170405194741.18956-7-eblake@redhat.com>
 In-Reply-To: <20170405194741.18956-1-eblake@redhat.com>
 References: <20170405194741.18956-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 03/13] s390x: Drop useless casts
+Subject: [Qemu-devel] [PATCH v3 06/13] qobject: Add helper macros for common
+ scalar insertions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,35 +31,98 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
+Cc: armbru@redhat.com
 
-An upcoming Coccinelle cleanup script wanted to reformat the casts
-present in this file - but on closer look, we don't need the casts
-at all because C automatically converts void* to any other pointer.
+Rather than making lots of callers wrap a scalar in a QInt, QString,
+or QBool, provide helper macros that do the wrapping automatically.
+
+Update the Coccinelle script to make mass conversions easy, although
+the conversion itself will be done as a separate patches to ease
+review and backport efforts.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- target/s390x/cpu_models.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/qapi/qmp/qdict.h         |  8 ++++++++
+ include/qapi/qmp/qlist.h         |  8 ++++++++
+ scripts/coccinelle/qobject.cocci | 22 ++++++++++++++++++++++
+ 3 files changed, 38 insertions(+)
 
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 1434d15..ce461cc 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -376,12 +376,12 @@ static void cpu_model_from_info(S390CPUModel *model, const CpuModelInfo *info,
+diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
+index fe9a4c5..9d9f9a3 100644
+--- a/include/qapi/qmp/qdict.h
++++ b/include/qapi/qmp/qdict.h
+@@ -52,6 +52,14 @@ void qdict_destroy_obj(QObject *obj);
+ #define qdict_put(qdict, key, obj) \
+         qdict_put_obj(qdict, key, QOBJECT(obj))
 
- static void qdict_add_disabled_feat(const char *name, void *opaque)
- {
--    qdict_put((QDict *) opaque, name, qbool_from_bool(false));
-+    qdict_put(opaque, name, qbool_from_bool(false));
- }
++/* Helpers for int, bool, and const char*. */
++#define qdict_put_int(qdict, key, value) \
++        qdict_put(qdict, key, qint_from_int(value))
++#define qdict_put_bool(qdict, key, value) \
++        qdict_put(qdict, key, qbool_from_bool(value))
++#define qdict_put_str(qdict, key, value) \
++        qdict_put(qdict, key, qstring_from_str(value))
++
+ /* High level helpers */
+ double qdict_get_double(const QDict *qdict, const char *key);
+ int64_t qdict_get_int(const QDict *qdict, const char *key);
+diff --git a/include/qapi/qmp/qlist.h b/include/qapi/qmp/qlist.h
+index a84117e..659325a 100644
+--- a/include/qapi/qmp/qlist.h
++++ b/include/qapi/qmp/qlist.h
+@@ -29,6 +29,14 @@ typedef struct QList {
+ #define qlist_append(qlist, obj) \
+         qlist_append_obj(qlist, QOBJECT(obj))
 
- static void qdict_add_enabled_feat(const char *name, void *opaque)
- {
--    qdict_put((QDict *) opaque, name, qbool_from_bool(true));
-+    qdict_put(opaque, name, qbool_from_bool(true));
- }
++/* Helpers for int, bool, and const char*. */
++#define qlist_append_int(qlist, value) \
++        qlist_append(qlist, qint_from_int(value))
++#define qlist_append_bool(qlist, value) \
++        qlist_append(qlist, qbool_from_bool(value))
++#define qlist_append_str(qlist, value) \
++        qlist_append(qlist, qstring_from_str(value))
++
+ #define QLIST_FOREACH_ENTRY(qlist, var)             \
+         for ((var) = ((qlist)->head.tqh_first);     \
+             (var);                                  \
+diff --git a/scripts/coccinelle/qobject.cocci b/scripts/coccinelle/qobject.cocci
+index aa899e2..97703a4 100644
+--- a/scripts/coccinelle/qobject.cocci
++++ b/scripts/coccinelle/qobject.cocci
+@@ -2,12 +2,34 @@
+ @@
+ expression Obj, Key, E;
+ @@
++(
+ - qdict_put_obj(Obj, Key, QOBJECT(E));
+ + qdict_put(Obj, Key, E);
++|
++- qdict_put(Obj, Key, qint_from_int(E));
+++ qdict_put_int(Obj, Key, E);
++|
++- qdict_put(Obj, Key, qbool_from_bool(E));
+++ qdict_put_bool(Obj, Key, E);
++|
++- qdict_put(Obj, Key, qstring_from_str(E));
+++ qdict_put_str(Obj, Key, E);
++)
 
- /* convert S390CPUDef into a static CpuModelInfo */
+ // Use QList macros where they make sense
+ @@
+ expression Obj, E;
+ @@
++(
+ - qlist_append_obj(Obj, QOBJECT(E));
+ + qlist_append(Obj, E);
++|
++- qlist_append(Obj, qint_from_int(E));
+++ qlist_append_int(Obj, E);
++|
++- qlist_append(Obj, qbool_from_bool(E));
+++ qlist_append_bool(Obj, E);
++|
++- qlist_append(Obj, qstring_from_str(E));
+++ qlist_append_str(Obj, E);
++)
 -- 
 2.9.3
