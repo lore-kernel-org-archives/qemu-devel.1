@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59108)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cvqoz-0001bd-Qn
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:42:27 -0400
+	(envelope-from <eblake@redhat.com>) id 1cvquE-0002WS-P5
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:47:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cvqow-0005DM-MO
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:42:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57272)
+	(envelope-from <eblake@redhat.com>) id 1cvquB-0007uo-JM
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:47:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58030)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cvqow-0005D6-E5
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:42:22 -0400
-Date: Wed, 5 Apr 2017 16:42:16 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170405194216.GA15566@thinpad.lan.raisama.net>
-References: <20170404202429.14643-1-ehabkost@redhat.com>
-	<20170404202429.14643-2-ehabkost@redhat.com>
-	<9ae31b10-0f8c-69fc-c53b-089f89beda3e@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9ae31b10-0f8c-69fc-c53b-089f89beda3e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 01/21] qdev: Replace
- cannot_instantiate_with_device_add_yet with !user_creatable
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cvquB-0007t6-A8
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:47:47 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2441E7E9C0
+	for <qemu-devel@nongnu.org>; Wed,  5 Apr 2017 19:47:46 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+Date: Wed,  5 Apr 2017 14:47:28 -0500
+Message-Id: <20170405194741.18956-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 00/13] qapi-related cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,120 +27,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com
 
-On Wed, Apr 05, 2017 at 10:01:29PM +0300, Marcel Apfelbaum wrote:
-> On 04/04/2017 11:24 PM, Eduardo Habkost wrote:
-> > cannot_instantiate_with_device_add_yet was introduced by commit
-> > 837d37167dc446af8a91189108b363c04609e296 to replace no_user. It
-> > was supposed to be a temporary measure.
-> > 
-> 
-> 
-> Hi Eduardo,
-> 
-> > When it was introduced, we had 54
-> > cannot_instantiate_with_device_add_yet=true lines in the code.
-> > Today (3 years later) this number has not shrinked: we now have
-> > 57 cannot_instantiate_with_device_add_yet=true lines. I think it
-> > is safe to say it is not a temporary measure, and we won't see
-> > the flag go away soon.
-> > 
-> > Instead of a long field name that misleads people to believe it
-> > is temporary, replace it a shorter and less misleading field:
-> > user_creatable.
-> 
-> I completely agree with you. I never liked "negation" fields
-> and especially the ones ending with "_yet".
-> 
-> I also don't understand why "user_creatable" can't be used for white-listing *Q35*.
-> I do understand that on some archs we need a white-list per board,
-> but I don't think x86 needs it.
-> 
-> > 
-> > Except for code comments, changes were generated using the
-> > following Coccinelle patch:
-> > 
-> >   @@
-> >   expression DC;
-> >   @@
-> >   (
-> >   -DC->cannot_instantiate_with_device_add_yet = false;
-> >   +DC->user_creatable = true;
-> 
-> Is it necessary? Isn't "creatable = true" the default?
+This is a subset of my earlier post "Rip out dynamic JSON parsing"[1],
+and then a rebase of that work onto master.  It is available here:
 
-cannot_instantiate_with_device_add_yet is also false by default,
-but if there's code explicitly setting it to false somewhere, it
-is probably necessary for some reason. The script doesn't care
-what's the reason, because this is a 100% mechanical translation
-from the old logic to equivalent logic using the new field.
+git fetch git://repo.or.cz/qemu/ericb.git qapi-dynamic-json-v3
 
-If you are still curious about specific cases: explicit
-cannot_instantiate_with_device_add_yet=false/user_creatable=true
-is necessary at x86_cpu_common_class_init(), because TYPE_CPU has
-cannot_instantiate_with_device_add_yet=true (most CPU types don't
-support device_add), but TYPE_X86_CPU sets it back to false
-(because x86 supports CPU hotplug).
+the tag name is a bit of a misnomer for the current series, but is
+historically accurate.
 
-> 
-> >   |
-> >   -DC->cannot_instantiate_with_device_add_yet = true;
-> >   +DC->user_creatable = false;
-> >   )
-> > 
-> >   @@
-> >   typedef ObjectClass;
-> >   expression dc;
-> >   identifier class, data;
-> >   @@
-> >    static void device_class_init(ObjectClass *class, void *data)
-> >    {
-> >    ...
-> >    dc->hotpluggable = true;
-> >   +dc->user_creatable = true;
-> 
-> OK... it seems risky :). Is true that "hotpluggable" => creatable,
-> but the prev rule should work, right?
+Since v2 [2], I've split up the original patches 2-3 (done manually,
+and mixing multiple cleanups into one) into a much longer sequence of
+patches 2-11 (separate cleanups in 2, 3, 10, 11, and use of Coccinelle
+instead of manual for the bulk of the work); I've also dropped the
+original patch 6.  I've also addressed some of the comments left by
+Markus on v2, although I still couldn't figure out how to use an 'id'
+instead of "device":"floppy0" in 12.
 
-Note that this part is only changing device_class_init(), and no
-other function. dc->hotpluggable=true appears here by pure
-chance: it's just because this is the spot where the new
-dc->user_creatable=true line is being added.
+This is 2.10 material, and will probably be a conflict magnet the
+longer it is not applied (conversely, since it is now generated by
+Coccinelle, it will be a lot easier to regenerate the series if
+another round of rebasing is needed).
 
-This explicit line addition is required because there's no
-explicit dc->user_creatable=false line in device_class_init
-because QOM objects are always zeroed on creation)
+[1] https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg05425.html
+[2] https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg03661.html
 
-> 
-> >    ...
-> >    }
-> > 
-> >   @@
-> >   @@
-> >    struct DeviceClass {
-> >    ...
-> >   -bool cannot_instantiate_with_device_add_yet;
-> >   +bool user_creatable;
-> >    ...
-> >   }
-> > 
-> >   @@
-> >   expression DC;
-> >   @@
-> >   (
-> >   -!DC->cannot_instantiate_with_device_add_yet
-> >   +DC->user_creatable
-> >   |
-> >   -DC->cannot_instantiate_with_device_add_yet
-> >   +!DC->user_creatable
-> >   )
-> > 
-> 
-> Nice script!
+001/13:[0030] [FC] 'pci: Use struct instead of QDict to pass back parameters'
+002/13:[down] 'pci: Reduce scope of error injection'
+003/13:[down] 's390x: Drop useless casts'
+004/13:[down] 'coccinelle: Add script to remove useless QObject casts'
+005/13:[down] 'qobject: Drop useless QObject casts'
+006/13:[down] 'qobject: Add helper macros for common scalar insertions'
+007/13:[down] 'block: Use simpler QDict/QList scalar insertion macros'
+008/13:[down] 'tests: Use simpler QDict/QList scalar insertion macros'
+009/13:[down] 'qobject: Use simpler QDict/QList scalar insertion macros'
+010/13:[down] 'block: Simplify bdrv_append_temp_snapshot() logic'
+011/13:[down] 'QemuOpts: Simplify qemu_opts_to_qdict()'
+012/13:[----] [--] 'fdc-test: Avoid deprecated 'change' command'
+013/13:[0024] [FC] 'test-qga: Actually test 0xff sync bytes'
 
-Thanks!
+Eric Blake (13):
+  pci: Use struct instead of QDict to pass back parameters
+  pci: Reduce scope of error injection
+  s390x: Drop useless casts
+  coccinelle: Add script to remove useless QObject casts
+  qobject: Drop useless QObject casts
+  qobject: Add helper macros for common scalar insertions
+  block: Use simpler QDict/QList scalar insertion macros
+  tests: Use simpler QDict/QList scalar insertion macros
+  qobject: Use simpler QDict/QList scalar insertion macros
+  block: Simplify bdrv_append_temp_snapshot() logic
+  QemuOpts: Simplify qemu_opts_to_qdict()
+  fdc-test: Avoid deprecated 'change' command
+  test-qga: Actually test 0xff sync bytes
+
+ include/hw/pci/pcie_aer.h           |   4 -
+ include/qapi/qmp/qdict.h            |   8 ++
+ include/qapi/qmp/qlist.h            |   8 ++
+ block.c                             |  58 ++++++---------
+ block/blkdebug.c                    |   8 +-
+ block/blkverify.c                   |  11 ++-
+ block/curl.c                        |   2 +-
+ block/file-posix.c                  |   8 +-
+ block/file-win32.c                  |   4 +-
+ block/iscsi.c                       |   2 +-
+ block/nbd.c                         |  41 +++++------
+ block/nfs.c                         |  43 +++++------
+ block/null.c                        |   2 +-
+ block/qcow2.c                       |   4 +-
+ block/quorum.c                      |  16 ++--
+ block/rbd.c                         |  16 ++--
+ block/ssh.c                         |  16 ++--
+ block/vvfat.c                       |  10 +--
+ blockdev.c                          |  30 ++++----
+ hw/block/xen_disk.c                 |   2 +-
+ hw/pci/pcie_aer.c                   |  48 +++++++-----
+ hw/usb/xen-usb.c                    |  12 +--
+ monitor.c                           |  23 +++---
+ qapi/qmp-event.c                    |   2 +-
+ qemu-img.c                          |   6 +-
+ qemu-io.c                           |   2 +-
+ qemu-nbd.c                          |   2 +-
+ qobject/qdict.c                     |   2 +-
+ target/s390x/cpu_models.c           |   4 +-
+ tests/check-qdict.c                 | 142 ++++++++++++++++++------------------
+ tests/check-qlist.c                 |   4 +-
+ tests/device-introspect-test.c      |   4 +-
+ tests/fdc-test.c                    |   5 +-
+ tests/libqtest.c                    |   8 ++
+ tests/test-qemu-opts.c              |   4 +-
+ tests/test-qga.c                    |  34 +++++++--
+ tests/test-qmp-commands.c           |  30 ++++----
+ tests/test-qmp-event.c              |  30 ++++----
+ tests/test-qobject-output-visitor.c |   6 +-
+ util/qemu-option.c                  |   6 +-
+ MAINTAINERS                         |   1 +
+ scripts/coccinelle/qobject.cocci    |  35 +++++++++
+ 42 files changed, 375 insertions(+), 328 deletions(-)
+ create mode 100644 scripts/coccinelle/qobject.cocci
 
 -- 
-Eduardo
+2.9.3
