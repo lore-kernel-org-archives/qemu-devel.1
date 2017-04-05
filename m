@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cvlal-0005qG-UV
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 10:07:28 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1cvlbn-0006S9-GJ
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 10:08:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cvlag-0003XU-6F
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 10:07:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47568)
+	(envelope-from <pbonzini@redhat.com>) id 1cvlbh-0003uK-Tu
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 10:08:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49144)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cvlag-0003XC-0a
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 10:07:18 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cvlbh-0003tD-OM
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 10:08:21 -0400
 References: <20170405132503.32125-1-alex.bennee@linaro.org>
-	<20170405132503.32125-12-alex.bennee@linaro.org>
+	<20170405132503.32125-10-alex.bennee@linaro.org>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5ee6d2cb-d3e5-8b28-6a73-2d84c44ce614@redhat.com>
-Date: Wed, 5 Apr 2017 16:07:11 +0200
+Message-ID: <3f66fd3e-c66c-c4aa-ed6f-eee1ba34a932@redhat.com>
+Date: Wed, 5 Apr 2017 16:08:16 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170405132503.32125-12-alex.bennee@linaro.org>
+In-Reply-To: <20170405132503.32125-10-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 11/12] cpus: call cpu_update_icount on
- read
+Subject: Re: [Qemu-devel] [PATCH v2 09/12] cpus: introduce cpu_update_icount
+ helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,46 +34,18 @@ Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@greensocs.com, fred.k
 
 
 On 05/04/2017 15:25, Alex Benn=C3=A9e wrote:
-> This ensures each time the vCPU thread reads the icount we update the
-> master timer_state.qemu_icount field. This way as long as updates are
-> in BQL protected sections (which they should be) the main-loop can
-> never come to update the log and find time has gone backwards.
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  cpus.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
->=20
-> diff --git a/cpus.c b/cpus.c
-> index ff75af449a..63de033cc8 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -246,19 +246,17 @@ void cpu_update_icount(CPUState *cpu)
-> =20
->  int64_t cpu_get_icount_raw(void)
->  {
-> -    int64_t icount;
->      CPUState *cpu =3D current_cpu;
-> =20
-> -    icount =3D atomic_read(&timers_state.qemu_icount);
->      if (cpu && cpu->running) {
->          if (!cpu->can_do_io) {
->              fprintf(stderr, "Bad icount read\n");
->              exit(1);
->          }
->          /* Take into account what has run */
-> -        icount +=3D cpu_get_icount_executed(cpu);
-> +        cpu_update_icount(cpu);
->      }
-> -    return icount;
-> +    return atomic_read(&timers_state.qemu_icount);
->  }
-> =20
->  /* Return the virtual CPU time, based on the instruction counter.  */
->=20
+> +{
+> +    int64_t executed =3D cpu_get_icount_executed(cpu);
+> +    cpu->icount_budget -=3D executed;
+> +    atomic_add(&timers_state.qemu_icount, executed);
+> +}
 
-Maybe the update should be done in gen_io_start instead.  There
-shouldn't be any interference between vCPU and I/O threads except
-between gen_io_start and gen_io_end.
+Since there's only one writer, it's also okay to do
+
+	atomic_set(&timers_state.qemu_icount,
+		   atomic_read(&timers_state.qemu_icount) + executed);
+
+(also not just faster, but also simpler to turn into TCG code if we do
+the update in gen_io_start).
 
 Paolo
