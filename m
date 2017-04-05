@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cvqAU-0003Q2-OS
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:00:36 -0400
+	(envelope-from <bounces@canonical.com>) id 1cvqB6-0003rf-05
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:01:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cvqAT-0001Hj-G7
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:00:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52694)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cvqAT-0001HD-7m
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:00:33 -0400
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed,  5 Apr 2017 20:00:24 +0100
-Message-Id: <20170405190024.27581-4-dgilbert@redhat.com>
-In-Reply-To: <20170405190024.27581-1-dgilbert@redhat.com>
-References: <20170405190024.27581-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] migration/i386: Remove support for
- pre-0.12 formats
+	(envelope-from <bounces@canonical.com>) id 1cvqB2-0001eZ-UX
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:01:12 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39750)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cvqB2-0001eP-Lw
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 15:01:08 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cvqB1-00020b-55
+	for <qemu-devel@nongnu.org>; Wed, 05 Apr 2017 19:01:07 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 243CB2E80C6
+	for <qemu-devel@nongnu.org>; Wed,  5 Apr 2017 19:01:07 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 05 Apr 2017 18:49:08 -0000
+From: sh-dvl <1678466@bugs.launchpad.net>
+Reply-To: Bug 1678466 <1678466@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170401120201.1125.46046.malonedeb@gac.canonical.com>
+Message-Id: <20170405184908.12505.5516.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1678466] Re: using x-vga=on with vfio-pci leads
+ to segfault
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,179 +37,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, quintela@redhat.com
+To: qemu-devel@nongnu.org
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+after applying the patch no segfault occures any more.
 
-Remove support for versions of the CPU state prior to 11
-which is the version used in qemu 0.12 - you'd be pretty
-lucky if you got a migration stream to work from anything
-that old anyway.  This doesn't affect the machine type
-definition in any way.
+thanks for quick fix.
 
-My main reason for doing this is the hack for sysenter_esp/eip
-that uses .get/.put's in state versions less than 7 (that's
-prior to somewhere before 0.10).
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- target/i386/machine.c | 115 +++++++++++++++-----------------------------------
- 1 file changed, 34 insertions(+), 81 deletions(-)
+regarding my assumption the missing I/O may depend on bios/slot or similar:=
+ it doesn't. the card does not show the entry in either slot or even as onl=
+y extra-card.
 
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 0b4756b..3cb2729 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -178,44 +178,6 @@ static const VMStateDescription vmstate_fpreg = {
-     }
- };
- 
--static bool version_is_5(void *opaque, int version_id)
--{
--    return version_id == 5;
--}
--
--#ifdef TARGET_X86_64
--static bool less_than_7(void *opaque, int version_id)
--{
--    return version_id < 7;
--}
--
--static int get_uint64_as_uint32(QEMUFile *f, void *pv, size_t size,
--                                VMStateField *field)
--{
--    uint64_t *v = pv;
--    *v = qemu_get_be32(f);
--    return 0;
--}
--
--static int put_uint64_as_uint32(QEMUFile *f, void *pv, size_t size,
--                                VMStateField *field, QJSON *vmdesc)
--{
--    uint64_t *v = pv;
--    qemu_put_be32(f, *v);
--
--    return 0;
--}
--
--static const VMStateInfo vmstate_hack_uint64_as_uint32 = {
--    .name = "uint64_as_uint32",
--    .get  = get_uint64_as_uint32,
--    .put  = put_uint64_as_uint32,
--};
--
--#define VMSTATE_HACK_UINT32(_f, _s, _t)                                  \
--    VMSTATE_SINGLE_TEST(_f, _s, _t, 0, vmstate_hack_uint64_as_uint32, uint64_t)
--#endif
--
- static void cpu_pre_save(void *opaque)
- {
-     X86CPU *cpu = opaque;
-@@ -842,7 +804,7 @@ static const VMStateDescription vmstate_mcg_ext_ctl = {
- VMStateDescription vmstate_x86_cpu = {
-     .name = "cpu",
-     .version_id = 12,
--    .minimum_version_id = 3,
-+    .minimum_version_id = 11,
-     .pre_save = cpu_pre_save,
-     .post_load = cpu_post_load,
-     .fields = (VMStateField[]) {
-@@ -865,16 +827,8 @@ VMStateDescription vmstate_x86_cpu = {
-         VMSTATE_SEGMENT(env.idt, X86CPU),
- 
-         VMSTATE_UINT32(env.sysenter_cs, X86CPU),
--#ifdef TARGET_X86_64
--        /* Hack: In v7 size changed from 32 to 64 bits on x86_64 */
--        VMSTATE_HACK_UINT32(env.sysenter_esp, X86CPU, less_than_7),
--        VMSTATE_HACK_UINT32(env.sysenter_eip, X86CPU, less_than_7),
--        VMSTATE_UINTTL_V(env.sysenter_esp, X86CPU, 7),
--        VMSTATE_UINTTL_V(env.sysenter_eip, X86CPU, 7),
--#else
-         VMSTATE_UINTTL(env.sysenter_esp, X86CPU),
-         VMSTATE_UINTTL(env.sysenter_eip, X86CPU),
--#endif
- 
-         VMSTATE_UINTTL(env.cr[0], X86CPU),
-         VMSTATE_UINTTL(env.cr[2], X86CPU),
-@@ -895,46 +849,45 @@ VMStateDescription vmstate_x86_cpu = {
-         VMSTATE_UINT64(env.fmask, X86CPU),
-         VMSTATE_UINT64(env.kernelgsbase, X86CPU),
- #endif
--        VMSTATE_UINT32_V(env.smbase, X86CPU, 4),
--
--        VMSTATE_UINT64_V(env.pat, X86CPU, 5),
--        VMSTATE_UINT32_V(env.hflags2, X86CPU, 5),
--
--        VMSTATE_UINT32_TEST(parent_obj.halted, X86CPU, version_is_5),
--        VMSTATE_UINT64_V(env.vm_hsave, X86CPU, 5),
--        VMSTATE_UINT64_V(env.vm_vmcb, X86CPU, 5),
--        VMSTATE_UINT64_V(env.tsc_offset, X86CPU, 5),
--        VMSTATE_UINT64_V(env.intercept, X86CPU, 5),
--        VMSTATE_UINT16_V(env.intercept_cr_read, X86CPU, 5),
--        VMSTATE_UINT16_V(env.intercept_cr_write, X86CPU, 5),
--        VMSTATE_UINT16_V(env.intercept_dr_read, X86CPU, 5),
--        VMSTATE_UINT16_V(env.intercept_dr_write, X86CPU, 5),
--        VMSTATE_UINT32_V(env.intercept_exceptions, X86CPU, 5),
--        VMSTATE_UINT8_V(env.v_tpr, X86CPU, 5),
-+        VMSTATE_UINT32(env.smbase, X86CPU),
-+
-+        VMSTATE_UINT64(env.pat, X86CPU),
-+        VMSTATE_UINT32(env.hflags2, X86CPU),
-+
-+        VMSTATE_UINT64(env.vm_hsave, X86CPU),
-+        VMSTATE_UINT64(env.vm_vmcb, X86CPU),
-+        VMSTATE_UINT64(env.tsc_offset, X86CPU),
-+        VMSTATE_UINT64(env.intercept, X86CPU),
-+        VMSTATE_UINT16(env.intercept_cr_read, X86CPU),
-+        VMSTATE_UINT16(env.intercept_cr_write, X86CPU),
-+        VMSTATE_UINT16(env.intercept_dr_read, X86CPU),
-+        VMSTATE_UINT16(env.intercept_dr_write, X86CPU),
-+        VMSTATE_UINT32(env.intercept_exceptions, X86CPU),
-+        VMSTATE_UINT8(env.v_tpr, X86CPU),
-         /* MTRRs */
--        VMSTATE_UINT64_ARRAY_V(env.mtrr_fixed, X86CPU, 11, 8),
--        VMSTATE_UINT64_V(env.mtrr_deftype, X86CPU, 8),
-+        VMSTATE_UINT64_ARRAY(env.mtrr_fixed, X86CPU, 11),
-+        VMSTATE_UINT64(env.mtrr_deftype, X86CPU),
-         VMSTATE_MTRR_VARS(env.mtrr_var, X86CPU, MSR_MTRRcap_VCNT, 8),
-         /* KVM-related states */
--        VMSTATE_INT32_V(env.interrupt_injected, X86CPU, 9),
--        VMSTATE_UINT32_V(env.mp_state, X86CPU, 9),
--        VMSTATE_UINT64_V(env.tsc, X86CPU, 9),
--        VMSTATE_INT32_V(env.exception_injected, X86CPU, 11),
--        VMSTATE_UINT8_V(env.soft_interrupt, X86CPU, 11),
--        VMSTATE_UINT8_V(env.nmi_injected, X86CPU, 11),
--        VMSTATE_UINT8_V(env.nmi_pending, X86CPU, 11),
--        VMSTATE_UINT8_V(env.has_error_code, X86CPU, 11),
--        VMSTATE_UINT32_V(env.sipi_vector, X86CPU, 11),
-+        VMSTATE_INT32(env.interrupt_injected, X86CPU),
-+        VMSTATE_UINT32(env.mp_state, X86CPU),
-+        VMSTATE_UINT64(env.tsc, X86CPU),
-+        VMSTATE_INT32(env.exception_injected, X86CPU),
-+        VMSTATE_UINT8(env.soft_interrupt, X86CPU),
-+        VMSTATE_UINT8(env.nmi_injected, X86CPU),
-+        VMSTATE_UINT8(env.nmi_pending, X86CPU),
-+        VMSTATE_UINT8(env.has_error_code, X86CPU),
-+        VMSTATE_UINT32(env.sipi_vector, X86CPU),
-         /* MCE */
--        VMSTATE_UINT64_V(env.mcg_cap, X86CPU, 10),
--        VMSTATE_UINT64_V(env.mcg_status, X86CPU, 10),
--        VMSTATE_UINT64_V(env.mcg_ctl, X86CPU, 10),
--        VMSTATE_UINT64_ARRAY_V(env.mce_banks, X86CPU, MCE_BANKS_DEF * 4, 10),
-+        VMSTATE_UINT64(env.mcg_cap, X86CPU),
-+        VMSTATE_UINT64(env.mcg_status, X86CPU),
-+        VMSTATE_UINT64(env.mcg_ctl, X86CPU),
-+        VMSTATE_UINT64_ARRAY(env.mce_banks, X86CPU, MCE_BANKS_DEF * 4),
-         /* rdtscp */
--        VMSTATE_UINT64_V(env.tsc_aux, X86CPU, 11),
-+        VMSTATE_UINT64(env.tsc_aux, X86CPU),
-         /* KVM pvclock msr */
--        VMSTATE_UINT64_V(env.system_time_msr, X86CPU, 11),
--        VMSTATE_UINT64_V(env.wall_clock_msr, X86CPU, 11),
-+        VMSTATE_UINT64(env.system_time_msr, X86CPU),
-+        VMSTATE_UINT64(env.wall_clock_msr, X86CPU),
-         /* XSAVE related fields */
-         VMSTATE_UINT64_V(env.xcr0, X86CPU, 12),
-         VMSTATE_UINT64_V(env.xstate_bv, X86CPU, 12),
--- 
-2.9.3
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1678466
+
+Title:
+  using x-vga=3Don with vfio-pci leads to segfault
+
+Status in QEMU:
+  New
+
+Bug description:
+  bug occures at least with qemu 2.8.0 and 2.8.1 in 64bit-system
+
+  stripped cmd for minimal config:
+  qemu-system-i386 -m 2048 -M q35  -enable-kvm -nodefaults -nodefconfig -de=
+vice ioh3420,bus=3Dpcie.0,addr=3D0x9,multifunction=3Don,port=3D1,chassis=3D=
+1,id=3Droot.1 -device vfio-pci,host=3D01:00.0,bus=3Droot.1,addr=3D01.0,x-vg=
+a=3Don
+
+  Backtrace is:
+  #0  0x00005555557ca836 in memory_region_update_container_subregions (subr=
+egion=3D0x55555828f2f0) at qemu-2.8.1/memory.c:2030
+  #1  0x00005555557ca9dc in memory_region_add_subregion_common (mr=3D0x0, o=
+ffset=3D8, subregion=3D0x55555828f2f0) at qemu-2.8.1/memory.c:2049
+  #2  0x00005555557caa9a in memory_region_add_subregion_overlap (mr=3D0x0, =
+offset=3D8, subregion=3D0x55555828f2f0, priority=3D1) at qemu-2.8.1/memory.=
+c:2066
+  #3  0x0000555555832e48 in vfio_probe_nvidia_bar5_quirk (vdev=3D0x55555805=
+aef0, nr=3D5) at qemu-2.8.1/hw/vfio/pci-quirks.c:689
+  #4  0x0000555555835433 in vfio_bar_quirk_setup (vdev=3D0x55555805aef0, nr=
+=3D5) at qemu-2.8.1/hw/vfio/pci-quirks.c:1652
+  #5  0x000055555582f122 in vfio_realize (pdev=3D0x55555805aef0, errp=3D0x7=
+fffffffdc78) at qemu-2.8.1/hw/vfio/pci.c:2777
+  #6  0x0000555555a86195 in pci_qdev_realize (qdev=3D0x55555805aef0, errp=
+=3D0x7fffffffdcf0) at hw/pci/pci.c:1966
+  #7  0x00005555559be7b7 in device_set_realized (obj=3D0x55555805aef0, valu=
+e=3Dtrue, errp=3D0x7fffffffdeb0) at hw/core/qdev.c:918
+  #8  0x0000555555bb017f in property_set_bool (obj=3D0x55555805aef0, v=3D0x=
+55555805ced0, name=3D0x555556071b56 "realized", opaque=3D0x555557f15860, er=
+rp=3D0x7fffffffdeb0) at qom/object.c:1854
+  #9  0x0000555555bae2e6 in object_property_set (obj=3D0x55555805aef0, v=3D=
+0x55555805ced0, name=3D0x555556071b56 "realized", errp=3D0x7fffffffdeb0) at=
+ qom/object.c:1088
+  #10 0x0000555555bb184f in object_property_set_qobject (obj=3D0x55555805ae=
+f0, value=3D0x55555805cd70, name=3D0x555556071b56 "realized", errp=3D0x7fff=
+ffffdeb0) at qom/qom-qobject.c:27
+  #11 0x0000555555bae637 in object_property_set_bool (obj=3D0x55555805aef0,=
+ value=3Dtrue, name=3D0x555556071b56 "realized", errp=3D0x7fffffffdeb0) at =
+qom/object.c:1157
+  #12 0x00005555558fee4b in qdev_device_add (opts=3D0x555556b15160, errp=3D=
+0x7fffffffdf28) at qdev-monitor.c:623
+  #13 0x00005555559142c1 in device_init_func (opaque=3D0x0, opts=3D0x555556=
+b15160, errp=3D0x0) at vl.c:2373
+  #14 0x0000555555cc3bb7 in qemu_opts_foreach (list=3D0x555556548b80 <qemu_=
+device_opts>, func=3D0x555555914283 <device_init_func>, opaque=3D0x0, errp=
+=3D0x0) at util/qemu-option.c:1116
+  #15 0x00005555559198aa in main (argc=3D12, argv=3D0x7fffffffe388, envp=3D=
+0x7fffffffe3f0) at vl.c:4574
+
+  as I can see, it happens during initialization of the device-option.
+
+  seems that the code tries to loop over a memory-region mr, which is
+  null from at least three calls before it crashes.
+
+  because there seems to be special handling for nvidia-cards, here're the =
+pci-infos of the card:
+  01:00.0 VGA compatible controller [0300]: NVIDIA Corporation G72 [GeForce=
+ 7300 GS] [10de:01df] (rev a1) (prog-if 00 [VGA controller])
+  	Subsystem: Gigabyte Technology Co., Ltd Device [1458:342a]
+  	Flags: fast devsel, IRQ 16
+  	Memory at de000000 (32-bit, non-prefetchable) [disabled] [size=3D16M]
+  	Memory at c0000000 (64-bit, prefetchable) [disabled] [size=3D256M]
+  	Memory at dd000000 (64-bit, non-prefetchable) [disabled] [size=3D16M]
+  	Expansion ROM at df000000 [disabled] [size=3D128K]
+  	Capabilities: [60] Power Management version 2
+  	Capabilities: [68] MSI: Enable- Count=3D1/1 Maskable- 64bit+
+  	Capabilities: [78] Express Endpoint, MSI 00
+  	Capabilities: [100] Virtual Channel
+  	Capabilities: [128] Power Budgeting <?>
+  	Kernel driver in use: vfio-pci
+
+  at least with a similar card in another slot the crash does not occure.
+  (sorry, can't change the slots at the moment)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1678466/+subscriptions
