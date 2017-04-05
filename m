@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jhanley@dgtlrift.com>) id 1cvnvb-0000Kv-H5
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 12:37:05 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cvnwl-0000sK-CR
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 12:38:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jhanley@dgtlrift.com>) id 1cvnvZ-0005jS-Ld
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 12:37:03 -0400
-Received: from mail-vk0-x230.google.com ([2607:f8b0:400c:c05::230]:34474)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cvnwj-0006BC-IA
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 12:38:15 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:34105)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jhanley@dgtlrift.com>)
-	id 1cvnvZ-0005j6-Fp
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 12:37:01 -0400
-Received: by mail-vk0-x230.google.com with SMTP id z204so11751225vkd.1
-	for <qemu-devel@nongnu.org>; Wed, 05 Apr 2017 09:37:01 -0700 (PDT)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cvnwj-0006B4-61
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 12:38:13 -0400
+Received: by mail-lf0-x243.google.com with SMTP id x137so1639693lff.1
+	for <qemu-devel@nongnu.org>; Wed, 05 Apr 2017 09:38:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <74004942B5DA03468B2B76399A14BF2ED54A885F@XSJ-PSEXMBX01.xlnx.xilinx.com>
-References: <CAF++6AOLSd0SYyv_LmnjinEj-jHBbyNZv_hxvdksGqCoDcpmjA@mail.gmail.com>
-	<74004942B5DA03468B2B76399A14BF2ED54A885F@XSJ-PSEXMBX01.xlnx.xilinx.com>
-From: James Hanley <jhanley@dgtlrift.com>
-Date: Wed, 5 Apr 2017 12:36:59 -0400
-Message-ID: <CAF++6AO++ygLFqNqDmd2w+gAmBw3a1aZn9w8oPF+h3M_bC0CHA@mail.gmail.com>
+In-Reply-To: <CAJ+F1C+2x=0pZxMz8FgxbkQD59zM2pngHKv7AT-hv-KA6xjN+Q@mail.gmail.com>
+References: <20170311132256.22951-1-marcandre.lureau@redhat.com>
+	<20170311132256.22951-18-marcandre.lureau@redhat.com>
+	<20170405161256.GA25291@redhat.com>
+	<CAJ+F1C+2x=0pZxMz8FgxbkQD59zM2pngHKv7AT-hv-KA6xjN+Q@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 5 Apr 2017 20:38:09 +0400
+Message-ID: <CAJ+F1CLScc+afY+p6AV76WJxbFRVvEJDRTtKYEXwJ_eRaMu65A@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] MTD timeout on bootup
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 17/21] virtio-channel: parse qga stream for
+ VMDUMP_INFO event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,114 +33,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, "alistair23@gmail.com" <alistair23@gmail.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, lersek@redhat.com, mdroth@linux.vnet.ibm.com, armbru@redhat.com, pbonzini@redhat.com, anderson@redhat.com
 
-Thanks Alistair.
-Regarding the issue - when I tried to use any of the pre-built images off
-of http://www.wiki.xilinx.com/Zynq+Releases none would detect the MTD
-device in QEMU - they all had a timeout error.  Single-stepping through
-QEMU with GDB as it booted up any of the kernels from Xilinx, I couldn't
-see how the SPI queue could be emptied from the fifo otherwise.  It wasn't
-until I made the change in the patch flipping the logic that it would
-detect the MTD device.
+Hi
 
-Taking a step back, I was really interested in understanding a working
-reference implementation for interaction between SPI and serial flash in
-QEMU for myself as I'm attempting to implement the Atmel SAM4C family of
-MCUs - so my knowledge of Zynq is limited, and I was really just looking
-for an ARM based reference model to use.
+Le 5 avr. 2017 18:13, "Daniel P. Berrange" <berrange@redhat.com> a =C3=A9cr=
+it :
 
-As far as patch submitting, I know this is out of scope of this thread, but
-"git send-email" seems to fail with Google Mail for GSuite domains.  Google
-keeps blocking it with an error that the app is a "less secure app"...
-anybody else know the resolution to this?
+On Sat, Mar 11, 2017 at 05:22:52PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> On virtio channel "org.qemu.guest_agent.0", parse the json stream until
+> the VMDUMP_INFO is received and retrieve the dump details.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  include/sysemu/dump-info.h | 15 +++++++++++++
+>  dump.c                     |  3 +++
+>  hw/char/virtio-console.c   | 53 ++++++++++++++++++++++++++++++
+++++++++++++++++
+>  3 files changed, 71 insertions(+)
+>  create mode 100644 include/sysemu/dump-info.h
+>
+> diff --git a/include/sysemu/dump-info.h b/include/sysemu/dump-info.h
+> new file mode 100644
+> index 0000000000..fb1ddff9af
+> --- /dev/null
+> +++ b/include/sysemu/dump-info.h
+> @@ -0,0 +1,15 @@
+> +#ifndef DUMP_INFO_H
+> +#define DUMP_INFO_H
+> +
+> +typedef struct DumpInfo {
+> +    bool received;
+> +    bool has_phys_base;
+> +    uint64_t phys_base;
+> +    bool has_text;
+> +    uint64_t text;
+> +    char *vmcoreinfo;
+> +} DumpInfo;
+> +
+> +extern DumpInfo dump_info;
+> +
+> +#endif /* DUMP_INFO_H */
+> diff --git a/dump.c b/dump.c
+> index f7b80d856b..68b406459e 100644
+> --- a/dump.c
+> +++ b/dump.c
+> @@ -20,6 +20,7 @@
+>  #include "monitor/monitor.h"
+>  #include "sysemu/kvm.h"
+>  #include "sysemu/dump.h"
+> +#include "sysemu/dump-info.h"
+>  #include "sysemu/sysemu.h"
+>  #include "sysemu/memory_mapping.h"
+>  #include "sysemu/cpus.h"
+> @@ -38,6 +39,8 @@
+>  #define ELF_MACHINE_UNAME "Unknown"
+>  #endif
+>
+> +DumpInfo dump_info =3D { 0, };
+> +
+>  uint16_t cpu_to_dump16(DumpState *s, uint16_t val)
+>  {
+>      if (s->dump_info.d_endian =3D=3D ELFDATA2LSB) {
+> diff --git a/hw/char/virtio-console.c b/hw/char/virtio-console.c
+> index 798d9b69fd..796b7c85aa 100644
+> --- a/hw/char/virtio-console.c
+> +++ b/hw/char/virtio-console.c
+> @@ -16,6 +16,9 @@
+>  #include "trace.h"
+>  #include "hw/virtio/virtio-serial.h"
+>  #include "qapi-event.h"
+> +#include "qapi/qmp/json-streamer.h"
+> +#include "qapi/qmp/json-parser.h"
+> +#include "sysemu/dump-info.h"
+>
+>  #define TYPE_VIRTIO_CONSOLE_SERIAL_PORT "virtserialport"
+>  #define VIRTIO_CONSOLE(obj) \
+> @@ -26,6 +29,7 @@ typedef struct VirtConsole {
+>
+>      CharBackend chr;
+>      guint watch;
+> +    JSONMessageParser parser;
+>  } VirtConsole;
+>
+>  /*
+> @@ -49,6 +53,11 @@ static ssize_t flush_buf(VirtIOSerialPort *port,
+>      VirtConsole *vcon =3D VIRTIO_CONSOLE(port);
+>      ssize_t ret;
+>
+> +    if (vcon->parser.emit &&
+> +        !dump_info.received) {
+> +        json_message_parser_feed(&vcon->parser, (const char *)buf, len);
+> +    }
 
-On Mon, Apr 3, 2017 at 1:32 PM, Alistair Francis <
-alistair.francis@xilinx.com> wrote:
+[snip]
 
-> > -----Original Message-----
-> > From: James Hanley [mailto:jhanley@dgtlrift.com]
-> > Sent: Friday, 31 March 2017 8:29 AM
-> > To: Alistair Francis <alistai@xilinx.com>; Peter Crosthwaite
-> > <crosthwaite.peter@gmail.com>; qemu-devel <qemu-devel@nongnu.org>
-> > Subject: MTD timeout on bootup
-> >
-> > When trying to bootup a pristine zync image from the zc702 tarball, it
-> would always
-> > fail with the MTD detection of the serial flash device type command over
-> the SPI.  I
-> > believe this section of code may have the logic flipped.  Once I changed
-> it to the
-> > following, I was able to detect the flash type when booting the pristine
-> image from
-> > Xilinx.
+so we just continually feed data into the json parser until we see the
+event we care about....
+
+What kind of denial of service protection does our JSON parser have. Now
+that QEMU is directly parsing JSON from QEMU guest agent, it is exposed
+to malicious attack by the guest agent.
+
+eg what happens if the 'vmcoreinfo' string in the JSON doc received from
+the guest ends up being 10GB in size ? Is that going to cause our JSON
+parser to allocate QString which is 10GB in size which we'll further
+try to strdup just below too...
+
+
+I haven't done research on our parsing robustness, but it's not the most
+complicated task qemu has. The alternative is to have a fixed size message
+on a different virtio port. But again, once we have a kernel alternative
+(pstore?) we should switch.
+
+
+
+> @@ -163,6 +177,37 @@ static void chr_event(void *opaque, int event)
+>      }
+>  }
 >
-> Hey Jim,
->
-> First off, thanks for the patch.
->
-> In the future do you mind following the guidelines here:
-> http://wiki.qemu-project.org/Contribute/SubmitAPatch
->
-> If you use git format-patch and git send-email to generate the patch and
-> send the result
-> to the mailing list it is much easier for people to review and apply.
->
-> Looking at the Xilinx Zynq-700 TRM (page 1754) I see that the
-> Man_start_com bit
-> specifies to manually start the transmission of data, so it looks like the
-> logic already in
-> the QEMU model is correct. What issue are you seeing that this fixes?
-> Maybe the logic
-> somewhere else is incorrect.
->
-> PS: Sorry about the footer, I had to reply from my corporate email account.
->
-> Thanks,
->
-> Alistair
->
-> > -Jim
-> >
-> >
-> > From baaaacca370c13526fd2b8c7b33c7d9e8a6d7b8d Mon Sep 17 00:00:00 2001
-> > From: Jim Hanley <Jim.Hanley@LandisGyr.com>
-> > Date: Thu, 23 Mar 2017 10:29:34 -0400
-> > Subject: [PATCH] MTD writes from the SPI were never being dequeue...
-> > Signed-off-by:
-> >
-> > ---
-> >  hw/ssi/xilinx_spips.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-> > index da8adfa..a3af1f7 100644
-> > --- a/hw/ssi/xilinx_spips.c
-> > +++ b/hw/ssi/xilinx_spips.c
-> > @@ -482,8 +482,8 @@ static void xilinx_spips_write(void *opaque, hwaddr
-> addr,
-> >      s->regs[addr] = (s->regs[addr] & ~mask) | (value & mask);
-> >  no_reg_update:
-> >      xilinx_spips_update_cs_lines(s);
-> > -    if ((man_start_com && s->regs[R_CONFIG] & MAN_START_EN) ||
-> > -            (fifo8_is_empty(&s->tx_fifo) && s->regs[R_CONFIG] &
-> MAN_START_EN)) {
-> > +    if (!((man_start_com && s->regs[R_CONFIG] & MAN_START_EN) ||
-> > +            (fifo8_is_empty(&s->tx_fifo) && s->regs[R_CONFIG] &
-> MAN_START_EN))) {
-> >          xilinx_spips_flush_txfifo(s);
-> >      }
-> >      xilinx_spips_update_cs_lines(s);
-> > --
-> > 2.7.4
->
->
->
-> This email and any attachments are intended for the sole use of the named
-> recipient(s) and contain(s) confidential information that may be
-> proprietary, privileged or copyrighted under applicable law. If you are not
-> the intended recipient, do not read, copy, or forward this email message or
-> any attachments. Delete this email message and any attachments immediately.
->
->
+> +
+> +static void qga_message(JSONMessageParser *parser, GQueue *tokens)
+> +{
+> +    /* VirtConsole *vcon =3D container_of(parser, VirtConsole, parser); =
+*/
+> +    QObject *obj;
+> +    QDict *msg, *data;
+> +    const char *event;
+> +
+> +    obj =3D json_parser_parse(tokens, NULL);
+> +    msg =3D qobject_to_qdict(obj);
+> +    if (!msg) {
+> +        error_report("JSON parsing failed");
+> +        return;
+> +    }
+> +
+> +    event =3D qdict_get_try_str(msg, "event");
+> +    data =3D qdict_get_qdict(msg, "data");
+> +    if (event && g_str_equal(event, "VMDUMP_INFO") && data) {
+> +        dump_info.received =3D true;
+> +        if (qdict_haskey(data, "phys-base")) {
+> +            dump_info.has_phys_base =3D true;
+> +            dump_info.phys_base =3D qdict_get_try_uint(data, "phys-base"=
+,
+0);
+> +        }
+> +        if (qdict_haskey(data, "text")) {
+> +            dump_info.has_text =3D true;
+> +            dump_info.text =3D qdict_get_try_uint(data, "text", 0);
+> +        }
+> +        dump_info.vmcoreinfo =3D g_strdup(qdict_get_try_str(data,
+"vmcoreinfo"));
+> +    }
+> +}
+
+
+Regards,
+Daniel
+--
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/
+:|
+|: http://libvirt.org              -o-             http://virt-manager.org
+:|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/
+:|
