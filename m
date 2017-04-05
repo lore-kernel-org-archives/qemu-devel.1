@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cvsWH-0008Rc-48
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 17:31:13 -0400
+	(envelope-from <mst@redhat.com>) id 1cvsox-0004Wx-1h
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 17:50:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cvsWG-0005l7-Do
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 17:31:13 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:33971)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cvsWG-0005kn-76
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 17:31:12 -0400
-Received: by mail-wr0-x234.google.com with SMTP id t20so33899954wra.1
-	for <qemu-devel@nongnu.org>; Wed, 05 Apr 2017 14:31:11 -0700 (PDT)
+	(envelope-from <mst@redhat.com>) id 1cvsot-0005By-WC
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 17:50:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39922)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cvsot-0005BW-Pg
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 17:50:27 -0400
+Date: Thu, 6 Apr 2017 00:50:22 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170406004845-mutt-send-email-mst@kernel.org>
+References: <1490260051-6046-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+	<20170324161238.366ce6a7@t450s.home>
+	<58DA6954.2000601@cn.fujitsu.com>
+	<20170328101233.74f50a92@t450s.home>
+	<20170329000148.GA18849@redhat.com>
+	<20170328205513.21b97381@t450s.home>
+	<20170330205823-mutt-send-email-mst@kernel.org>
+	<20170330121652.2ac8fa62@t450s.home>
+	<58E4B0C9.50109@cn.fujitsu.com>
+	<20170405133822.76cda620@t450s.home>
 MIME-Version: 1.0
-In-Reply-To: <20170405212512.GB15566@thinpad.lan.raisama.net>
-References: <20170404202429.14643-1-ehabkost@redhat.com>
-	<20170404202429.14643-2-ehabkost@redhat.com>
-	<9ae31b10-0f8c-69fc-c53b-089f89beda3e@redhat.com>
-	<20170405212512.GB15566@thinpad.lan.raisama.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 5 Apr 2017 22:30:50 +0100
-Message-ID: <CAFEAcA89c4AmEyVyTPZ+NjFKvy3wG-J2875=rO=Wok5NOdc46A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2 01/21] qdev: Replace
- cannot_instantiate_with_device_add_yet with !user_creatable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170405133822.76cda620@t450s.home>
+Subject: Re: [Qemu-devel] [PATCH v6] vfio error recovery: kernel support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,21 +35,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Laszlo Ersek <lersek@redhat.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Cao jin <caoj.fnst@cn.fujitsu.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, izumi.taku@jp.fujitsu.com
 
-On 5 April 2017 at 22:25, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> It's true that q35 wouldn't break if it simply used
-> user_creatable after applying this series. But it will break if
-> one day we link code that registers a user-creatable non-x86
-> device inside the qemu-system-x86_64 binary (even if by
-> accident), or if we add a new user-creatable sysbus device for
-> other x86 machines (e.g. isapc, xenfv, xenpv, pc-i440fx).
+On Wed, Apr 05, 2017 at 01:38:22PM -0600, Alex Williamson wrote:
+> The previous intention of trying to handle all sorts of AER faults
+> clearly had more value, though even there the implementation and
+> configuration requirements restricted the practicality.  For instance
+> is AER support actually useful to a customer if it requires all ports
+> of a multifunction device assigned to the VM?  This seems more like a
+> feature targeting whole system partitioning rather than general VM
+> device assignment use cases.  Maybe that's ok, but it should be a clear
+> design decision.
 
-I would some day like us to be able to move towards
-multiple-architectures-one-qemu-binary, so yes, we
-should not assume that no non-x86 devices or CPUs
-could ever be linked in.
+Alex, what kind of testing do you expect to be necessary?
+Would you say testing on real hardware and making it trigger
+AER errors is a requirement?
 
-thanks
--- PMM
+-- 
+MST
