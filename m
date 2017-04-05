@@ -1,41 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cvagZ-0006M7-1j
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 22:28:40 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1cvbff-0007B0-VQ
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 23:31:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cvagW-0006mQ-3j
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 22:28:39 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49120
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1cvagV-0006kO-UL
-	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 22:28:36 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v352O0HQ023636
-	for <qemu-devel@nongnu.org>; Tue, 4 Apr 2017 22:28:34 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29mbv38r78-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 04 Apr 2017 22:28:33 -0400
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Tue, 4 Apr 2017 20:28:33 -0600
-Date: Wed, 5 Apr 2017 10:28:26 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170329011637.89377-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170329011637.89377-2-bjsdjshi@linux.vnet.ibm.com>
-	<e445fb5a-7076-a557-d0c0-94dbf60b289a@redhat.com>
+	(envelope-from <wei.w.wang@intel.com>) id 1cvbfc-0006F4-KD
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 23:31:48 -0400
+Received: from mga06.intel.com ([134.134.136.31]:20033)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1cvbfc-0006CI-A7
+	for qemu-devel@nongnu.org; Tue, 04 Apr 2017 23:31:44 -0400
+From: "Wang, Wei W" <wei.w.wang@intel.com>
+Date: Wed, 5 Apr 2017 03:31:36 +0000
+Message-ID: <286AC319A985734F985F78AFA26841F7391E1962@shsmsx102.ccr.corp.intel.com>
+References: <1489648127-37282-1-git-send-email-wei.w.wang@intel.com>
+	<1489648127-37282-3-git-send-email-wei.w.wang@intel.com>
+In-Reply-To: <1489648127-37282-3-git-send-email-wei.w.wang@intel.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e445fb5a-7076-a557-d0c0-94dbf60b289a@redhat.com>
-Message-Id: <20170405022825.GD22108@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/1] block: pass the right options for
- BlockDriver.bdrv_open()
+Subject: Re: [Qemu-devel] [PATCH kernel v8 2/4] virtio-balloon:
+ VIRTIO_BALLOON_F_CHUNK_TRANSFER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,136 +30,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-block@nongnu.org, kwolf@redhat.com, qemu-devel@nongnu.org, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com
+To: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "mst@redhat.com" <mst@redhat.com>, "david@redhat.com" <david@redhat.com>, "Hansen, Dave" <dave.hansen@intel.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>
 
-* Max Reitz <mreitz@redhat.com> [2017-03-29 23:07:22 +0200]:
+On Thursday, March 16, 2017 3:09 PM Wei Wang wrote:
+> The implementation of the current virtio-balloon is not very efficient, b=
+ecause
+> the ballooned pages are transferred to the host one by one. Here is the
+> breakdown of the time in percentage spent on each step of the balloon inf=
+lating
+> process (inflating 7GB of an 8GB idle guest).
+>=20
+> 1) allocating pages (6.5%)
+> 2) sending PFNs to host (68.3%)
+> 3) address translation (6.1%)
+> 4) madvise (19%)
+>=20
+> It takes about 4126ms for the inflating process to complete.
+> The above profiling shows that the bottlenecks are stage 2) and stage 4).
+>=20
+> This patch optimizes step 2) by transferring pages to the host in chunks.=
+ A chunk
+> consists of guest physically continuous pages, and it is offered to the h=
+ost via a
+> base PFN (i.e. the start PFN of those physically continuous pages) and th=
+e size
+> (i.e. the total number of the pages). A chunk is formated as below:
+>=20
+> --------------------------------------------------------
+> |                 Base (52 bit)        | Rsvd (12 bit) |
+> --------------------------------------------------------
+> --------------------------------------------------------
+> |                 Size (52 bit)        | Rsvd (12 bit) |
+> --------------------------------------------------------
+>=20
+> By doing so, step 4) can also be optimized by doing address translation a=
+nd
+> madvise() in chunks rather than page by page.
+>=20
+> This optimization requires the negotiation of a new feature bit,
+> VIRTIO_BALLOON_F_CHUNK_TRANSFER.
+>=20
+> With this new feature, the above ballooning process takes ~590ms resultin=
+g in
+> an improvement of ~85%.
+>=20
+> TODO: optimize stage 1) by allocating/freeing a chunk of pages instead of=
+ a
+> single page each time.
+>=20
+> Signed-off-by: Liang Li <liang.z.li@intel.com>
+> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  drivers/virtio/virtio_balloon.c     | 371 ++++++++++++++++++++++++++++++=
++++-
+> --
+>  include/uapi/linux/virtio_balloon.h |   9 +
+>  2 files changed, 353 insertions(+), 27 deletions(-)
+>=20
+> diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_ball=
+oon.c index
+> f59cb4f..3f4a161 100644
+> --- a/drivers/virtio/virtio_balloon.c
+> +++ b/drivers/virtio/virtio_balloon.c
+> @@ -42,6 +42,10 @@
+>  #define OOM_VBALLOON_DEFAULT_PAGES 256
+>  #define VIRTBALLOON_OOM_NOTIFY_PRIORITY 80
+>=20
+> +#define PAGE_BMAP_SIZE	(8 * PAGE_SIZE)
+> +#define PFNS_PER_PAGE_BMAP	(PAGE_BMAP_SIZE * BITS_PER_BYTE)
+> +#define PAGE_BMAP_COUNT_MAX	32
+> +
+>  static int oom_pages =3D OOM_VBALLOON_DEFAULT_PAGES;
+> module_param(oom_pages, int, S_IRUSR | S_IWUSR);
+> MODULE_PARM_DESC(oom_pages, "pages to free on OOM"); @@ -50,6 +54,14
+> @@ MODULE_PARM_DESC(oom_pages, "pages to free on OOM");  static struct
+> vfsmount *balloon_mnt;  #endif
+>=20
+> +#define BALLOON_CHUNK_BASE_SHIFT 12
+> +#define BALLOON_CHUNK_SIZE_SHIFT 12
+> +struct balloon_page_chunk {
+> +	__le64 base;
+> +	__le64 size;
+> +};
+> +
+> +typedef __le64 resp_data_t;
+>  struct virtio_balloon {
+>  	struct virtio_device *vdev;
+>  	struct virtqueue *inflate_vq, *deflate_vq, *stats_vq; @@ -67,6 +79,31
+> @@ struct virtio_balloon {
+>=20
+>  	/* Number of balloon pages we've told the Host we're not using. */
+>  	unsigned int num_pages;
+> +	/* Pointer to the response header. */
+> +	struct virtio_balloon_resp_hdr *resp_hdr;
+> +	/* Pointer to the start address of response data. */
+> +	resp_data_t *resp_data;
 
-> On 29.03.2017 03:16, Dong Jia Shi wrote:
-> > raw_open() expects the caller always passing in the right actual
-> > @options parameter. But when trying to applying snapshot on a RBD
-> > image, bdrv_snapshot_goto() calls raw_open() (by calling the
-> > bdrv_open callback on the BlockDriver) with a NULL @options, and
-> > that will result in a Segmentation fault.
-> > 
-> > For the other non-raw format drivers, it also makes sense to passing
-> > in the actual options, althought they don't trigger the problem so
-> > far.
-> > 
-> > Let's prepare a @options by adding the "file" key-value pair to a
-> > copy of the actual options that were given for the node (i.e.
-> > bs->options), and pass it to the callback.
-> > 
-> > BlockDriver.bdrv_open() expects bs->file to be NULL and just
-> > overwrites it with the result from bdrv_open_child(). If that
-> > bdrv_open_child() fails, the field becomes NULL. While we are at
-> > it, we also correct the cleanning up action for a call failure of
-> > BlockDriver.bdrv_open() by replacing bdrv_unref() with
-> > bdrv_unref_child().
-> > 
-> > Suggested-by: Max Reitz <mreitz@redhat.com>
-> > Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> > ---
-> >  block/snapshot.c | 14 ++++++++++++--
-> >  1 file changed, 12 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/block/snapshot.c b/block/snapshot.c
-> > index bf5c2ca..281626c 100644
-> > --- a/block/snapshot.c
-> > +++ b/block/snapshot.c
-> > @@ -27,6 +27,7 @@
-> >  #include "block/block_int.h"
-> >  #include "qapi/error.h"
-> >  #include "qapi/qmp/qerror.h"
-> > +#include "qapi/qmp/qstring.h"
-> >  
-> >  QemuOptsList internal_snapshot_opts = {
-> >      .name = "snapshot",
-> > @@ -189,11 +190,20 @@ int bdrv_snapshot_goto(BlockDriverState *bs,
-> >      }
-> >  
-> >      if (bs->file) {
-> > +        QDict *options = qdict_clone_shallow(bs->options);
-> > +        QDict *file_options;
-> > +
-> > +        qdict_extract_subqdict(options, &file_options, "file.");
-> > +        QDECREF(file_options);
-> > +        qdict_put(options, "file",
-> > +                  qstring_from_str(bdrv_get_node_name(bs->file->bs)));
-> > +
-> >          drv->bdrv_close(bs);
-> >          ret = bdrv_snapshot_goto(bs->file->bs, snapshot_id);
-> > -        open_ret = drv->bdrv_open(bs, NULL, bs->open_flags, NULL);
-> > +        open_ret = drv->bdrv_open(bs, options, bs->open_flags, NULL);
-> > +        QDECREF(options);
-> >          if (open_ret < 0) {
-> > -            bdrv_unref(bs->file->bs);
-> > +            bdrv_unref_child(bs, bs->file);
-> >              bs->drv = NULL;
-> >              return open_ret;
-> >          }
-> 
-> I just noticed another issue (sorry I did not before...):
-Hi Max,
-No need for sorry.
+I think the implementation has an issue here - both the balloon pages and t=
+he unused pages use the same buffer ("resp_data" above) to store chunks. It=
+ would cause a race in this case: live migration starts while ballooning is=
+ also in progress. I plan to use separate buffers for CHUNKS_OF_BALLOON_PAG=
+ES and CHUNKS_OF_UNUSED_PAGES. Please let me know if you have a different s=
+uggestion. Thanks.
 
-> 
-> In drv->bdrv_open(), the block driver will generally overwrite bs->file
-> without looking at it because it assumes that it's NULL. That means we
-> should probably actually make sure it's NULL because otherwise we will
-> the child BDS will have a reference count that is 1 too high.
-> 
-> (bdrv_open_inherit() (ultimately called from bdrv_open_child()) invokes
-> bdrv_ref() for a child BDS specified by node-name reference.)
-> 
-> That means we should unconditionally invoke
-> bdrv_unref_child(bs, bs->file) before calling drv->bdrv_open(). But we
-> have to wrap everything in bdrv_ref()/bdrv_unref() so the BDS isn't
-> deleted in the meantime.
-Understood.
-
-> 
-> So I think it should look something like this:
-> 
-> BlockDriverState *file;
-> QDict *options = ...;
-> QDict *file_options;
-> 
-> file = bs->file->bs;
-> /* Prevent it from getting deleted when detached from bs */
-> bdrv_ref(file);
-> 
-> qdict_extract_subqdict(...);
-> QDECREF(file_options);
-> qdict_put(..., qstring_from_str(bdrv_get_node_name(file)));
-> 
-> drv->bdrv_close(bs);
-> bdrv_unref_child(bs, bs->file);
-> bs->file = NULL;
-> 
-> ret = bdrv_snapshot_goto(file, snapshot_id);
-> open_ret = drv->bdrv_open(...);
-Here, I think we'd still need a:
-QDECREF(options);
-
-> if (open_ret < 0) {
->     bdrv_unref(file);
->     bs->drv = NULL;
->     return open_ret;
-> }
-> 
-> assert(bs->file->bs == file);
-> bdrv_unref(file);
-
-It looks convoluted, but I don't see a better solution. So I will
-prepare a new patch based on your code.
-
-Thanks for the help!
-
-> 
-> 
-> Max
-> 
-
--- 
-Dong Jia Shi
+Best,
+Wei
