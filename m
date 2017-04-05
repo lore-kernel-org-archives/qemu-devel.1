@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57301)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cvgQA-0002LK-8s
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cvgQD-0002Mx-Ac
 	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 04:36:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cvgQ9-0005b3-Cw
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 04:36:06 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:42838
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cvgQ6-0005YH-Al
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 04:36:07 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:42829
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1cvgQ9-0005aT-5G
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 04:36:05 -0400
+	id 1cvgQ6-0005XO-3y
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 04:36:02 -0400
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Wed,  5 Apr 2017 09:35:24 +0100
-Message-Id: <1491381329-3995-10-git-send-email-mark.cave-ayland@ilande.co.uk>
+Date: Wed,  5 Apr 2017 09:35:21 +0100
+Message-Id: <1491381329-3995-7-git-send-email-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <1491381329-3995-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 References: <1491381329-3995-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 09/14] tcx: remove page24 and cpage from
- tcx24_update_display()
+Subject: [Qemu-devel] [PATCH 06/14] tcx: ensure tcx_set_dirty() also
+ invalidates the 24-bit plane and cplane
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +28,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: kraxel@redhat.com, qemu-devel@nongnu.org
 
-Since all of the tcx_*_dirty() functions now calculate the 24-bit and
-cplane offsets themselves from the base address, these variables are no
-longer needed.
-
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/display/tcx.c |    7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ hw/display/tcx.c |    7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/hw/display/tcx.c b/hw/display/tcx.c
-index e9056e0..4f4f03f 100644
+index d24466f..6817bd2 100644
 --- a/hw/display/tcx.c
 +++ b/hw/display/tcx.c
-@@ -430,7 +430,7 @@ static void tcx24_update_display(void *opaque)
+@@ -96,6 +96,13 @@ typedef struct TCXState {
+ static void tcx_set_dirty(TCXState *s, ram_addr_t addr, int len)
  {
-     TCXState *ts = opaque;
-     DisplaySurface *surface = qemu_console_surface(ts->con);
--    ram_addr_t page, page_min, page_max, cpage, page24;
-+    ram_addr_t page, page_min, page_max;
-     int y, y_start, dd, ds;
-     uint8_t *d, *s;
-     uint32_t *cptr, *s24;
-@@ -440,8 +440,6 @@ static void tcx24_update_display(void *opaque)
-     }
+     memory_region_set_dirty(&s->vram_mem, addr, len);
++
++    if (s->depth == 24) {
++        memory_region_set_dirty(&s->vram_mem, s->vram24_offset + addr * 4,
++                                len * 4);
++        memory_region_set_dirty(&s->vram_mem, s->cplane_offset + addr * 4,
++                                len * 4);
++    }
+ }
  
-     page = 0;
--    page24 = ts->vram24_offset;
--    cpage = ts->cplane_offset;
-     y_start = -1;
-     page_min = -1;
-     page_max = 0;
-@@ -453,8 +451,7 @@ static void tcx24_update_display(void *opaque)
-     ds = 1024;
- 
-     memory_region_sync_dirty_bitmap(&ts->vram_mem);
--    for (y = 0; y < ts->height; page += TARGET_PAGE_SIZE,
--            page24 += TARGET_PAGE_SIZE, cpage += TARGET_PAGE_SIZE) {
-+    for (y = 0; y < ts->height; page += TARGET_PAGE_SIZE) {
-         if (tcx_check_dirty(ts, page, TARGET_PAGE_SIZE)) {
-             if (y_start < 0)
-                 y_start = y;
+ static inline int tcx24_check_dirty(TCXState *s, ram_addr_t page,
 -- 
 1.7.10.4
