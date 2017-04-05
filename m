@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cvnwl-0000sK-CR
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 12:38:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1cvoOe-0006Kk-So
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 13:07:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cvnwj-0006BC-IA
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 12:38:15 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:34105)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cvnwj-0006B4-61
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 12:38:13 -0400
-Received: by mail-lf0-x243.google.com with SMTP id x137so1639693lff.1
-	for <qemu-devel@nongnu.org>; Wed, 05 Apr 2017 09:38:13 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CAJ+F1C+2x=0pZxMz8FgxbkQD59zM2pngHKv7AT-hv-KA6xjN+Q@mail.gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1cvoOb-0000qF-O5
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 13:07:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50796)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cvoOb-0000ps-FM
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 13:07:01 -0400
 References: <20170311132256.22951-1-marcandre.lureau@redhat.com>
 	<20170311132256.22951-18-marcandre.lureau@redhat.com>
 	<20170405161256.GA25291@redhat.com>
-	<CAJ+F1C+2x=0pZxMz8FgxbkQD59zM2pngHKv7AT-hv-KA6xjN+Q@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 5 Apr 2017 20:38:09 +0400
-Message-ID: <CAJ+F1CLScc+afY+p6AV76WJxbFRVvEJDRTtKYEXwJ_eRaMu65A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2f015621-19aa-d70b-6103-fef6514fcd7e@redhat.com>
+Date: Wed, 5 Apr 2017 12:06:56 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170405161256.GA25291@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="5wGMWpf7vvinJ40Wi2OqvMgiOTOmT31QN"
 Subject: Re: [Qemu-devel] [PATCH 17/21] virtio-channel: parse qga stream for
  VMDUMP_INFO event
 List-Id: <qemu-devel.nongnu.org>
@@ -33,168 +30,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, lersek@redhat.com, mdroth@linux.vnet.ibm.com, armbru@redhat.com, pbonzini@redhat.com, anderson@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: mdroth@linux.vnet.ibm.com, armbru@redhat.com, qemu-devel@nongnu.org, anderson@redhat.com, pbonzini@redhat.com, lersek@redhat.com
 
-Hi
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--5wGMWpf7vvinJ40Wi2OqvMgiOTOmT31QN
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: mdroth@linux.vnet.ibm.com, armbru@redhat.com, qemu-devel@nongnu.org,
+ anderson@redhat.com, pbonzini@redhat.com, lersek@redhat.com
+Message-ID: <2f015621-19aa-d70b-6103-fef6514fcd7e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 17/21] virtio-channel: parse qga stream for
+ VMDUMP_INFO event
+References: <20170311132256.22951-1-marcandre.lureau@redhat.com>
+ <20170311132256.22951-18-marcandre.lureau@redhat.com>
+ <20170405161256.GA25291@redhat.com>
+In-Reply-To: <20170405161256.GA25291@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Le 5 avr. 2017 18:13, "Daniel P. Berrange" <berrange@redhat.com> a =C3=A9cr=
-it :
+On 04/05/2017 11:12 AM, Daniel P. Berrange wrote:
+> On Sat, Mar 11, 2017 at 05:22:52PM +0400, Marc-Andr=C3=A9 Lureau wrote:=
 
-On Sat, Mar 11, 2017 at 05:22:52PM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> On virtio channel "org.qemu.guest_agent.0", parse the json stream until
-> the VMDUMP_INFO is received and retrieve the dump details.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  include/sysemu/dump-info.h | 15 +++++++++++++
->  dump.c                     |  3 +++
->  hw/char/virtio-console.c   | 53 ++++++++++++++++++++++++++++++
-++++++++++++++++
->  3 files changed, 71 insertions(+)
->  create mode 100644 include/sysemu/dump-info.h
->
-> diff --git a/include/sysemu/dump-info.h b/include/sysemu/dump-info.h
-> new file mode 100644
-> index 0000000000..fb1ddff9af
-> --- /dev/null
-> +++ b/include/sysemu/dump-info.h
-> @@ -0,0 +1,15 @@
-> +#ifndef DUMP_INFO_H
-> +#define DUMP_INFO_H
-> +
-> +typedef struct DumpInfo {
-> +    bool received;
-> +    bool has_phys_base;
-> +    uint64_t phys_base;
-> +    bool has_text;
-> +    uint64_t text;
-> +    char *vmcoreinfo;
-> +} DumpInfo;
-> +
-> +extern DumpInfo dump_info;
-> +
-> +#endif /* DUMP_INFO_H */
-> diff --git a/dump.c b/dump.c
-> index f7b80d856b..68b406459e 100644
-> --- a/dump.c
-> +++ b/dump.c
-> @@ -20,6 +20,7 @@
->  #include "monitor/monitor.h"
->  #include "sysemu/kvm.h"
->  #include "sysemu/dump.h"
-> +#include "sysemu/dump-info.h"
->  #include "sysemu/sysemu.h"
->  #include "sysemu/memory_mapping.h"
->  #include "sysemu/cpus.h"
-> @@ -38,6 +39,8 @@
->  #define ELF_MACHINE_UNAME "Unknown"
->  #endif
->
-> +DumpInfo dump_info =3D { 0, };
-> +
->  uint16_t cpu_to_dump16(DumpState *s, uint16_t val)
->  {
->      if (s->dump_info.d_endian =3D=3D ELFDATA2LSB) {
-> diff --git a/hw/char/virtio-console.c b/hw/char/virtio-console.c
-> index 798d9b69fd..796b7c85aa 100644
-> --- a/hw/char/virtio-console.c
-> +++ b/hw/char/virtio-console.c
-> @@ -16,6 +16,9 @@
->  #include "trace.h"
->  #include "hw/virtio/virtio-serial.h"
->  #include "qapi-event.h"
-> +#include "qapi/qmp/json-streamer.h"
-> +#include "qapi/qmp/json-parser.h"
-> +#include "sysemu/dump-info.h"
->
->  #define TYPE_VIRTIO_CONSOLE_SERIAL_PORT "virtserialport"
->  #define VIRTIO_CONSOLE(obj) \
-> @@ -26,6 +29,7 @@ typedef struct VirtConsole {
->
->      CharBackend chr;
->      guint watch;
-> +    JSONMessageParser parser;
->  } VirtConsole;
->
->  /*
-> @@ -49,6 +53,11 @@ static ssize_t flush_buf(VirtIOSerialPort *port,
->      VirtConsole *vcon =3D VIRTIO_CONSOLE(port);
->      ssize_t ret;
->
-> +    if (vcon->parser.emit &&
-> +        !dump_info.received) {
-> +        json_message_parser_feed(&vcon->parser, (const char *)buf, len);
-> +    }
+>> On virtio channel "org.qemu.guest_agent.0", parse the json stream unti=
+l
+>> the VMDUMP_INFO is received and retrieve the dump details.
+>>
 
-[snip]
+>=20
+> so we just continually feed data into the json parser until we see the
+> event we care about....
+>=20
+> What kind of denial of service protection does our JSON parser have. No=
+w
+> that QEMU is directly parsing JSON from QEMU guest agent, it is exposed=
 
-so we just continually feed data into the json parser until we see the
-event we care about....
+> to malicious attack by the guest agent.
 
-What kind of denial of service protection does our JSON parser have. Now
-that QEMU is directly parsing JSON from QEMU guest agent, it is exposed
-to malicious attack by the guest agent.
+Our JSON parser rejects input that exceeds various limits:
 
-eg what happens if the 'vmcoreinfo' string in the JSON doc received from
-the guest ends up being 10GB in size ? Is that going to cause our JSON
-parser to allocate QString which is 10GB in size which we'll further
-try to strdup just below too...
+json-lexer.c:
+#define MAX_TOKEN_SIZE (64ULL << 20)
+
+json-streamer.c:
+#define MAX_TOKEN_SIZE (64ULL << 20)
+#define MAX_TOKEN_COUNT (2ULL << 20)
+#define MAX_NESTING (1ULL << 10)
+
+>=20
+> eg what happens if the 'vmcoreinfo' string in the JSON doc received fro=
+m
+> the guest ends up being 10GB in size ? Is that going to cause our JSON
+> parser to allocate QString which is 10GB in size which we'll further
+> try to strdup just below too...
+
+The parser will have rejected the guest data long before the 10GB mark.
+But our error recovery from that rejection may not be ideal...
 
 
-I haven't done research on our parsing robustness, but it's not the most
-complicated task qemu has. The alternative is to have a fixed size message
-on a different virtio port. But again, once we have a kernel alternative
-(pstore?) we should switch.
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
+--5wGMWpf7vvinJ40Wi2OqvMgiOTOmT31QN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> @@ -163,6 +177,37 @@ static void chr_event(void *opaque, int event)
->      }
->  }
->
-> +
-> +static void qga_message(JSONMessageParser *parser, GQueue *tokens)
-> +{
-> +    /* VirtConsole *vcon =3D container_of(parser, VirtConsole, parser); =
-*/
-> +    QObject *obj;
-> +    QDict *msg, *data;
-> +    const char *event;
-> +
-> +    obj =3D json_parser_parse(tokens, NULL);
-> +    msg =3D qobject_to_qdict(obj);
-> +    if (!msg) {
-> +        error_report("JSON parsing failed");
-> +        return;
-> +    }
-> +
-> +    event =3D qdict_get_try_str(msg, "event");
-> +    data =3D qdict_get_qdict(msg, "data");
-> +    if (event && g_str_equal(event, "VMDUMP_INFO") && data) {
-> +        dump_info.received =3D true;
-> +        if (qdict_haskey(data, "phys-base")) {
-> +            dump_info.has_phys_base =3D true;
-> +            dump_info.phys_base =3D qdict_get_try_uint(data, "phys-base"=
-,
-0);
-> +        }
-> +        if (qdict_haskey(data, "text")) {
-> +            dump_info.has_text =3D true;
-> +            dump_info.text =3D qdict_get_try_uint(data, "text", 0);
-> +        }
-> +        dump_info.vmcoreinfo =3D g_strdup(qdict_get_try_str(data,
-"vmcoreinfo"));
-> +    }
-> +}
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
+iQEcBAEBCAAGBQJY5SQwAAoJEKeha0olJ0NqrV4H/iM+BITQZBWxUypAPadu7IjB
+kTuhju0pSGBI8//LZtMN7tmsvSXDhY2ks6e+au+aqAPRoDlUBU6KZTmy28+/+uaA
+J35ACS6hDte24fKdaFyq3qWmtXp5/TyVHcmDcB4GFiNWbgfC+kcEMR8lhZHm90hE
+UeBqkiy9srJ+I4z5aKd9V3WQdKLRayG1RilfTwrbu7Y/es78Yf/Zz2ifWRGeRA/b
+qhoneCUxMsJoHrPhQSXE3Alr/57M3MQkT8srSI60KFYoJCPhsJCeTAWJoTxp3tmi
+Pk1XKEK+uFVlqu7FIX3vJLPiHCOleHTWydOTQnDzA6Rrj4oGapesJhJizts/BIU=
+=2WX3
+-----END PGP SIGNATURE-----
 
-Regards,
-Daniel
---
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/
-:|
-|: http://libvirt.org              -o-             http://virt-manager.org
-:|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/
-:|
+--5wGMWpf7vvinJ40Wi2OqvMgiOTOmT31QN--
