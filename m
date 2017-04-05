@@ -1,29 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cvgZa-0001W8-Q2
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 04:45:52 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cvgjR-0003wY-AV
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 04:56:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cvgZW-0001tc-RM
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 04:45:50 -0400
-Received: from [59.151.112.132] (port=8115 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cvgZV-0001rS-Rr
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 04:45:46 -0400
-References: <1490260051-6046-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-	<20170324161238.366ce6a7@t450s.home> <58DA6954.2000601@cn.fujitsu.com>
-	<20170328101233.74f50a92@t450s.home>
-	<20170329000148.GA18849@redhat.com>
-	<20170328205513.21b97381@t450s.home>
-	<20170330205823-mutt-send-email-mst@kernel.org>
-	<20170330121652.2ac8fa62@t450s.home>
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Message-ID: <58E4B0C9.50109@cn.fujitsu.com>
-Date: Wed, 5 Apr 2017 16:54:33 +0800
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cvgjO-00067a-4Y
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 04:56:01 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56696
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cvgjN-00065S-UB
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 04:55:58 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v358raUg026776
+	for <qemu-devel@nongnu.org>; Wed, 5 Apr 2017 04:55:56 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 29mtpqpxty-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 05 Apr 2017 04:55:55 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Wed, 5 Apr 2017 09:55:53 +0100
+Date: Wed, 5 Apr 2017 10:55:47 +0200
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <20170404202429.14643-22-ehabkost@redhat.com>
+References: <20170404202429.14643-1-ehabkost@redhat.com>
+	<20170404202429.14643-22-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170330121652.2ac8fa62@t450s.home>
-Content-Type: text/plain; charset="windows-1252"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6] vfio error recovery: kernel support
+Message-Id: <20170405105547.00b5ed92.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 21/21] s390-pcibus: No need to set
+ user_creatable=false explicitly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,96 +43,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, izumi.taku@jp.fujitsu.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Frank Blaschka <frank.blaschka@de.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Sorry for late. Distracted by other problem for a while.
+On Tue,  4 Apr 2017 17:24:29 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-On 03/31/2017 02:16 AM, Alex Williamson wrote:
-> On Thu, 30 Mar 2017 21:00:35 +0300
-
->>>>>>     
->>>>>>>
->>>>>>> I also asked in my previous comments to provide examples of errors that
->>>>>>> might trigger correctable errors to the user, this comment seems to
->>>>>>> have been missed.  In my experience, AERs generated during device
->>>>>>> assignment are generally hardware faults or induced by bad guest
->>>>>>> drivers.  These are cases where a single fatal error is an appropriate
->>>>>>> and sufficient response.  We've scaled back this support to the point
->>>>>>> where we're only improving the situation of correctable errors and I'm
->>>>>>> not convinced this is worthwhile and we're not simply checking a box on
->>>>>>> an ill-conceived marketing requirements document.      
->>>>>>
->>>>>> Sorry. I noticed that question: "what actual errors do we expect
->>>>>> userspace to see as non-fatal errors?", but I am confused about it.
->>>>>> Correctable, non-fatal, fatal errors are clearly defined in PCIe spec,
->>>>>> and Uncorrectable Error Severity Register will tell which is fatal, and
->>>>>> which is non-fatal, this register is configurable, they are device
->>>>>> specific as I guess. AER core driver distinguish them by
->>>>>> pci_channel_io_normal/pci_channel_io_frozen,  So I don't understand your
->>>>>> question. Or
->>>>>>
->>>>>> Or, Do you mean we could list the default non-fatal error of
->>>>>> Uncorrectable Error Severity Register which is provided by PCIe spec?    
->>>>>
->>>>> I'm trying to ask why is this patch series useful.  It's clearly
->>>>> possible for us to signal non-fatal errors for a device to a guest, but
->>>>> why is it necessarily a good idea to do so?  What additional RAS
->>>>> feature is gained by this?  Can we give a single example of a real
->>>>> world scenario where a guest has been shutdown due to a non-fatal error
->>>>> that the guest driver would have handled?    
->>>>
->>>> We've been discussing AER for months if not years.
->>>> Isn't it a bit too late to ask whether AER recovery
->>>> by guests it useful at all?  
->>>
->>>
->>> Years, but I think that is more indicative of the persistence of the
->>> developers rather than growing acceptance on my part.  For the majority
->>> of that we were headed down the path of full AER support with the guest
->>> able to invoke bus resets.  It was a complicated solution, but it was
->>> more clear that it had some value.   Of course that's been derailed
->>> due to various issues and we're now on this partial implementation that
->>> only covers non-fatal errors that we assume the guest can recover from
->>> without providing it mechanisms to do bus resets.  Is there actual
->>> value to this or are we just trying to fill an AER checkbox on
->>> someone's marketing sheet?  I don't think it's too much to ask for a
->>> commit log to include evidence or discussion about how a feature is
->>> actually a benefit to implement.  
->>
->> Seems rather self evident but ok.  So something like
->>
->> With this patch, guest is able to recover from non-fatal correctable
->> errors - as opposed to stopping the guest with no ability to
->> recover which was the only option previously.
->>
->> Would this address your question?
+> TYPE_S390_PCI_HOST_BRIDGE is a subclass of TYPE_PCI_HOST_BRIDGE,
+> which is a subclass of TYPE_SYS_BUS_DEVICE. TYPE_SYS_BUS_DEVICE
+> already sets user_creatable=false, so we don't require an
+> explicit user_creatable=false assignment in
+> s390_pcihost_class_init().
 > 
+> Cc: Alexander Graf <agraf@suse.de>
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
+> Cc: Frank Blaschka <frank.blaschka@de.ibm.com>
+> Cc: Laszlo Ersek <lersek@redhat.com>
+> Cc: Marcel Apfelbaum <marcel@redhat.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Pierre Morel <pmorel@linux.vnet.ibm.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+> Changes series v1 -> v2:
+> * Previous patch was:
+>   "s390: Add FIXME for unexplained user_creatable=false line",
+>   but now we know we can remove the explicit user_creatable=false
+>   assignment
+> ---
+>  hw/s390x/s390-pci-bus.c | 1 -
+>  1 file changed, 1 deletion(-)
 > 
-> No, that's just restating the theoretical usefulness of this.  Have you
-> ever seen a non-fatal error?  Does it ever trigger?  If we can't
-> provide a real world case of this being useful, can we at least discuss
-> the types of things that might trigger a non-fatal error for which the
-> guest could recover?  In patch 3/3 Cao Jin claimed we have a 50% chance
-> of reducing VM stop conditions, but I suspect this is just a misuse of
-> statistics, just because there are two choices, fatal vs non-fatal,
-> does not make them equally likely.  Do we have any idea of the
-> incidence rate of non-fatal errors?  Is it non-zero?  Thanks,
-> 
+> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> index 1ec30c45ce..973893df07 100644
+> --- a/hw/s390x/s390-pci-bus.c
+> +++ b/hw/s390x/s390-pci-bus.c
+> @@ -867,7 +867,6 @@ static void s390_pcihost_class_init(ObjectClass *klass, void *data)
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>      HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
+>  
+> -    dc->user_creatable = false;
+>      dc->reset = s390_pcihost_reset;
+>      k->init = s390_pcihost_init;
+>      hc->plug = s390_pcihost_hot_plug;
 
-Apparently, I don't have experience to induce non-fatal error, device
-error is more of a chance related with the environment(temperature,
-humidity, etc) as I understand.
-
-After reading the discussion, can I construe that the old design with
-full AER support is preferred than this new one?  The core issue of the
-old design is that the second host link reset make the subsequent
-guest's register reading fail, and I think this can be solved by test
-the device's accessibility(read device' register, all F's means
-unaccessible. IIRC, EEH of Power also use this way to test device's
-accessiblity) and delay guest's reading if device is temporarily
-unaccessible.
-
--- 
-Sincerely,
-Cao jin
+Acked-by: Cornelia Huck <cornelia.huck@de.ibm.com>
