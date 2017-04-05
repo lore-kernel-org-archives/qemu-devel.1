@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cviAT-0007IT-Qb
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 06:28:02 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1cviGP-0008PL-1M
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 06:34:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cviAQ-0003pP-Fh
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 06:28:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50834)
+	(envelope-from <dgilbert@redhat.com>) id 1cviGL-0006t0-Lt
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 06:34:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38368)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cviAQ-0003ox-7D
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 06:27:58 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cviGL-0006sZ-Dh
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 06:34:05 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1F7C580480
-	for <qemu-devel@nongnu.org>; Wed,  5 Apr 2017 10:27:56 +0000 (UTC)
-Date: Wed, 5 Apr 2017 11:27:50 +0100
+	by mx1.redhat.com (Postfix) with ESMTPS id 5A09DC00109A
+	for <qemu-devel@nongnu.org>; Wed,  5 Apr 2017 10:34:04 +0000 (UTC)
+Date: Wed, 5 Apr 2017 11:34:00 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170405102749.GA4066@work-vm>
+Message-ID: <20170405103400.GB4066@work-vm>
 References: <20170323204544.12015-1-quintela@redhat.com>
 	<20170323204544.12015-31-quintela@redhat.com>
-	<20170330065652.GH20667@pxdev.xzpeter.org>
-	<20170331152555.GN4514@work-vm>
-	<20170401071501.GM3981@pxdev.xzpeter.org>
+	<20170331165227.GP4514@work-vm> <87r3183w89.fsf@secure.mitica>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170401071501.GM3981@pxdev.xzpeter.org>
+In-Reply-To: <87r3183w89.fsf@secure.mitica>
 Subject: Re: [Qemu-devel] [PATCH 30/51] ram: Move src_page_req* to RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -36,91 +34,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Fri, Mar 31, 2017 at 04:25:56PM +0100, Dr. David Alan Gilbert wrote:
-> > * Peter Xu (peterx@redhat.com) wrote:
-> > > On Thu, Mar 23, 2017 at 09:45:23PM +0100, Juan Quintela wrote:
-> > > > This are the last postcopy fields still at MigrationState.  Once there
-> > > 
-> > > s/This/These/
-> > > 
-> > > > Move MigrationSrcPageRequest to ram.c and remove MigrationState
-> > > > parameters where appropiate.
-> > > > 
-> > > > Signed-off-by: Juan Quintela <quintela@redhat.com>
-> > > 
-> > > Reviewed-by: Peter Xu <peterx@redhat.com>
-> > > 
-> > > One question below though...
-> > > 
-> > > [...]
-> > > 
-> > > > @@ -1191,19 +1204,18 @@ static bool get_queued_page(RAMState *rs, MigrationState *ms,
-> > > >   *
-> > > >   * It should be empty at the end anyway, but in error cases there may
-> > > >   * xbe some left.
-> > > > - *
-> > > > - * @ms: current migration state
-> > > >   */
-> > > > -void flush_page_queue(MigrationState *ms)
-> > > > +void flush_page_queue(void)
-> > > >  {
-> > > > -    struct MigrationSrcPageRequest *mspr, *next_mspr;
-> > > > +    struct RAMSrcPageRequest *mspr, *next_mspr;
-> > > > +    RAMState *rs = &ram_state;
-> > > >      /* This queue generally should be empty - but in the case of a failed
-> > > >       * migration might have some droppings in.
-> > > >       */
-> > > >      rcu_read_lock();
-> > > 
-> > > Could I ask why we are taking the RCU read lock rather than the mutex
-> > > here?
-> > 
-> > It's a good question whether we need anything at all.
-> > flush_page_queue is called only from migrate_fd_cleanup.
-> > migrate_fd_cleanup is called either from a backhalf, which I think has the bql,
-> > or from a failure path in migrate_fd_connect.
-> > migrate_fd_connect is called from migration_channel_connect and rdma_start_outgoing_migration
-> > which I think both end up at monitor commands so also in the bql.
-> > 
-> > So I think we can probably just lose the rcu_read_lock/unlock.
+* Juan Quintela (quintela@redhat.com) wrote:
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > * Juan Quintela (quintela@redhat.com) wrote:
 > 
-> Thanks for the confirmation.
+> Hi
 > 
-> (ps: even if we are not with bql, we should not need this
->  rcu_read_lock, right? My understanding is: if we want to protect
->  src_page_requests, we should need the mutex, not rcu lock; while for
->  the memory_region_unref() since we have had the reference, looks like
->  we don't need any kind of locking either)
+> >> @@ -1191,19 +1204,18 @@ static bool get_queued_page(RAMState *rs, MigrationState *ms,
+> >>   *
+> >>   * It should be empty at the end anyway, but in error cases there may
+> >>   * xbe some left.
+> >> - *
+> >> - * @ms: current migration state
+> >>   */
+> >> -void flush_page_queue(MigrationState *ms)
+> >> +void flush_page_queue(void)
+> >
+> > I'm not sure this is safe;  it's called from migrate_fd_cleanup right at
+> > the end, if you do any finalisation/cleanup of the RAMState in
+> > ram_save_complete
+> > then when is it safe to run this?
+> 
+> But, looking into it, I think that we should be able to move this into
+> ram_save_cleanup() no?
+> 
+> We don't need it after that?
+> As an added bonus, we can remove the export of it.
 
-Right; I guess the memory_region_unref might cause the memory region
-to be cleanup up in that loop without the rcu locks, but I don't think
-it's a problem even if they are cleaned up.
+As discussed by irc;  the thing I'm cautious about is getting the order
+of cleanup right.
+If you look at migration_completion you see we call
+qemu_savevm_state_complete_postcopy() (which calls ram_save_complete)
+before we call await_return_path_close_on_source  which ensures that the
+thread that's handling requests from the destination and queuing them
+has finished.
+
+It seems right to make sure that thread has finished (and thus nothing
+is trying to add anythign to that queue) before trying to clean it up.
 
 Dave
 
-> > 
-> > Dave
-> > 
-> > > 
-> > > > -    QSIMPLEQ_FOREACH_SAFE(mspr, &ms->src_page_requests, next_req, next_mspr) {
-> > > > +    QSIMPLEQ_FOREACH_SAFE(mspr, &rs->src_page_requests, next_req, next_mspr) {
-> > > >          memory_region_unref(mspr->rb->mr);
-> > > > -        QSIMPLEQ_REMOVE_HEAD(&ms->src_page_requests, next_req);
-> > > > +        QSIMPLEQ_REMOVE_HEAD(&rs->src_page_requests, next_req);
-> > > >          g_free(mspr);
-> > > >      }
-> > > >      rcu_read_unlock();
-> > > 
-> > > Thanks,
-> > > 
-> > > -- peterx
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >> @@ -1260,16 +1272,16 @@ int ram_save_queue_pages(MigrationState *ms, const char *rbname,
+> >>          goto err;
+> >>      }
+> >>  
+> >> -    struct MigrationSrcPageRequest *new_entry =
+> >> -        g_malloc0(sizeof(struct MigrationSrcPageRequest));
+> >> +    struct RAMSrcPageRequest *new_entry =
+> >> +        g_malloc0(sizeof(struct RAMSrcPageRequest));
+> >>      new_entry->rb = ramblock;
+> >>      new_entry->offset = start;
+> >>      new_entry->len = len;
+> >>  
+> >>      memory_region_ref(ramblock->mr);
+> >> -    qemu_mutex_lock(&ms->src_page_req_mutex);
+> >> -    QSIMPLEQ_INSERT_TAIL(&ms->src_page_requests, new_entry, next_req);
+> >> -    qemu_mutex_unlock(&ms->src_page_req_mutex);
+> >> +    qemu_mutex_lock(&rs->src_page_req_mutex);
+> >> +    QSIMPLEQ_INSERT_TAIL(&rs->src_page_requests, new_entry, next_req);
+> >> +    qemu_mutex_unlock(&rs->src_page_req_mutex);
+> >
+> > Hmm ok where did it get it's rs from?
+> > Anyway, the thing I needed to convince myself of was that there was
+> > any guarantee that
+> > RAMState would exist by the time the first request came in, something
+> > that we now need
+> > to be careful of.
+> > I think we're mostly OK; we call qemu_savevm_state_begin() at the top
+> > of migration_thread so the ram_save_setup should be done and allocate
+> > the RAMState before we get into the main loop and thus before we ever
+> > look at the 'start_postcopy' flag and thus before we ever ask the destination
+> > to send us stuff.
+> >
+> >>      rcu_read_unlock();
+> >>  
+> >>      return 0;
+> >> @@ -1408,7 +1420,7 @@ static int ram_find_and_save_block(RAMState *rs, QEMUFile *f, bool last_stage)
+> >>  
+> >>      do {
+> >>          again = true;
+> >> -        found = get_queued_page(rs, ms, &pss, &dirty_ram_abs);
+> >> +        found = get_queued_page(rs, &pss, &dirty_ram_abs);
+> >>  
+> >>          if (!found) {
+> >>              /* priority queue empty, so just search for something dirty */
+> >> @@ -1968,6 +1980,8 @@ static int ram_state_init(RAMState *rs)
+> >>  
+> >>      memset(rs, 0, sizeof(*rs));
+> >>      qemu_mutex_init(&rs->bitmap_mutex);
+> >> +    qemu_mutex_init(&rs->src_page_req_mutex);
+> >> +    QSIMPLEQ_INIT(&rs->src_page_requests);
+> >
+> > Similar question to above; that mutex is going to get reinit'd
+> > on a new migration and it shouldn't be without it being destroyed.
+> > Maybe make it a once.
 > 
-> -- peterx
+> good catch.  I think that the easiest way is to just move it into proper
+> RAMState, init it here, and destroy it at cleanup?
+> 
+> Later, Juan.
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
