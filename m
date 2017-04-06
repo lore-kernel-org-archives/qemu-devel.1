@@ -1,41 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cw7Gv-0003Rq-Jj
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:16:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1cw7NN-0000YY-FA
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:23:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cw7Gr-0003EL-LH
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:16:21 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53936
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cw7Gr-0003E7-CS
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:16:17 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v36DDop2047228
-	for <qemu-devel@nongnu.org>; Thu, 6 Apr 2017 09:16:15 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 29nkydr07t-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 06 Apr 2017 09:16:15 -0400
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Thu, 6 Apr 2017 14:16:13 +0100
-Date: Thu, 6 Apr 2017 15:16:10 +0200
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <5e9b4ef5-f737-bc26-433d-f111e44e294a@redhat.com>
-References: <20170406111646.12624-1-cornelia.huck@de.ibm.com>
-	<20170406111646.12624-6-cornelia.huck@de.ibm.com>
-	<5e9b4ef5-f737-bc26-433d-f111e44e294a@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1cw7NM-0006Ue-Dr
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:23:01 -0400
+References: <20170405194741.18956-1-eblake@redhat.com>
+	<20170405194741.18956-11-eblake@redhat.com>
+	<20170406090045.GC4341@noname.redhat.com>
+	<1313a278-947d-9b73-640f-3aa518019773@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b0c018d5-8178-fdc0-9412-b3b53babd941@redhat.com>
+Date: Thu, 6 Apr 2017 08:22:51 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170406151610.0f8c867e.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 05/10] s390x/css: provide
- introspection for virtual subchannel and device busid
+In-Reply-To: <1313a278-947d-9b73-640f-3aa518019773@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="dbfnh1wAxiIqvcFU5tJHIxD4kW4VsD7IX"
+Subject: Re: [Qemu-devel] [PATCH v3 10/13] block: Simplify
+ bdrv_append_temp_snapshot() logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,23 +27,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, agraf@suse.de
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, "open list:Block layer core" <qemu-block@nongnu.org>, armbru@redhat.com
 
-On Thu, 6 Apr 2017 14:19:10 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--dbfnh1wAxiIqvcFU5tJHIxD4kW4VsD7IX
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org,
+ "open list:Block layer core" <qemu-block@nongnu.org>, armbru@redhat.com
+Message-ID: <b0c018d5-8178-fdc0-9412-b3b53babd941@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 10/13] block: Simplify
+ bdrv_append_temp_snapshot() logic
+References: <20170405194741.18956-1-eblake@redhat.com>
+ <20170405194741.18956-11-eblake@redhat.com>
+ <20170406090045.GC4341@noname.redhat.com>
+ <1313a278-947d-9b73-640f-3aa518019773@redhat.com>
+In-Reply-To: <1313a278-947d-9b73-640f-3aa518019773@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 06.04.2017 13:16, Cornelia Huck wrote:
+On 04/06/2017 07:52 AM, Eric Blake wrote:
 
-> > +out_err:
-> > +    error_propagate(errp, err);
-> > +    css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
-> > +    ccw_dev->sch = NULL;
-> > +    g_free(sch);
-> > +    return;
-> >  }
-> 
-> Cosmetic nit: Remove the unnecessary "return;" statement right before
-> the closing curly bracket.
+>>> +out:
+>>> +    QDECREF(snapshot_options);
+>>>      g_free(tmp_filename);
+>>>      return bs_snapshot;
+>>
+>> bs_snapshot is uninitialised or at least the wrong return value in err=
+or
+>> cases. (Hm... Shouldn't the compiler catch the uninitialised part?)
+>=20
+> Odd, and I agree that I recall the compiler generally able to catch tha=
+t
+> (maybe it's a matter of compiling with -g vs. -O2).  I'm surprised the
+> autobuilder didn't flag it.
 
-Yup, will merge in.
+And now the autobuilder finally replies.  It is indeed a matter of
+difference in CFLAGS on whether the compiler will catch it.
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--dbfnh1wAxiIqvcFU5tJHIxD4kW4VsD7IX
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY5kErAAoJEKeha0olJ0NqaroH/iBrki+56O/wEQKIm1H9QWHb
+aByPk8CMLOskLWVqlSn07eP3f+NAvi24VAgTG1nIX+kUpCJ8PTtlfgnDodr8do26
+vxjH6aBGwJCNdk5dqpwlymmeRoDIk4m/FI8lqk3d32venrmkqRIfB37EED4NuM8g
+QTm6VwF8Cbl8q2eed41CyZKkjcLedTYO4/fw6esAYRIcmZurufytx0qWBKq1r+5T
+OHsl3ix8f0OmMqB3ML1+MTW1PTz5LHM0hHc/NWyr3sMORqPIqZS8sCpOj3sZI2Sl
+6QKwJQAe5fjQoNIdTzIzNoueX7ol7U4Va9mJ4Dv6GK7g6Goq+jxNcO0Z30h/Tuc=
+=7eT1
+-----END PGP SIGNATURE-----
+
+--dbfnh1wAxiIqvcFU5tJHIxD4kW4VsD7IX--
