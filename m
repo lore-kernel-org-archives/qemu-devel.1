@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cw80O-0001OG-CJ
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 10:03:24 -0400
+	(envelope-from <eblake@redhat.com>) id 1cw82a-00033D-ST
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 10:05:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cw80F-00009Q-44
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 10:03:20 -0400
-Date: Thu, 6 Apr 2017 15:02:55 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170406140255.GA31259@stefanha-x1.localdomain>
-References: <1491384478-12325-1-git-send-email-lidongchen@tencent.com>
+	(envelope-from <eblake@redhat.com>) id 1cw82W-0000pr-Sa
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 10:05:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45916)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cw82W-0000pZ-MD
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 10:05:32 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9EBB05145D
+	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 14:05:31 +0000 (UTC)
+References: <20170406131326.2418-1-quintela@redhat.com>
+	<20170406131326.2418-3-quintela@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <51d06417-c04a-4277-f289-aeb04daf4364@redhat.com>
+Date: Thu, 6 Apr 2017 09:05:30 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="3V7upXqbjpZ4EhLz"
-Content-Disposition: inline
-In-Reply-To: <1491384478-12325-1-git-send-email-lidongchen@tencent.com>
-Subject: Re: [Qemu-devel] [PATCH v3] migration/block:limit the time used for
- block migration
+In-Reply-To: <20170406131326.2418-3-quintela@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="wUqf0vGV3In9F3X4Wupwlx3Rv3HR5GaxJ"
+Subject: Re: [Qemu-devel] [PATCH 2/5] qdev: Export qdev_hot_removed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,49 +34,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jemmy858585@gmail.com
-Cc: qemu-devel@nongnu.org, famz@redhat.com, quintela@redhat.com, dgilbert@redhat.com, qemu-block@nongnu.org, Lidong Chen <lidongchen@tencent.com>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com
 
-
---3V7upXqbjpZ4EhLz
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wUqf0vGV3In9F3X4Wupwlx3Rv3HR5GaxJ
+From: Eric Blake <eblake@redhat.com>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com
+Message-ID: <51d06417-c04a-4277-f289-aeb04daf4364@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/5] qdev: Export qdev_hot_removed
+References: <20170406131326.2418-1-quintela@redhat.com>
+ <20170406131326.2418-3-quintela@redhat.com>
+In-Reply-To: <20170406131326.2418-3-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 05, 2017 at 05:27:58PM +0800, jemmy858585@gmail.com wrote:
-> From: Lidong Chen <lidongchen@tencent.com>
+On 04/06/2017 08:13 AM, Juan Quintela wrote:
+> I need to move qdev_unplug to qdev-monitor in the following patch, and
+> it needs access to this variable.
 >=20
-> when migration with high speed, mig_save_device_bulk invoke
-> bdrv_is_allocated too frequently, and cause vnc reponse slowly.
-> this patch limit the time used for bdrv_is_allocated.
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  hw/core/qdev.c         | 2 +-
+>  include/hw/qdev-core.h | 1 +
+>  2 files changed, 2 insertions(+), 1 deletion(-)
+>=20
 
-bdrv_is_allocated() is supposed to yield back to the event loop if it
-needs to block.  If your VNC session is experiencing jitter then it's
-probably because a system call in the bdrv_is_allocated() code path is
-synchronous when it should be asynchronous.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-You could try to identify the system call using strace -f -T.  In the
-output you'll see the duration of each system call.  I guess there is a
-file I/O system call that is taking noticable amounts of time.
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-A proper solution is to refactor the synchronous code to make it
-asynchronous.  This might require invoking the system call from a
-thread pool worker.
 
-Stefan
-
---3V7upXqbjpZ4EhLz
+--wUqf0vGV3In9F3X4Wupwlx3Rv3HR5GaxJ
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBAgAGBQJY5kqPAAoJEJykq7OBq3PIIXoIALlKH6+G2VMARezVQ4ADcLSR
-li0n9yngs67hHeJD9PoSbYPkC+QUQfcDzS6Ry0NcFSeNwleoXP6JfICseteFdiK4
-hQURbx+nFwrLhPlpgNYwbY9FhDOj2P63FBn3ZvqFbVdC58mEjvhgxW8TYE79VXaD
-7OjHxdEEPROF8prphEqRpeeU94uuRkfNI/kfweaVJUE3fEDCkKDqVz89yMcutxTA
-T8xV/tD7biLlqQNx9nYIcjTU7sDh7kldqMSq4qQLb1N2RFlQsuUmHZkNc1FidOTN
-yRNW7p5xQWJyDd+Wzpbcs8d13Uxsp2Y2mJHzRdUsWF7ji34/QfRY7U2C+hnY0zs=
-=UITi
+iQEcBAEBCAAGBQJY5ksqAAoJEKeha0olJ0NqspkIAKbJYr9Blw1Xmq/ulfcQjn81
+S/gZglq4ySXYVernyeO4NUELka0OsLmLhnFz1P8ZvNPKTdHOyuPRv6C9MwnA5amH
+SqecHdNeFaCEejddY3pmwnlq3qMGxOMAryBVNhGdjekaWhePcZUNhM6iipdedQ4n
+0zQBjTsFB5LTBJ4mJHHlIWtZ04jxirKMt9Pfh7ksiuk2vb3jgT+6nMlL8GQkjzuY
+vb6DCmVmtSOPg8LMpbrpHOBMsJ9fW+LzLFMO0unuSfDszWxM3uJHyHUH5RmAzva6
+uTy38DmFusiJnF1tQVFOCxrGK6Q6nwM0ebBWJVynbgamsR8gXnkOVvKTh/wJlhc=
+=fxKS
 -----END PGP SIGNATURE-----
 
---3V7upXqbjpZ4EhLz--
+--wUqf0vGV3In9F3X4Wupwlx3Rv3HR5GaxJ--
