@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sahid.ferdjaoui@redhat.com>) id 1cw4tC-0001x1-68
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 06:43:43 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1cw4vf-0002uw-QJ
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 06:46:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sahid.ferdjaoui@redhat.com>) id 1cw4tB-0003pz-73
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 06:43:42 -0400
-Date: Thu, 6 Apr 2017 12:43:36 +0200
-From: Sahid Orentino Ferdjaoui <sferdjao@redhat.com>
-Message-ID: <20170406104336.GA28959@redhat>
-References: <20170403114044.15762-1-lvivier@redhat.com>
-	<ef70b4ab-f71a-8235-dc63-ae34097436af@amsat.org>
+	(envelope-from <eric.auger@redhat.com>) id 1cw4vc-0004SK-Lp
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 06:46:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59136)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1cw4vc-0004S8-FL
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 06:46:12 -0400
+References: <1491462524-1617-1-git-send-email-peterx@redhat.com>
+	<1491462524-1617-3-git-send-email-peterx@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <7e00fb5f-fe48-1e8f-3441-eacacf67e931@redhat.com>
+Date: Thu, 6 Apr 2017 12:45:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <ef70b4ab-f71a-8235-dc63-ae34097436af@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] virtio-gpu: replace
- PIXMAN_* by PIXMAN_BE_*
+In-Reply-To: <1491462524-1617-3-git-send-email-peterx@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 2/9] memory: provide
+ IOMMU_NOTIFIER_FOREACH macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,79 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Laurent Vivier <lvivier@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, Marcel Apfelbaum <marcel@redhat.com>, bd.aviv@gmail.com, David Gibson <david@gibson.dropbear.id.au>
 
-On Mon, Apr 03, 2017 at 09:28:02AM -0300, Philippe Mathieu-Daud=E9 wrote:
-> On 04/03/2017 08:40 AM, Laurent Vivier wrote:
-> > This avoids a "#ifdef HOST_WORDS_BIGENDIAN" and this is the purpose
-> > of PIXMAN_BE_* macros.
-> >=20
-> > Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->=20
-> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
->
+Hi Peter,
+On 06/04/2017 09:08, Peter Xu wrote:
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+Even if the commit message is obvious it may be requested?
 
-Reviewed-by: Sahid Orentino Ferdjaoui <sahid.ferdjaoui@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
->=20
-> > ---
-> >  hw/display/virtio-gpu.c | 35 ++++++++---------------------------
-> >  1 file changed, 8 insertions(+), 27 deletions(-)
-> >=20
-> > diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-> > index 9b530ab..7befcef 100644
-> > --- a/hw/display/virtio-gpu.c
-> > +++ b/hw/display/virtio-gpu.c
-> > @@ -258,41 +258,22 @@ void virtio_gpu_get_display_info(VirtIOGPU *g,
-> >  static pixman_format_code_t get_pixman_format(uint32_t virtio_gpu_fo=
-rmat)
-> >  {
-> >      switch (virtio_gpu_format) {
-> > -#ifdef HOST_WORDS_BIGENDIAN
-> >      case VIRTIO_GPU_FORMAT_B8G8R8X8_UNORM:
-> > -        return PIXMAN_b8g8r8x8;
-> > +        return PIXMAN_BE_b8g8r8x8;
-> >      case VIRTIO_GPU_FORMAT_B8G8R8A8_UNORM:
-> > -        return PIXMAN_b8g8r8a8;
-> > +        return PIXMAN_BE_b8g8r8a8;
-> >      case VIRTIO_GPU_FORMAT_X8R8G8B8_UNORM:
-> > -        return PIXMAN_x8r8g8b8;
-> > +        return PIXMAN_BE_x8r8g8b8;
-> >      case VIRTIO_GPU_FORMAT_A8R8G8B8_UNORM:
-> > -        return PIXMAN_a8r8g8b8;
-> > +        return PIXMAN_BE_a8r8g8b8;
-> >      case VIRTIO_GPU_FORMAT_R8G8B8X8_UNORM:
-> > -        return PIXMAN_r8g8b8x8;
-> > +        return PIXMAN_BE_r8g8b8x8;
-> >      case VIRTIO_GPU_FORMAT_R8G8B8A8_UNORM:
-> > -        return PIXMAN_r8g8b8a8;
-> > +        return PIXMAN_BE_r8g8b8a8;
-> >      case VIRTIO_GPU_FORMAT_X8B8G8R8_UNORM:
-> > -        return PIXMAN_x8b8g8r8;
-> > +        return PIXMAN_BE_x8b8g8r8;
-> >      case VIRTIO_GPU_FORMAT_A8B8G8R8_UNORM:
-> > -        return PIXMAN_a8b8g8r8;
-> > -#else
-> > -    case VIRTIO_GPU_FORMAT_B8G8R8X8_UNORM:
-> > -        return PIXMAN_x8r8g8b8;
-> > -    case VIRTIO_GPU_FORMAT_B8G8R8A8_UNORM:
-> > -        return PIXMAN_a8r8g8b8;
-> > -    case VIRTIO_GPU_FORMAT_X8R8G8B8_UNORM:
-> > -        return PIXMAN_b8g8r8x8;
-> > -    case VIRTIO_GPU_FORMAT_A8R8G8B8_UNORM:
-> > -        return PIXMAN_b8g8r8a8;
-> > -    case VIRTIO_GPU_FORMAT_R8G8B8X8_UNORM:
-> > -        return PIXMAN_x8b8g8r8;
-> > -    case VIRTIO_GPU_FORMAT_R8G8B8A8_UNORM:
-> > -        return PIXMAN_a8b8g8r8;
-> > -    case VIRTIO_GPU_FORMAT_X8B8G8R8_UNORM:
-> > -        return PIXMAN_r8g8b8x8;
-> > -    case VIRTIO_GPU_FORMAT_A8B8G8R8_UNORM:
-> > -        return PIXMAN_r8g8b8a8;
-> > -#endif
-> > +        return PIXMAN_BE_a8b8g8r8;
-> >      default:
-> >          return 0;
-> >      }
-> >=20
+> ---
+>  include/exec/memory.h | 3 +++
+>  memory.c              | 4 ++--
+>  2 files changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index 0840c89..07e43da 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -239,6 +239,9 @@ struct MemoryRegion {
+>      IOMMUNotifierFlag iommu_notify_flags;
+>  };
+>  
+> +#define IOMMU_NOTIFIER_FOREACH(n, mr) \
+> +    QLIST_FOREACH((n), &(mr)->iommu_notify, node)
+> +
+>  /**
+>   * MemoryListener: callbacks structure for updates to the physical memory map
+>   *
+> diff --git a/memory.c b/memory.c
+> index 75ac595..7496b3d 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -1583,7 +1583,7 @@ static void memory_region_update_iommu_notify_flags(MemoryRegion *mr)
+>      IOMMUNotifierFlag flags = IOMMU_NOTIFIER_NONE;
+>      IOMMUNotifier *iommu_notifier;
+>  
+> -    QLIST_FOREACH(iommu_notifier, &mr->iommu_notify, node) {
+> +    IOMMU_NOTIFIER_FOREACH(iommu_notifier, mr) {
+>          flags |= iommu_notifier->notifier_flags;
+>      }
+>  
+> @@ -1667,7 +1667,7 @@ void memory_region_notify_iommu(MemoryRegion *mr,
+>          request_flags = IOMMU_NOTIFIER_UNMAP;
+>      }
+>  
+> -    QLIST_FOREACH(iommu_notifier, &mr->iommu_notify, node) {
+> +    IOMMU_NOTIFIER_FOREACH(iommu_notifier, mr) {
+>          /*
+>           * Skip the notification if the notification does not overlap
+>           * with registered range.
+> 
