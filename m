@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cw93M-0002Oq-TQ
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 11:10:30 -0400
+	(envelope-from <eblake@redhat.com>) id 1cw93z-0002pH-Cj
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 11:11:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cw93J-0005uu-LR
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 11:10:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50610)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cw93J-0005ud-CJ
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 11:10:25 -0400
-Date: Thu, 6 Apr 2017 09:10:15 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170406091015.78b5a67f@t450s.home>
-In-Reply-To: <1491462524-1617-2-git-send-email-peterx@redhat.com>
-References: <1491462524-1617-1-git-send-email-peterx@redhat.com>
-	<1491462524-1617-2-git-send-email-peterx@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1cw93y-0006Wc-Cx
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 11:11:07 -0400
+References: <20170406142527.25835-1-famz@redhat.com>
+	<20170406142527.25835-5-famz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8187ae38-68b0-15a3-23ea-6be56c083a80@redhat.com>
+Date: Thu, 6 Apr 2017 10:10:51 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 1/9] memory: add section range info for
- IOMMU notifier
+In-Reply-To: <20170406142527.25835-5-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="dduAXajnwxSObVj2GO7V0h1MoHxmQ77ea"
+Subject: Re: [Qemu-devel] [PATCH for-2.9 4/5] block: Drain BH in
+ bdrv_drained_begin
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,167 +25,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, Marcel Apfelbaum <marcel@redhat.com>, jan.kiszka@siemens.com, jasowang@redhat.com, David Gibson <david@gibson.dropbear.id.au>, bd.aviv@gmail.com
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Ed Swierk <eswierk@skyportsystems.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu,  6 Apr 2017 15:08:36 +0800
-Peter Xu <peterx@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--dduAXajnwxSObVj2GO7V0h1MoHxmQ77ea
+From: Eric Blake <eblake@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Ed Swierk <eswierk@skyportsystems.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8187ae38-68b0-15a3-23ea-6be56c083a80@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.9 4/5] block: Drain BH in
+ bdrv_drained_begin
+References: <20170406142527.25835-1-famz@redhat.com>
+ <20170406142527.25835-5-famz@redhat.com>
+In-Reply-To: <20170406142527.25835-5-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> In this patch, IOMMUNotifier.{start|end} are introduced to store section
-> information for a specific notifier. When notification occurs, we not
-> only check the notification type (MAP|UNMAP), but also check whether the
-> notified iova range overlaps with the range of specific IOMMU notifier,
-> and skip those notifiers if not in the listened range.
-> 
-> When removing an region, we need to make sure we removed the correct
-> VFIOGuestIOMMU by checking the IOMMUNotifier.start address as well.
-> 
-> This patch is solving the problem that vfio-pci devices receive
-> duplicated UNMAP notification on x86 platform when vIOMMU is there. The
-> issue is that x86 IOMMU has a (0, 2^64-1) IOMMU region, which is
-> splitted by the (0xfee00000, 0xfeefffff) IRQ region. AFAIK
-> this (splitted IOMMU region) is only happening on x86.
-> 
-> This patch also helps vhost to leverage the new interface as well, so
-> that vhost won't get duplicated cache flushes. In that sense, it's an
-> slight performance improvement.
-> 
-> Suggested-by: David Gibson <david@gibson.dropbear.id.au>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On 04/06/2017 09:25 AM, Fam Zheng wrote:
+> During block job completion, nothing is preventing
+> block_job_defer_to_main_loop_bh from being called in a nested
+> aio_poll(), which is a trouble, such as in this code path:
+>=20
+>     qmp_block_commit
+>       commit_active_start
+>         bdrv_reopen
+>           bdrv_reopen_multiple
+>             bdrv_reopen_prepare
+>               bdrv_flush
+>                 aio_poll
+>                   aio_bh_poll
+>                     aio_bh_call
+>                       block_job_defer_to_main_loop_bh
+>                         stream_complete
+>                           bdrv_reopen
+>=20
+> block_job_defer_to_main_loop_bh is the last step of the stream job,
+> which should have been "paused" by the bdrv_drained_begin/end in
+> bdrv_reopen_multiple, but it is not done because it's in the form of a
+> main loop BH.
+>=20
+> Similar to why block jobs should be paused between drained_begin and
+> drained_end, BHs they schedule must be excluded as well.  To achieve
+> this, this patch forces draining the BH before leaving bdrv_drained_beg=
+in().
+>=20
+> Signed-off-by: Fam Zheng <famz@redhat.com>
 > ---
-> v7->v8:
-> - let vhost dmar leverage the new interface as well
-> - add some more comments in commit message, mentioning what issue this
->   patch has solved
-> - since touched up, removing Alex's a-b and DavidG's r-b
-> ---
->  hw/vfio/common.c      | 12 +++++++++---
->  hw/virtio/vhost.c     | 10 ++++++++--
->  include/exec/memory.h | 19 ++++++++++++++++++-
->  memory.c              |  9 +++++++++
->  4 files changed, 44 insertions(+), 6 deletions(-)
+>  block/io.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+>=20
+
+Nice writeup.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
-Acked-by: Alex Williamson <alex.williamson@redhat.com>
+--dduAXajnwxSObVj2GO7V0h1MoHxmQ77ea
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> 
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index f3ba9b9..6b33b9f 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -478,8 +478,13 @@ static void vfio_listener_region_add(MemoryListener *listener,
->          giommu->iommu_offset = section->offset_within_address_space -
->                                 section->offset_within_region;
->          giommu->container = container;
-> -        giommu->n.notify = vfio_iommu_map_notify;
-> -        giommu->n.notifier_flags = IOMMU_NOTIFIER_ALL;
-> +        llend = int128_add(int128_make64(section->offset_within_region),
-> +                           section->size);
-> +        llend = int128_sub(llend, int128_one());
-> +        iommu_notifier_init(&giommu->n, vfio_iommu_map_notify,
-> +                            IOMMU_NOTIFIER_ALL,
-> +                            section->offset_within_region,
-> +                            int128_get64(llend));
->          QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
->  
->          memory_region_register_iommu_notifier(giommu->iommu, &giommu->n);
-> @@ -550,7 +555,8 @@ static void vfio_listener_region_del(MemoryListener *listener,
->          VFIOGuestIOMMU *giommu;
->  
->          QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
-> -            if (giommu->iommu == section->mr) {
-> +            if (giommu->iommu == section->mr &&
-> +                giommu->n.start == section->offset_within_region) {
->                  memory_region_unregister_iommu_notifier(giommu->iommu,
->                                                          &giommu->n);
->                  QLIST_REMOVE(giommu, giommu_next);
-> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> index 613494d..185b95b 100644
-> --- a/hw/virtio/vhost.c
-> +++ b/hw/virtio/vhost.c
-> @@ -736,14 +736,20 @@ static void vhost_iommu_region_add(MemoryListener *listener,
->      struct vhost_dev *dev = container_of(listener, struct vhost_dev,
->                                           iommu_listener);
->      struct vhost_iommu *iommu;
-> +    Int128 end;
->  
->      if (!memory_region_is_iommu(section->mr)) {
->          return;
->      }
->  
->      iommu = g_malloc0(sizeof(*iommu));
-> -    iommu->n.notify = vhost_iommu_unmap_notify;
-> -    iommu->n.notifier_flags = IOMMU_NOTIFIER_UNMAP;
-> +    end = int128_add(int128_make64(section->offset_within_region),
-> +                     section->size);
-> +    end = int128_sub(end, int128_one());
-> +    iommu_notifier_init(&iommu->n, vhost_iommu_unmap_notify,
-> +                        IOMMU_NOTIFIER_UNMAP,
-> +                        section->offset_within_region,
-> +                        int128_get64(end));
->      iommu->mr = section->mr;
->      iommu->iommu_offset = section->offset_within_address_space -
->                            section->offset_within_region;
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index f20b191..0840c89 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -77,13 +77,30 @@ typedef enum {
->  
->  #define IOMMU_NOTIFIER_ALL (IOMMU_NOTIFIER_MAP | IOMMU_NOTIFIER_UNMAP)
->  
-> +struct IOMMUNotifier;
-> +typedef void (*IOMMUNotify)(struct IOMMUNotifier *notifier,
-> +                            IOMMUTLBEntry *data);
-> +
->  struct IOMMUNotifier {
-> -    void (*notify)(struct IOMMUNotifier *notifier, IOMMUTLBEntry *data);
-> +    IOMMUNotify notify;
->      IOMMUNotifierFlag notifier_flags;
-> +    /* Notify for address space range start <= addr <= end */
-> +    hwaddr start;
-> +    hwaddr end;
->      QLIST_ENTRY(IOMMUNotifier) node;
->  };
->  typedef struct IOMMUNotifier IOMMUNotifier;
->  
-> +static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
-> +                                       IOMMUNotifierFlag flags,
-> +                                       hwaddr start, hwaddr end)
-> +{
-> +    n->notify = fn;
-> +    n->notifier_flags = flags;
-> +    n->start = start;
-> +    n->end = end;
-> +}
-> +
->  /* New-style MMIO accessors can indicate that the transaction failed.
->   * A zero (MEMTX_OK) response means success; anything else is a failure
->   * of some kind. The memory subsystem will bitwise-OR together results
-> diff --git a/memory.c b/memory.c
-> index 4c95aaf..75ac595 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -1606,6 +1606,7 @@ void memory_region_register_iommu_notifier(MemoryRegion *mr,
->  
->      /* We need to register for at least one bitfield */
->      assert(n->notifier_flags != IOMMU_NOTIFIER_NONE);
-> +    assert(n->start <= n->end);
->      QLIST_INSERT_HEAD(&mr->iommu_notify, n, node);
->      memory_region_update_iommu_notify_flags(mr);
->  }
-> @@ -1667,6 +1668,14 @@ void memory_region_notify_iommu(MemoryRegion *mr,
->      }
->  
->      QLIST_FOREACH(iommu_notifier, &mr->iommu_notify, node) {
-> +        /*
-> +         * Skip the notification if the notification does not overlap
-> +         * with registered range.
-> +         */
-> +        if (iommu_notifier->start > entry.iova + entry.addr_mask + 1 ||
-> +            iommu_notifier->end < entry.iova) {
-> +            continue;
-> +        }
->          if (iommu_notifier->notifier_flags & request_flags) {
->              iommu_notifier->notify(iommu_notifier, &entry);
->          }
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY5lp8AAoJEKeha0olJ0NqQXUH/0EYrqWfRhId7jddUXfhlVrL
+YhFb2buuAl3kHy6gpURdVSu1ieE4oYilQpoQhoZBP3NO8MeYPLEGC/QIC5i/i8Cn
+DKyHAK2guDl37QpVA1uMnzhlT/jsSCK5sx2l26GUEQJV5+cLWEpZ02pRsGic57UX
+nKzACBRzgYP9A4919fyY6iOOJPm6/Dc7bzWXwscGbgkvQ/xY0KyI54Jcuqmn42p+
+J2mBmHQpNueuNUi9WiJfmmyn45AGO5M4KEFmUffDEouTZf3PUx3XG3dLJ7NoLJD8
+CO6Nw38z//yk71nsZA8zPag+GoyLVnXh2dc37G7dbUO97dCdQTfikqis3waz+Q8=
+=PbNZ
+-----END PGP SIGNATURE-----
+
+--dduAXajnwxSObVj2GO7V0h1MoHxmQ77ea--
