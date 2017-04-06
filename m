@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cwBLJ-0003tx-Hr
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 13:37:10 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cwBMU-0004WJ-4N
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 13:38:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cwBLI-0006n6-Gv
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 13:37:09 -0400
-References: <1491498851-16709-1-git-send-email-kwolf@redhat.com>
-	<1491498851-16709-3-git-send-email-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <70705caf-5b17-6001-6d7c-b3b97e0a61c2@redhat.com>
-Date: Thu, 6 Apr 2017 12:36:52 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cwBMT-0007O5-6Y
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 13:38:22 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:35815)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cwBMS-0007Nl-US
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 13:38:21 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id o21so45349618wrb.2
+	for <qemu-devel@nongnu.org>; Thu, 06 Apr 2017 10:38:20 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1491498851-16709-3-git-send-email-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="F7MS3in7g42sDbbB3WAmTI9iHrJLqIbFH"
-Subject: Re: [Qemu-devel] [PATCH for-2.9 2/2] commit: Set
- commit_top_bs->total_sectors
+In-Reply-To: <a710ff5405c04e8b97f5d4ed6739fb7b@XCGC3021.northgrum.com>
+References: <7a623fb8d2284ee28ddbd6e1ccf277e0@XCGC3021.northgrum.com>
+	<CAFEAcA8C17TnnBKim9T9k32Re9C-pWUokF-UeVAd=itcpROvRg@mail.gmail.com>
+	<a710ff5405c04e8b97f5d4ed6739fb7b@XCGC3021.northgrum.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 6 Apr 2017 18:37:59 +0100
+Message-ID: <CAFEAcA9VFFXk0U7prWV1KCzBTxDv6ABBLZhRmKZ=nd5b+GynqQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] EXT :Re: Emulating external registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,78 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: "Wu, Michael Y [US] (MS)" <Michael.Wu@ngc.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---F7MS3in7g42sDbbB3WAmTI9iHrJLqIbFH
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
-Message-ID: <70705caf-5b17-6001-6d7c-b3b97e0a61c2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9 2/2] commit: Set
- commit_top_bs->total_sectors
-References: <1491498851-16709-1-git-send-email-kwolf@redhat.com>
- <1491498851-16709-3-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1491498851-16709-3-git-send-email-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 6 April 2017 at 18:23, Wu, Michael Y [US] (MS) <Michael.Wu@ngc.com> wrot=
+e:
+> I changed my code to the following and added the appropriate read,write f=
+unctions and a MemoryRegionOps.
+>     memory_region_init_io(reg_memory, NULL, &reg_ops, reg,
+>                           "reg_mem", 0x00000040); //set to 64 bytes
+>     memory_region_add_subregion(sysmem, 0xFC000000, reg_memory);
+>
+> For the read function I just returned a zero. So if I were to read from t=
+he address 0xFC000000 it should return a value of 0? The current issue I am=
+ having is that gdb hangs when the pointer is accessed. I am starting to th=
+ink my bare-metal program is incorrect. I also added log messages in my rea=
+d and write functions. The read function was not accessed.
 
-On 04/06/2017 12:14 PM, Kevin Wolf wrote:
-> Like in the mirror filter driver, we also need to set the image size fo=
-r
-> the commit filter driver. This is less likely to be a problem in
-> practice than for the mirror because we're not at the active layer here=
-,
-> but attaching new parents to a node in the middle of the chain is
-> possible, so the size needs to be correct anyway.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/commit.c | 1 +
->  1 file changed, 1 insertion(+)
+You'll probably find that what has happened is that your program
+has taken an exception which you don't have an exception handler
+installed for, and has then jumped off into nowhere or gone into
+an infinite loop of taking exceptions. (Probably hitting ^c in
+gdb will break into wherever it is.) It's a good idea in bare
+metal test code to write at least a minimal set of exception handlers
+that can print a message when an unexpected exception occurs and
+stop, so you don't get too confused.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+You might also want to investigate QEMU's tracing:
+-d in_asm,exec,cpu,int,nochain -D debug.log will write tracing to
+the debug.log file (a lot of it, and this set of trace flags
+slow down execution a lot, but if you're doing very small bare
+metal flags that should be ok). This can help in figuring out
+what your test program is doing. (Watch out that the in_asm
+shows when we first encounter a block of code, but if we
+execute the same bit of code a second time we'll only print
+the exec and cpu parts of the logging.)
 
->=20
-> diff --git a/block/commit.c b/block/commit.c
-> index 4c38220..91d2c34 100644
-> --- a/block/commit.c
-> +++ b/block/commit.c
-> @@ -335,6 +335,7 @@ void commit_start(const char *job_id, BlockDriverSt=
-ate *bs,
->      if (commit_top_bs =3D=3D NULL) {
->          goto fail;
->      }
-> +    commit_top_bs->total_sectors =3D top->total_sectors;
-
-[I'd really like to change total_sectors to bytes in 2.10 or later, but
-that's a much hairier mess to untangle. I've got some patches that I
-hope to post soon that at least start the process with regards to
-bdrv_is_allocated...]
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---F7MS3in7g42sDbbB3WAmTI9iHrJLqIbFH
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY5ny0AAoJEKeha0olJ0NqSP0H/RqBDP3WpN1xGZXlEKNasUXf
-mg9zJXZV2b30GCoKnYFA29WqRK4WqMB+JCr63ez9Lv/noFz/fDBysr/1M3x+zFIq
-5u+8pE4X2FAu/H1ENEVni8QDUP/ysmWfyB18i7KjC59eGBrwBrevctNgbQARsEbZ
-/mPoqS8cVuajD6tgADys0IPdCRYGjPtH5EEeOD2PAd9vAHvM6J3XE796y8q7hQ6C
-trUUY+QD0PVHcCJq0hN6QQ2Vo2TP8ZKE4sa6IXQXQpzs1D73IrpARVwZv7x8CrdI
-hlXHvktnng/+Ys5q3Mrg5AzWjrFHJ+8nteWsXYAB65YewBV4eKDy4YxTh1+jtHo=
-=vIuP
------END PGP SIGNATURE-----
-
---F7MS3in7g42sDbbB3WAmTI9iHrJLqIbFH--
+thanks
+-- PMM
