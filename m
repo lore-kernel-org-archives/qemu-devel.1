@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cw3fg-00008b-M4
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:25:41 -0400
+	(envelope-from <marcel@redhat.com>) id 1cw3ly-0001Vw-2E
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:32:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cw3fd-0000nB-Gv
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:25:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45596)
+	(envelope-from <marcel@redhat.com>) id 1cw3lt-00033e-4p
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:32:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57480)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cw3fd-0000n1-AL
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:25:37 -0400
-Date: Thu, 6 Apr 2017 10:25:31 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170406092530.GD2135@work-vm>
-References: <3d1c16a1-ec05-0367-e569-64a63b34f2e3@redhat.com>
-	<CAFEAcA9cM=LjBRzrZdfsOss2xm4bKC6QM7gyg3HD4z-yeumTyw@mail.gmail.com>
-	<940ff281-82cd-18cf-160e-c5234f65db18@redhat.com>
-	<9d6c61bc-4a95-ce72-3565-e498f9c2b351@redhat.com>
-	<b815c2f9-1ce9-efed-4afa-c3553786dab1@redhat.com>
-	<7829c1dc-9138-c784-dcc5-3c46ec9b5c05@innervision.pl>
-	<20170309122641.GE2480@work-vm>
-	<a153e773-52c1-5d49-e78d-387eb0e712b5@redhat.com>
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cw3ls-00033N-SY
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:32:05 -0400
+References: <20170404202429.14643-1-ehabkost@redhat.com>
+	<20170404202429.14643-2-ehabkost@redhat.com>
+	<9ae31b10-0f8c-69fc-c53b-089f89beda3e@redhat.com>
+	<20170405194216.GA15566@thinpad.lan.raisama.net>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <64e61eac-825d-0721-07c1-f3935d63cb6a@redhat.com>
+Date: Thu, 6 Apr 2017 12:31:51 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a153e773-52c1-5d49-e78d-387eb0e712b5@redhat.com>
-Subject: Re: [Qemu-devel] external snapshots freezes block device since qemu
- 2.8
+In-Reply-To: <20170405194216.GA15566@thinpad.lan.raisama.net>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 01/21] qdev: Replace
+ cannot_instantiate_with_device_add_yet with !user_creatable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,50 +30,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Piotr Rybicki <piotr.rybicki@innervision.pl>, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>
 
-* John Snow (jsnow@redhat.com) wrote:
-> 
-> 
-> On 03/09/2017 07:26 AM, Dr. David Alan Gilbert wrote:
-> > * Piotr Rybicki (piotr.rybicki@innervision.pl) wrote:
-> >> Hello there.
-> >>
-> >> I discovered, that since qemu 2.8 , external snapshots (very similar to:
-> >> http://wiki.libvirt.org/page/Live-disk-backup-with-active-blockcommit),
-> >> freezes block device after:
-> >>
-> >> # virsh blockcommit (...)
-> >>
-> >> There is no error message after completion of the command above.
-> >> I'm using gluster + ZFS fuse mount as a storage for a VM on gentoo.
-> >> libvirt debug showed nothing helpful.
-> >> With qemu <2.8 -: snapshots are working as expected.
-> >>
-> >> Is this a known issue?
-> >> Is it qemu or libvirt ?
-> >>
-> >> If it helps, how can i diagnose this further?
-> > 
-> > I don't know of it, cc'd in jsnow.
-> > Have you tried bisecting?
-> > 
-> > Dave
-> > 
-> >> Thank You & Best regards
-> >> Piotr Rybicki
-> >>
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
-> 
-> I'm cleaning out my inbox and I seem to have missed this thread. Was
-> there any resolution?
+On 04/05/2017 10:42 PM, Eduardo Habkost wrote:
+> On Wed, Apr 05, 2017 at 10:01:29PM +0300, Marcel Apfelbaum wrote:
+>> On 04/04/2017 11:24 PM, Eduardo Habkost wrote:
+>>> cannot_instantiate_with_device_add_yet was introduced by commit
+>>> 837d37167dc446af8a91189108b363c04609e296 to replace no_user. It
+>>> was supposed to be a temporary measure.
+>>>
+>>
+>>
+>> Hi Eduardo,
+>>
+>>> When it was introduced, we had 54
+>>> cannot_instantiate_with_device_add_yet=true lines in the code.
+>>> Today (3 years later) this number has not shrinked: we now have
+>>> 57 cannot_instantiate_with_device_add_yet=true lines. I think it
+>>> is safe to say it is not a temporary measure, and we won't see
+>>> the flag go away soon.
+>>>
+>>> Instead of a long field name that misleads people to believe it
+>>> is temporary, replace it a shorter and less misleading field:
+>>> user_creatable.
+>>
+>> I completely agree with you. I never liked "negation" fields
+>> and especially the ones ending with "_yet".
+>>
+>> I also don't understand why "user_creatable" can't be used for white-listing *Q35*.
+>> I do understand that on some archs we need a white-list per board,
+>> but I don't think x86 needs it.
+>>
+>>>
+>>> Except for code comments, changes were generated using the
+>>> following Coccinelle patch:
+>>>
+>>>   @@
+>>>   expression DC;
+>>>   @@
+>>>   (
+>>>   -DC->cannot_instantiate_with_device_add_yet = false;
+>>>   +DC->user_creatable = true;
+>>
+>> Is it necessary? Isn't "creatable = true" the default?
+>
+> cannot_instantiate_with_device_add_yet is also false by default,
+> but if there's code explicitly setting it to false somewhere, it
+> is probably necessary for some reason. The script doesn't care
+> what's the reason, because this is a 100% mechanical translation
+> from the old logic to equivalent logic using the new field.
+>
 
-Not that I remember.
+I understand.
 
-Dave
+> If you are still curious about specific cases: explicit
+> cannot_instantiate_with_device_add_yet=false/user_creatable=true
+> is necessary at x86_cpu_common_class_init(), because TYPE_CPU has
+> cannot_instantiate_with_device_add_yet=true (most CPU types don't
+> support device_add), but TYPE_X86_CPU sets it back to false
+> (because x86 supports CPU hotplug).
+>
+>>
+>>>   |
+>>>   -DC->cannot_instantiate_with_device_add_yet = true;
+>>>   +DC->user_creatable = false;
+>>>   )
+>>>
+>>>   @@
+>>>   typedef ObjectClass;
+>>>   expression dc;
+>>>   identifier class, data;
+>>>   @@
+>>>    static void device_class_init(ObjectClass *class, void *data)
+>>>    {
+>>>    ...
+>>>    dc->hotpluggable = true;
+>>>   +dc->user_creatable = true;
+>>
+>> OK... it seems risky :). Is true that "hotpluggable" => creatable,
+>> but the prev rule should work, right?
+>
+> Note that this part is only changing device_class_init(), and no
+> other function. dc->hotpluggable=true appears here by pure
+> chance: it's just because this is the spot where the new
+> dc->user_creatable=true line is being added.
+>
+> This explicit line addition is required because there's no
+> explicit dc->user_creatable=false line in device_class_init
+> because QOM objects are always zeroed on creation)
+>
 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Thanks for the answers.
+
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+
+
+Thanks,
+Marcel
+
+>>
+>>>    ...
+>>>    }
+>>>
+>>>   @@
+>>>   @@
+>>>    struct DeviceClass {
+>>>    ...
+>>>   -bool cannot_instantiate_with_device_add_yet;
+>>>   +bool user_creatable;
+>>>    ...
+>>>   }
+>>>
+>>>   @@
+>>>   expression DC;
+>>>   @@
+>>>   (
+>>>   -!DC->cannot_instantiate_with_device_add_yet
+>>>   +DC->user_creatable
+>>>   |
+>>>   -DC->cannot_instantiate_with_device_add_yet
+>>>   +!DC->user_creatable
+>>>   )
+>>>
+>>
+>> Nice script!
+>
+> Thanks!
+>
