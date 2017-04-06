@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Michael.Wu@ngc.com>) id 1cwBAF-0000e4-AG
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 13:25:44 -0400
+	(envelope-from <kchamart@redhat.com>) id 1cwBAu-0000zm-GR
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 13:26:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Michael.Wu@ngc.com>) id 1cwBAC-0008OX-17
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 13:25:43 -0400
-Received: from xspc0103.northgrum.com ([157.127.149.150]:48371)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Michael.Wu@ngc.com>) id 1cwBAB-0008Nc-GM
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 13:25:39 -0400
-From: "Wu, Michael Y [US] (MS)" <Michael.Wu@ngc.com>
-Date: Thu, 6 Apr 2017 17:23:32 +0000
-Message-ID: <a710ff5405c04e8b97f5d4ed6739fb7b@XCGC3021.northgrum.com>
-References: <7a623fb8d2284ee28ddbd6e1ccf277e0@XCGC3021.northgrum.com>
-	<CAFEAcA8C17TnnBKim9T9k32Re9C-pWUokF-UeVAd=itcpROvRg@mail.gmail.com>
-In-Reply-To: <CAFEAcA8C17TnnBKim9T9k32Re9C-pWUokF-UeVAd=itcpROvRg@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <kchamart@redhat.com>) id 1cwBAt-0000Gx-Kh
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 13:26:24 -0400
+Date: Thu, 6 Apr 2017 19:26:15 +0200
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20170406172615.ye72dml43z5cme4l@eukaryote>
+References: <1491320156-4629-1-git-send-email-kwolf@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] EXT :Re:  Emulating external registers
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1491320156-4629-1-git-send-email-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH for-2.9] block: Ignore
+ guest dev permissions during incoming migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +23,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, armband@enea.com, Ciprian.Barbu@enea.com, qemu-devel@nongnu.org, mreitz@redhat.com, Alexandru.Avadanii@enea.com, pbonzini@redhat.com
 
-VGhhbmsgeW91IFBldGVyIQ0KDQpJIGNoYW5nZWQgbXkgY29kZSB0byB0aGUgZm9sbG93aW5nIGFu
-ZCBhZGRlZCB0aGUgYXBwcm9wcmlhdGUgcmVhZCx3cml0ZSBmdW5jdGlvbnMgYW5kIGEgTWVtb3J5
-UmVnaW9uT3BzLg0KICAgIG1lbW9yeV9yZWdpb25faW5pdF9pbyhyZWdfbWVtb3J5LCBOVUxMLCAm
-cmVnX29wcywgcmVnLA0KICAgICAgICAgICAgICAgICAgICAgICAgICAicmVnX21lbSIsIDB4MDAw
-MDAwNDApOyAvL3NldCB0byA2NCBieXRlcw0KICAgIG1lbW9yeV9yZWdpb25fYWRkX3N1YnJlZ2lv
-bihzeXNtZW0sIDB4RkMwMDAwMDAsIHJlZ19tZW1vcnkpOw0KDQpGb3IgdGhlIHJlYWQgZnVuY3Rp
-b24gSSBqdXN0IHJldHVybmVkIGEgemVyby4gU28gaWYgSSB3ZXJlIHRvIHJlYWQgZnJvbSB0aGUg
-YWRkcmVzcyAweEZDMDAwMDAwIGl0IHNob3VsZCByZXR1cm4gYSB2YWx1ZSBvZiAwPyBUaGUgY3Vy
-cmVudCBpc3N1ZSBJIGFtIGhhdmluZyBpcyB0aGF0IGdkYiBoYW5ncyB3aGVuIHRoZSBwb2ludGVy
-IGlzIGFjY2Vzc2VkLiBJIGFtIHN0YXJ0aW5nIHRvIHRoaW5rIG15IGJhcmUtbWV0YWwgcHJvZ3Jh
-bSBpcyBpbmNvcnJlY3QuIEkgYWxzbyBhZGRlZCBsb2cgbWVzc2FnZXMgaW4gbXkgcmVhZCBhbmQg
-d3JpdGUgZnVuY3Rpb25zLiBUaGUgcmVhZCBmdW5jdGlvbiB3YXMgbm90IGFjY2Vzc2VkLg0KDQov
-L1NvbWUgY29kZSBpbiBteSBiYXJlIG1ldGFsIHByb2dyYW0NCnZvbGF0aWxlIHVuc2lnbmVkIGlu
-dCAgKiBjb25zdCB0ZXN0ID0gKHVuc2lnbmVkIGludCAqKSAweEZDMDAwMDAwOw0KaWYgKDB4MCA9
-PSAqdGVzdCkgIC8vZ2RiIGhhbmdzIG9uIHRoaXMgbGluZSwgY2Fubm90IHN0ZXAgZnVydGhlcg0K
-ICB7DQogICAgcmVhZF9oaXQoKTsNCiAgfQ0KDQpUaGUgZmlsZSAndW5pbXAuYycgeW91IG1lbnRp
-b25lZCBsb29rcyBncmVhdCEgSSB3aWxsIGJlIHVzaW5nIHRoYXQgYXMgaW5zcGlyYXRpb24gZm9y
-IGNyZWF0aW5nIG15IG93biBkZXZpY2UgbW9kZWwuDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0t
-LS0tDQpGcm9tOiBQZXRlciBNYXlkZWxsIFttYWlsdG86cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3Jn
-XSANClNlbnQ6IFRodXJzZGF5LCBBcHJpbCAwNiwgMjAxNyAxOjMzIEFNDQpUbzogV3UsIE1pY2hh
-ZWwgWSBbVVNdIChNUykNCkNjOiBxZW11LWRldmVsQG5vbmdudS5vcmcNClN1YmplY3Q6IEVYVCA6
-UmU6IFtRZW11LWRldmVsXSBFbXVsYXRpbmcgZXh0ZXJuYWwgcmVnaXN0ZXJzDQoNCk9uIDUgQXBy
-aWwgMjAxNyBhdCAyMjowMywgV3UsIE1pY2hhZWwgWSBbVVNdIChNUykgPE1pY2hhZWwuV3VAbmdj
-LmNvbT4gd3JvdGU6DQo+IE15IGN1cnJlbnQgYXBwcm9hY2ggaXMgdG8gY3JlYXRlIGEgbmV3IE1l
-bW9yeVJlZ2lvbiBpbiB0aGUgaW5pdCBmdW5jdGlvbiBvZiB0aGUgZzNiZWlnZSBzb3VyY2UgY29k
-ZSAobWFjX29sZHdvcmxkLmMpLiBNeSBpZGVhIGlzIHRvIHNldCB1cCBzb21lIG1taW8gdG8gY2Vy
-dGFpbiBhZGRyZXNzIHRvIHJlcHJlc2VudCB0aG9zZSByZWdpc3RlcnMuIEZvciBub3cgSSBvbmx5
-IGNhcmUgYWJvdXQgcmVhZGluZyBhbmQgd3JpdGluZywgYnV0IGluIHRoZSBmdXR1cmUgSSBob3Bl
-IHRvIGFkZCBhZGRpdGlvbmFsIGxvZ2ljIHdoZW4gdGhlIHJlZ2lzdGVycyBhcmUgd3JpdHRlbi4N
-Cj4gSSBhZGRlZCB0aGUgZm9sbG93aW5nIGxpbmVzOg0KPiBNZW1vcnlSZWdpb24gKnJlZyA9IGdf
-bmV3KE1lbW9yeVJlZ2lvbiwgMSk7IA0KPiBtZW1vcnlfcmVnaW9uX2luaXRfYWxpYXMocmVnLCBO
-VUxMLCAicmVnX21taW8iLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZ2V0X3N5c3Rl
-bV9pbygpLCAwLCAweDAwMjAwMDAwKTsNCg0KVGhpcyBpcyBkZWZpbmluZyB5b3VyIHJlZ2lvbiB0
-byBiZSBhbiBhbGlhcyBpbnRvIHRoZSBzeXN0ZW0gSU8gcmVnaW9uLCBzbyByZWFkaW5nL3dyaXRp
-bmcgeW91ciByZWdpb24gd2lsbCBhY3QgbGlrZSByZWFkcyBhbmQgd3JpdGVzIGludG8gdGhvc2Ug
-SU8gcG9ydHMuIFRoaXMgZG9lc24ndCBzb3VuZCBsaWtlIHdoYXQgeW91IHdlcmUgdHJ5aW5nIHRv
-IGRvLg0KVXN1YWxseSBtZW1vcnkgcmVnaW9ucyBmb3IgcmVnaXN0ZXJzIGFyZSBkZWZpbmVkIHVz
-aW5nIG1lbW9yeV9yZWdpb25faW5pdF9pbygpLCB3aGVyZSB5b3UgcGFzcyBpbiBhIHN0cnVjdHVy
-ZSB0aGF0IGluY2x1ZGVzIHBvaW50ZXJzIHRvIGZ1bmN0aW9ucyB3aGljaCBhcmUgY2FsbGVkIGZv
-ciByZWFkcyBhbmQgd3JpdGVzLg0KDQo+IG1lbW9yeV9yZWdpb25fYWRkX3N1YnJlZ2lvbihzeXNt
-ZW0sIDB4ZmMwMDAwMDAsIHJlZyk7DQoNClR5cGljYWxseSB5b3Ugd291bGQgY3JlYXRlIGEgZGV2
-aWNlIG1vZGVsIGZvciB3aGF0ZXZlciB0aGlzIGRldmljZSBpcywgYW5kIHRoZW4gbWFwIGl0IGlu
-IHRoZSBib2FyZCBjb2RlLCBub3QgZGlyZWN0bHkgY3JlYXRlIGEgbWVtb3J5IHJlZ2lvbiBpbiB0
-aGUgYm9hcmQgY29kZS4NCg0KWW91IG1pZ2h0IGZpbmQgaXQgdXNlZnVsIHRvIGxvb2sgYXQgaHcv
-bWlzYy91bmltcC5jLCB3aGljaCBpcyBhIGRldmljZSB3aGljaCBzaW1wbHkgcHJpbnRzIGxvZyBt
-ZXNzYWdlcyB3aGVuIGl0IGlzIHJlYWQgb3Igd3JpdHRlbi4gT3IgdHJ5IGEgc2ltcGxlIGRldmlj
-ZSB0aGF0IHlvdXIgYm9hcmQgYWxyZWFkeSBoYXMuDQoNCnRoYW5rcw0KLS0gUE1NDQoNCg==
+On Tue, Apr 04, 2017 at 05:35:56PM +0200, Kevin Wolf wrote:
+> Usually guest devices don't like other writers to the same image, so
+> they use blk_set_perm() to prevent this from happening. In the migration
+> phase before the VM is actually running, though, they don't have a
+> problem with writes to the image. On the other hand, storage migration
+> needs to be able to write to the image in this phase, so the restrictive
+> blk_set_perm() call of qdev devices breaks it.
+> 
+> This patch flags all BlockBackends with a qdev device as
+> blk->disable_perm during incoming migration, which means that the
+> requested permissions are stored in the BlockBackend, but not actually
+> applied to its root node yet.
+> 
+> Once migration has finished and the VM should be resumed, the
+> permissions are applied. If they cannot be applied (e.g. because the NBD
+> server used for block migration hasn't been shut down), resuming the VM
+> fails.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/block-backend.c | 40 +++++++++++++++++++++++++++++++++++++++-
+>  include/block/block.h |  2 ++
+>  migration/migration.c |  8 ++++++++
+>  qmp.c                 |  6 ++++++
+>  4 files changed, 55 insertions(+), 1 deletion(-)
+
+With your fix applied, now I don't see the original error ("error:
+internal error: unable to execute QEMU command 'nbd-server-add':
+Conflicts with use by drive-virtio-disk0 as 'root', which does not allow
+'write' on #block163"), and I can export a disk via `nbd-server-add`
+with 'writeable' flag.  
+
+However, with this fix, running `drive-mirror` seg-faults source QEMU.
+
+Reproducer:
+
+(1) On destination QEMU
+
+$ /home/stack/build/build-qemu/x86_64-softmmu/qemu-system-x86_64 \
+    -display none -nodefconfig -nodefaults -m 512 \
+    -blockdev node-name=bar,driver=qcow2,file.driver=file,file.filename=./dst-disk.qcow2 \
+    -serial unix:/tmp/monitor,server,nowait \
+    -incoming tcp:localhost:6666 -qmp stdio
+{"QMP": {"version": {"qemu": {"micro": 93, "minor": 8, "major": 2}, "package": " (v2.9.0-rc3-3-g3a8624b)"}, "capabilities": []}}
+{ "execute": "qmp_capabilities" }
+{"return": {}}
+{ "execute": "nbd-server-start", "arguments": { "addr": { "type": "inet","data": { "host": "localhost", "port": "3333" } } } }
+{"return": {}}
+{ "execute": "nbd-server-add", "arguments": { "device": "bar","writable": true } }
+{"return": {}}
+/home/stack/src/qemu/nbd/server.c:nbd_receive_request():L706: read failed
+
+
+(2) On source QEMU:
+
+$  /home/stack/build/build-qemu/x86_64-softmmu/qemu-system-x86_64 \
+    -display none -nodefconfig -nodefaults -m 512 \
+    -device virtio-scsi-pci,id=scsi -device virtio-serial-pci \
+    -blockdev node-name=foo,driver=qcow2,file.driver=file,file.filename=./cirros-0.3.5.qcow2
+    -qmp stdio
+{"QMP": {"version": {"qemu": {"micro": 93, "minor": 8, "major": 2}, "package": " (v2.9.0-rc3-3-g3a8624b)"}, "capabilities": []}}
+{ "execute": "qmp_capabilities" }
+{"return": {}}
+{ "execute": "drive-mirror", "arguments": { "device": "foo", "target": "nbd:localhost:3333:exportname=bar", "sync": "full","format": "raw", "mode": "existing" } }
+Segmentation fault (core dumped)
+
+
+[...]
+
+-- 
+/kashyap
