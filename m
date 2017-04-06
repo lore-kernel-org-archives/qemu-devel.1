@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34849)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1cw4sj-0001jx-AK
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 06:43:14 -0400
+	(envelope-from <sahid.ferdjaoui@redhat.com>) id 1cw4tC-0001x1-68
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 06:43:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1cw4sg-0003gh-36
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 06:43:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46438)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1cw4sf-0003fN-Ql
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 06:43:10 -0400
-References: <1491462524-1617-1-git-send-email-peterx@redhat.com>
-	<1491462524-1617-2-git-send-email-peterx@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <0fc836bc-499b-f6b9-f862-9ba26a96beda@redhat.com>
-Date: Thu, 6 Apr 2017 12:42:54 +0200
+	(envelope-from <sahid.ferdjaoui@redhat.com>) id 1cw4tB-0003pz-73
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 06:43:42 -0400
+Date: Thu, 6 Apr 2017 12:43:36 +0200
+From: Sahid Orentino Ferdjaoui <sferdjao@redhat.com>
+Message-ID: <20170406104336.GA28959@redhat>
+References: <20170403114044.15762-1-lvivier@redhat.com>
+	<ef70b4ab-f71a-8235-dc63-ae34097436af@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <1491462524-1617-2-git-send-email-peterx@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 1/9] memory: add section range info for
- IOMMU notifier
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <ef70b4ab-f71a-8235-dc63-ae34097436af@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] virtio-gpu: replace
+ PIXMAN_* by PIXMAN_BE_*
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,171 +25,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, Marcel Apfelbaum <marcel@redhat.com>, bd.aviv@gmail.com, David Gibson <david@gibson.dropbear.id.au>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 
-Hi Peter,
-On 06/04/2017 09:08, Peter Xu wrote:
-> In this patch, IOMMUNotifier.{start|end} are introduced to store section
-> information for a specific notifier. When notification occurs, we not
-> only check the notification type (MAP|UNMAP), but also check whether the
-> notified iova range overlaps with the range of specific IOMMU notifier,
-> and skip those notifiers if not in the listened range.
-> 
-> When removing an region, we need to make sure we removed the correct
-> VFIOGuestIOMMU by checking the IOMMUNotifier.start address as well.
-> 
-> This patch is solving the problem that vfio-pci devices receive
-> duplicated UNMAP notification on x86 platform when vIOMMU is there. The
-> issue is that x86 IOMMU has a (0, 2^64-1) IOMMU region, which is
-> splitted by the (0xfee00000, 0xfeefffff) IRQ region. AFAIK
-> this (splitted IOMMU region) is only happening on x86.
-I think this is likely to happen on other architectures too as "reserved
-regions" are now exported to the user space.
-> 
-> This patch also helps vhost to leverage the new interface as well, so
-> that vhost won't get duplicated cache flushes. In that sense, it's an
-> slight performance improvement.
-> 
-> Suggested-by: David Gibson <david@gibson.dropbear.id.au>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-Looks good to me.
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+On Mon, Apr 03, 2017 at 09:28:02AM -0300, Philippe Mathieu-Daud=E9 wrote:
+> On 04/03/2017 08:40 AM, Laurent Vivier wrote:
+> > This avoids a "#ifdef HOST_WORDS_BIGENDIAN" and this is the purpose
+> > of PIXMAN_BE_* macros.
+> >=20
+> > Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+>=20
+> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+>
 
-Thanks
+Reviewed-by: Sahid Orentino Ferdjaoui <sahid.ferdjaoui@redhat.com>
 
-Eric
-> ---
-> v7->v8:
-> - let vhost dmar leverage the new interface as well
-> - add some more comments in commit message, mentioning what issue this
->   patch has solved
-> - since touched up, removing Alex's a-b and DavidG's r-b
-> ---
->  hw/vfio/common.c      | 12 +++++++++---
->  hw/virtio/vhost.c     | 10 ++++++++--
->  include/exec/memory.h | 19 ++++++++++++++++++-
->  memory.c              |  9 +++++++++
->  4 files changed, 44 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index f3ba9b9..6b33b9f 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -478,8 +478,13 @@ static void vfio_listener_region_add(MemoryListener *listener,
->          giommu->iommu_offset = section->offset_within_address_space -
->                                 section->offset_within_region;
->          giommu->container = container;
-> -        giommu->n.notify = vfio_iommu_map_notify;
-> -        giommu->n.notifier_flags = IOMMU_NOTIFIER_ALL;
-> +        llend = int128_add(int128_make64(section->offset_within_region),
-> +                           section->size);
-> +        llend = int128_sub(llend, int128_one());
-> +        iommu_notifier_init(&giommu->n, vfio_iommu_map_notify,
-> +                            IOMMU_NOTIFIER_ALL,
-> +                            section->offset_within_region,
-> +                            int128_get64(llend));
->          QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
->  
->          memory_region_register_iommu_notifier(giommu->iommu, &giommu->n);
-> @@ -550,7 +555,8 @@ static void vfio_listener_region_del(MemoryListener *listener,
->          VFIOGuestIOMMU *giommu;
->  
->          QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
-> -            if (giommu->iommu == section->mr) {
-> +            if (giommu->iommu == section->mr &&
-> +                giommu->n.start == section->offset_within_region) {
->                  memory_region_unregister_iommu_notifier(giommu->iommu,
->                                                          &giommu->n);
->                  QLIST_REMOVE(giommu, giommu_next);
-> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> index 613494d..185b95b 100644
-> --- a/hw/virtio/vhost.c
-> +++ b/hw/virtio/vhost.c
-> @@ -736,14 +736,20 @@ static void vhost_iommu_region_add(MemoryListener *listener,
->      struct vhost_dev *dev = container_of(listener, struct vhost_dev,
->                                           iommu_listener);
->      struct vhost_iommu *iommu;
-> +    Int128 end;
->  
->      if (!memory_region_is_iommu(section->mr)) {
->          return;
->      }
->  
->      iommu = g_malloc0(sizeof(*iommu));
-> -    iommu->n.notify = vhost_iommu_unmap_notify;
-> -    iommu->n.notifier_flags = IOMMU_NOTIFIER_UNMAP;
-> +    end = int128_add(int128_make64(section->offset_within_region),
-> +                     section->size);
-> +    end = int128_sub(end, int128_one());
-> +    iommu_notifier_init(&iommu->n, vhost_iommu_unmap_notify,
-> +                        IOMMU_NOTIFIER_UNMAP,
-> +                        section->offset_within_region,
-> +                        int128_get64(end));
->      iommu->mr = section->mr;
->      iommu->iommu_offset = section->offset_within_address_space -
->                            section->offset_within_region;
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index f20b191..0840c89 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -77,13 +77,30 @@ typedef enum {
->  
->  #define IOMMU_NOTIFIER_ALL (IOMMU_NOTIFIER_MAP | IOMMU_NOTIFIER_UNMAP)
->  
-> +struct IOMMUNotifier;
-> +typedef void (*IOMMUNotify)(struct IOMMUNotifier *notifier,
-> +                            IOMMUTLBEntry *data);
-> +
->  struct IOMMUNotifier {
-> -    void (*notify)(struct IOMMUNotifier *notifier, IOMMUTLBEntry *data);
-> +    IOMMUNotify notify;
->      IOMMUNotifierFlag notifier_flags;
-> +    /* Notify for address space range start <= addr <= end */
-> +    hwaddr start;
-> +    hwaddr end;
->      QLIST_ENTRY(IOMMUNotifier) node;
->  };
->  typedef struct IOMMUNotifier IOMMUNotifier;
->  
-> +static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
-> +                                       IOMMUNotifierFlag flags,
-> +                                       hwaddr start, hwaddr end)
-> +{
-> +    n->notify = fn;
-> +    n->notifier_flags = flags;
-> +    n->start = start;
-> +    n->end = end;
-> +}
-> +
->  /* New-style MMIO accessors can indicate that the transaction failed.
->   * A zero (MEMTX_OK) response means success; anything else is a failure
->   * of some kind. The memory subsystem will bitwise-OR together results
-> diff --git a/memory.c b/memory.c
-> index 4c95aaf..75ac595 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -1606,6 +1606,7 @@ void memory_region_register_iommu_notifier(MemoryRegion *mr,
->  
->      /* We need to register for at least one bitfield */
->      assert(n->notifier_flags != IOMMU_NOTIFIER_NONE);
-> +    assert(n->start <= n->end);
->      QLIST_INSERT_HEAD(&mr->iommu_notify, n, node);
->      memory_region_update_iommu_notify_flags(mr);
->  }
-> @@ -1667,6 +1668,14 @@ void memory_region_notify_iommu(MemoryRegion *mr,
->      }
->  
->      QLIST_FOREACH(iommu_notifier, &mr->iommu_notify, node) {
-> +        /*
-> +         * Skip the notification if the notification does not overlap
-> +         * with registered range.
-> +         */
-> +        if (iommu_notifier->start > entry.iova + entry.addr_mask + 1 ||
-> +            iommu_notifier->end < entry.iova) {
-> +            continue;
-> +        }
->          if (iommu_notifier->notifier_flags & request_flags) {
->              iommu_notifier->notify(iommu_notifier, &entry);
->          }
-> 
+>=20
+> > ---
+> >  hw/display/virtio-gpu.c | 35 ++++++++---------------------------
+> >  1 file changed, 8 insertions(+), 27 deletions(-)
+> >=20
+> > diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+> > index 9b530ab..7befcef 100644
+> > --- a/hw/display/virtio-gpu.c
+> > +++ b/hw/display/virtio-gpu.c
+> > @@ -258,41 +258,22 @@ void virtio_gpu_get_display_info(VirtIOGPU *g,
+> >  static pixman_format_code_t get_pixman_format(uint32_t virtio_gpu_fo=
+rmat)
+> >  {
+> >      switch (virtio_gpu_format) {
+> > -#ifdef HOST_WORDS_BIGENDIAN
+> >      case VIRTIO_GPU_FORMAT_B8G8R8X8_UNORM:
+> > -        return PIXMAN_b8g8r8x8;
+> > +        return PIXMAN_BE_b8g8r8x8;
+> >      case VIRTIO_GPU_FORMAT_B8G8R8A8_UNORM:
+> > -        return PIXMAN_b8g8r8a8;
+> > +        return PIXMAN_BE_b8g8r8a8;
+> >      case VIRTIO_GPU_FORMAT_X8R8G8B8_UNORM:
+> > -        return PIXMAN_x8r8g8b8;
+> > +        return PIXMAN_BE_x8r8g8b8;
+> >      case VIRTIO_GPU_FORMAT_A8R8G8B8_UNORM:
+> > -        return PIXMAN_a8r8g8b8;
+> > +        return PIXMAN_BE_a8r8g8b8;
+> >      case VIRTIO_GPU_FORMAT_R8G8B8X8_UNORM:
+> > -        return PIXMAN_r8g8b8x8;
+> > +        return PIXMAN_BE_r8g8b8x8;
+> >      case VIRTIO_GPU_FORMAT_R8G8B8A8_UNORM:
+> > -        return PIXMAN_r8g8b8a8;
+> > +        return PIXMAN_BE_r8g8b8a8;
+> >      case VIRTIO_GPU_FORMAT_X8B8G8R8_UNORM:
+> > -        return PIXMAN_x8b8g8r8;
+> > +        return PIXMAN_BE_x8b8g8r8;
+> >      case VIRTIO_GPU_FORMAT_A8B8G8R8_UNORM:
+> > -        return PIXMAN_a8b8g8r8;
+> > -#else
+> > -    case VIRTIO_GPU_FORMAT_B8G8R8X8_UNORM:
+> > -        return PIXMAN_x8r8g8b8;
+> > -    case VIRTIO_GPU_FORMAT_B8G8R8A8_UNORM:
+> > -        return PIXMAN_a8r8g8b8;
+> > -    case VIRTIO_GPU_FORMAT_X8R8G8B8_UNORM:
+> > -        return PIXMAN_b8g8r8x8;
+> > -    case VIRTIO_GPU_FORMAT_A8R8G8B8_UNORM:
+> > -        return PIXMAN_b8g8r8a8;
+> > -    case VIRTIO_GPU_FORMAT_R8G8B8X8_UNORM:
+> > -        return PIXMAN_x8b8g8r8;
+> > -    case VIRTIO_GPU_FORMAT_R8G8B8A8_UNORM:
+> > -        return PIXMAN_a8b8g8r8;
+> > -    case VIRTIO_GPU_FORMAT_X8B8G8R8_UNORM:
+> > -        return PIXMAN_r8g8b8x8;
+> > -    case VIRTIO_GPU_FORMAT_A8B8G8R8_UNORM:
+> > -        return PIXMAN_r8g8b8a8;
+> > -#endif
+> > +        return PIXMAN_BE_a8b8g8r8;
+> >      default:
+> >          return 0;
+> >      }
+> >=20
