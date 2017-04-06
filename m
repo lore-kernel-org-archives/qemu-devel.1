@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49193)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jgunthorpe@obsidianresearch.com>) id 1cwEQE-0001vx-KN
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 16:54:27 -0400
+	(envelope-from <rjones@redhat.com>) id 1cwEVR-0003dt-QE
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 16:59:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jgunthorpe@obsidianresearch.com>) id 1cwEQ9-000806-QN
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 16:54:26 -0400
-Received: from quartz.orcorp.ca ([184.70.90.242]:47873)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jgunthorpe@obsidianresearch.com>)
-	id 1cwEQ9-0007zK-H3
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 16:54:21 -0400
-Date: Thu, 6 Apr 2017 14:54:16 -0600
-From: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
-Message-ID: <20170406205416.GB27155@obsidianresearch.com>
-References: <1490872341-9959-1-git-send-email-marcel@redhat.com>
-	<20170330141314.GM20443@mtr-leonro.local>
-	<5e952524-7c2d-b4da-4bd7-6437830a40d8@redhat.com>
-	<f7f3fc0e-0a75-2fdc-b3c2-6c3d34ff2978@redhat.com>
-	<20170403062314.GO20443@mtr-leonro.local>
-	<aa400244-426a-ea62-0ccf-ac5adb76fdd1@redhat.com>
-	<20170404173349.GY20443@mtr-leonro.local>
-	<20170406194552.GB2170@yuval-lap>
+	(envelope-from <rjones@redhat.com>) id 1cwEVQ-0002jI-Nj
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 16:59:49 -0400
+Date: Thu, 6 Apr 2017 21:59:39 +0100
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20170406205939.GA28584@redhat.com>
+References: <1488314205-16264-1-git-send-email-kwolf@redhat.com>
+	<1488314205-16264-44-git-send-email-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170406194552.GB2170@yuval-lap>
-Subject: Re: [Qemu-devel] [PATCH RFC] hw/pvrdma: Proposal of a new pvrdma
- device
+In-Reply-To: <1488314205-16264-44-git-send-email-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 43/46] block: Assertions for write
+ permissions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,23 +24,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>
-Cc: Leon Romanovsky <leon@kernel.org>, Marcel Apfelbaum <marcel@redhat.com>, Doug Ledford <dledford@redhat.com>, qemu-devel@nongnu.org, linux-rdma@vger.kernel.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-On Thu, Apr 06, 2017 at 10:45:54PM +0300, Yuval Shaia wrote:
-
-> > Just add my 2 cents. You didn't answer on my question about other possible
-> > implementations. It can be SoftRoCE loopback optimizations, special ULP,
-> > RDMA transport, virtual driver with multiple VFs and single PF.
+On Tue, Feb 28, 2017 at 09:36:42PM +0100, Kevin Wolf wrote:
+> This adds assertions that ensure that the necessary write permissions
+> have been granted before someone attempts to write to a node.
 > 
-> Please see my response to Jason's comments - eventually, when a support for
-> VM to external host communication will be added - kdbr will become ULP as
-> well.
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Acked-by: Fam Zheng <famz@redhat.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  block/io.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/block/io.c b/block/io.c
+> index 2592ca1..4c79745 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -945,6 +945,8 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
+>      size_t skip_bytes;
+>      int ret;
+>  
+> +    assert(child->perm & (BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE));
 
-So, is KDBR only to be used on the HV side? Ie it never shows up in the VM?
 
-That is even weirder, we certainly do not want to see a kernel RDMA
-ULP for any of this - the entire point of RDMA is to let user space
-implement their protocols without needing a unique kernel component!!
+This assertion is thrown in the libguestfs test suite.  I filed a bug
+about it against the Fedora package:
 
-Jason
+https://lists.gnu.org/archive/html/qemu-block/2017-02/msg01305.html
+
+Rich.
+
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-p2v converts physical machines to virtual machines.  Boot with a
+live CD or over the network (PXE) and turn machines into KVM guests.
+http://libguestfs.org/virt-v2v
