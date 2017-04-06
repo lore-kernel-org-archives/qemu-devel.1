@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cw7B8-0006Pb-Nq
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:27 -0400
+	(envelope-from <quintela@redhat.com>) id 1cw7BD-0006U4-P8
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cw7B6-00004y-C8
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56550)
+	(envelope-from <quintela@redhat.com>) id 1cw7BA-00006g-Is
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57604)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cw7B6-0008WK-6B
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:20 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cw7BA-00006S-AN
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:24 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 48DCAC059746
-	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 13:10:19 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6D51C3D970
+	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 13:10:23 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu,  6 Apr 2017 15:08:59 +0200
-Message-Id: <20170406130913.2232-41-quintela@redhat.com>
+Date: Thu,  6 Apr 2017 15:09:02 +0200
+Message-Id: <20170406130913.2232-44-quintela@redhat.com>
 In-Reply-To: <20170406130913.2232-1-quintela@redhat.com>
 References: <20170406130913.2232-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 40/54] ram: Remove compression_switch and
- inline its logic
+Subject: [Qemu-devel] [PATCH 43/54] ram: Rename qemu_target_page_bits() to
+ qemu_target_page_size()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,65 +33,125 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com
 
-We can calculate its value, so not create a varible for it.
+It was used as a size in all cases except one.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-
---
-
-After Peter and Dave review, I dropped the variable and just inlined
-the condition.
-
-Later, Juan.
-
-Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/ram.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ exec.c                   | 4 ++--
+ include/sysemu/sysemu.h  | 2 +-
+ migration/migration.c    | 4 ++--
+ migration/postcopy-ram.c | 8 ++++----
+ migration/savevm.c       | 8 ++++----
+ 5 files changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 14d54fd..5dfc9bd 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -336,7 +336,6 @@ static QemuCond comp_done_cond;
- /* The empty QEMUFileOps will be used by file in CompressParam */
- static const QEMUFileOps empty_ops = { };
+diff --git a/exec.c b/exec.c
+index c97ef4a..7a640c7 100644
+--- a/exec.c
++++ b/exec.c
+@@ -3307,9 +3307,9 @@ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
+  * Allows code that needs to deal with migration bitmaps etc to still be built
+  * target independent.
+  */
+-size_t qemu_target_page_bits(void)
++size_t qemu_target_page_size(void)
+ {
+-    return TARGET_PAGE_BITS;
++    return TARGET_PAGE_SIZE;
+ }
  
--static bool compression_switch;
- static DecompressParam *decomp_param;
- static QemuThread *decompress_threads;
- static QemuMutex decomp_done_lock;
-@@ -420,7 +419,6 @@ void migrate_compress_threads_create(void)
-     if (!migrate_use_compression()) {
-         return;
-     }
--    compression_switch = true;
-     thread_count = migrate_compress_threads();
-     compress_threads = g_new0(QemuThread, thread_count);
-     comp_param = g_new0(CompressParam, thread_count);
-@@ -1092,7 +1090,6 @@ static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss,
-                  * point. In theory, xbzrle can do better than compression.
-                  */
-                 flush_compressed_data(rs);
--                compression_switch = false;
+ #endif
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 576c7ce..16175f7 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -67,7 +67,7 @@ int qemu_reset_requested_get(void);
+ void qemu_system_killed(int signal, pid_t pid);
+ void qemu_system_reset(bool report);
+ void qemu_system_guest_panicked(GuestPanicInformation *info);
+-size_t qemu_target_page_bits(void);
++size_t qemu_target_page_size(void);
+ 
+ void qemu_add_exit_notifier(Notifier *notify);
+ void qemu_remove_exit_notifier(Notifier *notify);
+diff --git a/migration/migration.c b/migration/migration.c
+index 8cd43a4..cf6ed65 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -646,7 +646,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
+     info->ram->skipped = 0;
+     info->ram->normal = norm_mig_pages_transferred();
+     info->ram->normal_bytes = norm_mig_pages_transferred() *
+-        (1ul << qemu_target_page_bits());
++        qemu_target_page_size();
+     info->ram->mbps = s->mbps;
+     info->ram->dirty_sync_count = ram_dirty_sync_count();
+     info->ram->postcopy_requests = ram_postcopy_requests();
+@@ -2001,7 +2001,7 @@ static void *migration_thread(void *opaque)
+                10000 is a small enough number for our purposes */
+             if (ram_dirty_pages_rate() && transferred_bytes > 10000) {
+                 s->expected_downtime = ram_dirty_pages_rate() *
+-                    (1ul << qemu_target_page_bits()) / bandwidth;
++                    qemu_target_page_size() / bandwidth;
              }
-         }
-         /* Didn't find anything this time, but try again on the new block */
-@@ -1326,7 +1323,14 @@ static int ram_save_target_page(RAMState *rs, MigrationState *ms,
-     /* Check the pages is dirty and if it is send it */
-     if (migration_bitmap_clear_dirty(rs, dirty_ram_abs)) {
-         unsigned long *unsentmap;
--        if (compression_switch && migrate_use_compression()) {
-+        /*
-+         * If xbzrle is on, stop using the data compression after first
-+         * round of migration even if compression is enabled. In theory,
-+         * xbzrle can do better than compression.
-+         */
-+
-+        if (migrate_use_compression())
-+            && (rs->ram_bulk_stage || !migrate_use_xbzrle()) {
-             res = ram_save_compressed_page(rs, ms, pss, last_stage);
-         } else {
-             res = ram_save_page(rs, ms, pss, last_stage);
+ 
+             qemu_file_reset_rate_limit(s->to_dst_file);
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index dc80dbb..8756364 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -123,7 +123,7 @@ bool postcopy_ram_supported_by_host(void)
+     struct uffdio_range range_struct;
+     uint64_t feature_mask;
+ 
+-    if ((1ul << qemu_target_page_bits()) > pagesize) {
++    if (qemu_target_page_size() > pagesize) {
+         error_report("Target page size bigger than host page size");
+         goto out;
+     }
+@@ -745,10 +745,10 @@ PostcopyDiscardState *postcopy_discard_send_init(MigrationState *ms,
+ void postcopy_discard_send_range(MigrationState *ms, PostcopyDiscardState *pds,
+                                 unsigned long start, unsigned long length)
+ {
+-    size_t tp_bits = qemu_target_page_bits();
++    size_t tp_size = qemu_target_page_size();
+     /* Convert to byte offsets within the RAM block */
+-    pds->start_list[pds->cur_entry] = (start - pds->offset) << tp_bits;
+-    pds->length_list[pds->cur_entry] = length << tp_bits;
++    pds->start_list[pds->cur_entry] = (start - pds->offset) * tp_size;
++    pds->length_list[pds->cur_entry] = length * tp_size;
+     trace_postcopy_discard_send_range(pds->ramblock_name, start, length);
+     pds->cur_entry++;
+     pds->nsentwords++;
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 853a81a..bbf055d 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -871,7 +871,7 @@ void qemu_savevm_send_postcopy_advise(QEMUFile *f)
+ {
+     uint64_t tmp[2];
+     tmp[0] = cpu_to_be64(ram_pagesize_summary());
+-    tmp[1] = cpu_to_be64(1ul << qemu_target_page_bits());
++    tmp[1] = cpu_to_be64(qemu_target_page_size());
+ 
+     trace_qemu_savevm_send_postcopy_advise();
+     qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE, 16, (uint8_t *)tmp);
+@@ -1390,13 +1390,13 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
+     }
+ 
+     remote_tps = qemu_get_be64(mis->from_src_file);
+-    if (remote_tps != (1ul << qemu_target_page_bits())) {
++    if (remote_tps != qemu_target_page_size()) {
+         /*
+          * Again, some differences could be dealt with, but for now keep it
+          * simple.
+          */
+-        error_report("Postcopy needs matching target page sizes (s=%d d=%d)",
+-                     (int)remote_tps, 1 << qemu_target_page_bits());
++        error_report("Postcopy needs matching target page sizes (s=%d d=%zd)",
++                     (int)remote_tps, qemu_target_page_size());
+         return -1;
+     }
+ 
 -- 
 2.9.3
