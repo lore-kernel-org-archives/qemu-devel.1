@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cvvAG-0007e0-Ne
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 20:20:41 -0400
+	(envelope-from <jcody@redhat.com>) id 1cvvCt-00008O-Cf
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 20:23:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cvvAF-0001o2-AI
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 20:20:40 -0400
-Date: Wed, 5 Apr 2017 20:20:28 -0400
+	(envelope-from <jcody@redhat.com>) id 1cvvCs-0002uL-FM
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 20:23:23 -0400
+Date: Wed, 5 Apr 2017 20:23:12 -0400
 From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170406002028.GK1135@localhost.localdomain>
+Message-ID: <20170406002312.GL1135@localhost.localdomain>
 References: <cover.1491416061.git.jcody@redhat.com>
-	<6c82b83fae72a5b5909993f0cf65a90f12efb669.1491416061.git.jcody@redhat.com>
-	<4a5f39ab-50ad-6071-130a-fe77493221ec@redhat.com>
-	<a0d3bd42-682c-fe21-eeaa-28e189386e57@redhat.com>
+	<1eeddeba3dc5775183bd1e44ecae616c233b932d.1491416061.git.jcody@redhat.com>
+	<4c0fc97d-ca5a-4952-570b-f7598f2aec9d@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a0d3bd42-682c-fe21-eeaa-28e189386e57@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 3/9] block: honor
- BDRV_O_ALLOW_RDWR when clearing bs->read_only
+In-Reply-To: <4c0fc97d-ca5a-4952-570b-f7598f2aec9d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 5/9] block: introduce
+ bdrv_try_set_read_only()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,29 +25,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
 
-On Wed, Apr 05, 2017 at 02:26:53PM -0500, Eric Blake wrote:
-> On 04/05/2017 02:20 PM, John Snow wrote:
+On Wed, Apr 05, 2017 at 04:28:44PM -0400, John Snow wrote:
 > 
-> > Conceptually straightforward.
-> > 
-> > looks like this might change behavior for... RBD and vvfat, right?
-> > RBD is the subject of this series so we'll just assume that was broken
-> > and stupid.
-> > 
-
-Yes on RBD, and that change is intentional.
-
-> > What's vvfat's story? It always set the read-only property to false
-> > regardless of what you asked for?
 > 
-> vvfat is even stupider than that - it has its own independent property
-> 'rw' that determines whether to allow write operations, separate from
-> the inherited BDS readonly property.
->
+> On 04/05/2017 02:28 PM, Jeff Cody wrote:
+> > Introduce try function for setting read_only flags.  Will return < 0 on
+> > error, with appropriate Error value set.  Does not alter any flags.
+> > 
+> > Signed-off-by: Jeff Cody <jcody@redhat.com>
+> > ---
+> >  block.c               | 14 +++++++++++++-
+> >  include/block/block.h |  1 +
+> >  2 files changed, 14 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/block.c b/block.c
+> > index 8bfe7f4..ad958b9 100644
+> > --- a/block.c
+> > +++ b/block.c
+> > @@ -197,7 +197,7 @@ bool bdrv_is_read_only(BlockDriverState *bs)
+> >      return bs->read_only;
+> >  }
+> >  
+> > -int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
+> > +int bdrv_try_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
+> >  {
+> >      /* Do not set read_only if copy_on_read is enabled */
+> >      if (bs->copy_on_read && read_only) {
+> > @@ -213,6 +213,18 @@ int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
+> >          return -EPERM;
+> >      }
+> >  
+> > +    return 0;
+> > +}
+> > +
+> > +int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
+> > +{
+> > +    int ret = 0;
+> > +
+> > +    ret = bdrv_try_set_read_only(bs, read_only, errp);
+> > +    if (ret < 0) {
+> > +        return ret;
+> > +    }
+> > +
+> >      bs->read_only = read_only;
+> >      return 0;
+> >  }
+> > diff --git a/include/block/block.h b/include/block/block.h
+> > index beb563a..0049b57 100644
+> > --- a/include/block/block.h
+> > +++ b/include/block/block.h
+> > @@ -426,6 +426,7 @@ int bdrv_is_allocated_above(BlockDriverState *top, BlockDriverState *base,
+> >                              int64_t sector_num, int nb_sectors, int *pnum);
+> >  
+> >  bool bdrv_is_read_only(BlockDriverState *bs);
+> > +int bdrv_try_set_read_only(BlockDriverState *bs, bool read_only, Error **errp);
+> >  int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp);
+> >  bool bdrv_is_sg(BlockDriverState *bs);
+> >  bool bdrv_is_inserted(BlockDriverState *bs);
+> > 
+> 
+> Maybe I'm just green, but I find it weird that the function is named
+> try_x when we aren't actually trying to do anything, we're checking to
+> see if we can.
 
-Yes, it is very odd.  But if we have copy_on_read enabled, or explicitly set
-the block device to read-only via QAPI or -drive, I think that those should
-take precedence.
+Yeah, not a good name.  Maybe bdrv_set_read_only_test() or
+bdrv_test_set_read_only()?
