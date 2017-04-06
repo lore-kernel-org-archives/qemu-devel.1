@@ -1,41 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cw78I-0004Zn-JU
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:07:27 -0400
+	(envelope-from <quintela@redhat.com>) id 1cw7AA-0005L3-55
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:09:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cw78D-00073U-Kz
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:07:26 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36745
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cw78D-00072r-F8
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:07:21 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v36CwYFq050510
-	for <qemu-devel@nongnu.org>; Thu, 6 Apr 2017 09:07:20 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 29ndvrjcvq-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 06 Apr 2017 09:07:20 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Thu, 6 Apr 2017 14:07:13 +0100
-Date: Thu, 6 Apr 2017 15:07:08 +0200
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <865405dc-f785-c458-3de7-dfc49dfca15f@redhat.com>
-References: <20170406111646.12624-1-cornelia.huck@de.ibm.com>
-	<20170406111646.12624-4-cornelia.huck@de.ibm.com>
-	<865405dc-f785-c458-3de7-dfc49dfca15f@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170406150708.7c49380d.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 03/10] s390x/pci: make printf
- always compile in debug output
+	(envelope-from <quintela@redhat.com>) id 1cw7A9-0007xC-6O
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:09:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55654)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cw7A9-0007wt-0S
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:09:21 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1A9D52E6046
+	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 13:09:20 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Thu,  6 Apr 2017 15:08:22 +0200
+Message-Id: <20170406130913.2232-4-quintela@redhat.com>
+In-Reply-To: <20170406130913.2232-1-quintela@redhat.com>
+References: <20170406130913.2232-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH 03/54] ram: Rename block_name to rbname
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,61 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, Danil Antonov <g.danil.anto@gmail.com>, agraf@suse.de
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com
 
-On Thu, 6 Apr 2017 14:15:45 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+So all places are consistent on the naming of a block name parameter.
 
-> On 06.04.2017 13:16, Cornelia Huck wrote:
-> > From: Danil Antonov <g.danil.anto@gmail.com>
-> > 
-> > Wrapped printf calls inside debug macros (DPRINTF) in `if` statement.
-> > This will ensure that printf function will always compile even if debug
-> > output is turned off and, in turn, will prevent bitrot of the format
-> > strings.
-> > 
-> > Signed-off-by: Danil Antonov <g.danil.anto@gmail.com>
-> > Message-Id: <CA+KKJYBi31Bs7DtVdzZdwG2t+u5+FGiAhQpd3pqJzUX1O8Cprg@mail.gmail.com>
-> > Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
-> > ---
-> >  hw/s390x/s390-pci-bus.c  | 16 ++++++++++------
-> >  hw/s390x/s390-pci-inst.c | 16 ++++++++++------
-> >  2 files changed, 20 insertions(+), 12 deletions(-)
-> > 
-> > diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> > index 69b0291e8a..0f62363434 100644
-> > --- a/hw/s390x/s390-pci-bus.c
-> > +++ b/hw/s390x/s390-pci-bus.c
-> > @@ -24,14 +24,18 @@
-> >  #include "qemu/error-report.h"
-> >  
-> >  /* #define DEBUG_S390PCI_BUS */
-> 
-> This comment is now somewhat misleading. If you uncomment this "#define
-> DEBUG_S390PCI_BUS" (without adding a "1" at the end), you end up with
-> some empty "if ()" statements now, i.e. compilation failures. So I'd
-> like to suggest to simply remove the above line.
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ migration/ram.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-Yeah, makes sense, and also matches what is done in the s390x/kvm patch.
-I'll merge that in.
-
-> 
-> > -#ifdef DEBUG_S390PCI_BUS
-> > -#define DPRINTF(fmt, ...) \
-> > -    do { fprintf(stderr, "S390pci-bus: " fmt, ## __VA_ARGS__); } while (0)
-> > -#else
-> > -#define DPRINTF(fmt, ...) \
-> > -    do { } while (0)
-> > +
-> > +#ifndef DEBUG_S390PCI_BUS
-> > +#define DEBUG_S390PCI_BUS  0
-> >  #endif
-> >  
-> > +#define DPRINTF(fmt, ...)                                         \
-> > +    do {                                                          \
-> > +        if (DEBUG_S390PCI_BUS) {                                  \
-> > +            fprintf(stderr, "S390pci-bus: " fmt, ## __VA_ARGS__); \
-> > +        }                                                         \
-> > +    } while (0)
-> > +
+diff --git a/migration/ram.c b/migration/ram.c
+index 356f8ce..776f8a7 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -743,14 +743,14 @@ static int save_zero_page(QEMUFile *f, RAMBlock *block, ram_addr_t offset,
+     return pages;
+ }
+ 
+-static void ram_release_pages(MigrationState *ms, const char *block_name,
++static void ram_release_pages(MigrationState *ms, const char *rbname,
+                               uint64_t offset, int pages)
+ {
+     if (!migrate_release_ram() || !migration_in_postcopy(ms)) {
+         return;
+     }
+ 
+-    ram_discard_range(NULL, block_name, offset, pages << TARGET_PAGE_BITS);
++    ram_discard_range(NULL, rbname, offset, pages << TARGET_PAGE_BITS);
+ }
+ 
+ /**
+@@ -1943,25 +1943,24 @@ int ram_postcopy_send_discard_bitmap(MigrationState *ms)
+  * Returns zero on success
+  *
+  * @mis: current migration incoming state
+- * @block_name: Name of the RAMBlock of the request. NULL means the
+- *              same that last one.
++ * @rbname: name of the RAMBlock of the request. NULL means the
++ *          same that last one.
+  * @start: RAMBlock starting page
+  * @length: RAMBlock size
+  */
+ int ram_discard_range(MigrationIncomingState *mis,
+-                      const char *block_name,
++                      const char *rbname,
+                       uint64_t start, size_t length)
+ {
+     int ret = -1;
+ 
+-    trace_ram_discard_range(block_name, start, length);
++    trace_ram_discard_range(rbname, start, length);
+ 
+     rcu_read_lock();
+-    RAMBlock *rb = qemu_ram_block_by_name(block_name);
++    RAMBlock *rb = qemu_ram_block_by_name(rbname);
+ 
+     if (!rb) {
+-        error_report("ram_discard_range: Failed to find block '%s'",
+-                     block_name);
++        error_report("ram_discard_range: Failed to find block '%s'", rbname);
+         goto err;
+     }
+ 
+-- 
+2.9.3
