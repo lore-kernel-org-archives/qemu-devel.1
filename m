@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cvvH9-0001D1-OB
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 20:27:48 -0400
+	(envelope-from <jcody@redhat.com>) id 1cvviT-0005TE-8n
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 20:56:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cvvH8-0004OK-Si
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 20:27:47 -0400
-Date: Wed, 5 Apr 2017 20:27:34 -0400
+	(envelope-from <jcody@redhat.com>) id 1cvviS-0005sR-CP
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 20:56:01 -0400
+Date: Wed, 5 Apr 2017 20:55:49 -0400
 From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170406002734.GM1135@localhost.localdomain>
+Message-ID: <20170406005549.GN1135@localhost.localdomain>
 References: <cover.1491416061.git.jcody@redhat.com>
-	<abc6320f80ff4af4788fe33b12bb12cbfa83d980.1491416061.git.jcody@redhat.com>
-	<a82f1619-7815-dc8c-279c-ed40b7da505d@redhat.com>
+	<6c82b83fae72a5b5909993f0cf65a90f12efb669.1491416061.git.jcody@redhat.com>
+	<4a5f39ab-50ad-6071-130a-fe77493221ec@redhat.com>
+	<a0d3bd42-682c-fe21-eeaa-28e189386e57@redhat.com>
+	<20170406002028.GK1135@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a82f1619-7815-dc8c-279c-ed40b7da505d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 6/9] block: use
- bdrv_try_set_read_only() during reopen
+In-Reply-To: <20170406002028.GK1135@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 3/9] block: honor
+ BDRV_O_ALLOW_RDWR when clearing bs->read_only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,68 +27,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com
 
-On Wed, Apr 05, 2017 at 04:25:39PM -0400, John Snow wrote:
-> 
-> 
-> On 04/05/2017 02:28 PM, Jeff Cody wrote:
-> > Signed-off-by: Jeff Cody <jcody@redhat.com>
-> > ---
-> >  block.c | 14 ++++++++------
-> >  1 file changed, 8 insertions(+), 6 deletions(-)
+On Wed, Apr 05, 2017 at 08:20:28PM -0400, Jeff Cody wrote:
+> On Wed, Apr 05, 2017 at 02:26:53PM -0500, Eric Blake wrote:
+> > On 04/05/2017 02:20 PM, John Snow wrote:
 > > 
-> > diff --git a/block.c b/block.c
-> > index ad958b9..3245fae 100644
-> > --- a/block.c
-> > +++ b/block.c
-> > @@ -2785,6 +2785,7 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
-> >      BlockDriver *drv;
-> >      QemuOpts *opts;
-> >      const char *value;
-> > +    bool read_only;
-> >  
-> >      assert(reopen_state != NULL);
-> >      assert(reopen_state->bs->drv != NULL);
-> > @@ -2813,12 +2814,13 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
-> >          qdict_put(reopen_state->options, "driver", qstring_from_str(value));
-> >      }
-> >  
-> > -    /* if we are to stay read-only, do not allow permission change
-> > -     * to r/w */
-> > -    if (!(reopen_state->bs->open_flags & BDRV_O_ALLOW_RDWR) &&
-> > -        reopen_state->flags & BDRV_O_RDWR) {
+> > > Conceptually straightforward.
+> > > 
+> > > looks like this might change behavior for... RBD and vvfat, right?
+> > > RBD is the subject of this series so we'll just assume that was broken
+> > > and stupid.
+> > > 
 > 
-> So the current code checks reopen_state->flags & BDRV_O_RDWR;
+> Yes on RBD, and that change is intentional.
 > 
-> > -        error_setg(errp, "Node '%s' is read only",
-> > -                   bdrv_get_device_or_node_name(reopen_state->bs));
-> > +    /* If we are to stay read-only, do not allow permission change
-> > +     * to r/w. Attempting to set to r/w may fail if either BDRV_O_ALLOW_RDWR is
-> > +     * not set, or if the BDS still has copy_on_read enabled */
-> > +    read_only = !(reopen_state->bs->open_flags & BDRV_O_RDWR);
+> > > What's vvfat's story? It always set the read-only property to false
+> > > regardless of what you asked for?
+> > 
+> > vvfat is even stupider than that - it has its own independent property
+> > 'rw' that determines whether to allow write operations, separate from
+> > the inherited BDS readonly property.
+> >
 > 
-> And the proposed change checks reopen_state->bs->open_flags &
-> BDRV_O_RDWR. (It's negated again inside of bdrv_try_set_read_only.)
-> 
-> Both check against !(reopen_state->bs->open_flags & BDRV_O_ALLOW_RDWR).
-> 
-> What's the functional difference of doing so, and is it intentional?
+> Yes, it is very odd.  But if we have copy_on_read enabled, or explicitly set
+> the block device to read-only via QAPI or -drive, I think that those should
+> take precedence.
 >
 
-Good catch; unintentional.  That line should read:
+I meant to add an example - currently, with this drive commandline:
 
-+    read_only = !(reopen_state->flags & BDRV_O_RDWR);
+"-drive format=vvfat,dir=/tmp/vvfat,rw,if=virtio,readonly=on"
 
-The functional difference is we would be testing against the open_flags of
-the current BS to see if we are requesting r/w or r/o, rather than checking
-against the reopen requested flags.
+The drive is not read-only, but writable.  That seems broken.
 
-> > +    ret = bdrv_try_set_read_only(reopen_state->bs, read_only, &local_err);
-> > +    if (local_err) {
-> > +        error_propagate(errp, local_err);
-> >          goto error;
-> >      }
-> >  
-> > 
+After this patch, this ends up throwing an error now (which I think is a
+logical thing to do):
+
+qemu-system-x86_64: -drive format=vvfat,dir=/tmp/vvfat,rw,if=virtio,readonly=on: Node '#block238' is read only
+
+How this affects vvfat (and rbd) should be documented in the commit message,
+however, so I should ammend that if we keep this behavior.
+
+One other possible option is to treat the vvfat 'rw' option as meaning
+"enable writes, iff the block device is writable".  With that
+interpretation, we could do something different in the above scenario:
+silently fail to set bs->read_only to 'true' in the vvfat driver, and keep
+it r/o.
