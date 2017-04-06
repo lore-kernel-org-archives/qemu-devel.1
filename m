@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44075)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cw1iR-0001oR-NB
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 03:20:25 -0400
+	(envelope-from <clg@kaod.org>) id 1cw1rC-00036Y-TK
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 03:29:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cw1iQ-0006ly-63
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 03:20:23 -0400
-Date: Thu, 6 Apr 2017 15:36:39 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170406053639.GD12179@umbus>
+	(envelope-from <clg@kaod.org>) id 1cw1r9-0003R8-NZ
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 03:29:26 -0400
+Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:53014)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cw1r8-0003OI-Fr
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 03:29:23 -0400
+Received: from player731.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id BC60A6451C
+	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 09:29:13 +0200 (CEST)
 References: <1491396106-26376-1-git-send-email-clg@kaod.org>
-	<1491396106-26376-9-git-send-email-clg@kaod.org>
+	<1491396106-26376-11-git-send-email-clg@kaod.org>
+	<c07a3f32-0967-0d9a-dd39-5f8e5e1d95d8@mvista.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <f6840bfd-f8a7-7b76-b7f6-6fa16366b884@kaod.org>
+Date: Thu, 6 Apr 2017 09:29:01 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="cQXOx3fnlpmgJsTP"
-Content-Disposition: inline
-In-Reply-To: <1491396106-26376-9-git-send-email-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 08/21] ipmi: introduce an
- ipmi_bmc_sdr_find() API
+In-Reply-To: <c07a3f32-0967-0d9a-dd39-5f8e5e1d95d8@mvista.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 10/21] ipmi: add SET_SENSOR_READING command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,103 +31,252 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>
+To: Corey Minyard <cminyard@mvista.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-
---cQXOx3fnlpmgJsTP
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Apr 05, 2017 at 02:41:33PM +0200, C=E9dric Le Goater wrote:
-> This patch exposes a new IPMI routine to query a sdr entry from the
-> sdr table maintained by the IPMI BMC simulator. The API is very
-> similar to the internal sdr_find_entry() routine and should be used
-> the same way to query one or all sdrs.
+On 04/05/2017 04:41 PM, Corey Minyard wrote:
+> On 04/05/2017 07:41 AM, C=E9dric Le Goater wrote:
+>> SET_SENSOR_READING is a complex IPMI command (IPMI spec : "35.17 Set
+>> Sensor Reading And Event Status Command"). Here is a very minimum
+>> framework fitting the Open PowerNV platform needs. This command is
+>> used on this platform to set the "System Firmware Progress" sensor and
+>> the "Boot Count" sensor.
+>>
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>> ---
+>>   hw/ipmi/ipmi_bmc_sim.c | 133 +++++++++++++++++++++++++++++++++++++++=
+++++++++++
+>>   1 file changed, 133 insertions(+)
+>>
+>> diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
+>> index 155561d06614..26036b20d4df 100644
+>> --- a/hw/ipmi/ipmi_bmc_sim.c
+>> +++ b/hw/ipmi/ipmi_bmc_sim.c
+>> @@ -45,6 +45,7 @@
+>>   #define IPMI_CMD_GET_SENSOR_READING       0x2d
+>>   #define IPMI_CMD_SET_SENSOR_TYPE          0x2e
+>>   #define IPMI_CMD_GET_SENSOR_TYPE          0x2f
+>> +#define IPMI_CMD_SET_SENSOR_READING       0x30
+>>     /* #define IPMI_NETFN_APP             0x06 In ipmi.h */
+>>   @@ -1739,6 +1740,137 @@ static void get_sensor_type(IPMIBmcSim *ibs,
+>>       rsp_buffer_push(rsp, sens->evt_reading_type_code);
+>>   }
+>>   +static void set_sensor_reading(IPMIBmcSim *ibs,
+>> +                               uint8_t *cmd, unsigned int cmd_len,
+>> +                               RspBuffer *rsp)
+>> +{
+>> +    IPMISensor *sens;
+>> +    uint8_t evd1;
+>> +    uint8_t evd2;
+>> +    uint8_t evd3;
+>> +
+>> +    if ((cmd[2] > MAX_SENSORS) ||
 >=20
-> A typical use would be to loop on the sdrs to build nodes of a device
-> tree.
+> Should be ">=3D" here, I believe.
 >=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> Acked-by: Corey Minyard <cminyard@mvista.com>
 
-I don't know much about IPMI, but since it has Corey's ack, I've
-staged 5..8/21 in my for-2.10 tree.  9 I've left for now, since Corey
-has comments.
+yes.
 
-> ---
->  hw/ipmi/ipmi_bmc_sim.c | 16 ++++++++++++++++
->  include/hw/ipmi/ipmi.h |  2 ++
->  2 files changed, 18 insertions(+)
+
+>> +            !IPMI_SENSOR_GET_PRESENT(ibs->sensors + cmd[2])) {
+>> +        rsp_buffer_set_error(rsp, IPMI_CC_REQ_ENTRY_NOT_PRESENT);
+>> +        return;
+>> +    }
+>> +
+>> +    sens =3D ibs->sensors + cmd[2];
+>> +
+>> +    /* Sensor Reading operation */
+>> +    switch ((cmd[3]) & 0x3) {
+>> +    case 0: /* Do not change */
+>> +        break;
+>> +    case 1: /* write given value to sensor reading byte */
+>> +        sens->reading =3D cmd[4];
+>> +        break;
+>> +    case 2:
+>> +    case 3:
+>> +        rsp_buffer_set_error(rsp, IPMI_CC_INVALID_DATA_FIELD);
+>> +        return;
+>> +    }
+>> +
+>> +    /* Deassertion bits operation */
+>> +    switch ((cmd[3] >> 2) & 0x3) {
+>> +    case 0: /* Do not change */
+>> +        break;
+>> +    case 1: /* write given value */
+>> +        if (cmd_len > 7) {
+>> +            sens->deassert_states =3D cmd[7];
+>> +        }
+>> +        if (cmd_len > 8) {
+>> +            sens->deassert_states =3D cmd[8] << 8;
+>> +        }
+>> +
+>> +    case 2: /* mask on */
+>> +        if (cmd_len > 7) {
+>> +            sens->deassert_states |=3D cmd[7];
+>> +        }
+>> +        if (cmd_len > 8) {
+>> +            sens->deassert_states |=3D cmd[8] << 8;
+>> +        }
+>> +        break;
+>> +    case 3: /* mask off */
+>> +        if (cmd_len > 7) {
+>> +            sens->deassert_states &=3D cmd[7];
+>> +        }
+>> +        if (cmd_len > 8) {
+>> +            sens->deassert_states &=3D (cmd[8] << 8);
+>> +        }
+>> +        break;
+>> +    }
+>> +
+>> +    /* Assertion bits operation */
+>> +    switch ((cmd[3] >> 4) & 0x3) {
+>> +    case 0: /* Do not change */
+>> +        break;
+>> +    case 1: /* write given value */
+>> +        if (cmd_len > 5) {
+>> +            sens->assert_states =3D cmd[5];
+>> +        }
+>> +        if (cmd_len > 6) {
+>> +            sens->assert_states =3D cmd[6] << 8;
+>> +        }
+>> +
+>> +    case 2: /* mask on */
+>> +        if (cmd_len > 5) {
+>> +            sens->assert_states |=3D cmd[5];
+>> +        }
+>> +        if (cmd_len > 6) {
+>> +            sens->assert_states |=3D cmd[6] << 8;
+>> +        }
+>> +        break;
+>> +    case 3: /* mask off */
+>> +        if (cmd_len > 5) {
+>> +            sens->assert_states &=3D cmd[5];
+>> +        }
+>> +        if (cmd_len > 6) {
+>> +            sens->assert_states &=3D (cmd[6] << 8);
+>> +        }
+>> +        break;
+>> +    }
+>> +
+>> +    evd1 =3D evd2 =3D evd3 =3D 0x0;
+>> +    if (cmd_len > 9) {
+>> +        evd1 =3D cmd[9];
+>> +    }
+>> +    if (cmd_len > 10) {
+>> +        evd2 =3D cmd[10];
+>> +    }
+>> +    if (cmd_len > 11) {
+>> +        evd3 =3D cmd[11];
+>> +    }
+>> +
+>> +    /* Event Data Bytes operation */
+>> +    switch ((cmd[3] >> 6) & 0x3) {
+>> +    case 0: /* Do not use the event data in message */
+>> +        evd1 =3D evd2 =3D evd3 =3D 0x0;
+>> +        break;
+>> +    case 1: /* Write given values to event data bytes excluding bits
+>> +             * [3:0] Event Data 1. */
+>> +        evd1 &=3D 0xf0;
+>> +        break;
+>> +    case 2: /* Write given values to event data bytes including bits
+>> +             * [3:0] Event Data 1. */
+>> +        break;
+>> +    case 3:
+>> +        rsp_buffer_set_error(rsp, IPMI_CC_INVALID_DATA_FIELD);
+>> +        return;
+>> +    }
 >=20
-> diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
-> index eae7b2d8c92b..8185a84b76b9 100644
-> --- a/hw/ipmi/ipmi_bmc_sim.c
-> +++ b/hw/ipmi/ipmi_bmc_sim.c
-> @@ -416,6 +416,22 @@ static int sdr_find_entry(IPMISdr *sdr, uint16_t rec=
-id,
->      return 1;
->  }
-> =20
-> +int ipmi_bmc_sdr_find(IPMIBmc *b, uint16_t recid,
-> +                      const struct ipmi_sdr_compact **sdr, uint16_t *nex=
-trec)
-> +
-> +{
-> +    IPMIBmcSim *ibs =3D IPMI_BMC_SIMULATOR(b);
-> +    unsigned int pos;
-> +
-> +    pos =3D 0;
-> +    if (sdr_find_entry(&ibs->sdr, recid, &pos, nextrec)) {
-> +        return -1;
-> +    }
-> +
-> +    *sdr =3D (const struct ipmi_sdr_compact *) &ibs->sdr.sdr[pos];
-> +    return 0;
-> +}
-> +
->  static void sel_inc_reservation(IPMISel *sel)
->  {
->      sel->reservation++;
-> diff --git a/include/hw/ipmi/ipmi.h b/include/hw/ipmi/ipmi.h
-> index 91b83b5bb0b6..0d36cfc6b7f3 100644
-> --- a/include/hw/ipmi/ipmi.h
-> +++ b/include/hw/ipmi/ipmi.h
-> @@ -259,4 +259,6 @@ struct ipmi_sdr_compact {
-> =20
->  typedef uint8_t ipmi_sdr_compact_buffer[sizeof(struct ipmi_sdr_compact)];
-> =20
-> +int ipmi_bmc_sdr_find(IPMIBmc *b, uint16_t recid,
-> +                      const struct ipmi_sdr_compact **sdr, uint16_t *nex=
-trec);
->  #endif
+> I think the above section (from the initialization of evd<n>) should be=
+ moved to
+> right before the sensor reading handling.  Otherwise, on an error you w=
+ill set the sensor
+> reading and assertion bits but will return an error from the command an=
+d not
+> send an event.  Actually, it may be better to create local copies of th=
+e reading
+> and the assertion bits and commit everything together at the end, for r=
+easons
+> I will talk about later, and because it's more clear.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Yes it seems better.
 
---cQXOx3fnlpmgJsTP
-Content-Type: application/pgp-signature; name="signature.asc"
+> There is some vagueness in the spec about how to handle the event data =
+bytes if
+> they are not present in the command but the command says to use them.  =
+I'm
+> ok with this implementation, but I'm wondering if returning an error wo=
+uldn't be
+> better in this particular case.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+I can add that.
+=20
+> The spec is also silent about how to handle setting threshold bits if t=
+hey are not
+> present but the value exceeds the thresholds.  I'm not sure what to do =
+here.
+> My gut says that the event should be generated, but that add a lot of c=
+omplexity.
+> We should probably at least add a comment about this if we don't do it,=
+ since
+> there is no handling of threshold sensors for event generation below.
 
-iQIcBAEBCAAGBQJY5dPlAAoJEGw4ysog2bOSDQMP/0PvY3Z+XFUtg2ZRF8MuAVUx
-OK3zpNwYEkmXFZdZG6AV+NICcJ5QwvpbWpyKPIFbF9bo1UU72iORTQDn95sUmV/x
-qiNM5UbIs9MYDXbZi9MdFNnsRtJUubIAysgCp6gPoYzPK9J8Zq/92Snlq+ErJ1mp
-8o1JdbhPSYx8bjkiChDC+UoGQLEoubs4PXy3hP7NiKnXgUwZZoK1lx3udJRsZ9pX
-gH5aKXyNHqAK18XSesUjs1kgE+mTF4F86zxqSQ+00IO5+mUQkaE52b4bOQfp7gIq
-cYFPrKIhQH2vEuQWh37TtNx8zbGKQ1EkzsvVG7PzypfsSpAfVHiNwvvrJSdnud/N
-F7vN7iHXHMQkddi5Etff90Sj7pNEZEICQaMegUkFgmLkavmG5ch37faxeUix57M2
-z8vHw7aGDWeQ424IWswc9x9u94gXl4njb556Q9nc8mlUG5E85W4vcXpN4r+/xChn
-FkvK6+A80mI8NYWO8kqGiecJezhRtdDOSuTFrkeMQmB1fnPFzp0x4g4vbzJeBj7l
-9NU6jZRjHMA3Id3P2408+9TiACs+505p1Qlc7m6YwPNf+gEXDa00NTTjuFJJZkvM
-7xAFxgLjTwp5ZHQh43nGENhBpsJgRwJ4E0UUAXri+RLwR3f07Qu4u8+Be8EpdanC
-eRhFe2QmOXIc7LAKH/Vy
-=59o7
------END PGP SIGNATURE-----
+I will leave that as a TODO for the moment. The command is becoming quite=
+ complex.
 
---cQXOx3fnlpmgJsTP--
+>> +
+>> +    if (IPMI_SENSOR_IS_DISCRETE(sens)) {
+>> +        unsigned int bit =3D evd1 & 0xf;
+>> +        uint16_t mask =3D (1 << bit);
+>> +
+>> +        if (sens->assert_states & mask & sens->assert_enable) {
+>> +            gen_event(ibs, cmd[2], 0, evd1, evd2, evd3);
+>> +        }
+>> +
+>> +        if (sens->deassert_states & mask & sens->deassert_enable) {
+>> +            gen_event(ibs, cmd[2], 1, evd1, evd2, evd3);
+>> +        }
+>=20
+> You should only generate the events if the values change. =20
+
+hmm, if we do that test, we would not genereate an event if only evd2=20
+changes. This is case with the command sent by the OpenPOWER firmware.
+
+Should we really test for a change of the {de}assert_states fields ?=20
+
+> So you need to save
+> the original values so you can compare.  Also, if the command requests =
+that the
+> BMC generate it's own event, you would need to scan the new values comp=
+ared
+> with the old values and send events for each bit that needs it.=20
+
+I will see what I can do. I am not sure which event data I should be=20
+using in that case ...
+
+> Again, more
+> complexity, but we should at least comment that we are not doing someth=
+ing
+> that may be needed later.
+
+OK. Thanks,
+
+C.
+
+> -corey
+>=20
+>> +    }
+>> +}
+>>     static const IPMICmdHandler chassis_cmds[] =3D {
+>>       [IPMI_CMD_GET_CHASSIS_CAPABILITIES] =3D { chassis_capabilities }=
+,
+>> @@ -1759,6 +1891,7 @@ static const IPMICmdHandler sensor_event_cmds[] =
+=3D {
+>>       [IPMI_CMD_GET_SENSOR_READING] =3D { get_sensor_reading, 3 },
+>>       [IPMI_CMD_SET_SENSOR_TYPE] =3D { set_sensor_type, 5 },
+>>       [IPMI_CMD_GET_SENSOR_TYPE] =3D { get_sensor_type, 3 },
+>> +    [IPMI_CMD_SET_SENSOR_READING] =3D { set_sensor_reading, 5 },
+>>   };
+>>   static const IPMINetfn sensor_event_netfn =3D {
+>>       .cmd_nums =3D ARRAY_SIZE(sensor_event_cmds),
+>=20
+>=20
