@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cw7EF-0000wq-Ch
+	(envelope-from <quintela@redhat.com>) id 1cw7EF-0000wt-Cq
 	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:13:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cw7EE-0001Zq-3Q
+	(envelope-from <quintela@redhat.com>) id 1cw7ED-0001ZW-K6
 	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:13:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44142)
+Received: from mx1.redhat.com ([209.132.183.28]:56922)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cw7ED-0001ZK-Ro
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:13:34 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cw7ED-0001Z8-EZ
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:13:33 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E96F87D0CD
-	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 13:13:32 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 994AA8E678
+	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 13:13:31 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu,  6 Apr 2017 15:13:24 +0200
-Message-Id: <20170406131326.2418-4-quintela@redhat.com>
+Date: Thu,  6 Apr 2017 15:13:23 +0200
+Message-Id: <20170406131326.2418-3-quintela@redhat.com>
 In-Reply-To: <20170406131326.2418-1-quintela@redhat.com>
 References: <20170406131326.2418-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/5] qdev: Move qdev_unplug() to qdev-monitor.c
+Subject: [Qemu-devel] [PATCH 2/5] qdev: Export qdev_hot_removed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,104 +32,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com
 
-It is not used by linux-user, otherwise I need to to create one stub
-for migration_is_idle() on following patch.
+I need to move qdev_unplug to qdev-monitor in the following patch, and
+it needs access to this variable.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- hw/core/qdev.c | 34 ----------------------------------
- qdev-monitor.c | 34 ++++++++++++++++++++++++++++++++++
- 2 files changed, 34 insertions(+), 34 deletions(-)
+ hw/core/qdev.c         | 2 +-
+ include/hw/qdev-core.h | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index c26cf84..0df0050 100644
+index 6fa46b5..c26cf84 100644
 --- a/hw/core/qdev.c
 +++ b/hw/core/qdev.c
-@@ -271,40 +271,6 @@ HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev)
-     return hotplug_ctrl;
- }
+@@ -41,7 +41,7 @@
  
--void qdev_unplug(DeviceState *dev, Error **errp)
--{
--    DeviceClass *dc = DEVICE_GET_CLASS(dev);
--    HotplugHandler *hotplug_ctrl;
--    HotplugHandlerClass *hdc;
--
--    if (dev->parent_bus && !qbus_is_hotpluggable(dev->parent_bus)) {
--        error_setg(errp, QERR_BUS_NO_HOTPLUG, dev->parent_bus->name);
--        return;
--    }
--
--    if (!dc->hotpluggable) {
--        error_setg(errp, QERR_DEVICE_NO_HOTPLUG,
--                   object_get_typename(OBJECT(dev)));
--        return;
--    }
--
--    qdev_hot_removed = true;
--
--    hotplug_ctrl = qdev_get_hotplug_handler(dev);
--    /* hotpluggable device MUST have HotplugHandler, if it doesn't
--     * then something is very wrong with it */
--    g_assert(hotplug_ctrl);
--
--    /* If device supports async unplug just request it to be done,
--     * otherwise just remove it synchronously */
--    hdc = HOTPLUG_HANDLER_GET_CLASS(hotplug_ctrl);
--    if (hdc->unplug_request) {
--        hotplug_handler_unplug_request(hotplug_ctrl, dev, errp);
--    } else {
--        hotplug_handler_unplug(hotplug_ctrl, dev, errp);
--    }
--}
--
- static int qdev_reset_one(DeviceState *dev, void *opaque)
- {
-     device_reset(dev);
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index 5f2fcdf..bb3d8ba 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -836,6 +836,40 @@ static DeviceState *find_device_state(const char *id, Error **errp)
-     return DEVICE(obj);
- }
+ bool qdev_hotplug = false;
+ static bool qdev_hot_added = false;
+-static bool qdev_hot_removed = false;
++bool qdev_hot_removed = false;
  
-+void qdev_unplug(DeviceState *dev, Error **errp)
-+{
-+    DeviceClass *dc = DEVICE_GET_CLASS(dev);
-+    HotplugHandler *hotplug_ctrl;
-+    HotplugHandlerClass *hdc;
-+
-+    if (dev->parent_bus && !qbus_is_hotpluggable(dev->parent_bus)) {
-+        error_setg(errp, QERR_BUS_NO_HOTPLUG, dev->parent_bus->name);
-+        return;
-+    }
-+
-+    if (!dc->hotpluggable) {
-+        error_setg(errp, QERR_DEVICE_NO_HOTPLUG,
-+                   object_get_typename(OBJECT(dev)));
-+        return;
-+    }
-+
-+    qdev_hot_removed = true;
-+
-+    hotplug_ctrl = qdev_get_hotplug_handler(dev);
-+    /* hotpluggable device MUST have HotplugHandler, if it doesn't
-+     * then something is very wrong with it */
-+    g_assert(hotplug_ctrl);
-+
-+    /* If device supports async unplug just request it to be done,
-+     * otherwise just remove it synchronously */
-+    hdc = HOTPLUG_HANDLER_GET_CLASS(hotplug_ctrl);
-+    if (hdc->unplug_request) {
-+        hotplug_handler_unplug_request(hotplug_ctrl, dev, errp);
-+    } else {
-+        hotplug_handler_unplug(hotplug_ctrl, dev, errp);
-+    }
-+}
-+
- void qmp_device_del(const char *id, Error **errp)
+ const VMStateDescription *qdev_get_vmsd(DeviceState *dev)
  {
-     DeviceState *dev = find_device_state(id, errp);
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index a96a913..f09b6b7 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -387,6 +387,7 @@ Object *qdev_get_machine(void);
+ void qdev_set_parent_bus(DeviceState *dev, BusState *bus);
+ 
+ extern bool qdev_hotplug;
++extern bool qdev_hot_removed;
+ 
+ char *qdev_get_dev_path(DeviceState *dev);
+ 
 -- 
 2.9.3
