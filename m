@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cw4px-0000rA-Rj
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 06:40:23 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1cw4sj-0001jx-AK
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 06:43:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cw4pt-0002yi-Ng
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 06:40:21 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:36108)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cw4pt-0002yK-H7
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 06:40:17 -0400
-Received: by mail-wr0-x243.google.com with SMTP id o21so5002991wrb.3
-	for <qemu-devel@nongnu.org>; Thu, 06 Apr 2017 03:40:17 -0700 (PDT)
-Date: Thu, 6 Apr 2017 11:40:13 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170406104013.GD21895@stefanha-x1.localdomain>
-References: <CA+Vqw5nfvdR-sE6DfmxMJmbE6+khoYLZSh+JAPD_9vVHtfdBpg@mail.gmail.com>
+	(envelope-from <eric.auger@redhat.com>) id 1cw4sg-0003gh-36
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 06:43:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46438)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1cw4sf-0003fN-Ql
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 06:43:10 -0400
+References: <1491462524-1617-1-git-send-email-peterx@redhat.com>
+	<1491462524-1617-2-git-send-email-peterx@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <0fc836bc-499b-f6b9-f862-9ba26a96beda@redhat.com>
+Date: Thu, 6 Apr 2017 12:42:54 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="M38YqGLZlgb6RLPS"
-Content-Disposition: inline
-In-Reply-To: <CA+Vqw5nfvdR-sE6DfmxMJmbE6+khoYLZSh+JAPD_9vVHtfdBpg@mail.gmail.com>
-Subject: Re: [Qemu-devel] Performance problem and improvement about block
- drive on NFS shares with libnfs
+In-Reply-To: <1491462524-1617-2-git-send-email-peterx@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 1/9] memory: add section range info for
+ IOMMU notifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,94 +29,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jaden Liang <jaden1q84@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, Marcel Apfelbaum <marcel@redhat.com>, bd.aviv@gmail.com, David Gibson <david@gibson.dropbear.id.au>
 
+Hi Peter,
+On 06/04/2017 09:08, Peter Xu wrote:
+> In this patch, IOMMUNotifier.{start|end} are introduced to store section
+> information for a specific notifier. When notification occurs, we not
+> only check the notification type (MAP|UNMAP), but also check whether the
+> notified iova range overlaps with the range of specific IOMMU notifier,
+> and skip those notifiers if not in the listened range.
+> 
+> When removing an region, we need to make sure we removed the correct
+> VFIOGuestIOMMU by checking the IOMMUNotifier.start address as well.
+> 
+> This patch is solving the problem that vfio-pci devices receive
+> duplicated UNMAP notification on x86 platform when vIOMMU is there. The
+> issue is that x86 IOMMU has a (0, 2^64-1) IOMMU region, which is
+> splitted by the (0xfee00000, 0xfeefffff) IRQ region. AFAIK
+> this (splitted IOMMU region) is only happening on x86.
+I think this is likely to happen on other architectures too as "reserved
+regions" are now exported to the user space.
+> 
+> This patch also helps vhost to leverage the new interface as well, so
+> that vhost won't get duplicated cache flushes. In that sense, it's an
+> slight performance improvement.
+> 
+> Suggested-by: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+Looks good to me.
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
---M38YqGLZlgb6RLPS
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks
 
-On Sat, Apr 01, 2017 at 01:23:46PM +0800, Jaden Liang wrote:
-> Hello,
->=20
-> I ran qemu with drive file via libnfs recently, and found some performance
-> problem and an improvement idea.
->=20
-> I started qemu with 6 drives parameter like nfs://127.0.0.1/dir/vm-disk-x=
-=2Eqcow2
-> which linked to a local NFS server, then used iometer in guest machine to=
- test
-> the 4K random read or random write IO performance. I found that while the=
- IO
-> depth go up, the IOPS hit a bottleneck. I looked into the causes, found t=
-hat the
-> main thread of qemu used 100% CPU. From the perf data, it show the CPU he=
-ats are
-> send / recv calls in libnfs. By reading the source code of libnfs and qem=
-u block
-> drive of nfs.c, libnfs only support single work thread, and the network e=
-vents
-> of nfs interface in qemu are all registered in the epoll of main thread. =
-That is
-> the cause why main thread uses 100% CPU.
->=20
-> After the analysis above, there is an improvement idea comes up. I start a
-> thread for every drive while libnfs open drive file, then create an epoll=
- in
-> every drive thread to handle all of the network events. I have finished a=
-n demo
-> modification in block/nfs.c, then rerun iometer in the guest machine, the
-> performance increased a lot. Random read IOPS increases almost 100%, rand=
-om
-> write IOPS increases about 68%.
->=20
-> Test model details
-> VM configure: 6 vdisks in 1 VM
-> Test tool and parameter: iometer with 4K random read and randwrite
-> Backend physical drive: 2 SSDs, 6 vdisks are seperated in 2 SSDs
->=20
-> Before modified:
-> IO Depth           1        2          4           8       16         32
-> 4K randread  16659  28387   42932   46868   52108   55760
-> 4K randwrite  12212   19456   30447   30574   35788   39015
->=20
-> After modified:
-> IO Depth            1         2          4          8        16          =
-32
-> 4K randread   17661   33115   57138   82016   99369   109410
-> 4K randwrite  12669   21492   36017   51532   61475   65577
->=20
-> I could put a up to coding standard patch later. Now I want to get some a=
-dvise
-> about this modification. Is this a reasonable solution to improve perform=
-ance in
-> NFS shares? Or there is another better way?
->=20
-> Any suggestions would be great! Also please feel free to ask question.
-
-Did you try using -object iothread,id=3Diothread1 -device
-virtio-blk-pci,iothread=3Diothread1,... to define IOThreads for each
-virtio-blk-pci device?
-
-The block/nfs.c code already supports IOThread so you can run multiple
-threads and don't need to use 100% CPU in the main loop.
-
-Stefan
-
---M38YqGLZlgb6RLPS
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJY5hsNAAoJEJykq7OBq3PI5RkH/1uvI33ztiNZ1teiiZjROU6f
-MWe1aV8FFofTey6d4ddOivWN3FthJL9/uybXOiwYgBFJU8lD/AJe4P/pFhEeUAre
-PTK0I1oW+bBPoErMmHZ0cQPe8jkQJ5YpZlN9UaCQMglXWbw8Yj1yLpWoDzhZ4BUe
-wkUKDuFuxZe/+7oPmtPeZP2UGoFLo02PxsZSc8Hvnay3WojKB7yn2s4uU+PGPTTj
-Y/Iu0LA8DX3zWC4JySL+wyoCayUnLn85++ae1GZ88ByUNbaqq7wH/vkDtxklXG30
-k2q4AY2S+Ipbbl3BJniMsqD1KJdlemy2VJE1/tn5ET9lu6ZKTp4Bs5QSEvy8s1w=
-=BsAW
------END PGP SIGNATURE-----
-
---M38YqGLZlgb6RLPS--
+Eric
+> ---
+> v7->v8:
+> - let vhost dmar leverage the new interface as well
+> - add some more comments in commit message, mentioning what issue this
+>   patch has solved
+> - since touched up, removing Alex's a-b and DavidG's r-b
+> ---
+>  hw/vfio/common.c      | 12 +++++++++---
+>  hw/virtio/vhost.c     | 10 ++++++++--
+>  include/exec/memory.h | 19 ++++++++++++++++++-
+>  memory.c              |  9 +++++++++
+>  4 files changed, 44 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index f3ba9b9..6b33b9f 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -478,8 +478,13 @@ static void vfio_listener_region_add(MemoryListener *listener,
+>          giommu->iommu_offset = section->offset_within_address_space -
+>                                 section->offset_within_region;
+>          giommu->container = container;
+> -        giommu->n.notify = vfio_iommu_map_notify;
+> -        giommu->n.notifier_flags = IOMMU_NOTIFIER_ALL;
+> +        llend = int128_add(int128_make64(section->offset_within_region),
+> +                           section->size);
+> +        llend = int128_sub(llend, int128_one());
+> +        iommu_notifier_init(&giommu->n, vfio_iommu_map_notify,
+> +                            IOMMU_NOTIFIER_ALL,
+> +                            section->offset_within_region,
+> +                            int128_get64(llend));
+>          QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
+>  
+>          memory_region_register_iommu_notifier(giommu->iommu, &giommu->n);
+> @@ -550,7 +555,8 @@ static void vfio_listener_region_del(MemoryListener *listener,
+>          VFIOGuestIOMMU *giommu;
+>  
+>          QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
+> -            if (giommu->iommu == section->mr) {
+> +            if (giommu->iommu == section->mr &&
+> +                giommu->n.start == section->offset_within_region) {
+>                  memory_region_unregister_iommu_notifier(giommu->iommu,
+>                                                          &giommu->n);
+>                  QLIST_REMOVE(giommu, giommu_next);
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index 613494d..185b95b 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -736,14 +736,20 @@ static void vhost_iommu_region_add(MemoryListener *listener,
+>      struct vhost_dev *dev = container_of(listener, struct vhost_dev,
+>                                           iommu_listener);
+>      struct vhost_iommu *iommu;
+> +    Int128 end;
+>  
+>      if (!memory_region_is_iommu(section->mr)) {
+>          return;
+>      }
+>  
+>      iommu = g_malloc0(sizeof(*iommu));
+> -    iommu->n.notify = vhost_iommu_unmap_notify;
+> -    iommu->n.notifier_flags = IOMMU_NOTIFIER_UNMAP;
+> +    end = int128_add(int128_make64(section->offset_within_region),
+> +                     section->size);
+> +    end = int128_sub(end, int128_one());
+> +    iommu_notifier_init(&iommu->n, vhost_iommu_unmap_notify,
+> +                        IOMMU_NOTIFIER_UNMAP,
+> +                        section->offset_within_region,
+> +                        int128_get64(end));
+>      iommu->mr = section->mr;
+>      iommu->iommu_offset = section->offset_within_address_space -
+>                            section->offset_within_region;
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index f20b191..0840c89 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -77,13 +77,30 @@ typedef enum {
+>  
+>  #define IOMMU_NOTIFIER_ALL (IOMMU_NOTIFIER_MAP | IOMMU_NOTIFIER_UNMAP)
+>  
+> +struct IOMMUNotifier;
+> +typedef void (*IOMMUNotify)(struct IOMMUNotifier *notifier,
+> +                            IOMMUTLBEntry *data);
+> +
+>  struct IOMMUNotifier {
+> -    void (*notify)(struct IOMMUNotifier *notifier, IOMMUTLBEntry *data);
+> +    IOMMUNotify notify;
+>      IOMMUNotifierFlag notifier_flags;
+> +    /* Notify for address space range start <= addr <= end */
+> +    hwaddr start;
+> +    hwaddr end;
+>      QLIST_ENTRY(IOMMUNotifier) node;
+>  };
+>  typedef struct IOMMUNotifier IOMMUNotifier;
+>  
+> +static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
+> +                                       IOMMUNotifierFlag flags,
+> +                                       hwaddr start, hwaddr end)
+> +{
+> +    n->notify = fn;
+> +    n->notifier_flags = flags;
+> +    n->start = start;
+> +    n->end = end;
+> +}
+> +
+>  /* New-style MMIO accessors can indicate that the transaction failed.
+>   * A zero (MEMTX_OK) response means success; anything else is a failure
+>   * of some kind. The memory subsystem will bitwise-OR together results
+> diff --git a/memory.c b/memory.c
+> index 4c95aaf..75ac595 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -1606,6 +1606,7 @@ void memory_region_register_iommu_notifier(MemoryRegion *mr,
+>  
+>      /* We need to register for at least one bitfield */
+>      assert(n->notifier_flags != IOMMU_NOTIFIER_NONE);
+> +    assert(n->start <= n->end);
+>      QLIST_INSERT_HEAD(&mr->iommu_notify, n, node);
+>      memory_region_update_iommu_notify_flags(mr);
+>  }
+> @@ -1667,6 +1668,14 @@ void memory_region_notify_iommu(MemoryRegion *mr,
+>      }
+>  
+>      QLIST_FOREACH(iommu_notifier, &mr->iommu_notify, node) {
+> +        /*
+> +         * Skip the notification if the notification does not overlap
+> +         * with registered range.
+> +         */
+> +        if (iommu_notifier->start > entry.iova + entry.addr_mask + 1 ||
+> +            iommu_notifier->end < entry.iova) {
+> +            continue;
+> +        }
+>          if (iommu_notifier->notifier_flags & request_flags) {
+>              iommu_notifier->notify(iommu_notifier, &entry);
+>          }
+> 
