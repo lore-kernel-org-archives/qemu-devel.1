@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cw5VK-0000rY-Gz
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 07:23:07 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1cw5dC-0004Kq-9R
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 07:31:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cw5VJ-0004nW-Bk
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 07:23:06 -0400
-Date: Thu, 6 Apr 2017 13:22:56 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170406112256.GF4341@noname.redhat.com>
-References: <1491320156-4629-1-git-send-email-kwolf@redhat.com>
-	<d74fad45-9f89-6f34-020f-87e6b20ea59b@redhat.com>
+	(envelope-from <eric.auger@redhat.com>) id 1cw5d9-0000iB-5A
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 07:31:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40198)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1cw5d8-0000hh-SM
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 07:31:11 -0400
+References: <1491462524-1617-1-git-send-email-peterx@redhat.com>
+	<1491462524-1617-3-git-send-email-peterx@redhat.com>
+	<7e00fb5f-fe48-1e8f-3441-eacacf67e931@redhat.com>
+	<20170406111227.GB3981@pxdev.xzpeter.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <8bbb752a-61b1-e2f9-f4cf-a603ec7fa565@redhat.com>
+Date: Thu, 6 Apr 2017 13:30:54 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="sm4nu43k4a2Rpi4c"
-Content-Disposition: inline
-In-Reply-To: <d74fad45-9f89-6f34-020f-87e6b20ea59b@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH for-2.9] block: Ignore guest dev
- permissions during incoming migration
+In-Reply-To: <20170406111227.GB3981@pxdev.xzpeter.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 2/9] memory: provide
+ IOMMU_NOTIFIER_FOREACH macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,113 +31,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, pbonzini@redhat.com, jcody@redhat.com, Ciprian.Barbu@enea.com, Alexandru.Avadanii@enea.com, armband@enea.com, eblake@redhat.com, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, Marcel Apfelbaum <marcel@redhat.com>, bd.aviv@gmail.com, David Gibson <david@gibson.dropbear.id.au>
 
+Hi,
 
---sm4nu43k4a2Rpi4c
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 06/04/2017 13:12, Peter Xu wrote:
+> On Thu, Apr 06, 2017 at 12:45:59PM +0200, Auger Eric wrote:
+>> Hi Peter,
+>> On 06/04/2017 09:08, Peter Xu wrote:
+>>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>>> Signed-off-by: Peter Xu <peterx@redhat.com>
+>> Even if the commit message is obvious it may be requested?
+> 
+> Do you mean we'd better provide a commit message?
+> 
+> How about this:
+> 
+>   A new macro is provided to iterate all the IOMMU notifiers hooked
+>   under specific IOMMU memory region.
+yep perfect
 
-Am 05.04.2017 um 15:22 hat Max Reitz geschrieben:
-> On 04.04.2017 17:35, Kevin Wolf wrote:
-> > Usually guest devices don't like other writers to the same image, so
-> > they use blk_set_perm() to prevent this from happening. In the migration
-> > phase before the VM is actually running, though, they don't have a
-> > problem with writes to the image. On the other hand, storage migration
-> > needs to be able to write to the image in this phase, so the restrictive
-> > blk_set_perm() call of qdev devices breaks it.
-> >=20
-> > This patch flags all BlockBackends with a qdev device as
-> > blk->disable_perm during incoming migration, which means that the
-> > requested permissions are stored in the BlockBackend, but not actually
-> > applied to its root node yet.
-> >=20
-> > Once migration has finished and the VM should be resumed, the
-> > permissions are applied. If they cannot be applied (e.g. because the NBD
-> > server used for block migration hasn't been shut down), resuming the VM
-> > fails.
-> >=20
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  block/block-backend.c | 40 +++++++++++++++++++++++++++++++++++++++-
-> >  include/block/block.h |  2 ++
-> >  migration/migration.c |  8 ++++++++
-> >  qmp.c                 |  6 ++++++
-> >  4 files changed, 55 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/block/block-backend.c b/block/block-backend.c
-> > index 0b63773..f817040 100644
-> > --- a/block/block-backend.c
-> > +++ b/block/block-backend.c
->=20
-> [...]
->=20
-> > @@ -597,15 +598,52 @@ void blk_get_perm(BlockBackend *blk, uint64_t *pe=
-rm, uint64_t *shared_perm)
-> >      *shared_perm =3D blk->shared_perm;
-> >  }
-> > =20
-> > +/*
-> > + * Notifies the user of all BlockBackends that migration has completed=
-=2E qdev
-> > + * devices can tighten their permissions in response (specifically rev=
-oke
-> > + * shared write permissions that we needed for storage migration).
-> > + *
-> > + * If an error is returned, the VM cannot be allowed to be resumed.
-> > + */
-> > +void blk_resume_after_migration(Error **errp)
-> > +{
-> > +    BlockBackend *blk;
-> > +    Error *local_err =3D NULL;
-> > +
-> > +    for (blk =3D blk_next(NULL); blk; blk =3D blk_next(blk)) {
->=20
-> Shouldn't we use blk_all_next()?
-
-Good catch, thanks.
-
-At first I added it into the loop in qmp_cont() and then copied it here
-without noticing the resetting the iostatus is really only needed for
-monitor-owned BBs at the moment, but this one is different.
-
-Of course, as soon as we improve query-block to work reasonably well
-with -device drive=3D<node-name>, qmp_cont() needs to use blk_all_next(),
-too.
-
-> Trusting you that silently disabling autostart is something the upper
-> layers can deal with, the rest looks good to me.
->=20
-> (The only other runtime changes of autostart apart from stop/cont appear
-> to be in blockdev_init() (if (bdrv_key_required()), but I don't think
-> that can happen anymore) and in migration/colo.c (which enables it and
-> emits an error message).)
-
-I think in practice libvirt always sets -S on the destination anyway.
-
-Kevin
-
---sm4nu43k4a2Rpi4c
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJY5iUQAAoJEH8JsnLIjy/WgC0P/RkED5mLmESbceywnfDnqf1x
-Js7Bhotm65msEnGRy8hi/Q4MD1BaywKQqjPSqWptplRIJv3xTFTKMydydGZNCHIr
-AxyW/z0cxoBmnTPYoPkHPb0/NyzDf3UhWA9+bc2N4C/P1QFTA9PoAgCQQtuU7vKl
-4J9NzcrOYC4yzhx/CMVkGtTCyAtXI9HZikxT6TSRYdfPG1NYHkvBkMvfc418ENdc
-MM4rNW7/bQ8GbSbXijKtUjvzEKzxInleeAQUJ/+D+CZgsCuxkrk7ZJUU5VF1xQlI
-SvaGTrFUTIb9UOoGgcz/0qs5mC7Gq7u1HtoClMocQ0dgY3SmlsMs16p0AiAJyjh1
-qrGVo5QGdpwGJDaOwHrYguvQHUWThaTqhGpbHHQDi73Z0b30iTPrquL+3NV7pc9P
-nqhb68xNQqx8F/M2T1w+aXI8PNiWVOmQelS3ZamwrOoFueos+Vs6cqPFUGhQKYui
-x2EYKKFkArrChjN72ZHzRzQrYLuNWyatxxU62bRxufVQ84WYFs5Fw5z1/8qaqc2U
-Ez4SnJ8QF18vBFin7VmqZ8vHFc4HYj93J8QlYWsnWMFkaGbVCNpS/6JUI39/+wX+
-VZdYaTMcWF3NQHarr8zqFuN+Zb1Nrlef5AkGTbEj7V8QW0/mf5bP5J5NyPimcQf+
-09mmNdJ2EkaiWrISw8O8
-=FHzh
------END PGP SIGNATURE-----
-
---sm4nu43k4a2Rpi4c--
+Eric
+> 
+> Thanks,
+> 
+>>
+>> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+>>
+>>> ---
+>>>  include/exec/memory.h | 3 +++
+>>>  memory.c              | 4 ++--
+>>>  2 files changed, 5 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/include/exec/memory.h b/include/exec/memory.h
+>>> index 0840c89..07e43da 100644
+>>> --- a/include/exec/memory.h
+>>> +++ b/include/exec/memory.h
+>>> @@ -239,6 +239,9 @@ struct MemoryRegion {
+>>>      IOMMUNotifierFlag iommu_notify_flags;
+>>>  };
+>>>  
+>>> +#define IOMMU_NOTIFIER_FOREACH(n, mr) \
+>>> +    QLIST_FOREACH((n), &(mr)->iommu_notify, node)
+>>> +
+>>>  /**
+>>>   * MemoryListener: callbacks structure for updates to the physical memory map
+>>>   *
+>>> diff --git a/memory.c b/memory.c
+>>> index 75ac595..7496b3d 100644
+>>> --- a/memory.c
+>>> +++ b/memory.c
+>>> @@ -1583,7 +1583,7 @@ static void memory_region_update_iommu_notify_flags(MemoryRegion *mr)
+>>>      IOMMUNotifierFlag flags = IOMMU_NOTIFIER_NONE;
+>>>      IOMMUNotifier *iommu_notifier;
+>>>  
+>>> -    QLIST_FOREACH(iommu_notifier, &mr->iommu_notify, node) {
+>>> +    IOMMU_NOTIFIER_FOREACH(iommu_notifier, mr) {
+>>>          flags |= iommu_notifier->notifier_flags;
+>>>      }
+>>>  
+>>> @@ -1667,7 +1667,7 @@ void memory_region_notify_iommu(MemoryRegion *mr,
+>>>          request_flags = IOMMU_NOTIFIER_UNMAP;
+>>>      }
+>>>  
+>>> -    QLIST_FOREACH(iommu_notifier, &mr->iommu_notify, node) {
+>>> +    IOMMU_NOTIFIER_FOREACH(iommu_notifier, mr) {
+>>>          /*
+>>>           * Skip the notification if the notification does not overlap
+>>>           * with registered range.
+>>>
+> 
+> -- peterx
+> 
