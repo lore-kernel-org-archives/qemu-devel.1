@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36823)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cw979-0004KB-4g
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 11:14:24 -0400
+	(envelope-from <kwolf@redhat.com>) id 1cw9AS-0006l0-E1
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 11:17:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cw975-00085C-VB
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 11:14:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33252)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cw975-000854-P6
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 11:14:19 -0400
-Date: Thu, 6 Apr 2017 16:14:15 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170406151415.GE31259@stefanha-x1.localdomain>
-References: <1491405126-30591-1-git-send-email-den@openvz.org>
-	<1491405126-30591-2-git-send-email-den@openvz.org>
+	(envelope-from <kwolf@redhat.com>) id 1cw9AR-0000UJ-Fh
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 11:17:48 -0400
+Date: Thu, 6 Apr 2017 17:17:33 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170406151733.GJ4341@noname.redhat.com>
+References: <20170406142527.25835-1-famz@redhat.com>
+	<20170406142527.25835-4-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="TD8GDToEDw0WLGOL"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1491405126-30591-2-git-send-email-den@openvz.org>
-Subject: Re: [Qemu-devel] [PATCH 1/2] parallels: create
- parallels_inactivate() callback of block driver state
+In-Reply-To: <20170406142527.25835-4-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.9 3/5] block: Quiesce old aio context
+ during bdrv_set_aio_context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>
-Cc: qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-
---TD8GDToEDw0WLGOL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Apr 05, 2017 at 06:12:05PM +0300, Denis V. Lunev wrote:
-> We should avoid to image file at migration end when BDRV_O_INACTIVE
-
-s/avoid to image/avoid writing to the image/ ?
-
-> is set on the block driver state. All modifications should be done
-> in advance, i.e. in bdrv_inactivate.
->=20
-> The patch also adds final bdrv_flush() to be sure that changes have
-> reached disk finally before other side will access the image.
-
-If migration fails/cancels on the source after .bdrv_inactivate() we
-need to return to the "activated" state.  .bdrv_invalidate_cache() will
-be called so I think it needs to be implemented by parallels to set
-s->header->inuse again if BDRV_O_RDWR.
-
-=2Ebdrv_invalidate_cache() is also called on the destination at live
-migration handover.  That's okay - it makes sense for the destination to
-set the inuse field on success.
-
-> -static void parallels_close(BlockDriverState *bs)
-> +static int parallels_inactivate(BlockDriverState *bs)
+Am 06.04.2017 um 16:25 hat Fam Zheng geschrieben:
+> The fact that the bs->aio_context is changing can confuse the dataplane
+> iothread, because of the now fine granularity aio context lock.
+> bdrv_drain should rather be a bdrv_drained_begin/end pair, but since
+> bs->aio_context is changing, we can just use aio_disable_external and
+> block_job_pause.
+> 
+> Reported-by: Ed Swierk <eswierk@skyportsystems.com>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  block.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block.c b/block.c
+> index 8893ac1..e70684a 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -4395,11 +4395,14 @@ void bdrv_attach_aio_context(BlockDriverState *bs,
+>  
+>  void bdrv_set_aio_context(BlockDriverState *bs, AioContext *new_context)
 >  {
-> +    int err;
->      BDRVParallelsState *s =3D bs->opaque;
-> =20
-> -    if (bs->open_flags & BDRV_O_RDWR) {
-> -        s->header->inuse =3D 0;
-> -        parallels_update_header(bs);
-> +    if (!(bs->open_flags & BDRV_O_RDWR)) {
-> +        return 0;
+> -    AioContext *ctx;
+> +    AioContext *ctx = bdrv_get_aio_context(bs);
+>  
+> +    aio_disable_external(ctx);
+> +    if (bs->job) {
+> +        block_job_pause(bs->job);
 > +    }
-> +
-> +    s->header->inuse =3D 0;
-> +    err =3D parallels_update_header(bs);
-> +    if (err < 0) {
 
-Should we set s->header->inuse again in all error paths in case
-something calls parallels_hupdate_header() again later?
+Even more bs->job users... :-(
 
---TD8GDToEDw0WLGOL
-Content-Type: application/pgp-signature; name="signature.asc"
+But is this one actually necessary? We drain all pending BHs below, so
+the job shouldn't have any requests in flight or be able to submit new
+ones while we switch.
 
------BEGIN PGP SIGNATURE-----
+>      bdrv_drain(bs); /* ensure there are no in-flight requests */
+>  
+> -    ctx = bdrv_get_aio_context(bs);
+>      while (aio_poll(ctx, false)) {
+>          /* wait for all bottom halves to execute */
+>      }
+> @@ -4412,6 +4415,10 @@ void bdrv_set_aio_context(BlockDriverState *bs, AioContext *new_context)
+>      aio_context_acquire(new_context);
+>      bdrv_attach_aio_context(bs, new_context);
+>      aio_context_release(new_context);
+> +    if (bs->job) {
+> +        block_job_resume(bs->job);
+> +    }
+> +    aio_enable_external(ctx);
+>  }
 
-iQEcBAEBAgAGBQJY5ltHAAoJEJykq7OBq3PIqGAH/1Sj7gEtPlQOsSZPyucmuTVX
-70BkHIPiV0ZQ4kRHj9P+znRAZXz4GgwqfUhOLHzUA3PjawyuamjkLmJqgmSQugWn
-XsHmU4VsmWw9lMaYjzSYCvmOZ5YYJuac4qot7QGemwLr7KCbQKVU0eeO2aUNFjxd
-Cy5G4PPT+3YlxIWZyXerV64fAjX/v85zkJ43VUeEaG+Bt+kR3uH421h5geKjkxcN
-aYJoBkyuDJvhP8Ob2ZNm0qPVUXeN4PCL95bmFBNjGTcwC6RKWdMfm8pNZ9cVvB6P
-UVmG8rGCG/qnTk7LGrA2s0s6cb0P1DQ+lRZ2qWehVyPN7vU4NwyqFDfx8vnOjHI=
-=SKt+
------END PGP SIGNATURE-----
+The aio_disabe/enable_external() pair seems to make sense anyway.
 
---TD8GDToEDw0WLGOL--
+Kevin
