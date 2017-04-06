@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cw5sb-0006nH-Gr
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 07:47:10 -0400
+	(envelope-from <clg@kaod.org>) id 1cw5wY-0007m2-M4
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 07:51:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cw5sW-0000vz-V5
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 07:47:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36932)
+	(envelope-from <clg@kaod.org>) id 1cw5wT-0002jR-Ll
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 07:51:14 -0400
+Received: from 4.mo2.mail-out.ovh.net ([87.98.172.75]:49489)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cw5sW-0000vb-M6
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 07:47:04 -0400
-Date: Thu, 6 Apr 2017 19:46:47 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170406114647.GC3981@pxdev.xzpeter.org>
-References: <1491462524-1617-1-git-send-email-peterx@redhat.com>
-	<1491462524-1617-4-git-send-email-peterx@redhat.com>
-	<4e552edd-dae8-d0ea-c5b1-4c6cabaf2867@redhat.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cw5wT-0002iY-G5
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 07:51:09 -0400
+Received: from player731.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 08B817BDAB
+	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 13:51:06 +0200 (CEST)
+References: <1491396106-26376-1-git-send-email-clg@kaod.org>
+	<1491396106-26376-5-git-send-email-clg@kaod.org>
+	<20170406042318.GA12179@umbus>
+	<6e24736f-5a64-ea4a-f9bb-6ebed5acca4a@kaod.org>
+	<1491470207.4166.107.camel@kernel.crashing.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <9a5826c0-5940-f668-fbef-f90f277408e0@kaod.org>
+Date: Thu, 6 Apr 2017 13:50:59 +0200
 MIME-Version: 1.0
+In-Reply-To: <1491470207.4166.107.camel@kernel.crashing.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4e552edd-dae8-d0ea-c5b1-4c6cabaf2867@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v8 3/9] memory: provide iommu_replay_all()
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 04/21] ppc/pnv: enable only one LPC bus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,147 +33,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, Marcel Apfelbaum <marcel@redhat.com>, bd.aviv@gmail.com, David Gibson <david@gibson.dropbear.id.au>
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Thu, Apr 06, 2017 at 12:52:19PM +0200, Auger Eric wrote:
-> Hi Peter,
-> 
-> On 06/04/2017 09:08, Peter Xu wrote:
-> > This is an "global" version of exising memory_region_iommu_replay() - we
-> s/exising/existing
-> > announce the translations to all the registered notifiers, instead of a
-> > specific one.
-> > 
-> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  include/exec/memory.h | 8 ++++++++
-> >  memory.c              | 9 +++++++++
-> >  2 files changed, 17 insertions(+)
-> > 
-> > diff --git a/include/exec/memory.h b/include/exec/memory.h
-> > index 07e43da..fb7dff3 100644
-> > --- a/include/exec/memory.h
-> > +++ b/include/exec/memory.h
-> > @@ -713,6 +713,14 @@ void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n,
-> >                                  bool is_write);
-> >  
-> >  /**
-> > + * memory_region_iommu_replay_all: replay existing IOMMU translations
-> > + * to all the notifiers registered.
-> > + *
-> > + * @mr: the memory region to observe
-> > + */
-> > +void memory_region_iommu_replay_all(MemoryRegion *mr);
-> > +
-> > +/**
-> >   * memory_region_unregister_iommu_notifier: unregister a notifier for
-> >   * changes to IOMMU translation entries.
-> >   *
-> > diff --git a/memory.c b/memory.c
-> > index 7496b3d..b4ed67b 100644
-> > --- a/memory.c
-> > +++ b/memory.c
-> > @@ -1642,6 +1642,15 @@ void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n,
-> >      }
-> >  }
-> >  
-> > +void memory_region_iommu_replay_all(MemoryRegion *mr)
-> > +{
-> > +    IOMMUNotifier *notifier;
-> > +
-> > +    IOMMU_NOTIFIER_FOREACH(notifier, mr) {
-> > +        memory_region_iommu_replay(mr, notifier, false);
-> It is not fully clear to me what is the consequence of setting
-> is_write=false always?
+On 04/06/2017 11:16 AM, Benjamin Herrenschmidt wrote:
+> On Thu, 2017-04-06 at 11:06 +0200, C=C3=A9dric Le Goater wrote:
+>> The object will be initialized which raises some concern because we do=
+n't=20
+>> have the chip id at the moment but the object is still valid in some w=
+ay.=20
+>> I think I need to remove it from the list of children of the chip or u=
+se=20
+>> a pointer instead.
+>=20
+> Well... so it exists on all chips. All chips have an LPC controller...
+>=20
+> Whether firmware enables it and whether it's connected to anything is a
+>  system issue.
 
-I am not quite sure about it either, on why we are having the is_write
-parameter on memory_region_iommu_replay(). It's there since the first
-commit that introduced the interface:
+So, looking at hostboot, the lower level firmware, I think the initial=20
+patch is more in sync with it :=20
 
-    commit a788f227ef7bd2912fcaacdfe13d13ece2998149
-    Author: David Gibson <david@gibson.dropbear.id.au>
-    Date:   Wed Sep 30 12:13:55 2015 +1000
+   https://github.com/open-power/hostboot/blob/master-p8/src/usr/devtree/=
+bld_devtree.C#L1038
 
-    memory: Allow replay of IOMMU mapping notifications
+David, can we keep it as it is ? I will change the commit log which is=20
+a bit fuzzy.=20
 
-However imho that should be a check against page RW permissions, which
-seems unecessary during replay. Or say, not sure whether below patch
-would be good (as a standalone one besides current patch/series):
+Cheers,
 
-------8<------
-
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 6b33b9f..d008a4b 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -488,7 +488,7 @@ static void vfio_listener_region_add(MemoryListener *listener,
-         QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
- 
-         memory_region_register_iommu_notifier(giommu->iommu, &giommu->n);
--        memory_region_iommu_replay(giommu->iommu, &giommu->n, false);
-+        memory_region_iommu_replay(giommu->iommu, &giommu->n);
- 
-         return;
-     }
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index c4fc94d..5ab0151 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -725,11 +725,8 @@ void memory_region_register_iommu_notifier(MemoryRegion *mr,
-  *
-  * @mr: the memory region to observe
-  * @n: the notifier to which to replay iommu mappings
-- * @is_write: Whether to treat the replay as a translate "write"
-- *     through the iommu
-  */
--void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n,
--                                bool is_write);
-+void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n);
- 
- /**
-  * memory_region_iommu_replay_all: replay existing IOMMU translations
-diff --git a/memory.c b/memory.c
-index b782d5b..155ca1c 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1620,8 +1620,7 @@ uint64_t memory_region_iommu_get_min_page_size(MemoryRegion *mr)
-     return TARGET_PAGE_SIZE;
- }
- 
--void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n,
--                                bool is_write)
-+void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n)
- {
-     hwaddr addr, granularity;
-     IOMMUTLBEntry iotlb;
-@@ -1635,7 +1634,13 @@ void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n,
-     granularity = memory_region_iommu_get_min_page_size(mr);
- 
-     for (addr = 0; addr < memory_region_size(mr); addr += granularity) {
--        iotlb = mr->iommu_ops->translate(mr, addr, is_write);
-+        /*
-+         * For a replay, we don't need to do permission check.
-+         * Assuming a "read" operation here to make sure we will pass
-+         * the check (in case we don't have write permission on the
-+         * page).
-+         */
-+        iotlb = mr->iommu_ops->translate(mr, addr, false);
-         if (iotlb.perm != IOMMU_NONE) {
-             n->notify(n, &iotlb);
-         }
-@@ -1653,7 +1658,7 @@ void memory_region_iommu_replay_all(MemoryRegion *mr)
-     IOMMUNotifier *notifier;
- 
-     IOMMU_NOTIFIER_FOREACH(notifier, mr) {
--        memory_region_iommu_replay(mr, notifier, false);
-+        memory_region_iommu_replay(mr, notifier);
-     }
- }
-
------>8------
-
-Thanks,
-
--- peterx
+C.=20
