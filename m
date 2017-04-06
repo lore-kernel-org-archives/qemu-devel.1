@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cw5dd-0004Xe-Ho
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 07:31:42 -0400
+	(envelope-from <peterx@redhat.com>) id 1cw5sb-0006nH-Gr
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 07:47:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cw5dc-00015F-Ct
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 07:31:41 -0400
-Date: Thu, 6 Apr 2017 12:31:27 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170406113103.GG11940@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1491320156-4629-1-git-send-email-kwolf@redhat.com>
-	<d74fad45-9f89-6f34-020f-87e6b20ea59b@redhat.com>
-	<20170406112256.GF4341@noname.redhat.com>
+	(envelope-from <peterx@redhat.com>) id 1cw5sW-0000vz-V5
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 07:47:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36932)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cw5sW-0000vb-M6
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 07:47:04 -0400
+Date: Thu, 6 Apr 2017 19:46:47 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170406114647.GC3981@pxdev.xzpeter.org>
+References: <1491462524-1617-1-git-send-email-peterx@redhat.com>
+	<1491462524-1617-4-git-send-email-peterx@redhat.com>
+	<4e552edd-dae8-d0ea-c5b1-4c6cabaf2867@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170406112256.GF4341@noname.redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH for-2.9] block: Ignore guest dev
- permissions during incoming migration
+In-Reply-To: <4e552edd-dae8-d0ea-c5b1-4c6cabaf2867@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v8 3/9] memory: provide iommu_replay_all()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,92 +28,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, armband@enea.com, jcody@redhat.com, Ciprian.Barbu@enea.com, qemu-devel@nongnu.org, Alexandru.Avadanii@enea.com, pbonzini@redhat.com
+To: Auger Eric <eric.auger@redhat.com>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, Marcel Apfelbaum <marcel@redhat.com>, bd.aviv@gmail.com, David Gibson <david@gibson.dropbear.id.au>
 
-On Thu, Apr 06, 2017 at 01:22:56PM +0200, Kevin Wolf wrote:
-> Am 05.04.2017 um 15:22 hat Max Reitz geschrieben:
-> > On 04.04.2017 17:35, Kevin Wolf wrote:
-> > > Usually guest devices don't like other writers to the same image, so
-> > > they use blk_set_perm() to prevent this from happening. In the migration
-> > > phase before the VM is actually running, though, they don't have a
-> > > problem with writes to the image. On the other hand, storage migration
-> > > needs to be able to write to the image in this phase, so the restrictive
-> > > blk_set_perm() call of qdev devices breaks it.
-> > > 
-> > > This patch flags all BlockBackends with a qdev device as
-> > > blk->disable_perm during incoming migration, which means that the
-> > > requested permissions are stored in the BlockBackend, but not actually
-> > > applied to its root node yet.
-> > > 
-> > > Once migration has finished and the VM should be resumed, the
-> > > permissions are applied. If they cannot be applied (e.g. because the NBD
-> > > server used for block migration hasn't been shut down), resuming the VM
-> > > fails.
-> > > 
-> > > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > > ---
-> > >  block/block-backend.c | 40 +++++++++++++++++++++++++++++++++++++++-
-> > >  include/block/block.h |  2 ++
-> > >  migration/migration.c |  8 ++++++++
-> > >  qmp.c                 |  6 ++++++
-> > >  4 files changed, 55 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/block/block-backend.c b/block/block-backend.c
-> > > index 0b63773..f817040 100644
-> > > --- a/block/block-backend.c
-> > > +++ b/block/block-backend.c
+On Thu, Apr 06, 2017 at 12:52:19PM +0200, Auger Eric wrote:
+> Hi Peter,
+> 
+> On 06/04/2017 09:08, Peter Xu wrote:
+> > This is an "global" version of exising memory_region_iommu_replay() - we
+> s/exising/existing
+> > announce the translations to all the registered notifiers, instead of a
+> > specific one.
 > > 
-> > [...]
+> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  include/exec/memory.h | 8 ++++++++
+> >  memory.c              | 9 +++++++++
+> >  2 files changed, 17 insertions(+)
 > > 
-> > > @@ -597,15 +598,52 @@ void blk_get_perm(BlockBackend *blk, uint64_t *perm, uint64_t *shared_perm)
-> > >      *shared_perm = blk->shared_perm;
-> > >  }
-> > >  
-> > > +/*
-> > > + * Notifies the user of all BlockBackends that migration has completed. qdev
-> > > + * devices can tighten their permissions in response (specifically revoke
-> > > + * shared write permissions that we needed for storage migration).
-> > > + *
-> > > + * If an error is returned, the VM cannot be allowed to be resumed.
-> > > + */
-> > > +void blk_resume_after_migration(Error **errp)
-> > > +{
-> > > +    BlockBackend *blk;
-> > > +    Error *local_err = NULL;
-> > > +
-> > > +    for (blk = blk_next(NULL); blk; blk = blk_next(blk)) {
-> > 
-> > Shouldn't we use blk_all_next()?
-> 
-> Good catch, thanks.
-> 
-> At first I added it into the loop in qmp_cont() and then copied it here
-> without noticing the resetting the iostatus is really only needed for
-> monitor-owned BBs at the moment, but this one is different.
-> 
-> Of course, as soon as we improve query-block to work reasonably well
-> with -device drive=<node-name>, qmp_cont() needs to use blk_all_next(),
-> too.
-> 
-> > Trusting you that silently disabling autostart is something the upper
-> > layers can deal with, the rest looks good to me.
-> > 
-> > (The only other runtime changes of autostart apart from stop/cont appear
-> > to be in blockdev_init() (if (bdrv_key_required()), but I don't think
-> > that can happen anymore) and in migration/colo.c (which enables it and
-> > emits an error message).)
-> 
-> I think in practice libvirt always sets -S on the destination anyway.
+> > diff --git a/include/exec/memory.h b/include/exec/memory.h
+> > index 07e43da..fb7dff3 100644
+> > --- a/include/exec/memory.h
+> > +++ b/include/exec/memory.h
+> > @@ -713,6 +713,14 @@ void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n,
+> >                                  bool is_write);
+> >  
+> >  /**
+> > + * memory_region_iommu_replay_all: replay existing IOMMU translations
+> > + * to all the notifiers registered.
+> > + *
+> > + * @mr: the memory region to observe
+> > + */
+> > +void memory_region_iommu_replay_all(MemoryRegion *mr);
+> > +
+> > +/**
+> >   * memory_region_unregister_iommu_notifier: unregister a notifier for
+> >   * changes to IOMMU translation entries.
+> >   *
+> > diff --git a/memory.c b/memory.c
+> > index 7496b3d..b4ed67b 100644
+> > --- a/memory.c
+> > +++ b/memory.c
+> > @@ -1642,6 +1642,15 @@ void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n,
+> >      }
+> >  }
+> >  
+> > +void memory_region_iommu_replay_all(MemoryRegion *mr)
+> > +{
+> > +    IOMMUNotifier *notifier;
+> > +
+> > +    IOMMU_NOTIFIER_FOREACH(notifier, mr) {
+> > +        memory_region_iommu_replay(mr, notifier, false);
+> It is not fully clear to me what is the consequence of setting
+> is_write=false always?
 
-Libvirt uses -S for *all* QEMU instances it starts, regardless of use of
-migration, since we need todo things after qemu starts, but before CPUs
-are run.
+I am not quite sure about it either, on why we are having the is_write
+parameter on memory_region_iommu_replay(). It's there since the first
+commit that introduced the interface:
 
+    commit a788f227ef7bd2912fcaacdfe13d13ece2998149
+    Author: David Gibson <david@gibson.dropbear.id.au>
+    Date:   Wed Sep 30 12:13:55 2015 +1000
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+    memory: Allow replay of IOMMU mapping notifications
+
+However imho that should be a check against page RW permissions, which
+seems unecessary during replay. Or say, not sure whether below patch
+would be good (as a standalone one besides current patch/series):
+
+------8<------
+
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 6b33b9f..d008a4b 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -488,7 +488,7 @@ static void vfio_listener_region_add(MemoryListener *listener,
+         QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
+ 
+         memory_region_register_iommu_notifier(giommu->iommu, &giommu->n);
+-        memory_region_iommu_replay(giommu->iommu, &giommu->n, false);
++        memory_region_iommu_replay(giommu->iommu, &giommu->n);
+ 
+         return;
+     }
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index c4fc94d..5ab0151 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -725,11 +725,8 @@ void memory_region_register_iommu_notifier(MemoryRegion *mr,
+  *
+  * @mr: the memory region to observe
+  * @n: the notifier to which to replay iommu mappings
+- * @is_write: Whether to treat the replay as a translate "write"
+- *     through the iommu
+  */
+-void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n,
+-                                bool is_write);
++void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n);
+ 
+ /**
+  * memory_region_iommu_replay_all: replay existing IOMMU translations
+diff --git a/memory.c b/memory.c
+index b782d5b..155ca1c 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1620,8 +1620,7 @@ uint64_t memory_region_iommu_get_min_page_size(MemoryRegion *mr)
+     return TARGET_PAGE_SIZE;
+ }
+ 
+-void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n,
+-                                bool is_write)
++void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n)
+ {
+     hwaddr addr, granularity;
+     IOMMUTLBEntry iotlb;
+@@ -1635,7 +1634,13 @@ void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n,
+     granularity = memory_region_iommu_get_min_page_size(mr);
+ 
+     for (addr = 0; addr < memory_region_size(mr); addr += granularity) {
+-        iotlb = mr->iommu_ops->translate(mr, addr, is_write);
++        /*
++         * For a replay, we don't need to do permission check.
++         * Assuming a "read" operation here to make sure we will pass
++         * the check (in case we don't have write permission on the
++         * page).
++         */
++        iotlb = mr->iommu_ops->translate(mr, addr, false);
+         if (iotlb.perm != IOMMU_NONE) {
+             n->notify(n, &iotlb);
+         }
+@@ -1653,7 +1658,7 @@ void memory_region_iommu_replay_all(MemoryRegion *mr)
+     IOMMUNotifier *notifier;
+ 
+     IOMMU_NOTIFIER_FOREACH(notifier, mr) {
+-        memory_region_iommu_replay(mr, notifier, false);
++        memory_region_iommu_replay(mr, notifier);
+     }
+ }
+
+----->8------
+
+Thanks,
+
+-- peterx
