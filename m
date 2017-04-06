@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cw3Kk-000419-Tl
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:04:03 -0400
+	(envelope-from <clg@kaod.org>) id 1cw3Nk-0004zC-4G
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:07:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cw3Kh-0004zV-Np
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:04:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57340)
+	(envelope-from <clg@kaod.org>) id 1cw3Ng-0007Lm-S5
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:07:08 -0400
+Received: from 3.mo2.mail-out.ovh.net ([46.105.58.226]:43778)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1cw3Kh-0004z0-Fu
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:03:59 -0400
-Date: Thu, 6 Apr 2017 11:03:47 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170406090347.GD4341@noname.redhat.com>
-References: <33ced3d3-acd7-2945-518d-465a4621b151@redhat.com>
-	<20170403130041.GD5036@noname.str.redhat.com>
-	<20170403135012.GY26598@andariel.pipo.sk>
-	<20170404121624.GA4536@noname.str.redhat.com>
-	<d270f1a4-5814-9b23-61f6-745c73ecaadd@redhat.com>
-	<20170404145348.GD4536@noname.str.redhat.com>
-	<b58edec8-b383-5079-77f2-6f194701ce52@redhat.com>
-	<20170405110131.GA5161@noname.redhat.com>
-	<1556fcc9-50ab-7458-74fe-41756f1dd451@redhat.com>
-	<20170406084824.GA4341@noname.redhat.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cw3Ng-0007L4-L3
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:07:04 -0400
+Received: from player731.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 0F0B67BE45
+	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 11:07:02 +0200 (CEST)
+References: <1491396106-26376-1-git-send-email-clg@kaod.org>
+	<1491396106-26376-5-git-send-email-clg@kaod.org>
+	<20170406042318.GA12179@umbus>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <6e24736f-5a64-ea4a-f9bb-6ebed5acca4a@kaod.org>
+Date: Thu, 6 Apr 2017 11:06:55 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170406084824.GA4341@noname.redhat.com>
-Subject: Re: [Qemu-devel] nbd: Possible regression in 2.9 RCs
+In-Reply-To: <20170406042318.GA12179@umbus>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 04/21] ppc/pnv: enable only one LPC bus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,81 +31,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Krempa <pkrempa@redhat.com>, svc-armband <armband@enea.com>, Markus Armbruster <armbru@redhat.com>, Jeff Cody <jcody@redhat.com>, Ciprian Barbu <Ciprian.Barbu@enea.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Alexandru Avadanii <Alexandru.Avadanii@enea.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-Am 06.04.2017 um 10:48 hat Kevin Wolf geschrieben:
-> Am 05.04.2017 um 23:13 hat Paolo Bonzini geschrieben:
-> > On 05/04/2017 13:01, Kevin Wolf wrote:
-> > > Am 04.04.2017 um 17:09 hat Paolo Bonzini geschrieben:
-> > >> On 04/04/2017 16:53, Kevin Wolf wrote:
-> > >>>> The big question is how this fits into release management.  We have
-> > >>>> another important regression from the op blocker work and only a week
-> > >>>> to go before the last rc.  Are we going to delay 2.9 arbitrarily?  Are
-> > >>>> we going to shorten the 2.10 development period correspondingly?  (I
-> > >>>> vote yes and yes, FWIW).
-> > >>> Which is the other regression?
-> > >>
-> > >> The assertion failure for snapshot_blkdev with iothreads.
-> > > 
-> > > Ah, right, I keep forgetting that this started appearing with the op
-> > > blocker series because the failure mode is completely different, so it
-> > > seems to have been a latent bug somewhere else that was uncovered by it.
-> > > 
-> > > If we're sure that the change of the order in bdrv_append() is what
-> > > caused the bug to appear, we can just undo that for 2.9, at the cost of
-> > > a messed up graph in the error case when bdrv_set_backing_hd() fails
-> > > (because we have no way to undo bdrv_replace_node()).
-> > 
-> > I don't know if that is enough to fix all of the issues, but the bug is
-> > easy to reproduce.
-> > 
-> > The issue is the lack of understanding of what node movement does to
-> > quiesce_counter.  The invariant is that children cannot have a lower
-> > quiesce_counter than parents, I think (paths in the graph can only join
-> > in the children direction, right?).
-> 
-> Maybe I'm missing something, but I think this isn't true at all. Drains
-> are propagated to the parents, so that this specific node doesn't
-> receive new requests, but not to the children. The assumption is that
-> children don't do anything anyway without requests from their parents,
-> so they are effectively quiesced even with quiesce_counter == 0.
-> 
-> So if anything, the invariant should be the exact opposite: Parents
-> cannot have a lower quiesce_counter than their children.
-> 
-> I think the exact thing that the quiesce_counter of a node is expected
-> to be is the number of paths from itself to an explicitly drained node
-> in the directed block driver graph (counting one path if it is
-> explicitly drained itself). A path counts multiple times if a node is
-> explicitly drained multiple times.
-> 
-> > Is it checked, and are there violations already?  Maybe we need a
-> > get_quiesce_counter method in BdrvChildRole, to cover BlockBackend's
-> > quiesce_counter?  Then we can use that information to adjust the
-> > quiesce_counter when nodes move in the graph.
-> 
-> We would need that if we had a downwards propagation and if a
-> BlockBackend could be drained, but as it stands, I don't see what could
-> be missing from bdrv_replace_child_noperm() (well, except that I think
-> your patch is right to avoid calling drained_end/begin if both nodes
-> were drained because new requests could sneak in this way in theory).
+On 04/06/2017 06:23 AM, David Gibson wrote:
+> On Wed, Apr 05, 2017 at 02:41:29PM +0200, C=E9dric Le Goater wrote:
+>> Multi chip systems only have one LPC bus, on chip 0. The PnvLPC object
+>> will still be created under the PnvChip objects but only the one under
+>> chip 0 will be advertise in the device tree.
+>>
+>> Also remove the comment which is slightly wrong. Only chip 0 has a LPC
+>> device node : xscom@3fc0000000000/isa@b0020
+>>
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+>=20
+> This seems a very round about way of accomplishing the goal.  Wouldn't
+> it make more sense for the chip to only construct (or only realize)
+> the LPC if it's chip zero, rather than passing the chip id through to
+> the lpc object.
 
-Actually, to get this part completely right, we also need to drain the
-BlockBackend _before_ attaching the new BDS. Otherwise, if the old BDS
-wasn't quiesced, but the new one is, the BdrvChildRole.drained_begin()
-callback could send requests to the already drained new BDS.
+hmm, yes. I can do better on this.=20
 
-Kevin
+The object will be initialized which raises some concern because we don't=
+=20
+have the chip id at the moment but the object is still valid in some way.=
+=20
+I think I need to remove it from the list of children of the chip or use=20
+a pointer instead.
 
-> > The block layer has good tests, but as the internal logic grows more
-> > complex we should probably have more C level tests.  I'm constantly
-> > impressed by the amount of tricky cases that test-replication.c catches
-> > in the block job code.
-> 
-> Never really noticed test-replication specifically catching things when
-> I worked on the op blockers code which changed a lot around block jobs,
-> but that we should consider this type of tests more often is probably a
-> good point.
-> 
-> Kevin
+Thanks,
+
+C.=20
+
+>=20
+>> ---
+>>  hw/ppc/pnv.c             |  2 ++
+>>  hw/ppc/pnv_lpc.c         | 20 ++++++++++++--------
+>>  include/hw/ppc/pnv_lpc.h |  2 ++
+>>  3 files changed, 16 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+>> index 78133e5d20e1..493c7eed7980 100644
+>> --- a/hw/ppc/pnv.c
+>> +++ b/hw/ppc/pnv.c
+>> @@ -811,6 +811,8 @@ static void pnv_chip_realize(DeviceState *dev, Err=
+or **errp)
+>>      g_free(typename);
+>> =20
+>>      /* Create LPC controller */
+>> +    object_property_set_int(OBJECT(&chip->lpc), chip->chip_id, "chip-=
+id",
+>> +                            &error_fatal);
+>>      object_property_set_bool(OBJECT(&chip->lpc), true, "realized",
+>>                               &error_fatal);
+>>      pnv_xscom_add_subregion(chip, PNV_XSCOM_LPC_BASE, &chip->lpc.xsco=
+m_regs);
+>> diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+>> index 20cbb6a0dbbd..1a212a2a399f 100644
+>> --- a/hw/ppc/pnv_lpc.c
+>> +++ b/hw/ppc/pnv_lpc.c
+>> @@ -92,14 +92,6 @@ enum {
+>>  #define LPC_HC_REGS_OPB_SIZE    0x00001000
+>> =20
+>> =20
+>> -/*
+>> - * TODO: the "primary" cell should only be added on chip 0. This is
+>> - * how skiboot chooses the default LPC controller on multichip
+>> - * systems.
+>> - *
+>> - * It would be easly done if we can change the populate() interface t=
+o
+>> - * replace the PnvXScomInterface parameter by a PnvChip one
+>> - */
+>>  static int pnv_lpc_populate(PnvXScomInterface *dev, void *fdt, int xs=
+com_offset)
+>>  {
+>>      const char compat[] =3D "ibm,power8-lpc\0ibm,lpc";
+>> @@ -110,6 +102,12 @@ static int pnv_lpc_populate(PnvXScomInterface *de=
+v, void *fdt, int xscom_offset)
+>>          cpu_to_be32(lpc_pcba),
+>>          cpu_to_be32(PNV_XSCOM_LPC_SIZE)
+>>      };
+>> +    PnvLpcController *lpc =3D PNV_LPC(dev);
+>> +
+>> +    /* Only populate one LPC bus per system, the one on chip 0.*/
+>> +    if (lpc->chip_id) {
+>> +        return 0;
+>> +    }
+>> =20
+>>      name =3D g_strdup_printf("isa@%x", lpc_pcba);
+>>      offset =3D fdt_add_subnode(fdt, xscom_offset, name);
+>> @@ -486,6 +484,11 @@ static void pnv_lpc_realize(DeviceState *dev, Err=
+or **errp)
+>>      lpc->psi =3D PNV_PSI(obj);
+>>  }
+>> =20
+>> +static Property pnv_lpc_properties[] =3D {
+>> +    DEFINE_PROP_UINT32("chip-id", PnvLpcController, chip_id, 0),
+>> +    DEFINE_PROP_END_OF_LIST(),
+>> +};
+>> +
+>>  static void pnv_lpc_class_init(ObjectClass *klass, void *data)
+>>  {
+>>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+>> @@ -494,6 +497,7 @@ static void pnv_lpc_class_init(ObjectClass *klass,=
+ void *data)
+>>      xdc->populate =3D pnv_lpc_populate;
+>> =20
+>>      dc->realize =3D pnv_lpc_realize;
+>> +    dc->props =3D pnv_lpc_properties;
+>>  }
+>> =20
+>>  static const TypeInfo pnv_lpc_info =3D {
+>> diff --git a/include/hw/ppc/pnv_lpc.h b/include/hw/ppc/pnv_lpc.h
+>> index 53040026c37b..dcfadda90090 100644
+>> --- a/include/hw/ppc/pnv_lpc.h
+>> +++ b/include/hw/ppc/pnv_lpc.h
+>> @@ -67,6 +67,8 @@ typedef struct PnvLpcController {
+>> =20
+>>      /* PSI to generate interrupts */
+>>      PnvPsi *psi;
+>> +
+>> +    uint32_t chip_id;
+>>  } PnvLpcController;
+>> =20
+>>  #define   LPC_HC_IRQ_SERIRQ0            0x80000000 /* all bits down t=
+o ... */
+>=20
