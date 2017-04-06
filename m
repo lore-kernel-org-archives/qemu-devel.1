@@ -1,39 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cw1yd-0004rH-Tk
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 03:37:08 -0400
+	(envelope-from <clg@kaod.org>) id 1cw20U-0005pV-8M
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 03:39:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cw1yZ-0006YH-RC
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 03:37:07 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46663
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cw1yZ-0006Y4-Kp
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 03:37:03 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v367YBiS028575
-	for <qemu-devel@nongnu.org>; Thu, 6 Apr 2017 03:37:02 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 29nereynwv-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 06 Apr 2017 03:37:02 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Thu, 6 Apr 2017 08:37:00 +0100
-Date: Thu, 6 Apr 2017 09:36:55 +0200
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <20170405194741.18956-4-eblake@redhat.com>
-References: <20170405194741.18956-1-eblake@redhat.com>
-	<20170405194741.18956-4-eblake@redhat.com>
+	(envelope-from <clg@kaod.org>) id 1cw20R-0007KF-3v
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 03:39:02 -0400
+Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:36669)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cw20Q-0007Jn-So
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 03:38:59 -0400
+Received: from player731.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 537687C0CF
+	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 09:38:56 +0200 (CEST)
+References: <1491396106-26376-1-git-send-email-clg@kaod.org>
+	<1491396106-26376-9-git-send-email-clg@kaod.org>
+	<20170406053639.GD12179@umbus>
+	<a1a7e91c-cc90-2b99-0db0-d3d172e0daeb@kaod.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <a9d3ec8e-33f2-d439-8d2e-d4f51e0cabc4@kaod.org>
+Date: Thu, 6 Apr 2017 09:38:45 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170406093655.0deaafe2.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 03/13] s390x: Drop useless casts
+In-Reply-To: <a1a7e91c-cc90-2b99-0db0-d3d172e0daeb@kaod.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 08/21] ipmi: introduce an
+ ipmi_bmc_sdr_find() API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,44 +33,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, armbru@redhat.com, Richard Henderson <rth@twiddle.net>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Corey Minyard <cminyard@mvista.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Wed,  5 Apr 2017 14:47:31 -0500
-Eric Blake <eblake@redhat.com> wrote:
+On 04/06/2017 09:36 AM, C=E9dric Le Goater wrote:
+> On 04/06/2017 07:36 AM, David Gibson wrote:
+>> On Wed, Apr 05, 2017 at 02:41:33PM +0200, C=E9dric Le Goater wrote:
+>>> This patch exposes a new IPMI routine to query a sdr entry from the
+>>> sdr table maintained by the IPMI BMC simulator. The API is very
+>>> similar to the internal sdr_find_entry() routine and should be used
+>>> the same way to query one or all sdrs.
+>>>
+>>> A typical use would be to loop on the sdrs to build nodes of a device
+>>> tree.
+>>>
+>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>>> Acked-by: Corey Minyard <cminyard@mvista.com>
+>>
+>> I don't know much about IPMI, but since it has Corey's ack, I've
+>> staged 5..8/21 in my for-2.10 tree.=20
+>=20
+> thanks for doing so. The patchset needs the interface introduced in   =20
+> patch 9 and 10 to build the sensor nodes in the device tree and to=20
 
-> An upcoming Coccinelle cleanup script wanted to reformat the casts
-> present in this file - but on closer look, we don't need the casts
-> at all because C automatically converts void* to any other pointer.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  target/s390x/cpu_models.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-> index 1434d15..ce461cc 100644
-> --- a/target/s390x/cpu_models.c
-> +++ b/target/s390x/cpu_models.c
-> @@ -376,12 +376,12 @@ static void cpu_model_from_info(S390CPUModel *model, const CpuModelInfo *info,
-> 
->  static void qdict_add_disabled_feat(const char *name, void *opaque)
->  {
-> -    qdict_put((QDict *) opaque, name, qbool_from_bool(false));
-> +    qdict_put(opaque, name, qbool_from_bool(false));
->  }
-> 
->  static void qdict_add_enabled_feat(const char *name, void *opaque)
->  {
-> -    qdict_put((QDict *) opaque, name, qbool_from_bool(true));
-> +    qdict_put(opaque, name, qbool_from_bool(true));
->  }
-> 
->  /* convert S390CPUDef into a static CpuModelInfo */
+oups, I meant patch 8 and 9 :
 
-Do you prefer to keep this in this series, or should we just go ahead
-and apply this via s390x?
+[PATCH 08/21] ipmi: introduce an ipmi_bmc_sdr_find() API
+[PATCH 09/21] ipmi: introduce an ipmi_bmc_gen_event() API
 
-In any case,
+sorry for the noise.
 
-Acked-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+C.=20
+
+> generate shutdown events which is important for the machine.
+>=20
+>> 9 I've left for now, since Corey has comments.
+>=20
+> It's patch 10 in fact which is about the SET_SENSOR_READING command.=20
+>=20
+> I think this is the most complex command in the IPMI specs ... It's=20
+> not a strong requirement for the firmware but as I have started it=20
+> I am trying to reach a minimal and correct implementation ... It really
+> is giving me headaches tough. I am glad that Corey is giving some=20
+> support.
+>=20
+> C.=20
+> =20
+>>> ---
+>>>  hw/ipmi/ipmi_bmc_sim.c | 16 ++++++++++++++++
+>>>  include/hw/ipmi/ipmi.h |  2 ++
+>>>  2 files changed, 18 insertions(+)
+>>>
+>>> diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
+>>> index eae7b2d8c92b..8185a84b76b9 100644
+>>> --- a/hw/ipmi/ipmi_bmc_sim.c
+>>> +++ b/hw/ipmi/ipmi_bmc_sim.c
+>>> @@ -416,6 +416,22 @@ static int sdr_find_entry(IPMISdr *sdr, uint16_t=
+ recid,
+>>>      return 1;
+>>>  }
+>>> =20
+>>> +int ipmi_bmc_sdr_find(IPMIBmc *b, uint16_t recid,
+>>> +                      const struct ipmi_sdr_compact **sdr, uint16_t =
+*nextrec)
+>>> +
+>>> +{
+>>> +    IPMIBmcSim *ibs =3D IPMI_BMC_SIMULATOR(b);
+>>> +    unsigned int pos;
+>>> +
+>>> +    pos =3D 0;
+>>> +    if (sdr_find_entry(&ibs->sdr, recid, &pos, nextrec)) {
+>>> +        return -1;
+>>> +    }
+>>> +
+>>> +    *sdr =3D (const struct ipmi_sdr_compact *) &ibs->sdr.sdr[pos];
+>>> +    return 0;
+>>> +}
+>>> +
+>>>  static void sel_inc_reservation(IPMISel *sel)
+>>>  {
+>>>      sel->reservation++;
+>>> diff --git a/include/hw/ipmi/ipmi.h b/include/hw/ipmi/ipmi.h
+>>> index 91b83b5bb0b6..0d36cfc6b7f3 100644
+>>> --- a/include/hw/ipmi/ipmi.h
+>>> +++ b/include/hw/ipmi/ipmi.h
+>>> @@ -259,4 +259,6 @@ struct ipmi_sdr_compact {
+>>> =20
+>>>  typedef uint8_t ipmi_sdr_compact_buffer[sizeof(struct ipmi_sdr_compa=
+ct)];
+>>> =20
+>>> +int ipmi_bmc_sdr_find(IPMIBmc *b, uint16_t recid,
+>>> +                      const struct ipmi_sdr_compact **sdr, uint16_t =
+*nextrec);
+>>>  #endif
+>>
+>=20
+>=20
