@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cw3ly-0001Vw-2E
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:32:11 -0400
+	(envelope-from <marcel@redhat.com>) id 1cw3oL-0002CW-2L
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:34:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cw3lt-00033e-4p
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:32:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57480)
+	(envelope-from <marcel@redhat.com>) id 1cw3oG-0003v6-6U
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:34:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60152)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cw3ls-00033N-SY
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:32:05 -0400
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cw3oG-0003uk-0O
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:34:32 -0400
 References: <20170404202429.14643-1-ehabkost@redhat.com>
-	<20170404202429.14643-2-ehabkost@redhat.com>
-	<9ae31b10-0f8c-69fc-c53b-089f89beda3e@redhat.com>
-	<20170405194216.GA15566@thinpad.lan.raisama.net>
+	<20170404202429.14643-5-ehabkost@redhat.com>
 From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <64e61eac-825d-0721-07c1-f3935d63cb6a@redhat.com>
-Date: Thu, 6 Apr 2017 12:31:51 +0300
+Message-ID: <5b8d32db-4de2-f82e-fa2e-a5ed806428e4@redhat.com>
+Date: Thu, 6 Apr 2017 12:34:25 +0300
 MIME-Version: 1.0
-In-Reply-To: <20170405194216.GA15566@thinpad.lan.raisama.net>
+In-Reply-To: <20170404202429.14643-5-ehabkost@redhat.com>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 01/21] qdev: Replace
- cannot_instantiate_with_device_add_yet with !user_creatable
+Subject: Re: [Qemu-devel] [PATCH v2 04/21] iommu: Remove FIXME comment about
+ user_creatable=true
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,131 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: Laszlo Ersek <lersek@redhat.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 04/05/2017 10:42 PM, Eduardo Habkost wrote:
-> On Wed, Apr 05, 2017 at 10:01:29PM +0300, Marcel Apfelbaum wrote:
->> On 04/04/2017 11:24 PM, Eduardo Habkost wrote:
->>> cannot_instantiate_with_device_add_yet was introduced by commit
->>> 837d37167dc446af8a91189108b363c04609e296 to replace no_user. It
->>> was supposed to be a temporary measure.
->>>
->>
->>
->> Hi Eduardo,
->>
->>> When it was introduced, we had 54
->>> cannot_instantiate_with_device_add_yet=true lines in the code.
->>> Today (3 years later) this number has not shrinked: we now have
->>> 57 cannot_instantiate_with_device_add_yet=true lines. I think it
->>> is safe to say it is not a temporary measure, and we won't see
->>> the flag go away soon.
->>>
->>> Instead of a long field name that misleads people to believe it
->>> is temporary, replace it a shorter and less misleading field:
->>> user_creatable.
->>
->> I completely agree with you. I never liked "negation" fields
->> and especially the ones ending with "_yet".
->>
->> I also don't understand why "user_creatable" can't be used for white-listing *Q35*.
->> I do understand that on some archs we need a white-list per board,
->> but I don't think x86 needs it.
->>
->>>
->>> Except for code comments, changes were generated using the
->>> following Coccinelle patch:
->>>
->>>   @@
->>>   expression DC;
->>>   @@
->>>   (
->>>   -DC->cannot_instantiate_with_device_add_yet = false;
->>>   +DC->user_creatable = true;
->>
->> Is it necessary? Isn't "creatable = true" the default?
+On 04/04/2017 11:24 PM, Eduardo Habkost wrote:
+> amd-iommu and intel-iommu are really meant to be used with
+> -device, so they need user_creatable=true. Remove the FIXME
+> comment.
 >
-> cannot_instantiate_with_device_add_yet is also false by default,
-> but if there's code explicitly setting it to false somewhere, it
-> is probably necessary for some reason. The script doesn't care
-> what's the reason, because this is a 100% mechanical translation
-> from the old logic to equivalent logic using the new field.
+> Cc: Marcel Apfelbaum <marcel@redhat.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+> Changes v1 -> v2:
+> * (none)
+> ---
+>  hw/i386/amd_iommu.c   | 5 +----
+>  hw/i386/intel_iommu.c | 5 +----
+>  2 files changed, 2 insertions(+), 8 deletions(-)
 >
-
-I understand.
-
-> If you are still curious about specific cases: explicit
-> cannot_instantiate_with_device_add_yet=false/user_creatable=true
-> is necessary at x86_cpu_common_class_init(), because TYPE_CPU has
-> cannot_instantiate_with_device_add_yet=true (most CPU types don't
-> support device_add), but TYPE_X86_CPU sets it back to false
-> (because x86 supports CPU hotplug).
+> diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
+> index 7b92c8c15a..efcc93cbfd 100644
+> --- a/hw/i386/amd_iommu.c
+> +++ b/hw/i386/amd_iommu.c
+> @@ -1186,10 +1186,7 @@ static void amdvi_class_init(ObjectClass *klass, void* data)
+>      dc->vmsd = &vmstate_amdvi;
+>      dc->hotpluggable = false;
+>      dc_class->realize = amdvi_realize;
+> -    /*
+> -     * FIXME: Set only because we are not sure yet if this device
+> -     * will be outside the q35 sysbus whitelist.
+> -     */
+> +    /* Supported by the pc-q35-* machine types */
+>      dc->user_creatable = true;
+>  }
 >
->>
->>>   |
->>>   -DC->cannot_instantiate_with_device_add_yet = true;
->>>   +DC->user_creatable = false;
->>>   )
->>>
->>>   @@
->>>   typedef ObjectClass;
->>>   expression dc;
->>>   identifier class, data;
->>>   @@
->>>    static void device_class_init(ObjectClass *class, void *data)
->>>    {
->>>    ...
->>>    dc->hotpluggable = true;
->>>   +dc->user_creatable = true;
->>
->> OK... it seems risky :). Is true that "hotpluggable" => creatable,
->> but the prev rule should work, right?
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index d71d52c328..b14db306ef 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -2601,10 +2601,7 @@ static void vtd_class_init(ObjectClass *klass, void *data)
+>      dc->hotpluggable = false;
+>      x86_class->realize = vtd_realize;
+>      x86_class->int_remap = vtd_int_remap;
+> -    /*
+> -     * FIXME: Set only because we are not sure yet if this device
+> -     * will be outside the q35 sysbus whitelist.
+> -     */
+> +    /* Supported by the pc-q35-* machine types */
+>      dc->user_creatable = true;
+>  }
 >
-> Note that this part is only changing device_class_init(), and no
-> other function. dc->hotpluggable=true appears here by pure
-> chance: it's just because this is the spot where the new
-> dc->user_creatable=true line is being added.
 >
-> This explicit line addition is required because there's no
-> explicit dc->user_creatable=false line in device_class_init
-> because QOM objects are always zeroed on creation)
->
-
-Thanks for the answers.
 
 Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 
-
 Thanks,
 Marcel
-
->>
->>>    ...
->>>    }
->>>
->>>   @@
->>>   @@
->>>    struct DeviceClass {
->>>    ...
->>>   -bool cannot_instantiate_with_device_add_yet;
->>>   +bool user_creatable;
->>>    ...
->>>   }
->>>
->>>   @@
->>>   expression DC;
->>>   @@
->>>   (
->>>   -!DC->cannot_instantiate_with_device_add_yet
->>>   +DC->user_creatable
->>>   |
->>>   -DC->cannot_instantiate_with_device_add_yet
->>>   +!DC->user_creatable
->>>   )
->>>
->>
->> Nice script!
->
-> Thanks!
->
