@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1cwBAu-0000zm-GR
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 13:26:25 -0400
+	(envelope-from <eblake@redhat.com>) id 1cwBJk-0003IY-TJ
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 13:35:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1cwBAt-0000Gx-Kh
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 13:26:24 -0400
-Date: Thu, 6 Apr 2017 19:26:15 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20170406172615.ye72dml43z5cme4l@eukaryote>
-References: <1491320156-4629-1-git-send-email-kwolf@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1cwBJk-0005gr-1J
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 13:35:32 -0400
+References: <1491498851-16709-1-git-send-email-kwolf@redhat.com>
+	<1491498851-16709-2-git-send-email-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <af573474-b17f-4c53-f592-e8147ad5a79e@redhat.com>
+Date: Thu, 6 Apr 2017 12:35:21 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1491320156-4629-1-git-send-email-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH for-2.9] block: Ignore
- guest dev permissions during incoming migration
+In-Reply-To: <1491498851-16709-2-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="BI8RxDWdUX0jQEep60DkGlahNXfi8wNoW"
+Subject: Re: [Qemu-devel] [PATCH for-2.9 1/2] commit: Set
+ commit_top_bs->aio_context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,77 +25,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, armband@enea.com, Ciprian.Barbu@enea.com, qemu-devel@nongnu.org, mreitz@redhat.com, Alexandru.Avadanii@enea.com, pbonzini@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
-On Tue, Apr 04, 2017 at 05:35:56PM +0200, Kevin Wolf wrote:
-> Usually guest devices don't like other writers to the same image, so
-> they use blk_set_perm() to prevent this from happening. In the migration
-> phase before the VM is actually running, though, they don't have a
-> problem with writes to the image. On the other hand, storage migration
-> needs to be able to write to the image in this phase, so the restrictive
-> blk_set_perm() call of qdev devices breaks it.
-> 
-> This patch flags all BlockBackends with a qdev device as
-> blk->disable_perm during incoming migration, which means that the
-> requested permissions are stored in the BlockBackend, but not actually
-> applied to its root node yet.
-> 
-> Once migration has finished and the VM should be resumed, the
-> permissions are applied. If they cannot be applied (e.g. because the NBD
-> server used for block migration hasn't been shut down), resuming the VM
-> fails.
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--BI8RxDWdUX0jQEep60DkGlahNXfi8wNoW
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+Message-ID: <af573474-b17f-4c53-f592-e8147ad5a79e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.9 1/2] commit: Set
+ commit_top_bs->aio_context
+References: <1491498851-16709-1-git-send-email-kwolf@redhat.com>
+ <1491498851-16709-2-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1491498851-16709-2-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 04/06/2017 12:14 PM, Kevin Wolf wrote:
+> The filter driver that is inserted by the commit job needs to use the
+> same AioContext as its parent and child nodes.
+>=20
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  block/block-backend.c | 40 +++++++++++++++++++++++++++++++++++++++-
->  include/block/block.h |  2 ++
->  migration/migration.c |  8 ++++++++
->  qmp.c                 |  6 ++++++
->  4 files changed, 55 insertions(+), 1 deletion(-)
+>  block/commit.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>=20
 
-With your fix applied, now I don't see the original error ("error:
-internal error: unable to execute QEMU command 'nbd-server-add':
-Conflicts with use by drive-virtio-disk0 as 'root', which does not allow
-'write' on #block163"), and I can export a disk via `nbd-server-add`
-with 'writeable' flag.  
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-However, with this fix, running `drive-mirror` seg-faults source QEMU.
-
-Reproducer:
-
-(1) On destination QEMU
-
-$ /home/stack/build/build-qemu/x86_64-softmmu/qemu-system-x86_64 \
-    -display none -nodefconfig -nodefaults -m 512 \
-    -blockdev node-name=bar,driver=qcow2,file.driver=file,file.filename=./dst-disk.qcow2 \
-    -serial unix:/tmp/monitor,server,nowait \
-    -incoming tcp:localhost:6666 -qmp stdio
-{"QMP": {"version": {"qemu": {"micro": 93, "minor": 8, "major": 2}, "package": " (v2.9.0-rc3-3-g3a8624b)"}, "capabilities": []}}
-{ "execute": "qmp_capabilities" }
-{"return": {}}
-{ "execute": "nbd-server-start", "arguments": { "addr": { "type": "inet","data": { "host": "localhost", "port": "3333" } } } }
-{"return": {}}
-{ "execute": "nbd-server-add", "arguments": { "device": "bar","writable": true } }
-{"return": {}}
-/home/stack/src/qemu/nbd/server.c:nbd_receive_request():L706: read failed
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
-(2) On source QEMU:
+--BI8RxDWdUX0jQEep60DkGlahNXfi8wNoW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-$  /home/stack/build/build-qemu/x86_64-softmmu/qemu-system-x86_64 \
-    -display none -nodefconfig -nodefaults -m 512 \
-    -device virtio-scsi-pci,id=scsi -device virtio-serial-pci \
-    -blockdev node-name=foo,driver=qcow2,file.driver=file,file.filename=./cirros-0.3.5.qcow2
-    -qmp stdio
-{"QMP": {"version": {"qemu": {"micro": 93, "minor": 8, "major": 2}, "package": " (v2.9.0-rc3-3-g3a8624b)"}, "capabilities": []}}
-{ "execute": "qmp_capabilities" }
-{"return": {}}
-{ "execute": "drive-mirror", "arguments": { "device": "foo", "target": "nbd:localhost:3333:exportname=bar", "sync": "full","format": "raw", "mode": "existing" } }
-Segmentation fault (core dumped)
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
+iQEcBAEBCAAGBQJY5nxZAAoJEKeha0olJ0NqexgIAJPcAvbXedZEOFlu2nDdcLQD
+tM0JiLZ1YY1C+e/v0wKtDm/POmWXFwZKWCHX56ZPQTVq2R6EN3C3lKiTNjribpX7
+EpjeJyU0DpZnjkZVV25Y2sL7CXKsB1ZjSDkVDdilDus5fZalQySoGeptUQz8UEUg
+joFBbF4fXJyLNAr5J1gPdqxClxqYy/5468eqsfU7q2JJ/dPB0WzNFnkb2Cf7civl
+aew/Irk3UTow7J9NRMw+XYbTwjjBmj7VL/6iSXUznDbSVvr0VreQlvK9H8cWbm97
+uaspWWwN63hR2d1jlzPrMRFEbyWFVBcvcPJaAaAw66naDxecCu6Y9/070cgFqzw=
+=DxXe
+-----END PGP SIGNATURE-----
 
-[...]
-
--- 
-/kashyap
+--BI8RxDWdUX0jQEep60DkGlahNXfi8wNoW--
