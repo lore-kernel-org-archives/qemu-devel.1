@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cw3p7-0002dW-Im
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:35:26 -0400
+	(envelope-from <marcel@redhat.com>) id 1cw3qZ-0003TB-7r
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:36:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cw3p6-0004V5-DK
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:35:25 -0400
+	(envelope-from <marcel@redhat.com>) id 1cw3qV-0005at-1y
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:36:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47368)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cw3qU-0005al-Oi
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:36:50 -0400
 References: <20170404202429.14643-1-ehabkost@redhat.com>
-	<20170404202429.14643-6-ehabkost@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <7a5885d9-5944-eab9-70f4-88fbb5a5294a@redhat.com>
-Date: Thu, 6 Apr 2017 11:35:13 +0200
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <ed3c19c8-ca7c-5cd6-fbdc-b593d021e5dc@redhat.com>
+Date: Thu, 6 Apr 2017 12:36:46 +0300
 MIME-Version: 1.0
-In-Reply-To: <20170404202429.14643-6-ehabkost@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170404202429.14643-1-ehabkost@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 05/21] fdc: Remove user_creatable flag
- from sysbus-fdc & SUNW, fdtwo
+Subject: Re: [Qemu-devel] [PATCH v2 00/21] qdev/sysbus: Set
+ user_creatable=false by default on sysbus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,54 +28,209 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: Laszlo Ersek <lersek@redhat.com>, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Laszlo Ersek <lersek@redhat.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>
 
-On 04.04.2017 22:24, Eduardo Habkost wrote:
-> sysbus-fdc and SUNW,fdtwo devices need IRQs to be wired and mmio
-> to be mapped, and can't be used with -device. Unset
-> user_creatable on their device classes.
-> 
-> Cc: John Snow <jsnow@redhat.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: qemu-block@nongnu.org
+On 04/04/2017 11:24 PM, Eduardo Habkost wrote:
+> Changes v1 -> v2
+> ----------------
+>
+> * Rewrote series name and cover letter completely to not pretend
+>   we're fixing the q35 lack-of-sysbus-whitelist bug, and explain
+>   the motivation for the series.
+>   * Previous series name was:
+>     "sysbus: Don't allow -device/device_add by default"
+>   * Rewrote description of patch 02/21, too
+>   * (I really hope people read this cover letter before
+>     commenting on individual patches.)
+> * Rewrote FIXME comments to make it clear that we just set
+>   user_creatable=true temporarily because we don't know yet if
+>   the device should be in the q35 whitelist.
+> * Set user_creatable=true on xen-backend also
+>   (I didn't notice it was missing because I was building QEMU
+>   without xen support)
+>   * New patches:
+>     * "xen-backend: Remove FIXME comment about user_creatable flag"
+>     * "xen-sysdev: Remove user_creatable flag"
+> * Patch:
+>     "s390: Add FIXME for unexplained user_creatable=false line"
+>   replaced with:
+>     "s390-pcibus: No need to set user_creatable=false explicitly"
+>
+> Description
+> -----------
+>
+> This series refactor the cannot_instantiate_with_device_add code
+> for sysbus. First, the cannot_instantiate_with_device_add field
+> is replaced by !user_creatable.
+>
+> Then, we change TYPE_SYS_BUS_DEVICE to set user_creatable=false
+> by default, and we set user_creatable=true explicitly only on the
+> devices that are really supposed to be user-creatable on some
+> machines.
+>
+> Motivation
+> ----------
+>
+> First of all, this makes the code less fragile: setting
+> user_creatable=false or cannot_instantiate_with_device_add=true
+> on all sysbus devices is incorrect, and makes code that looks at
+> cannot_instantiate_with_device_add/user_creatable easy to break.
+>
+> This also fixes a regression introduced by commit
+> 33cd52b5d7b9adfd009e95f07e6c64dd88ae2a31, that makes all sysbus
+> devices appear on "-device help" and lack the "no-user" flag on
+> "info qdm"[1].
+>
+> This will also make it possible for automatic test code (like the
+> device-crash-test.py script I sent a while ago[2]) skip devices
+> that are not supposed to be user-creatable on any machine.
+>
+> A note about the lack of sysbus whitelist on q35
+> ------------------------------------------------
+>
+> This series won't make the per-machine whitelist of sysbus
+> devices unnecessary, but just makes the user_creatable field
+> consistent on the sys-bus-device classes. This means q35 and xen
+> still need to be fixed to implemented a sysbus device whitelist.
+>
+> However, despite not being strictly necessary for fixing the q35
+> bug, reducing the list of user_creatable=true devices will help
+> us be more confident when building the q35 whitelist.
+>
+> Full list of user_creatable=true sysbus devices
+> -----------------------------------------------
+>
+> In the end of this series, the only remaining sysbus devices with
+> user_creatable=true will be:
+>
+> * vfio-amd-xgbe (arm)
+> * vfio-calxeda-xgmac (arm)
+> * amd-iommu (x86)
+> * intel-iommu (x86)
+> * xen-backend (x86)
+> * spapr-pci-host-bridge (ppc)
+> * spapr-pci-vfio-host-bridge (ppc)
+> * eTSEC (ppc)
+>
+> References/Notes
+> ----------------
+>
+> [1] For example, before this series, we had 174 sysbus devices
+>     listed on qemu-system-arm -device help:
+>       $ qemu-system-arm -machine none -device help 2>&1 | grep 'bus System' | wc -l
+>       174
+>       $
+>     after this series, we now have:
+>       $ ./arm-softmmu/qemu-system-arm -machine none -device help 2>&1 | grep 'bus System'
+>       name "vfio-amd-xgbe", bus System, desc "VFIO AMD XGBE"
+>       name "vfio-calxeda-xgmac", bus System, desc "VFIO Calxeda XGMAC"
+>       $
+>
+> [2] Subject: [PATCH 0/3] script for crash-testing -device
+>
+> ---
+> Cc: Alexander Graf <agraf@suse.de>
+> Cc: Laszlo Ersek <lersek@redhat.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: Marcel Apfelbaum <marcel@redhat.com>
 > Cc: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
-> Changes v1 -> v2:
-> * Commit message rewrite only
-> ---
->  hw/block/fdc.c | 10 ----------
->  1 file changed, 10 deletions(-)
-> 
-> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-> index 3d05565628..a328693d15 100644
-> --- a/hw/block/fdc.c
-> +++ b/hw/block/fdc.c
-> @@ -2880,11 +2880,6 @@ static void sysbus_fdc_class_init(ObjectClass *klass, void *data)
->  
->      dc->props = sysbus_fdc_properties;
->      set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-> -    /*
-> -     * FIXME: Set only because we are not sure yet if this device
-> -     * will be outside the q35 sysbus whitelist.
-> -     */
-> -    dc->user_creatable = true;
->  }
->  
->  static const TypeInfo sysbus_fdc_info = {
-> @@ -2911,11 +2906,6 @@ static void sun4m_fdc_class_init(ObjectClass *klass, void *data)
->  
->      dc->props = sun4m_fdc_properties;
->      set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-> -    /*
-> -     * FIXME: Set only because we are not sure yet if this device
-> -     * will be outside the q35 sysbus whitelist.
-> -     */
-> -    dc->user_creatable = true;
->  }
->  
->  static const TypeInfo sun4m_fdc_info = {
-> 
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+>
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+Series
+    Acked-by: Marcel Apfelbaum <marcel@redhat.com>
+
+Thanks,
+Marcel
+
+> Eduardo Habkost (21):
+>   qdev: Replace cannot_instantiate_with_device_add_yet with
+>     !user_creatable
+>   sysbus: Set user_creatable=false by default on TYPE_SYS_BUS_DEVICE
+>   xen-backend: Remove FIXME comment about user_creatable flag
+>   iommu: Remove FIXME comment about user_creatable=true
+>   fdc: Remove user_creatable flag from sysbus-fdc & SUNW,fdtwo
+>   pflash_cfi01: Remove user_creatable flag
+>   kvmclock: Remove user_creatable flag
+>   ioapic: Remove user_creatable flag
+>   kvmvapic: Remove user_creatable flag
+>   sysbus-ahci: Remove user_creatable flag
+>   allwinner-ahci: Remove user_creatable flag
+>   isabus-bridge: Remove user_creatable flag
+>   unimplemented-device: Remove user_creatable flag
+>   fw_cfg: Remove user_creatable flag
+>   esp: Remove user_creatable flag
+>   generic-sdhci: Remove user_creatable flag
+>   hpet: Remove user_creatable flag
+>   sysbus-ohci: Remove user_creatable flag
+>   virtio-mmio: Remove user_creatable flag
+>   xen-sysdev: Remove user_creatable flag
+>   s390-pcibus: No need to set user_creatable=false explicitly
+>
+>  include/hw/qdev-core.h              | 10 +++++-----
+>  include/hw/qdev-properties.h        |  4 ++--
+>  hw/acpi/piix4.c                     |  2 +-
+>  hw/arm/spitz.c                      |  2 +-
+>  hw/audio/marvell_88w8618.c          |  2 +-
+>  hw/audio/pcspk.c                    |  2 +-
+>  hw/core/or-irq.c                    |  2 +-
+>  hw/core/qdev.c                      |  1 +
+>  hw/core/register.c                  |  2 +-
+>  hw/core/sysbus.c                    | 11 +++++++++++
+>  hw/dma/i8257.c                      |  2 +-
+>  hw/dma/sparc32_dma.c                |  2 +-
+>  hw/gpio/omap_gpio.c                 |  4 ++--
+>  hw/i2c/omap_i2c.c                   |  2 +-
+>  hw/i2c/smbus_eeprom.c               |  2 +-
+>  hw/i2c/smbus_ich9.c                 |  2 +-
+>  hw/i386/amd_iommu.c                 |  2 ++
+>  hw/i386/intel_iommu.c               |  2 ++
+>  hw/i386/pc.c                        |  2 +-
+>  hw/input/vmmouse.c                  |  2 +-
+>  hw/intc/apic_common.c               |  2 +-
+>  hw/intc/etraxfs_pic.c               |  2 +-
+>  hw/intc/grlib_irqmp.c               |  2 +-
+>  hw/intc/i8259_common.c              |  2 +-
+>  hw/intc/nios2_iic.c                 |  2 +-
+>  hw/intc/omap_intc.c                 |  4 ++--
+>  hw/isa/lpc_ich9.c                   |  2 +-
+>  hw/isa/piix4.c                      |  2 +-
+>  hw/isa/vt82c686.c                   |  2 +-
+>  hw/mips/gt64xxx_pci.c               |  2 +-
+>  hw/misc/vmport.c                    |  2 +-
+>  hw/net/dp8393x.c                    |  2 +-
+>  hw/net/etraxfs_eth.c                |  2 +-
+>  hw/net/fsl_etsec/etsec.c            |  2 ++
+>  hw/net/lance.c                      |  2 +-
+>  hw/pci-bridge/dec.c                 |  2 +-
+>  hw/pci-bridge/pci_expander_bridge.c |  2 +-
+>  hw/pci-host/apb.c                   |  2 +-
+>  hw/pci-host/bonito.c                |  2 +-
+>  hw/pci-host/gpex.c                  |  2 +-
+>  hw/pci-host/grackle.c               |  2 +-
+>  hw/pci-host/piix.c                  |  6 +++---
+>  hw/pci-host/ppce500.c               |  2 +-
+>  hw/pci-host/prep.c                  |  2 +-
+>  hw/pci-host/q35.c                   |  4 ++--
+>  hw/pci-host/uninorth.c              |  8 ++++----
+>  hw/pci-host/versatile.c             |  2 +-
+>  hw/pci-host/xilinx-pcie.c           |  2 +-
+>  hw/ppc/ppc4xx_pci.c                 |  2 +-
+>  hw/ppc/spapr_drc.c                  |  2 +-
+>  hw/ppc/spapr_pci.c                  |  2 ++
+>  hw/s390x/s390-pci-bus.c             |  1 -
+>  hw/sd/milkymist-memcard.c           |  2 +-
+>  hw/sd/pl181.c                       |  2 +-
+>  hw/sh4/sh_pci.c                     |  2 +-
+>  hw/timer/i8254_common.c             |  2 +-
+>  hw/timer/mc146818rtc.c              |  2 +-
+>  hw/vfio/amd-xgbe.c                  |  2 ++
+>  hw/vfio/calxeda-xgmac.c             |  2 ++
+>  hw/xen/xen_backend.c                |  2 ++
+>  monitor.c                           |  2 +-
+>  qdev-monitor.c                      |  6 +++---
+>  qom/cpu.c                           |  2 +-
+>  target/i386/cpu.c                   |  2 +-
+>  64 files changed, 95 insertions(+), 70 deletions(-)
+>
