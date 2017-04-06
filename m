@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cw7BD-0006U4-P8
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:29 -0400
+	(envelope-from <quintela@redhat.com>) id 1cw7B8-0006Pl-UG
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cw7BA-00006g-Is
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57604)
+	(envelope-from <quintela@redhat.com>) id 1cw7B7-00005b-Mm
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34807)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cw7BA-00006S-AN
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:24 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cw7B7-00005H-FN
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:21 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6D51C3D970
-	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 13:10:23 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 94DE5C04BD43
+	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 13:10:20 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu,  6 Apr 2017 15:09:02 +0200
-Message-Id: <20170406130913.2232-44-quintela@redhat.com>
+Date: Thu,  6 Apr 2017 15:09:00 +0200
+Message-Id: <20170406130913.2232-42-quintela@redhat.com>
 In-Reply-To: <20170406130913.2232-1-quintela@redhat.com>
 References: <20170406130913.2232-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 43/54] ram: Rename qemu_target_page_bits() to
- qemu_target_page_size()
+Subject: [Qemu-devel] [PATCH 41/54] migration: Remove MigrationState from
+ migration_in_postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,125 +33,160 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com
 
-It was used as a size in all cases except one.
+We need to call for the migrate_get_current() in more that half of the
+uses, so call that inside.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- exec.c                   | 4 ++--
- include/sysemu/sysemu.h  | 2 +-
- migration/migration.c    | 4 ++--
- migration/postcopy-ram.c | 8 ++++----
- migration/savevm.c       | 8 ++++----
- 5 files changed, 13 insertions(+), 13 deletions(-)
+ include/migration/migration.h |  2 +-
+ migration/migration.c         |  6 ++++--
+ migration/ram.c               | 22 ++++++++++------------
+ migration/savevm.c            |  4 ++--
+ 4 files changed, 17 insertions(+), 17 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index c97ef4a..7a640c7 100644
---- a/exec.c
-+++ b/exec.c
-@@ -3307,9 +3307,9 @@ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
-  * Allows code that needs to deal with migration bitmaps etc to still be built
-  * target independent.
-  */
--size_t qemu_target_page_bits(void)
-+size_t qemu_target_page_size(void)
- {
--    return TARGET_PAGE_BITS;
-+    return TARGET_PAGE_SIZE;
- }
- 
- #endif
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 576c7ce..16175f7 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -67,7 +67,7 @@ int qemu_reset_requested_get(void);
- void qemu_system_killed(int signal, pid_t pid);
- void qemu_system_reset(bool report);
- void qemu_system_guest_panicked(GuestPanicInformation *info);
--size_t qemu_target_page_bits(void);
-+size_t qemu_target_page_size(void);
- 
- void qemu_add_exit_notifier(Notifier *notify);
- void qemu_remove_exit_notifier(Notifier *notify);
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index 357eaa0..2cd2007 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -238,7 +238,7 @@ bool migration_is_idle(MigrationState *s);
+ bool migration_has_finished(MigrationState *);
+ bool migration_has_failed(MigrationState *);
+ /* True if outgoing migration has entered postcopy phase */
+-bool migration_in_postcopy(MigrationState *);
++bool migration_in_postcopy(void);
+ /* ...and after the device transmission */
+ bool migration_in_postcopy_after_devices(MigrationState *);
+ MigrationState *migrate_get_current(void);
 diff --git a/migration/migration.c b/migration/migration.c
-index 8cd43a4..cf6ed65 100644
+index a44d188..8cd43a4 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -646,7 +646,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
-     info->ram->skipped = 0;
-     info->ram->normal = norm_mig_pages_transferred();
-     info->ram->normal_bytes = norm_mig_pages_transferred() *
--        (1ul << qemu_target_page_bits());
-+        qemu_target_page_size();
-     info->ram->mbps = s->mbps;
-     info->ram->dirty_sync_count = ram_dirty_sync_count();
-     info->ram->postcopy_requests = ram_postcopy_requests();
-@@ -2001,7 +2001,7 @@ static void *migration_thread(void *opaque)
-                10000 is a small enough number for our purposes */
-             if (ram_dirty_pages_rate() && transferred_bytes > 10000) {
-                 s->expected_downtime = ram_dirty_pages_rate() *
--                    (1ul << qemu_target_page_bits()) / bandwidth;
-+                    qemu_target_page_size() / bandwidth;
-             }
+@@ -1054,14 +1054,16 @@ bool migration_has_failed(MigrationState *s)
+             s->state == MIGRATION_STATUS_FAILED);
+ }
  
-             qemu_file_reset_rate_limit(s->to_dst_file);
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index dc80dbb..8756364 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -123,7 +123,7 @@ bool postcopy_ram_supported_by_host(void)
-     struct uffdio_range range_struct;
-     uint64_t feature_mask;
- 
--    if ((1ul << qemu_target_page_bits()) > pagesize) {
-+    if (qemu_target_page_size() > pagesize) {
-         error_report("Target page size bigger than host page size");
-         goto out;
-     }
-@@ -745,10 +745,10 @@ PostcopyDiscardState *postcopy_discard_send_init(MigrationState *ms,
- void postcopy_discard_send_range(MigrationState *ms, PostcopyDiscardState *pds,
-                                 unsigned long start, unsigned long length)
+-bool migration_in_postcopy(MigrationState *s)
++bool migration_in_postcopy(void)
  {
--    size_t tp_bits = qemu_target_page_bits();
-+    size_t tp_size = qemu_target_page_size();
-     /* Convert to byte offsets within the RAM block */
--    pds->start_list[pds->cur_entry] = (start - pds->offset) << tp_bits;
--    pds->length_list[pds->cur_entry] = length << tp_bits;
-+    pds->start_list[pds->cur_entry] = (start - pds->offset) * tp_size;
-+    pds->length_list[pds->cur_entry] = length * tp_size;
-     trace_postcopy_discard_send_range(pds->ramblock_name, start, length);
-     pds->cur_entry++;
-     pds->nsentwords++;
++    MigrationState *s = migrate_get_current();
++
+     return (s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE);
+ }
+ 
+ bool migration_in_postcopy_after_devices(MigrationState *s)
+ {
+-    return migration_in_postcopy(s) && s->postcopy_after_devices;
++    return migration_in_postcopy() && s->postcopy_after_devices;
+ }
+ 
+ bool migration_is_idle(MigrationState *s)
+diff --git a/migration/ram.c b/migration/ram.c
+index 5dfc9bd..8dd750e 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -776,10 +776,9 @@ static int save_zero_page(RAMState *rs, RAMBlock *block, ram_addr_t offset,
+     return pages;
+ }
+ 
+-static void ram_release_pages(MigrationState *ms, const char *rbname,
+-                              uint64_t offset, int pages)
++static void ram_release_pages(const char *rbname, uint64_t offset, int pages)
+ {
+-    if (!migrate_release_ram() || !migration_in_postcopy(ms)) {
++    if (!migrate_release_ram() || !migration_in_postcopy()) {
+         return;
+     }
+ 
+@@ -845,9 +844,9 @@ static int ram_save_page(RAMState *rs, MigrationState *ms,
+              * page would be stale
+              */
+             xbzrle_cache_zero_page(rs, current_addr);
+-            ram_release_pages(ms, block->idstr, pss->offset, pages);
++            ram_release_pages(block->idstr, pss->offset, pages);
+         } else if (!rs->ram_bulk_stage &&
+-                   !migration_in_postcopy(ms) && migrate_use_xbzrle()) {
++                   !migration_in_postcopy() && migrate_use_xbzrle()) {
+             pages = save_xbzrle_page(rs, &p, current_addr, block,
+                                      offset, last_stage);
+             if (!last_stage) {
+@@ -866,7 +865,7 @@ static int ram_save_page(RAMState *rs, MigrationState *ms,
+         if (send_async) {
+             qemu_put_buffer_async(rs->f, p, TARGET_PAGE_SIZE,
+                                   migrate_release_ram() &
+-                                  migration_in_postcopy(ms));
++                                  migration_in_postcopy());
+         } else {
+             qemu_put_buffer(rs->f, p, TARGET_PAGE_SIZE);
+         }
+@@ -896,8 +895,7 @@ static int do_compress_ram_page(QEMUFile *f, RAMBlock *block,
+         error_report("compressed data failed!");
+     } else {
+         bytes_sent += blen;
+-        ram_release_pages(migrate_get_current(), block->idstr,
+-                          offset & TARGET_PAGE_MASK, 1);
++        ram_release_pages(block->idstr, offset & TARGET_PAGE_MASK, 1);
+     }
+ 
+     return bytes_sent;
+@@ -1033,7 +1031,7 @@ static int ram_save_compressed_page(RAMState *rs, MigrationState *ms,
+                 }
+             }
+             if (pages > 0) {
+-                ram_release_pages(ms, block->idstr, pss->offset, pages);
++                ram_release_pages(block->idstr, pss->offset, pages);
+             }
+         } else {
+             offset |= RAM_SAVE_FLAG_CONTINUE;
+@@ -1041,7 +1039,7 @@ static int ram_save_compressed_page(RAMState *rs, MigrationState *ms,
+             if (pages == -1) {
+                 pages = compress_page_with_multi_thread(rs, block, offset);
+             } else {
+-                ram_release_pages(ms, block->idstr, pss->offset, pages);
++                ram_release_pages(block->idstr, pss->offset, pages);
+             }
+         }
+     }
+@@ -2200,7 +2198,7 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
+ 
+     rcu_read_lock();
+ 
+-    if (!migration_in_postcopy(migrate_get_current())) {
++    if (!migration_in_postcopy()) {
+         migration_bitmap_sync(rs);
+     }
+ 
+@@ -2238,7 +2236,7 @@ static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
+ 
+     remaining_size = rs->migration_dirty_pages * TARGET_PAGE_SIZE;
+ 
+-    if (!migration_in_postcopy(migrate_get_current()) &&
++    if (!migration_in_postcopy() &&
+         remaining_size < max_size) {
+         qemu_mutex_lock_iothread();
+         rcu_read_lock();
 diff --git a/migration/savevm.c b/migration/savevm.c
-index 853a81a..bbf055d 100644
+index 3b19a4a..853a81a 100644
 --- a/migration/savevm.c
 +++ b/migration/savevm.c
-@@ -871,7 +871,7 @@ void qemu_savevm_send_postcopy_advise(QEMUFile *f)
+@@ -1062,7 +1062,7 @@ int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy)
+ static bool should_send_vmdesc(void)
  {
-     uint64_t tmp[2];
-     tmp[0] = cpu_to_be64(ram_pagesize_summary());
--    tmp[1] = cpu_to_be64(1ul << qemu_target_page_bits());
-+    tmp[1] = cpu_to_be64(qemu_target_page_size());
+     MachineState *machine = MACHINE(qdev_get_machine());
+-    bool in_postcopy = migration_in_postcopy(migrate_get_current());
++    bool in_postcopy = migration_in_postcopy();
+     return !machine->suppress_vmdesc && !in_postcopy;
+ }
  
-     trace_qemu_savevm_send_postcopy_advise();
-     qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE, 16, (uint8_t *)tmp);
-@@ -1390,13 +1390,13 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
-     }
+@@ -1111,7 +1111,7 @@ void qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only)
+     int vmdesc_len;
+     SaveStateEntry *se;
+     int ret;
+-    bool in_postcopy = migration_in_postcopy(migrate_get_current());
++    bool in_postcopy = migration_in_postcopy();
  
-     remote_tps = qemu_get_be64(mis->from_src_file);
--    if (remote_tps != (1ul << qemu_target_page_bits())) {
-+    if (remote_tps != qemu_target_page_size()) {
-         /*
-          * Again, some differences could be dealt with, but for now keep it
-          * simple.
-          */
--        error_report("Postcopy needs matching target page sizes (s=%d d=%d)",
--                     (int)remote_tps, 1 << qemu_target_page_bits());
-+        error_report("Postcopy needs matching target page sizes (s=%d d=%zd)",
-+                     (int)remote_tps, qemu_target_page_size());
-         return -1;
-     }
+     trace_savevm_state_complete_precopy();
  
 -- 
 2.9.3
