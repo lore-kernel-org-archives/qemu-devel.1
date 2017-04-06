@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sahid.ferdjaoui@redhat.com>) id 1cw938-0002I4-Gj
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 11:10:15 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1cw93M-0002Oq-TQ
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 11:10:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sahid.ferdjaoui@redhat.com>) id 1cw932-0005nh-8Y
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 11:10:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49892)
+	(envelope-from <alex.williamson@redhat.com>) id 1cw93J-0005uu-LR
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 11:10:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50610)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sahid.ferdjaoui@redhat.com>)
-	id 1cw932-0005m2-0a
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 11:10:08 -0400
-Date: Thu, 6 Apr 2017 17:10:04 +0200
-From: Sahid Orentino Ferdjaoui <sferdjao@redhat.com>
-Message-ID: <20170406151004.GA1618@redhat>
-References: <1491434491-1765-1-git-send-email-anthony.xu@intel.com>
-	<1491434491-1765-2-git-send-email-anthony.xu@intel.com>
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1cw93J-0005ud-CJ
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 11:10:25 -0400
+Date: Thu, 6 Apr 2017 09:10:15 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170406091015.78b5a67f@t450s.home>
+In-Reply-To: <1491462524-1617-2-git-send-email-peterx@redhat.com>
+References: <1491462524-1617-1-git-send-email-peterx@redhat.com>
+	<1491462524-1617-2-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1491434491-1765-2-git-send-email-anthony.xu@intel.com>
-Subject: Re: [Qemu-devel] [PATCH 1/3] move xen-common.c to hw/xen/
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 1/9] memory: add section range info for
+ IOMMU notifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,77 +29,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony Xu <anthony.xu@intel.com>
-Cc: qemu-devel@nongnu.org, anthony.perard@citrix.com, pbonzini@redhat.com, sstabellini@kernel.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, Marcel Apfelbaum <marcel@redhat.com>, jan.kiszka@siemens.com, jasowang@redhat.com, David Gibson <david@gibson.dropbear.id.au>, bd.aviv@gmail.com
 
-On Wed, Apr 05, 2017 at 04:21:29PM -0700, Anthony Xu wrote:
-> move xen-common.c to hw/xen/
+On Thu,  6 Apr 2017 15:08:36 +0800
+Peter Xu <peterx@redhat.com> wrote:
+
+> In this patch, IOMMUNotifier.{start|end} are introduced to store section
+> information for a specific notifier. When notification occurs, we not
+> only check the notification type (MAP|UNMAP), but also check whether the
+> notified iova range overlaps with the range of specific IOMMU notifier,
+> and skip those notifiers if not in the listened range.
 > 
-> Signed-off -by: Anthony Xu <anthony.xu@intel.com>
-
-nit: s/Signed-off -by/Signed-off-by, not sure if it's really important
-or not.
-
-Reviewed-By: Sahid Orentino Ferdjaoui <sahid.ferdjaoui@redhat.com>
-
+> When removing an region, we need to make sure we removed the correct
+> VFIOGuestIOMMU by checking the IOMMUNotifier.start address as well.
 > 
+> This patch is solving the problem that vfio-pci devices receive
+> duplicated UNMAP notification on x86 platform when vIOMMU is there. The
+> issue is that x86 IOMMU has a (0, 2^64-1) IOMMU region, which is
+> splitted by the (0xfee00000, 0xfeefffff) IRQ region. AFAIK
+> this (splitted IOMMU region) is only happening on x86.
+> 
+> This patch also helps vhost to leverage the new interface as well, so
+> that vhost won't get duplicated cache flushes. In that sense, it's an
+> slight performance improvement.
+> 
+> Suggested-by: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
->  Makefile.target                         | 2 --
->  hw/xen/Makefile.objs                    | 2 +-
->  xen-common.c => hw/xen/xen-common.c     | 0
->  stubs/Makefile.objs                     | 1 +
->  xen-common-stub.c => stubs/xen-common.c | 0
->  5 files changed, 2 insertions(+), 3 deletions(-)
->  rename xen-common.c => hw/xen/xen-common.c (100%)
->  rename xen-common-stub.c => stubs/xen-common.c (100%)
->
-> diff --git a/Makefile.target b/Makefile.target
-> index 7df2b8c..48c027f 100644
-> --- a/Makefile.target
-> +++ b/Makefile.target
-> @@ -150,9 +150,7 @@ obj-y += migration/ram.o migration/savevm.o
->  LIBS := $(libs_softmmu) $(LIBS)
->  
->  # xen support
-> -obj-$(CONFIG_XEN) += xen-common.o
->  obj-$(CONFIG_XEN_I386) += xen-hvm.o xen-mapcache.o
-> -obj-$(call lnot,$(CONFIG_XEN)) += xen-common-stub.o
->  obj-$(call lnot,$(CONFIG_XEN_I386)) += xen-hvm-stub.o
->  
->  # Hardware support
-> diff --git a/hw/xen/Makefile.objs b/hw/xen/Makefile.objs
-> index 4be3ec9..64a70bc 100644
-> --- a/hw/xen/Makefile.objs
-> +++ b/hw/xen/Makefile.objs
-> @@ -1,5 +1,5 @@
->  # xen backend driver support
-> -common-obj-$(CONFIG_XEN) += xen_backend.o xen_devconfig.o xen_pvdev.o
-> +common-obj-$(CONFIG_XEN) += xen_backend.o xen_devconfig.o xen_pvdev.o xen-common.o
+> v7->v8:
+> - let vhost dmar leverage the new interface as well
+> - add some more comments in commit message, mentioning what issue this
+>   patch has solved
+> - since touched up, removing Alex's a-b and DavidG's r-b
+> ---
+>  hw/vfio/common.c      | 12 +++++++++---
+>  hw/virtio/vhost.c     | 10 ++++++++--
+>  include/exec/memory.h | 19 ++++++++++++++++++-
+>  memory.c              |  9 +++++++++
+>  4 files changed, 44 insertions(+), 6 deletions(-)
 
-Refers to the moved file /xen-common.c to /hw/xen/xen-common.c
 
->  obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen-host-pci-device.o
->  obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen_pt.o xen_pt_config_init.o xen_pt_graphics.o xen_pt_msi.o
-> diff --git a/xen-common.c b/hw/xen/xen-common.c
-> similarity index 100%
-> rename from xen-common.c
-> rename to hw/xen/xen-common.c
-> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-> index 224f04b..6c80613 100644
-> --- a/stubs/Makefile.objs
-> +++ b/stubs/Makefile.objs
-> @@ -37,3 +37,4 @@ stub-obj-y += target-monitor-defs.o
->  stub-obj-y += target-get-monitor-def.o
->  stub-obj-y += pc_madt_cpu_entry.o
->  stub-obj-y += vmgenid.o
-> +stub-obj-y += xen-common.o
+Acked-by: Alex Williamson <alex.williamson@redhat.com>
 
-Refers to the moved file /xen-common-stub.c to /hw/xen/stubs/xen-common.c
-
-> diff --git a/xen-common-stub.c b/stubs/xen-common.c
-> similarity index 100%
-> rename from xen-common-stub.c
-> rename to stubs/xen-common.c
-> -- 
-> 1.8.3.1
 > 
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index f3ba9b9..6b33b9f 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -478,8 +478,13 @@ static void vfio_listener_region_add(MemoryListener *listener,
+>          giommu->iommu_offset = section->offset_within_address_space -
+>                                 section->offset_within_region;
+>          giommu->container = container;
+> -        giommu->n.notify = vfio_iommu_map_notify;
+> -        giommu->n.notifier_flags = IOMMU_NOTIFIER_ALL;
+> +        llend = int128_add(int128_make64(section->offset_within_region),
+> +                           section->size);
+> +        llend = int128_sub(llend, int128_one());
+> +        iommu_notifier_init(&giommu->n, vfio_iommu_map_notify,
+> +                            IOMMU_NOTIFIER_ALL,
+> +                            section->offset_within_region,
+> +                            int128_get64(llend));
+>          QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
+>  
+>          memory_region_register_iommu_notifier(giommu->iommu, &giommu->n);
+> @@ -550,7 +555,8 @@ static void vfio_listener_region_del(MemoryListener *listener,
+>          VFIOGuestIOMMU *giommu;
+>  
+>          QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
+> -            if (giommu->iommu == section->mr) {
+> +            if (giommu->iommu == section->mr &&
+> +                giommu->n.start == section->offset_within_region) {
+>                  memory_region_unregister_iommu_notifier(giommu->iommu,
+>                                                          &giommu->n);
+>                  QLIST_REMOVE(giommu, giommu_next);
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index 613494d..185b95b 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -736,14 +736,20 @@ static void vhost_iommu_region_add(MemoryListener *listener,
+>      struct vhost_dev *dev = container_of(listener, struct vhost_dev,
+>                                           iommu_listener);
+>      struct vhost_iommu *iommu;
+> +    Int128 end;
+>  
+>      if (!memory_region_is_iommu(section->mr)) {
+>          return;
+>      }
+>  
+>      iommu = g_malloc0(sizeof(*iommu));
+> -    iommu->n.notify = vhost_iommu_unmap_notify;
+> -    iommu->n.notifier_flags = IOMMU_NOTIFIER_UNMAP;
+> +    end = int128_add(int128_make64(section->offset_within_region),
+> +                     section->size);
+> +    end = int128_sub(end, int128_one());
+> +    iommu_notifier_init(&iommu->n, vhost_iommu_unmap_notify,
+> +                        IOMMU_NOTIFIER_UNMAP,
+> +                        section->offset_within_region,
+> +                        int128_get64(end));
+>      iommu->mr = section->mr;
+>      iommu->iommu_offset = section->offset_within_address_space -
+>                            section->offset_within_region;
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index f20b191..0840c89 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -77,13 +77,30 @@ typedef enum {
+>  
+>  #define IOMMU_NOTIFIER_ALL (IOMMU_NOTIFIER_MAP | IOMMU_NOTIFIER_UNMAP)
+>  
+> +struct IOMMUNotifier;
+> +typedef void (*IOMMUNotify)(struct IOMMUNotifier *notifier,
+> +                            IOMMUTLBEntry *data);
+> +
+>  struct IOMMUNotifier {
+> -    void (*notify)(struct IOMMUNotifier *notifier, IOMMUTLBEntry *data);
+> +    IOMMUNotify notify;
+>      IOMMUNotifierFlag notifier_flags;
+> +    /* Notify for address space range start <= addr <= end */
+> +    hwaddr start;
+> +    hwaddr end;
+>      QLIST_ENTRY(IOMMUNotifier) node;
+>  };
+>  typedef struct IOMMUNotifier IOMMUNotifier;
+>  
+> +static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
+> +                                       IOMMUNotifierFlag flags,
+> +                                       hwaddr start, hwaddr end)
+> +{
+> +    n->notify = fn;
+> +    n->notifier_flags = flags;
+> +    n->start = start;
+> +    n->end = end;
+> +}
+> +
+>  /* New-style MMIO accessors can indicate that the transaction failed.
+>   * A zero (MEMTX_OK) response means success; anything else is a failure
+>   * of some kind. The memory subsystem will bitwise-OR together results
+> diff --git a/memory.c b/memory.c
+> index 4c95aaf..75ac595 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -1606,6 +1606,7 @@ void memory_region_register_iommu_notifier(MemoryRegion *mr,
+>  
+>      /* We need to register for at least one bitfield */
+>      assert(n->notifier_flags != IOMMU_NOTIFIER_NONE);
+> +    assert(n->start <= n->end);
+>      QLIST_INSERT_HEAD(&mr->iommu_notify, n, node);
+>      memory_region_update_iommu_notify_flags(mr);
+>  }
+> @@ -1667,6 +1668,14 @@ void memory_region_notify_iommu(MemoryRegion *mr,
+>      }
+>  
+>      QLIST_FOREACH(iommu_notifier, &mr->iommu_notify, node) {
+> +        /*
+> +         * Skip the notification if the notification does not overlap
+> +         * with registered range.
+> +         */
+> +        if (iommu_notifier->start > entry.iova + entry.addr_mask + 1 ||
+> +            iommu_notifier->end < entry.iova) {
+> +            continue;
+> +        }
+>          if (iommu_notifier->notifier_flags & request_flags) {
+>              iommu_notifier->notify(iommu_notifier, &entry);
+>          }
