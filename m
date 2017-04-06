@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cw7BW-0006oI-85
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:51 -0400
+	(envelope-from <quintela@redhat.com>) id 1cw7EA-0000sd-N2
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:13:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cw7BS-0000ER-3D
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54990)
+	(envelope-from <quintela@redhat.com>) id 1cw7E9-0001YD-SK
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:13:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34018)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cw7BR-0000Dx-M2
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:41 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cw7E9-0001Xk-MN
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:13:29 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C5F5276F5
-	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 13:10:40 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C84DE3D975
+	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 13:13:28 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu,  6 Apr 2017 15:09:13 +0200
-Message-Id: <20170406130913.2232-55-quintela@redhat.com>
-In-Reply-To: <20170406130913.2232-1-quintela@redhat.com>
-References: <20170406130913.2232-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 54/54] migration: Remove MigrationState
- parameter from migration_is_idle()
+Date: Thu,  6 Apr 2017 15:13:21 +0200
+Message-Id: <20170406131326.2418-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/5] Disable hotplug during migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,54 +30,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com
 
-Only user don't have a MigrationState handly.
+Hi
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- include/migration/migration.h | 2 +-
- migration/migration.c         | 8 +++-----
- 2 files changed, 4 insertions(+), 6 deletions(-)
+This updates patches with all the comments received.
+I move qdev_unplug() to make linux-user compile.
 
-diff --git a/include/migration/migration.h b/include/migration/migration.h
-index b84ec3d..ba1a16c 100644
---- a/include/migration/migration.h
-+++ b/include/migration/migration.h
-@@ -234,7 +234,7 @@ void remove_migration_state_change_notifier(Notifier *notify);
- MigrationState *migrate_init(const MigrationParams *params);
- bool migration_is_blocked(Error **errp);
- bool migration_in_setup(MigrationState *);
--bool migration_is_idle(MigrationState *s);
-+bool migration_is_idle(void);
- bool migration_has_finished(MigrationState *);
- bool migration_has_failed(MigrationState *);
- /* True if outgoing migration has entered postcopy phase */
-diff --git a/migration/migration.c b/migration/migration.c
-index e9e2aa2..f247f7a 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1067,11 +1067,9 @@ bool migration_in_postcopy_after_devices(MigrationState *s)
-     return migration_in_postcopy() && s->postcopy_after_devices;
- }
- 
--bool migration_is_idle(MigrationState *s)
-+bool migration_is_idle(void)
- {
--    if (!s) {
--        s = migrate_get_current();
--    }
-+    MigrationState *s = migrate_get_current();
- 
-     switch (s->state) {
-     case MIGRATION_STATUS_NONE:
-@@ -1136,7 +1134,7 @@ int migrate_add_blocker(Error *reason, Error **errp)
-         return -EACCES;
-     }
- 
--    if (migration_is_idle(NULL)) {
-+    if (migration_is_idle()) {
-         migration_blockers = g_slist_prepend(migration_blockers, reason);
-         return 0;
-     }
+Please, review.
+
+
+[RFC - v1]
+This series disable hotplug/unplug during migration.  Thank to Markus
+for explaining where I had to put the checks.  Why?  Because during
+migration we will fail if there are changes.  For instance, in
+postcopy, if we add a memory region, we would failing.  Same for other
+devices if they are not setup exactly the same on destination.
+
+Iidea would be to disable it, andthen enable for the thing that we know that work.
+
+This series are on top of my previous RAMState v2 serie.
+
+Commets, please?
+
+Thanks, Juan.
+
+
+*** BLURB HERE ***
+
+Juan Quintela (5):
+  qdev: qdev_hotplug is really a bool
+  qdev: Export qdev_hot_removed
+  qdev: Move qdev_unplug() to qdev-monitor.c
+  migration: Disable hotplug/unplug during migration
+  ram: Remove migration_bitmap_extend()
+
+ exec.c                  |  1 -
+ hw/core/qdev.c          | 40 +++-------------------------------------
+ include/exec/ram_addr.h |  2 --
+ include/hw/qdev-core.h  |  3 ++-
+ migration/ram.c         | 34 ----------------------------------
+ qdev-monitor.c          | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 50 insertions(+), 75 deletions(-)
+
 -- 
 2.9.3
