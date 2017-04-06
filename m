@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50414)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cw7As-00062W-1u
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:10 -0400
+	(envelope-from <quintela@redhat.com>) id 1cw7Aw-00068n-5f
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cw7Ao-0008Ii-4i
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:25868)
+	(envelope-from <quintela@redhat.com>) id 1cw7Au-0008Oe-VG
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47668)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cw7An-0008IN-Si
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:02 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cw7Au-0008Mu-MS
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:08 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EC9547AEAC
-	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 13:10:00 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D0613C04B92B
+	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 13:10:07 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu,  6 Apr 2017 15:08:48 +0200
-Message-Id: <20170406130913.2232-30-quintela@redhat.com>
+Date: Thu,  6 Apr 2017 15:08:51 +0200
+Message-Id: <20170406130913.2232-33-quintela@redhat.com>
 In-Reply-To: <20170406130913.2232-1-quintela@redhat.com>
 References: <20170406130913.2232-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 29/54] ram: Move bytes_transferred into RAMState
+Subject: [Qemu-devel] [PATCH 32/54] ram: Move last_req_rb to RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,148 +32,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com
 
+It was on MigrationState when it is only used inside ram.c for
+postcopy.  Problem is that we need to access it without being able to
+pass it RAMState directly.
+
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- migration/ram.c | 35 +++++++++++++++++------------------
- 1 file changed, 17 insertions(+), 18 deletions(-)
+ include/migration/migration.h | 2 --
+ migration/migration.c         | 1 -
+ migration/ram.c               | 7 +++++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index 87d0cc5..0f75573 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -189,8 +189,6 @@ struct MigrationState
+     /* Queue of outstanding page requests from the destination */
+     QemuMutex src_page_req_mutex;
+     QSIMPLEQ_HEAD(src_page_requests, MigrationSrcPageRequest) src_page_requests;
+-    /* The RAMBlock used in the last src_page_request */
+-    RAMBlock *last_req_rb;
+     /* The semaphore is used to notify COLO thread that failover is finished */
+     QemuSemaphore colo_exit_sem;
+ 
+diff --git a/migration/migration.c b/migration/migration.c
+index 5a13ed0..429bab4 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1118,7 +1118,6 @@ MigrationState *migrate_init(const MigrationParams *params)
+     s->postcopy_after_devices = false;
+     s->postcopy_requests = 0;
+     s->migration_thread_running = false;
+-    s->last_req_rb = NULL;
+     error_free(s->error);
+     s->error = NULL;
+ 
 diff --git a/migration/ram.c b/migration/ram.c
-index f6ae17f..7fbaa52 100644
+index 2f5cbd1..cec51b4 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -198,6 +198,8 @@ struct RAMState {
-     uint64_t xbzrle_overflows;
-     /* number of dirty bits in the bitmap */
-     uint64_t migration_dirty_pages;
-+    /* total number of bytes transferred */
-+    uint64_t bytes_transferred;
-     /* protects modification of the bitmap */
+@@ -204,6 +204,8 @@ struct RAMState {
      QemuMutex bitmap_mutex;
      /* Ram Bitmap protected by RCU */
-@@ -247,6 +249,11 @@ static ram_addr_t ram_save_remaining(void)
-     return ram_state.migration_dirty_pages;
- }
+     RAMBitmap *ram_bitmap;
++    /* The RAMBlock used in the last src_page_requests */
++    RAMBlock *last_req_rb;
+ };
+ typedef struct RAMState RAMState;
  
-+uint64_t ram_bytes_transferred(void)
-+{
-+    return ram_state.bytes_transferred;
-+}
-+
- /* used by the search for pages to send */
- struct PageSearchStatus {
-     /* Current block being searched */
-@@ -871,9 +878,7 @@ static int do_compress_ram_page(QEMUFile *f, RAMBlock *block,
-     return bytes_sent;
- }
- 
--static uint64_t bytes_transferred;
--
--static void flush_compressed_data(QEMUFile *f)
-+static void flush_compressed_data(RAMState *rs, QEMUFile *f)
+@@ -1226,12 +1228,13 @@ int ram_save_queue_pages(MigrationState *ms, const char *rbname,
+                          ram_addr_t start, ram_addr_t len)
  {
-     int idx, len, thread_count;
+     RAMBlock *ramblock;
++    RAMState *rs = &ram_state;
  
-@@ -894,7 +899,7 @@ static void flush_compressed_data(QEMUFile *f)
-         qemu_mutex_lock(&comp_param[idx].mutex);
-         if (!comp_param[idx].quit) {
-             len = qemu_put_qemu_file(f, comp_param[idx].file);
--            bytes_transferred += len;
-+            rs->bytes_transferred += len;
-         }
-         qemu_mutex_unlock(&comp_param[idx].mutex);
-     }
-@@ -990,7 +995,7 @@ static int ram_save_compressed_page(RAMState *rs, MigrationState *ms,
-          * is used to avoid resending the block name.
-          */
-         if (block != rs->last_sent_block) {
--            flush_compressed_data(f);
-+            flush_compressed_data(rs, f);
-             pages = save_zero_page(rs, f, block, offset, p, bytes_transferred);
-             if (pages == -1) {
-                 /* Make sure the first page is sent out before other pages */
-@@ -1066,7 +1071,7 @@ static bool find_dirty_block(RAMState *rs, QEMUFile *f, PageSearchStatus *pss,
-                 /* If xbzrle is on, stop using the data compression at this
-                  * point. In theory, xbzrle can do better than compression.
-                  */
--                flush_compressed_data(f);
-+                flush_compressed_data(rs, f);
-                 compression_switch = false;
-             }
-         }
-@@ -1450,7 +1455,7 @@ void acct_update_position(QEMUFile *f, size_t size, bool zero)
-         rs->zero_pages += pages;
-     } else {
-         rs->norm_pages += pages;
--        bytes_transferred += size;
-+        rs->bytes_transferred += size;
-         qemu_update_position(f, size);
-     }
- }
-@@ -1460,11 +1465,6 @@ uint64_t ram_bytes_remaining(void)
-     return ram_save_remaining() * TARGET_PAGE_SIZE;
- }
- 
--uint64_t ram_bytes_transferred(void)
--{
--    return bytes_transferred;
--}
--
- uint64_t ram_bytes_total(void)
- {
-     RAMBlock *block;
-@@ -2027,7 +2027,6 @@ static int ram_state_init(RAMState *rs)
- 
-     qemu_mutex_lock_ramlist();
+     ms->postcopy_requests++;
      rcu_read_lock();
--    bytes_transferred = 0;
-     ram_state_reset(rs);
+     if (!rbname) {
+         /* Reuse last RAMBlock */
+-        ramblock = ms->last_req_rb;
++        ramblock = rs->last_req_rb;
  
-     rs->ram_bitmap = g_new0(struct RAMBitmap, 1);
-@@ -2139,7 +2138,7 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
-     while ((ret = qemu_file_rate_limit(f)) == 0) {
-         int pages;
- 
--        pages = ram_find_and_save_block(rs, f, false, &bytes_transferred);
-+        pages = ram_find_and_save_block(rs, f, false, &rs->bytes_transferred);
-         /* no more pages to sent */
-         if (pages == 0) {
-             done = 1;
-@@ -2161,7 +2160,7 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+         if (!ramblock) {
+             /*
+@@ -1249,7 +1252,7 @@ int ram_save_queue_pages(MigrationState *ms, const char *rbname,
+             error_report("ram_save_queue_pages no block '%s'", rbname);
+             goto err;
          }
-         i++;
+-        ms->last_req_rb = ramblock;
++        rs->last_req_rb = ramblock;
      }
--    flush_compressed_data(f);
-+    flush_compressed_data(rs, f);
-     rcu_read_unlock();
- 
-     /*
-@@ -2171,7 +2170,7 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
-     ram_control_after_iterate(f, RAM_CONTROL_ROUND);
- 
-     qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
--    bytes_transferred += 8;
-+    rs->bytes_transferred += 8;
- 
-     ret = qemu_file_get_error(f);
-     if (ret < 0) {
-@@ -2210,14 +2209,14 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
-         int pages;
- 
-         pages = ram_find_and_save_block(rs, f, !migration_in_colo_state(),
--                                        &bytes_transferred);
-+                                        &rs->bytes_transferred);
-         /* no more blocks to sent */
-         if (pages == 0) {
-             break;
-         }
-     }
- 
--    flush_compressed_data(f);
-+    flush_compressed_data(rs, f);
-     ram_control_after_iterate(f, RAM_CONTROL_FINISH);
- 
-     rcu_read_unlock();
+     trace_ram_save_queue_pages(ramblock->idstr, start, len);
+     if (start+len > ramblock->used_length) {
 -- 
 2.9.3
