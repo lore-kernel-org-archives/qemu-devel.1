@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cw7AO-0005Xr-M3
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:09:37 -0400
+	(envelope-from <quintela@redhat.com>) id 1cw7AQ-0005ZV-Ew
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:09:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cw7AN-00085M-R9
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:09:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38342)
+	(envelope-from <quintela@redhat.com>) id 1cw7AM-00084n-Jw
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:09:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49400)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cw7AN-00084z-L4
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:09:35 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cw7AM-000849-Dx
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:09:34 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C53486AAD3
-	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 13:09:34 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7E606624DF
+	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 13:09:33 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu,  6 Apr 2017 15:08:32 +0200
-Message-Id: <20170406130913.2232-14-quintela@redhat.com>
+Date: Thu,  6 Apr 2017 15:08:31 +0200
+Message-Id: <20170406130913.2232-13-quintela@redhat.com>
 In-Reply-To: <20170406130913.2232-1-quintela@redhat.com>
 References: <20170406130913.2232-1-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 13/54] ram: Move iterations_prev into RAMState
+Subject: [Qemu-devel] [PATCH 12/54] ram: Move xbzrle_cache_miss_prev into
+ RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,59 +40,54 @@ Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- migration/ram.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ migration/ram.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/migration/ram.c b/migration/ram.c
-index 32b1cbb..5b6fef8 100644
+index 9a82355..32b1cbb 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -163,6 +163,8 @@ struct RAMState {
+@@ -161,6 +161,8 @@ struct RAMState {
+     uint64_t bytes_xfer_prev;
+     /* number of dirty pages since start_time */
      uint64_t num_dirty_pages_period;
-     /* xbzrle misses since the beginning of the period */
-     uint64_t xbzrle_cache_miss_prev;
-+    /* number of iterations at the beginning of period */
-+    uint64_t iterations_prev;
++    /* xbzrle misses since the beginning of the period */
++    uint64_t xbzrle_cache_miss_prev;
  };
  typedef struct RAMState RAMState;
 =20
-@@ -625,16 +627,13 @@ static void migration_bitmap_sync_range(RAMState *r=
-s, ram_addr_t start,
-                              start, length, &rs->num_dirty_pages_period)=
-;
+@@ -624,7 +626,6 @@ static void migration_bitmap_sync_range(RAMState *rs,=
+ ram_addr_t start,
  }
 =20
--/* Fix me: there are too many global variables used in migration process=
+ /* Fix me: there are too many global variables used in migration process=
 . */
--static uint64_t iterations_prev;
--
+-static uint64_t xbzrle_cache_miss_prev;
+ static uint64_t iterations_prev;
+=20
  static void migration_bitmap_sync_init(RAMState *rs)
- {
+@@ -632,7 +633,7 @@ static void migration_bitmap_sync_init(RAMState *rs)
      rs->time_last_bitmap_sync =3D 0;
      rs->bytes_xfer_prev =3D 0;
      rs->num_dirty_pages_period =3D 0;
-     rs->xbzrle_cache_miss_prev =3D 0;
--    iterations_prev =3D 0;
-+    rs->iterations_prev =3D 0;
+-    xbzrle_cache_miss_prev =3D 0;
++    rs->xbzrle_cache_miss_prev =3D 0;
+     iterations_prev =3D 0;
  }
 =20
- /**
-@@ -712,13 +711,13 @@ static void migration_bitmap_sync(RAMState *rs)
-         }
-=20
-         if (migrate_use_xbzrle()) {
--            if (iterations_prev !=3D acct_info.iterations) {
-+            if (rs->iterations_prev !=3D acct_info.iterations) {
+@@ -714,11 +715,11 @@ static void migration_bitmap_sync(RAMState *rs)
+             if (iterations_prev !=3D acct_info.iterations) {
                  acct_info.xbzrle_cache_miss_rate =3D
                     (double)(acct_info.xbzrle_cache_miss -
-                             rs->xbzrle_cache_miss_prev) /
--                   (acct_info.iterations - iterations_prev);
-+                   (acct_info.iterations - rs->iterations_prev);
+-                            xbzrle_cache_miss_prev) /
++                            rs->xbzrle_cache_miss_prev) /
+                    (acct_info.iterations - iterations_prev);
              }
--            iterations_prev =3D acct_info.iterations;
-+            rs->iterations_prev =3D acct_info.iterations;
-             rs->xbzrle_cache_miss_prev =3D acct_info.xbzrle_cache_miss;
+             iterations_prev =3D acct_info.iterations;
+-            xbzrle_cache_miss_prev =3D acct_info.xbzrle_cache_miss;
++            rs->xbzrle_cache_miss_prev =3D acct_info.xbzrle_cache_miss;
          }
          s->dirty_pages_rate =3D rs->num_dirty_pages_period * 1000
+             / (end_time - rs->time_last_bitmap_sync);
 --=20
 2.9.3
