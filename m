@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cwASt-0004rv-UG
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 12:40:57 -0400
+	(envelope-from <bounces@canonical.com>) id 1cwAwG-0003Dz-3L
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 13:11:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cwASs-00020O-72
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 12:40:55 -0400
-References: <20170406150148.zwjpozqtale44jfh@perseus.local>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <da7174ff-38c1-07fd-96b6-fa9280524002@redhat.com>
-Date: Thu, 6 Apr 2017 11:40:41 -0500
+	(envelope-from <bounces@canonical.com>) id 1cwAwC-0005jl-RG
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 13:11:16 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60365)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cwAwC-0005h1-Ib
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 13:11:12 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cwAw9-0005Q9-KT
+	for <qemu-devel@nongnu.org>; Thu, 06 Apr 2017 17:11:09 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id ACF572E80C3
+	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 17:11:08 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170406150148.zwjpozqtale44jfh@perseus.local>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Jx85vsk9GA9NRNc30QHMnKG58q7lh2F1H"
-Subject: Re: [Qemu-devel] [RFC] Proposed qcow2 extension: subcluster
- allocation
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 06 Apr 2017 17:02:24 -0000
+From: rubenvb <1635339@bugs.launchpad.net>
+Reply-To: Bug 1635339 <1635339@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20161020160532.23339.63373.malonedeb@soybean.canonical.com>
+Message-Id: <20170406170224.12541.40916.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1635339] Re: qxl_pre_save assertion failure on vm
+ "save"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,282 +37,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Jx85vsk9GA9NRNc30QHMnKG58q7lh2F1H
-From: Eric Blake <eblake@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
-Message-ID: <da7174ff-38c1-07fd-96b6-fa9280524002@redhat.com>
-Subject: Re: [Qemu-devel] [RFC] Proposed qcow2 extension: subcluster
- allocation
-References: <20170406150148.zwjpozqtale44jfh@perseus.local>
-In-Reply-To: <20170406150148.zwjpozqtale44jfh@perseus.local>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+I'm running into this issue as well:
+Arch Linux
+Qemu 2.8.0
+spice guest tools: 0.132
+QXL driver version (as reported by Windows Device Manager): 10.0.0.15000
 
-On 04/06/2017 10:01 AM, Alberto Garcia wrote:
-> Hi all,
->=20
-> over the past couple of months I discussed with some of you the
-> possibility to extend the qcow2 format in order to improve its
-> performance and reduce its memory requirements (particularly with very
-> large images).
->=20
-> After some discussion in the mailing list and the #qemu IRC channel I
-> decided to write a prototype of a new extension for qcow2 so I could
-> understand better the scope of the changes and have some preliminary
-> data about its effects.
->=20
-> This e-mail is the formal presentation of my proposal to extend the
-> on-disk qcow2 format. As you can see this is still an RFC. Due to the
-> nature of the changes I would like to get as much feedback as possible
-> before going forward.
+Everything else works great. It would save me a lot of rebooting if this co=
+uld get fixed.
+If there is anything I can do or try, I'll be glad to help.
 
-The idea in general makes sense; I can even remember chatting with Kevin
-about similar ideas as far back as 2015, where the biggest drawback is
-that it is an incompatible image change, and therefore images created
-with the flag cannot be read by older tools.
+Relevant log of VM boot and crash on selecting suspend action in virt-
+manager:
 
-> =3D=3D=3D Test results =3D=3D=3D
->=20
-> I have a basic working prototype of this. It's still incomplete -and
-> buggy :)- but it gives an idea of what we can expect from it. In my
-> implementation each data cluster has 8 subclusters, but that's not set
-> in stone (see below).
->=20
-> I made all tests on an SSD drive, writing to an empty qcow2 image with
-> a fully populated 40GB backing image, performing random writes using
-> fio with a block size of 4KB.
->=20
-> I tried with the default and maximum cluster sizes (64KB and 2MB) and
-> also with some other sizes. I also made sure to try with 32KB clusters
-> so the subcluster size matches the 4KB block size used for the I/O.
->=20
-> It's important to point out that once a cluster has been completely
-> allocated then having subclusters offers no performance benefit. For
-> this reason the size of the image for these tests (40GB) was chosen to
-> be large enough to guarantee that there are always new clusters being
-> allocated. This is therefore a worst-case scenario (or best-case for
-> this feature, if you want).
->=20
-> Here are the results (subcluster size in brackets):
->=20
-> |-----------------+----------------+-----------------+-----------------=
---|
-> |  cluster size   | subclusters=3Don | subclusters=3Doff | Max L2 cache=
- size |
-> |-----------------+----------------+-----------------+-----------------=
---|
-> |   2 MB (256 KB) |   440 IOPS     |  100 IOPS       | 160 KB (*)      =
-  |
-> | 512 KB  (64 KB) |  1000 IOPS     |  300 IOPS       | 640 KB          =
-  |
-> |  64 KB   (8 KB) |  3000 IOPS     | 1000 IOPS       |   5 MB          =
-  |
-> |  32 KB   (4 KB) | 12000 IOPS     | 1300 IOPS       |  10 MB          =
-  |
-> |   4 KB  (512 B) |   100 IOPS     |  100 IOPS       |  80 MB          =
-  |
-> |-----------------+----------------+-----------------+-----------------=
---|
+2017-04-06 16:59:24.681+0000: starting up libvirt version: 3.1.0, qemu vers=
+ion: 2.8.0, hostname: arch-vaio.localdomain
+LC_ALL=3DC PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin QEMU_AU=
+DIO_DRV=3Dspice /usr/bin/qemu-system-x86_64 -name guest=3DWindows,debug-thr=
+eads=3Don -S -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/li=
+bvirt/qemu/domain-9-Windows/master-key.aes -machine pc-i440fx-2.7,accel=3Dk=
+vm,usb=3Doff,vmport=3Doff,dump-guest-core=3Doff -cpu core2duo,hv_time,hv_re=
+laxed,hv_vapic,hv_spinlocks=3D0x1fff -m 2048 -realtime mlock=3Doff -smp 2,s=
+ockets=3D1,cores=3D2,threads=3D1 -uuid f14684d3-5f81-4743-8512-e516d85ca2c9=
+ -no-user-config -nodefaults -chardev socket,id=3Dcharmonitor,path=3D/var/l=
+ib/libvirt/qemu/domain-9-Windows/monitor.sock,server,nowait -mon chardev=3D=
+charmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dlocaltime,driftfix=3Dsl=
+ew -global kvm-pit.lost_tick_policy=3Ddelay -no-hpet -no-shutdown -global P=
+IIX4_PM.disable_s3=3D1 -global PIIX4_PM.disable_s4=3D1 -boot strict=3Don -d=
+evice ich9-usb-ehci1,id=3Dusb,bus=3Dpci.0,addr=3D0x6.0x7 -device ich9-usb-u=
+hci1,masterbus=3Dusb.0,firstport=3D0,bus=3Dpci.0,multifunction=3Don,addr=3D=
+0x6 -device ich9-usb-uhci2,masterbus=3Dusb.0,firstport=3D2,bus=3Dpci.0,addr=
+=3D0x6.0x1 -device ich9-usb-uhci3,masterbus=3Dusb.0,firstport=3D4,bus=3Dpci=
+.0,addr=3D0x6.0x2 -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0=
+,addr=3D0x5 -drive file=3D/mnt/media/Qemu/windows10.qcow2,format=3Dqcow2,if=
+=3Dnone,id=3Ddrive-virtio-disk0 -device virtio-blk-pci,scsi=3Doff,bus=3Dpci=
+.0,addr=3D0x7,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1 -d=
+rive file=3D/usr/share/spice-guest-tools/spice-guest-tools.iso,format=3Draw=
+,if=3Dnone,id=3Ddrive-ide0-0-1,readonly=3Don -device ide-cd,bus=3Dide.0,uni=
+t=3D1,drive=3Ddrive-ide0-0-1,id=3Dide0-0-1 -netdev user,id=3Dhostnet0 -devi=
+ce rtl8139,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:44:08:31,bus=3Dpci.0,=
+addr=3D0x3 -chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dchars=
+erial0,id=3Dserial0 -chardev spicevmc,id=3Dcharchannel0,name=3Dvdagent -dev=
+ice virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchannel0,id=
+=3Dchannel0,name=3Dcom.redhat.spice.0 -device usb-tablet,id=3Dinput2,bus=3D=
+usb.0,port=3D3 -spice port=3D5900,addr=3D127.0.0.1,disable-ticketing,image-=
+compression=3Doff,seamless-migration=3Don -device qxl-vga,id=3Dvideo0,ram_s=
+ize=3D67108864,vram_size=3D67108864,vram64_size_mb=3D0,vgamem_mb=3D16,max_o=
+utputs=3D1,bus=3Dpci.0,addr=3D0x2 -device intel-hda,id=3Dsound0,bus=3Dpci.0=
+,addr=3D0x4 -device hda-duplex,id=3Dsound0-codec0,bus=3Dsound0.0,cad=3D0 -c=
+hardev spicevmc,id=3Dcharredir0,name=3Dusbredir -device usb-redir,chardev=
+=3Dcharredir0,id=3Dredir0,bus=3Dusb.0,port=3D1 -chardev spicevmc,id=3Dcharr=
+edir1,name=3Dusbredir -device usb-redir,chardev=3Dcharredir1,id=3Dredir1,bu=
+s=3Dusb.0,port=3D2 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,add=
+r=3D0x8 -msg timestamp=3Don
+char device redirected to /dev/pts/6 (label charserial0)
+main_channel_link: add main channel client
+red_dispatcher_set_cursor_peer: =
 
-Those are some cool results!
+inputs_connect: inputs channel client create
+main_channel_handle_parsed: agent start
+ehci warning: guest updated active QH
+qemu-system-x86_64: /build/qemu/src/qemu-2.8.0/hw/display/qxl.c:2173: qxl_p=
+re_save: Assertion `d->last_release_offset < d->vga.vram_size' failed.
+2017-04-06 17:00:32.819+0000: shutting down, reason=3Dcrashed
 
+-- =
 
-> =3D=3D=3D Changes to the on-disk format =3D=3D=3D
->=20
-> The qcow2 on-disk format needs to change so each L2 entry has a bitmap
-> indicating the allocation status of each subcluster. There are three
-> possible states (unallocated, allocated, all zeroes), so we need two
-> bits per subcluster.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1635339
 
-You also have to add a new incompatible feature bit, so that older tools
-know they can't read the new image correctly, and therefore don't
-accidentally corrupt it.
+Title:
+  qxl_pre_save assertion failure on vm "save"
 
->=20
-> An L2 entry is 64 bits wide, and this is the current format (for
-> uncompressed clusters):
->=20
-> 63    56 55    48 47    40 39    32 31    24 23    16 15     8 7      0=
+Status in QEMU:
+  New
 
-> 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000=
+Bug description:
+  When I try and save my Windows 10 VM, I see an assertion failure, and
+  the machine is shut down.
 
-> **<----> <--------------------------------------------------><------->*=
+  I see the following in the log:
 
->   Rsrved              host cluster offset of data             Reserved
->   (6 bits)                (47 bits)                           (8 bits)
->=20
->     bit 63: refcount =3D=3D 1   (QCOW_OFLAG_COPIED)
->     bit 62: compressed =3D 1  (QCOW_OFLAG_COMPRESSED)
->     bit 0: all zeros        (QCOW_OFLAG_ZERO)
->=20
-> I thought of three alternatives for storing the subcluster bitmaps. I
-> haven't made my mind completely about which one is the best one, so
-> I'd like to present all three for discussion. Here they are:
->=20
-> (1) Storing the bitmap inside the 64-bit entry
->=20
->     This is a simple alternative and is the one that I chose for my
->     prototype. There are 14 unused bits plus the "all zeroes" one. If
->     we steal one from the host offset we have the 16 bits that we need
->     for the bitmap and we have 46 bits left for the host offset, which
->     is more than enough.
+  main_channel_handle_parsed: agent start
+  qemu-system-x86_64: /build/qemu-Zwynhi/qemu-2.5+dfsg/hw/display/qxl.c:210=
+1: qxl_pre_save: Assertion `d->last_release_offset < d->vga.vram_size' fail=
+ed.
+  2016-10-20 11:52:42.713+0000: shutting down
 
-Note that because you are using exactly 8 subclusters, you can require
-that the minimum cluster size when subclusters are enabled be 4k (since
-we already have a lower-limit of 512-byte sector operation, and don't
-want subclusters to be smaller than that); at which case you are
-guaranteed that the host cluster offset will be 4k aligned.  So in
-reality, once you turn on subclusters, you have:
+  Please let me know what other information would be relevant!
 
-63    56 55    48 47    40 39    32 31    24 23    16 15     8 7      0
-00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-**<----> <-----------------------------------------------><---------->*
-  Rsrved              host cluster offset of data             Reserved
-  (6 bits)                (44 bits)                           (11 bits)
-
-where you have 17 bits plus the "all zeroes" bit to play with, thanks to
-the three bits of host cluster offset that are now guaranteed to be zero
-due to cluster size alignment (but you're also right that the "all
-zeroes" bit is now redundant information with the 8 subcluster-is-zero
-bits, so repurposing it does not hurt)
-
->=20
->     * Pros:
->       + Simple. Few changes compared to the current qcow2 format.
->=20
->     * Cons:
->       - Only 8 subclusters per cluster. We would not be making the
->         most of this feature.
->=20
->       - No reserved bits left for the future.
-
-I just argued you have at least one, and probably 2, bits left over for
-future in-word expansion.
-
->=20
-> (2) Making L2 entries 128-bit wide.
->=20
->     In this alternative we would double the size of L2 entries. The
->     first half would remain unchanged and the second one would store
->     the bitmap. That would leave us with 32 subclusters per cluster.
-
-Although for smaller cluster sizes (such as 4k clusters), you'd still
-want to restrict that subclusters are at least 512-byte sectors, so
-you'd be using fewer than 32 of those subcluster positions until the
-cluster size is large enough.
-
->=20
->     * Pros:
->       + More subclusters per cluster. We could have images with
->         e.g. 128k clusters with 4k subclusters.
-
-Could allow variable-sized subclusters (your choice of 32 subclusters of
-4k each, or 16 subclusters of 8k each)
-
->=20
->     * Cons:
->       - More space needed for L2 entries. The same cluster size would
->         require a cache twice as large, although having subcluster
->         allocation would compensate for this.
->=20
->       - More changes to the code to handle 128-bit entries.
-
-Dealing with variable-sized subclusters, or with unused subclsuster
-entries when the cluster size is too small (such as a 4k cluster should
-not be allowed any subclusters smaller than 512 bytes, but that's at
-most 8 out of the 32 slots available), can get tricky.
-
->=20
->       - We would still be wasting the 14 reserved bits that L2 entries
->         have.
->=20
-> (3) Storing the bitmap somewhere else
->=20
->     This would involve storing the bitmap separate from the L2 tables
->     (perhaps using the bitmaps extension? I haven't looked much into
->     this).
->=20
->     * Pros:
->       + Possibility to make the number of subclusters configurable
->         by the user (32, 64, 128, ...)
->       + All existing metadata structures would remain untouched
->         (although the "all zeroes" bit in L2 entries would probably
->         become unused).
-
-It might still remain useful for optimization purposes, although then we
-get into image consistency questions (if the all zeroes bit is set but
-subcluster map claims allocation, or if the all zeroes bit is clear but
-all subclusters claim zero, which one wins).
-
->=20
->     * Cons:
->       - As with alternative (2), more space needed for metadata.
->=20
->       - The bitmap would also need to be cached for performance
->         reasons.
->=20
->       - Possibly one more *_cache_size option.
->=20
->       - One more metadata structure to be updated for each
->         allocation. This would probably impact I/O negatively.
-
-Having the subcluster table directly in the L2 means that updating the
-L2 table is done with a single write. You are definitely right that
-having the subcluster table as a bitmap in a separate cluster means two
-writes instead of one, but as always, it's hard to predict how much of
-an impact that is without benchmarks.
-
->=20
-> =3D=3D=3D Compressed clusters =3D=3D=3D
->=20
-> My idea is that compressed clusters would remain the same. They are
-> read-only anyway so they would not be affected by any of these
-> changes.
->=20
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
->=20
-> I think I managed to summarize all the ideas that I had in my mind,
-> but I'm sure you probably have questions and comments, so I'd be happy
-> to get as much feedback as possible.
->=20
-> So, looking forward to reading your opinions.
->=20
-
-The fact that you already have numbers proving the speedups that are
-possible when first allocating the image make this sound like a useful
-project, even though it is an incompatible image change that old tools
-won't be able to recognize. You'll want to make sure 'qemu-img amend'
-can rewrite an image with subclusters into an older image.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---Jx85vsk9GA9NRNc30QHMnKG58q7lh2F1H
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY5m+JAAoJEKeha0olJ0NqUKMH/1fkfgAu6LQWl5WvnHBkhmgH
-PgtOCCJvNMWVa46RFBnCX0th5ppp/CCcPy9uYmwjqcMvBOthdy64gPf8GZn0ORtV
-XXO37OvlZ7+c0z1CTDtnFsqvp9VkMxfxc+VwFbG5pUr2GWmqIBacSYAwTboQWymo
-7kcl1yVEptCeXwuxA9JQQ2eToZWAuKJj1xSAKF5T1M7ta3gncyQ5+VDd3Zd5PYh2
-HM7QBcoxNk0USxUmqVxXVTF+8ziVenZcVQd9sdjL8zafoBLuzcKmALIMxE0FT4ld
-UvpPrSHZQeEhH02sMlpL0AJKGtrbY+IJtj6oK38gGb+yENpP/2xOurfizN6SiSI=
-=1SDl
------END PGP SIGNATURE-----
-
---Jx85vsk9GA9NRNc30QHMnKG58q7lh2F1H--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1635339/+subscriptions
