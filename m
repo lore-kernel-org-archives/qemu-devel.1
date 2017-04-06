@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cw3xY-00060g-Do
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:44:09 -0400
+	(envelope-from <stefanha@gmail.com>) id 1cw3xY-00060f-Dj
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:44:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cw3xU-00088Y-ER
+	(envelope-from <stefanha@gmail.com>) id 1cw3xW-000894-Ct
 	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:44:08 -0400
-Date: Thu, 6 Apr 2017 10:10:10 +0100
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:35278)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cw3xW-00088n-2w
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:44:06 -0400
+Received: by mail-wr0-x244.google.com with SMTP id t20so9688425wra.2
+	for <qemu-devel@nongnu.org>; Thu, 06 Apr 2017 02:44:05 -0700 (PDT)
+Date: Thu, 6 Apr 2017 10:43:59 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170406091010.GA21261@stefanha-x1.localdomain>
-References: <CAO_EM_=wECMYRRaDyPtY8sKFZF8owp0u2sE4k_oeS=BLF9B2Mw@mail.gmail.com>
-	<20170403165755.GF3539@stefanha-x1.localdomain>
-	<87zifw9s6f.fsf@linaro.org>
+Message-ID: <20170406094359.GB21261@stefanha-x1.localdomain>
+References: <20170331084147.32716-1-haozhong.zhang@intel.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="rwEMma7ioTxnRzrJ"
+	protocol="application/pgp-signature"; boundary="hQiwHBbRI9kgIhsi"
 Content-Disposition: inline
-In-Reply-To: <87zifw9s6f.fsf@linaro.org>
-Subject: Re: [Qemu-devel] [Qemu-block] New iotest repros failures on virtio
- external snapshot with iothread
+In-Reply-To: <20170331084147.32716-1-haozhong.zhang@intel.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 0/4] nvdimm: enable flush hint address
+ structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,95 +30,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: Ed Swierk <eswierk@skyportsystems.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: qemu-devel@nongnu.org, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, dan.j.williams@intel.com, Richard Henderson <rth@twiddle.net>
 
 
---rwEMma7ioTxnRzrJ
-Content-Type: text/plain; charset=iso-8859-1
+--hQiwHBbRI9kgIhsi
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 04, 2017 at 03:13:44PM +0100, Alex Benn=E9e wrote:
+On Fri, Mar 31, 2017 at 04:41:43PM +0800, Haozhong Zhang wrote:
+> This patch series constructs the flush hint address structures for
+> nvdimm devices in QEMU.
 >=20
-> Stefan Hajnoczi <stefanha@gmail.com> writes:
->=20
-> > On Wed, Mar 29, 2017 at 07:01:38PM -0700, Ed Swierk wrote:
-> >> Parts of qemu's block code have changed a lot in recent months but are
-> >> not well exercised by current tests.
-> <snip>
-> >
-> > 4. How to automate tests with real Linux guests?  This is a complex
-> > topic and probably what we should discuss in this email thread.
-> >
-> > The buildroot + busybox approach is good for a small set of sanity
-> > tests.  There was a similar attempt here:
-> > https://github.com/stsquad/qemu-jeos
-> >
-> > Building from source becomes a challenge when other people want to add
-> > software to test other areas of QEMU.  The process also requires
-> > attention to maintain the image over time (e.g. as host build
-> > environments change).
-> >
-> > There are image builder tools like virt-builder and mkosi for building
-> > bootable virtual machine images based on standard Linux distros:
-> > http://libguestfs.org/virt-builder.1.html
-> > https://github.com/systemd/mkosi
-> >
-> > This eliminates the build-from-source hassles and gives us a full Linux
-> > guest environment.  Booting is very fast with mkosi so the advantage to
-> > custom building a minimal image is negligible.
->=20
-> Does it entirely? If your building a ARM guest on x86 how do you ensure
-> the cross-compilers are correct for the kernel and userspace?
+> It's of course not for 2.9. I send it out early in order to get
+> comments on one point I'm uncertain (see the detailed explanation
+> below). Thanks for any comments in advance!
+> Background
+> ---------------
 
-virt-builder and mkosi install binary distros like Debian or Fedora.
-They do not compile from source.
+Extra background:
 
-virt-builder supports cross-arch image building so it's a good starting
-point for QEMU guest images.
+Flush Hint Addresses are necessary because:
 
-> > My suggestion is:
-> >
-> > Let's pick an image builder tool like virt-builder and keep a single
-> > build script per guest architecture (e.g.  build-test-os-x86_64.sh).
-> > All tests for that architecture run against the same disk image.
-> >
-> > It's easy to add additional software to the disk image by modifying the
-> > build script.
-> >
-> > A Makefile ensures that the image file gets rebuilt if the build script
-> > has changed.
->=20
-> I have experimented building LTP for foreign guests inside docker
-> images. I expect the docker build image could be extended to build full
-> kernel and file-systems in a known environment, possibly using
-> virt-builder to do it.
+1. Some hardware configurations may require them.  In other words, a
+   cache flush instruction is not enough to persist data.
 
-My concern with building from source is that extending and maintaining
-the infrastructure does not scale.  These efforts fizzle out like
-qemu-jeos because no one really has time to maintain them.  Few people
-want to extend them because they are complex and brittle.
+2. The host file system may need fsync(2) calls (e.g. to persist
+   metadata changes).
 
-Image builder tools skip the complexity of build-from-source.  You start
-with something like a Dockerfile or virt-builder command-line.  It's
-much easier for people to contribute and there is much less that can go
-wrong at image build time.
+Without Flush Hint Addresses only some NVDIMM configurations actually
+guarantee data persistence.
 
-Stefan
+> Flush hint address structure is a substructure of NFIT and specifies
+> one or more addresses, namely Flush Hint Addresses. Software can write
+> to any one of these flush hint addresses to cause any preceding writes
+> to the NVDIMM region to be flushed out of the intervening platform
+> buffers to the targeted NVDIMM. More details can be found in ACPI Spec
+> 6.1, Section 5.2.25.8 "Flush Hint Address Structure".
 
---rwEMma7ioTxnRzrJ
+Do you have performance data?  I'm concerned that Flush Hint Address
+hardware interface is not virtualization-friendly.
+
+In Linux drivers/nvdimm/region_devs.c:nvdimm_flush() does:
+
+  wmb();
+  for (i =3D 0; i < nd_region->ndr_mappings; i++)
+      if (ndrd_get_flush_wpq(ndrd, i, 0))
+          writeq(1, ndrd_get_flush_wpq(ndrd, i, idx));
+  wmb();
+
+That looks pretty lightweight - it's an MMIO write between write
+barriers.
+
+This patch implements the MMIO write like this:
+
+  void nvdimm_flush(NVDIMMDevice *nvdimm)
+  {
+      if (nvdimm->backend_fd !=3D -1) {
+          /*
+           * If the backend store is a physical NVDIMM device, fsync()
+           * will trigger the flush via the flush hint on the host device.
+           */
+          fsync(nvdimm->backend_fd);
+      }
+  }
+
+The MMIO store instruction turned into a synchronous fsync(2) system
+call plus vmexit/vmenter and QEMU userspace context switch:
+
+1. The vcpu blocks during the fsync(2) system call.  The MMIO write
+   instruction has an unexpected and huge latency.
+
+2. The vcpu thread holds the QEMU global mutex so all other threads
+   (including the monitor) are blocked during fsync(2).  Other vcpu
+   threads may block if they vmexit.
+
+It is hard to implement this efficiently in QEMU.  This is why I said
+the hardware interface is not virtualization-friendly.  It's cheap on
+real hardware but expensive under virtualization.
+
+We should think about the optimal way of implementing Flush Hint
+Addresses in QEMU.  But if there is no reasonable way to implement them
+then I think it's better *not* to implement them, just like the Block
+Window feature which is also not virtualization-friendly.  Users who
+want a block device can use virtio-blk.  I don't think NVDIMM Block
+Window can achieve better performance than virtio-blk under
+virtualization (although I'm happy to be proven wrong).
+
+Some ideas for a faster implementation:
+
+1. Use memory_region_clear_global_locking() to avoid taking the QEMU
+   global mutex.  Little synchronization is necessary as long as the
+   NVDIMM device isn't hot unplugged (not yet supported anyway).
+
+2. Can the host kernel provide a way to mmap Address Flush Hints from
+   the physical NVDIMM in cases where the configuration does not require
+   host kernel interception?  That way QEMU can map the physical
+   NVDIMM's Address Flush Hints directly into the guest.  The hypervisor
+   is bypassed and performance would be good.
+
+I'm not sure there is anything we can do to make the case where the host
+kernel wants an fsync(2) fast :(.
+
+Benchmark results would be important for deciding how big the problem
+is.
+
+--hQiwHBbRI9kgIhsi
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJY5gXyAAoJEJykq7OBq3PIZjUH/iwRi7yiTN6nMc6Cf60P+oDR
-IDycvt2CBCRNWOVhauErPsCHwtqr4eGl/iyvAvs58YpkqF7zWnoHV8TAhebOjzcs
-tpkdnE8e5DD+OC9NQ7ShQDU/UzoBylpvBJkwusZQE/bobMv4JpciaEbt16xsghXm
-BiGEPDLPbWk17mVDxzWq49yeE3N4vuwvt6qBFvxviJ3LCMPuZFbYwyftqUfupWYF
-0NagqhThQqY8ZVQqvRJ1hGLGFbqU/GC70IxvJoYlEopFBCrvs/zJwqGqxrO9iIIX
-+ZVCJ0OqqBOVKbM26MIwmv06xIPOOjOsVWIajy9BNo+Kwg7F2/xLvbaAr/FPoUs=
-=R6PR
+iQEcBAEBAgAGBQJY5g3fAAoJEJykq7OBq3PIOu8H/ihMPMr6npoTFk4xDBjFsNqr
+6izxemNmiNWMkeN6vHNjOL4DbAfOYXFd9FsLRaSa1f7jCzxuoARo/IB5EW6Yq522
+Rw7wHkVwTI51C6dlWa+p6V4xIspQpW0TPa3zrl7Ua751vinmhHMJqBogdus4EmNe
+u7G3096TCFDGlIb3vhc7+ZNqUgP+fZNNeF8beM3jigDYsIP2FJ+A5XKJMgRnQjIZ
+7kfbIHPv2xK6om0ShXHLR/2H5GXClEvGnhqi2KubnoGZXEeSOREPXKRDCJauoIFj
+cs1qlR4Ii56Ph6MGEVG39KfdxdWra19FGh8C10kCJFNTxIEux/efUoK6kB/xT14=
+=7sdk
 -----END PGP SIGNATURE-----
 
---rwEMma7ioTxnRzrJ--
+--hQiwHBbRI9kgIhsi--
