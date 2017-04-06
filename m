@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cw6mb-0007Wg-PO
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 08:45:05 -0400
+	(envelope-from <eblake@redhat.com>) id 1cw6tk-0000Ox-0a
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 08:52:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cw6mY-0005X2-NU
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 08:45:01 -0400
-Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:49050)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cw6mY-0005Vo-GT
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 08:44:58 -0400
-Received: from player731.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id E401878AE3
-	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 14:44:56 +0200 (CEST)
-References: <1491396106-26376-1-git-send-email-clg@kaod.org>
-	<1491396106-26376-4-git-send-email-clg@kaod.org>
-	<20170406020256.GA1991@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <5e61337a-135c-9574-993f-de00fab26777@kaod.org>
-Date: Thu, 6 Apr 2017 14:44:53 +0200
+	(envelope-from <eblake@redhat.com>) id 1cw6tj-0000jk-4c
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 08:52:24 -0400
+References: <20170405194741.18956-1-eblake@redhat.com>
+	<20170405194741.18956-11-eblake@redhat.com>
+	<20170406090045.GC4341@noname.redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1313a278-947d-9b73-640f-3aa518019773@redhat.com>
+Date: Thu, 6 Apr 2017 07:52:05 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170406020256.GA1991@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 03/21] ppc/pnv: Add support for POWER8+ LPC
- Controller
+In-Reply-To: <20170406090045.GC4341@noname.redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="JVfPvemo5N4JQARebwtBcgOtLxENPn0Hp"
+Subject: Re: [Qemu-devel] [PATCH v3 10/13] block: Simplify
+ bdrv_append_temp_snapshot() logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,78 +26,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-On 04/06/2017 04:02 AM, David Gibson wrote:
-> On Wed, Apr 05, 2017 at 02:41:28PM +0200, C=E9dric Le Goater wrote:
->> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--JVfPvemo5N4JQARebwtBcgOtLxENPn0Hp
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, Max Reitz <mreitz@redhat.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>
+Message-ID: <1313a278-947d-9b73-640f-3aa518019773@redhat.com>
+Subject: Re: [PATCH v3 10/13] block: Simplify bdrv_append_temp_snapshot()
+ logic
+References: <20170405194741.18956-1-eblake@redhat.com>
+ <20170405194741.18956-11-eblake@redhat.com>
+ <20170406090045.GC4341@noname.redhat.com>
+In-Reply-To: <20170406090045.GC4341@noname.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 04/06/2017 04:00 AM, Kevin Wolf wrote:
+> Am 05.04.2017 um 21:47 hat Eric Blake geschrieben:
+>> Noticed while checking Coccinelle results. Naming a label 'out:'
+>> when it is only used on error paths is weird; meanwhile we know
+>> that snapshot_options is NULL on success and that QDECREF(NULL)
+>> is safe.  So merge the two exit paths into one.
 >>
->> It adds the Naples chip which supports proper LPC interrupts via the
->> LPC controller rather than via an external CPLD.
->>
->> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->> [clg: - updated for qemu-2.9
->>       - ported on latest PowerNV patchset ]
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
 >> ---
->>  hw/ppc/pnv.c             | 13 ++++++++++++-
->>  hw/ppc/pnv_lpc.c         | 47 +++++++++++++++++++++++++++++++++++++++=
-++++++--
->>  include/hw/ppc/pnv_lpc.h |  9 +++++++++
->>  3 files changed, 66 insertions(+), 3 deletions(-)
+>>  block.c | 7 ++-----
+>>  1 file changed, 2 insertions(+), 5 deletions(-)
 >>
->> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
->> index 24e523f554c6..78133e5d20e1 100644
->> --- a/hw/ppc/pnv.c
->> +++ b/hw/ppc/pnv.c
->> @@ -373,7 +373,14 @@ static void pnv_lpc_isa_irq_handler_cpld(void *op=
-aque, int n, int level)
->> =20
->>  static void pnv_lpc_isa_irq_handler(void *opaque, int n, int level)
->>  {
->> -     /* XXX TODO */
->> +    PnvChip *chip =3D opaque;
->> +    PnvLpcController *lpc =3D &chip->lpc;
->> +
->> +    /* The Naples HW latches the 1 levels, clearing is done by SW */
->> +    if (level) {
->> +        lpc->lpc_hc_irqstat |=3D LPC_HC_IRQ_SERIRQ0 >> n;
->> +        pnv_lpc_eval_irqs(lpc);
->> +    }
->>  }
+>> diff --git a/block.c b/block.c
+>> index 9b87bf6..a13625f 100644
+>> --- a/block.c
+>> +++ b/block.c
+>> @@ -2209,13 +2209,10 @@ static BlockDriverState *bdrv_append_temp_snap=
+shot(BlockDriverState *bs,
+>>          goto out;
+>>      }
+>>
+>> +out:
+>> +    QDECREF(snapshot_options);
+>>      g_free(tmp_filename);
+>>      return bs_snapshot;
 >=20
-> Now that you have a more complete LPC model, I think this function,
-> and the allocation of the LPC irqs should move into pnv_lpc.c.
->=20
->=20
-> Apart from that, looks fine.
+> bs_snapshot is uninitialised or at least the wrong return value in erro=
+r
+> cases. (Hm... Shouldn't the compiler catch the uninitialised part?)
 
-While I am at changing things, we have a 'cpld_irqstate' under the=20
-machine to model the state of the CPLD chip. It is only used in :=20
+Odd, and I agree that I recall the compiler generally able to catch that
+(maybe it's a matter of compiling with -g vs. -O2).  I'm surprised the
+autobuilder didn't flag it.  (I think I missed it due to rebase churn on
+my end).  The obvious fix is to:
 
-	static void pnv_lpc_isa_irq_handler_cpld(void *opaque, int n, int level)
-	{
-	    PnvMachineState *pnv =3D POWERNV_MACHINE(qdev_get_machine());
-	    uint32_t old_state =3D pnv->cpld_irqstate;
-	    PnvLpcController *lpc =3D opaque;
+-    BlockDriverState *bs_snapshot;
++    BlockDriverState *bs_snapshot =3D NULL;
 
-	    if (level) {
-	        pnv->cpld_irqstate |=3D 1u << n;
-	    } else {
-	        pnv->cpld_irqstate &=3D ~(1u << n);
-	    }
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-	    if (pnv->cpld_irqstate !=3D old_state) {
-	        pnv_psi_irq_set(lpc->psi, PSIHB_IRQ_EXTERNAL, pnv->cpld_irqstate=
- !=3D 0);
-	    }
-	}
 
-May be we could move that under the LPC object even if it is not strictly
-correct from a HW pov ?=20
+--JVfPvemo5N4JQARebwtBcgOtLxENPn0Hp
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Thanks,
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-C.=20
+iQEcBAEBCAAGBQJY5jn1AAoJEKeha0olJ0NqJK8IAJ5PJdHjudLH/dTW0j2XPf/T
+t4Qp5UVK/1kMG+FGnqpintah2fyLdzOevRQUZXfuZZJMGyr7/ly6xioKMwg00S8w
+S8RQ8B5vipwnECEmWGpbRj0QtfI82Nt3ZWb119x2bkdeOci8FZum4qLClOe9Cr3B
+qg9UYIebCCnEzvAft5gL6U2O7H0gCV+E1NWIL8xFhGFICWB4aZh1DJa4mk+RpFqd
+tL5aEJszhTBQY1dqcLF9TyX+kG55PmI+u8JNDC3xGIiQU3NKG7U+eit0SpzNtX0b
+V25mzixRAYwY1KZr1qKVZh09ruvbvodsCMXG728/wlpw0/sCaWKZH/z2jFz2pDM=
+=pv54
+-----END PGP SIGNATURE-----
+
+--JVfPvemo5N4JQARebwtBcgOtLxENPn0Hp--
