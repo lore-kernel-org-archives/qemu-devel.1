@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1cw52S-0005tk-RB
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 06:53:17 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1cw53w-00075y-Kp
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 06:54:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1cw52P-0000Lh-MG
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 06:53:16 -0400
-Received: from mga14.intel.com ([192.55.52.115]:38870)
+	(envelope-from <eric.auger@redhat.com>) id 1cw53t-0000d3-Hn
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 06:54:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35030)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1cw52P-0000LS-AF
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 06:53:13 -0400
-Date: Thu, 6 Apr 2017 18:53:09 +0800
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-ID: <20170406105309.4yqkqo3itlhkuy5o@hz-desktop>
-References: <20170331084147.32716-1-haozhong.zhang@intel.com>
-	<20170331084147.32716-5-haozhong.zhang@intel.com>
-	<20170406101356.GC21261@stefanha-x1.localdomain>
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1cw53t-0000ck-8c
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 06:54:45 -0400
+References: <1491462524-1617-1-git-send-email-peterx@redhat.com>
+	<1491462524-1617-5-git-send-email-peterx@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <e7889877-58be-3f02-a26d-522326756fa1@redhat.com>
+Date: Thu, 6 Apr 2017 12:54:30 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170406101356.GC21261@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [RFC PATCH 4/4] nvdimm acpi: build flush hint
- address structure if required
+In-Reply-To: <1491462524-1617-5-git-send-email-peterx@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 4/9] memory: introduce
+ memory_region_notify_one()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,98 +29,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, dan.j.williams@intel.com, Richard Henderson <rth@twiddle.net>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, Marcel Apfelbaum <marcel@redhat.com>, bd.aviv@gmail.com, David Gibson <david@gibson.dropbear.id.au>
 
-On 04/06/17 11:13 +0100, Stefan Hajnoczi wrote:
-> On Fri, Mar 31, 2017 at 04:41:47PM +0800, Haozhong Zhang wrote:
-> > 
-> > Add an boolean option 'flush-hint' to device 'nvdimm'. If it's on, a
-> > flush hint address structure will be constructed for each nvdimm
-> > device.
+Hi Peter,
+On 06/04/2017 09:08, Peter Xu wrote:
+> Generalizing the notify logic in memory_region_notify_iommu() into a
+> single function. This can be further used in customized replay()
+> functions for IOMMUs.
 > 
-> Users should not need to set the flush hint option.  NVDIMM
-> configurations that persist data properly without Flush Hint Addresses
-> shouldn't use them (for best performance).  Configurations that rely on
-> flush hints *must* use them to guarantee data integrity.
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-It's for backwards compatibility, i.e. migrating a VM on QEMU w/o
-flush hint support to another one w/ flush hint support. By using a
-flush-hint option and making it disabled by default, users can ensure
-both QEMU provide the same VM configuration.
+Thanks
 
-Haozhong
+Eric
 
+> ---
+>  include/exec/memory.h | 15 +++++++++++++++
+>  memory.c              | 40 ++++++++++++++++++++++++----------------
+>  2 files changed, 39 insertions(+), 16 deletions(-)
 > 
-> I don't remember if there's a way to detect the configuration from host
-> userspace, but we should focus on setting this correctly without
-> requiring users to know which setting is necessary.
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index fb7dff3..055b3a8 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -688,6 +688,21 @@ void memory_region_notify_iommu(MemoryRegion *mr,
+>                                  IOMMUTLBEntry entry);
+>  
+>  /**
+> + * memory_region_notify_one: notify a change in an IOMMU translation
+> + *                           entry to a single notifier
+> + *
+> + * This works just like memory_region_notify_iommu(), but it only
+> + * notifies a specific notifier, not all of them.
+> + *
+> + * @notifier: the notifier to be notified
+> + * @entry: the new entry in the IOMMU translation table.  The entry
+> + *         replaces all old entries for the same virtual I/O address range.
+> + *         Deleted entries have .@perm == 0.
+> + */
+> +void memory_region_notify_one(IOMMUNotifier *notifier,
+> +                              IOMMUTLBEntry *entry);
+> +
+> +/**
+>   * memory_region_register_iommu_notifier: register a notifier for changes to
+>   * IOMMU translation entries.
+>   *
+> diff --git a/memory.c b/memory.c
+> index b4ed67b..ded4bf1 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -1662,32 +1662,40 @@ void memory_region_unregister_iommu_notifier(MemoryRegion *mr,
+>      memory_region_update_iommu_notify_flags(mr);
+>  }
+>  
+> -void memory_region_notify_iommu(MemoryRegion *mr,
+> -                                IOMMUTLBEntry entry)
+> +void memory_region_notify_one(IOMMUNotifier *notifier,
+> +                              IOMMUTLBEntry *entry)
+>  {
+> -    IOMMUNotifier *iommu_notifier;
+>      IOMMUNotifierFlag request_flags;
+>  
+> -    assert(memory_region_is_iommu(mr));
+> +    /*
+> +     * Skip the notification if the notification does not overlap
+> +     * with registered range.
+> +     */
+> +    if (notifier->start > entry->iova + entry->addr_mask + 1 ||
+> +        notifier->end < entry->iova) {
+> +        return;
+> +    }
+>  
+> -    if (entry.perm & IOMMU_RW) {
+> +    if (entry->perm & IOMMU_RW) {
+>          request_flags = IOMMU_NOTIFIER_MAP;
+>      } else {
+>          request_flags = IOMMU_NOTIFIER_UNMAP;
+>      }
+>  
+> +    if (notifier->notifier_flags & request_flags) {
+> +        notifier->notify(notifier, entry);
+> +    }
+> +}
+> +
+> +void memory_region_notify_iommu(MemoryRegion *mr,
+> +                                IOMMUTLBEntry entry)
+> +{
+> +    IOMMUNotifier *iommu_notifier;
+> +
+> +    assert(memory_region_is_iommu(mr));
+> +
+>      IOMMU_NOTIFIER_FOREACH(iommu_notifier, mr) {
+> -        /*
+> -         * Skip the notification if the notification does not overlap
+> -         * with registered range.
+> -         */
+> -        if (iommu_notifier->start > entry.iova + entry.addr_mask + 1 ||
+> -            iommu_notifier->end < entry.iova) {
+> -            continue;
+> -        }
+> -        if (iommu_notifier->notifier_flags & request_flags) {
+> -            iommu_notifier->notify(iommu_notifier, &entry);
+> -        }
+> +        memory_region_notify_one(iommu_notifier, &entry);
+>      }
+>  }
+>  
 > 
-> > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> > ---
-> >  hw/acpi/nvdimm.c        | 106 +++++++++++++++++++++++++++++++++++++++++++++---
-> >  hw/i386/pc.c            |   5 ++-
-> >  hw/mem/nvdimm.c         |  26 ++++++++++++
-> >  include/hw/mem/nvdimm.h |   2 +-
-> >  4 files changed, 132 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
-> > index ea2ac3e..a7ff0b2 100644
-> > --- a/hw/acpi/nvdimm.c
-> > +++ b/hw/acpi/nvdimm.c
-> > @@ -32,6 +32,8 @@
-> >  #include "hw/acpi/bios-linker-loader.h"
-> >  #include "hw/nvram/fw_cfg.h"
-> >  #include "hw/mem/nvdimm.h"
-> > +#include "exec/address-spaces.h"
-> > +#include "qapi/error.h"
-> >  
-> >  static int nvdimm_device_list(Object *obj, void *opaque)
-> >  {
-> > @@ -168,6 +170,22 @@ struct NvdimmNfitControlRegion {
-> >  typedef struct NvdimmNfitControlRegion NvdimmNfitControlRegion;
-> >  
-> >  /*
-> > + * NVDIMM Flush Hint Address Structure
-> > + *
-> > + * It enables the data durability mechanism via ACPI.
-> > + */
-> > +struct NvdimmNfitFlushHintAddress {
-> > +    uint16_t type;
-> > +    uint16_t length;
-> > +    uint32_t nfit_handle;
-> > +    uint16_t nr_flush_hint_addr;
-> > +    uint8_t  reserved[6];
-> > +#define NR_FLUSH_HINT_ADDR 1
-> > +    uint64_t flush_hint_addr[NR_FLUSH_HINT_ADDR];
-> 
-> How should the number of flush hints be set?  This patch hardcodes it to
-> 1 but the Linux nvdimm drivers tries to balance between flush hint
-> addresses to improve performance (to prevent cache line bouncing?).
-> 
-> > +} QEMU_PACKED;
-> > +typedef struct NvdimmNfitFlushHintAddress NvdimmNfitFlushHintAddress;
-> > +
-> > +/*
-> >   * Module serial number is a unique number for each device. We use the
-> >   * slot id of NVDIMM device to generate this number so that each device
-> >   * associates with a different number.
-> > @@ -343,10 +361,79 @@ static void nvdimm_build_structure_dcr(GArray *structures, DeviceState *dev)
-> >                                           (DSM) in DSM Spec Rev1.*/);
-> >  }
-> >  
-> > -static GArray *nvdimm_build_device_structure(void)
-> > +static uint64_t nvdimm_flush_hint_read(void *opaque, hwaddr addr, unsigned size)
-> > +{
-> > +    return 0;
-> > +}
-> > +
-> > +static void nvdimm_flush_hint_write(void *opaque, hwaddr addr,
-> > +                                    uint64_t data, unsigned size)
-> > +{
-> > +    nvdimm_debug("Write Flush Hint: offset 0x%"HWADDR_PRIx", data 0x%"PRIx64"\n",
-> > +                 addr, data);
-> > +    nvdimm_flush((NVDIMMDevice *)opaque);
-> 
-> C automatically casts void * to any other pointer type.  The cast is
-> unnecessary.
