@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cw8MD-0005S4-T7
+	(envelope-from <famz@redhat.com>) id 1cw8MD-0005S5-Tj
 	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 10:25:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cw8MD-0001eu-62
+	(envelope-from <famz@redhat.com>) id 1cw8MC-0001eW-GD
 	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 10:25:53 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Thu,  6 Apr 2017 22:25:23 +0800
-Message-Id: <20170406142527.25835-2-famz@redhat.com>
-In-Reply-To: <20170406142527.25835-1-famz@redhat.com>
-References: <20170406142527.25835-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9 1/5] block: Fix unpaired
- aio_disable_external in external snapshot
+Date: Thu,  6 Apr 2017 22:25:22 +0800
+Message-Id: <20170406142527.25835-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.9 0/5] block: Fixes regarding dataplane
+ and management operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,55 +21,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-bdrv_replace_child_noperm tries to hand over the quiesce_counter state
-from old bs to the new one, but if they are not on the same aio context
-this causes unbalance.
+These are accumulated fixes that showed up when working on the "change"
+issue and "repeated snapshot + commit" crash on dataplane:
 
-Fix this by forcing callers to move the aio context first, and assert
-it.
+    [Qemu-devel] [PATCH] blk: fix aio context loss on media change
+        - Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Reported-by: Ed Swierk <eswierk@skyportsystems.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- block.c    | 3 +++
- blockdev.c | 4 ++--
- 2 files changed, 5 insertions(+), 2 deletions(-)
+    [Qemu-devel] New iotest repros failures on virtio external snapshot with
+    iothread
+        - Ed Swierk <eswierk@skyportsystems.com>
 
-diff --git a/block.c b/block.c
-index 927ba89..8893ac1 100644
---- a/block.c
-+++ b/block.c
-@@ -1752,6 +1752,9 @@ static void bdrv_replace_child_noperm(BdrvChild *child,
- {
-     BlockDriverState *old_bs = child->bs;
- 
-+    if (old_bs && new_bs) {
-+        assert(bdrv_get_aio_context(old_bs) == bdrv_get_aio_context(new_bs));
-+    }
-     if (old_bs) {
-         if (old_bs->quiesce_counter && child->role->drained_end) {
-             child->role->drained_end(child);
-diff --git a/blockdev.c b/blockdev.c
-index 040c152..4927914 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1772,6 +1772,8 @@ static void external_snapshot_prepare(BlkActionState *common,
-         return;
-     }
- 
-+    bdrv_set_aio_context(state->new_bs, state->aio_context);
-+
-     /* This removes our old bs and adds the new bs. This is an operation that
-      * can fail, so we need to do it in .prepare; undoing it for abort is
-      * always possible. */
-@@ -1789,8 +1791,6 @@ static void external_snapshot_commit(BlkActionState *common)
-     ExternalSnapshotState *state =
-                              DO_UPCAST(ExternalSnapshotState, common, common);
- 
--    bdrv_set_aio_context(state->new_bs, state->aio_context);
--
-     /* We don't need (or want) to use the transactional
-      * bdrv_reopen_multiple() across all the entries at once, because we
-      * don't want to abort all of them if one of them fails the reopen */
+Specifically, patch 4 is an output of the former, and the rest are from the
+latter. They seem quite related hence this one series.
+
+With this series applied, Ed's test case '176' passes (reran 10+ times):
+
+    https://github.com/skyportsystems/qemu-1/commits/eswierk-iotests-2.9
+
+NOTE: The "change" crash still needs Vladimir's fix. Patch 4 is noticed with a
+few not-so-related WIP patches, but my understanding is this is a latent bug
+and IMO the change is rather harmless to have.
+
+Fam Zheng (5):
+  block: Fix unpaired aio_disable_external in external snapshot
+  mirror: Fix aio context of mirror_top_bs
+  block: Quiesce old aio context during bdrv_set_aio_context
+  block: Drain BH in bdrv_drained_begin
+  coroutine: Explicitly specify AioContext when creating coroutine
+
+ block.c                      | 23 +++++++++++++++++---
+ block/blkverify.c            |  4 ++--
+ block/block-backend.c        |  4 ++--
+ block/io.c                   | 21 ++++++++++++-------
+ block/mirror.c               |  1 +
+ block/nbd-client.c           |  2 +-
+ block/quorum.c               |  6 +++---
+ block/sheepdog.c             |  4 ++--
+ blockdev.c                   |  4 ++--
+ blockjob.c                   |  2 +-
+ hw/9pfs/9p.c                 |  4 ++--
+ include/block/block.h        |  3 +++
+ include/qemu/coroutine.h     |  3 ++-
+ include/qemu/main-loop.h     |  2 +-
+ migration/migration.c        |  3 ++-
+ nbd/server.c                 |  6 ++++--
+ qemu-img.c                   |  3 ++-
+ qemu-io-cmds.c               |  3 ++-
+ tests/test-aio-multithread.c | 12 +++++++----
+ tests/test-coroutine.c       | 50 ++++++++++++++++++++++++++++++--------------
+ tests/test-thread-pool.c     |  3 ++-
+ util/qemu-coroutine.c        |  6 ++++--
+ 22 files changed, 113 insertions(+), 56 deletions(-)
+
 -- 
 2.9.3
