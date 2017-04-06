@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cw3xY-00060f-Dj
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:44:14 -0400
+	(envelope-from <haozhong.zhang@intel.com>) id 1cw4BO-0008Hl-L8
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:58:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cw3xW-000894-Ct
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:44:08 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:35278)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cw3xW-00088n-2w
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:44:06 -0400
-Received: by mail-wr0-x244.google.com with SMTP id t20so9688425wra.2
-	for <qemu-devel@nongnu.org>; Thu, 06 Apr 2017 02:44:05 -0700 (PDT)
-Date: Thu, 6 Apr 2017 10:43:59 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170406094359.GB21261@stefanha-x1.localdomain>
+	(envelope-from <haozhong.zhang@intel.com>) id 1cw4BL-0004bi-K4
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:58:26 -0400
+Received: from mga01.intel.com ([192.55.52.88]:2249)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1cw4BL-0004ai-8B
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 05:58:23 -0400
+Date: Thu, 6 Apr 2017 17:58:18 +0800
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Message-ID: <20170406095818.vshfv2jgqfzxjhrd@hz-desktop>
 References: <20170331084147.32716-1-haozhong.zhang@intel.com>
+	<2f298f0a-cf07-d131-90c2-bef89537d981@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="hQiwHBbRI9kgIhsi"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170331084147.32716-1-haozhong.zhang@intel.com>
+In-Reply-To: <2f298f0a-cf07-d131-90c2-bef89537d981@gmail.com>
 Subject: Re: [Qemu-devel] [RFC PATCH 0/4] nvdimm: enable flush hint address
  structure
 List-Id: <qemu-devel.nongnu.org>
@@ -30,124 +29,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Haozhong Zhang <haozhong.zhang@intel.com>
-Cc: qemu-devel@nongnu.org, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, dan.j.williams@intel.com, Richard Henderson <rth@twiddle.net>
+To: Xiao Guangrong <guangrong.xiao@gmail.com>
+Cc: qemu-devel@nongnu.org, dan.j.williams@intel.com, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
+On 04/06/17 17:39 +0800, Xiao Guangrong wrote:
+> 
+> 
+> On 31/03/2017 4:41 PM, Haozhong Zhang wrote:
+> > This patch series constructs the flush hint address structures for
+> > nvdimm devices in QEMU.
+> > 
+> > It's of course not for 2.9. I send it out early in order to get
+> > comments on one point I'm uncertain (see the detailed explanation
+> > below). Thanks for any comments in advance!
+> > 
+> > 
+> > Background
+> > ---------------
+> > Flush hint address structure is a substructure of NFIT and specifies
+> > one or more addresses, namely Flush Hint Addresses. Software can write
+> > to any one of these flush hint addresses to cause any preceding writes
+> > to the NVDIMM region to be flushed out of the intervening platform
+> > buffers to the targeted NVDIMM. More details can be found in ACPI Spec
+> > 6.1, Section 5.2.25.8 "Flush Hint Address Structure".
+> > 
+> > 
+> > Why is it RFC?
+> > ---------------
+> > RFC is added because I'm not sure whether the way in this patch series
+> > that allocates the guest flush hint addresses is right.
+> > 
+> > QEMU needs to trap guest accesses (at least for writes) to the flush
+> > hint addresses in order to perform the necessary flush on the host
+> > back store. Therefore, QEMU needs to create IO memory regions that
+> > cover those flush hint addresses. In order to create those IO memory
+> > regions, QEMU needs to know the flush hint addresses or their offsets
+> > to other known memory regions in advance. So far looks good.
+> > 
+> > Flush hint addresses are in the guest address space. Looking at how
+> > the current NVDIMM ACPI in QEMU allocates the DSM buffer, it's natural
+> > to take the same way for flush hint addresses, i.e. let the guest
+> > firmware allocate from free addresses and patch them in the flush hint
+> > address structure. (*Please correct me If my following understand is wrong*)
+> > However, the current allocation and pointer patching are transparent
+> > to QEMU, so QEMU will be unaware of the flush hint addresses, and
+> > consequently have no way to create corresponding IO memory regions in
+> > order to trap guest accesses.
+> 
+> Er, it is awkward and flush-hint-table is static which may not be
+> easily patched.
+> 
+> > 
+> > Alternatively, this patch series moves the allocation of flush hint
+> > addresses to QEMU:
+> > 
+> > 1. (Patch 1) We reserve an address range after the end address of each
+> >    nvdimm device. Its size is specified by the user via a new pc-dimm
+> >    option 'reserved-size'.
+> > 
+> 
+> We should make it only work for nvdimm?
+>
 
---hQiwHBbRI9kgIhsi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Yes, we can check whether the machine option 'nvdimm' is present when
+plugging the nvdimm.
 
-On Fri, Mar 31, 2017 at 04:41:43PM +0800, Haozhong Zhang wrote:
-> This patch series constructs the flush hint address structures for
-> nvdimm devices in QEMU.
->=20
-> It's of course not for 2.9. I send it out early in order to get
-> comments on one point I'm uncertain (see the detailed explanation
-> below). Thanks for any comments in advance!
-> Background
-> ---------------
+> >    For the following example,
+> >         -object memory-backend-file,id=mem0,size=4G,...
+> >         -device nvdimm,id=dimm0,memdev=mem0,reserved-size=4K,...
+> >         -device pc-dimm,id=dimm1,...
+> >    if dimm0 is allocated to address N ~ N+4G, the address of dimm1
+> >    will start from N+4G+4K or higher. N+4G ~ N+4G+4K is reserved for
+> >    dimm0.
+> > 
+> > 2. (Patch 4) When NVDIMM ACPI code builds the flush hint address
+> >    structure for each nvdimm device, it will allocate them from the
+> >    above reserved area, e.g. the flush hint addresses of above dimm0
+> >    are allocated in N+4G ~ N+4G+4K. The addresses are known to QEMU in
+> >    this way, so QEMU can easily create IO memory regions for them.
+> > 
+> >    If the reserved area is not present or too small, QEMU will report
+> >    errors.
+> > 
+> 
+> We should make 'reserved-size' always be page-aligned and should be
+> transparent to the user, i.e, automatically reserve 4k if 'flush-hint'
+> is specified?
+>
 
-Extra background:
+4K alignment is already enforced by current memory plug code.
 
-Flush Hint Addresses are necessary because:
+About the automatic reservation, is a non-zero default value
+acceptable by qemu design/convention in general?
 
-1. Some hardware configurations may require them.  In other words, a
-   cache flush instruction is not enough to persist data.
-
-2. The host file system may need fsync(2) calls (e.g. to persist
-   metadata changes).
-
-Without Flush Hint Addresses only some NVDIMM configurations actually
-guarantee data persistence.
-
-> Flush hint address structure is a substructure of NFIT and specifies
-> one or more addresses, namely Flush Hint Addresses. Software can write
-> to any one of these flush hint addresses to cause any preceding writes
-> to the NVDIMM region to be flushed out of the intervening platform
-> buffers to the targeted NVDIMM. More details can be found in ACPI Spec
-> 6.1, Section 5.2.25.8 "Flush Hint Address Structure".
-
-Do you have performance data?  I'm concerned that Flush Hint Address
-hardware interface is not virtualization-friendly.
-
-In Linux drivers/nvdimm/region_devs.c:nvdimm_flush() does:
-
-  wmb();
-  for (i =3D 0; i < nd_region->ndr_mappings; i++)
-      if (ndrd_get_flush_wpq(ndrd, i, 0))
-          writeq(1, ndrd_get_flush_wpq(ndrd, i, idx));
-  wmb();
-
-That looks pretty lightweight - it's an MMIO write between write
-barriers.
-
-This patch implements the MMIO write like this:
-
-  void nvdimm_flush(NVDIMMDevice *nvdimm)
-  {
-      if (nvdimm->backend_fd !=3D -1) {
-          /*
-           * If the backend store is a physical NVDIMM device, fsync()
-           * will trigger the flush via the flush hint on the host device.
-           */
-          fsync(nvdimm->backend_fd);
-      }
-  }
-
-The MMIO store instruction turned into a synchronous fsync(2) system
-call plus vmexit/vmenter and QEMU userspace context switch:
-
-1. The vcpu blocks during the fsync(2) system call.  The MMIO write
-   instruction has an unexpected and huge latency.
-
-2. The vcpu thread holds the QEMU global mutex so all other threads
-   (including the monitor) are blocked during fsync(2).  Other vcpu
-   threads may block if they vmexit.
-
-It is hard to implement this efficiently in QEMU.  This is why I said
-the hardware interface is not virtualization-friendly.  It's cheap on
-real hardware but expensive under virtualization.
-
-We should think about the optimal way of implementing Flush Hint
-Addresses in QEMU.  But if there is no reasonable way to implement them
-then I think it's better *not* to implement them, just like the Block
-Window feature which is also not virtualization-friendly.  Users who
-want a block device can use virtio-blk.  I don't think NVDIMM Block
-Window can achieve better performance than virtio-blk under
-virtualization (although I'm happy to be proven wrong).
-
-Some ideas for a faster implementation:
-
-1. Use memory_region_clear_global_locking() to avoid taking the QEMU
-   global mutex.  Little synchronization is necessary as long as the
-   NVDIMM device isn't hot unplugged (not yet supported anyway).
-
-2. Can the host kernel provide a way to mmap Address Flush Hints from
-   the physical NVDIMM in cases where the configuration does not require
-   host kernel interception?  That way QEMU can map the physical
-   NVDIMM's Address Flush Hints directly into the guest.  The hypervisor
-   is bypassed and performance would be good.
-
-I'm not sure there is anything we can do to make the case where the host
-kernel wants an fsync(2) fast :(.
-
-Benchmark results would be important for deciding how big the problem
-is.
-
---hQiwHBbRI9kgIhsi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJY5g3fAAoJEJykq7OBq3PIOu8H/ihMPMr6npoTFk4xDBjFsNqr
-6izxemNmiNWMkeN6vHNjOL4DbAfOYXFd9FsLRaSa1f7jCzxuoARo/IB5EW6Yq522
-Rw7wHkVwTI51C6dlWa+p6V4xIspQpW0TPa3zrl7Ua751vinmhHMJqBogdus4EmNe
-u7G3096TCFDGlIb3vhc7+ZNqUgP+fZNNeF8beM3jigDYsIP2FJ+A5XKJMgRnQjIZ
-7kfbIHPv2xK6om0ShXHLR/2H5GXClEvGnhqi2KubnoGZXEeSOREPXKRDCJauoIFj
-cs1qlR4Ii56Ph6MGEVG39KfdxdWra19FGh8C10kCJFNTxIEux/efUoK6kB/xT14=
-=7sdk
------END PGP SIGNATURE-----
-
---hQiwHBbRI9kgIhsi--
+Thanks,
+Haozhong
