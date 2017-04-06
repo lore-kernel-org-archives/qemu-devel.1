@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cw7kJ-0004v1-BI
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:46:44 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1cw7ld-0005yI-LM
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:48:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cw7kE-0000oR-I3
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:46:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48270)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cw7kE-0000o8-BV
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:46:38 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 46CFD3DBC2
-	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 13:46:37 +0000 (UTC)
-References: <20170406131326.2418-1-quintela@redhat.com>
-	<20170406131326.2418-2-quintela@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e1ac640f-23ed-e311-c45d-55c86ff929e1@redhat.com>
-Date: Thu, 6 Apr 2017 08:46:30 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170406131326.2418-2-quintela@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="iaaFdg1GqaWCssmjGXSKtgX1R3ghHC2Ml"
-Subject: Re: [Qemu-devel] [PATCH 1/5] qdev: qdev_hotplug is really a bool
+	(envelope-from <programmingkidx@gmail.com>) id 1cw7lc-0001VH-QP
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:48:05 -0400
+In-Reply-To: <718b56ea-2930-c85e-2c7f-b8b4287925a1@kaod.org>
+References: <20170406102249.20383-1-nikunj@linux.vnet.ibm.com>
+	<6029cef4-0a41-cde0-b3c9-6b6ad9bde572@kaod.org>
+	<AA97BA94-C905-4D71-9D73-8064D3E309EA@gmail.com>
+	<718b56ea-2930-c85e-2c7f-b8b4287925a1@kaod.org>
+Mime-Version: 1.0 (Apple Message framework v753.1)
+Content-Type: text/plain; charset=ISO-8859-1; delsp=yes; format=flowed
+Message-Id: <9A190410-18FD-40B1-B5E0-C7E9D98591E0@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+From: G 3 <programmingkidx@gmail.com>
+Date: Thu, 6 Apr 2017 09:47:55 -0400
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH RFC v1 0/3] Enable MTTCG on PPC64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,53 +25,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---iaaFdg1GqaWCssmjGXSKtgX1R3ghHC2Ml
-From: Eric Blake <eblake@redhat.com>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com
-Message-ID: <e1ac640f-23ed-e311-c45d-55c86ff929e1@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/5] qdev: qdev_hotplug is really a bool
-References: <20170406131326.2418-1-quintela@redhat.com>
- <20170406131326.2418-2-quintela@redhat.com>
-In-Reply-To: <20170406131326.2418-2-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 04/06/2017 08:13 AM, Juan Quintela wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  hw/core/qdev.c         | 4 ++--
->  include/hw/qdev-core.h | 2 +-
->  2 files changed, 3 insertions(+), 3 deletions(-)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+To: =?ISO-8859-1?Q?C=E9dric_Le_Goater?= <clg@kaod.org>
+Cc: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net, alex.bennee@linaro.org, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
 
---iaaFdg1GqaWCssmjGXSKtgX1R3ghHC2Ml
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+On Apr 6, 2017, at 9:32 AM, C=E9dric Le Goater wrote:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+> On 04/06/2017 03:28 PM, G 3 wrote:
+>>
+>> On Apr 6, 2017, at 9:26 AM, C=E9dric Le Goater wrote:
+>>
+>>> Hello Nikunj,
+>>>
+>>> On 04/06/2017 12:22 PM, Nikunj A Dadhania wrote:
+>>>> The series enables Multi-Threaded TCG on PPC64
+>>>>
+>>>> Patch 01: Use atomic_cmpxchg in store conditional
+>>>>       02: Handle first write to page during atomic operation
+>>>>       03: Generate memory barriers for sync/isync and load/store =20=
 
-iQEcBAEBCAAGBQJY5ka2AAoJEKeha0olJ0Nq+CAH/A3TNGL4LUBljB+HF9LBS+ES
-a6rrMJ81LqoPcVmzS5d12O0MPDGMyxIKVy5Oi6tKazCemD3bMVRHnZYkeu6+wsd4
-hSSdK09Qss5UYAfHhBr1Kaa/0pOohqZ3hgGxCQA0cGEB/FvzJwrmWwAHxAt0UPP6
-Lip5i0uBuFnoUcm0YWWKaAywhgivJop6NE8gwWXY9ZhuUeSTF0oBNSysfGXjTkiV
-HAu+EOHjr+XgKdYSOXdxxUxhiE7c0nlcAZIOqjM/iG2YpG7oUgDxtPRQrgoAru6q
-3dJ53kOladfWkOGVtwN7k4vSM6abZpgbw72EH2OXe6PDNpXbFdJcXFhAChc3sYY=
-=Ge2B
------END PGP SIGNATURE-----
+>>>> conditional
+>>>>
+>>>> Patches are based on ppc-for-2.10
+>>>>
+>>>> Tested using following:
+>>>> ./ppc64-softmmu/qemu-system-ppc64 -cpu POWER8 -vga none -=20
+>>>> nographic -machine pseries,usb=3Doff -m 2G  -smp =20
+>>>> 8,cores=3D8,threads=3D1 -accel tcg,thread=3Dmulti  f23.img
+>>>
+>>> I tried it with a Ubuntu 16.04.2 guest using stress --cpu 8. It =20
+>>> looked
+>>> good : the CPU usage of QEMU reached 760% on the host.
+>>
+>> What was your guest operating system?
+>
+> The guest is an Ubuntu 16.04.2 and the host is an Ubuntu 17.04.
+>
+> C.
 
---iaaFdg1GqaWCssmjGXSKtgX1R3ghHC2Ml--
+Thank you for the information.
+
+What you could do is run QEMU in emulation mode (non-kvm mode) and =20
+time how long it takes Ubuntu to boot up with one emulated core vs =20
+how long it takes to boot up on say 4 emulated cores. This would be a =20=
+
+good start:
+
+Boot up times:
+
+one core:
+
+two cores:
+
+four cores:
+
+eight cores:
