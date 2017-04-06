@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cw0Aa-0000Gn-Vi
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 01:41:22 -0400
+	(envelope-from <marcel@redhat.com>) id 1cw0BM-0000lg-MG
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 01:42:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cw0AX-0006QT-0x
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 01:41:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59044)
+	(envelope-from <marcel@redhat.com>) id 1cw0BL-0007G5-28
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 01:42:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38136)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cw0AW-0006OP-Np
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 01:41:16 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cw0BK-0007Fk-Sq
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 01:42:06 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5257261D0F
-	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 05:41:15 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E0F7A7EBB8
+	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 05:42:05 +0000 (UTC)
 References: <20170405194741.18956-1-eblake@redhat.com>
-	<20170405194741.18956-2-eblake@redhat.com>
+	<20170405194741.18956-3-eblake@redhat.com>
 From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <b030c1a4-1236-9330-221f-e9b6a42cf70f@redhat.com>
-Date: Thu, 6 Apr 2017 08:41:10 +0300
+Message-ID: <572daf5e-bac0-4e30-9225-72a1a16f48eb@redhat.com>
+Date: Thu, 6 Apr 2017 08:42:01 +0300
 MIME-Version: 1.0
-In-Reply-To: <20170405194741.18956-2-eblake@redhat.com>
+In-Reply-To: <20170405194741.18956-3-eblake@redhat.com>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 01/13] pci: Use struct instead of QDict
- to pass back parameters
+Subject: Re: [Qemu-devel] [PATCH v3 02/13] pci: Reduce scope of error
+ injection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,104 +38,53 @@ To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 Cc: armbru@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
 
 On 04/05/2017 10:47 PM, Eric Blake wrote:
-> It's simpler to just use a C struct than it is to bundle things
-> into a QDict in one function just to pull them back out in the
-> caller.  Plus, doing this gets rid of one more user of dynamic
-> JSON through qobject_from_jsonf(), as well as a memory leak of
-> the QDict.
->
-> While cleaning the code, fix things to report all errors (the
-> code was previously silently ignoring a failure of
-> pcie_aer_inject_error(), at a distance).
+> No one outside of pcie_aer.h was using error injection; mark them
+> static for internal use.
 >
 > Signed-off-by: Eric Blake <eblake@redhat.com>
 >
 > ---
-> v3: more cleanups suggested by Markus, drop R-b
+> v3: new patch, suggested by Markus
 > ---
->  hw/pci/pcie_aer.c | 44 ++++++++++++++++++++++++++------------------
->  1 file changed, 26 insertions(+), 18 deletions(-)
+>  include/hw/pci/pcie_aer.h | 4 ----
+>  hw/pci/pcie_aer.c         | 4 ++--
+>  2 files changed, 2 insertions(+), 6 deletions(-)
 >
+> diff --git a/include/hw/pci/pcie_aer.h b/include/hw/pci/pcie_aer.h
+> index 526802b..729a943 100644
+> --- a/include/hw/pci/pcie_aer.h
+> +++ b/include/hw/pci/pcie_aer.h
+> @@ -100,8 +100,4 @@ void pcie_aer_root_write_config(PCIDevice *dev,
+>                                  uint32_t addr, uint32_t val, int len,
+>                                  uint32_t root_cmd_prev);
+>
+> -/* error injection */
+> -int pcie_aer_inject_error(PCIDevice *dev, const PCIEAERErr *err);
+> -void pcie_aer_msg(PCIDevice *dev, const PCIEAERMsg *msg);
+> -
+>  #endif /* QEMU_PCIE_AER_H */
 > diff --git a/hw/pci/pcie_aer.c b/hw/pci/pcie_aer.c
-> index a8c1820..653af86 100644
+> index 653af86..828052b 100644
 > --- a/hw/pci/pcie_aer.c
 > +++ b/hw/pci/pcie_aer.c
-> @@ -44,6 +44,13 @@
->  #define PCI_ERR_SRC_COR_OFFS    0
->  #define PCI_ERR_SRC_UNCOR_OFFS  2
->
-> +typedef struct PCIEErrorDetails {
-> +    const char *id;
-> +    const char *root_bus;
-> +    int bus;
-> +    int devfn;
-> +} PCIEErrorDetails;
-> +
->  /* From 6.2.7 Error Listing and Rules. Table 6-2, 6-3 and 6-4 */
->  static uint32_t pcie_aer_uncor_default_severity(uint32_t status)
+> @@ -376,7 +376,7 @@ static void pcie_aer_msg_root_port(PCIDevice *dev, const PCIEAERMsg *msg)
+>   *
+>   * Walk up the bus tree from the device, propagate the error message.
+>   */
+> -void pcie_aer_msg(PCIDevice *dev, const PCIEAERMsg *msg)
+> +static void pcie_aer_msg(PCIDevice *dev, const PCIEAERMsg *msg)
 >  {
-> @@ -942,8 +949,14 @@ static int pcie_aer_parse_error_string(const char *error_name,
->      return -EINVAL;
->  }
+>      uint8_t type;
 >
-> +/*
-> + * Inject an error described by @qdict.
-> + * On success, set @details to show where error was sent.
-> + * Return negative errno if injection failed and a message was emitted.
-> + */
->  static int do_pcie_aer_inject_error(Monitor *mon,
-> -                                    const QDict *qdict, QObject **ret_data)
-> +                                    const QDict *qdict,
-> +                                    PCIEErrorDetails *details)
+> @@ -631,7 +631,7 @@ static bool pcie_aer_inject_uncor_error(PCIEAERInject *inj, bool is_fatal)
+>   * Figure 6-2: Flowchart Showing Sequence of Device Error Signaling and Logging
+>   *             Operations
+>   */
+> -int pcie_aer_inject_error(PCIDevice *dev, const PCIEAERErr *err)
+> +static int pcie_aer_inject_error(PCIDevice *dev, const PCIEAERErr *err)
 >  {
->      const char *id = qdict_get_str(qdict, "id");
->      const char *error_name;
-> @@ -1005,33 +1018,28 @@ static int do_pcie_aer_inject_error(Monitor *mon,
->      err.prefix[3] = qdict_get_try_int(qdict, "prefix3", 0);
->
->      ret = pcie_aer_inject_error(dev, &err);
-> -    *ret_data = qobject_from_jsonf("{'id': %s, "
-> -                                   "'root_bus': %s, 'bus': %d, 'devfn': %d, "
-> -                                   "'ret': %d}",
-> -                                   id, pci_root_bus_path(dev),
-> -                                   pci_bus_num(dev->bus), dev->devfn,
-> -                                   ret);
-> -    assert(*ret_data);
-> +    if (ret < 0) {
-> +        monitor_printf(mon, "failed to inject error: %s\n",
-> +                       strerror(-ret));
-> +        return ret;
-> +    }
-> +    details->id = id;
-> +    details->root_bus = pci_root_bus_path(dev);
-> +    details->bus = pci_bus_num(dev->bus);
-> +    details->devfn = dev->devfn;
->
->      return 0;
->  }
->
->  void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict)
->  {
-> -    QObject *data;
-> -    int devfn;
-> +    PCIEErrorDetails data;
->
->      if (do_pcie_aer_inject_error(mon, qdict, &data) < 0) {
->          return;
->      }
->
-> -    qdict = qobject_to_qdict(data);
-> -    assert(qdict);
-> -
-> -    devfn = (int)qdict_get_int(qdict, "devfn");
->      monitor_printf(mon, "OK id: %s root bus: %s, bus: %x devfn: %x.%x\n",
-> -                   qdict_get_str(qdict, "id"),
-> -                   qdict_get_str(qdict, "root_bus"),
-> -                   (int) qdict_get_int(qdict, "bus"),
-> -                   PCI_SLOT(devfn), PCI_FUNC(devfn));
-> +                   data.id, data.root_bus, data.bus,
-> +                   PCI_SLOT(data.devfn), PCI_FUNC(data.devfn));
->  }
+>      uint8_t *aer_cap = NULL;
+>      uint16_t devctl = 0;
 >
 
 
