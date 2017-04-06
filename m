@@ -1,40 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cvw1l-0000iU-7A
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 21:15:58 -0400
+	(envelope-from <herongguang.he@huawei.com>) id 1cvwXN-00051d-Hu
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 21:48:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cvw1g-000408-6a
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 21:15:57 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57263)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1cvw1f-0003zx-SI
-	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 21:15:52 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3619EZ2093261
-	for <qemu-devel@nongnu.org>; Wed, 5 Apr 2017 21:15:50 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29n9g74rq5-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 05 Apr 2017 21:15:50 -0400
-Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Wed, 5 Apr 2017 21:15:48 -0400
-Date: Thu, 6 Apr 2017 09:15:42 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170405091909.36357-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170405091909.36357-2-bjsdjshi@linux.vnet.ibm.com>
-	<0910cdba-6e7b-169f-784a-a0e064f2c71d@redhat.com>
+	(envelope-from <herongguang.he@huawei.com>) id 1cvwXK-0000B3-B8
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 21:48:37 -0400
+Received: from [45.249.212.187] (port=3024 helo=dggrg01-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <herongguang.he@huawei.com>) id 1cvwXJ-00006r-Mr
+	for qemu-devel@nongnu.org; Wed, 05 Apr 2017 21:48:34 -0400
+References: <58CFE56E.9090303@huawei.com>
+	<135b6663-b65c-b5ba-d3a8-b2a2127a07fa@redhat.com>
+From: "Herongguang (Stephen)" <herongguang.he@huawei.com>
+Message-ID: <58E59E29.7070305@huawei.com>
+Date: Thu, 6 Apr 2017 09:47:21 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0910cdba-6e7b-169f-784a-a0e064f2c71d@redhat.com>
-Message-Id: <20170406011542.GI22108@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v4 1/1] block: pass the right options for
- BlockDriver.bdrv_open()
+In-Reply-To: <135b6663-b65c-b5ba-d3a8-b2a2127a07fa@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [BUG/RFC] INIT IPI lost when VM starts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,51 +27,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-block@nongnu.org, kwolf@redhat.com, qemu-devel@nongnu.org, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com
-
-* Max Reitz <mreitz@redhat.com> [2017-04-05 15:54:14 +0200]:
-
-> On 05.04.2017 11:19, Dong Jia Shi wrote:
-> > raw_open() expects the caller always passing in the right actual
-> > @options parameter. But when trying to applying snapshot on a RBD
-> > image, bdrv_snapshot_goto() calls raw_open() (by calling the
-> > bdrv_open callback on the BlockDriver) with a NULL @options, and
-> > that will result in a Segmentation fault.
-> > 
-> > For the other non-raw format drivers, it also makes sense to passing
-> > in the actual options, althought they don't trigger the problem so
-> > far.
-> > 
-> > Let's prepare a @options by adding the "file" key-value pair to a
-> > copy of the actual options that were given for the node (i.e.
-> > bs->options), and pass it to the callback.
-> > 
-> > BlockDriver.bdrv_open() expects bs->file to be NULL and just
-> > overwrites it with the result from bdrv_open_child(). That means we
-> > should actually make sure it's NULL because otherwise the child BDS
-> > will have a reference count that is 1 too high. So we unconditionally
-> > invoke bdrv_unref_child() before calling BlockDriver.bdrv_open(), and
-> > we wrap everything in bdrv_ref()/bdrv_unref() so the BDS isn't
-> > deleted in the meantime.
-> > 
-> > Suggested-by: Max Reitz <mreitz@redhat.com>
-> > Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> > ---
-> >  block/snapshot.c | 26 +++++++++++++++++++++++---
-> >  1 file changed, 23 insertions(+), 3 deletions(-)
-> 
-> Thank you, I've applied the patch to my block branch (for inclusion in 2.9):
-> 
-> https://github.com/XanClic/qemu/commits/block
-Thank you!
-
-> 
-> Max
-> 
+To: Paolo Bonzini <pbonzini@redhat.com>, rkrcmar@redhat.com, afaerber@suse.de, jan.kiszka@siemens.com, qemu-devel@nongnu.org, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, wangxinxin.wang@huawei.com, "weidong.huang@huawei.com >> Huangweidong (C)" <weidong.huang@huawei.com>
 
 
 
+On 2017/4/6 0:16, Paolo Bonzini wrote:
+>
+> On 20/03/2017 15:21, Herongguang (Stephen) wrote:
+>> We encountered a problem that when a domain starts, seabios failed to
+>> online a vCPU.
+>>
+>> After investigation, we found that the reason is in kvm-kmod,
+>> KVM_APIC_INIT bit in
+>> vcpu->arch.apic->pending_events was overwritten by qemu, and thus an
+>> INIT IPI sent
+>> to AP was lost. Qemu does this since libvirtd sends a ‘query-cpus’ qmp
+>> command to qemu
+>> on VM start.
+>>
+>> In qemu, qmp_query_cpus-> cpu_synchronize_state->
+>> kvm_cpu_synchronize_state->
+>> do_kvm_cpu_synchronize_state, qemu gets registers/vcpu_events from
+>> kvm-kmod and
+>> sets cpu->kvm_vcpu_dirty to true, and vcpu thread in qemu will call
+>> kvm_arch_put_registers if cpu->kvm_vcpu_dirty is true, thus
+>> pending_events is
+>> overwritten by qemu.
+>>
+>> I think there is no need for qemu to set cpu->kvm_vcpu_dirty to true
+>> after ‘query-cpus’,
+>> and  kvm-kmod should not clear KVM_APIC_INIT unconditionally. And I am
+>> not sure whether
+>> it is OK for qemu to set cpu->kvm_vcpu_dirty in
+>> do_kvm_cpu_synchronize_state in each caller.
+>>
+>> What’s your opinion?
+> Hi Rongguang,
+>
+> sorry for the late response.
+>
+> Where exactly is KVM_APIC_INIT dropped?  kvm_get_mp_state does clear the
+> bit, but the result of the INIT is stored in mp_state.
 
--- 
-Dong Jia Shi
+It's dropped in KVM_SET_VCPU_EVENTS, see below.
+
+>
+> kvm_get_vcpu_events is called after kvm_get_mp_state; it retrieves
+> KVM_APIC_INIT in events.smi.latched_init and kvm_set_vcpu_events passes
+> it back.  Maybe it should ignore events.smi.latched_init if not in SMM,
+> but I would like to understand the exact sequence of events.
+
+time0:
+vcpu1:
+qmp_query_cpus-> cpu_synchronize_state-> kvm_cpu_synchronize_state->
+ > do_kvm_cpu_synchronize_state(and set vcpu1's cpu->kvm_vcpu_dirty to true)-> kvm_arch_get_registers(KVM_APIC_INIT bit in vcpu->arch.apic->pending_events was not set)
+
+time1:
+vcpu0:
+send INIT-SIPI to all AP->(in vcpu 0's context)__apic_accept_irq(KVM_APIC_INIT bit in vcpu1's arch.apic->pending_events is set)
+
+time2:
+vcpu1:
+kvm_cpu_exec->(if cpu->kvm_vcpu_dirty is true)kvm_arch_put_registers->kvm_put_vcpu_events(overwritten KVM_APIC_INIT bit in vcpu->arch.apic->pending_events!)
+
+So it's a race between vcpu1 get/put registers with kvm/other vcpus changing vcpu1's status/structure fields in the mean time, I am in worry of if there are other fields may be overwritten,
+sipi_vector is one.
+
+also see: https://www.mail-archive.com/qemu-devel@nongnu.org/msg438675.html
+
+> Thanks,
+>
+> paolo
+>
+> .
+>
