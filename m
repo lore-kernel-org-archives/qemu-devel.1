@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cw3DC-0001kb-Lh
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 04:56:15 -0400
+	(envelope-from <oussemakeder@yahoo.fr>) id 1cw3E0-0002B1-Kg
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 04:57:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cw3DB-00023E-RD
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 04:56:14 -0400
-Date: Thu, 6 Apr 2017 10:56:01 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170406085601.GB4341@noname.redhat.com>
-References: <20170405194741.18956-1-eblake@redhat.com>
-	<20170405194741.18956-13-eblake@redhat.com>
-	<cf7bf2dd-32ee-baf2-b963-177c4aff8c52@redhat.com>
+	(envelope-from <oussemakeder@yahoo.fr>) id 1cw3Dw-0002TZ-Pi
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 04:57:04 -0400
+Received: from nm8-vm3.bullet.mail.ir2.yahoo.com ([212.82.96.137]:55210)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <oussemakeder@yahoo.fr>) id 1cw3Dw-0002QY-E4
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 04:57:00 -0400
+Date: Thu, 6 Apr 2017 08:56:57 +0000 (UTC)
+From: oussema ben khedher <oussemakeder@yahoo.fr>
+Reply-To: oussema ben khedher <oussemakeder@yahoo.fr>
+Message-ID: <293234596.3000264.1491469017925@mail.yahoo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cf7bf2dd-32ee-baf2-b963-177c4aff8c52@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 12/13] fdc-test: Avoid
- deprecated 'change' command
+References: <293234596.3000264.1491469017925.ref@mail.yahoo.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] about get approximative time of execution
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,39 +26,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, armbru@redhat.com, "open list:Floppy" <qemu-block@nongnu.org>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Am 05.04.2017 um 22:52 hat John Snow geschrieben:
-> On 04/05/2017 03:47 PM, Eric Blake wrote:
-> > Use the preferred blockdev-change-medium command instead.
-> > 
-> > Admittedly, use of 'device' is also deprecated over the newer use
-> > of 'id', but the test is exploiting that the name 'floppy0' is
-> > auto-created by the board, and I could not figure out where the
-> > command line lives that would need to be tweaked to provide a
-> > non-random 'id' to this device.
-> > 
-> 
-> qtest_start
->   qtest_init
->     qtest_init_without_qmp_handshake
-> 
-> You can give *extra* args to qtest_start, but depending on the board
-> -nodefaults isn't going to get rid of that embedded FDC nor its default
-> floppy0 drive, I think.
 
-It does get rid of the default drive.
 
-> You could perhaps add a second floppy drive explicitly with
-> -device floppy,id=snafu,bus=floppy-bus.0,unit=1
-
-As soon as you use -device floppy, the default drive goes away, too, so
-you don't have to use a secondary floppy drive. It's like the default
-CD-ROM that goes away if you use -device ide-cd.
-
-So if you want to give it an ID, the solution is as simple as:
-
-    -device floppy,id=foo
-
-Kevin
+im working in the reconstitution of execution trace informations of the gue=
+st processor in qemu and i need an approximative time of execution of every=
+=C2=A0translation block by the guest processor .
+can you give me some hints about that ?=C2=A0thank you
