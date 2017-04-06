@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1cwB1O-0005pP-Lq
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 13:16:36 -0400
+	(envelope-from <Michael.Wu@ngc.com>) id 1cwBAF-0000e4-AG
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 13:25:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1cwB1N-0001mM-0E
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 13:16:34 -0400
-Date: Thu, 6 Apr 2017 19:16:23 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20170406171623.bpb6klixmv4o2afg@eukaryote>
-References: <1491320156-4629-1-git-send-email-kwolf@redhat.com>
+	(envelope-from <Michael.Wu@ngc.com>) id 1cwBAC-0008OX-17
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 13:25:43 -0400
+Received: from xspc0103.northgrum.com ([157.127.149.150]:48371)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Michael.Wu@ngc.com>) id 1cwBAB-0008Nc-GM
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 13:25:39 -0400
+From: "Wu, Michael Y [US] (MS)" <Michael.Wu@ngc.com>
+Date: Thu, 6 Apr 2017 17:23:32 +0000
+Message-ID: <a710ff5405c04e8b97f5d4ed6739fb7b@XCGC3021.northgrum.com>
+References: <7a623fb8d2284ee28ddbd6e1ccf277e0@XCGC3021.northgrum.com>
+	<CAFEAcA8C17TnnBKim9T9k32Re9C-pWUokF-UeVAd=itcpROvRg@mail.gmail.com>
+In-Reply-To: <CAFEAcA8C17TnnBKim9T9k32Re9C-pWUokF-UeVAd=itcpROvRg@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1491320156-4629-1-git-send-email-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH for-2.9] block: Ignore
- guest dev permissions during incoming migration
+Subject: Re: [Qemu-devel] EXT :Re:  Emulating external registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,172 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, armband@enea.com, Ciprian.Barbu@enea.com, qemu-devel@nongnu.org, mreitz@redhat.com, Alexandru.Avadanii@enea.com, pbonzini@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Tue, Apr 04, 2017 at 05:35:56PM +0200, Kevin Wolf wrote:
-> Usually guest devices don't like other writers to the same image, so
-> they use blk_set_perm() to prevent this from happening. In the migration
-> phase before the VM is actually running, though, they don't have a
-> problem with writes to the image. On the other hand, storage migration
-> needs to be able to write to the image in this phase, so the restrictive
-> blk_set_perm() call of qdev devices breaks it.
-> 
-> This patch flags all BlockBackends with a qdev device as
-> blk->disable_perm during incoming migration, which means that the
-> requested permissions are stored in the BlockBackend, but not actually
-> applied to its root node yet.
-> 
-> Once migration has finished and the VM should be resumed, the
-> permissions are applied. If they cannot be applied (e.g. because the NBD
-> server used for block migration hasn't been shut down), resuming the VM
-> fails.
-
-So I have an environment with a patched QEMU built with your fix to test
-it with libvirt APIs, however, there's a libvirt bug that I just
-discovered which fails the NBD-based live storage migration:
-
-    https://www.redhat.com/archives/libvir-list/2017-April/msg00350.html
-    -- NBD-based storage migration fails with "error: invalid argument:
-    monitor must not be NULL"
-
-Meanwhile, I'm about it test with plain QMP.
-
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/block-backend.c | 40 +++++++++++++++++++++++++++++++++++++++-
->  include/block/block.h |  2 ++
->  migration/migration.c |  8 ++++++++
->  qmp.c                 |  6 ++++++
->  4 files changed, 55 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/block-backend.c b/block/block-backend.c
-> index 0b63773..f817040 100644
-> --- a/block/block-backend.c
-> +++ b/block/block-backend.c
-> @@ -61,6 +61,7 @@ struct BlockBackend {
->  
->      uint64_t perm;
->      uint64_t shared_perm;
-> +    bool disable_perm;
->  
->      bool allow_write_beyond_eof;
->  
-> @@ -578,7 +579,7 @@ int blk_set_perm(BlockBackend *blk, uint64_t perm, uint64_t shared_perm,
->  {
->      int ret;
->  
-> -    if (blk->root) {
-> +    if (blk->root && !blk->disable_perm) {
->          ret = bdrv_child_try_set_perm(blk->root, perm, shared_perm, errp);
->          if (ret < 0) {
->              return ret;
-> @@ -597,15 +598,52 @@ void blk_get_perm(BlockBackend *blk, uint64_t *perm, uint64_t *shared_perm)
->      *shared_perm = blk->shared_perm;
->  }
->  
-> +/*
-> + * Notifies the user of all BlockBackends that migration has completed. qdev
-> + * devices can tighten their permissions in response (specifically revoke
-> + * shared write permissions that we needed for storage migration).
-> + *
-> + * If an error is returned, the VM cannot be allowed to be resumed.
-> + */
-> +void blk_resume_after_migration(Error **errp)
-> +{
-> +    BlockBackend *blk;
-> +    Error *local_err = NULL;
-> +
-> +    for (blk = blk_next(NULL); blk; blk = blk_next(blk)) {
-> +        if (!blk->disable_perm) {
-> +            continue;
-> +        }
-> +
-> +        blk->disable_perm = false;
-> +
-> +        blk_set_perm(blk, blk->perm, blk->shared_perm, &local_err);
-> +        if (local_err) {
-> +            error_propagate(errp, local_err);
-> +            blk->disable_perm = true;
-> +            return;
-> +        }
-> +    }
-> +}
-> +
->  static int blk_do_attach_dev(BlockBackend *blk, void *dev)
->  {
->      if (blk->dev) {
->          return -EBUSY;
->      }
-> +
-> +    /* While migration is still incoming, we don't need to apply the
-> +     * permissions of guest device BlockBackends. We might still have a block
-> +     * job or NBD server writing to the image for storage migration. */
-> +    if (runstate_check(RUN_STATE_INMIGRATE)) {
-> +        blk->disable_perm = true;
-> +    }
-> +
->      blk_ref(blk);
->      blk->dev = dev;
->      blk->legacy_dev = false;
->      blk_iostatus_reset(blk);
-> +
->      return 0;
->  }
->  
-> diff --git a/include/block/block.h b/include/block/block.h
-> index 5149260..3e09222 100644
-> --- a/include/block/block.h
-> +++ b/include/block/block.h
-> @@ -366,6 +366,8 @@ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp);
->  void bdrv_invalidate_cache_all(Error **errp);
->  int bdrv_inactivate_all(void);
->  
-> +void blk_resume_after_migration(Error **errp);
-> +
->  /* Ensure contents are flushed to disk.  */
->  int bdrv_flush(BlockDriverState *bs);
->  int coroutine_fn bdrv_co_flush(BlockDriverState *bs);
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 54060f7..ad4036f 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -349,6 +349,14 @@ static void process_incoming_migration_bh(void *opaque)
->          exit(EXIT_FAILURE);
->      }
->  
-> +    /* If we get an error here, just don't restart the VM yet. */
-> +    blk_resume_after_migration(&local_err);
-> +    if (local_err) {
-> +        error_free(local_err);
-> +        local_err = NULL;
-> +        autostart = false;
-> +    }
-> +
->      /*
->       * This must happen after all error conditions are dealt with and
->       * we're sure the VM is going to be running on this host.
-> diff --git a/qmp.c b/qmp.c
-> index fa82b59..a744e44 100644
-> --- a/qmp.c
-> +++ b/qmp.c
-> @@ -207,6 +207,12 @@ void qmp_cont(Error **errp)
->          }
->      }
->  
-> +    blk_resume_after_migration(&local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +
->      if (runstate_check(RUN_STATE_INMIGRATE)) {
->          autostart = 1;
->      } else {
-> -- 
-> 1.8.3.1
-> 
-> 
-
--- 
-/kashyap
+VGhhbmsgeW91IFBldGVyIQ0KDQpJIGNoYW5nZWQgbXkgY29kZSB0byB0aGUgZm9sbG93aW5nIGFu
+ZCBhZGRlZCB0aGUgYXBwcm9wcmlhdGUgcmVhZCx3cml0ZSBmdW5jdGlvbnMgYW5kIGEgTWVtb3J5
+UmVnaW9uT3BzLg0KICAgIG1lbW9yeV9yZWdpb25faW5pdF9pbyhyZWdfbWVtb3J5LCBOVUxMLCAm
+cmVnX29wcywgcmVnLA0KICAgICAgICAgICAgICAgICAgICAgICAgICAicmVnX21lbSIsIDB4MDAw
+MDAwNDApOyAvL3NldCB0byA2NCBieXRlcw0KICAgIG1lbW9yeV9yZWdpb25fYWRkX3N1YnJlZ2lv
+bihzeXNtZW0sIDB4RkMwMDAwMDAsIHJlZ19tZW1vcnkpOw0KDQpGb3IgdGhlIHJlYWQgZnVuY3Rp
+b24gSSBqdXN0IHJldHVybmVkIGEgemVyby4gU28gaWYgSSB3ZXJlIHRvIHJlYWQgZnJvbSB0aGUg
+YWRkcmVzcyAweEZDMDAwMDAwIGl0IHNob3VsZCByZXR1cm4gYSB2YWx1ZSBvZiAwPyBUaGUgY3Vy
+cmVudCBpc3N1ZSBJIGFtIGhhdmluZyBpcyB0aGF0IGdkYiBoYW5ncyB3aGVuIHRoZSBwb2ludGVy
+IGlzIGFjY2Vzc2VkLiBJIGFtIHN0YXJ0aW5nIHRvIHRoaW5rIG15IGJhcmUtbWV0YWwgcHJvZ3Jh
+bSBpcyBpbmNvcnJlY3QuIEkgYWxzbyBhZGRlZCBsb2cgbWVzc2FnZXMgaW4gbXkgcmVhZCBhbmQg
+d3JpdGUgZnVuY3Rpb25zLiBUaGUgcmVhZCBmdW5jdGlvbiB3YXMgbm90IGFjY2Vzc2VkLg0KDQov
+L1NvbWUgY29kZSBpbiBteSBiYXJlIG1ldGFsIHByb2dyYW0NCnZvbGF0aWxlIHVuc2lnbmVkIGlu
+dCAgKiBjb25zdCB0ZXN0ID0gKHVuc2lnbmVkIGludCAqKSAweEZDMDAwMDAwOw0KaWYgKDB4MCA9
+PSAqdGVzdCkgIC8vZ2RiIGhhbmdzIG9uIHRoaXMgbGluZSwgY2Fubm90IHN0ZXAgZnVydGhlcg0K
+ICB7DQogICAgcmVhZF9oaXQoKTsNCiAgfQ0KDQpUaGUgZmlsZSAndW5pbXAuYycgeW91IG1lbnRp
+b25lZCBsb29rcyBncmVhdCEgSSB3aWxsIGJlIHVzaW5nIHRoYXQgYXMgaW5zcGlyYXRpb24gZm9y
+IGNyZWF0aW5nIG15IG93biBkZXZpY2UgbW9kZWwuDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0t
+LS0tDQpGcm9tOiBQZXRlciBNYXlkZWxsIFttYWlsdG86cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3Jn
+XSANClNlbnQ6IFRodXJzZGF5LCBBcHJpbCAwNiwgMjAxNyAxOjMzIEFNDQpUbzogV3UsIE1pY2hh
+ZWwgWSBbVVNdIChNUykNCkNjOiBxZW11LWRldmVsQG5vbmdudS5vcmcNClN1YmplY3Q6IEVYVCA6
+UmU6IFtRZW11LWRldmVsXSBFbXVsYXRpbmcgZXh0ZXJuYWwgcmVnaXN0ZXJzDQoNCk9uIDUgQXBy
+aWwgMjAxNyBhdCAyMjowMywgV3UsIE1pY2hhZWwgWSBbVVNdIChNUykgPE1pY2hhZWwuV3VAbmdj
+LmNvbT4gd3JvdGU6DQo+IE15IGN1cnJlbnQgYXBwcm9hY2ggaXMgdG8gY3JlYXRlIGEgbmV3IE1l
+bW9yeVJlZ2lvbiBpbiB0aGUgaW5pdCBmdW5jdGlvbiBvZiB0aGUgZzNiZWlnZSBzb3VyY2UgY29k
+ZSAobWFjX29sZHdvcmxkLmMpLiBNeSBpZGVhIGlzIHRvIHNldCB1cCBzb21lIG1taW8gdG8gY2Vy
+dGFpbiBhZGRyZXNzIHRvIHJlcHJlc2VudCB0aG9zZSByZWdpc3RlcnMuIEZvciBub3cgSSBvbmx5
+IGNhcmUgYWJvdXQgcmVhZGluZyBhbmQgd3JpdGluZywgYnV0IGluIHRoZSBmdXR1cmUgSSBob3Bl
+IHRvIGFkZCBhZGRpdGlvbmFsIGxvZ2ljIHdoZW4gdGhlIHJlZ2lzdGVycyBhcmUgd3JpdHRlbi4N
+Cj4gSSBhZGRlZCB0aGUgZm9sbG93aW5nIGxpbmVzOg0KPiBNZW1vcnlSZWdpb24gKnJlZyA9IGdf
+bmV3KE1lbW9yeVJlZ2lvbiwgMSk7IA0KPiBtZW1vcnlfcmVnaW9uX2luaXRfYWxpYXMocmVnLCBO
+VUxMLCAicmVnX21taW8iLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZ2V0X3N5c3Rl
+bV9pbygpLCAwLCAweDAwMjAwMDAwKTsNCg0KVGhpcyBpcyBkZWZpbmluZyB5b3VyIHJlZ2lvbiB0
+byBiZSBhbiBhbGlhcyBpbnRvIHRoZSBzeXN0ZW0gSU8gcmVnaW9uLCBzbyByZWFkaW5nL3dyaXRp
+bmcgeW91ciByZWdpb24gd2lsbCBhY3QgbGlrZSByZWFkcyBhbmQgd3JpdGVzIGludG8gdGhvc2Ug
+SU8gcG9ydHMuIFRoaXMgZG9lc24ndCBzb3VuZCBsaWtlIHdoYXQgeW91IHdlcmUgdHJ5aW5nIHRv
+IGRvLg0KVXN1YWxseSBtZW1vcnkgcmVnaW9ucyBmb3IgcmVnaXN0ZXJzIGFyZSBkZWZpbmVkIHVz
+aW5nIG1lbW9yeV9yZWdpb25faW5pdF9pbygpLCB3aGVyZSB5b3UgcGFzcyBpbiBhIHN0cnVjdHVy
+ZSB0aGF0IGluY2x1ZGVzIHBvaW50ZXJzIHRvIGZ1bmN0aW9ucyB3aGljaCBhcmUgY2FsbGVkIGZv
+ciByZWFkcyBhbmQgd3JpdGVzLg0KDQo+IG1lbW9yeV9yZWdpb25fYWRkX3N1YnJlZ2lvbihzeXNt
+ZW0sIDB4ZmMwMDAwMDAsIHJlZyk7DQoNClR5cGljYWxseSB5b3Ugd291bGQgY3JlYXRlIGEgZGV2
+aWNlIG1vZGVsIGZvciB3aGF0ZXZlciB0aGlzIGRldmljZSBpcywgYW5kIHRoZW4gbWFwIGl0IGlu
+IHRoZSBib2FyZCBjb2RlLCBub3QgZGlyZWN0bHkgY3JlYXRlIGEgbWVtb3J5IHJlZ2lvbiBpbiB0
+aGUgYm9hcmQgY29kZS4NCg0KWW91IG1pZ2h0IGZpbmQgaXQgdXNlZnVsIHRvIGxvb2sgYXQgaHcv
+bWlzYy91bmltcC5jLCB3aGljaCBpcyBhIGRldmljZSB3aGljaCBzaW1wbHkgcHJpbnRzIGxvZyBt
+ZXNzYWdlcyB3aGVuIGl0IGlzIHJlYWQgb3Igd3JpdHRlbi4gT3IgdHJ5IGEgc2ltcGxlIGRldmlj
+ZSB0aGF0IHlvdXIgYm9hcmQgYWxyZWFkeSBoYXMuDQoNCnRoYW5rcw0KLS0gUE1NDQoNCg==
