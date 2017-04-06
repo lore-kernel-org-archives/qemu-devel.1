@@ -1,15 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cw7gU-0001aN-LS
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:42:48 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1cw7iy-0003qq-4Q
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:45:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cw7gT-0007cH-MS
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:42:46 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1cw7ix-0000Kv-0F
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:45:20 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu,  6 Apr 2017 14:42:32 +0100
-Message-Id: <1491486152-24304-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] target/arm: Add assertion about FSC format for
- syndrome registers
+Date: Thu,  6 Apr 2017 14:45:14 +0100
+Message-Id: <1491486314-25823-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] stellaris: Don't hw_error() on bad register
+ accesses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,82 +19,173 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>
+Cc: patches@linaro.org
 
-In tlb_fill() we construct a syndrome register value from a
-fault status register value which is filled in by arm_tlb_fill().
-arm_tlb_fill() returns FSR values which might be in the format
-used with short-format page descriptors, or the format used
-with long-format (LPAE) descriptors. The syndrome register
-always uses LPAE-format FSR status codes.
-
-It isn't actually possible to end up delivering a syndrome
-register value to the guest for a fault which is reported
-with a short-format FSR (that kind of stage 1 fault will only
-happen for an AArch32 translation regime which doesn't have
-a syndrome register, and can never be redirected to an AArch64
-or Hyp exception level). Add an assertion which checks this,
-and adjust the code so that we construct a syndrome with
-an invalid status code, rather than allowing set bits in
-the FSR input to randomly corrupt other fields in the syndrome.
+Current recommended style is to log a guest error on bad register
+accesses, not kill the whole system with hw_error().  Change the
+hw_error() calls to log as LOG_GUEST_ERROR or LOG_UNIMP or use
+g_assert_not_reached() as appropriate.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
-It took me a little while to convince myself that you'd
-never take a short-format FSR to a using-syndrome EL :-)
----
- target/arm/op_helper.c | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+ hw/arm/stellaris.c | 60 +++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 37 insertions(+), 23 deletions(-)
 
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index d64c867..156b825 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -130,7 +130,7 @@ void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType access_type,
-     if (unlikely(ret)) {
-         ARMCPU *cpu = ARM_CPU(cs);
-         CPUARMState *env = &cpu->env;
--        uint32_t syn, exc;
-+        uint32_t syn, exc, fsc;
-         unsigned int target_el;
-         bool same_el;
- 
-@@ -145,19 +145,32 @@ void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType access_type,
-             env->cp15.hpfar_el2 = extract64(fi.s2addr, 12, 47) << 4;
+diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
+index 9edcd49..ea7a809 100644
+--- a/hw/arm/stellaris.c
++++ b/hw/arm/stellaris.c
+@@ -108,7 +108,10 @@ static void gptm_reload(gptm_state *s, int n, int reset)
+     } else if (s->mode[n] == 0xa) {
+         /* PWM mode.  Not implemented.  */
+     } else {
+-        hw_error("TODO: 16-bit timer mode 0x%x\n", s->mode[n]);
++        qemu_log_mask(LOG_UNIMP,
++                      "GPTM: 16-bit timer mode unimplemented: 0x%x\n",
++                      s->mode[n]);
++        return;
+     }
+     s->tick[n] = tick;
+     timer_mod(s->timer[n], tick);
+@@ -149,7 +152,9 @@ static void gptm_tick(void *opaque)
+     } else if (s->mode[n] == 0xa) {
+         /* PWM mode.  Not implemented.  */
+     } else {
+-        hw_error("TODO: 16-bit timer mode 0x%x\n", s->mode[n]);
++        qemu_log_mask(LOG_UNIMP,
++                      "GPTM: 16-bit timer mode unimplemented: 0x%x\n",
++                      s->mode[n]);
+     }
+     gptm_update_irq(s);
+ }
+@@ -286,7 +291,8 @@ static void gptm_write(void *opaque, hwaddr offset,
+         s->match_prescale[0] = value;
+         break;
+     default:
+-        hw_error("gptm_write: Bad offset 0x%x\n", (int)offset);
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "GPTM: read at bad offset 0x%x\n", (int)offset);
+     }
+     gptm_update_irq(s);
+ }
+@@ -425,7 +431,10 @@ static int ssys_board_class(const ssys_state *s)
          }
-         same_el = arm_current_el(env) == target_el;
--        /* AArch64 syndrome does not have an LPAE bit */
--        syn = fsr & ~(1 << 9);
-+
-+        if (fsr & (1 << 9)) {
-+            /* LPAE format fault status register : bottom 6 bits are
-+             * status code in the same form as needed for syndrome
-+             */
-+            fsc = extract32(fsr, 0, 6);
-+        } else {
-+            /* Short format FSR : this fault will never actually be reported
-+             * to an EL that uses a syndrome register. Check that here,
-+             * and use a (currently) reserved FSR code in case the constructed
-+             * syndrome does leak into the guest somehow.
-+             */
-+            assert(target_el != 2 && !arm_el_is_aa64(env, target_el));
-+            fsc = 0x3f;
-+        }
+         /* for unknown classes, fall through */
+     default:
+-        hw_error("ssys_board_class: Unknown class 0x%08x\n", did0);
++        /* This can only happen if the hardwired constant did0 value
++         * in this board's stellaris_board_info struct is wrong.
++         */
++        g_assert_not_reached();
+     }
+ }
  
-         /* For insn and data aborts we assume there is no instruction syndrome
-          * information; this is always true for exceptions reported to EL1.
-          */
-         if (access_type == MMU_INST_FETCH) {
--            syn = syn_insn_abort(same_el, 0, fi.s1ptw, syn);
-+            syn = syn_insn_abort(same_el, 0, fi.s1ptw, fsc);
-             exc = EXCP_PREFETCH_ABORT;
-         } else {
-             syn = merge_syn_data_abort(env->exception.syndrome, target_el,
-                                        same_el, fi.s1ptw,
--                                       access_type == MMU_DATA_STORE, syn);
-+                                       access_type == MMU_DATA_STORE, fsc);
-             if (access_type == MMU_DATA_STORE
-                 && arm_feature(env, ARM_FEATURE_V6)) {
-                 fsr |= (1 << 11);
+@@ -479,8 +488,7 @@ static uint64_t ssys_read(void *opaque, hwaddr offset,
+             case DID0_CLASS_SANDSTORM:
+                 return pllcfg_sandstorm[xtal];
+             default:
+-                hw_error("ssys_read: Unhandled class for PLLCFG read.\n");
+-                return 0;
++                g_assert_not_reached();
+             }
+         }
+     case 0x070: /* RCC2 */
+@@ -512,7 +520,8 @@ static uint64_t ssys_read(void *opaque, hwaddr offset,
+     case 0x1e4: /* USER1 */
+         return s->user1;
+     default:
+-        hw_error("ssys_read: Bad offset 0x%x\n", (int)offset);
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "SSYS: read at bad offset 0x%x\n", (int)offset);
+         return 0;
+     }
+ }
+@@ -614,7 +623,8 @@ static void ssys_write(void *opaque, hwaddr offset,
+         s->ldoarst = value;
+         break;
+     default:
+-        hw_error("ssys_write: Bad offset 0x%x\n", (int)offset);
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "SSYS: write at bad offset 0x%x\n", (int)offset);
+     }
+     ssys_update(s);
+ }
+@@ -748,7 +758,8 @@ static uint64_t stellaris_i2c_read(void *opaque, hwaddr offset,
+     case 0x20: /* MCR */
+         return s->mcr;
+     default:
+-        hw_error("strllaris_i2c_read: Bad offset 0x%x\n", (int)offset);
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "stellaris_i2c: read at bad offset 0x%x\n", (int)offset);
+         return 0;
+     }
+ }
+@@ -823,17 +834,18 @@ static void stellaris_i2c_write(void *opaque, hwaddr offset,
+         s->mris &= ~value;
+         break;
+     case 0x20: /* MCR */
+-        if (value & 1)
+-            hw_error(
+-                      "stellaris_i2c_write: Loopback not implemented\n");
+-        if (value & 0x20)
+-            hw_error(
+-                      "stellaris_i2c_write: Slave mode not implemented\n");
++        if (value & 1) {
++            qemu_log_mask(LOG_UNIMP, "stellaris_i2c: Loopback not implemented");
++        }
++        if (value & 0x20) {
++            qemu_log_mask(LOG_UNIMP,
++                          "stellaris_i2c: Slave mode not implemented");
++        }
+         s->mcr = value & 0x31;
+         break;
+     default:
+-        hw_error("stellaris_i2c_write: Bad offset 0x%x\n",
+-                  (int)offset);
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "stellaris_i2c: write at bad offset 0x%x\n", (int)offset);
+     }
+     stellaris_i2c_update(s);
+ }
+@@ -1057,8 +1069,8 @@ static uint64_t stellaris_adc_read(void *opaque, hwaddr offset,
+     case 0x30: /* SAC */
+         return s->sac;
+     default:
+-        hw_error("strllaris_adc_read: Bad offset 0x%x\n",
+-                  (int)offset);
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "stellaris_adc: read at bad offset 0x%x\n", (int)offset);
+         return 0;
+     }
+ }
+@@ -1078,8 +1090,9 @@ static void stellaris_adc_write(void *opaque, hwaddr offset,
+             return;
+         case 0x04: /* SSCTL */
+             if (value != 6) {
+-                hw_error("ADC: Unimplemented sequence %" PRIx64 "\n",
+-                          value);
++                qemu_log_mask(LOG_UNIMP,
++                              "ADC: Unimplemented sequence %" PRIx64 "\n",
++                              value);
+             }
+             s->ssctl[n] = value;
+             return;
+@@ -1110,13 +1123,14 @@ static void stellaris_adc_write(void *opaque, hwaddr offset,
+         s->sspri = value;
+         break;
+     case 0x28: /* PSSI */
+-        hw_error("Not implemented:  ADC sample initiate\n");
++        qemu_log_mask(LOG_UNIMP, "ADC: sample initiate unimplemented");
+         break;
+     case 0x30: /* SAC */
+         s->sac = value;
+         break;
+     default:
+-        hw_error("stellaris_adc_write: Bad offset 0x%x\n", (int)offset);
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "stellaris_adc: write at bad offset 0x%x\n", (int)offset);
+     }
+     stellaris_adc_update(s);
+ }
 -- 
 2.7.4
