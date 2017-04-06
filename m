@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50649)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cw7B2-0006IC-IJ
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:17 -0400
+	(envelope-from <quintela@redhat.com>) id 1cw7B4-0006K9-6o
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cw7Ay-0008S9-Vm
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34064)
+	(envelope-from <quintela@redhat.com>) id 1cw7B2-0008Ux-Vr
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59168)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cw7Ay-0008RD-Pp
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:12 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cw7B2-0008UE-Ng
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:10:16 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D278E7AEA4
-	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 13:10:11 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D53DC7F7C0
+	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 13:10:15 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu,  6 Apr 2017 15:08:54 +0200
-Message-Id: <20170406130913.2232-36-quintela@redhat.com>
+Date: Thu,  6 Apr 2017 15:08:57 +0200
+Message-Id: <20170406130913.2232-39-quintela@redhat.com>
 In-Reply-To: <20170406130913.2232-1-quintela@redhat.com>
 References: <20170406130913.2232-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 35/54] ram: Remove dirty_bytes_rate
+Subject: [Qemu-devel] [PATCH 38/54] ram: Add QEMUFile to RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,70 +32,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com
 
-It can be recalculated from dirty_pages_rate.
-
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-
---
-
-Dave was the one that reviewed it O:-)
-
-Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- include/migration/migration.h | 1 -
- migration/migration.c         | 6 +++---
- migration/ram.c               | 1 -
- 3 files changed, 3 insertions(+), 5 deletions(-)
+ migration/ram.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
 
-diff --git a/include/migration/migration.h b/include/migration/migration.h
-index 2f9c973..e185d13 100644
---- a/include/migration/migration.h
-+++ b/include/migration/migration.h
-@@ -155,7 +155,6 @@ struct MigrationState
-     int64_t downtime;
-     int64_t expected_downtime;
-     int64_t dirty_pages_rate;
--    int64_t dirty_bytes_rate;
-     bool enabled_capabilities[MIGRATION_CAPABILITY__MAX];
-     int64_t xbzrle_cache_size;
-     int64_t setup_time;
-diff --git a/migration/migration.c b/migration/migration.c
-index b51918f..9e15510 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1110,7 +1110,6 @@ MigrationState *migrate_init(const MigrationParams *params)
-     s->downtime = 0;
-     s->expected_downtime = 0;
-     s->dirty_pages_rate = 0;
--    s->dirty_bytes_rate = 0;
-     s->setup_time = 0;
-     s->start_postcopy = false;
-     s->postcopy_after_devices = false;
-@@ -2000,8 +1999,9 @@ static void *migration_thread(void *opaque)
-                                       bandwidth, max_size);
-             /* if we haven't sent anything, we don't want to recalculate
-                10000 is a small enough number for our purposes */
--            if (s->dirty_bytes_rate && transferred_bytes > 10000) {
--                s->expected_downtime = s->dirty_bytes_rate / bandwidth;
-+            if (s->dirty_pages_rate && transferred_bytes > 10000) {
-+                s->expected_downtime = s->dirty_pages_rate *
-+                    (1ul << qemu_target_page_bits()) / bandwidth;
-             }
- 
-             qemu_file_reset_rate_limit(s->to_dst_file);
 diff --git a/migration/ram.c b/migration/ram.c
-index 1580617..ef4f508 100644
+index b9f415c..62b44cf 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -728,7 +728,6 @@ static void migration_bitmap_sync(RAMState *rs)
-         }
-         s->dirty_pages_rate = rs->num_dirty_pages_period * 1000
-             / (end_time - rs->time_last_bitmap_sync);
--        s->dirty_bytes_rate = s->dirty_pages_rate * TARGET_PAGE_SIZE;
-         rs->time_last_bitmap_sync = end_time;
-         rs->num_dirty_pages_period = 0;
+@@ -165,6 +165,8 @@ struct RAMSrcPageRequest {
+ 
+ /* State of RAM for migration */
+ struct RAMState {
++    /* QEMUFile used for this migration */
++    QEMUFile *f;
+     /* Last block that we have visited searching for dirty pages */
+     RAMBlock *last_seen_block;
+     /* Last block from where we have sent data */
+@@ -525,14 +527,13 @@ static void xbzrle_cache_zero_page(RAMState *rs, ram_addr_t current_addr)
+  *          -1 means that xbzrle would be longer than normal
+  *
+  * @rs: current RAM state
+- * @f: QEMUFile where to send the data
+  * @current_data: pointer to the address of the page contents
+  * @current_addr: addr of the page
+  * @block: block that contains the page we want to send
+  * @offset: offset inside the block for the page
+  * @last_stage: if we are at the completion stage
+  */
+-static int save_xbzrle_page(RAMState *rs, QEMUFile *f, uint8_t **current_data,
++static int save_xbzrle_page(RAMState *rs, uint8_t **current_data,
+                             ram_addr_t current_addr, RAMBlock *block,
+                             ram_addr_t offset, bool last_stage)
+ {
+@@ -583,10 +584,11 @@ static int save_xbzrle_page(RAMState *rs, QEMUFile *f, uint8_t **current_data,
      }
+ 
+     /* Send XBZRLE based compressed page */
+-    bytes_xbzrle = save_page_header(f, block, offset | RAM_SAVE_FLAG_XBZRLE);
+-    qemu_put_byte(f, ENCODING_FLAG_XBZRLE);
+-    qemu_put_be16(f, encoded_len);
+-    qemu_put_buffer(f, XBZRLE.encoded_buf, encoded_len);
++    bytes_xbzrle = save_page_header(rs->f, block,
++                                    offset | RAM_SAVE_FLAG_XBZRLE);
++    qemu_put_byte(rs->f, ENCODING_FLAG_XBZRLE);
++    qemu_put_be16(rs->f, encoded_len);
++    qemu_put_buffer(rs->f, XBZRLE.encoded_buf, encoded_len);
+     bytes_xbzrle += encoded_len + 1 + 2;
+     rs->xbzrle_pages++;
+     rs->xbzrle_bytes += bytes_xbzrle;
+@@ -850,7 +852,7 @@ static int ram_save_page(RAMState *rs, MigrationState *ms, QEMUFile *f,
+             ram_release_pages(ms, block->idstr, pss->offset, pages);
+         } else if (!rs->ram_bulk_stage &&
+                    !migration_in_postcopy(ms) && migrate_use_xbzrle()) {
+-            pages = save_xbzrle_page(rs, f, &p, current_addr, block,
++            pages = save_xbzrle_page(rs, &p, current_addr, block,
+                                      offset, last_stage);
+             if (!last_stage) {
+                 /* Can't send this cached data async, since the cache page
+@@ -2090,6 +2092,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
+             return -1;
+          }
+     }
++    rs->f = f;
+ 
+     rcu_read_lock();
+ 
 -- 
 2.9.3
