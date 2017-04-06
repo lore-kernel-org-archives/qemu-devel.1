@@ -1,17 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1cw7Gl-0003I5-3c
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:16:15 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cw7Gv-0003Rq-Jj
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:16:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1cw7Gf-000399-DS
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:16:11 -0400
-From: jemmy858585@gmail.com
-Date: Thu,  6 Apr 2017 21:15:36 +0800
-Message-Id: <1491484536-22776-3-git-send-email-lidongchen@tencent.com>
-In-Reply-To: <1491484536-22776-1-git-send-email-lidongchen@tencent.com>
-References: <1491484536-22776-1-git-send-email-lidongchen@tencent.com>
-Subject: [Qemu-devel] [PATCH 2/2] migration/block: use blk_pwrite_zeroes for
- each zero cluster
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cw7Gr-0003EL-LH
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:16:21 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53936
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cw7Gr-0003E7-CS
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:16:17 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v36DDop2047228
+	for <qemu-devel@nongnu.org>; Thu, 6 Apr 2017 09:16:15 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 29nkydr07t-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 06 Apr 2017 09:16:15 -0400
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Thu, 6 Apr 2017 14:16:13 +0100
+Date: Thu, 6 Apr 2017 15:16:10 +0200
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <5e9b4ef5-f737-bc26-433d-f111e44e294a@redhat.com>
+References: <20170406111646.12624-1-cornelia.huck@de.ibm.com>
+	<20170406111646.12624-6-cornelia.huck@de.ibm.com>
+	<5e9b4ef5-f737-bc26-433d-f111e44e294a@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170406151610.0f8c867e.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 05/10] s390x/css: provide
+ introspection for virtual subchannel and device busid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,72 +44,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, famz@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, Lidong Chen <lidongchen@tencent.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, agraf@suse.de
 
-From: Lidong Chen <lidongchen@tencent.com>
+On Thu, 6 Apr 2017 14:19:10 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-BLOCK_SIZE is (1 << 20), qcow2 cluster size is 65536 by default,
-this maybe cause the qcow2 file size is bigger after migration.
-This patch check each cluster, use blk_pwrite_zeroes for each
-zero cluster.
+> On 06.04.2017 13:16, Cornelia Huck wrote:
 
-Signed-off-by: Lidong Chen <lidongchen@tencent.com>
----
- migration/block.c | 34 ++++++++++++++++++++++++++++++++--
- 1 file changed, 32 insertions(+), 2 deletions(-)
+> > +out_err:
+> > +    error_propagate(errp, err);
+> > +    css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
+> > +    ccw_dev->sch = NULL;
+> > +    g_free(sch);
+> > +    return;
+> >  }
+> 
+> Cosmetic nit: Remove the unnecessary "return;" statement right before
+> the closing curly bracket.
 
-diff --git a/migration/block.c b/migration/block.c
-index 7734ff7..1fce9b9 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -885,6 +885,10 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
-     int64_t total_sectors = 0;
-     int nr_sectors;
-     int ret;
-+    int i;
-+    int cluster_size;
-+    int64_t addr_offset;
-+    uint8_t *buf_offset;
- 
-     do {
-         addr = qemu_get_be64(f);
-@@ -934,8 +938,34 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
-             } else {
-                 buf = g_malloc(BLOCK_SIZE);
-                 qemu_get_buffer(f, buf, BLOCK_SIZE);
--                ret = blk_pwrite(blk, addr * BDRV_SECTOR_SIZE, buf,
--                                 nr_sectors * BDRV_SECTOR_SIZE, 0);
-+
-+                cluster_size = bdrv_get_cluster_size(blk_bs(blk));
-+
-+                if (cluster_size > 0) {
-+                    for (i = 0; i < BLOCK_SIZE / cluster_size; i++) {
-+                        addr_offset = addr * BDRV_SECTOR_SIZE
-+                                        + i * cluster_size;
-+                        buf_offset = buf + i * cluster_size;
-+
-+                        if (buffer_is_zero(buf_offset, cluster_size)) {
-+                            ret = blk_pwrite_zeroes(blk, addr_offset,
-+                                                    cluster_size,
-+                                                    BDRV_REQ_MAY_UNMAP);
-+                        } else {
-+                            ret = blk_pwrite(blk, addr_offset,
-+                                             buf_offset, cluster_size, 0);
-+                        }
-+
-+                        if (ret < 0) {
-+                            g_free(buf);
-+                            return ret;
-+                        }
-+                    }
-+                } else {
-+                    ret = blk_pwrite(blk, addr * BDRV_SECTOR_SIZE, buf,
-+                                     nr_sectors * BDRV_SECTOR_SIZE, 0);
-+                }
-+
-                 g_free(buf);
-             }
- 
--- 
-1.8.3.1
+Yup, will merge in.
