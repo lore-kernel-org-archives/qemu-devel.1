@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cw7AA-0005L1-3R
+	(envelope-from <quintela@redhat.com>) id 1cw7AA-0005L0-3D
 	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:09:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cw7A5-0007vY-39
+	(envelope-from <quintela@redhat.com>) id 1cw7A7-0007wd-LQ
 	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:09:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55596)
+Received: from mx1.redhat.com ([209.132.183.28]:49070)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cw7A4-0007vK-QW
-	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:09:17 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cw7A7-0007wK-GA
+	for qemu-devel@nongnu.org; Thu, 06 Apr 2017 09:09:19 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C9FE52E604D
-	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 13:09:15 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 96B9561D37
+	for <qemu-devel@nongnu.org>; Thu,  6 Apr 2017 13:09:18 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu,  6 Apr 2017 15:08:19 +0200
-Message-Id: <20170406130913.2232-1-quintela@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 00/54] Creating RAMState for migration
+Date: Thu,  6 Apr 2017 15:08:21 +0200
+Message-Id: <20170406130913.2232-3-quintela@redhat.com>
+In-Reply-To: <20170406130913.2232-1-quintela@redhat.com>
+References: <20170406130913.2232-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH 02/54] ram: Rename flush_page_queue() to
+ migration_page_queue_free()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,152 +33,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com
 
+It reflects better what it does.
 
-Hi
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
+ include/migration/migration.h | 2 +-
+ migration/migration.c         | 2 +-
+ migration/ram.c               | 5 +++--
+ 3 files changed, 5 insertions(+), 4 deletions(-)
 
-Contination of the previous series, addressed comments from Peter and Dav=
-e.
-- All docs suggestions changed
-- rename flush_page_queue to migration_page_queue()
-- rebase on top of latest
-- move the compression-switch logic
-- change parameters to page_abs everywhere (notice that we end dropping t=
-hem)
-
-Please comment.
-
-Later, Juan.
-
-
-[v2]
-Continuation of previous series, all review comments addressed. New thing=
-s:
-- Consolidate all function comments in the same style (yes, docs)
-- Be much more careful with maintaining comments correct
-- Move all postcopy fields to RAMState
-- Move QEMUFile to RAMState
-- rename qemu_target_page_bits() to qemu_target_page_size() to reflect us=
-e
-- Remove MigrationState from functions that don't need it
-- reorganize last_sent_block to the place where it is used/needed
-- Move several places from offsets to pages
-- Rename last_ram_offset() to last_ram_page() to refect use
-
-Please comment.
-
-
-[v1]
-Currently, we have several places where we store informaticon about
-ram for migration pruposes:
-- global variables on migration/ram.c
-- inside the accounting_info struct in migration/ram.c
-  notice that not all the accounting vars are inside there
-- some stuff is in MigrationState, althought it belongs to migrate/ram.c
-
-So, this series does:
-- move everything related to ram.c to RAMState struct
-- make all the statistics consistent, exporting them with an accessor
-  function
-
-Why now?
-
-Because I am trying to do some more optimizations about how we send
-data around and it is basically impossible to do with current code, we
-still need to add more variables.  Notice that there are things like that=
-:
-- accounting info was only reset if we had xbzrle enabled
-- How/where to initialize variables are completely inconsistent.
-
-
-
-To Do:
-
-- There are still places that access directly the global struct.
-  Mainly postcopy.  We could finfd a way to make a pointer to the
-  current migration.  If people like the approach, I will search where
-  to put it.
-- I haven't posted any real change here, this is just the move of
-  variables to the struct and pass the struct around.  Optimizations
-  will came after.
-
-- Consolidate XBZRLE, Compression params, etc in its own structs
-  (inside or not RAMState, to be able to allocate ones, others, or
-  ...)
-
-Comments, please.
-
-
-Chao Fan (1):
-  ram: Add page-size to output in 'info migrate'
-
-Juan Quintela (53):
-  ram: Update all functions comments
-  ram: Rename flush_page_queue() to migration_page_queue_free()
-  ram: Rename block_name to rbname
-  ram: Create RAMState
-  ram: Add dirty_rate_high_cnt to RAMState
-  ram: Move bitmap_sync_count into RAMState
-  ram: Move start time into RAMState
-  ram: Move bytes_xfer_prev into RAMState
-  ram: Change byte_xfer_now type to uint64_t
-  ram: Move num_dirty_pages_period into RAMState
-  ram: Change num_dirty_pages_period type to uint64_t
-  ram: Move xbzrle_cache_miss_prev into RAMState
-  ram: Move iterations_prev into RAMState
-  ram: Move dup_pages into RAMState
-  ram: Remove unused dup_mig_bytes_transferred()
-  ram: Remove unused pages_skipped variable
-  ram: Move norm_pages to RAMState
-  ram: Remove norm_mig_bytes_transferred
-  ram: Move iterations into RAMState
-  ram: Move xbzrle_bytes into RAMState
-  ram: Move xbzrle_pages into RAMState
-  ram: Move xbzrle_cache_miss into RAMState
-  ram: Move xbzrle_cache_miss_rate into RAMState
-  ram: Move xbzrle_overflows into RAMState
-  ram: Move migration_dirty_pages to RAMState
-  ram: Everything was init to zero, so use memset
-  ram: Move migration_bitmap_mutex into RAMState
-  ram: Move migration_bitmap_rcu into RAMState
-  ram: Move bytes_transferred into RAMState
-  ram: Use the RAMState bytes_transferred parameter
-  ram: Remove ram_save_remaining
-  ram: Move last_req_rb to RAMState
-  ram: Move src_page_req* to RAMState
-  ram: Create ram_dirty_sync_count()
-  ram: Remove dirty_bytes_rate
-  ram: Move dirty_pages_rate to RAMState
-  ram: Move postcopy_requests into RAMState
-  ram: Add QEMUFile to RAMState
-  ram: Move QEMUFile into RAMState
-  ram: Remove compression_switch and inline its logic
-  migration: Remove MigrationState from migration_in_postcopy
-  ram: We don't need MigrationState parameter anymore
-  ram: Rename qemu_target_page_bits() to qemu_target_page_size()
-  ram: Pass RAMBlock to bitmap_sync
-  ram: ram_discard_range() don't use the mis parameter
-  ram: reorganize last_sent_block
-  ram: Use page number instead of an address for the bitmap operations
-  ram: Remember last_page instead of last_offset
-  ram: Change offset field in PageSearchStatus to page
-  ram: Use ramblock and page offset instead of absolute offset
-  ram: rename last_ram_offset() last_ram_pages()
-  ram: Use RAMBitmap type for coherence
-  migration: Remove MigrationState parameter from migration_is_idle()
-
- exec.c                        |   10 +-
- hmp.c                         |    3 +
- include/exec/ram_addr.h       |    6 +-
- include/migration/migration.h |   41 +-
- include/sysemu/sysemu.h       |    2 +-
- migration/migration.c         |   44 +-
- migration/postcopy-ram.c      |   14 +-
- migration/ram.c               | 1194 ++++++++++++++++++++++-------------=
-------
- migration/savevm.c            |   15 +-
- migration/trace-events        |    4 +-
- qapi-schema.json              |    5 +-
- 11 files changed, 700 insertions(+), 638 deletions(-)
-
---=20
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index 5720c88..24487be 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -377,7 +377,7 @@ void savevm_skip_configuration(void);
+ int global_state_store(void);
+ void global_state_store_running(void);
+ 
+-void flush_page_queue(MigrationState *ms);
++void migration_page_queue_free(MigrationState *ms);
+ int ram_save_queue_pages(MigrationState *ms, const char *rbname,
+                          ram_addr_t start, ram_addr_t len);
+ uint64_t ram_pagesize_summary(void);
+diff --git a/migration/migration.c b/migration/migration.c
+index 54060f7..7ce8d43 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -947,7 +947,7 @@ static void migrate_fd_cleanup(void *opaque)
+     qemu_bh_delete(s->cleanup_bh);
+     s->cleanup_bh = NULL;
+ 
+-    flush_page_queue(s);
++    migration_page_queue_free(s);
+ 
+     if (s->to_dst_file) {
+         trace_migrate_fd_cleanup();
+diff --git a/migration/ram.c b/migration/ram.c
+index 652abe4..356f8ce 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -1186,14 +1186,15 @@ static bool get_queued_page(MigrationState *ms, PageSearchStatus *pss,
+ }
+ 
+ /**
+- * flush_page_queue: flush any remaining pages in the ram request queue
++ * migration_page_queue_free: drop any remaining pages in the ram
++ * request queue
+  *
+  * It should be empty at the end anyway, but in error cases there may
+  * be some left.  in case that there is any page left, we drop it.
+  *
+  * @ms: current migration state
+  */
+-void flush_page_queue(MigrationState *ms)
++void migration_page_queue_free(MigrationState *ms)
+ {
+     struct MigrationSrcPageRequest *mspr, *next_mspr;
+     /* This queue generally should be empty - but in the case of a failed
+-- 
 2.9.3
