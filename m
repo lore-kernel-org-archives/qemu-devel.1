@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwbcy-0002he-71
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 17:41:09 -0400
+	(envelope-from <bounces@canonical.com>) id 1cwbmF-0004PX-59
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 17:50:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwbct-0001et-J8
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 17:41:08 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50272)
+	(envelope-from <bounces@canonical.com>) id 1cwbmB-0003XF-65
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 17:50:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51128)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cwbct-0001eb-Cs
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 17:41:03 -0400
+	id 1cwbmA-0003X4-Vm
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 17:50:39 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cwbcr-0007nE-6w
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 21:41:01 +0000
+	id 1cwbm8-0002lU-M4
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 21:50:36 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 325D72E80C3
-	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 21:41:01 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 85AC12E80C4
+	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 21:50:36 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Apr 2017 21:34:54 -0000
-From: Roger Lawhorn <rll@twc.com>
+Date: Fri, 07 Apr 2017 21:45:20 -0000
+From: Alex Williamson <alex.l.williamson@gmail.com>
 Reply-To: Bug 1680679 <1680679@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20170407032144.12640.21952.malonedeb@gac.canonical.com>
-Message-Id: <20170407213454.31343.9228.malone@wampee.canonical.com>
+Message-Id: <20170407214520.31343.77976.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1680679] Re: qemu cannot run twice
 List-Id: <qemu-devel.nongnu.org>
@@ -38,8 +38,12 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-ok, so I will research qemu and nvidia optimus. I have a custom BIOS
-made by an MSI employee. I have hundreds of bios options to play with.
+I suspect the 'M' in GTX880M is the biggest contributor to the Code 43.
+The fact you can get it to work once per host boot on SeaBIOS is a
+fluke.  If you can get custom ROMs, you might try playing with the vfio-
+pci x-pci-device-id option to masquerade as a discrete card, maybe that
+would avoid mobile code in the NVIDIA driver that would expect Optimus.
+Obviously do so at your own risk.
 
 -- =
 
