@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cwSAO-0007Oz-L4
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 07:35:01 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1cwSAx-0007qB-Mw
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 07:35:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cwSAN-00039W-SW
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 07:35:00 -0400
-Date: Fri, 7 Apr 2017 12:34:50 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170407113450.GO13602@stefanha-x1.localdomain>
-References: <1491384478-12325-1-git-send-email-lidongchen@tencent.com>
-	<20170406140255.GA31259@stefanha-x1.localdomain>
-	<CAOGPPbfpN5QVxzvAkRv4MY7nE0YBxU0-UeMuJpVCe-wBB_9p8A@mail.gmail.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1cwSAu-0003O4-Kk
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 07:35:35 -0400
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:35104)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cwSAu-0003No-Dv
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 07:35:32 -0400
+Received: by mail-wr0-x236.google.com with SMTP id o21so75189205wrb.2
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 04:35:32 -0700 (PDT)
+References: <20170405132503.32125-1-alex.bennee@linaro.org>
+	<20170405132503.32125-12-alex.bennee@linaro.org>
+	<5ee6d2cb-d3e5-8b28-6a73-2d84c44ce614@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <5ee6d2cb-d3e5-8b28-6a73-2d84c44ce614@redhat.com>
+Date: Fri, 07 Apr 2017 12:35:29 +0100
+Message-ID: <87k26wa1ry.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="vNrHrykRFvLVX6W3"
-Content-Disposition: inline
-In-Reply-To: <CAOGPPbfpN5QVxzvAkRv4MY7nE0YBxU0-UeMuJpVCe-wBB_9p8A@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v3] migration/block:limit the time used for
- block migration
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 11/12] cpus: call cpu_update_icount on
+ read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,46 +32,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 858585 jemmy <jemmy858585@gmail.com>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, quintela@redhat.com, dgilbert@redhat.com, qemu-block@nongnu.org, Lidong Chen <lidongchen@tencent.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: dovgaluk@ispras.ru, rth@twiddle.net, peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
 
---vNrHrykRFvLVX6W3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-On Fri, Apr 07, 2017 at 09:30:33AM +0800, 858585 jemmy wrote:
-> On Thu, Apr 6, 2017 at 10:02 PM, Stefan Hajnoczi <stefanha@redhat.com> wr=
-ote:
-> > On Wed, Apr 05, 2017 at 05:27:58PM +0800, jemmy858585@gmail.com wrote:
-> >
-> > A proper solution is to refactor the synchronous code to make it
-> > asynchronous.  This might require invoking the system call from a
-> > thread pool worker.
-> >
->=20
-> yes, i agree with you, but this is a big change.
-> I will try to find how to optimize this code, maybe need a long time.
->=20
-> this patch is not a perfect solution, but can alleviate the problem.
+> On 05/04/2017 15:25, Alex Bennée wrote:
+>> This ensures each time the vCPU thread reads the icount we update the
+>> master timer_state.qemu_icount field. This way as long as updates are
+>> in BQL protected sections (which they should be) the main-loop can
+>> never come to update the log and find time has gone backwards.
+>>
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> ---
+>>  cpus.c | 6 ++----
+>>  1 file changed, 2 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/cpus.c b/cpus.c
+>> index ff75af449a..63de033cc8 100644
+>> --- a/cpus.c
+>> +++ b/cpus.c
+>> @@ -246,19 +246,17 @@ void cpu_update_icount(CPUState *cpu)
+>>
+>>  int64_t cpu_get_icount_raw(void)
+>>  {
+>> -    int64_t icount;
+>>      CPUState *cpu = current_cpu;
+>>
+>> -    icount = atomic_read(&timers_state.qemu_icount);
+>>      if (cpu && cpu->running) {
+>>          if (!cpu->can_do_io) {
+>>              fprintf(stderr, "Bad icount read\n");
+>>              exit(1);
+>>          }
+>>          /* Take into account what has run */
+>> -        icount += cpu_get_icount_executed(cpu);
+>> +        cpu_update_icount(cpu);
+>>      }
+>> -    return icount;
+>> +    return atomic_read(&timers_state.qemu_icount);
+>>  }
+>>
+>>  /* Return the virtual CPU time, based on the instruction counter.  */
+>>
+>
+> Maybe the update should be done in gen_io_start instead.  There
+> shouldn't be any interference between vCPU and I/O threads except
+> between gen_io_start and gen_io_end.
 
-Let's try to understand the problem fully first.
+I'm not sure I follow. gen_io_start is a translation time thing. At
+least here we ensure we update whenever the value is read.
 
-Stefan
 
---vNrHrykRFvLVX6W3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJY53laAAoJEJykq7OBq3PI6uEIAMhM6LiRwmY+kfRmZ/jWQdSU
-ARTHnOalaI0TGFSUochJwVQQOW6lzaXNuKSIFNH1KtXffEA941L5nlhXX1OSHA2/
-qj3ZDDvyMul9Zf+oGhr3KY3NZdLbR4I1ENRBNH5B1UNhEFR0BSDY7+2Ljw0Ukxrf
-LLLceHksAa2Qms6IsXQyU7VQi7nmpKhQaVXKSCRV0TYYOw70WvxbGGhcyU3nNSrz
-3fdewGAHN4uTAfvvauS7Ryg9jUzwjIx+WwWvDhL85gUfYQNFZxcugx/gHeK8YZw4
-4mGJPvLXX/LnecHY5ZAN/TBb0HSej3JPSxpZMjf/0Ocjofz0qemInu4JEZSGduw=
-=oviq
------END PGP SIGNATURE-----
-
---vNrHrykRFvLVX6W3--
+--
+Alex Bennée
