@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58143)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1cwTZN-0006Mw-GM
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:04:54 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1cwTjD-0000A3-D4
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:15:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1cwTZJ-000141-Ho
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:04:53 -0400
-Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:33782)
+	(envelope-from <alex.bennee@linaro.org>) id 1cwTj9-0004zr-MM
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:15:03 -0400
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:33455)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1cwTZJ-00013w-DP
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:04:49 -0400
-Received: by mail-io0-x242.google.com with SMTP id b140so2467821iof.0
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 06:04:49 -0700 (PDT)
-In-Reply-To: <CAJy91CbmDWrRCmA8gbgYBNXx0NNeZBSXSd19J+MNUYzLMrLCwQ@mail.gmail.com>
-References: <mailman.167.1491494426.906.qemu-devel@nongnu.org>
-	<3F8ADDFA-7686-416B-A63A-4C59EC99DDC6@gmail.com>
-	<CAJy91CaTPoUVHYSKAqM=svr3E=JPr-3pYYGRW72Fr-XuS0RTNQ@mail.gmail.com>
-	<CAJy91CbmDWrRCmA8gbgYBNXx0NNeZBSXSd19J+MNUYzLMrLCwQ@mail.gmail.com>
-Mime-Version: 1.0 (Apple Message framework v753.1)
-Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
-Message-Id: <5ECA2A1E-99B1-4D9E-90E1-B6FA70947E0D@gmail.com>
-Content-Transfer-Encoding: 7bit
-From: G 3 <programmingkidx@gmail.com>
-Date: Fri, 7 Apr 2017 09:04:45 -0400
-Subject: Re: [Qemu-devel] is qemu able to run multiple system emulation
- simultaneously
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cwTj9-0004vY-FY
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:14:59 -0400
+Received: by mail-wr0-x232.google.com with SMTP id g19so63495902wrb.0
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 06:14:57 -0700 (PDT)
+References: <20170405132503.32125-1-alex.bennee@linaro.org>
+	<20170405132503.32125-12-alex.bennee@linaro.org>
+	<5ee6d2cb-d3e5-8b28-6a73-2d84c44ce614@redhat.com>
+	<87k26wa1ry.fsf@linaro.org>
+	<2061307774.11920398.1491567568031.JavaMail.zimbra@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <2061307774.11920398.1491567568031.JavaMail.zimbra@redhat.com>
+Date: Fri, 07 Apr 2017 14:14:59 +0100
+Message-ID: <87inmg9x64.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 11/12] cpus: call cpu_update_icount on
+ read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,41 +34,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jiahuan Zhang <jiahuanzhang90@gmail.com>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: dovgaluk@ispras.ru, rth@twiddle.net, peter maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, mttcg@greensocs.com, fred konrad <fred.konrad@greensocs.com>, a rigo <a.rigo@virtualopensystems.com>, cota@braap.org, bobby prani <bobby.prani@gmail.com>, nikunj@linux.vnet.ibm.com, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
 
-On Apr 7, 2017, at 3:08 AM, Jiahuan Zhang wrote:
+Paolo Bonzini <pbonzini@redhat.com> writes:
+
+> ----- Original Message -----
+>> From: "Alex Bennée" <alex.bennee@linaro.org>
+>> To: "Paolo Bonzini" <pbonzini@redhat.com>
+>> Cc: dovgaluk@ispras.ru, rth@twiddle.net, "peter maydell" <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+>> mttcg@greensocs.com, "fred konrad" <fred.konrad@greensocs.com>, "a rigo" <a.rigo@virtualopensystems.com>,
+>> cota@braap.org, "bobby prani" <bobby.prani@gmail.com>, nikunj@linux.vnet.ibm.com, "Peter Crosthwaite"
+>> <crosthwaite.peter@gmail.com>
+>> Sent: Friday, April 7, 2017 7:35:29 PM
+>> Subject: Re: [PATCH v2 11/12] cpus: call cpu_update_icount on read
+>>
+>>
+>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>>
+>> > On 05/04/2017 15:25, Alex Bennée wrote:
+>> >> This ensures each time the vCPU thread reads the icount we update the
+>> >> master timer_state.qemu_icount field. This way as long as updates are
+>> >> in BQL protected sections (which they should be) the main-loop can
+>> >> never come to update the log and find time has gone backwards.
+>> >>
+>> >> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> >> ---
+>> >>  cpus.c | 6 ++----
+>> >>  1 file changed, 2 insertions(+), 4 deletions(-)
+>> >>
+>> >> diff --git a/cpus.c b/cpus.c
+>> >> index ff75af449a..63de033cc8 100644
+>> >> --- a/cpus.c
+>> >> +++ b/cpus.c
+>> >> @@ -246,19 +246,17 @@ void cpu_update_icount(CPUState *cpu)
+>> >>
+>> >>  int64_t cpu_get_icount_raw(void)
+>> >>  {
+>> >> -    int64_t icount;
+>> >>      CPUState *cpu = current_cpu;
+>> >>
+>> >> -    icount = atomic_read(&timers_state.qemu_icount);
+>> >>      if (cpu && cpu->running) {
+>> >>          if (!cpu->can_do_io) {
+>> >>              fprintf(stderr, "Bad icount read\n");
+>> >>              exit(1);
+>> >>          }
+>> >>          /* Take into account what has run */
+>> >> -        icount += cpu_get_icount_executed(cpu);
+>> >> +        cpu_update_icount(cpu);
+>> >>      }
+>> >> -    return icount;
+>> >> +    return atomic_read(&timers_state.qemu_icount);
+>> >>  }
+>> >>
+>> >>  /* Return the virtual CPU time, based on the instruction counter.  */
+>> >>
+>> >
+>> > Maybe the update should be done in gen_io_start instead.  There
+>> > shouldn't be any interference between vCPU and I/O threads except
+>> > between gen_io_start and gen_io_end.
+>>
+>> I'm not sure I follow. gen_io_start is a translation time thing. At
+>> least here we ensure we update whenever the value is read.
+>
+> Sorry, I meant we should generate TCG opcodes for the translation in
+> gen_io_start.
+
+Ahh OK. I think this is 2.10 stuff though right?
 
 >
->
-> On 7 April 2017 at 08:26, Jiahuan Zhang <jiahuanzhang90@gmail.com>  
-> wrote:
-> On 6 April 2017 at 19:58, G 3 <programmingkidx@gmail.com> wrote:
->
-> On Apr 6, 2017, at 12:00 PM, qemu-devel-request@nongnu.org wrote:
->
-> Dear QEMU developers,
->
-> I need multiple ARM-based hardware emulation runing simultaneously  
-> in one
-> PC.
-> I wander if QEMU is capble to run two system emulation at the same  
-> time.
-> Or I have to use two QEMU for two system emulation
->
-> If the former is possible, where can i find some docs about it? I have
-> searched two days, the result is not positive.
->
-> Please help. Thanks in advance.
->
-> Best regards,
-> Jiahuan
->
-> My vote goes to running multiple instances of QEMU at the same  
-> time. It is easy to do and works.
->
-> Just done a try. Multiple system emulation can be done by running  
-> multiple instances of QEMU. You are right! Thanks.
+> Paolo
 
-You're welcome.
+
+--
+Alex Bennée
