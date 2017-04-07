@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51425)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.guang55@zte.com.cn>) id 1cwPik-0005QL-JN
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 04:58:19 -0400
+	(envelope-from <stefanha@redhat.com>) id 1cwPpB-0007Wj-Cj
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:04:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wang.guang55@zte.com.cn>) id 1cwPih-0006At-GY
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 04:58:18 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:41297)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.guang55@zte.com.cn>) id 1cwPig-00069h-Ot
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 04:58:15 -0400
-From: Wang guang <wang.guang55@zte.com.cn>
-Date: Sat, 8 Apr 2017 09:16:23 +0800
-Message-Id: <1491614183-4580-2-git-send-email-wang.guang55@zte.com.cn>
-In-Reply-To: <1491614183-4580-1-git-send-email-wang.guang55@zte.com.cn>
-References: <1491614183-4580-1-git-send-email-wang.guang55@zte.com.cn>
-Subject: [Qemu-devel] [PATCH] vhost: skip RAM device memory sections
+	(envelope-from <stefanha@redhat.com>) id 1cwPpA-0000nb-Kc
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:04:57 -0400
+Date: Fri, 7 Apr 2017 10:04:47 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170407090447.GD13602@stefanha-x1.localdomain>
+References: <20170405194741.18956-1-eblake@redhat.com>
+	<20170405194741.18956-6-eblake@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="q9KOos5vDmpwPx9o"
+Content-Disposition: inline
+In-Reply-To: <20170405194741.18956-6-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 05/13] qobject: Drop useless QObject
+ casts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,39 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com
-Cc: qemu-devel@nongnu.org, ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Weil <sw@weilnetz.de>, Alberto Garcia <berto@igalia.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-From: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
 
-A RAM device represents a mapping to a physical device, such as to a PCI
-* MMIO BAR of an vfio-pci assigned device.
-Vhost listens to this region,and increases the region's reference count
-while passthrough?for?network adapters (Physical Function, PF or Virtual Function, VF).
-After detaching   network adapters with  vhost backend dirver or vhost user dirver,
-it unregister vhost listen function  by memory_listener_unregister.
-After detaching the passthrough pf  or vf,
-the RAM device region's reference by  vhost listener increated can not be released,
-due to vhost listen function does not exist.So let's just skip RAM device memory.
+--q9KOos5vDmpwPx9o
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
----
- hw/virtio/vhost.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On Wed, Apr 05, 2017 at 02:47:33PM -0500, Eric Blake wrote:
+> We have macros in place to make it less verbose to add a subtype
+> of QObject to both QDict and QList. While we have made cleanups
+> like this in the past (see commit fcfcd8ffc, for example), having
+> it be automated by Coccinelle makes it easier to maintain.
+>=20
+> Patch created mechanically via:
+>   spatch --sp-file scripts/coccinelle/qobject.cocci \
+>     --macro-file scripts/cocci-macro-file.h --dir . --in-place
+> then I verified that no manual touchups were required.
+>=20
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  block.c                   | 12 ++++--------
+>  block/blkdebug.c          |  4 ++--
+>  block/blkverify.c         |  7 +++----
+>  block/file-posix.c        |  6 +++---
+>  block/file-win32.c        |  4 ++--
+>  block/quorum.c            | 16 ++++++----------
+>  tests/check-qdict.c       | 20 ++++++++++----------
+>  tests/test-qmp-commands.c | 24 ++++++++++++------------
+>  8 files changed, 42 insertions(+), 51 deletions(-)
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 613494d..c1ff98f 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -611,7 +611,8 @@ static void vhost_set_memory(MemoryListener *listener,
- static bool vhost_section(MemoryRegionSection *section)
- {
-     return memory_region_is_ram(section->mr) &&
--        !memory_region_is_rom(section->mr);
-+        !memory_region_is_rom(section->mr) &&
-+        !memory_region_is_skip_dump(section->mr);
- }
- 
- static void vhost_begin(MemoryListener *listener)
--- 
-1.8.3.1
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--q9KOos5vDmpwPx9o
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJY51YvAAoJEJykq7OBq3PI2n8IAKdaxoRX8r/gBn5yHBXNGh9S
+LaRAelqWxW/ynAVtvOHXFAjyi0hBQOHi1JFgr9d9BTy7Kl6JOMm4bwcD90e9CWx9
+tcI/Y7amcpLLO0VK3XsFuVonZrYVrDNHaO1Rt3CY0OiC6fOp+JNKAqdYSooZf2O8
+LzFk3ffFkvBAs+SDvvOBoTBACEs73auv4UIHttZM6si8BZ72uo4lbkX+yWkhSMIY
+JDbwMQOm4VGT9hSXTD3W8EQNYQ+u2+85ygIjKpvK0OXczolYKG/lE6e2ao10S0UG
+AOUTb5CpQBoGOy0gSfmcH99lAYqWPCCiJUPk+9elLif4XE49MpdLwGj20B6u0R8=
+=HKwL
+-----END PGP SIGNATURE-----
+
+--q9KOos5vDmpwPx9o--
