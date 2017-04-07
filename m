@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cwVkU-0006av-PP
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:24:31 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1cwW1o-0002OT-7i
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:42:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cwVkT-0008Ew-Mh
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:24:30 -0400
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:34588)
+	(envelope-from <alex.bennee@linaro.org>) id 1cwW1k-0007PF-6b
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:42:24 -0400
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:35693)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cwVkT-0008EG-Ga
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:24:29 -0400
-Received: by mail-wm0-x236.google.com with SMTP id w204so279252wmd.1
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 08:24:29 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cwW1j-0007Ns-VE
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:42:20 -0400
+Received: by mail-wm0-x22d.google.com with SMTP id w64so1695738wma.0
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 08:42:19 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Fri,  7 Apr 2017 16:42:09 +0100
+Message-Id: <20170407154221.26918-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1491572865-8549-1-git-send-email-kwolf@redhat.com>
-References: <1491572865-8549-1-git-send-email-kwolf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 7 Apr 2017 16:24:07 +0100
-Message-ID: <CAFEAcA_u223rHUL=fqVQBQBArL+Xr-hrKiNfpgPncip=vNUKpA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 00/10] Block layer fixes for 2.9.0-rc4
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 00/12] icount and misc MTTCG fixes for
+ 2.9-rc4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +28,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: dovgaluk@ispras.ru, rth@twiddle.net, pbonzini@redhat.com
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On 7 April 2017 at 14:47, Kevin Wolf <kwolf@redhat.com> wrote:
-> The following changes since commit 5fe2339e6b09da7d6f48b9bef0f1a7360392b489:
->
->   Merge remote-tracking branch 'remotes/awilliam/tags/vfio-updates-20170406.0' into staging (2017-04-07 10:29:56 +0100)
->
-> are available in the git repository at:
->
->
->   git://repo.or.cz/qemu/kevin.git tags/for-upstream
->
-> for you to fetch changes up to 19dd29e8a77cd820515de5289f566508e0ed4926:
->
->   mirror: Fix aio context of mirror_top_bs (2017-04-07 14:44:06 +0200)
->
-> ----------------------------------------------------------------
-> Block layer fixes for 2.9.0-rc4
->
-> ----------------------------------------------------------------
-> Fam Zheng (3):
->       block: Fix unpaired aio_disable_external in external snapshot
->       block: Assert attached child node has right aio context
->       mirror: Fix aio context of mirror_top_bs
->
-> Jeff Cody (1):
->       qemu-img: img_create does not support image-opts, fix docs
->
-> Kevin Wolf (4):
->       block: Ignore guest dev permissions during incoming migration
->       commit: Set commit_top_bs->aio_context
->       commit: Set commit_top_bs->total_sectors
->       block: Don't check permissions for copy on read
->
-> Max Reitz (2):
->       block/mirror: Fix use-after-free
->       iotests: Add mirror tests for orphaned source
+Hi,
 
-Applied, thanks.
+This doesn't change much from v2 earlier this week:
 
--- PMM
+  https://lists.nongnu.org/archive/html/qemu-devel/2017-04/msg00661.html
+
+There was a minor improvement to the cpu_update_icount to not use a
+potentially expensive atomic_add (which is CST) when you can get away
+with weaker semantics with a single writer.
+
+I've also fixed a compile error on 32bit guests. It only falls back to
+non-atomic code if CONFIG_ATOMIC64 is not set which isn't the case for
+ARMv7 as it can use load/store-exclusive pair to do the operation.
+This does require using the __no_check atomic variants though.
+
+I still plan to roll a pull-request on Monday and get it sent to Peter
+in good time for cutting -rc4.
+
+Cheers,
+
+
+Alex Bennée (12):
+  scripts/qemugdb/mtree.py: fix up mtree dump
+  scripts/qemu-gdb/timers.py: new helper to dump timer state
+  scripts/replay-dump.py: replay log dumper
+  target/i386/misc_helper: wrap BQL around another IRQ generator
+  cpus: remove icount handling from qemu_tcg_cpu_thread_fn
+  cpus: check cpu->running in cpu_get_icount_raw()
+  cpus: move icount preparation out of tcg_exec_cpu
+  cpus: don't credit executed instructions before they have run
+  cpus: introduce cpu_update_icount helper
+  cpu-exec: update icount after each TB_EXIT
+  cpus: call cpu_update_icount on read
+  replay: assert time only goes forward
+
+ cpu-exec.c                |  14 +--
+ cpus.c                    | 109 ++++++++++++++-----
+ include/qemu/timer.h      |   1 +
+ include/qom/cpu.h         |   1 +
+ replay/replay-internal.c  |   4 +
+ replay/replay.c           |   4 +
+ scripts/qemu-gdb.py       |   3 +-
+ scripts/qemugdb/mtree.py  |  12 +-
+ scripts/qemugdb/timers.py |  54 +++++++++
+ scripts/replay-dump.py    | 272 ++++++++++++++++++++++++++++++++++++++++++++++
+ target/i386/misc_helper.c |   3 +
+ 11 files changed, 437 insertions(+), 40 deletions(-)
+ create mode 100644 scripts/qemugdb/timers.py
+ create mode 100755 scripts/replay-dump.py
+
+-- 
+2.11.0
