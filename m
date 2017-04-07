@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cwVBG-0002Kd-Qp
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:48:07 -0400
+	(envelope-from <bounces@canonical.com>) id 1cwVEa-0004DX-MO
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:51:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cwVBD-0001K5-Ik
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:48:06 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:35781)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cwVBD-0001Jp-D4
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:48:03 -0400
-Received: by mail-wm0-x235.google.com with SMTP id w64so503672wma.0
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 07:48:03 -0700 (PDT)
-Date: Fri, 7 Apr 2017 15:47:59 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170407144759.GL16146@stefanha-x1.localdomain>
-References: <1491548326-60072-1-git-send-email-weiqi4@huawei.com>
+	(envelope-from <bounces@canonical.com>) id 1cwVEX-0002nR-FA
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:51:32 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54823)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cwVEX-0002n4-96
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:51:29 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cwVEU-0005EU-OP
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 14:51:26 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2CFAA2E81F9
+	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 14:51:16 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="DN8g+DOX2TxGxleI"
-Content-Disposition: inline
-In-Reply-To: <1491548326-60072-1-git-send-email-weiqi4@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH 1/3] vhost: simple clean up
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 07 Apr 2017 14:44:34 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1635339 <1635339@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20161020160532.23339.63373.malonedeb@soybean.canonical.com>
+Message-Id: <20170407144435.12743.28795.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1635339] Re: qxl_pre_save assertion failure on vm
+ "save"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +37,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: weiqi <weiqi4@huawei.com>
-Cc: mst@redhat.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
+** Changed in: qemu
+       Status: Fix Released =3D> Confirmed
 
---DN8g+DOX2TxGxleI
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+-- =
 
-On Fri, Apr 07, 2017 at 02:58:46PM +0800, weiqi wrote:
-> From: Wei Qi <weiqi4@huawei.com>
->=20
-> It is unnecessary to assign 'hdev->nvqs' to 'i', because 'hdev->nvqs' unu=
-sed after assignment, so remove it.
->=20
-> Signed-off-by: Wei Qi <weiqi4@huawei.com>
-> ---
->  hw/virtio/vhost.c | 1 -
->  1 file changed, 1 deletion(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1635339
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Title:
+  qxl_pre_save assertion failure on vm "save"
 
---DN8g+DOX2TxGxleI
-Content-Type: application/pgp-signature; name="signature.asc"
+Status in QEMU:
+  Confirmed
 
------BEGIN PGP SIGNATURE-----
+Bug description:
+  When I try and save my Windows 10 VM, I see an assertion failure, and
+  the machine is shut down.
 
-iQEcBAEBAgAGBQJY56afAAoJEJykq7OBq3PIiloIAIsHiXXGfDNOETo9fIywb4Gl
-zlum3Y2wJqDfsjWLWK0wXPaVtVCwpOJup71CAm9KhI10dzj9A2rngvnm8J4BjuJi
-TjiyDqsgo1B1ROCVV0nfXG6WLbYrLZwy0vEBk5Fg40bLwJkeQvujwY5zITKpD4JR
-/U3OK7nFuZwpE/KG95j9BXGkmVA+HGJqdGgGbNpafRkB+Fy/TomguIJWxDznRxLm
-rhbldgVksphWEYODDgHlJVAK2DsJJAtgKij2WQJrX1/lVzFnIlw7j01bCHy6JRYo
-6kV5vvDbO0juSDfxrZzpWBcCmfkQDpSjv5+za83Z0GrsWxXvgaMtZXZFHLlZu2s=
-=k+rc
------END PGP SIGNATURE-----
+  I see the following in the log:
 
---DN8g+DOX2TxGxleI--
+  main_channel_handle_parsed: agent start
+  qemu-system-x86_64: /build/qemu-Zwynhi/qemu-2.5+dfsg/hw/display/qxl.c:210=
+1: qxl_pre_save: Assertion `d->last_release_offset < d->vga.vram_size' fail=
+ed.
+  2016-10-20 11:52:42.713+0000: shutting down
+
+  Please let me know what other information would be relevant!
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1635339/+subscriptions
