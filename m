@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cwUPf-0006nU-5f
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:58:56 -0400
+	(envelope-from <bounces@canonical.com>) id 1cwUQQ-0007T6-Jn
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:59:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cwUPe-0002AE-Aq
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:58:55 -0400
-References: <CAO_EM_=wECMYRRaDyPtY8sKFZF8owp0u2sE4k_oeS=BLF9B2Mw@mail.gmail.com>
-	<67b441ce-ee18-c6d5-df5f-224439214ab8@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <6838894a-e6ab-1c83-25a1-163c35fd0a38@redhat.com>
-Date: Fri, 7 Apr 2017 15:58:37 +0200
+	(envelope-from <bounces@canonical.com>) id 1cwUQM-00034Z-U8
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:59:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42055)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cwUQM-00033i-O7
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:59:38 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cwUQL-0002IO-OC
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 13:59:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id AA14A2E80C3
+	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 13:59:37 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <67b441ce-ee18-c6d5-df5f-224439214ab8@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="xgOPU1RKN2H6OFFwdeSrGaC0ULit15GrQ"
-Subject: Re: [Qemu-devel] New iotest repros failures on virtio external
- snapshot with iothread
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 07 Apr 2017 13:47:01 -0000
+From: Thomas Huth <1030666@bugs.launchpad.net>
+Reply-To: Bug 1030666 <1030666@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20120730014155.9541.71695.malonedeb@soybean.canonical.com>
+Message-Id: <20170407134701.1808.15364.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1030666] Re: gdb can't proceed after a breakpoint
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,72 +36,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Ed Swierk <eswierk@skyportsystems.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---xgOPU1RKN2H6OFFwdeSrGaC0ULit15GrQ
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, Ed Swierk <eswierk@skyportsystems.com>,
- Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Message-ID: <6838894a-e6ab-1c83-25a1-163c35fd0a38@redhat.com>
-Subject: Re: [Qemu-devel] New iotest repros failures on virtio external
- snapshot with iothread
-References: <CAO_EM_=wECMYRRaDyPtY8sKFZF8owp0u2sE4k_oeS=BLF9B2Mw@mail.gmail.com>
- <67b441ce-ee18-c6d5-df5f-224439214ab8@redhat.com>
-In-Reply-To: <67b441ce-ee18-c6d5-df5f-224439214ab8@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Triaging old bug tickets ... can you still reproduce this issue with the
+latest version of QEMU (version 2.9)?
 
-On 30.03.2017 04:16, Eric Blake wrote:
-> On 03/29/2017 09:01 PM, Ed Swierk via Qemu-devel wrote:
->> Parts of qemu's block code have changed a lot in recent months but are=
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
->> not well exercised by current tests.
->>
->> Subtle bugs have crept in causing assertion failures, hangs and other
->> crashes in a variety of situations: immediately on start, on first
->> guest activity, on external snapshot create or commit, on qmp quit
->> command.
->>
->> Reproducing these bugs has proved tricky, as each may occur only with
->> a specific combination of qemu version, block device type (virtio-blk
->> or virtio-scsi) and iothread enabled or not. In some cases the bug
->> occurs only after several external snapshot operations. And in some
->> cases the bug only manifests when a guest is accessing the block
->> device simultaneously.
->>
->> I've written an iotest (number 176, for now) that attempts to cover
->=20
-> At least one other thread has already proposed a test 176.  It's
-> somewhat straightforward to renumber things, but I'm wondering if there=
+-- =
 
-> is some even-more-efficient way of reserving test numbers, perhaps
-> through the wiki, since we are finding that test numbers get reserved
-> several weeks before actually getting merged into the tree.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1030666
 
-As a maintainer, I don't mind collisions; I can and will rename tests.
-For all I care, you can even name all of your tests 001.
+Title:
+  gdb can't proceed after a breakpoint
 
-Max
+Status in QEMU:
+  Incomplete
 
+Bug description:
+  Using qemu-1.1.0-windows.zip package from http://lassauge.free.fr/qemu/
+  Host: Windows 7 Ultimate 64-bit
+  Guest: i386 system running MS-DOS 6.22
+  Launch command line:
+  =C2=A0=C2=A0qemu-system-i386.exe -L Bios -fda "DOS.vfd" -fdb "Data.vfd" -=
+gdb tcp:127.0.0.1:1234
+  Debbugers tried:
+  =C2=A0=C2=A0gdb 7.3.50.20111026-cvs running on Cygwin 1.7.16
+  =C2=A0=C2=A0gdb 7.4 on MinGW
 
---xgOPU1RKN2H6OFFwdeSrGaC0ULit15GrQ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  Short description:
+  I use gdb to attach to a running Qemu session, set a breakpoint and resum=
+e execution. When the breakpoint is hit, gdb gains control as expected. How=
+ever, trying to single-step or continue at this point just causes the same =
+breakpoint to be hit immediately again. Deleting the breakpoint allows sing=
+le-stepping or continue to work.
 
------BEGIN PGP SIGNATURE-----
+  Steps to reproduce:
+  DOS.vfd is a floppy image containing an MS-DOS 6.22 startup disk.
+  Data.vfd is a floppy image containing a single program (hello.com).
+  The aim is to debug the execution of hello.com with gdb.
+  Launch Qemu.
+  Launch gdb, an attach to qemu:
+  =C2=A0=C2=A0"target remote localhost:1234"
+  I know the address at which hello.com will be loaded, so set a breakpoint=
+ there and resume execution:
+  =C2=A0=C2=A0"break *0xf730"
+  =C2=A0=C2=A0"continue"
+  In Qemu, start hello.com. The breakpoint is immediately hit, execution st=
+ops and gdb gains control.
+  Examining the program gives expected results (such as "info reg" or "disa=
+ssemble").
+  At this point, try to proceed either with single-stepping ("si" or "ni") =
+or with "continue", and the same breakpoint is immediately hit again. Subse=
+quent attempts to single-step or continue just keep hitting the same breakp=
+oint.
+  The only way to proceed at this point is to delete the breakpoint, after =
+which both single-stepping and continue work.
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljnmw0SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AeZkH/2RZvA4tlnSgh8n85mCtzHBb0td30X1/
-k22KdiJqqTCEBPKIqmuHsgwPxlv7DYwePz6oIK4CJQyL6ljA6mbcYvYZxM8Cn6Er
-g+6j2ujcgA5qTX2yB/tjwtUfCnIPbS7QI7ZsJka2or7uWNttbqD7IrWq3Lq+PQK5
-JI+vCMetM5N9XgY1clE/QjEQSI8HI49lN23rGfG1v4rtD0E2ANRYyO+QleDKroXd
-UKZVZwbMZAW+nn7qO+qthpeWvzSOvgC+QQhG493Cr56t0pzWXfE8nUSqdvGh5k79
-Wp5eWxaAPxynrOtTIkoKKoCgY7VN5j4/x8Z5zqnK0Sydqc+NOUH9Kxk=
-=o6iV
------END PGP SIGNATURE-----
+  Note that single-stepping and continue works as expected if it is done
+  after interrupting execution with Ctrl-C.
 
---xgOPU1RKN2H6OFFwdeSrGaC0ULit15GrQ--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1030666/+subscriptions
