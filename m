@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cwV2O-0003IG-DH
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:38:57 -0400
+	(envelope-from <berrange@redhat.com>) id 1cwV4U-000541-KL
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:41:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cwV2K-00059w-7N
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:38:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52692)
+	(envelope-from <berrange@redhat.com>) id 1cwV4T-0006or-1E
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:41:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56668)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cwV2J-00059d-U9
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:38:52 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CE9A963E25
-	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 14:38:50 +0000 (UTC)
-Received: from work-vm (ovpn-116-136.ams2.redhat.com [10.36.116.136])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4E4B118235
-	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 14:38:49 +0000 (UTC)
-Date: Fri, 7 Apr 2017 15:38:47 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170407143847.GM2138@work-vm>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cwV4S-0006od-Nf
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:41:04 -0400
+Date: Fri, 7 Apr 2017 15:41:00 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170407144100.GL26896@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1491575431-32170-1-git-send-email-amarnath.valluri@intel.com>
+	<1491575431-32170-10-git-send-email-amarnath.valluri@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] Hacks for building on gcc 7 / Fedora 26
+In-Reply-To: <1491575431-32170-10-git-send-email-amarnath.valluri@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v2 9/9] tpm: Added support for TPM emulator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,145 +28,257 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Amarnath Valluri <amarnath.valluri@intel.com>
+Cc: qemu-devel@nongnu.org, patrick.ohly@intel.com, stefanb@linux.vnet.ibm.com, marcandre.lureau@gmail.com
 
-Hi,
-   Fedora 26 has gcc 7.0.1 which has the normal compliment
-of new fussy warnings; so far I've posted :
+On Fri, Apr 07, 2017 at 05:30:31PM +0300, Amarnath Valluri wrote:
+> This change introduces a new TPM backend driver that can communicate with
+> swtpm(software TPM emulator) using unix domain socket interface.
+> 
+> Swtpm uses two unix sockets, one for plain TPM commands and responses, and one
+> for out-of-band control messages.
+> 
+> The swtpm and associated tools can be found here:
+>     https://github.com/stefanberger/swtpm
+> 
+> Usage:
+>     # setup TPM state directory
+>     mkdir /tmp/mytpm
+>     chown -R tss:root /tmp/mytpm
+>     /usr/bin/swtpm_setup --tpm-state /tmp/mytpm --createek
+> 
+>     # Ask qemu to use TPM emulator with given tpm state directory
+>     qemu-system-x86_64 \
+>         [...] \
+>         -tpmdev emulator,id=tpm0,tpmstatedir=/tmp/mytpm,logfile=/tmp/swtpm.log \
+>         -device tpm-tis,tpmdev=tpm0 \
+>         [...]
+> 
+> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
+> ---
+>  configure             |  15 +-
+>  hmp.c                 |  21 ++
+>  hw/tpm/Makefile.objs  |   1 +
+>  hw/tpm/tpm_emulator.c | 927 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/tpm/tpm_ioctl.h    | 243 +++++++++++++
+>  qapi-schema.json      |  36 +-
+>  qemu-options.hx       |  53 ++-
+>  tpm.c                 |   2 +-
+>  8 files changed, 1289 insertions(+), 9 deletions(-)
+>  create mode 100644 hw/tpm/tpm_emulator.c
+>  create mode 100644 hw/tpm/tpm_ioctl.h
 
-tests/check-qdict: Fix missing brackets
-slirp/smb: Replace constant strings by glib string
+> +static int tpm_emulator_spawn_emulator(TPMEmulator *tpm_pt)
+> +{
+> +    int fds[2] = { -1, -1 };
+> +    int ctrl_fds[2] = { -1, -1 };
+> +    pid_t cpid;
+> +
+> +    if (!tpm_pt->ops->has_data_path) {
+> +        if (socketpair(AF_UNIX, SOCK_SEQPACKET, 0, fds) < 0) {
+> +            return -1;
+> +        }
+> +    }
+> + 
+> +    if (!tpm_pt->ops->has_ctrl_path) {
+> +        if (socketpair(AF_UNIX, SOCK_SEQPACKET, 0, ctrl_fds) < 0) {
+> +            if (!tpm_pt->ops->has_data_path) {
+> +                closesocket(fds[0]);
+> +                closesocket(fds[1]);
+> +            }
+> +            return -1;
+> +        }
+> +    }
+> +
+> +    cpid = qemu_fork(NULL);
+> +    if (cpid < 0) {
+> +        error_report("tpm-emulator: Fork failure: %s", strerror(errno));
+> +        if (!tpm_pt->ops->has_data_path) {
+> +            closesocket(fds[0]);
+> +            closesocket(fds[1]);
+> +        }
+> +        if (!tpm_pt->ops->has_ctrl_path) {
+> +            closesocket(ctrl_fds[0]);
+> +            closesocket(ctrl_fds[1]);
+> +        }
+> +        return -1;
+> +    }
+> +
+> +    if (cpid == 0) { /* CHILD */
+> +        enum {
+> +            PARAM_PATH,
+> +            PARAM_IFACE,
+> +            PARAM_SERVER,  PARAM_SERVER_ARGS,
+> +            PARAM_CTRL,    PARAM_CTRL_ARGS,
+> +            PARAM_STATE,   PARAM_STATE_ARGS,
+> +            PARAM_PIDFILE, PARAM_PIDFILE_ARGS,
+> +            PARAM_LOG,     PARAM_LOG_ARGS,
+> +            PARAM_MAX
+> +        };
+> +
+> +        int i;
+> +        int data_fd = -1, ctrl_fd = -1;
+> +        char *argv[PARAM_MAX+1];
+> +
+> +        /* close all unused inherited sockets */
+> +        if (fds[0] >= 0)
+> +            closesocket(fds[0]);
+> +        if (ctrl_fds[0] >= 0)
+> +            closesocket(ctrl_fds[0]);
 
-that fix one actual mistake and work around something it's being
-fussy over.
+The 'if' checks are pointless - its already guaranteed by the
+fact you check socketpair() status.
 
-But I've also got a pile of hacks, attached below that I'm
-not too sure what I'll do with them yet, but they're attached
-for anyone else trying to build.  Note they're smoke-only-tested.
+> +        i = STDERR_FILENO + 1;
+> +        if (fds[1] >= 0) {
+> +            data_fd = dup2(fds[1], i++);
+> +            if (data_fd < 0) {
+> +                error_report("tpm-emulator: dup2() failure - %s",
+> +                             strerror(errno));
+> +                goto exit_child;
+> +            }
+> +        }
+> +        if (ctrl_fds[1] >= 0) {
+> +            ctrl_fd = dup2(ctrl_fds[1], i++);
+> +            if (ctrl_fd < 0) {
+> +                error_report("tpm-emulator: dup2() failure - %s",
+> +                             strerror(errno));
+> +                goto exit_child;
+> +            }
+> +        }
+> +        for ( ; i < _SC_OPEN_MAX; i++) {
 
-I also have gcc bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D80346
-filed for what I reckon is a couple of overly pessimistic warnings.
+Errr, _SC_OPEN_MAX is not the maximum number of FDs - it is parameter to
+use with sysconf() to query the number of files - you must call sysconf().
 
-Enjoy,
+> +            closesocket(i);
 
-Dave
-
-=46rom 15353ce59e35e1d85927138982241491ea65cee2 Mon Sep 17 00:00:00 2001
-=46rom: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Date: Thu, 6 Apr 2017 15:44:50 +0100
-Subject: [HACK!] Hacks for f26 build
-
----
- block/blkdebug.c         | 4 ++--
- block/blkverify.c        | 4 ++--
- hw/usb/bus.c             | 5 +++--
- include/qemu/iov.h       | 4 ++--
- tests/bios-tables-test.c | 2 +-
- 5 files changed, 10 insertions(+), 9 deletions(-)
-
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index 67e8024e36..34c645d095 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -689,9 +689,9 @@ static void blkdebug_refresh_filename(BlockDriverState =
-*bs, QDict *options)
-     }
-=20
-     if (!force_json && bs->file->bs->exact_filename[0]) {
--        snprintf(bs->exact_filename, sizeof(bs->exact_filename),
-+        g_assert_cmpint(snprintf(bs->exact_filename, sizeof(bs->exact_file=
-name),
-                  "blkdebug:%s:%s", s->config_file ?: "",
--                 bs->file->bs->exact_filename);
-+                 bs->file->bs->exact_filename), <, sizeof(bs->exact_filena=
-me));
-     }
-=20
-     opts =3D qdict_new();
-diff --git a/block/blkverify.c b/block/blkverify.c
-index 9a1e21c6ad..d038947a5a 100644
---- a/block/blkverify.c
-+++ b/block/blkverify.c
-@@ -305,10 +305,10 @@ static void blkverify_refresh_filename(BlockDriverSta=
-te *bs, QDict *options)
-     if (bs->file->bs->exact_filename[0]
-         && s->test_file->bs->exact_filename[0])
-     {
--        snprintf(bs->exact_filename, sizeof(bs->exact_filename),
-+        g_assert_cmpint(snprintf(bs->exact_filename, sizeof(bs->exact_file=
-name),
-                  "blkverify:%s:%s",
-                  bs->file->bs->exact_filename,
--                 s->test_file->bs->exact_filename);
-+                 s->test_file->bs->exact_filename), <, sizeof(bs->exact_fi=
-lename));
-     }
- }
-=20
-diff --git a/hw/usb/bus.c b/hw/usb/bus.c
-index 24f1608b4b..6023f3b419 100644
---- a/hw/usb/bus.c
-+++ b/hw/usb/bus.c
-@@ -8,6 +8,7 @@
- #include "monitor/monitor.h"
- #include "trace.h"
- #include "qemu/cutils.h"
-+#include <glib.h>
-=20
- static void usb_bus_dev_print(Monitor *mon, DeviceState *qdev, int indent);
-=20
-@@ -407,8 +408,8 @@ void usb_register_companion(const char *masterbus, USBP=
-ort *ports[],
- void usb_port_location(USBPort *downstream, USBPort *upstream, int portnr)
- {
-     if (upstream) {
--        snprintf(downstream->path, sizeof(downstream->path), "%s.%d",
--                 upstream->path, portnr);
-+        g_assert_cmpint(snprintf(downstream->path, sizeof(downstream->path=
-), "%s.%d",
-+                 upstream->path, portnr), <, sizeof(downstream->path));
-         downstream->hubcount =3D upstream->hubcount + 1;
-     } else {
-         snprintf(downstream->path, sizeof(downstream->path), "%d", portnr);
-diff --git a/include/qemu/iov.h b/include/qemu/iov.h
-index bd9fd55b0a..ebb0221140 100644
---- a/include/qemu/iov.h
-+++ b/include/qemu/iov.h
-@@ -46,7 +46,7 @@ static inline size_t
- iov_from_buf(const struct iovec *iov, unsigned int iov_cnt,
-              size_t offset, const void *buf, size_t bytes)
- {
--    if (__builtin_constant_p(bytes) && iov_cnt &&
-+    if (__builtin_constant_p(bytes) && iov_cnt && bytes <=3D INT_MAX &&
-         offset <=3D iov[0].iov_len && bytes <=3D iov[0].iov_len - offset) {
-         memcpy(iov[0].iov_base + offset, buf, bytes);
-         return bytes;
-@@ -59,7 +59,7 @@ static inline size_t
- iov_to_buf(const struct iovec *iov, const unsigned int iov_cnt,
-            size_t offset, void *buf, size_t bytes)
- {
--    if (__builtin_constant_p(bytes) && iov_cnt &&
-+    if (__builtin_constant_p(bytes) && iov_cnt && bytes <=3D INT_MAX &&
-         offset <=3D iov[0].iov_len && bytes <=3D iov[0].iov_len - offset) {
-         memcpy(buf, iov[0].iov_base + offset, bytes);
-         return bytes;
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index 88dbf97853..c55de4f65b 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -98,7 +98,7 @@ static void test_acpi_rsdt_table(test_data *data)
-     AcpiRsdtDescriptorRev1 *rsdt_table =3D &data->rsdt_table;
-     uint32_t addr =3D data->rsdp_table.rsdt_physical_address;
-     uint32_t *tables;
--    int tables_nr;
-+    unsigned int tables_nr;
-     uint8_t checksum;
-=20
-     /* read the header */
---=20
-2.12.2
+close, not closesocket - you can't assume these are all sockets.
 
 
+> +        DPRINT("\n")
+> +        if (execv(tpm_pt->ops->path, (char * const *)argv) < 0) {
+> +            error_report("execv() failure : %s", strerror(errno));
+> +        }
+> +
+> +exit_child:
+> +        g_strfreev(argv);
+> +        if (data_fd >= 0)
+> +            closesocket(data_fd);
+> +        if (ctrl_fd >= 0)
+> +            closesocket(ctrl_fd);
+> +
+> +        exit(0);
 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+You need _exit(), not exit() as you don't want to run atexit() handlers
+here. You also want '1' not '0' since this is a failure scenario.
+
+> +    } else { /* self */
+> +        struct stat st;
+> +        DPRINTF("child pid: %d", cpid);
+> +        int rc;
+> +        int timeout = 3; /* wait for max 3 seconds */
+> +
+> +        /* close unsed sockets */
+> +        if (fds[1] >= 0)
+> +            closesocket(fds[1]);
+> +        if (ctrl_fds[1] >= 0)
+> +            closesocket(ctrl_fds[1]);
+> +
+> +        while((rc = stat(TPM_EMULATOR_PIDFILE, &st)) < 0 && timeout--) {
+> +            sleep(1);
+> +        }
+
+A fixed 3 second timeout will inevitably cause failures on systems with
+high load.
+
+Presumably you're trying to handle the scenario where the child process
+exits without creating the pid file ?
+
+In which case you can use 'kill(cpid, 0)' and if errno == ESRCH
+then the child has exited.
+
+> +
+> +        if (timeout == -1) {
+> +            error_report("tpm-emulator: failed to find pid file: %s",
+> +                         strerror(errno));
+> +            goto err_kill_child;
+> +        }
+> +
+> +        tpm_pt->data_ioc = _iochannel_new(tpm_pt->ops->data_path, fds[0], NULL);
+> +        if (!tpm_pt->data_ioc) {
+> +            error_report("tpm-emulator: Unable to connect socket : %s",
+> +                          tpm_pt->ops->data_path);
+> +            goto err_kill_child;
+> +        }
+> +
+> +        tpm_pt->ctrl_ioc = _iochannel_new(tpm_pt->ops->ctrl_path, ctrl_fds[0], NULL);
+> +        if (!tpm_pt->ctrl_ioc) {
+> +            error_report("tpm-emulator: Unable to connect socket : %s",
+> +                          tpm_pt->ops->ctrl_path);
+> +            goto err_kill_child;
+> +        }
+> +
+> +        tpm_pt->child_running = true;
+> +
+> +        qemu_add_child_watch(cpid);
+> +
+> +        qio_channel_add_watch(tpm_pt->data_ioc, G_IO_HUP|G_IO_ERR,
+> +                              tpm_emulator_fd_handler, tpm_pt, NULL);
+> +    }
+> +
+> +    return 0;
+> +
+> +err_kill_child:
+> +    kill(cpid, SIGTERM);
+> +    closesocket(fds[0]);
+> +    closesocket(ctrl_fds[0]);
+
+You can't assume the child has gone after a SIGTERM. You need to
+check, and be prepared to SIGKILL after time reasonable time,
+if needed.
+
+> +    tpm_pt->child_running = false;
+> +
+> +    return -1;
+> +}
+
+> +
+> +static const QemuOptDesc tpm_emulator_cmdline_opts[] = {
+> +    TPM_STANDARD_CMDLINE_OPTS,
+> +    {
+> +        .name = "tpmstatedir",
+> +        .type = QEMU_OPT_STRING,
+> +        .help = "TPM state directroy",
+> +    },
+> +    {
+> +        .name = "spawn",
+> +        .type = QEMU_OPT_BOOL,
+> +        .help = "Wether to spwan given emlatory binary",
+> +    },
+> +    {
+> +        .name = "path",
+> +        .type = QEMU_OPT_STRING,
+> +        .help = "Path to TPM emulator binary",
+> +    },
+> +    {
+> +        .name = "data-path",
+> +        .type = QEMU_OPT_STRING,
+> +        .help = "Socket path to use for data exhange",
+> +    },
+> +    {
+> +        .name = "ctrl-path",
+> +        .type = QEMU_OPT_STRING,
+> +        .help = "Socket path to use for out-of-band control messages",
+> +    },
+
+I'm still not convinced by the need for 2 separate UNIX sockets, unless
+there's a performance reason, but that looks unlikely.
+
+
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
