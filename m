@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cwYqW-0003ng-07
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 14:42:56 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cwZRj-00045J-0C
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 15:21:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cwYqV-0000GD-3U
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 14:42:56 -0400
-Received: from mail-pg0-x230.google.com ([2607:f8b0:400e:c05::230]:34397)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cwZRe-0005ZV-Qm
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 15:21:22 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:33014)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cwYqU-0000Fy-UY
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 14:42:55 -0400
-Received: by mail-pg0-x230.google.com with SMTP id 21so74188697pgg.1
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 11:42:54 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170405132503.32125-1-alex.bennee@linaro.org>
-	<20170405132503.32125-12-alex.bennee@linaro.org>
-	<5ee6d2cb-d3e5-8b28-6a73-2d84c44ce614@redhat.com>
-	<87k26wa1ry.fsf@linaro.org>
-	<2061307774.11920398.1491567568031.JavaMail.zimbra@redhat.com>
-	<87inmg9x64.fsf@linaro.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <a4ac932f-1aae-f841-9f85-1001f0142454@twiddle.net>
-Date: Fri, 7 Apr 2017 11:42:51 -0700
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cwZRe-0005ZQ-L8
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 15:21:18 -0400
+Received: by mail-qt0-x243.google.com with SMTP id c45so3133952qtb.0
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 12:21:18 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170407143847.GM2138@work-vm>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <1573e08f-9805-eaf4-3fe1-c1172b6ef6e4@amsat.org>
+Date: Fri, 7 Apr 2017 16:21:14 -0300
 MIME-Version: 1.0
-In-Reply-To: <87inmg9x64.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 11/12] cpus: call cpu_update_icount on
- read
+In-Reply-To: <20170407143847.GM2138@work-vm>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Hacks for building on gcc 7 / Fedora 26
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,16 +33,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: dovgaluk@ispras.ru, peter maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, mttcg@greensocs.com, fred konrad <fred.konrad@greensocs.com>, a rigo <a.rigo@virtualopensystems.com>, cota@braap.org, bobby prani <bobby.prani@gmail.com>, nikunj@linux.vnet.ibm.com, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
 
-On 04/07/2017 06:14 AM, Alex Bennée wrote:
->> Sorry, I meant we should generate TCG opcodes for the translation in
->> gen_io_start.
-> Ahh OK. I think this is 2.10 stuff though right?
+Hi Dave,
+
+On 04/07/2017 11:38 AM, Dr. David Alan Gilbert wrote:
+> Hi,
+>    Fedora 26 has gcc 7.0.1 which has the normal compliment
+> of new fussy warnings; so far I've posted :
+>
+> tests/check-qdict: Fix missing brackets
+> slirp/smb: Replace constant strings by glib string
+>
+> that fix one actual mistake and work around something it's being
+> fussy over.
+>
+> But I've also got a pile of hacks, attached below that I'm
+> not too sure what I'll do with them yet, but they're attached
+> for anyone else trying to build.  Note they're smoke-only-tested.
+>
+> I also have gcc bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80346
+> filed for what I reckon is a couple of overly pessimistic warnings.
+>
+> Enjoy,
+>
+> Dave
+>
+> From 15353ce59e35e1d85927138982241491ea65cee2 Mon Sep 17 00:00:00 2001
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> Date: Thu, 6 Apr 2017 15:44:50 +0100
+> Subject: [HACK!] Hacks for f26 build
+>
+> ---
+>  block/blkdebug.c         | 4 ++--
+>  block/blkverify.c        | 4 ++--
+>  hw/usb/bus.c             | 5 +++--
+>  include/qemu/iov.h       | 4 ++--
+>  tests/bios-tables-test.c | 2 +-
+>  5 files changed, 10 insertions(+), 9 deletions(-)
+>
+> diff --git a/block/blkdebug.c b/block/blkdebug.c
+> index 67e8024e36..34c645d095 100644
+> --- a/block/blkdebug.c
+> +++ b/block/blkdebug.c
+> @@ -689,9 +689,9 @@ static void blkdebug_refresh_filename(BlockDriverState *bs, QDict *options)
+>      }
+>
+>      if (!force_json && bs->file->bs->exact_filename[0]) {
+> -        snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+> +        g_assert_cmpint(snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+>                   "blkdebug:%s:%s", s->config_file ?: "",
+> -                 bs->file->bs->exact_filename);
+> +                 bs->file->bs->exact_filename), <, sizeof(bs->exact_filename));
+
+I'm not sure this works as expected if you compile with CPPFLAGS 
++=-DG_DISABLE_ASSERT.
+
+I added in me docker TODO "also build with -DG_DISABLE_ASSERT".
+
+>      }
+>
+>      opts = qdict_new();
+> diff --git a/block/blkverify.c b/block/blkverify.c
+> index 9a1e21c6ad..d038947a5a 100644
+> --- a/block/blkverify.c
+> +++ b/block/blkverify.c
+> @@ -305,10 +305,10 @@ static void blkverify_refresh_filename(BlockDriverState *bs, QDict *options)
+>      if (bs->file->bs->exact_filename[0]
+>          && s->test_file->bs->exact_filename[0])
+>      {
+> -        snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+> +        g_assert_cmpint(snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+>                   "blkverify:%s:%s",
+>                   bs->file->bs->exact_filename,
+> -                 s->test_file->bs->exact_filename);
+> +                 s->test_file->bs->exact_filename), <, sizeof(bs->exact_filename));
+>      }
+>  }
+>
+> diff --git a/hw/usb/bus.c b/hw/usb/bus.c
+> index 24f1608b4b..6023f3b419 100644
+> --- a/hw/usb/bus.c
+> +++ b/hw/usb/bus.c
+> @@ -8,6 +8,7 @@
+>  #include "monitor/monitor.h"
+>  #include "trace.h"
+>  #include "qemu/cutils.h"
+> +#include <glib.h>
+>
+>  static void usb_bus_dev_print(Monitor *mon, DeviceState *qdev, int indent);
+>
+> @@ -407,8 +408,8 @@ void usb_register_companion(const char *masterbus, USBPort *ports[],
+>  void usb_port_location(USBPort *downstream, USBPort *upstream, int portnr)
+>  {
+>      if (upstream) {
+> -        snprintf(downstream->path, sizeof(downstream->path), "%s.%d",
+> -                 upstream->path, portnr);
+> +        g_assert_cmpint(snprintf(downstream->path, sizeof(downstream->path), "%s.%d",
+> +                 upstream->path, portnr), <, sizeof(downstream->path));
+>          downstream->hubcount = upstream->hubcount + 1;
+>      } else {
+>          snprintf(downstream->path, sizeof(downstream->path), "%d", portnr);
+> diff --git a/include/qemu/iov.h b/include/qemu/iov.h
+> index bd9fd55b0a..ebb0221140 100644
+> --- a/include/qemu/iov.h
+> +++ b/include/qemu/iov.h
+> @@ -46,7 +46,7 @@ static inline size_t
+>  iov_from_buf(const struct iovec *iov, unsigned int iov_cnt,
+>               size_t offset, const void *buf, size_t bytes)
+>  {
+> -    if (__builtin_constant_p(bytes) && iov_cnt &&
+> +    if (__builtin_constant_p(bytes) && iov_cnt && bytes <= INT_MAX &&
+>          offset <= iov[0].iov_len && bytes <= iov[0].iov_len - offset) {
+>          memcpy(iov[0].iov_base + offset, buf, bytes);
+>          return bytes;
+> @@ -59,7 +59,7 @@ static inline size_t
+>  iov_to_buf(const struct iovec *iov, const unsigned int iov_cnt,
+>             size_t offset, void *buf, size_t bytes)
+>  {
+> -    if (__builtin_constant_p(bytes) && iov_cnt &&
+> +    if (__builtin_constant_p(bytes) && iov_cnt && bytes <= INT_MAX &&
+>          offset <= iov[0].iov_len && bytes <= iov[0].iov_len - offset) {
+>          memcpy(buf, iov[0].iov_base + offset, bytes);
+>          return bytes;
+> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+> index 88dbf97853..c55de4f65b 100644
+> --- a/tests/bios-tables-test.c
+> +++ b/tests/bios-tables-test.c
+> @@ -98,7 +98,7 @@ static void test_acpi_rsdt_table(test_data *data)
+>      AcpiRsdtDescriptorRev1 *rsdt_table = &data->rsdt_table;
+>      uint32_t addr = data->rsdp_table.rsdt_physical_address;
+>      uint32_t *tables;
+> -    int tables_nr;
+> +    unsigned int tables_nr;
+
+Personally I prefer size_t here.
+
+>      uint8_t checksum;
+>
+>      /* read the header */
 >
 
-Definitely.
-
-
-r~
+regards,
+Phil.
