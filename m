@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43411)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cwVQi-0001Q4-9S
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:04:05 -0400
+	(envelope-from <bounces@canonical.com>) id 1cwVY5-0002lW-MX
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:11:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cwVQf-0005o3-L8
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:04:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42284)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cwVQf-0005n3-Cr
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:04:01 -0400
-References: <20170407143254.22061-1-dgilbert@redhat.com>
-	<a9e3490a-0a70-7b9d-53cb-0a2fd389c796@redhat.com>
-	<20170407145634.GA2623@work-vm>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <130e1495-72f5-7ab5-0f25-0e3cb65006dc@redhat.com>
-Date: Fri, 7 Apr 2017 10:03:58 -0500
+	(envelope-from <bounces@canonical.com>) id 1cwVY2-0001gI-UD
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:11:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58711)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cwVY2-0001fv-OJ
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:11:38 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cwVXy-00078X-VE
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 15:11:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6935A2E80CE
+	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 15:11:34 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170407145634.GA2623@work-vm>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="kotnhcC115IgLbQOKIMlfJlsU4cvn4JLm"
-Subject: Re: [Qemu-devel] [PATCH for 2.10] slirp/smb: Replace constant
- strings by glib string
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 07 Apr 2017 15:00:21 -0000
+From: Alex Williamson <alex.l.williamson@gmail.com>
+Reply-To: Bug 1678466 <1678466@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170401120201.1125.46046.malonedeb@gac.canonical.com>
+Message-Id: <20170407150021.12743.46004.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1678466] Re: using x-vga=on with vfio-pci leads
+ to segfault
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,72 +37,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com, berrange@redhat.com
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kotnhcC115IgLbQOKIMlfJlsU4cvn4JLm
-From: Eric Blake <eblake@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org,
- jan.kiszka@siemens.com, berrange@redhat.com
-Message-ID: <130e1495-72f5-7ab5-0f25-0e3cb65006dc@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for 2.10] slirp/smb: Replace constant strings
- by glib string
-References: <20170407143254.22061-1-dgilbert@redhat.com>
- <a9e3490a-0a70-7b9d-53cb-0a2fd389c796@redhat.com>
- <20170407145634.GA2623@work-vm>
-In-Reply-To: <20170407145634.GA2623@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This is now fixed in QEMU 2.9-rc
 
-On 04/07/2017 09:56 AM, Dr. David Alan Gilbert wrote:
+-- =
 
->=20
->> The cleanup is useful, and resolves one of the build issues I pointed
->> out earlier on Rawhide (looks like it is now Fedora 26 in addition to
->> Rawhide that have new-enough gcc).  In that thread, we argued that it'=
-s
->> not going to be essential to get this in for 2.9, but as more and more=
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1678466
 
->> people move to newer gcc, it will probably be a candidate for
->> qemu-stable for 2.9.1 in addition to 2.10.
->=20
-> Ah which thread is that?
+Title:
+  using x-vga=3Don with vfio-pci leads to segfault
 
-https://lists.gnu.org/archive/html/qemu-devel/2017-03/threads.html#04552
-in particular
-https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg04567.html
+Status in QEMU:
+  New
 
-> I just posted:
-> https://lists.nongnu.org/archive/html/qemu-devel/2017-04/msg01294.html
+Bug description:
+  bug occures at least with qemu 2.8.0 and 2.8.1 in 64bit-system
 
-Yes, I just saw that. And it is indeed hacky, but maybe it will spur
-some proper patches.
+  stripped cmd for minimal config:
+  qemu-system-i386 -m 2048 -M q35  -enable-kvm -nodefaults -nodefconfig -de=
+vice ioh3420,bus=3Dpcie.0,addr=3D0x9,multifunction=3Don,port=3D1,chassis=3D=
+1,id=3Droot.1 -device vfio-pci,host=3D01:00.0,bus=3Droot.1,addr=3D01.0,x-vg=
+a=3Don
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+  Backtrace is:
+  #0  0x00005555557ca836 in memory_region_update_container_subregions (subr=
+egion=3D0x55555828f2f0) at qemu-2.8.1/memory.c:2030
+  #1  0x00005555557ca9dc in memory_region_add_subregion_common (mr=3D0x0, o=
+ffset=3D8, subregion=3D0x55555828f2f0) at qemu-2.8.1/memory.c:2049
+  #2  0x00005555557caa9a in memory_region_add_subregion_overlap (mr=3D0x0, =
+offset=3D8, subregion=3D0x55555828f2f0, priority=3D1) at qemu-2.8.1/memory.=
+c:2066
+  #3  0x0000555555832e48 in vfio_probe_nvidia_bar5_quirk (vdev=3D0x55555805=
+aef0, nr=3D5) at qemu-2.8.1/hw/vfio/pci-quirks.c:689
+  #4  0x0000555555835433 in vfio_bar_quirk_setup (vdev=3D0x55555805aef0, nr=
+=3D5) at qemu-2.8.1/hw/vfio/pci-quirks.c:1652
+  #5  0x000055555582f122 in vfio_realize (pdev=3D0x55555805aef0, errp=3D0x7=
+fffffffdc78) at qemu-2.8.1/hw/vfio/pci.c:2777
+  #6  0x0000555555a86195 in pci_qdev_realize (qdev=3D0x55555805aef0, errp=
+=3D0x7fffffffdcf0) at hw/pci/pci.c:1966
+  #7  0x00005555559be7b7 in device_set_realized (obj=3D0x55555805aef0, valu=
+e=3Dtrue, errp=3D0x7fffffffdeb0) at hw/core/qdev.c:918
+  #8  0x0000555555bb017f in property_set_bool (obj=3D0x55555805aef0, v=3D0x=
+55555805ced0, name=3D0x555556071b56 "realized", opaque=3D0x555557f15860, er=
+rp=3D0x7fffffffdeb0) at qom/object.c:1854
+  #9  0x0000555555bae2e6 in object_property_set (obj=3D0x55555805aef0, v=3D=
+0x55555805ced0, name=3D0x555556071b56 "realized", errp=3D0x7fffffffdeb0) at=
+ qom/object.c:1088
+  #10 0x0000555555bb184f in object_property_set_qobject (obj=3D0x55555805ae=
+f0, value=3D0x55555805cd70, name=3D0x555556071b56 "realized", errp=3D0x7fff=
+ffffdeb0) at qom/qom-qobject.c:27
+  #11 0x0000555555bae637 in object_property_set_bool (obj=3D0x55555805aef0,=
+ value=3Dtrue, name=3D0x555556071b56 "realized", errp=3D0x7fffffffdeb0) at =
+qom/object.c:1157
+  #12 0x00005555558fee4b in qdev_device_add (opts=3D0x555556b15160, errp=3D=
+0x7fffffffdf28) at qdev-monitor.c:623
+  #13 0x00005555559142c1 in device_init_func (opaque=3D0x0, opts=3D0x555556=
+b15160, errp=3D0x0) at vl.c:2373
+  #14 0x0000555555cc3bb7 in qemu_opts_foreach (list=3D0x555556548b80 <qemu_=
+device_opts>, func=3D0x555555914283 <device_init_func>, opaque=3D0x0, errp=
+=3D0x0) at util/qemu-option.c:1116
+  #15 0x00005555559198aa in main (argc=3D12, argv=3D0x7fffffffe388, envp=3D=
+0x7fffffffe3f0) at vl.c:4574
 
+  as I can see, it happens during initialization of the device-option.
 
---kotnhcC115IgLbQOKIMlfJlsU4cvn4JLm
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  seems that the code tries to loop over a memory-region mr, which is
+  null from at least three calls before it crashes.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+  because there seems to be special handling for nvidia-cards, here're the =
+pci-infos of the card:
+  01:00.0 VGA compatible controller [0300]: NVIDIA Corporation G72 [GeForce=
+ 7300 GS] [10de:01df] (rev a1) (prog-if 00 [VGA controller])
+  	Subsystem: Gigabyte Technology Co., Ltd Device [1458:342a]
+  	Flags: fast devsel, IRQ 16
+  	Memory at de000000 (32-bit, non-prefetchable) [disabled] [size=3D16M]
+  	Memory at c0000000 (64-bit, prefetchable) [disabled] [size=3D256M]
+  	Memory at dd000000 (64-bit, non-prefetchable) [disabled] [size=3D16M]
+  	Expansion ROM at df000000 [disabled] [size=3D128K]
+  	Capabilities: [60] Power Management version 2
+  	Capabilities: [68] MSI: Enable- Count=3D1/1 Maskable- 64bit+
+  	Capabilities: [78] Express Endpoint, MSI 00
+  	Capabilities: [100] Virtual Channel
+  	Capabilities: [128] Power Budgeting <?>
+  	Kernel driver in use: vfio-pci
 
-iQEcBAEBCAAGBQJY56peAAoJEKeha0olJ0Nqxw8H/1/fXcuw40iAVBkSDKgTvZHo
-2lZBkyTag7nN8W08rvJ3myfrNt5ESyxK/tqdid3X+C0ywIUDu5A62iw4T/dbePU+
-HalTLkwxk/MTm1KPc3sqAKSzMfpnaBWBeYtN9hB2OFT2e9W0wMJhW2j2PWaS3d/f
-jFr67yMDptuC82xxzGrXu1+QdAhHXZ3KArSr+WnRXyBz1UmmmP+XOCQ7uEmmfouo
-1s5y7ch3Pjx28aMXJ789oKp2/qScEONEKiYxMh7vh4LUomug5e9gd0UZIUkCugMb
-yaI8K5UeYzyWuz7Laa3sIS+dOZxBhja2lbCDe5CHrMDE5btYap1FxKFSkAaSv3s=
-=Exs0
------END PGP SIGNATURE-----
+  at least with a similar card in another slot the crash does not occure.
+  (sorry, can't change the slots at the moment)
 
---kotnhcC115IgLbQOKIMlfJlsU4cvn4JLm--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1678466/+subscriptions
