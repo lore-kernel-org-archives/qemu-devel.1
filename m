@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cwVJC-0006Wu-KV
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:56:19 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1cwVJb-0006lL-QX
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:56:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cwVJ9-0004D8-Bp
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:56:18 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170407124121.GC4716@noname.redhat.com>
-References: <20170406150148.zwjpozqtale44jfh@perseus.local>
-	<da7174ff-38c1-07fd-96b6-fa9280524002@redhat.com>
-	<20170407124121.GC4716@noname.redhat.com>
-Date: Fri, 07 Apr 2017 16:24:44 +0200
-Message-ID: <w514ly0e1n7.fsf@maestria.local.igalia.com>
+	(envelope-from <dgilbert@redhat.com>) id 1cwVJY-0004Hw-Ix
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:56:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:8381)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cwVJY-0004Hj-Ab
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:56:40 -0400
+Date: Fri, 7 Apr 2017 15:56:35 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170407145634.GA2623@work-vm>
+References: <20170407143254.22061-1-dgilbert@redhat.com>
+	<a9e3490a-0a70-7b9d-53cb-0a2fd389c796@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC] Proposed qcow2 extension: subcluster
- allocation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a9e3490a-0a70-7b9d-53cb-0a2fd389c796@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for 2.10] slirp/smb: Replace constant
+ strings by glib string
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,90 +28,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com, berrange@redhat.com
 
-On Fri 07 Apr 2017 02:41:21 PM CEST, Kevin Wolf <kwolf@redhat.com> wrote:
->> 63    56 55    48 47    40 39    32 31    24 23    16 15     8 7      0
->> 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
->> **<----> <-----------------------------------------------><---------->*
->>   Rsrved              host cluster offset of data             Reserved
->>   (6 bits)                (44 bits)                           (11 bits)
->> 
->> where you have 17 bits plus the "all zeroes" bit to play with, thanks to
->> the three bits of host cluster offset that are now guaranteed to be zero
->> due to cluster size alignment (but you're also right that the "all
->> zeroes" bit is now redundant information with the 8 subcluster-is-zero
->> bits, so repurposing it does not hurt)
->> 
->> > 
->> >     * Pros:
->> >       + Simple. Few changes compared to the current qcow2 format.
->> > 
->> >     * Cons:
->> >       - Only 8 subclusters per cluster. We would not be making the
->> >         most of this feature.
->> > 
->> >       - No reserved bits left for the future.
->> 
->> I just argued you have at least one, and probably 2, bits left over for
->> future in-word expansion.
->
-> I think only 8 subclusters is just too few. That the subcluster status
-> would be split in two halves doesn't make me like this layout much
-> better either.
+* Eric Blake (eblake@redhat.com) wrote:
+> On 04/07/2017 09:32 AM, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > gcc 7 (on fedora 26) objects to many of the snprintf's
+> > in the smb path and command creation because it can't
+> > figure out that the smb_dir (i.e. the /tmp dir for the configuration)
+> > is known to be short.
+> > 
+> > Replace all these fixed length buffers by g_str* functions that dynamically
+> > allocate and use g_dir_make_tmp to make the directory.
+> > (It's fairly new glib but we have a compat function for it).
+> > 
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >  net/slirp.c | 30 +++++++++++++++++-------------
+> >  1 file changed, 17 insertions(+), 13 deletions(-)
+> > 
+> > diff --git a/net/slirp.c b/net/slirp.c
+> > index f97ec23345..9f6521190b 100644
+> > --- a/net/slirp.c
+> > +++ b/net/slirp.c
+> > @@ -80,7 +80,7 @@ typedef struct SlirpState {
+> >      Slirp *slirp;
+> >      Notifier exit_notifier;
+> >  #ifndef _WIN32
+> > -    char smb_dir[128];
+> > +    gchar *smb_dir;
+> 
+> Does it really have to be gchar? That's one of the more pointless
+> typedefs in glib; and I think 'char *' is just fine.
 
-I also agree that 8 are too few (splitting the subcluster field would
-not be strictly necessary, but that's not so important).
+Yes I'm happy either way.
 
->> > (2) Making L2 entries 128-bit wide.
->> > 
->> >     In this alternative we would double the size of L2 entries. The
->> >     first half would remain unchanged and the second one would store
->> >     the bitmap. That would leave us with 32 subclusters per cluster.
->> 
->> Although for smaller cluster sizes (such as 4k clusters), you'd still
->> want to restrict that subclusters are at least 512-byte sectors, so
->> you'd be using fewer than 32 of those subcluster positions until the
->> cluster size is large enough.
->> 
->> > 
->> >     * Pros:
->> >       + More subclusters per cluster. We could have images with
->> >         e.g. 128k clusters with 4k subclusters.
->> 
->> Could allow variable-sized subclusters (your choice of 32 subclusters of
->> 4k each, or 16 subclusters of 8k each)
->
-> I don't think using less subclusters is desirable if it doesn't come
-> with savings elsewhere. We already need to allocate two clusters for an
-> L2 table now, so we want to use it.
->
-> The more interesting kind of variable-sized subclusters would be if you
-> could select any multiple of 32, meaning three or more clusters per L2
-> table (with 192 bits or more per entry).
+> > -    snprintf(smb_cmdline, sizeof(smb_cmdline), "%s -l %s -s %s",
+> > +    smb_cmdline = g_strdup_printf("%s -l %s -s %s",
+> >               CONFIG_SMBD_COMMAND, s->smb_dir, smb_conf);
+> 
+> Gross that we're parsing a command line through a shell, but
+> pre-existing and looks like CONFIG_SMBD_COMMAND, s->smb_dir, and
+> smb_conf should all be enough under our control to ensure that there are
+> no shell metacharacters and therefore exploits possible.
 
-Yeah, I agree. I think it's worth considering. One more drawback that I
-can think of is that if we make L2 entries wider and we have compressed
-clusters we'd be wasting space in their entries.
+Yes, it's quite hacky.
 
->> >       - One more metadata structure to be updated for each
->> >         allocation. This would probably impact I/O negatively.
->> 
->> Having the subcluster table directly in the L2 means that updating
->> the L2 table is done with a single write. You are definitely right
->> that having the subcluster table as a bitmap in a separate cluster
->> means two writes instead of one, but as always, it's hard to predict
->> how much of an impact that is without benchmarks.
->
-> Note that it's not just additional write requests, but that we can't
-> update the L2 table entry and the bitmap atomically any more, so we
-> have to worry about ordering. The ordering between L2 table and
-> refcount blocks is already painful enough, I'm not sure if I would
-> want to add a third type. Ordering also means disk flushes, which are
-> a lot slower than just additional writes.
+> The cleanup is useful, and resolves one of the build issues I pointed
+> out earlier on Rawhide (looks like it is now Fedora 26 in addition to
+> Rawhide that have new-enough gcc).  In that thread, we argued that it's
+> not going to be essential to get this in for 2.9, but as more and more
+> people move to newer gcc, it will probably be a candidate for
+> qemu-stable for 2.9.1 in addition to 2.10.
 
-You're rightk, I think you just convinced me that this is a bad idea and
-I'm also more inclined towards (2) now.
+Ah which thread is that?
+I just posted:
+https://lists.nongnu.org/archive/html/qemu-devel/2017-04/msg01294.html
 
-Berto
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks!
+
+Dave
+
+> 
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+> 
+
+
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
