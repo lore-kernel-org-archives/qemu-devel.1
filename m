@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwbJL-0005tJ-RH
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 17:20:53 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cwbPb-0008Ae-Al
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 17:27:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwbJJ-0003An-7Q
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 17:20:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47959)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cwbJJ-0003AZ-22
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 17:20:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cwbJH-00020o-9j
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 21:20:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BFE982E80CD
-	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 21:20:46 +0000 (UTC)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cwbPY-0004fy-4u
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 17:27:19 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:34865)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cwbPY-0004fp-0v
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 17:27:16 -0400
+Received: by mail-qt0-x243.google.com with SMTP id r5so11436806qtb.2
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 14:27:15 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170406154107.9178-1-dgilbert@redhat.com>
+	<48d5bb0d-25a9-365c-04fa-e3dad7ecf6e8@redhat.com>
+	<6a5a2849-1ae4-cd54-d4f6-00d32f4d7e29@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <417ce2f3-ccb6-16a2-5495-724a66df6365@amsat.org>
+Date: Fri, 7 Apr 2017 18:27:11 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Apr 2017 21:15:21 -0000
-From: Roger Lawhorn <rll@twc.com>
-Reply-To: Bug 1680679 <1680679@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170407032144.12640.21952.malonedeb@gac.canonical.com>
-Message-Id: <20170407211521.30800.31463.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1680679] Re: qemu cannot run twice
+In-Reply-To: <6a5a2849-1ae4-cd54-d4f6-00d32f4d7e29@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-2.9?] tests/check-qdict: Fix missing
+ brackets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,192 +36,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, armbru@redhat.com, mreitz@redhat.com
 
-My uefi build script. If you see an error or issue that could cause
-error 43 please confirm it:
+On 04/06/2017 12:55 PM, Eric Blake wrote:
+> On 04/06/2017 10:49 AM, Eric Blake wrote:
+>> On 04/06/2017 10:41 AM, Dr. David Alan Gilbert (git) wrote:
+>>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>>>
+>>> Gcc 7 (on Fedora 26) spotted odd use of integers instead of a
+>>> boolean; it's got a point.
+>>>
+>>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>> ---
+>>>  tests/check-qdict.c | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/tests/check-qdict.c b/tests/check-qdict.c
+>>> index 81162ee572..6f3fbcf9c1 100644
+>>> --- a/tests/check-qdict.c
+>>> +++ b/tests/check-qdict.c
+>>> @@ -559,7 +559,7 @@ static void qdict_join_test(void)
+>>>          g_assert(qdict_size(dict1) == 2);
+>>>          g_assert(qdict_size(dict2) == !overwrite);
+>>>
+>>> -        g_assert(qdict_get_int(dict1, "foo") == overwrite ? 84 : 42);
+>>> +        g_assert(qdict_get_int(dict1, "foo") == (overwrite ? 84 : 42));
+>>
+>> How is the test passing pre-patch, and why does it not change the test
+>> post-patch?  Does that mean that overwrite is not doing what we expected?
+>
+> Replying to myself:
+>
+> Pre-patch, it was reached twice (once for overwrite=false, once for
+> overwrite=true), as:
+>
+> (42 == false) ? 84 : 42
+> (84 == true) ? 84 : 42
+>
+> which simplifies to 42 on both iterations, and g_assert(42) succeeds.
+> In fact, this is a tautology - no matter WHAT value we encounter, the
+> assert succeeds, so we are not actually testing that the value matters.
+>
+> Post-patch, it becomes:
+>
+> 42 == (false ? 84 : 42)
+> 84 == (true ? 84 : 42)
+>
+> which is then asserting that we actually have the value we expect.
+>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>
+> Safe for 2.9, but late enough that it also doesn't matter if it slips
+> until 2.10.
+>
 
-#!/bin/bash
+another case which demonstrate human _optimized_ C is more bug prone 
+than verbose basic code...
 
-cd /home/dad/qemu/qemu2
-sudo ./up.sh tap0
+Most cpp generates the same asm code with the following C:
 
-configfile=3D./vfio-pci1.cfg
-
-vfiobind() {
-    dev=3D"$1"
-        vendor=3D$(cat /sys/bus/pci/devices/$dev/vendor)
-        device=3D$(cat /sys/bus/pci/devices/$dev/device)
-        if [ -e /sys/bus/pci/devices/$dev/driver ]; then
-                echo $dev > /sys/bus/pci/devices/$dev/driver/unbind
-        fi
-        echo $vendor $device > /sys/bus/pci/drivers/vfio-pci/new_id
-
+if (overwrite) {
+     g_assert(qdict_get_int(dict1, "foo") == 84);
+} else {
+     g_assert(qdict_get_int(dict1, "foo") == 42);
 }
 
-modprobe vfio-pci
-
-cat $configfile | while read line;do
-    echo $line | grep ^# >/dev/null 2>&1 && continue
-        vfiobind $line
-done
-
-vmname=3D"windows10vm"
-
-if ps -A | grep -q $vmname; then
-   echo "$vmname is already running." &
-   exit 1
-
-else
-
-# use pulseaudio
-export QEMU_AUDIO_DRV=3Dpa
-
-cp /usr/share/OVMF/OVMF_VARS.fd /tmp/my_vars.fd
-
-qemu-system-x86_64 \
-  -name $vmname,process=3D$vmname \
-  -machine type=3Dpc-i440fx-2.6,accel=3Dkvm \
-  -cpu host,kvm=3Doff \
-  -smp 8,sockets=3D1,cores=3D4,threads=3D2 \
-  -enable-kvm \
-  -m 4G \
-  -mem-path /run/hugepages/kvm \
-  -mem-prealloc \
-  -balloon none \
-  -rtc clock=3Dhost,base=3Dlocaltime \
-  -serial none \
-  -parallel none \
-  -vga none \
-  -device vfio-pci,host=3D01:00.0,multifunction=3Don \
-  -device vfio-pci,host=3D01:00.1 \
-  -drive if=3Dpflash,format=3Draw,readonly,file=3D/home/dad/qemu/qemu2/OVMF=
--pure-efi.fd \
-  -drive if=3Dpflash,format=3Draw,file=3D/tmp/my_vars.fd \
-  -boot order=3Ddc -boot menu=3Don \
-  -device virtio-scsi-pci,id=3Dscsi \
-  -drive id=3Ddisk0,if=3Dvirtio,cache=3Dnone,format=3Draw,file=3D/home/dad/=
-qemu/qemu2/win7.img \
-  -drive file=3D/home/dad/qemu/qemu2/virtio-win-0.1.126.iso,id=3Dvirtiocd,f=
-ormat=3Draw,if=3Dnone -device ide-cd,bus=3Dide.1,drive=3Dvirtiocd \
-  -netdev type=3Dtap,id=3Dnet0,ifname=3Dtap0,vhost=3Don,script=3Dno,downscr=
-ipt=3Dno \
-  -device virtio-net-pci,netdev=3Dnet0,mac=3D00:16:3e:00:01:01 \
-  -usb -usbdevice host:413c:a503 -usbdevice host:13fe:3100
-
-sudo ./down.sh tap0
-   exit 0
-fi
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1680679
-
-Title:
-  qemu cannot run twice
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  After using qemu with gpu passthrough and then shutting down windows 7 pr=
-operly I cannot boot windows 7 a second time.
-  Only a full reboot of linux fixes this issue.
-  Qemu appears to corrupt something in linux when exiting.
-  I get no error messages but windows 7 never finishes booting during the 2=
-nd try.
-  Apparently I do try to run vfiobind each time the script is run.
-  Wondering if rerunning vfiobind can cause an issue?
-
-  =
-
-  My specs:
-  -------------------------------------------------------------------------=
-----------------
-  System:    Host: GT70-2PE Kernel: 4.5.4-040504-generic x86_64 (64 bit gcc=
-: 5.3.1)
-             Desktop: Cinnamon 3.2.7 (Gtk 3.18.9) Distro: Linux Mint 18.1 S=
-erena
-  Machine:   Mobo: Micro-Star model: MS-1763 v: REV:0.C Bios: American Mega=
-trends v: E1763IMS.51B date: 01/29/2015
-  CPU:       Quad core Intel Core i7-4810MQ (-HT-MCP-) cache: 6144 KB
-             flags: (lm nx sse sse2 sse3 sse4_1 sse4_2 ssse3 vmx) bmips: 22=
-347
-             clock speeds: max: 2801 MHz 1: 2801 MHz 2: 2801 MHz 3: 2801 MH=
-z 4: 2801 MHz 5: 2801 MHz 6: 2801 MHz
-             7: 2801 MHz 8: 2801 MHz
-  Graphics:  Card-1: Intel 4th Gen Core Processor Integrated Graphics Contr=
-oller bus-ID: 00:02.0
-             Card-2: NVIDIA GK104M [GeForce GTX 880M] bus-ID: 01:00.0
-             Display Server: X.Org 1.18.4 drivers: intel (unloaded: fbdev,v=
-esa)
-             Resolution: 1920x1080@60.02hz, 1920x1080@60.00hz
-             GLX Renderer: Mesa DRI Intel Haswell Mobile GLX Version: 3.0 M=
-esa 12.0.6 Direct Rendering: Yes
-
-  =
-
-  My script:
-  -------------------------------------------------------------------------=
-------------------
-  #!/bin/bash
-
-  cd ~/qemu
-  sudo ./up.sh tap0
-
-  configfile=3D~/qemu/vfio-pci1.cfg
-
-  vfiobind() {
-      dev=3D"$1"
-          vendor=3D$(cat /sys/bus/pci/devices/$dev/vendor)
-          device=3D$(cat /sys/bus/pci/devices/$dev/device)
-          if [ -e /sys/bus/pci/devices/$dev/driver ]; then
-                  echo $dev > /sys/bus/pci/devices/$dev/driver/unbind
-          fi
-          echo $vendor $device > /sys/bus/pci/drivers/vfio-pci/new_id
-
-  }
-
-  modprobe vfio-pci
-
-  cat $configfile | while read line;do
-      echo $line | grep ^# >/dev/null 2>&1 && continue
-          vfiobind $line
-  done
-
-  sudo qemu-system-x86_64 -machine type=3Dq35,accel=3Dkvm -cpu host,kvm=3Do=
-ff \
-  -smp 8,sockets=3D1,cores=3D4,threads=3D2 \
-  -bios /usr/share/seabios/bios.bin \
-  -serial none \
-  -parallel none \
-  -vga none \
-  -m 4G \
-  -mem-path /run/hugepages/kvm \
-  -mem-prealloc \
-  -balloon none \
-  -rtc clock=3Dhost,base=3Dlocaltime \
-  -device ioh3420,bus=3Dpcie.0,addr=3D1c.0,multifunction=3Don,port=3D1,chas=
-sis=3D1,id=3Droot.1 \
-  -device vfio-pci,host=3D01:00.0,bus=3Droot.1,addr=3D00.0,multifunction=3D=
-on,x-vga=3Don \
-  -device virtio-scsi-pci,id=3Dscsi \
-  -drive id=3Ddisk0,if=3Dvirtio,cache=3Dnone,format=3Draw,file=3D/home/dad/=
-qemu/windows7.img \
-  -drive file=3D/home/dad/1TB-Backup/Iso/SP1ForWin7.iso,id=3Disocd,format=
-=3Draw,if=3Dnone -device scsi-cd,drive=3Disocd \
-  -net nic -net tap,ifname=3Dtap0,script=3Dno,downscript=3Dno \
-  -usbdevice host:413c:a503 \
-  -usbdevice host:13fe:3100 \
-  -usbdevice host:0bc2:ab21 \
-  -boot menu=3Don \
-  -boot order=3Dc
-
-  sudo ./down.sh tap0
-
-  exit 0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1680679/+subscriptions
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
