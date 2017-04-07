@@ -1,24 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cwQ2N-0005Fj-7q
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:18:36 -0400
+	(envelope-from <lersek@redhat.com>) id 1cwQ5c-0006Co-8Z
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:21:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cwQ2M-0005PG-5A
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:18:35 -0400
-Date: Fri, 7 Apr 2017 10:18:22 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170407091822.GI13602@stefanha-x1.localdomain>
-References: <cover.1491416061.git.jcody@redhat.com>
-	<1eeddeba3dc5775183bd1e44ecae616c233b932d.1491416061.git.jcody@redhat.com>
-	<4c0fc97d-ca5a-4952-570b-f7598f2aec9d@redhat.com>
-	<20170406002312.GL1135@localhost.localdomain>
+	(envelope-from <lersek@redhat.com>) id 1cwQ5X-0006yG-H5
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:21:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47844)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cwQ5X-0006y8-8Z
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:21:51 -0400
+References: <76795e20-2f20-1e54-cfa5-7444f28b18ee@huawei.com>
+	<20170321113428.GC15920@cbox> <58D17AF0.2010802@arm.com>
+	<20170321193933.GB31111@cbox> <58DA3F68.6090901@arm.com>
+	<20170328112328.GA31156@cbox> <20170328115413.GJ23682@e104320-lin>
+	<b1c6e747-2fa7-b7a1-60d5-4a9c480b9dc9@huawei.com>
+	<58DA67BA.8070404@arm.com>
+	<5b7352f4-4965-3ed5-3879-db871797be47@huawei.com>
+	<20170329103658.GQ23682@e104320-lin>
+	<2a427164-9b37-6711-3a56-906634ba7f12@redhat.com>
+	<7c5c8ab7-8fcc-1c98-0bc1-cccb66c4c84d@huawei.com>
+	<6ac1597a-2ed5-36b2-848d-5fd048b16d66@redhat.com>
+	<55546a4b-c33b-37b9-dafe-15ce75bc1b62@huawei.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <09c64b28-5eb5-4efd-6cb8-035b69313a99@redhat.com>
+Date: Fri, 7 Apr 2017 11:21:41 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="pe+tqlI1iYzVj1X/"
-Content-Disposition: inline
-In-Reply-To: <20170406002312.GL1135@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 5/9] block: introduce
- bdrv_try_set_read_only()
+In-Reply-To: <55546a4b-c33b-37b9-dafe-15ce75bc1b62@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] kvm: pass the virtual SEI syndrome to
+ guest OS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,61 +38,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org
+To: gengdongjiu <gengdongjiu@huawei.com>, Achin Gupta <achin.gupta@arm.com>
+Cc: ard.biesheuvel@linaro.org, edk2-devel@lists.01.org, qemu-devel@nongnu.org, zhaoshenglong@huawei.com, James Morse <james.morse@arm.com>, Christoffer Dall <cdall@linaro.org>, xiexiuqi@huawei.com, Marc Zyngier <marc.zyngier@arm.com>, catalin.marinas@arm.com, will.deacon@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, suzuki.poulose@arm.com, andre.przywara@arm.com, mark.rutland@arm.com, vladimir.murzin@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, wangxiongfeng2@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com, Leif.Lindholm@linaro.comnd@arm.com, Michael Tsirkin <mtsirkin@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
+On 04/07/17 04:52, gengdongjiu wrote:
+> 
+> On 2017/4/7 2:55, Laszlo Ersek wrote:
 
---pe+tqlI1iYzVj1X/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+>> I'm unsure if, by "not fixed", you are saying
+>>
+>>   the number of CPER entries that fits in Error Status Data Block N is
+>>   not *uniform* across 0 <= N <= 10 [1]
+>>
+>> or
+>>
+>>   the number of CPER entries that fits in Error Status Data Block N is
+>>   not *known* in advance, for all of 0 <= N <= 10 [2]
+>>
+>> Which one is your point?
+>>
+>> If [1], that's no problem; you can simply sum the individual error
+>> status data block sizes in advance, and allocate "etc/hardware_errors"
+>> accordingly, using the total size.
+>>
+>> (Allocating one shared fw_cfg blob for all status data blocks is more
+>> memory efficient, as each ALLOCATE command will allocate whole pages
+>> (rounded up from the actual blob size).)
+>>
+>> If your point is [2], then splitting the error status data blocks to
+>> separate fw_cfg blobs makes no difference: regardless of whether we try
+>> to place all the error status data blocks in a single fw_cfg blob, or in
+>> separate fw_cfg blobs, the individual data block cannot be resized at OS
+>> runtime, so there's no way to make it work.
+>>
+> My Point is [2]. The HEST(Hardware Error Source Table) table format is here:
+> https://wiki.linaro.org/LEG/Engineering/Kernel/RAS/APEITables#Hardware_Error_Source_Table_.28HEST.29
+> 
+> Now I understand your thought.
 
-On Wed, Apr 05, 2017 at 08:23:12PM -0400, Jeff Cody wrote:
-> On Wed, Apr 05, 2017 at 04:28:44PM -0400, John Snow wrote:
-> > On 04/05/2017 02:28 PM, Jeff Cody wrote:
-> > > diff --git a/include/block/block.h b/include/block/block.h
-> > > index beb563a..0049b57 100644
-> > > --- a/include/block/block.h
-> > > +++ b/include/block/block.h
-> > > @@ -426,6 +426,7 @@ int bdrv_is_allocated_above(BlockDriverState *top=
-, BlockDriverState *base,
-> > >                              int64_t sector_num, int nb_sectors, int =
-*pnum);
-> > > =20
-> > >  bool bdrv_is_read_only(BlockDriverState *bs);
-> > > +int bdrv_try_set_read_only(BlockDriverState *bs, bool read_only, Err=
-or **errp);
-> > >  int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error *=
-*errp);
-> > >  bool bdrv_is_sg(BlockDriverState *bs);
-> > >  bool bdrv_is_inserted(BlockDriverState *bs);
-> > >=20
-> >=20
-> > Maybe I'm just green, but I find it weird that the function is named
-> > try_x when we aren't actually trying to do anything, we're checking to
-> > see if we can.
->=20
-> Yeah, not a good name.  Maybe bdrv_set_read_only_test() or
-> bdrv_test_set_read_only()?
+But if you mean [2], then I am confused, with regard to firmware on
+physical hardware. Namely, even on physical machines, the firmware has
+to estimate, in advance, the area size that will be needed for CPERs,
+doesn't it? And once the firmware allocates that memory area, it cannot
+be resized at OS runtime. If there are more CPERs at runtime (due to
+hardware errors) than the firmware allocated room for, they must surely
+wrap around in the preallocated buffer (like in a ring buffer). Isn't
+that correct?
 
-This one reads nicely:
+On the diagrams that you linked above (great looking diagrams BTW!), I
+see CPER in two places (it is helpfully shaded red):
 
-  if (bdrv_can_set_read_only(...)) {
-      ...
-  }
+- to the right of BERT; the CPER is part of a box that is captioned
+"firmware reserved memory"
 
---pe+tqlI1iYzVj1X/
-Content-Type: application/pgp-signature; name="signature.asc"
+- to the right of HEST; again the CPER is part of a box that is
+captioned "firmware reserved memory"
 
------BEGIN PGP SIGNATURE-----
+So, IMO, when QEMU has to guesstimate the room for CPERs in advance,
+that doesn't differ from the physical firmware case. In QEMU maybe you
+can let the user specify the area size on the command line, with a
+machine type property or similar.
 
-iQEcBAEBAgAGBQJY51leAAoJEJykq7OBq3PIkFQIALjErNP9punH/yVfc32WbFJQ
-AgweJdTZnR+u+6QcCIs5sjBVrB11PidCS5gPmHVsAInftZMU30/ZrgCvkHW3CB/F
-J7Nq1Bw8JVCyMnLBHPPvz4dwCIWbnNoxU32WULDNb02lZzTSMwl8b1yLAu5ITn49
-Kxzj3GmNGfZmi1qH+Ibsq+4wKjF/5yLzhi0wJ1yT8K++1NHx4MyvcNw2dDU+iKSy
-p6LvMsOXQjhOnMsEM93VCUgx7sieVYUo8Yikm0E2Lw2NPVEhBEBqOR+b6CkCOY7M
-yKneu5iLlYTttVlb6Jx8qQ2pf2hxsihIzGxdFd4RioydICGH4m9tNfYeFfxBL14=
-=e4ox
------END PGP SIGNATURE-----
-
---pe+tqlI1iYzVj1X/--
+Thanks
+Laszlo
