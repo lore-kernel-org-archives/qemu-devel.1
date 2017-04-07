@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cwbVy-00019Z-VJ
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 17:33:55 -0400
+	(envelope-from <bounces@canonical.com>) id 1cwbcy-0002he-71
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 17:41:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cwbVu-0007GL-0K
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 17:33:55 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170322204844.446-1-f4bug@amsat.org>
-	<20170322204844.446-2-f4bug@amsat.org>
-	<87y3vw1o94.fsf@dusky.pond.sub.org>
-	<1490255007.463.11.camel@redhat.com>
-	<CAJ+F1CJNy+e83EHR_8uzAHURxDk6idnNTTL_FoD-krWPue7Lww@mail.gmail.com>
-	<1490262680.463.27.camel@redhat.com>
-	<87tw6ktban.fsf@dusky.pond.sub.org>
-	<1490277406.13302.1.camel@redhat.com>
-	<878tnwm6g7.fsf@dusky.pond.sub.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f5610e3c-116f-ae57-1e67-1fd930a59c4c@amsat.org>
-Date: Fri, 7 Apr 2017 18:33:45 -0300
+	(envelope-from <bounces@canonical.com>) id 1cwbct-0001et-J8
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 17:41:08 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50272)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cwbct-0001eb-Cs
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 17:41:03 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cwbcr-0007nE-6w
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 21:41:01 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 325D72E80C3
+	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 21:41:01 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <878tnwm6g7.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RESEND 1/3] usb-ccid: make
- ccid_write_data_block() cope with null buffers
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 07 Apr 2017 21:34:54 -0000
+From: Roger Lawhorn <rll@twc.com>
+Reply-To: Bug 1680679 <1680679@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170407032144.12640.21952.malonedeb@gac.canonical.com>
+Message-Id: <20170407213454.31343.9228.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1680679] Re: qemu cannot run twice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,35 +36,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-trivial@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+To: qemu-devel@nongnu.org
 
-Hi Markus, Gerd.
+ok, so I will research qemu and nvidia optimus. I have a custom BIOS
+made by an MSI employee. I have hundreds of bios options to play with.
 
-On 03/23/2017 11:08 AM, Markus Armbruster wrote:
-> Gerd Hoffmann <kraxel@redhat.com> writes:
->
->> On Do, 2017-03-23 at 13:41 +0100, Markus Armbruster wrote:
->>> Gerd Hoffmann <kraxel@redhat.com> writes:
->>>
->>>>   Hi,
->>>>
->>>>>  oops, there are hard-coded calls with NULL/0. I suppose to fix clang
->>>>> warning, it would need to check if data != null for memcpy.
->>>>
->>>> I'd check for len > 0, and in that if branch we can also assert on data
->>>> == NULL and thereby check that len and data are consistent.
->>>
->>> If len is non-zero but data is null, memcpy() will crash just fine by
->>> itself, so why bother asserting.
->>
->> To make clang happy?  But maybe clang is clever enough to figure data
->> can't be null at that point in case we call memcpy with len != 0
->> only ...
->
-> If Clang needs another hint to become happy, then an assertion is a fine
-> way to provide it.
+-- =
 
-Apparently Clang isn't clever enough using an assertion.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1680679
 
-I'll resend checking len.
+Title:
+  qemu cannot run twice
+
+Status in QEMU:
+  Invalid
+
+Bug description:
+  After using qemu with gpu passthrough and then shutting down windows 7 pr=
+operly I cannot boot windows 7 a second time.
+  Only a full reboot of linux fixes this issue.
+  Qemu appears to corrupt something in linux when exiting.
+  I get no error messages but windows 7 never finishes booting during the 2=
+nd try.
+  Apparently I do try to run vfiobind each time the script is run.
+  Wondering if rerunning vfiobind can cause an issue?
+
+  =
+
+  My specs:
+  -------------------------------------------------------------------------=
+----------------
+  System:    Host: GT70-2PE Kernel: 4.5.4-040504-generic x86_64 (64 bit gcc=
+: 5.3.1)
+             Desktop: Cinnamon 3.2.7 (Gtk 3.18.9) Distro: Linux Mint 18.1 S=
+erena
+  Machine:   Mobo: Micro-Star model: MS-1763 v: REV:0.C Bios: American Mega=
+trends v: E1763IMS.51B date: 01/29/2015
+  CPU:       Quad core Intel Core i7-4810MQ (-HT-MCP-) cache: 6144 KB
+             flags: (lm nx sse sse2 sse3 sse4_1 sse4_2 ssse3 vmx) bmips: 22=
+347
+             clock speeds: max: 2801 MHz 1: 2801 MHz 2: 2801 MHz 3: 2801 MH=
+z 4: 2801 MHz 5: 2801 MHz 6: 2801 MHz
+             7: 2801 MHz 8: 2801 MHz
+  Graphics:  Card-1: Intel 4th Gen Core Processor Integrated Graphics Contr=
+oller bus-ID: 00:02.0
+             Card-2: NVIDIA GK104M [GeForce GTX 880M] bus-ID: 01:00.0
+             Display Server: X.Org 1.18.4 drivers: intel (unloaded: fbdev,v=
+esa)
+             Resolution: 1920x1080@60.02hz, 1920x1080@60.00hz
+             GLX Renderer: Mesa DRI Intel Haswell Mobile GLX Version: 3.0 M=
+esa 12.0.6 Direct Rendering: Yes
+
+  =
+
+  My script:
+  -------------------------------------------------------------------------=
+------------------
+  #!/bin/bash
+
+  cd ~/qemu
+  sudo ./up.sh tap0
+
+  configfile=3D~/qemu/vfio-pci1.cfg
+
+  vfiobind() {
+      dev=3D"$1"
+          vendor=3D$(cat /sys/bus/pci/devices/$dev/vendor)
+          device=3D$(cat /sys/bus/pci/devices/$dev/device)
+          if [ -e /sys/bus/pci/devices/$dev/driver ]; then
+                  echo $dev > /sys/bus/pci/devices/$dev/driver/unbind
+          fi
+          echo $vendor $device > /sys/bus/pci/drivers/vfio-pci/new_id
+
+  }
+
+  modprobe vfio-pci
+
+  cat $configfile | while read line;do
+      echo $line | grep ^# >/dev/null 2>&1 && continue
+          vfiobind $line
+  done
+
+  sudo qemu-system-x86_64 -machine type=3Dq35,accel=3Dkvm -cpu host,kvm=3Do=
+ff \
+  -smp 8,sockets=3D1,cores=3D4,threads=3D2 \
+  -bios /usr/share/seabios/bios.bin \
+  -serial none \
+  -parallel none \
+  -vga none \
+  -m 4G \
+  -mem-path /run/hugepages/kvm \
+  -mem-prealloc \
+  -balloon none \
+  -rtc clock=3Dhost,base=3Dlocaltime \
+  -device ioh3420,bus=3Dpcie.0,addr=3D1c.0,multifunction=3Don,port=3D1,chas=
+sis=3D1,id=3Droot.1 \
+  -device vfio-pci,host=3D01:00.0,bus=3Droot.1,addr=3D00.0,multifunction=3D=
+on,x-vga=3Don \
+  -device virtio-scsi-pci,id=3Dscsi \
+  -drive id=3Ddisk0,if=3Dvirtio,cache=3Dnone,format=3Draw,file=3D/home/dad/=
+qemu/windows7.img \
+  -drive file=3D/home/dad/1TB-Backup/Iso/SP1ForWin7.iso,id=3Disocd,format=
+=3Draw,if=3Dnone -device scsi-cd,drive=3Disocd \
+  -net nic -net tap,ifname=3Dtap0,script=3Dno,downscript=3Dno \
+  -usbdevice host:413c:a503 \
+  -usbdevice host:13fe:3100 \
+  -usbdevice host:0bc2:ab21 \
+  -boot menu=3Don \
+  -boot order=3Dc
+
+  sudo ./down.sh tap0
+
+  exit 0
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1680679/+subscriptions
