@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cwYGE-0001go-Go
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 14:05:27 -0400
+	(envelope-from <rth7680@gmail.com>) id 1cwYUP-0005W3-Hy
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 14:20:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cwYGD-0003cu-Ma
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 14:05:26 -0400
-References: <20170407065414.9143-1-famz@redhat.com>
-	<20170407065414.9143-7-famz@redhat.com>
-	<20170407132850.GG16146@stefanha-x1.localdomain>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <6f0d8984-d781-9dc3-a175-5428da83c6f7@redhat.com>
-Date: Fri, 7 Apr 2017 14:05:12 -0400
+	(envelope-from <rth7680@gmail.com>) id 1cwYUO-0000Dh-SI
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 14:20:05 -0400
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170406102249.20383-1-nikunj@linux.vnet.ibm.com>
+	<20170406102249.20383-4-nikunj@linux.vnet.ibm.com>
+	<2f858a60-0824-96c1-8248-49325fac2721@twiddle.net>
+	<87zifsrdxb.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <b202b111-2960-9868-452e-6cb0c1a14844@twiddle.net>
+Date: Fri, 7 Apr 2017 11:19:59 -0700
 MIME-Version: 1.0
-In-Reply-To: <20170407132850.GG16146@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <87zifsrdxb.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 6/6] tests/block-job-txn: Don't start
- block job before adding to txn
+Subject: Re: [Qemu-devel] [PATCH RFC v1 3/3] target/ppc: Generate fence
+ operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,40 +27,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org, programmingkidx@gmail.com, bharata@linux.vnet.ibm.com
+
+On 04/06/2017 10:21 PM, Nikunj A Dadhania wrote:
+> We do that in the macro:
+>
+>       if (len > 1) {                                          \
+>           gen_check_align(ctx, t0, (len) - 1);                \
+>       }                                                       \
+>
+> Would we still need a barrier before the alignment check?
+
+Ah, that's where it's been placed.
+
+So, the MO_ALIGN flag to tcg_gen_atomic_* takes care of the alignment check 
+too.  So we could move this down into the failure path.
 
 
-
-On 04/07/2017 09:28 AM, Stefan Hajnoczi wrote:
-> On Fri, Apr 07, 2017 at 02:54:14PM +0800, Fam Zheng wrote:
->> Previously, before test_block_job_start returns, the job can already
->> complete, as a result, the transactional state of other jobs added to
->> the same txn later cannot be handled correctly.
->>
->> Move the block_job_start() calls to callers after
->> block_job_txn_add_job() calls.
->>
->> Signed-off-by: Fam Zheng <famz@redhat.com>
->> ---
->>  tests/test-blockjob-txn.c | 6 +++++-
->>  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> CCing John Snow because he looked at block jobs completing during txn
-> setup recently.
-> 
-> Stefan
-> 
-
-This matches the changes we made to qmp_transaction, but I forgot to (or
-didn't take care to)  change the qtest as it didn't cause a regression
-at the time.
-
-I wonder if I should make it a runtime error to add a job to a
-transaction which has already "started" to make sure that this interface
-is not misused, as this test highlights that there were still some
-remaining "bad" uses of the interface.
-
-Regardless...
-
-Thanks for the CC. ACK
+r~
