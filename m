@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwUQQ-0007T6-Jn
+	(envelope-from <bounces@canonical.com>) id 1cwUQQ-0007T8-KL
 	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:59:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwUQM-00034Z-U8
+	(envelope-from <bounces@canonical.com>) id 1cwUQM-00034M-MH
 	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:59:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42055)
+Received: from indium.canonical.com ([91.189.90.7]:42046)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cwUQM-00033i-O7
+	id 1cwUQM-00033G-G7
 	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:59:38 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cwUQL-0002IO-OC
+	id 1cwUQL-0002IL-9n
 	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 13:59:37 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AA14A2E80C3
+	by loganberry.canonical.com (Postfix) with ESMTP id 3BC112E80C3
 	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 13:59:37 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Apr 2017 13:47:01 -0000
-From: Thomas Huth <1030666@bugs.launchpad.net>
-Reply-To: Bug 1030666 <1030666@bugs.launchpad.net>
+Date: Fri, 07 Apr 2017 13:46:44 -0000
+From: Thomas Huth <1031955@bugs.launchpad.net>
+Reply-To: Bug 1031955 <1031955@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20120730014155.9541.71695.malonedeb@soybean.canonical.com>
-Message-Id: <20170407134701.1808.15364.malone@chaenomeles.canonical.com>
+References: <20120801215949.18709.64548.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170407134644.1773.94871.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1030666] Re: gdb can't proceed after a breakpoint
+Subject: [Qemu-devel] [Bug 1031955] Re: qemu-system-arm -M lm3s811evb fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,56 +48,56 @@ latest version of QEMU (version 2.9)?
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1030666
+https://bugs.launchpad.net/bugs/1031955
 
 Title:
-  gdb can't proceed after a breakpoint
+  qemu-system-arm -M lm3s811evb fails
 
 Status in QEMU:
   Incomplete
 
 Bug description:
-  Using qemu-1.1.0-windows.zip package from http://lassauge.free.fr/qemu/
-  Host: Windows 7 Ultimate 64-bit
-  Guest: i386 system running MS-DOS 6.22
-  Launch command line:
-  =C2=A0=C2=A0qemu-system-i386.exe -L Bios -fda "DOS.vfd" -fdb "Data.vfd" -=
-gdb tcp:127.0.0.1:1234
-  Debbugers tried:
-  =C2=A0=C2=A0gdb 7.3.50.20111026-cvs running on Cygwin 1.7.16
-  =C2=A0=C2=A0gdb 7.4 on MinGW
+  I am trying out examples from StellarisWare.
 
-  Short description:
-  I use gdb to attach to a running Qemu session, set a breakpoint and resum=
-e execution. When the breakpoint is hit, gdb gains control as expected. How=
-ever, trying to single-step or continue at this point just causes the same =
-breakpoint to be hit immediately again. Deleting the breakpoint allows sing=
-le-stepping or continue to work.
+  When I try the uart_echo example, that initially tries to talk to the =
 
-  Steps to reproduce:
-  DOS.vfd is a floppy image containing an MS-DOS 6.22 startup disk.
-  Data.vfd is a floppy image containing a single program (hello.com).
-  The aim is to debug the execution of hello.com with gdb.
-  Launch Qemu.
-  Launch gdb, an attach to qemu:
-  =C2=A0=C2=A0"target remote localhost:1234"
-  I know the address at which hello.com will be loaded, so set a breakpoint=
- there and resume execution:
-  =C2=A0=C2=A0"break *0xf730"
-  =C2=A0=C2=A0"continue"
-  In Qemu, start hello.com. The breakpoint is immediately hit, execution st=
-ops and gdb gains control.
-  Examining the program gives expected results (such as "info reg" or "disa=
-ssemble").
-  At this point, try to proceed either with single-stepping ("si" or "ni") =
-or with "continue", and the same breakpoint is immediately hit again. Subse=
-quent attempts to single-step or continue just keep hitting the same breakp=
-oint.
-  The only way to proceed at this point is to delete the breakpoint, after =
-which both single-stepping and continue work.
+  display, I get this:
 
-  Note that single-stepping and continue works as expected if it is done
-  after interrupting execution with Ctrl-C.
+      $ .../qemu-1.1.1/bin/qemu-system-arm -M lm3s811evb -kernel uart_echo/=
+gcc/uart_echo.bin      =
+
+      qemu: hardware error: strllaris_i2c_read: Bad offset 0xfc0
+      =
+
+      CPU #0:
+      R00=3D00000001 R01=3D005b8d80 R02=3D00061a80 R03=3D007a11ff
+      R04=3D40020000 R05=3D005b8d80 R06=3D00000002 R07=3D00000000
+      R08=3D00000000 R09=3D00000000 R10=3D00000000 R11=3D00000000
+      R12=3D00000000 R13=3D200000d4 R14=3D00000995 R15=3D000009cc
+      PSR=3D20000173 --C- T svc32
+      Aborted
+
+  The example is located in boards/ek-lm3s811/uart_echo in the =
+
+  StellarisWare distribution.
+
+  With the latest from git:
+
+      $ .../qemu-git/qemu/bin/qemu-system-arm -M lm3s811evb -kernel uart_ec=
+ho/gcc/uart_echo.bin
+      qemu-system-arm: hw/qdev.c:310: qdev_get_gpio_in: Assertion `n >=3D 0=
+ && n < dev->num_gpio_in' failed.
+
+  This however seems to be reported already (Bug #1028260).
+
+  Both versions compiled from sources:
+
+      ./configure --target-list=3Darm-linux-user,arm-softmmu,armeb-linux-
+  user  --enable-sdl --prefix=3D/path/to/...
+
+  Running Ubunti 10.04 with Linux 2.6.32-40-generic-pae.
+
+  /Lars
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1030666/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1031955/+subscriptions
