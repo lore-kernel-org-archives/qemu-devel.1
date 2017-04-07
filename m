@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cwQaY-0000nC-5k
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:53:55 -0400
+	(envelope-from <lersek@redhat.com>) id 1cwQeI-0001me-6T
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:57:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cwQaX-0002bc-FA
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:53:54 -0400
-Date: Fri, 7 Apr 2017 10:53:44 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170407095344.GM13602@stefanha-x1.localdomain>
-References: <cover.1491416061.git.jcody@redhat.com>
-	<5767805b2cdb11651ba302297c19ee2362009dec.1491416061.git.jcody@redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1cwQeF-0004KS-0m
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:57:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46866)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cwQeE-0004K2-Oc
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:57:42 -0400
+References: <20170406212209.22788-1-ard.biesheuvel@linaro.org>
+	<20170407085513.czs6tsbwhkecfjrq@kamzik.brq.redhat.com>
+	<64d6ad1d-d9ce-2bbb-dfb9-35938f9593ec@redhat.com>
+	<CAAibmn3D_vWCv0HwZ607ejESDEnf2i5QVZTfJBM29hRgqqdu_A@mail.gmail.com>
+	<CAKv+Gu8aRUOSvne8B=Uk1g7QByyNeNOY1o-A7ap_L1dqeOG5_g@mail.gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <fbb22baa-4d6f-63ca-cf49-bfdfc2bdc712@redhat.com>
+Date: Fri, 7 Apr 2017 11:57:35 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="P9KQiUGMzYCFwWCN"
-Content-Disposition: inline
-In-Reply-To: <5767805b2cdb11651ba302297c19ee2362009dec.1491416061.git.jcody@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 9/9] block/rbd: Add support for
- reopen()
+In-Reply-To: <CAKv+Gu8aRUOSvne8B=Uk1g7QByyNeNOY1o-A7ap_L1dqeOG5_g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/virt: generate 64-bit addressable
+ ACPI objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,40 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jsnow@redhat.com, kwolf@redhat.com
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Phil Dennis-Jordan <phil@philjordan.eu>
+Cc: Andrew Jones <drjones@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Igor Mammedov <imammedo@redhat.com>
 
+On 04/07/17 11:44, Ard Biesheuvel wrote:
+> On 7 April 2017 at 10:36, Phil Dennis-Jordan <phil@philjordan.eu> wrote:
+>> On 7 April 2017 at 21:11, Laszlo Ersek <lersek@redhat.com> wrote:
+>>> On 04/07/17 10:55, Andrew Jones wrote:
+>>>> On Thu, Apr 06, 2017 at 10:22:09PM +0100, Ard Biesheuvel wrote:
 
---P9KQiUGMzYCFwWCN
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+>>>>> @@ -712,7 +712,7 @@ static void build_fadt(GArray *table_data, BIOSLinker *linker,
+>>>>>
+>>>>>      /* DSDT address to be filled by Guest linker */
+>>>>>      bios_linker_loader_add_pointer(linker,
+>>>>> -        ACPI_BUILD_TABLE_FILE, dsdt_entry_offset, sizeof(fadt->dsdt),
+>>>>> +        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->Xdsdt),
+>>>>>          ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+>>>>>
+>>>>>      build_header(linker, table_data,
+>>
+>> I don't know what it's like in ARM-Land, but X64 Windows does not take
+>> kindly to a zero DSDT pointer in my experience. It might make sense to
+>> make the choice between DSDT and XDSDT conditional on whether the
+>> pointer is actually above 4GB? Mind you, I don't even know if
+>> Microsoft makes ARM variants of Windows generally available, and
+>> whether they currently work in Qemu; the FOSS OSes are typically more
+>> lenient.
+>>
+> 
+> Documentation/arm64/acpi_object_usage.txt in the kernel contains this under FADT
+> 
+>    For the DSDT that is also required, the X_DSDT field is to be used,
+>    not the DSDT field.
+> 
+> and so we should be using xdsdt anyway. *However*, this is all moot
+> given that UEFI is in charge of populating these fields. What we
+> generate here and what the guest sees are two different things that
+> are almost completely disconnected when it comes to RSDP, RSDT/XSDT
+> and the DSDT field in FADT.
 
-On Wed, Apr 05, 2017 at 02:28:51PM -0400, Jeff Cody wrote:
-> This adds support for reopen in rbd, for changing between r/w and r/o.
->=20
-> Note, that this is only a flag change, but we will block a change from
-> r/o to r/w if we are using an RBD internal snapshot.
->=20
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
-> ---
->  block/rbd.c | 21 +++++++++++++++++++++
->  1 file changed, 21 insertions(+)
+Agreed; in ARM guests, there is no ACPI without UEFI, and UEFI handles
+the above stuff internally. For UEFI guests, some of the linker/loader
+commands have a somewhat indirect meaning.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---P9KQiUGMzYCFwWCN
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJY52GoAAoJEJykq7OBq3PIVlMH/0WAjtsvyruGYC9mm6KLAuJQ
-BYv8tNu4bmY0fncoJ8ZhToiGPccTE4J78y2TnzA34LpNX/CyA1v1O0TVfjqs6C3Z
-xx7rurGptFJj0W+epfanPEXlh8McLgCgNB+YYFhH99SLN/jsP/tigX85aeZCdIkr
-/gkOuVrae/8xiEg55roEDMzPxsyBNvK1/tkLI2Q/M9sq5BkHGnnd201GWrStbzAK
-N/fmyfbaib4/ujCg1buYH3fEe7Zk4u2RnfnpT+mQpNsJeoiejq4jMl4Ol81UuHpc
-lNwBj/ITg3NTlrUm7nNmcSRC1nSNd4lQxmXC35b6Yf+AM9pR6TxYd0up37ftMho=
-=I1C2
------END PGP SIGNATURE-----
-
---P9KQiUGMzYCFwWCN--
+Laszlo
