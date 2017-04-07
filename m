@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45869)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cwUIK-0008Uz-7j
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:51:21 -0400
+	(envelope-from <eblake@redhat.com>) id 1cwUL1-0002XI-F5
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:54:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cwUIG-0004wQ-6n
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:51:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44000)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cwUIF-0004w9-UX
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:51:16 -0400
-References: <1491548326-60072-1-git-send-email-weiqi4@huawei.com>
-	<20170407083849.GA26482@redhat>
+	(envelope-from <eblake@redhat.com>) id 1cwUL0-0006PF-Ef
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:54:07 -0400
+References: <1491561165-12415-1-git-send-email-kwolf@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <cf5ca19e-7de9-c13f-fa7f-b2f3e0d24fbc@redhat.com>
-Date: Fri, 7 Apr 2017 08:51:10 -0500
+Message-ID: <71657ad0-5d2f-5d26-1c42-854e50e6786c@redhat.com>
+Date: Fri, 7 Apr 2017 08:53:59 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170407083849.GA26482@redhat>
+In-Reply-To: <1491561165-12415-1-git-send-email-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="0xCOls11OCKFCsDo9Hdw0NaTKMWFBpgGP"
-Subject: Re: [Qemu-devel] [PATCH 1/3] vhost: simple clean up
+	boundary="f9gmRpJs0gcngxQOsitoes97vJbgR6mCr"
+Subject: Re: [Qemu-devel] [PATCH for-2.9] block: Don't check permissions for
+ copy on read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +24,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sahid Orentino Ferdjaoui <sferdjao@redhat.com>, weiqi <weiqi4@huawei.com>
-Cc: arei.gonglei@huawei.com, qemu-devel@nongnu.org, mst@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, rjones@redhat.com, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0xCOls11OCKFCsDo9Hdw0NaTKMWFBpgGP
+--f9gmRpJs0gcngxQOsitoes97vJbgR6mCr
 From: Eric Blake <eblake@redhat.com>
-To: Sahid Orentino Ferdjaoui <sferdjao@redhat.com>, weiqi <weiqi4@huawei.com>
-Cc: arei.gonglei@huawei.com, qemu-devel@nongnu.org, mst@redhat.com
-Message-ID: <cf5ca19e-7de9-c13f-fa7f-b2f3e0d24fbc@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/3] vhost: simple clean up
-References: <1491548326-60072-1-git-send-email-weiqi4@huawei.com>
- <20170407083849.GA26482@redhat>
-In-Reply-To: <20170407083849.GA26482@redhat>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, rjones@redhat.com, qemu-devel@nongnu.org
+Message-ID: <71657ad0-5d2f-5d26-1c42-854e50e6786c@redhat.com>
+Subject: Re: [PATCH for-2.9] block: Don't check permissions for copy on read
+References: <1491561165-12415-1-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1491561165-12415-1-git-send-email-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 04/07/2017 03:38 AM, Sahid Orentino Ferdjaoui wrote:
-> On Fri, Apr 07, 2017 at 02:58:46PM +0800, weiqi wrote:
->> From: Wei Qi <weiqi4@huawei.com>
->>
->> It is unnecessary to assign 'hdev->nvqs' to 'i', because 'hdev->nvqs' =
-unused after assignment, so remove it.
->=20
-> nit: The line should not be longer than 76 characters [0].
->=20
-> [0] http://wiki.qemu-project.org/Contribute/SubmitAPatch#Write_a_meanin=
-gful_commit_message
+On 04/07/2017 05:32 AM, Kevin Wolf wrote:
+> The assertion is currently failing. We can't require callers to have
+> write permissions when all they are doing is a read, so comment it out.=
 
-Also, make sure you have proper threading.  Although you sent a 0/3
-cover letter (with Message-ID:
-<1491548305-75464-1-git-send-email-weiqi4@huawei.com>), this 1/3 message
-is lacking both References: and In-Reply-To: headers, and therefore
-appears as its own top level thread.
+> Add a FIXME comment in the code so that the check is re-enabled when
+> copy on read is refactored into its own filter driver.
+>=20
+> Reported-by: Richard W.M. Jones <rjones@redhat.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/io.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/block/io.c b/block/io.c
+> index 2709a70..7321dda 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -945,7 +945,14 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(B=
+drvChild *child,
+>      size_t skip_bytes;
+>      int ret;
+> =20
+> -    assert(child->perm & (BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE));=
+
+> +    /* FIXME We cannot require callers to have write permissions when =
+all they
+> +     * are doing is a read request. If we did things right, write perm=
+issions
+> +     * would be obtained anyway, but internally by the copy-on-read co=
+de. As
+> +     * long as it is implemented here rather than in a separat filter =
+driver,
+
+s/separat/separate/
+
+> +     * the copy-on-read code doesn't have its own BdrvChild, however, =
+for which
+> +     * it could request permissions. Therefore we have to bypass the p=
+ermission
+> +     * system for the moment. */
+> +    // assert(child->perm & (BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE=
+));
+
+Makes checkpatch.pl unhappy - but that's intentional.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -68,7 +92,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---0xCOls11OCKFCsDo9Hdw0NaTKMWFBpgGP
+--f9gmRpJs0gcngxQOsitoes97vJbgR6mCr
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -78,13 +102,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJY55lOAAoJEKeha0olJ0NquS4H/REsfvejoD75TR9MvTIY4tLP
-kT73mXNcD8myTfoCm3jyg1JLX3Gq5fNZgAEtAqUo/0goOCO6sdQ+wdiJZzYulkwt
-/cEomDdf3c8nfXcfoRrdY32TuEfghvWgnaeOBrHgvRzxcyJB4NTaXE/Ic+zjv4z5
-iY2vgoo7HLRm5A6IfmzhBUzBJggRNfRjTRhOEg0T9PMsdza9Jf95uW52UlAdqWEA
-fAFxsYnTki7b30ajWDfgVZD6UYzFFOupRCpEMiip09/f6n4/SD59ixhK2zVW/MC0
-6U4sd2i3JRn4oKtrTrIinrJ1jb0kiWRkwchsGD3zRH3eZ6vAxA6JEsAqA1Dcb2M=
-=z8f0
+iQEcBAEBCAAGBQJY55n3AAoJEKeha0olJ0NqT3UH/iKk4m/dpgWzgYdrbWYgWfDw
+mEezP6t2/STdvXWxkxtKetODkEeCuUtr1qexOy0+UWrrKcT4RVPS0MAuyCjepGrw
+VRHgwuw+gBDAzg6VHqXLqvlqLpwmhc9PKhBynKU1epr34ai4AUALxdrkbOcJBgDG
+RdKty2qMzse50EiaVxLd/ms5C/ErvszlfInCl5Uhr9ATWjSneUjSCGNl3GBeCTe+
+YMlhb/Rnd1nozWQvlYC7K/lXwGTHnLojo2u84jPXREd37lL9U/EJ0gyF5cV1q/oZ
+6bwNkzkuq7iFlmMXMF0LBs1Xn2ntXFfzlzYIfioKcWglp/piEj232XxEaGCPoc0=
+=CNyE
 -----END PGP SIGNATURE-----
 
---0xCOls11OCKFCsDo9Hdw0NaTKMWFBpgGP--
+--f9gmRpJs0gcngxQOsitoes97vJbgR6mCr--
