@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cwVJb-0006lL-QX
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:56:45 -0400
+	(envelope-from <bounces@canonical.com>) id 1cwVNp-0000bq-Ax
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:01:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cwVJY-0004Hw-Ix
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:56:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:8381)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cwVJY-0004Hj-Ab
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:56:40 -0400
-Date: Fri, 7 Apr 2017 15:56:35 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170407145634.GA2623@work-vm>
-References: <20170407143254.22061-1-dgilbert@redhat.com>
-	<a9e3490a-0a70-7b9d-53cb-0a2fd389c796@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1cwVNl-0005H5-EA
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:01:05 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55536)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cwVNl-0005Gi-9D
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:01:01 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cwVNj-0004Q1-B1
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 15:00:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 3D4192E80C2
+	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 15:00:59 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a9e3490a-0a70-7b9d-53cb-0a2fd389c796@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for 2.10] slirp/smb: Replace constant
- strings by glib string
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 07 Apr 2017 14:55:44 -0000
+From: Alex Williamson <alex.l.williamson@gmail.com>
+Reply-To: Bug 1680679 <1680679@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170407032144.12640.21952.malonedeb@gac.canonical.com>
+Message-Id: <20170407145544.12878.12530.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1680679] Re: qemu cannot run twice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,79 +36,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com, berrange@redhat.com
+To: qemu-devel@nongnu.org
 
-* Eric Blake (eblake@redhat.com) wrote:
-> On 04/07/2017 09:32 AM, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > gcc 7 (on fedora 26) objects to many of the snprintf's
-> > in the smb path and command creation because it can't
-> > figure out that the smb_dir (i.e. the /tmp dir for the configuration)
-> > is known to be short.
-> > 
-> > Replace all these fixed length buffers by g_str* functions that dynamically
-> > allocate and use g_dir_make_tmp to make the directory.
-> > (It's fairly new glib but we have a compat function for it).
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  net/slirp.c | 30 +++++++++++++++++-------------
-> >  1 file changed, 17 insertions(+), 13 deletions(-)
-> > 
-> > diff --git a/net/slirp.c b/net/slirp.c
-> > index f97ec23345..9f6521190b 100644
-> > --- a/net/slirp.c
-> > +++ b/net/slirp.c
-> > @@ -80,7 +80,7 @@ typedef struct SlirpState {
-> >      Slirp *slirp;
-> >      Notifier exit_notifier;
-> >  #ifndef _WIN32
-> > -    char smb_dir[128];
-> > +    gchar *smb_dir;
-> 
-> Does it really have to be gchar? That's one of the more pointless
-> typedefs in glib; and I think 'char *' is just fine.
+If you get one boot where GPU assignment works with a mobile GeForce,
+you're doing better than most.
 
-Yes I'm happy either way.
+-- =
 
-> > -    snprintf(smb_cmdline, sizeof(smb_cmdline), "%s -l %s -s %s",
-> > +    smb_cmdline = g_strdup_printf("%s -l %s -s %s",
-> >               CONFIG_SMBD_COMMAND, s->smb_dir, smb_conf);
-> 
-> Gross that we're parsing a command line through a shell, but
-> pre-existing and looks like CONFIG_SMBD_COMMAND, s->smb_dir, and
-> smb_conf should all be enough under our control to ensure that there are
-> no shell metacharacters and therefore exploits possible.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1680679
 
-Yes, it's quite hacky.
+Title:
+  qemu cannot run twice
 
-> The cleanup is useful, and resolves one of the build issues I pointed
-> out earlier on Rawhide (looks like it is now Fedora 26 in addition to
-> Rawhide that have new-enough gcc).  In that thread, we argued that it's
-> not going to be essential to get this in for 2.9, but as more and more
-> people move to newer gcc, it will probably be a candidate for
-> qemu-stable for 2.9.1 in addition to 2.10.
+Status in QEMU:
+  New
 
-Ah which thread is that?
-I just posted:
-https://lists.nongnu.org/archive/html/qemu-devel/2017-04/msg01294.html
+Bug description:
+  After using qemu with gpu passthrough and then shutting down windows 7 pr=
+operly I cannot boot windows 7 a second time.
+  Only a full reboot of linux fixes this issue.
+  Qemu appears to corrupt something in linux when exiting.
+  I get no error messages but windows 7 never finishes booting during the 2=
+nd try.
+  Apparently I do try to run vfiobind each time the script is run.
+  Wondering if rerunning vfiobind can cause an issue?
 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+  =
 
-Thanks!
+  My specs:
+  -------------------------------------------------------------------------=
+----------------
+  System:    Host: GT70-2PE Kernel: 4.5.4-040504-generic x86_64 (64 bit gcc=
+: 5.3.1)
+             Desktop: Cinnamon 3.2.7 (Gtk 3.18.9) Distro: Linux Mint 18.1 S=
+erena
+  Machine:   Mobo: Micro-Star model: MS-1763 v: REV:0.C Bios: American Mega=
+trends v: E1763IMS.51B date: 01/29/2015
+  CPU:       Quad core Intel Core i7-4810MQ (-HT-MCP-) cache: 6144 KB
+             flags: (lm nx sse sse2 sse3 sse4_1 sse4_2 ssse3 vmx) bmips: 22=
+347
+             clock speeds: max: 2801 MHz 1: 2801 MHz 2: 2801 MHz 3: 2801 MH=
+z 4: 2801 MHz 5: 2801 MHz 6: 2801 MHz
+             7: 2801 MHz 8: 2801 MHz
+  Graphics:  Card-1: Intel 4th Gen Core Processor Integrated Graphics Contr=
+oller bus-ID: 00:02.0
+             Card-2: NVIDIA GK104M [GeForce GTX 880M] bus-ID: 01:00.0
+             Display Server: X.Org 1.18.4 drivers: intel (unloaded: fbdev,v=
+esa)
+             Resolution: 1920x1080@60.02hz, 1920x1080@60.00hz
+             GLX Renderer: Mesa DRI Intel Haswell Mobile GLX Version: 3.0 M=
+esa 12.0.6 Direct Rendering: Yes
 
-Dave
+  =
 
-> 
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
-> 
+  My script:
+  -------------------------------------------------------------------------=
+------------------
+  #!/bin/bash
 
+  cd ~/qemu
+  sudo ./up.sh tap0
 
+  configfile=3D~/qemu/vfio-pci1.cfg
 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+  vfiobind() {
+      dev=3D"$1"
+          vendor=3D$(cat /sys/bus/pci/devices/$dev/vendor)
+          device=3D$(cat /sys/bus/pci/devices/$dev/device)
+          if [ -e /sys/bus/pci/devices/$dev/driver ]; then
+                  echo $dev > /sys/bus/pci/devices/$dev/driver/unbind
+          fi
+          echo $vendor $device > /sys/bus/pci/drivers/vfio-pci/new_id
+
+  }
+
+  modprobe vfio-pci
+
+  cat $configfile | while read line;do
+      echo $line | grep ^# >/dev/null 2>&1 && continue
+          vfiobind $line
+  done
+
+  sudo qemu-system-x86_64 -machine type=3Dq35,accel=3Dkvm -cpu host,kvm=3Do=
+ff \
+  -smp 8,sockets=3D1,cores=3D4,threads=3D2 \
+  -bios /usr/share/seabios/bios.bin \
+  -serial none \
+  -parallel none \
+  -vga none \
+  -m 4G \
+  -mem-path /run/hugepages/kvm \
+  -mem-prealloc \
+  -balloon none \
+  -rtc clock=3Dhost,base=3Dlocaltime \
+  -device ioh3420,bus=3Dpcie.0,addr=3D1c.0,multifunction=3Don,port=3D1,chas=
+sis=3D1,id=3Droot.1 \
+  -device vfio-pci,host=3D01:00.0,bus=3Droot.1,addr=3D00.0,multifunction=3D=
+on,x-vga=3Don \
+  -device virtio-scsi-pci,id=3Dscsi \
+  -drive id=3Ddisk0,if=3Dvirtio,cache=3Dnone,format=3Draw,file=3D/home/dad/=
+qemu/windows7.img \
+  -drive file=3D/home/dad/1TB-Backup/Iso/SP1ForWin7.iso,id=3Disocd,format=
+=3Draw,if=3Dnone -device scsi-cd,drive=3Disocd \
+  -net nic -net tap,ifname=3Dtap0,script=3Dno,downscript=3Dno \
+  -usbdevice host:413c:a503 \
+  -usbdevice host:13fe:3100 \
+  -usbdevice host:0bc2:ab21 \
+  -boot menu=3Don \
+  -boot order=3Dc
+
+  sudo ./down.sh tap0
+
+  exit 0
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1680679/+subscriptions
