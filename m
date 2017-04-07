@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwalP-0003oj-Mf
+	(envelope-from <bounces@canonical.com>) id 1cwalP-0003ok-NM
 	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 16:45:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwalM-0000R4-JP
+	(envelope-from <bounces@canonical.com>) id 1cwalM-0000R9-K9
 	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 16:45:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41197)
+Received: from indium.canonical.com ([91.189.90.7]:41196)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cwalM-0000Qv-6N
+	id 1cwalM-0000Qw-8K
 	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 16:45:44 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cwalK-0000rv-A0
+	id 1cwalK-0000rN-JT
 	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 20:45:42 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id EFF712E80CE
-	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 20:45:41 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 578B62E80D2
+	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 20:45:42 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Apr 2017 20:32:18 -0000
+Date: Fri, 07 Apr 2017 20:34:26 -0000
 From: Roger Lawhorn <rll@twc.com>
 Reply-To: Bug 1680679 <1680679@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20170407032144.12640.21952.malonedeb@gac.canonical.com>
-Message-Id: <20170407203219.31186.11038.malone@wampee.canonical.com>
+Message-Id: <20170407203426.1580.63228.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1680679] Re: qemu cannot run twice
 List-Id: <qemu-devel.nongnu.org>
@@ -38,12 +38,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-NOTE: I only get gpu passthrough to work when using seabios. UEFI will
-not work with modern nvidia drivers. You get the 'code 43' error because
-whatever standards nvidia expects when talking to uefi are not met by
-the OVMF firmware used by qemu. This issue happens to windows users
-also. They had to update their uefi firmware to get around the code 43
-issue.
+NOTE: Article showing windows users updating their motherboard uefi firmwar=
+e to get around code 43:
+https://devtalk.nvidia.com/default/topic/861244/cuda-setup-and-installation=
+/geforce-740m-asus-x550l-code-43-after-windows-10-update/3
 
 -- =
 
