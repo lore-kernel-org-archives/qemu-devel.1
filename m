@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cwVHE-0005kl-MC
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:54:18 -0400
+	(envelope-from <bounces@canonical.com>) id 1cwVIy-0006Q6-4V
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:56:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cwVHB-0003k3-EX
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:54:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59074)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cwVHB-0003jx-5V
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:54:13 -0400
-References: <20170407143254.22061-1-dgilbert@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a9e3490a-0a70-7b9d-53cb-0a2fd389c796@redhat.com>
-Date: Fri, 7 Apr 2017 09:54:05 -0500
+	(envelope-from <bounces@canonical.com>) id 1cwVIu-00046g-Sn
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:56:04 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55245)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cwVIu-00046W-MT
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:56:00 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cwVIs-0002tK-Sg
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 14:55:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8BEB42E80C8
+	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 14:55:58 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170407143254.22061-1-dgilbert@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="tNOTWamHJXxt4HjsqTjIuAjvqBAqSVCLe"
-Subject: Re: [Qemu-devel] [PATCH for 2.10] slirp/smb: Replace constant
- strings by glib string
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 07 Apr 2017 14:38:49 -0000
+From: Arndt Kritzner <kritzner@logicway.de>
+Reply-To: Bug 1014681 <1014681@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20120618143358.15172.76386.malonedeb@wampee.canonical.com>
+Message-Id: <20170407143849.2245.37447.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1014681] Re: BSOD with newer host kernels (x64)
+ and W2k8S guest (x64)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,97 +37,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com, berrange@redhat.com
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---tNOTWamHJXxt4HjsqTjIuAjvqBAqSVCLe
-From: Eric Blake <eblake@redhat.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
- qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com,
- berrange@redhat.com
-Message-ID: <a9e3490a-0a70-7b9d-53cb-0a2fd389c796@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for 2.10] slirp/smb: Replace constant strings
- by glib string
-References: <20170407143254.22061-1-dgilbert@redhat.com>
-In-Reply-To: <20170407143254.22061-1-dgilbert@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Sorry, but I have moved to ESXI more than 4 years ago.
 
-On 04/07/2017 09:32 AM, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->=20
-> gcc 7 (on fedora 26) objects to many of the snprintf's
-> in the smb path and command creation because it can't
-> figure out that the smb_dir (i.e. the /tmp dir for the configuration)
-> is known to be short.
->=20
-> Replace all these fixed length buffers by g_str* functions that dynamic=
-ally
-> allocate and use g_dir_make_tmp to make the directory.
-> (It's fairly new glib but we have a compat function for it).
->=20
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  net/slirp.c | 30 +++++++++++++++++-------------
->  1 file changed, 17 insertions(+), 13 deletions(-)
->=20
-> diff --git a/net/slirp.c b/net/slirp.c
-> index f97ec23345..9f6521190b 100644
-> --- a/net/slirp.c
-> +++ b/net/slirp.c
-> @@ -80,7 +80,7 @@ typedef struct SlirpState {
->      Slirp *slirp;
->      Notifier exit_notifier;
->  #ifndef _WIN32
-> -    char smb_dir[128];
-> +    gchar *smb_dir;
+-- =
 
-Does it really have to be gchar? That's one of the more pointless
-typedefs in glib; and I think 'char *' is just fine.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1014681
 
+Title:
+  BSOD with newer host kernels (x64) and W2k8S guest (x64)
 
-> =20
-> -    snprintf(smb_cmdline, sizeof(smb_cmdline), "%s -l %s -s %s",
-> +    smb_cmdline =3D g_strdup_printf("%s -l %s -s %s",
->               CONFIG_SMBD_COMMAND, s->smb_dir, smb_conf);
+Status in QEMU:
+  Incomplete
 
-Gross that we're parsing a command line through a shell, but
-pre-existing and looks like CONFIG_SMBD_COMMAND, s->smb_dir, and
-smb_conf should all be enough under our control to ensure that there are
-no shell metacharacters and therefore exploits possible.
+Bug description:
+  Hallo, I attempted to move virtual machines from one host to another
+  but got stuck with Windows-BSODs on the target host. The host-side
+  console message is "virtio_ioport_write: unexpected address 0x13 value
+  0x1". Eventually there are overlaps to bug #990364, but I'm not sure.
 
-The cleanup is useful, and resolves one of the build issues I pointed
-out earlier on Rawhide (looks like it is now Fedora 26 in addition to
-Rawhide that have new-enough gcc).  In that thread, we argued that it's
-not going to be essential to get this in for 2.9, but as more and more
-people move to newer gcc, it will probably be a candidate for
-qemu-stable for 2.9.1 in addition to 2.10.
+  Host machine: 2x Opteron 4238 a 6 cores, 32GB RAM, Linux x86_64
+  Guest machine(s): Windows 2008 Server R2 x64
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+  I tried different combinations of component versions, but only kernel
+  2.6.34 could run the guests (but has other difficulties). See testet
+  variants in comment.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+  Run arguments are attached. Minidump follows immediately.
 
-
---tNOTWamHJXxt4HjsqTjIuAjvqBAqSVCLe
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY56gNAAoJEKeha0olJ0NqHQ4IAKbJg+GGXfH01W3sXAz07iI/
-DTAXYVWu0brChYzGQVfesFOJIPPZVlnXzctSyIvcGF+lXGaPpEzkthsQlgmoQVVw
-oJF+nGcjm1hOx5vwLgpHR47QL77whUducuHyfBbjsWyzaKU/JUzY6cgEKohej+Hr
-cidJkbbwu2+9Gko0fhv5p+DnQW+W+6qlL6WAhFvl/XRTNeAF1luQAfFp2a3wUBCM
-Pw4bZoXA016xyAe/yvMPGL3nh+qNPeDytOlg3MLYAgoZRlfboUJ6+3Z+Jb3k5+gg
-LWqAaZo4bLILxkFCK5K67CpO0ZVREO6KgYeBn7swsTUv9pdKBWekGW1fMHuZ9FA=
-=o/+R
------END PGP SIGNATURE-----
-
---tNOTWamHJXxt4HjsqTjIuAjvqBAqSVCLe--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1014681/+subscriptions
