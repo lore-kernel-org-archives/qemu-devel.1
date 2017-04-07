@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59851)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwWKk-0007Ye-8k
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 12:01:59 -0400
+	(envelope-from <bounces@canonical.com>) id 1cwWnC-00080t-N9
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 12:31:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwWKg-0005U7-AH
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 12:01:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44158)
+	(envelope-from <bounces@canonical.com>) id 1cwWn7-000205-OH
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 12:31:22 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49262)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cwWKg-0005U3-4k
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 12:01:54 -0400
+	id 1cwWn7-0001ws-I8
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 12:31:17 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cwWKe-0008KQ-2V
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 16:01:52 +0000
+	id 1cwWn5-0004cg-5q
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 16:31:15 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C60272E81D1
-	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 16:01:44 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 2B1602E80C6
+	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 16:31:15 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Apr 2017 15:48:18 -0000
-From: Gerd Hoffmann <1635339@bugs.launchpad.net>
+Date: Fri, 07 Apr 2017 16:23:31 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Reply-To: Bug 1635339 <1635339@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20161020160532.23339.63373.malonedeb@soybean.canonical.com>
-Message-Id: <20170407154818.30114.84071.malone@soybean.canonical.com>
+Message-Id: <20170407162332.31126.87885.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1635339] Re: qxl_pre_save assertion failure on vm
  "save"
@@ -39,22 +39,17 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Well.  qxl commands are expected to live in bar 0 (same bar where the
-rings are too).  vram bar was added as surface storage.
+An untested hack that might fail cleaner might be:
 
-Now the windows drivers started to us vram for qxl commands.  Problem is
-we simply can't live-migrate such a guest.  At least not without
-changing the vmstate format.  Which isn't something I would attempt just
-a few days before release.
+  error_report("Broken driver ..... migration failed");
+  qemu_file_set_error(migrate_get_current()->to_dst_file, -EINVAL);
 
-We can't throw an error in qxl_pre_save either (and fail migration
-instead of aborting).
+(untested, probably needs checking it works with savevm).
 
-I don't see an easy way out for 2.9.
+I must go around and add a return value to pre_save().
 
-Long term options are (a) revert the driver change, and probably add
-some checks to qxl to make sure guests don't use vram for commands, or
-(b) extend qxl vmstate so we can handle that case.
+We probably also need to make sure some migration testing gets added to
+the driver dev
 
 -- =
 
