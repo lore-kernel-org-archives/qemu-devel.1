@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cwY9z-00086s-Jx
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 13:59:00 -0400
+	(envelope-from <bounces@canonical.com>) id 1cwYCQ-0000ok-MC
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 14:01:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cwY9w-0001Ul-I0
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 13:58:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33392)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cwY9w-0001UC-8t
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 13:58:56 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D5C5280490
-	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 17:58:54 +0000 (UTC)
-Date: Fri, 7 Apr 2017 18:58:49 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170407175849.GF2623@work-vm>
-References: <1490860207-8302-1-git-send-email-thuth@redhat.com>
-	<1490860207-8302-2-git-send-email-thuth@redhat.com>
-	<c341bda5-8e1d-2717-3606-51ef1611d1a8@redhat.com>
-	<678cd353-56cb-3dac-3f91-966cb5abeb34@redhat.com>
-	<55a17a77-9ab4-519a-b917-695fd33fd4be@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1cwYCN-0002i8-Ka
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 14:01:30 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35402)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cwYCN-0002i3-Er
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 14:01:27 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cwYCK-0006eh-Jc
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 18:01:24 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 931B92E80C3
+	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 18:01:24 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <55a17a77-9ab4-519a-b917-695fd33fd4be@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] libqtest: Ignore QMP events when
- parsing the response for HMP commands
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 07 Apr 2017 17:53:31 -0000
+From: Roger Lawhorn <rll@twc.com>
+Reply-To: Bug 1680679 <1680679@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170407032144.12640.21952.malonedeb@gac.canonical.com>
+Message-Id: <20170407175332.31504.35200.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1680679] Re: qemu cannot run twice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,74 +36,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
 
-* John Snow (jsnow@redhat.com) wrote:
-> 
-> 
-> On 04/04/2017 03:31 AM, Thomas Huth wrote:
-> > On 03.04.2017 21:09, John Snow wrote:
-> >>
-> >>
-> >> On 03/30/2017 03:50 AM, Thomas Huth wrote:
-> >>> When running certain HMP commands (like "device_del") via QMP, we
-> >>> can sometimes get a QMP event in the response first, so that the
-> >>> "g_assert(ret)" statement in qtest_hmp() triggers and the test
-> >>> fails. Fix this by ignoring such QMP events while looking for the
-> >>> real return value from QMP.
-> >>>
-> >>> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> >>> ---
-> >>>  tests/libqtest.c | 6 ++++++
-> >>>  1 file changed, 6 insertions(+)
-> >>>
-> >>> diff --git a/tests/libqtest.c b/tests/libqtest.c
-> >>> index a5c3d2b..c9b2d76 100644
-> >>> --- a/tests/libqtest.c
-> >>> +++ b/tests/libqtest.c
-> >>> @@ -580,6 +580,12 @@ char *qtest_hmpv(QTestState *s, const char *fmt, va_list ap)
-> >>>                       " 'arguments': {'command-line': %s}}",
-> >>>                       cmd);
-> >>>      ret = g_strdup(qdict_get_try_str(resp, "return"));
-> >>> +    while (ret == NULL && qdict_get_try_str(resp, "event")) {
-> >>> +        /* Ignore asynchronous QMP events */
-> >>> +        QDECREF(resp);
-> >>> +        resp = qtest_qmp_receive(s);
-> >>> +        ret = g_strdup(qdict_get_try_str(resp, "return"));
-> >>> +    }
-> >>>      g_assert(ret);
-> >>>      QDECREF(resp);
-> >>>      g_free(cmd);
-> >>>
-> >>
-> >> You've probably been asked this, but can you just shove the QMP response
-> >> you don't want into the event queue for consumption by other calls?
-> > 
-> > Well, this is the qtest_hmpv() function, so I assume that the caller
-> > just wants to execute a HMP command and does not really care about QMP
-> > events. If you care about QMP events, you should use the qmp functions
-> > instead.
-> > 
-> >  Thomas
-> > 
-> 
-> I don't think it's obvious that using HMP functions should cause the QMP
-> stream to become faulty, though.
-> 
-> If someone uses an HMP function and then tries to wait on a QMP event to
-> confirm that some key condition has occurred (pausing or resuming, for
-> instance) it would not be immediately apparent from the user's POV that
-> this function just eats replies because it was convenient to do so.
-> 
-> I guess the event queue only exists in python though, so it's not as
-> trivial as I was thinking it would be...
+I have been told that getting this to work with a laptop is rare.
+I own an MSI GT70-2PE.
 
-I think it's OK to discard the QMP events - it feels rare to mix and match
-in a test; if you care about QMP events you'll probably be basing the
-test around QMP rather than HMP.
+-- =
 
-Dave
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1680679
 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Title:
+  qemu cannot run twice
+
+Status in QEMU:
+  New
+
+Bug description:
+  After using qemu with gpu passthrough and then shutting down windows 7 pr=
+operly I cannot boot windows 7 a second time.
+  Only a full reboot of linux fixes this issue.
+  Qemu appears to corrupt something in linux when exiting.
+  I get no error messages but windows 7 never finishes booting during the 2=
+nd try.
+  Apparently I do try to run vfiobind each time the script is run.
+  Wondering if rerunning vfiobind can cause an issue?
+
+  =
+
+  My specs:
+  -------------------------------------------------------------------------=
+----------------
+  System:    Host: GT70-2PE Kernel: 4.5.4-040504-generic x86_64 (64 bit gcc=
+: 5.3.1)
+             Desktop: Cinnamon 3.2.7 (Gtk 3.18.9) Distro: Linux Mint 18.1 S=
+erena
+  Machine:   Mobo: Micro-Star model: MS-1763 v: REV:0.C Bios: American Mega=
+trends v: E1763IMS.51B date: 01/29/2015
+  CPU:       Quad core Intel Core i7-4810MQ (-HT-MCP-) cache: 6144 KB
+             flags: (lm nx sse sse2 sse3 sse4_1 sse4_2 ssse3 vmx) bmips: 22=
+347
+             clock speeds: max: 2801 MHz 1: 2801 MHz 2: 2801 MHz 3: 2801 MH=
+z 4: 2801 MHz 5: 2801 MHz 6: 2801 MHz
+             7: 2801 MHz 8: 2801 MHz
+  Graphics:  Card-1: Intel 4th Gen Core Processor Integrated Graphics Contr=
+oller bus-ID: 00:02.0
+             Card-2: NVIDIA GK104M [GeForce GTX 880M] bus-ID: 01:00.0
+             Display Server: X.Org 1.18.4 drivers: intel (unloaded: fbdev,v=
+esa)
+             Resolution: 1920x1080@60.02hz, 1920x1080@60.00hz
+             GLX Renderer: Mesa DRI Intel Haswell Mobile GLX Version: 3.0 M=
+esa 12.0.6 Direct Rendering: Yes
+
+  =
+
+  My script:
+  -------------------------------------------------------------------------=
+------------------
+  #!/bin/bash
+
+  cd ~/qemu
+  sudo ./up.sh tap0
+
+  configfile=3D~/qemu/vfio-pci1.cfg
+
+  vfiobind() {
+      dev=3D"$1"
+          vendor=3D$(cat /sys/bus/pci/devices/$dev/vendor)
+          device=3D$(cat /sys/bus/pci/devices/$dev/device)
+          if [ -e /sys/bus/pci/devices/$dev/driver ]; then
+                  echo $dev > /sys/bus/pci/devices/$dev/driver/unbind
+          fi
+          echo $vendor $device > /sys/bus/pci/drivers/vfio-pci/new_id
+
+  }
+
+  modprobe vfio-pci
+
+  cat $configfile | while read line;do
+      echo $line | grep ^# >/dev/null 2>&1 && continue
+          vfiobind $line
+  done
+
+  sudo qemu-system-x86_64 -machine type=3Dq35,accel=3Dkvm -cpu host,kvm=3Do=
+ff \
+  -smp 8,sockets=3D1,cores=3D4,threads=3D2 \
+  -bios /usr/share/seabios/bios.bin \
+  -serial none \
+  -parallel none \
+  -vga none \
+  -m 4G \
+  -mem-path /run/hugepages/kvm \
+  -mem-prealloc \
+  -balloon none \
+  -rtc clock=3Dhost,base=3Dlocaltime \
+  -device ioh3420,bus=3Dpcie.0,addr=3D1c.0,multifunction=3Don,port=3D1,chas=
+sis=3D1,id=3Droot.1 \
+  -device vfio-pci,host=3D01:00.0,bus=3Droot.1,addr=3D00.0,multifunction=3D=
+on,x-vga=3Don \
+  -device virtio-scsi-pci,id=3Dscsi \
+  -drive id=3Ddisk0,if=3Dvirtio,cache=3Dnone,format=3Draw,file=3D/home/dad/=
+qemu/windows7.img \
+  -drive file=3D/home/dad/1TB-Backup/Iso/SP1ForWin7.iso,id=3Disocd,format=
+=3Draw,if=3Dnone -device scsi-cd,drive=3Disocd \
+  -net nic -net tap,ifname=3Dtap0,script=3Dno,downscript=3Dno \
+  -usbdevice host:413c:a503 \
+  -usbdevice host:13fe:3100 \
+  -usbdevice host:0bc2:ab21 \
+  -boot menu=3Don \
+  -boot order=3Dc
+
+  sudo ./down.sh tap0
+
+  exit 0
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1680679/+subscriptions
