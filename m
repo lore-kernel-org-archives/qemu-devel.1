@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cwQiP-0003TT-Ay
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 06:02:05 -0400
+	(envelope-from <famz@redhat.com>) id 1cwQr5-0005QY-Q9
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 06:11:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cwQiK-0007GZ-B7
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 06:02:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39894)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cwQiK-0007GD-3Y
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 06:01:56 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 18547624BE
-	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 10:01:55 +0000 (UTC)
-Date: Fri, 7 Apr 2017 11:01:51 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170407100148.GF2138@work-vm>
-References: <20170406130913.2232-1-quintela@redhat.com>
-	<20170406130913.2232-46-quintela@redhat.com>
+	(envelope-from <famz@redhat.com>) id 1cwQr4-000277-Ov
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 06:10:59 -0400
+Date: Fri, 7 Apr 2017 18:10:38 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170407101038.GB16233@lemon>
+References: <1491554685-1288-1-git-send-email-lidongchen@tencent.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170406130913.2232-46-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 45/54] ram: Pass RAMBlock to bitmap_sync
+In-Reply-To: <1491554685-1288-1-git-send-email-lidongchen@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH v2] migration/block: use blk_pwrite_zeroes
+ for each zero cluster
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,74 +23,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: jemmy858585@gmail.com
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, quintela@redhat.com, dgilbert@redhat.com, qemu-block@nongnu.org, Lidong Chen <lidongchen@tencent.com>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> We change the meaning of start to be the offset from the beggining of
-> the block.
+On Fri, 04/07 16:44, jemmy858585@gmail.com wrote:
+> From: Lidong Chen <lidongchen@tencent.com>
 > 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-
-Still a little nervous about whether we want to pass RB all the way down to cpu_* but OK.
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
+> BLOCK_SIZE is (1 << 20), qcow2 cluster size is 65536 by default,
+> this maybe cause the qcow2 file size is bigger after migration.
+> This patch check each cluster, use blk_pwrite_zeroes for each
+> zero cluster.
+> 
+> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
 > ---
->  include/exec/ram_addr.h | 2 ++
->  migration/ram.c         | 8 ++++----
->  2 files changed, 6 insertions(+), 4 deletions(-)
+>  migration/block.c | 37 +++++++++++++++++++++++++++++++++++--
+>  1 file changed, 35 insertions(+), 2 deletions(-)
 > 
-> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-> index 9aadc5c..8a1372c 100644
-> --- a/include/exec/ram_addr.h
-> +++ b/include/exec/ram_addr.h
-> @@ -354,11 +354,13 @@ static inline void cpu_physical_memory_clear_dirty_range(ram_addr_t start,
+> diff --git a/migration/block.c b/migration/block.c
+> index 7734ff7..c32e046 100644
+> --- a/migration/block.c
+> +++ b/migration/block.c
+> @@ -885,6 +885,11 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
+>      int64_t total_sectors = 0;
+>      int nr_sectors;
+>      int ret;
+> +    int i;
+> +    int64_t addr_offset;
+> +    uint8_t *buf_offset;
+
+Poor variable names, they are not offset, maybe "cur_addr" and "cur_buf"? And
+they can be moved to the loop block below.
+
+> +    BlockDriverInfo bdi;
+> +    int cluster_size;
 >  
->  static inline
->  uint64_t cpu_physical_memory_sync_dirty_bitmap(unsigned long *dest,
-> +                                               RAMBlock *rb,
->                                                 ram_addr_t start,
->                                                 ram_addr_t length,
->                                                 uint64_t *real_dirty_pages)
->  {
->      ram_addr_t addr;
-> +    start = rb->offset + start;
->      unsigned long page = BIT_WORD(start >> TARGET_PAGE_BITS);
->      uint64_t num_dirty = 0;
+>      do {
+>          addr = qemu_get_be64(f);
+> @@ -934,8 +939,36 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
+>              } else {
+>                  buf = g_malloc(BLOCK_SIZE);
+>                  qemu_get_buffer(f, buf, BLOCK_SIZE);
+> -                ret = blk_pwrite(blk, addr * BDRV_SECTOR_SIZE, buf,
+> -                                 nr_sectors * BDRV_SECTOR_SIZE, 0);
+> +
+> +                ret = bdrv_get_info(blk_bs(blk), &bdi);
+> +                cluster_size = bdi.cluster_size;
+> +
+> +                if (ret == 0 && cluster_size > 0 &&
+> +                    cluster_size < BLOCK_SIZE &&
+
+I think cluster_size == BLOCK_SIZE should work too.
+
+> +                    BLOCK_SIZE % cluster_size == 0) {
+> +                    for (i = 0; i < BLOCK_SIZE / cluster_size; i++) {
+> +                        addr_offset = addr * BDRV_SECTOR_SIZE
+> +                                        + i * cluster_size;
+> +                        buf_offset = buf + i * cluster_size;
+> +
+> +                        if (buffer_is_zero(buf_offset, cluster_size)) {
+> +                            ret = blk_pwrite_zeroes(blk, addr_offset,
+> +                                                    cluster_size,
+> +                                                    BDRV_REQ_MAY_UNMAP);
+> +                        } else {
+> +                             ret = blk_pwrite(blk, addr_offset, buf_offset,
+> +                                              cluster_size, 0);
+> +                        }
+> +
+> +                        if (ret < 0) {
+> +                            g_free(buf);
+> +                            return ret;
+> +                        }
+> +                    }
+> +                } else {
+> +                    ret = blk_pwrite(blk, addr * BDRV_SECTOR_SIZE, buf,
+> +                                     nr_sectors * BDRV_SECTOR_SIZE, 0);
+> +                }
+>                  g_free(buf);
+>              }
 >  
-> diff --git a/migration/ram.c b/migration/ram.c
-> index fe01e7b..3f3842a 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -646,13 +646,13 @@ static inline bool migration_bitmap_clear_dirty(RAMState *rs, ram_addr_t addr)
->      return ret;
->  }
->  
-> -static void migration_bitmap_sync_range(RAMState *rs, ram_addr_t start,
-> -                                        ram_addr_t length)
-> +static void migration_bitmap_sync_range(RAMState *rs, RAMBlock *rb,
-> +                                        ram_addr_t start, ram_addr_t length)
->  {
->      unsigned long *bitmap;
->      bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
->      rs->migration_dirty_pages +=
-> -        cpu_physical_memory_sync_dirty_bitmap(bitmap, start, length,
-> +        cpu_physical_memory_sync_dirty_bitmap(bitmap, rb, start, length,
->                                                &rs->num_dirty_pages_period);
->  }
->  
-> @@ -699,7 +699,7 @@ static void migration_bitmap_sync(RAMState *rs)
->      qemu_mutex_lock(&rs->bitmap_mutex);
->      rcu_read_lock();
->      QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> -        migration_bitmap_sync_range(rs, block->offset, block->used_length);
-> +        migration_bitmap_sync_range(rs, block, 0, block->used_length);
->      }
->      rcu_read_unlock();
->      qemu_mutex_unlock(&rs->bitmap_mutex);
 > -- 
-> 2.9.3
+> 1.8.3.1
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+Is it possible use (source) cluster size as the transfer chunk size, instead of
+BDRV_SECTORS_PER_DIRTY_CHUNK? Then the existing BLK_MIG_FLAG_ZERO_BLOCK logic
+can help and you don't need to send zero bytes on the wire. This may still not
+be optimal if dest has larger cluster, but it should cover the common use case
+well.
+
+Fam
