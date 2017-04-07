@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cwPvW-0002GU-PL
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:11:32 -0400
+	(envelope-from <bounces@canonical.com>) id 1cwPwD-0002dK-Pv
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:12:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cwPvT-0002CL-Ir
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:11:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41850)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cwPvT-0002CG-9o
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:11:27 -0400
-References: <20170406212209.22788-1-ard.biesheuvel@linaro.org>
-	<20170407085513.czs6tsbwhkecfjrq@kamzik.brq.redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <64d6ad1d-d9ce-2bbb-dfb9-35938f9593ec@redhat.com>
-Date: Fri, 7 Apr 2017 11:11:19 +0200
+	(envelope-from <bounces@canonical.com>) id 1cwPwA-0002SI-M2
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:12:13 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34895)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cwPwA-0002S4-H6
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:12:10 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cwPw8-00073A-8j
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 09:12:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 70EA92E81FB
+	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 09:12:01 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170407085513.czs6tsbwhkecfjrq@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/virt: generate 64-bit addressable
- ACPI objects
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 07 Apr 2017 08:56:22 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1635339 <1635339@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20161020160532.23339.63373.malonedeb@soybean.canonical.com>
+Message-Id: <20170407085622.31539.58601.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1635339] Re: qxl_pre_save assertion failure on vm
+ "save"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,206 +37,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, phil@philjordan.eu, mst@redhat.com, zhaoshenglong@huawei.com, imammedo@redhat.com
+To: qemu-devel@nongnu.org
 
-On 04/07/17 10:55, Andrew Jones wrote:
-> On Thu, Apr 06, 2017 at 10:22:09PM +0100, Ard Biesheuvel wrote:
->> Our current ACPI table generation code limits the placement of ACPI
->> tables to 32-bit addressable memory, in order to be able to emit the
->> root pointer (RSDP) and root table (RSDT) using table types from the
->> ACPI 1.0 days.
->>
->> Since ARM was not supported by ACPI before version 5.0, it makes sense
->> to lift this restriction. This is not crucial for mach-virt, which is
->> guaranteed to have some memory available below the 4 GB mark, but it
->> is a nice to have for QEMU machines that do not have any 32-bit
->> addressable, not unlike some real world 64-bit ARM systems.
->>
->> Since we already emit a version of the RSDP root pointer that carries
->> a 64-bit wide address for the 64-bit root table (XSDT), all we need to
->> do is replace the RSDT generation with the generation of an XSDT table,
->> and use a different slot in the FADT table to refer to the DSDT.
->>
->> Note that this only modifies the private interaction between QEMU and
->> UEFI. Since these tables are all handled by the generic AcpiTableDxe
->> driver which generates its own RSDP, RSDT and XSDT tables and manages
->> the DSDT pointer in FADT itself, the tables that are present to the
->> guest are identical, and so no mach-virt versioning is required for
->> this change.
+I can see a bunch of similar looking failures in Fedora's automatic
+backtrace stats system
 
-The last paragraph could be dropped from the commit message (or trimmed
-a bit). Not really necessary, saying it just FYI. Namely, we don't
-version firmware blobs (i.e., we don't tie different firmware blobs to
-different versions of a machine type), and ACPI tables are considered
-part of the firmware (from the OS's POV), despite the fact that
-technically we generate them in QEMU. So, in my understanding, the ACPI
-content we generate never needs to consider machine types.
+-- =
 
->>
->> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->> ---
->>  hw/arm/virt-acpi-build.c    | 55 ++++++++++++++++++++++++++++++++++-----------
->>  include/hw/acpi/acpi-defs.h | 11 +++++++++
->>  2 files changed, 53 insertions(+), 13 deletions(-)
->>
->> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
->> index b173bd109b91..d18368094c00 100644
->> --- a/hw/arm/virt-acpi-build.c
->> +++ b/hw/arm/virt-acpi-build.c
->> @@ -391,12 +391,12 @@ static void acpi_dsdt_add_power_button(Aml *scope)
->>  
->>  /* RSDP */
->>  static GArray *
->> -build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_offset)
->> +build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
->>  {
->>      AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
->> -    unsigned rsdt_pa_size = sizeof(rsdp->rsdt_physical_address);
->> -    unsigned rsdt_pa_offset =
->> -        (char *)&rsdp->rsdt_physical_address - rsdp_table->data;
->> +    unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
->> +    unsigned xsdt_pa_offset =
->> +        (char *)&rsdp->xsdt_physical_address - rsdp_table->data;
->>  
->>      bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, rsdp_table, 16,
->>                               true /* fseg memory */);
->> @@ -408,8 +408,8 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_offset)
->>  
->>      /* Address to be filled by Guest linker */
->>      bios_linker_loader_add_pointer(linker,
->> -        ACPI_BUILD_RSDP_FILE, rsdt_pa_offset, rsdt_pa_size,
->> -        ACPI_BUILD_TABLE_FILE, rsdt_tbl_offset);
->> +        ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
->> +        ACPI_BUILD_TABLE_FILE, xsdt_tbl_offset);
->>  
->>      /* Checksum to be filled by Guest linker */
->>      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
->> @@ -686,7 +686,7 @@ static void build_fadt(GArray *table_data, BIOSLinker *linker,
->>                         VirtMachineState *vms, unsigned dsdt_tbl_offset)
->>  {
->>      AcpiFadtDescriptorRev5_1 *fadt = acpi_data_push(table_data, sizeof(*fadt));
->> -    unsigned dsdt_entry_offset = (char *)&fadt->dsdt - table_data->data;
->> +    unsigned xdsdt_entry_offset = (char *)&fadt->Xdsdt - table_data->data;
->>      uint16_t bootflags;
->>  
->>      switch (vms->psci_conduit) {
->> @@ -712,7 +712,7 @@ static void build_fadt(GArray *table_data, BIOSLinker *linker,
->>  
->>      /* DSDT address to be filled by Guest linker */
->>      bios_linker_loader_add_pointer(linker,
->> -        ACPI_BUILD_TABLE_FILE, dsdt_entry_offset, sizeof(fadt->dsdt),
->> +        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->Xdsdt),
->>          ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
->>  
->>      build_header(linker, table_data,
->> @@ -772,12 +772,41 @@ struct AcpiBuildState {
->>      bool patched;
->>  } AcpiBuildState;
->>  
->> +/* Build xsdt table */
->> +
->> +static
->> +void build_xsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
->> +                const char *oem_id, const char *oem_table_id)
->> +{
->> +    int i;
->> +    unsigned xsdt_entries_offset;
->> +    AcpiXsdtDescriptorRev2 *xsdt;
->> +    const unsigned table_data_len = (sizeof(uint64_t) * table_offsets->len);
->> +    const unsigned xsdt_entry_size = sizeof(xsdt->table_offset_entry[0]);
->> +    const size_t xsdt_len = sizeof(*xsdt) + table_data_len;
->> +
->> +    xsdt = acpi_data_push(table_data, xsdt_len);
->> +    xsdt_entries_offset = (char *)xsdt->table_offset_entry - table_data->data;
->> +    for (i = 0; i < table_offsets->len; ++i) {
->> +        uint64_t ref_tbl_offset = g_array_index(table_offsets, uint32_t, i);
->> +        uint64_t xsdt_entry_offset = xsdt_entries_offset + xsdt_entry_size * i;
->> +
->> +        /* xsdt->table_offset_entry to be filled by Guest linker */
->> +        bios_linker_loader_add_pointer(linker,
->> +            ACPI_BUILD_TABLE_FILE, xsdt_entry_offset, xsdt_entry_size,
->> +            ACPI_BUILD_TABLE_FILE, ref_tbl_offset);
->> +    }
->> +    build_header(linker, table_data,
->> +                 (void *)xsdt, "XSDT", xsdt_len, 1, oem_id, oem_table_id);
->> +}
-> 
-> build_xsdt should probably go in hw/acpi/aml-build.c
-> 
->> +
->> +
->>  static
->>  void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->>  {
->>      VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
->>      GArray *table_offsets;
->> -    unsigned dsdt, rsdt;
->> +    unsigned dsdt, xsdt;
->>      GArray *tables_blob = tables->table_data;
->>  
->>      table_offsets = g_array_new(false, true /* clear */,
->> @@ -817,12 +846,12 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->>          build_iort(tables_blob, tables->linker);
->>      }
->>  
->> -    /* RSDT is pointed to by RSDP */
->> -    rsdt = tables_blob->len;
->> -    build_rsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
->> +    /* XSDT is pointed to by RSDP */
->> +    xsdt = tables_blob->len;
->> +    build_xsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
->>  
->>      /* RSDP is in FSEG memory, so allocate it separately */
->> -    build_rsdp(tables->rsdp, tables->linker, rsdt);
->> +    build_rsdp(tables->rsdp, tables->linker, xsdt);
->>  
->>      /* Cleanup memory that's no longer used. */
->>      g_array_free(table_offsets, true);
->> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
->> index 4cc3630e613e..bf37acf4c4c6 100644
->> --- a/include/hw/acpi/acpi-defs.h
->> +++ b/include/hw/acpi/acpi-defs.h
->> @@ -238,6 +238,17 @@ struct AcpiRsdtDescriptorRev1
->>  typedef struct AcpiRsdtDescriptorRev1 AcpiRsdtDescriptorRev1;
->>  
->>  /*
->> + * ACPI 2.0 eXtended System Description Table (XSDT)
->> + */
->> +struct AcpiXsdtDescriptorRev2
->> +{
->> +    ACPI_TABLE_HEADER_DEF       /* ACPI common table header */
->> +    uint64_t table_offset_entry[0];  /* Array of pointers to other */
->> +    /* ACPI tables */
->> +} QEMU_PACKED;
->> +typedef struct AcpiXsdtDescriptorRev2 AcpiXsdtDescriptorRev2;
->> +
->> +/*
->>   * ACPI 1.0 Firmware ACPI Control Structure (FACS)
->>   */
->>  struct AcpiFacsDescriptorRev1
->> -- 
->> 2.9.3
->>
->>
-> 
-> Otherwise
-> 
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1635339
 
-Great, I didn't want to be the first one to provide public feedback. :)
+Title:
+  qxl_pre_save assertion failure on vm "save"
 
-Personally I'm fine if we keep the XSDT generation local to
-"hw/arm/virt-acpi-build.c" for now, and we upstream it to
-"hw/acpi/aml-build.c" later (for example when i386 actually puts it to
-use -- which shouldn't be that far out, AIUI, since Phil will probably
-need XSDT for OSX guests). However, I also wouldn't mind if the XSDT
-builder were moved to "hw/acpi/aml-build.c" right now.
+Status in QEMU:
+  New
 
-So one way or another,
+Bug description:
+  When I try and save my Windows 10 VM, I see an assertion failure, and
+  the machine is shut down.
 
-Acked-by: Laszlo Ersek <lersek@redhat.com>
+  I see the following in the log:
 
-Thanks
-Laszlo
+  main_channel_handle_parsed: agent start
+  qemu-system-x86_64: /build/qemu-Zwynhi/qemu-2.5+dfsg/hw/display/qxl.c:210=
+1: qxl_pre_save: Assertion `d->last_release_offset < d->vga.vram_size' fail=
+ed.
+  2016-10-20 11:52:42.713+0000: shutting down
+
+  Please let me know what other information would be relevant!
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1635339/+subscriptions
