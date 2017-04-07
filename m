@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwc5r-0006aD-9J
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 18:11:00 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cwcFX-0007pO-7x
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 18:21:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwc5n-0001Ic-VC
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 18:10:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54829)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cwc5n-0001IT-PV
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 18:10:55 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cwc5l-0002mb-At
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 22:10:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4A3C92E80C7
-	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 22:10:53 +0000 (UTC)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cwcFU-0004hG-DC
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 18:20:59 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Fri,  7 Apr 2017 19:20:12 -0300
+Message-Id: <20170407222016.15308-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Apr 2017 22:01:12 -0000
-From: Roger Lawhorn <rll@twc.com>
-Reply-To: Bug 1680679 <1680679@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170407032144.12640.21952.malonedeb@gac.canonical.com>
-Message-Id: <20170407220112.31085.90563.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1680679] Re: qemu cannot run twice
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 0/4] 3 easy-to-fix clang warnings,
+ 1 error code fixed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,123 +25,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-It works using seabios. I assume that the nvidia driver cannot see
-optimus, and expect an intel card also, unless I use OVMF. I do know
-that you cannot run off the intel card in windows. It's a no-no. Thanks
-for the bios tip. Maybe I can hide the optimus feature from OVMF and
-windows.
+This patchset fixes three easy-to-fix unrelated clang warnings, so it was
+probably better to send them separately the first time.
 
--- =
+v2:
+    - hw/usb/dev-smartcard-reader.c: The first patch was treating NULL and 0 as
+      errors but those values are legal in some cases, i.e. no (virtual)
+      smartcard inserted into the card reader (Gerd Hoffmann's review).
+    - device_tree.c: Added Marc-André Lureau's Reviewed-by.
+    - qga/commands-posix.c: Added a commit to improve failed operation, as
+      suggested by Michael Roth.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1680679
+Philippe Mathieu-Daudé (4):
+  usb-ccid: make ccid_write_data_block() cope with null buffers
+  device_tree: fix compiler warnings (clang 5)
+  qga: fix compiler warnings (clang 5)
+  qga: improve error handling in transfer_memory_block
 
-Title:
-  qemu cannot run twice
+ device_tree.c                 |  1 +
+ hw/usb/dev-smartcard-reader.c |  5 ++++-
+ qga/commands-posix.c          | 11 ++++++++---
+ 3 files changed, 13 insertions(+), 4 deletions(-)
 
-Status in QEMU:
-  Invalid
-
-Bug description:
-  After using qemu with gpu passthrough and then shutting down windows 7 pr=
-operly I cannot boot windows 7 a second time.
-  Only a full reboot of linux fixes this issue.
-  Qemu appears to corrupt something in linux when exiting.
-  I get no error messages but windows 7 never finishes booting during the 2=
-nd try.
-  Apparently I do try to run vfiobind each time the script is run.
-  Wondering if rerunning vfiobind can cause an issue?
-
-  =
-
-  My specs:
-  -------------------------------------------------------------------------=
-----------------
-  System:    Host: GT70-2PE Kernel: 4.5.4-040504-generic x86_64 (64 bit gcc=
-: 5.3.1)
-             Desktop: Cinnamon 3.2.7 (Gtk 3.18.9) Distro: Linux Mint 18.1 S=
-erena
-  Machine:   Mobo: Micro-Star model: MS-1763 v: REV:0.C Bios: American Mega=
-trends v: E1763IMS.51B date: 01/29/2015
-  CPU:       Quad core Intel Core i7-4810MQ (-HT-MCP-) cache: 6144 KB
-             flags: (lm nx sse sse2 sse3 sse4_1 sse4_2 ssse3 vmx) bmips: 22=
-347
-             clock speeds: max: 2801 MHz 1: 2801 MHz 2: 2801 MHz 3: 2801 MH=
-z 4: 2801 MHz 5: 2801 MHz 6: 2801 MHz
-             7: 2801 MHz 8: 2801 MHz
-  Graphics:  Card-1: Intel 4th Gen Core Processor Integrated Graphics Contr=
-oller bus-ID: 00:02.0
-             Card-2: NVIDIA GK104M [GeForce GTX 880M] bus-ID: 01:00.0
-             Display Server: X.Org 1.18.4 drivers: intel (unloaded: fbdev,v=
-esa)
-             Resolution: 1920x1080@60.02hz, 1920x1080@60.00hz
-             GLX Renderer: Mesa DRI Intel Haswell Mobile GLX Version: 3.0 M=
-esa 12.0.6 Direct Rendering: Yes
-
-  =
-
-  My script:
-  -------------------------------------------------------------------------=
-------------------
-  #!/bin/bash
-
-  cd ~/qemu
-  sudo ./up.sh tap0
-
-  configfile=3D~/qemu/vfio-pci1.cfg
-
-  vfiobind() {
-      dev=3D"$1"
-          vendor=3D$(cat /sys/bus/pci/devices/$dev/vendor)
-          device=3D$(cat /sys/bus/pci/devices/$dev/device)
-          if [ -e /sys/bus/pci/devices/$dev/driver ]; then
-                  echo $dev > /sys/bus/pci/devices/$dev/driver/unbind
-          fi
-          echo $vendor $device > /sys/bus/pci/drivers/vfio-pci/new_id
-
-  }
-
-  modprobe vfio-pci
-
-  cat $configfile | while read line;do
-      echo $line | grep ^# >/dev/null 2>&1 && continue
-          vfiobind $line
-  done
-
-  sudo qemu-system-x86_64 -machine type=3Dq35,accel=3Dkvm -cpu host,kvm=3Do=
-ff \
-  -smp 8,sockets=3D1,cores=3D4,threads=3D2 \
-  -bios /usr/share/seabios/bios.bin \
-  -serial none \
-  -parallel none \
-  -vga none \
-  -m 4G \
-  -mem-path /run/hugepages/kvm \
-  -mem-prealloc \
-  -balloon none \
-  -rtc clock=3Dhost,base=3Dlocaltime \
-  -device ioh3420,bus=3Dpcie.0,addr=3D1c.0,multifunction=3Don,port=3D1,chas=
-sis=3D1,id=3Droot.1 \
-  -device vfio-pci,host=3D01:00.0,bus=3Droot.1,addr=3D00.0,multifunction=3D=
-on,x-vga=3Don \
-  -device virtio-scsi-pci,id=3Dscsi \
-  -drive id=3Ddisk0,if=3Dvirtio,cache=3Dnone,format=3Draw,file=3D/home/dad/=
-qemu/windows7.img \
-  -drive file=3D/home/dad/1TB-Backup/Iso/SP1ForWin7.iso,id=3Disocd,format=
-=3Draw,if=3Dnone -device scsi-cd,drive=3Disocd \
-  -net nic -net tap,ifname=3Dtap0,script=3Dno,downscript=3Dno \
-  -usbdevice host:413c:a503 \
-  -usbdevice host:13fe:3100 \
-  -usbdevice host:0bc2:ab21 \
-  -boot menu=3Don \
-  -boot order=3Dc
-
-  sudo ./down.sh tap0
-
-  exit 0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1680679/+subscriptions
+-- 
+2.11.0
