@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cwQvy-0006YT-IT
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 06:16:08 -0400
+	(envelope-from <kwolf@redhat.com>) id 1cwR4u-0007vA-Ce
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 06:25:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cwQvx-00049d-JG
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 06:16:02 -0400
-Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:36154)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cwQvx-00048g-CL
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 06:16:01 -0400
-Received: by mail-wr0-x232.google.com with SMTP id c55so26945497wrc.3
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 03:16:00 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1cwR4s-0008PQ-Ub
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 06:25:16 -0400
+Date: Fri, 7 Apr 2017 12:25:05 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170407102505.GB4716@noname.redhat.com>
+References: <1488314205-16264-1-git-send-email-kwolf@redhat.com>
+	<1488314205-16264-44-git-send-email-kwolf@redhat.com>
+	<20170406205939.GA28584@redhat.com>
+	<a010df05-e986-2142-3196-31f549558511@redhat.com>
+	<20170406211537.GR30620@redhat.com>
+	<616fdb8b-2c41-9718-d5b3-e335e78745e4@redhat.com>
+	<20170406212936.GA28793@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170406220934.6155.13106.stgit@gimli.home>
-References: <20170406220934.6155.13106.stgit@gimli.home>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 7 Apr 2017 11:15:39 +0100
-Message-ID: <CAFEAcA-+_VL49nyT-hzPkoW_PTVmYaCN3Es-VAhgRzCNrwj1kg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL for-2.9 0/1] VFIO fixes 2017-04-06
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170406212936.GA28793@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 43/46] block: Assertions for write
+ permissions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +29,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On 6 April 2017 at 23:11, Alex Williamson <alex.williamson@redhat.com> wrote:
-> The following changes since commit 54d689988c847271d87b3eb113712147129fb811:
->
->   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into
-> staging (2017-04-06 09:27:49 +0100)
->
-> are available in the git repository at:
->
->
->   git://github.com/awilliam/qemu-vfio.git tags/vfio-updates-20170406.0
->
-> for you to fetch changes up to 8f419c5b43b988df4ef11315aeb8524e50c99687:
->
->   vfio/pci-quirks: Exclude non-ioport BAR from NVIDIA quirk (2017-04-06
-> 16:03:26 -0600)
->
-> ----------------------------------------------------------------
-> VFIO fixes 2017-04-06
->
->  - Extra test for NVIDIA BAR5 quirk to avoid segfault (Alex Williamson)
->
-> ----------------------------------------------------------------
-> Alex Williamson (1):
->       vfio/pci-quirks: Exclude non-ioport BAR from NVIDIA quirk
->
->  hw/vfio/pci-quirks.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+Am 06.04.2017 um 23:29 hat Richard W.M. Jones geschrieben:
+> On Thu, Apr 06, 2017 at 04:23:19PM -0500, Eric Blake wrote:
+> > On 04/06/2017 04:15 PM, Richard W.M. Jones wrote:
+> > 
+> > >>>> +++ b/block/io.c
+> > >>>> @@ -945,6 +945,8 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
+> > >>>>      size_t skip_bytes;
+> > >>>>      int ret;
+> > >>>>  
+> > >>>> +    assert(child->perm & (BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE));
+> > >>>
+> > 
+> > > https://bugzilla.redhat.com/show_bug.cgi?id=1439922
+> > > 
+> > > There is also a minimal reproducer in comment 2.
+> > 
+> > If it helps, backtrace shows:
+> > 
+> > #4  0x0000555555c09f10 in bdrv_co_do_copy_on_readv
+> > (child=0x555556990180, offset=0, bytes=512, qiov=0x7fffffffd0c0) at
+> > block/io.c:948
+> > #5  0x0000555555c0a33d in bdrv_aligned_preadv (child=0x555556990180,
+> > req=0x7fffb6dffec0, offset=0, bytes=512, align=1, qiov=0x7fffffffd0c0,
+> > flags=1)
+> >     at block/io.c:1058
+> > #6  0x0000555555c0a8c3 in bdrv_co_preadv (child=0x555556990180,
+> > offset=0, bytes=512, qiov=0x7fffffffd0c0, flags=BDRV_REQ_COPY_ON_READ)
+> > at block/io.c:1166
+> > #7  0x0000555555bf7ccf in blk_co_preadv (blk=0x555556a2bc20, offset=0,
+> > bytes=512, qiov=0x7fffffffd0c0, flags=0) at block/block-backend.c:927
+> > #8  0x0000555555bf7e19 in blk_read_entry (opaque=0x7fffffffd0e0)
+> >     at block/block-backend.c:974
+> > #9  0x0000555555cc3015 in coroutine_trampoline (i0=1485566720, i1=21845)
+> >     at util/coroutine-ucontext.c:79
+> 
+> The patch that fixes this is simply:
+> 
+> diff --git a/block/io.c b/block/io.c
+> index 2709a7007f..4f1a730e45 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -945,8 +945,6 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
+>      size_t skip_bytes;
+>      int ret;
+>  
+> -    assert(child->perm & (BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE));
+> -
+>      /* Cover entire cluster so no additional backing file I/O is required when
+>       * allocating cluster in the image file.
+>       */
+> 
+> It has no ill effects that I can see, and fixes the libguestfs test
+> suite, but I'm assuming the assert was added for a reason so I'm not
+> proposing this as a patch.
 
-Applied, thanks.
+I think for the moment this is actually the best solution. Copy on read
+is currently implemented in a way that we can't do things properly with
+respect to permissions, so we need to bypass the permission system.
 
--- PMM
+We can't require the callers to have write permissions for a read
+request, this would have to be handled internally by the COR code. As
+long as it is still implemented directly in block/io.c instead of a
+separate filter driver, the COR code doesn't have a BdrvChild and
+therefore can't have its own set of permissions on the node.
+
+Kevin
