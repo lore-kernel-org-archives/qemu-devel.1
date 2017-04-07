@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33593)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwUzS-0000cE-Mr
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:35:55 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1cwXKv-0006sa-Si
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 13:06:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwUzO-0003nu-Fj
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:35:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51256)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cwUzO-0003n7-4N
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:35:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cwUzM-0000VA-8M
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 14:35:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 11D342E80CC
-	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 14:35:46 +0000 (UTC)
+	(envelope-from <dgilbert@redhat.com>) id 1cwXKr-0006Mh-Rq
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 13:06:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44578)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cwXKr-0006M4-Iw
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 13:06:09 -0400
+Date: Fri, 7 Apr 2017 18:06:04 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170407170600.GD2623@work-vm>
+References: <1487734936-43472-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1487734936-43472-8-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Apr 2017 14:16:41 -0000
-From: Marcin Mielniczuk <marmistrzmar@gmail.com>
-Reply-To: Bug 1481272 <1481272@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150804095638.25012.1470.malonedeb@chaenomeles.canonical.com>
-Message-Id: <20170407141641.30529.51416.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1481272] Re: main-loop: WARNING: I/O thread spun
- for 1000 iterations
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1487734936-43472-8-git-send-email-zhang.zhanghailiang@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH 07/15] COLO: Load PVM's dirty pages into
+ SVM's RAM cache temporarily
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,43 +28,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Cc: qemu-devel@nongnu.org, zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, Juan Quintela <quintela@redhat.com>
 
-I experience the same while running Minix guest under an Arch Linux
-host. Sometimes during heavy I/O the whole machine freezes with this
-error message.
+* zhanghailiang (zhang.zhanghailiang@huawei.com) wrote:
+> We should not load PVM's state directly into SVM, because there maybe some
+> errors happen when SVM is receving data, which will break SVM.
+> 
+> We need to ensure receving all data before load the state into SVM. We use
+> an extra memory to cache these data (PVM's ram). The ram cache in secondary side
+> is initially the same as SVM/PVM's memory. And in the process of checkpoint,
+> we cache the dirty pages of PVM into this ram cache firstly, so this ram cache
+> always the same as PVM's memory at every checkpoint, then we flush this cached ram
+> to SVM after we receive all PVM's state.
 
--- =
+You're probably going to find this interesting to merge with Juan's recent RAM block series.
+Probably not too hard, but he's touching a lot of the same code and rearranging things.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1481272
+Dave
 
-Title:
-  main-loop: WARNING: I/O thread spun for 1000 iterations
 
-Status in QEMU:
-  New
-
-Bug description:
-  I compile the latest qemu to launch a VM but the monitor output the
-  "main-loop: WARNING: I/O thread spun for 1000 iterations".
-
-  # /usr/local/bin/qemu-system-x86_64 -name rhel6 -S -no-kvm -m 1024M -real=
-time mlock=3Doff -smp 1,sockets=3D1,cores=3D1,threads=3D1 -uuid c9dd2a5c-40=
-f2-fd3d-3c54-9cd84f8b9174 -rtc base=3Dutc  -drive file=3D/home/samba-share/=
-ubuntu.img,if=3Dnone,id=3Ddrive-virtio-disk0,format=3Dqcow2,cache=3Dnone -d=
-evice virtio-blk-pci,bus=3Dpci.0,addr=3D0x4,drive=3Ddrive-virtio-disk0,id=
-=3Ddisk,serial=3D425618d4-871f-4021-bc5d-bcd7f1b5ca9c,bootindex=3D0 -vnc :1=
- -boot menu=3Don -monitor stdio
-  QEMU 2.3.93 monitor - type 'help' for more information
-  (qemu) c
-  (qemu) main-loop: WARNING: I/O thread spun for 1000 iterations           =
-    <-----------------------
-
-  qemu]# git branch -v
-  * master               e95edef Merge remote-tracking branch 'remotes/ssta=
-bellini/tags/xen-migration-2.4-tag' into staging
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1481272/+subscriptions
+> Cc: Juan Quintela <quintela@redhat.com>
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  include/exec/ram_addr.h       |  1 +
+>  include/migration/migration.h |  4 +++
+>  migration/colo.c              | 14 +++++++++
+>  migration/ram.c               | 73 ++++++++++++++++++++++++++++++++++++++++++-
+>  4 files changed, 91 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+> index 3e79466..44e1190 100644
+> --- a/include/exec/ram_addr.h
+> +++ b/include/exec/ram_addr.h
+> @@ -27,6 +27,7 @@ struct RAMBlock {
+>      struct rcu_head rcu;
+>      struct MemoryRegion *mr;
+>      uint8_t *host;
+> +    uint8_t *colo_cache; /* For colo, VM's ram cache */
+>      ram_addr_t offset;
+>      ram_addr_t used_length;
+>      ram_addr_t max_length;
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index 1735d66..93c6148 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -379,4 +379,8 @@ int ram_save_queue_pages(MigrationState *ms, const char *rbname,
+>  PostcopyState postcopy_state_get(void);
+>  /* Set the state and return the old state */
+>  PostcopyState postcopy_state_set(PostcopyState new_state);
+> +
+> +/* ram cache */
+> +int colo_init_ram_cache(void);
+> +void colo_release_ram_cache(void);
+>  #endif
+> diff --git a/migration/colo.c b/migration/colo.c
+> index 1e3e975..edb7f00 100644
+> --- a/migration/colo.c
+> +++ b/migration/colo.c
+> @@ -551,6 +551,7 @@ void *colo_process_incoming_thread(void *opaque)
+>      uint64_t total_size;
+>      uint64_t value;
+>      Error *local_err = NULL;
+> +    int ret;
+>  
+>      qemu_sem_init(&mis->colo_incoming_sem, 0);
+>  
+> @@ -572,6 +573,12 @@ void *colo_process_incoming_thread(void *opaque)
+>       */
+>      qemu_file_set_blocking(mis->from_src_file, true);
+>  
+> +    ret = colo_init_ram_cache();
+> +    if (ret < 0) {
+> +        error_report("Failed to initialize ram cache");
+> +        goto out;
+> +    }
+> +
+>      bioc = qio_channel_buffer_new(COLO_BUFFER_BASE_SIZE);
+>      fb = qemu_fopen_channel_input(QIO_CHANNEL(bioc));
+>      object_unref(OBJECT(bioc));
+> @@ -705,11 +712,18 @@ out:
+>      if (fb) {
+>          qemu_fclose(fb);
+>      }
+> +    /*
+> +     * We can ensure BH is hold the global lock, and will join COLO
+> +     * incoming thread, so here it is not necessary to lock here again,
+> +     * Or there will be a deadlock error.
+> +     */
+> +    colo_release_ram_cache();
+>  
+>      /* Hope this not to be too long to loop here */
+>      qemu_sem_wait(&mis->colo_incoming_sem);
+>      qemu_sem_destroy(&mis->colo_incoming_sem);
+>      /* Must be called after failover BH is completed */
+> +
+>      if (mis->to_src_file) {
+>          qemu_fclose(mis->to_src_file);
+>      }
+> diff --git a/migration/ram.c b/migration/ram.c
+> index f289fcd..b588990 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -219,6 +219,7 @@ static RAMBlock *last_sent_block;
+>  static ram_addr_t last_offset;
+>  static QemuMutex migration_bitmap_mutex;
+>  static uint64_t migration_dirty_pages;
+> +static bool ram_cache_enable;
+>  static uint32_t last_version;
+>  static bool ram_bulk_stage;
+>  
+> @@ -2227,6 +2228,20 @@ static inline void *host_from_ram_block_offset(RAMBlock *block,
+>      return block->host + offset;
+>  }
+>  
+> +static inline void *colo_cache_from_block_offset(RAMBlock *block,
+> +                                                 ram_addr_t offset)
+> +{
+> +    if (!offset_in_ramblock(block, offset)) {
+> +        return NULL;
+> +    }
+> +    if (!block->colo_cache) {
+> +        error_report("%s: colo_cache is NULL in block :%s",
+> +                     __func__, block->idstr);
+> +        return NULL;
+> +    }
+> +    return block->colo_cache + offset;
+> +}
+> +
+>  /*
+>   * If a page (or a whole RDMA chunk) has been
+>   * determined to be zero, then zap it.
+> @@ -2542,7 +2557,12 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>                       RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE)) {
+>              RAMBlock *block = ram_block_from_stream(f, flags);
+>  
+> -            host = host_from_ram_block_offset(block, addr);
+> +            /* After going into COLO, we should load the Page into colo_cache */
+> +            if (ram_cache_enable) {
+> +                host = colo_cache_from_block_offset(block, addr);
+> +            } else {
+> +                host = host_from_ram_block_offset(block, addr);
+> +            }
+>              if (!host) {
+>                  error_report("Illegal RAM offset " RAM_ADDR_FMT, addr);
+>                  ret = -EINVAL;
+> @@ -2637,6 +2657,57 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>      return ret;
+>  }
+>  
+> +/*
+> + * colo cache: this is for secondary VM, we cache the whole
+> + * memory of the secondary VM, it will be called after first migration.
+> + */
+> +int colo_init_ram_cache(void)
+> +{
+> +    RAMBlock *block;
+> +
+> +    rcu_read_lock();
+> +    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+> +        block->colo_cache = qemu_anon_ram_alloc(block->used_length, NULL);
+> +        if (!block->colo_cache) {
+> +            error_report("%s: Can't alloc memory for COLO cache of block %s,"
+> +                         "size 0x" RAM_ADDR_FMT, __func__, block->idstr,
+> +                         block->used_length);
+> +            goto out_locked;
+> +        }
+> +        memcpy(block->colo_cache, block->host, block->used_length);
+> +    }
+> +    rcu_read_unlock();
+> +    ram_cache_enable = true;
+> +    return 0;
+> +
+> +out_locked:
+> +    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+> +        if (block->colo_cache) {
+> +            qemu_anon_ram_free(block->colo_cache, block->used_length);
+> +            block->colo_cache = NULL;
+> +        }
+> +    }
+> +
+> +    rcu_read_unlock();
+> +    return -errno;
+> +}
+> +
+> +void colo_release_ram_cache(void)
+> +{
+> +    RAMBlock *block;
+> +
+> +    ram_cache_enable = false;
+> +
+> +    rcu_read_lock();
+> +    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+> +        if (block->colo_cache) {
+> +            qemu_anon_ram_free(block->colo_cache, block->used_length);
+> +            block->colo_cache = NULL;
+> +        }
+> +    }
+> +    rcu_read_unlock();
+> +}
+> +
+>  static SaveVMHandlers savevm_ram_handlers = {
+>      .save_live_setup = ram_save_setup,
+>      .save_live_iterate = ram_save_iterate,
+> -- 
+> 1.8.3.1
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
