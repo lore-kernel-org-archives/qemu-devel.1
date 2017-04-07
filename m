@@ -1,40 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cwMfB-0000kd-0N
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 01:42:25 -0400
+	(envelope-from <clg@kaod.org>) id 1cwN4B-0005C7-Fz
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 02:08:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cwMf7-0003mh-Vr
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 01:42:25 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52301
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cwMf7-0003mM-Pe
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 01:42:21 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v375ce1Q103669
-	for <qemu-devel@nongnu.org>; Fri, 7 Apr 2017 01:42:20 -0400
-Received: from e28smtp03.in.ibm.com (e28smtp03.in.ibm.com [125.16.236.3])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 29p3dc423q-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 01:42:20 -0400
-Received: from localhost
-	by e28smtp03.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Fri, 7 Apr 2017 11:12:17 +0530
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <20170407052348.GA27571@umbus>
+	(envelope-from <clg@kaod.org>) id 1cwN46-0000g5-Gb
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 02:08:15 -0400
+Received: from 1.mo179.mail-out.ovh.net ([178.33.111.220]:36217)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cwN46-0000fY-AZ
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 02:08:10 -0400
+Received: from player716.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 9714D3517E
+	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 08:08:07 +0200 (CEST)
 References: <20170406102249.20383-1-nikunj@linux.vnet.ibm.com>
-	<20170406102249.20383-2-nikunj@linux.vnet.ibm.com>
-	<20170407052348.GA27571@umbus>
-Date: Fri, 07 Apr 2017 11:12:08 +0530
+	<6029cef4-0a41-cde0-b3c9-6b6ad9bde572@kaod.org>
+	<87vaqgrds2.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <a74b9ee8-1b9d-244b-8046-b116fedb55f1@kaod.org>
+Date: Fri, 7 Apr 2017 08:07:57 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Message-Id: <87y3vcdb9r.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH RFC v1 1/3] target/ppc: Emulate LL/SC using
- cmpxchg helpers
+In-Reply-To: <87vaqgrds2.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH RFC v1 0/3] Enable MTTCG on PPC64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,46 +31,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, rth@twiddle.net, qemu-devel@nongnu.org, alex.bennee@linaro.org, programmingkidx@gmail.com, bharata@linux.vnet.ibm.com
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
+Cc: programmingkidx@gmail.com, alex.bennee@linaro.org, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
-David Gibson <david@gibson.dropbear.id.au> writes:
+On 04/07/2017 07:24 AM, Nikunj A Dadhania wrote:
+> C=C3=A9dric Le Goater <clg@kaod.org> writes:
+>=20
+>> Hello Nikunj,
+>>
+>> On 04/06/2017 12:22 PM, Nikunj A Dadhania wrote:
+>>> The series enables Multi-Threaded TCG on PPC64
+>>>
+>>> Patch 01: Use atomic_cmpxchg in store conditional
+>>>       02: Handle first write to page during atomic operation
+>>>       03: Generate memory barriers for sync/isync and load/store cond=
+itional
+>>>
+>>> Patches are based on ppc-for-2.10
+>>>
+>>> Tested using following:
+>>> ./ppc64-softmmu/qemu-system-ppc64 -cpu POWER8 -vga none -nographic -m=
+achine pseries,usb=3Doff -m 2G  -smp 8,cores=3D8,threads=3D1 -accel tcg,t=
+hread=3Dmulti  f23.img
+>>
+>> I tried it with a Ubuntu 16.04.2 guest using stress --cpu 8. It looked=
+=20
+>> good : the CPU usage of QEMU reached 760% on the host.
+>=20
+> Cool.
+>=20
+>>> Todo:
+>>> * Enable other machine types and PPC32.
+>>
+>> I am quite ignorant on the topic.
+>> Have you looked at what it would take to emulate support of the HW
+>> threads ?
+>=20
+> We would need to implement msgsndp (doorbell support for IPI between
+> threads of same core)
 
-> [ Unknown signature status ]
-> On Thu, Apr 06, 2017 at 03:52:47PM +0530, Nikunj A Dadhania wrote:
->> Emulating LL/SC with cmpxchg is not correct, since it can suffer from
->> the ABA problem. However, portable parallel code is written assuming
->> only cmpxchg which means that in practice this is a viable alternative.
->> 
->> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
->> ---
->>  target/ppc/translate.c | 24 +++++++++++++++++++++---
->>  1 file changed, 21 insertions(+), 3 deletions(-)
->> 
->> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
->> index b6abc60..a9c733d 100644
->> --- a/target/ppc/translate.c
->> +++ b/target/ppc/translate.c
->> @@ -73,6 +73,7 @@ static TCGv cpu_cfar;
->>  #endif
->>  static TCGv cpu_xer, cpu_so, cpu_ov, cpu_ca, cpu_ov32, cpu_ca32;
->>  static TCGv cpu_reserve;
->> +static TCGv cpu_reserve_val;
->>  static TCGv cpu_fpscr;
->>  static TCGv_i32 cpu_access_type;
->>  
->> @@ -181,6 +182,9 @@ void ppc_translate_init(void)
->>      cpu_reserve = tcg_global_mem_new(cpu_env,
->>                                       offsetof(CPUPPCState, reserve_addr),
->>                                       "reserve_addr");
->> +    cpu_reserve_val = tcg_global_mem_new(cpu_env,
->> +                                     offsetof(CPUPPCState, reserve_val),
->> +                                     "reserve_val");
->
-> I notice that lqarx is not updated.  Does that matter?
+ok. I get it. Thanks,
 
-Thats correct, I haven't touched that yet. Most of the locks are
-implemented using lwarx/stwcx. 
+>> and the PowerNV machine ?
+>=20
+> Haven't tried it, should work. Just give a shot, let me know if you see=
+ problems.
 
-Regards
-Nikunj
+sure. pnv is still on 2.9, so I will rebase on 2.10, merge your=20
+patches  and tell you.
+
+Thanks,
+
+C.=20
