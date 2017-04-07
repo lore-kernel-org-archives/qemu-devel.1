@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwPwD-0002dK-Pv
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:12:15 -0400
+	(envelope-from <stefanha@redhat.com>) id 1cwPx9-0003Dq-FN
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:13:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwPwA-0002SI-M2
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:12:13 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34895)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cwPwA-0002S4-H6
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:12:10 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cwPw8-00073A-8j
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 09:12:08 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 70EA92E81FB
-	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 09:12:01 +0000 (UTC)
+	(envelope-from <stefanha@redhat.com>) id 1cwPx8-0002l7-Ep
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:13:11 -0400
+Date: Fri, 7 Apr 2017 10:13:00 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170407091300.GG13602@stefanha-x1.localdomain>
+References: <cover.1491416061.git.jcody@redhat.com>
+	<fcdfe9c672ecdb179264187e0671b5432fced4c4.1491416061.git.jcody@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Apr 2017 08:56:22 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1635339 <1635339@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20161020160532.23339.63373.malonedeb@soybean.canonical.com>
-Message-Id: <20170407085622.31539.58601.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1635339] Re: qxl_pre_save assertion failure on vm
- "save"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="9Iq5ULCa7nGtWwZS"
+Content-Disposition: inline
+In-Reply-To: <fcdfe9c672ecdb179264187e0671b5432fced4c4.1491416061.git.jcody@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 2/9] block: do not set BDS
+ read_only if copy_on_read enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,36 +25,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jsnow@redhat.com, kwolf@redhat.com
 
-I can see a bunch of similar looking failures in Fedora's automatic
-backtrace stats system
 
--- =
+--9Iq5ULCa7nGtWwZS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1635339
+On Wed, Apr 05, 2017 at 02:28:44PM -0400, Jeff Cody wrote:
 
-Title:
-  qxl_pre_save assertion failure on vm "save"
+Minor comments but:
 
-Status in QEMU:
-  New
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Bug description:
-  When I try and save my Windows 10 VM, I see an assertion failure, and
-  the machine is shut down.
+> diff --git a/block.c b/block.c
+> index 7b4c7ef..f60d5ea 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -192,9 +192,17 @@ void path_combine(char *dest, int dest_size,
+>      }
+>  }
+> =20
+> -void bdrv_set_read_only(BlockDriverState *bs, bool read_only)
+> +int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **err=
+p)
+>  {
+> +    /* Do not set read_only if copy_on_read is enabled */
+> +    if (bs->copy_on_read && read_only) {
+> +        error_setg(errp, "Cannot set node '%s' to r/o while COW enabled",
 
-  I see the following in the log:
+Users might be puzzled by "COR".  The -drive option is called
+"copy-on-read" so spelling it out is clearer than using an acronym.
 
-  main_channel_handle_parsed: agent start
-  qemu-system-x86_64: /build/qemu-Zwynhi/qemu-2.5+dfsg/hw/display/qxl.c:210=
-1: qxl_pre_save: Assertion `d->last_release_offset < d->vga.vram_size' fail=
-ed.
-  2016-10-20 11:52:42.713+0000: shutting down
+> @@ -1173,7 +1171,18 @@ static int vvfat_open(BlockDriverState *bs, QDict =
+*options, int flags,
+>          if (ret < 0) {
+>              goto fail;
+>          }
+> -        bdrv_set_read_only(bs, false);
+> +        ret =3D bdrv_set_read_only(bs, false, &local_err);
+> +        if (ret < 0) {
+> +            error_propagate(errp, local_err);
+> +            goto fail;
+> +        }
 
-  Please let me know what other information would be relevant!
+read_only =3D false by default.  There's no need to set it now that you've
+moved the bdrv_set_read_only(bs, true) call.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1635339/+subscriptions
+--9Iq5ULCa7nGtWwZS
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJY51gcAAoJEJykq7OBq3PIo6AH/i8748Q0ovY0QB7BEIdhur9H
+ZlXAeTe0mDJkdkYzXSBDzY4BzRu5uVGoL8I8D6PlhZxN5tYgERA4enZHY4Y+f6ry
+hIMBRvQEPa+TdMMK5K+Il0B/Pkgo3TlmM2lksdnT5/18u/XCaZLshkLc77dF5qK7
+rrUE2q/AhJYDaW1UTznhfg+zx6SF1l8nW9yCXqGKagChuQRWCIVYrOVPIuiveCj1
+z4DR4xIe4ZVOBKUhmuhbEnl7MxDHDl/KmaK1I22r+tWKCuD+IvhK2zhjAEFFO1cL
+OUbIMA+ewmsMjPN5HUBO3eQ8WhPQ08d4kgZU6DUHG7a4KJFRoccqqazEoYmfXDE=
+=pY7c
+-----END PGP SIGNATURE-----
+
+--9Iq5ULCa7nGtWwZS--
