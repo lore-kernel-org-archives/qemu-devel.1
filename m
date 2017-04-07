@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwUQQ-0007T8-KL
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:59:43 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cwUSP-0000cC-PF
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:01:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwUQM-00034M-MH
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:59:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42046)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cwUQM-00033G-G7
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:59:38 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cwUQL-0002IL-9n
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 13:59:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3BC112E80C3
-	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 13:59:37 +0000 (UTC)
+	(envelope-from <mreitz@redhat.com>) id 1cwUSO-0005Ts-R4
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:01:45 -0400
+References: <1491561165-12415-1-git-send-email-kwolf@redhat.com>
+	<71657ad0-5d2f-5d26-1c42-854e50e6786c@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <1833e44f-e221-0c10-0e99-d6a499c5eb83@redhat.com>
+Date: Fri, 7 Apr 2017 16:01:35 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Apr 2017 13:46:44 -0000
-From: Thomas Huth <1031955@bugs.launchpad.net>
-Reply-To: Bug 1031955 <1031955@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20120801215949.18709.64548.malonedeb@chaenomeles.canonical.com>
-Message-Id: <20170407134644.1773.94871.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1031955] Re: qemu-system-arm -M lm3s811evb fails
+In-Reply-To: <71657ad0-5d2f-5d26-1c42-854e50e6786c@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Bj4GJfRBVkr4c1uoPqIA8GXijDFTDM1kh"
+Subject: Re: [Qemu-devel] [PATCH for-2.9] block: Don't check permissions for
+ copy on read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,68 +25,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: rjones@redhat.com, qemu-devel@nongnu.org
 
-Triaging old bug tickets ... can you still reproduce this issue with the
-latest version of QEMU (version 2.9)?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Bj4GJfRBVkr4c1uoPqIA8GXijDFTDM1kh
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org
+Cc: rjones@redhat.com, qemu-devel@nongnu.org
+Message-ID: <1833e44f-e221-0c10-0e99-d6a499c5eb83@redhat.com>
+Subject: Re: [PATCH for-2.9] block: Don't check permissions for copy on read
+References: <1491561165-12415-1-git-send-email-kwolf@redhat.com>
+ <71657ad0-5d2f-5d26-1c42-854e50e6786c@redhat.com>
+In-Reply-To: <71657ad0-5d2f-5d26-1c42-854e50e6786c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+On 07.04.2017 15:53, Eric Blake wrote:
+> On 04/07/2017 05:32 AM, Kevin Wolf wrote:
+>> The assertion is currently failing. We can't require callers to have
+>> write permissions when all they are doing is a read, so comment it out=
+=2E
+>> Add a FIXME comment in the code so that the check is re-enabled when
+>> copy on read is refactored into its own filter driver.
+>>
+>> Reported-by: Richard W.M. Jones <rjones@redhat.com>
+>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>> ---
+>>  block/io.c | 9 ++++++++-
+>>  1 file changed, 8 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/block/io.c b/block/io.c
+>> index 2709a70..7321dda 100644
+>> --- a/block/io.c
+>> +++ b/block/io.c
+>> @@ -945,7 +945,14 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(=
+BdrvChild *child,
+>>      size_t skip_bytes;
+>>      int ret;
+>> =20
+>> -    assert(child->perm & (BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE))=
+;
+>> +    /* FIXME We cannot require callers to have write permissions when=
+ all they
+>> +     * are doing is a read request. If we did things right, write per=
+missions
+>> +     * would be obtained anyway, but internally by the copy-on-read c=
+ode. As
+>> +     * long as it is implemented here rather than in a separat filter=
+ driver,
+>=20
+> s/separat/separate/
+>=20
+>> +     * the copy-on-read code doesn't have its own BdrvChild, however,=
+ for which
+>> +     * it could request permissions. Therefore we have to bypass the =
+permission
+>> +     * system for the moment. */
+>> +    // assert(child->perm & (BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRIT=
+E));
+>=20
+> Makes checkpatch.pl unhappy - but that's intentional.
 
--- =
+Is it? I don't know. But not that I mind, so for good measure:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1031955
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-Title:
-  qemu-system-arm -M lm3s811evb fails
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Status in QEMU:
-  Incomplete
 
-Bug description:
-  I am trying out examples from StellarisWare.
 
-  When I try the uart_echo example, that initially tries to talk to the =
+--Bj4GJfRBVkr4c1uoPqIA8GXijDFTDM1kh
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  display, I get this:
+-----BEGIN PGP SIGNATURE-----
 
-      $ .../qemu-1.1.1/bin/qemu-system-arm -M lm3s811evb -kernel uart_echo/=
-gcc/uart_echo.bin      =
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljnm78SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A4h0IAK/XtROsnjBuglchBD2KOLrAPXWF+PxL
+pB3HOcCGHrXLkpDUBs4+S74SUm/4hoykiWzuswdKWf2D28X+8xrRcqVCpPcSvVfG
+d9kTK+rS9fH8KeeeZRaLvC4kp7ZGFUEZeZgBb8Ox/jm8bh/KZLnjNKCv+0fZhNQC
+HBMHMCx0dR9+q0AhmNLk+2V5sj54qDr5s5i/ETFmGvlReCxbnjEIkjywbb7F9/O0
+uB6o097KaWI40sbf3Xh8rHw3Q7Hypzu8/h5lPLSY2a92HlByf2y7iYQOAkIkQBzt
+9isdwSLFeY2+etiKTWhCce5LTgGNq/HZ7WN6WVh978m/8h2JIa1abHA=
+=bly7
+-----END PGP SIGNATURE-----
 
-      qemu: hardware error: strllaris_i2c_read: Bad offset 0xfc0
-      =
-
-      CPU #0:
-      R00=3D00000001 R01=3D005b8d80 R02=3D00061a80 R03=3D007a11ff
-      R04=3D40020000 R05=3D005b8d80 R06=3D00000002 R07=3D00000000
-      R08=3D00000000 R09=3D00000000 R10=3D00000000 R11=3D00000000
-      R12=3D00000000 R13=3D200000d4 R14=3D00000995 R15=3D000009cc
-      PSR=3D20000173 --C- T svc32
-      Aborted
-
-  The example is located in boards/ek-lm3s811/uart_echo in the =
-
-  StellarisWare distribution.
-
-  With the latest from git:
-
-      $ .../qemu-git/qemu/bin/qemu-system-arm -M lm3s811evb -kernel uart_ec=
-ho/gcc/uart_echo.bin
-      qemu-system-arm: hw/qdev.c:310: qdev_get_gpio_in: Assertion `n >=3D 0=
- && n < dev->num_gpio_in' failed.
-
-  This however seems to be reported already (Bug #1028260).
-
-  Both versions compiled from sources:
-
-      ./configure --target-list=3Darm-linux-user,arm-softmmu,armeb-linux-
-  user  --enable-sdl --prefix=3D/path/to/...
-
-  Running Ubunti 10.04 with Linux 2.6.32-40-generic-pae.
-
-  /Lars
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1031955/+subscriptions
+--Bj4GJfRBVkr4c1uoPqIA8GXijDFTDM1kh--
