@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cwUF4-0005iW-AJ
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:47:59 -0400
+	(envelope-from <kwolf@redhat.com>) id 1cwUF7-0005n1-7J
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:48:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cwUF3-0003Mh-5m
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:47:58 -0400
+	(envelope-from <kwolf@redhat.com>) id 1cwUF6-0003Pl-9m
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:48:01 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Apr 2017 15:47:36 +0200
-Message-Id: <1491572865-8549-2-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Apr 2017 15:47:39 +0200
+Message-Id: <1491572865-8549-5-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1491572865-8549-1-git-send-email-kwolf@redhat.com>
 References: <1491572865-8549-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 01/10] block: Ignore guest dev permissions
- during incoming migration
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 04/10] block/mirror: Fix use-after-free
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,154 +25,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Usually guest devices don't like other writers to the same image, so
-they use blk_set_perm() to prevent this from happening. In the migration
-phase before the VM is actually running, though, they don't have a
-problem with writes to the image. On the other hand, storage migration
-needs to be able to write to the image in this phase, so the restrictive
-blk_set_perm() call of qdev devices breaks it.
+From: Max Reitz <mreitz@redhat.com>
 
-This patch flags all BlockBackends with a qdev device as
-blk->disable_perm during incoming migration, which means that the
-requested permissions are stored in the BlockBackend, but not actually
-applied to its root node yet.
+If @bs does not have any parents, the only reference to @mirror_top_bs
+will be held by the BlockJob object after the bdrv_unref() following
+block_job_create(). However, if block_job_create() fails, this reference
+will not exist and @mirror_top_bs will have been deleted when we
+goto fail.
 
-Once migration has finished and the VM should be resumed, the
-permissions are applied. If they cannot be applied (e.g. because the NBD
-server used for block migration hasn't been shut down), resuming the VM
-fails.
+The issue comes back at all later entries to the fail label: We delete
+the BlockJob object before rolling back our changes to the node graph.
+This means that we will delete @mirror_top_bs in the process.
 
+All in all, whenever @bs does not have any parents and we go down the
+fail path we will dereference @mirror_top_bs after it has been deleted.
+
+Fix this by invoking bdrv_unref() only when block_job_create() was
+successful and by bdrv_ref()'ing @mirror_top_bs in the fail path before
+deleting the BlockJob object. Finally, bdrv_unref() it at the end of the
+fail path after we actually no longer need it.
+
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Tested-by: Kashyap Chamarthy <kchamart@redhat.com>
 ---
- block/block-backend.c | 40 +++++++++++++++++++++++++++++++++++++++-
- include/block/block.h |  2 ++
- migration/migration.c |  8 ++++++++
- qmp.c                 |  6 ++++++
- 4 files changed, 55 insertions(+), 1 deletion(-)
+ block/mirror.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 0b63773..18ece99 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -61,6 +61,7 @@ struct BlockBackend {
- 
-     uint64_t perm;
-     uint64_t shared_perm;
-+    bool disable_perm;
- 
-     bool allow_write_beyond_eof;
- 
-@@ -578,7 +579,7 @@ int blk_set_perm(BlockBackend *blk, uint64_t perm, uint64_t shared_perm,
- {
-     int ret;
- 
--    if (blk->root) {
-+    if (blk->root && !blk->disable_perm) {
-         ret = bdrv_child_try_set_perm(blk->root, perm, shared_perm, errp);
-         if (ret < 0) {
-             return ret;
-@@ -597,15 +598,52 @@ void blk_get_perm(BlockBackend *blk, uint64_t *perm, uint64_t *shared_perm)
-     *shared_perm = blk->shared_perm;
+diff --git a/block/mirror.c b/block/mirror.c
+index 9e2fecc..46ecd38 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1150,7 +1150,7 @@ static void mirror_start_job(const char *job_id, Bl=
+ockDriverState *bs,
+     mirror_top_bs->total_sectors =3D bs->total_sectors;
+=20
+     /* bdrv_append takes ownership of the mirror_top_bs reference, need =
+to keep
+-     * it alive until block_job_create() even if bs has no parent. */
++     * it alive until block_job_create() succeeds even if bs has no pare=
+nt. */
+     bdrv_ref(mirror_top_bs);
+     bdrv_drained_begin(bs);
+     bdrv_append(mirror_top_bs, bs, &local_err);
+@@ -1168,10 +1168,12 @@ static void mirror_start_job(const char *job_id, =
+BlockDriverState *bs,
+                          BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHA=
+NGED |
+                          BLK_PERM_WRITE | BLK_PERM_GRAPH_MOD, speed,
+                          creation_flags, cb, opaque, errp);
+-    bdrv_unref(mirror_top_bs);
+     if (!s) {
+         goto fail;
+     }
++    /* The block job now has a reference to this node */
++    bdrv_unref(mirror_top_bs);
++
+     s->source =3D bs;
+     s->mirror_top_bs =3D mirror_top_bs;
+=20
+@@ -1242,6 +1244,10 @@ static void mirror_start_job(const char *job_id, B=
+lockDriverState *bs,
+=20
+ fail:
+     if (s) {
++        /* Make sure this BDS does not go away until we have completed t=
+he graph
++         * changes below */
++        bdrv_ref(mirror_top_bs);
++
+         g_free(s->replaces);
+         blk_unref(s->target);
+         block_job_unref(&s->common);
+@@ -1250,6 +1256,8 @@ fail:
+     bdrv_child_try_set_perm(mirror_top_bs->backing, 0, BLK_PERM_ALL,
+                             &error_abort);
+     bdrv_replace_node(mirror_top_bs, backing_bs(mirror_top_bs), &error_a=
+bort);
++
++    bdrv_unref(mirror_top_bs);
  }
- 
-+/*
-+ * Notifies the user of all BlockBackends that migration has completed. qdev
-+ * devices can tighten their permissions in response (specifically revoke
-+ * shared write permissions that we needed for storage migration).
-+ *
-+ * If an error is returned, the VM cannot be allowed to be resumed.
-+ */
-+void blk_resume_after_migration(Error **errp)
-+{
-+    BlockBackend *blk;
-+    Error *local_err = NULL;
-+
-+    for (blk = blk_all_next(NULL); blk; blk = blk_all_next(blk)) {
-+        if (!blk->disable_perm) {
-+            continue;
-+        }
-+
-+        blk->disable_perm = false;
-+
-+        blk_set_perm(blk, blk->perm, blk->shared_perm, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            blk->disable_perm = true;
-+            return;
-+        }
-+    }
-+}
-+
- static int blk_do_attach_dev(BlockBackend *blk, void *dev)
- {
-     if (blk->dev) {
-         return -EBUSY;
-     }
-+
-+    /* While migration is still incoming, we don't need to apply the
-+     * permissions of guest device BlockBackends. We might still have a block
-+     * job or NBD server writing to the image for storage migration. */
-+    if (runstate_check(RUN_STATE_INMIGRATE)) {
-+        blk->disable_perm = true;
-+    }
-+
-     blk_ref(blk);
-     blk->dev = dev;
-     blk->legacy_dev = false;
-     blk_iostatus_reset(blk);
-+
-     return 0;
- }
- 
-diff --git a/include/block/block.h b/include/block/block.h
-index 5149260..3e09222 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -366,6 +366,8 @@ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp);
- void bdrv_invalidate_cache_all(Error **errp);
- int bdrv_inactivate_all(void);
- 
-+void blk_resume_after_migration(Error **errp);
-+
- /* Ensure contents are flushed to disk.  */
- int bdrv_flush(BlockDriverState *bs);
- int coroutine_fn bdrv_co_flush(BlockDriverState *bs);
-diff --git a/migration/migration.c b/migration/migration.c
-index 54060f7..ad4036f 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -349,6 +349,14 @@ static void process_incoming_migration_bh(void *opaque)
-         exit(EXIT_FAILURE);
-     }
- 
-+    /* If we get an error here, just don't restart the VM yet. */
-+    blk_resume_after_migration(&local_err);
-+    if (local_err) {
-+        error_free(local_err);
-+        local_err = NULL;
-+        autostart = false;
-+    }
-+
-     /*
-      * This must happen after all error conditions are dealt with and
-      * we're sure the VM is going to be running on this host.
-diff --git a/qmp.c b/qmp.c
-index fa82b59..a744e44 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -207,6 +207,12 @@ void qmp_cont(Error **errp)
-         }
-     }
- 
-+    blk_resume_after_migration(&local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-     if (runstate_check(RUN_STATE_INMIGRATE)) {
-         autostart = 1;
-     } else {
--- 
+=20
+ void mirror_start(const char *job_id, BlockDriverState *bs,
+--=20
 1.8.3.1
