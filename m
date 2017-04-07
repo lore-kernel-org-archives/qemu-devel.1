@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cwW1t-0002RX-2G
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:42:32 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1cwW1q-0002Op-HE
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:42:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cwW1s-0007Wi-4a
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:42:29 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:35735)
+	(envelope-from <alex.bennee@linaro.org>) id 1cwW1p-0007Vo-G5
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:42:26 -0400
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:34277)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cwW1r-0007WU-UC
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:42:28 -0400
-Received: by mail-wm0-x232.google.com with SMTP id w64so1698364wma.0
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 08:42:27 -0700 (PDT)
+	id 1cwW1p-0007VG-Aj
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:42:25 -0400
+Received: by mail-wr0-x22d.google.com with SMTP id t20so112057569wra.1
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 08:42:25 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  7 Apr 2017 16:42:18 +0100
-Message-Id: <20170407154221.26918-10-alex.bennee@linaro.org>
+Date: Fri,  7 Apr 2017 16:42:15 +0100
+Message-Id: <20170407154221.26918-7-alex.bennee@linaro.org>
 In-Reply-To: <20170407154221.26918-1-alex.bennee@linaro.org>
 References: <20170407154221.26918-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 09/12] cpus: introduce cpu_update_icount
- helper
+Subject: [Qemu-devel] [PATCH v3 06/12] cpus: check cpu->running in
+ cpu_get_icount_raw()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,74 +33,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: dovgaluk@ispras.ru, rth@twiddle.net, pbonzini@redhat.com
 Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-By holding off updates to timer_state.qemu_icount we can run into
-trouble when the non-vCPU thread needs to know the time. This helper
-ensures we atomically update timers_state.qemu_icount based on what
-has been currently executed.
+The lifetime of current_cpu is now the lifetime of the vCPU thread.
+However get_icount_raw() can apply a fudge factor if called while code
+is running to take into account the current executed instruction
+count.
+
+To ensure this is always the case we also check cpu->running.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
- cpus.c               | 23 +++++++++++++++++++++--
- include/qemu/timer.h |  1 +
- 2 files changed, 22 insertions(+), 2 deletions(-)
+ cpus.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/cpus.c b/cpus.c
-index 88eabdc19f..3854f17c35 100644
+index 4e48b9c4ad..18b1746770 100644
 --- a/cpus.c
 +++ b/cpus.c
-@@ -232,12 +232,31 @@ static int64_t cpu_get_icount_executed(CPUState *cpu)
-     return cpu->icount_budget - (cpu->icount_decr.u16.low + cpu->icount_extra);
- }
- 
-+/*
-+ * Update the global shared timer_state.qemu_icount to take into
-+ * account executed instructions. This is done by the TCG vCPU
-+ * thread so the main-loop can see time has moved forward.
-+ */
-+void cpu_update_icount(CPUState *cpu)
-+{
-+    int64_t executed = cpu_get_icount_executed(cpu);
-+    cpu->icount_budget -= executed;
-+
-+#ifdef CONFIG_ATOMIC64
-+    atomic_set__nocheck(&timers_state.qemu_icount,
-+                        atomic_read__nocheck(&timers_state.qemu_icount) +
-+                        executed);
-+#else /* FIXME: we need 64bit atomics to do this safely */
-+    timers_state.qemu_icount += executed;
-+#endif
-+}
-+
- int64_t cpu_get_icount_raw(void)
- {
-     int64_t icount;
+@@ -229,7 +229,7 @@ int64_t cpu_get_icount_raw(void)
      CPUState *cpu = current_cpu;
  
--    icount = timers_state.qemu_icount;
-+    icount = atomic_read(&timers_state.qemu_icount);
-     if (cpu && cpu->running) {
+     icount = timers_state.qemu_icount;
+-    if (cpu) {
++    if (cpu && cpu->running) {
          if (!cpu->can_do_io) {
              fprintf(stderr, "Bad icount read\n");
-@@ -1220,7 +1239,7 @@ static void process_icount_data(CPUState *cpu)
- {
-     if (use_icount) {
-         /* Account for executed instructions */
--        timers_state.qemu_icount += cpu_get_icount_executed(cpu);
-+        cpu_update_icount(cpu);
- 
-         /* Reset the counters */
-         cpu->icount_decr.u16.low = 0;
-diff --git a/include/qemu/timer.h b/include/qemu/timer.h
-index e1742f2f3d..8a1eb74839 100644
---- a/include/qemu/timer.h
-+++ b/include/qemu/timer.h
-@@ -869,6 +869,7 @@ int64_t cpu_get_icount_raw(void);
- int64_t cpu_get_icount(void);
- int64_t cpu_get_clock(void);
- int64_t cpu_icount_to_ns(int64_t icount);
-+void    cpu_update_icount(CPUState *cpu);
- 
- /*******************************************/
- /* host CPU ticks (if available) */
+             exit(1);
 -- 
 2.11.0
