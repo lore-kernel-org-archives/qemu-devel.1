@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cwTjD-0000A3-D4
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:15:04 -0400
+	(envelope-from <stefanha@redhat.com>) id 1cwTsB-0001rR-LJ
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:24:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cwTj9-0004zr-MM
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:15:03 -0400
-Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:33455)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cwTj9-0004vY-FY
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:14:59 -0400
-Received: by mail-wr0-x232.google.com with SMTP id g19so63495902wrb.0
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 06:14:57 -0700 (PDT)
-References: <20170405132503.32125-1-alex.bennee@linaro.org>
-	<20170405132503.32125-12-alex.bennee@linaro.org>
-	<5ee6d2cb-d3e5-8b28-6a73-2d84c44ce614@redhat.com>
-	<87k26wa1ry.fsf@linaro.org>
-	<2061307774.11920398.1491567568031.JavaMail.zimbra@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <2061307774.11920398.1491567568031.JavaMail.zimbra@redhat.com>
-Date: Fri, 07 Apr 2017 14:14:59 +0100
-Message-ID: <87inmg9x64.fsf@linaro.org>
+	(envelope-from <stefanha@redhat.com>) id 1cwTsA-0001Ik-FC
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:24:19 -0400
+Date: Fri, 7 Apr 2017 14:23:58 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170407132358.GC16146@stefanha-x1.localdomain>
+References: <20170407065414.9143-1-famz@redhat.com>
+	<20170407065414.9143-2-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 11/12] cpus: call cpu_update_icount on
- read
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="uXxzq0nDebZQVNAZ"
+Content-Disposition: inline
+In-Reply-To: <20170407065414.9143-2-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] block: Fix unpaired
+ aio_disable_external in external snapshot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,79 +25,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: dovgaluk@ispras.ru, rth@twiddle.net, peter maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, mttcg@greensocs.com, fred konrad <fred.konrad@greensocs.com>, a rigo <a.rigo@virtualopensystems.com>, cota@braap.org, bobby prani <bobby.prani@gmail.com>, nikunj@linux.vnet.ibm.com, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+--uXxzq0nDebZQVNAZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> ----- Original Message -----
->> From: "Alex Bennée" <alex.bennee@linaro.org>
->> To: "Paolo Bonzini" <pbonzini@redhat.com>
->> Cc: dovgaluk@ispras.ru, rth@twiddle.net, "peter maydell" <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
->> mttcg@greensocs.com, "fred konrad" <fred.konrad@greensocs.com>, "a rigo" <a.rigo@virtualopensystems.com>,
->> cota@braap.org, "bobby prani" <bobby.prani@gmail.com>, nikunj@linux.vnet.ibm.com, "Peter Crosthwaite"
->> <crosthwaite.peter@gmail.com>
->> Sent: Friday, April 7, 2017 7:35:29 PM
->> Subject: Re: [PATCH v2 11/12] cpus: call cpu_update_icount on read
->>
->>
->> Paolo Bonzini <pbonzini@redhat.com> writes:
->>
->> > On 05/04/2017 15:25, Alex Bennée wrote:
->> >> This ensures each time the vCPU thread reads the icount we update the
->> >> master timer_state.qemu_icount field. This way as long as updates are
->> >> in BQL protected sections (which they should be) the main-loop can
->> >> never come to update the log and find time has gone backwards.
->> >>
->> >> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->> >> ---
->> >>  cpus.c | 6 ++----
->> >>  1 file changed, 2 insertions(+), 4 deletions(-)
->> >>
->> >> diff --git a/cpus.c b/cpus.c
->> >> index ff75af449a..63de033cc8 100644
->> >> --- a/cpus.c
->> >> +++ b/cpus.c
->> >> @@ -246,19 +246,17 @@ void cpu_update_icount(CPUState *cpu)
->> >>
->> >>  int64_t cpu_get_icount_raw(void)
->> >>  {
->> >> -    int64_t icount;
->> >>      CPUState *cpu = current_cpu;
->> >>
->> >> -    icount = atomic_read(&timers_state.qemu_icount);
->> >>      if (cpu && cpu->running) {
->> >>          if (!cpu->can_do_io) {
->> >>              fprintf(stderr, "Bad icount read\n");
->> >>              exit(1);
->> >>          }
->> >>          /* Take into account what has run */
->> >> -        icount += cpu_get_icount_executed(cpu);
->> >> +        cpu_update_icount(cpu);
->> >>      }
->> >> -    return icount;
->> >> +    return atomic_read(&timers_state.qemu_icount);
->> >>  }
->> >>
->> >>  /* Return the virtual CPU time, based on the instruction counter.  */
->> >>
->> >
->> > Maybe the update should be done in gen_io_start instead.  There
->> > shouldn't be any interference between vCPU and I/O threads except
->> > between gen_io_start and gen_io_end.
->>
->> I'm not sure I follow. gen_io_start is a translation time thing. At
->> least here we ensure we update whenever the value is read.
->
-> Sorry, I meant we should generate TCG opcodes for the translation in
-> gen_io_start.
+On Fri, Apr 07, 2017 at 02:54:09PM +0800, Fam Zheng wrote:
+> bdrv_replace_child_noperm tries to hand over the quiesce_counter state
+> from old bs to the new one, but if they are not on the same aio context
+> this causes unbalance.
+>=20
+> Fix this by setting the correct aio context before calling
+> bdrv_append().
+>=20
+> Reported-by: Ed Swierk <eswierk@skyportsystems.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  blockdev.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Ahh OK. I think this is 2.10 stuff though right?
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
->
-> Paolo
+--uXxzq0nDebZQVNAZ
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
---
-Alex Bennée
+iQEcBAEBAgAGBQJY55LuAAoJEJykq7OBq3PIXNAIAJY8nwlRSEi+0mX3xGu+MzUl
++Se6ycSbjhcbrVXMss0OkdS3cH5+/RLSfXJo5JZuNgOhFBm9YwabDARBRk4vuaZJ
+g23JxaLnacFsRiGneDnqchVm9OOH8KG/QsCASHJFiW+2Dpb0QQJ+yMXXf/9pp7Nv
+UxqwCceXcfW8mx4+ZkO19RvD2Fp4gX7JunpeYiKrCGRkYa36FHOb04upjtFfPnWQ
+X5/Z3qySPzlC3nVugbbwxpd4dukCvvBWeiVwZH3bvLCG2oIeD2ieJQRf6mgMehji
+Al97EQs/MfpCNupkAVUZDHRjL1BCaB+HDEUC2zh2D/C9PlfKWaf9EoGV6ku14mU=
+=n8Ai
+-----END PGP SIGNATURE-----
+
+--uXxzq0nDebZQVNAZ--
