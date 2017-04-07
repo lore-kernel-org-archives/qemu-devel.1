@@ -1,21 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57565)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cwUjQ-0002CR-Dd
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:19:21 -0400
+	(envelope-from <bounces@canonical.com>) id 1cwUld-0003F1-7L
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:21:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cwUjP-0006g1-BH
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:19:20 -0400
-References: <20170406190847.29347-1-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <f2c42a58-098c-549d-31cf-32792835f03a@redhat.com>
-Date: Fri, 7 Apr 2017 16:19:09 +0200
+	(envelope-from <bounces@canonical.com>) id 1cwUla-0007NK-I6
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:21:37 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47405)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cwUla-0007MF-CH
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:21:34 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cwUlY-0002WO-3p
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 14:21:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6FF442E829F
+	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 14:21:13 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170406190847.29347-1-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ItDcE0uCrBsSFwgg3DAuNVPjo2BgS27vi"
-Subject: Re: [Qemu-devel] [PATCH for-2.9] throttle: Remove block from group
- on hot-unplug
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 07 Apr 2017 14:14:14 -0000
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reply-To: Bug 1670175 <1670175@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170305190118.21996.2136.malonedeb@gac.canonical.com>
+Message-Id: <20170407141415.2360.38519.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1670175] Re: qemu-system-sparc64 with
+ tribblix-sparc-0m16.iso ends with "panic - kernel: no nucleus hblk8 to
+ allocate"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,69 +38,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, berto@igalia.com, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ItDcE0uCrBsSFwgg3DAuNVPjo2BgS27vi
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, berto@igalia.com, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <f2c42a58-098c-549d-31cf-32792835f03a@redhat.com>
-Subject: Re: [PATCH for-2.9] throttle: Remove block from group on hot-unplug
-References: <20170406190847.29347-1-eblake@redhat.com>
-In-Reply-To: <20170406190847.29347-1-eblake@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+Looks like tribblix is an OpenSolaris variant from the above output (I
+normally tend to test with Milax but it's good to have another reference
+around).
 
-On 06.04.2017 21:08, Eric Blake wrote:
-> When a block device that is part of a throttle group is hot-unplugged,
-> we forgot to remove it from the throttle group. This leaves stale
-> memory around, and causes an easily reproducible crash:
->=20
-> $ ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio=
- \
-> -device virtio-scsi-pci,bus=3Dpci.0 -drive \
-> id=3Ddrive_image2,if=3Dnone,format=3Draw,file=3Dfile2,bps=3D512000,iops=
-=3D100,group=3Dfoo \
-> -device scsi-hd,id=3Dimage2,drive=3Ddrive_image2 -drive \
-> id=3Ddrive_image3,if=3Dnone,format=3Draw,file=3Dfile3,bps=3D512000,iops=
-=3D100,group=3Dfoo \
-> -device scsi-hd,id=3Dimage3,drive=3Ddrive_image3
-> {'execute':'qmp_capabilities'}
-> {'execute':'device_del','arguments':{'id':'image3'}}
-> {'execute':'system_reset'}
->=20
-> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1428810
->=20
-> Suggested-by: Alberto Garcia <berto@igalia.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  block/block-backend.c | 3 +++
->  1 file changed, 3 insertions(+)
-
-Thanks, applied to my block branch:
-
-https://github.com/XanClic/qemu/commits/block
-
-Max
+I spent a lot of time during the 2.8 cycle fixing up the context switch
+code in OpenBIOS which gets OpenSolaris most of the way. AFAICT the 2
+main missing items are:
 
 
---ItDcE0uCrBsSFwgg3DAuNVPjo2BgS27vi
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+1) Wiring up the ebus interrupts
 
------BEGIN PGP SIGNATURE-----
+I have patches for this, but they cause Linux to panic on startup,
+presumably because of 2) below.
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljnn90SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AiE4H/j2UEjK8q4f/PtgytPTyNy6xlF+sPmMR
-mQi2Zh3ygfbYMTy6sOt7rMvHHhdIfjnTt23AmPBE9Pi0JNgswy0ZW/tneLrdKNf6
-1eCbYL2ekySpZo3w9zD1DAVbHqXZ46ivIbwNKmfkEuDNgOjk6tuk4Dih5GTY962s
-y86p2Gdxsv/JcNF22hJfgJ11Wxd+VkYKlT9YXqCcjrb3Rv8ZVennh7fHZaesUmjb
-9MZvOrB9U6vuQTBqcNsn2WHkujsDOS6H4+nRAV8XJkkBTOY3Wrj3lPceyTLg1yqh
-SLspbT76bdv6/J8ctxoXFO+2uDaW2hipYHr+OXZ3bp8SIKr60MSSqQU=
-=gHfM
------END PGP SIGNATURE-----
+2) Fix up the /pci nodes, adding 2 PCI bridges to the DT
 
---ItDcE0uCrBsSFwgg3DAuNVPjo2BgS27vi--
+This will take some thought since OpenBIOS needs to be modified to
+handle multiple PCI buses and has know bugs with PCI bridges.
+
+
+The CPU for sun4u machines will always be at 100% because the USIIi process=
+or doesn't have a HLT or equivalent instruction that can be used by the gue=
+st to enable QEMU to pause the vCPU whilst idle.
+
+Note that I work on this as time allows, so progress isn't particularly
+rapid. Offers of sponsorship to enable me to spend more time on this
+would be gratefully received :)
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1670175
+
+Title:
+  qemu-system-sparc64 with tribblix-sparc-0m16.iso ends with "panic -
+  kernel: no nucleus hblk8 to allocate"
+
+Status in QEMU:
+  New
+
+Bug description:
+  > qemu-system-sparc64 -m 1024 -cdrom Downloads/tribblix-sparc-0m16.iso -b=
+oot d -nographic
+  OpenBIOS for Sparc64
+  Configuration device id QEMU version 1 machine id 0
+  kernel cmdline =
+
+  CPUs: 1 x SUNW,UltraSPARC-IIi
+  UUID: 00000000-0000-0000-0000-000000000000
+  Welcome to OpenBIOS v1.1 built on Nov 24 2016 21:23
+    Type 'help' for detailed information
+  Trying cdrom:f...
+  Not a bootable ELF image
+  Not a bootable a.out image
+
+  Loading FCode image...
+  Loaded 7120 bytes
+  entry point is 0x4000
+  Evaluating FCode...
+  Evaluating FCode...
+  Ignoring failed claim for va 10a96a0 memsz 19!
+  Ignoring failed claim for va 1000000 memsz d1fb6!
+  Ignoring failed claim for va 1402000 memsz 32518!
+  Ignoring failed claim for va 1800000 memsz 52ac8!
+  SunOS Release 5.11 Version tribblix-m16 64-bit
+  Copyright (c) 1983, 2010, Oracle and/or its affiliates. All rights reserv=
+ed.
+  could not find debugger-vocabulary-hook>threads:interpret: exception -13 =
+caught
+  interpret \ ident	"%Z%%M%	%I%	%E% SMI"
+  \ Copyright 2005 Sun Microsystems, Inc.  All rights reserved.
+  \ Use is subject to license terms.
+  \
+  \ CDDL HEADER START
+  \
+  \ The contents of this file are subject to the terms of the
+  \ Common Development and Distribution License, Version 1.0 only
+  \ (the "License").  You may not use this file except in compliance
+  \ with the License.
+  \
+  \ You can obtain a copy of the license at usr/src/OPENSOLARIS.LICENSE
+  \ or http://www.opensolaris.org/os/licensing.
+  \ See the License for =
+
+  WARNING: add_spec: No major number for sf
+  panic - kernel: no nucleus hblk8 to allocate
+  EXIT
+
+  QEMU keeps running (CPU is on 100 % all the time), I can interact with
+  the prompt:
+
+  0 > boot
+  Not a Linux kernel image
+  Not a bootable ELF image
+  Not a bootable a.out image
+
+  Loading FCode image...
+  Unhandled Exception 0x0000000000000018
+  PC =3D 0x00000000ffd25310 NPC =3D 0x00000000ffd25314
+  Stopping execution
+
+  > qemu-system-sparc64 -version
+  QEMU emulator version 2.8.0(Virtualization:Staging / SLE_12_SP2)
+
+  from
+  https://build.opensuse.org/package/show/Virtualization:Staging/qemu on
+  openSUSE Leap 42.2.
+
+  ISO: http://pkgs.tribblix.org/iso/tribblix-sparc-0m16.iso.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1670175/+subscriptions
