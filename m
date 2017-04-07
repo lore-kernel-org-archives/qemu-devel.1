@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cwRGz-0003nA-Gm
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 06:37:46 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1cwRIp-0004Mr-QT
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 06:39:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cwRGw-0005u5-Aq
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 06:37:45 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:50301
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1cwRGw-0005mM-48
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 06:37:42 -0400
-References: <1491381329-3995-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1491560929.26308.41.camel@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <3aff73da-2e94-eef5-c0db-74a4ded14311@ilande.co.uk>
-Date: Fri, 7 Apr 2017 11:37:00 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1cwRIm-0006RZ-J4
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 06:39:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47500)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cwRIm-0006RQ-9m
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 06:39:36 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 01AFE67EA7
+	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 10:39:35 +0000 (UTC)
+Date: Fri, 7 Apr 2017 11:39:31 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170407103931.GH2138@work-vm>
+References: <20170406130913.2232-1-quintela@redhat.com>
+	<20170406130913.2232-50-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1491560929.26308.41.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 00/14] TCX/CG3 adapter cleanups
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170406130913.2232-50-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 49/54] ram: Remember last_page instead of
+ last_offset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +34,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
 Cc: qemu-devel@nongnu.org
 
-On 07/04/17 11:28, Gerd Hoffmann wrote:
-
-> On Mi, 2017-04-05 at 09:35 +0100, Mark Cave-Ayland wrote:
->> This started as part of the work on Gerd's thread-safe display patches
->> but ended up turning into something a lot more comprehensive. It contains
->> lots of cleanupm and fixes for display invalidation (particularly on 24-bit
->> TCX) exposed by testing the thread-safe patchset.
->>
->> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+* Juan Quintela (quintela@redhat.com) wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 > 
-> Looks all fine to me.
+> --
 > 
-> Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+> Improve comment
+> Fix typo
 > 
-> You'll merge them through the sparc queue I guess?
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  migration/ram.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 52ab14b..5b2045d 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -171,8 +171,8 @@ struct RAMState {
+>      RAMBlock *last_seen_block;
+>      /* Last block from where we have sent data */
+>      RAMBlock *last_sent_block;
+> -    /* Last offset we have sent data from */
+> -    ram_addr_t last_offset;
+> +    /* Last dirty targe page we have sent */
+                          ^t
 
-Yes, I can do. I think it makes sense to merge them before your display
-thread-safety series, so if that still works for you I'll send a pull
-request early on when the tree opens for 2.10 to clear the way for your
-updates.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-
-ATB,
-
-Mark.
+> +    ram_addr_t last_page;
+>      /* last ram version we have seen */
+>      uint32_t last_version;
+>      /* We are in the first round */
+> @@ -1061,7 +1061,7 @@ static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss,
+>      pss->offset = migration_bitmap_find_dirty(rs, pss->block, pss->offset,
+>                                                page_abs);
+>      if (pss->complete_round && pss->block == rs->last_seen_block &&
+> -        pss->offset >= rs->last_offset) {
+> +        (pss->offset >> TARGET_PAGE_BITS) >= rs->last_page) {
+>          /*
+>           * We've been once around the RAM and haven't found anything.
+>           * Give up.
+> @@ -1402,7 +1402,7 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
+>      }
+>  
+>      pss.block = rs->last_seen_block;
+> -    pss.offset = rs->last_offset;
+> +    pss.offset = rs->last_page << TARGET_PAGE_BITS;
+>      pss.complete_round = false;
+>  
+>      if (!pss.block) {
+> @@ -1424,7 +1424,7 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
+>      } while (!pages && again);
+>  
+>      rs->last_seen_block = pss.block;
+> -    rs->last_offset = pss.offset;
+> +    rs->last_page = pss.offset >> TARGET_PAGE_BITS;
+>  
+>      return pages;
+>  }
+> @@ -1499,7 +1499,7 @@ static void ram_state_reset(RAMState *rs)
+>  {
+>      rs->last_seen_block = NULL;
+>      rs->last_sent_block = NULL;
+> -    rs->last_offset = 0;
+> +    rs->last_page = 0;
+>      rs->last_version = ram_list.version;
+>      rs->ram_bulk_stage = true;
+>  }
+> @@ -1844,7 +1844,7 @@ static int postcopy_chunk_hostpages(MigrationState *ms)
+>      /* Easiest way to make sure we don't resume in the middle of a host-page */
+>      rs->last_seen_block = NULL;
+>      rs->last_sent_block = NULL;
+> -    rs->last_offset     = 0;
+> +    rs->last_page = 0;
+>  
+>      QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+>          unsigned long first = block->offset >> TARGET_PAGE_BITS;
+> -- 
+> 2.9.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
