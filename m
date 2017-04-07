@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46103)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46254)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cwNnV-00088P-KZ
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 02:55:08 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1cwNnr-00005e-K8
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 02:55:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cwNnU-0004bv-Oy
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 02:55:05 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Fri,  7 Apr 2017 14:54:12 +0800
-Message-Id: <20170407065414.9143-5-famz@redhat.com>
-In-Reply-To: <20170407065414.9143-1-famz@redhat.com>
-References: <20170407065414.9143-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 4/6] block: Quiesce old aio context during
- bdrv_set_aio_context
+	(envelope-from <jemmy858585@gmail.com>) id 1cwNnq-0004nh-NG
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 02:55:27 -0400
+MIME-Version: 1.0
+In-Reply-To: <CAOGPPbdw-JEMM9MDJwQFcSJRmCn9nxqmyFF18ORcP0NdVoXLkQ@mail.gmail.com>
+References: <1491484536-22776-1-git-send-email-lidongchen@tencent.com>
+	<CAOGPPbdw-JEMM9MDJwQFcSJRmCn9nxqmyFF18ORcP0NdVoXLkQ@mail.gmail.com>
+From: 858585 jemmy <jemmy858585@gmail.com>
+Date: Fri, 7 Apr 2017 14:55:24 +0800
+Message-ID: <CAOGPPbfu0qMy4b-X25wcQBvFS4dj8XTnmU5TT_9gpzv4PUYbug@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH 0/2] use blk_pwrite_zeroes for each zero
+ cluster
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,52 +24,87 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, Lidong Chen <lidongchen@tencent.com>
 
-The fact that the bs->aio_context is changing can confuse the dataplane
-iothread, because of the now fine granularity aio context lock.
-bdrv_drain should rather be a bdrv_drained_begin/end pair, but since
-bs->aio_context is changing, we can just use aio_disable_external and
-block_job_pause.
+On Fri, Apr 7, 2017 at 1:22 PM, 858585 jemmy <jemmy858585@gmail.com> wrote:
+> the test result for this patch:
+>
+> the migration command :
+> virsh migrate --live 165cf436-312f-47e7-90f2-f8aa63f34893
+> --copy-storage-all qemu+ssh://10.59.163.38/system
+>
+> the qemu-img info on source host:
+> qemu-img info /instanceimage/165cf436-312f-47e7-90f2-f8aa63f34893/165cf436-312f-47e7-90f2-f8aa63f34893_vda.qcow2
+> image: /instanceimage/165cf436-312f-47e7-90f2-f8aa63f34893/165cf436-312f-47e7-90f2-f8aa63f34893_vda.qcow2
+> file format: qcow2
+> virtual size: 1.0T (1095216660480 bytes)
+> disk size: 1.5G (1638989824 bytes)
+> cluster_size: 65536
+> backing file: /baseimage/img2016042213665396/img2016042213665396.qcow2
+>
+> the qemu-img info on dest host(before apply patch):
+> qemu-img info /instanceimage/165cf436-312f-47e7-90f2-f8aa63f34893/165cf436-312f-47e7-90f2-f8aa63f34893_vda.qcow2
+> image: /instanceimage/165cf436-312f-47e7-90f2-f8aa63f34893/165cf436-312f-47e7-90f2-f8aa63f34893_vda.qcow2
+> file format: qcow2
+> virtual size: 40G (42949672960 bytes)
+> disk size: 4.1G (4423286784 bytes)
+> cluster_size: 65536
+> backing file: /baseimage/img2016042213665396/img2016042213665396.qcow2
+>
+> the qemu-img info on dest host(after apply patch):
+> qemu-img info /instanceimage/165cf436-312f-47e7-90f2-f8aa63f34893/165cf436-312f-47e7-90f2-f8aa63f34893_vda.qcow2
+> image: /instanceimage/165cf436-312f-47e7-90f2-f8aa63f34893/165cf436-312f-47e7-90f2-f8aa63f34893_vda.qcow2
+> file format: qcow2
+> virtual size: 40G (42949672960 bytes)
+> disk size: 2.3G (2496200704 bytes)
+> cluster_size: 65536
+> backing file: /baseimage/img2016042213665396/img2016042213665396.qcow2
+>
+> the disk size reduce from 4.1G to 2.3G.
+>
 
-Reported-by: Ed Swierk <eswierk@skyportsystems.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- block.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+I find a bug for my patch.
+unfortunately, when use raw format , bdrv_get_cluster_size return 1.
+the raw format cluster size is 1.
+and will reduce migration speed.
 
-diff --git a/block.c b/block.c
-index b8a3011..512515a 100644
---- a/block.c
-+++ b/block.c
-@@ -4396,11 +4396,14 @@ void bdrv_attach_aio_context(BlockDriverState *bs,
- 
- void bdrv_set_aio_context(BlockDriverState *bs, AioContext *new_context)
- {
--    AioContext *ctx;
-+    AioContext *ctx = bdrv_get_aio_context(bs);
- 
-+    aio_disable_external(ctx);
-+    if (bs->job) {
-+        block_job_pause(bs->job);
-+    }
-     bdrv_drain(bs); /* ensure there are no in-flight requests */
- 
--    ctx = bdrv_get_aio_context(bs);
-     while (aio_poll(ctx, false)) {
-         /* wait for all bottom halves to execute */
-     }
-@@ -4413,6 +4416,10 @@ void bdrv_set_aio_context(BlockDriverState *bs, AioContext *new_context)
-     aio_context_acquire(new_context);
-     bdrv_attach_aio_context(bs, new_context);
-     aio_context_release(new_context);
-+    if (bs->job) {
-+        block_job_resume(bs->job);
-+    }
-+    aio_enable_external(ctx);
- }
- 
- void bdrv_add_aio_context_notifier(BlockDriverState *bs,
--- 
-2.9.3
+bdrv_get_cluster_size return bs->bl.request_alignment when cluster_size is zero.
+and bs->bl.request_alignment is 1 when use raw format.
+
+static int bdrv_get_cluster_size(BlockDriverState *bs)
+{
+    BlockDriverInfo bdi;
+    int ret;
+
+    ret = bdrv_get_info(bs, &bdi);
+    if (ret < 0 || bdi.cluster_size == 0) {
+        return bs->bl.request_alignment;
+    } else {
+        return bdi.cluster_size;
+    }
+}
+
+so i will change to use bdrv_get_info function to get cluster_size.
+and bdrv_get_cluster_size is not need to be public.
+
+>
+> On Thu, Apr 6, 2017 at 9:15 PM,  <jemmy858585@gmail.com> wrote:
+>> From: Lidong Chen <lidongchen@tencent.com>
+>>
+>> BLOCK_SIZE is (1 << 20), qcow2 cluster size is 65536 by default,
+>> this maybe cause the qcow2 file size is bigger after migration.
+>> This patch check each cluster, use blk_pwrite_zeroes for each
+>> zero cluster.
+>>
+>> Lidong Chen (2):
+>>   block: make bdrv_get_cluster_size public
+>>   migration/block: use blk_pwrite_zeroes for each zero cluster
+>>
+>>  block/io.c            |  2 +-
+>>  include/block/block.h |  1 +
+>>  migration/block.c     | 34 ++++++++++++++++++++++++++++++++--
+>>  3 files changed, 34 insertions(+), 3 deletions(-)
+>>
+>> --
+>> 1.8.3.1
+>>
