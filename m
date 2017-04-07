@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cwW1p-0002OX-3R
+	(envelope-from <alex.bennee@linaro.org>) id 1cwW1p-0002OV-30
 	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:42:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cwW1n-0007Tr-MO
+	(envelope-from <alex.bennee@linaro.org>) id 1cwW1l-0007R1-Ny
 	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:42:25 -0400
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:33674)
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:37899)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cwW1n-0007SV-GH
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:42:23 -0400
-Received: by mail-wr0-x22e.google.com with SMTP id g19so68076883wrb.0
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 08:42:23 -0700 (PDT)
+	id 1cwW1l-0007QF-HO
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:42:21 -0400
+Received: by mail-wm0-x22a.google.com with SMTP id t189so10641151wmt.1
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 08:42:21 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  7 Apr 2017 16:42:13 +0100
-Message-Id: <20170407154221.26918-5-alex.bennee@linaro.org>
+Date: Fri,  7 Apr 2017 16:42:11 +0100
+Message-Id: <20170407154221.26918-3-alex.bennee@linaro.org>
 In-Reply-To: <20170407154221.26918-1-alex.bennee@linaro.org>
 References: <20170407154221.26918-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 04/12] target/i386/misc_helper: wrap BQL
- around another IRQ generator
+Subject: [Qemu-devel] [PATCH v3 02/12] scripts/qemu-gdb/timers.py: new
+ helper to dump timer state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,38 +31,99 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: dovgaluk@ispras.ru, rth@twiddle.net, pbonzini@redhat.com
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Anything that calls into HW emulation must be protected by the BQL.
+This introduces the qemu-gdb command "qemu timers" which will dump the
+state of the main timers in the system.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Acked-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- target/i386/misc_helper.c | 3 +++
- 1 file changed, 3 insertions(+)
+ scripts/qemu-gdb.py       |  3 ++-
+ scripts/qemugdb/timers.py | 54 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 56 insertions(+), 1 deletion(-)
+ create mode 100644 scripts/qemugdb/timers.py
 
-diff --git a/target/i386/misc_helper.c b/target/i386/misc_helper.c
-index ca2ea09f54..628f64aad5 100644
---- a/target/i386/misc_helper.c
-+++ b/target/i386/misc_helper.c
-@@ -18,6 +18,7 @@
-  */
+diff --git a/scripts/qemu-gdb.py b/scripts/qemu-gdb.py
+index b3f8e04f77..3e7adb87dc 100644
+--- a/scripts/qemu-gdb.py
++++ b/scripts/qemu-gdb.py
+@@ -26,7 +26,7 @@ import os, sys
  
- #include "qemu/osdep.h"
-+#include "qemu/main-loop.h"
- #include "cpu.h"
- #include "exec/helper-proto.h"
- #include "exec/exec-all.h"
-@@ -156,7 +157,9 @@ void helper_write_crN(CPUX86State *env, int reg, target_ulong t0)
-         break;
-     case 8:
-         if (!(env->hflags2 & HF2_VINTR_MASK)) {
-+            qemu_mutex_lock_iothread();
-             cpu_set_apic_tpr(x86_env_get_cpu(env)->apic_state, t0);
-+            qemu_mutex_unlock_iothread();
-         }
-         env->v_tpr = t0 & 0x0f;
-         break;
+ sys.path.append(os.path.dirname(__file__))
+ 
+-from qemugdb import aio, mtree, coroutine
++from qemugdb import aio, mtree, coroutine, timers
+ 
+ class QemuCommand(gdb.Command):
+     '''Prefix for QEMU debug support commands'''
+@@ -38,6 +38,7 @@ QemuCommand()
+ coroutine.CoroutineCommand()
+ mtree.MtreeCommand()
+ aio.HandlersCommand()
++timers.TimersCommand()
+ 
+ coroutine.CoroutineSPFunction()
+ coroutine.CoroutinePCFunction()
+diff --git a/scripts/qemugdb/timers.py b/scripts/qemugdb/timers.py
+new file mode 100644
+index 0000000000..be71a001e3
+--- /dev/null
++++ b/scripts/qemugdb/timers.py
+@@ -0,0 +1,54 @@
++#!/usr/bin/python
++# GDB debugging support
++#
++# Copyright 2017 Linaro Ltd
++#
++# Author: Alex Bennée <alex.bennee@linaro.org>
++#
++# This work is licensed under the terms of the GNU GPL, version 2.  See
++# the COPYING file in the top-level directory.
++
++# 'qemu timers' -- display the current timerlists
++
++import gdb
++
++class TimersCommand(gdb.Command):
++    '''Display the current QEMU timers'''
++
++    def __init__(self):
++        'Register the class as a gdb command'
++        gdb.Command.__init__(self, 'qemu timers', gdb.COMMAND_DATA,
++                             gdb.COMPLETE_NONE)
++
++    def dump_timers(self, timer):
++        "Follow a timer and recursively dump each one in the list."
++        # timer should be of type QemuTimer
++        gdb.write("    timer %s/%s (cb:%s,opq:%s)\n" % (
++            timer['expire_time'],
++            timer['scale'],
++            timer['cb'],
++            timer['opaque']))
++
++        if int(timer['next']) > 0:
++            self.dump_timers(timer['next'])
++
++
++    def process_timerlist(self, tlist, ttype):
++        gdb.write("Processing %s timers\n" % (ttype))
++        gdb.write("  clock %s is enabled:%s, last:%s\n" % (
++            tlist['clock']['type'],
++            tlist['clock']['enabled'],
++            tlist['clock']['last']))
++        if int(tlist['active_timers']) > 0:
++            self.dump_timers(tlist['active_timers'])
++
++
++    def invoke(self, arg, from_tty):
++        'Run the command'
++        main_timers = gdb.parse_and_eval("main_loop_tlg")
++
++        # This will break if QEMUClockType in timer.h is redfined
++        self.process_timerlist(main_timers['tl'][0], "Realtime")
++        self.process_timerlist(main_timers['tl'][1], "Virtual")
++        self.process_timerlist(main_timers['tl'][2], "Host")
++        self.process_timerlist(main_timers['tl'][3], "Virtual RT")
 -- 
 2.11.0
