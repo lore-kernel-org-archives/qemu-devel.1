@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cwPpO-0007g6-Vv
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:05:13 -0400
+	(envelope-from <stefanha@redhat.com>) id 1cwPqt-0000AX-MF
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:06:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cwPpL-0000sG-SX
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:05:10 -0400
-Date: Fri, 7 Apr 2017 10:04:50 +0100
+	(envelope-from <stefanha@redhat.com>) id 1cwPqq-0001Iq-IF
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:06:43 -0400
+Date: Fri, 7 Apr 2017 10:06:33 +0100
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170407090450.GE13602@stefanha-x1.localdomain>
-References: <20170405194741.18956-1-eblake@redhat.com>
-	<20170405194741.18956-8-eblake@redhat.com>
+Message-ID: <20170407090633.GF13602@stefanha-x1.localdomain>
+References: <cover.1491416061.git.jcody@redhat.com>
+	<114fed348a816c240ed64fa1c5edb863f45ec1e9.1491416061.git.jcody@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="5oH/S/bF6lOfqCQb"
+	protocol="application/pgp-signature"; boundary="dgjlcl3Tl+kb3YDk"
 Content-Disposition: inline
-In-Reply-To: <20170405194741.18956-8-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 07/13] block: Use simpler QDict/QList
- scalar insertion macros
+In-Reply-To: <114fed348a816c240ed64fa1c5edb863f45ec1e9.1491416061.git.jcody@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 1/9] block: add
+ bdrv_set_read_only() helper function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,56 +25,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>, Stefan Weil <sw@weilnetz.de>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Lieven <pl@kamp.de>, Fam Zheng <famz@redhat.com>, Alberto Garcia <berto@igalia.com>, Josh Durgin <jdurgin@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, "open list:blkdebug" <qemu-block@nongnu.org>
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jsnow@redhat.com, kwolf@redhat.com
 
 
---5oH/S/bF6lOfqCQb
+--dgjlcl3Tl+kb3YDk
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 05, 2017 at 02:47:35PM -0500, Eric Blake wrote:
-> We now have macros in place to make it less verbose to add a scalar
-> to QDict and QList, so use them.
+On Wed, Apr 05, 2017 at 02:28:43PM -0400, Jeff Cody wrote:
+> We have a helper wrapper for checking for the BDS read_only flag,
+> add a helper wrapper to set the read_only flag as well.
 >=20
-> Patch created mechanically via:
->   spatch --sp-file scripts/coccinelle/qobject.cocci \
->     --macro-file scripts/cocci-macro-file.h --dir block --in-place
-> then touched up manually to fix a couple of '?:' back to original spacing.
->=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Jeff Cody <jcody@redhat.com>
 > ---
->  block/blkdebug.c   |  6 +++---
->  block/blkverify.c  |  6 +++---
->  block/curl.c       |  2 +-
->  block/file-posix.c |  8 ++++----
->  block/file-win32.c |  4 ++--
->  block/iscsi.c      |  2 +-
->  block/nbd.c        | 41 ++++++++++++++++++++---------------------
->  block/nfs.c        | 43 +++++++++++++++++--------------------------
->  block/null.c       |  2 +-
->  block/qcow2.c      |  4 ++--
->  block/quorum.c     |  8 ++++----
->  block/rbd.c        | 16 ++++++++--------
->  block/ssh.c        | 16 +++++++---------
->  block/vvfat.c      | 10 +++++-----
->  14 files changed, 78 insertions(+), 90 deletions(-)
+>  block.c               | 5 +++++
+>  block/bochs.c         | 2 +-
+>  block/cloop.c         | 2 +-
+>  block/dmg.c           | 2 +-
+>  block/rbd.c           | 2 +-
+>  block/vvfat.c         | 4 ++--
+>  include/block/block.h | 1 +
+>  7 files changed, 12 insertions(+), 6 deletions(-)
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---5oH/S/bF6lOfqCQb
+--dgjlcl3Tl+kb3YDk
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJY51YyAAoJEJykq7OBq3PIr4sH/R3Upzx7aMCePMEKgEzuUY+8
-u8laVb59pbLn7ca1w5C79HTpaWx5daHxH5jN56q4KdQwM31dwk0ube49cs6BDozi
-X/nreeICymdHxOxg6Ezz9mKZ1CEYkBKgdS6zx1sTsRA1Sbx8fxgrRefF4civa5Fw
-FMpyKIp9n2LsVYP4L+2M7oRlRCksEx5eTrjZbzroR4qMytjCzwjb2n36BQMcDozC
-/RYvT1srl78n1UAnZ2pqVbQ16F9FOoyuCJcrLwV5hWaZ22qKj4I4CxuxXryEOvuK
-DTBjHMrJLFMdh25RC/o/kJpOtA+QRLoF5e6Vr/J8pj95zHy8f7XfBO/SGS+kX84=
-=duWo
+iQEcBAEBAgAGBQJY51aZAAoJEJykq7OBq3PIV8EH/1Rvm+0RC2/K6lrPl3rsdT2z
+/mq6rNd7E1adqa/RNYRwHqcyDFZh7BOYlBEARq3nCqYAlhDO+LvIBg786mg9NKAG
+X1I4+6xZHJp2VIaHMNXCzAXg7Y0SbXGnUtUu5YRBgUSPSPsjgJb80VVqGQ7nDF50
+0RRG889gN2ulKHJ6Pyy5xkl0r+hMzrQ/pjgr9IWxjtFHG8KhW/+hr/RM5SBBwXn9
+J2CZOexdmyp4WzvMpoUbKRLwpQ6qL45V/OcRl71QTIykQ+F9S4lWlFPociMfgfIs
+f9/yEPq4Yuhv0BzO+Il4I2ZPMWJURbdS/y+zpt/s61zyEbs1pUqtw0dEUeZ6cOo=
+=R/Q1
 -----END PGP SIGNATURE-----
 
---5oH/S/bF6lOfqCQb--
+--dgjlcl3Tl+kb3YDk--
