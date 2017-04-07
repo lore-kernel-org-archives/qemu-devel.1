@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35515)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cwV4U-000541-KL
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:41:08 -0400
+	(envelope-from <stefanha@gmail.com>) id 1cwV4x-0005TI-MO
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:41:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cwV4T-0006or-1E
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:41:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56668)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cwV4S-0006od-Nf
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:41:04 -0400
-Date: Fri, 7 Apr 2017 15:41:00 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170407144100.GL26896@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1491575431-32170-1-git-send-email-amarnath.valluri@intel.com>
-	<1491575431-32170-10-git-send-email-amarnath.valluri@intel.com>
+	(envelope-from <stefanha@gmail.com>) id 1cwV4t-00072d-GJ
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:41:35 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:33318)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cwV4t-00072Y-9p
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:41:31 -0400
+Received: by mail-wm0-x236.google.com with SMTP id y18so72729wmh.0
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 07:41:31 -0700 (PDT)
+Date: Fri, 7 Apr 2017 15:41:28 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170407144128.GK16146@stefanha-x1.localdomain>
+References: <20170331084147.32716-1-haozhong.zhang@intel.com>
+	<20170331084147.32716-5-haozhong.zhang@intel.com>
+	<20170406101356.GC21261@stefanha-x1.localdomain>
+	<20170406105309.4yqkqo3itlhkuy5o@hz-desktop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="3MHXEHrrXKLGx71o"
 Content-Disposition: inline
-In-Reply-To: <1491575431-32170-10-git-send-email-amarnath.valluri@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v2 9/9] tpm: Added support for TPM emulator
+In-Reply-To: <20170406105309.4yqkqo3itlhkuy5o@hz-desktop>
+Subject: Re: [Qemu-devel] [RFC PATCH 4/4] nvdimm acpi: build flush hint
+ address structure if required
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,257 +33,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amarnath Valluri <amarnath.valluri@intel.com>
-Cc: qemu-devel@nongnu.org, patrick.ohly@intel.com, stefanb@linux.vnet.ibm.com, marcandre.lureau@gmail.com
-
-On Fri, Apr 07, 2017 at 05:30:31PM +0300, Amarnath Valluri wrote:
-> This change introduces a new TPM backend driver that can communicate with
-> swtpm(software TPM emulator) using unix domain socket interface.
-> 
-> Swtpm uses two unix sockets, one for plain TPM commands and responses, and one
-> for out-of-band control messages.
-> 
-> The swtpm and associated tools can be found here:
->     https://github.com/stefanberger/swtpm
-> 
-> Usage:
->     # setup TPM state directory
->     mkdir /tmp/mytpm
->     chown -R tss:root /tmp/mytpm
->     /usr/bin/swtpm_setup --tpm-state /tmp/mytpm --createek
-> 
->     # Ask qemu to use TPM emulator with given tpm state directory
->     qemu-system-x86_64 \
->         [...] \
->         -tpmdev emulator,id=tpm0,tpmstatedir=/tmp/mytpm,logfile=/tmp/swtpm.log \
->         -device tpm-tis,tpmdev=tpm0 \
->         [...]
-> 
-> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
-> ---
->  configure             |  15 +-
->  hmp.c                 |  21 ++
->  hw/tpm/Makefile.objs  |   1 +
->  hw/tpm/tpm_emulator.c | 927 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  hw/tpm/tpm_ioctl.h    | 243 +++++++++++++
->  qapi-schema.json      |  36 +-
->  qemu-options.hx       |  53 ++-
->  tpm.c                 |   2 +-
->  8 files changed, 1289 insertions(+), 9 deletions(-)
->  create mode 100644 hw/tpm/tpm_emulator.c
->  create mode 100644 hw/tpm/tpm_ioctl.h
-
-> +static int tpm_emulator_spawn_emulator(TPMEmulator *tpm_pt)
-> +{
-> +    int fds[2] = { -1, -1 };
-> +    int ctrl_fds[2] = { -1, -1 };
-> +    pid_t cpid;
-> +
-> +    if (!tpm_pt->ops->has_data_path) {
-> +        if (socketpair(AF_UNIX, SOCK_SEQPACKET, 0, fds) < 0) {
-> +            return -1;
-> +        }
-> +    }
-> + 
-> +    if (!tpm_pt->ops->has_ctrl_path) {
-> +        if (socketpair(AF_UNIX, SOCK_SEQPACKET, 0, ctrl_fds) < 0) {
-> +            if (!tpm_pt->ops->has_data_path) {
-> +                closesocket(fds[0]);
-> +                closesocket(fds[1]);
-> +            }
-> +            return -1;
-> +        }
-> +    }
-> +
-> +    cpid = qemu_fork(NULL);
-> +    if (cpid < 0) {
-> +        error_report("tpm-emulator: Fork failure: %s", strerror(errno));
-> +        if (!tpm_pt->ops->has_data_path) {
-> +            closesocket(fds[0]);
-> +            closesocket(fds[1]);
-> +        }
-> +        if (!tpm_pt->ops->has_ctrl_path) {
-> +            closesocket(ctrl_fds[0]);
-> +            closesocket(ctrl_fds[1]);
-> +        }
-> +        return -1;
-> +    }
-> +
-> +    if (cpid == 0) { /* CHILD */
-> +        enum {
-> +            PARAM_PATH,
-> +            PARAM_IFACE,
-> +            PARAM_SERVER,  PARAM_SERVER_ARGS,
-> +            PARAM_CTRL,    PARAM_CTRL_ARGS,
-> +            PARAM_STATE,   PARAM_STATE_ARGS,
-> +            PARAM_PIDFILE, PARAM_PIDFILE_ARGS,
-> +            PARAM_LOG,     PARAM_LOG_ARGS,
-> +            PARAM_MAX
-> +        };
-> +
-> +        int i;
-> +        int data_fd = -1, ctrl_fd = -1;
-> +        char *argv[PARAM_MAX+1];
-> +
-> +        /* close all unused inherited sockets */
-> +        if (fds[0] >= 0)
-> +            closesocket(fds[0]);
-> +        if (ctrl_fds[0] >= 0)
-> +            closesocket(ctrl_fds[0]);
-
-The 'if' checks are pointless - its already guaranteed by the
-fact you check socketpair() status.
-
-> +        i = STDERR_FILENO + 1;
-> +        if (fds[1] >= 0) {
-> +            data_fd = dup2(fds[1], i++);
-> +            if (data_fd < 0) {
-> +                error_report("tpm-emulator: dup2() failure - %s",
-> +                             strerror(errno));
-> +                goto exit_child;
-> +            }
-> +        }
-> +        if (ctrl_fds[1] >= 0) {
-> +            ctrl_fd = dup2(ctrl_fds[1], i++);
-> +            if (ctrl_fd < 0) {
-> +                error_report("tpm-emulator: dup2() failure - %s",
-> +                             strerror(errno));
-> +                goto exit_child;
-> +            }
-> +        }
-> +        for ( ; i < _SC_OPEN_MAX; i++) {
-
-Errr, _SC_OPEN_MAX is not the maximum number of FDs - it is parameter to
-use with sysconf() to query the number of files - you must call sysconf().
-
-> +            closesocket(i);
-
-close, not closesocket - you can't assume these are all sockets.
+To: qemu-devel@nongnu.org, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, dan.j.williams@intel.com, Richard Henderson <rth@twiddle.net>
 
 
-> +        DPRINT("\n")
-> +        if (execv(tpm_pt->ops->path, (char * const *)argv) < 0) {
-> +            error_report("execv() failure : %s", strerror(errno));
-> +        }
-> +
-> +exit_child:
-> +        g_strfreev(argv);
-> +        if (data_fd >= 0)
-> +            closesocket(data_fd);
-> +        if (ctrl_fd >= 0)
-> +            closesocket(ctrl_fd);
-> +
-> +        exit(0);
+--3MHXEHrrXKLGx71o
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-You need _exit(), not exit() as you don't want to run atexit() handlers
-here. You also want '1' not '0' since this is a failure scenario.
+On Thu, Apr 06, 2017 at 06:53:09PM +0800, Haozhong Zhang wrote:
+> On 04/06/17 11:13 +0100, Stefan Hajnoczi wrote:
+> > On Fri, Mar 31, 2017 at 04:41:47PM +0800, Haozhong Zhang wrote:
+> > >=20
+> > > Add an boolean option 'flush-hint' to device 'nvdimm'. If it's on, a
+> > > flush hint address structure will be constructed for each nvdimm
+> > > device.
+> >=20
+> > Users should not need to set the flush hint option.  NVDIMM
+> > configurations that persist data properly without Flush Hint Addresses
+> > shouldn't use them (for best performance).  Configurations that rely on
+> > flush hints *must* use them to guarantee data integrity.
+>=20
+> It's for backwards compatibility, i.e. migrating a VM on QEMU w/o
+> flush hint support to another one w/ flush hint support. By using a
+> flush-hint option and making it disabled by default, users can ensure
+> both QEMU provide the same VM configuration.
 
-> +    } else { /* self */
-> +        struct stat st;
-> +        DPRINTF("child pid: %d", cpid);
-> +        int rc;
-> +        int timeout = 3; /* wait for max 3 seconds */
-> +
-> +        /* close unsed sockets */
-> +        if (fds[1] >= 0)
-> +            closesocket(fds[1]);
-> +        if (ctrl_fds[1] >= 0)
-> +            closesocket(ctrl_fds[1]);
-> +
-> +        while((rc = stat(TPM_EMULATOR_PIDFILE, &st)) < 0 && timeout--) {
-> +            sleep(1);
-> +        }
+I think QEMU should play a role in deciding whether to use Address Flush
+Hints or not.
 
-A fixed 3 second timeout will inevitably cause failures on systems with
-high load.
+We should not require the user to set a sensible value.  If they get it
+wrong then they may suffer data loss!
 
-Presumably you're trying to handle the scenario where the child process
-exits without creating the pid file ?
+Stefan
 
-In which case you can use 'kill(cpid, 0)' and if errno == ESRCH
-then the child has exited.
+--3MHXEHrrXKLGx71o
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> +
-> +        if (timeout == -1) {
-> +            error_report("tpm-emulator: failed to find pid file: %s",
-> +                         strerror(errno));
-> +            goto err_kill_child;
-> +        }
-> +
-> +        tpm_pt->data_ioc = _iochannel_new(tpm_pt->ops->data_path, fds[0], NULL);
-> +        if (!tpm_pt->data_ioc) {
-> +            error_report("tpm-emulator: Unable to connect socket : %s",
-> +                          tpm_pt->ops->data_path);
-> +            goto err_kill_child;
-> +        }
-> +
-> +        tpm_pt->ctrl_ioc = _iochannel_new(tpm_pt->ops->ctrl_path, ctrl_fds[0], NULL);
-> +        if (!tpm_pt->ctrl_ioc) {
-> +            error_report("tpm-emulator: Unable to connect socket : %s",
-> +                          tpm_pt->ops->ctrl_path);
-> +            goto err_kill_child;
-> +        }
-> +
-> +        tpm_pt->child_running = true;
-> +
-> +        qemu_add_child_watch(cpid);
-> +
-> +        qio_channel_add_watch(tpm_pt->data_ioc, G_IO_HUP|G_IO_ERR,
-> +                              tpm_emulator_fd_handler, tpm_pt, NULL);
-> +    }
-> +
-> +    return 0;
-> +
-> +err_kill_child:
-> +    kill(cpid, SIGTERM);
-> +    closesocket(fds[0]);
-> +    closesocket(ctrl_fds[0]);
+-----BEGIN PGP SIGNATURE-----
 
-You can't assume the child has gone after a SIGTERM. You need to
-check, and be prepared to SIGKILL after time reasonable time,
-if needed.
+iQEcBAEBAgAGBQJY56UYAAoJEJykq7OBq3PIy74H/iG5NtXVqym24/Kq3uQ9I8Zd
+/OG6MglUw8K10j/nb+m56cAWQA2HUnkuB6gXCKLomWdnzll8roYU43fbrTs4zHb/
+/vYSxpX1uAJAL74T5yLcYTBQaQ7hiXgki/D3ONBgM4pCddaKR4SUalF0Vp92u+cw
+zpzH/oYDd1Vb/9gcqk4WeylWaqtolYMitgliCh6muCJ9dzZR280XseJa3SBoki8Y
+fXmW4WxZLNtCijoH+K8ZnhNurhEnLsWSV5338fJcivkfvtVhIRw0lkNiunPx5GAF
+7eFRWAlJrAVH+FHsZheFwSjkuGgbq3RvJxLqhoq0SpkCRvt6b6TeP09Sp8OCFAI=
+=WzBD
+-----END PGP SIGNATURE-----
 
-> +    tpm_pt->child_running = false;
-> +
-> +    return -1;
-> +}
-
-> +
-> +static const QemuOptDesc tpm_emulator_cmdline_opts[] = {
-> +    TPM_STANDARD_CMDLINE_OPTS,
-> +    {
-> +        .name = "tpmstatedir",
-> +        .type = QEMU_OPT_STRING,
-> +        .help = "TPM state directroy",
-> +    },
-> +    {
-> +        .name = "spawn",
-> +        .type = QEMU_OPT_BOOL,
-> +        .help = "Wether to spwan given emlatory binary",
-> +    },
-> +    {
-> +        .name = "path",
-> +        .type = QEMU_OPT_STRING,
-> +        .help = "Path to TPM emulator binary",
-> +    },
-> +    {
-> +        .name = "data-path",
-> +        .type = QEMU_OPT_STRING,
-> +        .help = "Socket path to use for data exhange",
-> +    },
-> +    {
-> +        .name = "ctrl-path",
-> +        .type = QEMU_OPT_STRING,
-> +        .help = "Socket path to use for out-of-band control messages",
-> +    },
-
-I'm still not convinced by the need for 2 separate UNIX sockets, unless
-there's a performance reason, but that looks unlikely.
-
-
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+--3MHXEHrrXKLGx71o--
