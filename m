@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwUGd-00071Q-Ko
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:49:36 -0400
+	(envelope-from <bounces@canonical.com>) id 1cwUGd-00071M-K2
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:49:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwUGZ-00043m-HI
+	(envelope-from <bounces@canonical.com>) id 1cwUGZ-00043s-HV
 	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:49:35 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40260)
+Received: from indium.canonical.com ([91.189.90.7]:40264)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cwUGZ-00043U-Bt
+	id 1cwUGZ-00043W-CQ
 	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:49:31 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cwUGY-0002Y8-4m
+	id 1cwUGY-0002Vt-CE
 	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 13:49:30 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 069D32E80CB
+	by loganberry.canonical.com (Postfix) with ESMTP id 5B8502E80C3
 	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 13:49:30 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Apr 2017 13:39:32 -0000
-From: Thomas Huth <1024275@bugs.launchpad.net>
-Reply-To: Bug 1024275 <1024275@bugs.launchpad.net>
+Date: Fri, 07 Apr 2017 13:37:33 -0000
+From: Thomas Huth <1022023@bugs.launchpad.net>
+Reply-To: Bug 1022023 <1022023@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20120713074334.30448.10631.malonedeb@gac.canonical.com>
-Message-Id: <20170407133932.2559.65937.malone@chaenomeles.canonical.com>
+References: <20120707081203.6181.33768.malonedeb@gac.canonical.com>
+Message-Id: <20170407133734.1912.66162.launchpad@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1024275] Re: bad iteraction between -daemonize
- and -nographic
+Subject: [Qemu-devel] [Bug 1022023] Re: vga/std lacks few wide screen modes.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,43 +38,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-According to the Debian bug tracker, this has been fixed with this upstream=
- commit:
-http://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3Dab51b1d568e02c80b1abf9016b=
-da3a86dc1db389
-... so let's close this now.
-
 ** Changed in: qemu
-       Status: Confirmed =3D> Fix Released
+   Importance: Undecided =3D> Wishlist
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1024275
+https://bugs.launchpad.net/bugs/1022023
 
 Title:
-  bad iteraction between -daemonize and -nographic
+  vga/std lacks few wide screen modes.
 
 Status in QEMU:
-  Fix Released
-Status in qemu package in Debian:
-  Fix Released
+  New
 
 Bug description:
-   $ qemu -daemonize -nographic
-   $ _
-
-  After this, the terminal is switched to some weird mode, not
-  processing cr/lf, and not showing the characters being typed (it is
-  fixable by using `stty sane').
-
-  Something is seriously wrong here: When -daemonize is given, qemu not
-  touch tty parameters at all.
-
-  Thanks,
-
-  /mjt
+  hi,
+  i have noticed that qemu-1.0.1 doesn't support few widescreen modes on -v=
+ga std, e.g. 1680x1050, 1600x1000, 1440x900.
+  i have a few laptops with kvm and i would like to work with qemu windows =
+guest native full wide screen mode.
+  could you please add these modes?
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1024275/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1022023/+subscriptions
