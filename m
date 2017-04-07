@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cwW1p-0002OY-AN
+	(envelope-from <alex.bennee@linaro.org>) id 1cwW1p-0002OU-2u
 	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:42:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cwW1o-0007VC-Fx
+	(envelope-from <alex.bennee@linaro.org>) id 1cwW1k-0007Q4-OM
 	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:42:25 -0400
-Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:35565)
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:37894)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cwW1o-0007Tm-AE
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:42:24 -0400
-Received: by mail-wr0-x235.google.com with SMTP id o21so83623618wrb.2
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 08:42:24 -0700 (PDT)
+	id 1cwW1k-0007Ok-Hm
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:42:20 -0400
+Received: by mail-wm0-x232.google.com with SMTP id t189so10640824wmt.1
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 08:42:20 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  7 Apr 2017 16:42:14 +0100
-Message-Id: <20170407154221.26918-6-alex.bennee@linaro.org>
+Date: Fri,  7 Apr 2017 16:42:10 +0100
+Message-Id: <20170407154221.26918-2-alex.bennee@linaro.org>
 In-Reply-To: <20170407154221.26918-1-alex.bennee@linaro.org>
 References: <20170407154221.26918-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 05/12] cpus: remove icount handling from
- qemu_tcg_cpu_thread_fn
+Subject: [Qemu-devel] [PATCH v3 01/12] scripts/qemugdb/mtree.py: fix up
+ mtree dump
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +31,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: dovgaluk@ispras.ru, rth@twiddle.net, pbonzini@redhat.com
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-We should never be running in multi-threaded mode with icount enabled.
-There is no point calling handle_icount_deadline here so remove it and
-assert !use_icount.
+Since QEMU has been able to build with native Int128 support this was
+broken as it attempts to fish values out of the non-existent
+structure. Also the alias print was trying to make a %x out of
+gdb.ValueType directly which didn't seem to work.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
- cpus.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ scripts/qemugdb/mtree.py | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/cpus.c b/cpus.c
-index 68fdbc40b9..4e48b9c4ad 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1392,6 +1392,8 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
- {
-     CPUState *cpu = arg;
+diff --git a/scripts/qemugdb/mtree.py b/scripts/qemugdb/mtree.py
+index cc8131c2e7..e6791b7885 100644
+--- a/scripts/qemugdb/mtree.py
++++ b/scripts/qemugdb/mtree.py
+@@ -21,7 +21,15 @@ def isnull(ptr):
+     return ptr == gdb.Value(0).cast(ptr.type)
  
-+    g_assert(!use_icount);
+ def int128(p):
+-    return int(p['lo']) + (int(p['hi']) << 64)
++    '''Read an Int128 type to a python integer.
 +
-     rcu_register_thread();
++    QEMU can be built with native Int128 support so we need to detect
++    if the value is a structure or the native type.
++    '''
++    if p.type.code == gdb.TYPE_CODE_STRUCT:
++        return int(p['lo']) + (int(p['hi']) << 64)
++    else:
++        return int(("%s" % p), 16)
  
-     qemu_mutex_lock_iothread();
-@@ -1434,8 +1436,6 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
-             }
-         }
- 
--        handle_icount_deadline();
--
-         atomic_mb_set(&cpu->exit_request, 0);
-         qemu_tcg_wait_io_event(cpu);
-     }
+ class MtreeCommand(gdb.Command):
+     '''Display the memory tree hierarchy'''
+@@ -69,7 +77,7 @@ class MtreeCommand(gdb.Command):
+             gdb.write('%s    alias: %s@%016x (@ %s)\n' %
+                       ('  ' * level,
+                        alias['name'].string(),
+-                       ptr['alias_offset'],
++                       int(ptr['alias_offset']),
+                        alias,
+                        ),
+                       gdb.STDOUT)
 -- 
 2.11.0
