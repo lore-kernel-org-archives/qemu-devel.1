@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42301)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cwfFP-0003om-PK
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 21:33:04 -0400
+	(envelope-from <intermediadc@hotmail.com>) id 1cwfwj-0001Gn-Bz
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 22:17:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cwfFM-0006UW-LW
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 21:33:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60282)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1cwfFM-0006UN-CE
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 21:33:00 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3BC5361D15
-	for <qemu-devel@nongnu.org>; Sat,  8 Apr 2017 01:32:59 +0000 (UTC)
-References: <20170323173928.14439-1-pbonzini@redhat.com>
-	<20170323173928.14439-11-pbonzini@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <04b67e67-6b27-e5d0-5fbd-38ec98d57b44@redhat.com>
-Date: Fri, 7 Apr 2017 21:32:58 -0400
+	(envelope-from <intermediadc@hotmail.com>) id 1cwfwg-0003nH-69
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 22:17:49 -0400
+From: luigi burdo <intermediadc@hotmail.com>
+Date: Fri, 7 Apr 2017 17:49:55 +0000
+Message-ID: <AM5P194MB01294EAC74E1825F9210E04CC80C0@AM5P194MB0129.EURP194.PROD.OUTLOOK.COM>
+References: <20170407060752.31313-1-nikunj@linux.vnet.ibm.com>
+In-Reply-To: <20170407060752.31313-1-nikunj@linux.vnet.ibm.com>
+Content-Language: it-IT
 MIME-Version: 1.0
-In-Reply-To: <20170323173928.14439-11-pbonzini@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 10/10] blockjob: use deferred_to_main_loop
- to indicate the coroutine has ended
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 0/3] Enable MTTCG on PPC64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,82 +23,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: jcody@redhat.com
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>, "rth@twiddle.net" <rth@twiddle.net>
+Cc: "programmingkidx@gmail.com" <programmingkidx@gmail.com>, "alex.bennee@linaro.org" <alex.bennee@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "bharata@linux.vnet.ibm.com" <bharata@linux.vnet.ibm.com>
+
+Tested on PowerMac G5 Quad  and 380% of system load and working on
+
+Fedora 25 PPC64 host and Ubuntu Mate 17.04 guest  (patched the 2.9 rc3)
 
 
+The machine configuration was this
 
-On 03/23/2017 01:39 PM, Paolo Bonzini wrote:
-> All block jobs are using block_job_defer_to_main_loop as the final
-> step just before the coroutine terminates.  At this point,
-> block_job_enter should do nothing, but currently it restarts
-> the freed coroutine.
-> 
-> Now, the job->co states should probably be changed to an enum
-> (e.g. BEFORE_START, STARTED, YIELDED, COMPLETED) subsuming
+sudo ./qemu-system-ppc64 -cpu POWER8 -vga none -machine pseries-2.5,usb=3Do=
+ff -m 2G  -smp 4,cores=3D4,threads=3D1 -accel tcg,thread=3Dmulti  -kerne vm=
+linuz    -append root=3D/dev/sda   -device ich9-ahci,id=3Dahci   -device id=
+e-drive,drive=3Ddisk0 -drive file=3D/dev/sda4,if=3Dnone,id=3Ddisk0   -net n=
+ic,model=3Dpcnet -net user -soundhw hda  -display sdl -vga virtio
 
-Yes, I'd love to formalize the FSM for jobs.
 
-> block_job_started, job->deferred_to_main_loop and job->busy.
-> For now, this patch eliminates the problematic reenter by
-> removing the reset of job->deferred_to_main_loop (which served
-> no purpose, as far as I could see) and checking the flag in
-> block_job_enter.
+vga virtio working too
 
-Not sure -- the original commit 794f01414 makes it seem like it should
-stay so that the correct AIO context can be acquired. Probably a race as
-jobs don't often stay long once they've deferred to the main loop, but I
-think the reset is harmless as you say.
+here a shot
 
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  blockjob.c                   | 10 ++++++++--
->  include/block/blockjob_int.h |  3 ++-
->  2 files changed, 10 insertions(+), 3 deletions(-)
-> 
-> diff --git a/blockjob.c b/blockjob.c
-> index 3fa2885..2d80dae 100644
-> --- a/blockjob.c
-> +++ b/blockjob.c
-> @@ -750,7 +750,14 @@ void block_job_resume_all(void)
->  
->  void block_job_enter(BlockJob *job)
->  {
-> -    if (job->co && !job->busy) {
-> +    if (!block_job_started(job)) {
-> +        return;
-> +    }
-> +    if (job->deferred_to_main_loop) {
-> +        return;
-> +    }
-> +
-> +    if (!job->busy) {
->          qemu_coroutine_enter(job->co);
->      }
->  }
-> @@ -874,7 +881,6 @@ static void block_job_defer_to_main_loop_bh(void *opaque)
->          aio_context_acquire(aio_context);
->      }
->  
-> -    data->job->deferred_to_main_loop = false;
->      data->fn(data->job, data->opaque);
->  
->      if (aio_context != data->aio_context) {
-> diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-> index 97ffc43..4d287ba 100644
-> --- a/include/block/blockjob_int.h
-> +++ b/include/block/blockjob_int.h
-> @@ -227,7 +227,8 @@ typedef void BlockJobDeferToMainLoopFn(BlockJob *job, void *opaque);
->   * @fn: The function to run in the main loop
->   * @opaque: The opaque value that is passed to @fn
->   *
-> - * Execute a given function in the main loop with the BlockDriverState
-> + * This function must be called by the main job coroutine just before it
-> + * returns.  @fn is executed in the main loop with the BlockDriverState
->   * AioContext acquired.  Block jobs must call bdrv_unref(), bdrv_close(), and
->   * anything that uses bdrv_drain_all() in the main loop.
->   *
-> 
+https://scontent-mxp1-1.xx.fbcdn.net/v/t1.0-9/17796379_10208795258860396_78=
+25547329794577576_n.jpg?oh=3D526d6ddeb67c817053582d5b9ee56c71&oe=3D594D7BDF
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+
+Thanks
+
+Luigi
