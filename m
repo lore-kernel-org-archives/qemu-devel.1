@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38443)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cwQRz-00044A-RC
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:45:04 -0400
+	(envelope-from <stefanha@redhat.com>) id 1cwQSW-0004Un-Mw
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:45:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cwQRv-0000Aw-Uy
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:45:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41030)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cwQRv-0000Am-PF
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:44:59 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7D84781243
-	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 09:44:58 +0000 (UTC)
-Date: Fri, 7 Apr 2017 10:44:55 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170407094454.GD2138@work-vm>
-References: <20170406130913.2232-1-quintela@redhat.com>
-	<20170406130913.2232-12-quintela@redhat.com>
+	(envelope-from <stefanha@redhat.com>) id 1cwQSV-0000Nu-Ts
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:45:36 -0400
+Date: Fri, 7 Apr 2017 10:45:25 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170407094525.GJ13602@stefanha-x1.localdomain>
+References: <cover.1491416061.git.jcody@redhat.com>
+	<fcdfe9c672ecdb179264187e0671b5432fced4c4.1491416061.git.jcody@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="k1BdFSKqAqVdu8k/"
 Content-Disposition: inline
-In-Reply-To: <20170406130913.2232-12-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 11/54] ram: Change num_dirty_pages_period
- type to uint64_t
+In-Reply-To: <fcdfe9c672ecdb179264187e0671b5432fced4c4.1491416061.git.jcody@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 2/9] block: do not set BDS
+ read_only if copy_on_read enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,53 +25,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jsnow@redhat.com, kwolf@redhat.com
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  include/exec/ram_addr.h | 2 +-
->  migration/ram.c         | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-> index b05dc84..9aadc5c 100644
-> --- a/include/exec/ram_addr.h
-> +++ b/include/exec/ram_addr.h
-> @@ -356,7 +356,7 @@ static inline
->  uint64_t cpu_physical_memory_sync_dirty_bitmap(unsigned long *dest,
->                                                 ram_addr_t start,
->                                                 ram_addr_t length,
-> -                                               int64_t *real_dirty_pages)
-> +                                               uint64_t *real_dirty_pages)
 
-right that makes sense because num_dirty_pages_period gets passed to it.
+--k1BdFSKqAqVdu8k/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
->  {
->      ram_addr_t addr;
->      unsigned long page = BIT_WORD(start >> TARGET_PAGE_BITS);
-> diff --git a/migration/ram.c b/migration/ram.c
-> index d6cf032..9a82355 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -160,7 +160,7 @@ struct RAMState {
->      /* bytes transferred at start_time */
->      uint64_t bytes_xfer_prev;
->      /* number of dirty pages since start_time */
-> -    int64_t num_dirty_pages_period;
-> +    uint64_t num_dirty_pages_period;
+On Wed, Apr 05, 2017 at 02:28:44PM -0400, Jeff Cody wrote:
+> @@ -1173,7 +1171,18 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
+>          if (ret < 0) {
+>              goto fail;
+>          }
+> -        bdrv_set_read_only(bs, false);
+> +        ret = bdrv_set_read_only(bs, false, &local_err);
+> +        if (ret < 0) {
+> +            error_propagate(errp, local_err);
+> +            goto fail;
+> +        }
 
-and trace_migration_bitmap_sync_end is already using PRIu64 so
-that sohuld be OK.
+I realized later in the series why you are doing this.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+The error code path introduces a resource leak: enable_write_target()
+has already been called and isn't cleaned up by the fail label.
 
->  };
->  typedef struct RAMState RAMState;
->  
-> -- 
-> 2.9.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+It would be cleaner to check that bs is writable before calling
+enable_write_target().
+
+Stefan
+
+--k1BdFSKqAqVdu8k/
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJY51+1AAoJEJykq7OBq3PIzqwH/iyhxdshwloPzjx+YAbqILL3
+0HLxwXABJKKR1oF5ljoQmbkRM8FmkRzsTgpcfdthsIcdIvLdkb5LZByKgWfA7WvW
+fINzQxSIRPQt5uIvqyyQ6A1HCOoA9PEf9dbBpBqFCjWuQUTSIRN6qov0Aw5DVz3L
+PczJxpVGtwL2ytpesFsyFbxLcZb4AsDnLehydYXu131JEdmc4pDcmhEEkoW16mQ4
+OAN/L+Pm9aq/otBeTh0+OXEQFr6jA7nEDJ5ldyqkIoa13IvxyYdGbAItwDjC3MBa
+g5Kx+1lnEu8fhXEvx446lBLgvW/oq9wgnLVj2Zlkx9lF4yC2w6CHOtNp0zuS5hA=
+=KiRS
+-----END PGP SIGNATURE-----
+
+--k1BdFSKqAqVdu8k/--
