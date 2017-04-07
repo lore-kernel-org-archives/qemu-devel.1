@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cwdRj-0006rk-5c
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 19:37:40 -0400
+	(envelope-from <bounces@canonical.com>) id 1cwdZc-0008To-53
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 19:45:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cwdRe-0004JI-7M
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 19:37:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52572)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1cwdRd-0004I0-Uy
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 19:37:34 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ABBEBC059735
-	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 23:37:32 +0000 (UTC)
-References: <20170323173928.14439-1-pbonzini@redhat.com>
-	<20170323173928.14439-5-pbonzini@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <5a3d56b5-96ea-87cd-5520-4647b3001749@redhat.com>
-Date: Fri, 7 Apr 2017 19:37:31 -0400
+	(envelope-from <bounces@canonical.com>) id 1cwdZX-0006RL-Dt
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 19:45:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39502)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cwdZW-0006Q7-VH
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 19:45:43 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cwdZV-0004EL-5K
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 23:45:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id BA20E2E80CA
+	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 23:45:40 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170323173928.14439-5-pbonzini@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 04/10] blockjob: introduce
- block_job_pause/resume_all
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 07 Apr 2017 23:38:20 -0000
+From: Roger Lawhorn <rll@twc.com>
+Reply-To: Bug 1680679 <1680679@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170407032144.12640.21952.malonedeb@gac.canonical.com>
+Message-Id: <20170407233820.30360.23613.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1680679] Re: qemu cannot run twice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,275 +36,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: jcody@redhat.com
+To: qemu-devel@nongnu.org
 
+I meant to say you cannot run without the intel card in windows if you
+have optimus. I am glad seabios somehow hides optimus.
 
+-- =
 
-On 03/23/2017 01:39 PM, Paolo Bonzini wrote:
-> Remove use of block_job_pause/resume from outside blockjob.c, thus
-> making them static.  Again, one reason to do this is that
-> block_job_pause/resume will have different locking rules compared
-> to everything else that block.c and block/io.c use.
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1680679
 
-Ominous
+Title:
+  qemu cannot run twice
 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  block/io.c               |  18 +-------
->  blockjob.c               | 114 ++++++++++++++++++++++++++++-------------------
->  include/block/blockjob.h |  14 +++---
->  3 files changed, 77 insertions(+), 69 deletions(-)
-> 
-> diff --git a/block/io.c b/block/io.c
-> index 2709a70..1cc9318 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -284,16 +284,9 @@ void bdrv_drain_all_begin(void)
->      bool waited = true;
->      BlockDriverState *bs;
->      BdrvNextIterator it;
-> -    BlockJob *job = NULL;
->      GSList *aio_ctxs = NULL, *ctx;
->  
-> -    while ((job = block_job_next(job))) {
-> -        AioContext *aio_context = blk_get_aio_context(job->blk);
-> -
-> -        aio_context_acquire(aio_context);
-> -        block_job_pause(job);
-> -        aio_context_release(aio_context);
-> -    }
-> +    block_job_pause_all();
->  
+Status in QEMU:
+  Invalid
 
-Cool. Well, maybe cool. I think it would be cool if we didn't have to
-explicitly pause jobs here at all. This is better at least, though.
+Bug description:
+  After using qemu with gpu passthrough and then shutting down windows 7 pr=
+operly I cannot boot windows 7 a second time.
+  Only a full reboot of linux fixes this issue.
+  Qemu appears to corrupt something in linux when exiting.
+  I get no error messages but windows 7 never finishes booting during the 2=
+nd try.
+  Apparently I do try to run vfiobind each time the script is run.
+  Wondering if rerunning vfiobind can cause an issue?
 
->      for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
->          AioContext *aio_context = bdrv_get_aio_context(bs);
-> @@ -337,7 +330,6 @@ void bdrv_drain_all_end(void)
->  {
->      BlockDriverState *bs;
->      BdrvNextIterator it;
-> -    BlockJob *job = NULL;
->  
->      for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
->          AioContext *aio_context = bdrv_get_aio_context(bs);
-> @@ -348,13 +340,7 @@ void bdrv_drain_all_end(void)
->          aio_context_release(aio_context);
->      }
->  
-> -    while ((job = block_job_next(job))) {
-> -        AioContext *aio_context = blk_get_aio_context(job->blk);
-> -
-> -        aio_context_acquire(aio_context);
-> -        block_job_resume(job);
-> -        aio_context_release(aio_context);
-> -    }
-> +    block_job_resume_all();
->  }
->  
->  void bdrv_drain_all(void)
-> diff --git a/blockjob.c b/blockjob.c
-> index 1c63d15..caca718 100644
-> --- a/blockjob.c
-> +++ b/blockjob.c
-> @@ -55,36 +55,6 @@ struct BlockJobTxn {
->  
->  static QLIST_HEAD(, BlockJob) block_jobs = QLIST_HEAD_INITIALIZER(block_jobs);
->  
-> -static char *child_job_get_parent_desc(BdrvChild *c)
-> -{
-> -    BlockJob *job = c->opaque;
-> -    return g_strdup_printf("%s job '%s'",
-> -                           BlockJobType_lookup[job->driver->job_type],
-> -                           job->id);
-> -}
-> -
-> -static const BdrvChildRole child_job = {
-> -    .get_parent_desc    = child_job_get_parent_desc,
-> -    .stay_at_node       = true,
-> -};
-> -
-> -static void block_job_drained_begin(void *opaque)
-> -{
-> -    BlockJob *job = opaque;
-> -    block_job_pause(job);
-> -}
-> -
-> -static void block_job_drained_end(void *opaque)
-> -{
-> -    BlockJob *job = opaque;
-> -    block_job_resume(job);
-> -}
-> -
-> -static const BlockDevOps block_job_dev_ops = {
-> -    .drained_begin = block_job_drained_begin,
-> -    .drained_end = block_job_drained_end,
-> -};
-> -
->  BlockJob *block_job_next(BlockJob *job)
->  {
->      if (!job) {
-> @@ -106,6 +76,21 @@ BlockJob *block_job_get(const char *id)
->      return NULL;
->  }
->  
-> +static void block_job_pause(BlockJob *job)
-> +{
-> +    job->pause_count++;
-> +}
-> +
-> +static void block_job_resume(BlockJob *job)
-> +{
-> +    assert(job->pause_count > 0);
-> +    job->pause_count--;
-> +    if (job->pause_count) {
-> +        return;
-> +    }
-> +    block_job_enter(job);
-> +}
-> +
->  static void block_job_ref(BlockJob *job)
->  {
->      ++job->refcnt;
-> @@ -171,6 +156,36 @@ static void block_job_detach_aio_context(void *opaque)
->      block_job_unref(job);
->  }
->  
-> +static char *child_job_get_parent_desc(BdrvChild *c)
-> +{
-> +    BlockJob *job = c->opaque;
-> +    return g_strdup_printf("%s job '%s'",
-> +                           BlockJobType_lookup[job->driver->job_type],
-> +                           job->id);
-> +}
-> +
-> +static const BdrvChildRole child_job = {
-> +    .get_parent_desc    = child_job_get_parent_desc,
-> +    .stay_at_node       = true,
-> +};
-> +
-> +static void block_job_drained_begin(void *opaque)
-> +{
-> +    BlockJob *job = opaque;
-> +    block_job_pause(job);
-> +}
-> +
-> +static void block_job_drained_end(void *opaque)
-> +{
-> +    BlockJob *job = opaque;
-> +    block_job_resume(job);
-> +}
-> +
-> +static const BlockDevOps block_job_dev_ops = {
-> +    .drained_begin = block_job_drained_begin,
-> +    .drained_end = block_job_drained_end,
-> +};
-> +
+  =
 
-Movement should probably be its own patch, but I'm not a cop or nothin'
+  My specs:
+  -------------------------------------------------------------------------=
+----------------
+  System:    Host: GT70-2PE Kernel: 4.5.4-040504-generic x86_64 (64 bit gcc=
+: 5.3.1)
+             Desktop: Cinnamon 3.2.7 (Gtk 3.18.9) Distro: Linux Mint 18.1 S=
+erena
+  Machine:   Mobo: Micro-Star model: MS-1763 v: REV:0.C Bios: American Mega=
+trends v: E1763IMS.51B date: 01/29/2015
+  CPU:       Quad core Intel Core i7-4810MQ (-HT-MCP-) cache: 6144 KB
+             flags: (lm nx sse sse2 sse3 sse4_1 sse4_2 ssse3 vmx) bmips: 22=
+347
+             clock speeds: max: 2801 MHz 1: 2801 MHz 2: 2801 MHz 3: 2801 MH=
+z 4: 2801 MHz 5: 2801 MHz 6: 2801 MHz
+             7: 2801 MHz 8: 2801 MHz
+  Graphics:  Card-1: Intel 4th Gen Core Processor Integrated Graphics Contr=
+oller bus-ID: 00:02.0
+             Card-2: NVIDIA GK104M [GeForce GTX 880M] bus-ID: 01:00.0
+             Display Server: X.Org 1.18.4 drivers: intel (unloaded: fbdev,v=
+esa)
+             Resolution: 1920x1080@60.02hz, 1920x1080@60.00hz
+             GLX Renderer: Mesa DRI Intel Haswell Mobile GLX Version: 3.0 M=
+esa 12.0.6 Direct Rendering: Yes
 
->  void block_job_remove_all_bdrv(BlockJob *job)
->  {
->      GSList *l;
-> @@ -471,11 +486,6 @@ void block_job_complete(BlockJob *job, Error **errp)
->      job->driver->complete(job, errp);
->  }
->  
-> -void block_job_pause(BlockJob *job)
-> -{
-> -    job->pause_count++;
-> -}
-> -
->  void block_job_user_pause(BlockJob *job)
->  {
->      job->user_paused = true;
-> @@ -520,16 +530,6 @@ void coroutine_fn block_job_pause_point(BlockJob *job)
->      }
->  }
->  
-> -void block_job_resume(BlockJob *job)
-> -{
-> -    assert(job->pause_count > 0);
-> -    job->pause_count--;
-> -    if (job->pause_count) {
-> -        return;
-> -    }
-> -    block_job_enter(job);
-> -}
-> -
->  void block_job_user_resume(BlockJob *job)
->  {
->      if (job && job->user_paused && job->pause_count > 0) {
-> @@ -723,6 +723,30 @@ static void block_job_event_completed(BlockJob *job, const char *msg)
->                                          &error_abort);
->  }
->  
-> +void block_job_pause_all(void)
-> +{
-> +    BlockJob *job = NULL;
-> +    while ((job = block_job_next(job))) {
-> +        AioContext *aio_context = blk_get_aio_context(job->blk);
-> +
-> +        aio_context_acquire(aio_context);
-> +        block_job_pause(job);
-> +        aio_context_release(aio_context);
-> +    }
-> +}
-> +
-> +void block_job_resume_all(void)
-> +{
-> +    BlockJob *job = NULL;
-> +    while ((job = block_job_next(job))) {
-> +        AioContext *aio_context = blk_get_aio_context(job->blk);
-> +
-> +        aio_context_acquire(aio_context);
-> +        block_job_resume(job);
-> +        aio_context_release(aio_context);
-> +    }
-> +}
-> +
->  void block_job_event_ready(BlockJob *job)
->  {
->      job->ready = true;
-> diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-> index 9e906f7..aac87cd 100644
-> --- a/include/block/blockjob.h
-> +++ b/include/block/blockjob.h
-> @@ -235,12 +235,11 @@ void block_job_complete(BlockJob *job, Error **errp);
->  BlockJobInfo *block_job_query(BlockJob *job, Error **errp);
->  
->  /**
-> - * block_job_pause:
-> - * @job: The job to be paused.
-> + * block_job_pause_all:
->   *
-> - * Asynchronously pause the specified job.
-> + * Asynchronously pause all jobs.
->   */
-> -void block_job_pause(BlockJob *job);
-> +void block_job_pause_all(void);
->  
->  /**
->   * block_job_user_pause:
-> @@ -260,12 +259,11 @@ void block_job_user_pause(BlockJob *job);
->  bool block_job_user_paused(BlockJob *job);
->  
->  /**
-> - * block_job_resume:
-> - * @job: The job to be resumed.
-> + * block_job_resume_all:
->   *
-> - * Resume the specified job.  Must be paired with a preceding block_job_pause.
-> + * Resume all block jobs.  Must be paired with a preceding block_job_pause_all.
->   */
-> -void block_job_resume(BlockJob *job);
-> +void block_job_resume_all(void);
->  
->  /**
->   * block_job_user_resume:
-> 
+  =
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+  My script:
+  -------------------------------------------------------------------------=
+------------------
+  #!/bin/bash
+
+  cd ~/qemu
+  sudo ./up.sh tap0
+
+  configfile=3D~/qemu/vfio-pci1.cfg
+
+  vfiobind() {
+      dev=3D"$1"
+          vendor=3D$(cat /sys/bus/pci/devices/$dev/vendor)
+          device=3D$(cat /sys/bus/pci/devices/$dev/device)
+          if [ -e /sys/bus/pci/devices/$dev/driver ]; then
+                  echo $dev > /sys/bus/pci/devices/$dev/driver/unbind
+          fi
+          echo $vendor $device > /sys/bus/pci/drivers/vfio-pci/new_id
+
+  }
+
+  modprobe vfio-pci
+
+  cat $configfile | while read line;do
+      echo $line | grep ^# >/dev/null 2>&1 && continue
+          vfiobind $line
+  done
+
+  sudo qemu-system-x86_64 -machine type=3Dq35,accel=3Dkvm -cpu host,kvm=3Do=
+ff \
+  -smp 8,sockets=3D1,cores=3D4,threads=3D2 \
+  -bios /usr/share/seabios/bios.bin \
+  -serial none \
+  -parallel none \
+  -vga none \
+  -m 4G \
+  -mem-path /run/hugepages/kvm \
+  -mem-prealloc \
+  -balloon none \
+  -rtc clock=3Dhost,base=3Dlocaltime \
+  -device ioh3420,bus=3Dpcie.0,addr=3D1c.0,multifunction=3Don,port=3D1,chas=
+sis=3D1,id=3Droot.1 \
+  -device vfio-pci,host=3D01:00.0,bus=3Droot.1,addr=3D00.0,multifunction=3D=
+on,x-vga=3Don \
+  -device virtio-scsi-pci,id=3Dscsi \
+  -drive id=3Ddisk0,if=3Dvirtio,cache=3Dnone,format=3Draw,file=3D/home/dad/=
+qemu/windows7.img \
+  -drive file=3D/home/dad/1TB-Backup/Iso/SP1ForWin7.iso,id=3Disocd,format=
+=3Draw,if=3Dnone -device scsi-cd,drive=3Disocd \
+  -net nic -net tap,ifname=3Dtap0,script=3Dno,downscript=3Dno \
+  -usbdevice host:413c:a503 \
+  -usbdevice host:13fe:3100 \
+  -usbdevice host:0bc2:ab21 \
+  -boot menu=3Don \
+  -boot order=3Dc
+
+  sudo ./down.sh tap0
+
+  exit 0
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1680679/+subscriptions
