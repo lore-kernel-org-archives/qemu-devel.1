@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38646)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwTyp-0005tW-V1
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:31:13 -0400
+	(envelope-from <bounces@canonical.com>) id 1cwU2T-0007U7-Vj
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:34:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwTym-0004gZ-PW
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:31:11 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37154)
+	(envelope-from <bounces@canonical.com>) id 1cwU2O-00063I-W7
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:34:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37440)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cwTym-0004gD-K9
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:31:08 -0400
+	id 1cwU2O-00062j-QB
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:34:52 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cwTyk-0000FC-48
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 13:31:06 +0000
+	id 1cwU2N-00066X-7q
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 13:34:51 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F2D832E827E
-	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 13:30:58 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 37D522E80C9
+	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 13:34:51 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Apr 2017 13:22:33 -0000
-From: Gerd Hoffmann <1635339@bugs.launchpad.net>
-Reply-To: Bug 1635339 <1635339@bugs.launchpad.net>
+Date: Fri, 07 Apr 2017 13:24:13 -0000
+From: Thomas Huth <1013714@bugs.launchpad.net>
+Reply-To: Bug 1013714 <1013714@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20161020160532.23339.63373.malonedeb@soybean.canonical.com>
-Message-Id: <20170407132233.30835.30093.malone@soybean.canonical.com>
+References: <20120615145323.29444.96098.malonedeb@soybean.canonical.com>
+Message-Id: <20170407132413.12230.21659.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1635339] Re: qxl_pre_save assertion failure on vm
- "save"
+Subject: [Qemu-devel] [Bug 1013714] Re: Data corruption after block
+ migration (LV->LV)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,49 +39,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I put my money on that one:
+Closing according to comment #3
 
-https://cgit.freedesktop.org/spice/win32/qxl-wddm-
-dod/commit/?id=3Df6e099db39e7d0787f294d5fd0dce328b5210faa
-
-commit f6e099db39e7d0787f294d5fd0dce328b5210faa
-Author: Sameeh Jubran <sameeh@daynix.com>
-Date:   Sun Sep 11 16:05:24 2016 +0300
-
-    Use the second bar (VRAM) for qxl command buffer.
-    =
-
-    Based on a patch by Sandy Stutsman <sstutsma@redhat.com>
-    =
-
-    Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
-    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1635339
+https://bugs.launchpad.net/bugs/1013714
 
 Title:
-  qxl_pre_save assertion failure on vm "save"
+  Data corruption after block migration (LV->LV)
 
 Status in QEMU:
-  New
+  Fix Released
 
 Bug description:
-  When I try and save my Windows 10 VM, I see an assertion failure, and
-  the machine is shut down.
+  We quite frequently use the live block migration feature to move VM's
+  between nodes without downtime. These sometimes result in data
+  corruption on the receiving end. It only happens if the VM is actually
+  doing I/O (doesn't have to be all that much to trigger the issue).
 
-  I see the following in the log:
+  We use logical volumes and each VM has two disks.  We use cache=3Dnone
+  for all VM disks.
 
-  main_channel_handle_parsed: agent start
-  qemu-system-x86_64: /build/qemu-Zwynhi/qemu-2.5+dfsg/hw/display/qxl.c:210=
-1: qxl_pre_save: Assertion `d->last_release_offset < d->vga.vram_size' fail=
-ed.
-  2016-10-20 11:52:42.713+0000: shutting down
+  All guests use virtio (a mix of various Linux distro's and Windows
+  2008R2).
 
-  Please let me know what other information would be relevant!
+  We currently have two stacks in use and have seen the issue on both of
+  them:
+
+  Fedora - qemu-kvm 0.13
+  Scientific Linux 6.2 (RHEL derived) - qemu-kvm package 0.12.1.2
+
+  Even though we don't run the most recent versions of KVM I highly
+  suspect this issue is still unreported and that filing a bug is
+  therefore appropriate. (There doesn't seem to be any similar bug
+  report in launchpad or RedHat's bugzilla and nothing related in change
+  logs, release notes and  git commit logs.)
+
+  I have no idea where to look or where to start debugging this issue,
+  but if there is any way I can provide useful debug information please
+  let me know.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1635339/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1013714/+subscriptions
