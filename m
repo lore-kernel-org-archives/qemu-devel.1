@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cwUF4-0005i8-2U
+	(envelope-from <kwolf@redhat.com>) id 1cwUF4-0005iW-AJ
 	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:47:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cwUF3-0003Mm-9B
+	(envelope-from <kwolf@redhat.com>) id 1cwUF3-0003Mh-5m
 	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:47:58 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Apr 2017 15:47:37 +0200
-Message-Id: <1491572865-8549-3-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Apr 2017 15:47:36 +0200
+Message-Id: <1491572865-8549-2-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1491572865-8549-1-git-send-email-kwolf@redhat.com>
 References: <1491572865-8549-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 02/10] commit: Set commit_top_bs->aio_context
+Subject: [Qemu-devel] [PULL 01/10] block: Ignore guest dev permissions
+ during incoming migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,35 +23,154 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-The filter driver that is inserted by the commit job needs to use the
-same AioContext as its parent and child nodes.
+Usually guest devices don't like other writers to the same image, so
+they use blk_set_perm() to prevent this from happening. In the migration
+phase before the VM is actually running, though, they don't have a
+problem with writes to the image. On the other hand, storage migration
+needs to be able to write to the image in this phase, so the restrictive
+blk_set_perm() call of qdev devices breaks it.
+
+This patch flags all BlockBackends with a qdev device as
+blk->disable_perm during incoming migration, which means that the
+requested permissions are stored in the BlockBackend, but not actually
+applied to its root node yet.
+
+Once migration has finished and the VM should be resumed, the
+permissions are applied. If they cannot be applied (e.g. because the NBD
+server used for block migration hasn't been shut down), resuming the VM
+fails.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
+Tested-by: Kashyap Chamarthy <kchamart@redhat.com>
 ---
- block/commit.c | 2 ++
- 1 file changed, 2 insertions(+)
+ block/block-backend.c | 40 +++++++++++++++++++++++++++++++++++++++-
+ include/block/block.h |  2 ++
+ migration/migration.c |  8 ++++++++
+ qmp.c                 |  6 ++++++
+ 4 files changed, 55 insertions(+), 1 deletion(-)
 
-diff --git a/block/commit.c b/block/commit.c
-index 2832482..4c38220 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -335,6 +335,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-     if (commit_top_bs == NULL) {
-         goto fail;
-     }
-+    bdrv_set_aio_context(commit_top_bs, bdrv_get_aio_context(top));
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 0b63773..18ece99 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -61,6 +61,7 @@ struct BlockBackend {
  
-     bdrv_set_backing_hd(commit_top_bs, top, &local_err);
-     if (local_err) {
-@@ -482,6 +483,7 @@ int bdrv_commit(BlockDriverState *bs)
-         error_report_err(local_err);
-         goto ro_cleanup;
-     }
-+    bdrv_set_aio_context(commit_top_bs, bdrv_get_aio_context(backing_file_bs));
+     uint64_t perm;
+     uint64_t shared_perm;
++    bool disable_perm;
  
-     bdrv_set_backing_hd(commit_top_bs, backing_file_bs, &error_abort);
-     bdrv_set_backing_hd(bs, commit_top_bs, &error_abort);
+     bool allow_write_beyond_eof;
+ 
+@@ -578,7 +579,7 @@ int blk_set_perm(BlockBackend *blk, uint64_t perm, uint64_t shared_perm,
+ {
+     int ret;
+ 
+-    if (blk->root) {
++    if (blk->root && !blk->disable_perm) {
+         ret = bdrv_child_try_set_perm(blk->root, perm, shared_perm, errp);
+         if (ret < 0) {
+             return ret;
+@@ -597,15 +598,52 @@ void blk_get_perm(BlockBackend *blk, uint64_t *perm, uint64_t *shared_perm)
+     *shared_perm = blk->shared_perm;
+ }
+ 
++/*
++ * Notifies the user of all BlockBackends that migration has completed. qdev
++ * devices can tighten their permissions in response (specifically revoke
++ * shared write permissions that we needed for storage migration).
++ *
++ * If an error is returned, the VM cannot be allowed to be resumed.
++ */
++void blk_resume_after_migration(Error **errp)
++{
++    BlockBackend *blk;
++    Error *local_err = NULL;
++
++    for (blk = blk_all_next(NULL); blk; blk = blk_all_next(blk)) {
++        if (!blk->disable_perm) {
++            continue;
++        }
++
++        blk->disable_perm = false;
++
++        blk_set_perm(blk, blk->perm, blk->shared_perm, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            blk->disable_perm = true;
++            return;
++        }
++    }
++}
++
+ static int blk_do_attach_dev(BlockBackend *blk, void *dev)
+ {
+     if (blk->dev) {
+         return -EBUSY;
+     }
++
++    /* While migration is still incoming, we don't need to apply the
++     * permissions of guest device BlockBackends. We might still have a block
++     * job or NBD server writing to the image for storage migration. */
++    if (runstate_check(RUN_STATE_INMIGRATE)) {
++        blk->disable_perm = true;
++    }
++
+     blk_ref(blk);
+     blk->dev = dev;
+     blk->legacy_dev = false;
+     blk_iostatus_reset(blk);
++
+     return 0;
+ }
+ 
+diff --git a/include/block/block.h b/include/block/block.h
+index 5149260..3e09222 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -366,6 +366,8 @@ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp);
+ void bdrv_invalidate_cache_all(Error **errp);
+ int bdrv_inactivate_all(void);
+ 
++void blk_resume_after_migration(Error **errp);
++
+ /* Ensure contents are flushed to disk.  */
+ int bdrv_flush(BlockDriverState *bs);
+ int coroutine_fn bdrv_co_flush(BlockDriverState *bs);
+diff --git a/migration/migration.c b/migration/migration.c
+index 54060f7..ad4036f 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -349,6 +349,14 @@ static void process_incoming_migration_bh(void *opaque)
+         exit(EXIT_FAILURE);
+     }
+ 
++    /* If we get an error here, just don't restart the VM yet. */
++    blk_resume_after_migration(&local_err);
++    if (local_err) {
++        error_free(local_err);
++        local_err = NULL;
++        autostart = false;
++    }
++
+     /*
+      * This must happen after all error conditions are dealt with and
+      * we're sure the VM is going to be running on this host.
+diff --git a/qmp.c b/qmp.c
+index fa82b59..a744e44 100644
+--- a/qmp.c
++++ b/qmp.c
+@@ -207,6 +207,12 @@ void qmp_cont(Error **errp)
+         }
+     }
+ 
++    blk_resume_after_migration(&local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
+     if (runstate_check(RUN_STATE_INMIGRATE)) {
+         autostart = 1;
+     } else {
 -- 
 1.8.3.1
