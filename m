@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwVY5-0002lW-MX
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:11:43 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cwVYW-0002zq-QH
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:12:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwVY2-0001gI-UD
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:11:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58711)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cwVY2-0001fv-OJ
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:11:38 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cwVXy-00078X-VE
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 15:11:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6935A2E80CE
-	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 15:11:34 +0000 (UTC)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cwVYV-0001zl-U8
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:12:08 -0400
+Received: from mail-lf0-x232.google.com ([2a00:1450:4010:c07::232]:34419)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cwVYV-0001zU-Mh
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:12:07 -0400
+Received: by mail-lf0-x232.google.com with SMTP id z15so43784446lfd.1
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 08:12:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <1491575431-32170-1-git-send-email-amarnath.valluri@intel.com>
+	<1491575431-32170-10-git-send-email-amarnath.valluri@intel.com>
+	<20170407144100.GL26896@redhat.com>
+In-Reply-To: <20170407144100.GL26896@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 07 Apr 2017 15:11:55 +0000
+Message-ID: <CAJ+F1CJ1wfP_RS25=gokRvk2y0+-_7pX8adzmBUMZPpaz=AOgw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Apr 2017 15:00:21 -0000
-From: Alex Williamson <alex.l.williamson@gmail.com>
-Reply-To: Bug 1678466 <1678466@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170401120201.1125.46046.malonedeb@gac.canonical.com>
-Message-Id: <20170407150021.12743.46004.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1678466] Re: using x-vga=on with vfio-pci leads
- to segfault
+Subject: Re: [Qemu-devel] [PATCH v2 9/9] tpm: Added support for TPM emulator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,95 +31,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, Amarnath Valluri <amarnath.valluri@intel.com>
+Cc: qemu-devel@nongnu.org, patrick.ohly@intel.com, stefanb@linux.vnet.ibm.com
 
-This is now fixed in QEMU 2.9-rc
+Hi
 
--- =
+On Fri, Apr 7, 2017 at 4:41 PM Daniel P. Berrange
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1678466
+> > +        .name =3D "data-path",
+> > +        .type =3D QEMU_OPT_STRING,
+> > +        .help =3D "Socket path to use for data exhange",
+> > +    },
+> > +    {
+> > +        .name =3D "ctrl-path",
+> > +        .type =3D QEMU_OPT_STRING,
+> > +        .help =3D "Socket path to use for out-of-band control messages=
+",
+> > +    },
+>
+> I'm still not convinced by the need for 2 separate UNIX sockets, unless
+> there's a performance reason, but that looks unlikely.
+>
+>
+We would also need something more than an implementation of the protocol
+that qemu is going to rely on as an external dependency.  A protocol
+specification would help to start the discussion. Alternatively, I would
+suggest to not rely on a public protocol, and implement the helper as part
+of qemu with a private protocol (but still documented).
 
-Title:
-  using x-vga=3Don with vfio-pci leads to segfault
-
-Status in QEMU:
-  New
-
-Bug description:
-  bug occures at least with qemu 2.8.0 and 2.8.1 in 64bit-system
-
-  stripped cmd for minimal config:
-  qemu-system-i386 -m 2048 -M q35  -enable-kvm -nodefaults -nodefconfig -de=
-vice ioh3420,bus=3Dpcie.0,addr=3D0x9,multifunction=3Don,port=3D1,chassis=3D=
-1,id=3Droot.1 -device vfio-pci,host=3D01:00.0,bus=3Droot.1,addr=3D01.0,x-vg=
-a=3Don
-
-  Backtrace is:
-  #0  0x00005555557ca836 in memory_region_update_container_subregions (subr=
-egion=3D0x55555828f2f0) at qemu-2.8.1/memory.c:2030
-  #1  0x00005555557ca9dc in memory_region_add_subregion_common (mr=3D0x0, o=
-ffset=3D8, subregion=3D0x55555828f2f0) at qemu-2.8.1/memory.c:2049
-  #2  0x00005555557caa9a in memory_region_add_subregion_overlap (mr=3D0x0, =
-offset=3D8, subregion=3D0x55555828f2f0, priority=3D1) at qemu-2.8.1/memory.=
-c:2066
-  #3  0x0000555555832e48 in vfio_probe_nvidia_bar5_quirk (vdev=3D0x55555805=
-aef0, nr=3D5) at qemu-2.8.1/hw/vfio/pci-quirks.c:689
-  #4  0x0000555555835433 in vfio_bar_quirk_setup (vdev=3D0x55555805aef0, nr=
-=3D5) at qemu-2.8.1/hw/vfio/pci-quirks.c:1652
-  #5  0x000055555582f122 in vfio_realize (pdev=3D0x55555805aef0, errp=3D0x7=
-fffffffdc78) at qemu-2.8.1/hw/vfio/pci.c:2777
-  #6  0x0000555555a86195 in pci_qdev_realize (qdev=3D0x55555805aef0, errp=
-=3D0x7fffffffdcf0) at hw/pci/pci.c:1966
-  #7  0x00005555559be7b7 in device_set_realized (obj=3D0x55555805aef0, valu=
-e=3Dtrue, errp=3D0x7fffffffdeb0) at hw/core/qdev.c:918
-  #8  0x0000555555bb017f in property_set_bool (obj=3D0x55555805aef0, v=3D0x=
-55555805ced0, name=3D0x555556071b56 "realized", opaque=3D0x555557f15860, er=
-rp=3D0x7fffffffdeb0) at qom/object.c:1854
-  #9  0x0000555555bae2e6 in object_property_set (obj=3D0x55555805aef0, v=3D=
-0x55555805ced0, name=3D0x555556071b56 "realized", errp=3D0x7fffffffdeb0) at=
- qom/object.c:1088
-  #10 0x0000555555bb184f in object_property_set_qobject (obj=3D0x55555805ae=
-f0, value=3D0x55555805cd70, name=3D0x555556071b56 "realized", errp=3D0x7fff=
-ffffdeb0) at qom/qom-qobject.c:27
-  #11 0x0000555555bae637 in object_property_set_bool (obj=3D0x55555805aef0,=
- value=3Dtrue, name=3D0x555556071b56 "realized", errp=3D0x7fffffffdeb0) at =
-qom/object.c:1157
-  #12 0x00005555558fee4b in qdev_device_add (opts=3D0x555556b15160, errp=3D=
-0x7fffffffdf28) at qdev-monitor.c:623
-  #13 0x00005555559142c1 in device_init_func (opaque=3D0x0, opts=3D0x555556=
-b15160, errp=3D0x0) at vl.c:2373
-  #14 0x0000555555cc3bb7 in qemu_opts_foreach (list=3D0x555556548b80 <qemu_=
-device_opts>, func=3D0x555555914283 <device_init_func>, opaque=3D0x0, errp=
-=3D0x0) at util/qemu-option.c:1116
-  #15 0x00005555559198aa in main (argc=3D12, argv=3D0x7fffffffe388, envp=3D=
-0x7fffffffe3f0) at vl.c:4574
-
-  as I can see, it happens during initialization of the device-option.
-
-  seems that the code tries to loop over a memory-region mr, which is
-  null from at least three calls before it crashes.
-
-  because there seems to be special handling for nvidia-cards, here're the =
-pci-infos of the card:
-  01:00.0 VGA compatible controller [0300]: NVIDIA Corporation G72 [GeForce=
- 7300 GS] [10de:01df] (rev a1) (prog-if 00 [VGA controller])
-  	Subsystem: Gigabyte Technology Co., Ltd Device [1458:342a]
-  	Flags: fast devsel, IRQ 16
-  	Memory at de000000 (32-bit, non-prefetchable) [disabled] [size=3D16M]
-  	Memory at c0000000 (64-bit, prefetchable) [disabled] [size=3D256M]
-  	Memory at dd000000 (64-bit, non-prefetchable) [disabled] [size=3D16M]
-  	Expansion ROM at df000000 [disabled] [size=3D128K]
-  	Capabilities: [60] Power Management version 2
-  	Capabilities: [68] MSI: Enable- Count=3D1/1 Maskable- 64bit+
-  	Capabilities: [78] Express Endpoint, MSI 00
-  	Capabilities: [100] Virtual Channel
-  	Capabilities: [128] Power Budgeting <?>
-  	Kernel driver in use: vfio-pci
-
-  at least with a similar card in another slot the crash does not occure.
-  (sorry, can't change the slots at the moment)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1678466/+subscriptions
+--=20
+Marc-Andr=C3=A9 Lureau
