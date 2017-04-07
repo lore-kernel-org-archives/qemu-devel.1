@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwU3U-00084J-0x
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:36:01 -0400
+	(envelope-from <bounces@canonical.com>) id 1cwU7B-00015E-OM
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:39:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwU3P-0006Zi-0H
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:36:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38144)
+	(envelope-from <bounces@canonical.com>) id 1cwU77-0007os-8A
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:39:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38361)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cwU3O-0006ZY-QE
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:35:54 -0400
+	id 1cwU77-0007o5-25
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:39:45 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cwU3M-00072B-MG
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 13:35:53 +0000
+	id 1cwU75-0007bV-S4
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 13:39:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D39612E817B
-	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 13:35:45 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id D22D62E805E
+	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 13:39:43 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Apr 2017 13:26:08 -0000
-From: "Matwey V. Kornilov" <matwey.kornilov@gmail.com>
-Reply-To: Bug 1661386 <1661386@bugs.launchpad.net>
+Date: Fri, 07 Apr 2017 13:26:56 -0000
+From: Thomas Huth <1013888@bugs.launchpad.net>
+Reply-To: Bug 1013888 <1013888@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20170202204510.26617.69309.malonedeb@wampee.canonical.com>
-Message-Id: <20170407132608.12396.53396.malone@gac.canonical.com>
+References: <20120615224639.22616.95414.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170407132656.12396.125.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1661386] Re: Assertion `ret ==
- cpu->kvm_msr_buf->nmsrs' failed
+Subject: [Qemu-devel] [Bug 1013888] Re: windows xp sp3 setup blank screen on
+ boot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,92 +39,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Hi,
+Marking this bug as fixed, according to comment #4 and #5
 
-I've attached the files with logs you requested. Could you comment them
-somehow?
-
-x86info says that IA32_PERF is not enabled:
-
-Performance MSRs:
-  MSR_IA32_PERF_STATUS: 0x0
-  MSR_IA32_MISC_ENABLE: 0x0 [Enabled: ]
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1661386
+https://bugs.launchpad.net/bugs/1013888
 
 Title:
-  Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed
+  windows xp sp3 setup blank screen on boot
 
 Status in QEMU:
-  New
+  Fix Released
 
 Bug description:
-  Hello,
+  When attempting to run Windows XP SP3 setup in qemu on a Lubuntu host
+  with the following kernel:
 
-  =
+  Linux michael-XPS-M1530 3.2.0-23-generic #36-Ubuntu SMP Tue Apr 10
+  20:39:51 UTC 2012 x86_64 x86_64 x86_64 GNU/Linux
 
-  I see the following when try to run qemu from master as the following:
-
-  # ./x86_64-softmmu/qemu-system-x86_64 --version
-  QEMU emulator version 2.8.50 (v2.8.0-1006-g4e9f524)
-  Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
-  # ./x86_64-softmmu/qemu-system-x86_64 -machine accel=3Dkvm -nodefaults
-  -no-reboot -nographic -cpu host -vga none  -kernel .build.kernel.kvm
-  -initrd .build.initrd.kvm -append 'panic=3D1 no-kvmclock console=3DttyS0
-  loglevel=3D7' -m 1024 -serial stdio
-  qemu-system-x86_64: /home/matwey/lab/qemu/target/i386/kvm.c:1849:
-  kvm_put_msrs: Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
-
-  First broken commit has been bisected:
-
-  commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
-  Author: Paolo Bonzini <pbonzini@redhat.com>
-  Date:   Wed Mar 30 22:55:29 2016 +0200
-
-      target-i386: assert that KVM_GET/SET_MSRS can set all requested MSRs
-      =
-
-      This would have caught the bug in the previous patch.
-      =
-
-      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-  My cpuinfo is the following:
-
-  processor       : 0
-  vendor_id       : GenuineIntel
-  cpu family      : 6
-  model           : 44
-  model name      : Intel(R) Xeon(R) CPU           X5675  @ 3.07GHz
-  stepping        : 2
-  microcode       : 0x14
-  cpu MHz         : 3066.775
-  cache size      : 12288 KB
-  physical id     : 0
-  siblings        : 2
-  core id         : 0
-  cpu cores       : 2
-  apicid          : 0
-  initial apicid  : 0
-  fpu             : yes
-  fpu_exception   : yes
-  cpuid level     : 11
-  wp              : yes
-  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
-a cmov pat pse36 clflush dts mmx fxsr sse sse2 ss ht syscall nx rdtscp lm c=
-onstant_tsc arch_perfmon pebs bts nopl xtopology tsc_reliable nonstop_tsc a=
-perfmperf pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 popcnt aes hypervisor =
-lahf_lm ida arat epb dtherm tpr_shadow vnmi ept vpid
-  bugs            :
-  bogomips        : 6133.55
-  clflush size    : 64
-  cache_alignment : 64
-  address sizes   : 40 bits physical, 48 bits virtual
-  power management:
+  Qemu does not get past a blank screen after "Setup is inspecting your
+  computer's hardware configuration"
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1661386/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1013888/+subscriptions
