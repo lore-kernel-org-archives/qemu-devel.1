@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cwQYR-0007ft-Rf
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:51:46 -0400
+	(envelope-from <stefanha@redhat.com>) id 1cwQZZ-0000Cm-Fn
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:52:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cwQYO-0001xH-LM
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:51:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46954)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cwQYO-0001ww-Cl
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:51:40 -0400
-References: <20170406212209.22788-1-ard.biesheuvel@linaro.org>
-	<20170407085513.czs6tsbwhkecfjrq@kamzik.brq.redhat.com>
-	<64d6ad1d-d9ce-2bbb-dfb9-35938f9593ec@redhat.com>
-	<CAAibmn3D_vWCv0HwZ607ejESDEnf2i5QVZTfJBM29hRgqqdu_A@mail.gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <6d321415-1b3e-ca93-29b7-d3872d3dd453@redhat.com>
-Date: Fri, 7 Apr 2017 11:51:34 +0200
+	(envelope-from <stefanha@redhat.com>) id 1cwQZY-0002KG-Mc
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:52:53 -0400
+Date: Fri, 7 Apr 2017 10:52:45 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170407095245.GL13602@stefanha-x1.localdomain>
+References: <cover.1491416061.git.jcody@redhat.com>
+	<613303fd54633f005eeea485e32f590994eb299f.1491416061.git.jcody@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAAibmn3D_vWCv0HwZ607ejESDEnf2i5QVZTfJBM29hRgqqdu_A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/virt: generate 64-bit addressable
- ACPI objects
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="gwtGiOGliFx8mAnm"
+Content-Disposition: inline
+In-Reply-To: <613303fd54633f005eeea485e32f590994eb299f.1491416061.git.jcody@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 8/9] block/rbd: do not blindly set
+ bs->read_only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,261 +25,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Phil Dennis-Jordan <phil@philjordan.eu>
-Cc: Andrew Jones <drjones@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, qemu-devel@nongnu.org, peter.maydell@linaro.org, "Michael S. Tsirkin" <mst@redhat.com>, zhaoshenglong@huawei.com, Igor Mammedov <imammedo@redhat.com>
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jsnow@redhat.com, kwolf@redhat.com
 
-On 04/07/17 11:36, Phil Dennis-Jordan wrote:
-> On 7 April 2017 at 21:11, Laszlo Ersek <lersek@redhat.com> wrote:
->> On 04/07/17 10:55, Andrew Jones wrote:
->>> On Thu, Apr 06, 2017 at 10:22:09PM +0100, Ard Biesheuvel wrote:
->>>> Our current ACPI table generation code limits the placement of ACPI
->>>> tables to 32-bit addressable memory, in order to be able to emit the
->>>> root pointer (RSDP) and root table (RSDT) using table types from the
->>>> ACPI 1.0 days.
->>>>
->>>> Since ARM was not supported by ACPI before version 5.0, it makes sense
->>>> to lift this restriction. This is not crucial for mach-virt, which is
->>>> guaranteed to have some memory available below the 4 GB mark, but it
->>>> is a nice to have for QEMU machines that do not have any 32-bit
->>>> addressable, not unlike some real world 64-bit ARM systems.
-> 
-> "QEMU machines that do not have any 32-bit addressable memory," perhaps?
-> 
->>>> Since we already emit a version of the RSDP root pointer that carries
->>>> a 64-bit wide address for the 64-bit root table (XSDT), all we need to
->>>> do is replace the RSDT generation with the generation of an XSDT table,
->>>> and use a different slot in the FADT table to refer to the DSDT.
->>>>
->>>> Note that this only modifies the private interaction between QEMU and
->>>> UEFI. Since these tables are all handled by the generic AcpiTableDxe
->>>> driver which generates its own RSDP, RSDT and XSDT tables and manages
->>>> the DSDT pointer in FADT itself, the tables that are present to the
->>>> guest are identical, and so no mach-virt versioning is required for
->>>> this change.
->>
->> The last paragraph could be dropped from the commit message (or trimmed
->> a bit). Not really necessary, saying it just FYI. Namely, we don't
->> version firmware blobs (i.e., we don't tie different firmware blobs to
->> different versions of a machine type), and ACPI tables are considered
->> part of the firmware (from the OS's POV), despite the fact that
->> technically we generate them in QEMU. So, in my understanding, the ACPI
->> content we generate never needs to consider machine types.
->>
->>>>
->>>> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->>>> ---
->>>>  hw/arm/virt-acpi-build.c    | 55 ++++++++++++++++++++++++++++++++++-----------
->>>>  include/hw/acpi/acpi-defs.h | 11 +++++++++
->>>>  2 files changed, 53 insertions(+), 13 deletions(-)
->>>>
->>>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
->>>> index b173bd109b91..d18368094c00 100644
->>>> --- a/hw/arm/virt-acpi-build.c
->>>> +++ b/hw/arm/virt-acpi-build.c
->>>> @@ -391,12 +391,12 @@ static void acpi_dsdt_add_power_button(Aml *scope)
->>>>
->>>>  /* RSDP */
->>>>  static GArray *
->>>> -build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_offset)
->>>> +build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
->>>>  {
->>>>      AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
->>>> -    unsigned rsdt_pa_size = sizeof(rsdp->rsdt_physical_address);
->>>> -    unsigned rsdt_pa_offset =
->>>> -        (char *)&rsdp->rsdt_physical_address - rsdp_table->data;
->>>> +    unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
->>>> +    unsigned xsdt_pa_offset =
->>>> +        (char *)&rsdp->xsdt_physical_address - rsdp_table->data;
->>>>
->>>>      bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, rsdp_table, 16,
->>>>                               true /* fseg memory */);
->>>> @@ -408,8 +408,8 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_offset)
->>>>
->>>>      /* Address to be filled by Guest linker */
->>>>      bios_linker_loader_add_pointer(linker,
->>>> -        ACPI_BUILD_RSDP_FILE, rsdt_pa_offset, rsdt_pa_size,
->>>> -        ACPI_BUILD_TABLE_FILE, rsdt_tbl_offset);
->>>> +        ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
->>>> +        ACPI_BUILD_TABLE_FILE, xsdt_tbl_offset);
->>>>
->>>>      /* Checksum to be filled by Guest linker */
->>>>      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
->>>> @@ -686,7 +686,7 @@ static void build_fadt(GArray *table_data, BIOSLinker *linker,
->>>>                         VirtMachineState *vms, unsigned dsdt_tbl_offset)
->>>>  {
->>>>      AcpiFadtDescriptorRev5_1 *fadt = acpi_data_push(table_data, sizeof(*fadt));
->>>> -    unsigned dsdt_entry_offset = (char *)&fadt->dsdt - table_data->data;
->>>> +    unsigned xdsdt_entry_offset = (char *)&fadt->Xdsdt - table_data->data;
->>>>      uint16_t bootflags;
->>>>
->>>>      switch (vms->psci_conduit) {
->>>> @@ -712,7 +712,7 @@ static void build_fadt(GArray *table_data, BIOSLinker *linker,
->>>>
->>>>      /* DSDT address to be filled by Guest linker */
->>>>      bios_linker_loader_add_pointer(linker,
->>>> -        ACPI_BUILD_TABLE_FILE, dsdt_entry_offset, sizeof(fadt->dsdt),
->>>> +        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->Xdsdt),
->>>>          ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
->>>>
->>>>      build_header(linker, table_data,
-> 
-> I don't know what it's like in ARM-Land, but X64 Windows does not take
-> kindly to a zero DSDT pointer in my experience. It might make sense to
-> make the choice between DSDT and XDSDT conditional on whether the
-> pointer is actually above 4GB?
 
-This choice is already being made, in edk2's
-MdeModulePkg/Universal/Acpi/AcpiTableDxe, in function AddTableToList().
-The most recent commit to look at is 78807f605082
-("MdeModulePkg/AcpiTableDxe: Not make FADT.{DSDT,X_DSDT} mutual
-exclusion", 2017-03-16).
+--gwtGiOGliFx8mAnm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I think this QEMU code is fine as-is. Windows's behavior wrt. ACPI is
-unpredictable; we shouldn't speculate about Windows-on-aarch64 until we
-actually get to see it / run it.
+On Wed, Apr 05, 2017 at 02:28:50PM -0400, Jeff Cody wrote:
+> We do not want to just blindly set bs->read_only.  The only time
+> we need to set it with the current rbd driver, is if we are using an
+> rbd snapshot.  In that case, we must set it to read-only.
+>=20
+> Signed-off-by: Jeff Cody <jcody@redhat.com>
+> ---
+>  block/rbd.c | 13 +++++++++----
+>  1 file changed, 9 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/block/rbd.c b/block/rbd.c
+> index c5e1aeb..35853c9 100644
+> --- a/block/rbd.c
+> +++ b/block/rbd.c
+> @@ -635,6 +635,7 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict =
+*options, int flags,
+>          goto failed_shutdown;
+>      }
+> =20
+> +    /* rbd_open is always r/w */
+>      r =3D rbd_open(s->io_ctx, s->image_name, &s->image, s->snap);
+>      if (r < 0) {
+>          error_setg_errno(errp, -r, "error reading header from %s",
+> @@ -642,10 +643,14 @@ static int qemu_rbd_open(BlockDriverState *bs, QDic=
+t *options, int flags,
+>          goto failed_open;
+>      }
+> =20
+> -    r =3D bdrv_set_read_only(bs, (s->snap !=3D NULL), &local_err);
+> -    if (r < 0) {
+> -        error_propagate(errp, local_err);
+> -        goto failed_open;
+> +    /* If we are using an rbd snapshot, we must be r/o, otherwise
+> +     * leave as-is */
+> +    if (s->snap !=3D NULL) {
+> +        r =3D bdrv_set_read_only(bs, true, &local_err);
+> +        if (r < 0) {
+> +            error_propagate(errp, local_err);
+> +            goto failed_open;
+> +        }
 
-Now, for guest firmware (similar to SeaBIOS) that lacks the
-above-mentioned logic of AcpiTableDxe, your concern could be valid. But,
-for ARM guests that consume ACPI, there is no such firmware. There is
-only edk2.
+This patch series breaks git-bisect(1) for -drive
+file.driver=3Drbd,file.read-only=3Don since bdrv_set_read_only(bs, false,
+&local_err) fails.
 
-> Mind you, I don't even know if
-> Microsoft makes ARM variants of Windows generally available, and
-> whether they currently work in Qemu; the FOSS OSes are typically more
-> lenient.
-> 
-> See also the discussion in this thread on qemu-devel:
-> https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05754.html
-> and a related issue on edk2-devel:
-> https://lists.01.org/pipermail/edk2-devel/2017-March/008460.html
-> 
->>>> @@ -772,12 +772,41 @@ struct AcpiBuildState {
->>>>      bool patched;
->>>>  } AcpiBuildState;
->>>>
->>>> +/* Build xsdt table */
->>>> +
->>>> +static
->>>> +void build_xsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
->>>> +                const char *oem_id, const char *oem_table_id)
->>>> +{
->>>> +    int i;
->>>> +    unsigned xsdt_entries_offset;
->>>> +    AcpiXsdtDescriptorRev2 *xsdt;
->>>> +    const unsigned table_data_len = (sizeof(uint64_t) * table_offsets->len);
->>>> +    const unsigned xsdt_entry_size = sizeof(xsdt->table_offset_entry[0]);
->>>> +    const size_t xsdt_len = sizeof(*xsdt) + table_data_len;
->>>> +
->>>> +    xsdt = acpi_data_push(table_data, xsdt_len);
->>>> +    xsdt_entries_offset = (char *)xsdt->table_offset_entry - table_data->data;
->>>> +    for (i = 0; i < table_offsets->len; ++i) {
->>>> +        uint64_t ref_tbl_offset = g_array_index(table_offsets, uint32_t, i);
->>>> +        uint64_t xsdt_entry_offset = xsdt_entries_offset + xsdt_entry_size * i;
->>>> +
->>>> +        /* xsdt->table_offset_entry to be filled by Guest linker */
->>>> +        bios_linker_loader_add_pointer(linker,
->>>> +            ACPI_BUILD_TABLE_FILE, xsdt_entry_offset, xsdt_entry_size,
->>>> +            ACPI_BUILD_TABLE_FILE, ref_tbl_offset);
->>>> +    }
->>>> +    build_header(linker, table_data,
->>>> +                 (void *)xsdt, "XSDT", xsdt_len, 1, oem_id, oem_table_id);
->>>> +}
->>>
->>> build_xsdt should probably go in hw/acpi/aml-build.c
->>>
->>>> +
->>>> +
->>>>  static
->>>>  void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->>>>  {
->>>>      VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
->>>>      GArray *table_offsets;
->>>> -    unsigned dsdt, rsdt;
->>>> +    unsigned dsdt, xsdt;
->>>>      GArray *tables_blob = tables->table_data;
->>>>
->>>>      table_offsets = g_array_new(false, true /* clear */,
->>>> @@ -817,12 +846,12 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->>>>          build_iort(tables_blob, tables->linker);
->>>>      }
->>>>
->>>> -    /* RSDT is pointed to by RSDP */
->>>> -    rsdt = tables_blob->len;
->>>> -    build_rsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
->>>> +    /* XSDT is pointed to by RSDP */
->>>> +    xsdt = tables_blob->len;
->>>> +    build_xsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
->>>>
->>>>      /* RSDP is in FSEG memory, so allocate it separately */
->>>> -    build_rsdp(tables->rsdp, tables->linker, rsdt);
->>>> +    build_rsdp(tables->rsdp, tables->linker, xsdt);
->>>>
->>>>      /* Cleanup memory that's no longer used. */
->>>>      g_array_free(table_offsets, true);
->>>> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
->>>> index 4cc3630e613e..bf37acf4c4c6 100644
->>>> --- a/include/hw/acpi/acpi-defs.h
->>>> +++ b/include/hw/acpi/acpi-defs.h
->>>> @@ -238,6 +238,17 @@ struct AcpiRsdtDescriptorRev1
->>>>  typedef struct AcpiRsdtDescriptorRev1 AcpiRsdtDescriptorRev1;
->>>>
->>>>  /*
->>>> + * ACPI 2.0 eXtended System Description Table (XSDT)
->>>> + */
->>>> +struct AcpiXsdtDescriptorRev2
->>>> +{
->>>> +    ACPI_TABLE_HEADER_DEF       /* ACPI common table header */
->>>> +    uint64_t table_offset_entry[0];  /* Array of pointers to other */
->>>> +    /* ACPI tables */
->>>> +} QEMU_PACKED;
->>>> +typedef struct AcpiXsdtDescriptorRev2 AcpiXsdtDescriptorRev2;
->>>> +
->>>> +/*
->>>>   * ACPI 1.0 Firmware ACPI Control Structure (FACS)
->>>>   */
->>>>  struct AcpiFacsDescriptorRev1
->>>> --
->>>> 2.9.3
->>>>
->>>>
->>>
->>> Otherwise
->>>
->>> Reviewed-by: Andrew Jones <drjones@redhat.com>
->>>
->>
->> Great, I didn't want to be the first one to provide public feedback. :)
->>
->> Personally I'm fine if we keep the XSDT generation local to
->> "hw/arm/virt-acpi-build.c" for now, and we upstream it to
->> "hw/acpi/aml-build.c" later (for example when i386 actually puts it to
->> use -- which shouldn't be that far out, AIUI, since Phil will probably
->> need XSDT for OSX guests). However, I also wouldn't mind if the XSDT
->> builder were moved to "hw/acpi/aml-build.c" right now.
-> 
-> FWIW, OS X guests don't appear to care about an XSDT, and I'm not
-> planning any work in that area. My patch only affects the x86 FADT
-> (Rev1->Rev3).
+Please squash this patch where you added the bdrv_set_read_only() errp
+argument.
 
-Ah, okay, I missed that bit, sorry. Thanks for the info.
+--gwtGiOGliFx8mAnm
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> From what I saw, this is, aside from the struct
-> definition, completely independent from Qemu's ARM FADT, which I think
-> has always used the Rev5(.1?) variant.
-> (Are patches for 2.10 already being accepted?
+-----BEGIN PGP SIGNATURE-----
 
-Reviewed & discussed, yes; merged, no.
+iQEcBAEBAgAGBQJY52FtAAoJEJykq7OBq3PI69EIAMIwLQcLUFKpNVEg9bO6VuOp
+itSa9zyZnXFfT2opYWl98UHwH8hodLNbDGRVmE+heGyWJJCs09S0/rdXeLYF8J01
+jrJHoc9SsP70r+3bymdYJTO2TLDpNihOCCKe91YRLaRkYS/gDiJe9H7j1N89/wEk
+vGk441TtCH/0ve+CYacVA6t92QCKE/q8RHKWf1liJUxk+vdroPxnTx3TlCRx73pP
+lQHm10P7/SU0O/jr1KE2Kw+gtIvU6xZ6U9AKngvKrWl/H6I2GbrIbXvVnRoh3VV7
+vHd3WhmEFTrSet6SbLtb9mE/1rSBcLc2+fV0zS5yfGKBu9SIufyN0XDZLi2M7zM=
+=zg9x
+-----END PGP SIGNATURE-----
 
-Thanks,
-Laszlo
-
-> Michael previously said
-> I should wait until 2.9 is out, that's the only reason I'm still
-> hanging onto my patch.)
-> 
->> So one way or another,
->>
->> Acked-by: Laszlo Ersek <lersek@redhat.com>
->>
->> Thanks
->> Laszlo
+--gwtGiOGliFx8mAnm--
