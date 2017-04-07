@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60810)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cwRvG-0008GG-6s
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 07:19:26 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cwRvI-0008Hk-LH
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 07:19:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cwRvC-0004YZ-4L
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 07:19:22 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34386)
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cwRvC-0004Yj-Nl
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 07:19:24 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34414)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cwRvB-0004YM-QU
+	id 1cwRvC-0004YO-EJ
 	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 07:19:18 -0400
 Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v37BJGEG012703
-	for <qemu-devel@nongnu.org>; Fri, 7 Apr 2017 07:19:16 -0400
+	v37BJDpk012513
+	for <qemu-devel@nongnu.org>; Fri, 7 Apr 2017 07:19:17 -0400
 Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29p6g61tp4-1
+	by mx0a-001b2d01.pphosted.com with ESMTP id 29p6g61tmk-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 07:19:16 -0400
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 07:19:17 -0400
 Received: from localhost
 	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Fri, 7 Apr 2017 12:19:13 +0100
+	Fri, 7 Apr 2017 12:19:11 +0100
 From: Cornelia Huck <cornelia.huck@de.ibm.com>
-Date: Fri,  7 Apr 2017 13:18:47 +0200
+Date: Fri,  7 Apr 2017 13:18:46 +0200
 In-Reply-To: <20170407111851.20680-1-cornelia.huck@de.ibm.com>
 References: <20170407111851.20680-1-cornelia.huck@de.ibm.com>
-Message-Id: <20170407111851.20680-5-cornelia.huck@de.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 for-2.10 4/8] s390x/3270: Add emulated
- terminal3270 device
+Message-Id: <20170407111851.20680-4-cornelia.huck@de.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 for-2.10 3/8] s390x/3270: Add abstract
+ emulated ccw-attached 3270 device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,11 +43,8 @@ Cc: borntraeger@de.ibm.com, agraf@suse.de, pbonzini@redhat.com, marcandre.lureau
 
 From: Yang Chen <bjcyang@linux.vnet.ibm.com>
 
-This is a basic implementation of the emulated ccw-attached 3270
-called x-terminal3270, which provides visibility of the device in
-the qemu monitor and guest. The x prefix indicates that this is
-just an experimental implementation for the current stage. This
-device will not be compiled until the basic functions are available.
+This introduces the infrastructure for the emulated 3270
+devices, which will be attached to the virtual-css-bus.
 
 Signed-off-by: Yang Chen <bjcyang@linux.vnet.ibm.com>
 Signed-off-by: Jing Liu <liujbjl@linux.vnet.ibm.com>
@@ -55,69 +52,179 @@ Reviewed-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
 Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
 ---
- hw/char/terminal3270.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 54 insertions(+)
- create mode 100644 hw/char/terminal3270.c
+ hw/s390x/3270-ccw.c         | 99 +++++++++++++++++++++++++++++++++++++++++++++
+ hw/s390x/Makefile.objs      |  1 +
+ include/hw/s390x/3270-ccw.h | 44 ++++++++++++++++++++
+ 3 files changed, 144 insertions(+)
+ create mode 100644 hw/s390x/3270-ccw.c
+ create mode 100644 include/hw/s390x/3270-ccw.h
 
-diff --git a/hw/char/terminal3270.c b/hw/char/terminal3270.c
+diff --git a/hw/s390x/3270-ccw.c b/hw/s390x/3270-ccw.c
 new file mode 100644
-index 0000000000..bef3812c18
+index 0000000000..47b9e89bb7
 --- /dev/null
-+++ b/hw/char/terminal3270.c
-@@ -0,0 +1,54 @@
++++ b/hw/s390x/3270-ccw.c
+@@ -0,0 +1,99 @@
 +/*
-+ * Terminal 3270 implementation
++ * Emulated ccw-attached 3270 implementation
 + *
 + * Copyright 2017 IBM Corp.
++ * Author(s): Yang Chen <bjcyang@linux.vnet.ibm.com>
++ *            Jing Liu <liujbjl@linux.vnet.ibm.com>
 + *
-+ * Authors: Yang Chen <bjcyang@linux.vnet.ibm.com>
-+ *          Jing Liu <liujbjl@linux.vnet.ibm.com>
++ * This work is licensed under the terms of the GNU GPL, version 2 or (at
++ * your option) any later version. See the COPYING file in the top-level
++ * directory.
++ */
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qemu/module.h"
++#include "cpu.h"
++#include "hw/s390x/css.h"
++#include "hw/s390x/css-bridge.h"
++#include "hw/s390x/3270-ccw.h"
++
++static void emulated_ccw_3270_realize(DeviceState *ds, Error **errp)
++{
++    uint16_t chpid;
++    EmulatedCcw3270Device *dev = EMULATED_CCW_3270(ds);
++    EmulatedCcw3270Class *ck = EMULATED_CCW_3270_GET_CLASS(dev);
++    CcwDevice *cdev = CCW_DEVICE(ds);
++    CCWDeviceClass *cdk = CCW_DEVICE_GET_CLASS(cdev);
++    SubchDev *sch = css_create_virtual_sch(cdev->devno, errp);
++    Error *err = NULL;
++
++    if (!sch) {
++        return;
++    }
++
++    if (!ck->init) {
++        goto out_err;
++    }
++
++    sch->driver_data = dev;
++    cdev->sch = sch;
++    chpid = css_find_free_chpid(sch->cssid);
++
++    if (chpid > MAX_CHPID) {
++        error_setg(&err, "No available chpid to use.");
++        goto out_err;
++    }
++
++    sch->id.reserved = 0xff;
++    sch->id.cu_type = EMULATED_CCW_3270_CU_TYPE;
++    css_sch_build_virtual_schib(sch, (uint8_t)chpid,
++                                EMULATED_CCW_3270_CHPID_TYPE);
++
++    ck->init(dev, &err);
++    if (err) {
++        goto out_err;
++    }
++
++    cdk->realize(cdev, &err);
++    if (err) {
++        goto out_err;
++    }
++
++    return;
++
++out_err:
++    error_propagate(errp, err);
++    css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
++    cdev->sch = NULL;
++    g_free(sch);
++}
++
++static Property emulated_ccw_3270_properties[] = {
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void emulated_ccw_3270_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->props = emulated_ccw_3270_properties;
++    dc->bus_type = TYPE_VIRTUAL_CSS_BUS;
++    dc->realize = emulated_ccw_3270_realize;
++    dc->hotpluggable = false;
++}
++
++static const TypeInfo emulated_ccw_3270_info = {
++    .name = TYPE_EMULATED_CCW_3270,
++    .parent = TYPE_CCW_DEVICE,
++    .instance_size = sizeof(EmulatedCcw3270Device),
++    .class_init = emulated_ccw_3270_class_init,
++    .class_size = sizeof(EmulatedCcw3270Class),
++    .abstract = true,
++};
++
++static void emulated_ccw_register(void)
++{
++    type_register_static(&emulated_ccw_3270_info);
++}
++
++type_init(emulated_ccw_register)
+diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
+index 41ac4ec325..36bd4b1645 100644
+--- a/hw/s390x/Makefile.objs
++++ b/hw/s390x/Makefile.objs
+@@ -7,6 +7,7 @@ obj-y += sclpcpu.o
+ obj-y += ipl.o
+ obj-y += css.o
+ obj-y += s390-virtio-ccw.o
++obj-y += 3270-ccw.o
+ obj-y += virtio-ccw.o
+ obj-y += css-bridge.o
+ obj-y += ccw-device.o
+diff --git a/include/hw/s390x/3270-ccw.h b/include/hw/s390x/3270-ccw.h
+new file mode 100644
+index 0000000000..45ea515e9f
+--- /dev/null
++++ b/include/hw/s390x/3270-ccw.h
+@@ -0,0 +1,44 @@
++/*
++ * Emulated ccw-attached 3270 definitions
++ *
++ * Copyright 2017 IBM Corp.
++ * Author(s): Yang Chen <bjcyang@linux.vnet.ibm.com>
++ *            Jing Liu <liujbjl@linux.vnet.ibm.com>
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or (at
 + * your option) any later version. See the COPYING file in the top-level
 + * directory.
 + */
 +
-+#include "qemu/osdep.h"
-+#include "hw/s390x/3270-ccw.h"
++#ifndef HW_S390X_3270_CCW_H
++#define HW_S390X_3270_CCW_H
 +
-+typedef struct Terminal3270 {
-+    EmulatedCcw3270Device cdev;
-+} Terminal3270;
++#include "hw/sysbus.h"
++#include "hw/s390x/css.h"
++#include "hw/s390x/ccw-device.h"
 +
-+#define TYPE_TERMINAL_3270 "x-terminal3270"
++#define EMULATED_CCW_3270_CU_TYPE 0x3270
++#define EMULATED_CCW_3270_CHPID_TYPE 0x1a
 +
-+static void terminal_init(EmulatedCcw3270Device *dev, Error **errp)
-+{
-+    static bool terminal_available;
++#define TYPE_EMULATED_CCW_3270 "emulated-ccw-3270"
++#define EMULATED_CCW_3270(obj) \
++     OBJECT_CHECK(EmulatedCcw3270Device, (obj), TYPE_EMULATED_CCW_3270)
++#define EMULATED_CCW_3270_CLASS(klass) \
++     OBJECT_CLASS_CHECK(EmulatedCcw3270Class, (klass), TYPE_EMULATED_CCW_3270)
++#define EMULATED_CCW_3270_GET_CLASS(obj) \
++     OBJECT_GET_CLASS(EmulatedCcw3270Class, (obj), TYPE_EMULATED_CCW_3270)
 +
-+    if (terminal_available) {
-+        error_setg(errp, "Multiple 3270 terminals are not supported.");
-+        return;
-+    }
-+    terminal_available = true;
-+}
++typedef struct EmulatedCcw3270Device {
++    CcwDevice parent_obj;
++} EmulatedCcw3270Device;
 +
-+static void terminal_class_init(ObjectClass *klass, void *data)
-+{
-+    EmulatedCcw3270Class *ck = EMULATED_CCW_3270_CLASS(klass);
++typedef struct EmulatedCcw3270Class {
++    CCWDeviceClass parent_class;
 +
-+    ck->init = terminal_init;
-+}
++    void (*init)(EmulatedCcw3270Device *, Error **);
++    int (*read_payload_3270)(EmulatedCcw3270Device *, uint32_t, uint16_t);
++    int (*write_payload_3270)(EmulatedCcw3270Device *, uint8_t, uint32_t,
++                              uint16_t);
++} EmulatedCcw3270Class;
 +
-+static const TypeInfo ccw_terminal_info = {
-+    .name = TYPE_TERMINAL_3270,
-+    .parent = TYPE_EMULATED_CCW_3270,
-+    .instance_size = sizeof(Terminal3270),
-+    .class_init = terminal_class_init,
-+    .class_size = sizeof(EmulatedCcw3270Class),
-+};
-+
-+static void register_types(void)
-+{
-+    type_register_static(&ccw_terminal_info);
-+}
-+
-+type_init(register_types)
++#endif
 -- 
 2.11.0
