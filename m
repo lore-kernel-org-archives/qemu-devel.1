@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cwV9s-000145-Sy
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:46:42 -0400
+	(envelope-from <stefanha@gmail.com>) id 1cwVBG-0002Kd-Qp
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:48:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cwV9r-0000xe-Ot
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:46:40 -0400
-References: <20170407013709.18440-1-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <66d900f0-71ae-532e-c9fc-725647d69b99@redhat.com>
-Date: Fri, 7 Apr 2017 16:46:29 +0200
+	(envelope-from <stefanha@gmail.com>) id 1cwVBD-0001K5-Ik
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:48:06 -0400
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:35781)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cwVBD-0001Jp-D4
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:48:03 -0400
+Received: by mail-wm0-x235.google.com with SMTP id w64so503672wma.0
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 07:48:03 -0700 (PDT)
+Date: Fri, 7 Apr 2017 15:47:59 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170407144759.GL16146@stefanha-x1.localdomain>
+References: <1491548326-60072-1-git-send-email-weiqi4@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20170407013709.18440-1-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="qNjsiVtbpEnWxFnB7KBkKlS8liSiKXldP"
-Subject: Re: [Qemu-devel] [PATCH for-2.9?] qcow2: Allow discard of final
- unaligned cluster
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="DN8g+DOX2TxGxleI"
+Content-Disposition: inline
+In-Reply-To: <1491548326-60072-1-git-send-email-weiqi4@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] vhost: simple clean up
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,106 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, "open list:qcow2" <qemu-block@nongnu.org>
+To: weiqi <weiqi4@huawei.com>
+Cc: mst@redhat.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qNjsiVtbpEnWxFnB7KBkKlS8liSiKXldP
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, "open list:qcow2" <qemu-block@nongnu.org>
-Message-ID: <66d900f0-71ae-532e-c9fc-725647d69b99@redhat.com>
-Subject: Re: [PATCH for-2.9?] qcow2: Allow discard of final unaligned cluster
-References: <20170407013709.18440-1-eblake@redhat.com>
-In-Reply-To: <20170407013709.18440-1-eblake@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
+
+--DN8g+DOX2TxGxleI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 07.04.2017 03:37, Eric Blake wrote:
-> As mentioned in commit 0c1bd46, we ignored requests to
-> discard the trailing cluster of an unaligned image.  While
-> discard is an advisory operation from the guest standpoint,
-> (and we are therefore free to ignore any request), our
-> qcow2 implementation exploits the fact that a discarded
-> cluster reads back as 0.  As long as we discard on cluster
-> boundaries, we are fine; but that means we could observe
-> non-zero data leaked at the tail of an unaligned image.
+On Fri, Apr 07, 2017 at 02:58:46PM +0800, weiqi wrote:
+> From: Wei Qi <weiqi4@huawei.com>
 >=20
-> Enhance iotest 66 to cover this case, and fix the implementation
-> to honor a discard request on the final partial cluster.
+> It is unnecessary to assign 'hdev->nvqs' to 'i', because 'hdev->nvqs' unu=
+sed after assignment, so remove it.
 >=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Wei Qi <weiqi4@huawei.com>
 > ---
+>  hw/virtio/vhost.c | 1 -
+>  1 file changed, 1 deletion(-)
 
-Thanks!
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-> I can't convince myself whether we strongly rely on aligned discards
-> to guarantee that we read back zeroes on qcow2
-
-No, we don't.
-
->                                                (it would be a
-> stronger contract than what the block layer requires of pdiscard,
-> since the guest cannot guarantee that a discard does anything). If
-> we do, then this is a bug fix worthy of 2.9.
-
-I'm not sure it would be, even if we "relied" on it. For instance,
-intra-cluster discarding will be silently ignored (in contrast to
-intra-cluster zero writes).
-
-(Obviously one might argue that the desired behavior is to read back
-zeroes because for compat=3D1.1 images we actually write zero clusters
-instead of just completely discarding clusters, but...)
-
->                                              If we don't, then the
-> changes to test 66 rely on internal implementation (but the test is
-> already specific to qcow2), and the patch can wait for 2.10.
-
-If you want to write zeroes, use zero writing.
-
-Note that discarding on compat=3D0.10 images will actually really discard=
-
-the clusters instead of creating zero clusters (because those don't
-exist in compat=3D0.10). So if you have a backing file, afterwards you'll=
-
-see its contents in the discarded areas.
-
-(I personally actually really like that discard behavior. If I had to
-decide, I would like that behavior for compat=3D1.1 images, too, but I
-don't, so it reads back as zero there.)
-
-> At any rate, I do know that we don't want to make discard work on
-> sub-cluster boundaries anywhere except at the tail of the image
-> (that's what write-zeroes is for, and it may be slower when it
-> has to do COW or read-modify-write).  Any reliance that we (might)
-> have on whole-cluster discards reading back as 0 is also relying
-> on using aligned operations.
-
-No, we don't, because discard doesn't give you guarantees about what
-kind of data you'll read back.
-
-Therefore: Applied to my block-next branch for 2.10:
-
-https://github.com/XanClic/qemu/commits/block-next
-
-Max
-
-
---qNjsiVtbpEnWxFnB7KBkKlS8liSiKXldP
+--DN8g+DOX2TxGxleI
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljnpkUSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AQbcH/0utasi8ptR6FMjdEjIOc2f3XNXGhGIG
-rP8OknbQlcYgynOulhhRh6uztvRuinKUSW6bbuGj8XVZ7pPBJd8EPjUjRlkvn4k6
-rfChhCCpGlkIwY4CdDFLy6HOpIqhLWuXojyigpWELui2pW/pWxslB3ArKN6lXsMG
-342q462FSHHnEz44p+hnqpYSicxvfDm++E3x/q8xusrdto59M11qhxSgv/wyNkki
-F299+02BlxFn0+OQa+ntS4ymk1M1BzvnqyhyeiIuvcsP9yd3Iq/n1Afibr+XkCMk
-CGrBaXWN/0soVKNCkg0WHJjGZ1Eiwv+1ex/h736UziuW8bmCUhXqKyo=
-=0ik1
+iQEcBAEBAgAGBQJY56afAAoJEJykq7OBq3PIiloIAIsHiXXGfDNOETo9fIywb4Gl
+zlum3Y2wJqDfsjWLWK0wXPaVtVCwpOJup71CAm9KhI10dzj9A2rngvnm8J4BjuJi
+TjiyDqsgo1B1ROCVV0nfXG6WLbYrLZwy0vEBk5Fg40bLwJkeQvujwY5zITKpD4JR
+/U3OK7nFuZwpE/KG95j9BXGkmVA+HGJqdGgGbNpafRkB+Fy/TomguIJWxDznRxLm
+rhbldgVksphWEYODDgHlJVAK2DsJJAtgKij2WQJrX1/lVzFnIlw7j01bCHy6JRYo
+6kV5vvDbO0juSDfxrZzpWBcCmfkQDpSjv5+za83Z0GrsWxXvgaMtZXZFHLlZu2s=
+=k+rc
 -----END PGP SIGNATURE-----
 
---qNjsiVtbpEnWxFnB7KBkKlS8liSiKXldP--
+--DN8g+DOX2TxGxleI--
