@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cwUFB-0005rU-DN
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:48:06 -0400
+	(envelope-from <kwolf@redhat.com>) id 1cwUFC-0005sN-BX
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:48:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cwUF7-0003Sr-Ki
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:48:05 -0400
+	(envelope-from <kwolf@redhat.com>) id 1cwUFB-0003Vt-KG
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:48:06 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Apr 2017 15:47:40 +0200
-Message-Id: <1491572865-8549-6-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Apr 2017 15:47:41 +0200
+Message-Id: <1491572865-8549-7-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1491572865-8549-1-git-send-email-kwolf@redhat.com>
 References: <1491572865-8549-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 05/10] iotests: Add mirror tests for orphaned
- source
+Subject: [Qemu-devel] [PULL 06/10] qemu-img: img_create does not support
+ image-opts, fix docs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,118 +23,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Max Reitz <mreitz@redhat.com>
+From: Jeff Cody <jcody@redhat.com>
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
+The documentation and help for qemu-img claims that 'qemu-img create'
+will take the '--image-opts' argument.  This is not true, so this
+patch removes those claims.
+
+Signed-off-by: Jeff Cody <jcody@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/041        | 46 +++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/041.out    |  4 ++--
- tests/qemu-iotests/iotests.py | 15 ++++++++++++++
- 3 files changed, 63 insertions(+), 2 deletions(-)
+ qemu-img-cmds.hx | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
-index bc6cf78..2f54986 100755
---- a/tests/qemu-iotests/041
-+++ b/tests/qemu-iotests/041
-@@ -966,5 +966,51 @@ class TestRepairQuorum(iotests.QMPTestCase):
-         #       to check that this file is really driven by quorum
-         self.vm.shutdown()
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index 9c9702c..8ac7822 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -22,9 +22,9 @@ STEXI
+ ETEXI
  
-+# Test mirroring with a source that does not have any parents (not even a
-+# BlockBackend)
-+class TestOrphanedSource(iotests.QMPTestCase):
-+    def setUp(self):
-+        blk0 = { 'node-name': 'src',
-+                 'driver': 'null-co' }
-+
-+        blk1 = { 'node-name': 'dest',
-+                 'driver': 'null-co' }
-+
-+        blk2 = { 'node-name': 'dest-ro',
-+                 'driver': 'null-co',
-+                 'read-only': 'on' }
-+
-+        self.vm = iotests.VM()
-+        self.vm.add_blockdev(self.qmp_to_opts(blk0))
-+        self.vm.add_blockdev(self.qmp_to_opts(blk1))
-+        self.vm.add_blockdev(self.qmp_to_opts(blk2))
-+        self.vm.launch()
-+
-+    def tearDown(self):
-+        self.vm.shutdown()
-+
-+    def test_no_job_id(self):
-+        self.assert_no_active_block_jobs()
-+
-+        result = self.vm.qmp('blockdev-mirror', device='src', sync='full',
-+                             target='dest')
-+        self.assert_qmp(result, 'error/class', 'GenericError')
-+
-+    def test_success(self):
-+        self.assert_no_active_block_jobs()
-+
-+        result = self.vm.qmp('blockdev-mirror', job_id='job', device='src',
-+                             sync='full', target='dest')
-+        self.assert_qmp(result, 'return', {})
-+
-+        self.complete_and_wait('job')
-+
-+    def test_failing_permissions(self):
-+        self.assert_no_active_block_jobs()
-+
-+        result = self.vm.qmp('blockdev-mirror', device='src', sync='full',
-+                             target='dest-ro')
-+        self.assert_qmp(result, 'error/class', 'GenericError')
-+
- if __name__ == '__main__':
-     iotests.main(supported_fmts=['qcow2', 'qed'])
-diff --git a/tests/qemu-iotests/041.out b/tests/qemu-iotests/041.out
-index b67d050..e30fd3b 100644
---- a/tests/qemu-iotests/041.out
-+++ b/tests/qemu-iotests/041.out
-@@ -1,5 +1,5 @@
--............................................................................
-+...............................................................................
- ----------------------------------------------------------------------
--Ran 76 tests
-+Ran 79 tests
+ DEF("create", img_create,
+-    "create [-q] [--object objectdef] [--image-opts] [-f fmt] [-o options] filename [size]")
++    "create [-q] [--object objectdef] [-f fmt] [-o options] filename [size]")
+ STEXI
+-@item create [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [-o @var{options}] @var{filename} [@var{size}]
++@item create [--object @var{objectdef}] [-q] [-f @var{fmt}] [-o @var{options}] @var{filename} [@var{size}]
+ ETEXI
  
- OK
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index bec8eb4..abcf3c1 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -177,6 +177,14 @@ class VM(qtest.QEMUQtestMachine):
-         self._num_drives += 1
-         return self
- 
-+    def add_blockdev(self, opts):
-+        self._args.append('-blockdev')
-+        if isinstance(opts, str):
-+            self._args.append(opts)
-+        else:
-+            self._args.append(','.join(opts))
-+        return self
-+
-     def pause_drive(self, drive, event=None):
-         '''Pause drive r/w operations'''
-         if not event:
-@@ -235,6 +243,13 @@ class QMPTestCase(unittest.TestCase):
-             output[basestr[:-1]] = obj # Strip trailing '.'
-         return output
- 
-+    def qmp_to_opts(self, obj):
-+        obj = self.flatten_qmp_object(obj)
-+        output_list = list()
-+        for key in obj:
-+            output_list += [key + '=' + obj[key]]
-+        return ','.join(output_list)
-+
-     def assert_qmp_absent(self, d, path):
-         try:
-             result = self.dictpath(d, path)
+ DEF("commit", img_commit,
 -- 
 1.8.3.1
