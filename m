@@ -1,19 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1cwMLy-00053s-46
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 01:22:35 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cwMNo-0005gF-Uz
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 01:24:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1cwMLx-0003Kl-4q
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 01:22:34 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cwMNk-0004LH-Vw
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 01:24:29 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39299)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1cwMNk-0004Jk-N3
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 01:24:24 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v375NcHc128917
+	for <qemu-devel@nongnu.org>; Fri, 7 Apr 2017 01:24:23 -0400
+Received: from e28smtp02.in.ibm.com (e28smtp02.in.ibm.com [125.16.236.2])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 29p2h5nkub-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 01:24:22 -0400
+Received: from localhost
+	by e28smtp02.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Fri, 7 Apr 2017 10:54:19 +0530
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <6029cef4-0a41-cde0-b3c9-6b6ad9bde572@kaod.org>
+References: <20170406102249.20383-1-nikunj@linux.vnet.ibm.com>
+	<6029cef4-0a41-cde0-b3c9-6b6ad9bde572@kaod.org>
+Date: Fri, 07 Apr 2017 10:54:13 +0530
 MIME-Version: 1.0
-In-Reply-To: <1491484536-22776-1-git-send-email-lidongchen@tencent.com>
-References: <1491484536-22776-1-git-send-email-lidongchen@tencent.com>
-From: 858585 jemmy <jemmy858585@gmail.com>
-Date: Fri, 7 Apr 2017 13:22:31 +0800
-Message-ID: <CAOGPPbdw-JEMM9MDJwQFcSJRmCn9nxqmyFF18ORcP0NdVoXLkQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 0/2] use blk_pwrite_zeroes for each zero
- cluster
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <87vaqgrds2.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH RFC v1 0/3] Enable MTTCG on PPC64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,62 +41,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, Lidong Chen <lidongchen@tencent.com>
+To: =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
+Cc: programmingkidx@gmail.com, alex.bennee@linaro.org, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
-the test result for this patch:
+C=C3=A9dric Le Goater <clg@kaod.org> writes:
 
-the migration command :
-virsh migrate --live 165cf436-312f-47e7-90f2-f8aa63f34893
---copy-storage-all qemu+ssh://10.59.163.38/system
-
-the qemu-img info on source host:
-qemu-img info /instanceimage/165cf436-312f-47e7-90f2-f8aa63f34893/165cf436-312f-47e7-90f2-f8aa63f34893_vda.qcow2
-image: /instanceimage/165cf436-312f-47e7-90f2-f8aa63f34893/165cf436-312f-47e7-90f2-f8aa63f34893_vda.qcow2
-file format: qcow2
-virtual size: 1.0T (1095216660480 bytes)
-disk size: 1.5G (1638989824 bytes)
-cluster_size: 65536
-backing file: /baseimage/img2016042213665396/img2016042213665396.qcow2
-
-the qemu-img info on dest host(before apply patch):
-qemu-img info /instanceimage/165cf436-312f-47e7-90f2-f8aa63f34893/165cf436-312f-47e7-90f2-f8aa63f34893_vda.qcow2
-image: /instanceimage/165cf436-312f-47e7-90f2-f8aa63f34893/165cf436-312f-47e7-90f2-f8aa63f34893_vda.qcow2
-file format: qcow2
-virtual size: 40G (42949672960 bytes)
-disk size: 4.1G (4423286784 bytes)
-cluster_size: 65536
-backing file: /baseimage/img2016042213665396/img2016042213665396.qcow2
-
-the qemu-img info on dest host(after apply patch):
-qemu-img info /instanceimage/165cf436-312f-47e7-90f2-f8aa63f34893/165cf436-312f-47e7-90f2-f8aa63f34893_vda.qcow2
-image: /instanceimage/165cf436-312f-47e7-90f2-f8aa63f34893/165cf436-312f-47e7-90f2-f8aa63f34893_vda.qcow2
-file format: qcow2
-virtual size: 40G (42949672960 bytes)
-disk size: 2.3G (2496200704 bytes)
-cluster_size: 65536
-backing file: /baseimage/img2016042213665396/img2016042213665396.qcow2
-
-the disk size reduce from 4.1G to 2.3G.
-
-
-On Thu, Apr 6, 2017 at 9:15 PM,  <jemmy858585@gmail.com> wrote:
-> From: Lidong Chen <lidongchen@tencent.com>
+> Hello Nikunj,
 >
-> BLOCK_SIZE is (1 << 20), qcow2 cluster size is 65536 by default,
-> this maybe cause the qcow2 file size is bigger after migration.
-> This patch check each cluster, use blk_pwrite_zeroes for each
-> zero cluster.
+> On 04/06/2017 12:22 PM, Nikunj A Dadhania wrote:
+>> The series enables Multi-Threaded TCG on PPC64
+>>=20
+>> Patch 01: Use atomic_cmpxchg in store conditional
+>>       02: Handle first write to page during atomic operation
+>>       03: Generate memory barriers for sync/isync and load/store conditi=
+onal
+>>=20
+>> Patches are based on ppc-for-2.10
+>>=20
+>> Tested using following:
+>> ./ppc64-softmmu/qemu-system-ppc64 -cpu POWER8 -vga none -nographic -mach=
+ine pseries,usb=3Doff -m 2G  -smp 8,cores=3D8,threads=3D1 -accel tcg,thread=
+=3Dmulti  f23.img
 >
-> Lidong Chen (2):
->   block: make bdrv_get_cluster_size public
->   migration/block: use blk_pwrite_zeroes for each zero cluster
+> I tried it with a Ubuntu 16.04.2 guest using stress --cpu 8. It looked=20
+> good : the CPU usage of QEMU reached 760% on the host.
+
+Cool.
+
+>> Todo:
+>> * Enable other machine types and PPC32.
 >
->  block/io.c            |  2 +-
->  include/block/block.h |  1 +
->  migration/block.c     | 34 ++++++++++++++++++++++++++++++++--
->  3 files changed, 34 insertions(+), 3 deletions(-)
->
-> --
-> 1.8.3.1
->
+> I am quite ignorant on the topic.
+> Have you looked at what it would take to emulate support of the HW
+> threads ?
+
+We would need to implement msgsndp (doorbell support for IPI between
+threads of same core)
+
+> and the PowerNV machine ?
+
+Haven't tried it, should work. Just give a shot, let me know if you see pro=
+blems.
+
+Regards
+Nikunj
