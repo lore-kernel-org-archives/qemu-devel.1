@@ -1,35 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cwN4w-0005eQ-Q3
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cwN4w-0005e1-BC
 	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 02:09:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cwN4r-0000y6-Q3
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cwN4r-0000y0-O2
 	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 02:09:02 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33378)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33377)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cwN4r-0000xh-HP
+	id 1cwN4r-0000xd-DX
 	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 02:08:57 -0400
 Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v376408L081907
-	for <qemu-devel@nongnu.org>; Fri, 7 Apr 2017 02:08:56 -0400
-Received: from e23smtp06.au.ibm.com (e23smtp06.au.ibm.com [202.81.31.148])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29p4qphkn7-1
+	v3763xpS081860
+	for <qemu-devel@nongnu.org>; Fri, 7 Apr 2017 02:08:54 -0400
+Received: from e23smtp04.au.ibm.com (e23smtp04.au.ibm.com [202.81.31.146])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 29p4qphkkf-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 02:08:56 -0400
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 02:08:54 -0400
 Received: from localhost
-	by e23smtp06.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e23smtp04.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Fri, 7 Apr 2017 16:08:53 +1000
+	Fri, 7 Apr 2017 16:08:51 +1000
 From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Date: Fri,  7 Apr 2017 11:37:50 +0530
-In-Reply-To: <20170407060752.31313-1-nikunj@linux.vnet.ibm.com>
-References: <20170407060752.31313-1-nikunj@linux.vnet.ibm.com>
-Message-Id: <20170407060752.31313-2-nikunj@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 1/3] target/ppc: Emulate LL/SC using cmpxchg
- helpers
+Date: Fri,  7 Apr 2017 11:37:49 +0530
+Message-Id: <20170407060752.31313-1-nikunj@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 0/3] Enable MTTCG on PPC64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,78 +38,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
 Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org, programmingkidx@gmail.com, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
 
-Emulating LL/SC with cmpxchg is not correct, since it can suffer from
-the ABA problem. However, portable parallel code is written assuming
-only cmpxchg which means that in practice this is a viable alternative.
+The series enables Multi-Threaded TCG on PPC64
 
-Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
----
- target/ppc/translate.c | 29 +++++++++++++++++++++++------
- 1 file changed, 23 insertions(+), 6 deletions(-)
+Patch 01: Use atomic_cmpxchg in store conditional
+      02: Handle first write to page during atomic operation
+      03: Generate memory barriers for sync/isync and load/store conditional
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index f40b5a1..50b6d4d 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -73,6 +73,7 @@ static TCGv cpu_cfar;
- #endif
- static TCGv cpu_xer, cpu_so, cpu_ov, cpu_ca, cpu_ov32, cpu_ca32;
- static TCGv cpu_reserve;
-+static TCGv cpu_reserve_val;
- static TCGv cpu_fpscr;
- static TCGv_i32 cpu_access_type;
- 
-@@ -181,6 +182,9 @@ void ppc_translate_init(void)
-     cpu_reserve = tcg_global_mem_new(cpu_env,
-                                      offsetof(CPUPPCState, reserve_addr),
-                                      "reserve_addr");
-+    cpu_reserve_val = tcg_global_mem_new(cpu_env,
-+                                     offsetof(CPUPPCState, reserve_val),
-+                                     "reserve_val");
- 
-     cpu_fpscr = tcg_global_mem_new(cpu_env,
-                                    offsetof(CPUPPCState, fpscr), "fpscr");
-@@ -3023,7 +3027,7 @@ static void gen_##name(DisasContext *ctx)                            \
-     }                                                                \
-     tcg_gen_qemu_ld_tl(gpr, t0, ctx->mem_idx, memop);                \
-     tcg_gen_mov_tl(cpu_reserve, t0);                                 \
--    tcg_gen_st_tl(gpr, cpu_env, offsetof(CPUPPCState, reserve_val)); \
-+    tcg_gen_mov_tl(cpu_reserve_val, gpr);                            \
-     tcg_temp_free(t0);                                               \
- }
- 
-@@ -3155,14 +3159,27 @@ static void gen_conditional_store(DisasContext *ctx, TCGv EA,
- static void gen_conditional_store(DisasContext *ctx, TCGv EA,
-                                   int reg, int memop)
- {
--    TCGLabel *l1;
-+    TCGLabel *l1 = gen_new_label();
-+    TCGLabel *l2 = gen_new_label();
-+    TCGv t0;
- 
--    tcg_gen_trunc_tl_i32(cpu_crf[0], cpu_so);
--    l1 = gen_new_label();
-     tcg_gen_brcond_tl(TCG_COND_NE, EA, cpu_reserve, l1);
--    tcg_gen_ori_i32(cpu_crf[0], cpu_crf[0], CRF_EQ);
--    tcg_gen_qemu_st_tl(cpu_gpr[reg], EA, ctx->mem_idx, memop);
-+
-+    t0 = tcg_temp_new();
-+    tcg_gen_atomic_cmpxchg_tl(t0, cpu_reserve, cpu_reserve_val,
-+                              cpu_gpr[reg], ctx->mem_idx,
-+                              DEF_MEMOP(memop) | MO_ALIGN);
-+    tcg_gen_setcond_tl(TCG_COND_EQ, t0, t0, cpu_reserve_val);
-+    tcg_gen_shli_tl(t0, t0, CRF_EQ_BIT);
-+    tcg_gen_or_tl(t0, t0, cpu_so);
-+    tcg_gen_trunc_tl_i32(cpu_crf[0], t0);
-+    tcg_temp_free(t0);
-+    tcg_gen_br(l2);
-+
-     gen_set_label(l1);
-+    tcg_gen_trunc_tl_i32(cpu_crf[0], cpu_so);
-+
-+    gen_set_label(l2);
-     tcg_gen_movi_tl(cpu_reserve, -1);
- }
- #endif
+Patches are based on ppc-for-2.10
+
+Changelog:
+v1:
+* Rewrote store_conditional as suggested by Richard
+
+Tested using following:
+./ppc64-softmmu/qemu-system-ppc64 -cpu POWER8 -vga none -nographic -machine pseries,usb=off -m 2G  -smp 8,cores=8,threads=1 -accel tcg,thread=multi  f23.img
+
+Todo:
+* Implement lqarx and stqcx
+* Enable other machine types and PPC32.
+* More testing for corner cases.
+
+Nikunj A Dadhania (3):
+  target/ppc: Emulate LL/SC using cmpxchg helpers
+  cputlb: handle first atomic write to the page
+  target/ppc: Generate fence operations
+
+ cputlb.c               |  8 +++++++-
+ target/ppc/translate.c | 37 +++++++++++++++++++++++++++++++------
+ 2 files changed, 38 insertions(+), 7 deletions(-)
+
 -- 
 2.9.3
