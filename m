@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cwW1p-0002OV-30
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:42:26 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1cwW1s-0002QW-2f
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:42:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cwW1l-0007R1-Ny
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:42:25 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:37899)
+	(envelope-from <alex.bennee@linaro.org>) id 1cwW1r-0007WI-53
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:42:28 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:33697)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cwW1l-0007QF-HO
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:42:21 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id t189so10641151wmt.1
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 08:42:21 -0700 (PDT)
+	id 1cwW1q-0007Vz-VG
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 11:42:27 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id g19so68078056wrb.0
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 08:42:26 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  7 Apr 2017 16:42:11 +0100
-Message-Id: <20170407154221.26918-3-alex.bennee@linaro.org>
+Date: Fri,  7 Apr 2017 16:42:16 +0100
+Message-Id: <20170407154221.26918-8-alex.bennee@linaro.org>
 In-Reply-To: <20170407154221.26918-1-alex.bennee@linaro.org>
 References: <20170407154221.26918-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 02/12] scripts/qemu-gdb/timers.py: new
- helper to dump timer state
+Subject: [Qemu-devel] [PATCH v3 07/12] cpus: move icount preparation out of
+ tcg_exec_cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,99 +31,129 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: dovgaluk@ispras.ru, rth@twiddle.net, pbonzini@redhat.com
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-This introduces the qemu-gdb command "qemu timers" which will dump the
-state of the main timers in the system.
+As icount is only supported for single-threaded execution due to the
+requirement for determinism let's remove it from the common
+tcg_exec_cpu path.
+
+Also remove the additional fiddling which shouldn't be required as the
+icount counters should all be rectified as you enter the loop.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- scripts/qemu-gdb.py       |  3 ++-
- scripts/qemugdb/timers.py | 54 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 56 insertions(+), 1 deletion(-)
- create mode 100644 scripts/qemugdb/timers.py
 
-diff --git a/scripts/qemu-gdb.py b/scripts/qemu-gdb.py
-index b3f8e04f77..3e7adb87dc 100644
---- a/scripts/qemu-gdb.py
-+++ b/scripts/qemu-gdb.py
-@@ -26,7 +26,7 @@ import os, sys
+---
+v2
+  - only clear u16.low
+  - drop BQL assert
+---
+ cpus.c | 67 ++++++++++++++++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 45 insertions(+), 22 deletions(-)
+
+diff --git a/cpus.c b/cpus.c
+index 18b1746770..d9cb9407a2 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1179,47 +1179,64 @@ static void handle_icount_deadline(void)
+     }
+ }
  
- sys.path.append(os.path.dirname(__file__))
+-static int tcg_cpu_exec(CPUState *cpu)
++static void prepare_icount_for_run(CPUState *cpu)
+ {
+-    int ret;
+-#ifdef CONFIG_PROFILER
+-    int64_t ti;
+-#endif
+-
+-#ifdef CONFIG_PROFILER
+-    ti = profile_getclock();
+-#endif
+     if (use_icount) {
+         int64_t count;
+         int decr;
+-        timers_state.qemu_icount -= (cpu->icount_decr.u16.low
+-                                    + cpu->icount_extra);
+-        cpu->icount_decr.u16.low = 0;
+-        cpu->icount_extra = 0;
++
++        /* These should always be cleared by process_icount_data after
++         * each vCPU execution. However u16.high can be raised
++         * asynchronously by cpu_exit/cpu_interrupt/tcg_handle_interrupt
++         */
++        g_assert(cpu->icount_decr.u16.low == 0);
++        g_assert(cpu->icount_extra == 0);
++
++
+         count = tcg_get_icount_limit();
++
+         timers_state.qemu_icount += count;
+         decr = (count > 0xffff) ? 0xffff : count;
+         count -= decr;
+         cpu->icount_decr.u16.low = decr;
+         cpu->icount_extra = count;
+     }
+-    qemu_mutex_unlock_iothread();
+-    cpu_exec_start(cpu);
+-    ret = cpu_exec(cpu);
+-    cpu_exec_end(cpu);
+-    qemu_mutex_lock_iothread();
+-#ifdef CONFIG_PROFILER
+-    tcg_time += profile_getclock() - ti;
+-#endif
++}
++
++static void process_icount_data(CPUState *cpu)
++{
+     if (use_icount) {
+         /* Fold pending instructions back into the
+            instruction counter, and clear the interrupt flag.  */
+         timers_state.qemu_icount -= (cpu->icount_decr.u16.low
+                         + cpu->icount_extra);
+-        cpu->icount_decr.u32 = 0;
++
++        /* Reset the counters */
++        cpu->icount_decr.u16.low = 0;
+         cpu->icount_extra = 0;
+         replay_account_executed_instructions();
+     }
++}
++
++
++static int tcg_cpu_exec(CPUState *cpu)
++{
++    int ret;
++#ifdef CONFIG_PROFILER
++    int64_t ti;
++#endif
++
++#ifdef CONFIG_PROFILER
++    ti = profile_getclock();
++#endif
++    qemu_mutex_unlock_iothread();
++    cpu_exec_start(cpu);
++    ret = cpu_exec(cpu);
++    cpu_exec_end(cpu);
++    qemu_mutex_lock_iothread();
++#ifdef CONFIG_PROFILER
++    tcg_time += profile_getclock() - ti;
++#endif
+     return ret;
+ }
  
--from qemugdb import aio, mtree, coroutine
-+from qemugdb import aio, mtree, coroutine, timers
+@@ -1306,7 +1323,13 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
  
- class QemuCommand(gdb.Command):
-     '''Prefix for QEMU debug support commands'''
-@@ -38,6 +38,7 @@ QemuCommand()
- coroutine.CoroutineCommand()
- mtree.MtreeCommand()
- aio.HandlersCommand()
-+timers.TimersCommand()
- 
- coroutine.CoroutineSPFunction()
- coroutine.CoroutinePCFunction()
-diff --git a/scripts/qemugdb/timers.py b/scripts/qemugdb/timers.py
-new file mode 100644
-index 0000000000..be71a001e3
---- /dev/null
-+++ b/scripts/qemugdb/timers.py
-@@ -0,0 +1,54 @@
-+#!/usr/bin/python
-+# GDB debugging support
-+#
-+# Copyright 2017 Linaro Ltd
-+#
-+# Author: Alex Bennée <alex.bennee@linaro.org>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2.  See
-+# the COPYING file in the top-level directory.
+             if (cpu_can_run(cpu)) {
+                 int r;
 +
-+# 'qemu timers' -- display the current timerlists
++                prepare_icount_for_run(cpu);
 +
-+import gdb
+                 r = tcg_cpu_exec(cpu);
 +
-+class TimersCommand(gdb.Command):
-+    '''Display the current QEMU timers'''
++                process_icount_data(cpu);
 +
-+    def __init__(self):
-+        'Register the class as a gdb command'
-+        gdb.Command.__init__(self, 'qemu timers', gdb.COMMAND_DATA,
-+                             gdb.COMPLETE_NONE)
-+
-+    def dump_timers(self, timer):
-+        "Follow a timer and recursively dump each one in the list."
-+        # timer should be of type QemuTimer
-+        gdb.write("    timer %s/%s (cb:%s,opq:%s)\n" % (
-+            timer['expire_time'],
-+            timer['scale'],
-+            timer['cb'],
-+            timer['opaque']))
-+
-+        if int(timer['next']) > 0:
-+            self.dump_timers(timer['next'])
-+
-+
-+    def process_timerlist(self, tlist, ttype):
-+        gdb.write("Processing %s timers\n" % (ttype))
-+        gdb.write("  clock %s is enabled:%s, last:%s\n" % (
-+            tlist['clock']['type'],
-+            tlist['clock']['enabled'],
-+            tlist['clock']['last']))
-+        if int(tlist['active_timers']) > 0:
-+            self.dump_timers(tlist['active_timers'])
-+
-+
-+    def invoke(self, arg, from_tty):
-+        'Run the command'
-+        main_timers = gdb.parse_and_eval("main_loop_tlg")
-+
-+        # This will break if QEMUClockType in timer.h is redfined
-+        self.process_timerlist(main_timers['tl'][0], "Realtime")
-+        self.process_timerlist(main_timers['tl'][1], "Virtual")
-+        self.process_timerlist(main_timers['tl'][2], "Host")
-+        self.process_timerlist(main_timers['tl'][3], "Virtual RT")
+                 if (r == EXCP_DEBUG) {
+                     cpu_handle_guest_debug(cpu);
+                     break;
 -- 
 2.11.0
