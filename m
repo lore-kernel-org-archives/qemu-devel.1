@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwU2T-0007U7-Vj
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:34:58 -0400
+	(envelope-from <bounces@canonical.com>) id 1cwU3U-00084J-0x
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:36:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwU2O-00063I-W7
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:34:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37440)
+	(envelope-from <bounces@canonical.com>) id 1cwU3P-0006Zi-0H
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:36:00 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38144)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cwU2O-00062j-QB
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:34:52 -0400
+	id 1cwU3O-0006ZY-QE
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 09:35:54 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cwU2N-00066X-7q
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 13:34:51 +0000
+	id 1cwU3M-00072B-MG
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 13:35:53 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 37D522E80C9
-	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 13:34:51 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id D39612E817B
+	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 13:35:45 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Apr 2017 13:24:13 -0000
-From: Thomas Huth <1013714@bugs.launchpad.net>
-Reply-To: Bug 1013714 <1013714@bugs.launchpad.net>
+Date: Fri, 07 Apr 2017 13:26:08 -0000
+From: "Matwey V. Kornilov" <matwey.kornilov@gmail.com>
+Reply-To: Bug 1661386 <1661386@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20120615145323.29444.96098.malonedeb@soybean.canonical.com>
-Message-Id: <20170407132413.12230.21659.malone@gac.canonical.com>
+References: <20170202204510.26617.69309.malonedeb@wampee.canonical.com>
+Message-Id: <20170407132608.12396.53396.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1013714] Re: Data corruption after block
- migration (LV->LV)
+Subject: [Qemu-devel] [Bug 1661386] Re: Assertion `ret ==
+ cpu->kvm_msr_buf->nmsrs' failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,50 +39,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Closing according to comment #3
+Hi,
 
-** Changed in: qemu
-       Status: New =3D> Fix Released
+I've attached the files with logs you requested. Could you comment them
+somehow?
+
+x86info says that IA32_PERF is not enabled:
+
+Performance MSRs:
+  MSR_IA32_PERF_STATUS: 0x0
+  MSR_IA32_MISC_ENABLE: 0x0 [Enabled: ]
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1013714
+https://bugs.launchpad.net/bugs/1661386
 
 Title:
-  Data corruption after block migration (LV->LV)
+  Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed
 
 Status in QEMU:
-  Fix Released
+  New
 
 Bug description:
-  We quite frequently use the live block migration feature to move VM's
-  between nodes without downtime. These sometimes result in data
-  corruption on the receiving end. It only happens if the VM is actually
-  doing I/O (doesn't have to be all that much to trigger the issue).
+  Hello,
 
-  We use logical volumes and each VM has two disks.  We use cache=3Dnone
-  for all VM disks.
+  =
 
-  All guests use virtio (a mix of various Linux distro's and Windows
-  2008R2).
+  I see the following when try to run qemu from master as the following:
 
-  We currently have two stacks in use and have seen the issue on both of
-  them:
+  # ./x86_64-softmmu/qemu-system-x86_64 --version
+  QEMU emulator version 2.8.50 (v2.8.0-1006-g4e9f524)
+  Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
+  # ./x86_64-softmmu/qemu-system-x86_64 -machine accel=3Dkvm -nodefaults
+  -no-reboot -nographic -cpu host -vga none  -kernel .build.kernel.kvm
+  -initrd .build.initrd.kvm -append 'panic=3D1 no-kvmclock console=3DttyS0
+  loglevel=3D7' -m 1024 -serial stdio
+  qemu-system-x86_64: /home/matwey/lab/qemu/target/i386/kvm.c:1849:
+  kvm_put_msrs: Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
 
-  Fedora - qemu-kvm 0.13
-  Scientific Linux 6.2 (RHEL derived) - qemu-kvm package 0.12.1.2
+  First broken commit has been bisected:
 
-  Even though we don't run the most recent versions of KVM I highly
-  suspect this issue is still unreported and that filing a bug is
-  therefore appropriate. (There doesn't seem to be any similar bug
-  report in launchpad or RedHat's bugzilla and nothing related in change
-  logs, release notes and  git commit logs.)
+  commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
+  Author: Paolo Bonzini <pbonzini@redhat.com>
+  Date:   Wed Mar 30 22:55:29 2016 +0200
 
-  I have no idea where to look or where to start debugging this issue,
-  but if there is any way I can provide useful debug information please
-  let me know.
+      target-i386: assert that KVM_GET/SET_MSRS can set all requested MSRs
+      =
+
+      This would have caught the bug in the previous patch.
+      =
+
+      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+  My cpuinfo is the following:
+
+  processor       : 0
+  vendor_id       : GenuineIntel
+  cpu family      : 6
+  model           : 44
+  model name      : Intel(R) Xeon(R) CPU           X5675  @ 3.07GHz
+  stepping        : 2
+  microcode       : 0x14
+  cpu MHz         : 3066.775
+  cache size      : 12288 KB
+  physical id     : 0
+  siblings        : 2
+  core id         : 0
+  cpu cores       : 2
+  apicid          : 0
+  initial apicid  : 0
+  fpu             : yes
+  fpu_exception   : yes
+  cpuid level     : 11
+  wp              : yes
+  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
+a cmov pat pse36 clflush dts mmx fxsr sse sse2 ss ht syscall nx rdtscp lm c=
+onstant_tsc arch_perfmon pebs bts nopl xtopology tsc_reliable nonstop_tsc a=
+perfmperf pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 popcnt aes hypervisor =
+lahf_lm ida arat epb dtherm tpr_shadow vnmi ept vpid
+  bugs            :
+  bogomips        : 6133.55
+  clflush size    : 64
+  cache_alignment : 64
+  address sizes   : 40 bits physical, 48 bits virtual
+  power management:
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1013714/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1661386/+subscriptions
