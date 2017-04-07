@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwbJL-0005tI-R8
+	(envelope-from <bounces@canonical.com>) id 1cwbJL-0005tK-RY
 	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 17:20:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwbJI-0003Ad-Jg
+	(envelope-from <bounces@canonical.com>) id 1cwbJJ-0003Ap-6x
 	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 17:20:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47929)
+Received: from indium.canonical.com ([91.189.90.7]:47958)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cwbJI-0003AT-Ct
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 17:20:48 -0400
+	id 1cwbJJ-0003AY-1d
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 17:20:49 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cwbJG-00020c-Fa
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 21:20:46 +0000
+	id 1cwbJH-00020L-29
+	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 21:20:47 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D467A2E80D9
-	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 21:20:45 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 4A0742E80DC
+	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 21:20:46 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Apr 2017 21:11:41 -0000
-From: Alex Williamson <alex.l.williamson@gmail.com>
+Date: Fri, 07 Apr 2017 21:13:00 -0000
+From: Roger Lawhorn <rll@twc.com>
 Reply-To: Bug 1680679 <1680679@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20170407032144.12640.21952.malonedeb@gac.canonical.com>
-Message-Id: <20170407211141.12807.17356.malone@gac.canonical.com>
+Message-Id: <20170407211300.12710.765.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1680679] Re: qemu cannot run twice
 List-Id: <qemu-devel.nongnu.org>
@@ -38,16 +38,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Perhaps you get Code 43 because mobile NVIDIA chips make use of Optimus
-which requires significant proprietary firmware support.  QEMU/VFIO has
-never claimed to work with such devices.  The further speculation in the
-original report that QEMU corrupted something in Linux seems
-unjustified, the device simply doesn't work a second time.  This might
-be lack of proper reset support in the GPU itself or poor interaction
-with aforementioned proprietary firmware.
-
-** Changed in: qemu
-       Status: New =3D> Invalid
+GTX880M - uefi firmware built in, confirmed
 
 -- =
 
