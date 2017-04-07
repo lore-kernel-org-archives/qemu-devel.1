@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40508)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiahuanzhang90@gmail.com>) id 1cwNMH-0002ha-8c
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 02:26:58 -0400
+	(envelope-from <lists@philjordan.eu>) id 1cwNVe-0003ys-0j
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 02:36:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jiahuanzhang90@gmail.com>) id 1cwNMG-0001lv-9S
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 02:26:57 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:34475)
+	(envelope-from <lists@philjordan.eu>) id 1cwNVc-00052o-PD
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 02:36:38 -0400
+Received: from mail-vk0-x242.google.com ([2607:f8b0:400c:c05::242]:34512)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jiahuanzhang90@gmail.com>)
-	id 1cwNMG-0001lJ-51
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 02:26:56 -0400
-Received: by mail-qk0-x242.google.com with SMTP id p68so8916549qke.1
-	for <qemu-devel@nongnu.org>; Thu, 06 Apr 2017 23:26:56 -0700 (PDT)
+	(Exim 4.71) (envelope-from <lists@philjordan.eu>) id 1cwNVc-00052Y-Gx
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 02:36:36 -0400
+Received: by mail-vk0-x242.google.com with SMTP id y16so8390872vky.1
+	for <qemu-devel@nongnu.org>; Thu, 06 Apr 2017 23:36:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <3F8ADDFA-7686-416B-A63A-4C59EC99DDC6@gmail.com>
-References: <mailman.167.1491494426.906.qemu-devel@nongnu.org>
-	<3F8ADDFA-7686-416B-A63A-4C59EC99DDC6@gmail.com>
-From: Jiahuan Zhang <jiahuanzhang90@gmail.com>
-Date: Fri, 7 Apr 2017 08:26:55 +0200
-Message-ID: <CAJy91CaTPoUVHYSKAqM=svr3E=JPr-3pYYGRW72Fr-XuS0RTNQ@mail.gmail.com>
+In-Reply-To: <1491325264-14502-2-git-send-email-gsomlo@gmail.com>
+References: <1491325264-14502-1-git-send-email-gsomlo@gmail.com>
+	<1491325264-14502-2-git-send-email-gsomlo@gmail.com>
+From: Phil Dennis-Jordan <lists@philjordan.eu>
+Date: Fri, 7 Apr 2017 18:36:15 +1200
+Message-ID: <CAGCz3vtbiujA7r35yn1EH9h8KKNBZn4Xk2hqX641w1++4-Nj5w@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] is qemu able to run multiple system emulation
- simultaneously
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] applesmc: cosmetic whitespace and
+ indentation cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +30,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: G 3 <programmingkidx@gmail.com>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: "Gabriel L. Somlo" <gsomlo@gmail.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, eshelton@pobox.com, f4bug@amsat.org, Alexander Graf <agraf@suse.de>
 
-On 6 April 2017 at 19:58, G 3 <programmingkidx@gmail.com> wrote:
+Looks good to me.
 
+Reviewed-by: Phil Dennis-Jordan <phil@philjordan.eu>
+
+
+On Wed, Apr 5, 2017 at 5:01 AM, Gabriel L. Somlo <gsomlo@gmail.com> wrote:
+> Signed-off-by: Gabriel Somlo <gsomlo@gmail.com>
+> Reviewed-by: Alexander Graf <agraf@suse.de>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/misc/applesmc.c | 98 ++++++++++++++++++++++++++++--------------------=
+------
+>  1 file changed, 50 insertions(+), 48 deletions(-)
 >
-> On Apr 6, 2017, at 12:00 PM, qemu-devel-request@nongnu.org wrote:
+> diff --git a/hw/misc/applesmc.c b/hw/misc/applesmc.c
+> index 77fab5b..6381197 100644
+> --- a/hw/misc/applesmc.c
+> +++ b/hw/misc/applesmc.c
+> @@ -39,21 +39,24 @@
+>  /* #define DEBUG_SMC */
 >
-> Dear QEMU developers,
->>
->> I need multiple ARM-based hardware emulation runing simultaneously in one
->> PC.
->> I wander if QEMU is capble to run two system emulation at the same time.
->> Or I have to use two QEMU for two system emulation
->>
->> If the former is possible, where can i find some docs about it? I have
->> searched two days, the result is not positive.
->>
->> Please help. Thanks in advance.
->>
->> Best regards,
->> Jiahuan
->>
+>  #define APPLESMC_DEFAULT_IOBASE        0x300
+> -/* data port used by Apple SMC */
+> -#define APPLESMC_DATA_PORT             0x0
+> -/* command/status port used by Apple SMC */
+> -#define APPLESMC_CMD_PORT              0x4
+> -#define APPLESMC_NR_PORTS              32
 >
-> My vote goes to running multiple instances of QEMU at the same time. It is
-> easy to do and works.
+> -#define APPLESMC_READ_CMD              0x10
+> -#define APPLESMC_WRITE_CMD             0x11
+> -#define APPLESMC_GET_KEY_BY_INDEX_CMD  0x12
+> -#define APPLESMC_GET_KEY_TYPE_CMD      0x13
+> +enum {
+> +    APPLESMC_DATA_PORT               =3D 0x00,
+> +    APPLESMC_CMD_PORT                =3D 0x04,
+> +    APPLESMC_NUM_PORTS               =3D 0x20,
+> +};
+> +
+> +enum {
+> +    APPLESMC_READ_CMD                =3D 0x10,
+> +    APPLESMC_WRITE_CMD               =3D 0x11,
+> +    APPLESMC_GET_KEY_BY_INDEX_CMD    =3D 0x12,
+> +    APPLESMC_GET_KEY_TYPE_CMD        =3D 0x13,
+> +};
 >
-
-As for as I know, "running multiple instances of QEMU at the same time" is
-feasible for user-mode emulation, namely emulting CPU, according to
-https://en.wikipedia.org/wiki/QEMU.
-Wikipedia says
-"Virtualization solutions that use QEMU are able to execute multiple
-virtual CPUs in parallel. QEMU is also able to run multiple threads in
-user-mode emulation mode.
-
-For full system emulation, QEMU uses a single thread to emulate all the
-virtual CPUs and hardware. "
-However, what I need is system emulation, an ARM processor with various
-periphrals.
-
-I think Peter is right.
+>  #ifdef DEBUG_SMC
+>  #define smc_debug(...) fprintf(stderr, "AppleSMC: " __VA_ARGS__)
+>  #else
+> -#define smc_debug(...) do { } while(0)
+> +#define smc_debug(...) do { } while (0)
+>  #endif
+>
+>  static char default_osk[64] =3D "This is a dummy key. Enter the real key=
+ "
+> @@ -77,12 +80,11 @@ struct AppleSMCState {
+>      uint32_t iobase;
+>      uint8_t cmd;
+>      uint8_t status;
+> -    uint8_t key[4];
+> +    char key[4];
+>      uint8_t read_pos;
+>      uint8_t data_len;
+>      uint8_t data_pos;
+>      uint8_t data[255];
+> -    uint8_t charactic[4];
+>      char *osk;
+>      QLIST_HEAD(, AppleSMCData) data_def;
+>  };
+> @@ -93,10 +95,10 @@ static void applesmc_io_cmd_write(void *opaque, hwadd=
+r addr, uint64_t val,
+>      AppleSMCState *s =3D opaque;
+>
+>      smc_debug("CMD Write B: %#x =3D %#x\n", addr, val);
+> -    switch(val) {
+> -        case APPLESMC_READ_CMD:
+> -            s->status =3D 0x0c;
+> -            break;
+> +    switch (val) {
+> +    case APPLESMC_READ_CMD:
+> +        s->status =3D 0x0c;
+> +        break;
+>      }
+>      s->cmd =3D val;
+>      s->read_pos =3D 0;
+> @@ -123,54 +125,54 @@ static void applesmc_io_data_write(void *opaque, hw=
+addr addr, uint64_t val,
+>      AppleSMCState *s =3D opaque;
+>
+>      smc_debug("DATA Write B: %#x =3D %#x\n", addr, val);
+> -    switch(s->cmd) {
+> -        case APPLESMC_READ_CMD:
+> -            if(s->read_pos < 4) {
+> -                s->key[s->read_pos] =3D val;
+> -                s->status =3D 0x04;
+> -            } else if(s->read_pos =3D=3D 4) {
+> -                s->data_len =3D val;
+> -                s->status =3D 0x05;
+> -                s->data_pos =3D 0;
+> -                smc_debug("Key =3D %c%c%c%c Len =3D %d\n", s->key[0],
+> -                          s->key[1], s->key[2], s->key[3], val);
+> -                applesmc_fill_data(s);
+> -            }
+> -            s->read_pos++;
+> -            break;
+> +    switch (s->cmd) {
+> +    case APPLESMC_READ_CMD:
+> +        if (s->read_pos < 4) {
+> +            s->key[s->read_pos] =3D val;
+> +            s->status =3D 0x04;
+> +        } else if (s->read_pos =3D=3D 4) {
+> +            s->data_len =3D val;
+> +            s->status =3D 0x05;
+> +            s->data_pos =3D 0;
+> +            smc_debug("Key =3D %c%c%c%c Len =3D %d\n", s->key[0],
+> +                      s->key[1], s->key[2], s->key[3], val);
+> +            applesmc_fill_data(s);
+> +        }
+> +        s->read_pos++;
+> +        break;
+>      }
+>  }
+>
+> -static uint64_t applesmc_io_data_read(void *opaque, hwaddr addr1,
+> -                                      unsigned size)
+> +static uint64_t applesmc_io_data_read(void *opaque, hwaddr addr, unsigne=
+d size)
+>  {
+>      AppleSMCState *s =3D opaque;
+>      uint8_t retval =3D 0;
+>
+> -    switch(s->cmd) {
+> -        case APPLESMC_READ_CMD:
+> -            if(s->data_pos < s->data_len) {
+> -                retval =3D s->data[s->data_pos];
+> -                smc_debug("READ_DATA[%d] =3D %#hhx\n", s->data_pos,
+> -                          retval);
+> -                s->data_pos++;
+> -                if(s->data_pos =3D=3D s->data_len) {
+> -                    s->status =3D 0x00;
+> -                    smc_debug("EOF\n");
+> -                } else
+> -                    s->status =3D 0x05;
+> +    switch (s->cmd) {
+> +    case APPLESMC_READ_CMD:
+> +        if (s->data_pos < s->data_len) {
+> +            retval =3D s->data[s->data_pos];
+> +            smc_debug("READ_DATA[%d] =3D %#hhx\n", s->data_pos,
+> +                      retval);
+> +            s->data_pos++;
+> +            if (s->data_pos =3D=3D s->data_len) {
+> +                s->status =3D 0x00;
+> +                smc_debug("EOF\n");
+> +            } else {
+> +                s->status =3D 0x05;
+>              }
+> +        }
+>      }
+> -    smc_debug("DATA Read b: %#x =3D %#x\n", addr1, retval);
+> +    smc_debug("DATA Read b: %#x =3D %#x\n", addr, retval);
+>
+>      return retval;
+>  }
+>
+> -static uint64_t applesmc_io_cmd_read(void *opaque, hwaddr addr1, unsigne=
+d size)
+> +static uint64_t applesmc_io_cmd_read(void *opaque, hwaddr addr, unsigned=
+ size)
+>  {
+>      AppleSMCState *s =3D opaque;
+>
+> -    smc_debug("CMD Read B: %#x\n", addr1);
+> +    smc_debug("CMD Read B: %#x\n", addr);
+>      return s->status;
+>  }
+>
+> --
+> 2.7.4
+>
+>
