@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cwR4u-0007vA-Ce
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 06:25:17 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1cwR5u-0008OE-To
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 06:26:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cwR4s-0008PQ-Ub
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 06:25:16 -0400
-Date: Fri, 7 Apr 2017 12:25:05 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170407102505.GB4716@noname.redhat.com>
-References: <1488314205-16264-1-git-send-email-kwolf@redhat.com>
-	<1488314205-16264-44-git-send-email-kwolf@redhat.com>
-	<20170406205939.GA28584@redhat.com>
-	<a010df05-e986-2142-3196-31f549558511@redhat.com>
-	<20170406211537.GR30620@redhat.com>
-	<616fdb8b-2c41-9718-d5b3-e335e78745e4@redhat.com>
-	<20170406212936.GA28793@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1cwR5q-0000Wx-QK
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 06:26:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40282)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cwR5q-0000WJ-He
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 06:26:14 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 86499C059746
+	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 10:26:13 +0000 (UTC)
+Date: Fri, 7 Apr 2017 11:26:10 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170407102609.GG2138@work-vm>
+References: <20170406130913.2232-1-quintela@redhat.com>
+	<20170406130913.2232-49-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170406212936.GA28793@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 43/46] block: Assertions for write
- permissions
+In-Reply-To: <20170406130913.2232-49-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 48/54] ram: Use page number instead of an
+ address for the bitmap operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +34,267 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Am 06.04.2017 um 23:29 hat Richard W.M. Jones geschrieben:
-> On Thu, Apr 06, 2017 at 04:23:19PM -0500, Eric Blake wrote:
-> > On 04/06/2017 04:15 PM, Richard W.M. Jones wrote:
-> > 
-> > >>>> +++ b/block/io.c
-> > >>>> @@ -945,6 +945,8 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
-> > >>>>      size_t skip_bytes;
-> > >>>>      int ret;
-> > >>>>  
-> > >>>> +    assert(child->perm & (BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE));
-> > >>>
-> > 
-> > > https://bugzilla.redhat.com/show_bug.cgi?id=1439922
-> > > 
-> > > There is also a minimal reproducer in comment 2.
-> > 
-> > If it helps, backtrace shows:
-> > 
-> > #4  0x0000555555c09f10 in bdrv_co_do_copy_on_readv
-> > (child=0x555556990180, offset=0, bytes=512, qiov=0x7fffffffd0c0) at
-> > block/io.c:948
-> > #5  0x0000555555c0a33d in bdrv_aligned_preadv (child=0x555556990180,
-> > req=0x7fffb6dffec0, offset=0, bytes=512, align=1, qiov=0x7fffffffd0c0,
-> > flags=1)
-> >     at block/io.c:1058
-> > #6  0x0000555555c0a8c3 in bdrv_co_preadv (child=0x555556990180,
-> > offset=0, bytes=512, qiov=0x7fffffffd0c0, flags=BDRV_REQ_COPY_ON_READ)
-> > at block/io.c:1166
-> > #7  0x0000555555bf7ccf in blk_co_preadv (blk=0x555556a2bc20, offset=0,
-> > bytes=512, qiov=0x7fffffffd0c0, flags=0) at block/block-backend.c:927
-> > #8  0x0000555555bf7e19 in blk_read_entry (opaque=0x7fffffffd0e0)
-> >     at block/block-backend.c:974
-> > #9  0x0000555555cc3015 in coroutine_trampoline (i0=1485566720, i1=21845)
-> >     at util/coroutine-ucontext.c:79
+* Juan Quintela (quintela@redhat.com) wrote:
+> We use an unsigned long for the page number.  Notice that our bitmaps
+> already got that for the index, so we have that limit.
 > 
-> The patch that fixes this is simply:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+
+see below....
+
+> --
 > 
-> diff --git a/block/io.c b/block/io.c
-> index 2709a7007f..4f1a730e45 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -945,8 +945,6 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
->      size_t skip_bytes;
->      int ret;
+> rename page to page_abs everywhere.
+> fix trace types for pages
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  migration/ram.c        | 76 ++++++++++++++++++++++----------------------------
+>  migration/trace-events |  4 +--
+>  2 files changed, 36 insertions(+), 44 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 1ef142f..52ab14b 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -609,13 +609,12 @@ static int save_xbzrle_page(RAMState *rs, uint8_t **current_data,
+>   * @rs: current RAM state
+>   * @rb: RAMBlock where to search for dirty pages
+>   * @start: starting address (typically so we can continue from previous page)
+> - * @ram_addr_abs: pointer into which to store the address of the dirty page
+> - *                within the global ram_addr space
+> + * @page_abs: pointer into where to store the dirty page
+>   */
+>  static inline
+>  ram_addr_t migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
+>                                         ram_addr_t start,
+> -                                       ram_addr_t *ram_addr_abs)
+> +                                       unsigned long *page_abs)
+>  {
+>      unsigned long base = rb->offset >> TARGET_PAGE_BITS;
+>      unsigned long nr = base + (start >> TARGET_PAGE_BITS);
+> @@ -632,17 +631,17 @@ ram_addr_t migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
+>          next = find_next_bit(bitmap, size, nr);
+>      }
 >  
-> -    assert(child->perm & (BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE));
-> -
->      /* Cover entire cluster so no additional backing file I/O is required when
->       * allocating cluster in the image file.
->       */
+> -    *ram_addr_abs = next << TARGET_PAGE_BITS;
+> +    *page_abs = next;
+>      return (next - base) << TARGET_PAGE_BITS;
+>  }
+>  
+> -static inline bool migration_bitmap_clear_dirty(RAMState *rs, ram_addr_t addr)
+> +static inline bool migration_bitmap_clear_dirty(RAMState *rs,
+> +                                                unsigned long page_abs)
+>  {
+>      bool ret;
+> -    int nr = addr >> TARGET_PAGE_BITS;
+>      unsigned long *bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
+>  
+> -    ret = test_and_clear_bit(nr, bitmap);
+> +    ret = test_and_clear_bit(page_abs, bitmap);
+>  
+>      if (ret) {
+>          rs->migration_dirty_pages--;
+> @@ -1054,14 +1053,13 @@ static int ram_save_compressed_page(RAMState *rs, PageSearchStatus *pss,
+>   * @rs: current RAM state
+>   * @pss: data about the state of the current dirty page scan
+>   * @again: set to false if the search has scanned the whole of RAM
+> - * @ram_addr_abs: pointer into which to store the address of the dirty page
+> - *                within the global ram_addr space
+> + * @page_abs: pointer into where to store the dirty page
+>   */
+>  static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss,
+> -                             bool *again, ram_addr_t *ram_addr_abs)
+> +                             bool *again, unsigned long *page_abs)
+>  {
+>      pss->offset = migration_bitmap_find_dirty(rs, pss->block, pss->offset,
+> -                                              ram_addr_abs);
+> +                                              page_abs);
+>      if (pss->complete_round && pss->block == rs->last_seen_block &&
+>          pss->offset >= rs->last_offset) {
+>          /*
+> @@ -1108,11 +1106,10 @@ static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss,
+>   *
+>   * @rs: current RAM state
+>   * @offset: used to return the offset within the RAMBlock
+> - * @ram_addr_abs: pointer into which to store the address of the dirty page
+> - *                within the global ram_addr space
+> + * @page_abs: pointer into where to store the dirty page
+>   */
+>  static RAMBlock *unqueue_page(RAMState *rs, ram_addr_t *offset,
+> -                              ram_addr_t *ram_addr_abs)
+> +                              unsigned long *page_abs)
+>  {
+>      RAMBlock *block = NULL;
+>  
+> @@ -1122,8 +1119,7 @@ static RAMBlock *unqueue_page(RAMState *rs, ram_addr_t *offset,
+>                                  QSIMPLEQ_FIRST(&rs->src_page_requests);
+>          block = entry->rb;
+>          *offset = entry->offset;
+> -        *ram_addr_abs = (entry->offset + entry->rb->offset) &
+> -                        TARGET_PAGE_MASK;
+> +        *page_abs = (entry->offset + entry->rb->offset) >> TARGET_PAGE_BITS;
+>  
+>          if (entry->len > TARGET_PAGE_SIZE) {
+>              entry->len -= TARGET_PAGE_SIZE;
+> @@ -1148,18 +1144,17 @@ static RAMBlock *unqueue_page(RAMState *rs, ram_addr_t *offset,
+>   *
+>   * @rs: current RAM state
+>   * @pss: data about the state of the current dirty page scan
+> - * @ram_addr_abs: pointer into which to store the address of the dirty page
+> - *                within the global ram_addr space
+> + * @page_abs: pointer into where to store the dirty page
+>   */
+>  static bool get_queued_page(RAMState *rs, PageSearchStatus *pss,
+> -                            ram_addr_t *ram_addr_abs)
+> +                            unsigned long *page_abs)
+>  {
+>      RAMBlock  *block;
+>      ram_addr_t offset;
+>      bool dirty;
+>  
+>      do {
+> -        block = unqueue_page(rs, &offset, ram_addr_abs);
+> +        block = unqueue_page(rs, &offset, page_abs);
+>          /*
+>           * We're sending this page, and since it's postcopy nothing else
+>           * will dirty it, and we must make sure it doesn't get sent again
+> @@ -1169,17 +1164,15 @@ static bool get_queued_page(RAMState *rs, PageSearchStatus *pss,
+>          if (block) {
+>              unsigned long *bitmap;
+>              bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
+> -            dirty = test_bit(*ram_addr_abs >> TARGET_PAGE_BITS, bitmap);
+> +            dirty = test_bit(*page_abs, bitmap);
+>              if (!dirty) {
+> -                trace_get_queued_page_not_dirty(
+> -                    block->idstr, (uint64_t)offset,
+> -                    (uint64_t)*ram_addr_abs,
+> -                    test_bit(*ram_addr_abs >> TARGET_PAGE_BITS,
+> -                         atomic_rcu_read(&rs->ram_bitmap)->unsentmap));
+> +                trace_get_queued_page_not_dirty(block->idstr, (uint64_t)offset,
+> +                    *page_abs,
+> +                    test_bit(*page_abs,
+> +                             atomic_rcu_read(&rs->ram_bitmap)->unsentmap));
+>              } else {
+> -                trace_get_queued_page(block->idstr,
+> -                                      (uint64_t)offset,
+> -                                      (uint64_t)*ram_addr_abs);
+> +                trace_get_queued_page(block->idstr, (uint64_t)offset,
+> +                                     *page_abs);
+>              }
+>          }
+>  
+> @@ -1307,15 +1300,15 @@ err:
+>   * @ms: current migration state
+>   * @pss: data about the page we want to send
+>   * @last_stage: if we are at the completion stage
+> - * @dirty_ram_abs: address of the start of the dirty page in ram_addr_t space
+> + * @page_abs: page number of the dirty page
+>   */
+>  static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
+> -                                bool last_stage, ram_addr_t dirty_ram_abs)
+> +                                bool last_stage, unsigned long page_abs)
+>  {
+>      int res = 0;
+>  
+>      /* Check the pages is dirty and if it is send it */
+> -    if (migration_bitmap_clear_dirty(rs, dirty_ram_abs)) {
+> +    if (migration_bitmap_clear_dirty(rs, page_abs)) {
+>          unsigned long *unsentmap;
+>          /*
+>           * If xbzrle is on, stop using the data compression after first
+> @@ -1335,7 +1328,7 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
+>          }
+>          unsentmap = atomic_rcu_read(&rs->ram_bitmap)->unsentmap;
+>          if (unsentmap) {
+> -            clear_bit(dirty_ram_abs >> TARGET_PAGE_BITS, unsentmap);
+> +            clear_bit(page_abs, unsentmap);
+>          }
+>      }
+>  
+> @@ -1357,24 +1350,24 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
+>   * @ms: current migration state
+>   * @pss: data about the page we want to send
+>   * @last_stage: if we are at the completion stage
+> - * @dirty_ram_abs: Address of the start of the dirty page in ram_addr_t space
+> + * @page_abs: Page number of the dirty page
+>   */
+>  static int ram_save_host_page(RAMState *rs, PageSearchStatus *pss,
+>                                bool last_stage,
+> -                              ram_addr_t dirty_ram_abs)
+> +                              unsigned long page_abs)
+>  {
+>      int tmppages, pages = 0;
+>      size_t pagesize = qemu_ram_pagesize(pss->block);
+>  
+>      do {
+> -        tmppages = ram_save_target_page(rs, pss, last_stage, dirty_ram_abs);
+> +        tmppages = ram_save_target_page(rs, pss, last_stage, page_abs);
+>          if (tmppages < 0) {
+>              return tmppages;
+>          }
+>  
+>          pages += tmppages;
+>          pss->offset += TARGET_PAGE_SIZE;
+> -        dirty_ram_abs += TARGET_PAGE_SIZE;
+> +        page_abs++;
+>      } while (pss->offset & (pagesize - 1));
+>  
+>      /* The offset we leave with is the last one we looked at */
+> @@ -1401,8 +1394,7 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
+>      PageSearchStatus pss;
+>      int pages = 0;
+>      bool again, found;
+> -    ram_addr_t dirty_ram_abs; /* Address of the start of the dirty page in
+> -                                 ram_addr_t space */
+> +    unsigned long page_abs; /* Page number of the dirty page */
+>  
+>      /* No dirty page as there is zero RAM */
+>      if (!ram_bytes_total()) {
+> @@ -1419,15 +1411,15 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
+>  
+>      do {
+>          again = true;
+> -        found = get_queued_page(rs, &pss, &dirty_ram_abs);
+> +        found = get_queued_page(rs, &pss, &page_abs);
+>  
+>          if (!found) {
+>              /* priority queue empty, so just search for something dirty */
+> -            found = find_dirty_block(rs, &pss, &again, &dirty_ram_abs);
+> +            found = find_dirty_block(rs, &pss, &again, &page_abs);
+>          }
+>  
+>          if (found) {
+> -            pages = ram_save_host_page(rs, &pss, last_stage, dirty_ram_abs);
+> +            pages = ram_save_host_page(rs, &pss, last_stage, page_abs);
+>          }
+>      } while (!pages && again);
+>  
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 7372ce2..9514044 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -63,8 +63,8 @@ put_qtailq_end(const char *name, const char *reason) "%s %s"
+>  qemu_file_fclose(void) ""
+>  
+>  # migration/ram.c
+> -get_queued_page(const char *block_name, uint64_t tmp_offset, uint64_t ram_addr) "%s/%" PRIx64 " ram_addr=%" PRIx64
+> -get_queued_page_not_dirty(const char *block_name, uint64_t tmp_offset, uint64_t ram_addr, int sent) "%s/%" PRIx64 " ram_addr=%" PRIx64 " (sent=%d)"
+> +get_queued_page(const char *block_name, uint64_t tmp_offset, unsigned long page_abs) "%s/%" PRIx64 " page_abs=%lu"
+> +get_queued_page_not_dirty(const char *block_name, uint64_t tmp_offset, unsigned long page_abs, int sent) "%s/%" PRIx64 " page_abs=%lu (sent=%d)"
+
+Yes, but if you respin, please make those %lx rather than %lu.
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+>  migration_bitmap_sync_start(void) ""
+>  migration_bitmap_sync_end(uint64_t dirty_pages) "dirty_pages %" PRIu64
+>  migration_throttle(void) ""
+> -- 
+> 2.9.3
 > 
-> It has no ill effects that I can see, and fixes the libguestfs test
-> suite, but I'm assuming the assert was added for a reason so I'm not
-> proposing this as a patch.
-
-I think for the moment this is actually the best solution. Copy on read
-is currently implemented in a way that we can't do things properly with
-respect to permissions, so we need to bypass the permission system.
-
-We can't require the callers to have write permissions for a read
-request, this would have to be handled internally by the COR code. As
-long as it is still implemented directly in block/io.c instead of a
-separate filter driver, the COR code doesn't have a BdrvChild and
-therefore can't have its own set of permissions on the node.
-
-Kevin
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
