@@ -1,31 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cwRWE-0007Nr-3a
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 06:53:31 -0400
+	(envelope-from <peterx@redhat.com>) id 1cwRca-0008V7-0d
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 07:00:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cwRWB-0002ok-0M
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 06:53:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49832)
+	(envelope-from <peterx@redhat.com>) id 1cwRcW-00058e-TX
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 07:00:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34042)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cwRWA-0002oV-Nr
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 06:53:26 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 81C72C04BD38
-	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 10:53:25 +0000 (UTC)
-Date: Fri, 7 Apr 2017 11:53:22 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170407105321.GI2138@work-vm>
-References: <20170406130913.2232-1-quintela@redhat.com>
-	<20170406130913.2232-52-quintela@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170406130913.2232-52-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 51/54] ram: Use ramblock and page offset
- instead of absolute offset
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cwRcW-00058M-La
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 07:00:00 -0400
+From: Peter Xu <peterx@redhat.com>
+Date: Fri,  7 Apr 2017 18:59:06 +0800
+Message-Id: <1491562755-23867-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v9 0/9] VT-d: vfio enablement and misc enhances
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,233 +21,243 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, Marcel Apfelbaum <marcel@redhat.com>, jan.kiszka@siemens.com, jasowang@redhat.com, peterx@redhat.com, David Gibson <david@gibson.dropbear.id.au>, alex.williamson@redhat.com, bd.aviv@gmail.com
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> This removes the needto pass also the absolute offset.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+This is v9 of vt-d vfio enablement series.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+v9:
+- add r-b for Eric on patch 1,2,4,5
+- add r-b for mst on all patches
+- add a-b for Alex on patch 1
+- add commit message in patch 2 (it was empty) [Eric]
+- fix English errors [Eric]
 
-> ---
->  migration/ram.c | 65 ++++++++++++++++++++++++---------------------------------
->  1 file changed, 27 insertions(+), 38 deletions(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 4132503..fc1f08f 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -609,12 +609,10 @@ static int save_xbzrle_page(RAMState *rs, uint8_t **current_data,
->   * @rs: current RAM state
->   * @rb: RAMBlock where to search for dirty pages
->   * @start: page where we start the search
-> - * @page_abs: pointer into where to store the dirty page
->   */
->  static inline
->  unsigned long migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
-> -                                          unsigned long start,
-> -                                          unsigned long *page_abs)
-> +                                          unsigned long start)
->  {
->      unsigned long base = rb->offset >> TARGET_PAGE_BITS;
->      unsigned long nr = base + start;
-> @@ -631,17 +629,18 @@ unsigned long migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
->          next = find_next_bit(bitmap, size, nr);
->      }
->  
-> -    *page_abs = next;
->      return next - base;
->  }
->  
->  static inline bool migration_bitmap_clear_dirty(RAMState *rs,
-> -                                                unsigned long page_abs)
-> +                                                RAMBlock *rb,
-> +                                                unsigned long page)
->  {
->      bool ret;
->      unsigned long *bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
-> +    unsigned long nr = (rb->offset >> TARGET_PAGE_BITS) + page;
->  
-> -    ret = test_and_clear_bit(page_abs, bitmap);
-> +    ret = test_and_clear_bit(nr, bitmap);
->  
->      if (ret) {
->          rs->migration_dirty_pages--;
-> @@ -1053,13 +1052,10 @@ static int ram_save_compressed_page(RAMState *rs, PageSearchStatus *pss,
->   * @rs: current RAM state
->   * @pss: data about the state of the current dirty page scan
->   * @again: set to false if the search has scanned the whole of RAM
-> - * @page_abs: pointer into where to store the dirty page
->   */
-> -static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss,
-> -                             bool *again, unsigned long *page_abs)
-> +static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss, bool *again)
->  {
-> -    pss->page = migration_bitmap_find_dirty(rs, pss->block, pss->page,
-> -                                            page_abs);
-> +    pss->page = migration_bitmap_find_dirty(rs, pss->block, pss->page);
->      if (pss->complete_round && pss->block == rs->last_seen_block &&
->          pss->page >= rs->last_page) {
->          /*
-> @@ -1106,10 +1102,8 @@ static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss,
->   *
->   * @rs: current RAM state
->   * @offset: used to return the offset within the RAMBlock
-> - * @page_abs: pointer into where to store the dirty page
->   */
-> -static RAMBlock *unqueue_page(RAMState *rs, ram_addr_t *offset,
-> -                              unsigned long *page_abs)
-> +static RAMBlock *unqueue_page(RAMState *rs, ram_addr_t *offset)
->  {
->      RAMBlock *block = NULL;
->  
-> @@ -1119,7 +1113,6 @@ static RAMBlock *unqueue_page(RAMState *rs, ram_addr_t *offset,
->                                  QSIMPLEQ_FIRST(&rs->src_page_requests);
->          block = entry->rb;
->          *offset = entry->offset;
-> -        *page_abs = (entry->offset + entry->rb->offset) >> TARGET_PAGE_BITS;
->  
->          if (entry->len > TARGET_PAGE_SIZE) {
->              entry->len -= TARGET_PAGE_SIZE;
-> @@ -1144,17 +1137,15 @@ static RAMBlock *unqueue_page(RAMState *rs, ram_addr_t *offset,
->   *
->   * @rs: current RAM state
->   * @pss: data about the state of the current dirty page scan
-> - * @page_abs: pointer into where to store the dirty page
->   */
-> -static bool get_queued_page(RAMState *rs, PageSearchStatus *pss,
-> -                            unsigned long *page_abs)
-> +static bool get_queued_page(RAMState *rs, PageSearchStatus *pss)
->  {
->      RAMBlock  *block;
->      ram_addr_t offset;
->      bool dirty;
->  
->      do {
-> -        block = unqueue_page(rs, &offset, page_abs);
-> +        block = unqueue_page(rs, &offset);
->          /*
->           * We're sending this page, and since it's postcopy nothing else
->           * will dirty it, and we must make sure it doesn't get sent again
-> @@ -1163,16 +1154,18 @@ static bool get_queued_page(RAMState *rs, PageSearchStatus *pss,
->           */
->          if (block) {
->              unsigned long *bitmap;
-> +            unsigned long page;
-> +
->              bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
-> -            dirty = test_bit(*page_abs, bitmap);
-> +            page = (block->offset + offset) >> TARGET_PAGE_BITS;
-> +            dirty = test_bit(page, bitmap);
->              if (!dirty) {
->                  trace_get_queued_page_not_dirty(block->idstr, (uint64_t)offset,
-> -                    *page_abs,
-> -                    test_bit(*page_abs,
-> +                    page,
-> +                    test_bit(page,
->                               atomic_rcu_read(&rs->ram_bitmap)->unsentmap));
->              } else {
-> -                trace_get_queued_page(block->idstr, (uint64_t)offset,
-> -                                     *page_abs);
-> +                trace_get_queued_page(block->idstr, (uint64_t)offset, page);
->              }
->          }
->  
-> @@ -1300,22 +1293,22 @@ err:
->   * @ms: current migration state
->   * @pss: data about the page we want to send
->   * @last_stage: if we are at the completion stage
-> - * @page_abs: page number of the dirty page
->   */
->  static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
-> -                                bool last_stage, unsigned long page_abs)
-> +                                bool last_stage)
->  {
->      int res = 0;
->  
->      /* Check the pages is dirty and if it is send it */
-> -    if (migration_bitmap_clear_dirty(rs, page_abs)) {
-> +    if (migration_bitmap_clear_dirty(rs, pss->block, pss->page)) {
->          unsigned long *unsentmap;
->          /*
->           * If xbzrle is on, stop using the data compression after first
->           * round of migration even if compression is enabled. In theory,
->           * xbzrle can do better than compression.
->           */
-> -
-> +        unsigned long page =
-> +            (pss->block->offset >> TARGET_PAGE_BITS) + pss->page;
->          if (migrate_use_compression()
->              && (rs->ram_bulk_stage || !migrate_use_xbzrle())) {
->              res = ram_save_compressed_page(rs, pss, last_stage);
-> @@ -1328,7 +1321,7 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
->          }
->          unsentmap = atomic_rcu_read(&rs->ram_bitmap)->unsentmap;
->          if (unsentmap) {
-> -            clear_bit(page_abs, unsentmap);
-> +            clear_bit(page, unsentmap);
->          }
->      }
->  
-> @@ -1350,25 +1343,22 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
->   * @ms: current migration state
->   * @pss: data about the page we want to send
->   * @last_stage: if we are at the completion stage
-> - * @page_abs: Page number of the dirty page
->   */
->  static int ram_save_host_page(RAMState *rs, PageSearchStatus *pss,
-> -                              bool last_stage,
-> -                              unsigned long page_abs)
-> +                              bool last_stage)
->  {
->      int tmppages, pages = 0;
->      size_t pagesize_bits =
->          qemu_ram_pagesize(pss->block) >> TARGET_PAGE_BITS;
->  
->      do {
-> -        tmppages = ram_save_target_page(rs, pss, last_stage, page_abs);
-> +        tmppages = ram_save_target_page(rs, pss, last_stage);
->          if (tmppages < 0) {
->              return tmppages;
->          }
->  
->          pages += tmppages;
->          pss->page++;
-> -        page_abs++;
->      } while (pss->page & (pagesize_bits - 1));
->  
->      /* The offset we leave with is the last one we looked at */
-> @@ -1395,7 +1385,6 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
->      PageSearchStatus pss;
->      int pages = 0;
->      bool again, found;
-> -    unsigned long page_abs; /* Page number of the dirty page */
->  
->      /* No dirty page as there is zero RAM */
->      if (!ram_bytes_total()) {
-> @@ -1412,15 +1401,15 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
->  
->      do {
->          again = true;
-> -        found = get_queued_page(rs, &pss, &page_abs);
-> +        found = get_queued_page(rs, &pss);
->  
->          if (!found) {
->              /* priority queue empty, so just search for something dirty */
-> -            found = find_dirty_block(rs, &pss, &again, &page_abs);
-> +            found = find_dirty_block(rs, &pss, &again);
->          }
->  
->          if (found) {
-> -            pages = ram_save_host_page(rs, &pss, last_stage, page_abs);
-> +            pages = ram_save_host_page(rs, &pss, last_stage);
->          }
->      } while (!pages && again);
->  
-> -- 
-> 2.9.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+v8
+- remove patches 1-9 since merged already
+- add David's r-b for all the patches
+- add Aviv's s-o-b in the last patch
+- rename iommu to iommu_dmar [Jason]
+- rename last patch subject to "remote IOTLB" [Jason]
+- pick up jason's two patches to fix vhost breakage
+                  ^^^^^^^^^^^
+                  (v9 comment: here it should be "one patch")
+- let vhost leverage the new IOMMU notifier interface
+
+v7:
+- for the two traces patches: Change subjects. Remove vtd_err() and
+  vtd_err_nonzero_rsvd() tracers, instead using standalone trace for
+  each of the places. Don't remove any DPRINTF() if there is no
+  replacement. [Jason]
+- add r-b and a-b for Alex/David/Jason.
+- in patch "intel_iommu: renaming gpa to iova where proper", convert
+  one more place where I missed [Jason]
+- fix the place where I should use "~0ULL" not "~0" [Jason]
+- squash patch 16 into 18 [Jason]
+
+v6:
+- do unmap in all cases when replay [Jason]
+- do global replay even if context entry is invalidated [Jason]
+- when iommu reset, send unmap to all registered notifiers [Jason]
+- use rcu read lock to protect the whole vfio_iommu_map_notify()
+  [Alex, Paolo]
+
+v5:
+- fix patch 4 subject too long, and error spelling [Eric]
+- add ack-by for alex in patch 1 [Alex]
+- squashing patch 19/20 into patch 18 [Jason]
+- fix comments in vtd_page_walk() [Jason]
+- remove all error_report() [Jason]
+- add comment for patch 18, mention about that enabled vhost without
+  ATS as well [Jason]
+- remove skipped debug thing during page walk [Jason]
+- remove duplicated page walk trace [Jason]
+- some tunings in vtd_address_space_unmap(), to provide correct iova
+  and addr_mask. For this, I tuned this patch as well a bit:
+  "memory: add section range info for IOMMU notifier"
+  to loosen the range check
+
+v4:
+- convert all error_report()s into traces (in the two patches that did
+  that)
+- rebased to Jason's DMAR series (master + one more patch:
+  "[PATCH V4 net-next] vhost_net: device IOTLB support")
+- let vhost use the new api iommu_notifier_init() so it won't break
+  vhost dmar [Jason]
+- touch commit message of the patch:
+  "intel_iommu: provide its own replay() callback"
+  old replay is not a dead loop, but it will just consume lots of time
+  [Jason]
+- add comment for patch:
+  "intel_iommu: do replay when context invalidate"
+  telling why replay won't be a problem even without CM=1 [Jason]
+- remove a useless comment line [Jason]
+- remove dmar_enabled parameter for vtd_switch_address_space() and
+  vtd_switch_address_space_all() [Mst, Jason]
+- merged the vfio patches in, to support unmap of big ranges at the
+  beginning ("[PATCH RFC 0/3] vfio: allow to notify unmap for very big
+  region")
+- using caching_mode instead of cache_mode_enabled, and "caching-mode"
+  instead of "cache-mode" [Kevin]
+- when receive context entry invalidation, we unmap the entire region
+  first, then replay [Alex]
+- fix commit message for patch:
+  "intel_iommu: simplify irq region translation" [Kevin]
+- handle domain/global invalidation, and notify where proper [Jason,
+  Kevin]
+
+v3:
+- fix style error reported by patchew
+- fix comment in domain switch patch: use "IOMMU address space" rather
+  than "IOMMU region" [Kevin]
+- add ack-by for Paolo in patch:
+  "memory: add section range info for IOMMU notifier"
+  (this is seperately collected besides this thread)
+- remove 3 patches which are merged already (from Jason)
+- rebase to master b6c0897
+
+v2:
+- change comment for "end" parameter in vtd_page_walk() [Tianyu]
+- change comment for "a iova" to "an iova" [Yi]
+- fix fault printed val for GPA address in vtd_page_walk_level (debug
+  only)
+- rebased to master (rather than Aviv's v6 series) and merged Aviv's
+  series v6: picked patch 1 (as patch 1 in this series), dropped patch
+  2, re-wrote patch 3 (as patch 17 of this series).
+- picked up two more bugfix patches from Jason's DMAR series
+- picked up the following patch as well:
+  "[PATCH v3] intel_iommu: allow dynamic switch of IOMMU region"
+
+This RFC series is a re-work for Aviv B.D.'s vfio enablement series
+with vt-d:
+
+  https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg01452.html
+
+Aviv has done a great job there, and what we still lack there are
+mostly the following:
+
+(1) VFIO got duplicated IOTLB notifications due to splitted VT-d IOMMU
+    memory region.
+
+(2) VT-d still haven't provide a correct replay() mechanism (e.g.,
+    when IOMMU domain switches, things will broke).
+
+This series should have solved the above two issues.
+
+Online repo:
+
+  https://github.com/xzpeter/qemu/tree/vtd-vfio-enablement
+
+I would be glad to hear about any review comments for above patches.
+
+=========
+Test Done
+=========
+
+Build test passed for x86_64/arm/ppc64.
+
+Simply tested with x86_64, assigning two PCI devices to a single VM,
+boot the VM using:
+
+bin=x86_64-softmmu/qemu-system-x86_64
+$bin -M q35,accel=kvm,kernel-irqchip=split -m 1G \
+     -device intel-iommu,intremap=on,eim=off,caching-mode=on \
+     -netdev user,id=net0,hostfwd=tcp::5555-:22 \
+     -device virtio-net-pci,netdev=net0 \
+     -device vfio-pci,host=03:00.0 \
+     -device vfio-pci,host=02:00.0 \
+     -trace events=".trace.vfio" \
+     /var/lib/libvirt/images/vm1.qcow2
+
+pxdev:bin [vtd-vfio-enablement]# cat .trace.vfio
+vtd_page_walk*
+vtd_replay*
+vtd_inv_desc*
+
+Then, in the guest, run the following tool:
+
+  https://github.com/xzpeter/clibs/blob/master/gpl/userspace/vfio-bind-group/vfio-bind-group.c
+
+With parameter:
+
+  ./vfio-bind-group 00:03.0 00:04.0
+
+Check host side trace log, I can see pages are replayed and mapped in
+00:04.0 device address space, like:
+
+...
+vtd_replay_ce_valid replay valid context device 00:04.00 hi 0x401 lo 0x38fe1001
+vtd_page_walk Page walk for ce (0x401, 0x38fe1001) iova range 0x0 - 0x8000000000
+vtd_page_walk_level Page walk (base=0x38fe1000, level=3) iova range 0x0 - 0x8000000000
+vtd_page_walk_level Page walk (base=0x35d31000, level=2) iova range 0x0 - 0x40000000
+vtd_page_walk_level Page walk (base=0x34979000, level=1) iova range 0x0 - 0x200000
+vtd_page_walk_one Page walk detected map level 0x1 iova 0x0 -> gpa 0x22dc3000 mask 0xfff perm 3
+vtd_page_walk_one Page walk detected map level 0x1 iova 0x1000 -> gpa 0x22e25000 mask 0xfff perm 3
+vtd_page_walk_one Page walk detected map level 0x1 iova 0x2000 -> gpa 0x22e12000 mask 0xfff perm 3
+vtd_page_walk_one Page walk detected map level 0x1 iova 0x3000 -> gpa 0x22e2d000 mask 0xfff perm 3
+vtd_page_walk_one Page walk detected map level 0x1 iova 0x4000 -> gpa 0x12a49000 mask 0xfff perm 3
+vtd_page_walk_one Page walk detected map level 0x1 iova 0x5000 -> gpa 0x129bb000 mask 0xfff perm 3
+vtd_page_walk_one Page walk detected map level 0x1 iova 0x6000 -> gpa 0x128db000 mask 0xfff perm 3
+vtd_page_walk_one Page walk detected map level 0x1 iova 0x7000 -> gpa 0x12a80000 mask 0xfff perm 3
+vtd_page_walk_one Page walk detected map level 0x1 iova 0x8000 -> gpa 0x12a7e000 mask 0xfff perm 3
+vtd_page_walk_one Page walk detected map level 0x1 iova 0x9000 -> gpa 0x12b22000 mask 0xfff perm 3
+vtd_page_walk_one Page walk detected map level 0x1 iova 0xa000 -> gpa 0x12b41000 mask 0xfff perm 3
+...
+
+=========
+Todo List
+=========
+
+- error reporting for the assigned devices (as Tianyu has mentioned)
+
+- per-domain address-space: A better solution in the future may be -
+  we maintain one address space per IOMMU domain in the guest (so
+  multiple devices can share a same address space if they are sharing
+  the same IOMMU domains in the guest), rather than one address space
+  per device (which is current implementation of vt-d). However that's
+  a step further than this series, and let's see whether we can first
+  provide a workable version of device assignment with vt-d
+  protection.
+
+- don't need to notify IOTLB (psi/gsi/global) invalidations to devices
+  that with ATS enabled
+
+- investigate when guest map page while mask contains existing mapped
+  pages (e.g. map 12k-16k first, then map 0-12k)
+
+- coalesce unmap during page walk (currently, we send it once per
+  page)
+
+- when do PSI for unmap, whether we can send one notify directly
+  instead of walking over the page table?
+
+- more to come...
+
+Thanks,
+
+Jason Wang (1):
+  intel_iommu: use the correct memory region for device IOTLB
+    notification
+
+Peter Xu (8):
+  memory: add section range info for IOMMU notifier
+  memory: provide IOMMU_NOTIFIER_FOREACH macro
+  memory: provide iommu_replay_all()
+  memory: introduce memory_region_notify_one()
+  memory: add MemoryRegionIOMMUOps.replay() callback
+  intel_iommu: provide its own replay() callback
+  intel_iommu: allow dynamic switch of IOMMU region
+  intel_iommu: enable remote IOTLB
+
+ hw/i386/intel_iommu.c          | 442 +++++++++++++++++++++++++++++++++++++++--
+ hw/i386/intel_iommu_internal.h |   1 +
+ hw/i386/trace-events           |  10 +-
+ hw/vfio/common.c               |  12 +-
+ hw/virtio/vhost.c              |  10 +-
+ include/exec/memory.h          |  49 ++++-
+ include/hw/i386/intel_iommu.h  |  10 +
+ memory.c                       |  52 ++++-
+ 8 files changed, 552 insertions(+), 34 deletions(-)
+
+-- 
+2.7.4
