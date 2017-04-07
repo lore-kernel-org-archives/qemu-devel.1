@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwVEa-0004DX-MO
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:51:33 -0400
+	(envelope-from <stefanha@gmail.com>) id 1cwVFa-0004mh-BK
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:52:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwVEX-0002nR-FA
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:51:32 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54823)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cwVEX-0002n4-96
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:51:29 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cwVEU-0005EU-OP
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 14:51:26 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2CFAA2E81F9
-	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 14:51:16 +0000 (UTC)
+	(envelope-from <stefanha@gmail.com>) id 1cwVFX-0003HT-49
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 10:52:34 -0400
+Date: Fri, 7 Apr 2017 15:52:27 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170407145227.GM16146@stefanha-x1.localdomain>
+References: <20170406190847.29347-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Apr 2017 14:44:34 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1635339 <1635339@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20161020160532.23339.63373.malonedeb@soybean.canonical.com>
-Message-Id: <20170407144435.12743.28795.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1635339] Re: qxl_pre_save assertion failure on vm
- "save"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="S66JdqtemGhvbcZP"
+Content-Disposition: inline
+In-Reply-To: <20170406190847.29347-1-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.9] throttle: Remove
+ block from group on hot-unplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,36 +24,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-** Changed in: qemu
-       Status: Fix Released =3D> Confirmed
 
--- =
+--S66JdqtemGhvbcZP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1635339
+On Thu, Apr 06, 2017 at 02:08:47PM -0500, Eric Blake wrote:
+> When a block device that is part of a throttle group is hot-unplugged,
+> we forgot to remove it from the throttle group. This leaves stale
+> memory around, and causes an easily reproducible crash:
+>=20
+> $ ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio \
+> -device virtio-scsi-pci,bus=3Dpci.0 -drive \
+> id=3Ddrive_image2,if=3Dnone,format=3Draw,file=3Dfile2,bps=3D512000,iops=
+=3D100,group=3Dfoo \
+> -device scsi-hd,id=3Dimage2,drive=3Ddrive_image2 -drive \
+> id=3Ddrive_image3,if=3Dnone,format=3Draw,file=3Dfile3,bps=3D512000,iops=
+=3D100,group=3Dfoo \
+> -device scsi-hd,id=3Dimage3,drive=3Ddrive_image3
+> {'execute':'qmp_capabilities'}
+> {'execute':'device_del','arguments':{'id':'image3'}}
+> {'execute':'system_reset'}
+>=20
+> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1428810
+>=20
+> Suggested-by: Alberto Garcia <berto@igalia.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  block/block-backend.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
-Title:
-  qxl_pre_save assertion failure on vm "save"
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Status in QEMU:
-  Confirmed
+--S66JdqtemGhvbcZP
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Bug description:
-  When I try and save my Windows 10 VM, I see an assertion failure, and
-  the machine is shut down.
+-----BEGIN PGP SIGNATURE-----
 
-  I see the following in the log:
+iQEcBAEBAgAGBQJY56erAAoJEJykq7OBq3PIV+sIAKvSYkFaTnmLtnghPnnvoTYe
+VI8UPMCDxHwzTrVk90bDOpUcRManbcQ3goMRybqJqUpheBQxnwELckpYPBZq1s7i
+UOGtsg11AvKFBnoIia8nxHFpFR7u0PKKEcnmBUm7DJXxPrg3eFEpv9L+C/TVUJpQ
+OJ0hs/951cOK1u9QXBdUSOywjv1bku5t525YL5S8EBPzJkJymr/7qiA5yy5jpJLp
+/6vJxCNwvbEpJoAR70HlbFqLTXT+el7eQo57q1pkTqM7CKWk+XqT47xaRqbMtvaz
+v1262ljsPYt82fRtrzPNSt4pM/7eP/FCzgzS8d2yBeUjdOkuhwTouGN4zljUiow=
+=WpYr
+-----END PGP SIGNATURE-----
 
-  main_channel_handle_parsed: agent start
-  qemu-system-x86_64: /build/qemu-Zwynhi/qemu-2.5+dfsg/hw/display/qxl.c:210=
-1: qxl_pre_save: Assertion `d->last_release_offset < d->vga.vram_size' fail=
-ed.
-  2016-10-20 11:52:42.713+0000: shutting down
-
-  Please let me know what other information would be relevant!
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1635339/+subscriptions
+--S66JdqtemGhvbcZP--
