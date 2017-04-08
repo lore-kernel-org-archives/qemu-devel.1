@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54082)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwdZc-0008To-53
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 19:45:49 -0400
+	(envelope-from <jsnow@redhat.com>) id 1cwdqz-00036G-Pj
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:03:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cwdZX-0006RL-Dt
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 19:45:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39502)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cwdZW-0006Q7-VH
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 19:45:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cwdZV-0004EL-5K
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 23:45:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BA20E2E80CA
-	for <qemu-devel@nongnu.org>; Fri,  7 Apr 2017 23:45:40 +0000 (UTC)
+	(envelope-from <jsnow@redhat.com>) id 1cwdqu-0003B8-O1
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:03:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32934)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1cwdqu-00039V-Fu
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:03:40 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 10F9DC04B937
+	for <qemu-devel@nongnu.org>; Sat,  8 Apr 2017 00:03:37 +0000 (UTC)
+References: <20170323173928.14439-1-pbonzini@redhat.com>
+	<20170323173928.14439-6-pbonzini@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <48253fa9-d5eb-f750-6dfc-e478bfd85277@redhat.com>
+Date: Fri, 7 Apr 2017 20:03:36 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20170323173928.14439-6-pbonzini@redhat.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Apr 2017 23:38:20 -0000
-From: Roger Lawhorn <rll@twc.com>
-Reply-To: Bug 1680679 <1680679@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170407032144.12640.21952.malonedeb@gac.canonical.com>
-Message-Id: <20170407233820.30360.23613.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1680679] Re: qemu cannot run twice
+Subject: Re: [Qemu-devel] [PATCH 05/10] blockjob: separate monitor and
+ blockjob APIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,120 +34,328 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: jcody@redhat.com
 
-I meant to say you cannot run without the intel card in windows if you
-have optimus. I am glad seabios somehow hides optimus.
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1680679
+On 03/23/2017 01:39 PM, Paolo Bonzini wrote:
+> We already have different locking policies for APIs called by the monit=
+or
+> and the block job.  Monitor APIs need consistency across block_job_get
+> and the actual operation (e.g. block_job_set_speed), so currently there
+> are explicit aio_context_acquire/release calls in blockdev.c.
+>=20
+> When a block job needs to do something instead it doesn't care about lo=
+cking,
+> because the whole coroutine runs under the AioContext lock.  When movin=
+g
+> away from the AioContext lock, the monitor will have to call new
+> block_job_lock/unlock APIs, while blockjob APIs will take care of this
+> for the users.
+>=20
+> In preparation for that, keep all the blockjob APIs together in the
+> blockjob.c file.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  blockjob.c | 206 +++++++++++++++++++++++++++++++----------------------=
+--------
 
-Title:
-  qemu cannot run twice
+Did you guys order... like, fifty million pizzas?
 
-Status in QEMU:
-  Invalid
+Hooray for
+$ diff -u <(sed -n 's/^-//p' patch) <(sed -n 's/^\+//p' patch)
 
-Bug description:
-  After using qemu with gpu passthrough and then shutting down windows 7 pr=
-operly I cannot boot windows 7 a second time.
-  Only a full reboot of linux fixes this issue.
-  Qemu appears to corrupt something in linux when exiting.
-  I get no error messages but windows 7 never finishes booting during the 2=
-nd try.
-  Apparently I do try to run vfiobind each time the script is run.
-  Wondering if rerunning vfiobind can cause an issue?
+Looks clean, though it may be useful to do a few more things;
 
-  =
+- Demarcate what you think is the monitor API in this file
+- Organize blockjob.h to match to serve as a useful reference.
 
-  My specs:
-  -------------------------------------------------------------------------=
-----------------
-  System:    Host: GT70-2PE Kernel: 4.5.4-040504-generic x86_64 (64 bit gcc=
-: 5.3.1)
-             Desktop: Cinnamon 3.2.7 (Gtk 3.18.9) Distro: Linux Mint 18.1 S=
-erena
-  Machine:   Mobo: Micro-Star model: MS-1763 v: REV:0.C Bios: American Mega=
-trends v: E1763IMS.51B date: 01/29/2015
-  CPU:       Quad core Intel Core i7-4810MQ (-HT-MCP-) cache: 6144 KB
-             flags: (lm nx sse sse2 sse3 sse4_1 sse4_2 ssse3 vmx) bmips: 22=
-347
-             clock speeds: max: 2801 MHz 1: 2801 MHz 2: 2801 MHz 3: 2801 MH=
-z 4: 2801 MHz 5: 2801 MHz 6: 2801 MHz
-             7: 2801 MHz 8: 2801 MHz
-  Graphics:  Card-1: Intel 4th Gen Core Processor Integrated Graphics Contr=
-oller bus-ID: 00:02.0
-             Card-2: NVIDIA GK104M [GeForce GTX 880M] bus-ID: 01:00.0
-             Display Server: X.Org 1.18.4 drivers: intel (unloaded: fbdev,v=
-esa)
-             Resolution: 1920x1080@60.02hz, 1920x1080@60.00hz
-             GLX Renderer: Mesa DRI Intel Haswell Mobile GLX Version: 3.0 M=
-esa 12.0.6 Direct Rendering: Yes
+>  1 file changed, 105 insertions(+), 101 deletions(-)
+>=20
+> diff --git a/blockjob.c b/blockjob.c
+> index caca718..c5f1d19 100644
+> --- a/blockjob.c
+> +++ b/blockjob.c
+> @@ -334,11 +334,6 @@ void block_job_start(BlockJob *job)
+>      qemu_coroutine_enter(job->co);
+>  }
+> =20
+> -void block_job_fail(BlockJob *job)
+> -{
+> -    block_job_unref(job);
+> -}
+> -
+>  static void block_job_completed_single(BlockJob *job)
+>  {
+>      if (!job->ret) {
+> @@ -440,21 +435,6 @@ static void block_job_completed_txn_success(BlockJ=
+ob *job)
+>      }
+>  }
+> =20
+> -void block_job_completed(BlockJob *job, int ret)
+> -{
+> -    assert(blk_bs(job->blk)->job =3D=3D job);
+> -    assert(!job->completed);
+> -    job->completed =3D true;
+> -    job->ret =3D ret;
+> -    if (!job->txn) {
+> -        block_job_completed_single(job);
+> -    } else if (ret < 0 || block_job_is_cancelled(job)) {
+> -        block_job_completed_txn_abort(job);
+> -    } else {
+> -        block_job_completed_txn_success(job);
+> -    }
+> -}
+> -
+>  void block_job_set_speed(BlockJob *job, int64_t speed, Error **errp)
+>  {
+>      Error *local_err =3D NULL;
+> @@ -492,44 +472,11 @@ void block_job_user_pause(BlockJob *job)
+>      block_job_pause(job);
+>  }
+> =20
+> -static bool block_job_should_pause(BlockJob *job)
+> -{
+> -    return job->pause_count > 0;
+> -}
+> -
+>  bool block_job_user_paused(BlockJob *job)
+>  {
+>      return job->user_paused;
+>  }
+> =20
+> -void coroutine_fn block_job_pause_point(BlockJob *job)
+> -{
+> -    assert(job && block_job_started(job));
+> -
+> -    if (!block_job_should_pause(job)) {
+> -        return;
+> -    }
+> -    if (block_job_is_cancelled(job)) {
+> -        return;
+> -    }
+> -
+> -    if (job->driver->pause) {
+> -        job->driver->pause(job);
+> -    }
+> -
+> -    if (block_job_should_pause(job) && !block_job_is_cancelled(job)) {
+> -        job->paused =3D true;
+> -        job->busy =3D false;
+> -        qemu_coroutine_yield(); /* wait for block_job_resume() */
+> -        job->busy =3D true;
+> -        job->paused =3D false;
+> -    }
+> -
+> -    if (job->driver->resume) {
+> -        job->driver->resume(job);
+> -    }
+> -}
+> -
+>  void block_job_user_resume(BlockJob *job)
+>  {
+>      if (job && job->user_paused && job->pause_count > 0) {
+> @@ -538,13 +485,6 @@ void block_job_user_resume(BlockJob *job)
+>      }
+>  }
+> =20
+> -void block_job_enter(BlockJob *job)
+> -{
+> -    if (job->co && !job->busy) {
+> -        qemu_coroutine_enter(job->co);
+> -    }
+> -}
+> -
+>  void block_job_cancel(BlockJob *job)
+>  {
+>      if (block_job_started(job)) {
+> @@ -556,11 +496,6 @@ void block_job_cancel(BlockJob *job)
+>      }
+>  }
+> =20
+> -bool block_job_is_cancelled(BlockJob *job)
+> -{
+> -    return job->cancelled;
+> -}
+> -
+>  void block_job_iostatus_reset(BlockJob *job)
+>  {
+>      job->iostatus =3D BLOCK_DEVICE_IO_STATUS_OK;
+> @@ -628,42 +563,6 @@ int block_job_complete_sync(BlockJob *job, Error *=
+*errp)
+>      return block_job_finish_sync(job, &block_job_complete, errp);
+>  }
+> =20
+> -void block_job_sleep_ns(BlockJob *job, QEMUClockType type, int64_t ns)
+> -{
+> -    assert(job->busy);
+> -
+> -    /* Check cancellation *before* setting busy =3D false, too!  */
+> -    if (block_job_is_cancelled(job)) {
+> -        return;
+> -    }
+> -
+> -    job->busy =3D false;
+> -    if (!block_job_should_pause(job)) {
+> -        co_aio_sleep_ns(blk_get_aio_context(job->blk), type, ns);
+> -    }
+> -    job->busy =3D true;
+> -
+> -    block_job_pause_point(job);
+> -}
+> -
+> -void block_job_yield(BlockJob *job)
+> -{
+> -    assert(job->busy);
+> -
+> -    /* Check cancellation *before* setting busy =3D false, too!  */
+> -    if (block_job_is_cancelled(job)) {
+> -        return;
+> -    }
+> -
+> -    job->busy =3D false;
+> -    if (!block_job_should_pause(job)) {
+> -        qemu_coroutine_yield();
+> -    }
+> -    job->busy =3D true;
+> -
+> -    block_job_pause_point(job);
+> -}
+> -
+>  BlockJobInfo *block_job_query(BlockJob *job, Error **errp)
+>  {
+>      BlockJobInfo *info;
+> @@ -723,6 +622,10 @@ static void block_job_event_completed(BlockJob *jo=
+b, const char *msg)
+>                                          &error_abort);
+>  }
+> =20
+> +/*
+> + * API for block job drivers and the block layer.
+> + */
+> +
+>  void block_job_pause_all(void)
+>  {
+>      BlockJob *job =3D NULL;
+> @@ -735,6 +638,59 @@ void block_job_pause_all(void)
+>      }
+>  }
+> =20
+> +void block_job_fail(BlockJob *job)
+> +{
+> +    block_job_unref(job);
+> +}
+> +
+> +void block_job_completed(BlockJob *job, int ret)
+> +{
+> +    assert(blk_bs(job->blk)->job =3D=3D job);
+> +    assert(!job->completed);
+> +    job->completed =3D true;
+> +    job->ret =3D ret;
+> +    if (!job->txn) {
+> +        block_job_completed_single(job);
+> +    } else if (ret < 0 || block_job_is_cancelled(job)) {
+> +        block_job_completed_txn_abort(job);
+> +    } else {
+> +        block_job_completed_txn_success(job);
+> +    }
+> +}
+> +
+> +static bool block_job_should_pause(BlockJob *job)
+> +{
+> +    return job->pause_count > 0;
+> +}
+> +
+> +void coroutine_fn block_job_pause_point(BlockJob *job)
+> +{
+> +    assert(job && block_job_started(job));
+> +
+> +    if (!block_job_should_pause(job)) {
+> +        return;
+> +    }
+> +    if (block_job_is_cancelled(job)) {
+> +        return;
+> +    }
+> +
+> +    if (job->driver->pause) {
+> +        job->driver->pause(job);
+> +    }
+> +
+> +    if (block_job_should_pause(job) && !block_job_is_cancelled(job)) {
+> +        job->paused =3D true;
+> +        job->busy =3D false;
+> +        qemu_coroutine_yield(); /* wait for block_job_resume() */
+> +        job->busy =3D true;
+> +        job->paused =3D false;
+> +    }
+> +
+> +    if (job->driver->resume) {
+> +        job->driver->resume(job);
+> +    }
+> +}
+> +
+>  void block_job_resume_all(void)
+>  {
+>      BlockJob *job =3D NULL;
+> @@ -747,6 +703,54 @@ void block_job_resume_all(void)
+>      }
+>  }
+> =20
+> +void block_job_enter(BlockJob *job)
+> +{
+> +    if (job->co && !job->busy) {
+> +        qemu_coroutine_enter(job->co);
+> +    }
+> +}
+> +
+> +bool block_job_is_cancelled(BlockJob *job)
+> +{
+> +    return job->cancelled;
+> +}
+> +
+> +void block_job_sleep_ns(BlockJob *job, QEMUClockType type, int64_t ns)
+> +{
+> +    assert(job->busy);
+> +
+> +    /* Check cancellation *before* setting busy =3D false, too!  */
+> +    if (block_job_is_cancelled(job)) {
+> +        return;
+> +    }
+> +
+> +    job->busy =3D false;
+> +    if (!block_job_should_pause(job)) {
+> +        co_aio_sleep_ns(blk_get_aio_context(job->blk), type, ns);
+> +    }
+> +    job->busy =3D true;
+> +
+> +    block_job_pause_point(job);
+> +}
+> +
+> +void block_job_yield(BlockJob *job)
+> +{
+> +    assert(job->busy);
+> +
+> +    /* Check cancellation *before* setting busy =3D false, too!  */
+> +    if (block_job_is_cancelled(job)) {
+> +        return;
+> +    }
+> +
+> +    job->busy =3D false;
+> +    if (!block_job_should_pause(job)) {
+> +        qemu_coroutine_yield();
+> +    }
+> +    job->busy =3D true;
+> +
+> +    block_job_pause_point(job);
+> +}
+> +
+>  void block_job_event_ready(BlockJob *job)
+>  {
+>      job->ready =3D true;
+>=20
 
-  =
-
-  My script:
-  -------------------------------------------------------------------------=
-------------------
-  #!/bin/bash
-
-  cd ~/qemu
-  sudo ./up.sh tap0
-
-  configfile=3D~/qemu/vfio-pci1.cfg
-
-  vfiobind() {
-      dev=3D"$1"
-          vendor=3D$(cat /sys/bus/pci/devices/$dev/vendor)
-          device=3D$(cat /sys/bus/pci/devices/$dev/device)
-          if [ -e /sys/bus/pci/devices/$dev/driver ]; then
-                  echo $dev > /sys/bus/pci/devices/$dev/driver/unbind
-          fi
-          echo $vendor $device > /sys/bus/pci/drivers/vfio-pci/new_id
-
-  }
-
-  modprobe vfio-pci
-
-  cat $configfile | while read line;do
-      echo $line | grep ^# >/dev/null 2>&1 && continue
-          vfiobind $line
-  done
-
-  sudo qemu-system-x86_64 -machine type=3Dq35,accel=3Dkvm -cpu host,kvm=3Do=
-ff \
-  -smp 8,sockets=3D1,cores=3D4,threads=3D2 \
-  -bios /usr/share/seabios/bios.bin \
-  -serial none \
-  -parallel none \
-  -vga none \
-  -m 4G \
-  -mem-path /run/hugepages/kvm \
-  -mem-prealloc \
-  -balloon none \
-  -rtc clock=3Dhost,base=3Dlocaltime \
-  -device ioh3420,bus=3Dpcie.0,addr=3D1c.0,multifunction=3Don,port=3D1,chas=
-sis=3D1,id=3Droot.1 \
-  -device vfio-pci,host=3D01:00.0,bus=3Droot.1,addr=3D00.0,multifunction=3D=
-on,x-vga=3Don \
-  -device virtio-scsi-pci,id=3Dscsi \
-  -drive id=3Ddisk0,if=3Dvirtio,cache=3Dnone,format=3Draw,file=3D/home/dad/=
-qemu/windows7.img \
-  -drive file=3D/home/dad/1TB-Backup/Iso/SP1ForWin7.iso,id=3Disocd,format=
-=3Draw,if=3Dnone -device scsi-cd,drive=3Disocd \
-  -net nic -net tap,ifname=3Dtap0,script=3Dno,downscript=3Dno \
-  -usbdevice host:413c:a503 \
-  -usbdevice host:13fe:3100 \
-  -usbdevice host:0bc2:ab21 \
-  -boot menu=3Don \
-  -boot order=3Dc
-
-  sudo ./down.sh tap0
-
-  exit 0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1680679/+subscriptions
+--=20
+=97js
