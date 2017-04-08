@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cwyK6-0000d8-5W
-	for qemu-devel@nongnu.org; Sat, 08 Apr 2017 17:55:10 -0400
+	(envelope-from <intermediadc@hotmail.com>) id 1cx071-0000jq-7E
+	for qemu-devel@nongnu.org; Sat, 08 Apr 2017 19:49:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cwyK2-0005lq-TG
-	for qemu-devel@nongnu.org; Sat, 08 Apr 2017 17:55:10 -0400
-Received: from hera.aquilenet.fr ([141.255.128.1]:47585)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cwyK2-0005kF-My
-	for qemu-devel@nongnu.org; Sat, 08 Apr 2017 17:55:06 -0400
-Date: Sat, 8 Apr 2017 23:55:02 +0200
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20170408215502.wuxt7xk4ap6yi7cf@var.youpi.perso.aquilenet.fr>
-References: <20170407143254.22061-1-dgilbert@redhat.com>
-	<a9e3490a-0a70-7b9d-53cb-0a2fd389c796@redhat.com>
+	(envelope-from <intermediadc@hotmail.com>) id 1cx070-0003nM-K0
+	for qemu-devel@nongnu.org; Sat, 08 Apr 2017 19:49:47 -0400
+From: luigi burdo <intermediadc@hotmail.com>
+Date: Sat, 8 Apr 2017 11:16:16 +0000
+Message-ID: <AM5P194MB0129FDB6B5EF9BD99DA02F05C80F0@AM5P194MB0129.EURP194.PROD.OUTLOOK.COM>
+References: <20170407060752.31313-1-nikunj@linux.vnet.ibm.com>
+	<AM5P194MB01294EAC74E1825F9210E04CC80C0@AM5P194MB0129.EURP194.PROD.OUTLOOK.COM>,
+	<2883915A-A579-4BC2-9FBE-5D885B88AF22@gmail.com>,
+	<AM5P194MB012946E7708F112D8F8327E6C80C0@AM5P194MB0129.EURP194.PROD.OUTLOOK.COM>
+In-Reply-To: <AM5P194MB012946E7708F112D8F8327E6C80C0@AM5P194MB0129.EURP194.PROD.OUTLOOK.COM>
+Content-Language: it-IT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a9e3490a-0a70-7b9d-53cb-0a2fd389c796@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for 2.10] slirp/smb: Replace constant
- strings by glib string
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 0/3] Enable MTTCG on PPC64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,11 +26,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, jan.kiszka@siemens.com, berrange@redhat.com
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>, "rth@twiddle.net" <rth@twiddle.net>, "alex.bennee@linaro.org" <alex.bennee@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "bharata@linux.vnet.ibm.com" <bharata@linux.vnet.ibm.com>, G 3 <programmingkidx@gmail.com>
 
-Hello,
 
-Applied to my tree, thanks!
+Hi, on info is mttcg using an amouth of ram for cpu caching and translating=
+ operations like was did in past by emulators like virtualpc,realpc, bluela=
+bel or softwindows?
 
-Samuel
+in case of yes is possible increase it from the command line?
+
+Thanks
+
+Luigi
