@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cweCG-00075N-4c
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:25:45 -0400
+	(envelope-from <jsnow@redhat.com>) id 1cweFE-0000BD-Ly
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:28:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cweCC-00026Y-W9
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:25:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44349)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cweCC-00026B-JM
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:25:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cweCA-0007MO-D0
-	for <qemu-devel@nongnu.org>; Sat, 08 Apr 2017 00:25:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4F6D62E807C
-	for <qemu-devel@nongnu.org>; Sat,  8 Apr 2017 00:25:38 +0000 (UTC)
+	(envelope-from <jsnow@redhat.com>) id 1cweFB-0002xW-I8
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:28:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37596)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1cweFB-0002wx-99
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:28:45 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1649363E25
+	for <qemu-devel@nongnu.org>; Sat,  8 Apr 2017 00:28:43 +0000 (UTC)
+References: <20170323173928.14439-1-pbonzini@redhat.com>
+	<20170323173928.14439-7-pbonzini@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <693405a4-11cb-2553-3345-711babb12112@redhat.com>
+Date: Fri, 7 Apr 2017 20:28:42 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 08 Apr 2017 00:14:03 -0000
-From: Adam Clark <hobbyos@eryjus.com>
-Reply-To: Bug 1680991 <1680991@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20170408001403.30529.99444.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1680991] [NEW] System Timer returning 0 tick
- count for raspi2 emulation
+In-Reply-To: <20170323173928.14439-7-pbonzini@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 06/10] blockjob: move iostatus reset inside
+ block_job_user_resume
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,265 +34,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-Public bug reported:
-
-In a small hobby kernel for Raspberry Pi 2B, I am using the system timer
-to control wait durations.  This timer is located at 0x3f003000 and the
-timer counts are located at 0x3f003004 (CLO) and 0x3f004008 (CHI).
-Reading these memory locations returns 0 for both.
-
-The basic code for this function is:
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@@ uint64_t ReadSysTimerCount() -- read the system time running count
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-ReadSysTimerCount:
-	ldr	r0,=3DST_CLO                  @ load the base address of the system ti=
-mer
-	ldrd	r0,r1,[r0]                  @ Get the 64-bit timer "count" into r1:r0
-	mov	pc,lr			    @ return
-
-Tracing back the definition of ST_CLO in my code:
-#define ST_CLO              (ST_BASE+4)                 // Counter Lower 32=
- bits
-#define ST_BASE             (HW_BASE+0x3000)            // System Timer bas=
-e address
-#define HW_BASE             (0x3f000000)                // this is the base=
- address for all hardware I/O addresses
-
-I have tested a similar program that I know to work on real hardware
-with qemu-system-arm reading the same mmio register and have the same
-issue, so I'm pretty sure the issue is not with my code.
-
-My Host PC is a VM on vmWare esxi running FC25 (8 cores, 8GB RAM): =
-
-[adam@os-dev ~]$ uname -a
-Linux os-dev.jammin 4.10.8-200.fc25.x86_64 #1 SMP Fri Mar 31 13:20:22 UTC 2=
-017 x86_64 x86_64 x86_64 GNU/Linux
-
-I have confirmed this issue on QEMU 2.7.1 (fc25 Distro) and 2.9.0-rc3
-(git).
-
-adam@os-dev ~]$ qemu-system-arm --version
-QEMU emulator version 2.7.1(qemu-2.7.1-4.fc25), Copyright (c) 2003-2016 Fab=
-rice Bellard and the QEMU Project developers
-
-[adam@os-dev ~]$ ./workspace/qemu/bin/debug/native/arm-softmmu/qemu-system-=
-arm --version
-QEMU emulator version 2.8.93 (v2.9.0-rc3-15-g5daf9b3)
-Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-A remote debugger for my kernel shows the following:
-(gdb) info reg
-r0             0x0	0
-r1             0x0	0
-r2             0x96	150
-r3             0x0	0
-r4             0xa000	40960
-r5             0x0	0
-r6             0x0	0
-r7             0x0	0
-r8             0x0	0
-r9             0xa000	40960
-r10            0x0	0
-r11            0x7fdc	32732
-r12            0x0	0
-sp             0x7fc8	0x7fc8
-lr             0x8194	33172
-pc             0x80a4	0x80a4
-cpsr           0x800001d3	-2147483181
-(gdb) stepi
-0x000080a8 in ?? ()
-(gdb) info reg
-r0             0x3f003004	1056976900
-r1             0x0	0
-r2             0x96	150
-r3             0x0	0
-r4             0xa000	40960
-r5             0x0	0
-r6             0x0	0
-r7             0x0	0
-r8             0x0	0
-r9             0xa000	40960
-r10            0x0	0
-r11            0x7fdc	32732
-r12            0x0	0
-sp             0x7fc8	0x7fc8
-lr             0x8194	33172
-pc             0x80a8	0x80a8
-cpsr           0x800001d3	-2147483181
-(gdb) stepi
-0x000080ac in ?? ()
-(gdb) info reg
-r0             0x0	0
-r1             0x0	0
-r2             0x96	150
-r3             0x0	0
-r4             0xa000	40960
-r5             0x0	0
-r6             0x0	0
-r7             0x0	0
-r8             0x0	0
-r9             0xa000	40960
-r10            0x0	0
-r11            0x7fdc	32732
-r12            0x0	0
-sp             0x7fc8	0x7fc8
-lr             0x8194	33172
-pc             0x80ac	0x80ac
-cpsr           0x800001d3	-2147483181
-
-Notice r0 is loaded with the address for CLO and then cleared with 0
-when read.
-
-I am writing my code against the documented specifications in "BCM2835
-ARM Peripherals" (attached for convenience), section "12 System Timer".
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: jcody@redhat.com
 
 
-Please let me know if you need anything else from me.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+On 03/23/2017 01:39 PM, Paolo Bonzini wrote:
+> Outside blockjob.c, the block_job_iostatus_reset function is used once
+> in the monitor and once in BlockBackend.  When we introduce the block
+> job mutex, block_job_iostatus_reset's client is going to be the block
+> layer (for which blockjob.c will take the block job mutex) rather than
+> the monitor (which will take the block job mutex by itself).
+> 
 
-** Attachment added: "BSM2835 ARM Peripherals"
-   https://bugs.launchpad.net/bugs/1680991/+attachment/4857848/+files/SoC-P=
-eripherals.pdf
+Ah, sure. So we leave the block-backend call alone, here. We're moving
+it from "public API" to "specifically block-layer API" to help
+facilitate different mutex semantics. OK.
 
--- =
+> The monitor's call to block_job_iostatus_reset from the monitor comes
+> just before the sole call to block_job_user_resume, so reset the
+> iostatus directly from block_job_iostatus_reset.  This will avoid
+> the need to introduce separate block_job_iostatus_reset and
+> block_job_iostatus_reset_locked APIs.
+> 
+> After making this change, move the function together with the others
+> that were moved in the previous patch.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1680991
+Reviewed-by: John Snow <jsnow@redhat.com>
 
-Title:
-  System Timer returning 0 tick count for raspi2 emulation
-
-Status in QEMU:
-  New
-
-Bug description:
-  In a small hobby kernel for Raspberry Pi 2B, I am using the system
-  timer to control wait durations.  This timer is located at 0x3f003000
-  and the timer counts are located at 0x3f003004 (CLO) and 0x3f004008
-  (CHI).  Reading these memory locations returns 0 for both.
-
-  The basic code for this function is:
-  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  @@ uint64_t ReadSysTimerCount() -- read the system time running count
-  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  ReadSysTimerCount:
-  	ldr	r0,=3DST_CLO                  @ load the base address of the system =
-timer
-  	ldrd	r0,r1,[r0]                  @ Get the 64-bit timer "count" into r1:=
-r0
-  	mov	pc,lr			    @ return
-
-  Tracing back the definition of ST_CLO in my code:
-  #define ST_CLO              (ST_BASE+4)                 // Counter Lower =
-32 bits
-  #define ST_BASE             (HW_BASE+0x3000)            // System Timer b=
-ase address
-  #define HW_BASE             (0x3f000000)                // this is the ba=
-se address for all hardware I/O addresses
-
-  I have tested a similar program that I know to work on real hardware
-  with qemu-system-arm reading the same mmio register and have the same
-  issue, so I'm pretty sure the issue is not with my code.
-
-  My Host PC is a VM on vmWare esxi running FC25 (8 cores, 8GB RAM): =
-
-  [adam@os-dev ~]$ uname -a
-  Linux os-dev.jammin 4.10.8-200.fc25.x86_64 #1 SMP Fri Mar 31 13:20:22 UTC=
- 2017 x86_64 x86_64 x86_64 GNU/Linux
-
-  I have confirmed this issue on QEMU 2.7.1 (fc25 Distro) and 2.9.0-rc3
-  (git).
-
-  adam@os-dev ~]$ qemu-system-arm --version
-  QEMU emulator version 2.7.1(qemu-2.7.1-4.fc25), Copyright (c) 2003-2016 F=
-abrice Bellard and the QEMU Project developers
-
-  [adam@os-dev ~]$ ./workspace/qemu/bin/debug/native/arm-softmmu/qemu-syste=
-m-arm --version
-  QEMU emulator version 2.8.93 (v2.9.0-rc3-15-g5daf9b3)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-  A remote debugger for my kernel shows the following:
-  (gdb) info reg
-  r0             0x0	0
-  r1             0x0	0
-  r2             0x96	150
-  r3             0x0	0
-  r4             0xa000	40960
-  r5             0x0	0
-  r6             0x0	0
-  r7             0x0	0
-  r8             0x0	0
-  r9             0xa000	40960
-  r10            0x0	0
-  r11            0x7fdc	32732
-  r12            0x0	0
-  sp             0x7fc8	0x7fc8
-  lr             0x8194	33172
-  pc             0x80a4	0x80a4
-  cpsr           0x800001d3	-2147483181
-  (gdb) stepi
-  0x000080a8 in ?? ()
-  (gdb) info reg
-  r0             0x3f003004	1056976900
-  r1             0x0	0
-  r2             0x96	150
-  r3             0x0	0
-  r4             0xa000	40960
-  r5             0x0	0
-  r6             0x0	0
-  r7             0x0	0
-  r8             0x0	0
-  r9             0xa000	40960
-  r10            0x0	0
-  r11            0x7fdc	32732
-  r12            0x0	0
-  sp             0x7fc8	0x7fc8
-  lr             0x8194	33172
-  pc             0x80a8	0x80a8
-  cpsr           0x800001d3	-2147483181
-  (gdb) stepi
-  0x000080ac in ?? ()
-  (gdb) info reg
-  r0             0x0	0
-  r1             0x0	0
-  r2             0x96	150
-  r3             0x0	0
-  r4             0xa000	40960
-  r5             0x0	0
-  r6             0x0	0
-  r7             0x0	0
-  r8             0x0	0
-  r9             0xa000	40960
-  r10            0x0	0
-  r11            0x7fdc	32732
-  r12            0x0	0
-  sp             0x7fc8	0x7fc8
-  lr             0x8194	33172
-  pc             0x80ac	0x80ac
-  cpsr           0x800001d3	-2147483181
-
-  Notice r0 is loaded with the address for CLO and then cleared with 0
-  when read.
-
-  I am writing my code against the documented specifications in "BCM2835
-  ARM Peripherals" (attached for convenience), section "12 System
-  Timer".
-
-  =
-
-  Please let me know if you need anything else from me.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1680991/+subscriptions
+> ---
+>  blockdev.c |  1 -
+>  blockjob.c | 11 ++++++-----
+>  2 files changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/blockdev.c b/blockdev.c
+> index c5b2c2c..fbc376b 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -3726,7 +3726,6 @@ void qmp_block_job_resume(const char *device, Error **errp)
+>      }
+>  
+>      trace_qmp_block_job_resume(job);
+> -    block_job_iostatus_reset(job);
+>      block_job_user_resume(job);
+>      aio_context_release(aio_context);
+>  }
+> diff --git a/blockjob.c b/blockjob.c
+> index c5f1d19..c9cb5b1 100644
+> --- a/blockjob.c
+> +++ b/blockjob.c
+> @@ -481,6 +481,7 @@ void block_job_user_resume(BlockJob *job)
+>  {
+>      if (job && job->user_paused && job->pause_count > 0) {
+>          job->user_paused = false;
+> +        block_job_iostatus_reset(job);
+>          block_job_resume(job);
+>      }
+>  }
+> @@ -496,11 +497,6 @@ void block_job_cancel(BlockJob *job)
+>      }
+>  }
+>  
+> -void block_job_iostatus_reset(BlockJob *job)
+> -{
+> -    job->iostatus = BLOCK_DEVICE_IO_STATUS_OK;
+> -}
+> -
+>  static int block_job_finish_sync(BlockJob *job,
+>                                   void (*finish)(BlockJob *, Error **errp),
+>                                   Error **errp)
+> @@ -751,6 +747,11 @@ void block_job_yield(BlockJob *job)
+>      block_job_pause_point(job);
+>  }
+>  
+> +void block_job_iostatus_reset(BlockJob *job)
+> +{
+> +    job->iostatus = BLOCK_DEVICE_IO_STATUS_OK;
+> +}
+> +
+>  void block_job_event_ready(BlockJob *job)
+>  {
+>      job->ready = true;
+> 
