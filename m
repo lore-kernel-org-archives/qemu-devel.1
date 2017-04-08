@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jason.vas.dias@gmail.com>) id 1cwrll-0007o9-Ra
-	for qemu-devel@nongnu.org; Sat, 08 Apr 2017 10:55:18 -0400
+	(envelope-from <shah.suramya@gmail.com>) id 1cwrwZ-0004LM-Oa
+	for qemu-devel@nongnu.org; Sat, 08 Apr 2017 11:06:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jason.vas.dias@gmail.com>) id 1cwrll-0006oc-6v
-	for qemu-devel@nongnu.org; Sat, 08 Apr 2017 10:55:17 -0400
-Received: from mail-ua0-x233.google.com ([2607:f8b0:400c:c08::233]:34687)
+	(envelope-from <shah.suramya@gmail.com>) id 1cwrwV-00048s-Kt
+	for qemu-devel@nongnu.org; Sat, 08 Apr 2017 11:06:27 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:34282)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jason.vas.dias@gmail.com>)
-	id 1cwrll-0006oW-28
-	for qemu-devel@nongnu.org; Sat, 08 Apr 2017 10:55:17 -0400
-Received: by mail-ua0-x233.google.com with SMTP id u103so8662660uau.1
-	for <qemu-devel@nongnu.org>; Sat, 08 Apr 2017 07:55:16 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CALyZvKwUk9iO3m-HGR48CqH2+=WhDk1eXpcPGCGJ5-TBAt5=KQ@mail.gmail.com>
-References: <CALyZvKyt=dddquvi4exc1vcJ0w=mN4qBb032RWmfER_VDW8hGA@mail.gmail.com>
-	<CALyZvKwUk9iO3m-HGR48CqH2+=WhDk1eXpcPGCGJ5-TBAt5=KQ@mail.gmail.com>
-From: Jason Vas Dias <jason.vas.dias@gmail.com>
-Date: Sat, 8 Apr 2017 14:55:15 +0000
-Message-ID: <CALyZvKyJRL3=CZzZMp3BtgkezSFnKXBi=O_WPaGG53K5JkK6_g@mail.gmail.com>
-Content-Type: multipart/mixed; boundary=f403045f89d0160d52054ca8eee2
-Subject: Re: [Qemu-devel] v2.8.1 configure / build fails - just to let you
- know :
+	(Exim 4.71) (envelope-from <shah.suramya@gmail.com>)
+	id 1cwrwV-00048h-Em
+	for qemu-devel@nongnu.org; Sat, 08 Apr 2017 11:06:23 -0400
+Received: by mail-pg0-x244.google.com with SMTP id o123so20445403pga.1
+	for <qemu-devel@nongnu.org>; Sat, 08 Apr 2017 08:06:23 -0700 (PDT)
+From: Suramya Shah <shah.suramya@gmail.com>
+Date: Sat,  8 Apr 2017 20:35:24 +0530
+Message-Id: <20170408150524.2870-1-shah.suramya@gmail.com>
+Subject: [Qemu-devel] [PATCH] hw/core: fix segmentation fault
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +25,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Suramya Shah <shah.suramya@gmail.com>
 
---f403045f89d0160d52054ca8eee2
-Content-Type: text/plain; charset=UTF-8
+Reproducer:
+ $i386-softmmu/qemu-system-i386 -S -machine isapc,accel=tcg -device amd-iommu
+Segmentation fault (core dumped)
 
-Patch attached - removes '-c' from $CPP invocation in
-  pc-bios/optionrom/Makefile
-- $CPP was 'cpp' in my environment.
-Maybe you should use $CC or $CXX with '-e' flag ? -
-then no warning (error) would occur for '-c' .
+Partial bt:
+#0  bus_add_child (child=0x555556d4e520, bus=0x0) at hw/core/qdev.c:88
+#1  qdev_set_parent_bus (dev=0x555556d4e520, bus=bus@entry=0x0)
+at hw/core/qdev.c:119
 
---f403045f89d0160d52054ca8eee2
-Content-Type: application/octet-stream; name="qemu-v2.8.1-cpp_no-c.patch"
-Content-Disposition: attachment; filename="qemu-v2.8.1-cpp_no-c.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: file0
+Signed-off-by: Suramya Shah <shah.suramya@gmail.com>
+---
+ hw/core/qdev.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-ZGlmZiAtLWdpdCBhL3BjLWJpb3Mvb3B0aW9ucm9tL01ha2VmaWxlIGIvcGMtYmlvcy9vcHRpb25y
-b20vTWFrZWZpbGUKaW5kZXggZmE1M2Q5ZS4uZjg5NGQ1ZCAxMDA2NDQKLS0tIGEvcGMtYmlvcy9v
-cHRpb25yb20vTWFrZWZpbGUKKysrIGIvcGMtYmlvcy9vcHRpb25yb20vTWFrZWZpbGUKQEAgLTQz
-LDcgKzQzLDcgQEAgYnVpbGQtYWxsOiBtdWx0aWJvb3QuYmluIGxpbnV4Ym9vdC5iaW4gbGludXhi
-b290X2RtYS5iaW4ga3ZtdmFwaWMuYmluCiAKIAogJS5vOiAlLlMKLQkkKGNhbGwgcXVpZXQtY29t
-bWFuZCwkKENQUCkgJChRRU1VX0lOQ0xVREVTKSAkKFFFTVVfREdGTEFHUykgLWMgLW8gLSAkPCB8
-ICQoQVMpICQoQVNGTEFHUykgLW8gJEAsIkFTIiwiJChUQVJHRVRfRElSKSRAIikKKwkkKGNhbGwg
-cXVpZXQtY29tbWFuZCwkKENQUCkgJChRRU1VX0lOQ0xVREVTKSAkKFFFTVVfREdGTEFHUykgLW8g
-LSAkPCB8ICQoQVMpICQoQVNGTEFHUykgLW8gJEAsIkFTIiwiJChUQVJHRVRfRElSKSRAIikKIAog
-JS5pbWc6ICUubwogCSQoY2FsbCBxdWlldC1jb21tYW5kLCQoTEQpICQoTERGTEFHU19OT1BJRSkg
-LW0gJChMRF9JMzg2X0VNVUxBVElPTikgLVQgJChTUkNfUEFUSCkvcGMtYmlvcy9vcHRpb25yb20v
-ZmxhdC5sZHMgLXMgLW8gJEAgJDwsIkJVSUxEIiwiJChUQVJHRVRfRElSKSRAIikK
---f403045f89d0160d52054ca8eee2--
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 1e7fb33..07a211b 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -84,7 +84,11 @@ static void bus_add_child(BusState *bus, DeviceState *child)
+ {
+     char name[32];
+     BusChild *kid = g_malloc0(sizeof(*kid));
+-
++    
++    if (!bus) {
++        error_report("bus not found ");
++        exit(0);
++    }
+     kid->index = bus->max_index++;
+     kid->child = child;
+     object_ref(OBJECT(kid->child));
+-- 
+2.9.3
