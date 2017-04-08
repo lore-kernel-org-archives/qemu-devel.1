@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cweFE-0000BD-Ly
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:28:49 -0400
+	(envelope-from <jsnow@redhat.com>) id 1cweO3-0001iB-EN
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:37:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cweFB-0002xW-I8
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:28:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37596)
+	(envelope-from <jsnow@redhat.com>) id 1cweO0-0006qP-Bh
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:37:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43560)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1cweFB-0002wx-99
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:28:45 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1cweO0-0006q0-5n
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:37:52 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1649363E25
-	for <qemu-devel@nongnu.org>; Sat,  8 Apr 2017 00:28:43 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1A89C8553C
+	for <qemu-devel@nongnu.org>; Sat,  8 Apr 2017 00:37:51 +0000 (UTC)
 References: <20170323173928.14439-1-pbonzini@redhat.com>
-	<20170323173928.14439-7-pbonzini@redhat.com>
+	<20170323173928.14439-8-pbonzini@redhat.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <693405a4-11cb-2553-3345-711babb12112@redhat.com>
-Date: Fri, 7 Apr 2017 20:28:42 -0400
+Message-ID: <47608498-a23c-37d4-2b31-f2d70bdcdd87@redhat.com>
+Date: Fri, 7 Apr 2017 20:37:50 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170323173928.14439-7-pbonzini@redhat.com>
+In-Reply-To: <20170323173928.14439-8-pbonzini@redhat.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 06/10] blockjob: move iostatus reset inside
- block_job_user_resume
+Subject: Re: [Qemu-devel] [PATCH 07/10] blockjob: strengthen a bit
+ test-blockjob-txn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,81 +40,48 @@ Cc: jcody@redhat.com
 
 
 On 03/23/2017 01:39 PM, Paolo Bonzini wrote:
-> Outside blockjob.c, the block_job_iostatus_reset function is used once
-> in the monitor and once in BlockBackend.  When we introduce the block
-> job mutex, block_job_iostatus_reset's client is going to be the block
-> layer (for which blockjob.c will take the block job mutex) rather than
-> the monitor (which will take the block job mutex by itself).
-> 
-
-Ah, sure. So we leave the block-backend call alone, here. We're moving
-it from "public API" to "specifically block-layer API" to help
-facilitate different mutex semantics. OK.
-
-> The monitor's call to block_job_iostatus_reset from the monitor comes
-> just before the sole call to block_job_user_resume, so reset the
-> iostatus directly from block_job_iostatus_reset.  This will avoid
-> the need to introduce separate block_job_iostatus_reset and
-> block_job_iostatus_reset_locked APIs.
-> 
-> After making this change, move the function together with the others
-> that were moved in the previous patch.
+> Unlike test-blockjob-txn, QMP releases the reference to the transaction
+> before the jobs finish.  Thus, while working on the next patch,
+> qemu-iotest 124 showed a failure that the unit tests did not have.
+> Make the unit test just a little nastier, so that it fails too.
 > 
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  tests/test-blockjob-txn.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
+> index 4ccbda1..bfc2aaa 100644
+> --- a/tests/test-blockjob-txn.c
+> +++ b/tests/test-blockjob-txn.c
+> @@ -165,6 +165,11 @@ static void test_pair_jobs(int expected1, int expected2)
+>      job2 = test_block_job_start(2, true, expected2, &result2);
+>      block_job_txn_add_job(txn, job2);
+>  
+
+^ Oh, this might cause you grief too. Should be add-add-start-start, not
+start-add-start-add. Fam sent a patch fixing this recently.
+
+> +    /* Release our reference now to trigger as many nice
+> +     * use-after-free bugs as possible.
+> +     */
+> +    block_job_txn_unref(txn);
+> +
+
+This is fine, though.
+
+>      if (expected1 == -ECANCELED) {
+>          block_job_cancel(job1);
+>      }
+> @@ -185,8 +190,6 @@ static void test_pair_jobs(int expected1, int expected2)
+>  
+>      g_assert_cmpint(result1, ==, expected1);
+>      g_assert_cmpint(result2, ==, expected2);
+> -
+> -    block_job_txn_unref(txn);
+>  }
+>  
+>  static void test_pair_jobs_success(void)
+> 
 
 Reviewed-by: John Snow <jsnow@redhat.com>
-
-> ---
->  blockdev.c |  1 -
->  blockjob.c | 11 ++++++-----
->  2 files changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/blockdev.c b/blockdev.c
-> index c5b2c2c..fbc376b 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -3726,7 +3726,6 @@ void qmp_block_job_resume(const char *device, Error **errp)
->      }
->  
->      trace_qmp_block_job_resume(job);
-> -    block_job_iostatus_reset(job);
->      block_job_user_resume(job);
->      aio_context_release(aio_context);
->  }
-> diff --git a/blockjob.c b/blockjob.c
-> index c5f1d19..c9cb5b1 100644
-> --- a/blockjob.c
-> +++ b/blockjob.c
-> @@ -481,6 +481,7 @@ void block_job_user_resume(BlockJob *job)
->  {
->      if (job && job->user_paused && job->pause_count > 0) {
->          job->user_paused = false;
-> +        block_job_iostatus_reset(job);
->          block_job_resume(job);
->      }
->  }
-> @@ -496,11 +497,6 @@ void block_job_cancel(BlockJob *job)
->      }
->  }
->  
-> -void block_job_iostatus_reset(BlockJob *job)
-> -{
-> -    job->iostatus = BLOCK_DEVICE_IO_STATUS_OK;
-> -}
-> -
->  static int block_job_finish_sync(BlockJob *job,
->                                   void (*finish)(BlockJob *, Error **errp),
->                                   Error **errp)
-> @@ -751,6 +747,11 @@ void block_job_yield(BlockJob *job)
->      block_job_pause_point(job);
->  }
->  
-> +void block_job_iostatus_reset(BlockJob *job)
-> +{
-> +    job->iostatus = BLOCK_DEVICE_IO_STATUS_OK;
-> +}
-> +
->  void block_job_event_ready(BlockJob *job)
->  {
->      job->ready = true;
-> 
