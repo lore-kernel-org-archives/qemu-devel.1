@@ -1,22 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cwPqt-0000AX-MF
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:06:44 -0400
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1cwPrW-0000m4-PH
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:07:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cwPqq-0001Iq-IF
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:06:43 -0400
-Date: Fri, 7 Apr 2017 10:06:33 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170407090633.GF13602@stefanha-x1.localdomain>
-References: <cover.1491416061.git.jcody@redhat.com>
-	<114fed348a816c240ed64fa1c5edb863f45ec1e9.1491416061.git.jcody@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="dgjlcl3Tl+kb3YDk"
-Content-Disposition: inline
-In-Reply-To: <114fed348a816c240ed64fa1c5edb863f45ec1e9.1491416061.git.jcody@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 1/9] block: add
- bdrv_set_read_only() helper function
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1cwPrT-0001c3-KW
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:07:22 -0400
+Received: from mx7.zte.com.cn ([202.103.147.169]:36092)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1cwPrS-0001Zg-Mi
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 05:07:19 -0400
+From: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+Date: Sat, 8 Apr 2017 09:24:10 +0800
+Message-Id: <1491614650-5144-1-git-send-email-lu.zhipeng@zte.com.cn>
+Subject: [Qemu-devel] [PATCH] vhost: skip RAM device memory sections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,44 +21,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jsnow@redhat.com, kwolf@redhat.com
+To: mst@redhat.com
+Cc: wang.guang55@zte.com.cn, qemu-devel@nongnu.org, ZhiPeng Lu <lu.zhipeng@zte.com.cn>
 
+A RAM device represents a mapping to a physical device, such as to a PCI
+* MMIO BAR of an vfio-pci assigned device.
+Vhost listens to this region,and increases the region's reference count
+while passthrough?for?network adapters (Physical Function, PF or Virtual Function, VF).
+After detaching   network adapters with  vhost backend dirver or vhost user dirver,
+it unregister vhost listen function  by memory_listener_unregister.
+After detaching the passthrough pf  or vf,
+the RAM device region's reference by  vhost listener increated can not be released,
+due to vhost listen function does not exist.So let's just skip RAM device memory.
 
---dgjlcl3Tl+kb3YDk
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+---
+ hw/virtio/vhost.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-On Wed, Apr 05, 2017 at 02:28:43PM -0400, Jeff Cody wrote:
-> We have a helper wrapper for checking for the BDS read_only flag,
-> add a helper wrapper to set the read_only flag as well.
->=20
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
-> ---
->  block.c               | 5 +++++
->  block/bochs.c         | 2 +-
->  block/cloop.c         | 2 +-
->  block/dmg.c           | 2 +-
->  block/rbd.c           | 2 +-
->  block/vvfat.c         | 4 ++--
->  include/block/block.h | 1 +
->  7 files changed, 12 insertions(+), 6 deletions(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---dgjlcl3Tl+kb3YDk
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJY51aZAAoJEJykq7OBq3PIV8EH/1Rvm+0RC2/K6lrPl3rsdT2z
-/mq6rNd7E1adqa/RNYRwHqcyDFZh7BOYlBEARq3nCqYAlhDO+LvIBg786mg9NKAG
-X1I4+6xZHJp2VIaHMNXCzAXg7Y0SbXGnUtUu5YRBgUSPSPsjgJb80VVqGQ7nDF50
-0RRG889gN2ulKHJ6Pyy5xkl0r+hMzrQ/pjgr9IWxjtFHG8KhW/+hr/RM5SBBwXn9
-J2CZOexdmyp4WzvMpoUbKRLwpQ6qL45V/OcRl71QTIykQ+F9S4lWlFPociMfgfIs
-f9/yEPq4Yuhv0BzO+Il4I2ZPMWJURbdS/y+zpt/s61zyEbs1pUqtw0dEUeZ6cOo=
-=R/Q1
------END PGP SIGNATURE-----
-
---dgjlcl3Tl+kb3YDk--
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index 613494d..c1ff98f 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -611,7 +611,8 @@ static void vhost_set_memory(MemoryListener *listener,
+ static bool vhost_section(MemoryRegionSection *section)
+ {
+     return memory_region_is_ram(section->mr) &&
+-        !memory_region_is_rom(section->mr);
++        !memory_region_is_rom(section->mr) &&
++        !memory_region_is_skip_dump(section->mr);
+ }
+ 
+ static void vhost_begin(MemoryListener *listener)
+-- 
+1.8.3.1
