@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anthony.xu@intel.com>) id 1cwePp-0002YQ-K1
+	(envelope-from <anthony.xu@intel.com>) id 1cwePp-0002YN-IE
 	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:39:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anthony.xu@intel.com>) id 1cwePo-0007xZ-6D
+	(envelope-from <anthony.xu@intel.com>) id 1cwePn-0007x6-Bc
 	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:39:45 -0400
-Received: from mga14.intel.com ([192.55.52.115]:37867)
+Received: from mga14.intel.com ([192.55.52.115]:44873)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
-	id 1cwePn-0007wz-Sf
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:39:44 -0400
+	id 1cwePn-0007w8-3P
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:39:43 -0400
 From: Anthony Xu <anthony.xu@intel.com>
-Date: Fri,  7 Apr 2017 17:45:36 -0700
-Message-Id: <1491612336-31066-5-git-send-email-anthony.xu@intel.com>
+Date: Fri,  7 Apr 2017 17:45:33 -0700
+Message-Id: <1491612336-31066-2-git-send-email-anthony.xu@intel.com>
 In-Reply-To: <1491612336-31066-1-git-send-email-anthony.xu@intel.com>
 References: <1491612336-31066-1-git-send-email-anthony.xu@intel.com>
-Subject: [Qemu-devel] [PATCH 4/4] pam: setup pc.bios
+Subject: [Qemu-devel] [PATCH 1/4] pam:refactor PAM related code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,115 +27,158 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, eblake@redhat.com, Anthony Xu <anthony.xu@intel.com>
 
-when pam is disabled, set pc.bios and isa.bios region as writeable,
-and add isa.bios to system memory region.
+split PAM SMRAM functions in piix.c
+create mch_init_pam in q35.c
 
 Signed-off-by: Anthony Xu <anthony.xu@intel.com>
 ---
- hw/i386/pc.c         |  2 +-
- hw/i386/pc_sysfw.c   | 30 +++++++++++++++++++++---------
- include/hw/i386/pc.h |  4 +++-
- 3 files changed, 25 insertions(+), 11 deletions(-)
+ hw/pci-host/piix.c | 58 ++++++++++++++++++++++++++++++++++++++----------------
+ hw/pci-host/q35.c  | 23 +++++++++++++---------
+ 2 files changed, 55 insertions(+), 26 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 455f7fe..3e23f58 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1443,7 +1443,7 @@ void pc_memory_init(PCMachineState *pcms,
-     }
- 
-     /* Initialize PC system firmware */
--    pc_system_firmware_init(rom_memory, !pcmc->pci_enabled);
-+    pc_system_firmware_init(system_memory, rom_memory, !pcmc->pci_enabled);
- 
-     if (pcms->pam) {
-         MemoryRegion *option_rom_mr = g_malloc(sizeof(*option_rom_mr));
-diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-index f915ad0..e5ac615 100644
---- a/hw/i386/pc_sysfw.c
-+++ b/hw/i386/pc_sysfw.c
-@@ -173,7 +173,8 @@ static void pc_system_flash_init(MemoryRegion *rom_memory)
-     }
+diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+index f9218aa..ff4e8b5 100644
+--- a/hw/pci-host/piix.c
++++ b/hw/pci-host/piix.c
+@@ -138,16 +138,11 @@ static int pci_slot_get_pirq(PCIDevice *pci_dev, int pci_intx)
+     return (pci_intx + slot_addend) & 3;
  }
  
--static void old_pc_system_rom_init(MemoryRegion *rom_memory, bool isapc_ram_fw)
-+static void old_pc_system_rom_init(MemoryRegion *system_memory,
-+                                   MemoryRegion *rom_memory, bool isapc_ram_fw)
+-static void i440fx_update_memory_mappings(PCII440FXState *d)
++static void i440fx_update_smram(PCII440FXState *d)
  {
-     char *filename;
-     MemoryRegion *bios, *isa_bios;
-@@ -197,8 +198,11 @@ static void old_pc_system_rom_init(MemoryRegion *rom_memory, bool isapc_ram_fw)
-     bios = g_malloc(sizeof(*bios));
-     memory_region_init_ram(bios, NULL, "pc.bios", bios_size, &error_fatal);
-     vmstate_register_ram_global(bios);
--    if (!isapc_ram_fw) {
--        memory_region_set_readonly(bios, true);
-+    if (PC_MACHINE(current_machine)->pam) {
-+        /* if PAM is disabled, set it as readwrite */
-+        if (!isapc_ram_fw) {
-+            memory_region_set_readonly(bios, true);
-+        }
-     }
-     ret = rom_add_file_fixed(bios_name, (uint32_t)(-bios_size), -1);
-     if (ret != 0) {
-@@ -216,21 +220,29 @@ static void old_pc_system_rom_init(MemoryRegion *rom_memory, bool isapc_ram_fw)
-     isa_bios = g_malloc(sizeof(*isa_bios));
-     memory_region_init_alias(isa_bios, NULL, "isa-bios", bios,
-                              bios_size - isa_bios_size, isa_bios_size);
--    memory_region_add_subregion_overlap(rom_memory,
-+    if (PC_MACHINE(current_machine)->pam) {
-+        memory_region_add_subregion_overlap(rom_memory,
-+                                        0x100000 - isa_bios_size,
-+                                        isa_bios,
-+                                        1);
-+        if (!isapc_ram_fw) {
-+            memory_region_set_readonly(isa_bios, true);
-+        }
-+    } else {
-+        /* if PAM is disabed, add isa-bios to system memory region */
-+        memory_region_add_subregion_overlap(system_memory,
-                                         0x100000 - isa_bios_size,
-                                         isa_bios,
-                                         1);
--    if (!isapc_ram_fw) {
--        memory_region_set_readonly(isa_bios, true);
-     }
--
-     /* map all the bios at the top of memory */
-     memory_region_add_subregion(rom_memory,
-                                 (uint32_t)(-bios_size),
-                                 bios);
+-    int i;
+     PCIDevice *pd = PCI_DEVICE(d);
+ 
+     memory_region_transaction_begin();
+-    for (i = 0; i < 13; i++) {
+-        pam_update(&d->pam_regions[i], i,
+-                   pd->config[I440FX_PAM + ((i + 1) / 2)]);
+-    }
+     memory_region_set_enabled(&d->smram_region,
+                               !(pd->config[I440FX_SMRAM] & SMRAM_D_OPEN));
+     memory_region_set_enabled(&d->smram,
+@@ -155,6 +150,39 @@ static void i440fx_update_memory_mappings(PCII440FXState *d)
+     memory_region_transaction_commit();
  }
  
--void pc_system_firmware_init(MemoryRegion *rom_memory, bool isapc_ram_fw)
-+void pc_system_firmware_init(MemoryRegion *system_memory,
-+                             MemoryRegion *rom_memory, bool isapc_ram_fw)
- {
-     DriveInfo *pflash_drv;
- 
-@@ -238,7 +250,7 @@ void pc_system_firmware_init(MemoryRegion *rom_memory, bool isapc_ram_fw)
- 
-     if (isapc_ram_fw || pflash_drv == NULL) {
-         /* When a pflash drive is not found, use rom-mode */
--        old_pc_system_rom_init(rom_memory, isapc_ram_fw);
-+        old_pc_system_rom_init(system_memory, rom_memory, isapc_ram_fw);
-         return;
-     }
- 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 05f4df5..eb5b853 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -354,7 +354,9 @@ static inline bool isa_ne2000_init(ISABus *bus, int base, int irq, NICInfo *nd)
- }
- 
- /* pc_sysfw.c */
--void pc_system_firmware_init(MemoryRegion *rom_memory,
++static void i440fx_update_pam(PCII440FXState *d)
++{
++    int i;
++    PCIDevice *pd = PCI_DEVICE(d);
++    memory_region_transaction_begin();
++    pam_update(&d->pam_regions[0], 0,
++               pd->config[I440FX_PAM]);
++    for (i = 1; i < 13; i++) {
++        pam_update(&d->pam_regions[i], i,
++                   pd->config[I440FX_PAM + ((i + 1) / 2)]);
++    }
++    memory_region_transaction_commit();
++}
 +
-+void pc_system_firmware_init(MemoryRegion *system_memory,
-+                             MemoryRegion *rom_memory,
-                              bool isapc_ram_fw);
++static void i440fx_update_memory_mappings(PCII440FXState *d)
++{
++    i440fx_update_pam(d);
++    i440fx_update_smram(d);
++}
++
++
++static void i440fx_init_pam(PCII440FXState *d)
++{
++    int i;
++    init_pam(DEVICE(d), d->ram_memory, d->system_memory,
++             d->pci_address_space, &d->pam_regions[0],
++             PAM_BIOS_BASE,  PAM_BIOS_SIZE);
++    for (i = 0; i < 12; ++i) {
++        init_pam(DEVICE(d), d->ram_memory, d->system_memory,
++                 d->pci_address_space, &d->pam_regions[i + 1],
++                 PAM_EXPAN_BASE + i * PAM_EXPAN_SIZE, PAM_EXPAN_SIZE);
++    }
++}
  
- /* pvpanic.c */
+ static void i440fx_write_config(PCIDevice *dev,
+                                 uint32_t address, uint32_t val, int len)
+@@ -163,9 +191,12 @@ static void i440fx_write_config(PCIDevice *dev,
+ 
+     /* XXX: implement SMRAM.D_LOCK */
+     pci_default_write_config(dev, address, val, len);
+-    if (ranges_overlap(address, len, I440FX_PAM, I440FX_PAM_SIZE) ||
+-        range_covers_byte(address, len, I440FX_SMRAM)) {
+-        i440fx_update_memory_mappings(d);
++    if (ranges_overlap(address, len, I440FX_PAM, I440FX_PAM_SIZE)) {
++        i440fx_update_pam(d);
++    }
++
++    if (range_covers_byte(address, len, I440FX_SMRAM)) {
++        i440fx_update_smram(d);
+     }
+ }
+ 
+@@ -335,7 +366,6 @@ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+     PCIHostState *s;
+     PIIX3State *piix3;
+     PCII440FXState *f;
+-    unsigned i;
+     I440FXState *i440fx;
+ 
+     dev = qdev_create(NULL, host_type);
+@@ -378,13 +408,7 @@ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+     object_property_add_const_link(qdev_get_machine(), "smram",
+                                    OBJECT(&f->smram), &error_abort);
+ 
+-    init_pam(dev, f->ram_memory, f->system_memory, f->pci_address_space,
+-             &f->pam_regions[0], PAM_BIOS_BASE, PAM_BIOS_SIZE);
+-    for (i = 0; i < 12; ++i) {
+-        init_pam(dev, f->ram_memory, f->system_memory, f->pci_address_space,
+-                 &f->pam_regions[i+1], PAM_EXPAN_BASE + i * PAM_EXPAN_SIZE,
+-                 PAM_EXPAN_SIZE);
+-    }
++    i440fx_init_pam(f);
+ 
+     /* Xen supports additional interrupt routes from the PCI devices to
+      * the IOAPIC: the four pins of each PCI device on the bus are also
+diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+index 344f77b..8866357 100644
+--- a/hw/pci-host/q35.c
++++ b/hw/pci-host/q35.c
+@@ -460,9 +460,21 @@ static void mch_reset(DeviceState *qdev)
+     mch_update(mch);
+ }
+ 
+-static void mch_realize(PCIDevice *d, Error **errp)
++static void mch_init_pam(MCHPCIState *mch)
+ {
+     int i;
++    init_pam(DEVICE(mch), mch->ram_memory, mch->system_memory,
++             mch->pci_address_space, &mch->pam_regions[0],
++             PAM_BIOS_BASE, PAM_BIOS_SIZE);
++    for (i = 0; i < 12; ++i) {
++        init_pam(DEVICE(mch), mch->ram_memory, mch->system_memory,
++                 mch->pci_address_space, &mch->pam_regions[i + 1],
++                 PAM_EXPAN_BASE + i * PAM_EXPAN_SIZE, PAM_EXPAN_SIZE);
++    }
++}
++
++static void mch_realize(PCIDevice *d, Error **errp)
++{
+     MCHPCIState *mch = MCH_PCI_DEVICE(d);
+ 
+     /* setup pci memory mapping */
+@@ -510,14 +522,7 @@ static void mch_realize(PCIDevice *d, Error **errp)
+     object_property_add_const_link(qdev_get_machine(), "smram",
+                                    OBJECT(&mch->smram), &error_abort);
+ 
+-    init_pam(DEVICE(mch), mch->ram_memory, mch->system_memory,
+-             mch->pci_address_space, &mch->pam_regions[0],
+-             PAM_BIOS_BASE, PAM_BIOS_SIZE);
+-    for (i = 0; i < 12; ++i) {
+-        init_pam(DEVICE(mch), mch->ram_memory, mch->system_memory,
+-                 mch->pci_address_space, &mch->pam_regions[i+1],
+-                 PAM_EXPAN_BASE + i * PAM_EXPAN_SIZE, PAM_EXPAN_SIZE);
+-    }
++    mch_init_pam(mch);
+ }
+ 
+ uint64_t mch_mcfg_base(void)
 -- 
 1.8.3.1
