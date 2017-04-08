@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46806)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <intermediadc@hotmail.com>) id 1cwfwj-0001Gn-Bz
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 22:17:50 -0400
+	(envelope-from <famz@redhat.com>) id 1cwh21-00077i-GT
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 23:27:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <intermediadc@hotmail.com>) id 1cwfwg-0003nH-69
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 22:17:49 -0400
-From: luigi burdo <intermediadc@hotmail.com>
-Date: Fri, 7 Apr 2017 17:49:55 +0000
-Message-ID: <AM5P194MB01294EAC74E1825F9210E04CC80C0@AM5P194MB0129.EURP194.PROD.OUTLOOK.COM>
-References: <20170407060752.31313-1-nikunj@linux.vnet.ibm.com>
-In-Reply-To: <20170407060752.31313-1-nikunj@linux.vnet.ibm.com>
-Content-Language: it-IT
+	(envelope-from <famz@redhat.com>) id 1cwh20-0000L5-OR
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 23:27:21 -0400
+Date: Sat, 8 Apr 2017 11:27:08 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170408032708.GA6548@lemon>
+References: <20170407065414.9143-1-famz@redhat.com>
+	<20170407065414.9143-6-famz@redhat.com>
+	<20170407132642.GF16146@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 0/3] Enable MTTCG on PPC64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170407132642.GF16146@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v2 5/6] coroutine: Explicitly specify
+ AioContext when entering coroutine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,31 +25,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>, "rth@twiddle.net" <rth@twiddle.net>
-Cc: "programmingkidx@gmail.com" <programmingkidx@gmail.com>, "alex.bennee@linaro.org" <alex.bennee@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "bharata@linux.vnet.ibm.com" <bharata@linux.vnet.ibm.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-Tested on PowerMac G5 Quad  and 380% of system load and working on
+On Fri, 04/07 14:26, Stefan Hajnoczi wrote:
+> I wasn't expecting the patch to touch so many places.  If a coroutine
+> can be permanently associated with an AioContext then there's no need to
+> keep assigning co->ctx on each qemu_coroutine_enter().
 
-Fedora 25 PPC64 host and Ubuntu Mate 17.04 guest  (patched the 2.9 rc3)
+Maybe, but bs->job->co->ctx changes when bdrv_set_aio_context(bs->ctx) is
+called. In v1 the co->ctx is associated at qemu_coroutine_create() time but
+failed to handle bdrv_set_aio_context.
 
-
-The machine configuration was this
-
-sudo ./qemu-system-ppc64 -cpu POWER8 -vga none -machine pseries-2.5,usb=3Do=
-ff -m 2G  -smp 4,cores=3D4,threads=3D1 -accel tcg,thread=3Dmulti  -kerne vm=
-linuz    -append root=3D/dev/sda   -device ich9-ahci,id=3Dahci   -device id=
-e-drive,drive=3Ddisk0 -drive file=3D/dev/sda4,if=3Dnone,id=3Ddisk0   -net n=
-ic,model=3Dpcnet -net user -soundhw hda  -display sdl -vga virtio
-
-
-vga virtio working too
-
-here a shot
-
-https://scontent-mxp1-1.xx.fbcdn.net/v/t1.0-9/17796379_10208795258860396_78=
-25547329794577576_n.jpg?oh=3D526d6ddeb67c817053582d5b9ee56c71&oe=3D594D7BDF
-
-
-Thanks
-
-Luigi
+Fam
