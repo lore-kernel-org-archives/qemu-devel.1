@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cwe5S-0005wg-PC
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:18:43 -0400
+	(envelope-from <bounces@canonical.com>) id 1cweCG-00075O-4q
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:25:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cwe5P-0000JJ-Lg
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:18:42 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33303)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cwe5P-0000Ix-Fl
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:18:39 -0400
-Received: by mail-qk0-x244.google.com with SMTP id p22so12164173qka.0
-	for <qemu-devel@nongnu.org>; Fri, 07 Apr 2017 17:18:39 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170323173928.14439-1-pbonzini@redhat.com>
-	<20170323173928.14439-3-pbonzini@redhat.com>
-	<db112c85-7ea9-509d-dbf7-cebc19623653@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <22fbec98-0eae-bdd1-038b-8910185493c9@amsat.org>
-Date: Fri, 7 Apr 2017 21:18:35 -0300
+	(envelope-from <bounces@canonical.com>) id 1cweCD-00026f-0X
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:25:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44348)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cweCC-00026A-Iv
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:25:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cweCA-0007MO-Sb
+	for <qemu-devel@nongnu.org>; Sat, 08 Apr 2017 00:25:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D505B2E80C2
+	for <qemu-devel@nongnu.org>; Sat,  8 Apr 2017 00:25:38 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <db112c85-7ea9-509d-dbf7-cebc19623653@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 02/10] blockjob: remove iostatus_reset
- callback
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 08 Apr 2017 00:17:39 -0000
+From: Adam Clark <hobbyos@eryjus.com>
+Reply-To: Bug 1680991 <1680991@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170408001403.30529.99444.malonedeb@soybean.canonical.com>
+Message-Id: <20170408001739.12541.95460.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1680991] Re: System Timer returning 0 tick count
+ for raspi2 emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,52 +37,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: John Snow <jsnow@redhat.com>, Jeff Cody <jcody@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 04/07/2017 08:12 PM, John Snow wrote:
-> On 03/23/2017 01:39 PM, Paolo Bonzini wrote:
->> This is unused since commit 66a0fae ("blockjob: Don't touch BDS iostatus",
->> 2016-05-19).
->>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>  blockjob.c                   | 3 ---
->>  include/block/blockjob_int.h | 3 ---
->>  2 files changed, 6 deletions(-)
->>
->> diff --git a/blockjob.c b/blockjob.c
->> index a9fb624..24d1e12 100644
->> --- a/blockjob.c
->> +++ b/blockjob.c
->> @@ -555,9 +555,6 @@ bool block_job_is_cancelled(BlockJob *job)
->>  void block_job_iostatus_reset(BlockJob *job)
->>  {
->>      job->iostatus = BLOCK_DEVICE_IO_STATUS_OK;
->> -    if (job->driver->iostatus_reset) {
->> -        job->driver->iostatus_reset(job);
->> -    }
->>  }
->>
->>  static int block_job_finish_sync(BlockJob *job,
->> diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
->> index 3f86cc5..bfcc5d1 100644
->> --- a/include/block/blockjob_int.h
->> +++ b/include/block/blockjob_int.h
->> @@ -44,9 +44,6 @@ struct BlockJobDriver {
->>      /** Optional callback for job types that support setting a speed limit */
->>      void (*set_speed)(BlockJob *job, int64_t speed, Error **errp);
->>
->> -    /** Optional callback for job types that need to forward I/O status reset */
->> -    void (*iostatus_reset)(BlockJob *job);
->> -
->>      /** Mandatory: Entrypoint for the Coroutine. */
->>      CoroutineEntry *start;
->>
->>
->
-> Good find.
->
-> Reviewed-by: John Snow <jsnow@redhat.com>
+The command lines are:
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+[adam@os-dev ~]$ qemu-system-aarch64 -m 256 -M raspi2 -serial stdio
+-kernel bin/rpi2b/kernel.elf
+
+[adam@os-dev workspace]$ ./qemu/bin/debug/native/arm-softmmu/qemu-
+system-arm -m 256 -M raspi2 -serial stdio -kernel
+century/bin/rpi2b/kernel.elf
+
+
+A sample kernel is also attached for your convenience.
+
+** Attachment added: "Sample kernel to reproduce the problem"
+   https://bugs.launchpad.net/qemu/+bug/1680991/+attachment/4857850/+files/=
+kernel.elf
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1680991
+
+Title:
+  System Timer returning 0 tick count for raspi2 emulation
+
+Status in QEMU:
+  New
+
+Bug description:
+  In a small hobby kernel for Raspberry Pi 2B, I am using the system
+  timer to control wait durations.  This timer is located at 0x3f003000
+  and the timer counts are located at 0x3f003004 (CLO) and 0x3f004008
+  (CHI).  Reading these memory locations returns 0 for both.
+
+  The basic code for this function is:
+  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+  @@ uint64_t ReadSysTimerCount() -- read the system time running count
+  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+  ReadSysTimerCount:
+  	ldr	r0,=3DST_CLO                  @ load the base address of the system =
+timer
+  	ldrd	r0,r1,[r0]                  @ Get the 64-bit timer "count" into r1:=
+r0
+  	mov	pc,lr			    @ return
+
+  Tracing back the definition of ST_CLO in my code:
+  #define ST_CLO              (ST_BASE+4)                 // Counter Lower =
+32 bits
+  #define ST_BASE             (HW_BASE+0x3000)            // System Timer b=
+ase address
+  #define HW_BASE             (0x3f000000)                // this is the ba=
+se address for all hardware I/O addresses
+
+  I have tested a similar program that I know to work on real hardware
+  with qemu-system-arm reading the same mmio register and have the same
+  issue, so I'm pretty sure the issue is not with my code.
+
+  My Host PC is a VM on vmWare esxi running FC25 (8 cores, 8GB RAM): =
+
+  [adam@os-dev ~]$ uname -a
+  Linux os-dev.jammin 4.10.8-200.fc25.x86_64 #1 SMP Fri Mar 31 13:20:22 UTC=
+ 2017 x86_64 x86_64 x86_64 GNU/Linux
+
+  I have confirmed this issue on QEMU 2.7.1 (fc25 Distro) and 2.9.0-rc3
+  (git).
+
+  adam@os-dev ~]$ qemu-system-arm --version
+  QEMU emulator version 2.7.1(qemu-2.7.1-4.fc25), Copyright (c) 2003-2016 F=
+abrice Bellard and the QEMU Project developers
+
+  [adam@os-dev ~]$ ./workspace/qemu/bin/debug/native/arm-softmmu/qemu-syste=
+m-arm --version
+  QEMU emulator version 2.8.93 (v2.9.0-rc3-15-g5daf9b3)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+
+  A remote debugger for my kernel shows the following:
+  (gdb) info reg
+  r0             0x0	0
+  r1             0x0	0
+  r2             0x96	150
+  r3             0x0	0
+  r4             0xa000	40960
+  r5             0x0	0
+  r6             0x0	0
+  r7             0x0	0
+  r8             0x0	0
+  r9             0xa000	40960
+  r10            0x0	0
+  r11            0x7fdc	32732
+  r12            0x0	0
+  sp             0x7fc8	0x7fc8
+  lr             0x8194	33172
+  pc             0x80a4	0x80a4
+  cpsr           0x800001d3	-2147483181
+  (gdb) stepi
+  0x000080a8 in ?? ()
+  (gdb) info reg
+  r0             0x3f003004	1056976900
+  r1             0x0	0
+  r2             0x96	150
+  r3             0x0	0
+  r4             0xa000	40960
+  r5             0x0	0
+  r6             0x0	0
+  r7             0x0	0
+  r8             0x0	0
+  r9             0xa000	40960
+  r10            0x0	0
+  r11            0x7fdc	32732
+  r12            0x0	0
+  sp             0x7fc8	0x7fc8
+  lr             0x8194	33172
+  pc             0x80a8	0x80a8
+  cpsr           0x800001d3	-2147483181
+  (gdb) stepi
+  0x000080ac in ?? ()
+  (gdb) info reg
+  r0             0x0	0
+  r1             0x0	0
+  r2             0x96	150
+  r3             0x0	0
+  r4             0xa000	40960
+  r5             0x0	0
+  r6             0x0	0
+  r7             0x0	0
+  r8             0x0	0
+  r9             0xa000	40960
+  r10            0x0	0
+  r11            0x7fdc	32732
+  r12            0x0	0
+  sp             0x7fc8	0x7fc8
+  lr             0x8194	33172
+  pc             0x80ac	0x80ac
+  cpsr           0x800001d3	-2147483181
+
+  Notice r0 is loaded with the address for CLO and then cleared with 0
+  when read.
+
+  I am writing my code against the documented specifications in "BCM2835
+  ARM Peripherals" (attached for convenience), section "12 System
+  Timer".
+
+  =
+
+  Please let me know if you need anything else from me.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1680991/+subscriptions
