@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35144)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cweO3-0001iB-EN
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:37:56 -0400
+	(envelope-from <anthony.xu@intel.com>) id 1cwePp-0002YL-Hm
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:39:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cweO0-0006qP-Bh
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:37:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43560)
+	(envelope-from <anthony.xu@intel.com>) id 1cwePn-0007xO-QI
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:39:45 -0400
+Received: from mga14.intel.com ([192.55.52.115]:44873)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1cweO0-0006q0-5n
-	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:37:52 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1A89C8553C
-	for <qemu-devel@nongnu.org>; Sat,  8 Apr 2017 00:37:51 +0000 (UTC)
-References: <20170323173928.14439-1-pbonzini@redhat.com>
-	<20170323173928.14439-8-pbonzini@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <47608498-a23c-37d4-2b31-f2d70bdcdd87@redhat.com>
-Date: Fri, 7 Apr 2017 20:37:50 -0400
-MIME-Version: 1.0
-In-Reply-To: <20170323173928.14439-8-pbonzini@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 07/10] blockjob: strengthen a bit
- test-blockjob-txn
+	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
+	id 1cwePn-0007w8-HP
+	for qemu-devel@nongnu.org; Fri, 07 Apr 2017 20:39:43 -0400
+From: Anthony Xu <anthony.xu@intel.com>
+Date: Fri,  7 Apr 2017 17:45:35 -0700
+Message-Id: <1491612336-31066-4-git-send-email-anthony.xu@intel.com>
+In-Reply-To: <1491612336-31066-1-git-send-email-anthony.xu@intel.com>
+References: <1491612336-31066-1-git-send-email-anthony.xu@intel.com>
+Subject: [Qemu-devel] [PATCH 3/4] pam: disable pc.rom when pam is disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,54 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: jcody@redhat.com
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, eblake@redhat.com, Anthony Xu <anthony.xu@intel.com>
 
+pc.rom depends on pam. When pam is disabled, pc.rom is useless
 
+Signed-off-by: Anthony Xu <anthony.xu@intel.com>
+---
+ hw/i386/pc.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-On 03/23/2017 01:39 PM, Paolo Bonzini wrote:
-> Unlike test-blockjob-txn, QMP releases the reference to the transaction
-> before the jobs finish.  Thus, while working on the next patch,
-> qemu-iotest 124 showed a failure that the unit tests did not have.
-> Make the unit test just a little nastier, so that it fails too.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  tests/test-blockjob-txn.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
-> index 4ccbda1..bfc2aaa 100644
-> --- a/tests/test-blockjob-txn.c
-> +++ b/tests/test-blockjob-txn.c
-> @@ -165,6 +165,11 @@ static void test_pair_jobs(int expected1, int expected2)
->      job2 = test_block_job_start(2, true, expected2, &result2);
->      block_job_txn_add_job(txn, job2);
->  
-
-^ Oh, this might cause you grief too. Should be add-add-start-start, not
-start-add-start-add. Fam sent a patch fixing this recently.
-
-> +    /* Release our reference now to trigger as many nice
-> +     * use-after-free bugs as possible.
-> +     */
-> +    block_job_txn_unref(txn);
-> +
-
-This is fine, though.
-
->      if (expected1 == -ECANCELED) {
->          block_job_cancel(job1);
->      }
-> @@ -185,8 +190,6 @@ static void test_pair_jobs(int expected1, int expected2)
->  
->      g_assert_cmpint(result1, ==, expected1);
->      g_assert_cmpint(result2, ==, expected2);
-> -
-> -    block_job_txn_unref(txn);
->  }
->  
->  static void test_pair_jobs_success(void)
-> 
-
-Reviewed-by: John Snow <jsnow@redhat.com>
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 9d154c2..455f7fe 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1358,7 +1358,7 @@ void pc_memory_init(PCMachineState *pcms,
+                     MemoryRegion **ram_memory)
+ {
+     int linux_boot, i;
+-    MemoryRegion *ram, *option_rom_mr;
++    MemoryRegion *ram;
+     MemoryRegion *ram_below_4g, *ram_above_4g;
+     FWCfgState *fw_cfg;
+     MachineState *machine = MACHINE(pcms);
+@@ -1445,15 +1445,16 @@ void pc_memory_init(PCMachineState *pcms,
+     /* Initialize PC system firmware */
+     pc_system_firmware_init(rom_memory, !pcmc->pci_enabled);
+ 
+-    option_rom_mr = g_malloc(sizeof(*option_rom_mr));
+-    memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
++    if (pcms->pam) {
++        MemoryRegion *option_rom_mr = g_malloc(sizeof(*option_rom_mr));
++        memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
+                            &error_fatal);
+-    vmstate_register_ram_global(option_rom_mr);
+-    memory_region_add_subregion_overlap(rom_memory,
++        vmstate_register_ram_global(option_rom_mr);
++        memory_region_add_subregion_overlap(rom_memory,
+                                         PC_ROM_MIN_VGA,
+                                         option_rom_mr,
+                                         1);
+-
++    }
+     fw_cfg = bochs_bios_init(&address_space_memory, pcms);
+ 
+     rom_set_fw(fw_cfg);
+-- 
+1.8.3.1
