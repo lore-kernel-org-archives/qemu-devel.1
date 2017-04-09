@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hrgstephen@gmail.com>) id 1cxFoq-000564-PQ
-	for qemu-devel@nongnu.org; Sun, 09 Apr 2017 12:36:05 -0400
+	(envelope-from <rth7680@gmail.com>) id 1cxGCZ-0000KI-7p
+	for qemu-devel@nongnu.org; Sun, 09 Apr 2017 13:00:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hrgstephen@gmail.com>) id 1cxFop-0003oD-UF
-	for qemu-devel@nongnu.org; Sun, 09 Apr 2017 12:36:04 -0400
-Received: from mail-ua0-x242.google.com ([2607:f8b0:400c:c08::242]:35596)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hrgstephen@gmail.com>)
-	id 1cxFop-0003ns-RH
-	for qemu-devel@nongnu.org; Sun, 09 Apr 2017 12:36:03 -0400
-Received: by mail-ua0-x242.google.com with SMTP id m20so2663718uab.2
-	for <qemu-devel@nongnu.org>; Sun, 09 Apr 2017 09:36:03 -0700 (PDT)
+	(envelope-from <rth7680@gmail.com>) id 1cxGCY-0005on-FZ
+	for qemu-devel@nongnu.org; Sun, 09 Apr 2017 13:00:35 -0400
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170407060752.31313-1-nikunj@linux.vnet.ibm.com>
+	<20170408065107.GG27571@umbus>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <4b5db053-9cd9-2a3d-dc44-298be538d9dc@twiddle.net>
+Date: Sun, 9 Apr 2017 10:00:28 -0700
 MIME-Version: 1.0
-In-Reply-To: <CADZi59xe6OcCasvtkPBjP7nTsgDA5r_E_Rt7W88BszYdJhuxGQ@mail.gmail.com>
-References: <CADZi59zNxk-Yr4rpN1E49s=AdsdW-W9YfhpCvpJeBz7oigyFSg@mail.gmail.com>
-	<CADZi59xe6OcCasvtkPBjP7nTsgDA5r_E_Rt7W88BszYdJhuxGQ@mail.gmail.com>
-From: hrg <hrgstephen@gmail.com>
-Date: Mon, 10 Apr 2017 00:36:02 +0800
-Message-ID: <CADZi59xEg0SvScgo=Jg0MxTbGYY=nTX18Qo-4GMkfayThDU9zw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC/BUG] xen-mapcache: buggy invalidate map cache?
+In-Reply-To: <20170408065107.GG27571@umbus>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] Enable MTTCG on PPC64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,25 +24,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: anthony.perard@citrix.com, xen-devel@lists.xensource.com, qemu-devel@nongnu.org, jun.nakajima@intel.com, agraf@suse.de, sstabellini@kernel.org
-Cc: xen-devel@lists.xenproject.org, xen-devel@lists.xen.org, "Herongguang (Stephen)" <herongguang.he@huawei.com>, wangxinxin.wang@huawei.com
+To: David Gibson <david@gibson.dropbear.id.au>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, alex.bennee@linaro.org, programmingkidx@gmail.com, bharata@linux.vnet.ibm.com
 
-On Sun, Apr 9, 2017 at 11:55 PM, hrg <hrgstephen@gmail.com> wrote:
-> On Sun, Apr 9, 2017 at 11:52 PM, hrg <hrgstephen@gmail.com> wrote:
->> Hi,
+On 04/07/2017 11:51 PM, David Gibson wrote:
+> On Fri, Apr 07, 2017 at 11:37:49AM +0530, Nikunj A Dadhania wrote:
+>> The series enables Multi-Threaded TCG on PPC64
 >>
->> In xen_map_cache_unlocked(), map to guest memory maybe in entry->next
->> instead of first level entry (if map to rom other than guest memory
->> comes first), while in xen_invalidate_map_cache(), when VM ballooned
->> out memory, qemu did not invalidate cache entries in linked
->> list(entry->next), so when VM balloon back in memory, gfns probably
->> mapped to different mfns, thus if guest asks device to DMA to these
->> GPA, qemu may DMA to stale MFNs.
+>> Patch 01: Use atomic_cmpxchg in store conditional
+>>       02: Handle first write to page during atomic operation
+>>       03: Generate memory barriers for sync/isync and load/store conditional
 >>
->> So I think in xen_invalidate_map_cache() linked lists should also be
->> checked and invalidated.
->>
->> What=E2=80=99s your opinion? Is this a bug? Is my analyze correct?
+>> Patches are based on ppc-for-2.10
 >
-> Added Jun Nakajima and Alexander Graf
-And correct Stefano Stabellini's email address.
+> Applied to ppc-for-2.10.  Anyone object to that for 2/3, which isn't
+> within ppc code?
+
+Please go ahead.  If there was another queue it might have gone in, it would 
+probably be tcg-next, and I don't have anything else pending at the moment.
+
+
+r~
