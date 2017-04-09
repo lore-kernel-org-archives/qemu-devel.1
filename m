@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <intermediadc@hotmail.com>) id 1cx8uX-0000xK-Ng
-	for qemu-devel@nongnu.org; Sun, 09 Apr 2017 05:13:30 -0400
+	(envelope-from <sundeep.lkml@gmail.com>) id 1cxAse-00046x-Cx
+	for qemu-devel@nongnu.org; Sun, 09 Apr 2017 07:19:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <intermediadc@hotmail.com>) id 1cx8uS-0005Ow-U6
-	for qemu-devel@nongnu.org; Sun, 09 Apr 2017 05:13:29 -0400
-From: luigi burdo <intermediadc@hotmail.com>
-Date: Sun, 9 Apr 2017 08:41:08 +0000
-Message-ID: <AM5P194MB01292723DDB978AC78F8FDD7C80E0@AM5P194MB0129.EURP194.PROD.OUTLOOK.COM>
-References: <20170407060752.31313-1-nikunj@linux.vnet.ibm.com>,
-	<20170408065107.GG27571@umbus>
-In-Reply-To: <20170408065107.GG27571@umbus>
-Content-Language: it-IT
-MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 0/3] Enable MTTCG on PPC64
+	(envelope-from <sundeep.lkml@gmail.com>) id 1cxAsZ-0000ra-FA
+	for qemu-devel@nongnu.org; Sun, 09 Apr 2017 07:19:40 -0400
+From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+Date: Sun,  9 Apr 2017 16:49:14 +0530
+Message-Id: <1491736758-19540-1-git-send-email-sundeep.lkml@gmail.com>
+Subject: [Qemu-devel] [Qemu-devel RFC v2 0/4] Add support for Smartfusion2
+ SoC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,48 +18,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "programmingkidx@gmail.com" <programmingkidx@gmail.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, "bharata@linux.vnet.ibm.com" <bharata@linux.vnet.ibm.com>, "alex.bennee@linaro.org" <alex.bennee@linaro.org>, "rth@twiddle.net" <rth@twiddle.net>
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, crosthwaite.peter@gmail.com, Subbaraya Sundeep <sundeep.lkml@gmail.com>
 
-Hi David and Nikuji,
+Hi Qemu-devel,
 
-can i suggest to remove the message:
+I am trying to add Smartfusion2 SoC.
+SoC is from Microsemi and System on Module(SOM)
+board is from Emcraft systems. Smartfusion2 has hardened
+Microcontroller(Cortex-M3)based Sub System and FPGA fabric.
+At the moment only system timer, sysreg and SPI
+controller are modelled.
 
+Testing:
+./arm-softmmu/qemu-system-arm -M smartfusion2-som -serial mon:stdio \
+-kernel u-boot.bin -display none -drive file=spi.bin,if=mtd,format=raw
 
-Guest not yet converted to MTTCG - you may get unexpected results
-where the mttcg is enabled?
+U-boot is from Emcraft with modified SPI driver not to use PDMA.
+Linux is 4.5 linux with Smartfusion2 SoC dts and clocksource 
+driver added by myself @
+https://github.com/Subbaraya-Sundeep/linux.git
 
-another thing im finding  is this message
-Guest expects a stronger memory ordering than the host provides
-This may cause strange/hard to debug errors
+Baremetal elfs from Microsemi Softconsole IDE are also working.
 
+Changes from v1:
+    Added SPI controller.
 
-I have 8 gb on my machine and this message come if i gave 512mb on the gues=
-t too.
+Thanks,
+Sundeep
 
-Is possible know where the mttcg is already enabled?
+Subbaraya Sundeep (4):
+  msf2: Add Smartfusion2 System timer
+  msf2: Microsemi Smartfusion2 System Register block.
+  msf2: Add Smartfusion2 SPI controller
+  msf2: Add Emcraft's Smartfusion2 SOM kit.
 
-i see on x86,i386,arm too if i set thread=3Dmulty the qemu start using the =
-other host cores is on this guest system enabled?
+ default-configs/arm-softmmu.mak |   1 +
+ hw/arm/Makefile.objs            |   2 +-
+ hw/arm/msf2_soc.c               | 141 +++++++++++++
+ hw/misc/Makefile.objs           |   1 +
+ hw/misc/msf2_sysreg.c           | 168 +++++++++++++++
+ hw/ssi/Makefile.objs            |   1 +
+ hw/ssi/msf2_spi.c               | 449 ++++++++++++++++++++++++++++++++++++++++
+ hw/timer/Makefile.objs          |   1 +
+ hw/timer/msf2_timer.c           | 273 ++++++++++++++++++++++++
+ 9 files changed, 1036 insertions(+), 1 deletion(-)
+ create mode 100644 hw/arm/msf2_soc.c
+ create mode 100644 hw/misc/msf2_sysreg.c
+ create mode 100644 hw/ssi/msf2_spi.c
+ create mode 100644 hw/timer/msf2_timer.c
 
-if yes i have the same messages of ppc64 too :
-
-Guest not yet converted to MTTCG - you may get unexpected results
-
-and
-
-Guest expects a stronger memory ordering than the host provides
-This may cause strange/hard to debug errors
-
-
-Ciao
-
-Luigi
-
-
-Applied to ppc-for-2.10.  Anyone object to that for 2/3, which isn't
-within ppc code?
-
---
-David Gibson
-<http://www.ozlabs.org/~dgibson>
+-- 
+2.5.0
