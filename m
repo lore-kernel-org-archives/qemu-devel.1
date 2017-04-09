@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <intermediadc@hotmail.com>) id 1cx071-0000jq-7E
-	for qemu-devel@nongnu.org; Sat, 08 Apr 2017 19:49:47 -0400
+	(envelope-from <tejaswinipoluri3@gmail.com>) id 1cx0Us-0002yu-Oo
+	for qemu-devel@nongnu.org; Sat, 08 Apr 2017 20:14:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <intermediadc@hotmail.com>) id 1cx070-0003nM-K0
-	for qemu-devel@nongnu.org; Sat, 08 Apr 2017 19:49:47 -0400
-From: luigi burdo <intermediadc@hotmail.com>
-Date: Sat, 8 Apr 2017 11:16:16 +0000
-Message-ID: <AM5P194MB0129FDB6B5EF9BD99DA02F05C80F0@AM5P194MB0129.EURP194.PROD.OUTLOOK.COM>
-References: <20170407060752.31313-1-nikunj@linux.vnet.ibm.com>
-	<AM5P194MB01294EAC74E1825F9210E04CC80C0@AM5P194MB0129.EURP194.PROD.OUTLOOK.COM>,
-	<2883915A-A579-4BC2-9FBE-5D885B88AF22@gmail.com>,
-	<AM5P194MB012946E7708F112D8F8327E6C80C0@AM5P194MB0129.EURP194.PROD.OUTLOOK.COM>
-In-Reply-To: <AM5P194MB012946E7708F112D8F8327E6C80C0@AM5P194MB0129.EURP194.PROD.OUTLOOK.COM>
-Content-Language: it-IT
+	(envelope-from <tejaswinipoluri3@gmail.com>) id 1cx0Ur-0001gu-K5
+	for qemu-devel@nongnu.org; Sat, 08 Apr 2017 20:14:26 -0400
+Received: from mail-it0-x22c.google.com ([2607:f8b0:4001:c0b::22c]:35310)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tejaswinipoluri3@gmail.com>)
+	id 1cx0Ur-0001gi-D9
+	for qemu-devel@nongnu.org; Sat, 08 Apr 2017 20:14:25 -0400
+Received: by mail-it0-x22c.google.com with SMTP id 70so1690223ita.0
+	for <qemu-devel@nongnu.org>; Sat, 08 Apr 2017 17:14:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 0/3] Enable MTTCG on PPC64
+In-Reply-To: <CAH=b03tqB4vy0fg3ikhf1iGpbQyLfDd28ymrO_Qo_QSysHOAKA@mail.gmail.com>
+References: <1490610662-5483-1-git-send-email-tejaswinipoluri3@gmail.com>
+	<20170327111309.GB26900@stefanha-x1.localdomain>
+	<CAH=b03tqB4vy0fg3ikhf1iGpbQyLfDd28ymrO_Qo_QSysHOAKA@mail.gmail.com>
+From: Tejaswini Poluri <tejaswinipoluri3@gmail.com>
+Date: Sun, 9 Apr 2017 05:44:22 +0530
+Message-ID: <CAH=b03tKZyiv3k6J6Mi4sujUTteV07Jsk4a+Lf_oDj-q7yFuUg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [[RFC]PATCH:hw/sd:sd_init()] hw/sd : modified the
+ sd_init() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,16 +31,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>, "rth@twiddle.net" <rth@twiddle.net>, "alex.bennee@linaro.org" <alex.bennee@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "bharata@linux.vnet.ibm.com" <bharata@linux.vnet.ibm.com>, G 3 <programmingkidx@gmail.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
+Hii Paolo,
+Waiting for your comments on this patch
 
-Hi, on info is mttcg using an amouth of ram for cpu caching and translating=
- operations like was did in past by emulators like virtualpc,realpc, bluela=
-bel or softwindows?
+Regards,
+Tejaswini
+On 28 Mar 2017 11:01 a.m., "Tejaswini Poluri" <tejaswinipoluri3@gmail.com>
+wrote:
 
-in case of yes is possible increase it from the command line?
-
-Thanks
-
-Luigi
+>
+>
+> On Mon, Mar 27, 2017 at 4:43 PM, Stefan Hajnoczi <stefanha@redhat.com>
+> wrote:
+>
+>> On Mon, Mar 27, 2017 at 04:01:02PM +0530, Tejaswini wrote:
+>> > From: Tejaswini Poluri <tejaswinipoluri3@gmail.com>
+>>
+>> Please shorten the subject line: "[PATCH] hw/sd: simplify sd_init()
+>> prototype"
+>>
+>> > @@ -573,16 +573,19 @@ SDState *sd_init(BlockBackend *blk, bool is_spi)
+>> >      qdev_prop_set_drive(dev, "drive", blk, &err);
+>> >      if (err) {
+>> >          error_report("sd_init failed: %s", error_get_pretty(err));
+>> > -        return NULL;
+>> > +        return -1;
+>> >      }
+>> >      qdev_prop_set_bit(dev, "spi", is_spi);
+>> >      object_property_set_bool(obj, true, "realized", &err);
+>> >      if (err) {
+>> >          error_report("sd_init failed: %s", error_get_pretty(err));
+>> > -        return NULL;
+>> > +        return -1;
+>> >      }
+>> > -
+>> > -    return SD_CARD(dev);
+>> > +    sd_state = SD_CARD(dev);
+>>
+>> The caller will not see the new value of sd_state.  In C arguments are
+>> passed by value.  That means they are local variables inside the
+>> function and do not affect the caller.
+>>
+>> The caller will call sd_init() along with passing SDState pointer as an
+> argument like below
+> if (sd_init(s->card, blk, false) < 0) .
+> And the sd_init() function is modified to
+> int sd_init(SDState *sd_state, BlockBackend *blk, bool is_spi)
+> so that the caller gets the new value of SDstate updated.
+> Looking forward for the comments of Paolo Bonzini to understand what more
+> needs to be done as part of the task.
+>
+> I have CCed Paolo Bonzini, who posted this task.  Maybe he can explain
+>> what he meant by "Include SDState by value instead of allocating it in
+>> sd_init (hw/sd/)".
+>>
+>> > +    if (!sd_state) {
+>> > +             return -1;
+>> > +     }
+>>
+>> QEMU use 4 space indentation.  Please do not use tabs.
+>>
+>
+>
+>
+> --
+> Regards,
+> Tejaswini
+>
