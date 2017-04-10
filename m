@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cxVz5-0000KZ-Hx
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 05:51:44 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1cxVzH-0000SO-RY
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 05:51:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cxVz1-0007sE-RX
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 05:51:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51044)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cxVz1-0007rr-LQ
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 05:51:39 -0400
-Date: Mon, 10 Apr 2017 10:51:33 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170410095133.GC3655@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1491814858-63428-1-git-send-email-longpeng2@huawei.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1cxVzD-0007zd-Cm
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 05:51:55 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:33409)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cxVzD-0007zR-5y
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 05:51:51 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id l28so15515659wre.0
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 02:51:51 -0700 (PDT)
+References: <20170410081217.2897-1-nikunj@linux.vnet.ibm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170410081217.2897-1-nikunj@linux.vnet.ibm.com>
+Date: Mon, 10 Apr 2017 10:51:57 +0100
+Message-ID: <87mvbok2te.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1491814858-63428-1-git-send-email-longpeng2@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 15/19] tests: crypto: add cipher
- speed case
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for 2.10] tcg: enable MTTCG by default for
+ PPC64 on x86
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,29 +30,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Longpeng(Mike)" <longpeng2@huawei.com>
-Cc: xuquan8@huawei.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org
-
-On Mon, Apr 10, 2017 at 05:00:58PM +0800, Longpeng(Mike) wrote:
-> Now we have afalg-backend and libiary-backend, it's necessary
-> to add the speed test in test-crypto-cipher.
-> 
-> We can use "./tests/test-crypto-cipher speed" to do the speed
-> test.
-
-This is not using any of the existing code for the benchmark, so there's
-no real benefit to having it in this file.
-
-I'd suggest creating a separate test program for performance benchmarking,
-eg  tests/benchmark-crypto-cipher, that would be invoked separately as &
-when needed ie skipped by make check-unit, but run by a 'make check-speed'.
-
-Likewise for the other tests you've changed later in this series.
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net, qemu-devel@nongnu.org, intermediadc@hotmail.com, programmingkidx@gmail.com, clg@kaod.org
 
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+Nikunj A Dadhania <nikunj@linux.vnet.ibm.com> writes:
+
+> This enables the multi-threaded system emulation by default for PPC64
+> guests using the x86_64 TCG back-end.
+
+Technically this enables it for all backends that can meet the guests
+default memory model requirements. So far only the x86 backend defines
+one as:
+
+  #define TCG_TARGET_DEFAULT_MO (TCG_MO_ALL & ~TCG_MO_ST_LD)
+
+>
+> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+
+> ---
+>
+> Depends on following patch which fixes the define name:
+>
+> https://patchwork.ozlabs.org/patch/748840/
+>
+> ---
+>  configure        | 2 ++
+>  target/ppc/cpu.h | 2 ++
+>  2 files changed, 4 insertions(+)
+>
+> diff --git a/configure b/configure
+> index 4b3b5cd..2a87495 100755
+> --- a/configure
+> +++ b/configure
+> @@ -6008,12 +6008,14 @@ case "$target_name" in
+>    ppc64)
+>      TARGET_BASE_ARCH=ppc
+>      TARGET_ABI_DIR=ppc
+> +    mttcg=yes
+>      gdb_xml_files="power64-core.xml power-fpu.xml power-altivec.xml power-spe.xml power-vsx.xml"
+>    ;;
+>    ppc64le)
+>      TARGET_ARCH=ppc64
+>      TARGET_BASE_ARCH=ppc
+>      TARGET_ABI_DIR=ppc
+> +    mttcg=yes
+>      gdb_xml_files="power64-core.xml power-fpu.xml power-altivec.xml power-spe.xml power-vsx.xml"
+>    ;;
+>    ppc64abi32)
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index e0ff041..ece535d 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -30,6 +30,8 @@
+>  #define TARGET_LONG_BITS 64
+>  #define TARGET_PAGE_BITS 12
+>
+> +#define TCG_GUEST_DEFAULT_MO 0
+> +
+>  /* Note that the official physical address space bits is 62-M where M
+>     is implementation dependent.  I've not looked up M for the set of
+>     cpus we emulate at the system level.  */
+
+
+--
+Alex Bennée
