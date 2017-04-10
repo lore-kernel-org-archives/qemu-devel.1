@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cxWoj-0001Uq-JA
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:45:06 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1cxWom-0001Yn-65
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:45:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cxWoi-00085I-JS
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:45:05 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1cxWok-00086e-VY
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:45:08 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Apr 2017 11:39:49 +0100
-Message-Id: <1491820793-5348-4-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1491820793-5348-1-git-send-email-peter.maydell@linaro.org>
-References: <1491820793-5348-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 3/7] arm: Factor out "generate right kind of
- step exception"
+Date: Mon, 10 Apr 2017 11:39:46 +0100
+Message-Id: <1491820793-5348-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/7] arm: Implement M profile exception return
+ properly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,72 +21,119 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>
 
-We currently have two places that do:
-            if (dc->ss_active) {
-                gen_step_complete_exception(dc);
-            } else {
-                gen_exception_internal(EXCP_DEBUG);
-            }
+On M profile, return from exceptions happen when privileged code
+executes one of the following function call return instructions:
+     * POP or LDM which loads the PC
+     * LDR to PC
+     * BX register
+and the new PC value is 0xFFxxxxxx.
+    
+QEMU tries to implement this by not treating the instruction
+specially but then catching the attempt to execute from the magic
+address value.  This is not ideal, because:
+ * there are guest visible differences from the architecturally
+   specified behaviour (for instance jumping to 0xFFxxxxxx via a
+   different instruction should not cause an exception return but it
+   will in the QEMU implementation)
+ * we have to account for it in various places (like refusing to take
+   an interrupt if the PC is at a magic value, and making sure that
+   the MPU doesn't deny execution at the magic value addresses)
+    
+Drop these hacks, and instead implement exception return the way the
+architecture specifies -- by having the relevant instructions check
+for the magic value and raise the 'do an exception return' QEMU
+internal exception immediately.
 
-Factor this out into its own function, as we're about to add
-a third place that needs the same logic.
+I realised when I was looking at the MPU patches that the current
+mechanism was a bit awkward and needed still more workarounds in
+code that really shouldn't have to care about exception-return.
+And it turns out that implementing it properly doesn't actually
+have very much runtime cost at all.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/translate.c | 28 ++++++++++++++++------------
- 1 file changed, 16 insertions(+), 12 deletions(-)
+NB: this is technically speaking a migration compatibility break,
+if you were unlucky enough to migrate just after an exception
+return when the PC value was one of the magic values, since the
+new QEMU will not treat this as "now do exception return".
+However we don't guarantee migration compatibility for M profile,
+so that's OK.
+    
+The effect on the generated code is minor:
+    
+     bx lr, old code (and new code for unprivileged mode):
+      TCG:
+       mov_i32 tmp5,r14
+       movi_i32 tmp6,$0xfffffffffffffffe
+       and_i32 pc,tmp5,tmp6
+       movi_i32 tmp6,$0x1
+       and_i32 tmp5,tmp5,tmp6
+       st_i32 tmp5,env,$0x218
+       exit_tb $0x0
+      x86_64 generated code:
+       0x7f2aabe87019:  mov    %ebx,%ebp
+       0x7f2aabe8701b:  and    $0xfffffffffffffffe,%ebp
+       0x7f2aabe8701e:  mov    %ebp,0x3c(%r14)
+       0x7f2aabe87022:  and    $0x1,%ebx
+       0x7f2aabe87025:  mov    %ebx,0x218(%r14)
+       0x7f2aabe8702c:  xor    %eax,%eax
+       0x7f2aabe8702e:  jmpq   0x7f2aabe7c016
+    
+     bx lr, new code when privileged:
+      TCG:
+       mov_i32 tmp5,r14
+       movi_i32 tmp6,$0xfffffffffffffffe
+       and_i32 pc,tmp5,tmp6
+       movi_i32 tmp6,$0x1
+       and_i32 tmp5,tmp5,tmp6
+       st_i32 tmp5,env,$0x218
+       movi_i32 tmp5,$0xffffffffff000000
+       brcond_i32 pc,tmp5,geu,$L1
+       exit_tb $0x0
+       set_label $L1
+       movi_i32 tmp5,$0x8
+       call exception_internal,$0x0,$0,env,tmp5
+      x86_64 generated code:
+       0x7fe8fa1264e3:  mov    %ebp,%ebx
+       0x7fe8fa1264e5:  and    $0xfffffffffffffffe,%ebx
+       0x7fe8fa1264e8:  mov    %ebx,0x3c(%r14)
+       0x7fe8fa1264ec:  and    $0x1,%ebp
+       0x7fe8fa1264ef:  mov    %ebp,0x218(%r14)
+       0x7fe8fa1264f6:  cmp    $0xff000000,%ebx
+       0x7fe8fa1264fc:  jae    0x7fe8fa126509
+       0x7fe8fa126502:  xor    %eax,%eax
+       0x7fe8fa126504:  jmpq   0x7fe8fa122016
+       0x7fe8fa126509:  mov    %r14,%rdi
+       0x7fe8fa12650c:  mov    $0x8,%esi
+       0x7fe8fa126511:  mov    $0x56095dbeccf5,%r10
+       0x7fe8fa12651b:  callq  *%r10
+    
+which is a difference of one cmp/branch-not-taken. This will
+be lost in the noise of having to exit generated code and
+look up the next TB anyway.
+    
+Patches 1 and 2 are minor bug fixes which remove code paths that
+incorrectly called gen_bx(), so we don't have to consider them when
+looking at which gen_bx() calls need to be changed to call
+gen_bx_excret().  Patches 3 to 5 are minor preliminary refactorings;
+patch 6 is the meat of the series; finally patch 7 removes the old
+mechanism.
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index ddc62b6..870e320 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -296,6 +296,19 @@ static void gen_step_complete_exception(DisasContext *s)
-     s->is_jmp = DISAS_EXC;
- }
- 
-+static void gen_singlestep_exception(DisasContext *s)
-+{
-+    /* Generate the right kind of exception for singlestep, which is
-+     * either the architectural singlestep or EXCP_DEBUG for QEMU's
-+     * gdb singlestepping.
-+     */
-+    if (s->ss_active) {
-+        gen_step_complete_exception(s);
-+    } else {
-+        gen_exception_internal(EXCP_DEBUG);
-+    }
-+}
-+
- static void gen_smul_dual(TCGv_i32 a, TCGv_i32 b)
- {
-     TCGv_i32 tmp1 = tcg_temp_new_i32();
-@@ -11998,24 +12011,15 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
-             gen_set_pc_im(dc, dc->pc);
-             /* fall through */
-         default:
--            if (dc->ss_active) {
--                gen_step_complete_exception(dc);
--            } else {
--                /* FIXME: Single stepping a WFI insn will not halt
--                   the CPU.  */
--                gen_exception_internal(EXCP_DEBUG);
--            }
-+            /* FIXME: Single stepping a WFI insn will not halt the CPU. */
-+            gen_singlestep_exception(dc);
-         }
-         if (dc->condjmp) {
-             /* "Condition failed" instruction codepath. */
-             gen_set_label(dc->condlabel);
-             gen_set_condexec(dc);
-             gen_set_pc_im(dc, dc->pc);
--            if (dc->ss_active) {
--                gen_step_complete_exception(dc);
--            } else {
--                gen_exception_internal(EXCP_DEBUG);
--            }
-+            gen_singlestep_exception(dc);
-         }
-     } else {
-         /* While branches must always occur at the end of an IT block,
+thanks
+-- PMM
+
+Peter Maydell (7):
+  arm: Don't implement BXJ on M-profile CPUs
+  arm: Thumb shift operations should not permit interworking branches
+  arm: Factor out "generate right kind of step exception"
+  arm: Move gen_set_condexec() and gen_set_pc_im() up in the file
+  arm: Move condition-failed codepath generation out of if()
+  arm: Implement M profile exception return properly
+  arm: Remove workarounds for old M-profile exception return
+    implementation
+
+ target/arm/translate.h |   4 ++
+ target/arm/cpu.c       |  43 +------------
+ target/arm/translate.c | 163 ++++++++++++++++++++++++++++++++-----------------
+ 3 files changed, 113 insertions(+), 97 deletions(-)
+
 -- 
 2.7.4
