@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cxcz2-0003br-BW
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 13:20:09 -0400
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1cxczy-0004HT-3a
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 13:21:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cxcyz-0000uN-7t
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 13:20:08 -0400
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:35296)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cxcyz-0000tj-1G
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 13:20:05 -0400
-Received: by mail-wr0-x233.google.com with SMTP id o21so125173982wrb.2
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 10:20:03 -0700 (PDT)
-References: <20170406102249.20383-1-nikunj@linux.vnet.ibm.com>
-	<6029cef4-0a41-cde0-b3c9-6b6ad9bde572@kaod.org>
-	<87vaqgrds2.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<a74b9ee8-1b9d-244b-8046-b116fedb55f1@kaod.org>
-	<25dcb89b-35be-ea27-8719-7b446f464694@kaod.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <25dcb89b-35be-ea27-8719-7b446f464694@kaod.org>
-Date: Mon, 10 Apr 2017 18:20:08 +0100
-Message-ID: <87lgr8ji2f.fsf@linaro.org>
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1cxczu-0001Kc-RR
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 13:21:06 -0400
+Received: from mail-sn1nam01on0135.outbound.protection.outlook.com
+	([104.47.32.135]:45540
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Andrew.Baumann@microsoft.com>)
+	id 1cxczu-0001Jt-82
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 13:21:02 -0400
+From: Andrew Baumann <Andrew.Baumann@microsoft.com>
+Date: Mon, 10 Apr 2017 17:04:57 +0000
+Message-ID: <DM2PR21MB00607B40448D581BDE2DA7D99E010@DM2PR21MB0060.namprd21.prod.outlook.com>
+References: <20170408054318.19830-1-omar.rizwan@gmail.com>
+	<DM2PR21MB00601A5A86C3F935CCCBAC0D9E0F0@DM2PR21MB0060.namprd21.prod.outlook.com>
+	<CAJ=RBN+VF1ysQ39NELKY7dK75aMGcB-iDDGy_sFooC6pTf1rBw@mail.gmail.com>
+In-Reply-To: <CAJ=RBN+VF1ysQ39NELKY7dK75aMGcB-iDDGy_sFooC6pTf1rBw@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH RFC v1 0/3] Enable MTTCG on PPC64
+Subject: Re: [Qemu-devel] [PATCH] raspi: Add Raspberry Pi 1 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,64 +32,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>
-Cc: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net, programmingkidx@gmail.com, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
+To: Omar Rizwan <omar.rizwan@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
 
-
-Cédric Le Goater <clg@kaod.org> writes:
-
-> On 04/07/2017 08:07 AM, Cédric Le Goater wrote:
->> On 04/07/2017 07:24 AM, Nikunj A Dadhania wrote:
->>> Cédric Le Goater <clg@kaod.org> writes:
->>>
->>>> Hello Nikunj,
->>>>
->>>> On 04/06/2017 12:22 PM, Nikunj A Dadhania wrote:
->>>>> The series enables Multi-Threaded TCG on PPC64
->>>>>
->>>>> Patch 01: Use atomic_cmpxchg in store conditional
->>>>>       02: Handle first write to page during atomic operation
->>>>>       03: Generate memory barriers for sync/isync and load/store conditional
->>>>>
->>>>> Patches are based on ppc-for-2.10
->>>>>
->>>>> Tested using following:
->>>>> ./ppc64-softmmu/qemu-system-ppc64 -cpu POWER8 -vga none -nographic -machine pseries,usb=off -m 2G  -smp 8,cores=8,threads=1 -accel tcg,thread=multi  f23.img
->>>>
->>>> I tried it with a Ubuntu 16.04.2 guest using stress --cpu 8. It looked
->>>> good : the CPU usage of QEMU reached 760% on the host.
->>>
->>> Cool.
->>>
->>>>> Todo:
->>>>> * Enable other machine types and PPC32.
->>>>
->>>> I am quite ignorant on the topic.
->>>> Have you looked at what it would take to emulate support of the HW
->>>> threads ?
->>>
->>> We would need to implement msgsndp (doorbell support for IPI between
->>> threads of same core)
->>
->> ok. I get it. Thanks,
->>
->>>> and the PowerNV machine ?
->>>
->>> Haven't tried it, should work. Just give a shot, let me know if you see problems.
->>
->> sure. pnv is still on 2.9, so I will rebase on 2.10, merge your
->> patches  and tell you.
->
-> The system seems to be spinning in skiboot in cpu_idle/relax when
-> starting the linux kernel. It finally boots, but it is rather long.
-> David has merged enough to test if you want to give it a try.
-
-Does PPC have Wait-for-irq or similar "sleeping" instructions?
-
-We had to ensure we were not jumping out of the cpu loop and suspend
-normally.
-
-See c22edfebff29f63d793032e4fbd42a035bb73e27 for an example.
-
---
-Alex Bennée
+PiBGcm9tOiBPbWFyIFJpendhbiBbbWFpbHRvOm9tYXIucml6d2FuQGdtYWlsLmNvbV0NCj4gU2Vu
+dDogRnJpZGF5LCA3IEFwcmlsIDIwMTcgMjM6MTMNCj4gT24gRnJpLCBBcHIgNywgMjAxNyBhdCAx
+MDo1NyBQTSBBbmRyZXcgQmF1bWFubg0KPiA8QW5kcmV3LkJhdW1hbm5AbWljcm9zb2Z0LmNvbT4g
+d3JvdGU6DQo+ID4gPiBGcm9tOiBPbWFyIFJpendhbiBbbWFpbHRvOm9tYXIucml6d2FuQGdtYWls
+LmNvbV0NCj4gPiA+IFNlbnQ6IEZyaWRheSwgNyBBcHJpbCAyMDE3IDIyOjQzDQoNCj4gPiBEaWQg
+eW91IGRvIGFueSB0ZXN0aW5nIG9mIHRoaXM/IE9uZSBvZiB0aGUgcmVhc29ucyBJIG5ldmVyIGdv
+dCBhcm91bmQgdG8NCj4gdXBzdHJlYW1pbmcgdGhpcyB3YXMgdGhhdCBJIGNvdWxkbid0IGdldCBS
+YXNwYmlhbiB3b3JraW5nIHJlbGlhYmx5ICh0aGVyZSB3YXMNCj4gc29tZSBwcm9ibGVtIHdpdGgg
+c3RhbGxlZCBETUEgcmVhZHMgZnJvbSB0aGUgTU1DIGNvbnRyb2xsZXIpLCBhbmQgSSBkaWRuJ3QN
+Cj4gaGF2ZSB0aGUgY3ljbGVzIHRvIGRlYnVnIGl0IGZ1cnRoZXIuIEFsc28sIElJUkMgUmFzcGJp
+YW4gb24gcGkxIGRlcGVuZGVkIG9uIHRoZQ0KPiBzeXN0ZW0gdGltZXIgZGV2aWNlcywgc28gaXQg
+bWlnaHQgbm90IG1ha2Ugc2Vuc2UgdG8gaGF2ZSB0aGlzIGJvYXJkLWxldmVsDQo+IHN1cHBvcnQg
+d2l0aG91dCBhZGRpbmcgdGhhdCBmaXJzdC4NCj4gDQo+IEkgZGlkIHRlc3QgUmFzcGJpYW4gb24g
+dGhlIHJhc3BpIG1hY2hpbmUgYW5kIG1heWJlIGVuY291bnRlcmVkIHRoZQ0KPiBzYW1lIGlzc3Vl
+IHlvdSBkaWQgKG9yLCBtb3JlIGxpa2VseSwgYSBzeXN0aW1lciByZWxhdGVkIGlzc3VlKTsNCj4g
+aXQgd291bGQganVzdCBoYW5nIGluIGEgbG9vcCB3aXRoIHByb2dyYW0gY291bnRlciBhdCAweEMw
+MDBBMDAwLg0KPiANCj4gQnV0IG15IHVzZSBmb3IgdGhpcyBpcyBiYXJlLW1ldGFsIGNvZGUsIHdo
+aWNoIHdvcmtzIE9LLg0KPiAoSXMgdGhlcmUgc29tZSBzdGFuZGFyZCB0aGF0IHRoZSBtYWNoaW5l
+IHNob3VsZCBydW4gTGludXggYmVmb3JlDQo+IGdldHRpbmcgdXBzdHJlYW1lZD8pDQoNCk5vLCBJ
+IGRvbid0IGtub3cgb2Ygc3VjaCBhIHN0YW5kYXJkLCBidXQgaXQncyBwcm9iYWJseSB3b3J0aCBu
+b3RpbmcgdGhlIGxpbWl0YXRpb25zIGluIHRoZSBjb21taXQgbWVzc2FnZS4gQW5kIGl0IG1pZ2h0
+IGV2ZW4gYmUgd29ydGggcHV0dGluZyB0aGUgc3lzdGltZXJzIGZpcnN0Li4uDQoNCj4gSSdkIGxp
+a2UgdG8gdXBzdHJlYW0gdGhlIHN5c3RlbSB0aW1lciBuZXh0LCBhbnl3YXkuDQoNClNvdW5kcyBn
+b29kLg0KDQo+ID4gPiAtLS0gYS9ody9hcm0vYmNtMjgzNV9wZXJpcGhlcmFscy5jDQo+ID4gPiAr
+KysgYi9ody9hcm0vYmNtMjgzNV9wZXJpcGhlcmFscy5jDQo+ID4gPiBAQCAtMzQsNiArMzQsNyBA
+QCBzdGF0aWMgdm9pZCBiY20yODM1X3BlcmlwaGVyYWxzX2luaXQoT2JqZWN0ICpvYmopDQo+ID4g
+PiAgICAgIC8qIEludGVybmFsIG1lbW9yeSByZWdpb24gZm9yIHBlcmlwaGVyYWwgYnVzIGFkZHJl
+c3NlcyAobm90IGV4cG9ydGVkKSAqLw0KPiA+ID4gICAgICBtZW1vcnlfcmVnaW9uX2luaXQoJnMt
+PmdwdV9idXNfbXIsIG9iaiwgImJjbTI4MzUtZ3B1IiwgKHVpbnQ2NF90KTENCj4gPDwNCj4gPiA+
+IDMyKTsNCj4gPiA+ICAgICAgb2JqZWN0X3Byb3BlcnR5X2FkZF9jaGlsZChvYmosICJncHUtYnVz
+IiwgT0JKRUNUKCZzLT5ncHVfYnVzX21yKSwNCj4gPiA+IE5VTEwpOw0KPiA+ID4gKyAgICBzeXNi
+dXNfaW5pdF9tbWlvKFNZU19CVVNfREVWSUNFKHMpLCAmcy0+Z3B1X2J1c19tcik7DQo+ID4gPg0K
+PiA+ID4gICAgICAvKiBJbnRlcm5hbCBtZW1vcnkgcmVnaW9uIGZvciByZXF1ZXN0L3Jlc3BvbnNl
+IGNvbW11bmljYXRpb24gd2l0aA0KPiA+ID4gICAgICAgKiBtYWlsYm94LWFkZHJlc3NhYmxlIHBl
+cmlwaGVyYWxzIChub3QgZXhwb3J0ZWQpDQo+ID4NCj4gPiBUaGlzIGxpbmUgbG9va3MgbGlrZSBp
+dCBtaWdodCBoYXZlIHNudWNrIGluIGJ5IGFjY2lkZW50Pw0KPiANCj4gDQo+IERvIHlvdSByZWNh
+bGwgd2h5IHRoYXQgbGluZSB3YXMgcmVtb3ZlZD8gYmNtMjgzNV9yZWFsaXplIGZhaWxzIHdpdGhv
+dXQNCj4gaXQsIGJlY2F1c2UgdGhlIHNlY29uZCBzeXNidXNfbW1pb19tYXBfb3ZlcmxhcCBjYWxs
+DQo+IA0KPiBzeXNidXNfbW1pb19tYXBfb3ZlcmxhcChTWVNfQlVTX0RFVklDRSgmcy0+cGVyaXBo
+ZXJhbHMpLCAxLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgMHg0MDAwMDAwMCwgMSk7
+DQo+IA0KPiBmYWlscyB0aGlzIGFzc2VydGlvbiBpbiBzeXNidXMuYywgaW4gc3lzYnVzX21taW9f
+bWFwX2NvbW1vbjoNCj4gDQo+IGFzc2VydChuID49IDAgJiYgbiA8IGRldi0+bnVtX21taW8pOw0K
+PiANCj4gSSBjYW4ndCBlYXNpbHkgZmluZCBkb2N1bWVudGF0aW9uIGZvciB0aGF0IDB4NDAwMDAw
+MDAgbWVtb3J5IG1hcHBpbmcsDQo+IHdoaWNoIEkgZmlndXJlZCBJJ2Qga2VlcCBpbjsgc2hvdWxk
+IGl0IGp1c3QgYmUgcmVtb3ZlZCBmcm9tIGJjbTI4MzU/DQo+IEFtIEkgbWlzdW5kZXJzdGFuZGlu
+ZyBzb21ldGhpbmc/DQoNClRoZSB2YXJpb3VzIG1hcHBpbmcgYWxpYXNlcyBhcmUgaW50ZW5kZWQg
+dG8gaW1wbGVtZW50IHRoZSBidXMgYWRkcmVzc2VzIGZyb20gUzEuMi4zIC8gZmlndXJlIG9uIHBh
+Z2UgNSBvZiB0aGlzIGRvY3VtZW50Og0KaHR0cHM6Ly93d3cucmFzcGJlcnJ5cGkub3JnL3dwLWNv
+bnRlbnQvdXBsb2Fkcy8yMDEyLzAyL0JDTTI4MzUtQVJNLVBlcmlwaGVyYWxzLnBkZg0KDQpJbiBB
+Uk0gQ1BVIHBoeXNpY2FsIGFkZHJlc3NlcywgdGhlIFJBTSBpcyBtYXBwZWQgYXQgMCwgYW5kIHRo
+ZSBwZXJpcGhlcmFscyBhdCAweDIwMDAwMDAwDQoNCkluIFZDIENQVSBidXMgYWRkcmVzc2VzICh3
+aGljaCBnZXQgdXNlZCBmb3IgRE1BKSwgUkFNIGlzIGFsaWFzZWQgZm91ciB0aW1lcywgYXQgMCAw
+eDQwMDAwMDAwIDB4ODAwMDAwMDAgYW5kIDB4QzAwMDAwMDAuIFBlcmlwaGVyYWxzIGFyZSBhbHNv
+IGFsaWFzZWQgZm91ciB0aW1lcyBhdCBhIGZpeGVkIG9mZnNldCBvZiAweDNlMDAwMDAwIGZyb20g
+dGhlIGJhc2Ugb2YgdGhlIFJBTSBhbGlhcywgd2hpY2ggaXMgaG93IHlvdSBnZXQgdGhlIDB4N2Uw
+MDAwMDAgcGVyaXBoZXJhbCBiYXNlICgweDQwMDAwMDAwICsgMHgzZTAwMDAwMCkuDQoNClRoaXMg
+aXMgaW1wbGVtZW50ZWQgYXMgZm9sbG93czogYmNtMjgzNV9wZXJpcGhlcmFscyBpbXBsZW1lbnRz
+L2V4cG9ydHMgb25lIG1lbW9yeSByZWdpb24gInBlcmlfbXIiIHdoaWNoIGNvbnRhaW5zIGp1c3Qg
+dGhlIHBlcmlwaGVyYWxzLiBJdCBhbHNvIGJ1aWxkcyBhIHByaXZhdGUgTVIgZm9yIHRoZSBHUFUg
+KCJWQyBDUFUiIGluIHRoZSBzcGVjKSBidXMgYWRkcmVzc2VzLCAiZ3B1X21yIiwgYW5kIGFsaWFz
+ZXMgUkFNIGludG8gaXQgZm91ciB0aW1lcyBhbG9uZyB3aXRoIHRoZSBwZXJpcGhlcmFsIE1SIGF0
+IEJDTTI4MzVfVkNfUEVSSV9CQVNFICgweDdlMDAwMDAwKS4gSXRzIHBhcmVudCwgZGV2aWNlLCBl
+aXRoZXIgYmNtMjgzNSBvciBiY20yODM2LCBtYXBzIHRoZSBwZXJpcGhlcmFsIE1SIGludG8gdGhl
+IGRlZmF1bHQgc3lzYnVzIG1taW8gYnVzIChpLmUuLCB0aGUgQ1BVJ3MgcGh5c2ljYWwgYWRkcmVz
+cyBzcGFjZSkgYXQgdGhlIHJlbGV2YW50IENQVSBwaHlzaWNhbCBiYXNlIGFkZHJlc3MgKDB4MjAw
+MDAwMDAgb24gcGkxLCAweDNGMDAwMDAwIG9uIHBpMikuDQoNCk5vdywgYXMgdG8gd2h5IHRoZSBt
+YXBwaW5nIGNhbGwgZmFpbHM6IEknbSBjb25mdXNlZCB3aGVyZSB5b3Ugc2F3IHRoYXQgY2FsbCB3
+aXRoIHRoZSAweDQwMDAwMDAwIGFkZHJlc3MuIFRoZSBjb2RlIGluIG15IHRyZWUgZm9yIGJjbTI4
+MzUuYyBpczoNCg0KLyogUGVyaXBoZXJhbCBiYXNlIGFkZHJlc3Mgc2VlbiBieSB0aGUgQ1BVICov
+DQojZGVmaW5lIEJDTTI4MzVfUEVSSV9CQVNFICAgICAgIDB4MjAwMDAwMDANCi4uLg0KICAgIHN5
+c2J1c19tbWlvX21hcF9vdmVybGFwKFNZU19CVVNfREVWSUNFKCZzLT5wZXJpcGhlcmFscyksIDAs
+DQogICAgICAgICAgICAgICAgICAgICAgICAgICAgQkNNMjgzNV9QRVJJX0JBU0UsIDEpOw0KDQpB
+bHNvLCBub3RlIHRoYXQgdGhpcyBpcyBtYXBwaW5nIHRoZSBwZXJpcGhlcmFscyBNUiwgbm90IHRo
+ZSB0aGUgZ3B1X2J1c19tciB3aGljaCBpcyBuZXZlciB1c2VkIHdpdGggYW55IHN5c2J1cyBBUElz
+LCBzbyBJJ20gc3RpbGwgbm90IGNsZWFyIG9uIHdoeSB3ZSBuZWVkIHRvIGNhbGwgc3lzYnVzX2lu
+aXRfbW1pbyBvbiBpdC4gSXQncyBlbnRpcmVseSBwb3NzaWJsZSBteSBjb2RlIGlzIGJyb2tlbiwg
+YW5kL29yIHRoYXQgYXNzZXJ0IHdhc24ndCB0aGVyZSB3aGVuIEkgdGVzdGVkIGl0LCBidXQgeW91
+IG1pZ2h0IGhhdmUgdG8gZGlnIGEgYml0IGRlZXBlciB0byBjb252aW5jZSBtZSB0aGF0IHdoYXQg
+eW91J3JlIGRvaW5nIGlzIGFsc28gc2FuZSA6KQ0KDQpCVFcsIEkgc3VzcGVjdCBub2JvZHkgZWxz
+ZSB3aWxsIHdhbnQgdG8gcmV2aWV3IHRoaXMgdW50aWwgYWZ0ZXIgMi45Lg0KDQpBbmRyZXcNCg==
