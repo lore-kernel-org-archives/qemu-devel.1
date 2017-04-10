@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1cxd2B-0005jE-R8
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 13:23:25 -0400
+	(envelope-from <rth7680@gmail.com>) id 1cxd5f-0006r5-EO
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 13:27:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1cxd28-0002Qs-Im
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 13:23:23 -0400
-Received: from mail-sn1nam01on0124.outbound.protection.outlook.com
-	([104.47.32.124]:21328
-	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Andrew.Baumann@microsoft.com>)
-	id 1cxd28-0002Qe-AK
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 13:23:20 -0400
-From: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Date: Mon, 10 Apr 2017 17:08:26 +0000
-Message-ID: <DM2PR21MB0060B58DF1CC6FCE1C24D8149E010@DM2PR21MB0060.namprd21.prod.outlook.com>
-References: <20170408054318.19830-1-omar.rizwan@gmail.com>
-	<DM2PR21MB00601A5A86C3F935CCCBAC0D9E0F0@DM2PR21MB0060.namprd21.prod.outlook.com>
-	<CAJ=RBN+VF1ysQ39NELKY7dK75aMGcB-iDDGy_sFooC6pTf1rBw@mail.gmail.com>
-	<DM2PR21MB00607B40448D581BDE2DA7D99E010@DM2PR21MB0060.namprd21.prod.outlook.com>
-In-Reply-To: <DM2PR21MB00607B40448D581BDE2DA7D99E010@DM2PR21MB0060.namprd21.prod.outlook.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <rth7680@gmail.com>) id 1cxd5e-0003Lk-Fh
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 13:26:59 -0400
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:35807)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cxd5e-0003LD-AB
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 13:26:58 -0400
+Received: by mail-pg0-x243.google.com with SMTP id g2so26430828pge.2
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 10:26:56 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170410060655.32289-1-nikunj@linux.vnet.ibm.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <fc0b737f-738a-1bc2-1b94-aa041ab8ae6c@twiddle.net>
+Date: Mon, 10 Apr 2017 10:26:52 -0700
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] raspi: Add Raspberry Pi 1 support
+In-Reply-To: <20170410060655.32289-1-nikunj@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH fix for-2.9] cpus: fix wrong define name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,47 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Omar Rizwan <omar.rizwan@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: pbonzini@redhat.com, crosthwaite.peter@gmail.com, david@gibson.dropbear.id.au, alex.bennee@linaro.org
 
-PiBGcm9tOiBBbmRyZXcgQmF1bWFubg0KPiBTZW50OiBNb25kYXksIDEwIEFwcmlsIDIwMTcgMTA6
-MDUNCj4gPiBGcm9tOiBPbWFyIFJpendhbiBbbWFpbHRvOm9tYXIucml6d2FuQGdtYWlsLmNvbV0N
-Cj4gPiBTZW50OiBGcmlkYXksIDcgQXByaWwgMjAxNyAyMzoxMw0KDQo+ID4gSSBjYW4ndCBlYXNp
-bHkgZmluZCBkb2N1bWVudGF0aW9uIGZvciB0aGF0IDB4NDAwMDAwMDAgbWVtb3J5IG1hcHBpbmcs
-DQo+ID4gd2hpY2ggSSBmaWd1cmVkIEknZCBrZWVwIGluOyBzaG91bGQgaXQganVzdCBiZSByZW1v
-dmVkIGZyb20gYmNtMjgzNT8NCj4gPiBBbSBJIG1pc3VuZGVyc3RhbmRpbmcgc29tZXRoaW5nPw0K
-PiANCj4gVGhlIHZhcmlvdXMgbWFwcGluZyBhbGlhc2VzIGFyZSBpbnRlbmRlZCB0byBpbXBsZW1l
-bnQgdGhlIGJ1cyBhZGRyZXNzZXMgZnJvbQ0KPiBTMS4yLjMgLyBmaWd1cmUgb24gcGFnZSA1IG9m
-IHRoaXMgZG9jdW1lbnQ6DQo+IGh0dHBzOi8vd3d3LnJhc3BiZXJyeXBpLm9yZy93cC1jb250ZW50
-L3VwbG9hZHMvMjAxMi8wMi9CQ00yODM1LUFSTS0NCj4gUGVyaXBoZXJhbHMucGRmDQo+IA0KPiBJ
-biBBUk0gQ1BVIHBoeXNpY2FsIGFkZHJlc3NlcywgdGhlIFJBTSBpcyBtYXBwZWQgYXQgMCwgYW5k
-IHRoZSBwZXJpcGhlcmFscyBhdA0KPiAweDIwMDAwMDAwDQo+IA0KPiBJbiBWQyBDUFUgYnVzIGFk
-ZHJlc3NlcyAod2hpY2ggZ2V0IHVzZWQgZm9yIERNQSksIFJBTSBpcyBhbGlhc2VkIGZvdXIgdGlt
-ZXMsDQo+IGF0IDAgMHg0MDAwMDAwMCAweDgwMDAwMDAwIGFuZCAweEMwMDAwMDAwLiBQZXJpcGhl
-cmFscyBhcmUgYWxzbyBhbGlhc2VkDQo+IGZvdXIgdGltZXMgYXQgYSBmaXhlZCBvZmZzZXQgb2Yg
-MHgzZTAwMDAwMCBmcm9tIHRoZSBiYXNlIG9mIHRoZSBSQU0gYWxpYXMsDQo+IHdoaWNoIGlzIGhv
-dyB5b3UgZ2V0IHRoZSAweDdlMDAwMDAwIHBlcmlwaGVyYWwgYmFzZSAoMHg0MDAwMDAwMCArDQo+
-IDB4M2UwMDAwMDApLg0KPiANCj4gVGhpcyBpcyBpbXBsZW1lbnRlZCBhcyBmb2xsb3dzOiBiY20y
-ODM1X3BlcmlwaGVyYWxzIGltcGxlbWVudHMvZXhwb3J0cyBvbmUNCj4gbWVtb3J5IHJlZ2lvbiAi
-cGVyaV9tciIgd2hpY2ggY29udGFpbnMganVzdCB0aGUgcGVyaXBoZXJhbHMuIEl0IGFsc28gYnVp
-bGRzIGENCj4gcHJpdmF0ZSBNUiBmb3IgdGhlIEdQVSAoIlZDIENQVSIgaW4gdGhlIHNwZWMpIGJ1
-cyBhZGRyZXNzZXMsICJncHVfbXIiLCBhbmQNCj4gYWxpYXNlcyBSQU0gaW50byBpdCBmb3VyIHRp
-bWVzIGFsb25nIHdpdGggdGhlIHBlcmlwaGVyYWwgTVIgYXQNCj4gQkNNMjgzNV9WQ19QRVJJX0JB
-U0UgKDB4N2UwMDAwMDApLiBJdHMgcGFyZW50LCBkZXZpY2UsIGVpdGhlciBiY20yODM1IG9yDQo+
-IGJjbTI4MzYsIG1hcHMgdGhlIHBlcmlwaGVyYWwgTVIgaW50byB0aGUgZGVmYXVsdCBzeXNidXMg
-bW1pbyBidXMgKGkuZS4sIHRoZQ0KPiBDUFUncyBwaHlzaWNhbCBhZGRyZXNzIHNwYWNlKSBhdCB0
-aGUgcmVsZXZhbnQgQ1BVIHBoeXNpY2FsIGJhc2UgYWRkcmVzcw0KPiAoMHgyMDAwMDAwMCBvbiBw
-aTEsIDB4M0YwMDAwMDAgb24gcGkyKS4NCj4gDQo+IE5vdywgYXMgdG8gd2h5IHRoZSBtYXBwaW5n
-IGNhbGwgZmFpbHM6IEknbSBjb25mdXNlZCB3aGVyZSB5b3Ugc2F3IHRoYXQgY2FsbA0KPiB3aXRo
-IHRoZSAweDQwMDAwMDAwIGFkZHJlc3MuIFRoZSBjb2RlIGluIG15IHRyZWUgZm9yIGJjbTI4MzUu
-YyBpczoNCj4gDQo+IC8qIFBlcmlwaGVyYWwgYmFzZSBhZGRyZXNzIHNlZW4gYnkgdGhlIENQVSAq
-Lw0KPiAjZGVmaW5lIEJDTTI4MzVfUEVSSV9CQVNFICAgICAgIDB4MjAwMDAwMDANCj4gLi4uDQo+
-ICAgICBzeXNidXNfbW1pb19tYXBfb3ZlcmxhcChTWVNfQlVTX0RFVklDRSgmcy0+cGVyaXBoZXJh
-bHMpLCAwLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgQkNNMjgzNV9QRVJJX0JBU0Us
-IDEpOw0KDQpPaywgSSBqdXN0IGxvb2tlZCBhdCB5b3VyIHBhdGNoLCBhbmQgaXQgbG9va3MgbGlr
-ZSB5b3UgYWRkZWQgdGhlIDB4NDAwMDAwMDAgbWFwcGluZy4gSXQncyBkZWZpbml0ZWx5IG5vdCBp
-biBteSB0cmVlIChodHRwczovL2dpdGh1Yi5jb20vMHhhYnUvcWVtdS9ibG9iL3Jhc3BpL2h3L2Fy
-bS9iY20yODM1LmMpLiBJIHdvdWxkIHN1Z2dlc3QgdGFraW5nIGl0IGJhY2sgb3V0IGFnYWluIGFu
-ZCBzYW5pdHktY2hlY2tpbmcgeW91ciBwYXRjaCBhZ2FpbnN0IHRoZSBjb2RlIGluIG15IHRyZWUg
-Zm9yIGFueSBvdGhlciBzcHVyaW91cyBjaGFuZ2VzIHRoYXQgbWF5IGhhdmUgc251Y2sgaW4uLi4N
-Cg0KQW5kcmV3DQo=
+On 04/09/2017 11:06 PM, Nikunj A Dadhania wrote:
+> While the configure script generates TARGET_SUPPORTS_MTTCG define, one
+> of the define is cpus.c is checking wrong name: TARGET_SUPPORT_MTTCG
+>
+> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+> ---
+>  cpus.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/cpus.c b/cpus.c
+> index 68fdbc4..58d90aa 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -202,7 +202,7 @@ void qemu_tcg_configure(QemuOpts *opts, Error **errp)
+>              } else if (use_icount) {
+>                  error_setg(errp, "No MTTCG when icount is enabled");
+>              } else {
+> -#ifndef TARGET_SUPPORT_MTTCG
+> +#ifndef TARGET_SUPPORTS_MTTCG
+
+This sort of thing is why glibc moved to using -Wundef.
+
+It would be a huge amount of work to convert our existing sources, but it would 
+probably pay off in the long run.
+
+
+r~
