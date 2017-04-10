@@ -1,43 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cxU3l-0000tw-09
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:48:25 -0400
+	(envelope-from <famz@redhat.com>) id 1cxUAB-0001xx-5S
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:55:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cxU3f-0000Ob-TH
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:48:25 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46531
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cxU3f-0000OR-Mj
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:48:19 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3A7iCfa088282
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 03:48:18 -0400
-Received: from e23smtp05.au.ibm.com (e23smtp05.au.ibm.com [202.81.31.147])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 29r4vt300w-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 03:48:17 -0400
-Received: from localhost
-	by e23smtp05.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Mon, 10 Apr 2017 17:48:15 +1000
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <87k26ska7j.fsf@linaro.org>
-References: <20170407060752.31313-1-nikunj@linux.vnet.ibm.com>
-	<20170408065107.GG27571@umbus>
-	<AM5P194MB01292723DDB978AC78F8FDD7C80E0@AM5P194MB0129.EURP194.PROD.OUTLOOK.COM>
-	<871st1wt9q.fsf@linaro.org>
-	<87r310rf6i.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<87k26ska7j.fsf@linaro.org>
-Date: Mon, 10 Apr 2017 13:17:18 +0530
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <87mvbor9fd.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 0/3] Enable MTTCG on PPC64
+	(envelope-from <famz@redhat.com>) id 1cxUAA-0002VJ-Df
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:55:03 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Mon, 10 Apr 2017 15:54:51 +0800
+Message-Id: <20170410075451.21329-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.9] iscsi: Fix iscsi_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,33 +17,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: luigi burdo <intermediadc@hotmail.com>, David Gibson <david@gibson.dropbear.id.au>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "programmingkidx@gmail.com" <programmingkidx@gmail.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, "bharata@linux.vnet.ibm.com" <bharata@linux.vnet.ibm.com>, "rth@twiddle.net" <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+Since d5895fcb (iscsi: Split URL into individual options), creating
+qcow2 image on an iscsi LUN fails:
 
-> Nikunj A Dadhania <nikunj@linux.vnet.ibm.com> writes:
->
->> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
->>
->>> luigi burdo <intermediadc@hotmail.com> writes:
->>>
->>>> Hi David and Nikuji,
->>>>
->>>> can i suggest to remove the message:
->>>>
->>>>
->>>> Guest not yet converted to MTTCG - you may get unexpected results
->>>> where the mttcg is enabled?
->>>
->>> Have you declared the memory ordering for the guest?
->>
->> No, I havent done that yet, will send a patch.
->
-> You also need to update configure so mttcg=3D"yes" (resulting in
-> TARGET_SUPPORTS_MTTCG being set for the build).
+    qemu-img create -f qcow2 iscsi://$SERVER/$IQN/0 1G
+    qemu-img: iscsi://$SERVER/$IQN/0: Could not create image: Invalid
+        argument
 
-Yes, I have that patch for ppc64, will send it to the list.
+The problem is iscsi_open now expects that transport_name, portal and
+target are already parsed into structured options by
+iscsi_parse_filename, but it is not called in iscsi_create.
 
-Regards
-Nikunj
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ block/iscsi.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/block/iscsi.c b/block/iscsi.c
+index 716e74a..07596b5 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -2092,6 +2092,7 @@ static int iscsi_create(const char *filename, QemuOpts *opts, Error **errp)
+     BlockDriverState *bs;
+     IscsiLun *iscsilun = NULL;
+     QDict *bs_options;
++    Error *local_err = NULL;
+ 
+     bs = bdrv_new();
+ 
+@@ -2103,7 +2104,13 @@ static int iscsi_create(const char *filename, QemuOpts *opts, Error **errp)
+ 
+     bs_options = qdict_new();
+     qdict_put(bs_options, "filename", qstring_from_str(filename));
+-    ret = iscsi_open(bs, bs_options, 0, NULL);
++    iscsi_parse_filename(filename, bs_options, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        ret = -EINVAL;
++    } else {
++        ret = iscsi_open(bs, bs_options, 0, NULL);
++    }
+     QDECREF(bs_options);
+ 
+     if (ret != 0) {
+-- 
+2.9.3
