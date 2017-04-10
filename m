@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cxUfI-0006ch-4K
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:27:13 -0400
+	(envelope-from <berrange@redhat.com>) id 1cxUjE-0007VS-Nc
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:31:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cxUfE-000430-VM
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:27:12 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:3026
-	helo=dggrg01-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cxUfD-00041j-SV
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:27:08 -0400
-References: <1487734936-43472-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1487734936-43472-13-git-send-email-zhang.zhanghailiang@huawei.com>
-	<20170407171840.GE2623@work-vm>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <58EB41C0.5060203@huawei.com>
-Date: Mon, 10 Apr 2017 16:26:40 +0800
+	(envelope-from <berrange@redhat.com>) id 1cxUjB-0005cW-JQ
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:31:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46558)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cxUjB-0005bH-Aw
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:31:13 -0400
+Date: Mon, 10 Apr 2017 09:31:05 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170410083105.GB3655@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1491575431-32170-1-git-send-email-amarnath.valluri@intel.com>
+	<1491575431-32170-10-git-send-email-amarnath.valluri@intel.com>
+	<20170407144100.GL26896@redhat.com>
+	<d74c2094-051e-bf1d-7c41-316b0e3651bc@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20170407171840.GE2623@work-vm>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 12/15] savevm: split the process of
- different stages for loadvm/savevm
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <d74c2094-051e-bf1d-7c41-316b0e3651bc@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v2 9/9] tpm: Added support for TPM emulator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,161 +30,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, Juan Quintela <quintela@redhat.com>
+To: Amarnath Valluri <amarnath.valluri@intel.com>
+Cc: qemu-devel@nongnu.org, patrick.ohly@intel.com, stefanb@linux.vnet.ibm.com, marcandre.lureau@gmail.com
 
-On 2017/4/8 1:18, Dr. David Alan Gilbert wrote:
-> * zhanghailiang (zhang.zhanghailiang@huawei.com) wrote:
->> There are several stages during loadvm/savevm process. In different stage,
->> migration incoming processes different types of sections.
->> We want to control these stages more accuracy, it will benefit COLO
->> performance, we don't have to save type of QEMU_VM_SECTION_START
->> sections everytime while do checkpoint, besides, we want to separate
->> the process of saving/loading memory and devices state.
->>
->> So we add three new helper functions: qemu_loadvm_state_begin(),
->> qemu_load_device_state() and qemu_savevm_live_state() to achieve
->> different process during migration.
->>
->> Besides, we make qemu_loadvm_state_main() and qemu_save_device_state()
->> public.
->>
->> Cc: Juan Quintela <quintela@redhat.com>
->> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
->> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
->> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> ---
->>   include/sysemu/sysemu.h |  6 ++++++
->>   migration/savevm.c      | 55 ++++++++++++++++++++++++++++++++++++++++++-------
->>   2 files changed, 54 insertions(+), 7 deletions(-)
->>
->> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
->> index 7ed665a..95cae41 100644
->> --- a/include/sysemu/sysemu.h
->> +++ b/include/sysemu/sysemu.h
->> @@ -132,7 +132,13 @@ void qemu_savevm_send_postcopy_ram_discard(QEMUFile *f, const char *name,
->>                                              uint64_t *start_list,
->>                                              uint64_t *length_list);
->>   
->> +void qemu_savevm_live_state(QEMUFile *f);
->> +int qemu_save_device_state(QEMUFile *f);
->> +
->>   int qemu_loadvm_state(QEMUFile *f);
->> +int qemu_loadvm_state_begin(QEMUFile *f);
->> +int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
->> +int qemu_load_device_state(QEMUFile *f);
->>   
->>   extern int autostart;
->>   
->> diff --git a/migration/savevm.c b/migration/savevm.c
->> index 9c2d239..dac478b 100644
->> --- a/migration/savevm.c
->> +++ b/migration/savevm.c
->> @@ -54,6 +54,7 @@
->>   #include "qemu/cutils.h"
->>   #include "io/channel-buffer.h"
->>   #include "io/channel-file.h"
->> +#include "migration/colo.h"
->>   
->>   #ifndef ETH_P_RARP
->>   #define ETH_P_RARP 0x8035
->> @@ -1279,13 +1280,21 @@ done:
->>       return ret;
->>   }
->>   
->> -static int qemu_save_device_state(QEMUFile *f)
->> +void qemu_savevm_live_state(QEMUFile *f)
->>   {
->> -    SaveStateEntry *se;
->> +    /* save QEMU_VM_SECTION_END section */
->> +    qemu_savevm_state_complete_precopy(f, true);
->> +    qemu_put_byte(f, QEMU_VM_EOF);
->> +}
->>   
->> -    qemu_put_be32(f, QEMU_VM_FILE_MAGIC);
->> -    qemu_put_be32(f, QEMU_VM_FILE_VERSION);
->> +int qemu_save_device_state(QEMUFile *f)
->> +{
->> +    SaveStateEntry *se;
->>   
->> +    if (!migration_in_colo_state()) {
->> +        qemu_put_be32(f, QEMU_VM_FILE_MAGIC);
->> +        qemu_put_be32(f, QEMU_VM_FILE_VERSION);
->> +    }
-> Note that got split out into qemu_savevm_state_header() at some point.
+On Mon, Apr 10, 2017 at 10:08:21AM +0300, Amarnath Valluri wrote:
+> 
+> 
+> On 07.04.2017 17:41, Daniel P. Berrange wrote:
+> > On Fri, Apr 07, 2017 at 05:30:31PM +0300, Amarnath Valluri wrote:
+> > > This change introduces a new TPM backend driver that can communicate with
+> > > swtpm(software TPM emulator) using unix domain socket interface.
+> > > 
+> > > Swtpm uses two unix sockets, one for plain TPM commands and responses, and one
+> > > for out-of-band control messages.
+> > > 
+> > > The swtpm and associated tools can be found here:
+> > >      https://github.com/stefanberger/swtpm
+> > > 
+> > > Usage:
+> > >      # setup TPM state directory
+> > >      mkdir /tmp/mytpm
+> > >      chown -R tss:root /tmp/mytpm
+> > >      /usr/bin/swtpm_setup --tpm-state /tmp/mytpm --createek
+> > > 
+> > >      # Ask qemu to use TPM emulator with given tpm state directory
+> > >      qemu-system-x86_64 \
+> > >          [...] \
+> > >          -tpmdev emulator,id=tpm0,tpmstatedir=/tmp/mytpm,logfile=/tmp/swtpm.log \
+> > >          -device tpm-tis,tpmdev=tpm0 \
+> > >          [...]
+> > > 
+> > > Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
+> > > ---
+> > >   configure             |  15 +-
+> > >   hmp.c                 |  21 ++
+> > >   hw/tpm/Makefile.objs  |   1 +
+> > >   hw/tpm/tpm_emulator.c | 927 ++++++++++++++++++++++++++++++++++++++++++++++++++
+> > >   hw/tpm/tpm_ioctl.h    | 243 +++++++++++++
+> > >   qapi-schema.json      |  36 +-
+> > >   qemu-options.hx       |  53 ++-
+> > >   tpm.c                 |   2 +-
+> > >   8 files changed, 1289 insertions(+), 9 deletions(-)
+> > >   create mode 100644 hw/tpm/tpm_emulator.c
+> > >   create mode 100644 hw/tpm/tpm_ioctl.h
+> > > +static int tpm_emulator_spawn_emulator(TPMEmulator *tpm_pt)
+> > > +{
+> > > +    int fds[2] = { -1, -1 };
+> > > +    int ctrl_fds[2] = { -1, -1 };
+> > > +    pid_t cpid;
+> > > +
+> > > +    if (!tpm_pt->ops->has_data_path) {
+> > > +        if (socketpair(AF_UNIX, SOCK_SEQPACKET, 0, fds) < 0) {
+> > > +            return -1;
+> > > +        }
+> > > +    }
+> > > +
+> > > +    if (!tpm_pt->ops->has_ctrl_path) {
+> > > +        if (socketpair(AF_UNIX, SOCK_SEQPACKET, 0, ctrl_fds) < 0) {
+> > > +            if (!tpm_pt->ops->has_data_path) {
+> > > +                closesocket(fds[0]);
+> > > +                closesocket(fds[1]);
+> > > +            }
+> > > +            return -1;
+> > > +        }
+> > > +    }
+> > > +
+> > > +    cpid = qemu_fork(NULL);
+> > > +    if (cpid < 0) {
+> > > +        error_report("tpm-emulator: Fork failure: %s", strerror(errno));
+> > > +        if (!tpm_pt->ops->has_data_path) {
+> > > +            closesocket(fds[0]);
+> > > +            closesocket(fds[1]);
+> > > +        }
+> > > +        if (!tpm_pt->ops->has_ctrl_path) {
+> > > +            closesocket(ctrl_fds[0]);
+> > > +            closesocket(ctrl_fds[1]);
+> > > +        }
+> > > +        return -1;
+> > > +    }
+> > > +
+> > > +    if (cpid == 0) { /* CHILD */
+> > > +        enum {
+> > > +            PARAM_PATH,
+> > > +            PARAM_IFACE,
+> > > +            PARAM_SERVER,  PARAM_SERVER_ARGS,
+> > > +            PARAM_CTRL,    PARAM_CTRL_ARGS,
+> > > +            PARAM_STATE,   PARAM_STATE_ARGS,
+> > > +            PARAM_PIDFILE, PARAM_PIDFILE_ARGS,
+> > > +            PARAM_LOG,     PARAM_LOG_ARGS,
+> > > +            PARAM_MAX
+> > > +        };
+> > > +
+> > > +        int i;
+> > > +        int data_fd = -1, ctrl_fd = -1;
+> > > +        char *argv[PARAM_MAX+1];
+> > > +
+> > > +        /* close all unused inherited sockets */
+> > > +        if (fds[0] >= 0)
+> > > +            closesocket(fds[0]);
+> > > +        if (ctrl_fds[0] >= 0)
+> > > +            closesocket(ctrl_fds[0]);
+> > The 'if' checks are pointless - its already guaranteed by the
+> > fact you check socketpair() status.
+> socketpairs might not be created in case of data-path & ctrl-path provided,
+> so i feel these checks are needed.
+> > 
+> > > +        i = STDERR_FILENO + 1;
+> > > +        if (fds[1] >= 0) {
+> > > +            data_fd = dup2(fds[1], i++);
+> > > +            if (data_fd < 0) {
+> > > +                error_report("tpm-emulator: dup2() failure - %s",
+> > > +                             strerror(errno));
+> > > +                goto exit_child;
+> > > +            }
+> > > +        }
+> > > +        if (ctrl_fds[1] >= 0) {
+> > > +            ctrl_fd = dup2(ctrl_fds[1], i++);
+> > > +            if (ctrl_fd < 0) {
+> > > +                error_report("tpm-emulator: dup2() failure - %s",
+> > > +                             strerror(errno));
+> > > +                goto exit_child;
+> > > +            }
+> > > +        }
+> > > +        for ( ; i < _SC_OPEN_MAX; i++) {
+> > Errr, _SC_OPEN_MAX is not the maximum number of FDs - it is parameter to
+> > use with sysconf() to query the number of files - you must call sysconf().
+> Ya, thanks for educating me, i will change this.
+> > 
+> > > +            closesocket(i);
+> > close, not closesocket - you can't assume these are all sockets.
+> Does this change makes any difference, as per include/sysemu/os-posix.h,
+> closesocket() is define as close(), and this backend is targeted only for
+> "Linux" targets. Please let me know if i am missing something.
 
-Do you mean i should use the wrapper qemu_savevm_state_heade() here ?
+Using closesocket() is misleading even if it does happen to call close()
+on Linux.
 
-> Dave
->
->>       cpu_synchronize_all_states();
->>   
->>       QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
->> @@ -1336,8 +1345,6 @@ enum LoadVMExitCodes {
->>       LOADVM_QUIT     =  1,
->>   };
->>   
->> -static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
->> -
->>   /* ------ incoming postcopy messages ------ */
->>   /* 'advise' arrives before any transfers just to tell us that a postcopy
->>    * *might* happen - it might be skipped if precopy transferred everything
->> @@ -1942,7 +1949,7 @@ qemu_loadvm_section_part_end(QEMUFile *f, MigrationIncomingState *mis)
->>       return 0;
->>   }
->>   
->> -static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
->> +int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
->>   {
->>       uint8_t section_type;
->>       int ret = 0;
->> @@ -2080,6 +2087,40 @@ int qemu_loadvm_state(QEMUFile *f)
->>       return ret;
->>   }
->>   
->> +int qemu_loadvm_state_begin(QEMUFile *f)
->> +{
->> +    MigrationIncomingState *mis = migration_incoming_get_current();
->> +    Error *local_err = NULL;
->> +    int ret;
->> +
->> +    if (qemu_savevm_state_blocked(&local_err)) {
->> +        error_report_err(local_err);
->> +        return -EINVAL;
->> +    }
->> +    /* Load QEMU_VM_SECTION_START section */
->> +    ret = qemu_loadvm_state_main(f, mis);
->> +    if (ret < 0) {
->> +        error_report("Failed to loadvm begin work: %d", ret);
->> +    }
->> +    return ret;
->> +}
->> +
->> +int qemu_load_device_state(QEMUFile *f)
->> +{
->> +    MigrationIncomingState *mis = migration_incoming_get_current();
->> +    int ret;
->> +
->> +    /* Load QEMU_VM_SECTION_FULL section */
->> +    ret = qemu_loadvm_state_main(f, mis);
->> +    if (ret < 0) {
->> +        error_report("Failed to load device state: %d", ret);
->> +        return ret;
->> +    }
->> +
->> +    cpu_synchronize_all_post_init();
->> +    return 0;
->> +}
->> +
->>   int save_vmstate(Monitor *mon, const char *name)
->>   {
->>       BlockDriverState *bs, *bs1;
->> -- 
->> 1.8.3.1
->>
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
-> .
->
+
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
