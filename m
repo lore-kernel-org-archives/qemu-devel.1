@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38605)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cxb4B-0003V4-S1
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:17:20 -0400
+	(envelope-from <eblake@redhat.com>) id 1cxbEy-0005Qs-Us
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:28:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cxb4A-00063l-LZ
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:17:19 -0400
-References: <20170410075451.21329-1-famz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <24011a9e-eab2-60b4-48a2-0e5ec1f4cf12@redhat.com>
-Date: Mon, 10 Apr 2017 17:17:07 +0200
+	(envelope-from <eblake@redhat.com>) id 1cxbEu-0002NM-BB
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:28:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39378)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cxbEu-0002Mu-4U
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:28:24 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 017A880F8D
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 15:28:23 +0000 (UTC)
+References: <20170410142112.11550-1-marcandre.lureau@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <01d19d9a-b809-c300-bc83-ffe344175cea@redhat.com>
+Date: Mon, 10 Apr 2017 10:28:14 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170410075451.21329-1-famz@redhat.com>
+In-Reply-To: <20170410142112.11550-1-marcandre.lureau@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="2nNGhEuqlEEw4sH1Cgvqv6f2svrM2tmio"
-Subject: Re: [Qemu-devel] [PATCH for-2.9] iscsi: Fix iscsi_create
+	boundary="lDsLq0evFutUkwDBQ5NLUh4UvNAQ5ENQQ"
+Subject: Re: [Qemu-devel] [PATCH] test-keyval: fix leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,93 +33,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Kevin Wolf <kwolf@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2nNGhEuqlEEw4sH1Cgvqv6f2svrM2tmio
-From: Max Reitz <mreitz@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org,
- Peter Lieven <pl@kamp.de>, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <24011a9e-eab2-60b4-48a2-0e5ec1f4cf12@redhat.com>
-Subject: Re: [PATCH for-2.9] iscsi: Fix iscsi_create
-References: <20170410075451.21329-1-famz@redhat.com>
-In-Reply-To: <20170410075451.21329-1-famz@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
+--lDsLq0evFutUkwDBQ5NLUh4UvNAQ5ENQQ
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: armbru@redhat.com
+Message-ID: <01d19d9a-b809-c300-bc83-ffe344175cea@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] test-keyval: fix leaks
+References: <20170410142112.11550-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20170410142112.11550-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 10.04.2017 09:54, Fam Zheng wrote:
-> Since d5895fcb (iscsi: Split URL into individual options), creating
-> qcow2 image on an iscsi LUN fails:
->=20
->     qemu-img create -f qcow2 iscsi://$SERVER/$IQN/0 1G
->     qemu-img: iscsi://$SERVER/$IQN/0: Could not create image: Invalid
->         argument
->=20
-> The problem is iscsi_open now expects that transport_name, portal and
-> target are already parsed into structured options by
-> iscsi_parse_filename, but it is not called in iscsi_create.
->=20
-> Signed-off-by: Fam Zheng <famz@redhat.com>
+On 04/10/2017 09:21 AM, Marc-Andr=C3=A9 Lureau wrote:
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->  block/iscsi.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
->=20
-> diff --git a/block/iscsi.c b/block/iscsi.c
-> index 716e74a..07596b5 100644
-> --- a/block/iscsi.c
-> +++ b/block/iscsi.c
-> @@ -2092,6 +2092,7 @@ static int iscsi_create(const char *filename, Qem=
-uOpts *opts, Error **errp)
->      BlockDriverState *bs;
->      IscsiLun *iscsilun =3D NULL;
->      QDict *bs_options;
-> +    Error *local_err =3D NULL;
-> =20
->      bs =3D bdrv_new();
-> =20
-> @@ -2103,7 +2104,13 @@ static int iscsi_create(const char *filename, Qe=
-muOpts *opts, Error **errp)
-> =20
->      bs_options =3D qdict_new();
->      qdict_put(bs_options, "filename", qstring_from_str(filename));
+>  tests/test-keyval.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 
-Doesn't the below change make this qdict_put() superfluous?
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Max
+Leaks in the testsuite are not showstoppers, so I'm okay if we defer it
+to 2.10 to minimize churn now that we are late in hard freeze.
 
-> -    ret =3D iscsi_open(bs, bs_options, 0, NULL);
-> +    iscsi_parse_filename(filename, bs_options, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        ret =3D -EINVAL;
-> +    } else {
-> +        ret =3D iscsi_open(bs, bs_options, 0, NULL);
-> +    }
->      QDECREF(bs_options);
-> =20
->      if (ret !=3D 0) {
->=20
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-
---2nNGhEuqlEEw4sH1Cgvqv6f2svrM2tmio
+--lDsLq0evFutUkwDBQ5NLUh4UvNAQ5ENQQ
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljrofMSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AvekH/30OPTT9mThknBxybO2R7JZI7Ft4G1oB
-ssQ/zR43hNFwvpgTAnZkWRgqEIT/pLsgzaYxG+GRK96N8WtuI7Dc9uAWkMWYxmun
-qeKihEoWcDG0651gx+A4V2USweasY2Qyf3lSOVKijq7YL7q5v3Tp9VBV5iY7tYOx
-WSJT/EK2NAUGwsSs8jEIojyLxC6eORy0dKF4h8/vs16KgxGb8RdctSXUN/K0F/3W
-9OauTsYn+3Lc6rlrpXvMVN99cIc7O65wox/aQpO8t8IV5ytsb8/s9sd1RmW08xsO
-UUs9zHNuvE2iMfP+WWwRsMn6QeKox43tqeRThgApR4VY/jYbjlz16zA=
-=EhSS
+iQEcBAEBCAAGBQJY66SOAAoJEKeha0olJ0Nqn8QH/0+0qvLoZhAMbNvshKqrvVpY
+OqXs4BvcTsh/3RGkIpTOnMdQzmTchCTxnnezfAhZ0TXVeakG9A9J8cg+EwIPPpPf
+LZT5d3itMXuacLSuvodCjtagkpocVbokm4tB//Ma5uyWODddaT6njNvrSrytUEKc
+KsY9vfdRbUrRdrrlYqCukGC/SI4G/SSdU9ffgyYkbD+Ud2M8UkWS6IGPOEc5GX+e
+XIDoxn0d8Bqjud7Y+ZICGZTgdsEzC3t6nLRhcakwJTY1aflU3eZUIKkzAvVHhxry
+OZQeAdGctJNgRsTluaQjAGrpKgNbIb98pfpjSu/+y7EO8a+q3YcVlgHp0L3d5Sk=
+=Wqcn
 -----END PGP SIGNATURE-----
 
---2nNGhEuqlEEw4sH1Cgvqv6f2svrM2tmio--
+--lDsLq0evFutUkwDBQ5NLUh4UvNAQ5ENQQ--
