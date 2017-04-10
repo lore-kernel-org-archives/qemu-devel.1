@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39123)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cxhBw-0006Ug-Hi
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 17:49:45 -0400
+	(envelope-from <groug@kaod.org>) id 1cxhZ8-0000S8-NY
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 18:13:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cxhBv-0006qQ-P9
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 17:49:44 -0400
-References: <1486979689-230770-1-git-send-email-vsementsov@virtuozzo.com>
-	<1486979689-230770-16-git-send-email-vsementsov@virtuozzo.com>
-	<20170216134830.GB28784@lemon.lan>
-	<a6e7cad6-3c9f-1276-baca-1fceb5db7e8f@virtuozzo.com>
-	<20170217122141.GD3468@lemon.lan>
-	<4fbb78a1-a486-3031-1666-6f586a5d4ab9@virtuozzo.com>
-	<20170217140537.GA15819@lemon.lan> <20170217195133.GB20911@work-vm>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <051f049e-a063-3392-4c39-e4aefbfdc2a0@redhat.com>
-Date: Mon, 10 Apr 2017 17:49:30 -0400
+	(envelope-from <groug@kaod.org>) id 1cxhZ5-00085i-H8
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 18:13:42 -0400
+Received: from 3.mo68.mail-out.ovh.net ([46.105.58.60]:35996)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cxhZ5-00084a-A6
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 18:13:39 -0400
+Received: from player737.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 5A12E49CD6
+	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 00:13:34 +0200 (CEST)
+Date: Tue, 11 Apr 2017 00:13:22 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170411001322.5925a3bb@bahia.lan>
+In-Reply-To: <3b38d5f9-3611-6ec8-df14-a6054d574dc2@twiddle.net>
+References: <20170410060655.32289-1-nikunj@linux.vnet.ibm.com>
+	<fc0b737f-738a-1bc2-1b94-aa041ab8ae6c@twiddle.net>
+	<CAFEAcA95xYVh6fwjNJ6QaXgwXsqH_zYMANfkdEUh7OkZ22aqRQ@mail.gmail.com>
+	<20170410194414.7f829fee@bahia.lan>
+	<3b38d5f9-3611-6ec8-df14-a6054d574dc2@twiddle.net>
 MIME-Version: 1.0
-In-Reply-To: <20170217195133.GB20911@work-vm>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 15/17] iotests: add default node-name
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/.oondsCnmnH0YrLVbFWDLr=";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH fix for-2.9] cpus: fix wrong define name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +34,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, lirans@il.ibm.com, quintela@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com, jdenemar@redhat.com
+To: Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
+
+--Sig_/.oondsCnmnH0YrLVbFWDLr=
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, 10 Apr 2017 10:49:12 -0700
+Richard Henderson <rth@twiddle.net> wrote:
+
+> On 04/10/2017 10:44 AM, Greg Kurz wrote:
+> > On Mon, 10 Apr 2017 18:29:57 +0100
+> > Peter Maydell <peter.maydell@linaro.org> wrote:
+> > =20
+> >> On 10 April 2017 at 18:26, Richard Henderson <rth@twiddle.net> wrote: =
+=20
+> >>> On 04/09/2017 11:06 PM, Nikunj A Dadhania wrote: =20
+> >>>> --- a/cpus.c
+> >>>> +++ b/cpus.c
+> >>>> @@ -202,7 +202,7 @@ void qemu_tcg_configure(QemuOpts *opts, Error **=
+errp)
+> >>>>              } else if (use_icount) {
+> >>>>                  error_setg(errp, "No MTTCG when icount is enabled");
+> >>>>              } else {
+> >>>> -#ifndef TARGET_SUPPORT_MTTCG
+> >>>> +#ifndef TARGET_SUPPORTS_MTTCG =20
+> >>>
+> >>>
+> >>> This sort of thing is why glibc moved to using -Wundef.
+> >>>
+> >>> It would be a huge amount of work to convert our existing sources, bu=
+t it
+> >>> would probably pay off in the long run. =20
+> >>
+> >> We already build with -Wundef...
+> >> =20
+> >
+> > From the gcc info page:
+> >
+> > '-Wundef'
+> >      Warn if an undefined identifier is evaluated in an '#if' directive.
+> >
+> > and BTW, isn't the purpose of #ifndef precisely to detect that the
+> > identifier is undefined ? =20
+>=20
+> Yes, but it also has the typo problem above, whereas
+>=20
+>    #if !TARGET_SUPPORTS_MTTCG
+>=20
+> plus -Wundef would have caught that error.
+>=20
+
+Turning such #ifdef/#ifndef to #if/#if ! would indeed make sense, but
+we'd still have to be careful that every new addition follows the rule.
+
+>=20
+> r~
 
 
+--Sig_/.oondsCnmnH0YrLVbFWDLr=
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-On 02/17/2017 02:51 PM, Dr. David Alan Gilbert wrote:
-> * Fam Zheng (famz@redhat.com) wrote:
->> On Fri, 02/17 16:36, Vladimir Sementsov-Ogievskiy wrote:
->>> 17.02.2017 15:21, Fam Zheng wrote:
->>>> On Fri, 02/17 13:20, Vladimir Sementsov-Ogievskiy wrote:
->>>>> 16.02.2017 16:48, Fam Zheng wrote:
->>>>>> On Mon, 02/13 12:54, Vladimir Sementsov-Ogievskiy wrote:
->>>>>>> When testing migration, auto-generated by qemu node-names differs in
->>>>>>> source and destination qemu and migration fails. After this patch,
->>>>>>> auto-generated by iotest nodenames will be the same.
->>>>>> What should be done in libvirt to make sure the node-names are matching
->>>>>> correctly at both sides?
->>>>> Hmm, just set node names appropriately?
->>>> But I think the problem is that node names are not configurable from libvirt
->>>> today, and then the migration will fail. Should the device name take precedence
->>>> in the code, to make it easier?
->>>
->>> libvirt can use same parameters as I in this patch..
->>
->> If I'm not mistaken, libvirt can be patched to explicitly set the same node
->> names in the QEMU command line, but that is some extra work to do there. My
->> point is if device names are used during migration, when available, this patch
->> and the libvirt change is not necessary.
-> 
-> Always best to check with libvirt guys to see what makes sense for them;
-> ccing in jdenemar.
-> 
-> Dave
-> 
->> Fam
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-Sorry for the necromancy, looks like discussion died here. Vladimir,
-what's plans?
+iEYEARECAAYFAljsA4IACgkQAvw66wEB28KvsgCglglbb75Ol9EkU2QJJdJj6bBI
+pWgAn29Zwy8WpxXGVr81X3b5MwhA6te/
+=L1Se
+-----END PGP SIGNATURE-----
 
---js
+--Sig_/.oondsCnmnH0YrLVbFWDLr=--
