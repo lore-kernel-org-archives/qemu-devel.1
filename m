@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cxWol-0001XC-FR
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:45:08 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1cxWoj-0001Uq-JA
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:45:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cxWok-00086Q-N6
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:45:07 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1cxWoi-00085I-JS
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:45:05 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Apr 2017 11:39:47 +0100
-Message-Id: <1491820793-5348-2-git-send-email-peter.maydell@linaro.org>
+Date: Mon, 10 Apr 2017 11:39:49 +0100
+Message-Id: <1491820793-5348-4-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1491820793-5348-1-git-send-email-peter.maydell@linaro.org>
 References: <1491820793-5348-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 1/7] arm: Don't implement BXJ on M-profile CPUs
+Subject: [Qemu-devel] [PATCH 3/7] arm: Factor out "generate right kind of
+ step exception"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,32 +23,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>
 
-For M-profile CPUs, the BXJ instruction does not exist at all, and
-the encoding should always UNDEF. We were accidentally implementing
-it to behave like A-profile BXJ; correct the error.
+We currently have two places that do:
+            if (dc->ss_active) {
+                gen_step_complete_exception(dc);
+            } else {
+                gen_exception_internal(EXCP_DEBUG);
+            }
+
+Factor this out into its own function, as we're about to add
+a third place that needs the same logic.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ target/arm/translate.c | 28 ++++++++++++++++------------
+ 1 file changed, 16 insertions(+), 12 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index e32e38c..fe3f442 100644
+index ddc62b6..870e320 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -10485,7 +10485,12 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
-                         }
-                         break;
-                     case 4: /* bxj */
--                        /* Trivial implementation equivalent to bx.  */
-+                        /* Trivial implementation equivalent to bx.
-+                         * This instruction doesn't exist at all for M-profile.
-+                         */
-+                        if (arm_dc_feature(s, ARM_FEATURE_M)) {
-+                            goto illegal_op;
-+                        }
-                         tmp = load_reg(s, rn);
-                         gen_bx(s, tmp);
-                         break;
+@@ -296,6 +296,19 @@ static void gen_step_complete_exception(DisasContext *s)
+     s->is_jmp = DISAS_EXC;
+ }
+ 
++static void gen_singlestep_exception(DisasContext *s)
++{
++    /* Generate the right kind of exception for singlestep, which is
++     * either the architectural singlestep or EXCP_DEBUG for QEMU's
++     * gdb singlestepping.
++     */
++    if (s->ss_active) {
++        gen_step_complete_exception(s);
++    } else {
++        gen_exception_internal(EXCP_DEBUG);
++    }
++}
++
+ static void gen_smul_dual(TCGv_i32 a, TCGv_i32 b)
+ {
+     TCGv_i32 tmp1 = tcg_temp_new_i32();
+@@ -11998,24 +12011,15 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
+             gen_set_pc_im(dc, dc->pc);
+             /* fall through */
+         default:
+-            if (dc->ss_active) {
+-                gen_step_complete_exception(dc);
+-            } else {
+-                /* FIXME: Single stepping a WFI insn will not halt
+-                   the CPU.  */
+-                gen_exception_internal(EXCP_DEBUG);
+-            }
++            /* FIXME: Single stepping a WFI insn will not halt the CPU. */
++            gen_singlestep_exception(dc);
+         }
+         if (dc->condjmp) {
+             /* "Condition failed" instruction codepath. */
+             gen_set_label(dc->condlabel);
+             gen_set_condexec(dc);
+             gen_set_pc_im(dc, dc->pc);
+-            if (dc->ss_active) {
+-                gen_step_complete_exception(dc);
+-            } else {
+-                gen_exception_internal(EXCP_DEBUG);
+-            }
++            gen_singlestep_exception(dc);
+         }
+     } else {
+         /* While branches must always occur at the end of an IT block,
 -- 
 2.7.4
