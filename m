@@ -1,41 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cxS7T-0003mF-4m
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 01:44:08 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1cxSNI-00074v-LS
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 02:00:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cxS7Q-0002xZ-1R
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 01:44:07 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53902
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cxS7P-0002xE-RQ
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 01:44:03 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3A5heaX113377
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 01:44:02 -0400
-Received: from e23smtp02.au.ibm.com (e23smtp02.au.ibm.com [202.81.31.144])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 29qykysdjj-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 01:44:01 -0400
-Received: from localhost
-	by e23smtp02.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Mon, 10 Apr 2017 15:43:59 +1000
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <871st1wt9q.fsf@linaro.org>
-References: <20170407060752.31313-1-nikunj@linux.vnet.ibm.com>
-	<20170408065107.GG27571@umbus>
-	<AM5P194MB01292723DDB978AC78F8FDD7C80E0@AM5P194MB0129.EURP194.PROD.OUTLOOK.COM>
-	<871st1wt9q.fsf@linaro.org>
-Date: Mon, 10 Apr 2017 11:13:01 +0530
+	(envelope-from <dgibson@ozlabs.org>) id 1cxSNE-0006ws-EJ
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 02:00:28 -0400
+Date: Mon, 10 Apr 2017 15:59:51 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170410055951.GR27571@umbus>
+References: <1491396106-26376-1-git-send-email-clg@kaod.org>
+	<1491396106-26376-20-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <87r310rf6i.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 0/3] Enable MTTCG on PPC64
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="1GSL5ZULXUIqbbH1"
+Content-Disposition: inline
+In-Reply-To: <1491396106-26376-20-git-send-email-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 19/21] pci: Don't call pci_irq_handler()
+ for a negative intx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,30 +25,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, luigi burdo <intermediadc@hotmail.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "programmingkidx@gmail.com" <programmingkidx@gmail.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, "bharata@linux.vnet.ibm.com" <bharata@linux.vnet.ibm.com>, "rth@twiddle.net" <rth@twiddle.net>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
 
-> luigi burdo <intermediadc@hotmail.com> writes:
->
->> Hi David and Nikuji,
->>
->> can i suggest to remove the message:
->>
->>
->> Guest not yet converted to MTTCG - you may get unexpected results
->> where the mttcg is enabled?
->
-> Have you declared the memory ordering for the guest?
+--1GSL5ZULXUIqbbH1
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-No, I havent done that yet, will send a patch.
+On Wed, Apr 05, 2017 at 02:41:44PM +0200, C=E9dric Le Goater wrote:
+> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+>=20
+> Under some circumstances, pci_intx() can return -1 (when the interrupt
+> pin in the config space is 0 which normally means no interrupt).
+>=20
+> I have seen cases of pci_set_irq() being called on such devices, in
+> turn causing pci_irq_handler() to be called with "-1" as an argument
+> which doesn't seem like a terribly good idea.
+>=20
+> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> [clg: updated for qemu-2.9 ]
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
->> another thing im finding  is this message
->> Guest expects a stronger memory ordering than the host provides
->> This may cause strange/hard to debug errors
->
-> See ca759f9e387db87e1719911f019bc60c74be9ed8 for an example.
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
-Regards
-Nikunj
+This looks like a real bug fix which should go to Michael independent
+of the rest of the series.
+
+> ---
+>  hw/pci/pci.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 817ad14ed987..bfd65461348c 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -1419,7 +1419,9 @@ qemu_irq pci_allocate_irq(PCIDevice *pci_dev)
+>  void pci_set_irq(PCIDevice *pci_dev, int level)
+>  {
+>      int intx =3D pci_intx(pci_dev);
+> -    pci_irq_handler(pci_dev, intx, level);
+> +    if (intx >=3D 0) {
+> +        pci_irq_handler(pci_dev, intx, level);
+> +    }
+>  }
+> =20
+>  /* Special hooks used by device assignment */
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--1GSL5ZULXUIqbbH1
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJY6x9VAAoJEGw4ysog2bOSAdsP/jaxKNnSnHA63KkbE44EP952
+WRuC2GFaIQVSHnst6724fRR0YpLdwPjshrO8G9Trw2JgtOaNf3lwhIGuuppDyZK9
+kIh5lo1GB8SLZuUWUaVwgBVKANugvTOZPMFwSCpw/gFG43Et+x8/Bf6QgxSs76JO
+4HnI6GZkY2WckZnfQpFg82CR7+Eez4FqfNH6HBNHdGsr/lIaWSGoRTCoZwuf9IID
+gwkLTKRGbCxVZTlis2U6DG/gYogjzZcs+oelvtqwuPJi6nx1ZcBn5zmo2rPyKSEx
+xZYKqGTwNHqA4Jt5kwOkbTCqFoIabAZSJTHnQMgNLx7O+v+phLQAYhAYHw9Eaxt6
+3lXsfvsAnyGhugs1yz/Gytm5P71Ppgjt22WwY6BIqOG3LxoWpRT1hRHe2WwEaccU
+/iuoO7burgMWZAU9lGxJXWO3Wl9/1BEF0DLhU5pps6KXkgePS7LI5ZTWh7nqLU0T
+SruC9/CrclKcK0pnmRjKuIvk2cQchPc3xgOprvGvEw18SDy9iBLFrKpXak03G2rf
+3UaeF4yb/bmgvNmcMF5cYF8GjgXGRQ24SGyfi0dFoux+nagshS5Sa53U9kdIfBqb
+Yp2XFKbZRiN94PFOfdAAvZW9t474WUpvvYZoXC2eg3gSmyTV8cHF9lMClkSG8s+W
+Zadpq2hInjywbiwODKSS
+=I6y3
+-----END PGP SIGNATURE-----
+
+--1GSL5ZULXUIqbbH1--
