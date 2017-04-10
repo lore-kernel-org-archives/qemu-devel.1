@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cxOOC-0000Ja-1k
-	for qemu-devel@nongnu.org; Sun, 09 Apr 2017 21:45:08 -0400
+	(envelope-from <famz@redhat.com>) id 1cxOQn-0001j9-El
+	for qemu-devel@nongnu.org; Sun, 09 Apr 2017 21:47:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cxOOB-0006Xn-0u
-	for qemu-devel@nongnu.org; Sun, 09 Apr 2017 21:45:08 -0400
-Date: Mon, 10 Apr 2017 09:44:55 +0800
+	(envelope-from <famz@redhat.com>) id 1cxOQm-0007uT-8O
+	for qemu-devel@nongnu.org; Sun, 09 Apr 2017 21:47:49 -0400
+Date: Mon, 10 Apr 2017 09:47:36 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170410014455.GB15038@lemon>
-References: <1491741460-10308-1-git-send-email-lidongchen@tencent.com>
-	<20170410005142.GA14050@lemon>
-	<CAOGPPbdkQnTU66wpFcuF7oF4_LcUUED2z7aaBZwMNLjqpLLdGQ@mail.gmail.com>
+Message-ID: <20170410014736.GC15038@lemon>
+References: <1491554685-1288-1-git-send-email-lidongchen@tencent.com>
+	<20170407101038.GB16233@lemon>
+	<CAOGPPbcLi5vdOEd9ph2-3=b6pezdZ1JAoUgvFf-6Ka-EDqD+vw@mail.gmail.com>
+	<CAOGPPbdA9mBXb8pSmYFuSR-MGU--=nbxJCBpJ4EJc-p50dCAtw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAOGPPbdkQnTU66wpFcuF7oF4_LcUUED2z7aaBZwMNLjqpLLdGQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v3] migration/block: use blk_pwrite_zeroes
+In-Reply-To: <CAOGPPbdA9mBXb8pSmYFuSR-MGU--=nbxJCBpJ4EJc-p50dCAtw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2] migration/block: use blk_pwrite_zeroes
  for each zero cluster
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -26,22 +27,137 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: 858585 jemmy <jemmy858585@gmail.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Lidong Chen <lidongchen@tencent.com>
+Cc: qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Lidong Chen <lidongchen@tencent.com>
 
-On Mon, 04/10 09:10, 858585 jemmy wrote:
-> >> +                        if (ret < 0) {
-> >> +                            g_free(buf);
-> >> +                            return ret;
-> >> +                        }
+On Sat, 04/08 21:29, 858585 jemmy wrote:
+> On Sat, Apr 8, 2017 at 12:52 PM, 858585 jemmy <jemmy858585@gmail.com> wrote:
+> > On Fri, Apr 7, 2017 at 6:10 PM, Fam Zheng <famz@redhat.com> wrote:
+> >> On Fri, 04/07 16:44, jemmy858585@gmail.com wrote:
+> >>> From: Lidong Chen <lidongchen@tencent.com>
+> >>>
+> >>> BLOCK_SIZE is (1 << 20), qcow2 cluster size is 65536 by default,
+> >>> this maybe cause the qcow2 file size is bigger after migration.
+> >>> This patch check each cluster, use blk_pwrite_zeroes for each
+> >>> zero cluster.
+> >>>
+> >>> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+> >>> ---
+> >>>  migration/block.c | 37 +++++++++++++++++++++++++++++++++++--
+> >>>  1 file changed, 35 insertions(+), 2 deletions(-)
+> >>>
+> >>> diff --git a/migration/block.c b/migration/block.c
+> >>> index 7734ff7..c32e046 100644
+> >>> --- a/migration/block.c
+> >>> +++ b/migration/block.c
+> >>> @@ -885,6 +885,11 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
+> >>>      int64_t total_sectors = 0;
+> >>>      int nr_sectors;
+> >>>      int ret;
+> >>> +    int i;
+> >>> +    int64_t addr_offset;
+> >>> +    uint8_t *buf_offset;
+> >>
+> >> Poor variable names, they are not offset, maybe "cur_addr" and "cur_buf"? And
+> >> they can be moved to the loop block below.
+> > ok, i will change.
 > >
-> > This if block is not necessary because...
+> >>
+> >>> +    BlockDriverInfo bdi;
+> >>> +    int cluster_size;
+> >>>
+> >>>      do {
+> >>>          addr = qemu_get_be64(f);
+> >>> @@ -934,8 +939,36 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
+> >>>              } else {
+> >>>                  buf = g_malloc(BLOCK_SIZE);
+> >>>                  qemu_get_buffer(f, buf, BLOCK_SIZE);
+> >>> -                ret = blk_pwrite(blk, addr * BDRV_SECTOR_SIZE, buf,
+> >>> -                                 nr_sectors * BDRV_SECTOR_SIZE, 0);
+> >>> +
+> >>> +                ret = bdrv_get_info(blk_bs(blk), &bdi);
+> >>> +                cluster_size = bdi.cluster_size;
+> >>> +
+> >>> +                if (ret == 0 && cluster_size > 0 &&
+> >>> +                    cluster_size < BLOCK_SIZE &&
+> >>
+> >> I think cluster_size == BLOCK_SIZE should work too.
+> > This case the (flags & BLK_MIG_FLAG_ZERO_BLOCK) should be true,
+> > and will invoke blk_pwrite_zeroes before apply this patch.
+> > but maybe the source qemu maybe not enabled zero flag.
+> > so i think cluster_size <= BLOCK_SIZE is ok.
+> >
+> >>
+> >>> +                    BLOCK_SIZE % cluster_size == 0) {
+> >>> +                    for (i = 0; i < BLOCK_SIZE / cluster_size; i++) {
+> >>> +                        addr_offset = addr * BDRV_SECTOR_SIZE
+> >>> +                                        + i * cluster_size;
+> >>> +                        buf_offset = buf + i * cluster_size;
+> >>> +
+> >>> +                        if (buffer_is_zero(buf_offset, cluster_size)) {
+> >>> +                            ret = blk_pwrite_zeroes(blk, addr_offset,
+> >>> +                                                    cluster_size,
+> >>> +                                                    BDRV_REQ_MAY_UNMAP);
+> >>> +                        } else {
+> >>> +                             ret = blk_pwrite(blk, addr_offset, buf_offset,
+> >>> +                                              cluster_size, 0);
+> >>> +                        }
+> >>> +
+> >>> +                        if (ret < 0) {
+> >>> +                            g_free(buf);
+> >>> +                            return ret;
+> >>> +                        }
+> >>> +                    }
+> >>> +                } else {
+> >>> +                    ret = blk_pwrite(blk, addr * BDRV_SECTOR_SIZE, buf,
+> >>> +                                     nr_sectors * BDRV_SECTOR_SIZE, 0);
+> >>> +                }
+> >>>                  g_free(buf);
+> >>>              }
+> >>>
+> >>> --
+> >>> 1.8.3.1
+> >>>
+> >>
+> >> Is it possible use (source) cluster size as the transfer chunk size, instead of
+> >> BDRV_SECTORS_PER_DIRTY_CHUNK? Then the existing BLK_MIG_FLAG_ZERO_BLOCK logic
+> >> can help and you don't need to send zero bytes on the wire. This may still not
+> >> be optimal if dest has larger cluster, but it should cover the common use case
+> >> well.
+> >
+> > yes, i also think BDRV_SECTORS_PER_DIRTY_CHUNK is too large.
+> > This have two disadvantage:
+> > 1. it will cause the dest qcow2 file size is bigger after migration.
+> > 2. it will cause transfer not necessary data, and maybe cause the
+> > migration can't be successful.
+> >
+> > in my production environment, some vm only write 2MB/s, the dirty
+> > block migrate speed is 70MB/s.
+> > but it still migration timeout.
+> >
+> > but if we change the size of BDRV_SECTORS_PER_DIRTY_CHUNK, it will
+> > break the protocol.
+> > the old version qemu will not be able to migrate to new version qemu.
+> > there are not information about the length about the migration buffer.
+> >
+> > so i think we should add new flags to indicate that there are an
+> > additional byte about the length
+> > of migration buffer. i will send another patch later, and test the result.
 > 
 > Hi Fam:
->       It's necessary to check each cluster is written successfully.
->       if we remove this if block, it maybe ignore some error, and only check
->       the last cluster.
->       Thanks.
+> Do we need consider the circumstances than migrate from new qemu version
+> to old qemu version?
 
-Yes, I missed the fact it is in the loop body. My bad. Thanks for pointint out:
+Yes, usually we use a subsection to achieve that - missing the "chunk size"
+field should result in using the old BDRV_SECTORS_PER_DIRTY_CHUNK value.
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+Fam
+
+> 
+> >
+> > this patch is also valuable, there are many old version qemu in my
+> > production environment.
+> > and will be benefit with this patch.
+> >
+> >>
+> >> Fam
+> 
