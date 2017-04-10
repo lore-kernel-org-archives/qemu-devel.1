@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cxUua-0001P6-TI
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:43:02 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1cxUwa-0002O6-I6
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:45:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cxUua-00039W-3e
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:43:00 -0400
-Date: Mon, 10 Apr 2017 10:42:50 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170410084250.GC4883@noname.redhat.com>
-References: <20170406150148.zwjpozqtale44jfh@perseus.local>
-	<d60ea1f9-ae2c-6625-90de-944cbb490f85@redhat.com>
+	(envelope-from <edgar.iglesias@gmail.com>) id 1cxUwZ-0003n7-Jh
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:45:04 -0400
+Date: Mon, 10 Apr 2017 10:44:56 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Message-ID: <20170410084456.GB19103@toto>
+References: <1491486152-24304-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="SLDf9lqlvOQaIe6s"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d60ea1f9-ae2c-6625-90de-944cbb490f85@redhat.com>
-Subject: Re: [Qemu-devel] [RFC] Proposed qcow2 extension: subcluster
- allocation
+In-Reply-To: <1491486152-24304-1-git-send-email-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Add assertion about FSC format
+ for syndrome registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +23,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, patches@linaro.org
+
+On Thu, Apr 06, 2017 at 02:42:32PM +0100, Peter Maydell wrote:
+> In tlb_fill() we construct a syndrome register value from a
+> fault status register value which is filled in by arm_tlb_fill().
+> arm_tlb_fill() returns FSR values which might be in the format
+> used with short-format page descriptors, or the format used
+> with long-format (LPAE) descriptors. The syndrome register
+> always uses LPAE-format FSR status codes.
+> 
+> It isn't actually possible to end up delivering a syndrome
+> register value to the guest for a fault which is reported
+> with a short-format FSR (that kind of stage 1 fault will only
+> happen for an AArch32 translation regime which doesn't have
+> a syndrome register, and can never be redirected to an AArch64
+> or Hyp exception level). Add an assertion which checks this,
+> and adjust the code so that we construct a syndrome with
+> an invalid status code, rather than allowing set bits in
+> the FSR input to randomly corrupt other fields in the syndrome.
 
 
---SLDf9lqlvOQaIe6s
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+BTW,
 
-Am 07.04.2017 um 19:10 hat Max Reitz geschrieben:
-> One case I'd be especially interested in are of course 4 kB subclusters
-> for 64 kB clusters (because 4 kB is a usual page size and can be
-> configured to be the block size of a guest device; and because 64 kB
-> simply is the standard cluster size of qcow2 images nowadays[1]...).
+Have you seen something suspicous when running code or was
+this a theoretical issue?
 
-Why should the current default cluster size be an argument for anything?
-64k is a tradeoff between small COW size and large allocation
-granularity that seemed to work well (and it used to be the maximum
-cluster size originally, so it seemed safer than 128k).
+Cheers,
+Edgar
 
-With subclusters, we have a completely different situation and need to
-find a new default that works best. I'm relatively sure that 64k are too
-small under the new conditions.
-
-Also, undefined reference: [1] (I was hoping to find a better argument
-there...)
-
-Kevin
-
---SLDf9lqlvOQaIe6s
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJY60WKAAoJEH8JsnLIjy/WLpcQAJZh7SaLlh98FTPKons1V3OK
-9WiwW+iA3TK8UDOuGmYotNQlf+MmnX5E4MOMvdFV0sIzAtMK3NsIv/RLdVT5L91T
-nCA96z3qi6RQCFPJKzt2VHjCk9KX8+vJXAGicG8CsWobAKMi9CXkOEhhrw17+5HB
-G4apWk0/EMutji8u/q4yX2m0ZwpPNy8tPCpDvvID7EIZv1kpPKBewk5zkkdQv+K0
-XeCKQ0V3ZH44TMVY2iFOBeKGUl8/CcdImK3sFTMTYs0UMjZVkGY7P/t5RLf+4O4a
-F7P3y8OGVLnOd+N8rXzoVeBVFRIZJwef0yGpnGBCmymOrNALf5Gm0IiOfEOlkcCZ
-nDAZ8D2kC1hq3xfV3fidJ8avNBnzpXdz0sWD4QS4FOYr2bAkCSpf22eUr7vrMmOG
-2YkuxzoGc96MpXaTYaXjliJvO1UpSTVoIH6FC2Mr3UeXPks4LMtbDOn5P9taHhM2
-u7P+tcrPXBEFFFI6TYPBloYBeBeFvc/VdNs9yN3ZSExyIp42KnhrreekCWzsR2VD
-xz27J1oElqcKCdydC+WLPuc6hqz0DFLYLQ2xKM/z6fQURM8QZhyLFtUhLAcCUaiZ
-T2k/PPCis8BxQVyGzXF8QHdZKcLKdQ/aON5RdO9+uWzhMK1TkX2oNhK42SfmYrPi
-FqVm6Os5r6Mblu5INefQ
-=iWEy
------END PGP SIGNATURE-----
-
---SLDf9lqlvOQaIe6s--
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> It took me a little while to convince myself that you'd
+> never take a short-format FSR to a using-syndrome EL :-)
+> ---
+>  target/arm/op_helper.c | 23 ++++++++++++++++++-----
+>  1 file changed, 18 insertions(+), 5 deletions(-)
+> 
+> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+> index d64c867..156b825 100644
+> --- a/target/arm/op_helper.c
+> +++ b/target/arm/op_helper.c
+> @@ -130,7 +130,7 @@ void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType access_type,
+>      if (unlikely(ret)) {
+>          ARMCPU *cpu = ARM_CPU(cs);
+>          CPUARMState *env = &cpu->env;
+> -        uint32_t syn, exc;
+> +        uint32_t syn, exc, fsc;
+>          unsigned int target_el;
+>          bool same_el;
+>  
+> @@ -145,19 +145,32 @@ void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType access_type,
+>              env->cp15.hpfar_el2 = extract64(fi.s2addr, 12, 47) << 4;
+>          }
+>          same_el = arm_current_el(env) == target_el;
+> -        /* AArch64 syndrome does not have an LPAE bit */
+> -        syn = fsr & ~(1 << 9);
+> +
+> +        if (fsr & (1 << 9)) {
+> +            /* LPAE format fault status register : bottom 6 bits are
+> +             * status code in the same form as needed for syndrome
+> +             */
+> +            fsc = extract32(fsr, 0, 6);
+> +        } else {
+> +            /* Short format FSR : this fault will never actually be reported
+> +             * to an EL that uses a syndrome register. Check that here,
+> +             * and use a (currently) reserved FSR code in case the constructed
+> +             * syndrome does leak into the guest somehow.
+> +             */
+> +            assert(target_el != 2 && !arm_el_is_aa64(env, target_el));
+> +            fsc = 0x3f;
+> +        }
+>  
+>          /* For insn and data aborts we assume there is no instruction syndrome
+>           * information; this is always true for exceptions reported to EL1.
+>           */
+>          if (access_type == MMU_INST_FETCH) {
+> -            syn = syn_insn_abort(same_el, 0, fi.s1ptw, syn);
+> +            syn = syn_insn_abort(same_el, 0, fi.s1ptw, fsc);
+>              exc = EXCP_PREFETCH_ABORT;
+>          } else {
+>              syn = merge_syn_data_abort(env->exception.syndrome, target_el,
+>                                         same_el, fi.s1ptw,
+> -                                       access_type == MMU_DATA_STORE, syn);
+> +                                       access_type == MMU_DATA_STORE, fsc);
+>              if (access_type == MMU_DATA_STORE
+>                  && arm_feature(env, ARM_FEATURE_V6)) {
+>                  fsr |= (1 << 11);
+> -- 
+> 2.7.4
+> 
+> 
