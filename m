@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54301)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <herbie.robinson@stratus.com>) id 1cxbmU-0007c8-QP
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 12:03:07 -0400
+	(envelope-from <stefanha@redhat.com>) id 1cxbns-0008W9-CV
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 12:04:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <herbie.robinson@stratus.com>) id 1cxbmR-0005ZD-OJ
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 12:03:06 -0400
-Received: from us-smtp-delivery-131.mimecast.com ([216.205.24.131]:21305)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <herbie.robinson@stratus.com>)
-	id 1cxbmR-0005Yu-HI
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 12:03:03 -0400
-From: "Robinson, Herbie" <Herbie.Robinson@stratus.com>
-Date: Mon, 10 Apr 2017 16:02:54 +0000
-Message-ID: <BN3PR0801MB0898A85B6C3C2E2AF9984C1BE6010@BN3PR0801MB0898.namprd08.prod.outlook.com>
-Content-Language: en-US
+	(envelope-from <stefanha@redhat.com>) id 1cxbnr-0005yV-Ie
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 12:04:32 -0400
+Date: Mon, 10 Apr 2017 17:04:17 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170410160417.GH3214@stefanha-x1.localdomain>
+References: <20170410022636.29925-1-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-Subject: [Qemu-devel] ping RE: [PATCH v3] SGABIOS: fix wrong video attrs for
- int 10h, ah==13h
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="l06SQqiZYCi8rTKz"
+Content-Disposition: inline
+In-Reply-To: <20170410022636.29925-1-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/2] block: Quiesce old aio context
+ during bdrv_set_aio_context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,37 +24,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>, Laurent Vivier <lvivier@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-aHR0cDovL3BhdGNod29yay5vemxhYnMub3JnL3BhdGNoLzczNzQ0Ni8NCg0KDQotLS0tLU9yaWdp
-bmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogTGF1cmVudCBWaXZpZXIgW21haWx0bzpsdml2aWVyQHJl
-ZGhhdC5jb21dIA0KU2VudDogRnJpZGF5LCBNYXJjaCAxMCwgMjAxNyAyOjEwIFBNDQpUbzogUm9i
-aW5zb24sIEhlcmJpZSA8SGVyYmllLlJvYmluc29uQHN0cmF0dXMuY29tPjsgcWVtdS1kZXZlbEBu
-b25nbnUub3JnDQpDYzogcWVtdS10cml2aWFsQG5vbmdudS5vcmcNClN1YmplY3Q6IFJlOiBbUEFU
-Q0ggdjNdIFNHQUJJT1M6IGZpeCB3cm9uZyB2aWRlbyBhdHRycyBmb3IgaW50IDEwaCwgYWg9PTEz
-aA0KDQpPbiAxMC8wMy8yMDE3IDE2OjU0LCBIZXJiaWUgUm9iaW5zb24gd3JvdGU6DQo+IEZpeCBC
-dWcgIzE2NzA1MDk6IHdyb25nIHZpZGVvIGF0dHJzIGZvciBpbnQgMTBoLCBhaD09MTNoIFRoZSAN
-Cj4gc3Vicm91dGluZSBzZXRfY3Vyc29yX3Bvc2l0aW9uIGlzIHRyYXNoaW5nICVieC4NCj4gVW5m
-b3J0dW5hdGVseSwgJWJsIGNvbnRhaW5zIHRoZSB2aWRlbyBhdHRyaWJ1dGUgZm9yIHdyaXRlX3N0
-cmluZy4NCj4gDQo+IFRoZSBmaXggc2F2ZXMgJWJ4IGluIHRoZSBmdW5jdGlvbiBwcm9sb2cgYW5k
-IHJlc3RvcmVzIGl0IGluIHRoZSANCj4gZXBpbG9nLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogSGVy
-YmllIFJvYmluc29uIDxIZXJiaWUuUm9iaW5zb25Ac3RyYXR1cy5jb20+DQoNClJldmlld2VkLWJ5
-OiBMYXVyZW50IFZpdmllciA8bHZpdmllckByZWRoYXQuY29tPg0KDQoNCj4gLS0tDQo+IFJlbW92
-ZWQgaW5jb3JyZWN0IGNvZGUgZGVsZXRpb25zIGZyb20gc2V0X2N1cnJlbnRfY3Vyc29yLg0KPiBS
-ZW1vdmVkIGV4cGxhbmF0aW9uIG9mIHNhbWUgZnJvbSB0aGUgY29tbWl0IG1lc3NhZ2UuDQo+IA0K
-PiBCVFcsIEkgZGlkbid0IHNlZSBhbnkgdGVzdCBjYXNlcyBmb3IgdGhpcyBjb2RlLCBidXQgaWYg
-dGhleSBleGlzdCBhbmQgDQo+IHNvbWVib2R5IHBvaW50cyBtZSBhdCB0aGVtLCBJIHNob3VsZCBi
-ZSBhYmxlIHRvIGdlbmVyYXRlIGEgdmVyeSBzbWFsbCANCj4gcWNvdzIgZmlsZSB0aGF0IGRlbW9u
-c3RyYXRlcyB0aGUgcHJvYmxlbS4NCj4gDQo+ICBzZ2FiaW9zLlMgfCAyICsrDQo+ICAxIGZpbGUg
-Y2hhbmdlZCwgMiBpbnNlcnRpb25zKCspDQo+IA0KPiBkaWZmIC0tZ2l0IGEvc2dhYmlvcy5TIGIv
-c2dhYmlvcy5TDQo+IGluZGV4IDI3NWQwNjMuLjk2YzRlMjMgMTAwNjQ0DQo+IC0tLSBhL3NnYWJp
-b3MuUw0KPiArKysgYi9zZ2FiaW9zLlMNCj4gQEAgLTE3MjgsNiArMTcyOCw3IEBAIHdyaXRlX3N0
-cmluZ190YWlsOg0KPiAgDQo+ICBzZXRfY3Vyc29yX3Bvc2l0aW9uOg0KPiAgICBwdXNodyAlYXgN
-Cj4gKyAgcHVzaHcgJWJ4DQo+ICAgIHB1c2h3ICVkcw0KPiAgICBwdXNodyAkQkRBX1NFRw0KPiAg
-ICBwb3B3ICVkcyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgLyogZHMgPSAweDQwICovDQo+
-IEBAIC0xNzM4LDYgKzE3MzksNyBAQCBzZXRfY3Vyc29yX3Bvc2l0aW9uOg0KPiAgICBtb3Z3ICVh
-eCwgJWJ4ICAgICAgICAgICAgICAgICAgICAgICAgLyogYnggPSBjdXJzb3Igc2F2ZSBvZmZzZXQg
-Ki8NCj4gICAgbW92dyAlZHgsICglYngpICAgICAgICAgICAgICAgICAgICAgIC8qIHNhdmUgbmV3
-IGN1cnNvciB2YWx1ZSAqLw0KPiAgICBwb3B3ICVkcw0KPiArICBwb3B3ICVieA0KPiAgICBwb3B3
-ICVheA0KPiAgICByZXQNCj4gIA0KPiANCg0K
+
+--l06SQqiZYCi8rTKz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Apr 10, 2017 at 10:26:34AM +0800, Fam Zheng wrote:
+> v3: Use bdrv_parent_drained_begin/end. [Kevin]
+>     Do it before releasing new_context. [Stefan]
+>=20
+> Fam Zheng (2):
+>   block: Make bdrv_parent_drained_begin/end public
+>   block: Quiesce old aio context during bdrv_set_aio_context
+>=20
+>  block.c               |  7 +++++--
+>  block/io.c            |  4 ++--
+>  include/block/block.h | 16 ++++++++++++++++
+>  3 files changed, 23 insertions(+), 4 deletions(-)
+
+Thanks, applied to my block tree for 2.10:
+https://github.com/stefanha/qemu/commits/block
+
+If you'd like this in a stable release please CC qemu-stable.
+
+Stefan
+
+--l06SQqiZYCi8rTKz
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJY660BAAoJEJykq7OBq3PIkKMIAJPmuLNTxra8XoWK28cfpsgV
+zAkmCASU1LWGK3X7bUvb8duLcJ3Hf74cgHW00AaFa8sBFvpzdiQAzILrrPNPWoGq
+6A2ZiYcVDATT0/O9LVJiISvz2KqGu1aXjiMZFBbNCY8wQ6hjeYeUMme4TsQClkgR
+7tRdWUbWrG/XLAAxi7FKWC8WrqYwk8smfShuShmSSnHs2+LGcBQY+q+VHVGhcHC9
+KQ44fScl+aivRU31WWL7+MtqZlEKARDrL3h1jgOgejyEKli+hOLyIvQRnhY41GCw
+6CpI+grs8yr4jMjFII6tTeRj9cjt+F4quk89jcPMxHCzhcjhpeS4Zymc489PiEs=
+=SrZx
+-----END PGP SIGNATURE-----
+
+--l06SQqiZYCi8rTKz--
