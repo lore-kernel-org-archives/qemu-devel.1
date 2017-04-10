@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cxbpE-0001BA-Il
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 12:05:57 -0400
+	(envelope-from <bounces@canonical.com>) id 1cxZP7-0000NR-6j
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 09:30:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cxbpD-0006QP-Lb
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 12:05:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35716)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1cxbpD-0006Q1-GA
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 12:05:55 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8D433C05974D
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 16:05:54 +0000 (UTC)
-References: <20170323173928.14439-1-pbonzini@redhat.com>
-	<20170323173928.14439-6-pbonzini@redhat.com>
-	<48253fa9-d5eb-f750-6dfc-e478bfd85277@redhat.com>
-	<a9195765-0f0b-7aac-a403-9dc4ebd376f4@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <271d6d98-55f6-3a32-f8c1-b60a901e21ff@redhat.com>
-Date: Mon, 10 Apr 2017 12:05:53 -0400
+	(envelope-from <bounces@canonical.com>) id 1cxZP3-00013w-Ve
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 09:30:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38198)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cxZP3-00013R-PO
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 09:30:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cxZP2-0005nN-Gw
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 13:30:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5E8D22E80C0
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 13:30:44 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <a9195765-0f0b-7aac-a403-9dc4ebd376f4@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 05/10] blockjob: separate monitor and
- blockjob APIs
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 10 Apr 2017 13:23:46 -0000
+From: =?utf-8?b?TWljaGHFgiBLxJlwaWXFhA==?= <launchpad@kempniu.pl>
+Reply-To: Bug 1681439 <1681439@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170410132346.31250.84835.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1681439] [NEW] qemu-system-x86_64:
+ hw/ide/core.c:685: ide_cancel_dma_sync: Assertion `s->bus->dma->aiocb ==
+ NULL' failed.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,34 +37,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: jcody@redhat.com
+To: qemu-devel@nongnu.org
 
+Public bug reported:
 
+Since upgrading to QEMU 2.8.0, my Windows 7 64-bit virtual machines
+started crashing due to the assertion quoted in the summary failing.
+The assertion in question was added by commit 9972354856 ("block: add
+BDS field to count in-flight requests").  My tests show that setting
+discard=3Dunmap is needed to reproduce the issue.  Speaking of
+reproduction, it is a bit flaky, because I have been unable to come up
+with specific instructions that would allow the issue to be triggered
+outside of my environment, but I do have a semi-sane way of testing that
+appears to depend on a specific initial state of data on the underlying
+storage volume, actions taken within the VM and waiting for about 20
+minutes.
 
-On 04/08/2017 05:52 AM, Paolo Bonzini wrote:
-> 
-> 
-> On 08/04/2017 08:03, John Snow wrote:
->> Looks clean, though it may be useful to do a few more things;
->>
->> - Demarcate what you think is the monitor API in this file
-> 
-> It's already there:
-> 
-> +/*
-> + * API for block job drivers and the block layer.
-> + */
-> +
-> 
-> where everything before is for the monitor.
-> 
+Here is the shortest QEMU command line that I managed to reproduce the
+bug with:
 
-I meant explicitly, with a comment at the top explaining the demarcation.
+    qemu-system-x86_64 \
+        -machine pc-i440fx-2.7,accel=3Dkvm \
+        -m 3072 \
+        -drive file=3D/dev/lvm/qemu,format=3Draw,if=3Dide,discard=3Dunmap \
+	-netdev tap,id=3Dhostnet0,ifname=3Dtap0,script=3Dno,downscript=3Dno,vhost=
+=3Don \
+        -device virtio-net-pci,netdev=3Dhostnet0 \
+	-vnc :0
 
->> - Organize blockjob.h to match to serve as a useful reference.
-> 
-> Hmm, yes.
-> 
-> Paolo
-> 
+The underlying storage (/dev/lvm/qemu) is a thin LVM snapshot.
+
+QEMU was compiled using:
+
+    ./configure --python=3D/usr/bin/python2.7 --target-list=3Dx86_64-softmmu
+    make -j3
+
+My virtualization environment is not really a critical one and
+reproduction is not that much of a hassle, so if you need me to gather
+further diagnostic information or test patches, I will be happy to help.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1681439
+
+Title:
+  qemu-system-x86_64: hw/ide/core.c:685: ide_cancel_dma_sync: Assertion
+  `s->bus->dma->aiocb =3D=3D NULL' failed.
+
+Status in QEMU:
+  New
+
+Bug description:
+  Since upgrading to QEMU 2.8.0, my Windows 7 64-bit virtual machines
+  started crashing due to the assertion quoted in the summary failing.
+  The assertion in question was added by commit 9972354856 ("block: add
+  BDS field to count in-flight requests").  My tests show that setting
+  discard=3Dunmap is needed to reproduce the issue.  Speaking of
+  reproduction, it is a bit flaky, because I have been unable to come up
+  with specific instructions that would allow the issue to be triggered
+  outside of my environment, but I do have a semi-sane way of testing that
+  appears to depend on a specific initial state of data on the underlying
+  storage volume, actions taken within the VM and waiting for about 20
+  minutes.
+
+  Here is the shortest QEMU command line that I managed to reproduce the
+  bug with:
+
+      qemu-system-x86_64 \
+          -machine pc-i440fx-2.7,accel=3Dkvm \
+          -m 3072 \
+          -drive file=3D/dev/lvm/qemu,format=3Draw,if=3Dide,discard=3Dunmap=
+ \
+  	-netdev tap,id=3Dhostnet0,ifname=3Dtap0,script=3Dno,downscript=3Dno,vhos=
+t=3Don \
+          -device virtio-net-pci,netdev=3Dhostnet0 \
+  	-vnc :0
+
+  The underlying storage (/dev/lvm/qemu) is a thin LVM snapshot.
+
+  QEMU was compiled using:
+
+      ./configure --python=3D/usr/bin/python2.7 --target-list=3Dx86_64-soft=
+mmu
+      make -j3
+
+  My virtualization environment is not really a critical one and
+  reproduction is not that much of a hassle, so if you need me to gather
+  further diagnostic information or test patches, I will be happy to help.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1681439/+subscriptions
