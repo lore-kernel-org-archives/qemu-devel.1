@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cxbns-0008W9-CV
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 12:04:33 -0400
+	(envelope-from <jsnow@redhat.com>) id 1cxboA-0000Jr-Sv
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 12:04:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cxbnr-0005yV-Ie
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 12:04:32 -0400
-Date: Mon, 10 Apr 2017 17:04:17 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170410160417.GH3214@stefanha-x1.localdomain>
-References: <20170410022636.29925-1-famz@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1cxboA-00064O-0N
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 12:04:50 -0400
+References: <cover.1491597120.git.jcody@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <34fe2331-2471-81bc-60f7-247fb81b55d3@redhat.com>
+Date: Mon, 10 Apr 2017 12:04:35 -0400
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="l06SQqiZYCi8rTKz"
-Content-Disposition: inline
-In-Reply-To: <20170410022636.29925-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/2] block: Quiesce old aio context
- during bdrv_set_aio_context
+In-Reply-To: <cover.1491597120.git.jcody@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 0/8] RBD reopen,
+ read_only cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,47 +23,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
 
 
---l06SQqiZYCi8rTKz
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 10, 2017 at 10:26:34AM +0800, Fam Zheng wrote:
-> v3: Use bdrv_parent_drained_begin/end. [Kevin]
->     Do it before releasing new_context. [Stefan]
->=20
-> Fam Zheng (2):
->   block: Make bdrv_parent_drained_begin/end public
->   block: Quiesce old aio context during bdrv_set_aio_context
->=20
->  block.c               |  7 +++++--
->  block/io.c            |  4 ++--
->  include/block/block.h | 16 ++++++++++++++++
->  3 files changed, 23 insertions(+), 4 deletions(-)
+On 04/07/2017 04:55 PM, Jeff Cody wrote:
+> Changes from v1:
+> 
+> Patch 2: Has v1 patch 8 (do not blindly xset bs->read_only) squashed into it
+>          (thanks Stefan)
+>          COW -> "copy-on-read" (Thanks John)
+>          Drop unneeded call in vvfat, and bypass enable_write_target (Stefan)
+> 
+> Patch 5: Rename bdrv_try_... to bdrv_can_set_read_only() (Thanks John, Stefan)
+> 
+> Patch 6: Use "reopen_state->flags" not "reopen_state->bs->open_flags"
+>          (Thanks John)
+> 
+> 
+> 
+> This series does two things:
+> 
+> 1.) Cleans up some of the logic behind setting the read_only flag
+>     for a BDS in the block layer, so that it is done consistently
+>     (and rules are applied consistently), and
+> 
+> 2.) Adds .bdrv_reopen_prepare() implementation for RBD, so that block
+>     jobs can be run on backing chains that have rbd protocol nodes.
+> 
+> Jeff Cody (8):
+>   block: add bdrv_set_read_only() helper function
+>   block: do not set BDS read_only if copy_on_read enabled
+>   block: honor BDRV_O_ALLOW_RDWR when clearing bs->read_only
+>   block: code movement
+>   block: introduce bdrv_can_set_read_only()
+>   block: use bdrv_can_set_read_only() during reopen
+>   block/rbd - update variable names to more apt names
+>   block/rbd: Add support for reopen()
+> 
+>  block.c               | 56 +++++++++++++++++++++++++++++++++++---------
+>  block/bochs.c         |  5 +++-
+>  block/cloop.c         |  5 +++-
+>  block/dmg.c           |  6 ++++-
+>  block/rbd.c           | 65 +++++++++++++++++++++++++++++++++++++--------------
+>  block/vvfat.c         | 19 +++++++++++----
+>  include/block/block.h |  2 ++
+>  7 files changed, 123 insertions(+), 35 deletions(-)
+> 
 
-Thanks, applied to my block tree for 2.10:
-https://github.com/stefanha/qemu/commits/block
-
-If you'd like this in a stable release please CC qemu-stable.
-
-Stefan
-
---l06SQqiZYCi8rTKz
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJY660BAAoJEJykq7OBq3PIkKMIAJPmuLNTxra8XoWK28cfpsgV
-zAkmCASU1LWGK3X7bUvb8duLcJ3Hf74cgHW00AaFa8sBFvpzdiQAzILrrPNPWoGq
-6A2ZiYcVDATT0/O9LVJiISvz2KqGu1aXjiMZFBbNCY8wQ6hjeYeUMme4TsQClkgR
-7tRdWUbWrG/XLAAxi7FKWC8WrqYwk8smfShuShmSSnHs2+LGcBQY+q+VHVGhcHC9
-KQ44fScl+aivRU31WWL7+MtqZlEKARDrL3h1jgOgejyEKli+hOLyIvQRnhY41GCw
-6CpI+grs8yr4jMjFII6tTeRj9cjt+F4quk89jcPMxHCzhcjhpeS4Zymc489PiEs=
-=SrZx
------END PGP SIGNATURE-----
-
---l06SQqiZYCi8rTKz--
+Reviewed-by: John Snow <jsnow@redhat.com>
