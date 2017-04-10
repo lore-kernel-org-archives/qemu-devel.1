@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37201)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1cxOYa-0002g5-Oc
-	for qemu-devel@nongnu.org; Sun, 09 Apr 2017 21:55:54 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1cxOez-0003su-9b
+	for qemu-devel@nongnu.org; Sun, 09 Apr 2017 22:02:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1cxOYX-0003Gd-JJ
-	for qemu-devel@nongnu.org; Sun, 09 Apr 2017 21:55:52 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:39515)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1cxOYV-0003F7-R3
-	for qemu-devel@nongnu.org; Sun, 09 Apr 2017 21:55:49 -0400
-Date: Mon, 10 Apr 2017 09:55:42 +0800 (CST)
-Message-ID: <201704100955427186216@zte.com.cn>
-References: 1491614183-4580-1-git-send-email-wang.guang55@zte.com.cn,
-	62d3af82-73cf-25b0-b476-d2391090629e@redhat.com,
-	201704100905183392545@zte.com.cn
-Mime-Version: 1.0
-From: <lu.zhipeng@zte.com.cn>
-Content-Type: multipart/related;
-	boundary="=====_002_next====="
-Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiDovazlj5E6IFJlOiAgW1BBVENIXSB2?=
- =?utf-8?q?host=3A_skip_RAM_device_memory_sections?=
+	(envelope-from <jemmy858585@gmail.com>) id 1cxOey-00075a-2z
+	for qemu-devel@nongnu.org; Sun, 09 Apr 2017 22:02:29 -0400
+MIME-Version: 1.0
+In-Reply-To: <20170410014736.GC15038@lemon>
+References: <1491554685-1288-1-git-send-email-lidongchen@tencent.com>
+	<20170407101038.GB16233@lemon>
+	<CAOGPPbcLi5vdOEd9ph2-3=b6pezdZ1JAoUgvFf-6Ka-EDqD+vw@mail.gmail.com>
+	<CAOGPPbdA9mBXb8pSmYFuSR-MGU--=nbxJCBpJ4EJc-p50dCAtw@mail.gmail.com>
+	<20170410014736.GC15038@lemon>
+From: 858585 jemmy <jemmy858585@gmail.com>
+Date: Mon, 10 Apr 2017 10:02:23 +0800
+Message-ID: <CAOGPPbfhOb81ncmu72gn84b1uj51Nx=Tf_0bim5yzUDu4_7zyA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2] migration/block: use blk_pwrite_zeroes
+ for each zero cluster
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,223 +26,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: yang.bin18@zte.com.cn, wang.guang55@zte.com.cn, qemu-devel@nongnu.org, mst@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Lidong Chen <lidongchen@tencent.com>
 
+On Mon, Apr 10, 2017 at 9:47 AM, Fam Zheng <famz@redhat.com> wrote:
+> On Sat, 04/08 21:29, 858585 jemmy wrote:
+>> On Sat, Apr 8, 2017 at 12:52 PM, 858585 jemmy <jemmy858585@gmail.com> wrote:
+>> > On Fri, Apr 7, 2017 at 6:10 PM, Fam Zheng <famz@redhat.com> wrote:
+>> >> On Fri, 04/07 16:44, jemmy858585@gmail.com wrote:
+>> >>> From: Lidong Chen <lidongchen@tencent.com>
+>> >>>
+>> >>> BLOCK_SIZE is (1 << 20), qcow2 cluster size is 65536 by default,
+>> >>> this maybe cause the qcow2 file size is bigger after migration.
+>> >>> This patch check each cluster, use blk_pwrite_zeroes for each
+>> >>> zero cluster.
+>> >>>
+>> >>> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+>> >>> ---
+>> >>>  migration/block.c | 37 +++++++++++++++++++++++++++++++++++--
+>> >>>  1 file changed, 35 insertions(+), 2 deletions(-)
+>> >>>
+>> >>> diff --git a/migration/block.c b/migration/block.c
+>> >>> index 7734ff7..c32e046 100644
+>> >>> --- a/migration/block.c
+>> >>> +++ b/migration/block.c
+>> >>> @@ -885,6 +885,11 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
+>> >>>      int64_t total_sectors = 0;
+>> >>>      int nr_sectors;
+>> >>>      int ret;
+>> >>> +    int i;
+>> >>> +    int64_t addr_offset;
+>> >>> +    uint8_t *buf_offset;
+>> >>
+>> >> Poor variable names, they are not offset, maybe "cur_addr" and "cur_buf"? And
+>> >> they can be moved to the loop block below.
+>> > ok, i will change.
+>> >
+>> >>
+>> >>> +    BlockDriverInfo bdi;
+>> >>> +    int cluster_size;
+>> >>>
+>> >>>      do {
+>> >>>          addr = qemu_get_be64(f);
+>> >>> @@ -934,8 +939,36 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
+>> >>>              } else {
+>> >>>                  buf = g_malloc(BLOCK_SIZE);
+>> >>>                  qemu_get_buffer(f, buf, BLOCK_SIZE);
+>> >>> -                ret = blk_pwrite(blk, addr * BDRV_SECTOR_SIZE, buf,
+>> >>> -                                 nr_sectors * BDRV_SECTOR_SIZE, 0);
+>> >>> +
+>> >>> +                ret = bdrv_get_info(blk_bs(blk), &bdi);
+>> >>> +                cluster_size = bdi.cluster_size;
+>> >>> +
+>> >>> +                if (ret == 0 && cluster_size > 0 &&
+>> >>> +                    cluster_size < BLOCK_SIZE &&
+>> >>
+>> >> I think cluster_size == BLOCK_SIZE should work too.
+>> > This case the (flags & BLK_MIG_FLAG_ZERO_BLOCK) should be true,
+>> > and will invoke blk_pwrite_zeroes before apply this patch.
+>> > but maybe the source qemu maybe not enabled zero flag.
+>> > so i think cluster_size <= BLOCK_SIZE is ok.
+>> >
+>> >>
+>> >>> +                    BLOCK_SIZE % cluster_size == 0) {
+>> >>> +                    for (i = 0; i < BLOCK_SIZE / cluster_size; i++) {
+>> >>> +                        addr_offset = addr * BDRV_SECTOR_SIZE
+>> >>> +                                        + i * cluster_size;
+>> >>> +                        buf_offset = buf + i * cluster_size;
+>> >>> +
+>> >>> +                        if (buffer_is_zero(buf_offset, cluster_size)) {
+>> >>> +                            ret = blk_pwrite_zeroes(blk, addr_offset,
+>> >>> +                                                    cluster_size,
+>> >>> +                                                    BDRV_REQ_MAY_UNMAP);
+>> >>> +                        } else {
+>> >>> +                             ret = blk_pwrite(blk, addr_offset, buf_offset,
+>> >>> +                                              cluster_size, 0);
+>> >>> +                        }
+>> >>> +
+>> >>> +                        if (ret < 0) {
+>> >>> +                            g_free(buf);
+>> >>> +                            return ret;
+>> >>> +                        }
+>> >>> +                    }
+>> >>> +                } else {
+>> >>> +                    ret = blk_pwrite(blk, addr * BDRV_SECTOR_SIZE, buf,
+>> >>> +                                     nr_sectors * BDRV_SECTOR_SIZE, 0);
+>> >>> +                }
+>> >>>                  g_free(buf);
+>> >>>              }
+>> >>>
+>> >>> --
+>> >>> 1.8.3.1
+>> >>>
+>> >>
+>> >> Is it possible use (source) cluster size as the transfer chunk size, instead of
+>> >> BDRV_SECTORS_PER_DIRTY_CHUNK? Then the existing BLK_MIG_FLAG_ZERO_BLOCK logic
+>> >> can help and you don't need to send zero bytes on the wire. This may still not
+>> >> be optimal if dest has larger cluster, but it should cover the common use case
+>> >> well.
+>> >
+>> > yes, i also think BDRV_SECTORS_PER_DIRTY_CHUNK is too large.
+>> > This have two disadvantage:
+>> > 1. it will cause the dest qcow2 file size is bigger after migration.
+>> > 2. it will cause transfer not necessary data, and maybe cause the
+>> > migration can't be successful.
+>> >
+>> > in my production environment, some vm only write 2MB/s, the dirty
+>> > block migrate speed is 70MB/s.
+>> > but it still migration timeout.
+>> >
+>> > but if we change the size of BDRV_SECTORS_PER_DIRTY_CHUNK, it will
+>> > break the protocol.
+>> > the old version qemu will not be able to migrate to new version qemu.
+>> > there are not information about the length about the migration buffer.
+>> >
+>> > so i think we should add new flags to indicate that there are an
+>> > additional byte about the length
+>> > of migration buffer. i will send another patch later, and test the result.
+>>
+>> Hi Fam:
+>> Do we need consider the circumstances than migrate from new qemu version
+>> to old qemu version?
+>
+> Yes, usually we use a subsection to achieve that - missing the "chunk size"
+> field should result in using the old BDRV_SECTORS_PER_DIRTY_CHUNK value.
 
---=====_002_next=====
-Content-Transfer-Encoding: base64 
-Content-Type: text/plain;
-	charset="UTF-8"
+ok, i will develop a prototype firstly, and send out the performance
+test result later.
 
-aSdtIHNvcnJ5IO+8jGl0IHNob3VsZCBiZSBtZW1vcnlfcmVnaW9uX2lzX3JhbV9kZXZpY2UgaW4g
-IG5ldyAgdmVyc2lvbiBxZW11ICwgbWVtb3J5X3JlZ2lvbl9pc19za2lwX2R1bXAgaXMgaW4gb2xk
-ZXIgdmVyc2lvbiBxZW11Lg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQroiqblv5fmnIsgbHV6
-aGlwZW5nDQoNCg0KDQoNCg0KDQpJVOW8gOWPkeW3peeoi+W4iCBJVCBEZXZlbG9wbWVudApFbmdp
-bmVlcg0K5pON5L2c57O757uf5Lqn5ZOB6YOoL+S4reW/g+eglOeptumZoi/ns7vnu5/kuqflk4Eg
-T1MgUHJvZHVjdCBEZXB0Li9DZW50cmFsIFLvvIZEIEluc3RpdHV0ZS9TeXN0ZW0gUHJvZHVjdA0K
-DQoNCg0KDQoNCg0KDQoNCg0K5Zub5bed55yB5oiQ6YO95biC5aSp5bqc5aSn6YGT5Lit5q61ODAw
-5Y+3DQpFOiBsdS56aGlwZW5nQHp0ZS5jb20uY24gDQp3d3cuenRlLmNvbS5jbg0KDQoNCg0KDQoN
-Cg0K5Y6f5aeL6YKu5Lu2DQoNCg0KDQrlj5Hku7bkurrvvJrnjovlub8xMDE2NTk5Mg0K5pS25Lu2
-5Lq677ya6Iqm5b+X5pyLMTAxMDgyNzINCuaKhOmAgeS6uu+8muadqOaWjDEwMDgwNzQ3DQrml6Ug
-5pyfIO+8mjIwMTflubQwNOaciDEw5pelIDA5OjA1DQrkuLsg6aKYIO+8mui9rOWPkTogUmU6IFtR
-ZW11LWRldmVsXSBbUEFUQ0hdIHZob3N0OiBza2lwIFJBTSBkZXZpY2UgbWVtb3J5IHNlY3Rpb25z
-DQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoN
-Cg0K5Y+R5Lu25Lq677yaIO+8nHBib256aW5pQHJlZGhhdC5jb23vvJ4NCuaUtuS7tuS6uu+8mueO
-i+W5vzEwMTY1OTkyIO+8nG1zdEByZWRoYXQuY29t77yeDQrmioTpgIHkurrvvJroiqblv5fmnIsx
-MDEwODI3MiDvvJxxZW11LWRldmVsQG5vbmdudS5vcmfvvJ4NCuaXpSDmnJ8g77yaMjAxN+W5tDA0
-5pyIMDjml6UgMDE6MjQNCuS4uyDpopgg77yaUmU6IFtRZW11LWRldmVsXSBbUEFUQ0hdIHZob3N0
-OiBza2lwIFJBTSBkZXZpY2UgbWVtb3J5IHNlY3Rpb25zDQoNCg0KDQoNCg0KDQoNCk9uIDA4LzA0
-LzIwMTcgMDk6MTYsIFdhbmcgZ3Vhbmcgd3JvdGU6DQrvvJ4gRnJvbTogWmhpUGVuZyBMdSDvvJxs
-dS56aGlwZW5nQHp0ZS5jb20uY27vvJ4NCu+8niANCu+8niBBIFJBTSBkZXZpY2UgcmVwcmVzZW50
-cyBhIG1hcHBpbmcgdG8gYSBwaHlzaWNhbCBkZXZpY2UsIHN1Y2ggYXMgdG8gYSBQQ0kNCu+8niAq
-IE1NSU8gQkFSIG9mIGFuIHZmaW8tcGNpIGFzc2lnbmVkIGRldmljZS4NCu+8niBWaG9zdCBsaXN0
-ZW5zIHRvIHRoaXMgcmVnaW9uLGFuZCBpbmNyZWFzZXMgdGhlIHJlZ2lvbidzIHJlZmVyZW5jZSBj
-b3VudA0K77yeIHdoaWxlIHBhc3N0aHJvdWdoP2Zvcj9uZXR3b3JrIGFkYXB0ZXJzIChQaHlzaWNh
-bCBGdW5jdGlvbiwgUEYgb3IgVmlydHVhbCBGdW5jdGlvbiwgVkYpLg0K77yeIEFmdGVyIGRldGFj
-aGluZyAgIG5ldHdvcmsgYWRhcHRlcnMgd2l0aCAgdmhvc3QgYmFja2VuZCBkaXJ2ZXIgb3Igdmhv
-c3QgdXNlciBkaXJ2ZXIsDQrvvJ4gaXQgdW5yZWdpc3RlciB2aG9zdCBsaXN0ZW4gZnVuY3Rpb24g
-IGJ5IG1lbW9yeV9saXN0ZW5lcl91bnJlZ2lzdGVyLg0K77yeIEFmdGVyIGRldGFjaGluZyB0aGUg
-cGFzc3Rocm91Z2ggcGYgIG9yIHZmLA0K77yeIHRoZSBSQU0gZGV2aWNlIHJlZ2lvbidzIHJlZmVy
-ZW5jZSBieSAgdmhvc3QgbGlzdGVuZXIgaW5jcmVhdGVkIGNhbiBub3QgYmUgcmVsZWFzZWQsDQrv
-vJ4gZHVlIHRvIHZob3N0IGxpc3RlbiBmdW5jdGlvbiBkb2VzIG5vdCBleGlzdC5TbyBsZXQncyBq
-dXN0IHNraXAgUkFNIGRldmljZSBtZW1vcnkuDQrvvJ4gDQrvvJ4gU2lnbmVkLW9mZi1ieTogWmhp
-UGVuZyBMdSDvvJxsdS56aGlwZW5nQHp0ZS5jb20uY27vvJ4NCu+8niAtLS0NCu+8niAgaHcvdmly
-dGlvL3Zob3N0LmMgfCAzICsrLQ0K77yeICAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCsp
-LCAxIGRlbGV0aW9uKC0pDQrvvJ4gDQrvvJ4gZGlmZiAtLWdpdCBhL2h3L3ZpcnRpby92aG9zdC5j
-IGIvaHcvdmlydGlvL3Zob3N0LmMNCu+8niBpbmRleCA2MTM0OTRkLi5jMWZmOThmIDEwMDY0NA0K
-77yeIC0tLSBhL2h3L3ZpcnRpby92aG9zdC5jDQrvvJ4gKysrIGIvaHcvdmlydGlvL3Zob3N0LmMN
-Cu+8niBAQCAtNjExLDcgKzYxMSw4IEBAIHN0YXRpYyB2b2lkIHZob3N0X3NldF9tZW1vcnkoTWVt
-b3J5TGlzdGVuZXIgKmxpc3RlbmVyLA0K77yeICBzdGF0aWMgYm9vbCB2aG9zdF9zZWN0aW9uKE1l
-bW9yeVJlZ2lvblNlY3Rpb24gKnNlY3Rpb24pDQrvvJ4gIHsNCu+8niAgICAgIHJldHVybiBtZW1v
-cnlfcmVnaW9uX2lzX3JhbShzZWN0aW9uLe+8nm1yKSAmJg0K77yeIC0gICAgICAgICFtZW1vcnlf
-cmVnaW9uX2lzX3JvbShzZWN0aW9uLe+8nm1yKQ0K77yeICsgICAgICAgICFtZW1vcnlfcmVnaW9u
-X2lzX3JvbShzZWN0aW9uLe+8nm1yKSAmJg0K77yeICsgICAgICAgICFtZW1vcnlfcmVnaW9uX2lz
-X3NraXBfZHVtcChzZWN0aW9uLe+8nm1yKQ0K77yeICB9DQoNCldoeSBub3QgbWVtb3J5X3JlZ2lv
-bl9pc19yYW1fZGV2aWNlPw0KDQpQYW9sbw==
-
-
---=====_002_next=====
-Content-Type: image/jpeg;
-	 name="=?UTF-8?B?MjQyNDJlNTYzN2FmNDI4ODkxYzRkYjczMWU3NzY1YWQuanBn?="
-Content-Disposition: inline;
-	filename="=?UTF-8?B?MjQyNDJlNTYzN2FmNDI4ODkxYzRkYjczMWU3NzY1YWQuanBn?="
-Content-ID: <24242e5637af428891c4db731e7765ad>
-Content-Transfer-Encoding: base64
-
-R0lGODlhcwAmAPcAAAAAAP///wCP1QCP1Pf7/vL5/QCP1gWR1gqT1gyU2AyU1w6V1xWY2BeZ2R6c
-2iGd2iyi3C6j3TOl3Tqo3kWt4Emv4Uyw4U2x4lOz4ly35F645GO65WW75me85m6/53XC6IHH64XJ
-64bK7IzM7I/N7JXQ7ZfR7pnS7pzT7p3U76PW8KPW76XX8K7b8bDc8rff87vh9Lzh9L7i9cnn9tLr
-+Nnu+eDx+uf0++n1++33/PD4/PT6/fj8/gKQ1AWR1QeS1QiT1QmT1g+W1xCW1xOX1xia2Bub2Ryb
-2R+d2SCd2SKe2iSf2iag2ymh2yqh2yui3DSm3Tio3Typ3j2q3j6q3kCr30Os30eu4Euw4U6x4U+y
-4k+y4VGz4lCy4Va141W04li241q341245F+55GW75Ga85Wm95mi95Gq+5Wu+5m2/5m/A53HB6HDA
-53HB5nLB53PC53XC53bD53nE6HvF6X3G6X/H6YHI6oHI6YLI6oLI6YbK64TJ6YnL64rM64zM65HP
-7JPQ7ZbR7ZrT7qXX76bY8KfY76jZ8Kra8azb8a/c8bDc8bHd8rLd8rXe8rXe8bjg87zi9Lzh873i
-88Dj9MPl9cXm9cfm9cnn9c3p9s/q987p9tHr99Lr99Xt+Nbt+Nrv+d/x+eDx+eX0++Tz+u/4/OHy
-+ePz+ur2+/b7/fr9/vz+/v7//////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAK0ALAAAAABzACYA
-Rwj/AAMIHEiwoMGDCBMqXMiwoUOGiti0mUhxopcBAgZoHKAglcATFaVg3DgAC0U2hgKsKkJyiZqK
-FUV4bHijx4AHDFmN0BiJ4A2NRFYRJKAAo6WFKzJibOCQEclMB1WxxOgDUQEeqbKm2sEDoQaMhAqS
-sonE4B2MeQ7WmGlwj0YKCv0oHeDkIUGnAvJCNShVowA7dgXyyXKhsGEJG6kYNqxFUEImGSsQDJFR
-gOSClUj61cx5wAmEBKJk9JIwTefTaxzaGNnQxhIBex0WAUPwRZoOZnLr3q27Q6CBKXgL742mhUBW
-e3AP771HlcNSaDjQCVwwByQc1A2+9vtbodONsQn2/8UI2O6F03lP+/1QcEpeJgMbabwyMEzeOQuJ
-bBSAyC5ejeENNN5GQzBAxIEHNgAGAQZ9JQAlBvUggBIGlYDWQBtYoKGGW1yw4YZacPGhBVjsIRAB
-B4xEV3YCfZdRgAKNJ0ATLBo01gBlOXSIARgpohAEeQkgSo1EFmnkkUgmqeSSCKkxl3qaMRUBZ5V1
-llcHAaQ40lxP+uXQWALkmB0HGplhECYHWADDQ24oJYAVClHilwCgRMVSXiYGhgIZG/TZZxlXaNTD
-F2X4+adxA+Fg0wBkEGTfACkQhNgAKzR0iop0MvQdgHZu5EdgXw0AYUE2UViQhQKkVdAcQZYSAA9D
-GP/xxQ4B1KHRFg1h4OYYDzHiJowBDKgiSZXlSZAGeYVFEJhiDnRHXnoM5EOXxO7HmQMGdRJkRtj5
-txmwMqoRWBZPplftuXEkxIUJBj2CxUJSVPkGi5sOAO5UA6hqJCql2sVKEBilcRCyAxhQB0GFqEet
-X3IglAhJlxzEAwPoaSaABV+S1VAmQ+RlREOTBHkGkySXbPLJKKes8sosC6TJllCS9JshC8NsbSUB
-eFAzZ244FIpSNfrRxADsGoRKQS/ETCWWIShspSMBUGyteu82dGOzCr3AR0EyaESFQU4OAJdDcBC7
-SEJjuJmuQTzg+0SSNmG7ECuQDZBAQUlo9AlBg2D/BMVDm2wpQA4KOUISJ53mpa9DJVRmLkZcUgv1
-QDRjRMNAI2SUmkAzYDSEcw3xMVcEmj7VqUblPSRGRl2ooMIKK6hAh0Y/kMBC7K9PkBceBeGwUaUB
-gLKRc/xqZIpD7vkFR0Obwna6AGiAqlEhBY1iUxIG5YFRtAZh1IYOAh090AIY9cRQAUBALsBRzM91
-734CICDEAvQvoMAQGNBaELICKDvQ1Wa5kEBi4IJGNMITmTCgAhvhgg8o5QsvMKALcHaQSKRHAAro
-SlO+ZafHQQ5mAuhDg8AiFo0VBAQCDAAIMWWuKlWGKQZJg5vg5C2/vI92LujKKna4CtAdRAwa8QIL
-7YY4xLPErwREHGIVMMI7km0nL4CgjovsdboBiNAumbPYsKpkLUQZRAZ5+dtAOrEAAXwtITjgkiey
-U68bDiB1RSKARo4QmEOkR3wDOUNlMnCQQrgJPvQyHV+KUCwkAfAhYMjLD4RyECxUJhEESeRmBCAB
-mMCkBAlpnhsHwAQPWHIifWCQ1UzIEFAEqQsLwQEQ8gIBgWiBS0qbI0JeMJcaHGQV04plXr6kEbkp
-hBVTEkAPjtcQOWSEVwGQxBw+wMxmOvOZHxiEQnIAgj1o8JZ/gKY2SeDDhejgDW1YnEI+AUm7fIKR
-LUunOtfJThYFBAA7
-
-
---=====_002_next=====
-Content-Type: image/jpeg;
-	 name="=?UTF-8?B?OWFlM2UyMTRjMTdkNDllZDkzNWQ4N2M2NzRiYTNlZTIuanBn?="
-Content-Disposition: inline;
-	filename="=?UTF-8?B?OWFlM2UyMTRjMTdkNDllZDkzNWQ4N2M2NzRiYTNlZTIuanBn?="
-Content-ID: <9ae3e214c17d49ed935d87c674ba3ee2>
-Content-Transfer-Encoding: base64
-
-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
-
-
---=====_002_next=====--
+>
+> Fam
+>
+>>
+>> >
+>> > this patch is also valuable, there are many old version qemu in my
+>> > production environment.
+>> > and will be benefit with this patch.
+>> >
+>> >>
+>> >> Fam
+>>
