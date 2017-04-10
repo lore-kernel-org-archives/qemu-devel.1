@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cxVMC-0007yQ-Qe
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 05:11:33 -0400
+	(envelope-from <groug@kaod.org>) id 1cxVPK-0002B2-L7
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 05:14:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cxVMB-0007Ee-Ky
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 05:11:32 -0400
-Date: Mon, 10 Apr 2017 11:11:17 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170410091117.GD4883@noname.redhat.com>
-References: <20170407065414.9143-1-famz@redhat.com>
-	<20170407065414.9143-5-famz@redhat.com>
-	<20170407125051.GB16146@stefanha-x1.localdomain>
-	<20170408034351.GC6548@lemon>
-	<20170410080621.GB4883@noname.redhat.com>
-	<20170410084551.GD14050@lemon>
+	(envelope-from <groug@kaod.org>) id 1cxVPG-0008Qo-Lw
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 05:14:46 -0400
+Received: from 3.mo68.mail-out.ovh.net ([46.105.58.60]:51390)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cxVPG-0008OS-Ei
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 05:14:42 -0400
+Received: from player737.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 4C50E4ADF6
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 11:14:35 +0200 (CEST)
+Date: Mon, 10 Apr 2017 11:14:25 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170410111425.634d7284@bahia.lan>
+In-Reply-To: <1491562132-69066-1-git-send-email-liqiang6-s@360.cn>
+References: <1491562132-69066-1-git-send-email-liqiang6-s@360.cn>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170410084551.GD14050@lemon>
-Subject: Re: [Qemu-devel] [PATCH v2 4/6] block: Quiesce old aio context
- during bdrv_set_aio_context
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/N3INYyxUGVIDH=sO8b_fDfg";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH] 9pfs: xattr: fix memory leak in
+ v9fs_list_xattr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +31,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Li Qiang <liq3ea@gmail.com>
+Cc: qemu-devel@nongnu.org, ppandit@redhat.com, Li Qiang <liqiang6-s@360.cn>
 
-Am 10.04.2017 um 10:45 hat Fam Zheng geschrieben:
-> On Mon, 04/10 10:06, Kevin Wolf wrote:
-> > Am 08.04.2017 um 05:43 hat Fam Zheng geschrieben:
-> > > On Fri, 04/07 13:50, Stefan Hajnoczi wrote:
-> > > > On Fri, Apr 07, 2017 at 02:54:12PM +0800, Fam Zheng wrote:
-> > > > > @@ -4413,6 +4416,10 @@ void bdrv_set_aio_context(BlockDriverState *bs, AioContext *new_context)
-> > > > >      aio_context_acquire(new_context);
-> > > > >      bdrv_attach_aio_context(bs, new_context);
-> > > > >      aio_context_release(new_context);
-> > > > > +    if (bs->job) {
-> > > > > +        block_job_resume(bs->job);
-> > > > > +    }
-> > > > 
-> > > > Should this be called before aio_context_release(new_context)?
-> > > 
-> > > Yes, and I'm going to replace it with bdrv_parent_drained_begin() as Kevin
-> > > suggested.
-> > 
-> > I think at the moment bdrv_parent_drained_begin() can't replace it yet,
-> > but you need both.
-> 
-> I think we have it already, see 600ac6a0e (blockjob: add devops to blockjob
-> backends):
-> 
->     bdrv_parent_drained_begin
->      -> blk_root_drained_begin
->       -> block_job_drained_begin
->        -> block_job_pause
+--Sig_/N3INYyxUGVIDH=sO8b_fDfg
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Ah, yes, you're right. Somehow I thought this was only for 2.10.
+On Fri,  7 Apr 2017 03:48:52 -0700
+Li Qiang <liq3ea@gmail.com> wrote:
 
-Kevin
+> Free 'orig_value' in error path.
+>=20
+> Signed-off-by: Li Qiang <liqiang6-s@360.cn>
+> ---
+
+Good catch. I'll send a pull req later today.
+
+Cheers.
+
+--
+Greg
+
+>  hw/9pfs/9p-xattr.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/hw/9pfs/9p-xattr.c b/hw/9pfs/9p-xattr.c
+> index eec160b..d05c1a1 100644
+> --- a/hw/9pfs/9p-xattr.c
+> +++ b/hw/9pfs/9p-xattr.c
+> @@ -108,6 +108,7 @@ ssize_t v9fs_list_xattr(FsContext *ctx, const char *p=
+ath,
+>      g_free(name);
+>      close_preserve_errno(dirfd);
+>      if (xattr_len < 0) {
+> +        g_free(orig_value);
+>          return -1;
+>      }
+> =20
+
+
+--Sig_/N3INYyxUGVIDH=sO8b_fDfg
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAljrTPEACgkQAvw66wEB28L0RQCfaor7h/hxEFy40901RYUnsXiH
+uxQAn1yW2aXNM6DOnbYIM7EttKsD4tvn
+=oz2j
+-----END PGP SIGNATURE-----
+
+--Sig_/N3INYyxUGVIDH=sO8b_fDfg--
