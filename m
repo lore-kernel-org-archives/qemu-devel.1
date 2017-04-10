@@ -1,31 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45163)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cxhZ8-0000S8-NY
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 18:13:43 -0400
+	(envelope-from <bounces@canonical.com>) id 1cxhbI-00011J-3Y
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 18:15:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cxhZ5-00085i-H8
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 18:13:42 -0400
-Received: from 3.mo68.mail-out.ovh.net ([46.105.58.60]:35996)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cxhZ5-00084a-A6
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 18:13:39 -0400
-Received: from player737.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 5A12E49CD6
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 00:13:34 +0200 (CEST)
-Date: Tue, 11 Apr 2017 00:13:22 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170411001322.5925a3bb@bahia.lan>
-In-Reply-To: <3b38d5f9-3611-6ec8-df14-a6054d574dc2@twiddle.net>
-References: <20170410060655.32289-1-nikunj@linux.vnet.ibm.com>
-	<fc0b737f-738a-1bc2-1b94-aa041ab8ae6c@twiddle.net>
-	<CAFEAcA95xYVh6fwjNJ6QaXgwXsqH_zYMANfkdEUh7OkZ22aqRQ@mail.gmail.com>
-	<20170410194414.7f829fee@bahia.lan>
-	<3b38d5f9-3611-6ec8-df14-a6054d574dc2@twiddle.net>
+	(envelope-from <bounces@canonical.com>) id 1cxhbE-00008O-PM
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 18:15:56 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59887)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cxhbE-00007W-Jh
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 18:15:52 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cxhbB-0002LT-V0
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 22:15:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id CF1902E80D1
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 22:15:49 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/.oondsCnmnH0YrLVbFWDLr=";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH fix for-2.9] cpus: fix wrong define name
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 10 Apr 2017 22:08:46 -0000
+From: John Snow <1681439@bugs.launchpad.net>
+Reply-To: Bug 1681439 <1681439@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170410132346.31250.84835.malonedeb@wampee.canonical.com>
+Message-Id: <20170410220847.31250.94319.launchpad@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1681439] Re: qemu-system-x86_64:
+ hw/ide/core.c:685: ide_cancel_dma_sync: Assertion `s->bus->dma->aiocb ==
+ NULL' failed.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,75 +38,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
 
---Sig_/.oondsCnmnH0YrLVbFWDLr=
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+** Changed in: qemu
+     Assignee: (unassigned) =3D> John Snow (jnsnow)
 
-On Mon, 10 Apr 2017 10:49:12 -0700
-Richard Henderson <rth@twiddle.net> wrote:
+-- =
 
-> On 04/10/2017 10:44 AM, Greg Kurz wrote:
-> > On Mon, 10 Apr 2017 18:29:57 +0100
-> > Peter Maydell <peter.maydell@linaro.org> wrote:
-> > =20
-> >> On 10 April 2017 at 18:26, Richard Henderson <rth@twiddle.net> wrote: =
-=20
-> >>> On 04/09/2017 11:06 PM, Nikunj A Dadhania wrote: =20
-> >>>> --- a/cpus.c
-> >>>> +++ b/cpus.c
-> >>>> @@ -202,7 +202,7 @@ void qemu_tcg_configure(QemuOpts *opts, Error **=
-errp)
-> >>>>              } else if (use_icount) {
-> >>>>                  error_setg(errp, "No MTTCG when icount is enabled");
-> >>>>              } else {
-> >>>> -#ifndef TARGET_SUPPORT_MTTCG
-> >>>> +#ifndef TARGET_SUPPORTS_MTTCG =20
-> >>>
-> >>>
-> >>> This sort of thing is why glibc moved to using -Wundef.
-> >>>
-> >>> It would be a huge amount of work to convert our existing sources, bu=
-t it
-> >>> would probably pay off in the long run. =20
-> >>
-> >> We already build with -Wundef...
-> >> =20
-> >
-> > From the gcc info page:
-> >
-> > '-Wundef'
-> >      Warn if an undefined identifier is evaluated in an '#if' directive.
-> >
-> > and BTW, isn't the purpose of #ifndef precisely to detect that the
-> > identifier is undefined ? =20
->=20
-> Yes, but it also has the typo problem above, whereas
->=20
->    #if !TARGET_SUPPORTS_MTTCG
->=20
-> plus -Wundef would have caught that error.
->=20
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1681439
 
-Turning such #ifdef/#ifndef to #if/#if ! would indeed make sense, but
-we'd still have to be careful that every new addition follows the rule.
+Title:
+  qemu-system-x86_64: hw/ide/core.c:685: ide_cancel_dma_sync: Assertion
+  `s->bus->dma->aiocb =3D=3D NULL' failed.
 
->=20
-> r~
+Status in QEMU:
+  New
 
+Bug description:
+  Since upgrading to QEMU 2.8.0, my Windows 7 64-bit virtual machines
+  started crashing due to the assertion quoted in the summary failing.
+  The assertion in question was added by commit 9972354856 ("block: add
+  BDS field to count in-flight requests").  My tests show that setting
+  discard=3Dunmap is needed to reproduce the issue.  Speaking of
+  reproduction, it is a bit flaky, because I have been unable to come up
+  with specific instructions that would allow the issue to be triggered
+  outside of my environment, but I do have a semi-sane way of testing that
+  appears to depend on a specific initial state of data on the underlying
+  storage volume, actions taken within the VM and waiting for about 20
+  minutes.
 
---Sig_/.oondsCnmnH0YrLVbFWDLr=
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+  Here is the shortest QEMU command line that I managed to reproduce the
+  bug with:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+      qemu-system-x86_64 \
+          -machine pc-i440fx-2.7,accel=3Dkvm \
+          -m 3072 \
+          -drive file=3D/dev/lvm/qemu,format=3Draw,if=3Dide,discard=3Dunmap=
+ \
+  	-netdev tap,id=3Dhostnet0,ifname=3Dtap0,script=3Dno,downscript=3Dno,vhos=
+t=3Don \
+          -device virtio-net-pci,netdev=3Dhostnet0 \
+  	-vnc :0
 
-iEYEARECAAYFAljsA4IACgkQAvw66wEB28KvsgCglglbb75Ol9EkU2QJJdJj6bBI
-pWgAn29Zwy8WpxXGVr81X3b5MwhA6te/
-=L1Se
------END PGP SIGNATURE-----
+  The underlying storage (/dev/lvm/qemu) is a thin LVM snapshot.
 
---Sig_/.oondsCnmnH0YrLVbFWDLr=--
+  QEMU was compiled using:
+
+      ./configure --python=3D/usr/bin/python2.7 --target-list=3Dx86_64-soft=
+mmu
+      make -j3
+
+  My virtualization environment is not really a critical one and
+  reproduction is not that much of a hassle, so if you need me to gather
+  further diagnostic information or test patches, I will be happy to help.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1681439/+subscriptions
