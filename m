@@ -1,22 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1cxarP-0001sF-6u
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:04:09 -0400
+	(envelope-from <famz@redhat.com>) id 1cxatD-0003CS-2B
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:06:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1cxarL-000122-6S
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:04:07 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:33455)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
-	id 1cxarK-000117-W9
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:04:03 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id l28so21460180wre.0
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 08:04:01 -0700 (PDT)
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Mon, 10 Apr 2017 16:03:49 +0100
-Message-Id: <20170410150350.3267-1-ard.biesheuvel@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 1/2] hw/acpi-defs: replace leading X with x_
- in FADT field names
+	(envelope-from <famz@redhat.com>) id 1cxatB-0001tX-Oj
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:05:59 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Mon, 10 Apr 2017 23:05:32 +0800
+Message-Id: <20170410150542.30376-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH for 2.9 v3 00/10] block: Fixes regarding
+ dataplane and management operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +18,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org, lersek@redhat.com
-Cc: phil@philjordan.eu, mst@redhat.com, imammedo@redhat.com, drjones@redhat.com, zhaoshenglong@huawei.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-At the request of Michael, replace the leading capital X in the FADT
-field name Xfacs and Xdsdt with lower case x + underscore.
+v3: Respin the unmerged changes from v2 and include one new fix:
 
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- include/hw/acpi/acpi-defs.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+    (Yes, it is a big series for the last -rc, and I personally prefer the v2
+    approach for the 4-9 part of the problem, which is much more mechanical.)
 
-diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-index 4cc3630e613e..db48807056b3 100644
---- a/include/hw/acpi/acpi-defs.h
-+++ b/include/hw/acpi/acpi-defs.h
-@@ -165,8 +165,8 @@ struct AcpiFadtDescriptorRev5_1 {
-     /* ARM-Specific Boot Flags (see below for individual flags) (ACPI 5.1) */
-     uint16_t arm_boot_flags;
-     uint8_t minor_revision;  /* FADT Minor Revision (ACPI 5.1) */
--    uint64_t Xfacs;          /* 64-bit physical address of FACS */
--    uint64_t Xdsdt;          /* 64-bit physical address of DSDT */
-+    uint64_t x_facs;         /* 64-bit physical address of FACS */
-+    uint64_t x_dsdt;         /* 64-bit physical address of DSDT */
-     /* 64-bit Extended Power Mgt 1a Event Reg Blk address */
-     struct AcpiGenericAddress xpm1a_event_block;
-     /* 64-bit Extended Power Mgt 1b Event Reg Blk address */
+    - 1, 2 are redoing previous patch 4, using bdrv_parent_drained_begin/end.
+      [Kevin]
+      Also fix the ordering against aio_context_release. [Stefan]
+    - 3 is unchanged from patch 6 in v2.
+    - 4-9 are reworking of patch 5 following Paolo's suggestion, which allowed
+      better patch split.
+    - 10 is finding of a latent bug, which is revealed by patch 9.
+
+v2: - Drop patch 4 in v1. A second thought made me feel neither it nor Kevin's
+      suggestion to move the BH process to bdrv_drain_recurse/BDRV_POLL_WHILE
+      is a complete fix. So leave it for a separate patch.
+    - Add rev-by to patches 1, 3, 4.
+    - Split from patch 1 in v1 and add patch 2, for the new assertions. [Kevin]
+    - Rewrite patch 5. Fix block job's co when a BDS is moved to a different
+      aio context. [Kevin]
+    - Add patch 6.
+
+Crashes are reported on dataplane devices when doing snapshot and commit under
+guest I/O.
+
+With this series, Ed's test case '176' now passes:
+
+    https://github.com/skyportsystems/qemu-1/commits/eswierk-iotests-2.9
+
+Fam Zheng (10):
+  block: Make bdrv_parent_drained_begin/end public
+  block: Quiesce old aio context during bdrv_set_aio_context
+  tests/block-job-txn: Don't start block job before adding to txn
+  coroutine: Extract qemu_aio_coroutine_enter
+  async: Introduce aio_co_enter and aio_co_enter_if_inactive
+  block: Introduce bdrv_coroutine_enter and *_if_inactive
+  blockjob: Use bdrv_coroutine_enter to start coroutine
+  qemu-io-cmds: Use bdrv_coroutine_enter
+  block: Use bdrv_coroutine_enter to start I/O coroutines
+  block: Fix bdrv_co_flush early return
+
+ block.c                    | 17 +++++++++++++++--
+ block/block-backend.c      |  4 ++--
+ block/io.c                 | 34 ++++++++++++++++++----------------
+ blockjob.c                 |  4 ++--
+ include/block/aio.h        | 18 ++++++++++++++++++
+ include/block/block.h      | 27 +++++++++++++++++++++++++++
+ include/qemu/coroutine.h   |  5 +++++
+ qemu-io-cmds.c             |  2 +-
+ tests/qemu-iotests/109.out | 10 +++++-----
+ tests/test-blockjob-txn.c  |  6 +++++-
+ util/async.c               | 14 +++++++++++++-
+ util/qemu-coroutine.c      | 11 ++++++++---
+ util/trace-events          |  2 +-
+ 13 files changed, 120 insertions(+), 34 deletions(-)
+
 -- 
 2.9.3
