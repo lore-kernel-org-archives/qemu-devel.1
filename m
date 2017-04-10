@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cxVki-0003Ss-7e
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 05:36:53 -0400
+	(envelope-from <longpeng2@huawei.com>) id 1cxVp6-0005gZ-0T
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 05:41:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cxVkf-0002VW-59
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 05:36:52 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:33406)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cxVke-0002VI-Va
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 05:36:49 -0400
-Received: by mail-wr0-x244.google.com with SMTP id l28so3538711wre.0
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 02:36:48 -0700 (PDT)
-Date: Mon, 10 Apr 2017 10:36:46 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170410093646.GK2567@stefanha-x1.localdomain>
-References: <20170323173928.14439-1-pbonzini@redhat.com>
-	<20170323173928.14439-9-pbonzini@redhat.com>
+	(envelope-from <longpeng2@huawei.com>) id 1cxVp1-0004Ol-0R
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 05:41:23 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:3361
+	helo=dggrg03-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <longpeng2@huawei.com>) id 1cxVp0-0004Nk-8u
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 05:41:18 -0400
+Message-ID: <58EB531E.40504@huawei.com>
+Date: Mon, 10 Apr 2017 17:40:46 +0800
+From: "Longpeng (Mike)" <longpeng2@huawei.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="1y1tiN5hVw5cPBDe"
-Content-Disposition: inline
-In-Reply-To: <20170323173928.14439-9-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 08/10] blockjob: introduce
- block_job_cancel_async
+References: <1491814997-58268-1-git-send-email-longpeng2@huawei.com>
+	<33183CC9F5247A488A2544077AF19020DA224512@DGGEMA505-MBS.china.huawei.com>
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA224512@DGGEMA505-MBS.china.huawei.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.10 00/19] crypto: add af_alg-backend
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,34 +29,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, jcody@redhat.com, jsnow@redhat.com
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Cc: "berrange@redhat.com" <berrange@redhat.com>, "kraxel@redhat.com" <kraxel@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "Xuquan (Quan Xu)" <xuquan8@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+
+On 2017/4/10 17:28, Gonglei (Arei) wrote:
+
+> 
+>> -----Original Message-----
+>> From: longpeng
+>> Sent: Monday, April 10, 2017 5:03 PM
+>> To: berrange@redhat.com; kraxel@redhat.com; pbonzini@redhat.com;
+>> eblake@redhat.com; armbru@redhat.com
+>> Cc: Xuquan (Quan Xu); Gonglei (Arei); qemu-devel@nongnu.org; longpeng
+>> Subject: [PATCH for-2.10 00/19] crypto: add af_alg-backend support
+>>
+>> The AF_ALG socket family is the userspace interface for linux
+>> crypto API, users can use it to access hardware accelerators.
+>>
+>> This patchset adds a afalg-backend for qemu crypto subsystem. Currently
+>> when performs encrypt/decrypt, we'll try afalg-backend first and will
+>> back to libiary-backend if it failed.
+>>
+> Cool.
+> 
+> You'd better add the performance compared results in the cover letter. :)
+> 
 
 
---1y1tiN5hVw5cPBDe
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+OK, I'll add the results in V2.
 
-On Thu, Mar 23, 2017 at 06:39:26PM +0100, Paolo Bonzini wrote:
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  blockjob.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
+In addition, I find a BUG in patch 18, please review other parts and I'll fix
+them together in next version.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> 
+> Regards,
+> -Gonglei
+> 
+>> In the next step, It would support a command parameter to specifies
+>> which backends prefer to and some other improvements.
+>>
+>> Longpeng(Mike) (19):
+>>   crypto: cipher: introduce context free function
+>>   crypto: cipher: introduce qcrypto_cipher_ctx_new for gcrypt-backend
+>>   crypto: cipher: introduce qcrypto_cipher_ctx_new for nettle-backend
+>>   crypto: cipher: introduce qcrypto_cipher_ctx_new for builtin-backend
+>>   crypto: cipher: add cipher driver framework
+>>   crypto: hash: add hash driver framework
+>>   crypto: hmac: move crypto/hmac.h into include/crypto/
+>>   crypto: hmac: introduce qcrypto_hmac_ctx_new for gcrypt-backend
+>>   crypto: hmac: introduce qcrypto_hmac_ctx_new for nettle-backend
+>>   crypto: hmac: introduce qcrypto_hmac_ctx_new for glib-backend
+>>   crypto: hmac: add hmac driver framework
+>>   socket: add af_alg family support
+>>   crypto: introduce some common functions for af_alg backend
+>>   crypto: cipher: add af_alg cipher support
+>>   tests: crypto: add cipher speed case
+>>   crypto: hash: add af_alg hash support
+>>   tests: crypto: add hash speed case
+>>   crypto: hmac: add af_alg hmac support
+>>   tests: crypto: add hmac speed case
+>>
+>>  configure                   |  21 ++++
+>>  crypto/Makefile.objs        |   3 +
+>>  crypto/afalg-comm.c         |  71 ++++++++++++++
+>>  crypto/cipher-afalg.c       | 229
+>> +++++++++++++++++++++++++++++++++++++++++++
+>>  crypto/cipher-builtin.c     | 120 +++++++++++------------
+>>  crypto/cipher-gcrypt.c      |  99 ++++++++++---------
+>>  crypto/cipher-nettle.c      |  78 ++++++++-------
+>>  crypto/cipher.c             |  87 +++++++++++++++++
+>>  crypto/hash-afalg.c         | 232
+>> ++++++++++++++++++++++++++++++++++++++++++++
+>>  crypto/hash-gcrypt.c        |  17 ++--
+>>  crypto/hash-glib.c          |  17 ++--
+>>  crypto/hash-nettle.c        |  17 ++--
+>>  crypto/hash.c               |  22 +++++
+>>  crypto/hmac-gcrypt.c        |  39 ++++----
+>>  crypto/hmac-glib.c          |  58 +++++------
+>>  crypto/hmac-nettle.c        |  39 +++-----
+>>  crypto/hmac.c               |  65 +++++++++++++
+>>  crypto/hmac.h               | 166 -------------------------------
+>>  include/crypto/afalg-comm.h |  74 ++++++++++++++
+>>  include/crypto/cipher.h     |  29 ++++++
+>>  include/crypto/hash.h       |  13 +++
+>>  include/crypto/hmac.h       | 199
+>> +++++++++++++++++++++++++++++++++++++
+>>  include/qemu/sockets.h      |   6 ++
+>>  qapi-schema.json            |  21 +++-
+>>  tests/test-crypto-cipher.c  |  92 ++++++++++++++++--
+>>  tests/test-crypto-hash.c    |  56 ++++++++++-
+>>  tests/test-crypto-hmac.c    |  66 ++++++++++++-
+>>  util/qemu-sockets.c         |  91 +++++++++++++++++
+>>  28 files changed, 1599 insertions(+), 428 deletions(-)
+>>  create mode 100644 crypto/afalg-comm.c
+>>  create mode 100644 crypto/cipher-afalg.c
+>>  create mode 100644 crypto/hash-afalg.c
+>>  delete mode 100644 crypto/hmac.h
+>>  create mode 100644 include/crypto/afalg-comm.h
+>>  create mode 100644 include/crypto/hmac.h
+>>
+>> --
+>> 1.8.3.1
+>>
+> 
+> 
+> .
+> 
 
---1y1tiN5hVw5cPBDe
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJY61IuAAoJEJykq7OBq3PITtkH/AhMIvkGbm5pgMV+8eEHxDx1
-mq4WEBFrcWzE+ClaEAPAq0FH+qfN2jj5DUGDSa64cSq4NVnfE1PEyBd34UQbuTuV
-eIWoLF2x7poWBoPfZGX2Gn/um54UcBWnKcajYhEyu5o0PSeaBm+MSd15jTKLVuHP
-XauUhxEtF7nfdtn9JkaQQ4UcROHf4hlwDnA1qn8QNCqfyL1veKBYzi7151NyjMv8
-GIMdjK7FQbh38DJSerwBuUb+MjDqE/+YSwHdpoLtqL0bYMN2cw4LkjU9xMjJIcUs
-MHhD2oF3tcTflzK4z5cw9FZKzc184Sg5aKJgzitgejrexxklf/L49KExj2OeyO4=
-=wqNr
------END PGP SIGNATURE-----
-
---1y1tiN5hVw5cPBDe--
+-- 
+Regards,
+Longpeng(Mike)
