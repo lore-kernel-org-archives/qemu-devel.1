@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cxcBO-0000jM-C9
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 12:28:51 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1cxcEF-0001Rp-41
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 12:31:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cxcBN-0007mX-GH
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 12:28:50 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:35621)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cxcBN-0007m9-AH
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 12:28:49 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id w64so43550436wma.0
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 09:28:49 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1491820793-5348-7-git-send-email-peter.maydell@linaro.org>
-References: <1491820793-5348-1-git-send-email-peter.maydell@linaro.org>
-	<1491820793-5348-7-git-send-email-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Apr 2017 17:28:27 +0100
-Message-ID: <CAFEAcA9A60tdpYTPbm36+i2uo6E__5EjtRWu_Esnx5uASDsZ6g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 6/7] arm: Implement M profile
- exception return properly
+	(envelope-from <a.perevalov@samsung.com>) id 1cxcEC-00008x-0E
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 12:31:47 -0400
+Received: from mailout3.w1.samsung.com ([210.118.77.13]:38782)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1cxcEB-0008VV-Mb
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 12:31:43 -0400
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout3.w1.samsung.com
+	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
+	2014)) with ESMTP id <0OO7004W3CKMLLA0@mailout3.w1.samsung.com> for
+	qemu-devel@nongnu.org; Mon, 10 Apr 2017 17:31:34 +0100 (BST)
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Message-id: <559bdae4-4dd1-459e-502b-98b05face50e@samsung.com>
+Date: Mon, 10 Apr 2017 19:31:32 +0300
+MIME-version: 1.0
+In-reply-to: <f768dcd7-a57b-03bf-b697-dd6cabac2574@oracle.com>
+Content-type: text/plain; charset=windows-1252; format=flowed
+Content-transfer-encoding: 7bit
+References: <CGME20170310140816eucas1p2bd85d3759739d64bb184ce0fbd74f90d@eucas1p2.samsung.com>
+	<20170310140806.GA11225@aperevalov-ubuntu>
+	<20170313105338.GA2626@work-vm> <20170313214636.GK27056@redhat.com>
+	<8d9cb1a5-3961-dde3-cf4c-f013f7c92620@samsung.com>
+	<f768dcd7-a57b-03bf-b697-dd6cabac2574@oracle.com>
+Subject: Re: [Qemu-devel] Dual userfaultfd behavior
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +36,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Richard Henderson <rth@twiddle.net>, "patches@linaro.org" <patches@linaro.org>
+To: Mike Kravetz <mike.kravetz@oracle.com>, Andrea Arcangeli <aarcange@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
 
-On 10 April 2017 at 11:39, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On M profile, return from exceptions happen when privileged code
-> executes one of the following function call return instructions:
->  * POP or LDM which loads the PC
->  * LDR to PC
->  * BX register
-> and the new PC value is 0xFFxxxxxx.
+Hello,
 
-So this isn't quite right -- the special behaviour happens only
-when in Handler mode. (Handler is always privileged, but not
-all privileged code is in Handler mode)...
 
-> +static inline void gen_bx_excret(DisasContext *s, TCGv_i32 var)
-> +{
-> +    /* Generate the same code here as for a simple bx, but flag via
-> +     * s->is_jmp that we need to do the rest of the work later.
-> +     */
-> +    gen_bx(s, var);
-> +    if (!IS_USER(s) && arm_dc_feature(s, ARM_FEATURE_M)) {
 
-...so we need to track "are we in Handler mode" (ie
-env->v7m.exception != 0) in the TB flags and test that here
-rather than testing IS_USER.
+On 03/18/2017 02:27 AM, Mike Kravetz wrote:
+> On 03/15/2017 06:47 AM, Alexey Perevalov wrote:
+>> Hi Andrea,
+>>
+>> thank you for so perfect design description,
+>>
+>> the main question who will do RFC patches,
+>> you or Mike or if you not against I could try.
+> Sorry for not replying sooner, I have been away from e-mail.
+>
+> I have some other projects which require attention before I could start
+> any in depth work on this issue.
+ok, if nobody started, let me to begin to code that.
+I already implemented straightforward approach, but it
+didn't take into account page migration.
+>> On 03/14/2017 12:46 AM, Andrea Arcangeli wrote:
+>>> I think what is needed is an extension to UFFDIO_COPY so that it will
+>>> not fail if used with lower granularity than the hugetlbfs page
+>>> size. Then a special feature flag should be set in the
+>>> uffdio_api.features to tell userland it can use a lower granularity
+>>> than the hugetlbfs page size.
+>>>
+>>> UFFDIO_COPY will still allocate a 1GB page, but it will copy only part
+>>> of and then map only the copied part with a pte of 4k granularity (or
+>>> 2MB granularity if the uffdio_copy.dst/len parameters allows for
+>>> hugepmds). This way if there's a missing fault in the part that is not
+>>> copied yet, it'll still trigger a page fault and we'll call
+>>> handle_userfault from hugetlb_no_page, which will trigger a new
+>>> UFFDIO_COPY and map another fragment of the 1GB page.
+>>> The same code than should allow us to map a 2MB hugetlbfs page with 4k
+>>> granularity in UFFDIO_COPY so then userland can choose if to do
+>>> postcopy live migration on hugetlbfs with 2MB or 4kb granularity (on
+>>> very slow network 4kb would be preferable for example for the latency).
+>>>
+>>> Mapping a 1GB page without a hugepud or mapping a 2MB page without a
+>>> hugepmd breaks all sort of invariants into the hugetlbfs code, page
+>>> migration wouldn't be able to cope with it either. Solving the fallout
+>>> from such breakage is what is required to implement this basically.
+> Agree!
+>
+> I was wondering if it might be easier or more straight forward to split
+> the target vma.  You would then create a new vma of the copy page size
+> to be used during the copy.  In this way the the mappings and page table
+> entries remain as expected.
+>
+> Of course, you would still want to allocate a huge page of the original
+> target vma size and map that as smaller page sizes are copied.  I don't
+> think there is anything that does something similar today.
+>
+> When the copy is done (or aborted) we then create/convert a new vma for
+> the huge page and merge it into the target vma(s).
+>
+> Not sure if that would be any easier.  It was just the first thing that
+> popped into my head.
+>
 
-(Otherwise if you have code which executes the same 'bx' instruction
-both as a legitimate exception return and as a fake exception
-return while in privileged thread mode then we assert() in
-do_v7m_exception_exit. I have a test case that does this but no
-real code would ever do it.)
 
-thanks
--- PMM
+-- 
+Best regards,
+Alexey Perevalov
