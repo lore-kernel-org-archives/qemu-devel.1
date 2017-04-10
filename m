@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cxatT-0003Oz-DF
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:06:16 -0400
+	(envelope-from <famz@redhat.com>) id 1cxatZ-0003T2-NB
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:06:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cxatP-000203-By
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:06:15 -0400
+	(envelope-from <famz@redhat.com>) id 1cxatY-00023w-PY
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:06:21 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Mon, 10 Apr 2017 23:05:33 +0800
-Message-Id: <20170410150542.30376-2-famz@redhat.com>
+Date: Mon, 10 Apr 2017 23:05:35 +0800
+Message-Id: <20170410150542.30376-4-famz@redhat.com>
 In-Reply-To: <20170410150542.30376-1-famz@redhat.com>
 References: <20170410150542.30376-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH for 2.9 v3 01/10] block: Make
- bdrv_parent_drained_begin/end public
+Subject: [Qemu-devel] [PATCH for 2.9 v3 03/10] tests/block-job-txn: Don't
+ start block job before adding to txn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,60 +23,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
+Previously, before test_block_job_start returns, the job can already
+complete, as a result, the transactional state of other jobs added to
+the same txn later cannot be handled correctly.
+
+Move the block_job_start() calls to callers after
+block_job_txn_add_job() calls.
+
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block/io.c            |  4 ++--
- include/block/block.h | 16 ++++++++++++++++
- 2 files changed, 18 insertions(+), 2 deletions(-)
+ tests/test-blockjob-txn.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/block/io.c b/block/io.c
-index 7321dda..9598646 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -44,7 +44,7 @@ static void coroutine_fn bdrv_co_do_rw(void *opaque);
- static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
-     int64_t offset, int count, BdrvRequestFlags flags);
- 
--static void bdrv_parent_drained_begin(BlockDriverState *bs)
-+void bdrv_parent_drained_begin(BlockDriverState *bs)
- {
-     BdrvChild *c;
- 
-@@ -55,7 +55,7 @@ static void bdrv_parent_drained_begin(BlockDriverState *bs)
-     }
+diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
+index 4ccbda1..0f80194 100644
+--- a/tests/test-blockjob-txn.c
++++ b/tests/test-blockjob-txn.c
+@@ -110,7 +110,6 @@ static BlockJob *test_block_job_start(unsigned int iterations,
+     s->result = result;
+     data->job = s;
+     data->result = result;
+-    block_job_start(&s->common);
+     return &s->common;
  }
  
--static void bdrv_parent_drained_end(BlockDriverState *bs)
-+void bdrv_parent_drained_end(BlockDriverState *bs)
- {
-     BdrvChild *c;
+@@ -123,6 +122,7 @@ static void test_single_job(int expected)
+     txn = block_job_txn_new();
+     job = test_block_job_start(1, true, expected, &result);
+     block_job_txn_add_job(txn, job);
++    block_job_start(job);
  
-diff --git a/include/block/block.h b/include/block/block.h
-index 3e09222..488a07e 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -573,6 +573,22 @@ void bdrv_io_plug(BlockDriverState *bs);
- void bdrv_io_unplug(BlockDriverState *bs);
+     if (expected == -ECANCELED) {
+         block_job_cancel(job);
+@@ -164,6 +164,8 @@ static void test_pair_jobs(int expected1, int expected2)
+     block_job_txn_add_job(txn, job1);
+     job2 = test_block_job_start(2, true, expected2, &result2);
+     block_job_txn_add_job(txn, job2);
++    block_job_start(job1);
++    block_job_start(job2);
  
- /**
-+ * bdrv_parent_drained_begin:
-+ *
-+ * Begin a quiesced section of all users of @bs. This is part of
-+ * bdrv_drained_begin.
-+ */
-+void bdrv_parent_drained_begin(BlockDriverState *bs);
-+
-+/**
-+ * bdrv_parent_drained_end:
-+ *
-+ * End a quiesced section of all users of @bs. This is part of
-+ * bdrv_drained_end.
-+ */
-+void bdrv_parent_drained_end(BlockDriverState *bs);
-+
-+/**
-  * bdrv_drained_begin:
-  *
-  * Begin a quiesced section for exclusive access to the BDS, by disabling
+     if (expected1 == -ECANCELED) {
+         block_job_cancel(job1);
+@@ -223,6 +225,8 @@ static void test_pair_jobs_fail_cancel_race(void)
+     block_job_txn_add_job(txn, job1);
+     job2 = test_block_job_start(2, false, 0, &result2);
+     block_job_txn_add_job(txn, job2);
++    block_job_start(job1);
++    block_job_start(job2);
+ 
+     block_job_cancel(job1);
+ 
 -- 
 2.9.3
