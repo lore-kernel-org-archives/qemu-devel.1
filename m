@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1cxSqY-0002Wy-TC
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 02:30:43 -0400
+	(envelope-from <kraxel@redhat.com>) id 1cxTHx-0005te-10
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 02:59:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1cxSqX-0006Qi-VE
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 02:30:42 -0400
-Received: from mail-yb0-x229.google.com ([2607:f8b0:4002:c09::229]:36286)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1cxSqX-0006Qd-RN
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 02:30:41 -0400
-Received: by mail-yb0-x229.google.com with SMTP id i124so30803420ybc.3
-	for <qemu-devel@nongnu.org>; Sun, 09 Apr 2017 23:30:41 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170410050759.12359.94192.malone@gac.canonical.com>
-References: <20170206024535.14624.3001.malonedeb@soybean.canonical.com>
-	<20170410050759.12359.94192.malone@gac.canonical.com>
-From: 858585 jemmy <jemmy858585@gmail.com>
-Date: Mon, 10 Apr 2017 14:30:40 +0800
-Message-ID: <CAOGPPbc9Bw+fLSVFxTLh8XwfJM7tymsWT7b7vPHL_9CxTv5k1Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [Bug 1662050] Re: qemu-img convert a overlay qcow2
- image into a entire image
+	(envelope-from <kraxel@redhat.com>) id 1cxTHs-000644-Qo
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 02:59:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46460)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cxTHs-00063a-Le
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 02:58:56 -0400
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 10 Apr 2017 08:58:37 +0200
+Message-Id: <20170410065837.31847-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] qxl: add migration blocker to avoid pre-save
+ assert
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +22,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1662050 <1662050@bugs.launchpad.net>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, 1635339@bugs.launchpad.net
 
-On Mon, Apr 10, 2017 at 1:07 PM, wayen <1662050@bugs.launchpad.net> wrote:
-> Hi Lidong Chen:
->     I used QEMU 2.0.0 on Ubuntu 14.04.
->     Do you mean your patch can make qemu-img convert qcow2 overlay into a new overlay?
+Cc: 1635339@bugs.launchpad.net
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/display/qxl.h |  1 +
+ hw/display/qxl.c | 22 ++++++++++++++++++++++
+ 2 files changed, 23 insertions(+)
 
-yes. but i find it already fixed in 2.0.0.
-do you add the -o backing_file= option in the command?
-
->
-> --
-> You received this bug notification because you are a member of qemu-
-> devel-ml, which is subscribed to QEMU.
-> https://bugs.launchpad.net/bugs/1662050
->
-> Title:
->   qemu-img convert a overlay qcow2 image into a entire image
->
-> Status in QEMU:
->   Incomplete
->
-> Bug description:
->   I have a base image file "base.qcow2" and a delta qcow2 image file
->   "delta.qcow2" whose backing file is "base.qcow2".
->
->   Now I use qemu-img to convert "delta.qcow2" and will get a new image
->   file "new.qcow2" which is entire and equivalent to combination of
->   "base.qcow2" and "delta.qcow2".
->
->   In fact,I don't want to get a complete image.I just want to convert
->   delta qcow2 image file "A" to a New delta overlay qcow2 image "B"
->   which is equivalent to "A". So the "new.qcow2" is not what i want. I
->   have to admit that this is not bug. Could you please take this as a
->   new feature and enable qemu-img to convert qcow2 overlay itself?
->
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1662050/+subscriptions
->
+diff --git a/hw/display/qxl.h b/hw/display/qxl.h
+index d2d49dd..77e5a36 100644
+--- a/hw/display/qxl.h
++++ b/hw/display/qxl.h
+@@ -40,6 +40,7 @@ typedef struct PCIQXLDevice {
+     uint32_t           cmdlog;
+ 
+     uint32_t           guest_bug;
++    Error              *migration_blocker;
+ 
+     enum qxl_mode      mode;
+     uint32_t           cmdflags;
+diff --git a/hw/display/qxl.c b/hw/display/qxl.c
+index c31b293..74ebeb9 100644
+--- a/hw/display/qxl.c
++++ b/hw/display/qxl.c
+@@ -26,6 +26,7 @@
+ #include "qemu/queue.h"
+ #include "qemu/atomic.h"
+ #include "sysemu/sysemu.h"
++#include "migration/migration.h"
+ #include "trace.h"
+ 
+ #include "qxl.h"
+@@ -639,6 +640,27 @@ static int interface_get_command(QXLInstance *sin, struct QXLCommandExt *ext)
+         qxl->guest_primary.commands++;
+         qxl_track_command(qxl, ext);
+         qxl_log_command(qxl, "cmd", ext);
++        {
++            /*
++             * Windows 8 drivers place qxl commands in the vram
++             * (instead of the ram) bar.  We can't live migrate such a
++             * guest, so add a migration blocker in case we detect
++             * this, to avoid triggering the assert in pre_save().
++             *
++             * https://cgit.freedesktop.org/spice/win32/qxl-wddm-dod/commit/?id=f6e099db39e7d0787f294d5fd0dce328b5210faa
++             */
++            void *msg = qxl_phys2virt(qxl, ext->cmd.data, ext->group_id);
++            if (msg != NULL && (
++                    msg < (void *)qxl->vga.vram_ptr ||
++                    msg > ((void *)qxl->vga.vram_ptr + qxl->vga.vram_size))) {
++                if (!qxl->migration_blocker) {
++                    Error *local_err = NULL;
++                    error_setg(&qxl->migration_blocker,
++                               "qxl: guest bug: command not in ram bar");
++                    migrate_add_blocker(qxl->migration_blocker, &local_err);
++                }
++            }
++        }
+         trace_qxl_ring_command_get(qxl->id, qxl_mode_to_string(qxl->mode));
+         return true;
+     default:
+-- 
+2.9.3
