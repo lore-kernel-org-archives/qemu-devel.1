@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cxUqM-0008SI-3h
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:38:39 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cxUtO-0000gZ-BZ
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:41:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cxUqL-0001D3-6t
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:38:38 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:37269)
+	(envelope-from <peter.maydell@linaro.org>) id 1cxUtN-0002ZK-G6
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:41:46 -0400
+Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:36419)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cxUqK-0001CB-Vp
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:38:37 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id u2so31332550wmu.0
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 01:38:35 -0700 (PDT)
+	id 1cxUtN-0002Z4-9d
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:41:45 -0400
+Received: by mail-wr0-x235.google.com with SMTP id c55so70122599wrc.3
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 01:41:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170408143639.2524-1-shah.suramya@gmail.com>
-References: <20170408143639.2524-1-shah.suramya@gmail.com>
+In-Reply-To: <20170408150524.2870-1-shah.suramya@gmail.com>
+References: <20170408150524.2870-1-shah.suramya@gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Apr 2017 09:38:13 +0100
-Message-ID: <CAFEAcA-TnbTDWCP_1zdCQ2OvKNQf6caC0E2pOU9Vf+2NmhEXcg@mail.gmail.com>
+Date: Mon, 10 Apr 2017 09:41:23 +0100
+Message-ID: <CAFEAcA_Gyo4DwWyCvC7BsHeQLeRASSyxhJxt8a+6Jknr0gta1Q@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2] hw/net: convert "dma" property type
- from ptr to link
+Subject: Re: [Qemu-devel] [PATCH] hw/core: fix segmentation fault
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,60 +29,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Suramya Shah <shah.suramya@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 8 April 2017 at 15:36, Suramya Shah <shah.suramya@gmail.com> wrote:
-> The lance device needs pointer to ISA DMA device to operate. But according to
-> qdev-properties.h, properties of pointer type should be avoided.
-> A link type property is a good substitution.
+On 8 April 2017 at 16:05, Suramya Shah <shah.suramya@gmail.com> wrote:
+> Reproducer:
+>  $i386-softmmu/qemu-system-i386 -S -machine isapc,accel=tcg -device amd-iommu
+> Segmentation fault (core dumped)
 >
-> Changes since v1
->  -changed the code in hw/sparc/sun4m.c which uses the device.
+> Partial bt:
+> #0  bus_add_child (child=0x555556d4e520, bus=0x0) at hw/core/qdev.c:88
+> #1  qdev_set_parent_bus (dev=0x555556d4e520, bus=bus@entry=0x0)
+> at hw/core/qdev.c:119
 >
 > Signed-off-by: Suramya Shah <shah.suramya@gmail.com>
 > ---
->  hw/net/lance.c   | 8 ++++++--
->  hw/sparc/sun4m.c | 2 +-
->  2 files changed, 7 insertions(+), 3 deletions(-)
+>  hw/core/qdev.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 >
-> diff --git a/hw/net/lance.c b/hw/net/lance.c
-> index 573d724..3996b9c 100644
-> --- a/hw/net/lance.c
-> +++ b/hw/net/lance.c
-> @@ -44,6 +44,7 @@
->  #include "pcnet.h"
->  #include "trace.h"
->  #include "sysemu/sysemu.h"
-> +#include "qapi/error.h"
->
->  #define TYPE_LANCE "lance"
->  #define SYSBUS_PCNET(obj) \
-> @@ -145,10 +146,14 @@ static void lance_instance_init(Object *obj)
->      device_add_bootindex_property(obj, &s->conf.bootindex,
->                                    "bootindex", "/ethernet-phy@0",
->                                    DEVICE(obj), NULL);
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index 1e7fb33..07a211b 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -84,7 +84,11 @@ static void bus_add_child(BusState *bus, DeviceState *child)
+>  {
+>      char name[32];
+>      BusChild *kid = g_malloc0(sizeof(*kid));
+> -
 > +
-> +    object_property_add_link(obj, "dma", TYPE_LANCE,
-> +                             (Object **)&d->state.dma_opaque,
-> +                             qdev_prop_allow_set_link_before_realize,
-> +                             0, &error_abort);
->  }
->
->  static Property lance_properties[] = {
-> -    DEFINE_PROP_PTR("dma", SysBusPCNetState, state.dma_opaque),
->      DEFINE_NIC_PROPERTIES(SysBusPCNetState, state.conf),
->      DEFINE_PROP_END_OF_LIST(),
->  };
-> @@ -164,7 +169,6 @@ static void lance_class_init(ObjectClass *klass, void *data)
->      dc->reset = lance_reset;
->      dc->vmsd = &vmstate_lance;
->      dc->props = lance_properties;
-> -    /* Reason: pointer property "dma" */
->      dc->cannot_instantiate_with_device_add_yet = true;
+> +    if (!bus) {
+> +        error_report("bus not found ");
+> +        exit(0);
+> +    }
+>      kid->index = bus->max_index++;
+>      kid->child = child;
+>      object_ref(OBJECT(kid->child));
 
-Please don't remove the comment but not the line it refers
-to; either the comment needs updating or the cannot_instantiate
-setting is no longer correct and needs removing.
+Thanks for the patch, but this doesn't look like the right way to fix
+this. Exiting with an error in a low-level function like this is not
+really any better than crashing. This function is not supposed to
+be called with a NULL bus pointer, so the question is: why is that
+happening? Something in one of the calling functions, probably
+several layers up the stack, has a bug. To fix this bug we need to
+look at that code and identify why it is trying to add the child
+device to a NULL bus and what bus it ought to be putting it on
+instead.
 
 thanks
 -- PMM
