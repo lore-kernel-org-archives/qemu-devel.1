@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cxbP5-0000V6-7z
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:38:58 -0400
+	(envelope-from <stefanha@redhat.com>) id 1cxbPH-0000au-SU
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:39:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cxbP3-0005sD-U1
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:38:55 -0400
-References: <20170410150542.30376-1-famz@redhat.com>
-	<20170410150542.30376-10-famz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1fcf3c15-02db-b3db-c030-a16373f59b12@redhat.com>
-Date: Mon, 10 Apr 2017 10:38:40 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cxbPG-0005w3-W3
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:39:07 -0400
+Date: Mon, 10 Apr 2017 16:38:54 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170410153854.GE3214@stefanha-x1.localdomain>
+References: <cover.1491597120.git.jcody@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170410150542.30376-10-famz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="n8glITNt1h87jsLHo557BplD4d5suokFL"
-Subject: Re: [Qemu-devel] [PATCH for 2.9 v3 09/10] block: Use
- bdrv_coroutine_enter to start I/O coroutines
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="/2994txjAzEdQwm5"
+Content-Disposition: inline
+In-Reply-To: <cover.1491597120.git.jcody@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 0/8] RBD reopen,
+ read_only cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,98 +24,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, eblake@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---n8glITNt1h87jsLHo557BplD4d5suokFL
-From: Eric Blake <eblake@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org,
- Ed Swierk <eswierk@skyportsystems.com>, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <1fcf3c15-02db-b3db-c030-a16373f59b12@redhat.com>
-Subject: Re: [PATCH for 2.9 v3 09/10] block: Use bdrv_coroutine_enter to start
- I/O coroutines
-References: <20170410150542.30376-1-famz@redhat.com>
- <20170410150542.30376-10-famz@redhat.com>
-In-Reply-To: <20170410150542.30376-10-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--/2994txjAzEdQwm5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 04/10/2017 10:05 AM, Fam Zheng wrote:
-> BDRV_POLL_WHILE waits for the started I/O by releasing bs's ctx then po=
-lling
-> the main context, which relies on the yielded the coroutine would conti=
-nue on
-> bs->ctx and notify qemu_aio_context with bdrv_wakeup(). Thus, using
-
-Reads awkwardly.  I'm guessing:
-
-which relies on the yielded coroutine continuing on bs->ctx before
-notifying qemu_aio_context with bdrv_wakeup().
-
-> qemu_coroutine_enter to start I/O is wrong because if the coroutine is =
-entered
-> from main loop, co->ctx will be qemu_aio_context, as a result of the "r=
-elease,
-> poll, acquire" loop of BDRV_POLL_WHILE, race conditions happen when bot=
-h
-> main thread and the iothread access the same BDS:
+On Fri, Apr 07, 2017 at 04:55:24PM -0400, Jeff Cody wrote:
+>=20
+> Changes from v1:
+>=20
+> Patch 2: Has v1 patch 8 (do not blindly xset bs->read_only) squashed into=
+ it
+>          (thanks Stefan)
+>          COW -> "copy-on-read" (Thanks John)
+>          Drop unneeded call in vvfat, and bypass enable_write_target (Ste=
+fan)
+>=20
+> Patch 5: Rename bdrv_try_... to bdrv_can_set_read_only() (Thanks John, St=
+efan)
+>=20
+> Patch 6: Use "reopen_state->flags" not "reopen_state->bs->open_flags"
+>          (Thanks John)
+>=20
+>=20
+>=20
+> This series does two things:
+>=20
+> 1.) Cleans up some of the logic behind setting the read_only flag
+>     for a BDS in the block layer, so that it is done consistently
+>     (and rules are applied consistently), and
+>=20
+> 2.) Adds .bdrv_reopen_prepare() implementation for RBD, so that block
+>     jobs can be run on backing chains that have rbd protocol nodes.
+>=20
+> Jeff Cody (8):
+>   block: add bdrv_set_read_only() helper function
+>   block: do not set BDS read_only if copy_on_read enabled
+>   block: honor BDRV_O_ALLOW_RDWR when clearing bs->read_only
+>   block: code movement
+>   block: introduce bdrv_can_set_read_only()
+>   block: use bdrv_can_set_read_only() during reopen
+>   block/rbd - update variable names to more apt names
+>   block/rbd: Add support for reopen()
+>=20
+>  block.c               | 56 +++++++++++++++++++++++++++++++++++---------
+>  block/bochs.c         |  5 +++-
+>  block/cloop.c         |  5 +++-
+>  block/dmg.c           |  6 ++++-
+>  block/rbd.c           | 65 +++++++++++++++++++++++++++++++++++++--------=
+------
+>  block/vvfat.c         | 19 +++++++++++----
+>  include/block/block.h |  2 ++
+>  7 files changed, 123 insertions(+), 35 deletions(-)
+>=20
+> --=20
+> 2.9.3
 >=20
 
->         aio_context_acquire(bs->ctx)
->=20
-> Note that in above case, bdrv_drained_begin() doesn't do the "release,
-> poll, acquire" in BDRV_POLL_WHILE, because bs->in_flight =3D=3D 0.
->=20
-> Fix this by using bdrv_coroutine_enter and enter coroutine in the right=
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-> context.
->=20
-> iotests 109 output is updated because the coroutine reenter flow during=
-
-> mirror job complete is different (now through co_queue_wakeup, instead
-> of the unconditional qemu_coroutine_switch before), making the end job
-> len different.
->=20
-> Signed-off-by: Fam Zheng <famz@redhat.com>
->=20
-> fixup
-
-Is this leftovers during rebasing?
-
-> ---
->  block/block-backend.c      |  4 ++--
->  block/io.c                 | 14 +++++++-------
->  tests/qemu-iotests/109.out | 10 +++++-----
->  3 files changed, 14 insertions(+), 14 deletions(-)
->=20
-
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---n8glITNt1h87jsLHo557BplD4d5suokFL
+--/2994txjAzEdQwm5
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJY66cAAAoJEKeha0olJ0NqxY8H/2TKdUnICvN3Jpc/Pa7NHjEN
-xykr+giu6O1H6JaUGcAzbIQsPitFYETWbJi3W1gd6zulSlA6m6WoD6uztN1BfeGu
-AySlovsjOTFTyRmX9j92DB/NlFmXBoKYf2+lc4d6H0/LEDv5lSmbVDpoOmn6CvuO
-8g/w6WwFjRz1Hoy5MMAh0hUZvA4NJDNfGwj8LR2Yh8f6Rxrq+Su50VMgaCEYK0Hw
-TYA16rNG6Tv4fDC/oLE9px36dNQzXz3IcDjbG7++5S2anu33XcKnLPn2FZj6+zAk
-j7+6EpOKihra+Xat+KYkQpaHKbPPkAAM3wn4Sr42rL8gkd4774TqM6Wchovbu1M=
-=xo5z
+iQEcBAEBAgAGBQJY66cOAAoJEJykq7OBq3PIij8H/1FlRewY7jsXAsezBYBAGGgW
+SJxLi0Pp9fL80V5FYjMnxbaZbEMAF+zHBacyVcgnOIMhPqq6H1zZcX9DM0VW0/dW
+SckwH+ULXl7vESOijOXwDpa0vaks4UYFtuc8i0Y46WJ7LNNfMDCiYYytfGXrYSxl
+6gvGkviqMZBf7V7pPzwFRGaMYEolLppA+DDQfImY/uWp7uO8BCqsaDyKULCzSyyW
+8PwkJgh7WHPR8XXbjFBiVYY+sVLZChYHIIiM/s2f96xfsRG50ZneR2ieklMN8KlQ
+JZc7F3tuHkVrciIZ8JrKOSR+72ScLU9DWoG2/jVkwS3xOXbm7Sf0+Ernvc3i91g=
+=KlT2
 -----END PGP SIGNATURE-----
 
---n8glITNt1h87jsLHo557BplD4d5suokFL--
+--/2994txjAzEdQwm5--
