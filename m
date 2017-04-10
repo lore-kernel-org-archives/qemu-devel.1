@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cxWIo-0000W4-W5
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:12:08 -0400
+	(envelope-from <berrange@redhat.com>) id 1cxWMb-0001EU-Dw
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:16:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cxWIj-0005jO-T7
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:12:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46682)
+	(envelope-from <berrange@redhat.com>) id 1cxWMY-0006Mj-7B
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:16:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40236)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cxWIj-0005jF-K9
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:12:01 -0400
-Date: Mon, 10 Apr 2017 11:11:52 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cxWMX-0006MY-UU
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:15:58 -0400
+Date: Mon, 10 Apr 2017 11:15:52 +0100
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170410101152.GG3655@redhat.com>
+Message-ID: <20170410101552.GH3655@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1491814840-63048-1-git-send-email-longpeng2@huawei.com>
+References: <1491814847-63240-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1491814840-63048-1-git-send-email-longpeng2@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 12/19] socket: add af_alg family
- support
+In-Reply-To: <1491814847-63240-1-git-send-email-longpeng2@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 13/19] crypto: introduce some
+ common functions for af_alg backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,197 +29,133 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Longpeng(Mike)" <longpeng2@huawei.com>
-Cc: kraxel@redhat.com, pbonzini@redhat.com, eblake@redhat.com, armbru@redhat.com, xuquan8@huawei.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org
+Cc: xuquan8@huawei.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org
 
-On Mon, Apr 10, 2017 at 05:00:40PM +0800, Longpeng(Mike) wrote:
-> The AF_ALG socket family is the userspace interface for linux
-> crypto API, this patch adds af_alg family support. It'll be used
-> by afalg-backend crypto later.
+On Mon, Apr 10, 2017 at 05:00:47PM +0800, Longpeng(Mike) wrote:
+> This patch introduces some common functions for af_alg backend,
+> they would be used in af_alg-backend cipher/hash/hmac latter.
 > 
 > Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 > ---
->  configure              | 21 ++++++++++++
->  include/qemu/sockets.h |  6 ++++
->  qapi-schema.json       | 21 +++++++++++-
->  util/qemu-sockets.c    | 91 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 138 insertions(+), 1 deletion(-)
+>  crypto/Makefile.objs        |  1 +
+>  crypto/afalg-comm.c         | 71 +++++++++++++++++++++++++++++++++++++++++++++
+>  include/crypto/afalg-comm.h | 61 ++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 133 insertions(+)
+>  create mode 100644 crypto/afalg-comm.c
+>  create mode 100644 include/crypto/afalg-comm.h
 > 
-> diff --git a/configure b/configure
-> index 4b3b5cd..970c9bc 100755
-> --- a/configure
-> +++ b/configure
-> @@ -4737,6 +4737,23 @@ if compile_prog "" "" ; then
->      have_af_vsock=yes
->  fi
->  
-> +##########################################
-> +# check for usable AF_ALG environment
-> +hava_af_alg=no
-> +cat > $TMPC << EOF
-> +#include <errno.h>
-> +#include <sys/types.h>
-> +#include <sys/socket.h>
-> +int main(void) {
-> +    int sock;
-> +    sock = socket(AF_ALG, SOCK_SEQPACKET, 0);
-> +    return sock;
+> diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
+> index 1f749f2..6f244a3 100644
+> --- a/crypto/Makefile.objs
+> +++ b/crypto/Makefile.objs
+> @@ -10,6 +10,7 @@ crypto-obj-$(if $(CONFIG_NETTLE),n,$(if $(CONFIG_GCRYPT_HMAC),n,y)) += hmac-glib
+>  crypto-obj-y += aes.o
+>  crypto-obj-y += desrfb.o
+>  crypto-obj-y += cipher.o
+> +crypto-obj-$(CONFIG_AF_ALG) += afalg-comm.o
+>  crypto-obj-y += tlscreds.o
+>  crypto-obj-y += tlscredsanon.o
+>  crypto-obj-y += tlscredsx509.o
+> diff --git a/crypto/afalg-comm.c b/crypto/afalg-comm.c
+> new file mode 100644
+> index 0000000..27bc88c
+> --- /dev/null
+> +++ b/crypto/afalg-comm.c
+
+Just calls this  crypto/afalg.c
+
+
+> +void afalg_comm_format_type(AfalgSocketAddress *afalg,
+> +                            const char *type)
+> +{
+> +    afalg->type = (char *)g_new0(int8_t, SALG_TYPE_LEN_MAX);
+> +    pstrcpy(afalg->type, SALG_TYPE_LEN_MAX, type);
 > +}
-> +EOF
-> +if compile_prog "" "" ; then
-> +    have_af_alg=yes
-> +fi
+
+Needs an 'Error **errp' for reporting if 'type' is too long
+
+
+> diff --git a/include/crypto/afalg-comm.h b/include/crypto/afalg-comm.h
+> new file mode 100644
+> index 0000000..b6b9464
+> --- /dev/null
+> +++ b/include/crypto/afalg-comm.h
+> @@ -0,0 +1,61 @@
+> +/*
+> + * QEMU Crypto af_alg support
+> + *
+> + * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
+> + *
+> + * Authors:
+> + *    Longpeng(Mike) <longpeng2@huawei.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or
+> + * (at your option) any later version.  See the COPYING file in the
+> + * top-level directory.
+> + */
+> +#ifndef QCRYPTO_AFALG_H
+> +#define QCRYPTO_AFALG_H
 > +
->  #################################################
->  # Sparc implicitly links with --relax, which is
->  # incompatible with -r, so --no-relax should be
-> @@ -5767,6 +5784,10 @@ if test "$have_af_vsock" = "yes" ; then
->    echo "CONFIG_AF_VSOCK=y" >> $config_host_mak
->  fi
->  
-> +if test "$have_af_alg" = "yes" ; then
-> +  echo "CONFIG_AF_ALG=y" >> $config_host_mak
-> +fi
+> +#include "qapi-types.h"
 > +
->  if test "$have_sysmacros" = "yes" ; then
->    echo "CONFIG_SYSMACROS=y" >> $config_host_mak
->  fi
-> diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
-> index 7842f6d..0a4a003 100644
-> --- a/include/qemu/sockets.h
-> +++ b/include/qemu/sockets.h
-> @@ -51,6 +51,12 @@ int socket_listen(SocketAddress *addr, Error **errp);
->  void socket_listen_cleanup(int fd, Error **errp);
->  int socket_dgram(SocketAddress *remote, SocketAddress *local, Error **errp);
->  
-> +#ifdef CONFIG_AF_ALG
-> +#define SALG_TYPE_LEN_MAX 14
-> +#define SALG_NAME_LEN_MAX 64
-> +int socket_bind(SocketAddress *addr, Error **errp);
+> +#ifndef SOL_ALG
+> +#define SOL_ALG 279
 > +#endif
-> +
->  /* Old, ipv4 only bits.  Don't use for new code. */
->  int parse_host_port(struct sockaddr_in *saddr, const char *str);
->  int socket_init(void);
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 250e4dc..0cb06d3 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -1516,12 +1516,14 @@
->  #
->  # @vsock: vsock family (since 2.8)
->  #
-> +# @afalg: af_alg family (since 2.10)
-> +#
->  # @unknown: otherwise
->  #
->  # Since: 2.1
->  ##
->  { 'enum': 'NetworkAddressFamily',
-> -  'data': [ 'ipv4', 'ipv6', 'unix', 'vsock', 'unknown' ] }
-> +  'data': [ 'ipv4', 'ipv6', 'unix', 'vsock', 'afalg', 'unknown' ] }
->  
->  ##
->  # @VncBasicInfo:
-> @@ -4119,6 +4121,22 @@
->      'port': 'str' } }
->  
->  ##
-> +# @AfalgSocketAddress:
-> +#
-> +# Captures a socket address in the af_alg namespace.
-> +#
-> +# @type: type of the crypto algogrithms
-> +#
-> +# @name: name of the crypto algogrithms
-> +#
-> +# Since: 2.10
-> +##
-> +{ 'struct': 'AfalgSocketAddress',
-> +  'data': {
-> +    'type': 'str',
-> +    'name': 'str' }}
-> +
-> +##
->  # @SocketAddress:
->  #
->  # Captures the address of a socket, which could also be a named file descriptor
-> @@ -4130,6 +4148,7 @@
->      'inet': 'InetSocketAddress',
->      'unix': 'UnixSocketAddress',
->      'vsock': 'VsockSocketAddress',
-> +    'afalg': 'AfalgSocketAddress',
->      'fd': 'String' } }
->  
->  ##
 
-I really don't think we want to expose any of this in the qapi-schema. It is
-a Linux specific internal implementation detail that is not relevant to users
-of QAPI.
+This can be in the .c file as I don't se it used elsewhere.
 
-> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-> index 21442c3..258e419 100644
-> --- a/util/qemu-sockets.c
-> +++ b/util/qemu-sockets.c
-> @@ -1151,6 +1151,97 @@ void socket_listen_cleanup(int fd, Error **errp)
->      qapi_free_SocketAddress(addr);
->  }
->  
-> +#ifdef CONFIG_AF_ALG
 > +
-> +#include <linux/if_alg.h>
-> +
-> +static bool afalg_parse_bind_saddr(const AfalgSocketAddress *saddr,
-> +                                   struct sockaddr_alg *alg,
-> +                                   Error **errp)
-> +{
-> +    memset(alg, 0, sizeof(*alg));
-> +    alg->salg_family = AF_ALG;
-> +
-> +    if (qemu_strnlen(saddr->type, SALG_TYPE_LEN_MAX) == SALG_TYPE_LEN_MAX) {
-> +        error_setg(errp, "Afalg type(%s) is larger than 14 bytes",
-> +                   saddr->type);
-> +        return false;
-> +    }
-> +
-> +    if (qemu_strnlen(saddr->name, SALG_NAME_LEN_MAX) == SALG_NAME_LEN_MAX) {
-> +        error_setg(errp, "Afalg name(%s) is larger than 64 bytes",
-> +                   saddr->name);
-> +        return false;
-> +    }
-> +
-> +    pstrcpy((char *)alg->salg_type, SALG_TYPE_LEN_MAX, saddr->type);
-> +    pstrcpy((char *)alg->salg_name, SALG_NAME_LEN_MAX, saddr->name);
-> +
-> +    return true;
-> +}
-> +
-> +static int afalg_bind_saddr(const AfalgSocketAddress *saddr,
-> +                            Error **errp)
-> +{
-> +    struct sockaddr_alg alg;
-> +    int sbind;
-> +
-> +    if (!afalg_parse_bind_saddr(saddr, &alg, errp)) {
-> +        return -1;
-> +    }
-> +
-> +    sbind = qemu_socket(AF_ALG, SOCK_SEQPACKET, 0);
-> +    if (sbind < 0) {
-> +        error_setg_errno(errp, errno, "Failed to create socket");
-> +        return -1;
-> +    }
-> +
-> +    if (bind(sbind, (const struct sockaddr *)&alg, sizeof(alg)) != 0) {
-> +        error_setg_errno(errp, errno, "Failed to bind socket");
-> +        closesocket(sbind);
-> +        return -1;
-> +    }
-> +
-> +    return sbind;
-> +}
+> +typedef struct QCryptoAfalg QCryptoAfalg;
+> +struct QCryptoAfalg {
 
-Just put this code in the crypto afalg codebase directly
+Name it 'QCryptoAFAlg'  since the letters 'af' are an abbreviation.
 
+> +    int tfmfd;
+> +    int opfd;
+> +    struct msghdr *msg;
+> +    struct cmsghdr *cmsg;
+> +};
+> +
+> +
+> +/**
+> + * afalg_comm_format_type:
+> + * @afalg: the AfalgSocketAddress object
+> + * @type: the type of crypto alg.
+> + *
+> + * Set the type field of the @afalg according to @type.
+> + */
+> +void afalg_comm_format_type(AfalgSocketAddress *afalg,
+> +                            const char *type);
+> +
+> +/**
+> + * afalg_comm_alloc:
+> + * @saddr: the SocketAddress object
+> + *
+> + * Allocate a QCryptoAfalg object and bind itself to
+> + * a AF_ALG socket.
+> + *
+> + * Returns:
+> + *  a new QCryptoAfalg object, or NULL in error.
+> + */
+> +QCryptoAfalg *afalg_comm_alloc(SocketAddress *saddr);
+> +
+> +/**
+> + * afalg_comm_free:
+> + * @afalg: the QCryptoAfalg object
+> + *
+> + * Free the @afalg.
+> + */
+> +void afalg_comm_free(QCryptoAfalg *afalg);
+> +
+> +#endif
+
+This is all for internal use by the crypto/ code, so should be in a header
+crypto/afalgpriv.h
+
+> -- 
+> 1.8.3.1
+> 
+> 
 
 Regards,
 Daniel
