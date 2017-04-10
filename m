@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cxW8Q-0005Hh-4y
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:01:23 -0400
+	(envelope-from <berrange@redhat.com>) id 1cxWAs-00061R-Ke
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:03:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cxW8P-0002AA-Ay
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:01:22 -0400
-Date: Mon, 10 Apr 2017 11:01:15 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170410100115.GO2567@stefanha-x1.localdomain>
-References: <1491384478-12325-1-git-send-email-lidongchen@tencent.com>
-	<20170406140255.GA31259@stefanha-x1.localdomain>
-	<CAOGPPbfpN5QVxzvAkRv4MY7nE0YBxU0-UeMuJpVCe-wBB_9p8A@mail.gmail.com>
-	<20170407113312.GN13602@stefanha-x1.localdomain>
-	<3565ef7f-97dd-4d7b-fbed-590e032819bf@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1cxWAo-0002p6-Vo
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:03:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33550)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cxWAo-0002ou-QD
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:03:50 -0400
+Date: Mon, 10 Apr 2017 11:03:45 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170410100345.GD3655@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1491814786-60036-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="wxIXENaY2CYUgF8u"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <3565ef7f-97dd-4d7b-fbed-590e032819bf@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3] migration/block:limit the
- time used for block migration
+In-Reply-To: <1491814786-60036-1-git-send-email-longpeng2@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 05/19] crypto: cipher: add cipher
+ driver framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +28,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 858585 jemmy <jemmy858585@gmail.com>, kwolf@redhat.com, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, Lidong Chen <lidongchen@tencent.com>
+To: "Longpeng(Mike)" <longpeng2@huawei.com>
+Cc: xuquan8@huawei.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org
+
+On Mon, Apr 10, 2017 at 04:59:46PM +0800, Longpeng(Mike) wrote:
+> 1) makes the public APIs in cipher-nettle/gcrypt/builtin static,
+>    and rename them with "nettle/gcrypt/builtin" prefix.
+> 
+> 2) introduces cipher framework, including QCryptoCipherDriver
+>    and new public APIs.
+> 
+> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+> ---
+>  crypto/cipher-builtin.c | 59 +++++++++++++++++--------------------------------
+>  crypto/cipher-gcrypt.c  | 58 +++++++++++++++++-------------------------------
+>  crypto/cipher-nettle.c  | 59 +++++++++++++++++--------------------------------
+>  crypto/cipher.c         | 59 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  include/crypto/cipher.h | 22 ++++++++++++++++++
+>  5 files changed, 141 insertions(+), 116 deletions(-)
+> 
+
+> diff --git a/include/crypto/cipher.h b/include/crypto/cipher.h
+> index bec9f41..32b6065 100644
+> --- a/include/crypto/cipher.h
+> +++ b/include/crypto/cipher.h
+> @@ -23,6 +23,7 @@
+>  
+>  #include "qapi-types.h"
+>  
+> +typedef struct QCryptoCipherDriver QCryptoCipherDriver;
+>  typedef struct QCryptoCipher QCryptoCipher;
+>  
+>  /* See also "QCryptoCipherAlgorithm" and "QCryptoCipherMode"
+> @@ -76,7 +77,28 @@ typedef struct QCryptoCipher QCryptoCipher;
+>   *
+>   */
+>  
+> +struct QCryptoCipherDriver {
+> +    int (*cipher_encrypt)(QCryptoCipher *cipher,
+> +                          const void *in,
+> +                          void *out,
+> +                          size_t len,
+> +                          Error **errp);
+> +
+> +    int (*cipher_decrypt)(QCryptoCipher *cipher,
+> +                          const void *in,
+> +                          void *out,
+> +                          size_t len,
+> +                          Error **errp);
+> +
+> +    int (*cipher_setiv)(QCryptoCipher *cipher,
+> +                        const uint8_t *iv, size_t niv,
+> +                        Error **errp);
+> +
+> +    void (*cipher_free)(QCryptoCipher *cipher);
+> +};
+
+Please put this in a crypto/cipherpriv.h header file, since it is
+not something we want to expose to the rest of QEMU source code.
 
 
---wxIXENaY2CYUgF8u
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Sat, Apr 08, 2017 at 06:09:16PM +0800, Paolo Bonzini wrote:
-> On 07/04/2017 19:33, Stefan Hajnoczi wrote:
-> > The migration thread is holding the QEMU global mutex, the AioContext,
-> > and the qcow2 s->lock while the L2 table is read from disk.
-> >=20
-> > The QEMU global mutex is needed for block layer operations that touch
-> > the global drives list.  bdrv_is_allocated() can be called without the
-> > global mutex.
->=20
-> Hi Stefan,
->=20
-> only virtio-blk and virtio-scsi take the AioContext lock (because they
-> support dataplane).  For block migration to work with devices such as
-> IDE, it needs to take the iothread lock too.  I think there's a comment
-> about this in migration/block.c.
-
-Good point.  :(
-
-Stefan
-
---wxIXENaY2CYUgF8u
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJY61frAAoJEJykq7OBq3PIDUQIAIic7IdWT9QnyfpbltSqI5zT
-CCIQ/RPFpbHE3l3ZXM7NeA+Q0p2sZSndpM1G7NQgrOpHUEspUGA/wVHPRq1GJdkl
-0Z7GhFpQ0xjjyW2/4/kt8AF70QcZBi5gTQRKPkaTzwgPLHTtqZLHpV59Pk+wJC82
-OrT7I5Ld/HmRf3xx9M38LFAiDu4ondslhZ5dRhPRPZdnHmoSHfs0U5HwzHiGirmi
-gLu3MD3Cb4QPV/UWTiu0nXJbNXYpDA5MJNBIoFNpSQqRIfCHgzdmM4Vr8GOOZbyK
-xPkjLbKtll6dt6gW2KpNLdY/+F03Z+K13iblOJpRlrGWNQSwo4uigLxQgyYq+DU=
-=Y3nI
------END PGP SIGNATURE-----
-
---wxIXENaY2CYUgF8u--
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
