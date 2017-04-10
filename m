@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cxZGB-0004KP-GO
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 09:21:36 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cxZH7-0004qQ-Hf
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 09:22:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cxZG7-0005bi-I8
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 09:21:35 -0400
-Received: from 9.mo179.mail-out.ovh.net ([46.105.76.148]:54510)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cxZG7-0005aC-Ck
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 09:21:31 -0400
-Received: from player690.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 1C984354F8
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 15:21:28 +0200 (CEST)
-References: <1491396106-26376-1-git-send-email-clg@kaod.org>
-	<1491396106-26376-12-git-send-email-clg@kaod.org>
-	<20170410151634.538043c8@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <34241c5a-b650-04e3-eb75-e19291b4e254@kaod.org>
-Date: Mon, 10 Apr 2017 15:21:19 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cxZH3-00064p-Id
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 09:22:33 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1491820793-5348-1-git-send-email-peter.maydell@linaro.org>
+	<1491820793-5348-6-git-send-email-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <6a8d54a6-cf11-38d3-390f-dd4536b2c2b6@amsat.org>
+Date: Mon, 10 Apr 2017 10:22:25 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170410151634.538043c8@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 11/21] ppc/pnv: scan ISA bus to
- populate device tree
+In-Reply-To: <1491820793-5348-6-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 5/7] arm: Move condition-failed
+ codepath generation out of if()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,82 +28,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, patches@linaro.org
 
-On 04/10/2017 03:16 PM, Greg Kurz wrote:
-> On Wed,  5 Apr 2017 14:41:36 +0200
-> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->=20
->> This is an empty shell that we will use to include nodes in the device
->> tree for ISA devices. We expect RTC, UART and IPMI BT devices.
->>
->> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->> ---
->>  hw/ppc/pnv.c | 32 ++++++++++++++++++++++++++++++++
->>  1 file changed, 32 insertions(+)
->>
->> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
->> index 493c7eed7980..a3c8f6594d10 100644
->> --- a/hw/ppc/pnv.c
->> +++ b/hw/ppc/pnv.c
->> @@ -281,6 +281,36 @@ static void powernv_populate_chip(PnvChip *chip, =
-void *fdt)
->>      g_free(typename);
->>  }
->> =20
->> +typedef struct ForeachPopulateArgs {
->> +    void *fdt;
->> +    int offset;
->> +} ForeachPopulateArgs;
->> +
->> +static int powernv_populate_isa_device(DeviceState *dev, void *opaque=
-)
->> +{
->> +    return 0;
->> +}
->> +
->> +static void powernv_populate_isa(ISABus *bus, void *fdt)
->> +{
->> +    int lpc_offset;
->> +    ForeachPopulateArgs args;
->> +
->> +    lpc_offset =3D fdt_node_offset_by_compatible(fdt, -1, "ibm,lpc");
->> +    if (lpc_offset < 0) {
->> +        error_report("Could find the lpc node !?");
->=20
-> s/Could find/Could not find ?
+Hi Peter,
 
-yes. I will fix that. =20
+On 04/10/2017 07:39 AM, Peter Maydell wrote:
+> Move the code to generate the "condition failed" instruction
+> codepath out of the if (singlestepping) {} else {}. This
+> will allow adding support for handling a new is_jmp type
+> which can't be neatly split into "singlestepping case"
+> versus "not singlestepping case".
 
-Thanks,
+This makes also the code more readable :)
 
-C.=20
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/translate.c | 24 +++++++++++-------------
+>  1 file changed, 11 insertions(+), 13 deletions(-)
+>
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index a1a0e73..87fd702 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -11988,9 +11988,9 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
+>      /* At this stage dc->condjmp will only be set when the skipped
+>         instruction was a conditional branch or trap, and the PC has
+>         already been written.  */
+> +    gen_set_condexec(dc);
+>      if (unlikely(cs->singlestep_enabled || dc->ss_active)) {
+>          /* Unconditional and "condition passed" instruction codepath. */
+> -        gen_set_condexec(dc);
+>          switch (dc->is_jmp) {
+>          case DISAS_SWI:
+>              gen_ss_advance(dc);
+> @@ -12013,13 +12013,6 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
+>              /* FIXME: Single stepping a WFI insn will not halt the CPU. */
+>              gen_singlestep_exception(dc);
+>          }
+> -        if (dc->condjmp) {
+> -            /* "Condition failed" instruction codepath. */
+> -            gen_set_label(dc->condlabel);
+> -            gen_set_condexec(dc);
+> -            gen_set_pc_im(dc, dc->pc);
+> -            gen_singlestep_exception(dc);
+> -        }
+>      } else {
+>          /* While branches must always occur at the end of an IT block,
+>             there are a few other things that can cause us to terminate
+> @@ -12029,7 +12022,6 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
+>              - Hardware watchpoints.
+>             Hardware breakpoints have already been handled and skip this code.
+>           */
+> -        gen_set_condexec(dc);
+>          switch(dc->is_jmp) {
+>          case DISAS_NEXT:
+>              gen_goto_tb(dc, 1, dc->pc);
+> @@ -12069,11 +12061,17 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
+>              gen_exception(EXCP_SMC, syn_aa32_smc(), 3);
+>              break;
+>          }
+> -        if (dc->condjmp) {
+> -            gen_set_label(dc->condlabel);
+> -            gen_set_condexec(dc);
+> +    }
+> +
+> +    if (dc->condjmp) {
+> +        /* "Condition failed" instruction codepath for the branch/trap insn */
+> +        gen_set_label(dc->condlabel);
+> +        gen_set_condexec(dc);
+> +        if (unlikely(cs->singlestep_enabled || dc->ss_active)) {
 
->=20
->> +        return;
->> +    }
->> +
->> +    args.fdt =3D fdt;
->> +    args.offset =3D lpc_offset;
->> +
->> +    /* ISA devices are not necessarily parented to the ISA bus so we
->> +     * can not use object_child_foreach() */
->> +    qbus_walk_children(BUS(bus), powernv_populate_isa_device,
->> +                       NULL, NULL, NULL, &args);
->> +}
->> +
->>  static void *powernv_create_fdt(MachineState *machine)
->>  {
->>      const char plat_compat[] =3D "qemu,powernv\0ibm,powernv";
->> @@ -328,6 +358,8 @@ static void *powernv_create_fdt(MachineState *mach=
-ine)
->>      for (i =3D 0; i < pnv->num_chips; i++) {
->>          powernv_populate_chip(pnv->chips[i], fdt);
->>      }
->> +
->> +    powernv_populate_isa(pnv->isa_bus, fdt);
->>      return fdt;
->>  }
->> =20
->=20
+I'm custom to think "let's change that and think how to protect the code 
+to help the next one who will modify it" and wonder if it isn't safer to 
+define:
+
+const bool singlestepping;
+
+singlestepping = cs->singlestep_enabled || dc->ss_active;
+
+Then use:
+
+if unlikely(singlestepping)
+
+At line 11993 and here, what do you think?
+
+Either way:
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> +            gen_set_pc_im(dc, dc->pc);
+> +            gen_singlestep_exception(dc);
+> +        } else {
+>              gen_goto_tb(dc, 1, dc->pc);
+> -            dc->condjmp = 0;
+>          }
+>      }
+>
+>
