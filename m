@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53843)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cxVAr-0007Ve-4P
+	(envelope-from <longpeng2@huawei.com>) id 1cxVAq-0007Vd-Vo
 	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:59:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cxVAo-0001cB-E7
+	(envelope-from <longpeng2@huawei.com>) id 1cxVAm-0001bj-AZ
 	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:59:49 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3417
+Received: from szxga02-in.huawei.com ([45.249.212.188]:3416
 	helo=dggrg02-dlp.huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cxVAn-0001b5-M9
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:59:46 -0400
+	(envelope-from <longpeng2@huawei.com>) id 1cxVAl-0001YM-7V
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:59:44 -0400
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
-Date: Mon, 10 Apr 2017 16:59:33 +0800
-Message-ID: <1491814773-60036-1-git-send-email-longpeng2@huawei.com>
+Date: Mon, 10 Apr 2017 16:59:24 +0800
+Message-ID: <1491814764-59688-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH for-2.10 03/19] crypto: cipher: introduce
- qcrypto_cipher_ctx_new for nettle-backend
+Subject: [Qemu-devel] [PATCH for-2.10 02/19] crypto: cipher: introduce
+ qcrypto_cipher_ctx_new for gcrypt-backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +29,18 @@ To: berrange@redhat.com
 Cc: xuquan8@huawei.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org, "Longpeng(Mike)" <longpeng2@huawei.com>
 
 Extracts qcrypto_cipher_ctx_new() from qcrypto_cipher_new() for
-nettle-backend impls.
+gcrypt-backend impls.
 
 Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 ---
- crypto/cipher-nettle.c | 41 +++++++++++++++++++++++++++++------------
- 1 file changed, 29 insertions(+), 12 deletions(-)
+ crypto/cipher-gcrypt.c | 50 +++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 33 insertions(+), 17 deletions(-)
 
-diff --git a/crypto/cipher-nettle.c b/crypto/cipher-nettle.c
-index e04e3a1..e6d6e6c 100644
---- a/crypto/cipher-nettle.c
-+++ b/crypto/cipher-nettle.c
-@@ -262,12 +262,12 @@ static void nettle_cipher_free_ctx(QCryptoCipherNettle *ctx)
+diff --git a/crypto/cipher-gcrypt.c b/crypto/cipher-gcrypt.c
+index 0ecffa2..871730b 100644
+--- a/crypto/cipher-gcrypt.c
++++ b/crypto/cipher-gcrypt.c
+@@ -80,12 +80,12 @@ static void gcrypt_cipher_free_ctx(QCryptoCipherGcrypt *ctx,
  }
  
  
@@ -48,17 +48,17 @@ index e04e3a1..e6d6e6c 100644
 -                                  QCryptoCipherMode mode,
 -                                  const uint8_t *key, size_t nkey,
 -                                  Error **errp)
-+static QCryptoCipherNettle *qcrypto_cipher_ctx_new(QCryptoCipherAlgorithm alg,
++static QCryptoCipherGcrypt *qcrypto_cipher_ctx_new(QCryptoCipherAlgorithm alg,
 +                                                   QCryptoCipherMode mode,
 +                                                   const uint8_t *key,
 +                                                   size_t nkey,
 +                                                   Error **errp)
  {
 -    QCryptoCipher *cipher;
-     QCryptoCipherNettle *ctx;
-     uint8_t *rfbkey;
- 
-@@ -287,12 +287,7 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+     QCryptoCipherGcrypt *ctx;
+     gcry_error_t err;
+     int gcryalg, gcrymode;
+@@ -162,10 +162,6 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
          return NULL;
      }
  
@@ -66,26 +66,70 @@ index e04e3a1..e6d6e6c 100644
 -    cipher->alg = alg;
 -    cipher->mode = mode;
 -
-     ctx = g_new0(QCryptoCipherNettle, 1);
+     ctx = g_new0(QCryptoCipherGcrypt, 1);
+ 
+     err = gcry_cipher_open(&ctx->handle, gcryalg, gcrymode, 0);
+@@ -174,7 +170,7 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+                    gcry_strerror(err));
+         goto error;
+     }
+-    if (cipher->mode == QCRYPTO_CIPHER_MODE_XTS) {
++    if (mode == QCRYPTO_CIPHER_MODE_XTS) {
+         err = gcry_cipher_open(&ctx->tweakhandle, gcryalg, gcrymode, 0);
+         if (err != 0) {
+             error_setg(errp, "Cannot initialize cipher: %s",
+@@ -183,7 +179,7 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+         }
+     }
+ 
+-    if (cipher->alg == QCRYPTO_CIPHER_ALG_DES_RFB) {
++    if (alg == QCRYPTO_CIPHER_ALG_DES_RFB) {
+         /* We're using standard DES cipher from gcrypt, so we need
+          * to munge the key so that the results are the same as the
+          * bizarre RFB variant of DES :-)
+@@ -193,7 +189,7 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+         g_free(rfbkey);
+         ctx->blocksize = 8;
+     } else {
+-        if (cipher->mode == QCRYPTO_CIPHER_MODE_XTS) {
++        if (mode == QCRYPTO_CIPHER_MODE_XTS) {
+             nkey /= 2;
+             err = gcry_cipher_setkey(ctx->handle, key, nkey);
+             if (err != 0) {
+@@ -210,7 +206,7 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+                        gcry_strerror(err));
+             goto error;
+         }
+-        switch (cipher->alg) {
++        switch (alg) {
+         case QCRYPTO_CIPHER_ALG_AES_128:
+         case QCRYPTO_CIPHER_ALG_AES_192:
+         case QCRYPTO_CIPHER_ALG_AES_256:
+@@ -230,7 +226,7 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+         }
+     }
+ 
+-    if (cipher->mode == QCRYPTO_CIPHER_MODE_XTS) {
++    if (mode == QCRYPTO_CIPHER_MODE_XTS) {
+         if (ctx->blocksize != XTS_BLOCK_SIZE) {
+             error_setg(errp,
+                        "Cipher block size %zu must equal XTS block size %d",
+@@ -240,12 +236,10 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+         ctx->iv = g_new0(uint8_t, ctx->blocksize);
+     }
+ 
 -    cipher->opaque = ctx;
- 
-     switch (alg) {
-     case QCRYPTO_CIPHER_ALG_DES_RFB:
-@@ -436,10 +431,10 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
- 
-     ctx->iv = g_new0(uint8_t, ctx->blocksize);
- 
 -    return cipher;
 +    return ctx;
  
   error:
--    qcrypto_cipher_free(cipher);
-+    nettle_cipher_free_ctx(ctx);
+     gcrypt_cipher_free_ctx(ctx, mode);
+-    g_free(cipher);
      return NULL;
  }
  
-@@ -561,3 +556,25 @@ int qcrypto_cipher_setiv(QCryptoCipher *cipher,
-     memcpy(ctx->iv, iv, niv);
+@@ -385,3 +379,25 @@ int qcrypto_cipher_setiv(QCryptoCipher *cipher,
+ 
      return 0;
  }
 +
@@ -96,10 +140,10 @@ index e04e3a1..e6d6e6c 100644
 +                                  Error **errp)
 +{
 +    QCryptoCipher *cipher;
-+    QCryptoCipherNettle *ctx;
++    QCryptoCipherGcrypt *ctx;
 +
 +    ctx = qcrypto_cipher_ctx_new(alg, mode, key, nkey, errp);
-+    if (!ctx) {
++    if (ctx == NULL) {
 +        return NULL;
 +    }
 +
