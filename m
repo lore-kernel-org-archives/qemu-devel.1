@@ -1,29 +1,45 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cxfsm-0005nV-EE
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 16:25:53 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1cxgas-0001Sk-Kw
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 17:11:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cxfsl-0000rA-LQ
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 16:25:52 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:33228)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1cxfsl-0000qc-Gb
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 16:25:51 -0400
-Received: by mail-oi0-x242.google.com with SMTP id t63so8961803oih.0
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 13:25:50 -0700 (PDT)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1cxgan-00086C-HT
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 17:11:26 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36703
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1cxgan-00085l-BY
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 17:11:21 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3AL3dgY141475
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 17:11:20 -0400
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 29rd8fkjvk-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 17:11:20 -0400
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Mon, 10 Apr 2017 17:11:19 -0400
+References: <1491575431-32170-1-git-send-email-amarnath.valluri@intel.com>
+	<1491575431-32170-10-git-send-email-amarnath.valluri@intel.com>
+	<20170407144100.GL26896@redhat.com>
+	<CAJ+F1CJ1wfP_RS25=gokRvk2y0+-_7pX8adzmBUMZPpaz=AOgw@mail.gmail.com>
+	<094e28c1-b780-f8ff-fc6a-9f6dd3421a3a@intel.com>
+	<CAJ+F1CKo=tAXKHzoY4mfZxc9V2N5+sszOJwPOVqkJZK2tD6vMA@mail.gmail.com>
+	<1491818850.10884.99.camel@intel.com>
+	<df1081c7-7f3b-20df-0ff0-a2c2e6de9e43@linux.vnet.ibm.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Mon, 10 Apr 2017 17:11:16 -0400
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <CAFEAcA8-OO8AOKc4FD2Hj5WvJkcSkPV_1ef9i7ihgZDaf9ui3Q@mail.gmail.com>
-References: <cover.1491349058.git.alistair.francis@xilinx.com>
-	<f65e921725d39ce81c2d0910d59897a020596c58.1491349058.git.alistair.francis@xilinx.com>
-	<CAFEAcA8-OO8AOKc4FD2Hj5WvJkcSkPV_1ef9i7ihgZDaf9ui3Q@mail.gmail.com>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Mon, 10 Apr 2017 13:25:18 -0700
-Message-ID: <CAKmqyKN4hmgL9L9QTCCkGxMOeAgTT0otvNkDLnpGjL-rumHwqQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v1 2/5] cadence_gem: Correct the
- multi-queue can rx logic
+In-Reply-To: <df1081c7-7f3b-20df-0ff0-a2c2e6de9e43@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <bd30fa0d-fa7d-6722-11ad-3eac6f806012@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 9/9] tpm: Added support for TPM emulator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,62 +48,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Patrick Ohly <patrick.ohly@intel.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: Amarnath Valluri <amarnath.valluri@intel.com>, "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 
-On Mon, Apr 10, 2017 at 5:37 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 5 April 2017 at 00:40, Alistair Francis <alistair.francis@xilinx.com> wrote:
->> Correct the buffer descriptor busy logic to work correctly when using
->> multiple queues.
+On 04/10/2017 12:14 PM, Stefan Berger wrote:
+> On 04/10/2017 06:07 AM, Patrick Ohly wrote:
+>> On Mon, 2017-04-10 at 09:54 +0000, Marc-Andr=C3=A9 Lureau wrote:
 >>
->> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
->> ---
->>
->>  hw/net/cadence_gem.c | 18 +++++++++++-------
->>  1 file changed, 11 insertions(+), 7 deletions(-)
->>
->> diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
->> index 17c229d..3e37665 100644
->> --- a/hw/net/cadence_gem.c
->> +++ b/hw/net/cadence_gem.c
->> @@ -481,14 +481,18 @@ static int gem_can_receive(NetClientState *nc)
->>      }
->>
->>      for (i = 0; i < s->num_priority_queues; i++) {
->> -        if (rx_desc_get_ownership(s->rx_desc[i]) == 1) {
->> -            if (s->can_rx_state != 2) {
->> -                s->can_rx_state = 2;
->> -                DB_PRINT("can't receive - busy buffer descriptor (q%d) 0x%x\n",
->> -                         i, s->rx_desc_addr[i]);
->> -             }
->> -            return 0;
->> +        if (rx_desc_get_ownership(s->rx_desc[i]) != 1) {
->> +            break;
->> +        }
->> +    };
->> +
->> +    if (i == s->num_priority_queues) {
->> +        if (s->can_rx_state != 2) {
->> +            s->can_rx_state = 2;
->> +            DB_PRINT("can't receive - busy buffer descriptor (q%d) 0x%x\n",
->> +                     i, s->rx_desc_addr[i]);
+>>> By "public protocol", I mean qemu communication with a foreign
+>>> project, swtpm or other.
+>>>
+>>> If qemu grows new needs, or if the protocol is found limited or buggy=
+,
+>>> it may change. Subtle interactions may break between various
+>>> implementations.  The minimum would be some versioning or
+>>> capabilities. A document describing the states and messages
+>>> allowed/denied & effects would be quite necessary.
+>> Stefan, is there any documentation besides the source?
 >
-> This looks a little odd -- surely i isn't the right index to use
-> into rx_desc_addr[] any more now we're outside the loop and i
-> is always larger than the largest valid queue number? It looks
-> like the debug print should be rephrased somehow.
+> No.
 
-Yeah you are right. It means that they are all busy, we can either
-iterate over all of them and print out this or just print one
-statement saying that. Somehow I ended up half way between both.
+I now started to describe the protocol on the Wiki:
 
-I'll update it to just print that they are all busy. I don't see why
-we need every address printed.
+https://github.com/stefanberger/swtpm/wiki/Control-Channel-Specification
 
-Thanks,
+However, there's also a description in an existing man page:
 
-Alistair
+https://github.com/stefanberger/swtpm/blob/master/man/man3/swtpm_ioctls.p=
+od
 
 >
-> thanks
-> -- PMM
+>>
+>> Just asking, I don't think it is needed because...
+>>
+>>> Otoh, there doesn't seem to be other users of this protocol, or other
+>>> implementations. So it may make sense to make it qemu-specific, and
+>>> thus "private": the protocol and implementation can evolve without
+>>> risk to break other users. This gives us a lot more flexibility and
+>>> control, and doesn't have to be very strictly documented (although it
+>>> is still better to be strict, but requires more effort).
+>> ... I suspect it falls into this camp. I can't think of any users of t=
+he
+>> protocol besides swtpm itself and now qemu. Stefan, is that correct?
+>>
+>
+> Correct. Only swtpm client tools (swtpm_ioctl) and now your QEMU=20
+> patches are using the protocol.
+>
