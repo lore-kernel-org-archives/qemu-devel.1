@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53541)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cxYqv-0002X3-UE
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 08:55:31 -0400
+	(envelope-from <ashijeetacharya@gmail.com>) id 1cxZ01-0001XY-WB
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 09:04:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cxYqs-00039T-0t
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 08:55:30 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:35913)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cxYqr-00038l-PP
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 08:55:25 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id c55so74645747wrc.3
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 05:55:25 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 10 Apr 2017 13:55:20 +0100
-Message-Id: <20170410125524.21008-8-alex.bennee@linaro.org>
-In-Reply-To: <20170410125524.21008-1-alex.bennee@linaro.org>
-References: <20170410125524.21008-1-alex.bennee@linaro.org>
+	(envelope-from <ashijeetacharya@gmail.com>) id 1cxYzy-0007N4-4c
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 09:04:53 -0400
 MIME-Version: 1.0
+In-Reply-To: <1491057878-27868-2-git-send-email-ashijeetacharya@gmail.com>
+References: <1491057878-27868-1-git-send-email-ashijeetacharya@gmail.com>
+	<1491057878-27868-2-git-send-email-ashijeetacharya@gmail.com>
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Date: Mon, 10 Apr 2017 18:34:47 +0530
+Message-ID: <CAC2QTZaeOqHOwD5M=FU6Mg5HY1PvCgxbm1QyoAv0y2XE6xR5mA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 07/11] cpus: don't credit executed instructions
- before they have run
+Subject: Re: [Qemu-devel] [PATCH v3 1/6] vmdk: Move
+ vmdk_find_offset_in_cluster() to the top
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,89 +23,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: Fam Zheng <famz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, Ashijeet Acharya <ashijeetacharya@gmail.com>
 
-Outside of the vCPU thread icount time will only be tracked against
-timers_state.qemu_icount. We no longer credit cycles until they have
-completed the run. Inside the vCPU thread we adjust for passage of
-time by looking at how many have run so far. This is only valid inside
-the vCPU thread while it is running.
+On Sat, Apr 1, 2017 at 8:14 PM, Ashijeet Acharya
+<ashijeetacharya@gmail.com> wrote:
+> Move the existing vmdk_find_offset_in_cluster() function to the top of
+> the driver. Also, introduce a new helper function size_to_clusters()
+> which returns the number of clusters for a given size in bytes. Here,
+> we leave the last cluster as we need to perform COW for that one.
+>
+I will remove the trailing part of the commit message in v4 as there
+is no size_to_clusters() in this patch anymore, I forgot to update it!
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
-diff --git a/cpus.c b/cpus.c
-index 6034b104c3..0ecb0b87f0 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -223,6 +223,15 @@ void qemu_tcg_configure(QemuOpts *opts, Error **errp)
-     }
- }
- 
-+/* The current number of executed instructions is based on what we
-+ * originally budgeted minus the current state of the decrementing
-+ * icount counters in extra/u16.low.
-+ */
-+static int64_t cpu_get_icount_executed(CPUState *cpu)
-+{
-+    return cpu->icount_budget - (cpu->icount_decr.u16.low + cpu->icount_extra);
-+}
-+
- int64_t cpu_get_icount_raw(void)
- {
-     int64_t icount;
-@@ -234,7 +243,8 @@ int64_t cpu_get_icount_raw(void)
-             fprintf(stderr, "Bad icount read\n");
-             exit(1);
-         }
--        icount -= (cpu->icount_decr.u16.low + cpu->icount_extra);
-+        /* Take into account what has run */
-+        icount += cpu_get_icount_executed(cpu);
-     }
-     return icount;
- }
-@@ -1195,7 +1205,10 @@ static void prepare_icount_for_run(CPUState *cpu)
- 
-         count = tcg_get_icount_limit();
- 
--        timers_state.qemu_icount += count;
-+        /* To calculate what we have executed so far we need to know
-+         * what we originally budgeted to run this cycle */
-+        cpu->icount_budget = count;
-+
-         decr = (count > 0xffff) ? 0xffff : count;
-         count -= decr;
-         cpu->icount_decr.u16.low = decr;
-@@ -1206,14 +1219,14 @@ static void prepare_icount_for_run(CPUState *cpu)
- static void process_icount_data(CPUState *cpu)
- {
-     if (use_icount) {
--        /* Fold pending instructions back into the
--           instruction counter, and clear the interrupt flag.  */
--        timers_state.qemu_icount -= (cpu->icount_decr.u16.low
--                        + cpu->icount_extra);
-+        /* Account for executed instructions */
-+        timers_state.qemu_icount += cpu_get_icount_executed(cpu);
- 
-         /* Reset the counters */
-         cpu->icount_decr.u16.low = 0;
-         cpu->icount_extra = 0;
-+        cpu->icount_budget = 0;
-+
-         replay_account_executed_instructions();
-     }
- }
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index c3292efe1c..5d10359c8f 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -332,6 +332,7 @@ struct CPUState {
-     /* updates protected by BQL */
-     uint32_t interrupt_request;
-     int singlestep_enabled;
-+    int64_t icount_budget;
-     int64_t icount_extra;
-     sigjmp_buf jmp_env;
- 
--- 
-2.11.0
+Ashijeet
