@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cxUtO-0000gZ-BZ
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:41:47 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1cxUuA-00017y-4H
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:42:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cxUtN-0002ZK-G6
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:41:46 -0400
-Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:36419)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cxUtN-0002Z4-9d
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:41:45 -0400
-Received: by mail-wr0-x235.google.com with SMTP id c55so70122599wrc.3
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 01:41:45 -0700 (PDT)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1cxUu9-0002uX-41
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:42:34 -0400
+Date: Mon, 10 Apr 2017 10:42:22 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Message-ID: <20170410084222.GA19103@toto>
+References: <1491486152-24304-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170408150524.2870-1-shah.suramya@gmail.com>
-References: <20170408150524.2870-1-shah.suramya@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Apr 2017 09:41:23 +0100
-Message-ID: <CAFEAcA_Gyo4DwWyCvC7BsHeQLeRASSyxhJxt8a+6Jknr0gta1Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] hw/core: fix segmentation fault
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1491486152-24304-1-git-send-email-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Add assertion about FSC format
+ for syndrome registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +23,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suramya Shah <shah.suramya@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, patches@linaro.org
 
-On 8 April 2017 at 16:05, Suramya Shah <shah.suramya@gmail.com> wrote:
-> Reproducer:
->  $i386-softmmu/qemu-system-i386 -S -machine isapc,accel=tcg -device amd-iommu
-> Segmentation fault (core dumped)
->
-> Partial bt:
-> #0  bus_add_child (child=0x555556d4e520, bus=0x0) at hw/core/qdev.c:88
-> #1  qdev_set_parent_bus (dev=0x555556d4e520, bus=bus@entry=0x0)
-> at hw/core/qdev.c:119
->
-> Signed-off-by: Suramya Shah <shah.suramya@gmail.com>
+On Thu, Apr 06, 2017 at 02:42:32PM +0100, Peter Maydell wrote:
+> In tlb_fill() we construct a syndrome register value from a
+> fault status register value which is filled in by arm_tlb_fill().
+> arm_tlb_fill() returns FSR values which might be in the format
+> used with short-format page descriptors, or the format used
+> with long-format (LPAE) descriptors. The syndrome register
+> always uses LPAE-format FSR status codes.
+> 
+> It isn't actually possible to end up delivering a syndrome
+> register value to the guest for a fault which is reported
+> with a short-format FSR (that kind of stage 1 fault will only
+> happen for an AArch32 translation regime which doesn't have
+> a syndrome register, and can never be redirected to an AArch64
+> or Hyp exception level). Add an assertion which checks this,
+> and adjust the code so that we construct a syndrome with
+> an invalid status code, rather than allowing set bits in
+> the FSR input to randomly corrupt other fields in the syndrome.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Tricky but it looks correct as far as I can follow the specs...
+
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+
+
+
+
 > ---
->  hw/core/qdev.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 1e7fb33..07a211b 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -84,7 +84,11 @@ static void bus_add_child(BusState *bus, DeviceState *child)
->  {
->      char name[32];
->      BusChild *kid = g_malloc0(sizeof(*kid));
-> -
+> It took me a little while to convince myself that you'd
+> never take a short-format FSR to a using-syndrome EL :-)
+> ---
+>  target/arm/op_helper.c | 23 ++++++++++++++++++-----
+>  1 file changed, 18 insertions(+), 5 deletions(-)
+> 
+> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+> index d64c867..156b825 100644
+> --- a/target/arm/op_helper.c
+> +++ b/target/arm/op_helper.c
+> @@ -130,7 +130,7 @@ void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType access_type,
+>      if (unlikely(ret)) {
+>          ARMCPU *cpu = ARM_CPU(cs);
+>          CPUARMState *env = &cpu->env;
+> -        uint32_t syn, exc;
+> +        uint32_t syn, exc, fsc;
+>          unsigned int target_el;
+>          bool same_el;
+>  
+> @@ -145,19 +145,32 @@ void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType access_type,
+>              env->cp15.hpfar_el2 = extract64(fi.s2addr, 12, 47) << 4;
+>          }
+>          same_el = arm_current_el(env) == target_el;
+> -        /* AArch64 syndrome does not have an LPAE bit */
+> -        syn = fsr & ~(1 << 9);
 > +
-> +    if (!bus) {
-> +        error_report("bus not found ");
-> +        exit(0);
-> +    }
->      kid->index = bus->max_index++;
->      kid->child = child;
->      object_ref(OBJECT(kid->child));
-
-Thanks for the patch, but this doesn't look like the right way to fix
-this. Exiting with an error in a low-level function like this is not
-really any better than crashing. This function is not supposed to
-be called with a NULL bus pointer, so the question is: why is that
-happening? Something in one of the calling functions, probably
-several layers up the stack, has a bug. To fix this bug we need to
-look at that code and identify why it is trying to add the child
-device to a NULL bus and what bus it ought to be putting it on
-instead.
-
-thanks
--- PMM
+> +        if (fsr & (1 << 9)) {
+> +            /* LPAE format fault status register : bottom 6 bits are
+> +             * status code in the same form as needed for syndrome
+> +             */
+> +            fsc = extract32(fsr, 0, 6);
+> +        } else {
+> +            /* Short format FSR : this fault will never actually be reported
+> +             * to an EL that uses a syndrome register. Check that here,
+> +             * and use a (currently) reserved FSR code in case the constructed
+> +             * syndrome does leak into the guest somehow.
+> +             */
+> +            assert(target_el != 2 && !arm_el_is_aa64(env, target_el));
+> +            fsc = 0x3f;
+> +        }
+>  
+>          /* For insn and data aborts we assume there is no instruction syndrome
+>           * information; this is always true for exceptions reported to EL1.
+>           */
+>          if (access_type == MMU_INST_FETCH) {
+> -            syn = syn_insn_abort(same_el, 0, fi.s1ptw, syn);
+> +            syn = syn_insn_abort(same_el, 0, fi.s1ptw, fsc);
+>              exc = EXCP_PREFETCH_ABORT;
+>          } else {
+>              syn = merge_syn_data_abort(env->exception.syndrome, target_el,
+>                                         same_el, fi.s1ptw,
+> -                                       access_type == MMU_DATA_STORE, syn);
+> +                                       access_type == MMU_DATA_STORE, fsc);
+>              if (access_type == MMU_DATA_STORE
+>                  && arm_feature(env, ARM_FEATURE_V6)) {
+>                  fsr |= (1 << 11);
+> -- 
+> 2.7.4
+> 
+> 
