@@ -1,14 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cxUAB-0001xx-5S
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:55:04 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1cxUBu-0002bt-HR
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:56:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cxUAA-0002VJ-Df
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:55:03 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Mon, 10 Apr 2017 15:54:51 +0800
-Message-Id: <20170410075451.21329-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9] iscsi: Fix iscsi_create
+	(envelope-from <alex.bennee@linaro.org>) id 1cxUBr-0003IJ-GK
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:56:50 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:34968)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cxUBr-0003Hy-9h
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:56:47 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id o21so114527294wrb.2
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 00:56:47 -0700 (PDT)
+References: <20170410060655.32289-1-nikunj@linux.vnet.ibm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170410060655.32289-1-nikunj@linux.vnet.ibm.com>
+Date: Mon, 10 Apr 2017 08:56:52 +0100
+Message-ID: <87inmck857.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH fix for-2.9] cpus: fix wrong define name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,51 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, rth@twiddle.net, pbonzini@redhat.com, crosthwaite.peter@gmail.com, david@gibson.dropbear.id.au
 
-Since d5895fcb (iscsi: Split URL into individual options), creating
-qcow2 image on an iscsi LUN fails:
 
-    qemu-img create -f qcow2 iscsi://$SERVER/$IQN/0 1G
-    qemu-img: iscsi://$SERVER/$IQN/0: Could not create image: Invalid
-        argument
+Nikunj A Dadhania <nikunj@linux.vnet.ibm.com> writes:
 
-The problem is iscsi_open now expects that transport_name, portal and
-target are already parsed into structured options by
-iscsi_parse_filename, but it is not called in iscsi_create.
+> While the configure script generates TARGET_SUPPORTS_MTTCG define, one
+> of the define is cpus.c is checking wrong name: TARGET_SUPPORT_MTTCG
+>
+> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+> ---
+>  cpus.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/cpus.c b/cpus.c
+> index 68fdbc4..58d90aa 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -202,7 +202,7 @@ void qemu_tcg_configure(QemuOpts *opts, Error **errp)
+>              } else if (use_icount) {
+>                  error_setg(errp, "No MTTCG when icount is enabled");
+>              } else {
+> -#ifndef TARGET_SUPPORT_MTTCG
+> +#ifndef TARGET_SUPPORTS_MTTCG
+>                  error_report("Guest not yet converted to MTTCG - "
+>                               "you may get unexpected results");
+>  #endif
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- block/iscsi.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+Opps that's embarrassing.
 
-diff --git a/block/iscsi.c b/block/iscsi.c
-index 716e74a..07596b5 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -2092,6 +2092,7 @@ static int iscsi_create(const char *filename, QemuOpts *opts, Error **errp)
-     BlockDriverState *bs;
-     IscsiLun *iscsilun = NULL;
-     QDict *bs_options;
-+    Error *local_err = NULL;
- 
-     bs = bdrv_new();
- 
-@@ -2103,7 +2104,13 @@ static int iscsi_create(const char *filename, QemuOpts *opts, Error **errp)
- 
-     bs_options = qdict_new();
-     qdict_put(bs_options, "filename", qstring_from_str(filename));
--    ret = iscsi_open(bs, bs_options, 0, NULL);
-+    iscsi_parse_filename(filename, bs_options, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        ret = -EINVAL;
-+    } else {
-+        ret = iscsi_open(bs, bs_options, 0, NULL);
-+    }
-     QDECREF(bs_options);
- 
-     if (ret != 0) {
--- 
-2.9.3
+Applied to my tree, I'll be sending a pullreq today
+
+--
+Alex Bennée
