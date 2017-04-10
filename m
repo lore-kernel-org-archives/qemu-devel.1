@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37287)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cxXbS-0008Eg-Jb
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 07:35:27 -0400
+	id 1cxXiz-0001aI-Gb
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 07:43:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cxXbP-0000oH-GP
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 07:35:26 -0400
+	id 1cxXiw-0003LN-EK
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 07:43:13 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <1491821097-5647-1-git-send-email-peter.maydell@linaro.org>
+References: <1491820793-5348-1-git-send-email-peter.maydell@linaro.org>
+	<1491820793-5348-4-git-send-email-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <00c1e3ee-63fe-92e7-b5ca-1c7e08a59089@amsat.org>
-Date: Mon, 10 Apr 2017 08:35:17 -0300
+Message-ID: <c05b13b4-9ffe-318c-6ee6-04e1630ab92d@amsat.org>
+Date: Mon, 10 Apr 2017 08:43:05 -0300
 MIME-Version: 1.0
-In-Reply-To: <1491821097-5647-1-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1491820793-5348-4-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] arm: Move excnames[] array into
- arm_log_exceptions()
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 3/7] arm: Factor out "generate
+ right kind of step exception"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,101 +29,77 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+Cc: Richard Henderson <rth@twiddle.net>, patches@linaro.org
 
-On 04/10/2017 07:44 AM, Peter Maydell wrote:
-> The excnames[] array is defined in internals.h because we used
-> to use it from two different source files for handling logging
-> of AArch32 and AArch64 exception entry. Refactoring means that
-> it's now used only in arm_log_exception() in helper.c, so move
-> the array into that function.
+On 04/10/2017 07:39 AM, Peter Maydell wrote:
+> We currently have two places that do:
+>             if (dc->ss_active) {
+>                 gen_step_complete_exception(dc);
+>             } else {
+>                 gen_exception_internal(EXCP_DEBUG);
+>             }
 >
-> Suggested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Factor this out into its own function, as we're about to add
+> a third place that needs the same logic.
+>
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Philippe Mathieu-Daud� <f4bug@amsat.org>
 
 > ---
->  target/arm/cpu.h       |  2 +-
->  target/arm/internals.h | 23 -----------------------
->  target/arm/helper.c    | 19 +++++++++++++++++++
->  3 files changed, 20 insertions(+), 24 deletions(-)
+>  target/arm/translate.c | 28 ++++++++++++++++------------
+>  1 file changed, 16 insertions(+), 12 deletions(-)
 >
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index e6f05e2..ab86943 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -58,7 +58,7 @@
->  #define EXCP_SEMIHOST       16   /* semihosting call */
->  #define EXCP_NOCP           17   /* v7M NOCP UsageFault */
->  #define EXCP_INVSTATE       18   /* v7M INVSTATE UsageFault */
-> -/* NB: new EXCP_ defines should be added to the excnames[] array too */
-> +/* NB: add new EXCP_ defines to the array in arm_log_exception() too */
->
->  #define ARMV7M_EXCP_RESET   1
->  #define ARMV7M_EXCP_NMI     2
-> diff --git a/target/arm/internals.h b/target/arm/internals.h
-> index 97ca034..1f6efef 100644
-> --- a/target/arm/internals.h
-> +++ b/target/arm/internals.h
-> @@ -51,29 +51,6 @@ static inline bool excp_is_internal(int excp)
->          || excp == EXCP_SEMIHOST;
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index ddc62b6..870e320 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -296,6 +296,19 @@ static void gen_step_complete_exception(DisasContext *s)
+>      s->is_jmp = DISAS_EXC;
 >  }
 >
-> -/* Exception names for debug logging; note that not all of these
-> - * precisely correspond to architectural exceptions.
-> - */
-> -static const char * const excnames[] = {
-> -    [EXCP_UDEF] = "Undefined Instruction",
-> -    [EXCP_SWI] = "SVC",
-> -    [EXCP_PREFETCH_ABORT] = "Prefetch Abort",
-> -    [EXCP_DATA_ABORT] = "Data Abort",
-> -    [EXCP_IRQ] = "IRQ",
-> -    [EXCP_FIQ] = "FIQ",
-> -    [EXCP_BKPT] = "Breakpoint",
-> -    [EXCP_EXCEPTION_EXIT] = "QEMU v7M exception exit",
-> -    [EXCP_KERNEL_TRAP] = "QEMU intercept of kernel commpage",
-> -    [EXCP_HVC] = "Hypervisor Call",
-> -    [EXCP_HYP_TRAP] = "Hypervisor Trap",
-> -    [EXCP_SMC] = "Secure Monitor Call",
-> -    [EXCP_VIRQ] = "Virtual IRQ",
-> -    [EXCP_VFIQ] = "Virtual FIQ",
-> -    [EXCP_SEMIHOST] = "Semihosting call",
-> -    [EXCP_NOCP] = "v7M NOCP UsageFault",
-> -    [EXCP_INVSTATE] = "v7M INVSTATE UsageFault",
-> -};
-> -
->  /* Scale factor for generic timers, ie number of ns per tick.
->   * This gives a 62.5MHz timer.
->   */
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 8cb7a94..8a3e448 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -6271,6 +6271,25 @@ static void arm_log_exception(int idx)
+> +static void gen_singlestep_exception(DisasContext *s)
+> +{
+> +    /* Generate the right kind of exception for singlestep, which is
+> +     * either the architectural singlestep or EXCP_DEBUG for QEMU's
+> +     * gdb singlestepping.
+> +     */
+> +    if (s->ss_active) {
+> +        gen_step_complete_exception(s);
+> +    } else {
+> +        gen_exception_internal(EXCP_DEBUG);
+> +    }
+> +}
+> +
+>  static void gen_smul_dual(TCGv_i32 a, TCGv_i32 b)
 >  {
->      if (qemu_loglevel_mask(CPU_LOG_INT)) {
->          const char *exc = NULL;
-> +        static const char * const excnames[] = {
-> +            [EXCP_UDEF] = "Undefined Instruction",
-> +            [EXCP_SWI] = "SVC",
-> +            [EXCP_PREFETCH_ABORT] = "Prefetch Abort",
-> +            [EXCP_DATA_ABORT] = "Data Abort",
-> +            [EXCP_IRQ] = "IRQ",
-> +            [EXCP_FIQ] = "FIQ",
-> +            [EXCP_BKPT] = "Breakpoint",
-> +            [EXCP_EXCEPTION_EXIT] = "QEMU v7M exception exit",
-> +            [EXCP_KERNEL_TRAP] = "QEMU intercept of kernel commpage",
-> +            [EXCP_HVC] = "Hypervisor Call",
-> +            [EXCP_HYP_TRAP] = "Hypervisor Trap",
-> +            [EXCP_SMC] = "Secure Monitor Call",
-> +            [EXCP_VIRQ] = "Virtual IRQ",
-> +            [EXCP_VFIQ] = "Virtual FIQ",
-> +            [EXCP_SEMIHOST] = "Semihosting call",
-> +            [EXCP_NOCP] = "v7M NOCP UsageFault",
-> +            [EXCP_INVSTATE] = "v7M INVSTATE UsageFault",
-> +        };
->
->          if (idx >= 0 && idx < ARRAY_SIZE(excnames)) {
->              exc = excnames[idx];
+>      TCGv_i32 tmp1 = tcg_temp_new_i32();
+> @@ -11998,24 +12011,15 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
+>              gen_set_pc_im(dc, dc->pc);
+>              /* fall through */
+>          default:
+> -            if (dc->ss_active) {
+> -                gen_step_complete_exception(dc);
+> -            } else {
+> -                /* FIXME: Single stepping a WFI insn will not halt
+> -                   the CPU.  */
+> -                gen_exception_internal(EXCP_DEBUG);
+> -            }
+> +            /* FIXME: Single stepping a WFI insn will not halt the CPU. */
+> +            gen_singlestep_exception(dc);
+>          }
+>          if (dc->condjmp) {
+>              /* "Condition failed" instruction codepath. */
+>              gen_set_label(dc->condlabel);
+>              gen_set_condexec(dc);
+>              gen_set_pc_im(dc, dc->pc);
+> -            if (dc->ss_active) {
+> -                gen_step_complete_exception(dc);
+> -            } else {
+> -                gen_exception_internal(EXCP_DEBUG);
+> -            }
+> +            gen_singlestep_exception(dc);
+>          }
+>      } else {
+>          /* While branches must always occur at the end of an IT block,
 >
