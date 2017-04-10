@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cxWWG-0004Dm-EM
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:26:01 -0400
+	(envelope-from <kraxel@redhat.com>) id 1cxWY9-0004rg-Mz
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:27:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cxWWB-000106-AR
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:26:00 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3424
-	helo=dggrg02-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cxWWA-0000vA-SU
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:25:55 -0400
-Message-ID: <58EB5D9E.3040504@huawei.com>
-Date: Mon, 10 Apr 2017 18:25:34 +0800
-From: "Longpeng (Mike)" <longpeng2@huawei.com>
-MIME-Version: 1.0
-References: <1491814858-63428-1-git-send-email-longpeng2@huawei.com>
-	<20170410095133.GC3655@redhat.com>
-In-Reply-To: <20170410095133.GC3655@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.10 15/19] tests: crypto: add cipher
- speed case
+	(envelope-from <kraxel@redhat.com>) id 1cxWY5-0001vM-Cy
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:27:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55514)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cxWY5-0001v1-5m
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:27:53 -0400
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 10 Apr 2017 12:27:46 +0200
+Message-Id: <20170410102746.24889-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] qxl: add migration blocker to avoid
+ pre-save assert
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +22,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: xuquan8@huawei.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, 1635339@bugs.launchpad.net
 
-Hi Daniel,
+Cc: 1635339@bugs.launchpad.net
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/display/qxl.h |  1 +
+ hw/display/qxl.c | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 29 insertions(+)
 
-Ok, I'll take all your suggestions, and fix them in next version.
-
-Thanks.
-
-On 2017/4/10 17:51, Daniel P. Berrange wrote:
-
-> On Mon, Apr 10, 2017 at 05:00:58PM +0800, Longpeng(Mike) wrote:
->> Now we have afalg-backend and libiary-backend, it's necessary
->> to add the speed test in test-crypto-cipher.
->>
->> We can use "./tests/test-crypto-cipher speed" to do the speed
->> test.
-> 
-> This is not using any of the existing code for the benchmark, so there's
-> no real benefit to having it in this file.
-> 
-> I'd suggest creating a separate test program for performance benchmarking,
-> eg  tests/benchmark-crypto-cipher, that would be invoked separately as &
-> when needed ie skipped by make check-unit, but run by a 'make check-speed'.
-> 
-> Likewise for the other tests you've changed later in this series.
-> 
-> 
-> Regards,
-> Daniel
-
-
+diff --git a/hw/display/qxl.h b/hw/display/qxl.h
+index d2d49dd..77e5a36 100644
+--- a/hw/display/qxl.h
++++ b/hw/display/qxl.h
+@@ -40,6 +40,7 @@ typedef struct PCIQXLDevice {
+     uint32_t           cmdlog;
+ 
+     uint32_t           guest_bug;
++    Error              *migration_blocker;
+ 
+     enum qxl_mode      mode;
+     uint32_t           cmdflags;
+diff --git a/hw/display/qxl.c b/hw/display/qxl.c
+index c31b293..c1f830c 100644
+--- a/hw/display/qxl.c
++++ b/hw/display/qxl.c
+@@ -26,6 +26,7 @@
+ #include "qemu/queue.h"
+ #include "qemu/atomic.h"
+ #include "sysemu/sysemu.h"
++#include "migration/migration.h"
+ #include "trace.h"
+ 
+ #include "qxl.h"
+@@ -639,6 +640,27 @@ static int interface_get_command(QXLInstance *sin, struct QXLCommandExt *ext)
+         qxl->guest_primary.commands++;
+         qxl_track_command(qxl, ext);
+         qxl_log_command(qxl, "cmd", ext);
++        {
++            /*
++             * Windows 8 drivers place qxl commands in the vram
++             * (instead of the ram) bar.  We can't live migrate such a
++             * guest, so add a migration blocker in case we detect
++             * this, to avoid triggering the assert in pre_save().
++             *
++             * https://cgit.freedesktop.org/spice/win32/qxl-wddm-dod/commit/?id=f6e099db39e7d0787f294d5fd0dce328b5210faa
++             */
++            void *msg = qxl_phys2virt(qxl, ext->cmd.data, ext->group_id);
++            if (msg != NULL && (
++                    msg < (void *)qxl->vga.vram_ptr ||
++                    msg > ((void *)qxl->vga.vram_ptr + qxl->vga.vram_size))) {
++                if (!qxl->migration_blocker) {
++                    Error *local_err = NULL;
++                    error_setg(&qxl->migration_blocker,
++                               "qxl: guest bug: command not in ram bar");
++                    migrate_add_blocker(qxl->migration_blocker, &local_err);
++                }
++            }
++        }
+         trace_qxl_ring_command_get(qxl->id, qxl_mode_to_string(qxl->mode));
+         return true;
+     default:
+@@ -1236,6 +1258,12 @@ static void qxl_hard_reset(PCIQXLDevice *d, int loadvm)
+     qemu_spice_create_host_memslot(&d->ssd);
+     qxl_soft_reset(d);
+ 
++    if (d->migration_blocker) {
++        migrate_del_blocker(d->migration_blocker);
++        error_free(d->migration_blocker);
++        d->migration_blocker = NULL;
++    }
++
+     if (startstop) {
+         qemu_spice_display_start();
+     }
 -- 
-Regards,
-Longpeng(Mike)
+2.9.3
