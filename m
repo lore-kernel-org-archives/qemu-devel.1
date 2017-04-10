@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cxWoi-0001TV-4m
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:45:09 -0400
+	(envelope-from <kraxel@redhat.com>) id 1cxWvI-00064g-Qn
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:51:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cxWoh-00084D-5A
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:45:04 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Apr 2017 11:39:51 +0100
-Message-Id: <1491820793-5348-6-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1491820793-5348-1-git-send-email-peter.maydell@linaro.org>
-References: <1491820793-5348-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 5/7] arm: Move condition-failed codepath
- generation out of if()
+	(envelope-from <kraxel@redhat.com>) id 1cxWvE-0002Ja-Sg
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:51:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50032)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cxWvE-0002JK-Mx
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:51:48 -0400
+Message-ID: <1491821505.30990.4.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 10 Apr 2017 12:51:45 +0200
+In-Reply-To: <CAJ+F1C+0rfVXxfXNRLkXx0qeE1u3jrH27kEQ7Ty3niTq1aSwaA@mail.gmail.com>
+References: <20170410102746.24889-1-kraxel@redhat.com>
+	<CAJ+F1C+0rfVXxfXNRLkXx0qeE1u3jrH27kEQ7Ty3niTq1aSwaA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2] qxl: add migration blocker to avoid
+ pre-save assert
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,78 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>
+To: =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
+Cc: qemu-devel@nongnu.org, 1635339@bugs.launchpad.net
 
-Move the code to generate the "condition failed" instruction
-codepath out of the if (singlestepping) {} else {}. This
-will allow adding support for handling a new is_jmp type
-which can't be neatly split into "singlestepping case"
-versus "not singlestepping case".
+  Hi,
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/translate.c | 24 +++++++++++-------------
- 1 file changed, 11 insertions(+), 13 deletions(-)
+> > +                if (!qxl->migration_blocker) {
+> > +                    Error *local_err =3D NULL;
+> > +                    error_setg(&qxl->migration_blocker,
+> > +                               "qxl: guest bug: command not in ram bar=
+");
+> > +                    migrate_add_blocker(qxl->migration_blocker,
+> > &local_err);
+> >
+>=20
+> What do you do with the local_err? error_report_err() perhaps ?
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index a1a0e73..87fd702 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -11988,9 +11988,9 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
-     /* At this stage dc->condjmp will only be set when the skipped
-        instruction was a conditional branch or trap, and the PC has
-        already been written.  */
-+    gen_set_condexec(dc);
-     if (unlikely(cs->singlestep_enabled || dc->ss_active)) {
-         /* Unconditional and "condition passed" instruction codepath. */
--        gen_set_condexec(dc);
-         switch (dc->is_jmp) {
-         case DISAS_SWI:
-             gen_ss_advance(dc);
-@@ -12013,13 +12013,6 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
-             /* FIXME: Single stepping a WFI insn will not halt the CPU. */
-             gen_singlestep_exception(dc);
-         }
--        if (dc->condjmp) {
--            /* "Condition failed" instruction codepath. */
--            gen_set_label(dc->condlabel);
--            gen_set_condexec(dc);
--            gen_set_pc_im(dc, dc->pc);
--            gen_singlestep_exception(dc);
--        }
-     } else {
-         /* While branches must always occur at the end of an IT block,
-            there are a few other things that can cause us to terminate
-@@ -12029,7 +12022,6 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
-             - Hardware watchpoints.
-            Hardware breakpoints have already been handled and skip this code.
-          */
--        gen_set_condexec(dc);
-         switch(dc->is_jmp) {
-         case DISAS_NEXT:
-             gen_goto_tb(dc, 1, dc->pc);
-@@ -12069,11 +12061,17 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
-             gen_exception(EXCP_SMC, syn_aa32_smc(), 3);
-             break;
-         }
--        if (dc->condjmp) {
--            gen_set_label(dc->condlabel);
--            gen_set_condexec(dc);
-+    }
-+
-+    if (dc->condjmp) {
-+        /* "Condition failed" instruction codepath for the branch/trap insn */
-+        gen_set_label(dc->condlabel);
-+        gen_set_condexec(dc);
-+        if (unlikely(cs->singlestep_enabled || dc->ss_active)) {
-+            gen_set_pc_im(dc, dc->pc);
-+            gen_singlestep_exception(dc);
-+        } else {
-             gen_goto_tb(dc, 1, dc->pc);
--            dc->condjmp = 0;
-         }
-     }
- 
--- 
-2.7.4
+We can't error out at that point, unlike most migration blockers this
+isn't added at device initialization time.
+
+So, yes, we could error_report it, but the message would end up in the
+logfile unnoticed, so I'm not sure how useful that is ...
+
+cheers,
+  Gerd
