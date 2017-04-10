@@ -1,35 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cxhbI-00011J-3Y
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 18:15:57 -0400
+	(envelope-from <alistair23@gmail.com>) id 1cxhij-0002U1-MJ
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 18:23:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cxhbE-00008O-PM
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 18:15:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59887)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cxhbE-00007W-Jh
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 18:15:52 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cxhbB-0002LT-V0
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 22:15:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CF1902E80D1
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 22:15:49 +0000 (UTC)
+	(envelope-from <alistair23@gmail.com>) id 1cxhii-0002rW-Ea
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 18:23:37 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:35489)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1cxhii-0002qi-8Z
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 18:23:36 -0400
+Received: by mail-oi0-x243.google.com with SMTP id g204so14631340oib.2
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 15:23:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 10 Apr 2017 22:08:46 -0000
-From: John Snow <1681439@bugs.launchpad.net>
-Reply-To: Bug 1681439 <1681439@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170410132346.31250.84835.malonedeb@wampee.canonical.com>
-Message-Id: <20170410220847.31250.94319.launchpad@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1681439] Re: qemu-system-x86_64:
- hw/ide/core.c:685: ide_cancel_dma_sync: Assertion `s->bus->dma->aiocb ==
- NULL' failed.
+Sender: alistair23@gmail.com
+In-Reply-To: <CAFEAcA9Pp85ir53BEsd2dT=6iG8gi_6hH2hGkn12Fus0k1K8FQ@mail.gmail.com>
+References: <cover.1491349058.git.alistair.francis@xilinx.com>
+	<325f60be9b819f261848db3d69554da640294ca4.1491349058.git.alistair.francis@xilinx.com>
+	<CAFEAcA9Pp85ir53BEsd2dT=6iG8gi_6hH2hGkn12Fus0k1K8FQ@mail.gmail.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Mon, 10 Apr 2017 15:23:04 -0700
+Message-ID: <CAKmqyKOXoMRQbe+qEroxZxVPh06JU6vbZJ1wddBb_8imPeD-1A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v1 3/5] cadence_gem: Only trigger
+ interrupts if the status register is set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,61 +32,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-** Changed in: qemu
-     Assignee: (unassigned) =3D> John Snow (jnsnow)
+On Mon, Apr 10, 2017 at 5:44 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 5 April 2017 at 00:40, Alistair Francis <alistair.francis@xilinx.com> wrote:
+>> Only trigger multi-queue GEM interrupts if the interrupt status register
+>> is set. This logic was already used for non multi-queue interrupts but
+>> it also applies to multi-queue interrupts.
+>>
+>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>> ---
+>>
+>>  hw/net/cadence_gem.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
+>> index 3e37665..b9eaed4 100644
+>> --- a/hw/net/cadence_gem.c
+>> +++ b/hw/net/cadence_gem.c
+>> @@ -518,7 +518,7 @@ static void gem_update_int_status(CadenceGEMState *s)
+>>      }
+>>
+>>      for (i = 0; i < s->num_priority_queues; ++i) {
+>> -        if (s->regs[GEM_INT_Q1_STATUS + i]) {
+>> +        if (s->regs[GEM_INT_Q1_STATUS + i] && s->regs[GEM_ISR]) {
+>>              DB_PRINT("asserting int. (q=%d)\n", i);
+>>              qemu_set_irq(s->irq[i], 1);
+>>          }
+>
+> With this change, if s->regs[GEM_ISR] is zero then the entire
+> function never does anything, so you could hoist that up to
+> the start, rather than testing it inside the loop and in the
+> previous conditional.
 
--- =
+Yep, I have moved it to the top.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1681439
+>
+> Also the comment says "raise or lower interrupt based on current
+> status", but the code will only ever do qemu_set_irq(..., 1),
+> never 0. Which is right?
 
-Title:
-  qemu-system-x86_64: hw/ide/core.c:685: ide_cancel_dma_sync: Assertion
-  `s->bus->dma->aiocb =3D=3D NULL' failed.
+This is a little confusing. The interrupts are lowered when the ISR is
+read, so the assumption was that we never need to clear them in the
+gem_update_int_status(). Although then if we perform a reset nothing
+will clear the interrupts until the ISR is read from. So that is a
+bug. I'll update this patch to fix this up in V2.
 
-Status in QEMU:
-  New
+Thanks,
 
-Bug description:
-  Since upgrading to QEMU 2.8.0, my Windows 7 64-bit virtual machines
-  started crashing due to the assertion quoted in the summary failing.
-  The assertion in question was added by commit 9972354856 ("block: add
-  BDS field to count in-flight requests").  My tests show that setting
-  discard=3Dunmap is needed to reproduce the issue.  Speaking of
-  reproduction, it is a bit flaky, because I have been unable to come up
-  with specific instructions that would allow the issue to be triggered
-  outside of my environment, but I do have a semi-sane way of testing that
-  appears to depend on a specific initial state of data on the underlying
-  storage volume, actions taken within the VM and waiting for about 20
-  minutes.
+Alistair
 
-  Here is the shortest QEMU command line that I managed to reproduce the
-  bug with:
-
-      qemu-system-x86_64 \
-          -machine pc-i440fx-2.7,accel=3Dkvm \
-          -m 3072 \
-          -drive file=3D/dev/lvm/qemu,format=3Draw,if=3Dide,discard=3Dunmap=
- \
-  	-netdev tap,id=3Dhostnet0,ifname=3Dtap0,script=3Dno,downscript=3Dno,vhos=
-t=3Don \
-          -device virtio-net-pci,netdev=3Dhostnet0 \
-  	-vnc :0
-
-  The underlying storage (/dev/lvm/qemu) is a thin LVM snapshot.
-
-  QEMU was compiled using:
-
-      ./configure --python=3D/usr/bin/python2.7 --target-list=3Dx86_64-soft=
-mmu
-      make -j3
-
-  My virtualization environment is not really a critical one and
-  reproduction is not that much of a hassle, so if you need me to gather
-  further diagnostic information or test patches, I will be happy to help.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1681439/+subscriptions
+>
+> thanks
+> -- PMM
