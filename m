@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cxRlk-0007Ah-58
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 01:21:41 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1cxS5L-00026Z-NH
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 01:41:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cxRlg-0005bN-5O
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 01:21:40 -0400
-Date: Mon, 10 Apr 2017 15:19:55 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1cxS5K-0002Of-Dd
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 01:41:55 -0400
+Date: Mon, 10 Apr 2017 15:41:25 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170410051955.GL27571@umbus>
+Message-ID: <20170410054125.GQ27571@umbus>
 References: <1491396106-26376-1-git-send-email-clg@kaod.org>
-	<1491396106-26376-14-git-send-email-clg@kaod.org>
+	<1491396106-26376-19-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="umrsQkkrw7viUWFs"
+	protocol="application/pgp-signature"; boundary="WZLuFERxa6Y0cbOt"
 Content-Disposition: inline
-In-Reply-To: <1491396106-26376-14-git-send-email-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 13/21] ppc/pnv: populate device tree for
- serial devices
+In-Reply-To: <1491396106-26376-19-git-send-email-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 18/21] pci: Use the new
+ pci_can_add_device() to enforce devfn_min/max
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,76 +26,98 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
 
---umrsQkkrw7viUWFs
+--WZLuFERxa6Y0cbOt
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 05, 2017 at 02:41:38PM +0200, C=E9dric Le Goater wrote:
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
-> ---
->  hw/ppc/pnv.c | 33 +++++++++++++++++++++++++++++++++
->  1 file changed, 33 insertions(+)
+On Wed, Apr 05, 2017 at 02:41:43PM +0200, C=E9dric Le Goater wrote:
+> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 >=20
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index 2f9c41e350d4..00e594a0cbe3 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -301,6 +301,37 @@ static void powernv_populate_rtc(ISADevice *d, void =
-*fdt, int lpc_off)
->      _FDT((fdt_setprop_string(fdt, node, "compatible", "pnpPNP,b00")));
+> This adds a devfn_max field to PCIBus and adds a pci_can_add_device()
+> function which, if no "addr" (aka devfn) is specified, will tell whether
+> there is any slot free between devfn_min and devfn_max.
+>=20
+> When devfn_max is 0 (default), it will be ignored (no constraints).
+>=20
+> This will be used by some PCI root complex implementations that support
+> only one direct child to avoid having qemu put dumb devices at different
+> slot numbers.
+>=20
+> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> [clg: updated for qemu-2.9 ]
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> ---
+>  hw/pci/pci.c             | 22 ++++++++++++++++++++++
+>  include/hw/pci/pci_bus.h |  1 +
+>  2 files changed, 23 insertions(+)
+>=20
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 259483b1c01a..817ad14ed987 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -143,6 +143,27 @@ static uint16_t pcibus_numa_node(PCIBus *bus)
+>      return NUMA_NODE_UNASSIGNED;
 >  }
 > =20
-> +static void powernv_populate_serial(ISADevice *d, void *fdt, int lpc_off)
+> +static bool pci_can_add_device(BusState *bus, QemuOpts *opts)
 > +{
-> +    const char compatible[] =3D "ns16550\0pnpPNP,501";
-> +    uint32_t io_base =3D d->ioport_id;
-> +    uint32_t io_regs[] =3D {
-> +        cpu_to_be32(1),
-> +        cpu_to_be32(io_base),
-> +        cpu_to_be32(8)
-> +    };
-> +    char *name;
-> +    int node;
+> +    unsigned int devfn, max;
+> +    PCIBus *pbus =3D PCI_BUS(bus);
 > +
-> +    name =3D g_strdup_printf("%s@i%x", qdev_fw_name(DEVICE(d)), io_base);
-> +    node =3D fdt_add_subnode(fdt, lpc_off, name);
-> +    _FDT(node);
-> +    g_free(name);
-> +
-> +    _FDT((fdt_setprop(fdt, node, "reg", io_regs, sizeof(io_regs))));
-> +    _FDT((fdt_setprop(fdt, node, "compatible", compatible,
-> +                      sizeof(compatible))));
-> +
-> +    _FDT((fdt_setprop_cell(fdt, node, "clock-frequency", 1843200)));
-> +    _FDT((fdt_setprop_cell(fdt, node, "current-speed", 115200)));
-> +    _FDT((fdt_setprop_cell(fdt, node, "interrupts", d->isairq[0])));
-> +    _FDT((fdt_setprop_cell(fdt, node, "interrupt-parent",
-> +                           fdt_get_phandle(fdt, lpc_off))));
-> +
-> +    /* This is needed by Linux */
-> +    _FDT((fdt_setprop_string(fdt, node, "device_type", "serial")));
+> +    /* If address is specified, say yes and let it fail if that doesn't =
+work */
+> +    if (qemu_opt_get(opts, "addr") !=3D NULL) {
+
+Ah, so these are options for the device to add, not for the bus.  I'm
+not entirely sure that device options are standardized enough to do
+this safely.
+
+Could you use an initialized, but not realized, device pointer instead?
+
+
+> +        return true;
+> +    }
+> +    max =3D ARRAY_SIZE(pbus->devices);
+> +    if (pbus->devfn_max && pbus->devfn_max < max) {
+> +        max =3D pbus->devfn_max;
+> +    }
+> +    for (devfn =3D pbus->devfn_min ; devfn < max; devfn +=3D PCI_FUNC_MA=
+X) {
+> +        if (!pbus->devices[devfn]) {
+> +            break;
+> +        }
+> +    }
+> +    return devfn < max;
 > +}
 > +
->  typedef struct ForeachPopulateArgs {
->      void *fdt;
->      int offset;
-> @@ -313,6 +344,8 @@ static int powernv_populate_isa_device(DeviceState *d=
-ev, void *opaque)
+>  static void pci_bus_class_init(ObjectClass *klass, void *data)
+>  {
+>      BusClass *k =3D BUS_CLASS(klass);
+> @@ -154,6 +175,7 @@ static void pci_bus_class_init(ObjectClass *klass, vo=
+id *data)
+>      k->realize =3D pci_bus_realize;
+>      k->unrealize =3D pci_bus_unrealize;
+>      k->reset =3D pcibus_reset;
+> +    k->can_add_device =3D pci_can_add_device;
 > =20
->      if (object_dynamic_cast(OBJECT(dev), TYPE_MC146818_RTC)) {
->          powernv_populate_rtc(d, args->fdt, args->offset);
-> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_ISA_SERIAL)) {
-> +        powernv_populate_serial(d, args->fdt, args->offset);
->      } else {
->          error_report("unknown isa device %s@i%x", qdev_fw_name(dev),
->                       d->ioport_id);
+>      pbc->is_root =3D pcibus_is_root;
+>      pbc->bus_num =3D pcibus_num;
+> diff --git a/include/hw/pci/pci_bus.h b/include/hw/pci/pci_bus.h
+> index 5484a9b5c573..05c9dd22a8fa 100644
+> --- a/include/hw/pci/pci_bus.h
+> +++ b/include/hw/pci/pci_bus.h
+> @@ -23,6 +23,7 @@ struct PCIBus {
+>      PCIIOMMUFunc iommu_fn;
+>      void *iommu_opaque;
+>      uint8_t devfn_min;
+> +    uint8_t devfn_max;
+>      pci_set_irq_fn set_irq;
+>      pci_map_irq_fn map_irq;
+>      pci_route_irq_fn route_intx_to_irq;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -103,25 +125,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---umrsQkkrw7viUWFs
+--WZLuFERxa6Y0cbOt
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJY6xX7AAoJEGw4ysog2bOSJH4QALjSNGAM+lF93VnDrZIfNF65
-xJ4iSlLwnmCxzDmY5WiEr9Y46m77N9C8+z0FhbBwIQFeb3U7SUKb5C8K3tpJpdCw
-X85GMSV7uumBjqfx3QjFN1+Vi85pfA/igvxTIHtJgFA1v7yfgXPc15YyOA7Ue2g6
-gLh9v4H1s/jdR138Xaq/rm15iHVYiBirmsjnA1VhKLyQLuVvPjMW7iYnvG1/XNrf
-nETJwwm1kLGpYBE3T9YjRzx7CvjaFKfhW28ULFu9SInnA/vsCiB0gvg8RRcumkis
-/U1THRsBdgdH3Gg2p/4YJIcG1B24EJIZEQwinPZEHH1pQ0gh9dvgwcKs2mFnid68
-43OfS7dc36ips7BiAUAUxS58Z5RlZPfTdRJxDZFXabh41frd2FHYGF3ccwKd38tV
-SWugdQhzG8EcxvyaMveQ/9old11DaJrA6wu3w2qTkDxRNEiqY5i7y0eXsd7dsi/n
-XuODJs19ScgfNhZwdnVBzCu3Yhnd/8+uMsYEZDbRhQVTLyydttpW8MmtOJ6boLcQ
-q9Kac8tRMZA1cajh12ODJNUeICIQX40rZs4WpXiQq8BIhsMKBr1SKY/Sb9WlD/sz
-YE6TOL/vhmUADTa0CwWcUhIM0tGrRk76ydkYrRkmdAhfs7qyyZ8s3MWHvE11qLo4
-WIMCoGTSIa9Cbu7TsdgE
-=AVpm
+iQIcBAEBCAAGBQJY6xsFAAoJEGw4ysog2bOSX/IQAL97Nu/HKBdRdZ4pp6kY7akh
+cps3K1DqY8adUzfN4e9oJacQ4wYs2spnWnqXZsseD4EygIqEXPi7oMCzgGntuXcV
+Ul056xhtuWVTi9qrQEG+y9KkJFdLPKzL/8kYV4ZdrHp7YIypqIIAUl/1O47t77T5
+esBz6yELNlpm8RQv5Ibwi0Ur30c+QQU/R3IR1R0ziuxr9zu8HV3Q3uCserY8u+sy
+LMa6CfKi+s+FpYmZ/gxrBuWg2cge3Ee/4DsznHk2nYB730vIVdgf/ZA/kOupAX2Y
+XvDrtHsZzFbBRmrm/hHwttqvY2tyXpNWUDkfhH9gqTusoy/nrQa5yWXg/34/Zsof
+Xipe0lGMJJFyqu0mKTb2mZSAmgq3E/8C30/26yDFWGjdG/yMpuvx7jbTZY8R3EGW
+oHsam8q1pxx506DktLJ/DLnxVyJCcgwWYsAkAIZpa4BTFCXq+Vb9mjYlT9QOyjIB
+9zarWT5Y4qbZuQgMb4QE90hSRonVp+j/SI1nZvNxJwmWJAa26H9YSl9lQ2LQZEk7
+rpeA5wCnzBWBLUU3ByOr9mfW9Dvr5RwMK1BcTLNPgoVm96eqaWPS0j0JE1zquOep
+sju+w0a0M4L3qwuL31CXSEhJ7NamMIQpyQ0D+JWJ0MEh+wo/caInt2iK4Gsm07MH
+5O26LQ4l8z5aBy7rMxKv
+=iyKq
 -----END PGP SIGNATURE-----
 
---umrsQkkrw7viUWFs--
+--WZLuFERxa6Y0cbOt--
