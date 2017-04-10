@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cxVPK-0002B2-L7
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 05:14:47 -0400
+	(envelope-from <stefanha@gmail.com>) id 1cxVXL-0005PH-IW
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 05:23:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cxVPG-0008Qo-Lw
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 05:14:46 -0400
-Received: from 3.mo68.mail-out.ovh.net ([46.105.58.60]:51390)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cxVPG-0008OS-Ei
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 05:14:42 -0400
-Received: from player737.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 4C50E4ADF6
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 11:14:35 +0200 (CEST)
-Date: Mon, 10 Apr 2017 11:14:25 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170410111425.634d7284@bahia.lan>
-In-Reply-To: <1491562132-69066-1-git-send-email-liqiang6-s@360.cn>
-References: <1491562132-69066-1-git-send-email-liqiang6-s@360.cn>
+	(envelope-from <stefanha@gmail.com>) id 1cxVXH-0004QS-KX
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 05:23:03 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:35050)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cxVXH-0004Q0-Co
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 05:22:59 -0400
+Received: by mail-wm0-x232.google.com with SMTP id w64so33721395wma.0
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 02:22:59 -0700 (PDT)
+Date: Mon, 10 Apr 2017 10:22:55 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170410092255.GD2567@stefanha-x1.localdomain>
+References: <20170323173928.14439-1-pbonzini@redhat.com>
+	<20170323173928.14439-4-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/N3INYyxUGVIDH=sO8b_fDfg";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH] 9pfs: xattr: fix memory leak in
- v9fs_list_xattr
+	protocol="application/pgp-signature"; boundary="MAH+hnPXVZWQ5cD/"
+Content-Disposition: inline
+In-Reply-To: <20170323173928.14439-4-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 03/10] blockjob: introduce block_job_fail
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>
-Cc: qemu-devel@nongnu.org, ppandit@redhat.com, Li Qiang <liqiang6-s@360.cn>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, jcody@redhat.com, jsnow@redhat.com
 
---Sig_/N3INYyxUGVIDH=sO8b_fDfg
-Content-Type: text/plain; charset=US-ASCII
+
+--MAH+hnPXVZWQ5cD/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri,  7 Apr 2017 03:48:52 -0700
-Li Qiang <liq3ea@gmail.com> wrote:
-
-> Free 'orig_value' in error path.
+On Thu, Mar 23, 2017 at 06:39:21PM +0100, Paolo Bonzini wrote:
+> Outside blockjob.c, block_job_unref is only used when a block job fails
+> to start, and block_job_ref is not used at all.  The reference counting
+> thus is pretty well hidden.  Introduce a separate function to be used
+> by block jobs; because block_job_ref and block_job_unref now become
+> static, move them earlier in blockjob.c.
 >=20
-> Signed-off-by: Li Qiang <liqiang6-s@360.cn>
-> ---
+> Later on, block_job_fail will also have different locking than
+> block_job_unref.
 
-Good catch. I'll send a pull req later today.
+block_job_fail() sounds like it's *the* job failure API.
+How about block_job_fail_early()?
 
-Cheers.
+It indicates the API is only for the beginning of the job's lifecycle.
 
---
-Greg
+Stefan
 
->  hw/9pfs/9p-xattr.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/hw/9pfs/9p-xattr.c b/hw/9pfs/9p-xattr.c
-> index eec160b..d05c1a1 100644
-> --- a/hw/9pfs/9p-xattr.c
-> +++ b/hw/9pfs/9p-xattr.c
-> @@ -108,6 +108,7 @@ ssize_t v9fs_list_xattr(FsContext *ctx, const char *p=
-ath,
->      g_free(name);
->      close_preserve_errno(dirfd);
->      if (xattr_len < 0) {
-> +        g_free(orig_value);
->          return -1;
->      }
-> =20
-
-
---Sig_/N3INYyxUGVIDH=sO8b_fDfg
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+--MAH+hnPXVZWQ5cD/
+Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
 
-iEYEARECAAYFAljrTPEACgkQAvw66wEB28L0RQCfaor7h/hxEFy40901RYUnsXiH
-uxQAn1yW2aXNM6DOnbYIM7EttKsD4tvn
-=oz2j
+iQEcBAEBAgAGBQJY607vAAoJEJykq7OBq3PIPzgH/3EMJpGUcqmabuxjCeYCpEHO
+tjFC018zqtMP7NPMy44ePwk1nNccPvB1vRBGFCzRbdkwbmKsHC4T/OGjvHvbfOEm
+guQ7Am9aSL5fovbhkWlcskUMM+iAHTpc0cJrl3jbcWfH1IMGx9Sp5KkR/PUG/3PA
+jwyocVILJt2LzSUwTjPXI/UHnycdZXvduHCvyt3OjrjG0K+PElNVimMVmMh/EeJj
+HhAtvMXrshLAFTxB3l5kFGHOHInX08hgu732/xzuk+iuFkVlNgec0lCXWtboovLS
+FFGbSkrDc77SFCCSNb2zDKYUxGkiij5bXuyWzg1yWdC86EriQknp0xFgm2/nx2o=
+=q4gN
 -----END PGP SIGNATURE-----
 
---Sig_/N3INYyxUGVIDH=sO8b_fDfg--
+--MAH+hnPXVZWQ5cD/--
