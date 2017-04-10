@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cxV9J-0006dN-CD
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:58:14 -0400
+	(envelope-from <longpeng2@huawei.com>) id 1cxVAp-0007VV-2e
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:59:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cxV9I-00011O-MX
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:58:13 -0400
-Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:33830)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cxV9I-00010y-F2
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:58:12 -0400
-Received: by mail-wr0-x235.google.com with SMTP id z109so3972747wrb.1
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 01:58:12 -0700 (PDT)
+	(envelope-from <longpeng2@huawei.com>) id 1cxVAk-0001Zj-DW
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:59:47 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:3027
+	helo=dggrg01-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <longpeng2@huawei.com>) id 1cxVAj-0001TM-Ll
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:59:42 -0400
+From: "Longpeng(Mike)" <longpeng2@huawei.com>
+Date: Mon, 10 Apr 2017 16:59:17 +0800
+Message-ID: <1491814757-62684-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20170410084456.GB19103@toto>
-References: <1491486152-24304-1-git-send-email-peter.maydell@linaro.org>
-	<20170410084456.GB19103@toto>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Apr 2017 09:57:50 +0100
-Message-ID: <CAFEAcA-W_OGF7zjzZmPDBT+t2CKziyW-01VJxStfcxjr3Rfnww@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Add assertion about FSC format
- for syndrome registers
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH for-2.10 01/19] crypto: cipher: introduce
+ context free function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +25,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, "patches@linaro.org" <patches@linaro.org>
+To: berrange@redhat.com
+Cc: xuquan8@huawei.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-On 10 April 2017 at 09:44, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
-> Have you seen something suspicous when running code or was
-> this a theoretical issue?
+Refactors the qcrypto_cipher_free(), splits it into two parts. One
+is gcrypt/nettle__cipher_free_ctx() to free the special context.
 
-No, I was looking at the code for a different reason and
-was surprised that the syndrome-generation code wasn't doing
-anything to handle short-format FSRs. I started out thinking
-that this was just a corner case we'd forgotten since it
-only affects AArch32 guests (and even wrote some code to do
-short-to-long status code conversion), but after some thought
-I realised that it's not possible to get to a point where
-we would need the syndrome after such a fault. It's a
-tricky enough point that it seems worth having an assert
-and some comments to assure future readers that it isn't
-just something we forgot to handle...
+This makes code more clear, what's more, it would be used by the
+later patch.
 
-thanks
--- PMM
+Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+---
+ crypto/cipher-gcrypt.c | 31 ++++++++++++++++++-------------
+ crypto/cipher-nettle.c | 18 ++++++++++++++----
+ 2 files changed, 32 insertions(+), 17 deletions(-)
+
+diff --git a/crypto/cipher-gcrypt.c b/crypto/cipher-gcrypt.c
+index 6487eca..0ecffa2 100644
+--- a/crypto/cipher-gcrypt.c
++++ b/crypto/cipher-gcrypt.c
+@@ -64,6 +64,22 @@ struct QCryptoCipherGcrypt {
+     uint8_t *iv;
+ };
+ 
++static void gcrypt_cipher_free_ctx(QCryptoCipherGcrypt *ctx,
++                                   QCryptoCipherMode mode)
++{
++    if (!ctx) {
++        return;
++    }
++
++    gcry_cipher_close(ctx->handle);
++    if (mode == QCRYPTO_CIPHER_MODE_XTS) {
++        gcry_cipher_close(ctx->tweakhandle);
++    }
++    g_free(ctx->iv);
++    g_free(ctx);
++}
++
++
+ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+                                   QCryptoCipherMode mode,
+                                   const uint8_t *key, size_t nkey,
+@@ -228,11 +244,7 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+     return cipher;
+ 
+  error:
+-    gcry_cipher_close(ctx->handle);
+-    if (cipher->mode == QCRYPTO_CIPHER_MODE_XTS) {
+-        gcry_cipher_close(ctx->tweakhandle);
+-    }
+-    g_free(ctx);
++    gcrypt_cipher_free_ctx(ctx, mode);
+     g_free(cipher);
+     return NULL;
+ }
+@@ -240,17 +252,10 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+ 
+ void qcrypto_cipher_free(QCryptoCipher *cipher)
+ {
+-    QCryptoCipherGcrypt *ctx;
+     if (!cipher) {
+         return;
+     }
+-    ctx = cipher->opaque;
+-    gcry_cipher_close(ctx->handle);
+-    if (cipher->mode == QCRYPTO_CIPHER_MODE_XTS) {
+-        gcry_cipher_close(ctx->tweakhandle);
+-    }
+-    g_free(ctx->iv);
+-    g_free(ctx);
++    gcrypt_cipher_free_ctx(cipher->opaque, cipher->mode);
+     g_free(cipher);
+ }
+ 
+diff --git a/crypto/cipher-nettle.c b/crypto/cipher-nettle.c
+index dfc9030..e04e3a1 100644
+--- a/crypto/cipher-nettle.c
++++ b/crypto/cipher-nettle.c
+@@ -249,6 +249,19 @@ bool qcrypto_cipher_supports(QCryptoCipherAlgorithm alg,
+ }
+ 
+ 
++static void nettle_cipher_free_ctx(QCryptoCipherNettle *ctx)
++{
++    if (!ctx) {
++        return;
++    }
++
++    g_free(ctx->iv);
++    g_free(ctx->ctx);
++    g_free(ctx->ctx_tweak);
++    g_free(ctx);
++}
++
++
+ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+                                   QCryptoCipherMode mode,
+                                   const uint8_t *key, size_t nkey,
+@@ -440,10 +453,7 @@ void qcrypto_cipher_free(QCryptoCipher *cipher)
+     }
+ 
+     ctx = cipher->opaque;
+-    g_free(ctx->iv);
+-    g_free(ctx->ctx);
+-    g_free(ctx->ctx_tweak);
+-    g_free(ctx);
++    nettle_cipher_free_ctx(ctx);
+     g_free(cipher);
+ }
+ 
+-- 
+1.8.3.1
