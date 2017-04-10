@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43875)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cxP1X-0005s5-SC
+	(envelope-from <bounces@canonical.com>) id 1cxP1X-0005s4-Rz
 	for qemu-devel@nongnu.org; Sun, 09 Apr 2017 22:25:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cxP1U-00072n-OH
+	(envelope-from <bounces@canonical.com>) id 1cxP1U-00072i-Na
 	for qemu-devel@nongnu.org; Sun, 09 Apr 2017 22:25:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36562)
+Received: from indium.canonical.com ([91.189.90.7]:36563)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cxP1U-00072R-GF
+	id 1cxP1U-00072S-GJ
 	for qemu-devel@nongnu.org; Sun, 09 Apr 2017 22:25:44 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cxP1T-0002eH-0x
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 02:25:43 +0000
+	id 1cxP1S-0002dG-G3
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 02:25:42 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0272B2E805E
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 02:25:43 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 6E2022E80C3
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 02:25:42 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 10 Apr 2017 02:16:14 -0000
+Date: Mon, 10 Apr 2017 02:14:53 -0000
 From: wayen <1662050@bugs.launchpad.net>
 Reply-To: Bug 1662050 <1662050@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20170206024535.14624.3001.malonedeb@soybean.canonical.com>
-Message-Id: <20170410021614.12772.91806.malone@gac.canonical.com>
+Message-Id: <20170410021453.1711.64526.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1662050] Re: qemu-img convert a overlay qcow2
  image into a entire image
@@ -39,7 +39,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Is there any way to remove holes from sparse qcow2 overlay? It's very
+Is there any way to remove holes from qcow2 overlay images? It's very
 important to me. I am looking forward to your reply.
 
 -- =
