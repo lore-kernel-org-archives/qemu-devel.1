@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cxTYq-0002ho-9l
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:16:29 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cxTj5-0004Kw-KT
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:27:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cxTYn-0003aS-5T
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:16:28 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38012)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cxTYm-0003a7-W1
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:16:25 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cxTYl-0004ID-Oi
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 07:16:23 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BA17C2E80C7
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 07:16:23 +0000 (UTC)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cxTj2-0007bK-Ge
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:27:03 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:3415
+	helo=dggrg02-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cxTj1-0007VI-OV
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:27:00 -0400
+References: <1487734936-43472-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1487734936-43472-2-git-send-email-zhang.zhanghailiang@huawei.com>
+	<20170407154650.GN2138@work-vm>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <58EB338C.5040801@huawei.com>
+Date: Mon, 10 Apr 2017 15:26:04 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 10 Apr 2017 07:00:47 -0000
-From: wayen <1662050@bugs.launchpad.net>
-Reply-To: Bug 1662050 <1662050@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170206024535.14624.3001.malonedeb@soybean.canonical.com>
-Message-Id: <20170410070047.1773.51029.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1662050] Re: qemu-img convert a overlay qcow2
- image into a entire image
+In-Reply-To: <20170407154650.GN2138@work-vm>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 01/15] net/colo: Add notifier/callback
+ related helpers for filter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,38 +30,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, Jason Wang <jasowang@redhat.com>
 
-Hi Lidong Chen:
+On 2017/4/7 23:46, Dr. David Alan Gilbert wrote:
+> * zhanghailiang (zhang.zhanghailiang@huawei.com) wrote:
+>> We will use this notifier to help COLO to notify filter object
+>> to do something, like do checkpoint, or process failover event.
+>>
+>> Cc: Jason Wang <jasowang@redhat.com>
+>> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+>> ---
+>>   net/colo.c | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>   net/colo.h | 18 ++++++++++++
+>>   2 files changed, 110 insertions(+)
+>>
+> <..>
+>
+>> +FilterNotifier *filter_noitifier_new(FilterNotifierCallback *cb,
+>                            ^^^^^^^^^ Typo - no*i*tifier
 
-    I forgot to use this option.I think the way you said is effective.I
-will try it.Thank you very much for your help
+Good catch, will fix it in next version.
 
--- =
+> (I've not looked at this patch much, I'll leave networking stuff to Jason)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1662050
+OK, thanks.
 
-Title:
-  qemu-img convert a overlay qcow2 image into a entire image
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  I have a base image file "base.qcow2" and a delta qcow2 image file
-  "delta.qcow2" whose backing file is "base.qcow2".
-
-  Now I use qemu-img to convert "delta.qcow2" and will get a new image
-  file "new.qcow2" which is entire and equivalent to combination of
-  "base.qcow2" and "delta.qcow2".
-
-  In fact,I don't want to get a complete image.I just want to convert
-  delta qcow2 image file "A" to a New delta overlay qcow2 image "B"
-  which is equivalent to "A". So the "new.qcow2" is not what i want. I
-  have to admit that this is not bug. Could you please take this as a
-  new feature and enable qemu-img to convert qcow2 overlay itself?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1662050/+subscriptions
+> Dave
+>
+>> +                    void *opaque, Error **errp)
+>> +{
+>> +    FilterNotifier *notify;
+>> +    int ret;
+>> +
+>> +    notify = (FilterNotifier *)g_source_new(&notifier_source_funcs,
+>> +                sizeof(FilterNotifier));
+>> +    ret = event_notifier_init(&notify->event, false);
+>> +    if (ret < 0) {
+>> +        error_setg_errno(errp, -ret, "Failed to initialize event notifier");
+>> +        goto fail;
+>> +    }
+>> +    notify->pfd.fd = event_notifier_get_fd(&notify->event);
+>> +    notify->pfd.events = G_IO_IN | G_IO_HUP | G_IO_ERR;
+>> +    notify->cb = cb;
+>> +    notify->opaque = opaque;
+>> +    g_source_add_poll(&notify->source, &notify->pfd);
+>> +
+>> +    return notify;
+>> +
+>> +fail:
+>> +    g_source_destroy(&notify->source);
+>> +    return NULL;
+>> +}
+>> +
+>> +int filter_notifier_set(FilterNotifier *notify, uint64_t value)
+>> +{
+>> +    ssize_t ret;
+>> +
+>> +    do {
+>> +        ret = write(notify->event.wfd, &value, sizeof(value));
+>> +    } while (ret < 0 && errno == EINTR);
+>> +
+>> +    /* EAGAIN is fine, a read must be pending.  */
+>> +    if (ret < 0 && errno != EAGAIN) {
+>> +        return -errno;
+>> +    }
+>> +    return 0;
+>> +}
+>> diff --git a/net/colo.h b/net/colo.h
+>> index cd9027f..00f03b5 100644
+>> --- a/net/colo.h
+>> +++ b/net/colo.h
+>> @@ -19,6 +19,7 @@
+>>   #include "qemu/jhash.h"
+>>   #include "qemu/timer.h"
+>>   #include "slirp/tcp.h"
+>> +#include "qemu/event_notifier.h"
+>>   
+>>   #define HASHTABLE_MAX_SIZE 16384
+>>   
+>> @@ -89,4 +90,21 @@ void connection_hashtable_reset(GHashTable *connection_track_table);
+>>   Packet *packet_new(const void *data, int size);
+>>   void packet_destroy(void *opaque, void *user_data);
+>>   
+>> +typedef void FilterNotifierCallback(void *opaque, int value);
+>> +typedef struct FilterNotifier {
+>> +    GSource source;
+>> +    EventNotifier event;
+>> +    GPollFD pfd;
+>> +    FilterNotifierCallback *cb;
+>> +    void *opaque;
+>> +} FilterNotifier;
+>> +
+>> +FilterNotifier *filter_noitifier_new(FilterNotifierCallback *cb,
+>> +                    void *opaque, Error **errp);
+>> +int filter_notifier_set(FilterNotifier *notify, uint64_t value);
+>> +
+>> +enum {
+>> +    COLO_CHECKPOINT = 2,
+>> +    COLO_FAILOVER,
+>> +};
+>>   #endif /* QEMU_COLO_PROXY_H */
+>> -- 
+>> 1.8.3.1
+>>
+>>
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+> .
+>
