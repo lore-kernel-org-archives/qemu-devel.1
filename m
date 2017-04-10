@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41565)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cxbEy-0005Qs-Us
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:28:29 -0400
+	(envelope-from <lersek@redhat.com>) id 1cxbFR-0005hA-DQ
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:28:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cxbEu-0002NM-BB
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:28:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39378)
+	(envelope-from <lersek@redhat.com>) id 1cxbFM-0002bE-Lr
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:28:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41436)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cxbEu-0002Mu-4U
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:28:24 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 017A880F8D
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 15:28:23 +0000 (UTC)
-References: <20170410142112.11550-1-marcandre.lureau@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <01d19d9a-b809-c300-bc83-ffe344175cea@redhat.com>
-Date: Mon, 10 Apr 2017 10:28:14 -0500
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cxbFM-0002a3-G4
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:28:52 -0400
+References: <20170410150350.3267-1-ard.biesheuvel@linaro.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <f3c8cba3-6cf5-75a1-eaf6-a3ad1d3505f9@redhat.com>
+Date: Mon, 10 Apr 2017 17:28:44 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170410142112.11550-1-marcandre.lureau@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="lDsLq0evFutUkwDBQ5NLUh4UvNAQ5ENQQ"
-Subject: Re: [Qemu-devel] [PATCH] test-keyval: fix leaks
+In-Reply-To: <20170410150350.3267-1-ard.biesheuvel@linaro.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] hw/acpi-defs: replace leading X
+ with x_ in FADT field names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,56 +27,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: armbru@redhat.com
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>, qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: phil@philjordan.eu, mst@redhat.com, imammedo@redhat.com, drjones@redhat.com, zhaoshenglong@huawei.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lDsLq0evFutUkwDBQ5NLUh4UvNAQ5ENQQ
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-Cc: armbru@redhat.com
-Message-ID: <01d19d9a-b809-c300-bc83-ffe344175cea@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] test-keyval: fix leaks
-References: <20170410142112.11550-1-marcandre.lureau@redhat.com>
-In-Reply-To: <20170410142112.11550-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 04/10/2017 09:21 AM, Marc-Andr=C3=A9 Lureau wrote:
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On 04/10/17 17:03, Ard Biesheuvel wrote:
+> At the request of Michael, replace the leading capital X in the FADT
+> field name Xfacs and Xdsdt with lower case x + underscore.
+> 
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 > ---
->  tests/test-keyval.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>  include/hw/acpi/acpi-defs.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> index 4cc3630e613e..db48807056b3 100644
+> --- a/include/hw/acpi/acpi-defs.h
+> +++ b/include/hw/acpi/acpi-defs.h
+> @@ -165,8 +165,8 @@ struct AcpiFadtDescriptorRev5_1 {
+>      /* ARM-Specific Boot Flags (see below for individual flags) (ACPI 5.1) */
+>      uint16_t arm_boot_flags;
+>      uint8_t minor_revision;  /* FADT Minor Revision (ACPI 5.1) */
+> -    uint64_t Xfacs;          /* 64-bit physical address of FACS */
+> -    uint64_t Xdsdt;          /* 64-bit physical address of DSDT */
+> +    uint64_t x_facs;         /* 64-bit physical address of FACS */
+> +    uint64_t x_dsdt;         /* 64-bit physical address of DSDT */
+>      /* 64-bit Extended Power Mgt 1a Event Reg Blk address */
+>      struct AcpiGenericAddress xpm1a_event_block;
+>      /* 64-bit Extended Power Mgt 1b Event Reg Blk address */
+> 
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+(This is for 2.10, or whatever comes after 2.9.)
 
-Leaks in the testsuite are not showstoppers, so I'm okay if we defer it
-to 2.10 to minimize churn now that we are late in hard freeze.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---lDsLq0evFutUkwDBQ5NLUh4UvNAQ5ENQQ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY66SOAAoJEKeha0olJ0Nqn8QH/0+0qvLoZhAMbNvshKqrvVpY
-OqXs4BvcTsh/3RGkIpTOnMdQzmTchCTxnnezfAhZ0TXVeakG9A9J8cg+EwIPPpPf
-LZT5d3itMXuacLSuvodCjtagkpocVbokm4tB//Ma5uyWODddaT6njNvrSrytUEKc
-KsY9vfdRbUrRdrrlYqCukGC/SI4G/SSdU9ffgyYkbD+Ud2M8UkWS6IGPOEc5GX+e
-XIDoxn0d8Bqjud7Y+ZICGZTgdsEzC3t6nLRhcakwJTY1aflU3eZUIKkzAvVHhxry
-OZQeAdGctJNgRsTluaQjAGrpKgNbIb98pfpjSu/+y7EO8a+q3YcVlgHp0L3d5Sk=
-=Wqcn
------END PGP SIGNATURE-----
-
---lDsLq0evFutUkwDBQ5NLUh4UvNAQ5ENQQ--
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
