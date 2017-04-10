@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49984)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cxaCa-0000kh-2s
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 10:21:57 -0400
+	(envelope-from <bounces@canonical.com>) id 1cxaFf-0002N3-Rx
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 10:25:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cxaCW-0003Xk-5b
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 10:21:56 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42055
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <bounces@canonical.com>) id 1cxaFc-0004Iw-PG
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 10:25:07 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60486)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cxaCV-0003Xb-Uk
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 10:21:52 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3AEDvBD109808
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 10:21:51 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 29r9qveemk-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 10:21:50 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Mon, 10 Apr 2017 15:21:49 +0100
-From: Greg Kurz <groug@kaod.org>
-Date: Mon, 10 Apr 2017 16:21:35 +0200
-In-Reply-To: <1491834095-6476-1-git-send-email-groug@kaod.org>
-References: <1491834095-6476-1-git-send-email-groug@kaod.org>
-Message-Id: <1491834095-6476-2-git-send-email-groug@kaod.org>
-Subject: [Qemu-devel] [PULL] 9pfs: xattr: fix memory leak in v9fs_list_xattr
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cxaFc-0004Ig-Ja
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 10:25:04 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cxaFa-0005s1-E9
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 14:25:02 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8FB782E80DC
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 14:25:00 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 10 Apr 2017 14:07:25 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1481272 <1481272@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150804095638.25012.1470.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170410140725.30463.21786.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1481272] Re: main-loop: WARNING: I/O thread spun
+ for 1000 iterations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,29 +38,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>, Li Qiang <liq3ea@gmail.com>, Li Qiang <liqiang6-s@360.cn>
 
-From: Li Qiang <liq3ea@gmail.com>
+I think that's a workaround, not a fix for whatever the underlying bug
+is.
 
-Free 'orig_value' in error path.
+-- =
 
-Signed-off-by: Li Qiang <liqiang6-s@360.cn>
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/9pfs/9p-xattr.c | 1 +
- 1 file changed, 1 insertion(+)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1481272
 
-diff --git a/hw/9pfs/9p-xattr.c b/hw/9pfs/9p-xattr.c
-index eec160b3c2ac..d05c1a1c1df5 100644
---- a/hw/9pfs/9p-xattr.c
-+++ b/hw/9pfs/9p-xattr.c
-@@ -108,6 +108,7 @@ ssize_t v9fs_list_xattr(FsContext *ctx, const char *path,
-     g_free(name);
-     close_preserve_errno(dirfd);
-     if (xattr_len < 0) {
-+        g_free(orig_value);
-         return -1;
-     }
- 
--- 
-2.7.4
+Title:
+  main-loop: WARNING: I/O thread spun for 1000 iterations
+
+Status in QEMU:
+  New
+
+Bug description:
+  I compile the latest qemu to launch a VM but the monitor output the
+  "main-loop: WARNING: I/O thread spun for 1000 iterations".
+
+  # /usr/local/bin/qemu-system-x86_64 -name rhel6 -S -no-kvm -m 1024M -real=
+time mlock=3Doff -smp 1,sockets=3D1,cores=3D1,threads=3D1 -uuid c9dd2a5c-40=
+f2-fd3d-3c54-9cd84f8b9174 -rtc base=3Dutc  -drive file=3D/home/samba-share/=
+ubuntu.img,if=3Dnone,id=3Ddrive-virtio-disk0,format=3Dqcow2,cache=3Dnone -d=
+evice virtio-blk-pci,bus=3Dpci.0,addr=3D0x4,drive=3Ddrive-virtio-disk0,id=
+=3Ddisk,serial=3D425618d4-871f-4021-bc5d-bcd7f1b5ca9c,bootindex=3D0 -vnc :1=
+ -boot menu=3Don -monitor stdio
+  QEMU 2.3.93 monitor - type 'help' for more information
+  (qemu) c
+  (qemu) main-loop: WARNING: I/O thread spun for 1000 iterations           =
+    <-----------------------
+
+  qemu]# git branch -v
+  * master               e95edef Merge remote-tracking branch 'remotes/ssta=
+bellini/tags/xen-migration-2.4-tag' into staging
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1481272/+subscriptions
