@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1cxTSJ-000823-GJ
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:09:45 -0400
+	(envelope-from <peterx@redhat.com>) id 1cxTSv-0008QL-Oj
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:10:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1cxTSG-0001aH-8s
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:09:43 -0400
-Received: from mga02.intel.com ([134.134.136.20]:15296)
+	(envelope-from <peterx@redhat.com>) id 1cxTSs-0001p8-HO
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:10:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:13984)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
-	id 1cxTSF-0001Zt-PU
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:09:40 -0400
-References: <1491575431-32170-1-git-send-email-amarnath.valluri@intel.com>
-	<1491575431-32170-10-git-send-email-amarnath.valluri@intel.com>
-	<20170407144100.GL26896@redhat.com>
-From: Amarnath Valluri <amarnath.valluri@intel.com>
-Message-ID: <d74c2094-051e-bf1d-7c41-316b0e3651bc@intel.com>
-Date: Mon, 10 Apr 2017 10:08:21 +0300
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cxTSs-0001om-8b
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:10:18 -0400
+Date: Mon, 10 Apr 2017 15:09:50 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170410070950.GK3981@pxdev.xzpeter.org>
+References: <1491562755-23867-1-git-send-email-peterx@redhat.com>
+	<1491562755-23867-2-git-send-email-peterx@redhat.com>
+	<20170410043922.GI27571@umbus>
 MIME-Version: 1.0
-In-Reply-To: <20170407144100.GL26896@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 9/9] tpm: Added support for TPM emulator
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170410043922.GI27571@umbus>
+Subject: Re: [Qemu-devel] [PATCH v9 1/9] memory: add section range info for
+ IOMMU notifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,259 +29,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, patrick.ohly@intel.com, stefanb@linux.vnet.ibm.com, marcandre.lureau@gmail.com
+To: David Gibson <david@gibson.dropbear.id.au>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
 
+On Mon, Apr 10, 2017 at 02:39:22PM +1000, David Gibson wrote:
+> On Fri, Apr 07, 2017 at 06:59:07PM +0800, Peter Xu wrote:
+> > In this patch, IOMMUNotifier.{start|end} are introduced to store section
+> > information for a specific notifier. When notification occurs, we not
+> > only check the notification type (MAP|UNMAP), but also check whether the
+> > notified iova range overlaps with the range of specific IOMMU notifier,
+> > and skip those notifiers if not in the listened range.
+> > 
+> > When removing an region, we need to make sure we removed the correct
+> > VFIOGuestIOMMU by checking the IOMMUNotifier.start address as well.
+> > 
+> > This patch is solving the problem that vfio-pci devices receive
+> > duplicated UNMAP notification on x86 platform when vIOMMU is there. The
+> > issue is that x86 IOMMU has a (0, 2^64-1) IOMMU region, which is
+> > splitted by the (0xfee00000, 0xfeefffff) IRQ region. AFAIK
+> > this (splitted IOMMU region) is only happening on x86.
+> > 
+> > This patch also helps vhost to leverage the new interface as well, so
+> > that vhost won't get duplicated cache flushes. In that sense, it's an
+> > slight performance improvement.
+> > 
+> > Suggested-by: David Gibson <david@gibson.dropbear.id.au>
+> > Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> > Acked-by: Alex Williamson <alex.williamson@redhat.com>
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  hw/vfio/common.c      | 12 +++++++++---
+> >  hw/virtio/vhost.c     | 10 ++++++++--
+> >  include/exec/memory.h | 19 ++++++++++++++++++-
+> >  memory.c              |  9 +++++++++
+> >  4 files changed, 44 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> > index f3ba9b9..6b33b9f 100644
+> > --- a/hw/vfio/common.c
+> > +++ b/hw/vfio/common.c
+> > @@ -478,8 +478,13 @@ static void vfio_listener_region_add(MemoryListener *listener,
+> >          giommu->iommu_offset = section->offset_within_address_space -
+> >                                 section->offset_within_region;
+> >          giommu->container = container;
+> > -        giommu->n.notify = vfio_iommu_map_notify;
+> > -        giommu->n.notifier_flags = IOMMU_NOTIFIER_ALL;
+> > +        llend = int128_add(int128_make64(section->offset_within_region),
+> > +                           section->size);
+> > +        llend = int128_sub(llend, int128_one());
+> > +        iommu_notifier_init(&giommu->n, vfio_iommu_map_notify,
+> > +                            IOMMU_NOTIFIER_ALL,
+> > +                            section->offset_within_region,
+> > +                            int128_get64(llend));
+> 
+> Seems to me it would make sense to put the fiddling around to convert
+> the MemoryRegionSection into the necessary values would make sense to
+> go inside iommu_notifier_init().
 
+But will we always get one MemoryRegionSection if we are not in any of
+the region_{add|del} callback? E.g., what if we want to init an IOMMU
+notifier that covers just the whole IOMMU region range?
 
-On 07.04.2017 17:41, Daniel P. Berrange wrote:
-> On Fri, Apr 07, 2017 at 05:30:31PM +0300, Amarnath Valluri wrote:
->> This change introduces a new TPM backend driver that can communicate with
->> swtpm(software TPM emulator) using unix domain socket interface.
->>
->> Swtpm uses two unix sockets, one for plain TPM commands and responses, and one
->> for out-of-band control messages.
->>
->> The swtpm and associated tools can be found here:
->>      https://github.com/stefanberger/swtpm
->>
->> Usage:
->>      # setup TPM state directory
->>      mkdir /tmp/mytpm
->>      chown -R tss:root /tmp/mytpm
->>      /usr/bin/swtpm_setup --tpm-state /tmp/mytpm --createek
->>
->>      # Ask qemu to use TPM emulator with given tpm state directory
->>      qemu-system-x86_64 \
->>          [...] \
->>          -tpmdev emulator,id=tpm0,tpmstatedir=/tmp/mytpm,logfile=/tmp/swtpm.log \
->>          -device tpm-tis,tpmdev=tpm0 \
->>          [...]
->>
->> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
->> ---
->>   configure             |  15 +-
->>   hmp.c                 |  21 ++
->>   hw/tpm/Makefile.objs  |   1 +
->>   hw/tpm/tpm_emulator.c | 927 ++++++++++++++++++++++++++++++++++++++++++++++++++
->>   hw/tpm/tpm_ioctl.h    | 243 +++++++++++++
->>   qapi-schema.json      |  36 +-
->>   qemu-options.hx       |  53 ++-
->>   tpm.c                 |   2 +-
->>   8 files changed, 1289 insertions(+), 9 deletions(-)
->>   create mode 100644 hw/tpm/tpm_emulator.c
->>   create mode 100644 hw/tpm/tpm_ioctl.h
->> +static int tpm_emulator_spawn_emulator(TPMEmulator *tpm_pt)
->> +{
->> +    int fds[2] = { -1, -1 };
->> +    int ctrl_fds[2] = { -1, -1 };
->> +    pid_t cpid;
->> +
->> +    if (!tpm_pt->ops->has_data_path) {
->> +        if (socketpair(AF_UNIX, SOCK_SEQPACKET, 0, fds) < 0) {
->> +            return -1;
->> +        }
->> +    }
->> +
->> +    if (!tpm_pt->ops->has_ctrl_path) {
->> +        if (socketpair(AF_UNIX, SOCK_SEQPACKET, 0, ctrl_fds) < 0) {
->> +            if (!tpm_pt->ops->has_data_path) {
->> +                closesocket(fds[0]);
->> +                closesocket(fds[1]);
->> +            }
->> +            return -1;
->> +        }
->> +    }
->> +
->> +    cpid = qemu_fork(NULL);
->> +    if (cpid < 0) {
->> +        error_report("tpm-emulator: Fork failure: %s", strerror(errno));
->> +        if (!tpm_pt->ops->has_data_path) {
->> +            closesocket(fds[0]);
->> +            closesocket(fds[1]);
->> +        }
->> +        if (!tpm_pt->ops->has_ctrl_path) {
->> +            closesocket(ctrl_fds[0]);
->> +            closesocket(ctrl_fds[1]);
->> +        }
->> +        return -1;
->> +    }
->> +
->> +    if (cpid == 0) { /* CHILD */
->> +        enum {
->> +            PARAM_PATH,
->> +            PARAM_IFACE,
->> +            PARAM_SERVER,  PARAM_SERVER_ARGS,
->> +            PARAM_CTRL,    PARAM_CTRL_ARGS,
->> +            PARAM_STATE,   PARAM_STATE_ARGS,
->> +            PARAM_PIDFILE, PARAM_PIDFILE_ARGS,
->> +            PARAM_LOG,     PARAM_LOG_ARGS,
->> +            PARAM_MAX
->> +        };
->> +
->> +        int i;
->> +        int data_fd = -1, ctrl_fd = -1;
->> +        char *argv[PARAM_MAX+1];
->> +
->> +        /* close all unused inherited sockets */
->> +        if (fds[0] >= 0)
->> +            closesocket(fds[0]);
->> +        if (ctrl_fds[0] >= 0)
->> +            closesocket(ctrl_fds[0]);
-> The 'if' checks are pointless - its already guaranteed by the
-> fact you check socketpair() status.
-socketpairs might not be created in case of data-path & ctrl-path 
-provided, so i feel these checks are needed.
->
->> +        i = STDERR_FILENO + 1;
->> +        if (fds[1] >= 0) {
->> +            data_fd = dup2(fds[1], i++);
->> +            if (data_fd < 0) {
->> +                error_report("tpm-emulator: dup2() failure - %s",
->> +                             strerror(errno));
->> +                goto exit_child;
->> +            }
->> +        }
->> +        if (ctrl_fds[1] >= 0) {
->> +            ctrl_fd = dup2(ctrl_fds[1], i++);
->> +            if (ctrl_fd < 0) {
->> +                error_report("tpm-emulator: dup2() failure - %s",
->> +                             strerror(errno));
->> +                goto exit_child;
->> +            }
->> +        }
->> +        for ( ; i < _SC_OPEN_MAX; i++) {
-> Errr, _SC_OPEN_MAX is not the maximum number of FDs - it is parameter to
-> use with sysconf() to query the number of files - you must call sysconf().
-Ya, thanks for educating me, i will change this.
->
->> +            closesocket(i);
-> close, not closesocket - you can't assume these are all sockets.
-Does this change makes any difference, as per 
-include/sysemu/os-posix.h,  closesocket() is define as close(), and this 
-backend is targeted only for "Linux" targets. Please let me know if i am 
-missing something.
->
->
->> +        DPRINT("\n")
->> +        if (execv(tpm_pt->ops->path, (char * const *)argv) < 0) {
->> +            error_report("execv() failure : %s", strerror(errno));
->> +        }
->> +
->> +exit_child:
->> +        g_strfreev(argv);
->> +        if (data_fd >= 0)
->> +            closesocket(data_fd);
->> +        if (ctrl_fd >= 0)
->> +            closesocket(ctrl_fd);
->> +
->> +        exit(0);
-> You need _exit(), not exit() as you don't want to run atexit() handlers
-> here. You also want '1' not '0' since this is a failure scenario.
-Sure, i will change this.
->
->> +    } else { /* self */
->> +        struct stat st;
->> +        DPRINTF("child pid: %d", cpid);
->> +        int rc;
->> +        int timeout = 3; /* wait for max 3 seconds */
->> +
->> +        /* close unsed sockets */
->> +        if (fds[1] >= 0)
->> +            closesocket(fds[1]);
->> +        if (ctrl_fds[1] >= 0)
->> +            closesocket(ctrl_fds[1]);
->> +
->> +        while((rc = stat(TPM_EMULATOR_PIDFILE, &st)) < 0 && timeout--) {
->> +            sleep(1);
->> +        }
-> A fixed 3 second timeout will inevitably cause failures on systems with
-> high load.
->
-> Presumably you're trying to handle the scenario where the child process
-> exits without creating the pid file ?
-The check is mainly to know if the child setup is done and ready to 
-accept requests.
->
-> In which case you can use 'kill(cpid, 0)' and if errno == ESRCH
-> then the child has exited.
->
->> +
->> +        if (timeout == -1) {
->> +            error_report("tpm-emulator: failed to find pid file: %s",
->> +                         strerror(errno));
->> +            goto err_kill_child;
->> +        }
->> +
->> +        tpm_pt->data_ioc = _iochannel_new(tpm_pt->ops->data_path, fds[0], NULL);
->> +        if (!tpm_pt->data_ioc) {
->> +            error_report("tpm-emulator: Unable to connect socket : %s",
->> +                          tpm_pt->ops->data_path);
->> +            goto err_kill_child;
->> +        }
->> +
->> +        tpm_pt->ctrl_ioc = _iochannel_new(tpm_pt->ops->ctrl_path, ctrl_fds[0], NULL);
->> +        if (!tpm_pt->ctrl_ioc) {
->> +            error_report("tpm-emulator: Unable to connect socket : %s",
->> +                          tpm_pt->ops->ctrl_path);
->> +            goto err_kill_child;
->> +        }
->> +
->> +        tpm_pt->child_running = true;
->> +
->> +        qemu_add_child_watch(cpid);
->> +
->> +        qio_channel_add_watch(tpm_pt->data_ioc, G_IO_HUP|G_IO_ERR,
->> +                              tpm_emulator_fd_handler, tpm_pt, NULL);
->> +    }
->> +
->> +    return 0;
->> +
->> +err_kill_child:
->> +    kill(cpid, SIGTERM);
->> +    closesocket(fds[0]);
->> +    closesocket(ctrl_fds[0]);
-> You can't assume the child has gone after a SIGTERM. You need to
-> check, and be prepared to SIGKILL after time reasonable time,
-> if needed.
-Ok, i will add this check.
->
->> +    tpm_pt->child_running = false;
->> +
->> +    return -1;
->> +}
->> +
->> +static const QemuOptDesc tpm_emulator_cmdline_opts[] = {
->> +    TPM_STANDARD_CMDLINE_OPTS,
->> +    {
->> +        .name = "tpmstatedir",
->> +        .type = QEMU_OPT_STRING,
->> +        .help = "TPM state directroy",
->> +    },
->> +    {
->> +        .name = "spawn",
->> +        .type = QEMU_OPT_BOOL,
->> +        .help = "Wether to spwan given emlatory binary",
->> +    },
->> +    {
->> +        .name = "path",
->> +        .type = QEMU_OPT_STRING,
->> +        .help = "Path to TPM emulator binary",
->> +    },
->> +    {
->> +        .name = "data-path",
->> +        .type = QEMU_OPT_STRING,
->> +        .help = "Socket path to use for data exhange",
->> +    },
->> +    {
->> +        .name = "ctrl-path",
->> +        .type = QEMU_OPT_STRING,
->> +        .help = "Socket path to use for out-of-band control messages",
->> +    },
-> I'm still not convinced by the need for 2 separate UNIX sockets, unless
-> there's a performance reason, but that looks unlikely.
-I myself, is not expert of swtpm's interface, hence i cannot defend this.
-i am just trying to enable emulation support in qemu using swtpm. Stefan 
-Berger is the right person to comment on this.
+Considering above, I would still slightly prefer current interface.
 
-- Amarnath
+> 
+> >          QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
+> >  
+> >          memory_region_register_iommu_notifier(giommu->iommu, &giommu->n);
+> > @@ -550,7 +555,8 @@ static void vfio_listener_region_del(MemoryListener *listener,
+> >          VFIOGuestIOMMU *giommu;
+> >  
+> >          QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
+> > -            if (giommu->iommu == section->mr) {
+> > +            if (giommu->iommu == section->mr &&
+> > +                giommu->n.start == section->offset_within_region) {
+> 
+> This test should be sufficient, but I'd be a bit more comfortable if
+> there was a test and assert() that the end matches as well.  I also
+> wonder if remove-matching-notifier helper would be useful here.
+> Although vhost doesn't appear to ever remove, so maybe it's premature.
+
+Oh... vhost does remove it, but I just forgot to touch it up :( ...
+Thanks for pointing out.
+
+Marcel, if this is the only comment, would you mind squash below
+change into current patch? Thanks,
+
+----8<----
+
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index 185b95b..0001e60 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -771,7 +771,8 @@ static void vhost_iommu_region_del(MemoryListener *listener,
+     }
+ 
+     QLIST_FOREACH(iommu, &dev->iommu_list, iommu_next) {
+-        if (iommu->mr == section->mr) {
++        if (iommu->mr == section->mr &&
++            iommu->n.start == section->offset_within_region) {
+             memory_region_unregister_iommu_notifier(iommu->mr,
+                                                     &iommu->n);
+             QLIST_REMOVE(iommu, iommu_next);
+
+---->8----
+
+> 
+> >                  memory_region_unregister_iommu_notifier(giommu->iommu,
+> >                                                          &giommu->n);
+> >                  QLIST_REMOVE(giommu, giommu_next);
+> > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> > index 613494d..185b95b 100644
+> > --- a/hw/virtio/vhost.c
+> > +++ b/hw/virtio/vhost.c
+> > @@ -736,14 +736,20 @@ static void vhost_iommu_region_add(MemoryListener *listener,
+> >      struct vhost_dev *dev = container_of(listener, struct vhost_dev,
+> >                                           iommu_listener);
+> >      struct vhost_iommu *iommu;
+> > +    Int128 end;
+> >  
+> >      if (!memory_region_is_iommu(section->mr)) {
+> >          return;
+> >      }
+> >  
+> >      iommu = g_malloc0(sizeof(*iommu));
+> > -    iommu->n.notify = vhost_iommu_unmap_notify;
+> > -    iommu->n.notifier_flags = IOMMU_NOTIFIER_UNMAP;
+> > +    end = int128_add(int128_make64(section->offset_within_region),
+> > +                     section->size);
+> > +    end = int128_sub(end, int128_one());
+> > +    iommu_notifier_init(&iommu->n, vhost_iommu_unmap_notify,
+> > +                        IOMMU_NOTIFIER_UNMAP,
+> > +                        section->offset_within_region,
+> > +                        int128_get64(end));
+> >      iommu->mr = section->mr;
+> >      iommu->iommu_offset = section->offset_within_address_space -
+> >                            section->offset_within_region;
+> > diff --git a/include/exec/memory.h b/include/exec/memory.h
+> > index f20b191..0840c89 100644
+> > --- a/include/exec/memory.h
+> > +++ b/include/exec/memory.h
+> > @@ -77,13 +77,30 @@ typedef enum {
+> >  
+> >  #define IOMMU_NOTIFIER_ALL (IOMMU_NOTIFIER_MAP | IOMMU_NOTIFIER_UNMAP)
+> >  
+> > +struct IOMMUNotifier;
+> > +typedef void (*IOMMUNotify)(struct IOMMUNotifier *notifier,
+> > +                            IOMMUTLBEntry *data);
+> > +
+> >  struct IOMMUNotifier {
+> > -    void (*notify)(struct IOMMUNotifier *notifier, IOMMUTLBEntry *data);
+> > +    IOMMUNotify notify;
+> >      IOMMUNotifierFlag notifier_flags;
+> > +    /* Notify for address space range start <= addr <= end */
+> > +    hwaddr start;
+> > +    hwaddr end;
+> >      QLIST_ENTRY(IOMMUNotifier) node;
+> >  };
+> >  typedef struct IOMMUNotifier IOMMUNotifier;
+> >  
+> > +static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
+> > +                                       IOMMUNotifierFlag flags,
+> > +                                       hwaddr start, hwaddr end)
+> > +{
+> > +    n->notify = fn;
+> > +    n->notifier_flags = flags;
+> > +    n->start = start;
+> > +    n->end = end;
+> > +}
+> > +
+> >  /* New-style MMIO accessors can indicate that the transaction failed.
+> >   * A zero (MEMTX_OK) response means success; anything else is a failure
+> >   * of some kind. The memory subsystem will bitwise-OR together results
+> > diff --git a/memory.c b/memory.c
+> > index 4c95aaf..75ac595 100644
+> > --- a/memory.c
+> > +++ b/memory.c
+> > @@ -1606,6 +1606,7 @@ void memory_region_register_iommu_notifier(MemoryRegion *mr,
+> >  
+> >      /* We need to register for at least one bitfield */
+> >      assert(n->notifier_flags != IOMMU_NOTIFIER_NONE);
+> > +    assert(n->start <= n->end);
+> >      QLIST_INSERT_HEAD(&mr->iommu_notify, n, node);
+> >      memory_region_update_iommu_notify_flags(mr);
+> >  }
+> > @@ -1667,6 +1668,14 @@ void memory_region_notify_iommu(MemoryRegion *mr,
+> >      }
+> >  
+> >      QLIST_FOREACH(iommu_notifier, &mr->iommu_notify, node) {
+> > +        /*
+> > +         * Skip the notification if the notification does not overlap
+> > +         * with registered range.
+> > +         */
+> > +        if (iommu_notifier->start > entry.iova + entry.addr_mask + 1 ||
+> > +            iommu_notifier->end < entry.iova) {
+> > +            continue;
+> > +        }
+> >          if (iommu_notifier->notifier_flags & request_flags) {
+> >              iommu_notifier->notify(iommu_notifier, &entry);
+> >          }
+> 
+> -- 
+> David Gibson			| I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
+
+-- peterx
