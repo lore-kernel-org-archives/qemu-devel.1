@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cxZjq-0004yB-HY
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 09:52:15 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cxZjx-00050O-IY
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 09:52:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cxZjp-0008Mh-1K
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 09:52:14 -0400
-Date: Mon, 10 Apr 2017 14:52:03 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170410135203.GA20631@stefanha-x1.localdomain>
-References: <1491384478-12325-1-git-send-email-lidongchen@tencent.com>
-	<20170406140255.GA31259@stefanha-x1.localdomain>
-	<CAOGPPbfpN5QVxzvAkRv4MY7nE0YBxU0-UeMuJpVCe-wBB_9p8A@mail.gmail.com>
-	<20170407113450.GO13602@stefanha-x1.localdomain>
-	<CAOGPPbcf6bPXmVGFcw3niNznPx1BHsA=uR2G0sN=AV6xhWXMrA@mail.gmail.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cxZju-0008No-Di
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 09:52:21 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1491820793-5348-1-git-send-email-peter.maydell@linaro.org>
+	<1491820793-5348-7-git-send-email-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <809ae021-06ce-00d4-73ec-6fe3e6142c45@amsat.org>
+Date: Mon, 10 Apr 2017 10:52:12 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="wRRV7LY7NUeQGEoC"
-Content-Disposition: inline
-In-Reply-To: <CAOGPPbcf6bPXmVGFcw3niNznPx1BHsA=uR2G0sN=AV6xhWXMrA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3] migration/block:limit the
- time used for block migration
+In-Reply-To: <1491820793-5348-7-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 6/7] arm: Implement M profile
+ exception return properly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,211 +28,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 858585 jemmy <jemmy858585@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, Lidong Chen <lidongchen@tencent.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, patches@linaro.org
 
+On 04/10/2017 07:39 AM, Peter Maydell wrote:
+> On M profile, return from exceptions happen when privileged code
+> executes one of the following function call return instructions:
+>  * POP or LDM which loads the PC
+>  * LDR to PC
+>  * BX register
+> and the new PC value is 0xFFxxxxxx.
+>
+> QEMU tries to implement this by not treating the instruction
+> specially but then catching the attempt to execute from the magic
+> address value.  This is not ideal, because:
+>  * there are guest visible differences from the architecturally
+>    specified behaviour (for instance jumping to 0xFFxxxxxx via a
+>    different instruction should not cause an exception return but it
+>    will in the QEMU implementation)
+>  * we have to account for it in various places (like refusing to take
+>    an interrupt if the PC is at a magic value, and making sure that
+>    the MPU doesn't deny execution at the magic value addresses)
+>
+> Drop these hacks, and instead implement exception return the way the
+> architecture specifies -- by having the relevant instructions check
+> for the magic value and raise the 'do an exception return' QEMU
+> internal exception immediately.
+>
+> The effect on the generated code is minor:
+>
+>  bx lr, old code (and new code for unprivileged mode):
+>   TCG:
+>    mov_i32 tmp5,r14
+>    movi_i32 tmp6,$0xfffffffffffffffe
+>    and_i32 pc,tmp5,tmp6
+>    movi_i32 tmp6,$0x1
+>    and_i32 tmp5,tmp5,tmp6
+>    st_i32 tmp5,env,$0x218
+>    exit_tb $0x0
+>    set_label $L0
+>    exit_tb $0x7f2aabd61993
+>   x86_64 generated code:
+>    0x7f2aabe87019:  mov    %ebx,%ebp
+>    0x7f2aabe8701b:  and    $0xfffffffffffffffe,%ebp
+>    0x7f2aabe8701e:  mov    %ebp,0x3c(%r14)
+>    0x7f2aabe87022:  and    $0x1,%ebx
+>    0x7f2aabe87025:  mov    %ebx,0x218(%r14)
+>    0x7f2aabe8702c:  xor    %eax,%eax
+>    0x7f2aabe8702e:  jmpq   0x7f2aabe7c016
+>
+>  bx lr, new code when privileged:
+>   TCG:
+>    mov_i32 tmp5,r14
+>    movi_i32 tmp6,$0xfffffffffffffffe
+>    and_i32 pc,tmp5,tmp6
+>    movi_i32 tmp6,$0x1
+>    and_i32 tmp5,tmp5,tmp6
+>    st_i32 tmp5,env,$0x218
+>    movi_i32 tmp5,$0xffffffffff000000
+>    brcond_i32 pc,tmp5,geu,$L1
+>    exit_tb $0x0
+>    set_label $L1
+>    movi_i32 tmp5,$0x8
+>    call exception_internal,$0x0,$0,env,tmp5
+>   x86_64 generated code:
+>    0x7fe8fa1264e3:  mov    %ebp,%ebx
+>    0x7fe8fa1264e5:  and    $0xfffffffffffffffe,%ebx
+>    0x7fe8fa1264e8:  mov    %ebx,0x3c(%r14)
+>    0x7fe8fa1264ec:  and    $0x1,%ebp
+>    0x7fe8fa1264ef:  mov    %ebp,0x218(%r14)
+>    0x7fe8fa1264f6:  cmp    $0xff000000,%ebx
+>    0x7fe8fa1264fc:  jae    0x7fe8fa126509
+>    0x7fe8fa126502:  xor    %eax,%eax
+>    0x7fe8fa126504:  jmpq   0x7fe8fa122016
+>    0x7fe8fa126509:  mov    %r14,%rdi
+>    0x7fe8fa12650c:  mov    $0x8,%esi
+>    0x7fe8fa126511:  mov    $0x56095dbeccf5,%r10
+>    0x7fe8fa12651b:  callq  *%r10
+>
+> which is a difference of one cmp/branch-not-taken. This will
+> be lost in the noise of having to exit generated code and
+> look up the next TB anyway.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/translate.h |  4 ++++
+>  target/arm/translate.c | 65 +++++++++++++++++++++++++++++++++++++++++++++-----
+>  2 files changed, 63 insertions(+), 6 deletions(-)
+>
+> diff --git a/target/arm/translate.h b/target/arm/translate.h
+> index abb0760..c2a5451 100644
+> --- a/target/arm/translate.h
+> +++ b/target/arm/translate.h
+> @@ -134,6 +134,10 @@ static void disas_set_insn_syndrome(DisasContext *s, uint32_t syn)
+>  #define DISAS_HVC 8
+>  #define DISAS_SMC 9
+>  #define DISAS_YIELD 10
+> +/* M profile branch which might be an exception return (and so needs
+> + * custom end-of-TB code)
+> + */
+> +#define DISAS_BX_EXCRET 11
+>
+>  #ifdef TARGET_AARCH64
+>  void a64_translate_init(void);
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index 87fd702..156ab46 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -932,6 +932,51 @@ static inline void gen_bx(DisasContext *s, TCGv_i32 var)
+>      store_cpu_field(var, thumb);
+>  }
+>
+> +/* Set PC and Thumb state from var. var is marked as dead.
+> + * For M-profile CPUs, include logic to detect exception-return
+> + * branches and handle them.
+> + * This is needed for Thumb POP/LDM to PC, LDR to PC, and BX reg, and no others.
+> + */
+> +static inline void gen_bx_excret(DisasContext *s, TCGv_i32 var)
+> +{
+> +    /* Generate the same code here as for a simple bx, but flag via
+> +     * s->is_jmp that we need to do the rest of the work later.
+> +     */
+> +    gen_bx(s, var);
+> +    if (!IS_USER(s) && arm_dc_feature(s, ARM_FEATURE_M)) {
+> +        s->is_jmp = DISAS_BX_EXCRET;
+> +    }
+> +}
+> +
+> +static inline void gen_bx_excret_final_code(DisasContext *s)
+> +{
+> +    /* Generate the code to finish possible exception return and end the TB */
+> +    TCGLabel *excret_label = gen_new_label();
+> +
+> +    /* Is the new PC value in the magic range indicating exception return? */
+> +    tcg_gen_brcondi_i32(TCG_COND_GEU, cpu_R[15], 0xff000000, excret_label);
 
---wRRV7LY7NUeQGEoC
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Idea for a GSoC: branch prediction hints!
 
-On Sat, Apr 08, 2017 at 09:17:58PM +0800, 858585 jemmy wrote:
-> On Fri, Apr 7, 2017 at 7:34 PM, Stefan Hajnoczi <stefanha@redhat.com> wro=
-te:
-> > On Fri, Apr 07, 2017 at 09:30:33AM +0800, 858585 jemmy wrote:
-> >> On Thu, Apr 6, 2017 at 10:02 PM, Stefan Hajnoczi <stefanha@redhat.com>=
- wrote:
-> >> > On Wed, Apr 05, 2017 at 05:27:58PM +0800, jemmy858585@gmail.com wrot=
-e:
-> >> >
-> >> > A proper solution is to refactor the synchronous code to make it
-> >> > asynchronous.  This might require invoking the system call from a
-> >> > thread pool worker.
-> >> >
-> >>
-> >> yes, i agree with you, but this is a big change.
-> >> I will try to find how to optimize this code, maybe need a long time.
-> >>
-> >> this patch is not a perfect solution, but can alleviate the problem.
-> >
-> > Let's try to understand the problem fully first.
-> >
->=20
-> when migrate the vm with high speed, i find vnc response slowly sometime.
-> not only vnc response slowly, virsh console aslo response slowly sometime.
-> and the guest os block io performance is also reduce.
->=20
-> the bug can be reproduce by this command:
-> virsh migrate-setspeed 165cf436-312f-47e7-90f2-f8aa63f34893 900
-> virsh migrate --live 165cf436-312f-47e7-90f2-f8aa63f34893
-> --copy-storage-inc qemu+ssh://10.59.163.38/system
->=20
-> and --copy-storage-all have no problem.
-> virsh migrate --live 165cf436-312f-47e7-90f2-f8aa63f34893
-> --copy-storage-all qemu+ssh://10.59.163.38/system
->=20
-> compare the difference between --copy-storage-inc and
-> --copy-storage-all. i find out the reason is
-> mig_save_device_bulk invoke bdrv_is_allocated, but bdrv_is_allocated
-> is synchronous and maybe wait
-> for a long time.
->=20
-> i write this code to measure the time used by  brdrv_is_allocated()
->=20
->  279     static int max_time =3D 0;
->  280     int tmp;
->=20
->  288             clock_gettime(CLOCK_MONOTONIC_RAW, &ts1);
->  289             ret =3D bdrv_is_allocated(blk_bs(bb), cur_sector,
->  290                                     MAX_IS_ALLOCATED_SEARCH, &nr_sec=
-tors);
->  291             clock_gettime(CLOCK_MONOTONIC_RAW, &ts2);
->  292
->  293
->  294             tmp =3D  (ts2.tv_sec - ts1.tv_sec)*1000000000L
->  295                            + (ts2.tv_nsec - ts1.tv_nsec);
->  296             if (tmp > max_time) {
->  297                max_time=3Dtmp;
->  298                fprintf(stderr, "max_time is %d\n", max_time);
->  299             }
->=20
-> the test result is below:
->=20
->  max_time is 37014
->  max_time is 1075534
->  max_time is 17180913
->  max_time is 28586762
->  max_time is 49563584
->  max_time is 103085447
->  max_time is 110836833
->  max_time is 120331438
->=20
-> bdrv_is_allocated is called after qemu_mutex_lock_iothread.
-> and the main thread is also call qemu_mutex_lock_iothread.
-> so cause the main thread maybe wait for a long time.
->=20
->    if (bmds->shared_base) {
->         qemu_mutex_lock_iothread();
->         aio_context_acquire(blk_get_aio_context(bb));
->         /* Skip unallocated sectors; intentionally treats failure as
->          * an allocated sector */
->         while (cur_sector < total_sectors &&
->                !bdrv_is_allocated(blk_bs(bb), cur_sector,
->                                   MAX_IS_ALLOCATED_SEARCH, &nr_sectors)) {
->             cur_sector +=3D nr_sectors;
->         }
->         aio_context_release(blk_get_aio_context(bb));
->         qemu_mutex_unlock_iothread();
->     }
->=20
-> #0  0x00007f107322f264 in __lll_lock_wait () from /lib64/libpthread.so.0
-> #1  0x00007f107322a508 in _L_lock_854 () from /lib64/libpthread.so.0
-> #2  0x00007f107322a3d7 in pthread_mutex_lock () from /lib64/libpthread.so=
-=2E0
-> #3  0x0000000000949ecb in qemu_mutex_lock (mutex=3D0xfc51a0) at
-> util/qemu-thread-posix.c:60
-> #4  0x0000000000459e58 in qemu_mutex_lock_iothread () at /root/qemu/cpus.=
-c:1516
-> #5  0x0000000000945322 in os_host_main_loop_wait (timeout=3D28911939) at
-> util/main-loop.c:258
-> #6  0x00000000009453f2 in main_loop_wait (nonblocking=3D0) at util/main-l=
-oop.c:517
-> #7  0x00000000005c76b4 in main_loop () at vl.c:1898
-> #8  0x00000000005ceb77 in main (argc=3D49, argv=3D0x7fff921182b8,
-> envp=3D0x7fff92118448) at vl.c:4709
+tcg_gen_brcondi_i32(TCG_COND_GEU | TCG_COND_UNLIKELY, ...
 
-The following patch moves bdrv_is_allocated() into bb's AioContext.  It
-will execute without blocking other I/O activity.
+> +    /* No: end the TB as we would for a DISAS_JMP */
+> +    if (s->singlestep_enabled || s->ss_active) {
+> +        gen_singlestep_exception(s);
+> +    } else {
+> +        tcg_gen_exit_tb(0);
+> +    }
+> +    gen_set_label(excret_label);
+> +    /* Yes: this is an exception return.
+> +     * At this point in runtime env->regs[15] and env->thumb will hold
+> +     * the exception-return magic number, which do_v7m_exception_exit()
+> +     * will read. Nothing else will be able to see those values because
+> +     * the cpu-exec main loop guarantees that we will always go straight
+> +     * from raising the exception to the exception-handling code.
+> +     *
+> +     * gen_ss_advance(s) does nothing on M profile currently but
+> +     * calling it is conceptually the right thing as we have executed
+> +     * this instruction (compare SWI, HVC, SMC handling).
+> +     */
+> +    gen_ss_advance(s);
+> +    gen_exception_internal(EXCP_EXCEPTION_EXIT);
+> +}
+> +
+>  /* Variant of store_reg which uses branch&exchange logic when storing
+>     to r15 in ARM architecture v7 and above. The source must be a temporary
+>     and will be marked as dead. */
+> @@ -951,7 +996,7 @@ static inline void store_reg_bx(DisasContext *s, int reg, TCGv_i32 var)
+>  static inline void store_reg_from_load(DisasContext *s, int reg, TCGv_i32 var)
+>  {
+>      if (reg == 15 && ENABLE_ARCH_5) {
+> -        gen_bx(s, var);
+> +        gen_bx_excret(s, var);
+>      } else {
+>          store_reg(s, reg, var);
+>      }
+> @@ -9870,7 +9915,7 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
+>                          tmp = tcg_temp_new_i32();
+>                          gen_aa32_ld32u(s, tmp, addr, get_mem_index(s));
+>                          if (i == 15) {
+> -                            gen_bx(s, tmp);
+> +                            gen_bx_excret(s, tmp);
+>                          } else if (i == rn) {
+>                              loaded_var = tmp;
+>                              loaded_base = 1;
+> @@ -10902,7 +10947,7 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
+>                  goto illegal_op;
+>              }
+>              if (rs == 15) {
+> -                gen_bx(s, tmp);
+> +                gen_bx_excret(s, tmp);
+>              } else {
+>                  store_reg(s, rs, tmp);
+>              }
+> @@ -11092,9 +11137,10 @@ static void disas_thumb_insn(CPUARMState *env, DisasContext *s)
+>                      tmp2 = tcg_temp_new_i32();
+>                      tcg_gen_movi_i32(tmp2, val);
+>                      store_reg(s, 14, tmp2);
+> +                    gen_bx(s, tmp);
+> +                } else {
+> +                    gen_bx_excret(s, tmp);
 
-Compile-tested only.
+This change was not easy to understand, can you add a one line comment?
 
-diff --git a/migration/block.c b/migration/block.c
-index 7734ff7..a5572a4 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -263,6 +263,29 @@ static void blk_mig_read_cb(void *opaque, int ret)
-     blk_mig_unlock();
- }
+>                  }
+> -                /* already thumb, no need to check */
+> -                gen_bx(s, tmp);
+>                  break;
+>              }
+>              break;
+> @@ -11989,7 +12035,14 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
+>         instruction was a conditional branch or trap, and the PC has
+>         already been written.  */
+>      gen_set_condexec(dc);
+> -    if (unlikely(cs->singlestep_enabled || dc->ss_active)) {
+> +    if (dc->is_jmp == DISAS_BX_EXCRET) {
+> +        /* Exception return branches need some special case code at the
+> +         * end of the TB, which is complex enough that it has to
+> +         * handle the single-step vs not and the condition-failed
+> +         * insn codepath itself.
+> +         */
+> +        gen_bx_excret_final_code(dc);
+> +    } else if (unlikely(cs->singlestep_enabled || dc->ss_active)) {
+>          /* Unconditional and "condition passed" instruction codepath. */
+>          switch (dc->is_jmp) {
+>          case DISAS_SWI:
+>
 
-+typedef struct {
-+    int64_t *total_sectors;
-+    int64_t *cur_sector;
-+    BlockBackend *bb;
-+    QemuEvent event;
-+} MigNextAllocatedClusterData;
-+
-+static void coroutine_fn mig_next_allocated_cluster(void *opaque)
-+{
-+    MigNextAllocatedClusterData *data =3D opaque;
-+    int nr_sectors;
-+
-+    /* Skip unallocated sectors; intentionally treats failure as
-+     * an allocated sector */
-+    while (*data->cur_sector < *data->total_sectors &&
-+           !bdrv_is_allocated(blk_bs(data->bb), *data->cur_sector,
-+                              MAX_IS_ALLOCATED_SEARCH, &nr_sectors)) {
-+        *data->cur_sector +=3D nr_sectors;
-+    }
-+
-+    qemu_event_set(&data->event);
-+}
-+
- /* Called with no lock taken.  */
-
- static int mig_save_device_bulk(QEMUFile *f, BlkMigDevState *bmds)
-@@ -274,17 +297,27 @@ static int mig_save_device_bulk(QEMUFile *f, BlkMigDe=
-vState *bmds)
-     int nr_sectors;
-
-     if (bmds->shared_base) {
-+        /* Searching for the next allocated cluster can block.  Do it in a
-+         * coroutine inside bb's AioContext.  That way we don't need to ho=
-ld
-+         * the global mutex while blocked.
-+         */
-+        AioContext *bb_ctx;
-+        Coroutine *co;
-+        MigNextAllocatedClusterData data =3D {
-+            .cur_sector =3D &cur_sector,
-+            .total_sectors =3D &total_sectors,
-+            .bb =3D bb,
-+        };
-+
-+        qemu_event_init(&data.event, false);
-+
-         qemu_mutex_lock_iothread();
--        aio_context_acquire(blk_get_aio_context(bb));
--        /* Skip unallocated sectors; intentionally treats failure as
--         * an allocated sector */
--        while (cur_sector < total_sectors &&
--               !bdrv_is_allocated(blk_bs(bb), cur_sector,
--                                  MAX_IS_ALLOCATED_SEARCH, &nr_sectors)) {
--            cur_sector +=3D nr_sectors;
--        }
--        aio_context_release(blk_get_aio_context(bb));
-+        bb_ctx =3D blk_get_aio_context(bb);
-         qemu_mutex_unlock_iothread();
-+
-+        co =3D qemu_coroutine_create(mig_next_allocated_cluster, &data);
-+        aio_co_schedule(bb_ctx, co);
-+        qemu_event_wait(&data.event);
-     }
-=20
-     if (cur_sector >=3D total_sectors) {
-
---wRRV7LY7NUeQGEoC
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJY644DAAoJEJykq7OBq3PIxqcH/iDjsBdEohMBM06V6Dv47CxL
-3P56Gw936EdL2Q3OQDCIKQvprDHC/Yq/LBrtK/CznaIn3FnmAYeuGYBguERS0KjI
-fRbzFfdF8hFkfSmv87iKpVSRtuLbJJI/VYhEiZA/BWw3KtbyZRYvm4EtGJuhidQ0
-Og5pb3EB99bgwruCdqZqYg6fGmum/UWq8LWtxB3I2xB50sx+OxCxO3xxRYzDzflz
-etrwB9n4E/60t1T9AE2O5s1vp56IVhyuHi033HEHzz1L+qLcMEwXx9BN1+15X1Hk
-QLvnduK9orZtu/W5Mt1SZiHRpjfK9+7oygM9JH3jHFhfwBB4Q+nTchd1q/2SVmo=
-=2Hw4
------END PGP SIGNATURE-----
-
---wRRV7LY7NUeQGEoC--
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
