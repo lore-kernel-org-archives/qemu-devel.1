@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39399)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cxRg4-0006Oe-W6
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 01:15:49 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1cxRlk-0007Ag-50
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 01:21:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cxRfz-0004A4-V1
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 01:15:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51023)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cxRfz-00049a-Mz
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 01:15:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cxRfy-0002sw-3Q
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 05:15:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 123FD2E8048
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 05:15:42 +0000 (UTC)
+	(envelope-from <dgibson@ozlabs.org>) id 1cxRlg-0005bS-5P
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 01:21:40 -0400
+Date: Mon, 10 Apr 2017 15:17:38 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170410051738.GJ27571@umbus>
+References: <1491396106-26376-1-git-send-email-clg@kaod.org>
+	<1491396106-26376-12-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 10 Apr 2017 05:07:59 -0000
-From: wayen <1662050@bugs.launchpad.net>
-Reply-To: Bug 1662050 <1662050@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170206024535.14624.3001.malonedeb@soybean.canonical.com>
-Message-Id: <20170410050759.12359.94192.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1662050] Re: qemu-img convert a overlay qcow2
- image into a entire image
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="yr/DzoowOgTDcSCF"
+Content-Disposition: inline
+In-Reply-To: <1491396106-26376-12-git-send-email-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 11/21] ppc/pnv: scan ISA bus to populate
+ device tree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,38 +25,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Hi Lidong Chen:
-    I used QEMU 2.0.0 on Ubuntu 14.04.
-    Do you mean your patch can make qemu-img convert qcow2 overlay into a n=
-ew overlay?
 
--- =
+--yr/DzoowOgTDcSCF
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1662050
+On Wed, Apr 05, 2017 at 02:41:36PM +0200, C=E9dric Le Goater wrote:
+> This is an empty shell that we will use to include nodes in the device
+> tree for ISA devices. We expect RTC, UART and IPMI BT devices.
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-Title:
-  qemu-img convert a overlay qcow2 image into a entire image
+This is so simple, I'd probably fold it into the next patch.  But
+apart from that.
 
-Status in QEMU:
-  Incomplete
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
-Bug description:
-  I have a base image file "base.qcow2" and a delta qcow2 image file
-  "delta.qcow2" whose backing file is "base.qcow2".
+> ---
+>  hw/ppc/pnv.c | 32 ++++++++++++++++++++++++++++++++
+>  1 file changed, 32 insertions(+)
+>=20
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index 493c7eed7980..a3c8f6594d10 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -281,6 +281,36 @@ static void powernv_populate_chip(PnvChip *chip, voi=
+d *fdt)
+>      g_free(typename);
+>  }
+> =20
+> +typedef struct ForeachPopulateArgs {
+> +    void *fdt;
+> +    int offset;
+> +} ForeachPopulateArgs;
+> +
+> +static int powernv_populate_isa_device(DeviceState *dev, void *opaque)
+> +{
+> +    return 0;
+> +}
+> +
+> +static void powernv_populate_isa(ISABus *bus, void *fdt)
+> +{
+> +    int lpc_offset;
+> +    ForeachPopulateArgs args;
+> +
+> +    lpc_offset =3D fdt_node_offset_by_compatible(fdt, -1, "ibm,lpc");
+> +    if (lpc_offset < 0) {
+> +        error_report("Could find the lpc node !?");
+> +        return;
+> +    }
+> +
+> +    args.fdt =3D fdt;
+> +    args.offset =3D lpc_offset;
+> +
+> +    /* ISA devices are not necessarily parented to the ISA bus so we
+> +     * can not use object_child_foreach() */
+> +    qbus_walk_children(BUS(bus), powernv_populate_isa_device,
+> +                       NULL, NULL, NULL, &args);
+> +}
+> +
+>  static void *powernv_create_fdt(MachineState *machine)
+>  {
+>      const char plat_compat[] =3D "qemu,powernv\0ibm,powernv";
+> @@ -328,6 +358,8 @@ static void *powernv_create_fdt(MachineState *machine)
+>      for (i =3D 0; i < pnv->num_chips; i++) {
+>          powernv_populate_chip(pnv->chips[i], fdt);
+>      }
+> +
+> +    powernv_populate_isa(pnv->isa_bus, fdt);
+>      return fdt;
+>  }
+> =20
 
-  Now I use qemu-img to convert "delta.qcow2" and will get a new image
-  file "new.qcow2" which is entire and equivalent to combination of
-  "base.qcow2" and "delta.qcow2".
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-  In fact,I don't want to get a complete image.I just want to convert
-  delta qcow2 image file "A" to a New delta overlay qcow2 image "B"
-  which is equivalent to "A". So the "new.qcow2" is not what i want. I
-  have to admit that this is not bug. Could you please take this as a
-  new feature and enable qemu-img to convert qcow2 overlay itself?
+--yr/DzoowOgTDcSCF
+Content-Type: application/pgp-signature; name="signature.asc"
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1662050/+subscriptions
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJY6xVvAAoJEGw4ysog2bOS25YP/RmADoyr0rhkPZv6iEUgbVIC
+cmNEtd8cxj2k+vguCq3ZJZ68HY/3XeplB1TzlVWYlcju1fqhoYa4uEAc05aWzq9a
+QJAwU42sdDwoHB/qZwhXnaPCI+G+m+HL4gKgNVH0LiGp/QNNX/xkF4nZwJ1VnmwP
+cAJNk6fHfaRXjx83WpMu+U6IS7mcTtgGs5eFBpX0ULiwzQmBkZMJEr3bNGs/YtAE
+OOWpBCzDtBV4Yt+rpW9nnz1Ng7DB5IFwD0IeHwkO5xYmU4jGl9Yl7v9ELOVZIEYy
+nr7Ff8GVJGnpCg3ljuJoHRJUG3+7j95mcfN9YYfzwle/Zk4fB8RM0To/I8H1NARs
+xBOOuajKehoFkbQKEeEMRlFFnHhTcil+ZXwRv/0uVjO0wLk28ROYf+pV+de3J6/F
+axzwPiADYzjSFE8/6HzEnQEXviQvJ6q6iOxwRCapESv5GYcPnZCz3m/5zXFCVD9d
+vTVZCOmkm4kPhWXh2wFzrwFB3Vk0YdBYpq3Pk4NOUqigmVLsc1FtyJVOtF57VDJM
+0TMNEUbCMXb30E78kQ4NfKCjpGClEyByrZ6v+hQXvHkSQslI5777/Wcck9yTyFuW
+7L1j9+T+/ExQ9vq1gZkqTqNDvR2KxNi/rp+JsknwTkn/AVeaxtYiQ4dSrgBoXk5h
+X1gBHEanblm+u33Lj+1a
+=sXFT
+-----END PGP SIGNATURE-----
+
+--yr/DzoowOgTDcSCF--
