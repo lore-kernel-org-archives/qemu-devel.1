@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42843)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cxZjx-00050O-IY
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 09:52:23 -0400
+	id 1cxZkv-0005bE-7Z
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 09:53:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cxZju-0008No-Di
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 09:52:21 -0400
+	id 1cxZks-0000K3-5m
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 09:53:21 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <1491820793-5348-1-git-send-email-peter.maydell@linaro.org>
-	<1491820793-5348-7-git-send-email-peter.maydell@linaro.org>
+	<1491820793-5348-8-git-send-email-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <809ae021-06ce-00d4-73ec-6fe3e6142c45@amsat.org>
-Date: Mon, 10 Apr 2017 10:52:12 -0300
+Message-ID: <bb111dba-c11a-80f5-e685-a9d6ca2cb8d9@amsat.org>
+Date: Mon, 10 Apr 2017 10:53:13 -0300
 MIME-Version: 1.0
-In-Reply-To: <1491820793-5348-7-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1491820793-5348-8-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 6/7] arm: Implement M profile
- exception return properly
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 7/7] arm: Remove workarounds for
+ old M-profile exception return implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,225 +32,111 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@no
 Cc: Richard Henderson <rth@twiddle.net>, patches@linaro.org
 
 On 04/10/2017 07:39 AM, Peter Maydell wrote:
-> On M profile, return from exceptions happen when privileged code
-> executes one of the following function call return instructions:
->  * POP or LDM which loads the PC
->  * LDR to PC
->  * BX register
-> and the new PC value is 0xFFxxxxxx.
->
-> QEMU tries to implement this by not treating the instruction
-> specially but then catching the attempt to execute from the magic
-> address value.  This is not ideal, because:
->  * there are guest visible differences from the architecturally
->    specified behaviour (for instance jumping to 0xFFxxxxxx via a
->    different instruction should not cause an exception return but it
->    will in the QEMU implementation)
->  * we have to account for it in various places (like refusing to take
->    an interrupt if the PC is at a magic value, and making sure that
->    the MPU doesn't deny execution at the magic value addresses)
->
-> Drop these hacks, and instead implement exception return the way the
-> architecture specifies -- by having the relevant instructions check
-> for the magic value and raise the 'do an exception return' QEMU
-> internal exception immediately.
->
-> The effect on the generated code is minor:
->
->  bx lr, old code (and new code for unprivileged mode):
->   TCG:
->    mov_i32 tmp5,r14
->    movi_i32 tmp6,$0xfffffffffffffffe
->    and_i32 pc,tmp5,tmp6
->    movi_i32 tmp6,$0x1
->    and_i32 tmp5,tmp5,tmp6
->    st_i32 tmp5,env,$0x218
->    exit_tb $0x0
->    set_label $L0
->    exit_tb $0x7f2aabd61993
->   x86_64 generated code:
->    0x7f2aabe87019:  mov    %ebx,%ebp
->    0x7f2aabe8701b:  and    $0xfffffffffffffffe,%ebp
->    0x7f2aabe8701e:  mov    %ebp,0x3c(%r14)
->    0x7f2aabe87022:  and    $0x1,%ebx
->    0x7f2aabe87025:  mov    %ebx,0x218(%r14)
->    0x7f2aabe8702c:  xor    %eax,%eax
->    0x7f2aabe8702e:  jmpq   0x7f2aabe7c016
->
->  bx lr, new code when privileged:
->   TCG:
->    mov_i32 tmp5,r14
->    movi_i32 tmp6,$0xfffffffffffffffe
->    and_i32 pc,tmp5,tmp6
->    movi_i32 tmp6,$0x1
->    and_i32 tmp5,tmp5,tmp6
->    st_i32 tmp5,env,$0x218
->    movi_i32 tmp5,$0xffffffffff000000
->    brcond_i32 pc,tmp5,geu,$L1
->    exit_tb $0x0
->    set_label $L1
->    movi_i32 tmp5,$0x8
->    call exception_internal,$0x0,$0,env,tmp5
->   x86_64 generated code:
->    0x7fe8fa1264e3:  mov    %ebp,%ebx
->    0x7fe8fa1264e5:  and    $0xfffffffffffffffe,%ebx
->    0x7fe8fa1264e8:  mov    %ebx,0x3c(%r14)
->    0x7fe8fa1264ec:  and    $0x1,%ebp
->    0x7fe8fa1264ef:  mov    %ebp,0x218(%r14)
->    0x7fe8fa1264f6:  cmp    $0xff000000,%ebx
->    0x7fe8fa1264fc:  jae    0x7fe8fa126509
->    0x7fe8fa126502:  xor    %eax,%eax
->    0x7fe8fa126504:  jmpq   0x7fe8fa122016
->    0x7fe8fa126509:  mov    %r14,%rdi
->    0x7fe8fa12650c:  mov    $0x8,%esi
->    0x7fe8fa126511:  mov    $0x56095dbeccf5,%r10
->    0x7fe8fa12651b:  callq  *%r10
->
-> which is a difference of one cmp/branch-not-taken. This will
-> be lost in the noise of having to exit generated code and
-> look up the next TB anyway.
+> Now that we've rewritten M-profile exception return so that the magic
+> PC values are not visible to other parts of QEMU, we can delete the
+> special casing of them elsewhere.
 >
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/arm/translate.h |  4 ++++
->  target/arm/translate.c | 65 +++++++++++++++++++++++++++++++++++++++++++++-----
->  2 files changed, 63 insertions(+), 6 deletions(-)
->
-> diff --git a/target/arm/translate.h b/target/arm/translate.h
-> index abb0760..c2a5451 100644
-> --- a/target/arm/translate.h
-> +++ b/target/arm/translate.h
-> @@ -134,6 +134,10 @@ static void disas_set_insn_syndrome(DisasContext *s, uint32_t syn)
->  #define DISAS_HVC 8
->  #define DISAS_SMC 9
->  #define DISAS_YIELD 10
-> +/* M profile branch which might be an exception return (and so needs
-> + * custom end-of-TB code)
-> + */
-> +#define DISAS_BX_EXCRET 11
->
->  #ifdef TARGET_AARCH64
->  void a64_translate_init(void);
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index 87fd702..156ab46 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -932,6 +932,51 @@ static inline void gen_bx(DisasContext *s, TCGv_i32 var)
->      store_cpu_field(var, thumb);
->  }
->
-> +/* Set PC and Thumb state from var. var is marked as dead.
-> + * For M-profile CPUs, include logic to detect exception-return
-> + * branches and handle them.
-> + * This is needed for Thumb POP/LDM to PC, LDR to PC, and BX reg, and no others.
-> + */
-> +static inline void gen_bx_excret(DisasContext *s, TCGv_i32 var)
-> +{
-> +    /* Generate the same code here as for a simple bx, but flag via
-> +     * s->is_jmp that we need to do the rest of the work later.
-> +     */
-> +    gen_bx(s, var);
-> +    if (!IS_USER(s) && arm_dc_feature(s, ARM_FEATURE_M)) {
-> +        s->is_jmp = DISAS_BX_EXCRET;
-> +    }
-> +}
-> +
-> +static inline void gen_bx_excret_final_code(DisasContext *s)
-> +{
-> +    /* Generate the code to finish possible exception return and end the TB */
-> +    TCGLabel *excret_label = gen_new_label();
-> +
-> +    /* Is the new PC value in the magic range indicating exception return? */
-> +    tcg_gen_brcondi_i32(TCG_COND_GEU, cpu_R[15], 0xff000000, excret_label);
-
-Idea for a GSoC: branch prediction hints!
-
-tcg_gen_brcondi_i32(TCG_COND_GEU | TCG_COND_UNLIKELY, ...
-
-> +    /* No: end the TB as we would for a DISAS_JMP */
-> +    if (s->singlestep_enabled || s->ss_active) {
-> +        gen_singlestep_exception(s);
-> +    } else {
-> +        tcg_gen_exit_tb(0);
-> +    }
-> +    gen_set_label(excret_label);
-> +    /* Yes: this is an exception return.
-> +     * At this point in runtime env->regs[15] and env->thumb will hold
-> +     * the exception-return magic number, which do_v7m_exception_exit()
-> +     * will read. Nothing else will be able to see those values because
-> +     * the cpu-exec main loop guarantees that we will always go straight
-> +     * from raising the exception to the exception-handling code.
-> +     *
-> +     * gen_ss_advance(s) does nothing on M profile currently but
-> +     * calling it is conceptually the right thing as we have executed
-> +     * this instruction (compare SWI, HVC, SMC handling).
-> +     */
-> +    gen_ss_advance(s);
-> +    gen_exception_internal(EXCP_EXCEPTION_EXIT);
-> +}
-> +
->  /* Variant of store_reg which uses branch&exchange logic when storing
->     to r15 in ARM architecture v7 and above. The source must be a temporary
->     and will be marked as dead. */
-> @@ -951,7 +996,7 @@ static inline void store_reg_bx(DisasContext *s, int reg, TCGv_i32 var)
->  static inline void store_reg_from_load(DisasContext *s, int reg, TCGv_i32 var)
->  {
->      if (reg == 15 && ENABLE_ARCH_5) {
-> -        gen_bx(s, var);
-> +        gen_bx_excret(s, var);
->      } else {
->          store_reg(s, reg, var);
->      }
-> @@ -9870,7 +9915,7 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
->                          tmp = tcg_temp_new_i32();
->                          gen_aa32_ld32u(s, tmp, addr, get_mem_index(s));
->                          if (i == 15) {
-> -                            gen_bx(s, tmp);
-> +                            gen_bx_excret(s, tmp);
->                          } else if (i == rn) {
->                              loaded_var = tmp;
->                              loaded_base = 1;
-> @@ -10902,7 +10947,7 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
->                  goto illegal_op;
->              }
->              if (rs == 15) {
-> -                gen_bx(s, tmp);
-> +                gen_bx_excret(s, tmp);
->              } else {
->                  store_reg(s, rs, tmp);
->              }
-> @@ -11092,9 +11137,10 @@ static void disas_thumb_insn(CPUARMState *env, DisasContext *s)
->                      tmp2 = tcg_temp_new_i32();
->                      tcg_gen_movi_i32(tmp2, val);
->                      store_reg(s, 14, tmp2);
-> +                    gen_bx(s, tmp);
-> +                } else {
-> +                    gen_bx_excret(s, tmp);
-
-This change was not easy to understand, can you add a one line comment?
-
->                  }
-> -                /* already thumb, no need to check */
-> -                gen_bx(s, tmp);
->                  break;
->              }
->              break;
-> @@ -11989,7 +12035,14 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
->         instruction was a conditional branch or trap, and the PC has
->         already been written.  */
->      gen_set_condexec(dc);
-> -    if (unlikely(cs->singlestep_enabled || dc->ss_active)) {
-> +    if (dc->is_jmp == DISAS_BX_EXCRET) {
-> +        /* Exception return branches need some special case code at the
-> +         * end of the TB, which is complex enough that it has to
-> +         * handle the single-step vs not and the condition-failed
-> +         * insn codepath itself.
-> +         */
-> +        gen_bx_excret_final_code(dc);
-> +    } else if (unlikely(cs->singlestep_enabled || dc->ss_active)) {
->          /* Unconditional and "condition passed" instruction codepath. */
->          switch (dc->is_jmp) {
->          case DISAS_SWI:
->
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+>  target/arm/cpu.c       | 43 ++-----------------------------------------
+>  target/arm/translate.c |  8 --------
+>  2 files changed, 2 insertions(+), 49 deletions(-)
+>
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 04b062c..b357aee 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -304,33 +304,6 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+>  }
+>
+>  #if !defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64)
+> -static void arm_v7m_unassigned_access(CPUState *cpu, hwaddr addr,
+> -                                      bool is_write, bool is_exec, int opaque,
+> -                                      unsigned size)
+> -{
+> -    ARMCPU *arm = ARM_CPU(cpu);
+> -    CPUARMState *env = &arm->env;
+> -
+> -    /* ARMv7-M interrupt return works by loading a magic value into the PC.
+> -     * On real hardware the load causes the return to occur.  The qemu
+> -     * implementation performs the jump normally, then does the exception
+> -     * return by throwing a special exception when when the CPU tries to
+> -     * execute code at the magic address.
+> -     */
+> -    if (env->v7m.exception != 0 && addr >= 0xfffffff0 && is_exec) {
+> -        cpu->exception_index = EXCP_EXCEPTION_EXIT;
+> -        cpu_loop_exit(cpu);
+> -    }
+> -
+> -    /* In real hardware an attempt to access parts of the address space
+> -     * with nothing there will usually cause an external abort.
+> -     * However our QEMU board models are often missing device models where
+> -     * the guest can boot anyway with the default read-as-zero/writes-ignored
+> -     * behaviour that you get without a QEMU unassigned_access hook.
+> -     * So just return here to retain that default behaviour.
+> -     */
+> -}
+> -
+>  static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+>  {
+>      CPUClass *cc = CPU_GET_CLASS(cs);
+> @@ -338,17 +311,7 @@ static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+>      CPUARMState *env = &cpu->env;
+>      bool ret = false;
+>
+> -    /* ARMv7-M interrupt return works by loading a magic value
+> -     * into the PC.  On real hardware the load causes the
+> -     * return to occur.  The qemu implementation performs the
+> -     * jump normally, then does the exception return when the
+> -     * CPU tries to execute code at the magic address.
+> -     * This will cause the magic PC value to be pushed to
+> -     * the stack if an interrupt occurred at the wrong time.
+> -     * We avoid this by disabling interrupts when
+> -     * pc contains a magic address.
+> -     *
+> -     * ARMv7-M interrupt masking works differently than -A or -R.
+> +    /* ARMv7-M interrupt masking works differently than -A or -R.
+>       * There is no FIQ/IRQ distinction. Instead of I and F bits
+>       * masking FIQ and IRQ interrupts, an exception is taken only
+>       * if it is higher priority than the current execution priority
+> @@ -356,8 +319,7 @@ static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+>       * currently active exception).
+>       */
+>      if (interrupt_request & CPU_INTERRUPT_HARD
+> -        && (armv7m_nvic_can_take_pending_exception(env->nvic))
+> -        && (env->regs[15] < 0xfffffff0)) {
+> +        && (armv7m_nvic_can_take_pending_exception(env->nvic))) {
+>          cs->exception_index = EXCP_IRQ;
+>          cc->do_interrupt(cs);
+>          ret = true;
+> @@ -1091,7 +1053,6 @@ static void arm_v7m_class_init(ObjectClass *oc, void *data)
+>      cc->do_interrupt = arm_v7m_cpu_do_interrupt;
+>  #endif
+>
+> -    cc->do_unassigned_access = arm_v7m_unassigned_access;
+>      cc->cpu_exec_interrupt = arm_v7m_cpu_exec_interrupt;
+>  }
+>
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index 156ab46..c85bc6c 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -11914,14 +11914,6 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
+>              dc->is_jmp = DISAS_EXC;
+>              break;
+>          }
+> -#else
+> -        if (arm_dc_feature(dc, ARM_FEATURE_M)) {
+> -            /* Branches to the magic exception-return addresses should
+> -             * already have been caught via the arm_v7m_unassigned_access hook,
+> -             * and never get here.
+> -             */
+> -            assert(dc->pc < 0xfffffff0);
+> -        }
+>  #endif
+>
+>          if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
+>
