@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47613)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <patrick.ohly@intel.com>) id 1cxWEW-0007zW-FJ
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:07:41 -0400
+	(envelope-from <berrange@redhat.com>) id 1cxWIo-0000W4-W5
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:12:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <patrick.ohly@intel.com>) id 1cxWES-0004b5-Gx
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:07:40 -0400
-Received: from mail-io0-x22f.google.com ([2607:f8b0:4001:c06::22f]:35336)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <patrick.ohly@intel.com>)
-	id 1cxWES-0004aV-9e
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:07:36 -0400
-Received: by mail-io0-x22f.google.com with SMTP id r16so35135664ioi.2
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 03:07:35 -0700 (PDT)
-Message-ID: <1491818850.10884.99.camel@intel.com>
-From: Patrick Ohly <patrick.ohly@intel.com>
-Date: Mon, 10 Apr 2017 12:07:30 +0200
-In-Reply-To: <CAJ+F1CKo=tAXKHzoY4mfZxc9V2N5+sszOJwPOVqkJZK2tD6vMA@mail.gmail.com>
-References: <1491575431-32170-1-git-send-email-amarnath.valluri@intel.com>
-	<1491575431-32170-10-git-send-email-amarnath.valluri@intel.com>
-	<20170407144100.GL26896@redhat.com>
-	<CAJ+F1CJ1wfP_RS25=gokRvk2y0+-_7pX8adzmBUMZPpaz=AOgw@mail.gmail.com>
-	<094e28c1-b780-f8ff-fc6a-9f6dd3421a3a@intel.com>
-	<CAJ+F1CKo=tAXKHzoY4mfZxc9V2N5+sszOJwPOVqkJZK2tD6vMA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 9/9] tpm: Added support for TPM emulator
+	(envelope-from <berrange@redhat.com>) id 1cxWIj-0005jO-T7
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:12:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46682)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cxWIj-0005jF-K9
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:12:01 -0400
+Date: Mon, 10 Apr 2017 11:11:52 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170410101152.GG3655@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1491814840-63048-1-git-send-email-longpeng2@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1491814840-63048-1-git-send-email-longpeng2@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 12/19] socket: add af_alg family
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,38 +28,202 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Amarnath Valluri <amarnath.valluri@intel.com>, "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, stefanb@linux.vnet.ibm.com
+To: "Longpeng(Mike)" <longpeng2@huawei.com>
+Cc: kraxel@redhat.com, pbonzini@redhat.com, eblake@redhat.com, armbru@redhat.com, xuquan8@huawei.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org
 
-On Mon, 2017-04-10 at 09:54 +0000, Marc-André Lureau wrote:
-
-> By "public protocol", I mean qemu communication with a foreign
-> project, swtpm or other.
+On Mon, Apr 10, 2017 at 05:00:40PM +0800, Longpeng(Mike) wrote:
+> The AF_ALG socket family is the userspace interface for linux
+> crypto API, this patch adds af_alg family support. It'll be used
+> by afalg-backend crypto later.
 > 
-> If qemu grows new needs, or if the protocol is found limited or buggy,
-> it may change. Subtle interactions may break between various
-> implementations.  The minimum would be some versioning or
-> capabilities. A document describing the states and messages
-> allowed/denied & effects would be quite necessary.
+> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+> ---
+>  configure              | 21 ++++++++++++
+>  include/qemu/sockets.h |  6 ++++
+>  qapi-schema.json       | 21 +++++++++++-
+>  util/qemu-sockets.c    | 91 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 138 insertions(+), 1 deletion(-)
+> 
+> diff --git a/configure b/configure
+> index 4b3b5cd..970c9bc 100755
+> --- a/configure
+> +++ b/configure
+> @@ -4737,6 +4737,23 @@ if compile_prog "" "" ; then
+>      have_af_vsock=yes
+>  fi
+>  
+> +##########################################
+> +# check for usable AF_ALG environment
+> +hava_af_alg=no
+> +cat > $TMPC << EOF
+> +#include <errno.h>
+> +#include <sys/types.h>
+> +#include <sys/socket.h>
+> +int main(void) {
+> +    int sock;
+> +    sock = socket(AF_ALG, SOCK_SEQPACKET, 0);
+> +    return sock;
+> +}
+> +EOF
+> +if compile_prog "" "" ; then
+> +    have_af_alg=yes
+> +fi
+> +
+>  #################################################
+>  # Sparc implicitly links with --relax, which is
+>  # incompatible with -r, so --no-relax should be
+> @@ -5767,6 +5784,10 @@ if test "$have_af_vsock" = "yes" ; then
+>    echo "CONFIG_AF_VSOCK=y" >> $config_host_mak
+>  fi
+>  
+> +if test "$have_af_alg" = "yes" ; then
+> +  echo "CONFIG_AF_ALG=y" >> $config_host_mak
+> +fi
+> +
+>  if test "$have_sysmacros" = "yes" ; then
+>    echo "CONFIG_SYSMACROS=y" >> $config_host_mak
+>  fi
+> diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
+> index 7842f6d..0a4a003 100644
+> --- a/include/qemu/sockets.h
+> +++ b/include/qemu/sockets.h
+> @@ -51,6 +51,12 @@ int socket_listen(SocketAddress *addr, Error **errp);
+>  void socket_listen_cleanup(int fd, Error **errp);
+>  int socket_dgram(SocketAddress *remote, SocketAddress *local, Error **errp);
+>  
+> +#ifdef CONFIG_AF_ALG
+> +#define SALG_TYPE_LEN_MAX 14
+> +#define SALG_NAME_LEN_MAX 64
+> +int socket_bind(SocketAddress *addr, Error **errp);
+> +#endif
+> +
+>  /* Old, ipv4 only bits.  Don't use for new code. */
+>  int parse_host_port(struct sockaddr_in *saddr, const char *str);
+>  int socket_init(void);
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 250e4dc..0cb06d3 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -1516,12 +1516,14 @@
+>  #
+>  # @vsock: vsock family (since 2.8)
+>  #
+> +# @afalg: af_alg family (since 2.10)
+> +#
+>  # @unknown: otherwise
+>  #
+>  # Since: 2.1
+>  ##
+>  { 'enum': 'NetworkAddressFamily',
+> -  'data': [ 'ipv4', 'ipv6', 'unix', 'vsock', 'unknown' ] }
+> +  'data': [ 'ipv4', 'ipv6', 'unix', 'vsock', 'afalg', 'unknown' ] }
+>  
+>  ##
+>  # @VncBasicInfo:
+> @@ -4119,6 +4121,22 @@
+>      'port': 'str' } }
+>  
+>  ##
+> +# @AfalgSocketAddress:
+> +#
+> +# Captures a socket address in the af_alg namespace.
+> +#
+> +# @type: type of the crypto algogrithms
+> +#
+> +# @name: name of the crypto algogrithms
+> +#
+> +# Since: 2.10
+> +##
+> +{ 'struct': 'AfalgSocketAddress',
+> +  'data': {
+> +    'type': 'str',
+> +    'name': 'str' }}
+> +
+> +##
+>  # @SocketAddress:
+>  #
+>  # Captures the address of a socket, which could also be a named file descriptor
+> @@ -4130,6 +4148,7 @@
+>      'inet': 'InetSocketAddress',
+>      'unix': 'UnixSocketAddress',
+>      'vsock': 'VsockSocketAddress',
+> +    'afalg': 'AfalgSocketAddress',
+>      'fd': 'String' } }
+>  
+>  ##
 
-Stefan, is there any documentation besides the source?
+I really don't think we want to expose any of this in the qapi-schema. It is
+a Linux specific internal implementation detail that is not relevant to users
+of QAPI.
 
-Just asking, I don't think it is needed because...
+> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+> index 21442c3..258e419 100644
+> --- a/util/qemu-sockets.c
+> +++ b/util/qemu-sockets.c
+> @@ -1151,6 +1151,97 @@ void socket_listen_cleanup(int fd, Error **errp)
+>      qapi_free_SocketAddress(addr);
+>  }
+>  
+> +#ifdef CONFIG_AF_ALG
+> +
+> +#include <linux/if_alg.h>
+> +
+> +static bool afalg_parse_bind_saddr(const AfalgSocketAddress *saddr,
+> +                                   struct sockaddr_alg *alg,
+> +                                   Error **errp)
+> +{
+> +    memset(alg, 0, sizeof(*alg));
+> +    alg->salg_family = AF_ALG;
+> +
+> +    if (qemu_strnlen(saddr->type, SALG_TYPE_LEN_MAX) == SALG_TYPE_LEN_MAX) {
+> +        error_setg(errp, "Afalg type(%s) is larger than 14 bytes",
+> +                   saddr->type);
+> +        return false;
+> +    }
+> +
+> +    if (qemu_strnlen(saddr->name, SALG_NAME_LEN_MAX) == SALG_NAME_LEN_MAX) {
+> +        error_setg(errp, "Afalg name(%s) is larger than 64 bytes",
+> +                   saddr->name);
+> +        return false;
+> +    }
+> +
+> +    pstrcpy((char *)alg->salg_type, SALG_TYPE_LEN_MAX, saddr->type);
+> +    pstrcpy((char *)alg->salg_name, SALG_NAME_LEN_MAX, saddr->name);
+> +
+> +    return true;
+> +}
+> +
+> +static int afalg_bind_saddr(const AfalgSocketAddress *saddr,
+> +                            Error **errp)
+> +{
+> +    struct sockaddr_alg alg;
+> +    int sbind;
+> +
+> +    if (!afalg_parse_bind_saddr(saddr, &alg, errp)) {
+> +        return -1;
+> +    }
+> +
+> +    sbind = qemu_socket(AF_ALG, SOCK_SEQPACKET, 0);
+> +    if (sbind < 0) {
+> +        error_setg_errno(errp, errno, "Failed to create socket");
+> +        return -1;
+> +    }
+> +
+> +    if (bind(sbind, (const struct sockaddr *)&alg, sizeof(alg)) != 0) {
+> +        error_setg_errno(errp, errno, "Failed to bind socket");
+> +        closesocket(sbind);
+> +        return -1;
+> +    }
+> +
+> +    return sbind;
+> +}
 
-> Otoh, there doesn't seem to be other users of this protocol, or other
-> implementations. So it may make sense to make it qemu-specific, and
-> thus "private": the protocol and implementation can evolve without
-> risk to break other users. This gives us a lot more flexibility and
-> control, and doesn't have to be very strictly documented (although it
-> is still better to be strict, but requires more effort).
+Just put this code in the crypto afalg codebase directly
 
-... I suspect it falls into this camp. I can't think of any users of the
-protocol besides swtpm itself and now qemu. Stefan, is that correct?
 
+Regards,
+Daniel
 -- 
-Best Regards, Patrick Ohly
-
-The content of this message is my personal opinion only and although
-I am an employee of Intel, the statements I make here in no way
-represent Intel's position on the issue, nor am I authorized to speak
-on behalf of Intel on this matter.
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
