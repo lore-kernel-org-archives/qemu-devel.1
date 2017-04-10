@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cxUjE-0007VS-Nc
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:31:18 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cxUqM-0008SI-3h
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:38:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cxUjB-0005cW-JQ
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:31:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46558)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cxUjB-0005bH-Aw
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:31:13 -0400
-Date: Mon, 10 Apr 2017 09:31:05 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170410083105.GB3655@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1491575431-32170-1-git-send-email-amarnath.valluri@intel.com>
-	<1491575431-32170-10-git-send-email-amarnath.valluri@intel.com>
-	<20170407144100.GL26896@redhat.com>
-	<d74c2094-051e-bf1d-7c41-316b0e3651bc@intel.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cxUqL-0001D3-6t
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:38:38 -0400
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:37269)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cxUqK-0001CB-Vp
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:38:37 -0400
+Received: by mail-wm0-x22b.google.com with SMTP id u2so31332550wmu.0
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 01:38:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <d74c2094-051e-bf1d-7c41-316b0e3651bc@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v2 9/9] tpm: Added support for TPM emulator
+In-Reply-To: <20170408143639.2524-1-shah.suramya@gmail.com>
+References: <20170408143639.2524-1-shah.suramya@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 10 Apr 2017 09:38:13 +0100
+Message-ID: <CAFEAcA-TnbTDWCP_1zdCQ2OvKNQf6caC0E2pOU9Vf+2NmhEXcg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2] hw/net: convert "dma" property type
+ from ptr to link
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,146 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amarnath Valluri <amarnath.valluri@intel.com>
-Cc: qemu-devel@nongnu.org, patrick.ohly@intel.com, stefanb@linux.vnet.ibm.com, marcandre.lureau@gmail.com
+To: Suramya Shah <shah.suramya@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
 
-On Mon, Apr 10, 2017 at 10:08:21AM +0300, Amarnath Valluri wrote:
-> 
-> 
-> On 07.04.2017 17:41, Daniel P. Berrange wrote:
-> > On Fri, Apr 07, 2017 at 05:30:31PM +0300, Amarnath Valluri wrote:
-> > > This change introduces a new TPM backend driver that can communicate with
-> > > swtpm(software TPM emulator) using unix domain socket interface.
-> > > 
-> > > Swtpm uses two unix sockets, one for plain TPM commands and responses, and one
-> > > for out-of-band control messages.
-> > > 
-> > > The swtpm and associated tools can be found here:
-> > >      https://github.com/stefanberger/swtpm
-> > > 
-> > > Usage:
-> > >      # setup TPM state directory
-> > >      mkdir /tmp/mytpm
-> > >      chown -R tss:root /tmp/mytpm
-> > >      /usr/bin/swtpm_setup --tpm-state /tmp/mytpm --createek
-> > > 
-> > >      # Ask qemu to use TPM emulator with given tpm state directory
-> > >      qemu-system-x86_64 \
-> > >          [...] \
-> > >          -tpmdev emulator,id=tpm0,tpmstatedir=/tmp/mytpm,logfile=/tmp/swtpm.log \
-> > >          -device tpm-tis,tpmdev=tpm0 \
-> > >          [...]
-> > > 
-> > > Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
-> > > ---
-> > >   configure             |  15 +-
-> > >   hmp.c                 |  21 ++
-> > >   hw/tpm/Makefile.objs  |   1 +
-> > >   hw/tpm/tpm_emulator.c | 927 ++++++++++++++++++++++++++++++++++++++++++++++++++
-> > >   hw/tpm/tpm_ioctl.h    | 243 +++++++++++++
-> > >   qapi-schema.json      |  36 +-
-> > >   qemu-options.hx       |  53 ++-
-> > >   tpm.c                 |   2 +-
-> > >   8 files changed, 1289 insertions(+), 9 deletions(-)
-> > >   create mode 100644 hw/tpm/tpm_emulator.c
-> > >   create mode 100644 hw/tpm/tpm_ioctl.h
-> > > +static int tpm_emulator_spawn_emulator(TPMEmulator *tpm_pt)
-> > > +{
-> > > +    int fds[2] = { -1, -1 };
-> > > +    int ctrl_fds[2] = { -1, -1 };
-> > > +    pid_t cpid;
-> > > +
-> > > +    if (!tpm_pt->ops->has_data_path) {
-> > > +        if (socketpair(AF_UNIX, SOCK_SEQPACKET, 0, fds) < 0) {
-> > > +            return -1;
-> > > +        }
-> > > +    }
-> > > +
-> > > +    if (!tpm_pt->ops->has_ctrl_path) {
-> > > +        if (socketpair(AF_UNIX, SOCK_SEQPACKET, 0, ctrl_fds) < 0) {
-> > > +            if (!tpm_pt->ops->has_data_path) {
-> > > +                closesocket(fds[0]);
-> > > +                closesocket(fds[1]);
-> > > +            }
-> > > +            return -1;
-> > > +        }
-> > > +    }
-> > > +
-> > > +    cpid = qemu_fork(NULL);
-> > > +    if (cpid < 0) {
-> > > +        error_report("tpm-emulator: Fork failure: %s", strerror(errno));
-> > > +        if (!tpm_pt->ops->has_data_path) {
-> > > +            closesocket(fds[0]);
-> > > +            closesocket(fds[1]);
-> > > +        }
-> > > +        if (!tpm_pt->ops->has_ctrl_path) {
-> > > +            closesocket(ctrl_fds[0]);
-> > > +            closesocket(ctrl_fds[1]);
-> > > +        }
-> > > +        return -1;
-> > > +    }
-> > > +
-> > > +    if (cpid == 0) { /* CHILD */
-> > > +        enum {
-> > > +            PARAM_PATH,
-> > > +            PARAM_IFACE,
-> > > +            PARAM_SERVER,  PARAM_SERVER_ARGS,
-> > > +            PARAM_CTRL,    PARAM_CTRL_ARGS,
-> > > +            PARAM_STATE,   PARAM_STATE_ARGS,
-> > > +            PARAM_PIDFILE, PARAM_PIDFILE_ARGS,
-> > > +            PARAM_LOG,     PARAM_LOG_ARGS,
-> > > +            PARAM_MAX
-> > > +        };
-> > > +
-> > > +        int i;
-> > > +        int data_fd = -1, ctrl_fd = -1;
-> > > +        char *argv[PARAM_MAX+1];
-> > > +
-> > > +        /* close all unused inherited sockets */
-> > > +        if (fds[0] >= 0)
-> > > +            closesocket(fds[0]);
-> > > +        if (ctrl_fds[0] >= 0)
-> > > +            closesocket(ctrl_fds[0]);
-> > The 'if' checks are pointless - its already guaranteed by the
-> > fact you check socketpair() status.
-> socketpairs might not be created in case of data-path & ctrl-path provided,
-> so i feel these checks are needed.
-> > 
-> > > +        i = STDERR_FILENO + 1;
-> > > +        if (fds[1] >= 0) {
-> > > +            data_fd = dup2(fds[1], i++);
-> > > +            if (data_fd < 0) {
-> > > +                error_report("tpm-emulator: dup2() failure - %s",
-> > > +                             strerror(errno));
-> > > +                goto exit_child;
-> > > +            }
-> > > +        }
-> > > +        if (ctrl_fds[1] >= 0) {
-> > > +            ctrl_fd = dup2(ctrl_fds[1], i++);
-> > > +            if (ctrl_fd < 0) {
-> > > +                error_report("tpm-emulator: dup2() failure - %s",
-> > > +                             strerror(errno));
-> > > +                goto exit_child;
-> > > +            }
-> > > +        }
-> > > +        for ( ; i < _SC_OPEN_MAX; i++) {
-> > Errr, _SC_OPEN_MAX is not the maximum number of FDs - it is parameter to
-> > use with sysconf() to query the number of files - you must call sysconf().
-> Ya, thanks for educating me, i will change this.
-> > 
-> > > +            closesocket(i);
-> > close, not closesocket - you can't assume these are all sockets.
-> Does this change makes any difference, as per include/sysemu/os-posix.h,
-> closesocket() is define as close(), and this backend is targeted only for
-> "Linux" targets. Please let me know if i am missing something.
+On 8 April 2017 at 15:36, Suramya Shah <shah.suramya@gmail.com> wrote:
+> The lance device needs pointer to ISA DMA device to operate. But according to
+> qdev-properties.h, properties of pointer type should be avoided.
+> A link type property is a good substitution.
+>
+> Changes since v1
+>  -changed the code in hw/sparc/sun4m.c which uses the device.
+>
+> Signed-off-by: Suramya Shah <shah.suramya@gmail.com>
+> ---
+>  hw/net/lance.c   | 8 ++++++--
+>  hw/sparc/sun4m.c | 2 +-
+>  2 files changed, 7 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/net/lance.c b/hw/net/lance.c
+> index 573d724..3996b9c 100644
+> --- a/hw/net/lance.c
+> +++ b/hw/net/lance.c
+> @@ -44,6 +44,7 @@
+>  #include "pcnet.h"
+>  #include "trace.h"
+>  #include "sysemu/sysemu.h"
+> +#include "qapi/error.h"
+>
+>  #define TYPE_LANCE "lance"
+>  #define SYSBUS_PCNET(obj) \
+> @@ -145,10 +146,14 @@ static void lance_instance_init(Object *obj)
+>      device_add_bootindex_property(obj, &s->conf.bootindex,
+>                                    "bootindex", "/ethernet-phy@0",
+>                                    DEVICE(obj), NULL);
+> +
+> +    object_property_add_link(obj, "dma", TYPE_LANCE,
+> +                             (Object **)&d->state.dma_opaque,
+> +                             qdev_prop_allow_set_link_before_realize,
+> +                             0, &error_abort);
+>  }
+>
+>  static Property lance_properties[] = {
+> -    DEFINE_PROP_PTR("dma", SysBusPCNetState, state.dma_opaque),
+>      DEFINE_NIC_PROPERTIES(SysBusPCNetState, state.conf),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+> @@ -164,7 +169,6 @@ static void lance_class_init(ObjectClass *klass, void *data)
+>      dc->reset = lance_reset;
+>      dc->vmsd = &vmstate_lance;
+>      dc->props = lance_properties;
+> -    /* Reason: pointer property "dma" */
+>      dc->cannot_instantiate_with_device_add_yet = true;
 
-Using closesocket() is misleading even if it does happen to call close()
-on Linux.
+Please don't remove the comment but not the line it refers
+to; either the comment needs updating or the cannot_instantiate
+setting is no longer correct and needs removing.
 
-
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+thanks
+-- PMM
