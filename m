@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cxbJ1-0006wJ-L1
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:32:40 -0400
+	(envelope-from <eblake@redhat.com>) id 1cxbP5-0000V6-7z
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:38:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cxbJ0-0003rw-Kx
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:32:39 -0400
-Date: Mon, 10 Apr 2017 16:32:23 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170410153223.GD3214@stefanha-x1.localdomain>
-References: <20170406150148.zwjpozqtale44jfh@perseus.local>
-	<20170407122021.GP13602@stefanha-x1.localdomain>
-	<20170407130129.GE4716@noname.redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1cxbP3-0005sD-U1
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:38:55 -0400
+References: <20170410150542.30376-1-famz@redhat.com>
+	<20170410150542.30376-10-famz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1fcf3c15-02db-b3db-c030-a16373f59b12@redhat.com>
+Date: Mon, 10 Apr 2017 10:38:40 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="wLAMOaPNJ0fu1fTG"
-Content-Disposition: inline
-In-Reply-To: <20170407130129.GE4716@noname.redhat.com>
-Subject: Re: [Qemu-devel] [RFC] Proposed qcow2 extension: subcluster
- allocation
+In-Reply-To: <20170410150542.30376-10-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="n8glITNt1h87jsLHo557BplD4d5suokFL"
+Subject: Re: [Qemu-devel] [PATCH for 2.9 v3 09/10] block: Use
+ bdrv_coroutine_enter to start I/O coroutines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,116 +25,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-
---wLAMOaPNJ0fu1fTG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--n8glITNt1h87jsLHo557BplD4d5suokFL
+From: Eric Blake <eblake@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org,
+ Ed Swierk <eswierk@skyportsystems.com>, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <1fcf3c15-02db-b3db-c030-a16373f59b12@redhat.com>
+Subject: Re: [PATCH for 2.9 v3 09/10] block: Use bdrv_coroutine_enter to start
+ I/O coroutines
+References: <20170410150542.30376-1-famz@redhat.com>
+ <20170410150542.30376-10-famz@redhat.com>
+In-Reply-To: <20170410150542.30376-10-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 07, 2017 at 03:01:29PM +0200, Kevin Wolf wrote:
-> Am 07.04.2017 um 14:20 hat Stefan Hajnoczi geschrieben:
-> > On Thu, Apr 06, 2017 at 06:01:48PM +0300, Alberto Garcia wrote:
-> > > Here are the results (subcluster size in brackets):
-> > >=20
-> > > |-----------------+----------------+-----------------+---------------=
-----|
-> > > |  cluster size   | subclusters=3Don | subclusters=3Doff | Max L2 cac=
-he size |
-> > > |-----------------+----------------+-----------------+---------------=
-----|
-> > > |   2 MB (256 KB) |   440 IOPS     |  100 IOPS       | 160 KB (*)    =
-    |
-> > > | 512 KB  (64 KB) |  1000 IOPS     |  300 IOPS       | 640 KB        =
-    |
-> > > |  64 KB   (8 KB) |  3000 IOPS     | 1000 IOPS       |   5 MB        =
-    |
-> > > |  32 KB   (4 KB) | 12000 IOPS     | 1300 IOPS       |  10 MB        =
-    |
-> > > |   4 KB  (512 B) |   100 IOPS     |  100 IOPS       |  80 MB        =
-    |
-> > > |-----------------+----------------+-----------------+---------------=
-----|
-> > >=20
-> > >                 (*) The L2 cache must be a multiple of the cluster
-> > >                     size, so in this case it must be 2MB. On the table
-> > >                     I chose to show how much of those 2MB are actually
-> > >                     used so you can compare it with the other cases.
-> > >=20
-> > > Some comments about the results:
-> > >=20
-> > > - For the 64KB, 512KB and 2MB cases, having subclusters increases
-> > >   write performance roughly by three. This happens because for each
-> > >   cluster allocation there's less data to copy from the backing
-> > >   image. For the same reason, the smaller the cluster, the better the
-> > >   performance. As expected, 64KB clusters with no subclusters perform
-> > >   roughly the same as 512KB clusters with 64KB subclusters.
-> > >=20
-> > > - The 32KB case is the most interesting one. Without subclusters it's
-> > >   not very different from the 64KB case, but having a subcluster with
-> > >   the same size of the I/O block eliminates the need for COW entirely
-> > >   and the performance skyrockets (10 times faster!).
-> > >=20
-> > > - 4KB is however very slow. I attribute this to the fact that the
-> > >   cluster size is so small that a new cluster needs to be allocated
-> > >   for every single write and its refcount updated accordingly. The L2
-> > >   and refcount tables are also so small that they are too inefficient
-> > >   and need to grow all the time.
-> > >=20
-> > > Here are the results when writing to an empty 40GB qcow2 image with no
-> > > backing file. The numbers are of course different but as you can see
-> > > the patterns are similar:
-> > >=20
-> > > |-----------------+----------------+-----------------+---------------=
-----|
-> > > |  cluster size   | subclusters=3Don | subclusters=3Doff | Max L2 cac=
-he size |
-> > > |-----------------+----------------+-----------------+---------------=
-----|
-> > > |   2 MB (256 KB) |  1200 IOPS     |  255 IOPS       | 160 KB        =
-    |
-> > > | 512 KB  (64 KB) |  3000 IOPS     |  700 IOPS       | 640 KB        =
-    |
-> > > |  64 KB   (8 KB) |  7200 IOPS     | 3300 IOPS       |   5 MB        =
-    |
-> > > |  32 KB   (4 KB) | 12300 IOPS     | 4200 IOPS       |  10 MB        =
-    |
-> > > |   4 KB  (512 B) |   100 IOPS     |  100 IOPS       |  80 MB        =
-    |
-> > > |-----------------+----------------+-----------------+---------------=
-----|
-> >=20
-> > I don't understand why subclusters=3Don performs so much better when
-> > there's no backing file.  Is qcow2 zeroing out the 64 KB cluster with
-> > subclusters=3Doff?
-> >=20
-> > It ought to just write the 4 KB data when a new cluster is touched.
-> > Therefore the performance should be very similar to subclusters=3Don.
+On 04/10/2017 10:05 AM, Fam Zheng wrote:
+> BDRV_POLL_WHILE waits for the started I/O by releasing bs's ctx then po=
+lling
+> the main context, which relies on the yielded the coroutine would conti=
+nue on
+> bs->ctx and notify qemu_aio_context with bdrv_wakeup(). Thus, using
+
+Reads awkwardly.  I'm guessing:
+
+which relies on the yielded coroutine continuing on bs->ctx before
+notifying qemu_aio_context with bdrv_wakeup().
+
+> qemu_coroutine_enter to start I/O is wrong because if the coroutine is =
+entered
+> from main loop, co->ctx will be qemu_aio_context, as a result of the "r=
+elease,
+> poll, acquire" loop of BDRV_POLL_WHILE, race conditions happen when bot=
+h
+> main thread and the iothread access the same BDS:
 >=20
-> No, it can't do that. Nobody guarantees that the cluster contains only
-> zeros when we don't write them. It could have been used before and then
-> either freed on a qcow2 level or we could be sitting on a block device
-> rather than a file.
 
-I thought we had the no-op optimization for clusters allocated at the
-end of a POSIX file.  All the more reason to add sub-clusters!
+>         aio_context_acquire(bs->ctx)
+>=20
+> Note that in above case, bdrv_drained_begin() doesn't do the "release,
+> poll, acquire" in BDRV_POLL_WHILE, because bs->in_flight =3D=3D 0.
+>=20
+> Fix this by using bdrv_coroutine_enter and enter coroutine in the right=
 
-Stefan
+> context.
+>=20
+> iotests 109 output is updated because the coroutine reenter flow during=
 
---wLAMOaPNJ0fu1fTG
+> mirror job complete is different (now through co_queue_wakeup, instead
+> of the unconditional qemu_coroutine_switch before), making the end job
+> len different.
+>=20
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+>=20
+> fixup
+
+Is this leftovers during rebasing?
+
+> ---
+>  block/block-backend.c      |  4 ++--
+>  block/io.c                 | 14 +++++++-------
+>  tests/qemu-iotests/109.out | 10 +++++-----
+>  3 files changed, 14 insertions(+), 14 deletions(-)
+>=20
+
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--n8glITNt1h87jsLHo557BplD4d5suokFL
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBAgAGBQJY66WHAAoJEJykq7OBq3PIQpYIAJjj7rtFveCLCd2TIxuIYKHF
-zsoxQDZLVbnrKwu8ThVGX3TO3IF/42y3Jh/cZgbMfRT3HImNRXEV/pL0QaQRbGd4
-3Dqg2BKO9OHvqhb+jPRIXQUnobMQS3okzUKbIbs53G2L+dzMRW9FXF2J+dP9QBt/
-1kn6FgUrx6MrYqMYwyREGFaPJ6ngHWH/a8tAx9+HkNDJMkdr4/yJ/6jYntIwXq/y
-VjYhHuO5zTuAuRUIOhoWF3IWipQ+90wBef7yw05o9bkQi3IsHngQv/pi9MBqcSh1
-4sDj+mDBAq2IcM+3W3UI+JK8+IpHtCyT8FO+K0eJ809TVOOfFoBn1wA727J9HYs=
-=C0C4
+iQEcBAEBCAAGBQJY66cAAAoJEKeha0olJ0NqxY8H/2TKdUnICvN3Jpc/Pa7NHjEN
+xykr+giu6O1H6JaUGcAzbIQsPitFYETWbJi3W1gd6zulSlA6m6WoD6uztN1BfeGu
+AySlovsjOTFTyRmX9j92DB/NlFmXBoKYf2+lc4d6H0/LEDv5lSmbVDpoOmn6CvuO
+8g/w6WwFjRz1Hoy5MMAh0hUZvA4NJDNfGwj8LR2Yh8f6Rxrq+Su50VMgaCEYK0Hw
+TYA16rNG6Tv4fDC/oLE9px36dNQzXz3IcDjbG7++5S2anu33XcKnLPn2FZj6+zAk
+j7+6EpOKihra+Xat+KYkQpaHKbPPkAAM3wn4Sr42rL8gkd4774TqM6Wchovbu1M=
+=xo5z
 -----END PGP SIGNATURE-----
 
---wLAMOaPNJ0fu1fTG--
+--n8glITNt1h87jsLHo557BplD4d5suokFL--
