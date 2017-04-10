@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cxbRA-0001u3-4D
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:41:05 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1cxbRF-0001zB-PY
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:41:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cxbR6-0006mm-9h
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:41:04 -0400
-Date: Mon, 10 Apr 2017 18:16:46 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1cxbR7-0006nI-Bk
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:41:09 -0400
+Date: Mon, 10 Apr 2017 18:14:15 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170410081646.GT27571@umbus>
+Message-ID: <20170410081414.GS27571@umbus>
 References: <1491396106-26376-1-git-send-email-clg@kaod.org>
-	<1491396106-26376-22-git-send-email-clg@kaod.org>
+	<1491396106-26376-21-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="VZEZlOQeSr/zV9d3"
+	protocol="application/pgp-signature"; boundary="daC8KDjlMyCcZyAo"
 Content-Disposition: inline
-In-Reply-To: <1491396106-26376-22-git-send-email-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 21/21] ppc/pnv: Create a default PCI layout
+In-Reply-To: <1491396106-26376-21-git-send-email-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 20/21] ppc/pnv: Add model for Power8 PHB3
+ PCIe Host bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,188 +29,2971 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
 
---VZEZlOQeSr/zV9d3
+--daC8KDjlMyCcZyAo
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 05, 2017 at 02:41:46PM +0200, C=E9dric Le Goater wrote:
+On Wed, Apr 05, 2017 at 02:41:45PM +0200, C=E9dric Le Goater wrote:
 > From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 >=20
-> This creates a legacy PCIe->PCI bridge under the PHB by default to which
-> a bunch of standard devices are attached. Currently:
+> This is a model of the PCIe host bridge found on Power8 chips,
+> including IOMMU support, PCIe root complex etc...
 >=20
->   - VGA (as specified by -vga)
->   - USB (with keyboard and mouse if graphcis is enabled)
->   - AHCI
->   - e1000
->=20
-> This gives us something close to a standard OpenPower platform.
+> This implementation doesn't emulate the EEH error handling (and
+> may never do).
 >=20
 > Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 > [clg: updated for qemu-2.9
->       reworked pnv_create_pci_legacy_bridge() ]
+>       QOM'ified the models
+>       introduced pnv_chip_phb_realize() to create the PHB3 objects
+>       updated the XICSFabric handlers to loop on the PHB3 ICS
+>       fixed the XIVE update
+>       fixed IRQ number overlap in pnv_phb3_remap_irqs() ]
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
-Apart from one nit below.
-
 > ---
->  hw/ppc/pnv.c | 111 +++++++++++++++++++++++++++++++++++++++++++++++++++++=
+>  hw/intc/xics.c                      |    2 +-
+>  hw/pci-host/Makefile.objs           |    1 +
+>  hw/pci-host/pnv_phb3.c              | 1052 +++++++++++++++++++++++++++++=
 ++++++
->  1 file changed, 111 insertions(+)
+>  hw/pci-host/pnv_phb3_msi.c          |  304 ++++++++++
+>  hw/pci-host/pnv_phb3_pbcq.c         |  361 ++++++++++++
+>  hw/pci-host/pnv_phb3_rc.c           |  134 +++++
+>  hw/ppc/pnv.c                        |   76 ++-
+>  hw/ppc/pnv_xscom.c                  |    5 +-
+>  include/hw/pci-host/pnv_phb3.h      |  156 ++++++
+>  include/hw/pci-host/pnv_phb3_regs.h |  506 +++++++++++++++++
+>  include/hw/ppc/pnv.h                |    6 +
+>  include/hw/ppc/pnv_xscom.h          |    9 +
+>  include/hw/ppc/xics.h               |    1 +
+>  13 files changed, 2608 insertions(+), 5 deletions(-)
+>  create mode 100644 hw/pci-host/pnv_phb3.c
+>  create mode 100644 hw/pci-host/pnv_phb3_msi.c
+>  create mode 100644 hw/pci-host/pnv_phb3_pbcq.c
+>  create mode 100644 hw/pci-host/pnv_phb3_rc.c
+>  create mode 100644 include/hw/pci-host/pnv_phb3.h
+>  create mode 100644 include/hw/pci-host/pnv_phb3_regs.h
 >=20
+> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> index 292fffecd376..efb65aabdf30 100644
+> --- a/hw/intc/xics.c
+> +++ b/hw/intc/xics.c
+> @@ -263,7 +263,7 @@ void icp_eoi(ICPState *icp, uint32_t xirr)
+>      }
+>  }
+> =20
+> -static void icp_irq(ICSState *ics, int server, int nr, uint8_t priority)
+> +void icp_irq(ICSState *ics, int server, int nr, uint8_t priority)
+>  {
+>      ICPState *icp =3D xics_icp_get(ics->xics, server);
+> =20
+> diff --git a/hw/pci-host/Makefile.objs b/hw/pci-host/Makefile.objs
+> index 9c7909cf44c6..3167b4430eb9 100644
+> --- a/hw/pci-host/Makefile.objs
+> +++ b/hw/pci-host/Makefile.objs
+> @@ -17,3 +17,4 @@ common-obj-$(CONFIG_PCI_PIIX) +=3D piix.o
+>  common-obj-$(CONFIG_PCI_Q35) +=3D q35.o
+>  common-obj-$(CONFIG_PCI_GENERIC) +=3D gpex.o
+>  common-obj-$(CONFIG_PCI_XILINX) +=3D xilinx-pcie.o
+> +obj-$(CONFIG_POWERNV) +=3D pnv_phb3.o pnv_phb3_pbcq.o pnv_phb3_rc.o pnv_=
+phb3_msi.o
+> diff --git a/hw/pci-host/pnv_phb3.c b/hw/pci-host/pnv_phb3.c
+> new file mode 100644
+> index 000000000000..4068ae6d8c62
+> --- /dev/null
+> +++ b/hw/pci-host/pnv_phb3.c
+> @@ -0,0 +1,1052 @@
+> +/*
+> + * QEMU PowerPC PowerNV PHB3 model
+> + *
+> + * Copyright (c) 2014-2017, IBM Corporation.
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License, version 2, as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> +#include "qemu/osdep.h"
+> +#include "qemu/log.h"
+> +#include "qapi/error.h"
+> +#include "qemu-common.h"
+> +#include "hw/pci-host/pnv_phb3.h"
+> +#include "hw/pci/pci_bridge.h"
+> +#include "hw/pci/pci_bus.h"
+> +
+> +#undef DISPLAY_UNIMPLENTED_REG
+> +
+> +static PCIDevice *pnb_phb3_find_cfg_dev(PnvPhb3State *phb)
+
+Is this supposed to be "pnv" instead of "pnb"?  Note also that just
+"phb3_" is probably a sufficiently distinct prefix if you wanted to
+shorten all the function names.
+
+> +{
+> +    PCIHostState *pci =3D PCI_HOST_BRIDGE(phb);
+> +    uint64_t addr =3D phb->regs[PHB_CONFIG_ADDRESS >> 3];
+> +    uint8_t bus, devfn;
+> +
+> +    if (!(addr >> 63)) {
+> +        return NULL;
+> +    }
+> +    bus =3D (addr >> 52) & 0xff;
+> +    devfn =3D (addr >> 44) & 0xff;
+> +
+> +    return pci_find_device(pci->bus, bus, devfn);
+> +}
+> +
+> +static void pnv_phb3_config_write(PnvPhb3State *phb, unsigned off,
+> +                                  unsigned size, uint64_t val)
+> +{
+> +    uint32_t cfg_addr, limit;
+> +    PCIDevice *pdev;
+> +
+> +    pdev =3D pnb_phb3_find_cfg_dev(phb);
+> +    if (!pdev) {
+> +        return;
+> +    }
+> +    cfg_addr =3D (phb->regs[PHB_CONFIG_ADDRESS >> 3] >> 32) & 0xfff;
+> +    cfg_addr |=3D off;
+> +    limit =3D pci_config_size(pdev);
+> +    if (limit <=3D cfg_addr) {
+> +        /* conventional pci device can be behind pcie-to-pci bridge.
+> +           256 <=3D addr < 4K has no effects. */
+> +        return;
+> +    }
+> +    switch (size) {
+> +    case 1:
+> +        break;
+> +    case 2:
+> +        val =3D bswap16(val);
+
+An unconditional bswap() seems unlikely to be correct.  What's the
+purpose of thise?
+
+> +        break;
+> +    case 4:
+> +        val =3D bswap32(val);
+> +        break;
+
+No 64-bit config registers?
+
+> +    default:
+> +        return;
+
+You can probably have an assert() here, since the memory region
+registration should prevent bad access sizes.
+
+
+> +    }
+> +    pci_host_config_write_common(pdev, cfg_addr, limit, val, size);
+> +}
+> +
+> +static uint64_t pnv_phb3_config_read(PnvPhb3State *phb, unsigned off,
+> +                                     unsigned size)
+> +{
+> +    uint32_t cfg_addr, limit;
+> +    PCIDevice *pdev;
+> +    uint64_t val;
+> +
+> +    pdev =3D pnb_phb3_find_cfg_dev(phb);
+> +    if (!pdev) {
+> +        return ~0ull;
+> +    }
+> +    cfg_addr =3D (phb->regs[PHB_CONFIG_ADDRESS >> 3] >> 32) & 0xffc;
+> +    cfg_addr |=3D off;
+> +    limit =3D pci_config_size(pdev);
+> +    if (limit <=3D cfg_addr) {
+> +        /* conventional pci device can be behind pcie-to-pci bridge.
+> +           256 <=3D addr < 4K has no effects. */
+> +        return ~0ull;
+> +    }
+> +    val =3D pci_host_config_read_common(pdev, cfg_addr, limit, size);
+> +    switch (size) {
+> +    case 1:
+> +        return val;
+> +    case 2:
+> +        return bswap16(val);
+> +    case 4:
+> +        return bswap32(val);
+> +    default:
+> +        return ~0ull;
+
+As with read, I expect you can have an assert() here.
+
+> +    }
+> +}
+> +
+> +static void pnv_phb3_check_m32(PnvPhb3State *phb)
+> +{
+> +    uint64_t base, start, size;
+> +    MemoryRegion *parent;
+> +
+> +    if (phb->m32_mapped) {
+> +        /* Should we destroy it in RCU friendly way... ? */
+
+Should be fine for now - everything is under the BQL anyway.
+
+> +        memory_region_del_subregion(phb->mr_m32.container, &phb->mr_m32);
+> +        phb->m32_mapped =3D false;
+> +    }
+> +
+> +    /* Disabled ? move on with life ... */
+> +    if (!(phb->regs[PHB_PHB3_CONFIG >> 3] & PHB_PHB3C_M32_EN)) {
+> +        return;
+> +    }
+> +
+> +    /* Grab geometry from registers */
+> +    base =3D phb->regs[PHB_M32_BASE_ADDR >> 3];
+> +    start =3D phb->regs[PHB_M32_START_ADDR >> 3];
+> +    size =3D ~(phb->regs[PHB_M32_BASE_MASK >> 3] | 0xfffc000000000000ull=
+) + 1;
+> +
+> +    /* Check if it matches an enabled MMIO region in the PBCQ */
+> +    if (phb->pbcq->mmio0_mapped && base >=3D phb->pbcq->mmio0_base &&
+> +        (base + size) <=3D (phb->pbcq->mmio0_base + phb->pbcq->mmio0_siz=
+e)) {
+> +        parent =3D &phb->pbcq->mmbar0;
+> +        base -=3D phb->pbcq->mmio0_base;
+> +    } else if (phb->pbcq->mmio1_mapped && base >=3D phb->pbcq->mmio1_bas=
+e &&
+> +        (base + size) <=3D (phb->pbcq->mmio1_base + phb->pbcq->mmio1_siz=
+e)) {
+> +        parent =3D &phb->pbcq->mmbar1;
+> +        base -=3D phb->pbcq->mmio1_base;
+> +    } else {
+> +        return;
+> +    }
+> +
+> +    /* Create alias */
+> +    memory_region_init_alias(&phb->mr_m32, OBJECT(phb), "phb3-m32",
+> +                             &phb->pci_mmio, start, size);
+> +    memory_region_add_subregion(parent, base, &phb->mr_m32);
+> +    phb->m32_mapped =3D true;
+> +}
+> +
+> +static void pnv_phb3_check_m64(PnvPhb3State *phb, uint32_t index)
+> +{
+> +    uint64_t base, start, size, m64;
+> +    MemoryRegion *parent;
+> +
+> +    if (phb->m64_mapped[index]) {
+> +        /* Should we destroy it in RCU friendly way... ? */
+> +        memory_region_del_subregion(phb->mr_m64[index].container,
+> +                                    &phb->mr_m64[index]);
+> +        phb->m64_mapped[index] =3D false;
+> +    }
+> +
+> +    /* Get table entry */
+> +    m64 =3D phb->ioda_M64BT[index];
+> +
+> +    /* Disabled ? move on with life ... */
+> +    if (!(m64 & IODA2_M64BT_ENABLE)) {
+> +        return;
+> +    }
+> +
+> +    /* Grab geometry from registers */
+> +    base =3D GETFIELD(IODA2_M64BT_BASE, m64) << 20;
+> +    if (m64 & IODA2_M64BT_SINGLE_PE) {
+> +        base &=3D ~0x1ffffffull;
+> +    }
+> +    size =3D GETFIELD(IODA2_M64BT_MASK, m64) << 20;
+> +    size |=3D 0xfffc000000000000ull;
+> +    size =3D ~size + 1;
+> +    start =3D base | (phb->regs[PHB_M64_UPPER_BITS >> 3]);
+> +
+> +    /* Check if it matches an enabled MMIO region in the PBCQ */
+> +    if (phb->pbcq->mmio0_mapped && base >=3D phb->pbcq->mmio0_base &&
+> +        (base + size) <=3D (phb->pbcq->mmio0_base + phb->pbcq->mmio0_siz=
+e)) {
+> +        parent =3D &phb->pbcq->mmbar0;
+> +        base -=3D phb->pbcq->mmio0_base;
+> +    } else if (phb->pbcq->mmio1_mapped && base >=3D phb->pbcq->mmio1_bas=
+e &&
+> +        (base + size) <=3D (phb->pbcq->mmio1_base + phb->pbcq->mmio1_siz=
+e)) {
+> +        parent =3D &phb->pbcq->mmbar1;
+> +        base -=3D phb->pbcq->mmio1_base;
+> +    } else {
+> +        return;
+> +    }
+> +
+> +    /* Create alias */
+> +    memory_region_init_alias(&phb->mr_m64[index], OBJECT(phb), "phb3-m64=
+",
+> +                             &phb->pci_mmio, start, size);
+> +    memory_region_add_subregion(parent, base, &phb->mr_m64[index]);
+> +    phb->m64_mapped[index] =3D true;
+> +}
+> +
+> +static void pnv_phb3_check_all_m64s(PnvPhb3State *phb)
+> +{
+> +    uint64_t i;
+> +
+> +    for (i =3D 0; i < PNV_PHB3_NUM_M64; i++) {
+> +        pnv_phb3_check_m64(phb, i);
+> +    }
+> +}
+> +
+> +static void pnv_phb3_lxivt_write(PnvPhb3State *phb, unsigned idx, uint64=
+_t val)
+> +{
+> +    ICSState *ics =3D phb->lsi_ics;
+> +    uint8_t server, prio;
+> +
+> +    phb->ioda_LXIVT[idx] =3D val & (IODA2_LXIVT_SERVER_MASK |
+> +                                  IODA2_LXIVT_PRIORITY_MASK |
+> +                                  IODA2_LXIVT_NODE_ID_MASK);
+> +    server =3D GETFIELD(IODA2_LXIVT_SERVER, val);
+> +    prio =3D GETFIELD(IODA2_LXIVT_PRIORITY, val);
+> +
+> +    /*
+> +     * The low order 2 bits are the link pointer (Type II interrupts).
+> +     * Shift back to get a valid IRQ server.
+> +     */
+> +    server >>=3D 2;
+> +
+> +    ics_simple_write_xive(ics, idx, server, prio, prio);
+> +}
+> +
+> +static uint64_t *pnv_phb3_ioda_access(PnvPhb3State *phb,
+> +                                      unsigned *out_table, unsigned *out=
+_idx)
+> +{
+> +    uint64_t adreg =3D phb->regs[PHB_IODA_ADDR >> 3];
+> +    unsigned int index =3D GETFIELD(PHB_IODA_AD_TADR, adreg);
+> +    unsigned int table =3D GETFIELD(PHB_IODA_AD_TSEL, adreg);
+> +    unsigned int mask;
+> +    uint64_t *tptr =3D NULL;
+> +
+> +    switch (table) {
+> +    case IODA2_TBL_LIST:
+> +        tptr =3D phb->ioda_LIST;
+> +        mask =3D 7;
+> +        break;
+> +    case IODA2_TBL_LXIVT:
+> +        tptr =3D phb->ioda_LXIVT;
+> +        mask =3D 7;
+> +        break;
+> +    case IODA2_TBL_IVC_CAM:
+> +    case IODA2_TBL_RBA:
+> +        mask =3D 31;
+> +        break;
+> +    case IODA2_TBL_RCAM:
+> +        mask =3D 63;
+> +        break;
+> +    case IODA2_TBL_MRT:
+> +        mask =3D 7;
+> +        break;
+> +    case IODA2_TBL_PESTA:
+> +    case IODA2_TBL_PESTB:
+> +        mask =3D 255;
+> +        break;
+> +    case IODA2_TBL_TVT:
+> +        tptr =3D phb->ioda_TVT;
+> +        mask =3D 511;
+> +        break;
+> +    case IODA2_TBL_TCAM:
+> +    case IODA2_TBL_TDR:
+> +        mask =3D 63;
+> +        break;
+> +    case IODA2_TBL_M64BT:
+> +        tptr =3D phb->ioda_M64BT;
+> +        mask =3D 15;
+> +        break;
+> +    case IODA2_TBL_M32DT:
+> +        tptr =3D phb->ioda_MDT;
+> +        mask =3D 255;
+> +        break;
+> +    case IODA2_TBL_PEEV:
+> +        tptr =3D phb->ioda_PEEV;
+> +        mask =3D 3;
+> +        break;
+> +    default:
+> +        return NULL;
+> +    }
+> +    index &=3D mask;
+> +    if (out_idx) {
+> +        *out_idx =3D index;
+> +    }
+> +    if (out_table) {
+> +        *out_table =3D table;
+> +    }
+> +    if (adreg & PHB_IODA_AD_AUTOINC) {
+> +        index =3D (index + 1) & mask;
+> +        adreg =3D SETFIELD(PHB_IODA_AD_TADR, adreg, index);
+> +    }
+> +    if (tptr) {
+> +        tptr +=3D index;
+> +    }
+> +    phb->regs[PHB_IODA_ADDR >> 3] =3D adreg;
+> +    return tptr;
+> +}
+> +
+> +static uint64_t pnv_phb3_ioda_read(PnvPhb3State *phb)
+> +{
+> +        unsigned table;
+> +        uint64_t *tptr;
+> +
+> +        tptr =3D pnv_phb3_ioda_access(phb, &table, NULL);
+> +        if (!tptr) {
+> +            /* Return 0 on unsupported tables, not ff's */
+> +            return 0;
+> +        }
+> +        return *tptr;
+> +}
+> +
+> +static void pnv_phb3_ioda_write(PnvPhb3State *phb, uint64_t val)
+> +{
+> +        unsigned table, idx;
+> +        uint64_t *tptr;
+> +
+> +        tptr =3D pnv_phb3_ioda_access(phb, &table, &idx);
+> +        if (!tptr) {
+> +            return;
+> +        }
+> +
+> +        /* Handle side effects */
+> +        switch (table) {
+> +        case IODA2_TBL_LXIVT:
+> +            pnv_phb3_lxivt_write(phb, idx, val);
+> +            break;
+> +        case IODA2_TBL_M64BT:
+> +            *tptr =3D val;
+> +            pnv_phb3_check_m64(phb, idx);
+> +            break;
+> +        default:
+> +            *tptr =3D val;
+> +        }
+> +}
+> +
+> +/* This is called whenever the PHB LSI, MSI source ID register or
+> + * the PBCQ irq filters are written.
+> + */
+> +void pnv_phb3_remap_irqs(PnvPhb3State *phb)
+> +{
+> +    ICSState *ics =3D phb->lsi_ics;
+> +    uint32_t local, global, count, mask, comp;
+> +    uint64_t baren;
+> +
+> +    /* First check if we are enabled. Unlike real HW we don't separate T=
+X and RX
+> +     * so we enable if both are set
+> +     */
+> +    baren =3D phb->pbcq->nest_regs[PBCQ_NEST_BAR_EN];
+> +    if (!(baren & PBCQ_NEST_BAR_EN_IRSN_RX) ||
+> +        !(baren & PBCQ_NEST_BAR_EN_IRSN_TX)) {
+> +        ics->offset =3D 0;
+> +        return;
+> +    }
+> +
+> +    /* Grab local LSI source ID */
+> +    local =3D GETFIELD(PHB_LSI_SRC_ID, phb->regs[PHB_LSI_SOURCE_ID >> 3]=
+) << 3;
+> +
+> +    /* Grab global one and compare */
+> +    global =3D GETFIELD(PBCQ_NEST_LSI_SRC,
+> +                      phb->pbcq->nest_regs[PBCQ_NEST_LSI_SRC_ID]) << 3;
+> +    if (global !=3D local) {
+> +        /* This happens during initialization, let's come back when we
+> +         * are properly configured
+> +         */
+> +        ics->offset =3D 0;
+> +        return;
+> +    }
+> +
+> +    /* Get the base on the powerbus */
+> +    comp =3D GETFIELD(PBCQ_NEST_IRSN_COMP,
+> +                    phb->pbcq->nest_regs[PBCQ_NEST_IRSN_COMPARE]);
+> +    mask =3D GETFIELD(PBCQ_NEST_IRSN_COMP,
+> +                    phb->pbcq->nest_regs[PBCQ_NEST_IRSN_MASK]);
+> +    count =3D ((~mask) + 1) & 0x7ffff;
+> +    phb->total_irq =3D count;
+> +
+> +    /* Sanity checks */
+> +    if ((global + PNV_PHB3_NUM_LSI) > count) {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "LSIs out of reach: LSI base=3D%d total irq=3D%d",
+> +                      global, count);
+> +    }
+> +
+> +    if (count > 2048) {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "More interrupts than supported: %d", count);
+> +    }
+> +
+> +    if ((comp & mask) !=3D comp) {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "IRQ compare bits not in mask: comp=3D0x%x mask=3D=
+0x%x",
+> +                      comp, mask);
+> +        comp &=3D mask;
+> +    }
+> +    /* Setup LSI offset */
+> +    ics->offset =3D comp + global;
+> +
+> +    /* Setup MSI offset */
+> +    pnv_phb3_msi_update_config(phb->msis, comp, count - PNV_PHB3_NUM_LSI=
+);
+> +}
+> +
+> +static void pnv_phb3_lsi_src_id_write(PnvPhb3State *phb, uint64_t val)
+> +{
+> +    /* Sanitize content */
+> +    val &=3D PHB_LSI_SRC_ID_MASK;
+> +    phb->regs[PHB_LSI_SOURCE_ID >> 3] =3D val;
+> +    pnv_phb3_remap_irqs(phb);
+> +}
+> +
+> +static void pnv_phb3_rtc_invalidate(PnvPhb3State *phb, uint64_t val)
+> +{
+> +    PnvPhb3DMASpace *ds;
+> +
+> +    /* Always invalidate all for now ... */
+> +    QLIST_FOREACH(ds, &phb->dma_spaces, list) {
+> +        ds->pe_num =3D PHB_INVALID_PE;
+> +    }
+> +}
+> +
+> +
+> +static void pnv_phb3_update_msi_regions(PnvPhb3DMASpace *ds)
+> +{
+> +    uint64_t cfg =3D ds->phb->regs[PHB_PHB3_CONFIG >> 3];
+> +
+> +    if (cfg & PHB_PHB3C_32BIT_MSI_EN) {
+> +        if (!ds->msi32_mapped) {
+> +            memory_region_add_subregion(&ds->dma_mr, 0xffff0000, &ds->ms=
+i32_mr);
+> +            ds->msi32_mapped =3D true;
+> +        }
+> +    } else {
+> +        if (ds->msi32_mapped) {
+> +            memory_region_del_subregion(&ds->dma_mr, &ds->msi32_mr);
+> +            ds->msi32_mapped =3D false;
+
+Could you just use the MR build in enabled flag
+(memory_region_set_enabled() etc.) instead of using your own flags?
+
+> +        }
+> +    }
+> +
+> +    if (cfg & PHB_PHB3C_64BIT_MSI_EN) {
+> +        if (!ds->msi64_mapped) {
+> +            memory_region_add_subregion(&ds->dma_mr,
+> +                                        (1ull << 60), &ds->msi64_mr);
+> +            ds->msi64_mapped =3D true;
+> +        }
+> +    } else {
+> +        if (ds->msi64_mapped) {
+> +            memory_region_del_subregion(&ds->dma_mr, &ds->msi64_mr);
+> +            ds->msi64_mapped =3D false;
+> +        }
+> +    }
+> +}
+> +
+> +static void pnv_phb3_update_all_msi_regions(PnvPhb3State *phb)
+> +{
+> +    PnvPhb3DMASpace *ds;
+> +
+> +    QLIST_FOREACH(ds, &phb->dma_spaces, list) {
+> +        pnv_phb3_update_msi_regions(ds);
+> +    }
+> +}
+> +
+> +void pnv_phb3_reg_write(void *opaque, hwaddr off, uint64_t val, unsigned=
+ size)
+> +{
+> +    PnvPhb3State *phb =3D opaque;
+> +    bool changed;
+> +
+> +    /* Special case configuration data */
+> +    if ((off & 0xfffc) =3D=3D PHB_CONFIG_DATA) {
+> +        pnv_phb3_config_write(phb, off & 0x3, size, val);
+> +        return;
+> +    }
+> +
+> +    /* Other registers are 64-bit only */
+> +    if (size !=3D 8 || off & 0x7) {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "Invalid register access, offset: 0x%"PRIx64" size=
+: %d",
+> +                      off, size);
+> +        return;
+> +    }
+> +
+> +    /* Handle masking */
+> +    switch (off) {
+> +    case PHB_M64_UPPER_BITS:
+> +        val &=3D 0xfffc000000000000ull;
+> +        break;
+> +    }
+> +
+> +    /* Record whether it changed */
+> +    changed =3D phb->regs[off >> 3] !=3D val;
+> +
+> +    /* Store in register cache first */
+> +    phb->regs[off >> 3] =3D val;
+> +
+> +    /* Handle side effects */
+> +    switch (off) {
+> +    case PHB_PHB3_CONFIG:
+> +        if (changed) {
+> +            pnv_phb3_update_all_msi_regions(phb);
+> +        }
+> +        /* fall through */
+> +    case PHB_M32_BASE_ADDR:
+> +    case PHB_M32_BASE_MASK:
+> +    case PHB_M32_START_ADDR:
+> +        if (changed) {
+> +            pnv_phb3_check_m32(phb);
+> +        }
+> +        break;
+> +    case PHB_M64_UPPER_BITS:
+> +        if (changed) {
+> +            pnv_phb3_check_all_m64s(phb);
+> +        }
+> +        break;
+> +    case PHB_LSI_SOURCE_ID:
+> +        if (changed) {
+> +            pnv_phb3_lsi_src_id_write(phb, val);
+> +        }
+> +        break;
+> +
+> +    /* IODA table accesses */
+> +    case PHB_IODA_DATA0:
+> +        pnv_phb3_ioda_write(phb, val);
+> +        break;
+> +
+> +    /* RTC invalidation */
+> +    case PHB_RTC_INVALIDATE:
+> +        pnv_phb3_rtc_invalidate(phb, val);
+> +        break;
+> +
+> +    /* FFI request */
+> +    case PHB_FFI_REQUEST:
+> +        pnv_phb3_msi_ffi(phb->msis, val);
+> +        break;
+> +
+> +    /* Silent simple writes */
+> +    case PHB_CONFIG_ADDRESS:
+> +    case PHB_IODA_ADDR:
+> +    case PHB_TCE_KILL:
+> +    case PHB_TCE_SPEC_CTL:
+> +    case PHB_PEST_BAR:
+> +    case PHB_PELTV_BAR:
+> +    case PHB_RTT_BAR:
+> +    case PHB_RBA_BAR:
+> +    case PHB_IVT_BAR:
+> +    case PHB_FFI_LOCK:
+> +        break;
+> +
+> +#ifdef DISPLAY_UNIMPLENTED_REG
+
+I don't think you need the ifdef - qemu_log_mask() already has a test
+to see whether to write the message.
+
+> +    /* Noise on anything else */
+> +    default:
+> +        qemu_log_mask(LOG_UNIMP, "reg_write 0x%"PRIx64"=3D%"PRIx64, off,=
+ val);
+> +#endif
+> +    }
+> +}
+> +
+> +uint64_t pnv_phb3_reg_read(void *opaque, hwaddr off, unsigned size)
+> +{
+> +    PnvPhb3State *phb =3D opaque;
+> +    uint64_t val;
+> +
+> +    if ((off & 0xfffc) =3D=3D PHB_CONFIG_DATA) {
+> +        return pnv_phb3_config_read(phb, off & 0x3, size);
+> +    }
+> +
+> +    /* Other registers are 64-bit only */
+> +    if (size !=3D 8 || off & 0x7) {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "Invalid register access, offset: 0x%"PRIx64" size=
+: %d",
+> +                      off, size);
+> +        return ~0ull;
+> +    }
+> +
+> +    /* Default read from cache */
+> +    val =3D phb->regs[off >> 3];
+> +
+> +    switch (off) {
+> +    /* Simulate venice DD2.0 */
+> +    case PHB_VERSION:
+> +        return 0x000000a300000005ull;
+> +
+> +    /* IODA table accesses */
+> +    case PHB_IODA_DATA0:
+> +        return pnv_phb3_ioda_read(phb);
+> +
+> +    /* Link training always appears trained */
+> +    case PHB_PCIE_DLP_TRAIN_CTL:
+> +        return PHB_PCIE_DLP_INBAND_PRESENCE | PHB_PCIE_DLP_TC_DL_LINKACT;
+> +
+> +    /* FFI Lock */
+> +    case PHB_FFI_LOCK:
+> +        /* Set lock and return previous value */
+> +        phb->regs[off >> 3] |=3D PHB_FFI_LOCK_STATE;
+> +        return val;
+> +
+> +    /* Silent simple reads */
+> +    case PHB_PHB3_CONFIG:
+> +    case PHB_M32_BASE_ADDR:
+> +    case PHB_M32_BASE_MASK:
+> +    case PHB_M32_START_ADDR:
+> +    case PHB_CONFIG_ADDRESS:
+> +    case PHB_IODA_ADDR:
+> +    case PHB_RTC_INVALIDATE:
+> +    case PHB_TCE_KILL:
+> +    case PHB_TCE_SPEC_CTL:
+> +    case PHB_PEST_BAR:
+> +    case PHB_PELTV_BAR:
+> +    case PHB_RTT_BAR:
+> +    case PHB_RBA_BAR:
+> +    case PHB_IVT_BAR:
+> +    case PHB_M64_UPPER_BITS:
+> +        break;
+> +
+> +#ifdef DISPLAY_UNIMPLENTED_REG
+> +    /* Noise on anything else */
+> +    default:
+> +        qemu_log_mask(LOG_UNIMP, "reg_read 0x%"PRIx64"=3D%"PRIx64, off, =
+val);
+> +#endif
+> +    }
+> +    return val;
+> +}
+> +
+> +static const MemoryRegionOps pnv_phb3_reg_ops =3D {
+> +    .read =3D pnv_phb3_reg_read,
+> +    .write =3D pnv_phb3_reg_write,
+> +    .valid.min_access_size =3D 1,
+> +    .valid.max_access_size =3D 8,
+> +    .impl.min_access_size =3D 1,
+> +    .impl.max_access_size =3D 8,
+> +    .endianness =3D DEVICE_BIG_ENDIAN,
+> +};
+> +
+> +static int pnv_phb3_map_irq(PCIDevice *pci_dev, int irq_num)
+> +{
+> +    /* Check that out properly ... */
+> +    return irq_num & 3;
+> +}
+> +
+> +static void pnv_phb3_set_irq(void *opaque, int irq_num, int level)
+> +{
+> +    PnvPhb3State *phb =3D opaque;
+> +
+> +    /* LSI only ... */
+> +    if (irq_num > 3) {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "Unknown IRQ to set %d", irq_num);
+> +    }
+> +    qemu_set_irq(phb->lsi_ics->qirqs[irq_num], level);
+> +}
+> +
+> +static bool pnv_phb3_resolve_pe(PnvPhb3DMASpace *ds)
+> +{
+> +    uint64_t rtt, addr;
+> +    uint16_t rte;
+> +    int bus_num;
+> +
+> +    /* Already resolved ? */
+> +    if (ds->pe_num !=3D PHB_INVALID_PE) {
+> +        return true;
+> +    }
+> +
+> +    /* We need to lookup the RTT */
+> +    rtt =3D ds->phb->regs[PHB_RTT_BAR >> 3];
+> +    if (!(rtt & PHB_RBA_BAR_ENABLE)) {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "DMA with RTT BAR disabled !");
+> +        /* Set error bits ? fence ? ... */
+> +        return false;
+> +    }
+> +
+> +    /* Read RTE */
+> +    bus_num =3D pci_bus_num(ds->bus);
+> +    addr =3D rtt & PHB_RTT_BASE_ADDRESS_MASK;
+> +    addr +=3D 2 * ((bus_num << 8) | ds->devfn);
+> +    if (dma_memory_read(&address_space_memory, addr, &rte, sizeof(rte)))=
+ {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "Failed to read RTT entry at 0x%"=
+PRIx64,
+> +                      addr);
+> +        /* Set error bits ? fence ? ... */
+> +        return false;
+> +    }
+> +    rte =3D be16_to_cpu(rte);
+> +
+> +    /* Fail upon reading of invalid PE# */
+> +    if (rte >=3D PNV_PHB3_NUM_PE) {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "RTE for RID 0x%x invalid (%04x)",
+> +                      ds->devfn, rte);
+> +        /* Set error bits ? fence ? ... */
+> +        return false;
+> +    }
+> +    ds->pe_num =3D rte;
+> +    return true;
+> +}
+> +
+> +static void pnv_phb3_translate_tve(PnvPhb3DMASpace *ds, hwaddr addr,
+> +                                   bool is_write, uint64_t tve,
+> +                                   IOMMUTLBEntry *tlb)
+> +{
+> +    uint64_t tta =3D GETFIELD(IODA2_TVT_TABLE_ADDR, tve);
+> +    int32_t  lev =3D GETFIELD(IODA2_TVT_NUM_LEVELS, tve);
+> +    uint32_t tts =3D GETFIELD(IODA2_TVT_TCE_TABLE_SIZE, tve);
+> +    uint32_t tps =3D GETFIELD(IODA2_TVT_IO_PSIZE, tve);
+> +
+> +    /* Invalid levels */
+> +    if (lev > 4) {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "Invalid #levels in TVE %d", lev);
+> +        return;
+> +    }
+> +
+> +    /* IO Page Size of 0 means untranslated, else use TCEs */
+> +    if (tps =3D=3D 0) {
+> +        /* We only support non-translate in top window
+> +         * XXX FIX THAT, Venice/Murano support it on bottom window
+> +         * above 4G and Naples suports it on everything
+> +         */
+> +        if (!(tve & PPC_BIT(51))) {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                          "xlate for invalid non-translate TVE");
+> +            return;
+> +        }
+> +        /* XXX Handle boundaries */
+> +
+> +        /* XXX Use 4k pages like q35 ... for now */
+> +        tlb->iova =3D addr & 0xfffffffffffff000ull;
+> +        tlb->translated_addr =3D addr & 0x0003fffffffff000ull;
+> +        tlb->addr_mask =3D 0xfffull;
+> +        tlb->perm =3D IOMMU_RW;
+> +    } else {
+> +        uint32_t tce_shift, tbl_shift, sh;
+> +        uint64_t base, taddr, tce, tce_mask;
+> +
+> +        /* TVE disabled ? */
+> +        if (tts =3D=3D 0) {
+> +            qemu_log_mask(LOG_GUEST_ERROR, "xlate for invalid translated=
+ TVE");
+> +            return;
+> +        }
+> +
+> +        /* Address bits per bottom level TCE entry */
+> +        tce_shift =3D tps + 11;
+> +
+> +        /* Address bits per table level */
+> +        tbl_shift =3D tts + 8;
+> +
+> +        /* Top level table base address */
+> +        base =3D tta << 12;
+> +
+> +        /* Total shift to first level */
+> +        sh =3D tbl_shift * lev + tce_shift;
+> +
+> +        /* XXX Multi-level untested */
+> +        while ((lev--) >=3D 0) {
+> +            /* Grab the TCE address */
+> +            taddr =3D base | (((addr >> sh) & ((1ul << tbl_shift) - 1)) =
+<< 3);
+> +            if (dma_memory_read(&address_space_memory, taddr, &tce,
+> +                                sizeof(tce))) {
+> +                qemu_log_mask(LOG_GUEST_ERROR,
+> +                              "Failed to read TCE at 0x%"PRIx64, taddr);
+> +                return;
+> +            }
+> +            tce =3D be64_to_cpu(tce);
+> +
+> +            /* Check permission for indirect TCE */
+> +            if ((lev >=3D 0) && !(tce & 3)) {
+> +                qemu_log_mask(LOG_GUEST_ERROR,
+> +                              "Invalid indirect TCE at 0x%"PRIx64, taddr=
+);
+> +                qemu_log_mask(LOG_GUEST_ERROR,
+> +                              " xlate %"PRIx64":%c TVE=3D%"PRIx64,
+> +                              addr, is_write ? 'W' : 'R', tve);
+> +                qemu_log_mask(LOG_GUEST_ERROR,
+> +                              " tta=3D%"PRIx64" lev=3D%d tts=3D%d tps=3D=
+%d",
+> +                              tta, lev, tts, tps);
+> +                return;
+> +            }
+> +            sh -=3D tbl_shift;
+> +            base =3D tce & ~0xfffull;
+> +        }
+> +
+> +        /* We exit the loop with TCE being the final TCE */
+> +        tce_mask =3D ~((1ull << tce_shift) - 1);
+> +        tlb->iova =3D addr & tce_mask;
+> +        tlb->translated_addr =3D tce & tce_mask;
+> +        tlb->addr_mask =3D ~tce_mask;
+> +        tlb->perm =3D tce & 3;
+> +        if ((is_write & !(tce & 2)) || ((!is_write) && !(tce & 1))) {
+> +            qemu_log_mask(LOG_GUEST_ERROR, "TCE access fault at 0x%"PRIx=
+64,
+> +                          taddr);
+> +            qemu_log_mask(LOG_GUEST_ERROR, " xlate %"PRIx64":%c TVE=3D%"=
+PRIx64,
+> +                          addr, is_write ? 'W' : 'R', tve);
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                          " tta=3D%"PRIx64" lev=3D%d tts=3D%d tps=3D%d",
+> +                          tta, lev, tts, tps);
+> +        }
+> +    }
+> +}
+> +
+> +static IOMMUTLBEntry pnv_phb3_translate_iommu(MemoryRegion *iommu, hwadd=
+r addr,
+> +                                              bool is_write)
+> +{
+> +    PnvPhb3DMASpace *ds =3D container_of(iommu, PnvPhb3DMASpace, dma_mr);
+> +    int tve_sel;
+> +    uint64_t tve, cfg;
+> +    IOMMUTLBEntry ret =3D {
+> +        .target_as =3D &address_space_memory,
+> +        .iova =3D addr,
+> +        .translated_addr =3D 0,
+> +        .addr_mask =3D ~(hwaddr)0,
+> +        .perm =3D IOMMU_NONE,
+> +    };
+> +
+> +    /* Resolve PE# */
+> +    if (!pnv_phb3_resolve_pe(ds)) {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "Failed to resolve PE# for bus @%p (%d) devfn 0x%x=
+",
+> +                      ds->bus, pci_bus_num(ds->bus), ds->devfn);
+> +        return ret;
+> +    }
+> +
+> +    /* Check top bits */
+> +    switch (addr >> 60) {
+> +    case 00:
+> +        /* DMA or 32-bit MSI ? */
+> +        cfg =3D ds->phb->regs[PHB_PHB3_CONFIG >> 3];
+> +        if ((cfg & PHB_PHB3C_32BIT_MSI_EN) &&
+> +            ((addr & 0xffffffffffff0000ull) =3D=3D 0xffff0000ull)) {
+> +            qemu_log_mask(LOG_GUEST_ERROR, "xlate on 32-bit MSI region");
+> +            return ret;
+> +        }
+> +        /* Choose TVE XXX Use PHB3 Control Register */
+> +        tve_sel =3D (addr >> 59) & 1;
+> +        tve =3D ds->phb->ioda_TVT[ds->pe_num * 2 + tve_sel];
+> +        pnv_phb3_translate_tve(ds, addr, is_write, tve, &ret);
+> +        break;
+> +    case 01:
+> +        qemu_log_mask(LOG_GUEST_ERROR, "xlate on 64-bit MSI region");
+> +        break;
+> +    default:
+> +        qemu_log_mask(LOG_GUEST_ERROR, "xlate on unsupported address 0x%=
+"PRIx64,
+> +                      addr);
+> +    }
+> +    return ret;
+> +}
+> +
+> +static const MemoryRegionIOMMUOps pnv_phb3_iommu_ops =3D {
+> +    .translate =3D pnv_phb3_translate_iommu,
+> +};
+> +
+> +/*
+> + * MSI/MSIX memory region implementation.
+> + * The handler handles both MSI and MSIX.
+> + */
+> +static void pnv_phb3_msi_write(void *opaque, hwaddr addr,
+> +                               uint64_t data, unsigned size)
+> +{
+> +    PnvPhb3DMASpace *ds =3D opaque;
+> +
+> +    /* Resolve PE# */
+> +    if (!pnv_phb3_resolve_pe(ds)) {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "Failed to resolve PE# for bus @%p (%d) devfn 0x%x=
+",
+> +                      ds->bus, pci_bus_num(ds->bus), ds->devfn);
+> +        return;
+> +    }
+> +
+> +    pnv_phb3_msi_send(ds->phb->msis, addr, data, ds->pe_num);
+> +}
+> +
+> +static const MemoryRegionOps pnv_phb3_msi_ops =3D {
+> +    /* There is no .read as the read result is undefined by PCI spec */
+> +    .read =3D NULL,
+> +    .write =3D pnv_phb3_msi_write,
+> +    .endianness =3D DEVICE_LITTLE_ENDIAN
+> +};
+> +
+> +static AddressSpace *pnv_phb3_dma_iommu(PCIBus *bus, void *opaque, int d=
+evfn)
+> +{
+> +    PnvPhb3State *phb =3D opaque;
+> +    PnvPhb3DMASpace *ds;
+> +
+> +    QLIST_FOREACH(ds, &phb->dma_spaces, list) {
+> +        if (ds->bus =3D=3D bus && ds->devfn =3D=3D devfn) {
+> +            break;
+> +        }
+> +    }
+> +    if (ds =3D=3D NULL) {
+> +        ds =3D g_malloc0(sizeof(PnvPhb3DMASpace));
+> +        ds->bus =3D bus;
+> +        ds->devfn =3D devfn;
+> +        ds->pe_num =3D PHB_INVALID_PE;
+> +        ds->phb =3D phb;
+> +        memory_region_init_iommu(&ds->dma_mr, OBJECT(phb),
+> +                                 &pnv_phb3_iommu_ops, "phb3_iommu", UINT=
+64_MAX);
+
+Since you can have multiple of these per PHB, shouldn't they have a
+more specific name?
+
+> +        address_space_init(&ds->dma_as, &ds->dma_mr, "phb3_iommu");
+> +        memory_region_init_io(&ds->msi32_mr, OBJECT(phb), &pnv_phb3_msi_=
+ops,
+> +                              ds, "msi32", 0x10000);
+> +        memory_region_init_io(&ds->msi64_mr, OBJECT(phb), &pnv_phb3_msi_=
+ops,
+> +                              ds, "msi64", 0x100000);
+> +        pnv_phb3_update_msi_regions(ds);
+> +
+> +        QLIST_INSERT_HEAD(&phb->dma_spaces, ds, list);
+> +    }
+> +    return &ds->dma_as;
+> +}
+> +
+> +static void pnv_phb3_root_bus_class_init(ObjectClass *klass, void *data)
+> +{
+> +    BusClass *k =3D BUS_CLASS(klass);
+> +
+> +    k->max_dev =3D 1;
+> +}
+> +
+> +#define TYPE_PNV_PHB3_ROOT_BUS "pnv-phb3-root-bus"
+> +
+> +static const TypeInfo pnv_phb3_root_bus_info =3D {
+> +    .name =3D TYPE_PNV_PHB3_ROOT_BUS,
+> +    .parent =3D TYPE_PCIE_BUS,
+> +    .class_init =3D pnv_phb3_root_bus_class_init,
+> +};
+> +
+> +static void pnv_phb3_initfn(Object *obj)
+> +{
+> +    PnvPhb3State *phb =3D PNV_PHB3(obj);
+> +    /* Create LSI source */
+> +    phb->lsi_ics =3D ICS_SIMPLE(object_new(TYPE_ICS_SIMPLE));
+> +    object_property_add_child(OBJECT(phb), "ics-phb-lsi", OBJECT(phb->ls=
+i_ics),
+> +                              NULL);
+> +
+> +    /* Default init ... will be fixed by HW inits */
+> +    phb->lsi_ics->offset =3D 0;
+> +    phb->lsi_ics->nr_irqs =3D PNV_PHB3_NUM_LSI;
+> +
+> +    /* Create MSI source */
+> +    phb->msis =3D PHB3_MSI(object_new(TYPE_PHB3_MSI));
+> +    object_property_add_const_link(OBJECT(phb->msis), "phb", obj, &error=
+_abort);
+> +    object_property_add_child(OBJECT(phb), "ics-phb-msi", OBJECT(phb->ms=
+is),
+> +                              NULL);
+> +
+> +    /* Create PBCQ */
+> +    phb->pbcq =3D PNV_PBCQ(object_new(TYPE_PNV_PBCQ));
+> +    object_property_add_const_link(OBJECT(phb->pbcq), "phb", obj, &error=
+_abort);
+> +    object_property_add_child(OBJECT(phb), "pbcq", OBJECT(phb->pbcq), NU=
+LL);
+> +
+> +    QLIST_INIT(&phb->dma_spaces);
+> +}
+> +
+> +static void pnv_phb3_realize(DeviceState *dev, Error **errp)
+> +{
+> +    PnvPhb3State *phb =3D PNV_PHB3(dev);
+> +    PCIHostState *pci =3D PCI_HOST_BRIDGE(dev);
+> +    Object *obj;
+> +    Error *error =3D NULL;
+> +    int i;
+> +
+> +    memory_region_init(&phb->pci_mmio, OBJECT(phb), "pci-mmio",
+> +                       PCI_MMIO_TOTAL_SIZE);
+> +
+> +    /* PHB3 doesn't support IO space. However, qemu gets very upset if
+> +     * we don't have an IO region to anchor IO BARs onto so we just
+> +     * initialize one which we never hook up to anything
+> +     */
+> +    memory_region_init(&phb->pci_io, OBJECT(phb), "pci-io", 0x10000);
+> +
+> +    memory_region_init_io(&phb->mr_regs, OBJECT(phb), &pnv_phb3_reg_ops,=
+ phb,
+> +                          "phb3-regs", 0x1000);
+> +
+> +   /* get XICSFabric from chip */
+> +    obj =3D object_property_get_link(OBJECT(dev), "xics", &error);
+> +    if (!obj) {
+> +        error_setg(errp, "%s: required link 'xics' not found: %s",
+> +                   __func__, error_get_pretty(error));
+> +        return;
+> +    }
+> +
+> +    object_property_add_const_link(OBJECT(phb->lsi_ics), "xics", obj, &e=
+rror);
+> +    object_property_set_bool(OBJECT(phb->lsi_ics), true, "realized", &er=
+ror);
+> +    if (error) {
+> +        error_propagate(errp, error);
+> +        return;
+> +    }
+> +
+> +    for (i =3D 0; i < PNV_PHB3_NUM_LSI; i++) {
+> +        ics_set_irq_type(phb->lsi_ics, i, true);
+> +    }
+> +
+> +    object_property_add_const_link(OBJECT(phb->msis), "xics", obj, &erro=
+r);
+> +    object_property_set_bool(OBJECT(phb->msis), true, "realized", &error=
+);
+> +    if (error) {
+> +        error_propagate(errp, error);
+> +        return;
+> +    }
+> +
+> +    object_property_set_int(OBJECT(phb->pbcq), phb->phb_id, "phb-id", &e=
+rror);
+> +    object_property_set_int(OBJECT(phb->pbcq), phb->chip_id, "chip-id", =
+&error);
+> +    object_property_set_bool(OBJECT(phb->pbcq), true, "realized", &error=
+);
+> +    if (error) {
+> +        error_propagate(errp, error);
+> +        return;
+> +    }
+> +
+> +    pci->bus =3D pci_register_bus(dev, "phb3-root-bus",
+> +                                pnv_phb3_set_irq, pnv_phb3_map_irq, phb,
+> +                                &phb->pci_mmio, &phb->pci_io,
+> +                                0, 4, TYPE_PNV_PHB3_ROOT_BUS);
+> +    pci->bus->devfn_max =3D 1;
+> +    pci_setup_iommu(pci->bus, pnv_phb3_dma_iommu, phb);
+> +}
+> +
+> +void pnv_phb3_update_regions(PnvPhb3State *phb)
+> +{
+> +    /* Unmap first always */
+> +    if (phb->regs_mapped) {
+> +        memory_region_del_subregion(&phb->pbcq->phbbar, &phb->mr_regs);
+> +        phb->regs_mapped =3D false;
+> +    }
+> +
+> +    /* Map registers if enabled */
+> +    if (phb->pbcq->phb_mapped) {
+> +        /* XXX We should use the PHB BAR 2 register but we don't ... */
+> +        memory_region_add_subregion(&phb->pbcq->phbbar, 0, &phb->mr_regs=
+);
+> +        phb->regs_mapped =3D true;
+> +    }
+> +
+> +    /* Check/update m32 */
+> +    if (phb->m32_mapped) {
+> +        pnv_phb3_check_m32(phb);
+> +    }
+> +}
+> +
+> +static Property pnv_phb3_properties[] =3D {
+> +        DEFINE_PROP_UINT32("phb-id", PnvPhb3State, phb_id, 0),
+> +        DEFINE_PROP_UINT32("chip-id", PnvPhb3State, chip_id, 0),
+> +        DEFINE_PROP_END_OF_LIST(),
+> +
+> +};
+> +
+> +static void pnv_phb3_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> +
+> +    dc->realize =3D pnv_phb3_realize;
+> +    dc->props =3D pnv_phb3_properties;
+> +}
+> +
+> +static const TypeInfo pnv_phb3_type_info =3D {
+> +    .name =3D TYPE_PNV_PHB3,
+> +    .parent =3D TYPE_PCI_HOST_BRIDGE,
+> +    .instance_size =3D sizeof(PnvPhb3State),
+> +    .class_init =3D pnv_phb3_class_init,
+> +    .instance_init =3D pnv_phb3_initfn,
+> +};
+> +
+> +static void pnv_phb3_register_types(void)
+> +{
+> +    type_register_static(&pnv_phb3_type_info);
+> +    type_register_static(&pnv_phb3_root_bus_info);
+> +}
+> +
+> +type_init(pnv_phb3_register_types)
+> diff --git a/hw/pci-host/pnv_phb3_msi.c b/hw/pci-host/pnv_phb3_msi.c
+> new file mode 100644
+> index 000000000000..d4041de37b16
+> --- /dev/null
+> +++ b/hw/pci-host/pnv_phb3_msi.c
+> @@ -0,0 +1,304 @@
+> +/*
+> + * QEMU PowerPC PowerNV PHB3 model
+> + *
+> + * Copyright (c) 2014-2017, IBM Corporation.
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License, version 2, as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> +#include "qemu/osdep.h"
+> +#include "qemu/log.h"
+> +#include "qapi/error.h"
+> +#include "qemu-common.h"
+> +#include "hw/pci-host/pnv_phb3.h"
+> +#include "hw/pci/msi.h"
+> +
+> +static uint64_t phb3_msi_ive_addr(PnvPhb3State *phb, int srcno)
+> +{
+> +    uint64_t ivtbar =3D phb->regs[PHB_IVT_BAR >> 3];
+> +    uint64_t phbctl =3D phb->regs[PHB_CONTROL >> 3];
+> +
+> +    if (!(ivtbar & PHB_IVT_BAR_ENABLE)) {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "Failed access to disable IVT BAR=
+ !");
+> +        return 0;
+> +    }
+> +
+> +    if (srcno >=3D (ivtbar & PHB_IVT_LENGTH_MASK)) {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "MSI out of bounds (%d vs  0x%"PR=
+Ix64")",
+> +                      srcno, ivtbar & PHB_IVT_LENGTH_MASK);
+> +        return 0;
+> +    }
+> +
+> +    ivtbar &=3D PHB_IVT_BASE_ADDRESS_MASK;
+> +
+> +    if (phbctl & PHB_CTRL_IVE_128_BYTES) {
+> +        return ivtbar + 128 * srcno;
+> +    } else {
+> +        return ivtbar + 16 * srcno;
+> +    }
+> +}
+> +
+> +static bool phb3_msi_read_ive(PnvPhb3State *phb, int srcno, uint64_t *ou=
+t_ive)
+> +{
+> +    uint64_t ive_addr, ive;
+> +
+> +    ive_addr =3D phb3_msi_ive_addr(phb, srcno);
+> +    if (!ive_addr) {
+> +        return false;
+> +    }
+> +
+> +    if (dma_memory_read(&address_space_memory, ive_addr, &ive, sizeof(iv=
+e))) {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "Failed to read IVE at 0x%" PRIx6=
+4,
+> +                      ive_addr);
+> +        return false;
+> +    }
+> +    *out_ive =3D be64_to_cpu(ive);
+> +
+> +    return true;
+> +}
+> +
+> +static void phb3_msi_set_p(Phb3MsiState *msis, int srcno, uint8_t gen)
+> +{
+> +    uint64_t ive_addr;
+> +    uint8_t p =3D 0x01 | (gen << 1);
+> +
+> +    ive_addr =3D phb3_msi_ive_addr(msis->phb, srcno);
+> +    if (!ive_addr) {
+> +        return;
+> +    }
+> +
+> +    if (dma_memory_write(&address_space_memory, ive_addr + 4, &p, 1)) {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "Failed to write IVE (set P) at 0x%" PRIx64, ive_a=
+ddr);
+> +    }
+> +}
+> +
+> +static void phb3_msi_set_q(Phb3MsiState *msis, int srcno)
+> +{
+> +    uint64_t ive_addr;
+> +    uint8_t q =3D 0x01;
+> +
+> +    ive_addr =3D phb3_msi_ive_addr(msis->phb, srcno);
+> +    if (!ive_addr) {
+> +        return;
+> +    }
+> +
+> +    if (dma_memory_write(&address_space_memory, ive_addr + 5, &q, 1)) {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "Failed to write IVE (set Q) at 0x%" PRIx64, ive_a=
+ddr);
+> +    }
+> +}
+> +
+> +static void phb3_msi_try_send(Phb3MsiState *msis, int srcno, bool ignore=
+_p)
+> +{
+> +    ICSState *ics =3D &msis->ics;
+> +    uint64_t ive;
+> +    uint64_t server, prio, pq, gen;
+> +
+> +    if (!phb3_msi_read_ive(msis->phb, srcno, &ive)) {
+> +        return;
+> +    }
+> +
+> +    server =3D GETFIELD(IODA2_IVT_SERVER, ive);
+> +    prio =3D GETFIELD(IODA2_IVT_PRIORITY, ive);
+> +    pq =3D GETFIELD(IODA2_IVT_Q, ive);
+> +    if (!ignore_p) {
+> +        pq |=3D GETFIELD(IODA2_IVT_P, ive) << 1;
+> +    }
+> +    gen =3D GETFIELD(IODA2_IVT_GEN, ive);
+> +
+> +    /*
+> +     * The low order 2 bits are the link pointer (Type II interrupts).
+> +     * Shift back to get a valid IRQ server.
+> +     */
+> +    server >>=3D 2;
+> +
+> +    switch (pq) {
+> +    case 0: /* 00 */
+> +        if (prio =3D=3D 0xff) {
+> +            /* Masked, set Q */
+> +            phb3_msi_set_q(msis, srcno);
+> +        } else {
+> +            /* Enabled, set P and send */
+> +            phb3_msi_set_p(msis, srcno, gen);
+> +            icp_irq(ics, server, srcno + ics->offset, prio);
+> +        }
+> +        break;
+> +    case 2: /* 10 */
+> +        /* Already pending, set Q */
+> +        phb3_msi_set_q(msis, srcno);
+> +        break;
+> +    case 1: /* 01 */
+> +    case 3: /* 11 */
+> +    default:
+> +        /* Just drop stuff if Q already set */
+> +        break;
+> +    }
+> +}
+> +
+> +static void phb3_msi_set_irq(void *opaque, int srcno, int val)
+> +{
+> +    Phb3MsiState *msis =3D opaque;
+> +
+> +    if (val) {
+> +        phb3_msi_try_send(msis, srcno, false);
+> +    }
+> +}
+> +
+> +
+> +void pnv_phb3_msi_send(Phb3MsiState *msis, uint64_t addr, uint16_t data,
+> +                       int32_t dev_pe)
+> +{
+> +    uint64_t ive;
+> +    uint16_t pe;
+> +    uint32_t src =3D ((addr >> 4) & 0xffff) | (data & 0x1f);
+> +
+> +    if (src >=3D msis->ics.nr_irqs) {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "MSI %d out of bounds", src);
+> +        return;
+> +    }
+> +    if (dev_pe >=3D 0) {
+> +        if (!phb3_msi_read_ive(msis->phb, src, &ive)) {
+> +            return;
+> +        }
+> +        pe =3D GETFIELD(IODA2_IVT_PE, ive);
+> +        if (pe !=3D dev_pe) {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                          "MSI %d send by PE#%d but assigned to PE#%d",
+> +                          src, dev_pe, pe);
+> +            return;
+> +        }
+> +    }
+> +    qemu_irq_pulse(msis->ics.qirqs[src]);
+> +}
+> +
+> +void pnv_phb3_msi_ffi(Phb3MsiState *msis, uint64_t val)
+> +{
+> +    /* Emit interrupt */
+> +    pnv_phb3_msi_send(msis, val, 0, -1);
+> +
+> +    /* Clear FFI lock */
+> +    msis->phb->regs[PHB_FFI_LOCK >> 3] =3D 0;
+> +}
+> +
+> +static void phb3_msi_reject(ICSState *ics, uint32_t nr)
+> +{
+> +    Phb3MsiState *msis =3D PHB3_MSI(ics);
+> +    unsigned int srcno =3D nr - ics->offset;
+> +    unsigned int idx =3D srcno >> 6;
+> +    unsigned int bit =3D 1ull << (srcno & 0x3f);
+> +
+> +    assert(srcno < PHB3_MAX_MSI);
+> +
+> +    msis->rba[idx] |=3D bit;
+> +    msis->rba_sum |=3D (1u << idx);
+> +}
+> +
+> +static void phb3_msi_resend(ICSState *ics)
+> +{
+> +    Phb3MsiState *msis =3D PHB3_MSI(ics);
+> +    unsigned int i, j;
+> +
+> +    if (msis->rba_sum =3D=3D 0) {
+> +        return;
+> +    }
+> +
+> +    for (i =3D 0; i < 32; i++) {
+> +        if ((msis->rba_sum & (1u << i)) =3D=3D 0) {
+> +            continue;
+> +        }
+> +        msis->rba_sum &=3D ~(1u << i);
+> +        for (j =3D 0; j < 64; j++) {
+> +            if ((msis->rba[i] & (1ull << j)) =3D=3D 0) {
+> +                continue;
+> +            }
+> +            msis->rba[i] &=3D ~(1u << j);
+> +            phb3_msi_try_send(msis, i * 64 + j, true);
+> +        }
+> +    }
+> +}
+> +
+> +static void phb3_msi_reset(void *dev)
+> +{
+> +    Phb3MsiState *msis =3D PHB3_MSI(dev);
+> +
+> +    memset(msis->rba, 0, sizeof(msis->rba));
+> +    msis->rba_sum =3D 0;
+> +}
+> +
+> +void pnv_phb3_msi_update_config(Phb3MsiState *msis, uint32_t base,
+> +                                uint32_t count)
+> +{
+> +    if (count > PHB3_MAX_MSI) {
+> +        count =3D PHB3_MAX_MSI;
+> +    }
+> +    msis->ics.nr_irqs =3D count;
+> +    msis->ics.offset =3D base;
+> +}
+> +
+> +static void phb3_msi_initfn(Object *obj)
+> +{
+> +    Phb3MsiState *msis =3D PHB3_MSI(obj);
+> +
+> +    /* Will be overriden later */
+> +    msis->ics.offset =3D 0;
+> +
+> +    /* Hard wire 2048, we ignore the fact that 8 of them can be
+> +     * taken over by LSIs at this point
+> +     */
+> +    msis->ics.nr_irqs =3D PHB3_MAX_MSI;
+> +}
+> +
+> +static void phb3_msi_realize(DeviceState *dev, Error **errp)
+> +{
+> +    Phb3MsiState *msis =3D PHB3_MSI(dev);
+> +    Object *obj;
+> +    Error *err =3D NULL;
+> +
+> +    obj =3D object_property_get_link(OBJECT(dev), "phb", &err);
+> +    if (!obj) {
+> +        error_setg(errp, "%s: required link 'phb' not found: %s",
+> +                   __func__, error_get_pretty(err));
+> +        return;
+> +    }
+> +    msis->phb =3D PNV_PHB3(obj);
+> +
+> +    msis->ics.irqs =3D NULL;
+> +    msis->ics.qirqs =3D qemu_allocate_irqs(phb3_msi_set_irq, msis, PHB3_=
+MAX_MSI);
+> +
+> +    qemu_register_reset(phb3_msi_reset, dev);
+> +}
+> +
+> +static void phb3_msi_class_init(ObjectClass *klass, void *data)
+> +{
+> +    ICSStateClass *isc =3D ICS_BASE_CLASS(klass);
+> +
+> +    isc->realize =3D phb3_msi_realize;
+> +    isc->reject =3D phb3_msi_reject;
+> +    isc->resend =3D phb3_msi_resend;
+> +}
+> +
+> +static const TypeInfo phb3_msi_info =3D {
+> +    .name =3D TYPE_PHB3_MSI,
+> +    .parent =3D TYPE_ICS_BASE,
+> +    .instance_size =3D sizeof(Phb3MsiState),
+> +    .class_init =3D phb3_msi_class_init,
+> +    .class_size =3D sizeof(ICSStateClass),
+> +    .instance_init =3D phb3_msi_initfn,
+> +};
+> +
+> +static void pnv_phb3_msi_register_types(void)
+> +{
+> +    type_register_static(&phb3_msi_info);
+> +}
+> +
+> +type_init(pnv_phb3_msi_register_types)
+> diff --git a/hw/pci-host/pnv_phb3_pbcq.c b/hw/pci-host/pnv_phb3_pbcq.c
+> new file mode 100644
+> index 000000000000..2f32632c2aff
+> --- /dev/null
+> +++ b/hw/pci-host/pnv_phb3_pbcq.c
+> @@ -0,0 +1,361 @@
+> +/*
+> + * QEMU PowerPC PowerNV PHB3 model
+> + *
+> + * Copyright (c) 2014-2017, IBM Corporation.
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License, version 2, as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "qemu-common.h"
+> +#include "qemu/log.h"
+> +#include "hw/ppc/fdt.h"
+> +#include "hw/pci-host/pnv_phb3.h"
+> +#include "hw/ppc/pnv.h"
+> +#include "hw/ppc/pnv_xscom.h"
+> +#include "hw/pci/pci_bridge.h"
+> +#include "hw/pci/pci_bus.h"
+> +
+> +#include <libfdt.h>
+> +
+> +static uint64_t pnv_pbcq_nest_xscom_read(void *opaque, hwaddr addr,
+> +                                         unsigned size)
+> +{
+> +    PnvPBCQState *pbcq =3D PNV_PBCQ(opaque);
+> +    uint32_t offset =3D addr >> 3;
+> +
+> +    return pbcq->nest_regs[offset];
+> +}
+> +
+> +static uint64_t pnv_pbcq_pci_xscom_read(void *opaque, hwaddr addr,
+> +                                        unsigned size)
+> +{
+> +    PnvPBCQState *pbcq =3D PNV_PBCQ(opaque);
+> +    uint32_t offset =3D addr >> 3;
+> +
+> +    return pbcq->pci_regs[offset];
+> +}
+> +
+> +static uint64_t pnv_pbcq_spci_xscom_read(void *opaque, hwaddr addr,
+> +                                         unsigned size)
+> +{
+> +    PnvPBCQState *pbcq =3D PNV_PBCQ(opaque);
+> +    uint32_t offset =3D addr >> 3;
+> +
+> +    if (offset =3D=3D PBCQ_SPCI_ASB_DATA) {
+> +        return pnv_phb3_reg_read(pbcq->phb,
+> +                                 pbcq->spci_regs[PBCQ_SPCI_ASB_ADDR], 8);
+> +    }
+> +    return pbcq->spci_regs[offset];
+> +}
+> +
+> +static void pnv_pbcq_update_map(PnvPBCQState *pbcq)
+> +{
+> +    uint64_t bar_en =3D pbcq->nest_regs[PBCQ_NEST_BAR_EN];
+> +    uint64_t bar, mask, size;
+> +
+> +    /*
+> +     * NOTE: This will really not work well if those are remapped
+> +     * after the PHB has created its sub regions. We could do better
+> +     * if we had a way to resize regions but we don't really care
+> +     * that much in practice as the stuff below really only happens
+> +     * once early during boot
+> +     */
+> +
+> +    /* Handle unmaps */
+> +    if (pbcq->mmio0_mapped && !(bar_en & PBCQ_NEST_BAR_EN_MMIO0)) {
+> +        memory_region_del_subregion(get_system_memory(), &pbcq->mmbar0);
+> +        pbcq->mmio0_mapped =3D false;
+> +    }
+> +    if (pbcq->mmio1_mapped && !(bar_en & PBCQ_NEST_BAR_EN_MMIO1)) {
+> +        memory_region_del_subregion(get_system_memory(), &pbcq->mmbar1);
+> +        pbcq->mmio1_mapped =3D false;
+> +    }
+> +    if (pbcq->phb_mapped && !(bar_en & PBCQ_NEST_BAR_EN_PHB)) {
+> +        memory_region_del_subregion(get_system_memory(), &pbcq->phbbar);
+> +        pbcq->phb_mapped =3D false;
+> +    }
+> +
+> +    /* Update PHB */
+> +    pnv_phb3_update_regions(pbcq->phb);
+> +
+> +    /* Handle maps */
+> +    if (!pbcq->mmio0_mapped && (bar_en & PBCQ_NEST_BAR_EN_MMIO0)) {
+> +        bar =3D pbcq->nest_regs[PBCQ_NEST_MMIO_BAR0] >> 14;
+> +        mask =3D pbcq->nest_regs[PBCQ_NEST_MMIO_MASK0];
+> +        size =3D ((~mask) >> 14) + 1;
+> +        memory_region_init(&pbcq->mmbar0, OBJECT(pbcq), "pbcq-mmio0", si=
+ze);
+> +        memory_region_add_subregion(get_system_memory(), bar, &pbcq->mmb=
+ar0);
+> +        pbcq->mmio0_mapped =3D true;
+> +        pbcq->mmio0_base =3D bar;
+> +        pbcq->mmio0_size =3D size;
+> +    }
+> +    if (!pbcq->mmio1_mapped && (bar_en & PBCQ_NEST_BAR_EN_MMIO1)) {
+> +        bar =3D pbcq->nest_regs[PBCQ_NEST_MMIO_BAR1] >> 14;
+> +        mask =3D pbcq->nest_regs[PBCQ_NEST_MMIO_MASK1];
+> +        size =3D ((~mask) >> 14) + 1;
+> +        memory_region_init(&pbcq->mmbar1, OBJECT(pbcq), "pbcq-mmio1", si=
+ze);
+> +        memory_region_add_subregion(get_system_memory(), bar, &pbcq->mmb=
+ar1);
+> +        pbcq->mmio1_mapped =3D true;
+> +        pbcq->mmio1_base =3D bar;
+> +        pbcq->mmio1_size =3D size;
+> +    }
+> +    if (!pbcq->phb_mapped && (bar_en & PBCQ_NEST_BAR_EN_PHB)) {
+> +        bar =3D pbcq->nest_regs[PBCQ_NEST_PHB_BAR] >> 14;
+> +        size =3D 0x1000;
+> +        memory_region_init(&pbcq->phbbar, OBJECT(pbcq), "pbcq-phb", size=
+);
+> +        memory_region_add_subregion(get_system_memory(), bar, &pbcq->phb=
+bar);
+> +        pbcq->phb_mapped =3D true;
+> +    }
+> +
+> +    /* Update PHB */
+> +    pnv_phb3_update_regions(pbcq->phb);
+> +}
+> +
+> +static void pnv_pbcq_nest_xscom_write(void *opaque, hwaddr addr,
+> +                                uint64_t val, unsigned size)
+> +{
+> +    PnvPBCQState *pbcq =3D PNV_PBCQ(opaque);
+> +    uint32_t reg =3D addr >> 3;
+> +
+> +    switch (reg) {
+> +    case PBCQ_NEST_MMIO_BAR0:
+> +    case PBCQ_NEST_MMIO_BAR1:
+> +    case PBCQ_NEST_MMIO_MASK0:
+> +    case PBCQ_NEST_MMIO_MASK1:
+> +        if (pbcq->nest_regs[PBCQ_NEST_BAR_EN] &
+> +            (PBCQ_NEST_BAR_EN_MMIO0 |
+> +             PBCQ_NEST_BAR_EN_MMIO1)) {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                           "PHB3: Changing enabled BAR unsupported\n");
+> +        }
+> +        pbcq->nest_regs[reg] =3D val & 0xffffffffc0000000ull;
+> +        break;
+> +    case PBCQ_NEST_PHB_BAR:
+> +        if (pbcq->nest_regs[PBCQ_NEST_BAR_EN] & PBCQ_NEST_BAR_EN_PHB) {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                           "PHB3: Changing enabled BAR unsupported\n");
+> +        }
+> +        pbcq->nest_regs[reg] =3D val & 0xfffffffffc000000ull;
+> +        break;
+> +    case PBCQ_NEST_BAR_EN:
+> +        pbcq->nest_regs[reg] =3D val & 0xf800000000000000ull;
+> +        pnv_pbcq_update_map(pbcq);
+> +        pnv_phb3_remap_irqs(pbcq->phb);
+> +        break;
+> +    case PBCQ_NEST_IRSN_COMPARE:
+> +    case PBCQ_NEST_IRSN_MASK:
+> +        pbcq->nest_regs[reg] =3D val & PBCQ_NEST_IRSN_COMP_MASK;
+> +        pnv_phb3_remap_irqs(pbcq->phb);
+> +        break;
+> +    case PBCQ_NEST_LSI_SRC_ID:
+> +        pbcq->nest_regs[reg] =3D val & PBCQ_NEST_LSI_SRC_MASK;
+> +        pnv_phb3_remap_irqs(pbcq->phb);
+> +        break;
+> +    }
+> +
+> +    /* XXX Don't error out on other regs for now ... */
+> +}
+> +
+> +static void pnv_pbcq_pci_xscom_write(void *opaque, hwaddr addr,
+> +                                     uint64_t val, unsigned size)
+> +{
+> +    PnvPBCQState *pbcq =3D PNV_PBCQ(opaque);
+> +    uint32_t reg =3D addr >> 3;
+> +
+> +    switch (reg) {
+> +    case PBCQ_PCI_BAR2:
+> +        pbcq->pci_regs[reg] =3D val & 0xfffffffffc000000ull;
+> +        pnv_pbcq_update_map(pbcq);
+> +        break;
+> +    }
+> +
+> +    /* XXX Don't error out on other regs for now ... */
+> +}
+> +
+> +static void pnv_pbcq_spci_xscom_write(void *opaque, hwaddr addr,
+> +                                uint64_t val, unsigned size)
+> +{
+> +    PnvPBCQState *pbcq =3D PNV_PBCQ(opaque);
+> +    uint32_t reg =3D addr >> 3;
+> +
+> +    switch (reg) {
+> +    case PBCQ_SPCI_ASB_ADDR:
+> +        pbcq->spci_regs[reg] =3D val & 0xfff;
+> +        break;
+> +    case PBCQ_SPCI_ASB_STATUS:
+> +        pbcq->spci_regs[reg] &=3D ~val;
+> +        break;
+> +    case PBCQ_SPCI_ASB_DATA:
+> +        pnv_phb3_reg_write(pbcq->phb, pbcq->spci_regs[PBCQ_SPCI_ASB_ADDR=
+],
+> +                           val, 8);
+> +        break;
+> +    case PBCQ_SPCI_AIB_CAPP_EN:
+> +    case PBCQ_SPCI_CAPP_SEC_TMR:
+> +        break;
+> +    }
+> +
+> +    /* XXX Don't error out on other regs for now ... */
+> +}
+> +
+> +static const MemoryRegionOps pnv_pbcq_nest_xscom_ops =3D {
+> +    .read =3D pnv_pbcq_nest_xscom_read,
+> +    .write =3D pnv_pbcq_nest_xscom_write,
+> +    .valid.min_access_size =3D 8,
+> +    .valid.max_access_size =3D 8,
+> +    .impl.min_access_size =3D 8,
+> +    .impl.max_access_size =3D 8,
+> +    .endianness =3D DEVICE_BIG_ENDIAN,
+> +};
+> +
+> +static const MemoryRegionOps pnv_pbcq_pci_xscom_ops =3D {
+> +    .read =3D pnv_pbcq_pci_xscom_read,
+> +    .write =3D pnv_pbcq_pci_xscom_write,
+> +    .valid.min_access_size =3D 8,
+> +    .valid.max_access_size =3D 8,
+> +    .impl.min_access_size =3D 8,
+> +    .impl.max_access_size =3D 8,
+> +    .endianness =3D DEVICE_BIG_ENDIAN,
+> +};
+> +
+> +static const MemoryRegionOps pnv_pbcq_spci_xscom_ops =3D {
+> +    .read =3D pnv_pbcq_spci_xscom_read,
+> +    .write =3D pnv_pbcq_spci_xscom_write,
+> +    .valid.min_access_size =3D 8,
+> +    .valid.max_access_size =3D 8,
+> +    .impl.min_access_size =3D 8,
+> +    .impl.max_access_size =3D 8,
+> +    .endianness =3D DEVICE_BIG_ENDIAN,
+> +};
+> +
+> +static void pnv_pbcq_default_bars(PnvPBCQState *pbcq)
+> +{
+> +    uint64_t mm0, mm1, reg;
+> +
+> +    mm0 =3D 0x3d00000000000ull +
+> +            0x4000000000ull * pbcq->chip_id +
+> +            0x1000000000ull * pbcq->phb_id;
+> +    mm1 =3D 0x3ff8000000000ull +
+> +            0x0200000000ull * pbcq->chip_id +
+> +            0x0080000000ull * pbcq->phb_id;
+> +    reg =3D 0x3fffe40000000ull +
+> +            0x0000400000ull * pbcq->chip_id +
+> +            0x0000100000ull * pbcq->phb_id;
+> +
+> +    pbcq->nest_regs[PBCQ_NEST_MMIO_BAR0] =3D mm0 << 14;
+> +    pbcq->nest_regs[PBCQ_NEST_MMIO_BAR1] =3D mm1 << 14;
+> +    pbcq->nest_regs[PBCQ_NEST_PHB_BAR] =3D reg << 14;
+> +    pbcq->nest_regs[PBCQ_NEST_MMIO_MASK0] =3D 0x3fff000000000ull << 14;
+> +    pbcq->nest_regs[PBCQ_NEST_MMIO_MASK1] =3D 0x3ffff80000000ull << 14;
+> +    pbcq->pci_regs[PBCQ_PCI_BAR2] =3D reg << 14;
+> +}
+> +
+> +static void pnv_pbcq_realize(DeviceState *dev, Error **errp)
+> +{
+> +    PnvPBCQState *pbcq =3D PNV_PBCQ(dev);
+> +    Object *obj;
+> +    Error *err =3D NULL;
+> +
+> +    assert(pbcq->phb_id < 4);
+> +
+> +    obj =3D object_property_get_link(OBJECT(dev), "phb", &err);
+> +    if (!obj) {
+> +        error_setg(errp, "%s: required link 'phb' not found: %s",
+> +                   __func__, error_get_pretty(err));
+> +        return;
+> +    }
+> +    pbcq->phb =3D PNV_PHB3(obj);
+> +
+> +    /* XXX Fix OPAL to do that: establish default BAR values */
+> +    pnv_pbcq_default_bars(pbcq);
+> +
+> +    /* XScom region for PBCQ registers */
+> +    memory_region_init_io(&pbcq->xscom_nest_regs, OBJECT(dev),
+> +                          &pnv_pbcq_nest_xscom_ops,
+> +                          pbcq, "xscom-pbcq-nest",
+> +                          PNV_XSCOM_PBCQ_NEST_SIZE << 3);
+> +    memory_region_init_io(&pbcq->xscom_pci_regs, OBJECT(dev),
+> +                          &pnv_pbcq_pci_xscom_ops,
+> +                          pbcq, "xscom-pbcq-pci",
+> +                          PNV_XSCOM_PBCQ_PCI_SIZE << 3);
+> +    memory_region_init_io(&pbcq->xscom_spci_regs, OBJECT(dev),
+> +                          &pnv_pbcq_spci_xscom_ops,
+> +                          pbcq, "xscom-pbcq-spci",
+> +                          PNV_XSCOM_PBCQ_SPCI_SIZE << 3);
+> +}
+> +
+> +static int pnv_pbcq_populate(PnvXScomInterface *dev, void *fdt,
+> +                             int xscom_offset)
+> +{
+> +    const char compat[] =3D "ibm,power8-pbcq";
+> +    PnvPBCQState *pbcq =3D PNV_PBCQ(dev);
+> +    char *name;
+> +    int offset;
+> +    uint32_t lpc_pcba =3D PNV_XSCOM_PBCQ_NEST_BASE;
+> +    uint32_t reg[] =3D {
+> +        cpu_to_be32(lpc_pcba),
+> +        cpu_to_be32(PNV_XSCOM_PBCQ_NEST_SIZE),
+> +        cpu_to_be32(PNV_XSCOM_PBCQ_PCI_BASE),
+> +        cpu_to_be32(PNV_XSCOM_PBCQ_PCI_SIZE),
+> +        cpu_to_be32(PNV_XSCOM_PBCQ_SPCI_BASE),
+> +        cpu_to_be32(PNV_XSCOM_PBCQ_SPCI_SIZE)
+> +    };
+> +
+> +    name =3D g_strdup_printf("pbcq@%x", lpc_pcba);
+> +    offset =3D fdt_add_subnode(fdt, xscom_offset, name);
+> +    _FDT(offset);
+> +    g_free(name);
+> +
+> +    _FDT((fdt_setprop(fdt, offset, "reg", reg, sizeof(reg))));
+> +
+> +    _FDT((fdt_setprop_cell(fdt, offset, "ibm,phb-index", pbcq->phb_id)));
+> +    _FDT((fdt_setprop(fdt, offset, "compatible", compat,
+> +                      sizeof(compat))));
+> +    return 0;
+> +}
+> +
+> +static Property pnv_pbcq_properties[] =3D {
+> +        DEFINE_PROP_UINT32("phb-id", PnvPBCQState, phb_id, 0),
+> +        DEFINE_PROP_UINT32("chip-id", PnvPBCQState, chip_id, 0),
+> +        DEFINE_PROP_END_OF_LIST(),
+> +
+> +};
+> +
+> +static void pnv_pbcq_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> +    PnvXScomInterfaceClass *xdc =3D PNV_XSCOM_INTERFACE_CLASS(klass);
+> +
+> +    xdc->populate =3D pnv_pbcq_populate;
+> +
+> +    dc->realize =3D pnv_pbcq_realize;
+> +    dc->props =3D pnv_pbcq_properties;
+> +}
+> +
+> +static const TypeInfo pnv_pbcq_type_info =3D {
+> +    .name          =3D TYPE_PNV_PBCQ,
+> +    .parent        =3D TYPE_DEVICE,
+> +    .instance_size =3D sizeof(PnvPBCQState),
+> +    .class_init    =3D pnv_pbcq_class_init,
+> +    .interfaces    =3D (InterfaceInfo[]) {
+> +        { TYPE_PNV_XSCOM_INTERFACE },
+> +        { }
+> +    }
+> +};
+> +
+> +static void pnv_pbcq_register_types(void)
+> +{
+> +    type_register_static(&pnv_pbcq_type_info);
+> +}
+> +
+> +type_init(pnv_pbcq_register_types)
+> diff --git a/hw/pci-host/pnv_phb3_rc.c b/hw/pci-host/pnv_phb3_rc.c
+> new file mode 100644
+> index 000000000000..b68e694518ca
+> --- /dev/null
+> +++ b/hw/pci-host/pnv_phb3_rc.c
+> @@ -0,0 +1,134 @@
+> +/*
+> + * QEMU PowerPC PowerNV PHB3 model
+> + *
+> + * Copyright (c) 2014-2017, IBM Corporation.
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License, version 2, as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "qemu-common.h"
+> +#include "hw/pci-host/pnv_phb3.h"
+> +#include "hw/pci/pcie_port.h"
+> +
+> +static void pnv_phb3_rc_write_config(PCIDevice *d,
+> +                                     uint32_t address, uint32_t val, int=
+ len)
+> +{
+> +    uint32_t root_cmd =3D
+> +        pci_get_long(d->config + d->exp.aer_cap + PCI_ERR_ROOT_COMMAND);
+> +
+> +    pci_bridge_write_config(d, address, val, len);
+> +    pcie_cap_slot_write_config(d, address, val, len);
+> +    pcie_aer_write_config(d, address, val, len);
+> +    pcie_aer_root_write_config(d, address, val, len, root_cmd);
+> +}
+> +
+> +static void pnv_phb3_rc_reset(DeviceState *qdev)
+> +{
+> +    PCIDevice *d =3D PCI_DEVICE(qdev);
+> +
+> +    pcie_cap_root_reset(d);
+> +    pcie_cap_deverr_reset(d);
+> +    pcie_cap_slot_reset(d);
+> +    pcie_cap_arifwd_reset(d);
+> +    pcie_aer_root_reset(d);
+> +    pci_bridge_reset(qdev);
+> +    pci_bridge_disable_base_limit(d);
+> +}
+> +
+> +static void pnv_phb3_rc_realize(PCIDevice *d, Error **errp)
+> +{
+> +    PCIEPort *p =3D PCIE_PORT(d);
+> +    PCIESlot *s =3D PCIE_SLOT(d);
+> +    int rc;
+> +    Error *err =3D NULL;
+> +
+> +    DEVICE(d)->id =3D "pcie";
+> +    pci_bridge_initfn(d, TYPE_PCIE_BUS);
+> +
+> +    /* TODO Make that a property ? Allow for only one device (8 function=
+s) */
+> +    pci_bridge_get_sec_bus(PCI_BRIDGE(d))->devfn_max =3D 8;
+> +
+> +    pcie_port_init_reg(d);
+> +
+> +    rc =3D pcie_cap_init(d, 0x48, PCI_EXP_TYPE_ROOT_PORT, p->port);
+> +    if (rc < 0) {
+> +        error_setg(errp, "phb3-rc: pcie_cap_init() error %d !", rc);
+> +        goto err_bridge;
+> +    }
+> +    pcie_cap_arifwd_init(d);
+> +    pcie_cap_deverr_init(d);
+> +    pcie_cap_slot_init(d, s->slot);
+> +    pcie_chassis_create(s->chassis);
+> +    rc =3D pcie_chassis_add_slot(s);
+> +    if (rc < 0) {
+> +        error_setg(errp, "phb3-rc: pcie_chassis_add_slot() error %d !", =
+rc);
+> +        goto err_pcie_cap;
+> +    }
+> +    pcie_cap_root_init(d);
+> +    rc =3D pcie_aer_init(d, PCI_ERR_VER, 0x100, PCI_ERR_SIZEOF, &err);
+> +    if (rc < 0) {
+> +        error_propagate(errp, err);
+> +        goto err_slot;
+> +    }
+> +    pcie_aer_root_init(d);
+> +    return;
+> +
+> +err_slot:
+> +    pcie_chassis_del_slot(s);
+> +err_pcie_cap:
+> +    pcie_cap_exit(d);
+> +err_bridge:
+> +    pci_bridge_exitfn(d);
+> +}
+> +
+> +static void pnv_phb3_rc_exit(PCIDevice *d)
+> +{
+> +    PCIESlot *s =3D PCIE_SLOT(d);
+> +
+> +    pcie_aer_exit(d);
+> +    pcie_chassis_del_slot(s);
+> +    pcie_cap_exit(d);
+> +    pci_bridge_exitfn(d);
+> +}
+> +
+> +static void pnv_phb3_rc_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> +    PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
+> +
+> +    k->is_express =3D 1;
+> +    k->is_bridge =3D 1;
+> +    k->realize =3D pnv_phb3_rc_realize;
+> +    k->exit =3D pnv_phb3_rc_exit;
+> +    k->config_write =3D pnv_phb3_rc_write_config;
+> +    k->vendor_id =3D PCI_VENDOR_ID_IBM;
+> +    k->device_id =3D 0x03dc;
+> +    k->revision =3D 0;
+> +    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+> +    dc->desc =3D "IBM PHB3 PCIE Root Port";
+> +    dc->reset =3D pnv_phb3_rc_reset;
+> +}
+> +
+> +static const TypeInfo pnv_phb3_rc_info =3D {
+> +    .name          =3D TYPE_PNV_PHB3_RC,
+> +    .parent        =3D TYPE_PCIE_SLOT,
+> +    .class_init    =3D pnv_phb3_rc_class_init,
+> +};
+> +
+> +static void pnv_phb3_rc_register_types(void)
+> +{
+> +    type_register_static(&pnv_phb3_rc_info);
+> +}
+> +
+> +type_init(pnv_phb3_rc_register_types)
 > diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index db6e078edcea..766e6cf4bc12 100644
+> index df0a88c3e252..db6e078edcea 100644
 > --- a/hw/ppc/pnv.c
 > +++ b/hw/ppc/pnv.c
-> @@ -48,6 +48,10 @@
->  #include "hw/pci/pci_bridge.h"
->  #include "hw/pci/msi.h"
->  #include "hw/pci-host/pnv_phb3.h"
-> +#include "hw/usb.h"
-> +#include "hw/ide/pci.h"
-> +#include "hw/ide/ahci.h"
-> +#include "net/net.h"
+> @@ -43,6 +43,11 @@
+>  #include "hw/isa/isa.h"
+>  #include "hw/char/serial.h"
+>  #include "hw/timer/mc146818rtc.h"
+> +#include "hw/pci/pci.h"
+> +#include "hw/pci/pci_bus.h"
+> +#include "hw/pci/pci_bridge.h"
+> +#include "hw/pci/msi.h"
+> +#include "hw/pci-host/pnv_phb3.h"
 > =20
 >  #include <libfdt.h>
 > =20
-> @@ -573,6 +577,87 @@ static ISABus *pnv_isa_create(PnvChip *chip)
->      return isa_bus;
+> @@ -659,6 +664,7 @@ static void ppc_powernv_init(MachineState *machine)
+>          object_property_set_int(chip, PNV_CHIP_HWID(i), "chip-id",
+>                                  &error_fatal);
+>          object_property_set_int(chip, smp_cores, "nr-cores", &error_fata=
+l);
+> +        object_property_set_int(chip, 1, "num-phbs", &error_fatal);
+>          object_property_set_bool(chip, true, "realized", &error_fatal);
+>      }
+>      g_free(chip_typename);
+> @@ -905,6 +911,41 @@ static void pnv_chip_icp_realize(PnvChip *chip, Erro=
+r **errp)
+>      g_free(typename);
 >  }
 > =20
-> +
-> +/* Returns whether we want to use VGA or not */
-> +static int pnv_vga_init(PCIBus *pci_bus)
+> +static PnvPhb3State *pnv_chip_phb_realize(PnvChip *chip, int i, Error **=
+errp)
 > +{
-> +    switch (vga_interface_type) {
-> +    case VGA_NONE:
-> +        return false;
-> +    case VGA_DEVICE:
-> +        return true;
-> +    case VGA_STD:
-> +    case VGA_VIRTIO:
-> +        return pci_vga_init(pci_bus) !=3D NULL;
-> +    default:
-> +        fprintf(stderr, "This vga model is not supported,"
-> +                "currently it only supports -vga std\n");
-
-This message doesn't appear to be entirely accurate, since virtio-vga
-is apparently supported above as well.  Also this should probably be
-an error_report().
-
-> +        exit(0);
+> +    Error *error =3D NULL;
+> +    PnvPhb3State *phb =3D NULL;
+> +    Object *obj;
+> +    char name[32];
+> +
+> +    snprintf(name, sizeof(name), "phb[%d]", i);
+> +    obj =3D object_new(TYPE_PNV_PHB3);
+> +    qdev_set_parent_bus(DEVICE(obj), sysbus_get_default());
+> +    object_property_set_int(obj, i, "phb-id", &error_fatal);
+> +    object_property_set_int(obj, chip->chip_id, "chip-id", &error_fatal);
+> +    object_property_add_child(OBJECT(chip), name, obj, &error_fatal);
+> +    object_property_add_const_link(obj, "xics", qdev_get_machine(),
+> +                                   &error_fatal);
+> +    object_property_set_bool(obj, true, "realized", &error);
+> +    if (error) {
+> +        error_propagate(errp, error);
+> +        return NULL;
 > +    }
+> +
+> +    phb =3D PNV_PHB3(obj);
+> +
+> +    memory_region_add_subregion(&chip->xscom,
+> +                                (PNV_XSCOM_PBCQ_NEST_BASE + 0x400 * i) <=
+< 3,
+> +                                &phb->pbcq->xscom_nest_regs);
+> +    memory_region_add_subregion(&chip->xscom,
+> +                                (PNV_XSCOM_PBCQ_PCI_BASE + 0x400 * i) <<=
+ 3,
+> +                                &phb->pbcq->xscom_pci_regs);
+> +    memory_region_add_subregion(&chip->xscom,
+> +                                (PNV_XSCOM_PBCQ_SPCI_BASE + 0x040 * i) <=
+< 3,
+> +                                &phb->pbcq->xscom_spci_regs);
+> +    return phb;
 > +}
 > +
-> +static void pnv_nic_init(PCIBus *pci_bus)
-> +{
-> +    int i;
-> +
-> +    for (i =3D 0; i < nb_nics; i++) {
-> +        NICInfo *nd =3D &nd_table[i];
-> +        DeviceState *dev;
-> +        PCIDevice *pdev;
-> +        Error *err =3D NULL;
-> +
-> +        pdev =3D pci_create(pci_bus, -1, "e1000");
-> +        dev =3D &pdev->qdev;
-> +        qdev_set_nic_properties(dev, nd);
-> +        object_property_set_bool(OBJECT(dev), true, "realized", &err);
-> +        if (err) {
-> +            error_report_err(err);
-> +            object_unparent(OBJECT(dev));
-> +            exit(1);
-> +        }
-> +    }
-> +}
-> +
-> +#define MAX_SATA_PORTS     6
-> +
-> +static void pnv_storage_init(PCIBus *pci_bus)
-> +{
-> +    DriveInfo *hd[MAX_SATA_PORTS];
-> +    PCIDevice *ahci;
-> +
-> +    /* Add an AHCI device. We use an ICH9 since that's all we have
-> +     * at hand for PCI AHCI but it shouldn't really matter
-> +     */
-> +    ahci =3D pci_create_simple(pci_bus, -1, "ich9-ahci");
-> +    g_assert(MAX_SATA_PORTS =3D=3D ICH_AHCI(ahci)->ahci.ports);
-> +    ide_drive_get(hd, ICH_AHCI(ahci)->ahci.ports);
-> +    ahci_ide_create_devs(ahci, hd);
-> +}
-> +
-> +static PCIBus *pnv_create_pci_legacy_bridge(PnvPhb3State *phb,
-> +                                            uint8_t chassis_nr)
-> +{
-> +    PCIDevice *dev;
-> +    PCIHostState *pcih =3D PCI_HOST_BRIDGE(phb);
-> +    PCIDevice *pdev;
-> +    PCIBus *parent;
-> +
-> +    /* Add root complex */
-> +    pdev =3D pci_create_multifunction(pcih->bus, 0, false, TYPE_PNV_PHB3=
-_RC);
-> +    qdev_prop_set_uint8(&pdev->qdev, "chassis", phb->chip_id * 4 + phb->=
-phb_id);
-> +    qdev_prop_set_uint16(&pdev->qdev, "slot", 1);
-> +    qdev_init_nofail(&pdev->qdev);
-> +
-> +    /* Setup bus for that chip */
-> +    parent =3D pci_bridge_get_sec_bus(PCI_BRIDGE(pdev));
-> +
-> +    dev =3D pci_create_multifunction(parent, 0, false, "pci-bridge");
-> +    qdev_prop_set_uint8(&dev->qdev, "chassis_nr", chassis_nr);
-> +    dev->qdev.id =3D "pci";
-> +    qdev_init_nofail(&dev->qdev);
-> +    return pci_bridge_get_sec_bus(PCI_BRIDGE(dev));
-> +}
-> +
->  static void ppc_powernv_init(MachineState *machine)
+>  static void pnv_chip_realize(DeviceState *dev, Error **errp)
 >  {
->      PnvMachineState *pnv =3D POWERNV_MACHINE(machine);
-> @@ -581,6 +666,8 @@ static void ppc_powernv_init(MachineState *machine)
->      long fw_size;
->      int i;
->      char *chip_typename;
-> +    PCIBus *pbus;
-> +    bool has_gfx =3D false;
-> =20
->      /* allocate RAM */
->      if (machine->ram_size < (1 * G_BYTE)) {
-> @@ -682,6 +769,30 @@ static void ppc_powernv_init(MachineState *machine)
->       * host to powerdown */
->      pnv->powerdown_notifier.notify =3D pnv_powerdown_notify;
->      qemu_register_powerdown_notifier(&pnv->powerdown_notifier);
+>      PnvChip *chip =3D PNV_CHIP(dev);
+> @@ -1003,6 +1044,18 @@ static void pnv_chip_realize(DeviceState *dev, Err=
+or **errp)
+>          return;
+>      }
+>      pnv_xscom_add_subregion(chip, PNV_XSCOM_OCC_BASE, &chip->occ.xscom_r=
+egs);
 > +
-> +    /* Add a PCI switch */
-> +    pbus =3D pnv_create_pci_legacy_bridge(pnv->chips[0]->phbs[0], 128);
+> +    /* MSIs are supported on this platform */
+> +    msi_nonbroken =3D true;
 > +
-> +    /* Graphics & USB */
-> +    if (pnv_vga_init(pbus)) {
-> +        has_gfx =3D true;
-> +        machine->usb |=3D defaults_enabled() && !machine->usb_disabled;
-> +    }
-> +    if (machine->usb) {
-> +        pci_create_simple(pbus, -1, "nec-usb-xhci");
-> +        if (has_gfx) {
-> +            USBBus *usb_bus =3D usb_bus_find(-1);
-> +
-> +            usb_create_simple(usb_bus, "usb-kbd");
-> +            usb_create_simple(usb_bus, "usb-mouse");
+> +    /* Create Power system Host Bridges 3 (PHB3) */
+> +    for (i =3D 0; i < chip->num_phbs; i++) {
+> +        chip->phbs[i] =3D pnv_chip_phb_realize(chip, i, &error);
+> +        if (error) {
+> +            error_propagate(errp, error);
+> +            return;
 > +        }
 > +    }
-> +
-> +    /* Add NIC */
-> +    pnv_nic_init(pbus);
-> +
-> +    /* Add storage */
-> +    pnv_storage_init(pbus);
 >  }
 > =20
->  /*
+>  static Property pnv_chip_properties[] =3D {
+> @@ -1011,6 +1064,7 @@ static Property pnv_chip_properties[] =3D {
+>      DEFINE_PROP_UINT64("ram-size", PnvChip, ram_size, 0),
+>      DEFINE_PROP_UINT32("nr-cores", PnvChip, nr_cores, 1),
+>      DEFINE_PROP_UINT64("cores-mask", PnvChip, cores_mask, 0x0),
+> +    DEFINE_PROP_UINT32("num-phbs", PnvChip, num_phbs, 1),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+> =20
+> @@ -1035,12 +1089,20 @@ static const TypeInfo pnv_chip_info =3D {
+>  static ICSState *pnv_ics_get(XICSFabric *xi, int irq)
+>  {
+>      PnvMachineState *pnv =3D POWERNV_MACHINE(xi);
+> -    int i;
+> +    int i, j;
+> =20
+>      for (i =3D 0; i < pnv->num_chips; i++) {
+>          if (ics_valid_irq(&pnv->chips[i]->psi.ics, irq)) {
+>              return &pnv->chips[i]->psi.ics;
+>          }
+> +        for (j =3D 0; j < pnv->chips[i]->num_phbs; j++) {
+> +            if (ics_valid_irq(pnv->chips[i]->phbs[j]->lsi_ics, irq)) {
+> +                return pnv->chips[i]->phbs[j]->lsi_ics;
+> +            }
+> +            if (ics_valid_irq(ICS_BASE(pnv->chips[i]->phbs[j]->msis), ir=
+q)) {
+> +                return ICS_BASE(pnv->chips[i]->phbs[j]->msis);
+> +            }
+> +        }
+>      }
+>      return NULL;
+>  }
+> @@ -1048,10 +1110,14 @@ static ICSState *pnv_ics_get(XICSFabric *xi, int =
+irq)
+>  static void pnv_ics_resend(XICSFabric *xi)
+>  {
+>      PnvMachineState *pnv =3D POWERNV_MACHINE(xi);
+> -    int i;
+> +    int i, j;
+> =20
+>      for (i =3D 0; i < pnv->num_chips; i++) {
+>          ics_resend(&pnv->chips[i]->psi.ics);
+> +        for (j =3D 0; j < pnv->chips[i]->num_phbs; j++) {
+> +            ics_resend(pnv->chips[i]->phbs[j]->lsi_ics);
+> +            ics_resend(ICS_BASE(pnv->chips[i]->phbs[j]->msis));
+> +        }
+>      }
+>  }
+> =20
+> @@ -1082,7 +1148,7 @@ static void pnv_pic_print_info(InterruptStatsProvid=
+er *obj,
+>                                 Monitor *mon)
+>  {
+>      PnvMachineState *pnv =3D POWERNV_MACHINE(obj);
+> -    int i;
+> +    int i, j;
+>      CPUState *cs;
+> =20
+>      CPU_FOREACH(cs) {
+> @@ -1093,6 +1159,10 @@ static void pnv_pic_print_info(InterruptStatsProvi=
+der *obj,
+> =20
+>      for (i =3D 0; i < pnv->num_chips; i++) {
+>          ics_pic_print_info(&pnv->chips[i]->psi.ics, mon);
+> +        for (j =3D 0; j < pnv->chips[i]->num_phbs; j++) {
+> +            ics_pic_print_info(pnv->chips[i]->phbs[j]->lsi_ics, mon);
+> +            ics_pic_print_info(ICS_BASE(pnv->chips[i]->phbs[j]->msis), m=
+on);
+> +        }
+>      }
+>  }
+> =20
+> diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
+> index 38bc85f117f6..a75e6c95b885 100644
+> --- a/hw/ppc/pnv_xscom.c
+> +++ b/hw/ppc/pnv_xscom.c
+> @@ -255,7 +255,10 @@ int pnv_xscom_populate(PnvChip *chip, void *fdt, int=
+ root_offset)
+>      args.fdt =3D fdt;
+>      args.xscom_offset =3D xscom_offset;
+> =20
+> -    object_child_foreach(OBJECT(chip), xscom_populate_child, &args);
+> +    /* Some PnvXScomInterface objects lie a bit deeper (PnvPBCQState)
+> +     * than the first layer, so we need to loop on the whole object
+> +     * hierarchy to catch them */
+> +    object_child_foreach_recursive(OBJECT(chip), xscom_populate_child, &=
+args);
+>      return 0;
+>  }
+> =20
+> diff --git a/include/hw/pci-host/pnv_phb3.h b/include/hw/pci-host/pnv_phb=
+3.h
+> new file mode 100644
+> index 000000000000..ef7cdf6b2089
+> --- /dev/null
+> +++ b/include/hw/pci-host/pnv_phb3.h
+> @@ -0,0 +1,156 @@
+> +/*
+> + * QEMU PowerPC PowerNV PHB3 model
+> + *
+> + * Copyright (c) 2014-2017, IBM Corporation.
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License, version 2, as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#ifndef PCI_HOST_PNV_PHB3_H
+> +#define PCI_HOST_PNV_PHB3_H
+> +
+> +#include "hw/pci/pci_host.h"
+> +#include "hw/ppc/xics.h"
+> +#include "hw/pci-host/pnv_phb3_regs.h"
+> +
+> +#define PNV_PHB3_NUM_M64     16
+> +#define PNV_PHB3_NUM_REGS    (0x1000 >> 3)
+> +#define PNV_PHB3_NUM_LSI     8
+> +#define PNV_PHB3_NUM_PE      256
+> +
+> +#define PCI_MMIO_TOTAL_SIZE     (0x1ull << 60)
+> +
+> +#define IODA2_PCI_BUS_MAX 256
+> +
+> +typedef struct PnvPBCQState PnvPBCQState;
+> +typedef struct PnvPhb3State PnvPhb3State;
+> +typedef struct PnvPhb3DMASpace PnvPhb3DMASpace;
+> +
+> +/* Similarily with pnv_phb3_msi */
+> +typedef struct Phb3MsiState Phb3MsiState;
+> +
+> +/* We have one such address space wrapper per possible device
+> + * under the PHB since they need to be assigned statically at
+> + * qemu device creation time. The relationship to a PE is done
+> + * later dynamically. This means we can potentially create a lot
+> + * of these guys. Q35 stores them as some kind of radix tree but
+> + * we never really need to do fast lookups so instead we simply
+> + * keep a QLIST of them for now, we can add the radix if needed
+> + * later on.
+> + *
+> + * We do cache the PE number to speed things up a bit though.
+> + */
+> +struct PnvPhb3DMASpace {
+> +    PCIBus *bus;
+> +    uint8_t devfn;
+> +    int pe_num;         /* Cached PE number */
+> +#define PHB_INVALID_PE (-1)
+> +    PnvPhb3State *phb;
+> +    AddressSpace dma_as;
+> +    MemoryRegion dma_mr;
+> +    MemoryRegion msi32_mr;
+> +    MemoryRegion msi64_mr;
+> +    bool msi32_mapped;
+> +    bool msi64_mapped;
+> +    QLIST_ENTRY(PnvPhb3DMASpace) list;
+> +};
+> +
+> +struct PnvPhb3State {
+> +    PCIHostState parent_obj;
+> +
+> +    uint32_t chip_id;
+> +    uint32_t phb_id;
+> +    MemoryRegion mr_m32;
+> +    MemoryRegion mr_m64[PNV_PHB3_NUM_M64];
+> +    MemoryRegion mr_regs;
+> +    bool regs_mapped;
+> +    bool m32_mapped;
+> +    bool m64_mapped[PNV_PHB3_NUM_M64];
+> +    MemoryRegion pci_mmio;
+> +    MemoryRegion pci_io;
+> +    uint64_t regs[PNV_PHB3_NUM_REGS];
+> +    PnvPBCQState *pbcq;
+> +    uint64_t ioda_LIST[8];
+> +    uint64_t ioda_LXIVT[8];
+> +    uint64_t ioda_TVT[512];
+> +    uint64_t ioda_M64BT[16];
+> +    uint64_t ioda_MDT[256];
+> +    uint64_t ioda_PEEV[4];
+> +    uint32_t total_irq;
+> +    ICSState *lsi_ics;
+> +    Phb3MsiState *msis;
+> +    QLIST_HEAD(, PnvPhb3DMASpace) dma_spaces;
+> +};
+> +
+> +struct PnvPBCQState {
+> +    DeviceState parent;
+> +
+> +    uint32_t chip_id;
+> +    uint32_t phb_id;
+> +    uint32_t nest_xbase;
+> +    uint32_t spci_xbase;
+> +    uint32_t pci_xbase;
+> +    uint64_t nest_regs[PBCQ_NEST_REGS_COUNT];
+> +    uint64_t spci_regs[PBCQ_SPCI_REGS_COUNT];
+> +    uint64_t pci_regs[PBCQ_PCI_REGS_COUNT];
+> +    MemoryRegion mmbar0;
+> +    MemoryRegion mmbar1;
+> +    MemoryRegion phbbar;
+> +    bool mmio0_mapped;
+> +    bool mmio1_mapped;
+> +    bool phb_mapped;
+> +    uint64_t mmio0_base;
+> +    uint64_t mmio0_size;
+> +    uint64_t mmio1_base;
+> +    uint64_t mmio1_size;
+> +    PnvPhb3State *phb;
+> +
+> +    MemoryRegion xscom_nest_regs;
+> +    MemoryRegion xscom_pci_regs;
+> +    MemoryRegion xscom_spci_regs;
+> +};
+> +
+> +#define TYPE_PNV_PBCQ "pnv-pbcq"
+> +#define PNV_PBCQ(obj) \
+> +     OBJECT_CHECK(PnvPBCQState, (obj), TYPE_PNV_PBCQ)
+> +
+> +
+> +#define TYPE_PNV_PHB3 "pnv-phb3"
+> +#define PNV_PHB3(obj) \
+> +     OBJECT_CHECK(PnvPhb3State, (obj), TYPE_PNV_PHB3)
+> +
+> +#define TYPE_PNV_PHB3_RC "pnv-phb3-rc"
+> +
+> +#define PHB3_MAX_MSI     2048
+> +
+> +typedef struct Phb3MsiState {
+> +    ICSState ics;
+> +    PnvPhb3State *phb;
+> +    uint64_t rba[PHB3_MAX_MSI / 64];
+> +    uint32_t rba_sum;
+> +} Phb3MsiState;
+> +
+> +#define TYPE_PHB3_MSI "phb3-msi"
+> +#define PHB3_MSI(obj) OBJECT_CHECK(Phb3MsiState, (obj), TYPE_PHB3_MSI)
+> +
+> +uint64_t pnv_phb3_reg_read(void *opaque, hwaddr off, unsigned size);
+> +void pnv_phb3_reg_write(void *opaque, hwaddr off, uint64_t val, unsigned=
+ size);
+> +void pnv_phb3_update_regions(PnvPhb3State *phb);
+> +void pnv_phb3_remap_irqs(PnvPhb3State *phb);
+> +void pnv_phb3_msi_update_config(Phb3MsiState *msis, uint32_t base,
+> +                                uint32_t count);
+> +void pnv_phb3_msi_send(Phb3MsiState *msis, uint64_t addr, uint16_t data,
+> +                       int32_t dev_pe);
+> +void pnv_phb3_msi_ffi(Phb3MsiState *msis, uint64_t val);
+> +
+> +#endif /* PCI_HOST_PNV_PHB3_H */
+> diff --git a/include/hw/pci-host/pnv_phb3_regs.h b/include/hw/pci-host/pn=
+v_phb3_regs.h
+> new file mode 100644
+> index 000000000000..4c3187434355
+> --- /dev/null
+> +++ b/include/hw/pci-host/pnv_phb3_regs.h
+> @@ -0,0 +1,506 @@
+> +/* Copyright (c) 2013-2017, IBM Corporation.
+> + *
+> + * Licensed under the Apache License, Version 2.0 (the "License");
+> + * you may not use this file except in compliance with the License.
+> + * You may obtain a copy of the License at
+> + *
+> + *      http://www.apache.org/licenses/LICENSE-2.0
+> + *
+> + * Unless required by applicable law or agreed to in writing, software
+> + * distributed under the License is distributed on an "AS IS" BASIS,
+> + * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+> + * implied.
+> + * See the License for the specific language governing permissions and
+> + * limitations under the License.
+> + */
+> +
+> +#ifndef PCI_HOST_PNV_PHB3_REGS_H
+> +#define PCI_HOST_PNV_PHB3_REGS_H
+> +
+> +#define PPC_BIT(bit)            (0x8000000000000000UL >> (bit))
+> +#define PPC_BIT32(bit)          (0x80000000UL >> (bit))
+> +#define PPC_BIT8(bit)           (0x80UL >> (bit))
+> +#define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_BIT(b=
+s))
+> +#define PPC_BITMASK32(bs, be)   ((PPC_BIT32(bs) - PPC_BIT32(be)) | \
+> +                                 PPC_BIT32(bs))
+> +#define PPC_BITLSHIFT(be)       (63 - (be))
+> +#define PPC_BITLSHIFT32(be)     (31 - (be))
+> +
+> +/* Extract field fname from val */
+> +#define GETFIELD(fname, val)                    \
+> +        (((val) & fname##_MASK) >> fname##_LSH)
+> +
+> +/* Set field fname of oval to fval
+> + * NOTE: oval isn't modified, the combined result is returned
+> + */
+> +#define SETFIELD(fname, oval, fval)                     \
+> +        (((oval) & ~fname##_MASK) | \
+> +         ((((typeof(oval))(fval)) << fname##_LSH) & fname##_MASK))
+> +
+> +/*
+> + * PBCQ XSCOM registers
+> + */
+> +
+> +#define PBCQ_NEST_IRSN_COMPARE  0x1a
+> +#define PBCQ_NEST_IRSN_COMP_MASK      PPC_BITMASK(0, 18)
+> +#define PBCQ_NEST_IRSN_COMP_LSH       PPC_BITLSHIFT(18)
+> +#define PBCQ_NEST_IRSN_MASK     0x1b
+> +#define PBCQ_NEST_LSI_SRC_ID    0x1f
+> +#define   PBCQ_NEST_LSI_SRC_MASK     PPC_BITMASK(0, 7)
+> +#define   PBCQ_NEST_LSI_SRC_LSH      PPC_BITLSHIFT(7)
+> +#define PBCQ_NEST_REGS_COUNT    0x46
+> +#define PBCQ_NEST_MMIO_BAR0     0x40
+> +#define PBCQ_NEST_MMIO_BAR1     0x41
+> +#define PBCQ_NEST_PHB_BAR       0x42
+> +#define PBCQ_NEST_MMIO_MASK0    0x43
+> +#define PBCQ_NEST_MMIO_MASK1    0x44
+> +#define PBCQ_NEST_BAR_EN        0x45
+> +#define   PBCQ_NEST_BAR_EN_MMIO0    PPC_BIT(0)
+> +#define   PBCQ_NEST_BAR_EN_MMIO1    PPC_BIT(1)
+> +#define   PBCQ_NEST_BAR_EN_PHB      PPC_BIT(2)
+> +#define   PBCQ_NEST_BAR_EN_IRSN_RX  PPC_BIT(3)
+> +#define   PBCQ_NEST_BAR_EN_IRSN_TX  PPC_BIT(4)
+> +
+> +#define PBCQ_PCI_REGS_COUNT     0x15
+> +#define PBCQ_PCI_BAR2           0x0b
+> +
+> +#define PBCQ_SPCI_REGS_COUNT    0x5
+> +#define PBCQ_SPCI_ASB_ADDR      0x0
+> +#define PBCQ_SPCI_ASB_STATUS    0x1
+> +#define PBCQ_SPCI_ASB_DATA      0x2
+> +#define PBCQ_SPCI_AIB_CAPP_EN   0x3
+> +#define PBCQ_SPCI_CAPP_SEC_TMR  0x4
+> +
+> +/*
+> + * PHB MMIO registers
+> + */
+> +
+> +/* PHB Fundamental register set A */
+> +#define PHB_LSI_SOURCE_ID               0x100
+> +#define   PHB_LSI_SRC_ID_MASK           PPC_BITMASK(5, 12)
+> +#define   PHB_LSI_SRC_ID_LSH            PPC_BITLSHIFT(12)
+> +#define PHB_DMA_CHAN_STATUS             0x110
+> +#define   PHB_DMA_CHAN_ANY_ERR          PPC_BIT(27)
+> +#define   PHB_DMA_CHAN_ANY_ERR1         PPC_BIT(28)
+> +#define   PHB_DMA_CHAN_ANY_FREEZE       PPC_BIT(29)
+> +#define PHB_CPU_LOADSTORE_STATUS        0x120
+> +#define   PHB_CPU_LS_ANY_ERR            PPC_BIT(27)
+> +#define   PHB_CPU_LS_ANY_ERR1           PPC_BIT(28)
+> +#define   PHB_CPU_LS_ANY_FREEZE         PPC_BIT(29)
+> +#define PHB_DMA_MSI_NODE_ID             0x128
+> +#define   PHB_DMAMSI_NID_FIXED          PPC_BIT(0)
+> +#define   PHB_DMAMSI_NID_MASK           PPC_BITMASK(24, 31)
+> +#define   PHB_DMAMSI_NID_LSH            PPC_BITLSHIFT(31)
+> +#define PHB_CONFIG_DATA                 0x130
+> +#define PHB_LOCK0                       0x138
+> +#define PHB_CONFIG_ADDRESS              0x140
+> +#define   PHB_CA_ENABLE                 PPC_BIT(0)
+> +#define   PHB_CA_BUS_MASK               PPC_BITMASK(4, 11)
+> +#define   PHB_CA_BUS_LSH                PPC_BITLSHIFT(11)
+> +#define   PHB_CA_DEV_MASK               PPC_BITMASK(12, 16)
+> +#define   PHB_CA_DEV_LSH                PPC_BITLSHIFT(16)
+> +#define   PHB_CA_FUNC_MASK              PPC_BITMASK(17, 19)
+> +#define   PHB_CA_FUNC_LSH               PPC_BITLSHIFT(19)
+> +#define   PHB_CA_REG_MASK               PPC_BITMASK(20, 31)
+> +#define   PHB_CA_REG_LSH                PPC_BITLSHIFT(31)
+> +#define   PHB_CA_PE_MASK                PPC_BITMASK(40, 47)
+> +#define   PHB_CA_PE_LSH                 PPC_BITLSHIFT(47)
+> +#define PHB_LOCK1                       0x148
+> +#define PHB_IVT_BAR                     0x150
+> +#define   PHB_IVT_BAR_ENABLE            PPC_BIT(0)
+> +#define   PHB_IVT_BASE_ADDRESS_MASK     PPC_BITMASK(14, 48)
+> +#define   PHB_IVT_BASE_ADDRESS_LSH      PPC_BITLSHIFT(48)
+> +#define   PHB_IVT_LENGTH_MASK           PPC_BITMASK(52, 63)
+> +#define   PHB_IVT_LENGTH_ADDRESS_LSH    PPC_BITLSHIFT(63)
+> +#define PHB_RBA_BAR                     0x158
+> +#define   PHB_RBA_BAR_ENABLE            PPC_BIT(0)
+> +#define   PHB_RBA_BASE_ADDRESS_MASK     PPC_BITMASK(14, 55)
+> +#define   PHB_RBA_BASE_ADDRESS_LSH      PPC_BITLSHIFT(55)
+> +#define PHB_PHB3_CONFIG                 0x160
+> +#define   PHB_PHB3C_64B_TCE_EN          PPC_BIT(2)
+> +#define   PHB_PHB3C_32BIT_MSI_EN        PPC_BIT(8)
+> +#define   PHB_PHB3C_64BIT_MSI_EN        PPC_BIT(14)
+> +#define   PHB_PHB3C_M32_EN              PPC_BIT(16)
+> +#define PHB_RTT_BAR                     0x168
+> +#define   PHB_RTT_BAR_ENABLE            PPC_BIT(0)
+> +#define   PHB_RTT_BASE_ADDRESS_MASK     PPC_BITMASK(14, 46)
+> +#define   PHB_RTT_BASE_ADDRESS_LSH      PPC_BITLSHIFT(46)
+> +#define PHB_PELTV_BAR                   0x188
+> +#define   PHB_PELTV_BAR_ENABLE          PPC_BIT(0)
+> +#define   PHB_PELTV_BASE_ADDRESS_MASK   PPC_BITMASK(14, 50)
+> +#define   PHB_PELTV_BASE_ADDRESS_LSH    PPC_BITLSHIFT(50)
+> +#define PHB_M32_BASE_ADDR               0x190
+> +#define PHB_M32_BASE_MASK               0x198
+> +#define PHB_M32_START_ADDR              0x1a0
+> +#define PHB_PEST_BAR                    0x1a8
+> +#define   PHB_PEST_BAR_ENABLE           PPC_BIT(0)
+> +#define   PHB_PEST_BASE_ADDRESS_MASK    PPC_BITMASK(14, 51)
+> +#define   PHB_PEST_BASE_ADDRESS_LSH     PPC_BITLSHIFT(51)
+> +#define PHB_M64_UPPER_BITS              0x1f0
+> +#define PHB_INTREP_TIMER                0x1f8
+> +#define PHB_DMARD_SYNC                  0x200
+> +#define PHB_RTC_INVALIDATE              0x208
+> +#define   PHB_RTC_INVALIDATE_ALL        PPC_BIT(0)
+> +#define   PHB_RTC_INVALIDATE_RID_MASK   PPC_BITMASK(16, 31)
+> +#define   PHB_RTC_INVALIDATE_RID_LSH    PPC_BITLSHIFT(31)
+> +#define PHB_TCE_KILL                    0x210
+> +#define   PHB_TCE_KILL_ALL              PPC_BIT(0)
+> +#define PHB_TCE_SPEC_CTL                0x218
+> +#define PHB_IODA_ADDR                   0x220
+> +#define   PHB_IODA_AD_AUTOINC           PPC_BIT(0)
+> +#define   PHB_IODA_AD_TSEL_MASK         PPC_BITMASK(11, 15)
+> +#define   PHB_IODA_AD_TSEL_LSH          PPC_BITLSHIFT(15)
+> +#define   PHB_IODA_AD_TADR_MASK         PPC_BITMASK(55, 63)
+> +#define   PHB_IODA_AD_TADR_LSH          PPC_BITLSHIFT(63)
+> +#define PHB_IODA_DATA0                  0x228
+> +#define PHB_FFI_REQUEST                 0x238
+> +#define   PHB_FFI_LOCK_CLEAR            PPC_BIT(3)
+> +#define   PHB_FFI_REQUEST_ISN_MASK      PPC_BITMASK(49, 59)
+> +#define   PHB_FFI_REQUEST_ISN_LSH       PPC_BITLSHIFT(59)
+> +#define PHB_FFI_LOCK                    0x240
+> +#define   PHB_FFI_LOCK_STATE            PPC_BIT(0)
+> +#define PHB_XIVE_UPDATE                 0x248 /* Broken in DD1 */
+> +#define PHB_PHB3_GEN_CAP                0x250
+> +#define PHB_PHB3_TCE_CAP                0x258
+> +#define PHB_PHB3_IRQ_CAP                0x260
+> +#define PHB_PHB3_EEH_CAP                0x268
+> +#define PHB_IVC_INVALIDATE              0x2a0
+> +#define   PHB_IVC_INVALIDATE_ALL        PPC_BIT(0)
+> +#define   PHB_IVC_INVALIDATE_SID_MASK   PPC_BITMASK(16, 31)
+> +#define   PHB_IVC_INVALIDATE_SID_LSH    PPC_BITLSHIFT(31)
+> +#define PHB_IVC_UPDATE                  0x2a8
+> +#define   PHB_IVC_UPDATE_ENABLE_P       PPC_BIT(0)
+> +#define   PHB_IVC_UPDATE_ENABLE_Q       PPC_BIT(1)
+> +#define   PHB_IVC_UPDATE_ENABLE_SERVER  PPC_BIT(2)
+> +#define   PHB_IVC_UPDATE_ENABLE_PRI     PPC_BIT(3)
+> +#define   PHB_IVC_UPDATE_ENABLE_GEN     PPC_BIT(4)
+> +#define   PHB_IVC_UPDATE_ENABLE_CON     PPC_BIT(5)
+> +#define   PHB_IVC_UPDATE_GEN_MATCH_MASK PPC_BITMASK(6, 7)
+> +#define   PHB_IVC_UPDATE_GEN_MATCH_LSH  PPC_BITLSHIFT(7)
+> +#define   PHB_IVC_UPDATE_SERVER_MASK    PPC_BITMASK(8, 23)
+> +#define   PHB_IVC_UPDATE_SERVER_LSH     PPC_BITLSHIFT(23)
+> +#define   PHB_IVC_UPDATE_PRI_MASK       PPC_BITMASK(24, 31)
+> +#define   PHB_IVC_UPDATE_PRI_LSH        PPC_BITLSHIFT(31)
+> +#define   PHB_IVC_UPDATE_GEN_MASK       PPC_BITMASK(32, 33)
+> +#define   PHB_IVC_UPDATE_GEN_LSH        PPC_BITLSHIFT(33)
+> +#define   PHB_IVC_UPDATE_P_MASK         PPC_BITMASK(34, 34)
+> +#define   PHB_IVC_UPDATE_P_LSH          PPC_BITLSHIFT(34)
+> +#define   PHB_IVC_UPDATE_Q_MASK         PPC_BITMASK(35, 35)
+> +#define   PHB_IVC_UPDATE_Q_LSH          PPC_BITLSHIFT(35)
+> +#define   PHB_IVC_UPDATE_SID_MASK       PPC_BITMASK(48, 63)
+> +#define   PHB_IVC_UPDATE_SID_LSH        PPC_BITLSHIFT(63)
+> +#define PHB_PAPR_ERR_INJ_CTL            0x2b0
+> +#define   PHB_PAPR_ERR_INJ_CTL_INB      PPC_BIT(0)
+> +#define   PHB_PAPR_ERR_INJ_CTL_OUTB     PPC_BIT(1)
+> +#define   PHB_PAPR_ERR_INJ_CTL_STICKY   PPC_BIT(2)
+> +#define   PHB_PAPR_ERR_INJ_CTL_CFG      PPC_BIT(3)
+> +#define   PHB_PAPR_ERR_INJ_CTL_RD       PPC_BIT(4)
+> +#define   PHB_PAPR_ERR_INJ_CTL_WR       PPC_BIT(5)
+> +#define   PHB_PAPR_ERR_INJ_CTL_FREEZE   PPC_BIT(6)
+> +#define PHB_PAPR_ERR_INJ_ADDR           0x2b8
+> +#define   PHB_PAPR_ERR_INJ_ADDR_MMIO_MASK       PPC_BITMASK(16, 63)
+> +#define   PHB_PAPR_ERR_INJ_ADDR_MMIO_LSH        PPC_BITLSHIFT(63)
+> +#define PHB_PAPR_ERR_INJ_MASK           0x2c0
+> +#define   PHB_PAPR_ERR_INJ_MASK_CFG_MASK        PPC_BITMASK(4, 11)
+> +#define   PHB_PAPR_ERR_INJ_MASK_CFG_LSH         PPC_BITLSHIFT(11)
+> +#define   PHB_PAPR_ERR_INJ_MASK_MMIO_MASK       PPC_BITMASK(16, 63)
+> +#define   PHB_PAPR_ERR_INJ_MASK_MMIO_LSH        PPC_BITLSHIFT(63)
+> +#define PHB_ETU_ERR_SUMMARY             0x2c8
+> +
+> +/*  UTL registers */
+> +#define UTL_SYS_BUS_CONTROL             0x400
+> +#define UTL_STATUS                      0x408
+> +#define UTL_SYS_BUS_AGENT_STATUS        0x410
+> +#define UTL_SYS_BUS_AGENT_ERR_SEVERITY  0x418
+> +#define UTL_SYS_BUS_AGENT_IRQ_EN        0x420
+> +#define UTL_SYS_BUS_BURST_SZ_CONF       0x440
+> +#define UTL_REVISION_ID                 0x448
+> +#define UTL_BCLK_DOMAIN_DBG1            0x460
+> +#define UTL_BCLK_DOMAIN_DBG2            0x468
+> +#define UTL_BCLK_DOMAIN_DBG3            0x470
+> +#define UTL_BCLK_DOMAIN_DBG4            0x478
+> +#define UTL_BCLK_DOMAIN_DBG5            0x480
+> +#define UTL_BCLK_DOMAIN_DBG6            0x488
+> +#define UTL_OUT_POST_HDR_BUF_ALLOC      0x4c0
+> +#define UTL_OUT_POST_DAT_BUF_ALLOC      0x4d0
+> +#define UTL_IN_POST_HDR_BUF_ALLOC       0x4e0
+> +#define UTL_IN_POST_DAT_BUF_ALLOC       0x4f0
+> +#define UTL_OUT_NP_BUF_ALLOC            0x500
+> +#define UTL_IN_NP_BUF_ALLOC             0x510
+> +#define UTL_PCIE_TAGS_ALLOC             0x520
+> +#define UTL_GBIF_READ_TAGS_ALLOC        0x530
+> +#define UTL_PCIE_PORT_CONTROL           0x540
+> +#define UTL_PCIE_PORT_STATUS            0x548
+> +#define UTL_PCIE_PORT_ERROR_SEV         0x550
+> +#define UTL_PCIE_PORT_IRQ_EN            0x558
+> +#define UTL_RC_STATUS                   0x560
+> +#define UTL_RC_ERR_SEVERITY             0x568
+> +#define UTL_RC_IRQ_EN                   0x570
+> +#define UTL_EP_STATUS                   0x578
+> +#define UTL_EP_ERR_SEVERITY             0x580
+> +#define UTL_EP_ERR_IRQ_EN               0x588
+> +#define UTL_PCI_PM_CTRL1                0x590
+> +#define UTL_PCI_PM_CTRL2                0x598
+> +#define UTL_GP_CTL1                     0x5a0
+> +#define UTL_GP_CTL2                     0x5a8
+> +#define UTL_PCLK_DOMAIN_DBG1            0x5b0
+> +#define UTL_PCLK_DOMAIN_DBG2            0x5b8
+> +#define UTL_PCLK_DOMAIN_DBG3            0x5c0
+> +#define UTL_PCLK_DOMAIN_DBG4            0x5c8
+> +
+> +/* PCI-E Stack registers */
+> +#define PHB_PCIE_SYSTEM_CONFIG          0x600
+> +#define PHB_PCIE_BUS_NUMBER             0x608
+> +#define PHB_PCIE_SYSTEM_TEST            0x618
+> +#define PHB_PCIE_LINK_MANAGEMENT        0x630
+> +#define   PHB_PCIE_LM_LINK_ACTIVE       PPC_BIT(8)
+> +#define PHB_PCIE_DLP_TRAIN_CTL          0x640
+> +#define   PHB_PCIE_DLP_TCTX_DISABLE     PPC_BIT(1)
+> +#define   PHB_PCIE_DLP_TCRX_DISABLED    PPC_BIT(16)
+> +#define   PHB_PCIE_DLP_INBAND_PRESENCE  PPC_BIT(19)
+> +#define   PHB_PCIE_DLP_TC_DL_LINKUP     PPC_BIT(21)
+> +#define   PHB_PCIE_DLP_TC_DL_PGRESET    PPC_BIT(22)
+> +#define   PHB_PCIE_DLP_TC_DL_LINKACT    PPC_BIT(23)
+> +#define PHB_PCIE_SLOP_LOOPBACK_STATUS   0x648
+> +#define PHB_PCIE_SYS_LINK_INIT          0x668
+> +#define PHB_PCIE_UTL_CONFIG             0x670
+> +#define PHB_PCIE_DLP_CONTROL            0x678
+> +#define PHB_PCIE_UTL_ERRLOG1            0x680
+> +#define PHB_PCIE_UTL_ERRLOG2            0x688
+> +#define PHB_PCIE_UTL_ERRLOG3            0x690
+> +#define PHB_PCIE_UTL_ERRLOG4            0x698
+> +#define PHB_PCIE_DLP_ERRLOG1            0x6a0
+> +#define PHB_PCIE_DLP_ERRLOG2            0x6a8
+> +#define PHB_PCIE_DLP_ERR_STATUS         0x6b0
+> +#define PHB_PCIE_DLP_ERR_COUNTERS       0x6b8
+> +#define PHB_PCIE_UTL_ERR_INJECT         0x6c0
+> +#define PHB_PCIE_TLDLP_ERR_INJECT       0x6c8
+> +#define PHB_PCIE_LANE_EQ_CNTL0          0x6d0
+> +#define PHB_PCIE_LANE_EQ_CNTL1          0x6d8
+> +#define PHB_PCIE_LANE_EQ_CNTL2          0x6e0
+> +#define PHB_PCIE_LANE_EQ_CNTL3          0x6e8
+> +#define PHB_PCIE_STRAPPING              0x700
+> +
+> +/* Fundamental register set B */
+> +#define PHB_VERSION                     0x800
+> +#define PHB_RESET                       0x808
+> +#define PHB_CONTROL                     0x810
+> +#define   PHB_CTRL_IVE_128_BYTES        PPC_BIT(24)
+> +#define PHB_AIB_RX_CRED_INIT_TIMER      0x818
+> +#define PHB_AIB_RX_CMD_CRED             0x820
+> +#define PHB_AIB_RX_DATA_CRED            0x828
+> +#define PHB_AIB_TX_CMD_CRED             0x830
+> +#define PHB_AIB_TX_DATA_CRED            0x838
+> +#define PHB_AIB_TX_CHAN_MAPPING         0x840
+> +#define PHB_AIB_TAG_ENABLE              0x858
+> +#define PHB_AIB_FENCE_CTRL              0x860
+> +#define PHB_TCE_TAG_ENABLE              0x868
+> +#define PHB_TCE_WATERMARK               0x870
+> +#define PHB_TIMEOUT_CTRL1               0x878
+> +#define PHB_TIMEOUT_CTRL2               0x880
+> +#define PHB_QUIESCE_DMA_G               0x888
+> +#define PHB_AIB_TAG_STATUS              0x900
+> +#define PHB_TCE_TAG_STATUS              0x908
+> +
+> +/* FIR & Error registers */
+> +#define PHB_LEM_FIR_ACCUM               0xc00
+> +#define PHB_LEM_FIR_AND_MASK            0xc08
+> +#define PHB_LEM_FIR_OR_MASK             0xc10
+> +#define PHB_LEM_ERROR_MASK              0xc18
+> +#define PHB_LEM_ERROR_AND_MASK          0xc20
+> +#define PHB_LEM_ERROR_OR_MASK           0xc28
+> +#define PHB_LEM_ACTION0                 0xc30
+> +#define PHB_LEM_ACTION1                 0xc38
+> +#define PHB_LEM_WOF                     0xc40
+> +#define PHB_ERR_STATUS                  0xc80
+> +#define PHB_ERR1_STATUS                 0xc88
+> +#define PHB_ERR_INJECT                  0xc90
+> +#define PHB_ERR_LEM_ENABLE              0xc98
+> +#define PHB_ERR_IRQ_ENABLE              0xca0
+> +#define PHB_ERR_FREEZE_ENABLE           0xca8
+> +#define PHB_ERR_AIB_FENCE_ENABLE        0xcb0
+> +#define PHB_ERR_LOG_0                   0xcc0
+> +#define PHB_ERR_LOG_1                   0xcc8
+> +#define PHB_ERR_STATUS_MASK             0xcd0
+> +#define PHB_ERR1_STATUS_MASK            0xcd8
+> +
+> +#define PHB_OUT_ERR_STATUS              0xd00
+> +#define PHB_OUT_ERR1_STATUS             0xd08
+> +#define PHB_OUT_ERR_INJECT              0xd10
+> +#define PHB_OUT_ERR_LEM_ENABLE          0xd18
+> +#define PHB_OUT_ERR_IRQ_ENABLE          0xd20
+> +#define PHB_OUT_ERR_FREEZE_ENABLE       0xd28
+> +#define PHB_OUT_ERR_AIB_FENCE_ENABLE    0xd30
+> +#define PHB_OUT_ERR_LOG_0               0xd40
+> +#define PHB_OUT_ERR_LOG_1               0xd48
+> +#define PHB_OUT_ERR_STATUS_MASK         0xd50
+> +#define PHB_OUT_ERR1_STATUS_MASK        0xd58
+> +
+> +#define PHB_INA_ERR_STATUS              0xd80
+> +#define PHB_INA_ERR1_STATUS             0xd88
+> +#define PHB_INA_ERR_INJECT              0xd90
+> +#define PHB_INA_ERR_LEM_ENABLE          0xd98
+> +#define PHB_INA_ERR_IRQ_ENABLE          0xda0
+> +#define PHB_INA_ERR_FREEZE_ENABLE       0xda8
+> +#define PHB_INA_ERR_AIB_FENCE_ENABLE    0xdb0
+> +#define PHB_INA_ERR_LOG_0               0xdc0
+> +#define PHB_INA_ERR_LOG_1               0xdc8
+> +#define PHB_INA_ERR_STATUS_MASK         0xdd0
+> +#define PHB_INA_ERR1_STATUS_MASK        0xdd8
+> +
+> +#define PHB_INB_ERR_STATUS              0xe00
+> +#define PHB_INB_ERR1_STATUS             0xe08
+> +#define PHB_INB_ERR_INJECT              0xe10
+> +#define PHB_INB_ERR_LEM_ENABLE          0xe18
+> +#define PHB_INB_ERR_IRQ_ENABLE          0xe20
+> +#define PHB_INB_ERR_FREEZE_ENABLE       0xe28
+> +#define PHB_INB_ERR_AIB_FENCE_ENABLE    0xe30
+> +#define PHB_INB_ERR_LOG_0               0xe40
+> +#define PHB_INB_ERR_LOG_1               0xe48
+> +#define PHB_INB_ERR_STATUS_MASK         0xe50
+> +#define PHB_INB_ERR1_STATUS_MASK        0xe58
+> +
+> +/* Performance monitor & Debug registers */
+> +#define PHB_TRACE_CONTROL               0xf80
+> +#define PHB_PERFMON_CONFIG              0xf88
+> +#define PHB_PERFMON_CTR0                0xf90
+> +#define PHB_PERFMON_CTR1                0xf98
+> +#define PHB_PERFMON_CTR2                0xfa0
+> +#define PHB_PERFMON_CTR3                0xfa8
+> +#define PHB_HOTPLUG_OVERRIDE            0xfb0
+> +#define   PHB_HPOVR_FORCE_RESAMPLE      PPC_BIT(9)
+> +#define   PHB_HPOVR_PRESENCE_A          PPC_BIT(10)
+> +#define   PHB_HPOVR_PRESENCE_B          PPC_BIT(11)
+> +#define   PHB_HPOVR_LINK_ACTIVE         PPC_BIT(12)
+> +#define   PHB_HPOVR_LINK_BIFURCATED     PPC_BIT(13)
+> +#define   PHB_HPOVR_LINK_LANE_SWAPPED   PPC_BIT(14)
+> +
+> +/*
+> + * IODA2 on-chip tables
+> + */
+> +
+> +#define IODA2_TBL_LIST          1
+> +#define IODA2_TBL_LXIVT         2
+> +#define IODA2_TBL_IVC_CAM       3
+> +#define IODA2_TBL_RBA           4
+> +#define IODA2_TBL_RCAM          5
+> +#define IODA2_TBL_MRT           6
+> +#define IODA2_TBL_PESTA         7
+> +#define IODA2_TBL_PESTB         8
+> +#define IODA2_TBL_TVT           9
+> +#define IODA2_TBL_TCAM          10
+> +#define IODA2_TBL_TDR           11
+> +#define IODA2_TBL_M64BT         16
+> +#define IODA2_TBL_M32DT         17
+> +#define IODA2_TBL_PEEV          20
+> +
+> +/* LXIVT */
+> +#define IODA2_LXIVT_SERVER_MASK         PPC_BITMASK(8, 23)
+> +#define IODA2_LXIVT_SERVER_LSH          PPC_BITLSHIFT(23)
+> +#define IODA2_LXIVT_PRIORITY_MASK       PPC_BITMASK(24, 31)
+> +#define IODA2_LXIVT_PRIORITY_LSH        PPC_BITLSHIFT(31)
+> +#define IODA2_LXIVT_NODE_ID_MASK        PPC_BITMASK(56, 63)
+> +#define IODA2_LXIVT_NODE_ID_LSH         PPC_BITLSHIFT(63)
+> +
+> +/* IVT */
+> +#define IODA2_IVT_SERVER_MASK           PPC_BITMASK(0, 23)
+> +#define IODA2_IVT_SERVER_LSH            PPC_BITLSHIFT(23)
+> +#define IODA2_IVT_PRIORITY_MASK         PPC_BITMASK(24, 31)
+> +#define IODA2_IVT_PRIORITY_LSH          PPC_BITLSHIFT(31)
+> +#define IODA2_IVT_GEN_MASK              PPC_BITMASK(37, 38)
+> +#define IODA2_IVT_GEN_LSH               PPC_BITLSHIFT(38)
+> +#define IODA2_IVT_P_MASK                PPC_BITMASK(39, 39)
+> +#define IODA2_IVT_P_LSH                 PPC_BITLSHIFT(39)
+> +#define IODA2_IVT_Q_MASK                PPC_BITMASK(47, 47)
+> +#define IODA2_IVT_Q_LSH                 PPC_BITLSHIFT(47)
+> +#define IODA2_IVT_PE_MASK               PPC_BITMASK(48, 63)
+> +#define IODA2_IVT_PE_LSH                PPC_BITLSHIFT(63)
+> +
+> +/* TVT */
+> +#define IODA2_TVT_TABLE_ADDR_MASK       PPC_BITMASK(0, 47)
+> +#define IODA2_TVT_TABLE_ADDR_LSH        PPC_BITLSHIFT(47)
+> +#define IODA2_TVT_NUM_LEVELS_MASK       PPC_BITMASK(48, 50)
+> +#define IODA2_TVT_NUM_LEVELS_LSH        PPC_BITLSHIFT(50)
+> +#define   IODA2_TVE_1_LEVEL     0
+> +#define   IODA2_TVE_2_LEVELS    1
+> +#define   IODA2_TVE_3_LEVELS    2
+> +#define   IODA2_TVE_4_LEVELS    3
+> +#define   IODA2_TVE_5_LEVELS    4
+> +#define IODA2_TVT_TCE_TABLE_SIZE_MASK   PPC_BITMASK(51, 55)
+> +#define IODA2_TVT_TCE_TABLE_SIZE_LSH    PPC_BITLSHIFT(55)
+> +#define IODA2_TVT_IO_PSIZE_MASK         PPC_BITMASK(59, 63)
+> +#define IODA2_TVT_IO_PSIZE_LSH          PPC_BITLSHIFT(63)
+> +
+> +/* PESTA */
+> +#define IODA2_PESTA_MMIO_FROZEN         PPC_BIT(0)
+> +
+> +/* PESTB */
+> +#define IODA2_PESTB_DMA_STOPPED         PPC_BIT(0)
+> +
+> +/* M32DT */
+> +#define IODA2_M32DT_PE_MASK             PPC_BITMASK(8, 15)
+> +#define IODA2_M32DT_PE_LSH              PPC_BITLSHIFT(15)
+> +
+> +/* M64BT */
+> +#define IODA2_M64BT_ENABLE              PPC_BIT(0)
+> +#define IODA2_M64BT_SINGLE_PE           PPC_BIT(1)
+> +#define IODA2_M64BT_BASE_MASK           PPC_BITMASK(2, 31)
+> +#define IODA2_M64BT_BASE_LSH            PPC_BITLSHIFT(31)
+> +#define IODA2_M64BT_MASK_MASK           PPC_BITMASK(34, 63)
+> +#define IODA2_M64BT_MASK_LSH            PPC_BITLSHIFT(63)
+> +#define IODA2_M64BT_SINGLE_BASE_MASK    PPC_BITMASK(2, 26)
+> +#define IODA2_M64BT_SINGLE_BASE_LSH     PPC_BITLSHIFT(26)
+> +#define IODA2_M64BT_PE_HI_MASK          PPC_BITMASK(27, 31)
+> +#define IODA2_M64BT_PE_HI_LSH           PPC_BITLSHIFT(31)
+> +#define IODA2_M64BT_SINGLE_MASK_MASK    PPC_BITMASK(34, 58)
+> +#define IODA2_M64BT_SINGLE_MASK_LSH     PPC_BITLSHIFT(58)
+> +#define IODA2_M64BT_PE_LOW_MASK         PPC_BITMASK(59, 63)
+> +#define IODA2_M64BT_PE_LOW_LSH          PPC_BITLSHIFT(63)
+> +
+> +/*
+> + * IODA2 in-memory tables
+> + */
+> +
+> +/* PEST
+> + *
+> + * 2x8 bytes entries, PEST0 and PEST1
+> + */
+> +
+> +#define IODA2_PEST0_MMIO_CAUSE          PPC_BIT(2)
+> +#define IODA2_PEST0_CFG_READ            PPC_BIT(3)
+> +#define IODA2_PEST0_CFG_WRITE           PPC_BIT(4)
+> +#define IODA2_PEST0_TTYPE_MASK          PPC_BITMASK(5, 7)
+> +#define IODA2_PEST0_TTYPE_LSH           PPC_BITLSHIFT(7)
+> +#define   PEST_TTYPE_DMA_WRITE          0
+> +#define   PEST_TTYPE_MSI                1
+> +#define   PEST_TTYPE_DMA_READ           2
+> +#define   PEST_TTYPE_DMA_READ_RESP      3
+> +#define   PEST_TTYPE_MMIO_LOAD          4
+> +#define   PEST_TTYPE_MMIO_STORE         5
+> +#define   PEST_TTYPE_OTHER              7
+> +#define IODA2_PEST0_CA_RETURN           PPC_BIT(8)
+> +#define IODA2_PEST0_UTL_RTOS_TIMEOUT    PPC_BIT(8) /* Same bit as CA ret=
+urn */
+> +#define IODA2_PEST0_UR_RETURN           PPC_BIT(9)
+> +#define IODA2_PEST0_UTL_NONFATAL        PPC_BIT(10)
+> +#define IODA2_PEST0_UTL_FATAL           PPC_BIT(11)
+> +#define IODA2_PEST0_PARITY_UE           PPC_BIT(13)
+> +#define IODA2_PEST0_UTL_CORRECTABLE     PPC_BIT(14)
+> +#define IODA2_PEST0_UTL_INTERRUPT       PPC_BIT(15)
+> +#define IODA2_PEST0_MMIO_XLATE          PPC_BIT(16)
+> +#define IODA2_PEST0_IODA2_ERROR         PPC_BIT(16) /* Same bit as MMIO =
+xlate */
+> +#define IODA2_PEST0_TCE_PAGE_FAULT      PPC_BIT(18)
+> +#define IODA2_PEST0_TCE_ACCESS_FAULT    PPC_BIT(19)
+> +#define IODA2_PEST0_DMA_RESP_TIMEOUT    PPC_BIT(20)
+> +#define IODA2_PEST0_AIB_SIZE_INVALID    PPC_BIT(21)
+> +#define IODA2_PEST0_LEM_BIT_MASK        PPC_BITMASK(26, 31)
+> +#define IODA2_PEST0_LEM_BIT_LSH         PPC_BITLSHIFT(31)
+> +#define IODA2_PEST0_RID_MASK            PPC_BITMASK(32, 47)
+> +#define IODA2_PEST0_RID_LSH             PPC_BITLSHIFT(47)
+> +#define IODA2_PEST0_MSI_DATA_MASK       PPC_BITMASK(48, 63)
+> +#define IODA2_PEST0_MSI_DATA_LSH        PPC_BITLSHIFT(63)
+> +
+> +#define IODA2_PEST1_FAIL_ADDR_MASK      PPC_BITMASK(3, 63)
+> +#define IODA2_PEST1_FAIL_ADDR_LSH       PPC_BITLSHIFT(63)
+> +
+> +
+> +#endif /* PCI_HOST_PNV_PHB3_REGS_H */
+> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+> index b70a13bd4175..b6feff140cb0 100644
+> --- a/include/hw/ppc/pnv.h
+> +++ b/include/hw/ppc/pnv.h
+> @@ -25,6 +25,8 @@
+>  #include "hw/ppc/pnv_psi.h"
+>  #include "hw/ppc/pnv_occ.h"
+> =20
+> +typedef struct PnvPhb3State PnvPhb3State;
+> +
+>  #define TYPE_PNV_CHIP "powernv-chip"
+>  #define PNV_CHIP(obj) OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP)
+>  #define PNV_CHIP_CLASS(klass) \
+> @@ -61,6 +63,10 @@ typedef struct PnvChip {
+>      PnvLpcController lpc;
+>      PnvPsi       psi;
+>      PnvOCC       occ;
+> +
+> +    uint32_t     num_phbs;
+> +#define PNV_MAX_CHIP_PHB 4
+> +    PnvPhb3State *phbs[PNV_MAX_CHIP_PHB];
+>  } PnvChip;
+> =20
+>  typedef struct PnvChipClass {
+> diff --git a/include/hw/ppc/pnv_xscom.h b/include/hw/ppc/pnv_xscom.h
+> index 3757b2cab94b..731c2fff26e2 100644
+> --- a/include/hw/ppc/pnv_xscom.h
+> +++ b/include/hw/ppc/pnv_xscom.h
+> @@ -66,6 +66,15 @@ typedef struct PnvXScomInterfaceClass {
+>  #define PNV_XSCOM_OCC_BASE        0x0066000
+>  #define PNV_XSCOM_OCC_SIZE        0x6000
+> =20
+> +#define PNV_XSCOM_PBCQ_NEST_BASE  0x2012000
+> +#define PNV_XSCOM_PBCQ_NEST_SIZE  0x46
+> +
+> +#define PNV_XSCOM_PBCQ_PCI_BASE   0x9012000
+> +#define PNV_XSCOM_PBCQ_PCI_SIZE   0x15
+> +
+> +#define PNV_XSCOM_PBCQ_SPCI_BASE  0x9013c00
+> +#define PNV_XSCOM_PBCQ_SPCI_SIZE  0x5
+> +
+>  extern void pnv_xscom_realize(PnvChip *chip, Error **errp);
+>  extern int pnv_xscom_populate(PnvChip *chip, void *fdt, int offset);
+> =20
+> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> index e6699c917e24..eeee5abd86f5 100644
+> --- a/include/hw/ppc/xics.h
+> +++ b/include/hw/ppc/xics.h
+> @@ -190,6 +190,7 @@ void icp_set_mfrr(ICPState *icp, uint8_t mfrr);
+>  uint32_t icp_accept(ICPState *ss);
+>  uint32_t icp_ipoll(ICPState *ss, uint32_t *mfrr);
+>  void icp_eoi(ICPState *icp, uint32_t xirr);
+> +void icp_irq(ICSState *ics, int server, int nr, uint8_t priority);
+> =20
+>  void ics_simple_write_xive(ICSState *ics, int nr, int server,
+>                             uint8_t priority, uint8_t saved_priority);
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -217,25 +3001,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---VZEZlOQeSr/zV9d3
+--daC8KDjlMyCcZyAo
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJY6z9uAAoJEGw4ysog2bOSIZgQAIRPCLP6taiVUQgkQnMqBA5X
-GW1ZXYZT4ZwNdbhQjwO8UTO53Aa2TkAQbvogkH64sVJWzucJHHMuU4O4m6OxE3l3
-00gAUbTx0czdBcFIi7MtFJWM4/JKDhVv846QlnMuYrmH6SjpreuK9wJkKjTRktlW
-Bjoh/1a3YL0AWPwKeYbEVnnyH3zuvLzvlB44VLO26rGuZ4I5Wn9jHAtS0lOv9bhs
-V3TAy0BlLt04BNceQsweswmruSLeXmGxzh62Z6ogrJvJ98+dqIuDdxA/ZzVPlaso
-gONXnut+VuuIucvyyRigNjPaesHJosSOHQq/hrHR4Qkcf1SeiVGfuwDK3I0Z6wOO
-AyyGzdnPs5qQHOHA+iEUat+cFZ5Sf+30+zhy1lhNRYqZTb7tkTZRmijL53PURZQA
-F2mtgFBgP1VxbL5kAnm7vyBELbqE6SuXupssO7RH0TlxSwqCboSizYpYry1X8BLo
-IvZOLamOaCGbtjj8BNXn10G/8tdQB/xhyTgQDnoFnBYCDikXzkVqEQTrvocrYaFh
-ePsrseP560xfKUzcWBWKjnTXiUc0QbCx2zGADmfDaN0B/nkp1mRpYOX7yL0YpHHk
-FKHmLGQF+wqIL5HIvn1rZmQ5lQR862yOGpeEJJh9vCIB6LbqO/9N3N3OB6sf92G5
-2rdNgUuCfM5ZxPRR0gHQ
-=Y8B7
+iQIcBAEBCAAGBQJY6z7UAAoJEGw4ysog2bOSoUIP/iPApuofQZTIRat7oLedtCCo
+cu9yvgL8eLkkMWKonjtE1lqzf11G1rqcytr8RqhKRjbMK6AZM2O0t0SdQDbPfu9g
+R+mZ+qfIalXH1ltEM4TkmZwwOUvACsl0aQ8jdewXIP7MsQb4eqAJ4eRaLdPDiInr
+FmfL5gc7sgSSt339f0vbWnK/KpIwHPwSsVPSn7vuyQ329+86rFrJoruzQ5L99dxi
+ovWt97jmK2xQcvNY/sRjWvwzNiCduZQygCGXmESgtsMI22a+HTt3HB7nS7aIrNVH
+e0n9l40yd+z7cVwei1aKH8IFnDVdDYFBfNmAZuM3ha1pHD+JZpGWGWtgX2p9LwFW
+FOyXojohZqzE0bnqOItptXmH3fY4loxjgtPp7qBDb2SdHPscYOC9VkgBdLWb+Xbc
++9wE5BicKswusaRjFJ69cK8Db9pSgNVGNLlt4S361KXl2qRpRgEaWqz3q40gWRoX
+tyiOwO9zvGavRRJZ/OGNqIiz11cq3OYdPz1b4Ps2cew2g2uE4NkVCPhWOjIxDZYp
+GQ8pNeGhCdnn+UMre5F8dpZUNMMrWviUFeISZBGoLKHB4mYst3t59bBPS2phw9K7
+Dl3BlZ9gs2b/vd8G0aqeVE7zKgW1DQBcfpaSxydr4k1euiluIe8qjCxIld/J4B1L
+E1SPGrtxCwIhg1SR1Si5
+=iBau
 -----END PGP SIGNATURE-----
 
---VZEZlOQeSr/zV9d3--
+--daC8KDjlMyCcZyAo--
