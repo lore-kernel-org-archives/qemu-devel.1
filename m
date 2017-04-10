@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cxZxc-0006S9-EC
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 10:06:29 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cxaCI-0000fo-0M
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 10:21:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cxZxX-0005uu-G7
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 10:06:28 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:35697)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1cxZxX-0005fC-43
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 10:06:23 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170405151148.16363-5-stefanha@redhat.com>
-References: <20170405151148.16363-1-stefanha@redhat.com>
-	<20170405151148.16363-5-stefanha@redhat.com>
-Date: Mon, 10 Apr 2017 16:05:42 +0200
-Message-ID: <w51k26se4sp.fsf@maestria.local.igalia.com>
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cxaCE-0003NH-2G
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 10:21:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57246)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1cxaCD-0003N5-SY
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 10:21:33 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 06508C05678E
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 14:21:32 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Mon, 10 Apr 2017 16:21:12 +0200
+Message-Id: <20170410142112.11550-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 4/9] qcow2: make refcount size
- calculation conservative
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] test-keyval: fix leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,20 +31,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Nir Soffer <nsoffer@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On Wed 05 Apr 2017 05:11:43 PM CEST, Stefan Hajnoczi wrote:
-> The refcount metadata size calculation is inaccurate and can produce
-> numbers that are too small.  This is bad because we should calculate a
-> conservative number - one that is guaranteed to be large enough.
->
-> This patch switches the approach to a fixed point calculation because
-> the existing equation is hard to solve when inaccuracies are taken care
-> of.
->
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ tests/test-keyval.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-
-Berto
+diff --git a/tests/test-keyval.c b/tests/test-keyval.c
+index ba19560a22..141ee5d0c4 100644
+--- a/tests/test-keyval.c
++++ b/tests/test-keyval.c
+@@ -628,6 +628,7 @@ static void test_keyval_visit_alternate(void)
+     visit_type_AltNumStr(v, "a", &ans, &error_abort);
+     g_assert_cmpint(ans->type, =3D=3D, QTYPE_QSTRING);
+     g_assert_cmpstr(ans->u.s, =3D=3D, "1");
++    qapi_free_AltNumStr(ans);
+     visit_type_AltNumInt(v, "a", &ani, &err);
+     error_free_or_abort(&err);
+     visit_end_struct(v, NULL);
+@@ -649,11 +650,14 @@ static void test_keyval_visit_any(void)
+     visit_type_any(v, "a", &any, &error_abort);
+     qlist =3D qobject_to_qlist(any);
+     g_assert(qlist);
++    qobject_decref(any);
+     qstr =3D qobject_to_qstring(qlist_pop(qlist));
+     g_assert_cmpstr(qstring_get_str(qstr), =3D=3D, "null");
++    QDECREF(qstr);
+     qstr =3D qobject_to_qstring(qlist_pop(qlist));
+     g_assert_cmpstr(qstring_get_str(qstr), =3D=3D, "1");
+     g_assert(qlist_empty(qlist));
++    QDECREF(qstr);
+     visit_check_struct(v, &error_abort);
+     visit_end_struct(v, NULL);
+     visit_free(v);
+--=20
+2.12.0.191.gc5d8de91d
