@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53106)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cxV8m-0006NB-VS
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:57:41 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cxV9J-0006dN-CD
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:58:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cxV8i-0000pL-4L
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:57:41 -0400
-Date: Mon, 10 Apr 2017 09:57:28 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170410085728.GB2567@stefanha-x1.localdomain>
-References: <20170321031635.22123-1-famz@redhat.com>
-	<20170321031635.22123-5-famz@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cxV9I-00011O-MX
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:58:13 -0400
+Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:33830)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cxV9I-00010y-F2
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:58:12 -0400
+Received: by mail-wr0-x235.google.com with SMTP id z109so3972747wrb.1
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 01:58:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="0eh6TmSyL6TZE2Uz"
-Content-Disposition: inline
-In-Reply-To: <20170321031635.22123-5-famz@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC 04/16] block: Propagate
- BLK_PERM_AIO_CONTEXT_CHANGE down the graph
+In-Reply-To: <20170410084456.GB19103@toto>
+References: <1491486152-24304-1-git-send-email-peter.maydell@linaro.org>
+	<20170410084456.GB19103@toto>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 10 Apr 2017 09:57:50 +0100
+Message-ID: <CAFEAcA-W_OGF7zjzZmPDBT+t2CKziyW-01VJxStfcxjr3Rfnww@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Add assertion about FSC format
+ for syndrome registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,69 +30,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, "patches@linaro.org" <patches@linaro.org>
 
+On 10 April 2017 at 09:44, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
+> Have you seen something suspicous when running code or was
+> this a theoretical issue?
 
---0eh6TmSyL6TZE2Uz
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+No, I was looking at the code for a different reason and
+was surprised that the syndrome-generation code wasn't doing
+anything to handle short-format FSRs. I started out thinking
+that this was just a corner case we'd forgotten since it
+only affects AArch32 guests (and even wrote some code to do
+short-to-long status code conversion), but after some thought
+I realised that it's not possible to get to a point where
+we would need the syndrome after such a fault. It's a
+tricky enough point that it seems worth having an assert
+and some comments to assure future readers that it isn't
+just something we forgot to handle...
 
-On Tue, Mar 21, 2017 at 11:16:23AM +0800, Fam Zheng wrote:
-> @@ -1713,21 +1714,22 @@ void bdrv_format_default_perms(BlockDriverState *=
-bs, BdrvChild *c,
->          perm |=3D BLK_PERM_CONSISTENT_READ;
->          shared &=3D ~(BLK_PERM_WRITE | BLK_PERM_RESIZE);
->      } else {
-> -        /* We want consistent read from backing files if the parent need=
-s it.
-> +        /* We want consistent read and aio context change from backing f=
-iles if
-> +         * the parent needs it.
->           * No other operations are performed on backing files. */
-> -        perm &=3D BLK_PERM_CONSISTENT_READ;
-> +        perm &=3D BLK_PERM_CONSISTENT_READ | BLK_PERM_AIO_CONTEXT_CHANGE;
-> =20
-> -        /* If the parent can deal with changing data, we're okay with a
-> +        /* If the parent can deal with changing aio context, we're okay =
-too;
-> +         * If the parent can deal with changing data, we're okay with a
->           * writable and resizable backing file. */
->          /* TODO Require !(perm & BLK_PERM_CONSISTENT_READ), too? */
-> +        shared &=3D BLK_PERM_AIO_CONTEXT_CHANGE | BLK_PERM_WRITE;
->          if (shared & BLK_PERM_WRITE) {
-> -            shared =3D BLK_PERM_WRITE | BLK_PERM_RESIZE;
-> -        } else {
-> -            shared =3D 0;
-> +            shared |=3D BLK_PERM_WRITE | BLK_PERM_RESIZE;
-
-We already have BLK_PERM_WRITE so we're just adding BLK_PERM_RESIZE.
-The following is clearer:
-
-  shared |=3D BLK_PERM_RESIZE;
-
->          }
-> =20
->          shared |=3D BLK_PERM_CONSISTENT_READ | BLK_PERM_GRAPH_MOD |
-> -                  BLK_PERM_WRITE_UNCHANGED;
-> +                  BLK_PERM_WRITE_UNCHANGED | BLK_PERM_AIO_CONTEXT_CHANGE;
-
-Why was shared &=3D BLK_PERM_AIO_CONTEXT_CHANGE necessary above if we
-unconditionally OR it here?
-
---0eh6TmSyL6TZE2Uz
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJY60j4AAoJEJykq7OBq3PIAmQIALJynocEvzXDC3QpL3UDkQJQ
-fLhKB/SxoIaA1OijRP7BBWvWWm+k+4IvfJ3NUyxoHQBU5Fy/Z7ubMByCw8Mvd7Xa
-9hA8CgXfeCK8SuYDztj2cAcV3UYbmMMcHWW1e369MVVXHhm7913pz4MQJPeti934
-pVKMY495xx3gJDpEa/Wt3l+Vi33LjUEOhBZSuObFXA5ee0UfZFU/0AjA3Qwsc4BE
-dTBDiw5mmaNKdhsh6N8j0Sd1hPDB3Hoi8hyCA4xy1gRylmM/RMA3fdBwP98gGEIf
-8gw2EB9rnGulfUQecIbiUXaWOXKktYhfOuPU5+ptun4FV/jMPpv+pQkCFsay7lY=
-=R7gA
------END PGP SIGNATURE-----
-
---0eh6TmSyL6TZE2Uz--
+thanks
+-- PMM
