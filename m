@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41891)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cxUBu-0002bt-HR
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:56:51 -0400
+	(envelope-from <kwolf@redhat.com>) id 1cxULM-0003oR-PH
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:06:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cxUBr-0003IJ-GK
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:56:50 -0400
-Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:34968)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cxUBr-0003Hy-9h
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 03:56:47 -0400
-Received: by mail-wr0-x22a.google.com with SMTP id o21so114527294wrb.2
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 00:56:47 -0700 (PDT)
-References: <20170410060655.32289-1-nikunj@linux.vnet.ibm.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170410060655.32289-1-nikunj@linux.vnet.ibm.com>
-Date: Mon, 10 Apr 2017 08:56:52 +0100
-Message-ID: <87inmck857.fsf@linaro.org>
+	(envelope-from <kwolf@redhat.com>) id 1cxULL-0005t2-RK
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 04:06:36 -0400
+Date: Mon, 10 Apr 2017 10:06:21 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170410080621.GB4883@noname.redhat.com>
+References: <20170407065414.9143-1-famz@redhat.com>
+	<20170407065414.9143-5-famz@redhat.com>
+	<20170407125051.GB16146@stefanha-x1.localdomain>
+	<20170408034351.GC6548@lemon>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH fix for-2.9] cpus: fix wrong define name
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170408034351.GC6548@lemon>
+Subject: Re: [Qemu-devel] [PATCH v2 4/6] block: Quiesce old aio context
+ during bdrv_set_aio_context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +26,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, rth@twiddle.net, pbonzini@redhat.com, crosthwaite.peter@gmail.com, david@gibson.dropbear.id.au
+To: Fam Zheng <famz@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
+Am 08.04.2017 um 05:43 hat Fam Zheng geschrieben:
+> On Fri, 04/07 13:50, Stefan Hajnoczi wrote:
+> > On Fri, Apr 07, 2017 at 02:54:12PM +0800, Fam Zheng wrote:
+> > > @@ -4413,6 +4416,10 @@ void bdrv_set_aio_context(BlockDriverState *bs, AioContext *new_context)
+> > >      aio_context_acquire(new_context);
+> > >      bdrv_attach_aio_context(bs, new_context);
+> > >      aio_context_release(new_context);
+> > > +    if (bs->job) {
+> > > +        block_job_resume(bs->job);
+> > > +    }
+> > 
+> > Should this be called before aio_context_release(new_context)?
+> 
+> Yes, and I'm going to replace it with bdrv_parent_drained_begin() as Kevin
+> suggested.
 
-Nikunj A Dadhania <nikunj@linux.vnet.ibm.com> writes:
+I think at the moment bdrv_parent_drained_begin() can't replace it yet,
+but you need both.
 
-> While the configure script generates TARGET_SUPPORTS_MTTCG define, one
-> of the define is cpus.c is checking wrong name: TARGET_SUPPORT_MTTCG
->
-> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-> ---
->  cpus.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/cpus.c b/cpus.c
-> index 68fdbc4..58d90aa 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -202,7 +202,7 @@ void qemu_tcg_configure(QemuOpts *opts, Error **errp)
->              } else if (use_icount) {
->                  error_setg(errp, "No MTTCG when icount is enabled");
->              } else {
-> -#ifndef TARGET_SUPPORT_MTTCG
-> +#ifndef TARGET_SUPPORTS_MTTCG
->                  error_report("Guest not yet converted to MTTCG - "
->                               "you may get unexpected results");
->  #endif
-
-Opps that's embarrassing.
-
-Applied to my tree, I'll be sending a pullreq today
-
---
-Alex Bennée
+Kevin
