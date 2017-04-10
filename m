@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cxXXo-0006i6-Sh
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 07:31:42 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cxXbS-0008Eg-Jb
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 07:35:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cxXXl-0008U6-Op
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 07:31:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49526)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cxXXl-0008U1-GG
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 07:31:37 -0400
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 10 Apr 2017 13:31:31 +0200
-Message-Id: <20170410113131.2585-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v3] qxl: add migration blocker to avoid
- pre-save assert
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cxXbP-0000oH-GP
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 07:35:26 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1491821097-5647-1-git-send-email-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <00c1e3ee-63fe-92e7-b5ca-1c7e08a59089@amsat.org>
+Date: Mon, 10 Apr 2017 08:35:17 -0300
+MIME-Version: 1.0
+In-Reply-To: <1491821097-5647-1-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] arm: Move excnames[] array into
+ arm_log_exceptions()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,83 +27,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, 1635339@bugs.launchpad.net
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-Cc: 1635339@bugs.launchpad.net
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/display/qxl.h |  1 +
- hw/display/qxl.c | 31 +++++++++++++++++++++++++++++++
- 2 files changed, 32 insertions(+)
+On 04/10/2017 07:44 AM, Peter Maydell wrote:
+> The excnames[] array is defined in internals.h because we used
+> to use it from two different source files for handling logging
+> of AArch32 and AArch64 exception entry. Refactoring means that
+> it's now used only in arm_log_exception() in helper.c, so move
+> the array into that function.
+>
+> Suggested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-diff --git a/hw/display/qxl.h b/hw/display/qxl.h
-index d2d49dd..77e5a36 100644
---- a/hw/display/qxl.h
-+++ b/hw/display/qxl.h
-@@ -40,6 +40,7 @@ typedef struct PCIQXLDevice {
-     uint32_t           cmdlog;
- 
-     uint32_t           guest_bug;
-+    Error              *migration_blocker;
- 
-     enum qxl_mode      mode;
-     uint32_t           cmdflags;
-diff --git a/hw/display/qxl.c b/hw/display/qxl.c
-index c31b293..9feae78 100644
---- a/hw/display/qxl.c
-+++ b/hw/display/qxl.c
-@@ -26,6 +26,7 @@
- #include "qemu/queue.h"
- #include "qemu/atomic.h"
- #include "sysemu/sysemu.h"
-+#include "migration/migration.h"
- #include "trace.h"
- 
- #include "qxl.h"
-@@ -639,6 +640,30 @@ static int interface_get_command(QXLInstance *sin, struct QXLCommandExt *ext)
-         qxl->guest_primary.commands++;
-         qxl_track_command(qxl, ext);
-         qxl_log_command(qxl, "cmd", ext);
-+        {
-+            /*
-+             * Windows 8 drivers place qxl commands in the vram
-+             * (instead of the ram) bar.  We can't live migrate such a
-+             * guest, so add a migration blocker in case we detect
-+             * this, to avoid triggering the assert in pre_save().
-+             *
-+             * https://cgit.freedesktop.org/spice/win32/qxl-wddm-dod/commit/?id=f6e099db39e7d0787f294d5fd0dce328b5210faa
-+             */
-+            void *msg = qxl_phys2virt(qxl, ext->cmd.data, ext->group_id);
-+            if (msg != NULL && (
-+                    msg < (void *)qxl->vga.vram_ptr ||
-+                    msg > ((void *)qxl->vga.vram_ptr + qxl->vga.vram_size))) {
-+                if (!qxl->migration_blocker) {
-+                    Error *local_err = NULL;
-+                    error_setg(&qxl->migration_blocker,
-+                               "qxl: guest bug: command not in ram bar");
-+                    migrate_add_blocker(qxl->migration_blocker, &local_err);
-+                    if (local_err) {
-+                        error_report_err(local_err);
-+                    }
-+                }
-+            }
-+        }
-         trace_qxl_ring_command_get(qxl->id, qxl_mode_to_string(qxl->mode));
-         return true;
-     default:
-@@ -1236,6 +1261,12 @@ static void qxl_hard_reset(PCIQXLDevice *d, int loadvm)
-     qemu_spice_create_host_memslot(&d->ssd);
-     qxl_soft_reset(d);
- 
-+    if (d->migration_blocker) {
-+        migrate_del_blocker(d->migration_blocker);
-+        error_free(d->migration_blocker);
-+        d->migration_blocker = NULL;
-+    }
-+
-     if (startstop) {
-         qemu_spice_display_start();
-     }
--- 
-2.9.3
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+>  target/arm/cpu.h       |  2 +-
+>  target/arm/internals.h | 23 -----------------------
+>  target/arm/helper.c    | 19 +++++++++++++++++++
+>  3 files changed, 20 insertions(+), 24 deletions(-)
+>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index e6f05e2..ab86943 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -58,7 +58,7 @@
+>  #define EXCP_SEMIHOST       16   /* semihosting call */
+>  #define EXCP_NOCP           17   /* v7M NOCP UsageFault */
+>  #define EXCP_INVSTATE       18   /* v7M INVSTATE UsageFault */
+> -/* NB: new EXCP_ defines should be added to the excnames[] array too */
+> +/* NB: add new EXCP_ defines to the array in arm_log_exception() too */
+>
+>  #define ARMV7M_EXCP_RESET   1
+>  #define ARMV7M_EXCP_NMI     2
+> diff --git a/target/arm/internals.h b/target/arm/internals.h
+> index 97ca034..1f6efef 100644
+> --- a/target/arm/internals.h
+> +++ b/target/arm/internals.h
+> @@ -51,29 +51,6 @@ static inline bool excp_is_internal(int excp)
+>          || excp == EXCP_SEMIHOST;
+>  }
+>
+> -/* Exception names for debug logging; note that not all of these
+> - * precisely correspond to architectural exceptions.
+> - */
+> -static const char * const excnames[] = {
+> -    [EXCP_UDEF] = "Undefined Instruction",
+> -    [EXCP_SWI] = "SVC",
+> -    [EXCP_PREFETCH_ABORT] = "Prefetch Abort",
+> -    [EXCP_DATA_ABORT] = "Data Abort",
+> -    [EXCP_IRQ] = "IRQ",
+> -    [EXCP_FIQ] = "FIQ",
+> -    [EXCP_BKPT] = "Breakpoint",
+> -    [EXCP_EXCEPTION_EXIT] = "QEMU v7M exception exit",
+> -    [EXCP_KERNEL_TRAP] = "QEMU intercept of kernel commpage",
+> -    [EXCP_HVC] = "Hypervisor Call",
+> -    [EXCP_HYP_TRAP] = "Hypervisor Trap",
+> -    [EXCP_SMC] = "Secure Monitor Call",
+> -    [EXCP_VIRQ] = "Virtual IRQ",
+> -    [EXCP_VFIQ] = "Virtual FIQ",
+> -    [EXCP_SEMIHOST] = "Semihosting call",
+> -    [EXCP_NOCP] = "v7M NOCP UsageFault",
+> -    [EXCP_INVSTATE] = "v7M INVSTATE UsageFault",
+> -};
+> -
+>  /* Scale factor for generic timers, ie number of ns per tick.
+>   * This gives a 62.5MHz timer.
+>   */
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 8cb7a94..8a3e448 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -6271,6 +6271,25 @@ static void arm_log_exception(int idx)
+>  {
+>      if (qemu_loglevel_mask(CPU_LOG_INT)) {
+>          const char *exc = NULL;
+> +        static const char * const excnames[] = {
+> +            [EXCP_UDEF] = "Undefined Instruction",
+> +            [EXCP_SWI] = "SVC",
+> +            [EXCP_PREFETCH_ABORT] = "Prefetch Abort",
+> +            [EXCP_DATA_ABORT] = "Data Abort",
+> +            [EXCP_IRQ] = "IRQ",
+> +            [EXCP_FIQ] = "FIQ",
+> +            [EXCP_BKPT] = "Breakpoint",
+> +            [EXCP_EXCEPTION_EXIT] = "QEMU v7M exception exit",
+> +            [EXCP_KERNEL_TRAP] = "QEMU intercept of kernel commpage",
+> +            [EXCP_HVC] = "Hypervisor Call",
+> +            [EXCP_HYP_TRAP] = "Hypervisor Trap",
+> +            [EXCP_SMC] = "Secure Monitor Call",
+> +            [EXCP_VIRQ] = "Virtual IRQ",
+> +            [EXCP_VFIQ] = "Virtual FIQ",
+> +            [EXCP_SEMIHOST] = "Semihosting call",
+> +            [EXCP_NOCP] = "v7M NOCP UsageFault",
+> +            [EXCP_INVSTATE] = "v7M INVSTATE UsageFault",
+> +        };
+>
+>          if (idx >= 0 && idx < ARRAY_SIZE(excnames)) {
+>              exc = excnames[idx];
+>
