@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cxWfm-0006Wg-7L
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:35:51 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1cxWk1-0000C6-AL
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:40:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cxWfk-0004Xs-N3
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:35:50 -0400
-Received: from mail-lf0-x229.google.com ([2a00:1450:4010:c07::229]:33855)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cxWfk-0004XU-9L
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:35:48 -0400
-Received: by mail-lf0-x229.google.com with SMTP id z15so68255344lfd.1
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 03:35:48 -0700 (PDT)
-MIME-Version: 1.0
-References: <20170410102746.24889-1-kraxel@redhat.com>
-In-Reply-To: <20170410102746.24889-1-kraxel@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 10 Apr 2017 10:35:36 +0000
-Message-ID: <CAJ+F1C+0rfVXxfXNRLkXx0qeE1u3jrH27kEQ7Ty3niTq1aSwaA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] qxl: add migration blocker to avoid
- pre-save assert
+	(envelope-from <pm215@archaic.org.uk>) id 1cxWjw-00069e-PV
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 06:40:13 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 10 Apr 2017 11:39:48 +0100
+Message-Id: <1491820793-5348-3-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1491820793-5348-1-git-send-email-peter.maydell@linaro.org>
+References: <1491820793-5348-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 2/7] arm: Thumb shift operations should not
+ permit interworking branches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,102 +20,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: 1635339@bugs.launchpad.net
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>
 
-Hi
+In Thumb mode, the only instructions which can cause an interworking
+branch by writing the PC are BLX, BX, BXJ, LDR, POP and LDM. Unlike
+ARM mode, data processing instructions which target the PC do not
+cause interworking branches.
 
-On Mon, Apr 10, 2017 at 12:27 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
+When we added support for doing interworking branches on writes to
+PC from data processing instructions in commit 21aeb3430ce7ba, we
+accidentally changed a Thumb instruction to have interworking
+branch behaviour for writes to PC. (MOV, MOVS register-shifted
+register, encoding T2; this is the standard encoding for
+LSL/LSR/ASR/ROR (register).)
 
-> Cc: 1635339@bugs.launchpad.net
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
->
+For this encoding, behaviour with Rd == R15 is specified as
+UNPREDICTABLE, so allowing an interworking branch is within
+spec, but it's confusing and differs from our handling of this
+class of UNPREDICTABLE for other Thumb ALU operations. Make
+it perform a simple (non-interworking) branch like the others.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
->  hw/display/qxl.h |  1 +
->  hw/display/qxl.c | 28 ++++++++++++++++++++++++++++
->  2 files changed, 29 insertions(+)
->
-> diff --git a/hw/display/qxl.h b/hw/display/qxl.h
-> index d2d49dd..77e5a36 100644
-> --- a/hw/display/qxl.h
-> +++ b/hw/display/qxl.h
-> @@ -40,6 +40,7 @@ typedef struct PCIQXLDevice {
->      uint32_t           cmdlog;
->
->      uint32_t           guest_bug;
-> +    Error              *migration_blocker;
->
->      enum qxl_mode      mode;
->      uint32_t           cmdflags;
-> diff --git a/hw/display/qxl.c b/hw/display/qxl.c
-> index c31b293..c1f830c 100644
-> --- a/hw/display/qxl.c
-> +++ b/hw/display/qxl.c
-> @@ -26,6 +26,7 @@
->  #include "qemu/queue.h"
->  #include "qemu/atomic.h"
->  #include "sysemu/sysemu.h"
-> +#include "migration/migration.h"
->  #include "trace.h"
->
->  #include "qxl.h"
-> @@ -639,6 +640,27 @@ static int interface_get_command(QXLInstance *sin,
-> struct QXLCommandExt *ext)
->          qxl->guest_primary.commands++;
->          qxl_track_command(qxl, ext);
->          qxl_log_command(qxl, "cmd", ext);
-> +        {
-> +            /*
-> +             * Windows 8 drivers place qxl commands in the vram
-> +             * (instead of the ram) bar.  We can't live migrate such a
-> +             * guest, so add a migration blocker in case we detect
-> +             * this, to avoid triggering the assert in pre_save().
-> +             *
-> +             *
-> https://cgit.freedesktop.org/spice/win32/qxl-wddm-dod/commit/?id=3Df6e099=
-db39e7d0787f294d5fd0dce328b5210faa
-> +             */
-> +            void *msg =3D qxl_phys2virt(qxl, ext->cmd.data, ext->group_i=
-d);
-> +            if (msg !=3D NULL && (
-> +                    msg < (void *)qxl->vga.vram_ptr ||
-> +                    msg > ((void *)qxl->vga.vram_ptr +
-> qxl->vga.vram_size))) {
-> +                if (!qxl->migration_blocker) {
-> +                    Error *local_err =3D NULL;
-> +                    error_setg(&qxl->migration_blocker,
-> +                               "qxl: guest bug: command not in ram bar")=
-;
-> +                    migrate_add_blocker(qxl->migration_blocker,
-> &local_err);
->
+ target/arm/translate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-What do you do with the local_err? error_report_err() perhaps ?
-
-
-> +                }
-> +            }
-> +        }
->          trace_qxl_ring_command_get(qxl->id,
-> qxl_mode_to_string(qxl->mode));
->          return true;
->      default:
-> @@ -1236,6 +1258,12 @@ static void qxl_hard_reset(PCIQXLDevice *d, int
-> loadvm)
->      qemu_spice_create_host_memslot(&d->ssd);
->      qxl_soft_reset(d);
->
-> +    if (d->migration_blocker) {
-> +        migrate_del_blocker(d->migration_blocker);
-> +        error_free(d->migration_blocker);
-> +        d->migration_blocker =3D NULL;
-> +    }
-> +
->      if (startstop) {
->          qemu_spice_display_start();
->      }
-> --
-> 2.9.3
->
-> --
-Marc-Andr=C3=A9 Lureau
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index fe3f442..ddc62b6 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -9959,7 +9959,7 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
+             gen_arm_shift_reg(tmp, op, tmp2, logic_cc);
+             if (logic_cc)
+                 gen_logic_CC(tmp);
+-            store_reg_bx(s, rd, tmp);
++            store_reg(s, rd, tmp);
+             break;
+         case 1: /* Sign/zero extend.  */
+             op = (insn >> 20) & 7;
+-- 
+2.7.4
