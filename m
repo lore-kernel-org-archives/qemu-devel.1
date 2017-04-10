@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cxdCg-0000oF-HB
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 13:34:15 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1cxdCh-0000pA-55
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 13:34:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cxdCf-0006tP-CS
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 13:34:14 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1cxdCg-0006u1-8R
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 13:34:15 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Apr 2017 18:13:39 +0100
-Message-Id: <1491844419-12485-10-git-send-email-peter.maydell@linaro.org>
+Date: Mon, 10 Apr 2017 18:13:33 +0100
+Message-Id: <1491844419-12485-4-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1491844419-12485-1-git-send-email-peter.maydell@linaro.org>
 References: <1491844419-12485-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 9/9] arm: Remove workarounds for old
- M-profile exception return implementation
+Subject: [Qemu-devel] [PATCH v2 3/9] arm: Factor out "generate right kind of
+ step exception"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,110 +26,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-Now that we've rewritten M-profile exception return so that the magic
-PC values are not visible to other parts of QEMU, we can delete the
-special casing of them elsewhere.
+We currently have two places that do:
+            if (dc->ss_active) {
+                gen_step_complete_exception(dc);
+            } else {
+                gen_exception_internal(EXCP_DEBUG);
+            }
+
+Factor this out into its own function, as we're about to add
+a third place that needs the same logic.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- target/arm/cpu.c       | 43 ++-----------------------------------------
- target/arm/translate.c |  8 --------
- 2 files changed, 2 insertions(+), 49 deletions(-)
+ target/arm/translate.c | 28 ++++++++++++++++------------
+ 1 file changed, 16 insertions(+), 12 deletions(-)
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 04b062c..b357aee 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -304,33 +304,6 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
- }
- 
- #if !defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64)
--static void arm_v7m_unassigned_access(CPUState *cpu, hwaddr addr,
--                                      bool is_write, bool is_exec, int opaque,
--                                      unsigned size)
--{
--    ARMCPU *arm = ARM_CPU(cpu);
--    CPUARMState *env = &arm->env;
--
--    /* ARMv7-M interrupt return works by loading a magic value into the PC.
--     * On real hardware the load causes the return to occur.  The qemu
--     * implementation performs the jump normally, then does the exception
--     * return by throwing a special exception when when the CPU tries to
--     * execute code at the magic address.
--     */
--    if (env->v7m.exception != 0 && addr >= 0xfffffff0 && is_exec) {
--        cpu->exception_index = EXCP_EXCEPTION_EXIT;
--        cpu_loop_exit(cpu);
--    }
--
--    /* In real hardware an attempt to access parts of the address space
--     * with nothing there will usually cause an external abort.
--     * However our QEMU board models are often missing device models where
--     * the guest can boot anyway with the default read-as-zero/writes-ignored
--     * behaviour that you get without a QEMU unassigned_access hook.
--     * So just return here to retain that default behaviour.
--     */
--}
--
- static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
- {
-     CPUClass *cc = CPU_GET_CLASS(cs);
-@@ -338,17 +311,7 @@ static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-     CPUARMState *env = &cpu->env;
-     bool ret = false;
- 
--    /* ARMv7-M interrupt return works by loading a magic value
--     * into the PC.  On real hardware the load causes the
--     * return to occur.  The qemu implementation performs the
--     * jump normally, then does the exception return when the
--     * CPU tries to execute code at the magic address.
--     * This will cause the magic PC value to be pushed to
--     * the stack if an interrupt occurred at the wrong time.
--     * We avoid this by disabling interrupts when
--     * pc contains a magic address.
--     *
--     * ARMv7-M interrupt masking works differently than -A or -R.
-+    /* ARMv7-M interrupt masking works differently than -A or -R.
-      * There is no FIQ/IRQ distinction. Instead of I and F bits
-      * masking FIQ and IRQ interrupts, an exception is taken only
-      * if it is higher priority than the current execution priority
-@@ -356,8 +319,7 @@ static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-      * currently active exception).
-      */
-     if (interrupt_request & CPU_INTERRUPT_HARD
--        && (armv7m_nvic_can_take_pending_exception(env->nvic))
--        && (env->regs[15] < 0xfffffff0)) {
-+        && (armv7m_nvic_can_take_pending_exception(env->nvic))) {
-         cs->exception_index = EXCP_IRQ;
-         cc->do_interrupt(cs);
-         ret = true;
-@@ -1091,7 +1053,6 @@ static void arm_v7m_class_init(ObjectClass *oc, void *data)
-     cc->do_interrupt = arm_v7m_cpu_do_interrupt;
- #endif
- 
--    cc->do_unassigned_access = arm_v7m_unassigned_access;
-     cc->cpu_exec_interrupt = arm_v7m_cpu_exec_interrupt;
- }
- 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 1e8b0a8..6968f73 100644
+index ddc62b6..870e320 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -11927,14 +11927,6 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
-             dc->is_jmp = DISAS_EXC;
-             break;
-         }
--#else
--        if (arm_dc_feature(dc, ARM_FEATURE_M)) {
--            /* Branches to the magic exception-return addresses should
--             * already have been caught via the arm_v7m_unassigned_access hook,
--             * and never get here.
--             */
--            assert(dc->pc < 0xfffffff0);
--        }
- #endif
+@@ -296,6 +296,19 @@ static void gen_step_complete_exception(DisasContext *s)
+     s->is_jmp = DISAS_EXC;
+ }
  
-         if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
++static void gen_singlestep_exception(DisasContext *s)
++{
++    /* Generate the right kind of exception for singlestep, which is
++     * either the architectural singlestep or EXCP_DEBUG for QEMU's
++     * gdb singlestepping.
++     */
++    if (s->ss_active) {
++        gen_step_complete_exception(s);
++    } else {
++        gen_exception_internal(EXCP_DEBUG);
++    }
++}
++
+ static void gen_smul_dual(TCGv_i32 a, TCGv_i32 b)
+ {
+     TCGv_i32 tmp1 = tcg_temp_new_i32();
+@@ -11998,24 +12011,15 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
+             gen_set_pc_im(dc, dc->pc);
+             /* fall through */
+         default:
+-            if (dc->ss_active) {
+-                gen_step_complete_exception(dc);
+-            } else {
+-                /* FIXME: Single stepping a WFI insn will not halt
+-                   the CPU.  */
+-                gen_exception_internal(EXCP_DEBUG);
+-            }
++            /* FIXME: Single stepping a WFI insn will not halt the CPU. */
++            gen_singlestep_exception(dc);
+         }
+         if (dc->condjmp) {
+             /* "Condition failed" instruction codepath. */
+             gen_set_label(dc->condlabel);
+             gen_set_condexec(dc);
+             gen_set_pc_im(dc, dc->pc);
+-            if (dc->ss_active) {
+-                gen_step_complete_exception(dc);
+-            } else {
+-                gen_exception_internal(EXCP_DEBUG);
+-            }
++            gen_singlestep_exception(dc);
+         }
+     } else {
+         /* While branches must always occur at the end of an IT block,
 -- 
 2.7.4
