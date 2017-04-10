@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cxYqr-0002UE-Ry
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 08:55:27 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1cxYqt-0002Uw-Ep
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 08:55:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cxYqn-00036s-Mb
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 08:55:25 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:33355)
+	(envelope-from <alex.bennee@linaro.org>) id 1cxYqs-0003AF-MH
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 08:55:27 -0400
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:38615)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cxYqn-00035g-GK
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 08:55:21 -0400
-Received: by mail-wr0-x234.google.com with SMTP id l28so18756218wre.0
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 05:55:19 -0700 (PDT)
+	id 1cxYqs-00039I-Gi
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 08:55:26 -0400
+Received: by mail-wm0-x231.google.com with SMTP id t189so36722602wmt.1
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 05:55:26 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 10 Apr 2017 13:55:14 +0100
-Message-Id: <20170410125524.21008-2-alex.bennee@linaro.org>
+Date: Mon, 10 Apr 2017 13:55:23 +0100
+Message-Id: <20170410125524.21008-11-alex.bennee@linaro.org>
 In-Reply-To: <20170410125524.21008-1-alex.bennee@linaro.org>
 References: <20170410125524.21008-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 01/11] scripts/qemugdb/mtree.py: fix up mtree
- dump
+Subject: [Qemu-devel] [PULL 10/11] cpus: call cpu_update_icount on read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +30,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-Since QEMU has been able to build with native Int128 support this was
-broken as it attempts to fish values out of the non-existent
-structure. Also the alias print was trying to make a %x out of
-gdb.ValueType directly which didn't seem to work.
+This ensures each time the vCPU thread reads the icount we update the
+master timer_state.qemu_icount field. This way as long as updates are
+in BQL protected sections (which they should be) the main-loop can
+never come to update the log and find time has gone backwards.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-diff --git a/scripts/qemugdb/mtree.py b/scripts/qemugdb/mtree.py
-index cc8131c2e7..e6791b7885 100644
---- a/scripts/qemugdb/mtree.py
-+++ b/scripts/qemugdb/mtree.py
-@@ -21,7 +21,15 @@ def isnull(ptr):
-     return ptr == gdb.Value(0).cast(ptr.type)
+diff --git a/cpus.c b/cpus.c
+index 9c8bd2c991..740b8dc3f8 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -253,19 +253,21 @@ void cpu_update_icount(CPUState *cpu)
  
- def int128(p):
--    return int(p['lo']) + (int(p['hi']) << 64)
-+    '''Read an Int128 type to a python integer.
-+
-+    QEMU can be built with native Int128 support so we need to detect
-+    if the value is a structure or the native type.
-+    '''
-+    if p.type.code == gdb.TYPE_CODE_STRUCT:
-+        return int(p['lo']) + (int(p['hi']) << 64)
-+    else:
-+        return int(("%s" % p), 16)
+ int64_t cpu_get_icount_raw(void)
+ {
+-    int64_t icount;
+     CPUState *cpu = current_cpu;
  
- class MtreeCommand(gdb.Command):
-     '''Display the memory tree hierarchy'''
-@@ -69,7 +77,7 @@ class MtreeCommand(gdb.Command):
-             gdb.write('%s    alias: %s@%016x (@ %s)\n' %
-                       ('  ' * level,
-                        alias['name'].string(),
--                       ptr['alias_offset'],
-+                       int(ptr['alias_offset']),
-                        alias,
-                        ),
-                       gdb.STDOUT)
+-    icount = atomic_read(&timers_state.qemu_icount);
+     if (cpu && cpu->running) {
+         if (!cpu->can_do_io) {
+             fprintf(stderr, "Bad icount read\n");
+             exit(1);
+         }
+         /* Take into account what has run */
+-        icount += cpu_get_icount_executed(cpu);
++        cpu_update_icount(cpu);
+     }
+-    return icount;
++#ifdef CONFIG_ATOMIC64
++    return atomic_read__nocheck(&timers_state.qemu_icount);
++#else /* FIXME: we need 64bit atomics to do this safely */
++    return timers_state.qemu_icount;
++#endif
+ }
+ 
+ /* Return the virtual CPU time, based on the instruction counter.  */
 -- 
 2.11.0
