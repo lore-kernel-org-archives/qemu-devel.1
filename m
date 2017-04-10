@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cxb2z-0002cI-7p
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:16:06 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cxb4B-0003V4-S1
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:17:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cxb2y-0005k9-3A
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:16:05 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:35474)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cxb2x-0005jv-Sw
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:16:04 -0400
-Received: by mail-wr0-x234.google.com with SMTP id o21so122832634wrb.2
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 08:16:03 -0700 (PDT)
+	(envelope-from <mreitz@redhat.com>) id 1cxb4A-00063l-LZ
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 11:17:19 -0400
+References: <20170410075451.21329-1-famz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <24011a9e-eab2-60b4-48a2-0e5ec1f4cf12@redhat.com>
+Date: Mon, 10 Apr 2017 17:17:07 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170404143121.GA6421@kozik-book>
-References: <20170318192509.15499-1-krzk@kernel.org>
-	<CAFEAcA8WGoa=DYXRH4MHfnHmUR_5-xERdmcuqrsk=bmS7GBCmg@mail.gmail.com>
-	<20170404134402.GA4196@kozik-book>
-	<CAFEAcA9UGEVVUfL3--goP4mVU+ezegWPcoka41XM8d_E2yyJkQ@mail.gmail.com>
-	<20170404143121.GA6421@kozik-book>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Apr 2017 16:15:42 +0100
-Message-ID: <CAFEAcA_DaW_DdcYweHPGpJrMNMP+Sd-Bw6W_OM7tCF5cMyh4aQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2] hw/misc: Add Exynos4210 Pseudo Random
- Number Generator
+In-Reply-To: <20170410075451.21329-1-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="2nNGhEuqlEEw4sH1Cgvqv6f2svrM2tmio"
+Subject: Re: [Qemu-devel] [PATCH for-2.9] iscsi: Fix iscsi_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,57 +23,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Kevin Wolf <kwolf@redhat.com>
 
-On 4 April 2017 at 15:31, Krzysztof Kozlowski <krzk@kernel.org> wrote:
-> On Tue, Apr 04, 2017 at 03:05:09PM +0100, Peter Maydell wrote:
->> On 4 April 2017 at 14:44, Krzysztof Kozlowski <krzk@kernel.org> wrote:
->> > On Tue, Apr 04, 2017 at 01:09:08PM +0100, Peter Maydell wrote:
->> >> Is there a data sheet that describes this RNG? I had a quick google
->> >> but couldn't find anything in the 4210 manual you can get from Samsung.
->> >
->> > Official and public datasheet - I never heard about it... AFAIK, Samsung
->> > never released any datasheet... But recently I found a copy of
->> > Exynos4412 datasheet published on FriendlyArm website:
->> > http://wiki.friendlyarm.com/wiki/index.php/NanoPC-T1
->> > (at the bottom in "Resources").
->> >
->> > Some blocks in Exynos4412, including the RNG, are the same as in
->> > Exynos4210. However, you should not expect too much data about the RNG
->> > in the datasheet...
->> >
->> >> In particular I'm not sure we want to use GRand here.
->> >
->> > Now, I am not sure neither. :)
->>
->> The last RNG we added was hw/misc/bcm2835_rng.c, which uses
->> qcrypto_random_bytes() to get cryptographically-random bytes
->> from the host. On the other hand it sounds like this Exynos
->> hardware is a PRNG without true-random input...
->
-> Yes, I think that is the case. The PRNG block looks the same on all
-> Exynos SoCs. At least from datasheet perspective and registers.
-> The difference came with Exynos5420 with introducing another block -
-> True RNG - which could be chained to PRNG as seed. However the PRNG
-> stays the same (according to datasheet).
->
-> Unfortunately I could not verify too much of this because on Exynos5420
-> apparently the PRNG block is locked by SecureMonitor.
->
-> At some point I will probably get back to Exynos5420 (and True RNG) but
-> till then, the choice of GRand repeatable random sequences makes some
-> sense to me.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2nNGhEuqlEEw4sH1Cgvqv6f2svrM2tmio
+From: Max Reitz <mreitz@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org,
+ Peter Lieven <pl@kamp.de>, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <24011a9e-eab2-60b4-48a2-0e5ec1f4cf12@redhat.com>
+Subject: Re: [PATCH for-2.9] iscsi: Fix iscsi_create
+References: <20170410075451.21329-1-famz@redhat.com>
+In-Reply-To: <20170410075451.21329-1-famz@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-I was talking to Dan on IRC and his suggestion was that we should just
-use qcrypto_random_bytes() for everything. On the other hand I'm
-not totally sure that's the right approach.
+On 10.04.2017 09:54, Fam Zheng wrote:
+> Since d5895fcb (iscsi: Split URL into individual options), creating
+> qcow2 image on an iscsi LUN fails:
+>=20
+>     qemu-img create -f qcow2 iscsi://$SERVER/$IQN/0 1G
+>     qemu-img: iscsi://$SERVER/$IQN/0: Could not create image: Invalid
+>         argument
+>=20
+> The problem is iscsi_open now expects that transport_name, portal and
+> target are already parsed into structured options by
+> iscsi_parse_filename, but it is not called in iscsi_create.
+>=20
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  block/iscsi.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/block/iscsi.c b/block/iscsi.c
+> index 716e74a..07596b5 100644
+> --- a/block/iscsi.c
+> +++ b/block/iscsi.c
+> @@ -2092,6 +2092,7 @@ static int iscsi_create(const char *filename, Qem=
+uOpts *opts, Error **errp)
+>      BlockDriverState *bs;
+>      IscsiLun *iscsilun =3D NULL;
+>      QDict *bs_options;
+> +    Error *local_err =3D NULL;
+> =20
+>      bs =3D bdrv_new();
+> =20
+> @@ -2103,7 +2104,13 @@ static int iscsi_create(const char *filename, Qe=
+muOpts *opts, Error **errp)
+> =20
+>      bs_options =3D qdict_new();
+>      qdict_put(bs_options, "filename", qstring_from_str(filename));
 
-I think my core issue here is that we really don't understand what
-the hardware is doing or what the properties of its randomness
-actually are. To me that says "Linux should not trust this thing
-at all and shouldn't use it" which in turn makes implementing a
-model in QEMU less important :-)
+Doesn't the below change make this qdict_put() superfluous?
 
-thanks
--- PMM
+Max
+
+> -    ret =3D iscsi_open(bs, bs_options, 0, NULL);
+> +    iscsi_parse_filename(filename, bs_options, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        ret =3D -EINVAL;
+> +    } else {
+> +        ret =3D iscsi_open(bs, bs_options, 0, NULL);
+> +    }
+>      QDECREF(bs_options);
+> =20
+>      if (ret !=3D 0) {
+>=20
+
+
+
+--2nNGhEuqlEEw4sH1Cgvqv6f2svrM2tmio
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljrofMSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AvekH/30OPTT9mThknBxybO2R7JZI7Ft4G1oB
+ssQ/zR43hNFwvpgTAnZkWRgqEIT/pLsgzaYxG+GRK96N8WtuI7Dc9uAWkMWYxmun
+qeKihEoWcDG0651gx+A4V2USweasY2Qyf3lSOVKijq7YL7q5v3Tp9VBV5iY7tYOx
+WSJT/EK2NAUGwsSs8jEIojyLxC6eORy0dKF4h8/vs16KgxGb8RdctSXUN/K0F/3W
+9OauTsYn+3Lc6rlrpXvMVN99cIc7O65wox/aQpO8t8IV5ytsb8/s9sd1RmW08xsO
+UUs9zHNuvE2iMfP+WWwRsMn6QeKox43tqeRThgApR4VY/jYbjlz16zA=
+=EhSS
+-----END PGP SIGNATURE-----
+
+--2nNGhEuqlEEw4sH1Cgvqv6f2svrM2tmio--
