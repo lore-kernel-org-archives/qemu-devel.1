@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cxbk7-00062F-Ty
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 12:00:40 -0400
+	(envelope-from <herbie.robinson@stratus.com>) id 1cxbmU-0007c8-QP
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 12:03:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cxbk6-0004Py-SL
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 12:00:39 -0400
-Date: Mon, 10 Apr 2017 17:00:23 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170410160023.GG3214@stefanha-x1.localdomain>
-References: <1491741460-10308-1-git-send-email-lidongchen@tencent.com>
+	(envelope-from <herbie.robinson@stratus.com>) id 1cxbmR-0005ZD-OJ
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 12:03:06 -0400
+Received: from us-smtp-delivery-131.mimecast.com ([216.205.24.131]:21305)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <herbie.robinson@stratus.com>)
+	id 1cxbmR-0005Yu-HI
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 12:03:03 -0400
+From: "Robinson, Herbie" <Herbie.Robinson@stratus.com>
+Date: Mon, 10 Apr 2017 16:02:54 +0000
+Message-ID: <BN3PR0801MB0898A85B6C3C2E2AF9984C1BE6010@BN3PR0801MB0898.namprd08.prod.outlook.com>
+Content-Language: en-US
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="DWg365Y4B18r8evw"
-Content-Disposition: inline
-In-Reply-To: <1491741460-10308-1-git-send-email-lidongchen@tencent.com>
-Subject: Re: [Qemu-devel] [PATCH v3] migration/block: use blk_pwrite_zeroes
- for each zero cluster
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+Subject: [Qemu-devel] ping RE: [PATCH v3] SGABIOS: fix wrong video attrs for
+ int 10h, ah==13h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,142 +27,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jemmy858585@gmail.com
-Cc: qemu-devel@nongnu.org, famz@redhat.com, quintela@redhat.com, dgilbert@redhat.com, qemu-block@nongnu.org, Lidong Chen <lidongchen@tencent.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>, Laurent Vivier <lvivier@redhat.com>
 
-
---DWg365Y4B18r8evw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Sun, Apr 09, 2017 at 08:37:40PM +0800, jemmy858585@gmail.com wrote:
-> From: Lidong Chen <lidongchen@tencent.com>
->=20
-> BLOCK_SIZE is (1 << 20), qcow2 cluster size is 65536 by default,
-> this maybe cause the qcow2 file size is bigger after migration.
-> This patch check each cluster, use blk_pwrite_zeroes for each
-> zero cluster.
->=20
-> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
-> ---
->  migration/block.c | 38 ++++++++++++++++++++++++++++++++++++--
->  1 file changed, 36 insertions(+), 2 deletions(-)
->=20
-> diff --git a/migration/block.c b/migration/block.c
-> index 7734ff7..fe613db 100644
-> --- a/migration/block.c
-> +++ b/migration/block.c
-> @@ -885,6 +885,8 @@ static int block_load(QEMUFile *f, void *opaque, int =
-version_id)
->      int64_t total_sectors =3D 0;
->      int nr_sectors;
->      int ret;
-> +    BlockDriverInfo bdi;
-> +    int cluster_size;
-> =20
->      do {
->          addr =3D qemu_get_be64(f);
-> @@ -934,8 +936,40 @@ static int block_load(QEMUFile *f, void *opaque, int=
- version_id)
->              } else {
->                  buf =3D g_malloc(BLOCK_SIZE);
->                  qemu_get_buffer(f, buf, BLOCK_SIZE);
-> -                ret =3D blk_pwrite(blk, addr * BDRV_SECTOR_SIZE, buf,
-> -                                 nr_sectors * BDRV_SECTOR_SIZE, 0);
-> +
-> +                ret =3D bdrv_get_info(blk_bs(blk), &bdi);
-> +                cluster_size =3D bdi.cluster_size;
-> +
-> +                if (ret =3D=3D 0 && cluster_size > 0 &&
-> +                    cluster_size <=3D BLOCK_SIZE &&
-> +                    BLOCK_SIZE % cluster_size =3D=3D 0) {
-
-How about:
-
-  if (blk !=3D blk_prev) {
-      blk_prev =3D blk;
-      total_sectors =3D blk_nb_sectors(blk);
-      if (total_sectors <=3D 0) {
-          error_report("Error getting length of block device %s",
-                       device_name);
-          return -EINVAL;
-      }
-
-      blk_invalidate_cache(blk, &local_err);
-      if (local_err) {
-          error_report_err(local_err);
-          return -EINVAL;
-      }
-
-+     ret =3D bdrv_get_info(blk_bs(blk), &bdi);
-+     if (ret =3D=3D 0 && cluster_size > 0 && cluster_size <=3D BLOCK_SIZE =
-&&
-+         BLOCK_SIZE % cluster_size =3D=3D 0) {
-+         zero_cluster_size =3D bdi.cluster_size;
-+     } else {
-+         zero_cluster_size =3D 0;
-+     }
-  }
-
-That way we only fetch the cluster size once per device.
-
-When processing a block we do without repeatedly fetching the cluster
-size:
-
-  if (zero_cluster_size) {
-     ...detect zeroes...
-  }
-
-> +                    int i;
-> +                    int64_t cur_addr;
-> +                    uint8_t *cur_buf;
-> +
-> +                    for (i =3D 0; i < BLOCK_SIZE / cluster_size; i++) {
-> +                        cur_addr =3D addr * BDRV_SECTOR_SIZE
-> +                                        + i * cluster_size;
-> +                        cur_buf =3D buf + i * cluster_size;
-> +
-> +                        if (buffer_is_zero(cur_buf, cluster_size)) {
-> +                            ret =3D blk_pwrite_zeroes(blk, cur_addr,
-> +                                                    cluster_size,
-> +                                                    BDRV_REQ_MAY_UNMAP);
-> +                        } else {
-> +                             ret =3D blk_pwrite(blk, cur_addr, cur_buf,
-> +                                              cluster_size, 0);
-
-Indentation is off here.
-
-> +                        }
-> +
-> +                        if (ret < 0) {
-> +                            g_free(buf);
-> +                            return ret;
-> +                        }
-> +                    }
-> +                } else {
-> +                    ret =3D blk_pwrite(blk, addr * BDRV_SECTOR_SIZE, buf,
-> +                                     nr_sectors * BDRV_SECTOR_SIZE, 0);
-> +                }
->                  g_free(buf);
->              }
-> =20
-> --=20
-> 1.8.3.1
->=20
-
---DWg365Y4B18r8evw
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJY66wXAAoJEJykq7OBq3PIdAoH/2Hi9eT3jHbkhSgxJYJXSa+p
-U2GDc+Jb6A1MQzHXuY3Tm9u7n9836VwpdAE+3W/zml1gviCjOWFiWj525UfKHnyk
-YmpdDjgIMqOCIj9QY7x2iIngoeRKTS8QyUMLoHkLr4Kj04oFR+CgN4FGp0IGYA5F
-97gV5vm3fYzb4eIksH5IErxWcGeRE/X3uHmjhNqhsUCo13WkreB17OtCA7CngKz8
-b/1g55JC1f/NDUgmwexq4kjS6FmkhhbsA3CPld73BgBYlzahAJojGnBy3+toeeYS
-MNx61jwDtw6NOaaeYJ96L6v4zl1GvhkYFTM3ZfiEfpWGAV8RrSoBiXD40MEQ3tU=
-=r+nC
------END PGP SIGNATURE-----
-
---DWg365Y4B18r8evw--
+aHR0cDovL3BhdGNod29yay5vemxhYnMub3JnL3BhdGNoLzczNzQ0Ni8NCg0KDQotLS0tLU9yaWdp
+bmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogTGF1cmVudCBWaXZpZXIgW21haWx0bzpsdml2aWVyQHJl
+ZGhhdC5jb21dIA0KU2VudDogRnJpZGF5LCBNYXJjaCAxMCwgMjAxNyAyOjEwIFBNDQpUbzogUm9i
+aW5zb24sIEhlcmJpZSA8SGVyYmllLlJvYmluc29uQHN0cmF0dXMuY29tPjsgcWVtdS1kZXZlbEBu
+b25nbnUub3JnDQpDYzogcWVtdS10cml2aWFsQG5vbmdudS5vcmcNClN1YmplY3Q6IFJlOiBbUEFU
+Q0ggdjNdIFNHQUJJT1M6IGZpeCB3cm9uZyB2aWRlbyBhdHRycyBmb3IgaW50IDEwaCwgYWg9PTEz
+aA0KDQpPbiAxMC8wMy8yMDE3IDE2OjU0LCBIZXJiaWUgUm9iaW5zb24gd3JvdGU6DQo+IEZpeCBC
+dWcgIzE2NzA1MDk6IHdyb25nIHZpZGVvIGF0dHJzIGZvciBpbnQgMTBoLCBhaD09MTNoIFRoZSAN
+Cj4gc3Vicm91dGluZSBzZXRfY3Vyc29yX3Bvc2l0aW9uIGlzIHRyYXNoaW5nICVieC4NCj4gVW5m
+b3J0dW5hdGVseSwgJWJsIGNvbnRhaW5zIHRoZSB2aWRlbyBhdHRyaWJ1dGUgZm9yIHdyaXRlX3N0
+cmluZy4NCj4gDQo+IFRoZSBmaXggc2F2ZXMgJWJ4IGluIHRoZSBmdW5jdGlvbiBwcm9sb2cgYW5k
+IHJlc3RvcmVzIGl0IGluIHRoZSANCj4gZXBpbG9nLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogSGVy
+YmllIFJvYmluc29uIDxIZXJiaWUuUm9iaW5zb25Ac3RyYXR1cy5jb20+DQoNClJldmlld2VkLWJ5
+OiBMYXVyZW50IFZpdmllciA8bHZpdmllckByZWRoYXQuY29tPg0KDQoNCj4gLS0tDQo+IFJlbW92
+ZWQgaW5jb3JyZWN0IGNvZGUgZGVsZXRpb25zIGZyb20gc2V0X2N1cnJlbnRfY3Vyc29yLg0KPiBS
+ZW1vdmVkIGV4cGxhbmF0aW9uIG9mIHNhbWUgZnJvbSB0aGUgY29tbWl0IG1lc3NhZ2UuDQo+IA0K
+PiBCVFcsIEkgZGlkbid0IHNlZSBhbnkgdGVzdCBjYXNlcyBmb3IgdGhpcyBjb2RlLCBidXQgaWYg
+dGhleSBleGlzdCBhbmQgDQo+IHNvbWVib2R5IHBvaW50cyBtZSBhdCB0aGVtLCBJIHNob3VsZCBi
+ZSBhYmxlIHRvIGdlbmVyYXRlIGEgdmVyeSBzbWFsbCANCj4gcWNvdzIgZmlsZSB0aGF0IGRlbW9u
+c3RyYXRlcyB0aGUgcHJvYmxlbS4NCj4gDQo+ICBzZ2FiaW9zLlMgfCAyICsrDQo+ICAxIGZpbGUg
+Y2hhbmdlZCwgMiBpbnNlcnRpb25zKCspDQo+IA0KPiBkaWZmIC0tZ2l0IGEvc2dhYmlvcy5TIGIv
+c2dhYmlvcy5TDQo+IGluZGV4IDI3NWQwNjMuLjk2YzRlMjMgMTAwNjQ0DQo+IC0tLSBhL3NnYWJp
+b3MuUw0KPiArKysgYi9zZ2FiaW9zLlMNCj4gQEAgLTE3MjgsNiArMTcyOCw3IEBAIHdyaXRlX3N0
+cmluZ190YWlsOg0KPiAgDQo+ICBzZXRfY3Vyc29yX3Bvc2l0aW9uOg0KPiAgICBwdXNodyAlYXgN
+Cj4gKyAgcHVzaHcgJWJ4DQo+ICAgIHB1c2h3ICVkcw0KPiAgICBwdXNodyAkQkRBX1NFRw0KPiAg
+ICBwb3B3ICVkcyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgLyogZHMgPSAweDQwICovDQo+
+IEBAIC0xNzM4LDYgKzE3MzksNyBAQCBzZXRfY3Vyc29yX3Bvc2l0aW9uOg0KPiAgICBtb3Z3ICVh
+eCwgJWJ4ICAgICAgICAgICAgICAgICAgICAgICAgLyogYnggPSBjdXJzb3Igc2F2ZSBvZmZzZXQg
+Ki8NCj4gICAgbW92dyAlZHgsICglYngpICAgICAgICAgICAgICAgICAgICAgIC8qIHNhdmUgbmV3
+IGN1cnNvciB2YWx1ZSAqLw0KPiAgICBwb3B3ICVkcw0KPiArICBwb3B3ICVieA0KPiAgICBwb3B3
+ICVheA0KPiAgICByZXQNCj4gIA0KPiANCg0K
