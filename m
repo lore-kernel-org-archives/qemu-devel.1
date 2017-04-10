@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cxZot-0007Vr-80
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 09:57:28 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cxZoo-0002Pw-Ew
+	(envelope-from <clg@kaod.org>) id 1cxZon-0007QB-Oc
 	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 09:57:27 -0400
-Received: from 1.mo179.mail-out.ovh.net ([178.33.111.220]:47643)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <clg@kaod.org>) id 1cxZoj-0002Mz-MP
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 09:57:21 -0400
+Received: from 10.mo179.mail-out.ovh.net ([46.105.79.46]:34983)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cxZoo-0002Ow-7u
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 09:57:22 -0400
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cxZoj-0002M8-DD
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 09:57:17 -0400
 Received: from player690.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 0B8FF35710
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 15:57:20 +0200 (CEST)
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id DEE2F35716
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 15:57:15 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Mon, 10 Apr 2017 15:56:52 +0200
-Message-Id: <1491832618-27536-3-git-send-email-clg@kaod.org>
+Date: Mon, 10 Apr 2017 15:56:51 +0200
+Message-Id: <1491832618-27536-2-git-send-email-clg@kaod.org>
 In-Reply-To: <1491832618-27536-1-git-send-email-clg@kaod.org>
 References: <1491832618-27536-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 2/8] ppc/pnv: enable only one LPC bus
+Subject: [Qemu-devel] [PATCH v2 1/8] ppc/pnv: Add support for POWER8+ LPC
+ Controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,121 +31,286 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-The firmware (skiboot) chooses the default LPC bus of a multichip
-systems using a "primary" property. The LPC bus of chip 0 should be
-the only connected in the system. Let's advertise it in the device
-tree.
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
+It adds the Naples chip which supports proper LPC interrupts via the
+LPC controller rather than via an external CPLD.
+
+Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+[clg: - updated for qemu-2.9
+      - ported on latest PowerNV patchset
+      - moved the IRQ handler in pnv_lpc.c
+      - introduced pnv_lpc_isa_irq_create() to create the ISA IRQs ]
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
+
  Changes since v1:
 
- - the device tree is populated for all LPC busses of the system but
-   only the one on chip 0 has the "primary" property.
+ - moved the IRQ handler in pnv_lpc.c
+ - introduced pnv_lpc_isa_irq_create() to create the ISA IRQs=20
 
- hw/ppc/pnv.c             |  2 ++
- hw/ppc/pnv_lpc.c         | 23 ++++++++++++++---------
- include/hw/ppc/pnv_lpc.h |  2 ++
- 3 files changed, 18 insertions(+), 9 deletions(-)
+ hw/ppc/pnv.c             | 45 +++-------------------
+ hw/ppc/pnv_lpc.c         | 97 ++++++++++++++++++++++++++++++++++++++++++=
++++++-
+ include/hw/ppc/pnv_lpc.h |  8 ++++
+ 3 files changed, 108 insertions(+), 42 deletions(-)
 
 diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 27589b91d1cf..7d742b6e34e1 100644
+index 16f32c9bbd9d..27589b91d1cf 100644
 --- a/hw/ppc/pnv.c
 +++ b/hw/ppc/pnv.c
-@@ -765,6 +765,8 @@ static void pnv_chip_realize(DeviceState *dev, Error =
-**errp)
-     g_free(typename);
+@@ -346,36 +346,6 @@ static void ppc_powernv_reset(void)
+     cpu_physical_memory_write(PNV_FDT_ADDR, fdt, fdt_totalsize(fdt));
+ }
 =20
-     /* Create LPC controller */
-+    object_property_set_int(OBJECT(&chip->lpc), chip->chip_id, "chip-id"=
-,
-+                            &error_fatal);
-     object_property_set_bool(OBJECT(&chip->lpc), true, "realized",
-                              &error_fatal);
-     pnv_xscom_add_subregion(chip, PNV_XSCOM_LPC_BASE, &chip->lpc.xscom_r=
-egs);
+-/* If we don't use the built-in LPC interrupt deserializer, we need
+- * to provide a set of qirqs for the ISA bus or things will go bad.
+- *
+- * Most machines using pre-Naples chips (without said deserializer)
+- * have a CPLD that will collect the SerIRQ and shoot them as a
+- * single level interrupt to the P8 chip. So let's setup a hook
+- * for doing just that.
+- */
+-static void pnv_lpc_isa_irq_handler_cpld(void *opaque, int n, int level)
+-{
+-    PnvMachineState *pnv =3D POWERNV_MACHINE(qdev_get_machine());
+-    uint32_t old_state =3D pnv->cpld_irqstate;
+-    PnvChip *chip =3D opaque;
+-
+-    if (level) {
+-        pnv->cpld_irqstate |=3D 1u << n;
+-    } else {
+-        pnv->cpld_irqstate &=3D ~(1u << n);
+-    }
+-    if (pnv->cpld_irqstate !=3D old_state) {
+-        pnv_psi_irq_set(&chip->psi, PSIHB_IRQ_EXTERNAL,
+-                        pnv->cpld_irqstate !=3D 0);
+-    }
+-}
+-
+-static void pnv_lpc_isa_irq_handler(void *opaque, int n, int level)
+-{
+-     /* XXX TODO */
+-}
+-
+ static ISABus *pnv_isa_create(PnvChip *chip)
+ {
+     PnvLpcController *lpc =3D &chip->lpc;
+@@ -390,16 +360,7 @@ static ISABus *pnv_isa_create(PnvChip *chip)
+     isa_bus =3D isa_bus_new(NULL, &lpc->isa_mem, &lpc->isa_io,
+                           &error_fatal);
+=20
+-    /* Not all variants have a working serial irq decoder. If not,
+-     * handling of LPC interrupts becomes a platform issue (some
+-     * platforms have a CPLD to do it).
+-     */
+-    if (pcc->chip_type =3D=3D PNV_CHIP_POWER8NVL) {
+-        irqs =3D qemu_allocate_irqs(pnv_lpc_isa_irq_handler, chip, ISA_N=
+UM_IRQS);
+-    } else {
+-        irqs =3D qemu_allocate_irqs(pnv_lpc_isa_irq_handler_cpld, chip,
+-                                  ISA_NUM_IRQS);
+-    }
++    irqs =3D pnv_lpc_isa_irq_create(lpc, pcc->chip_type, ISA_NUM_IRQS);
+=20
+     isa_bus_irqs(isa_bus, irqs);
+     return isa_bus;
+@@ -699,6 +660,10 @@ static void pnv_chip_init(Object *obj)
+     object_property_add_child(obj, "occ", OBJECT(&chip->occ), NULL);
+     object_property_add_const_link(OBJECT(&chip->occ), "psi",
+                                    OBJECT(&chip->psi), &error_abort);
++
++    /* The LPC controller needs PSI to generate interrupts */
++    object_property_add_const_link(OBJECT(&chip->lpc), "psi",
++                                   OBJECT(&chip->psi), &error_abort);
+ }
+=20
+ static void pnv_chip_icp_realize(PnvChip *chip, Error **errp)
 diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
-index baee366d386a..13d7a695678d 100644
+index 78db52415b11..baee366d386a 100644
 --- a/hw/ppc/pnv_lpc.c
 +++ b/hw/ppc/pnv_lpc.c
-@@ -92,14 +92,6 @@ enum {
- #define LPC_HC_REGS_OPB_SIZE    0x00001000
+@@ -250,6 +250,34 @@ static const MemoryRegionOps pnv_lpc_xscom_ops =3D {
+     .endianness =3D DEVICE_BIG_ENDIAN,
+ };
 =20
-=20
--/*
-- * TODO: the "primary" cell should only be added on chip 0. This is
-- * how skiboot chooses the default LPC controller on multichip
-- * systems.
-- *
-- * It would be easly done if we can change the populate() interface to
-- * replace the PnvXScomInterface parameter by a PnvChip one
-- */
- static int pnv_lpc_populate(PnvXScomInterface *dev, void *fdt, int xscom=
-_offset)
- {
-     const char compat[] =3D "ibm,power8-lpc\0ibm,lpc";
-@@ -110,6 +102,7 @@ static int pnv_lpc_populate(PnvXScomInterface *dev, v=
-oid *fdt, int xscom_offset)
-         cpu_to_be32(lpc_pcba),
-         cpu_to_be32(PNV_XSCOM_LPC_SIZE)
-     };
-+    PnvLpcController *lpc =3D PNV_LPC(dev);
-=20
-     name =3D g_strdup_printf("isa@%x", lpc_pcba);
-     offset =3D fdt_add_subnode(fdt, xscom_offset, name);
-@@ -119,7 +112,13 @@ static int pnv_lpc_populate(PnvXScomInterface *dev, =
-void *fdt, int xscom_offset)
-     _FDT((fdt_setprop(fdt, offset, "reg", reg, sizeof(reg))));
-     _FDT((fdt_setprop_cell(fdt, offset, "#address-cells", 2)));
-     _FDT((fdt_setprop_cell(fdt, offset, "#size-cells", 1)));
--    _FDT((fdt_setprop(fdt, offset, "primary", NULL, 0)));
++static void pnv_lpc_eval_irqs(PnvLpcController *lpc)
++{
++    bool lpc_to_opb_irq =3D false;
 +
-+    /* The firmware (skiboot) chooses the default LPC bus of the
-+     * system using a "primary" property.
-+     */
-+    if (lpc->chip_id =3D=3D 0x0) {
-+        _FDT((fdt_setprop(fdt, offset, "primary", NULL, 0)));
++    /* Update LPC controller to OPB line */
++    if (lpc->lpc_hc_irqser_ctrl & LPC_HC_IRQSER_EN) {
++        uint32_t irqs;
++
++        irqs =3D lpc->lpc_hc_irqstat & lpc->lpc_hc_irqmask;
++        lpc_to_opb_irq =3D (irqs !=3D 0);
 +    }
-     _FDT((fdt_setprop(fdt, offset, "compatible", compat, sizeof(compat))=
-));
-     return 0;
- }
-@@ -486,6 +485,11 @@ static void pnv_lpc_realize(DeviceState *dev, Error =
-**errp)
-     lpc->psi =3D PNV_PSI(obj);
- }
-=20
-+static Property pnv_lpc_properties[] =3D {
-+    DEFINE_PROP_UINT32("chip-id", PnvLpcController, chip_id, 0),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
 +
- static void pnv_lpc_class_init(ObjectClass *klass, void *data)
++    /* We don't honor the polarity register, it's pointless and unused
++     * anyway
++     */
++    if (lpc_to_opb_irq) {
++        lpc->opb_irq_input |=3D OPB_MASTER_IRQ_LPC;
++    } else {
++        lpc->opb_irq_input &=3D ~OPB_MASTER_IRQ_LPC;
++    }
++
++    /* Update OPB internal latch */
++    lpc->opb_irq_stat |=3D lpc->opb_irq_input & lpc->opb_irq_mask;
++
++    /* Reflect the interrupt */
++    pnv_psi_irq_set(lpc->psi, PSIHB_IRQ_LPC_I2C, lpc->opb_irq_stat !=3D =
+0);
++}
++
+ static uint64_t lpc_hc_read(void *opaque, hwaddr addr, unsigned size)
  {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-@@ -494,6 +498,7 @@ static void pnv_lpc_class_init(ObjectClass *klass, vo=
-id *data)
-     xdc->populate =3D pnv_lpc_populate;
+     PnvLpcController *lpc =3D opaque;
+@@ -300,12 +328,15 @@ static void lpc_hc_write(void *opaque, hwaddr addr,=
+ uint64_t val,
+         break;
+     case LPC_HC_IRQSER_CTRL:
+         lpc->lpc_hc_irqser_ctrl =3D val;
++        pnv_lpc_eval_irqs(lpc);
+         break;
+     case LPC_HC_IRQMASK:
+         lpc->lpc_hc_irqmask =3D val;
++        pnv_lpc_eval_irqs(lpc);
+         break;
+     case LPC_HC_IRQSTAT:
+         lpc->lpc_hc_irqstat &=3D ~val;
++        pnv_lpc_eval_irqs(lpc);
+         break;
+     case LPC_HC_ERROR_ADDRESS:
+         break;
+@@ -363,14 +394,15 @@ static void opb_master_write(void *opaque, hwaddr a=
+ddr,
+     switch (addr) {
+     case OPB_MASTER_LS_IRQ_STAT:
+         lpc->opb_irq_stat &=3D ~val;
++        pnv_lpc_eval_irqs(lpc);
+         break;
+     case OPB_MASTER_LS_IRQ_MASK:
+-        /* XXX Filter out reserved bits */
+         lpc->opb_irq_mask =3D val;
++        pnv_lpc_eval_irqs(lpc);
+         break;
+     case OPB_MASTER_LS_IRQ_POL:
+-        /* XXX Filter out reserved bits */
+         lpc->opb_irq_pol =3D val;
++        pnv_lpc_eval_irqs(lpc);
+         break;
+     case OPB_MASTER_LS_IRQ_INPUT:
+         /* Read only */
+@@ -398,6 +430,8 @@ static const MemoryRegionOps opb_master_ops =3D {
+ static void pnv_lpc_realize(DeviceState *dev, Error **errp)
+ {
+     PnvLpcController *lpc =3D PNV_LPC(dev);
++    Object *obj;
++    Error *error =3D NULL;
 =20
-     dc->realize =3D pnv_lpc_realize;
-+    dc->props =3D pnv_lpc_properties;
+     /* Reg inits */
+     lpc->lpc_hc_fw_rd_acc_size =3D LPC_HC_FW_RD_4B;
+@@ -441,6 +475,15 @@ static void pnv_lpc_realize(DeviceState *dev, Error =
+**errp)
+     pnv_xscom_region_init(&lpc->xscom_regs, OBJECT(dev),
+                           &pnv_lpc_xscom_ops, lpc, "xscom-lpc",
+                           PNV_XSCOM_LPC_SIZE);
++
++    /* get PSI object from chip */
++    obj =3D object_property_get_link(OBJECT(dev), "psi", &error);
++    if (!obj) {
++        error_setg(errp, "%s: required link 'psi' not found: %s",
++                   __func__, error_get_pretty(error));
++        return;
++    }
++    lpc->psi =3D PNV_PSI(obj);
  }
 =20
- static const TypeInfo pnv_lpc_info =3D {
+ static void pnv_lpc_class_init(ObjectClass *klass, void *data)
+@@ -470,3 +513,53 @@ static void pnv_lpc_register_types(void)
+ }
+=20
+ type_init(pnv_lpc_register_types)
++
++/* If we don't use the built-in LPC interrupt deserializer, we need
++ * to provide a set of qirqs for the ISA bus or things will go bad.
++ *
++ * Most machines using pre-Naples chips (without said deserializer)
++ * have a CPLD that will collect the SerIRQ and shoot them as a
++ * single level interrupt to the P8 chip. So let's setup a hook
++ * for doing just that.
++ */
++static void pnv_lpc_isa_irq_handler_cpld(void *opaque, int n, int level)
++{
++    PnvMachineState *pnv =3D POWERNV_MACHINE(qdev_get_machine());
++    uint32_t old_state =3D pnv->cpld_irqstate;
++    PnvLpcController *lpc =3D opaque;
++
++    if (level) {
++        pnv->cpld_irqstate |=3D 1u << n;
++    } else {
++        pnv->cpld_irqstate &=3D ~(1u << n);
++    }
++
++    if (pnv->cpld_irqstate !=3D old_state) {
++        pnv_psi_irq_set(lpc->psi, PSIHB_IRQ_EXTERNAL, pnv->cpld_irqstate=
+ !=3D 0);
++    }
++}
++
++static void pnv_lpc_isa_irq_handler(void *opaque, int n, int level)
++{
++    PnvLpcController *lpc =3D opaque;
++
++    /* The Naples HW latches the 1 levels, clearing is done by SW */
++    if (level) {
++        lpc->lpc_hc_irqstat |=3D LPC_HC_IRQ_SERIRQ0 >> n;
++        pnv_lpc_eval_irqs(lpc);
++    }
++}
++
++qemu_irq *pnv_lpc_isa_irq_create(PnvLpcController *lpc, int chip_type,
++                                 int nirqs)
++{
++    /* Not all variants have a working serial irq decoder. If not,
++     * handling of LPC interrupts becomes a platform issue (some
++     * platforms have a CPLD to do it).
++     */
++    if (chip_type =3D=3D PNV_CHIP_POWER8NVL) {
++        return qemu_allocate_irqs(pnv_lpc_isa_irq_handler, lpc, nirqs);
++    } else {
++        return qemu_allocate_irqs(pnv_lpc_isa_irq_handler_cpld, lpc, nir=
+qs);
++    }
++}
 diff --git a/include/hw/ppc/pnv_lpc.h b/include/hw/ppc/pnv_lpc.h
-index ccf969af9448..c78ee4a98c62 100644
+index 38e5506975aa..ccf969af9448 100644
 --- a/include/hw/ppc/pnv_lpc.h
 +++ b/include/hw/ppc/pnv_lpc.h
-@@ -67,6 +67,8 @@ typedef struct PnvLpcController {
+@@ -23,6 +23,8 @@
+ #define PNV_LPC(obj) \
+      OBJECT_CHECK(PnvLpcController, (obj), TYPE_PNV_LPC)
 =20
-     /* PSI to generate interrupts */
-     PnvPsi *psi;
++typedef struct PnvPsi PnvPsi;
 +
-+    uint32_t chip_id;
+ typedef struct PnvLpcController {
+     DeviceState parent;
+=20
+@@ -62,6 +64,12 @@ typedef struct PnvLpcController {
+=20
+     /* XSCOM registers */
+     MemoryRegion xscom_regs;
++
++    /* PSI to generate interrupts */
++    PnvPsi *psi;
  } PnvLpcController;
 =20
- qemu_irq *pnv_lpc_isa_irq_create(PnvLpcController *lpc, int chip_type,
++qemu_irq *pnv_lpc_isa_irq_create(PnvLpcController *lpc, int chip_type,
++                                 int nirqs);
++
+ #endif /* _PPC_PNV_LPC_H */
 --=20
 2.7.4
