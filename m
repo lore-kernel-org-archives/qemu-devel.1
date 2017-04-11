@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cxxl1-00073h-PC
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:31:05 -0400
+	(envelope-from <stefanha@redhat.com>) id 1cxxmn-0000Qi-2E
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:32:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cxxky-0003uC-L3
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:31:03 -0400
-Received: from 10.mo173.mail-out.ovh.net ([46.105.74.148]:38319)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cxxky-0003tb-Aw
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:31:00 -0400
-Received: from player778.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id E2A1F3144A
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 17:30:54 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Tue, 11 Apr 2017 17:30:05 +0200
-Message-Id: <1491924606-20026-8-git-send-email-clg@kaod.org>
-In-Reply-To: <1491924606-20026-1-git-send-email-clg@kaod.org>
-References: <1491924606-20026-1-git-send-email-clg@kaod.org>
+	(envelope-from <stefanha@redhat.com>) id 1cxxml-0004oe-Q9
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:32:53 -0400
+Date: Tue, 11 Apr 2017 16:32:34 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170411153234.GA5940@stefanha-x1.localdomain>
+References: <1491384478-12325-1-git-send-email-lidongchen@tencent.com>
+	<20170406140255.GA31259@stefanha-x1.localdomain>
+	<CAOGPPbfpN5QVxzvAkRv4MY7nE0YBxU0-UeMuJpVCe-wBB_9p8A@mail.gmail.com>
+	<20170407113450.GO13602@stefanha-x1.localdomain>
+	<CAOGPPbcf6bPXmVGFcw3niNznPx1BHsA=uR2G0sN=AV6xhWXMrA@mail.gmail.com>
+	<20170410135203.GA20631@stefanha-x1.localdomain>
+	<CAOGPPbeMnM8z5DFaXFAEOswy94z1OYsRXVRe7LLg8S7RHS46QA@mail.gmail.com>
+	<CAOGPPbfZjX0zsZZqhc0v6u2KNo8oDU9RvqTL-rW9W0Oid4ovMQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 7/8] ppc/pnv: add initial IPMI sensors for
- the BMC simulator
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="BOKacYhQ+x31HxR3"
+Content-Disposition: inline
+In-Reply-To: <CAOGPPbfZjX0zsZZqhc0v6u2KNo8oDU9RvqTL-rW9W0Oid4ovMQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3] migration/block:limit the
+ time used for block migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,227 +31,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: 858585 jemmy <jemmy858585@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, Lidong Chen <lidongchen@tencent.com>
 
-Skiboot, the firmware for the PowerNV platform, expects the BMC to
-provide some specific IPMI sensors. These sensors are exposed in the
-device tree and their values are updated by the firmware at boot time.
 
-Sensors of interest are :
+--BOKacYhQ+x31HxR3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-	"FW Boot Progress"
-	"Boot Count"
+On Tue, Apr 11, 2017 at 09:06:37PM +0800, 858585 jemmy wrote:
+> On Tue, Apr 11, 2017 at 8:19 PM, 858585 jemmy <jemmy858585@gmail.com> wro=
+te:
+> > On Mon, Apr 10, 2017 at 9:52 PM, Stefan Hajnoczi <stefanha@gmail.com> w=
+rote:
+> >> On Sat, Apr 08, 2017 at 09:17:58PM +0800, 858585 jemmy wrote:
+> >>> On Fri, Apr 7, 2017 at 7:34 PM, Stefan Hajnoczi <stefanha@redhat.com>=
+ wrote:
+> >>> > On Fri, Apr 07, 2017 at 09:30:33AM +0800, 858585 jemmy wrote:
+> >>> >> On Thu, Apr 6, 2017 at 10:02 PM, Stefan Hajnoczi <stefanha@redhat.=
+com> wrote:
+> >>> >> > On Wed, Apr 05, 2017 at 05:27:58PM +0800, jemmy858585@gmail.com =
+wrote:
+> >>> >> >
+> >>> >> > A proper solution is to refactor the synchronous code to make it
+> >>> >> > asynchronous.  This might require invoking the system call from a
+> >>> >> > thread pool worker.
+> >>> >> >
+> >>> >>
+> >>> >> yes, i agree with you, but this is a big change.
+> >>> >> I will try to find how to optimize this code, maybe need a long ti=
+me.
+> >>> >>
+> >>> >> this patch is not a perfect solution, but can alleviate the proble=
+m.
+> >>> >
+> >>> > Let's try to understand the problem fully first.
+> >>> >
+> >>>
+> >>> when migrate the vm with high speed, i find vnc response slowly somet=
+ime.
+> >>> not only vnc response slowly, virsh console aslo response slowly some=
+time.
+> >>> and the guest os block io performance is also reduce.
+> >>>
+> >>> the bug can be reproduce by this command:
+> >>> virsh migrate-setspeed 165cf436-312f-47e7-90f2-f8aa63f34893 900
+> >>> virsh migrate --live 165cf436-312f-47e7-90f2-f8aa63f34893
+> >>> --copy-storage-inc qemu+ssh://10.59.163.38/system
+> >>>
+> >>> and --copy-storage-all have no problem.
+> >>> virsh migrate --live 165cf436-312f-47e7-90f2-f8aa63f34893
+> >>> --copy-storage-all qemu+ssh://10.59.163.38/system
+> >>>
+> >>> compare the difference between --copy-storage-inc and
+> >>> --copy-storage-all. i find out the reason is
+> >>> mig_save_device_bulk invoke bdrv_is_allocated, but bdrv_is_allocated
+> >>> is synchronous and maybe wait
+> >>> for a long time.
+> >>>
+> >>> i write this code to measure the time used by  brdrv_is_allocated()
+> >>>
+> >>>  279     static int max_time =3D 0;
+> >>>  280     int tmp;
+> >>>
+> >>>  288             clock_gettime(CLOCK_MONOTONIC_RAW, &ts1);
+> >>>  289             ret =3D bdrv_is_allocated(blk_bs(bb), cur_sector,
+> >>>  290                                     MAX_IS_ALLOCATED_SEARCH, &nr=
+_sectors);
+> >>>  291             clock_gettime(CLOCK_MONOTONIC_RAW, &ts2);
+> >>>  292
+> >>>  293
+> >>>  294             tmp =3D  (ts2.tv_sec - ts1.tv_sec)*1000000000L
+> >>>  295                            + (ts2.tv_nsec - ts1.tv_nsec);
+> >>>  296             if (tmp > max_time) {
+> >>>  297                max_time=3Dtmp;
+> >>>  298                fprintf(stderr, "max_time is %d\n", max_time);
+> >>>  299             }
+> >>>
+> >>> the test result is below:
+> >>>
+> >>>  max_time is 37014
+> >>>  max_time is 1075534
+> >>>  max_time is 17180913
+> >>>  max_time is 28586762
+> >>>  max_time is 49563584
+> >>>  max_time is 103085447
+> >>>  max_time is 110836833
+> >>>  max_time is 120331438
+> >>>
+> >>> bdrv_is_allocated is called after qemu_mutex_lock_iothread.
+> >>> and the main thread is also call qemu_mutex_lock_iothread.
+> >>> so cause the main thread maybe wait for a long time.
+> >>>
+> >>>    if (bmds->shared_base) {
+> >>>         qemu_mutex_lock_iothread();
+> >>>         aio_context_acquire(blk_get_aio_context(bb));
+> >>>         /* Skip unallocated sectors; intentionally treats failure as
+> >>>          * an allocated sector */
+> >>>         while (cur_sector < total_sectors &&
+> >>>                !bdrv_is_allocated(blk_bs(bb), cur_sector,
+> >>>                                   MAX_IS_ALLOCATED_SEARCH, &nr_sector=
+s)) {
+> >>>             cur_sector +=3D nr_sectors;
+> >>>         }
+> >>>         aio_context_release(blk_get_aio_context(bb));
+> >>>         qemu_mutex_unlock_iothread();
+> >>>     }
+> >>>
+> >>> #0  0x00007f107322f264 in __lll_lock_wait () from /lib64/libpthread.s=
+o.0
+> >>> #1  0x00007f107322a508 in _L_lock_854 () from /lib64/libpthread.so.0
+> >>> #2  0x00007f107322a3d7 in pthread_mutex_lock () from /lib64/libpthrea=
+d.so.0
+> >>> #3  0x0000000000949ecb in qemu_mutex_lock (mutex=3D0xfc51a0) at
+> >>> util/qemu-thread-posix.c:60
+> >>> #4  0x0000000000459e58 in qemu_mutex_lock_iothread () at /root/qemu/c=
+pus.c:1516
+> >>> #5  0x0000000000945322 in os_host_main_loop_wait (timeout=3D28911939)=
+ at
+> >>> util/main-loop.c:258
+> >>> #6  0x00000000009453f2 in main_loop_wait (nonblocking=3D0) at util/ma=
+in-loop.c:517
+> >>> #7  0x00000000005c76b4 in main_loop () at vl.c:1898
+> >>> #8  0x00000000005ceb77 in main (argc=3D49, argv=3D0x7fff921182b8,
+> >>> envp=3D0x7fff92118448) at vl.c:4709
+> >>
+> >> The following patch moves bdrv_is_allocated() into bb's AioContext.  It
+> >> will execute without blocking other I/O activity.
+> >>
+> >> Compile-tested only.
+> > i will try this patch.
+>=20
+> Hi Stefan:
+> It work for virtio. i will test ide later.
+> Do you have any suggestion about the test case?
 
-As such a device is defined on the command line, we can only detect
-its presence at reset time.
+1. When testing virtio-blk it's interesting to try both -object
+   iothread,id=3Diothread0 -device virtio-blk-pci,iothread=3Diothread0,...
+   and without iothread.  The code paths are different so there may be
+   bugs that only occur with iothread or without iothread.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
----
+2. The guest should be submitting I/O requests to increase the chance of
+   race conditions.  You could run "dd if=3D/dev/vda of=3D/dev/null
+   iflag=3Ddirect bs=3D4k &" 8 times inside the guest to generate I/O.
 
- Changes since v1:
+Thanks,
+Stefan
 
- - fixed test on sdr->header.rec_type which was incorrect
- - changed the type of the 'bmc' attribute of the machine and changed
-   accordingly the prototype of the helper routines
+--BOKacYhQ+x31HxR3
+Content-Type: application/pgp-signature; name="signature.asc"
 
- hw/ppc/Makefile.objs |  2 +-
- hw/ppc/pnv.c         | 21 ++++++++++++++
- hw/ppc/pnv_bmc.c     | 81 ++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
- include/hw/ppc/pnv.h |  9 ++++++
- 4 files changed, 112 insertions(+), 1 deletion(-)
- create mode 100644 hw/ppc/pnv_bmc.c
+-----BEGIN PGP SIGNATURE-----
 
-diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
-index ef67ea820158..7efc68674819 100644
---- a/hw/ppc/Makefile.objs
-+++ b/hw/ppc/Makefile.objs
-@@ -6,7 +6,7 @@ obj-$(CONFIG_PSERIES) +=3D spapr_hcall.o spapr_iommu.o sp=
-apr_rtas.o
- obj-$(CONFIG_PSERIES) +=3D spapr_pci.o spapr_rtc.o spapr_drc.o spapr_rng=
-.o
- obj-$(CONFIG_PSERIES) +=3D spapr_cpu_core.o spapr_ovec.o
- # IBM PowerNV
--obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_ps=
-i.o pnv_occ.o
-+obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_ps=
-i.o pnv_occ.o pnv_bmc.o
- ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)
- obj-y +=3D spapr_pci_vfio.o
- endif
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 977e126aca2c..685eb122d20c 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -35,6 +35,7 @@
- #include "qapi/visitor.h"
- #include "monitor/monitor.h"
- #include "hw/intc/intc.h"
-+#include "hw/ipmi/ipmi.h"
-=20
- #include "hw/ppc/xics.h"
- #include "hw/ppc/pnv_xscom.h"
-@@ -476,16 +477,36 @@ static void *powernv_create_fdt(MachineState *machi=
-ne)
-     /* Populate ISA devices on chip 0 */
-     lpc_offset =3D pnv_chip_lpc_offset(pnv->chips[0], fdt);
-     powernv_populate_isa(pnv->isa_bus, fdt, lpc_offset);
-+
-+    if (pnv->bmc) {
-+        pnv_bmc_populate_sensors(pnv->bmc, fdt);
-+    }
-+
-     return fdt;
- }
-=20
- static void ppc_powernv_reset(void)
- {
-     MachineState *machine =3D MACHINE(qdev_get_machine());
-+    PnvMachineState *pnv =3D POWERNV_MACHINE(machine);
-     void *fdt;
-+    Object *obj;
-=20
-     qemu_devices_reset();
-=20
-+    /* OpenPOWER systems have a BMC, which can be defined on the
-+     * command line with:
-+     *
-+     *   -device ipmi-bmc-sim,id=3Dbmc0
-+     *
-+     * This is the internal simulator but it could also be an external
-+     * BMC.
-+     */
-+    obj =3D object_resolve_path_type("", TYPE_IPMI_BMC, NULL);
-+    if (obj) {
-+        pnv->bmc =3D IPMI_BMC(obj);
-+    }
-+
-     fdt =3D powernv_create_fdt(machine);
-=20
-     /* Pack resulting tree */
-diff --git a/hw/ppc/pnv_bmc.c b/hw/ppc/pnv_bmc.c
-new file mode 100644
-index 000000000000..a0820dca559b
---- /dev/null
-+++ b/hw/ppc/pnv_bmc.c
-@@ -0,0 +1,81 @@
-+/*
-+ * QEMU PowerNV, BMC related functions
-+ *
-+ * Copyright (c) 2016-2017, IBM Corporation.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License, version 2, as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/hw.h"
-+#include "sysemu/sysemu.h"
-+#include "target/ppc/cpu.h"
-+#include "qapi/error.h"
-+#include "qemu/log.h"
-+#include "hw/ipmi/ipmi.h"
-+#include "hw/ppc/fdt.h"
-+
-+#include "hw/ppc/pnv.h"
-+
-+#include <libfdt.h>
-+
-+/* TODO: include definition in ipmi.h */
-+#define IPMI_SDR_FULL_TYPE 1
-+
-+void pnv_bmc_populate_sensors(IPMIBmc *bmc, void *fdt)
-+{
-+    int offset;
-+    int i;
-+    const struct ipmi_sdr_compact *sdr;
-+    uint16_t nextrec;
-+
-+    offset =3D fdt_add_subnode(fdt, 0, "/bmc");
-+    _FDT(offset);
-+
-+    _FDT((fdt_setprop_string(fdt, offset, "name", "bmc")));
-+    _FDT((fdt_setprop_cell(fdt, offset, "#address-cells", 0x1)));
-+    _FDT((fdt_setprop_cell(fdt, offset, "#size-cells", 0x0)));
-+
-+    offset =3D fdt_add_subnode(fdt, offset, "sensors");
-+    _FDT(offset);
-+
-+    _FDT((fdt_setprop_cell(fdt, offset, "#address-cells", 0x1)));
-+    _FDT((fdt_setprop_cell(fdt, offset, "#size-cells", 0x0)));
-+
-+    for (i =3D 0; !ipmi_bmc_sdr_find(bmc, i, &sdr, &nextrec); i++) {
-+        int off;
-+        char *name;
-+
-+        if (sdr->header.rec_type !=3D IPMI_SDR_COMPACT_TYPE &&
-+            sdr->header.rec_type !=3D IPMI_SDR_FULL_TYPE) {
-+            continue;
-+        }
-+
-+        name =3D g_strdup_printf("sensor@%x", sdr->sensor_owner_number);
-+        off =3D fdt_add_subnode(fdt, offset, name);
-+        _FDT(off);
-+        g_free(name);
-+
-+        _FDT((fdt_setprop_cell(fdt, off, "reg", sdr->sensor_owner_number=
-)));
-+        _FDT((fdt_setprop_string(fdt, off, "name", "sensor")));
-+        _FDT((fdt_setprop_string(fdt, off, "compatible", "ibm,ipmi-senso=
-r")));
-+        _FDT((fdt_setprop_cell(fdt, off, "ipmi-sensor-reading-type",
-+                               sdr->reading_type)));
-+        _FDT((fdt_setprop_cell(fdt, off, "ipmi-entity-id",
-+                               sdr->entity_id)));
-+        _FDT((fdt_setprop_cell(fdt, off, "ipmi-entity-instance",
-+                               sdr->entity_instance)));
-+        _FDT((fdt_setprop_cell(fdt, off, "ipmi-sensor-type",
-+                               sdr->sensor_type)));
-+    }
-+}
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index b45a0d91c813..02f6cf565ca4 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -118,6 +118,8 @@ typedef struct PnvChipClass {
- #define POWERNV_MACHINE(obj) \
-     OBJECT_CHECK(PnvMachineState, (obj), TYPE_POWERNV_MACHINE)
-=20
-+typedef struct IPMIBmc IPMIBmc;
-+
- typedef struct PnvMachineState {
-     /*< private >*/
-     MachineState parent_obj;
-@@ -130,12 +132,19 @@ typedef struct PnvMachineState {
-=20
-     ISABus       *isa_bus;
-     uint32_t     cpld_irqstate;
-+
-+    IPMIBmc      *bmc;
- } PnvMachineState;
-=20
- #define PNV_FDT_ADDR          0x01000000
- #define PNV_TIMEBASE_FREQ     512000000ULL
-=20
- /*
-+ * BMC helpers
-+ */
-+void pnv_bmc_populate_sensors(IPMIBmc *bmc, void *fdt);
-+
-+/*
-  * POWER8 MMIO base addresses
-  */
- #define PNV_XSCOM_SIZE        0x800000000ull
---=20
-2.7.4
+iQEcBAEBAgAGBQJY7PcRAAoJEJykq7OBq3PIUgQH/0Eh38rSPrbEPXui6q6qRflB
+kntY94jkLzMrXY4VBqZYUc53DvHzzfpRoOCnhDaPVu3YkbM6B8bjPGHwpq+RiemE
+eDTxJHGWU4c9DCLP7oOxF/CC6UHqxwezNq0FZYkxikLBR90h/YkTHQvSP/aojw8u
+OKPpKG/0AyFnqXawiWILmo+bERZUrwuDgtWtEpdrDkCMjThH1i5sTLFiKb2KIyx/
+kCUGzueCE/lwUKOgPbE97HuC9ddAiLN1fAnfv4jxsehYS9MuvMBia1gyYEs6sZOd
+MwYiP3YwxECAWozRnV2sEm1sKtTgM1Wls2friAr6wdH4c/JEiwZKzyHfSnAFjJM=
+=N6AQ
+-----END PGP SIGNATURE-----
+
+--BOKacYhQ+x31HxR3--
