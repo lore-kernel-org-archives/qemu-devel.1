@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cxz0F-0004g3-Gf
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 12:50:52 -0400
+	(envelope-from <stefanha@redhat.com>) id 1cxzC2-0007bK-AT
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 13:03:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cxz0A-0002hG-Lx
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 12:50:51 -0400
-Received: from 3.mo173.mail-out.ovh.net ([46.105.34.1]:34508)
+	(envelope-from <stefanha@redhat.com>) id 1cxzBy-00077X-EF
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 13:03:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:9760)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cxz0A-0002gw-F3
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 12:50:46 -0400
-Received: from player791.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 680EF30FA5
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 18:50:43 +0200 (CEST)
-References: <1491396106-26376-1-git-send-email-clg@kaod.org>
-	<1491396106-26376-22-git-send-email-clg@kaod.org>
-	<1491909013.4099.4.camel@redhat.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <ab9d8d7b-da49-1bc6-dfd8-545cae19cf90@kaod.org>
-Date: Tue, 11 Apr 2017 18:50:35 +0200
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cxzBy-00077D-8O
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 13:02:58 -0400
+Date: Tue, 11 Apr 2017 18:02:50 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170411170250.GF5940@stefanha-x1.localdomain>
+References: <20170411131733.27542-1-lvivier@redhat.com>
+	<20170411131733.27542-3-lvivier@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1491909013.4099.4.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 21/21] ppc/pnv: Create a default
- PCI layout
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="B0nZA57HJSoPbsHY"
+Content-Disposition: inline
+In-Reply-To: <20170411131733.27542-3-lvivier@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] virtio-rng: stop virtqueue while the
+ CPU is stopped
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,29 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Amit Shah <amit@kernel.org>, qemu-devel@nongnu.org
 
-On 04/11/2017 01:10 PM, Andrea Bolognani wrote:
-> On Wed, 2017-04-05 at 14:41 +0200, C=C3=A9dric Le Goater wrote:
->> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->> =20
->> This creates a legacy PCIe->PCI bridge under the PHB by default to whi=
-ch
->> a bunch of standard devices are attached. Currently:
->> =20
->>    - VGA (as specified by -vga)
->>    - USB (with keyboard and mouse if graphcis is enabled)
->>    - AHCI
->>    - e1000
->> =20
->> This gives us something close to a standard OpenPower platform.
->=20
-> These bridges and devices are not added when -nodefaults
-> is in use, right?
 
-I haven't checked that yet but I will.
+--B0nZA57HJSoPbsHY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
+On Tue, Apr 11, 2017 at 03:17:33PM +0200, Laurent Vivier wrote:
+> diff --git a/hw/virtio/virtio-rng.c b/hw/virtio/virtio-rng.c
+> index 9639f4e..d270d56 100644
+> --- a/hw/virtio/virtio-rng.c
+> +++ b/hw/virtio/virtio-rng.c
+> @@ -53,6 +53,15 @@ static void chr_read(void *opaque, const void *buf, si=
+ze_t size)
+>          return;
+>      }
+> =20
+> +    /* we can't modify the virtqueue until
+> +     * our state is fully synced
+> +     */
+> +
+> +    if (!runstate_check(RUN_STATE_RUNNING)) {
+> +        trace_virtio_rng_cpu_is_stopped(vrng);
+> +        return;
+> +    }
+> +
 
-C.=20
+I'm concerned about what happens when the guest is stopped and resumed
+(e.g. 'stop' and 'cont' monitor commands).  Since we throw away the
+chr_read() callback the device will hang unless the guest kicks it
+again?
+
+It's not clear to me that the rate limit timer will help us...
+
+Stefan
+
+--B0nZA57HJSoPbsHY
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJY7Qw6AAoJEJykq7OBq3PI8/cH/iQ3w+snk0JxdolkMgKPqcKu
+8HwL06vpt3xPIECO4j6NcNtiqevITPZq8PWSTWbK081KxoBlEQHTyGXCu5hI+jsD
+8vAI74Gc4rrzzxhAVrXNP2izH6JEgO9PCNYm1YsZgBpr8i/DceRjmEo/6kEQnlw9
+poBRnNLb4Nsws+2MWBGFBF6Ui+WfyDDmHF1HInmMJqUz3JZAGvdrdMFSiMpwhklF
+6KF2AujYFyIduLL6vAcjZuIFi4JLpFAA5ebESYbZ3jLZ+Ki4VqOFhIDhfsXjx2IK
+hgETq+quGbtBWV0sOpRepMsBl0zIxMQhb3gW1420v0BJkEvkpb0GXrnjlwXfyoA=
+=oNhU
+-----END PGP SIGNATURE-----
+
+--B0nZA57HJSoPbsHY--
