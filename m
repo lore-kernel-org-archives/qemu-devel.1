@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cxvfY-0000jv-QH
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:17:17 -0400
+	(envelope-from <lvivier@redhat.com>) id 1cxvg2-000151-GD
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:17:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cxvfV-0006lS-M7
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:17:16 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1489765795-32398-1-git-send-email-craig@rancher.com>
-Date: Tue, 11 Apr 2017 15:17:10 +0200
-In-Reply-To: <1489765795-32398-1-git-send-email-craig@rancher.com> (Craig
-	Jellick's message of "Fri, 17 Mar 2017 08:49:55 -0700")
-Message-ID: <871ssz9j8p.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] Add 'none' as type for drive's if option
+	(envelope-from <lvivier@redhat.com>) id 1cxvfz-0006vA-AT
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:17:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56740)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1cxvfz-0006uZ-4l
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:17:43 -0400
+From: Laurent Vivier <lvivier@redhat.com>
+Date: Tue, 11 Apr 2017 15:17:31 +0200
+Message-Id: <20170411131733.27542-1-lvivier@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/2] migration: fix virtio-rng
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,28 +21,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Craig Jellick <craig@rancher.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Amit Shah <amit@kernel.org>, qemu-devel@nongnu.org
 
-Perhaps this can go via qemu-trivial.
+When post-copy migration is enabled, the destination
+guest can ask for memory from the source when the
+vmstate is restored.
 
-Craig Jellick <craig@rancher.com> writes:
+In the case of virtio, a part of the virtqueue
+is migrated by the vmstate structure (last_avail_idx)
+another part is migrated inside the RAM (used_idx).
+On the source side, the virtqueue can be modified
+whereas the vmstate is already migrated, and the destination
+side can ask for the value in RAM. In this case we have
+an inconsistency that can generate this kind of error:
+    "VQ 0 size 0x8 < last_avail_idx 0xa - used_idx 0"
+in hw/virtio/virtio.c:2180, virtio_load().
 
-> Signed-off-by: Craig Jellick <craig@rancher.com>
-> ---
->  qemu-options.hx | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 99af8ed..8291e64 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -591,7 +591,7 @@ Special files such as iSCSI devices can be specified using protocol
->  specific URLs. See the section for "Device URL Syntax" for more information.
->  @item if=@var{interface}
->  This option defines on which type on interface the drive is connected.
-> -Available types are: ide, scsi, sd, mtd, floppy, pflash, virtio.
-> +Available types are: ide, scsi, sd, mtd, floppy, pflash, virtio, none.
->  @item bus=@var{bus},unit=@var{unit}
->  These options define where is connected the drive by defining the bus number and
->  the unit id.
+This happens with virtio-rng as the chr_read()
+function which modifies the virqueue is called
+by the rng backend and the rng backend continues to
+run while the migration is running and the CPU is stopped.
+
+This series fixes this problem by ignoring chr_read()
+calls while the CPU is stopped. The first patch of the
+series fixes another problem triggered by this error
+case: a use-after-free case.
+
+The probability to have this problem is very low, as
+generally the post-copy phase is very short, so the window
+to modify the virtqueue while the vmstate has been sent
+is very small... except if you are doing trans-continental
+guest migration with high latency and post-copy phase that
+can be run for minutes.
+
+I've been able to reproduce the problem locally on a host,
+by adding network latency with "tc". Another condition is
+to have an rng daemon running in the guest to generate
+events in the virtio-rng device.
+
+Laurent Vivier (2):
+  migration: don't close a file descriptor while it can be in use
+  virtio-rng: stop virtqueue while the CPU is stopped
+
+ hw/virtio/trace-events |  2 ++
+ hw/virtio/virtio-rng.c | 10 ++++++++++
+ migration/migration.c  |  6 +++---
+ 3 files changed, 15 insertions(+), 3 deletions(-)
+
+-- 
+2.9.3
