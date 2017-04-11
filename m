@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cxua4-0006i9-8t
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 08:07:36 -0400
+	(envelope-from <eblake@redhat.com>) id 1cxueY-0008GR-1q
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 08:12:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cxua3-00036k-F0
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 08:07:32 -0400
-Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:34576)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cxua3-00035D-8l
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 08:07:31 -0400
-Received: by mail-wr0-x232.google.com with SMTP id z109so27423280wrb.1
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 05:07:31 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1cxueS-0005K5-GL
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 08:12:10 -0400
+References: <20170411011718.9152-1-eblake@redhat.com>
+	<20170411011718.9152-4-eblake@redhat.com>
+	<7d7d9d70-1842-7911-6854-571b3cb04d19@amsat.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <eb799df8-94bb-e395-d2f3-d5424d8bd307@redhat.com>
+Date: Tue, 11 Apr 2017 07:11:56 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAJKOXPecitJXUxfzPut-nt+TzMEfncNpHHshCbAeZ-4pe_S4Xw@mail.gmail.com>
-References: <20170318192509.15499-1-krzk@kernel.org>
-	<CAFEAcA8WGoa=DYXRH4MHfnHmUR_5-xERdmcuqrsk=bmS7GBCmg@mail.gmail.com>
-	<20170404134402.GA4196@kozik-book>
-	<CAFEAcA9UGEVVUfL3--goP4mVU+ezegWPcoka41XM8d_E2yyJkQ@mail.gmail.com>
-	<20170404143121.GA6421@kozik-book>
-	<CAFEAcA_DaW_DdcYweHPGpJrMNMP+Sd-Bw6W_OM7tCF5cMyh4aQ@mail.gmail.com>
-	<CAJKOXPecitJXUxfzPut-nt+TzMEfncNpHHshCbAeZ-4pe_S4Xw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 11 Apr 2017 13:07:09 +0100
-Message-ID: <CAFEAcA-FTFQMa_O24R7BWSorroCXrfQkDtqjrmty88A0fiLLHg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2] hw/misc: Add Exynos4210 Pseudo Random
- Number Generator
+In-Reply-To: <7d7d9d70-1842-7911-6854-571b3cb04d19@amsat.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="HomUo9tv5i8t4NqCJalgU00cPFM4433KO"
+Subject: Re: [Qemu-devel] [PATCH v9 03/13] qemu-io: Switch 'alloc' command
+ to byte-based length
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,18 +26,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-On 11 April 2017 at 13:02, Krzysztof Kozlowski <krzk@kernel.org> wrote:
-> But first I need to setup proper booting image + rootfs instead of
-> only initramfs. The sdhci node is failing (missing regulators or
-> capabilities) so essentially there is no storage now.
->
-> How do you access any kind of disk image in case of other boards?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--HomUo9tv5i8t4NqCJalgU00cPFM4433KO
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+Message-ID: <eb799df8-94bb-e395-d2f3-d5424d8bd307@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v9 03/13] qemu-io: Switch 'alloc' command to
+ byte-based length
+References: <20170411011718.9152-1-eblake@redhat.com>
+ <20170411011718.9152-4-eblake@redhat.com>
+ <7d7d9d70-1842-7911-6854-571b3cb04d19@amsat.org>
+In-Reply-To: <7d7d9d70-1842-7911-6854-571b3cb04d19@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Depends on the board, some of them have SD controllers, a few
-have PCI controllers that can take a virtio or scsi controller.
+On 04/10/2017 09:37 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Eric,
+>=20
+> On 04/10/2017 10:17 PM, Eric Blake wrote:
+>> For the 'alloc' command, accepting an offset in bytes but a length
+>> in sectors, and reporting output in sectors, is confusing.  Do
+>> everything in bytes, and adjust the expected output accordingly.
+>>
 
-thanks
--- PMM
+>>          }
+>>      } else {
+>> -        nb_sectors =3D 1;
+>> +        bytes =3D BDRV_SECTOR_SIZE;
+>>      }
+>> +    if (bytes & 0x1ff) {
+>=20
+> This macro is self-explanatory:
+>=20
+> if(!QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE))
+
+Indeed; but I was going for copy-and-paste consistency with the rest of
+the file that also open-codes this.  A separate cleanup patch for all of
+them would qualify as trivial.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--HomUo9tv5i8t4NqCJalgU00cPFM4433KO
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY7MgMAAoJEKeha0olJ0NqxK0IAJ9xdE0sAUwInX4lr5GIdflR
+oJdG8ACD5//k2U9ZaSzOysrqFCYzdUlt877rasxpSYRoFqyRIjX6g9Unooi/RZmi
++p/+qW6dZFfqSnxaq0LIuD8DOchw2KtUALptkXN+3E44s/rHEn3+QlIDCVfht4iV
+lY0EKSN2qtA7KP01VNrpqj/2Fbkn0SfHUmtOuFKSyQ4Bq4TbUE09qHPgp2Ay5s2g
+21ZO3TBtH8vieuvX6FXPlYD0gYIbtiQPrA5QUHPviWz+5S/0OwMYKNoar8kyHTz0
+bqJEHbqHczGjkfovlyHXZXXnAhiuiBZaaPItnlHW1dHwF4ITdsF5KzzzL3t6b0Y=
+=r7CG
+-----END PGP SIGNATURE-----
+
+--HomUo9tv5i8t4NqCJalgU00cPFM4433KO--
