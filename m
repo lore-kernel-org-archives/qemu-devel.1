@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55032)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cxsJu-0002Lq-Ne
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:42:44 -0400
+	(envelope-from <stefanha@redhat.com>) id 1cxsXw-0004fn-KQ
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:57:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cxsJt-0008Qa-Uj
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:42:42 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170324123458.yk3rj3g47e5xr33i@eukaryote>
-	<0e1c78f3-1b82-58e4-035e-944484e66f29@redhat.com>
-	<ef9e10c4-3986-32ba-da2d-1b8f71d58319@redhat.com>
-	<20170404132815.aactqo2o5izpzclf@eukaryote>
-	<8420253d-261f-f040-6815-c949b8a2cce2@redhat.com>
-Date: Tue, 11 Apr 2017 11:42:28 +0200
-In-Reply-To: <8420253d-261f-f040-6815-c949b8a2cce2@redhat.com> (Eric Blake's
-	message of "Tue, 4 Apr 2017 08:54:50 -0500")
-Message-ID: <877f2rcmbf.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] Making QMP 'block-job-cancel'
- transactionable
+	(envelope-from <stefanha@redhat.com>) id 1cxsXt-0005xR-BC
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:57:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35812)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cxsXt-0005wh-52
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:57:09 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Tue, 11 Apr 2017 10:56:54 +0100
+Message-Id: <20170411095654.18383-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH] simpletrace: document Analyzer method
+ signatures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +22,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Kashyap Chamarthy <kchamart@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Eric Blake <eblake@redhat.com> writes:
+Users can inherit from the simpletrace.Analyzer class and receive
+callbacks when events of interest occur in a trace file.  The method
+signature is a little magic because the timestamp and pid arguments are
+optional.  Document this.
 
-> On 04/04/2017 08:28 AM, Kashyap Chamarthy wrote:
->
->>> Minor or not, it is a useful viewpoint. Either way, as long as the new
->>> way of getting a transactional non-pivot successful completion is
->>> something that libvirt can learn via introspection, 
->> 
->> Can you elaborate a little more on the above, for my own edification --
->> how might it be possible for "libvirt can learn via introspection"?  Is
->> it via some method using the QMP 'query-commands' /
->> 'query-command-line-options'?
->
-> Those, and query-qmp-schema.
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ scripts/simpletrace.py | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
-Avoid query-command-line-options if you can.  If you can't, know its
-limitations and quirks.
-
->                               If the change includes the addition of
-> something new in the .json files describing QMP, then query-qmp-schema
-> will let libvirt probe whether the version of qemu it it talking to has
-> that new field or not (presumably, in this case it would be a new
-> optional bool member to select the mode when creating a job, as well as
-> a new command visible through query-commands to change the mode of a
-> running job).
+diff --git a/scripts/simpletrace.py b/scripts/simpletrace.py
+index 4c99004..d60b3a0 100755
+--- a/scripts/simpletrace.py
++++ b/scripts/simpletrace.py
+@@ -116,7 +116,28 @@ class Analyzer(object):
+     is invoked.
+ 
+     If a method matching a trace event name exists, it is invoked to process
+-    that trace record.  Otherwise the catchall() method is invoked."""
++    that trace record.  Otherwise the catchall() method is invoked.
++
++    Example:
++    The following method handles the runstate_set(int new_state) trace event::
++
++      def runstate_set(self, new_state):
++          ...
++
++    The method can also take a timestamp argument before the trace event
++    arguments::
++
++      def runstate_set(self, timestamp, new_state):
++          ...
++
++    Timestamps have the uint64_t type and are in nanoseconds.
++
++    The pid can be included in addition to the timestamp and is useful when
++    dealing with traces from multiple processes::
++
++      def runstate_set(self, timestamp, pid, new_state):
++          ...
++    """
+ 
+     def begin(self):
+         """Called at the start of the trace."""
+-- 
+2.9.3
