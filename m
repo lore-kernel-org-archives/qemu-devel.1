@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cxspy-0002jI-Bq
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:15:51 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1cxss2-0003Lw-2Q
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:17:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cxspv-0005TY-8Y
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:15:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54598)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cxspv-0005T1-2U
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:15:47 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <CA+KKJYCOKxea1TJY0Uu8HSzYLoh3G=EX-DeKbM+r40HhoxfJrw@mail.gmail.com>
-	<20170403151953.GE3539@stefanha-x1.localdomain>
-Date: Tue, 11 Apr 2017 12:15:44 +0200
-In-Reply-To: <20170403151953.GE3539@stefanha-x1.localdomain> (Stefan
-	Hajnoczi's message of "Mon, 3 Apr 2017 16:19:53 +0100")
-Message-ID: <87o9w3b67j.fsf@dusky.pond.sub.org>
+	(envelope-from <dgibson@ozlabs.org>) id 1cxss0-0006mM-OM
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:17:58 -0400
+Date: Tue, 11 Apr 2017 16:53:00 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170411065300.GC12900@umbus.fritz.box>
+References: <20170410081217.2897-1-nikunj@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] debug: made printf always compile in debug
- output
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="ghzN8eJ9Qlbqn3iT"
+Content-Disposition: inline
+In-Reply-To: <20170410081217.2897-1-nikunj@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH for 2.10] tcg: enable MTTCG by default for
+ PPC64 on x86
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,73 +24,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Danil Antonov <g.danil.anto@gmail.com>, qemu-devel@nongnu.org
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Cc: qemu-ppc@nongnu.org, rth@twiddle.net, qemu-devel@nongnu.org, alex.bennee@linaro.org, intermediadc@hotmail.com, programmingkidx@gmail.com, clg@kaod.org
 
-Stefan Hajnoczi <stefanha@gmail.com> writes:
 
-> On Mon, Mar 27, 2017 at 02:50:47PM +0300, Danil Antonov wrote:
->> diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
->> index 2b0f3e1..bf880c1 100644
->> --- a/hw/acpi/pcihp.c
->> +++ b/hw/acpi/pcihp.c
->> @@ -39,13 +39,16 @@
->>  #include "qom/qom-qobject.h"
->>  #include "qapi/qmp/qint.h"
->> 
->> -//#define DEBUG
->> 
->> -#ifdef DEBUG
->> -# define ACPI_PCIHP_DPRINTF(format, ...)     printf(format, ## __VA_ARGS__)
->> -#else
->> -# define ACPI_PCIHP_DPRINTF(format, ...)     do { } while (0)
->> -#endif
->> +#ifndef DEBUG
->> +#define DEBUG 0
->> +#endif
->> +
->> +#define ACPI_PCIHP_DPRINTF(fmt, ...) do {     \
->> +    if (DEBUG) {                              \
->> +        fprintf(stderr, fmt, ## __VA_ARGS__); \
->> +    }                                         \
->> +} while (0);
->
-> The semicolon isn't necessary.  The caller provides it.
+--ghzN8eJ9Qlbqn3iT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-s/isn't necessary/is wrong/
+On Mon, Apr 10, 2017 at 01:42:17PM +0530, Nikunj A Dadhania wrote:
+> This enables the multi-threaded system emulation by default for PPC64
+> guests using the x86_64 TCG back-end.
+>=20
+> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+> ---
+>=20
+> Depends on following patch which fixes the define name:
+>=20
+> https://patchwork.ozlabs.org/patch/748840/
 
->   ACPI_PCIHP_DPRINTF("foo\n");
+Applied to ppc-for-2.10.
 
-Your defintion of ACPI_PCIHP_DPRINTF() expands this into *two*
-statements, the one you want, plus a null statement:
+>=20
+> ---
+>  configure        | 2 ++
+>  target/ppc/cpu.h | 2 ++
+>  2 files changed, 4 insertions(+)
+>=20
+> diff --git a/configure b/configure
+> index 4b3b5cd..2a87495 100755
+> --- a/configure
+> +++ b/configure
+> @@ -6008,12 +6008,14 @@ case "$target_name" in
+>    ppc64)
+>      TARGET_BASE_ARCH=3Dppc
+>      TARGET_ABI_DIR=3Dppc
+> +    mttcg=3Dyes
+>      gdb_xml_files=3D"power64-core.xml power-fpu.xml power-altivec.xml po=
+wer-spe.xml power-vsx.xml"
+>    ;;
+>    ppc64le)
+>      TARGET_ARCH=3Dppc64
+>      TARGET_BASE_ARCH=3Dppc
+>      TARGET_ABI_DIR=3Dppc
+> +    mttcg=3Dyes
+>      gdb_xml_files=3D"power64-core.xml power-fpu.xml power-altivec.xml po=
+wer-spe.xml power-vsx.xml"
+>    ;;
+>    ppc64abi32)
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index e0ff041..ece535d 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -30,6 +30,8 @@
+>  #define TARGET_LONG_BITS 64
+>  #define TARGET_PAGE_BITS 12
+> =20
+> +#define TCG_GUEST_DEFAULT_MO 0
+> +
+>  /* Note that the official physical address space bits is 62-M where M
+>     is implementation dependent.  I've not looked up M for the set of
+>     cpus we emulate at the system level.  */
 
-    do { ... } while (0);;
-    \___________________/|
-      first statment     |
-                     null statement
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Breaks in places where C expects a statement, e.g.
+--ghzN8eJ9Qlbqn3iT
+Content-Type: application/pgp-signature; name="signature.asc"
 
-    if (cond1)
-        if (cond2)
-            ACPI_PCIHP_DPRINTF(...);
-        else
-            bar();
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-Gets parsed like
+iQIcBAEBCAAGBQJY7H1KAAoJEGw4ysog2bOSKBEP/0fRZOb8Ki8tpMt41pzcEZVM
+1efAgeoy1VK2VScYjaIWz8G6CKA8QUSnfPSWiVaxFtMVMyQQQvPtet+SY1s90ajh
+rwbZsSn2Bo8IxM2u/gvxFurVx/U+bETb7GZlTgOiEt0Ex8jXprPwZIaLR0pCivMV
+qV1QQfD3NLKMLXIlJW9A2GCQ45/XXDMlAn2sHT7WDV0b5Bud6Ujg3rSepXOoddQN
+pRK6do9jlOmi9iOkDv3I59y5RTp++WEbVhtaOoDLvcJSZqgN14jA+VrhgtjKafO4
+L9ZEIYWSNZb54lKFxVoelCq9V6grkV7g1xKdggszTdOAbQX3aPmu7nUKWxgbPhzS
+MJqCrBFKHrtM5C2NsG1Tl17bnKiPTDkc53Iphf+7DE26IEVPmpgesMJSJEUjN62r
+w+JYupRFGt/vOHEAEk9UB380dkrvYwCu8/aN34idK2M0K5oHykX7cL/CL2vyhcZc
+HCvAtsHrAy1eWyVQPyHtcMWWgn2UVCYS1kq5yKpzJ7o2V/15sestNWM7EVo3Z4Fd
+pCpQLAp0XZ8oq+jro5mq/LFsjq+RNzMPv+x0yFGPp7JOGV49BoRMXmqaOretWGHI
+l6KxgPKfB4k0fbYPoDwJH56r6g5ckHfVB+tCDNBc/Fu7ev/glAeBK0gMl1DSud98
+7YD8mxyWQoZcYoJfch7T
+=jLeY
+-----END PGP SIGNATURE-----
 
-    if (cond1) {
-        if (cond2) {
-            first statement
-        }
-    }
-    null statement
-    else // compiler chokes, fortunately
-        bar();
-
-> It's normal to define statement-like macros with do { ... } while (0)
-> and no semicolon in the definition.
-
-A macro should expand into exactly one expression or exactly one
-statement.  Intentional deviations from this rule may be okay.
-Accidental deviations aren't.
+--ghzN8eJ9Qlbqn3iT--
