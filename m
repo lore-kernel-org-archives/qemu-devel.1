@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cxxl1-00073l-Q6
+	(envelope-from <clg@kaod.org>) id 1cxxl1-00073h-PC
 	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:31:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cxxky-0003uJ-LS
+	(envelope-from <clg@kaod.org>) id 1cxxky-0003uC-L3
 	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:31:03 -0400
-Received: from 2.mo173.mail-out.ovh.net ([178.33.251.49]:44312)
+Received: from 10.mo173.mail-out.ovh.net ([46.105.74.148]:38319)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cxxky-0003te-Da
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cxxky-0003tb-Aw
 	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:31:00 -0400
 Received: from player778.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 33B9431543
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 17:30:59 +0200 (CEST)
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id E2A1F3144A
+	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 17:30:54 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Tue, 11 Apr 2017 17:30:06 +0200
-Message-Id: <1491924606-20026-9-git-send-email-clg@kaod.org>
+Date: Tue, 11 Apr 2017 17:30:05 +0200
+Message-Id: <1491924606-20026-8-git-send-email-clg@kaod.org>
 In-Reply-To: <1491924606-20026-1-git-send-email-clg@kaod.org>
 References: <1491924606-20026-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 8/8] ppc/pnv: generate an OEM SEL event on
- shutdown
+Subject: [Qemu-devel] [PATCH v3 7/8] ppc/pnv: add initial IPMI sensors for
+ the BMC simulator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,9 +33,17 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-OpenPOWER systems expect to be notified with such an event before a
-shutdown or a reboot. An OEM SEL message is sent with specific
-identifiers and a user data containing the request : OFF or REBOOT.
+Skiboot, the firmware for the PowerNV platform, expects the BMC to
+provide some specific IPMI sensors. These sensors are exposed in the
+device tree and their values are updated by the firmware at boot time.
+
+Sensors of interest are :
+
+	"FW Boot Progress"
+	"Boot Count"
+
+As such a device is defined on the command line, we can only detect
+its presence at reset time.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
@@ -43,118 +51,206 @@ Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
  Changes since v1:
 
- - changed the prototype of the helper routine
+ - fixed test on sdr->header.rec_type which was incorrect
+ - changed the type of the 'bmc' attribute of the machine and changed
+   accordingly the prototype of the helper routines
 
- hw/ppc/pnv.c         | 14 ++++++++++++++
- hw/ppc/pnv_bmc.c     | 41 +++++++++++++++++++++++++++++++++++++++++
- include/hw/ppc/pnv.h |  2 ++
- 3 files changed, 57 insertions(+)
+ hw/ppc/Makefile.objs |  2 +-
+ hw/ppc/pnv.c         | 21 ++++++++++++++
+ hw/ppc/pnv_bmc.c     | 81 ++++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+ include/hw/ppc/pnv.h |  9 ++++++
+ 4 files changed, 112 insertions(+), 1 deletion(-)
+ create mode 100644 hw/ppc/pnv_bmc.c
 
+diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
+index ef67ea820158..7efc68674819 100644
+--- a/hw/ppc/Makefile.objs
++++ b/hw/ppc/Makefile.objs
+@@ -6,7 +6,7 @@ obj-$(CONFIG_PSERIES) +=3D spapr_hcall.o spapr_iommu.o sp=
+apr_rtas.o
+ obj-$(CONFIG_PSERIES) +=3D spapr_pci.o spapr_rtc.o spapr_drc.o spapr_rng=
+.o
+ obj-$(CONFIG_PSERIES) +=3D spapr_cpu_core.o spapr_ovec.o
+ # IBM PowerNV
+-obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_ps=
+i.o pnv_occ.o
++obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_ps=
+i.o pnv_occ.o pnv_bmc.o
+ ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)
+ obj-y +=3D spapr_pci_vfio.o
+ endif
 diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 685eb122d20c..d4bcdb027f7c 100644
+index 977e126aca2c..685eb122d20c 100644
 --- a/hw/ppc/pnv.c
 +++ b/hw/ppc/pnv.c
-@@ -485,6 +485,15 @@ static void *powernv_create_fdt(MachineState *machin=
-e)
+@@ -35,6 +35,7 @@
+ #include "qapi/visitor.h"
+ #include "monitor/monitor.h"
+ #include "hw/intc/intc.h"
++#include "hw/ipmi/ipmi.h"
+=20
+ #include "hw/ppc/xics.h"
+ #include "hw/ppc/pnv_xscom.h"
+@@ -476,16 +477,36 @@ static void *powernv_create_fdt(MachineState *machi=
+ne)
+     /* Populate ISA devices on chip 0 */
+     lpc_offset =3D pnv_chip_lpc_offset(pnv->chips[0], fdt);
+     powernv_populate_isa(pnv->isa_bus, fdt, lpc_offset);
++
++    if (pnv->bmc) {
++        pnv_bmc_populate_sensors(pnv->bmc, fdt);
++    }
++
      return fdt;
  }
 =20
-+static void pnv_powerdown_notify(Notifier *n, void *opaque)
-+{
-+    PnvMachineState *pnv =3D POWERNV_MACHINE(qdev_get_machine());
-+
-+    if (pnv->bmc) {
-+        pnv_bmc_powerdown(pnv->bmc);
-+    }
-+}
-+
  static void ppc_powernv_reset(void)
  {
      MachineState *machine =3D MACHINE(qdev_get_machine());
-@@ -638,6 +647,11 @@ static void ppc_powernv_init(MachineState *machine)
++    PnvMachineState *pnv =3D POWERNV_MACHINE(machine);
+     void *fdt;
++    Object *obj;
 =20
-     /* Create an RTC ISA device too */
-     rtc_init(pnv->isa_bus, 2000, NULL);
+     qemu_devices_reset();
+=20
++    /* OpenPOWER systems have a BMC, which can be defined on the
++     * command line with:
++     *
++     *   -device ipmi-bmc-sim,id=3Dbmc0
++     *
++     * This is the internal simulator but it could also be an external
++     * BMC.
++     */
++    obj =3D object_resolve_path_type("", TYPE_IPMI_BMC, NULL);
++    if (obj) {
++        pnv->bmc =3D IPMI_BMC(obj);
++    }
 +
-+    /* OpenPOWER systems use a IPMI SEL Event message to notify the
-+     * host to powerdown */
-+    pnv->powerdown_notifier.notify =3D pnv_powerdown_notify;
-+    qemu_register_powerdown_notifier(&pnv->powerdown_notifier);
- }
+     fdt =3D powernv_create_fdt(machine);
 =20
- /*
+     /* Pack resulting tree */
 diff --git a/hw/ppc/pnv_bmc.c b/hw/ppc/pnv_bmc.c
-index a0820dca559b..7b60b4c36071 100644
---- a/hw/ppc/pnv_bmc.c
+new file mode 100644
+index 000000000000..a0820dca559b
+--- /dev/null
 +++ b/hw/ppc/pnv_bmc.c
-@@ -32,6 +32,47 @@
- /* TODO: include definition in ipmi.h */
- #define IPMI_SDR_FULL_TYPE 1
-=20
+@@ -0,0 +1,81 @@
 +/*
-+ * OEM SEL Event data packet sent by BMC in response of a Read Event
-+ * Message Buffer command
++ * QEMU PowerNV, BMC related functions
++ *
++ * Copyright (c) 2016-2017, IBM Corporation.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License, version 2, as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
 + */
-+typedef struct OemSel {
-+    /* SEL header */
-+    uint8_t id[2];
-+    uint8_t type;
-+    uint8_t timestamp[4];
-+    uint8_t manuf_id[3];
 +
-+    /* OEM SEL data (6 bytes) follows */
-+    uint8_t netfun;
-+    uint8_t cmd;
-+    uint8_t data[4];
-+} OemSel;
++#include "qemu/osdep.h"
++#include "hw/hw.h"
++#include "sysemu/sysemu.h"
++#include "target/ppc/cpu.h"
++#include "qapi/error.h"
++#include "qemu/log.h"
++#include "hw/ipmi/ipmi.h"
++#include "hw/ppc/fdt.h"
 +
-+#define SOFT_OFF        0x00
-+#define SOFT_REBOOT     0x01
++#include "hw/ppc/pnv.h"
 +
-+static void pnv_gen_oem_sel(IPMIBmc *bmc, uint8_t reboot)
++#include <libfdt.h>
++
++/* TODO: include definition in ipmi.h */
++#define IPMI_SDR_FULL_TYPE 1
++
++void pnv_bmc_populate_sensors(IPMIBmc *bmc, void *fdt)
 +{
-+    /* IPMI SEL Event are 16 bytes long */
-+    OemSel sel =3D {
-+        .id        =3D { 0x55 , 0x55 },
-+        .type      =3D 0xC0, /* OEM */
-+        .manuf_id  =3D { 0x0, 0x0, 0x0 },
-+        .timestamp =3D { 0x0, 0x0, 0x0, 0x0 },
-+        .netfun    =3D 0x3A, /* IBM */
-+        .cmd       =3D 0x04, /* AMI OEM SEL Power Notification */
-+        .data      =3D { reboot, 0xFF, 0xFF, 0xFF },
-+    };
++    int offset;
++    int i;
++    const struct ipmi_sdr_compact *sdr;
++    uint16_t nextrec;
 +
-+    ipmi_bmc_gen_event(bmc, (uint8_t *) &sel, 0 /* do not log the event =
-*/);
++    offset =3D fdt_add_subnode(fdt, 0, "/bmc");
++    _FDT(offset);
++
++    _FDT((fdt_setprop_string(fdt, offset, "name", "bmc")));
++    _FDT((fdt_setprop_cell(fdt, offset, "#address-cells", 0x1)));
++    _FDT((fdt_setprop_cell(fdt, offset, "#size-cells", 0x0)));
++
++    offset =3D fdt_add_subnode(fdt, offset, "sensors");
++    _FDT(offset);
++
++    _FDT((fdt_setprop_cell(fdt, offset, "#address-cells", 0x1)));
++    _FDT((fdt_setprop_cell(fdt, offset, "#size-cells", 0x0)));
++
++    for (i =3D 0; !ipmi_bmc_sdr_find(bmc, i, &sdr, &nextrec); i++) {
++        int off;
++        char *name;
++
++        if (sdr->header.rec_type !=3D IPMI_SDR_COMPACT_TYPE &&
++            sdr->header.rec_type !=3D IPMI_SDR_FULL_TYPE) {
++            continue;
++        }
++
++        name =3D g_strdup_printf("sensor@%x", sdr->sensor_owner_number);
++        off =3D fdt_add_subnode(fdt, offset, name);
++        _FDT(off);
++        g_free(name);
++
++        _FDT((fdt_setprop_cell(fdt, off, "reg", sdr->sensor_owner_number=
+)));
++        _FDT((fdt_setprop_string(fdt, off, "name", "sensor")));
++        _FDT((fdt_setprop_string(fdt, off, "compatible", "ibm,ipmi-senso=
+r")));
++        _FDT((fdt_setprop_cell(fdt, off, "ipmi-sensor-reading-type",
++                               sdr->reading_type)));
++        _FDT((fdt_setprop_cell(fdt, off, "ipmi-entity-id",
++                               sdr->entity_id)));
++        _FDT((fdt_setprop_cell(fdt, off, "ipmi-entity-instance",
++                               sdr->entity_instance)));
++        _FDT((fdt_setprop_cell(fdt, off, "ipmi-sensor-type",
++                               sdr->sensor_type)));
++    }
 +}
-+
-+void pnv_bmc_powerdown(IPMIBmc *bmc)
-+{
-+    pnv_gen_oem_sel(bmc, SOFT_OFF);
-+}
-+
- void pnv_bmc_populate_sensors(IPMIBmc *bmc, void *fdt)
- {
-     int offset;
 diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index 02f6cf565ca4..c1288f974d4a 100644
+index b45a0d91c813..02f6cf565ca4 100644
 --- a/include/hw/ppc/pnv.h
 +++ b/include/hw/ppc/pnv.h
-@@ -134,6 +134,7 @@ typedef struct PnvMachineState {
-     uint32_t     cpld_irqstate;
+@@ -118,6 +118,8 @@ typedef struct PnvChipClass {
+ #define POWERNV_MACHINE(obj) \
+     OBJECT_CHECK(PnvMachineState, (obj), TYPE_POWERNV_MACHINE)
 =20
-     IPMIBmc      *bmc;
-+    Notifier     powerdown_notifier;
++typedef struct IPMIBmc IPMIBmc;
++
+ typedef struct PnvMachineState {
+     /*< private >*/
+     MachineState parent_obj;
+@@ -130,12 +132,19 @@ typedef struct PnvMachineState {
+=20
+     ISABus       *isa_bus;
+     uint32_t     cpld_irqstate;
++
++    IPMIBmc      *bmc;
  } PnvMachineState;
 =20
  #define PNV_FDT_ADDR          0x01000000
-@@ -143,6 +144,7 @@ typedef struct PnvMachineState {
-  * BMC helpers
-  */
- void pnv_bmc_populate_sensors(IPMIBmc *bmc, void *fdt);
-+void pnv_bmc_powerdown(IPMIBmc *bmc);
+ #define PNV_TIMEBASE_FREQ     512000000ULL
 =20
  /*
++ * BMC helpers
++ */
++void pnv_bmc_populate_sensors(IPMIBmc *bmc, void *fdt);
++
++/*
   * POWER8 MMIO base addresses
+  */
+ #define PNV_XSCOM_SIZE        0x800000000ull
 --=20
 2.7.4
