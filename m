@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cxxks-0006v0-7E
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:30:58 -0400
+	(envelope-from <clg@kaod.org>) id 1cxxl1-00073l-Q6
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:31:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cxxkp-0003lY-3r
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:30:54 -0400
-Received: from 9.mo173.mail-out.ovh.net ([46.105.72.44]:43472)
+	(envelope-from <clg@kaod.org>) id 1cxxky-0003uJ-LS
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:31:03 -0400
+Received: from 2.mo173.mail-out.ovh.net ([178.33.251.49]:44312)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cxxko-0003kX-TJ
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:30:51 -0400
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cxxky-0003te-Da
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:31:00 -0400
 Received: from player778.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id DE24F3144A
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 17:30:49 +0200 (CEST)
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 33B9431543
+	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 17:30:59 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Tue, 11 Apr 2017 17:30:04 +0200
-Message-Id: <1491924606-20026-7-git-send-email-clg@kaod.org>
+Date: Tue, 11 Apr 2017 17:30:06 +0200
+Message-Id: <1491924606-20026-9-git-send-email-clg@kaod.org>
 In-Reply-To: <1491924606-20026-1-git-send-email-clg@kaod.org>
 References: <1491924606-20026-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 6/8] ppc/pnv: populate device tree for IPMI
- BT devices
+Subject: [Qemu-devel] [PATCH v3 8/8] ppc/pnv: generate an OEM SEL event on
+ shutdown
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,88 +33,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-When an ipmi-bt device [1] is defined on the ISA bus, we need to
-populate the device tree with the object properties. Such devices are
-created with the command line options :
-
-   -device ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10
-
-[1] https://lists.gnu.org/archive/html/qemu-devel/2015-11/msg03168.html
+OpenPOWER systems expect to be notified with such an event before a
+shutdown or a reboot. An OEM SEL message is sent with specific
+identifiers and a user data containing the request : OFF or REBOOT.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 ---
 
- Changes sinve v2:
+ Changes since v1:
 
- - removed the initializer of io_base
+ - changed the prototype of the helper routine
 
- Changes sinve v1:
-
- - reworked the assignement of the ISA IO base in the 'reg' array
-   property
-=20
- hw/ppc/pnv.c | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+ hw/ppc/pnv.c         | 14 ++++++++++++++
+ hw/ppc/pnv_bmc.c     | 41 +++++++++++++++++++++++++++++++++++++++++
+ include/hw/ppc/pnv.h |  2 ++
+ 3 files changed, 57 insertions(+)
 
 diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index dfa21e4d740a..977e126aca2c 100644
+index 685eb122d20c..d4bcdb027f7c 100644
 --- a/hw/ppc/pnv.c
 +++ b/hw/ppc/pnv.c
-@@ -354,6 +354,39 @@ static void powernv_populate_serial(ISADevice *d, vo=
-id *fdt, int lpc_off)
-     _FDT((fdt_setprop_string(fdt, node, "device_type", "serial")));
+@@ -485,6 +485,15 @@ static void *powernv_create_fdt(MachineState *machin=
+e)
+     return fdt;
  }
 =20
-+static void powernv_populate_ipmi_bt(ISADevice *d, void *fdt, int lpc_of=
-f)
++static void pnv_powerdown_notify(Notifier *n, void *opaque)
 +{
-+    const char compatible[] =3D "bt\0ipmi-bt";
-+    uint32_t io_base;
-+    uint32_t io_regs[] =3D {
-+        cpu_to_be32(1),
-+        0, /* 'io_base' retrieved from the 'ioport' property of 'isa-ipm=
-i-bt' */
-+        cpu_to_be32(3)
-+    };
-+    uint32_t irq;
-+    char *name;
-+    int node;
++    PnvMachineState *pnv =3D POWERNV_MACHINE(qdev_get_machine());
 +
-+    io_base =3D object_property_get_int(OBJECT(d), "ioport", &error_fata=
-l);
-+    io_regs[1] =3D cpu_to_be32(io_base);
-+
-+    irq =3D object_property_get_int(OBJECT(d), "irq", &error_fatal);
-+
-+    name =3D g_strdup_printf("%s@i%x", qdev_fw_name(DEVICE(d)), io_base)=
-;
-+    node =3D fdt_add_subnode(fdt, lpc_off, name);
-+    _FDT(node);
-+    g_free(name);
-+
-+    fdt_setprop(fdt, node, "reg", io_regs, sizeof(io_regs));
-+    fdt_setprop(fdt, node, "compatible", compatible, sizeof(compatible))=
-;
-+
-+    /* Mark it as reserved to avoid Linux trying to claim it */
-+    _FDT((fdt_setprop_string(fdt, node, "status", "reserved")));
-+    _FDT((fdt_setprop_cell(fdt, node, "interrupts", irq)));
-+    _FDT((fdt_setprop_cell(fdt, node, "interrupt-parent",
-+                           fdt_get_phandle(fdt, lpc_off))));
++    if (pnv->bmc) {
++        pnv_bmc_powerdown(pnv->bmc);
++    }
 +}
 +
- typedef struct ForeachPopulateArgs {
-     void *fdt;
+ static void ppc_powernv_reset(void)
+ {
+     MachineState *machine =3D MACHINE(qdev_get_machine());
+@@ -638,6 +647,11 @@ static void ppc_powernv_init(MachineState *machine)
+=20
+     /* Create an RTC ISA device too */
+     rtc_init(pnv->isa_bus, 2000, NULL);
++
++    /* OpenPOWER systems use a IPMI SEL Event message to notify the
++     * host to powerdown */
++    pnv->powerdown_notifier.notify =3D pnv_powerdown_notify;
++    qemu_register_powerdown_notifier(&pnv->powerdown_notifier);
+ }
+=20
+ /*
+diff --git a/hw/ppc/pnv_bmc.c b/hw/ppc/pnv_bmc.c
+index a0820dca559b..7b60b4c36071 100644
+--- a/hw/ppc/pnv_bmc.c
++++ b/hw/ppc/pnv_bmc.c
+@@ -32,6 +32,47 @@
+ /* TODO: include definition in ipmi.h */
+ #define IPMI_SDR_FULL_TYPE 1
+=20
++/*
++ * OEM SEL Event data packet sent by BMC in response of a Read Event
++ * Message Buffer command
++ */
++typedef struct OemSel {
++    /* SEL header */
++    uint8_t id[2];
++    uint8_t type;
++    uint8_t timestamp[4];
++    uint8_t manuf_id[3];
++
++    /* OEM SEL data (6 bytes) follows */
++    uint8_t netfun;
++    uint8_t cmd;
++    uint8_t data[4];
++} OemSel;
++
++#define SOFT_OFF        0x00
++#define SOFT_REBOOT     0x01
++
++static void pnv_gen_oem_sel(IPMIBmc *bmc, uint8_t reboot)
++{
++    /* IPMI SEL Event are 16 bytes long */
++    OemSel sel =3D {
++        .id        =3D { 0x55 , 0x55 },
++        .type      =3D 0xC0, /* OEM */
++        .manuf_id  =3D { 0x0, 0x0, 0x0 },
++        .timestamp =3D { 0x0, 0x0, 0x0, 0x0 },
++        .netfun    =3D 0x3A, /* IBM */
++        .cmd       =3D 0x04, /* AMI OEM SEL Power Notification */
++        .data      =3D { reboot, 0xFF, 0xFF, 0xFF },
++    };
++
++    ipmi_bmc_gen_event(bmc, (uint8_t *) &sel, 0 /* do not log the event =
+*/);
++}
++
++void pnv_bmc_powerdown(IPMIBmc *bmc)
++{
++    pnv_gen_oem_sel(bmc, SOFT_OFF);
++}
++
+ void pnv_bmc_populate_sensors(IPMIBmc *bmc, void *fdt)
+ {
      int offset;
-@@ -368,6 +401,8 @@ static int powernv_populate_isa_device(DeviceState *d=
-ev, void *opaque)
-         powernv_populate_rtc(d, args->fdt, args->offset);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_ISA_SERIAL)) {
-         powernv_populate_serial(d, args->fdt, args->offset);
-+    } else if (object_dynamic_cast(OBJECT(dev), "isa-ipmi-bt")) {
-+        powernv_populate_ipmi_bt(d, args->fdt, args->offset);
-     } else {
-         error_report("unknown isa device %s@i%x", qdev_fw_name(dev),
-                      d->ioport_id);
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index 02f6cf565ca4..c1288f974d4a 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -134,6 +134,7 @@ typedef struct PnvMachineState {
+     uint32_t     cpld_irqstate;
+=20
+     IPMIBmc      *bmc;
++    Notifier     powerdown_notifier;
+ } PnvMachineState;
+=20
+ #define PNV_FDT_ADDR          0x01000000
+@@ -143,6 +144,7 @@ typedef struct PnvMachineState {
+  * BMC helpers
+  */
+ void pnv_bmc_populate_sensors(IPMIBmc *bmc, void *fdt);
++void pnv_bmc_powerdown(IPMIBmc *bmc);
+=20
+ /*
+  * POWER8 MMIO base addresses
 --=20
 2.7.4
