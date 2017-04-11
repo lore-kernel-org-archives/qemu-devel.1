@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cy0sc-0002qB-2n
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 14:51:08 -0400
+	(envelope-from <eblake@redhat.com>) id 1cy0si-0002vn-J5
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 14:51:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cy0sY-0004fJ-45
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 14:51:06 -0400
+	(envelope-from <eblake@redhat.com>) id 1cy0sf-0004kc-Uf
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 14:51:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49238)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cy0sf-0004kF-L3
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 14:51:09 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Tue, 11 Apr 2017 13:50:26 -0500
-Message-Id: <20170411185034.13460-6-eblake@redhat.com>
+Date: Tue, 11 Apr 2017 13:50:29 -0500
+Message-Id: <20170411185034.13460-9-eblake@redhat.com>
 In-Reply-To: <20170411185034.13460-1-eblake@redhat.com>
 References: <20170411185034.13460-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 05/13] qobject: Drop useless QObject casts
+Subject: [Qemu-devel] [PATCH v4 08/13] tests: Use simpler QDict/QList scalar
+ insertion macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,204 +25,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Weil <sw@weilnetz.de>, Alberto Garcia <berto@igalia.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, "open list:Block layer core" <qemu-block@nongnu.org>
+Cc: armbru@redhat.com, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-We have macros in place to make it less verbose to add a subtype
-of QObject to both QDict and QList. While we have made cleanups
-like this in the past (see commit fcfcd8ffc, for example), having
-it be automated by Coccinelle makes it easier to maintain.
+We now have macros in place to make it less verbose to add a scalar
+to QDict and QList, so use them.
 
 Patch created mechanically via:
   spatch --sp-file scripts/coccinelle/qobject.cocci \
-    --macro-file scripts/cocci-macro-file.h --dir . --in-place
-then I verified that no manual touchups were required.
+    --macro-file scripts/cocci-macro-file.h --dir tests --in-place
+then manually checked that no touch-ups were needed.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
 ---
 v4: no change
 v3: new patch
 ---
- block.c                   | 12 ++++--------
- block/blkdebug.c          |  4 ++--
- block/blkverify.c         |  7 +++----
- block/file-posix.c        |  6 +++---
- block/file-win32.c        |  4 ++--
- block/quorum.c            | 16 ++++++----------
- tests/check-qdict.c       | 20 ++++++++++----------
- tests/test-qmp-commands.c | 24 ++++++++++++------------
- 8 files changed, 42 insertions(+), 51 deletions(-)
+ tests/check-qdict.c                 | 134 ++++++++++++++++++------------------
+ tests/check-qlist.c                 |   4 +-
+ tests/device-introspect-test.c      |   4 +-
+ tests/test-qemu-opts.c              |   4 +-
+ tests/test-qmp-commands.c           |  24 +++----
+ tests/test-qmp-event.c              |  30 ++++----
+ tests/test-qobject-output-visitor.c |   6 +-
+ 7 files changed, 103 insertions(+), 103 deletions(-)
 
-diff --git a/block.c b/block.c
-index 1fbbb8d..9024518 100644
---- a/block.c
-+++ b/block.c
-@@ -4674,11 +4674,9 @@ void bdrv_refresh_filename(BlockDriverState *bs)
-          * contain a representation of the filename, therefore the following
-          * suffices without querying the (exact_)filename of this BDS. */
-         if (bs->file->bs->full_open_options) {
--            qdict_put_obj(opts, "driver",
--                          QOBJECT(qstring_from_str(drv->format_name)));
-+            qdict_put(opts, "driver", qstring_from_str(drv->format_name));
-             QINCREF(bs->file->bs->full_open_options);
--            qdict_put_obj(opts, "file",
--                          QOBJECT(bs->file->bs->full_open_options));
-+            qdict_put(opts, "file", bs->file->bs->full_open_options);
-
-             bs->full_open_options = opts;
-         } else {
-@@ -4694,8 +4692,7 @@ void bdrv_refresh_filename(BlockDriverState *bs)
-
-         opts = qdict_new();
-         append_open_options(opts, bs);
--        qdict_put_obj(opts, "driver",
--                      QOBJECT(qstring_from_str(drv->format_name)));
-+        qdict_put(opts, "driver", qstring_from_str(drv->format_name));
-
-         if (bs->exact_filename[0]) {
-             /* This may not work for all block protocol drivers (some may
-@@ -4705,8 +4702,7 @@ void bdrv_refresh_filename(BlockDriverState *bs)
-              * needs some special format of the options QDict, it needs to
-              * implement the driver-specific bdrv_refresh_filename() function.
-              */
--            qdict_put_obj(opts, "filename",
--                          QOBJECT(qstring_from_str(bs->exact_filename)));
-+            qdict_put(opts, "filename", qstring_from_str(bs->exact_filename));
-         }
-
-         bs->full_open_options = opts;
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index 67e8024..c5d4772 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -695,10 +695,10 @@ static void blkdebug_refresh_filename(BlockDriverState *bs, QDict *options)
-     }
-
-     opts = qdict_new();
--    qdict_put_obj(opts, "driver", QOBJECT(qstring_from_str("blkdebug")));
-+    qdict_put(opts, "driver", qstring_from_str("blkdebug"));
-
-     QINCREF(bs->file->bs->full_open_options);
--    qdict_put_obj(opts, "image", QOBJECT(bs->file->bs->full_open_options));
-+    qdict_put(opts, "image", bs->file->bs->full_open_options);
-
-     for (e = qdict_first(options); e; e = qdict_next(options, e)) {
-         if (strcmp(qdict_entry_key(e), "x-image")) {
-diff --git a/block/blkverify.c b/block/blkverify.c
-index 9a1e21c..79c8914 100644
---- a/block/blkverify.c
-+++ b/block/blkverify.c
-@@ -291,13 +291,12 @@ static void blkverify_refresh_filename(BlockDriverState *bs, QDict *options)
-         && s->test_file->bs->full_open_options)
-     {
-         QDict *opts = qdict_new();
--        qdict_put_obj(opts, "driver", QOBJECT(qstring_from_str("blkverify")));
-+        qdict_put(opts, "driver", qstring_from_str("blkverify"));
-
-         QINCREF(bs->file->bs->full_open_options);
--        qdict_put_obj(opts, "raw", QOBJECT(bs->file->bs->full_open_options));
-+        qdict_put(opts, "raw", bs->file->bs->full_open_options);
-         QINCREF(s->test_file->bs->full_open_options);
--        qdict_put_obj(opts, "test",
--                      QOBJECT(s->test_file->bs->full_open_options));
-+        qdict_put(opts, "test", s->test_file->bs->full_open_options);
-
-         bs->full_open_options = opts;
-     }
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 0c48968..5370ba0 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -377,7 +377,7 @@ static void raw_parse_filename(const char *filename, QDict *options,
-      * function call can be ignored. */
-     strstart(filename, "file:", &filename);
-
--    qdict_put_obj(options, "filename", QOBJECT(qstring_from_str(filename)));
-+    qdict_put(options, "filename", qstring_from_str(filename));
- }
-
- static QemuOptsList raw_runtime_opts = {
-@@ -2150,7 +2150,7 @@ static void hdev_parse_filename(const char *filename, QDict *options,
-     /* The prefix is optional, just as for "file". */
-     strstart(filename, "host_device:", &filename);
-
--    qdict_put_obj(options, "filename", QOBJECT(qstring_from_str(filename)));
-+    qdict_put(options, "filename", qstring_from_str(filename));
- }
-
- static bool hdev_is_sg(BlockDriverState *bs)
-@@ -2449,7 +2449,7 @@ static void cdrom_parse_filename(const char *filename, QDict *options,
-     /* The prefix is optional, just as for "file". */
-     strstart(filename, "host_cdrom:", &filename);
-
--    qdict_put_obj(options, "filename", QOBJECT(qstring_from_str(filename)));
-+    qdict_put(options, "filename", qstring_from_str(filename));
- }
- #endif
-
-diff --git a/block/file-win32.c b/block/file-win32.c
-index 800fabd..57c4a78 100644
---- a/block/file-win32.c
-+++ b/block/file-win32.c
-@@ -282,7 +282,7 @@ static void raw_parse_filename(const char *filename, QDict *options,
-      * function call can be ignored. */
-     strstart(filename, "file:", &filename);
-
--    qdict_put_obj(options, "filename", QOBJECT(qstring_from_str(filename)));
-+    qdict_put(options, "filename", qstring_from_str(filename));
- }
-
- static QemuOptsList raw_runtime_opts = {
-@@ -669,7 +669,7 @@ static void hdev_parse_filename(const char *filename, QDict *options,
-     /* The prefix is optional, just as for "file". */
-     strstart(filename, "host_device:", &filename);
-
--    qdict_put_obj(options, "filename", QOBJECT(qstring_from_str(filename)));
-+    qdict_put(options, "filename", qstring_from_str(filename));
- }
-
- static int hdev_open(BlockDriverState *bs, QDict *options, int flags,
-diff --git a/block/quorum.c b/block/quorum.c
-index 40205fb..f7949e2 100644
---- a/block/quorum.c
-+++ b/block/quorum.c
-@@ -1096,19 +1096,15 @@ static void quorum_refresh_filename(BlockDriverState *bs, QDict *options)
-     children = qlist_new();
-     for (i = 0; i < s->num_children; i++) {
-         QINCREF(s->children[i]->bs->full_open_options);
--        qlist_append_obj(children,
--                         QOBJECT(s->children[i]->bs->full_open_options));
-+        qlist_append(children, s->children[i]->bs->full_open_options);
-     }
-
-     opts = qdict_new();
--    qdict_put_obj(opts, "driver", QOBJECT(qstring_from_str("quorum")));
--    qdict_put_obj(opts, QUORUM_OPT_VOTE_THRESHOLD,
--                  QOBJECT(qint_from_int(s->threshold)));
--    qdict_put_obj(opts, QUORUM_OPT_BLKVERIFY,
--                  QOBJECT(qbool_from_bool(s->is_blkverify)));
--    qdict_put_obj(opts, QUORUM_OPT_REWRITE,
--                  QOBJECT(qbool_from_bool(s->rewrite_corrupted)));
--    qdict_put_obj(opts, "children", QOBJECT(children));
-+    qdict_put(opts, "driver", qstring_from_str("quorum"));
-+    qdict_put(opts, QUORUM_OPT_VOTE_THRESHOLD, qint_from_int(s->threshold));
-+    qdict_put(opts, QUORUM_OPT_BLKVERIFY, qbool_from_bool(s->is_blkverify));
-+    qdict_put(opts, QUORUM_OPT_REWRITE, qbool_from_bool(s->rewrite_corrupted));
-+    qdict_put(opts, "children", children);
-
-     bs->full_open_options = opts;
- }
 diff --git a/tests/check-qdict.c b/tests/check-qdict.c
-index 81162ee..9cdc985 100644
+index 9cdc985..3effca5 100644
 --- a/tests/check-qdict.c
 +++ b/tests/check-qdict.c
 @@ -47,7 +47,7 @@ static void qdict_put_obj_test(void)
      qdict = qdict_new();
 
      // key "" will have tdb hash 12345
--    qdict_put_obj(qdict, "", QOBJECT(qint_from_int(num)));
-+    qdict_put(qdict, "", qint_from_int(num));
+-    qdict_put(qdict, "", qint_from_int(num));
++    qdict_put_int(qdict, "", num);
 
      g_assert(qdict_size(qdict) == 1);
      ent = QLIST_FIRST(&qdict->table[12345 % QDICT_BUCKET_MAX]);
@@ -225,47 +67,389 @@ index 81162ee..9cdc985 100644
      QDict *qdict;
 
      qdict = qdict_new();
--    qdict_put_obj(qdict, "num", QOBJECT(qint_from_int(0)));
--    qdict_put_obj(qdict, "str", QOBJECT(qstring_from_str("foo")));
-+    qdict_put(qdict, "num", qint_from_int(0));
-+    qdict_put(qdict, "str", qstring_from_str("foo"));
+-    qdict_put(qdict, "num", qint_from_int(0));
+-    qdict_put(qdict, "str", qstring_from_str("foo"));
++    qdict_put_int(qdict, "num", 0);
++    qdict_put_str(qdict, "str", "foo");
 
      QDECREF(qdict);
  }
-@@ -297,16 +297,16 @@ static void qdict_flatten_test(void)
-     qdict_put(dict1, "a", qint_from_int(0));
-     qdict_put(dict1, "b", qint_from_int(1));
+@@ -80,7 +80,7 @@ static void qdict_get_test(void)
+     const char *key = "test";
+     QDict *tests_dict = qdict_new();
 
--    qlist_append_obj(list1, QOBJECT(qint_from_int(23)));
--    qlist_append_obj(list1, QOBJECT(qint_from_int(66)));
--    qlist_append_obj(list1, QOBJECT(dict1));
--    qlist_append_obj(list2, QOBJECT(qint_from_int(42)));
--    qlist_append_obj(list2, QOBJECT(list1));
-+    qlist_append(list1, qint_from_int(23));
-+    qlist_append(list1, qint_from_int(66));
-+    qlist_append(list1, dict1);
-+    qlist_append(list2, qint_from_int(42));
-+    qlist_append(list2, list1);
+-    qdict_put(tests_dict, key, qint_from_int(value));
++    qdict_put_int(tests_dict, key, value);
 
-     qdict_put(dict2, "c", qint_from_int(2));
-     qdict_put(dict2, "d", qint_from_int(3));
--    qdict_put_obj(dict3, "e", QOBJECT(list2));
--    qdict_put_obj(dict3, "f", QOBJECT(dict2));
-+    qdict_put(dict3, "e", list2);
-+    qdict_put(dict3, "f", dict2);
-     qdict_put(dict3, "g", qint_from_int(4));
+     obj = qdict_get(tests_dict, key);
+     g_assert(obj != NULL);
+@@ -98,7 +98,7 @@ static void qdict_get_int_test(void)
+     const char *key = "int";
+     QDict *tests_dict = qdict_new();
+
+-    qdict_put(tests_dict, key, qint_from_int(value));
++    qdict_put_int(tests_dict, key, value);
+
+     ret = qdict_get_int(tests_dict, key);
+     g_assert(ret == value);
+@@ -113,7 +113,7 @@ static void qdict_get_try_int_test(void)
+     const char *key = "int";
+     QDict *tests_dict = qdict_new();
+
+-    qdict_put(tests_dict, key, qint_from_int(value));
++    qdict_put_int(tests_dict, key, value);
+
+     ret = qdict_get_try_int(tests_dict, key, 0);
+     g_assert(ret == value);
+@@ -128,7 +128,7 @@ static void qdict_get_str_test(void)
+     const char *str = "string";
+     QDict *tests_dict = qdict_new();
+
+-    qdict_put(tests_dict, key, qstring_from_str(str));
++    qdict_put_str(tests_dict, key, str);
+
+     p = qdict_get_str(tests_dict, key);
+     g_assert(p != NULL);
+@@ -144,7 +144,7 @@ static void qdict_get_try_str_test(void)
+     const char *str = "string";
+     QDict *tests_dict = qdict_new();
+
+-    qdict_put(tests_dict, key, qstring_from_str(str));
++    qdict_put_str(tests_dict, key, str);
+
+     p = qdict_get_try_str(tests_dict, key);
+     g_assert(p != NULL);
+@@ -188,7 +188,7 @@ static void qdict_haskey_test(void)
+     const char *key = "test";
+     QDict *tests_dict = qdict_new();
+
+-    qdict_put(tests_dict, key, qint_from_int(0));
++    qdict_put_int(tests_dict, key, 0);
+     g_assert(qdict_haskey(tests_dict, key) == 1);
+
+     QDECREF(tests_dict);
+@@ -199,7 +199,7 @@ static void qdict_del_test(void)
+     const char *key = "key test";
+     QDict *tests_dict = qdict_new();
+
+-    qdict_put(tests_dict, key, qstring_from_str("foo"));
++    qdict_put_str(tests_dict, key, "foo");
+     g_assert(qdict_size(tests_dict) == 1);
+
+     qdict_del(tests_dict, key);
+@@ -226,9 +226,9 @@ static void qdict_iterapi_test(void)
+
+     g_assert(qdict_first(tests_dict) == NULL);
+
+-    qdict_put(tests_dict, "key1", qint_from_int(1));
+-    qdict_put(tests_dict, "key2", qint_from_int(2));
+-    qdict_put(tests_dict, "key3", qint_from_int(3));
++    qdict_put_int(tests_dict, "key1", 1);
++    qdict_put_int(tests_dict, "key2", 2);
++    qdict_put_int(tests_dict, "key3", 3);
+
+     count = 0;
+     for (ent = qdict_first(tests_dict); ent; ent = qdict_next(tests_dict, ent)){
+@@ -294,20 +294,20 @@ static void qdict_flatten_test(void)
+      * }
+      */
+
+-    qdict_put(dict1, "a", qint_from_int(0));
+-    qdict_put(dict1, "b", qint_from_int(1));
++    qdict_put_int(dict1, "a", 0);
++    qdict_put_int(dict1, "b", 1);
+
+-    qlist_append(list1, qint_from_int(23));
+-    qlist_append(list1, qint_from_int(66));
++    qlist_append_int(list1, 23);
++    qlist_append_int(list1, 66);
+     qlist_append(list1, dict1);
+-    qlist_append(list2, qint_from_int(42));
++    qlist_append_int(list2, 42);
+     qlist_append(list2, list1);
+
+-    qdict_put(dict2, "c", qint_from_int(2));
+-    qdict_put(dict2, "d", qint_from_int(3));
++    qdict_put_int(dict2, "c", 2);
++    qdict_put_int(dict2, "d", 3);
+     qdict_put(dict3, "e", list2);
+     qdict_put(dict3, "f", dict2);
+-    qdict_put(dict3, "g", qint_from_int(4));
++    qdict_put_int(dict3, "g", 4);
 
      qdict_flatten(dict3);
+
+@@ -369,12 +369,12 @@ static void qdict_array_split_test(void)
+      * This example is given in the comment of qdict_array_split().
+      */
+
+-    qdict_put(test_dict, "1.x", qint_from_int(0));
+-    qdict_put(test_dict, "4.y", qint_from_int(1));
+-    qdict_put(test_dict, "0.a", qint_from_int(42));
+-    qdict_put(test_dict, "o.o", qint_from_int(7));
+-    qdict_put(test_dict, "0.b", qint_from_int(23));
+-    qdict_put(test_dict, "2", qint_from_int(66));
++    qdict_put_int(test_dict, "1.x", 0);
++    qdict_put_int(test_dict, "4.y", 1);
++    qdict_put_int(test_dict, "0.a", 42);
++    qdict_put_int(test_dict, "o.o", 7);
++    qdict_put_int(test_dict, "0.b", 23);
++    qdict_put_int(test_dict, "2", 66);
+
+     qdict_array_split(test_dict, &test_list);
+
+@@ -441,9 +441,9 @@ static void qdict_array_split_test(void)
+
+     test_dict = qdict_new();
+
+-    qdict_put(test_dict, "0", qint_from_int(42));
+-    qdict_put(test_dict, "1", qint_from_int(23));
+-    qdict_put(test_dict, "1.x", qint_from_int(84));
++    qdict_put_int(test_dict, "0", 42);
++    qdict_put_int(test_dict, "1", 23);
++    qdict_put_int(test_dict, "1.x", 84);
+
+     qdict_array_split(test_dict, &test_list);
+
+@@ -472,38 +472,38 @@ static void qdict_array_entries_test(void)
+
+     g_assert_cmpint(qdict_array_entries(dict, "foo."), ==, 0);
+
+-    qdict_put(dict, "bar", qint_from_int(0));
+-    qdict_put(dict, "baz.0", qint_from_int(0));
++    qdict_put_int(dict, "bar", 0);
++    qdict_put_int(dict, "baz.0", 0);
+     g_assert_cmpint(qdict_array_entries(dict, "foo."), ==, 0);
+
+-    qdict_put(dict, "foo.1", qint_from_int(0));
++    qdict_put_int(dict, "foo.1", 0);
+     g_assert_cmpint(qdict_array_entries(dict, "foo."), ==, -EINVAL);
+-    qdict_put(dict, "foo.0", qint_from_int(0));
++    qdict_put_int(dict, "foo.0", 0);
+     g_assert_cmpint(qdict_array_entries(dict, "foo."), ==, 2);
+-    qdict_put(dict, "foo.bar", qint_from_int(0));
++    qdict_put_int(dict, "foo.bar", 0);
+     g_assert_cmpint(qdict_array_entries(dict, "foo."), ==, -EINVAL);
+     qdict_del(dict, "foo.bar");
+
+-    qdict_put(dict, "foo.2.a", qint_from_int(0));
+-    qdict_put(dict, "foo.2.b", qint_from_int(0));
+-    qdict_put(dict, "foo.2.c", qint_from_int(0));
++    qdict_put_int(dict, "foo.2.a", 0);
++    qdict_put_int(dict, "foo.2.b", 0);
++    qdict_put_int(dict, "foo.2.c", 0);
+     g_assert_cmpint(qdict_array_entries(dict, "foo."), ==, 3);
+     g_assert_cmpint(qdict_array_entries(dict, ""), ==, -EINVAL);
+
+     QDECREF(dict);
+
+     dict = qdict_new();
+-    qdict_put(dict, "1", qint_from_int(0));
++    qdict_put_int(dict, "1", 0);
+     g_assert_cmpint(qdict_array_entries(dict, ""), ==, -EINVAL);
+-    qdict_put(dict, "0", qint_from_int(0));
++    qdict_put_int(dict, "0", 0);
+     g_assert_cmpint(qdict_array_entries(dict, ""), ==, 2);
+-    qdict_put(dict, "bar", qint_from_int(0));
++    qdict_put_int(dict, "bar", 0);
+     g_assert_cmpint(qdict_array_entries(dict, ""), ==, -EINVAL);
+     qdict_del(dict, "bar");
+
+-    qdict_put(dict, "2.a", qint_from_int(0));
+-    qdict_put(dict, "2.b", qint_from_int(0));
+-    qdict_put(dict, "2.c", qint_from_int(0));
++    qdict_put_int(dict, "2.a", 0);
++    qdict_put_int(dict, "2.b", 0);
++    qdict_put_int(dict, "2.c", 0);
+     g_assert_cmpint(qdict_array_entries(dict, ""), ==, 3);
+
+     QDECREF(dict);
+@@ -529,7 +529,7 @@ static void qdict_join_test(void)
+
+         /* First iteration: Test movement */
+         /* Second iteration: Test empty source and non-empty destination */
+-        qdict_put(dict2, "foo", qint_from_int(42));
++        qdict_put_int(dict2, "foo", 42);
+
+         for (i = 0; i < 2; i++) {
+             qdict_join(dict1, dict2, overwrite);
+@@ -541,7 +541,7 @@ static void qdict_join_test(void)
+         }
+
+         /* Test non-empty source and destination without conflict */
+-        qdict_put(dict2, "bar", qint_from_int(23));
++        qdict_put_int(dict2, "bar", 23);
+
+         qdict_join(dict1, dict2, overwrite);
+
+@@ -552,7 +552,7 @@ static void qdict_join_test(void)
+         g_assert(qdict_get_int(dict1, "bar") == 23);
+
+         /* Test conflict */
+-        qdict_put(dict2, "foo", qint_from_int(84));
++        qdict_put_int(dict2, "foo", 84);
+
+         qdict_join(dict1, dict2, overwrite);
+
+@@ -594,15 +594,15 @@ static void qdict_crumple_test_recursive(void)
+     QList *rules;
+
+     src = qdict_new();
+-    qdict_put(src, "vnc.listen.addr", qstring_from_str("127.0.0.1"));
+-    qdict_put(src, "vnc.listen.port", qstring_from_str("5901"));
+-    qdict_put(src, "vnc.acl.rules.0.match", qstring_from_str("fred"));
+-    qdict_put(src, "vnc.acl.rules.0.policy", qstring_from_str("allow"));
+-    qdict_put(src, "vnc.acl.rules.1.match", qstring_from_str("bob"));
+-    qdict_put(src, "vnc.acl.rules.1.policy", qstring_from_str("deny"));
+-    qdict_put(src, "vnc.acl.default", qstring_from_str("deny"));
+-    qdict_put(src, "vnc.acl..name", qstring_from_str("acl0"));
+-    qdict_put(src, "vnc.acl.rule..name", qstring_from_str("acl0"));
++    qdict_put_str(src, "vnc.listen.addr", "127.0.0.1");
++    qdict_put_str(src, "vnc.listen.port", "5901");
++    qdict_put_str(src, "vnc.acl.rules.0.match", "fred");
++    qdict_put_str(src, "vnc.acl.rules.0.policy", "allow");
++    qdict_put_str(src, "vnc.acl.rules.1.match", "bob");
++    qdict_put_str(src, "vnc.acl.rules.1.policy", "deny");
++    qdict_put_str(src, "vnc.acl.default", "deny");
++    qdict_put_str(src, "vnc.acl..name", "acl0");
++    qdict_put_str(src, "vnc.acl.rule..name", "acl0");
+
+     dst = qobject_to_qdict(qdict_crumple(src, &error_abort));
+     g_assert(dst);
+@@ -669,8 +669,8 @@ static void qdict_crumple_test_bad_inputs(void)
+
+     src = qdict_new();
+     /* rule.0 can't be both a string and a dict */
+-    qdict_put(src, "rule.0", qstring_from_str("fred"));
+-    qdict_put(src, "rule.0.policy", qstring_from_str("allow"));
++    qdict_put_str(src, "rule.0", "fred");
++    qdict_put_str(src, "rule.0.policy", "allow");
+
+     g_assert(qdict_crumple(src, &error) == NULL);
+     g_assert(error != NULL);
+@@ -680,8 +680,8 @@ static void qdict_crumple_test_bad_inputs(void)
+
+     src = qdict_new();
+     /* rule can't be both a list and a dict */
+-    qdict_put(src, "rule.0", qstring_from_str("fred"));
+-    qdict_put(src, "rule.a", qstring_from_str("allow"));
++    qdict_put_str(src, "rule.0", "fred");
++    qdict_put_str(src, "rule.a", "allow");
+
+     g_assert(qdict_crumple(src, &error) == NULL);
+     g_assert(error != NULL);
+@@ -692,7 +692,7 @@ static void qdict_crumple_test_bad_inputs(void)
+     src = qdict_new();
+     /* The input should be flat, ie no dicts or lists */
+     qdict_put(src, "rule.a", qdict_new());
+-    qdict_put(src, "rule.b", qstring_from_str("allow"));
++    qdict_put_str(src, "rule.b", "allow");
+
+     g_assert(qdict_crumple(src, &error) == NULL);
+     g_assert(error != NULL);
+@@ -702,8 +702,8 @@ static void qdict_crumple_test_bad_inputs(void)
+
+     src = qdict_new();
+     /* List indexes must not have gaps */
+-    qdict_put(src, "rule.0", qstring_from_str("deny"));
+-    qdict_put(src, "rule.3", qstring_from_str("allow"));
++    qdict_put_str(src, "rule.0", "deny");
++    qdict_put_str(src, "rule.3", "allow");
+
+     g_assert(qdict_crumple(src, &error) == NULL);
+     g_assert(error != NULL);
+@@ -713,8 +713,8 @@ static void qdict_crumple_test_bad_inputs(void)
+
+     src = qdict_new();
+     /* List indexes must be in %zu format */
+-    qdict_put(src, "rule.0", qstring_from_str("deny"));
+-    qdict_put(src, "rule.+1", qstring_from_str("allow"));
++    qdict_put_str(src, "rule.0", "deny");
++    qdict_put_str(src, "rule.+1", "allow");
+
+     g_assert(qdict_crumple(src, &error) == NULL);
+     g_assert(error != NULL);
+@@ -733,8 +733,8 @@ static void qdict_put_exists_test(void)
+     const char *key = "exists";
+     QDict *tests_dict = qdict_new();
+
+-    qdict_put(tests_dict, key, qint_from_int(1));
+-    qdict_put(tests_dict, key, qint_from_int(2));
++    qdict_put_int(tests_dict, key, 1);
++    qdict_put_int(tests_dict, key, 2);
+
+     value = qdict_get_int(tests_dict, key);
+     g_assert(value == 2);
+diff --git a/tests/check-qlist.c b/tests/check-qlist.c
+index e16da5e..4983867 100644
+--- a/tests/check-qlist.c
++++ b/tests/check-qlist.c
+@@ -74,7 +74,7 @@ static void qlist_destroy_test(void)
+     qlist = qlist_new();
+
+     for (i = 0; i < 42; i++)
+-        qlist_append(qlist, qint_from_int(i));
++        qlist_append_int(qlist, i);
+
+     QDECREF(qlist);
+ }
+@@ -103,7 +103,7 @@ static void qlist_iter_test(void)
+     qlist = qlist_new();
+
+     for (i = 0; i < iter_max; i++)
+-        qlist_append(qlist, qint_from_int(i));
++        qlist_append_int(qlist, i);
+
+     iter_called = 0;
+     qlist_iter(qlist, iter_func, NULL);
+diff --git a/tests/device-introspect-test.c b/tests/device-introspect-test.c
+index c5637cc..b1abb2a 100644
+--- a/tests/device-introspect-test.c
++++ b/tests/device-introspect-test.c
+@@ -32,9 +32,9 @@ static QList *qom_list_types(const char *implements, bool abstract)
+     QList *ret;
+     QDict *args = qdict_new();
+
+-    qdict_put(args, "abstract", qbool_from_bool(abstract));
++    qdict_put_bool(args, "abstract", abstract);
+     if (implements) {
+-        qdict_put(args, "implements", qstring_from_str(implements));
++        qdict_put_str(args, "implements", implements);
+     }
+     resp = qmp("{'execute': 'qom-list-types',"
+                " 'arguments': %p }", args);
+diff --git a/tests/test-qemu-opts.c b/tests/test-qemu-opts.c
+index 0ad74b4..cc1bb1a 100644
+--- a/tests/test-qemu-opts.c
++++ b/tests/test-qemu-opts.c
+@@ -299,7 +299,7 @@ static void test_qemu_opt_get_size(void)
+     dict = qdict_new();
+     g_assert(dict != NULL);
+
+-    qdict_put(dict, "size1", qstring_from_str("10"));
++    qdict_put_str(dict, "size1", "10");
+
+     qemu_opts_absorb_qdict(opts, dict, &error_abort);
+     g_assert(error_abort == NULL);
+@@ -309,7 +309,7 @@ static void test_qemu_opt_get_size(void)
+     g_assert(opt == 10);
+
+     /* reset value */
+-    qdict_put(dict, "size1", qstring_from_str("15"));
++    qdict_put_str(dict, "size1", "15");
+
+     qemu_opts_absorb_qdict(opts, dict, &error_abort);
+     g_assert(error_abort == NULL);
 diff --git a/tests/test-qmp-commands.c b/tests/test-qmp-commands.c
-index 0f81a98..ac3fd03 100644
+index ac3fd03..acdded4 100644
 --- a/tests/test-qmp-commands.c
 +++ b/tests/test-qmp-commands.c
 @@ -94,7 +94,7 @@ static void test_dispatch_cmd(void)
      QDict *req = qdict_new();
      QObject *resp;
 
--    qdict_put_obj(req, "execute", QOBJECT(qstring_from_str("user_def_cmd")));
-+    qdict_put(req, "execute", qstring_from_str("user_def_cmd"));
+-    qdict_put(req, "execute", qstring_from_str("user_def_cmd"));
++    qdict_put_str(req, "execute", "user_def_cmd");
 
      resp = qmp_dispatch(&qmp_commands, QOBJECT(req));
      assert(resp != NULL);
@@ -273,17 +457,21 @@ index 0f81a98..ac3fd03 100644
      QDict *args = qdict_new();
      QObject *resp;
 
--    qdict_put_obj(req, "execute", QOBJECT(qstring_from_str("user_def_cmd2")));
-+    qdict_put(req, "execute", qstring_from_str("user_def_cmd2"));
+-    qdict_put(req, "execute", qstring_from_str("user_def_cmd2"));
++    qdict_put_str(req, "execute", "user_def_cmd2");
 
      resp = qmp_dispatch(&qmp_commands, QOBJECT(req));
      assert(resp != NULL);
-@@ -125,7 +125,7 @@ static void test_dispatch_cmd_failure(void)
-     qdict_put(args, "a", qint_from_int(66));
+@@ -122,10 +122,10 @@ static void test_dispatch_cmd_failure(void)
+
+     /* check that with extra arguments it throws an error */
+     req = qdict_new();
+-    qdict_put(args, "a", qint_from_int(66));
++    qdict_put_int(args, "a", 66);
      qdict_put(req, "arguments", args);
 
--    qdict_put_obj(req, "execute", QOBJECT(qstring_from_str("user_def_cmd")));
-+    qdict_put(req, "execute", qstring_from_str("user_def_cmd"));
+-    qdict_put(req, "execute", qstring_from_str("user_def_cmd"));
++    qdict_put_str(req, "execute", "user_def_cmd");
 
      resp = qmp_dispatch(&qmp_commands, QOBJECT(req));
      assert(resp != NULL);
@@ -291,33 +479,134 @@ index 0f81a98..ac3fd03 100644
      QDict *ret_dict_dict2, *ret_dict_dict2_userdef;
      QInt *ret3;
 
--    qdict_put_obj(ud1a, "integer", QOBJECT(qint_from_int(42)));
--    qdict_put_obj(ud1a, "string", QOBJECT(qstring_from_str("hello")));
--    qdict_put_obj(ud1b, "integer", QOBJECT(qint_from_int(422)));
--    qdict_put_obj(ud1b, "string", QOBJECT(qstring_from_str("hello2")));
--    qdict_put_obj(args, "ud1a", QOBJECT(ud1a));
--    qdict_put_obj(args, "ud1b", QOBJECT(ud1b));
--    qdict_put_obj(req, "arguments", QOBJECT(args));
--    qdict_put_obj(req, "execute", QOBJECT(qstring_from_str("user_def_cmd2")));
-+    qdict_put(ud1a, "integer", qint_from_int(42));
-+    qdict_put(ud1a, "string", qstring_from_str("hello"));
-+    qdict_put(ud1b, "integer", qint_from_int(422));
-+    qdict_put(ud1b, "string", qstring_from_str("hello2"));
-+    qdict_put(args, "ud1a", ud1a);
-+    qdict_put(args, "ud1b", ud1b);
-+    qdict_put(req, "arguments", args);
-+    qdict_put(req, "execute", qstring_from_str("user_def_cmd2"));
+-    qdict_put(ud1a, "integer", qint_from_int(42));
+-    qdict_put(ud1a, "string", qstring_from_str("hello"));
+-    qdict_put(ud1b, "integer", qint_from_int(422));
+-    qdict_put(ud1b, "string", qstring_from_str("hello2"));
++    qdict_put_int(ud1a, "integer", 42);
++    qdict_put_str(ud1a, "string", "hello");
++    qdict_put_int(ud1b, "integer", 422);
++    qdict_put_str(ud1b, "string", "hello2");
+     qdict_put(args, "ud1a", ud1a);
+     qdict_put(args, "ud1b", ud1b);
+     qdict_put(req, "arguments", args);
+-    qdict_put(req, "execute", qstring_from_str("user_def_cmd2"));
++    qdict_put_str(req, "execute", "user_def_cmd2");
 
      ret = qobject_to_qdict(test_qmp_dispatch(req));
 
+@@ -190,9 +190,9 @@ static void test_dispatch_cmd_io(void)
+     assert(!strcmp(qdict_get_str(ret_dict_dict2, "string"), "blah4"));
+     QDECREF(ret);
+
+-    qdict_put(args3, "a", qint_from_int(66));
++    qdict_put_int(args3, "a", 66);
+     qdict_put(req, "arguments", args3);
+-    qdict_put(req, "execute", qstring_from_str("guest-get-time"));
++    qdict_put_str(req, "execute", "guest-get-time");
+
+     ret3 = qobject_to_qint(test_qmp_dispatch(req));
+     assert(qint_get_int(ret3) == 66);
 @@ -244,7 +244,7 @@ static void test_dealloc_partial(void)
          Visitor *v;
 
          ud2_dict = qdict_new();
--        qdict_put_obj(ud2_dict, "string0", QOBJECT(qstring_from_str(text)));
-+        qdict_put(ud2_dict, "string0", qstring_from_str(text));
+-        qdict_put(ud2_dict, "string0", qstring_from_str(text));
++        qdict_put_str(ud2_dict, "string0", text);
 
          v = qobject_input_visitor_new(QOBJECT(ud2_dict));
          visit_type_UserDefTwo(v, NULL, &ud2, &err);
+diff --git a/tests/test-qmp-event.c b/tests/test-qmp-event.c
+index 7bb621b..4c0f096 100644
+--- a/tests/test-qmp-event.c
++++ b/tests/test-qmp-event.c
+@@ -153,7 +153,7 @@ static void test_event_a(TestEventData *data,
+ {
+     QDict *d;
+     d = data->expect;
+-    qdict_put(d, "event", qstring_from_str("EVENT_A"));
++    qdict_put_str(d, "event", "EVENT_A");
+     qapi_event_send_event_a(&error_abort);
+ }
+
+@@ -162,7 +162,7 @@ static void test_event_b(TestEventData *data,
+ {
+     QDict *d;
+     d = data->expect;
+-    qdict_put(d, "event", qstring_from_str("EVENT_B"));
++    qdict_put_str(d, "event", "EVENT_B");
+     qapi_event_send_event_b(&error_abort);
+ }
+
+@@ -177,16 +177,16 @@ static void test_event_c(TestEventData *data,
+     b.has_enum1 = false;
+
+     d_b = qdict_new();
+-    qdict_put(d_b, "integer", qint_from_int(2));
+-    qdict_put(d_b, "string", qstring_from_str("test1"));
++    qdict_put_int(d_b, "integer", 2);
++    qdict_put_str(d_b, "string", "test1");
+
+     d_data = qdict_new();
+-    qdict_put(d_data, "a", qint_from_int(1));
++    qdict_put_int(d_data, "a", 1);
+     qdict_put(d_data, "b", d_b);
+-    qdict_put(d_data, "c", qstring_from_str("test2"));
++    qdict_put_str(d_data, "c", "test2");
+
+     d = data->expect;
+-    qdict_put(d, "event", qstring_from_str("EVENT_C"));
++    qdict_put_str(d, "event", "EVENT_C");
+     qdict_put(d, "data", d_data);
+
+     qapi_event_send_event_c(true, 1, true, &b, "test2", &error_abort);
+@@ -213,22 +213,22 @@ static void test_event_d(TestEventData *data,
+     a.enum2 = ENUM_ONE_VALUE2;
+
+     d_struct1 = qdict_new();
+-    qdict_put(d_struct1, "integer", qint_from_int(2));
+-    qdict_put(d_struct1, "string", qstring_from_str("test1"));
+-    qdict_put(d_struct1, "enum1", qstring_from_str("value1"));
++    qdict_put_int(d_struct1, "integer", 2);
++    qdict_put_str(d_struct1, "string", "test1");
++    qdict_put_str(d_struct1, "enum1", "value1");
+
+     d_a = qdict_new();
+     qdict_put(d_a, "struct1", d_struct1);
+-    qdict_put(d_a, "string", qstring_from_str("test2"));
+-    qdict_put(d_a, "enum2", qstring_from_str("value2"));
++    qdict_put_str(d_a, "string", "test2");
++    qdict_put_str(d_a, "enum2", "value2");
+
+     d_data = qdict_new();
+     qdict_put(d_data, "a", d_a);
+-    qdict_put(d_data, "b", qstring_from_str("test3"));
+-    qdict_put(d_data, "enum3", qstring_from_str("value3"));
++    qdict_put_str(d_data, "b", "test3");
++    qdict_put_str(d_data, "enum3", "value3");
+
+     d = data->expect;
+-    qdict_put(d, "event", qstring_from_str("EVENT_D"));
++    qdict_put_str(d, "event", "EVENT_D");
+     qdict_put(d, "data", d_data);
+
+     qapi_event_send_event_d(&a, "test3", false, NULL, true, ENUM_ONE_VALUE3,
+diff --git a/tests/test-qobject-output-visitor.c b/tests/test-qobject-output-visitor.c
+index c213fce..94b9518 100644
+--- a/tests/test-qobject-output-visitor.c
++++ b/tests/test-qobject-output-visitor.c
+@@ -343,9 +343,9 @@ static void test_visitor_out_any(TestOutputVisitorData *data,
+
+     visitor_reset(data);
+     qdict = qdict_new();
+-    qdict_put(qdict, "integer", qint_from_int(-42));
+-    qdict_put(qdict, "boolean", qbool_from_bool(true));
+-    qdict_put(qdict, "string", qstring_from_str("foo"));
++    qdict_put_int(qdict, "integer", -42);
++    qdict_put_bool(qdict, "boolean", true);
++    qdict_put_str(qdict, "string", "foo");
+     qobj = QOBJECT(qdict);
+     visit_type_any(data->ov, NULL, &qobj, &error_abort);
+     qobject_decref(qobj);
 -- 
 2.9.3
