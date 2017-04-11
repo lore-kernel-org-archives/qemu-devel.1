@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cxkRG-0005Qu-5L
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 21:17:50 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1cxkTJ-00075D-Hc
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 21:19:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cxkRE-0005uk-5o
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 21:17:46 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Mon, 10 Apr 2017 20:17:18 -0500
-Message-Id: <20170411011718.9152-14-eblake@redhat.com>
-In-Reply-To: <20170411011718.9152-1-eblake@redhat.com>
-References: <20170411011718.9152-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v9 13/13] tests: Add coverage for recent block
- geometry fixes
+	(envelope-from <jemmy858585@gmail.com>) id 1cxkTI-0006VW-G0
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 21:19:53 -0400
+MIME-Version: 1.0
+In-Reply-To: <20170410160023.GG3214@stefanha-x1.localdomain>
+References: <1491741460-10308-1-git-send-email-lidongchen@tencent.com>
+	<20170410160023.GG3214@stefanha-x1.localdomain>
+From: 858585 jemmy <jemmy858585@gmail.com>
+Date: Tue, 11 Apr 2017 09:19:49 +0800
+Message-ID: <CAOGPPbd=xQ_a5VtTdD6Cw0tmmaybjjbVgOPfF2CLw_E6fekZng@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v3] migration/block: use blk_pwrite_zeroes
+ for each zero cluster
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,250 +23,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, quintela@redhat.com, dgilbert@redhat.com, qemu-block@nongnu.org, Lidong Chen <lidongchen@tencent.com>
 
-Use blkdebug's new geometry constraints to emulate setups that
-have caused recent regression fixes: write zeroes asserting
-when running through a loopback block device with max-transfer
-smaller than cluster size, and discard rounding away portions
-of requests not aligned to preferred boundaries.  Also, add
-coverage that the block layer is honoring max transfer limits.
+On Tue, Apr 11, 2017 at 12:00 AM, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> On Sun, Apr 09, 2017 at 08:37:40PM +0800, jemmy858585@gmail.com wrote:
+>> From: Lidong Chen <lidongchen@tencent.com>
+>>
+>> BLOCK_SIZE is (1 << 20), qcow2 cluster size is 65536 by default,
+>> this maybe cause the qcow2 file size is bigger after migration.
+>> This patch check each cluster, use blk_pwrite_zeroes for each
+>> zero cluster.
+>>
+>> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+>> ---
+>>  migration/block.c | 38 ++++++++++++++++++++++++++++++++++++--
+>>  1 file changed, 36 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/migration/block.c b/migration/block.c
+>> index 7734ff7..fe613db 100644
+>> --- a/migration/block.c
+>> +++ b/migration/block.c
+>> @@ -885,6 +885,8 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
+>>      int64_t total_sectors = 0;
+>>      int nr_sectors;
+>>      int ret;
+>> +    BlockDriverInfo bdi;
+>> +    int cluster_size;
+>>
+>>      do {
+>>          addr = qemu_get_be64(f);
+>> @@ -934,8 +936,40 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
+>>              } else {
+>>                  buf = g_malloc(BLOCK_SIZE);
+>>                  qemu_get_buffer(f, buf, BLOCK_SIZE);
+>> -                ret = blk_pwrite(blk, addr * BDRV_SECTOR_SIZE, buf,
+>> -                                 nr_sectors * BDRV_SECTOR_SIZE, 0);
+>> +
+>> +                ret = bdrv_get_info(blk_bs(blk), &bdi);
+>> +                cluster_size = bdi.cluster_size;
+>> +
+>> +                if (ret == 0 && cluster_size > 0 &&
+>> +                    cluster_size <= BLOCK_SIZE &&
+>> +                    BLOCK_SIZE % cluster_size == 0) {
+>
+> How about:
+>
+>   if (blk != blk_prev) {
+>       blk_prev = blk;
+>       total_sectors = blk_nb_sectors(blk);
+>       if (total_sectors <= 0) {
+>           error_report("Error getting length of block device %s",
+>                        device_name);
+>           return -EINVAL;
+>       }
+>
+>       blk_invalidate_cache(blk, &local_err);
+>       if (local_err) {
+>           error_report_err(local_err);
+>           return -EINVAL;
+>       }
+>
+> +     ret = bdrv_get_info(blk_bs(blk), &bdi);
+> +     if (ret == 0 && cluster_size > 0 && cluster_size <= BLOCK_SIZE &&
+> +         BLOCK_SIZE % cluster_size == 0) {
+> +         zero_cluster_size = bdi.cluster_size;
+> +     } else {
+> +         zero_cluster_size = 0;
+> +     }
+>   }
+>
+> That way we only fetch the cluster size once per device.
+>
+> When processing a block we do without repeatedly fetching the cluster
+> size:
+>
+>   if (zero_cluster_size) {
+>      ...detect zeroes...
+>   }
 
-For now, a single iotest performs all actions, with the idea
-that we can add future blkdebug constraint test cases in the
-same file; but it can be split into multiple iotests if we find
-reason to run one portion of the test in more setups than what
-are possible in the other.
+good idea, i will test again for this patch.
 
-For reference, the final portion of the test (checking whether
-discard passes as much as possible to the lowest layers of the
-stack) works as follows:
-
-qemu-io: discard 30M at 80000001, passed to blkdebug
-  blkdebug: discard 511 bytes at 80000001, -ENOTSUP (smaller than
-blkdebug's 512 align)
-  blkdebug: discard 14371328 bytes at 80000512, passed to qcow2
-    qcow2: discard 739840 bytes at 80000512, -ENOTSUP (smaller than
-qcow2's 1M align)
-    qcow2: discard 13M bytes at 77M, succeeds
-  blkdebug: discard 15M bytes at 90M, passed to qcow2
-    qcow2: discard 15M bytes at 90M, succeeds
-  blkdebug: discard 1356800 bytes at 105M, passed to qcow2
-    qcow2: discard 1M at 105M, succeeds
-    qcow2: discard 308224 bytes at 106M, -ENOTSUP (smaller than qcow2's
-1M align)
-  blkdebug: discard 1 byte at 111457280, -ENOTSUP (smaller than
-blkdebug's 512 align)
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
----
-
-[yes, I added tests 177 and 179 out of order during this series.
-Oh well; I'm tired of renumbering this one.]
-
-v9: no change
-v7-v8: not submitted (earlier half of series sent for 2.9)
-v6: rebase to master by renumbering s/175/177/
-v5: rebase to master by renumbering s/173/175/
-v4: clean up some comments, nicer backing file creation, more commit message
-v3: make comments tied more to test at hand, rather than the
-particular hardware that led to the earlier patches being tested
-v2: new patch
----
- tests/qemu-iotests/177     | 114 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/177.out |  49 +++++++++++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 164 insertions(+)
- create mode 100755 tests/qemu-iotests/177
- create mode 100644 tests/qemu-iotests/177.out
-
-diff --git a/tests/qemu-iotests/177 b/tests/qemu-iotests/177
-new file mode 100755
-index 0000000..e4ddec7
---- /dev/null
-+++ b/tests/qemu-iotests/177
-@@ -0,0 +1,114 @@
-+#!/bin/bash
-+#
-+# Test corner cases with unusual block geometries
-+#
-+# Copyright (C) 2016-2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=eblake@redhat.com
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+status=1	# failure is the default!
-+
-+_cleanup()
-+{
-+	_cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt qcow2
-+_supported_proto file
-+
-+CLUSTER_SIZE=1M
-+size=128M
-+options=driver=blkdebug,image.driver=qcow2
-+
-+echo
-+echo "== setting up files =="
-+
-+TEST_IMG="$TEST_IMG.base" _make_test_img $size
-+$QEMU_IO -c "write -P 11 0 $size" "$TEST_IMG.base" | _filter_qemu_io
-+_make_test_img -b "$TEST_IMG.base"
-+$QEMU_IO -c "write -P 22 0 $size" "$TEST_IMG" | _filter_qemu_io
-+
-+# Limited to 64k max-transfer
-+echo
-+echo "== constrained alignment and max-transfer =="
-+limits=align=4k,max-transfer=64k
-+$QEMU_IO -c "open -o $options,$limits blkdebug::$TEST_IMG" \
-+         -c "write -P 33 1000 128k" -c "read -P 33 1000 128k" | _filter_qemu_io
-+
-+echo
-+echo "== write zero with constrained max-transfer =="
-+limits=align=512,max-transfer=64k,opt-write-zero=$CLUSTER_SIZE
-+$QEMU_IO -c "open -o $options,$limits blkdebug::$TEST_IMG" \
-+         -c "write -z 8003584 2093056" | _filter_qemu_io
-+
-+# non-power-of-2 write-zero/discard alignments
-+echo
-+echo "== non-power-of-2 write zeroes limits =="
-+
-+limits=align=512,opt-write-zero=15M,max-write-zero=15M,opt-discard=15M,max-discard=15M
-+$QEMU_IO -c "open -o $options,$limits blkdebug::$TEST_IMG" \
-+         -c "write -z 32M 32M" | _filter_qemu_io
-+
-+echo
-+echo "== non-power-of-2 discard limits =="
-+
-+limits=align=512,opt-write-zero=15M,max-write-zero=15M,opt-discard=15M,max-discard=15M
-+$QEMU_IO -c "open -o $options,$limits blkdebug::$TEST_IMG" \
-+         -c "discard 80000001 30M" | _filter_qemu_io
-+
-+echo
-+echo "== verify image content =="
-+
-+function verify_io()
-+{
-+    if ($QEMU_IMG info -f "$IMGFMT" "$TEST_IMG" |
-+	    grep "compat: 0.10" > /dev/null); then
-+        # For v2 images, discarded clusters are read from the backing file
-+        discarded=11
-+    else
-+        # Discarded clusters are zeroed for v3 or later
-+        discarded=0
-+    fi
-+
-+    echo read -P 22 0 1000
-+    echo read -P 33 1000 128k
-+    echo read -P 22 132072 7871512
-+    echo read -P 0 8003584 2093056
-+    echo read -P 22 10096640 23457792
-+    echo read -P 0 32M 32M
-+    echo read -P 22 64M 13M
-+    echo read -P $discarded 77M 29M
-+    echo read -P 22 106M 22M
-+}
-+
-+verify_io | $QEMU_IO "$TEST_IMG" | _filter_qemu_io
-+
-+_check_test_img
-+
-+# success, all done
-+echo "*** done"
-+status=0
-diff --git a/tests/qemu-iotests/177.out b/tests/qemu-iotests/177.out
-new file mode 100644
-index 0000000..e887542
---- /dev/null
-+++ b/tests/qemu-iotests/177.out
-@@ -0,0 +1,49 @@
-+QA output created by 177
-+
-+== setting up files ==
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134217728
-+wrote 134217728/134217728 bytes at offset 0
-+128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.base
-+wrote 134217728/134217728 bytes at offset 0
-+128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== constrained alignment and max-transfer ==
-+wrote 131072/131072 bytes at offset 1000
-+128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 131072/131072 bytes at offset 1000
-+128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== write zero with constrained max-transfer ==
-+wrote 2093056/2093056 bytes at offset 8003584
-+1.996 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== non-power-of-2 write zeroes limits ==
-+wrote 33554432/33554432 bytes at offset 33554432
-+32 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== non-power-of-2 discard limits ==
-+discard 31457280/31457280 bytes at offset 80000001
-+30 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== verify image content ==
-+read 1000/1000 bytes at offset 0
-+1000 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 131072/131072 bytes at offset 1000
-+128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 7871512/7871512 bytes at offset 132072
-+7.507 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 2093056/2093056 bytes at offset 8003584
-+1.996 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 23457792/23457792 bytes at offset 10096640
-+22.371 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 33554432/33554432 bytes at offset 33554432
-+32 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 13631488/13631488 bytes at offset 67108864
-+13 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 30408704/30408704 bytes at offset 80740352
-+29 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 23068672/23068672 bytes at offset 111149056
-+22 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+No errors were found on the image.
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index cfc8823..e7f987e 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -169,4 +169,5 @@
- 174 auto
- 175 auto quick
- 176 rw auto backing
-+177 rw auto quick
- 179 rw auto quick
--- 
-2.9.3
+>
+>> +                    int i;
+>> +                    int64_t cur_addr;
+>> +                    uint8_t *cur_buf;
+>> +
+>> +                    for (i = 0; i < BLOCK_SIZE / cluster_size; i++) {
+>> +                        cur_addr = addr * BDRV_SECTOR_SIZE
+>> +                                        + i * cluster_size;
+>> +                        cur_buf = buf + i * cluster_size;
+>> +
+>> +                        if (buffer_is_zero(cur_buf, cluster_size)) {
+>> +                            ret = blk_pwrite_zeroes(blk, cur_addr,
+>> +                                                    cluster_size,
+>> +                                                    BDRV_REQ_MAY_UNMAP);
+>> +                        } else {
+>> +                             ret = blk_pwrite(blk, cur_addr, cur_buf,
+>> +                                              cluster_size, 0);
+>
+> Indentation is off here.
+>
+>> +                        }
+>> +
+>> +                        if (ret < 0) {
+>> +                            g_free(buf);
+>> +                            return ret;
+>> +                        }
+>> +                    }
+>> +                } else {
+>> +                    ret = blk_pwrite(blk, addr * BDRV_SECTOR_SIZE, buf,
+>> +                                     nr_sectors * BDRV_SECTOR_SIZE, 0);
+>> +                }
+>>                  g_free(buf);
+>>              }
+>>
+>> --
+>> 1.8.3.1
+>>
