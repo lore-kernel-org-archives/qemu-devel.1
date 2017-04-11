@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37556)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cxm0H-0002PG-4Y
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 22:58:02 -0400
+	id 1cxm0l-0002kj-TX
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 22:58:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cxm0G-0007uF-AY
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 22:58:01 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:33448)
+	id 1cxm0h-00089G-BZ
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 22:58:32 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:33877)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cxm0G-0007u0-6D
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 22:58:00 -0400
-Received: by mail-qt0-x244.google.com with SMTP id c45so13066013qtb.0
-	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 19:58:00 -0700 (PDT)
+	id 1cxm0h-00088j-70
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 22:58:27 -0400
+Received: by mail-qk0-x242.google.com with SMTP id p68so22505105qke.1
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 19:58:26 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20170316092121.25672-1-marcandre.lureau@redhat.com>
-	<20170316092121.25672-14-marcandre.lureau@redhat.com>
+	<20170316092121.25672-15-marcandre.lureau@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c71d700d-4654-3e73-57a4-d94e013d0237@amsat.org>
-Date: Mon, 10 Apr 2017 23:57:56 -0300
+Message-ID: <858d9225-7e85-c90c-272e-92584430db37@amsat.org>
+Date: Mon, 10 Apr 2017 23:58:23 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170316092121.25672-14-marcandre.lureau@redhat.com>
+In-Reply-To: <20170316092121.25672-15-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 13/21] char-socket: add 'addr' property
+Subject: Re: [Qemu-devel] [PATCH v3 14/21] char-socket: add 'connected'
+ property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,44 +39,40 @@ To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel
 Cc: pbonzini@redhat.com
 
 On 03/16/2017 06:21 AM, Marc-André Lureau wrote:
-> Add a property to lookup the connection details.
->
 > Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  chardev/char-socket.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
+>  chardev/char-socket.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 >
 > diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index 4325a05387..81021c5863 100644
+> index 81021c5863..06389393fa 100644
 > --- a/chardev/char-socket.c
 > +++ b/chardev/char-socket.c
-> @@ -1006,6 +1006,15 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
->      sock->addr = addr;
+> @@ -1015,6 +1015,14 @@ char_socket_get_addr(Object *obj, Visitor *v, const char *name,
+>      visit_type_SocketAddress(v, name, &s->addr, errp);
 >  }
 >
-> +static void
-> +char_socket_get_addr(Object *obj, Visitor *v, const char *name,
-> +                     void *opaque, Error **errp)
+> +static bool
+> +char_socket_get_connected(Object *obj, Error **errp)
 > +{
 > +    SocketChardev *s = SOCKET_CHARDEV(obj);
 > +
-> +    visit_type_SocketAddress(v, name, &s->addr, errp);
+> +    return s->connected;
 > +}
 > +
 >  static void char_socket_class_init(ObjectClass *oc, void *data)
 >  {
 >      ChardevClass *cc = CHARDEV_CLASS(oc);
-> @@ -1021,6 +1030,10 @@ static void char_socket_class_init(ObjectClass *oc, void *data)
->      cc->chr_add_client = tcp_chr_add_client;
->      cc->chr_add_watch = tcp_chr_add_watch;
->      cc->chr_update_read_handler = tcp_chr_update_read_handler;
+> @@ -1034,6 +1042,9 @@ static void char_socket_class_init(ObjectClass *oc, void *data)
+>      object_class_property_add(oc, "addr", "SocketAddress",
+>                                char_socket_get_addr, NULL,
+>                                NULL, NULL, &error_abort);
 > +
-> +    object_class_property_add(oc, "addr", "SocketAddress",
-> +                              char_socket_get_addr, NULL,
-> +                              NULL, NULL, &error_abort);
+> +    object_class_property_add_bool(oc, "connected", char_socket_get_connected,
+> +                                   NULL, &error_abort);
 >  }
 >
 >  static const TypeInfo char_socket_type_info = {
