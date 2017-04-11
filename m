@@ -1,20 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1cxwrX-0002mX-KV
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 10:33:44 -0400
+	(envelope-from <bounces@canonical.com>) id 1cxwz6-0004wD-Bh
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 10:41:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1cxwrW-0008BC-Hu
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 10:33:43 -0400
-Date: Tue, 11 Apr 2017 16:33:30 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20170411143330.6knvf35j4hecolkz@eukaryote>
-References: <1491919733-21065-1-git-send-email-kwolf@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1cxwz2-00032c-Ce
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 10:41:32 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47723)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cxwz2-00032H-6g
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 10:41:28 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cxwz0-0005Hn-34
+	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 14:41:26 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0C2FD2E81A7
+	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 14:41:22 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1491919733-21065-1-git-send-email-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9] sheepdog: Fix crash in
- co_read_response()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 11 Apr 2017 14:31:59 -0000
+From: Gerd Hoffmann <1635339@bugs.launchpad.net>
+Reply-To: Bug 1635339 <1635339@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20161020160532.23339.63373.malonedeb@soybean.canonical.com>
+Message-Id: <20170411143159.12640.50476.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1635339] Re: qxl_pre_save assertion failure on vm
+ "save"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,62 +37,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, peter.maydell@linaro.org, mreitz@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Tue, Apr 11, 2017 at 04:08:53PM +0200, Kevin Wolf wrote:
-> This fixes a regression introduced in commit 9d456654.
-> 
-> aio_co_wake() can only be used to reenter a coroutine that was already
-> previously entered, otherwise co->ctx is uninitialised and we access
-> garbage. Using it immediately after qemu_coroutine_create() like in
-> co_read_response() is wrong and causes segfaults.
-> 
-> Replace the call with aio_co_enter(), which gets an explicit AioContext
-> parameter and works even for new coroutines.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> Tested-by: Kashyap Chamarthy <kchamart@redhat.com>
+Will be fixed in the windows driver, yes.
 
-Thanks. 
+But throwing core dumps isn't exactly nice, even in case the guest is
+buggy, thats why the qemu workaround, so we simply refuse to live-
+migrate instead of crashing.
 
-The test evidence was posted on IRC.  But just for archives' sake, I was
-here (on Git) when I applied this patch:
+-- =
 
-    $ git describe
-    v2.9.0-rc3-45-gaa388dd
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1635339
 
-And that was the specific test:
+Title:
+  qxl_pre_save assertion failure on vm "save"
 
-	$ qemu-img convert -t directsync \
-		./cirros-0.3.5.qcow2 sheepdog:cirros0.3.5vm
+Status in QEMU:
+  Confirmed
 
-After applying this patch, the segfault is gone, and the `qemu-img convert`
-happens successfully.
+Bug description:
+  When I try and save my Windows 10 VM, I see an assertion failure, and
+  the machine is shut down.
 
-That was my Sheepdog environment:
-https://kashyapc.fedorapeople.org/virt/sheepdog-qemu-corosync.txt
+  I see the following in the log:
 
-> ---
->  block/sheepdog.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/block/sheepdog.c b/block/sheepdog.c
-> index 1b71fc8..142eb4f 100644
-> --- a/block/sheepdog.c
-> +++ b/block/sheepdog.c
-> @@ -942,7 +942,7 @@ static void co_read_response(void *opaque)
->          s->co_recv = qemu_coroutine_create(aio_read_response, opaque);
->      }
->  
-> -    aio_co_wake(s->co_recv);
-> +    aio_co_enter(s->aio_context, s->co_recv);
->  }
->  
->  static void co_write_request(void *opaque)
-> -- 
-> 1.8.3.1
-> 
+  main_channel_handle_parsed: agent start
+  qemu-system-x86_64: /build/qemu-Zwynhi/qemu-2.5+dfsg/hw/display/qxl.c:210=
+1: qxl_pre_save: Assertion `d->last_release_offset < d->vga.vram_size' fail=
+ed.
+  2016-10-20 11:52:42.713+0000: shutting down
 
--- 
-/kashyap
+  Please let me know what other information would be relevant!
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1635339/+subscriptions
