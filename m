@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cxyEE-0001MZ-LR
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 12:01:15 -0400
+	(envelope-from <clg@kaod.org>) id 1cxyGP-0003Ql-Rf
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 12:03:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cxyED-0001su-JY
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 12:01:14 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:34629)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1cxyED-0001rZ-F0
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 12:01:13 -0400
-Received: by mail-oi0-x243.google.com with SMTP id o83so314867oik.1
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 09:01:13 -0700 (PDT)
+	(envelope-from <clg@kaod.org>) id 1cxyGM-0002ql-Pl
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 12:03:29 -0400
+Received: from 2.mo173.mail-out.ovh.net ([178.33.251.49]:49603)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cxyGM-0002qE-K0
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 12:03:26 -0400
+Received: from player778.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 6A44531169
+	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 18:03:24 +0200 (CEST)
+References: <1491396106-26376-1-git-send-email-clg@kaod.org>
+	<1491396106-26376-21-git-send-email-clg@kaod.org>
+	<20170410081414.GS27571@umbus>
+	<1491879951.4166.222.camel@kernel.crashing.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <d44181ac-63fd-deec-3013-a0b048123418@kaod.org>
+Date: Tue, 11 Apr 2017 18:03:12 +0200
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <CAFEAcA_E0vM9HE1=5DVhw9cA-BYea1wR2M1LHEXs1L+-Q5vUCg@mail.gmail.com>
-References: <cover.1491349058.git.alistair.francis@xilinx.com>
-	<325f60be9b819f261848db3d69554da640294ca4.1491349058.git.alistair.francis@xilinx.com>
-	<CAFEAcA9Pp85ir53BEsd2dT=6iG8gi_6hH2hGkn12Fus0k1K8FQ@mail.gmail.com>
-	<CAKmqyKOXoMRQbe+qEroxZxVPh06JU6vbZJ1wddBb_8imPeD-1A@mail.gmail.com>
-	<CAFEAcA_E0vM9HE1=5DVhw9cA-BYea1wR2M1LHEXs1L+-Q5vUCg@mail.gmail.com>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 11 Apr 2017 09:00:41 -0700
-Message-ID: <CAKmqyKMTmnipfAWwjAQdDgryXoVyMxQg+7ow4=wBO5sBv7gMtQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v1 3/5] cadence_gem: Only trigger
- interrupts if the status register is set
+In-Reply-To: <1491879951.4166.222.camel@kernel.crashing.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 20/21] ppc/pnv: Add model for Power8 PHB3
+ PCIe Host bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,43 +33,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Tue, Apr 11, 2017 at 2:05 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 10 April 2017 at 23:23, Alistair Francis <alistair.francis@xilinx.com> wrote:
->> On Mon, Apr 10, 2017 at 5:44 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
->>> Also the comment says "raise or lower interrupt based on current
->>> status", but the code will only ever do qemu_set_irq(..., 1),
->>> never 0. Which is right?
+On 04/11/2017 05:05 AM, Benjamin Herrenschmidt wrote:
+> On Mon, 2017-04-10 at 18:14 +1000, David Gibson wrote:
+>>> +    switch (size) {
+>>> +    case 1:
+>>> +        break;
+>>> +    case 2:
+>>> +        val = bswap16(val);
 >>
->> This is a little confusing. The interrupts are lowered when the ISR is
->> read, so the assumption was that we never need to clear them in the
->> gem_update_int_status(). Although then if we perform a reset nothing
->> will clear the interrupts until the ISR is read from.
+>> An unconditional bswap() seems unlikely to be correct.  What's the
+>> purpose of thise?
+> 
+> Though it is :-) I *think* ... I did test with both LE and BE hosts I
+> believe but Cedric can double check.
+
+Yeah that works. I ran a PowerNV guest under a Pseries BE guest under
+a PowerNV P8 host. Network was running on the final guest so I suppose 
+that's enough to check the PCI layer.  
+
+> 
+> From memory it comes from the fact that the PHB register space is
+> declared to be big endian since 99% of it actually is.
+> 
+> However the CONFIG_DATA register used to issue config space accesses is
+> "special" and expect little endian accesses.
+> 
+> However because the whole region is marked BE, qemu will have done
+> the necessary swapping for BE, which thus needs to be undone for
+> that specific register unconditionally:
+> 
+>  - BE host will not swap the value, so we get the LE value written by
+> the guest which needs to be swapped to BE.
+> 
+>  - LE host will have swapped the value as if it was BE except it isn't
+> so we need to re-swap it.
 >
-> On QEMU reset the other end will be reset anyway so it will
-> update its idea of whether the irq is asserted (and calling
-> qemu_set_irq in a reset function is generally not a good idea).
-> If the device has guest-programmable reset of some kind you'd
-> need to clear the irq lines then, though.
+> IE. Another option would be to create a specific memory region just for
+> that one register but it's easier to just unconditionally swap.
 
-Ok, that explains why it was always working.
-
-I still like the idea of all irq updates (raise or lower) being done
-in a single function. Instead of how it was previously where the
-raises where in one function and the lower was in the read function.
-That way if in some future IP version the ISR is cleared somewhere
-else the interrupt logic is ready to handle it.
-
-I did make one small error in my V2 though, so I'll send a V3 with the
-consolidation still in it.
+No that's fine. I will add some helper routines to explain what is
+happening. I have had to do some thing similar with the Aspeed flash
+controller tests when using the Command mode.  
 
 Thanks,
 
-Alistair
-
->
-> thanks
-> -- PMM
->
+C.
+ 
+>>> +        break;
+>>> +    case 4:
+>>> +        val = bswap32(val);
+>>> +        break;
+>>
+>> No 64-bit config registers?
+> 
+> No, they don't exist. (Which is also why an assert isn't a good
+> idea as other registers do support 64-bit accesses).
+> 
+> Ben.
+> 
