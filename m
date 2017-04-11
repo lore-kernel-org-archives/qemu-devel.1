@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cxwQj-0001zC-Ei
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 10:06:06 -0400
+	(envelope-from <kwolf@redhat.com>) id 1cxwTh-00041R-OP
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 10:09:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cxwQg-0002sa-9C
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 10:06:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42884)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1cxwQg-0002s3-1C
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 10:05:58 -0400
-References: <20170411080154.12474.20009.malonedeb@gac.canonical.com>
-	<20170411082140.1520.57032.malone@chaenomeles.canonical.com>
-	<CAOGPPbctB_RKy1G9+MuKwVN7T7hn6dwKuQ27hVpoVWX8CVyhYg@mail.gmail.com>
-	<20170411135700.GM4516@noname.str.redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <2f46f9ff-ab18-3fe7-2551-11a8e36d522d@redhat.com>
-Date: Tue, 11 Apr 2017 16:05:54 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170411135700.GM4516@noname.str.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Bug 1681688] Re: qemu live migration failed
+	(envelope-from <kwolf@redhat.com>) id 1cxwTg-0004oZ-OD
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 10:09:05 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue, 11 Apr 2017 16:08:53 +0200
+Message-Id: <1491919733-21065-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.9] sheepdog: Fix crash in
+ co_read_response()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,64 +18,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, 858585 jemmy <jemmy858585@gmail.com>
-Cc: Bug 1681688 <1681688@bugs.launchpad.net>, qemu-devel@nongnu.org
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, mreitz@redhat.com, kchamart@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-On 11/04/2017 15:57, Kevin Wolf wrote:
-> Am 11.04.2017 um 15:35 hat 858585 jemmy geschrieben:
->> Hi Kevin:
->>    Can you provide some information about the original bug which you want fix?
->>
->>    the original comment:
->>    Usually guest devices don't like other writers to the same image, so
->>    they use blk_set_perm() to prevent this from happening.
->>
->>    i don't find where the dest qemu will use blk_set_perm during migration.
->>    but after apply this patch, blkconf_apply_backend_options don't update the
->>    blk->root->perm.
-> 
-> Do I understand correctly that this is not simply live migration, but
-> block live migration (with 'migrate -b')?
-> 
-> Can you please post a backtrace not of the successful case, but of the
-> failing assertion?
+This fixes a regression introduced in commit 9d456654.
 
-It happens only with postcopy migration.
+aio_co_wake() can only be used to reenter a coroutine that was already
+previously entered, otherwise co->ctx is uninitialised and we access
+garbage. Using it immediately after qemu_coroutine_create() like in
+co_read_response() is wrong and causes segfaults.
 
-qemu-system-x86_64: /home/lvivier/Projects/qemu/block/io.c:1348:
-bdrv_aligned_pwritev: Assertion `child->perm & BLK_PERM_WRITE' failed.
+Replace the call with aio_co_enter(), which gets an explicit AioContext
+parameter and works even for new coroutines.
 
-Program received signal SIGABRT, Aborted.
-0x00007ffff35061f7 in raise () from /lib64/libc.so.6
-...
-(gdb) bt
-#0  0x00007ffff35061f7 in raise () from /lib64/libc.so.6
-#1  0x00007ffff35078e8 in abort () from /lib64/libc.so.6
-#2  0x00007ffff34ff266 in __assert_fail_base () from /lib64/libc.so.6
-#3  0x00007ffff34ff312 in __assert_fail () from /lib64/libc.so.6
-#4  0x0000555555a92d1a in bdrv_aligned_pwritev
-(req=req@entry=0x7ffed02fae70,
-    offset=offset@entry=12424523776, bytes=12288, align=align@entry=1,
-    qiov=qiov@entry=0x555558601a20, flags=flags@entry=0,
-child=0x555556661fb0,
-    child=0x555556661fb0) at /home/lvivier/Projects/qemu/block/io.c:1348
-#5  0x0000555555a93906 in bdrv_co_pwritev (child=0x555556661fb0,
-    offset=offset@entry=12424523776, bytes=<optimized out>,
-bytes@entry=12288,
-    qiov=qiov@entry=0x555558601a20, flags=0)
-    at /home/lvivier/Projects/qemu/block/io.c:1622
-#6  0x0000555555a84a30 in blk_co_pwritev (blk=0x5555566565e0,
-    offset=12424523776, bytes=12288, qiov=0x555558601a20,
-    flags=<optimized out>)
-    at /home/lvivier/Projects/qemu/block/block-backend.c:992
-#7  0x0000555555a84b4a in blk_aio_write_entry (opaque=0x55555760aba0)
-    at /home/lvivier/Projects/qemu/block/block-backend.c:1183
-#8  0x0000555555b1639a in coroutine_trampoline (i0=<optimized out>,
-    i1=<optimized out>)
-    at /home/lvivier/Projects/qemu/util/coroutine-ucontext.c:79
-#9  0x00007ffff3517d40 in ?? () from /lib64/libc.so.6
-#10 0x00007fffffffcdd0 in ?? ()
----Type <return> to continue, or q <return> to quit---
-#11 0x0000000000000000 in ?? ()
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Tested-by: Kashyap Chamarthy <kchamart@redhat.com>
+---
+ block/sheepdog.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Laurent
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index 1b71fc8..142eb4f 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -942,7 +942,7 @@ static void co_read_response(void *opaque)
+         s->co_recv = qemu_coroutine_create(aio_read_response, opaque);
+     }
+ 
+-    aio_co_wake(s->co_recv);
++    aio_co_enter(s->aio_context, s->co_recv);
+ }
+ 
+ static void co_write_request(void *opaque)
+-- 
+1.8.3.1
