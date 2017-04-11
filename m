@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cxry6-0003KY-Ku
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:20:16 -0400
+	(envelope-from <armbru@redhat.com>) id 1cxs0h-0004JA-DB
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:22:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cxry2-00063o-0m
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:20:10 -0400
-References: <20170410150542.30376-1-famz@redhat.com>
-	<20170410150542.30376-11-famz@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <835298af-03d2-8a58-ef08-0e51864977f5@redhat.com>
-Date: Tue, 11 Apr 2017 17:19:52 +0800
+	(envelope-from <armbru@redhat.com>) id 1cxs0c-0007yj-Ax
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:22:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42442)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cxs0c-0007yB-37
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:22:46 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1490945793-21276-1-git-send-email-peterx@redhat.com>
+	<20170331191601-mutt-send-email-mst@kernel.org>
+	<20170401012942.GK3981@pxdev.xzpeter.org>
+Date: Tue, 11 Apr 2017 11:22:38 +0200
+In-Reply-To: <20170401012942.GK3981@pxdev.xzpeter.org> (Peter Xu's message of
+	"Sat, 1 Apr 2017 09:29:42 +0800")
+Message-ID: <87bms3cn8h.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170410150542.30376-11-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for 2.9 v3 10/10] block: Fix bdrv_co_flush
- early return
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH for-2.10 0/5] x86/vIOMMU: move init back to
+ machine init phase
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,59 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, tianyu.lan@intel.com, kevin.tian@intel.com, yi.l.liu@intel.com, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
+Peter Xu <peterx@redhat.com> writes:
 
+> On Fri, Mar 31, 2017 at 07:17:34PM +0300, Michael S. Tsirkin wrote:
+>> On Fri, Mar 31, 2017 at 03:36:28PM +0800, Peter Xu wrote:
+>> > At the very beginning, the x86 vIOMMUs are created via "-M iommu=on".
+>> > We moved one step further a year ago to have the vIOMMUs just like a
+>> > general device, so that we can init them with far more specific
+>> > parameters with "-device" interface.
+>> > 
+>> > However, gradually we found that problem starts to occur due to this.
+>> > The main issue is that the DMA address space of any PCI device is
+>> > postponed to be init after device realization, while some devices'
+>> > realizations would depend on this address space. That looks like a
+>> > dead lock. We have patches and solutions for different single problem,
+>> > but, maybe it's time we can consider to solve the root cause this
+>> > time, of course after 2.9 release.
+>> > 
+>> > This series tries to solve the root cause, and move vIOMMU inits back
+>> > to machine init for x86 platforms. Then, we'll have solid DMA address
+>> > space for each device even during realization.
+>> > 
+>> > Please kindly review. Thanks.
+>> 
+>> I think it's a clean way to do it at a high level.
+>> However I would like to set a tag in the class
+>> rather than listing specific devices.
+>> Also, init order should be consistent for all machines
+>> not just q35.
+>
+> I agree that we may finally need a tag if we want to have a general
+> solution for device init ordering. However I was thinking maybe for
+> x86 IOMMUs we should even move the init earlier than an ordered device
+> list, considering the integrated devices are created during machine
+> init, and it's before the general device init loop.
+>
+> Actually, iiuc that's also following how the real hardware works -
+> since the IOMMU unit (now we only have the root vIOMMU) belongs to
+> north bridge, so imho in emulation codes we'd better follow how the
+> hardware works if possible (I believe in hardware IOMMUs should be
+> inited along with north bridge).
+>
+> (btw, maybe I should mark at least the first patch as RFC...)
 
-On 10/04/2017 23:05, Fam Zheng wrote:
-> bdrv_inc_in_flight and bdrv_dec_in_flight are mandatory for
-> BDRV_POLL_WHILE to work, even for the shortcut case where flush is
-> unnecessary. Move the if block to below bdrv_dec_in_flight, and BTW fix
-> the variable declaration position.
-> 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  block/io.c | 16 +++++++++-------
->  1 file changed, 9 insertions(+), 7 deletions(-)
-> 
-> diff --git a/block/io.c b/block/io.c
-> index 00e45ca..bae6947 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -2278,16 +2278,17 @@ static void coroutine_fn bdrv_flush_co_entry(void *opaque)
->  
->  int coroutine_fn bdrv_co_flush(BlockDriverState *bs)
->  {
-> -    int ret;
-> -
-> -    if (!bs || !bdrv_is_inserted(bs) || bdrv_is_read_only(bs) ||
-> -        bdrv_is_sg(bs)) {
-> -        return 0;
-> -    }
-> +    int current_gen;
-> +    int ret = 0;
->  
->      bdrv_inc_in_flight(bs);
->  
-> -    int current_gen = bs->write_gen;
-> +    if (!bs || !bdrv_is_inserted(bs) || bdrv_is_read_only(bs) ||
-> +        bdrv_is_sg(bs)) {
-> +        goto early_exit;
-> +    }
-> +
-> +    current_gen = bs->write_gen;
->  
->      /* Wait until any previous flushes are completed */
->      while (bs->active_flush_req) {
-> @@ -2370,6 +2371,7 @@ out:
->      /* Return value is ignored - it's ok if wait queue is empty */
->      qemu_co_queue_next(&bs->flush_queue);
->  
-> +early_exit:
->      bdrv_dec_in_flight(bs);
->      return ret;
->  }
-> 
-
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+No objection to fixing yet another initialization order problem by
+making it yet another special case, but I think we should really, really
+sit down and try to come up with a *generic* way to express
+initialization order constraints.  This is a modelling problem: we need
+to model how physical hardware resets.  As long as we don't, we're
+damned to tinker with this rickety tower of special cases.
