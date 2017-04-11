@@ -1,24 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cxqcg-0002gR-OW
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 03:53:59 -0400
+	(envelope-from <bounces@canonical.com>) id 1cxqej-0003br-Lq
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 03:56:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cxqcb-0005YJ-U7
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 03:53:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34736)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1cxqcb-0005XM-OQ
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 03:53:53 -0400
-Date: Tue, 11 Apr 2017 09:53:48 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170411075348.GA4516@noname.str.redhat.com>
-References: <BM1PR01MB072283BB7A3BC4BB287D35A784010@BM1PR01MB0722.INDPRD01.PROD.OUTLOOK.COM>
-	<BM1PR01MB07224A0D4D1815F66D26EB7C84010@BM1PR01MB0722.INDPRD01.PROD.OUTLOOK.COM>
+	(envelope-from <bounces@canonical.com>) id 1cxqee-0007Hi-OJ
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 03:56:05 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49020)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cxqee-0007HY-Hg
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 03:56:00 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cxqeV-0002dc-2j
+	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 07:55:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1379D2E80C9
+	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 07:55:51 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BM1PR01MB07224A0D4D1815F66D26EB7C84010@BM1PR01MB0722.INDPRD01.PROD.OUTLOOK.COM>
-Subject: Re: [Qemu-devel] First contribution - Interested in Outreachy
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 11 Apr 2017 07:45:58 -0000
+From: =?utf-8?b?TWljaGHFgiBLxJlwaWXFhA==?= <launchpad@kempniu.pl>
+Reply-To: Bug 1681439 <1681439@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170410132346.31250.84835.malonedeb@wampee.canonical.com>
+Message-Id: <20170411074558.30236.19938.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1681439] Re: qemu-system-x86_64:
+ hw/ide/core.c:685: ide_cancel_dma_sync: Assertion `s->bus->dma->aiocb ==
+ NULL' failed.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,25 +38,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Prerna Garg <Prerna.Garg@live.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "stefanha@redhat.com" <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: qemu-devel@nongnu.org
 
-Hi Prerna,
+> I don't think the assert you are talking about in the subject is added
+> by 9972354856. That assertion was added by 86698a12f and has been
+> present since QEMU 2.6. I don't see the relation immediately to
+> AioContext patches.
 
-Am 10.04.2017 um 21:59 hat Prerna Garg geschrieben:
-> The previous patch was incorrect. Sorry for the inconvenience. Please consider
-> this as my first contribution. 
+You are right, of course.  Sorry for misleading you about this.  What I
+meant to write was that git bisect pinpoints commit 9972354856 as the
+likely culprit ("likely" because of the makeshift testing methodology
+used).
 
-Please read this wiki page about how to submit patches to QEMU:
+> Is this only during boot/shutdown? If not, it looks like there might be
+> some other errors occurring that aggravate the device state and cause a
+> reset by the guest.
 
-    http://wiki.qemu-project.org/Contribute/SubmitAPatch
+In fact this has never happened to me upon boot or shutdown.  I believe
+the operating system installed on the storage volume I am testing this
+with has some kind of disk-intensive activity scheduled to run about
+twenty minutes after booting.  That is why I have to wait that long
+after booting the VM to determine whether the issue appears.
 
-The most important point that is missing from your patch is the
-Signed-off-by line, without which a patch cannot be accepted.
+> Anyway, what should happen is something like this:
+> =
 
-You should also try to have a commit message (including the subject
-line) that describes the change that your patch is making, and include
-[PATCH] in your subject line. If you use 'git format-patch' to create
-the email, the [PATCH] is added automatically.
+> - Guest issues a reset request (ide_exec_cmd -> cmd_device_reset)
+> - The device should now be "busy" and cannot accept any more requests (se=
+e the conditional early in ide_exec_cmd)
+> - cmd_device_reset drains any existing requests.
+> - we assert that there are no handles to BH routines that have yet to ret=
+urn
+> =
 
-Kevin
+> Normally I'd say this is enough; because:
+> =
+
+> Although blk_drain does not prohibit future DMA transfers, it is being
+> called after an explicit reset request from the guest, and so the device
+> should be unable to service any further requests. After existing DMA
+> commands are drained we should be unable to add any further requests.
+> =
+
+> It generally shouldn't be possible to see new requests show up here,
+> unless;
+> =
+
+> (A) We are not guarding ide_exec_cmd properly and a new command is sneaki=
+ng in while we are trying to reset the device, or
+> (B) blk_drain is not in fact doing what we expect it to (draining all pen=
+ding DMA from an outstanding IDE command we are servicing.)
+
+ide_cancel_dma_sync() is also invoked from bmdma_cmd_writeb() and this
+is in fact the code path taken when the assertion fails.
+
+> Since you mentioned that you need to enable TRIM support in order to see
+> the behavior, perhaps this is a function of a TRIM command being
+> improperly implemented and causing the guest to panic, and we are indeed
+> not draining TRIM requests properly.
+
+I am not sure what the relation of TRIM to BMDMA is, but I still cannot
+reproduce the issue without TRIM being enabled.
+
+> That's my best wild guess, anyway. If you can't reproduce this
+> elsewhere, can you run some debug version of this to see under which
+> codepath we are invoking reset, and what the running command that we are
+> failing to terminate is?
+
+I recompiled QEMU with --enable-debug --extra-cflags=3D"-ggdb -O0" and
+attached the output of "bt full".  If this is not enough, please let me
+know.
+
+
+** Attachment added: "Output of "bt full" when the assertion fails"
+   https://bugs.launchpad.net/qemu/+bug/1681439/+attachment/4860013/+files/=
+bt-full.log
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1681439
+
+Title:
+  qemu-system-x86_64: hw/ide/core.c:685: ide_cancel_dma_sync: Assertion
+  `s->bus->dma->aiocb =3D=3D NULL' failed.
+
+Status in QEMU:
+  New
+
+Bug description:
+  Since upgrading to QEMU 2.8.0, my Windows 7 64-bit virtual machines
+  started crashing due to the assertion quoted in the summary failing.
+  The assertion in question was added by commit 9972354856 ("block: add
+  BDS field to count in-flight requests").  My tests show that setting
+  discard=3Dunmap is needed to reproduce the issue.  Speaking of
+  reproduction, it is a bit flaky, because I have been unable to come up
+  with specific instructions that would allow the issue to be triggered
+  outside of my environment, but I do have a semi-sane way of testing that
+  appears to depend on a specific initial state of data on the underlying
+  storage volume, actions taken within the VM and waiting for about 20
+  minutes.
+
+  Here is the shortest QEMU command line that I managed to reproduce the
+  bug with:
+
+      qemu-system-x86_64 \
+          -machine pc-i440fx-2.7,accel=3Dkvm \
+          -m 3072 \
+          -drive file=3D/dev/lvm/qemu,format=3Draw,if=3Dide,discard=3Dunmap=
+ \
+  	-netdev tap,id=3Dhostnet0,ifname=3Dtap0,script=3Dno,downscript=3Dno,vhos=
+t=3Don \
+          -device virtio-net-pci,netdev=3Dhostnet0 \
+  	-vnc :0
+
+  The underlying storage (/dev/lvm/qemu) is a thin LVM snapshot.
+
+  QEMU was compiled using:
+
+      ./configure --python=3D/usr/bin/python2.7 --target-list=3Dx86_64-soft=
+mmu
+      make -j3
+
+  My virtualization environment is not really a critical one and
+  reproduction is not that much of a hassle, so if you need me to gather
+  further diagnostic information or test patches, I will be happy to help.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1681439/+subscriptions
