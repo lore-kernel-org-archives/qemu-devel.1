@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cxt4N-0006nr-7j
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:30:44 -0400
+	(envelope-from <kchamart@redhat.com>) id 1cxt4e-0006yM-LR
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:31:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cxt4M-0003we-8U
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:30:43 -0400
-Date: Tue, 11 Apr 2017 11:30:31 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170411103031.GC17943@stefanha-x1.localdomain>
-References: <20170410150542.30376-1-famz@redhat.com>
-	<20170410150542.30376-3-famz@redhat.com>
+	(envelope-from <kchamart@redhat.com>) id 1cxt4d-00049d-PY
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:31:00 -0400
+Date: Tue, 11 Apr 2017 12:30:49 +0200
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20170411103049.dqjkpgjszaqb5xn3@eukaryote>
+References: <20170324123458.yk3rj3g47e5xr33i@eukaryote>
+	<0e1c78f3-1b82-58e4-035e-944484e66f29@redhat.com>
+	<ef9e10c4-3986-32ba-da2d-1b8f71d58319@redhat.com>
+	<20170404132815.aactqo2o5izpzclf@eukaryote>
+	<8420253d-261f-f040-6815-c949b8a2cce2@redhat.com>
+	<877f2rcmbf.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="WfZ7S8PLGjBY9Voh"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170410150542.30376-3-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for 2.9 v3 02/10] block: Quiesce old aio
- context during bdrv_set_aio_context
+In-Reply-To: <877f2rcmbf.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [Qemu-block] Making QMP 'block-job-cancel'
+ transactionable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
+On Tue, Apr 11, 2017 at 11:42:28AM +0200, Markus Armbruster wrote:
+> Eric Blake <eblake@redhat.com> writes:
+> 
+> > On 04/04/2017 08:28 AM, Kashyap Chamarthy wrote:
+> >
+> >>> Minor or not, it is a useful viewpoint. Either way, as long as the new
+> >>> way of getting a transactional non-pivot successful completion is
+> >>> something that libvirt can learn via introspection, 
+> >> 
+> >> Can you elaborate a little more on the above, for my own edification --
+> >> how might it be possible for "libvirt can learn via introspection"?  Is
+> >> it via some method using the QMP 'query-commands' /
+> >> 'query-command-line-options'?
+> >
+> > Those, and query-qmp-schema.
+> 
+> Avoid query-command-line-options if you can.  If you can't, know its
+> limitations and quirks.
 
---WfZ7S8PLGjBY9Voh
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks; I actually meant to mention 'query-qmp-schema' (thanks to Eric
+for correcting).  And I didn't fortet your reminder of the
+incompleteness / limitations of 'query-command-line-options' from your
+KVMForum 2015 presentation :-)
 
-On Mon, Apr 10, 2017 at 11:05:34PM +0800, Fam Zheng wrote:
-> The fact that the bs->aio_context is changing can confuse the dataplane
-> iothread, because of the now fine granularity aio context lock.
-> bdrv_drain should rather be a bdrv_drained_begin/end pair, but since
-> bs->aio_context is changing, we can just use aio_disable_external and
-> bdrv_parent_drained_begin.
->=20
-> Reported-by: Ed Swierk <eswierk@skyportsystems.com>
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  block.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> >                               If the change includes the addition of
+> > something new in the .json files describing QMP, then query-qmp-schema
+> > will let libvirt probe whether the version of qemu it it talking to has
+> > that new field or not (presumably, in this case it would be a new
+> > optional bool member to select the mode when creating a job, as well as
+> > a new command visible through query-commands to change the mode of a
+> > running job).
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---WfZ7S8PLGjBY9Voh
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJY7LBHAAoJEJykq7OBq3PIC3UH/j3SGvmUQ29+qzhezTKMpTcI
-wafdt6zugVmZX7LDXjttkrE2fERqNHgsFnqk/ItlfBB6io8bnzR7bAc3+ngXOpGD
-YWQcAh0JzuSY2NNyhvPENbllOvGlsM8Mj2anf5x5uHgYAsiDMwPpmUg1u24VgRj7
-3BG+4YJAmPbA64yarAGt+qs5lhsJO8GDn9qRs3TlymL9Fw62RZPvLCWZL5JuJKtU
-yGmcdcXKd+lKaq0pbamTdZPVxp9lwSQQZ23jwEpKX5lXJG7FMMlau9ZH2SCIOhzc
-Cd6Hdw+r1lbADdf7/fiKLaBqfH8CkEoyBggtUH2tiwpiTLy2m83TgoHdOANone4=
-=r9+g
------END PGP SIGNATURE-----
-
---WfZ7S8PLGjBY9Voh--
+-- 
+/kashyap
