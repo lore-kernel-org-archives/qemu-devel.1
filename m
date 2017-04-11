@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44136)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiahuanzhang90@gmail.com>) id 1cxpo8-0000tQ-I8
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 03:01:45 -0400
+	(envelope-from <kraxel@redhat.com>) id 1cxppI-0001XL-Sr
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 03:02:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jiahuanzhang90@gmail.com>) id 1cxpo7-0002s1-HK
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 03:01:44 -0400
-Received: from mail-qk0-x231.google.com ([2607:f8b0:400d:c09::231]:33678)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jiahuanzhang90@gmail.com>)
-	id 1cxpo7-0002rl-Bf
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 03:01:43 -0400
-Received: by mail-qk0-x231.google.com with SMTP id h67so132490204qke.0
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 00:01:41 -0700 (PDT)
+	(envelope-from <kraxel@redhat.com>) id 1cxppF-0003FU-Q6
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 03:02:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54776)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cxppF-0003EY-Kp
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 03:02:53 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E0063804E4
+	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 07:02:50 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 11 Apr 2017 09:02:41 +0200
+Message-Id: <20170411070243.635-1-kraxel@redhat.com>
 MIME-Version: 1.0
-From: Jiahuan Zhang <jiahuanzhang90@gmail.com>
-Date: Tue, 11 Apr 2017 09:01:40 +0200
-Message-ID: <CAJy91CZHb_aJncY1KSqTorZF3Gex=4_xd9=FmS5_QGzkXDNwGg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: [Qemu-devel] guest host time synchronization
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL for-2.9 0/2] qxl bugfixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,21 +30,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Dear QEMU developers,
+  Hi,
 
-I made a test to check the time difference of QEMU emulated ARM-based Linux
-guest and the Windows host. The result is, the guest time is around 0.2
-second faster than the host. I used the "-rtc base" option.
+Two bugfixes for qxl.  Well, one actually is a workaround for a guest
+driver bug.
 
-So can I say that, the time precision of QEMU emulation is in seconds? Is
-it possible to make it more precise? because I need to test the latency of
-my guest/host communication with high time resolution, at least in
-miliseconds.
+please pull,
+  Gerd
 
-Please let me know if you have any method  for the communication
-performance testing. Thank you very much.
+The following changes since commit 5fe2339e6b09da7d6f48b9bef0f1a7360392b4=
+89:
 
-Best regards,
-Jiahuan
+  Merge remote-tracking branch 'remotes/awilliam/tags/vfio-updates-201704=
+06.0' into staging (2017-04-07 10:29:56 +0100)
+
+are available in the git repository at:
+
+  git://git.kraxel.org/qemu tags/pull-fixes-20170411-1
+
+for you to fetch changes up to 86dbcdd9c7590d06db89ca256c5eaf0b4aba8858:
+
+  qxl: add migration blocker to avoid pre-save assert (2017-04-11 08:38:1=
+7 +0200)
+
+----------------------------------------------------------------
+qxl: bugfixes.
+
+----------------------------------------------------------------
+Gerd Hoffmann (1):
+      qxl: add migration blocker to avoid pre-save assert
+
+Marc-Andr=C3=A9 Lureau (1):
+      qxl: switch display on entering VGA
+
+ hw/display/qxl.h |  1 +
+ hw/display/qxl.c | 32 ++++++++++++++++++++++++++++++++
+ 2 files changed, 33 insertions(+)
