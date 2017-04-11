@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38642)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cxwOy-0000yZ-KB
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 10:04:16 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cxwPq-0001Lf-B2
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 10:05:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cxwOt-00026Q-Pc
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 10:04:12 -0400
-Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:35817)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cxwOt-00025b-JX
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 10:04:07 -0400
-Received: by mail-wr0-x232.google.com with SMTP id o21so141289471wrb.2
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 07:04:07 -0700 (PDT)
-References: <20170406102249.20383-1-nikunj@linux.vnet.ibm.com>
-	<6029cef4-0a41-cde0-b3c9-6b6ad9bde572@kaod.org>
-	<87vaqgrds2.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<a74b9ee8-1b9d-244b-8046-b116fedb55f1@kaod.org>
-	<25dcb89b-35be-ea27-8719-7b446f464694@kaod.org>
-	<87lgr8ji2f.fsf@linaro.org>
-	<04c9f03f-7f04-ebce-15f1-988db1fb2c1d@kaod.org>
-	<1491917167.7236.1.camel@kernel.crashing.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1491917167.7236.1.camel@kernel.crashing.org>
-Date: Tue, 11 Apr 2017 15:04:15 +0100
-Message-ID: <87h91vjb1c.fsf@linaro.org>
+	(envelope-from <mreitz@redhat.com>) id 1cxwPp-0002SS-5B
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 10:05:06 -0400
+References: <20170406150148.zwjpozqtale44jfh@perseus.local>
+	<d60ea1f9-ae2c-6625-90de-944cbb490f85@redhat.com>
+	<w5160ibyufr.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <9d848582-8c76-4d88-2b31-e0e4c63b61d4@redhat.com>
+Date: Tue, 11 Apr 2017 16:04:53 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH RFC v1 0/3] Enable MTTCG on PPC64
+In-Reply-To: <w5160ibyufr.fsf@maestria.local.igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="oUtU9vcURMiFfgmvShGjwBrumATBpGohb"
+Subject: Re: [Qemu-devel] [RFC] Proposed qcow2 extension: subcluster
+ allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,57 +26,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net, programmingkidx@gmail.com, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--oUtU9vcURMiFfgmvShGjwBrumATBpGohb
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <9d848582-8c76-4d88-2b31-e0e4c63b61d4@redhat.com>
+Subject: Re: [RFC] Proposed qcow2 extension: subcluster allocation
+References: <20170406150148.zwjpozqtale44jfh@perseus.local>
+ <d60ea1f9-ae2c-6625-90de-944cbb490f85@redhat.com>
+ <w5160ibyufr.fsf@maestria.local.igalia.com>
+In-Reply-To: <w5160ibyufr.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Benjamin Herrenschmidt <benh@kernel.crashing.org> writes:
-
-> On Tue, 2017-04-11 at 14:28 +0200, Cédric Le Goater wrote:
->> I really don't know.
+On 11.04.2017 14:56, Alberto Garcia wrote:
+> On Fri 07 Apr 2017 07:10:46 PM CEST, Max Reitz wrote:
+>>> =3D=3D=3D Changes to the on-disk format =3D=3D=3D
+>>>
+>>> The qcow2 on-disk format needs to change so each L2 entry has a bitma=
+p
+>>> indicating the allocation status of each subcluster. There are three
+>>> possible states (unallocated, allocated, all zeroes), so we need two
+>>> bits per subcluster.
 >>
->> Ben, now that we have mttcg activated by default on ppc, it takes
->> a while for the linux kernel to do the early setup. I think we are
->> in the code section where we spin loop the secondaries. Most of the
->> time is spent in skiboot under cpu_idle/relax.
->>
->> Any idea where that could come from ?
->>
->> > See c22edfebff29f63d793032e4fbd42a035bb73e27 for an example.
->>
->> Thanks for the hint.
->
-> They are spinning, but they have smt_low instructions in the loop,
-> maybe that causes us to do some kind of synchronization as we exit
-> the emulation loop on these ? I added that to force relinguish time
-> to other threads on the pre-MT TCG...
+>> You don't need two bits, you need log(3) / log(2) =3D ld(3) =E2=89=88 =
+1.58. You
+>> can encode the status of eight subclusters (3^8 =3D 6561) in 13 bits
+>> (ld(6561) =E2=89=88 12.68).
+>=20
+> Right, although that would make the encoding more cumbersome to use and=
 
-Yeah you need a tweak the approach when running with MTTCG as otherwise
-you end up causing exits for one vCPUs loop to yield to vCPUs that are
-already running in other threads.
+> to debug. Is it worth it?
 
-> There isn't really such a "pause" instruction. At least not yet.... P9
-> has a wait that is meant to wait for special AS_Notify cycles but will
-> also wait for interrupts. We don't have an mwait at this point.
+Probably not, considering this is probably not the way we want to go anyw=
+ay.
 
-They are worth implementing. FWIW on ARM we only really handle WFI
-(Wait-for-interrupt) which will cause the EXCP_HALT and that will put
-the vCPU into a halted state which can be woken up next interrupt.
+>> One case I'd be especially interested in are of course 4 kB
+>> subclusters for 64 kB clusters (because 4 kB is a usual page size and
+>> can be configured to be the block size of a guest device; and because
+>> 64 kB simply is the standard cluster size of qcow2 images
+>> nowadays[1]...).
+>=20
+> I think that we should have at least that, but ideally larger
+> cluster-to-subcluster ratios.
+>=20
+>> (We could even get one more bit if we had a subcluster-flag, because I=
 
-For the other cases YIELD and WFE (wait-for-event) we just treat them as
-NOPs when MTTCG is enabled (test parallel_cpus). So they will busy-wait
-spin around the guests wfe code but don't trigger expensive longjmps out
-of the execution loop. This was all done in:
+>> guess we can always assume subclustered clusters to have OFLAG_COPIED
+>> and be uncompressed. But still, three bits missing.)
+>=20
+> Why can we always assume OFLAG_COPIED?
 
-  c22edfebff target-arm: don't generate WFE/YIELD calls for MTTCG
+Because partially allocated clusters cannot be used with internal
+snapshots, and that is what OFLAG_COPIED is for.
 
-One other thing I noticed while looking through the PPC stuff is I
-couldn't see any handling of cpu_reset/powering on. There is a potential
-race here which ThreadSanitizer will complain about if you start loading
-up your about-to-be-powered-on-vCPU from another thread. The fix here is
-to defer the setup with async work. See:
+>> If course, if you'd be willing to give up the all-zeroes state for
+>> subclusters, it would be enough...
+>=20
+> I still think that it looks like a better idea to allow having more
+> subclusters, but giving up the all-zeroes state is a valid
+> alternative. Apart from having to overwrite with zeroes when a
+> subcluster is discarded, is there anything else that we would miss?
 
-  062ba099e0 target-arm/powerctl: defer cpu reset work to CPU context
+It if it's a real discard you can just discard it (which is what we do
+for compat=3D0.10 images anyway); but zero-writes will then have to be
+come real writes, yes.
 
---
-Alex Bennée
+>> By the way, if you'd only allow multiple of 1s overhead
+>> (i.e. multiples of 32 subclusters), I think (3) would be pretty much
+>> the same as (2) if you just always write the subcluster information
+>> adjacent to the L2 table. Should be just the same caching-wise and
+>> performance-wise.
+>=20
+> Then (3) is effectively the same as (2), just that the subcluster
+> bitmaps are at the end of the L2 cluster, and not next to each entry.
+
+Exactly. But it's a difference in implementation, as you won't have to
+worry about having changed the L2 table layout; maybe that's a benefit.
+
+Max
+
+
+--oUtU9vcURMiFfgmvShGjwBrumATBpGohb
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljs4oUSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AKT4H/3yWGqVFF59IThGMJ6vrNsq5D5VhxlAh
+wlUx5Fd5t6inyRiCNQWn7OvJmYOY2C4KGLfmdgKOSt6tiLScS9DPdot5WHI91aRc
+K9NScerAV5cI3sE+LtSntRnuy8m6cpi2ah0XFXtHloTmrObHL6ANxhmV5QnEHEfO
+jzU93Kfh5IIMigFSXVC11d3av0K+cRiXlLIN1oAQYKEuKiq3ytYK+djBxZJZCynh
+panZKdA5pUQOn44qBbN+1NW/YufeLXqXsRnt6XGxEPE03NdXxY1iXEeyixCa/rU8
+eS+9nHniLwp2ys5u7T+KuEh2nvTcZ8NA4FOss2nC48uoUbPRlvhMULc=
+=5+tK
+-----END PGP SIGNATURE-----
+
+--oUtU9vcURMiFfgmvShGjwBrumATBpGohb--
