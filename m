@@ -1,15 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1cxuYA-0005KC-PU
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 08:05:35 -0400
+	(envelope-from <bounces@canonical.com>) id 1cxuYj-0005fc-KF
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 08:06:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1cxuY5-0001KV-UB
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 08:05:34 -0400
-From: jemmy858585@gmail.com
-Date: Tue, 11 Apr 2017 20:05:12 +0800
-Message-Id: <1491912312-23393-1-git-send-email-lidongchen@tencent.com>
-Subject: [Qemu-devel] [PATCH v4] migration/block: use blk_pwrite_zeroes for
- each zero cluster
+	(envelope-from <bounces@canonical.com>) id 1cxuYf-0001gO-Ie
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 08:06:09 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57197)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cxuYf-0001fo-C6
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 08:06:05 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cxuYd-0007cJ-Om
+	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 12:06:04 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 309892E80D5
+	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 12:06:00 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 11 Apr 2017 11:52:51 -0000
+From: Marc Pignat <1635339@bugs.launchpad.net>
+Reply-To: Bug 1635339 <1635339@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20161020160532.23339.63373.malonedeb@soybean.canonical.com>
+Message-Id: <20170411115251.1711.79560.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1635339] Re: qxl_pre_save assertion failure on vm
+ "save"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,79 +38,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, famz@redhat.com, quintela@redhat.com, dgilbert@redhat.com, qemu-block@nongnu.org, Lidong Chen <lidongchen@tencent.com>
 
-From: Lidong Chen <lidongchen@tencent.com>
+Did I miss something or this is a bug in the windows qxl driver and
+should be fixed there?
 
-BLOCK_SIZE is (1 << 20), qcow2 cluster size is 65536 by default,
-this maybe cause the qcow2 file size is bigger after migration.
-This patch check each cluster, use blk_pwrite_zeroes for each
-zero cluster.
+-- =
 
-Signed-off-by: Lidong Chen <lidongchen@tencent.com>
----
- migration/block.c | 33 +++++++++++++++++++++++++++++++--
- 1 file changed, 31 insertions(+), 2 deletions(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1635339
 
-diff --git a/migration/block.c b/migration/block.c
-index 7734ff7..5d0635a 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -885,6 +885,8 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
-     int64_t total_sectors = 0;
-     int nr_sectors;
-     int ret;
-+    BlockDriverInfo bdi;
-+    int cluster_size;
- 
-     do {
-         addr = qemu_get_be64(f);
-@@ -919,6 +921,15 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
-                     error_report_err(local_err);
-                     return -EINVAL;
-                 }
-+
-+                ret = bdrv_get_info(blk_bs(blk), &bdi);
-+                if (ret == 0 && bdi.cluster_size > 0 &&
-+                    bdi.cluster_size <= BLOCK_SIZE &&
-+                    BLOCK_SIZE % bdi.cluster_size == 0) {
-+                    cluster_size = bdi.cluster_size;
-+                } else {
-+                    cluster_size = BLOCK_SIZE;
-+                }
-             }
- 
-             if (total_sectors - addr < BDRV_SECTORS_PER_DIRTY_CHUNK) {
-@@ -932,10 +943,28 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
-                                         nr_sectors * BDRV_SECTOR_SIZE,
-                                         BDRV_REQ_MAY_UNMAP);
-             } else {
-+                int i;
-+                int64_t cur_addr;
-+                uint8_t *cur_buf;
-+
-                 buf = g_malloc(BLOCK_SIZE);
-                 qemu_get_buffer(f, buf, BLOCK_SIZE);
--                ret = blk_pwrite(blk, addr * BDRV_SECTOR_SIZE, buf,
--                                 nr_sectors * BDRV_SECTOR_SIZE, 0);
-+                for (i = 0; i < BLOCK_SIZE / cluster_size; i++) {
-+                    cur_addr = addr * BDRV_SECTOR_SIZE + i * cluster_size;
-+                    cur_buf = buf + i * cluster_size;
-+
-+                    if (buffer_is_zero(cur_buf, cluster_size)) {
-+                        ret = blk_pwrite_zeroes(blk, cur_addr,
-+                                                cluster_size,
-+                                                BDRV_REQ_MAY_UNMAP);
-+                    } else {
-+                        ret = blk_pwrite(blk, cur_addr, cur_buf,
-+                                         cluster_size, 0);
-+                    }
-+                    if (ret < 0) {
-+                        break;
-+                    }
-+                }
-                 g_free(buf);
-             }
- 
--- 
-1.8.3.1
+Title:
+  qxl_pre_save assertion failure on vm "save"
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  When I try and save my Windows 10 VM, I see an assertion failure, and
+  the machine is shut down.
+
+  I see the following in the log:
+
+  main_channel_handle_parsed: agent start
+  qemu-system-x86_64: /build/qemu-Zwynhi/qemu-2.5+dfsg/hw/display/qxl.c:210=
+1: qxl_pre_save: Assertion `d->last_release_offset < d->vga.vram_size' fail=
+ed.
+  2016-10-20 11:52:42.713+0000: shutting down
+
+  Please let me know what other information would be relevant!
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1635339/+subscriptions
