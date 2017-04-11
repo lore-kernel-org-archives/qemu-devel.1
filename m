@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1cy4LT-0000LT-U4
+	(envelope-from <alistai@xilinx.com>) id 1cy4LT-0000LU-VD
 	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 18:33:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1cy4LP-0005fa-Ua
+	(envelope-from <alistai@xilinx.com>) id 1cy4LP-0005ff-V8
 	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 18:33:07 -0400
-Received: from mail-by2nam01on0085.outbound.protection.outlook.com
-	([104.47.34.85]:58464
+Received: from mail-by2nam01on0051.outbound.protection.outlook.com
+	([104.47.34.51]:31539
 	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1cy4LP-0005fL-KF
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1cy4LP-0005fK-Kd
 	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 18:33:03 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 11 Apr 2017 15:30:27 -0700
-Message-ID: <026dbe01a1d42619eee30ce3f2079741bf04bc73.1491947224.git.alistair.francis@xilinx.com>
+Date: Tue, 11 Apr 2017 15:30:20 -0700
+Message-ID: <8a7e8059984e27d46a276a66299d035a0afd280f.1491947224.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1491947224.git.alistair.francis@xilinx.com>
 References: <cover.1491947224.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 5/5] xlnx-zynqmp: Set the Cadence GEM
- revision
+Subject: [Qemu-devel] [PATCH v3 2/5] cadence_gem: Correct the multi-queue
+ can rx logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +31,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
 Cc: f4bug@amsat.org, alistair.francis@xilinx.com, alistair23@gmail.com
 
+Correct the buffer descriptor busy logic to work correctly when using
+multiple queues.
+
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
 
- hw/arm/xlnx-zynqmp.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ hw/net/cadence_gem.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
 
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index bc4e66b..e41b6fe 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -30,6 +30,8 @@
- #define ARM_PHYS_TIMER_PPI  30
- #define ARM_VIRT_TIMER_PPI  27
+diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
+index 17c229d..a66a9cc 100644
+--- a/hw/net/cadence_gem.c
++++ b/hw/net/cadence_gem.c
+@@ -481,14 +481,17 @@ static int gem_can_receive(NetClientState *nc)
+     }
  
-+#define GEM_REVISION        0x40070106
+     for (i = 0; i < s->num_priority_queues; i++) {
+-        if (rx_desc_get_ownership(s->rx_desc[i]) == 1) {
+-            if (s->can_rx_state != 2) {
+-                s->can_rx_state = 2;
+-                DB_PRINT("can't receive - busy buffer descriptor (q%d) 0x%x\n",
+-                         i, s->rx_desc_addr[i]);
+-             }
+-            return 0;
++        if (rx_desc_get_ownership(s->rx_desc[i]) != 1) {
++            break;
++        }
++    };
 +
- #define GIC_BASE_ADDR       0xf9000000
- #define GIC_DIST_ADDR       0xf9010000
- #define GIC_CPU_ADDR        0xf9020000
-@@ -334,8 +336,10 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-             qemu_check_nic_model(nd, TYPE_CADENCE_GEM);
-             qdev_set_nic_properties(DEVICE(&s->gem[i]), nd);
++    if (i == s->num_priority_queues) {
++        if (s->can_rx_state != 2) {
++            s->can_rx_state = 2;
++            DB_PRINT("can't receive - all the buffer descriptors are busy\n");
          }
-+        object_property_set_int(OBJECT(&s->gem[i]), GEM_REVISION, "revision",
-+                                &error_abort);
-         object_property_set_int(OBJECT(&s->gem[i]), 2, "num-priority-queues",
--                                  &error_abort);
-+                                &error_abort);
-         object_property_set_bool(OBJECT(&s->gem[i]), true, "realized", &err);
-         if (err) {
-             error_propagate(errp, err);
++        return 0;
+     }
+ 
+     if (s->can_rx_state != 0) {
 -- 
 2.9.3
