@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37983)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cxxkP-0006SW-1w
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:30:26 -0400
+	(envelope-from <clg@kaod.org>) id 1cxxkS-0006Uz-51
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:30:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cxxkO-0003UQ-21
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:30:25 -0400
-References: <20170406150148.zwjpozqtale44jfh@perseus.local>
-	<d60ea1f9-ae2c-6625-90de-944cbb490f85@redhat.com>
-	<w5160ibyufr.fsf@maestria.local.igalia.com>
-	<9d848582-8c76-4d88-2b31-e0e4c63b61d4@redhat.com>
-	<w5137dfyq1f.fsf@maestria.local.igalia.com>
-	<20170411144921.GN4516@noname.str.redhat.com>
-	<b5fb4bc7-d07b-6b7a-4fd5-d17c6e380ce7@redhat.com>
-	<1bbcc4ba-e889-2242-cb44-c933eedfb212@redhat.com>
-	<760cb82c-9bff-c289-c2b3-940319c66b5c@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <be491b99-9ea4-d1d0-41f4-51945b64f5d4@redhat.com>
-Date: Tue, 11 Apr 2017 10:30:03 -0500
+	(envelope-from <clg@kaod.org>) id 1cxxkP-0003VT-1F
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:30:28 -0400
+Received: from 2.mo173.mail-out.ovh.net ([178.33.251.49]:56016)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cxxkO-0003UE-Ry
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:30:24 -0400
+Received: from player778.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id C163331236
+	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 17:30:21 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Tue, 11 Apr 2017 17:29:58 +0200
+Message-Id: <1491924606-20026-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <760cb82c-9bff-c289-c2b3-940319c66b5c@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="FJpsOR32IR9v4irC2p3nUa43n3wtOqkkT"
-Subject: Re: [Qemu-devel] [RFC] Proposed qcow2 extension: subcluster
- allocation
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 0/8] pnv: improvement of LPC support and
+ IPMI support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,77 +28,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---FJpsOR32IR9v4irC2p3nUa43n3wtOqkkT
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Alberto Garcia <berto@igalia.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
-Message-ID: <be491b99-9ea4-d1d0-41f4-51945b64f5d4@redhat.com>
-Subject: Re: [Qemu-devel] [RFC] Proposed qcow2 extension: subcluster
- allocation
-References: <20170406150148.zwjpozqtale44jfh@perseus.local>
- <d60ea1f9-ae2c-6625-90de-944cbb490f85@redhat.com>
- <w5160ibyufr.fsf@maestria.local.igalia.com>
- <9d848582-8c76-4d88-2b31-e0e4c63b61d4@redhat.com>
- <w5137dfyq1f.fsf@maestria.local.igalia.com>
- <20170411144921.GN4516@noname.str.redhat.com>
- <b5fb4bc7-d07b-6b7a-4fd5-d17c6e380ce7@redhat.com>
- <1bbcc4ba-e889-2242-cb44-c933eedfb212@redhat.com>
- <760cb82c-9bff-c289-c2b3-940319c66b5c@redhat.com>
-In-Reply-To: <760cb82c-9bff-c289-c2b3-940319c66b5c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hello,
 
-On 04/11/2017 10:18 AM, Max Reitz wrote:
+The first patches improve the LPC support for the POWER8NVL (nvlink)
+systems and for multichip systems. Next, we add IPMI support to the
+machine which is required to power off and reboot a PowerNV system. To
+make use of it, a BT device and an BMC simulator need to be defined on
+the command line:
 
-> Hm, yeah, although you have to keep in mind that the padding is almost
-> pretty much the same as the the data bits we need, effectively doubling=
+    -device ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D1=
+0
 
-> the size of the L2 tables:
->=20
-> padding =3D 2^{n+2} - 2^{n+1} - 64 (=3D2^6)
->         =3D 2^{n+1} - 64
->=20
-> So that's not so nice, but if it's the only thing we can do...
+To improve the sensor and FRU support, one can use the following
+options for the simulator:
 
-Or we mix-and-match your ideas: since our subclusters are ternary
-encoding, if you want 128 subclusters, instead of asking for 256 bits,
-you ask for ld(3^128) =3D 203 bits, then use 11 padding bits of your
-original 64, and you have something that still fits in 256 bits instead
-of 512...
+    sdrfile=3D./palmetto-SDR.bin,fruareasize=3D256,frudatafile=3D./palmet=
+to-FRU.bin
 
-Okay, just kidding.  Anything larger than 32 subclusters does get
-awkward fast.
 
+To test, grab a kernel and a rootfs image here :
+
+  https://openpower.xyz/job/openpower-op-build/distro=3Dubuntu,target=3Dp=
+almetto/lastSuccessfulBuild/artifact/images/zImage.epapr
+  https://openpower.xyz/job/openpower-op-build/distro=3Dubuntu,target=3Dp=
+almetto/lastSuccessfulBuild/artifact/images/rootfs.cpio.xz
+
+The full patchset is available here :
+
+   https://github.com/legoater/qemu/commits/powernv-ipmi-2.9
+
+Thanks,
+
+C.
+
+Changes since v2:
+
+ - used PNV_LPC() macro to cast the 'opaque' parameter
+ - introduced a pnv_chip_lpc_offset() routine to locate the LPC node
+   of a chip  =20
+ - set the "primary" property on the LPC bus of chip 0 from the machine
+ - used the pnv_chip_lpc_offset() routine to scan the default LPC bus
+ - removed the initializer of io_base
+
+Changes since v1:
+
+ - moved the IRQ handler in pnv_lpc.c and introduced pnv_lpc_isa_irq_crea=
+te()
+ - only add the "primary" property on the LPC bus of chip 0
+ - reworked the assignement of the ISA IO base in the 'reg' array
+   property
+ - changed the type of the 'bmc' attribute of the machine
+
+Benjamin Herrenschmidt (1):
+  ppc/pnv: Add support for POWER8+ LPC Controller
+
+C=C3=A9dric Le Goater (7):
+  ppc/pnv: enable only one LPC bus
+  ppc/pnv: scan ISA bus to populate device tree
+  ppc/pnv: populate device tree for RTC devices
+  ppc/pnv: populate device tree for serial devices
+  ppc/pnv: populate device tree for IPMI BT devices
+  ppc/pnv: add initial IPMI sensors for the BMC simulator
+  ppc/pnv: generate an OEM SEL event on shutdown
+
+ hw/ppc/Makefile.objs     |   2 +-
+ hw/ppc/pnv.c             | 228 ++++++++++++++++++++++++++++++++++++++---=
+------
+ hw/ppc/pnv_bmc.c         | 122 +++++++++++++++++++++++++
+ hw/ppc/pnv_lpc.c         | 106 +++++++++++++++++++---
+ include/hw/ppc/pnv.h     |  11 +++
+ include/hw/ppc/pnv_lpc.h |   8 ++
+ 6 files changed, 425 insertions(+), 52 deletions(-)
+ create mode 100644 hw/ppc/pnv_bmc.c
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---FJpsOR32IR9v4irC2p3nUa43n3wtOqkkT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY7PZ7AAoJEKeha0olJ0Nq2WEH/iKOIXrz8F6MSxCVLuA+Zo0G
-fsGgY58XfNLZGcNqMnZIwlemkxZrcFjcLJIAW7OjJIPs+1pP53AeZcSXOmb2BonY
-srvxvgnRyUSPutnniwOeeOURd1tDvln+Ef4I9q0ZU0tqreuINR3rDt4YLMNnjkMJ
-yahF+tqptyV1PcGIzwOirUlu8Nqw6Di6EjgtzFni30Vc997987nBLZoadvjgr5JW
-rhl1dCUVMuhv5z3cVb3era+rp5cMRe3I/Yw2c4Bkb0vQzKe9Wd3DMF/LWixhzncK
-mSJtaZXza2AsBea7+Swc5+mvmESllKBkY4/zbLs/HRGqcSsS3z6usMMnYdGCVoM=
-=SVjT
------END PGP SIGNATURE-----
-
---FJpsOR32IR9v4irC2p3nUa43n3wtOqkkT--
+2.7.4
