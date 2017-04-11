@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cxss6-0003Mv-AN
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:18:08 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1cxsvO-0004x6-CF
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:21:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cxss1-0006mo-Mc
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:18:02 -0400
-Date: Tue, 11 Apr 2017 17:06:46 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1cxsvL-0008Ck-6y
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:21:26 -0400
+Date: Tue, 11 Apr 2017 20:19:34 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170411070646.GD12900@umbus.fritz.box>
-References: <1491374264-26293-1-git-send-email-clg@kaod.org>
+Message-ID: <20170411101934.GE12900@umbus.fritz.box>
+References: <1491832618-27536-1-git-send-email-clg@kaod.org>
+	<1491832618-27536-3-git-send-email-clg@kaod.org>
+	<20170411024041.GW27571@umbus>
+	<9b557996-5268-b95b-c6ae-9fe5b6191191@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="AkbCVLjbJ9qUtAXD"
+	protocol="application/pgp-signature"; boundary="vv4Sf/kQfcwinyKX"
 Content-Disposition: inline
-In-Reply-To: <1491374264-26293-1-git-send-email-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH] spapr: remove the 'nr_servers' field from
- the machine
+In-Reply-To: <9b557996-5268-b95b-c6ae-9fe5b6191191@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v2 2/8] ppc/pnv: enable only one LPC bus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,172 +30,105 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---AkbCVLjbJ9qUtAXD
+--vv4Sf/kQfcwinyKX
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 05, 2017 at 08:37:44AM +0200, C=E9dric Le Goater wrote:
-> xics_system_init() does not need 'nr_servers' anymore as it is only
-> used to define the 'interrupt-controller' node in the device tree. So
-> let's just compute the value when calling spapr_dt_xics().
+On Tue, Apr 11, 2017 at 09:06:16AM +0200, C=E9dric Le Goater wrote:
+> On 04/11/2017 04:40 AM, David Gibson wrote:
+> > On Mon, Apr 10, 2017 at 03:56:52PM +0200, C=E9dric Le Goater wrote:
+> >> The firmware (skiboot) chooses the default LPC bus of a multichip
+> >> systems using a "primary" property. The LPC bus of chip 0 should be
+> >> the only connected in the system. Let's advertise it in the device
+> >> tree.
+> >>
+> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >> ---
+> >>  Changes since v1:
+> >>
+> >>  - the device tree is populated for all LPC busses of the system but
+> >>    only the one on chip 0 has the "primary" property.
+> >>
+> >>  hw/ppc/pnv.c             |  2 ++
+> >>  hw/ppc/pnv_lpc.c         | 23 ++++++++++++++---------
+> >>  include/hw/ppc/pnv_lpc.h |  2 ++
+> >>  3 files changed, 18 insertions(+), 9 deletions(-)
+> >>
+> >> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> >> index 27589b91d1cf..7d742b6e34e1 100644
+> >> --- a/hw/ppc/pnv.c
+> >> +++ b/hw/ppc/pnv.c
+> >> @@ -765,6 +765,8 @@ static void pnv_chip_realize(DeviceState *dev, Err=
+or **errp)
+> >>      g_free(typename);
+> >> =20
+> >>      /* Create LPC controller */
+> >> +    object_property_set_int(OBJECT(&chip->lpc), chip->chip_id, "chip-=
+id",
+> >> +                            &error_fatal);
+> >>      object_property_set_bool(OBJECT(&chip->lpc), true, "realized",
+> >>                               &error_fatal);
+> >>      pnv_xscom_add_subregion(chip, PNV_XSCOM_LPC_BASE, &chip->lpc.xsco=
+m_regs);
+> >> diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+> >> index baee366d386a..13d7a695678d 100644
+> >> --- a/hw/ppc/pnv_lpc.c
+> >> +++ b/hw/ppc/pnv_lpc.c
+> >> @@ -92,14 +92,6 @@ enum {
+> >>  #define LPC_HC_REGS_OPB_SIZE    0x00001000
+> >> =20
+> >> =20
+> >> -/*
+> >> - * TODO: the "primary" cell should only be added on chip 0. This is
+> >> - * how skiboot chooses the default LPC controller on multichip
+> >> - * systems.
+> >> - *
+> >> - * It would be easly done if we can change the populate() interface to
+> >> - * replace the PnvXScomInterface parameter by a PnvChip one
+> >> - */
+> >>  static int pnv_lpc_populate(PnvXScomInterface *dev, void *fdt, int xs=
+com_offset)
+> >>  {
+> >>      const char compat[] =3D "ibm,power8-lpc\0ibm,lpc";
+> >> @@ -110,6 +102,7 @@ static int pnv_lpc_populate(PnvXScomInterface *dev=
+, void *fdt, int xscom_offset)
+> >>          cpu_to_be32(lpc_pcba),
+> >>          cpu_to_be32(PNV_XSCOM_LPC_SIZE)
+> >>      };
+> >> +    PnvLpcController *lpc =3D PNV_LPC(dev);
+> >> =20
+> >>      name =3D g_strdup_printf("isa@%x", lpc_pcba);
+> >>      offset =3D fdt_add_subnode(fdt, xscom_offset, name);
+> >> @@ -119,7 +112,13 @@ static int pnv_lpc_populate(PnvXScomInterface *de=
+v, void *fdt, int xscom_offset)
+> >>      _FDT((fdt_setprop(fdt, offset, "reg", reg, sizeof(reg))));
+> >>      _FDT((fdt_setprop_cell(fdt, offset, "#address-cells", 2)));
+> >>      _FDT((fdt_setprop_cell(fdt, offset, "#size-cells", 1)));
+> >> -    _FDT((fdt_setprop(fdt, offset, "primary", NULL, 0)));
+> >> +
+> >> +    /* The firmware (skiboot) chooses the default LPC bus of the
+> >> +     * system using a "primary" property.
+> >> +     */
+> >> +    if (lpc->chip_id =3D=3D 0x0) {
+> >> +        _FDT((fdt_setprop(fdt, offset, "primary", NULL, 0)));
+> >> +    }
+> >=20
+> > So, the choice of primary bus is really a machine level thing, rather
+> > than chip level.
+> >=20
+> > So I think it would make more sense for the machine to poke the
+> > 'primary' property into the device tree afterwards, rather than adding
+> > it initially within the chip/LPC code.  That will then avoid having to
+> > pass the chip-id property into the LPC.
 >=20
-> This also gives us an opportunity to simplify the xics_system_init()
-> routine and introduce a specific spapr_ics_create() helper to create
-> the sPAPR ICS object.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> ok. I will see how I can do that. I think that I will change=20
+> pnv_xscom_populate() to return the xscom offset in the device
+> tree. From this node, I can look for the ISA bus and add the=20
+> "primary" property if this is chip 0.
 
-Applied to ppc-for-2.10.
-
-> ---
->  hw/ppc/spapr.c         | 56 ++++++++++++++++++++++----------------------=
-------
->  include/hw/ppc/spapr.h |  1 -
->  2 files changed, 24 insertions(+), 33 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 4e87ffe776ea..df231a3fc4a1 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -96,45 +96,40 @@
-> =20
->  #define HTAB_SIZE(spapr)        (1ULL << ((spapr)->htab_shift))
-> =20
-> -static int try_create_xics(sPAPRMachineState *spapr, const char *type_ic=
-s,
-> -                           const char *type_icp, int nr_servers,
-> -                           int nr_irqs, Error **errp)
-> +static ICSState *spapr_ics_create(sPAPRMachineState *spapr,
-> +                                  const char *type_ics,
-> +                                  int nr_irqs, Error **errp)
->  {
-> -    XICSFabric *xi =3D XICS_FABRIC(spapr);
->      Error *err =3D NULL, *local_err =3D NULL;
-> -    ICSState *ics =3D NULL;
-> +    Object *obj;
-> =20
-> -    ics =3D ICS_SIMPLE(object_new(type_ics));
-> -    object_property_add_child(OBJECT(spapr), "ics", OBJECT(ics), NULL);
-> -    object_property_set_int(OBJECT(ics), nr_irqs, "nr-irqs", &err);
-> -    object_property_add_const_link(OBJECT(ics), "xics", OBJECT(xi), NULL=
-);
-> -    object_property_set_bool(OBJECT(ics), true, "realized", &local_err);
-> +    obj =3D object_new(type_ics);
-> +    object_property_add_child(OBJECT(spapr), "ics", obj, NULL);
-> +    object_property_add_const_link(obj, "xics", OBJECT(spapr), &error_ab=
-ort);
-> +    object_property_set_int(obj, nr_irqs, "nr-irqs", &err);
-> +    object_property_set_bool(obj, true, "realized", &local_err);
->      error_propagate(&err, local_err);
->      if (err) {
->          error_propagate(errp, err);
-> -        return -1;
-> +        return NULL;
->      }
-> =20
-> -    spapr->nr_servers =3D nr_servers;
-> -    spapr->ics =3D ics;
-> -    spapr->icp_type =3D type_icp;
-> -    return 0;
-> +    return ICS_SIMPLE(obj);
->  }
-> =20
-> -static int xics_system_init(MachineState *machine,
-> -                            int nr_servers, int nr_irqs, Error **errp)
-> +static void xics_system_init(MachineState *machine, int nr_irqs, Error *=
-*errp)
->  {
-> -    int rc =3D -1;
-> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(machine);
-> =20
->      if (kvm_enabled()) {
->          Error *err =3D NULL;
-> =20
->          if (machine_kernel_irqchip_allowed(machine) &&
-> -            !xics_kvm_init(SPAPR_MACHINE(machine), errp)) {
-> -            rc =3D try_create_xics(SPAPR_MACHINE(machine), TYPE_ICS_KVM,
-> -                                 TYPE_KVM_ICP, nr_servers, nr_irqs, &err=
-);
-> +            !xics_kvm_init(spapr, errp)) {
-> +            spapr->icp_type =3D TYPE_KVM_ICP;
-> +            spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_KVM, nr_irqs=
-, &err);
->          }
-> -        if (machine_kernel_irqchip_required(machine) && rc < 0) {
-> +        if (machine_kernel_irqchip_required(machine) && !spapr->ics) {
->              error_reportf_err(err,
->                                "kernel_irqchip requested but unavailable:=
- ");
->          } else {
-> @@ -142,13 +137,11 @@ static int xics_system_init(MachineState *machine,
->          }
->      }
-> =20
-> -    if (rc < 0) {
-> -        xics_spapr_init(SPAPR_MACHINE(machine), errp);
-> -        rc =3D try_create_xics(SPAPR_MACHINE(machine), TYPE_ICS_SIMPLE,
-> -                               TYPE_ICP, nr_servers, nr_irqs, errp);
-> +    if (!spapr->ics) {
-> +        xics_spapr_init(spapr, errp);
-> +        spapr->icp_type =3D TYPE_ICP;
-> +        spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_SIMPLE, nr_irqs,=
- errp);
->      }
-> -
-> -    return rc;
->  }
-> =20
->  static int spapr_fixup_cpu_smt_dt(void *fdt, int offset, PowerPCCPU *cpu,
-> @@ -912,6 +905,7 @@ static void *spapr_build_fdt(sPAPRMachineState *spapr,
->      void *fdt;
->      sPAPRPHBState *phb;
->      char *buf;
-> +    int smt =3D kvmppc_smt_threads();
-> =20
->      fdt =3D g_malloc0(FDT_MAX_SIZE);
->      _FDT((fdt_create_empty_tree(fdt, FDT_MAX_SIZE)));
-> @@ -951,7 +945,7 @@ static void *spapr_build_fdt(sPAPRMachineState *spapr,
->      _FDT(fdt_setprop_cell(fdt, 0, "#size-cells", 2));
-> =20
->      /* /interrupt controller */
-> -    spapr_dt_xics(spapr->nr_servers, fdt, PHANDLE_XICP);
-> +    spapr_dt_xics(DIV_ROUND_UP(max_cpus * smt, smp_threads), fdt, PHANDL=
-E_XICP);
-> =20
->      ret =3D spapr_populate_memory(spapr, fdt);
->      if (ret < 0) {
-> @@ -1970,7 +1964,6 @@ static void ppc_spapr_init(MachineState *machine)
->      hwaddr node0_size =3D spapr_node0_size();
->      long load_limit, fw_size;
->      char *filename;
-> -    int smt =3D kvmppc_smt_threads();
-> =20
->      msi_nonbroken =3D true;
-> =20
-> @@ -2021,8 +2014,7 @@ static void ppc_spapr_init(MachineState *machine)
->      load_limit =3D MIN(spapr->rma_size, RTAS_MAX_ADDR) - FW_OVERHEAD;
-> =20
->      /* Set up Interrupt Controller before we create the VCPUs */
-> -    xics_system_init(machine, DIV_ROUND_UP(max_cpus * smt, smp_threads),
-> -                     XICS_IRQS_SPAPR, &error_fatal);
-> +    xics_system_init(machine, XICS_IRQS_SPAPR, &error_fatal);
-> =20
->      /* Set up containers for ibm,client-set-architecture negotiated opti=
-ons */
->      spapr->ov5 =3D spapr_ovec_new();
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index db3d4acb18a6..742777f40a2d 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -95,7 +95,6 @@ struct sPAPRMachineState {
->      char *kvm_type;
->      MemoryHotplugState hotplug_memory;
-> =20
-> -    uint32_t nr_servers;
->      const char *icp_type;
->  };
-> =20
+I wouldn't even bother storing the offset, which may not be safe
+anyway.  You can just look it up again by path from the machine.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -201,25 +136,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---AkbCVLjbJ9qUtAXD
+--vv4Sf/kQfcwinyKX
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJY7ICDAAoJEGw4ysog2bOSTAMP/37SSx1Gtdr2us4fHq03ZcJY
-bfHEPqTWOWkr6ZL3UJYs5N1hPTNmQ5B9xLdfz+BlikVCcAM1ixkwTu0pbRfGk9/s
-xHxqfUGL8UlPbCJ46bK7JU7SvfuI0YqUrZgEJ8e79gU8yvARAaUbW4W+07ppQo/2
-aj4nYFTJk6TRzUfr6RYi5qzEQSxe52PZnsniHyoSo4hY5hWfyTvdwNlEqXjsfNO8
-gL1YnSWSMvasRuAAfTKBWnoQXnDWwq4nBPwzHhkSRraZg7iAIxVT0wGseWY1f/s1
-vIUTF4/lnIAdbnbVZ8CHvL90w6UScWRVhZpFxLEaEUbM8PXuYMknnAOuCmQnA73p
-bR4nNCz2WlJmOOeVmFwZ1VlDKCEjUfuFN1PbKar4S+77yoeUas7m6T/wzPEDZW0J
-IUQlOsFZAW5uQR+JqjqqsSajEgB8u4lnQBhvl/yF2rRdAiIrHRAyQF7VNPtqWFHH
-ru1Rt9iluTiDVr65Uu+3tUDl5dsagbxq3PwSs0ZXXT2E/zXr2YDoTx/l6TJj8mAp
-k7wyllLdGbP6F9bmVi+9Hfihdr6Xwk0gNfQpJLhFDa8mvN4uxoa+oR/YUW76Dwjt
-5LJuQU6RFzQr5gBRQH1q0rTGHzio1mPeQq0n4/PAZimr3tZnFaTfdtiO59La+BAu
-xKjAobmoTJajTdXkMJOO
-=sgJe
+iQIcBAEBCAAGBQJY7K2zAAoJEGw4ysog2bOSM9QP/jwxE9qnlNmVOHDCv2UsQIl0
+zctf5mMqQqQ5ykSun64qMGm6lrkkEDtS8eCipyeHv16SFEEg8UcM2jZNZI2vJu2s
+0iITMbDoVrCwc6tbkZA3yEjOkyanL+KJG50rP+emKn8mdWHSXZmp4jZakb0i7C3D
+ntIiYAL8kimrLOLUaKUgldH3Ok8jv2S8DZp+/w1m3uzl00VM2GnJPIeLGfvdrDVO
+uCpYGGrL7I6ouhvmtAcxCzo4jGWDqVNFAG/m6ocXIwIpAO+RQMFBIAJjXeQPVOui
+k51e2aUjswCh7T03YrP1zoVr5Z4fsn1AKzP3Ru7QxaDR6uxyOakhet0EbloKck4V
+hR7asgE4BF0J3nrB7lHd4xtlG757Kin+6yjrCflb622cZf9WRs5JXsXhVVfzivAK
+B9t/qP474lRyLUi+WB+bDdGdywDCkivWygd3ze9IMlwFSIBuWKYzFU1R5jWefP4O
+VgziswWLKTsnvE9z/5ekwcSAHrkYnS7TSev/tvuY2++ckCBbr/mvx6SrprIVbVXK
+oF8UQJWMx+vVJV9NWyn1YzIJjBu+3WyF6+ZNrQXN7cJWApwhFf3fMHcNUSF3MAYt
+gtW29cXyiR7e07dYmI2ZqrElfIXqQpDnd6Rxlzd1G3lCpYT/lJ6d8hfIvogBzwOq
+/4VGHN4FhKh4g4gIA6Fo
+=FOEx
 -----END PGP SIGNATURE-----
 
---AkbCVLjbJ9qUtAXD--
+--vv4Sf/kQfcwinyKX--
