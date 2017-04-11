@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cxtNT-0003YB-E3
+	(envelope-from <alex.bennee@linaro.org>) id 1cxtNT-0003Y8-Ci
 	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:50:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cxtNS-0004Sk-KP
+	(envelope-from <alex.bennee@linaro.org>) id 1cxtNQ-0004S6-Aj
 	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:50:27 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:35891)
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:34681)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cxtNS-0004SW-Ds
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:50:26 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id o81so59948602wmb.1
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 03:50:26 -0700 (PDT)
+	id 1cxtNQ-0004Rw-3o
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:50:24 -0400
+Received: by mail-wr0-x234.google.com with SMTP id z109so26151911wrb.1
+	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 03:50:23 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 11 Apr 2017 11:50:31 +0100
-Message-Id: <20170411105031.28904-4-alex.bennee@linaro.org>
-In-Reply-To: <20170411105031.28904-1-alex.bennee@linaro.org>
-References: <20170411105031.28904-1-alex.bennee@linaro.org>
+Date: Tue, 11 Apr 2017 11:50:28 +0100
+Message-Id: <20170411105031.28904-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 3/3] new
- script/analyse-tlb-flushes-simpletrace.py
+Subject: [Qemu-devel] [PATCH v1 0/3] Fix cputlb flush stats and exporting
+ data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,82 +31,65 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: bobby.prani@gmail.com, rth@twiddle.net, stefanha@redhat.com
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This is a simple helper script to extract TLB flush stats from the a
-simpletrace file and plot the results.
+This is mostly just an RFC for discussion as I know a number of GSoC
+projects will involve a degree of instrumentation and measurement of
+the internals of the TCG.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
+The first patch just fixes and expands the counters. The second uses
+(abuses?) the trace mechanism to export the data via the simpletrace
+binary trace format. The final patch is a script that then allows us
+to plot the collected data.
+
+So this series raises a few questions/thoughts:
+
+ - doing an atomic_inc(__ATOMIC_SEQ_CST) is inefficient
+
+ It would probably be better to have per-thread counters that are
+ summed when needed rather than enforcing sequential consistency on a
+ global counter.
+
+ - I could encode the events directly and count them in the script
+
+ This would be more trace-like but we'd loose the counters in the MMI
+ which is helpful on a live non-trace-enabled builds if you want to
+ get an idea of whats happening.
+
+ - Tracing is very event focused, would it be worth adding some sort
+   of counter/sampling support?
+
+ Currently the insertion of the trace_tlb_flushes() event in the entry
+ to the run loop is a massive hack. Most of the time the numbers
+ haven't changed. I could have just spawned a sampling helper on a
+ main-loop timer but I feel this might be a use case thinking about
+ for the tracing system.
+
+ - timestamps could be replaced with icount for some analysis
+
+ The icount mechanism would allow for a fairly fine grained matching of
+ events to execution time in TCG. Maybe this could be an optional
+ replacement?
+
+ - The simpletrace binary format is more efficient than debug output
+
+ One problem I have as a TCG hacker is the normal -d foo output is
+ very verbose and generates massive logs. -dfilter was an attempt to
+ make that easier but I'm quite happy with the trace approach. A boot
+ and build takes only about 85M in trace files compared to the
+ gigabytes a text file can take up.
+
+Alex Bennée (3):
+  cputlb: fix and enhance TLB statistics
+  cpus: dump TLB flush counts as trace event
+  new script/analyse-tlb-flushes-simpletrace.py
+
+ cpus.c                                     |  6 +++
+ cputlb.c                                   | 27 +++++++++++--
+ include/exec/cputlb.h                      |  4 +-
  scripts/analyse-tlb-flushes-simpletrace.py | 62 ++++++++++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
+ trace-events                               |  3 ++
+ translate-all.c                            |  4 +-
+ 6 files changed, 101 insertions(+), 5 deletions(-)
  create mode 100755 scripts/analyse-tlb-flushes-simpletrace.py
 
-diff --git a/scripts/analyse-tlb-flushes-simpletrace.py b/scripts/analyse-tlb-flushes-simpletrace.py
-new file mode 100755
-index 0000000000..9a1191c154
---- /dev/null
-+++ b/scripts/analyse-tlb-flushes-simpletrace.py
-@@ -0,0 +1,62 @@
-+#!/usr/bin/env python
-+# -*- coding: utf-8 -*-
-+#
-+# Generate a simple graph of flushes over time
-+#
-+# Author: Alex Bennée <alex.bennee@linaro.org>
-+#
-+
-+import os
-+import simpletrace
-+import argparse
-+import numpy as np
-+import matplotlib.pyplot as plt
-+
-+class CpuTLBFlushAnalyser(simpletrace.Analyzer):
-+    "A simpletrace Analyser for extracting flush stats."
-+
-+    def __init__(self):
-+        self.stats = 0
-+        self.timestamps = []
-+        self.flush_self = []
-+        self.flush_async = []
-+        self.flush_synced = []
-+
-+
-+    def tlb_flush_stats(self, timestamp, flush_self, flush_async, flush_synced):
-+        "Match for tlb_flush_stats event. Appends counts to the relevant array."
-+        self.timestamps.append(timestamp)
-+        self.flush_self.append(flush_self)
-+        self.flush_async.append(flush_async)
-+        self.flush_synced.append(flush_synced)
-+        self.stats += 1
-+
-+
-+def get_args():
-+    "Grab options"
-+    parser = argparse.ArgumentParser()
-+    parser.add_argument("--output", "-o", type=str, help="Render plot to file")
-+    parser.add_argument("events", type=str, help='trace file read from')
-+    parser.add_argument("tracefile", type=str, help='trace file read from')
-+    return parser.parse_args()
-+
-+if __name__ == '__main__':
-+    args = get_args()
-+
-+    # Gather data from the trace
-+    analyzer = CpuTLBFlushAnalyser()
-+    simpletrace.process(args.events, args.tracefile, analyzer)
-+
-+#    x = np.arange(analyzer.stats)
-+    fself, = plt.plot(analyzer.timestamps, analyzer.flush_self, label="Self")
-+    fasync, = plt.plot(analyzer.timestamps, analyzer.flush_async, label="Async")
-+    fsynced, = plt.plot(analyzer.timestamps, analyzer.flush_synced, label="Synced")
-+
-+    plt.legend(handles=[fself, fasync, fsynced])
-+    plt.xlabel("Execution Time")
-+    plt.ylabel("Culmlative count")
-+
-+    if args.output:
-+        plt.savefig(args.output)
-+    else:
-+        plt.show()
 -- 
 2.11.0
