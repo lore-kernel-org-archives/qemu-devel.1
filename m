@@ -1,40 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cxzmh-0000DV-G5
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 13:40:56 -0400
+	(envelope-from <lvivier@redhat.com>) id 1cxzo0-00016Q-D5
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 13:42:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cxzmc-0003rW-Dr
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 13:40:55 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32966
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cxzmc-0003r9-7v
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 13:40:50 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3BHcrZN023514
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 13:40:49 -0400
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 29rj2w6qv0-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 13:40:48 -0400
-Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 11 Apr 2017 13:40:48 -0400
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <lvivier@redhat.com>) id 1cxznv-0005Iw-Ha
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 13:42:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40044)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1cxznv-0005Hx-B2
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 13:42:11 -0400
+References: <20170411131733.27542-1-lvivier@redhat.com>
+	<20170411131733.27542-3-lvivier@redhat.com>
+	<20170411170250.GF5940@stefanha-x1.localdomain>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <560dec08-1b57-9850-ff30-5f326130a59d@redhat.com>
+Date: Tue, 11 Apr 2017 19:42:02 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <c2e13b99-77e3-b889-1edd-b52053e270ba@redhat.com>
-References: <20170411125205.23121-1-sameeh@daynix.com>
-	<c2e13b99-77e3-b889-1edd-b52053e270ba@redhat.com>
-Date: Tue, 11 Apr 2017 12:40:40 -0500
-Message-Id: <149193244047.15312.8438512061271732679@loki>
-Subject: Re: [Qemu-devel] [PATCH for-2.9?] qga-win: Enable 'can-offline'
- field in 'guest-get-vcpus' reply
+In-Reply-To: <20170411170250.GF5940@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] virtio-rng: stop virtqueue while the
+ CPU is stopped
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,51 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Sameeh Jubran <sameeh@daynix.com>, qemu-devel@nongnu.org
-Cc: Yan Vugenfirer <yan@daynix.com>, qemu-stable@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Amit Shah <amit@kernel.org>, qemu-devel@nongnu.org
 
-Quoting Eric Blake (2017-04-11 08:25:06)
-> On 04/11/2017 07:52 AM, Sameeh Jubran wrote:
-> > The QGA schema states:
-> > =
+On 11/04/2017 19:02, Stefan Hajnoczi wrote:
+> On Tue, Apr 11, 2017 at 03:17:33PM +0200, Laurent Vivier wrote:
+>> diff --git a/hw/virtio/virtio-rng.c b/hw/virtio/virtio-rng.c
+>> index 9639f4e..d270d56 100644
+>> --- a/hw/virtio/virtio-rng.c
+>> +++ b/hw/virtio/virtio-rng.c
+>> @@ -53,6 +53,15 @@ static void chr_read(void *opaque, const void *buf, size_t size)
+>>          return;
+>>      }
+>>  
+>> +    /* we can't modify the virtqueue until
+>> +     * our state is fully synced
+>> +     */
+>> +
+>> +    if (!runstate_check(RUN_STATE_RUNNING)) {
+>> +        trace_virtio_rng_cpu_is_stopped(vrng);
+>> +        return;
+>> +    }
+>> +
+> 
+> I'm concerned about what happens when the guest is stopped and resumed
+> (e.g. 'stop' and 'cont' monitor commands).  Since we throw away the
+> chr_read() callback the device will hang unless the guest kicks it
+> again?
+> 
+> It's not clear to me that the rate limit timer will help us...
 
-> > @can-offline: Whether offlining the VCPU is possible. This member
-> >                is always filled in by the guest agent when the structure
-> >                is returned, and always ignored on input (hence it can be
-> >                omitted then).
-> > =
+I think you're right (even if it seems hard to generate this case)
 
-> > Currently 'can-offline' is missing entirely from the reply. This causes
-> > errors in libvirt which is expecting the reply to be compliant with the
-> > schema docs.
-> > =
+What is the best solution:
 
-> > BZ#1438735: https://bugzilla.redhat.com/show_bug.cgi?id=3D1438735
-> > =
+- re-arming the timer/the backend request by calling
+virtio_rng_process() before the "return;"
 
-> > Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
-> > ---
-> >  qga/commands-win32.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> =
+or
 
-> Appropriate as a bug fix in 2.9 if there is still time for the
-> maintainer to submit a pull request, although we are late enough that if
-> it slips into 2.10 it is not a big deal.
-> =
+- adding a vmstate change handler to call virtio_rng_process()?
 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Yah, agreed, the final planned RC looks to have been tagged already though
-so I think it'll have to wait for 2.10/2.9.1. Thanks for the heads up.
-
-Cc: qemu-stable@nongnu.org
-
-> =
-
-> -- =
-
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
->=20
+Thanks,
+Laurent
