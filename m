@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33987)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1cxskf-0008Gd-43
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:10:22 -0400
+	(envelope-from <maxime.coquelin@redhat.com>) id 1cxski-0008Ih-Ey
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:10:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1cxskd-0002vh-TZ
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:10:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45126)
+	(envelope-from <maxime.coquelin@redhat.com>) id 1cxskh-0002x8-8q
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:10:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43490)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1cxskd-0002vC-Kb
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:10:19 -0400
+	id 1cxskh-0002wk-0H
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:10:23 -0400
 From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Date: Tue, 11 Apr 2017 12:10:01 +0200
-Message-Id: <20170411101002.28451-2-maxime.coquelin@redhat.com>
+Date: Tue, 11 Apr 2017 12:10:02 +0200
+Message-Id: <20170411101002.28451-3-maxime.coquelin@redhat.com>
 In-Reply-To: <20170411101002.28451-1-maxime.coquelin@redhat.com>
 References: <20170411101002.28451-1-maxime.coquelin@redhat.com>
-Subject: [Qemu-devel] [RFC 1/2] spec/vhost-user: Introduce secondary channel
- for slave initiated requests
+Subject: [Qemu-devel] [RFC 2/2] spec/vhost-user spec: Add IOMMU support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,228 +27,104 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mst@redhat.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, peterx@redhat.com, yuanhan.liu@linux.intel.com, virtio-comment@lists.oasis-open.org, qemu-devel@nongnu.org
 Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
 
-This vhost-user specification update aims at enabling the
-slave to send requests to the master using a dedicated socket
-created by the master.
+This patch specifies the master/slave communication to support
+device IOTLB implementation in slave.
 
-It can be used for example when the slave implements a device
-IOTLB to send cache miss requests to the master.
+The vhost_iotlb_msg structure introduced for kernel backends is
+re-used, making the design close between the two backends.
 
-The message types list is updated with an "Initiator" field to
-indicate for each type whether the master and/or slave can
-initiate the request.
+An exception is the use of the secondary channel to enable the
+slave to send IOTLB miss requests to the master.
 
 Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
 ---
- docs/specs/vhost-user.txt | 38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
+ docs/specs/vhost-user.txt | 56 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
 
 diff --git a/docs/specs/vhost-user.txt b/docs/specs/vhost-user.txt
-index 036890f..b365047 100644
+index b365047..048a4d6 100644
 --- a/docs/specs/vhost-user.txt
 +++ b/docs/specs/vhost-user.txt
-@@ -139,6 +139,7 @@ in the ancillary data:
-  * VHOST_USER_SET_VRING_KICK
-  * VHOST_USER_SET_VRING_CALL
-  * VHOST_USER_SET_VRING_ERR
-+ * VHOST_USER_SET_SLAVE_REQ_FD
+@@ -97,6 +97,23 @@ Depending on the request type, payload can be:
+    log offset: offset from start of supplied file descriptor
+        where logging starts (i.e. where guest address 0 would be logged)
  
- If Master is unable to send the full message or receives a wrong reply it will
- close the connection. An optional reconnection mechanism can be implemented.
-@@ -150,6 +151,11 @@ As older slaves don't support negotiating protocol features,
- a feature bit was dedicated for this purpose:
- #define VHOST_USER_F_PROTOCOL_FEATURES 30
- 
-+If the slave supports VHOST_USER_PROTOCOL_F_SLAVE_REQ protocol feature, the
-+master may create a secondary Unix domain socket and send its file descriptor
-+to the slave using VHOST_USER_SET_SLAVE_REQ_FD request. This new channel enables
-+the slave to send message requests and master to send message replies.
++ * An IOTLB message
++   ---------------------------------------------------------
++   | iova | size | user address | permissions flags | type |
++   ---------------------------------------------------------
 +
- Starting and stopping rings
- ----------------------
- Client must only process each ring when it is started.
-@@ -260,6 +266,7 @@ Protocol features
- #define VHOST_USER_PROTOCOL_F_RARP           2
- #define VHOST_USER_PROTOCOL_F_REPLY_ACK      3
- #define VHOST_USER_PROTOCOL_F_MTU            4
-+#define VHOST_USER_PROTOCOL_F_SLAVE_REQ      5
- 
- Message types
- -------------
-@@ -268,6 +275,7 @@ Message types
- 
-       Id: 1
-       Equivalent ioctl: VHOST_GET_FEATURES
-+      Initiator: Master
-       Master payload: N/A
-       Slave payload: u64
- 
-@@ -279,6 +287,7 @@ Message types
- 
-       Id: 2
-       Ioctl: VHOST_SET_FEATURES
-+      Initiator: Master
-       Master payload: u64
- 
-       Enable features in the underlying vhost implementation using a bitmask.
-@@ -289,6 +298,7 @@ Message types
- 
-       Id: 15
-       Equivalent ioctl: VHOST_GET_FEATURES
-+      Initiator: Master
-       Master payload: N/A
-       Slave payload: u64
- 
-@@ -302,6 +312,7 @@ Message types
- 
-       Id: 16
-       Ioctl: VHOST_SET_FEATURES
-+      Initiator: Master
-       Master payload: u64
- 
-       Enable protocol features in the underlying vhost implementation.
-@@ -314,6 +325,7 @@ Message types
- 
-       Id: 3
-       Equivalent ioctl: VHOST_SET_OWNER
-+      Initiator: Master
-       Master payload: N/A
- 
-       Issued when a new connection is established. It sets the current Master
-@@ -323,6 +335,7 @@ Message types
-  * VHOST_USER_RESET_OWNER
- 
-       Id: 4
-+      Initiator: Master
-       Master payload: N/A
- 
-       This is no longer used. Used to be sent to request disabling
-@@ -335,6 +348,7 @@ Message types
- 
-       Id: 5
-       Equivalent ioctl: VHOST_SET_MEM_TABLE
-+      Initiator: Master
-       Master payload: memory regions description
- 
-       Sets the memory map regions on the slave so it can translate the vring
-@@ -346,6 +360,7 @@ Message types
- 
-       Id: 6
-       Equivalent ioctl: VHOST_SET_LOG_BASE
-+      Initiator: Master
-       Master payload: u64
-       Slave payload: N/A
- 
-@@ -360,6 +375,7 @@ Message types
- 
-       Id: 7
-       Equivalent ioctl: VHOST_SET_LOG_FD
-+      Initiator: Master
-       Master payload: N/A
- 
-       Sets the logging file descriptor, which is passed as ancillary data.
-@@ -368,6 +384,7 @@ Message types
- 
-       Id: 8
-       Equivalent ioctl: VHOST_SET_VRING_NUM
-+      Initiator: Master
-       Master payload: vring state description
- 
-       Set the size of the queue.
-@@ -376,6 +393,7 @@ Message types
- 
-       Id: 9
-       Equivalent ioctl: VHOST_SET_VRING_ADDR
-+      Initiator: Master
-       Master payload: vring address description
-       Slave payload: N/A
- 
-@@ -385,6 +403,7 @@ Message types
- 
-       Id: 10
-       Equivalent ioctl: VHOST_SET_VRING_BASE
-+      Initiator: Master
-       Master payload: vring state description
- 
-       Sets the base offset in the available vring.
-@@ -393,6 +412,7 @@ Message types
- 
-       Id: 11
-       Equivalent ioctl: VHOST_USER_GET_VRING_BASE
-+      Initiator: Master
-       Master payload: vring state description
-       Slave payload: vring state description
- 
-@@ -402,6 +422,7 @@ Message types
- 
-       Id: 12
-       Equivalent ioctl: VHOST_SET_VRING_KICK
-+      Initiator: Master
-       Master payload: u64
- 
-       Set the event file descriptor for adding buffers to the vring. It
-@@ -415,6 +436,7 @@ Message types
- 
-       Id: 13
-       Equivalent ioctl: VHOST_SET_VRING_CALL
-+      Initiator: Master
-       Master payload: u64
- 
-       Set the event file descriptor to signal when buffers are used. It
-@@ -428,6 +450,7 @@ Message types
- 
-       Id: 14
-       Equivalent ioctl: VHOST_SET_VRING_ERR
-+      Initiator: Master
-       Master payload: u64
- 
-       Set the event file descriptor to signal when error occurs. It
-@@ -440,6 +463,7 @@ Message types
- 
-       Id: 17
-       Equivalent ioctl: N/A
-+      Initiator: Master
-       Master payload: N/A
-       Slave payload: u64
- 
-@@ -451,6 +475,7 @@ Message types
- 
-       Id: 18
-       Equivalent ioctl: N/A
-+      Initiator: Master
-       Master payload: vring state description
- 
-       Signal slave to enable or disable corresponding vring.
-@@ -461,6 +486,7 @@ Message types
- 
-       Id: 19
-       Equivalent ioctl: N/A
-+      Initiator: Master
-       Master payload: u64
- 
-       Ask vhost user backend to broadcast a fake RARP to notify the migration
-@@ -475,6 +501,7 @@ Message types
- 
-       Id: 20
-       Equivalent ioctl: N/A
-+      Initiator: Master
-       Master payload: u64
- 
-       Set host MTU value exposed to the guest.
-@@ -486,6 +513,17 @@ Message types
-       If VHOST_USER_PROTOCOL_F_REPLY_ACK is negotiated, slave must respond
-       with zero in case the specified MTU is valid, or non-zero otherwise.
- 
-+ * VHOST_USER_SET_SLAVE_REQ_FD
++   IOVA: a 64-bit guest I/O virtual address
++   Size: a 64-bit size
++   User address: a 64-bit user address
++   Permissions flags: a 8-bit bit field:
++    - Bit 0: Read access
++    - Bit 1: Write access
++   Type: a 8-bit IOTLB message type:
++    - 1: IOTLB miss
++    - 2: IOTLB update
++    - 3: IOTLB invalidate
++    - 4: IOTLB access fail
 +
-+      Id: 21
-+      Equivalent ioctl: N/A
-+      Initiator: Master
+ In QEMU the vhost-user message is implemented with the following struct:
+ 
+ typedef struct VhostUserMsg {
+@@ -109,6 +126,7 @@ typedef struct VhostUserMsg {
+         struct vhost_vring_addr addr;
+         VhostUserMemory memory;
+         VhostUserLog log;
++        struct vhost_iotlb_msg iotlb;
+     };
+ } QEMU_PACKED VhostUserMsg;
+ 
+@@ -258,6 +276,30 @@ Once the source has finished migration, rings will be stopped by
+ the source. No further update must be done before rings are
+ restarted.
+ 
++IOMMU support
++-------------
 +
-+      Set the socket file descriptor for slave initiated requests.
-+      This request should be sent only when VHOST_USER_F_PROTOCOL_FEATURES
-+      has been negotiated, and protocol feature bit VHOST_USER_PROTOCOL_F_SLAVE_REQ
-+      bit is present in VHOST_USER_GET_PROTOCOL_FEATURES.
++When the VIRTIO_F_IOMMU_PLATFORM feature has been negotiated, the master has
++to send IOTLB entries update & invalidation by sending VHOST_USER_IOTLB_MSG
++requests to the slave with a struct vhost_iotlb_msg payload. For update events,
++the iotlb payload has to be filled with the update message type (2), the I/O
++virtual address, the size, the user virtual address, and the permissions
++flags. For invalidation events, the iotlb payload has to be filled with the
++update message type (3), the I/O virtual address and the size. On success, the
++slave is expected to reply with a zero payload, non-zero otherwise.
++
++When the VHOST_USER_PROTOCOL_F_SLAVE_REQ is supported by the slave, and the
++master initiated the slave to master communication channel using the
++VHOST_USER_SET_SLAVE_REQ_FD request, the slave can send IOTLB miss and access
++failure events by sending VHOST_USER_IOTLB_MSG requests to the master with a
++struct vhost_iotlb_msg payload. For miss events, the iotlb payload has to be
++filled with the miss message type (1), the I/O virtual address and the
++permissions flags. For access failure event, the iotlb payload has to be
++filled with the access failure message type (4), the I/O virtual address and
++the permissions flags. On success, the master is expected to reply  when the
++request has been handled (for example, on miss requests, once the device IOTLB
++has been updated) with a zero payload, non-zero otherwise.
++
+ Protocol features
+ -----------------
+ 
+@@ -524,6 +566,20 @@ Message types
+       has been negotiated, and protocol feature bit VHOST_USER_PROTOCOL_F_SLAVE_REQ
+       bit is present in VHOST_USER_GET_PROTOCOL_FEATURES.
+ 
++ * VHOST_USER_IOTLB_MSG
++
++      Id: 22
++      Equivalent ioctl: N/A (equivalent to VHOST_IOTLB_MSG message type)
++      Initiator: Master or slave
++
++      Send IOTLB messages with struct vhost_iotlb_msg as payload.
++      Master sends such requests to update and invalidate entries in the device
++      IOTLB. Slave sends such requests to notify of an IOTLB miss, or an IOTLB
++      access failure. The recipient has to acknowledge the request with
++      sending zero as u64 payload for success, non-zero otherwise.
++      This request should be send only when VIRTIO_F_IOMMU_PLATFORM feature
++      has been successfully negotiated.
 +
  VHOST_USER_PROTOCOL_F_REPLY_ACK:
  -------------------------------
