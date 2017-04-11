@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cxvLE-0002B3-9Q
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 08:56:17 -0400
+	(envelope-from <eblake@redhat.com>) id 1cxvRJ-0003TJ-7G
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:02:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cxvLB-0007EV-64
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 08:56:16 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <d60ea1f9-ae2c-6625-90de-944cbb490f85@redhat.com>
-References: <20170406150148.zwjpozqtale44jfh@perseus.local>
-	<d60ea1f9-ae2c-6625-90de-944cbb490f85@redhat.com>
-Date: Tue, 11 Apr 2017 14:56:08 +0200
-Message-ID: <w5160ibyufr.fsf@maestria.local.igalia.com>
+	(envelope-from <eblake@redhat.com>) id 1cxvRD-00011G-F6
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:02:33 -0400
+References: <1486979689-230770-1-git-send-email-vsementsov@virtuozzo.com>
+	<1486979689-230770-16-git-send-email-vsementsov@virtuozzo.com>
+	<20170216134830.GB28784@lemon.lan>
+	<a6e7cad6-3c9f-1276-baca-1fceb5db7e8f@virtuozzo.com>
+	<20170217122141.GD3468@lemon.lan>
+	<4fbb78a1-a486-3031-1666-6f586a5d4ab9@virtuozzo.com>
+	<20170217140537.GA15819@lemon.lan>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <262167f4-9817-edcc-2a80-9246004e8068@redhat.com>
+Date: Tue, 11 Apr 2017 08:02:04 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC] Proposed qcow2 extension: subcluster
- allocation
+In-Reply-To: <20170217140537.GA15819@lemon.lan>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="DJT6PiMe8NXiI2lkRMSENIcn21hDUkx3d"
+Subject: Re: [Qemu-devel] [PATCH 15/17] iotests: add default node-name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,55 +29,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Fam Zheng <famz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, stefanha@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, lirans@il.ibm.com, pbonzini@redhat.com, amit.shah@redhat.com, den@openvz.org, mreitz@redhat.com, jsnow@redhat.com, dgilbert@redhat.com
 
-On Fri 07 Apr 2017 07:10:46 PM CEST, Max Reitz wrote:
->> =3D=3D=3D Changes to the on-disk format =3D=3D=3D
->>=20
->> The qcow2 on-disk format needs to change so each L2 entry has a bitmap
->> indicating the allocation status of each subcluster. There are three
->> possible states (unallocated, allocated, all zeroes), so we need two
->> bits per subcluster.
->
-> You don't need two bits, you need log(3) / log(2) =3D ld(3) =E2=89=88 1.5=
-8. You
-> can encode the status of eight subclusters (3^8 =3D 6561) in 13 bits
-> (ld(6561) =E2=89=88 12.68).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--DJT6PiMe8NXiI2lkRMSENIcn21hDUkx3d
+From: Eric Blake <eblake@redhat.com>
+To: Fam Zheng <famz@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, stefanha@redhat.com,
+ qemu-block@nongnu.org, quintela@redhat.com, qemu-devel@nongnu.org,
+ armbru@redhat.com, lirans@il.ibm.com, pbonzini@redhat.com,
+ amit.shah@redhat.com, den@openvz.org, mreitz@redhat.com, jsnow@redhat.com,
+ dgilbert@redhat.com
+Message-ID: <262167f4-9817-edcc-2a80-9246004e8068@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 15/17] iotests: add default node-name
+References: <1486979689-230770-1-git-send-email-vsementsov@virtuozzo.com>
+ <1486979689-230770-16-git-send-email-vsementsov@virtuozzo.com>
+ <20170216134830.GB28784@lemon.lan>
+ <a6e7cad6-3c9f-1276-baca-1fceb5db7e8f@virtuozzo.com>
+ <20170217122141.GD3468@lemon.lan>
+ <4fbb78a1-a486-3031-1666-6f586a5d4ab9@virtuozzo.com>
+ <20170217140537.GA15819@lemon.lan>
+In-Reply-To: <20170217140537.GA15819@lemon.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Right, although that would make the encoding more cumbersome to use and
-to debug. Is it worth it?
+On 02/17/2017 08:05 AM, Fam Zheng wrote:
+> On Fri, 02/17 16:36, Vladimir Sementsov-Ogievskiy wrote:
+>> 17.02.2017 15:21, Fam Zheng wrote:
+>>> On Fri, 02/17 13:20, Vladimir Sementsov-Ogievskiy wrote:
+>>>> 16.02.2017 16:48, Fam Zheng wrote:
+>>>>> On Mon, 02/13 12:54, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>> When testing migration, auto-generated by qemu node-names differs =
+in
+>>>>>> source and destination qemu and migration fails. After this patch,=
 
-> One case I'd be especially interested in are of course 4 kB
-> subclusters for 64 kB clusters (because 4 kB is a usual page size and
-> can be configured to be the block size of a guest device; and because
-> 64 kB simply is the standard cluster size of qcow2 images
-> nowadays[1]...).
+>>>>>> auto-generated by iotest nodenames will be the same.
+>>>>> What should be done in libvirt to make sure the node-names are matc=
+hing
+>>>>> correctly at both sides?
+>>>> Hmm, just set node names appropriately?
+>>> But I think the problem is that node names are not configurable from =
+libvirt
+>>> today, and then the migration will fail. Should the device name take =
+precedence
+>>> in the code, to make it easier?
+>>
+>> libvirt can use same parameters as I in this patch..
+>=20
+> If I'm not mistaken, libvirt can be patched to explicitly set the same =
+node
+> names in the QEMU command line, but that is some extra work to do there=
+=2E My
+> point is if device names are used during migration, when available, thi=
+s patch
+> and the libvirt change is not necessary.
 
-I think that we should have at least that, but ideally larger
-cluster-to-subcluster ratios.
+Ultimately, libvirt will be taught to use node names everywhere, at
+which point the appearance of an autogenerated node name in a qemu
+managed by libvirt will be considered a libvirt bug.  We're not there
+yet, but don't let auto-generated node names hold up a series.
 
-> (We could even get one more bit if we had a subcluster-flag, because I
-> guess we can always assume subclustered clusters to have OFLAG_COPIED
-> and be uncompressed. But still, three bits missing.)
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Why can we always assume OFLAG_COPIED?
 
-> If course, if you'd be willing to give up the all-zeroes state for
-> subclusters, it would be enough...
+--DJT6PiMe8NXiI2lkRMSENIcn21hDUkx3d
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-I still think that it looks like a better idea to allow having more
-subclusters, but giving up the all-zeroes state is a valid
-alternative. Apart from having to overwrite with zeroes when a
-subcluster is discarded, is there anything else that we would miss?
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-> By the way, if you'd only allow multiple of 1s overhead
-> (i.e. multiples of 32 subclusters), I think (3) would be pretty much
-> the same as (2) if you just always write the subcluster information
-> adjacent to the L2 table. Should be just the same caching-wise and
-> performance-wise.
+iQEcBAEBCAAGBQJY7NPMAAoJEKeha0olJ0NqnhcIAI59hAadR/m5syPNBj3oh9ZY
+e2VoeVaHls6IAzz+fiZpkbKWFturMJr3GmJ2lSsyEOsseAjzCtfKHDUArp98pUeE
+DuOxN7kcYJ5b+NIDMs/plGXGODYnog5BeQpG+VXiZGtRulN2kFQQRK8PydeQzxxE
+sOWyBFJlp+V3TsSJ53/2FfH3Cf0FAalg4EMzI2uqfocFH0mOIoblxENCo5oCW8yS
+nqeLyHkZxGfw07+2KGHZLjUjkia9Ef4tTFYZPxm2CYjkMAUN3WJ4K6TMHatfBmsM
+PcUDcgn9rFVvzzd8pZawkexOKlBbDMw8azjpHMYvcpd8m57Ajop4/Dlwia8olWU=
+=2AtF
+-----END PGP SIGNATURE-----
 
-Then (3) is effectively the same as (2), just that the subcluster
-bitmaps are at the end of the L2 cluster, and not next to each entry.
-
-Berto
+--DJT6PiMe8NXiI2lkRMSENIcn21hDUkx3d--
