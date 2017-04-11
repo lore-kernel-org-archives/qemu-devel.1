@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cy4IX-000679-Lm
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 18:30:06 -0400
+	(envelope-from <eblake@redhat.com>) id 1cy4IY-00069G-NH
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 18:30:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cy4IW-0004eA-OT
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 18:30:05 -0400
+	(envelope-from <eblake@redhat.com>) id 1cy4IX-0004eQ-QF
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 18:30:06 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Tue, 11 Apr 2017 17:29:34 -0500
-Message-Id: <20170411222945.11741-7-eblake@redhat.com>
+Date: Tue, 11 Apr 2017 17:29:36 -0500
+Message-Id: <20170411222945.11741-9-eblake@redhat.com>
 In-Reply-To: <20170411222945.11741-1-eblake@redhat.com>
 References: <20170411222945.11741-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH 06/17] commit: Switch commit_run() to byte-based
+Subject: [Qemu-devel] [PATCH 08/17] mirror: Switch
+ mirror_do_zero_or_discard() to byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,70 +24,70 @@ To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>
 
 We are gradually converting to byte-based interfaces, as they are
-easier to reason about than sector-based.  Change the internal
-loop iteration of committing to track by bytes instead of sectors
-(although we are still guaranteed that we iterate by steps that
-are sector-aligned).
+easier to reason about than sector-based.  Convert another internal
+function (no semantic change).
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- block/commit.c | 16 ++++++----------
- 1 file changed, 6 insertions(+), 10 deletions(-)
+ block/mirror.c | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/block/commit.c b/block/commit.c
-index d244c62..b7d3e60 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -129,17 +129,16 @@ static void coroutine_fn commit_run(void *opaque)
+diff --git a/block/mirror.c b/block/mirror.c
+index c923520..9a6f474 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -305,8 +305,8 @@ static int mirror_do_read(MirrorBlockJob *s, int64_t sector_num,
+ }
+
+ static void mirror_do_zero_or_discard(MirrorBlockJob *s,
+-                                      int64_t sector_num,
+-                                      int nb_sectors,
++                                      int64_t offset,
++                                      uint64_t bytes,
+                                       bool is_discard)
  {
-     CommitBlockJob *s = opaque;
-     CommitCompleteData *data;
--    int64_t sector_num, end;
-+    int64_t offset;
-     uint64_t delay_ns = 0;
-     int ret = 0;
--    int n = 0;
-+    int n = 0; /* sectors */
-     void *buf = NULL;
-     int bytes_written = 0;
-     int64_t base_len;
+     MirrorOp *op;
+@@ -315,16 +315,16 @@ static void mirror_do_zero_or_discard(MirrorBlockJob *s,
+      * so the freeing in mirror_iteration_done is nop. */
+     op = g_new0(MirrorOp, 1);
+     op->s = s;
+-    op->offset = sector_num * BDRV_SECTOR_SIZE;
+-    op->bytes = nb_sectors * BDRV_SECTOR_SIZE;
++    op->offset = offset;
++    op->bytes = bytes;
 
-     ret = s->common.len = blk_getlength(s->top);
-
--
-     if (s->common.len < 0) {
-         goto out;
+     s->in_flight++;
+-    s->bytes_in_flight += nb_sectors * BDRV_SECTOR_SIZE;
++    s->bytes_in_flight += bytes;
+     if (is_discard) {
+-        blk_aio_pdiscard(s->target, sector_num << BDRV_SECTOR_BITS,
++        blk_aio_pdiscard(s->target, offset,
+                          op->bytes, mirror_write_complete, op);
+     } else {
+-        blk_aio_pwrite_zeroes(s->target, sector_num * BDRV_SECTOR_SIZE,
++        blk_aio_pwrite_zeroes(s->target, offset,
+                               op->bytes, s->unmap ? BDRV_REQ_MAY_UNMAP : 0,
+                               mirror_write_complete, op);
      }
-@@ -156,10 +155,9 @@ static void coroutine_fn commit_run(void *opaque)
-         }
-     }
+@@ -448,7 +448,8 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+             break;
+         case MIRROR_METHOD_ZERO:
+         case MIRROR_METHOD_DISCARD:
+-            mirror_do_zero_or_discard(s, sector_num, io_sectors,
++            mirror_do_zero_or_discard(s, sector_num * BDRV_SECTOR_SIZE,
++                                      io_sectors * BDRV_SECTOR_SIZE,
+                                       mirror_method == MIRROR_METHOD_DISCARD);
+             if (write_zeroes_ok) {
+                 io_bytes_acct = 0;
+@@ -645,7 +646,8 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+                 continue;
+             }
 
--    end = s->common.len >> BDRV_SECTOR_BITS;
-     buf = blk_blockalign(s->top, COMMIT_BUFFER_SIZE);
-
--    for (sector_num = 0; sector_num < end; sector_num += n) {
-+    for (offset = 0; offset < s->common.len; offset += n * BDRV_SECTOR_SIZE) {
-         bool copy;
-
-         /* Note that even when no rate limit is applied we need to yield
-@@ -171,15 +169,13 @@ static void coroutine_fn commit_run(void *opaque)
+-            mirror_do_zero_or_discard(s, sector_num, nb_sectors, false);
++            mirror_do_zero_or_discard(s, sector_num * BDRV_SECTOR_SIZE,
++                                      nb_sectors * BDRV_SECTOR_SIZE, false);
+             sector_num += nb_sectors;
          }
-         /* Copy if allocated above the base */
-         ret = bdrv_is_allocated_above(blk_bs(s->top), blk_bs(s->base),
--                                      sector_num,
-+                                      offset / BDRV_SECTOR_SIZE,
-                                       COMMIT_BUFFER_SIZE / BDRV_SECTOR_SIZE,
-                                       &n);
-         copy = (ret == 1);
--        trace_commit_one_iteration(s, sector_num * BDRV_SECTOR_SIZE,
--                                   n * BDRV_SECTOR_SIZE, ret);
-+        trace_commit_one_iteration(s, offset, n * BDRV_SECTOR_SIZE, ret);
-         if (copy) {
--            ret = commit_populate(s->top, s->base,
--                                  sector_num * BDRV_SECTOR_SIZE,
-+            ret = commit_populate(s->top, s->base, offset,
-                                   n * BDRV_SECTOR_SIZE, buf);
-             bytes_written += n * BDRV_SECTOR_SIZE;
-         }
+
 -- 
 2.9.3
