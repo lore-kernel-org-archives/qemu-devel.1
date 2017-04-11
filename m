@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cxrbp-000719-3D
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 04:57:13 -0400
+	(envelope-from <kwolf@redhat.com>) id 1cxrdM-0008Di-2k
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 04:58:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cxrbj-000592-6q
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 04:57:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43230)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cxrbi-00058f-Tq
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 04:57:03 -0400
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D12E475EA8
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 08:57:01 +0000 (UTC)
-References: <20170323173928.14439-1-pbonzini@redhat.com>
-	<20170323173928.14439-10-pbonzini@redhat.com>
-	<9a383fa0-040f-c90e-23ca-df32636786b3@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7fdbf44b-24af-aa94-d1b7-c8d7e82af1c4@redhat.com>
-Date: Tue, 11 Apr 2017 12:11:08 +0800
+	(envelope-from <kwolf@redhat.com>) id 1cxrdL-0005ae-6a
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 04:58:44 -0400
+Date: Tue, 11 Apr 2017 10:58:33 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170411085833.GC4516@noname.str.redhat.com>
+References: <20170118161653.19296-1-eblake@redhat.com>
+	<20170118161653.19296-5-eblake@redhat.com>
+	<87h94vflc6.fsf@dusky.pond.sub.org>
+	<8999bd18-6f17-c15f-65a4-221475088ec8@redhat.com>
+	<8ae60273-e215-7b08-c5b1-bb1132b86312@redhat.com>
+	<8737dfe3c4.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <9a383fa0-040f-c90e-23ca-df32636786b3@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 09/10] blockjob: reorganize
- block_job_completed_txn_abort
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8737dfe3c4.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v2 4/6] fdc-test: Avoid deprecated 'change'
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,122 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: jcody@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, "open list:Floppy" <qemu-block@nongnu.org>
 
+Am 11.04.2017 um 10:49 hat Markus Armbruster geschrieben:
+> Eric Blake <eblake@redhat.com> writes:
+> 
+> > On 01/19/2017 08:39 AM, Eric Blake wrote:
+> >> On 01/19/2017 03:30 AM, Markus Armbruster wrote:
+> >>> Eric Blake <eblake@redhat.com> writes:
+> >>>
+> >>>> Use the preferred blockdev-change-medium command instead.
+> >>>>
+> >>>> Signed-off-by: Eric Blake <eblake@redhat.com>
+> >>>> Reviewed-by: John Snow <jsnow@redhat.com>
+> >>>> ---
+> >>>>  tests/fdc-test.c | 5 +++--
+> >>>>  1 file changed, 3 insertions(+), 2 deletions(-)
+> >>>>
+> >>>> diff --git a/tests/fdc-test.c b/tests/fdc-test.c
+> >>>> index 738c6b4..f5ff68d 100644
+> >>>> --- a/tests/fdc-test.c
+> >>>> +++ b/tests/fdc-test.c
+> >>>> @@ -298,8 +298,9 @@ static void test_media_insert(void)
+> >>>>
+> >>>>      /* Insert media in drive. DSKCHK should not be reset until a step pulse
+> >>>>       * is sent. */
+> >>>> -    qmp_discard_response("{'execute':'change', 'arguments':{"
+> >>>> -                         " 'device':'floppy0', 'target': %s, 'arg': 'raw' }}",
+> >>>> +    qmp_discard_response("{'execute':'blockdev-change-medium', 'arguments':{"
+> >>>> +                         " 'device':'floppy0', 'filename': %s, "
+> >>>> +                         "'format': 'raw' }}",
+> >>>>                           test_image);
+> >>>>
+> >>>>      dir = inb(FLOPPY_BASE + reg_dir);
+> >>>
+> >>> 'device' is deprecated.  Can we use 'id' here?
+> >> 
+> >> I'll give it a shot.
+> >
+> > Harder than I thought. Search for 'floppy0' in tests/ - you'll notice
+> > that nothing explicitly sets that device name, which means I don't know
+> > where to inject an explicit 'id' counterpart name to use instead (we are
+> > inheriting the default device name that you get when starting an x86
+> > board without -nodefaults).  Maybe someone else can supply an idea?
+> 
+> Kevin, John?
 
+I replied somewhere else, I guess v3 of the series. The solution is as
+simple as '-device floppy,id=foo'.
 
-On 11/04/2017 03:17, John Snow wrote:
-> One thing that I wonder about a little is the push-down of whether or
-> not to reset iostatus falling to block_job_cancel_async; it seemed to m=
-e
-> as if txn_abort really had the best knowledge as to whether or not we
-> wanted to reset iostatus, but as it stands it doesn't really make a
-> difference.
-
-Actually, there was no iostatus reset in txn_abort; it was done in
-block_job_cancel only.  But the BLOCK_JOB_CANCELLED event doesn't
-publish the iostatus actually, so I could have also done the opposite:
-remove the reset in block_job_cancel---it shouldn't make a difference in
-theory.
-
-On the other hand, I like respecting the invariant then the coroutine
-always runs with BLOCK_DEVICE_IO_STATUS_OK iostatus, so I think that
-it's right for cancel_async to reset the iostatus.  Speaking about
-iostatus and invariants, probably we should also set "job->user_paused =3D
-false" in block_job_cancel_async.
-
-> ACK for now, because it's still not perfectly obvious to me how this
-> will wind up helping, though I do believe you :)
-
-It just helps me making sure that the locking is correct later.  Maybe
-it will help you too!
-
-Paolo
-
->>  static void block_job_completed_txn_success(BlockJob *job)
->> @@ -502,37 +577,6 @@ void block_job_cancel(BlockJob *job)
->>      }
->>  }
->> =20
->> -static int block_job_finish_sync(BlockJob *job,
->> -                                 void (*finish)(BlockJob *, Error **e=
-rrp),
->> -                                 Error **errp)
->> -{
->> -    Error *local_err =3D NULL;
->> -    int ret;
->> -
->> -    assert(blk_bs(job->blk)->job =3D=3D job);
->> -
->> -    block_job_ref(job);
->> -
->> -    finish(job, &local_err);
->> -    if (local_err) {
->> -        error_propagate(errp, local_err);
->> -        block_job_unref(job);
->> -        return -EBUSY;
->> -    }
->> -    /* block_job_drain calls block_job_enter, and it should be enough=
- to
->> -     * induce progress until the job completes or moves to the main t=
-hread.
->> -    */
->> -    while (!job->deferred_to_main_loop && !job->completed) {
->> -        block_job_drain(job);
->> -    }
->> -    while (!job->completed) {
->> -        aio_poll(qemu_get_aio_context(), true);
->> -    }
->> -    ret =3D (job->cancelled && job->ret =3D=3D 0) ? -ECANCELED : job-=
->ret;
->> -    block_job_unref(job);
->> -    return ret;
->> -}
->> -
->>  /* A wrapper around block_job_cancel() taking an Error ** parameter s=
-o it may be
->>   * used with block_job_finish_sync() without the need for (rather nas=
-ty)
->>   * function pointer casts there. */
->> @@ -856,36 +900,3 @@ void block_job_defer_to_main_loop(BlockJob *job,
->>      aio_bh_schedule_oneshot(qemu_get_aio_context(),
->>                              block_job_defer_to_main_loop_bh, data);
->>  }
->=20
-> And everything following is pure movement.
->=20
->> -
->> -BlockJobTxn *block_job_txn_new(void)
->> -{
->> -    BlockJobTxn *txn =3D g_new0(BlockJobTxn, 1);
->> -    QLIST_INIT(&txn->jobs);
->> -    txn->refcnt =3D 1;
->> -    return txn;
->> -}
->> -
->> -static void block_job_txn_ref(BlockJobTxn *txn)
->> -{
->> -    txn->refcnt++;
->> -}
->> -
->> -void block_job_txn_unref(BlockJobTxn *txn)
->> -{
->> -    if (txn && --txn->refcnt =3D=3D 0) {
->> -        g_free(txn);
->> -    }
->> -}
->> -
->> -void block_job_txn_add_job(BlockJobTxn *txn, BlockJob *job)
->> -{
->> -    if (!txn) {
->> -        return;
->> -    }
->> -
->> -    assert(!job->txn);
->> -    job->txn =3D txn;
->> -
->> -    QLIST_INSERT_HEAD(&txn->jobs, job, txn_list);
->> -    block_job_txn_ref(txn);
->> -}
->>
+Kevin
