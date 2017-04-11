@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cxrsV-0000v7-Ri
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:14:24 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1cxrwT-0002V7-Ks
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:18:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cxrsV-0003V0-12
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:14:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50340)
+	(envelope-from <pbonzini@redhat.com>) id 1cxrwO-0005Nx-6j
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:18:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35086)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cxrsU-0003Ur-Ql
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:14:22 -0400
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E50F47AE90
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 09:14:21 +0000 (UTC)
-References: <20170323173928.14439-1-pbonzini@redhat.com>
-	<20170323173928.14439-6-pbonzini@redhat.com>
-	<48253fa9-d5eb-f750-6dfc-e478bfd85277@redhat.com>
-	<a9195765-0f0b-7aac-a403-9dc4ebd376f4@redhat.com>
-	<271d6d98-55f6-3a32-f8c1-b60a901e21ff@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cxrwN-0005Nc-WA
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:18:24 -0400
+References: <1491612336-31066-1-git-send-email-anthony.xu@intel.com>
+	<1491612336-31066-5-git-send-email-anthony.xu@intel.com>
+	<e6089f9a-a90a-33f7-1e62-9d941619b983@redhat.com>
+	<4712D8F4B26E034E80552F30A67BE0B1A589E5@ORSMSX112.amr.corp.intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d0cf5b0c-9408-0a32-407d-f693269b9338@redhat.com>
-Date: Tue, 11 Apr 2017 12:57:55 +0800
+Message-ID: <fadbd646-7477-58bc-ea6d-e4ae60020668@redhat.com>
+Date: Tue, 11 Apr 2017 17:18:19 +0800
 MIME-Version: 1.0
-In-Reply-To: <271d6d98-55f6-3a32-f8c1-b60a901e21ff@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 05/10] blockjob: separate monitor and
- blockjob APIs
+In-Reply-To: <4712D8F4B26E034E80552F30A67BE0B1A589E5@ORSMSX112.amr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/4] pam: setup pc.bios
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,59 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: jcody@redhat.com
+To: "Xu, Anthony" <anthony.xu@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
 
 
-On 11/04/2017 00:05, John Snow wrote:
->=20
->=20
-> On 04/08/2017 05:52 AM, Paolo Bonzini wrote:
->>
->>
->> On 08/04/2017 08:03, John Snow wrote:
->>> Looks clean, though it may be useful to do a few more things;
->>>
->>> - Demarcate what you think is the monitor API in this file
->>
->> It's already there:
->>
->> +/*
->> + * API for block job drivers and the block layer.
->> + */
->> +
->>
->> where everything before is for the monitor.
->>
->=20
-> I meant explicitly, with a comment at the top explaining the demarcatio=
-n.
+On 11/04/2017 09:42, Xu, Anthony wrote:
+>> I think this is wrong, the high copy should remain read-only or pflash
+>> stops working when you remove PAM.
+> 
+> I tried to set pc.bios as read-only and isa.bios as read&write,
+> it doesn't work. render_memory_region doesn't honor readonly
+> field of alias MemoryRegion. 
+> 
+> Two FlatRanges created for pc.bios and isa.bios point to the same
+> MemoryRegion pc.bios. Both get readonly from pc.bios.
+> Is this a bug or by design?
 
-Oh, sure.
+Read-write can use an alias to become read-only, but read-only cannot
+use an alias to become read-write.
 
->>> - Organize blockjob.h to match to serve as a useful reference.
->>
->> Hmm, yes.
+Let's sort this out later.
 
-As it turns out, no headers are necessary---but yours was a very good
-remark still, because a couple mistakes in this series stood out when
-checking.
+> Pc.bios and isa.bios are backed by the same memory block,
+> so it may cause CPU TLB alias, any issue here?
 
-The "API for block job drivers and the block layer" is already in
-blockjob_int.h while the rest is in blockjob.h.  This is nice because it
-provides some validation of the concept behind the patch, and also of
-the locking policy I chose for the rest of the work.
-
-But, there are two exceptions.  Both of them are introduced by this
-series and they shouldn't be:
-
-- blockjob_pause/resume_all should have its declaration in block_int.h,
-so I've fixed patch 4 accordingly
-
-- blockjob_create is in blockjob_int.h, but this patch should move it to
-the second part of the file, too.
-
-Thanks,
+No, it's okay.
 
 Paolo
