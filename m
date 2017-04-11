@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cxkR5-0005Gu-Ne
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 21:17:37 -0400
+	(envelope-from <eblake@redhat.com>) id 1cxkR5-0005Gx-Ow
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 21:17:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cxkR4-0005pn-E3
+	(envelope-from <eblake@redhat.com>) id 1cxkR4-0005pi-CV
 	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 21:17:35 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 10 Apr 2017 20:17:09 -0500
-Message-Id: <20170411011718.9152-5-eblake@redhat.com>
-In-Reply-To: <20170411011718.9152-1-eblake@redhat.com>
-References: <20170411011718.9152-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v9 04/13] qemu-io: Switch 'map' output to
- byte-based reporting
+Date: Mon, 10 Apr 2017 20:17:05 -0500
+Message-Id: <20170411011718.9152-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.10 v9 00/13] add blkdebug tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,144 +20,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
 
-Mixing byte offset and sector allocation counts is a bit
-confusing.  Also, reporting n/m sectors, where m decreases
-according to the remaining size of the file, isn't really
-adding any useful information.  Update the output to use
-byte counts, and adjust the affected tests (./check -qcow2 102,
-./check -vpc 146).
+Available as a tag at:
+git fetch git://repo.or.cz/qemu/ericb.git nbd-blkdebug-v9
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- qemu-io-cmds.c             |  5 ++---
- tests/qemu-iotests/102.out |  4 ++--
- tests/qemu-iotests/146.out | 30 +++++++++++++++---------------
- 3 files changed, 19 insertions(+), 20 deletions(-)
+Prerequisite: Max's block-next tree:
+https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg01298.html
 
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index df7297f..ed79c30 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -1895,9 +1895,8 @@ static int map_f(BlockBackend *blk, int argc, char **argv)
+v6 was:
+https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg01562.html
+v7 and v8 were the first half of v6, and already applied to 2.9,
+at commit f82c5b17.
 
-         retstr = ret ? "    allocated" : "not allocated";
-         cvtstr(offset << 9ULL, s1, sizeof(s1));
--        printf("[% 24" PRId64 "] % 8" PRId64 "/% 8" PRId64 " sectors %s "
--               "at offset %s (%d)\n",
--               offset << 9ULL, num, nb_sectors, retstr, s1, ret);
-+        printf("[% 24" PRId64 "] % 16" PRId64 " bytes %s at offset %s (%d)\n",
-+               offset << 9ULL, num << 9ULL, retstr, s1, ret);
+Since then:
+- Rebase to master
+- Add more qcow2 patches to make write zeroes at unaligned tail cluster
+more like discard of the same cluster, including more tests
 
-         offset += num;
-         nb_sectors -= num;
-diff --git a/tests/qemu-iotests/102.out b/tests/qemu-iotests/102.out
-index eecde16..0e0ae4c 100644
---- a/tests/qemu-iotests/102.out
-+++ b/tests/qemu-iotests/102.out
-@@ -6,7 +6,7 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=65536
- wrote 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- Image resized.
--[                       0]      128/     128 sectors     allocated at offset 0 bytes (1)
-+[                       0]            65536 bytes     allocated at offset 0 bytes (1)
- Offset          Length          Mapped to       File
+001/13:[down] 'qcow2: Unallocate unmapped zero clusters if no backing file'
+002/13:[down] 'iotests: Add test 179 to cover write zeroes with unmap'
+003/13:[down] 'qemu-io: Switch 'alloc' command to byte-based length'
+004/13:[down] 'qemu-io: Switch 'map' output to byte-based reporting'
+005/13:[down] 'qcow2: Optimize write zero of unaligned tail cluster'
+006/13:[0018] [FC] 'qcow2: Assert that cluster operations are aligned'
+007/13:[0003] [FC] 'qcow2: Discard/zero clusters by byte count'
+008/13:[----] [--] 'blkdebug: Sanity check block layer guarantees'
+009/13:[----] [--] 'blkdebug: Refactor error injection'
+010/13:[----] [--] 'blkdebug: Add pass-through write_zero and discard support'
+011/13:[----] [--] 'blkdebug: Simplify override logic'
+012/13:[0036] [FC] 'blkdebug: Add ability to override unmap geometries'
+013/13:[----] [-C] 'tests: Add coverage for recent block geometry fixes'
 
- === Testing map on an image file truncated outside of qemu ===
-@@ -17,5 +17,5 @@ wrote 65536/65536 bytes at offset 0
- Image resized.
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) qemu-io drv0 map
--[                       0]      128/     128 sectors     allocated at offset 0 bytes (1)
-+[                       0]            65536 bytes     allocated at offset 0 bytes (1)
- *** done
-diff --git a/tests/qemu-iotests/146.out b/tests/qemu-iotests/146.out
-index 4f334d8..d4e2f62 100644
---- a/tests/qemu-iotests/146.out
-+++ b/tests/qemu-iotests/146.out
-@@ -2,39 +2,39 @@ QA output created by 146
+Eric Blake (13):
+  qcow2: Unallocate unmapped zero clusters if no backing file
+  iotests: Add test 179 to cover write zeroes with unmap
+  qemu-io: Switch 'alloc' command to byte-based length
+  qemu-io: Switch 'map' output to byte-based reporting
+  qcow2: Optimize write zero of unaligned tail cluster
+  qcow2: Assert that cluster operations are aligned
+  qcow2: Discard/zero clusters by byte count
+  blkdebug: Sanity check block layer guarantees
+  blkdebug: Refactor error injection
+  blkdebug: Add pass-through write_zero and discard support
+  blkdebug: Simplify override logic
+  blkdebug: Add ability to override unmap geometries
+  tests: Add coverage for recent block geometry fixes
 
- === Testing VPC Autodetect ===
+ qapi/block-core.json              |  33 ++++-
+ block/qcow2.h                     |   9 +-
+ block/blkdebug.c                  | 264 +++++++++++++++++++++++++++++++-------
+ block/qcow2-cluster.c             |  62 +++++----
+ block/qcow2-snapshot.c            |   7 +-
+ block/qcow2.c                     |  28 ++--
+ qemu-io-cmds.c                    |  35 ++---
+ tests/qemu-iotests/019.out        |   8 +-
+ tests/qemu-iotests/102.out        |   4 +-
+ tests/qemu-iotests/146.out        |  30 ++---
+ tests/qemu-iotests/154            | 111 +++++++++++++++-
+ tests/qemu-iotests/154.out        |  82 ++++++++++++
+ tests/qemu-iotests/177            | 114 ++++++++++++++++
+ tests/qemu-iotests/177.out        |  49 +++++++
+ tests/qemu-iotests/179            |  78 +++++++++++
+ tests/qemu-iotests/179.out        |  22 ++++
+ tests/qemu-iotests/common.pattern |   2 +-
+ tests/qemu-iotests/group          |   2 +
+ 18 files changed, 809 insertions(+), 131 deletions(-)
+ create mode 100755 tests/qemu-iotests/177
+ create mode 100644 tests/qemu-iotests/177.out
+ create mode 100755 tests/qemu-iotests/179
+ create mode 100644 tests/qemu-iotests/179.out
 
--[                       0]  266334240/ 266334240 sectors not allocated at offset 0 bytes (0)
-+[                       0]     136363130880 bytes not allocated at offset 0 bytes (0)
-
- === Testing VPC with current_size force ===
-
--[                       0]  266338304/ 266338304 sectors not allocated at offset 0 bytes (0)
-+[                       0]     136365211648 bytes not allocated at offset 0 bytes (0)
-
- === Testing VPC with chs force ===
-
--[                       0]  266334240/ 266334240 sectors not allocated at offset 0 bytes (0)
-+[                       0]     136363130880 bytes not allocated at offset 0 bytes (0)
-
- === Testing Hyper-V Autodetect ===
-
--[                       0]  266338304/ 266338304 sectors not allocated at offset 0 bytes (0)
-+[                       0]     136365211648 bytes not allocated at offset 0 bytes (0)
-
- === Testing Hyper-V with current_size force ===
-
--[                       0]  266338304/ 266338304 sectors not allocated at offset 0 bytes (0)
-+[                       0]     136365211648 bytes not allocated at offset 0 bytes (0)
-
- === Testing Hyper-V with chs force ===
-
--[                       0]  266334240/ 266334240 sectors not allocated at offset 0 bytes (0)
-+[                       0]     136363130880 bytes not allocated at offset 0 bytes (0)
-
- === Testing d2v Autodetect ===
-
--[                       0]   514560/  514560 sectors     allocated at offset 0 bytes (1)
-+[                       0]        263454720 bytes     allocated at offset 0 bytes (1)
-
- === Testing d2v with current_size force ===
-
--[                       0]   514560/  514560 sectors     allocated at offset 0 bytes (1)
-+[                       0]        263454720 bytes     allocated at offset 0 bytes (1)
-
- === Testing d2v with chs force ===
-
--[                       0]   514560/  514560 sectors     allocated at offset 0 bytes (1)
-+[                       0]        263454720 bytes     allocated at offset 0 bytes (1)
-
- === Testing Image create, default ===
-
-@@ -42,15 +42,15 @@ Formatting 'TEST_DIR/IMGFMT-create-test.IMGFMT', fmt=IMGFMT size=4294967296
-
- === Read created image, default opts ====
-
--[                       0]  8389584/ 8389584 sectors not allocated at offset 0 bytes (0)
-+[                       0]       4295467008 bytes not allocated at offset 0 bytes (0)
-
- === Read created image, force_size_calc=chs ====
-
--[                       0]  8389584/ 8389584 sectors not allocated at offset 0 bytes (0)
-+[                       0]       4295467008 bytes not allocated at offset 0 bytes (0)
-
- === Read created image, force_size_calc=current_size ====
-
--[                       0]  8389584/ 8389584 sectors not allocated at offset 0 bytes (0)
-+[                       0]       4295467008 bytes not allocated at offset 0 bytes (0)
-
- === Testing Image create, force_size ===
-
-@@ -58,13 +58,13 @@ Formatting 'TEST_DIR/IMGFMT-create-test.IMGFMT', fmt=IMGFMT size=4294967296 forc
-
- === Read created image, default opts ====
-
--[                       0]  8388608/ 8388608 sectors not allocated at offset 0 bytes (0)
-+[                       0]       4294967296 bytes not allocated at offset 0 bytes (0)
-
- === Read created image, force_size_calc=chs ====
-
--[                       0]  8388608/ 8388608 sectors not allocated at offset 0 bytes (0)
-+[                       0]       4294967296 bytes not allocated at offset 0 bytes (0)
-
- === Read created image, force_size_calc=current_size ====
-
--[                       0]  8388608/ 8388608 sectors not allocated at offset 0 bytes (0)
-+[                       0]       4294967296 bytes not allocated at offset 0 bytes (0)
- *** done
 -- 
 2.9.3
