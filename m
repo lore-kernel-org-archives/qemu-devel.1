@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58982)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1cxuOG-0002Dc-Oh
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 07:55:21 -0400
+	(envelope-from <famz@redhat.com>) id 1cxuP0-0002aJ-2T
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 07:56:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1cxuOB-0005cy-PD
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 07:55:20 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:34534)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1cxuOB-0005cY-Ip
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 07:55:15 -0400
-Received: by mail-pf0-x241.google.com with SMTP id o126so12840054pfb.1
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 04:55:13 -0700 (PDT)
-References: <20170331084147.32716-1-haozhong.zhang@intel.com>
-	<20170331084147.32716-3-haozhong.zhang@intel.com>
-	<ad9c678b-5859-e54c-2eb6-06d458a41312@gmail.com>
-	<20170411082237.4wd5anbqab6pzlz2@hz-desktop>
-	<20170411082928.kpzw3pd5cweqyjt5@hz-desktop>
-From: Xiao Guangrong <guangrong.xiao@gmail.com>
-Message-ID: <337474c2-59f4-a3e6-fd40-e468e7bc4c22@gmail.com>
-Date: Tue, 11 Apr 2017 19:55:04 +0800
+	(envelope-from <famz@redhat.com>) id 1cxuOy-00060O-TJ
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 07:56:06 -0400
+Date: Tue, 11 Apr 2017 19:55:53 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170411115553.GC8507@lemon>
+References: <20170410150542.30376-1-famz@redhat.com>
+	<20170411110542.GI4516@noname.str.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170411082928.kpzw3pd5cweqyjt5@hz-desktop>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 2/4] nvdimm: add functions to
- initialize and perform flush on back store
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170411110542.GI4516@noname.str.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for 2.9 v3 00/10] block: Fixes regarding
+ dataplane and management operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,47 +24,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, dan.j.williams@intel.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
+On Tue, 04/11 13:05, Kevin Wolf wrote:
+> Am 10.04.2017 um 17:05 hat Fam Zheng geschrieben:
+> > v3: Respin the unmerged changes from v2 and include one new fix:
+> > 
+> >     (Yes, it is a big series for the last -rc, and I personally prefer the v2
+> >     approach for the 4-9 part of the problem, which is much more mechanical.)
+> > 
+> >     - 1, 2 are redoing previous patch 4, using bdrv_parent_drained_begin/end.
+> >       [Kevin]
+> >       Also fix the ordering against aio_context_release. [Stefan]
+> >     - 3 is unchanged from patch 6 in v2.
+> >     - 4-9 are reworking of patch 5 following Paolo's suggestion, which allowed
+> >       better patch split.
+> >     - 10 is finding of a latent bug, which is revealed by patch 9.
+> > 
+> > v2: - Drop patch 4 in v1. A second thought made me feel neither it nor Kevin's
+> >       suggestion to move the BH process to bdrv_drain_recurse/BDRV_POLL_WHILE
+> >       is a complete fix. So leave it for a separate patch.
+> >     - Add rev-by to patches 1, 3, 4.
+> >     - Split from patch 1 in v1 and add patch 2, for the new assertions. [Kevin]
+> >     - Rewrite patch 5. Fix block job's co when a BDS is moved to a different
+> >       aio context. [Kevin]
+> >     - Add patch 6.
+> > 
+> > Crashes are reported on dataplane devices when doing snapshot and commit under
+> > guest I/O.
+> > 
+> > With this series, Ed's test case '176' now passes:
+> > 
+> >     https://github.com/skyportsystems/qemu-1/commits/eswierk-iotests-2.9
+> 
+> I had only two points for this series. The first is that it adds unused
+> functions, which doesn't hurt (but I might just send a PATCH 11/10 to
+> remove them again). The second one is that some sheepdog code is
+> suspicious, but if anything it just means that this series is incomplete,
+> so not a show stopper either.
+> 
+> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 
+Thanks, I'll squash in the removal patch and send a pull request for 2.9.
 
-On 04/11/2017 04:29 PM, Haozhong Zhang wrote:
-> On 04/11/17 16:22 +0800, Haozhong Zhang wrote:
->> On 04/06/17 19:52 +0800, Xiao Guangrong wrote:
->>>
->>>
->>> On 03/31/2017 04:41 PM, Haozhong Zhang wrote:
->>>> fsync() is used to persist modifications to the back store. If the
->>>> host NVDIMM is used as the back store, fsync() on Linux will trigger
->>>> the write to the host flush hint address.
->>>>
->>>> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
->>>> ---
->>>>  hw/mem/nvdimm.c         | 22 ++++++++++++++++++++++
->>>>  include/hw/mem/nvdimm.h | 13 +++++++++++++
->>>>  2 files changed, 35 insertions(+)
->>>>
->>>> diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
->>>> index db896b0..484ab8b 100644
->>>> --- a/hw/mem/nvdimm.c
->>>> +++ b/hw/mem/nvdimm.c
->>>> @@ -78,6 +78,26 @@ static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm)
->>>>      return &nvdimm->nvdimm_mr;
->>>>  }
->>>>
->>>> +static void nvdimm_flush_init(NVDIMMDevice *nvdimm, MemoryRegion *hostmem_mr)
->>>> +{
->>>> +    if (nvdimm->flush_hint_enabled) {
->>>> +        nvdimm->backend_fd = memory_region_get_fd(hostmem_mr);
->>>
->>> Hmm, IIRC host-mem-file does not initalize backend_fd at all.
->>
->> Oops, forgot to add this part. Thanks for remind.
->
-> Sorry, I replied too quick.
->
-> For hostmem-file, hostmem_mr->ram_block->fd is set in file_ram_alloc(),
-> which can be got by memory_region_get_fd() here.
-
-Okay, my wrong memory and did not check the code during patch
-review. :)
+Fam
