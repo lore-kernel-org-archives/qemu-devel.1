@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cxrkO-00057y-33
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:06:00 -0400
+	(envelope-from <berrange@redhat.com>) id 1cxrl9-0005dV-Eu
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:06:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cxrkN-0000Wf-0D
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:06:00 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:35847)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cxrkM-0000WP-Pe
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:05:58 -0400
-Received: by mail-wr0-x231.google.com with SMTP id c55so90805339wrc.3
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 02:05:58 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1cxrl6-0000s6-6Y
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:06:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53806)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cxrl5-0000q6-VM
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:06:44 -0400
+Date: Tue, 11 Apr 2017 10:06:38 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170411090638.GB12640@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <CACpTSGuo31hQf6gEto2oFVW7WPuaVqEURQRm+mfjKuXyaFN_cA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKOXoMRQbe+qEroxZxVPh06JU6vbZJ1wddBb_8imPeD-1A@mail.gmail.com>
-References: <cover.1491349058.git.alistair.francis@xilinx.com>
-	<325f60be9b819f261848db3d69554da640294ca4.1491349058.git.alistair.francis@xilinx.com>
-	<CAFEAcA9Pp85ir53BEsd2dT=6iG8gi_6hH2hGkn12Fus0k1K8FQ@mail.gmail.com>
-	<CAKmqyKOXoMRQbe+qEroxZxVPh06JU6vbZJ1wddBb_8imPeD-1A@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 11 Apr 2017 10:05:37 +0100
-Message-ID: <CAFEAcA_E0vM9HE1=5DVhw9cA-BYea1wR2M1LHEXs1L+-Q5vUCg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v1 3/5] cadence_gem: Only trigger
- interrupts if the status register is set
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CACpTSGuo31hQf6gEto2oFVW7WPuaVqEURQRm+mfjKuXyaFN_cA@mail.gmail.com>
+Subject: Re: [Qemu-devel] quick question about live VM migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,25 +27,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Vinod Chegu <vinodchegu@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-On 10 April 2017 at 23:23, Alistair Francis <alistair.francis@xilinx.com> wrote:
-> On Mon, Apr 10, 2017 at 5:44 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
->> Also the comment says "raise or lower interrupt based on current
->> status", but the code will only ever do qemu_set_irq(..., 1),
->> never 0. Which is right?
->
-> This is a little confusing. The interrupts are lowered when the ISR is
-> read, so the assumption was that we never need to clear them in the
-> gem_update_int_status(). Although then if we perform a reset nothing
-> will clear the interrupts until the ISR is read from.
+On Mon, Apr 10, 2017 at 01:07:14PM -0700, Vinod Chegu wrote:
+> Hello,
+> 
+> A very basic question...
+> 
+> In a vanilla KVM env. (i.e. non open stack etc) when  a VM is live migrated
+> to another host does the MAC address of the vNICs and the DHCP IP address
+> for these interfaces remain the same ?
 
-On QEMU reset the other end will be reset anyway so it will
-update its idea of whether the irq is asserted (and calling
-qemu_set_irq in a reset function is generally not a good idea).
-If the device has guest-programmable reset of some kind you'd
-need to clear the irq lines then, though.
+*All* aspects of the virtual machine hardware *must* remain the same. If you
+have any differences in configuration of QEMU on the target host you are likely
+to either prevent live migration working, or break the guest OS after migration
+is finished. This includes MAC address, PCI addresses, device versions, etc,
+etc
 
-thanks
--- PMM
+> Thought the answer was a yes as the goal is to minimize disruption to the
+> apps etc. in the VM, but wanted to double check (couldn't verify as I don't
+> have a ready test env handy at the moment).
+> 
+> BTW, please assume that the MAC address for the vNIC interfaces were not
+> explicitly specified at the time of VM creation.
+
+It is the responsibility of whoever/whatever launches QEMU on the target
+host to ensure the hardware config is identical. The only safe way todo
+this is ensure you specify every single aspect of guest hardware when
+launching QEMU, including the MAC address. 
+
+FWIW, if you are using libvirt to manage QEMU, then libvirt goes to great
+lengths to ensure this happens (which is why QEMU command lines generated
+by libvirt are so huge :-)
+
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
