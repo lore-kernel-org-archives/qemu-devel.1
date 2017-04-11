@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cxvh3-0001qA-9B
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:18:51 -0400
+	(envelope-from <eblake@redhat.com>) id 1cxvhH-000215-Af
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:19:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cxvh2-0007Du-An
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:18:49 -0400
-References: <20170410075451.21329-1-famz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <27018f96-0801-d9f5-50cb-6fb7af9ba2bc@redhat.com>
-Date: Tue, 11 Apr 2017 15:18:35 +0200
+	(envelope-from <eblake@redhat.com>) id 1cxvhB-0007HB-Cq
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:19:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57498)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cxvhB-0007Gt-40
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:18:57 -0400
+References: <1491900566-32222-1-git-send-email-he.chen@linux.intel.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <173a855f-1ca7-e680-a39c-c5e6bce310be@redhat.com>
+Date: Tue, 11 Apr 2017 08:18:49 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170410075451.21329-1-famz@redhat.com>
+In-Reply-To: <1491900566-32222-1-git-send-email-he.chen@linux.intel.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="iCmHtrrKHd5hBIjjGGtph7CEF3oMoolT1"
-Subject: Re: [Qemu-devel] [PATCH for-2.9] iscsi: Fix iscsi_create
+	boundary="08E5pJRKDqv5EF5BhBLpma7WGNhgbGMTq"
+Subject: Re: [Qemu-devel] [PATCH v6] Allow setting NUMA distance for
+ different NUMA nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,63 +28,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Kevin Wolf <kwolf@redhat.com>
+To: He Chen <he.chen@linux.intel.com>, qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Andrew Jones <drjones@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---iCmHtrrKHd5hBIjjGGtph7CEF3oMoolT1
-From: Max Reitz <mreitz@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org,
- Peter Lieven <pl@kamp.de>, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <27018f96-0801-d9f5-50cb-6fb7af9ba2bc@redhat.com>
-Subject: Re: [PATCH for-2.9] iscsi: Fix iscsi_create
-References: <20170410075451.21329-1-famz@redhat.com>
-In-Reply-To: <20170410075451.21329-1-famz@redhat.com>
+--08E5pJRKDqv5EF5BhBLpma7WGNhgbGMTq
+From: Eric Blake <eblake@redhat.com>
+To: He Chen <he.chen@linux.intel.com>, qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Andrew Jones <drjones@redhat.com>
+Message-ID: <173a855f-1ca7-e680-a39c-c5e6bce310be@redhat.com>
+Subject: Re: [PATCH v6] Allow setting NUMA distance for different NUMA nodes
+References: <1491900566-32222-1-git-send-email-he.chen@linux.intel.com>
+In-Reply-To: <1491900566-32222-1-git-send-email-he.chen@linux.intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 10.04.2017 09:54, Fam Zheng wrote:
-> Since d5895fcb (iscsi: Split URL into individual options), creating
-> qcow2 image on an iscsi LUN fails:
+On 04/11/2017 03:49 AM, He Chen wrote:
+> This patch is going to add SLIT table support in QEMU, and provides
+> additional option `dist` for command `-numa` to allow user set vNUMA
+> distance by QEMU command.
 >=20
->     qemu-img create -f qcow2 iscsi://$SERVER/$IQN/0 1G
->     qemu-img: iscsi://$SERVER/$IQN/0: Could not create image: Invalid
->         argument
+> With this patch, when a user wants to create a guest that contains
+> several vNUMA nodes and also wants to set distance among those nodes,
+> the QEMU command would like:
 >=20
-> The problem is iscsi_open now expects that transport_name, portal and
-> target are already parsed into structured options by
-> iscsi_parse_filename, but it is not called in iscsi_create.
+> ```
+> -numa node,nodeid=3D0,cpus=3D0 \
+> -numa node,nodeid=3D1,cpus=3D1 \
+> -numa node,nodeid=3D2,cpus=3D2 \
+> -numa node,nodeid=3D3,cpus=3D3 \
+> -numa dist,src=3D0,dst=3D1,val=3D21 \
+> -numa dist,src=3D0,dst=3D2,val=3D31 \
+> -numa dist,src=3D0,dst=3D3,val=3D41 \
+> -numa dist,src=3D1,dst=3D2,val=3D21 \
+> -numa dist,src=3D1,dst=3D3,val=3D31 \
+> -numa dist,src=3D2,dst=3D3,val=3D21 \
+> ```
 >=20
-> Signed-off-by: Fam Zheng <famz@redhat.com>
+> Signed-off-by: He Chen <he.chen@linux.intel.com>
 > ---
->  block/iscsi.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
 
-Thanks, dropped the qdict_put() for "filename" and applied to my block
-branch:
-
-https://github.com/XanClic/qemu/commits/block
-
-Max
+Here is where you should mention what changed since v5, to help focus
+the attention of reviewers that have read earlier versions.
 
 
---iCmHtrrKHd5hBIjjGGtph7CEF3oMoolT1
+> +++ b/qapi-schema.json
+
+>  ##
+> +# @NumaDistOptions:
+> +#
+> +# Set the distance between 2 NUMA nodes.
+> +#
+> +# @src: source NUMA node.
+> +#
+> +# @dst: destination NUMA node.
+> +#
+> +# @val: NUMA distance from source node to destination node.
+> +#       When a node is unreachable from another node, set the distance=
+
+> +#       between them to 255.
+
+Still no mention that distances less than 10 are invalid, or that a node
+to itself defaults to 10 and can't be changed, or that other distances
+default to 20.  But that starts to get complex enough, and you cover it
+elsewhere, so I'm okay with what you have here.
+
+Interface looks sane, but I'll leave others to do the code review.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--08E5pJRKDqv5EF5BhBLpma7WGNhgbGMTq
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljs16sSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A7fgIAJmcYzHldAewwCZDMFyQDgf/idDiJ/no
-1tIsQ85VDpzFxCPeXPWIN89frjxAPIpVhXQxmdt9PWM11Xs8Vvp09ZwP/obxT9cM
-NAdBER9DFrd/TuurHb/OorGziCMenEwMECLpyXQX76xywR5Wz4xXI2VzFGR8WlLj
-UsWjGDhdLnAVQM0XK1P0JFaK7J6SiwUUfZoPQNrCdCNurR61ergJoezRUU+Mwu5z
-982uFcveVTPyGScXTCBlYsWdAHnCwlXv1F3W8PIa1ciSqgGJhE/J9llfjfscIiTX
-ScZxPTAAyiIsuN1OiQfpYDv4XElWTvrFkHWddQGVX6ftqB9rK66+460=
-=9xND
+iQEcBAEBCAAGBQJY7Ne5AAoJEKeha0olJ0NqEjYIAILBOmIMeGockNRjufe0wi7Y
+yqU0qIk/J+Ii28TuCMbJ2Z37kg+dUZZG5FvL61GDjwVAUB2tGyEHC5OTwWAiEVTJ
+8ubK2K8VDWVXXlk/QViyZzXdzIYGe4IW6vqJpQqwMAC7avkfNmG3W5nxLR94URxL
++tkhFBcRvPW6pDPfRPZ9el8uGFai76BW+vSR8G9iFX88rTtWaaMrdC7OopPneXaG
+aXyqnoX/kDtbk+7JqwebIY8MpnPptEQy0NXorJ3ie7NsAxyU2Q7ee2f1gfIfotqG
++29eJxYeNBDfAUed6vzlahkXwRDJqN/yBcXB8Rn/td9Dno7PRWVFgVAXrbv8lLs=
+=AnLt
 -----END PGP SIGNATURE-----
 
---iCmHtrrKHd5hBIjjGGtph7CEF3oMoolT1--
+--08E5pJRKDqv5EF5BhBLpma7WGNhgbGMTq--
