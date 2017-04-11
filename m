@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Prerna.Garg@live.com>) id 1cy37g-0006ry-W9
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 17:16:11 -0400
+	(envelope-from <eblake@redhat.com>) id 1cy3NQ-0001Pp-Cx
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 17:31:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Prerna.Garg@live.com>) id 1cy36l-0008UY-5C
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 17:14:48 -0400
-Received: from mail-oln040092255066.outbound.protection.outlook.com
-	([40.92.255.66]:39680
-	helo=APC01-HK2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Prerna.Garg@live.com>)
-	id 1cy36k-0008T8-FC
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 17:13:50 -0400
-From: Prerna Garg <Prerna.Garg@live.com>
-Date: Tue, 11 Apr 2017 20:41:26 +0000
-Message-ID: <BM1PR01MB0722EAF9BB6F0804187CF81984000@BM1PR01MB0722.INDPRD01.PROD.OUTLOOK.COM>
-Content-Language: en-US
-Content-Type: multipart/mixed;
-	boundary="_004_BM1PR01MB0722EAF9BB6F0804187CF81984000BM1PR01MB0722INDP_"
+	(envelope-from <eblake@redhat.com>) id 1cy3NM-0002dc-94
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 17:31:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54464)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cy3NM-0002cB-0Y
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 17:31:00 -0400
+References: <BM1PR01MB0722EAF9BB6F0804187CF81984000@BM1PR01MB0722.INDPRD01.PROD.OUTLOOK.COM>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ced60264-e022-7880-cba5-97afe7976c0e@redhat.com>
+Date: Tue, 11 Apr 2017 16:30:55 -0500
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH] Changed malloc and free to g_malloc and g_free
- in util/envlist.c
+In-Reply-To: <BM1PR01MB0722EAF9BB6F0804187CF81984000@BM1PR01MB0722.INDPRD01.PROD.OUTLOOK.COM>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="hDEoMvw9n65N5BK8GkEb837j5uXa2F3Sb"
+Subject: Re: [Qemu-devel] [PATCH] Changed malloc and free to g_malloc and
+ g_free in util/envlist.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,63 +28,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>
+To: Prerna Garg <Prerna.Garg@live.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
---_004_BM1PR01MB0722EAF9BB6F0804187CF81984000BM1PR01MB0722INDP_
-Content-Type: text/plain; charset="iso-8859-1"
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--hDEoMvw9n65N5BK8GkEb837j5uXa2F3Sb
+From: Eric Blake <eblake@redhat.com>
+To: Prerna Garg <Prerna.Garg@live.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <ced60264-e022-7880-cba5-97afe7976c0e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] Changed malloc and free to g_malloc and
+ g_free in util/envlist.c
+References: <BM1PR01MB0722EAF9BB6F0804187CF81984000@BM1PR01MB0722.INDPRD01.PROD.OUTLOOK.COM>
+In-Reply-To: <BM1PR01MB0722EAF9BB6F0804187CF81984000@BM1PR01MB0722.INDPRD01.PROD.OUTLOOK.COM>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
+On 04/11/2017 03:41 PM, Prerna Garg wrote:
+>=20
+
+[Nothing - it was all in the attachment]
+
+> 0003-Changed-malloc-and-free-to-g_malloc-and-g_free-respe.patch
+>=20
+
+While attachments are probably okay for a one-shot contribution, if your
+intent is to become an active contributor for Outreachy, you'll
+definitely want to fix your outgoing mail setup to work with inline
+patches sent directly from 'git send-email' rather than forcing everyone
+else to deal with your unusual workflow.
+
+>=20
+> From f3ee3cf9b69aca86c78ec26468a0b4533744cdad Mon Sep 17 00:00:00 2001
+> From: Prerna Garg <prerna.garg@live.com>
+> Date: Wed, 12 Apr 2017 02:04:36 +0530
+> Subject: [PATCH 3/3] Changed malloc and free to g_malloc and g_free
+>  respectively in util/envlist.c file
+
+Is there a patch 1/3 and 2/3 (and if so, where's the cover letter 0/3)?
+Or did you mean for this to be a single-patch series, at version 3?
+Given that the content has gone by before, I suspect the latter; to
+achieve that, use 'git send-email -v3'.
+
+You're also missing a category, and patches should generally favor
+imperative tense (think "[apply this patch to] do this") rather than
+past tense ("[this patch] did this").  Also, you want the subject line
+to be a short how; the commit body can be used for further explanations.
+So a better commit message might be:
+
+util: Switch malloc to g_malloc in envlist.c
+
+Also switch matching free to g_free.
+Done as one of the suggested bite sized tasks
+
+>=20
+> Signed-off-by: Prerna Garg <prerna.garg@live.com>
+> ---
+>  util/envlist.c | 22 +++++++++++-----------
+>  1 file changed, 11 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/util/envlist.c b/util/envlist.c
+> index e86857e..0324fe2 100644
+> --- a/util/envlist.c
+> +++ b/util/envlist.c
+> @@ -25,7 +25,7 @@ envlist_create(void)
+>  {
+>  	envlist_t *envlist;
+> =20
+> -	if ((envlist =3D malloc(sizeof (*envlist))) =3D=3D NULL)
+> +	if ((envlist =3D g_malloc(sizeof (*envlist))) =3D=3D NULL)
+>  		return (NULL);
+
+g_malloc() can't fail (rather, it fails by exit()ing), so any code
+checking for NULL is now dead code, and should be cleaned up as part of
+the same conversion patch.
+
+> =20
+>  	QLIST_INIT(&envlist->el_entries);
+> @@ -48,10 +48,10 @@ envlist_free(envlist_t *envlist)
+>  		entry =3D envlist->el_entries.lh_first;
+>  		QLIST_REMOVE(entry, ev_link);
+> =20
+> -		free((char *)entry->ev_var);
+> -		free(entry);
+> +		g_free((char *)entry->ev_var);
+
+Is the cast still necessary?  Are we casting away const?  It's useful to
+mention why a cast is present, if it is necessary; otherwise omit it as
+part of cleaning up the code.
 
 
---_004_BM1PR01MB0722EAF9BB6F0804187CF81984000BM1PR01MB0722INDP_
-Content-Type: text/x-patch;
-	name="0003-Changed-malloc-and-free-to-g_malloc-and-g_free-respe.patch"
-Content-Description: 0003-Changed-malloc-and-free-to-g_malloc-and-g_free-respe.patch
-Content-Disposition: attachment;
-	filename="0003-Changed-malloc-and-free-to-g_malloc-and-g_free-respe.patch";
-	size=2169; creation-date="Tue, 11 Apr 2017 20:41:15 GMT";
-	modification-date="Tue, 11 Apr 2017 20:41:15 GMT"
-Content-Transfer-Encoding: base64
+> @@ -225,7 +225,7 @@ envlist_to_environ(const envlist_t *envlist, size_t=
+ *count)
+>  	struct envlist_entry *entry;
+>  	char **env, **penv;
+> =20
+> -	penv =3D env =3D malloc((envlist->el_count + 1) * sizeof (char *));
+> +	penv =3D env =3D g_malloc((envlist->el_count + 1) * sizeof (char *));=
 
-RnJvbSBmM2VlM2NmOWI2OWFjYTg2Yzc4ZWMyNjQ2OGEwYjQ1MzM3NDRjZGFkIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBQcmVybmEgR2FyZyA8cHJlcm5hLmdhcmdAbGl2ZS5jb20+CkRh
-dGU6IFdlZCwgMTIgQXByIDIwMTcgMDI6MDQ6MzYgKzA1MzAKU3ViamVjdDogW1BBVENIIDMvM10g
-Q2hhbmdlZCBtYWxsb2MgYW5kIGZyZWUgdG8gZ19tYWxsb2MgYW5kIGdfZnJlZQogcmVzcGVjdGl2
-ZWx5IGluIHV0aWwvZW52bGlzdC5jIGZpbGUKClNpZ25lZC1vZmYtYnk6IFByZXJuYSBHYXJnIDxw
-cmVybmEuZ2FyZ0BsaXZlLmNvbT4KLS0tCiB1dGlsL2Vudmxpc3QuYyB8IDIyICsrKysrKysrKysr
-LS0tLS0tLS0tLS0KIDEgZmlsZSBjaGFuZ2VkLCAxMSBpbnNlcnRpb25zKCspLCAxMSBkZWxldGlv
-bnMoLSkKCmRpZmYgLS1naXQgYS91dGlsL2Vudmxpc3QuYyBiL3V0aWwvZW52bGlzdC5jCmluZGV4
-IGU4Njg1N2UuLjAzMjRmZTIgMTAwNjQ0Ci0tLSBhL3V0aWwvZW52bGlzdC5jCisrKyBiL3V0aWwv
-ZW52bGlzdC5jCkBAIC0yNSw3ICsyNSw3IEBAIGVudmxpc3RfY3JlYXRlKHZvaWQpCiB7CiAJZW52
-bGlzdF90ICplbnZsaXN0OwogCi0JaWYgKChlbnZsaXN0ID0gbWFsbG9jKHNpemVvZiAoKmVudmxp
-c3QpKSkgPT0gTlVMTCkKKwlpZiAoKGVudmxpc3QgPSBnX21hbGxvYyhzaXplb2YgKCplbnZsaXN0
-KSkpID09IE5VTEwpCiAJCXJldHVybiAoTlVMTCk7CiAKIAlRTElTVF9JTklUKCZlbnZsaXN0LT5l
-bF9lbnRyaWVzKTsKQEAgLTQ4LDEwICs0OCwxMCBAQCBlbnZsaXN0X2ZyZWUoZW52bGlzdF90ICpl
-bnZsaXN0KQogCQllbnRyeSA9IGVudmxpc3QtPmVsX2VudHJpZXMubGhfZmlyc3Q7CiAJCVFMSVNU
-X1JFTU9WRShlbnRyeSwgZXZfbGluayk7CiAKLQkJZnJlZSgoY2hhciAqKWVudHJ5LT5ldl92YXIp
-OwotCQlmcmVlKGVudHJ5KTsKKwkJZ19mcmVlKChjaGFyICopZW50cnktPmV2X3Zhcik7CisJCWdf
-ZnJlZShlbnRyeSk7CiAJfQotCWZyZWUoZW52bGlzdCk7CisJZ19mcmVlKGVudmxpc3QpOwogfQog
-CiAvKgpAQCAtMTU1LDE2ICsxNTUsMTYgQEAgZW52bGlzdF9zZXRlbnYoZW52bGlzdF90ICplbnZs
-aXN0LCBjb25zdCBjaGFyICplbnYpCiAKIAlpZiAoZW50cnkgIT0gTlVMTCkgewogCQlRTElTVF9S
-RU1PVkUoZW50cnksIGV2X2xpbmspOwotCQlmcmVlKChjaGFyICopZW50cnktPmV2X3Zhcik7Ci0J
-CWZyZWUoZW50cnkpOworCQlnX2ZyZWUoKGNoYXIgKillbnRyeS0+ZXZfdmFyKTsKKwkJZ19mcmVl
-KGVudHJ5KTsKIAl9IGVsc2UgewogCQllbnZsaXN0LT5lbF9jb3VudCsrOwogCX0KIAotCWlmICgo
-ZW50cnkgPSBtYWxsb2Moc2l6ZW9mICgqZW50cnkpKSkgPT0gTlVMTCkKKwlpZiAoKGVudHJ5ID0g
-Z19tYWxsb2Moc2l6ZW9mICgqZW50cnkpKSkgPT0gTlVMTCkKIAkJcmV0dXJuIChlcnJubyk7CiAJ
-aWYgKChlbnRyeS0+ZXZfdmFyID0gc3RyZHVwKGVudikpID09IE5VTEwpIHsKLQkJZnJlZShlbnRy
-eSk7CisJCWdfZnJlZShlbnRyeSk7CiAJCXJldHVybiAoZXJybm8pOwogCX0KIAlRTElTVF9JTlNF
-UlRfSEVBRCgmZW52bGlzdC0+ZWxfZW50cmllcywgZW50cnksIGV2X2xpbmspOwpAQCAtMjAxLDgg
-KzIwMSw4IEBAIGVudmxpc3RfdW5zZXRlbnYoZW52bGlzdF90ICplbnZsaXN0LCBjb25zdCBjaGFy
-ICplbnYpCiAJfQogCWlmIChlbnRyeSAhPSBOVUxMKSB7CiAJCVFMSVNUX1JFTU9WRShlbnRyeSwg
-ZXZfbGluayk7Ci0JCWZyZWUoKGNoYXIgKillbnRyeS0+ZXZfdmFyKTsKLQkJZnJlZShlbnRyeSk7
-CisJCWdfZnJlZSgoY2hhciAqKWVudHJ5LT5ldl92YXIpOworCQlnX2ZyZWUoZW50cnkpOwogCiAJ
-CWVudmxpc3QtPmVsX2NvdW50LS07CiAJfQpAQCAtMjI1LDcgKzIyNSw3IEBAIGVudmxpc3RfdG9f
-ZW52aXJvbihjb25zdCBlbnZsaXN0X3QgKmVudmxpc3QsIHNpemVfdCAqY291bnQpCiAJc3RydWN0
-IGVudmxpc3RfZW50cnkgKmVudHJ5OwogCWNoYXIgKiplbnYsICoqcGVudjsKIAotCXBlbnYgPSBl
-bnYgPSBtYWxsb2MoKGVudmxpc3QtPmVsX2NvdW50ICsgMSkgKiBzaXplb2YgKGNoYXIgKikpOwor
-CXBlbnYgPSBlbnYgPSBnX21hbGxvYygoZW52bGlzdC0+ZWxfY291bnQgKyAxKSAqIHNpemVvZiAo
-Y2hhciAqKSk7CiAJaWYgKGVudiA9PSBOVUxMKQogCQlyZXR1cm4gKE5VTEwpOwogCi0tIAoyLjcu
-NAoK
 
---_004_BM1PR01MB0722EAF9BB6F0804187CF81984000BM1PR01MB0722INDP_--
+g_new() is better than g_malloc() if you are going to multiply two
+values, to make sure you don't overflow the multiplication.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--hDEoMvw9n65N5BK8GkEb837j5uXa2F3Sb
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY7UsPAAoJEKeha0olJ0Nqv/0H/1aN4NdgT3d6PJ67EbwCurpg
+qyq5y0TL0Fp1DsEDvgqsbagaoafMoHW+sYevynzbJo9Znic+tHXGd9r6XpPuhCcJ
+ILEExAk0ZReHo5o4Ewk8HoU4xTLSycjv8QUw9aGc2ZPUMk0FN3ixF8baN0Pzkgoh
+6LqU5KdmFmBhTJE6uzURQrliDnbxp/EY8TtJqaZDEWjN84H1bXE2BQJuBZ0mNkFW
+xLKPEO9+XFFBeHGT1oIhzKLHTtluqNivBVC6mi/pMrBR6dsEu+FuCnZI5cmu3Hjn
+RcY/K0DRpZJ11xU3ZNXLBjeTlb30GgoioXQoDP4XWmTjutXFGzXFRjjusHgq9mc=
+=WI5J
+-----END PGP SIGNATURE-----
+
+--hDEoMvw9n65N5BK8GkEb837j5uXa2F3Sb--
