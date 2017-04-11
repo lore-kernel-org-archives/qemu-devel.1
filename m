@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50490)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cxs0h-0004JA-DB
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:22:52 -0400
+	(envelope-from <kwolf@redhat.com>) id 1cxs61-0005yE-Gt
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:28:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cxs0c-0007yj-Ax
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:22:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42442)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cxs0c-0007yB-37
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:22:46 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1490945793-21276-1-git-send-email-peterx@redhat.com>
-	<20170331191601-mutt-send-email-mst@kernel.org>
-	<20170401012942.GK3981@pxdev.xzpeter.org>
-Date: Tue, 11 Apr 2017 11:22:38 +0200
-In-Reply-To: <20170401012942.GK3981@pxdev.xzpeter.org> (Peter Xu's message of
-	"Sat, 1 Apr 2017 09:29:42 +0800")
-Message-ID: <87bms3cn8h.fsf@dusky.pond.sub.org>
+	(envelope-from <kwolf@redhat.com>) id 1cxs60-00020O-GP
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:28:21 -0400
+Date: Tue, 11 Apr 2017 11:28:07 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170411092807.GG4516@noname.str.redhat.com>
+References: <20170410150542.30376-1-famz@redhat.com>
+	<20170410150542.30376-6-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-2.10 0/5] x86/vIOMMU: move init back to
- machine init phase
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170410150542.30376-6-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for 2.9 v3 05/10] async: Introduce
+ aio_co_enter and aio_co_enter_if_inactive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +24,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, tianyu.lan@intel.com, kevin.tian@intel.com, yi.l.liu@intel.com, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Peter Xu <peterx@redhat.com> writes:
+Am 10.04.2017 um 17:05 hat Fam Zheng geschrieben:
+> They start the coroutine on the specified context.
+> 
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  include/block/aio.h | 18 ++++++++++++++++++
+>  util/async.c        | 14 +++++++++++++-
+>  2 files changed, 31 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/block/aio.h b/include/block/aio.h
+> index 677b6ff..b0a6bb3 100644
+> --- a/include/block/aio.h
+> +++ b/include/block/aio.h
+> @@ -511,6 +511,24 @@ void aio_co_schedule(AioContext *ctx, struct Coroutine *co);
+>  void aio_co_wake(struct Coroutine *co);
+>  
+>  /**
+> + * aio_co_enter:
+> + * @ctx: the context to run the coroutine
+> + * @co: the coroutine to run
+> + *
+> + * Enter a coroutine in the specified AioContext.
+> + */
+> +void aio_co_enter(AioContext *ctx, struct Coroutine *co);
+> +
+> +/**
+> + * aio_co_enter_if_inactive:
+> + * @ctx: the context to run the coroutine
+> + * @co: the coroutine to run
+> + *
+> + * Enter a coroutine in the specified AioContext, if it's not already entered.
+> + */
+> +void aio_co_enter_if_inactive(AioContext *ctx, struct Coroutine *co);
+> +
+> +/**
+>   * Return the AioContext whose event loop runs in the current thread.
+>   *
+>   * If called from an IOThread this will be the IOThread's AioContext.  If
+> diff --git a/util/async.c b/util/async.c
+> index 663e297..507671a 100644
+> --- a/util/async.c
+> +++ b/util/async.c
+> @@ -453,6 +453,11 @@ void aio_co_wake(struct Coroutine *co)
+>      smp_read_barrier_depends();
+>      ctx = atomic_read(&co->ctx);
+>  
+> +    aio_co_enter(ctx, co);
+> +}
+> +
+> +void aio_co_enter(AioContext *ctx, struct Coroutine *co)
+> +{
+>      if (ctx != qemu_get_current_aio_context()) {
+>          aio_co_schedule(ctx, co);
+>          return;
+> @@ -464,11 +469,18 @@ void aio_co_wake(struct Coroutine *co)
+>          QSIMPLEQ_INSERT_TAIL(&self->co_queue_wakeup, co, co_queue_next);
+>      } else {
+>          aio_context_acquire(ctx);
+> -        qemu_coroutine_enter(co);
+> +        qemu_aio_coroutine_enter(ctx, co);
+>          aio_context_release(ctx);
+>      }
+>  }
+>  
+> +void aio_co_enter_if_inactive(AioContext *ctx, struct Coroutine *co)
+> +{
+> +    if (!qemu_coroutine_entered(co)) {
+> +        aio_co_enter(ctx, co);
+> +    }
+> +}
 
-> On Fri, Mar 31, 2017 at 07:17:34PM +0300, Michael S. Tsirkin wrote:
->> On Fri, Mar 31, 2017 at 03:36:28PM +0800, Peter Xu wrote:
->> > At the very beginning, the x86 vIOMMUs are created via "-M iommu=on".
->> > We moved one step further a year ago to have the vIOMMUs just like a
->> > general device, so that we can init them with far more specific
->> > parameters with "-device" interface.
->> > 
->> > However, gradually we found that problem starts to occur due to this.
->> > The main issue is that the DMA address space of any PCI device is
->> > postponed to be init after device realization, while some devices'
->> > realizations would depend on this address space. That looks like a
->> > dead lock. We have patches and solutions for different single problem,
->> > but, maybe it's time we can consider to solve the root cause this
->> > time, of course after 2.9 release.
->> > 
->> > This series tries to solve the root cause, and move vIOMMU inits back
->> > to machine init for x86 platforms. Then, we'll have solid DMA address
->> > space for each device even during realization.
->> > 
->> > Please kindly review. Thanks.
->> 
->> I think it's a clean way to do it at a high level.
->> However I would like to set a tag in the class
->> rather than listing specific devices.
->> Also, init order should be consistent for all machines
->> not just q35.
->
-> I agree that we may finally need a tag if we want to have a general
-> solution for device init ordering. However I was thinking maybe for
-> x86 IOMMUs we should even move the init earlier than an ordered device
-> list, considering the integrated devices are created during machine
-> init, and it's before the general device init loop.
->
-> Actually, iiuc that's also following how the real hardware works -
-> since the IOMMU unit (now we only have the root vIOMMU) belongs to
-> north bridge, so imho in emulation codes we'd better follow how the
-> hardware works if possible (I believe in hardware IOMMUs should be
-> inited along with north bridge).
->
-> (btw, maybe I should mark at least the first patch as RFC...)
+Is this a useful function, though?
 
-No objection to fixing yet another initialization order problem by
-making it yet another special case, but I think we should really, really
-sit down and try to come up with a *generic* way to express
-initialization order constraints.  This is a modelling problem: we need
-to model how physical hardware resets.  As long as we don't, we're
-damned to tinker with this rickety tower of special cases.
+I think the only interesting case is the first qemu_coroutine_enter()
+after a coroutine is created, here we may want it to run in a different
+AioContext than the caller. However, once this has happened, it is
+already running in the right AioContext and we can use the normal
+functions without giving an explicit AioContext (except in cases where
+we wouldn't reenter from a callback of that AioContext, but do such
+cases even exist?)
+
+So I expect that some patches down the series, we get a patch that
+converts more than is actually necessary. Let's see.
+
+Kevin
