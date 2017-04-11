@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39538)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cxpLQ-0004wz-KU
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 02:32:06 -0400
+	(envelope-from <haozhong.zhang@intel.com>) id 1cxpNp-0005f1-SF
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 02:34:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cxpLN-0001NE-Fm
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 02:32:04 -0400
-Received: from 2.mo179.mail-out.ovh.net ([178.33.250.45]:37348)
+	(envelope-from <haozhong.zhang@intel.com>) id 1cxpNm-00024P-P0
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 02:34:33 -0400
+Received: from mga14.intel.com ([192.55.52.115]:60262)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cxpLN-0001Mb-6v
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 02:32:01 -0400
-Received: from player690.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id B827D34DFC
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 08:31:50 +0200 (CEST)
-References: <1491832618-27536-1-git-send-email-clg@kaod.org>
-	<1491832618-27536-2-git-send-email-clg@kaod.org>
-	<20170411022354.GV27571@umbus>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <07d9cc34-c102-223f-6c64-334fc7ec23a5@kaod.org>
-Date: Tue, 11 Apr 2017 08:31:45 +0200
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1cxpNm-000245-Ar
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 02:34:30 -0400
+Date: Tue, 11 Apr 2017 14:34:26 +0800
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Message-ID: <20170411063426.5fmxyuglhqk7qo3k@hz-desktop>
+References: <20170331084147.32716-1-haozhong.zhang@intel.com>
+	<20170406094359.GB21261@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20170411022354.GV27571@umbus>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/8] ppc/pnv: Add support for POWER8+
- LPC Controller
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170406094359.GB21261@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [RFC PATCH 0/4] nvdimm: enable flush hint address
+ structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,307 +29,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, dan.j.williams@intel.com, Richard Henderson <rth@twiddle.net>
 
-On 04/11/2017 04:23 AM, David Gibson wrote:
-> On Mon, Apr 10, 2017 at 03:56:51PM +0200, C=E9dric Le Goater wrote:
->> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->>
->> It adds the Naples chip which supports proper LPC interrupts via the
->> LPC controller rather than via an external CPLD.
->>
->> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->> [clg: - updated for qemu-2.9
->>       - ported on latest PowerNV patchset
->>       - moved the IRQ handler in pnv_lpc.c
->>       - introduced pnv_lpc_isa_irq_create() to create the ISA IRQs ]
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> ---
->>
->>  Changes since v1:
->>
->>  - moved the IRQ handler in pnv_lpc.c
->>  - introduced pnv_lpc_isa_irq_create() to create the ISA IRQs=20
->>
->>  hw/ppc/pnv.c             | 45 +++-------------------
->>  hw/ppc/pnv_lpc.c         | 97 +++++++++++++++++++++++++++++++++++++++=
-++++++++-
->>  include/hw/ppc/pnv_lpc.h |  8 ++++
->>  3 files changed, 108 insertions(+), 42 deletions(-)
->>
->> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
->> index 16f32c9bbd9d..27589b91d1cf 100644
->> --- a/hw/ppc/pnv.c
->> +++ b/hw/ppc/pnv.c
->> @@ -346,36 +346,6 @@ static void ppc_powernv_reset(void)
->>      cpu_physical_memory_write(PNV_FDT_ADDR, fdt, fdt_totalsize(fdt));
->>  }
->> =20
->> -/* If we don't use the built-in LPC interrupt deserializer, we need
->> - * to provide a set of qirqs for the ISA bus or things will go bad.
->> - *
->> - * Most machines using pre-Naples chips (without said deserializer)
->> - * have a CPLD that will collect the SerIRQ and shoot them as a
->> - * single level interrupt to the P8 chip. So let's setup a hook
->> - * for doing just that.
->> - */
->> -static void pnv_lpc_isa_irq_handler_cpld(void *opaque, int n, int lev=
-el)
->> -{
->> -    PnvMachineState *pnv =3D POWERNV_MACHINE(qdev_get_machine());
->> -    uint32_t old_state =3D pnv->cpld_irqstate;
->> -    PnvChip *chip =3D opaque;
->> -
->> -    if (level) {
->> -        pnv->cpld_irqstate |=3D 1u << n;
->> -    } else {
->> -        pnv->cpld_irqstate &=3D ~(1u << n);
->> -    }
->> -    if (pnv->cpld_irqstate !=3D old_state) {
->> -        pnv_psi_irq_set(&chip->psi, PSIHB_IRQ_EXTERNAL,
->> -                        pnv->cpld_irqstate !=3D 0);
->> -    }
->> -}
->> -
->> -static void pnv_lpc_isa_irq_handler(void *opaque, int n, int level)
->> -{
->> -     /* XXX TODO */
->> -}
->> -
->>  static ISABus *pnv_isa_create(PnvChip *chip)
->>  {
->>      PnvLpcController *lpc =3D &chip->lpc;
->> @@ -390,16 +360,7 @@ static ISABus *pnv_isa_create(PnvChip *chip)
->>      isa_bus =3D isa_bus_new(NULL, &lpc->isa_mem, &lpc->isa_io,
->>                            &error_fatal);
->> =20
->> -    /* Not all variants have a working serial irq decoder. If not,
->> -     * handling of LPC interrupts becomes a platform issue (some
->> -     * platforms have a CPLD to do it).
->> -     */
->> -    if (pcc->chip_type =3D=3D PNV_CHIP_POWER8NVL) {
->> -        irqs =3D qemu_allocate_irqs(pnv_lpc_isa_irq_handler, chip, IS=
-A_NUM_IRQS);
->> -    } else {
->> -        irqs =3D qemu_allocate_irqs(pnv_lpc_isa_irq_handler_cpld, chi=
-p,
->> -                                  ISA_NUM_IRQS);
->> -    }
->> +    irqs =3D pnv_lpc_isa_irq_create(lpc, pcc->chip_type, ISA_NUM_IRQS=
-);
->> =20
->>      isa_bus_irqs(isa_bus, irqs);
->>      return isa_bus;
->> @@ -699,6 +660,10 @@ static void pnv_chip_init(Object *obj)
->>      object_property_add_child(obj, "occ", OBJECT(&chip->occ), NULL);
->>      object_property_add_const_link(OBJECT(&chip->occ), "psi",
->>                                     OBJECT(&chip->psi), &error_abort);
->> +
->> +    /* The LPC controller needs PSI to generate interrupts */
->> +    object_property_add_const_link(OBJECT(&chip->lpc), "psi",
->> +                                   OBJECT(&chip->psi), &error_abort);
->>  }
->> =20
->>  static void pnv_chip_icp_realize(PnvChip *chip, Error **errp)
->> diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
->> index 78db52415b11..baee366d386a 100644
->> --- a/hw/ppc/pnv_lpc.c
->> +++ b/hw/ppc/pnv_lpc.c
->> @@ -250,6 +250,34 @@ static const MemoryRegionOps pnv_lpc_xscom_ops =3D=
- {
->>      .endianness =3D DEVICE_BIG_ENDIAN,
->>  };
->> =20
->> +static void pnv_lpc_eval_irqs(PnvLpcController *lpc)
->> +{
->> +    bool lpc_to_opb_irq =3D false;
->> +
->> +    /* Update LPC controller to OPB line */
->> +    if (lpc->lpc_hc_irqser_ctrl & LPC_HC_IRQSER_EN) {
->> +        uint32_t irqs;
->> +
->> +        irqs =3D lpc->lpc_hc_irqstat & lpc->lpc_hc_irqmask;
->> +        lpc_to_opb_irq =3D (irqs !=3D 0);
->> +    }
->> +
->> +    /* We don't honor the polarity register, it's pointless and unuse=
-d
->> +     * anyway
->> +     */
->> +    if (lpc_to_opb_irq) {
->> +        lpc->opb_irq_input |=3D OPB_MASTER_IRQ_LPC;
->> +    } else {
->> +        lpc->opb_irq_input &=3D ~OPB_MASTER_IRQ_LPC;
->> +    }
->> +
->> +    /* Update OPB internal latch */
->> +    lpc->opb_irq_stat |=3D lpc->opb_irq_input & lpc->opb_irq_mask;
->> +
->> +    /* Reflect the interrupt */
->> +    pnv_psi_irq_set(lpc->psi, PSIHB_IRQ_LPC_I2C, lpc->opb_irq_stat !=3D=
- 0);
->> +}
->> +
->>  static uint64_t lpc_hc_read(void *opaque, hwaddr addr, unsigned size)
->>  {
->>      PnvLpcController *lpc =3D opaque;
->> @@ -300,12 +328,15 @@ static void lpc_hc_write(void *opaque, hwaddr ad=
-dr, uint64_t val,
->>          break;
->>      case LPC_HC_IRQSER_CTRL:
->>          lpc->lpc_hc_irqser_ctrl =3D val;
->> +        pnv_lpc_eval_irqs(lpc);
->>          break;
->>      case LPC_HC_IRQMASK:
->>          lpc->lpc_hc_irqmask =3D val;
->> +        pnv_lpc_eval_irqs(lpc);
->>          break;
->>      case LPC_HC_IRQSTAT:
->>          lpc->lpc_hc_irqstat &=3D ~val;
->> +        pnv_lpc_eval_irqs(lpc);
->>          break;
->>      case LPC_HC_ERROR_ADDRESS:
->>          break;
->> @@ -363,14 +394,15 @@ static void opb_master_write(void *opaque, hwadd=
-r addr,
->>      switch (addr) {
->>      case OPB_MASTER_LS_IRQ_STAT:
->>          lpc->opb_irq_stat &=3D ~val;
->> +        pnv_lpc_eval_irqs(lpc);
->>          break;
->>      case OPB_MASTER_LS_IRQ_MASK:
->> -        /* XXX Filter out reserved bits */
->>          lpc->opb_irq_mask =3D val;
->> +        pnv_lpc_eval_irqs(lpc);
->>          break;
->>      case OPB_MASTER_LS_IRQ_POL:
->> -        /* XXX Filter out reserved bits */
->>          lpc->opb_irq_pol =3D val;
->> +        pnv_lpc_eval_irqs(lpc);
->>          break;
->>      case OPB_MASTER_LS_IRQ_INPUT:
->>          /* Read only */
->> @@ -398,6 +430,8 @@ static const MemoryRegionOps opb_master_ops =3D {
->>  static void pnv_lpc_realize(DeviceState *dev, Error **errp)
->>  {
->>      PnvLpcController *lpc =3D PNV_LPC(dev);
->> +    Object *obj;
->> +    Error *error =3D NULL;
->> =20
->>      /* Reg inits */
->>      lpc->lpc_hc_fw_rd_acc_size =3D LPC_HC_FW_RD_4B;
->> @@ -441,6 +475,15 @@ static void pnv_lpc_realize(DeviceState *dev, Err=
-or **errp)
->>      pnv_xscom_region_init(&lpc->xscom_regs, OBJECT(dev),
->>                            &pnv_lpc_xscom_ops, lpc, "xscom-lpc",
->>                            PNV_XSCOM_LPC_SIZE);
->> +
->> +    /* get PSI object from chip */
->> +    obj =3D object_property_get_link(OBJECT(dev), "psi", &error);
->> +    if (!obj) {
->> +        error_setg(errp, "%s: required link 'psi' not found: %s",
->> +                   __func__, error_get_pretty(error));
->> +        return;
->> +    }
->> +    lpc->psi =3D PNV_PSI(obj);
->>  }
->> =20
->>  static void pnv_lpc_class_init(ObjectClass *klass, void *data)
->> @@ -470,3 +513,53 @@ static void pnv_lpc_register_types(void)
->>  }
->> =20
->>  type_init(pnv_lpc_register_types)
->> +
->> +/* If we don't use the built-in LPC interrupt deserializer, we need
->> + * to provide a set of qirqs for the ISA bus or things will go bad.
->> + *
->> + * Most machines using pre-Naples chips (without said deserializer)
->> + * have a CPLD that will collect the SerIRQ and shoot them as a
->> + * single level interrupt to the P8 chip. So let's setup a hook
->> + * for doing just that.
->> + */
->> +static void pnv_lpc_isa_irq_handler_cpld(void *opaque, int n, int lev=
-el)
->> +{
->> +    PnvMachineState *pnv =3D POWERNV_MACHINE(qdev_get_machine());
->> +    uint32_t old_state =3D pnv->cpld_irqstate;
->> +    PnvLpcController *lpc =3D opaque;
->=20
-> You can use the existing PNV_LPC() and similar macros here, rather
-> than hard casting from a void *.  That's a bit safer.
+On 04/06/17 10:43 +0100, Stefan Hajnoczi wrote:
+> On Fri, Mar 31, 2017 at 04:41:43PM +0800, Haozhong Zhang wrote:
+> > This patch series constructs the flush hint address structures for
+> > nvdimm devices in QEMU.
+> > 
+> > It's of course not for 2.9. I send it out early in order to get
+> > comments on one point I'm uncertain (see the detailed explanation
+> > below). Thanks for any comments in advance!
+> > Background
+> > ---------------
+> 
+> Extra background:
+> 
+> Flush Hint Addresses are necessary because:
+> 
+> 1. Some hardware configurations may require them.  In other words, a
+>    cache flush instruction is not enough to persist data.
+> 
+> 2. The host file system may need fsync(2) calls (e.g. to persist
+>    metadata changes).
+> 
+> Without Flush Hint Addresses only some NVDIMM configurations actually
+> guarantee data persistence.
+> 
+> > Flush hint address structure is a substructure of NFIT and specifies
+> > one or more addresses, namely Flush Hint Addresses. Software can write
+> > to any one of these flush hint addresses to cause any preceding writes
+> > to the NVDIMM region to be flushed out of the intervening platform
+> > buffers to the targeted NVDIMM. More details can be found in ACPI Spec
+> > 6.1, Section 5.2.25.8 "Flush Hint Address Structure".
+> 
+> Do you have performance data?  I'm concerned that Flush Hint Address
+> hardware interface is not virtualization-friendly.
 
-ah yes. I missed that.=20
+Some performance data below.
 
-Thanks,
+Host HW config:
+  CPU: Intel(R) Xeon(R) CPU E5-2699 v4 @ 2.20GHz x 2 sockets w/ HT enabled
+  MEM: 64 GB
 
-C.=20
+  As I don't have NVDIMM hardware, so I use files in ext4 fs on a
+  normal SATA SSD as the back storage of vNVDIMM.
 
->> +
->> +    if (level) {
->> +        pnv->cpld_irqstate |=3D 1u << n;
->> +    } else {
->> +        pnv->cpld_irqstate &=3D ~(1u << n);
->> +    }
->> +
->> +    if (pnv->cpld_irqstate !=3D old_state) {
->> +        pnv_psi_irq_set(lpc->psi, PSIHB_IRQ_EXTERNAL, pnv->cpld_irqst=
-ate !=3D 0);
->> +    }
->> +}
->> +
->> +static void pnv_lpc_isa_irq_handler(void *opaque, int n, int level)
->> +{
->> +    PnvLpcController *lpc =3D opaque;
->> +
->> +    /* The Naples HW latches the 1 levels, clearing is done by SW */
->> +    if (level) {
->> +        lpc->lpc_hc_irqstat |=3D LPC_HC_IRQ_SERIRQ0 >> n;
->> +        pnv_lpc_eval_irqs(lpc);
->> +    }
->> +}
->> +
->> +qemu_irq *pnv_lpc_isa_irq_create(PnvLpcController *lpc, int chip_type=
-,
->> +                                 int nirqs)
->> +{
->> +    /* Not all variants have a working serial irq decoder. If not,
->> +     * handling of LPC interrupts becomes a platform issue (some
->> +     * platforms have a CPLD to do it).
->> +     */
->> +    if (chip_type =3D=3D PNV_CHIP_POWER8NVL) {
->> +        return qemu_allocate_irqs(pnv_lpc_isa_irq_handler, lpc, nirqs=
-);
->> +    } else {
->> +        return qemu_allocate_irqs(pnv_lpc_isa_irq_handler_cpld, lpc, =
-nirqs);
->> +    }
->> +}
->> diff --git a/include/hw/ppc/pnv_lpc.h b/include/hw/ppc/pnv_lpc.h
->> index 38e5506975aa..ccf969af9448 100644
->> --- a/include/hw/ppc/pnv_lpc.h
->> +++ b/include/hw/ppc/pnv_lpc.h
->> @@ -23,6 +23,8 @@
->>  #define PNV_LPC(obj) \
->>       OBJECT_CHECK(PnvLpcController, (obj), TYPE_PNV_LPC)
->> =20
->> +typedef struct PnvPsi PnvPsi;
->> +
->>  typedef struct PnvLpcController {
->>      DeviceState parent;
->> =20
->> @@ -62,6 +64,12 @@ typedef struct PnvLpcController {
->> =20
->>      /* XSCOM registers */
->>      MemoryRegion xscom_regs;
->> +
->> +    /* PSI to generate interrupts */
->> +    PnvPsi *psi;
->>  } PnvLpcController;
->> =20
->> +qemu_irq *pnv_lpc_isa_irq_create(PnvLpcController *lpc, int chip_type=
-,
->> +                                 int nirqs);
->> +
->>  #endif /* _PPC_PNV_LPC_H */
->=20
+
+Host SW config:
+  Kernel: 4.10.1
+  QEMU: commit ea2afcf with this patch series applied.
+
+
+Guest config:
+  For flush hint enabled case, the following QEMU options are used
+    -enable-kvm -smp 4 -cpu host -machine pc,nvdimm \
+    -m 4G,slots=4,maxmem=128G \
+    -object memory-backend-file,id=mem1,share,mem-path=nvm-img,size=8G \
+    -device nvdimm,id=nv1,memdev=mem1,reserved-size=4K,flush-hint \
+    -hda GUEST_DISK_IMG -serial pty
+
+  For flush hint disabled case, the following QEMU options are used
+    -enable-kvm -smp 4 -cpu host -machine pc,nvdimm \
+    -m 4G,slots=4,maxmem=128G \
+    -object memory-backend-file,id=mem1,share,mem-path=nvm-img,size=8G \
+    -device nvdimm,id=nv1,memdev=mem1 \
+    -hda GUEST_DISK_IMG -serial pty
+
+  nvm-img used above is created in ext4 fs on the host SSD by
+    dd if=/dev/zero of=nvm-img bs=1G count=8
+
+  Guest kernel: 4.11.0-rc4
+
+
+Benchmark in guest:
+  mkfs.ext4 /dev/pmem0
+  mount -o dax /dev/pmem0 /mnt
+  dd if=/dev/zero of=/mnt/data bs=1G count=7 # warm up EPT mapping
+  rm /mnt/data                               #
+  dd if=/dev/zero of=/mnt/data bs=1G count=7
+
+  and record the write speed reported by the last 'dd' command.
+
+
+Result:
+  - Flush hint disabled
+    Vary from 161 MB/s to 708 MB/s, depending on how many fs/device
+    flush operations are performed on the host side during the guest
+    'dd'.
+
+  - Flush hint enabled
+  
+    Vary from 164 MB/s to 546 MB/s, depending on how long fsync() in
+    QEMU takes. Usually, there is at least one fsync() during one 'dd'
+    command that takes several seconds (the worst one takes 39 s).
+
+    To be worse, during those long host-side fsync() operations, guest
+    kernel complained stalls.
+
+
+Some thoughts:
+
+- If the non-NVDIMM hardware is used as the back store of vNVDIMM,
+  QEMU may perform the host-side flush operations asynchronously with
+  VM, which will not block VM too long but sacrifice the durability
+  guarantee.
+
+- If physical NVDIMM is used as the back store and ADR is supported on
+  the host, QEMU can rely on ADR to guarantee the data durability and
+  will not need to emulate flush hint for guest.
+
+- If physical NVDIMM is used as the back store and ADR is not
+  supported on the host, QEMU will still need to emulate flush hint
+  for guest and need to use a fast approach other than fsync() to
+  trigger writes to host flush hint.
+
+  Could kernel expose an interface to allow the userland (i.e. QEMU in
+  this case) to directly write to the flush hint of a NVDIMM region?
+
+
+Haozhong
+
+> 
+> In Linux drivers/nvdimm/region_devs.c:nvdimm_flush() does:
+> 
+>   wmb();
+>   for (i = 0; i < nd_region->ndr_mappings; i++)
+>       if (ndrd_get_flush_wpq(ndrd, i, 0))
+>           writeq(1, ndrd_get_flush_wpq(ndrd, i, idx));
+>   wmb();
+> 
+> That looks pretty lightweight - it's an MMIO write between write
+> barriers.
+> 
+> This patch implements the MMIO write like this:
+> 
+>   void nvdimm_flush(NVDIMMDevice *nvdimm)
+>   {
+>       if (nvdimm->backend_fd != -1) {
+>           /*
+>            * If the backend store is a physical NVDIMM device, fsync()
+>            * will trigger the flush via the flush hint on the host device.
+>            */
+>           fsync(nvdimm->backend_fd);
+>       }
+>   }
+> 
+> The MMIO store instruction turned into a synchronous fsync(2) system
+> call plus vmexit/vmenter and QEMU userspace context switch:
+> 
+> 1. The vcpu blocks during the fsync(2) system call.  The MMIO write
+>    instruction has an unexpected and huge latency.
+> 
+> 2. The vcpu thread holds the QEMU global mutex so all other threads
+>    (including the monitor) are blocked during fsync(2).  Other vcpu
+>    threads may block if they vmexit.
+> 
+> It is hard to implement this efficiently in QEMU.  This is why I said
+> the hardware interface is not virtualization-friendly.  It's cheap on
+> real hardware but expensive under virtualization.
+> 
+> We should think about the optimal way of implementing Flush Hint
+> Addresses in QEMU.  But if there is no reasonable way to implement them
+> then I think it's better *not* to implement them, just like the Block
+> Window feature which is also not virtualization-friendly.  Users who
+> want a block device can use virtio-blk.  I don't think NVDIMM Block
+> Window can achieve better performance than virtio-blk under
+> virtualization (although I'm happy to be proven wrong).
+> 
+> Some ideas for a faster implementation:
+> 
+> 1. Use memory_region_clear_global_locking() to avoid taking the QEMU
+>    global mutex.  Little synchronization is necessary as long as the
+>    NVDIMM device isn't hot unplugged (not yet supported anyway).
+> 
+> 2. Can the host kernel provide a way to mmap Address Flush Hints from
+>    the physical NVDIMM in cases where the configuration does not require
+>    host kernel interception?  That way QEMU can map the physical
+>    NVDIMM's Address Flush Hints directly into the guest.  The hypervisor
+>    is bypassed and performance would be good.
+> 
+> I'm not sure there is anything we can do to make the case where the host
+> kernel wants an fsync(2) fast :(.
+> 
+> Benchmark results would be important for deciding how big the problem
+> is.
