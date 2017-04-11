@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50648)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cxvg4-00016U-Qg
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:17:49 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cxvgS-0001NT-1h
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:18:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cxvg3-0006x0-Vz
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:17:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56954)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1cxvg3-0006wi-Pw
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:17:47 -0400
-From: Laurent Vivier <lvivier@redhat.com>
-Date: Tue, 11 Apr 2017 15:17:33 +0200
-Message-Id: <20170411131733.27542-3-lvivier@redhat.com>
-In-Reply-To: <20170411131733.27542-1-lvivier@redhat.com>
-References: <20170411131733.27542-1-lvivier@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] virtio-rng: stop virtqueue while the CPU
- is stopped
+	(envelope-from <peter.maydell@linaro.org>) id 1cxvgI-00072X-N4
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:18:12 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:35607)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cxvgI-00072G-FM
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:18:02 -0400
+Received: by mail-wm0-x232.google.com with SMTP id w64so63486128wma.0
+	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 06:18:02 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20170411122632.14050-1-famz@redhat.com>
+References: <20170411122632.14050-1-famz@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 11 Apr 2017 14:17:40 +0100
+Message-ID: <CAFEAcA8zHfkxZUtH0h5ybTwSEBr1foGLvKzsO0rt0dgWL9MN2A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 00/11] Block patches for 2.9-rc4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,63 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Amit Shah <amit@kernel.org>, qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-If we modify the virtio-rng virqueue while the
-vmstate is already migrated we can have some
-inconsistencies between the virtqueue state and
-the memory content.
+On 11 April 2017 at 13:26, Fam Zheng <famz@redhat.com> wrote:
+> The following changes since commit 17fa24b79ceaa8258e415822cf2e2cb23cf3facb:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/pull-fixes-20170411-1' into staging (2017-04-11 10:03:51 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/famz/qemu.git tags/block-pull-request
+>
+> for you to fetch changes up to 76296dff97864ebb15fa65cc56a6f890ee0c5a28:
+>
+>   sheepdog: Use bdrv_coroutine_enter before BDRV_POLL_WHILE (2017-04-11 20:07:15 +0800)
+>
+> ----------------------------------------------------------------
+>
+> This fixes the known issue 'snapshot_blkdev is broken when using iothreads'.
+>
+> ----------------------------------------------------------------
+>
+> Fam Zheng (11):
+>   block: Make bdrv_parent_drained_begin/end public
+>   block: Quiesce old aio context during bdrv_set_aio_context
+>   tests/block-job-txn: Don't start block job before adding to txn
+>   coroutine: Extract qemu_aio_coroutine_enter
+>   async: Introduce aio_co_enter
+>   block: Introduce bdrv_coroutine_enter
+>   blockjob: Use bdrv_coroutine_enter to start coroutine
+>   qemu-io-cmds: Use bdrv_coroutine_enter
+>   block: Use bdrv_coroutine_enter to start I/O coroutines
+>   block: Fix bdrv_co_flush early return
+>   sheepdog: Use bdrv_coroutine_enter before BDRV_POLL_WHILE
 
-To avoid this, stop the virtqueue while the CPU
-is stopped.
+Applied, thanks.
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
----
- hw/virtio/trace-events |  2 ++
- hw/virtio/virtio-rng.c | 10 ++++++++++
- 2 files changed, 12 insertions(+)
-
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index 6926eed..564a4b8 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -11,6 +11,8 @@ virtio_set_status(void *vdev, uint8_t val) "vdev %p val %u"
- 
- # hw/virtio/virtio-rng.c
- virtio_rng_guest_not_ready(void *rng) "rng %p: guest not ready"
-+virtio_rng_cpu_is_stopped(void *rng) "rng %p: cpu is stopped"
-+virtio_rng_popped(void *rng) "rng %p: elem popped"
- virtio_rng_pushed(void *rng, size_t len) "rng %p: %zd bytes pushed"
- virtio_rng_request(void *rng, size_t size, unsigned quota) "rng %p: %zd bytes requested, %u bytes quota left"
- 
-diff --git a/hw/virtio/virtio-rng.c b/hw/virtio/virtio-rng.c
-index 9639f4e..d270d56 100644
---- a/hw/virtio/virtio-rng.c
-+++ b/hw/virtio/virtio-rng.c
-@@ -53,6 +53,15 @@ static void chr_read(void *opaque, const void *buf, size_t size)
-         return;
-     }
- 
-+    /* we can't modify the virtqueue until
-+     * our state is fully synced
-+     */
-+
-+    if (!runstate_check(RUN_STATE_RUNNING)) {
-+        trace_virtio_rng_cpu_is_stopped(vrng);
-+        return;
-+    }
-+
-     vrng->quota_remaining -= size;
- 
-     offset = 0;
-@@ -61,6 +70,7 @@ static void chr_read(void *opaque, const void *buf, size_t size)
-         if (!elem) {
-             break;
-         }
-+        trace_virtio_rng_popped(vrng);
-         len = iov_from_buf(elem->in_sg, elem->in_num,
-                            0, buf + offset, size - offset);
-         offset += len;
--- 
-2.9.3
+-- PMM
