@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cxrwT-0002V7-Ks
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:18:30 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1cxry6-0003KY-Ku
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:20:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cxrwO-0005Nx-6j
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:18:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35086)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cxrwN-0005Nc-WA
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:18:24 -0400
-References: <1491612336-31066-1-git-send-email-anthony.xu@intel.com>
-	<1491612336-31066-5-git-send-email-anthony.xu@intel.com>
-	<e6089f9a-a90a-33f7-1e62-9d941619b983@redhat.com>
-	<4712D8F4B26E034E80552F30A67BE0B1A589E5@ORSMSX112.amr.corp.intel.com>
+	(envelope-from <pbonzini@redhat.com>) id 1cxry2-00063o-0m
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:20:10 -0400
+References: <20170410150542.30376-1-famz@redhat.com>
+	<20170410150542.30376-11-famz@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <fadbd646-7477-58bc-ea6d-e4ae60020668@redhat.com>
-Date: Tue, 11 Apr 2017 17:18:19 +0800
+Message-ID: <835298af-03d2-8a58-ef08-0e51864977f5@redhat.com>
+Date: Tue, 11 Apr 2017 17:19:52 +0800
 MIME-Version: 1.0
-In-Reply-To: <4712D8F4B26E034E80552F30A67BE0B1A589E5@ORSMSX112.amr.corp.intel.com>
+In-Reply-To: <20170410150542.30376-11-famz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/4] pam: setup pc.bios
+Subject: Re: [Qemu-devel] [PATCH for 2.9 v3 10/10] block: Fix bdrv_co_flush
+ early return
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +24,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Xu, Anthony" <anthony.xu@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
 
 
-On 11/04/2017 09:42, Xu, Anthony wrote:
->> I think this is wrong, the high copy should remain read-only or pflash
->> stops working when you remove PAM.
+On 10/04/2017 23:05, Fam Zheng wrote:
+> bdrv_inc_in_flight and bdrv_dec_in_flight are mandatory for
+> BDRV_POLL_WHILE to work, even for the shortcut case where flush is
+> unnecessary. Move the if block to below bdrv_dec_in_flight, and BTW fix
+> the variable declaration position.
 > 
-> I tried to set pc.bios as read-only and isa.bios as read&write,
-> it doesn't work. render_memory_region doesn't honor readonly
-> field of alias MemoryRegion. 
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  block/io.c | 16 +++++++++-------
+>  1 file changed, 9 insertions(+), 7 deletions(-)
 > 
-> Two FlatRanges created for pc.bios and isa.bios point to the same
-> MemoryRegion pc.bios. Both get readonly from pc.bios.
-> Is this a bug or by design?
+> diff --git a/block/io.c b/block/io.c
+> index 00e45ca..bae6947 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -2278,16 +2278,17 @@ static void coroutine_fn bdrv_flush_co_entry(void *opaque)
+>  
+>  int coroutine_fn bdrv_co_flush(BlockDriverState *bs)
+>  {
+> -    int ret;
+> -
+> -    if (!bs || !bdrv_is_inserted(bs) || bdrv_is_read_only(bs) ||
+> -        bdrv_is_sg(bs)) {
+> -        return 0;
+> -    }
+> +    int current_gen;
+> +    int ret = 0;
+>  
+>      bdrv_inc_in_flight(bs);
+>  
+> -    int current_gen = bs->write_gen;
+> +    if (!bs || !bdrv_is_inserted(bs) || bdrv_is_read_only(bs) ||
+> +        bdrv_is_sg(bs)) {
+> +        goto early_exit;
+> +    }
+> +
+> +    current_gen = bs->write_gen;
+>  
+>      /* Wait until any previous flushes are completed */
+>      while (bs->active_flush_req) {
+> @@ -2370,6 +2371,7 @@ out:
+>      /* Return value is ignored - it's ok if wait queue is empty */
+>      qemu_co_queue_next(&bs->flush_queue);
+>  
+> +early_exit:
+>      bdrv_dec_in_flight(bs);
+>      return ret;
+>  }
+> 
 
-Read-write can use an alias to become read-only, but read-only cannot
-use an alias to become read-write.
-
-Let's sort this out later.
-
-> Pc.bios and isa.bios are backed by the same memory block,
-> so it may cause CPU TLB alias, any issue here?
-
-No, it's okay.
-
-Paolo
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
