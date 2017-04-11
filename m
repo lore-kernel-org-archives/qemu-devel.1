@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cxtdy-0001F1-61
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 07:07:31 -0400
+	(envelope-from <abologna@redhat.com>) id 1cxtgp-0001wr-Gd
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 07:10:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cxtdx-0003Ue-0B
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 07:07:30 -0400
-Date: Tue, 11 Apr 2017 19:07:15 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170411110715.GA8507@lemon>
-References: <20170410150542.30376-1-famz@redhat.com>
-	<20170410150542.30376-6-famz@redhat.com>
-	<20170411092807.GG4516@noname.str.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170411092807.GG4516@noname.str.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for 2.9 v3 05/10] async: Introduce
- aio_co_enter and aio_co_enter_if_inactive
+	(envelope-from <abologna@redhat.com>) id 1cxtgk-0004cO-Uj
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 07:10:27 -0400
+Message-ID: <1491909013.4099.4.camel@redhat.com>
+From: Andrea Bolognani <abologna@redhat.com>
+Date: Tue, 11 Apr 2017 13:10:13 +0200
+In-Reply-To: <1491396106-26376-22-git-send-email-clg@kaod.org>
+References: <1491396106-26376-1-git-send-email-clg@kaod.org>
+	<1491396106-26376-22-git-send-email-clg@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 21/21] ppc/pnv: Create a default
+ PCI layout
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,96 +24,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>
 
-On Tue, 04/11 11:28, Kevin Wolf wrote:
-> Am 10.04.2017 um 17:05 hat Fam Zheng geschrieben:
-> > They start the coroutine on the specified context.
-> > 
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > ---
-> >  include/block/aio.h | 18 ++++++++++++++++++
-> >  util/async.c        | 14 +++++++++++++-
-> >  2 files changed, 31 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/include/block/aio.h b/include/block/aio.h
-> > index 677b6ff..b0a6bb3 100644
-> > --- a/include/block/aio.h
-> > +++ b/include/block/aio.h
-> > @@ -511,6 +511,24 @@ void aio_co_schedule(AioContext *ctx, struct Coroutine *co);
-> >  void aio_co_wake(struct Coroutine *co);
-> >  
-> >  /**
-> > + * aio_co_enter:
-> > + * @ctx: the context to run the coroutine
-> > + * @co: the coroutine to run
-> > + *
-> > + * Enter a coroutine in the specified AioContext.
-> > + */
-> > +void aio_co_enter(AioContext *ctx, struct Coroutine *co);
-> > +
-> > +/**
-> > + * aio_co_enter_if_inactive:
-> > + * @ctx: the context to run the coroutine
-> > + * @co: the coroutine to run
-> > + *
-> > + * Enter a coroutine in the specified AioContext, if it's not already entered.
-> > + */
-> > +void aio_co_enter_if_inactive(AioContext *ctx, struct Coroutine *co);
-> > +
-> > +/**
-> >   * Return the AioContext whose event loop runs in the current thread.
-> >   *
-> >   * If called from an IOThread this will be the IOThread's AioContext.  If
-> > diff --git a/util/async.c b/util/async.c
-> > index 663e297..507671a 100644
-> > --- a/util/async.c
-> > +++ b/util/async.c
-> > @@ -453,6 +453,11 @@ void aio_co_wake(struct Coroutine *co)
-> >      smp_read_barrier_depends();
-> >      ctx = atomic_read(&co->ctx);
-> >  
-> > +    aio_co_enter(ctx, co);
-> > +}
-> > +
-> > +void aio_co_enter(AioContext *ctx, struct Coroutine *co)
-> > +{
-> >      if (ctx != qemu_get_current_aio_context()) {
-> >          aio_co_schedule(ctx, co);
-> >          return;
-> > @@ -464,11 +469,18 @@ void aio_co_wake(struct Coroutine *co)
-> >          QSIMPLEQ_INSERT_TAIL(&self->co_queue_wakeup, co, co_queue_next);
-> >      } else {
-> >          aio_context_acquire(ctx);
-> > -        qemu_coroutine_enter(co);
-> > +        qemu_aio_coroutine_enter(ctx, co);
-> >          aio_context_release(ctx);
-> >      }
-> >  }
-> >  
-> > +void aio_co_enter_if_inactive(AioContext *ctx, struct Coroutine *co)
-> > +{
-> > +    if (!qemu_coroutine_entered(co)) {
-> > +        aio_co_enter(ctx, co);
-> > +    }
-> > +}
-> 
-> Is this a useful function, though?
-> 
-> I think the only interesting case is the first qemu_coroutine_enter()
-> after a coroutine is created, here we may want it to run in a different
-> AioContext than the caller. However, once this has happened, it is
-> already running in the right AioContext and we can use the normal
-> functions without giving an explicit AioContext (except in cases where
-> we wouldn't reenter from a callback of that AioContext, but do such
-> cases even exist?)
-> 
-> So I expect that some patches down the series, we get a patch that
-> converts more than is actually necessary. Let's see.
-> 
-> Kevin
+On Wed, 2017-04-05 at 14:41 +0200, C=C3=A9dric Le Goater wrote:
+> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+>=C2=A0
+> This creates a legacy PCIe->PCI bridge under the PHB by default to whic=
+h
+> a bunch of standard devices are attached. Currently:
+>=C2=A0
+>=C2=A0=C2=A0=C2=A0- VGA (as specified by -vga)
+>=C2=A0=C2=A0=C2=A0- USB (with keyboard and mouse if graphcis is enabled)
+>=C2=A0=C2=A0=C2=A0- AHCI
+>=C2=A0=C2=A0=C2=A0- e1000
+>=C2=A0
+> This gives us something close to a standard OpenPower platform.
 
-You are right, actually this function is unused.
+These bridges and devices are not added when -nodefaults
+is in use, right?
 
-Fam
+--=C2=A0
+Andrea Bolognani / Red Hat / Virtualization
