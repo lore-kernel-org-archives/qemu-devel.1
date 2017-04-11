@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cxuYj-0005fc-KF
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 08:06:10 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cxua4-0006i9-8t
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 08:07:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cxuYf-0001gO-Ie
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 08:06:09 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57197)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cxuYf-0001fo-C6
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 08:06:05 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cxuYd-0007cJ-Om
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 12:06:04 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 309892E80D5
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 12:06:00 +0000 (UTC)
+	(envelope-from <peter.maydell@linaro.org>) id 1cxua3-00036k-F0
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 08:07:32 -0400
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:34576)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cxua3-00035D-8l
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 08:07:31 -0400
+Received: by mail-wr0-x232.google.com with SMTP id z109so27423280wrb.1
+	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 05:07:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 11 Apr 2017 11:52:51 -0000
-From: Marc Pignat <1635339@bugs.launchpad.net>
-Reply-To: Bug 1635339 <1635339@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20161020160532.23339.63373.malonedeb@soybean.canonical.com>
-Message-Id: <20170411115251.1711.79560.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1635339] Re: qxl_pre_save assertion failure on vm
- "save"
+In-Reply-To: <CAJKOXPecitJXUxfzPut-nt+TzMEfncNpHHshCbAeZ-4pe_S4Xw@mail.gmail.com>
+References: <20170318192509.15499-1-krzk@kernel.org>
+	<CAFEAcA8WGoa=DYXRH4MHfnHmUR_5-xERdmcuqrsk=bmS7GBCmg@mail.gmail.com>
+	<20170404134402.GA4196@kozik-book>
+	<CAFEAcA9UGEVVUfL3--goP4mVU+ezegWPcoka41XM8d_E2yyJkQ@mail.gmail.com>
+	<20170404143121.GA6421@kozik-book>
+	<CAFEAcA_DaW_DdcYweHPGpJrMNMP+Sd-Bw6W_OM7tCF5cMyh4aQ@mail.gmail.com>
+	<CAJKOXPecitJXUxfzPut-nt+TzMEfncNpHHshCbAeZ-4pe_S4Xw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 11 Apr 2017 13:07:09 +0100
+Message-ID: <CAFEAcA-FTFQMa_O24R7BWSorroCXrfQkDtqjrmty88A0fiLLHg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2] hw/misc: Add Exynos4210 Pseudo Random
+ Number Generator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,36 +35,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Did I miss something or this is a bug in the windows qxl driver and
-should be fixed there?
+On 11 April 2017 at 13:02, Krzysztof Kozlowski <krzk@kernel.org> wrote:
+> But first I need to setup proper booting image + rootfs instead of
+> only initramfs. The sdhci node is failing (missing regulators or
+> capabilities) so essentially there is no storage now.
+>
+> How do you access any kind of disk image in case of other boards?
 
--- =
+Depends on the board, some of them have SD controllers, a few
+have PCI controllers that can take a virtio or scsi controller.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1635339
-
-Title:
-  qxl_pre_save assertion failure on vm "save"
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  When I try and save my Windows 10 VM, I see an assertion failure, and
-  the machine is shut down.
-
-  I see the following in the log:
-
-  main_channel_handle_parsed: agent start
-  qemu-system-x86_64: /build/qemu-Zwynhi/qemu-2.5+dfsg/hw/display/qxl.c:210=
-1: qxl_pre_save: Assertion `d->last_release_offset < d->vga.vram_size' fail=
-ed.
-  2016-10-20 11:52:42.713+0000: shutting down
-
-  Please let me know what other information would be relevant!
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1635339/+subscriptions
+thanks
+-- PMM
