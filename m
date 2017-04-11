@@ -1,20 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47238)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1cxkTJ-00075D-Hc
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 21:19:54 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cxkUE-0007tV-5y
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 21:20:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1cxkTI-0006VW-G0
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 21:19:53 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cxkUA-0006ib-Uv
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 21:20:50 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53386
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1cxkUA-0006iL-P0
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 21:20:46 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3B1Iqx5041421
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 21:20:45 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 29rkcu498m-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 21:20:45 -0400
+Received: from localhost
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Mon, 10 Apr 2017 21:20:44 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20170410160023.GG3214@stefanha-x1.localdomain>
-References: <1491741460-10308-1-git-send-email-lidongchen@tencent.com>
-	<20170410160023.GG3214@stefanha-x1.localdomain>
-From: 858585 jemmy <jemmy858585@gmail.com>
-Date: Tue, 11 Apr 2017 09:19:49 +0800
-Message-ID: <CAOGPPbd=xQ_a5VtTdD6Cw0tmmaybjjbVgOPfF2CLw_E6fekZng@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v3] migration/block: use blk_pwrite_zeroes
- for each zero cluster
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20170407222016.15308-5-f4bug@amsat.org>
+References: <20170407222016.15308-1-f4bug@amsat.org>
+	<20170407222016.15308-5-f4bug@amsat.org>
+Date: Mon, 10 Apr 2017 20:20:26 -0500
+Message-Id: <149187362699.15312.3273219849572595103@loki>
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] qga: improve error handling in
+ transfer_memory_block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,121 +43,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, quintela@redhat.com, dgilbert@redhat.com, qemu-block@nongnu.org, Lidong Chen <lidongchen@tencent.com>
+To: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org
 
-On Tue, Apr 11, 2017 at 12:00 AM, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> On Sun, Apr 09, 2017 at 08:37:40PM +0800, jemmy858585@gmail.com wrote:
->> From: Lidong Chen <lidongchen@tencent.com>
->>
->> BLOCK_SIZE is (1 << 20), qcow2 cluster size is 65536 by default,
->> this maybe cause the qcow2 file size is bigger after migration.
->> This patch check each cluster, use blk_pwrite_zeroes for each
->> zero cluster.
->>
->> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
->> ---
->>  migration/block.c | 38 ++++++++++++++++++++++++++++++++++++--
->>  1 file changed, 36 insertions(+), 2 deletions(-)
->>
->> diff --git a/migration/block.c b/migration/block.c
->> index 7734ff7..fe613db 100644
->> --- a/migration/block.c
->> +++ b/migration/block.c
->> @@ -885,6 +885,8 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
->>      int64_t total_sectors = 0;
->>      int nr_sectors;
->>      int ret;
->> +    BlockDriverInfo bdi;
->> +    int cluster_size;
->>
->>      do {
->>          addr = qemu_get_be64(f);
->> @@ -934,8 +936,40 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
->>              } else {
->>                  buf = g_malloc(BLOCK_SIZE);
->>                  qemu_get_buffer(f, buf, BLOCK_SIZE);
->> -                ret = blk_pwrite(blk, addr * BDRV_SECTOR_SIZE, buf,
->> -                                 nr_sectors * BDRV_SECTOR_SIZE, 0);
->> +
->> +                ret = bdrv_get_info(blk_bs(blk), &bdi);
->> +                cluster_size = bdi.cluster_size;
->> +
->> +                if (ret == 0 && cluster_size > 0 &&
->> +                    cluster_size <= BLOCK_SIZE &&
->> +                    BLOCK_SIZE % cluster_size == 0) {
->
-> How about:
->
->   if (blk != blk_prev) {
->       blk_prev = blk;
->       total_sectors = blk_nb_sectors(blk);
->       if (total_sectors <= 0) {
->           error_report("Error getting length of block device %s",
->                        device_name);
->           return -EINVAL;
->       }
->
->       blk_invalidate_cache(blk, &local_err);
->       if (local_err) {
->           error_report_err(local_err);
->           return -EINVAL;
->       }
->
-> +     ret = bdrv_get_info(blk_bs(blk), &bdi);
-> +     if (ret == 0 && cluster_size > 0 && cluster_size <= BLOCK_SIZE &&
-> +         BLOCK_SIZE % cluster_size == 0) {
-> +         zero_cluster_size = bdi.cluster_size;
-> +     } else {
-> +         zero_cluster_size = 0;
-> +     }
->   }
->
-> That way we only fetch the cluster size once per device.
->
-> When processing a block we do without repeatedly fetching the cluster
-> size:
->
->   if (zero_cluster_size) {
->      ...detect zeroes...
->   }
+Quoting Philippe Mathieu-Daud=C3=A9 (2017-04-07 17:20:16)
+> Suggested-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-good idea, i will test again for this patch.
+Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 
->
->> +                    int i;
->> +                    int64_t cur_addr;
->> +                    uint8_t *cur_buf;
->> +
->> +                    for (i = 0; i < BLOCK_SIZE / cluster_size; i++) {
->> +                        cur_addr = addr * BDRV_SECTOR_SIZE
->> +                                        + i * cluster_size;
->> +                        cur_buf = buf + i * cluster_size;
->> +
->> +                        if (buffer_is_zero(cur_buf, cluster_size)) {
->> +                            ret = blk_pwrite_zeroes(blk, cur_addr,
->> +                                                    cluster_size,
->> +                                                    BDRV_REQ_MAY_UNMAP);
->> +                        } else {
->> +                             ret = blk_pwrite(blk, cur_addr, cur_buf,
->> +                                              cluster_size, 0);
->
-> Indentation is off here.
->
->> +                        }
->> +
->> +                        if (ret < 0) {
->> +                            g_free(buf);
->> +                            return ret;
->> +                        }
->> +                    }
->> +                } else {
->> +                    ret = blk_pwrite(blk, addr * BDRV_SECTOR_SIZE, buf,
->> +                                     nr_sectors * BDRV_SECTOR_SIZE, 0);
->> +                }
->>                  g_free(buf);
->>              }
->>
->> --
->> 1.8.3.1
->>
+> ---
+> =
+
+> Michael should I use Signed-off-by instead of the Suggested-by (since it =
+is your
+> code)?
+
+I suppose it could go either way depending on the circumstances
+(assuming you've asked for / obtained their SoB obviously), but
+speaking for myself here I don't think it's necessary.
+
+> =
+
+>  qga/commands-posix.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> =
+
+> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+> index fc45102a1e..ca5a24b2c9 100644
+> --- a/qga/commands-posix.c
+> +++ b/qga/commands-posix.c
+> @@ -2128,6 +2128,9 @@ static void transfer_memory_block(GuestMemoryBlock =
+*mem_blk, bool sys2memblk,
+>              if (errno =3D=3D ENOENT) {
+>                  result->response =3D
+>                      GUEST_MEMORY_BLOCK_RESPONSE_TYPE_OPERATION_NOT_SUPPO=
+RTED;
+> +            } else {
+> +                result->response =3D
+> +                    GUEST_MEMORY_BLOCK_RESPONSE_TYPE_OPERATION_FAILED;
+>              }
+>              goto out1;
+>          }
+> -- =
+
+> 2.11.0
+>=20
