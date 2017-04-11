@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cxkR9-0005J8-8P
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 21:17:41 -0400
+	(envelope-from <eblake@redhat.com>) id 1cxkRB-0005MA-Ab
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 21:17:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cxkR6-0005rZ-P4
-	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 21:17:39 -0400
+	(envelope-from <eblake@redhat.com>) id 1cxkR9-0005sr-It
+	for qemu-devel@nongnu.org; Mon, 10 Apr 2017 21:17:41 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 10 Apr 2017 20:17:10 -0500
-Message-Id: <20170411011718.9152-6-eblake@redhat.com>
+Date: Mon, 10 Apr 2017 20:17:12 -0500
+Message-Id: <20170411011718.9152-8-eblake@redhat.com>
 In-Reply-To: <20170411011718.9152-1-eblake@redhat.com>
 References: <20170411011718.9152-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v9 05/13] qcow2: Optimize write zero of
- unaligned tail cluster
+Subject: [Qemu-devel] [PATCH v9 07/13] qcow2: Discard/zero clusters by byte
+ count
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,280 +23,239 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
 
-We've already improved discards to operate efficiently on the tail
-of an unaligned qcow2 image; it's time to make a similar improvement
-to write zeroes.  The special case is only valid at the tail
-cluster of a file, where we must recognize that any sectors beyond
-the image end would implicitly read as zero, and therefore should
-not penalize our logic for widening a partial cluster into writing
-the whole cluster as zero.
+Passing a byte offset, but sector count, when we ultimately
+want to operate on cluster granularity, is madness.  Clean up
+the external interfaces to take both offset and count as bytes,
+while still keeping the assertion added previously that the
+caller must align the values to a cluster.  Then rename things
+to make sure backports don't get confused by changed units:
+instead of qcow2_discard_clusters() and qcow2_zero_clusters(),
+we now have qcow2_cluster_discard() and qcow2_cluster_zeroize().
 
-Update test 154 to cover the new scenarios, using two images of
-intentionally differing length.
-
-While at it, fix the test to gracefully skip when run as
-./check -qcow2 -o compat=0.10 154
-since the older format lacks zero clusters already required earlier
-in the test.
+The internal functions still operate on clusters at a time, and
+return an int for number of cleared clusters; but on an image
+with 2M clusters, a single L2 table holds 256k entries that each
+represent a 2M cluster, totalling well over INT_MAX bytes if we
+ever had a request for that many bytes at once.  All our callers
+currently limit themselves to 32-bit bytes (and therefore fewer
+clusters), but by making this function 64-bit clean, we have one
+less place to clean up if we later improve the block layer to
+support 64-bit bytes through all operations (with the block layer
+auto-fragmenting on behalf of more-limited drivers), rather than
+the current state where some interfaces are artificially limited
+to INT_MAX at a time.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
----
- block/qcow2.c              |   7 +++
- tests/qemu-iotests/154     | 111 ++++++++++++++++++++++++++++++++++++++++++++-
- tests/qemu-iotests/154.out |  82 +++++++++++++++++++++++++++++++++
- 3 files changed, 198 insertions(+), 2 deletions(-)
 
+---
+v9: rebase to earlier changes, drop R-b
+v7, v8: only earlier half of series submitted for 2.9
+v6: rebase due to context
+v5: s/count/byte/ to make the units obvious, and rework the math
+to ensure no 32-bit integer overflow on large clusters
+v4: improve function names, split assertion additions into earlier patch
+[no v3 or v2]
+v1: https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg00339.html
+---
+ block/qcow2.h          |  9 +++++----
+ block/qcow2-cluster.c  | 39 ++++++++++++++++++++++-----------------
+ block/qcow2-snapshot.c |  7 +++----
+ block/qcow2.c          | 21 +++++++++------------
+ 4 files changed, 39 insertions(+), 37 deletions(-)
+
+diff --git a/block/qcow2.h b/block/qcow2.h
+index f8aeb08..808104c 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -544,10 +544,11 @@ uint64_t qcow2_alloc_compressed_cluster_offset(BlockDriverState *bs,
+                                          int compressed_size);
+
+ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m);
+-int qcow2_discard_clusters(BlockDriverState *bs, uint64_t offset,
+-    int nb_sectors, enum qcow2_discard_type type, bool full_discard);
+-int qcow2_zero_clusters(BlockDriverState *bs, uint64_t offset, int nb_sectors,
+-                        int flags);
++int qcow2_cluster_discard(BlockDriverState *bs, uint64_t offset,
++                          uint64_t bytes, enum qcow2_discard_type type,
++                          bool full_discard);
++int qcow2_cluster_zeroize(BlockDriverState *bs, uint64_t offset,
++                          uint64_t bytes, int flags);
+
+ int qcow2_expand_zero_clusters(BlockDriverState *bs,
+                                BlockDriverAmendStatusCB *status_cb,
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 362a855..595e6e3 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -1509,16 +1509,16 @@ static int discard_single_l2(BlockDriverState *bs, uint64_t offset,
+     return nb_clusters;
+ }
+
+-int qcow2_discard_clusters(BlockDriverState *bs, uint64_t offset,
+-    int nb_sectors, enum qcow2_discard_type type, bool full_discard)
++int qcow2_cluster_discard(BlockDriverState *bs, uint64_t offset,
++                          uint64_t bytes, enum qcow2_discard_type type,
++                          bool full_discard)
+ {
+     BDRVQcow2State *s = bs->opaque;
+-    uint64_t end_offset;
++    uint64_t end_offset = offset + bytes;
+     uint64_t nb_clusters;
++    int64_t cleared;
+     int ret;
+
+-    end_offset = offset + (nb_sectors << BDRV_SECTOR_BITS);
+-
+     /* Caller must pass aligned values, except at image end */
+     assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
+     assert(QEMU_IS_ALIGNED(end_offset, s->cluster_size) ||
+@@ -1530,13 +1530,15 @@ int qcow2_discard_clusters(BlockDriverState *bs, uint64_t offset,
+
+     /* Each L2 table is handled by its own loop iteration */
+     while (nb_clusters > 0) {
+-        ret = discard_single_l2(bs, offset, nb_clusters, type, full_discard);
+-        if (ret < 0) {
++        cleared = discard_single_l2(bs, offset, nb_clusters, type,
++                                    full_discard);
++        if (cleared < 0) {
++            ret = cleared;
+             goto fail;
+         }
+
+-        nb_clusters -= ret;
+-        offset += (ret * s->cluster_size);
++        nb_clusters -= cleared;
++        offset += (cleared * s->cluster_size);
+     }
+
+     ret = 0;
+@@ -1591,20 +1593,22 @@ static int zero_single_l2(BlockDriverState *bs, uint64_t offset,
+     return nb_clusters;
+ }
+
+-int qcow2_zero_clusters(BlockDriverState *bs, uint64_t offset, int nb_sectors,
+-                        int flags)
++int qcow2_cluster_zeroize(BlockDriverState *bs, uint64_t offset,
++                          uint64_t bytes, int flags)
+ {
+     BDRVQcow2State *s = bs->opaque;
+     uint64_t end_offset;
+     uint64_t nb_clusters;
++    int64_t cleared;
+     int ret;
+
+-    end_offset = offset + (nb_sectors << BDRV_SECTOR_BITS);
++    end_offset = offset + bytes;
+
+     /* Caller must pass aligned values, except at image end */
+     assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
+     assert(QEMU_IS_ALIGNED(end_offset, s->cluster_size) ||
+            end_offset == bs->total_sectors << BDRV_SECTOR_BITS);
++    assert(QEMU_IS_ALIGNED(bytes, s->cluster_size));
+
+     /* The zero flag is only supported by version 3 and newer; we
+      * require the use of that flag if there is a backing file or if
+@@ -1615,18 +1619,19 @@ int qcow2_zero_clusters(BlockDriverState *bs, uint64_t offset, int nb_sectors,
+     }
+
+     /* Each L2 table is handled by its own loop iteration */
+-    nb_clusters = size_to_clusters(s, nb_sectors << BDRV_SECTOR_BITS);
++    nb_clusters = size_to_clusters(s, bytes);
+
+     s->cache_discards = true;
+
+     while (nb_clusters > 0) {
+-        ret = zero_single_l2(bs, offset, nb_clusters, flags);
+-        if (ret < 0) {
++        cleared = zero_single_l2(bs, offset, nb_clusters, flags);
++        if (cleared < 0) {
++            ret = cleared;
+             goto fail;
+         }
+
+-        nb_clusters -= ret;
+-        offset += (ret * s->cluster_size);
++        nb_clusters -= cleared;
++        offset += (cleared * s->cluster_size);
+     }
+
+     ret = 0;
+diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
+index 0324243..44243e0 100644
+--- a/block/qcow2-snapshot.c
++++ b/block/qcow2-snapshot.c
+@@ -440,10 +440,9 @@ int qcow2_snapshot_create(BlockDriverState *bs, QEMUSnapshotInfo *sn_info)
+
+     /* The VM state isn't needed any more in the active L1 table; in fact, it
+      * hurts by causing expensive COW for the next snapshot. */
+-    qcow2_discard_clusters(bs, qcow2_vm_state_offset(s),
+-                           align_offset(sn->vm_state_size, s->cluster_size)
+-                                >> BDRV_SECTOR_BITS,
+-                           QCOW2_DISCARD_NEVER, false);
++    qcow2_cluster_discard(bs, qcow2_vm_state_offset(s),
++                          align_offset(sn->vm_state_size, s->cluster_size),
++                          QCOW2_DISCARD_NEVER, false);
+
+ #ifdef DEBUG_ALLOC
+     {
 diff --git a/block/qcow2.c b/block/qcow2.c
-index 5c1573c..8038793 100644
+index 8038793..4d34610 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -2449,6 +2449,10 @@ static bool is_zero_sectors(BlockDriverState *bs, int64_t start,
-     BlockDriverState *file;
-     int64_t res;
+@@ -2508,7 +2508,7 @@ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
+     trace_qcow2_pwrite_zeroes(qemu_coroutine_self(), offset, count);
 
-+    if (start + count > bs->total_sectors) {
-+        count = bs->total_sectors - start;
-+    }
-+
-     if (!count) {
-         return true;
+     /* Whatever is left can use real zero clusters */
+-    ret = qcow2_zero_clusters(bs, offset, count >> BDRV_SECTOR_BITS, flags);
++    ret = qcow2_cluster_zeroize(bs, offset, count, flags);
+     qemu_co_mutex_unlock(&s->lock);
+
+     return ret;
+@@ -2531,8 +2531,8 @@ static coroutine_fn int qcow2_co_pdiscard(BlockDriverState *bs,
      }
-@@ -2467,6 +2471,9 @@ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
-     uint32_t tail = (offset + count) % s->cluster_size;
 
-     trace_qcow2_pwrite_zeroes_start_req(qemu_coroutine_self(), offset, count);
-+    if (offset + count == bs->total_sectors * BDRV_SECTOR_SIZE) {
-+        tail = 0;
-+    }
+     qemu_co_mutex_lock(&s->lock);
+-    ret = qcow2_discard_clusters(bs, offset, count >> BDRV_SECTOR_BITS,
+-                                 QCOW2_DISCARD_REQUEST, false);
++    ret = qcow2_cluster_discard(bs, offset, count, QCOW2_DISCARD_REQUEST,
++                                false);
+     qemu_co_mutex_unlock(&s->lock);
+     return ret;
+ }
+@@ -2839,9 +2839,8 @@ fail:
+ static int qcow2_make_empty(BlockDriverState *bs)
+ {
+     BDRVQcow2State *s = bs->opaque;
+-    uint64_t start_sector;
+-    int sector_step = (QEMU_ALIGN_DOWN(INT_MAX, s->cluster_size) /
+-                       BDRV_SECTOR_SIZE);
++    uint64_t offset, end_offset;
++    int step = QEMU_ALIGN_DOWN(INT_MAX, s->cluster_size);
+     int l1_clusters, ret = 0;
 
-     if (head || tail) {
-         int64_t cl_start = (offset - head) >> BDRV_SECTOR_BITS;
-diff --git a/tests/qemu-iotests/154 b/tests/qemu-iotests/154
-index 7ca7219..66128f5 100755
---- a/tests/qemu-iotests/154
-+++ b/tests/qemu-iotests/154
-@@ -2,7 +2,7 @@
- #
- # qcow2 specific bdrv_pwrite_zeroes tests with backing files (complements 034)
- #
--# Copyright (C) 2016 Red Hat, Inc.
-+# Copyright (C) 2016-2017 Red Hat, Inc.
- #
- # This program is free software; you can redistribute it and/or modify
- # it under the terms of the GNU General Public License as published by
-@@ -42,7 +42,10 @@ _supported_proto file
- _supported_os Linux
+     l1_clusters = DIV_ROUND_UP(s->l1_size, s->cluster_size / sizeof(uint64_t));
+@@ -2858,18 +2857,16 @@ static int qcow2_make_empty(BlockDriverState *bs)
 
- CLUSTER_SIZE=4k
--size=128M
-+size=$((128 * 1024 * 1024))
-+
-+# This test requires zero clusters, added in v3 images
-+_unsupported_imgopts compat=0.10
-
- echo
- echo == backing file contains zeros ==
-@@ -299,6 +302,110 @@ $QEMU_IO -c "read -P 0 75k 1k" "$TEST_IMG" | _filter_qemu_io
-
- $QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-
-+echo
-+echo == unaligned image tail cluster, no allocation needed ==
-+
-+CLUSTER_SIZE=1024 TEST_IMG="$TEST_IMG.base" _make_test_img $((size + 1024))
-+_make_test_img -b "$TEST_IMG.base" $((size + 2048))
-+
-+# With no backing file, write to all or part of unallocated partial cluster
-+
-+# Backing file: 128m: ... | 00 --
-+$QEMU_IO -c "write -z $size 512" "$TEST_IMG.base" | _filter_qemu_io
-+
-+# Backing file: 128m: ... | -- 00
-+$QEMU_IO -c "write -z $size 512" "$TEST_IMG.base" | _filter_qemu_io
-+
-+# Backing file: 128m: ... | 00 00
-+$QEMU_IO -c "write -z $size 1024" "$TEST_IMG.base" | _filter_qemu_io
-+
-+# No offset should be allocated, although the cluster itself is considered
-+# allocated due to the zero flag
-+$QEMU_IO -c "alloc $size 1024" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG.base" | _filter_qemu_img_map
-+
-+# With backing file that reads as zero, write to all or part of entire cluster
-+
-+# Backing file: 128m: ... | 00 00
-+# Active layer: 128m: ... | 00 00 00 00
-+$QEMU_IO -c "write -z $size 2048" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+# Backing file: 128m: ... | 00 00
-+# Active layer: 128m: ... | 00 00 -- --
-+$QEMU_IO -c "write -z $((size)) 1024" "$TEST_IMG" | _filter_qemu_io
-+
-+# Backing file: 128m: ... | 00 00
-+# Active layer: 128m: ... | -- -- 00 00
-+$QEMU_IO -c "write -z $((size + 1024)) 1024" "$TEST_IMG" | _filter_qemu_io
-+
-+# Backing file: 128m: ... | 00 00
-+# Active layer: 128m: ... | -- 00 00 --
-+$QEMU_IO -c "write -z $((size + 512)) 1024" "$TEST_IMG" | _filter_qemu_io
-+
-+# No offset should be allocated, although the cluster itself is considered
-+# allocated due to the zero flag
-+$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+# Preallocated cluster is not freed when unmap is not requested
-+
-+# Backing file: 128m: ... | XX -- => ... | XX 00
-+$QEMU_IO -c "write $((size)) 512" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IO -c "write -z $((size + 512)) 512" "$TEST_IMG.base" | _filter_qemu_io
-+
-+# Backing file: 128m: ... | XX 00 => ... | 00 00
-+$QEMU_IO -c "write -z $((size)) 1024" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG.base" | _filter_qemu_img_map
-+
-+echo
-+echo == unaligned image tail cluster, allocation required ==
-+
-+CLUSTER_SIZE=512 TEST_IMG="$TEST_IMG.base" _make_test_img $((size + 1024))
-+_make_test_img -b "$TEST_IMG.base" $((size + 2048))
-+
-+# Write beyond backing file must COW
-+# Backing file: 128m: ... | XX --
-+# Active layer: 128m: ... | -- -- 00 --
-+
-+$QEMU_IO -c "write -P 1 $((size)) 512" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IO -c "write -z $((size + 1024)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 1 $((size)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 0 $((size + 512)) 1536" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+CLUSTER_SIZE=512 TEST_IMG="$TEST_IMG.base" _make_test_img $((size + 1024))
-+_make_test_img -b "$TEST_IMG.base" $((size + 2048))
-+
-+# Writes at boundaries of (partial) cluster must not lose mid-cluster data
-+# Backing file: 128m: ... | -- XX
-+# Active layer: 128m: ... | 00 -- -- 00
-+
-+$QEMU_IO -c "write -P 1 $((size + 512)) 512" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IO -c "write -z $((size)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 0 $((size)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 1 $((size + 512)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 0 $((size + 1024)) 1024" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "write -z $((size + 1536)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 0 $((size)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 1 $((size + 512)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 0 $((size + 1024)) 1024" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+CLUSTER_SIZE=512 TEST_IMG="$TEST_IMG.base" _make_test_img $((size + 1024))
-+_make_test_img -b "$TEST_IMG.base" $((size + 2048))
-+
-+# Partial write must not lose data
-+# Backing file: 128m: ... | -- --
-+# Active layer: 128m: ... | -- -- XX 00
-+
-+$QEMU_IO -c "write -P 1 $((size + 1024)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "write -z $((size + 1536)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 0 $((size)) 1024" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 1 $((size + 1024)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 0 $((size + 1536)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
- # success, all done
- echo "*** done"
- rm -f $seq.full
-diff --git a/tests/qemu-iotests/154.out b/tests/qemu-iotests/154.out
-index da9eabd..d6e76f4 100644
---- a/tests/qemu-iotests/154.out
-+++ b/tests/qemu-iotests/154.out
-@@ -282,4 +282,86 @@ read 1024/1024 bytes at offset 76800
- { "start": 69632, "length": 4096, "depth": 0, "zero": true, "data": false},
- { "start": 73728, "length": 4096, "depth": 0, "zero": false, "data": true, "offset": 24576},
- { "start": 77824, "length": 134139904, "depth": 1, "zero": true, "data": false}]
-+
-+== unaligned image tail cluster, no allocation needed ==
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134218752
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
-+wrote 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 1024/1024 bytes at offset 134217728
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+1024/1024 bytes allocated at offset 128 MiB
-+[{ "start": 0, "length": 134218752, "depth": 0, "zero": true, "data": false}]
-+wrote 2048/2048 bytes at offset 134217728
-+2 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
-+{ "start": 134217728, "length": 2048, "depth": 0, "zero": true, "data": false}]
-+wrote 1024/1024 bytes at offset 134217728
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 1024/1024 bytes at offset 134218752
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 1024/1024 bytes at offset 134218240
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+2048/2048 bytes allocated at offset 128 MiB
-+[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
-+{ "start": 134217728, "length": 2048, "depth": 0, "zero": true, "data": false}]
-+wrote 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 134218240
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 1024/1024 bytes at offset 134217728
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+[{ "start": 0, "length": 134218752, "depth": 0, "zero": true, "data": false}]
-+
-+== unaligned image tail cluster, allocation required ==
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134218752
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
-+wrote 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 134218752
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 1536/1536 bytes at offset 134218240
-+1.500 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
-+{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": 20480}]
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134218752
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
-+wrote 512/512 bytes at offset 134218240
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 134218240
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 1024/1024 bytes at offset 134218752
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 134219264
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 134218240
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 1024/1024 bytes at offset 134218752
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
-+{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": 20480}]
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134218752
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
-+wrote 512/512 bytes at offset 134218752
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 134219264
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 1024/1024 bytes at offset 134217728
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 134218752
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 134219264
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
-+{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": 20480}]
- *** done
+     /* This fallback code simply discards every active cluster; this is slow,
+      * but works in all cases */
+-    for (start_sector = 0; start_sector < bs->total_sectors;
+-         start_sector += sector_step)
++    end_offset = bs->total_sectors * BDRV_SECTOR_SIZE;
++    for (offset = 0; offset < end_offset; offset += step)
+     {
+         /* As this function is generally used after committing an external
+          * snapshot, QCOW2_DISCARD_SNAPSHOT seems appropriate. Also, the
+          * default action for this kind of discard is to pass the discard,
+          * which will ideally result in an actually smaller image file, as
+          * is probably desired. */
+-        ret = qcow2_discard_clusters(bs, start_sector * BDRV_SECTOR_SIZE,
+-                                     MIN(sector_step,
+-                                         bs->total_sectors - start_sector),
+-                                     QCOW2_DISCARD_SNAPSHOT, true);
++        ret = qcow2_cluster_discard(bs, offset, MIN(step, end_offset - offset),
++                                    QCOW2_DISCARD_SNAPSHOT, true);
+         if (ret < 0) {
+             break;
+         }
 -- 
 2.9.3
