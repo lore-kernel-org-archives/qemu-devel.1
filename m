@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cxnSK-0000Hf-U2
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 00:31:06 -0400
+	(envelope-from <hrgstephen@gmail.com>) id 1cxniE-0001qk-0o
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 00:47:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cxnSH-0006VM-1W
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 00:31:04 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36944)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cxnSG-0006Ug-Ri
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 00:31:00 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cxnSF-0008Nz-2c
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 04:30:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9AB1B2E8193
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 04:30:54 +0000 (UTC)
+	(envelope-from <hrgstephen@gmail.com>) id 1cxniD-0004wf-5y
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 00:47:30 -0400
+Received: from mail-ua0-x243.google.com ([2607:f8b0:400c:c08::243]:33866)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hrgstephen@gmail.com>)
+	id 1cxniD-0004vv-1R
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 00:47:29 -0400
+Received: by mail-ua0-x243.google.com with SMTP id u59so7446674uau.1
+	for <qemu-devel@nongnu.org>; Mon, 10 Apr 2017 21:47:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <alpine.DEB.2.10.1704101243270.2759@sstabellini-ThinkPad-X260>
+References: <CADZi59zNxk-Yr4rpN1E49s=AdsdW-W9YfhpCvpJeBz7oigyFSg@mail.gmail.com>
+	<CADZi59xe6OcCasvtkPBjP7nTsgDA5r_E_Rt7W88BszYdJhuxGQ@mail.gmail.com>
+	<CADZi59xEg0SvScgo=Jg0MxTbGYY=nTX18Qo-4GMkfayThDU9zw@mail.gmail.com>
+	<alpine.DEB.2.10.1704101159340.2759@sstabellini-ThinkPad-X260>
+	<alpine.DEB.2.10.1704101243270.2759@sstabellini-ThinkPad-X260>
+From: hrg <hrgstephen@gmail.com>
+Date: Tue, 11 Apr 2017 12:47:26 +0800
+Message-ID: <CADZi59yC4m+wFS+iJUrV9Y59X96cQVMnrCNLvcd5o2kdjmqQdA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 11 Apr 2017 04:17:51 -0000
-From: Launchpad Bug Tracker <897193@bugs.launchpad.net>
-Reply-To: Bug 897193 <897193@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20111128122433.14324.27427.malonedeb@gac.canonical.com>
-Message-Id: <20170411041752.21757.66875.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 897193] Re: virtfs: kernel compile fails
+Subject: Re: [Qemu-devel] [RFC/BUG] xen-mapcache: buggy invalidate map cache?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,76 +33,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xensource.com, qemu-devel@nongnu.org, Jun Nakajima <jun.nakajima@intel.com>, Alexander Graf <agraf@suse.de>, xen-devel@lists.xenproject.org, xen-devel@lists.xen.org, "Herongguang (Stephen)" <herongguang.he@huawei.com>, wangxinxin.wang@huawei.com
 
-[Expired for QEMU because there has been no activity for 60 days.]
+On Tue, Apr 11, 2017 at 3:50 AM, Stefano Stabellini
+<sstabellini@kernel.org> wrote:
+> On Mon, 10 Apr 2017, Stefano Stabellini wrote:
+>> On Mon, 10 Apr 2017, hrg wrote:
+>> > On Sun, Apr 9, 2017 at 11:55 PM, hrg <hrgstephen@gmail.com> wrote:
+>> > > On Sun, Apr 9, 2017 at 11:52 PM, hrg <hrgstephen@gmail.com> wrote:
+>> > >> Hi,
+>> > >>
+>> > >> In xen_map_cache_unlocked(), map to guest memory maybe in entry->ne=
+xt
+>> > >> instead of first level entry (if map to rom other than guest memory
+>> > >> comes first), while in xen_invalidate_map_cache(), when VM balloone=
+d
+>> > >> out memory, qemu did not invalidate cache entries in linked
+>> > >> list(entry->next), so when VM balloon back in memory, gfns probably
+>> > >> mapped to different mfns, thus if guest asks device to DMA to these
+>> > >> GPA, qemu may DMA to stale MFNs.
+>> > >>
+>> > >> So I think in xen_invalidate_map_cache() linked lists should also b=
+e
+>> > >> checked and invalidated.
+>> > >>
+>> > >> What=E2=80=99s your opinion? Is this a bug? Is my analyze correct?
+>>
+>> Yes, you are right. We need to go through the list for each element of
+>> the array in xen_invalidate_map_cache. Can you come up with a patch?
+>
+> I spoke too soon. In the regular case there should be no locked mappings
+> when xen_invalidate_map_cache is called (see the DPRINTF warning at the
+> beginning of the functions). Without locked mappings, there should never
+> be more than one element in each list (see xen_map_cache_unlocked:
+> entry->lock =3D=3D true is a necessary condition to append a new entry to
+> the list, otherwise it is just remapped).
+>
+> Can you confirm that what you are seeing are locked mappings
+> when xen_invalidate_map_cache is called? To find out, enable the DPRINTK
+> by turning it into a printf or by defininig MAPCACHE_DEBUG.
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/897193
-
-Title:
-  virtfs: kernel compile fails
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  I am trying to compile a kernel under virtfs, and am getting an error.
-  The error does not occur when compiling outside of the virtfs mount.
-
-  Both guest and host are running the 3.0.4 kernel.
-  QEMU is latest from git: bc75c9e50d308b2ec6623a40179c5cdc84b63dae
-
-  QEMU command line:
-  /usr/local/bin/qemu-system-x86_64 -nographic -boot c -m 1024 -machine typ=
-e=3Dpc,accel=3Dkvm -drive file=3D/root/hdd1.img,if=3Dvirtio -drive file=3D/=
-root/test1.img,if=3Dvirtio -drive file=3D/root/test2.img,if=3Dvirtio -virtf=
-s local,path=3D/mnt/virtfs,security_model=3Dnone,mount_tag=3Dvirtfs -net ni=
-c,model=3Dvirtio,macaddr=3DDE:AD:BE:EF:AA:BB -net tap,ifname=3Dqtap0,script=
-=3Dno
-
-  virtfs line in /etc/fstab:
-  virtfs                  /mnt/virtfs             9p      defaults,noauto,t=
-rans=3Dvirtio    0 0
-
-  Steps to reproduce and output:
-
-  [root@guest linux-3.0.4]# make mrproper
-    CLEAN   scripts/basic
-    CLEAN   scripts/kconfig
-    CLEAN   include/config include/generated
-    CLEAN   .config .config.old
-  [root@guest linux-3.0.4]# make defconfig
-    HOSTCC  scripts/basic/fixdep
-    HOSTCC  scripts/kconfig/conf.o
-    SHIPPED scripts/kconfig/zconf.tab.c
-    SHIPPED scripts/kconfig/lex.zconf.c
-    SHIPPED scripts/kconfig/zconf.hash.c
-    HOSTCC  scripts/kconfig/zconf.tab.o
-    HOSTLD  scripts/kconfig/conf
-  *** Default configuration is based on 'x86_64_defconfig'
-  #
-  # configuration written to .config
-  #
-  [root@guest linux-3.0.4]# make
-  scripts/kconfig/conf --silentoldconfig Kconfig
-
-  *** Error during update of the configuration.
-
-  make[2]: *** [silentoldconfig] Error 1
-  make[1]: *** [silentoldconfig] Error 2
-  make: *** No rule to make target `include/config/auto.conf', needed by `i=
-nclude/config/kernel.release'.  Stop.
-
-  =
-
-  Please let me know if you need any other information.  Thanks!
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/897193/+subscriptions
+In fact, I think the DPRINTF above is incorrect too. In
+pci_add_option_rom(), rtl8139 rom is locked mapped in
+pci_add_option_rom->memory_region_get_ram_ptr (after
+memory_region_init_ram). So actually I think we should remove the
+DPRINTF warning as it is normal.
