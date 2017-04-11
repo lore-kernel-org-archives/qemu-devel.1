@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1cxwEx-0004Fr-7h
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:53:53 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cxwF2-0004HK-L3
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:53:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1cxwEt-0004hd-Ah
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:53:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46018)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1cxwEt-0004hP-1T
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:53:47 -0400
-References: <20170411101002.28451-1-maxime.coquelin@redhat.com>
-	<20170411101002.28451-2-maxime.coquelin@redhat.com>
-	<CAJ+F1CL8kK0XcMwueX8+kbDF=aVhBiRJ66gGoUNcUOmk=Yg7og@mail.gmail.com>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <7dfc220c-b22b-bd7d-53af-caf49275b66c@redhat.com>
-Date: Tue, 11 Apr 2017 15:53:37 +0200
+	(envelope-from <mreitz@redhat.com>) id 1cxwF1-0004nZ-Kz
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:53:56 -0400
+References: <20170411131327.10734-1-mreitz@redhat.com>
+	<CAFEAcA_bvMvXa7MtYY0UGhF6xwqFhTCU2ZEy7phj95fFXTzd8g@mail.gmail.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <6edf1cdd-86f7-3a09-ee7a-364ee18b697a@redhat.com>
+Date: Tue, 11 Apr 2017 15:53:49 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CL8kK0XcMwueX8+kbDF=aVhBiRJ66gGoUNcUOmk=Yg7og@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 1/2] spec/vhost-user: Introduce secondary
- channel for slave initiated requests
+In-Reply-To: <CAFEAcA_bvMvXa7MtYY0UGhF6xwqFhTCU2ZEy7phj95fFXTzd8g@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="7oLJIsKhvv9MNwgbHcgqPwLfqQ4QouR9N"
+Subject: Re: [Qemu-devel] [PATCH for-2.9?] block/nfs: Do not strcmp() with
+ NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,294 +25,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, mst@redhat.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, peterx@redhat.com, yuanhan.liu@linux.intel.com, virtio-comment@lists.oasis-open.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, Peter Lieven <pl@kamp.de>, QEMU Developers <qemu-devel@nongnu.org>
 
-Hi Marc-Andr=C3=A9,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--7oLJIsKhvv9MNwgbHcgqPwLfqQ4QouR9N
+From: Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>,
+ Jeff Cody <jcody@redhat.com>, Peter Lieven <pl@kamp.de>,
+ QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <6edf1cdd-86f7-3a09-ee7a-364ee18b697a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.9?] block/nfs: Do not strcmp() with
+ NULL
+References: <20170411131327.10734-1-mreitz@redhat.com>
+ <CAFEAcA_bvMvXa7MtYY0UGhF6xwqFhTCU2ZEy7phj95fFXTzd8g@mail.gmail.com>
+In-Reply-To: <CAFEAcA_bvMvXa7MtYY0UGhF6xwqFhTCU2ZEy7phj95fFXTzd8g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 04/11/2017 03:06 PM, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->
-> On Tue, Apr 11, 2017 at 12:10 PM Maxime Coquelin
-> <maxime.coquelin@redhat.com <mailto:maxime.coquelin@redhat.com>> wrote:
->
->     This vhost-user specification update aims at enabling the
->     slave to send requests to the master using a dedicated socket
->     created by the master.
->
->     It can be used for example when the slave implements a device
->     IOTLB to send cache miss requests to the master.
->
->     The message types list is updated with an "Initiator" field to
->     indicate for each type whether the master and/or slave can
->     initiate the request.
->
->     Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com
->     <mailto:maxime.coquelin@redhat.com>>
->
->
-> This is very similar to a patch I proposed for shutdown slave initiated
-> requests:
-> https://lists.gnu.org/archive/html/qemu-devel/2016-04/msg00095.html
-
-Indeed, thanks for pointing this out, I wasn't aware of your series.
-
-I find your proposal of having dedicated messages types
-(VHOST_USER_SLAVE_*) cleaner.
-
-Are you ok if I handover your patch, and replace
-VHOST_USER_SET_SLAVE_FD to VHOST_USER_SET_SLAVE_REQ_FD?
-
->
->
->     ---
->      docs/specs/vhost-user.txt | 38 +++++++++++++++++++++++++++++++++++=
-+++
->      1 file changed, 38 insertions(+)
->
->     diff --git a/docs/specs/vhost-user.txt b/docs/specs/vhost-user.txt
->     index 036890f..b365047 100644
->     --- a/docs/specs/vhost-user.txt
->     +++ b/docs/specs/vhost-user.txt
->     @@ -139,6 +139,7 @@ in the ancillary data:
->       * VHOST_USER_SET_VRING_KICK
->       * VHOST_USER_SET_VRING_CALL
->       * VHOST_USER_SET_VRING_ERR
->     + * VHOST_USER_SET_SLAVE_REQ_FD
->
->
-> I like "slave-req-fd" better than "slave-fd"
->
->
->      If Master is unable to send the full message or receives a wrong
->     reply it will
->      close the connection. An optional reconnection mechanism can be
->     implemented.
->     @@ -150,6 +151,11 @@ As older slaves don't support negotiating
->     protocol features,
->      a feature bit was dedicated for this purpose:
->      #define VHOST_USER_F_PROTOCOL_FEATURES 30
->
->     +If the slave supports VHOST_USER_PROTOCOL_F_SLAVE_REQ protocol
->     feature, the
->     +master may create a secondary Unix domain socket and send its file
->     descriptor
->     +to the slave using VHOST_USER_SET_SLAVE_REQ_FD request. This new
->     channel enables
->     +the slave to send message requests and master to send message repl=
-ies.
->     +
->      Starting and stopping rings
->      ----------------------
->      Client must only process each ring when it is started.
->     @@ -260,6 +266,7 @@ Protocol features
->      #define VHOST_USER_PROTOCOL_F_RARP           2
->      #define VHOST_USER_PROTOCOL_F_REPLY_ACK      3
->      #define VHOST_USER_PROTOCOL_F_MTU            4
->     +#define VHOST_USER_PROTOCOL_F_SLAVE_REQ      5
->
->      Message types
->      -------------
->     @@ -268,6 +275,7 @@ Message types
->
->            Id: 1
->            Equivalent ioctl: VHOST_GET_FEATURES
->     +      Initiator: Master
->            Master payload: N/A
->            Slave payload: u64
->
->     @@ -279,6 +287,7 @@ Message types
->
->            Id: 2
->            Ioctl: VHOST_SET_FEATURES
->     +      Initiator: Master
->            Master payload: u64
->
->            Enable features in the underlying vhost implementation using
->     a bitmask.
->     @@ -289,6 +298,7 @@ Message types
->
->            Id: 15
->            Equivalent ioctl: VHOST_GET_FEATURES
->     +      Initiator: Master
->            Master payload: N/A
->            Slave payload: u64
->
->     @@ -302,6 +312,7 @@ Message types
->
->            Id: 16
->            Ioctl: VHOST_SET_FEATURES
->     +      Initiator: Master
->            Master payload: u64
->
->            Enable protocol features in the underlying vhost implementat=
-ion.
->     @@ -314,6 +325,7 @@ Message types
->
->            Id: 3
->            Equivalent ioctl: VHOST_SET_OWNER
->     +      Initiator: Master
->            Master payload: N/A
->
->            Issued when a new connection is established. It sets the
->     current Master
->     @@ -323,6 +335,7 @@ Message types
->       * VHOST_USER_RESET_OWNER
->
->            Id: 4
->     +      Initiator: Master
->            Master payload: N/A
->
->            This is no longer used. Used to be sent to request disabling
->     @@ -335,6 +348,7 @@ Message types
->
->            Id: 5
->            Equivalent ioctl: VHOST_SET_MEM_TABLE
->     +      Initiator: Master
->            Master payload: memory regions description
->
->            Sets the memory map regions on the slave so it can translate
->     the vring
->     @@ -346,6 +360,7 @@ Message types
->
->            Id: 6
->            Equivalent ioctl: VHOST_SET_LOG_BASE
->     +      Initiator: Master
->            Master payload: u64
->            Slave payload: N/A
->
->     @@ -360,6 +375,7 @@ Message types
->
->            Id: 7
->            Equivalent ioctl: VHOST_SET_LOG_FD
->     +      Initiator: Master
->            Master payload: N/A
->
->            Sets the logging file descriptor, which is passed as
->     ancillary data.
->     @@ -368,6 +384,7 @@ Message types
->
->            Id: 8
->            Equivalent ioctl: VHOST_SET_VRING_NUM
->     +      Initiator: Master
->            Master payload: vring state description
->
->            Set the size of the queue.
->     @@ -376,6 +393,7 @@ Message types
->
->            Id: 9
->            Equivalent ioctl: VHOST_SET_VRING_ADDR
->     +      Initiator: Master
->            Master payload: vring address description
->            Slave payload: N/A
->
->     @@ -385,6 +403,7 @@ Message types
->
->            Id: 10
->            Equivalent ioctl: VHOST_SET_VRING_BASE
->     +      Initiator: Master
->            Master payload: vring state description
->
->            Sets the base offset in the available vring.
->     @@ -393,6 +412,7 @@ Message types
->
->            Id: 11
->            Equivalent ioctl: VHOST_USER_GET_VRING_BASE
->     +      Initiator: Master
->            Master payload: vring state description
->            Slave payload: vring state description
->
->     @@ -402,6 +422,7 @@ Message types
->
->            Id: 12
->            Equivalent ioctl: VHOST_SET_VRING_KICK
->     +      Initiator: Master
->            Master payload: u64
->
->            Set the event file descriptor for adding buffers to the vrin=
-g. It
->     @@ -415,6 +436,7 @@ Message types
->
->            Id: 13
->            Equivalent ioctl: VHOST_SET_VRING_CALL
->     +      Initiator: Master
->            Master payload: u64
->
->            Set the event file descriptor to signal when buffers are use=
-d. It
->     @@ -428,6 +450,7 @@ Message types
->
->            Id: 14
->            Equivalent ioctl: VHOST_SET_VRING_ERR
->     +      Initiator: Master
->            Master payload: u64
->
->            Set the event file descriptor to signal when error occurs. I=
-t
->     @@ -440,6 +463,7 @@ Message types
->
->            Id: 17
->            Equivalent ioctl: N/A
->     +      Initiator: Master
->            Master payload: N/A
->            Slave payload: u64
->
->     @@ -451,6 +475,7 @@ Message types
->
->            Id: 18
->            Equivalent ioctl: N/A
->     +      Initiator: Master
->            Master payload: vring state description
->
->            Signal slave to enable or disable corresponding vring.
->     @@ -461,6 +486,7 @@ Message types
->
->            Id: 19
->            Equivalent ioctl: N/A
->     +      Initiator: Master
->            Master payload: u64
->
->            Ask vhost user backend to broadcast a fake RARP to notify th=
+On 11.04.2017 15:30, Peter Maydell wrote:
+> On 11 April 2017 at 14:13, Max Reitz <mreitz@redhat.com> wrote:
+>> Parsing the URI is not required to give us a scheme; uri->scheme may b=
 e
->     migration
->     @@ -475,6 +501,7 @@ Message types
->
->            Id: 20
->            Equivalent ioctl: N/A
->     +      Initiator: Master
->            Master payload: u64
->
->            Set host MTU value exposed to the guest.
->     @@ -486,6 +513,17 @@ Message types
->            If VHOST_USER_PROTOCOL_F_REPLY_ACK is negotiated, slave must
->     respond
->            with zero in case the specified MTU is valid, or non-zero
->     otherwise.
->
->     + * VHOST_USER_SET_SLAVE_REQ_FD
->     +
->     +      Id: 21
->     +      Equivalent ioctl: N/A
->     +      Initiator: Master
->     +
->     +      Set the socket file descriptor for slave initiated requests.
->     +      This request should be sent only when
->     VHOST_USER_F_PROTOCOL_FEATURES
->     +      has been negotiated, and protocol feature bit
->     VHOST_USER_PROTOCOL_F_SLAVE_REQ
->     +      bit is present in VHOST_USER_GET_PROTOCOL_FEATURES.
->     +
->
->
-> looks good to me
->
->
->      VHOST_USER_PROTOCOL_F_REPLY_ACK:
->      -------------------------------
->      The original vhost-user specification only demands replies for cer=
-tain
->     --
->     2.9.3
->
->
-> --
-> Marc-Andr=C3=A9 Lureau
+>> NULL.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>  block/nfs.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/block/nfs.c b/block/nfs.c
+>> index 0816678307..0c7d5619fe 100644
+>> --- a/block/nfs.c
+>> +++ b/block/nfs.c
+>> @@ -83,7 +83,7 @@ static int nfs_parse_uri(const char *filename, QDict=
+ *options, Error **errp)
+>>          error_setg(errp, "Invalid URI specified");
+>>          goto out;
+>>      }
+>> -    if (strcmp(uri->scheme, "nfs") !=3D 0) {
+>> +    if (!uri->scheme || strcmp(uri->scheme, "nfs") !=3D 0) {
+>>          error_setg(errp, "URI scheme must be 'nfs'");
+>>          goto out;
+>>      }
+>=20
+> Just as a record of IRC discussion, a lot of the callers of uri_parse()=
+
+> get this wrong; for instance
+>  qemu-img info -f nbd blub#://
+>  qemu-img info -f sheepdog blub#://
+> both segfault.
+
+Yes, thanks for catching this.
+
+>                So since this isn't new (2.8 behaved the same way) I thi=
+nk
+> we should not try to fix this at this point in the 2.9 release cycle.
+
+And also because it'll always be a NULL pointer dereference, so it's not
+*too* bad.
+
+(If it had been just the single place in block/nfs.c, I think it would
+have made sense to still take this into 2.9 (because the fix is trivial
+and obviously makes sense), but sprinkling this "all over the place"
+(well, 8 lines changed) is a bit different.)
+
+> For 2.10 we might consider whether there's a change we could make to
+> the uri_parse() API that makes this mistake less easy. (For instance
+> do any of the users really ever want to handle a relative URL without
+> a schema?)
+
+Well, gluster (the only caller of uri_parse() which handles NULL scheme
+correctly) just defaults to a scheme then. So changing this might mean
+to break compatibility.
+
+In my opinion, if someone wants to improve uri_parse(), great, but I'm
+neither the maintainer of util/uri.c (not that we really have one...),
+nor have I ever touched it before, so I'm not exactly avid to be the one
+to do so.
+
+I think the number of callers is manageable (5), they're all in the
+block layer, they all do roughly the same with the result, and they all
+do the appropriate NULL checks except for URI.scheme. So just
+(trivially) fixing those 8 lines seems to be much easier and good enough
+from my perspective.
+
+(Rather than giving uri_parse() a new interface which might introduce
+again new bugs...)
+
+Max
+
+
+--7oLJIsKhvv9MNwgbHcgqPwLfqQ4QouR9N
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljs3+0SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AThAIALOiuzicseM0dICx26EEfcdy3Cws4ttz
++B4k1vvnIK6iSECTYhl4shIP3sCLmjcndQyrWd/Z0XnlZuqDW2T/M+SsEf4JBtum
+mCucA7KA/x6/GlfdgO8cVKcDU4VWAlqITawd984PJQ6+puEPLfhDs6YhY3c4UY4z
+QaJRJE6F8jPuy2E0ixTZDGAgHmSv08+3JGVxOQcpL3F5fAIqFCBup6nUx0MLu8De
+zw8AjbcgCRvpmjC1eTzVN5VwIiuwZ/6cfibJ4NLnIlvVfQqtbqCP4rPDYWtWdqT7
+J2sEJhhpYMZHwCiASKyZpGvjkkAxTcD2zmu4F697IQ2RuUUA9qHwprc=
+=8TRL
+-----END PGP SIGNATURE-----
+
+--7oLJIsKhvv9MNwgbHcgqPwLfqQ4QouR9N--
