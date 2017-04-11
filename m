@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cxx9z-00019M-GQ
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 10:52:48 -0400
+	(envelope-from <dan.j.williams@intel.com>) id 1cxxDq-0002G7-6k
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 10:56:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cxx9y-0008PC-NW
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 10:52:47 -0400
-References: <20170411145050.31290-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <97a7574e-4c00-62bb-e154-a4085b6243e0@redhat.com>
-Date: Tue, 11 Apr 2017 16:52:21 +0200
+	(envelope-from <dan.j.williams@intel.com>) id 1cxxDo-0001RY-Uk
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 10:56:46 -0400
+Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:35142)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
+	id 1cxxDo-0001QE-OY
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 10:56:44 -0400
+Received: by mail-oi0-x230.google.com with SMTP id f22so56285061oib.2
+	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 07:56:42 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170411145050.31290-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="StrRKNJxepu6wOg29X7oVHX3djtQQr5HD"
-Subject: Re: [Qemu-devel] [PATCH for-2.9?] block/io: Comment out permission
- assertions
+In-Reply-To: <20170411084133.wroqrhn5eczesqam@hz-desktop>
+References: <20170331084147.32716-1-haozhong.zhang@intel.com>
+	<20170406094359.GB21261@stefanha-x1.localdomain>
+	<30db934f-d27e-1d15-6257-84224283dea9@gmail.com>
+	<20170411084133.wroqrhn5eczesqam@hz-desktop>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Tue, 11 Apr 2017 07:56:41 -0700
+Message-ID: <CAPcyv4hmQRTn-KdUVYQjgb16cnprJ9yep+STFd1id4zEgL1rCg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [RFC PATCH 0/4] nvdimm: enable flush hint address
+ structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,58 +32,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Xiao Guangrong <guangrong.xiao@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Dan J Williams <dan.j.williams@intel.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Christoph Hellwig <hch@infradead.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---StrRKNJxepu6wOg29X7oVHX3djtQQr5HD
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Laurent Vivier <lvivier@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Fam Zheng <famz@redhat.com>
-Message-ID: <97a7574e-4c00-62bb-e154-a4085b6243e0@redhat.com>
-Subject: Re: [PATCH for-2.9?] block/io: Comment out permission assertions
-References: <20170411145050.31290-1-mreitz@redhat.com>
-In-Reply-To: <20170411145050.31290-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+[ adding Christoph ]
 
-On 11.04.2017 16:50, Max Reitz wrote:
-> In case of block migration, there may be writes to BlockBackends that d=
-o
-> not have the write permission taken. Before this issue is fixed (which
-> is not going to happen in 2.9), we therefore cannot assert that this is=
+On Tue, Apr 11, 2017 at 1:41 AM, Haozhong Zhang
+<haozhong.zhang@intel.com> wrote:
+> On 04/06/17 20:02 +0800, Xiao Guangrong wrote:
+>>
+>>
+>> On 04/06/2017 05:43 PM, Stefan Hajnoczi wrote:
+>> > On Fri, Mar 31, 2017 at 04:41:43PM +0800, Haozhong Zhang wrote:
+>> > > This patch series constructs the flush hint address structures for
+>> > > nvdimm devices in QEMU.
+>> > >
+>> > > It's of course not for 2.9. I send it out early in order to get
+>> > > comments on one point I'm uncertain (see the detailed explanation
+>> > > below). Thanks for any comments in advance!
+>> > > Background
+>> > > ---------------
+>> >
+>> > Extra background:
+>> >
+>> > Flush Hint Addresses are necessary because:
+>> >
+>> > 1. Some hardware configurations may require them.  In other words, a
+>> >    cache flush instruction is not enough to persist data.
+>> >
+>> > 2. The host file system may need fsync(2) calls (e.g. to persist
+>> >    metadata changes).
+>> >
+>> > Without Flush Hint Addresses only some NVDIMM configurations actually
+>> > guarantee data persistence.
+>> >
+>> > > Flush hint address structure is a substructure of NFIT and specifies
+>> > > one or more addresses, namely Flush Hint Addresses. Software can write
+>> > > to any one of these flush hint addresses to cause any preceding writes
+>> > > to the NVDIMM region to be flushed out of the intervening platform
+>> > > buffers to the targeted NVDIMM. More details can be found in ACPI Spec
+>> > > 6.1, Section 5.2.25.8 "Flush Hint Address Structure".
+>> >
+>> > Do you have performance data?  I'm concerned that Flush Hint Address
+>> > hardware interface is not virtualization-friendly.
+>> >
+>> > In Linux drivers/nvdimm/region_devs.c:nvdimm_flush() does:
+>> >
+>> >   wmb();
+>> >   for (i = 0; i < nd_region->ndr_mappings; i++)
+>> >       if (ndrd_get_flush_wpq(ndrd, i, 0))
+>> >           writeq(1, ndrd_get_flush_wpq(ndrd, i, idx));
+>> >   wmb();
+>> >
+>> > That looks pretty lightweight - it's an MMIO write between write
+>> > barriers.
+>> >
+>> > This patch implements the MMIO write like this:
+>> >
+>> >   void nvdimm_flush(NVDIMMDevice *nvdimm)
+>> >   {
+>> >       if (nvdimm->backend_fd != -1) {
+>> >           /*
+>> >            * If the backend store is a physical NVDIMM device, fsync()
+>> >            * will trigger the flush via the flush hint on the host device.
+>> >            */
+>> >           fsync(nvdimm->backend_fd);
+>> >       }
+>> >   }
+>> >
+>> > The MMIO store instruction turned into a synchronous fsync(2) system
+>> > call plus vmexit/vmenter and QEMU userspace context switch:
+>> >
+>> > 1. The vcpu blocks during the fsync(2) system call.  The MMIO write
+>> >    instruction has an unexpected and huge latency.
+>> >
+>> > 2. The vcpu thread holds the QEMU global mutex so all other threads
+>> >    (including the monitor) are blocked during fsync(2).  Other vcpu
+>> >    threads may block if they vmexit.
+>> >
+>> > It is hard to implement this efficiently in QEMU.  This is why I said
+>> > the hardware interface is not virtualization-friendly.  It's cheap on
+>> > real hardware but expensive under virtualization.
+>> >
+>> > We should think about the optimal way of implementing Flush Hint
+>> > Addresses in QEMU.  But if there is no reasonable way to implement them
+>> > then I think it's better *not* to implement them, just like the Block
+>> > Window feature which is also not virtualization-friendly.  Users who
+>> > want a block device can use virtio-blk.  I don't think NVDIMM Block
+>> > Window can achieve better performance than virtio-blk under
+>> > virtualization (although I'm happy to be proven wrong).
+>> >
+>> > Some ideas for a faster implementation:
+>> >
+>> > 1. Use memory_region_clear_global_locking() to avoid taking the QEMU
+>> >    global mutex.  Little synchronization is necessary as long as the
+>> >    NVDIMM device isn't hot unplugged (not yet supported anyway).
+>> >
+>> > 2. Can the host kernel provide a way to mmap Address Flush Hints from
+>> >    the physical NVDIMM in cases where the configuration does not require
+>> >    host kernel interception?  That way QEMU can map the physical
+>> >    NVDIMM's Address Flush Hints directly into the guest.  The hypervisor
+>> >    is bypassed and performance would be good.
+>> >
+>> > I'm not sure there is anything we can do to make the case where the host
+>> > kernel wants an fsync(2) fast :(.
+>>
+>> Good point.
+>>
+>> We can assume flush-CPU-cache-to-make-persistence is always
+>> available on Intel's hardware so that flush-hint-table is not
+>> needed if the vNVDIMM is based on a real Intel's NVDIMM device.
+>>
+>
+> We can let users of qemu (e.g. libvirt) detect whether the backend
+> device supports ADR, and pass 'flush-hint' option to qemu only if ADR
+> is not supported.
+>
 
-> the case.
->=20
-> Suggested-by: Kevin Wolf <kwolf@redhat.com>
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  block.c    |  6 +++++-
->  block/io.c | 12 ++++++++++--
->  2 files changed, 15 insertions(+), 3 deletions(-)
+There currently is no ACPI mechanism to detect the presence of ADR.
+Also, you still need the flush for fs metadata management.
 
-I'll send a revert for 2.10 if/when this is merged.
+>> If the vNVDIMM device is based on the regular file, i think
+>> fsync is the bottleneck rather than this mmio-virtualization. :(
+>>
+>
+> Yes, fsync() on the regular file is the bottleneck. We may either
+>
+> 1/ perform the host-side flush in an asynchronous way which will not
+>    block vcpu too long,
+>
+> or
+>
+> 2/ not provide strong durability guarantee for non-NVDIMM backend and
+>    not emulate flush-hint for guest at all. (I know 1/ does not
+>    provide strong durability guarantee either).
 
-Max
+or
 
-
---StrRKNJxepu6wOg29X7oVHX3djtQQr5HD
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljs7aUSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AoTQH/3Ddmdq4Ym2f6gItxO+FjsJwLi6muMdJ
-3u+9WmrjNjn2BWmjKJaESYw9ffZSfnZdi5ndOFMTtXiIbvWCPc8UfeLysYIvbbbn
-LwimxIPtEZt2cBHg7fNy5hhiPWq+FMKQNNKx2LoebZzZVnWmVeYRxjTfGUv7UEPk
-ZsooiwMmGzsOVYcvrt2om8dcuL40NwzinxQnsARdPaFs/n1iRXKjmZhh+bpgJlvX
-2t3teqdkM8Rkk9xevAfqZ8XqrwMNElnzMi8ajLphYAFnzj6oITJvBhicvxRQ1mPy
-fBfdJM0dA57KcztNJe4Lvcdc3JL9aKOfSN1qZGTmcmQKdai5qCQHqjE=
-=tYYR
------END PGP SIGNATURE-----
-
---StrRKNJxepu6wOg29X7oVHX3djtQQr5HD--
+3/ Use device-dax as a stop-gap until we can get an efficient fsync()
+overhead reduction (or bypass) mechanism built and accepted for
+filesystem-dax.
