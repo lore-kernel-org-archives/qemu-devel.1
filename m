@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vfeenstr@redhat.com>) id 1cxroT-0007hR-Sd
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:10:15 -0400
+	(envelope-from <armbru@redhat.com>) id 1cxrrA-0008Uw-0I
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:13:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vfeenstr@redhat.com>) id 1cxroQ-0001zm-Iz
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:10:13 -0400
-Received: from mail-wr0-f182.google.com ([209.85.128.182]:33835)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <vfeenstr@redhat.com>) id 1cxroQ-0001zC-8w
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:10:10 -0400
-Received: by mail-wr0-f182.google.com with SMTP id z109so24479416wrb.1
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 02:10:10 -0700 (PDT)
-From: Vinzenz Feenstra <vfeenstr@redhat.com>
-Message-Id: <42362591-42D0-452B-A8C9-60DA0C5F6876@redhat.com>
-Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Date: Tue, 11 Apr 2017 11:10:06 +0200
-In-Reply-To: <CAKPgXcE95EgoxoSD9CdY0Rt6WWtKDfZTjePpE=GMXB4EXp9UGQ@mail.gmail.com>
-References: <20170323113913.26974-1-vfeenstr@redhat.com>
-	<20170323113913.26974-2-vfeenstr@redhat.com>
-	<CAKPgXcE95EgoxoSD9CdY0Rt6WWtKDfZTjePpE=GMXB4EXp9UGQ@mail.gmail.com>
-Content-Type: text/plain;
-	charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5] qga: Add `guest-get-timezone` command
+	(envelope-from <armbru@redhat.com>) id 1cxrr4-00031Y-TM
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:12:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47665)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cxrr4-00031J-KI
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:12:54 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9E44C75721
+	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 09:12:52 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <1490860207-8302-1-git-send-email-thuth@redhat.com>
+	<1490860207-8302-2-git-send-email-thuth@redhat.com>
+	<c341bda5-8e1d-2717-3606-51ef1611d1a8@redhat.com>
+	<678cd353-56cb-3dac-3f91-966cb5abeb34@redhat.com>
+	<55a17a77-9ab4-519a-b917-695fd33fd4be@redhat.com>
+Date: Tue, 11 Apr 2017 11:12:48 +0200
+In-Reply-To: <55a17a77-9ab4-519a-b917-695fd33fd4be@redhat.com> (John Snow's
+	message of "Tue, 4 Apr 2017 10:33:47 -0400")
+Message-ID: <87fuhfcnov.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] libqtest: Ignore QMP events when
+ parsing the response for HMP commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,127 +37,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Eric Blake <eblake@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@gmail.com>, Sameeh Jubran <sameeh@daynix.com>
+To: John Snow <jsnow@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
 
-PING?
+John Snow <jsnow@redhat.com> writes:
 
+> On 04/04/2017 03:31 AM, Thomas Huth wrote:
+>> On 03.04.2017 21:09, John Snow wrote:
+>>>
+>>>
+>>> On 03/30/2017 03:50 AM, Thomas Huth wrote:
+>>>> When running certain HMP commands (like "device_del") via QMP, we
+>>>> can sometimes get a QMP event in the response first, so that the
+>>>> "g_assert(ret)" statement in qtest_hmp() triggers and the test
+>>>> fails. Fix this by ignoring such QMP events while looking for the
+>>>> real return value from QMP.
+>>>>
+>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>>> ---
+>>>>  tests/libqtest.c | 6 ++++++
+>>>>  1 file changed, 6 insertions(+)
+>>>>
+>>>> diff --git a/tests/libqtest.c b/tests/libqtest.c
+>>>> index a5c3d2b..c9b2d76 100644
+>>>> --- a/tests/libqtest.c
+>>>> +++ b/tests/libqtest.c
+>>>> @@ -580,6 +580,12 @@ char *qtest_hmpv(QTestState *s, const char *fmt, va_list ap)
+>>>>                       " 'arguments': {'command-line': %s}}",
+>>>>                       cmd);
+>>>>      ret = g_strdup(qdict_get_try_str(resp, "return"));
+>>>> +    while (ret == NULL && qdict_get_try_str(resp, "event")) {
+>>>> +        /* Ignore asynchronous QMP events */
+>>>> +        QDECREF(resp);
+>>>> +        resp = qtest_qmp_receive(s);
+>>>> +        ret = g_strdup(qdict_get_try_str(resp, "return"));
+>>>> +    }
+>>>>      g_assert(ret);
+>>>>      QDECREF(resp);
+>>>>      g_free(cmd);
+>>>>
+>>>
+>>> You've probably been asked this, but can you just shove the QMP response
+>>> you don't want into the event queue for consumption by other calls?
+>> 
+>> Well, this is the qtest_hmpv() function, so I assume that the caller
+>> just wants to execute a HMP command and does not really care about QMP
+>> events. If you care about QMP events, you should use the qmp functions
+>> instead.
+>> 
+>>  Thomas
+>> 
+>
+> I don't think it's obvious that using HMP functions should cause the QMP
+> stream to become faulty, though.
 
-> On Apr 4, 2017, at 11:42 AM, Sameeh Jubran <sameeh@daynix.com> wrote:
->=20
-> I have tested the patch on Windows 2012 R2
->=20
-> Reviewed-by: Sameeh Jubran <sameeh@daynix.com =
-<mailto:sameeh@daynix.com>>
-> Tested-by: Sameeh Jubran <sameeh@daynix.com =
-<mailto:sameeh@daynix.com>>
->=20
-> On Thu, Mar 23, 2017 at 2:39 PM, Vinzenz 'evilissimo' Feenstra =
-<vfeenstr@redhat.com <mailto:vfeenstr@redhat.com>> wrote:
-> From: Vinzenz Feenstra <vfeenstr@redhat.com =
-<mailto:vfeenstr@redhat.com>>
->=20
-> Adds a new command `guest-get-timezone` reporting the currently
-> configured timezone on the system. The information on what timezone is
-> currently is configured is useful in case of Windows VMs where the
-> offset of the hardware clock is required to have the same offset. This
-> can be used for management systems like `oVirt` to detect the timezone
-> difference and warn administrators of the misconfiguration.
->=20
-> Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com =
-<mailto:vfeenstr@redhat.com>>
-> ---
->  qga/commands.c       | 29 +++++++++++++++++++++++++++++
->  qga/qapi-schema.json | 26 ++++++++++++++++++++++++++
->  2 files changed, 55 insertions(+)
->=20
-> diff --git a/qga/commands.c b/qga/commands.c
-> index 4d92946..3b5789c 100644
-> --- a/qga/commands.c
-> +++ b/qga/commands.c
-> @@ -499,3 +499,32 @@ int ga_parse_whence(GuestFileWhence *whence, =
-Error **errp)
->      error_setg(errp, "invalid whence code %"PRId64, whence->u.value);
->      return -1;
->  }
-> +
-> +GuestTimezone *qmp_guest_get_timezone(Error **errp)
-> +{
-> +    GuestTimezone *info =3D g_new0(GuestTimezone, 1);
-> +    GTimeZone *tz =3D g_time_zone_new_local();
-> +    if (tz =3D=3D NULL) {
-> +        error_setg(errp, QERR_QGA_COMMAND_FAILED,
-> +                   "Couldn't retrieve local timezone");
-> +        goto error;
-> +    }
-> +
-> +    gint64 now =3D g_get_real_time() / G_USEC_PER_SEC;
-> +    gint32 intv =3D g_time_zone_find_interval(tz, =
-G_TIME_TYPE_UNIVERSAL, now);
-> +    info->offset =3D g_time_zone_get_offset(tz, intv);
-> +    gchar const *name =3D g_time_zone_get_abbreviation(tz, intv);
-> +    if (name !=3D NULL) {
-> +        info->has_zone =3D true;
-> +        info->zone =3D g_strdup(name);
-> +    }
-> +    g_time_zone_unref(tz);
-> +
-> +    return info;
-> +
-> +error:
-> +    g_time_zone_unref(tz);
-> +    g_free(info);
-> +    return NULL;
-> +}
-> +
-> diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-> index a02dbf2..5183ea2 100644
-> --- a/qga/qapi-schema.json
-> +++ b/qga/qapi-schema.json
-> @@ -1042,3 +1042,29 @@
->    'data':    { 'path': 'str', '*arg': ['str'], '*env': ['str'],
->                 '*input-data': 'str', '*capture-output': 'bool' },
->    'returns': 'GuestExec' }
-> +
-> +
-> +##
-> +# @GuestTimezone:
-> +#
-> +# @zone:    Timezone name
-> +# @offset:  Offset to UTC in seconds, negative numbers for time zones =
-west of
-> +#           GMT, positive numbers for east
-> +#
-> +# Since: 2.10
-> +##
-> +{ 'struct': 'GuestTimezone',
-> +  'data':   { '*zone': 'str', 'offset': 'int' } }
-> +
-> +
-> +##
-> +# @guest-get-timezone:
-> +#
-> +# Retrieves the timezone information from the guest.
-> +#
-> +# Returns: A GuestTimezone dictionary.
-> +#
-> +# Since: 2.10
-> +##
-> +{ 'command': 'guest-get-timezone',
-> +  'returns': 'GuestTimezone' }
-> --
-> 2.9.3
->=20
->=20
->=20
->=20
-> --=20
-> Respectfully,
-> Sameeh Jubran
-> Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>
-> Software Engineer @ Daynix <http://www.daynix.com/>.
+qtest_hmpv() is a helper function.  It tries to be convenient for the
+common case.  In particular, it receives, checks and consumes the QMP
+reply.  Before the patch, it screws up when QMP events arrive before the
+reply.  The patch fixes it by also consuming the events.  Makes sense.
 
---
-Vinzenz Feenstra
-Senior Software Developer
-Red Hat Czech
+The non-obviousness should be addressed in the function comment.
+
+> If someone uses an HMP function and then tries to wait on a QMP event to
+> confirm that some key condition has occurred (pausing or resuming, for
+> instance) it would not be immediately apparent from the user's POV that
+> this function just eats replies because it was convenient to do so.
+
+Code that needs to see events can't use this helper function.  It needs
+to use more primitive functions instead.
+
+> I guess the event queue only exists in python though, so it's not as
+> trivial as I was thinking it would be...
+
+More sophisticated handling of QMP events in libqtest is out of scope
+for this patch.  I'm not passing judgement on whether it would be
+useful :)
+
+With the function comment updated to mention QMP events get consumed:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
