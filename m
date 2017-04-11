@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1cxull-0001lG-Vb
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 08:19:39 -0400
+	(envelope-from <drjones@redhat.com>) id 1cxunM-0002V0-G4
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 08:21:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1cxulk-0000PI-Bh
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 08:19:37 -0400
+	(envelope-from <drjones@redhat.com>) id 1cxunJ-0001Dd-9p
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 08:21:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52592)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1cxunJ-0001A2-0X
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 08:21:13 -0400
+Date: Tue, 11 Apr 2017 14:21:04 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20170411122104.flz7rx4ue2g5dq3q@kamzik.brq.redhat.com>
+References: <1491900566-32222-1-git-send-email-he.chen@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20170410135203.GA20631@stefanha-x1.localdomain>
-References: <1491384478-12325-1-git-send-email-lidongchen@tencent.com>
-	<20170406140255.GA31259@stefanha-x1.localdomain>
-	<CAOGPPbfpN5QVxzvAkRv4MY7nE0YBxU0-UeMuJpVCe-wBB_9p8A@mail.gmail.com>
-	<20170407113450.GO13602@stefanha-x1.localdomain>
-	<CAOGPPbcf6bPXmVGFcw3niNznPx1BHsA=uR2G0sN=AV6xhWXMrA@mail.gmail.com>
-	<20170410135203.GA20631@stefanha-x1.localdomain>
-From: 858585 jemmy <jemmy858585@gmail.com>
-Date: Tue, 11 Apr 2017 20:19:29 +0800
-Message-ID: <CAOGPPbeMnM8z5DFaXFAEOswy94z1OYsRXVRe7LLg8S7RHS46QA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3] migration/block:limit the
- time used for block migration
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1491900566-32222-1-git-send-email-he.chen@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v6] Allow setting NUMA distance for
+ different NUMA nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,183 +27,385 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, Lidong Chen <lidongchen@tencent.com>
+To: He Chen <he.chen@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Mon, Apr 10, 2017 at 9:52 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> On Sat, Apr 08, 2017 at 09:17:58PM +0800, 858585 jemmy wrote:
->> On Fri, Apr 7, 2017 at 7:34 PM, Stefan Hajnoczi <stefanha@redhat.com> wrote:
->> > On Fri, Apr 07, 2017 at 09:30:33AM +0800, 858585 jemmy wrote:
->> >> On Thu, Apr 6, 2017 at 10:02 PM, Stefan Hajnoczi <stefanha@redhat.com> wrote:
->> >> > On Wed, Apr 05, 2017 at 05:27:58PM +0800, jemmy858585@gmail.com wrote:
->> >> >
->> >> > A proper solution is to refactor the synchronous code to make it
->> >> > asynchronous.  This might require invoking the system call from a
->> >> > thread pool worker.
->> >> >
->> >>
->> >> yes, i agree with you, but this is a big change.
->> >> I will try to find how to optimize this code, maybe need a long time.
->> >>
->> >> this patch is not a perfect solution, but can alleviate the problem.
->> >
->> > Let's try to understand the problem fully first.
->> >
->>
->> when migrate the vm with high speed, i find vnc response slowly sometime.
->> not only vnc response slowly, virsh console aslo response slowly sometime.
->> and the guest os block io performance is also reduce.
->>
->> the bug can be reproduce by this command:
->> virsh migrate-setspeed 165cf436-312f-47e7-90f2-f8aa63f34893 900
->> virsh migrate --live 165cf436-312f-47e7-90f2-f8aa63f34893
->> --copy-storage-inc qemu+ssh://10.59.163.38/system
->>
->> and --copy-storage-all have no problem.
->> virsh migrate --live 165cf436-312f-47e7-90f2-f8aa63f34893
->> --copy-storage-all qemu+ssh://10.59.163.38/system
->>
->> compare the difference between --copy-storage-inc and
->> --copy-storage-all. i find out the reason is
->> mig_save_device_bulk invoke bdrv_is_allocated, but bdrv_is_allocated
->> is synchronous and maybe wait
->> for a long time.
->>
->> i write this code to measure the time used by  brdrv_is_allocated()
->>
->>  279     static int max_time = 0;
->>  280     int tmp;
->>
->>  288             clock_gettime(CLOCK_MONOTONIC_RAW, &ts1);
->>  289             ret = bdrv_is_allocated(blk_bs(bb), cur_sector,
->>  290                                     MAX_IS_ALLOCATED_SEARCH, &nr_sectors);
->>  291             clock_gettime(CLOCK_MONOTONIC_RAW, &ts2);
->>  292
->>  293
->>  294             tmp =  (ts2.tv_sec - ts1.tv_sec)*1000000000L
->>  295                            + (ts2.tv_nsec - ts1.tv_nsec);
->>  296             if (tmp > max_time) {
->>  297                max_time=tmp;
->>  298                fprintf(stderr, "max_time is %d\n", max_time);
->>  299             }
->>
->> the test result is below:
->>
->>  max_time is 37014
->>  max_time is 1075534
->>  max_time is 17180913
->>  max_time is 28586762
->>  max_time is 49563584
->>  max_time is 103085447
->>  max_time is 110836833
->>  max_time is 120331438
->>
->> bdrv_is_allocated is called after qemu_mutex_lock_iothread.
->> and the main thread is also call qemu_mutex_lock_iothread.
->> so cause the main thread maybe wait for a long time.
->>
->>    if (bmds->shared_base) {
->>         qemu_mutex_lock_iothread();
->>         aio_context_acquire(blk_get_aio_context(bb));
->>         /* Skip unallocated sectors; intentionally treats failure as
->>          * an allocated sector */
->>         while (cur_sector < total_sectors &&
->>                !bdrv_is_allocated(blk_bs(bb), cur_sector,
->>                                   MAX_IS_ALLOCATED_SEARCH, &nr_sectors)) {
->>             cur_sector += nr_sectors;
->>         }
->>         aio_context_release(blk_get_aio_context(bb));
->>         qemu_mutex_unlock_iothread();
->>     }
->>
->> #0  0x00007f107322f264 in __lll_lock_wait () from /lib64/libpthread.so.0
->> #1  0x00007f107322a508 in _L_lock_854 () from /lib64/libpthread.so.0
->> #2  0x00007f107322a3d7 in pthread_mutex_lock () from /lib64/libpthread.so.0
->> #3  0x0000000000949ecb in qemu_mutex_lock (mutex=0xfc51a0) at
->> util/qemu-thread-posix.c:60
->> #4  0x0000000000459e58 in qemu_mutex_lock_iothread () at /root/qemu/cpus.c:1516
->> #5  0x0000000000945322 in os_host_main_loop_wait (timeout=28911939) at
->> util/main-loop.c:258
->> #6  0x00000000009453f2 in main_loop_wait (nonblocking=0) at util/main-loop.c:517
->> #7  0x00000000005c76b4 in main_loop () at vl.c:1898
->> #8  0x00000000005ceb77 in main (argc=49, argv=0x7fff921182b8,
->> envp=0x7fff92118448) at vl.c:4709
->
-> The following patch moves bdrv_is_allocated() into bb's AioContext.  It
-> will execute without blocking other I/O activity.
->
-> Compile-tested only.
-i will try this patch.
-
->
-> diff --git a/migration/block.c b/migration/block.c
-> index 7734ff7..a5572a4 100644
-> --- a/migration/block.c
-> +++ b/migration/block.c
-> @@ -263,6 +263,29 @@ static void blk_mig_read_cb(void *opaque, int ret)
->      blk_mig_unlock();
+On Tue, Apr 11, 2017 at 04:49:26PM +0800, He Chen wrote:
+> This patch is going to add SLIT table support in QEMU, and provides
+> additional option `dist` for command `-numa` to allow user set vNUMA
+> distance by QEMU command.
+> 
+> With this patch, when a user wants to create a guest that contains
+> several vNUMA nodes and also wants to set distance among those nodes,
+> the QEMU command would like:
+> 
+> ```
+> -numa node,nodeid=0,cpus=0 \
+> -numa node,nodeid=1,cpus=1 \
+> -numa node,nodeid=2,cpus=2 \
+> -numa node,nodeid=3,cpus=3 \
+> -numa dist,src=0,dst=1,val=21 \
+> -numa dist,src=0,dst=2,val=31 \
+> -numa dist,src=0,dst=3,val=41 \
+> -numa dist,src=1,dst=2,val=21 \
+> -numa dist,src=1,dst=3,val=31 \
+> -numa dist,src=2,dst=3,val=21 \
+> ```
+> 
+> Signed-off-by: He Chen <he.chen@linux.intel.com>
+> ---
+>  hw/acpi/aml-build.c         |  25 +++++++++++
+>  hw/i386/acpi-build.c        |   4 ++
+>  include/hw/acpi/aml-build.h |   1 +
+>  include/sysemu/numa.h       |   2 +
+>  include/sysemu/sysemu.h     |   4 ++
+>  numa.c                      | 100 ++++++++++++++++++++++++++++++++++++++++++++
+>  qapi-schema.json            |  30 ++++++++++++-
+>  qemu-options.hx             |  16 ++++++-
+>  8 files changed, 179 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+> index c6f2032..2c6ab07 100644
+> --- a/hw/acpi/aml-build.c
+> +++ b/hw/acpi/aml-build.c
+> @@ -24,6 +24,7 @@
+>  #include "hw/acpi/aml-build.h"
+>  #include "qemu/bswap.h"
+>  #include "qemu/bitops.h"
+> +#include "sysemu/numa.h"
+>  
+>  static GArray *build_alloc_array(void)
+>  {
+> @@ -1609,3 +1610,27 @@ void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
+>      numamem->base_addr = cpu_to_le64(base);
+>      numamem->range_length = cpu_to_le64(len);
 >  }
->
-> +typedef struct {
-> +    int64_t *total_sectors;
-> +    int64_t *cur_sector;
-> +    BlockBackend *bb;
-> +    QemuEvent event;
-> +} MigNextAllocatedClusterData;
 > +
-> +static void coroutine_fn mig_next_allocated_cluster(void *opaque)
+> +/*
+> + * ACPI spec 5.2.17 System Locality Distance Information Table
+> + * (Revision 2.0 or later)
+> + */
+> +void build_slit(GArray *table_data, BIOSLinker *linker)
 > +{
-> +    MigNextAllocatedClusterData *data = opaque;
-> +    int nr_sectors;
+> +    int slit_start, i, j;
+> +    slit_start = table_data->len;
 > +
-> +    /* Skip unallocated sectors; intentionally treats failure as
-> +     * an allocated sector */
-> +    while (*data->cur_sector < *data->total_sectors &&
-> +           !bdrv_is_allocated(blk_bs(data->bb), *data->cur_sector,
-> +                              MAX_IS_ALLOCATED_SEARCH, &nr_sectors)) {
-> +        *data->cur_sector += nr_sectors;
+> +    acpi_data_push(table_data, sizeof(AcpiTableHeader));
+> +
+> +    build_append_int_noprefix(table_data, nb_numa_nodes, 8);
+> +    for (i = 0; i < nb_numa_nodes; i++) {
+> +        for (j = 0; j < nb_numa_nodes; j++) {
+> +            build_append_int_noprefix(table_data, numa_info[i].distance[j], 1);
+> +        }
 > +    }
 > +
-> +    qemu_event_set(&data->event);
+> +    build_header(linker, table_data,
+> +                 (void *)(table_data->data + slit_start),
+> +                 "SLIT",
+> +                 table_data->len - slit_start, 1, NULL, NULL);
+> +}
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 2073108..2458ebc 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -2678,6 +2678,10 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+>      if (pcms->numa_nodes) {
+>          acpi_add_table(table_offsets, tables_blob);
+>          build_srat(tables_blob, tables->linker, machine);
+> +        if (have_numa_distance) {
+> +            acpi_add_table(table_offsets, tables_blob);
+> +            build_slit(tables_blob, tables->linker);
+> +        }
+>      }
+>      if (acpi_get_mcfg(&mcfg)) {
+>          acpi_add_table(table_offsets, tables_blob);
+> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+> index 00c21f1..329a0d0 100644
+> --- a/include/hw/acpi/aml-build.h
+> +++ b/include/hw/acpi/aml-build.h
+> @@ -389,4 +389,5 @@ GCC_FMT_ATTR(2, 3);
+>  void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
+>                         uint64_t len, int node, MemoryAffinityFlags flags);
+>  
+> +void build_slit(GArray *table_data, BIOSLinker *linker);
+>  #endif
+> diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+> index 8f09dcf..0ea1bc0 100644
+> --- a/include/sysemu/numa.h
+> +++ b/include/sysemu/numa.h
+> @@ -8,6 +8,7 @@
+>  #include "hw/boards.h"
+>  
+>  extern int nb_numa_nodes;   /* Number of NUMA nodes */
+> +extern bool have_numa_distance;
+>  
+>  struct numa_addr_range {
+>      ram_addr_t mem_start;
+> @@ -21,6 +22,7 @@ typedef struct node_info {
+>      struct HostMemoryBackend *node_memdev;
+>      bool present;
+>      QLIST_HEAD(, numa_addr_range) addr; /* List to store address ranges */
+> +    uint8_t distance[MAX_NODES];
+>  } NodeInfo;
+>  
+>  extern NodeInfo numa_info[MAX_NODES];
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index 576c7ce..6999545 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -169,6 +169,10 @@ extern int mem_prealloc;
+>  
+>  #define MAX_NODES 128
+>  #define NUMA_NODE_UNASSIGNED MAX_NODES
+> +#define NUMA_DISTANCE_MIN         10
+> +#define NUMA_DISTANCE_DEFAULT     20
+> +#define NUMA_DISTANCE_MAX         254
+> +#define NUMA_DISTANCE_UNREACHABLE 255
+>  
+>  #define MAX_OPTION_ROMS 16
+>  typedef struct QEMUOptionRom {
+> diff --git a/numa.c b/numa.c
+> index 6fc2393..1d3453a 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -51,6 +51,7 @@ static int max_numa_nodeid; /* Highest specified NUMA node ID, plus one.
+>                               * For all nodes, nodeid < max_numa_nodeid
+>                               */
+>  int nb_numa_nodes;
+> +bool have_numa_distance;
+>  NodeInfo numa_info[MAX_NODES];
+>  
+>  void numa_set_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node)
+> @@ -212,6 +213,41 @@ static void numa_node_parse(NumaNodeOptions *node, QemuOpts *opts, Error **errp)
+>      max_numa_nodeid = MAX(max_numa_nodeid, nodenr + 1);
+>  }
+>  
+> +static void numa_distance_parse(NumaDistOptions *dist, QemuOpts *opts, Error **errp)
+> +{
+> +    uint16_t src = dist->src;
+> +    uint16_t dst = dist->dst;
+> +    uint8_t val = dist->val;
+> +
+> +    if (!numa_info[src].present || !numa_info[dst].present) {
+> +        error_setg(errp, "Source/Destination NUMA node is missing. "
+> +                   "Please use '-numa node' option to declare it first.");
+> +        return;
+> +    }
+> +
+> +    if (src >= MAX_NODES || dst >= MAX_NODES) {
+> +        error_setg(errp, "Max number of NUMA nodes reached: %"
+> +                   PRIu16 "", MAX_NODES);
+                             ^ shouldn't need that empty string
+> +        return;
+> +    }
+> +
+> +    if (val < NUMA_DISTANCE_MIN) {
+> +        error_setg(errp, "NUMA distance (%" PRIu8 ") is invalid, "
+> +                   "it should be larger than %d.",
+> +                   val, NUMA_DISTANCE_MIN);
+> +        return;
+> +    }
+> +
+> +    if (src == dst && val != NUMA_DISTANCE_MIN) {
+> +        error_setg(errp, "Local distance of node %d should be %d.",
+> +                   src, NUMA_DISTANCE_MIN);
+> +        return;
+> +    }
+> +
+> +    numa_info[src].distance[dst] = val;
+> +    have_numa_distance = true;
 > +}
 > +
->  /* Called with no lock taken.  */
->
->  static int mig_save_device_bulk(QEMUFile *f, BlkMigDevState *bmds)
-> @@ -274,17 +297,27 @@ static int mig_save_device_bulk(QEMUFile *f, BlkMigDevState *bmds)
->      int nr_sectors;
->
->      if (bmds->shared_base) {
-> +        /* Searching for the next allocated cluster can block.  Do it in a
-> +         * coroutine inside bb's AioContext.  That way we don't need to hold
-> +         * the global mutex while blocked.
-> +         */
-> +        AioContext *bb_ctx;
-> +        Coroutine *co;
-> +        MigNextAllocatedClusterData data = {
-> +            .cur_sector = &cur_sector,
-> +            .total_sectors = &total_sectors,
-> +            .bb = bb,
-> +        };
-> +
-> +        qemu_event_init(&data.event, false);
-> +
->          qemu_mutex_lock_iothread();
-> -        aio_context_acquire(blk_get_aio_context(bb));
-> -        /* Skip unallocated sectors; intentionally treats failure as
-> -         * an allocated sector */
-> -        while (cur_sector < total_sectors &&
-> -               !bdrv_is_allocated(blk_bs(bb), cur_sector,
-> -                                  MAX_IS_ALLOCATED_SEARCH, &nr_sectors)) {
-> -            cur_sector += nr_sectors;
-> -        }
-> -        aio_context_release(blk_get_aio_context(bb));
-> +        bb_ctx = blk_get_aio_context(bb);
->          qemu_mutex_unlock_iothread();
-> +
-> +        co = qemu_coroutine_create(mig_next_allocated_cluster, &data);
-> +        aio_co_schedule(bb_ctx, co);
-> +        qemu_event_wait(&data.event);
+>  static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
+>  {
+>      NumaOptions *object = NULL;
+> @@ -235,6 +271,12 @@ static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
+>          }
+>          nb_numa_nodes++;
+>          break;
+> +    case NUMA_OPTIONS_TYPE_DIST:
+> +        numa_distance_parse(&object->u.dist, opts, &err);
+> +        if (err) {
+> +            goto end;
+> +        }
+> +        break;
+>      default:
+>          abort();
 >      }
+> @@ -294,6 +336,63 @@ static void validate_numa_cpus(void)
+>      g_free(seen_cpus);
+>  }
+>  
+> +static void validate_numa_distance(void)
+> +{
+> +    int src, dst, s, d;
+> +    bool is_asymmetrical = false;
+> +    bool opposite_missing = false;
+> +
+> +    if (!have_numa_distance) {
+> +        return;
+> +    }
+> +
+> +    for (src = 0; src < nb_numa_nodes; src++) {
+> +        for (dst = src; dst < nb_numa_nodes; dst++) {
+> +            s = src;
+> +            d = dst;
+> +
+> +            if (numa_info[s].present && numa_info[d].present) {
+> +                if (numa_info[s].distance[d] == 0 &&
+> +                    numa_info[d].distance[s] == 0) {
+> +                    if (s == d) {
+> +                        numa_info[s].distance[d] = NUMA_DISTANCE_MIN;
+> +                    } else {
+> +                        error_report("The distance between node %d and %d is missing, "
+> +                                     "please provide all unique node pair distances.",
+> +                                     s, d);
+> +                        exit(EXIT_FAILURE);
+> +                    }
+> +                }
+> +
+> +                if (numa_info[s].distance[d] == 0) {
+> +                    s = dst;
+> +                    d = src;
+> +                }
+> +
+> +                if (numa_info[d].distance[s] == 0) {
+> +                    opposite_missing = true;
+> +                }
+> +
+> +                if ((numa_info[d].distance[s] != 0) &&
+> +                    (numa_info[s].distance[d] != numa_info[d].distance[s])) {
+> +                    is_asymmetrical = true;
+> +                }
+> +
+> +                if (is_asymmetrical) {
+> +                    if (opposite_missing) {
+> +                        error_report("At least one asymmetrical pair of distances "
+> +                                     "is given, please provide distances for both "
+> +                                     "directions of all node pairs.");
+> +                        exit(EXIT_FAILURE);
+> +                    }
+> +                } else {
+> +                    numa_info[d].distance[s] = numa_info[s].distance[d];
+> +                }
+> +            }
+> +        }
+> +    }
+> +}
+> +
+>  void parse_numa_opts(MachineClass *mc)
+>  {
+>      int i;
+> @@ -390,6 +489,7 @@ void parse_numa_opts(MachineClass *mc)
+>          }
+>  
+>          validate_numa_cpus();
+> +        validate_numa_distance();
+>      } else {
+>          numa_set_mem_node_id(0, ram_size, 0);
+>      }
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 250e4dc..92fcd18 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -5673,10 +5673,14 @@
+>  ##
+>  # @NumaOptionsType:
+>  #
+> +# @node: NUMA nodes configuration
+> +#
+> +# @dist: NUMA distance configuration (since 2.10)
+> +#
+>  # Since: 2.1
+>  ##
+>  { 'enum': 'NumaOptionsType',
+> -  'data': [ 'node' ] }
+> +  'data': [ 'node', 'dist' ] }
+>  
+>  ##
+>  # @NumaOptions:
+> @@ -5689,7 +5693,8 @@
+>    'base': { 'type': 'NumaOptionsType' },
+>    'discriminator': 'type',
+>    'data': {
+> -    'node': 'NumaNodeOptions' }}
+> +    'node': 'NumaNodeOptions',
+> +    'dist': 'NumaDistOptions' }}
+>  
+>  ##
+>  # @NumaNodeOptions:
+> @@ -5718,6 +5723,27 @@
+>     '*memdev': 'str' }}
+>  
+>  ##
+> +# @NumaDistOptions:
+> +#
+> +# Set the distance between 2 NUMA nodes.
+> +#
+> +# @src: source NUMA node.
+> +#
+> +# @dst: destination NUMA node.
+> +#
+> +# @val: NUMA distance from source node to destination node.
+> +#       When a node is unreachable from another node, set the distance
+> +#       between them to 255.
+> +#
+> +# Since: 2.10
+> +##
+> +{ 'struct': 'NumaDistOptions',
+> +  'data': {
+> +   'src': 'uint16',
+> +   'dst': 'uint16',
+> +   'val': 'uint8' }}
+> +
+> +##
+>  # @HostMemPolicy:
+>  #
+>  # Host memory policy types
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 99af8ed..7823db8 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -139,12 +139,15 @@ ETEXI
+>  
+>  DEF("numa", HAS_ARG, QEMU_OPTION_numa,
+>      "-numa node[,mem=size][,cpus=firstcpu[-lastcpu]][,nodeid=node]\n"
+> -    "-numa node[,memdev=id][,cpus=firstcpu[-lastcpu]][,nodeid=node]\n", QEMU_ARCH_ALL)
+> +    "-numa node[,memdev=id][,cpus=firstcpu[-lastcpu]][,nodeid=node]\n"
+> +    "-numa dist,src=source,dst=destination,val=distance\n", QEMU_ARCH_ALL)
+>  STEXI
+>  @item -numa node[,mem=@var{size}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}]
+>  @itemx -numa node[,memdev=@var{id}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}]
+> +@itemx -numa dist,src=@var{source},dst=@var{destination},val=@var{distance}
+>  @findex -numa
+>  Define a NUMA node and assign RAM and VCPUs to it.
+> +Set the NUMA distance from a source node to a destination node.
+>  
+>  @var{firstcpu} and @var{lastcpu} are CPU indexes. Each
+>  @samp{cpus} option represent a contiguous range of CPU indexes
+> @@ -167,6 +170,17 @@ split equally between them.
+>  @samp{mem} and @samp{memdev} are mutually exclusive. Furthermore,
+>  if one node uses @samp{memdev}, all of them have to use it.
+>  
+> +@var{source} and @var{destination} are NUMA node IDs.
+> +@var{distance} is the NUMA distance from @var{source} to @var{destination}.
+> +The distance from a node to itself is always 10. If any pair of nodes is
+> +given a distance, then all pairs must be given distances. Although, when
+> +distances are only given in one direction for each pair of nodes, then
+> +the distances in the opposite directions are assumed to be the same. If,
+> +however, an asymmetrical pair of distances is given for even one node
+> +pair, then all node pairs must be provided distance values for both
+> +directions, even when they are symmetrical. When a node is unreachable
+> +from another node, set the pair's distance to 255.
+> +
+>  Note that the -@option{numa} option doesn't allocate any of the
+>  specified resources, it just assigns existing resources to NUMA
+>  nodes. This means that one still has to use the @option{-m},
+> -- 
+> 2.7.4
+> 
 >
->      if (cur_sector >= total_sectors) {
+
+Besides the "", looks good to me
+
+Reviewed-by: Andrew Jones <drjones@redhat.com>
