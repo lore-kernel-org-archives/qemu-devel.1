@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cxtNT-0003Y8-Ci
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:50:30 -0400
+	(envelope-from <stefanha@redhat.com>) id 1cxtPw-0005TD-3e
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:53:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cxtNQ-0004S6-Aj
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:50:27 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:34681)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cxtNQ-0004Rw-3o
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:50:24 -0400
-Received: by mail-wr0-x234.google.com with SMTP id z109so26151911wrb.1
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 03:50:23 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 11 Apr 2017 11:50:28 +0100
-Message-Id: <20170411105031.28904-1-alex.bennee@linaro.org>
+	(envelope-from <stefanha@redhat.com>) id 1cxtPt-0005ld-2N
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 06:53:00 -0400
+Date: Tue, 11 Apr 2017 11:52:39 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170411105239.GD17943@stefanha-x1.localdomain>
+References: <20170410150542.30376-1-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 0/3] Fix cputlb flush stats and exporting
- data
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="2iBwrppp/7QCDedR"
+Content-Disposition: inline
+In-Reply-To: <20170410150542.30376-1-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for 2.9 v3 00/10] block: Fixes regarding
+ dataplane and management operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +24,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: bobby.prani@gmail.com, rth@twiddle.net, stefanha@redhat.com
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-This is mostly just an RFC for discussion as I know a number of GSoC
-projects will involve a degree of instrumentation and measurement of
-the internals of the TCG.
 
-The first patch just fixes and expands the counters. The second uses
-(abuses?) the trace mechanism to export the data via the simpletrace
-binary trace format. The final patch is a script that then allows us
-to plot the collected data.
+--2iBwrppp/7QCDedR
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-So this series raises a few questions/thoughts:
+On Mon, Apr 10, 2017 at 11:05:32PM +0800, Fam Zheng wrote:
+> v3: Respin the unmerged changes from v2 and include one new fix:
+>=20
+>     (Yes, it is a big series for the last -rc, and I personally prefer th=
+e v2
+>     approach for the 4-9 part of the problem, which is much more mechanic=
+al.)
+>=20
+>     - 1, 2 are redoing previous patch 4, using bdrv_parent_drained_begin/=
+end.
+>       [Kevin]
+>       Also fix the ordering against aio_context_release. [Stefan]
+>     - 3 is unchanged from patch 6 in v2.
+>     - 4-9 are reworking of patch 5 following Paolo's suggestion, which al=
+lowed
+>       better patch split.
+>     - 10 is finding of a latent bug, which is revealed by patch 9.
+>=20
+> v2: - Drop patch 4 in v1. A second thought made me feel neither it nor Ke=
+vin's
+>       suggestion to move the BH process to bdrv_drain_recurse/BDRV_POLL_W=
+HILE
+>       is a complete fix. So leave it for a separate patch.
+>     - Add rev-by to patches 1, 3, 4.
+>     - Split from patch 1 in v1 and add patch 2, for the new assertions. [=
+Kevin]
+>     - Rewrite patch 5. Fix block job's co when a BDS is moved to a differ=
+ent
+>       aio context. [Kevin]
+>     - Add patch 6.
+>=20
+> Crashes are reported on dataplane devices when doing snapshot and commit =
+under
+> guest I/O.
+>=20
+> With this series, Ed's test case '176' now passes:
+>=20
+>     https://github.com/skyportsystems/qemu-1/commits/eswierk-iotests-2.9
+>=20
+> Fam Zheng (10):
+>   block: Make bdrv_parent_drained_begin/end public
+>   block: Quiesce old aio context during bdrv_set_aio_context
+>   tests/block-job-txn: Don't start block job before adding to txn
+>   coroutine: Extract qemu_aio_coroutine_enter
+>   async: Introduce aio_co_enter and aio_co_enter_if_inactive
+>   block: Introduce bdrv_coroutine_enter and *_if_inactive
+>   blockjob: Use bdrv_coroutine_enter to start coroutine
+>   qemu-io-cmds: Use bdrv_coroutine_enter
+>   block: Use bdrv_coroutine_enter to start I/O coroutines
+>   block: Fix bdrv_co_flush early return
+>=20
+>  block.c                    | 17 +++++++++++++++--
+>  block/block-backend.c      |  4 ++--
+>  block/io.c                 | 34 ++++++++++++++++++----------------
+>  blockjob.c                 |  4 ++--
+>  include/block/aio.h        | 18 ++++++++++++++++++
+>  include/block/block.h      | 27 +++++++++++++++++++++++++++
+>  include/qemu/coroutine.h   |  5 +++++
+>  qemu-io-cmds.c             |  2 +-
+>  tests/qemu-iotests/109.out | 10 +++++-----
+>  tests/test-blockjob-txn.c  |  6 +++++-
+>  util/async.c               | 14 +++++++++++++-
+>  util/qemu-coroutine.c      | 11 ++++++++---
+>  util/trace-events          |  2 +-
+>  13 files changed, 120 insertions(+), 34 deletions(-)
 
- - doing an atomic_inc(__ATOMIC_SEQ_CST) is inefficient
+We need a fix for 2.9.  Interactions between AioContexts, coroutines,
+and blockjobs are complex and brittle.  That is a pre-existing problem
+though and hopefully we can simplify abstractions in 2.10.
 
- It would probably be better to have per-thread counters that are
- summed when needed rather than enforcing sequential consistency on a
- global counter.
+Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
 
- - I could encode the events directly and count them in the script
+--2iBwrppp/7QCDedR
+Content-Type: application/pgp-signature; name="signature.asc"
 
- This would be more trace-like but we'd loose the counters in the MMI
- which is helpful on a live non-trace-enabled builds if you want to
- get an idea of whats happening.
+-----BEGIN PGP SIGNATURE-----
 
- - Tracing is very event focused, would it be worth adding some sort
-   of counter/sampling support?
+iQEcBAEBAgAGBQJY7LV3AAoJEJykq7OBq3PI8fEIAIyiwEm4Ls5fSo6HmRtMvv0z
+szaQdjIaH74WlIyQalhH4V2n75BquvkGdc5JAq0/T95rPK9O1aWqnxzk/b+R4vzL
+XXijcvRhH3po6gjB0N+elCpy/ooDSrd7AslAveFs2GHm0zCMtwBQAce+lDtu+PtQ
+fKtO9yGQUXvzebwGoBRsYAfzzDdTfmpBHgBKKtJ7fdTsndTuRP4bJsgzC1droV5T
+/JvRSTKB+LOyAjYoaBLkYuiTyVJpGZO4zIjwCUo6j6UEn0yQKaWR6hFh7PfzkeiI
+F471s8aU1i3OYJh0y/bReHnLe7jHvDWrgI3TI6XLQFV9cLntPpFTyEm77rbS/Ek=
+=cZBJ
+-----END PGP SIGNATURE-----
 
- Currently the insertion of the trace_tlb_flushes() event in the entry
- to the run loop is a massive hack. Most of the time the numbers
- haven't changed. I could have just spawned a sampling helper on a
- main-loop timer but I feel this might be a use case thinking about
- for the tracing system.
-
- - timestamps could be replaced with icount for some analysis
-
- The icount mechanism would allow for a fairly fine grained matching of
- events to execution time in TCG. Maybe this could be an optional
- replacement?
-
- - The simpletrace binary format is more efficient than debug output
-
- One problem I have as a TCG hacker is the normal -d foo output is
- very verbose and generates massive logs. -dfilter was an attempt to
- make that easier but I'm quite happy with the trace approach. A boot
- and build takes only about 85M in trace files compared to the
- gigabytes a text file can take up.
-
-Alex Bennée (3):
-  cputlb: fix and enhance TLB statistics
-  cpus: dump TLB flush counts as trace event
-  new script/analyse-tlb-flushes-simpletrace.py
-
- cpus.c                                     |  6 +++
- cputlb.c                                   | 27 +++++++++++--
- include/exec/cputlb.h                      |  4 +-
- scripts/analyse-tlb-flushes-simpletrace.py | 62 ++++++++++++++++++++++++++++++
- trace-events                               |  3 ++
- translate-all.c                            |  4 +-
- 6 files changed, 101 insertions(+), 5 deletions(-)
- create mode 100755 scripts/analyse-tlb-flushes-simpletrace.py
-
--- 
-2.11.0
+--2iBwrppp/7QCDedR--
