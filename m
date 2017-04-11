@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cxxkk-0006me-4Y
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:30:47 -0400
+	(envelope-from <clg@kaod.org>) id 1cxxkm-0006od-33
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:30:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cxxkg-0003gp-11
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:30:46 -0400
-Received: from 7.mo173.mail-out.ovh.net ([46.105.44.159]:55155)
+	(envelope-from <clg@kaod.org>) id 1cxxkl-0003iu-0S
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:30:48 -0400
+Received: from 7.mo173.mail-out.ovh.net ([46.105.44.159]:38439)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cxxkf-0003g6-NL
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:30:41 -0400
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cxxkk-0003iJ-Ow
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 11:30:46 -0400
 Received: from player778.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id ADB9631169
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 17:30:40 +0200 (CEST)
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 4A3D93134C
+	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 17:30:45 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Tue, 11 Apr 2017 17:30:02 +0200
-Message-Id: <1491924606-20026-5-git-send-email-clg@kaod.org>
+Date: Tue, 11 Apr 2017 17:30:03 +0200
+Message-Id: <1491924606-20026-6-git-send-email-clg@kaod.org>
 In-Reply-To: <1491924606-20026-1-git-send-email-clg@kaod.org>
 References: <1491924606-20026-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 4/8] ppc/pnv: populate device tree for RTC
- devices
+Subject: [Qemu-devel] [PATCH v3 5/8] ppc/pnv: populate device tree for
+ serial devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,31 +33,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-The code could be common to any ISA device but we are missing the IO
-length.
-
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/pnv.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ hw/ppc/pnv.c | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
 diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index c445906358d7..8ab5bb179b2c 100644
+index 8ab5bb179b2c..dfa21e4d740a 100644
 --- a/hw/ppc/pnv.c
 +++ b/hw/ppc/pnv.c
-@@ -303,6 +303,26 @@ static void powernv_populate_chip(PnvChip *chip, voi=
-d *fdt)
-     g_free(typename);
+@@ -323,6 +323,37 @@ static void powernv_populate_rtc(ISADevice *d, void =
+*fdt, int lpc_off)
+     _FDT((fdt_setprop_string(fdt, node, "compatible", "pnpPNP,b00")));
  }
 =20
-+static void powernv_populate_rtc(ISADevice *d, void *fdt, int lpc_off)
++static void powernv_populate_serial(ISADevice *d, void *fdt, int lpc_off=
+)
 +{
++    const char compatible[] =3D "ns16550\0pnpPNP,501";
 +    uint32_t io_base =3D d->ioport_id;
 +    uint32_t io_regs[] =3D {
 +        cpu_to_be32(1),
 +        cpu_to_be32(io_base),
-+        cpu_to_be32(2)
++        cpu_to_be32(8)
 +    };
 +    char *name;
 +    int node;
@@ -69,28 +68,31 @@ d *fdt)
 +    g_free(name);
 +
 +    _FDT((fdt_setprop(fdt, node, "reg", io_regs, sizeof(io_regs))));
-+    _FDT((fdt_setprop_string(fdt, node, "compatible", "pnpPNP,b00")));
++    _FDT((fdt_setprop(fdt, node, "compatible", compatible,
++                      sizeof(compatible))));
++
++    _FDT((fdt_setprop_cell(fdt, node, "clock-frequency", 1843200)));
++    _FDT((fdt_setprop_cell(fdt, node, "current-speed", 115200)));
++    _FDT((fdt_setprop_cell(fdt, node, "interrupts", d->isairq[0])));
++    _FDT((fdt_setprop_cell(fdt, node, "interrupt-parent",
++                           fdt_get_phandle(fdt, lpc_off))));
++
++    /* This is needed by Linux */
++    _FDT((fdt_setprop_string(fdt, node, "device_type", "serial")));
 +}
 +
  typedef struct ForeachPopulateArgs {
      void *fdt;
      int offset;
-@@ -310,6 +330,16 @@ typedef struct ForeachPopulateArgs {
+@@ -335,6 +366,8 @@ static int powernv_populate_isa_device(DeviceState *d=
+ev, void *opaque)
 =20
- static int powernv_populate_isa_device(DeviceState *dev, void *opaque)
- {
-+    ForeachPopulateArgs *args =3D opaque;
-+    ISADevice *d =3D ISA_DEVICE(dev);
-+
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_MC146818_RTC)) {
-+        powernv_populate_rtc(d, args->fdt, args->offset);
-+    } else {
-+        error_report("unknown isa device %s@i%x", qdev_fw_name(dev),
-+                     d->ioport_id);
-+    }
-+
-     return 0;
- }
-=20
+     if (object_dynamic_cast(OBJECT(dev), TYPE_MC146818_RTC)) {
+         powernv_populate_rtc(d, args->fdt, args->offset);
++    } else if (object_dynamic_cast(OBJECT(dev), TYPE_ISA_SERIAL)) {
++        powernv_populate_serial(d, args->fdt, args->offset);
+     } else {
+         error_report("unknown isa device %s@i%x", qdev_fw_name(dev),
+                      d->ioport_id);
 --=20
 2.7.4
