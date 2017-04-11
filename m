@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53605)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andr2000@gmail.com>) id 1cxsDP-0001SC-Qu
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:36:01 -0400
+	(envelope-from <maxime.coquelin@redhat.com>) id 1cxwEx-0004Fr-7h
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:53:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andr2000@gmail.com>) id 1cxsDL-00066i-PD
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:35:59 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:32886)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <andr2000@gmail.com>) id 1cxsDL-000622-Ij
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 05:35:55 -0400
-Received: by mail-wr0-x243.google.com with SMTP id l28so7497799wre.0
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 02:35:54 -0700 (PDT)
-From: Oleksandr Andrushchenko <andr2000@gmail.com>
-Date: Tue, 11 Apr 2017 12:35:46 +0300
-Message-Id: <1491903346-16075-1-git-send-email-andr2000@gmail.com>
-Subject: [Qemu-devel] [Xen-devel][PATCH] configure: introduce
- --enable-xen-fb-backend
+	(envelope-from <maxime.coquelin@redhat.com>) id 1cxwEt-0004hd-Ah
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:53:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46018)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1cxwEt-0004hP-1T
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 09:53:47 -0400
+References: <20170411101002.28451-1-maxime.coquelin@redhat.com>
+	<20170411101002.28451-2-maxime.coquelin@redhat.com>
+	<CAJ+F1CL8kK0XcMwueX8+kbDF=aVhBiRJ66gGoUNcUOmk=Yg7og@mail.gmail.com>
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Message-ID: <7dfc220c-b22b-bd7d-53af-caf49275b66c@redhat.com>
+Date: Tue, 11 Apr 2017 15:53:37 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAJ+F1CL8kK0XcMwueX8+kbDF=aVhBiRJ66gGoUNcUOmk=Yg7og@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC 1/2] spec/vhost-user: Introduce secondary
+ channel for slave initiated requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,133 +30,294 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
-Cc: joculator@gmail.com, al1img@gmail.com, vlad.babchuk@gmail.com, andrii.anisov@gmail.com, olekstysh@gmail.com, andr2000@gmail.com, sstabellini@kernel.org, anthony.perard@citrix.com, Oleksandr Andrushchenko <oleksandr_andrushchenko@epam.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, mst@redhat.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, peterx@redhat.com, yuanhan.liu@linux.intel.com, virtio-comment@lists.oasis-open.org, qemu-devel@nongnu.org
 
-From: Oleksandr Andrushchenko <oleksandr_andrushchenko@epam.com>
+Hi Marc-Andr=C3=A9,
 
-For some use cases when Xen framebuffer/input backend
-is not a part of Qemu it is required to disable it,
-because of conflicting access to input/display devices.
-Introduce additional configuration option for explicit
-input/display control.
+On 04/11/2017 03:06 PM, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>
+> On Tue, Apr 11, 2017 at 12:10 PM Maxime Coquelin
+> <maxime.coquelin@redhat.com <mailto:maxime.coquelin@redhat.com>> wrote:
+>
+>     This vhost-user specification update aims at enabling the
+>     slave to send requests to the master using a dedicated socket
+>     created by the master.
+>
+>     It can be used for example when the slave implements a device
+>     IOTLB to send cache miss requests to the master.
+>
+>     The message types list is updated with an "Initiator" field to
+>     indicate for each type whether the master and/or slave can
+>     initiate the request.
+>
+>     Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com
+>     <mailto:maxime.coquelin@redhat.com>>
+>
+>
+> This is very similar to a patch I proposed for shutdown slave initiated
+> requests:
+> https://lists.gnu.org/archive/html/qemu-devel/2016-04/msg00095.html
 
-Signed-off-by: Oleksandr Andrushchenko <oleksandr_andrushchenko@epam.com>
----
- configure                 | 18 ++++++++++++++++++
- hw/display/Makefile.objs  |  2 +-
- hw/xen/xen_backend.c      |  2 ++
- hw/xenpv/xen_machine_pv.c |  4 ++++
- 4 files changed, 25 insertions(+), 1 deletion(-)
+Indeed, thanks for pointing this out, I wasn't aware of your series.
 
-diff --git a/configure b/configure
-index 476210b1b93f..b805cb908f03 100755
---- a/configure
-+++ b/configure
-@@ -220,6 +220,7 @@ xen=""
- xen_ctrl_version=""
- xen_pv_domain_build="no"
- xen_pci_passthrough=""
-+xen_fb_backend=""
- linux_aio=""
- cap_ng=""
- attr=""
-@@ -909,6 +910,10 @@ for opt do
-   ;;
-   --enable-xen-pv-domain-build) xen_pv_domain_build="yes"
-   ;;
-+  --disable-xen-fb-backend) xen_fb_backend="no"
-+  ;;
-+  --enable-xen-fb-backend) xen_fb_backend="yes"
-+  ;;
-   --disable-brlapi) brlapi="no"
-   ;;
-   --enable-brlapi) brlapi="yes"
-@@ -1368,6 +1373,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-   virtfs          VirtFS
-   xen             xen backend driver support
-   xen-pci-passthrough
-+  xen-fb-backend  framebuffer/input backend support
-   brlapi          BrlAPI (Braile)
-   curl            curl connectivity
-   fdt             fdt device tree
-@@ -2213,6 +2219,15 @@ if test "$xen_pv_domain_build" = "yes" &&
- 	       "which requires Xen support."
- fi
- 
-+if test "$xen_fb_backend" != "no"; then
-+   if test "$xen" = "yes"; then
-+     xen_fb_backend=yes
-+   else
-+     error_exit "User requested feature Xen framebufer backend support" \
-+                " but this feature requires Xen support."
-+   fi
-+fi
-+
- ##########################################
- # Sparse probe
- if test "$sparse" != "no" ; then
-@@ -5444,6 +5459,9 @@ if test "$xen" = "yes" ; then
-   if test "$xen_pv_domain_build" = "yes" ; then
-     echo "CONFIG_XEN_PV_DOMAIN_BUILD=y" >> $config_host_mak
-   fi
-+  if test "$xen_fb_backend" = "yes" ; then
-+    echo "CONFIG_XEN_FB_BACKEND=y" >> $config_host_mak
-+  fi
- fi
- if test "$linux_aio" = "yes" ; then
-   echo "CONFIG_LINUX_AIO=y" >> $config_host_mak
-diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-index 063889beaf4a..f5ec97ed4f48 100644
---- a/hw/display/Makefile.objs
-+++ b/hw/display/Makefile.objs
-@@ -5,7 +5,7 @@ common-obj-$(CONFIG_JAZZ_LED) += jazz_led.o
- common-obj-$(CONFIG_PL110) += pl110.o
- common-obj-$(CONFIG_SSD0303) += ssd0303.o
- common-obj-$(CONFIG_SSD0323) += ssd0323.o
--common-obj-$(CONFIG_XEN_BACKEND) += xenfb.o
-+common-obj-$(CONFIG_XEN_FB_BACKEND) += xenfb.o
- 
- common-obj-$(CONFIG_VGA_PCI) += vga-pci.o
- common-obj-$(CONFIG_VGA_ISA) += vga-isa.o
-diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
-index d1190041ae12..5146cbba6ca5 100644
---- a/hw/xen/xen_backend.c
-+++ b/hw/xen/xen_backend.c
-@@ -582,7 +582,9 @@ void xen_be_register_common(void)
-     xen_set_dynamic_sysbus();
- 
-     xen_be_register("console", &xen_console_ops);
-+#ifdef CONFIG_XEN_FB_BACKEND
-     xen_be_register("vkbd", &xen_kbdmouse_ops);
-+#endif
-     xen_be_register("qdisk", &xen_blkdev_ops);
- #ifdef CONFIG_USB_LIBUSB
-     xen_be_register("qusb", &xen_usb_ops);
-diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
-index 79aef4ecc37b..b731344c3f0a 100644
---- a/hw/xenpv/xen_machine_pv.c
-+++ b/hw/xenpv/xen_machine_pv.c
-@@ -68,7 +68,9 @@ static void xen_init_pv(MachineState *machine)
-     }
- 
-     xen_be_register_common();
-+#ifdef CONFIG_XEN_FB_BACKEND
-     xen_be_register("vfb", &xen_framebuffer_ops);
-+#endif
-     xen_be_register("qnic", &xen_netdev_ops);
- 
-     /* configure framebuffer */
-@@ -95,8 +97,10 @@ static void xen_init_pv(MachineState *machine)
-     /* config cleanup hook */
-     atexit(xen_config_cleanup);
- 
-+#ifdef CONFIG_XEN_FB_BACKEND
-     /* setup framebuffer */
-     xen_init_display(xen_domid);
-+#endif
- }
- 
- static void xenpv_machine_init(MachineClass *mc)
--- 
-2.7.4
+I find your proposal of having dedicated messages types
+(VHOST_USER_SLAVE_*) cleaner.
+
+Are you ok if I handover your patch, and replace
+VHOST_USER_SET_SLAVE_FD to VHOST_USER_SET_SLAVE_REQ_FD?
+
+>
+>
+>     ---
+>      docs/specs/vhost-user.txt | 38 +++++++++++++++++++++++++++++++++++=
++++
+>      1 file changed, 38 insertions(+)
+>
+>     diff --git a/docs/specs/vhost-user.txt b/docs/specs/vhost-user.txt
+>     index 036890f..b365047 100644
+>     --- a/docs/specs/vhost-user.txt
+>     +++ b/docs/specs/vhost-user.txt
+>     @@ -139,6 +139,7 @@ in the ancillary data:
+>       * VHOST_USER_SET_VRING_KICK
+>       * VHOST_USER_SET_VRING_CALL
+>       * VHOST_USER_SET_VRING_ERR
+>     + * VHOST_USER_SET_SLAVE_REQ_FD
+>
+>
+> I like "slave-req-fd" better than "slave-fd"
+>
+>
+>      If Master is unable to send the full message or receives a wrong
+>     reply it will
+>      close the connection. An optional reconnection mechanism can be
+>     implemented.
+>     @@ -150,6 +151,11 @@ As older slaves don't support negotiating
+>     protocol features,
+>      a feature bit was dedicated for this purpose:
+>      #define VHOST_USER_F_PROTOCOL_FEATURES 30
+>
+>     +If the slave supports VHOST_USER_PROTOCOL_F_SLAVE_REQ protocol
+>     feature, the
+>     +master may create a secondary Unix domain socket and send its file
+>     descriptor
+>     +to the slave using VHOST_USER_SET_SLAVE_REQ_FD request. This new
+>     channel enables
+>     +the slave to send message requests and master to send message repl=
+ies.
+>     +
+>      Starting and stopping rings
+>      ----------------------
+>      Client must only process each ring when it is started.
+>     @@ -260,6 +266,7 @@ Protocol features
+>      #define VHOST_USER_PROTOCOL_F_RARP           2
+>      #define VHOST_USER_PROTOCOL_F_REPLY_ACK      3
+>      #define VHOST_USER_PROTOCOL_F_MTU            4
+>     +#define VHOST_USER_PROTOCOL_F_SLAVE_REQ      5
+>
+>      Message types
+>      -------------
+>     @@ -268,6 +275,7 @@ Message types
+>
+>            Id: 1
+>            Equivalent ioctl: VHOST_GET_FEATURES
+>     +      Initiator: Master
+>            Master payload: N/A
+>            Slave payload: u64
+>
+>     @@ -279,6 +287,7 @@ Message types
+>
+>            Id: 2
+>            Ioctl: VHOST_SET_FEATURES
+>     +      Initiator: Master
+>            Master payload: u64
+>
+>            Enable features in the underlying vhost implementation using
+>     a bitmask.
+>     @@ -289,6 +298,7 @@ Message types
+>
+>            Id: 15
+>            Equivalent ioctl: VHOST_GET_FEATURES
+>     +      Initiator: Master
+>            Master payload: N/A
+>            Slave payload: u64
+>
+>     @@ -302,6 +312,7 @@ Message types
+>
+>            Id: 16
+>            Ioctl: VHOST_SET_FEATURES
+>     +      Initiator: Master
+>            Master payload: u64
+>
+>            Enable protocol features in the underlying vhost implementat=
+ion.
+>     @@ -314,6 +325,7 @@ Message types
+>
+>            Id: 3
+>            Equivalent ioctl: VHOST_SET_OWNER
+>     +      Initiator: Master
+>            Master payload: N/A
+>
+>            Issued when a new connection is established. It sets the
+>     current Master
+>     @@ -323,6 +335,7 @@ Message types
+>       * VHOST_USER_RESET_OWNER
+>
+>            Id: 4
+>     +      Initiator: Master
+>            Master payload: N/A
+>
+>            This is no longer used. Used to be sent to request disabling
+>     @@ -335,6 +348,7 @@ Message types
+>
+>            Id: 5
+>            Equivalent ioctl: VHOST_SET_MEM_TABLE
+>     +      Initiator: Master
+>            Master payload: memory regions description
+>
+>            Sets the memory map regions on the slave so it can translate
+>     the vring
+>     @@ -346,6 +360,7 @@ Message types
+>
+>            Id: 6
+>            Equivalent ioctl: VHOST_SET_LOG_BASE
+>     +      Initiator: Master
+>            Master payload: u64
+>            Slave payload: N/A
+>
+>     @@ -360,6 +375,7 @@ Message types
+>
+>            Id: 7
+>            Equivalent ioctl: VHOST_SET_LOG_FD
+>     +      Initiator: Master
+>            Master payload: N/A
+>
+>            Sets the logging file descriptor, which is passed as
+>     ancillary data.
+>     @@ -368,6 +384,7 @@ Message types
+>
+>            Id: 8
+>            Equivalent ioctl: VHOST_SET_VRING_NUM
+>     +      Initiator: Master
+>            Master payload: vring state description
+>
+>            Set the size of the queue.
+>     @@ -376,6 +393,7 @@ Message types
+>
+>            Id: 9
+>            Equivalent ioctl: VHOST_SET_VRING_ADDR
+>     +      Initiator: Master
+>            Master payload: vring address description
+>            Slave payload: N/A
+>
+>     @@ -385,6 +403,7 @@ Message types
+>
+>            Id: 10
+>            Equivalent ioctl: VHOST_SET_VRING_BASE
+>     +      Initiator: Master
+>            Master payload: vring state description
+>
+>            Sets the base offset in the available vring.
+>     @@ -393,6 +412,7 @@ Message types
+>
+>            Id: 11
+>            Equivalent ioctl: VHOST_USER_GET_VRING_BASE
+>     +      Initiator: Master
+>            Master payload: vring state description
+>            Slave payload: vring state description
+>
+>     @@ -402,6 +422,7 @@ Message types
+>
+>            Id: 12
+>            Equivalent ioctl: VHOST_SET_VRING_KICK
+>     +      Initiator: Master
+>            Master payload: u64
+>
+>            Set the event file descriptor for adding buffers to the vrin=
+g. It
+>     @@ -415,6 +436,7 @@ Message types
+>
+>            Id: 13
+>            Equivalent ioctl: VHOST_SET_VRING_CALL
+>     +      Initiator: Master
+>            Master payload: u64
+>
+>            Set the event file descriptor to signal when buffers are use=
+d. It
+>     @@ -428,6 +450,7 @@ Message types
+>
+>            Id: 14
+>            Equivalent ioctl: VHOST_SET_VRING_ERR
+>     +      Initiator: Master
+>            Master payload: u64
+>
+>            Set the event file descriptor to signal when error occurs. I=
+t
+>     @@ -440,6 +463,7 @@ Message types
+>
+>            Id: 17
+>            Equivalent ioctl: N/A
+>     +      Initiator: Master
+>            Master payload: N/A
+>            Slave payload: u64
+>
+>     @@ -451,6 +475,7 @@ Message types
+>
+>            Id: 18
+>            Equivalent ioctl: N/A
+>     +      Initiator: Master
+>            Master payload: vring state description
+>
+>            Signal slave to enable or disable corresponding vring.
+>     @@ -461,6 +486,7 @@ Message types
+>
+>            Id: 19
+>            Equivalent ioctl: N/A
+>     +      Initiator: Master
+>            Master payload: u64
+>
+>            Ask vhost user backend to broadcast a fake RARP to notify th=
+e
+>     migration
+>     @@ -475,6 +501,7 @@ Message types
+>
+>            Id: 20
+>            Equivalent ioctl: N/A
+>     +      Initiator: Master
+>            Master payload: u64
+>
+>            Set host MTU value exposed to the guest.
+>     @@ -486,6 +513,17 @@ Message types
+>            If VHOST_USER_PROTOCOL_F_REPLY_ACK is negotiated, slave must
+>     respond
+>            with zero in case the specified MTU is valid, or non-zero
+>     otherwise.
+>
+>     + * VHOST_USER_SET_SLAVE_REQ_FD
+>     +
+>     +      Id: 21
+>     +      Equivalent ioctl: N/A
+>     +      Initiator: Master
+>     +
+>     +      Set the socket file descriptor for slave initiated requests.
+>     +      This request should be sent only when
+>     VHOST_USER_F_PROTOCOL_FEATURES
+>     +      has been negotiated, and protocol feature bit
+>     VHOST_USER_PROTOCOL_F_SLAVE_REQ
+>     +      bit is present in VHOST_USER_GET_PROTOCOL_FEATURES.
+>     +
+>
+>
+> looks good to me
+>
+>
+>      VHOST_USER_PROTOCOL_F_REPLY_ACK:
+>      -------------------------------
+>      The original vhost-user specification only demands replies for cer=
+tain
+>     --
+>     2.9.3
+>
+>
+> --
+> Marc-Andr=C3=A9 Lureau
