@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1cy6uy-000844-Ml
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 21:17:58 -0400
+	(envelope-from <cota@braap.org>) id 1cy6uz-00085G-LY
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 21:17:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1cy6ux-0006R6-4G
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 21:17:56 -0400
+	(envelope-from <cota@braap.org>) id 1cy6ux-0006RZ-Jc
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 21:17:57 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Tue, 11 Apr 2017 21:17:25 -0400
-Message-Id: <1491959850-30756-6-git-send-email-cota@braap.org>
+Date: Tue, 11 Apr 2017 21:17:30 -0400
+Message-Id: <1491959850-30756-11-git-send-email-cota@braap.org>
 In-Reply-To: <1491959850-30756-1-git-send-email-cota@braap.org>
 References: <1491959850-30756-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH 05/10] tcg: add jr opcode
+Subject: [Qemu-devel] [PATCH 10/10] tb-hash: improve tb_jmp_cache hash
+ function in user mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,210 +23,170 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Claudio Fontana <claudio.fontana@huawei.com>, Andrzej Zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, qemu-arm@nongnu.org, alex.bennee@linaro.org, Pranith Kumar <bobby.prani+qemu@gmail.com>
 
-This will be used by TCG targets to implement a fast path
-for indirect branches.
+Optimizations to cross-page chaining and indirect jumps make
+performance more sensitive to the hit rate of tb_jmp_cache.
+The constraint of reserving some bits for the page number
+lowers the achievable quality of the hashing function.
 
-I only have implemented and tested this on an i386 host, so
-make this opcode optional and mark it as not implemented by
-other TCG backends.
+However, user-mode does not have this requirement. Thus,
+with this change we use for user-mode a hashing function that
+is both faster and of better quality than the previous one.
+
+Measurements:
+
+-    specINT 2006 (test set), x86_64-linux-user. Host: Intel i7-4790K @ 4.00GHz
+                              Y axis: Speedup over 95b31d70
+
+     1.3x+-+-------------------------------------------------------------+-+
+         |        jr             $$                                        |
+    1.25x+-+....  jr+xxhash      %%  ....................................+-+
+         |        jr+hash+inline @@                 +++                    |
+     1.2x+-+.............................................................+-+
+         |                                          @@@                    |
+         |                    +++@@               ++@:@       +++  @@+     |
+    1.15x+-+..................$$$@@...............$$@.@.......@@...@@....+-+
+         |                    $ $@@               $$@ @      %%@   @@      |
+     1.1x+-+..................$.$@@...............$$@.@......%%@.$$@@....+-+
+         |          +++@@+    $ $@@               $$@ @    ++%%@+$$@@   +++|
+    1.05x+-+.........$$@@.....$.$@@...@@..........$$@.@..@@@.%%@.$$@@...@@-+
+         |           $$@@     $ $@@$$$@@          $$% @$$@+@$$%@ $$@@+$$@@ |
+         |+$$++++++++$$@@+++@@$ $@@$+$@@+++@@$$+@@$$% @$$@+@$$%@ $$%@ $$@@ |
+       1x+-$$@@A$$%@R$$@@R$$@@$_$%@$_$%@$$s@@$$%%@$$%.@$$%.@$$%@.$$%@.$$%@-+
+         | $$@@+$$%@ $$%@ $$@@$+$%@$ $%@$$%%@$$+%@$$% @$$% @$$%@ $$%@ $$%@ |
+    0.95x+-$$%@.$$%@.$$%@.$$%@$.$%@$.$%@$$.%@$$.%@$$%.@$$%.@$$%@.$$%@.$$%@-+
+         | $$%@ $$%@ $$%@ $$%@$ $%@$ $%@$$ %@$$ %@$$% @$$% @$$%@ $$%@ $$%@ |
+     0.9x+-$$%@-$$%@-$$%@-$$%@$$$%@$$$%@$$%%@$$%%@$$%@@$$%@@$$%@-$$%@-$$%@-+
+           astabzip2 gcc gobmh264rehmlibquantumcfomneperlbensjexalanchmean
+  png: http://imgur.com/RiaBuIi
+
+That is, a 6.45% hmean improvement for this commit. Note that this is the
+test set, so some benchmarks take almost no time (and therefore aren't that
+sensitive to changes here). See "train" results below.
+
+Note also that hashing quality is not the only requirement: xxhash
+gives on average the highest hit rates. However, the time spent computing
+the hash negates the performance gains coming from the increase in hit rate.
+Given these results, I dropped xxhash from subsequent experiments.
+
+-   specINT 2006 (train set), x86_64-linux-user. Host: Intel i7-4790K @ 4.00GHz
+                              Y axis: Speedup over 95b31d70
+
+    1.4x+-+--------------------------------------------------------------+-+
+        |    jr      $$                                           +++      |
+        |    jr+hash %%                                            :       |
+    1.3x+-+.......................................................%%%....+-+
+        |                                               +++  +++  %:%      |
+        |                      +++                      %%%   :   %+%      |
+    1.2x+-+.....................%%......................%.%..%%%.$$.%....+-+
+        |                     ++%%                 %%% $$+%  %:% $$+%      |
+        |            +++      $$$%                $$+% $$ %  %:% $$ %      |
+    1.1x+-+...........%%......$.$%................$$.%.$$.%.$$.%.$$.%..%%%-+
+        |  +++        %%      $ $%            +++ $$ % $$ % $$ % $$ % +%+% |
+        | ++%%  +++ ++%% ++%% $ $% $$$+ +++   %%% $$ % $$ % $$ % $$ % $$+% |
+      1x+-$$$%RGR%%R$$$%H$$$%P$j$%h$s$%.$$%%..%.%.$$.%.$$.%.$$.%.$$.%.$$.%-+
+        | $+$% $$$% $ $% $+$% $ $% $ $% $$+%  % % $$ % $$ % $$ % $$ % $$ % |
+        | $ $% $ $% $ $% $ $% $ $% $ $% $$ %  % % $$ % $$ % $$ % $$ % $$ % |
+    0.9x+-$.$%.$.$%.$.$%.$.$%.$.$%.$.$%.$$.%..%.%.$$.%.$$.%.$$.%.$$.%.$$.%-+
+        | $ $% $ $% $ $% $ $% $ $% $ $% $$ % $$+% $$ % $$ % $$ % $$ % $$ % |
+        | $ $% $ $% $ $% $ $% $ $% $ $% $$ % $$ % $$ % $$ % $$ % $$ % $$ % |
+    0.8x+-$$$%-$$$%-$$$%-$$$%-$$$%-$$$%-$$%%-$$%%-$$%%-$$%%-$$%%-$$%%-$$%%-+
+          astarbzip2 gcc gobmh264rehlibquantumcfomneperlbensjexalancbhmean
+  png: http://imgur.com/55iJJgD
+
+That is, a 10.19% hmean improvement for jr+hash (this commit).
+
+-               NBench, arm-linux-user. Host: Intel i7-4790K @ 4.00GHz
+                              Y axis: Speedup over 95b31d70
+
+    1.35x+-+-------------------------------------------------------------+-+
+         |               @@@   jr              $$                          |
+     1.3x+-+.............@.@.  jr+inline       %%  ...@@@................+-+
+         |               @ @   jr+inline+hash  @@     @ @                  |
+         |               @ @                          @ @                  |
+    1.25x+-+.............@.@..........................@.@................+-+
+         |               @ @                    @@@   @ @                  |
+     1.2x+-+.............@.@..................$$%.@...@.@................+-+
+         |               @ @                  $$% @   @ @                  |
+         |               @ @        %%@       $$% @  %% @                  |
+    1.15x+-+.............@.@........%%@.......$$%.@$$$%.@................+-+
+         |               @ @        %%@       $$% @$ $% @                  |
+     1.1x+-+.............@.@......$$$%@.......$$%.@$.$%.@...............@@-+
+         |               @ @      $ $%@       $$% @$ $% @               @@ |
+         |               @ @      $ $%@ $$%%@ $$% @$ $% @            $$%%@ |
+    1.05x+-+...........$$%.@$$$%@@$.$%@.$$.%@.$$%.@$.$%.@.........@@.$$.%@-+
+         | $$%%@       $$% @$ $% @$ $%@ $$ %@ $$% @$ $% @       %%%@ $$ %@ |
+       1x+-$$.%@AR%%%@R$$%B@$G$%P@$T$%@_$$+%@l$$%+@$s$%.@$$$%@.$$.%@.$$.%@-+
+         +-$$%%@-$$%%@-$$%@@$$$%@@$$$%@-$$%%@-$$%@@$$$%@@$$$%@-$$%%@-$$%%@-+
+        ASSIGNMBITFIELFOFP_EMULATHUFFMANLU_DECOMPNEURNUMERICSTRING_SOhmean
+  png: http://imgur.com/i5e1gdY
+
+That is, a 11% hmean perf gain--it almost doubles the perf gain
+from implementing the jr optimization.
+
+-              NBench, x86_64-linux-user. Host: Intel i7-4790K @ 4.00GHz
+
+     1.1x+-+-------------------------------------------------------------+-+
+         |         jr             $$                                       |
+    1.08x+-+.....  jr+inline      %%  ...................................+-+
+         |         jr+inline+hash @@                                       |
+         | $$ @@                                                           |
+    1.06x+-$$.@@.........................%%%.............................+-+
+         | $$%%@                         % %                               |
+    1.04x+-$$.%@.........................%.%.............................+-+
+         | $$ %@         @@@            $$ %                   $$          |
+         | $$ %@         @ @  %%        $$ %                   $$%%@       |
+    1.02x+-$$.%@........%%.@$$$%@@......$$.%@..%%@@..%%........$$.%@.$$%%@-+
+         | $$ %@    @@  %% @$ $% @$$$   $$ %@ $$% @  %%@@$$$%  $$ %@ $$ %@ |
+       1x+-$$.%@A$$R@@RG%%B@$G$%P@$T$%P_$$T%@h$$%+@$$$%e@$.$%@.$$.%@.$$.%@-+
+         | $$ %@ $$%%@ $$% @$ $% @$ $%  $$ %@ $$% @$ $% @$ $%@ $$ %@ $$ %@ |
+    0.98x+-$$.%@.$$.%@.$$%.@$.$%.@$.$%@.$$.%@.$$%.@$.$%.@$.$%@.$$.%@.$$.%@-+
+         | $$ %@ $$ %@ $$% @$ $% @$ $%@ $$ %@ $$% @$ $% @$ $%@ $$ %@ $$ %@ |
+         | $$ %@ $$ %@ $$% @$ $% @$ $%@ $$ %@ $$% @$ $% @$ $%@ $$ %@ $$ %@ |
+    0.96x+-$$.%@.$$.%@.$$%.@$.$%.@$.$%@.$$.%@.$$%.@$.$%.@$.$%@.$$.%@.$$.%@-+
+         +-$$%%@-$$%%@-$$%@@$$$%@@$$$%@-$$%%@-$$%@@$$$%@@$$$%@-$$%%@-$$%%@-+
+        ASSIGNMBITFIELFOFP_EMULATHUFFMANLU_DECOMPNEURNUMERICSTRING_SOhmean
+  png: http://imgur.com/Xu0Owgu
+
+The fact that NBench is not very sensitive to changes here was mentioned
+in the previous commit's log. We get a very slight overall decrease in hmean
+performance, although some workloads improve as well. Note that there are
+no error bars: NBench re-runs itself until confidence on the stability of
+the average is >= 95%, and it doesn't report the resulting stddev.
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- tcg/aarch64/tcg-target.h  | 1 +
- tcg/arm/tcg-target.h      | 1 +
- tcg/i386/tcg-target.h     | 1 +
- tcg/i386/tcg-target.inc.c | 7 +++++++
- tcg/ia64/tcg-target.h     | 1 +
- tcg/mips/tcg-target.h     | 1 +
- tcg/ppc/tcg-target.h      | 1 +
- tcg/s390/tcg-target.h     | 1 +
- tcg/sparc/tcg-target.h    | 1 +
- tcg/tcg-op.h              | 6 ++++++
- tcg/tcg-opc.h             | 1 +
- tcg/tcg.c                 | 1 +
- tcg/tci/tcg-target.h      | 1 +
- 13 files changed, 24 insertions(+)
+ include/exec/tb-hash.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
-index 1a5ea23..ed2fb84 100644
---- a/tcg/aarch64/tcg-target.h
-+++ b/tcg/aarch64/tcg-target.h
-@@ -77,6 +77,7 @@ typedef enum {
- #define TCG_TARGET_HAS_mulsh_i32        0
- #define TCG_TARGET_HAS_extrl_i64_i32    0
- #define TCG_TARGET_HAS_extrh_i64_i32    0
-+#define TCG_TARGET_HAS_jr               0
+diff --git a/include/exec/tb-hash.h b/include/exec/tb-hash.h
+index 2c27490..b1fe2d0 100644
+--- a/include/exec/tb-hash.h
++++ b/include/exec/tb-hash.h
+@@ -22,6 +22,8 @@
  
- #define TCG_TARGET_HAS_div_i64          1
- #define TCG_TARGET_HAS_rem_i64          1
-diff --git a/tcg/arm/tcg-target.h b/tcg/arm/tcg-target.h
-index 09a19c6..1c9f0a2 100644
---- a/tcg/arm/tcg-target.h
-+++ b/tcg/arm/tcg-target.h
-@@ -123,6 +123,7 @@ extern bool use_idiv_instructions;
- #define TCG_TARGET_HAS_mulsh_i32        0
- #define TCG_TARGET_HAS_div_i32          use_idiv_instructions
- #define TCG_TARGET_HAS_rem_i32          0
-+#define TCG_TARGET_HAS_jr               0
+ #include "exec/tb-hash-xx.h"
  
- enum {
-     TCG_AREG0 = TCG_REG_R6,
-diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
-index 4275787..ebbddb3 100644
---- a/tcg/i386/tcg-target.h
-+++ b/tcg/i386/tcg-target.h
-@@ -107,6 +107,7 @@ extern bool have_popcnt;
- #define TCG_TARGET_HAS_muls2_i32        1
- #define TCG_TARGET_HAS_muluh_i32        0
- #define TCG_TARGET_HAS_mulsh_i32        0
-+#define TCG_TARGET_HAS_jr               1
- 
- #if TCG_TARGET_REG_BITS == 64
- #define TCG_TARGET_HAS_extrl_i64_i32    0
-diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index 5918008..53baf71 100644
---- a/tcg/i386/tcg-target.inc.c
-+++ b/tcg/i386/tcg-target.inc.c
-@@ -1909,6 +1909,9 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-     case INDEX_op_br:
-         tcg_out_jxx(s, JCC_JMP, arg_label(a0), 0);
-         break;
-+    case INDEX_op_jr:
-+        tcg_out_modrm(s, OPC_GRP5, EXT5_JMPN_Ev, a0);
-+        break;
-     OP_32_64(ld8u):
-         /* Note that we can ignore REXW for the zero-extend to 64-bit.  */
-         tcg_out_modrm_offset(s, OPC_MOVZBL, a0, a1, a2);
-@@ -2277,6 +2280,7 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
- 
- static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
- {
-+    static const TCGTargetOpDef ri = { .args_ct_str = { "ri" } };
-     static const TCGTargetOpDef ri_r = { .args_ct_str = { "ri", "r" } };
-     static const TCGTargetOpDef re_r = { .args_ct_str = { "re", "r" } };
-     static const TCGTargetOpDef qi_r = { .args_ct_str = { "qi", "r" } };
-@@ -2324,6 +2328,9 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     case INDEX_op_st_i64:
-         return &re_r;
- 
-+    case INDEX_op_jr:
-+        return &ri;
++#ifdef CONFIG_SOFTMMU
 +
-     case INDEX_op_add_i32:
-     case INDEX_op_add_i64:
-         return &r_r_re;
-diff --git a/tcg/ia64/tcg-target.h b/tcg/ia64/tcg-target.h
-index 42aea03..a2760ba 100644
---- a/tcg/ia64/tcg-target.h
-+++ b/tcg/ia64/tcg-target.h
-@@ -173,6 +173,7 @@ typedef enum {
- #define TCG_TARGET_HAS_mulsh_i64        0
- #define TCG_TARGET_HAS_extrl_i64_i32    0
- #define TCG_TARGET_HAS_extrh_i64_i32    0
-+#define TCG_TARGET_HAS_jr               0
- 
- #define TCG_TARGET_deposit_i32_valid(ofs, len) ((len) <= 16)
- #define TCG_TARGET_deposit_i64_valid(ofs, len) ((len) <= 16)
-diff --git a/tcg/mips/tcg-target.h b/tcg/mips/tcg-target.h
-index f46d64a..d06e495 100644
---- a/tcg/mips/tcg-target.h
-+++ b/tcg/mips/tcg-target.h
-@@ -130,6 +130,7 @@ extern bool use_mips32r2_instructions;
- #define TCG_TARGET_HAS_muluh_i32        1
- #define TCG_TARGET_HAS_mulsh_i32        1
- #define TCG_TARGET_HAS_bswap32_i32      1
-+#define TCG_TARGET_HAS_jr               0
- 
- #if TCG_TARGET_REG_BITS == 64
- #define TCG_TARGET_HAS_add2_i32         0
-diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
-index abd8b3d..461bb0c 100644
---- a/tcg/ppc/tcg-target.h
-+++ b/tcg/ppc/tcg-target.h
-@@ -82,6 +82,7 @@ extern bool have_isa_3_00;
- #define TCG_TARGET_HAS_muls2_i32        0
- #define TCG_TARGET_HAS_muluh_i32        1
- #define TCG_TARGET_HAS_mulsh_i32        1
-+#define TCG_TARGET_HAS_jr               0
- 
- #if TCG_TARGET_REG_BITS == 64
- #define TCG_TARGET_HAS_add2_i32         0
-diff --git a/tcg/s390/tcg-target.h b/tcg/s390/tcg-target.h
-index cbdd2a6..b35c7b1 100644
---- a/tcg/s390/tcg-target.h
-+++ b/tcg/s390/tcg-target.h
-@@ -92,6 +92,7 @@ extern uint64_t s390_facilities;
- #define TCG_TARGET_HAS_mulsh_i32      0
- #define TCG_TARGET_HAS_extrl_i64_i32  0
- #define TCG_TARGET_HAS_extrh_i64_i32  0
-+#define TCG_TARGET_HAS_jr             0
- 
- #define TCG_TARGET_HAS_div2_i64       1
- #define TCG_TARGET_HAS_rot_i64        1
-diff --git a/tcg/sparc/tcg-target.h b/tcg/sparc/tcg-target.h
-index b8b74f9..3d6f872 100644
---- a/tcg/sparc/tcg-target.h
-+++ b/tcg/sparc/tcg-target.h
-@@ -123,6 +123,7 @@ extern bool use_vis3_instructions;
- #define TCG_TARGET_HAS_muls2_i32        1
- #define TCG_TARGET_HAS_muluh_i32        0
- #define TCG_TARGET_HAS_mulsh_i32        0
-+#define TCG_TARGET_HAS_jr               0
- 
- #define TCG_TARGET_HAS_extrl_i64_i32    1
- #define TCG_TARGET_HAS_extrh_i64_i32    1
-diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-index c68e300..1924633 100644
---- a/tcg/tcg-op.h
-+++ b/tcg/tcg-op.h
-@@ -261,6 +261,12 @@ static inline void tcg_gen_br(TCGLabel *l)
-     tcg_gen_op1(&tcg_ctx, INDEX_op_br, label_arg(l));
+ /* Only the bottom TB_JMP_PAGE_BITS of the jump cache hash bits vary for
+    addresses on the same page.  The top bits are the same.  This allows
+    TLB invalidation to quickly clear a subset of the hash table.  */
+@@ -45,6 +47,16 @@ static inline unsigned int tb_jmp_cache_hash_func(target_ulong pc)
+            | (tmp & TB_JMP_ADDR_MASK));
  }
  
-+/* jump to a host address contained in a register */
-+static inline void tcg_gen_jr(TCGv_ptr arg)
++#else
++
++/* In user-mode we can get better hashing because we do not have a TLB */
++static inline unsigned int tb_jmp_cache_hash_func(target_ulong pc)
 +{
-+    tcg_gen_op1i(INDEX_op_jr, GET_TCGV_PTR(arg));
++    return (pc ^ (pc >> TB_JMP_CACHE_BITS)) & (TB_JMP_CACHE_SIZE - 1);
 +}
 +
- void tcg_gen_mb(TCGBar);
- 
- /* Helper calls. */
-diff --git a/tcg/tcg-opc.h b/tcg/tcg-opc.h
-index f06f894..1e869af 100644
---- a/tcg/tcg-opc.h
-+++ b/tcg/tcg-opc.h
-@@ -34,6 +34,7 @@ DEF(set_label, 0, 0, 1, TCG_OPF_BB_END | TCG_OPF_NOT_PRESENT)
- DEF(call, 0, 0, 3, TCG_OPF_CALL_CLOBBER | TCG_OPF_NOT_PRESENT)
- 
- DEF(br, 0, 0, 1, TCG_OPF_BB_END)
-+DEF(jr, 0, 1, 0, TCG_OPF_BB_END)
- 
- #define IMPL(X) (__builtin_constant_p(X) && !(X) ? TCG_OPF_NOT_PRESENT : 0)
- #if TCG_TARGET_REG_BITS == 32
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index cb898f1..a7e7842 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -1139,6 +1139,7 @@ void tcg_dump_ops(TCGContext *s)
-             switch (c) {
-             case INDEX_op_set_label:
-             case INDEX_op_br:
-+            case INDEX_op_jr:
-             case INDEX_op_brcond_i32:
-             case INDEX_op_brcond_i64:
-             case INDEX_op_brcond2_i32:
-diff --git a/tcg/tci/tcg-target.h b/tcg/tci/tcg-target.h
-index 838bf3a..63d1a57 100644
---- a/tcg/tci/tcg-target.h
-+++ b/tcg/tci/tcg-target.h
-@@ -85,6 +85,7 @@
- #define TCG_TARGET_HAS_muls2_i32        0
- #define TCG_TARGET_HAS_muluh_i32        0
- #define TCG_TARGET_HAS_mulsh_i32        0
-+#define TCG_TARGET_HAS_jr               0
- 
- #if TCG_TARGET_REG_BITS == 64
- #define TCG_TARGET_HAS_extrl_i64_i32    0
++#endif /* CONFIG_SOFTMMU */
++
+ static inline
+ uint32_t tb_hash_func(tb_page_addr_t phys_pc, target_ulong pc, uint32_t flags)
+ {
 -- 
 2.7.4
