@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cyIsf-000265-Na
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:04:26 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cyIuV-0002sP-OZ
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:06:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cyIsb-0000To-2l
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:04:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49672)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cyIsa-0000Ta-Qj
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:04:17 -0400
-References: <20170406210917.6896-1-eblake@redhat.com>
-	<877f2pnb2t.fsf@dusky.pond.sub.org>
-	<70ca7ebd-f538-1721-c500-9e106225959c@redhat.com>
-	<87vaq97mxf.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <480c1dd8-fcd1-212c-a2c0-8170da3a7629@redhat.com>
-Date: Wed, 12 Apr 2017 09:03:54 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cyIuR-00016e-HL
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:06:15 -0400
+From: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Date: Wed, 12 Apr 2017 22:05:20 +0800
+Message-ID: <1492005921-15664-6-git-send-email-zhang.zhanghailiang@huawei.com>
+In-Reply-To: <1492005921-15664-1-git-send-email-zhang.zhanghailiang@huawei.com>
+References: <1492005921-15664-1-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <87vaq97mxf.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="fgLwwVas6Muhts07RXChXptk3SgV9vJfx"
-Subject: Re: [Qemu-devel] [PATCH] event: Add signal information to SHUTDOWN
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v4 5/6] replication: Implement block
+ replication for shared disk case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,116 +22,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Stefan Weil <sw@weilnetz.de>
+To: stefanha@redhat.com, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, xiecl.fnst@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Wen Congyang <wency@cn.fujitsu.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fgLwwVas6Muhts07RXChXptk3SgV9vJfx
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- Stefan Weil <sw@weilnetz.de>
-Message-ID: <480c1dd8-fcd1-212c-a2c0-8170da3a7629@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] event: Add signal information to SHUTDOWN
-References: <20170406210917.6896-1-eblake@redhat.com>
- <877f2pnb2t.fsf@dusky.pond.sub.org>
- <70ca7ebd-f538-1721-c500-9e106225959c@redhat.com>
- <87vaq97mxf.fsf@dusky.pond.sub.org>
-In-Reply-To: <87vaq97mxf.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Just as the scenario of non-shared disk block replication,
+we are going to implement block replication from many basic
+blocks that are already in QEMU.
+The architecture is:
 
-On 04/12/2017 08:52 AM, Markus Armbruster wrote:
->>> In other words, these three signals are polite requests to terminate
->>> QEMU.
->>>
->>> Stefan, are there equivalent requests under Windows?  I guess there
->>> might be one at least for SIGINT, namely whatever happens when you hi=
-t
->>> ^C on the console.
->>
->> Mingw has SIGINT (C99 requires it), and that's presumably what happens=
+         virtio-blk                     ||                               .----------
+             /                          ||                               | Secondary
+            /                           ||                               '----------
+           /                            ||                                 virtio-blk
+          /                             ||                                      |
+          |                             ||                               replication(5)
+          |                    NBD  -------->   NBD   (2)                       |
+          |                  client     ||    server ---> hidden disk <-- active disk(4)
+          |                     ^       ||                      |
+          |              replication(1) ||                      |
+          |                     |       ||                      |
+          |   +-----------------'       ||                      |
+         (3)  |drive-backup sync=none   ||                      |
+--------. |   +-----------------+       ||                      |
+Primary | |                     |       ||           backing    |
+--------' |                     |       ||                      |
+          V                     |                               |
+       +-------------------------------------------+            |
+       |               shared disk                 | <----------+
+       +-------------------------------------------+
 
->> for ^C,...
->>
->>>
->>> Could we arrange to run qemu_system_killed() then?
->>
->> ...but I don't know why it is not currently wired up to call
->> qemu_system_killed(), nor do I have enough Windows programming experti=
-se
->> to try and write such a patch. But I think that is an orthogonal
->> improvement.  On the other hand, mingw has a definition for SIGTERM (b=
-ut
->> I'm not sure how it gets triggered) and no definition at all for SIGHU=
-P
->> (as evidenced by the #ifdef'fery in the patch to get it to compile und=
-er
->> docker targetting mingw).
->=20
-> If all we need is distingishing host- and guest-initiated shutdown, the=
-n
-> detecting the latter reliably lets us stay away from OS-specific stuff.=
+    1) Primary writes will read original data and forward it to Secondary
+       QEMU.
+    2) The hidden-disk is created automatically. It buffers the original content
+       that is modified by the primary VM. It should also be an empty disk, and
+       the driver supports bdrv_make_empty() and backing file.
+    3) Primary write requests will be written to Shared disk.
+    4) Secondary write requests will be buffered in the active disk and it
+       will overwrite the existing sector content in the buffer.
 
-> Can we do that?
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Signed-off-by: Wen Congyang <wency@cn.fujitsu.com>
+Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+---
+v4:
+ - Call bdrv_invalidate_cache() while do checkpoint for shared disk
+---
+ block/replication.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 52 insertions(+), 6 deletions(-)
 
-I'll simplify what I can; I still can't guarantee that mingw will be
-setting the bool correctly in all cases, but setting a bool is easier
-than trying to set a signal name.
-
-
->> There are other reasons too: a guest can request shutdown immediately
->> before the host sends SIGINT. Based on when things are processed, you
->> could see either the guest or the host as the initiator.  And the race=
-
->> is not entirely implausible - when trying to shut down a guest, libvir=
-t
->> first tries to inform the guest to initiate things (whether by interru=
-pt
->> or guest agent), but after a given amount of time, assumes the guest i=
-s
->> unresponsive and resorts to a signal to qemu. A heavily loaded guest
->> that takes its time in responding could easily overlap with the timeou=
-t
->> resorting to a host-side action.
->=20
-> This race doesn't worry me.  If both host and guest have initiated a
-> shutdown, then reporting whichever of the two finishes first seems fair=
-=2E
-
-So maybe I just tone down the docs and not even mention it.
-
->=20
-> Additional ways to terminate QEMU: HMP and QMP command "quit", and the
-> various GUI controls such "close SDL window".
-
-Good points. I have no idea what exit path those take (if they
-raise(SIGINT) internally, it's quite easy - but if they go through some
-other exit path, then I'll need to wire in something else).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---fgLwwVas6Muhts07RXChXptk3SgV9vJfx
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY7jPKAAoJEKeha0olJ0NqfJUIAIj/mJ7GHkdZ2ip2QeOycbM2
-6xb9S6q5jui7WoEDFuAjLVSrlBTINuRycLlFO8W5KBYEGWeb5obMXlyRZQ7dcIqT
-i+K7Fiw+F2CKdlR8s+MJG85XakrQUGA778hqqY9leZUqF/hGbonME/Lpn6bxTCcJ
-iKLKl/4vfQJ8e3aeqTzHK7qLdWnqOiKdSUpyUMIiONgF9QVWLno1gf3w4JGLy1cV
-nkpzBk1DfiyqKUEppc48UPyaoyeuUreV6WnFBvajQ+k9ZV+vcBqYx6j7c6Ub87vw
-ssYF15h+rvzevuBlgKb3RtTnCqbDydLHj14A6DXDg+a3OFRtDiVbeFMWBEVXvc4=
-=bsWT
------END PGP SIGNATURE-----
-
---fgLwwVas6Muhts07RXChXptk3SgV9vJfx--
+diff --git a/block/replication.c b/block/replication.c
+index 3a35471..fb604e5 100644
+--- a/block/replication.c
++++ b/block/replication.c
+@@ -253,7 +253,7 @@ static coroutine_fn int replication_co_readv(BlockDriverState *bs,
+                                              QEMUIOVector *qiov)
+ {
+     BDRVReplicationState *s = bs->opaque;
+-    BdrvChild *child = s->secondary_disk;
++    BdrvChild *child = s->is_shared_disk ? s->primary_disk : s->secondary_disk;
+     BlockJob *job = NULL;
+     CowRequest req;
+     int ret;
+@@ -435,7 +435,12 @@ static void backup_job_completed(void *opaque, int ret)
+         s->error = -EIO;
+     }
+ 
+-    backup_job_cleanup(bs);
++    if (s->mode == REPLICATION_MODE_PRIMARY) {
++        s->replication_state = BLOCK_REPLICATION_DONE;
++        s->error = 0;
++    } else {
++        backup_job_cleanup(bs);
++    }
+ }
+ 
+ static bool check_top_bs(BlockDriverState *top_bs, BlockDriverState *bs)
+@@ -487,6 +492,19 @@ static void replication_start(ReplicationState *rs, ReplicationMode mode,
+ 
+     switch (s->mode) {
+     case REPLICATION_MODE_PRIMARY:
++        if (s->is_shared_disk) {
++            job = backup_job_create(NULL, s->primary_disk->bs, bs, 0,
++                MIRROR_SYNC_MODE_NONE, NULL, false, BLOCKDEV_ON_ERROR_REPORT,
++                BLOCKDEV_ON_ERROR_REPORT, BLOCK_JOB_INTERNAL,
++                backup_job_completed, bs, NULL, &local_err);
++            if (local_err) {
++                error_propagate(errp, local_err);
++                backup_job_cleanup(bs);
++                aio_context_release(aio_context);
++                return;
++            }
++            block_job_start(job);
++        }
+         break;
+     case REPLICATION_MODE_SECONDARY:
+         s->active_disk = bs->file;
+@@ -505,7 +523,8 @@ static void replication_start(ReplicationState *rs, ReplicationMode mode,
+         }
+ 
+         s->secondary_disk = s->hidden_disk->bs->backing;
+-        if (!s->secondary_disk->bs || !bdrv_has_blk(s->secondary_disk->bs)) {
++        if (!s->secondary_disk->bs ||
++            (!s->is_shared_disk && !bdrv_has_blk(s->secondary_disk->bs))) {
+             error_setg(errp, "The secondary disk doesn't have block backend");
+             aio_context_release(aio_context);
+             return;
+@@ -600,11 +619,24 @@ static void replication_do_checkpoint(ReplicationState *rs, Error **errp)
+ 
+     switch (s->mode) {
+     case REPLICATION_MODE_PRIMARY:
++        if (s->is_shared_disk) {
++            if (!s->primary_disk->bs->job) {
++                error_setg(errp, "Primary backup job was cancelled"
++                           " unexpectedly");
++                break;
++            }
++
++            backup_do_checkpoint(s->primary_disk->bs->job, &local_err);
++            if (local_err) {
++                error_propagate(errp, local_err);
++            }
++        }
+         break;
+     case REPLICATION_MODE_SECONDARY:
+         if (!s->is_shared_disk) {
+             if (!s->secondary_disk->bs->job) {
+-                error_setg(errp, "Backup job was cancelled unexpectedly");
++                error_setg(errp, "Secondary backup job was cancelled"
++                           " unexpectedly");
+                 break;
+             }
+             backup_do_checkpoint(s->secondary_disk->bs->job, &local_err);
+@@ -612,6 +644,16 @@ static void replication_do_checkpoint(ReplicationState *rs, Error **errp)
+                 error_propagate(errp, local_err);
+                 break;
+             }
++        } else {
++            /*
++             * For shared disk, we need to force SVM to re-read metadata
++             * that is loaded in memory, or there will be inconsistent.
++             */
++            bdrv_invalidate_cache(s->secondary_disk->bs, &local_err);
++            if (local_err) {
++                error_propagate(errp, local_err);
++                break;
++            }
+         }
+         secondary_do_checkpoint(s, errp);
+         break;
+@@ -683,8 +725,12 @@ static void replication_stop(ReplicationState *rs, bool failover, Error **errp)
+ 
+     switch (s->mode) {
+     case REPLICATION_MODE_PRIMARY:
+-        s->replication_state = BLOCK_REPLICATION_DONE;
+-        s->error = 0;
++        if (s->is_shared_disk && s->primary_disk->bs->job) {
++            block_job_cancel(s->primary_disk->bs->job);
++        } else {
++            s->replication_state = BLOCK_REPLICATION_DONE;
++            s->error = 0;
++        }
+         break;
+     case REPLICATION_MODE_SECONDARY:
+         /*
+-- 
+1.8.3.1
