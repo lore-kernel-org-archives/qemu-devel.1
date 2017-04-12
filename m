@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cyEBw-00087q-Hv
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 05:03:57 -0400
+	(envelope-from <armbru@redhat.com>) id 1cyECY-000063-PG
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 05:04:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cyEBr-0005iG-Mn
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 05:03:56 -0400
-Received: from 6.mo178.mail-out.ovh.net ([46.105.53.132]:44822)
+	(envelope-from <armbru@redhat.com>) id 1cyECT-0005yK-Tq
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 05:04:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52998)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cyEBr-0005hx-HN
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 05:03:51 -0400
-Received: from player715.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 16C3F2F5F8
-	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 11:03:49 +0200 (CEST)
-References: <1491984907-9894-1-git-send-email-bharata@linux.vnet.ibm.com>
-	<9e992fd5-8f42-5ec6-2a77-f6d9ce088226@kaod.org>
-	<20170412085300.GB1429@in.ibm.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <ab619b56-35ba-80f8-7647-06666673b7bb@kaod.org>
-Date: Wed, 12 Apr 2017 11:03:44 +0200
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cyECT-0005xX-P0
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 05:04:29 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5AFBB6AADA
+	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 09:04:28 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170406154107.9178-1-dgilbert@redhat.com>
+Date: Wed, 12 Apr 2017 11:04:26 +0200
+In-Reply-To: <20170406154107.9178-1-dgilbert@redhat.com> (David Alan Gilbert's
+	message of "Thu, 6 Apr 2017 16:41:07 +0100")
+Message-ID: <87lgr6m1yd.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170412085300.GB1429@in.ibm.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] spapr-cpu-core: Release ICPState object
- during CPU unrealization
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] tests/check-qdict: Fix missing brackets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,31 +32,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: bharata@linux.vnet.ibm.com
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com
 
-On 04/12/2017 10:53 AM, Bharata B Rao wrote:
-> On Wed, Apr 12, 2017 at 10:47:39AM +0200, C=E9dric Le Goater wrote:
->> On 04/12/2017 10:15 AM, Bharata B Rao wrote:
->>> Recent commits that re-organized ICPState object missed to destroy
->>> the object when CPU is unrealized. Fix this so that CPU unplug
->>> doesn't abort QEMU.
->>
->> Indeed.
->>
->>> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
->>
->> I am wondering if we should not be doing the unparent under=20
->> spapr_cpu_destroy() or even xics_cpu_destroy(). Apart from
->> that,=20
->=20
-> Thought so, but since object is created in realize routinte itself
-> (and not in any of its callers), did the object destruction in
-> unrealize to be symmetrical :)
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> writes:
 
-yes. I think it is a good pratice to unparent/free the object=20
-in the same file it was allocated.
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> Gcc 7 (on Fedora 26) spotted odd use of integers instead of a
+> boolean; it's got a point.
+>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  tests/check-qdict.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/tests/check-qdict.c b/tests/check-qdict.c
+> index 81162ee572..6f3fbcf9c1 100644
+> --- a/tests/check-qdict.c
+> +++ b/tests/check-qdict.c
+> @@ -559,7 +559,7 @@ static void qdict_join_test(void)
+>          g_assert(qdict_size(dict1) == 2);
+>          g_assert(qdict_size(dict2) == !overwrite);
+>  
+> -        g_assert(qdict_get_int(dict1, "foo") == overwrite ? 84 : 42);
+> +        g_assert(qdict_get_int(dict1, "foo") == (overwrite ? 84 : 42));
+>          g_assert(qdict_get_int(dict1, "bar") == 23);
+>  
+>          if (!overwrite) {
 
-Thanks,
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
-C.
+Applied to qapi-next, thanks!
