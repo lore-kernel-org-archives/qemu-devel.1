@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <x1917x@gmail.com>) id 1cyBaj-0004Ur-9M
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 02:17:22 -0400
+	(envelope-from <armbru@redhat.com>) id 1cyBxf-0008Vx-KL
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 02:41:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <x1917x@gmail.com>) id 1cyBag-0008AO-43
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 02:17:21 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:34476)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <x1917x@gmail.com>) id 1cyBaf-00089v-Oj
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 02:17:18 -0400
-Received: by mail-lf0-x241.google.com with SMTP id x72so1901958lfb.1
-	for <qemu-devel@nongnu.org>; Tue, 11 Apr 2017 23:17:15 -0700 (PDT)
-Date: Wed, 12 Apr 2017 16:17:04 +1000
-From: Alexey G <x1917x@gmail.com>
-Message-ID: <20170412161704.00003875@gmail.com>
-In-Reply-To: <alpine.DEB.2.10.1704111509350.2759@sstabellini-ThinkPad-X260>
-References: <CADZi59zNxk-Yr4rpN1E49s=AdsdW-W9YfhpCvpJeBz7oigyFSg@mail.gmail.com>
-	<CADZi59xe6OcCasvtkPBjP7nTsgDA5r_E_Rt7W88BszYdJhuxGQ@mail.gmail.com>
-	<CADZi59xEg0SvScgo=Jg0MxTbGYY=nTX18Qo-4GMkfayThDU9zw@mail.gmail.com>
-	<alpine.DEB.2.10.1704101159340.2759@sstabellini-ThinkPad-X260>
-	<alpine.DEB.2.10.1704101243270.2759@sstabellini-ThinkPad-X260>
-	<CADZi59yC4m+wFS+iJUrV9Y59X96cQVMnrCNLvcd5o2kdjmqQdA@mail.gmail.com>
-	<alpine.DEB.2.10.1704111509350.2759@sstabellini-ThinkPad-X260>
+	(envelope-from <armbru@redhat.com>) id 1cyBxc-0002ZP-If
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 02:41:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59100)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cyBxc-0002Yh-AN
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 02:41:00 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3D893804E9
+	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 06:40:58 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170411185034.13460-1-eblake@redhat.com>
+	<20170411185034.13460-7-eblake@redhat.com>
+Date: Wed, 12 Apr 2017 08:40:55 +0200
+In-Reply-To: <20170411185034.13460-7-eblake@redhat.com> (Eric Blake's message
+	of "Tue, 11 Apr 2017 13:50:27 -0500")
+Message-ID: <87r30yw2ko.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Xen-devel] [RFC/BUG] xen-mapcache: buggy
- invalidate map cache?
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 06/13] qobject: Add helper macros for
+ common scalar insertions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,110 +34,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: hrg <hrgstephen@gmail.com>, wangxinxin.wang@huawei.com, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, xen-devel@lists.xensource.com, Jun Nakajima <jun.nakajima@intel.com>, Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, xen-devel@lists.xen.org, "Herongguang (Stephen)" <herongguang.he@huawei.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Tue, 11 Apr 2017 15:32:09 -0700 (PDT)
-Stefano Stabellini <sstabellini@kernel.org> wrote:
+Eric Blake <eblake@redhat.com> writes:
 
-> On Tue, 11 Apr 2017, hrg wrote:
-> > On Tue, Apr 11, 2017 at 3:50 AM, Stefano Stabellini
-> > <sstabellini@kernel.org> wrote: =20
-> > > On Mon, 10 Apr 2017, Stefano Stabellini wrote: =20
-> > >> On Mon, 10 Apr 2017, hrg wrote: =20
-> > >> > On Sun, Apr 9, 2017 at 11:55 PM, hrg <hrgstephen@gmail.com> wrote:=
- =20
-> > >> > > On Sun, Apr 9, 2017 at 11:52 PM, hrg <hrgstephen@gmail.com> wrot=
-e: =20
-> > >> > >> Hi,
-> > >> > >>
-> > >> > >> In xen_map_cache_unlocked(), map to guest memory maybe in
-> > >> > >> entry->next instead of first level entry (if map to rom other t=
-han
-> > >> > >> guest memory comes first), while in xen_invalidate_map_cache(),
-> > >> > >> when VM ballooned out memory, qemu did not invalidate cache ent=
-ries
-> > >> > >> in linked list(entry->next), so when VM balloon back in memory,
-> > >> > >> gfns probably mapped to different mfns, thus if guest asks devi=
-ce
-> > >> > >> to DMA to these GPA, qemu may DMA to stale MFNs.
-> > >> > >>
-> > >> > >> So I think in xen_invalidate_map_cache() linked lists should al=
-so be
-> > >> > >> checked and invalidated.
-> > >> > >>
-> > >> > >> What=E2=80=99s your opinion? Is this a bug? Is my analyze corre=
-ct? =20
-> > >>
-> > >> Yes, you are right. We need to go through the list for each element =
-of
-> > >> the array in xen_invalidate_map_cache. Can you come up with a patch?=
- =20
-> > >
-> > > I spoke too soon. In the regular case there should be no locked mappi=
-ngs
-> > > when xen_invalidate_map_cache is called (see the DPRINTF warning at t=
-he
-> > > beginning of the functions). Without locked mappings, there should ne=
-ver
-> > > be more than one element in each list (see xen_map_cache_unlocked:
-> > > entry->lock =3D=3D true is a necessary condition to append a new entr=
-y to
-> > > the list, otherwise it is just remapped).
-> > >
-> > > Can you confirm that what you are seeing are locked mappings
-> > > when xen_invalidate_map_cache is called? To find out, enable the DPRI=
-NTK
-> > > by turning it into a printf or by defininig MAPCACHE_DEBUG. =20
-> >=20
-> > In fact, I think the DPRINTF above is incorrect too. In
-> > pci_add_option_rom(), rtl8139 rom is locked mapped in
-> > pci_add_option_rom->memory_region_get_ram_ptr (after
-> > memory_region_init_ram). So actually I think we should remove the
-> > DPRINTF warning as it is normal. =20
->=20
-> Let me explain why the DPRINTF warning is there: emulated dma operations
-> can involve locked mappings. Once a dma operation completes, the related
-> mapping is unlocked and can be safely destroyed. But if we destroy a
-> locked mapping in xen_invalidate_map_cache, while a dma is still
-> ongoing, QEMU will crash. We cannot handle that case.
->=20
-> However, the scenario you described is different. It has nothing to do
-> with DMA. It looks like pci_add_option_rom calls
-> memory_region_get_ram_ptr to map the rtl8139 rom. The mapping is a
-> locked mapping and it is never unlocked or destroyed.
->=20
-> It looks like "ptr" is not used after pci_add_option_rom returns. Does
-> the append patch fix the problem you are seeing? For the proper fix, I
-> think we probably need some sort of memory_region_unmap wrapper or maybe
-> a call to address_space_unmap.
+> Rather than making lots of callers wrap a scalar in a QInt, QString,
+> or QBool, provide helper macros that do the wrapping automatically.
+>
+> Update the Coccinelle script to make mass conversions easy, although
+> the conversion itself will be done as a separate patches to ease
+> review and backport efforts.
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+>
+> ---
+> v4: tweak comment wording
+> v3: new patch
+> ---
+>  include/qapi/qmp/qdict.h         |  8 ++++++++
+>  include/qapi/qmp/qlist.h         |  8 ++++++++
+>  scripts/coccinelle/qobject.cocci | 22 ++++++++++++++++++++++
+>  3 files changed, 38 insertions(+)
+>
+> diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
+> index fe9a4c5..f70d435 100644
+> --- a/include/qapi/qmp/qdict.h
+> +++ b/include/qapi/qmp/qdict.h
+> @@ -52,6 +52,14 @@ void qdict_destroy_obj(QObject *obj);
+>  #define qdict_put(qdict, key, obj) \
+>          qdict_put_obj(qdict, key, QOBJECT(obj))
+>
+> +/* Helpers for int, bool, and string. */
 
-Hmm, for some reason my message to the Xen-devel list got rejected but was =
-sent
-to Qemu-devel instead, without any notice. Sorry if I'm missing something
-obvious as a list newbie.
+Nitpick: this isn't a sentence, so why the period?
 
-Stefano, hrg,
+> +#define qdict_put_int(qdict, key, value) \
+> +        qdict_put(qdict, key, qint_from_int(value))
+> +#define qdict_put_bool(qdict, key, value) \
+> +        qdict_put(qdict, key, qbool_from_bool(value))
+> +#define qdict_put_str(qdict, key, value) \
+> +        qdict_put(qdict, key, qstring_from_str(value))
+> +
+>  /* High level helpers */
+>  double qdict_get_double(const QDict *qdict, const char *key);
+>  int64_t qdict_get_int(const QDict *qdict, const char *key);
+> diff --git a/include/qapi/qmp/qlist.h b/include/qapi/qmp/qlist.h
+> index a84117e..7b3fb9a 100644
+> --- a/include/qapi/qmp/qlist.h
+> +++ b/include/qapi/qmp/qlist.h
+> @@ -29,6 +29,14 @@ typedef struct QList {
+>  #define qlist_append(qlist, obj) \
+>          qlist_append_obj(qlist, QOBJECT(obj))
+>
+> +/* Helpers for int, bool, and string. */
 
-There is an issue with inconsistency between the list of normal MapCacheEnt=
-ry's
-and their 'reverse' counterparts - MapCacheRev's in locked_entries.
-When bad situation happens, there are multiple (locked) MapCacheEntry
-entries in the bucket's linked list along with a number of MapCacheRev's. A=
-nd
-when it comes to a reverse lookup, xen-mapcache picks the wrong entry from =
-the
-first list and calculates a wrong pointer from it which may then be caught =
-with
-the "Bad RAM offset" check (or not). Mapcache invalidation might be related=
- to
-this issue as well I think.
+Likewise.
 
-I'll try to provide a test code which can reproduce the issue from the
-guest side using an emulated IDE controller, though it's much simpler to ac=
-hieve
-this result with an AHCI controller using multiple NCQ I/O commands. So far=
- I've
-seen this issue only with Windows 7 (and above) guest on AHCI, but any bloc=
-k I/O
-DMA should be enough I think.
+> +#define qlist_append_int(qlist, value) \
+> +        qlist_append(qlist, qint_from_int(value))
+> +#define qlist_append_bool(qlist, value) \
+> +        qlist_append(qlist, qbool_from_bool(value))
+> +#define qlist_append_str(qlist, value) \
+> +        qlist_append(qlist, qstring_from_str(value))
+> +
+>  #define QLIST_FOREACH_ENTRY(qlist, var)             \
+>          for ((var) = ((qlist)->head.tqh_first);     \
+>              (var);                                  \
+> diff --git a/scripts/coccinelle/qobject.cocci b/scripts/coccinelle/qobject.cocci
+> index aa899e2..97703a4 100644
+> --- a/scripts/coccinelle/qobject.cocci
+> +++ b/scripts/coccinelle/qobject.cocci
+> @@ -2,12 +2,34 @@
+>  @@
+>  expression Obj, Key, E;
+>  @@
+> +(
+>  - qdict_put_obj(Obj, Key, QOBJECT(E));
+>  + qdict_put(Obj, Key, E);
+> +|
+> +- qdict_put(Obj, Key, qint_from_int(E));
+> ++ qdict_put_int(Obj, Key, E);
+> +|
+> +- qdict_put(Obj, Key, qbool_from_bool(E));
+> ++ qdict_put_bool(Obj, Key, E);
+> +|
+> +- qdict_put(Obj, Key, qstring_from_str(E));
+> ++ qdict_put_str(Obj, Key, E);
+> +)
+>
+>  // Use QList macros where they make sense
+>  @@
+>  expression Obj, E;
+>  @@
+> +(
+>  - qlist_append_obj(Obj, QOBJECT(E));
+>  + qlist_append(Obj, E);
+> +|
+> +- qlist_append(Obj, qint_from_int(E));
+> ++ qlist_append_int(Obj, E);
+> +|
+> +- qlist_append(Obj, qbool_from_bool(E));
+> ++ qlist_append_bool(Obj, E);
+> +|
+> +- qlist_append(Obj, qstring_from_str(E));
+> ++ qlist_append_str(Obj, E);
+> +)
