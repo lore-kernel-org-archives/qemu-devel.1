@@ -1,28 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cyD2B-0004fk-5j
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 03:49:48 -0400
+	(envelope-from <bounces@canonical.com>) id 1cyDDO-0006ok-KI
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 04:01:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cyD26-0000Zf-97
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 03:49:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51692)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cyD26-0000ZF-0n
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 03:49:42 -0400
-Date: Wed, 12 Apr 2017 15:49:30 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170412074930.GF16464@pxdev.xzpeter.org>
-References: <20170411101002.28451-1-maxime.coquelin@redhat.com>
-	<20170411101002.28451-3-maxime.coquelin@redhat.com>
-	<20170411132046.GA16464@pxdev.xzpeter.org>
-	<ed46bbd8-222b-3cda-e524-f9dfda8e3770@redhat.com>
-	<20170412071708.GE16464@pxdev.xzpeter.org>
-	<0f3cde33-98f0-c7b0-2f3b-372a26b83384@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1cyDDJ-0004xV-P4
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 04:01:22 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42827)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cyDDJ-0004x4-KP
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 04:01:17 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cyDDH-0004Cq-TH
+	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 08:01:15 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id DA0102E800F
+	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 08:01:15 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <0f3cde33-98f0-c7b0-2f3b-372a26b83384@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 2/2] spec/vhost-user spec: Add IOMMU support
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 12 Apr 2017 07:51:55 -0000
+From: =?utf-8?b?TWljaGHFgiBLxJlwaWXFhA==?= <launchpad@kempniu.pl>
+Reply-To: Bug 1681439 <1681439@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170410132346.31250.84835.malonedeb@wampee.canonical.com>
+Message-Id: <20170412075155.31027.48612.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1681439] Re: qemu-system-x86_64:
+ hw/ide/core.c:685: ide_cancel_dma_sync: Assertion `s->bus->dma->aiocb ==
+ NULL' failed.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,103 +38,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: mst@redhat.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, virtio-comment@lists.oasis-open.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Wed, Apr 12, 2017 at 09:24:47AM +0200, Maxime Coquelin wrote:
-> 
-> 
-> On 04/12/2017 09:17 AM, Peter Xu wrote:
-> >On Tue, Apr 11, 2017 at 05:16:19PM +0200, Maxime Coquelin wrote:
-> >>On 04/11/2017 03:20 PM, Peter Xu wrote:
-> >>>On Tue, Apr 11, 2017 at 12:10:02PM +0200, Maxime Coquelin wrote:
-> >
-> >[...]
-> >
-> >>>
-> >>>>+slave is expected to reply with a zero payload, non-zero otherwise.
-> >>>
-> >>>Is this ack mechanism really necessary? If not, not sure it'll be nice
-> >>>to keep vhost-user/vhost-kernel aligned on this behavior. At least
-> >>>that'll simplify vhost-user implementation on QEMU side (iiuc even
-> >>>without introducing new functions for update/invalidate operations).
-> >>
-> >>I think this is necessary, and it won't complexify the vhost-user
-> >>implementation on QEMU side, since already widely used (see reply-ack
-> >>feature).
-> >
-> >Could you provide file/function/link pointer to the "reply-ack"
-> >feature? I failed to find it myself.
-> >
-> >>
-> >>This reply-ack mechanism is used to obtain a behaviour closer to kernel
-> >>backend. Indeed, when QEMU sends a vhost_msg to the kernel backend, it
-> >>is blocked in the write() while the message is being processed in the
-> >>Kernel. With user backend, QEMU is unblocked from the write() when the
-> >>backend has read the message, before it is being processed.
-> >>
-> >
-> >I see. Then I agree with you that we may need a synchronized way to do
-> >it. One thing I think of is IOMMU page invalidation - it should be a
-> >sync operation to make sure that all the related caches were destroyed
-> >when the invalidation command returns in QEMU vIOMMU emulation path.
-> >
-> >>
-> >>>>+
-> >>>>+When the VHOST_USER_PROTOCOL_F_SLAVE_REQ is supported by the slave, and the
-> >>>>+master initiated the slave to master communication channel using the
-> >>>>+VHOST_USER_SET_SLAVE_REQ_FD request, the slave can send IOTLB miss and access
-> >>>>+failure events by sending VHOST_USER_IOTLB_MSG requests to the master with a
-> >>>>+struct vhost_iotlb_msg payload. For miss events, the iotlb payload has to be
-> >>>>+filled with the miss message type (1), the I/O virtual address and the
-> >>>>+permissions flags. For access failure event, the iotlb payload has to be
-> >>>>+filled with the access failure message type (4), the I/O virtual address and
-> >>>>+the permissions flags. On success, the master is expected to reply  when the
-> >>>>+request has been handled (for example, on miss requests, once the device IOTLB
-> >>>>+has been updated) with a zero payload, non-zero otherwise.
-> >>>
-> >>>Failed to understand the last sentence clearly. IIUC vhost-net will
-> >>>reply with an UPDATE message when a MISS message is received. Here for
-> >>>vhost-user are we going to send one extra zero payload after that?
-> >>
-> >>Not exactly. There are two channels, one for QEMU to backend requests
-> >>(channel A), one for backend to QEMU requests (channel B).
-> >>
-> >>The backend may be multi-threaded (like DPDK), one thread for handling
-> >>QEMU initiated requests (channel A), the others to handle packet
-> >>processing (i.e. one for Rx, one for Tx).
-> >>
-> >>The processing threads will need to translate iova adresses by
-> >>searching in the IOTLB cache. In case of miss, it will send an IOTLB
-> >>miss request on channel B, and then wait for the ack/nack. In case of
-> >>ack, it can search again the IOTLB cache and find the translation.
-> >>
-> >>On QEMU side, when the thread handling channel B requests receives the
-> >>IOTLB miss message, it gets the translation and send an IOTLB update
-> >>message on channel A. Then it waits for the ack from the backend,
-> >>meaning that the IOTLB cache has been updated, and replies ack on
-> >>channel B.
-> >
-> >If the ack on channel B is used to notify the processing thread that
-> >"cache is ready", then... would it be faster that we just let the
-> >processing thread poll the cache until it finds it, or let the other
-> >thread notify it when it receives ack on channel A? Not sure whether
-> >it'll be faster.
-> 
-> Not sure either.
-> Not requiring a ack can indeed make sense in some cases, for example
-> with single-threaded backends.
-> 
-> What we can do is to remove the mandatory ack reply for
-> VHOST_USER_IOTLB_MSG slave requests (miss, access fail).
-> The backend then can just rely on the REPLY_ACK feature, and set the
-> VHOST_USER_NEED_REPLY flag if it want to receive such ack.
-> 
-> Would it be fine for you?
+> > ide_cancel_dma_sync() is also invoked from bmdma_cmd_writeb() and this
+> > is in fact the code path taken when the assertion fails.
+> > =
 
-Okay I found the REPLY_ACK feature now.
+> =
 
-It's okay to me (actually, in either way). Thank you.
+> Yep, I wonder why your guest is trying to cancel DMA, though? Something
+> else is probably going wrong first.
 
--- 
-Peter Xu
+Beats me.
+
+> Can you compile QEMU from a branch and let me know what kind of info it
+> barfs out when it dies?
+> =
+
+> https://github.com/jnsnow/qemu/commit/2baa57a58bba00a45151d8544cfd457197e=
+cfa39
+> =
+
+> Please make backups of your data as appropriate as this is a development
+> branch not suitable for production use (etc etc etc!)
+> =
+
+> It's just some dumb printfs so I can see what the device was up to when
+> it decided to reset itself. I'm hoping that if I can see what command it
+> is trying to cancel I can work out why it isn't getting canceled correctl=
+y.
+
+It looks like the command being canceled when the assertion fails is
+DSM, which explains why it does not happen with TRIM disabled (I retried
+the test twice to make sure the canceled command is consistent; it is):
+
+    $ tail -20 qemu.log
+    =
+
+    =3D=3D ide_cancel_dma_sync =3D=3D
+    =
+
+    ATA Registers:
+    cmd	0x06
+    feature	0x01
+    error	0x00
+    nsector	0x00000001
+    sector	0x00
+    lcyl	0x00
+    hcyl	0x00
+    hob_feature	0x00
+    hob_nsector	0x00
+    hob_sector	0x00
+    hob_lcyl	0x00
+    hob_hcyl	0x00
+    select	0x60
+    status	0x58
+    lba48	0x00000000
+    qemu-system-x86_64: hw/ide/core.c:704: ide_cancel_dma_sync: Assertion `=
+s->bus->dma->aiocb =3D=3D NULL' failed.
+    $ grep ^cmd qemu.log | sort | uniq -c
+        128 cmd	0x06
+     151854 cmd	0xc8
+     217496 cmd	0xca
+
+I am happy to help if any further debugging is required.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1681439
+
+Title:
+  qemu-system-x86_64: hw/ide/core.c:685: ide_cancel_dma_sync: Assertion
+  `s->bus->dma->aiocb =3D=3D NULL' failed.
+
+Status in QEMU:
+  New
+
+Bug description:
+  Since upgrading to QEMU 2.8.0, my Windows 7 64-bit virtual machines
+  started crashing due to the assertion quoted in the summary failing.
+  The assertion in question was added by commit 9972354856 ("block: add
+  BDS field to count in-flight requests").  My tests show that setting
+  discard=3Dunmap is needed to reproduce the issue.  Speaking of
+  reproduction, it is a bit flaky, because I have been unable to come up
+  with specific instructions that would allow the issue to be triggered
+  outside of my environment, but I do have a semi-sane way of testing that
+  appears to depend on a specific initial state of data on the underlying
+  storage volume, actions taken within the VM and waiting for about 20
+  minutes.
+
+  Here is the shortest QEMU command line that I managed to reproduce the
+  bug with:
+
+      qemu-system-x86_64 \
+          -machine pc-i440fx-2.7,accel=3Dkvm \
+          -m 3072 \
+          -drive file=3D/dev/lvm/qemu,format=3Draw,if=3Dide,discard=3Dunmap=
+ \
+  	-netdev tap,id=3Dhostnet0,ifname=3Dtap0,script=3Dno,downscript=3Dno,vhos=
+t=3Don \
+          -device virtio-net-pci,netdev=3Dhostnet0 \
+  	-vnc :0
+
+  The underlying storage (/dev/lvm/qemu) is a thin LVM snapshot.
+
+  QEMU was compiled using:
+
+      ./configure --python=3D/usr/bin/python2.7 --target-list=3Dx86_64-soft=
+mmu
+      make -j3
+
+  My virtualization environment is not really a critical one and
+  reproduction is not that much of a hassle, so if you need me to gather
+  further diagnostic information or test patches, I will be happy to help.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1681439/+subscriptions
