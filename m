@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1cyJf2-0001B0-TD
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:54:22 -0400
+	(envelope-from <armbru@redhat.com>) id 1cyJgz-0001nz-Tq
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:56:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1cyJez-0001B7-1K
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:54:20 -0400
-Received: from mx2.suse.de ([195.135.220.15]:34664)
+	(envelope-from <armbru@redhat.com>) id 1cyJgw-0001b7-0C
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:56:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56942)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <agraf@suse.de>) id 1cyJey-0001Ah-Qz
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:54:16 -0400
-References: <1491911135-216950-1-git-send-email-agraf@suse.de>
-	<CALMp9eT220btgiw7S-0cLswr1j=-OCuMwOAWuWS51EmNYYRuJw@mail.gmail.com>
-	<4622E361-52AB-40F2-9915-45C48F0DBCD2@suse.de>
-	<CALMp9eR7AWETNZA1pSBXW2BWcrJXPk-Y1hbNvwu2Vq7Dkf6AjA@mail.gmail.com>
-From: Alexander Graf <agraf@suse.de>
-Message-ID: <204f274d-697d-f9c6-8719-9bf91105f8b9@suse.de>
-Date: Wed, 12 Apr 2017 16:54:10 +0200
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cyJgv-0001b0-OY
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:56:17 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170410142112.11550-1-marcandre.lureau@redhat.com>
+	<8737ddna9i.fsf@dusky.pond.sub.org>
+	<CAJ+F1C+XcrF042iTjsU6y5U7pqZDnaT8zMr1dGhe+W5bm34Naw@mail.gmail.com>
+Date: Wed, 12 Apr 2017 16:56:14 +0200
+In-Reply-To: <CAJ+F1C+XcrF042iTjsU6y5U7pqZDnaT8zMr1dGhe+W5bm34Naw@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Wed, 12 Apr 2017
+	14:33:07 +0000")
+Message-ID: <87pogh1xpt.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eR7AWETNZA1pSBXW2BWcrJXPk-Y1hbNvwu2Vq7Dkf6AjA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6] kvm: better MWAIT emulation for guests
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] test-keyval: fix leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +30,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jim Mattson <jmattson@google.com>
-Cc: kvm list <kvm@vger.kernel.org>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, LKML <linux-kernel@vger.kernel.org>, "Gabriel L. Somlo" <gsomlo@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, Joerg Roedel <joro@8bytes.org>, linux-doc@vger.kernel.org, qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: qemu-devel@nongnu.org
 
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
+> Hi
+>
+> On Wed, Apr 12, 2017 at 3:19 PM Markus Armbruster <armbru@redhat.com> wro=
+te:
+>
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>>
+>> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> > ---
+>> >  tests/test-keyval.c | 4 ++++
+>> >  1 file changed, 4 insertions(+)
+>> >
+>> > diff --git a/tests/test-keyval.c b/tests/test-keyval.c
+>> > index ba19560a22..141ee5d0c4 100644
+>> > --- a/tests/test-keyval.c
+>> > +++ b/tests/test-keyval.c
+>> > @@ -628,6 +628,7 @@ static void test_keyval_visit_alternate(void)
+>> >      visit_type_AltNumStr(v, "a", &ans, &error_abort);
+>> >      g_assert_cmpint(ans->type, =3D=3D, QTYPE_QSTRING);
+>> >      g_assert_cmpstr(ans->u.s, =3D=3D, "1");
+>> > +    qapi_free_AltNumStr(ans);
+>> >      visit_type_AltNumInt(v, "a", &ani, &err);
+>> >      error_free_or_abort(&err);
+>> >      visit_end_struct(v, NULL);
+>> > @@ -649,11 +650,14 @@ static void test_keyval_visit_any(void)
+>> >      visit_type_any(v, "a", &any, &error_abort);
+>>
+>> @any becomes a strong reference (qobject_input_type_any() increments the
+>> reference count).
+>>
+>> >      qlist =3D qobject_to_qlist(any);
+>>
+>> Reference count unchanged.
+>>
+>> >      g_assert(qlist);
+>> > +    qobject_decref(any);
+>>
+>> Uh, this is unnecessarily dirty: you relinquish the reference before
+>> you're actually done with it.  Works only because there's *another*
+>> reference hiding within @v.  Let's move this ...
+>>
+>> >      qstr =3D qobject_to_qstring(qlist_pop(qlist));
+>> >      g_assert_cmpstr(qstring_get_str(qstr), =3D=3D, "null");
+>> > +    QDECREF(qstr);
+>> >      qstr =3D qobject_to_qstring(qlist_pop(qlist));
+>> >      g_assert_cmpstr(qstring_get_str(qstr), =3D=3D, "1");
+>> >      g_assert(qlist_empty(qlist));
+>> > +    QDECREF(qstr);
+>>
+>> ... here.  Okay to do that on commit?
+>>
+>
+>  sure, makes sense
+>
+>
+>> >      visit_check_struct(v, &error_abort);
+>> >      visit_end_struct(v, NULL);
+>> >      visit_free(v);
+>>
+>> With the reference counting cleaned up:
+>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>>
+>>
+> thanks
 
-On 12.04.17 16:34, Jim Mattson wrote:
-> Actually, we have rejected commit 87c00572ba05aa8c ("kvm: x86: emulate
-> monitor and mwait instructions as nop"), so when we intercept
-> MONITOR/MWAIT, we synthesize #UD. Perhaps it is this difference from
-> vanilla kvm that motivates the following idea...
-
-So you're not running upstream kvm? In that case, you can just not take 
-this patch either :).
-
-> Since we're still not going to report MONITOR support in CPUID, the
-> only guests of consequence are paravirtual guests. What if a
-
-Only if someone actually implemented something for PV guests, yes.
-
-The real motivation is to allow user space to force set the MONITOR 
-CPUID flag. That way an admin can - if he really wants to - dedicate 
-pCPUs to the VM.
-
-I agree that we don't need the kvm pv flag for that. I'd be happy to 
-drop that if everyone agrees.
-
-> paravirtual guest was aware of the fact that sometimes MONITOR/MWAIT
-> would work as architected, and sometimes they would raise #UD (or do
-> something else that's guest-visible, to indicate that the hypevisor is
-> intercepting the instructions). Such a guest could first try a
-> MONITOR/MWAIT-based idle loop and then fall back on a HLT-based idle
-> loop if the hypervisor rejected its use of MONITOR/MWAIT.
-
-How would that work? That guest would have to atomically notify all 
-other vCPUs that wakeup notifications now go via IPIs instead of cache 
-line dirtying.
-
-That's probably as much work to get right as it would be to just emulate 
-MWAIT inside kvm ;).
-
-> We already have the loose concept of "this pCPU has other things to
-> do," which is encoded in the variable-sized PLE window. With
-> MONITOR/MWAIT, the choice is binary, but a simple implementation could
-> tie the two together, by allowing the guest to use MONITOR/MWAIT
-> whenever the PLE window exceeds a certain threshold. Or the decision
-> could be left to the userspace agent.
-
-I agree, and that's basically the idea I mentioned earlier with MWAIT 
-emulation. We could (for well behaved guests) switch between emulating 
-MWAIT and running native MWAIT.
-
-
-
-Alex
+Applied to qapi-next, thanks!
