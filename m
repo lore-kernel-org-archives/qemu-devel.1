@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41249)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1cy6uy-00084D-OK
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 21:17:58 -0400
+	(envelope-from <cota@braap.org>) id 1cy6v1-00088K-HV
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 21:18:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1cy6ux-0006Qp-0z
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 21:17:56 -0400
+	(envelope-from <cota@braap.org>) id 1cy6uz-0006T9-JN
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 21:17:59 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Tue, 11 Apr 2017 21:17:28 -0400
-Message-Id: <1491959850-30756-9-git-send-email-cota@braap.org>
+Date: Tue, 11 Apr 2017 21:17:29 -0400
+Message-Id: <1491959850-30756-10-git-send-email-cota@braap.org>
 In-Reply-To: <1491959850-30756-1-git-send-email-cota@braap.org>
 References: <1491959850-30756-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH 08/10] target/arm: optimize indirect branches
+Subject: [Qemu-devel] [PATCH 09/10] target/i386: optimize indirect branches
  with TCG's jr op
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,92 +29,184 @@ host address or NULL.
 
 Measurements:
 
-- Impact on Boot time
+-             NBench, x86_64-linux-user. Host: Intel i7-4790K @ 4.00GHz
+                             Y axis: Speedup over 95b31d70
 
-| setup   | ARM debian boot+shutdown time | stddev |
-|---------+-------------------------------+--------|
-| master  |                  10.050247057 | 0.0361 |
-| +cross  |                  10.311265443 | 0.0721 |
-| +jr     |                  10.216832579 | 0.0878 |
-| +inline |                  10.405597879 | 0.0332 |
-
-That is, a 3.5% slowdown. This is reasonable since booting
-has low hit rates in tb_jmp_cache.
-
--                NBench, arm-linux-user. Host: Intel i7-4790K @ 4.00GHz
-                            Y axis: speedup over 95b31d70
-
-    1.25x+-+-------------------------------------------------------------+-+
-         |                                                jr          $$$  |
-         |                                                jr+inline   %%%  |
-     1.2x+-+..................................$$$%%......................+-+
-         |                                    $ $ %                        |
-         |                                    $ $ %                        |
-         |                          %%%       $ $ %   %%                   |
-    1.15x+-+........................%.%.......$.$.%.$$$%.................+-+
-         |                          % %       $ $ % $ $%                   |
-         |                        $$$ %       $ $ % $ $%                   |
-     1.1x+-+......................$.$.%.......$.$.%.$.$%.................+-+
-         |                        $ $ %       $ $ % $ $%                   |
-         |                        $ $ % $$$   $ $ % $ $%               %%% |
-    1.05x+-+......................$.$.%.$.$%%.$.$.%.$.$%.............$$$.%-+
-         |             $$$%% $$%% $ $ % $ $ % $ $ % $ $%             $ $ % |
-         | $$$%%       $ $ % $$ % $ $ % $ $ % $ $ % $ $%             $ $ % |
-         | $ $ %       $ $ % $$ % $ $ % $ $ % $ $ % $ $%   %%% $$$%% $ $ % |
-       1x+-$.$B%R$$$%%G$A$H%T$$P%j$+$n%i$e$.%.$.$.%.$.$%.$$$.%.$.$.%.$.$.%-+
+     1.1x+-+-------------------------------------------------------------+-+
+         |          jr             $$                                      |
+    1.08x+-+......  jr+inline      %%  ..................................+-+
+         |                                                                 |
+         | $$$                                                             |
+    1.06x+-$.$............................%%%............................+-+
+         | $ $%%                          % %                              |
+    1.04x+-$.$.%..........................%.%............................+-+
+         | $ $ %                        $$$ %                  $$$         |
+         | $ $ %              %%%       $ $ %                  $ $%%       |
+    1.02x+-$.$.%.........%%%.$$.%.......$.$.%...%%%...%%.......$.$.%.$$$%%-+
+         | $ $ %         % % $$ % $$$   $ $ % $$$ %   %% $$$%% $ $ % $ $ % |
+       1x+-$.$B%R$$$ARGRA%H%T$$P%j$+$%%i$e$.%.$.$.%.$$$%.$.$.%.$.$.%.$.$.%-+
+         | $ $ % $ $%% $$$ % $$ % $ $ % $ $ % $ $ % $ $% $ $ % $ $ % $ $ % |
+    0.98x+-$.$.%.$.$.%.$.$.%.$$.%.$.$.%.$.$.%.$.$.%.$.$%.$.$.%.$.$.%.$.$.%-+
+         | $ $ % $ $ % $ $ % $$ % $ $ % $ $ % $ $ % $ $% $ $ % $ $ % $ $ % |
+         | $ $ % $ $ % $ $ % $$ % $ $ % $ $ % $ $ % $ $% $ $ % $ $ % $ $ % |
+    0.96x+-$.$.%.$.$.%.$.$.%.$$.%.$.$.%.$.$.%.$.$.%.$.$%.$.$.%.$.$.%.$.$.%-+
          +-$$$%%-$$$%%-$$$%%-$$%%-$$$%%-$$$%%-$$$%%-$$$%-$$$%%-$$$%%-$$$%%-+
         ASSIGNMBITFIELFOFP_EMULATHUFFMANLU_DECOMPNEURNUMERICSTRING_SOhmean
-  png: http://imgur.com/ihqQj6l
+  png: http://imgur.com/Jxj4hBd
 
-That is, a 6.65% hmean improvement with jr+inline (5.92% w/o inlining).
-Peak improvement is 21% for HUFFMAN.
+The fact that NBench is not very sensitive to changes here is a
+little surprising, especially given the significant improvements for
+ARM shown in the previous commit. I wonder whether the compiler is doing
+a better job compiling the x86_64 version (I'm using gcc 5.4.0), or I'm simply
+missing some i386 instructions to which the jr optimization should
+be applied.
 
--                NBench, arm-softmmu. Host: Intel i7-4790K @ 4.00GHz
-                            Y axis: speedup over 95b31d70
-        +------------------------------------------------------------------+
+     specINT 2006 (test set), x86_64-linux-user. Host: Intel i7-4790K @ 4.00GHz
+                             Y axis: Speedup over 95b31d70
+
+     1.3x+-+-------------------------------------------------------------+-+
+         |          jr+inline $$                                           |
+    1.25x+-+.............................................................+-+
+         |                                                                 |
+     1.2x+-+.............................................................+-+
+         |                                                                 |
+         |                     +++                 +++                     |
+    1.15x+-+...................$$$.................$$$...................+-+
+         |                     $ $                 $:$                     |
+     1.1x+-+...................$.$.................$.$...........$$$$....+-+
+         |           +++       $ $                 $ $       +++ $++$      |
+    1.05x+-+.........$$$$......$.$.................$.$...........$..$....+-+
+         |           $  $      $ $  $$$            $ $ $$$$ $$$$ $  $ $$$$ |
+         | $$$$  +++ $  $ +++  $ $  $ $  +++  $$$  $ $ $  $ $++$ $  $ $  $ |
+       1x+-$BA$G$$$$_$EM$_$$$$.$.$..$.$..$$$..$.$..$.$.$..$.$..$.$..$.$..$-+
+         | $  $ $  $ $  $ $  $ $ $  $ $  $ $  $ $  $ $ $  $ $  $ $  $ $  $ |
+    0.95x+-$..$.$..$.$..$.$..$.$.$..$.$..$.$..$.$..$.$.$..$.$..$.$..$.$..$-+
+         | $  $ $  $ $  $ $  $ $ $  $ $  $ $  $ $  $ $ $  $ $  $ $  $ $  $ |
+     0.9x+-$$$$-$$$$-$$$$-$$$$-$$$--$$$--$$$--$$$--$$$-$$$$-$$$$-$$$$-$$$$-+
+           astarbzip2gcc gobmh264rehmlibquantumcfomneperlbensjxalancbhmean
+  png: http://imgur.com/63Ncmx8
+
+That is a 4.4% hmean perf improvement.
+
+-  specINT 2006 (train set), x86_64-linux-user. Host: Intel i7-4790K @ 4.00GHz
+                             Y axis: Speedup over 95b31d70
+
+    1.4x+-+--------------------------------------------------------------+-+
+        |        jr  $$                                                    |
         |                                                                  |
-    1.3x+-+........................................ cross+noinline    $$ +-+
-        |                                           cross+inline      %%   |
-        |                      &&              @@&& cross+jr+noinline @@   |
-        |                   $$%@&              @@ & cross+jr+inline   &&   |
-    1.2x+-+.................$$%@&......$$..&&..@@.&......................+-+
-        |                   $$%@&      $$%%@&  @@ &  @@&                   |
-        |                   $$%@&      $$ %@&  @@ &  @@&                   |
-    1.1x+-+.................$$%@&...@@.$$.%@&..@@.&..@@&................&&-+
-        |             $$%@& $$%@&   @@&$$ %@&  @@ &  @@&               @@& |
-        |             $$%@& $$%@&   @@&$$ %@&$$%@ &  @@&       $$%@& $$%@& |
-        | $$%&& $$%&& $$%@& $$%@&$$$%@&$$ %@&$$%@ & %%@&       $$%@& $$%@& |
-      1x+-$$%@&A$$%@&A$$%@&A$$%@&$R$%@&$$T%@&$$%@s&+%%@&n$$%@&.$$%@&.$$%@&-+
-        | $$%@& $$%@& $$%@& $$%@&$ $%@&$$ %@&$$%@ & %%@& $$%@& $$%@& $$%@& |
-        | $$%@& $$%@& $$%@& $$%@&$ $%@&$$ %@&$$%@ & %%@& $$%@& $$%@& $$%@& |
-    0.9x+-$$%@&.$$%@&.$$%@&.$$%@&$.$%@&$$.%@&$$%@.&.%%@&.$$%@&.$$%@&.$$%@&-+
-        | $$%@& $$%@& $$%@& $$%@&$ $%@&$$ %@&$$%@ & %%@& $$%@& $$%@& $$%@& |
-        | $$%@& $$%@& $$%@& $$%@&$ $%@&$$ %@&$$%@ &$$%@& $$%@& $$%@& $$%@& |
-        | $$%@& $$%@& $$%@& $$%@&$ $%@&$$ %@&$$%@ &$$%@& $$%@& $$%@& $$%@& |
-    0.8x+-$$%@&-$$%@&-$$%@&-$$%@&$$$%@&$$%%@&$$%@&&$$%@&-$$%@&-$$%@&-$$%@&-+
-       ASSIGNMBITFIELFOUFP_EMULATHUFFMALU_DECOMPNEURANUMERICSTRING_SOhmean
-   png: http://imgur.com/yWJivBl
+    1.3x+-+..............................................................+-+
+        |                                                                  |
+        |                                                                  |
+    1.2x+-+......................................................$$$$....+-+
+        |                      +++                     $$$$  :   $++$      |
+        |                     $$$$                $$$$ $  $  :   $  $      |
+    1.1x+-+...................$..$................$..$.$..$.$$$$.$..$....+-+
+        |                     $  $                $  $ $  $ $: $ $  $ +++  |
+        |  +++       +++  +++ $  $ $$$$  +++      $  $ $  $ $: $ $  $ $$$$ |
+      1x+-$$$$GRAPH_$$$$_$$$$.$..$.$..$.$$$$......$..$.$..$.$..$.$..$.$..$-+
+        | $++$ $$$$ $  $ $++$ $  $ $  $ $  $      $  $ $  $ $  $ $  $ $  $ |
+        | $  $ $  $ $  $ $  $ $  $ $  $ $  $      $  $ $  $ $  $ $  $ $  $ |
+    0.9x+-$..$.$..$.$..$.$..$.$..$.$..$.$..$......$..$.$..$.$..$.$..$.$..$-+
+        | $  $ $  $ $  $ $  $ $  $ $  $ $  $ $$$$ $  $ $  $ $  $ $  $ $  $ |
+        | $  $ $  $ $  $ $  $ $  $ $  $ $  $ $  $ $  $ $  $ $  $ $  $ $  $ |
+    0.8x+-$$$$-$$$$-$$$$-$$$$-$$$$-$$$$-$$$$-$$$$-$$$$-$$$$-$$$$-$$$$-$$$$-+
+          astarbzip2 gcc gobmh264rehmlibquantmcfomneperlbensjexalancbhmean
+  png: http://imgur.com/hd0BhU6
 
-That is, a 9.86% hmean improvement when combining cross+jr+inline (this commit)
-over current master. Peak improvement is 25% for FP_EMULATION.
+That is, a 4.39 % hmean improvement for jr+inline, i.e. this commit.
+(4.5% for noinline). Peak improvement is 20% for xalancbmk.
+
+-    specINT 2006 (test set), x86_64-softmmu. Host: Intel i7-4790K @ 4.00GHz
+                             Y axis: Speedup over 95b31d70
+
+     1.3x+-+-------------------------------------------------------------+-+
+         |         cross    $$                                             |
+    1.25x+-+.....  jr       %%  .........................................+-+
+         |         cross+jr @@                                      :      |
+     1.2x+-+.............................................................+-+
+         |                                                       :  :      |
+         |             +++                                       :  :      |
+    1.15x+-+...........@@................................................+-+
+         |           $$@@ $$++                    +++            : @@      |
+     1.1x+-+.........$$@@.$$@@.....................................@@....+-+
+         |           $$@@ $$@@                    $$ :   @@@  +++$$@@      |
+    1.05x+-+.........$$@@.$$@@...@@...............$$...$$@.@.....$$@@....+-+
+         |        +++$$%@ $$@@  %%@+++++++++++++++$$+: $$@ @++@@ $$%@+$$@@+|
+         |  +@@+++@@+$$%@ $$@@++%%@$$$%  ::@@ ::@@$$@@@$$% @$$@@ $$%@+$$@@ |
+       1x+-$$%@A$$%@R$$%@R$$%@$$$%@$_$%@s%%%@$$%%@$$@.@$$%.@$$@@.$$%@.$$%@-+
+         |+$$%@ $$%@ $$%@ $$%@$ $%@$+$%@ %+%@$$+%@$$@+@$$% @$$@@ $$%@+$$%@ |
+    0.95x+-$$%@.$$%@.$$%@.$$%@$.$%@$.$%@$$.%@$$.%@$$@.@$$%.@$$%@.$$%@.$$%@-+
+         | $$%@ $$%@ $$%@ $$%@$ $%@$ $%@$$ %@$$ %@$$%+@$$% @$$%@ $$%@ $$%@ |
+     0.9x+-$$%@-$$%@-$$%@-$$%@$$$%@$$$%@$$%%@$$%%@$$%@@$$%@@$$%@-$$%@-$$%@-+
+           astabzip2 gcc gobmh264rehmlibquantumcfomneperlbensjexalanchmean
+  png: http://imgur.com/IV9UtSa
+
+Here we see how jr works best when combined with cross -- jr by itself is
+disappointingly around baseline performance. I attribute this to the frequent
+page invalidations and/or TLB flushes (I'm running Ubuntu 16.04 as the guest,
+so there are many processes), which lowers the maximum attainable hit rate in
+tb_jmp_cache.
+
+Overall the greatest hmean improvement comes from cross+jr though.
+
+-      specINT 2006 (train set), x86_64-softmmu. Host: Intel i7-4790K @ 4.00GHz
+                             Y axis: Speedup over 95b31d70
+
+    1.25x+-+-------------------------------------------------------------+-+
+         |        cross+inline    $$                                       |
+         |        cross+jr+inline %%                     +++      +++      |
+     1.2x+-+.............................................................+-+
+         |                                         :      :      +++       |
+    1.15x+-+.......................................................%%....+-+
+         |            ::   +++                    $$$  $$$%      $$$%      |
+         |           $$%%++%%%                    $:$  $+$% +++  $:$%      |
+     1.1x+-+.........$$.%.$$.%....................$.$..$.$%......$.$%....+-+
+         |      +++  $$+%+$$ %+++++ :+++          $ $: $ $%  :%% $+$% +++  |
+    1.05x+-+....$$...$$.%.$$.%......$$............$.$%.$.$%.$$$%.$.$%.$$%%-+
+         |      $$%% $$ % $$ % $$%% $$:   +++     $ $% $ $% $:$% $ $% $$+% |
+         |      $$+% $$ % $$ % $$:%+$$%%+++: +++  $ $%+$ $% $:$% $ $% $$ % |
+       1x+-$$$AR$$A%G$$P%_$$M%_$$o%s$$r%$$$%%e....$.$%.$.$%.$.$%.$.$%.$$.%-+
+         | $+$% $$ % $$ % $$ %+$$+% $$:%$:$+%$$$++$ $% $ $% $ $% $ $% $$ % |
+    0.95x+-$.$%.$$.%.$$.%.$$.%.$$.%.$$.%$.$.%$.$..$.$%.$.$%.$.$%.$.$%.$$.%-+
+         | $ $% $$ % $$ % $$ % $$ % $$ %$ $ %$+$% $ $% $ $% $ $% $ $% $$ % |
+         | $ $% $$ % $$ % $$ % $$ % $$ %$ $ %$ $% $ $% $ $% $ $% $ $% $$ % |
+     0.9x+-$$$%-$$%%-$$%%-$$%%-$$%%-$$%%$$$%%$$$%-$$$%-$$$%-$$$%-$$$%-$$%%-+
+           astabzip2 gcc gobmh264rehmlibquantumcfomneperlbensjexalanchmean
+  png: http://imgur.com/CBMxrBH
+
+This is the larger "train" set of SPECint06. Here cross+jr comes slightly
+below cross, but it's within the noise margins (I didn't run this many
+times, since it takes several hours).
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/arm/helper.c    | 11 +++++++++++
- target/arm/helper.h    |  1 +
- target/arm/translate.c | 23 +++++++++++++++++++++++
- 3 files changed, 35 insertions(+)
+ target/i386/helper.h      |  1 +
+ target/i386/misc_helper.c | 11 +++++++++++
+ target/i386/translate.c   | 42 +++++++++++++++++++++++++++++++++---------
+ 3 files changed, 45 insertions(+), 9 deletions(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 10b8807..dfbc488 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -9927,3 +9927,14 @@ uint32_t HELPER(cross_page_check)(CPUARMState *env, target_ulong vaddr)
+diff --git a/target/i386/helper.h b/target/i386/helper.h
+index dceb343..f7e9f9c 100644
+--- a/target/i386/helper.h
++++ b/target/i386/helper.h
+@@ -2,6 +2,7 @@ DEF_HELPER_FLAGS_4(cc_compute_all, TCG_CALL_NO_RWG_SE, tl, tl, tl, tl, int)
+ DEF_HELPER_FLAGS_4(cc_compute_c, TCG_CALL_NO_RWG_SE, tl, tl, tl, tl, int)
+ 
+ DEF_HELPER_2(cross_page_check, i32, env, tl)
++DEF_HELPER_2(get_hostptr, ptr, env, tl)
+ 
+ DEF_HELPER_3(write_eflags, void, env, tl, i32)
+ DEF_HELPER_1(read_eflags, tl, env)
+diff --git a/target/i386/misc_helper.c b/target/i386/misc_helper.c
+index a41daed..5d50ab0 100644
+--- a/target/i386/misc_helper.c
++++ b/target/i386/misc_helper.c
+@@ -642,3 +642,14 @@ uint32_t helper_cross_page_check(CPUX86State *env, target_ulong vaddr)
  {
      return !!tb_from_jmp_cache(env, vaddr);
  }
 +
-+void *HELPER(get_hostptr)(CPUARMState *env, target_ulong vaddr)
++void *helper_get_hostptr(CPUX86State *env, target_ulong vaddr)
 +{
 +    TranslationBlock *tb;
 +
@@ -124,79 +216,119 @@ index 10b8807..dfbc488 100644
 +    }
 +    return tb->tc_ptr;
 +}
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index d4b779b..0faacc1 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -2,6 +2,7 @@ DEF_HELPER_FLAGS_1(sxtb16, TCG_CALL_NO_RWG_SE, i32, i32)
- DEF_HELPER_FLAGS_1(uxtb16, TCG_CALL_NO_RWG_SE, i32, i32)
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index ffc8ccc..aab5c13 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -2521,7 +2521,8 @@ static void gen_bnd_jmp(DisasContext *s)
+    If INHIBIT, set HF_INHIBIT_IRQ_MASK if it isn't already set.
+    If RECHECK_TF, emit a rechecking helper for #DB, ignoring the state of
+    S->TF.  This is used by the syscall/sysret insns.  */
+-static void gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf)
++static void
++gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf, TCGv jr)
+ {
+     gen_update_cc_op(s);
  
- DEF_HELPER_2(cross_page_check, i32, env, tl)
-+DEF_HELPER_2(get_hostptr, ptr, env, tl)
- 
- DEF_HELPER_3(add_setq, i32, env, i32, i32)
- DEF_HELPER_3(add_saturate, i32, env, i32, i32)
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index ce97d0c..2510bb2 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -65,6 +65,14 @@ static TCGv_i32 cpu_R[16];
- TCGv_i32 cpu_CF, cpu_NF, cpu_VF, cpu_ZF;
- TCGv_i64 cpu_exclusive_addr;
- TCGv_i64 cpu_exclusive_val;
-+static bool gen_jr;
+@@ -2542,6 +2543,22 @@ static void gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf)
+         tcg_gen_exit_tb(0);
+     } else if (s->tf) {
+         gen_helper_single_step(cpu_env);
++    } else if (jr) {
++#ifdef TCG_TARGET_HAS_JR
++        TCGLabel *label = gen_new_label();
++        TCGv_ptr ptr = tcg_temp_local_new_ptr();
++        TCGv vaddr = tcg_temp_new();
 +
-+static inline void set_jr(void)
-+{
-+    if (TCG_TARGET_HAS_jr) {
-+        gen_jr = true;
-+    }
++        tcg_gen_ld_tl(vaddr, cpu_env, offsetof(CPUX86State, segs[R_CS].base));
++        tcg_gen_add_tl(vaddr, vaddr, jr);
++        gen_helper_get_hostptr(ptr, cpu_env, vaddr);
++        tcg_temp_free(vaddr);
++        tcg_gen_brcondi_ptr(TCG_COND_EQ, ptr, NULL, label);
++        tcg_gen_jr(ptr);
++        tcg_temp_free_ptr(ptr);
++        gen_set_label(label);
++#endif
++        tcg_gen_exit_tb(0);
+     } else {
+         tcg_gen_exit_tb(0);
+     }
+@@ -2552,13 +2569,18 @@ static void gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf)
+    If INHIBIT, set HF_INHIBIT_IRQ_MASK if it isn't already set.  */
+ static void gen_eob_inhibit_irq(DisasContext *s, bool inhibit)
+ {
+-    gen_eob_worker(s, inhibit, false);
++    gen_eob_worker(s, inhibit, false, NULL);
+ }
+ 
+ /* End of block, resetting the inhibit irq flag.  */
+ static void gen_eob(DisasContext *s)
+ {
+-    gen_eob_worker(s, false, false);
++    gen_eob_worker(s, false, false, NULL);
 +}
- 
- /* FIXME:  These should be removed.  */
- static TCGv_i32 cpu_F0s, cpu_F1s;
-@@ -221,6 +229,7 @@ static void store_reg(DisasContext *s, int reg, TCGv_i32 var)
-          */
-         tcg_gen_andi_i32(var, var, s->thumb ? ~1 : ~3);
-         s->is_jmp = DISAS_JUMP;
-+        set_jr();
-     }
-     tcg_gen_mov_i32(cpu_R[reg], var);
-     tcg_temp_free_i32(var);
-@@ -893,6 +902,7 @@ static inline void gen_bx_im(DisasContext *s, uint32_t addr)
-         tcg_temp_free_i32(tmp);
-     }
-     tcg_gen_movi_i32(cpu_R[15], addr & ~1);
-+    set_jr();
- }
- 
- /* Set PC and Thumb state from var.  var is marked as dead.  */
-@@ -902,6 +912,7 @@ static inline void gen_bx(DisasContext *s, TCGv_i32 var)
-     tcg_gen_andi_i32(cpu_R[15], var, ~1);
-     tcg_gen_andi_i32(var, var, 1);
-     store_cpu_field(var, thumb);
-+    set_jr();
- }
- 
- /* Variant of store_reg which uses branch&exchange logic when storing
-@@ -12042,6 +12053,18 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
-             gen_set_pc_im(dc, dc->pc);
-             /* fall through */
-         case DISAS_JUMP:
-+            if (TCG_TARGET_HAS_jr && gen_jr) {
-+                TCGv_ptr ptr = tcg_temp_local_new_ptr();
-+                TCGLabel *label = gen_new_label();
 +
-+                gen_jr = false;
-+                gen_helper_get_hostptr(ptr, cpu_env, cpu_R[15]);
-+                tcg_gen_brcondi_ptr(TCG_COND_EQ, ptr, NULL, label);
-+                tcg_gen_jr(ptr);
-+                tcg_temp_free_ptr(ptr);
-+                gen_set_label(label);
-+                /* fall through */
-+            }
-         default:
-             /* indicate that the hash table must be used to find the next TB */
-             tcg_gen_exit_tb(0);
++static void gen_jr(DisasContext *s, TCGv dest)
++{
++    gen_eob_worker(s, false, false, dest);
+ }
+ 
+ /* generate a jump to eip. No segment change must happen before as a
+@@ -4985,7 +5007,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+             gen_push_v(s, cpu_T1);
+             gen_op_jmp_v(cpu_T0);
+             gen_bnd_jmp(s);
+-            gen_eob(s);
++            gen_jr(s, cpu_T0);
+             break;
+         case 3: /* lcall Ev */
+             gen_op_ld_v(s, ot, cpu_T1, cpu_A0);
+@@ -5003,7 +5025,8 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+                                       tcg_const_i32(dflag - 1),
+                                       tcg_const_i32(s->pc - s->cs_base));
+             }
+-            gen_eob(s);
++            tcg_gen_ld_tl(cpu_tmp4, cpu_env, offsetof(CPUX86State, eip));
++            gen_jr(s, cpu_tmp4);
+             break;
+         case 4: /* jmp Ev */
+             if (dflag == MO_16) {
+@@ -5011,7 +5034,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+             }
+             gen_op_jmp_v(cpu_T0);
+             gen_bnd_jmp(s);
+-            gen_eob(s);
++            gen_jr(s, cpu_T0);
+             break;
+         case 5: /* ljmp Ev */
+             gen_op_ld_v(s, ot, cpu_T1, cpu_A0);
+@@ -5026,7 +5049,8 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+                 gen_op_movl_seg_T0_vm(R_CS);
+                 gen_op_jmp_v(cpu_T1);
+             }
+-            gen_eob(s);
++            tcg_gen_ld_tl(cpu_tmp4, cpu_env, offsetof(CPUX86State, eip));
++            gen_jr(s, cpu_tmp4);
+             break;
+         case 6: /* push Ev */
+             gen_push_v(s, cpu_T0);
+@@ -7143,7 +7167,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+         /* TF handling for the syscall insn is different. The TF bit is  checked
+            after the syscall insn completes. This allows #DB to not be
+            generated after one has entered CPL0 if TF is set in FMASK.  */
+-        gen_eob_worker(s, false, true);
++        gen_eob_worker(s, false, true, NULL);
+         break;
+     case 0x107: /* sysret */
+         if (!s->pe) {
+@@ -7158,7 +7182,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+                checked after the sysret insn completes. This allows #DB to be
+                generated "as if" the syscall insn in userspace has just
+                completed.  */
+-            gen_eob_worker(s, false, true);
++            gen_eob_worker(s, false, true, NULL);
+         }
+         break;
+ #endif
 -- 
 2.7.4
