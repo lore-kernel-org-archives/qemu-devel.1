@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cyFJc-0005pN-Iz
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 06:15:58 -0400
+	(envelope-from <stefanha@redhat.com>) id 1cyFOa-0007GY-9v
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 06:21:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cyFJa-0004U1-RG
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 06:15:56 -0400
-Date: Wed, 12 Apr 2017 12:15:42 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170412101542.GD4955@noname.str.redhat.com>
-References: <1488288927-4607-1-git-send-email-pl@kamp.de>
+	(envelope-from <stefanha@redhat.com>) id 1cyFOW-0006x3-7P
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 06:21:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52240)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cyFOV-0006wr-VU
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 06:21:00 -0400
+Date: Wed, 12 Apr 2017 11:20:55 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170412102055.GC26272@stefanha-x1.localdomain>
+References: <BM1PR01MB072299B8CAFBB379F8BF8DE584000@BM1PR01MB0722.INDPRD01.PROD.OUTLOOK.COM>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Izn7cH1Com+I3R9J"
 Content-Disposition: inline
-In-Reply-To: <1488288927-4607-1-git-send-email-pl@kamp.de>
-Subject: Re: [Qemu-devel] [PATCH] qemu-img: simplify img_convert
+In-Reply-To: <BM1PR01MB072299B8CAFBB379F8BF8DE584000@BM1PR01MB0722.INDPRD01.PROD.OUTLOOK.COM>
+Subject: Re: [Qemu-devel] [PATCH] Changed malloc and free to g_malloc and
+ g_free in util/compatfd.c file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,101 +28,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, stefanha@gmail.com, ct@flyingcircus.io, mreitz@redhat.com, famz@redhat.com, eblake@redhat.com
+To: Prerna Garg <Prerna.Garg@live.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-Am 28.02.2017 um 14:35 hat Peter Lieven geschrieben:
-> img_convert has been around before there was an ImgConvertState or
-> a block backend, but it has never been modified to directly use
-> these structs. Change this by parsing parameters directly into
-> the ImgConvertState and directly use BlockBackend where possible.
-> Futhermore variable initalization has been reworked and sorted.
-> 
-> Signed-off-by: Peter Lieven <pl@kamp.de>
+
+--Izn7cH1Com+I3R9J
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Apr 11, 2017 at 08:04:43PM +0000, Prerna Garg wrote:
+> From 9e25fdf1ea3e4f52a72bfefc053a701989b7af24 Mon Sep 17 00:00:00 2001
+> From: Prerna Garg <prerna.garg@live.com>
+> Date: Wed, 12 Apr 2017 01:29:40 +0530
+
+Please resend using git-send-email(1) so that email is properly
+formatted for git-am(1) and other tools who will process it.
+
+qemu-devel@nongnu.org receives many patch emails every day that both
+human maintainers and bots process.  Unfortunately free-form patch
+submission doesn't scale so we all have to follow the guidelines:
+http://wiki.qemu-project.org/Contribute/SubmitAPatch
+
+I suggest sending the email to just yourself first so you can confirm
+that it meets the guidelines.
+
+> Subject: [PATCH 2/2] Changed malloc and free to g_malloc and g_free in
+>  util/compatfd.c
+
+Please follow the commit message conventions:
+
+  compatfd: replace malloc() with g_malloc()
+
+The first part is a prefix that indicates which component in QEMU is
+affected.  You can use "git log path/to/file.c" to see what prefix is
+commonly used for a file.
+
+The second part is a brief summary written in present imperative.
+
+>=20
+> Signed-off-by: Prerna Garg <prerna.garg@live.com>
 > ---
->  qemu-img.c | 197 +++++++++++++++++++++++++------------------------------------
->  1 file changed, 81 insertions(+), 116 deletions(-)
-> 
-> diff --git a/qemu-img.c b/qemu-img.c
-> index caa76a7..f271167 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -1488,7 +1488,7 @@ typedef struct ImgConvertState {
->      int min_sparse;
->      size_t cluster_sectors;
->      size_t buf_sectors;
-> -    int num_coroutines;
-> +    long num_coroutines;
->      int running_coroutines;
->      Coroutine *co[MAX_COROUTINES];
->      int64_t wait_sector_num[MAX_COROUTINES];
-> @@ -1882,39 +1882,33 @@ static int convert_do_copy(ImgConvertState *s)
->  
->  static int img_convert(int argc, char **argv)
->  {
-> -    int c, bs_n, bs_i, compress, cluster_sectors, skip_create;
-> -    int64_t ret = 0;
-> -    int progress = 0, flags, src_flags;
-> -    bool writethrough, src_writethrough;
-> -    const char *fmt, *out_fmt, *cache, *src_cache, *out_baseimg, *out_filename;
-> +    int c, bs_i;
-> +    int flags, src_flags = 0;
-> +    const char *fmt = NULL, *out_fmt = "raw", *cache = "unsafe",
-> +               *src_cache = BDRV_DEFAULT_CACHE, *out_baseimg = NULL,
-> +               *out_filename;
->      BlockDriver *drv, *proto_drv;
-> -    BlockBackend **blk = NULL, *out_blk = NULL;
-> -    BlockDriverState **bs = NULL, *out_bs = NULL;
-> -    int64_t total_sectors;
-> -    int64_t *bs_sectors = NULL;
-> -    size_t bufsectors = IO_BUF_SIZE / BDRV_SECTOR_SIZE;
->      BlockDriverInfo bdi;
-> +    BlockDriverState *out_bs;
->      QemuOpts *opts = NULL;
->      QemuOptsList *create_opts = NULL;
->      const char *out_baseimg_param;
-> -    char *options = NULL;
->      const char *snapshot_name = NULL;
-> -    int min_sparse = 8; /* Need at least 4k of zeros for sparse detection */
-> -    bool quiet = false;
-> +    char *options = NULL;
->      Error *local_err = NULL;
->      QemuOpts *sn_opts = NULL;
-> -    ImgConvertState state;
-> -    bool image_opts = false;
-> -    bool wr_in_order = true;
-> -    long num_coroutines = 8;
-> +    bool writethrough, src_writethrough, quiet = false, image_opts = false,
-> +         compress = false, skip_create = false, progress = false;
+>  util/compatfd.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/util/compatfd.c b/util/compatfd.c
+> index 980bd33..7bf1344 100644
+> --- a/util/compatfd.c
+> +++ b/util/compatfd.c
+> @@ -71,14 +71,14 @@ static int qemu_signalfd_compat(const sigset_t *mask)
+>      QemuThread thread;
+>      int fds[2];
+> =20
+> -    info =3D malloc(sizeof(*info));
+> +    info =3D g_malloc(sizeof(*info));
+>      if (info =3D=3D NULL) {
+>          errno =3D ENOMEM;
+>          return -1;
+>      }
+> =20
+>      if (pipe(fds) =3D=3D -1) {
+> -        free(info);
+> +        g_free(info);
+>          return -1;
+>      }
 
-compress is never set, but tested. Should probably be completely
-replaced by s.compressed.
+Looks good.
 
-> [...]
-> +    /* Initialize before goto out */
-> +    if (quiet) {
-> +        progress = false;
-> +    }
-> +    qemu_progress_init(progress, 1.0);
->      qemu_progress_print(0, 100);
->  
-> -    blk = g_new0(BlockBackend *, bs_n);
-> -    bs = g_new0(BlockDriverState *, bs_n);
-> -    bs_sectors = g_new(int64_t, bs_n);
-> +    s.src = g_new0(BlockBackend *, s.src_num);
-> +    s.src_sectors = g_new(int64_t, s.src_num);
->  
-> -    total_sectors = 0;
-> -    for (bs_i = 0; bs_i < bs_n; bs_i++) {
-> -        blk[bs_i] = img_open(image_opts, argv[optind + bs_i],
-> -                             fmt, src_flags, src_writethrough, quiet);
-> -        if (!blk[bs_i]) {
-> +    for (bs_i = 0; bs_i < s.src_num; bs_i++) {
-> +        s.src[bs_i] = img_open(image_opts, argv[optind + bs_i],
-> +                                fmt, src_flags, src_writethrough, quiet);
+--Izn7cH1Com+I3R9J
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Indentation is off.
+-----BEGIN PGP SIGNATURE-----
 
-The rest looks okay.
+iQEcBAEBAgAGBQJY7f+HAAoJEJykq7OBq3PIIGAH/2yh9ivcLrMCLx+PSb9gJ16I
+np8BDocSwgG7cqT1kVrgDa0gm7nHQL68NMzZTowPk3134JBNqwwLSC3hFB1D8pHt
+ZfZSHjq2nf4RF7GUHzeWg1E792nbZqoJned8xOMAX7Fnk0pu5a+JCTQrqTl6HQhZ
+SYEAfGg749rtRKQPrmEzlnVLE3SD+0eAWm3koYXx6muatwMeX0uTNkFSI4P0yXH0
+9dX7Pab43eanb1kRIGrIbQSj9dswqz6vLIJtNL44Ursqsq29d3gtU/CQ2DIvVM1/
+sDyWRwqE6DUlTvdiU0ZK3pcoPg2Ny8GbDHOejULVGhNke7UC4MDCrmyb2h2Q8Xk=
+=F49R
+-----END PGP SIGNATURE-----
 
-Kevin
+--Izn7cH1Com+I3R9J--
