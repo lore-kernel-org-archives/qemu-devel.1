@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1cy6uz-00085G-LY
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 21:17:59 -0400
+	(envelope-from <cota@braap.org>) id 1cy6uy-00084D-OK
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 21:17:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1cy6ux-0006RZ-Jc
-	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 21:17:57 -0400
+	(envelope-from <cota@braap.org>) id 1cy6ux-0006Qp-0z
+	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 21:17:56 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Tue, 11 Apr 2017 21:17:30 -0400
-Message-Id: <1491959850-30756-11-git-send-email-cota@braap.org>
+Date: Tue, 11 Apr 2017 21:17:28 -0400
+Message-Id: <1491959850-30756-9-git-send-email-cota@braap.org>
 In-Reply-To: <1491959850-30756-1-git-send-email-cota@braap.org>
 References: <1491959850-30756-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH 10/10] tb-hash: improve tb_jmp_cache hash
- function in user mode
+Subject: [Qemu-devel] [PATCH 08/10] target/arm: optimize indirect branches
+ with TCG's jr op
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,170 +23,180 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Claudio Fontana <claudio.fontana@huawei.com>, Andrzej Zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, qemu-arm@nongnu.org, alex.bennee@linaro.org, Pranith Kumar <bobby.prani+qemu@gmail.com>
 
-Optimizations to cross-page chaining and indirect jumps make
-performance more sensitive to the hit rate of tb_jmp_cache.
-The constraint of reserving some bits for the page number
-lowers the achievable quality of the hashing function.
-
-However, user-mode does not have this requirement. Thus,
-with this change we use for user-mode a hashing function that
-is both faster and of better quality than the previous one.
+Speed up indirect branches by adding a helper to look for the
+TB in tb_jmp_cache. The helper returns either the corresponding
+host address or NULL.
 
 Measurements:
 
--    specINT 2006 (test set), x86_64-linux-user. Host: Intel i7-4790K @ 4.00GHz
-                              Y axis: Speedup over 95b31d70
+- Impact on Boot time
 
-     1.3x+-+-------------------------------------------------------------+-+
-         |        jr             $$                                        |
-    1.25x+-+....  jr+xxhash      %%  ....................................+-+
-         |        jr+hash+inline @@                 +++                    |
-     1.2x+-+.............................................................+-+
-         |                                          @@@                    |
-         |                    +++@@               ++@:@       +++  @@+     |
-    1.15x+-+..................$$$@@...............$$@.@.......@@...@@....+-+
-         |                    $ $@@               $$@ @      %%@   @@      |
-     1.1x+-+..................$.$@@...............$$@.@......%%@.$$@@....+-+
-         |          +++@@+    $ $@@               $$@ @    ++%%@+$$@@   +++|
-    1.05x+-+.........$$@@.....$.$@@...@@..........$$@.@..@@@.%%@.$$@@...@@-+
-         |           $$@@     $ $@@$$$@@          $$% @$$@+@$$%@ $$@@+$$@@ |
-         |+$$++++++++$$@@+++@@$ $@@$+$@@+++@@$$+@@$$% @$$@+@$$%@ $$%@ $$@@ |
-       1x+-$$@@A$$%@R$$@@R$$@@$_$%@$_$%@$$s@@$$%%@$$%.@$$%.@$$%@.$$%@.$$%@-+
-         | $$@@+$$%@ $$%@ $$@@$+$%@$ $%@$$%%@$$+%@$$% @$$% @$$%@ $$%@ $$%@ |
-    0.95x+-$$%@.$$%@.$$%@.$$%@$.$%@$.$%@$$.%@$$.%@$$%.@$$%.@$$%@.$$%@.$$%@-+
-         | $$%@ $$%@ $$%@ $$%@$ $%@$ $%@$$ %@$$ %@$$% @$$% @$$%@ $$%@ $$%@ |
-     0.9x+-$$%@-$$%@-$$%@-$$%@$$$%@$$$%@$$%%@$$%%@$$%@@$$%@@$$%@-$$%@-$$%@-+
-           astabzip2 gcc gobmh264rehmlibquantumcfomneperlbensjexalanchmean
-  png: http://imgur.com/RiaBuIi
+| setup   | ARM debian boot+shutdown time | stddev |
+|---------+-------------------------------+--------|
+| master  |                  10.050247057 | 0.0361 |
+| +cross  |                  10.311265443 | 0.0721 |
+| +jr     |                  10.216832579 | 0.0878 |
+| +inline |                  10.405597879 | 0.0332 |
 
-That is, a 6.45% hmean improvement for this commit. Note that this is the
-test set, so some benchmarks take almost no time (and therefore aren't that
-sensitive to changes here). See "train" results below.
+That is, a 3.5% slowdown. This is reasonable since booting
+has low hit rates in tb_jmp_cache.
 
-Note also that hashing quality is not the only requirement: xxhash
-gives on average the highest hit rates. However, the time spent computing
-the hash negates the performance gains coming from the increase in hit rate.
-Given these results, I dropped xxhash from subsequent experiments.
+-                NBench, arm-linux-user. Host: Intel i7-4790K @ 4.00GHz
+                            Y axis: speedup over 95b31d70
 
--   specINT 2006 (train set), x86_64-linux-user. Host: Intel i7-4790K @ 4.00GHz
-                              Y axis: Speedup over 95b31d70
-
-    1.4x+-+--------------------------------------------------------------+-+
-        |    jr      $$                                           +++      |
-        |    jr+hash %%                                            :       |
-    1.3x+-+.......................................................%%%....+-+
-        |                                               +++  +++  %:%      |
-        |                      +++                      %%%   :   %+%      |
-    1.2x+-+.....................%%......................%.%..%%%.$$.%....+-+
-        |                     ++%%                 %%% $$+%  %:% $$+%      |
-        |            +++      $$$%                $$+% $$ %  %:% $$ %      |
-    1.1x+-+...........%%......$.$%................$$.%.$$.%.$$.%.$$.%..%%%-+
-        |  +++        %%      $ $%            +++ $$ % $$ % $$ % $$ % +%+% |
-        | ++%%  +++ ++%% ++%% $ $% $$$+ +++   %%% $$ % $$ % $$ % $$ % $$+% |
-      1x+-$$$%RGR%%R$$$%H$$$%P$j$%h$s$%.$$%%..%.%.$$.%.$$.%.$$.%.$$.%.$$.%-+
-        | $+$% $$$% $ $% $+$% $ $% $ $% $$+%  % % $$ % $$ % $$ % $$ % $$ % |
-        | $ $% $ $% $ $% $ $% $ $% $ $% $$ %  % % $$ % $$ % $$ % $$ % $$ % |
-    0.9x+-$.$%.$.$%.$.$%.$.$%.$.$%.$.$%.$$.%..%.%.$$.%.$$.%.$$.%.$$.%.$$.%-+
-        | $ $% $ $% $ $% $ $% $ $% $ $% $$ % $$+% $$ % $$ % $$ % $$ % $$ % |
-        | $ $% $ $% $ $% $ $% $ $% $ $% $$ % $$ % $$ % $$ % $$ % $$ % $$ % |
-    0.8x+-$$$%-$$$%-$$$%-$$$%-$$$%-$$$%-$$%%-$$%%-$$%%-$$%%-$$%%-$$%%-$$%%-+
-          astarbzip2 gcc gobmh264rehlibquantumcfomneperlbensjexalancbhmean
-  png: http://imgur.com/55iJJgD
-
-That is, a 10.19% hmean improvement for jr+hash (this commit).
-
--               NBench, arm-linux-user. Host: Intel i7-4790K @ 4.00GHz
-                              Y axis: Speedup over 95b31d70
-
-    1.35x+-+-------------------------------------------------------------+-+
-         |               @@@   jr              $$                          |
-     1.3x+-+.............@.@.  jr+inline       %%  ...@@@................+-+
-         |               @ @   jr+inline+hash  @@     @ @                  |
-         |               @ @                          @ @                  |
-    1.25x+-+.............@.@..........................@.@................+-+
-         |               @ @                    @@@   @ @                  |
-     1.2x+-+.............@.@..................$$%.@...@.@................+-+
-         |               @ @                  $$% @   @ @                  |
-         |               @ @        %%@       $$% @  %% @                  |
-    1.15x+-+.............@.@........%%@.......$$%.@$$$%.@................+-+
-         |               @ @        %%@       $$% @$ $% @                  |
-     1.1x+-+.............@.@......$$$%@.......$$%.@$.$%.@...............@@-+
-         |               @ @      $ $%@       $$% @$ $% @               @@ |
-         |               @ @      $ $%@ $$%%@ $$% @$ $% @            $$%%@ |
-    1.05x+-+...........$$%.@$$$%@@$.$%@.$$.%@.$$%.@$.$%.@.........@@.$$.%@-+
-         | $$%%@       $$% @$ $% @$ $%@ $$ %@ $$% @$ $% @       %%%@ $$ %@ |
-       1x+-$$.%@AR%%%@R$$%B@$G$%P@$T$%@_$$+%@l$$%+@$s$%.@$$$%@.$$.%@.$$.%@-+
-         +-$$%%@-$$%%@-$$%@@$$$%@@$$$%@-$$%%@-$$%@@$$$%@@$$$%@-$$%%@-$$%%@-+
+    1.25x+-+-------------------------------------------------------------+-+
+         |                                                jr          $$$  |
+         |                                                jr+inline   %%%  |
+     1.2x+-+..................................$$$%%......................+-+
+         |                                    $ $ %                        |
+         |                                    $ $ %                        |
+         |                          %%%       $ $ %   %%                   |
+    1.15x+-+........................%.%.......$.$.%.$$$%.................+-+
+         |                          % %       $ $ % $ $%                   |
+         |                        $$$ %       $ $ % $ $%                   |
+     1.1x+-+......................$.$.%.......$.$.%.$.$%.................+-+
+         |                        $ $ %       $ $ % $ $%                   |
+         |                        $ $ % $$$   $ $ % $ $%               %%% |
+    1.05x+-+......................$.$.%.$.$%%.$.$.%.$.$%.............$$$.%-+
+         |             $$$%% $$%% $ $ % $ $ % $ $ % $ $%             $ $ % |
+         | $$$%%       $ $ % $$ % $ $ % $ $ % $ $ % $ $%             $ $ % |
+         | $ $ %       $ $ % $$ % $ $ % $ $ % $ $ % $ $%   %%% $$$%% $ $ % |
+       1x+-$.$B%R$$$%%G$A$H%T$$P%j$+$n%i$e$.%.$.$.%.$.$%.$$$.%.$.$.%.$.$.%-+
+         +-$$$%%-$$$%%-$$$%%-$$%%-$$$%%-$$$%%-$$$%%-$$$%-$$$%%-$$$%%-$$$%%-+
         ASSIGNMBITFIELFOFP_EMULATHUFFMANLU_DECOMPNEURNUMERICSTRING_SOhmean
-  png: http://imgur.com/i5e1gdY
+  png: http://imgur.com/ihqQj6l
 
-That is, a 11% hmean perf gain--it almost doubles the perf gain
-from implementing the jr optimization.
+That is, a 6.65% hmean improvement with jr+inline (5.92% w/o inlining).
+Peak improvement is 21% for HUFFMAN.
 
--              NBench, x86_64-linux-user. Host: Intel i7-4790K @ 4.00GHz
+-                NBench, arm-softmmu. Host: Intel i7-4790K @ 4.00GHz
+                            Y axis: speedup over 95b31d70
+        +------------------------------------------------------------------+
+        |                                                                  |
+    1.3x+-+........................................ cross+noinline    $$ +-+
+        |                                           cross+inline      %%   |
+        |                      &&              @@&& cross+jr+noinline @@   |
+        |                   $$%@&              @@ & cross+jr+inline   &&   |
+    1.2x+-+.................$$%@&......$$..&&..@@.&......................+-+
+        |                   $$%@&      $$%%@&  @@ &  @@&                   |
+        |                   $$%@&      $$ %@&  @@ &  @@&                   |
+    1.1x+-+.................$$%@&...@@.$$.%@&..@@.&..@@&................&&-+
+        |             $$%@& $$%@&   @@&$$ %@&  @@ &  @@&               @@& |
+        |             $$%@& $$%@&   @@&$$ %@&$$%@ &  @@&       $$%@& $$%@& |
+        | $$%&& $$%&& $$%@& $$%@&$$$%@&$$ %@&$$%@ & %%@&       $$%@& $$%@& |
+      1x+-$$%@&A$$%@&A$$%@&A$$%@&$R$%@&$$T%@&$$%@s&+%%@&n$$%@&.$$%@&.$$%@&-+
+        | $$%@& $$%@& $$%@& $$%@&$ $%@&$$ %@&$$%@ & %%@& $$%@& $$%@& $$%@& |
+        | $$%@& $$%@& $$%@& $$%@&$ $%@&$$ %@&$$%@ & %%@& $$%@& $$%@& $$%@& |
+    0.9x+-$$%@&.$$%@&.$$%@&.$$%@&$.$%@&$$.%@&$$%@.&.%%@&.$$%@&.$$%@&.$$%@&-+
+        | $$%@& $$%@& $$%@& $$%@&$ $%@&$$ %@&$$%@ & %%@& $$%@& $$%@& $$%@& |
+        | $$%@& $$%@& $$%@& $$%@&$ $%@&$$ %@&$$%@ &$$%@& $$%@& $$%@& $$%@& |
+        | $$%@& $$%@& $$%@& $$%@&$ $%@&$$ %@&$$%@ &$$%@& $$%@& $$%@& $$%@& |
+    0.8x+-$$%@&-$$%@&-$$%@&-$$%@&$$$%@&$$%%@&$$%@&&$$%@&-$$%@&-$$%@&-$$%@&-+
+       ASSIGNMBITFIELFOUFP_EMULATHUFFMALU_DECOMPNEURANUMERICSTRING_SOhmean
+   png: http://imgur.com/yWJivBl
 
-     1.1x+-+-------------------------------------------------------------+-+
-         |         jr             $$                                       |
-    1.08x+-+.....  jr+inline      %%  ...................................+-+
-         |         jr+inline+hash @@                                       |
-         | $$ @@                                                           |
-    1.06x+-$$.@@.........................%%%.............................+-+
-         | $$%%@                         % %                               |
-    1.04x+-$$.%@.........................%.%.............................+-+
-         | $$ %@         @@@            $$ %                   $$          |
-         | $$ %@         @ @  %%        $$ %                   $$%%@       |
-    1.02x+-$$.%@........%%.@$$$%@@......$$.%@..%%@@..%%........$$.%@.$$%%@-+
-         | $$ %@    @@  %% @$ $% @$$$   $$ %@ $$% @  %%@@$$$%  $$ %@ $$ %@ |
-       1x+-$$.%@A$$R@@RG%%B@$G$%P@$T$%P_$$T%@h$$%+@$$$%e@$.$%@.$$.%@.$$.%@-+
-         | $$ %@ $$%%@ $$% @$ $% @$ $%  $$ %@ $$% @$ $% @$ $%@ $$ %@ $$ %@ |
-    0.98x+-$$.%@.$$.%@.$$%.@$.$%.@$.$%@.$$.%@.$$%.@$.$%.@$.$%@.$$.%@.$$.%@-+
-         | $$ %@ $$ %@ $$% @$ $% @$ $%@ $$ %@ $$% @$ $% @$ $%@ $$ %@ $$ %@ |
-         | $$ %@ $$ %@ $$% @$ $% @$ $%@ $$ %@ $$% @$ $% @$ $%@ $$ %@ $$ %@ |
-    0.96x+-$$.%@.$$.%@.$$%.@$.$%.@$.$%@.$$.%@.$$%.@$.$%.@$.$%@.$$.%@.$$.%@-+
-         +-$$%%@-$$%%@-$$%@@$$$%@@$$$%@-$$%%@-$$%@@$$$%@@$$$%@-$$%%@-$$%%@-+
-        ASSIGNMBITFIELFOFP_EMULATHUFFMANLU_DECOMPNEURNUMERICSTRING_SOhmean
-  png: http://imgur.com/Xu0Owgu
-
-The fact that NBench is not very sensitive to changes here was mentioned
-in the previous commit's log. We get a very slight overall decrease in hmean
-performance, although some workloads improve as well. Note that there are
-no error bars: NBench re-runs itself until confidence on the stability of
-the average is >= 95%, and it doesn't report the resulting stddev.
+That is, a 9.86% hmean improvement when combining cross+jr+inline (this commit)
+over current master. Peak improvement is 25% for FP_EMULATION.
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- include/exec/tb-hash.h | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ target/arm/helper.c    | 11 +++++++++++
+ target/arm/helper.h    |  1 +
+ target/arm/translate.c | 23 +++++++++++++++++++++++
+ 3 files changed, 35 insertions(+)
 
-diff --git a/include/exec/tb-hash.h b/include/exec/tb-hash.h
-index 2c27490..b1fe2d0 100644
---- a/include/exec/tb-hash.h
-+++ b/include/exec/tb-hash.h
-@@ -22,6 +22,8 @@
- 
- #include "exec/tb-hash-xx.h"
- 
-+#ifdef CONFIG_SOFTMMU
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 10b8807..dfbc488 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -9927,3 +9927,14 @@ uint32_t HELPER(cross_page_check)(CPUARMState *env, target_ulong vaddr)
+ {
+     return !!tb_from_jmp_cache(env, vaddr);
+ }
 +
- /* Only the bottom TB_JMP_PAGE_BITS of the jump cache hash bits vary for
-    addresses on the same page.  The top bits are the same.  This allows
-    TLB invalidation to quickly clear a subset of the hash table.  */
-@@ -45,6 +47,16 @@ static inline unsigned int tb_jmp_cache_hash_func(target_ulong pc)
-            | (tmp & TB_JMP_ADDR_MASK));
++void *HELPER(get_hostptr)(CPUARMState *env, target_ulong vaddr)
++{
++    TranslationBlock *tb;
++
++    tb = tb_from_jmp_cache(env, vaddr);
++    if (unlikely(tb == NULL)) {
++        return NULL;
++    }
++    return tb->tc_ptr;
++}
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index d4b779b..0faacc1 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -2,6 +2,7 @@ DEF_HELPER_FLAGS_1(sxtb16, TCG_CALL_NO_RWG_SE, i32, i32)
+ DEF_HELPER_FLAGS_1(uxtb16, TCG_CALL_NO_RWG_SE, i32, i32)
+ 
+ DEF_HELPER_2(cross_page_check, i32, env, tl)
++DEF_HELPER_2(get_hostptr, ptr, env, tl)
+ 
+ DEF_HELPER_3(add_setq, i32, env, i32, i32)
+ DEF_HELPER_3(add_saturate, i32, env, i32, i32)
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index ce97d0c..2510bb2 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -65,6 +65,14 @@ static TCGv_i32 cpu_R[16];
+ TCGv_i32 cpu_CF, cpu_NF, cpu_VF, cpu_ZF;
+ TCGv_i64 cpu_exclusive_addr;
+ TCGv_i64 cpu_exclusive_val;
++static bool gen_jr;
++
++static inline void set_jr(void)
++{
++    if (TCG_TARGET_HAS_jr) {
++        gen_jr = true;
++    }
++}
+ 
+ /* FIXME:  These should be removed.  */
+ static TCGv_i32 cpu_F0s, cpu_F1s;
+@@ -221,6 +229,7 @@ static void store_reg(DisasContext *s, int reg, TCGv_i32 var)
+          */
+         tcg_gen_andi_i32(var, var, s->thumb ? ~1 : ~3);
+         s->is_jmp = DISAS_JUMP;
++        set_jr();
+     }
+     tcg_gen_mov_i32(cpu_R[reg], var);
+     tcg_temp_free_i32(var);
+@@ -893,6 +902,7 @@ static inline void gen_bx_im(DisasContext *s, uint32_t addr)
+         tcg_temp_free_i32(tmp);
+     }
+     tcg_gen_movi_i32(cpu_R[15], addr & ~1);
++    set_jr();
  }
  
-+#else
+ /* Set PC and Thumb state from var.  var is marked as dead.  */
+@@ -902,6 +912,7 @@ static inline void gen_bx(DisasContext *s, TCGv_i32 var)
+     tcg_gen_andi_i32(cpu_R[15], var, ~1);
+     tcg_gen_andi_i32(var, var, 1);
+     store_cpu_field(var, thumb);
++    set_jr();
+ }
+ 
+ /* Variant of store_reg which uses branch&exchange logic when storing
+@@ -12042,6 +12053,18 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
+             gen_set_pc_im(dc, dc->pc);
+             /* fall through */
+         case DISAS_JUMP:
++            if (TCG_TARGET_HAS_jr && gen_jr) {
++                TCGv_ptr ptr = tcg_temp_local_new_ptr();
++                TCGLabel *label = gen_new_label();
 +
-+/* In user-mode we can get better hashing because we do not have a TLB */
-+static inline unsigned int tb_jmp_cache_hash_func(target_ulong pc)
-+{
-+    return (pc ^ (pc >> TB_JMP_CACHE_BITS)) & (TB_JMP_CACHE_SIZE - 1);
-+}
-+
-+#endif /* CONFIG_SOFTMMU */
-+
- static inline
- uint32_t tb_hash_func(tb_page_addr_t phys_pc, target_ulong pc, uint32_t flags)
- {
++                gen_jr = false;
++                gen_helper_get_hostptr(ptr, cpu_env, cpu_R[15]);
++                tcg_gen_brcondi_ptr(TCG_COND_EQ, ptr, NULL, label);
++                tcg_gen_jr(ptr);
++                tcg_temp_free_ptr(ptr);
++                gen_set_label(label);
++                /* fall through */
++            }
+         default:
+             /* indicate that the hash table must be used to find the next TB */
+             tcg_gen_exit_tb(0);
 -- 
 2.7.4
