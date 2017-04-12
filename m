@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cyS5q-0003sQ-Q9
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 19:54:35 -0400
+	(envelope-from <no-reply@patchew.org>) id 1cyS8j-0005lE-CT
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 19:57:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cyS5p-0004vc-HZ
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 19:54:34 -0400
-Date: Thu, 13 Apr 2017 07:54:20 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170412235420.GB8607@lemon>
-References: <20170412204641.GA15762@localhost.localdomain>
-	<f5bf12f4-e4fd-87c7-a714-e412cee63e36@redhat.com>
-	<20170412222251.GB15762@localhost.localdomain>
+	(envelope-from <no-reply@patchew.org>) id 1cyS8g-0005ti-AY
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 19:57:33 -0400
+Resent-Message-Id: <E1cyS8g-0005ti-AY@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <149204143506.10500.9312462203357418218@6c512846dbc7>
+In-Reply-To: <20170408054318.19830-1-omar.rizwan@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170412222251.GB15762@localhost.localdomain>
-Subject: Re: [Qemu-devel] Regression from 2.8: stuck in bdrv_drain()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 12 Apr 2017 16:57:15 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] raspi: Add Raspberry Pi 1 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,77 +23,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, kwolf@redhat.com, peter.maydell@linaro.org, qemu-block@nongnu.org, qemu-devel@nongnu.org, stefanha@redhat.com, pbonzini@redhat.com
+To: omar.rizwan@gmail.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org, Andrew.Baumann@microsoft.com
 
-On Wed, 04/12 18:22, Jeff Cody wrote:
-> On Wed, Apr 12, 2017 at 05:38:17PM -0400, John Snow wrote:
-> > 
-> > 
-> > On 04/12/2017 04:46 PM, Jeff Cody wrote:
-> > > 
-> > > This occurs on v2.9.0-rc4, but not on v2.8.0.
-> > > 
-> > > When running QEMU with an iothread, and then performing a block-mirror, if
-> > > we do a system-reset after the BLOCK_JOB_READY event has emitted, qemu
-> > > becomes deadlocked.
-> > > 
-> > > The block job is not paused, nor cancelled, so we are stuck in the while
-> > > loop in block_job_detach_aio_context:
-> > > 
-> > > static void block_job_detach_aio_context(void *opaque)
-> > > {
-> > >     BlockJob *job = opaque;
-> > > 
-> > >     /* In case the job terminates during aio_poll()... */
-> > >     block_job_ref(job);
-> > > 
-> > >     block_job_pause(job);
-> > > 
-> > >     while (!job->paused && !job->completed) {
-> > >         block_job_drain(job);
-> > >     }
-> > > 
-> > 
-> > Looks like when block_job_drain calls block_job_enter from this context
-> > (the main thread, since we're trying to do a system_reset...), we cannot
-> > enter the coroutine because it's the wrong context, so we schedule an
-> > entry instead with
-> > 
-> > aio_co_schedule(ctx, co);
-> > 
-> > But that entry never happens, so the job never wakes up and we never
-> > make enough progress in the coroutine to gracefully pause, so we wedge here.
-> > 
-> 
-> 
-> John Snow and I debugged this some over IRC.  Here is a summary:
-> 
-> Simply put, with iothreads the aio context is different.  When
-> block_job_detach_aio_context() is called from the main thread via the system
-> reset (from main_loop_should_exit()), it calls block_job_drain() in a while
-> loop, with job->busy and job->completed as exit conditions.
-> 
-> block_job_drain() attempts to enter the coroutine (thus allowing job->busy
-> or job->completed to change).  However, since the aio context is different
-> with iothreads, we schedule the coroutine entry rather than directly
-> entering it.
-> 
-> This means the job coroutine is never going to be re-entered, because we are
-> waiting for it to complete in a while loop from the main thread, which is
-> blocking the qemu timers which would run the scheduled coroutine... hence,
-> we become stuck.
-
-John and I confirmed that this can be fixed by this pending patch:
-
-[PATCH for-2.9 4/5] block: Drain BH in bdrv_drained_begin
-
-https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg01018.html
-
-It didn't make it into 2.9-rc4 because of limited time. :(
-
-Looks like there is no -rc5, we'll have to document this as a known issue.
-Users should "block-job-complete/cancel" as soon as possible to avoid such a
-hang.
-
-Fam
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzA0MDgwNTQzMTguMTk4MzAtMS1vbWFyLnJpendhbkBnbWFpbC5jb20KU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSF0gcmFzcGk6IEFkZCBSYXNwYmVycnkgUGkgMSBzdXBwb3J0ClR5cGU6IHNl
+cmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49
+MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCiMg
+VXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cg
+LS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAg
+IGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9
+JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0
+cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAg
+ICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNU
+IFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
+ODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMDgyYmI2MSByYXNwaTog
+QWRkIFJhc3BiZXJyeSBQaSAxIHN1cHBvcnQKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5n
+IFBBVENIIDEvMTogcmFzcGk6IEFkZCBSYXNwYmVycnkgUGkgMSBzdXBwb3J0Li4uCkVSUk9SOiBs
+aW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTg5OiBGSUxFOiBody9hcm0vcmFzcGkuYzozNDoKKyAq
+IGh0dHBzOi8vZ2l0aHViLmNvbS9BbmRyZXdGcm9tTWVsYm91cm5lL3Jhc3BiZXJyeV9waV9yZXZp
+c2lvbi9ibG9iLzI3NjRjMTk5ODNmYjdiMWVmOGNiMjEwMzFlOTRjMjkzNzAzYWZhMmUvUkVBRE1F
+Lm1kCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDI1OCBsaW5lcyBjaGVja2VkCgpZb3Vy
+IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
+ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
+ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRl
+c3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
+bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5
+b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
