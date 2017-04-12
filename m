@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cyS32-0002I1-VH
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 19:51:42 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1cyS3G-0002Lw-Uf
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 19:51:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cyS2z-00047W-Ry
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 19:51:41 -0400
-Received: from mail.kernel.org ([198.145.29.136]:48084)
+	(envelope-from <sstabellini@kernel.org>) id 1cyS3D-00049m-RH
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 19:51:55 -0400
+Received: from mail.kernel.org ([198.145.29.136]:48122)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1cyS2z-00047G-Jk
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 19:51:37 -0400
-Date: Wed, 12 Apr 2017 16:51:30 -0700 (PDT)
+	id 1cyS3D-00049c-Ii
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 19:51:51 -0400
+Date: Wed, 12 Apr 2017 16:51:46 -0700 (PDT)
 From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <20170412161704.00003875@gmail.com>
-Message-ID: <alpine.DEB.2.10.1704121647180.2759@sstabellini-ThinkPad-X260>
+In-Reply-To: <58EDE1E4.2090003@huawei.com>
+Message-ID: <alpine.DEB.2.10.1704121645470.2759@sstabellini-ThinkPad-X260>
 References: <CADZi59zNxk-Yr4rpN1E49s=AdsdW-W9YfhpCvpJeBz7oigyFSg@mail.gmail.com>
 	<CADZi59xe6OcCasvtkPBjP7nTsgDA5r_E_Rt7W88BszYdJhuxGQ@mail.gmail.com>
 	<CADZi59xEg0SvScgo=Jg0MxTbGYY=nTX18Qo-4GMkfayThDU9zw@mail.gmail.com>
@@ -21,13 +21,12 @@ References: <CADZi59zNxk-Yr4rpN1E49s=AdsdW-W9YfhpCvpJeBz7oigyFSg@mail.gmail.com>
 	<alpine.DEB.2.10.1704101243270.2759@sstabellini-ThinkPad-X260>
 	<CADZi59yC4m+wFS+iJUrV9Y59X96cQVMnrCNLvcd5o2kdjmqQdA@mail.gmail.com>
 	<alpine.DEB.2.10.1704111509350.2759@sstabellini-ThinkPad-X260>
-	<20170412161704.00003875@gmail.com>
+	<58EDE1E4.2090003@huawei.com>
 MIME-Version: 1.0
-Content-ID: <alpine.DEB.2.10.1704121650450.2759@sstabellini-ThinkPad-X260>
+Content-ID: <alpine.DEB.2.10.1704121651380.2759@sstabellini-ThinkPad-X260>
 Content-Type: TEXT/PLAIN; CHARSET=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Xen-devel] [RFC/BUG] xen-mapcache: buggy
- invalidate map cache?
+Subject: Re: [Qemu-devel] [RFC/BUG] xen-mapcache: buggy invalidate map cache?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,49 +35,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey G <x1917x@gmail.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, hrg <hrgstephen@gmail.com>, wangxinxin.wang@huawei.com, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, xen-devel@lists.xensource.com, Jun Nakajima <jun.nakajima@intel.com>, Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, xen-devel@lists.xen.org, "Herongguang (Stephen)" <herongguang.he@huawei.com>
+To: "Herongguang (Stephen)" <herongguang.he@huawei.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, hrg <hrgstephen@gmail.com>, Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xensource.com, qemu-devel@nongnu.org, Jun Nakajima <jun.nakajima@intel.com>, Alexander Graf <agraf@suse.de>, xen-devel@lists.xenproject.org, xen-devel@lists.xen.org, wangxinxin.wang@huawei.com
 
-On Wed, 12 Apr 2017, Alexey G wrote:
-> On Tue, 11 Apr 2017 15:32:09 -0700 (PDT)
-> Stefano Stabellini <sstabellini@kernel.org> wrote:
->=20
+On Wed, 12 Apr 2017, Herongguang (Stephen) wrote:
+> On 2017/4/12 6:32, Stefano Stabellini wrote:
 > > On Tue, 11 Apr 2017, hrg wrote:
 > > > On Tue, Apr 11, 2017 at 3:50 AM, Stefano Stabellini
-> > > <sstabellini@kernel.org> wrote: =20
-> > > > On Mon, 10 Apr 2017, Stefano Stabellini wrote: =20
-> > > >> On Mon, 10 Apr 2017, hrg wrote: =20
-> > > >> > On Sun, Apr 9, 2017 at 11:55 PM, hrg <hrgstephen@gmail.com> wr=
-ote: =20
-> > > >> > > On Sun, Apr 9, 2017 at 11:52 PM, hrg <hrgstephen@gmail.com> =
-wrote: =20
-> > > >> > >> Hi,
-> > > >> > >>
-> > > >> > >> In xen_map_cache_unlocked(), map to guest memory maybe in
-> > > >> > >> entry->next instead of first level entry (if map to rom oth=
-er than
-> > > >> > >> guest memory comes first), while in xen_invalidate_map_cach=
-e(),
-> > > >> > >> when VM ballooned out memory, qemu did not invalidate cache=
- entries
-> > > >> > >> in linked list(entry->next), so when VM balloon back in mem=
-ory,
-> > > >> > >> gfns probably mapped to different mfns, thus if guest asks =
-device
-> > > >> > >> to DMA to these GPA, qemu may DMA to stale MFNs.
-> > > >> > >>
-> > > >> > >> So I think in xen_invalidate_map_cache() linked lists shoul=
-d also be
-> > > >> > >> checked and invalidated.
-> > > >> > >>
-> > > >> > >> What=E2=80=99s your opinion? Is this a bug? Is my analyze c=
-orrect? =20
-> > > >>
-> > > >> Yes, you are right. We need to go through the list for each elem=
-ent of
-> > > >> the array in xen_invalidate_map_cache. Can you come up with a pa=
-tch? =20
-> > > >
+> > > <sstabellini@kernel.org> wrote:
+> > > > On Mon, 10 Apr 2017, Stefano Stabellini wrote:
+> > > > > On Mon, 10 Apr 2017, hrg wrote:
+> > > > > > On Sun, Apr 9, 2017 at 11:55 PM, hrg <hrgstephen@gmail.com> w=
+rote:
+> > > > > > > On Sun, Apr 9, 2017 at 11:52 PM, hrg <hrgstephen@gmail.com>=
+ wrote:
+> > > > > > > > Hi,
+> > > > > > > >=20
+> > > > > > > > In xen_map_cache_unlocked(), map to guest memory maybe in
+> > > > > > > > entry->next
+> > > > > > > > instead of first level entry (if map to rom other than gu=
+est
+> > > > > > > > memory
+> > > > > > > > comes first), while in xen_invalidate_map_cache(), when V=
+M
+> > > > > > > > ballooned
+> > > > > > > > out memory, qemu did not invalidate cache entries in link=
+ed
+> > > > > > > > list(entry->next), so when VM balloon back in memory, gfn=
+s
+> > > > > > > > probably
+> > > > > > > > mapped to different mfns, thus if guest asks device to DM=
+A to
+> > > > > > > > these
+> > > > > > > > GPA, qemu may DMA to stale MFNs.
+> > > > > > > >=20
+> > > > > > > > So I think in xen_invalidate_map_cache() linked lists sho=
+uld
+> > > > > > > > also be
+> > > > > > > > checked and invalidated.
+> > > > > > > >=20
+> > > > > > > > What=E2=80=99s your opinion? Is this a bug? Is my analyze=
+ correct?
+> > > > > Yes, you are right. We need to go through the list for each ele=
+ment of
+> > > > > the array in xen_invalidate_map_cache. Can you come up with a p=
+atch?
 > > > > I spoke too soon. In the regular case there should be no locked m=
 appings
 > > > > when xen_invalidate_map_cache is called (see the DPRINTF warning =
@@ -90,18 +91,16 @@ d never
 > > > > entry->lock =3D=3D true is a necessary condition to append a new =
 entry to
 > > > > the list, otherwise it is just remapped).
-> > > >
+> > > >=20
 > > > > Can you confirm that what you are seeing are locked mappings
 > > > > when xen_invalidate_map_cache is called? To find out, enable the =
 DPRINTK
-> > > > by turning it into a printf or by defininig MAPCACHE_DEBUG. =20
-> > >=20
+> > > > by turning it into a printf or by defininig MAPCACHE_DEBUG.
 > > > In fact, I think the DPRINTF above is incorrect too. In
 > > > pci_add_option_rom(), rtl8139 rom is locked mapped in
 > > > pci_add_option_rom->memory_region_get_ram_ptr (after
 > > > memory_region_init_ram). So actually I think we should remove the
-> > > DPRINTF warning as it is normal. =20
-> >=20
+> > > DPRINTF warning as it is normal.
 > > Let me explain why the DPRINTF warning is there: emulated dma operati=
 ons
 > > can involve locked mappings. Once a dma operation completes, the rela=
@@ -124,37 +123,22 @@ I
 ybe
 > > a call to address_space_unmap.
 >=20
-> Hmm, for some reason my message to the Xen-devel list got rejected but =
-was sent
-> to Qemu-devel instead, without any notice. Sorry if I'm missing somethi=
-ng
-> obvious as a list newbie.
->=20
-> Stefano, hrg,
->=20
-> There is an issue with inconsistency between the list of normal MapCach=
-eEntry's
-> and their 'reverse' counterparts - MapCacheRev's in locked_entries.
-> When bad situation happens, there are multiple (locked) MapCacheEntry
-> entries in the bucket's linked list along with a number of MapCacheRev'=
-s. And
-> when it comes to a reverse lookup, xen-mapcache picks the wrong entry f=
-rom the
-> first list and calculates a wrong pointer from it which may then be cau=
-ght with
-> the "Bad RAM offset" check (or not). Mapcache invalidation might be rel=
-ated to
-> this issue as well I think.
->=20
-> I'll try to provide a test code which can reproduce the issue from the
-> guest side using an emulated IDE controller, though it's much simpler t=
-o achieve
-> this result with an AHCI controller using multiple NCQ I/O commands. So=
- far I've
-> seen this issue only with Windows 7 (and above) guest on AHCI, but any =
-block I/O
-> DMA should be enough I think.
+> Yes, I think so, maybe this is the proper way to fix this.
 
-That would be helpful. Please see if you can reproduce it after fixing
-the other issue (http://marc.info/?l=3Dqemu-devel&m=3D149195042500707&w=3D=
-2).
+Would you be up for sending a proper patch and testing it? We cannot call
+xen_invalidate_map_cache_entry directly from pci.c though, it would need
+to be one of the other functions like address_space_unmap for example.
+
+
+> > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> > index e6b08e1..04f98b7 100644
+> > --- a/hw/pci/pci.c
+> > +++ b/hw/pci/pci.c
+> > @@ -2242,6 +2242,7 @@ static void pci_add_option_rom(PCIDevice *pdev,=
+ bool
+> > is_default_rom,
+> >       }
+> >         pci_register_bar(pdev, PCI_ROM_SLOT, 0, &pdev->rom);
+> > +    xen_invalidate_map_cache_entry(ptr);
+> >   }
+> >     static void pci_del_option_rom(PCIDevice *pdev)
