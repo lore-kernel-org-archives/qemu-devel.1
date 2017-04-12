@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cyAih-00084S-Nk
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 01:21:32 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cyAil-00085S-DW
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 01:21:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cyAid-0008Gp-P9
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 01:21:31 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59772
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cyAih-0008Lg-EY
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 01:21:35 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35951
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1cyAid-0008Fu-Ig
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 01:21:27 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3C5IgMq017126
-	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 01:21:26 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29rr7jysnk-1
+	id 1cyAih-0008LL-88
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 01:21:31 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3C5IiSX059419
+	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 01:21:30 -0400
+Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 29s2mk21kk-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 01:21:26 -0400
+	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 01:21:30 -0400
 Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Tue, 11 Apr 2017 23:21:25 -0600
+	Tue, 11 Apr 2017 23:21:29 -0600
 From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Date: Wed, 12 Apr 2017 07:21:03 +0200
+Date: Wed, 12 Apr 2017 07:21:04 +0200
 In-Reply-To: <20170412052115.101657-1-bjsdjshi@linux.vnet.ibm.com>
 References: <20170412052115.101657-1-bjsdjshi@linux.vnet.ibm.com>
-Message-Id: <20170412052115.101657-2-bjsdjshi@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v5 01/13] update-linux-headers: update for
+Message-Id: <20170412052115.101657-3-bjsdjshi@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v5 02/13] vfio: linux-headers update for
  vfio-ccw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -42,25 +42,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org
 Cc: bjsdjshi@linux.vnet.ibm.com, renxiaof@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com
 
-Add vfio_ccw.h.
+This is a placeholder for a linux-headers update.
 
 Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 ---
- scripts/update-linux-headers.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ linux-headers/linux/vfio.h     | 17 +++++++++++++++++
+ linux-headers/linux/vfio_ccw.h | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 45 insertions(+)
+ create mode 100644 linux-headers/linux/vfio_ccw.h
 
-diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
-index 6a370a8..2f906c4 100755
---- a/scripts/update-linux-headers.sh
-+++ b/scripts/update-linux-headers.sh
-@@ -113,7 +113,7 @@ done
+diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+index 531cb2e..39a1d3b 100644
+--- a/linux-headers/linux/vfio.h
++++ b/linux-headers/linux/vfio.h
+@@ -198,6 +198,7 @@ struct vfio_device_info {
+ #define VFIO_DEVICE_FLAGS_PCI	(1 << 1)	/* vfio-pci device */
+ #define VFIO_DEVICE_FLAGS_PLATFORM (1 << 2)	/* vfio-platform device */
+ #define VFIO_DEVICE_FLAGS_AMBA  (1 << 3)	/* vfio-amba device */
++#define VFIO_DEVICE_FLAGS_CCW   (1 << 4)	/* vfio-ccw device */
+ 	__u32	num_regions;	/* Max region index + 1 */
+ 	__u32	num_irqs;	/* Max IRQ index + 1 */
+ };
+@@ -446,6 +447,22 @@ enum {
+ 	VFIO_PCI_NUM_IRQS
+ };
  
- rm -rf "$output/linux-headers/linux"
- mkdir -p "$output/linux-headers/linux"
--for header in kvm.h kvm_para.h vfio.h vhost.h \
-+for header in kvm.h kvm_para.h vfio.h vfio_ccw.h vhost.h \
-               psci.h userfaultfd.h; do
-     cp "$tmpdir/include/linux/$header" "$output/linux-headers/linux"
- done
++/*
++ * The VFIO-CCW bus driver makes use of the following fixed region and
++ * IRQ index mapping.  Unimplemented regions return a size of zero.
++ * Unimplemented IRQ types return a count of zero.
++ */
++
++enum {
++        VFIO_CCW_CONFIG_REGION_INDEX,
++        VFIO_CCW_NUM_REGIONS
++};
++
++enum {
++        VFIO_CCW_IO_IRQ_INDEX,
++        VFIO_CCW_NUM_IRQS
++};
++
+ /**
+  * VFIO_DEVICE_GET_PCI_HOT_RESET_INFO - _IORW(VFIO_TYPE, VFIO_BASE + 12,
+  *					      struct vfio_pci_hot_reset_info)
+diff --git a/linux-headers/linux/vfio_ccw.h b/linux-headers/linux/vfio_ccw.h
+new file mode 100644
+index 0000000..4ee74ae
+--- /dev/null
++++ b/linux-headers/linux/vfio_ccw.h
+@@ -0,0 +1,28 @@
++/*
++ * Interfaces for vfio-ccw
++ *
++ * Copyright IBM Corp. 2017
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License (version 2 only)
++ * as published by the Free Software Foundation.
++ *
++ * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
++ */
++
++#ifndef _VFIO_CCW_H_
++#define _VFIO_CCW_H_
++
++#include <linux/types.h>
++
++struct ccw_io_region {
++#define ORB_AREA_SIZE 12
++	__u8	orb_area[ORB_AREA_SIZE];
++#define SCSW_AREA_SIZE 12
++	__u8	scsw_area[SCSW_AREA_SIZE];
++#define IRB_AREA_SIZE 96
++	__u8	irb_area[IRB_AREA_SIZE];
++	__u32	ret_code;
++} __packed;
++
++#endif
 -- 
 2.10.2
