@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cyMsb-0007TX-DM
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 14:20:34 -0400
+	(envelope-from <Michael.Wu@ngc.com>) id 1cyNGe-0003QV-FS
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 14:45:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cyMsa-0000UM-82
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 14:20:33 -0400
-References: <20170406150148.zwjpozqtale44jfh@perseus.local>
-	<b55603db-5215-ac30-29e4-f4764f17c14e@openvz.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d77e0178-8898-3583-ca2c-adf43bf9e0f4@redhat.com>
-Date: Wed, 12 Apr 2017 13:20:20 -0500
+	(envelope-from <Michael.Wu@ngc.com>) id 1cyNGb-0000EE-AD
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 14:45:24 -0400
+Received: from xspc0103.northgrum.com ([157.127.149.150]:32206)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Michael.Wu@ngc.com>) id 1cyNGb-0000Dl-1Q
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 14:45:21 -0400
+From: "Wu, Michael Y [US] (MS)" <Michael.Wu@ngc.com>
+Date: Wed, 12 Apr 2017 18:44:24 +0000
+Message-ID: <2acc95968bf94ad188d8e42dfce2085e@XCGC3021.northgrum.com>
+References: <7a623fb8d2284ee28ddbd6e1ccf277e0@XCGC3021.northgrum.com>
+	<CAFEAcA8C17TnnBKim9T9k32Re9C-pWUokF-UeVAd=itcpROvRg@mail.gmail.com>
+	<a710ff5405c04e8b97f5d4ed6739fb7b@XCGC3021.northgrum.com>
+	<CAFEAcA9VFFXk0U7prWV1KCzBTxDv6ABBLZhRmKZ=nd5b+GynqQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA9VFFXk0U7prWV1KCzBTxDv6ABBLZhRmKZ=nd5b+GynqQ@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <b55603db-5215-ac30-29e4-f4764f17c14e@openvz.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="bB4ajdh7V1Rk2dFiCkKTqcJrQ25aA11i3"
-Subject: Re: [Qemu-devel] [RFC] Proposed qcow2 extension: subcluster
- allocation
+Subject: Re: [Qemu-devel] EXT :Re: Emulating external registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,115 +30,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bB4ajdh7V1Rk2dFiCkKTqcJrQ25aA11i3
-From: Eric Blake <eblake@redhat.com>
-To: "Denis V. Lunev" <den@openvz.org>, Alberto Garcia <berto@igalia.com>,
- qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
-Message-ID: <d77e0178-8898-3583-ca2c-adf43bf9e0f4@redhat.com>
-Subject: Re: [Qemu-devel] [RFC] Proposed qcow2 extension: subcluster
- allocation
-References: <20170406150148.zwjpozqtale44jfh@perseus.local>
- <b55603db-5215-ac30-29e4-f4764f17c14e@openvz.org>
-In-Reply-To: <b55603db-5215-ac30-29e4-f4764f17c14e@openvz.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 04/12/2017 12:55 PM, Denis V. Lunev wrote:
-> Let me rephrase a bit.
->=20
-> The proposal is looking very close to the following case:
-> - raw sparse file
->=20
-> In this case all writes are very-very-very fast and from the
-> guest point of view all is OK. Sequential data is really sequential.
-> Though once we are starting to perform any sequential IO, we
-> have real pain. Each sequential operation becomes random
-> on the host file system and the IO becomes very slow. This
-> will not be observed with the test, but the performance will
-> degrade very soon.
->=20
-> This is why raw sparse files are not used in the real life.
-> Hypervisor must maintain guest OS invariants and the data,
-> which is nearby from the guest point of view should be kept
-> nearby in host.
->=20
-> This is why actually that 64kb data blocks are extremely
-> small :) OK. This is offtopic.
-
-Not necessarily. Using subclusters may allow you to ramp up to larger
-cluster sizes. We can also set up our allocation (and pre-allocation
-schemes) so that we always reserve an entire cluster on the host at the
-time we allocate the cluster, even if we only plan to write to
-particular subclusters within that cluster.  In fact, 32 subclusters to
-a 2M cluster results in 64k subclusters, where you are still writing at
-64k data chunks but could now have guaranteed 2M locality, compared to
-the current qcow2 with 64k clusters that writes in 64k data chunks but
-with no locality.
-
-Just because we don't write the entire cluster up front does not mean
-that we don't have to allocate (or have a mode that allocates) the
-entire cluster at the time of the first subcluster use.
-
->=20
-> One can easily recreate this case using the following simple
-> test:
-> - write each even 4kb page of the disk, one by one
-> - write each odd 4 kb page of the disk
-> - run sequential read with f.e. 1 MB data block
->=20
-> Normally we should still have native performance, but
-> with raw sparse files and (as far as understand the
-> proposal) sub-clusters we will have the host IO pattern
-> exactly like random.
-
-Only if we don't pre-allocate entire clusters at the point that we first
-touch the cluster.
-
->=20
-> This seems like a big and inevitable problem of the approach
-> for me. We still have the potential to improve current
-> algorithms and not introduce non-compatible changes.
->=20
-> Sorry if this is too emotional. We have learned above in a
-> very hard way.
-
-And your experience is useful, as a way to fine-tune this proposal.  But
-it doesn't mean we should entirely ditch this proposal.  I also
-appreciate that you have patches in the works to reduce bottlenecks
-(such as turning sub-cluster writes into 3 IOPs rather than 5, by doing
-read-head, read-tail, write-cluster, instead of the current read-head,
-write-head, write-body, read-tail, write-tail), but think that both
-approaches are complimentary, not orthogonal.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---bB4ajdh7V1Rk2dFiCkKTqcJrQ25aA11i3
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY7m/kAAoJEKeha0olJ0NqBwQH/2p0rYj9jXKzxBFjup3UyUYX
-iCJYTykK+kSI3UMrvoC6MrB13qoa8iwe9RHiItXVKKKxMCNbskZotXX6Rqa8I/TN
-+Sy9oI/MMpVctThVCG3dBQpHnFJ1FKs4TVwRRBf3DIfQKZV6SVLUJ8tGxwcN8yRS
-b7c1RSXa/9RaYNLmOq8JhRu9EeXgj03HebDmDOk4JWs+Mtlco73f1St16O8l/GAF
-WbsfCw7CMY2xQ6IIeeR+wkL7sFoNey18eGV4/zQNi5JnNJ2UGpknGBg4ueNQN342
-fShl4PKuEwU2UB48C6ZbCZkEeITM7X7QeiO7yYDgkp7QLq6nAAN2YvrQCYDRZnc=
-=XhRK
------END PGP SIGNATURE-----
-
---bB4ajdh7V1Rk2dFiCkKTqcJrQ25aA11i3--
+VGhhbmsgeW91IGZvciB0aGUgc3VnZ2VzdGlvbnMuIEkgZm91bmQgb3V0IHRoYXQgdGhlIGlzc3Vl
+IHdhcyB3aXRoIGhvdyB0aGUgYmFyZSBtZXRhbCBwcm9ncmFtIGNvbmZpZ3VyZWQgbWVtb3J5Lg0K
+VGhlIHByb2dyYW0gaXMgbm93IGFibGUgdG8gcmVhZCBhbmQgd3JpdGUgZnJvbSBhIHBvaW50ZXIu
+DQoNCkkgaW5jbHVkZWQgeW91ciB1bmltcGxlbWVudGVkIGRldmljZSBpbnRvIHRoZSBnMyBtYWNo
+aW5lIChtYWNfb2xkd29ybGQuYykgSSBhbSBlbXVsYXRpbmcgdXNpbmcgdGhlIGZvbGxvd2luZyBj
+b2RlLg0KY3JlYXRlX3VuaW1wbGVtZW50ZWRfZGV2aWNlKCJ1bmltcCIsMHgwMzQwMDAwMCwoNCA8
+PCAyMCkpOw0KDQpXaGVuIEkgc2V0IGEgcG9pbnRlciB0byAweDAzNDAwMDAwLCBJIGNhbiByZWFk
+IGFuZCB3cml0ZSB0byB0aGF0IGxvY2F0aW9uLiBIb3dldmVyIEkgaGF2ZSBubyBvdXRwdXRzIGZy
+b20gdGhlIHJlYWQgYW5kIHdyaXRlIGNhbGxiYWNrcy4gSSBoYXZlIHRoZSAnLWQgdW5pbXAnIHNl
+dCBpbiB0aGUgY29tbWFuZCBhcmd1bWVudHMgYXMgd2VsbC4NCg0KSSBhZGRlZCB0aGUgY3JlYXRl
+X3VuaW1wbGVtZW50ZWRfZGV2aWNlIGF0IHRoZSBlbmQgb2YgdGhlIGZ1bmN0aW9uIHBwY19oZWF0
+aHJvd19pbml0IChtYWNfb2xkd29ybGQuYykuIElzIG15IHVzYWdlIGNvcnJlY3QgaW4gYWRkaW5n
+IHRoaXMgZGV2aWNlIHRvIGFuIGV4aXN0aW5nIG1hY2hpbmU/DQpJbiB1bmltcC5oLCB0aGUgY29t
+bWVudHMgbWVudGlvbiB0aGF0IHRoZSBwcmlvcml0eSBpcyBhdCAtMTAwMC4gRG9lcyB0aGF0IG1l
+YW4gSSBjYW4gc2V0IGEgdW5pbXBsZW1lbnRlZCBkZXZpY2UgdG8gYSBodWdlIGFkZHJlc3MgcmFu
+Z2UgdG8gcGljayB1cCBhbnkgcmVhZC93cml0ZXM/DQogDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2Ut
+LS0tLQ0KRnJvbTogUGV0ZXIgTWF5ZGVsbCBbbWFpbHRvOnBldGVyLm1heWRlbGxAbGluYXJvLm9y
+Z10gDQpTZW50OiBUaHVyc2RheSwgQXByaWwgMDYsIDIwMTcgMTA6MzggQU0NClRvOiBXdSwgTWlj
+aGFlbCBZIFtVU10gKE1TKQ0KQ2M6IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KU3ViamVjdDogUmU6
+IFtRZW11LWRldmVsXSBFWFQgOlJlOiBFbXVsYXRpbmcgZXh0ZXJuYWwgcmVnaXN0ZXJzDQoNCk9u
+IDYgQXByaWwgMjAxNyBhdCAxODoyMywgV3UsIE1pY2hhZWwgWSBbVVNdIChNUykgPE1pY2hhZWwu
+V3VAbmdjLmNvbT4gd3JvdGU6DQo+IEkgY2hhbmdlZCBteSBjb2RlIHRvIHRoZSBmb2xsb3dpbmcg
+YW5kIGFkZGVkIHRoZSBhcHByb3ByaWF0ZSByZWFkLHdyaXRlIGZ1bmN0aW9ucyBhbmQgYSBNZW1v
+cnlSZWdpb25PcHMuDQo+ICAgICBtZW1vcnlfcmVnaW9uX2luaXRfaW8ocmVnX21lbW9yeSwgTlVM
+TCwgJnJlZ19vcHMsIHJlZywNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAicmVnX21lbSIs
+IDB4MDAwMDAwNDApOyAvL3NldCB0byA2NCBieXRlcw0KPiAgICAgbWVtb3J5X3JlZ2lvbl9hZGRf
+c3VicmVnaW9uKHN5c21lbSwgMHhGQzAwMDAwMCwgcmVnX21lbW9yeSk7DQo+DQo+IEZvciB0aGUg
+cmVhZCBmdW5jdGlvbiBJIGp1c3QgcmV0dXJuZWQgYSB6ZXJvLiBTbyBpZiBJIHdlcmUgdG8gcmVh
+ZCBmcm9tIHRoZSBhZGRyZXNzIDB4RkMwMDAwMDAgaXQgc2hvdWxkIHJldHVybiBhIHZhbHVlIG9m
+IDA/IFRoZSBjdXJyZW50IGlzc3VlIEkgYW0gaGF2aW5nIGlzIHRoYXQgZ2RiIGhhbmdzIHdoZW4g
+dGhlIHBvaW50ZXIgaXMgYWNjZXNzZWQuIEkgYW0gc3RhcnRpbmcgdG8gdGhpbmsgbXkgYmFyZS1t
+ZXRhbCBwcm9ncmFtIGlzIGluY29ycmVjdC4gSSBhbHNvIGFkZGVkIGxvZyBtZXNzYWdlcyBpbiBt
+eSByZWFkIGFuZCB3cml0ZSBmdW5jdGlvbnMuIFRoZSByZWFkIGZ1bmN0aW9uIHdhcyBub3QgYWNj
+ZXNzZWQuDQoNCllvdSdsbCBwcm9iYWJseSBmaW5kIHRoYXQgd2hhdCBoYXMgaGFwcGVuZWQgaXMg
+dGhhdCB5b3VyIHByb2dyYW0gaGFzIHRha2VuIGFuIGV4Y2VwdGlvbiB3aGljaCB5b3UgZG9uJ3Qg
+aGF2ZSBhbiBleGNlcHRpb24gaGFuZGxlciBpbnN0YWxsZWQgZm9yLCBhbmQgaGFzIHRoZW4ganVt
+cGVkIG9mZiBpbnRvIG5vd2hlcmUgb3IgZ29uZSBpbnRvIGFuIGluZmluaXRlIGxvb3Agb2YgdGFr
+aW5nIGV4Y2VwdGlvbnMuIChQcm9iYWJseSBoaXR0aW5nIF5jIGluIGdkYiB3aWxsIGJyZWFrIGlu
+dG8gd2hlcmV2ZXIgaXQgaXMuKSBJdCdzIGEgZ29vZCBpZGVhIGluIGJhcmUgbWV0YWwgdGVzdCBj
+b2RlIHRvIHdyaXRlIGF0IGxlYXN0IGEgbWluaW1hbCBzZXQgb2YgZXhjZXB0aW9uIGhhbmRsZXJz
+IHRoYXQgY2FuIHByaW50IGEgbWVzc2FnZSB3aGVuIGFuIHVuZXhwZWN0ZWQgZXhjZXB0aW9uIG9j
+Y3VycyBhbmQgc3RvcCwgc28geW91IGRvbid0IGdldCB0b28gY29uZnVzZWQuDQoNCllvdSBtaWdo
+dCBhbHNvIHdhbnQgdG8gaW52ZXN0aWdhdGUgUUVNVSdzIHRyYWNpbmc6DQotZCBpbl9hc20sZXhl
+YyxjcHUsaW50LG5vY2hhaW4gLUQgZGVidWcubG9nIHdpbGwgd3JpdGUgdHJhY2luZyB0byB0aGUg
+ZGVidWcubG9nIGZpbGUgKGEgbG90IG9mIGl0LCBhbmQgdGhpcyBzZXQgb2YgdHJhY2UgZmxhZ3Mg
+c2xvdyBkb3duIGV4ZWN1dGlvbiBhIGxvdCwgYnV0IGlmIHlvdSdyZSBkb2luZyB2ZXJ5IHNtYWxs
+IGJhcmUgbWV0YWwgZmxhZ3MgdGhhdCBzaG91bGQgYmUgb2spLiBUaGlzIGNhbiBoZWxwIGluIGZp
+Z3VyaW5nIG91dCB3aGF0IHlvdXIgdGVzdCBwcm9ncmFtIGlzIGRvaW5nLiAoV2F0Y2ggb3V0IHRo
+YXQgdGhlIGluX2FzbSBzaG93cyB3aGVuIHdlIGZpcnN0IGVuY291bnRlciBhIGJsb2NrIG9mIGNv
+ZGUsIGJ1dCBpZiB3ZSBleGVjdXRlIHRoZSBzYW1lIGJpdCBvZiBjb2RlIGEgc2Vjb25kIHRpbWUg
+d2UnbGwgb25seSBwcmludCB0aGUgZXhlYyBhbmQgY3B1IHBhcnRzIG9mIHRoZSBsb2dnaW5nLikN
+Cg0KdGhhbmtzDQotLSBQTU0NCg0K
