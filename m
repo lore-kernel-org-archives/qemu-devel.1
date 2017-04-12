@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cyBxf-0008Vx-KL
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 02:41:04 -0400
+	(envelope-from <armbru@redhat.com>) id 1cyC9H-0001sj-Bl
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 02:53:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cyBxc-0002ZP-If
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 02:41:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59100)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cyBxc-0002Yh-AN
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 02:41:00 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3D893804E9
-	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 06:40:58 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1cyC9G-0006ut-JV
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 02:53:03 -0400
 From: Markus Armbruster <armbru@redhat.com>
 References: <20170411185034.13460-1-eblake@redhat.com>
-	<20170411185034.13460-7-eblake@redhat.com>
-Date: Wed, 12 Apr 2017 08:40:55 +0200
-In-Reply-To: <20170411185034.13460-7-eblake@redhat.com> (Eric Blake's message
-	of "Tue, 11 Apr 2017 13:50:27 -0500")
-Message-ID: <87r30yw2ko.fsf@dusky.pond.sub.org>
+	<20170411185034.13460-8-eblake@redhat.com>
+Date: Wed, 12 Apr 2017 08:52:48 +0200
+In-Reply-To: <20170411185034.13460-8-eblake@redhat.com> (Eric Blake's message
+	of "Tue, 11 Apr 2017 13:50:28 -0500")
+Message-ID: <87inmaw20v.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 06/13] qobject: Add helper macros for
- common scalar insertions
+Subject: Re: [Qemu-devel] [PATCH v4 07/13] block: Use simpler QDict/QList
+ scalar insertion macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,108 +25,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>, Fam Zheng <famz@redhat.com>, "open list:blkdebug" <qemu-block@nongnu.org>, "Richard W.M. Jones" <rjones@redhat.com>, Stefan Weil <sw@weilnetz.de>, Jeff Cody <jcody@redhat.com>, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 Eric Blake <eblake@redhat.com> writes:
 
-> Rather than making lots of callers wrap a scalar in a QInt, QString,
-> or QBool, provide helper macros that do the wrapping automatically.
+> We now have macros in place to make it less verbose to add a scalar
+> to QDict and QList, so use them.
 >
-> Update the Coccinelle script to make mass conversions easy, although
-> the conversion itself will be done as a separate patches to ease
-> review and backport efforts.
+> Patch created mechanically via:
+>   spatch --sp-file scripts/coccinelle/qobject.cocci \
+>     --macro-file scripts/cocci-macro-file.h --dir block --in-place
+> then touched up manually to fix a couple of '?:' back to original spacing.
 >
+> For ease of review, the mechanical work was split by tree location:
+> this only touches files under block/; there are other block-related
+> files (like top-level block.c) that will be fixed in a later global
+> cleanup.
+
+I don't like this split.  Splitting out *subsystems* may ease review,
+but this splits out directory block/, which is only a part of the block
+subsystem.  Explaining this takes you more than three dozen words.  I'd
+prefer either the whole block subsystem (as defined in MAINTAINERS)
+split out, or no split.
+
+I'm willing to accept the split as is anyway if block maintainers are
+okay with it.
+
+I'm also willing to squash the three parts on commit.
+
 > Signed-off-by: Eric Blake <eblake@redhat.com>
->
-> ---
-> v4: tweak comment wording
-> v3: new patch
-> ---
->  include/qapi/qmp/qdict.h         |  8 ++++++++
->  include/qapi/qmp/qlist.h         |  8 ++++++++
->  scripts/coccinelle/qobject.cocci | 22 ++++++++++++++++++++++
->  3 files changed, 38 insertions(+)
->
-> diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
-> index fe9a4c5..f70d435 100644
-> --- a/include/qapi/qmp/qdict.h
-> +++ b/include/qapi/qmp/qdict.h
-> @@ -52,6 +52,14 @@ void qdict_destroy_obj(QObject *obj);
->  #define qdict_put(qdict, key, obj) \
->          qdict_put_obj(qdict, key, QOBJECT(obj))
->
-> +/* Helpers for int, bool, and string. */
-
-Nitpick: this isn't a sentence, so why the period?
-
-> +#define qdict_put_int(qdict, key, value) \
-> +        qdict_put(qdict, key, qint_from_int(value))
-> +#define qdict_put_bool(qdict, key, value) \
-> +        qdict_put(qdict, key, qbool_from_bool(value))
-> +#define qdict_put_str(qdict, key, value) \
-> +        qdict_put(qdict, key, qstring_from_str(value))
-> +
->  /* High level helpers */
->  double qdict_get_double(const QDict *qdict, const char *key);
->  int64_t qdict_get_int(const QDict *qdict, const char *key);
-> diff --git a/include/qapi/qmp/qlist.h b/include/qapi/qmp/qlist.h
-> index a84117e..7b3fb9a 100644
-> --- a/include/qapi/qmp/qlist.h
-> +++ b/include/qapi/qmp/qlist.h
-> @@ -29,6 +29,14 @@ typedef struct QList {
->  #define qlist_append(qlist, obj) \
->          qlist_append_obj(qlist, QOBJECT(obj))
->
-> +/* Helpers for int, bool, and string. */
-
-Likewise.
-
-> +#define qlist_append_int(qlist, value) \
-> +        qlist_append(qlist, qint_from_int(value))
-> +#define qlist_append_bool(qlist, value) \
-> +        qlist_append(qlist, qbool_from_bool(value))
-> +#define qlist_append_str(qlist, value) \
-> +        qlist_append(qlist, qstring_from_str(value))
-> +
->  #define QLIST_FOREACH_ENTRY(qlist, var)             \
->          for ((var) = ((qlist)->head.tqh_first);     \
->              (var);                                  \
-> diff --git a/scripts/coccinelle/qobject.cocci b/scripts/coccinelle/qobject.cocci
-> index aa899e2..97703a4 100644
-> --- a/scripts/coccinelle/qobject.cocci
-> +++ b/scripts/coccinelle/qobject.cocci
-> @@ -2,12 +2,34 @@
->  @@
->  expression Obj, Key, E;
->  @@
-> +(
->  - qdict_put_obj(Obj, Key, QOBJECT(E));
->  + qdict_put(Obj, Key, E);
-> +|
-> +- qdict_put(Obj, Key, qint_from_int(E));
-> ++ qdict_put_int(Obj, Key, E);
-> +|
-> +- qdict_put(Obj, Key, qbool_from_bool(E));
-> ++ qdict_put_bool(Obj, Key, E);
-> +|
-> +- qdict_put(Obj, Key, qstring_from_str(E));
-> ++ qdict_put_str(Obj, Key, E);
-> +)
->
->  // Use QList macros where they make sense
->  @@
->  expression Obj, E;
->  @@
-> +(
->  - qlist_append_obj(Obj, QOBJECT(E));
->  + qlist_append(Obj, E);
-> +|
-> +- qlist_append(Obj, qint_from_int(E));
-> ++ qlist_append_int(Obj, E);
-> +|
-> +- qlist_append(Obj, qbool_from_bool(E));
-> ++ qlist_append_bool(Obj, E);
-> +|
-> +- qlist_append(Obj, qstring_from_str(E));
-> ++ qlist_append_str(Obj, E);
-> +)
+> Acked-by: Richard W.M. Jones <rjones@redhat.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
