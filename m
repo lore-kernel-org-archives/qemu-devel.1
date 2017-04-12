@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cyIhX-0006uQ-CT
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 09:52:52 -0400
+	(envelope-from <lvivier@redhat.com>) id 1cyIi3-00078V-EZ
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 09:53:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cyIhU-0004Ud-A3
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 09:52:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42810)
+	(envelope-from <lvivier@redhat.com>) id 1cyIi2-0004cN-Ea
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 09:53:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54588)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cyIhU-0004U2-0j
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 09:52:48 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170406210917.6896-1-eblake@redhat.com>
-	<877f2pnb2t.fsf@dusky.pond.sub.org>
-	<70ca7ebd-f538-1721-c500-9e106225959c@redhat.com>
-Date: Wed, 12 Apr 2017 15:52:44 +0200
-In-Reply-To: <70ca7ebd-f538-1721-c500-9e106225959c@redhat.com> (Eric Blake's
-	message of "Wed, 12 Apr 2017 08:15:07 -0500")
-Message-ID: <87vaq97mxf.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] event: Add signal information to SHUTDOWN
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1cyIi2-0004bz-8V
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 09:53:22 -0400
+From: Laurent Vivier <lvivier@redhat.com>
+Date: Wed, 12 Apr 2017 15:53:11 +0200
+Message-Id: <20170412135312.1686-2-lvivier@redhat.com>
+In-Reply-To: <20170412135312.1686-1-lvivier@redhat.com>
+References: <20170412135312.1686-1-lvivier@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/2] migration: don't close a file
+ descriptor while it can be in use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,165 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Stefan Weil <sw@weilnetz.de>
+To: "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Amit Shah <amit@kernel.org>, qemu-devel@nongnu.org
 
-Eric Blake <eblake@redhat.com> writes:
+If we close the QEMUFile descriptor in process_incoming_migration_co()
+while it has been stopped by an error, the postcopy_ram_listen_thread()
+can try to continue to use it. And as the memory has been freed
+it is working with an invalid pointer and crashes.
 
-> On 04/12/2017 06:02 AM, Markus Armbruster wrote:
->> Eric Blake <eblake@redhat.com> writes:
->> 
->>> qemu_kill_report() is already able to tell whether a shutdown
->>> was triggered by guest action (no output) or by a host signal
->>> (a message about termination is printed via error_report); but
->>> this information is then lost.  Libvirt would like to be able
->>> to distinguish between a SHUTDOWN event triggered solely by
->>> guest request and one triggered by a SIGTERM on the host.
->>>
->>> Enhance the SHUTDOWN event to pass the value of shutdown_signal
->>> through to the monitor client, suitably remapped into a
->>> platform-neutral string.  Note that mingw lacks decent signal
->> 
->> I understand the desire to distinguish between guest-initiated and
->> host-initiated shutdown, but I'm not sure why libvirt (or anyone) would
->> care for the exact signal.  Can you explain?
->
-> If we don't care about the signal itself, a simple boolean (host vs.
-> guest) is just as easy to code up.  Or even code up a boolean now, and
-> then add signal information down the road if someone has a use case for
-> it (as Dan said, libvirt doesn't care, but someone on top of libvirt
-> might - but I haven't identified such a user at this point in time).
+Fix this by releasing the memory after having managed the error
+case (which, in fact, calls exit())
 
-Starting with just a boolean should be safe.  Especially attractive if
-it lets us sidestep Windows complications; more on that below.
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+---
+ migration/migration.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
->> 
->>>                           Note that mingw lacks decent signal
->>> support, and will never report a signal because it never calls
->>> qemu_system_killed().
->> 
->> Awkward.
->> 
->
->> In other words, these three signals are polite requests to terminate
->> QEMU.
->> 
->> Stefan, are there equivalent requests under Windows?  I guess there
->> might be one at least for SIGINT, namely whatever happens when you hit
->> ^C on the console.
->
-> Mingw has SIGINT (C99 requires it), and that's presumably what happens
-> for ^C,...
->
->> 
->> Could we arrange to run qemu_system_killed() then?
->
-> ...but I don't know why it is not currently wired up to call
-> qemu_system_killed(), nor do I have enough Windows programming expertise
-> to try and write such a patch. But I think that is an orthogonal
-> improvement.  On the other hand, mingw has a definition for SIGTERM (but
-> I'm not sure how it gets triggered) and no definition at all for SIGHUP
-> (as evidenced by the #ifdef'fery in the patch to get it to compile under
-> docker targetting mingw).
-
-If all we need is distingishing host- and guest-initiated shutdown, then
-detecting the latter reliably lets us stay away from OS-specific stuff.
-Can we do that?
-
->> 
->> If not, could we at least distinguish between guest-initiated and
->> host-initiated shutdown?
->> 
->>> See also https://bugzilla.redhat.com/1384007
->>>
->>> Signed-off-by: Eric Blake <eblake@redhat.com>
->>> ---
->>>  qapi/event.json | 20 +++++++++++++++++++-
->>>  vl.c            | 21 ++++++++++++++++++---
->>>  2 files changed, 37 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/qapi/event.json b/qapi/event.json
->>> index e80f3f4..6aad475 100644
->>> --- a/qapi/event.json
->>> +++ b/qapi/event.json
->>> @@ -5,11 +5,29 @@
->>>  ##
->>>
->>>  ##
->>> +# @ShutdownSignal:
->>> +#
->>> +# The list of host signal types known to cause qemu to shut down a guest.
->>> +#
->>> +# @int: SIGINT
->>> +# @hup: SIGHUP
->>> +# @term: SIGTERM
->>> +#
->>> +# Since: 2.10
->>> +##
->>> +{ 'enum': 'ShutdownSignal', 'data': [ 'int', 'hup', 'term' ] }
->> 
->> I'd call them sigint, sighup, sigterm, but it's a matter of taste.
->
-> And it goes away if we are okay with a simpler bool of host vs. guest.
->
->> 
->>> +
->>> +##
->>>  # @SHUTDOWN:
->>>  #
->>>  # Emitted when the virtual machine has shut down, indicating that qemu is
->>>  # about to exit.
->>>  #
->>> +# @signal: If present, the shutdown was (probably) triggered due to
->>> +# the receipt of the given signal in the host, rather than by a guest
->>> +# action (note that there is an inherent race with a guest choosing to
->>> +# shut down near the same time the host sends a signal). (since 2.10)
->>> +#
->> 
->> Is the "(probably)" due to just Windows, or are there other reasons for
->> uncertainty?
->
-> There are other reasons too: a guest can request shutdown immediately
-> before the host sends SIGINT. Based on when things are processed, you
-> could see either the guest or the host as the initiator.  And the race
-> is not entirely implausible - when trying to shut down a guest, libvirt
-> first tries to inform the guest to initiate things (whether by interrupt
-> or guest agent), but after a given amount of time, assumes the guest is
-> unresponsive and resorts to a signal to qemu. A heavily loaded guest
-> that takes its time in responding could easily overlap with the timeout
-> resorting to a host-side action.
-
-This race doesn't worry me.  If both host and guest have initiated a
-shutdown, then reporting whichever of the two finishes first seems fair.
-
-Additional ways to terminate QEMU: HMP and QMP command "quit", and the
-various GUI controls such "close SDL window".
-
->
->>> -static void qemu_kill_report(void)
->>> +static ShutdownSignal qemu_kill_report(void)
->>>  {
->>> +    ShutdownSignal ss = SHUTDOWN_SIGNAL__MAX;
->>>      if (!qtest_driver() && shutdown_signal != -1) {
->> 
->> Outside this patch's scope: could just as well use 0 instead of -1, as 0
->> can't be a valid signal number (kill() uses it for "check if we could
->> kill").
->
-> Indeed.
->
->>> @@ -1852,8 +1867,8 @@ static bool main_loop_should_exit(void)
->>>          qemu_system_suspend();
->>>      }
->>>      if (qemu_shutdown_requested()) {
->>> -        qemu_kill_report();
->>> -        qapi_event_send_shutdown(&error_abort);
->>> +        ShutdownSignal ss = qemu_kill_report();
->>> +        qapi_event_send_shutdown(ss < SHUTDOWN_SIGNAL__MAX, ss, &error_abort);
->>>          if (no_shutdown) {
->>>              vm_stop(RUN_STATE_SHUTDOWN);
->>>          } else {
->> 
->> Why not send the event within qemu_kill_report()?
->
-> Sure, I can do that in v2.
+diff --git a/migration/migration.c b/migration/migration.c
+index ad4036f..e024e0a 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -436,9 +436,6 @@ static void process_incoming_migration_co(void *opaque)
+         qemu_thread_join(&mis->colo_incoming_thread);
+     }
+ 
+-    qemu_fclose(f);
+-    free_xbzrle_decoded_buf();
+-
+     if (ret < 0) {
+         migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
+                           MIGRATION_STATUS_FAILED);
+@@ -447,6 +444,9 @@ static void process_incoming_migration_co(void *opaque)
+         exit(EXIT_FAILURE);
+     }
+ 
++    qemu_fclose(f);
++    free_xbzrle_decoded_buf();
++
+     mis->bh = qemu_bh_new(process_incoming_migration_bh, mis);
+     qemu_bh_schedule(mis->bh);
+ }
+-- 
+2.9.3
