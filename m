@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1cyEwO-0005Tk-Ls
+	(envelope-from <guangrong.xiao@gmail.com>) id 1cyEwO-0005Tl-MN
 	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 05:51:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1cyEwL-0004kS-G9
+	(envelope-from <guangrong.xiao@gmail.com>) id 1cyEwN-0004kx-JY
 	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 05:51:56 -0400
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:36264)
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:33938)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1cyEwL-0004k8-A1
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 05:51:53 -0400
-Received: by mail-pg0-x243.google.com with SMTP id 34so1371276pgx.3
-	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 02:51:53 -0700 (PDT)
+	id 1cyEwN-0004kp-EM
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 05:51:55 -0400
+Received: by mail-pf0-x242.google.com with SMTP id o126so4065486pfb.1
+	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 02:51:55 -0700 (PDT)
 From: guangrong.xiao@gmail.com
-Date: Wed, 12 Apr 2017 17:51:06 +0800
-Message-Id: <20170412095111.11728-1-xiaoguangrong@tencent.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 0/5] mc146818rtc: fix Windows VM clock faster
+Date: Wed, 12 Apr 2017 17:51:07 +0800
+Message-Id: <20170412095111.11728-2-xiaoguangrong@tencent.com>
+In-Reply-To: <20170412095111.11728-1-xiaoguangrong@tencent.com>
+References: <20170412095111.11728-1-xiaoguangrong@tencent.com>
+Subject: [Qemu-devel] [PATCH 1/5] mc146818rtc: update periodic timer only if
+ it is needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,78 +32,87 @@ Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, yunfangtai@tencent.com, Xiao Gua
 
 From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-We noticed that the clock on some windows VMs, e.g, Window7 and window8
-is really faster and the issue can be easily reproduced by staring the
-VM with '-rtc base=localtime,clock=vm,driftfix=slew -no-hpet' and 
-running attached code in the guest
+Currently, the timer is updated whenever RegA or RegB is written
+even if the periodic timer related configuration is not changed
 
-The root cause is that the clock will be lost if the periodic period is
-changed as currently code counts the next periodic time like this:
-      next_irq_clock = (cur_clock & ~(period - 1)) + period;
+This patch optimizes it slightly to make the update happen only
+if its period or enable-status is changed, also later patches are
+depend on this optimization
 
-consider the case if cur_clock = 0x11FF and period = 0x100, then the
-next_irq_clock is 0x1200, however, there is only 1 clock left to trigger
-the next irq. Unfortunately, Windows guests (at least Windows7) change
-the period very frequently if it runs the attached code, so that the
-lost clock is accumulated, the wall-time become faster and faster
+Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+---
+ hw/timer/mc146818rtc.c | 31 +++++++++++++++++++++++++++++--
+ 1 file changed, 29 insertions(+), 2 deletions(-)
 
-The main idea to fix the issue is we use a accurate clock period to
-calculate the next irq:
-    next_irq_clock = cur_clock + period;
-
-After that, it is really convenient to compensate clock if it is needed 
-
-The code running in windows VM is attached:
-// TimeInternalTest.cpp : Defines the entry point for the console application.
-//
-
-#include "stdafx.h"
-#pragma comment(lib, "winmm")
-#include <stdio.h>
-#include <windows.h>
-
-#define SWITCH_PEROID  13
-
-int _tmain(int argc, _TCHAR* argv[])
-{
-	if (argc != 2)
-	{
-		printf("parameter error!\n");
-		printf("USAGE: *.exe time(ms)\n");
-		printf("example: *.exe 40\n");
-		return 0;
-	}
-	else
-	{
-		DWORD internal = atoi((char *)argv[1]);
-		DWORD count = 0;
-
-		while (1)
-		{
-			count++;
-			timeBeginPeriod(1);
-			DWORD start = timeGetTime();
-			Sleep(internal);
-			timeEndPeriod(1);
-			if ((count % SWITCH_PEROID) == 0) {
-				Sleep(1);
-			}
-		}
-	}
-	return 0;
-}
-
-Tai Yunfang (1):
-  mc146818rtc: properly count the time for the next interrupt
-
-Xiao Guangrong (4):
-  mc146818rtc: update periodic timer only if it is needed
-  mc146818rtc: fix clock lost after scaling coalesced irq
-  mc146818rtc: move x86 specific code out of periodic_timer_update
-  mc146818rtc: embrace all x86 specific code
-
- hw/timer/mc146818rtc.c | 370 ++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 272 insertions(+), 98 deletions(-)
-
+diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+index 4165450..749e206 100644
+--- a/hw/timer/mc146818rtc.c
++++ b/hw/timer/mc146818rtc.c
+@@ -387,10 +387,25 @@ static void rtc_update_timer(void *opaque)
+     check_update_timer(s);
+ }
+ 
++static bool rtc_periodic_timer_updated_by_regA(RTCState *s, uint64_t data)
++{
++    uint8_t orig = s->cmos_data[RTC_REG_A];
++
++    return (orig & 0x0f) != (data & 0x0f);
++}
++
++static bool rtc_periodic_timer_updated_by_regB(RTCState *s, uint64_t data)
++{
++    uint8_t orig = s->cmos_data[RTC_REG_B];
++
++    return (orig & REG_B_PIE) != (data & REG_B_PIE);
++}
++
+ static void cmos_ioport_write(void *opaque, hwaddr addr,
+                               uint64_t data, unsigned size)
+ {
+     RTCState *s = opaque;
++    bool update_periodic_timer;
+ 
+     if ((addr & 1) == 0) {
+         s->cmos_index = data & 0x7f;
+@@ -423,6 +438,8 @@ static void cmos_ioport_write(void *opaque, hwaddr addr,
+             }
+             break;
+         case RTC_REG_A:
++            update_periodic_timer = rtc_periodic_timer_updated_by_regA(s, data);
++
+             if ((data & 0x60) == 0x60) {
+                 if (rtc_running(s)) {
+                     rtc_update_time(s);
+@@ -445,10 +462,16 @@ static void cmos_ioport_write(void *opaque, hwaddr addr,
+             /* UIP bit is read only */
+             s->cmos_data[RTC_REG_A] = (data & ~REG_A_UIP) |
+                 (s->cmos_data[RTC_REG_A] & REG_A_UIP);
+-            periodic_timer_update(s, qemu_clock_get_ns(rtc_clock));
++
++            if (update_periodic_timer) {
++                periodic_timer_update(s, qemu_clock_get_ns(rtc_clock));
++            }
++
+             check_update_timer(s);
+             break;
+         case RTC_REG_B:
++            update_periodic_timer = rtc_periodic_timer_updated_by_regB(s, data);
++
+             if (data & REG_B_SET) {
+                 /* update cmos to when the rtc was stopping */
+                 if (rtc_running(s)) {
+@@ -475,7 +498,11 @@ static void cmos_ioport_write(void *opaque, hwaddr addr,
+                 qemu_irq_lower(s->irq);
+             }
+             s->cmos_data[RTC_REG_B] = data;
+-            periodic_timer_update(s, qemu_clock_get_ns(rtc_clock));
++
++            if (update_periodic_timer) {
++                periodic_timer_update(s, qemu_clock_get_ns(rtc_clock));
++            }
++
+             check_update_timer(s);
+             break;
+         case RTC_REG_C:
 -- 
 2.9.3
