@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cyJKi-0003zl-Fg
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:33:21 -0400
+	(envelope-from <armbru@redhat.com>) id 1cyJKf-0003zb-1o
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:33:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cyJKh-0002lg-Gu
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:33:20 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:32904)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cyJKh-0002lS-54
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:33:19 -0400
-Received: by mail-lf0-x244.google.com with SMTP id r36so3405446lfi.0
-	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 07:33:19 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1cyJKY-0002k4-VB
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:33:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48850)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cyJKY-0002jw-Lj
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:33:10 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170406210917.6896-1-eblake@redhat.com>
+	<877f2pnb2t.fsf@dusky.pond.sub.org>
+	<70ca7ebd-f538-1721-c500-9e106225959c@redhat.com>
+	<87vaq97mxf.fsf@dusky.pond.sub.org>
+	<480c1dd8-fcd1-212c-a2c0-8170da3a7629@redhat.com>
+Date: Wed, 12 Apr 2017 16:33:07 +0200
+In-Reply-To: <480c1dd8-fcd1-212c-a2c0-8170da3a7629@redhat.com> (Eric Blake's
+	message of "Wed, 12 Apr 2017 09:03:54 -0500")
+Message-ID: <87zifl3dcs.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20170410142112.11550-1-marcandre.lureau@redhat.com>
-	<8737ddna9i.fsf@dusky.pond.sub.org>
-In-Reply-To: <8737ddna9i.fsf@dusky.pond.sub.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 12 Apr 2017 14:33:07 +0000
-Message-ID: <CAJ+F1C+XcrF042iTjsU6y5U7pqZDnaT8zMr1dGhe+W5bm34Naw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] test-keyval: fix leaks
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] event: Add signal information to SHUTDOWN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,72 +30,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Stefan Weil <sw@weilnetz.de>
 
-Hi
+Eric Blake <eblake@redhat.com> writes:
 
-On Wed, Apr 12, 2017 at 3:19 PM Markus Armbruster <armbru@redhat.com> wrote=
-:
+> On 04/12/2017 08:52 AM, Markus Armbruster wrote:
+>>>> In other words, these three signals are polite requests to terminate
+>>>> QEMU.
+>>>>
+>>>> Stefan, are there equivalent requests under Windows?  I guess there
+>>>> might be one at least for SIGINT, namely whatever happens when you hit
+>>>> ^C on the console.
+>>>
+>>> Mingw has SIGINT (C99 requires it), and that's presumably what happens
+>>> for ^C,...
+>>>
+>>>>
+>>>> Could we arrange to run qemu_system_killed() then?
+>>>
+>>> ...but I don't know why it is not currently wired up to call
+>>> qemu_system_killed(), nor do I have enough Windows programming expertise
+>>> to try and write such a patch. But I think that is an orthogonal
+>>> improvement.  On the other hand, mingw has a definition for SIGTERM (but
+>>> I'm not sure how it gets triggered) and no definition at all for SIGHUP
+>>> (as evidenced by the #ifdef'fery in the patch to get it to compile under
+>>> docker targetting mingw).
+>> 
+>> If all we need is distingishing host- and guest-initiated shutdown, then
+>> detecting the latter reliably lets us stay away from OS-specific stuff.
+>> Can we do that?
+>
+> I'll simplify what I can; I still can't guarantee that mingw will be
+> setting the bool correctly in all cases, but setting a bool is easier
+> than trying to set a signal name.
+>
+>>> There are other reasons too: a guest can request shutdown immediately
+>>> before the host sends SIGINT. Based on when things are processed, you
+>>> could see either the guest or the host as the initiator.  And the race
+>>> is not entirely implausible - when trying to shut down a guest, libvirt
+>>> first tries to inform the guest to initiate things (whether by interrupt
+>>> or guest agent), but after a given amount of time, assumes the guest is
+>>> unresponsive and resorts to a signal to qemu. A heavily loaded guest
+>>> that takes its time in responding could easily overlap with the timeout
+>>> resorting to a host-side action.
+>> 
+>> This race doesn't worry me.  If both host and guest have initiated a
+>> shutdown, then reporting whichever of the two finishes first seems fair.
+>
+> So maybe I just tone down the docs and not even mention it.
 
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  tests/test-keyval.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >
-> > diff --git a/tests/test-keyval.c b/tests/test-keyval.c
-> > index ba19560a22..141ee5d0c4 100644
-> > --- a/tests/test-keyval.c
-> > +++ b/tests/test-keyval.c
-> > @@ -628,6 +628,7 @@ static void test_keyval_visit_alternate(void)
-> >      visit_type_AltNumStr(v, "a", &ans, &error_abort);
-> >      g_assert_cmpint(ans->type, =3D=3D, QTYPE_QSTRING);
-> >      g_assert_cmpstr(ans->u.s, =3D=3D, "1");
-> > +    qapi_free_AltNumStr(ans);
-> >      visit_type_AltNumInt(v, "a", &ani, &err);
-> >      error_free_or_abort(&err);
-> >      visit_end_struct(v, NULL);
-> > @@ -649,11 +650,14 @@ static void test_keyval_visit_any(void)
-> >      visit_type_any(v, "a", &any, &error_abort);
->
-> @any becomes a strong reference (qobject_input_type_any() increments the
-> reference count).
->
-> >      qlist =3D qobject_to_qlist(any);
->
-> Reference count unchanged.
->
-> >      g_assert(qlist);
-> > +    qobject_decref(any);
->
-> Uh, this is unnecessarily dirty: you relinquish the reference before
-> you're actually done with it.  Works only because there's *another*
-> reference hiding within @v.  Let's move this ...
->
-> >      qstr =3D qobject_to_qstring(qlist_pop(qlist));
-> >      g_assert_cmpstr(qstring_get_str(qstr), =3D=3D, "null");
-> > +    QDECREF(qstr);
-> >      qstr =3D qobject_to_qstring(qlist_pop(qlist));
-> >      g_assert_cmpstr(qstring_get_str(qstr), =3D=3D, "1");
-> >      g_assert(qlist_empty(qlist));
-> > +    QDECREF(qstr);
->
-> ... here.  Okay to do that on commit?
->
+Works for me.
 
- sure, makes sense
+>> Additional ways to terminate QEMU: HMP and QMP command "quit", and the
+>> various GUI controls such "close SDL window".
+>
+> Good points. I have no idea what exit path those take (if they
+> raise(SIGINT) internally, it's quite easy - but if they go through some
+> other exit path, then I'll need to wire in something else).
 
-
-> >      visit_check_struct(v, &error_abort);
-> >      visit_end_struct(v, NULL);
-> >      visit_free(v);
->
-> With the reference counting cleaned up:
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->
->
-thanks
---=20
-Marc-Andr=C3=A9 Lureau
+Chasing down all host-initiated terminations looks like a fool's errand
+to me.  But if we can reliably detect guest-initiated, we don't have to,
+do we?
