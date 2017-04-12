@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cyGJN-0000sb-VF
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 07:19:46 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cyGRz-000205-1a
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 07:28:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cyGJK-0000BV-QS
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 07:19:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57060)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cyGJK-0000BO-Kx
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 07:19:42 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 66DEE19D00C
-	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 11:19:41 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170410142112.11550-1-marcandre.lureau@redhat.com>
-Date: Wed, 12 Apr 2017 13:19:37 +0200
-In-Reply-To: <20170410142112.11550-1-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Mon, 10 Apr 2017 16:21:12 +0200")
-Message-ID: <8737ddna9i.fsf@dusky.pond.sub.org>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cyGRx-0003Qk-8n
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 07:28:39 -0400
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:33518)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cyGRw-0003QF-Ru
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 07:28:37 -0400
+Received: by mail-lf0-x241.google.com with SMTP id r36so2777239lfi.0
+	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 04:28:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <1491995456-6411-1-git-send-email-huang.yong@zte.com.cn>
+In-Reply-To: <1491995456-6411-1-git-send-email-huang.yong@zte.com.cn>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 12 Apr 2017 11:28:24 +0000
+Message-ID: <CAJ+F1CLukvP9EcdJXBGcBuNhfYAs3EBe_4cLbcdJx2N-xxQdfg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] test-keyval: fix leaks
+Subject: Re: [Qemu-devel] [PATCH] QEMU Guest Agent: Add an interface to
+ determine guest os type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,58 +30,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Huang Yong <huang.yong@zte.com.cn>, mdroth@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org, Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+Hi
 
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  tests/test-keyval.c | 4 ++++
->  1 file changed, 4 insertions(+)
+On Wed, Apr 12, 2017 at 1:12 PM Huang Yong <huang.yong@zte.com.cn> wrote:
+
+> vm management tools (e.g.libvirt) may tell if guest os is linux or window=
+s,
+> so they can design a customized application accordingly, we suggest to ad=
+d
+> an interface (guest-ostype) in QEMU.
 >
-> diff --git a/tests/test-keyval.c b/tests/test-keyval.c
-> index ba19560a22..141ee5d0c4 100644
-> --- a/tests/test-keyval.c
-> +++ b/tests/test-keyval.c
-> @@ -628,6 +628,7 @@ static void test_keyval_visit_alternate(void)
->      visit_type_AltNumStr(v, "a", &ans, &error_abort);
->      g_assert_cmpint(ans->type, =3D=3D, QTYPE_QSTRING);
->      g_assert_cmpstr(ans->u.s, =3D=3D, "1");
-> +    qapi_free_AltNumStr(ans);
->      visit_type_AltNumInt(v, "a", &ani, &err);
->      error_free_or_abort(&err);
->      visit_end_struct(v, NULL);
-> @@ -649,11 +650,14 @@ static void test_keyval_visit_any(void)
->      visit_type_any(v, "a", &any, &error_abort);
 
-@any becomes a strong reference (qobject_input_type_any() increments the
-reference count).
+This proposal is probably redundant with "qemu-ga: add guest-get-osrelease
+command" http://patchew.org/QEMU/20170331101947.2046-2-vfeenstr@redhat.com
 
->      qlist =3D qobject_to_qlist(any);
 
-Reference count unchanged.
 
->      g_assert(qlist);
-> +    qobject_decref(any);
-
-Uh, this is unnecessarily dirty: you relinquish the reference before
-you're actually done with it.  Works only because there's *another*
-reference hiding within @v.  Let's move this ...
-
->      qstr =3D qobject_to_qstring(qlist_pop(qlist));
->      g_assert_cmpstr(qstring_get_str(qstr), =3D=3D, "null");
-> +    QDECREF(qstr);
->      qstr =3D qobject_to_qstring(qlist_pop(qlist));
->      g_assert_cmpstr(qstring_get_str(qstr), =3D=3D, "1");
->      g_assert(qlist_empty(qlist));
-> +    QDECREF(qstr);
-
-... here.  Okay to do that on commit?
-
->      visit_check_struct(v, &error_abort);
->      visit_end_struct(v, NULL);
->      visit_free(v);
-
-With the reference counting cleaned up:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Huang Yong <huang.yong@zte.com.cn>
+> ---
+>  qga/commands-posix.c | 10 ++++++++++
+>  qga/commands-win32.c | 10 ++++++++++
+>  qga/qapi-schema.json | 12 ++++++++++++
+>  3 files changed, 32 insertions(+)
+>
+> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+> index 915df9e..24ec2b6 100644
+> --- a/qga/commands-posix.c
+> +++ b/qga/commands-posix.c
+> @@ -49,6 +49,11 @@ extern char **environ;
+>  #endif
+>  #endif
+>
+> +typedef enum GuestArch {
+> +    ARCH_WINDOWS =3D 0,
+> +    ARCH_LINUX =3D 1,
+> +} GuestArch;
+> +
+>  static void ga_wait_child(pid_t pid, int *status, Error **errp)
+>  {
+>      pid_t rpid;
+> @@ -2470,6 +2475,11 @@ qmp_guest_fstrim(bool has_minimum, int64_t minimum=
+,
+> Error **errp)
+>  }
+>  #endif
+>
+> +int64_t qmp_guest_ostype(Error **errp)
+> +{
+> +    return ARCH_LINUX;
+> +}
+> +
+>  /* add unsupported commands to the blacklist */
+>  GList *ga_command_blacklist_init(GList *blacklist)
+>  {
+> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> index 19d72b2..a6639dd 100644
+> --- a/qga/commands-win32.c
+> +++ b/qga/commands-win32.c
+> @@ -58,6 +58,11 @@ static struct {
+>      .filehandles =3D QTAILQ_HEAD_INITIALIZER(guest_file_state.filehandle=
+s),
+>  };
+>
+> +typedef enum GuestArch {
+> +    ARCH_WINDOWS =3D 0,
+> +    ARCH_LINUX =3D 1,
+> +} GuestArch;
+> +
+>  #define FILE_GENERIC_APPEND (FILE_GENERIC_WRITE & ~FILE_WRITE_DATA)
+>
+>  typedef struct OpenFlags {
+> @@ -214,6 +219,11 @@ void qmp_guest_file_close(int64_t handle, Error
+> **errp)
+>      g_free(gfh);
+>  }
+>
+> +int64_t qmp_guest_ostype(Error **errp)
+> +{
+> +    return ARCH_WINDOWS;
+> +}
+> +
+>  static void acquire_privilege(const char *name, Error **errp)
+>  {
+>      HANDLE token =3D NULL;
+> diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+> index a02dbf2..496ae55 100644
+> --- a/qga/qapi-schema.json
+> +++ b/qga/qapi-schema.json
+> @@ -26,6 +26,7 @@
+>          'guest-get-time',
+>          'guest-set-vcpus',
+>          'guest-sync',
+> +        'guest-ostype',
+>          'guest-sync-delimited' ] } }
+>
+>  ##
+> @@ -1042,3 +1043,14 @@
+>    'data':    { 'path': 'str', '*arg': ['str'], '*env': ['str'],
+>                 '*input-data': 'str', '*capture-output': 'bool' },
+>    'returns': 'GuestExec' }
+> +
+> +##
+> +# @guest-ostype:
+> +#
+> +# Get guest os type info
+> +# Returns: os type, Linux/Windows
+> +#
+> +# Since: 2.5.0
+> +##
+> +{ 'command': 'guest-ostype',
+> +  'returns': 'int' }
+> --
+> 1.8.3.1
+>
+>
+>
+> --
+Marc-Andr=C3=A9 Lureau
