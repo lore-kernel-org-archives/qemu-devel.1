@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41236)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1cy6uy-00083b-DH
+	(envelope-from <cota@braap.org>) id 1cy6uy-00083y-Jr
 	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 21:17:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1cy6ux-0006Qu-1X
+	(envelope-from <cota@braap.org>) id 1cy6ux-0006R0-2u
 	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 21:17:56 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Tue, 11 Apr 2017 21:17:23 -0400
-Message-Id: <1491959850-30756-4-git-send-email-cota@braap.org>
+Date: Tue, 11 Apr 2017 21:17:24 -0400
+Message-Id: <1491959850-30756-5-git-send-email-cota@braap.org>
 In-Reply-To: <1491959850-30756-1-git-send-email-cota@braap.org>
 References: <1491959850-30756-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH 03/10] target/arm: optimize cross-page block
+Subject: [Qemu-devel] [PATCH 04/10] target/i386: optimize cross-page block
  chaining in softmmu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,89 +29,104 @@ tb_jmp_cache remains high, this improves performance.
 
 Measurements:
 
-- Boot time of ARM debian jessie on Intel host:
+-       specINT 2006 (test set), x86_64-softmmu. Host: Intel i7-4790K @ 4.00GHz
+                          Y axis: Speedup over 95b31d70
 
-| setup              | ARM debian boot+shutdown time | stddev |
-|--------------------+-------------------------------+--------|
-| master             |                  10.050247057 | 0.0361 |
-| +cross             |                  10.311265443 | 0.0721 |
+     1.3x+-+-------------------------------------------------------------+-+
+         |           cross $$                                              |
+    1.25x+-+.............................................................+-+
+         |                                                                 |
+     1.2x+-+.............................................................+-+
+         |                                                        :        |
+         |                                                        :        |
+    1.15x+-+.............................................................+-+
+         |           $$$$ $$$$                     +++            :        |
+     1.1x+-+.........$..$.$..$...........................................+-+
+         |           $  $ $  $                     $$$           $$$$      |
+    1.05x+-+.........$..$.$..$.....................$.$.$$$$......$..$....+-+
+         |           $  $ $  $      +++  +++  +++  $+$ $++$  +++ $: $ $$$$ |
+         |       +++ $  $ $  $ +++  $$$   :    :   $ $ $  $ $$$$ $: $ $++$ |
+       1x+-$$$$G$$$$_$EM$_$ro$s$$$..$.$.......$$$..$.$.$..$.$..$.$..$.$..$-+
+         | $++$ $ :$ $  $ $  $ $ $  $ $   :   $+$  $ $ $  $ $++$ $: $ $  $ |
+    0.95x+-$..$.$..$.$..$.$..$.$.$..$.$..$$$..$.$..$.$.$..$.$..$.$..$.$..$-+
+         | $  $ $  $ $  $ $  $ $ $  $ $  $:$  $ $  $ $ $  $ $  $ $  $ $  $ |
+     0.9x+-$$$$-$$$$-$$$$-$$$$-$$$--$$$--$$$--$$$--$$$-$$$$-$$$$-$$$$-$$$$-+
+           astarbzip2gcc gobmh264rehmlibquantumcfomneperlbensjxalancbhmean
+  png: http://imgur.com/cwRnmCi
 
-That is a 2.58% slowdown when booting. This is reasonable given that
-tb_jmp_cache's hit rate when booting is expected to be low.
+That is, a hmean gain of 2.6%.
 
--                NBench, arm-softmmu. Host: Intel i7-4790K @ 4.00GHz
-                        (y axis: Speedup over 95b31d70)
+-      specINT 2006 (train set), x86_64-softmmu. Host: Intel i7-4790K @ 4.00GHz
+                          Y axis: Speedup over 95b31d70
 
-    1.3x+-+--------------------------------------------------------------+-+
-        |                                           cross+noinline $$$     |
-        |                                           cross+inline   %%%     |
-        |                   $$$%%                                          |
-    1.2x+-+.................$.$.%.......$$$..............................+-+
-        |                   $ $ %       $ $%                               |
-        |                   $ $ %       $ $%                               |
-    1.1x+-+.................$.$.%.......$.$%.............................+-+
-        |             $$$%% $ $ %       $ $%                               |
-        |             $ $ % $ $ %       $ $% $$$%%             $$$%% $$$%% |
-        | $$$%% $$$%% $ $ % $ $ % $$$%% $ $% $ $ %   %%%       $ $ % $ $ % |
-      1x+-$.$B%R$R$A%G$A$H%T$M$_%P$L$i%l$n$%.$.$.%...%.%.$$$%%.$.$.%.$.$.%-+
-        | $ $ % $ $ % $ $ % $ $ % $ $ % $ $% $ $ %   % % $ $ % $ $ % $ $ % |
-        | $ $ % $ $ % $ $ % $ $ % $ $ % $ $% $ $ %   % % $ $ % $ $ % $ $ % |
-    0.9x+-$.$.%.$.$.%.$.$.%.$.$.%.$.$.%.$.$%.$.$.%...%.%.$.$.%.$.$.%.$.$.%-+
-        | $ $ % $ $ % $ $ % $ $ % $ $ % $ $% $ $ %   % % $ $ % $ $ % $ $ % |
-        | $ $ % $ $ % $ $ % $ $ % $ $ % $ $% $ $ % $$$ % $ $ % $ $ % $ $ % |
-        | $ $ % $ $ % $ $ % $ $ % $ $ % $ $% $ $ % $ $ % $ $ % $ $ % $ $ % |
-    0.8x+-$$$%%-$$$%%-$$$%%-$$$%%-$$$%%-$$$%-$$$%%-$$$%%-$$$%%-$$$%%-$$$%%-+
-       ASSIGNMBITFIELFOUFP_EMULATHUFFMALU_DECOMPNEURANUMERICSTRING_SOhmean
+    1.25x+-+-------------------------------------------------------------+-+
+         |                cross $$                                         |
+         |                                                                 |
+     1.2x+-+.............................................................+-+
+         |                                          :            +++       |
+    1.15x+-+.............................................................+-+
+         |            :                            $$$ $$$$      $$$$      |
+         |           $$$$ +++                      $:$ $++$  +++ $: $      |
+     1.1x+-+.........$..$.$$$$.....................$.$.$..$......$..$....+-+
+         |       +++ $++$ $++$ +++   :             $ $ $  $   :  $++$ +++  |
+    1.05x+-+....$$$$.$..$.$..$......$$$............$.$.$..$.$$$$.$..$.$$$$-+
+         |      $++$ $  $ $  $ $$$  $:$            $ $ $  $ $ :$ $  $ $  $ |
+         |      $  $ $  $ $  $ $:$  $+$  +++  +++  $ $ $  $ $ :$ $  $ $  $ |
+       1x+-$$$$G$AP$_$EM$_$ro$s$i$li$e$..$$$.......$.$.$..$.$..$.$..$.$..$-+
+         | $++$ $  $ $  $ $  $ $+$  $ $  $:$  $$$  $ $ $  $ $  $ $  $ $  $ |
+    0.95x+-$..$.$..$.$..$.$..$.$.$..$.$..$.$..$.$..$.$.$..$.$..$.$..$.$..$-+
+         | $  $ $  $ $  $ $  $ $ $  $ $  $ $  $+$  $ $ $  $ $  $ $  $ $  $ |
+         | $  $ $  $ $  $ $  $ $ $  $ $  $ $  $ $  $ $ $  $ $  $ $  $ $  $ |
+     0.9x+-$$$$-$$$$-$$$$-$$$$-$$$--$$$--$$$--$$$--$$$-$$$$-$$$$-$$$$-$$$$-+
+           astarbzip2gcc gobmh264rehmlibquantumcfomneperlbensjxalancbhmean
+  png: http://imgur.com/0CbG7dD
 
-  png: http://imgur.com/1rmYSaF
-
-That is, a 4.04% hmean perf improvement over master with tb_from_jmp_cache
-not inlined, and a 5.82% hmean perf improvement over master with tb_from_jmp_cache
-inlined (i.e. this commit). The largest improvement is 21% for the FP_EMULATION
-benchmark.
+This is the larger "train" set. We get a hmean improvement of 6.1%.
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/arm/helper.c    |  5 +++++
- target/arm/helper.h    |  2 ++
- target/arm/translate.c | 12 ++++++++++++
- 3 files changed, 19 insertions(+)
+ target/i386/helper.h      |  2 ++
+ target/i386/misc_helper.c |  5 +++++
+ target/i386/translate.c   | 14 +++++++++++++-
+ 3 files changed, 20 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 8cb7a94..10b8807 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -9922,3 +9922,8 @@ uint32_t HELPER(crc32c)(uint32_t acc, uint32_t val, uint32_t bytes)
-     /* Linux crc32c converts the output to one's complement.  */
-     return crc32c(acc, buf, bytes) ^ 0xffffffff;
- }
-+
-+uint32_t HELPER(cross_page_check)(CPUARMState *env, target_ulong vaddr)
-+{
-+    return !!tb_from_jmp_cache(env, vaddr);
-+}
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index df86bf7..d4b779b 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
+diff --git a/target/i386/helper.h b/target/i386/helper.h
+index 6fb8fb9..dceb343 100644
+--- a/target/i386/helper.h
++++ b/target/i386/helper.h
 @@ -1,6 +1,8 @@
- DEF_HELPER_FLAGS_1(sxtb16, TCG_CALL_NO_RWG_SE, i32, i32)
- DEF_HELPER_FLAGS_1(uxtb16, TCG_CALL_NO_RWG_SE, i32, i32)
+ DEF_HELPER_FLAGS_4(cc_compute_all, TCG_CALL_NO_RWG_SE, tl, tl, tl, tl, int)
+ DEF_HELPER_FLAGS_4(cc_compute_c, TCG_CALL_NO_RWG_SE, tl, tl, tl, tl, int)
  
 +DEF_HELPER_2(cross_page_check, i32, env, tl)
 +
- DEF_HELPER_3(add_setq, i32, env, i32, i32)
- DEF_HELPER_3(add_saturate, i32, env, i32, i32)
- DEF_HELPER_3(sub_saturate, i32, env, i32, i32)
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index e32e38c..ce97d0c 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -4085,6 +4085,18 @@ static inline void gen_goto_tb(DisasContext *s, int n, target_ulong dest)
-         gen_set_pc_im(s, dest);
-         tcg_gen_exit_tb((uintptr_t)s->tb + n);
+ DEF_HELPER_3(write_eflags, void, env, tl, i32)
+ DEF_HELPER_1(read_eflags, tl, env)
+ DEF_HELPER_2(divb_AL, void, env, tl)
+diff --git a/target/i386/misc_helper.c b/target/i386/misc_helper.c
+index ca2ea09..a41daed 100644
+--- a/target/i386/misc_helper.c
++++ b/target/i386/misc_helper.c
+@@ -637,3 +637,8 @@ void helper_wrpkru(CPUX86State *env, uint32_t ecx, uint64_t val)
+     env->pkru = val;
+     tlb_flush(cs);
+ }
++
++uint32_t helper_cross_page_check(CPUX86State *env, target_ulong vaddr)
++{
++    return !!tb_from_jmp_cache(env, vaddr);
++}
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index 1d1372f..ffc8ccc 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -2153,7 +2153,19 @@ static inline void gen_goto_tb(DisasContext *s, int tb_num, target_ulong eip)
+         gen_jmp_im(eip);
+         tcg_gen_exit_tb((uintptr_t)s->tb + tb_num);
      } else {
-+        TCGv vaddr = tcg_const_tl(dest);
+-        /* jump to another page: currently not optimized */
++        /* jump to another page */
++        TCGv vaddr = tcg_const_tl(eip);
 +        TCGv_i32 valid = tcg_temp_new_i32();
 +        TCGLabel *label = gen_new_label();
 +
@@ -119,12 +134,12 @@ index e32e38c..ce97d0c 100644
 +        tcg_temp_free(vaddr);
 +        tcg_gen_brcondi_i32(TCG_COND_EQ, valid, 0, label);
 +        tcg_temp_free_i32(valid);
-+        tcg_gen_goto_tb(n);
-+        gen_set_pc_im(s, dest);
-+        tcg_gen_exit_tb((uintptr_t)s->tb + n);
++        tcg_gen_goto_tb(tb_num);
++        gen_jmp_im(eip);
++        tcg_gen_exit_tb((uintptr_t)s->tb + tb_num);
 +        gen_set_label(label);
-         gen_set_pc_im(s, dest);
-         tcg_gen_exit_tb(0);
+         gen_jmp_im(eip);
+         gen_eob(s);
      }
 -- 
 2.7.4
