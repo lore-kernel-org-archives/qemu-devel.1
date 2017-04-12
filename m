@@ -1,39 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cyOYY-0001JZ-HC
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 16:08:00 -0400
+	(envelope-from <lersek@redhat.com>) id 1cyOho-0003T1-9q
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 16:17:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cyOYT-0003bx-D2
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 16:07:58 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50128
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cyOYT-0003bb-5z
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 16:07:53 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3CK3pr4114527
-	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 16:07:52 -0400
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 29spb46607-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 16:07:52 -0400
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 12 Apr 2017 14:07:51 -0600
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <lersek@redhat.com>) id 1cyOhj-0007GH-Ci
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 16:17:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39362)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cyOhj-0007FK-74
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 16:17:27 -0400
+References: <1488435591-17882-1-git-send-email-mst@redhat.com>
+	<1488435591-17882-3-git-send-email-mst@redhat.com>
+	<CAJ+F1C+kLB5VCsSakbd6+CKx4uNbxZNqd+vNMAWte4yKqcbw9Q@mail.gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <83ab7c00-5d71-d3fc-741b-2a7abbb6f63a@redhat.com>
+Date: Wed, 12 Apr 2017 22:17:19 +0200
 MIME-Version: 1.0
+In-Reply-To: <CAJ+F1C+kLB5VCsSakbd6+CKx4uNbxZNqd+vNMAWte4yKqcbw9Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20170404055146.8901-2-vfeenstr@redhat.com>
-References: <20170404055146.8901-1-vfeenstr@redhat.com>
-	<20170404055146.8901-2-vfeenstr@redhat.com>
-Date: Wed, 12 Apr 2017 15:07:42 -0500
-Message-Id: <149202766263.22939.9361142502968019871@loki>
-Subject: Re: [Qemu-devel] [PATCH v3 1/1] qga: Add 'guest-get-users' command
+Subject: Re: [Qemu-devel] [PULL 02/15] docs: VM Generation ID device
+ description
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,306 +29,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@gmail.com
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: Gal Hammer <ghammer@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Ben Warren <ben@skyportsystems.com>, Igor Mammedov <imammedo@redhat.com>
 
-Quoting Vinzenz 'evilissimo' Feenstra (2017-04-04 00:51:46)
-> From: Vinzenz Feenstra <vfeenstr@redhat.com>
-> =
+On 04/12/17 22:06, Marc-Andr=C3=A9 Lureau wrote:
+> On Thu, Mar 2, 2017 at 10:22 AM Michael S. Tsirkin <mst@redhat.com> wro=
+te:
 
-> A command that will list all currently logged in users, and the time
-> since when they are logged in.
-> =
+>> +Device Usage:
+>> +-------------
+>> +
+>> +The device has one property, which may be only be set using the comma=
+nd
+>> line:
+>> +
+>> +  guid - sets the value of the GUID.  A special value "auto" instruct=
+s
+>> +         QEMU to generate a new random GUID.
+>> +
+>> +For example:
+>> +
+>> +  QEMU  -device vmgenid,guid=3D"324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
+>> +  QEMU  -device vmgenid,guid=3Dauto
+>>
+>=20
+> The default will keep uuid to null, should it be documented? Wouldn't i=
+t
+> make sense to default to auto?
 
-> Examples:
-> =
-
-> virsh # qemu-agent-command F25 '{ "execute": "guest-get-users" }'
-> {"return":[{"login-time":1490622289.903835,"user":"root"}]}
-> =
-
-> virsh # qemu-agent-command Win2k12r2 '{ "execute": "guest-get-users" }'
-> {"return":[{"login-time":1490351044.670552,"domain":"LADIDA",
-> "user":"Administrator"}]}
-> =
-
-> Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
-> ---
->  configure             |  2 +-
->  include/glib-compat.h |  5 +++
->  qga/commands-posix.c  | 54 +++++++++++++++++++++++++++++++
->  qga/commands-win32.c  | 89 +++++++++++++++++++++++++++++++++++++++++++++=
-++++++
->  qga/qapi-schema.json  | 24 ++++++++++++++
->  5 files changed, 173 insertions(+), 1 deletion(-)
-> =
-
-> diff --git a/configure b/configure
-> index d1ce33b..779ebfd 100755
-> --- a/configure
-> +++ b/configure
-> @@ -737,7 +737,7 @@ if test "$mingw32" =3D "yes" ; then
->    sysconfdir=3D"\${prefix}"
->    local_statedir=3D
->    confsuffix=3D""
-> -  libs_qga=3D"-lws2_32 -lwinmm -lpowrprof -liphlpapi -lnetapi32 $libs_qg=
-a"
-> +  libs_qga=3D"-lws2_32 -lwinmm -lpowrprof -lwtsapi32 -liphlpapi -lnetapi=
-32 $libs_qga"
->  fi
-> =
-
->  werror=3D""
-> diff --git a/include/glib-compat.h b/include/glib-compat.h
-> index 863c8cf..f8ee9dc 100644
-> --- a/include/glib-compat.h
-> +++ b/include/glib-compat.h
-> @@ -217,6 +217,11 @@ static inline void g_hash_table_add(GHashTable *hash=
-_table, gpointer key)
->  {
->      g_hash_table_replace(hash_table, key, key);
->  }
-> +
-> +static gboolean g_hash_table_contains(GHashTable *hash_table, gpointer k=
-ey)
-> +{
-> +    return g_hash_table_lookup_extended(hash_table, key, NULL, NULL);
-> +}
->  #endif
-> =
-
->  #ifndef g_assert_true
-> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-> index 73d93eb..3081ee7 100644
-> --- a/qga/commands-posix.c
-> +++ b/qga/commands-posix.c
-> @@ -15,6 +15,7 @@
->  #include <sys/ioctl.h>
->  #include <sys/wait.h>
->  #include <dirent.h>
-> +#include <utmpx.h>
->  #include "qga/guest-agent-core.h"
->  #include "qga-qmp-commands.h"
->  #include "qapi/qmp/qerror.h"
-> @@ -2515,3 +2516,56 @@ void ga_command_state_init(GAState *s, GACommandSt=
-ate *cs)
->      ga_command_state_add(cs, NULL, guest_fsfreeze_cleanup);
->  #endif
->  }
-> +
-> +#ifndef QGA_MICRO_SECOND_TO_SECOND
-> +#   define QGA_MICRO_SECOND_TO_SECOND 1000000
-> +#endif
-
-I don't really understand the pattern here and elsewhere. Where else would
-QGA_MICRO_SECOND_TO_SECOND ever be defined? I'd rather things break and
-need to be reconciled explicitly if such a thing was ever introduced.
-
-Everything else looks good though.
-
-> +
-> +static double ga_get_login_time(struct utmpx *user_info)
-> +{
-> +    double seconds =3D (double)user_info->ut_tv.tv_sec;
-> +    double useconds =3D (double)user_info->ut_tv.tv_usec;
-> +    useconds /=3D QGA_MICRO_SECOND_TO_SECOND;
-> +    return seconds + useconds;
-> +}
-> +
-> +GuestUserList *qmp_guest_get_users(Error **err)
-> +{
-> +    GHashTable *cache =3D g_hash_table_new(g_str_hash, g_str_equal);
-> +    GuestUserList *head =3D NULL, *cur_item =3D NULL;
-> +    setutxent();
-> +    for (;;) {
-> +        struct utmpx *user_info =3D getutxent();
-> +        if (user_info =3D=3D NULL) {
-> +            break;
-> +        } else if (user_info->ut_type !=3D USER_PROCESS) {
-> +            continue;
-> +        } else if (g_hash_table_contains(cache, user_info->ut_user)) {
-> +            gpointer value =3D g_hash_table_lookup(cache, user_info->ut_=
-user);
-> +            GuestUser *user =3D (GuestUser *)value;
-> +            double login_time =3D ga_get_login_time(user_info);
-> +            /* We're ensuring the earliest login time to be sent */
-> +            if (login_time < user->login_time) {
-> +                user->login_time =3D login_time;
-> +            }
-> +            continue;
-> +        }
-> +
-> +        GuestUserList *item =3D g_new0(GuestUserList, 1);
-> +        item->value =3D g_new0(GuestUser, 1);
-> +        item->value->user =3D g_strdup(user_info->ut_user);
-> +        item->value->login_time =3D ga_get_login_time(user_info);
-> +
-> +        g_hash_table_insert(cache, item->value->user, item->value);
-> +
-> +        if (!cur_item) {
-> +            head =3D cur_item =3D item;
-> +        } else {
-> +            cur_item->next =3D item;
-> +            cur_item =3D item;
-> +        }
-> +    }
-> +    endutxent();
-> +    g_hash_table_destroy(cache);
-> +    return head;
-> +}
-> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-> index 19d72b2..8b84a90 100644
-> --- a/qga/commands-win32.c
-> +++ b/qga/commands-win32.c
-> @@ -11,6 +11,9 @@
->   * See the COPYING file in the top-level directory.
->   */
-> =
-
-> +#ifndef _WIN32_WINNT
-> +#   define _WIN32_WINNT 0x0600
-> +#endif
->  #include "qemu/osdep.h"
->  #include <wtypes.h>
->  #include <powrprof.h>
-> @@ -25,6 +28,7 @@
->  #include <initguid.h>
->  #endif
->  #include <lm.h>
-> +#include <wtsapi32.h>
-> =
-
->  #include "qga/guest-agent-core.h"
->  #include "qga/vss-win32.h"
-> @@ -1536,3 +1540,88 @@ void ga_command_state_init(GAState *s, GACommandSt=
-ate *cs)
->          ga_command_state_add(cs, NULL, guest_fsfreeze_cleanup);
->      }
->  }
-> +
-> +/* MINGW is missing two fields: IncomingFrames & OutgoingFrames */
-> +typedef struct _GA_WTSINFOA {
-> +    WTS_CONNECTSTATE_CLASS State;
-> +    DWORD SessionId;
-> +    DWORD IncomingBytes;
-> +    DWORD OutgoingBytes;
-> +    DWORD IncomingFrames;
-> +    DWORD OutgoingFrames;
-> +    DWORD IncomingCompressedBytes;
-> +    DWORD OutgoingCompressedBy;
-> +    CHAR WinStationName[WINSTATIONNAME_LENGTH];
-> +    CHAR Domain[DOMAIN_LENGTH];
-> +    CHAR UserName[USERNAME_LENGTH + 1];
-> +    LARGE_INTEGER ConnectTime;
-> +    LARGE_INTEGER DisconnectTime;
-> +    LARGE_INTEGER LastInputTime;
-> +    LARGE_INTEGER LogonTime;
-> +    LARGE_INTEGER CurrentTime;
-> +
-> +} GA_WTSINFOA;
-> +
-> +GuestUserList *qmp_guest_get_users(Error **err)
-> +{
-> +#if (_WIN32_WINNT >=3D 0x0600)
-> +#ifndef QGA_NANOSECONDS
-> +#   define QGA_NANOSECONDS 10000000
-> +#endif
-> +#ifndef QGA_EPOCH_TIME_DIFF
-> +#   define QGA_EPOCH_TIME_DIFF 116444736000000000LL
-> +#endif
-> +
-> +    GHashTable *cache =3D g_hash_table_new(g_str_hash, g_str_equal);
-> +    GuestUserList *head =3D NULL, *cur_item =3D NULL;
-> +
-> +    DWORD count =3D 0;
-> +    WTS_SESSION_INFOA *entries =3D NULL;
-> +    if (WTSEnumerateSessionsA(NULL, 0, 1, &entries, &count)) {
-> +        for (DWORD i =3D 0; i < count; ++i) {
-> +            DWORD buffer_size =3D 0;
-> +            GA_WTSINFOA *session_info =3D NULL;
-> +            if (WTSQuerySessionInformationA(
-> +                NULL,
-> +                entries[i].SessionId,
-> +                WTSSessionInfo,
-> +                (LPSTR *)&session_info,
-> +                &buffer_size
-> +            )) {
-> +                if (strlen(session_info->UserName) =3D=3D 0 ||
-> +                    g_hash_table_contains(cache, session_info->UserName)=
-) {
-> +                    WTSFreeMemory(session_info);
-> +                    continue;
-> +                }
-> +
-> +                GuestUserList *item =3D g_new0(GuestUserList, 1);
-> +                item->value =3D g_new0(GuestUser, 1);
-> +
-> +                item->value->user =3D g_strdup(session_info->UserName);
-> +                item->value->domain =3D g_strdup(session_info->Domain);
-> +                item->value->has_domain =3D true;
-> +
-> +                INT64 login =3D session_info->LogonTime.QuadPart;
-> +                login -=3D QGA_EPOCH_TIME_DIFF;
-> +                item->value->login_time =3D ((double)login) / QGA_NANOSE=
-CONDS;
-> +
-> +                g_hash_table_add(cache, item->value->user);
-> +
-> +                if (!cur_item) {
-> +                    head =3D cur_item =3D item;
-> +                } else {
-> +                    cur_item->next =3D item;
-> +                    cur_item =3D item;
-> +                }
-> +            }
-> +            WTSFreeMemory(session_info);
-> +        }
-> +        WTSFreeMemory(entries);
-> +    }
-> +    g_hash_table_destroy(cache);
-> +    return head;
-> +#else
-> +    error_setg(err, QERR_UNSUPPORTED);
-> +    return NULL;
-> +#endif
-> +}
-> diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-> index a02dbf2..27d10be 100644
-> --- a/qga/qapi-schema.json
-> +++ b/qga/qapi-schema.json
-> @@ -1042,3 +1042,27 @@
->    'data':    { 'path': 'str', '*arg': ['str'], '*env': ['str'],
->                 '*input-data': 'str', '*capture-output': 'bool' },
->    'returns': 'GuestExec' }
-> +
-> +##
-> +# @GuestUser:
-> +# @user:       Username
-> +# @domain:     Logon domain (windows only)
-> +# @login-time: Time of login of this user on the computer. If multiple
-> +#              instances of the user are logged in, the earliest login t=
-ime is
-> +#              reported. The value is in fractional seconds since epoch =
-time.
-> +#
-> +# Since: 2.10
-> +##
-> +{ 'struct': 'GuestUser',
-> +  'data': { 'user': 'str', 'login-time': 'number', '*domain': 'str' } }
-> +
-> +##
-> +# @guest-get-users:
-> +# Retrieves a list of currently active users on the VM.
-> +#
-> +# Returns: A unique list of users.
-> +#
-> +# Since: 2.10
-> +##
-> +{ 'command': 'guest-get-users',
-> +  'returns': ['GuestUser'] }
-> -- =
-
-> 2.9.3
-> =
+I guess it might.
 
 >=20
+>=20
+>> +The property may be queried via QMP/HMP:
+>> +
+>> +  (QEMU) query-vm-generation-id
+>> +  {"return": {"guid": "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"}}
+>> +
+>> +Setting of this parameter is intentionally left out from the QMP/HMP
+>> +interfaces.  There are no known use cases for changing the GUID once =
+QEMU
+>> is
+>> +running, and adding this capability would greatly increase the comple=
+xity.
+>>
+>=20
+> Is this supposed to be not permitted?
+>=20
+> { "execute": "qom-set", "arguments": { "path":
+> "/machine/peripheral-anon/device[1]", "property": "guid", "value": "aut=
+o" }
+> }
+
+I don't know if qom-set can be disabled for individual devices / device
+properties. Either way, setting a new GUID for VMGENID will definitely
+take custom code.
+
+> Is there any linux kernel support being worked on?
+
+There's an RHBZ for it (alias "vmgenid-kernel"):
+
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1159983
+
+(It is private because RHBZs for the kernel component are private by
+default.)
+
+Thanks
+Laszlo
