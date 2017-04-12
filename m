@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cyDR3-0002KS-GD
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 04:15:30 -0400
+	(envelope-from <herongguang.he@huawei.com>) id 1cyDRF-0002T1-KN
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 04:15:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cyDQz-0001kf-Kj
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 04:15:29 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33064)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1cyDQz-0001k0-Cx
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 04:15:25 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3C88tA0076858
-	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 04:15:23 -0400
-Received: from e28smtp04.in.ibm.com (e28smtp04.in.ibm.com [125.16.236.4])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29sb7c3hw4-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 04:15:23 -0400
-Received: from localhost
-	by e28smtp04.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Wed, 12 Apr 2017 13:45:20 +0530
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Date: Wed, 12 Apr 2017 13:45:07 +0530
-Message-Id: <1491984907-9894-1-git-send-email-bharata@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH] spapr-cpu-core: Release ICPState object during
- CPU unrealization
+	(envelope-from <herongguang.he@huawei.com>) id 1cyDRB-0001px-Hl
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 04:15:41 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:3363
+	helo=dggrg03-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <herongguang.he@huawei.com>) id 1cyDRA-0001mK-Mp
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 04:15:37 -0400
+References: <CADZi59zNxk-Yr4rpN1E49s=AdsdW-W9YfhpCvpJeBz7oigyFSg@mail.gmail.com>
+	<CADZi59xe6OcCasvtkPBjP7nTsgDA5r_E_Rt7W88BszYdJhuxGQ@mail.gmail.com>
+	<CADZi59xEg0SvScgo=Jg0MxTbGYY=nTX18Qo-4GMkfayThDU9zw@mail.gmail.com>
+	<alpine.DEB.2.10.1704101159340.2759@sstabellini-ThinkPad-X260>
+	<alpine.DEB.2.10.1704101243270.2759@sstabellini-ThinkPad-X260>
+	<CADZi59yC4m+wFS+iJUrV9Y59X96cQVMnrCNLvcd5o2kdjmqQdA@mail.gmail.com>
+	<alpine.DEB.2.10.1704111509350.2759@sstabellini-ThinkPad-X260>
+From: "Herongguang (Stephen)" <herongguang.he@huawei.com>
+Message-ID: <58EDE1E4.2090003@huawei.com>
+Date: Wed, 12 Apr 2017 16:14:28 +0800
+MIME-Version: 1.0
+In-Reply-To: <alpine.DEB.2.10.1704111509350.2759@sstabellini-ThinkPad-X260>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC/BUG] xen-mapcache: buggy invalidate map cache?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,29 +33,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, clg@kaod.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
+To: Stefano Stabellini <sstabellini@kernel.org>, hrg <hrgstephen@gmail.com>
+Cc: Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xensource.com, qemu-devel@nongnu.org, Jun Nakajima <jun.nakajima@intel.com>, Alexander Graf <agraf@suse.de>, xen-devel@lists.xenproject.org, xen-devel@lists.xen.org, wangxinxin.wang@huawei.com
 
-Recent commits that re-organized ICPState object missed to destroy
-the object when CPU is unrealized. Fix this so that CPU unplug
-doesn't abort QEMU.
 
-Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
----
- hw/ppc/spapr_cpu_core.c | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 2e689b5..4389ef4 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -127,6 +127,7 @@ static void spapr_cpu_core_unrealizefn(DeviceState *dev, Error **errp)
-         PowerPCCPU *cpu = POWERPC_CPU(cs);
- 
-         spapr_cpu_destroy(cpu);
-+        object_unparent(cpu->intc);
-         cpu_remove_sync(cs);
-         object_unparent(obj);
-     }
--- 
-2.7.4
+On 2017/4/12 6:32, Stefano Stabellini wrote:
+> On Tue, 11 Apr 2017, hrg wrote:
+>> On Tue, Apr 11, 2017 at 3:50 AM, Stefano Stabellini
+>> <sstabellini@kernel.org> wrote:
+>>> On Mon, 10 Apr 2017, Stefano Stabellini wrote:
+>>>> On Mon, 10 Apr 2017, hrg wrote:
+>>>>> On Sun, Apr 9, 2017 at 11:55 PM, hrg <hrgstephen@gmail.com> wrote:
+>>>>>> On Sun, Apr 9, 2017 at 11:52 PM, hrg <hrgstephen@gmail.com> wrote:
+>>>>>>> Hi,
+>>>>>>>
+>>>>>>> In xen_map_cache_unlocked(), map to guest memory maybe in entry->next
+>>>>>>> instead of first level entry (if map to rom other than guest memory
+>>>>>>> comes first), while in xen_invalidate_map_cache(), when VM ballooned
+>>>>>>> out memory, qemu did not invalidate cache entries in linked
+>>>>>>> list(entry->next), so when VM balloon back in memory, gfns probably
+>>>>>>> mapped to different mfns, thus if guest asks device to DMA to these
+>>>>>>> GPA, qemu may DMA to stale MFNs.
+>>>>>>>
+>>>>>>> So I think in xen_invalidate_map_cache() linked lists should also be
+>>>>>>> checked and invalidated.
+>>>>>>>
+>>>>>>> What’s your opinion? Is this a bug? Is my analyze correct?
+>>>> Yes, you are right. We need to go through the list for each element of
+>>>> the array in xen_invalidate_map_cache. Can you come up with a patch?
+>>> I spoke too soon. In the regular case there should be no locked mappings
+>>> when xen_invalidate_map_cache is called (see the DPRINTF warning at the
+>>> beginning of the functions). Without locked mappings, there should never
+>>> be more than one element in each list (see xen_map_cache_unlocked:
+>>> entry->lock == true is a necessary condition to append a new entry to
+>>> the list, otherwise it is just remapped).
+>>>
+>>> Can you confirm that what you are seeing are locked mappings
+>>> when xen_invalidate_map_cache is called? To find out, enable the DPRINTK
+>>> by turning it into a printf or by defininig MAPCACHE_DEBUG.
+>> In fact, I think the DPRINTF above is incorrect too. In
+>> pci_add_option_rom(), rtl8139 rom is locked mapped in
+>> pci_add_option_rom->memory_region_get_ram_ptr (after
+>> memory_region_init_ram). So actually I think we should remove the
+>> DPRINTF warning as it is normal.
+> Let me explain why the DPRINTF warning is there: emulated dma operations
+> can involve locked mappings. Once a dma operation completes, the related
+> mapping is unlocked and can be safely destroyed. But if we destroy a
+> locked mapping in xen_invalidate_map_cache, while a dma is still
+> ongoing, QEMU will crash. We cannot handle that case.
+>
+> However, the scenario you described is different. It has nothing to do
+> with DMA. It looks like pci_add_option_rom calls
+> memory_region_get_ram_ptr to map the rtl8139 rom. The mapping is a
+> locked mapping and it is never unlocked or destroyed.
+>
+> It looks like "ptr" is not used after pci_add_option_rom returns. Does
+> the append patch fix the problem you are seeing? For the proper fix, I
+> think we probably need some sort of memory_region_unmap wrapper or maybe
+> a call to address_space_unmap.
+
+Yes, I think so, maybe this is the proper way to fix this.
+
+>
+>
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index e6b08e1..04f98b7 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -2242,6 +2242,7 @@ static void pci_add_option_rom(PCIDevice *pdev, bool is_default_rom,
+>       }
+>   
+>       pci_register_bar(pdev, PCI_ROM_SLOT, 0, &pdev->rom);
+> +    xen_invalidate_map_cache_entry(ptr);
+>   }
+>   
+>   static void pci_del_option_rom(PCIDevice *pdev)
