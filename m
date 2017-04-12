@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cyS3G-0002Lw-Uf
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 19:51:56 -0400
+	(envelope-from <no-reply@patchew.org>) id 1cyS3M-0002SW-66
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 19:52:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cyS3D-00049m-RH
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 19:51:55 -0400
-Received: from mail.kernel.org ([198.145.29.136]:48122)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1cyS3D-00049c-Ii
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 19:51:51 -0400
-Date: Wed, 12 Apr 2017 16:51:46 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <58EDE1E4.2090003@huawei.com>
-Message-ID: <alpine.DEB.2.10.1704121645470.2759@sstabellini-ThinkPad-X260>
-References: <CADZi59zNxk-Yr4rpN1E49s=AdsdW-W9YfhpCvpJeBz7oigyFSg@mail.gmail.com>
-	<CADZi59xe6OcCasvtkPBjP7nTsgDA5r_E_Rt7W88BszYdJhuxGQ@mail.gmail.com>
-	<CADZi59xEg0SvScgo=Jg0MxTbGYY=nTX18Qo-4GMkfayThDU9zw@mail.gmail.com>
-	<alpine.DEB.2.10.1704101159340.2759@sstabellini-ThinkPad-X260>
-	<alpine.DEB.2.10.1704101243270.2759@sstabellini-ThinkPad-X260>
-	<CADZi59yC4m+wFS+iJUrV9Y59X96cQVMnrCNLvcd5o2kdjmqQdA@mail.gmail.com>
-	<alpine.DEB.2.10.1704111509350.2759@sstabellini-ThinkPad-X260>
-	<58EDE1E4.2090003@huawei.com>
+	(envelope-from <no-reply@patchew.org>) id 1cyS3J-0004Ao-2p
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 19:52:00 -0400
+Resent-Message-Id: <E1cyS3J-0004Ao-2p@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <149204110903.10500.17384665286927706715@6c512846dbc7>
+In-Reply-To: <1491572865-8549-1-git-send-email-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-ID: <alpine.DEB.2.10.1704121651380.2759@sstabellini-ThinkPad-X260>
-Content-Type: TEXT/PLAIN; CHARSET=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC/BUG] xen-mapcache: buggy invalidate map cache?
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 12 Apr 2017 16:51:49 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 00/10] Block layer fixes for 2.9.0-rc4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,110 +23,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Herongguang (Stephen)" <herongguang.he@huawei.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, hrg <hrgstephen@gmail.com>, Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xensource.com, qemu-devel@nongnu.org, Jun Nakajima <jun.nakajima@intel.com>, Alexander Graf <agraf@suse.de>, xen-devel@lists.xenproject.org, xen-devel@lists.xen.org, wangxinxin.wang@huawei.com
+To: kwolf@redhat.com
+Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-On Wed, 12 Apr 2017, Herongguang (Stephen) wrote:
-> On 2017/4/12 6:32, Stefano Stabellini wrote:
-> > On Tue, 11 Apr 2017, hrg wrote:
-> > > On Tue, Apr 11, 2017 at 3:50 AM, Stefano Stabellini
-> > > <sstabellini@kernel.org> wrote:
-> > > > On Mon, 10 Apr 2017, Stefano Stabellini wrote:
-> > > > > On Mon, 10 Apr 2017, hrg wrote:
-> > > > > > On Sun, Apr 9, 2017 at 11:55 PM, hrg <hrgstephen@gmail.com> w=
-rote:
-> > > > > > > On Sun, Apr 9, 2017 at 11:52 PM, hrg <hrgstephen@gmail.com>=
- wrote:
-> > > > > > > > Hi,
-> > > > > > > >=20
-> > > > > > > > In xen_map_cache_unlocked(), map to guest memory maybe in
-> > > > > > > > entry->next
-> > > > > > > > instead of first level entry (if map to rom other than gu=
-est
-> > > > > > > > memory
-> > > > > > > > comes first), while in xen_invalidate_map_cache(), when V=
-M
-> > > > > > > > ballooned
-> > > > > > > > out memory, qemu did not invalidate cache entries in link=
-ed
-> > > > > > > > list(entry->next), so when VM balloon back in memory, gfn=
-s
-> > > > > > > > probably
-> > > > > > > > mapped to different mfns, thus if guest asks device to DM=
-A to
-> > > > > > > > these
-> > > > > > > > GPA, qemu may DMA to stale MFNs.
-> > > > > > > >=20
-> > > > > > > > So I think in xen_invalidate_map_cache() linked lists sho=
-uld
-> > > > > > > > also be
-> > > > > > > > checked and invalidated.
-> > > > > > > >=20
-> > > > > > > > What=E2=80=99s your opinion? Is this a bug? Is my analyze=
- correct?
-> > > > > Yes, you are right. We need to go through the list for each ele=
-ment of
-> > > > > the array in xen_invalidate_map_cache. Can you come up with a p=
-atch?
-> > > > I spoke too soon. In the regular case there should be no locked m=
-appings
-> > > > when xen_invalidate_map_cache is called (see the DPRINTF warning =
-at the
-> > > > beginning of the functions). Without locked mappings, there shoul=
-d never
-> > > > be more than one element in each list (see xen_map_cache_unlocked=
-:
-> > > > entry->lock =3D=3D true is a necessary condition to append a new =
-entry to
-> > > > the list, otherwise it is just remapped).
-> > > >=20
-> > > > Can you confirm that what you are seeing are locked mappings
-> > > > when xen_invalidate_map_cache is called? To find out, enable the =
-DPRINTK
-> > > > by turning it into a printf or by defininig MAPCACHE_DEBUG.
-> > > In fact, I think the DPRINTF above is incorrect too. In
-> > > pci_add_option_rom(), rtl8139 rom is locked mapped in
-> > > pci_add_option_rom->memory_region_get_ram_ptr (after
-> > > memory_region_init_ram). So actually I think we should remove the
-> > > DPRINTF warning as it is normal.
-> > Let me explain why the DPRINTF warning is there: emulated dma operati=
-ons
-> > can involve locked mappings. Once a dma operation completes, the rela=
-ted
-> > mapping is unlocked and can be safely destroyed. But if we destroy a
-> > locked mapping in xen_invalidate_map_cache, while a dma is still
-> > ongoing, QEMU will crash. We cannot handle that case.
-> >=20
-> > However, the scenario you described is different. It has nothing to d=
-o
-> > with DMA. It looks like pci_add_option_rom calls
-> > memory_region_get_ram_ptr to map the rtl8139 rom. The mapping is a
-> > locked mapping and it is never unlocked or destroyed.
-> >=20
-> > It looks like "ptr" is not used after pci_add_option_rom returns. Doe=
-s
-> > the append patch fix the problem you are seeing? For the proper fix, =
-I
-> > think we probably need some sort of memory_region_unmap wrapper or ma=
-ybe
-> > a call to address_space_unmap.
->=20
-> Yes, I think so, maybe this is the proper way to fix this.
-
-Would you be up for sending a proper patch and testing it? We cannot call
-xen_invalidate_map_cache_entry directly from pci.c though, it would need
-to be one of the other functions like address_space_unmap for example.
-
-
-> > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> > index e6b08e1..04f98b7 100644
-> > --- a/hw/pci/pci.c
-> > +++ b/hw/pci/pci.c
-> > @@ -2242,6 +2242,7 @@ static void pci_add_option_rom(PCIDevice *pdev,=
- bool
-> > is_default_rom,
-> >       }
-> >         pci_register_bar(pdev, PCI_ROM_SLOT, 0, &pdev->rom);
-> > +    xen_invalidate_map_cache_entry(ptr);
-> >   }
-> >     static void pci_del_option_rom(PCIDevice *pdev)
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ5
+MTU3Mjg2NS04NTQ5LTEtZ2l0LXNlbmQtZW1haWwta3dvbGZAcmVkaGF0LmNvbQpTdWJqZWN0OiBb
+UWVtdS1kZXZlbF0gW1BVTEwgMDAvMTBdIEJsb2NrIGxheWVyIGZpeGVzIGZvciAyLjkuMC1yYzQK
+VHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNF
+PWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWls
+ZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1l
+bGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQo
+Z2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRz
+OyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAt
+LWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwg
+Li9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVk
+PTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQK
+PT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFk
+ZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo0YTllN2Ri
+IG1pcnJvcjogRml4IGFpbyBjb250ZXh0IG9mIG1pcnJvcl90b3BfYnMKNzk3NjdmNSBibG9jazog
+QXNzZXJ0IGF0dGFjaGVkIGNoaWxkIG5vZGUgaGFzIHJpZ2h0IGFpbyBjb250ZXh0CmRmYWQzYTUg
+YmxvY2s6IEZpeCB1bnBhaXJlZCBhaW9fZGlzYWJsZV9leHRlcm5hbCBpbiBleHRlcm5hbCBzbmFw
+c2hvdAo5OWJlMWRjIGJsb2NrOiBEb24ndCBjaGVjayBwZXJtaXNzaW9ucyBmb3IgY29weSBvbiBy
+ZWFkCjBlNWU5MzUgcWVtdS1pbWc6IGltZ19jcmVhdGUgZG9lcyBub3Qgc3VwcG9ydCBpbWFnZS1v
+cHRzLCBmaXggZG9jcwozYWZiOWZhIGlvdGVzdHM6IEFkZCBtaXJyb3IgdGVzdHMgZm9yIG9ycGhh
+bmVkIHNvdXJjZQo1Y2NjNDNkIGJsb2NrL21pcnJvcjogRml4IHVzZS1hZnRlci1mcmVlCmU2NWQ3
+NjcgY29tbWl0OiBTZXQgY29tbWl0X3RvcF9icy0+dG90YWxfc2VjdG9ycwoyZGRkY2QyIGNvbW1p
+dDogU2V0IGNvbW1pdF90b3BfYnMtPmFpb19jb250ZXh0CjU3NzBmMzggYmxvY2s6IElnbm9yZSBn
+dWVzdCBkZXYgcGVybWlzc2lvbnMgZHVyaW5nIGluY29taW5nIG1pZ3JhdGlvbgoKPT09IE9VVFBV
+VCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMDogYmxvY2s6IElnbm9yZSBndWVzdCBkZXYg
+cGVybWlzc2lvbnMgZHVyaW5nIGluY29taW5nIG1pZ3JhdGlvbi4uLgpDaGVja2luZyBQQVRDSCAy
+LzEwOiBjb21taXQ6IFNldCBjb21taXRfdG9wX2JzLT5haW9fY29udGV4dC4uLgpDaGVja2luZyBQ
+QVRDSCAzLzEwOiBjb21taXQ6IFNldCBjb21taXRfdG9wX2JzLT50b3RhbF9zZWN0b3JzLi4uCkNo
+ZWNraW5nIFBBVENIIDQvMTA6IGJsb2NrL21pcnJvcjogRml4IHVzZS1hZnRlci1mcmVlLi4uCkNo
+ZWNraW5nIFBBVENIIDUvMTA6IGlvdGVzdHM6IEFkZCBtaXJyb3IgdGVzdHMgZm9yIG9ycGhhbmVk
+IHNvdXJjZS4uLgpDaGVja2luZyBQQVRDSCA2LzEwOiBxZW11LWltZzogaW1nX2NyZWF0ZSBkb2Vz
+IG5vdCBzdXBwb3J0IGltYWdlLW9wdHMsIGZpeCBkb2NzLi4uCkNoZWNraW5nIFBBVENIIDcvMTA6
+IGJsb2NrOiBEb24ndCBjaGVjayBwZXJtaXNzaW9ucyBmb3IgY29weSBvbiByZWFkLi4uCkVSUk9S
+OiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMzI6IEZJTEU6IGJsb2NrL2lvLmM6OTU1Ogor
+ICAgIC8vIGFzc2VydChjaGlsZC0+cGVybSAmIChCTEtfUEVSTV9XUklURV9VTkNIQU5HRUQgfCBC
+TEtfUEVSTV9XUklURSkpOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNSBsaW5lcyBj
+aGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
+IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
+aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQ
+QVRDSCA4LzEwOiBibG9jazogRml4IHVucGFpcmVkIGFpb19kaXNhYmxlX2V4dGVybmFsIGluIGV4
+dGVybmFsIHNuYXBzaG90Li4uCkNoZWNraW5nIFBBVENIIDkvMTA6IGJsb2NrOiBBc3NlcnQgYXR0
+YWNoZWQgY2hpbGQgbm9kZSBoYXMgcmlnaHQgYWlvIGNvbnRleHQuLi4KQ2hlY2tpbmcgUEFUQ0gg
+MTAvMTA6IG1pcnJvcjogRml4IGFpbyBjb250ZXh0IG9mIG1pcnJvcl90b3BfYnMuLi4KPT09IE9V
+VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
+XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5v
+cmc=
