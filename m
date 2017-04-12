@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cyF1x-0001Ur-Lo
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 05:57:42 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1cyF7S-0002Ld-5u
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 06:03:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cyF1u-0006Wq-La
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 05:57:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51484)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cyF1u-0006V6-Dj
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 05:57:38 -0400
-Date: Wed, 12 Apr 2017 10:57:31 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170412095731.GA26272@stefanha-x1.localdomain>
-References: <20170411131733.27542-1-lvivier@redhat.com>
-	<20170411131733.27542-3-lvivier@redhat.com>
-	<20170411170250.GF5940@stefanha-x1.localdomain>
-	<560dec08-1b57-9850-ff30-5f326130a59d@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1cyF7P-0008Qo-3g
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 06:03:22 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:36315)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cyF7O-0008Qb-Tq
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 06:03:19 -0400
+Received: by mail-wm0-x233.google.com with SMTP id o81so83230202wmb.1
+	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 03:03:16 -0700 (PDT)
+References: <1491959850-30756-1-git-send-email-cota@braap.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1491959850-30756-1-git-send-email-cota@braap.org>
+Date: Wed, 12 Apr 2017 11:03:25 +0100
+Message-ID: <87fuhej636.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="6TrnltStXW4iwmi0"
-Content-Disposition: inline
-In-Reply-To: <560dec08-1b57-9850-ff30-5f326130a59d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] virtio-rng: stop virtqueue while the
- CPU is stopped
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 00/10] TCG optimizations for 2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +29,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Amit Shah <amit@kernel.org>, qemu-devel@nongnu.org
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Claudio Fontana <claudio.fontana@huawei.com>, Andrzej Zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, qemu-arm@nongnu.org, Pranith Kumar <bobby.prani+qemu@gmail.com>
 
 
---6TrnltStXW4iwmi0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Emilio G. Cota <cota@braap.org> writes:
 
-On Tue, Apr 11, 2017 at 07:42:02PM +0200, Laurent Vivier wrote:
-> On 11/04/2017 19:02, Stefan Hajnoczi wrote:
-> > On Tue, Apr 11, 2017 at 03:17:33PM +0200, Laurent Vivier wrote:
-> >> diff --git a/hw/virtio/virtio-rng.c b/hw/virtio/virtio-rng.c
-> >> index 9639f4e..d270d56 100644
-> >> --- a/hw/virtio/virtio-rng.c
-> >> +++ b/hw/virtio/virtio-rng.c
-> >> @@ -53,6 +53,15 @@ static void chr_read(void *opaque, const void *buf,=
- size_t size)
-> >>          return;
-> >>      }
-> >> =20
-> >> +    /* we can't modify the virtqueue until
-> >> +     * our state is fully synced
-> >> +     */
-> >> +
-> >> +    if (!runstate_check(RUN_STATE_RUNNING)) {
-> >> +        trace_virtio_rng_cpu_is_stopped(vrng);
-> >> +        return;
-> >> +    }
-> >> +
-> >=20
-> > I'm concerned about what happens when the guest is stopped and resumed
-> > (e.g. 'stop' and 'cont' monitor commands).  Since we throw away the
-> > chr_read() callback the device will hang unless the guest kicks it
-> > again?
-> >=20
-> > It's not clear to me that the rate limit timer will help us...
->=20
-> I think you're right (even if it seems hard to generate this case)
->=20
-> What is the best solution:
->=20
-> - re-arming the timer/the backend request by calling
-> virtio_rng_process() before the "return;"
+> Hi all,
+>
+> This series is aimed at 2.10 or beyond. Its goal is to improve
+> TCG performance by optimizing:
+>
+> 1- Cross-page direct jumps (softmmu only, obviously). Patches 1-4.
+> 2- Indirect branches (softmmu and user-mode). Patches 5-9.
+> 3- tb_jmp_cache hashing in user-mode. Patch 10.
+>
+> I decided to work on this after reading this paper [1] (code at [2]),
+> which among other optimizations it proposes solutions for 1 and 2.
+> I followed the same overall scheme they follow, that is to use helpers
+> to check whether the target vaddr is valid, and if so, jump to its
+> corresponding translated code (host address) without having to go back
+> to the exec loop. My implementation differs from that in the paper
+> in that it uses tb_jmp_cache instead of adding more caches,
+> which is simpler and probably more resilient in environments
+> where TLB invalidations are frequent (in the paper they acknowledge
+> that they limited background processes to a minimum, which isn't
+> realistic).
 
-This would waste CPU and throw away entropy bits.
+Hi Emilio,
 
-> or
->=20
-> - adding a vmstate change handler to call virtio_rng_process()?
+If you want to get some numbers on TLB invalidations please have a look
+at my WIP branch:
 
-Yes, I think vm change handlers solve the problem.
+  https://github.com/stsquad/qemu/tree/misc/tlb-flush-stats
 
---6TrnltStXW4iwmi0
-Content-Type: application/pgp-signature; name="signature.asc"
+It's mainly an experiment at how easy it is to extract number data using
+QEMU's trace subsystem (it turns out pretty easy). I had started looking
+at the execution trace but got a little bogged down with re-implementing
+hashes in python - it would be nice if we could just ctype dll load the
+C implementation (or maybe just save the computed hashes in another
+trace point rather than inferring via exec_tb).
 
------BEGIN PGP SIGNATURE-----
+>
+> These changes require modifications on the targets and, for optimization
+> number 2, a new TCG opcode to jump to a host address contained in a register.
+>
+> For now I only implemented this for the i386 and arm targets, and
+> the i386 TCG backend. Other targets/backends can easily opt-in.
+>
+> The 3rd optimization is implemented in the last patch: it improves
+> tb_jmp_cache hashing for user-mode by removing the requirement of
+> being able to clear parts of the cache given a page number, since this
+> requirement only applies to softmmu.
+>
+> The series applies cleanly on top of 95b31d709ba34.
+>
+> The commit logs include many measurements, performed using SPECint06 and
+> NBench from dbt-bench[3].
+>
+> Feedback welcome! Thanks,
 
-iQEcBAEBAgAGBQJY7foLAAoJEJykq7OBq3PIOGoH/1PH5xA87Jp8VSBS+JP16OQg
-/LcAoWlJFgQcLzU6uyNCo/Jr7FQXPeCBlkOh5LqVNFYuzI5W4pqRi6GhFrWSXLfP
-BxqnvixSNpL/Wy4E1vmSW2C2S6L/JuNq5Jlo7q4xTRGTGm+axMD74Hlz7wn4fzjZ
-dK2B/4VVitoDkOEvdbqB1xf9D5FC+mXPOdLHn7B7D+aoBSBwbGIFd3zMBUvDZ2eq
-0R81TBVL8Ezp/QIIPZSzg7kWXtDUSJfRh5ijhKM1uNH0+coU7bw+5AsO4p1MfPUr
-fgo5ZjSv71ui1h8bhc6UgWef0mxa17d2QJga5EGNNWpfNEl9e/FT1zh/lM9+qts=
-=UpRm
------END PGP SIGNATURE-----
+Given my notes above I think it would be worthwhile coming up with some
+trace-points in the helpers and hash lookups so we can analyse their
+behaviour as well as just looking at the performance improvement in
+benchmarks.
 
---6TrnltStXW4iwmi0--
+>
+> 		Emilio
+>
+> [1] "Optimizing Control Transfer and Memory Virtualization
+> in Full System Emulators", Ding-Yong Hong, Chun-Chen Hsu, Cheng-Yi Chou,
+> Wei-Chung Hsu, Pangfeng Liu, Jan-Jan Wu. ACM TACO, Jan. 2016.
+>   http://www.iis.sinica.edu.tw/page/library/TechReport/tr2015/tr15002.pdf
+>
+> [2] https://github.com/tkhsu/quick-android-emulator/tree/quick-qemu
+>
+> [3] https://github.com/cota/dbt-bench
+
+
+--
+Alex Bennée
