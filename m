@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cyECY-000063-PG
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 05:04:36 -0400
+	(envelope-from <famz@redhat.com>) id 1cyEKZ-000228-Jn
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 05:12:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cyECT-0005yK-Tq
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 05:04:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52998)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cyECT-0005xX-P0
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 05:04:29 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5AFBB6AADA
-	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 09:04:28 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170406154107.9178-1-dgilbert@redhat.com>
-Date: Wed, 12 Apr 2017 11:04:26 +0200
-In-Reply-To: <20170406154107.9178-1-dgilbert@redhat.com> (David Alan Gilbert's
-	message of "Thu, 6 Apr 2017 16:41:07 +0100")
-Message-ID: <87lgr6m1yd.fsf@dusky.pond.sub.org>
+	(envelope-from <famz@redhat.com>) id 1cyEKY-0000wh-Bj
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 05:12:51 -0400
+Date: Wed, 12 Apr 2017 17:12:39 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170412091239.GA8607@lemon>
+References: <20170324123458.yk3rj3g47e5xr33i@eukaryote>
+	<0e1c78f3-1b82-58e4-035e-944484e66f29@redhat.com>
+	<20170411120504.GJ4516@noname.str.redhat.com>
+	<58fea8c2-deb7-b9fa-e6d8-d1ea158ed500@redhat.com>
+	<20170411133017.GL4516@noname.str.redhat.com>
+	<20170412084205.GC32022@lemon>
+	<20170412085931.GA4955@noname.str.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] tests/check-qdict: Fix missing brackets
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170412085931.GA4955@noname.str.redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] Making QMP 'block-job-cancel'
+ transactionable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,35 +29,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, mreitz@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> writes:
+On Wed, 04/12 10:59, Kevin Wolf wrote:
+> Am 12.04.2017 um 10:42 hat Fam Zheng geschrieben:
+> > On Tue, 04/11 15:30, Kevin Wolf wrote:
+> > > Am 11.04.2017 um 15:14 hat Eric Blake geschrieben:
+> > > > On 04/11/2017 07:05 AM, Kevin Wolf wrote:
+> > > > > Note that job completion/cancellation aren't synchronous QMP commands.
+> > > > > The job works something like this, where '...' means that the VM can run
+> > > > > and submit new writes etc.:
+> > > > > 
+> > > > > 1. Start job: mirror_start
+> > > > > ...
+> > > > > 2. Bulk has completed: BLOCK_JOB_READY event
+> > > > > ...
+> > > > > 3. Request completion/cancellation: block-job-completet/cancel
+> > > > > ...
+> > > > > 4. Actual completion/cancellation: BLOCK_JOB_COMPLETED
+> > > > > 
+> > > > > The last one is the actual job completion that we want to be atomic for
+> > > > > a group of nodes. Just making step 3 atomic (which is what including
+> > > > > block-job-complete/cancel in transaction would mean) doesn't really buy
+> > > > > us anything because the data will still change between step 3 and 4.
+> > > > 
+> > > > But as long as the data changes between steps 3 and 4 are written to
+> > > > only one of the two devices, rather than both, then the disk contents
+> > > > atomicity is guaranteed at the point where we stopped the mirroring (ie.
+> > > > during step 3).
+> > > 
+> > > But that's not how things work. Essentially requesting completion means
+> > > that the next time that source and target are in sync, we complete the
+> > > block job. This means that still new copying requests can be issued
+> > > before the job actually completes (and it's even likely to happen).
+> > > 
+> > > > > Now step 4 is reached for each job individually, and unless you stop the
+> > > > > VM (or at least the processing of I/O requests), I don't see how you
+> > > > > could reach it at the same time for all jobs.
+> > > > 
+> > > > The fact that the jobs complete independently (based on different
+> > > > amounts of data to flush) is not problematic, if we are still guaranteed
+> > > > that issuing the request altered the graph so that future writes by the
+> > > > guest only go to one side, and the delay in closing is only due to
+> > > > flushing write requests that pre-dated the job end request.
+> > > 
+> > > This is not easily possible without implementing something like a backup
+> > > job for the final stage of the mirror job... Otherwise the guest can
+> > > always overwrite a sector that is still marked dirty and then that new
+> > > sector will definitely be copied still.
+> > 
+> > We can add a block-job-cancel-sync command and call block_job_cancel_sync(). If
+> > added to transaction, this does what Eric is asking, right?
+> 
+> But why is this better than issuing an explicit stop/cont? The VM will
+> still be stopped for the same time, but additionally the monitor will
+> block and the qemu process won't be responsive until the job has
+> completed.
 
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> Gcc 7 (on Fedora 26) spotted odd use of integers instead of a
-> boolean; it's got a point.
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  tests/check-qdict.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/tests/check-qdict.c b/tests/check-qdict.c
-> index 81162ee572..6f3fbcf9c1 100644
-> --- a/tests/check-qdict.c
-> +++ b/tests/check-qdict.c
-> @@ -559,7 +559,7 @@ static void qdict_join_test(void)
->          g_assert(qdict_size(dict1) == 2);
->          g_assert(qdict_size(dict2) == !overwrite);
->  
-> -        g_assert(qdict_get_int(dict1, "foo") == overwrite ? 84 : 42);
-> +        g_assert(qdict_get_int(dict1, "foo") == (overwrite ? 84 : 42));
->          g_assert(qdict_get_int(dict1, "bar") == 23);
->  
->          if (!overwrite) {
+In practice I don't expect block_job_cancel_sync to be "long running", I expect
+it in the order of a few bdrv_flush() time, which is not worse than the block
+job starting commands. (I agree that block-job-complete-sync would be
+very different.)
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-
-Applied to qapi-next, thanks!
+Fam
