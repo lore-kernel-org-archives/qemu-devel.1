@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50774)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cyI9d-0004el-NM
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 09:17:50 -0400
+	(envelope-from <eblake@redhat.com>) id 1cyIAS-00054F-4S
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 09:18:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cyI9Y-0000ey-U7
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 09:17:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54264)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cyI9Y-0000en-LP
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 09:17:44 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C5AB7128D
-	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 13:17:43 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1cyIAO-00018R-6A
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 09:18:40 -0400
 References: <20170411185034.13460-1-eblake@redhat.com>
-	<20170411185034.13460-7-eblake@redhat.com>
-	<87r30yw2ko.fsf@dusky.pond.sub.org>
+	<20170411185034.13460-8-eblake@redhat.com>
+	<87inmaw20v.fsf@dusky.pond.sub.org>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <57dfecb1-f7d7-4ae7-4d80-c350909883ba@redhat.com>
-Date: Wed, 12 Apr 2017 08:17:42 -0500
+Message-ID: <c436e037-5cf7-05ec-c6a8-7f5ea8b832e8@redhat.com>
+Date: Wed, 12 Apr 2017 08:18:13 -0500
 MIME-Version: 1.0
-In-Reply-To: <87r30yw2ko.fsf@dusky.pond.sub.org>
+In-Reply-To: <87inmaw20v.fsf@dusky.pond.sub.org>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="16m9aWDRM37e9llM4tP31rfDqwTrp5KOb"
-Subject: Re: [Qemu-devel] [PATCH v4 06/13] qobject: Add helper macros for
- common scalar insertions
+	boundary="rTbtMrbn9roAR7q47VfmU67PixKjndJlh"
+Subject: Re: [Qemu-devel] [PATCH v4 07/13] block: Use simpler QDict/QList
+ scalar insertion macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,60 +27,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>, Fam Zheng <famz@redhat.com>, "open list:blkdebug" <qemu-block@nongnu.org>, "Richard W.M. Jones" <rjones@redhat.com>, Stefan Weil <sw@weilnetz.de>, Jeff Cody <jcody@redhat.com>, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---16m9aWDRM37e9llM4tP31rfDqwTrp5KOb
+--rTbtMrbn9roAR7q47VfmU67PixKjndJlh
 From: Eric Blake <eblake@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
-Message-ID: <57dfecb1-f7d7-4ae7-4d80-c350909883ba@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 06/13] qobject: Add helper macros for
- common scalar insertions
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Josh Durgin <jdurgin@redhat.com>, Fam Zheng <famz@redhat.com>,
+ "open list:blkdebug" <qemu-block@nongnu.org>,
+ "Richard W.M. Jones" <rjones@redhat.com>, Stefan Weil <sw@weilnetz.de>,
+ Jeff Cody <jcody@redhat.com>, Peter Lieven <pl@kamp.de>,
+ Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c436e037-5cf7-05ec-c6a8-7f5ea8b832e8@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 07/13] block: Use simpler QDict/QList
+ scalar insertion macros
 References: <20170411185034.13460-1-eblake@redhat.com>
- <20170411185034.13460-7-eblake@redhat.com>
- <87r30yw2ko.fsf@dusky.pond.sub.org>
-In-Reply-To: <87r30yw2ko.fsf@dusky.pond.sub.org>
+ <20170411185034.13460-8-eblake@redhat.com>
+ <87inmaw20v.fsf@dusky.pond.sub.org>
+In-Reply-To: <87inmaw20v.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 04/12/2017 01:40 AM, Markus Armbruster wrote:
+On 04/12/2017 01:52 AM, Markus Armbruster wrote:
 > Eric Blake <eblake@redhat.com> writes:
 >=20
->> Rather than making lots of callers wrap a scalar in a QInt, QString,
->> or QBool, provide helper macros that do the wrapping automatically.
+>> We now have macros in place to make it less verbose to add a scalar
+>> to QDict and QList, so use them.
 >>
->> Update the Coccinelle script to make mass conversions easy, although
->> the conversion itself will be done as a separate patches to ease
->> review and backport efforts.
+>> Patch created mechanically via:
+>>   spatch --sp-file scripts/coccinelle/qobject.cocci \
+>>     --macro-file scripts/cocci-macro-file.h --dir block --in-place
+>> then touched up manually to fix a couple of '?:' back to original spac=
+ing.
 >>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->>
->> ---
->> v4: tweak comment wording
->> v3: new patch
->> ---
->>  include/qapi/qmp/qdict.h         |  8 ++++++++
->>  include/qapi/qmp/qlist.h         |  8 ++++++++
->>  scripts/coccinelle/qobject.cocci | 22 ++++++++++++++++++++++
->>  3 files changed, 38 insertions(+)
->>
->> diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
->> index fe9a4c5..f70d435 100644
->> --- a/include/qapi/qmp/qdict.h
->> +++ b/include/qapi/qmp/qdict.h
->> @@ -52,6 +52,14 @@ void qdict_destroy_obj(QObject *obj);
->>  #define qdict_put(qdict, key, obj) \
->>          qdict_put_obj(qdict, key, QOBJECT(obj))
->>
->> +/* Helpers for int, bool, and string. */
+>> For ease of review, the mechanical work was split by tree location:
+>> this only touches files under block/; there are other block-related
+>> files (like top-level block.c) that will be fixed in a later global
+>> cleanup.
 >=20
-> Nitpick: this isn't a sentence, so why the period?
+> I don't like this split.  Splitting out *subsystems* may ease review,
+> but this splits out directory block/, which is only a part of the block=
 
-Hmm, there's no period on the comment just before:
-/* Helper to qdict_put_obj(), accepts any object */
+> subsystem.  Explaining this takes you more than three dozen words.  I'd=
 
-I'm fine if you touch it up on commit.
+> prefer either the whole block subsystem (as defined in MAINTAINERS)
+> split out, or no split.
+>=20
+> I'm willing to accept the split as is anyway if block maintainers are
+> okay with it.
+>=20
+> I'm also willing to squash the three parts on commit.
+
+I'm leaning towards squashing the three into one.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -98,7 +88,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---16m9aWDRM37e9llM4tP31rfDqwTrp5KOb
+--rTbtMrbn9roAR7q47VfmU67PixKjndJlh
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -108,13 +98,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJY7ij2AAoJEKeha0olJ0NqS3gH/Rrf4tFeVbsxTGHscWE1FRHX
-FloZ0IN0/eW3/PLY7d9R1LRxxd3jz5SBCv3WiXwIg1UDqkEXKYbXdQ8NIWiQRRx/
-aQkw0cQDCLbG0mCEE5GcaMC+ZNooQTd5m6RfM0cL0+fK3n3GAv9wX3n/mEzYaGH4
-1JQl8qRcsSIJjwv/CiaE/uEYxK05pybylopCfW9YDHRd2Yq4b8TuPo1RL/HQpqaf
-xRow5M/7IwXiW+tlQ6wSTeG7y0ExaviO0gYM/ESH9QFcYJ5lpSImY1Q39Uz00LYw
-No8d1Wso5qifmkmzGdy4yGd1AUDi7ef5pvqWE0JOTQEInyo7hFmSHdX2mnEu+vk=
-=Q2L5
+iQEcBAEBCAAGBQJY7ikVAAoJEKeha0olJ0NqzeoIAI/X+14AXzJMbE/DmuqOA5aW
+KMjX31XqBo+nm+Z06cZhe2UoZVJi0GhMh5nzY4WTprdcipiOCxH9+Oa8FW+AJh/f
+rjHnMIEkvH6/oNFbRj7vkIGsjQLr+NCmDW2F5dsec1O/pc4EWLOuKrwGCheGCjfr
+N6Gb0QNXWjdmMJbDCKD2uWM88h1vhMk3kWdKq8Zb45aKlzeek4OQfb/ZbmDE3Z5d
+vSLZnbB/NBLGKdCtDZud2R37zrEml5tDRQopJOi7lFgV7k/6ah2dplZeMRNK/5GW
+IjfEfTc2zGpqJwTcb1sm59Dbp2jq1d+3Td7tVLFsUpOm53unEhcCrsvbr1wmay8=
+=e397
 -----END PGP SIGNATURE-----
 
---16m9aWDRM37e9llM4tP31rfDqwTrp5KOb--
+--rTbtMrbn9roAR7q47VfmU67PixKjndJlh--
