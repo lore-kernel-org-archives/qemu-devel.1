@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1cy6ux-00082H-Fa
+	(envelope-from <cota@braap.org>) id 1cy6ux-00082N-Mc
 	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 21:17:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1cy6uw-0006QK-Hp
+	(envelope-from <cota@braap.org>) id 1cy6uw-0006Q0-Cr
 	for qemu-devel@nongnu.org; Tue, 11 Apr 2017 21:17:55 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Tue, 11 Apr 2017 21:17:22 -0400
-Message-Id: <1491959850-30756-3-git-send-email-cota@braap.org>
+Date: Tue, 11 Apr 2017 21:17:26 -0400
+Message-Id: <1491959850-30756-7-git-send-email-cota@braap.org>
 In-Reply-To: <1491959850-30756-1-git-send-email-cota@braap.org>
 References: <1491959850-30756-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH 02/10] exec-all: inline tb_from_jmp_cache
+Subject: [Qemu-devel] [PATCH 06/10] tcg: add brcondi_ptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,84 +22,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Claudio Fontana <claudio.fontana@huawei.com>, Andrzej Zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, qemu-arm@nongnu.org, alex.bennee@linaro.org, Pranith Kumar <bobby.prani+qemu@gmail.com>
 
-The inline improves performance, as shown in subsequent commits' logs.
-
-This commit is kept separate to ease review, since the inclusion
-of tb-hash.h might be controversial. The problem here, which was
-introduced before this commit, is that tb_hash_func() depends on
-page_addr_t: this defeats the original purpose of tb-hash.h,
-which was to be self-contained and CPU-agnostic.
+This will be used by TCG targets to implement a fast path
+for indirect branches.
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- cpu-exec.c              | 19 -------------------
- include/exec/exec-all.h | 24 +++++++++++++++++++++++-
- 2 files changed, 23 insertions(+), 20 deletions(-)
+ tcg/tcg-op.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/cpu-exec.c b/cpu-exec.c
-index ce9750a..748cb66 100644
---- a/cpu-exec.c
-+++ b/cpu-exec.c
-@@ -309,25 +309,6 @@ static bool tb_cmp(const void *p, const void *d)
-     return false;
- }
- 
--TranslationBlock *tb_from_jmp_cache(CPUArchState *env, target_ulong vaddr)
--{
--    CPUState *cpu = ENV_GET_CPU(env);
--    TranslationBlock *tb;
--    target_ulong cs_base, pc;
--    uint32_t flags;
--
--    if (unlikely(atomic_read(&cpu->exit_request))) {
--        return NULL;
--    }
--    cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
--    tb = atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(vaddr)]);
--    if (likely(tb && tb->pc == vaddr && tb->cs_base == cs_base &&
--               tb->flags == flags)) {
--        return tb;
--    }
--    return NULL;
--}
--
- static TranslationBlock *tb_htable_lookup(CPUState *cpu,
-                                           target_ulong pc,
-                                           target_ulong cs_base,
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 18b80bc..bd76987 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -367,7 +367,29 @@ struct TranslationBlock {
- void tb_free(TranslationBlock *tb);
- void tb_flush(CPUState *cpu);
- void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr);
--TranslationBlock *tb_from_jmp_cache(CPUArchState *env, target_ulong vaddr);
-+
-+/* tb_hash_func() in tb-hash.h needs tb_page_addr_t, defined above */
-+#include "tb-hash.h"
-+
-+static inline
-+TranslationBlock *tb_from_jmp_cache(CPUArchState *env, target_ulong vaddr)
-+{
-+    CPUState *cpu = ENV_GET_CPU(env);
-+    TranslationBlock *tb;
-+    target_ulong cs_base, pc;
-+    uint32_t flags;
-+
-+    if (unlikely(atomic_read(&cpu->exit_request))) {
-+        return NULL;
-+    }
-+    cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
-+    tb = atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(vaddr)]);
-+    if (likely(tb && tb->pc == vaddr && tb->cs_base == cs_base &&
-+               tb->flags == flags)) {
-+        return tb;
-+    }
-+    return NULL;
-+}
- 
- #if defined(USE_DIRECT_JUMP)
- 
+diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
+index 1924633..abf784b 100644
+--- a/tcg/tcg-op.h
++++ b/tcg/tcg-op.h
+@@ -1118,6 +1118,8 @@ void tcg_gen_atomic_xor_fetch_i64(TCGv_i64, TCGv, TCGv_i64, TCGArg, TCGMemOp);
+     tcg_gen_addi_i32(TCGV_PTR_TO_NAT(R), TCGV_PTR_TO_NAT(A), (B))
+ # define tcg_gen_ext_i32_ptr(R, A) \
+     tcg_gen_mov_i32(TCGV_PTR_TO_NAT(R), (A))
++# define tcg_gen_brcondi_ptr(C, A, I, L) \
++    tcg_gen_brcondi_i32(C, TCGV_PTR_TO_NAT(A), (uintptr_t)I, L)
+ #else
+ # define tcg_gen_ld_ptr(R, A, O) \
+     tcg_gen_ld_i64(TCGV_PTR_TO_NAT(R), (A), (O))
+@@ -1129,4 +1131,6 @@ void tcg_gen_atomic_xor_fetch_i64(TCGv_i64, TCGv, TCGv_i64, TCGArg, TCGMemOp);
+     tcg_gen_addi_i64(TCGV_PTR_TO_NAT(R), TCGV_PTR_TO_NAT(A), (B))
+ # define tcg_gen_ext_i32_ptr(R, A) \
+     tcg_gen_ext_i32_i64(TCGV_PTR_TO_NAT(R), (A))
++# define tcg_gen_brcondi_ptr(C, A, I, L) \
++    tcg_gen_brcondi_i64(C, TCGV_PTR_TO_NAT(A), (uintptr_t)I, L)
+ #endif /* UINTPTR_MAX == UINT32_MAX */
 -- 
 2.7.4
