@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49797)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cyL5b-00059q-Vn
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 12:25:53 -0400
+	(envelope-from <mst@redhat.com>) id 1cyL9G-0005uP-6W
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 12:29:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cyL5a-0001Yr-QH
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 12:25:51 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:36255)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cyL5a-0001YA-KA
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 12:25:50 -0400
-Received: by mail-wm0-x234.google.com with SMTP id o81so91857614wmb.1
-	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 09:25:48 -0700 (PDT)
+	(envelope-from <mst@redhat.com>) id 1cyL9C-0003Rp-7b
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 12:29:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33118)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cyL9B-0003RT-V3
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 12:29:34 -0400
+Date: Wed, 12 Apr 2017 19:29:28 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170412185249-mutt-send-email-mst@kernel.org>
+References: <1491911135-216950-1-git-send-email-agraf@suse.de>
+	<CALMp9eT220btgiw7S-0cLswr1j=-OCuMwOAWuWS51EmNYYRuJw@mail.gmail.com>
+	<4622E361-52AB-40F2-9915-45C48F0DBCD2@suse.de>
+	<CALMp9eR7AWETNZA1pSBXW2BWcrJXPk-Y1hbNvwu2Vq7Dkf6AjA@mail.gmail.com>
+	<204f274d-697d-f9c6-8719-9bf91105f8b9@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <20170412150221.12199.46501.malone@gac.canonical.com>
-References: <20170412105411.12710.65118.malonedeb@gac.canonical.com>
-	<20170412150221.12199.46501.malone@gac.canonical.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 12 Apr 2017 17:25:27 +0100
-Message-ID: <CAFEAcA_MkSJ7AyBzWyDKcjHN7gdh=toMB44Hz4Ynjn7k6AKRyw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [Bug 1682093] Re: aarch64-softmmu "bad ram
- pointer" crash
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <204f274d-697d-f9c6-8719-9bf91105f8b9@suse.de>
+Subject: Re: [Qemu-devel] [PATCH v6] kvm: better MWAIT emulation for guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +30,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1682093 <1682093@bugs.launchpad.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Alexander Graf <agraf@suse.de>
+Cc: Jim Mattson <jmattson@google.com>, kvm list <kvm@vger.kernel.org>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, LKML <linux-kernel@vger.kernel.org>, "Gabriel L. Somlo" <gsomlo@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, Joerg Roedel <joro@8bytes.org>, linux-doc@vger.kernel.org, qemu-devel@nongnu.org
 
-On 12 April 2017 at 16:02, Harry Wagstaff <1682093@bugs.launchpad.net> wrote:
-> I've done some investigation and it appears that this bug is caused by
-> the following:
->
-> 1. The flash memory of the virt platform is initialised as a
-> cfi.pflash01. It has a memory region with romd_mode = true and
-> rom_device = true
->
-> 2. Some code stored in the flash memory is executed. This causes the
-> memory to be loaded into the TLB.
->
-> 3. The code is overwritten. This causes the romd_mode of the flash
-> memory to be reset. It also causes the code to be evicted from the TLB.
->
-> 4. An attempt is made to execute the code again (cpu_exec(), cpu-exec.c:677)
-> 4a. Eventually, QEMU attempts to refill the TLB (softmmu_template.h:127)
-> 4b. We try to fill in the tlb entry (tlb_set_page_with_attrs, cputlb.c:602)
-> 4b. The flash memory no longer appears to be a ram or romd (cputlb.c:632)
-> 4c. QEMU decides that the flash memory is an IO device (cputlb.c:634)
-> 4d. QEMU aborts while trying to fill in the rest of the TLB entry (qemu_ram_addr_from_host_nofail)
+On Wed, Apr 12, 2017 at 04:54:10PM +0200, Alexander Graf wrote:
+> 
+> 
+> On 12.04.17 16:34, Jim Mattson wrote:
+> > Actually, we have rejected commit 87c00572ba05aa8c ("kvm: x86: emulate
+> > monitor and mwait instructions as nop"), so when we intercept
+> > MONITOR/MWAIT, we synthesize #UD. Perhaps it is this difference from
+> > vanilla kvm that motivates the following idea...
+> 
+> So you're not running upstream kvm? In that case, you can just not take this
+> patch either :).
+> 
+> > Since we're still not going to report MONITOR support in CPUID, the
+> > only guests of consequence are paravirtual guests. What if a
+> 
+> Only if someone actually implemented something for PV guests, yes.
+> 
+> The real motivation is to allow user space to force set the MONITOR CPUID
+> flag. That way an admin can - if he really wants to - dedicate pCPUs to the
+> VM.
+> 
+> I agree that we don't need the kvm pv flag for that. I'd be happy to drop
+> that if everyone agrees.
 
-Yeah, this is a known bug -- but fixing it would just mean that
-we would print the slightly more helpful message about the
-guest attempting to execute from something that isn't RAM
-or ROM before exiting.
+I don't really agree we do not need the PV flag. mwait on kvm is
+different from mwait on bare metal in that you are heavily penalized by
+scheduler for polling unless you configure the host just so.
+HLT lets you give up the host CPU if you know you won't need
+it for a long time.
 
-See for instance this thread from January.
-https://lists.nongnu.org/archive/html/qemu-devel/2017-01/msg00674.html
+So while many people can get by with monitor cpuid (those that isolate
+host CPUs) and it's a valuable option to have, I think a PV flag is also
+a valuable option and can be set for more configurations.
 
-> I have built a MWE (which I have attached) which produces this behaviour
-> in git head. I'm not exactly sure what a fix for this should look like:
-> AFAIK it's not technically valid to write into flash, but I'm not sure
-> that QEMU crashing should be considered correct behaviour.
+Guest has an idle driver calling mwait on short waits and halt on longer
+ones.  I'm in fact testing an idle driver using such a PV flag and will
+post when ready (after vacation ~3 weeks from now probably).
 
-You should fix your guest so that it doesn't try to execute
-from flash without putting the flash back into the mode you
-can execute from...
-
-Writing to the flash device is permitted -- it's how
-you program it (you write command bytes to it, and
-read back responses and status and so on).
-
-thanks
--- PMM
+> > paravirtual guest was aware of the fact that sometimes MONITOR/MWAIT
+> > would work as architected, and sometimes they would raise #UD (or do
+> > something else that's guest-visible, to indicate that the hypevisor is
+> > intercepting the instructions). Such a guest could first try a
+> > MONITOR/MWAIT-based idle loop and then fall back on a HLT-based idle
+> > loop if the hypervisor rejected its use of MONITOR/MWAIT.
+> 
+> How would that work? That guest would have to atomically notify all other
+> vCPUs that wakeup notifications now go via IPIs instead of cache line
+> dirtying.
+> 
+> That's probably as much work to get right as it would be to just emulate
+> MWAIT inside kvm ;).
+> 
+> > We already have the loose concept of "this pCPU has other things to
+> > do," which is encoded in the variable-sized PLE window. With
+> > MONITOR/MWAIT, the choice is binary, but a simple implementation could
+> > tie the two together, by allowing the guest to use MONITOR/MWAIT
+> > whenever the PLE window exceeds a certain threshold. Or the decision
+> > could be left to the userspace agent.
+> 
+> I agree, and that's basically the idea I mentioned earlier with MWAIT
+> emulation. We could (for well behaved guests) switch between emulating MWAIT
+> and running native MWAIT.
+> 
+> 
+> 
+> Alex
