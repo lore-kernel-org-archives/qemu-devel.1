@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36605)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cyIuc-0002xy-HE
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:06:26 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cyIuj-000331-Sm
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:06:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cyIuX-00018C-PN
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:06:22 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cyIuc-0001Co-Db
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:06:28 -0400
 From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Date: Wed, 12 Apr 2017 22:05:18 +0800
-Message-ID: <1492005921-15664-4-git-send-email-zhang.zhanghailiang@huawei.com>
-In-Reply-To: <1492005921-15664-1-git-send-email-zhang.zhanghailiang@huawei.com>
-References: <1492005921-15664-1-git-send-email-zhang.zhanghailiang@huawei.com>
+Date: Wed, 12 Apr 2017 22:05:15 +0800
+Message-ID: <1492005921-15664-1-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 3/6] replication: Split out
- backup_do_checkpoint() from secondary_do_checkpoint()
+Subject: [Qemu-devel] [PATCH v4 0/6] COLO block replication supports shared
+ disk case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,97 +21,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: stefanha@redhat.com, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, xiecl.fnst@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, xiecl.fnst@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, eddie.dong@intel.com
 
-The helper backup_do_checkpoint() will be used for primary related
-codes. Here we split it out from secondary_do_checkpoint().
+COLO block replication doesn't support the shared disk case,
+Here we try to implement it and this is the 4th version.
 
-Besides, it is unnecessary to call backup_do_checkpoint() in
-replication starting and normally stop replication path.
-We only need call it while do real checkpointing.
+Please review and any commits are welcomed.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Changlong Xie <xiecl.fnst@cn.fujitsu.com>
-Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
----
- block/replication.c | 36 +++++++++++++++++++-----------------
- 1 file changed, 19 insertions(+), 17 deletions(-)
+Cc: Dr. David Alan Gilbert (git) <dgilbert@redhat.com>
+Cc: eddie.dong@intel.com
 
-diff --git a/block/replication.c b/block/replication.c
-index 418b81b..b021215 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -352,20 +352,8 @@ static bool replication_recurse_is_first_non_filter(BlockDriverState *bs,
- 
- static void secondary_do_checkpoint(BDRVReplicationState *s, Error **errp)
- {
--    Error *local_err = NULL;
-     int ret;
- 
--    if (!s->secondary_disk->bs->job) {
--        error_setg(errp, "Backup job was cancelled unexpectedly");
--        return;
--    }
--
--    backup_do_checkpoint(s->secondary_disk->bs->job, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        return;
--    }
--
-     ret = s->active_disk->bs->drv->bdrv_make_empty(s->active_disk->bs);
-     if (ret < 0) {
-         error_setg(errp, "Cannot make active disk empty");
-@@ -578,6 +566,8 @@ static void replication_start(ReplicationState *rs, ReplicationMode mode,
-             return;
-         }
-         block_job_start(job);
-+
-+        secondary_do_checkpoint(s, errp);
-         break;
-     default:
-         aio_context_release(aio_context);
-@@ -586,10 +576,6 @@ static void replication_start(ReplicationState *rs, ReplicationMode mode,
- 
-     s->replication_state = BLOCK_REPLICATION_RUNNING;
- 
--    if (s->mode == REPLICATION_MODE_SECONDARY) {
--        secondary_do_checkpoint(s, errp);
--    }
--
-     s->error = 0;
-     aio_context_release(aio_context);
- }
-@@ -599,13 +585,29 @@ static void replication_do_checkpoint(ReplicationState *rs, Error **errp)
-     BlockDriverState *bs = rs->opaque;
-     BDRVReplicationState *s;
-     AioContext *aio_context;
-+    Error *local_err = NULL;
- 
-     aio_context = bdrv_get_aio_context(bs);
-     aio_context_acquire(aio_context);
-     s = bs->opaque;
- 
--    if (s->mode == REPLICATION_MODE_SECONDARY) {
-+    switch (s->mode) {
-+    case REPLICATION_MODE_PRIMARY:
-+        break;
-+    case REPLICATION_MODE_SECONDARY:
-+        if (!s->secondary_disk->bs->job) {
-+            error_setg(errp, "Backup job was cancelled unexpectedly");
-+            break;
-+        }
-+        backup_do_checkpoint(s->secondary_disk->bs->job, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            break;
-+        }
-         secondary_do_checkpoint(s, errp);
-+        break;
-+    default:
-+        abort();
-     }
-     aio_context_release(aio_context);
- }
+v4:
+- Add proper comment for primary_disk in patch 2 (Stefan)
+- Call bdrv_invalidate_cache() while do checkpoint for shared disk in patch 5
+
+v3:
+- Fix some comments from Stefan and Eric
+
+v2:
+- Drop the patch which add a blk_root() helper
+- Fix some comments from Changlong
+
+zhanghailiang (6):
+  docs/block-replication: Add description for shared-disk case
+  replication: add shared-disk and shared-disk-id options
+  replication: Split out backup_do_checkpoint() from
+    secondary_do_checkpoint()
+  replication: fix code logic with the new shared_disk option
+  replication: Implement block replication for shared disk case
+  nbd/replication: implement .bdrv_get_info() for nbd and replication
+    driver
+
+ block/nbd.c                |  12 +++
+ block/replication.c        | 198 ++++++++++++++++++++++++++++++++++-----------
+ docs/block-replication.txt | 139 ++++++++++++++++++++++++++++++-
+ qapi/block-core.json       |  10 ++-
+ 4 files changed, 306 insertions(+), 53 deletions(-)
+
 -- 
 1.8.3.1
