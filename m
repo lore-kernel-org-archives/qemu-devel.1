@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cyEtp-0004Z0-LY
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 05:49:18 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1cyEvw-0005EI-1k
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 05:51:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cyEto-0003yM-Nu
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 05:49:17 -0400
-Date: Wed, 12 Apr 2017 11:49:09 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170412094909.GC4955@noname.str.redhat.com>
-References: <20170411011718.9152-1-eblake@redhat.com>
-	<20170411011718.9152-2-eblake@redhat.com>
+	(envelope-from <jemmy858585@gmail.com>) id 1cyEvv-0004cv-5O
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 05:51:28 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170411011718.9152-2-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v9 01/13] qcow2: Unallocate unmapped zero
- clusters if no backing file
+In-Reply-To: <20170412091819.GB4955@noname.str.redhat.com>
+References: <20170412091819.GB4955@noname.str.redhat.com>
+From: 858585 jemmy <jemmy858585@gmail.com>
+Date: Wed, 12 Apr 2017 17:51:23 +0800
+Message-ID: <CAOGPPbfkZ5qJC-YkeBs+LLdn88VTvij_Xk8_FEpaNmg_pyXVVA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] migrate -b problems
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,53 +21,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, dgilbert@redhat.com, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, quintela@redhat.com
 
-Am 11.04.2017 um 03:17 hat Eric Blake geschrieben:
-> 'qemu-img map' already coalesces information about unallocated
-> clusters (those with status 0) and pure zero clusters (those
-> with status BDRV_BLOCK_ZERO and no offset).  Furthermore, all
-> qcow2 images with no backing file already report all unallocated
-> clusters (in the preallocation sense of clusters with no offset)
-> as BDRV_BLOCK_ZERO, regardless of whether the QCOW_OFLAG_ZERO was
-> set in that L2 entry (QCOW_OFLAG_ZERO also implies a return of
-> BDRV_BLOCK_ALLOCATED, but we intentionally do not expose that bit
-> to external users), thanks to generic block layer code in
-> bdrv_co_get_block_status().
-> 
-> So, for an image with no backing file, having bdrv_pwrite_zeroes
-> mark clusters as unallocated (defer to backing file) rather than
-> reads-as-zero (regardless of backing file) makes no difference
-> to normal behavior, but may potentially allow for fewer writes to
-> the L2 table of a freshly-created image where the L2 table is
-> initially written to all-zeroes (although I don't actually know
-> if we skip an L2 update and flush when re-writing the same
-> contents as already present).
+it this bug?
+https://bugs.launchpad.net/qemu/+bug/1681688
 
-I don't get this. Allocating a cluster always involves an L2 update, no
-matter whether it was previously unallocated or a zero cluster.
-
-> Furthermore, this matches the behavior of discard_single_l2(), in
-> favoring an unallocated cluster over a zero cluster when full
-> discard is requested.
-
-The only use for "full discard" is qcow2_make_empty(). It explicitly
-requests that the backing file becomes visible again. This is a
-completely different case.
-
-In other words, in order to stay consistent between discard and
-write_zeroes from a guest POV, we need to leave this code alone.
-
-> Meanwhile, version 2 qcow2 files (compat=0.10) lack support for an
-> explicit zero cluster.  This minor tweak therefore allows us to turn
-> write zeroes with unmap into an actual unallocation on those files,
-> where they used to return -ENOTSUP and cause an allocation due to
-> the fallback to explicitly written zeroes.
-
-Okay, this is true.
-
-But I doubt that making write_zeroes more efficient on v2 images without
-a backing file is really worth any extra complexity at this point...
-
-Kevin
+On Wed, Apr 12, 2017 at 5:18 PM, Kevin Wolf <kwolf@redhat.com> wrote:
+> Hi all,
+>
+> after getting assertion failure reports for block migration in the last
+> minute, we just hacked around it by commenting out op blocker assertions
+> for the 2.9 release, but now we need to see how to fix things properly.
+> Luckily, get_maintainer.pl doesn't report me, but only you. :-)
+>
+> The main problem I see with the block migration code (on the
+> destination) is that it abuses the BlockBackend that belongs to the
+> guest device to make its own writes to the image file. If the guest
+> isn't allowed to write to the image (which it now isn't during incoming
+> migration since it would conflict with the newer style of block
+> migration using an NBD server), writing to this BlockBackend doesn't
+> work any more.
+>
+> So what should really happen is that incoming block migration creates
+> its own BlockBackend for writing to the image. Now we don't want to do
+> this anew for every incoming block, but ideally we'd just create all
+> necessary BlockBackends upfront and then keep using them throughout the
+> whole migration. Is there a way to get some setup/teardown callbacks
+> at the start/end of the migration that could initialise and free such
+> global data?
+>
+> The other problem with block migration is that is uses a BlockBackend
+> name to identify which device is migrated. However, there can be images
+> that are not attached to any BlockBackend, or if it is, the BlockBackend
+> might be anonymous, so this doesn't work. I suppose changing the field
+> to "device name if available, node-name otherwise" would solve this.
+>
+> Kevin
+>
