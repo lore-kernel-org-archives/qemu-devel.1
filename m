@@ -1,15 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1cyI0d-0001JO-Ne
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 09:08:36 -0400
+	(envelope-from <berto@igalia.com>) id 1cyI1h-00023k-N0
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 09:09:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1cyI0Y-0005xJ-Qh
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 09:08:31 -0400
-From: jemmy858585@gmail.com
-Date: Wed, 12 Apr 2017 21:07:56 +0800
-Message-Id: <1492002476-26784-1-git-send-email-lidongchen@tencent.com>
-Subject: [Qemu-devel] [PATCH v5] migration/block: use blk_pwrite_zeroes for
- each zero cluster
+	(envelope-from <berto@igalia.com>) id 1cyI1c-0006LE-PK
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 09:09:37 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170411185034.13460-8-eblake@redhat.com>
+References: <20170411185034.13460-1-eblake@redhat.com>
+	<20170411185034.13460-8-eblake@redhat.com>
+Date: Wed, 12 Apr 2017 15:09:30 +0200
+Message-ID: <w517f2pkc1h.fsf@maestria.local.igalia.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 07/13] block: Use simpler QDict/QList
+ scalar insertion macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,82 +23,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, famz@redhat.com, quintela@redhat.com, dgilbert@redhat.com, qemu-block@nongnu.org, Lidong Chen <lidongchen@tencent.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jeff Cody <jcody@redhat.com>, Stefan Weil <sw@weilnetz.de>, Paolo Bonzini <pbonzini@redhat.com>, Peter Lieven <pl@kamp.de>, Fam Zheng <famz@redhat.com>, Josh Durgin <jdurgin@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, "open list:blkdebug" <qemu-block@nongnu.org>
 
-From: Lidong Chen <lidongchen@tencent.com>
+On Tue 11 Apr 2017 08:50:28 PM CEST, Eric Blake wrote:
+> We now have macros in place to make it less verbose to add a scalar
+> to QDict and QList, so use them.
+>
+> Patch created mechanically via:
+>   spatch --sp-file scripts/coccinelle/qobject.cocci \
+>     --macro-file scripts/cocci-macro-file.h --dir block --in-place
+> then touched up manually to fix a couple of '?:' back to original spacing.
+>
+> For ease of review, the mechanical work was split by tree location:
+> this only touches files under block/; there are other block-related
+> files (like top-level block.c) that will be fixed in a later global
+> cleanup.
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Acked-by: Richard W.M. Jones <rjones@redhat.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-BLOCK_SIZE is (1 << 20), qcow2 cluster size is 65536 by default,
-this maybe cause the qcow2 file size is bigger after migration.
-This patch check each cluster, use blk_pwrite_zeroes for each
-zero cluster.
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-Signed-off-by: Lidong Chen <lidongchen@tencent.com>
----
- migration/block.c | 35 +++++++++++++++++++++++++++++++++--
- 1 file changed, 33 insertions(+), 2 deletions(-)
-
-diff --git a/migration/block.c b/migration/block.c
-index 7734ff7..41c7a55 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -885,6 +885,8 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
-     int64_t total_sectors = 0;
-     int nr_sectors;
-     int ret;
-+    BlockDriverInfo bdi;
-+    int cluster_size;
- 
-     do {
-         addr = qemu_get_be64(f);
-@@ -919,6 +921,15 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
-                     error_report_err(local_err);
-                     return -EINVAL;
-                 }
-+
-+                ret = bdrv_get_info(blk_bs(blk), &bdi);
-+                if (ret == 0 && bdi.cluster_size > 0 &&
-+                    bdi.cluster_size <= BLOCK_SIZE &&
-+                    BLOCK_SIZE % bdi.cluster_size == 0) {
-+                    cluster_size = bdi.cluster_size;
-+                } else {
-+                    cluster_size = BLOCK_SIZE;
-+                }
-             }
- 
-             if (total_sectors - addr < BDRV_SECTORS_PER_DIRTY_CHUNK) {
-@@ -932,10 +943,30 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
-                                         nr_sectors * BDRV_SECTOR_SIZE,
-                                         BDRV_REQ_MAY_UNMAP);
-             } else {
-+                int i;
-+                int64_t cur_addr;
-+                uint8_t *cur_buf;
-+
-                 buf = g_malloc(BLOCK_SIZE);
-                 qemu_get_buffer(f, buf, BLOCK_SIZE);
--                ret = blk_pwrite(blk, addr * BDRV_SECTOR_SIZE, buf,
--                                 nr_sectors * BDRV_SECTOR_SIZE, 0);
-+                for (i = 0; i < BLOCK_SIZE / cluster_size; i++) {
-+                    cur_addr = addr * BDRV_SECTOR_SIZE + i * cluster_size;
-+                    cur_buf = buf + i * cluster_size;
-+
-+                    if ((!block_mig_state.zero_blocks ||
-+                        cluster_size < BLOCK_SIZE) &&
-+                        buffer_is_zero(cur_buf, cluster_size)) {
-+                        ret = blk_pwrite_zeroes(blk, cur_addr,
-+                                                cluster_size,
-+                                                BDRV_REQ_MAY_UNMAP);
-+                    } else {
-+                        ret = blk_pwrite(blk, cur_addr, cur_buf,
-+                                         cluster_size, 0);
-+                    }
-+                    if (ret < 0) {
-+                        break;
-+                    }
-+                }
-                 g_free(buf);
-             }
- 
--- 
-1.8.3.1
+Berto
