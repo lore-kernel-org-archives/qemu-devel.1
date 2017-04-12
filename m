@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45588)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cyPc6-0001BW-On
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 17:15:44 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cyPdm-0001sG-QS
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 17:17:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cyPc5-0003q9-85
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 17:15:42 -0400
-Date: Wed, 12 Apr 2017 18:15:29 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170412211529.GD27126@thinpad.lan.raisama.net>
-References: <1490189568-167621-1-git-send-email-imammedo@redhat.com>
-	<1490189568-167621-11-git-send-email-imammedo@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cyPdk-0000QG-U3
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 17:17:26 -0400
+Received: from mail-lf0-x234.google.com ([2a00:1450:4010:c07::234]:34426)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cyPdk-0000M7-Ef
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 17:17:24 -0400
+Received: by mail-lf0-x234.google.com with SMTP id t144so20778480lff.1
+	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 14:17:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1490189568-167621-11-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 10/23] numa: mirror cpu to node
- mapping in MachineState::possible_cpus
+References: <1488435591-17882-1-git-send-email-mst@redhat.com>
+	<1488435591-17882-3-git-send-email-mst@redhat.com>
+	<CAJ+F1C+kLB5VCsSakbd6+CKx4uNbxZNqd+vNMAWte4yKqcbw9Q@mail.gmail.com>
+	<FFF7A2B4-A481-455B-8692-9F4486EB84BD@skyportsystems.com>
+	<CAJ+F1CLyBwaCrL=HwDJLRc3BsRX1hDQKdfv44ZFsPVjf4UoFWw@mail.gmail.com>
+	<9CD33C23-31A4-408C-883C-FD9160CB4A9D@skyportsystems.com>
+	<CAJ+F1C+mNEFi235OKq6oVASFKZUyY0Z0SWvmbBpaiqp7QqthGA@mail.gmail.com>
+	<F46E145D-006E-40EB-9871-D53E6F686D4F@skyportsystems.com>
+In-Reply-To: <F46E145D-006E-40EB-9871-D53E6F686D4F@skyportsystems.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 12 Apr 2017 21:17:12 +0000
+Message-ID: <CAJ+F1CK1ob6raJNQSAv-kDHKjS_g3=ohgXPsYKmYtwfiikLxtA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 02/15] docs: VM Generation ID device
+ description
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,234 +37,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Ben Warren <ben@skyportsystems.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Gal Hammer <ghammer@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On Wed, Mar 22, 2017 at 02:32:35PM +0100, Igor Mammedov wrote:
-> Introduce machine_set_cpu_numa_node() helper that stores
-> node mapping for CPU in MachineState::possible_cpus.
-> CPU and node it belongs to is specified by 'props' argument.
-> 
-> Patch doesn't remove old way of storing mapping in
-> numa_info[X].node_cpu as removing it at the same time
-> makes patch rather big. Instead it just mirrors mapping
-> in possible_cpus and follow up per target patches will
-> switch to possible_cpus and numa_info[X].node_cpu will
-> be removed once there isn't any users left.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Hi
 
-So, this patch is the one that makes "-numa" and "-numa cpu"
-affect query-hotpluggable-cpus output.
+On Thu, Apr 13, 2017 at 1:03 AM Ben Warren <ben@skyportsystems.com> wrote:
 
-Before this patch:
+> On Apr 12, 2017, at 1:47 PM, Marc-Andr=C3=A9 Lureau <marcandre.lureau@gma=
+il.com>
+> wrote:
+>
+> Hi
+>
+> On Thu, Apr 13, 2017 at 12:25 AM Ben Warren <ben@skyportsystems.com>
+> wrote:
+>
+> On Apr 12, 2017, at 1:22 PM, Marc-Andr=C3=A9 Lureau <marcandre.lureau@gma=
+il.com>
+> wrote:
+>
+> Hi
+>
+> On Thu, Apr 13, 2017 at 12:17 AM Ben Warren <ben@skyportsystems.com>
+> wrote:
+>
+> On Apr 12, 2017, at 1:06 PM, Marc-Andr=C3=A9 Lureau <marcandre.lureau@gma=
+il.com>
+> wrote:
+>
+> +Device Usage:
+> +-------------
+> +
+> +The device has one property, which may be only be set using the command
+> line:
+> +
+> +  guid - sets the value of the GUID.  A special value "auto" instructs
+> +         QEMU to generate a new random GUID.
+> +
+> +For example:
+> +
+> +  QEMU  -device vmgenid,guid=3D"324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
+> +  QEMU  -device vmgenid,guid=3Dauto
+>
+>
+> The default will keep uuid to null, should it be documented? Wouldn't it
+> make sense to default to auto?
+>
+> There is no default - you have to supply a value. It=E2=80=99s up to what=
+ever
+> software is managing VM lifecycle to decide what value to pass in.  Alway=
+s
+> setting to =E2=80=98auto=E2=80=99 will cause a lot of churn within Window=
+s that may or may
+> not be acceptable to your use case.
+>
+>
+> Why would you have a vmgenid device if it's always null? Does that please
+> some windows use-cases as well?
+>
+>
+> I don=E2=80=99t get what you mean by this.  What device is always null?  =
+Either
+> the device is instantiated or it isn=E2=80=99t.  If not there, Windows wi=
+ll not
+> find a device and I don=E2=80=99t know how derived objects (Invocation ID=
+, etc.)
+> are handled.
+>
+>
+> If you start a VM without specifying guid argument, you'll always have a
+> genid null uuid, event after a migration (this could have been handled by
+> qemu without requiring management layer, no?). I don't understand why aut=
+o
+> would create more churn than what the management layer would do by settin=
+g
+> new uuid for each VM started. Could you explain?
+>
+> Looks like there=E2=80=99s a bug.  GUID should be a mandatory parameter.
+>
 
-  $ qemu-system-x86_64 -smp 2 -m 2G -numa node -numa node -numa node -numa node
-  [run qmp-shell]
-  (QEMU) query-hotpluggable-cpus
-  {
-      "return": [
-          {
-              "qom-path": "/machine/unattached/device[2]",
-              "type": "qemu64-x86_64-cpu",
-              "vcpus-count": 1,
-              "props": {
-                  "socket-id": 1,
-                  "core-id": 0,
-                  "thread-id": 0
-              }
-          },
-          {
-              "qom-path": "/machine/unattached/device[0]",
-              "type": "qemu64-x86_64-cpu",
-              "vcpus-count": 1,
-              "props": {
-                  "socket-id": 0,
-                  "core-id": 0,
-                  "thread-id": 0
-              }
-          }
-      ]
-  }
+Not necessarily a bug, if the guid can be changed when starting a "new" VM,
+which I think should work.
 
-
-After this patch:
-
-  $ qemu-system-x86_64 -smp 2 -m 2G -numa node -numa node -numa node -numa node
-  [run qmp-shell]
-  (QEMU) query-hotpluggable-cpus
-  {
-      "return": [
-          {
-              "qom-path": "/machine/unattached/device[2]",
-              "type": "qemu64-x86_64-cpu",
-              "vcpus-count": 1,
-              "props": {
-                  "socket-id": 1,
-                  "node-id": 1,
-                  "core-id": 0,
-                  "thread-id": 0
-              }
-          },
-          {
-              "qom-path": "/machine/unattached/device[0]",
-              "type": "qemu64-x86_64-cpu",
-              "vcpus-count": 1,
-              "props": {
-                  "socket-id": 0,
-                  "node-id": 0,
-                  "core-id": 0,
-                  "thread-id": 0
-              }
-          }
-      ]
-  }
-
-
-As noted in another message, I am not sure we really should make
-"-numa" affect query-hotpluggable-cpus output unconditionally (I
-believe we shouldn't). But we do, we need to document this very
-clearly.
+However, I didn't manage to get your driver noticing the acpi event. I
+tried to migrate/save & restore, and no vmgenid_notify kernel messages came
+out, nor notices got incremented. How did you test it?
 
 
-> ---
->  include/hw/boards.h |  2 ++
->  hw/core/machine.c   | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  numa.c              |  8 +++++++
->  3 files changed, 78 insertions(+)
-> 
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index 1dd0fde..40f30f1 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -42,6 +42,8 @@ bool machine_dump_guest_core(MachineState *machine);
->  bool machine_mem_merge(MachineState *machine);
->  void machine_register_compat_props(MachineState *machine);
->  HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine);
-> +void machine_set_cpu_numa_node(MachineState *machine,
-> +                               CpuInstanceProperties *props, Error **errp);
->  
->  /**
->   * CPUArchId:
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 0d92672..6ff0b45 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -388,6 +388,74 @@ HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine)
->      return head;
->  }
->  
-> +void machine_set_cpu_numa_node(MachineState *machine,
-> +                               CpuInstanceProperties *props, Error **errp)
-> +{
-> +    MachineClass *mc = MACHINE_GET_CLASS(machine);
-> +    bool match = false;
-> +    int i;
-> +
-> +    if (!mc->possible_cpu_arch_ids) {
-> +        error_setg(errp, "mapping of CPUs to NUMA node is not supported");
-> +        return;
-> +    }
-> +
-> +    /* force board to initialize possible_cpus if it hasn't been done yet */
-> +    mc->possible_cpu_arch_ids(machine);
-> +
-> +    for (i = 0; i < machine->possible_cpus->len; i++) {
-> +        CPUArchId *slot = &machine->possible_cpus->cpus[i];
-> +
-> +        /* reject unsupported by board properties */
-> +        if (props->has_thread_id && !slot->props.has_thread_id) {
-> +            error_setg(errp, "thread-id is not supported");
-> +            return;
-> +        }
-> +
-> +        if (props->has_core_id && !slot->props.has_core_id) {
-> +            error_setg(errp, "core-id is not supported");
-> +            return;
-> +        }
-> +
-> +        if (props->has_socket_id && !slot->props.has_socket_id) {
-> +            error_setg(errp, "socket-id is not supported");
-> +            return;
-> +        }
-> +
-> +        /* skip slots with explicit mismatch */
-> +        if (props->has_thread_id && props->thread_id != slot->props.thread_id) {
-> +                continue;
-> +        }
-> +
-> +        if (props->has_core_id && props->core_id != slot->props.core_id) {
-> +                continue;
-> +        }
-> +
-> +        if (props->has_socket_id && props->socket_id != slot->props.socket_id) {
-> +                continue;
-> +        }
-> +
-> +        /* reject assignment if slot is already assigned, for compatibility
-> +         * of legacy cpu_index mapping with SPAPR core based mapping do not
-> +         * error out if cpu thread and matched core have the same node-id */
-> +        if (slot->props.has_node_id &&
-> +            slot->props.node_id != props->node_id) {
-> +            error_setg(errp, "CPU is already assigned to node-id: %" PRId64,
-> +                       slot->props.node_id);
-> +            return;
-> +        }
-> +
-> +        /* assign slot to node as it's matched '-numa cpu' key */
-> +        match = true;
-> +        slot->props.node_id = props->node_id;
-> +        slot->props.has_node_id = props->has_node_id;
-> +    }
-> +
-> +    if (!match) {
-> +        error_setg(errp, "no match found");
-> +    }
-> +}
-> +
->  static void machine_class_init(ObjectClass *oc, void *data)
->  {
->      MachineClass *mc = MACHINE_CLASS(oc);
-> diff --git a/numa.c b/numa.c
-> index 24c596d..44057f1 100644
-> --- a/numa.c
-> +++ b/numa.c
-> @@ -169,6 +169,7 @@ static void numa_node_parse(MachineState *ms, NumaNodeOptions *node,
->          exit(1);
->      }
->      for (cpus = node->cpus; cpus; cpus = cpus->next) {
-> +        CpuInstanceProperties props;
->          if (cpus->value >= max_cpus) {
->              error_setg(errp,
->                         "CPU index (%" PRIu16 ")"
-> @@ -177,6 +178,10 @@ static void numa_node_parse(MachineState *ms, NumaNodeOptions *node,
->              return;
->          }
->          bitmap_set(numa_info[nodenr].node_cpu, cpus->value, 1);
-> +        props = mc->cpu_index_to_instance_props(ms, cpus->value);
-> +        props.node_id = nodenr;
-> +        props.has_node_id = true;
-> +        machine_set_cpu_numa_node(ms, &props, &error_fatal);
->      }
->  
->      if (node->has_mem && node->has_memdev) {
-> @@ -393,9 +398,12 @@ void parse_numa_opts(MachineState *ms)
->          if (i == nb_numa_nodes) {
->              for (i = 0; i < max_cpus; i++) {
->                  CpuInstanceProperties props;
-> +                /* fetch default mapping from board and enable it */
->                  props = mc->cpu_index_to_instance_props(ms, i);
-> +                props.has_node_id = true;
->  
->                  set_bit(i, numa_info[props.node_id].node_cpu);
-> +                machine_set_cpu_numa_node(ms, &props, &error_fatal);
->              }
->          }
->  
-> -- 
-> 2.7.4
-> 
-> 
+> As for the churn, I=E2=80=99ll give you one example.  If an Active Direct=
+ory
+> Domain Controller (ADDC) detects a change in VM Generation ID, it takes
+> this to mean that the VM has been rolled back in time, and so its
+> replication sequence numbers are =E2=80=9Cdirty=E2=80=9D.  This has the e=
+ffect of causing
+> the Domain controller to perform a full =E2=80=9Cpull replication=E2=80=
+=9D with other
+> ADDCs.  In large deployments this can be costly.  VM Generation ID is use=
+d
+> by other applications besides AD.
+>
+>
 
--- 
-Eduardo
+I start to understand better the use case and how the device should be used=
+.
+
+thanks again
+
+>
+>
+>
+> +The property may be queried via QMP/HMP:
+> +
+> +  (QEMU) query-vm-generation-id
+> +  {"return": {"guid": "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"}}
+> +
+> +Setting of this parameter is intentionally left out from the QMP/HMP
+> +interfaces.  There are no known use cases for changing the GUID once QEM=
+U
+> is
+> +running, and adding this capability would greatly increase the complexit=
+y.
+>
+>
+> Is this supposed to be not permitted?
+>
+> { "execute": "qom-set", "arguments": { "path":
+> "/machine/peripheral-anon/device[1]", "property": "guid", "value": "auto"=
+ }
+> }
+>
+> Is there any linux kernel support being worked on?
+>
+> This isn=E2=80=99t really relevant to the Linux kernel, at least in any w=
+ay I can
+> think of.  What did you have in mind?
+>
+>
+> Testing, but apparently we do have RFE for RHEL as Laszlo pointed out.
+>
+> OK, so you mean a guest driver.  I do have one that needs work to go
+> upstream, but has been helpful to me in testing.
+> https://github.com/ben-skyportsystems/vmgenid-test
+>
+>
+> Thanks, that's exactly what I was looking for :)
+>
+>
+> Good.  I wish I had the time to integrate this upstream, but it=E2=80=99s=
+ one of
+> those things that is good enough, and so will have to wait for another ti=
+me.
+>
+> --
+> Marc-Andr=C3=A9 Lureau
+>
+> --
+Marc-Andr=C3=A9 Lureau
