@@ -1,32 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60745)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1cyOpp-0007b5-OE
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 16:25:51 -0400
+	(envelope-from <jcody@redhat.com>) id 1cyPAE-0004s2-9v
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 16:46:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1cyOpl-0003O6-MR
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 16:25:49 -0400
-Received: from mail-pg0-x22f.google.com ([2607:f8b0:400e:c05::22f]:36461)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
-	id 1cyOpl-0003Nr-Dw
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 16:25:45 -0400
-Received: by mail-pg0-x22f.google.com with SMTP id g2so19750491pge.3
-	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 13:25:45 -0700 (PDT)
-From: Ben Warren <ben@skyportsystems.com>
-Message-Id: <9CD33C23-31A4-408C-883C-FD9160CB4A9D@skyportsystems.com>
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Date: Wed, 12 Apr 2017 13:25:42 -0700
-In-Reply-To: <CAJ+F1CLyBwaCrL=HwDJLRc3BsRX1hDQKdfv44ZFsPVjf4UoFWw@mail.gmail.com>
-References: <1488435591-17882-1-git-send-email-mst@redhat.com>
-	<1488435591-17882-3-git-send-email-mst@redhat.com>
-	<CAJ+F1C+kLB5VCsSakbd6+CKx4uNbxZNqd+vNMAWte4yKqcbw9Q@mail.gmail.com>
-	<FFF7A2B4-A481-455B-8692-9F4486EB84BD@skyportsystems.com>
-	<CAJ+F1CLyBwaCrL=HwDJLRc3BsRX1hDQKdfv44ZFsPVjf4UoFWw@mail.gmail.com>
-Content-Type: text/plain;
-	charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 02/15] docs: VM Generation ID device
- description
+	(envelope-from <jcody@redhat.com>) id 1cyPAD-0001p4-5B
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 16:46:54 -0400
+Date: Wed, 12 Apr 2017 16:46:41 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170412204641.GA15762@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] Regression from 2.8: stuck in bdrv_drain()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,81 +20,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Gal Hammer <ghammer@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, jsnow@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, stefanha@redhat.com, pbonzini@redhat.com
 
 
-> On Apr 12, 2017, at 1:22 PM, Marc-Andr=C3=A9 Lureau =
-<marcandre.lureau@gmail.com> wrote:
->=20
-> Hi
->=20
-> On Thu, Apr 13, 2017 at 12:17 AM Ben Warren <ben@skyportsystems.com =
-<mailto:ben@skyportsystems.com>> wrote:
->> On Apr 12, 2017, at 1:06 PM, Marc-Andr=C3=A9 Lureau =
-<marcandre.lureau@gmail.com <mailto:marcandre.lureau@gmail.com>> wrote:
->>=20
->> +Device Usage:
->> +-------------
->> +
->> +The device has one property, which may be only be set using the =
-command line:
->> +
->> +  guid - sets the value of the GUID.  A special value "auto" =
-instructs
->> +         QEMU to generate a new random GUID.
->> +
->> +For example:
->> +
->> +  QEMU  -device vmgenid,guid=3D"324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
->> +  QEMU  -device vmgenid,guid=3Dauto
->>=20
->> The default will keep uuid to null, should it be documented? Wouldn't =
-it make sense to default to auto?
->=20
-> There is no default - you have to supply a value. It=E2=80=99s up to =
-whatever software is managing VM lifecycle to decide what value to pass =
-in.  Always setting to =E2=80=98auto=E2=80=99 will cause a lot of churn =
-within Windows that may or may not be acceptable to your use case.
->=20
->=20
-> Why would you have a vmgenid device if it's always null? Does that =
-please some windows use-cases as well?=20
-> =20
-I don=E2=80=99t get what you mean by this.  What device is always null?  =
-Either the device is instantiated or it isn=E2=80=99t.  If not there, =
-Windows will not find a device and I don=E2=80=99t know how derived =
-objects (Invocation ID, etc.) are handled.
->> =20
->> +The property may be queried via QMP/HMP:
->> +
->> +  (QEMU) query-vm-generation-id
->> +  {"return": {"guid": "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"}}
->> +
->> +Setting of this parameter is intentionally left out from the QMP/HMP
->> +interfaces.  There are no known use cases for changing the GUID once =
-QEMU is
->> +running, and adding this capability would greatly increase the =
-complexity.
->> =20
->> Is this supposed to be not permitted?
->>=20
->> { "execute": "qom-set", "arguments": { "path": =
-"/machine/peripheral-anon/device[1]", "property": "guid", "value": =
-"auto" } }
->>=20
->> Is there any linux kernel support being worked on?
->=20
-> This isn=E2=80=99t really relevant to the Linux kernel, at least in =
-any way I can think of.  What did you have in mind?
->=20
-> Testing, but apparently we do have RFE for RHEL as Laszlo pointed out.
-OK, so you mean a guest driver.  I do have one that needs work to go =
-upstream, but has been helpful to me in testing.
-https://github.com/ben-skyportsystems/vmgenid-test =
-<https://github.com/ben-skyportsystems/vmgenid-test>
+This occurs on v2.9.0-rc4, but not on v2.8.0.
 
->=20
-> Thanks
-> --=20
-> Marc-Andr=C3=A9 Lureau
+When running QEMU with an iothread, and then performing a block-mirror, if
+we do a system-reset after the BLOCK_JOB_READY event has emitted, qemu
+becomes deadlocked.
+
+The block job is not paused, nor cancelled, so we are stuck in the while
+loop in block_job_detach_aio_context:
+
+static void block_job_detach_aio_context(void *opaque)
+{
+    BlockJob *job = opaque;
+
+    /* In case the job terminates during aio_poll()... */
+    block_job_ref(job);
+
+    block_job_pause(job);
+
+    while (!job->paused && !job->completed) {
+        block_job_drain(job);
+    }
+
+    block_job_unref(job);
+}
+
+
+Reproducer script and QAPI commands:
+
+# QEMU script:
+gdb --args /home/user/deploy-${1}/bin/qemu-system-x86_64 -enable-kvm -smp 4 -object iothread,id=iothread0 -drive file=${2},if=none,id=drive-virtio-disk0,aio=native,cache=none,discard=unmap  -device virtio-blk-pci,scsi=off,bus=pci.0,drive=drive-virtio-disk0,id=virtio-disk0,iothread=iothread0 -m 1024 -boot menu=on -qmp stdio -drive file=${3},if=none,id=drive-data-disk0,format=qcow2,cache=none,aio=native,werror=stop,rerror=stop -device virtio-blk-pci,drive=drive-data-disk0,id=data-disk0,iothread=iothread0,bus=pci.0,addr=0x7 
+
+
+# QAPI commands:
+{ "execute": "drive-mirror", "arguments": { "device": "drive-data-disk0", "target": "/home/user/sn1", "format": "qcow2", "mode": "absolute-paths", "sync": "full", "speed": 1000000000, "on-source-error": "stop", "on-target-error": "stop" } }
+
+
+# after BLOCK_JOB_READY, do system reset
+{ "execute": "system_reset" }
+
+
+
+
+
+gbd bt:
+
+(gdb) bt
+#0  0x0000555555aa79f3 in bdrv_drain_recurse (bs=bs@entry=0x55555783e900) at block/io.c:164
+#1  0x0000555555aa825d in bdrv_drained_begin (bs=bs@entry=0x55555783e900) at block/io.c:231
+#2  0x0000555555aa8449 in bdrv_drain (bs=0x55555783e900) at block/io.c:265
+#3  0x0000555555a9c356 in blk_drain (blk=<optimized out>) at block/block-backend.c:1383
+#4  0x0000555555aa3cfd in mirror_drain (job=<optimized out>) at block/mirror.c:1000
+#5  0x0000555555a66e11 in block_job_detach_aio_context (opaque=0x555557a19a40) at blockjob.c:142
+#6  0x0000555555a62f4d in bdrv_detach_aio_context (bs=bs@entry=0x555557839410) at block.c:4357
+#7  0x0000555555a63116 in bdrv_set_aio_context (bs=bs@entry=0x555557839410, new_context=new_context@entry=0x55555668bc20) at block.c:4418
+#8  0x0000555555a9d326 in blk_set_aio_context (blk=0x5555566db520, new_context=0x55555668bc20) at block/block-backend.c:1662
+#9  0x00005555557e38da in virtio_blk_data_plane_stop (vdev=<optimized out>) at /home/jcody/work/upstream/qemu-kvm/hw/block/dataplane/virtio-blk.c:262
+#10 0x00005555559f9d5f in virtio_bus_stop_ioeventfd (bus=bus@entry=0x5555583089a8) at hw/virtio/virtio-bus.c:246
+#11 0x00005555559fa49b in virtio_bus_stop_ioeventfd (bus=bus@entry=0x5555583089a8) at hw/virtio/virtio-bus.c:238
+#12 0x00005555559f6a18 in virtio_pci_stop_ioeventfd (proxy=0x555558300510) at hw/virtio/virtio-pci.c:348
+#13 0x00005555559f6a18 in virtio_pci_reset (qdev=<optimized out>) at hw/virtio/virtio-pci.c:1872
+#14 0x00005555559139a9 in qdev_reset_one (dev=<optimized out>, opaque=<optimized out>) at hw/core/qdev.c:310
+#15 0x0000555555916738 in qbus_walk_children (bus=0x55555693aa30, pre_devfn=0x0, pre_busfn=0x0, post_devfn=0x5555559139a0 <qdev_reset_one>, post_busfn=0x5555559120f0 <qbus_reset_one>, opaque=0x0) at hw/core/bus.c:59
+#16 0x0000555555913318 in qdev_walk_children (dev=0x5555569387d0, pre_devfn=0x0, pre_busfn=0x0, post_devfn=0x5555559139a0 <qdev_reset_one>, post_busfn=0x5555559120f0 <qbus_reset_one>, opaque=0x0) at hw/core/qdev.c:617
+#17 0x0000555555916738 in qbus_walk_children (bus=0x555556756f70, pre_devfn=0x0, pre_busfn=0x0, post_devfn=0x5555559139a0 <qdev_reset_one>, post_busfn=0x5555559120f0 <qbus_reset_one>, opaque=0x0) at hw/core/bus.c:59
+#18 0x00005555559168ca in qemu_devices_reset () at hw/core/reset.c:69
+#19 0x000055555581fcbb in pc_machine_reset () at /home/jcody/work/upstream/qemu-kvm/hw/i386/pc.c:2234
+#20 0x00005555558a4d96 in qemu_system_reset (report=<optimized out>) at vl.c:1697
+#21 0x000055555577157a in main_loop_should_exit () at vl.c:1865
+#22 0x000055555577157a in main_loop () at vl.c:1902
+#23 0x000055555577157a in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:4709
+
+
+-Jeff
