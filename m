@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1cyUbH-0004it-1V
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 22:35:12 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1cyV4r-0007Cb-KQ
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 23:05:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1cyUbD-0002BF-TN
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 22:35:11 -0400
-From: jemmy858585@gmail.com
-Date: Thu, 13 Apr 2017 10:34:28 +0800
-Message-Id: <1492050868-16200-1-git-send-email-lidongchen@tencent.com>
-Subject: [Qemu-devel] [PATCH v6] migration/block: use blk_pwrite_zeroes for
- each zero cluster
+	(envelope-from <rkagan@virtuozzo.com>) id 1cyV4m-0003yu-KK
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 23:05:45 -0400
+Received: from mail-db5eur01on0110.outbound.protection.outlook.com
+	([104.47.2.110]:45413
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1cyV4m-0003yX-0m
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 23:05:40 -0400
+Date: Wed, 12 Apr 2017 19:30:56 +0300
+From: Roman Kagan <rkagan@virtuozzo.com>
+Message-ID: <20170412163055.GB4915@rkaganb.sw.ru>
+References: <8a7bf9dbac4c6db5b7e8dd5c968cacae@ispras.ru>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <8a7bf9dbac4c6db5b7e8dd5c968cacae@ispras.ru>
+Subject: Re: [Qemu-devel] WinDbg module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,86 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, famz@redhat.com, quintela@redhat.com, dgilbert@redhat.com, qemu-block@nongnu.org, Lidong Chen <lidongchen@tencent.com>
+To: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+Cc: qemu-devel@nongnu.org, sw@weilnetz.de, Pavel Dovgalyuk <dovgaluk@ispras.ru>, pbonzini@redhat.com
 
-From: Lidong Chen <lidongchen@tencent.com>
+On Wed, Apr 12, 2017 at 05:05:45PM +0300, Mihail Abakumov wrote:
+> Hello.
+> 
+> We made the debugger module WinDbg (like GDB) for QEMU. This is the
+> replacement of the remote stub in Windows kernel. Used for remote Windows
+> kernel debugging without debugging mode.
+> 
+> The latest build and instructions for the launch can be found here:
+> https://github.com/ispras/qemu/releases/tag/v2.7.50-windbg
+> 
+> Currently only one ways to create a remote debugging connection is
+> supported: using COM port with named pipe.
+> 
+> Should I prepare patches for inclusion in the master branch? Or is it too
+> specific module and it is not needed?
 
-BLOCK_SIZE is (1 << 20), qcow2 cluster size is 65536 by default,
-this may cause the qcow2 file size to be bigger after migration.
-This patch checks each cluster, using blk_pwrite_zeroes for each
-zero cluster.
+Please do!
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Lidong Chen <lidongchen@tencent.com>
----
-v6 changelog:
-Fix up some grammar in the comment.
----
- migration/block.c | 35 +++++++++++++++++++++++++++++++++--
- 1 file changed, 33 insertions(+), 2 deletions(-)
+Every once in a while dealing with a Windows guest problem I wished I
+had this.  We at Virtuozzo looked into doing something like this but
+never got around to.
 
-diff --git a/migration/block.c b/migration/block.c
-index 7734ff7..41c7a55 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -885,6 +885,8 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
-     int64_t total_sectors = 0;
-     int nr_sectors;
-     int ret;
-+    BlockDriverInfo bdi;
-+    int cluster_size;
- 
-     do {
-         addr = qemu_get_be64(f);
-@@ -919,6 +921,15 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
-                     error_report_err(local_err);
-                     return -EINVAL;
-                 }
-+
-+                ret = bdrv_get_info(blk_bs(blk), &bdi);
-+                if (ret == 0 && bdi.cluster_size > 0 &&
-+                    bdi.cluster_size <= BLOCK_SIZE &&
-+                    BLOCK_SIZE % bdi.cluster_size == 0) {
-+                    cluster_size = bdi.cluster_size;
-+                } else {
-+                    cluster_size = BLOCK_SIZE;
-+                }
-             }
- 
-             if (total_sectors - addr < BDRV_SECTORS_PER_DIRTY_CHUNK) {
-@@ -932,10 +943,30 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
-                                         nr_sectors * BDRV_SECTOR_SIZE,
-                                         BDRV_REQ_MAY_UNMAP);
-             } else {
-+                int i;
-+                int64_t cur_addr;
-+                uint8_t *cur_buf;
-+
-                 buf = g_malloc(BLOCK_SIZE);
-                 qemu_get_buffer(f, buf, BLOCK_SIZE);
--                ret = blk_pwrite(blk, addr * BDRV_SECTOR_SIZE, buf,
--                                 nr_sectors * BDRV_SECTOR_SIZE, 0);
-+                for (i = 0; i < BLOCK_SIZE / cluster_size; i++) {
-+                    cur_addr = addr * BDRV_SECTOR_SIZE + i * cluster_size;
-+                    cur_buf = buf + i * cluster_size;
-+
-+                    if ((!block_mig_state.zero_blocks ||
-+                        cluster_size < BLOCK_SIZE) &&
-+                        buffer_is_zero(cur_buf, cluster_size)) {
-+                        ret = blk_pwrite_zeroes(blk, cur_addr,
-+                                                cluster_size,
-+                                                BDRV_REQ_MAY_UNMAP);
-+                    } else {
-+                        ret = blk_pwrite(blk, cur_addr, cur_buf,
-+                                         cluster_size, 0);
-+                    }
-+                    if (ret < 0) {
-+                        break;
-+                    }
-+                }
-                 g_free(buf);
-             }
- 
--- 
-1.8.3.1
+Thanks,
+Roman.
