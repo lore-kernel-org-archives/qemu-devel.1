@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cyMPR-0004BC-T6
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 13:50:27 -0400
+	(envelope-from <eblake@redhat.com>) id 1cyMPT-0004CV-6f
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 13:50:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cyMPQ-0007Tt-Tr
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 13:50:25 -0400
+	(envelope-from <eblake@redhat.com>) id 1cyMPS-0007Uz-6o
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 13:50:27 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed, 12 Apr 2017 12:49:18 -0500
-Message-Id: <20170412174920.8744-11-eblake@redhat.com>
+Date: Wed, 12 Apr 2017 12:49:19 -0500
+Message-Id: <20170412174920.8744-12-eblake@redhat.com>
 In-Reply-To: <20170412174920.8744-1-eblake@redhat.com>
 References: <20170412174920.8744-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH 10/12] mirror: Switch mirror_dirty_init() to
- byte-based iteration
+Subject: [Qemu-devel] [PATCH 11/12] dirty-bitmap: Switch bdrv_set_dirty() to
+ bytes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,102 +21,90 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Now that we have adjusted the majority of the calls this function
-makes to be byte-based, it is easier to read the code if it makes
-passes over the image using bytes rather than sectors.
+Both callers already had bytes available, but were scaling to
+sectors.  Move the scaling to internal code.  In the case of
+bdrv_aligned_pwritev(), we are now passing the exact offset
+rather than a rounded sector-aligned value, but that's okay
+as long as dirty bitmap widens start/bytes to granularity
+boundaries.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- block/mirror.c | 35 ++++++++++++++---------------------
- 1 file changed, 14 insertions(+), 21 deletions(-)
+ include/block/block_int.h | 2 +-
+ block/dirty-bitmap.c      | 8 +++++---
+ block/io.c                | 6 ++----
+ 3 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/block/mirror.c b/block/mirror.c
-index 21b4f5d..846e392 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -601,15 +601,13 @@ static void mirror_throttle(MirrorBlockJob *s)
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 08063c1..0b737fd 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -917,7 +917,7 @@ void blk_dev_eject_request(BlockBackend *blk, bool force);
+ bool blk_dev_is_tray_open(BlockBackend *blk);
+ bool blk_dev_is_medium_locked(BlockBackend *blk);
 
- static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
- {
--    int64_t sector_num, end;
-+    int64_t offset;
-     BlockDriverState *base = s->base;
-     BlockDriverState *bs = s->source;
-     BlockDriverState *target_bs = blk_bs(s->target);
--    int ret, n;
-+    int ret;
-     int64_t count;
+-void bdrv_set_dirty(BlockDriverState *bs, int64_t cur_sector, int64_t nr_sect);
++void bdrv_set_dirty(BlockDriverState *bs, int64_t offset, int64_t bytes);
+ bool bdrv_requests_pending(BlockDriverState *bs);
 
--    end = s->bdev_length / BDRV_SECTOR_SIZE;
--
-     if (base == NULL && !bdrv_has_zero_init(target_bs)) {
-         if (!bdrv_can_write_zeroes_with_unmap(target_bs)) {
-             bdrv_set_dirty_bitmap(s->dirty_bitmap, 0, s->bdev_length);
-@@ -617,9 +615,9 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
-         }
-
-         s->initial_zeroing_ongoing = true;
--        for (sector_num = 0; sector_num < end; ) {
--            int nb_sectors = MIN(end - sector_num,
--                QEMU_ALIGN_DOWN(INT_MAX, s->granularity) >> BDRV_SECTOR_BITS);
-+        for (offset = 0; offset < s->bdev_length; ) {
-+            int bytes = MIN(s->bdev_length - offset,
-+                            QEMU_ALIGN_DOWN(INT_MAX, s->granularity));
-
-             mirror_throttle(s);
-
-@@ -635,9 +633,8 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
-                 continue;
-             }
-
--            mirror_do_zero_or_discard(s, sector_num * BDRV_SECTOR_SIZE,
--                                      nb_sectors * BDRV_SECTOR_SIZE, false);
--            sector_num += nb_sectors;
-+            mirror_do_zero_or_discard(s, offset, bytes, false);
-+            offset += bytes;
-         }
-
-         mirror_wait_for_all_io(s);
-@@ -645,10 +642,10 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
-     }
-
-     /* First part, loop on the sectors and initialize the dirty bitmap.  */
--    for (sector_num = 0; sector_num < end; ) {
-+    for (offset = 0; offset < s->bdev_length; ) {
-         /* Just to make sure we are not exceeding int limit. */
--        int nb_sectors = MIN(INT_MAX >> BDRV_SECTOR_BITS,
--                             end - sector_num);
-+        int bytes = MIN(s->bdev_length - offset,
-+                        QEMU_ALIGN_DOWN(INT_MAX, s->granularity));
-
-         mirror_throttle(s);
-
-@@ -656,20 +653,16 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
-             return 0;
-         }
-
--        ret = bdrv_is_allocated_above(bs, base, sector_num * BDRV_SECTOR_SIZE,
--                                      nb_sectors * BDRV_SECTOR_SIZE, &count);
-+        ret = bdrv_is_allocated_above(bs, base, offset, bytes, &count);
-         if (ret < 0) {
-             return ret;
-         }
-
--        n = DIV_ROUND_UP(count, BDRV_SECTOR_SIZE);
--        assert(n > 0);
-+        count = QEMU_ALIGN_UP(count, BDRV_SECTOR_SIZE);
-         if (ret == 1) {
--            bdrv_set_dirty_bitmap(s->dirty_bitmap,
--                                  sector_num * BDRV_SECTOR_SIZE,
--                                  n * BDRV_SECTOR_SIZE);
-+            bdrv_set_dirty_bitmap(s->dirty_bitmap, offset, count);
-         }
--        sector_num += n;
-+        offset += count;
-     }
-     return 0;
+ void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out);
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 8e7822c..ef165eb 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -478,15 +478,17 @@ void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap)
+     hbitmap_deserialize_finish(bitmap->bitmap);
  }
+
+-void bdrv_set_dirty(BlockDriverState *bs, int64_t cur_sector,
+-                    int64_t nr_sectors)
++void bdrv_set_dirty(BlockDriverState *bs, int64_t offset, int64_t bytes)
+ {
+     BdrvDirtyBitmap *bitmap;
++    int64_t end_sector = DIV_ROUND_UP(offset + bytes, BDRV_SECTOR_SIZE);
++
+     QLIST_FOREACH(bitmap, &bs->dirty_bitmaps, list) {
+         if (!bdrv_dirty_bitmap_enabled(bitmap)) {
+             continue;
+         }
+-        hbitmap_set(bitmap->bitmap, cur_sector, nr_sectors);
++        hbitmap_set(bitmap->bitmap, offset >> BDRV_SECTOR_BITS,
++                    end_sector - (offset >> BDRV_SECTOR_BITS));
+     }
+ }
+
+diff --git a/block/io.c b/block/io.c
+index 9218329..d22d35f 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1328,7 +1328,6 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
+     bool waited;
+     int ret;
+
+-    int64_t start_sector = offset >> BDRV_SECTOR_BITS;
+     int64_t end_sector = DIV_ROUND_UP(offset + bytes, BDRV_SECTOR_SIZE);
+     uint64_t bytes_remaining = bytes;
+     int max_transfer;
+@@ -1407,7 +1406,7 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
+     bdrv_debug_event(bs, BLKDBG_PWRITEV_DONE);
+
+     ++bs->write_gen;
+-    bdrv_set_dirty(bs, start_sector, end_sector - start_sector);
++    bdrv_set_dirty(bs, offset, bytes);
+
+     if (bs->wr_highest_offset < offset + bytes) {
+         bs->wr_highest_offset = offset + bytes;
+@@ -2535,8 +2534,7 @@ int coroutine_fn bdrv_co_pdiscard(BlockDriverState *bs, int64_t offset,
+     ret = 0;
+ out:
+     ++bs->write_gen;
+-    bdrv_set_dirty(bs, req.offset >> BDRV_SECTOR_BITS,
+-                   req.bytes >> BDRV_SECTOR_BITS);
++    bdrv_set_dirty(bs, req.offset, req.bytes);
+     tracked_request_end(&req);
+     bdrv_dec_in_flight(bs);
+     return ret;
 -- 
 2.9.3
