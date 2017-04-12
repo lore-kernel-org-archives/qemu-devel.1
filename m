@@ -1,41 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cyE1a-0003mx-Jo
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 04:53:15 -0400
+	(envelope-from <jasowang@redhat.com>) id 1cyE30-0004ZQ-Tn
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 04:54:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cyE1X-0008Nl-CV
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 04:53:14 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38521)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1cyE1X-0008Mv-3a
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 04:53:11 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3C8n4Gl091703
-	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 04:53:10 -0400
-Received: from e28smtp04.in.ibm.com (e28smtp04.in.ibm.com [125.16.236.4])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29s91jhhcp-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 04:53:09 -0400
-Received: from localhost
-	by e28smtp04.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Wed, 12 Apr 2017 14:23:06 +0530
-Date: Wed, 12 Apr 2017 14:23:00 +0530
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Reply-To: bharata@linux.vnet.ibm.com
-References: <1491984907-9894-1-git-send-email-bharata@linux.vnet.ibm.com>
-	<9e992fd5-8f42-5ec6-2a77-f6d9ce088226@kaod.org>
+	(envelope-from <jasowang@redhat.com>) id 1cyE2x-0000vD-Qy
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 04:54:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:27874)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cyE2x-0000uV-Kb
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 04:54:39 -0400
+References: <20170411101002.28451-1-maxime.coquelin@redhat.com>
+	<20170411101002.28451-3-maxime.coquelin@redhat.com>
+	<20170411132046.GA16464@pxdev.xzpeter.org>
+	<ed46bbd8-222b-3cda-e524-f9dfda8e3770@redhat.com>
+	<20170412071708.GE16464@pxdev.xzpeter.org>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <131237e3-d6e3-804e-5bf4-ce2c281e140f@redhat.com>
+Date: Wed, 12 Apr 2017 16:54:25 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <9e992fd5-8f42-5ec6-2a77-f6d9ce088226@kaod.org>
-Message-Id: <20170412085300.GB1429@in.ibm.com>
+In-Reply-To: <20170412071708.GE16464@pxdev.xzpeter.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] spapr-cpu-core: Release ICPState object
- during CPU unrealization
+Subject: Re: [Qemu-devel] [RFC 2/2] spec/vhost-user spec: Add IOMMU support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,26 +30,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: Peter Xu <peterx@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc: mst@redhat.com, vkaplans@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, virtio-comment@lists.oasis-open.org, qemu-devel@nongnu.org
 
-On Wed, Apr 12, 2017 at 10:47:39AM +0200, C=E9dric Le Goater wrote:
-> On 04/12/2017 10:15 AM, Bharata B Rao wrote:
-> > Recent commits that re-organized ICPState object missed to destroy
-> > the object when CPU is unrealized. Fix this so that CPU unplug
-> > doesn't abort QEMU.
->=20
-> Indeed.
->=20
-> > Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
->=20
-> I am wondering if we should not be doing the unparent under=20
-> spapr_cpu_destroy() or even xics_cpu_destroy(). Apart from
-> that,=20
 
-Thought so, but since object is created in realize routinte itself
-(and not in any of its callers), did the object destruction in
-unrealize to be symmetrical :)
 
-Regards,
-Bharata.
+On 2017=E5=B9=B404=E6=9C=8812=E6=97=A5 15:17, Peter Xu wrote:
+> On Tue, Apr 11, 2017 at 05:16:19PM +0200, Maxime Coquelin wrote:
+>> On 04/11/2017 03:20 PM, Peter Xu wrote:
+>>> On Tue, Apr 11, 2017 at 12:10:02PM +0200, Maxime Coquelin wrote:
+> [...]
+>
+>>>> +slave is expected to reply with a zero payload, non-zero otherwise.
+>>> Is this ack mechanism really necessary? If not, not sure it'll be nic=
+e
+>>> to keep vhost-user/vhost-kernel aligned on this behavior. At least
+>>> that'll simplify vhost-user implementation on QEMU side (iiuc even
+>>> without introducing new functions for update/invalidate operations).
+>> I think this is necessary, and it won't complexify the vhost-user
+>> implementation on QEMU side, since already widely used (see reply-ack
+>> feature).
+> Could you provide file/function/link pointer to the "reply-ack"
+> feature? I failed to find it myself.
+>
+>> This reply-ack mechanism is used to obtain a behaviour closer to kerne=
+l
+>> backend. Indeed, when QEMU sends a vhost_msg to the kernel backend, it
+>> is blocked in the write() while the message is being processed in the
+>> Kernel. With user backend, QEMU is unblocked from the write() when the
+>> backend has read the message, before it is being processed.
+>>
+> I see. Then I agree with you that we may need a synchronized way to do
+> it. One thing I think of is IOMMU page invalidation - it should be a
+> sync operation to make sure that all the related caches were destroyed
+> when the invalidation command returns in QEMU vIOMMU emulation path.
+>
+
+Looks not, if I understand correctly, e.g for Intel IOMMU, when QI is=20
+enabled, this could be done asynchronously by not waiting for the=20
+completion through wait descriptor. Vhost-kernel always implement the=20
+invalidation as a synchronous one for simplicity, but looks like this is=20
+not needed.
+
+Thakns
