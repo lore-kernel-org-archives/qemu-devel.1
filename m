@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Michael.Wu@ngc.com>) id 1cyNGe-0003QV-FS
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 14:45:25 -0400
+	(envelope-from <den@virtuozzo.com>) id 1cyNJ0-00046h-4u
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 14:47:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Michael.Wu@ngc.com>) id 1cyNGb-0000EE-AD
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 14:45:24 -0400
-Received: from xspc0103.northgrum.com ([157.127.149.150]:32206)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Michael.Wu@ngc.com>) id 1cyNGb-0000Dl-1Q
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 14:45:21 -0400
-From: "Wu, Michael Y [US] (MS)" <Michael.Wu@ngc.com>
-Date: Wed, 12 Apr 2017 18:44:24 +0000
-Message-ID: <2acc95968bf94ad188d8e42dfce2085e@XCGC3021.northgrum.com>
-References: <7a623fb8d2284ee28ddbd6e1ccf277e0@XCGC3021.northgrum.com>
-	<CAFEAcA8C17TnnBKim9T9k32Re9C-pWUokF-UeVAd=itcpROvRg@mail.gmail.com>
-	<a710ff5405c04e8b97f5d4ed6739fb7b@XCGC3021.northgrum.com>
-	<CAFEAcA9VFFXk0U7prWV1KCzBTxDv6ABBLZhRmKZ=nd5b+GynqQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA9VFFXk0U7prWV1KCzBTxDv6ABBLZhRmKZ=nd5b+GynqQ@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <den@virtuozzo.com>) id 1cyNIx-00017r-1x
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 14:47:50 -0400
+Received: from mail-ve1eur01on0115.outbound.protection.outlook.com
+	([104.47.1.115]:45884
+	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1cyNIw-00016e-Gf
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 14:47:46 -0400
+References: <8a7bf9dbac4c6db5b7e8dd5c968cacae@ispras.ru>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <6da22cb5-de2d-1c0d-e912-79a6c7e4b7a2@openvz.org>
+Date: Wed, 12 Apr 2017 21:47:38 +0300
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] EXT :Re: Emulating external registers
+In-Reply-To: <8a7bf9dbac4c6db5b7e8dd5c968cacae@ispras.ru>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] WinDbg module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Mihail Abakumov <mikhail.abakumov@ispras.ru>, qemu-devel@nongnu.org
+Cc: sw@weilnetz.de, Pavel Dovgalyuk <dovgaluk@ispras.ru>, pbonzini@redhat.com
 
-VGhhbmsgeW91IGZvciB0aGUgc3VnZ2VzdGlvbnMuIEkgZm91bmQgb3V0IHRoYXQgdGhlIGlzc3Vl
-IHdhcyB3aXRoIGhvdyB0aGUgYmFyZSBtZXRhbCBwcm9ncmFtIGNvbmZpZ3VyZWQgbWVtb3J5Lg0K
-VGhlIHByb2dyYW0gaXMgbm93IGFibGUgdG8gcmVhZCBhbmQgd3JpdGUgZnJvbSBhIHBvaW50ZXIu
-DQoNCkkgaW5jbHVkZWQgeW91ciB1bmltcGxlbWVudGVkIGRldmljZSBpbnRvIHRoZSBnMyBtYWNo
-aW5lIChtYWNfb2xkd29ybGQuYykgSSBhbSBlbXVsYXRpbmcgdXNpbmcgdGhlIGZvbGxvd2luZyBj
-b2RlLg0KY3JlYXRlX3VuaW1wbGVtZW50ZWRfZGV2aWNlKCJ1bmltcCIsMHgwMzQwMDAwMCwoNCA8
-PCAyMCkpOw0KDQpXaGVuIEkgc2V0IGEgcG9pbnRlciB0byAweDAzNDAwMDAwLCBJIGNhbiByZWFk
-IGFuZCB3cml0ZSB0byB0aGF0IGxvY2F0aW9uLiBIb3dldmVyIEkgaGF2ZSBubyBvdXRwdXRzIGZy
-b20gdGhlIHJlYWQgYW5kIHdyaXRlIGNhbGxiYWNrcy4gSSBoYXZlIHRoZSAnLWQgdW5pbXAnIHNl
-dCBpbiB0aGUgY29tbWFuZCBhcmd1bWVudHMgYXMgd2VsbC4NCg0KSSBhZGRlZCB0aGUgY3JlYXRl
-X3VuaW1wbGVtZW50ZWRfZGV2aWNlIGF0IHRoZSBlbmQgb2YgdGhlIGZ1bmN0aW9uIHBwY19oZWF0
-aHJvd19pbml0IChtYWNfb2xkd29ybGQuYykuIElzIG15IHVzYWdlIGNvcnJlY3QgaW4gYWRkaW5n
-IHRoaXMgZGV2aWNlIHRvIGFuIGV4aXN0aW5nIG1hY2hpbmU/DQpJbiB1bmltcC5oLCB0aGUgY29t
-bWVudHMgbWVudGlvbiB0aGF0IHRoZSBwcmlvcml0eSBpcyBhdCAtMTAwMC4gRG9lcyB0aGF0IG1l
-YW4gSSBjYW4gc2V0IGEgdW5pbXBsZW1lbnRlZCBkZXZpY2UgdG8gYSBodWdlIGFkZHJlc3MgcmFu
-Z2UgdG8gcGljayB1cCBhbnkgcmVhZC93cml0ZXM/DQogDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2Ut
-LS0tLQ0KRnJvbTogUGV0ZXIgTWF5ZGVsbCBbbWFpbHRvOnBldGVyLm1heWRlbGxAbGluYXJvLm9y
-Z10gDQpTZW50OiBUaHVyc2RheSwgQXByaWwgMDYsIDIwMTcgMTA6MzggQU0NClRvOiBXdSwgTWlj
-aGFlbCBZIFtVU10gKE1TKQ0KQ2M6IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KU3ViamVjdDogUmU6
-IFtRZW11LWRldmVsXSBFWFQgOlJlOiBFbXVsYXRpbmcgZXh0ZXJuYWwgcmVnaXN0ZXJzDQoNCk9u
-IDYgQXByaWwgMjAxNyBhdCAxODoyMywgV3UsIE1pY2hhZWwgWSBbVVNdIChNUykgPE1pY2hhZWwu
-V3VAbmdjLmNvbT4gd3JvdGU6DQo+IEkgY2hhbmdlZCBteSBjb2RlIHRvIHRoZSBmb2xsb3dpbmcg
-YW5kIGFkZGVkIHRoZSBhcHByb3ByaWF0ZSByZWFkLHdyaXRlIGZ1bmN0aW9ucyBhbmQgYSBNZW1v
-cnlSZWdpb25PcHMuDQo+ICAgICBtZW1vcnlfcmVnaW9uX2luaXRfaW8ocmVnX21lbW9yeSwgTlVM
-TCwgJnJlZ19vcHMsIHJlZywNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAicmVnX21lbSIs
-IDB4MDAwMDAwNDApOyAvL3NldCB0byA2NCBieXRlcw0KPiAgICAgbWVtb3J5X3JlZ2lvbl9hZGRf
-c3VicmVnaW9uKHN5c21lbSwgMHhGQzAwMDAwMCwgcmVnX21lbW9yeSk7DQo+DQo+IEZvciB0aGUg
-cmVhZCBmdW5jdGlvbiBJIGp1c3QgcmV0dXJuZWQgYSB6ZXJvLiBTbyBpZiBJIHdlcmUgdG8gcmVh
-ZCBmcm9tIHRoZSBhZGRyZXNzIDB4RkMwMDAwMDAgaXQgc2hvdWxkIHJldHVybiBhIHZhbHVlIG9m
-IDA/IFRoZSBjdXJyZW50IGlzc3VlIEkgYW0gaGF2aW5nIGlzIHRoYXQgZ2RiIGhhbmdzIHdoZW4g
-dGhlIHBvaW50ZXIgaXMgYWNjZXNzZWQuIEkgYW0gc3RhcnRpbmcgdG8gdGhpbmsgbXkgYmFyZS1t
-ZXRhbCBwcm9ncmFtIGlzIGluY29ycmVjdC4gSSBhbHNvIGFkZGVkIGxvZyBtZXNzYWdlcyBpbiBt
-eSByZWFkIGFuZCB3cml0ZSBmdW5jdGlvbnMuIFRoZSByZWFkIGZ1bmN0aW9uIHdhcyBub3QgYWNj
-ZXNzZWQuDQoNCllvdSdsbCBwcm9iYWJseSBmaW5kIHRoYXQgd2hhdCBoYXMgaGFwcGVuZWQgaXMg
-dGhhdCB5b3VyIHByb2dyYW0gaGFzIHRha2VuIGFuIGV4Y2VwdGlvbiB3aGljaCB5b3UgZG9uJ3Qg
-aGF2ZSBhbiBleGNlcHRpb24gaGFuZGxlciBpbnN0YWxsZWQgZm9yLCBhbmQgaGFzIHRoZW4ganVt
-cGVkIG9mZiBpbnRvIG5vd2hlcmUgb3IgZ29uZSBpbnRvIGFuIGluZmluaXRlIGxvb3Agb2YgdGFr
-aW5nIGV4Y2VwdGlvbnMuIChQcm9iYWJseSBoaXR0aW5nIF5jIGluIGdkYiB3aWxsIGJyZWFrIGlu
-dG8gd2hlcmV2ZXIgaXQgaXMuKSBJdCdzIGEgZ29vZCBpZGVhIGluIGJhcmUgbWV0YWwgdGVzdCBj
-b2RlIHRvIHdyaXRlIGF0IGxlYXN0IGEgbWluaW1hbCBzZXQgb2YgZXhjZXB0aW9uIGhhbmRsZXJz
-IHRoYXQgY2FuIHByaW50IGEgbWVzc2FnZSB3aGVuIGFuIHVuZXhwZWN0ZWQgZXhjZXB0aW9uIG9j
-Y3VycyBhbmQgc3RvcCwgc28geW91IGRvbid0IGdldCB0b28gY29uZnVzZWQuDQoNCllvdSBtaWdo
-dCBhbHNvIHdhbnQgdG8gaW52ZXN0aWdhdGUgUUVNVSdzIHRyYWNpbmc6DQotZCBpbl9hc20sZXhl
-YyxjcHUsaW50LG5vY2hhaW4gLUQgZGVidWcubG9nIHdpbGwgd3JpdGUgdHJhY2luZyB0byB0aGUg
-ZGVidWcubG9nIGZpbGUgKGEgbG90IG9mIGl0LCBhbmQgdGhpcyBzZXQgb2YgdHJhY2UgZmxhZ3Mg
-c2xvdyBkb3duIGV4ZWN1dGlvbiBhIGxvdCwgYnV0IGlmIHlvdSdyZSBkb2luZyB2ZXJ5IHNtYWxs
-IGJhcmUgbWV0YWwgZmxhZ3MgdGhhdCBzaG91bGQgYmUgb2spLiBUaGlzIGNhbiBoZWxwIGluIGZp
-Z3VyaW5nIG91dCB3aGF0IHlvdXIgdGVzdCBwcm9ncmFtIGlzIGRvaW5nLiAoV2F0Y2ggb3V0IHRo
-YXQgdGhlIGluX2FzbSBzaG93cyB3aGVuIHdlIGZpcnN0IGVuY291bnRlciBhIGJsb2NrIG9mIGNv
-ZGUsIGJ1dCBpZiB3ZSBleGVjdXRlIHRoZSBzYW1lIGJpdCBvZiBjb2RlIGEgc2Vjb25kIHRpbWUg
-d2UnbGwgb25seSBwcmludCB0aGUgZXhlYyBhbmQgY3B1IHBhcnRzIG9mIHRoZSBsb2dnaW5nLikN
-Cg0KdGhhbmtzDQotLSBQTU0NCg0K
+On 04/12/2017 05:05 PM, Mihail Abakumov wrote:
+> Hello.
+>
+> We made the debugger module WinDbg (like GDB) for QEMU. This is the
+> replacement of the remote stub in Windows kernel. Used for remote
+> Windows kernel debugging without debugging mode.
+>
+> The latest build and instructions for the launch can be found here:
+> https://github.com/ispras/qemu/releases/tag/v2.7.50-windbg
+>
+> Currently only one ways to create a remote debugging connection is
+> supported: using COM port with named pipe.
+>
+> Should I prepare patches for inclusion in the master branch? Or is it
+> too specific module and it is not needed?
+>
+this would be indeed useful. We have a lot of problems
+with Windows debugging. In general, Windows behaviour
+with and without debugger is different.
+
+Den
