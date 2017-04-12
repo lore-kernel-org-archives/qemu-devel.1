@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cyCSK-00050A-6Q
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 03:12:45 -0400
+	(envelope-from <peterx@redhat.com>) id 1cyCWo-0006UP-QY
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 03:17:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cyCSG-0005eT-6j
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 03:12:44 -0400
-Received: from 8.mo178.mail-out.ovh.net ([46.105.74.227]:60360)
+	(envelope-from <peterx@redhat.com>) id 1cyCWl-0006oM-HR
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 03:17:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54510)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cyCSG-0005eF-0Q
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 03:12:40 -0400
-Received: from player715.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id A249031615
-	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 09:12:38 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Wed, 12 Apr 2017 09:12:17 +0200
-Message-Id: <1491981137-32713-1-git-send-email-clg@kaod.org>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cyCWl-0006oF-8S
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 03:17:19 -0400
+Date: Wed, 12 Apr 2017 15:17:08 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170412071708.GE16464@pxdev.xzpeter.org>
+References: <20170411101002.28451-1-maxime.coquelin@redhat.com>
+	<20170411101002.28451-3-maxime.coquelin@redhat.com>
+	<20170411132046.GA16464@pxdev.xzpeter.org>
+	<ed46bbd8-222b-3cda-e524-f9dfda8e3770@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] pci: Don't call pci_irq_handler() for a
- negative intx
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ed46bbd8-222b-3cda-e524-f9dfda8e3770@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 2/2] spec/vhost-user spec: Add IOMMU support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +29,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc: mst@redhat.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, virtio-comment@lists.oasis-open.org, qemu-devel@nongnu.org
 
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+On Tue, Apr 11, 2017 at 05:16:19PM +0200, Maxime Coquelin wrote:
+> On 04/11/2017 03:20 PM, Peter Xu wrote:
+> >On Tue, Apr 11, 2017 at 12:10:02PM +0200, Maxime Coquelin wrote:
 
-Under some circumstances, pci_intx() can return -1 (when the interrupt
-pin in the config space is 0 which normally means no interrupt).
+[...]
 
-I have seen cases of pci_set_irq() being called on such devices, in
-turn causing pci_irq_handler() to be called with "-1" as an argument
-which doesn't seem like a terribly good idea.
+> >
+> >>+slave is expected to reply with a zero payload, non-zero otherwise.
+> >
+> >Is this ack mechanism really necessary? If not, not sure it'll be nice
+> >to keep vhost-user/vhost-kernel aligned on this behavior. At least
+> >that'll simplify vhost-user implementation on QEMU side (iiuc even
+> >without introducing new functions for update/invalidate operations).
+> 
+> I think this is necessary, and it won't complexify the vhost-user
+> implementation on QEMU side, since already widely used (see reply-ack
+> feature).
 
-Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-[clg: updated for qemu-2.9 ]
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/pci/pci.c |    4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Could you provide file/function/link pointer to the "reply-ack"
+feature? I failed to find it myself.
 
-Index: qemu-powernv-2.9.git/hw/pci/pci.c
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
---- qemu-powernv-2.9.git.orig/hw/pci/pci.c
-+++ qemu-powernv-2.9.git/hw/pci/pci.c
-@@ -1419,7 +1419,9 @@ qemu_irq pci_allocate_irq(PCIDevice *pci
- void pci_set_irq(PCIDevice *pci_dev, int level)
- {
-     int intx =3D pci_intx(pci_dev);
--    pci_irq_handler(pci_dev, intx, level);
-+    if (intx >=3D 0) {
-+        pci_irq_handler(pci_dev, intx, level);
-+    }
- }
-=20
- /* Special hooks used by device assignment */
+> 
+> This reply-ack mechanism is used to obtain a behaviour closer to kernel
+> backend. Indeed, when QEMU sends a vhost_msg to the kernel backend, it
+> is blocked in the write() while the message is being processed in the
+> Kernel. With user backend, QEMU is unblocked from the write() when the
+> backend has read the message, before it is being processed.
+> 
+
+I see. Then I agree with you that we may need a synchronized way to do
+it. One thing I think of is IOMMU page invalidation - it should be a
+sync operation to make sure that all the related caches were destroyed
+when the invalidation command returns in QEMU vIOMMU emulation path.
+
+> 
+> >>+
+> >>+When the VHOST_USER_PROTOCOL_F_SLAVE_REQ is supported by the slave, and the
+> >>+master initiated the slave to master communication channel using the
+> >>+VHOST_USER_SET_SLAVE_REQ_FD request, the slave can send IOTLB miss and access
+> >>+failure events by sending VHOST_USER_IOTLB_MSG requests to the master with a
+> >>+struct vhost_iotlb_msg payload. For miss events, the iotlb payload has to be
+> >>+filled with the miss message type (1), the I/O virtual address and the
+> >>+permissions flags. For access failure event, the iotlb payload has to be
+> >>+filled with the access failure message type (4), the I/O virtual address and
+> >>+the permissions flags. On success, the master is expected to reply  when the
+> >>+request has been handled (for example, on miss requests, once the device IOTLB
+> >>+has been updated) with a zero payload, non-zero otherwise.
+> >
+> >Failed to understand the last sentence clearly. IIUC vhost-net will
+> >reply with an UPDATE message when a MISS message is received. Here for
+> >vhost-user are we going to send one extra zero payload after that?
+> 
+> Not exactly. There are two channels, one for QEMU to backend requests
+> (channel A), one for backend to QEMU requests (channel B).
+> 
+> The backend may be multi-threaded (like DPDK), one thread for handling
+> QEMU initiated requests (channel A), the others to handle packet
+> processing (i.e. one for Rx, one for Tx).
+> 
+> The processing threads will need to translate iova adresses by
+> searching in the IOTLB cache. In case of miss, it will send an IOTLB
+> miss request on channel B, and then wait for the ack/nack. In case of
+> ack, it can search again the IOTLB cache and find the translation.
+> 
+> On QEMU side, when the thread handling channel B requests receives the
+> IOTLB miss message, it gets the translation and send an IOTLB update
+> message on channel A. Then it waits for the ack from the backend,
+> meaning that the IOTLB cache has been updated, and replies ack on
+> channel B.
+
+If the ack on channel B is used to notify the processing thread that
+"cache is ready", then... would it be faster that we just let the
+processing thread poll the cache until it finds it, or let the other
+thread notify it when it receives ack on channel A? Not sure whether
+it'll be faster.
+
+Thanks,
+
+-- 
+Peter Xu
