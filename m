@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cyJFq-0002nc-Qb
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:28:19 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cyJKi-0003zl-Fg
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:33:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cyJFp-0000X1-TM
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:28:18 -0400
-References: <1492005921-15664-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1492005921-15664-3-git-send-email-zhang.zhanghailiang@huawei.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <4125e702-1298-f7c6-5152-fbf3b5d06f57@redhat.com>
-Date: Wed, 12 Apr 2017 09:28:07 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cyJKh-0002lg-Gu
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:33:20 -0400
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:32904)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cyJKh-0002lS-54
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 10:33:19 -0400
+Received: by mail-lf0-x244.google.com with SMTP id r36so3405446lfi.0
+	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 07:33:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1492005921-15664-3-git-send-email-zhang.zhanghailiang@huawei.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="GtlSwAGtdgJIKkvemOoaQpbEJXHCwQpwl"
-Subject: Re: [Qemu-devel] [PATCH v4 2/6] replication: add shared-disk and
- shared-disk-id options
+References: <20170410142112.11550-1-marcandre.lureau@redhat.com>
+	<8737ddna9i.fsf@dusky.pond.sub.org>
+In-Reply-To: <8737ddna9i.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 12 Apr 2017 14:33:07 +0000
+Message-ID: <CAJ+F1C+XcrF042iTjsU6y5U7pqZDnaT8zMr1dGhe+W5bm34Naw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] test-keyval: fix leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,95 +30,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhanghailiang <zhang.zhanghailiang@huawei.com>, stefanha@redhat.com, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, xiecl.fnst@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, Wen Congyang <wency@cn.fujitsu.com>, qemu-block@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GtlSwAGtdgJIKkvemOoaQpbEJXHCwQpwl
-From: Eric Blake <eblake@redhat.com>
-To: zhanghailiang <zhang.zhanghailiang@huawei.com>, stefanha@redhat.com,
- qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, xiecl.fnst@cn.fujitsu.com,
- zhangchen.fnst@cn.fujitsu.com, Wen Congyang <wency@cn.fujitsu.com>,
- qemu-block@nongnu.org
-Message-ID: <4125e702-1298-f7c6-5152-fbf3b5d06f57@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 2/6] replication: add shared-disk and
- shared-disk-id options
-References: <1492005921-15664-1-git-send-email-zhang.zhanghailiang@huawei.com>
- <1492005921-15664-3-git-send-email-zhang.zhanghailiang@huawei.com>
-In-Reply-To: <1492005921-15664-3-git-send-email-zhang.zhanghailiang@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi
 
-On 04/12/2017 09:05 AM, zhanghailiang wrote:
-> We use these two options to identify which disk is
-> shared
->=20
-> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> Signed-off-by: Wen Congyang <wency@cn.fujitsu.com>
-> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-> ---
-> v4:
-> - Add proper comment for primary_disk (Stefan)
-> v2:
-> - Move g_free(s->shared_disk_id) to the common fail process place (Stef=
-an)
-> - Fix comments for these two options
-> ---
+On Wed, Apr 12, 2017 at 3:19 PM Markus Armbruster <armbru@redhat.com> wrote=
+:
 
-> +++ b/qapi/block-core.json
-> @@ -2661,12 +2661,20 @@
->  #          node who owns the replication node chain. Must not be given=
- in
->  #          primary mode.
->  #
-> +# @shared-disk-id: Id of shared disk while is replication mode, if @sh=
-ared-disk
-> +#                  is true, this option is required (Since: 2.10)
-> +#
-> +# @shared-disk: To indicate whether or not a disk is shared by primary=
- VM
-> +#               and secondary VM. (The default is false) (Since: 2.10)=
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  tests/test-keyval.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> >
+> > diff --git a/tests/test-keyval.c b/tests/test-keyval.c
+> > index ba19560a22..141ee5d0c4 100644
+> > --- a/tests/test-keyval.c
+> > +++ b/tests/test-keyval.c
+> > @@ -628,6 +628,7 @@ static void test_keyval_visit_alternate(void)
+> >      visit_type_AltNumStr(v, "a", &ans, &error_abort);
+> >      g_assert_cmpint(ans->type, =3D=3D, QTYPE_QSTRING);
+> >      g_assert_cmpstr(ans->u.s, =3D=3D, "1");
+> > +    qapi_free_AltNumStr(ans);
+> >      visit_type_AltNumInt(v, "a", &ani, &err);
+> >      error_free_or_abort(&err);
+> >      visit_end_struct(v, NULL);
+> > @@ -649,11 +650,14 @@ static void test_keyval_visit_any(void)
+> >      visit_type_any(v, "a", &any, &error_abort);
+>
+> @any becomes a strong reference (qobject_input_type_any() increments the
+> reference count).
+>
+> >      qlist =3D qobject_to_qlist(any);
+>
+> Reference count unchanged.
+>
+> >      g_assert(qlist);
+> > +    qobject_decref(any);
+>
+> Uh, this is unnecessarily dirty: you relinquish the reference before
+> you're actually done with it.  Works only because there's *another*
+> reference hiding within @v.  Let's move this ...
+>
+> >      qstr =3D qobject_to_qstring(qlist_pop(qlist));
+> >      g_assert_cmpstr(qstring_get_str(qstr), =3D=3D, "null");
+> > +    QDECREF(qstr);
+> >      qstr =3D qobject_to_qstring(qlist_pop(qlist));
+> >      g_assert_cmpstr(qstring_get_str(qstr), =3D=3D, "1");
+> >      g_assert(qlist_empty(qlist));
+> > +    QDECREF(qstr);
+>
+> ... here.  Okay to do that on commit?
+>
 
-> +#
->  # Since: 2.9
->  ##
->  { 'struct': 'BlockdevOptionsReplication',
->    'base': 'BlockdevOptionsGenericFormat',
->    'data': { 'mode': 'ReplicationMode',
-> -            '*top-id': 'str' } }
-> +            '*top-id': 'str',
-> +            '*shared-disk-id': 'str',
-> +            '*shared-disk': 'bool' } }
+ sure, makes sense
 
-Do we need a separate bool and string? Or is it sufficient to say that
-if shared-disk is omitted, we are not sharing, and that if a shared-disk
-string is present, then we are sharing and it names the id of the shared
-disk.
 
+> >      visit_check_struct(v, &error_abort);
+> >      visit_end_struct(v, NULL);
+> >      visit_free(v);
+>
+> With the reference counting cleaned up:
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>
+>
+thanks
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---GtlSwAGtdgJIKkvemOoaQpbEJXHCwQpwl
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY7jl3AAoJEKeha0olJ0NqA5EIAKkgVStf5VCDuMdjfHny9x4d
-VuFxMDSkzscHLTNDdLjIC8gWXTjfamoL1K+E0cg6BbzQqs7g0P4k7gRP/WksdZjv
-rMRnv8O6/WK//+8mmhseanRIJRIljYYFXT2QB4NOJnyFs4YOJJXw2QprC9pzhMmN
-8FQYAPWCofsUwM7sQru4jDAsrgYLFDFdWce1hLVENYnMq7fWvblMohkKKZ+PbYNc
-TLEcEBuGQm1sh2H1H3zF7JDrEpLnHsRMPsa7QDfuILuZjabdWVOaT3ET3jLXxRMR
-pkYdsnHgrXTcDP3vhQw7H2vpul6mABtoVX7ZTJQQeN0PoHSazAvjLiHwjYX71lQ=
-=pGIF
------END PGP SIGNATURE-----
-
---GtlSwAGtdgJIKkvemOoaQpbEJXHCwQpwl--
+Marc-Andr=C3=A9 Lureau
