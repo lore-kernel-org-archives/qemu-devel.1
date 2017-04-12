@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cyOXP-0000ei-Q1
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 16:06:51 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1cyOY6-000126-Ct
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 16:07:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cyOXM-00039I-M8
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 16:06:47 -0400
-Received: from mail-lf0-x232.google.com ([2a00:1450:4010:c07::232]:33494)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cyOXM-00038z-4v
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 16:06:44 -0400
-Received: by mail-lf0-x232.google.com with SMTP id h125so19966226lfe.0
-	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 13:06:44 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1cyOY1-0003Q6-Gl
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 16:07:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51670)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cyOY1-0003P0-A1
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 16:07:25 -0400
+Date: Wed, 12 Apr 2017 17:07:20 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170412200720.GA27126@thinpad.lan.raisama.net>
+References: <20170411205813.GA4006@rkaganip.lan>
+	<87inm91wo4.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <1488435591-17882-1-git-send-email-mst@redhat.com>
-	<1488435591-17882-3-git-send-email-mst@redhat.com>
-In-Reply-To: <1488435591-17882-3-git-send-email-mst@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 12 Apr 2017 20:06:32 +0000
-Message-ID: <CAJ+F1C+kLB5VCsSakbd6+CKx4uNbxZNqd+vNMAWte4yKqcbw9Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 02/15] docs: VM Generation ID device
- description
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87inm91wo4.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] vmbus bridge: machine property or device?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,332 +27,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: Gal Hammer <ghammer@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>, Ben Warren <ben@skyportsystems.com>, Igor Mammedov <imammedo@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Roman Kagan <rkagan@virtuozzo.com>, Peter Maydell <peter.maydell@linaro.org>, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 
-Hi
+On Wed, Apr 12, 2017 at 05:18:51PM +0200, Markus Armbruster wrote:
+> Cc'ing a few more people who might have a reasoned opinion.
+> 
+> Roman Kagan <rkagan@virtuozzo.com> writes:
+> 
+> > While hammering out the VMBus / storage series, we've been struggling to
+> > figure out the best practices solution to the following problem:
+> >
+> > VMBus is provided by a vmbus bridge; it appears the most natural to have
+> > it subclassed from SysBusDevice.  There can only be one VMBus in the
+> > VM.
+> 
+> TYPE_DEVICE unless you actually need something TYPE_SYS_BUS_DEVICE
+> provides.
+> 
+> > Now the question is how to add it to the system:
+> >
+> > 1) with a boolean machine property "vmbus" that would trigger the
+> >    creation of the VMBus bridge; its class would have
+> >    ->cannot_instantiate_with_device_add_yet = true
+> 
+> This makes it an optional onboard device.  Similar ones exist already,
+> e.g. various optional onboard USB host controllers controlled by machine
+> property "usb".
+> 
+> > 2) with a regular -device option; this would require setting
+> >    ->has_dynamic_sysbus = true for i440fx machines (q35 already have it)
+> 
+> This makes it a pluggable sysbus device.
+> 
+> I'd be tempted to leave old i400FX rot in peace, but your use case may
+> not allow that.
 
-On Thu, Mar 2, 2017 at 10:22 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+I have sent a RFC some time ago that replaces the all-or-nothing
+has_dynamic_sysbus flag with an explicit sysbus device whitelist,
+so i440fx wouldn't be a big problem. But as you noted above, if
+you don't need TYPE_SYS_BUS_DEVIC, you can just use TYPE_DEVICE.
 
-> From: Ben Warren <ben@skyportsystems.com>
->
-> This patch is based off an earlier version by
-> Gal Hammer (ghammer@redhat.com)
->
-> Requirements section, ASCII diagrams and overall help
-> provided by Laszlo Ersek (lersek@redhat.com)
->
-> Signed-off-by: Gal Hammer <ghammer@redhat.com>
-> Signed-off-by: Ben Warren <ben@skyportsystems.com>
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  docs/specs/vmgenid.txt | 245
-> +++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 245 insertions(+)
->  create mode 100644 docs/specs/vmgenid.txt
->
-> diff --git a/docs/specs/vmgenid.txt b/docs/specs/vmgenid.txt
-> new file mode 100644
-> index 0000000..aa9f518
-> --- /dev/null
-> +++ b/docs/specs/vmgenid.txt
-> @@ -0,0 +1,245 @@
-> +VIRTUAL MACHINE GENERATION ID
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
-> +
-> +Copyright (C) 2016 Red Hat, Inc.
-> +Copyright (C) 2017 Skyport Systems, Inc.
-> +
-> +This work is licensed under the terms of the GNU GPL, version 2 or later=
-.
-> +See the COPYING file in the top-level directory.
-> +
-> +=3D=3D=3D
-> +
-> +The VM generation ID (vmgenid) device is an emulated device which
-> +exposes a 128-bit, cryptographically random, integer value identifier,
-> +referred to as a Globally Unique Identifier, or GUID.
-> +
-> +This allows management applications (e.g. libvirt) to notify the guest
-> +operating system when the virtual machine is executed with a different
-> +configuration (e.g. snapshot execution or creation from a template).  Th=
-e
-> +guest operating system notices the change, and is then able to react as
-> +appropriate by marking its copies of distributed databases as dirty,
-> +re-initializing its random number generator etc.
-> +
-> +
-> +Requirements
-> +------------
-> +
-> +These requirements are extracted from the "How to implement virtual
-> machine
-> +generation ID support in a virtualization platform" section of the
-> +specification, dated August 1, 2012.
-> +
-> +
-> +The document may be found on the web at:
-> +  http://go.microsoft.com/fwlink/?LinkId=3D260709
-> +
-> +R1a. The generation ID shall live in an 8-byte aligned buffer.
-> +
-> +R1b. The buffer holding the generation ID shall be in guest RAM, ROM, or
-> device
-> +     MMIO range.
-> +
-> +R1c. The buffer holding the generation ID shall be kept separate from
-> areas
-> +     used by the operating system.
-> +
-> +R1d. The buffer shall not be covered by an AddressRangeMemory or
-> +     AddressRangeACPI entry in the E820 or UEFI memory map.
-> +
-> +R1e. The generation ID shall not live in a page frame that could be
-> mapped with
-> +     caching disabled. (In other words, regardless of whether the
-> generation ID
-> +     lives in RAM, ROM or MMIO, it shall only be mapped as cacheable.)
-> +
-> +R2 to R5. [These AML requirements are isolated well enough in the
-> Microsoft
-> +          specification for us to simply refer to them here.]
-> +
-> +R6. The hypervisor shall expose a _HID (hardware identifier) object in t=
-he
-> +    VMGenId device's scope that is unique to the hypervisor vendor.
-> +
-> +
-> +QEMU Implementation
-> +-------------------
-> +
-> +The above-mentioned specification does not dictate which ACPI descriptor
-> table
-> +will contain the VM Generation ID device.  Other implementations (Hyper-=
-V
-> and
-> +Xen) put it in the main descriptor table (Differentiated System
-> Description
-> +Table or DSDT).  For ease of debugging and implementation, we have
-> decided to
-> +put it in its own Secondary System Description Table, or SSDT.
-> +
-> +The following is a dump of the contents from a running system:
-> +
-> +# iasl -p ./SSDT -d /sys/firmware/acpi/tables/SSDT
-> +
-> +Intel ACPI Component Architecture
-> +ASL+ Optimizing Compiler version 20150717-64
-> +Copyright (c) 2000 - 2015 Intel Corporation
-> +
-> +Reading ACPI table from file /sys/firmware/acpi/tables/SSDT - Length
-> +00000198 (0x0000C6)
-> +ACPI: SSDT 0x0000000000000000 0000C6 (v01 BOCHS  VMGENID  00000001 BXPC
-> +00000001)
-> +Acpi table [SSDT] successfully installed and loaded
-> +Pass 1 parse of [SSDT]
-> +Pass 2 parse of [SSDT]
-> +Parsing Deferred Opcodes (Methods/Buffers/Packages/Regions)
-> +
-> +Parsing completed
-> +Disassembly completed
-> +ASL Output:    ./SSDT.dsl - 1631 bytes
-> +# cat SSDT.dsl
-> +/*
-> + * Intel ACPI Component Architecture
-> + * AML/ASL+ Disassembler version 20150717-64
-> + * Copyright (c) 2000 - 2015 Intel Corporation
-> + *
-> + * Disassembling to symbolic ASL+ operators
-> + *
-> + * Disassembly of /sys/firmware/acpi/tables/SSDT, Sun Feb  5 00:19:37 20=
-17
-> + *
-> + * Original Table Header:
-> + *     Signature        "SSDT"
-> + *     Length           0x000000CA (202)
-> + *     Revision         0x01
-> + *     Checksum         0x4B
-> + *     OEM ID           "BOCHS "
-> + *     OEM Table ID     "VMGENID"
-> + *     OEM Revision     0x00000001 (1)
-> + *     Compiler ID      "BXPC"
-> + *     Compiler Version 0x00000001 (1)
-> + */
-> +DefinitionBlock ("/sys/firmware/acpi/tables/SSDT.aml", "SSDT", 1, "BOCHS
-> ",
-> +"VMGENID", 0x00000001)
-> +{
-> +    Name (VGIA, 0x07FFF000)
-> +    Scope (\_SB)
-> +    {
-> +        Device (VGEN)
-> +        {
-> +            Name (_HID, "QEMUVGID")  // _HID: Hardware ID
-> +            Name (_CID, "VM_Gen_Counter")  // _CID: Compatible ID
-> +            Name (_DDN, "VM_Gen_Counter")  // _DDN: DOS Device Name
-> +            Method (_STA, 0, NotSerialized)  // _STA: Status
-> +            {
-> +                Local0 =3D 0x0F
-> +                If ((VGIA =3D=3D Zero))
-> +                {
-> +                    Local0 =3D Zero
-> +                }
-> +
-> +                Return (Local0)
-> +            }
-> +
-> +            Method (ADDR, 0, NotSerialized)
-> +            {
-> +                Local0 =3D Package (0x02) {}
-> +                Index (Local0, Zero) =3D (VGIA + 0x28)
-> +                Index (Local0, One) =3D Zero
-> +                Return (Local0)
-> +            }
-> +        }
-> +    }
-> +
-> +    Method (\_GPE._E05, 0, NotSerialized)  // _Exx: Edge-Triggered GPE
-> +    {
-> +        Notify (\_SB.VGEN, 0x80) // Status Change
-> +    }
-> +}
-> +
-> +
-> +Design Details:
-> +---------------
-> +
-> +Requirements R1a through R1e dictate that the memory holding the
-> +VM Generation ID must be allocated and owned by the guest firmware,
-> +in this case BIOS or UEFI.  However, to be useful, QEMU must be able to
-> +change the contents of the memory at runtime, specifically when starting=
- a
-> +backed-up or snapshotted image.  In order to do this, QEMU must know the
-> +address that has been allocated.
-> +
-> +The mechanism chosen for this memory sharing is writeable fw_cfg blobs.
-> +These are data object that are visible to both QEMU and guests, and are
-> +addressable as sequential files.
-> +
-> +More information about fw_cfg can be found in "docs/specs/fw_cfg.txt"
-> +
-> +Two fw_cfg blobs are used in this case:
-> +
-> +/etc/vmgenid_guid - contains the actual VM Generation ID GUID
-> +                  - read-only to the guest
-> +/etc/vmgenid_addr - contains the address of the downloaded vmgenid blob
-> +                  - writeable by the guest
-> +
-> +
-> +QEMU sends the following commands to the guest at startup:
-> +
-> +1. Allocate memory for vmgenid_guid fw_cfg blob.
-> +2. Write the address of vmgenid_guid into the SSDT (VGIA ACPI variable a=
-s
-> +   shown above in the iasl dump).  Note that this change is not propagat=
-ed
-> +   back to QEMU.
-> +3. Write the address of vmgenid_guid back to QEMU's copy of vmgenid_addr
-> +   via the fw_cfg DMA interface.
-> +
-> +After step 3, QEMU is able to update the contents of vmgenid_guid at wil=
-l.
-> +
-> +Since BIOS or UEFI does not necessarily run when we wish to change the
-> GUID,
-> +the value of VGIA is persisted via the VMState mechanism.
-> +
-> +As spelled out in the specification, any change to the GUID executes an
-> +ACPI notification.  The exact handler to use is not specified, so the
-> vmgenid
-> +device uses the first unused one:  \_GPE._E05.
-> +
-> +
-> +Endian-ness Considerations:
-> +---------------------------
-> +
-> +Although not specified in Microsoft's document, it is assumed that the
-> +device is expected to use little-endian format.
-> +
-> +All GUID passed in via command line or monitor are treated as big-endian=
-.
-> +GUID values displayed via monitor are shown in big-endian format.
-> +
-> +
-> +GUID Storage Format:
-> +--------------------
-> +
-> +In order to implement an OVMF "SDT Header Probe Suppressor", the content=
-s
-> of
-> +the vmgenid_guid fw_cfg blob are not simply a 128-bit GUID.  There is al=
-so
-> +significant padding in order to align and fill a memory page, as shown i=
-n
-> the
-> +following diagram:
-> +
-> ++----------------------------------+
-> +| SSDT with OEM Table ID =3D VMGENID |
-> ++----------------------------------+
-> +| ...                              |       TOP OF PAGE
-> +| VGIA dword object ---------------|-----> +---------------------------+
-> +| ...                              |       | fw-allocated array for    |
-> +| _STA method referring to VGIA    |       | "etc/vmgenid_guid"        |
-> +| ...                              |       +---------------------------+
-> +| ADDR method referring to VGIA    |       |  0: OVMF SDT Header probe |
-> +| ...                              |       |     suppressor            |
-> ++----------------------------------+       | 36: padding for 8-byte    |
-> +                                           |     alignment             |
-> +                                           | 40: GUID                  |
-> +                                           | 56: padding to page size  |
-> +                                           +---------------------------+
-> +                                           END OF PAGE
-> +
-> +
-> +Device Usage:
-> +-------------
-> +
-> +The device has one property, which may be only be set using the command
-> line:
-> +
-> +  guid - sets the value of the GUID.  A special value "auto" instructs
-> +         QEMU to generate a new random GUID.
-> +
-> +For example:
-> +
-> +  QEMU  -device vmgenid,guid=3D"324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
-> +  QEMU  -device vmgenid,guid=3Dauto
->
+> 
+> >
+> > 3) anything else
+> >
+> >
+> > So far we went with 1) but since it's essentially the API the management
+> > layer would have to use we'd like to get it right from the beginning.
+> 
+> Asking for advice here is a good idea.
+> 
+> Anyone?
+> 
 
-The default will keep uuid to null, should it be documented? Wouldn't it
-make sense to default to auto?
+I would go with (2) instead of (1): it allows more flexibility in
+case the device needs additional arguments, and will
+automatically benefit from (present and future) mechanisms for
+reporting available device-types and buses. Asking QEMU if
+"-device FOO" is supported is easy and reliable; the mechanisms
+for asking QEMU about supported "-machine" options are obscure
+and probably not well-tested.
 
-
-> +The property may be queried via QMP/HMP:
-> +
-> +  (QEMU) query-vm-generation-id
-> +  {"return": {"guid": "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"}}
-> +
-> +Setting of this parameter is intentionally left out from the QMP/HMP
-> +interfaces.  There are no known use cases for changing the GUID once QEM=
-U
-> is
-> +running, and adding this capability would greatly increase the complexit=
-y.
->
-
-Is this supposed to be not permitted?
-
-{ "execute": "qom-set", "arguments": { "path":
-"/machine/peripheral-anon/device[1]", "property": "guid", "value": "auto" }
-}
-
-Is there any linux kernel support being worked on?
-
-thanks
---=20
-Marc-Andr=C3=A9 Lureau
+-- 
+Eduardo
