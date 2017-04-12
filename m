@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cyG5x-00076c-8O
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 07:05:54 -0400
+	(envelope-from <huang.yong@zte.com.cn>) id 1cyGCa-0008FW-CC
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 07:12:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cyG5t-0003hv-Fm
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 07:05:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55250)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cyG5t-0003ha-9l
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 07:05:49 -0400
-Date: Wed, 12 Apr 2017 12:05:42 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170412110542.GC12839@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170406210917.6896-1-eblake@redhat.com>
-	<877f2pnb2t.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <877f2pnb2t.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH] event: Add signal information to SHUTDOWN
+	(envelope-from <huang.yong@zte.com.cn>) id 1cyGCV-0006Dj-Gh
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 07:12:44 -0400
+Received: from out1.zte.com.cn ([202.103.147.172]:34780)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <huang.yong@zte.com.cn>) id 1cyGCU-0006Ba-UE
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 07:12:39 -0400
+From: Huang Yong <huang.yong@zte.com.cn>
+Date: Wed, 12 Apr 2017 19:10:56 +0800
+Message-Id: <1491995456-6411-1-git-send-email-huang.yong@zte.com.cn>
+Subject: [Qemu-devel] [PATCH] QEMU Guest Agent: Add an interface to
+ determine guest os type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +22,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Stefan Weil <sw@weilnetz.de>
+To: mdroth@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org, Huang Yong <huang.yong@zte.com.cn>
 
-On Wed, Apr 12, 2017 at 01:02:02PM +0200, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
-> 
-> > qemu_kill_report() is already able to tell whether a shutdown
-> > was triggered by guest action (no output) or by a host signal
-> > (a message about termination is printed via error_report); but
-> > this information is then lost.  Libvirt would like to be able
-> > to distinguish between a SHUTDOWN event triggered solely by
-> > guest request and one triggered by a SIGTERM on the host.
-> >
-> > Enhance the SHUTDOWN event to pass the value of shutdown_signal
-> > through to the monitor client, suitably remapped into a
-> > platform-neutral string.  Note that mingw lacks decent signal
-> 
-> I understand the desire to distinguish between guest-initiated and
-> host-initiated shutdown, but I'm not sure why libvirt (or anyone) would
-> care for the exact signal.  Can you explain?
+vm management tools (e.g.libvirt) may tell if guest os is linux or windows,
+so they can design a customized application accordingly, we suggest to add
+an interface (guest-ostype) in QEMU.
 
-Libvirt doesn't care from a functional POV - it merely needs to distinguish
-host vs guest. Any signal info would merely informational and thus logged.
-So signal info would realistically only be used someone is trying to
-troubleshoot some problem and needs to understand exactly what triggered
-it.
+Signed-off-by: Huang Yong <huang.yong@zte.com.cn>
+---
+ qga/commands-posix.c | 10 ++++++++++
+ qga/commands-win32.c | 10 ++++++++++
+ qga/qapi-schema.json | 12 ++++++++++++
+ 3 files changed, 32 insertions(+)
 
-
-Regards,
-Daniel
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 915df9e..24ec2b6 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -49,6 +49,11 @@ extern char **environ;
+ #endif
+ #endif
+ 
++typedef enum GuestArch {
++    ARCH_WINDOWS = 0,
++    ARCH_LINUX = 1,
++} GuestArch;
++
+ static void ga_wait_child(pid_t pid, int *status, Error **errp)
+ {
+     pid_t rpid;
+@@ -2470,6 +2475,11 @@ qmp_guest_fstrim(bool has_minimum, int64_t minimum, Error **errp)
+ }
+ #endif
+ 
++int64_t qmp_guest_ostype(Error **errp)
++{
++    return ARCH_LINUX;
++}
++
+ /* add unsupported commands to the blacklist */
+ GList *ga_command_blacklist_init(GList *blacklist)
+ {
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index 19d72b2..a6639dd 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -58,6 +58,11 @@ static struct {
+     .filehandles = QTAILQ_HEAD_INITIALIZER(guest_file_state.filehandles),
+ };
+ 
++typedef enum GuestArch {
++    ARCH_WINDOWS = 0,
++    ARCH_LINUX = 1,
++} GuestArch;
++
+ #define FILE_GENERIC_APPEND (FILE_GENERIC_WRITE & ~FILE_WRITE_DATA)
+ 
+ typedef struct OpenFlags {
+@@ -214,6 +219,11 @@ void qmp_guest_file_close(int64_t handle, Error **errp)
+     g_free(gfh);
+ }
+ 
++int64_t qmp_guest_ostype(Error **errp)
++{
++    return ARCH_WINDOWS;
++}
++
+ static void acquire_privilege(const char *name, Error **errp)
+ {
+     HANDLE token = NULL;
+diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+index a02dbf2..496ae55 100644
+--- a/qga/qapi-schema.json
++++ b/qga/qapi-schema.json
+@@ -26,6 +26,7 @@
+         'guest-get-time',
+         'guest-set-vcpus',
+         'guest-sync',
++        'guest-ostype',
+         'guest-sync-delimited' ] } }
+ 
+ ##
+@@ -1042,3 +1043,14 @@
+   'data':    { 'path': 'str', '*arg': ['str'], '*env': ['str'],
+                '*input-data': 'str', '*capture-output': 'bool' },
+   'returns': 'GuestExec' }
++
++##
++# @guest-ostype:
++#
++# Get guest os type info
++# Returns: os type, Linux/Windows
++#
++# Since: 2.5.0
++##
++{ 'command': 'guest-ostype',
++  'returns': 'int' }
 -- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+1.8.3.1
