@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cyG1D-0005YO-2M
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 07:01:06 -0400
+	(envelope-from <armbru@redhat.com>) id 1cyG2P-0006By-V7
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 07:02:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cyG1A-0002JQ-1o
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 07:00:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58981)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cyG19-0002Im-SA
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 07:00:55 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cyG17-0002Bu-4J
-	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 11:00:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id ED83C2E80CC
-	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 11:00:52 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1cyG2J-00033l-No
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 07:02:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38230)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cyG2J-00032W-Fx
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 07:02:07 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170406210917.6896-1-eblake@redhat.com>
+Date: Wed, 12 Apr 2017 13:02:02 +0200
+In-Reply-To: <20170406210917.6896-1-eblake@redhat.com> (Eric Blake's message
+	of "Thu, 6 Apr 2017 16:09:17 -0500")
+Message-ID: <877f2pnb2t.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Apr 2017 10:54:11 -0000
-From: Harry Wagstaff <1682093@bugs.launchpad.net>
-Reply-To: Bug 1682093 <1682093@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20170412105411.12710.65118.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1682093] [NEW] aarch64-softmmu "bad ram pointer"
- crash
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] event: Add signal information to SHUTDOWN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,71 +26,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Weil <sw@weilnetz.de>
 
-Public bug reported:
+Eric Blake <eblake@redhat.com> writes:
 
-I am developing a piece of software called SimBench which is a
-benchmarking system for full system simulators. I am currently porting
-this to aarch64, using QEMU as a test platform.
+> qemu_kill_report() is already able to tell whether a shutdown
+> was triggered by guest action (no output) or by a host signal
+> (a message about termination is printed via error_report); but
+> this information is then lost.  Libvirt would like to be able
+> to distinguish between a SHUTDOWN event triggered solely by
+> guest request and one triggered by a SIGTERM on the host.
+>
+> Enhance the SHUTDOWN event to pass the value of shutdown_signal
+> through to the monitor client, suitably remapped into a
+> platform-neutral string.  Note that mingw lacks decent signal
 
-I have encountered a 'bad ram pointer' crash. I've attempted to build a
-minimum test case, but I haven't managed to replicate the behaviour in
-isolation, so I've created a branch of my project which exhibits the
-crash: https://bitbucket.org/Awesomeclaw/simbench/get/qemu-bug.tar.gz
+I understand the desire to distinguish between guest-initiated and
+host-initiated shutdown, but I'm not sure why libvirt (or anyone) would
+care for the exact signal.  Can you explain?
 
-The package can be compiled using:
+>                           Note that mingw lacks decent signal
+> support, and will never report a signal because it never calls
+> qemu_system_killed().
 
-make
+Awkward.
 
-and then run using:
+os-posix.c arranges for SIGINT, SIGHUP and SIGTERM to be caught.  Here's
+the handler:
 
-qemu-system-aarch64  -M virt -m 512 -cpu cortex-a57 -kernel
-out/armv8/virt/simbench -nographic
+    static void termsig_handler(int signal, siginfo_t *info, void *c)
+    {
+        qemu_system_killed(info->si_signo, info->si_pid);
+    }
 
-I have replicated the issue in both qemu 2.8.1 and in 2.9.0-rc3, on
-Fedora 23. Please let me know if you need any more information or any
-logs/core dumps/etc.
+    void qemu_system_killed(int signal, pid_t pid)
+    {
+        shutdown_signal = signal;
+        shutdown_pid = pid;
+        no_shutdown = 0;
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+        /* Cannot call qemu_system_shutdown_request directly because
+         * we are in a signal handler.
+         */
+        shutdown_requested = 1;
+        qemu_notify_event();
+    }
 
--- =
+The variables are all int or pid_t.  Works in practice (pedants might
+ask for sig_atomic_t, but I won't).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1682093
+In other words, these three signals are polite requests to terminate
+QEMU.
 
-Title:
-  aarch64-softmmu "bad ram pointer" crash
+Stefan, are there equivalent requests under Windows?  I guess there
+might be one at least for SIGINT, namely whatever happens when you hit
+^C on the console.
 
-Status in QEMU:
-  New
+Could we arrange to run qemu_system_killed() then?
 
-Bug description:
-  I am developing a piece of software called SimBench which is a
-  benchmarking system for full system simulators. I am currently porting
-  this to aarch64, using QEMU as a test platform.
+If not, could we at least distinguish between guest-initiated and
+host-initiated shutdown?
 
-  I have encountered a 'bad ram pointer' crash. I've attempted to build
-  a minimum test case, but I haven't managed to replicate the behaviour
-  in isolation, so I've created a branch of my project which exhibits
-  the crash: https://bitbucket.org/Awesomeclaw/simbench/get/qemu-
-  bug.tar.gz
+> See also https://bugzilla.redhat.com/1384007
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  qapi/event.json | 20 +++++++++++++++++++-
+>  vl.c            | 21 ++++++++++++++++++---
+>  2 files changed, 37 insertions(+), 4 deletions(-)
+>
+> diff --git a/qapi/event.json b/qapi/event.json
+> index e80f3f4..6aad475 100644
+> --- a/qapi/event.json
+> +++ b/qapi/event.json
+> @@ -5,11 +5,29 @@
+>  ##
+>
+>  ##
+> +# @ShutdownSignal:
+> +#
+> +# The list of host signal types known to cause qemu to shut down a guest.
+> +#
+> +# @int: SIGINT
+> +# @hup: SIGHUP
+> +# @term: SIGTERM
+> +#
+> +# Since: 2.10
+> +##
+> +{ 'enum': 'ShutdownSignal', 'data': [ 'int', 'hup', 'term' ] }
 
-  The package can be compiled using:
+I'd call them sigint, sighup, sigterm, but it's a matter of taste.
 
-  make
+> +
+> +##
+>  # @SHUTDOWN:
+>  #
+>  # Emitted when the virtual machine has shut down, indicating that qemu is
+>  # about to exit.
+>  #
+> +# @signal: If present, the shutdown was (probably) triggered due to
+> +# the receipt of the given signal in the host, rather than by a guest
+> +# action (note that there is an inherent race with a guest choosing to
+> +# shut down near the same time the host sends a signal). (since 2.10)
+> +#
 
-  and then run using:
+Is the "(probably)" due to just Windows, or are there other reasons for
+uncertainty?
 
-  qemu-system-aarch64  -M virt -m 512 -cpu cortex-a57 -kernel
-  out/armv8/virt/simbench -nographic
+>  # Note: If the command-line option "-no-shutdown" has been specified, qemu will
+>  # not exit, and a STOP event will eventually follow the SHUTDOWN event
+>  #
+> @@ -21,7 +39,7 @@
+>  #      "timestamp": { "seconds": 1267040730, "microseconds": 682951 } }
+>  #
+>  ##
+> -{ 'event': 'SHUTDOWN' }
+> +{ 'event': 'SHUTDOWN', 'data': { '*signal': 'ShutdownSignal' } }
+>
+>  ##
+>  # @POWERDOWN:
+> diff --git a/vl.c b/vl.c
+> index 0b4ed52..af29b2c 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -1626,9 +1626,23 @@ static int qemu_shutdown_requested(void)
+>      return atomic_xchg(&shutdown_requested, 0);
+>  }
+>
+> -static void qemu_kill_report(void)
+> +static ShutdownSignal qemu_kill_report(void)
+>  {
+> +    ShutdownSignal ss = SHUTDOWN_SIGNAL__MAX;
+>      if (!qtest_driver() && shutdown_signal != -1) {
 
-  I have replicated the issue in both qemu 2.8.1 and in 2.9.0-rc3, on
-  Fedora 23. Please let me know if you need any more information or any
-  logs/core dumps/etc.
+Outside this patch's scope: could just as well use 0 instead of -1, as 0
+can't be a valid signal number (kill() uses it for "check if we could
+kill").
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1682093/+subscriptions
+> +        switch (shutdown_signal) {
+> +        case SIGINT:
+> +            ss = SHUTDOWN_SIGNAL_INT;
+> +            break;
+> +#ifdef SIGHUP
+> +        case SIGHUP:
+> +            ss = SHUTDOWN_SIGNAL_HUP;
+> +            break;
+> +#endif
+> +        case SIGTERM:
+> +            ss = SHUTDOWN_SIGNAL_TERM;
+> +            break;
+> +        }
+>          if (shutdown_pid == 0) {
+>              /* This happens for eg ^C at the terminal, so it's worth
+>               * avoiding printing an odd message in that case.
+> @@ -1644,6 +1658,7 @@ static void qemu_kill_report(void)
+>          }
+>          shutdown_signal = -1;
+>      }
+> +    return ss;
+>  }
+>
+>  static int qemu_reset_requested(void)
+> @@ -1852,8 +1867,8 @@ static bool main_loop_should_exit(void)
+>          qemu_system_suspend();
+>      }
+>      if (qemu_shutdown_requested()) {
+> -        qemu_kill_report();
+> -        qapi_event_send_shutdown(&error_abort);
+> +        ShutdownSignal ss = qemu_kill_report();
+> +        qapi_event_send_shutdown(ss < SHUTDOWN_SIGNAL__MAX, ss, &error_abort);
+>          if (no_shutdown) {
+>              vm_stop(RUN_STATE_SHUTDOWN);
+>          } else {
+
+Why not send the event within qemu_kill_report()?
