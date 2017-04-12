@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cyGRz-000205-1a
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 07:28:40 -0400
+	(envelope-from <vfeenstr@redhat.com>) id 1cyGY2-0003In-H4
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 07:34:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cyGRx-0003Qk-8n
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 07:28:39 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:33518)
+	(envelope-from <vfeenstr@redhat.com>) id 1cyGXz-0006kN-CE
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 07:34:54 -0400
+Received: from mail-wr0-f180.google.com ([209.85.128.180]:36002)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cyGRw-0003QF-Ru
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 07:28:37 -0400
-Received: by mail-lf0-x241.google.com with SMTP id r36so2777239lfi.0
-	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 04:28:36 -0700 (PDT)
-MIME-Version: 1.0
+	(Exim 4.71) (envelope-from <vfeenstr@redhat.com>) id 1cyGXz-0006ii-2E
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 07:34:51 -0400
+Received: by mail-wr0-f180.google.com with SMTP id c55so15474906wrc.3
+	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 04:34:50 -0700 (PDT)
+From: Vinzenz Feenstra <vfeenstr@redhat.com>
+Message-Id: <8552B978-C0A0-4ED9-91D6-EA334EE9B1FA@redhat.com>
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Date: Wed, 12 Apr 2017 13:34:46 +0200
+In-Reply-To: <CAJ+F1CLukvP9EcdJXBGcBuNhfYAs3EBe_4cLbcdJx2N-xxQdfg@mail.gmail.com>
 References: <1491995456-6411-1-git-send-email-huang.yong@zte.com.cn>
-In-Reply-To: <1491995456-6411-1-git-send-email-huang.yong@zte.com.cn>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 12 Apr 2017 11:28:24 +0000
-Message-ID: <CAJ+F1CLukvP9EcdJXBGcBuNhfYAs3EBe_4cLbcdJx2N-xxQdfg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+	<CAJ+F1CLukvP9EcdJXBGcBuNhfYAs3EBe_4cLbcdJx2N-xxQdfg@mail.gmail.com>
+Content-Type: text/plain;
+	charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH] QEMU Guest Agent: Add an interface to
  determine guest os type
@@ -30,32 +31,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Huang Yong <huang.yong@zte.com.cn>, mdroth@linux.vnet.ibm.com
-Cc: qemu-devel@nongnu.org, Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: Huang Yong <huang.yong@zte.com.cn>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-Hi
 
-On Wed, Apr 12, 2017 at 1:12 PM Huang Yong <huang.yong@zte.com.cn> wrote:
-
-> vm management tools (e.g.libvirt) may tell if guest os is linux or window=
-s,
-> so they can design a customized application accordingly, we suggest to ad=
-d
+> On Apr 12, 2017, at 1:28 PM, Marc-Andr=C3=A9 Lureau =
+<marcandre.lureau@gmail.com> wrote:
+>=20
+> Hi
+>=20
+> On Wed, Apr 12, 2017 at 1:12 PM Huang Yong <huang.yong@zte.com.cn =
+<mailto:huang.yong@zte.com.cn>> wrote:
+> vm management tools (e.g.libvirt) may tell if guest os is linux or =
+windows,
+> so they can design a customized application accordingly, we suggest to =
+add
 > an interface (guest-ostype) in QEMU.
->
+>=20
+> This proposal is probably redundant with "qemu-ga: add =
+guest-get-osrelease command" =
+http://patchew.org/QEMU/20170331101947.2046-2-vfeenstr@redhat.com =
+<http://patchew.org/QEMU/20170331101947.2046-2-vfeenstr@redhat.com>
 
-This proposal is probably redundant with "qemu-ga: add guest-get-osrelease
-command" http://patchew.org/QEMU/20170331101947.2046-2-vfeenstr@redhat.com
+Indeed, that=E2=80=99s going the same direction just that we=E2=80=99re =
+trying to report a bit more extensive information.
 
-
-
-> Signed-off-by: Huang Yong <huang.yong@zte.com.cn>
+>=20
+>=20
+>=20
+> Signed-off-by: Huang Yong <huang.yong@zte.com.cn =
+<mailto:huang.yong@zte.com.cn>>
 > ---
 >  qga/commands-posix.c | 10 ++++++++++
 >  qga/commands-win32.c | 10 ++++++++++
 >  qga/qapi-schema.json | 12 ++++++++++++
 >  3 files changed, 32 insertions(+)
->
+>=20
 > diff --git a/qga/commands-posix.c b/qga/commands-posix.c
 > index 915df9e..24ec2b6 100644
 > --- a/qga/commands-posix.c
@@ -63,7 +74,7 @@ command" http://patchew.org/QEMU/20170331101947.2046-2-vfeenstr@redhat.com
 > @@ -49,6 +49,11 @@ extern char **environ;
 >  #endif
 >  #endif
->
+>=20
 > +typedef enum GuestArch {
 > +    ARCH_WINDOWS =3D 0,
 > +    ARCH_LINUX =3D 1,
@@ -72,12 +83,11 @@ command" http://patchew.org/QEMU/20170331101947.2046-2-vfeenstr@redhat.com
 >  static void ga_wait_child(pid_t pid, int *status, Error **errp)
 >  {
 >      pid_t rpid;
-> @@ -2470,6 +2475,11 @@ qmp_guest_fstrim(bool has_minimum, int64_t minimum=
-,
-> Error **errp)
+> @@ -2470,6 +2475,11 @@ qmp_guest_fstrim(bool has_minimum, int64_t =
+minimum, Error **errp)
 >  }
 >  #endif
->
+>=20
 > +int64_t qmp_guest_ostype(Error **errp)
 > +{
 > +    return ARCH_LINUX;
@@ -91,23 +101,23 @@ command" http://patchew.org/QEMU/20170331101947.2046-2-vfeenstr@redhat.com
 > --- a/qga/commands-win32.c
 > +++ b/qga/commands-win32.c
 > @@ -58,6 +58,11 @@ static struct {
->      .filehandles =3D QTAILQ_HEAD_INITIALIZER(guest_file_state.filehandle=
-s),
+>      .filehandles =3D =
+QTAILQ_HEAD_INITIALIZER(guest_file_state.filehandles),
 >  };
->
+>=20
 > +typedef enum GuestArch {
 > +    ARCH_WINDOWS =3D 0,
 > +    ARCH_LINUX =3D 1,
 > +} GuestArch;
 > +
 >  #define FILE_GENERIC_APPEND (FILE_GENERIC_WRITE & ~FILE_WRITE_DATA)
->
+>=20
 >  typedef struct OpenFlags {
-> @@ -214,6 +219,11 @@ void qmp_guest_file_close(int64_t handle, Error
-> **errp)
+> @@ -214,6 +219,11 @@ void qmp_guest_file_close(int64_t handle, Error =
+**errp)
 >      g_free(gfh);
 >  }
->
+>=20
 > +int64_t qmp_guest_ostype(Error **errp)
 > +{
 > +    return ARCH_WINDOWS;
@@ -126,7 +136,7 @@ s),
 >          'guest-sync',
 > +        'guest-ostype',
 >          'guest-sync-delimited' ] } }
->
+>=20
 >  ##
 > @@ -1042,3 +1043,14 @@
 >    'data':    { 'path': 'str', '*arg': ['str'], '*env': ['str'],
@@ -145,8 +155,13 @@ s),
 > +  'returns': 'int' }
 > --
 > 1.8.3.1
->
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+>=20
+>=20
+>=20
+> --=20
+> Marc-Andr=C3=A9 Lureau
+
+--
+Vinzenz Feenstra
+Senior Software Developer
+Red Hat Czech
