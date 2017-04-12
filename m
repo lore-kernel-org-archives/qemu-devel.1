@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55034)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cyLOH-0000ZE-Jy
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 12:45:12 -0400
+	(envelope-from <den@virtuozzo.com>) id 1cyLnD-0006jY-D4
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 13:10:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cyLOE-0000Xw-DV
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 12:45:09 -0400
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Wed, 12 Apr 2017 17:44:44 +0100
-Message-Id: <20170412164445.23039-4-berrange@redhat.com>
-In-Reply-To: <20170412164445.23039-1-berrange@redhat.com>
-References: <20170412164445.23039-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 3/4] qemu-img: introduce --target-image-opts
- for 'convert' command
+	(envelope-from <den@virtuozzo.com>) id 1cyLnA-0002gG-Rf
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 13:10:55 -0400
+References: <20170406150148.zwjpozqtale44jfh@perseus.local>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <2b915695-29b5-df8d-4d89-080eeaaaff13@openvz.org>
+Date: Wed, 12 Apr 2017 19:54:50 +0300
+MIME-Version: 1.0
+In-Reply-To: <20170406150148.zwjpozqtale44jfh@perseus.local>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] Proposed qcow2 extension: subcluster
+ allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,235 +23,329 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-The '--image-opts' flags indicates whether the source filename
-includes options. The target filename has to remain in the
-plain filename format though, since it needs to be passed to
-bdrv_create().  When using --skip-create though, it would be
-possible to use image-opts syntax. This adds --target-image-opts
-to indicate that the target filename includes options. Currently
-this mandates use of the --skip-create flag too.
+On 04/06/2017 06:01 PM, Alberto Garcia wrote:
+> Hi all,
+>
+> over the past couple of months I discussed with some of you the
+> possibility to extend the qcow2 format in order to improve its
+> performance and reduce its memory requirements (particularly with very
+> large images).
+>
+> After some discussion in the mailing list and the #qemu IRC channel I
+> decided to write a prototype of a new extension for qcow2 so I could
+> understand better the scope of the changes and have some preliminary
+> data about its effects.
+>
+> This e-mail is the formal presentation of my proposal to extend the
+> on-disk qcow2 format. As you can see this is still an RFC. Due to the
+> nature of the changes I would like to get as much feedback as possible
+> before going forward.
+>
+> === Problem ===
+>
+> The original problem that I wanted to address is the memory
+> requirements of qcow2 files if you want to have very large images and
+> still keep good I/O performance. This is a consequence of its very
+> structure, which I'm going to describe now.
+>
+> A qcow2 image is divided into units of constant size called clusters,
+> and among other things it contains metadata that maps guest addresses
+> to host addresses (the so-called L1 and L2 tables).
+>
+> There are two basic problems that result from this:
+>
+> 1) Reading from or writing to a qcow2 image involves reading the
+>    corresponding entry on the L2 table that maps the guest address to
+>    the host address. This is very slow because it involves two I/O
+>    operations: one on the L2 table and the other one on the actual
+>    data cluster.
+>
+> 2) A cluster is the smallest unit of allocation. Therefore writing a
+>    mere 512 bytes to an empty disk requires allocating a complete
+>    cluster and filling it with zeroes (or with data from the backing
+>    image if there is one). This wastes more disk space and also has a
+>    negative impact on I/O.
+>
+> Problem (1) can be solved by keeping in memory a cache of the L2
+> tables (QEMU has an "l2_cache_size" parameter for this purpose). The
+> amount of disk space used by L2 tables depends on two factors: the
+> disk size and the cluster size.
+>
+> The cluster size can be configured when the image is created, and it
+> can be any power of two between 512 bytes and 2 MB (it defaults to 64
+> KB).
+>
+> The maximum amount of space needed for the L2 tables can be calculated
+> with the following formula:
+>
+>    max_l2_size = virtual_disk_size * 8 / cluster_size
+>
+> Large images require a large amount of metadata, and therefore a large
+> amount of memory for the L2 cache. With the default cluster size
+> (64KB) that's 128MB of L2 cache for a 1TB qcow2 image.
+>
+> The only way to reduce the size of the L2 tables is therefore
+> increasing the cluster size, but this makes the image less efficient
+> as described earlier in (2).
+>
+> === The proposal ===
+>
+> The idea of this proposal is to extend the qcow2 format by allowing
+> subcluster allocation. There would be an optional feature that would
+> need to be enabled when creating the image. The on-disk format would
+> remain essentially the same, except that each data cluster would be
+> internally divided into a number of subclusters of equal size.
+>
+> What this means in practice is that each entry on an L2 table would be
+> accompanied by a bitmap indicating the allocation state of each one of
+> the subclusters for that cluster. There are several alternatives for
+> storing the bitmap, described below.
+>
+> Other than L2 entries, all other data structures would remain
+> unchanged, but for data clusters the smallest unit of allocation would
+> now be the subcluster. Reference counting would still be at the
+> cluster level, because there's no way to reference individual
+> subclusters. Copy-on-write on internal snapshots would need to copy
+> complete clusters, so that scenario would not benefit from this
+> change.
+>
+> I see two main use cases for this feature:
+>
+> a) The qcow2 image is not too large / the L2 cache is not a problem,
+>    but you want to increase the allocation performance. In this case
+>    you can have something like a 128KB cluster with 4KB subclusters
+>    (with 4KB being a common block size in ext4 and other filesystems)
+>
+> b) The qcow2 image is very large and you want to save metadata space
+>    in order to have a smaller L2 cache. In this case you can go for
+>    the maximum cluster size (2MB) but you want to have smaller
+>    subclusters to increase the allocation performance and optimize the
+>    disk usage. This was actually my original use case.
+>
+> === Test results ===
+>
+> I have a basic working prototype of this. It's still incomplete -and
+> buggy :)- but it gives an idea of what we can expect from it. In my
+> implementation each data cluster has 8 subclusters, but that's not set
+> in stone (see below).
+>
+> I made all tests on an SSD drive, writing to an empty qcow2 image with
+> a fully populated 40GB backing image, performing random writes using
+> fio with a block size of 4KB.
+>
+> I tried with the default and maximum cluster sizes (64KB and 2MB) and
+> also with some other sizes. I also made sure to try with 32KB clusters
+> so the subcluster size matches the 4KB block size used for the I/O.
+>
+> It's important to point out that once a cluster has been completely
+> allocated then having subclusters offers no performance benefit. For
+> this reason the size of the image for these tests (40GB) was chosen to
+> be large enough to guarantee that there are always new clusters being
+> allocated. This is therefore a worst-case scenario (or best-case for
+> this feature, if you want).
+>
+> Here are the results (subcluster size in brackets):
+>
+> |-----------------+----------------+-----------------+-------------------|
+> |  cluster size   | subclusters=on | subclusters=off | Max L2 cache size |
+> |-----------------+----------------+-----------------+-------------------|
+> |   2 MB (256 KB) |   440 IOPS     |  100 IOPS       | 160 KB (*)        |
+> | 512 KB  (64 KB) |  1000 IOPS     |  300 IOPS       | 640 KB            |
+> |  64 KB   (8 KB) |  3000 IOPS     | 1000 IOPS       |   5 MB            |
+> |  32 KB   (4 KB) | 12000 IOPS     | 1300 IOPS       |  10 MB            |
+> |   4 KB  (512 B) |   100 IOPS     |  100 IOPS       |  80 MB            |
+> |-----------------+----------------+-----------------+-------------------|
+>
+>                 (*) The L2 cache must be a multiple of the cluster
+>                     size, so in this case it must be 2MB. On the table
+>                     I chose to show how much of those 2MB are actually
+>                     used so you can compare it with the other cases.
+>
+> Some comments about the results:
+>
+> - For the 64KB, 512KB and 2MB cases, having subclusters increases
+>   write performance roughly by three. This happens because for each
+>   cluster allocation there's less data to copy from the backing
+>   image. For the same reason, the smaller the cluster, the better the
+>   performance. As expected, 64KB clusters with no subclusters perform
+>   roughly the same as 512KB clusters with 64KB subclusters.
+>
+> - The 32KB case is the most interesting one. Without subclusters it's
+>   not very different from the 64KB case, but having a subcluster with
+>   the same size of the I/O block eliminates the need for COW entirely
+>   and the performance skyrockets (10 times faster!).
+>
+> - 4KB is however very slow. I attribute this to the fact that the
+>   cluster size is so small that a new cluster needs to be allocated
+>   for every single write and its refcount updated accordingly. The L2
+>   and refcount tables are also so small that they are too inefficient
+>   and need to grow all the time.
+>
+> Here are the results when writing to an empty 40GB qcow2 image with no
+> backing file. The numbers are of course different but as you can see
+> the patterns are similar:
+>
+> |-----------------+----------------+-----------------+-------------------|
+> |  cluster size   | subclusters=on | subclusters=off | Max L2 cache size |
+> |-----------------+----------------+-----------------+-------------------|
+> |   2 MB (256 KB) |  1200 IOPS     |  255 IOPS       | 160 KB            |
+> | 512 KB  (64 KB) |  3000 IOPS     |  700 IOPS       | 640 KB            |
+> |  64 KB   (8 KB) |  7200 IOPS     | 3300 IOPS       |   5 MB            |
+> |  32 KB   (4 KB) | 12300 IOPS     | 4200 IOPS       |  10 MB            |
+> |   4 KB  (512 B) |   100 IOPS     |  100 IOPS       |  80 MB            |
+> |-----------------+----------------+-----------------+-------------------|
+>
+> === Changes to the on-disk format ===
+>
+> The qcow2 on-disk format needs to change so each L2 entry has a bitmap
+> indicating the allocation status of each subcluster. There are three
+> possible states (unallocated, allocated, all zeroes), so we need two
+> bits per subcluster.
+>
+> An L2 entry is 64 bits wide, and this is the current format (for
+> uncompressed clusters):
+>
+> 63    56 55    48 47    40 39    32 31    24 23    16 15     8 7      0
+> 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+> **<----> <--------------------------------------------------><------->*
+>   Rsrved              host cluster offset of data             Reserved
+>   (6 bits)                (47 bits)                           (8 bits)
+>
+>     bit 63: refcount == 1   (QCOW_OFLAG_COPIED)
+>     bit 62: compressed = 1  (QCOW_OFLAG_COMPRESSED)
+>     bit 0: all zeros        (QCOW_OFLAG_ZERO)
+>
+> I thought of three alternatives for storing the subcluster bitmaps. I
+> haven't made my mind completely about which one is the best one, so
+> I'd like to present all three for discussion. Here they are:
+>
+> (1) Storing the bitmap inside the 64-bit entry
+>
+>     This is a simple alternative and is the one that I chose for my
+>     prototype. There are 14 unused bits plus the "all zeroes" one. If
+>     we steal one from the host offset we have the 16 bits that we need
+>     for the bitmap and we have 46 bits left for the host offset, which
+>     is more than enough.
+>
+>     * Pros:
+>       + Simple. Few changes compared to the current qcow2 format.
+>
+>     * Cons:
+>       - Only 8 subclusters per cluster. We would not be making the
+>         most of this feature.
+>
+>       - No reserved bits left for the future.
+>
+> (2) Making L2 entries 128-bit wide.
+>
+>     In this alternative we would double the size of L2 entries. The
+>     first half would remain unchanged and the second one would store
+>     the bitmap. That would leave us with 32 subclusters per cluster.
+>
+>     * Pros:
+>       + More subclusters per cluster. We could have images with
+>         e.g. 128k clusters with 4k subclusters.
+>
+>     * Cons:
+>       - More space needed for L2 entries. The same cluster size would
+>         require a cache twice as large, although having subcluster
+>         allocation would compensate for this.
+>
+>       - More changes to the code to handle 128-bit entries.
+>
+>       - We would still be wasting the 14 reserved bits that L2 entries
+>         have.
+>
+> (3) Storing the bitmap somewhere else
+>
+>     This would involve storing the bitmap separate from the L2 tables
+>     (perhaps using the bitmaps extension? I haven't looked much into
+>     this).
+>
+>     * Pros:
+>       + Possibility to make the number of subclusters configurable
+>         by the user (32, 64, 128, ...)
+>       + All existing metadata structures would remain untouched
+>         (although the "all zeroes" bit in L2 entries would probably
+>         become unused).
+>
+>     * Cons:
+>       - As with alternative (2), more space needed for metadata.
+>
+>       - The bitmap would also need to be cached for performance
+>         reasons.
+>
+>       - Possibly one more *_cache_size option.
+>
+>       - One more metadata structure to be updated for each
+>         allocation. This would probably impact I/O negatively.
+>
+> === Compressed clusters ===
+>
+> My idea is that compressed clusters would remain the same. They are
+> read-only anyway so they would not be affected by any of these
+> changes.
+>
+> ===========================
+>
+> I think I managed to summarize all the ideas that I had in my mind,
+> but I'm sure you probably have questions and comments, so I'd be happy
+> to get as much feedback as possible.
+>
+> So, looking forward to reading your opinions.
+>
+> Regards,
+>
+> Berto
+>
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- qemu-img-cmds.hx |  4 +--
- qemu-img.c       | 84 +++++++++++++++++++++++++++++++++++++++-----------------
- qemu-img.texi    | 12 ++++++--
- 3 files changed, 71 insertions(+), 29 deletions(-)
+My opinion about this approach is very negative as the problem could
+be (partially) solved in a much better way.
 
-diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
-index 8ac7822..93b50ef 100644
---- a/qemu-img-cmds.hx
-+++ b/qemu-img-cmds.hx
-@@ -40,9 +40,9 @@ STEXI
- ETEXI
- 
- DEF("convert", img_convert,
--    "convert [--object objectdef] [--image-opts] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-o options] [-s snapshot_id_or_name] [-l snapshot_param] [-S sparse_size] [-m num_coroutines] [-W] filename [filename2 [...]] output_filename")
-+    "convert [--object objectdef] [--image-opts] [--target-image-opts] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-o options] [-s snapshot_id_or_name] [-l snapshot_param] [-S sparse_size] [-m num_coroutines] [-W] filename [filename2 [...]] output_filename")
- STEXI
--@item convert [--object @var{objectdef}] [--image-opts] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-o @var{options}] [-s @var{snapshot_id_or_name}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] @var{filename} [@var{filename2} [...]] @var{output_filename}
-+@item convert [--object @var{objectdef}] [--image-opts] [--target-image-opts] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-o @var{options}] [-s @var{snapshot_id_or_name}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] @var{filename} [@var{filename2} [...]] @var{output_filename}
- ETEXI
- 
- DEF("dd", img_dd,
-diff --git a/qemu-img.c b/qemu-img.c
-index 83aff5e..31c4923 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -59,6 +59,7 @@ enum {
-     OPTION_PATTERN = 260,
-     OPTION_FLUSH_INTERVAL = 261,
-     OPTION_NO_DRAIN = 262,
-+    OPTION_TARGET_IMAGE_OPTS = 263,
- };
- 
- typedef enum OutputFormat {
-@@ -1921,7 +1922,7 @@ static int img_convert(int argc, char **argv)
-     int progress = 0, flags, src_flags;
-     bool writethrough, src_writethrough;
-     const char *fmt, *out_fmt, *cache, *src_cache, *out_baseimg, *out_filename;
--    BlockDriver *drv, *proto_drv;
-+    BlockDriver *drv = NULL, *proto_drv = NULL;
-     BlockBackend **blk = NULL, *out_blk = NULL;
-     BlockDriverState **bs = NULL, *out_bs = NULL;
-     int64_t total_sectors;
-@@ -1941,9 +1942,10 @@ static int img_convert(int argc, char **argv)
-     bool image_opts = false;
-     bool wr_in_order = true;
-     long num_coroutines = 8;
-+    bool tgt_image_opts = false;
- 
-+    out_fmt = NULL;
-     fmt = NULL;
--    out_fmt = "raw";
-     cache = "unsafe";
-     src_cache = BDRV_DEFAULT_CACHE;
-     out_baseimg = NULL;
-@@ -1954,6 +1956,7 @@ static int img_convert(int argc, char **argv)
-             {"help", no_argument, 0, 'h'},
-             {"object", required_argument, 0, OPTION_OBJECT},
-             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-+            {"target-image-opts", no_argument, 0, OPTION_TARGET_IMAGE_OPTS},
-             {0, 0, 0, 0}
-         };
-         c = getopt_long(argc, argv, ":hf:O:B:ce6o:s:l:S:pt:T:qnm:W",
-@@ -2075,9 +2078,16 @@ static int img_convert(int argc, char **argv)
-         case OPTION_IMAGE_OPTS:
-             image_opts = true;
-             break;
-+        case OPTION_TARGET_IMAGE_OPTS:
-+            tgt_image_opts = true;
-+            break;
-         }
-     }
- 
-+    if (!out_fmt && !tgt_image_opts) {
-+        out_fmt = "raw";
-+    }
-+
-     if (qemu_opts_foreach(&qemu_object_opts,
-                           user_creatable_add_opts_foreach,
-                           NULL, NULL)) {
-@@ -2090,6 +2100,11 @@ static int img_convert(int argc, char **argv)
-         goto fail_getopt;
-     }
- 
-+    if (tgt_image_opts && !skip_create) {
-+        error_report("--target-image-opts requires use of -n flag");
-+        goto fail_getopt;
-+    }
-+
-     /* Initialize before goto out */
-     if (quiet) {
-         progress = 0;
-@@ -2100,8 +2115,13 @@ static int img_convert(int argc, char **argv)
-     out_filename = bs_n >= 1 ? argv[argc - 1] : NULL;
- 
-     if (options && has_help_option(options)) {
--        ret = print_block_option_help(out_filename, out_fmt);
--        goto out;
-+        if (out_fmt) {
-+            ret = print_block_option_help(out_filename, out_fmt);
-+            goto out;
-+        } else {
-+            error_report("Option help requires a format be specified");
-+            goto fail_getopt;
-+        }
-     }
- 
-     if (bs_n < 1) {
-@@ -2168,22 +2188,22 @@ static int img_convert(int argc, char **argv)
-         goto out;
-     }
- 
--    /* Find driver and parse its options */
--    drv = bdrv_find_format(out_fmt);
--    if (!drv) {
--        error_report("Unknown file format '%s'", out_fmt);
--        ret = -1;
--        goto out;
--    }
-+    if (!skip_create) {
-+        /* Find driver and parse its options */
-+        drv = bdrv_find_format(out_fmt);
-+        if (!drv) {
-+            error_report("Unknown file format '%s'", out_fmt);
-+            ret = -1;
-+            goto out;
-+        }
- 
--    proto_drv = bdrv_find_protocol(out_filename, true, &local_err);
--    if (!proto_drv) {
--        error_report_err(local_err);
--        ret = -1;
--        goto out;
--    }
-+        proto_drv = bdrv_find_protocol(out_filename, true, &local_err);
-+        if (!proto_drv) {
-+            error_report_err(local_err);
-+            ret = -1;
-+            goto out;
-+        }
- 
--    if (!skip_create) {
-         if (!drv->create_opts) {
-             error_report("Format driver '%s' does not support image creation",
-                          drv->format_name);
-@@ -2232,7 +2252,7 @@ static int img_convert(int argc, char **argv)
-         const char *preallocation =
-             qemu_opt_get(opts, BLOCK_OPT_PREALLOC);
- 
--        if (!drv->bdrv_co_pwritev_compressed) {
-+        if (drv && !drv->bdrv_co_pwritev_compressed) {
-             error_report("Compression not supported for this file format");
-             ret = -1;
-             goto out;
-@@ -2272,18 +2292,32 @@ static int img_convert(int argc, char **argv)
-         goto out;
-     }
- 
--    /* XXX we should allow --image-opts to trigger use of
--     * img_open() here, but then we have trouble with
--     * the bdrv_create() call which takes different params.
--     * Not critical right now, so fix can wait...
--     */
--    out_blk = img_open_file(out_filename, out_fmt, flags, writethrough, quiet);
-+    if (skip_create) {
-+        out_blk = img_open(tgt_image_opts, out_filename, out_fmt,
-+                           flags, writethrough, quiet);
-+    } else {
-+        /* TODO ultimately we should allow --target-image-opts
-+         * to be used even when -n is not given.
-+         * That has to wait for bdrv_create to be improved
-+         * to allow filenames in option syntax
-+         */
-+        out_blk = img_open_file(out_filename, out_fmt,
-+                                flags, writethrough, quiet);
-+    }
-     if (!out_blk) {
-         ret = -1;
-         goto out;
-     }
-     out_bs = blk_bs(out_blk);
- 
-+    if (compress) {
-+        if (!out_bs->drv->bdrv_co_pwritev_compressed) {
-+            error_report("Compression not supported for this file format");
-+            ret = -1;
-+            goto out;
-+        }
-+    }
-+
-     /* increase bufsectors from the default 4096 (2M) if opt_transfer
-      * or discard_alignment of the out_bs is greater. Limit to 32768 (16MB)
-      * as maximum. */
-diff --git a/qemu-img.texi b/qemu-img.texi
-index c81db3e..63f597d 100644
---- a/qemu-img.texi
-+++ b/qemu-img.texi
-@@ -45,9 +45,17 @@ keys.
- 
- @item --image-opts
- 
--Indicates that the @var{filename} parameter is to be interpreted as a
-+Indicates that the source @var{filename} parameter is to be interpreted as a
- full option string, not a plain filename. This parameter is mutually
--exclusive with the @var{-f} and @var{-F} parameters.
-+exclusive with the @var{-f} parameter.
-+
-+@item --target-image-opts
-+
-+Indicates that the target @var{filename} parameter(s) are to be interpreted a
-+a full option string, not a plain filename. This parameter is mutually
-+exclusive with the @var{-O} parameters. It is currently required to also use
-+the @var{-n} parameter to skip image creation. This restriction may be relaxed
-+in a future release.
- 
- @item fmt
- is the disk image format. It is guessed automatically in most cases. See below
--- 
-2.9.3
+1) current L2 cache management seems very wrong to me. Each cache
+    miss means that we have to read entire L2 cache block. This means
+    that in the worst case (when dataset of the test does not fit L2 cache
+    size we read 64kb of L2 table for each 4 kb read).
+
+    The situation is MUCH worse once we are starting to increase cluster
+    size. For 1 Mb blocks we have to read 1 Mb on each cache miss.
+
+    The situation can be cured immediately once we will start reading
+    L2 cache with 4 or 8kb chunks. We have patchset for this for our
+    downstream and preparing it for upstream.
+
+Performance results are the following (roughly, from memory) for
+Intel P3700 PCIe SSD, which is 300k IOPS capable.
+
+We have 20k IOPSes without any modifications on 16 Gb dataset IOPS
+test. We have 50k with (1) implemented. With 1Mb datablock we have
+100k IOPses. This is not that big, but this is much better.
+
+2) yet another terrible thing in cluster allocation is its allocation
+strategy.
+    Current QCOW2 codebase implies that we need 5 (five) IOPSes to
+    complete COW operation. We are reading head, writing head, reading
+    tail, writing tail, writing actual data to be written. This could be
+easily
+    reduced to 3 IOPSes.
+    Another problem is the amount of data written. We are writing entire
+    cluster in write operation and this is also insane. It is possible to
+    perform fallocate() and actual data write on normal modern filesystem.
+    This patch series was also finished but not yet sent.
+    This gives around 20 times difference for cluster allocation.
+
+3) Partial allocation is very bad from the later performance point of view.
+    The guest can send 4-5 Mb requests. In this case QCOW2 read for
+    non-sequential data would be completely sequential, having HUGE
+    latency here. We should perform chunk reading in coroutine pool,
+    like has been done recently by Peter Lieven in qemu-img in commit
+    2d9187bc65
+    We are struggling to finish this and put into the production.
+
+I do think that this complex of things could address almost all initial
+issues.
+
+Den
