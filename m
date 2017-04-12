@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cyLOE-0000V7-JK
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 12:45:09 -0400
+	(envelope-from <berrange@redhat.com>) id 1cyLOJ-0000bq-Qa
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 12:45:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cyLOD-0000Xn-UX
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 12:45:06 -0400
+	(envelope-from <berrange@redhat.com>) id 1cyLOI-0000dg-Ma
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 12:45:11 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Wed, 12 Apr 2017 17:44:43 +0100
-Message-Id: <20170412164445.23039-3-berrange@redhat.com>
+Date: Wed, 12 Apr 2017 17:44:45 +0100
+Message-Id: <20170412164445.23039-5-berrange@redhat.com>
 In-Reply-To: <20170412164445.23039-1-berrange@redhat.com>
 References: <20170412164445.23039-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 2/4] qemu-img: fix --image-opts usage with
- dd command
+Subject: [Qemu-devel] [PATCH v4 4/4] qemu-img: copy *key-secret opts when
+ opening newly created files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,37 +23,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-The --image-opts flag can only be used to affect the parsing
-of the source image. The target image has to be specified in
-the traditional style regardless, since it needs to be passed
-to the bdrv_create() API which does not support the new style
-opts.
+The qemu-img dd/convert commands will create a image file and
+then try to open it. Historically it has been possible to open
+new files without passing any options. With encrypted files
+though, the *key-secret options are mandatory, so we need to
+provide those options when opening the newly created file.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- qemu-img.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ qemu-img.c | 41 +++++++++++++++++++++++++++++++++++------
+ 1 file changed, 35 insertions(+), 6 deletions(-)
 
 diff --git a/qemu-img.c b/qemu-img.c
-index 2249c21..83aff5e 100644
+index 31c4923..3d9e7b3 100644
 --- a/qemu-img.c
 +++ b/qemu-img.c
-@@ -4312,8 +4312,13 @@ static int img_dd(int argc, char **argv)
-         goto out;
+@@ -305,15 +305,17 @@ static BlockBackend *img_open_opts(const char *optstr,
+ }
+ 
+ static BlockBackend *img_open_file(const char *filename,
++                                   QDict *options,
+                                    const char *fmt, int flags,
+                                    bool writethrough, bool quiet)
+ {
+     BlockBackend *blk;
+     Error *local_err = NULL;
+-    QDict *options = NULL;
+ 
+     if (fmt) {
+-        options = qdict_new();
++        if (!options) {
++            options = qdict_new();
++        }
+         qdict_put(options, "driver", qstring_from_str(fmt));
      }
  
--    blk2 = img_open(image_opts, out.filename, out_fmt, BDRV_O_RDWR,
--                    false, false);
-+    /* TODO, we can't honour --image-opts for the target,
-+     * since it needs to be given in a format compatible
-+     * with the bdrv_create() call above which does not
-+     * support image-opts style.
-+     */
-+    blk2 = img_open_file(out.filename, out_fmt, BDRV_O_RDWR,
-+                         false, false);
+@@ -332,6 +334,33 @@ static BlockBackend *img_open_file(const char *filename,
+ }
+ 
+ 
++static int img_add_key_secrets(void *opaque,
++                               const char *name, const char *value,
++                               Error **errp)
++{
++    QDict *options = opaque;
++
++    if (g_str_has_suffix(name, "key-secret")) {
++        qdict_put(options, name, qstring_from_str(value));
++    }
++
++    return 0;
++}
++
++static BlockBackend *img_open_new_file(const char *filename,
++                                       QemuOpts *create_opts,
++                                       const char *fmt, int flags,
++                                       bool writethrough, bool quiet)
++{
++    QDict *options = NULL;
++
++    options = qdict_new();
++    qemu_opt_foreach(create_opts, img_add_key_secrets, options, NULL);
++
++    return img_open_file(filename, options, fmt, flags, writethrough, quiet);
++}
++
++
+ static BlockBackend *img_open(bool image_opts,
+                               const char *filename,
+                               const char *fmt, int flags, bool writethrough,
+@@ -351,7 +380,7 @@ static BlockBackend *img_open(bool image_opts,
+         }
+         blk = img_open_opts(filename, opts, flags, writethrough, quiet);
+     } else {
+-        blk = img_open_file(filename, fmt, flags, writethrough, quiet);
++        blk = img_open_file(filename, NULL, fmt, flags, writethrough, quiet);
+     }
+     return blk;
+ }
+@@ -2301,8 +2330,8 @@ static int img_convert(int argc, char **argv)
+          * That has to wait for bdrv_create to be improved
+          * to allow filenames in option syntax
+          */
+-        out_blk = img_open_file(out_filename, out_fmt,
+-                                flags, writethrough, quiet);
++        out_blk = img_open_new_file(out_filename, opts, out_fmt,
++                                    flags, writethrough, quiet);
+     }
+     if (!out_blk) {
+         ret = -1;
+@@ -4351,7 +4380,7 @@ static int img_dd(int argc, char **argv)
+      * with the bdrv_create() call above which does not
+      * support image-opts style.
+      */
+-    blk2 = img_open_file(out.filename, out_fmt, BDRV_O_RDWR,
++    blk2 = img_open_file(out.filename, NULL, out_fmt, BDRV_O_RDWR,
+                          false, false);
  
      if (!blk2) {
-         ret = -1;
 -- 
 2.9.3
