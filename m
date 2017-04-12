@@ -1,27 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cyL9G-0005uP-6W
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 12:29:39 -0400
+	(envelope-from <berrange@redhat.com>) id 1cyLOB-0000Rn-27
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 12:45:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cyL9C-0003Rp-7b
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 12:29:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33118)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cyL9B-0003RT-V3
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 12:29:34 -0400
-Date: Wed, 12 Apr 2017 19:29:28 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170412185249-mutt-send-email-mst@kernel.org>
-References: <1491911135-216950-1-git-send-email-agraf@suse.de>
-	<CALMp9eT220btgiw7S-0cLswr1j=-OCuMwOAWuWS51EmNYYRuJw@mail.gmail.com>
-	<4622E361-52AB-40F2-9915-45C48F0DBCD2@suse.de>
-	<CALMp9eR7AWETNZA1pSBXW2BWcrJXPk-Y1hbNvwu2Vq7Dkf6AjA@mail.gmail.com>
-	<204f274d-697d-f9c6-8719-9bf91105f8b9@suse.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <204f274d-697d-f9c6-8719-9bf91105f8b9@suse.de>
-Subject: Re: [Qemu-devel] [PATCH v6] kvm: better MWAIT emulation for guests
+	(envelope-from <berrange@redhat.com>) id 1cyLO9-0000WL-J7
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 12:45:03 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Wed, 12 Apr 2017 17:44:41 +0100
+Message-Id: <20170412164445.23039-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/4 for-2.10] Improve convert and dd commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,72 +17,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Graf <agraf@suse.de>
-Cc: Jim Mattson <jmattson@google.com>, kvm list <kvm@vger.kernel.org>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, LKML <linux-kernel@vger.kernel.org>, "Gabriel L. Somlo" <gsomlo@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, Joerg Roedel <joro@8bytes.org>, linux-doc@vger.kernel.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On Wed, Apr 12, 2017 at 04:54:10PM +0200, Alexander Graf wrote:
-> 
-> 
-> On 12.04.17 16:34, Jim Mattson wrote:
-> > Actually, we have rejected commit 87c00572ba05aa8c ("kvm: x86: emulate
-> > monitor and mwait instructions as nop"), so when we intercept
-> > MONITOR/MWAIT, we synthesize #UD. Perhaps it is this difference from
-> > vanilla kvm that motivates the following idea...
-> 
-> So you're not running upstream kvm? In that case, you can just not take this
-> patch either :).
-> 
-> > Since we're still not going to report MONITOR support in CPUID, the
-> > only guests of consequence are paravirtual guests. What if a
-> 
-> Only if someone actually implemented something for PV guests, yes.
-> 
-> The real motivation is to allow user space to force set the MONITOR CPUID
-> flag. That way an admin can - if he really wants to - dedicate pCPUs to the
-> VM.
-> 
-> I agree that we don't need the kvm pv flag for that. I'd be happy to drop
-> that if everyone agrees.
+Update to
 
-I don't really agree we do not need the PV flag. mwait on kvm is
-different from mwait on bare metal in that you are heavily penalized by
-scheduler for polling unless you configure the host just so.
-HLT lets you give up the host CPU if you know you won't need
-it for a long time.
+  v1: https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05699.html
+  v2: https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg00728.html
+  v3: https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg04391.html
 
-So while many people can get by with monitor cpuid (those that isolate
-host CPUs) and it's a valuable option to have, I think a PV flag is also
-a valuable option and can be set for more configurations.
+This series is in response to Max pointing out that you cannot
+use 'convert' for an encrypted target image.
 
-Guest has an idle driver calling mwait on short waits and halt on longer
-ones.  I'm in fact testing an idle driver using such a PV flag and will
-post when ready (after vacation ~3 weeks from now probably).
+The 'convert' and 'dd' commands need to first create the image
+and then open it. The bdrv_create() method takes a set of options
+for creating the image, which let us provide a key-secret for the
+encryption key. When the commands then open the new image, they
+don't provide any options, so the image is unable to be opened
+due to lack of encryption key. It is also not possible to use
+the --image-opts argument to provide structured options in the
+target image name - it must be a plain filename to satisfy the
+bdrv_create() API contract.
 
-> > paravirtual guest was aware of the fact that sometimes MONITOR/MWAIT
-> > would work as architected, and sometimes they would raise #UD (or do
-> > something else that's guest-visible, to indicate that the hypevisor is
-> > intercepting the instructions). Such a guest could first try a
-> > MONITOR/MWAIT-based idle loop and then fall back on a HLT-based idle
-> > loop if the hypervisor rejected its use of MONITOR/MWAIT.
-> 
-> How would that work? That guest would have to atomically notify all other
-> vCPUs that wakeup notifications now go via IPIs instead of cache line
-> dirtying.
-> 
-> That's probably as much work to get right as it would be to just emulate
-> MWAIT inside kvm ;).
-> 
-> > We already have the loose concept of "this pCPU has other things to
-> > do," which is encoded in the variable-sized PLE window. With
-> > MONITOR/MWAIT, the choice is binary, but a simple implementation could
-> > tie the two together, by allowing the guest to use MONITOR/MWAIT
-> > whenever the PLE window exceeds a certain threshold. Or the decision
-> > could be left to the userspace agent.
-> 
-> I agree, and that's basically the idea I mentioned earlier with MWAIT
-> emulation. We could (for well behaved guests) switch between emulating MWAIT
-> and running native MWAIT.
-> 
-> 
-> 
-> Alex
+This series addresses these problems to some extent
+
+ - Adds a new --target-image-opts flag which is used to say
+   that the target filename is using structured options.
+   It is *only* permitted to use this when -n is also set.
+   ie the target image must be pre-created so convert/dd
+   don't need to run bdrv_create().
+
+ - When --target-image-opts is not used, add special case
+   code that identifies options passed to bdrv_create()
+   named "*key-secret" and adds them to the options used
+   to open the new image
+
+In future it is desirable to make --target-image-opts work even when -n is
+*not* given. This requires considerable work to create a new bdrv_create()
+API impl.
+
+The first patch fixes a bug in the 'dd' command while the second adds support
+for the missing '--object' arg to 'dd', allowing it to reference secrets when
+opening files.  The last two patches implement the new features described above
+for the 'convert' command.
+
+Changed in v4:
+
+ - Refactor img_open_new_file in terms of img_open_file (Kevin)
+
+Changed in v3:
+
+ - Drop all patches affecting the 'dd' command except for the clear bug fix
+   and the --object support. They can be re-considered once dd is rewritten
+   to run ontop of convert.
+ - Use consistent return/goto style in dd command (Max)
+ - Fix error reporting when using compressed image and skip-create (Max)
+ - Unconditionally create QDict when open files (Max)
+
+Changed in v2:
+
+ - Replace dd -n flag with support for conv=nocreat,notrunc
+ - Misc typos (Eric, Fam)
+
+Daniel P. Berrange (4):
+  qemu-img: add support for --object with 'dd' command
+  qemu-img: fix --image-opts usage with dd command
+  qemu-img: introduce --target-image-opts for 'convert' command
+  qemu-img: copy *key-secret opts when opening newly created files
+
+ qemu-img-cmds.hx |   4 +-
+ qemu-img.c       | 146 +++++++++++++++++++++++++++++++++++++++++++------------
+ qemu-img.texi    |  12 ++++-
+ 3 files changed, 128 insertions(+), 34 deletions(-)
+
+-- 
+2.9.3
