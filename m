@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cyDr0-0001Kj-AR
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 04:42:19 -0400
+	(envelope-from <clg@kaod.org>) id 1cyDwN-0002k2-Fk
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 04:47:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cyDqz-0001ED-AR
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 04:42:18 -0400
-Date: Wed, 12 Apr 2017 16:42:05 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170412084205.GC32022@lemon>
-References: <20170324123458.yk3rj3g47e5xr33i@eukaryote>
-	<0e1c78f3-1b82-58e4-035e-944484e66f29@redhat.com>
-	<20170411120504.GJ4516@noname.str.redhat.com>
-	<58fea8c2-deb7-b9fa-e6d8-d1ea158ed500@redhat.com>
-	<20170411133017.GL4516@noname.str.redhat.com>
+	(envelope-from <clg@kaod.org>) id 1cyDwK-0005i2-CL
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 04:47:51 -0400
+Received: from 10.mo178.mail-out.ovh.net ([46.105.76.150]:38124)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cyDwK-0005h2-6M
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 04:47:48 -0400
+Received: from player715.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id B698331730
+	for <qemu-devel@nongnu.org>; Wed, 12 Apr 2017 10:47:45 +0200 (CEST)
+References: <1491984907-9894-1-git-send-email-bharata@linux.vnet.ibm.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <9e992fd5-8f42-5ec6-2a77-f6d9ce088226@kaod.org>
+Date: Wed, 12 Apr 2017 10:47:39 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170411133017.GL4516@noname.str.redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] Making QMP 'block-job-cancel'
- transactionable
+In-Reply-To: <1491984907-9894-1-git-send-email-bharata@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] spapr-cpu-core: Release ICPState object
+ during CPU unrealization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +30,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-On Tue, 04/11 15:30, Kevin Wolf wrote:
-> Am 11.04.2017 um 15:14 hat Eric Blake geschrieben:
-> > On 04/11/2017 07:05 AM, Kevin Wolf wrote:
-> > > Note that job completion/cancellation aren't synchronous QMP commands.
-> > > The job works something like this, where '...' means that the VM can run
-> > > and submit new writes etc.:
-> > > 
-> > > 1. Start job: mirror_start
-> > > ...
-> > > 2. Bulk has completed: BLOCK_JOB_READY event
-> > > ...
-> > > 3. Request completion/cancellation: block-job-completet/cancel
-> > > ...
-> > > 4. Actual completion/cancellation: BLOCK_JOB_COMPLETED
-> > > 
-> > > The last one is the actual job completion that we want to be atomic for
-> > > a group of nodes. Just making step 3 atomic (which is what including
-> > > block-job-complete/cancel in transaction would mean) doesn't really buy
-> > > us anything because the data will still change between step 3 and 4.
-> > 
-> > But as long as the data changes between steps 3 and 4 are written to
-> > only one of the two devices, rather than both, then the disk contents
-> > atomicity is guaranteed at the point where we stopped the mirroring (ie.
-> > during step 3).
-> 
-> But that's not how things work. Essentially requesting completion means
-> that the next time that source and target are in sync, we complete the
-> block job. This means that still new copying requests can be issued
-> before the job actually completes (and it's even likely to happen).
-> 
-> > > Now step 4 is reached for each job individually, and unless you stop the
-> > > VM (or at least the processing of I/O requests), I don't see how you
-> > > could reach it at the same time for all jobs.
-> > 
-> > The fact that the jobs complete independently (based on different
-> > amounts of data to flush) is not problematic, if we are still guaranteed
-> > that issuing the request altered the graph so that future writes by the
-> > guest only go to one side, and the delay in closing is only due to
-> > flushing write requests that pre-dated the job end request.
-> 
-> This is not easily possible without implementing something like a backup
-> job for the final stage of the mirror job... Otherwise the guest can
-> always overwrite a sector that is still marked dirty and then that new
-> sector will definitely be copied still.
+On 04/12/2017 10:15 AM, Bharata B Rao wrote:
+> Recent commits that re-organized ICPState object missed to destroy
+> the object when CPU is unrealized. Fix this so that CPU unplug
+> doesn't abort QEMU.
 
-We can add a block-job-cancel-sync command and call block_job_cancel_sync(). If
-added to transaction, this does what Eric is asking, right?
+Indeed.
 
-Fam
+> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+
+I am wondering if we should not be doing the unparent under=20
+spapr_cpu_destroy() or even xics_cpu_destroy(). Apart from
+that,=20
+
+Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
+
+Thanks,
+
+C.
+
+> ---
+>  hw/ppc/spapr_cpu_core.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index 2e689b5..4389ef4 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -127,6 +127,7 @@ static void spapr_cpu_core_unrealizefn(DeviceState =
+*dev, Error **errp)
+>          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> =20
+>          spapr_cpu_destroy(cpu);
+> +        object_unparent(cpu->intc);
+>          cpu_remove_sync(cs);
+>          object_unparent(obj);
+>      }
+>=20
