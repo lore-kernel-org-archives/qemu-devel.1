@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52078)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cyfGL-0004X5-Ti
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 09:58:18 -0400
+	(envelope-from <kwolf@redhat.com>) id 1cyfHi-0005c0-J9
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 09:59:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cyfGK-0004fm-Ve
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 09:58:17 -0400
-Date: Thu, 13 Apr 2017 10:58:05 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170413135805.GE27126@thinpad.lan.raisama.net>
-References: <1490189568-167621-1-git-send-email-imammedo@redhat.com>
-	<1490189568-167621-11-git-send-email-imammedo@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1cyfHd-0005cH-MV
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 09:59:42 -0400
+Date: Thu, 13 Apr 2017 15:59:29 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170413135929.GE5095@noname.redhat.com>
+References: <20170406150148.zwjpozqtale44jfh@perseus.local>
+	<2b915695-29b5-df8d-4d89-080eeaaaff13@openvz.org>
+	<w51shlcv7sb.fsf@maestria.local.igalia.com>
+	<565c1e1b-b9e1-e9c5-790e-283d04afc747@openvz.org>
+	<w51poggv3xh.fsf@maestria.local.igalia.com>
+	<ec4f6034-0c94-658c-6b2a-e0aecea173f4@openvz.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1490189568-167621-11-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 10/23] numa: mirror cpu to node
- mapping in MachineState::possible_cpus
+In-Reply-To: <ec4f6034-0c94-658c-6b2a-e0aecea173f4@openvz.org>
+Subject: Re: [Qemu-devel] [RFC] Proposed qcow2 extension: subcluster
+ allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,114 +28,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: "Denis V. Lunev" <den@openvz.org>
+Cc: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Wed, Mar 22, 2017 at 02:32:35PM +0100, Igor Mammedov wrote:
-> Introduce machine_set_cpu_numa_node() helper that stores
-> node mapping for CPU in MachineState::possible_cpus.
-> CPU and node it belongs to is specified by 'props' argument.
-> 
-> Patch doesn't remove old way of storing mapping in
-> numa_info[X].node_cpu as removing it at the same time
-> makes patch rather big. Instead it just mirrors mapping
-> in possible_cpus and follow up per target patches will
-> switch to possible_cpus and numa_info[X].node_cpu will
-> be removed once there isn't any users left.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
->  include/hw/boards.h |  2 ++
->  hw/core/machine.c   | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  numa.c              |  8 +++++++
->  3 files changed, 78 insertions(+)
-> 
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index 1dd0fde..40f30f1 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -42,6 +42,8 @@ bool machine_dump_guest_core(MachineState *machine);
->  bool machine_mem_merge(MachineState *machine);
->  void machine_register_compat_props(MachineState *machine);
->  HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine);
-> +void machine_set_cpu_numa_node(MachineState *machine,
-> +                               CpuInstanceProperties *props, Error **errp);
->  
->  /**
->   * CPUArchId:
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 0d92672..6ff0b45 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -388,6 +388,74 @@ HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine)
->      return head;
->  }
->  
-> +void machine_set_cpu_numa_node(MachineState *machine,
-> +                               CpuInstanceProperties *props, Error **errp)
+Am 13.04.2017 um 15:30 hat Denis V. Lunev geschrieben:
+> On 04/13/2017 04:21 PM, Alberto Garcia wrote:
+> > On Thu 13 Apr 2017 02:44:51 PM CEST, Denis V. Lunev wrote:
+> >>>> 1) current L2 cache management seems very wrong to me. Each cache
+> >>>>     miss means that we have to read entire L2 cache block. This means
+> >>>>     that in the worst case (when dataset of the test does not fit L2
+> >>>>     cache size we read 64kb of L2 table for each 4 kb read).
+> >>>>
+> >>>>     The situation is MUCH worse once we are starting to increase
+> >>>>     cluster size. For 1 Mb blocks we have to read 1 Mb on each cache
+> >>>>     miss.
+> >>>>
+> >>>>     The situation can be cured immediately once we will start reading
+> >>>>     L2 cache with 4 or 8kb chunks. We have patchset for this for our
+> >>>>     downstream and preparing it for upstream.
+> >>> Correct, although the impact of this depends on whether you are using
+> >>> SDD or HDD.
+> >>>
+> >>> With an SSD what you want is to minimize is the number of unnecessary
+> >>> reads, so reading small chunks will likely increase the performance when
+> >>> there's a cache miss.
+> >>>
+> >>> With an HDD what you want is to minimize the number of seeks. Once you
+> >>> have moved the disk head to the location where the cluster is, reading
+> >>> the whole cluster is relatively inexpensive, so (leaving the memory
+> >>> requirements aside) you generally want to read as much as possible.
+> >> no! This greatly helps for HDD too!
+> >>
+> >> The reason is that you cover areas of the virtual disk much more
+> >> precise.  There is very simple example. Let us assume that I have
+> >> f.e. 1 TB virtual HDD with 1 MB block size. As far as I understand
+> >> right now L2 cache for the case consists of 4 L2 clusters.
+> >>
+> >> So, I can exhaust current cache only with 5 requests and each actual
+> >> read will costs L2 table read. This is a read problem. This condition
+> >> could happen on fragmented FS without a problem.
+> > But what you're saying is that this makes a more efficient use of cache
+> > memory.
+> >
+> > If the guest OS has a lot of unused space but is very fragmented then
+> > you don't want to fill up your cache with L2 entries that are not going
+> > to be used. It's better to read smaller chunks from the L2 table so
+> > there are fewer chances of having to evict entries from the
+> > cache. Therefore this results in less cache misses and better I/O
+> > performance.
+> >
+> > Ok, this sounds perfectly reasonable to me.
+> >
+> > If the cache is however big enough for the whole disk then you never
+> > need to evict entries, so with an HDD you actually want to take
+> > advantage of disk seeks and read as many L2 entries as possible.
+> >
+> > However it's true that in this case this will only affect the initial
+> > reads. Once the cache is full there's no need to read the L2 tables from
+> > disk anymore and the performance will be the same, so your point remains
+> > valid.
+> >
+> > Still, one of the goals from my proposal is to reduce the amount of
+> > metadata needed for the image. No matter how efficient you make the
+> > cache, the only way to reduce the amount of L2 entries is to increase
+> > the cluster size. And increasing the cluster size results in slower COW
+> > and less efficient use of disk space.
+> actually we can read by clusters if the cache is empty or near empty.
+> Yes, block size should be increased. I perfectly in agreement with your.
+> But I think that we could do that by plain increase of the cluster size
+> without any further dances. Sub-clusters as sub-clusters will help
+> if we are able to avoid COW. With COW I do not see much difference.
 
-If you change this to:
+With COW, it's basically just the same argument as you're making for
+reading L2 tables: There's a difference between having to copy 64k to
+process a write request and having to copy 2 MB.
 
-  void cpu_slot_set_numa_node(CPUArchId *slot, uint64_t node_id,
-                              Error **errp);
+> But for the case of the COW absence, further sequential reading will
+> be broken by the fragmented file in the host. That is the point. We
+> should try to avoid host fragmentation at all.
 
-and move the CPU slot lookup code from machine_set_cpu_numa_node()
-to a helper:
+I still don't understand why you think that subclusters will cause
+fragmentation that wouldn't be there without subclusters. The opposite
+is true, with subclusters, larger cluster sizes become more realistic to
+use.
 
-  CPUArchId *machine_get_cpu_slot(MachineState *machine,
-                                  CpuInstanceProperties *props, Error **errp);
+> >>>>     Another problem is the amount of data written. We are writing
+> >>>>     entire cluster in write operation and this is also insane. It is
+> >>>>     possible to perform fallocate() and actual data write on normal
+> >>>>     modern filesystem.
+> >>> But that only works when filling the cluster with zeroes, doesn't it? If
+> >>> there's a backing image you need to bring all the contents from there.
+> >> Yes. Backing images are problems. Though, even with sub-clusters, we
+> >> will suffer exactly the same with the amount of IOPSes as even with
+> >> that head and tail have to be read. If you are spoken about
+> >> subclusters equals to FS block size and avoid COW at all, this would
+> >> be terribly slow later on with sequential reading. In such an approach
+> >> sequential reading will result in random read.
+> >>
+> >> Guest OSes are written keeping in mind that adjacent LBAs are really
+> >> adjacent and reading them sequentially is a very good idea. This
+> >> invariant will be broken for the case of subclusters.
+> > This invariant is already broken by the very design of the qcow2 format,
+> > subclusters don't really add anything new there. For any given cluster
+> > size you can write 4k in every odd cluster, then do the same in every
+> > even cluster, and you'll get an equally fragmented image.
+>
+> The size of the cluster matters! Our experiments in older Parallels
+> shown that with 1 Mb continuous (!) cluster this invariant is "almost"
+> kept and this works fine for sequential ops.
 
-and change cpu_index_to_cpu_instance_props to return CPUArchId:
+So you should be interested in what I called "use case 2" in another
+email in this thread: Making use of the subclusters so that you can
+increase the cluster size to 2 MB while still maintaining reasonable COW
+granularity.
 
-  CPUArchId *cpu_index_to_cpu_slot(MachineState *machine, int cpu_index);
-
-We could simply have this on "-numa cpu" code:
-
-    slot = machine_get_cpu_slot(machine, props);
-    cpu_slot_set_numa_node(slot, node_id);
-
-and this on the legacy "-numa node,cpu=..." code:
-
-    slot = mc->cpu_index_to_cpu_slot(machine, i);
-    cpu_slot_set_numa_node(slot, node_id);
-
-I believe we will be able to reuse machine_get_cpu_slot() to
-replace pc_find_cpu_slot() and spapr_find_cpu_slot() later.
-
-(I also suggest renaming "CPUArchId" and "possible CPUs" to
-"CPUSlot" and "CPU slots" in the code and comments. This would
-help people reviewing the code, but it can be done later if you
-prefer.)
-
-[...]
-> @@ -177,6 +178,10 @@ static void numa_node_parse(MachineState *ms, NumaNodeOptions *node,
->              return;
->          }
->          bitmap_set(numa_info[nodenr].node_cpu, cpus->value, 1);
-> +        props = mc->cpu_index_to_instance_props(ms, cpus->value);
-> +        props.node_id = nodenr;
-> +        props.has_node_id = true;
-> +        machine_set_cpu_numa_node(ms, &props, &error_fatal);
->      }
->  
->      if (node->has_mem && node->has_memdev) {
-> @@ -393,9 +398,12 @@ void parse_numa_opts(MachineState *ms)
->          if (i == nb_numa_nodes) {
->              for (i = 0; i < max_cpus; i++) {
->                  CpuInstanceProperties props;
-> +                /* fetch default mapping from board and enable it */
->                  props = mc->cpu_index_to_instance_props(ms, i);
-> +                props.has_node_id = true;
->  
->                  set_bit(i, numa_info[props.node_id].node_cpu);
-> +                machine_set_cpu_numa_node(ms, &props, &error_fatal);
->              }
->          }
->  
-> -- 
-> 2.7.4
-> 
-> 
-
--- 
-Eduardo
+Kevin
