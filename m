@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cyiFe-0004Aq-70
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 13:09:47 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1cyiKJ-0005ZR-3M
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 13:14:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cyiFc-0007QZ-5a
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 13:09:46 -0400
-References: <58EF2AA9.8010501@huawei.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <313049a7-b154-d3a1-9cb1-205950ab055a@redhat.com>
-Date: Thu, 13 Apr 2017 19:09:31 +0200
+	(envelope-from <rkagan@virtuozzo.com>) id 1cyiKH-0000S1-Q2
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 13:14:35 -0400
+Date: Thu, 13 Apr 2017 19:42:51 +0300
+From: Roman Kagan <rkagan@virtuozzo.com>
+Message-ID: <20170413164250.GB14317@rkaganb.sw.ru>
+References: <20170406150148.zwjpozqtale44jfh@perseus.local>
+	<2b915695-29b5-df8d-4d89-080eeaaaff13@openvz.org>
+	<w51shlcv7sb.fsf@maestria.local.igalia.com>
+	<565c1e1b-b9e1-e9c5-790e-283d04afc747@openvz.org>
+	<w51poggv3xh.fsf@maestria.local.igalia.com>
+	<20170413135155.GD5095@noname.redhat.com>
+	<w51k26ov1eq.fsf@maestria.local.igalia.com>
+	<20170413142735.GF5095@noname.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <58EF2AA9.8010501@huawei.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] ARM virt machine boots fail with 14 ioh3420
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20170413142735.GF5095@noname.redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC] Proposed qcow2 extension:
+ subcluster allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,147 +30,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shannon Zhao <zhaoshenglong@huawei.com>, "edk2-devel@lists.01.org" <edk2-devel@ml01.01.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, zhuweilun <zhuweilun@huawei.com>, Marcel Apfelbaum <marcel@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andrea Bolognani <abologna@redhat.com>, Drew Jones <drjones@redhat.com>, qemu devel list <qemu-devel@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Alberto Garcia <berto@igalia.com>, "Denis V. Lunev" <den@openvz.org>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Adding Andrea, Ard, Drew and Marcel; and the main qemu list
-
-On 04/13/17 09:37, Shannon Zhao wrote:
-> Hi,
+On Thu, Apr 13, 2017 at 04:27:35PM +0200, Kevin Wolf wrote:
+> Am 13.04.2017 um 16:15 hat Alberto Garcia geschrieben:
+> > On Thu 13 Apr 2017 03:51:55 PM CEST, Kevin Wolf wrote:
+> > >> This invariant is already broken by the very design of the qcow2
+> > >> format, subclusters don't really add anything new there. For any
+> > >> given cluster size you can write 4k in every odd cluster, then do the
+> > >> same in every even cluster, and you'll get an equally fragmented
+> > >> image.
+> > >
+> > > Because this scenario has appeared repeatedly in this thread: Can we
+> > > please use a more realistic one that shows an actual problem? Because
+> > > with 8k or more for the cluster size you don't get any qcow2
+> > > fragmentation with 4k even/odd writes (which is a pathological case
+> > > anyway), and the file systems are clever enough to cope with it, too.
+> > >
+> > > Just to confirm this experimentally, I ran this short script:
+> > >
+> > > ----------------------------------------------------------------
+> > > #!/bin/bash
+> > > ./qemu-img create -f qcow2 /tmp/test.qcow2 64M
+> > >
+> > > echo even blocks
+> > > for i in $(seq 0 32767); do echo "write $((i * 8))k 4k"; done | ./qemu-io /tmp/test.qcow2 > /dev/null
+> > > echo odd blocks
+> > > for i in $(seq 0 32767); do echo "write $((i * 8 + 4))k 4k"; done | ./qemu-io /tmp/test.qcow2 > /dev/null
+> > >
+> > > ./qemu-img map /tmp/test.qcow2
+> > > filefrag -v /tmp/test.qcow2
+> > > ----------------------------------------------------------------
+> > 
+> > But that's because while you're writing on every other 4k block the
+> > cluster size is 64k, so you're effectively allocating clusters in
+> > sequential order. That's why you get this:
+> > 
+> > > Offset          Length          Mapped to       File
+> > > 0               0x4000000       0x50000         /tmp/test.qcow2
+> > 
+> > You would need to either have 4k clusters, or space writes even more.
+> > 
+> > Here's a simpler example, mkfs.ext4 on an empty drive gets you something
+> > like this:
+> > [...]
 > 
-> I'm testing the PCIe devices hotplug for ARM virt machine and using
-> ioh3420 as root port. I found that below command line could work.
+> My point wasn't that qcow2 doesn't fragment, but that Denis and you were
+> both using a really bad example. You were trying to construct an
+> artificially bad image and you actually ended up constructing a perfect
+> one.
 > 
-> qemu-system-aarch64 -machine virt,accel=kvm,usb=off -cpu host -bios
-> QEMU_EFI.fd -m 12288 -smp 8,sockets=8,cores=1,threads=1  -device
-> ioh3420,port=0x8,chassis=1,id=pci.1,bus=pcie.0,addr=0x1 -device
-> ioh3420,port=0x9,chassis=2,id=pci.2,bus=pcie.0,addr=0x2 -device
-> ioh3420,port=0xa,chassis=3,id=pci.3,bus=pcie.0,addr=0x3 -device
-> ioh3420,port=0xb,chassis=4,id=pci.4,bus=pcie.0,addr=0x4 -device
-> ioh3420,port=0xc,chassis=5,id=pci.5,bus=pcie.0,addr=0x5 -device
-> ioh3420,port=0xd,chassis=6,id=pci.6,bus=pcie.0,addr=0x6 -device
-> ioh3420,port=0xe,chassis=7,id=pci.7,bus=pcie.0,addr=0x7 -device
-> ioh3420,port=0xf,chassis=8,id=pci.8,bus=pcie.0,addr=0x8 -device
-> ioh3420,port=0x10,chassis=9,id=pci.9,bus=pcie.0,addr=0x9 -device
-> ioh3420,port=0x11,chassis=10,id=pci.10,bus=pcie.0,addr=0xa -device
-> ioh3420,port=0x12,chassis=11,id=pci.11,bus=pcie.0,addr=0xb -device
-> ioh3420,port=0x13,chassis=12,id=pci.12,bus=pcie.0,addr=0xc -device
-> ioh3420,port=0x14,chassis=13,id=pci.13,bus=pcie.0,addr=0xd -device
-> i82801b11-bridge,id=pci.17,bus=pcie.0,addr=0x11 -device
-> pci-bridge,chassis_nr=18,id=pci.18,bus=pci.17,addr=0x0 -device
-> usb-ehci,id=usb,bus=pci.18,addr=0x1 -device
-> virtio-scsi-pci,id=scsi0,bus=pci.1,addr=0x0,disable-legacy=on,disable-modern=off
-> -drive
-> file=/mnt/sdb/guest.raw,format=raw,if=none,id=drive-scsi0-0-0-0,cache=none,aio=native
-> -device
-> scsi-hd,bus=scsi0.0,channel=0,scsi-id=0,lun=0,drive=drive-scsi0-0-0-0,id=scsi0-0-0-0,bootindex=1
-> -netdev tap,id=hostnet1,vhost=on -device
-> virtio-net-pci,netdev=hostnet1,id=net1,mac=00:16:3e:2b:cc:e1,bus=pci.2,addr=0x0,disable-legacy=on,disable-modern=off
-> -netdev tap,id=hostnet2,vhost=on -device
-> virtio-net-pci,netdev=hostnet2,id=net2,mac=00:16:3e:22:29:80,bus=pci.3,addr=0x0,disable-legacy=on,disable-modern=off
-> -netdev tap,id=hostnet3,vhost=on -device
-> virtio-net-pci,netdev=hostnet3,id=net3,mac=00:16:3e:28:07:9a,bus=pci.4,addr=0x0,disable-legacy=on,disable-modern=off
-> -netdev tap,id=hostnet4,vhost=on -device
-> virtio-net-pci,netdev=hostnet4,id=net4,mac=00:16:3e:3d:cd:b6,bus=pci.5,addr=0x0,disable-legacy=on,disable-modern=off
-> -netdev tap,id=hostnet5,vhost=on -device
-> virtio-net-pci,netdev=hostnet5,id=net5,mac=00:16:3e:64:9f:b0,bus=pci.6,addr=0x0,disable-legacy=on,disable-modern=off
-> -netdev tap,id=hostnet6,vhost=on -device
-> virtio-net-pci,netdev=hostnet6,id=net6,mac=00:16:3e:33:5b:d3,bus=pci.7,addr=0x0,disable-legacy=on,disable-modern=off
-> -netdev tap,id=hostnet7,vhost=on -device
-> virtio-net-pci,netdev=hostnet7,id=net7,mac=00:16:3e:39:7c:df,bus=pci.8,addr=0x0,disable-legacy=on,disable-modern=off
-> -netdev tap,id=hostnet8,vhost=on -device
-> virtio-net-pci,netdev=hostnet8,id=net8,mac=00:16:3e:0a:c1:4e,bus=pci.9,addr=0x0,disable-legacy=on,disable-modern=off
-> -netdev tap,id=hostnet9,vhost=on -device
-> virtio-net-pci,netdev=hostnet9,id=net9,mac=00:16:3e:0a:58:a6,bus=pci.10,addr=0x0,disable-legacy=on,disable-modern=off
-> -netdev tap,id=hostnet10,vhost=on -device
-> virtio-net-pci,netdev=hostnet10,id=net10,mac=00:16:3e:35:b5:80,bus=pci.11,addr=0x0,disable-legacy=on,disable-modern=off
-> -netdev tap,id=hostnet11,vhost=on -device
-> virtio-net-pci,netdev=hostnet11,id=net11,mac=00:16:3e:4d:b5:bb,bus=pci.12,addr=0x0,disable-legacy=on,disable-modern=off
-> -netdev tap,id=hostnet12,vhost=on -device
-> virtio-net-pci,netdev=hostnet12,id=net12,mac=00:16:3e:3b:69:e9,bus=pci.13,addr=0x0,disable-legacy=on,disable-modern=off
-> -nographic
+> > Now, I haven't measured the effect of this on I/O performance, but
+> > Denis's point seems in principle valid to me.
 > 
-> But if I add one more ioh3420 device by appending above command with
-> "-device ioh3420,port=0x15,chassis=14,id=pci.14,bus=pcie.0,addr=0xe",
-> the guest can't boot. It seems that the firmware doesn't recognize the
-> PCIe devices and print "Connect: PciRoot(0x0): Not Found".
+> In principle yes, but especially his fear of host file system
+> fragmentation seems a bit exaggerated. If I use 64k even/odd writes in
+> the script, I end up with a horribly fragmented qcow2 image, but still
+> perfectly contiguous layout of the image file in the file system.
 > 
-> I'm using QEMU 2.8.1 and edk2 at commit 36a0d5c. Is there any limitation
-> of the supported PCIe devices?
+> We can and probably should do something about the qcow2 fragmentation
+> eventually (I guess a more intelligent cluster allocation strategy could
+> go a long way there), but I wouldn't worry to much about the host file
+> system.
 
-In one sentence: you are running out of (emulated) IO space.
+I beg to disagree.  I didn't have QEMU with subcluster allocation
+enabled (you did, didn't you?) so I went ahead with a raw file:
 
-Aarch64 does not have "IO space", but with QEMU, using the "virt"
-machine type, we emulate 64KB of IO space, mapped to a special MMIO
-range. This is available for PCI resource allocation, for such devices
-that have IO BARs (and for such PCI bridges that reserve IO space for
-hotplug purposes).
+# truncate --size 64k bbb                                                                                                                                                          [14/14]
+# filefrag -v bbb
+Filesystem type is: ef53
+File size of bbb is 65536 (16 blocks of 4096 bytes)
+bbb: 0 extents found
+# for i in {0..7}; do echo write $[(i * 2) * 4]k 4k; done | qemu-io bbb
+...
+# for i in {0..7}; do echo write $[(i * 2 + 1) * 4]k 4k; done | qemu-io bbb
+...
+# filefrag -v bbb
+Filesystem type is: ef53
+File size of bbb is 65536 (16 blocks of 4096 bytes)
+ ext:     logical_offset:        physical_offset: length:   expected: flags:
+   0:        0..       1:   65860793..  65860794:      2:
+   1:        2..       2:   65859644..  65859644:      1:   65860795:
+   2:        3..       3:   65859651..  65859651:      1:   65859645:
+   3:        4..       4:   65859645..  65859645:      1:   65859652:
+   4:        5..       5:   65859652..  65859652:      1:   65859646:
+   5:        6..       6:   65859646..  65859646:      1:   65859653:
+   6:        7..       7:   65859653..  65859653:      1:   65859647:
+   7:        8..       8:   65859647..  65859647:      1:   65859654:
+   8:        9..       9:   65859654..  65859654:      1:   65859648:
+   9:       10..      10:   65859648..  65859648:      1:   65859655:
+  10:       11..      11:   65859655..  65859655:      1:   65859649:
+  11:       12..      12:   65859649..  65859649:      1:   65859656:
+  12:       13..      13:   65859656..  65859656:      1:   65859650:
+  13:       14..      14:   65859650..  65859650:      1:   65859657:
+  14:       15..      15:   65859657..  65859657:      1:   65859651: last,eof
+bbb: 15 extents found
 
-The ioh3420 PCI Express Root Port device represents such a bridge. Even
-if you plug a PCI Express device into it that has only MMIO BARs, the
-bridge still advertises IO support, and it causes the firmware (and/or
-Linux) to reserve 4KB of IO space. With ~15-16 such ports, you run out
-of the 64 KB IO aperture, and the resource assignment fails.
+So the host filesystem did a very poor job here (ext4 on top of two-way
+raid0 on top of rotating disks).
 
-The solution to this problem comes together from several parts:
+Naturally, replacing truncate with fallocate in the above example gives
+no fragmenation:
 
-(1) New, vendor-independent device models in QEMU, for PCI Express Root
-Ports and Downstream Ports, that (optionally) do not advertise any
-support at all for IO BARs. This is on Marcel's task list. Please refer to:
+...
+# filefrag -v bbb
+Filesystem type is: ef53
+File size of bbb is 65536 (16 blocks of 4096 bytes)
+ ext:     logical_offset:        physical_offset: length:   expected: flags:
+   0:        0..      15:  183616784.. 183616799:     16:             last,eof
+bbb: 1 extent found
 
-  generic port device model:
-    https://bugzilla.redhat.com/show_bug.cgi?id=1390316
-
-  optional disablement of IO space:
-    https://bugzilla.redhat.com/show_bug.cgi?id=1344299
-
-(2) A similar question exists for MMIO space. While there the issue
-isn't exactly "running out of available aperture", we still want to
-control the MMIO reservation size for root ports and downstream ports --
-different devices that are to be hot-plugged can require different
-reservations in advance. For this, please refer to:
-
-  sizing of MMIO reservation:
-    https://bugzilla.redhat.com/show_bug.cgi?id=1437113
-
-(3) In the firmware, platform code can control the aperture reservation
-of bridges, for hotplug purposes, while the generic PCI Bus driver
-enumerates devices and assigns resources. The driver that does this is
-
-  OvmfPkg/PciHotPlugInitDxe
-
-At the moment, this driver is only included in OVMF, not in ArmVirtQemu.
-Plus, it doesn't really do the right thing in OVMF either.
-
-Once items (1) and (2) above are solved, I will update PciHotPlugInitDxe
-so that it adheres to the reservation sizes dictated by QEMU. For this,
-please refer to:
-
-  adhere to IO reservation disablement:
-    https://bugzilla.redhat.com/show_bug.cgi?id=1434740
-    (depends on BZ#1344299 above)
-
-  adhere to MMIO reservation sizing:
-    https://bugzilla.redhat.com/show_bug.cgi?id=1434747
-    (depends on BZ#1437113 above)
-
-We plan to work on these items in the following months (upstream first,
-obviously).
-
---*--
-
-Please read the following document in the QEMU source tree:
-
-  docs/pcie.txt
-
-It will give you the "grand vision" we have for PCI Express on the Q35
-(x86) machine type, and most of that -- intentionally! -- applies to the
-"virt" (aarch64) machine type as well.
-
-See also the following QEMU commits (especially the second one):
-
-  9ca019c1dd57 q35: Improve sample configuration files
-  166d434685ed mach-virt: Provide sample configuration files
-
-Thanks!
-Laszlo
+Roman.
