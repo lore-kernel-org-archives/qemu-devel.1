@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cybEW-0008UL-Bx
+	(envelope-from <wei.w.wang@intel.com>) id 1cybEW-0008UK-Bv
 	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 05:40:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cybES-0008IG-GA
+	(envelope-from <wei.w.wang@intel.com>) id 1cybES-0008IU-Te
 	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 05:40:08 -0400
 Received: from mga02.intel.com ([134.134.136.20]:11319)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1cybES-0008Hg-7m
+	id 1cybES-0008Hg-M8
 	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 05:40:04 -0400
 From: Wei Wang <wei.w.wang@intel.com>
-Date: Thu, 13 Apr 2017 17:35:03 +0800
-Message-Id: <1492076108-117229-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v9 0/5] Extend virtio-balloon for fast
- (de)inflating & fast live migration
+Date: Thu, 13 Apr 2017 17:35:04 +0800
+Message-Id: <1492076108-117229-2-git-send-email-wei.w.wang@intel.com>
+In-Reply-To: <1492076108-117229-1-git-send-email-wei.w.wang@intel.com>
+References: <1492076108-117229-1-git-send-email-wei.w.wang@intel.com>
+Subject: [Qemu-devel] [PATCH v9 1/5] virtio-balloon: deflate via a page list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,39 +26,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, david@redhat.com, dave.hansen@intel.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, wei.w.wang@intel.com, liliang.opensource@gmail.com
 
-This patch series implements two optimizations:
-1) transfer pages in chuncks between the guest and host;
-2) transfer the guest unused pages to the host so that they
-can be skipped to migrate in live migration.
+From: Liang Li <liang.z.li@intel.com>
 
-Changes:
-v8->v9:
-1) Split the two new features, VIRTIO_BALLOON_F_BALLOON_CHUNKS and
-VIRTIO_BALLOON_F_MISC_VQ, which were mixed together in the previous
-implementation;
-2) Simpler function to get the free page block.
+This patch saves the deflated pages to a list, instead of the PFN array.
+Accordingly, the balloon_pfn_to_page() function is removed.
 
-v7->v8:
-1) Use only one chunk format, instead of two.
-2) re-write the virtio-balloon implementation patch.
-3) commit changes
-4) patch re-org
+Signed-off-by: Liang Li <liang.z.li@intel.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+---
+ drivers/virtio/virtio_balloon.c | 22 ++++++++--------------
+ 1 file changed, 8 insertions(+), 14 deletions(-)
 
-Liang Li (1):
-  virtio-balloon: deflate via a page list
-
-Wei Wang (4):
-  virtio-balloon: VIRTIO_BALLOON_F_BALLOON_CHUNKS
-  mm: function to offer a page block on the free list
-  mm: export symbol of next_zone and first_online_pgdat
-  virtio-balloon: VIRTIO_BALLOON_F_MISC_VQ
-
- drivers/virtio/virtio_balloon.c     | 615 +++++++++++++++++++++++++++++++++---
- include/linux/mm.h                  |   3 +
- include/uapi/linux/virtio_balloon.h |  21 ++
- mm/mmzone.c                         |   2 +
- mm/page_alloc.c                     |  87 +++++
- 5 files changed, 678 insertions(+), 50 deletions(-)
-
+diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
+index 181793f..f59cb4f 100644
+--- a/drivers/virtio/virtio_balloon.c
++++ b/drivers/virtio/virtio_balloon.c
+@@ -103,12 +103,6 @@ static u32 page_to_balloon_pfn(struct page *page)
+ 	return pfn * VIRTIO_BALLOON_PAGES_PER_PAGE;
+ }
+ 
+-static struct page *balloon_pfn_to_page(u32 pfn)
+-{
+-	BUG_ON(pfn % VIRTIO_BALLOON_PAGES_PER_PAGE);
+-	return pfn_to_page(pfn / VIRTIO_BALLOON_PAGES_PER_PAGE);
+-}
+-
+ static void balloon_ack(struct virtqueue *vq)
+ {
+ 	struct virtio_balloon *vb = vq->vdev->priv;
+@@ -181,18 +175,16 @@ static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
+ 	return num_allocated_pages;
+ }
+ 
+-static void release_pages_balloon(struct virtio_balloon *vb)
++static void release_pages_balloon(struct virtio_balloon *vb,
++				 struct list_head *pages)
+ {
+-	unsigned int i;
+-	struct page *page;
++	struct page *page, *next;
+ 
+-	/* Find pfns pointing at start of each page, get pages and free them. */
+-	for (i = 0; i < vb->num_pfns; i += VIRTIO_BALLOON_PAGES_PER_PAGE) {
+-		page = balloon_pfn_to_page(virtio32_to_cpu(vb->vdev,
+-							   vb->pfns[i]));
++	list_for_each_entry_safe(page, next, pages, lru) {
+ 		if (!virtio_has_feature(vb->vdev,
+ 					VIRTIO_BALLOON_F_DEFLATE_ON_OOM))
+ 			adjust_managed_page_count(page, 1);
++		list_del(&page->lru);
+ 		put_page(page); /* balloon reference */
+ 	}
+ }
+@@ -202,6 +194,7 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
+ 	unsigned num_freed_pages;
+ 	struct page *page;
+ 	struct balloon_dev_info *vb_dev_info = &vb->vb_dev_info;
++	LIST_HEAD(pages);
+ 
+ 	/* We can only do one array worth at a time. */
+ 	num = min(num, ARRAY_SIZE(vb->pfns));
+@@ -215,6 +208,7 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
+ 		if (!page)
+ 			break;
+ 		set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
++		list_add(&page->lru, &pages);
+ 		vb->num_pages -= VIRTIO_BALLOON_PAGES_PER_PAGE;
+ 	}
+ 
+@@ -226,7 +220,7 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
+ 	 */
+ 	if (vb->num_pfns != 0)
+ 		tell_host(vb, vb->deflate_vq);
+-	release_pages_balloon(vb);
++	release_pages_balloon(vb, &pages);
+ 	mutex_unlock(&vb->balloon_lock);
+ 	return num_freed_pages;
+ }
 -- 
 2.7.4
