@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1cyVJs-0000PX-GP
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 23:21:17 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1cyVgm-0002RC-MJ
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 23:44:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1cyVJr-0008Ee-Ia
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 23:21:16 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1cyVgl-0005vq-O0
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 23:44:56 -0400
+Date: Thu, 13 Apr 2017 12:54:22 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170413025422.GA14531@umbus.fritz.box>
+References: <1491984907-9894-1-git-send-email-bharata@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <1491736758-19540-1-git-send-email-sundeep.lkml@gmail.com>
-References: <1491736758-19540-1-git-send-email-sundeep.lkml@gmail.com>
-From: sundeep subbaraya <sundeep.lkml@gmail.com>
-Date: Thu, 13 Apr 2017 08:51:12 +0530
-Message-ID: <CALHRZurSfOAt53Sf=aGdGe7cHCxNggjUrt6pPDEQLRcvfX_cDA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [Qemu-devel RFC v2 0/4] Add support for
- Smartfusion2 SoC
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="KsGdsel6WgEHnImy"
+Content-Disposition: inline
+In-Reply-To: <1491984907-9894-1-git-send-email-bharata@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] spapr-cpu-core: Release ICPState object
+ during CPU unrealization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,71 +24,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>
+To: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org
 
-Hi Qemu-devel,
 
-This is my first attempt in Qemu.
-Please let me know am doing correct or not.
-SoC is cortex M3 based so no bootrom stuff and unlike other
-SoCs Qemu need not load dtb and kernel in DDR. Hence am using
-u-boot (supplied with -kernel) as bootloader in eNVM and it loads
-kernel from SPI flash to DDR same like real hardware scenario.
-Also let me know any other Maintainers need to be CCed.
+--KsGdsel6WgEHnImy
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thank you,
-Sundeep
+On Wed, Apr 12, 2017 at 01:45:07PM +0530, Bharata B Rao wrote:
+> Recent commits that re-organized ICPState object missed to destroy
+> the object when CPU is unrealized. Fix this so that CPU unplug
+> doesn't abort QEMU.
+>=20
+> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-On Sun, Apr 9, 2017 at 4:49 PM, Subbaraya Sundeep
-<sundeep.lkml@gmail.com> wrote:
-> Hi Qemu-devel,
->
-> I am trying to add Smartfusion2 SoC.
-> SoC is from Microsemi and System on Module(SOM)
-> board is from Emcraft systems. Smartfusion2 has hardened
-> Microcontroller(Cortex-M3)based Sub System and FPGA fabric.
-> At the moment only system timer, sysreg and SPI
-> controller are modelled.
->
-> Testing:
-> ./arm-softmmu/qemu-system-arm -M smartfusion2-som -serial mon:stdio \
-> -kernel u-boot.bin -display none -drive file=spi.bin,if=mtd,format=raw
->
-> U-boot is from Emcraft with modified SPI driver not to use PDMA.
-> Linux is 4.5 linux with Smartfusion2 SoC dts and clocksource
-> driver added by myself @
-> https://github.com/Subbaraya-Sundeep/linux.git
->
-> Baremetal elfs from Microsemi Softconsole IDE are also working.
->
-> Changes from v1:
->     Added SPI controller.
->
-> Thanks,
-> Sundeep
->
-> Subbaraya Sundeep (4):
->   msf2: Add Smartfusion2 System timer
->   msf2: Microsemi Smartfusion2 System Register block.
->   msf2: Add Smartfusion2 SPI controller
->   msf2: Add Emcraft's Smartfusion2 SOM kit.
->
->  default-configs/arm-softmmu.mak |   1 +
->  hw/arm/Makefile.objs            |   2 +-
->  hw/arm/msf2_soc.c               | 141 +++++++++++++
->  hw/misc/Makefile.objs           |   1 +
->  hw/misc/msf2_sysreg.c           | 168 +++++++++++++++
->  hw/ssi/Makefile.objs            |   1 +
->  hw/ssi/msf2_spi.c               | 449 ++++++++++++++++++++++++++++++++++++++++
->  hw/timer/Makefile.objs          |   1 +
->  hw/timer/msf2_timer.c           | 273 ++++++++++++++++++++++++
->  9 files changed, 1036 insertions(+), 1 deletion(-)
->  create mode 100644 hw/arm/msf2_soc.c
->  create mode 100644 hw/misc/msf2_sysreg.c
->  create mode 100644 hw/ssi/msf2_spi.c
->  create mode 100644 hw/timer/msf2_timer.c
->
-> --
-> 2.5.0
->
+Applied to ppc-for-2.10, thanks.
+
+> ---
+>  hw/ppc/spapr_cpu_core.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index 2e689b5..4389ef4 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -127,6 +127,7 @@ static void spapr_cpu_core_unrealizefn(DeviceState *d=
+ev, Error **errp)
+>          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> =20
+>          spapr_cpu_destroy(cpu);
+> +        object_unparent(cpu->intc);
+>          cpu_remove_sync(cs);
+>          object_unparent(obj);
+>      }
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--KsGdsel6WgEHnImy
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJY7uhaAAoJEGw4ysog2bOS6UEP/0KBtIIY5y1VoYBpJAzB9X1I
+HhuUe+DqJqQSy1Xcn/YfCqFC0eTRgMMW+Jwl7uVlHEfHyYgGxaQ1P9HG/OvsSo5Q
+XaLaO60A8/AeBmM8jEZ2nJNvKf/LNP+KAFewttGhVmPrAlzQBtKBa+ZtJ11+4PP/
+xuLnw3NUNr5owZ3bv2azDZbV4U27+JgicWyOssa3UIwd/d4MSd/zdMrh/hoUXBn/
+/yISjOly7wV4P49kjv5EibZa4saNIxaxk15YI4mbyT0oG7mVwEkvBss6u7LNSR5B
+59kvq6PvG272+jiTWDn/FfXfWHRHg3ZFphK4GfKE/j0N9EhvanjnFvbySHi5u9e4
+LJqMUULOsXgSos754IeGlSklcrWBKNzRgi5zVox/NYyeexTqrYoTQ8bmbgJPRbsX
+tp2PcITMNT8xCMS7zMuEKMG4GMmYLwuTpGHMtGMR5R3vmFAinm5o1N96X2Ozf1BB
+Z8ieTNVZTkeeBHD3swKcTiwyLEuZtrnELgGpDLoeV+pF1tJF16iWtRVr3DK6MHi6
+si0IFHAoU1MGXBYRZEhlCRdPiCUSz88ZyRZGkG+S/HFEDldREXOUrZSL1inQ2C95
+HdBeIoiWC7VgaxYBLcXCIWELzdlZ9L9420SKCIVVy46/MJFLg5+6PyDOFfIKQuWe
+UzCdGaA+lNMqhjAbp/r3
+=pkdK
+-----END PGP SIGNATURE-----
+
+--KsGdsel6WgEHnImy--
