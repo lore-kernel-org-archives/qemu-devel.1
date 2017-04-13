@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38044)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cyb64-0006B1-8D
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 05:31:25 -0400
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1cyb6w-0006cw-6o
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 05:32:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cyb60-0005fZ-EH
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 05:31:24 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:3036
-	helo=dggrg01-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cyb5z-0005cO-Gr
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 05:31:20 -0400
-References: <20170412095111.11728-1-xiaoguangrong@tencent.com>
-	<cdce9f8e-ec58-d210-3be2-932359e0dcf7@redhat.com>
-	<d684319d-afb7-62ea-8486-80c1bee23744@gmail.com>
-	<d59e2de5-959d-0b94-6030-264b2310c9e1@gmail.com>
-	<D1BD20B5DB34024DA951CEEE6C4C5998ADA414FF@DGGEMA501-MBX.china.huawei.com>
-	<418f9ca3-09a9-e40c-e15b-9498036f0b12@gmail.com>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <58EF4512.1060004@huawei.com>
-Date: Thu, 13 Apr 2017 17:29:54 +0800
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1cyb6r-0005xe-UQ
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 05:32:18 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:56250)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1cyb6r-0005xS-Lz
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 05:32:13 -0400
 MIME-Version: 1.0
-In-Reply-To: <418f9ca3-09a9-e40c-e15b-9498036f0b12@gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel]
- =?utf-8?b?562U5aSNOiBbUEFUQ0ggMC81XSBtYzE0NjgxOHJ0?=
- =?utf-8?q?c=3A_fix_Windows_VM_clock_faster?=
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Date: Thu, 13 Apr 2017 12:32:12 +0300
+From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+In-Reply-To: <ec726281-486f-5448-4c3c-c28375c182cb@weilnetz.de>
+References: <8a7bf9dbac4c6db5b7e8dd5c968cacae@ispras.ru>
+	<20170412163055.GB4915@rkaganb.sw.ru>
+	<ec726281-486f-5448-4c3c-c28375c182cb@weilnetz.de>
+Message-ID: <b738b19aad6d0f4b7b55b0530b1b5382@ispras.ru>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] WinDbg module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,95 +29,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Xiao Guangrong <guangrong.xiao@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>
-Cc: xuquan8@huawei.com, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "yunfangtai@tencent.com" <yunfangtai@tencent.com>, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Stefan Weil <sw@weilnetz.de>
+Cc: Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org, Pavel Dovgalyuk <dovgaluk@ispras.ru>, pbonzini@redhat.com
 
-On 2017/4/13 17:18, Xiao Guangrong wrote:
->
-> On 04/13/2017 05:05 PM, Zhanghailiang wrote:
->> Hi,
->>
->> -----邮件原件-----
->> 发件人: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] 代表 Xiao Guangrong
->> 发送时间: 2017年4月13日 16:53
->> 收件人: Paolo Bonzini; mst@redhat.com; mtosatti@redhat.com
->> 抄送: qemu-devel@nongnu.org; kvm@vger.kernel.org; yunfangtai@tencent.com; Xiao Guangrong
->> 主题: Re: [PATCH 0/5] mc146818rtc: fix Windows VM clock faster
->>
->>
->>
->> On 04/13/2017 04:39 PM, Xiao Guangrong wrote:
->>>
->>> On 04/13/2017 02:37 PM, Paolo Bonzini wrote:
->>>>
->>>> On 12/04/2017 17:51, guangrong.xiao@gmail.com wrote:
->>>>> The root cause is that the clock will be lost if the periodic period
->>>>> is changed as currently code counts the next periodic time like this:
->>>>>        next_irq_clock = (cur_clock & ~(period - 1)) + period;
->>>>>
->>>>> consider the case if cur_clock = 0x11FF and period = 0x100, then the
->>>>> next_irq_clock is 0x1200, however, there is only 1 clock left to
->>>>> trigger the next irq. Unfortunately, Windows guests (at least
->>>>> Windows7) change the period very frequently if it runs the attached
->>>>> code, so that the lost clock is accumulated, the wall-time become
->>>>> faster and faster
->>>> Very interesting.
->>>>
->>> Yes, indeed.
->>>
->>>> However, I think that the above should be exactly how the RTC should
->>>> work.  The original RTC circuit had 22 divider stages (see page 13 of
->>>> the datasheet[1], at the bottom right), and the periodic interrupt
->>>> taps the rising edge of one of the dividers (page 16, second
->>>> paragraph).  The datasheet also never mentions a comparator being
->>>> used to trigger the periodic interrupts.
->>>>
->>> That was my thought before, however, after more test, i am not sure if
->>> re-configuring RegA changes these divider stages internal...
->>>
->>>> Have you checked that this Windows bug doesn't happen on real
->>>> hardware too?  Or is the combination of driftfix=slew and changing
->>>> periods that is a problem?
->>>>
->>> I have two physical windows 7 machines, both of them have
->>> 'useplatformclock = off' and ntp disabled, the wall time is really
->>> accurate. The difference is that the physical machines are using Intel
->>> Q87 LPC chipset which is mc146818rtc compatible. However, on VM, the
->>> issue is easily be reproduced just in ~10 mins.
->>>
->>> Our test mostly focus on 'driftfix=slew' and after this patchset the
->>> time is accurate and stable.
->>>
->>> I will do the test for dropping 'slew' and see what will happen...
->>>
->>> Well, the time is easily observed to be faster if 'driftfix=slew' is not used. :(
->> You mean, it only fixes the one case which with the ' driftfix=slew ' is used ?
-> No. for both.
->
->> We encountered this problem too, I have tried to fix it long time ago.
->> https://lists.gnu.org/archive/html/qemu-devel/2016-03/msg06937.html.
->> (It seems that your solution is more useful)
->> But it seems that it is impossible to fix, we need to emulate the behaviors of real hardware,
->> but we didn't find any clear description about it. And it seems that other virtualization platforms
-> That is the issue, the hardware spec does not detail how the clock is
-> counted when the timer interval is changed. What we can do at this time
-> is that speculate it from the behaviors. Current RTC is completely
-> unusable anyway.
->
->
->> have this problem too:
->> VMware:
->> https://www.vmware.com/files/pdf/Timekeeping-In-VirtualMachines.pdf
->> Heper-v:
->> https://blogs.msdn.microsoft.com/virtual_pc_guy/2010/11/19/time-synchronization-in-hyper-v/
-> Hmm, slower clock is understandable, does really the Windows7 on hyperV
-> have faster clock? Did you meet it?
+Stefan Weil =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2017-04-12 20:55:
+> Am 12.04.2017 um 18:30 schrieb Roman Kagan:
+>> On Wed, Apr 12, 2017 at 05:05:45PM +0300, Mihail Abakumov wrote:
+>>> Hello.
+>>>=20
+>>> We made the debugger module WinDbg (like GDB) for QEMU. This is the
+>>> replacement of the remote stub in Windows kernel. Used for remote=20
+>>> Windows
+>>> kernel debugging without debugging mode.
+>>>=20
+>>> The latest build and instructions for the launch can be found here:
+>>> https://github.com/ispras/qemu/releases/tag/v2.7.50-windbg
+>>>=20
+>>> Currently only one ways to create a remote debugging connection is
+>>> supported: using COM port with named pipe.
+>>>=20
+>>> Should I prepare patches for inclusion in the master branch? Or is it=
+=20
+>>> too
+>>> specific module and it is not needed?
+>>=20
+>> Please do!
+>>=20
+>> Every once in a while dealing with a Windows guest problem I wished I
+>> had this.  We at Virtuozzo looked into doing something like this but
+>> never got around to.
+>>=20
+>> Thanks,
+>> Roman.
+>>=20
+>=20
+> Hello Mihail,
+>=20
+> from the previous answers you can see that there is a
+> need for WinDbg support.
+>=20
+> If you want to prepare patches for the official QEMU,
+> you need signed commits from all developers who contributed
+> (Dmitry Koltunov and you?).
+>=20
+> Make also sure that no licensed code (for example extracts
+> from MS header files) gets added.
+>=20
+> See http://wiki.qemu-project.org/Contribute/SubmitAPatch for
+> more hints.
+>=20
+> As far as I saw, WinDbg support adds several thousand lines
+> of code. Do you want to support that code after it has been
+> included in QEMU?
+>=20
+> Cheers
+> Stefan
 
-I don't know, we didn't test it, besides, I'd like to know how long did your testcase run before
-you judge it is stable with 'driftfix=slew'  option? (My previous patch can't fix it completely but
-only narrows the gap between timer in guest and real timer.)
+Yes, of course. We can support it.
 
-Hailiang
->
-> .
->
+Thanks,
+Mihail Abakumov
