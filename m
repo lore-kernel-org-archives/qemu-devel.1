@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cyZY2-0003E0-8U
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 03:52:11 -0400
+	(envelope-from <berto@igalia.com>) id 1cyZlD-0004uY-M4
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 04:05:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cyZXy-0004bq-DI
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 03:52:10 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38649)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1cyZXy-0004ac-4Y
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 03:52:06 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3D7nUhV052896
-	for <qemu-devel@nongnu.org>; Thu, 13 Apr 2017 03:52:02 -0400
-Received: from e28smtp09.in.ibm.com (e28smtp09.in.ibm.com [125.16.236.9])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29t0e0a5c9-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 13 Apr 2017 03:52:02 -0400
-Received: from localhost
-	by e28smtp09.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Thu, 13 Apr 2017 13:21:59 +0530
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Date: Thu, 13 Apr 2017 13:21:46 +0530
-Message-Id: <1492069906-11300-1-git-send-email-bharata@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH] cpus: Fix CPU unplug for MTTCG
+	(envelope-from <berto@igalia.com>) id 1cyZlA-0008QV-EX
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 04:05:47 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <b1a0b5a7-4528-eba8-630e-dd80bc8c26d2@redhat.com>
+References: <20170406150148.zwjpozqtale44jfh@perseus.local>
+	<d60ea1f9-ae2c-6625-90de-944cbb490f85@redhat.com>
+	<w5160ibyufr.fsf@maestria.local.igalia.com>
+	<9d848582-8c76-4d88-2b31-e0e4c63b61d4@redhat.com>
+	<w5137dfyq1f.fsf@maestria.local.igalia.com>
+	<5cb5f7fb-aadd-d8b5-7cf5-d677db045105@redhat.com>
+	<w51fuhdkdbg.fsf@maestria.local.igalia.com>
+	<b1a0b5a7-4528-eba8-630e-dd80bc8c26d2@redhat.com>
+Date: Thu, 13 Apr 2017 10:05:39 +0200
+Message-ID: <w51y3v4vijw.fsf@maestria.local.igalia.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC] Proposed qcow2 extension:
+ subcluster allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,34 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, pbonzini@redhat.com, nikunj@linux.vnet.ibm.com, alex.bennee@linaro.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
+To: Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org
 
-Ensure that the unplugged CPU thread is destroyed and the waiting
-thread is notified about it. This is needed for CPU unplug to work
-correctly in MTTCG mode.
+On Wed 12 Apr 2017 04:10:46 PM CEST, Max Reitz <mreitz@redhat.com> wrote:
+>> I still don't see why we can always assume OFLAG_COPIED. Before doing
+>> the COW one cluster can have references from multiple snapshots,
+>
+> Yes...
+>
+>> and OFLAG_COPIED is equally valid in that context.
+>
+> In what context? When having subclusters? Why?
+>
+>> We still need to know if we need to perform COW when writing to it,
+>> regardless of whether it has subclusters or not.
+>
+> But why would you reference a cluster multiple times if it has
+> subclusters? Yes, you can do it in theory, but we could just disallow
+> it, because it doesn't make sense.
 
-Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
----
- cpus.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+We discussed this yesterday on IRC, but I'm writing the summary here for
+reference:
 
-diff --git a/cpus.c b/cpus.c
-index 740b8dc..79f780b 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1483,6 +1483,12 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
-                 /* Ignore everything else? */
-                 break;
-             }
-+        } else if (cpu->unplug) {
-+            qemu_tcg_destroy_vcpu(cpu);
-+            cpu->created = false;
-+            qemu_cond_signal(&qemu_cpu_cond);
-+            qemu_mutex_unlock_iothread();
-+            return NULL;
-         }
- 
-         atomic_mb_set(&cpu->exit_request, 0);
--- 
-2.7.4
+if you want be able to create internal snapshots quickly without having
+to copy a lot of data, you need to be able to have multiple references
+to one cluster.
+
+Anyway, it seems that this discussion is only relevant if we're trying
+to save as many bits as possible because we want to store everything in
+a 64-bit entry -alternative (1) from my original e-mail-. I agree that
+for that alternative the usefulness of that bit can be put into
+question.
+
+Berto
