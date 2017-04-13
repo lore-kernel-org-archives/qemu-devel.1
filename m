@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cyiQC-0006fe-MG
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 13:20:41 -0400
+	(envelope-from <kwolf@redhat.com>) id 1cyiTQ-0007cf-0x
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 13:24:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cyiQ8-0003Ds-LJ
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 13:20:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57592)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cyiQ8-0003DS-10
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 13:20:36 -0400
-Date: Thu, 13 Apr 2017 14:20:32 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170413172032.GF27126@thinpad.lan.raisama.net>
-References: <1490653177-131484-1-git-send-email-agraf@suse.de>
-	<20170328004108.GP28530@thinpad.lan.raisama.net>
-	<9d85e056-3331-9815-404b-9557ca5028cc@suse.de>
-	<20170328123105.GA4418@thinpad.lan.raisama.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170328123105.GA4418@thinpad.lan.raisama.net>
-Subject: Re: [Qemu-devel] [PATCH] i386: Allow cpuid bit override
+	(envelope-from <kwolf@redhat.com>) id 1cyiTP-0005BS-A2
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 13:24:00 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Thu, 13 Apr 2017 19:23:31 +0200
+Message-Id: <1492104214-29994-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/3] migration: Call
+ blk_resume_after_migration() for postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,126 +18,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Graf <agraf@suse.de>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, quintela@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, lvivier@redhat.com, qemu-devel@nongnu.org
 
-On Tue, Mar 28, 2017 at 09:31:05AM -0300, Eduardo Habkost wrote:
-> On Tue, Mar 28, 2017 at 01:26:04PM +0200, Alexander Graf wrote:
-> > On 03/28/2017 02:41 AM, Eduardo Habkost wrote:
-> > > On Tue, Mar 28, 2017 at 12:19:37AM +0200, Alexander Graf wrote:
-> > > > KVM has a feature bitmap of CPUID bits that it knows works for guests.
-> > > > QEMU removes bits that are not part of that bitmap automatically on VM
-> > > > start.
-> > > > 
-> > > > However, some times we just don't list features in that list because
-> > > > they don't make sense for normal scenarios, but may be useful in specific,
-> > > > targeted workloads.
-> > > > 
-> > > > For that purpose, add a new =force option to all CPUID feature flags in
-> > > > the CPU property. With that we can override the accel filtering and give
-> > > > users full control over the CPUID feature bits exposed into guests.
-> > > > 
-> > > > Signed-off-by: Alexander Graf <agraf@suse.de>
-> > > > ---
-> > > >   target/i386/cpu.c | 30 ++++++++++++++++++++++++++----
-> > > >   target/i386/cpu.h |  3 +++
-> > > >   2 files changed, 29 insertions(+), 4 deletions(-)
-> > > > 
-> > > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > > > index 7aa7622..5a22f9a 100644
-> > > > --- a/target/i386/cpu.c
-> > > > +++ b/target/i386/cpu.c
-> > > > @@ -2229,7 +2229,7 @@ void x86_cpu_list(FILE *f, fprintf_function cpu_fprintf)
-> > > >       g_slist_foreach(list, x86_cpu_list_entry, &s);
-> > > >       g_slist_free(list);
-> > > > -    (*cpu_fprintf)(f, "\nRecognized CPUID flags:\n");
-> > > > +    (*cpu_fprintf)(f, "\nRecognized CPUID flags (=on|=off|=force):\n");
-> > > >       for (i = 0; i < ARRAY_SIZE(feature_word_info); i++) {
-> > > >           FeatureWordInfo *fw = &feature_word_info[i];
-> > > > @@ -3460,6 +3460,7 @@ static int x86_cpu_filter_features(X86CPU *cpu)
-> > > >               x86_cpu_get_supported_feature_word(w, false);
-> > > >           uint32_t requested_features = env->features[w];
-> > > >           env->features[w] &= host_feat;
-> > > > +        env->features[w] |= cpu->forced_features[w];
-> > > >           cpu->filtered_features[w] = requested_features & ~env->features[w];
-> > > >           if (cpu->filtered_features[w]) {
-> > > >               rv = 1;
-> > > > @@ -3693,6 +3694,7 @@ static void x86_cpu_unrealizefn(DeviceState *dev, Error **errp)
-> > > >   typedef struct BitProperty {
-> > > >       uint32_t *ptr;
-> > > > +    uint32_t *force_ptr;
-> > > >       uint32_t mask;
-> > > >   } BitProperty;
-> > > Please take a look at:
-> > >    Subject: [PATCH for-2.9 v2 1/2] i386: Replace uint32_t* with FeatureWord on feature getter/setter
-> > > 
-> > > I plan to include that series in 2.9, and it would make the
-> > > force_ptr field unnecessary.
-> > > 
-> > > > @@ -3701,7 +3703,15 @@ static void x86_cpu_get_bit_prop(Object *obj, Visitor *v, const char *name,
-> > > >   {
-> > > >       BitProperty *fp = opaque;
-> > > >       bool value = (*fp->ptr & fp->mask) == fp->mask;
-> > > > -    visit_type_bool(v, name, &value, errp);
-> > > > +    bool forced = (*fp->force_ptr & fp->mask) == fp->mask;
-> > > > +    char str[] = "force";
-> > > > +    char *strval = str;
-> > > > +
-> > > > +    if (!forced) {
-> > > > +        strcpy(str, value ? "on" : "off");
-> > > > +    }
-> > > > +
-> > > > +    visit_type_str(v, name, &strval, errp);
-> > > You can define an enum type in qapi-schema.json, and use
-> > > visit_type_<YourEnumType>(). You can grep for
-> > > visit_type_OnOffAuto to find examples.
-> > > 
-> > > (But I suggest naming the enum something like
-> > > "X86CPUFeatureSetting" instead of "OnOffForce", because we will
-> > > probably add other enum values in the future).
-> > > 
-> > > However: we need to find a way to do this and not break
-> > > compatibility with "feat=yes|true|no|false", that's supported by
-> > > StringInputVisitor (which is used by object_property_parse()).
-> > > Maybe fallback to visit_type_bool() in case
-> > > visit_type_<YourEnumType>() fails?
-> > 
-> > Putting it into a special enum sounds much more fragile than the current
-> > solution to me. We need to bool fallback either way, so I fail to see any
-> > benefit from having the enum.
-> 
-> I don't see why the enum would be more fragile. With the QAPI
-> enum, we:
-> * Have a meaningful value for the QOM property 'type' field,
->   and have some hope to make type information for QOM properties
->   really useful one day;
-> * Have the possible values for the property well-documented in
->   the QAPI schema;
-> * Have the string<->enum translation code automatically generated
->   for us;
-> * Can easily add other values later (I have been planning to
->   support "feat=host" so "-cpu host/max" aren't special cases in
->   the code.
+This fixes one of the bugs that made us disable the op blocker assertions for
+the 2.9 release.
 
-Well, we have one problem:
+Kevin Wolf (3):
+  migration: Call blk_resume_after_migration() for postcopy
+  qemu-iotests: Filter HMP readline escape characters
+  qemu-iotests: Test postcopy migration
 
-* Breaking compatibility with management code that expects the
-  feature getter to return boolean values, not enums/strings.
-  This affects users of query-cpu-model-expansion, in particular.
-
-We could still make the setter accept an OnOffForce enum, but we
-would have to keep returning a boolean from the property getter.
-
-We could create a set of "force-FEAT=on|off" boolean properties,
-and make the existing property setter accept "FEAT=force" as
-input just to make the command-line easier to use. But I'm not
-sure if making the list of X86CPU properties even larger is worth
-it.
-
-This means Alex' patch might be a reasonable solution, except for
-the property getter that was changed to return a string. I will
-make specific comments about the code as reply to the patch
-itself.
+ migration/savevm.c               |   8 +++
+ tests/qemu-iotests/028.out       |   2 +-
+ tests/qemu-iotests/130.out       |   4 +-
+ tests/qemu-iotests/181           | 117 +++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/181.out       |  38 +++++++++++++
+ tests/qemu-iotests/common.filter |   7 +++
+ tests/qemu-iotests/common.qemu   |   4 +-
+ tests/qemu-iotests/group         |   1 +
+ 8 files changed, 176 insertions(+), 5 deletions(-)
+ create mode 100755 tests/qemu-iotests/181
+ create mode 100644 tests/qemu-iotests/181.out
 
 -- 
-Eduardo
+1.8.3.1
