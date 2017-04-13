@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xiaoguangrong.eric@gmail.com>) id 1cyau3-0002Xe-NN
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 05:19:01 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cyauH-0002dR-39
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 05:19:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xiaoguangrong.eric@gmail.com>) id 1cyau0-0001of-Hz
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 05:18:59 -0400
-Received: from mail-pg0-x22c.google.com ([2607:f8b0:400e:c05::22c]:33451)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <xiaoguangrong.eric@gmail.com>)
-	id 1cyau0-0001oE-93
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 05:18:56 -0400
-Received: by mail-pg0-x22c.google.com with SMTP id x125so27923013pgb.0
-	for <qemu-devel@nongnu.org>; Thu, 13 Apr 2017 02:18:52 -0700 (PDT)
-References: <20170412095111.11728-1-xiaoguangrong@tencent.com>
-	<cdce9f8e-ec58-d210-3be2-932359e0dcf7@redhat.com>
-	<d684319d-afb7-62ea-8486-80c1bee23744@gmail.com>
-	<d59e2de5-959d-0b94-6030-264b2310c9e1@gmail.com>
-	<D1BD20B5DB34024DA951CEEE6C4C5998ADA414FF@DGGEMA501-MBX.china.huawei.com>
-From: Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Message-ID: <418f9ca3-09a9-e40c-e15b-9498036f0b12@gmail.com>
-Date: Thu, 13 Apr 2017 17:18:45 +0800
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cyauD-0001q9-V3
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 05:19:13 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:28317 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1cyauD-0001pZ-Jp
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 05:19:09 -0400
+References: <20170412174920.8744-1-eblake@redhat.com>
+	<20170412174920.8744-4-eblake@redhat.com>
+	<bdff9bc8-a521-ddd6-3c71-bb97976b75ec@redhat.com>
+	<44a88413-bbe0-c67f-8700-d3777888647c@redhat.com>
+	<43ec2498-b32f-b3c1-37cb-e5bce27844be@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <077cd9f0-110a-f2ea-fcf9-31b6f4c8b2c1@virtuozzo.com>
+Date: Thu, 13 Apr 2017 12:19:00 +0300
 MIME-Version: 1.0
-In-Reply-To: <D1BD20B5DB34024DA951CEEE6C4C5998ADA414FF@DGGEMA501-MBX.china.huawei.com>
+In-Reply-To: <43ec2498-b32f-b3c1-37cb-e5bce27844be@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel]
- =?utf-8?b?562U5aSNOiBbUEFUQ0ggMC81XSBtYzE0NjgxOHJ0?=
- =?utf-8?q?c=3A_fix_Windows_VM_clock_faster?=
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 03/12] dirty-bitmap: Drop unused functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,97 +31,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhanghailiang <zhang.zhanghailiang@huawei.com>, Xiao Guangrong <guangrong.xiao@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "yunfangtai@tencent.com" <yunfangtai@tencent.com>, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: John Snow <jsnow@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-
-
-On 04/13/2017 05:05 PM, Zhanghailiang wrote:
-> Hi,
+13.04.2017 02:40, John Snow wrote:
 >
-> -----邮件原件-----
-> 发件人: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] 代表 Xiao Guangrong
-> 发送时间: 2017年4月13日 16:53
-> 收件人: Paolo Bonzini; mst@redhat.com; mtosatti@redhat.com
-> 抄送: qemu-devel@nongnu.org; kvm@vger.kernel.org; yunfangtai@tencent.com; Xiao Guangrong
-> 主题: Re: [PATCH 0/5] mc146818rtc: fix Windows VM clock faster
->
->
->
-> On 04/13/2017 04:39 PM, Xiao Guangrong wrote:
->>
->>
->> On 04/13/2017 02:37 PM, Paolo Bonzini wrote:
+> On 04/12/2017 07:36 PM, Eric Blake wrote:
+>> On 04/12/2017 05:47 PM, John Snow wrote:
 >>>
->>>
->>> On 12/04/2017 17:51, guangrong.xiao@gmail.com wrote:
->>>> The root cause is that the clock will be lost if the periodic period
->>>> is changed as currently code counts the next periodic time like this:
->>>>       next_irq_clock = (cur_clock & ~(period - 1)) + period;
+>>> On 04/12/2017 01:49 PM, Eric Blake wrote:
+>>>> We had several functions that no one was using, and which used
+>>>> sector-based interfaces.  I'm trying to convert towards byte-based
+>>>> interfaces, so it's easier to just drop the unused functions:
 >>>>
->>>> consider the case if cur_clock = 0x11FF and period = 0x100, then the
->>>> next_irq_clock is 0x1200, however, there is only 1 clock left to
->>>> trigger the next irq. Unfortunately, Windows guests (at least
->>>> Windows7) change the period very frequently if it runs the attached
->>>> code, so that the lost clock is accumulated, the wall-time become
->>>> faster and faster
+>>>> bdrv_dirty_bitmap_size
+>>>> bdrv_dirty_bitmap_get_meta
+>>>> bdrv_dirty_bitmap_reset_meta
+>>>> bdrv_dirty_bitmap_meta_granularity
+>>>>
+>>>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>>> ---
+>>>>   include/block/dirty-bitmap.h |  8 --------
+>>>>   block/dirty-bitmap.c         | 34 ----------------------------------
+>>>>   2 files changed, 42 deletions(-)
+>>>>
+>>> I think it's likely Vladimir is or at least was relying on some of these
+>>> for his migration and persistence series.
 >>>
->>> Very interesting.
->>>
+>>> Might be nice to let him chime in to see how much of a hassle this is.
+>> Then let's add him in cc ;)
 >>
->> Yes, indeed.
->>
->>> However, I think that the above should be exactly how the RTC should
->>> work.  The original RTC circuit had 22 divider stages (see page 13 of
->>> the datasheet[1], at the bottom right), and the periodic interrupt
->>> taps the rising edge of one of the dividers (page 16, second
->>> paragraph).  The datasheet also never mentions a comparator being
->>> used to trigger the periodic interrupts.
->>>
->>
->> That was my thought before, however, after more test, i am not sure if
->> re-configuring RegA changes these divider stages internal...
->>
->>> Have you checked that this Windows bug doesn't happen on real
->>> hardware too?  Or is the combination of driftfix=slew and changing
->>> periods that is a problem?
->>>
->>
->> I have two physical windows 7 machines, both of them have
->> 'useplatformclock = off' and ntp disabled, the wall time is really
->> accurate. The difference is that the physical machines are using Intel
->> Q87 LPC chipset which is mc146818rtc compatible. However, on VM, the
->> issue is easily be reproduced just in ~10 mins.
->>
->> Our test mostly focus on 'driftfix=slew' and after this patchset the
->> time is accurate and stable.
->>
->> I will do the test for dropping 'slew' and see what will happen...
->>
+> Err... I can't just summon people by mentioning them?
 >
->> Well, the time is easily observed to be faster if 'driftfix=slew' is not used. :(
+>> I'm okay if these functions stay because they have a user, but it would
+>> also be nice if they were properly byte-based (like everything else in
+>> dirty-bitmap at the end of my series).  So even if we remove them here,
+>> we can revert the removal, and re-add them but with a sane interface.
+>>
+> OK, but I will offer to do the work in the interest of not slowing
+> things down any further.
 >
-> You mean, it only fixes the one case which with the ' driftfix=slew ' is used ?
+> Do you use any of these, Vladimir?
+>
+> --js
+HI all!
 
-No. for both.
-
-> We encountered this problem too, I have tried to fix it long time ago.
-> https://lists.gnu.org/archive/html/qemu-devel/2016-03/msg06937.html.
-> (It seems that your solution is more useful)
-> But it seems that it is impossible to fix, we need to emulate the behaviors of real hardware,
-> but we didn't find any clear description about it. And it seems that other virtualization platforms
-
-That is the issue, the hardware spec does not detail how the clock is
-counted when the timer interval is changed. What we can do at this time
-is that speculate it from the behaviors. Current RTC is completely
-unusable anyway.
+only bdrv_dirty_bitmap_size() is used. No problem to add it back with my 
+series next update
 
 
-> have this problem too:
-> VMware:
-> https://www.vmware.com/files/pdf/Timekeeping-In-VirtualMachines.pdf
-> Heper-v:
-> https://blogs.msdn.microsoft.com/virtual_pc_guy/2010/11/19/time-synchronization-in-hyper-v/
-
-Hmm, slower clock is understandable, does really the Windows7 on hyperV
-have faster clock? Did you meet it?
+-- 
+Best regards,
+Vladimir
