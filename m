@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41868)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cyg8P-00035n-7w
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 10:54:10 -0400
+	(envelope-from <vfeenstr@redhat.com>) id 1cygE1-0004oY-LM
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 10:59:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cyg8O-0007i5-D7
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 10:54:09 -0400
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:38511)
+	(envelope-from <vfeenstr@redhat.com>) id 1cygDx-0002Bp-MW
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 10:59:57 -0400
+Received: from mail-wr0-f178.google.com ([209.85.128.178]:34332)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cyg8O-0007ha-5t
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 10:54:08 -0400
-Received: by mail-wm0-x22d.google.com with SMTP id t189so48988333wmt.1
-	for <qemu-devel@nongnu.org>; Thu, 13 Apr 2017 07:54:07 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <d2553d23-6710-5a1a-8efb-1d8379a1849e@redhat.com>
-References: <20170412204641.GA15762@localhost.localdomain>
-	<f5bf12f4-e4fd-87c7-a714-e412cee63e36@redhat.com>
-	<20170412222251.GB15762@localhost.localdomain>
-	<20170412235420.GB8607@lemon>
-	<CAFEAcA9yt49a61JLN-Sv=dFSz6rGC30hxb9=oHDqRnvpyjZXQQ@mail.gmail.com>
-	<d2553d23-6710-5a1a-8efb-1d8379a1849e@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 13 Apr 2017 15:53:46 +0100
-Message-ID: <CAFEAcA9hGHQQbzaH5brYABpzPTgE6UQLLPs_s4CMbgy4dKwUig@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Regression from 2.8: stuck in bdrv_drain()
+	(Exim 4.71) (envelope-from <vfeenstr@redhat.com>) id 1cygDx-00029g-E2
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 10:59:53 -0400
+Received: by mail-wr0-f178.google.com with SMTP id z109so37410983wrb.1
+	for <qemu-devel@nongnu.org>; Thu, 13 Apr 2017 07:59:51 -0700 (PDT)
+From: Vinzenz Feenstra <vfeenstr@redhat.com>
+Message-Id: <5156A9A8-F105-45F9-87C8-4291883A68BD@redhat.com>
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Date: Thu, 13 Apr 2017 16:59:48 +0200
+In-Reply-To: <20170403095438.15423-1-marcandre.lureau@redhat.com>
+References: <20170403095438.15423-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain;
+	charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] qga: improve fsfreeze documentations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,38 +29,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Jeff Cody <jcody@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
-On 13 April 2017 at 15:33, Eric Blake <eblake@redhat.com> wrote:
-> On 04/13/2017 04:48 AM, Peter Maydell wrote:
->> Well, we *hope* there is no -rc5, but if the bug is genuinely
->> a "we can't release like this" bug we will obviously have to
->> do another rc. Basically you all as the block maintainers should
->> make the call about whether it's release-critical or not.
->
-> Just curious: is there a technical reason we couldn't spin an -rc5 today
-> (with just the fix to this issue), and slip the schedule only by two
-> days instead of a full week?  And/or shorten the time for testing -rc5
-> from the usual 7 days into 5?
+Reviewed-by: Vinzenz Feenstra <vfeenstr@redhat.com =
+<mailto:marcandre.lureau@redhat.com>>
 
-I've just heard about another issue which probably will
-require an rc5. Whether that means it makes sense to add
-this fix too I don't know.
+> On Apr 3, 2017, at 11:54 AM, Marc-Andr=C3=A9 Lureau =
+<marcandre.lureau@redhat.com> wrote:
+>=20
+> Some users find the fsfreeze behaviour confusing. Add some notes about
+> invalid mount points and Windows usage.
+>=20
+> Related to:
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1436976
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+> qga/qapi-schema.json | 12 ++++++++++--
+> 1 file changed, 10 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+> index a02dbf2d18..8d901f556a 100644
+> --- a/qga/qapi-schema.json
+> +++ b/qga/qapi-schema.json
+> @@ -426,7 +426,13 @@
+> ##
+> # @guest-fsfreeze-freeze:
+> #
+> -# Sync and freeze all freezable, local guest filesystems
+> +# Sync and freeze all freezable, local guest filesystems. If this
+> +# command succeeded, you may call @guest-fsfreeze-thaw later to
+> +# unfreeze.
+> +#
+> +# Note: On Windows, the command is implemented with the help of a
+> +# Volume Shadow-copy Service DLL helper. The frozen state is limited
+> +# for up to 10 seconds by VSS.
+> #
+> # Returns: Number of file systems currently frozen. On error, all =
+filesystems
+> # will be thawed.
+> @@ -439,10 +445,12 @@
+> ##
+> # @guest-fsfreeze-freeze-list:
+> #
+> -# Sync and freeze specified guest filesystems
+> +# Sync and freeze specified guest filesystems.
+> +# See also @guest-fsfreeze-freeze.
+> #
+> # @mountpoints: an array of mountpoints of filesystems to be frozen.
+> #               If omitted, every mounted filesystem is frozen.
+> +#               Invalid mount points are ignored.
+> #
+> # Returns: Number of file systems currently frozen. On error, all =
+filesystems
+> # will be thawed.
+> --=20
+> 2.12.0.191.gc5d8de91d
+>=20
+>=20
 
-Not a technical reason, but we're a bit short on time to do an
-rc5 today, and I'm away on holiday until Tuesday after that
-anyway.
-
-My current plan is that we'll roll rc5 on Tuesday with
-either just the fix for that other issue or that plus this
-one, and then tag final release Thursday.
-
-What you lot as the block maintainers should decide is
-whether this is a release-critical bug that justifies sticking
-a fix in at the last minute, and if so make sure you have
-a patch on the list which fixes it and has been reviewed
-and flag it up to me so I can apply it on Tuesday.
-
-thanks
--- PMM
+--
+Vinzenz Feenstra
+Senior Software Developer
+Red Hat Czech
