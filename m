@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1cygjC-0004qk-QS
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 11:32:11 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cygua-00079b-Fr
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 11:43:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1cygjB-0002Zc-Qh
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 11:32:10 -0400
-References: <20170406150148.zwjpozqtale44jfh@perseus.local>
-	<2b915695-29b5-df8d-4d89-080eeaaaff13@openvz.org>
-	<w51shlcv7sb.fsf@maestria.local.igalia.com>
-	<565c1e1b-b9e1-e9c5-790e-283d04afc747@openvz.org>
-	<w51poggv3xh.fsf@maestria.local.igalia.com>
-	<ec4f6034-0c94-658c-6b2a-e0aecea173f4@openvz.org>
-	<w51h91suz53.fsf@maestria.local.igalia.com>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <e1ae017b-a832-0e52-02d0-eaeb882a2b4d@openvz.org>
-Date: Thu, 13 Apr 2017 18:17:21 +0300
-MIME-Version: 1.0
-In-Reply-To: <w51h91suz53.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC] Proposed qcow2 extension: subcluster
- allocation
+	(envelope-from <mreitz@redhat.com>) id 1cyguZ-0006Fu-Fh
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 11:43:56 -0400
+From: Max Reitz <mreitz@redhat.com>
+Date: Thu, 13 Apr 2017 17:43:34 +0200
+Message-Id: <20170413154334.23708-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.10?] block: Do not unref bs->file on
+ error in BD's open
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +18,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-stable@nongnu.org
 
-On 04/13/2017 06:04 PM, Alberto Garcia wrote:
-> On Thu 13 Apr 2017 03:30:43 PM CEST, Denis V. Lunev wrote:
->> Yes, block size should be increased. I perfectly in agreement with
->> your.  But I think that we could do that by plain increase of the
->> cluster size without any further dances. Sub-clusters as sub-clusters
->> will help if we are able to avoid COW. With COW I do not see much
->> difference.
-> I'm trying to summarize your position, tell me if I got everything
-> correctly:
->
-> 1. We should try to reduce data fragmentation on the qcow2 file,
->    because it will have a long term effect on the I/O performance (as
->    opposed to an effect on the initial operations on the empty image).
-yes
+The block layer takes care of removing the bs->file child if the block
+driver's bdrv_open()/bdrv_file_open() implementation fails. The block
+driver therefore does not need to do so, and indeed should not unless it
+sets bs->file to NULL afterwards -- because if this is not done, the
+bdrv_unref_child() in bdrv_open_inherit() will dereference the freed
+memory block at bs->file afterwards, which is not good.
 
-> 2. The way to do that is to increase the cluster size (to 1MB or
->    more).
-yes
+We can now decide whether to add a "bs->file = NULL;" after each of the
+offending bdrv_unref_child() invocations, or just drop them altogether.
+The latter is simpler, so let's do that.
 
-> 3. Benefit: increasing the cluster size also decreases the amount of
->    metadata (L2 and refcount).
-yes
+Cc: qemu-stable <qemu-stable@nongnu.org>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+It's an issue only in blkdebug, blkreplace and blkverify, and only when
+an error occurs in their open functions; therefore I think this is fine
+to delay until 2.10.
 
-> 4. Problem: L2 tables become too big and fill up the cache more
->    easily. To solve this the cache code should do partial reads
->    instead of complete L2 clusters.
-yes. We can read full cluster as originally if L2 cache is empty.
+However, it *is* a use-after-free newly introduced in 2.9, so that's
+where the question mark comes from...
+---
+ block/blkdebug.c  | 4 +---
+ block/blkreplay.c | 3 ---
+ block/blkverify.c | 3 ---
+ 3 files changed, 1 insertion(+), 9 deletions(-)
 
-> 5. Problem: larger cluster sizes also mean more data to copy when
->    there's a COW. To solve this the COW code should be modified so it
->    goes from 5 OPs (read head, write head, read tail, write tail,
->    write data) to 2 OPs (read cluster, write modified cluster).
-yes, with small tweak if head and tail are in different clusters. In
-this case we
-will end up with 3 OPs.
-
-> 6. Having subclusters adds incompatible changes to the file format,
->    and they offer no benefit after allocation.
-yes
-
-> 7. Subclusters are only really useful if they match the guest fs block
->    size (because you would avoid doing COW on allocation). Otherwise
->    the only thing that you get is a faster COW (because you move less
->    data), but the improvement is not dramatic and it's better if we do
->    what's proposed in point 5.
-yes
-
-> 8. Even if the subcluster size matches the guest block size, you'll
->    get very fast initial allocation but also more chances to end up
->    with a very fragmented qcow2 image, which is worse in the long run.
-yes
-
-> 9. Problem: larger clusters make a less efficient use of disk space,
->    but that's a drawback you're fine with considering all of the
->    above.
-yes
-
-> Is that a fair summary of what you're trying to say? Anything else
-> missing?
-yes.
-
-5a. Problem: initial cluster allocation without COW. Could be made
-      cluster-size agnostic with the help of fallocate() call. Big
-clusters are even
-      better as the amount of such allocations is reduced.
-
-Thank you very much for this cool summary! I am too tongue-tied.
-
-Den
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index 67e8024e36..cc4a146e84 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -389,14 +389,12 @@ static int blkdebug_open(BlockDriverState *bs, QDict *options, int flags,
+     } else if (align) {
+         error_setg(errp, "Invalid alignment");
+         ret = -EINVAL;
+-        goto fail_unref;
++        goto out;
+     }
+ 
+     ret = 0;
+     goto out;
+ 
+-fail_unref:
+-    bdrv_unref_child(bs, bs->file);
+ out:
+     if (ret < 0) {
+         g_free(s->config_file);
+diff --git a/block/blkreplay.c b/block/blkreplay.c
+index e1102119fb..6aa5fd4156 100755
+--- a/block/blkreplay.c
++++ b/block/blkreplay.c
+@@ -37,9 +37,6 @@ static int blkreplay_open(BlockDriverState *bs, QDict *options, int flags,
+ 
+     ret = 0;
+ fail:
+-    if (ret < 0) {
+-        bdrv_unref_child(bs, bs->file);
+-    }
+     return ret;
+ }
+ 
+diff --git a/block/blkverify.c b/block/blkverify.c
+index 9a1e21c6ad..af23281669 100644
+--- a/block/blkverify.c
++++ b/block/blkverify.c
+@@ -142,9 +142,6 @@ static int blkverify_open(BlockDriverState *bs, QDict *options, int flags,
+ 
+     ret = 0;
+ fail:
+-    if (ret < 0) {
+-        bdrv_unref_child(bs, bs->file);
+-    }
+     qemu_opts_del(opts);
+     return ret;
+ }
+-- 
+2.12.2
