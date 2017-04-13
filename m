@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47724)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cyjHC-0006qE-23
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 14:15:27 -0400
+	(envelope-from <kwolf@redhat.com>) id 1cyjWJ-0000lW-PA
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 14:31:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cyjH8-0001W8-SC
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 14:15:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58006)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cyjH8-0001Vy-Iq
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 14:15:22 -0400
-Date: Thu, 13 Apr 2017 15:15:18 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170413181518.GY32646@thinpad.lan.raisama.net>
-References: <20170411205813.GA4006@rkaganip.lan>
-	<87inm91wo4.fsf@dusky.pond.sub.org>
-	<20170412200720.GA27126@thinpad.lan.raisama.net>
-	<20170413151533.GD14312@rkaganb.sw.ru>
-	<20170413164457.GX32646@thinpad.lan.raisama.net>
-	<CAFEAcA_VQGDXmMmcTdzwb-UA4sVF1jeXfnXyUBNnZU2E4jdUPw@mail.gmail.com>
+	(envelope-from <kwolf@redhat.com>) id 1cyjWI-000811-UY
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 14:31:03 -0400
+Date: Thu, 13 Apr 2017 20:30:50 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170413183050.GH5095@noname.redhat.com>
+References: <1492104214-29994-1-git-send-email-kwolf@redhat.com>
+	<1492104214-29994-2-git-send-email-kwolf@redhat.com>
+	<a635dc96-283e-3704-59cb-248eb065bf2b@redhat.com>
+	<20170413175444.GG5095@noname.redhat.com>
+	<35c0f944-0303-5d86-7bf3-93940bd886e5@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="tjCHc7DPkfUGtrlw"
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA_VQGDXmMmcTdzwb-UA4sVF1jeXfnXyUBNnZU2E4jdUPw@mail.gmail.com>
-Subject: Re: [Qemu-devel] vmbus bridge: machine property or device?
+In-Reply-To: <35c0f944-0303-5d86-7bf3-93940bd886e5@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] migration: Call
+ blk_resume_after_migration() for postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,105 +28,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Roman Kagan <rkagan@virtuozzo.com>, Markus Armbruster <armbru@redhat.com>, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, quintela@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, lvivier@redhat.com, qemu-devel@nongnu.org
 
-On Thu, Apr 13, 2017 at 05:58:51PM +0100, Peter Maydell wrote:
-> On 13 April 2017 at 17:44, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > On Thu, Apr 13, 2017 at 06:15:34PM +0300, Roman Kagan wrote:
-> >> Can you (or anybody else) please help me decide if I need
-> >> TYPE_SYS_BUS_DEVICE?  Logically the VMBus bridge is "attached directly
-> >> to the main system bus" as written at the top of include/hw/sysbus.h.
-> >
-> > I think that documentation was written before we supported
-> > bus-less devices.
-> 
-> The major question to ask to determine whether you need to be
-> a sysbus device is how does the guest interact with this thing?
-> In particular, does it have memory mapped registers (and is it
-> not part of some other more specific interface like a PCI device) ?
-> 
-> > I'm not sure about the consequences of simply connecting IRQs
-> > inside ->realize() without using the sysbus *_irq helpers. I hope
-> > others can clarify this.
-> 
-> Connecting what IRQs to what? If your device has an IRQ
-> then it isn't the device's job to connect it up -- it is
-> the job of the machine model, because only the machine
-> model knows what the IRQ controller is, whether the IRQ
-> needs to be advertised via ACPI or device tree, and so on.
 
-I can't say it's a good idea, but it looks like there are devices
-that do that (probably they are machine-specific, so they know
-which machine they are being connected to?).
+--tjCHc7DPkfUGtrlw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I looked for realize functions that call sysbus_mmio_map() or
-get_system_memory() directly, and I've found a few:
+Am 13.04.2017 um 20:03 hat Eric Blake geschrieben:
+> On 04/13/2017 12:54 PM, Kevin Wolf wrote:
+> > Am 13.04.2017 um 19:39 hat Eric Blake geschrieben:
+> >> On 04/13/2017 12:23 PM, Kevin Wolf wrote:
+> >>> Commit d35ff5e6 ('block: Ignore guest dev permissions during incoming
+> >>> migration') added blk_resume_after_migration() to the precopy migrati=
+on
+> >>> path, but neglected to add it to the duplicated code that is used for
+> >>> postcopy migration. This means that the guest device doesn't request =
+the
+> >>> necessary permissions, which ultimately led to failing assertions.
+> >>>
+> >>> Add the missing blk_resume_after_migration() to the postcopy path.
+> >>>
+> >>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> >>> ---
+> >>>  migration/savevm.c | 8 ++++++++
+> >>>  1 file changed, 8 insertions(+)
+> >>
+> >> Reviewed-by: Eric Blake <eblake@redhat.com>
+> >>
+> >> Are we targetting this for 2.9-rc5, or is it 2.10 material?
+> >=20
+> > At this point, I think it's clearly 2.10.
+>=20
+> Okay.  Restating, to make sure I got your reasoning: the removed
+> assertions of commit e3e0003 imply that 2.9 is not regressing in
+> behavior, and at this point the worst the code can do without this patch
+> applied is behave like it's done previously; therefore this patch is not
+> fixing an observable 2.9 behavior and therefore not worth holding up the
+> release.
 
- 13  static void fsl_imx6_realize(DeviceState *dev, Error **errp)
- 11  static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
- 11  static void fsl_imx25_realize(DeviceState *dev, Error **errp)
- 10  static void fsl_imx31_realize(DeviceState *dev, Error **errp)
- 10  static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-  7  static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
-  4  static void aw_a10_realize(DeviceState *dev, Error **errp)
-  2  static void spapr_phb_realize(DeviceState *dev, Error **errp)
-  2  static void raven_realize(PCIDevice *d, Error **errp)
-  2  static void digic_realize(DeviceState *dev, Error **errp)
-  2  static void bcm2836_realize(DeviceState *dev, Error **errp)
-  1  static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-  1  static void x86_cpu_apic_realize(X86CPU *cpu, Error **errp)
-  1  static void vtd_realize(DeviceState *dev, Error **errp)
-  1  static void vt82c686b_realize(PCIDevice *d, Error **errp)
-  1  static void spapr_vio_busdev_realize(DeviceState *qdev, Error **errp)
-  1  static void rs6000mc_realize(DeviceState *dev, Error **errp)
-  1  static void realview_mpcore_realize(DeviceState *dev, Error **errp)
-  1  static void raven_pcihost_realizefn(DeviceState *d, Error **errp)
-  1  static void prep_systemio_realize(DeviceState *dev, Error **errp)
-  1  static void pnv_chip_realize(DeviceState *dev, Error **errp)
-  1  static void piix3_realize(PCIDevice *dev, Error **errp)
-  1  static void pci_ebus_realize(PCIDevice *pci_dev, Error **errp)
-  1  static void ich9_lpc_realize(PCIDevice *d, Error **errp)
-  1  static void i82378_realize(PCIDevice *pci, Error **errp)
-  1  static void bonito_realize(PCIDevice *dev, Error **errp)
-  1  static void amdvi_realize(DeviceState *dev, Error **err)
+Right, basically the new op blockers become ineffective for guest
+devices after postcopy migration.
 
-And the ones that call sysbus_connect_irq() directly:
+> But for 2.10, it's absolutely essential, as we have another patch
+> pending to revert e3e0003 at which point we have a behavior break
+> without this patch.
 
-  9  static void fsl_imx6_realize(DeviceState *dev, Error **errp)
-  8  static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-  8  static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-  7  static void fsl_imx25_realize(DeviceState *dev, Error **errp)
-  6  static void fsl_imx31_realize(DeviceState *dev, Error **errp)
-  5  static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
-  4  static void aw_a10_realize(DeviceState *dev, Error **errp)
-  4  static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-  1  static void realview_mpcore_realize(DeviceState *dev, Error **errp)
-  1  static void macio_realize_ide(MacIOState *s, MACIOIDEState *ide,
-  1  static void macio_oldworld_realize(PCIDevice *d, Error **errp)
-  1  static void macio_newworld_realize(PCIDevice *d, Error **errp)
-  1  static void bcm2836_realize(DeviceState *dev, Error **errp)
-  1  static void armv7m_realize(DeviceState *dev, Error **errp)
-  1  static void armv7m_nvic_realize(DeviceState *dev, Error **errp)
-  1  static void a9mp_priv_realize(DeviceState *dev, Error **errp)
+Correct.
 
-> You can do that without sysbus though, by using the core
-> DeviceState's qdev_init_gpio_* APIs. (NB that if you do
-> this then you're by necessity not a device creatable
-> with -device, since the board code has to wire you up.)
+Kevin
 
-Isn't "the board code has to wire you up" true for both sysbus
-and bus-less devices?
+--tjCHc7DPkfUGtrlw
+Content-Type: application/pgp-signature
 
-> 
-> If you're not using sysbus then watch out for reset:
-> all sysbus devices get automatically reset on QEMU
-> system reset; if you're directly using the DeviceState
-> baseclass then you have to arrange reset for yourself
-> somehow.
-> 
-> thanks
-> -- PMM
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
 
--- 
-Eduardo
+iQIcBAEBAgAGBQJY78PaAAoJEH8JsnLIjy/W728P/1nZb5jwN3w+JSBpNmIDExPQ
+2lK5O03xPLhcbMdoYIuRsecgZcPQbhvo+02xN7FrJOLwvd26ckFkw1okdHo/6CHN
+9MjrGxdwKZEGWQ3XvL+SpoRHNvrA5BG1u16P18zBFCZZitus1J4jAA1C+ZAwawRh
+3JUMO/eCnkCksmiaAxqN4wYOKYkKVa6CWOT0mAWdIsuerW3dYqpLUDa9CellAsXG
+mOo0H0x5AGq7QZRoCTLaX4dc7xmVU7CuJkIahjgvhLW3pj6nK8aPBRxjyH2xy4vl
+YwznC4KnBptVlVP3IMF763LpJdi3B3fchN8ZshJGt6c8aYVNbFG6JklkaLH9Jmy2
+PkGJnUTh842Vsfy9dci5ssdBbn+wL+Vy7tbgzRRAU6G7O+kObeEZZkPy2dDH1GQS
+yEerpkEKw5+CkRFALysJX7JzvF+7Dfat+L/6QyMt+FGCD+f9NLT6nTjD+JoDsdxz
+iPYEJNH+VS+oorfU7GYr/NUfosdGB2I8EIl8fCRE7n3ZniOuShj4NJjp42kOk+5I
+4cTjvnn2bscUNxL8ZJ18mYesoS0sYPMlYmbcPDygnh9gT5HoOYf+y+H9ZPU3H8vk
+JT+AunkqI/ik2h3ElIOpiqaEttXjf2cSzKTZjFBtK6hqQ6iY5GBN93++8dzucvXl
+ZedTmkeWraTKzQ5gtHqy
+=lT3q
+-----END PGP SIGNATURE-----
+
+--tjCHc7DPkfUGtrlw--
