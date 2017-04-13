@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cyYqL-00021B-Oo
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 03:07:02 -0400
+	(envelope-from <armbru@redhat.com>) id 1cyYuc-0003I5-Rv
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 03:11:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cyYqK-00038X-Tf
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 03:07:01 -0400
+	(envelope-from <armbru@redhat.com>) id 1cyYuZ-0005HQ-It
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 03:11:26 -0400
 From: Markus Armbruster <armbru@redhat.com>
-References: <20170412173203.20072-1-lvivier@redhat.com>
-Date: Thu, 13 Apr 2017 09:06:53 +0200
-In-Reply-To: <20170412173203.20072-1-lvivier@redhat.com> (Laurent Vivier's
-	message of "Wed, 12 Apr 2017 19:32:03 +0200")
-Message-ID: <87efwwrdki.fsf@dusky.pond.sub.org>
+References: <1489765795-32398-1-git-send-email-craig@rancher.com>
+	<871ssz9j8p.fsf@dusky.pond.sub.org>
+	<CY4PR11MB162370BEAB5D22F1E647CCE8AA030@CY4PR11MB1623.namprd11.prod.outlook.com>
+Date: Thu, 13 Apr 2017 09:11:20 +0200
+In-Reply-To: <CY4PR11MB162370BEAB5D22F1E647CCE8AA030@CY4PR11MB1623.namprd11.prod.outlook.com>
+	(Craig Jellick's message of "Wed, 12 Apr 2017 16:02:46 +0000")
+Message-ID: <87a87krdd3.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] arm: remove remaining
- cannot_destroy_with_object_finalize_yet
+Subject: Re: [Qemu-devel] [PATCH] Add 'none' as type for drive's if option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,27 +24,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org, Antony Pavlov <antonynpavlov@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>
+To: Craig Jellick <craig@rancher.com>
+Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Laurent Vivier <lvivier@redhat.com> writes:
+Craig Jellick <craig@rancher.com> writes:
 
-> With commit ce5b1bbf624b ("exec: move cpu_exec_init() calls to
-> realize functions"), we can now remove all the
-> remaining cannot_destroy_with_object_finalize_yet as
-> unsafe references have been moved to cpu_exec_realizefn().
-> (tested with QOM command provided by commit 4c315c27).
+> Is there an action I need to take for that?
 
-Also tested with device-introspect-test :)
+Fair question.
 
-> Suggested-by: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Expect e-mail from a qemu-trivial maintainer that your patch has been
+merged.  If you don't get one within a reasonable time frame, we failed
+you.  Send a reminder as a reply to this message then.
 
-Thanks, Laurent!
+I figure one week after 2.10 opens would be reasonable.  It's expected
+to open in a week.
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-
-Just three places marking broken devices left: versatile.c
-("realview_pci" and "versatile_pci"), target/ppc/kvm.c (various ppc
-CPUs).  Volunteers to fix them, so we can get rid of
-cannot_destroy_with_object_finalize_yet?
+Thanks!
