@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cyahY-0007VV-MU
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 05:06:06 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1cyaoU-0000Xy-Rt
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 05:13:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cyahV-000625-IR
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 05:06:04 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:3375
-	helo=dggrg03-dlp.huawei.com)
+	(envelope-from <arei.gonglei@huawei.com>) id 1cyaoR-0000DS-NF
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 05:13:14 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:3033
+	helo=dggrg01-dlp.huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cyahU-00060a-NT
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 05:06:01 -0400
-From: Zhanghailiang <zhang.zhanghailiang@huawei.com>
-Date: Thu, 13 Apr 2017 09:05:47 +0000
-Message-ID: <D1BD20B5DB34024DA951CEEE6C4C5998ADA414FF@DGGEMA501-MBX.china.huawei.com>
-References: <20170412095111.11728-1-xiaoguangrong@tencent.com>
-	<cdce9f8e-ec58-d210-3be2-932359e0dcf7@redhat.com>
-	<d684319d-afb7-62ea-8486-80c1bee23744@gmail.com>
-	<d59e2de5-959d-0b94-6030-264b2310c9e1@gmail.com>
-In-Reply-To: <d59e2de5-959d-0b94-6030-264b2310c9e1@gmail.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <arei.gonglei@huawei.com>) id 1cyaoR-00009c-32
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 05:13:11 -0400
+From: Gonglei <arei.gonglei@huawei.com>
+Date: Thu, 13 Apr 2017 17:11:12 +0800
+Message-ID: <1492074674-124192-1-git-send-email-arei.gonglei@huawei.com>
 MIME-Version: 1.0
-Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBbUEFUQ0ggMC81XSBtYzE0NjgxOHJ0?=
- =?utf-8?q?c=3A_fix_Windows_VM_clock_faster?=
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v17 0/2] virtio-crypto: virtio crypto device
+ specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,63 +25,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "yunfangtai@tencent.com" <yunfangtai@tencent.com>, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
+Cc: luonengjun@huawei.com, mst@redhat.com, cornelia.huck@de.ibm.com, stefanha@redhat.com, denglingli@chinamobile.com, Jani.Kokkonen@huawei.com, Ola.Liljedahl@arm.com, Varun.Sethi@freescale.com, xin.zeng@intel.com, brian.a.keating@intel.com, liang.j.ma@intel.com, john.griffin@intel.com, weidong.huang@huawei.com, mike.caraman@nxp.com, agraf@suse.de, jasowang@redhat.com, nmorey@kalray.eu, vincent.jardin@6wind.com, wu.wubin@huawei.com, arei.gonglei@hotmail.com, pasic@linux.vnet.ibm.com, zhbzg@huawei.com, eety.chen@huawei.com, amy.zhanghuimin@huawei.com, maoningning@huawei.com, Gonglei <arei.gonglei@huawei.com>
 
-SGksDQoNCi0tLS0t6YKu5Lu25Y6f5Lu2LS0tLS0NCuWPkeS7tuS6ujoga3ZtLW93bmVyQHZnZXIu
-a2VybmVsLm9yZyBbbWFpbHRvOmt2bS1vd25lckB2Z2VyLmtlcm5lbC5vcmddIOS7o+ihqCBYaWFv
-IEd1YW5ncm9uZw0K5Y+R6YCB5pe26Ze0OiAyMDE35bm0NOaciDEz5pelIDE2OjUzDQrmlLbku7bk
-uro6IFBhb2xvIEJvbnppbmk7IG1zdEByZWRoYXQuY29tOyBtdG9zYXR0aUByZWRoYXQuY29tDQrm
-ioTpgIE6IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsga3ZtQHZnZXIua2VybmVsLm9yZzsgeXVuZmFu
-Z3RhaUB0ZW5jZW50LmNvbTsgWGlhbyBHdWFuZ3JvbmcNCuS4u+mimDogUmU6IFtQQVRDSCAwLzVd
-IG1jMTQ2ODE4cnRjOiBmaXggV2luZG93cyBWTSBjbG9jayBmYXN0ZXINCg0KDQoNCk9uIDA0LzEz
-LzIwMTcgMDQ6MzkgUE0sIFhpYW8gR3Vhbmdyb25nIHdyb3RlOg0KPg0KPg0KPiBPbiAwNC8xMy8y
-MDE3IDAyOjM3IFBNLCBQYW9sbyBCb256aW5pIHdyb3RlOg0KPj4NCj4+DQo+PiBPbiAxMi8wNC8y
-MDE3IDE3OjUxLCBndWFuZ3JvbmcueGlhb0BnbWFpbC5jb20gd3JvdGU6DQo+Pj4gVGhlIHJvb3Qg
-Y2F1c2UgaXMgdGhhdCB0aGUgY2xvY2sgd2lsbCBiZSBsb3N0IGlmIHRoZSBwZXJpb2RpYyBwZXJp
-b2QgDQo+Pj4gaXMgY2hhbmdlZCBhcyBjdXJyZW50bHkgY29kZSBjb3VudHMgdGhlIG5leHQgcGVy
-aW9kaWMgdGltZSBsaWtlIHRoaXM6DQo+Pj4gICAgICAgbmV4dF9pcnFfY2xvY2sgPSAoY3VyX2Ns
-b2NrICYgfihwZXJpb2QgLSAxKSkgKyBwZXJpb2Q7DQo+Pj4NCj4+PiBjb25zaWRlciB0aGUgY2Fz
-ZSBpZiBjdXJfY2xvY2sgPSAweDExRkYgYW5kIHBlcmlvZCA9IDB4MTAwLCB0aGVuIHRoZSANCj4+
-PiBuZXh0X2lycV9jbG9jayBpcyAweDEyMDAsIGhvd2V2ZXIsIHRoZXJlIGlzIG9ubHkgMSBjbG9j
-ayBsZWZ0IHRvIA0KPj4+IHRyaWdnZXIgdGhlIG5leHQgaXJxLiBVbmZvcnR1bmF0ZWx5LCBXaW5k
-b3dzIGd1ZXN0cyAoYXQgbGVhc3QgDQo+Pj4gV2luZG93czcpIGNoYW5nZSB0aGUgcGVyaW9kIHZl
-cnkgZnJlcXVlbnRseSBpZiBpdCBydW5zIHRoZSBhdHRhY2hlZCANCj4+PiBjb2RlLCBzbyB0aGF0
-IHRoZSBsb3N0IGNsb2NrIGlzIGFjY3VtdWxhdGVkLCB0aGUgd2FsbC10aW1lIGJlY29tZSANCj4+
-PiBmYXN0ZXIgYW5kIGZhc3Rlcg0KPj4NCj4+IFZlcnkgaW50ZXJlc3RpbmcuDQo+Pg0KPg0KPiBZ
-ZXMsIGluZGVlZC4NCj4NCj4+IEhvd2V2ZXIsIEkgdGhpbmsgdGhhdCB0aGUgYWJvdmUgc2hvdWxk
-IGJlIGV4YWN0bHkgaG93IHRoZSBSVEMgc2hvdWxkIA0KPj4gd29yay4gIFRoZSBvcmlnaW5hbCBS
-VEMgY2lyY3VpdCBoYWQgMjIgZGl2aWRlciBzdGFnZXMgKHNlZSBwYWdlIDEzIG9mIA0KPj4gdGhl
-IGRhdGFzaGVldFsxXSwgYXQgdGhlIGJvdHRvbSByaWdodCksIGFuZCB0aGUgcGVyaW9kaWMgaW50
-ZXJydXB0IA0KPj4gdGFwcyB0aGUgcmlzaW5nIGVkZ2Ugb2Ygb25lIG9mIHRoZSBkaXZpZGVycyAo
-cGFnZSAxNiwgc2Vjb25kIA0KPj4gcGFyYWdyYXBoKS4gIFRoZSBkYXRhc2hlZXQgYWxzbyBuZXZl
-ciBtZW50aW9ucyBhIGNvbXBhcmF0b3IgYmVpbmcgDQo+PiB1c2VkIHRvIHRyaWdnZXIgdGhlIHBl
-cmlvZGljIGludGVycnVwdHMuDQo+Pg0KPg0KPiBUaGF0IHdhcyBteSB0aG91Z2h0IGJlZm9yZSwg
-aG93ZXZlciwgYWZ0ZXIgbW9yZSB0ZXN0LCBpIGFtIG5vdCBzdXJlIGlmIA0KPiByZS1jb25maWd1
-cmluZyBSZWdBIGNoYW5nZXMgdGhlc2UgZGl2aWRlciBzdGFnZXMgaW50ZXJuYWwuLi4NCj4NCj4+
-IEhhdmUgeW91IGNoZWNrZWQgdGhhdCB0aGlzIFdpbmRvd3MgYnVnIGRvZXNuJ3QgaGFwcGVuIG9u
-IHJlYWwgDQo+PiBoYXJkd2FyZSB0b28/ICBPciBpcyB0aGUgY29tYmluYXRpb24gb2YgZHJpZnRm
-aXg9c2xldyBhbmQgY2hhbmdpbmcgDQo+PiBwZXJpb2RzIHRoYXQgaXMgYSBwcm9ibGVtPw0KPj4N
-Cj4NCj4gSSBoYXZlIHR3byBwaHlzaWNhbCB3aW5kb3dzIDcgbWFjaGluZXMsIGJvdGggb2YgdGhl
-bSBoYXZlIA0KPiAndXNlcGxhdGZvcm1jbG9jayA9IG9mZicgYW5kIG50cCBkaXNhYmxlZCwgdGhl
-IHdhbGwgdGltZSBpcyByZWFsbHkgDQo+IGFjY3VyYXRlLiBUaGUgZGlmZmVyZW5jZSBpcyB0aGF0
-IHRoZSBwaHlzaWNhbCBtYWNoaW5lcyBhcmUgdXNpbmcgSW50ZWwNCj4gUTg3IExQQyBjaGlwc2V0
-IHdoaWNoIGlzIG1jMTQ2ODE4cnRjIGNvbXBhdGlibGUuIEhvd2V2ZXIsIG9uIFZNLCB0aGUgDQo+
-IGlzc3VlIGlzIGVhc2lseSBiZSByZXByb2R1Y2VkIGp1c3QgaW4gfjEwIG1pbnMuDQo+DQo+IE91
-ciB0ZXN0IG1vc3RseSBmb2N1cyBvbiAnZHJpZnRmaXg9c2xldycgYW5kIGFmdGVyIHRoaXMgcGF0
-Y2hzZXQgdGhlIA0KPiB0aW1lIGlzIGFjY3VyYXRlIGFuZCBzdGFibGUuDQo+DQo+IEkgd2lsbCBk
-byB0aGUgdGVzdCBmb3IgZHJvcHBpbmcgJ3NsZXcnIGFuZCBzZWUgd2hhdCB3aWxsIGhhcHBlbi4u
-Lg0KPg0KDQo+IFdlbGwsIHRoZSB0aW1lIGlzIGVhc2lseSBvYnNlcnZlZCB0byBiZSBmYXN0ZXIg
-aWYgJ2RyaWZ0Zml4PXNsZXcnIGlzIG5vdCB1c2VkLiA6KA0KDQpZb3UgbWVhbiwgaXQgb25seSBm
-aXhlcyB0aGUgb25lIGNhc2Ugd2hpY2ggd2l0aCB0aGUgJyBkcmlmdGZpeD1zbGV3ICcgaXMgdXNl
-ZCA/DQpXZSBlbmNvdW50ZXJlZCB0aGlzIHByb2JsZW0gdG9vLCBJIGhhdmUgdHJpZWQgdG8gZml4
-IGl0IGxvbmcgdGltZSBhZ28uICANCmh0dHBzOi8vbGlzdHMuZ251Lm9yZy9hcmNoaXZlL2h0bWwv
-cWVtdS1kZXZlbC8yMDE2LTAzL21zZzA2OTM3Lmh0bWwuDQooSXQgc2VlbXMgdGhhdCB5b3VyIHNv
-bHV0aW9uIGlzIG1vcmUgdXNlZnVsKQ0KQnV0IGl0IHNlZW1zIHRoYXQgaXQgaXMgaW1wb3NzaWJs
-ZSB0byBmaXgsIHdlIG5lZWQgdG8gZW11bGF0ZSB0aGUgYmVoYXZpb3JzIG9mIHJlYWwgaGFyZHdh
-cmUsIA0KYnV0IHdlIGRpZG4ndCBmaW5kIGFueSBjbGVhciBkZXNjcmlwdGlvbiBhYm91dCBpdC4g
-QW5kIGl0IHNlZW1zIHRoYXQgb3RoZXIgdmlydHVhbGl6YXRpb24gcGxhdGZvcm1zDQpoYXZlIHRo
-aXMgcHJvYmxlbSB0b286DQpWTXdhcmU6DQpodHRwczovL3d3dy52bXdhcmUuY29tL2ZpbGVzL3Bk
-Zi9UaW1la2VlcGluZy1Jbi1WaXJ0dWFsTWFjaGluZXMucGRmDQpIZXBlci12Og0KaHR0cHM6Ly9i
-bG9ncy5tc2RuLm1pY3Jvc29mdC5jb20vdmlydHVhbF9wY19ndXkvMjAxMC8xMS8xOS90aW1lLXN5
-bmNocm9uaXphdGlvbi1pbi1oeXBlci12Lw0KDQoNCkhhaWxpYW5nDQo=
+Thanks to Stefan, Michael, Halil, Cornelia for reviewing. The v17 has some
+big changes, so I don't add Stefan's R-by until I get a response for the
+new version :)
+
+v17 -> v16:
+ - Some grammar fixes [Stefan, Halil, Michael]
+ - add a section named "Supported crypto services" in order to explain bit
+   numbers and valuse clearly. [Halil, Cornelia]
+ - avoid word reptition [Halil]
+ - rename non-session mode to stateless mode [Halil]
+ - change descriptions for all elements in struct virtio_crypto_config [Halil]
+ - add Halil as a reviewer in the ackonwledgement part, thanks for his work.
+ - other fixes here and there.
+
+Changes since v15:
+ - use feature bits for non-session mode in order to keep compatibility with
+   pre-existing code. [Halil & Michael]
+ - introduce VIRTIO_CRYPTO_F_ NON_SESSION_MODE feature bit to control all other
+   non-session mode feature bits.
+ - fix some typos. [Stefan]
+ - introduce struct virtio_crypto_op_data_req_mux to support both session
+   and non-session based crypto operations and keep compatibility with
+   pre-existing code.
+
+Changes since v14:
+ - drop VIRTIO_CRYPTO_S_STARTED status [Halil & Cornelia]
+ - correct a sentence about dataqueue and controlq in the first paragraph. [Halil]
+ - change a MAY to MUST about max_dataqueues. [Halil]
+ - add non-session mode support
+   a) add four features for different crypto services to identify wheather support session mode.
+   b) rewrite some
+
+For pervious versions of virtio crypto spec, Pls see:
+
+[v14]:
+https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg02212.html
+
+[v13]:
+https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg07348.html
+
+For more information, please see:
+ http://qemu-project.org/Features/VirtioCrypto
+
+Please help to review, thanks.
+
+Gonglei (2):
+  virtio-crypto: Add virtio crypto device specification
+  virtio-crypto: Add conformance clauses
+
+ acknowledgements.tex |    1 +
+ conformance.tex      |   29 ++
+ content.tex          |    2 +
+ virtio-crypto.tex    | 1305 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 1337 insertions(+)
+ create mode 100644 virtio-crypto.tex
+
+-- 
+1.7.12.4
