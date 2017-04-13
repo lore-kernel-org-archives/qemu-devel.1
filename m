@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cySgi-0005IJ-Fy
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 20:32:41 -0400
+	(envelope-from <eblake@redhat.com>) id 1cySwH-000757-W9
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 20:48:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cySgd-0008AZ-Jt
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 20:32:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36450)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cySgd-0008AN-DN
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 20:32:35 -0400
-Date: Thu, 13 Apr 2017 08:32:29 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170413003229.GD8607@lemon>
-References: <BM1PR01MB072283BB7A3BC4BB287D35A784010@BM1PR01MB0722.INDPRD01.PROD.OUTLOOK.COM>
-	<BM1PR01MB07224A0D4D1815F66D26EB7C84010@BM1PR01MB0722.INDPRD01.PROD.OUTLOOK.COM>
-	<20170411075348.GA4516@noname.str.redhat.com>
-	<BM1PR01MB0722AC7132DBFA648D3732A084000@BM1PR01MB0722.INDPRD01.PROD.OUTLOOK.COM>
-	<BM1PR01MB0722F734DE63EB1274B3132B84000@BM1PR01MB0722.INDPRD01.PROD.OUTLOOK.COM>
+	(envelope-from <eblake@redhat.com>) id 1cySwG-0003wU-Pm
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 20:48:46 -0400
+References: <20170412174920.8744-1-eblake@redhat.com>
+	<20170412174920.8744-9-eblake@redhat.com>
+	<3eaa3c7a-1581-8d2d-a385-3400d434b3fe@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3d2709ed-bb61-254e-9dc0-4049e61c8722@redhat.com>
+Date: Wed, 12 Apr 2017 19:48:25 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BM1PR01MB0722F734DE63EB1274B3132B84000@BM1PR01MB0722.INDPRD01.PROD.OUTLOOK.COM>
-Subject: Re: [Qemu-devel] Fw: First contribution - Interested in Outreachy
+In-Reply-To: <3eaa3c7a-1581-8d2d-a385-3400d434b3fe@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="9j7KSJEvIcLtxXGHJhNRqUU1HRccRTkOh"
+Subject: Re: [Qemu-devel] [PATCH 08/12] dirty-bitmap: Change
+ bdrv_get_dirty() to take bytes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +26,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Prerna Garg <Prerna.Garg@live.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>, Jeff Cody <jcody@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Tue, 04/11 16:44, Prerna Garg wrote:
-> 
-> 
-> 
-> ________________________________
-> From: Prerna Garg
-> Sent: Tuesday, April 11, 2017 9:57 PM
-> To: Kevin Wolf
-> Subject: Re: First contribution - Interested in Outreachy
-> 
-> 
-> Hello,
-> 
-> 
-> I am having difficulties sending the email through command line. So as a last
-> resort I am sending the patch as an attachment.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--9j7KSJEvIcLtxXGHJhNRqUU1HRccRTkOh
+From: Eric Blake <eblake@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, Jeff Cody <jcody@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz
+ <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <3d2709ed-bb61-254e-9dc0-4049e61c8722@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 08/12] dirty-bitmap: Change bdrv_get_dirty()
+ to take bytes
+References: <20170412174920.8744-1-eblake@redhat.com>
+ <20170412174920.8744-9-eblake@redhat.com>
+ <3eaa3c7a-1581-8d2d-a385-3400d434b3fe@redhat.com>
+In-Reply-To: <3eaa3c7a-1581-8d2d-a385-3400d434b3fe@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Prerna,
+On 04/12/2017 07:25 PM, John Snow wrote:
 
-If it is git-send-email that doesn't work, probably it's because you haven't
-configured the email server info correctly. Follow the instructions of
-git-send-email to point to the used SMTP server in you $HOME/.gitconfig: 
+>> +++ b/migration/block.c
+>> @@ -537,8 +537,7 @@ static int mig_save_device_dirty(QEMUFile *f, BlkM=
+igDevState *bmds,
+>>          } else {
+>>              blk_mig_unlock();
+>>          }
+>> -        if (bdrv_get_dirty(bs, bmds->dirty_bitmap, sector)) {
+>> -
+>> +        if (bdrv_get_dirty(bs, bmds->dirty_bitmap, sector * BDRV_SECT=
+OR_SIZE)) {
+>=20
+> This one is a little weirder now though, isn't it? We're asking for the=
 
-https://git-scm.com/docs/git-send-email
+> dirty status of a single byte, technically. In practice, the scaling
+> factor will always cover the entire sector, but it reads a lot jankier =
+now.
+>=20
+>>              if (total_sectors - sector < BDRV_SECTORS_PER_DIRTY_CHUNK=
+) {
+>>                  nr_sectors =3D total_sectors - sector;
+>>              } else {
+>>
+>=20
+> Oh well, it was always janky...
 
-Let us know if you have any more difficulties.
+True. Think of it as "is the granularity (which may be a sector, a
+cluster, or even some other size) that contains 'offset' dirty?".  I
+really think migration/block.c will be easier to read once converted to
+byte operations everywhere, but have not yet tackled it (it was hard
+enough tackling mirror, backup, commit, and stream in parallel for the
+previous series).
 
-Fam
+>=20
+> Reviewed-by: John Snow <jsnow@redhat.com>
+>=20
+
+Thanks for the reviews, by the way, even if the prerequisite patches
+still haven't been fully reviewed.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--9j7KSJEvIcLtxXGHJhNRqUU1HRccRTkOh
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY7srZAAoJEKeha0olJ0NqfSoIAIayX3UPYO5rgY4UV1XUwAot
+unBaVz54WjvqJcwcqigWC8usCF5Fedizk2ddQIfdQ8iL3t8Vu3isnS6M8pOe3CMh
+J+Kua8YmJD1MFLYNSODSPqXp8OK3r6Gy4DzuiBJhCIo23ruWCp55VJNTp81qmJRE
+PrGE8kEc5LvST9oHmdI1E45H2AXqXjuse8rbC5p8eSG51r2Eb4lAdaFA/4YRd5K0
+F0hQYXUZ5ehHTkSf1/ZCi3el3jpZ4/VcPlf6r31IE6yuLyll4xp9AZXuOjrAHUOn
+SgNQfU11FeitFoId96br+NaeJVr2V3xU37Jclq+Bkn2KSjexBOPimkqIX8ypH6E=
+=lldV
+-----END PGP SIGNATURE-----
+
+--9j7KSJEvIcLtxXGHJhNRqUU1HRccRTkOh--
