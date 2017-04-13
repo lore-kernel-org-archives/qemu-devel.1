@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cyiEX-0003ao-5e
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 13:08:38 -0400
+	(envelope-from <lersek@redhat.com>) id 1cyiFe-0004Aq-70
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 13:09:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cyiET-0006xs-34
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 13:08:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52020)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cyiES-0006xO-Px
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 13:08:33 -0400
-Date: Thu, 13 Apr 2017 20:08:21 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170413194732-mutt-send-email-mst@kernel.org>
-References: <1492076108-117229-1-git-send-email-wei.w.wang@intel.com>
-	<1492076108-117229-6-git-send-email-wei.w.wang@intel.com>
+	(envelope-from <lersek@redhat.com>) id 1cyiFc-0007QZ-5a
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 13:09:46 -0400
+References: <58EF2AA9.8010501@huawei.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <313049a7-b154-d3a1-9cb1-205950ab055a@redhat.com>
+Date: Thu, 13 Apr 2017 19:09:31 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1492076108-117229-6-git-send-email-wei.w.wang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v9 5/5] virtio-balloon:
- VIRTIO_BALLOON_F_MISC_VQ
+In-Reply-To: <58EF2AA9.8010501@huawei.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] ARM virt machine boots fail with 14 ioh3420
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,401 +22,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, dave.hansen@intel.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com
+To: Shannon Zhao <zhaoshenglong@huawei.com>, "edk2-devel@lists.01.org" <edk2-devel@ml01.01.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, zhuweilun <zhuweilun@huawei.com>, Marcel Apfelbaum <marcel@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andrea Bolognani <abologna@redhat.com>, Drew Jones <drjones@redhat.com>, qemu devel list <qemu-devel@nongnu.org>
 
-On Thu, Apr 13, 2017 at 05:35:08PM +0800, Wei Wang wrote:
-> Add a new vq, miscq, to handle miscellaneous requests between the device
-> and the driver.
+Adding Andrea, Ard, Drew and Marcel; and the main qemu list
+
+On 04/13/17 09:37, Shannon Zhao wrote:
+> Hi,
 > 
-> This patch implemnts the VIRTIO_BALLOON_MISCQ_INQUIRE_UNUSED_PAGES
-
-implements
-
-> request sent from the device.
-
-Commands are sent from host and handled on guest.
-In fact how is this so different from stats?
-How about reusing the stats vq then? You can use one buffer
-for stats and one buffer for commands.
-
-> Upon receiving this request from the
-> miscq, the driver offers to the device the guest unused pages.
+> I'm testing the PCIe devices hotplug for ARM virt machine and using
+> ioh3420 as root port. I found that below command line could work.
 > 
-> Tests have shown that skipping the transfer of unused pages of a 32G
-> guest can get the live migration time reduced to 1/8.
+> qemu-system-aarch64 -machine virt,accel=kvm,usb=off -cpu host -bios
+> QEMU_EFI.fd -m 12288 -smp 8,sockets=8,cores=1,threads=1  -device
+> ioh3420,port=0x8,chassis=1,id=pci.1,bus=pcie.0,addr=0x1 -device
+> ioh3420,port=0x9,chassis=2,id=pci.2,bus=pcie.0,addr=0x2 -device
+> ioh3420,port=0xa,chassis=3,id=pci.3,bus=pcie.0,addr=0x3 -device
+> ioh3420,port=0xb,chassis=4,id=pci.4,bus=pcie.0,addr=0x4 -device
+> ioh3420,port=0xc,chassis=5,id=pci.5,bus=pcie.0,addr=0x5 -device
+> ioh3420,port=0xd,chassis=6,id=pci.6,bus=pcie.0,addr=0x6 -device
+> ioh3420,port=0xe,chassis=7,id=pci.7,bus=pcie.0,addr=0x7 -device
+> ioh3420,port=0xf,chassis=8,id=pci.8,bus=pcie.0,addr=0x8 -device
+> ioh3420,port=0x10,chassis=9,id=pci.9,bus=pcie.0,addr=0x9 -device
+> ioh3420,port=0x11,chassis=10,id=pci.10,bus=pcie.0,addr=0xa -device
+> ioh3420,port=0x12,chassis=11,id=pci.11,bus=pcie.0,addr=0xb -device
+> ioh3420,port=0x13,chassis=12,id=pci.12,bus=pcie.0,addr=0xc -device
+> ioh3420,port=0x14,chassis=13,id=pci.13,bus=pcie.0,addr=0xd -device
+> i82801b11-bridge,id=pci.17,bus=pcie.0,addr=0x11 -device
+> pci-bridge,chassis_nr=18,id=pci.18,bus=pci.17,addr=0x0 -device
+> usb-ehci,id=usb,bus=pci.18,addr=0x1 -device
+> virtio-scsi-pci,id=scsi0,bus=pci.1,addr=0x0,disable-legacy=on,disable-modern=off
+> -drive
+> file=/mnt/sdb/guest.raw,format=raw,if=none,id=drive-scsi0-0-0-0,cache=none,aio=native
+> -device
+> scsi-hd,bus=scsi0.0,channel=0,scsi-id=0,lun=0,drive=drive-scsi0-0-0-0,id=scsi0-0-0-0,bootindex=1
+> -netdev tap,id=hostnet1,vhost=on -device
+> virtio-net-pci,netdev=hostnet1,id=net1,mac=00:16:3e:2b:cc:e1,bus=pci.2,addr=0x0,disable-legacy=on,disable-modern=off
+> -netdev tap,id=hostnet2,vhost=on -device
+> virtio-net-pci,netdev=hostnet2,id=net2,mac=00:16:3e:22:29:80,bus=pci.3,addr=0x0,disable-legacy=on,disable-modern=off
+> -netdev tap,id=hostnet3,vhost=on -device
+> virtio-net-pci,netdev=hostnet3,id=net3,mac=00:16:3e:28:07:9a,bus=pci.4,addr=0x0,disable-legacy=on,disable-modern=off
+> -netdev tap,id=hostnet4,vhost=on -device
+> virtio-net-pci,netdev=hostnet4,id=net4,mac=00:16:3e:3d:cd:b6,bus=pci.5,addr=0x0,disable-legacy=on,disable-modern=off
+> -netdev tap,id=hostnet5,vhost=on -device
+> virtio-net-pci,netdev=hostnet5,id=net5,mac=00:16:3e:64:9f:b0,bus=pci.6,addr=0x0,disable-legacy=on,disable-modern=off
+> -netdev tap,id=hostnet6,vhost=on -device
+> virtio-net-pci,netdev=hostnet6,id=net6,mac=00:16:3e:33:5b:d3,bus=pci.7,addr=0x0,disable-legacy=on,disable-modern=off
+> -netdev tap,id=hostnet7,vhost=on -device
+> virtio-net-pci,netdev=hostnet7,id=net7,mac=00:16:3e:39:7c:df,bus=pci.8,addr=0x0,disable-legacy=on,disable-modern=off
+> -netdev tap,id=hostnet8,vhost=on -device
+> virtio-net-pci,netdev=hostnet8,id=net8,mac=00:16:3e:0a:c1:4e,bus=pci.9,addr=0x0,disable-legacy=on,disable-modern=off
+> -netdev tap,id=hostnet9,vhost=on -device
+> virtio-net-pci,netdev=hostnet9,id=net9,mac=00:16:3e:0a:58:a6,bus=pci.10,addr=0x0,disable-legacy=on,disable-modern=off
+> -netdev tap,id=hostnet10,vhost=on -device
+> virtio-net-pci,netdev=hostnet10,id=net10,mac=00:16:3e:35:b5:80,bus=pci.11,addr=0x0,disable-legacy=on,disable-modern=off
+> -netdev tap,id=hostnet11,vhost=on -device
+> virtio-net-pci,netdev=hostnet11,id=net11,mac=00:16:3e:4d:b5:bb,bus=pci.12,addr=0x0,disable-legacy=on,disable-modern=off
+> -netdev tap,id=hostnet12,vhost=on -device
+> virtio-net-pci,netdev=hostnet12,id=net12,mac=00:16:3e:3b:69:e9,bus=pci.13,addr=0x0,disable-legacy=on,disable-modern=off
+> -nographic
 > 
-> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> Signed-off-by: Liang Li <liang.z.li@intel.com>
-> ---
->  drivers/virtio/virtio_balloon.c     | 209 +++++++++++++++++++++++++++++++++---
->  include/uapi/linux/virtio_balloon.h |   8 ++
->  2 files changed, 204 insertions(+), 13 deletions(-)
+> But if I add one more ioh3420 device by appending above command with
+> "-device ioh3420,port=0x15,chassis=14,id=pci.14,bus=pcie.0,addr=0xe",
+> the guest can't boot. It seems that the firmware doesn't recognize the
+> PCIe devices and print "Connect: PciRoot(0x0): Not Found".
 > 
-> diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
-> index 5e2e7cc..95c703e 100644
-> --- a/drivers/virtio/virtio_balloon.c
-> +++ b/drivers/virtio/virtio_balloon.c
-> @@ -56,11 +56,12 @@ static struct vfsmount *balloon_mnt;
->  
->  /* Types of pages to chunk */
->  #define PAGE_CHUNK_TYPE_BALLOON 0
-> +#define PAGE_CHUNK_TYPE_UNUSED 1
->  
->  #define MAX_PAGE_CHUNKS 4096
->  struct virtio_balloon {
->  	struct virtio_device *vdev;
-> -	struct virtqueue *inflate_vq, *deflate_vq, *stats_vq;
-> +	struct virtqueue *inflate_vq, *deflate_vq, *stats_vq, *miscq;
->  
->  	/* The balloon servicing is delegated to a freezable workqueue. */
->  	struct work_struct update_balloon_stats_work;
-> @@ -94,6 +95,19 @@ struct virtio_balloon {
->  	struct virtio_balloon_page_chunk_hdr *balloon_page_chunk_hdr;
->  	struct virtio_balloon_page_chunk *balloon_page_chunk;
->  
-> +	/*
-> +	 * Buffer for PAGE_CHUNK_TYPE_UNUSED:
-> +	 * virtio_balloon_miscq_hdr +
-> +	 * virtio_balloon_page_chunk_hdr +
-> +	 * virtio_balloon_page_chunk * MAX_PAGE_CHUNKS
-> +	 */
-> +	struct virtio_balloon_miscq_hdr *miscq_out_hdr;
-> +	struct virtio_balloon_page_chunk_hdr *unused_page_chunk_hdr;
-> +	struct virtio_balloon_page_chunk *unused_page_chunk;
-> +
-> +	/* Buffer for host to send cmd to miscq */
-> +	struct virtio_balloon_miscq_hdr *miscq_in_hdr;
-> +
->  	/* Bitmap used to record pages */
->  	unsigned long *page_bmap[PAGE_BMAP_COUNT_MAX];
->  	/* Number of the allocated page_bmap */
-> @@ -220,6 +234,10 @@ static void send_page_chunks(struct virtio_balloon *vb, struct virtqueue *vq,
->  		hdr = vb->balloon_page_chunk_hdr;
->  		len = 0;
->  		break;
-> +	case PAGE_CHUNK_TYPE_UNUSED:
-> +		hdr = vb->unused_page_chunk_hdr;
-> +		len = sizeof(struct virtio_balloon_miscq_hdr);
-> +		break;
->  	default:
->  		dev_warn(&vb->vdev->dev, "%s: chunk %d of unknown pages\n",
->  			 __func__, type);
-> @@ -254,6 +272,10 @@ static void add_one_chunk(struct virtio_balloon *vb, struct virtqueue *vq,
->  		hdr = vb->balloon_page_chunk_hdr;
->  		chunk = vb->balloon_page_chunk;
->  		break;
-> +	case PAGE_CHUNK_TYPE_UNUSED:
-> +		hdr = vb->unused_page_chunk_hdr;
-> +		chunk = vb->unused_page_chunk;
-> +		break;
->  	default:
->  		dev_warn(&vb->vdev->dev, "%s: chunk %d of unknown pages\n",
->  			 __func__, type);
-> @@ -686,28 +708,139 @@ static void update_balloon_size_func(struct work_struct *work)
->  		queue_work(system_freezable_wq, work);
->  }
->  
-> +static void miscq_in_hdr_add(struct virtio_balloon *vb)
-> +{
-> +	struct scatterlist sg_in;
-> +
-> +	sg_init_one(&sg_in, vb->miscq_in_hdr,
-> +		    sizeof(struct virtio_balloon_miscq_hdr));
-> +	if (virtqueue_add_inbuf(vb->miscq, &sg_in, 1, vb->miscq_in_hdr,
-> +	    GFP_KERNEL) < 0) {
-> +		__virtio_clear_bit(vb->vdev,
-> +				   VIRTIO_BALLOON_F_MISC_VQ);
-> +		dev_warn(&vb->vdev->dev, "%s: add miscq_in_hdr err\n",
-> +			 __func__);
-> +		return;
-> +	}
-> +	virtqueue_kick(vb->miscq);
-> +}
-> +
-> +static void miscq_send_unused_pages(struct virtio_balloon *vb)
-> +{
-> +	struct virtio_balloon_miscq_hdr *miscq_out_hdr = vb->miscq_out_hdr;
-> +	struct virtqueue *vq = vb->miscq;
-> +	int ret = 0;
-> +	unsigned int order = 0, migratetype = 0;
-> +	struct zone *zone = NULL;
-> +	struct page *page = NULL;
-> +	u64 pfn;
-> +
-> +	miscq_out_hdr->cmd =  VIRTIO_BALLOON_MISCQ_INQUIRE_UNUSED_PAGES;
+> I'm using QEMU 2.8.1 and edk2 at commit 36a0d5c. Is there any limitation
+> of the supported PCIe devices?
 
-Gets endian-ness and whitespace wrong. Pls use static checkers to catch
-this type of error.
+In one sentence: you are running out of (emulated) IO space.
 
-> +	miscq_out_hdr->flags = 0;
-> +
-> +	for_each_populated_zone(zone) {
-> +		for (order = MAX_ORDER - 1; order > 0; order--) {
-> +			for (migratetype = 0; migratetype < MIGRATE_TYPES;
-> +			     migratetype++) {
-> +				do {
-> +					ret = inquire_unused_page_block(zone,
-> +						order, migratetype, &page);
-> +					if (!ret) {
-> +						pfn = (u64)page_to_pfn(page);
-> +						add_one_chunk(vb, vq,
-> +							PAGE_CHUNK_TYPE_UNUSED,
-> +							pfn,
-> +							(u64)(1 << order));
-> +					}
-> +				} while (!ret);
-> +			}
-> +		}
-> +	}
-> +	miscq_out_hdr->flags |= VIRTIO_BALLOON_MISCQ_F_COMPLETE;
+Aarch64 does not have "IO space", but with QEMU, using the "virt"
+machine type, we emulate 64KB of IO space, mapped to a special MMIO
+range. This is available for PCI resource allocation, for such devices
+that have IO BARs (and for such PCI bridges that reserve IO space for
+hotplug purposes).
 
-And where is miscq_out_hdr used? I see no add_outbuf anywhere.
+The ioh3420 PCI Express Root Port device represents such a bridge. Even
+if you plug a PCI Express device into it that has only MMIO BARs, the
+bridge still advertises IO support, and it causes the firmware (and/or
+Linux) to reserve 4KB of IO space. With ~15-16 such ports, you run out
+of the 64 KB IO aperture, and the resource assignment fails.
 
-Things like this should be passed through function parameters
-and not stuffed into device structure, fields should be
-initialized before use and not where we happen to
-have the data handy.
+The solution to this problem comes together from several parts:
 
+(1) New, vendor-independent device models in QEMU, for PCI Express Root
+Ports and Downstream Ports, that (optionally) do not advertise any
+support at all for IO BARs. This is on Marcel's task list. Please refer to:
 
+  generic port device model:
+    https://bugzilla.redhat.com/show_bug.cgi?id=1390316
 
-Also, _F_ is normally a bit number, you use it as a value here.
+  optional disablement of IO space:
+    https://bugzilla.redhat.com/show_bug.cgi?id=1344299
 
+(2) A similar question exists for MMIO space. While there the issue
+isn't exactly "running out of available aperture", we still want to
+control the MMIO reservation size for root ports and downstream ports --
+different devices that are to be hot-plugged can require different
+reservations in advance. For this, please refer to:
 
-> +	send_page_chunks(vb, vq, PAGE_CHUNK_TYPE_UNUSED, true);
-> +}
-> +
-> +static void miscq_handle(struct virtqueue *vq)
-> +{
-> +	struct virtio_balloon *vb = vq->vdev->priv;
-> +	struct virtio_balloon_miscq_hdr *hdr;
-> +	unsigned int len;
-> +
-> +	hdr = virtqueue_get_buf(vb->miscq, &len);
-> +	if (!hdr || len != sizeof(struct virtio_balloon_miscq_hdr)) {
-> +		dev_warn(&vb->vdev->dev, "%s: invalid miscq hdr len\n",
-> +			 __func__);
-> +		miscq_in_hdr_add(vb);
-> +		return;
-> +	}
-> +	switch (hdr->cmd) {
-> +	case VIRTIO_BALLOON_MISCQ_INQUIRE_UNUSED_PAGES:
-> +		miscq_send_unused_pages(vb);
-> +		break;
-> +	default:
-> +		dev_warn(&vb->vdev->dev, "%s: miscq cmd %d not supported\n",
-> +			 __func__, hdr->cmd);
-> +	}
-> +	miscq_in_hdr_add(vb);
-> +}
-> +
->  static int init_vqs(struct virtio_balloon *vb)
->  {
-> -	struct virtqueue *vqs[3];
-> -	vq_callback_t *callbacks[] = { balloon_ack, balloon_ack, stats_request };
-> -	static const char * const names[] = { "inflate", "deflate", "stats" };
-> -	int err, nvqs;
-> +	struct virtqueue **vqs;
-> +	vq_callback_t **callbacks;
-> +	const char **names;
-> +	int err = -ENOMEM;
-> +	int i, nvqs;
-> +
-> +	 /* Inflateq and deflateq are used unconditionally */
-> +	nvqs = 2;
-> +
-> +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ))
-> +		nvqs++;
-> +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_MISC_VQ))
-> +		nvqs++;
-> +
-> +	/* Allocate space for find_vqs parameters */
-> +	vqs = kcalloc(nvqs, sizeof(*vqs), GFP_KERNEL);
-> +	if (!vqs)
-> +		goto err_vq;
-> +	callbacks = kmalloc_array(nvqs, sizeof(*callbacks), GFP_KERNEL);
-> +	if (!callbacks)
-> +		goto err_callback;
-> +	names = kmalloc_array(nvqs, sizeof(*names), GFP_KERNEL);
-> +	if (!names)
-> +		goto err_names;
-> +
+  sizing of MMIO reservation:
+    https://bugzilla.redhat.com/show_bug.cgi?id=1437113
 
-All of 4 VQs, why are dynamic allocations called for?
+(3) In the firmware, platform code can control the aperture reservation
+of bridges, for hotplug purposes, while the generic PCI Bus driver
+enumerates devices and assigns resources. The driver that does this is
 
-> +	callbacks[0] = balloon_ack;
-> +	names[0] = "inflate";
-> +	callbacks[1] = balloon_ack;
-> +	names[1] = "deflate";
-> +
-> +	i = 2;
-> +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
-> +		callbacks[i] = stats_request;
-> +		names[i] = "stats";
-> +		i++;
-> +	}
->  
-> -	/*
-> -	 * We expect two virtqueues: inflate and deflate, and
-> -	 * optionally stat.
-> -	 */
-> -	nvqs = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ) ? 3 : 2;
-> -	err = vb->vdev->config->find_vqs(vb->vdev, nvqs, vqs, callbacks, names);
-> +	if (virtio_has_feature(vb->vdev,
-> +				      VIRTIO_BALLOON_F_MISC_VQ)) {
-> +		callbacks[i] = miscq_handle;
-> +		names[i] = "miscq";
-> +	}
-> +
-> +	err = vb->vdev->config->find_vqs(vb->vdev, nvqs, vqs, callbacks,
-> +					 names);
->  	if (err)
-> -		return err;
-> +		goto err_find;
->  
->  	vb->inflate_vq = vqs[0];
->  	vb->deflate_vq = vqs[1];
-> +	i = 2;
->  	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
->  		struct scatterlist sg;
-> -		vb->stats_vq = vqs[2];
->  
-> +		vb->stats_vq = vqs[i++];
->  		/*
->  		 * Prime this virtqueue with one buffer so the hypervisor can
->  		 * use it to signal us later (it can't be broken yet!).
-> @@ -718,7 +851,25 @@ static int init_vqs(struct virtio_balloon *vb)
->  			BUG();
->  		virtqueue_kick(vb->stats_vq);
->  	}
-> +
-> +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_MISC_VQ)) {
-> +		vb->miscq = vqs[i];
-> +		miscq_in_hdr_add(vb);
-> +	}
-> +
-> +	kfree(names);
-> +	kfree(callbacks);
-> +	kfree(vqs);
->  	return 0;
-> +
-> +err_find:
-> +	kfree(names);
-> +err_names:
-> +	kfree(callbacks);
-> +err_callback:
-> +	kfree(vqs);
-> +err_vq:
-> +	return err;
->  }
->  
->  #ifdef CONFIG_BALLOON_COMPACTION
-> @@ -843,6 +994,32 @@ static void balloon_page_chunk_init(struct virtio_balloon *vb)
->  	}
->  }
->  
-> +static void miscq_init(struct virtio_balloon *vb)
-> +{
-> +	void *buf;
-> +
-> +	vb->miscq_in_hdr = kmalloc(sizeof(struct virtio_balloon_miscq_hdr),
-> +				   GFP_KERNEL);
-> +	buf = kmalloc(sizeof(struct virtio_balloon_miscq_hdr) +
-> +		      sizeof(struct virtio_balloon_page_chunk_hdr) +
-> +		      sizeof(struct virtio_balloon_page_chunk) *
-> +		      MAX_PAGE_CHUNKS, GFP_KERNEL);
+  OvmfPkg/PciHotPlugInitDxe
 
-Mabe reduce MAX_PAGE_CHUNKS even further to fit in order-3 allocation.
+At the moment, this driver is only included in OVMF, not in ArmVirtQemu.
+Plus, it doesn't really do the right thing in OVMF either.
 
+Once items (1) and (2) above are solved, I will update PciHotPlugInitDxe
+so that it adheres to the reservation sizes dictated by QEMU. For this,
+please refer to:
 
-> +	if (!vb->miscq_in_hdr || !buf) {
-> +		kfree(buf);
-> +		kfree(vb->miscq_in_hdr);
-> +		__virtio_clear_bit(vb->vdev, VIRTIO_BALLOON_F_MISC_VQ);
+  adhere to IO reservation disablement:
+    https://bugzilla.redhat.com/show_bug.cgi?id=1434740
+    (depends on BZ#1344299 above)
 
-Again this does not really work here. In this case it might be best to
-just fail probe.
+  adhere to MMIO reservation sizing:
+    https://bugzilla.redhat.com/show_bug.cgi?id=1434747
+    (depends on BZ#1437113 above)
 
-> +		dev_warn(&vb->vdev->dev, "%s: failed\n", __func__);
-> +	} else {
-> +		vb->miscq_out_hdr = buf;
-> +		vb->unused_page_chunk_hdr = buf +
-> +				sizeof(struct virtio_balloon_miscq_hdr);
-> +		vb->unused_page_chunk_hdr->chunks = 0;
-> +		vb->unused_page_chunk = buf +
-> +				sizeof(struct virtio_balloon_miscq_hdr) +
-> +				sizeof(struct virtio_balloon_page_chunk_hdr);
-> +	}
-> +}
-> +
->  static int virtballoon_probe(struct virtio_device *vdev)
->  {
->  	struct virtio_balloon *vb;
-> @@ -869,6 +1046,9 @@ static int virtballoon_probe(struct virtio_device *vdev)
->  	if (virtio_has_feature(vdev, VIRTIO_BALLOON_F_BALLOON_CHUNKS))
->  		balloon_page_chunk_init(vb);
->  
-> +	if (virtio_has_feature(vdev, VIRTIO_BALLOON_F_MISC_VQ))
-> +		miscq_init(vb);
-> +
->  	mutex_init(&vb->balloon_lock);
->  	init_waitqueue_head(&vb->acked);
->  	vb->vdev = vdev;
-> @@ -946,6 +1126,8 @@ static void virtballoon_remove(struct virtio_device *vdev)
->  
->  	remove_common(vb);
->  	free_page_bmap(vb);
-> +	kfree(vb->miscq_out_hdr);
-> +	kfree(vb->miscq_in_hdr);
->  	if (vb->vb_dev_info.inode)
->  		iput(vb->vb_dev_info.inode);
->  	kfree(vb);
-> @@ -987,6 +1169,7 @@ static unsigned int features[] = {
->  	VIRTIO_BALLOON_F_STATS_VQ,
->  	VIRTIO_BALLOON_F_DEFLATE_ON_OOM,
->  	VIRTIO_BALLOON_F_BALLOON_CHUNKS,
-> +	VIRTIO_BALLOON_F_MISC_VQ,
->  };
->  
->  static struct virtio_driver virtio_balloon_driver = {
-> diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/virtio_balloon.h
-> index be317b7..96bdc86 100644
-> --- a/include/uapi/linux/virtio_balloon.h
-> +++ b/include/uapi/linux/virtio_balloon.h
-> @@ -35,6 +35,7 @@
->  #define VIRTIO_BALLOON_F_STATS_VQ	1 /* Memory Stats virtqueue */
->  #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on OOM */
->  #define VIRTIO_BALLOON_F_BALLOON_CHUNKS 3 /* Inflate/Deflate pages in chunks */
-> +#define VIRTIO_BALLOON_F_MISC_VQ	4 /* Virtqueue for misc. requests */
+We plan to work on these items in the following months (upstream first,
+obviously).
 
-Is "misc" the best we can do? I think these are
-actually host commands - aren't they?
+--*--
 
->  
->  /* Size of a PFN in the balloon interface. */
->  #define VIRTIO_BALLOON_PFN_SHIFT 12
-> @@ -95,4 +96,11 @@ struct virtio_balloon_page_chunk {
->  	__le64 size;
->  };
->  
-> +#define VIRTIO_BALLOON_MISCQ_INQUIRE_UNUSED_PAGES 0
+Please read the following document in the QEMU source tree:
 
-meaning what? Is this a command value? Is this a command
-to report unused memory then? Let's call it this then.
+  docs/pcie.txt
 
+It will give you the "grand vision" we have for PCI Express on the Q35
+(x86) machine type, and most of that -- intentionally! -- applies to the
+"virt" (aarch64) machine type as well.
 
-> +#define VIRTIO_BALLOON_MISCQ_F_COMPLETE 0x1
+See also the following QEMU commits (especially the second one):
 
-meaning what?
+  9ca019c1dd57 q35: Improve sample configuration files
+  166d434685ed mach-virt: Provide sample configuration files
 
-> +struct virtio_balloon_miscq_hdr {
-> +	__le16 cmd;
-> +	__le16 flags;
-
-Add padding to make it full 64 bit.
-
-> +};
-> +
->  #endif /* _LINUX_VIRTIO_BALLOON_H */
-> -- 
-> 2.7.4
+Thanks!
+Laszlo
