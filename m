@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cyS8j-0005lE-CT
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 19:57:34 -0400
+	(envelope-from <jsnow@redhat.com>) id 1cySBT-00073C-Sp
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 20:00:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cyS8g-0005ti-AY
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 19:57:33 -0400
-Resent-Message-Id: <E1cyS8g-0005ti-AY@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <149204143506.10500.9312462203357418218@6c512846dbc7>
-In-Reply-To: <20170408054318.19830-1-omar.rizwan@gmail.com>
+	(envelope-from <jsnow@redhat.com>) id 1cySBS-0007Ik-SC
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 20:00:23 -0400
+References: <20170412174920.8744-1-eblake@redhat.com>
+	<20170412174920.8744-6-eblake@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <9ef14074-b858-dbe0-8bd1-cf7dfe939e9c@redhat.com>
+Date: Wed, 12 Apr 2017 20:00:01 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 12 Apr 2017 16:57:15 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] raspi: Add Raspberry Pi 1 support
+In-Reply-To: <20170412174920.8744-6-eblake@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 05/12] dirty-bitmap: Set iterator start by
+ offset, not sector
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,33 +24,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: omar.rizwan@gmail.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org, Andrew.Baumann@microsoft.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA0MDgwNTQzMTguMTk4MzAtMS1vbWFyLnJpendhbkBnbWFpbC5jb20KU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSF0gcmFzcGk6IEFkZCBSYXNwYmVycnkgUGkgMSBzdXBwb3J0ClR5cGU6IHNl
-cmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49
-MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCiMg
-VXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cg
-LS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAg
-IGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9
-JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0
-cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAg
-ICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNU
-IFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
-ODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMDgyYmI2MSByYXNwaTog
-QWRkIFJhc3BiZXJyeSBQaSAxIHN1cHBvcnQKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5n
-IFBBVENIIDEvMTogcmFzcGk6IEFkZCBSYXNwYmVycnkgUGkgMSBzdXBwb3J0Li4uCkVSUk9SOiBs
-aW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTg5OiBGSUxFOiBody9hcm0vcmFzcGkuYzozNDoKKyAq
-IGh0dHBzOi8vZ2l0aHViLmNvbS9BbmRyZXdGcm9tTWVsYm91cm5lL3Jhc3BiZXJyeV9waV9yZXZp
-c2lvbi9ibG9iLzI3NjRjMTk5ODNmYjdiMWVmOGNiMjEwMzFlOTRjMjkzNzAzYWZhMmUvUkVBRE1F
-Lm1kCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDI1OCBsaW5lcyBjaGVja2VkCgpZb3Vy
-IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRl
-c3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
-bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5
-b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+
+
+On 04/12/2017 01:49 PM, Eric Blake wrote:
+> All callers to bdrv_dirty_iter_new() passed 0 for their initial
+> starting point, drop that parameter.
+> 
+> All callers to bdrv_set_dirty_iter() were scaling an offset to
+> a sector number; move the scaling to occur internally to dirty
+> bitmap code instead.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  include/block/dirty-bitmap.h | 5 ++---
+>  block/backup.c               | 5 ++---
+>  block/dirty-bitmap.c         | 9 ++++-----
+>  block/mirror.c               | 4 ++--
+>  4 files changed, 10 insertions(+), 13 deletions(-)
+> 
+> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+> index a83979d..efcec60 100644
+> --- a/include/block/dirty-bitmap.h
+> +++ b/include/block/dirty-bitmap.h
+> @@ -41,11 +41,10 @@ void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+>  void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+>                               int64_t cur_sector, int64_t nr_sectors);
+>  BdrvDirtyBitmapIter *bdrv_dirty_meta_iter_new(BdrvDirtyBitmap *bitmap);
+> -BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap,
+> -                                         uint64_t first_sector);
+> +BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap);
+>  void bdrv_dirty_iter_free(BdrvDirtyBitmapIter *iter);
+>  int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter);
+> -void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t sector_num);
+> +void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t offset);
+>  int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
+>  int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
+>  void bdrv_dirty_bitmap_truncate(BlockDriverState *bs);
+> diff --git a/block/backup.c b/block/backup.c
+> index 63ca208..efa4896 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -372,7 +372,7 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
+> 
+>      granularity = bdrv_dirty_bitmap_granularity(job->sync_bitmap);
+>      clusters_per_iter = MAX((granularity / job->cluster_size), 1);
+> -    dbi = bdrv_dirty_iter_new(job->sync_bitmap, 0);
+> +    dbi = bdrv_dirty_iter_new(job->sync_bitmap);
+> 
+>      /* Find the next dirty sector(s) */
+>      while ((offset = bdrv_dirty_iter_next(dbi) * BDRV_SECTOR_SIZE) >= 0) {
+> @@ -403,8 +403,7 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
+>          /* If the bitmap granularity is smaller than the backup granularity,
+>           * we need to advance the iterator pointer to the next cluster. */
+>          if (granularity < job->cluster_size) {
+> -            bdrv_set_dirty_iter(dbi,
+> -                                cluster * job->cluster_size / BDRV_SECTOR_SIZE);
+> +            bdrv_set_dirty_iter(dbi, cluster * job->cluster_size);
+>          }
+> 
+>          last_cluster = cluster - 1;
+> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+> index a413df1..3fb4871 100644
+> --- a/block/dirty-bitmap.c
+> +++ b/block/dirty-bitmap.c
+> @@ -367,11 +367,10 @@ uint32_t bdrv_dirty_bitmap_granularity(BdrvDirtyBitmap *bitmap)
+>      return BDRV_SECTOR_SIZE << hbitmap_granularity(bitmap->bitmap);
+>  }
+> 
+> -BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap,
+> -                                         uint64_t first_sector)
+> +BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap)
+>  {
+>      BdrvDirtyBitmapIter *iter = g_new(BdrvDirtyBitmapIter, 1);
+> -    hbitmap_iter_init(&iter->hbi, bitmap->bitmap, first_sector);
+> +    hbitmap_iter_init(&iter->hbi, bitmap->bitmap, 0);
+>      iter->bitmap = bitmap;
+>      bitmap->active_iterators++;
+>      return iter;
+> @@ -488,9 +487,9 @@ void bdrv_set_dirty(BlockDriverState *bs, int64_t cur_sector,
+>  /**
+>   * Advance a BdrvDirtyBitmapIter to an arbitrary offset.
+>   */
+> -void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *iter, int64_t sector_num)
+> +void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *iter, int64_t offset)
+>  {
+> -    hbitmap_iter_init(&iter->hbi, iter->hbi.hb, sector_num);
+> +    hbitmap_iter_init(&iter->hbi, iter->hbi.hb, offset >> BDRV_SECTOR_BITS);
+>  }
+> 
+>  int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap)
+> diff --git a/block/mirror.c b/block/mirror.c
+> index c92335a..7c1d6bf 100644
+> --- a/block/mirror.c
+> +++ b/block/mirror.c
+> @@ -370,7 +370,7 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+>          next_dirty = bdrv_dirty_iter_next(s->dbi) * BDRV_SECTOR_SIZE;
+>          if (next_dirty > next_offset || next_dirty < 0) {
+>              /* The bitmap iterator's cache is stale, refresh it */
+> -            bdrv_set_dirty_iter(s->dbi, next_offset >> BDRV_SECTOR_BITS);
+> +            bdrv_set_dirty_iter(s->dbi, next_offset);
+>              next_dirty = bdrv_dirty_iter_next(s->dbi) * BDRV_SECTOR_SIZE;
+>          }
+>          assert(next_dirty == next_offset);
+> @@ -779,7 +779,7 @@ static void coroutine_fn mirror_run(void *opaque)
+>      }
+> 
+>      assert(!s->dbi);
+> -    s->dbi = bdrv_dirty_iter_new(s->dirty_bitmap, 0);
+> +    s->dbi = bdrv_dirty_iter_new(s->dirty_bitmap);
+>      for (;;) {
+>          uint64_t delay_ns = 0;
+>          int64_t cnt, delta;
+> 
+
+Reviewed-by: John Snow <jsnow@redhat.com>
