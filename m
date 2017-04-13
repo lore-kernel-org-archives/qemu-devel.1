@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cyj5z-0004ng-Bh
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 14:03:52 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1cyjHC-0006qE-23
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 14:15:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cyj5y-00070u-EL
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 14:03:51 -0400
-References: <1492104214-29994-1-git-send-email-kwolf@redhat.com>
-	<1492104214-29994-2-git-send-email-kwolf@redhat.com>
-	<a635dc96-283e-3704-59cb-248eb065bf2b@redhat.com>
-	<20170413175444.GG5095@noname.redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <35c0f944-0303-5d86-7bf3-93940bd886e5@redhat.com>
-Date: Thu, 13 Apr 2017 13:03:35 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cyjH8-0001W8-SC
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 14:15:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58006)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cyjH8-0001Vy-Iq
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 14:15:22 -0400
+Date: Thu, 13 Apr 2017 15:15:18 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170413181518.GY32646@thinpad.lan.raisama.net>
+References: <20170411205813.GA4006@rkaganip.lan>
+	<87inm91wo4.fsf@dusky.pond.sub.org>
+	<20170412200720.GA27126@thinpad.lan.raisama.net>
+	<20170413151533.GD14312@rkaganb.sw.ru>
+	<20170413164457.GX32646@thinpad.lan.raisama.net>
+	<CAFEAcA_VQGDXmMmcTdzwb-UA4sVF1jeXfnXyUBNnZU2E4jdUPw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170413175444.GG5095@noname.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ABcvgglWxxtKjpjurevNjsnKVR1S3KuBg"
-Subject: Re: [Qemu-devel] [PATCH 1/3] migration: Call
- blk_resume_after_migration() for postcopy
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_VQGDXmMmcTdzwb-UA4sVF1jeXfnXyUBNnZU2E4jdUPw@mail.gmail.com>
+Subject: Re: [Qemu-devel] vmbus bridge: machine property or device?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,89 +31,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, quintela@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, lvivier@redhat.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Roman Kagan <rkagan@virtuozzo.com>, Markus Armbruster <armbru@redhat.com>, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ABcvgglWxxtKjpjurevNjsnKVR1S3KuBg
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, quintela@redhat.com,
- dgilbert@redhat.com, stefanha@redhat.com, lvivier@redhat.com,
- qemu-devel@nongnu.org
-Message-ID: <35c0f944-0303-5d86-7bf3-93940bd886e5@redhat.com>
-Subject: Re: [PATCH 1/3] migration: Call blk_resume_after_migration() for
- postcopy
-References: <1492104214-29994-1-git-send-email-kwolf@redhat.com>
- <1492104214-29994-2-git-send-email-kwolf@redhat.com>
- <a635dc96-283e-3704-59cb-248eb065bf2b@redhat.com>
- <20170413175444.GG5095@noname.redhat.com>
-In-Reply-To: <20170413175444.GG5095@noname.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, Apr 13, 2017 at 05:58:51PM +0100, Peter Maydell wrote:
+> On 13 April 2017 at 17:44, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > On Thu, Apr 13, 2017 at 06:15:34PM +0300, Roman Kagan wrote:
+> >> Can you (or anybody else) please help me decide if I need
+> >> TYPE_SYS_BUS_DEVICE?  Logically the VMBus bridge is "attached directly
+> >> to the main system bus" as written at the top of include/hw/sysbus.h.
+> >
+> > I think that documentation was written before we supported
+> > bus-less devices.
+> 
+> The major question to ask to determine whether you need to be
+> a sysbus device is how does the guest interact with this thing?
+> In particular, does it have memory mapped registers (and is it
+> not part of some other more specific interface like a PCI device) ?
+> 
+> > I'm not sure about the consequences of simply connecting IRQs
+> > inside ->realize() without using the sysbus *_irq helpers. I hope
+> > others can clarify this.
+> 
+> Connecting what IRQs to what? If your device has an IRQ
+> then it isn't the device's job to connect it up -- it is
+> the job of the machine model, because only the machine
+> model knows what the IRQ controller is, whether the IRQ
+> needs to be advertised via ACPI or device tree, and so on.
 
-On 04/13/2017 12:54 PM, Kevin Wolf wrote:
-> Am 13.04.2017 um 19:39 hat Eric Blake geschrieben:
->> On 04/13/2017 12:23 PM, Kevin Wolf wrote:
->>> Commit d35ff5e6 ('block: Ignore guest dev permissions during incoming=
+I can't say it's a good idea, but it looks like there are devices
+that do that (probably they are machine-specific, so they know
+which machine they are being connected to?).
 
->>> migration') added blk_resume_after_migration() to the precopy migrati=
-on
->>> path, but neglected to add it to the duplicated code that is used for=
+I looked for realize functions that call sysbus_mmio_map() or
+get_system_memory() directly, and I've found a few:
 
->>> postcopy migration. This means that the guest device doesn't request =
-the
->>> necessary permissions, which ultimately led to failing assertions.
->>>
->>> Add the missing blk_resume_after_migration() to the postcopy path.
->>>
->>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->>> ---
->>>  migration/savevm.c | 8 ++++++++
->>>  1 file changed, 8 insertions(+)
->>
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->>
->> Are we targetting this for 2.9-rc5, or is it 2.10 material?
->=20
-> At this point, I think it's clearly 2.10.
+ 13  static void fsl_imx6_realize(DeviceState *dev, Error **errp)
+ 11  static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+ 11  static void fsl_imx25_realize(DeviceState *dev, Error **errp)
+ 10  static void fsl_imx31_realize(DeviceState *dev, Error **errp)
+ 10  static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+  7  static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+  4  static void aw_a10_realize(DeviceState *dev, Error **errp)
+  2  static void spapr_phb_realize(DeviceState *dev, Error **errp)
+  2  static void raven_realize(PCIDevice *d, Error **errp)
+  2  static void digic_realize(DeviceState *dev, Error **errp)
+  2  static void bcm2836_realize(DeviceState *dev, Error **errp)
+  1  static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+  1  static void x86_cpu_apic_realize(X86CPU *cpu, Error **errp)
+  1  static void vtd_realize(DeviceState *dev, Error **errp)
+  1  static void vt82c686b_realize(PCIDevice *d, Error **errp)
+  1  static void spapr_vio_busdev_realize(DeviceState *qdev, Error **errp)
+  1  static void rs6000mc_realize(DeviceState *dev, Error **errp)
+  1  static void realview_mpcore_realize(DeviceState *dev, Error **errp)
+  1  static void raven_pcihost_realizefn(DeviceState *d, Error **errp)
+  1  static void prep_systemio_realize(DeviceState *dev, Error **errp)
+  1  static void pnv_chip_realize(DeviceState *dev, Error **errp)
+  1  static void piix3_realize(PCIDevice *dev, Error **errp)
+  1  static void pci_ebus_realize(PCIDevice *pci_dev, Error **errp)
+  1  static void ich9_lpc_realize(PCIDevice *d, Error **errp)
+  1  static void i82378_realize(PCIDevice *pci, Error **errp)
+  1  static void bonito_realize(PCIDevice *dev, Error **errp)
+  1  static void amdvi_realize(DeviceState *dev, Error **err)
 
-Okay.  Restating, to make sure I got your reasoning: the removed
-assertions of commit e3e0003 imply that 2.9 is not regressing in
-behavior, and at this point the worst the code can do without this patch
-applied is behave like it's done previously; therefore this patch is not
-fixing an observable 2.9 behavior and therefore not worth holding up the
-release.
+And the ones that call sysbus_connect_irq() directly:
 
-But for 2.10, it's absolutely essential, as we have another patch
-pending to revert e3e0003 at which point we have a behavior break
-without this patch.
+  9  static void fsl_imx6_realize(DeviceState *dev, Error **errp)
+  8  static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+  8  static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+  7  static void fsl_imx25_realize(DeviceState *dev, Error **errp)
+  6  static void fsl_imx31_realize(DeviceState *dev, Error **errp)
+  5  static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+  4  static void aw_a10_realize(DeviceState *dev, Error **errp)
+  4  static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+  1  static void realview_mpcore_realize(DeviceState *dev, Error **errp)
+  1  static void macio_realize_ide(MacIOState *s, MACIOIDEState *ide,
+  1  static void macio_oldworld_realize(PCIDevice *d, Error **errp)
+  1  static void macio_newworld_realize(PCIDevice *d, Error **errp)
+  1  static void bcm2836_realize(DeviceState *dev, Error **errp)
+  1  static void armv7m_realize(DeviceState *dev, Error **errp)
+  1  static void armv7m_nvic_realize(DeviceState *dev, Error **errp)
+  1  static void a9mp_priv_realize(DeviceState *dev, Error **errp)
 
-Works for me.
+> You can do that without sysbus though, by using the core
+> DeviceState's qdev_init_gpio_* APIs. (NB that if you do
+> this then you're by necessity not a device creatable
+> with -device, since the board code has to wire you up.)
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Isn't "the board code has to wire you up" true for both sysbus
+and bus-less devices?
 
+> 
+> If you're not using sysbus then watch out for reset:
+> all sysbus devices get automatically reset on QEMU
+> system reset; if you're directly using the DeviceState
+> baseclass then you have to arrange reset for yourself
+> somehow.
+> 
+> thanks
+> -- PMM
 
---ABcvgglWxxtKjpjurevNjsnKVR1S3KuBg
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY7713AAoJEKeha0olJ0NqBzQH/Rx4KOeQAjXEiKyG9DJrNmea
-NnPf/3+QdDQaB2C9LVAC4XQI551YOzJYt/rIx6wZt6y9evM5O+11BD2pem2wfXgR
-90/Ej3xsWdg+r8/vSh89tIlPGBPKJ0WQ5CGtbtqAgQJuxWbTqADYgJDC6tuUHP6g
-7rG3aOrJjAmecSCMAfd5K1TeXeWP8A+IVfQzHB2jk4u3+vo7h8xPm+GIxRwMz+2C
-s5/EsNm8a/GK5N/S7+bWwjeL4G+Mtz6K/aoEZDaOYtDsdCAStMYKKW/8MNm/P7fE
-m1vF1e/Z3F9N08eG3xJWlGoCL0bugG4LHn9Mrhn9rzpFRCHyHYDT9CNJJmu8ZqE=
-=GcR+
------END PGP SIGNATURE-----
-
---ABcvgglWxxtKjpjurevNjsnKVR1S3KuBg--
+-- 
+Eduardo
