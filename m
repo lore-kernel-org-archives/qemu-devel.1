@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.fonnemann@hexagon.com>) id 1cymdo-0003eY-Dz
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 17:51:01 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cymkC-0004cs-Cs
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 17:57:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.fonnemann@hexagon.com>) id 1cymdl-00011j-B6
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 17:51:00 -0400
-Received: from mail-db5eur01on0106.outbound.protection.outlook.com
-	([104.47.2.106]:10592
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.fonnemann@hexagon.com>)
-	id 1cymdk-00011L-Tj
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 17:50:57 -0400
-From: FONNEMANN Mark <mark.fonnemann@hexagon.com>
-Date: Thu, 13 Apr 2017 20:17:00 +0000
-Message-ID: <VI1PR0601MB2479AC08F717F15FCE287FC99C020@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-Content-Language: en-US
+	(envelope-from <peter.maydell@linaro.org>) id 1cymkB-0002qo-NJ
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 17:57:36 -0400
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:38223)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cymkB-0002pQ-Fa
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 17:57:35 -0400
+Received: by mail-wm0-x230.google.com with SMTP id t189so55913671wmt.1
+	for <qemu-devel@nongnu.org>; Thu, 13 Apr 2017 14:57:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: [Qemu-devel] dns server not working in QEMU using usermode
- networking (SLIRP)
+In-Reply-To: <20170413181518.GY32646@thinpad.lan.raisama.net>
+References: <20170411205813.GA4006@rkaganip.lan>
+	<87inm91wo4.fsf@dusky.pond.sub.org>
+	<20170412200720.GA27126@thinpad.lan.raisama.net>
+	<20170413151533.GD14312@rkaganb.sw.ru>
+	<20170413164457.GX32646@thinpad.lan.raisama.net>
+	<CAFEAcA_VQGDXmMmcTdzwb-UA4sVF1jeXfnXyUBNnZU2E4jdUPw@mail.gmail.com>
+	<20170413181518.GY32646@thinpad.lan.raisama.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 13 Apr 2017 22:57:13 +0100
+Message-ID: <CAFEAcA-WKS697Hy7NBkQiUNdTpkd4OfEJ3pJ4NKPKzeFuOAuLQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] vmbus bridge: machine property or device?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,28 +34,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Roman Kagan <rkagan@virtuozzo.com>, Markus Armbruster <armbru@redhat.com>, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 
-SGVsbG8tDQoNCkkgcG9zdGVkIHRoaXMgcXVlc3Rpb24gb24gc3RhY2sgb3ZlcmZsb3cgYW5kIGdv
-dCBubyByZXNwb25zZS4gU3RlZmFuIHJlY29tbWVuZGVkIGFza2luZyB0aGUgcXVlc3Rpb24gaGVy
-ZS4NCg0KSeKAmXZlIGluY2x1ZGVkIGEgc3VtbWFyeSBvZiB0aGUgcHJvYmxlbSBoZXJlIGluIHRo
-aXMgZW1haWwgYnV0IG1vcmUgZGV0YWlscyBjYW4gYmUgZm91bmQgaGVyZToNCg0KaHR0cDovL3N0
-YWNrb3ZlcmZsb3cuY29tL3F1ZXN0aW9ucy80MzMwODMxMC9kbnMtc2VydmVyLW5vdC13b3JraW5n
-LWluLXFlbXUtdXNlcm1vZGUtbmV0d29ya2luZz9ub3JlZGlyZWN0PTEjY29tbWVudDczNzA2NDEw
-XzQzMzA4MzEwDQoNCkJhc2ljYWxseSwgSSBjYW4gYWNjZXNzIHRoZSBpbnRlcm5ldCB1c2luZyBz
-dGF0aWMgSVAgYWRkcmVzc2VzIGJ1dCBuYW1lc2VydmVyIHJlc29sdXRpb24gaXMgbm90IHdvcmtp
-bmcuIEkgY2FuIHBpbmcgdGhlIHJvdXRlciAxMC4wLjIuMiBhZGRyZXNzIGFuZCBteSAxMC4wLjIu
-MTUgYWRkcmVzcyBidXQgbm90IHRoZSAxMC4wLjIuMyBhZGRyZXNzIG9mIHRoZSBETlMgc2VydmVy
-IG9yIHRoZSAxMC4wLjIuNCBvZiB0aGUgU01CIHNlcnZlciBib3RoIG9mIHdoaWNoIEkgbmVlZCBm
-b3IgbXkgcHJvamVjdC4NCg0KQW55IHN1Z2dlc3Rpb25zPw0KDQpwLnMuIEkgdHJpZWQgMi45cmMz
-IGFuZCBpdCBmYWlsZWQgYXMgd2VsbC4NCg0KQmVzdCBSZWdhcmRzIC8gTWl0IGZyZXVuZGxpY2hl
-biBHcsO8w59lbiAvIOaVrOWFtywNCk1hcmsuDQoNCk1hcmsgRm9ubmVtYW5uDQpTZW5pb3IgU29m
-dHdhcmUgRW5naW5lZXIg4oCTIE1hY2hpbmUgVG9vbCBNZXRyb2xvZ3kgU29sdXRpb25zDQpUOiAr
-MSA0MDEuODg2LjI1MjEgIE06ICsxIDI0OC44NjMuNzkzMQ0KRTogbWFyay5mb25uZW1hbm5AaGV4
-YWdvbm1ldHJvbG9neS5jb208bWFpbHRvOm1hcmsuZm9ubmVtYW5uQGhleGFnb25tZXRyb2xvZ3ku
-Y29tPg0KDQpIZXhhZ29uIE1hbnVmYWN0dXJpbmcgSW50ZWxsaWdlbmNlDQoyNTAgQ2lyY3VpdCBE
-cml2ZQ0KTm9ydGggS2luZ3N0b3duLCBSSSAgMDI4MjINClVTQQ0KcGMtZG1pcy5jb208aHR0cDov
-L3d3dy5wYy1kbWlzLmNvbS8+IHwgTGlua2VkSW48aHR0cDovL3d3dy5saW5rZWRpbi5jb20vZ3Jv
-dXBzL0hleGFnb24tTWV0cm9sb2d5LUluYy00MDE0Mjk0L2Fib3V0PiB8IEZhY2Vib29rPGh0dHA6
-Ly93d3cuZmFjZWJvb2suY29tL0hleGFnb24uTWV0cm9sb2d5LkluYz4gfCBUd2l0dGVyPGh0dHA6
-Ly90d2l0dGVyLmNvbS9oZXhtZXQ+DQoNCg==
+On 13 April 2017 at 19:15, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> I can't say it's a good idea, but it looks like there are devices
+> that do that (probably they are machine-specific, so they know
+> which machine they are being connected to?).
+>
+> I looked for realize functions that call sysbus_mmio_map() or
+> get_system_memory() directly, and I've found a few:
+
+Yeah. Ideally these should get cleaned up. The way I think is
+the right approach here is that the board code uses the
+system memory address space to map its devices, and then
+it passes a MemoryRegion to the SoC container device via a
+QOM link property. The SoC then maps its devices inside that
+MemoryRegion, and hands an MR to the CPU (and the CPU does
+its accesses to that MR). You can see some of this with
+stm32f205_soc.c and armv7m.c.
+
+I think most of your examples are SoCs which are just
+slightly old-style/lazy and using the system memory
+address space directly (since the SoC covers the whole
+of the address space anyway). The real bad code is devices
+which directly map their own memory regions into the
+system memory space even though they're just a leaf
+device like a UART (common in not-yet-converted-to-QOM code).
+
+> And the ones that call sysbus_connect_irq() directly:
+
+Calling sysbus_connect_irq() is fine because it's
+what you use to wire up a sysbus device's input IRQ
+line to something else. If you (as an SoC container
+object) have created both the IRQ chip and the other
+device then it's also your job to wire the two together.
+
+> Isn't "the board code has to wire you up" true for both sysbus
+> and bus-less devices?
+
+If you need no wiring up at all then it's ok.
+hw/core/generic-loader.c is an example of that.
+
+thanks
+-- PMM
