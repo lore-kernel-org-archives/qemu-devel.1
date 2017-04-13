@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cySwH-000757-W9
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 20:48:47 -0400
+	(envelope-from <jcody@redhat.com>) id 1cyTIE-00017B-0u
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 21:11:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cySwG-0003wU-Pm
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 20:48:46 -0400
-References: <20170412174920.8744-1-eblake@redhat.com>
-	<20170412174920.8744-9-eblake@redhat.com>
-	<3eaa3c7a-1581-8d2d-a385-3400d434b3fe@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3d2709ed-bb61-254e-9dc0-4049e61c8722@redhat.com>
-Date: Wed, 12 Apr 2017 19:48:25 -0500
+	(envelope-from <jcody@redhat.com>) id 1cyTIC-0002Wm-Ps
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 21:11:25 -0400
+Date: Wed, 12 Apr 2017 21:11:09 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170413011109.GC15762@localhost.localdomain>
+References: <20170412204641.GA15762@localhost.localdomain>
+	<f5bf12f4-e4fd-87c7-a714-e412cee63e36@redhat.com>
+	<20170412222251.GB15762@localhost.localdomain>
+	<20170412235420.GB8607@lemon>
 MIME-Version: 1.0
-In-Reply-To: <3eaa3c7a-1581-8d2d-a385-3400d434b3fe@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="9j7KSJEvIcLtxXGHJhNRqUU1HRccRTkOh"
-Subject: Re: [Qemu-devel] [PATCH 08/12] dirty-bitmap: Change
- bdrv_get_dirty() to take bytes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170412235420.GB8607@lemon>
+Subject: Re: [Qemu-devel] Regression from 2.8: stuck in bdrv_drain()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,91 +25,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>, Jeff Cody <jcody@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, kwolf@redhat.com, peter.maydell@linaro.org, qemu-block@nongnu.org, qemu-devel@nongnu.org, stefanha@redhat.com, pbonzini@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9j7KSJEvIcLtxXGHJhNRqUU1HRccRTkOh
-From: Eric Blake <eblake@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, Jeff Cody <jcody@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz
- <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <3d2709ed-bb61-254e-9dc0-4049e61c8722@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 08/12] dirty-bitmap: Change bdrv_get_dirty()
- to take bytes
-References: <20170412174920.8744-1-eblake@redhat.com>
- <20170412174920.8744-9-eblake@redhat.com>
- <3eaa3c7a-1581-8d2d-a385-3400d434b3fe@redhat.com>
-In-Reply-To: <3eaa3c7a-1581-8d2d-a385-3400d434b3fe@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, Apr 13, 2017 at 07:54:20AM +0800, Fam Zheng wrote:
+> On Wed, 04/12 18:22, Jeff Cody wrote:
+> > On Wed, Apr 12, 2017 at 05:38:17PM -0400, John Snow wrote:
+> > > 
+> > > 
+> > > On 04/12/2017 04:46 PM, Jeff Cody wrote:
+> > > > 
+> > > > This occurs on v2.9.0-rc4, but not on v2.8.0.
+> > > > 
+> > > > When running QEMU with an iothread, and then performing a block-mirror, if
+> > > > we do a system-reset after the BLOCK_JOB_READY event has emitted, qemu
+> > > > becomes deadlocked.
+> > > > 
+> > > > The block job is not paused, nor cancelled, so we are stuck in the while
+> > > > loop in block_job_detach_aio_context:
+> > > > 
+> > > > static void block_job_detach_aio_context(void *opaque)
+> > > > {
+> > > >     BlockJob *job = opaque;
+> > > > 
+> > > >     /* In case the job terminates during aio_poll()... */
+> > > >     block_job_ref(job);
+> > > > 
+> > > >     block_job_pause(job);
+> > > > 
+> > > >     while (!job->paused && !job->completed) {
+> > > >         block_job_drain(job);
+> > > >     }
+> > > > 
+> > > 
+> > > Looks like when block_job_drain calls block_job_enter from this context
+> > > (the main thread, since we're trying to do a system_reset...), we cannot
+> > > enter the coroutine because it's the wrong context, so we schedule an
+> > > entry instead with
+> > > 
+> > > aio_co_schedule(ctx, co);
+> > > 
+> > > But that entry never happens, so the job never wakes up and we never
+> > > make enough progress in the coroutine to gracefully pause, so we wedge here.
+> > > 
+> > 
+> > 
+> > John Snow and I debugged this some over IRC.  Here is a summary:
+> > 
+> > Simply put, with iothreads the aio context is different.  When
+> > block_job_detach_aio_context() is called from the main thread via the system
+> > reset (from main_loop_should_exit()), it calls block_job_drain() in a while
+> > loop, with job->busy and job->completed as exit conditions.
+> > 
+> > block_job_drain() attempts to enter the coroutine (thus allowing job->busy
+> > or job->completed to change).  However, since the aio context is different
+> > with iothreads, we schedule the coroutine entry rather than directly
+> > entering it.
+> > 
+> > This means the job coroutine is never going to be re-entered, because we are
+> > waiting for it to complete in a while loop from the main thread, which is
+> > blocking the qemu timers which would run the scheduled coroutine... hence,
+> > we become stuck.
+> 
+> John and I confirmed that this can be fixed by this pending patch:
+> 
+> [PATCH for-2.9 4/5] block: Drain BH in bdrv_drained_begin
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg01018.html
+> 
+> It didn't make it into 2.9-rc4 because of limited time. :(
+> 
+> Looks like there is no -rc5, we'll have to document this as a known issue.
+> Users should "block-job-complete/cancel" as soon as possible to avoid such a
+> hang.
+>
 
-On 04/12/2017 07:25 PM, John Snow wrote:
+I'd argue for including a fix for 2.9, since this is both a regression, and
+a hard lock without possible recovery short of restarting the QEMU process.
 
->> +++ b/migration/block.c
->> @@ -537,8 +537,7 @@ static int mig_save_device_dirty(QEMUFile *f, BlkM=
-igDevState *bmds,
->>          } else {
->>              blk_mig_unlock();
->>          }
->> -        if (bdrv_get_dirty(bs, bmds->dirty_bitmap, sector)) {
->> -
->> +        if (bdrv_get_dirty(bs, bmds->dirty_bitmap, sector * BDRV_SECT=
-OR_SIZE)) {
->=20
-> This one is a little weirder now though, isn't it? We're asking for the=
-
-> dirty status of a single byte, technically. In practice, the scaling
-> factor will always cover the entire sector, but it reads a lot jankier =
-now.
->=20
->>              if (total_sectors - sector < BDRV_SECTORS_PER_DIRTY_CHUNK=
-) {
->>                  nr_sectors =3D total_sectors - sector;
->>              } else {
->>
->=20
-> Oh well, it was always janky...
-
-True. Think of it as "is the granularity (which may be a sector, a
-cluster, or even some other size) that contains 'offset' dirty?".  I
-really think migration/block.c will be easier to read once converted to
-byte operations everywhere, but have not yet tackled it (it was hard
-enough tackling mirror, backup, commit, and stream in parallel for the
-previous series).
-
->=20
-> Reviewed-by: John Snow <jsnow@redhat.com>
->=20
-
-Thanks for the reviews, by the way, even if the prerequisite patches
-still haven't been fully reviewed.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---9j7KSJEvIcLtxXGHJhNRqUU1HRccRTkOh
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY7srZAAoJEKeha0olJ0NqfSoIAIayX3UPYO5rgY4UV1XUwAot
-unBaVz54WjvqJcwcqigWC8usCF5Fedizk2ddQIfdQ8iL3t8Vu3isnS6M8pOe3CMh
-J+Kua8YmJD1MFLYNSODSPqXp8OK3r6Gy4DzuiBJhCIo23ruWCp55VJNTp81qmJRE
-PrGE8kEc5LvST9oHmdI1E45H2AXqXjuse8rbC5p8eSG51r2Eb4lAdaFA/4YRd5K0
-F0hQYXUZ5ehHTkSf1/ZCi3el3jpZ4/VcPlf6r31IE6yuLyll4xp9AZXuOjrAHUOn
-SgNQfU11FeitFoId96br+NaeJVr2V3xU37Jclq+Bkn2KSjexBOPimkqIX8ypH6E=
-=lldV
------END PGP SIGNATURE-----
-
---9j7KSJEvIcLtxXGHJhNRqUU1HRccRTkOh--
+-Jeff
