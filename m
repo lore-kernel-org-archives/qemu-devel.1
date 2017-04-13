@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cyYvg-0003vh-0g
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 03:12:33 -0400
+	(envelope-from <famz@redhat.com>) id 1cyZ4e-0006HP-Tq
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 03:21:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cyYvc-0005s5-Rt
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 03:12:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60692)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cyYvc-0005rv-Iw
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 03:12:28 -0400
-References: <20170411101002.28451-1-maxime.coquelin@redhat.com>
-	<20170411101002.28451-3-maxime.coquelin@redhat.com>
-	<20170411132046.GA16464@pxdev.xzpeter.org>
-	<ed46bbd8-222b-3cda-e524-f9dfda8e3770@redhat.com>
-	<20170412071708.GE16464@pxdev.xzpeter.org>
-	<131237e3-d6e3-804e-5bf4-ce2c281e140f@redhat.com>
-	<20170412092653.GH16464@pxdev.xzpeter.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <57a21a07-bdd1-fc50-e8ae-c84789950bd8@redhat.com>
-Date: Thu, 13 Apr 2017 15:12:15 +0800
+	(envelope-from <famz@redhat.com>) id 1cyZ4d-0008Rl-TH
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 03:21:48 -0400
+Date: Thu, 13 Apr 2017 15:21:37 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170413072137.GA7585@lemon>
+References: <20170410022636.29925-1-famz@redhat.com>
+	<20170410160417.GH3214@stefanha-x1.localdomain>
+	<0800f14a-4b80-9bed-bf2a-41f177ffff64@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170412092653.GH16464@pxdev.xzpeter.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 2/2] spec/vhost-user spec: Add IOMMU support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0800f14a-4b80-9bed-bf2a-41f177ffff64@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/2] block: Quiesce old aio context
+ during bdrv_set_aio_context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,67 +25,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Maxime Coquelin <maxime.coquelin@redhat.com>, mst@redhat.com, vkaplans@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, virtio-comment@lists.oasis-open.org, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
+On Thu, 04/13 14:51, Paolo Bonzini wrote:
+> 
+> 
+> On 11/04/2017 00:04, Stefan Hajnoczi wrote:
+> > On Mon, Apr 10, 2017 at 10:26:34AM +0800, Fam Zheng wrote:
+> >> v3: Use bdrv_parent_drained_begin/end. [Kevin]
+> >>     Do it before releasing new_context. [Stefan]
+> >>
+> >> Fam Zheng (2):
+> >>   block: Make bdrv_parent_drained_begin/end public
+> >>   block: Quiesce old aio context during bdrv_set_aio_context
+> >>
+> >>  block.c               |  7 +++++--
+> >>  block/io.c            |  4 ++--
+> >>  include/block/block.h | 16 ++++++++++++++++
+> >>  3 files changed, 23 insertions(+), 4 deletions(-)
+> > 
+> > Thanks, applied to my block tree for 2.10:
+> > https://github.com/stefanha/qemu/commits/block
+> > 
+> > If you'd like this in a stable release please CC qemu-stable.
+> 
+> Stefan, can you squash this documentation patch in please?
+> 
+> diff --git a/block.c b/block.c
+> index 3b20a29..cb1c5c9 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -4392,6 +4392,18 @@ void bdrv_set_aio_context(BlockDriverState *bs,
+> AioContext *new_context)
+>  {
+>      AioContext *ctx = bdrv_get_aio_context(bs);
+> 
+> +    /* FIXME: This is the same as bdrv_drained_begin, only done
+> +     * manually.  At the end of this function, aio_enable_external
+> +     * must be done on ctx, not on new_context, so we cannot call
+> +     * bdrv_drained_end there.  And because bs->quiesce_counter will
+> +     * not be decreased there, we have to "explode" bdrv_drained_begin
+> +     * here too.
+> +     *
+> +     * Once aio_disable_external and aio_enable_external are replaced
+> +     * by BlockBackend device ops (called by .drained_begin/end
+> +     * BdrvChildRole callbacks), this can be replaced by a simple
+> +     * bdrv_drained_begin/end pair.
+> +     */
+>      aio_disable_external(ctx);
+>      bdrv_parent_drained_begin(bs);
+>      bdrv_drain(bs); /* ensure there are no in-flight requests */
 
+This patch was necessary to fix the earlier crash so it is already merged with
+my last pull request for -rc4:
 
-On 2017=E5=B9=B404=E6=9C=8812=E6=97=A5 17:26, Peter Xu wrote:
-> On Wed, Apr 12, 2017 at 04:54:25PM +0800, Jason Wang wrote:
->> On 2017=E5=B9=B404=E6=9C=8812=E6=97=A5 15:17, Peter Xu wrote:
->>> On Tue, Apr 11, 2017 at 05:16:19PM +0200, Maxime Coquelin wrote:
->>>> On 04/11/2017 03:20 PM, Peter Xu wrote:
->>>>> On Tue, Apr 11, 2017 at 12:10:02PM +0200, Maxime Coquelin wrote:
->>> [...]
->>>
->>>>>> +slave is expected to reply with a zero payload, non-zero otherwis=
-e.
->>>>> Is this ack mechanism really necessary? If not, not sure it'll be n=
-ice
->>>>> to keep vhost-user/vhost-kernel aligned on this behavior. At least
->>>>> that'll simplify vhost-user implementation on QEMU side (iiuc even
->>>>> without introducing new functions for update/invalidate operations)=
-.
->>>> I think this is necessary, and it won't complexify the vhost-user
->>>> implementation on QEMU side, since already widely used (see reply-ac=
-k
->>>> feature).
->>> Could you provide file/function/link pointer to the "reply-ack"
->>> feature? I failed to find it myself.
->>>
->>>> This reply-ack mechanism is used to obtain a behaviour closer to ker=
-nel
->>>> backend. Indeed, when QEMU sends a vhost_msg to the kernel backend, =
-it
->>>> is blocked in the write() while the message is being processed in th=
-e
->>>> Kernel. With user backend, QEMU is unblocked from the write() when t=
-he
->>>> backend has read the message, before it is being processed.
->>>>
->>> I see. Then I agree with you that we may need a synchronized way to d=
-o
->>> it. One thing I think of is IOMMU page invalidation - it should be a
->>> sync operation to make sure that all the related caches were destroye=
-d
->>> when the invalidation command returns in QEMU vIOMMU emulation path.
->>>
->> Looks not, if I understand correctly, e.g for Intel IOMMU, when QI is
->> enabled, this could be done asynchronously by not waiting for the comp=
-letion
->> through wait descriptor. Vhost-kernel always implement the invalidatio=
-n as a
->> synchronous one for simplicity, but looks like this is not needed.
-> IMHO, the point is guest cannot reuse that IOVA only if it sends a
-> invalidation wait descriptor. If without wait descriptor, the guest
-> should never release any IOVA range, if so, that'll be dangerous,
-> because the cache may still be dirty on that range on specific device.
->
-> And since guest will for sure use wait descriptor (as long as it wants
-> to reuse iova addresses), then we should possibly finally need a way
-> to synchronously invalidate IOTLB, including to vhost-user backends.
+commit aabf591007a83dc6520329bce929570115849286
+Author: Fam Zheng <famz@redhat.com>
+Date:   Wed Apr 5 14:44:24 2017 +0800
 
-Yes, what I mean is technically we can implement this only for wait=20
-descriptor.
+    block: Quiesce old aio context during bdrv_set_aio_context
+    
+    The fact that the bs->aio_context is changing can confuse the dataplane
+    iothread, because of the now fine granularity aio context lock.
+    bdrv_drain should rather be a bdrv_drained_begin/end pair, but since
+    bs->aio_context is changing, we can just use aio_disable_external and
+    bdrv_parent_drained_begin.
+    
+    Reported-by: Ed Swierk <eswierk@skyportsystems.com>
+    Signed-off-by: Fam Zheng <famz@redhat.com>
+    Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+    Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+    Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 
-Thanks
+Paolo, maybe you want to submit a formal patch for 2.10? (Sorry for the
+confusion, these series of mine went a bit messy.)
+
+Fam
