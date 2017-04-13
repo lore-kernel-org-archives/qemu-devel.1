@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cylRb-0003TL-CC
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 16:34:24 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cylVq-0006Su-M2
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 16:38:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cylRW-0002OX-7g
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 16:34:19 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cylVp-0006tR-Ok
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 16:38:42 -0400
+References: <20170207235757.2026-1-mreitz@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Date: Thu, 13 Apr 2017 22:34:01 +0200
-Message-Id: <20170413203401.3213-4-mreitz@redhat.com>
-In-Reply-To: <20170413203401.3213-1-mreitz@redhat.com>
-References: <20170413203401.3213-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10 3/3] qemu-img/convert: Move bs_n > 1
- && -B check down
+Message-ID: <efaef6ef-a1a5-a767-72a6-8c93ba0d9dd1@redhat.com>
+Date: Thu, 13 Apr 2017 22:38:32 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170207235757.2026-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="NQsnBKIP6LIvC0FK0mNTsVJ7KNM7xbNCQ"
+Subject: Re: [Qemu-devel] [PATCH] progress: Show current progress on SIGINFO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,71 +24,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-stable <qemu-stable@nongnu.org>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-It does not make much sense to use a backing image for the target when
-you concatenate multiple images (because then there is no correspondence
-between the source images' backing files and the target's); but it was
-still possible to give one by using -o backing_file=X instead of -B X.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NQsnBKIP6LIvC0FK0mNTsVJ7KNM7xbNCQ
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <efaef6ef-a1a5-a767-72a6-8c93ba0d9dd1@redhat.com>
+Subject: Re: [PATCH] progress: Show current progress on SIGINFO
+References: <20170207235757.2026-1-mreitz@redhat.com>
+In-Reply-To: <20170207235757.2026-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Fix this by moving the check.
+On 08.02.2017 00:57, Max Reitz wrote:
+> Currently we only print progress information on retrieval of SIGUSR1.
+> Some systems have a dedicated SIGINFO for this, however, so it should b=
+e
+> handled appropriately if it is available.
+>=20
+> Buglink: https://bugs.launchpad.net/qemu/+bug/1662468
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+> Can anyone test this on a BSD system? O:-)
+> ---
+>  util/qemu-progress.c | 3 +++
+>  qemu-img.texi        | 3 ++-
+>  2 files changed, 5 insertions(+), 1 deletion(-)
 
-(Also, change the error message because -B is not the only way to
- specify the backing file, evidently.)
+Ping
 
-Cc: qemu-stable <qemu-stable@nongnu.org>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- qemu-img.c                 | 14 +++++++-------
- tests/qemu-iotests/122.out |  4 ++--
- 2 files changed, 9 insertions(+), 9 deletions(-)
+(If nobody replies in the next month or so, I'm just going to merge
+this, as util/qemu-progress.c doesn't have a maintainer.)
 
-diff --git a/qemu-img.c b/qemu-img.c
-index 70ffb07447..cfd1986efd 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -2113,13 +2113,6 @@ static int img_convert(int argc, char **argv)
-     }
- 
- 
--    if (bs_n > 1 && out_baseimg) {
--        error_report("-B makes no sense when concatenating multiple input "
--                     "images");
--        ret = -1;
--        goto out;
--    }
--
-     src_flags = 0;
-     ret = bdrv_parse_cache_mode(src_cache, &src_flags, &src_writethrough);
-     if (ret < 0) {
-@@ -2229,6 +2222,13 @@ static int img_convert(int argc, char **argv)
-         out_baseimg = out_baseimg_param;
-     }
- 
-+    if (bs_n > 1 && out_baseimg) {
-+        error_report("Having a backing file for the target makes no sense when "
-+                     "concatenating multiple input images");
-+        ret = -1;
-+        goto out;
-+    }
-+
-     /* Check if compression is supported */
-     if (compress) {
-         bool encryption =
-diff --git a/tests/qemu-iotests/122.out b/tests/qemu-iotests/122.out
-index 98814de5d6..9317d801ad 100644
---- a/tests/qemu-iotests/122.out
-+++ b/tests/qemu-iotests/122.out
-@@ -61,8 +61,8 @@ read 65536/65536 bytes at offset 4194304
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 65536/65536 bytes at offset 8388608
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--qemu-img: -B makes no sense when concatenating multiple input images
--qemu-img: -B makes no sense when concatenating multiple input images
-+qemu-img: Having a backing file for the target makes no sense when concatenating multiple input images
-+qemu-img: Having a backing file for the target makes no sense when concatenating multiple input images
- 
- === Compression with misaligned allocations and image sizes ===
- 
--- 
-2.12.2
+
+--NQsnBKIP6LIvC0FK0mNTsVJ7KNM7xbNCQ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljv4ckSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AY9sH/1EDuJ8TxUT8EkjNOWBQajnRvjSA4WeP
+XqVTAvgPTSSq0xq5jJNXHiTT25bjIcBcr51QoImlPwib+lR/Wd4VBBJBYzGbOae5
+i16Tnz1/OjQhTpCtde2CvXV75iGpGSbfcEqhGjzLW5Mmzu782pFYobzUB/IrawuG
+J7g6Akcq2LuJQKxG2+gz+Mt+VvY/Ewz3gRJjf8AQVcUljWpkFblYsflCD8Oj9bfD
+s1qcJm56UROQG+snFIrb3pOxVYYraBhll9oeKy6u9zLPzmyZ99uakO+Ct8H7RNr9
+Y7J0B0iI3lGJimiHWyYGHkHbIZkEc//FFlzrW6FHYglPt5QWr/cDdjY=
+=MEsR
+-----END PGP SIGNATURE-----
+
+--NQsnBKIP6LIvC0FK0mNTsVJ7KNM7xbNCQ--
