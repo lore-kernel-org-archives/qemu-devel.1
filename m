@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cyifa-0004Fs-OG
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 13:36:39 -0400
+	(envelope-from <eblake@redhat.com>) id 1cyihy-0005J7-Cb
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 13:39:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cyifV-0006Zi-SO
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 13:36:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:24085)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cyifV-0006ZK-JB
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 13:36:29 -0400
-Date: Thu, 13 Apr 2017 14:36:25 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170413173625.GG27126@thinpad.lan.raisama.net>
-References: <1490700426-222115-1-git-send-email-agraf@suse.de>
+	(envelope-from <eblake@redhat.com>) id 1cyihx-0007rk-FH
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 13:39:02 -0400
+References: <1492104214-29994-1-git-send-email-kwolf@redhat.com>
+	<1492104214-29994-3-git-send-email-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c8d62cd3-73fc-4461-a3f1-c050908e9bec@redhat.com>
+Date: Thu, 13 Apr 2017 12:38:50 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1490700426-222115-1-git-send-email-agraf@suse.de>
-Subject: Re: [Qemu-devel] [PATCH v2] i386: Allow cpuid bit override
+In-Reply-To: <1492104214-29994-3-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="2CprCi1a12OEqbF8xSF809XKiTLr2hawC"
+Subject: Re: [Qemu-devel] [PATCH 2/3] qemu-iotests: Filter HMP readline
+ escape characters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,141 +25,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Graf <agraf@suse.de>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, quintela@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, lvivier@redhat.com, qemu-devel@nongnu.org
 
-On Tue, Mar 28, 2017 at 01:27:06PM +0200, Alexander Graf wrote:
-> KVM has a feature bitmap of CPUID bits that it knows works for guests.
-> QEMU removes bits that are not part of that bitmap automatically on VM
-> start.
-> 
-> However, some times we just don't list features in that list because
-> they don't make sense for normal scenarios, but may be useful in specific,
-> targeted workloads.
-> 
-> For that purpose, add a new =force option to all CPUID feature flags in
-> the CPU property. With that we can override the accel filtering and give
-> users full control over the CPUID feature bits exposed into guests.
-> 
-> Signed-off-by: Alexander Graf <agraf@suse.de>
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2CprCi1a12OEqbF8xSF809XKiTLr2hawC
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, quintela@redhat.com, dgilbert@redhat.com,
+ stefanha@redhat.com, lvivier@redhat.com, qemu-devel@nongnu.org
+Message-ID: <c8d62cd3-73fc-4461-a3f1-c050908e9bec@redhat.com>
+Subject: Re: [PATCH 2/3] qemu-iotests: Filter HMP readline escape characters
+References: <1492104214-29994-1-git-send-email-kwolf@redhat.com>
+ <1492104214-29994-3-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1492104214-29994-3-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 04/13/2017 12:23 PM, Kevin Wolf wrote:
+> The only thing the escape characters achieve is making the reference
+> output unreadable and lines that are potentially so long that git
+> doesn't want to put them into an email any more. Let's filter them out.=
+
+
+Hear! Hear!
+
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
-> 
-> v1 -> v2:
-> 
->   - Base on "i386: Replace uint32_t* with FeatureWord on feature getter/setter"
-> ---
->  target/i386/cpu.c | 25 ++++++++++++++++++++++---
->  target/i386/cpu.h |  3 +++
->  2 files changed, 25 insertions(+), 3 deletions(-)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 13c0985..6105fc5 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -2229,7 +2229,7 @@ void x86_cpu_list(FILE *f, fprintf_function cpu_fprintf)
->      g_slist_foreach(list, x86_cpu_list_entry, &s);
->      g_slist_free(list);
->  
-> -    (*cpu_fprintf)(f, "\nRecognized CPUID flags:\n");
-> +    (*cpu_fprintf)(f, "\nRecognized CPUID flags (=on|=off|=force):\n");
->      for (i = 0; i < ARRAY_SIZE(feature_word_info); i++) {
->          FeatureWordInfo *fw = &feature_word_info[i];
->  
-> @@ -3464,6 +3464,7 @@ static int x86_cpu_filter_features(X86CPU *cpu)
->              x86_cpu_get_supported_feature_word(w, false);
->          uint32_t requested_features = env->features[w];
->          env->features[w] &= host_feat;
-> +        env->features[w] |= cpu->forced_features[w];
->          cpu->filtered_features[w] = requested_features & ~env->features[w];
->          if (cpu->filtered_features[w]) {
->              rv = 1;
-> @@ -3706,8 +3707,17 @@ static void x86_cpu_get_bit_prop(Object *obj, Visitor *v, const char *name,
->      X86CPU *cpu = X86_CPU(obj);
->      BitProperty *fp = opaque;
->      uint32_t f = cpu->env.features[fp->w];
-> +    uint32_t ff = cpu->forced_features[fp->w];
->      bool value = (f & fp->mask) == fp->mask;
-> -    visit_type_bool(v, name, &value, errp);
-> +    bool forced = (ff & fp->mask) == fp->mask;
-> +    char str[] = "force";
-> +    char *strval = str;
-> +
-> +    if (forced) {
-> +        visit_type_str(v, name, &strval, errp);
-> +    } else {
-> +        visit_type_bool(v, name, &value, errp);
+>  tests/qemu-iotests/028.out       | 2 +-
+>  tests/qemu-iotests/130.out       | 4 ++--
+>  tests/qemu-iotests/common.filter | 7 +++++++
+>  tests/qemu-iotests/common.qemu   | 4 ++--
+>  4 files changed, 12 insertions(+), 5 deletions(-)
 
-Interesting approach. This means we keep returning a boolean
-value on the property getter (which is important to not break
-compatibility), but return a string in case the feature was set
-to "force".
+Yay!  But I think you're incomplete:
 
-We probably should update the 'type' field of the property, as it
-won't be a real "bool" property anymore.
+What about 051, 068, 142, and 145?
 
-I won't say I love that solution, but it seems to work. I'm CCing
-the QAPI maintainers to see what they think about it.
+(found by:
+ git grep -l $'\e' tests/qemu-iotests/*.out
+using bash as the shell)
 
-(For reference: in the v1 thread I have suggested introducing a
-new enum type in the QAPI schema, but this would break
-compatibility with existing management code that expects the
-property to return a boolean value [like the users of
-query-cpu-model-expansion]).
 
-> +    }
+> +++ b/tests/qemu-iotests/common.filter
+> @@ -86,6 +86,13 @@ _filter_qmp()
+>          -e '    QMP_VERSION'
 >  }
->  
->  static void x86_cpu_set_bit_prop(Object *obj, Visitor *v, const char *name,
-> @@ -3717,6 +3727,7 @@ static void x86_cpu_set_bit_prop(Object *obj, Visitor *v, const char *name,
->      X86CPU *cpu = X86_CPU(obj);
->      BitProperty *fp = opaque;
->      Error *local_err = NULL;
-> +    char *strval = NULL;
->      bool value;
->  
->      if (dev->realized) {
-> @@ -3724,7 +3735,15 @@ static void x86_cpu_set_bit_prop(Object *obj, Visitor *v, const char *name,
->          return;
->      }
->  
-> -    visit_type_bool(v, name, &value, &local_err);
-> +    visit_type_str(v, name, &strval, &local_err);
-> +    if (!local_err && !strcmp(strval, "force")) {
-> +        value = true;
-> +        cpu->forced_features[fp->w] |= fp->mask;
-> +    } else {
-> +        local_err = NULL;
-> +        visit_type_bool(v, name, &value, &local_err);
-> +    }
+> =20
+> +# readline makes HMP command strings so long that git complains
+> +_filter_hmp()
+> +{
+> +    sed -e 's/(qemu).*\o33\[D/(qemu) /g' \
 
-I'm not sure this is valid usage of the visitor API. If the
-visit_type_str() call succeeds, isn't the visitor allowed to
-consume the original value, and return something completely
-different when visit_type_bool() is called?
+\oNN is a GNU sed-ism, as far as I can tell.  Is it portable to our
+BSD/MacOS builds?
 
-> +
->      if (local_err) {
->          error_propagate(errp, local_err);
->          return;
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index c4602ca..69efe6c 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1230,6 +1230,9 @@ struct X86CPU {
->      /* Features that were filtered out because of missing host capabilities */
->      uint32_t filtered_features[FEATURE_WORDS];
->  
-> +    /* Features that are force enabled despite incompatible accel */
-> +    uint32_t forced_features[FEATURE_WORDS];
-> +
->      /* Enable PMU CPUID bits. This can't be enabled by default yet because
->       * it doesn't have ABI stability guarantees, as it passes all PMU CPUID
->       * bits returned by GET_SUPPORTED_CPUID (that depend on host CPU and kernel
-> -- 
-> 1.8.5.6
-> 
-> 
+> +        -e 's/\o33\[K//g'
+> +}
 
--- 
-Eduardo
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--2CprCi1a12OEqbF8xSF809XKiTLr2hawC
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY77eqAAoJEKeha0olJ0NqaHgH/jxf81t22UFRj7K7vn0k/5Z3
+qSTDGvNopzyZo4V408bkQh4Yha8kdSdGe4ntvi9LMowZj0NK+hSLzmZs2etRYmi5
+lulo8wxB92DUNJN/+NqeEclqNsoMkJ1dcVOikwUih1lQQHOtKFxUhBJ45vwPJqnY
+kP5GdgYTpMDnYBQ6krHRv9LHoTqxZ9lkROnWV2/kzfT2EKZAGcnrdOpRC/OrZ29m
+GIaRa+pp33aivP9xOt8F0fY+mLYJer4jDU7U3d7ROMFwM+CV3VBjlBA5cWDLo0bh
+87HUZIINeMxyDYySKkSDujsjkU8KrWgW2nV264DrUqqtBA3tFOCdZS1Hf+vtZ+A=
+=kEZP
+-----END PGP SIGNATURE-----
+
+--2CprCi1a12OEqbF8xSF809XKiTLr2hawC--
