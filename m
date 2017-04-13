@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1cyffB-0002Sf-KR
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 10:23:58 -0400
+	(envelope-from <kwolf@redhat.com>) id 1cyfis-0003Cb-E7
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 10:27:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1cyff8-0006zE-EL
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 10:23:57 -0400
-Received: from mail-db5eur01on0100.outbound.protection.outlook.com
-	([104.47.2.100]:53954
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1cyff8-0006wT-3M
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 10:23:54 -0400
-Date: Thu, 13 Apr 2017 17:08:04 +0300
-From: Roman Kagan <rkagan@virtuozzo.com>
-Message-ID: <20170413140804.GC14312@rkaganb.sw.ru>
-References: <20170411205813.GA4006@rkaganip.lan>
-	<87inm91wo4.fsf@dusky.pond.sub.org>
+	(envelope-from <kwolf@redhat.com>) id 1cyfir-000363-Da
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 10:27:46 -0400
+Date: Thu, 13 Apr 2017 16:27:35 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170413142735.GF5095@noname.redhat.com>
+References: <20170406150148.zwjpozqtale44jfh@perseus.local>
+	<2b915695-29b5-df8d-4d89-080eeaaaff13@openvz.org>
+	<w51shlcv7sb.fsf@maestria.local.igalia.com>
+	<565c1e1b-b9e1-e9c5-790e-283d04afc747@openvz.org>
+	<w51poggv3xh.fsf@maestria.local.igalia.com>
+	<20170413135155.GD5095@noname.redhat.com>
+	<w51k26ov1eq.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87inm91wo4.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] vmbus bridge: machine property or device?
+In-Reply-To: <w51k26ov1eq.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [RFC] Proposed qcow2 extension: subcluster
+ allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +29,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, "Denis
-	V. Lunev" <den@openvz.org>, Eduardo Habkost <ehabkost@redhat.com>, Peter
-	Maydell <peter.maydell@linaro.org>, Alexander Graf <agraf@suse.de>, Paolo
-	Bonzini <pbonzini@redhat.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Wed, Apr 12, 2017 at 05:18:51PM +0200, Markus Armbruster wrote:
-> Roman Kagan <rkagan@virtuozzo.com> writes:
-> > VMBus is provided by a vmbus bridge; it appears the most natural to have
-> > it subclassed from SysBusDevice.  There can only be one VMBus in the
-> > VM.
-> 
-> TYPE_DEVICE unless you actually need something TYPE_SYS_BUS_DEVICE
-> provides.
-
-I thought VMBus looked similar to an ISA or PCI bus in its relation to
-the system, and those bridges were TYPE_SYS_BUS_DEVICE.
-
-If it's subclassed directly from TYPE_DEVICE how is it connected to the
-rest of the QOM tree?
-
-> > Now the question is how to add it to the system:
+Am 13.04.2017 um 16:15 hat Alberto Garcia geschrieben:
+> On Thu 13 Apr 2017 03:51:55 PM CEST, Kevin Wolf wrote:
+> >> This invariant is already broken by the very design of the qcow2
+> >> format, subclusters don't really add anything new there. For any
+> >> given cluster size you can write 4k in every odd cluster, then do the
+> >> same in every even cluster, and you'll get an equally fragmented
+> >> image.
 > >
-> > 1) with a boolean machine property "vmbus" that would trigger the
-> >    creation of the VMBus bridge; its class would have
-> >    ->cannot_instantiate_with_device_add_yet = true
+> > Because this scenario has appeared repeatedly in this thread: Can we
+> > please use a more realistic one that shows an actual problem? Because
+> > with 8k or more for the cluster size you don't get any qcow2
+> > fragmentation with 4k even/odd writes (which is a pathological case
+> > anyway), and the file systems are clever enough to cope with it, too.
+> >
+> > Just to confirm this experimentally, I ran this short script:
+> >
+> > ----------------------------------------------------------------
+> > #!/bin/bash
+> > ./qemu-img create -f qcow2 /tmp/test.qcow2 64M
+> >
+> > echo even blocks
+> > for i in $(seq 0 32767); do echo "write $((i * 8))k 4k"; done | ./qemu-io /tmp/test.qcow2 > /dev/null
+> > echo odd blocks
+> > for i in $(seq 0 32767); do echo "write $((i * 8 + 4))k 4k"; done | ./qemu-io /tmp/test.qcow2 > /dev/null
+> >
+> > ./qemu-img map /tmp/test.qcow2
+> > filefrag -v /tmp/test.qcow2
+> > ----------------------------------------------------------------
 > 
-> This makes it an optional onboard device.  Similar ones exist already,
-> e.g. various optional onboard USB host controllers controlled by machine
-> property "usb".
+> But that's because while you're writing on every other 4k block the
+> cluster size is 64k, so you're effectively allocating clusters in
+> sequential order. That's why you get this:
 > 
-> > 2) with a regular -device option; this would require setting
-> >    ->has_dynamic_sysbus = true for i440fx machines (q35 already have it)
+> > Offset          Length          Mapped to       File
+> > 0               0x4000000       0x50000         /tmp/test.qcow2
 > 
-> This makes it a pluggable sysbus device.
+> You would need to either have 4k clusters, or space writes even more.
+> 
+> Here's a simpler example, mkfs.ext4 on an empty drive gets you something
+> like this:
+> [...]
 
-VMBus can't be hot-plugged into the system.  Besides, there can be no
-more than one VMBus in the system, so multiple -device vmbus-bridge
-options would not be allowed; I thought this semantics was clearer with
-a machine option.
+My point wasn't that qcow2 doesn't fragment, but that Denis and you were
+both using a really bad example. You were trying to construct an
+artificially bad image and you actually ended up constructing a perfect
+one.
 
-> I'd be tempted to leave old i400FX rot in peace, but your use case may
-> not allow that.
+> Now, I haven't measured the effect of this on I/O performance, but
+> Denis's point seems in principle valid to me.
 
-It doesn't ;)  Besides, we've had no specal cases for i440fx vs q35 in
-our VMBus code so far, so I don't see any reason to not to support both.
+In principle yes, but especially his fear of host file system
+fragmentation seems a bit exaggerated. If I use 64k even/odd writes in
+the script, I end up with a horribly fragmented qcow2 image, but still
+perfectly contiguous layout of the image file in the file system.
 
-Thanks,
-Roman.
+We can and probably should do something about the qcow2 fragmentation
+eventually (I guess a more intelligent cluster allocation strategy could
+go a long way there), but I wouldn't worry to much about the host file
+system.
+
+Kevin
