@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cyYbG-0007qP-22
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 02:51:27 -0400
+	(envelope-from <lprosek@redhat.com>) id 1cyYmK-0000iK-Rr
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 03:02:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cyYbE-0007jy-Vh
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 02:51:26 -0400
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20170410022636.29925-1-famz@redhat.com>
-	<20170410160417.GH3214@stefanha-x1.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0800f14a-4b80-9bed-bf2a-41f177ffff64@redhat.com>
-Date: Thu, 13 Apr 2017 14:51:04 +0800
+	(envelope-from <lprosek@redhat.com>) id 1cyYmG-0002IK-Ku
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 03:02:52 -0400
+Received: from mail-vk0-f41.google.com ([209.85.213.41]:36512)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1cyYmG-0002I1-G1
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 03:02:48 -0400
+Received: by mail-vk0-f41.google.com with SMTP id x65so14157606vkx.3
+	for <qemu-devel@nongnu.org>; Thu, 13 Apr 2017 00:02:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170410160417.GH3214@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/2] block: Quiesce old aio context
- during bdrv_set_aio_context
+In-Reply-To: <8a7bf9dbac4c6db5b7e8dd5c968cacae@ispras.ru>
+References: <8a7bf9dbac4c6db5b7e8dd5c968cacae@ispras.ru>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Thu, 13 Apr 2017 09:02:45 +0200
+Message-ID: <CABdb734AjdU7kQOUzmmnhEdd0wmJWM4-2Fop=8jZ588uZX3M-w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] WinDbg module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +27,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+Cc: qemu-devel <qemu-devel@nongnu.org>, sw@weilnetz.de, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>
 
+Hi,
 
+On Wed, Apr 12, 2017 at 4:05 PM, Mihail Abakumov
+<mikhail.abakumov@ispras.ru> wrote:
+> Hello.
+>
+> We made the debugger module WinDbg (like GDB) for QEMU. This is the
+> replacement of the remote stub in Windows kernel. Used for remote Windows
+> kernel debugging without debugging mode.
 
-On 11/04/2017 00:04, Stefan Hajnoczi wrote:
-> On Mon, Apr 10, 2017 at 10:26:34AM +0800, Fam Zheng wrote:
->> v3: Use bdrv_parent_drained_begin/end. [Kevin]
->>     Do it before releasing new_context. [Stefan]
->>
->> Fam Zheng (2):
->>   block: Make bdrv_parent_drained_begin/end public
->>   block: Quiesce old aio context during bdrv_set_aio_context
->>
->>  block.c               |  7 +++++--
->>  block/io.c            |  4 ++--
->>  include/block/block.h | 16 ++++++++++++++++
->>  3 files changed, 23 insertions(+), 4 deletions(-)
-> 
-> Thanks, applied to my block tree for 2.10:
-> https://github.com/stefanha/qemu/commits/block
-> 
-> If you'd like this in a stable release please CC qemu-stable.
+This is awesome!
 
-Stefan, can you squash this documentation patch in please?
+> The latest build and instructions for the launch can be found here:
+> https://github.com/ispras/qemu/releases/tag/v2.7.50-windbg
+>
+> Currently only one ways to create a remote debugging connection is
+> supported: using COM port with named pipe.
 
-diff --git a/block.c b/block.c
-index 3b20a29..cb1c5c9 100644
---- a/block.c
-+++ b/block.c
-@@ -4392,6 +4392,18 @@ void bdrv_set_aio_context(BlockDriverState *bs,
-AioContext *new_context)
- {
-     AioContext *ctx = bdrv_get_aio_context(bs);
+The linked v2.7.50-windbg seems to be a Windows release. Does it also
+work on Linux hosts with KVM?
 
-+    /* FIXME: This is the same as bdrv_drained_begin, only done
-+     * manually.  At the end of this function, aio_enable_external
-+     * must be done on ctx, not on new_context, so we cannot call
-+     * bdrv_drained_end there.  And because bs->quiesce_counter will
-+     * not be decreased there, we have to "explode" bdrv_drained_begin
-+     * here too.
-+     *
-+     * Once aio_disable_external and aio_enable_external are replaced
-+     * by BlockBackend device ops (called by .drained_begin/end
-+     * BdrvChildRole callbacks), this can be replaced by a simple
-+     * bdrv_drained_begin/end pair.
-+     */
-     aio_disable_external(ctx);
-     bdrv_parent_drained_begin(bs);
-     bdrv_drain(bs); /* ensure there are no in-flight requests */
+Also,
 
-Thanks,
+  #ifdef TARGET_X86_64 // Unimplemented yet
+  #error Unsupported Architecture
+  #endif
 
-Paolo
+can you estimate the amount of work to support 64-bit?
+
+Thanks!
+Ladi
+
+> Should I prepare patches for inclusion in the master branch? Or is it too
+> specific module and it is not needed?
+>
+> --
+> Thanks,
+> Mihail Abakumov
+>
