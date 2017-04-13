@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1cyiKJ-0005ZR-3M
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 13:14:36 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1cyiQC-0006fe-MG
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 13:20:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1cyiKH-0000S1-Q2
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 13:14:35 -0400
-Date: Thu, 13 Apr 2017 19:42:51 +0300
-From: Roman Kagan <rkagan@virtuozzo.com>
-Message-ID: <20170413164250.GB14317@rkaganb.sw.ru>
-References: <20170406150148.zwjpozqtale44jfh@perseus.local>
-	<2b915695-29b5-df8d-4d89-080eeaaaff13@openvz.org>
-	<w51shlcv7sb.fsf@maestria.local.igalia.com>
-	<565c1e1b-b9e1-e9c5-790e-283d04afc747@openvz.org>
-	<w51poggv3xh.fsf@maestria.local.igalia.com>
-	<20170413135155.GD5095@noname.redhat.com>
-	<w51k26ov1eq.fsf@maestria.local.igalia.com>
-	<20170413142735.GF5095@noname.redhat.com>
+	(envelope-from <ehabkost@redhat.com>) id 1cyiQ8-0003Ds-LJ
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 13:20:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57592)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cyiQ8-0003DS-10
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 13:20:36 -0400
+Date: Thu, 13 Apr 2017 14:20:32 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170413172032.GF27126@thinpad.lan.raisama.net>
+References: <1490653177-131484-1-git-send-email-agraf@suse.de>
+	<20170328004108.GP28530@thinpad.lan.raisama.net>
+	<9d85e056-3331-9815-404b-9557ca5028cc@suse.de>
+	<20170328123105.GA4418@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170413142735.GF5095@noname.redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC] Proposed qcow2 extension:
- subcluster allocation
+In-Reply-To: <20170328123105.GA4418@thinpad.lan.raisama.net>
+Subject: Re: [Qemu-devel] [PATCH] i386: Allow cpuid bit override
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,115 +29,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Alberto Garcia <berto@igalia.com>, "Denis V. Lunev" <den@openvz.org>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Alexander Graf <agraf@suse.de>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On Thu, Apr 13, 2017 at 04:27:35PM +0200, Kevin Wolf wrote:
-> Am 13.04.2017 um 16:15 hat Alberto Garcia geschrieben:
-> > On Thu 13 Apr 2017 03:51:55 PM CEST, Kevin Wolf wrote:
-> > >> This invariant is already broken by the very design of the qcow2
-> > >> format, subclusters don't really add anything new there. For any
-> > >> given cluster size you can write 4k in every odd cluster, then do the
-> > >> same in every even cluster, and you'll get an equally fragmented
-> > >> image.
-> > >
-> > > Because this scenario has appeared repeatedly in this thread: Can we
-> > > please use a more realistic one that shows an actual problem? Because
-> > > with 8k or more for the cluster size you don't get any qcow2
-> > > fragmentation with 4k even/odd writes (which is a pathological case
-> > > anyway), and the file systems are clever enough to cope with it, too.
-> > >
-> > > Just to confirm this experimentally, I ran this short script:
-> > >
-> > > ----------------------------------------------------------------
-> > > #!/bin/bash
-> > > ./qemu-img create -f qcow2 /tmp/test.qcow2 64M
-> > >
-> > > echo even blocks
-> > > for i in $(seq 0 32767); do echo "write $((i * 8))k 4k"; done | ./qemu-io /tmp/test.qcow2 > /dev/null
-> > > echo odd blocks
-> > > for i in $(seq 0 32767); do echo "write $((i * 8 + 4))k 4k"; done | ./qemu-io /tmp/test.qcow2 > /dev/null
-> > >
-> > > ./qemu-img map /tmp/test.qcow2
-> > > filefrag -v /tmp/test.qcow2
-> > > ----------------------------------------------------------------
+On Tue, Mar 28, 2017 at 09:31:05AM -0300, Eduardo Habkost wrote:
+> On Tue, Mar 28, 2017 at 01:26:04PM +0200, Alexander Graf wrote:
+> > On 03/28/2017 02:41 AM, Eduardo Habkost wrote:
+> > > On Tue, Mar 28, 2017 at 12:19:37AM +0200, Alexander Graf wrote:
+> > > > KVM has a feature bitmap of CPUID bits that it knows works for guests.
+> > > > QEMU removes bits that are not part of that bitmap automatically on VM
+> > > > start.
+> > > > 
+> > > > However, some times we just don't list features in that list because
+> > > > they don't make sense for normal scenarios, but may be useful in specific,
+> > > > targeted workloads.
+> > > > 
+> > > > For that purpose, add a new =force option to all CPUID feature flags in
+> > > > the CPU property. With that we can override the accel filtering and give
+> > > > users full control over the CPUID feature bits exposed into guests.
+> > > > 
+> > > > Signed-off-by: Alexander Graf <agraf@suse.de>
+> > > > ---
+> > > >   target/i386/cpu.c | 30 ++++++++++++++++++++++++++----
+> > > >   target/i386/cpu.h |  3 +++
+> > > >   2 files changed, 29 insertions(+), 4 deletions(-)
+> > > > 
+> > > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > > > index 7aa7622..5a22f9a 100644
+> > > > --- a/target/i386/cpu.c
+> > > > +++ b/target/i386/cpu.c
+> > > > @@ -2229,7 +2229,7 @@ void x86_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+> > > >       g_slist_foreach(list, x86_cpu_list_entry, &s);
+> > > >       g_slist_free(list);
+> > > > -    (*cpu_fprintf)(f, "\nRecognized CPUID flags:\n");
+> > > > +    (*cpu_fprintf)(f, "\nRecognized CPUID flags (=on|=off|=force):\n");
+> > > >       for (i = 0; i < ARRAY_SIZE(feature_word_info); i++) {
+> > > >           FeatureWordInfo *fw = &feature_word_info[i];
+> > > > @@ -3460,6 +3460,7 @@ static int x86_cpu_filter_features(X86CPU *cpu)
+> > > >               x86_cpu_get_supported_feature_word(w, false);
+> > > >           uint32_t requested_features = env->features[w];
+> > > >           env->features[w] &= host_feat;
+> > > > +        env->features[w] |= cpu->forced_features[w];
+> > > >           cpu->filtered_features[w] = requested_features & ~env->features[w];
+> > > >           if (cpu->filtered_features[w]) {
+> > > >               rv = 1;
+> > > > @@ -3693,6 +3694,7 @@ static void x86_cpu_unrealizefn(DeviceState *dev, Error **errp)
+> > > >   typedef struct BitProperty {
+> > > >       uint32_t *ptr;
+> > > > +    uint32_t *force_ptr;
+> > > >       uint32_t mask;
+> > > >   } BitProperty;
+> > > Please take a look at:
+> > >    Subject: [PATCH for-2.9 v2 1/2] i386: Replace uint32_t* with FeatureWord on feature getter/setter
+> > > 
+> > > I plan to include that series in 2.9, and it would make the
+> > > force_ptr field unnecessary.
+> > > 
+> > > > @@ -3701,7 +3703,15 @@ static void x86_cpu_get_bit_prop(Object *obj, Visitor *v, const char *name,
+> > > >   {
+> > > >       BitProperty *fp = opaque;
+> > > >       bool value = (*fp->ptr & fp->mask) == fp->mask;
+> > > > -    visit_type_bool(v, name, &value, errp);
+> > > > +    bool forced = (*fp->force_ptr & fp->mask) == fp->mask;
+> > > > +    char str[] = "force";
+> > > > +    char *strval = str;
+> > > > +
+> > > > +    if (!forced) {
+> > > > +        strcpy(str, value ? "on" : "off");
+> > > > +    }
+> > > > +
+> > > > +    visit_type_str(v, name, &strval, errp);
+> > > You can define an enum type in qapi-schema.json, and use
+> > > visit_type_<YourEnumType>(). You can grep for
+> > > visit_type_OnOffAuto to find examples.
+> > > 
+> > > (But I suggest naming the enum something like
+> > > "X86CPUFeatureSetting" instead of "OnOffForce", because we will
+> > > probably add other enum values in the future).
+> > > 
+> > > However: we need to find a way to do this and not break
+> > > compatibility with "feat=yes|true|no|false", that's supported by
+> > > StringInputVisitor (which is used by object_property_parse()).
+> > > Maybe fallback to visit_type_bool() in case
+> > > visit_type_<YourEnumType>() fails?
 > > 
-> > But that's because while you're writing on every other 4k block the
-> > cluster size is 64k, so you're effectively allocating clusters in
-> > sequential order. That's why you get this:
-> > 
-> > > Offset          Length          Mapped to       File
-> > > 0               0x4000000       0x50000         /tmp/test.qcow2
-> > 
-> > You would need to either have 4k clusters, or space writes even more.
-> > 
-> > Here's a simpler example, mkfs.ext4 on an empty drive gets you something
-> > like this:
-> > [...]
+> > Putting it into a special enum sounds much more fragile than the current
+> > solution to me. We need to bool fallback either way, so I fail to see any
+> > benefit from having the enum.
 > 
-> My point wasn't that qcow2 doesn't fragment, but that Denis and you were
-> both using a really bad example. You were trying to construct an
-> artificially bad image and you actually ended up constructing a perfect
-> one.
-> 
-> > Now, I haven't measured the effect of this on I/O performance, but
-> > Denis's point seems in principle valid to me.
-> 
-> In principle yes, but especially his fear of host file system
-> fragmentation seems a bit exaggerated. If I use 64k even/odd writes in
-> the script, I end up with a horribly fragmented qcow2 image, but still
-> perfectly contiguous layout of the image file in the file system.
-> 
-> We can and probably should do something about the qcow2 fragmentation
-> eventually (I guess a more intelligent cluster allocation strategy could
-> go a long way there), but I wouldn't worry to much about the host file
-> system.
+> I don't see why the enum would be more fragile. With the QAPI
+> enum, we:
+> * Have a meaningful value for the QOM property 'type' field,
+>   and have some hope to make type information for QOM properties
+>   really useful one day;
+> * Have the possible values for the property well-documented in
+>   the QAPI schema;
+> * Have the string<->enum translation code automatically generated
+>   for us;
+> * Can easily add other values later (I have been planning to
+>   support "feat=host" so "-cpu host/max" aren't special cases in
+>   the code.
 
-I beg to disagree.  I didn't have QEMU with subcluster allocation
-enabled (you did, didn't you?) so I went ahead with a raw file:
+Well, we have one problem:
 
-# truncate --size 64k bbb                                                                                                                                                          [14/14]
-# filefrag -v bbb
-Filesystem type is: ef53
-File size of bbb is 65536 (16 blocks of 4096 bytes)
-bbb: 0 extents found
-# for i in {0..7}; do echo write $[(i * 2) * 4]k 4k; done | qemu-io bbb
-...
-# for i in {0..7}; do echo write $[(i * 2 + 1) * 4]k 4k; done | qemu-io bbb
-...
-# filefrag -v bbb
-Filesystem type is: ef53
-File size of bbb is 65536 (16 blocks of 4096 bytes)
- ext:     logical_offset:        physical_offset: length:   expected: flags:
-   0:        0..       1:   65860793..  65860794:      2:
-   1:        2..       2:   65859644..  65859644:      1:   65860795:
-   2:        3..       3:   65859651..  65859651:      1:   65859645:
-   3:        4..       4:   65859645..  65859645:      1:   65859652:
-   4:        5..       5:   65859652..  65859652:      1:   65859646:
-   5:        6..       6:   65859646..  65859646:      1:   65859653:
-   6:        7..       7:   65859653..  65859653:      1:   65859647:
-   7:        8..       8:   65859647..  65859647:      1:   65859654:
-   8:        9..       9:   65859654..  65859654:      1:   65859648:
-   9:       10..      10:   65859648..  65859648:      1:   65859655:
-  10:       11..      11:   65859655..  65859655:      1:   65859649:
-  11:       12..      12:   65859649..  65859649:      1:   65859656:
-  12:       13..      13:   65859656..  65859656:      1:   65859650:
-  13:       14..      14:   65859650..  65859650:      1:   65859657:
-  14:       15..      15:   65859657..  65859657:      1:   65859651: last,eof
-bbb: 15 extents found
+* Breaking compatibility with management code that expects the
+  feature getter to return boolean values, not enums/strings.
+  This affects users of query-cpu-model-expansion, in particular.
 
-So the host filesystem did a very poor job here (ext4 on top of two-way
-raid0 on top of rotating disks).
+We could still make the setter accept an OnOffForce enum, but we
+would have to keep returning a boolean from the property getter.
 
-Naturally, replacing truncate with fallocate in the above example gives
-no fragmenation:
+We could create a set of "force-FEAT=on|off" boolean properties,
+and make the existing property setter accept "FEAT=force" as
+input just to make the command-line easier to use. But I'm not
+sure if making the list of X86CPU properties even larger is worth
+it.
 
-...
-# filefrag -v bbb
-Filesystem type is: ef53
-File size of bbb is 65536 (16 blocks of 4096 bytes)
- ext:     logical_offset:        physical_offset: length:   expected: flags:
-   0:        0..      15:  183616784.. 183616799:     16:             last,eof
-bbb: 1 extent found
+This means Alex' patch might be a reasonable solution, except for
+the property getter that was changed to return a string. I will
+make specific comments about the code as reply to the patch
+itself.
 
-Roman.
+-- 
+Eduardo
