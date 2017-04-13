@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1cyYmK-0000iK-Rr
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 03:02:54 -0400
+	(envelope-from <armbru@redhat.com>) id 1cyYqL-00021B-Oo
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 03:07:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1cyYmG-0002IK-Ku
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 03:02:52 -0400
-Received: from mail-vk0-f41.google.com ([209.85.213.41]:36512)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1cyYmG-0002I1-G1
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 03:02:48 -0400
-Received: by mail-vk0-f41.google.com with SMTP id x65so14157606vkx.3
-	for <qemu-devel@nongnu.org>; Thu, 13 Apr 2017 00:02:46 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1cyYqK-00038X-Tf
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 03:07:01 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170412173203.20072-1-lvivier@redhat.com>
+Date: Thu, 13 Apr 2017 09:06:53 +0200
+In-Reply-To: <20170412173203.20072-1-lvivier@redhat.com> (Laurent Vivier's
+	message of "Wed, 12 Apr 2017 19:32:03 +0200")
+Message-ID: <87efwwrdki.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <8a7bf9dbac4c6db5b7e8dd5c968cacae@ispras.ru>
-References: <8a7bf9dbac4c6db5b7e8dd5c968cacae@ispras.ru>
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Thu, 13 Apr 2017 09:02:45 +0200
-Message-ID: <CABdb734AjdU7kQOUzmmnhEdd0wmJWM4-2Fop=8jZ588uZX3M-w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] WinDbg module
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] arm: remove remaining
+ cannot_destroy_with_object_finalize_yet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +23,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-Cc: qemu-devel <qemu-devel@nongnu.org>, sw@weilnetz.de, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org, Antony Pavlov <antonynpavlov@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>
 
-Hi,
+Laurent Vivier <lvivier@redhat.com> writes:
 
-On Wed, Apr 12, 2017 at 4:05 PM, Mihail Abakumov
-<mikhail.abakumov@ispras.ru> wrote:
-> Hello.
->
-> We made the debugger module WinDbg (like GDB) for QEMU. This is the
-> replacement of the remote stub in Windows kernel. Used for remote Windows
-> kernel debugging without debugging mode.
+> With commit ce5b1bbf624b ("exec: move cpu_exec_init() calls to
+> realize functions"), we can now remove all the
+> remaining cannot_destroy_with_object_finalize_yet as
+> unsafe references have been moved to cpu_exec_realizefn().
+> (tested with QOM command provided by commit 4c315c27).
 
-This is awesome!
+Also tested with device-introspect-test :)
 
-> The latest build and instructions for the launch can be found here:
-> https://github.com/ispras/qemu/releases/tag/v2.7.50-windbg
->
-> Currently only one ways to create a remote debugging connection is
-> supported: using COM port with named pipe.
+> Suggested-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 
-The linked v2.7.50-windbg seems to be a Windows release. Does it also
-work on Linux hosts with KVM?
+Thanks, Laurent!
 
-Also,
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
-  #ifdef TARGET_X86_64 // Unimplemented yet
-  #error Unsupported Architecture
-  #endif
-
-can you estimate the amount of work to support 64-bit?
-
-Thanks!
-Ladi
-
-> Should I prepare patches for inclusion in the master branch? Or is it too
-> specific module and it is not needed?
->
-> --
-> Thanks,
-> Mihail Abakumov
->
+Just three places marking broken devices left: versatile.c
+("realview_pci" and "versatile_pci"), target/ppc/kvm.c (various ppc
+CPUs).  Volunteers to fix them, so we can get rid of
+cannot_destroy_with_object_finalize_yet?
