@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cyhGe-0006HL-7T
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 12:06:45 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cyhGh-0006JY-65
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 12:06:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cyhGd-00049t-BO
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 12:06:44 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cyhGg-0004BC-Az
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 12:06:47 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Thu, 13 Apr 2017 18:06:23 +0200
-Message-Id: <20170413160625.27719-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10 0/2] block: An empty filename counts
+Date: Thu, 13 Apr 2017 18:06:24 +0200
+Message-Id: <20170413160625.27719-2-mreitz@redhat.com>
+In-Reply-To: <20170413160625.27719-1-mreitz@redhat.com>
+References: <20170413160625.27719-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.10 1/2] block: An empty filename counts
  as no filename
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -19,23 +21,37 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-stable <qemu-stable@nongnu.org>
 
-See patch 1 for what is happening when you try "qemu-img info ''" and
-for the fix.
+Reproducer:
+    $ ./qemu-img info ''
+    qemu-img: ./block.c:1008: bdrv_open_driver: Assertion
+        `!drv->bdrv_needs_filename || bs->filename[0]' failed.
+    [1]    26105 abort (core dumped)  ./qemu-img info ''
 
-(Patch 2 just adds a simple test.)
+This patch fixes this to be:
+    $ ./qemu-img info ''
+    qemu-img: Could not open '': The 'file' block driver requires a file
+    name
 
+Cc: qemu-stable <qemu-stable@nongnu.org>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Max Reitz (2):
-  block: An empty filename counts as no filename
-  iotests/051: Add test for empty filename
-
- block.c                       | 2 +-
- tests/qemu-iotests/051        | 1 +
- tests/qemu-iotests/051.out    | 3 +++
- tests/qemu-iotests/051.pc.out | 3 +++
- 4 files changed, 8 insertions(+), 1 deletion(-)
-
+diff --git a/block.c b/block.c
+index 1fbbb8d606..46da908c93 100644
+--- a/block.c
++++ b/block.c
+@@ -1167,7 +1167,7 @@ static int bdrv_open_common(BlockDriverState *bs, BlockBackend *file,
+         filename = qdict_get_try_str(options, "filename");
+     }
+ 
+-    if (drv->bdrv_needs_filename && !filename) {
++    if (drv->bdrv_needs_filename && (!filename || !filename[0])) {
+         error_setg(errp, "The '%s' block driver requires a file name",
+                    drv->format_name);
+         ret = -EINVAL;
 -- 
 2.12.2
