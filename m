@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cyfis-0003Cb-E7
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 10:27:47 -0400
+	(envelope-from <eblake@redhat.com>) id 1cyfoK-0004Pr-8M
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 10:33:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cyfir-000363-Da
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 10:27:46 -0400
-Date: Thu, 13 Apr 2017 16:27:35 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170413142735.GF5095@noname.redhat.com>
-References: <20170406150148.zwjpozqtale44jfh@perseus.local>
-	<2b915695-29b5-df8d-4d89-080eeaaaff13@openvz.org>
-	<w51shlcv7sb.fsf@maestria.local.igalia.com>
-	<565c1e1b-b9e1-e9c5-790e-283d04afc747@openvz.org>
-	<w51poggv3xh.fsf@maestria.local.igalia.com>
-	<20170413135155.GD5095@noname.redhat.com>
-	<w51k26ov1eq.fsf@maestria.local.igalia.com>
+	(envelope-from <eblake@redhat.com>) id 1cyfoG-0006PG-5r
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 10:33:24 -0400
+References: <20170412204641.GA15762@localhost.localdomain>
+	<f5bf12f4-e4fd-87c7-a714-e412cee63e36@redhat.com>
+	<20170412222251.GB15762@localhost.localdomain>
+	<20170412235420.GB8607@lemon>
+	<CAFEAcA9yt49a61JLN-Sv=dFSz6rGC30hxb9=oHDqRnvpyjZXQQ@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d2553d23-6710-5a1a-8efb-1d8379a1849e@redhat.com>
+Date: Thu, 13 Apr 2017 09:33:06 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <w51k26ov1eq.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [RFC] Proposed qcow2 extension: subcluster
- allocation
+In-Reply-To: <CAFEAcA9yt49a61JLN-Sv=dFSz6rGC30hxb9=oHDqRnvpyjZXQQ@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="rNuDG50TDiREq7Bf3suAeCNkdM90dxtce"
+Subject: Re: [Qemu-devel] Regression from 2.8: stuck in bdrv_drain()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +27,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Jeff Cody <jcody@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
 
-Am 13.04.2017 um 16:15 hat Alberto Garcia geschrieben:
-> On Thu 13 Apr 2017 03:51:55 PM CEST, Kevin Wolf wrote:
-> >> This invariant is already broken by the very design of the qcow2
-> >> format, subclusters don't really add anything new there. For any
-> >> given cluster size you can write 4k in every odd cluster, then do the
-> >> same in every even cluster, and you'll get an equally fragmented
-> >> image.
-> >
-> > Because this scenario has appeared repeatedly in this thread: Can we
-> > please use a more realistic one that shows an actual problem? Because
-> > with 8k or more for the cluster size you don't get any qcow2
-> > fragmentation with 4k even/odd writes (which is a pathological case
-> > anyway), and the file systems are clever enough to cope with it, too.
-> >
-> > Just to confirm this experimentally, I ran this short script:
-> >
-> > ----------------------------------------------------------------
-> > #!/bin/bash
-> > ./qemu-img create -f qcow2 /tmp/test.qcow2 64M
-> >
-> > echo even blocks
-> > for i in $(seq 0 32767); do echo "write $((i * 8))k 4k"; done | ./qemu-io /tmp/test.qcow2 > /dev/null
-> > echo odd blocks
-> > for i in $(seq 0 32767); do echo "write $((i * 8 + 4))k 4k"; done | ./qemu-io /tmp/test.qcow2 > /dev/null
-> >
-> > ./qemu-img map /tmp/test.qcow2
-> > filefrag -v /tmp/test.qcow2
-> > ----------------------------------------------------------------
-> 
-> But that's because while you're writing on every other 4k block the
-> cluster size is 64k, so you're effectively allocating clusters in
-> sequential order. That's why you get this:
-> 
-> > Offset          Length          Mapped to       File
-> > 0               0x4000000       0x50000         /tmp/test.qcow2
-> 
-> You would need to either have 4k clusters, or space writes even more.
-> 
-> Here's a simpler example, mkfs.ext4 on an empty drive gets you something
-> like this:
-> [...]
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--rNuDG50TDiREq7Bf3suAeCNkdM90dxtce
+From: Eric Blake <eblake@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
+ Jeff Cody <jcody@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ John Snow <jsnow@redhat.com>
+Message-ID: <d2553d23-6710-5a1a-8efb-1d8379a1849e@redhat.com>
+Subject: Re: [Qemu-devel] Regression from 2.8: stuck in bdrv_drain()
+References: <20170412204641.GA15762@localhost.localdomain>
+ <f5bf12f4-e4fd-87c7-a714-e412cee63e36@redhat.com>
+ <20170412222251.GB15762@localhost.localdomain> <20170412235420.GB8607@lemon>
+ <CAFEAcA9yt49a61JLN-Sv=dFSz6rGC30hxb9=oHDqRnvpyjZXQQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA9yt49a61JLN-Sv=dFSz6rGC30hxb9=oHDqRnvpyjZXQQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-My point wasn't that qcow2 doesn't fragment, but that Denis and you were
-both using a really bad example. You were trying to construct an
-artificially bad image and you actually ended up constructing a perfect
-one.
+On 04/13/2017 04:48 AM, Peter Maydell wrote:
+> On 13 April 2017 at 00:54, Fam Zheng <famz@redhat.com> wrote:
+>> John and I confirmed that this can be fixed by this pending patch:
+>>
+>> [PATCH for-2.9 4/5] block: Drain BH in bdrv_drained_begin
+>>
+>> https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg01018.html
+>>
+>> It didn't make it into 2.9-rc4 because of limited time. :(
+>>
+>> Looks like there is no -rc5, we'll have to document this as a known is=
+sue.
+>=20
+> Well, we *hope* there is no -rc5, but if the bug is genuinely
+> a "we can't release like this" bug we will obviously have to
+> do another rc. Basically you all as the block maintainers should
+> make the call about whether it's release-critical or not.
 
-> Now, I haven't measured the effect of this on I/O performance, but
-> Denis's point seems in principle valid to me.
+Just curious: is there a technical reason we couldn't spin an -rc5 today
+(with just the fix to this issue), and slip the schedule only by two
+days instead of a full week?  And/or shorten the time for testing -rc5
+from the usual 7 days into 5?
 
-In principle yes, but especially his fear of host file system
-fragmentation seems a bit exaggerated. If I use 64k even/odd writes in
-the script, I end up with a horribly fragmented qcow2 image, but still
-perfectly contiguous layout of the image file in the file system.
+I don't know what other constraints we have to play with, so feel free
+to tell me that my idea is not feasible.  Also, while I'm a block layer
+contributor, I'm not one of its co-maintainers, so I'd trust the replies
+from others a bit more than mine when deciding what to do here.
 
-We can and probably should do something about the qcow2 fragmentation
-eventually (I guess a more intelligent cluster allocation strategy could
-go a long way there), but I wouldn't worry to much about the host file
-system.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Kevin
+
+--rNuDG50TDiREq7Bf3suAeCNkdM90dxtce
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY74wiAAoJEKeha0olJ0Nq/hEH/Aq6xWaRt3rgsxhkq1TFhHSS
+w1V+nWomBM+/IMz7rVIqTM1Tk1hPfjg06xVyiD0wFuMbGExMVqy8XHKZFj2tfEXk
+F9q1aU6SM2tC5yUEM/yBsJBK0FttKvQaiumZRbUi48LMvmiWd2/p2geC5q8bZhId
+qtB7jujVFt7RoBgPu34bv+Yt+LyeY0+9ZZXp8SEt7c4vu6ABaaT8GSj+F8RLCNA9
+CeLFrsbbyxMDj7q3qKfub/y1irtlEiH3rG5X6ZIAblCu8YCLSQ77Rzr8Qt6u0CFa
+MnSZBbkHCLttPfVVnue/5Z1pio9Nq0hh+83UNXMBWhAz1iMrgcm2ITFk3dtSYg0=
+=pPDN
+-----END PGP SIGNATURE-----
+
+--rNuDG50TDiREq7Bf3suAeCNkdM90dxtce--
