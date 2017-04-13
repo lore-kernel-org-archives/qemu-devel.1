@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cyTj4-0006cC-HZ
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 21:39:11 -0400
+	(envelope-from <cota@braap.org>) id 1cyTqZ-0007fL-M6
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 21:46:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cyTj3-000155-CR
-	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 21:39:10 -0400
-References: <20170412174920.8744-1-eblake@redhat.com>
-	<20170412174920.8744-13-eblake@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <9543861a-bf8d-00d8-3048-4abf5186af44@redhat.com>
-Date: Wed, 12 Apr 2017 21:38:59 -0400
+	(envelope-from <cota@braap.org>) id 1cyTqY-0003Xb-Gj
+	for qemu-devel@nongnu.org; Wed, 12 Apr 2017 21:46:55 -0400
+Date: Wed, 12 Apr 2017 21:46:46 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170413014646.GA1474@flamenco>
+References: <1491959850-30756-1-git-send-email-cota@braap.org>
+	<1491959850-30756-10-git-send-email-cota@braap.org>
+	<2ede0852-6888-8bcb-ac5a-363478841bc7@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170412174920.8744-13-eblake@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 12/12] dirty-bitmap: Convert internal
- hbitmap size/granularity
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2ede0852-6888-8bcb-ac5a-363478841bc7@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 09/10] target/i386: optimize indirect
+ branches with TCG's jr op
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,148 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Claudio Fontana <claudio.fontana@huawei.com>, Andrzej Zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, qemu-arm@nongnu.org, alex.bennee@linaro.org, Pranith Kumar <bobby.prani+qemu@gmail.com>
 
+On Wed, Apr 12, 2017 at 11:43:45 +0800, Paolo Bonzini wrote:
+> 
+> 
+> On 12/04/2017 09:17, Emilio G. Cota wrote:
+> > 
+> > The fact that NBench is not very sensitive to changes here is a
+> > little surprising, especially given the significant improvements for
+> > ARM shown in the previous commit. I wonder whether the compiler is doing
+> > a better job compiling the x86_64 version (I'm using gcc 5.4.0), or I'm simply
+> > missing some i386 instructions to which the jr optimization should
+> > be applied.
+> 
+> Maybe it is "ret"?  That would be a straightforward "bx lr" on ARM, but
+> it is missing in your i386 patch.
 
+Yes I missed that. I added this fix-up:
 
-On 04/12/2017 01:49 PM, Eric Blake wrote:
-> Now that all callers are using byte-based interfaces, there's no
-> reason for our internal hbitmap to remain with sector-based
-> granularity.  It also simplifies our internal scaling, since we
-> already know that hbitmap widens requests out to granularity
-> boundaries.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  block/dirty-bitmap.c | 37 ++++++++++++-------------------------
->  1 file changed, 12 insertions(+), 25 deletions(-)
-> 
-> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-> index ef165eb..26ca084 100644
-> --- a/block/dirty-bitmap.c
-> +++ b/block/dirty-bitmap.c
-> @@ -37,7 +37,7 @@
->   *     or enabled. A frozen bitmap can only abdicate() or reclaim().
->   */
->  struct BdrvDirtyBitmap {
-> -    HBitmap *bitmap;            /* Dirty sector bitmap implementation */
-> +    HBitmap *bitmap;            /* Dirty bitmap implementation */
->      HBitmap *meta;              /* Meta dirty bitmap */
->      BdrvDirtyBitmap *successor; /* Anonymous child; implies frozen status */
->      char *name;                 /* Optional non-empty unique ID */
-> @@ -93,12 +93,7 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriverState *bs,
->          return NULL;
->      }
->      bitmap = g_new0(BdrvDirtyBitmap, 1);
-> -    /*
-> -     * TODO - let hbitmap track full granularity. For now, it is tracking
-> -     * only sector granularity, as a shortcut for our iterators.
-> -     */
-> -    bitmap->bitmap = hbitmap_alloc(bitmap_size >> BDRV_SECTOR_BITS,
-> -                                   ctz32(granularity) - BDRV_SECTOR_BITS);
-> +    bitmap->bitmap = hbitmap_alloc(bitmap_size, ctz32(granularity));
->      bitmap->size = bitmap_size;
->      bitmap->name = g_strdup(name);
->      bitmap->disabled = false;
-> @@ -254,7 +249,7 @@ void bdrv_dirty_bitmap_truncate(BlockDriverState *bs)
->      QLIST_FOREACH(bitmap, &bs->dirty_bitmaps, list) {
->          assert(!bdrv_dirty_bitmap_frozen(bitmap));
->          assert(!bitmap->active_iterators);
-> -        hbitmap_truncate(bitmap->bitmap, size >> BDRV_SECTOR_BITS);
-> +        hbitmap_truncate(bitmap->bitmap, size);
->          bitmap->size = size;
->      }
->  }
-> @@ -336,7 +331,7 @@ bool bdrv_get_dirty(BlockDriverState *bs, BdrvDirtyBitmap *bitmap,
->                      int64_t offset)
->  {
->      if (bitmap) {
-> -        return hbitmap_get(bitmap->bitmap, offset >> BDRV_SECTOR_BITS);
-> +        return hbitmap_get(bitmap->bitmap, offset);
->      } else {
->          return false;
->      }
-> @@ -364,7 +359,7 @@ uint32_t bdrv_get_default_bitmap_granularity(BlockDriverState *bs)
-> 
->  uint32_t bdrv_dirty_bitmap_granularity(BdrvDirtyBitmap *bitmap)
->  {
-> -    return BDRV_SECTOR_SIZE << hbitmap_granularity(bitmap->bitmap);
-> +    return 1U << hbitmap_granularity(bitmap->bitmap);
->  }
-> 
->  BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap)
-> @@ -397,27 +392,21 @@ void bdrv_dirty_iter_free(BdrvDirtyBitmapIter *iter)
-> 
->  int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter)
->  {
-> -    return hbitmap_iter_next(&iter->hbi) * BDRV_SECTOR_SIZE;
-> +    return hbitmap_iter_next(&iter->hbi);
->  }
-> 
->  void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
->                             int64_t offset, int64_t bytes)
->  {
-> -    int64_t end_sector = DIV_ROUND_UP(offset + bytes, BDRV_SECTOR_SIZE);
-> -
->      assert(bdrv_dirty_bitmap_enabled(bitmap));
-> -    hbitmap_set(bitmap->bitmap, offset >> BDRV_SECTOR_BITS,
-> -                end_sector - (offset >> BDRV_SECTOR_BITS));
-> +    hbitmap_set(bitmap->bitmap, offset, bytes);
->  }
-> 
->  void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
->                               int64_t offset, int64_t bytes)
->  {
-> -    int64_t end_sector = DIV_ROUND_UP(offset + bytes, BDRV_SECTOR_SIZE);
-> -
->      assert(bdrv_dirty_bitmap_enabled(bitmap));
-> -    hbitmap_reset(bitmap->bitmap, offset >> BDRV_SECTOR_BITS,
-> -                  end_sector - (offset >> BDRV_SECTOR_BITS));
-> +    hbitmap_reset(bitmap->bitmap, offset, bytes);
->  }
-> 
->  void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out)
-> @@ -427,7 +416,7 @@ void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out)
->          hbitmap_reset_all(bitmap->bitmap);
->      } else {
->          HBitmap *backup = bitmap->bitmap;
-> -        bitmap->bitmap = hbitmap_alloc(bitmap->size >> BDRV_SECTOR_BITS,
-> +        bitmap->bitmap = hbitmap_alloc(bitmap->size,
->                                         hbitmap_granularity(backup));
->          *out = backup;
->      }
-> @@ -481,14 +470,12 @@ void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap)
->  void bdrv_set_dirty(BlockDriverState *bs, int64_t offset, int64_t bytes)
->  {
->      BdrvDirtyBitmap *bitmap;
-> -    int64_t end_sector = DIV_ROUND_UP(offset + bytes, BDRV_SECTOR_SIZE);
-> 
->      QLIST_FOREACH(bitmap, &bs->dirty_bitmaps, list) {
->          if (!bdrv_dirty_bitmap_enabled(bitmap)) {
->              continue;
->          }
-> -        hbitmap_set(bitmap->bitmap, offset >> BDRV_SECTOR_BITS,
-> -                    end_sector - (offset >> BDRV_SECTOR_BITS));
-> +        hbitmap_set(bitmap->bitmap, offset, bytes);
->      }
->  }
-> 
-> @@ -497,12 +484,12 @@ void bdrv_set_dirty(BlockDriverState *bs, int64_t offset, int64_t bytes)
->   */
->  void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *iter, int64_t offset)
->  {
-> -    hbitmap_iter_init(&iter->hbi, iter->hbi.hb, offset >> BDRV_SECTOR_BITS);
-> +    hbitmap_iter_init(&iter->hbi, iter->hbi.hb, offset);
->  }
-> 
->  int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap)
->  {
-> -    return hbitmap_count(bitmap->bitmap) << BDRV_SECTOR_BITS;
-> +    return hbitmap_count(bitmap->bitmap);
->  }
-> 
->  int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap)
-> 
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index aab5c13..f2b5a0f 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -6430,7 +6430,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+         /* Note that gen_pop_T0 uses a zero-extending load.  */
+         gen_op_jmp_v(cpu_T0);
+         gen_bnd_jmp(s);
+-        gen_eob(s);
++        gen_jr(s, cpu_T0);
+         break;
+     case 0xc3: /* ret */
+         ot = gen_pop_T0(s);
+@@ -6438,7 +6438,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+         /* Note that gen_pop_T0 uses a zero-extending load.  */
+         gen_op_jmp_v(cpu_T0);
+         gen_bnd_jmp(s);
+-        gen_eob(s);
++        gen_jr(s, cpu_T0);
+         break;
+     case 0xca: /* lret im */
+         val = cpu_ldsw_code(env, s->pc);
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+Any other instructions I should look into? Perhaps lret/lret im?
+
+Anyway, nbench does not improve much with the above. The reason seems to be
+that it's full of direct jumps (visible with -d in_asm). Also tried softmmu
+to see whether these jumps are in-page or not: peak improvement is ~8%, so
+I guess most of them are in-page. See http://imgur.com/EKRrYUz
+
+I'm running new tests on a server with no other users and which has
+frequency scaling disabled. This should help get less noisy numbers,
+since I'm having trouble replicating my own results :> (I used my desktop
+machine until now). Will post these numbers tomorrow (running overnight
+SPECint both train and set sizes).
+
+Thanks,
+
+		Emilio
