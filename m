@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1cyfZQ-0001R7-8K
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 10:18:01 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1cyffB-0002Sf-KR
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 10:23:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1cyfZP-00048F-4O
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 10:18:00 -0400
-References: <20170406150148.zwjpozqtale44jfh@perseus.local>
-	<2b915695-29b5-df8d-4d89-080eeaaaff13@openvz.org>
-	<w51shlcv7sb.fsf@maestria.local.igalia.com>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <565c1e1b-b9e1-e9c5-790e-283d04afc747@openvz.org>
-Date: Thu, 13 Apr 2017 15:44:51 +0300
+	(envelope-from <rkagan@virtuozzo.com>) id 1cyff8-0006zE-EL
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 10:23:57 -0400
+Received: from mail-db5eur01on0100.outbound.protection.outlook.com
+	([104.47.2.100]:53954
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1cyff8-0006wT-3M
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 10:23:54 -0400
+Date: Thu, 13 Apr 2017 17:08:04 +0300
+From: Roman Kagan <rkagan@virtuozzo.com>
+Message-ID: <20170413140804.GC14312@rkaganb.sw.ru>
+References: <20170411205813.GA4006@rkaganip.lan>
+	<87inm91wo4.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <w51shlcv7sb.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC] Proposed qcow2 extension: subcluster
- allocation
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <87inm91wo4.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] vmbus bridge: machine property or device?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,109 +30,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, "Denis
+	V. Lunev" <den@openvz.org>, Eduardo Habkost <ehabkost@redhat.com>, Peter
+	Maydell <peter.maydell@linaro.org>, Alexander Graf <agraf@suse.de>, Paolo
+	Bonzini <pbonzini@redhat.com>
 
-On 04/13/2017 02:58 PM, Alberto Garcia wrote:
-> On Wed 12 Apr 2017 06:54:50 PM CEST, Denis V. Lunev wrote:
->> My opinion about this approach is very negative as the problem could
->> be (partially) solved in a much better way.
-> Hmm... it seems to me that (some of) the problems you are describing ar=
-e
-> different from the ones this proposal tries to address. Not that I
-> disagree with them! I think you are giving useful feedback :)
->
->> 1) current L2 cache management seems very wrong to me. Each cache
->>     miss means that we have to read entire L2 cache block. This means
->>     that in the worst case (when dataset of the test does not fit L2
->>     cache size we read 64kb of L2 table for each 4 kb read).
->>
->>     The situation is MUCH worse once we are starting to increase
->>     cluster size. For 1 Mb blocks we have to read 1 Mb on each cache
->>     miss.
->>
->>     The situation can be cured immediately once we will start reading
->>     L2 cache with 4 or 8kb chunks. We have patchset for this for our
->>     downstream and preparing it for upstream.
-> Correct, although the impact of this depends on whether you are using
-> SDD or HDD.
->
-> With an SSD what you want is to minimize is the number of unnecessary
-> reads, so reading small chunks will likely increase the performance whe=
-n
-> there's a cache miss.
->
-> With an HDD what you want is to minimize the number of seeks. Once you
-> have moved the disk head to the location where the cluster is, reading
-> the whole cluster is relatively inexpensive, so (leaving the memory
-> requirements aside) you generally want to read as much as possible.
-no! This greatly helps for HDD too!
+On Wed, Apr 12, 2017 at 05:18:51PM +0200, Markus Armbruster wrote:
+> Roman Kagan <rkagan@virtuozzo.com> writes:
+> > VMBus is provided by a vmbus bridge; it appears the most natural to have
+> > it subclassed from SysBusDevice.  There can only be one VMBus in the
+> > VM.
+> 
+> TYPE_DEVICE unless you actually need something TYPE_SYS_BUS_DEVICE
+> provides.
 
-The reason is that you cover areas of the virtual disk much more precise.=
+I thought VMBus looked similar to an ISA or PCI bus in its relation to
+the system, and those bridges were TYPE_SYS_BUS_DEVICE.
 
-There is very simple example. Let us assume that I have f.e. 1 TB virtual=
+If it's subclassed directly from TYPE_DEVICE how is it connected to the
+rest of the QOM tree?
 
-HDD with 1 MB block size. As far as I understand right now L2 cache
-for the case consists of 4 L2 clusters.
+> > Now the question is how to add it to the system:
+> >
+> > 1) with a boolean machine property "vmbus" that would trigger the
+> >    creation of the VMBus bridge; its class would have
+> >    ->cannot_instantiate_with_device_add_yet = true
+> 
+> This makes it an optional onboard device.  Similar ones exist already,
+> e.g. various optional onboard USB host controllers controlled by machine
+> property "usb".
+> 
+> > 2) with a regular -device option; this would require setting
+> >    ->has_dynamic_sysbus = true for i440fx machines (q35 already have it)
+> 
+> This makes it a pluggable sysbus device.
 
-So, I can exhaust current cache only with 5 requests and each actual read=
+VMBus can't be hot-plugged into the system.  Besides, there can be no
+more than one VMBus in the system, so multiple -device vmbus-bridge
+options would not be allowed; I thought this semantics was clearer with
+a machine option.
 
-will costs L2 table read. This is a read problem. This condition could
-happen on fragmented FS without a problem.
+> I'd be tempted to leave old i400FX rot in peace, but your use case may
+> not allow that.
 
-With my proposal the situation is MUCH better. All accesses will be taken=
+It doesn't ;)  Besides, we've had no specal cases for i440fx vs q35 in
+our VMBus code so far, so I don't see any reason to not to support both.
 
-from the cache after the first run.
-
->> 2) yet another terrible thing in cluster allocation is its allocation
->>     strategy.
->>     Current QCOW2 codebase implies that we need 5 (five) IOPSes to
->>     complete COW operation. We are reading head, writing head, reading=
-
->>     tail, writing tail, writing actual data to be written. This could
->>     be easily reduced to 3 IOPSes.
-> That sounds right, but I'm not sure if this is really incompatible with=
-
-> my proposal :)
-the problem is code complexity, with is very complex right now.
-
-
->>     Another problem is the amount of data written. We are writing
->>     entire cluster in write operation and this is also insane. It is
->>     possible to perform fallocate() and actual data write on normal
->>     modern filesystem.
-> But that only works when filling the cluster with zeroes, doesn't it? I=
-f
-> there's a backing image you need to bring all the contents from there.
-
-Yes. Backing images are problems. Though, even with sub-clusters, we
-will suffer
-exactly the same with the amount of IOPSes as even with that head and
-tail have to
-be read. If you are spoken about subclusters equals to FS block size and
-avoid
-COW at all, this would be terribly slow later on with sequential
-reading. In such
-an approach sequential reading will result in random read.
-
-Guest OSes are written keeping in mind that adjacent LBAs are really
-adjacent
-and reading them sequentially is a very good idea. This invariant will
-be broken
-for the case of subclusters.
-
-For nowadays SSD we are facing problems somewhere else. Right now I can
-achieve
-only 100k IOPSes on SSD capable of 350-550k. 1 Mb block with
-preallocation and
-fragmented L2 cache gives same 100k. Tests for initially empty image
-gives around
-80k for us.
-
-May be I have too good hardware for these tests. Right now I am giving
-number
-from our last run on Intel top SSDs. We will remeasure this on something
-slower
-before submission ;)
-
-Den
+Thanks,
+Roman.
