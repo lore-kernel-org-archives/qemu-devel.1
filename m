@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cygGr-00067v-SF
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 11:02:59 -0400
+	(envelope-from <berto@igalia.com>) id 1cygJX-0006wQ-Hs
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 11:05:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cygGq-00044D-TT
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 11:02:53 -0400
-Date: Thu, 13 Apr 2017 11:02:39 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170413150239.GF15762@localhost.localdomain>
-References: <20170412204641.GA15762@localhost.localdomain>
-	<f5bf12f4-e4fd-87c7-a714-e412cee63e36@redhat.com>
-	<20170412222251.GB15762@localhost.localdomain>
-	<20170412235420.GB8607@lemon>
-	<20170413011109.GC15762@localhost.localdomain>
-	<c74d2b7d-d185-53ba-9bf9-8cf976d8f684@redhat.com>
-	<20170413143959.GE13387@stefanha-x1.localdomain>
+	(envelope-from <berto@igalia.com>) id 1cygJS-0005WM-GD
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 11:05:39 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <ec4f6034-0c94-658c-6b2a-e0aecea173f4@openvz.org>
+References: <20170406150148.zwjpozqtale44jfh@perseus.local>
+	<2b915695-29b5-df8d-4d89-080eeaaaff13@openvz.org>
+	<w51shlcv7sb.fsf@maestria.local.igalia.com>
+	<565c1e1b-b9e1-e9c5-790e-283d04afc747@openvz.org>
+	<w51poggv3xh.fsf@maestria.local.igalia.com>
+	<ec4f6034-0c94-658c-6b2a-e0aecea173f4@openvz.org>
+Date: Thu, 13 Apr 2017 17:04:56 +0200
+Message-ID: <w51h91suz53.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170413143959.GE13387@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] Regression from 2.8: stuck in bdrv_drain()
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC] Proposed qcow2 extension: subcluster
+ allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +27,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, kwolf@redhat.com, peter.maydell@linaro.org, qemu-block@nongnu.org, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
+To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Thu, Apr 13, 2017 at 03:39:59PM +0100, Stefan Hajnoczi wrote:
-> On Thu, Apr 13, 2017 at 01:45:55PM +0800, Paolo Bonzini wrote:
-> > 
-> > 
-> > On 13/04/2017 09:11, Jeff Cody wrote:
-> > >> It didn't make it into 2.9-rc4 because of limited time. :(
-> > >>
-> > >> Looks like there is no -rc5, we'll have to document this as a known issue.
-> > >> Users should "block-job-complete/cancel" as soon as possible to avoid such a
-> > >> hang.
-> > >
-> > > I'd argue for including a fix for 2.9, since this is both a regression, and
-> > > a hard lock without possible recovery short of restarting the QEMU process.
-> > 
-> > It is a bit of a corner case (and jobs on I/O thread are relatively rare
-> > too), so maybe it's not worth delaying 2.9.  It has been delayed already
-> > quite a bit.  Another reason I think I prefer to wait is to ensure that
-> > we have an entry in qemu-iotests to avoid the future regression.
-> 
-> I also think this does not require delaying the release:
-> 
-> 1. It needs to be marked as a known issue in the release notes.
-> 2. Let's roll the 2.9.1 stable release within a month of 2.9.0.
-> 
-> If both conditions are met then very few end users will be exposed to
-> the problem.  I hope libvirt will create IOThreads by default soon but
-> for the time being it is not a widely used configuration.
-> 
+On Thu 13 Apr 2017 03:30:43 PM CEST, Denis V. Lunev wrote:
+> Yes, block size should be increased. I perfectly in agreement with
+> your.  But I think that we could do that by plain increase of the
+> cluster size without any further dances. Sub-clusters as sub-clusters
+> will help if we are able to avoid COW. With COW I do not see much
+> difference.
 
-Without the fix, iothreads are not usable in 2.9.0, because a running block
-job can create a deadlock by a guest-initiated reboot.  I think losing the
-ability to use iothreads is enough reason to warrant a fix (especially if an
--rc5 may happen anyway).
+I'm trying to summarize your position, tell me if I got everything
+correctly:
 
--Jeff
+1. We should try to reduce data fragmentation on the qcow2 file,
+   because it will have a long term effect on the I/O performance (as
+   opposed to an effect on the initial operations on the empty image).
+
+2. The way to do that is to increase the cluster size (to 1MB or
+   more).
+
+3. Benefit: increasing the cluster size also decreases the amount of
+   metadata (L2 and refcount).
+
+4. Problem: L2 tables become too big and fill up the cache more
+   easily. To solve this the cache code should do partial reads
+   instead of complete L2 clusters.
+
+5. Problem: larger cluster sizes also mean more data to copy when
+   there's a COW. To solve this the COW code should be modified so it
+   goes from 5 OPs (read head, write head, read tail, write tail,
+   write data) to 2 OPs (read cluster, write modified cluster).
+
+6. Having subclusters adds incompatible changes to the file format,
+   and they offer no benefit after allocation.
+
+7. Subclusters are only really useful if they match the guest fs block
+   size (because you would avoid doing COW on allocation). Otherwise
+   the only thing that you get is a faster COW (because you move less
+   data), but the improvement is not dramatic and it's better if we do
+   what's proposed in point 5.
+
+8. Even if the subcluster size matches the guest block size, you'll
+   get very fast initial allocation but also more chances to end up
+   with a very fragmented qcow2 image, which is worse in the long run.
+
+9. Problem: larger clusters make a less efficient use of disk space,
+   but that's a drawback you're fine with considering all of the
+   above.
+
+Is that a fair summary of what you're trying to say? Anything else
+missing?
+
+Berto
