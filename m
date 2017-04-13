@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cyfQB-0007F8-BO
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 10:08:28 -0400
+	(envelope-from <berto@igalia.com>) id 1cyfXc-0000Lu-Il
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 10:16:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cyfQ7-0000YX-D1
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 10:08:27 -0400
-Date: Thu, 13 Apr 2017 16:08:18 +0200
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20170413140818.flntaxvwt54a2pgp@var.youpi.perso.aquilenet.fr>
-References: <1492076514-28821-1-git-send-email-clg@kaod.org>
-	<1492076514-28821-6-git-send-email-clg@kaod.org>
-	<cae91a9e-cc37-347f-d8fb-85a3173d9dcd@amsat.org>
+	(envelope-from <berto@igalia.com>) id 1cyfXW-0003Jj-QY
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 10:16:08 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170413135155.GD5095@noname.redhat.com>
+References: <20170406150148.zwjpozqtale44jfh@perseus.local>
+	<2b915695-29b5-df8d-4d89-080eeaaaff13@openvz.org>
+	<w51shlcv7sb.fsf@maestria.local.igalia.com>
+	<565c1e1b-b9e1-e9c5-790e-283d04afc747@openvz.org>
+	<w51poggv3xh.fsf@maestria.local.igalia.com>
+	<20170413135155.GD5095@noname.redhat.com>
+Date: Thu, 13 Apr 2017 16:15:57 +0200
+Message-ID: <w51k26ov1eq.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <cae91a9e-cc37-347f-d8fb-85a3173d9dcd@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH v2 5/5] slirp: add a fake NC-SI backend
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC] Proposed qcow2 extension: subcluster
+ allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,40 +27,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, Peter Maydell <peter.maydell@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Dmitry Fleytman <dmitry@daynix.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Hello,
+On Thu 13 Apr 2017 03:51:55 PM CEST, Kevin Wolf wrote:
+>> This invariant is already broken by the very design of the qcow2
+>> format, subclusters don't really add anything new there. For any
+>> given cluster size you can write 4k in every odd cluster, then do the
+>> same in every even cluster, and you'll get an equally fragmented
+>> image.
+>
+> Because this scenario has appeared repeatedly in this thread: Can we
+> please use a more realistic one that shows an actual problem? Because
+> with 8k or more for the cluster size you don't get any qcow2
+> fragmentation with 4k even/odd writes (which is a pathological case
+> anyway), and the file systems are clever enough to cope with it, too.
+>
+> Just to confirm this experimentally, I ran this short script:
+>
+> ----------------------------------------------------------------
+> #!/bin/bash
+> ./qemu-img create -f qcow2 /tmp/test.qcow2 64M
+>
+> echo even blocks
+> for i in $(seq 0 32767); do echo "write $((i * 8))k 4k"; done | ./qemu-io /tmp/test.qcow2 > /dev/null
+> echo odd blocks
+> for i in $(seq 0 32767); do echo "write $((i * 8 + 4))k 4k"; done | ./qemu-io /tmp/test.qcow2 > /dev/null
+>
+> ./qemu-img map /tmp/test.qcow2
+> filefrag -v /tmp/test.qcow2
+> ----------------------------------------------------------------
 
-Philippe Mathieu-Daudé, on jeu. 13 avril 2017 08:45:23 -0300, wrote:
-> > The NCSI header file <ncsi-pkt.h> comes from mainline Linux
+But that's because while you're writing on every other 4k block the
+cluster size is 64k, so you're effectively allocating clusters in
+sequential order. That's why you get this:
 
-Please mention within the file which file it comes from exactly.
+> Offset          Length          Mapped to       File
+> 0               0x4000000       0x50000         /tmp/test.qcow2
 
-> > +    case NCSI_PKT_CMD_SMA:
-> > +        rnh->common.length = htons(4);
-> > +        break;
-> > +    case NCSI_PKT_CMD_GVI:
-> > +        rnh->common.length = htons(36);
-> > +        break;
-> > +    case NCSI_PKT_CMD_GC: {
-> > +        rnh->common.length = htons(32);
-...
-> > +        break;
-> > +    }
-> > +
-> > +    case NCSI_PKT_CMD_GLS: {
-> > +        rnh->common.length = htons(16);
-> > +        break;
-> > +    }
-> > +
-> > +    slirp_output(slirp->opaque, ncsi_reply, sizeof(ncsi_reply));
+You would need to either have 4k clusters, or space writes even more.
 
-Are we really supposed to send sizeof(ncsi_reply), and not accordingly
-to the size announced withing the packet?
+Here's a simpler example, mkfs.ext4 on an empty drive gets you something
+like this:
 
-Appart from that,
+----------------------------------------------------------------
+Offset          Length          Mapped to       File
+[...]
+0x1040000       0x10000         0x150000        test.qcow2
+0x1050000       0x50000         0x100000        test.qcow2
+0x10a0000       0x10000         0x190000        test.qcow2
+0x10b0000       0x30000         0x160000        test.qcow2
+0x10e0000       0x10000         0x200000        test.qcow2
+0x10f0000       0x30000         0x1a0000        test.qcow2
+0x1120000       0x10000         0x210000        test.qcow2
+0x1130000       0x30000         0x1d0000        test.qcow2
+0x1160000       0x10000         0x280000        test.qcow2
+0x1170000       0x30000         0x220000        test.qcow2
+[...]
+----------------------------------------------------------------
 
-Acked-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Now, I haven't measured the effect of this on I/O performance, but
+Denis's point seems in principle valid to me.
 
-Samuel
+Berto
