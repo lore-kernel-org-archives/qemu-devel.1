@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cyoqn-0003Gf-St
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 20:12:35 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1cypY8-00089s-7J
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 20:57:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cyoqj-0007jX-IB
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 20:12:33 -0400
-Received: from mail.kernel.org ([198.145.29.136]:49160)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1cyoqj-0007ir-AH
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 20:12:29 -0400
-Date: Thu, 13 Apr 2017 17:12:21 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <1491903346-16075-1-git-send-email-andr2000@gmail.com>
-Message-ID: <alpine.DEB.2.10.1704131704560.2759@sstabellini-ThinkPad-X260>
-References: <1491903346-16075-1-git-send-email-andr2000@gmail.com>
+	(envelope-from <jemmy858585@gmail.com>) id 1cypY7-0002oy-3g
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 20:57:20 -0400
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [Xen-devel][PATCH] configure: introduce
- --enable-xen-fb-backend
+In-Reply-To: <20170413141617.GD13387@stefanha-x1.localdomain>
+References: <1492050868-16200-1-git-send-email-lidongchen@tencent.com>
+	<20170413141617.GD13387@stefanha-x1.localdomain>
+From: 858585 jemmy <jemmy858585@gmail.com>
+Date: Fri, 14 Apr 2017 08:57:17 +0800
+Message-ID: <CAOGPPbevJLdt5+C4jZEOC1iCFUK9RY8NF0Uu0C3xBh8DgbnbjQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6] migration/block: use blk_pwrite_zeroes
+ for each zero cluster
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,145 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Oleksandr Andrushchenko <andr2000@gmail.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, joculator@gmail.com, al1img@gmail.com, vlad.babchuk@gmail.com, andrii.anisov@gmail.com, olekstysh@gmail.com, sstabellini@kernel.org, anthony.perard@citrix.com, Oleksandr Andrushchenko <oleksandr_andrushchenko@epam.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, quintela@redhat.com, dgilbert@redhat.com, qemu-block@nongnu.org, Lidong Chen <lidongchen@tencent.com>
 
-On Tue, 11 Apr 2017, Oleksandr Andrushchenko wrote:
-> From: Oleksandr Andrushchenko <oleksandr_andrushchenko@epam.com>
-> 
-> For some use cases when Xen framebuffer/input backend
-> is not a part of Qemu it is required to disable it,
-> because of conflicting access to input/display devices.
-> Introduce additional configuration option for explicit
-> input/display control.
+On Thu, Apr 13, 2017 at 10:16 PM, Stefan Hajnoczi <stefanha@redhat.com> wro=
+te:
+> On Thu, Apr 13, 2017 at 10:34:28AM +0800, jemmy858585@gmail.com wrote:
+>> From: Lidong Chen <lidongchen@tencent.com>
+>>
+>> BLOCK_SIZE is (1 << 20), qcow2 cluster size is 65536 by default,
+>> this may cause the qcow2 file size to be bigger after migration.
+>> This patch checks each cluster, using blk_pwrite_zeroes for each
+>> zero cluster.
+>>
+>> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+>> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+>> ---
+>> v6 changelog:
+>> Fix up some grammar in the comment.
+>> ---
+>>  migration/block.c | 35 +++++++++++++++++++++++++++++++++--
+>>  1 file changed, 33 insertions(+), 2 deletions(-)
+>
+> I fixed the following gcc warning when merging the patch:
+>
+>   migration/block.c:958:25: error: =E2=80=98cluster_size=E2=80=99 may be =
+used uninitialized in this function [-Werror=3Dmaybe-uninitialized]
+>                             buffer_is_zero(cur_buf, cluster_size)) {
 
-In these cases when you don't want xenfb, why don't you just remove
-"vfb" from the xl config file? QEMU only starts the xenfb backend when
-requested by the toolstack.
+Thanks=EF=BC=8Ci will check gcc warning next time.
 
-Is it because you have an alternative xenfb backend? If so, is it really
-fully xenfb compatible, or is it a different protocol? If it is a
-different protocol, I suggest you rename your frontend/backend PV device
-name to something different from "vfb".
-
-
-> Signed-off-by: Oleksandr Andrushchenko <oleksandr_andrushchenko@epam.com>
-> ---
->  configure                 | 18 ++++++++++++++++++
->  hw/display/Makefile.objs  |  2 +-
->  hw/xen/xen_backend.c      |  2 ++
->  hw/xenpv/xen_machine_pv.c |  4 ++++
->  4 files changed, 25 insertions(+), 1 deletion(-)
-> 
-> diff --git a/configure b/configure
-> index 476210b1b93f..b805cb908f03 100755
-> --- a/configure
-> +++ b/configure
-> @@ -220,6 +220,7 @@ xen=""
->  xen_ctrl_version=""
->  xen_pv_domain_build="no"
->  xen_pci_passthrough=""
-> +xen_fb_backend=""
->  linux_aio=""
->  cap_ng=""
->  attr=""
-> @@ -909,6 +910,10 @@ for opt do
->    ;;
->    --enable-xen-pv-domain-build) xen_pv_domain_build="yes"
->    ;;
-> +  --disable-xen-fb-backend) xen_fb_backend="no"
-> +  ;;
-> +  --enable-xen-fb-backend) xen_fb_backend="yes"
-> +  ;;
->    --disable-brlapi) brlapi="no"
->    ;;
->    --enable-brlapi) brlapi="yes"
-> @@ -1368,6 +1373,7 @@ disabled with --disable-FEATURE, default is enabled if available:
->    virtfs          VirtFS
->    xen             xen backend driver support
->    xen-pci-passthrough
-> +  xen-fb-backend  framebuffer/input backend support
->    brlapi          BrlAPI (Braile)
->    curl            curl connectivity
->    fdt             fdt device tree
-> @@ -2213,6 +2219,15 @@ if test "$xen_pv_domain_build" = "yes" &&
->  	       "which requires Xen support."
->  fi
->  
-> +if test "$xen_fb_backend" != "no"; then
-> +   if test "$xen" = "yes"; then
-> +     xen_fb_backend=yes
-> +   else
-> +     error_exit "User requested feature Xen framebufer backend support" \
-> +                " but this feature requires Xen support."
-> +   fi
-> +fi
-> +
->  ##########################################
->  # Sparse probe
->  if test "$sparse" != "no" ; then
-> @@ -5444,6 +5459,9 @@ if test "$xen" = "yes" ; then
->    if test "$xen_pv_domain_build" = "yes" ; then
->      echo "CONFIG_XEN_PV_DOMAIN_BUILD=y" >> $config_host_mak
->    fi
-> +  if test "$xen_fb_backend" = "yes" ; then
-> +    echo "CONFIG_XEN_FB_BACKEND=y" >> $config_host_mak
-> +  fi
->  fi
->  if test "$linux_aio" = "yes" ; then
->    echo "CONFIG_LINUX_AIO=y" >> $config_host_mak
-> diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-> index 063889beaf4a..f5ec97ed4f48 100644
-> --- a/hw/display/Makefile.objs
-> +++ b/hw/display/Makefile.objs
-> @@ -5,7 +5,7 @@ common-obj-$(CONFIG_JAZZ_LED) += jazz_led.o
->  common-obj-$(CONFIG_PL110) += pl110.o
->  common-obj-$(CONFIG_SSD0303) += ssd0303.o
->  common-obj-$(CONFIG_SSD0323) += ssd0323.o
-> -common-obj-$(CONFIG_XEN_BACKEND) += xenfb.o
-> +common-obj-$(CONFIG_XEN_FB_BACKEND) += xenfb.o
->  
->  common-obj-$(CONFIG_VGA_PCI) += vga-pci.o
->  common-obj-$(CONFIG_VGA_ISA) += vga-isa.o
-> diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
-> index d1190041ae12..5146cbba6ca5 100644
-> --- a/hw/xen/xen_backend.c
-> +++ b/hw/xen/xen_backend.c
-> @@ -582,7 +582,9 @@ void xen_be_register_common(void)
->      xen_set_dynamic_sysbus();
->  
->      xen_be_register("console", &xen_console_ops);
-> +#ifdef CONFIG_XEN_FB_BACKEND
->      xen_be_register("vkbd", &xen_kbdmouse_ops);
-> +#endif
->      xen_be_register("qdisk", &xen_blkdev_ops);
->  #ifdef CONFIG_USB_LIBUSB
->      xen_be_register("qusb", &xen_usb_ops);
-> diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
-> index 79aef4ecc37b..b731344c3f0a 100644
-> --- a/hw/xenpv/xen_machine_pv.c
-> +++ b/hw/xenpv/xen_machine_pv.c
-> @@ -68,7 +68,9 @@ static void xen_init_pv(MachineState *machine)
->      }
->  
->      xen_be_register_common();
-> +#ifdef CONFIG_XEN_FB_BACKEND
->      xen_be_register("vfb", &xen_framebuffer_ops);
-> +#endif
->      xen_be_register("qnic", &xen_netdev_ops);
->  
->      /* configure framebuffer */
-> @@ -95,8 +97,10 @@ static void xen_init_pv(MachineState *machine)
->      /* config cleanup hook */
->      atexit(xen_config_cleanup);
->  
-> +#ifdef CONFIG_XEN_FB_BACKEND
->      /* setup framebuffer */
->      xen_init_display(xen_domid);
-> +#endif
->  }
->  
->  static void xenpv_machine_init(MachineClass *mc)
-> -- 
-> 2.7.4
-> 
+>
+> Thanks, applied to my block-next tree:
+> https://github.com/stefanha/qemu/commits/block-next
+>
+> Stefan
