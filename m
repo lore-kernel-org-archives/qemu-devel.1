@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cywra-0004Ah-6d
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:45:55 -0400
+	(envelope-from <yin.zuowei@zte.com.cn>) id 1cywsY-0004oB-QL
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:46:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cywrY-0004BF-PG
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:45:54 -0400
-MIME-Version: 1.0
-In-Reply-To: <20170414080206.2301-1-famz@redhat.com>
-References: <20170414080206.2301-1-famz@redhat.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Fri, 14 Apr 2017 09:45:50 +0100
-Message-ID: <CAJSP0QVgYNHh6P8HG20fzuq1dpMOAVs4ciY8Ho1hYLHED3xa_g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.9-rc5 v2] block: Drain
- BH in bdrv_drained_begin
+	(envelope-from <yin.zuowei@zte.com.cn>) id 1cywsV-0004mr-KZ
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:46:54 -0400
+Received: from mx7.zte.com.cn ([202.103.147.169]:36959)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <yin.zuowei@zte.com.cn>) id 1cywsT-0004eP-RJ
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:46:51 -0400
+Received: from notes_smtp.zte.com.cn ([10.30.1.239])
+	by mse01.zte.com.cn with ESMTP id v3E8kKeC058304
+	for <qemu-devel@nongnu.org>; Fri, 14 Apr 2017 16:46:20 +0800 (GMT-8)
+	(envelope-from yin.zuowei@zte.com.cn)
+Date: Fri, 14 Apr 2017 16:46:21 +0800 (CST)
+Message-ID: <201704141646219600739@zte.com.cn>
+Mime-Version: 1.0
+From: <yin.zuowei@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
+Subject: [Qemu-devel] =?utf-8?q?=5BBUG=5D_network_=3A_windows_os_lost_ip_a?=
+ =?utf-8?q?ddress_of_the_network_card_=C2=A0in_some_cases?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,169 +30,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Fri, Apr 14, 2017 at 9:02 AM, Fam Zheng <famz@redhat.com> wrote:
-> During block job completion, nothing is preventing
-> block_job_defer_to_main_loop_bh from being called in a nested
-> aio_poll(), which is a trouble, such as in this code path:
->
->     qmp_block_commit
->       commit_active_start
->         bdrv_reopen
->           bdrv_reopen_multiple
->             bdrv_reopen_prepare
->               bdrv_flush
->                 aio_poll
->                   aio_bh_poll
->                     aio_bh_call
->                       block_job_defer_to_main_loop_bh
->                         stream_complete
->                           bdrv_reopen
->
-> block_job_defer_to_main_loop_bh is the last step of the stream job,
-> which should have been "paused" by the bdrv_drained_begin/end in
-> bdrv_reopen_multiple, but it is not done because it's in the form of a
-> main loop BH.
->
-> Similar to why block jobs should be paused between drained_begin and
-> drained_end, BHs they schedule must be excluded as well.  To achieve
-> this, this patch forces draining the BH in BDRV_POLL_WHILE.
->
-> Also because the BH in question can do bdrv_unref and child replacing,
-> protect @bs carefully to avoid use-after-free.
->
-> As a side effect this fixes a hang in block_job_detach_aio_context
-> during system_reset when a block job is ready:
->
->     #0  0x0000555555aa79f3 in bdrv_drain_recurse
->     #1  0x0000555555aa825d in bdrv_drained_begin
->     #2  0x0000555555aa8449 in bdrv_drain
->     #3  0x0000555555a9c356 in blk_drain
->     #4  0x0000555555aa3cfd in mirror_drain
->     #5  0x0000555555a66e11 in block_job_detach_aio_context
->     #6  0x0000555555a62f4d in bdrv_detach_aio_context
->     #7  0x0000555555a63116 in bdrv_set_aio_context
->     #8  0x0000555555a9d326 in blk_set_aio_context
->     #9  0x00005555557e38da in virtio_blk_data_plane_stop
->     #10 0x00005555559f9d5f in virtio_bus_stop_ioeventfd
->     #11 0x00005555559fa49b in virtio_bus_stop_ioeventfd
->     #12 0x00005555559f6a18 in virtio_pci_stop_ioeventfd
->     #13 0x00005555559f6a18 in virtio_pci_reset
->     #14 0x00005555559139a9 in qdev_reset_one
->     #15 0x0000555555916738 in qbus_walk_children
->     #16 0x0000555555913318 in qdev_walk_children
->     #17 0x0000555555916738 in qbus_walk_children
->     #18 0x00005555559168ca in qemu_devices_reset
->     #19 0x000055555581fcbb in pc_machine_reset
->     #20 0x00005555558a4d96 in qemu_system_reset
->     #21 0x000055555577157a in main_loop_should_exit
->     #22 0x000055555577157a in main_loop
->     #23 0x000055555577157a in main
->
-> The rationale is that the loop in block_job_detach_aio_context cannot
-> make any progress in pausing/completing the job, because bs->in_flight
-> is 0, so bdrv_drain doesn't process the block_job_defer_to_main_loop
-> BH. With this patch, it does.
->
-> Reported-by: Jeff Cody <jcody@redhat.com>
-> Signed-off-by: Fam Zheng <famz@redhat.com>
->
-> ---
->
-> v2: Do the BH poll in BDRV_POLL_WHILE to cover bdrv_drain_all_begin as
-> well. [Kevin]
-> ---
->  block/io.c            | 10 +++++++---
->  include/block/block.h | 21 +++++++++++++--------
->  2 files changed, 20 insertions(+), 11 deletions(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
->
-> diff --git a/block/io.c b/block/io.c
-> index 8706bfa..a472157 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -158,7 +158,7 @@ bool bdrv_requests_pending(BlockDriverState *bs)
->
->  static bool bdrv_drain_recurse(BlockDriverState *bs)
->  {
-> -    BdrvChild *child;
-> +    BdrvChild *child, *tmp;
->      bool waited;
->
->      waited = BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
-> @@ -167,8 +167,12 @@ static bool bdrv_drain_recurse(BlockDriverState *bs)
->          bs->drv->bdrv_drain(bs);
->      }
->
-> -    QLIST_FOREACH(child, &bs->children, next) {
-> -        waited |= bdrv_drain_recurse(child->bs);
-> +    QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
-> +        BlockDriverState *bs = child->bs;
-> +        assert(bs->refcnt > 0);
-> +        bdrv_ref(bs);
-> +        waited |= bdrv_drain_recurse(bs);
-> +        bdrv_unref(bs);
->      }
-
-There are other loops over bs->children in the block layer code.  If a
-they indirectly call aio_poll() then the child bs could disappear.
-They should probably also take areference.
-
-That said, I wonder if this really solves the problem of graph changes
-during bs->children traversal.  We now have a reference but are
-iterating over stale data.
-
-This is a separate issue and doesn't need to hold up this patch.
-
->
->      return waited;
-> diff --git a/include/block/block.h b/include/block/block.h
-> index 97d4330..3f05e71 100644
-> --- a/include/block/block.h
-> +++ b/include/block/block.h
-> @@ -381,12 +381,13 @@ void bdrv_drain_all(void);
->
->  #define BDRV_POLL_WHILE(bs, cond) ({                       \
->      bool waited_ = false;                                  \
-> +    bool busy_ = true;                                     \
->      BlockDriverState *bs_ = (bs);                          \
->      AioContext *ctx_ = bdrv_get_aio_context(bs_);          \
->      if (aio_context_in_iothread(ctx_)) {                   \
-> -        while ((cond)) {                                   \
-> -            aio_poll(ctx_, true);                          \
-> -            waited_ = true;                                \
-> +        while ((cond) || busy_) {                          \
-> +            busy_ = aio_poll(ctx_, (cond));                \
-> +            waited_ |= !!(cond);                           \
->          }                                                  \
->      } else {                                               \
->          assert(qemu_get_current_aio_context() ==           \
-> @@ -398,11 +399,15 @@ void bdrv_drain_all(void);
->           */                                                \
->          assert(!bs_->wakeup);                              \
->          bs_->wakeup = true;                                \
-> -        while ((cond)) {                                   \
-> -            aio_context_release(ctx_);                     \
-> -            aio_poll(qemu_get_aio_context(), true);        \
-> -            aio_context_acquire(ctx_);                     \
-> -            waited_ = true;                                \
-> +        while (busy_) {                                    \
-> +            if ((cond)) {                                  \
-> +                waited_ = busy_ = true;                    \
-> +                aio_context_release(ctx_);                 \
-> +                aio_poll(qemu_get_aio_context(), true);    \
-> +                aio_context_acquire(ctx_);                 \
-> +            } else {                                       \
-> +                busy_ = aio_poll(ctx_, false);             \
-> +            }                                              \
->          }                                                  \
->          bs_->wakeup = false;                               \
->      }                                                      \
-> --
-> 2.9.3
->
->
+d2UgIGZvdW5kIHRoaXMgcHJvYmxlbSBmb3IgYSBsb25nIHRpbWUg44CCRm9yIGV4YW1wbGUsIGlm
+IHdlIGhhcyB0aHJlZSBuZXR3b3JrIGNhcmQgaW4gdmlydHVhbCB4bWwgZmlsZSDvvIxzdWNoIGFz
+ICJuZXR3b3JrIGNvbm5lY3Rpb24gMSIgLyAibmV0d29yayBjb25uZWN0aW9uIDIiLyJuZXR3b3Jr
+IGNvbm5lY3Rpb24gMyIg44CCDQoNCkVjaG8gbmV0d29yayBjYXJkIGhhcyBvd24gaXAgYWRkcmVz
+cyDvvIxzdWNoIGFzIDE5Mi4xNjguMS4xIC8gMi4xIC8zLjEgLCB3aGVuIGRlbGV0ZSB0aGUgZmly
+c3QgY2FyZCDvvIxyZWJvb3QgdGhlIHdpbmRvd3MgdmlydHVhbCBvcywgdGhlbiB0aGlzIHByb2Js
+ZW0gaGFwcGVuZWQgIQ0KDQoNCg0KDQp3ZSBmb3VuZCB0aGF0IHRoZSBzZW5jb25kIG5ldHdvcmsg
+Y2FyZCB3aWxsICByZXBsYWNlIHRoZSBmaXJzdCBvbmUgLCB0aGVuIHRoZSBpcCBhZGRyZXNzIG9m
+ICJuZXR3b3JrIGNvbm5lY3Rpb24gMiAiIGJlY29tZSAxOTIuMTY4LjEuMSDjgIINCg0KDQpPdXIg
+dGhpcmQgcGFydHkgdXNlcnMgYmVnYW4gdG8gY29tcGxhaW4gYWJvdXQgdGhpcyBidWcg44CCQWxs
+IHRoZSBidXNpbmVzcyBvZiB0aGUgc2Vjb25kIGlwICBsb3N0ICEhISANCg0KSSBtZWFuIGJvdGgg
+b2Ygd2luZG93cyBhbmQgbGludXggaGFzIHRoaXMgYnVnICwgIHdlIHNvbHZlIHRoaXMgYnVnIGlu
+IGxpbnV4ICB0aHJvdWdodCBib25kaW5nIG5ldGNyYWQgcGNpIGFuZCBtYWMgYWRkcmVzcyDjgIIN
+Cg0KVGhlcmUgaXMgbm8gZ29vZCBzb2x1dGlvbiBvbiB3aW5kb3dzIG9zIC4gdGhlcmEgYXJlID8g
+IHdlIGltcGxlbWVudGVkIGEgcGxhbiB0byByZXN1bXB0aW9uIG9mIElQIGJ5IFFHQS4gIElzIHRo
+ZXJlIGEgYmV0dGVyIHdheSA/
