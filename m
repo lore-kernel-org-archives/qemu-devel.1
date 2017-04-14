@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56935)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cywjX-0006k1-Fn
+	(envelope-from <lvivier@redhat.com>) id 1cywjX-0006jg-2g
 	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:37:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cywjW-0008OG-CU
+	(envelope-from <lvivier@redhat.com>) id 1cywjW-0008O6-7u
 	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:37:35 -0400
 From: Laurent Vivier <lvivier@redhat.com>
-Date: Fri, 14 Apr 2017 10:37:14 +0200
-Message-Id: <20170414083717.13641-2-lvivier@redhat.com>
-In-Reply-To: <20170414083717.13641-1-lvivier@redhat.com>
-References: <20170414083717.13641-1-lvivier@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/4] arm: remove remaining
+Date: Fri, 14 Apr 2017 10:37:13 +0200
+Message-Id: <20170414083717.13641-1-lvivier@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/4] qdev: remove all remaining
  cannot_destroy_with_object_finalize_yet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,140 +21,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alistair Francis <alistair.francis@xilinx.com>, Antony Pavlov <antonynpavlov@gmail.com>, Beniamino Galvani <b.galvani@gmail.com>, Markus Armbruster <armbru@redhat.com>, qemu-arm@nongnu.org, Laurent Vivier <lvivier@redhat.com>
 
-With commit ce5b1bbf624b ("exec: move cpu_exec_init() calls to
-realize functions"), we can now remove all the
-remaining cannot_destroy_with_object_finalize_yet as
-unsafe references have been moved to cpu_exec_realizefn().
-(tested with QOM command provided by commit 4c315c27).
+This series removes all the remaining uses of
+cannot_destroy_with_object_finalize_yet to finally remove
+the flag itself.
 
-Suggested-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
----
- hw/arm/allwinner-a10.c | 6 ------
- hw/arm/bcm2836.c       | 6 ------
- hw/arm/digic.c         | 6 ------
- hw/arm/fsl-imx25.c     | 5 -----
- hw/arm/fsl-imx31.c     | 5 -----
- hw/arm/fsl-imx6.c      | 5 -----
- hw/arm/xlnx-zynqmp.c   | 6 ------
- 7 files changed, 39 deletions(-)
+The ARM patch has already been sent alone and reviewed by Markus.
+I have tested the ppc one on ppc64 machine with KVM and using
+QDM device-list-properties command.
 
-diff --git a/hw/arm/allwinner-a10.c b/hw/arm/allwinner-a10.c
-index ca15d1c..f62a9a3 100644
---- a/hw/arm/allwinner-a10.c
-+++ b/hw/arm/allwinner-a10.c
-@@ -118,12 +118,6 @@ static void aw_a10_class_init(ObjectClass *oc, void *data)
-     DeviceClass *dc = DEVICE_CLASS(oc);
- 
-     dc->realize = aw_a10_realize;
--
--    /*
--     * Reason: creates an ARM CPU, thus use after free(), see
--     * arm_cpu_class_init()
--     */
--    dc->cannot_destroy_with_object_finalize_yet = true;
- }
- 
- static const TypeInfo aw_a10_type_info = {
-diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
-index 8451190..8c43291 100644
---- a/hw/arm/bcm2836.c
-+++ b/hw/arm/bcm2836.c
-@@ -160,12 +160,6 @@ static void bcm2836_class_init(ObjectClass *oc, void *data)
- 
-     dc->props = bcm2836_props;
-     dc->realize = bcm2836_realize;
--
--    /*
--     * Reason: creates an ARM CPU, thus use after free(), see
--     * arm_cpu_class_init()
--     */
--    dc->cannot_destroy_with_object_finalize_yet = true;
- }
- 
- static const TypeInfo bcm2836_type_info = {
-diff --git a/hw/arm/digic.c b/hw/arm/digic.c
-index d60ea39..94f3263 100644
---- a/hw/arm/digic.c
-+++ b/hw/arm/digic.c
-@@ -101,12 +101,6 @@ static void digic_class_init(ObjectClass *oc, void *data)
-     DeviceClass *dc = DEVICE_CLASS(oc);
- 
-     dc->realize = digic_realize;
--
--    /*
--     * Reason: creates an ARM CPU, thus use after free(), see
--     * arm_cpu_class_init()
--     */
--    dc->cannot_destroy_with_object_finalize_yet = true;
- }
- 
- static const TypeInfo digic_type_info = {
-diff --git a/hw/arm/fsl-imx25.c b/hw/arm/fsl-imx25.c
-index 2126f73..9056f27 100644
---- a/hw/arm/fsl-imx25.c
-+++ b/hw/arm/fsl-imx25.c
-@@ -290,11 +290,6 @@ static void fsl_imx25_class_init(ObjectClass *oc, void *data)
- 
-     dc->realize = fsl_imx25_realize;
- 
--    /*
--     * Reason: creates an ARM CPU, thus use after free(), see
--     * arm_cpu_class_init()
--     */
--    dc->cannot_destroy_with_object_finalize_yet = true;
-     dc->desc = "i.MX25 SOC";
- }
- 
-diff --git a/hw/arm/fsl-imx31.c b/hw/arm/fsl-imx31.c
-index dd1c713..d7e2d83 100644
---- a/hw/arm/fsl-imx31.c
-+++ b/hw/arm/fsl-imx31.c
-@@ -262,11 +262,6 @@ static void fsl_imx31_class_init(ObjectClass *oc, void *data)
- 
-     dc->realize = fsl_imx31_realize;
- 
--    /*
--     * Reason: creates an ARM CPU, thus use after free(), see
--     * arm_cpu_class_init()
--     */
--    dc->cannot_destroy_with_object_finalize_yet = true;
-     dc->desc = "i.MX31 SOC";
- }
- 
-diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
-index 76dd8a4..6969e73 100644
---- a/hw/arm/fsl-imx6.c
-+++ b/hw/arm/fsl-imx6.c
-@@ -442,11 +442,6 @@ static void fsl_imx6_class_init(ObjectClass *oc, void *data)
- 
-     dc->realize = fsl_imx6_realize;
- 
--    /*
--     * Reason: creates an ARM CPU, thus use after free(), see
--     * arm_cpu_class_init()
--     */
--    dc->cannot_destroy_with_object_finalize_yet = true;
-     dc->desc = "i.MX6 SOC";
- }
- 
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index bc4e66b..4f67158 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -439,12 +439,6 @@ static void xlnx_zynqmp_class_init(ObjectClass *oc, void *data)
- 
-     dc->props = xlnx_zynqmp_props;
-     dc->realize = xlnx_zynqmp_realize;
--
--    /*
--     * Reason: creates an ARM CPU, thus use after free(), see
--     * arm_cpu_class_init()
--     */
--    dc->cannot_destroy_with_object_finalize_yet = true;
- }
- 
- static const TypeInfo xlnx_zynqmp_type_info = {
+For the versatile one, the flag allowed to workaround a problem
+in the bus unparent function: the bus unparent is trying to
+unparent all the children of the bus. To do that, it has a list
+of the children of the bus, and calls object_unparent() for each
+child, and object_unparent() calls object_property_del_child() if
+obj->parent is not NULL.  As qdev_set_parent_bus() set only
+parent_bus and the list of children, parent is NULL and the child
+is never deleted.  We can avoid the problem by moving the
+qdev_set_parent_bus() to the realize part.
+
+I've tested all the changes with "make check" (including
+device-introspect-test). I've booted a versatilepb machine
+with a 3.16.0-4 debian installer kernel.
+
+Laurent Vivier (4):
+  arm: remove remaining cannot_destroy_with_object_finalize_yet
+  ppc: remove cannot_destroy_with_object_finalize_yet
+  versatile: remove cannot_destroy_with_object_finalize_yet
+  qdev: remove cannot_destroy_with_object_finalize_yet
+
+ hw/arm/allwinner-a10.c  |  6 ------
+ hw/arm/bcm2836.c        |  6 ------
+ hw/arm/digic.c          |  6 ------
+ hw/arm/fsl-imx25.c      |  5 -----
+ hw/arm/fsl-imx31.c      |  5 -----
+ hw/arm/fsl-imx6.c       |  5 -----
+ hw/arm/xlnx-zynqmp.c    |  6 ------
+ hw/pci-host/versatile.c | 35 ++++++++++++-----------------------
+ include/hw/qdev-core.h  | 13 -------------
+ qmp.c                   |  5 -----
+ target/ppc/kvm.c        | 10 ----------
+ 11 files changed, 12 insertions(+), 90 deletions(-)
+
 -- 
 2.9.3
