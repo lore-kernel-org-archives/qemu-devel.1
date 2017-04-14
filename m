@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cyoae-0000WN-6K
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 19:55:53 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1cyoqn-0003Gf-St
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 20:12:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cyoaZ-00005f-1y
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 19:55:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57586)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cyoaY-00005G-SF
-	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 19:55:46 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cyoaW-0003mP-Qb
-	for <qemu-devel@nongnu.org>; Thu, 13 Apr 2017 23:55:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A42A82E80CC
-	for <qemu-devel@nongnu.org>; Thu, 13 Apr 2017 23:55:44 +0000 (UTC)
+	(envelope-from <sstabellini@kernel.org>) id 1cyoqj-0007jX-IB
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 20:12:33 -0400
+Received: from mail.kernel.org ([198.145.29.136]:49160)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1cyoqj-0007ir-AH
+	for qemu-devel@nongnu.org; Thu, 13 Apr 2017 20:12:29 -0400
+Date: Thu, 13 Apr 2017 17:12:21 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <1491903346-16075-1-git-send-email-andr2000@gmail.com>
+Message-ID: <alpine.DEB.2.10.1704131704560.2759@sstabellini-ThinkPad-X260>
+References: <1491903346-16075-1-git-send-email-andr2000@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 13 Apr 2017 23:46:28 -0000
-From: =?utf-8?q?Bart=C5=82omeij_Bujak?= <1682681@bugs.launchpad.net>
-Reply-To: Bug 1682681 <1682681@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20170413234628.24443.78476.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1682681] [NEW] qemu 2.5 network model rtl8139
- collisions Ubuntu 16.04.2 LTS
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [Xen-devel][PATCH] configure: introduce
+ --enable-xen-fb-backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,51 +27,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Oleksandr Andrushchenko <andr2000@gmail.com>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, joculator@gmail.com, al1img@gmail.com, vlad.babchuk@gmail.com, andrii.anisov@gmail.com, olekstysh@gmail.com, sstabellini@kernel.org, anthony.perard@citrix.com, Oleksandr Andrushchenko <oleksandr_andrushchenko@epam.com>
 
-Public bug reported:
+On Tue, 11 Apr 2017, Oleksandr Andrushchenko wrote:
+> From: Oleksandr Andrushchenko <oleksandr_andrushchenko@epam.com>
+> 
+> For some use cases when Xen framebuffer/input backend
+> is not a part of Qemu it is required to disable it,
+> because of conflicting access to input/display devices.
+> Introduce additional configuration option for explicit
+> input/display control.
 
-When I use NIC model rtl8139, I have a lot collisions and very low transfer.
-I tested that with brctl and Open vSwitch, because I thought that was a vSw=
-itch issue. =
+In these cases when you don't want xenfb, why don't you just remove
+"vfb" from the xl config file? QEMU only starts the xenfb backend when
+requested by the toolstack.
 
-When I change NIC model to virtio all works as expect.
+Is it because you have an alternative xenfb backend? If so, is it really
+fully xenfb compatible, or is it a different protocol? If it is a
+different protocol, I suggest you rename your frontend/backend PV device
+name to something different from "vfb".
 
-Host: Ubuntu 16.04.2 LTS
-Guest: Ubuntu 14.04.5 LTS - affected
-Guest: Ubuntu 16.04.2 LTS - not affected
 
-QEMU emulator version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.10)
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1682681
-
-Title:
-  qemu 2.5 network model rtl8139 collisions Ubuntu 16.04.2 LTS
-
-Status in QEMU:
-  New
-
-Bug description:
-  When I use NIC model rtl8139, I have a lot collisions and very low transf=
-er.
-  I tested that with brctl and Open vSwitch, because I thought that was a v=
-Switch issue. =
-
-  When I change NIC model to virtio all works as expect.
-
-  Host: Ubuntu 16.04.2 LTS
-  Guest: Ubuntu 14.04.5 LTS - affected
-  Guest: Ubuntu 16.04.2 LTS - not affected
-
-  QEMU emulator version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.10)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1682681/+subscriptions
+> Signed-off-by: Oleksandr Andrushchenko <oleksandr_andrushchenko@epam.com>
+> ---
+>  configure                 | 18 ++++++++++++++++++
+>  hw/display/Makefile.objs  |  2 +-
+>  hw/xen/xen_backend.c      |  2 ++
+>  hw/xenpv/xen_machine_pv.c |  4 ++++
+>  4 files changed, 25 insertions(+), 1 deletion(-)
+> 
+> diff --git a/configure b/configure
+> index 476210b1b93f..b805cb908f03 100755
+> --- a/configure
+> +++ b/configure
+> @@ -220,6 +220,7 @@ xen=""
+>  xen_ctrl_version=""
+>  xen_pv_domain_build="no"
+>  xen_pci_passthrough=""
+> +xen_fb_backend=""
+>  linux_aio=""
+>  cap_ng=""
+>  attr=""
+> @@ -909,6 +910,10 @@ for opt do
+>    ;;
+>    --enable-xen-pv-domain-build) xen_pv_domain_build="yes"
+>    ;;
+> +  --disable-xen-fb-backend) xen_fb_backend="no"
+> +  ;;
+> +  --enable-xen-fb-backend) xen_fb_backend="yes"
+> +  ;;
+>    --disable-brlapi) brlapi="no"
+>    ;;
+>    --enable-brlapi) brlapi="yes"
+> @@ -1368,6 +1373,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+>    virtfs          VirtFS
+>    xen             xen backend driver support
+>    xen-pci-passthrough
+> +  xen-fb-backend  framebuffer/input backend support
+>    brlapi          BrlAPI (Braile)
+>    curl            curl connectivity
+>    fdt             fdt device tree
+> @@ -2213,6 +2219,15 @@ if test "$xen_pv_domain_build" = "yes" &&
+>  	       "which requires Xen support."
+>  fi
+>  
+> +if test "$xen_fb_backend" != "no"; then
+> +   if test "$xen" = "yes"; then
+> +     xen_fb_backend=yes
+> +   else
+> +     error_exit "User requested feature Xen framebufer backend support" \
+> +                " but this feature requires Xen support."
+> +   fi
+> +fi
+> +
+>  ##########################################
+>  # Sparse probe
+>  if test "$sparse" != "no" ; then
+> @@ -5444,6 +5459,9 @@ if test "$xen" = "yes" ; then
+>    if test "$xen_pv_domain_build" = "yes" ; then
+>      echo "CONFIG_XEN_PV_DOMAIN_BUILD=y" >> $config_host_mak
+>    fi
+> +  if test "$xen_fb_backend" = "yes" ; then
+> +    echo "CONFIG_XEN_FB_BACKEND=y" >> $config_host_mak
+> +  fi
+>  fi
+>  if test "$linux_aio" = "yes" ; then
+>    echo "CONFIG_LINUX_AIO=y" >> $config_host_mak
+> diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
+> index 063889beaf4a..f5ec97ed4f48 100644
+> --- a/hw/display/Makefile.objs
+> +++ b/hw/display/Makefile.objs
+> @@ -5,7 +5,7 @@ common-obj-$(CONFIG_JAZZ_LED) += jazz_led.o
+>  common-obj-$(CONFIG_PL110) += pl110.o
+>  common-obj-$(CONFIG_SSD0303) += ssd0303.o
+>  common-obj-$(CONFIG_SSD0323) += ssd0323.o
+> -common-obj-$(CONFIG_XEN_BACKEND) += xenfb.o
+> +common-obj-$(CONFIG_XEN_FB_BACKEND) += xenfb.o
+>  
+>  common-obj-$(CONFIG_VGA_PCI) += vga-pci.o
+>  common-obj-$(CONFIG_VGA_ISA) += vga-isa.o
+> diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
+> index d1190041ae12..5146cbba6ca5 100644
+> --- a/hw/xen/xen_backend.c
+> +++ b/hw/xen/xen_backend.c
+> @@ -582,7 +582,9 @@ void xen_be_register_common(void)
+>      xen_set_dynamic_sysbus();
+>  
+>      xen_be_register("console", &xen_console_ops);
+> +#ifdef CONFIG_XEN_FB_BACKEND
+>      xen_be_register("vkbd", &xen_kbdmouse_ops);
+> +#endif
+>      xen_be_register("qdisk", &xen_blkdev_ops);
+>  #ifdef CONFIG_USB_LIBUSB
+>      xen_be_register("qusb", &xen_usb_ops);
+> diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
+> index 79aef4ecc37b..b731344c3f0a 100644
+> --- a/hw/xenpv/xen_machine_pv.c
+> +++ b/hw/xenpv/xen_machine_pv.c
+> @@ -68,7 +68,9 @@ static void xen_init_pv(MachineState *machine)
+>      }
+>  
+>      xen_be_register_common();
+> +#ifdef CONFIG_XEN_FB_BACKEND
+>      xen_be_register("vfb", &xen_framebuffer_ops);
+> +#endif
+>      xen_be_register("qnic", &xen_netdev_ops);
+>  
+>      /* configure framebuffer */
+> @@ -95,8 +97,10 @@ static void xen_init_pv(MachineState *machine)
+>      /* config cleanup hook */
+>      atexit(xen_config_cleanup);
+>  
+> +#ifdef CONFIG_XEN_FB_BACKEND
+>      /* setup framebuffer */
+>      xen_init_display(xen_domid);
+> +#endif
+>  }
+>  
+>  static void xenpv_machine_init(MachineClass *mc)
+> -- 
+> 2.7.4
+> 
