@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cz5Oc-0000Q1-NH
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 13:52:35 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1cz6Fj-0007cU-RY
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 14:47:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cz5OY-0002WK-Qo
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 13:52:34 -0400
-Received: from mail.kernel.org ([198.145.29.136]:44206)
+	(envelope-from <sstabellini@kernel.org>) id 1cz6Fg-0008Bl-7e
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 14:47:27 -0400
+Received: from mail.kernel.org ([198.145.29.136]:51542)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1cz5OY-0002W9-IO
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 13:52:30 -0400
-Date: Fri, 14 Apr 2017 10:52:20 -0700 (PDT)
+	id 1cz6Fg-0008Ak-1F
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 14:47:24 -0400
+Date: Fri, 14 Apr 2017 11:47:18 -0700 (PDT)
 From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <f5ce758f-5f31-32d6-7e19-8c3a83017bab@suse.com>
-Message-ID: <alpine.DEB.2.10.1704141035090.23677@sstabellini-ThinkPad-X260>
-References: <1491903346-16075-1-git-send-email-andr2000@gmail.com>
-	<alpine.DEB.2.10.1704131704560.2759@sstabellini-ThinkPad-X260>
-	<693ebf90-00d7-823e-4db8-9b9686e56941@gmail.com>
-	<f5ce758f-5f31-32d6-7e19-8c3a83017bab@suse.com>
+In-Reply-To: <1491434491-1765-1-git-send-email-anthony.xu@intel.com>
+Message-ID: <alpine.DEB.2.10.1704141146580.23677@sstabellini-ThinkPad-X260>
+References: <1491434491-1765-1-git-send-email-anthony.xu@intel.com>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH] configure: introduce
- --enable-xen-fb-backend
+Subject: Re: [Qemu-devel] [PATCH 0/3] move xen related files to
+ corresponding xen directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,68 +27,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juergen Gross <jgross@suse.com>
-Cc: Oleksandr Andrushchenko <andr2000@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>, vlad.babchuk@gmail.com, qemu-devel@nongnu.org, andrii.anisov@gmail.com, olekstysh@gmail.com, al1img@gmail.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, joculator@gmail.com
+To: Anthony Xu <anthony.xu@intel.com>
+Cc: qemu-devel@nongnu.org, sstabellini@kernel.org, anthony.perard@citrix.com, pbonzini@redhat.com, eblake@redhat.com
 
-On Fri, 14 Apr 2017, Juergen Gross wrote:
-> On 14/04/17 08:06, Oleksandr Andrushchenko wrote:
-> > On 04/14/2017 03:12 AM, Stefano Stabellini wrote:
-> >> On Tue, 11 Apr 2017, Oleksandr Andrushchenko wrote:
-> >>> From: Oleksandr Andrushchenko <oleksandr_andrushchenko@epam.com>
-> >>>
-> >>> For some use cases when Xen framebuffer/input backend
-> >>> is not a part of Qemu it is required to disable it,
-> >>> because of conflicting access to input/display devices.
-> >>> Introduce additional configuration option for explicit
-> >>> input/display control.
-> >> In these cases when you don't want xenfb, why don't you just remove
-> >> "vfb" from the xl config file? QEMU only starts the xenfb backend when
-> >> requested by the toolstack.
-> >>
-> >> Is it because you have an alternative xenfb backend? If so, is it really
-> >> fully xenfb compatible, or is it a different protocol? If it is a
-> >> different protocol, I suggest you rename your frontend/backend PV device
-> >> name to something different from "vfb".
-> >>
-> > Well, offending part is vkbd actually (for multi-touch
-> > we run our own user-space backend which supports
-> > kbd/ptr/mtouch), but vfb and vkbd is the same backend
-> > in QEMU. So, I am ok for vfb, but just want vkbd off
-> > So, there are 2 options:
-> > 1. At compile time remove vkbd and still allow vfb
-> > 2. Remove xenfb completely, if acceptable (this is my case)
+On Wed, 5 Apr 2017, Anthony Xu wrote:
 > 
-> What about adding a Xenstore entry for backend type and let qemu test
-> for it being not present or containing "qemu"?
+>   move xen related files to corresponding xen directory
+> 
+>   move xen-common.c to hw/xen/
+>   move xen-hvm.c to hw/i386/xen/
+>   move xen-mapcache.c to hw/i386/xen/
+> 
+> Signed-off -by: Anthony Xu <anthony.xu@intel.com>
 
-That is what we do for the console, using the xenstore node "type". QEMU
-is "ioemu" while xenconsoled is "xenconsoled". Weirdly, instead of a
-backend node, it is a read-only frontend node, see
-tools/libxl/libxl_console.c:libxl__device_console_add.
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 
-Oleksandr, I am sorry to feature-creep this simple patch, but I think
-Juergen is right. But we cannot do it just for one protocol. We need to
-introduce a generic way to enable/disable backends in QEMU. Using a
-xenstore node is OK.
+I queued this series in my "next" branch.
 
-We could do exactly the same as the PV console, thus "type" = "ioemu",
-read-only, under the frontend xenstore directory. Or we could introduce
-new nodes. I would probably go for "backend-type" = "qemu" under the
-backend xenstore directory. I don't have a strong opinion about this. In
-the example below I'll use the PV console convention.
 
-For starters:
-
-* libxl needs to write the "type" node to xenstore for *all* protocols.
-  The "type" is not yet configurable.
-* qemu reads them for all backends, proceeds if "type" = "ioemu"
-
-These should be two simple patches. Stage 2:
-
-* we add options in the xl config file to configure any backend, libxl
-  set "type" accordingly (Maybe not *any*, but vif, vkbd, vfb could all
-  have a "type". It is OK if you only add an option for vkbd.)
-* non-QEMU backends, in particular Linux backends, also read the "type"
-  node and proceed if it's "linux"
-
-Does this sound OK to you?
+> 
+>  Makefile.target                              |  6 ------
+>  default-configs/i386-softmmu.mak             |  1 -
+>  default-configs/x86_64-softmmu.mak           |  1 -
+>  hw/i386/xen/Makefile.objs                    |  2 +-
+>  hw/i386/xen/trace-events                     | 17 +++++++++++++++++
+>  xen-hvm.c => hw/i386/xen/xen-hvm.c           |  2 +-
+>  xen-mapcache.c => hw/i386/xen/xen-mapcache.c |  2 +-
+>  hw/xen/Makefile.objs                         |  2 +-
+>  xen-common.c => hw/xen/xen-common.c          |  0
+>  stubs/Makefile.objs                          |  2 ++
+>  xen-common-stub.c => stubs/xen-common.c      |  0
+>  xen-hvm-stub.c => stubs/xen-hvm.c            |  0
+>  trace-events                                 | 16 ----------------
+>  13 files changed, 23 insertions(+), 28 deletions(-)
+>  rename xen-hvm.c => hw/i386/xen/xen-hvm.c (99%)
+>  rename xen-mapcache.c => hw/i386/xen/xen-mapcache.c (99%)
+>  rename xen-common.c => hw/xen/xen-common.c (100%)
+>  rename xen-common-stub.c => stubs/xen-common.c (100%)
+>  rename xen-hvm-stub.c => stubs/xen-hvm.c (100%)
+> 
+> -- 
+> 1.8.3.1
+> 
