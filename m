@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jgross@suse.com>) id 1cyww1-0006LP-Ha
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:50:30 -0400
+	(envelope-from <stefanha@gmail.com>) id 1cywxH-0006rT-M8
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:51:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jgross@suse.com>) id 1cywvy-0005wD-Fi
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:50:29 -0400
-Received: from mx2.suse.de ([195.135.220.15]:59661 helo=mx1.suse.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jgross@suse.com>) id 1cywvy-0005vA-8U
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:50:26 -0400
-References: <1491903346-16075-1-git-send-email-andr2000@gmail.com>
-	<alpine.DEB.2.10.1704131704560.2759@sstabellini-ThinkPad-X260>
-	<693ebf90-00d7-823e-4db8-9b9686e56941@gmail.com>
-From: Juergen Gross <jgross@suse.com>
-Message-ID: <f5ce758f-5f31-32d6-7e19-8c3a83017bab@suse.com>
-Date: Fri, 14 Apr 2017 10:50:21 +0200
+	(envelope-from <stefanha@gmail.com>) id 1cywxG-0006iZ-NW
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:51:47 -0400
 MIME-Version: 1.0
-In-Reply-To: <693ebf90-00d7-823e-4db8-9b9686e56941@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH] configure: introduce
- --enable-xen-fb-backend
+In-Reply-To: <20170414080206.2301-1-famz@redhat.com>
+References: <20170414080206.2301-1-famz@redhat.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Fri, 14 Apr 2017 09:51:44 +0100
+Message-ID: <CAJSP0QVbYRW0VD_1zUqU0T6V48wr_g3co8Dxs_ndpfA70d4TkQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.9-rc5 v2] block: Drain
+ BH in bdrv_drained_begin
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +22,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Oleksandr Andrushchenko <andr2000@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>
-Cc: vlad.babchuk@gmail.com, qemu-devel@nongnu.org, andrii.anisov@gmail.com, olekstysh@gmail.com, al1img@gmail.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, joculator@gmail.com
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 14/04/17 08:06, Oleksandr Andrushchenko wrote:
-> On 04/14/2017 03:12 AM, Stefano Stabellini wrote:
->> On Tue, 11 Apr 2017, Oleksandr Andrushchenko wrote:
->>> From: Oleksandr Andrushchenko <oleksandr_andrushchenko@epam.com>
->>>
->>> For some use cases when Xen framebuffer/input backend
->>> is not a part of Qemu it is required to disable it,
->>> because of conflicting access to input/display devices.
->>> Introduce additional configuration option for explicit
->>> input/display control.
->> In these cases when you don't want xenfb, why don't you just remove
->> "vfb" from the xl config file? QEMU only starts the xenfb backend when
->> requested by the toolstack.
->>
->> Is it because you have an alternative xenfb backend? If so, is it really
->> fully xenfb compatible, or is it a different protocol? If it is a
->> different protocol, I suggest you rename your frontend/backend PV device
->> name to something different from "vfb".
->>
-> Well, offending part is vkbd actually (for multi-touch
-> we run our own user-space backend which supports
-> kbd/ptr/mtouch), but vfb and vkbd is the same backend
-> in QEMU. So, I am ok for vfb, but just want vkbd off
-> So, there are 2 options:
-> 1. At compile time remove vkbd and still allow vfb
-> 2. Remove xenfb completely, if acceptable (this is my case)
+On Fri, Apr 14, 2017 at 9:02 AM, Fam Zheng <famz@redhat.com> wrote:
+> @@ -398,11 +399,15 @@ void bdrv_drain_all(void);
+>           */                                                \
+>          assert(!bs_->wakeup);                              \
+>          bs_->wakeup = true;                                \
+> -        while ((cond)) {                                   \
+> -            aio_context_release(ctx_);                     \
+> -            aio_poll(qemu_get_aio_context(), true);        \
+> -            aio_context_acquire(ctx_);                     \
+> -            waited_ = true;                                \
+> +        while (busy_) {                                    \
+> +            if ((cond)) {                                  \
+> +                waited_ = busy_ = true;                    \
+> +                aio_context_release(ctx_);                 \
+> +                aio_poll(qemu_get_aio_context(), true);    \
+> +                aio_context_acquire(ctx_);                 \
+> +            } else {                                       \
+> +                busy_ = aio_poll(ctx_, false);             \
+> +            }                                              \
 
-What about adding a Xenstore entry for backend type and let qemu test
-for it being not present or containing "qemu"?
+Wait, I'm confused.  The current thread is not in the BDS AioContext.
+We're not allowed to call aio_poll(ctx_, false).
 
+Did you mean aio_poll(qemu_get_aio_context(), false) in order to
+process defer to main loop BHs?
 
-Juergen
+Stefan
