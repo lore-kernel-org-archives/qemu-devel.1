@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yin.zuowei@zte.com.cn>) id 1cywsY-0004oB-QL
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:46:56 -0400
+	(envelope-from <jgross@suse.com>) id 1cyww1-0006LP-Ha
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:50:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yin.zuowei@zte.com.cn>) id 1cywsV-0004mr-KZ
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:46:54 -0400
-Received: from mx7.zte.com.cn ([202.103.147.169]:36959)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yin.zuowei@zte.com.cn>) id 1cywsT-0004eP-RJ
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:46:51 -0400
-Received: from notes_smtp.zte.com.cn ([10.30.1.239])
-	by mse01.zte.com.cn with ESMTP id v3E8kKeC058304
-	for <qemu-devel@nongnu.org>; Fri, 14 Apr 2017 16:46:20 +0800 (GMT-8)
-	(envelope-from yin.zuowei@zte.com.cn)
-Date: Fri, 14 Apr 2017 16:46:21 +0800 (CST)
-Message-ID: <201704141646219600739@zte.com.cn>
-Mime-Version: 1.0
-From: <yin.zuowei@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: [Qemu-devel] =?utf-8?q?=5BBUG=5D_network_=3A_windows_os_lost_ip_a?=
- =?utf-8?q?ddress_of_the_network_card_=C2=A0in_some_cases?=
+	(envelope-from <jgross@suse.com>) id 1cywvy-0005wD-Fi
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:50:29 -0400
+Received: from mx2.suse.de ([195.135.220.15]:59661 helo=mx1.suse.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jgross@suse.com>) id 1cywvy-0005vA-8U
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:50:26 -0400
+References: <1491903346-16075-1-git-send-email-andr2000@gmail.com>
+	<alpine.DEB.2.10.1704131704560.2759@sstabellini-ThinkPad-X260>
+	<693ebf90-00d7-823e-4db8-9b9686e56941@gmail.com>
+From: Juergen Gross <jgross@suse.com>
+Message-ID: <f5ce758f-5f31-32d6-7e19-8c3a83017bab@suse.com>
+Date: Fri, 14 Apr 2017 10:50:21 +0200
+MIME-Version: 1.0
+In-Reply-To: <693ebf90-00d7-823e-4db8-9b9686e56941@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Xen-devel] [PATCH] configure: introduce
+ --enable-xen-fb-backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,21 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Oleksandr Andrushchenko <andr2000@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>
+Cc: vlad.babchuk@gmail.com, qemu-devel@nongnu.org, andrii.anisov@gmail.com, olekstysh@gmail.com, al1img@gmail.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, joculator@gmail.com
 
-d2UgIGZvdW5kIHRoaXMgcHJvYmxlbSBmb3IgYSBsb25nIHRpbWUg44CCRm9yIGV4YW1wbGUsIGlm
-IHdlIGhhcyB0aHJlZSBuZXR3b3JrIGNhcmQgaW4gdmlydHVhbCB4bWwgZmlsZSDvvIxzdWNoIGFz
-ICJuZXR3b3JrIGNvbm5lY3Rpb24gMSIgLyAibmV0d29yayBjb25uZWN0aW9uIDIiLyJuZXR3b3Jr
-IGNvbm5lY3Rpb24gMyIg44CCDQoNCkVjaG8gbmV0d29yayBjYXJkIGhhcyBvd24gaXAgYWRkcmVz
-cyDvvIxzdWNoIGFzIDE5Mi4xNjguMS4xIC8gMi4xIC8zLjEgLCB3aGVuIGRlbGV0ZSB0aGUgZmly
-c3QgY2FyZCDvvIxyZWJvb3QgdGhlIHdpbmRvd3MgdmlydHVhbCBvcywgdGhlbiB0aGlzIHByb2Js
-ZW0gaGFwcGVuZWQgIQ0KDQoNCg0KDQp3ZSBmb3VuZCB0aGF0IHRoZSBzZW5jb25kIG5ldHdvcmsg
-Y2FyZCB3aWxsICByZXBsYWNlIHRoZSBmaXJzdCBvbmUgLCB0aGVuIHRoZSBpcCBhZGRyZXNzIG9m
-ICJuZXR3b3JrIGNvbm5lY3Rpb24gMiAiIGJlY29tZSAxOTIuMTY4LjEuMSDjgIINCg0KDQpPdXIg
-dGhpcmQgcGFydHkgdXNlcnMgYmVnYW4gdG8gY29tcGxhaW4gYWJvdXQgdGhpcyBidWcg44CCQWxs
-IHRoZSBidXNpbmVzcyBvZiB0aGUgc2Vjb25kIGlwICBsb3N0ICEhISANCg0KSSBtZWFuIGJvdGgg
-b2Ygd2luZG93cyBhbmQgbGludXggaGFzIHRoaXMgYnVnICwgIHdlIHNvbHZlIHRoaXMgYnVnIGlu
-IGxpbnV4ICB0aHJvdWdodCBib25kaW5nIG5ldGNyYWQgcGNpIGFuZCBtYWMgYWRkcmVzcyDjgIIN
-Cg0KVGhlcmUgaXMgbm8gZ29vZCBzb2x1dGlvbiBvbiB3aW5kb3dzIG9zIC4gdGhlcmEgYXJlID8g
-IHdlIGltcGxlbWVudGVkIGEgcGxhbiB0byByZXN1bXB0aW9uIG9mIElQIGJ5IFFHQS4gIElzIHRo
-ZXJlIGEgYmV0dGVyIHdheSA/
+On 14/04/17 08:06, Oleksandr Andrushchenko wrote:
+> On 04/14/2017 03:12 AM, Stefano Stabellini wrote:
+>> On Tue, 11 Apr 2017, Oleksandr Andrushchenko wrote:
+>>> From: Oleksandr Andrushchenko <oleksandr_andrushchenko@epam.com>
+>>>
+>>> For some use cases when Xen framebuffer/input backend
+>>> is not a part of Qemu it is required to disable it,
+>>> because of conflicting access to input/display devices.
+>>> Introduce additional configuration option for explicit
+>>> input/display control.
+>> In these cases when you don't want xenfb, why don't you just remove
+>> "vfb" from the xl config file? QEMU only starts the xenfb backend when
+>> requested by the toolstack.
+>>
+>> Is it because you have an alternative xenfb backend? If so, is it really
+>> fully xenfb compatible, or is it a different protocol? If it is a
+>> different protocol, I suggest you rename your frontend/backend PV device
+>> name to something different from "vfb".
+>>
+> Well, offending part is vkbd actually (for multi-touch
+> we run our own user-space backend which supports
+> kbd/ptr/mtouch), but vfb and vkbd is the same backend
+> in QEMU. So, I am ok for vfb, but just want vkbd off
+> So, there are 2 options:
+> 1. At compile time remove vkbd and still allow vfb
+> 2. Remove xenfb completely, if acceptable (this is my case)
+
+What about adding a Xenstore entry for backend type and let qemu test
+for it being not present or containing "qemu"?
+
+
+Juergen
