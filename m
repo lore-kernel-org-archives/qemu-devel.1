@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1cz0ct-0001xX-6G
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 08:47:00 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1cz0cr-0001uK-D9
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 08:46:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1cz0cr-0002Bz-Nr
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 08:46:59 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1cz0cq-00029h-JS
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 08:46:57 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Fri, 14 Apr 2017 14:46:35 +0200
-Message-Id: <1492173995-14140-5-git-send-email-eric.auger@redhat.com>
+Date: Fri, 14 Apr 2017 14:46:34 +0200
+Message-Id: <1492173995-14140-4-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1492173995-14140-1-git-send-email-eric.auger@redhat.com>
 References: <1492173995-14140-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v5 4/4] hw/intc/arm_gicv3_its: Allow save/restore
+Subject: [Qemu-devel] [RFC v5 3/4] hw/intc/arm_gicv3_kvm: Implement pending
+ table save
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,107 +23,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: vijay.kilari@gmail.com, Vijaya.Kumar@cavium.com, drjones@redhat.com, christoffer.dall@linaro.org, quintela@redhat.com, dgilbert@redhat.com
 
-We change the restoration priority of both the GICv3 and ITS. The
-GICv3 must be restored before the ITS and the ITS needs to be restored
-before PCIe devices since it translates their MSI transactions.
+This patch adds the flush of the LPI pending bits into the
+redistributor pending tables. This happens on VM stop.
+
+There is no explicit restore as the tables are implicitly sync'ed
+on ITS table restore and on LPI enable at redistributor level.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
 
 ---
-v2 -> v3:
-- reword migration blocker message
-- remove unmigratable setting to false
 
-v1 -> v2:
-- handle case where migrate_add_blocker fails
-- add comments along with ITS and GICv3 migration priorities
+v5: new
 ---
- hw/intc/arm_gicv3_common.c     |  1 +
- hw/intc/arm_gicv3_its_common.c |  2 +-
- hw/intc/arm_gicv3_its_kvm.c    | 24 ++++++++++++------------
- include/migration/vmstate.h    |  2 ++
- 4 files changed, 16 insertions(+), 13 deletions(-)
+ hw/intc/arm_gicv3_kvm.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
-index c6493d6..4228b7c 100644
---- a/hw/intc/arm_gicv3_common.c
-+++ b/hw/intc/arm_gicv3_common.c
-@@ -145,6 +145,7 @@ static const VMStateDescription vmstate_gicv3 = {
-     .minimum_version_id = 1,
-     .pre_save = gicv3_pre_save,
-     .post_load = gicv3_post_load,
-+    .priority = MIG_PRI_GICV3,
-     .fields = (VMStateField[]) {
-         VMSTATE_UINT32(gicd_ctlr, GICv3State),
-         VMSTATE_UINT32_ARRAY(gicd_statusr, GICv3State, 2),
-diff --git a/hw/intc/arm_gicv3_its_common.c b/hw/intc/arm_gicv3_its_common.c
-index efab8c7..22ce4c4 100644
---- a/hw/intc/arm_gicv3_its_common.c
-+++ b/hw/intc/arm_gicv3_its_common.c
-@@ -48,7 +48,7 @@ static const VMStateDescription vmstate_its = {
-     .name = "arm_gicv3_its",
-     .pre_save = gicv3_its_pre_save,
-     .post_load = gicv3_its_post_load,
--    .unmigratable = true,
-+    .priority = MIG_PRI_GICV3_ITS,
-     .fields = (VMStateField[]) {
-         VMSTATE_UINT32(ctlr, GICv3ITSState),
-         VMSTATE_UINT32(iidr, GICv3ITSState),
-diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
-index 7c5502c..8401d2f 100644
---- a/hw/intc/arm_gicv3_its_kvm.c
-+++ b/hw/intc/arm_gicv3_its_kvm.c
-@@ -77,18 +77,6 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
-     GICv3ITSState *s = ARM_GICV3_ITS_COMMON(dev);
-     Error *local_err = NULL;
+diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+index 19aab56..9898c49 100644
+--- a/hw/intc/arm_gicv3_kvm.c
++++ b/hw/intc/arm_gicv3_kvm.c
+@@ -25,6 +25,7 @@
+ #include "hw/sysbus.h"
+ #include "qemu/error-report.h"
+ #include "sysemu/kvm.h"
++#include "sysemu/sysemu.h"
+ #include "kvm_arm.h"
+ #include "gicv3_internal.h"
+ #include "vgic_common.h"
+@@ -680,6 +681,26 @@ static const ARMCPRegInfo gicv3_cpuif_reginfo[] = {
+     REGINFO_SENTINEL
+ };
  
--    /*
--     * Block migration of a KVM GICv3 ITS device: the API for saving and
--     * restoring the state in the kernel is not yet available
--     */
--    error_setg(&s->migration_blocker, "vITS migration is not implemented");
--    migrate_add_blocker(s->migration_blocker, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        error_free(s->migration_blocker);
--        return;
--    }
--
-     s->dev_fd = kvm_create_device(kvm_state, KVM_DEV_TYPE_ARM_VGIC_ITS, false);
-     if (s->dev_fd < 0) {
-         error_setg_errno(errp, -s->dev_fd, "error creating in-kernel ITS");
-@@ -105,6 +93,18 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
- 
-     gicv3_its_init_mmio(s, NULL);
- 
-+    if (!kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
-+        GITS_CTLR)) {
-+        error_setg(&s->migration_blocker, "This operating system kernel "
-+                   "does not support vGICv3 migration");
-+        migrate_add_blocker(s->migration_blocker, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            error_free(s->migration_blocker);
-+            return;
-+        }
++/**
++ * vm_change_state_handler - VM change state callback aiming at flushing
++ * RDIST pending tables into guest RAM
++ *
++ * The tables get flushed to guest RAM whenever the VM gets stopped.
++ */
++static void vm_change_state_handler(void *opaque, int running,
++                                    RunState state)
++{
++    GICv3State *s = (GICv3State *)opaque;
++
++    if (running) {
++        return;
 +    }
 +
-     kvm_msi_use_devid = true;
-     kvm_gsi_direct_mapping = false;
-     kvm_msi_via_irqfd_allowed = kvm_irqfds_enabled();
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index f2dbf84..8dab9c7 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -198,6 +198,8 @@ enum VMStateFlags {
- typedef enum {
-     MIG_PRI_DEFAULT = 0,
-     MIG_PRI_IOMMU,              /* Must happen before PCI devices */
-+    MIG_PRI_GICV3_ITS,          /* Must happen before PCI devices */
-+    MIG_PRI_GICV3,              /* Must happen before the ITS */
-     MIG_PRI_MAX,
- } MigrationPriority;
++    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
++                      KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES, NULL, true);
++}
++
++
+ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
+ {
+     GICv3State *s = KVM_ARM_GICV3(dev);
+@@ -751,6 +772,10 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
+             return;
+         }
+     }
++    if (kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
++                              KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES)) {
++        qemu_add_vm_change_state_handler(vm_change_state_handler, s);
++    }
+ }
  
+ static void kvm_arm_gicv3_class_init(ObjectClass *klass, void *data)
 -- 
 2.5.5
