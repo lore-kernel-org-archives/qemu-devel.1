@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cyx93-0000UQ-UE
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 05:03:59 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cyxKF-0002aK-A2
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 05:15:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cyx92-0001lz-FG
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 05:03:57 -0400
-Received: from mail-lf0-x22c.google.com ([2a00:1450:4010:c07::22c]:33196)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cyx92-0001lf-4U
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 05:03:56 -0400
-Received: by mail-lf0-x22c.google.com with SMTP id h125so39856250lfe.0
-	for <qemu-devel@nongnu.org>; Fri, 14 Apr 2017 02:03:55 -0700 (PDT)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cyxKB-0006WS-BM
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 05:15:31 -0400
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20170406142527.25835-1-famz@redhat.com>
+	<20170406142527.25835-5-famz@redhat.com>
+	<20170406153754.GK4341@noname.redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e7014d1b-3724-64db-474d-4c23f9c62ebc@redhat.com>
+Date: Fri, 14 Apr 2017 17:15:20 +0800
 MIME-Version: 1.0
-References: <20170411101002.28451-1-maxime.coquelin@redhat.com>
-	<20170411101002.28451-2-maxime.coquelin@redhat.com>
-	<CAJ+F1CL8kK0XcMwueX8+kbDF=aVhBiRJ66gGoUNcUOmk=Yg7og@mail.gmail.com>
-	<7dfc220c-b22b-bd7d-53af-caf49275b66c@redhat.com>
-In-Reply-To: <7dfc220c-b22b-bd7d-53af-caf49275b66c@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 14 Apr 2017 09:03:43 +0000
-Message-ID: <CAJ+F1C+SX0vqpAmyesgoyiWf1Fqncd6FaP2PemeUSHQq+GYLTw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 1/2] spec/vhost-user: Introduce secondary
- channel for slave initiated requests
+In-Reply-To: <20170406153754.GK4341@noname.redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-2.9 4/5] block: Drain BH in
+ bdrv_drained_begin
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,59 +26,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>, mst@redhat.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, peterx@redhat.com, yuanhan.liu@linux.intel.com, virtio-comment@lists.oasis-open.org, qemu-devel@nongnu.org
-
-Hi
-
-On Tue, Apr 11, 2017 at 5:53 PM Maxime Coquelin <maxime.coquelin@redhat.com=
->
-wrote:
-
-> Hi Marc-Andr=C3=A9,
->
-> On 04/11/2017 03:06 PM, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi
-> >
-> > On Tue, Apr 11, 2017 at 12:10 PM Maxime Coquelin
-> > <maxime.coquelin@redhat.com <mailto:maxime.coquelin@redhat.com>> wrote:
-> >
-> >     This vhost-user specification update aims at enabling the
-> >     slave to send requests to the master using a dedicated socket
-> >     created by the master.
-> >
-> >     It can be used for example when the slave implements a device
-> >     IOTLB to send cache miss requests to the master.
-> >
-> >     The message types list is updated with an "Initiator" field to
-> >     indicate for each type whether the master and/or slave can
-> >     initiate the request.
-> >
-> >     Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com
-> >     <mailto:maxime.coquelin@redhat.com>>
-> >
-> >
-> > This is very similar to a patch I proposed for shutdown slave initiated
-> > requests:
-> > https://lists.gnu.org/archive/html/qemu-devel/2016-04/msg00095.html
->
-> Indeed, thanks for pointing this out, I wasn't aware of your series.
->
-> I find your proposal of having dedicated messages types
-> (VHOST_USER_SLAVE_*) cleaner.
->
-> ok
+To: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
 
-> Are you ok if I handover your patch, and replace
-> VHOST_USER_SET_SLAVE_FD to VHOST_USER_SET_SLAVE_REQ_FD?
->
 
-They are very similar, I suggest you update your patch with the best of
-both.
+On 06/04/2017 23:37, Kevin Wolf wrote:
+> We used to poll BHs in earlier times. Commit 99723548 ('block: add BDS
+> field to count in-flight requests') changed this, without an explanation
+> in the commit message.
+> 
+> Paolo, is this simply a bug in that commit, or do you rely on it
+> somewhere? I remember that you wanted to get rid of some aio_poll()
+> calls a while ago.
 
-I suppose you came to the same conclusion with me that trying to make the
-communication both ways on the same fd would be quite difficult, although
-it's a bit strange that the qemu implementation forces the design of the
-protocol in some direction.
---=20
-Marc-Andr=C3=A9 Lureau
+It was replaced by the bdrv_inc_in_flight/bdrv_dec_in_flight calls in
+bdrv_aio_prw and bdrv_co_complete.
+
+These let bdrv_drain complete the invocation of the callbacks.  But
+block_job_defer_to_main_loop is different because it schedules the
+bottom half in another QEMU AioContext (the main thread's).
+
+Since he's here with me, I'll ask Fam exactly what's happening.  Stefan
+also found something not too convincing in his review.
+
+Paolo
+
+>>  block/io.c | 7 ++++++-
+>>  1 file changed, 6 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/block/io.c b/block/io.c
+>> index 2709a70..b9cfd18 100644
+>> --- a/block/io.c
+>> +++ b/block/io.c
+>> @@ -228,7 +228,12 @@ void bdrv_drained_begin(BlockDriverState *bs)
+>>          bdrv_parent_drained_begin(bs);
+>>      }
+>>  
+>> -    bdrv_drain_recurse(bs);
+>> +    while (true) {
+>> +        if (!bdrv_drain_recurse(bs) &&
+>> +            !aio_poll(bdrv_get_aio_context(bs), false)) {
+>> +                break;
+>> +            }
+> 
+> The indentation is off here.
+> 
+>> +    }
+>>  }
+> 
+> The old code had this in what is now the BDRV_POLL_WHILE() call in
+> bdrv_drain_recurse(). I think it makes more sense there, saves you a
+> loop here and fixes bdrv_drain_all_begin() at the same time.
+> 
+> Kevin
+> 
+> 
