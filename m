@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cywxH-0006rT-M8
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:51:48 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1cyx1t-0007se-Fk
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:56:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cywxG-0006iZ-NW
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:51:47 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1cyx1o-0008GV-Lh
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:56:33 -0400
+Received: from mga09.intel.com ([134.134.136.24]:44590)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1cyx1o-0008FN-Cp
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:56:28 -0400
+Message-ID: <58F08F1F.8020904@intel.com>
+Date: Fri, 14 Apr 2017 16:58:07 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20170414080206.2301-1-famz@redhat.com>
-References: <20170414080206.2301-1-famz@redhat.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Fri, 14 Apr 2017 09:51:44 +0100
-Message-ID: <CAJSP0QVbYRW0VD_1zUqU0T6V48wr_g3co8Dxs_ndpfA70d4TkQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.9-rc5 v2] block: Drain
- BH in bdrv_drained_begin
+References: <1492076108-117229-1-git-send-email-wei.w.wang@intel.com>
+	<1492076108-117229-4-git-send-email-wei.w.wang@intel.com>
+	<20170413130217.2316b0394192d8677f5ddbdf@linux-foundation.org>
+	<58F03443.9040202@intel.com>
+	<20170414025824.GK784@bombadil.infradead.org>
+In-Reply-To: <20170414025824.GK784@bombadil.infradead.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v9 3/5] mm: function to offer a page block
+ on the free list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,33 +32,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, david@redhat.com, dave.hansen@intel.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com
 
-On Fri, Apr 14, 2017 at 9:02 AM, Fam Zheng <famz@redhat.com> wrote:
-> @@ -398,11 +399,15 @@ void bdrv_drain_all(void);
->           */                                                \
->          assert(!bs_->wakeup);                              \
->          bs_->wakeup = true;                                \
-> -        while ((cond)) {                                   \
-> -            aio_context_release(ctx_);                     \
-> -            aio_poll(qemu_get_aio_context(), true);        \
-> -            aio_context_acquire(ctx_);                     \
-> -            waited_ = true;                                \
-> +        while (busy_) {                                    \
-> +            if ((cond)) {                                  \
-> +                waited_ = busy_ = true;                    \
-> +                aio_context_release(ctx_);                 \
-> +                aio_poll(qemu_get_aio_context(), true);    \
-> +                aio_context_acquire(ctx_);                 \
-> +            } else {                                       \
-> +                busy_ = aio_poll(ctx_, false);             \
-> +            }                                              \
+On 04/14/2017 10:58 AM, Matthew Wilcox wrote:
+> On Fri, Apr 14, 2017 at 10:30:27AM +0800, Wei Wang wrote:
+>> OK. What do you think if we add this:
+>>
+>> #if defined(CONFIG_VIRTIO_BALLOON) || defined(CONFIG_VIRTIO_BALLOON_MODULE)
+> That's spelled "IS_ENABLED(CONFIG_VIRTIO_BALLOON)", FYI.
 
-Wait, I'm confused.  The current thread is not in the BDS AioContext.
-We're not allowed to call aio_poll(ctx_, false).
+Right, thanks.
 
-Did you mean aio_poll(qemu_get_aio_context(), false) in order to
-process defer to main loop BHs?
-
-Stefan
+Best,
+Wei
