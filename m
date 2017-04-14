@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1cyyBH-0008Rb-Ba
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 06:10:21 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cyyiY-00069O-1E
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 06:44:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1cyyBE-0003q6-1W
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 06:10:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35456)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1cyyBD-0003pM-Nq
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 06:10:15 -0400
-Date: Fri, 14 Apr 2017 06:10:10 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <1167061760.27389486.1492164610590.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1492141282-28708-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cyyiU-0004UJ-Ti
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 06:44:42 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:3039
+	helo=dggrg01-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cyyiT-0004So-KP
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 06:44:38 -0400
 References: <1492141282-28708-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1167061760.27389486.1492164610590.JavaMail.zimbra@redhat.com>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <58F0A7CE.50501@huawei.com>
+Date: Fri, 14 Apr 2017 18:43:26 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1167061760.27389486.1492164610590.JavaMail.zimbra@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
 Subject: Re: [Qemu-devel] [PATCH] char: Fix removing wrong GSource that be
  found by fd_in_tag
 List-Id: <qemu-devel.nongnu.org>
@@ -27,296 +29,305 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhanghailiang <zhang.zhanghailiang@huawei.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, zhangchen fnst <zhangchen.fnst@cn.fujitsu.com>
 
-Hi
+Hi,
 
------ Original Message -----
-> We use fd_in_tag to find a GSource, fd_in_tag is return value of
-> g_source_attach(GSource *source, GMainContext *context), the return
-> value is unique only in the same context, so we may get the same
-> values with different 'context' parameters.
-> 
-> It is no problem to find the right fd_in_tag by using
->  g_main_context_find_source_by_id(GMainContext *context, guint source_id)
-> while there is only one default main context.
-> 
-> But colo-compare tries to create/use its own context, and if we pass wrong
-> 'context' parameter with right fd_in_tag, we will find a wrong GSource
-> to handle. We tied to fix the related codes in commit b43dec, but it didn't
+On 2017/4/14 18:10, Marc-André Lureau wrote:
+> Hi
+>
+> ----- Original Message -----
+>> We use fd_in_tag to find a GSource, fd_in_tag is return value of
+>> g_source_attach(GSource *source, GMainContext *context), the return
+>> value is unique only in the same context, so we may get the same
+>> values with different 'context' parameters.
+>>
+>> It is no problem to find the right fd_in_tag by using
+>>   g_main_context_find_source_by_id(GMainContext *context, guint source_id)
+>> while there is only one default main context.
+>>
+>> But colo-compare tries to create/use its own context, and if we pass wrong
+>> 'context' parameter with right fd_in_tag, we will find a wrong GSource
+>> to handle. We tied to fix the related codes in commit b43dec, but it didn't
+> tied->tried
+>
+> Please use a bit longer commit sha1, or full sha1, it will likely conflict otherwise in the future.
 
-tied->tried
+OK, I'll replace it with the full sha1.
+>> fix the bug completely, because we still have some codes didn't pass *right*
+>> context parameter for remove_fd_in_watch().
+> Mixing contexts sounds like a colo-compare bug, did you fix it there too?
 
-Please use a bit longer commit sha1, or full sha1, it will likely conflict otherwise in the future.
+Yes, we don't have to change any other codes in colo-compare,
+We just call qemu_chr_fe_set_handlers() in colo-compare to detach the old GSource
+from main default context, and attach the new GSource to the new context.
 
-> fix the bug completely, because we still have some codes didn't pass *right*
-> context parameter for remove_fd_in_watch().
+>> Let's fix it by record the GSource directly instead of fd_in_tag.
+> Make sense to me, and even simplify a bit the code. We should be more careful with pointers though (the reason why tag existed in the first place I imagine).
 
-Mixing contexts sounds like a colo-compare bug, did you fix it there too?
+Agreed.
 
-> 
-> Let's fix it by record the GSource directly instead of fd_in_tag.
+>> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+>> ---
+>>   chardev/char-fd.c     |  8 ++++----
+>>   chardev/char-io.c     | 23 ++++++++---------------
+>>   chardev/char-io.h     |  4 ++--
+>>   chardev/char-pty.c    |  6 +++---
+>>   chardev/char-socket.c |  8 ++++----
+>>   chardev/char-udp.c    |  8 ++++----
+>>   chardev/char.c        |  2 +-
+>>   include/sysemu/char.h |  2 +-
+>>   8 files changed, 27 insertions(+), 34 deletions(-)
+>>
+>> diff --git a/chardev/char-fd.c b/chardev/char-fd.c
+>> index 548dd4c..7f0169d 100644
+>> --- a/chardev/char-fd.c
+>> +++ b/chardev/char-fd.c
+>> @@ -58,7 +58,7 @@ static gboolean fd_chr_read(QIOChannel *chan, GIOCondition
+>> cond, void *opaque)
+>>       ret = qio_channel_read(
+>>           chan, (gchar *)buf, len, NULL);
+>>       if (ret == 0) {
+>> -        remove_fd_in_watch(chr, NULL);
+>> +        remove_fd_in_watch(chr);
+>>           qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
+>>           return FALSE;
+>>       }
+>> @@ -89,9 +89,9 @@ static void fd_chr_update_read_handler(Chardev *chr,
+>>   {
+>>       FDChardev *s = FD_CHARDEV(chr);
+>>   
+>> -    remove_fd_in_watch(chr, NULL);
+>> +    remove_fd_in_watch(chr);
+>>       if (s->ioc_in) {
+>> -        chr->fd_in_tag = io_add_watch_poll(chr, s->ioc_in,
+>> +        chr->chr_gsource = io_add_watch_poll(chr, s->ioc_in,
+>>                                              fd_chr_read_poll,
+>>                                              fd_chr_read, chr,
+>>                                              context);
+>> @@ -103,7 +103,7 @@ static void char_fd_finalize(Object *obj)
+>>       Chardev *chr = CHARDEV(obj);
+>>       FDChardev *s = FD_CHARDEV(obj);
+>>   
+>> -    remove_fd_in_watch(chr, NULL);
+>> +    remove_fd_in_watch(chr);
+>>       if (s->ioc_in) {
+>>           object_unref(OBJECT(s->ioc_in));
+>>       }
+>> diff --git a/chardev/char-io.c b/chardev/char-io.c
+>> index b4bb094..6deb193 100644
+>> --- a/chardev/char-io.c
+>> +++ b/chardev/char-io.c
+>> @@ -98,7 +98,7 @@ static GSourceFuncs io_watch_poll_funcs = {
+>>       .finalize = io_watch_poll_finalize,
+>>   };
+>>   
+>> -guint io_add_watch_poll(Chardev *chr,
+>> +GSource *io_add_watch_poll(Chardev *chr,
+>>                           QIOChannel *ioc,
+>>                           IOCanReadHandler *fd_can_read,
+>>                           QIOChannelFunc fd_read,
+>> @@ -106,7 +106,6 @@ guint io_add_watch_poll(Chardev *chr,
+>>                           GMainContext *context)
+>>   {
+>>       IOWatchPoll *iwp;
+>> -    int tag;
+>>       char *name;
+>>   
+>>       iwp = (IOWatchPoll *) g_source_new(&io_watch_poll_funcs,
+>> @@ -122,21 +121,15 @@ guint io_add_watch_poll(Chardev *chr,
+>>       g_source_set_name((GSource *)iwp, name);
+>>       g_free(name);
+>>   
+>> -    tag = g_source_attach(&iwp->parent, context);
+>> +    g_source_attach(&iwp->parent, context);
+>>       g_source_unref(&iwp->parent);
+>> -    return tag;
+>> +    return (GSource *)iwp;
+>>   }
+>>   
+>> -static void io_remove_watch_poll(guint tag, GMainContext *context)
+>> +static void io_remove_watch_poll(GSource *source)
+>>   {
+>> -    GSource *source;
+>>       IOWatchPoll *iwp;
+>>   
+>> -    g_return_if_fail(tag > 0);
+>> -
+>> -    source = g_main_context_find_source_by_id(context, tag);
+>> -    g_return_if_fail(source != NULL);
+>> -
+>>       iwp = io_watch_poll_from_source(source);
+>>       if (iwp->src) {
+>>           g_source_destroy(iwp->src);
+>> @@ -146,11 +139,11 @@ static void io_remove_watch_poll(guint tag,
+>> GMainContext *context)
+>>       g_source_destroy(&iwp->parent);
+>>   }
+>>   
+>> -void remove_fd_in_watch(Chardev *chr, GMainContext *context)
+>> +void remove_fd_in_watch(Chardev *chr)
+>>   {
+>> -    if (chr->fd_in_tag) {
+>> -        io_remove_watch_poll(chr->fd_in_tag, context);
+>> -        chr->fd_in_tag = 0;
+>> +    if (chr->chr_gsource) {
+>> +        io_remove_watch_poll(chr->chr_gsource);
+>> +        chr->chr_gsource = 0;
+> It's a pointer, let's use NULL.
 
-Make sense to me, and even simplify a bit the code. We should be more careful with pointers though (the reason why tag existed in the first place I imagine).
+OK. Will fix in next version.
 
-> 
-> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-
-> ---
->  chardev/char-fd.c     |  8 ++++----
->  chardev/char-io.c     | 23 ++++++++---------------
->  chardev/char-io.h     |  4 ++--
->  chardev/char-pty.c    |  6 +++---
->  chardev/char-socket.c |  8 ++++----
->  chardev/char-udp.c    |  8 ++++----
->  chardev/char.c        |  2 +-
->  include/sysemu/char.h |  2 +-
->  8 files changed, 27 insertions(+), 34 deletions(-)
-> 
-> diff --git a/chardev/char-fd.c b/chardev/char-fd.c
-> index 548dd4c..7f0169d 100644
-> --- a/chardev/char-fd.c
-> +++ b/chardev/char-fd.c
-> @@ -58,7 +58,7 @@ static gboolean fd_chr_read(QIOChannel *chan, GIOCondition
-> cond, void *opaque)
->      ret = qio_channel_read(
->          chan, (gchar *)buf, len, NULL);
->      if (ret == 0) {
-> -        remove_fd_in_watch(chr, NULL);
-> +        remove_fd_in_watch(chr);
->          qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
->          return FALSE;
->      }
-> @@ -89,9 +89,9 @@ static void fd_chr_update_read_handler(Chardev *chr,
->  {
->      FDChardev *s = FD_CHARDEV(chr);
->  
-> -    remove_fd_in_watch(chr, NULL);
-> +    remove_fd_in_watch(chr);
->      if (s->ioc_in) {
-> -        chr->fd_in_tag = io_add_watch_poll(chr, s->ioc_in,
-> +        chr->chr_gsource = io_add_watch_poll(chr, s->ioc_in,
->                                             fd_chr_read_poll,
->                                             fd_chr_read, chr,
->                                             context);
-> @@ -103,7 +103,7 @@ static void char_fd_finalize(Object *obj)
->      Chardev *chr = CHARDEV(obj);
->      FDChardev *s = FD_CHARDEV(obj);
->  
-> -    remove_fd_in_watch(chr, NULL);
-> +    remove_fd_in_watch(chr);
->      if (s->ioc_in) {
->          object_unref(OBJECT(s->ioc_in));
->      }
-> diff --git a/chardev/char-io.c b/chardev/char-io.c
-> index b4bb094..6deb193 100644
-> --- a/chardev/char-io.c
-> +++ b/chardev/char-io.c
-> @@ -98,7 +98,7 @@ static GSourceFuncs io_watch_poll_funcs = {
->      .finalize = io_watch_poll_finalize,
->  };
->  
-> -guint io_add_watch_poll(Chardev *chr,
-> +GSource *io_add_watch_poll(Chardev *chr,
->                          QIOChannel *ioc,
->                          IOCanReadHandler *fd_can_read,
->                          QIOChannelFunc fd_read,
-> @@ -106,7 +106,6 @@ guint io_add_watch_poll(Chardev *chr,
->                          GMainContext *context)
->  {
->      IOWatchPoll *iwp;
-> -    int tag;
->      char *name;
->  
->      iwp = (IOWatchPoll *) g_source_new(&io_watch_poll_funcs,
-> @@ -122,21 +121,15 @@ guint io_add_watch_poll(Chardev *chr,
->      g_source_set_name((GSource *)iwp, name);
->      g_free(name);
->  
-> -    tag = g_source_attach(&iwp->parent, context);
-> +    g_source_attach(&iwp->parent, context);
->      g_source_unref(&iwp->parent);
-> -    return tag;
-> +    return (GSource *)iwp;
->  }
->  
-> -static void io_remove_watch_poll(guint tag, GMainContext *context)
-> +static void io_remove_watch_poll(GSource *source)
->  {
-> -    GSource *source;
->      IOWatchPoll *iwp;
->  
-> -    g_return_if_fail(tag > 0);
-> -
-> -    source = g_main_context_find_source_by_id(context, tag);
-> -    g_return_if_fail(source != NULL);
-> -
->      iwp = io_watch_poll_from_source(source);
->      if (iwp->src) {
->          g_source_destroy(iwp->src);
-> @@ -146,11 +139,11 @@ static void io_remove_watch_poll(guint tag,
-> GMainContext *context)
->      g_source_destroy(&iwp->parent);
->  }
->  
-> -void remove_fd_in_watch(Chardev *chr, GMainContext *context)
-> +void remove_fd_in_watch(Chardev *chr)
->  {
-> -    if (chr->fd_in_tag) {
-> -        io_remove_watch_poll(chr->fd_in_tag, context);
-> -        chr->fd_in_tag = 0;
-> +    if (chr->chr_gsource) {
-> +        io_remove_watch_poll(chr->chr_gsource);
-> +        chr->chr_gsource = 0;
-
-It's a pointer, let's use NULL.
-
->      }
->  }
->  
-> diff --git a/chardev/char-io.h b/chardev/char-io.h
-> index 842be56..55973a7 100644
-> --- a/chardev/char-io.h
-> +++ b/chardev/char-io.h
-> @@ -29,14 +29,14 @@
->  #include "sysemu/char.h"
->  
->  /* Can only be used for read */
-> -guint io_add_watch_poll(Chardev *chr,
-> +GSource *io_add_watch_poll(Chardev *chr,
->                          QIOChannel *ioc,
->                          IOCanReadHandler *fd_can_read,
->                          QIOChannelFunc fd_read,
->                          gpointer user_data,
->                          GMainContext *context);
->  
-> -void remove_fd_in_watch(Chardev *chr, GMainContext *context);
-> +void remove_fd_in_watch(Chardev *chr);
->  
->  int io_channel_send(QIOChannel *ioc, const void *buf, size_t len);
->  
-> diff --git a/chardev/char-pty.c b/chardev/char-pty.c
-> index a6337be..561926f 100644
-> --- a/chardev/char-pty.c
-> +++ b/chardev/char-pty.c
-> @@ -199,7 +199,7 @@ static void pty_chr_state(Chardev *chr, int connected)
->              g_source_remove(s->open_tag);
->              s->open_tag = 0;
->          }
-> -        remove_fd_in_watch(chr, NULL);
-> +        remove_fd_in_watch(chr);
->          s->connected = 0;
->          /* (re-)connect poll interval for idle guests: once per second.
->           * We check more frequently in case the guests sends data to
-> @@ -215,8 +215,8 @@ static void pty_chr_state(Chardev *chr, int connected)
->              s->connected = 1;
->              s->open_tag = g_idle_add(qemu_chr_be_generic_open_func, chr);
->          }
-> -        if (!chr->fd_in_tag) {
-> -            chr->fd_in_tag = io_add_watch_poll(chr, s->ioc,
-> +        if (!chr->chr_gsource) {
-> +            chr->chr_gsource = io_add_watch_poll(chr, s->ioc,
->                                                 pty_chr_read_poll,
->                                                 pty_chr_read,
->                                                 chr, NULL);
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index 36ab0d6..376a70b 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -327,7 +327,7 @@ static void tcp_chr_free_connection(Chardev *chr)
->      }
->  
->      tcp_set_msgfds(chr, NULL, 0);
-> -    remove_fd_in_watch(chr, NULL);
-> +    remove_fd_in_watch(chr);
->      object_unref(OBJECT(s->sioc));
->      s->sioc = NULL;
->      object_unref(OBJECT(s->ioc));
-> @@ -484,7 +484,7 @@ static void tcp_chr_connect(void *opaque)
->  
->      s->connected = 1;
->      if (s->ioc) {
-> -        chr->fd_in_tag = io_add_watch_poll(chr, s->ioc,
-> +        chr->chr_gsource = io_add_watch_poll(chr, s->ioc,
->                                             tcp_chr_read_poll,
->                                             tcp_chr_read,
->                                             chr, NULL);
-> @@ -501,9 +501,9 @@ static void tcp_chr_update_read_handler(Chardev *chr,
->          return;
->      }
->  
-> -    remove_fd_in_watch(chr, NULL);
-> +    remove_fd_in_watch(chr);
->      if (s->ioc) {
-> -        chr->fd_in_tag = io_add_watch_poll(chr, s->ioc,
-> +        chr->chr_gsource = io_add_watch_poll(chr, s->ioc,
->                                             tcp_chr_read_poll,
->                                             tcp_chr_read, chr,
->                                             context);
-> diff --git a/chardev/char-udp.c b/chardev/char-udp.c
-> index 804bd22..9d050bc 100644
-> --- a/chardev/char-udp.c
-> +++ b/chardev/char-udp.c
-> @@ -81,7 +81,7 @@ static gboolean udp_chr_read(QIOChannel *chan, GIOCondition
-> cond, void *opaque)
->      ret = qio_channel_read(
->          s->ioc, (char *)s->buf, sizeof(s->buf), NULL);
->      if (ret <= 0) {
-> -        remove_fd_in_watch(chr, NULL);
-> +        remove_fd_in_watch(chr);
->          return FALSE;
->      }
->      s->bufcnt = ret;
-> @@ -101,9 +101,9 @@ static void udp_chr_update_read_handler(Chardev *chr,
->  {
->      UdpChardev *s = UDP_CHARDEV(chr);
->  
-> -    remove_fd_in_watch(chr, NULL);
-> +    remove_fd_in_watch(chr);
->      if (s->ioc) {
-> -        chr->fd_in_tag = io_add_watch_poll(chr, s->ioc,
-> +        chr->chr_gsource = io_add_watch_poll(chr, s->ioc,
->                                             udp_chr_read_poll,
->                                             udp_chr_read, chr,
->                                             context);
-> @@ -115,7 +115,7 @@ static void char_udp_finalize(Object *obj)
->      Chardev *chr = CHARDEV(obj);
->      UdpChardev *s = UDP_CHARDEV(obj);
->  
-> -    remove_fd_in_watch(chr, NULL);
-> +    remove_fd_in_watch(chr);
->      if (s->ioc) {
->          object_unref(OBJECT(s->ioc));
->      }
-> diff --git a/chardev/char.c b/chardev/char.c
-> index 3df1163..54cd5f4 100644
-> --- a/chardev/char.c
-> +++ b/chardev/char.c
-> @@ -560,7 +560,7 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
->      cc = CHARDEV_GET_CLASS(s);
->      if (!opaque && !fd_can_read && !fd_read && !fd_event) {
->          fe_open = 0;
-> -        remove_fd_in_watch(s, context);
-> +        remove_fd_in_watch(s);
->      } else {
->          fe_open = 1;
->      }
-> diff --git a/include/sysemu/char.h b/include/sysemu/char.h
-> index 450881d..e157f96 100644
-> --- a/include/sysemu/char.h
-> +++ b/include/sysemu/char.h
-> @@ -93,7 +93,7 @@ struct Chardev {
->      char *filename;
->      int logfd;
->      int be_open;
-> -    guint fd_in_tag;
-> +    GSource *chr_gsource;
->      DECLARE_BITMAP(features, QEMU_CHAR_FEATURE_LAST);
->      QTAILQ_ENTRY(Chardev) next;
->  };
-> --
-> 1.8.3.1
-> 
-> 
-> 
+Thanks,
+Hailiang
+>>       }
+>>   }
+>>   
+>> diff --git a/chardev/char-io.h b/chardev/char-io.h
+>> index 842be56..55973a7 100644
+>> --- a/chardev/char-io.h
+>> +++ b/chardev/char-io.h
+>> @@ -29,14 +29,14 @@
+>>   #include "sysemu/char.h"
+>>   
+>>   /* Can only be used for read */
+>> -guint io_add_watch_poll(Chardev *chr,
+>> +GSource *io_add_watch_poll(Chardev *chr,
+>>                           QIOChannel *ioc,
+>>                           IOCanReadHandler *fd_can_read,
+>>                           QIOChannelFunc fd_read,
+>>                           gpointer user_data,
+>>                           GMainContext *context);
+>>   
+>> -void remove_fd_in_watch(Chardev *chr, GMainContext *context);
+>> +void remove_fd_in_watch(Chardev *chr);
+>>   
+>>   int io_channel_send(QIOChannel *ioc, const void *buf, size_t len);
+>>   
+>> diff --git a/chardev/char-pty.c b/chardev/char-pty.c
+>> index a6337be..561926f 100644
+>> --- a/chardev/char-pty.c
+>> +++ b/chardev/char-pty.c
+>> @@ -199,7 +199,7 @@ static void pty_chr_state(Chardev *chr, int connected)
+>>               g_source_remove(s->open_tag);
+>>               s->open_tag = 0;
+>>           }
+>> -        remove_fd_in_watch(chr, NULL);
+>> +        remove_fd_in_watch(chr);
+>>           s->connected = 0;
+>>           /* (re-)connect poll interval for idle guests: once per second.
+>>            * We check more frequently in case the guests sends data to
+>> @@ -215,8 +215,8 @@ static void pty_chr_state(Chardev *chr, int connected)
+>>               s->connected = 1;
+>>               s->open_tag = g_idle_add(qemu_chr_be_generic_open_func, chr);
+>>           }
+>> -        if (!chr->fd_in_tag) {
+>> -            chr->fd_in_tag = io_add_watch_poll(chr, s->ioc,
+>> +        if (!chr->chr_gsource) {
+>> +            chr->chr_gsource = io_add_watch_poll(chr, s->ioc,
+>>                                                  pty_chr_read_poll,
+>>                                                  pty_chr_read,
+>>                                                  chr, NULL);
+>> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+>> index 36ab0d6..376a70b 100644
+>> --- a/chardev/char-socket.c
+>> +++ b/chardev/char-socket.c
+>> @@ -327,7 +327,7 @@ static void tcp_chr_free_connection(Chardev *chr)
+>>       }
+>>   
+>>       tcp_set_msgfds(chr, NULL, 0);
+>> -    remove_fd_in_watch(chr, NULL);
+>> +    remove_fd_in_watch(chr);
+>>       object_unref(OBJECT(s->sioc));
+>>       s->sioc = NULL;
+>>       object_unref(OBJECT(s->ioc));
+>> @@ -484,7 +484,7 @@ static void tcp_chr_connect(void *opaque)
+>>   
+>>       s->connected = 1;
+>>       if (s->ioc) {
+>> -        chr->fd_in_tag = io_add_watch_poll(chr, s->ioc,
+>> +        chr->chr_gsource = io_add_watch_poll(chr, s->ioc,
+>>                                              tcp_chr_read_poll,
+>>                                              tcp_chr_read,
+>>                                              chr, NULL);
+>> @@ -501,9 +501,9 @@ static void tcp_chr_update_read_handler(Chardev *chr,
+>>           return;
+>>       }
+>>   
+>> -    remove_fd_in_watch(chr, NULL);
+>> +    remove_fd_in_watch(chr);
+>>       if (s->ioc) {
+>> -        chr->fd_in_tag = io_add_watch_poll(chr, s->ioc,
+>> +        chr->chr_gsource = io_add_watch_poll(chr, s->ioc,
+>>                                              tcp_chr_read_poll,
+>>                                              tcp_chr_read, chr,
+>>                                              context);
+>> diff --git a/chardev/char-udp.c b/chardev/char-udp.c
+>> index 804bd22..9d050bc 100644
+>> --- a/chardev/char-udp.c
+>> +++ b/chardev/char-udp.c
+>> @@ -81,7 +81,7 @@ static gboolean udp_chr_read(QIOChannel *chan, GIOCondition
+>> cond, void *opaque)
+>>       ret = qio_channel_read(
+>>           s->ioc, (char *)s->buf, sizeof(s->buf), NULL);
+>>       if (ret <= 0) {
+>> -        remove_fd_in_watch(chr, NULL);
+>> +        remove_fd_in_watch(chr);
+>>           return FALSE;
+>>       }
+>>       s->bufcnt = ret;
+>> @@ -101,9 +101,9 @@ static void udp_chr_update_read_handler(Chardev *chr,
+>>   {
+>>       UdpChardev *s = UDP_CHARDEV(chr);
+>>   
+>> -    remove_fd_in_watch(chr, NULL);
+>> +    remove_fd_in_watch(chr);
+>>       if (s->ioc) {
+>> -        chr->fd_in_tag = io_add_watch_poll(chr, s->ioc,
+>> +        chr->chr_gsource = io_add_watch_poll(chr, s->ioc,
+>>                                              udp_chr_read_poll,
+>>                                              udp_chr_read, chr,
+>>                                              context);
+>> @@ -115,7 +115,7 @@ static void char_udp_finalize(Object *obj)
+>>       Chardev *chr = CHARDEV(obj);
+>>       UdpChardev *s = UDP_CHARDEV(obj);
+>>   
+>> -    remove_fd_in_watch(chr, NULL);
+>> +    remove_fd_in_watch(chr);
+>>       if (s->ioc) {
+>>           object_unref(OBJECT(s->ioc));
+>>       }
+>> diff --git a/chardev/char.c b/chardev/char.c
+>> index 3df1163..54cd5f4 100644
+>> --- a/chardev/char.c
+>> +++ b/chardev/char.c
+>> @@ -560,7 +560,7 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
+>>       cc = CHARDEV_GET_CLASS(s);
+>>       if (!opaque && !fd_can_read && !fd_read && !fd_event) {
+>>           fe_open = 0;
+>> -        remove_fd_in_watch(s, context);
+>> +        remove_fd_in_watch(s);
+>>       } else {
+>>           fe_open = 1;
+>>       }
+>> diff --git a/include/sysemu/char.h b/include/sysemu/char.h
+>> index 450881d..e157f96 100644
+>> --- a/include/sysemu/char.h
+>> +++ b/include/sysemu/char.h
+>> @@ -93,7 +93,7 @@ struct Chardev {
+>>       char *filename;
+>>       int logfd;
+>>       int be_open;
+>> -    guint fd_in_tag;
+>> +    GSource *chr_gsource;
+>>       DECLARE_BITMAP(features, QEMU_CHAR_FEATURE_LAST);
+>>       QTAILQ_ENTRY(Chardev) next;
+>>   };
+>> --
+>> 1.8.3.1
+>>
+>>
+>>
+> .
+>
