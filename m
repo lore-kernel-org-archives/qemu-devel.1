@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1cz5KN-0007Z1-KT
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 13:48:12 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1cz5Oc-0000Q1-NH
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 13:52:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1cz5KM-0000gT-P4
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 13:48:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38894)
+	(envelope-from <sstabellini@kernel.org>) id 1cz5OY-0002WK-Qo
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 13:52:34 -0400
+Received: from mail.kernel.org ([198.145.29.136]:44206)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1cz5KM-0000gI-Ij
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 13:48:10 -0400
-References: <20170414174056.28946-1-maxime.coquelin@redhat.com>
-	<20170414174056.28946-5-maxime.coquelin@redhat.com>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <7304c97c-2ced-ce35-e981-e77b9e58537b@redhat.com>
-Date: Fri, 14 Apr 2017 19:47:58 +0200
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1cz5OY-0002W9-IO
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 13:52:30 -0400
+Date: Fri, 14 Apr 2017 10:52:20 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <f5ce758f-5f31-32d6-7e19-8c3a83017bab@suse.com>
+Message-ID: <alpine.DEB.2.10.1704141035090.23677@sstabellini-ThinkPad-X260>
+References: <1491903346-16075-1-git-send-email-andr2000@gmail.com>
+	<alpine.DEB.2.10.1704131704560.2759@sstabellini-ThinkPad-X260>
+	<693ebf90-00d7-823e-4db8-9b9686e56941@gmail.com>
+	<f5ce758f-5f31-32d6-7e19-8c3a83017bab@suse.com>
 MIME-Version: 1.0
-In-Reply-To: <20170414174056.28946-5-maxime.coquelin@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 4/4] spec/vhost-user spec: Add IOMMU
- support
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [Xen-devel] [PATCH] configure: introduce
+ --enable-xen-fb-backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,26 +30,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, peterx@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org
+To: Juergen Gross <jgross@suse.com>
+Cc: Oleksandr Andrushchenko <andr2000@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>, vlad.babchuk@gmail.com, qemu-devel@nongnu.org, andrii.anisov@gmail.com, olekstysh@gmail.com, al1img@gmail.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, joculator@gmail.com
 
+On Fri, 14 Apr 2017, Juergen Gross wrote:
+> On 14/04/17 08:06, Oleksandr Andrushchenko wrote:
+> > On 04/14/2017 03:12 AM, Stefano Stabellini wrote:
+> >> On Tue, 11 Apr 2017, Oleksandr Andrushchenko wrote:
+> >>> From: Oleksandr Andrushchenko <oleksandr_andrushchenko@epam.com>
+> >>>
+> >>> For some use cases when Xen framebuffer/input backend
+> >>> is not a part of Qemu it is required to disable it,
+> >>> because of conflicting access to input/display devices.
+> >>> Introduce additional configuration option for explicit
+> >>> input/display control.
+> >> In these cases when you don't want xenfb, why don't you just remove
+> >> "vfb" from the xl config file? QEMU only starts the xenfb backend when
+> >> requested by the toolstack.
+> >>
+> >> Is it because you have an alternative xenfb backend? If so, is it really
+> >> fully xenfb compatible, or is it a different protocol? If it is a
+> >> different protocol, I suggest you rename your frontend/backend PV device
+> >> name to something different from "vfb".
+> >>
+> > Well, offending part is vkbd actually (for multi-touch
+> > we run our own user-space backend which supports
+> > kbd/ptr/mtouch), but vfb and vkbd is the same backend
+> > in QEMU. So, I am ok for vfb, but just want vkbd off
+> > So, there are 2 options:
+> > 1. At compile time remove vkbd and still allow vfb
+> > 2. Remove xenfb completely, if acceptable (this is my case)
+> 
+> What about adding a Xenstore entry for backend type and let qemu test
+> for it being not present or containing "qemu"?
 
+That is what we do for the console, using the xenstore node "type". QEMU
+is "ioemu" while xenconsoled is "xenconsoled". Weirdly, instead of a
+backend node, it is a read-only frontend node, see
+tools/libxl/libxl_console.c:libxl__device_console_add.
 
-On 04/14/2017 07:40 PM, Maxime Coquelin wrote:
->  static void slave_read(void *opaque)
->  {
->      struct vhost_dev *dev = opaque;
-> @@ -611,6 +639,8 @@ static void slave_read(void *opaque)
->      }
->
->      switch (msg.request) {
-Oops, I missed "case VHOST_USER_SLAVE_IOTLB_MSG:" here..
-> +        ret = vhost_user_iotlb_read(dev, &msg);
-> +        break;
->      default:
->          error_report("Received unexpected msg type.");
->          ret = -EINVAL;
-> @@ -848,6 +878,71 @@ static int vhost_user_net_set_mtu(struct vhost_dev *dev, uint16_t mtu)
->      return 0;
->  }
+Oleksandr, I am sorry to feature-creep this simple patch, but I think
+Juergen is right. But we cannot do it just for one protocol. We need to
+introduce a generic way to enable/disable backends in QEMU. Using a
+xenstore node is OK.
 
-Maxime
+We could do exactly the same as the PV console, thus "type" = "ioemu",
+read-only, under the frontend xenstore directory. Or we could introduce
+new nodes. I would probably go for "backend-type" = "qemu" under the
+backend xenstore directory. I don't have a strong opinion about this. In
+the example below I'll use the PV console convention.
+
+For starters:
+
+* libxl needs to write the "type" node to xenstore for *all* protocols.
+  The "type" is not yet configurable.
+* qemu reads them for all backends, proceeds if "type" = "ioemu"
+
+These should be two simple patches. Stage 2:
+
+* we add options in the xl config file to configure any backend, libxl
+  set "type" accordingly (Maybe not *any*, but vif, vkbd, vfb could all
+  have a "type". It is OK if you only add an option for vkbd.)
+* non-QEMU backends, in particular Linux backends, also read the "type"
+  node and proceed if it's "linux"
+
+Does this sound OK to you?
