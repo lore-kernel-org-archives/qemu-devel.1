@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cz8q5-0002w9-DE
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 17:33:10 -0400
+	(envelope-from <mst@redhat.com>) id 1cz8vT-0003lr-5o
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 17:38:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cz8q4-0004sp-34
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 17:33:09 -0400
+	(envelope-from <mst@redhat.com>) id 1cz8vQ-0008US-06
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 17:38:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41682)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cz8vP-0008St-N5
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 17:38:39 -0400
+Date: Sat, 15 Apr 2017 00:38:31 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170415000934-mutt-send-email-mst@kernel.org>
+References: <1492076108-117229-1-git-send-email-wei.w.wang@intel.com>
+	<1492076108-117229-3-git-send-email-wei.w.wang@intel.com>
+	<20170413184040-mutt-send-email-mst@kernel.org>
+	<58F08A60.2020407@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1491736758-19540-3-git-send-email-sundeep.lkml@gmail.com>
-References: <1491736758-19540-1-git-send-email-sundeep.lkml@gmail.com>
-	<1491736758-19540-3-git-send-email-sundeep.lkml@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 14 Apr 2017 14:32:36 -0700
-Message-ID: <CAKmqyKNzkdJV1=qepkzVhGGOdNYbHMhnKgP9PxfKhCKxPqdNcg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [Qemu-devel RFC v2 2/4] msf2: Microsemi
- Smartfusion2 System Register block.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <58F08A60.2020407@intel.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v9 2/5] virtio-balloon:
+ VIRTIO_BALLOON_F_BALLOON_CHUNKS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,222 +30,385 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, dave.hansen@intel.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com
 
-On Sun, Apr 9, 2017 at 4:19 AM, Subbaraya Sundeep
-<sundeep.lkml@gmail.com> wrote:
-> Added Sytem register block of Smartfusion2.
-> This block has PLL registers which are accessed by guest.
->
-> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> ---
->  hw/misc/Makefile.objs |   1 +
->  hw/misc/msf2_sysreg.c | 168 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 169 insertions(+)
->  create mode 100644 hw/misc/msf2_sysreg.c
->
-> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-> index c8b4893..aee53df 100644
-> --- a/hw/misc/Makefile.objs
-> +++ b/hw/misc/Makefile.objs
-> @@ -56,3 +56,4 @@ obj-$(CONFIG_EDU) += edu.o
->  obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
->  obj-$(CONFIG_AUX) += auxbus.o
->  obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
-> +obj-$(CONFIG_MSF2) += msf2_sysreg.o
-> diff --git a/hw/misc/msf2_sysreg.c b/hw/misc/msf2_sysreg.c
-> new file mode 100644
-> index 0000000..4873463
-> --- /dev/null
-> +++ b/hw/misc/msf2_sysreg.c
-> @@ -0,0 +1,168 @@
-> +/*
-> + * System Register block model of Microsemi SmartFusion2.
-> + *
-> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> + *
-> + * This program is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU General Public License
-> + * as published by the Free Software Foundation; either version
-> + * 2 of the License, or (at your option) any later version.
-> + *
-> + * You should have received a copy of the GNU General Public License along
-> + * with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/hw.h"
-> +#include "qemu/timer.h"
-> +#include "hw/sysbus.h"
-> +#include "sysemu/sysemu.h"
-> +#include "qemu/log.h"
-> +
-> +#ifndef MSF2_SYSREG_ERR_DEBUG
-> +#define MSF2_SYSREG_ERR_DEBUG 0
-> +#endif
-> +
-> +#define DB_PRINT(...) do { \
-> +        if (MSF2_SYSREG_ERR_DEBUG) { \
-> +            fprintf(stderr,  ": %s: ", __func__); \
-> +            fprintf(stderr, ## __VA_ARGS__); \
+On Fri, Apr 14, 2017 at 04:37:52PM +0800, Wei Wang wrote:
+> On 04/14/2017 12:34 AM, Michael S. Tsirkin wrote:
+> > On Thu, Apr 13, 2017 at 05:35:05PM +0800, Wei Wang wrote:
+> > 
+> > So we don't need the bitmap to talk to host, it is just
+> > a data structure we chose to maintain lists of pages, right?
+> Right. bitmap is the way to gather pages to chunk.
+> It's only needed in the balloon page case.
+> For the unused page case, we don't need it, since the free
+> page blocks are already chunks.
+> 
+> > OK as far as it goes but you need much better isolation for it.
+> > Build a data structure with APIs such as _init, _cleanup, _add, _clear,
+> > _find_first, _find_next.
+> > Completely unrelated to pages, it just maintains bits.
+> > Then use it here.
+> > 
+> > 
+> > >   static int oom_pages = OOM_VBALLOON_DEFAULT_PAGES;
+> > >   module_param(oom_pages, int, S_IRUSR | S_IWUSR);
+> > >   MODULE_PARM_DESC(oom_pages, "pages to free on OOM");
+> > > @@ -50,6 +54,10 @@ MODULE_PARM_DESC(oom_pages, "pages to free on OOM");
+> > >   static struct vfsmount *balloon_mnt;
+> > >   #endif
+> > > +/* Types of pages to chunk */
+> > > +#define PAGE_CHUNK_TYPE_BALLOON 0
+> > > +
+> > Doesn't look like you are ever adding more types in this
+> > patchset.  Pls keep code simple, generalize it later.
+> > 
+> "#define PAGE_CHUNK_TYPE_UNUSED 1" is added in another patch.
 
-You should use qemu_log() here.
+I would say add the extra code there too. Or maybe we can avoid
+adding it altogether.
 
-> +        } \
-> +    } while (0);
-> +
-> +#define R_PSS_RST_CTRL_SOFT_RST 0x1
-> +
-> +enum {
-> +    ESRAM_CR        = 0x00 / 4,
-> +    ESRAM_MAX_LAT,
-> +    DDR_CR,
-> +    ENVM_CR,
-> +    ENVM_REMAP_BASE_CR,
-> +    ENVM_REMAP_FAB_CR,
-> +    CC_CR,
-> +    CC_REGION_CR,
-> +    CC_LOCK_BASE_ADDR_CR,
-> +    CC_FLUSH_INDX_CR,
-> +    DDRB_BUF_TIMER_CR,
-> +    DDRB_NB_ADDR_CR,
-> +    DDRB_NB_SIZE_CR,
-> +    DDRB_CR,
-> +
-> +    SOFT_RESET_CR  = 0x48 / 4,
-> +    M3_CR,
-> +
-> +    GPIO_SYSRESET_SEL_CR = 0x58 / 4,
-> +
-> +    MDDR_CR = 0x60 / 4,
-> +
-> +    MSSDDR_PLL_STATUS_LOW_CR = 0x90 / 4,
-> +    MSSDDR_PLL_STATUS_HIGH_CR,
-> +    MSSDDR_FACC1_CR,
-> +    MSSDDR_FACC2_CR,
-> +
-> +    MSSDDR_PLL_STATUS = 0x150 / 4,
-> +
-> +};
-> +
-> +#define MSF2_SYSREG_MMIO_SIZE     0x300
-> +#define MSF2_SYSREG_NUM_REGS      (MSF2_SYSREG_MMIO_SIZE / 4)
-> +
-> +#define TYPE_MSF2_SYSREG          "msf2-sysreg"
-> +#define MSF2_SYSREG(obj)  OBJECT_CHECK(Sf2SysregState, (obj), TYPE_MSF2_SYSREG)
-> +
-> +typedef struct Sf2SysregState {
-> +    SysBusDevice parent_obj;
-> +
-> +    MemoryRegion iomem;
-> +
-> +    uint32_t regs[MSF2_SYSREG_NUM_REGS];
-> +} Sf2SysregState;
-> +
-> +static void msf2_sysreg_reset(DeviceState *d)
+> Types of page to chunk are treated differently. Different types of page
+> chunks are sent to the host via different protocols.
+> 
+> 1) PAGE_CHUNK_TYPE_BALLOON: Ballooned (i.e. inflated/deflated) pages
+> to chunk.  For the ballooned type, it uses the basic chunk msg format:
+> 
+> virtio_balloon_page_chunk_hdr +
+> virtio_balloon_page_chunk * MAX_PAGE_CHUNKS
+> 
+> 2) PAGE_CHUNK_TYPE_UNUSED: unused pages to chunk. It uses this miscq msg
+> format:
+> miscq_hdr +
+> virtio_balloon_page_chunk_hdr +
+> virtio_balloon_page_chunk * MAX_PAGE_CHUNKS
+> 
+> The chunk msg is actually the payload of the miscq msg.
+> 
+> 
+
+So just combine the two message formats and then it'll all be easier?
+
+
+> > > +#define MAX_PAGE_CHUNKS 4096
+> > This is an order-4 allocation. I'd make it 4095 and then it's
+> > an order-3 one.
+> 
+> Sounds good, thanks.
+> I think it would be better to make it 4090. Leave some space for the hdr
+> as well.
+
+And miscq hdr. In fact just let compiler do the math - something like:
+(8 * PAGE_SIZE - sizeof(hdr)) / sizeof(chunk)
+
+
+I skimmed explanation of algorithms below but please make sure
+code speaks for itself and add comments inline to document it.
+Whenever you answered me inline this is where you want to
+try to make code clearer and add comments.
+
+Also, pls find ways to abstract the data structure so we don't
+need to deal with its internals all over the code.
+
+
+....
+
+> > 
+> > >   {
+> > >   	struct scatterlist sg;
+> > > +	struct virtio_balloon_page_chunk_hdr *hdr;
+> > > +	void *buf;
+> > >   	unsigned int len;
+> > > -	sg_init_one(&sg, vb->pfns, sizeof(vb->pfns[0]) * vb->num_pfns);
+> > > +	switch (type) {
+> > > +	case PAGE_CHUNK_TYPE_BALLOON:
+> > > +		hdr = vb->balloon_page_chunk_hdr;
+> > > +		len = 0;
+> > > +		break;
+> > > +	default:
+> > > +		dev_warn(&vb->vdev->dev, "%s: chunk %d of unknown pages\n",
+> > > +			 __func__, type);
+> > > +		return;
+> > > +	}
+> > > -	/* We should always be able to add one buffer to an empty queue. */
+> > > -	virtqueue_add_outbuf(vq, &sg, 1, vb, GFP_KERNEL);
+> > > -	virtqueue_kick(vq);
+> > > +	buf = (void *)hdr - len;
+> > Moving back to before the header? How can this make sense?
+> > It works fine since len is 0, so just buf = hdr.
+> > 
+> For the unused page chunk case, it follows its own protocol:
+> miscq_hdr + payload(chunk msg).
+>  "buf = (void *)hdr - len" moves the buf pointer to the miscq_hdr, to send
+> the entire miscq msg.
+
+Well just pass the correct pointer in.
+
+> Please check the patch for implementing the unused page chunk,
+> it will be clear. If necessary, I can put "buf = (void *)hdr - len" from
+> that patch.
+
+Exactly. And all this pointer math is very messy. Please look for ways
+to clean it. It's generally easy to fill structures:
+
+struct foo *foo = kmalloc(..., sizeof(*foo) + n * sizeof(foo->a[0]));
+for (i = 0; i < n; ++i)
+	foo->a[i] = b;
+
+this is the kind of code that's easy to understand and it's
+obvious there are no overflows and no info leaks here.
+
+> 
+> > > +	len += sizeof(struct virtio_balloon_page_chunk_hdr);
+> > > +	len += hdr->chunks * sizeof(struct virtio_balloon_page_chunk);
+> > > +	sg_init_table(&sg, 1);
+> > > +	sg_set_buf(&sg, buf, len);
+> > > +	if (!virtqueue_add_outbuf(vq, &sg, 1, vb, GFP_KERNEL)) {
+> > > +		virtqueue_kick(vq);
+> > > +		if (busy_wait)
+> > > +			while (!virtqueue_get_buf(vq, &len) &&
+> > > +			       !virtqueue_is_broken(vq))
+> > > +				cpu_relax();
+> > > +		else
+> > > +			wait_event(vb->acked, virtqueue_get_buf(vq, &len));
+> > > +		hdr->chunks = 0;
+> > Why zero it here after device used it? Better to zero before use.
+> 
+> hdr->chunks tells the host how many chunks are there in the payload.
+> After the device use it, it is ready to zero it.
+
+It's rather confusing. Try to pass # of chunks around
+in some other way.
+
+> > 
+> > > +	}
+> > > +}
+> > > +
+> > > +static void add_one_chunk(struct virtio_balloon *vb, struct virtqueue *vq,
+> > > +			  int type, u64 base, u64 size)
+> > what are the units here? Looks like it's in 4kbyte units?
+> 
+> what is the "unit" you referred to?
+> This is the function to add one chunk, base pfn and size of the chunk are
+> supplied to the function.
+> 
+
+Are both size and base in bytes then?
+But you do not send them to host as is, you shift them for some reason
+before sending them to host.
+
+
+> 
+> > 
+> > > +	if (hdr->chunks == MAX_PAGE_CHUNKS)
+> > > +		send_page_chunks(vb, vq, type, false);
+> > 		and zero chunks here?
+> > > +}
+> > > +
+> > > +static void chunking_pages_from_bmap(struct virtio_balloon *vb,
+> > Does this mean "convert_bmap_to_chunks"?
+> > 
+> 
+> Yes.
+> 
+
+Pls name it accordingly then.
+
+> > > +				     struct virtqueue *vq,
+> > > +				     unsigned long pfn_start,
+> > > +				     unsigned long *bmap,
+> > > +				     unsigned long len)
+> > > +{
+> > > +	unsigned long pos = 0, end = len * BITS_PER_BYTE;
+> > > +
+> > > +	while (pos < end) {
+> > > +		unsigned long one = find_next_bit(bmap, end, pos);
+> > > +
+> > > +		if (one < end) {
+> > > +			unsigned long chunk_size, zero;
+> > > +
+> > > +			zero = find_next_zero_bit(bmap, end, one + 1);
+> > 
+> > zero and one are unhelpful names unless they equal 0 and 1.
+> > current/next?
+> > 
+> 
+> I think it is clear if we think about the bitmap, for example:
+> 00001111000011110000
+> one = the position of the next "1" bit,
+> zero= the position of the next "0" bit, starting from one.
+> 
+> Then, it is clear, chunk_size= zero - one
+> 
+> would it be better to use pos_0 and pos_1?
+
+Oh, so it's next_zero_bit and next_bit.
+
+
+> > > +			if (zero >= end)
+> > > +				chunk_size = end - one;
+> > > +			else
+> > > +				chunk_size = zero - one;
+> > > +
+> > > +			if (chunk_size)
+> > > +				add_one_chunk(vb, vq, PAGE_CHUNK_TYPE_BALLOON,
+> > > +					      pfn_start + one, chunk_size);
+> > Still not so what does a bit refer to? page or 4kbytes?
+> > I think it should be a page.
+> A bit in the bitmap corresponds to a pfn of a balloon page(4KB).
+
+That's a waste on systems with large page sizes, and it does not
+look like you handle that case correctly.
+
+
+> But I think it doesn't matter here, since it is pfn.
+> Using the above example:
+> 00001111000011110000
+> 
+> If the starting bit above corresponds to pfn-0x1000 (i.e. pfn_start)
+> Then the chunk base = 0x1004
+> (one is the position of the "Set" bit, which is 4), so pfn_start +one=0x1004
+> 
+> > > +static void tell_host(struct virtio_balloon *vb, struct virtqueue *vq)
+> > > +{
+> > > +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_BALLOON_CHUNKS)) {
+> > > +		int pfns, page_bmaps, i;
+> > > +		unsigned long pfn_start, pfns_len;
+> > > +
+> > > +		pfn_start = vb->pfn_start;
+> > > +		pfns = vb->pfn_stop - pfn_start + 1;
+> > > +		pfns = roundup(roundup(pfns, BITS_PER_LONG),
+> > > +			       PFNS_PER_PAGE_BMAP);
+> > > +		page_bmaps = pfns / PFNS_PER_PAGE_BMAP;
+> > > +		pfns_len = pfns / BITS_PER_BYTE;
+> > > +
+> > > +		for (i = 0; i < page_bmaps; i++) {
+> > > +			unsigned int bmap_len = PAGE_BMAP_SIZE;
+> > > +
+> > > +			/* The last one takes the leftover only */
+> > I don't understand what does this mean.
+> Still use the ruler analogy here: the object is 11-meter long, and we have
+> a 2-meter long ruler. The 5th time has covered 10 meters of the object, Then
+> the last time, the leftover is 1 meter, which means we can use half of the
+> ruler
+> to cover the left 1 meter.
+> 
+> Back to the implementation here, if there are only 10 pfns left in the last
+> round,
+> I think it's not necessary to search the entire page_bmap[] till the end.
+
+
+Pls reword the comment to make it a whole sentence.
+
+
+> > > +static void set_page_bmap(struct virtio_balloon *vb,
+> > > +			  struct list_head *pages, struct virtqueue *vq)
+> > > +{
+> > > +	unsigned long pfn_start, pfn_stop;
+> > > +	struct page *page;
+> > > +	bool found;
+> > > +
+> > > +	vb->pfn_min = rounddown(vb->pfn_min, BITS_PER_LONG);
+> > > +	vb->pfn_max = roundup(vb->pfn_max, BITS_PER_LONG);
+> > > +
+> > > +	extend_page_bmap_size(vb, vb->pfn_max - vb->pfn_min + 1);
+> > This might not do anything in particular might not cover the
+> > given pfn range. Do we care? Why not?
+> 
+> We have allocated only 1 page_bmap[], which is able to cover 1GB memory.
+> To inflate 2GB, it will try to extend by getting one more page_bmap,
+> page_bmap[1].
+> 
+> > > +	pfn_start = vb->pfn_min;
+> > > +
+> > > +	while (pfn_start < vb->pfn_max) {
+> > > +		pfn_stop = pfn_start + PFNS_PER_PAGE_BMAP * vb->page_bmaps;
+> > > +		pfn_stop = pfn_stop < vb->pfn_max ? pfn_stop : vb->pfn_max;
+> > > +
+> > > +		vb->pfn_start = pfn_start;
+> > > +		clear_page_bmap(vb);
+> > > +		found = false;
+> > > +
+> > > +		list_for_each_entry(page, pages, lru) {
+> > > +			unsigned long bmap_idx, bmap_pos, balloon_pfn;
+> > > +
+> > > +			balloon_pfn = page_to_balloon_pfn(page);
+> > > +			if (balloon_pfn < pfn_start || balloon_pfn > pfn_stop)
+> > > +				continue;
+> > > +			bmap_idx = (balloon_pfn - pfn_start) /
+> > > +				   PFNS_PER_PAGE_BMAP;
+> > > +			bmap_pos = (balloon_pfn - pfn_start) %
+> > > +				   PFNS_PER_PAGE_BMAP;
+> > > +			set_bit(bmap_pos, vb->page_bmap[bmap_idx]);
+> > Looks like this will crash if bmap_idx is out of range or
+> > if page_bmap allocation failed.
+> 
+> No, it won't. Please think about the analogy Case 2.2: pfn_start is updated
+> in each round. Like in the 2nd round, pfn_start is updated to 2, balloon_pfn
+> will be a value between 2 and 4, so the result of
+> "(balloon_pfn - pfn_start) /  PFNS_PER_PAGE_BMAP" will always be 0 when
+> we only have page_bmap[0].
+
+All these cases confuse too much. Pls abstract away the underlying data
+structure (or better find an appropriate existing one). Things should
+become clearer then.
+
+
+
+> >   #ifdef CONFIG_BALLOON_COMPACTION
+> > +
+> > +static void tell_host_one_page(struct virtio_balloon *vb,
+> > +			       struct virtqueue *vq, struct page *page)
+> > +{
+> > +	add_one_chunk(vb, vq, PAGE_CHUNK_TYPE_BALLOON, page_to_pfn(page), 1);
+> > This passes 4kbytes to host which seems wrong - I think you want a full page.
+> 
+> OK. It should be
+> add_one_chunk(vb, vq, PAGE_CHUNK_TYPE_BALLOON,
+>                           page_to_pfn(page), VIRTIO_BALLOON_PAGES_PER_PAGE)
+> 
+> right?
+> 
+> If Page=2*BalloonPage, it will pass 2*4K to the host.
+
+I guess, or better use whole page units.
+
+
+> +static void balloon_page_chunk_init(struct virtio_balloon *vb)
 > +{
-> +    Sf2SysregState *s = MSF2_SYSREG(d);
+> +	void *buf;
 > +
-> +    DB_PRINT("RESET\n");
-> +
-> +    s->regs[MSSDDR_PLL_STATUS_LOW_CR] = 0x02420041;
-> +    s->regs[MSSDDR_FACC1_CR] = 0x0A482124;
-> +    s->regs[MSSDDR_PLL_STATUS] = 0x3;
-> +}
-> +
-> +static uint64_t msf2_sysreg_read(void *opaque, hwaddr offset,
-> +    unsigned size)
-> +{
-> +    Sf2SysregState *s = opaque;
-> +    offset /= 4;
-> +    uint32_t ret = s->regs[offset];
+> +	/*
+> +	 * By default, we allocate page_bmap[0] only. More page_bmap will be
+> +	 * allocated on demand.
+> +	 */
+> +	vb->page_bmap[0] = kmalloc(PAGE_BMAP_SIZE, GFP_KERNEL);
+> +	buf = kmalloc(sizeof(struct virtio_balloon_page_chunk_hdr) +
+> +		      sizeof(struct virtio_balloon_page_chunk) *
+> +		      MAX_PAGE_CHUNKS, GFP_KERNEL);
+> +	if (!vb->page_bmap[0] || !buf) {
+> +		__virtio_clear_bit(vb->vdev, VIRTIO_BALLOON_F_BALLOON_CHUNKS);
+> 
+> > this doesn't work as expected as features has been OK'd by then.
+> > You want something like
+> > validate_features that I posted. See
+> > "virtio: allow drivers to validate features".
+> 
+> OK. I will change it after that patch is merged.
 
-Probably should check that this offset value is inside the array.
+It's upstream now.
 
-> +
-> +    DB_PRINT("addr: %08" HWADDR_PRIx " data: %08" PRIx32 "\n", offset * 4, ret);
-> +
-> +   return ret;
-> +}
-> +
-> +static void msf2_sysreg_write(void *opaque, hwaddr offset,
-> +                          uint64_t val, unsigned size)
-> +{
-> +    Sf2SysregState *s = (Sf2SysregState *)opaque;
-> +    offset /= 4;
-> +
-> +    DB_PRINT("addr: %08" HWADDR_PRIx " data: %08" PRIx64 "\n", offset * 4, val);
-> +
-> +    switch (offset) {
-> +    case MSSDDR_PLL_STATUS:
-> +        break;
-> +
-> +    default:
-> +        s->regs[offset] = val;
 
-Check the bounds here as well.
-
-> +        break;
-> +    }
-> +}
-> +
-> +static const MemoryRegionOps sysreg_ops = {
-> +    .read = msf2_sysreg_read,
-> +    .write = msf2_sysreg_write,
-> +    .endianness = DEVICE_NATIVE_ENDIAN,
-> +};
-> +
-> +static void msf2_sysreg_init(Object *obj)
-> +{
-> +    Sf2SysregState *s = MSF2_SYSREG(obj);
-> +
-> +    memory_region_init_io(&s->iomem, obj, &sysreg_ops, s, "sysreg",
-> +                          MSF2_SYSREG_MMIO_SIZE);
-> +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
-> +}
-> +
-> +static const VMStateDescription vmstate_msf2_sysreg = {
-> +    .name = "msf2_sysreg",
-> +    .version_id = 2,
-> +    .minimum_version_id = 2,
-
-This version_id should start at 1, you only increase it when you make
-changes to the code that affects migration once it's in the tree.
-
-Thanks,
-
-Alistair
-
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT32_ARRAY(regs, Sf2SysregState, MSF2_SYSREG_NUM_REGS),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static void msf2_sysreg_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +
-> +    dc->vmsd = &vmstate_msf2_sysreg;
-> +    dc->reset = msf2_sysreg_reset;
-> +}
-> +
-> +static const TypeInfo msf2_sysreg_info = {
-> +    .class_init = msf2_sysreg_class_init,
-> +    .name  = TYPE_MSF2_SYSREG,
-> +    .parent = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size  = sizeof(Sf2SysregState),
-> +    .instance_init = msf2_sysreg_init,
-> +};
-> +
-> +static void msf2_sysreg_register_types(void)
-> +{
-> +    type_register_static(&msf2_sysreg_info);
-> +}
-> +
-> +type_init(msf2_sysreg_register_types)
-> --
-> 2.5.0
->
->
+> > 
+> > > +		kfree(vb->page_bmap[0]);
+> > Looks like this will double free. you want to zero them I think.
+> > 
+> 
+> OK. I'll NULL the pointers after kfree().
+> 
+> 
+> 
+> Best,
+> Wei
+> 
+> 
