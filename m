@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1cz5Dz-0004MU-0O
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 13:41:36 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1cz5Dv-0005cl-31
+	(envelope-from <maxime.coquelin@redhat.com>) id 1cz5Dz-0004MV-0X
 	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 13:41:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35994)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <maxime.coquelin@redhat.com>) id 1cz5Dy-0005ef-18
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 13:41:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36072)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1cz5Du-0005b8-T2
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 13:41:31 -0400
+	id 1cz5Dx-0005eH-Ov
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 13:41:33 -0400
 From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Date: Fri, 14 Apr 2017 19:40:52 +0200
-Message-Id: <20170414174056.28946-1-maxime.coquelin@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC v2 0/4] vhost-user: Specify and implement device
- IOTLB support
+Date: Fri, 14 Apr 2017 19:40:53 +0200
+Message-Id: <20170414174056.28946-2-maxime.coquelin@redhat.com>
+In-Reply-To: <20170414174056.28946-1-maxime.coquelin@redhat.com>
+References: <20170414174056.28946-1-maxime.coquelin@redhat.com>
+Subject: [Qemu-devel] [RFC v2 1/4] vhost: propagate errors in
+ vhost_device_iotlb_miss()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +28,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mst@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, peterx@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org
 Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
 
-This series aims at specifying ans implementing the protocol update
-required to support device IOTLB with user backends.
+Some backends might want to know when things went wrong.
 
-In this second version, the slave requests channel part is re-used
-from Marc-Andr=C3=A9's series submitted last year[0], with main changes
-from original version being request/feature names renaming and addition
-of the REPLY_ACK feature support.
+Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+---
+ hw/virtio/vhost.c         | 15 ++++++++++-----
+ include/hw/virtio/vhost.h |  2 +-
+ 2 files changed, 11 insertions(+), 6 deletions(-)
 
-Regarding IOTLB protocol, one noticeable change is the IOTLB miss request
-reply made optionnal (i.e. only if slave requests it by setting the
-VHOST_USER_NEED_REPLY flag in the message header). This change provides
-more flexibility in the backend implementation of the feature.
-
-The protocol is very close to kernel backends, except that a new
-communication channel is introduced to enable the slave to send
-requests to the master.
-
-[0]: https://lists.gnu.org/archive/html/qemu-devel/2016-04/msg00095.html
-
-Marc-Andr=C3=A9 Lureau (2):
-  vhost-user: add vhost_user to hold the chr
-  vhost-user: add slave-req-fd support
-
-Maxime Coquelin (2):
-  vhost: propagate errors in vhost_device_iotlb_miss()
-  spec/vhost-user spec: Add IOMMU support
-
- docs/specs/vhost-user.txt | 104 ++++++++++++++++++++-
- hw/virtio/vhost-user.c    | 234 ++++++++++++++++++++++++++++++++++++++++=
-+++++-
- hw/virtio/vhost.c         |  15 ++-
- include/hw/virtio/vhost.h |   2 +-
- 4 files changed, 344 insertions(+), 11 deletions(-)
-
---=20
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index 613494d..c490cf9 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -964,18 +964,20 @@ static int vhost_memory_region_lookup(struct vhost_dev *hdev,
+     return -EFAULT;
+ }
+ 
+-void vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write)
++int vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write)
+ {
+     IOMMUTLBEntry iotlb;
+     uint64_t uaddr, len;
++    int ret = -EFAULT;
+ 
+     rcu_read_lock();
+ 
+     iotlb = address_space_get_iotlb_entry(dev->vdev->dma_as,
+                                           iova, write);
+     if (iotlb.target_as != NULL) {
+-        if (vhost_memory_region_lookup(dev, iotlb.translated_addr,
+-                                       &uaddr, &len)) {
++        ret = vhost_memory_region_lookup(dev, iotlb.translated_addr,
++                                         &uaddr, &len);
++        if (ret) {
+             error_report("Fail to lookup the translated address "
+                          "%"PRIx64, iotlb.translated_addr);
+             goto out;
+@@ -984,14 +986,17 @@ void vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write)
+         len = MIN(iotlb.addr_mask + 1, len);
+         iova = iova & ~iotlb.addr_mask;
+ 
+-        if (dev->vhost_ops->vhost_update_device_iotlb(dev, iova, uaddr,
+-                                                      len, iotlb.perm)) {
++        ret = dev->vhost_ops->vhost_update_device_iotlb(dev, iova, uaddr,
++                                                      len, iotlb.perm);
++        if (ret) {
+             error_report("Fail to update device iotlb");
+             goto out;
+         }
+     }
+ out:
+     rcu_read_unlock();
++
++    return ret;
+ }
+ 
+ static int vhost_virtqueue_start(struct vhost_dev *dev,
+diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
+index a450321..467dc77 100644
+--- a/include/hw/virtio/vhost.h
++++ b/include/hw/virtio/vhost.h
+@@ -105,5 +105,5 @@ bool vhost_has_free_slot(void);
+ int vhost_net_set_backend(struct vhost_dev *hdev,
+                           struct vhost_vring_file *file);
+ 
+-void vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write);
++int vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write);
+ #endif
+-- 
 2.9.3
