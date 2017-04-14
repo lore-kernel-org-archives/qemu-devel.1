@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37765)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cz8mG-0001x9-Ce
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 17:29:14 -0400
+	(envelope-from <alistair23@gmail.com>) id 1cz8q5-0002w9-DE
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 17:33:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cz8mE-0003VP-Hi
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 17:29:12 -0400
+	(envelope-from <alistair23@gmail.com>) id 1cz8q4-0004sp-34
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 17:33:09 -0400
 MIME-Version: 1.0
-In-Reply-To: <1491736758-19540-2-git-send-email-sundeep.lkml@gmail.com>
+In-Reply-To: <1491736758-19540-3-git-send-email-sundeep.lkml@gmail.com>
 References: <1491736758-19540-1-git-send-email-sundeep.lkml@gmail.com>
-	<1491736758-19540-2-git-send-email-sundeep.lkml@gmail.com>
+	<1491736758-19540-3-git-send-email-sundeep.lkml@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 14 Apr 2017 14:28:38 -0700
-Message-ID: <CAKmqyKMW-aTdzvTH5sir1BPx6U9XtgiZZ7TVigooXLFMY=UEQg@mail.gmail.com>
+Date: Fri, 14 Apr 2017 14:32:36 -0700
+Message-ID: <CAKmqyKNzkdJV1=qepkzVhGGOdNYbHMhnKgP9PxfKhCKxPqdNcg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [Qemu-devel RFC v2 1/4] msf2: Add Smartfusion2
- System timer
+Subject: Re: [Qemu-devel] [Qemu-devel RFC v2 2/4] msf2: Microsemi
+ Smartfusion2 System Register block.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,338 +28,216 @@ Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-a
 
 On Sun, Apr 9, 2017 at 4:19 AM, Subbaraya Sundeep
 <sundeep.lkml@gmail.com> wrote:
-> Modelled System Timer in Microsemi's Smartfusion2 Soc.
-> Timer has two 32bit down counters and two interrupts.
+> Added Sytem register block of Smartfusion2.
+> This block has PLL registers which are accessed by guest.
 >
 > Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-
-Hey Sundeep,
-
-I have some comments inline below.
-
 > ---
->  hw/timer/Makefile.objs |   1 +
->  hw/timer/msf2_timer.c  | 273 +++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 274 insertions(+)
->  create mode 100644 hw/timer/msf2_timer.c
+>  hw/misc/Makefile.objs |   1 +
+>  hw/misc/msf2_sysreg.c | 168 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 169 insertions(+)
+>  create mode 100644 hw/misc/msf2_sysreg.c
 >
-> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-> index dd6f27e..0bdf1e1 100644
-> --- a/hw/timer/Makefile.objs
-> +++ b/hw/timer/Makefile.objs
-> @@ -41,3 +41,4 @@ common-obj-$(CONFIG_STM32F2XX_TIMER) += stm32f2xx_timer.o
->  common-obj-$(CONFIG_ASPEED_SOC) += aspeed_timer.o
->
->  common-obj-$(CONFIG_SUN4V_RTC) += sun4v-rtc.o
-> +common-obj-$(CONFIG_MSF2) += msf2_timer.o
-> diff --git a/hw/timer/msf2_timer.c b/hw/timer/msf2_timer.c
+> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+> index c8b4893..aee53df 100644
+> --- a/hw/misc/Makefile.objs
+> +++ b/hw/misc/Makefile.objs
+> @@ -56,3 +56,4 @@ obj-$(CONFIG_EDU) += edu.o
+>  obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
+>  obj-$(CONFIG_AUX) += auxbus.o
+>  obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
+> +obj-$(CONFIG_MSF2) += msf2_sysreg.o
+> diff --git a/hw/misc/msf2_sysreg.c b/hw/misc/msf2_sysreg.c
 > new file mode 100644
-> index 0000000..962ada4
+> index 0000000..4873463
 > --- /dev/null
-> +++ b/hw/timer/msf2_timer.c
-> @@ -0,0 +1,273 @@
+> +++ b/hw/misc/msf2_sysreg.c
+> @@ -0,0 +1,168 @@
 > +/*
-> + * Timer block model of Microsemi SmartFusion2.
+> + * System Register block model of Microsemi SmartFusion2.
 > + *
-> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>.
+> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
 > + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
+> + * This program is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU General Public License
+> + * as published by the Free Software Foundation; either version
+> + * 2 of the License, or (at your option) any later version.
 > + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
+> + * You should have received a copy of the GNU General Public License along
+> + * with this program; if not, see <http://www.gnu.org/licenses/>.
 > + */
 > +
 > +#include "qemu/osdep.h"
+> +#include "hw/hw.h"
+> +#include "qemu/timer.h"
 > +#include "hw/sysbus.h"
-> +#include "hw/ptimer.h"
+> +#include "sysemu/sysemu.h"
 > +#include "qemu/log.h"
-> +#include "qemu/main-loop.h"
 > +
-> +#define D(x)
+> +#ifndef MSF2_SYSREG_ERR_DEBUG
+> +#define MSF2_SYSREG_ERR_DEBUG 0
+> +#endif
+> +
+> +#define DB_PRINT(...) do { \
+> +        if (MSF2_SYSREG_ERR_DEBUG) { \
+> +            fprintf(stderr,  ": %s: ", __func__); \
+> +            fprintf(stderr, ## __VA_ARGS__); \
 
-Don't use this for debug prints, you want something more along the
-lines of what is at the top of hw/misc/stm32f2xx_syscfg.c. Basically
-wrap around the qemu_log() function.
+You should use qemu_log() here.
 
+> +        } \
+> +    } while (0);
 > +
-> +#define NUM_TIMERS     2
+> +#define R_PSS_RST_CTRL_SOFT_RST 0x1
 > +
-> +#define R_VAL          0
-> +#define R_LOADVAL      1
-> +#define R_BGLOADVAL    2
-> +#define R_CTRL         3
-> +#define R_RIS          4
-> +#define R_MIS          5
-> +#define R_MAX          6
+> +enum {
+> +    ESRAM_CR        = 0x00 / 4,
+> +    ESRAM_MAX_LAT,
+> +    DDR_CR,
+> +    ENVM_CR,
+> +    ENVM_REMAP_BASE_CR,
+> +    ENVM_REMAP_FAB_CR,
+> +    CC_CR,
+> +    CC_REGION_CR,
+> +    CC_LOCK_BASE_ADDR_CR,
+> +    CC_FLUSH_INDX_CR,
+> +    DDRB_BUF_TIMER_CR,
+> +    DDRB_NB_ADDR_CR,
+> +    DDRB_NB_SIZE_CR,
+> +    DDRB_CR,
 > +
-> +#define TIMER_CTRL_ENBL     (1 << 0)
-> +#define TIMER_CTRL_ONESHOT  (1 << 1)
-> +#define TIMER_CTRL_INTR     (1 << 2)
-> +#define TIMER_RIS_ACK       (1 << 0)
-> +#define TIMER_RST_CLR       (1 << 6)
+> +    SOFT_RESET_CR  = 0x48 / 4,
+> +    M3_CR,
 > +
-> +struct msf2_timer {
-> +    QEMUBH *bh;
-> +    ptimer_state *ptimer;
-> +    void *parent;
-> +    int nr; /* for debug.  */
+> +    GPIO_SYSRESET_SEL_CR = 0x58 / 4,
 > +
-> +    unsigned long timer_div;
+> +    MDDR_CR = 0x60 / 4,
 > +
-> +    uint32_t regs[R_MAX];
-> +    qemu_irq irq;
+> +    MSSDDR_PLL_STATUS_LOW_CR = 0x90 / 4,
+> +    MSSDDR_PLL_STATUS_HIGH_CR,
+> +    MSSDDR_FACC1_CR,
+> +    MSSDDR_FACC2_CR,
+> +
+> +    MSSDDR_PLL_STATUS = 0x150 / 4,
+> +
 > +};
-
-Structs in QEMU should always be named in CamelCase.
-
 > +
-> +#define TYPE_MSF2_TIMER "msf2-timer"
-> +#define MSF2_TIMER(obj) \
-> +    OBJECT_CHECK(struct timerblock, (obj), TYPE_MSF2_TIMER)
+> +#define MSF2_SYSREG_MMIO_SIZE     0x300
+> +#define MSF2_SYSREG_NUM_REGS      (MSF2_SYSREG_MMIO_SIZE / 4)
 > +
-> +struct timerblock {
+> +#define TYPE_MSF2_SYSREG          "msf2-sysreg"
+> +#define MSF2_SYSREG(obj)  OBJECT_CHECK(Sf2SysregState, (obj), TYPE_MSF2_SYSREG)
+> +
+> +typedef struct Sf2SysregState {
 > +    SysBusDevice parent_obj;
 > +
-> +    MemoryRegion mmio;
-> +    uint32_t freq_hz;
-> +    struct msf2_timer *timers;
-> +};
+> +    MemoryRegion iomem;
 > +
-> +static inline unsigned int timer_from_addr(hwaddr addr)
+> +    uint32_t regs[MSF2_SYSREG_NUM_REGS];
+> +} Sf2SysregState;
+> +
+> +static void msf2_sysreg_reset(DeviceState *d)
 > +{
-> +    /* Timers get a 6x32bit control reg area each.  */
-> +    return addr / R_MAX;
+> +    Sf2SysregState *s = MSF2_SYSREG(d);
+> +
+> +    DB_PRINT("RESET\n");
+> +
+> +    s->regs[MSSDDR_PLL_STATUS_LOW_CR] = 0x02420041;
+> +    s->regs[MSSDDR_FACC1_CR] = 0x0A482124;
+> +    s->regs[MSSDDR_PLL_STATUS] = 0x3;
 > +}
 > +
-> +static void timer_update_irq(struct msf2_timer *st)
+> +static uint64_t msf2_sysreg_read(void *opaque, hwaddr offset,
+> +    unsigned size)
 > +{
-> +    int isr;
-> +    int ier;
+> +    Sf2SysregState *s = opaque;
+> +    offset /= 4;
+> +    uint32_t ret = s->regs[offset];
 
-I'd declare these both on the same line and declare them as bools.
+Probably should check that this offset value is inside the array.
 
 > +
-> +    isr = !!(st->regs[R_RIS] & TIMER_RIS_ACK);
-> +    ier = !!(st->regs[R_CTRL] & TIMER_CTRL_INTR);
+> +    DB_PRINT("addr: %08" HWADDR_PRIx " data: %08" PRIx32 "\n", offset * 4, ret);
 > +
-> +    qemu_set_irq(st->irq, (ier && isr));
+> +   return ret;
 > +}
 > +
-> +static uint64_t
-> +timer_read(void *opaque, hwaddr addr, unsigned int size)
+> +static void msf2_sysreg_write(void *opaque, hwaddr offset,
+> +                          uint64_t val, unsigned size)
 > +{
-> +    struct timerblock *t = opaque;
-> +    struct msf2_timer *st;
-> +    uint32_t r = 0;
-> +    unsigned int timer;
-> +    int isr;
-> +    int ier;
+> +    Sf2SysregState *s = (Sf2SysregState *)opaque;
+> +    offset /= 4;
 > +
-> +    addr >>= 2;
-> +    timer = timer_from_addr(addr);
-> +    st = &t->timers[timer];
+> +    DB_PRINT("addr: %08" HWADDR_PRIx " data: %08" PRIx64 "\n", offset * 4, val);
 > +
-> +    if (timer) {
-> +        addr -= 6;
-> +    }
-
-Isn't this timer logic just checking if (addr >> 2) == R_MAX and if it
-is set (addr >> 2) back to zero? This seems an overly complex way to
-check that.
-
-> +
-> +    switch (addr) {
-> +    case R_VAL:
-> +        r = ptimer_get_count(st->ptimer);
-> +        D(qemu_log("msf2_timer t=%d read counter=%x\n", timer, r));
-> +        break;
-> +
-> +    case R_MIS:
-> +        isr = !!(st->regs[R_RIS] & TIMER_RIS_ACK);
-> +        ier = !!(st->regs[R_CTRL] & TIMER_CTRL_INTR);
-> +        r = ier && isr;
+> +    switch (offset) {
+> +    case MSSDDR_PLL_STATUS:
 > +        break;
 > +
 > +    default:
-> +        if (addr < ARRAY_SIZE(st->regs)) {
-> +            r = st->regs[addr];
-> +        }
+> +        s->regs[offset] = val;
+
+Check the bounds here as well.
+
 > +        break;
 > +    }
-> +    D(fprintf(stderr, "%s timer=%d %x=%x\n", __func__, timer, addr * 4, r));
-> +    return r;
 > +}
 > +
-> +static void timer_update(struct msf2_timer *st)
-> +{
-> +    uint64_t count;
-> +
-> +    D(fprintf(stderr, "%s timer=%d\n", __func__, st->nr));
-> +
-> +    if (!(st->regs[R_CTRL] & TIMER_CTRL_ENBL)) {
-> +        ptimer_stop(st->ptimer);
-> +        return;
-> +    }
-> +
-> +    count = st->regs[R_LOADVAL];
-> +    ptimer_set_limit(st->ptimer, count, 1);
-> +    ptimer_run(st->ptimer, 1);
-> +}
-
-The update function should be above the read/write functions.
-
-> +
-> +static void
-> +timer_write(void *opaque, hwaddr addr,
-> +            uint64_t val64, unsigned int size)
-> +{
-> +    struct timerblock *t = opaque;
-> +    struct msf2_timer *st;
-> +    unsigned int timer;
-> +    uint32_t value = val64;
-> +
-> +    addr >>= 2;
-> +    timer = timer_from_addr(addr);
-> +    st = &t->timers[timer];
-> +    D(fprintf(stderr, "%s addr=%x val=%x (timer=%d)\n",
-> +             __func__, addr * 4, value, timer));
-> +
-> +    if (timer) {
-> +        addr -= 6;
-> +    }
-
-Same comment from the read function.
-
-> +
-> +    switch (addr) {
-> +    case R_CTRL:
-> +        st->regs[R_CTRL] = value;
-> +        timer_update(st);
-> +        break;
-> +
-> +    case R_RIS:
-> +        if (value & TIMER_RIS_ACK) {
-> +            st->regs[R_RIS] &= ~TIMER_RIS_ACK;
-> +        }
-> +        break;
-> +
-> +    case R_LOADVAL:
-> +        st->regs[R_LOADVAL] = value;
-> +        if (st->regs[R_CTRL] & TIMER_CTRL_ENBL) {
-> +            timer_update(st);
-> +        }
-> +        break;
-> +
-> +    case R_BGLOADVAL:
-> +        st->regs[R_BGLOADVAL] = value;
-> +        st->regs[R_LOADVAL] = value;
-> +        break;
-> +
-> +    case R_VAL:
-> +    case R_MIS:
-> +        break;
-> +
-> +    default:
-> +        if (addr < ARRAY_SIZE(st->regs)) {
-> +            st->regs[addr] = value;
-> +        }
-> +        break;
-> +    }
-> +    timer_update_irq(st);
-> +}
-> +
-> +static const MemoryRegionOps timer_ops = {
-> +    .read = timer_read,
-> +    .write = timer_write,
+> +static const MemoryRegionOps sysreg_ops = {
+> +    .read = msf2_sysreg_read,
+> +    .write = msf2_sysreg_write,
 > +    .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .valid = {
-> +        .min_access_size = 4,
-> +        .max_access_size = 4
-> +    }
 > +};
 > +
-> +static void timer_hit(void *opaque)
+> +static void msf2_sysreg_init(Object *obj)
 > +{
-> +    struct msf2_timer *st = opaque;
-> +    D(fprintf(stderr, "%s %d\n", __func__, st->nr));
-> +    st->regs[R_RIS] |= TIMER_RIS_ACK;
+> +    Sf2SysregState *s = MSF2_SYSREG(obj);
 > +
-> +    if (!(st->regs[R_CTRL] & TIMER_CTRL_ONESHOT)) {
-> +        timer_update(st);
-> +    }
-> +    timer_update_irq(st);
+> +    memory_region_init_io(&s->iomem, obj, &sysreg_ops, s, "sysreg",
+> +                          MSF2_SYSREG_MMIO_SIZE);
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
 > +}
 > +
-> +static void msf2_timer_realize(DeviceState *dev, Error **errp)
-> +{
-> +    struct timerblock *t = MSF2_TIMER(dev);
-> +    unsigned int i;
-> +
-> +    /* Init all the ptimers.  */
-> +    t->timers = g_malloc0((sizeof t->timers[0]) * NUM_TIMERS);
-> +    for (i = 0; i < NUM_TIMERS; i++) {
-> +        struct msf2_timer *st = &t->timers[i];
-> +
-> +        st->parent = t;
-> +        st->nr = i;
-> +        st->bh = qemu_bh_new(timer_hit, st);
-> +        st->ptimer = ptimer_init(st->bh, PTIMER_POLICY_DEFAULT);
-> +        ptimer_set_freq(st->ptimer, t->freq_hz);
-> +        sysbus_init_irq(SYS_BUS_DEVICE(dev), &st->irq);
-> +    }
-> +
-> +    memory_region_init_io(&t->mmio, OBJECT(t), &timer_ops, t, "msf2-timer",
-> +                          R_MAX * 4 * NUM_TIMERS);
-> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &t->mmio);
+> +static const VMStateDescription vmstate_msf2_sysreg = {
+> +    .name = "msf2_sysreg",
+> +    .version_id = 2,
+> +    .minimum_version_id = 2,
 
-This should be in the devices init() function.
+This version_id should start at 1, you only increase it when you make
+changes to the code that affects migration once it's in the tree.
 
 Thanks,
 
 Alistair
 
-> +}
-> +
-> +static Property msf2_timer_properties[] = {
-> +    DEFINE_PROP_UINT32("clock-frequency", struct timerblock, freq_hz,
-> +                                                                83 * 1000000),
-> +    DEFINE_PROP_END_OF_LIST(),
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT32_ARRAY(regs, Sf2SysregState, MSF2_SYSREG_NUM_REGS),
+> +        VMSTATE_END_OF_LIST()
+> +    }
 > +};
 > +
-> +static void msf2_timer_class_init(ObjectClass *klass, void *data)
+> +static void msf2_sysreg_class_init(ObjectClass *klass, void *data)
 > +{
 > +    DeviceClass *dc = DEVICE_CLASS(klass);
 > +
-> +    dc->realize = msf2_timer_realize;
-> +    dc->props = msf2_timer_properties;
+> +    dc->vmsd = &vmstate_msf2_sysreg;
+> +    dc->reset = msf2_sysreg_reset;
 > +}
 > +
-> +static const TypeInfo msf2_timer_info = {
-> +    .name          = TYPE_MSF2_TIMER,
-> +    .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(struct timerblock),
-> +    .class_init    = msf2_timer_class_init,
+> +static const TypeInfo msf2_sysreg_info = {
+> +    .class_init = msf2_sysreg_class_init,
+> +    .name  = TYPE_MSF2_SYSREG,
+> +    .parent = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size  = sizeof(Sf2SysregState),
+> +    .instance_init = msf2_sysreg_init,
 > +};
 > +
-> +static void msf2_timer_register_types(void)
+> +static void msf2_sysreg_register_types(void)
 > +{
-> +    type_register_static(&msf2_timer_info);
+> +    type_register_static(&msf2_sysreg_info);
 > +}
 > +
-> +type_init(msf2_timer_register_types)
+> +type_init(msf2_sysreg_register_types)
 > --
 > 2.5.0
 >
