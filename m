@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49180)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1cz16i-0007Rx-Sm
+	(envelope-from <a.perevalov@samsung.com>) id 1cz16i-0007Rl-Kq
 	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 09:17:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1cz16f-0008ET-S7
+	(envelope-from <a.perevalov@samsung.com>) id 1cz16f-0008E5-FP
 	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 09:17:48 -0400
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:24106)
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:61604)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1cz16f-0008DO-MK
+	id 1cz16f-0008DI-6i
 	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 09:17:45 -0400
 Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout1.w1.samsung.com
+	by mailout2.w1.samsung.com
 	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
-	2014)) with ESMTP id <0OOE00IO7I9IUO00@mailout1.w1.samsung.com> for
-	qemu-devel@nongnu.org; Fri, 14 Apr 2017 14:17:42 +0100 (BST)
+	2014)) with ESMTP id <0OOE00IN2I9GX100@mailout2.w1.samsung.com> for
+	qemu-devel@nongnu.org; Fri, 14 Apr 2017 14:17:40 +0100 (BST)
 From: Alexey Perevalov <a.perevalov@samsung.com>
-Date: Fri, 14 Apr 2017 16:17:20 +0300
-Message-id: <1492175840-5021-7-git-send-email-a.perevalov@samsung.com>
+Date: Fri, 14 Apr 2017 16:17:17 +0300
+Message-id: <1492175840-5021-4-git-send-email-a.perevalov@samsung.com>
 In-reply-to: <1492175840-5021-1-git-send-email-a.perevalov@samsung.com>
 References: <1492175840-5021-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170414131741eucas1p2f34e11e4292fef1c50ef63bd3522ad04@eucas1p2.samsung.com>
-Subject: [Qemu-devel] [PATCH 6/6] migration: detailed traces for postcopy
+	<CGME20170414131739eucas1p27a3eed795ae545efff380d7c5f8358c3@eucas1p2.samsung.com>
+Subject: [Qemu-devel] [PATCH 3/6] migration: add UFFD_FEATURE_THREAD_ID
+ feature support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,160 +34,111 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: dgilbert@redhat.com, qemu-devel@nongnu.org
 Cc: a.perevalov@samsung.com, i.maximets@samsung.com
 
-It could help to track down vCPU state during page fault and
-page fault sources.
-
-This patch showes proc's status/stack/syscall file at the moment of pagefault,
-it's very interesting to know who was page fault initiator.
+Userfaultfd mechanism is able to provide process thread id,
+in case when client request it with UFDD_API ioctl.
 
 Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
 ---
- migration/postcopy-ram.c | 98 +++++++++++++++++++++++++++++++++++++++++++++++-
- migration/trace-events   |  6 +++
- 2 files changed, 103 insertions(+), 1 deletion(-)
+ include/migration/postcopy-ram.h |  2 +-
+ migration/migration.c            |  2 +-
+ migration/postcopy-ram.c         | 12 ++++++------
+ migration/savevm.c               |  2 +-
+ 4 files changed, 9 insertions(+), 9 deletions(-)
 
+diff --git a/include/migration/postcopy-ram.h b/include/migration/postcopy-ram.h
+index 8e036b9..809f6db 100644
+--- a/include/migration/postcopy-ram.h
++++ b/include/migration/postcopy-ram.h
+@@ -14,7 +14,7 @@
+ #define QEMU_POSTCOPY_RAM_H
+ 
+ /* Return true if the host supports everything we need to do postcopy-ram */
+-bool postcopy_ram_supported_by_host(void);
++bool postcopy_ram_supported_by_host(MigrationIncomingState *mis);
+ 
+ /*
+  * Make all of RAM sensitive to accesses to areas that haven't yet been written
+diff --git a/migration/migration.c b/migration/migration.c
+index ad4036f..79f6425 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -802,7 +802,7 @@ void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
+          * special support.
+          */
+         if (!old_postcopy_cap && runstate_check(RUN_STATE_INMIGRATE) &&
+-            !postcopy_ram_supported_by_host()) {
++            !postcopy_ram_supported_by_host(NULL)) {
+             /* postcopy_ram_supported_by_host will have emitted a more
+              * detailed message
+              */
 diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index 42330fd..513633c 100644
+index dc80dbb..70f0480 100644
 --- a/migration/postcopy-ram.c
 +++ b/migration/postcopy-ram.c
-@@ -412,7 +412,91 @@ static int ram_block_enable_notify(const char *block_name, void *host_addr,
-     return 0;
- }
+@@ -60,13 +60,13 @@ struct PostcopyDiscardState {
+ #include <sys/eventfd.h>
+ #include <linux/userfaultfd.h>
  
--static int get_mem_fault_cpu_index(uint32_t pid)
-+#define PROC_LEN 1024
-+#define DEBUG_FAULT_PROCESS_STATUS 1
-+
-+#ifdef DEBUG_FAULT_PROCESS_STATUS
-+
-+static FILE *get_proc_file(const gchar *frmt, pid_t thread_id)
-+{
-+    FILE *f = NULL;
-+    gchar *file_path = g_strdup_printf(frmt, thread_id);
-+    if (file_path == NULL) {
-+        error_report("Couldn't allocate path for %u", thread_id);
-+        return NULL;
-+    }
-+    f = fopen(file_path, "r");
-+    if (!f) {
-+        error_report("can't open %s", file_path);
-+    }
-+
-+    trace_get_proc_file(file_path);
-+    g_free(file_path);
-+    return f;
-+}
-+
-+typedef void(*proc_line_handler)(const char *line);
-+
-+static void proc_line_cb(const char *line)
-+{
-+    /* trace_ functions are inline */
-+    trace_proc_line_cb(line);
-+}
-+
-+static void foreach_line_in_file(FILE *f, proc_line_handler cb)
-+{
-+    char *line = NULL;
-+    ssize_t read;
-+    size_t len;
-+
-+    while ((read = getline(&line, &len, f)) != -1) {
-+        /* workaround, trace_ infrastructure already insert \n
-+         * and getline includes it */
-+        ssize_t str_len = strlen(line) - 1;
-+        if (str_len <= 0)
-+            continue;
-+        line[str_len] = '\0';
-+        cb(line);
-+    }
-+    free(line);
-+}
-+
-+static void observe_thread_proc(const gchar *path_frmt, pid_t thread_id)
-+{
-+    FILE *f = get_proc_file(path_frmt, thread_id);
-+    if (!f) {
-+        error_report("can't read thread's proc");
-+        return;
-+    }
-+
-+    foreach_line_in_file(f, proc_line_cb);
-+    fclose(f);
-+}
-+
-+/*
-+ * for convinience tracing need to trace
-+ * observe_thread_begin
-+ * get_proc_file
-+ * proc_line_cb
-+ * observe_thread_end
-+ */
-+static void observe_thread(const char *msg, pid_t thread_id)
-+{
-+    trace_observe_thread_begin(msg);
-+    observe_thread_proc("/proc/%d/status", thread_id);
-+    observe_thread_proc("/proc/%d/syscall", thread_id);
-+    observe_thread_proc("/proc/%d/stack", thread_id);
-+    trace_observe_thread_end(msg);
-+}
-+
-+#else
-+static void observe_thread(const char *msg, pid_t thread_id)
-+{
-+}
-+
-+#endif /* DEBUG_FAULT_PROCESS_STATUS */
-+
-+static int get_mem_fault_cpu_index(pid_t pid)
+-static bool ufd_version_check(int ufd)
++static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
  {
-     CPUState *cpu_iter;
+     struct uffdio_api api_struct;
+     uint64_t ioctl_mask;
  
-@@ -421,9 +505,20 @@ static int get_mem_fault_cpu_index(uint32_t pid)
-            return cpu_iter->cpu_index;
-     }
-     trace_get_mem_fault_cpu_index(pid);
-+    observe_thread("not a vCPU", pid);
-+
-     return -1;
- }
- 
-+static void observe_vcpu_state(void)
-+{
-+    CPUState *cpu_iter;
-+    CPU_FOREACH(cpu_iter) {
-+        observe_thread("vCPU", cpu_iter->thread_id);
-+        trace_vcpu_state(cpu_iter->running, cpu_iter->cpu_index);
-+    }
-+}
-+
- /*
-  * Handle faults detected by the USERFAULT markings
+     api_struct.api = UFFD_API;
+-    api_struct.features = 0;
++    api_struct.features = UFFD_FEATURE_THREAD_ID;
+     if (ioctl(ufd, UFFDIO_API, &api_struct)) {
+         error_report("postcopy_ram_supported_by_host: UFFDIO_API failed: %s",
+                      strerror(errno));
+@@ -113,7 +113,7 @@ static int test_range_shared(const char *block_name, void *host_addr,
+  * normally fine since if the postcopy succeeds it gets turned back on at the
+  * end.
   */
-@@ -465,6 +560,7 @@ static void *postcopy_ram_fault_thread(void *opaque)
-         }
+-bool postcopy_ram_supported_by_host(void)
++bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
+ {
+     long pagesize = getpagesize();
+     int ufd = -1;
+@@ -136,7 +136,7 @@ bool postcopy_ram_supported_by_host(void)
+     }
  
-         ret = read(mis->userfault_fd, &msg, sizeof(msg));
-+        observe_vcpu_state();
-         if (ret != sizeof(msg)) {
-             if (errno == EAGAIN) {
-                 /*
-diff --git a/migration/trace-events b/migration/trace-events
-index ab2e1e4..3a74f91 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -202,6 +202,12 @@ save_xbzrle_page_overflow(void) ""
- ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait: %" PRIu64 " milliseconds, %d iterations"
- ram_load_complete(int ret, uint64_t seq_iter) "exit_code %d seq iteration %" PRIu64
- get_mem_fault_cpu_index(uint32_t pid) "pid %u is not vCPU"
-+observe_thread_status(int ptid, char *name, char *status) "host_tid %d %s %s"
-+vcpu_state(int cpu_index, int is_running) "cpu %d running %d"
-+proc_line_cb(const char *str) "%s"
-+get_proc_file(const char *str) "opened %s"
-+observe_thread_begin(const char *str) "%s"
-+observe_thread_end(const char *str) "%s"
+     /* Version and features check */
+-    if (!ufd_version_check(ufd)) {
++    if (!ufd_version_check(ufd, mis)) {
+         goto out;
+     }
  
- # migration/exec.c
- migration_exec_outgoing(const char *cmd) "cmd=%s"
+@@ -515,7 +515,7 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+      * Although the host check already tested the API, we need to
+      * do the check again as an ABI handshake on the new fd.
+      */
+-    if (!ufd_version_check(mis->userfault_fd)) {
++    if (!ufd_version_check(mis->userfault_fd, mis)) {
+         return -1;
+     }
+ 
+@@ -653,7 +653,7 @@ void *postcopy_get_tmp_page(MigrationIncomingState *mis)
+ 
+ #else
+ /* No target OS support, stubs just fail */
+-bool postcopy_ram_supported_by_host(void)
++bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
+ {
+     error_report("%s: No OS support", __func__);
+     return false;
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 3b19a4a..f01e418 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1360,7 +1360,7 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
+         return -1;
+     }
+ 
+-    if (!postcopy_ram_supported_by_host()) {
++    if (!postcopy_ram_supported_by_host(mis)) {
+         postcopy_state_set(POSTCOPY_INCOMING_NONE);
+         return -1;
+     }
 -- 
 1.8.3.1
