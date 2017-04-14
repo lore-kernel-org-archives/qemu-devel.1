@@ -1,35 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cyuzX-0007RO-QM
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 02:46:00 -0400
+	(envelope-from <stefanha@gmail.com>) id 1cyv0H-0007tK-3G
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 02:46:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cyuzT-0005Cj-HE
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 02:45:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41892)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cyuzT-0005CB-Ay
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 02:45:55 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cyuzR-0004fW-Fv
-	for <qemu-devel@nongnu.org>; Fri, 14 Apr 2017 06:45:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A5A5D2E80C8
-	for <qemu-devel@nongnu.org>; Fri, 14 Apr 2017 06:45:52 +0000 (UTC)
+	(envelope-from <stefanha@gmail.com>) id 1cyv0G-0005b3-AU
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 02:46:45 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 14 Apr 2017 06:38:18 -0000
-From: =?utf-8?b?TWljaGHFgiBLxJlwaWXFhA==?= <launchpad@kempniu.pl>
-Reply-To: Bug 1681439 <1681439@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170410132346.31250.84835.malonedeb@wampee.canonical.com>
-Message-Id: <20170414063818.17516.67434.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1681439] Re: qemu-system-x86_64:
- hw/ide/core.c:685: ide_cancel_dma_sync: Assertion `s->bus->dma->aiocb ==
- NULL' failed.
+In-Reply-To: <9c4b2a69-89fc-d4c2-7297-c9e52c17b4bd@redhat.com>
+References: <20170411155226.6395-1-mreitz@redhat.com>
+	<20170413132825.GB13387@stefanha-x1.localdomain>
+	<50cc7a90-607a-f10e-f1d8-403e8fe75d77@redhat.com>
+	<9c4b2a69-89fc-d4c2-7297-c9e52c17b4bd@redhat.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Fri, 14 Apr 2017 07:46:42 +0100
+Message-ID: <CAJSP0QV=rsDJc5yjzMnvG6DbKr+h5h9ZW2msxw_7hr9BKXvFFw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.10] Revert "block/io:
+ Comment out permission assertions"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,65 +25,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
 
-> Let's try and see if this doesn't fix your problem:
-> https://github.com/jnsnow/qemu/commit/57bf2ccdfe8dd35838c1e6642bf9bd76dc9=
-ad1a9
+On Fri, Apr 14, 2017 at 2:10 AM, John Snow <jsnow@redhat.com> wrote:
+> On 04/13/2017 10:34 AM, Max Reitz wrote:
+>> On 13.04.2017 15:28, Stefan Hajnoczi wrote:
+>>> On Tue, Apr 11, 2017 at 05:52:26PM +0200, Max Reitz wrote:
+>>>> This reverts commit e3e0003a8f6570aba1421ef99a0b383a43371a74.
+>>>>
+>>>> This commit was necessary for the 2.9 release because we were unable to
+>>>> fix the underlying issue(s) in time. However, we will be for 2.10.
+>>>>
+>>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>>> ---
+>>>>  block.c    |  6 +-----
+>>>>  block/io.c | 12 ++----------
+>>>>  2 files changed, 3 insertions(+), 15 deletions(-)
+>>>
+>>> Should we merge a fix before enabling the assertion again?  It's a known
+>>> issue.  Let people using qemu.git live a little and have fun without the
+>>> inevitable SIGABRT coredumps.  We don't benefit if more people encounter
+>>> this crash and duplicate work debugging it.
+>>
+>> Yes, we should probably merge the fixes we know about before. But after
+>> that, I'd rather merge this patch as soon as possible so we do have a
+>> chance of getting more reports (if anything else is broken) before the
+>> next freeze. :-)
+>>
+>> Max
+>>
+>
+> It's nice to have a working tree, but I think Max has a good point about
+> wanting to see the reports sooner rather than later, especially if we
+> want to roll a 2.9.1 very shortly after release.
+>
+> (Which I think we should.)
 
-Sadly, no, it still crashes.  Same assertion, same canceled command,
-same time to reproduce.
+I interpreted Max's reply to mean "okay, let's merge a fix first and
+then immediately enable the assertion again".
 
--- =
+Your reply seems to interpret Max's email as "the assertion might
+catch other bugs so it should be enabled immediately without a fix".
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1681439
+Those two are not the same :).
 
-Title:
-  qemu-system-x86_64: hw/ide/core.c:685: ide_cancel_dma_sync: Assertion
-  `s->bus->dma->aiocb =3D=3D NULL' failed.
-
-Status in QEMU:
-  New
-
-Bug description:
-  Since upgrading to QEMU 2.8.0, my Windows 7 64-bit virtual machines
-  started crashing due to the assertion quoted in the summary failing.
-  The assertion in question was added by commit 9972354856 ("block: add
-  BDS field to count in-flight requests").  My tests show that setting
-  discard=3Dunmap is needed to reproduce the issue.  Speaking of
-  reproduction, it is a bit flaky, because I have been unable to come up
-  with specific instructions that would allow the issue to be triggered
-  outside of my environment, but I do have a semi-sane way of testing that
-  appears to depend on a specific initial state of data on the underlying
-  storage volume, actions taken within the VM and waiting for about 20
-  minutes.
-
-  Here is the shortest QEMU command line that I managed to reproduce the
-  bug with:
-
-      qemu-system-x86_64 \
-          -machine pc-i440fx-2.7,accel=3Dkvm \
-          -m 3072 \
-          -drive file=3D/dev/lvm/qemu,format=3Draw,if=3Dide,discard=3Dunmap=
- \
-  	-netdev tap,id=3Dhostnet0,ifname=3Dtap0,script=3Dno,downscript=3Dno,vhos=
-t=3Don \
-          -device virtio-net-pci,netdev=3Dhostnet0 \
-  	-vnc :0
-
-  The underlying storage (/dev/lvm/qemu) is a thin LVM snapshot.
-
-  QEMU was compiled using:
-
-      ./configure --python=3D/usr/bin/python2.7 --target-list=3Dx86_64-soft=
-mmu
-      make -j3
-
-  My virtualization environment is not really a critical one and
-  reproduction is not that much of a hassle, so if you need me to gather
-  further diagnostic information or test patches, I will be happy to help.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1681439/+subscriptions
+Stefan
