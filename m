@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cywi0-0005Rw-2n
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:36:03 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1cywiJ-0005hl-H6
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:36:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cywhw-0007Us-4A
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:36:00 -0400
-Received: from 5.mo178.mail-out.ovh.net ([46.105.51.53]:53584)
+	(envelope-from <wei.w.wang@intel.com>) id 1cywiE-0007fV-E8
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:36:19 -0400
+Received: from mga06.intel.com ([134.134.136.31]:34912)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cywhv-0007UV-N8
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:35:56 -0400
-Received: from player715.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 854243174B
-	for <qemu-devel@nongnu.org>; Fri, 14 Apr 2017 10:35:54 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 14 Apr 2017 10:35:03 +0200
-Message-Id: <1492158903-8016-6-git-send-email-clg@kaod.org>
-In-Reply-To: <1492158903-8016-1-git-send-email-clg@kaod.org>
-References: <1492158903-8016-1-git-send-email-clg@kaod.org>
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1cywiE-0007el-0b
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:36:14 -0400
+Message-ID: <58F08A60.2020407@intel.com>
+Date: Fri, 14 Apr 2017 16:37:52 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 5/5] slirp: add a fake NC-SI backend
+References: <1492076108-117229-1-git-send-email-wei.w.wang@intel.com>
+	<1492076108-117229-3-git-send-email-wei.w.wang@intel.com>
+	<20170413184040-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20170413184040-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v9 2/5] virtio-balloon:
+ VIRTIO_BALLOON_F_BALLOON_CHUNKS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,785 +30,517 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Jason Wang <jasowang@redhat.com>, Dmitry Fleytman <dmitry@daynix.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, dave.hansen@intel.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com
 
-NC-SI (Network Controller Sideband Interface) enables a BMC to manage
-a set of NICs on a system. This model takes the simplest approach and
-reverses the NC-SI packets to pretend a NIC is present and exercise
-the Linux driver.
+On 04/14/2017 12:34 AM, Michael S. Tsirkin wrote:
+> On Thu, Apr 13, 2017 at 05:35:05PM +0800, Wei Wang wrote:
+>
+> So we don't need the bitmap to talk to host, it is just
+> a data structure we chose to maintain lists of pages, right?
+Right. bitmap is the way to gather pages to chunk.
+It's only needed in the balloon page case.
+For the unused page case, we don't need it, since the free
+page blocks are already chunks.
 
-The NCSI header file <ncsi-pkt.h> comes from mainline Linux and was
-untabified.
+> OK as far as it goes but you need much better isolation for it.
+> Build a data structure with APIs such as _init, _cleanup, _add, _clear,
+> _find_first, _find_next.
+> Completely unrelated to pages, it just maintains bits.
+> Then use it here.
+>
+>
+>>   static int oom_pages = OOM_VBALLOON_DEFAULT_PAGES;
+>>   module_param(oom_pages, int, S_IRUSR | S_IWUSR);
+>>   MODULE_PARM_DESC(oom_pages, "pages to free on OOM");
+>> @@ -50,6 +54,10 @@ MODULE_PARM_DESC(oom_pages, "pages to free on OOM");
+>>   static struct vfsmount *balloon_mnt;
+>>   #endif
+>>   
+>> +/* Types of pages to chunk */
+>> +#define PAGE_CHUNK_TYPE_BALLOON 0
+>> +
+> Doesn't look like you are ever adding more types in this
+> patchset.  Pls keep code simple, generalize it later.
+>
+"#define PAGE_CHUNK_TYPE_UNUSED 1" is added in another patch.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Acked-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
----
+Types of page to chunk are treated differently. Different types of page
+chunks are sent to the host via different protocols.
 
- Changes since v2:
- - modified the 'ncsi-pkt.h' file to add its location under the Linux
-   tree=20
- - removed useless zeroing of the 'reserved' fields=20
- - introduced a ncsi_rsp_handlers array to hold the payload size and
-   a specific handler routine for each command  =20
- - fixed the output size of the frame to match the command payload
-   size
+1) PAGE_CHUNK_TYPE_BALLOON: Ballooned (i.e. inflated/deflated) pages
+to chunk.  For the ballooned type, it uses the basic chunk msg format:
 
- include/net/eth.h   |   1 +
- include/net/eth.h   |   1 +
- slirp/Makefile.objs |   2 +-
- slirp/ncsi-pkt.h    | 419 ++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
- slirp/ncsi.c        | 130 ++++++++++++++++
- slirp/slirp.c       |   4 +
- slirp/slirp.h       |   3 +
- 6 files changed, 558 insertions(+), 1 deletion(-)
- create mode 100644 slirp/ncsi-pkt.h
- create mode 100644 slirp/ncsi.c
+virtio_balloon_page_chunk_hdr +
+virtio_balloon_page_chunk * MAX_PAGE_CHUNKS
 
-diff --git a/include/net/eth.h b/include/net/eth.h
-index afeb45be34e1..09054a506d6e 100644
---- a/include/net/eth.h
-+++ b/include/net/eth.h
-@@ -209,6 +209,7 @@ struct tcp_hdr {
- #define ETH_P_IPV6                (0x86dd)
- #define ETH_P_VLAN                (0x8100)
- #define ETH_P_DVLAN               (0x88a8)
-+#define ETH_P_NCSI                (0x88f8)
- #define ETH_P_UNKNOWN             (0xffff)
- #define VLAN_VID_MASK             0x0fff
- #define IP_HEADER_VERSION_4       (4)
-diff --git a/slirp/Makefile.objs b/slirp/Makefile.objs
-index 1baa1f1c7cfb..28049b03cddc 100644
---- a/slirp/Makefile.objs
-+++ b/slirp/Makefile.objs
-@@ -2,4 +2,4 @@ common-obj-y =3D cksum.o if.o ip_icmp.o ip6_icmp.o ip6_in=
-put.o ip6_output.o \
-                ip_input.o ip_output.o dnssearch.o dhcpv6.o
- common-obj-y +=3D slirp.o mbuf.o misc.o sbuf.o socket.o tcp_input.o tcp_=
-output.o
- common-obj-y +=3D tcp_subr.o tcp_timer.o udp.o udp6.o bootp.o tftp.o arp=
-_table.o \
--                ndp_table.o
-+                ndp_table.o ncsi.o
-diff --git a/slirp/ncsi-pkt.h b/slirp/ncsi-pkt.h
-new file mode 100644
-index 000000000000..ea07d1cd0f97
---- /dev/null
-+++ b/slirp/ncsi-pkt.h
-@@ -0,0 +1,419 @@
-+/*
-+ * Copyright Gavin Shan, IBM Corporation 2016.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ */
-+
-+#ifndef NCSI_PKT_H
-+#define NCSI_PKT_H
-+
-+/* from linux/net/ncsi/ncsi-pkt.h */
-+#define __be32 uint32_t
-+#define __be16 uint16_t
-+
-+struct ncsi_pkt_hdr {
-+        unsigned char mc_id;        /* Management controller ID */
-+        unsigned char revision;     /* NCSI version - 0x01      */
-+        unsigned char reserved;     /* Reserved                 */
-+        unsigned char id;           /* Packet sequence number   */
-+        unsigned char type;         /* Packet type              */
-+        unsigned char channel;      /* Network controller ID    */
-+        __be16        length;       /* Payload length           */
-+        __be32        reserved1[2]; /* Reserved                 */
-+};
-+
-+struct ncsi_cmd_pkt_hdr {
-+        struct ncsi_pkt_hdr common; /* Common NCSI packet header */
-+};
-+
-+struct ncsi_rsp_pkt_hdr {
-+        struct ncsi_pkt_hdr common; /* Common NCSI packet header */
-+        __be16              code;   /* Response code             */
-+        __be16              reason; /* Response reason           */
-+};
-+
-+struct ncsi_aen_pkt_hdr {
-+        struct ncsi_pkt_hdr common;       /* Common NCSI packet header *=
-/
-+        unsigned char       reserved2[3]; /* Reserved                  *=
-/
-+        unsigned char       type;         /* AEN packet type           *=
-/
-+};
-+
-+/* NCSI common command packet */
-+struct ncsi_cmd_pkt {
-+        struct ncsi_cmd_pkt_hdr cmd;      /* Command header */
-+        __be32                  checksum; /* Checksum       */
-+        unsigned char           pad[26];
-+};
-+
-+struct ncsi_rsp_pkt {
-+        struct ncsi_rsp_pkt_hdr rsp;      /* Response header */
-+        __be32                  checksum; /* Checksum        */
-+        unsigned char           pad[22];
-+};
-+
-+/* Select Package */
-+struct ncsi_cmd_sp_pkt {
-+        struct ncsi_cmd_pkt_hdr cmd;            /* Command header */
-+        unsigned char           reserved[3];    /* Reserved       */
-+        unsigned char           hw_arbitration; /* HW arbitration */
-+        __be32                  checksum;       /* Checksum       */
-+        unsigned char           pad[22];
-+};
-+
-+/* Disable Channel */
-+struct ncsi_cmd_dc_pkt {
-+        struct ncsi_cmd_pkt_hdr cmd;         /* Command header  */
-+        unsigned char           reserved[3]; /* Reserved        */
-+        unsigned char           ald;         /* Allow link down */
-+        __be32                  checksum;    /* Checksum        */
-+        unsigned char           pad[22];
-+};
-+
-+/* Reset Channel */
-+struct ncsi_cmd_rc_pkt {
-+        struct ncsi_cmd_pkt_hdr cmd;      /* Command header */
-+        __be32                  reserved; /* Reserved       */
-+        __be32                  checksum; /* Checksum       */
-+        unsigned char           pad[22];
-+};
-+
-+/* AEN Enable */
-+struct ncsi_cmd_ae_pkt {
-+        struct ncsi_cmd_pkt_hdr cmd;         /* Command header   */
-+        unsigned char           reserved[3]; /* Reserved         */
-+        unsigned char           mc_id;       /* MC ID            */
-+        __be32                  mode;        /* AEN working mode */
-+        __be32                  checksum;    /* Checksum         */
-+        unsigned char           pad[18];
-+};
-+
-+/* Set Link */
-+struct ncsi_cmd_sl_pkt {
-+        struct ncsi_cmd_pkt_hdr cmd;      /* Command header    */
-+        __be32                  mode;     /* Link working mode */
-+        __be32                  oem_mode; /* OEM link mode     */
-+        __be32                  checksum; /* Checksum          */
-+        unsigned char           pad[18];
-+};
-+
-+/* Set VLAN Filter */
-+struct ncsi_cmd_svf_pkt {
-+        struct ncsi_cmd_pkt_hdr cmd;       /* Command header    */
-+        __be16                  reserved;  /* Reserved          */
-+        __be16                  vlan;      /* VLAN ID           */
-+        __be16                  reserved1; /* Reserved          */
-+        unsigned char           index;     /* VLAN table index  */
-+        unsigned char           enable;    /* Enable or disable */
-+        __be32                  checksum;  /* Checksum          */
-+        unsigned char           pad[14];
-+};
-+
-+/* Enable VLAN */
-+struct ncsi_cmd_ev_pkt {
-+        struct ncsi_cmd_pkt_hdr cmd;         /* Command header   */
-+        unsigned char           reserved[3]; /* Reserved         */
-+        unsigned char           mode;        /* VLAN filter mode */
-+        __be32                  checksum;    /* Checksum         */
-+        unsigned char           pad[22];
-+};
-+
-+/* Set MAC Address */
-+struct ncsi_cmd_sma_pkt {
-+        struct ncsi_cmd_pkt_hdr cmd;      /* Command header          */
-+        unsigned char           mac[6];   /* MAC address             */
-+        unsigned char           index;    /* MAC table index         */
-+        unsigned char           at_e;     /* Addr type and operation */
-+        __be32                  checksum; /* Checksum                */
-+        unsigned char           pad[18];
-+};
-+
-+/* Enable Broadcast Filter */
-+struct ncsi_cmd_ebf_pkt {
-+        struct ncsi_cmd_pkt_hdr cmd;      /* Command header */
-+        __be32                  mode;     /* Filter mode    */
-+        __be32                  checksum; /* Checksum       */
-+        unsigned char           pad[22];
-+};
-+
-+/* Enable Global Multicast Filter */
-+struct ncsi_cmd_egmf_pkt {
-+        struct ncsi_cmd_pkt_hdr cmd;      /* Command header */
-+        __be32                  mode;     /* Global MC mode */
-+        __be32                  checksum; /* Checksum       */
-+        unsigned char           pad[22];
-+};
-+
-+/* Set NCSI Flow Control */
-+struct ncsi_cmd_snfc_pkt {
-+        struct ncsi_cmd_pkt_hdr cmd;         /* Command header    */
-+        unsigned char           reserved[3]; /* Reserved          */
-+        unsigned char           mode;        /* Flow control mode */
-+        __be32                  checksum;    /* Checksum          */
-+        unsigned char           pad[22];
-+};
-+
-+/* Get Link Status */
-+struct ncsi_rsp_gls_pkt {
-+        struct ncsi_rsp_pkt_hdr rsp;        /* Response header   */
-+        __be32                  status;     /* Link status       */
-+        __be32                  other;      /* Other indications */
-+        __be32                  oem_status; /* OEM link status   */
-+        __be32                  checksum;
-+        unsigned char           pad[10];
-+};
-+
-+/* Get Version ID */
-+struct ncsi_rsp_gvi_pkt {
-+        struct ncsi_rsp_pkt_hdr rsp;          /* Response header */
-+        __be32                  ncsi_version; /* NCSI version    */
-+        unsigned char           reserved[3];  /* Reserved        */
-+        unsigned char           alpha2;       /* NCSI version    */
-+        unsigned char           fw_name[12];  /* f/w name string */
-+        __be32                  fw_version;   /* f/w version     */
-+        __be16                  pci_ids[4];   /* PCI IDs         */
-+        __be32                  mf_id;        /* Manufacture ID  */
-+        __be32                  checksum;
-+};
-+
-+/* Get Capabilities */
-+struct ncsi_rsp_gc_pkt {
-+        struct ncsi_rsp_pkt_hdr rsp;         /* Response header   */
-+        __be32                  cap;         /* Capabilities      */
-+        __be32                  bc_cap;      /* Broadcast cap     */
-+        __be32                  mc_cap;      /* Multicast cap     */
-+        __be32                  buf_cap;     /* Buffering cap     */
-+        __be32                  aen_cap;     /* AEN cap           */
-+        unsigned char           vlan_cnt;    /* VLAN filter count */
-+        unsigned char           mixed_cnt;   /* Mix filter count  */
-+        unsigned char           mc_cnt;      /* MC filter count   */
-+        unsigned char           uc_cnt;      /* UC filter count   */
-+        unsigned char           reserved[2]; /* Reserved          */
-+        unsigned char           vlan_mode;   /* VLAN mode         */
-+        unsigned char           channel_cnt; /* Channel count     */
-+        __be32                  checksum;    /* Checksum          */
-+};
-+
-+/* Get Parameters */
-+struct ncsi_rsp_gp_pkt {
-+        struct ncsi_rsp_pkt_hdr rsp;          /* Response header       *=
-/
-+        unsigned char           mac_cnt;      /* Number of MAC addr    *=
-/
-+        unsigned char           reserved[2];  /* Reserved              *=
-/
-+        unsigned char           mac_enable;   /* MAC addr enable flags *=
-/
-+        unsigned char           vlan_cnt;     /* VLAN tag count        *=
-/
-+        unsigned char           reserved1;    /* Reserved              *=
-/
-+        __be16                  vlan_enable;  /* VLAN tag enable flags *=
-/
-+        __be32                  link_mode;    /* Link setting          *=
-/
-+        __be32                  bc_mode;      /* BC filter mode        *=
-/
-+        __be32                  valid_modes;  /* Valid mode parameters *=
-/
-+        unsigned char           vlan_mode;    /* VLAN mode             *=
-/
-+        unsigned char           fc_mode;      /* Flow control mode     *=
-/
-+        unsigned char           reserved2[2]; /* Reserved              *=
-/
-+        __be32                  aen_mode;     /* AEN mode              *=
-/
-+        unsigned char           mac[6];       /* Supported MAC addr    *=
-/
-+        __be16                  vlan;         /* Supported VLAN tags   *=
-/
-+        __be32                  checksum;     /* Checksum              *=
-/
-+};
-+
-+/* Get Controller Packet Statistics */
-+struct ncsi_rsp_gcps_pkt {
-+        struct ncsi_rsp_pkt_hdr rsp;            /* Response header      =
-      */
-+        __be32                  cnt_hi;         /* Counter cleared      =
-      */
-+        __be32                  cnt_lo;         /* Counter cleared      =
-      */
-+        __be32                  rx_bytes;       /* Rx bytes             =
-      */
-+        __be32                  tx_bytes;       /* Tx bytes             =
-      */
-+        __be32                  rx_uc_pkts;     /* Rx UC packets        =
-      */
-+        __be32                  rx_mc_pkts;     /* Rx MC packets        =
-      */
-+        __be32                  rx_bc_pkts;     /* Rx BC packets        =
-      */
-+        __be32                  tx_uc_pkts;     /* Tx UC packets        =
-      */
-+        __be32                  tx_mc_pkts;     /* Tx MC packets        =
-      */
-+        __be32                  tx_bc_pkts;     /* Tx BC packets        =
-      */
-+        __be32                  fcs_err;        /* FCS errors           =
-      */
-+        __be32                  align_err;      /* Alignment errors     =
-      */
-+        __be32                  false_carrier;  /* False carrier detecti=
-on    */
-+        __be32                  runt_pkts;      /* Rx runt packets      =
-      */
-+        __be32                  jabber_pkts;    /* Rx jabber packets    =
-      */
-+        __be32                  rx_pause_xon;   /* Rx pause XON frames  =
-      */
-+        __be32                  rx_pause_xoff;  /* Rx XOFF frames       =
-      */
-+        __be32                  tx_pause_xon;   /* Tx XON frames        =
-      */
-+        __be32                  tx_pause_xoff;  /* Tx XOFF frames       =
-      */
-+        __be32                  tx_s_collision; /* Single collision fram=
-es    */
-+        __be32                  tx_m_collision; /* Multiple collision fr=
-ames  */
-+        __be32                  l_collision;    /* Late collision frames=
-      */
-+        __be32                  e_collision;    /* Excessive collision f=
-rames */
-+        __be32                  rx_ctl_frames;  /* Rx control frames    =
-      */
-+        __be32                  rx_64_frames;   /* Rx 64-bytes frames   =
-      */
-+        __be32                  rx_127_frames;  /* Rx 65-127 bytes frame=
-s     */
-+        __be32                  rx_255_frames;  /* Rx 128-255 bytes fram=
-es    */
-+        __be32                  rx_511_frames;  /* Rx 256-511 bytes fram=
-es    */
-+        __be32                  rx_1023_frames; /* Rx 512-1023 bytes fra=
-mes   */
-+        __be32                  rx_1522_frames; /* Rx 1024-1522 bytes fr=
-ames  */
-+        __be32                  rx_9022_frames; /* Rx 1523-9022 bytes fr=
-ames  */
-+        __be32                  tx_64_frames;   /* Tx 64-bytes frames   =
-      */
-+        __be32                  tx_127_frames;  /* Tx 65-127 bytes frame=
-s     */
-+        __be32                  tx_255_frames;  /* Tx 128-255 bytes fram=
-es    */
-+        __be32                  tx_511_frames;  /* Tx 256-511 bytes fram=
-es    */
-+        __be32                  tx_1023_frames; /* Tx 512-1023 bytes fra=
-mes   */
-+        __be32                  tx_1522_frames; /* Tx 1024-1522 bytes fr=
-ames  */
-+        __be32                  tx_9022_frames; /* Tx 1523-9022 bytes fr=
-ames  */
-+        __be32                  rx_valid_bytes; /* Rx valid bytes       =
-      */
-+        __be32                  rx_runt_pkts;   /* Rx error runt packets=
-      */
-+        __be32                  rx_jabber_pkts; /* Rx error jabber packe=
-ts    */
-+        __be32                  checksum;       /* Checksum             =
-      */
-+};
-+
-+/* Get NCSI Statistics */
-+struct ncsi_rsp_gns_pkt {
-+        struct ncsi_rsp_pkt_hdr rsp;           /* Response header       =
-  */
-+        __be32                  rx_cmds;       /* Rx NCSI commands      =
-  */
-+        __be32                  dropped_cmds;  /* Dropped commands      =
-  */
-+        __be32                  cmd_type_errs; /* Command type errors   =
-  */
-+        __be32                  cmd_csum_errs; /* Command checksum error=
-s */
-+        __be32                  rx_pkts;       /* Rx NCSI packets       =
-  */
-+        __be32                  tx_pkts;       /* Tx NCSI packets       =
-  */
-+        __be32                  tx_aen_pkts;   /* Tx AEN packets        =
-  */
-+        __be32                  checksum;      /* Checksum              =
-  */
-+};
-+
-+/* Get NCSI Pass-through Statistics */
-+struct ncsi_rsp_gnpts_pkt {
-+        struct ncsi_rsp_pkt_hdr rsp;            /* Response header     *=
-/
-+        __be32                  tx_pkts;        /* Tx packets          *=
-/
-+        __be32                  tx_dropped;     /* Tx dropped packets  *=
-/
-+        __be32                  tx_channel_err; /* Tx channel errors   *=
-/
-+        __be32                  tx_us_err;      /* Tx undersize errors *=
-/
-+        __be32                  rx_pkts;        /* Rx packets          *=
-/
-+        __be32                  rx_dropped;     /* Rx dropped packets  *=
-/
-+        __be32                  rx_channel_err; /* Rx channel errors   *=
-/
-+        __be32                  rx_us_err;      /* Rx undersize errors *=
-/
-+        __be32                  rx_os_err;      /* Rx oversize errors  *=
-/
-+        __be32                  checksum;       /* Checksum            *=
-/
-+};
-+
-+/* Get package status */
-+struct ncsi_rsp_gps_pkt {
-+        struct ncsi_rsp_pkt_hdr rsp;      /* Response header            =
- */
-+        __be32                  status;   /* Hardware arbitration status=
- */
-+        __be32                  checksum;
-+};
-+
-+/* Get package UUID */
-+struct ncsi_rsp_gpuuid_pkt {
-+        struct ncsi_rsp_pkt_hdr rsp;      /* Response header */
-+        unsigned char           uuid[16]; /* UUID            */
-+        __be32                  checksum;
-+};
-+
-+/* AEN: Link State Change */
-+struct ncsi_aen_lsc_pkt {
-+        struct ncsi_aen_pkt_hdr aen;        /* AEN header      */
-+        __be32                  status;     /* Link status     */
-+        __be32                  oem_status; /* OEM link status */
-+        __be32                  checksum;   /* Checksum        */
-+        unsigned char           pad[14];
-+};
-+
-+/* AEN: Configuration Required */
-+struct ncsi_aen_cr_pkt {
-+        struct ncsi_aen_pkt_hdr aen;      /* AEN header */
-+        __be32                  checksum; /* Checksum   */
-+        unsigned char           pad[22];
-+};
-+
-+/* AEN: Host Network Controller Driver Status Change */
-+struct ncsi_aen_hncdsc_pkt {
-+        struct ncsi_aen_pkt_hdr aen;      /* AEN header */
-+        __be32                  status;   /* Status     */
-+        __be32                  checksum; /* Checksum   */
-+        unsigned char           pad[18];
-+};
-+
-+/* NCSI packet revision */
-+#define NCSI_PKT_REVISION       0x01
-+
-+/* NCSI packet commands */
-+#define NCSI_PKT_CMD_CIS        0x00 /* Clear Initial State             =
- */
-+#define NCSI_PKT_CMD_SP         0x01 /* Select Package                  =
- */
-+#define NCSI_PKT_CMD_DP         0x02 /* Deselect Package                =
- */
-+#define NCSI_PKT_CMD_EC         0x03 /* Enable Channel                  =
- */
-+#define NCSI_PKT_CMD_DC         0x04 /* Disable Channel                 =
- */
-+#define NCSI_PKT_CMD_RC         0x05 /* Reset Channel                   =
- */
-+#define NCSI_PKT_CMD_ECNT       0x06 /* Enable Channel Network Tx       =
- */
-+#define NCSI_PKT_CMD_DCNT       0x07 /* Disable Channel Network Tx      =
- */
-+#define NCSI_PKT_CMD_AE         0x08 /* AEN Enable                      =
- */
-+#define NCSI_PKT_CMD_SL         0x09 /* Set Link                        =
- */
-+#define NCSI_PKT_CMD_GLS        0x0a /* Get Link                        =
- */
-+#define NCSI_PKT_CMD_SVF        0x0b /* Set VLAN Filter                 =
- */
-+#define NCSI_PKT_CMD_EV         0x0c /* Enable VLAN                     =
- */
-+#define NCSI_PKT_CMD_DV         0x0d /* Disable VLAN                    =
- */
-+#define NCSI_PKT_CMD_SMA        0x0e /* Set MAC address                 =
- */
-+#define NCSI_PKT_CMD_EBF        0x10 /* Enable Broadcast Filter         =
- */
-+#define NCSI_PKT_CMD_DBF        0x11 /* Disable Broadcast Filter        =
- */
-+#define NCSI_PKT_CMD_EGMF       0x12 /* Enable Global Multicast Filter  =
- */
-+#define NCSI_PKT_CMD_DGMF       0x13 /* Disable Global Multicast Filter =
- */
-+#define NCSI_PKT_CMD_SNFC       0x14 /* Set NCSI Flow Control           =
- */
-+#define NCSI_PKT_CMD_GVI        0x15 /* Get Version ID                  =
- */
-+#define NCSI_PKT_CMD_GC         0x16 /* Get Capabilities                =
- */
-+#define NCSI_PKT_CMD_GP         0x17 /* Get Parameters                  =
- */
-+#define NCSI_PKT_CMD_GCPS       0x18 /* Get Controller Packet Statistics=
- */
-+#define NCSI_PKT_CMD_GNS        0x19 /* Get NCSI Statistics             =
- */
-+#define NCSI_PKT_CMD_GNPTS      0x1a /* Get NCSI Pass-throu Statistics  =
- */
-+#define NCSI_PKT_CMD_GPS        0x1b /* Get package status              =
- */
-+#define NCSI_PKT_CMD_OEM        0x50 /* OEM                             =
- */
-+#define NCSI_PKT_CMD_PLDM       0x51 /* PLDM request over NCSI over RBT =
- */
-+#define NCSI_PKT_CMD_GPUUID     0x52 /* Get package UUID                =
- */
-+
-+/* NCSI packet responses */
-+#define NCSI_PKT_RSP_CIS        (NCSI_PKT_CMD_CIS    + 0x80)
-+#define NCSI_PKT_RSP_SP         (NCSI_PKT_CMD_SP     + 0x80)
-+#define NCSI_PKT_RSP_DP         (NCSI_PKT_CMD_DP     + 0x80)
-+#define NCSI_PKT_RSP_EC         (NCSI_PKT_CMD_EC     + 0x80)
-+#define NCSI_PKT_RSP_DC         (NCSI_PKT_CMD_DC     + 0x80)
-+#define NCSI_PKT_RSP_RC         (NCSI_PKT_CMD_RC     + 0x80)
-+#define NCSI_PKT_RSP_ECNT       (NCSI_PKT_CMD_ECNT   + 0x80)
-+#define NCSI_PKT_RSP_DCNT       (NCSI_PKT_CMD_DCNT   + 0x80)
-+#define NCSI_PKT_RSP_AE         (NCSI_PKT_CMD_AE     + 0x80)
-+#define NCSI_PKT_RSP_SL         (NCSI_PKT_CMD_SL     + 0x80)
-+#define NCSI_PKT_RSP_GLS        (NCSI_PKT_CMD_GLS    + 0x80)
-+#define NCSI_PKT_RSP_SVF        (NCSI_PKT_CMD_SVF    + 0x80)
-+#define NCSI_PKT_RSP_EV         (NCSI_PKT_CMD_EV     + 0x80)
-+#define NCSI_PKT_RSP_DV         (NCSI_PKT_CMD_DV     + 0x80)
-+#define NCSI_PKT_RSP_SMA        (NCSI_PKT_CMD_SMA    + 0x80)
-+#define NCSI_PKT_RSP_EBF        (NCSI_PKT_CMD_EBF    + 0x80)
-+#define NCSI_PKT_RSP_DBF        (NCSI_PKT_CMD_DBF    + 0x80)
-+#define NCSI_PKT_RSP_EGMF       (NCSI_PKT_CMD_EGMF   + 0x80)
-+#define NCSI_PKT_RSP_DGMF       (NCSI_PKT_CMD_DGMF   + 0x80)
-+#define NCSI_PKT_RSP_SNFC       (NCSI_PKT_CMD_SNFC   + 0x80)
-+#define NCSI_PKT_RSP_GVI        (NCSI_PKT_CMD_GVI    + 0x80)
-+#define NCSI_PKT_RSP_GC         (NCSI_PKT_CMD_GC     + 0x80)
-+#define NCSI_PKT_RSP_GP         (NCSI_PKT_CMD_GP     + 0x80)
-+#define NCSI_PKT_RSP_GCPS       (NCSI_PKT_CMD_GCPS   + 0x80)
-+#define NCSI_PKT_RSP_GNS        (NCSI_PKT_CMD_GNS    + 0x80)
-+#define NCSI_PKT_RSP_GNPTS      (NCSI_PKT_CMD_GNPTS  + 0x80)
-+#define NCSI_PKT_RSP_GPS        (NCSI_PKT_CMD_GPS    + 0x80)
-+#define NCSI_PKT_RSP_OEM        (NCSI_PKT_CMD_OEM    + 0x80)
-+#define NCSI_PKT_RSP_PLDM       (NCSI_PKT_CMD_PLDM   + 0x80)
-+#define NCSI_PKT_RSP_GPUUID     (NCSI_PKT_CMD_GPUUID + 0x80)
-+
-+/* NCSI response code/reason */
-+#define NCSI_PKT_RSP_C_COMPLETED        0x0000 /* Command Completed     =
-   */
-+#define NCSI_PKT_RSP_C_FAILED           0x0001 /* Command Failed        =
-   */
-+#define NCSI_PKT_RSP_C_UNAVAILABLE      0x0002 /* Command Unavailable   =
-   */
-+#define NCSI_PKT_RSP_C_UNSUPPORTED      0x0003 /* Command Unsupported   =
-   */
-+#define NCSI_PKT_RSP_R_NO_ERROR         0x0000 /* No Error              =
-   */
-+#define NCSI_PKT_RSP_R_INTERFACE        0x0001 /* Interface not ready   =
-   */
-+#define NCSI_PKT_RSP_R_PARAM            0x0002 /* Invalid Parameter     =
-   */
-+#define NCSI_PKT_RSP_R_CHANNEL          0x0003 /* Channel not Ready     =
-   */
-+#define NCSI_PKT_RSP_R_PACKAGE          0x0004 /* Package not Ready     =
-   */
-+#define NCSI_PKT_RSP_R_LENGTH           0x0005 /* Invalid payload length=
-   */
-+#define NCSI_PKT_RSP_R_UNKNOWN          0x7fff /* Command type unsupport=
-ed */
-+
-+/* NCSI AEN packet type */
-+#define NCSI_PKT_AEN            0xFF /* AEN Packet               */
-+#define NCSI_PKT_AEN_LSC        0x00 /* Link status change       */
-+#define NCSI_PKT_AEN_CR         0x01 /* Configuration required   */
-+#define NCSI_PKT_AEN_HNCDSC     0x02 /* HNC driver status change */
-+
-+#endif /* NCSI_PKT_H */
-diff --git a/slirp/ncsi.c b/slirp/ncsi.c
-new file mode 100644
-index 000000000000..d12ba3e494b0
---- /dev/null
-+++ b/slirp/ncsi.c
-@@ -0,0 +1,130 @@
-+/*
-+ * NC-SI (Network Controller Sideband Interface) "echo" model
-+ *
-+ * Copyright (C) 2016 IBM Corp.
-+ *
-+ * This code is licensed under the GPL version 2 or later. See the
-+ * COPYING file in the top-level directory.
-+ */
-+#include "qemu/osdep.h"
-+#include "slirp.h"
-+
-+#include "ncsi-pkt.h"
-+
-+/* Get Capabilities */
-+static int ncsi_rsp_handler_gc(struct ncsi_rsp_pkt_hdr *rnh)
+2) PAGE_CHUNK_TYPE_UNUSED: unused pages to chunk. It uses this miscq msg
+format:
+miscq_hdr +
+virtio_balloon_page_chunk_hdr +
+virtio_balloon_page_chunk * MAX_PAGE_CHUNKS
+
+The chunk msg is actually the payload of the miscq msg.
+
+
+
+>> +#define MAX_PAGE_CHUNKS 4096
+> This is an order-4 allocation. I'd make it 4095 and then it's
+> an order-3 one.
+
+Sounds good, thanks.
+I think it would be better to make it 4090. Leave some space for the hdr
+as well.
+
+>
+>>   struct virtio_balloon {
+>>   	struct virtio_device *vdev;
+>>   	struct virtqueue *inflate_vq, *deflate_vq, *stats_vq;
+>> @@ -78,6 +86,32 @@ struct virtio_balloon {
+>>   	/* Synchronize access/update to this struct virtio_balloon elements */
+>>   	struct mutex balloon_lock;
+>>   
+>> +	/*
+>> +	 * Buffer for PAGE_CHUNK_TYPE_BALLOON:
+>> +	 * virtio_balloon_page_chunk_hdr +
+>> +	 * virtio_balloon_page_chunk * MAX_PAGE_CHUNKS
+>> +	 */
+>> +	struct virtio_balloon_page_chunk_hdr *balloon_page_chunk_hdr;
+>> +	struct virtio_balloon_page_chunk *balloon_page_chunk;
+>> +
+>> +	/* Bitmap used to record pages */
+>> +	unsigned long *page_bmap[PAGE_BMAP_COUNT_MAX];
+>> +	/* Number of the allocated page_bmap */
+>> +	unsigned int page_bmaps;
+>> +
+>> +	/*
+>> +	 * The allocated page_bmap size may be smaller than the pfn range of
+>> +	 * the ballooned pages. In this case, we need to use the page_bmap
+>> +	 * multiple times to cover the entire pfn range. It's like using a
+>> +	 * short ruler several times to finish measuring a long object.
+>> +	 * The start location of the ruler in the next measurement is the end
+>> +	 * location of the ruler in the previous measurement.
+>> +	 *
+>> +	 * pfn_max & pfn_min: forms the pfn range of the ballooned pages
+>> +	 * pfn_start & pfn_stop: records the start and stop pfn in each cover
+> cover? what does this mean?
+>
+> looks like you only use these to pass data to tell_host.
+> so pass these as parameters and you won't need to keep
+> them in this structure.
+>
+> And then you can move this comment to set_page_bmap where
+> it belongs.
+>
+>> +	 */
+>> +	unsigned long pfn_min, pfn_max, pfn_start, pfn_stop;
+>> +
+>>   	/* The array of pfns we tell the Host about. */
+>>   	unsigned int num_pfns;
+>>   	__virtio32 pfns[VIRTIO_BALLOON_ARRAY_PFNS_MAX];
+>> @@ -110,20 +144,201 @@ static void balloon_ack(struct virtqueue *vq)
+>>   	wake_up(&vb->acked);
+>>   }
+>>   
+>> -static void tell_host(struct virtio_balloon *vb, struct virtqueue *vq)
+>> +static inline void init_page_bmap_range(struct virtio_balloon *vb)
+>> +{
+>> +	vb->pfn_min = ULONG_MAX;
+>> +	vb->pfn_max = 0;
+>> +}
+>> +
+>> +static inline void update_page_bmap_range(struct virtio_balloon *vb,
+>> +					  struct page *page)
+>> +{
+>> +	unsigned long balloon_pfn = page_to_balloon_pfn(page);
+>> +
+>> +	vb->pfn_min = min(balloon_pfn, vb->pfn_min);
+>> +	vb->pfn_max = max(balloon_pfn, vb->pfn_max);
+>> +}
+>> +
+>> +/* The page_bmap size is extended by adding more number of page_bmap */
+> did you mean
+>
+> 	Allocate more bitmaps to cover the given number of pfns
+> 	and add them to page_bmap
+>
+> ?
+>
+> This isn't what this function does.
+> It blindly assumes 1 bitmap is allocated
+> and allocates more, up to PAGE_BMAP_COUNT_MAX.
+>
+
+Please let me use a concrete analogy to explain this algorithm:
+We have a 2-meter long ruler (i.e. page_bmap[0]).
+
+Case 1:
+To measure a  1-meter long object (i.e. pfn_max=1, pfn_min=0),
+we can simply use the ruler once and get to know that the object
+is 1-meter long.
+
+Case 2:
+To measure a 11-meter long object (i.e. pfn_max=11, pfn_min=0).
+We will first see if we can extend the 2-meter long ruler, for example,
+to 12-meter by getting another five 2-meter rulers and combine them
+(i.e. extend_page_bmap_size() to allocate page_bmap[1],
+page_bmap[2]...page_bmap[5]).
+Case 2.1: If the length of the ruler is successfully extended to
+                 12-meter, that is, we get a 12-meter long ruler, then we
+                 can simply use the ruler once and know the length of the
+                 object is 11-meter.
+Case 2.2: If the ruler failed to be extended. Then we need to use the
+                 2-meter long ruler 6 times to measure the 11-meter long
+                 object:
+                 1st time: pfn_start=0, pfn_stop=2;
+                 2nd time: pfn_start=2, pfn_stop=4;
+                 ..
+                 6th time: pfn_start=10, pfn_stop=11
+                 Still, we covered the entire length of the long object 
+with the
+                 short ruler that we have. But we used it 6 times (i.e. use
+                 page_bmap[0], 6 times).
+
+Based on the understanding of this analogy, I think the following
+questions would be easier to understand.
+
+>> +static void extend_page_bmap_size(struct virtio_balloon *vb,
+>> +				  unsigned long pfns)
+>> +{
+>> +	int i, bmaps;
+>> +	unsigned long bmap_len;
+>> +
+>> +	bmap_len = ALIGN(pfns, BITS_PER_LONG) / BITS_PER_BYTE;
+>> +	bmap_len = ALIGN(bmap_len, PAGE_BMAP_SIZE);
+> Align? PAGE_BMAP_SIZE doesn't even have to be a power of 2 ...
+
+ThoughPAGE_BMAP_SIZE has been set to 32K in the implementation,
+would you prefer to use roundup() here?
+
+
+>> +	bmaps = min((int)(bmap_len / PAGE_BMAP_SIZE),
+>> +		    PAGE_BMAP_COUNT_MAX);
+> I got lost here.
+>
+> Please use things like ARRAY_SIZE instead of macros.
+
+PAGE_BMAP_COUNT_MAX is the total amount of page_bmap[] that is
+allowed to be allocated on demand. It is 32 in the implementation.
+
+For example, if the calculation shows that it needs 100 page_bmap[],
+but we can only afford 32, so use 32 for bmaps, instead of 100. The
+the following implementation go through Case 2.2.
+
+
+
+>> +
+>> +	for (i = 1; i < bmaps; i++) {
+>> +		vb->page_bmap[i] = kmalloc(PAGE_BMAP_SIZE, GFP_KERNEL);
+>> +		if (vb->page_bmap[i])
+>> +			vb->page_bmaps++;
+>> +		else
+>> +			break;
+>> +	}
+>> +}
+>> +
+>> +static void free_extended_page_bmap(struct virtio_balloon *vb)
+>> +{
+>> +	int i, bmaps = vb->page_bmaps;
+>> +
+>> +	for (i = 1; i < bmaps; i++) {
+>> +		kfree(vb->page_bmap[i]);
+>> +		vb->page_bmap[i] = NULL;
+>> +		vb->page_bmaps--;
+>> +	}
+>> +}
+>> +
+> What's the magic number 1 here?
+> Maybe you want to document what is going on.
+> Here's a guess:
+>
+> We keep a single bmap around at all times.
+> If memory does not fit there, we allocate up to
+> PAGE_BMAP_COUNT_MAX of chunks.
+>
+
+Right. By default, we have only 1 page_bmap[] allocated.
+
+
+>> +static void free_page_bmap(struct virtio_balloon *vb)
+>> +{
+>> +	int i;
+>> +
+>> +	for (i = 0; i < vb->page_bmaps; i++)
+>> +		kfree(vb->page_bmap[i]);
+>> +}
+>> +
+>> +static void clear_page_bmap(struct virtio_balloon *vb)
+>> +{
+>> +	int i;
+>> +
+>> +	for (i = 0; i < vb->page_bmaps; i++)
+>> +		memset(vb->page_bmap[i], 0, PAGE_BMAP_SIZE);
+>> +}
+>> +
+>> +static void send_page_chunks(struct virtio_balloon *vb, struct virtqueue *vq,
+>> +			     int type, bool busy_wait)
+> busy_wait seems unused. pls drop.
+
+It will be used in the other patch (the 5th patch) for sending unused pages.
+Probably I can add it from that patch.
+
+>
+>>   {
+>>   	struct scatterlist sg;
+>> +	struct virtio_balloon_page_chunk_hdr *hdr;
+>> +	void *buf;
+>>   	unsigned int len;
+>>   
+>> -	sg_init_one(&sg, vb->pfns, sizeof(vb->pfns[0]) * vb->num_pfns);
+>> +	switch (type) {
+>> +	case PAGE_CHUNK_TYPE_BALLOON:
+>> +		hdr = vb->balloon_page_chunk_hdr;
+>> +		len = 0;
+>> +		break;
+>> +	default:
+>> +		dev_warn(&vb->vdev->dev, "%s: chunk %d of unknown pages\n",
+>> +			 __func__, type);
+>> +		return;
+>> +	}
+>>   
+>> -	/* We should always be able to add one buffer to an empty queue. */
+>> -	virtqueue_add_outbuf(vq, &sg, 1, vb, GFP_KERNEL);
+>> -	virtqueue_kick(vq);
+>> +	buf = (void *)hdr - len;
+> Moving back to before the header? How can this make sense?
+> It works fine since len is 0, so just buf = hdr.
+>
+For the unused page chunk case, it follows its own protocol:
+miscq_hdr + payload(chunk msg).
+  "buf = (void *)hdr - len" moves the buf pointer to the miscq_hdr, to send
+the entire miscq msg.
+
+Please check the patch for implementing the unused page chunk,
+it will be clear. If necessary, I can put "buf = (void *)hdr - len" from 
+that patch.
+
+
+>> +	len += sizeof(struct virtio_balloon_page_chunk_hdr);
+>> +	len += hdr->chunks * sizeof(struct virtio_balloon_page_chunk);
+>> +	sg_init_table(&sg, 1);
+>> +	sg_set_buf(&sg, buf, len);
+>> +	if (!virtqueue_add_outbuf(vq, &sg, 1, vb, GFP_KERNEL)) {
+>> +		virtqueue_kick(vq);
+>> +		if (busy_wait)
+>> +			while (!virtqueue_get_buf(vq, &len) &&
+>> +			       !virtqueue_is_broken(vq))
+>> +				cpu_relax();
+>> +		else
+>> +			wait_event(vb->acked, virtqueue_get_buf(vq, &len));
+>> +		hdr->chunks = 0;
+> Why zero it here after device used it? Better to zero before use.
+
+hdr->chunks tells the host how many chunks are there in the payload.
+After the device use it, it is ready to zero it.
+
+>
+>> +	}
+>> +}
+>> +
+>> +static void add_one_chunk(struct virtio_balloon *vb, struct virtqueue *vq,
+>> +			  int type, u64 base, u64 size)
+> what are the units here? Looks like it's in 4kbyte units?
+
+what is the "unit" you referred to?
+This is the function to add one chunk, base pfn and size of the chunk are
+supplied to the function.
+
+
+
+>
+>> +	if (hdr->chunks == MAX_PAGE_CHUNKS)
+>> +		send_page_chunks(vb, vq, type, false);
+> 		and zero chunks here?
+>> +}
+>> +
+>> +static void chunking_pages_from_bmap(struct virtio_balloon *vb,
+> Does this mean "convert_bmap_to_chunks"?
+>
+
+Yes.
+
+
+>> +				     struct virtqueue *vq,
+>> +				     unsigned long pfn_start,
+>> +				     unsigned long *bmap,
+>> +				     unsigned long len)
+>> +{
+>> +	unsigned long pos = 0, end = len * BITS_PER_BYTE;
+>> +
+>> +	while (pos < end) {
+>> +		unsigned long one = find_next_bit(bmap, end, pos);
+>> +
+>> +		if (one < end) {
+>> +			unsigned long chunk_size, zero;
+>> +
+>> +			zero = find_next_zero_bit(bmap, end, one + 1);
+>
+> zero and one are unhelpful names unless they equal 0 and 1.
+> current/next?
+>
+
+I think it is clear if we think about the bitmap, for example:
+00001111000011110000
+one = the position of the next "1" bit,
+zero= the position of the next "0" bit, starting from one.
+
+Then, it is clear, chunk_size= zero - one
+
+would it be better to use pos_0 and pos_1?
+
+>> +			if (zero >= end)
+>> +				chunk_size = end - one;
+>> +			else
+>> +				chunk_size = zero - one;
+>> +
+>> +			if (chunk_size)
+>> +				add_one_chunk(vb, vq, PAGE_CHUNK_TYPE_BALLOON,
+>> +					      pfn_start + one, chunk_size);
+> Still not so what does a bit refer to? page or 4kbytes?
+> I think it should be a page.
+A bit in the bitmap corresponds to a pfn of a balloon page(4KB).
+But I think it doesn't matter here, since it is pfn.
+Using the above example:
+00001111000011110000
+
+If the starting bit above corresponds to pfn-0x1000 (i.e. pfn_start)
+Then the chunk base = 0x1004
+(one is the position of the "Set" bit, which is 4), so pfn_start 
++one=0x1004
+
+>> +static void tell_host(struct virtio_balloon *vb, struct virtqueue *vq)
+>> +{
+>> +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_BALLOON_CHUNKS)) {
+>> +		int pfns, page_bmaps, i;
+>> +		unsigned long pfn_start, pfns_len;
+>> +
+>> +		pfn_start = vb->pfn_start;
+>> +		pfns = vb->pfn_stop - pfn_start + 1;
+>> +		pfns = roundup(roundup(pfns, BITS_PER_LONG),
+>> +			       PFNS_PER_PAGE_BMAP);
+>> +		page_bmaps = pfns / PFNS_PER_PAGE_BMAP;
+>> +		pfns_len = pfns / BITS_PER_BYTE;
+>> +
+>> +		for (i = 0; i < page_bmaps; i++) {
+>> +			unsigned int bmap_len = PAGE_BMAP_SIZE;
+>> +
+>> +			/* The last one takes the leftover only */
+> I don't understand what does this mean.
+Still use the ruler analogy here: the object is 11-meter long, and we have
+a 2-meter long ruler. The 5th time has covered 10 meters of the object, Then
+the last time, the leftover is 1 meter, which means we can use half of 
+the ruler
+to cover the left 1 meter.
+
+Back to the implementation here, if there are only 10 pfns left in the 
+last round,
+I think it's not necessary to search the entire page_bmap[] till the end.
+
+>> +static void set_page_bmap(struct virtio_balloon *vb,
+>> +			  struct list_head *pages, struct virtqueue *vq)
+>> +{
+>> +	unsigned long pfn_start, pfn_stop;
+>> +	struct page *page;
+>> +	bool found;
+>> +
+>> +	vb->pfn_min = rounddown(vb->pfn_min, BITS_PER_LONG);
+>> +	vb->pfn_max = roundup(vb->pfn_max, BITS_PER_LONG);
+>> +
+>> +	extend_page_bmap_size(vb, vb->pfn_max - vb->pfn_min + 1);
+> This might not do anything in particular might not cover the
+> given pfn range. Do we care? Why not?
+
+We have allocated only 1 page_bmap[], which is able to cover 1GB memory.
+To inflate 2GB, it will try to extend by getting one more page_bmap, 
+page_bmap[1].
+
+>> +	pfn_start = vb->pfn_min;
+>> +
+>> +	while (pfn_start < vb->pfn_max) {
+>> +		pfn_stop = pfn_start + PFNS_PER_PAGE_BMAP * vb->page_bmaps;
+>> +		pfn_stop = pfn_stop < vb->pfn_max ? pfn_stop : vb->pfn_max;
+>> +
+>> +		vb->pfn_start = pfn_start;
+>> +		clear_page_bmap(vb);
+>> +		found = false;
+>> +
+>> +		list_for_each_entry(page, pages, lru) {
+>> +			unsigned long bmap_idx, bmap_pos, balloon_pfn;
+>> +
+>> +			balloon_pfn = page_to_balloon_pfn(page);
+>> +			if (balloon_pfn < pfn_start || balloon_pfn > pfn_stop)
+>> +				continue;
+>> +			bmap_idx = (balloon_pfn - pfn_start) /
+>> +				   PFNS_PER_PAGE_BMAP;
+>> +			bmap_pos = (balloon_pfn - pfn_start) %
+>> +				   PFNS_PER_PAGE_BMAP;
+>> +			set_bit(bmap_pos, vb->page_bmap[bmap_idx]);
+> Looks like this will crash if bmap_idx is out of range or
+> if page_bmap allocation failed.
+
+No, it won't. Please think about the analogy Case 2.2: pfn_start is updated
+in each round. Like in the 2nd round, pfn_start is updated to 2, balloon_pfn
+will be a value between 2 and 4, so the result of
+"(balloon_pfn - pfn_start) /  PFNS_PER_PAGE_BMAP" will always be 0 when
+we only have page_bmap[0].
+
+>   
+>   #ifdef CONFIG_BALLOON_COMPACTION
+> +
+> +static void tell_host_one_page(struct virtio_balloon *vb,
+> +			       struct virtqueue *vq, struct page *page)
+> +{
+> +	add_one_chunk(vb, vq, PAGE_CHUNK_TYPE_BALLOON, page_to_pfn(page), 1);
+> This passes 4kbytes to host which seems wrong - I think you want a full page.
+
+OK. It should be
+add_one_chunk(vb, vq, PAGE_CHUNK_TYPE_BALLOON,
+                           page_to_pfn(page), VIRTIO_BALLOON_PAGES_PER_PAGE)
+
+right?
+
+If Page=2*BalloonPage, it will pass 2*4K to the host.
+
++static void balloon_page_chunk_init(struct virtio_balloon *vb)
 +{
-+    struct ncsi_rsp_gc_pkt *rsp =3D (struct ncsi_rsp_gc_pkt *) rnh;
++	void *buf;
 +
-+    rsp->cap =3D htonl(~0);
-+    rsp->bc_cap =3D htonl(~0);
-+    rsp->mc_cap =3D htonl(~0);
-+    rsp->buf_cap =3D htonl(~0);
-+    rsp->aen_cap =3D htonl(~0);
-+    rsp->vlan_mode =3D 0xff;
-+    rsp->uc_cnt =3D 2;
-+    return 0;
-+}
-+
-+/* Get Link status */
-+static int ncsi_rsp_handler_gls(struct ncsi_rsp_pkt_hdr *rnh)
-+{
-+    struct ncsi_rsp_gls_pkt *rsp =3D (struct ncsi_rsp_gls_pkt *) rnh;
-+
-+    rsp->status =3D htonl(0x1);
-+    return 0;
-+}
-+
-+static const struct ncsi_rsp_handler {
-+        unsigned char   type;
-+        int             payload;
-+        int             (*handler)(struct ncsi_rsp_pkt_hdr *rnh);
-+} ncsi_rsp_handlers[] =3D {
-+        { NCSI_PKT_RSP_CIS,     4, NULL },
-+        { NCSI_PKT_RSP_SP,      4, NULL },
-+        { NCSI_PKT_RSP_DP,      4, NULL },
-+        { NCSI_PKT_RSP_EC,      4, NULL },
-+        { NCSI_PKT_RSP_DC,      4, NULL },
-+        { NCSI_PKT_RSP_RC,      4, NULL },
-+        { NCSI_PKT_RSP_ECNT,    4, NULL },
-+        { NCSI_PKT_RSP_DCNT,    4, NULL },
-+        { NCSI_PKT_RSP_AE,      4, NULL },
-+        { NCSI_PKT_RSP_SL,      4, NULL },
-+        { NCSI_PKT_RSP_GLS,    16, ncsi_rsp_handler_gls },
-+        { NCSI_PKT_RSP_SVF,     4, NULL },
-+        { NCSI_PKT_RSP_EV,      4, NULL },
-+        { NCSI_PKT_RSP_DV,      4, NULL },
-+        { NCSI_PKT_RSP_SMA,     4, NULL },
-+        { NCSI_PKT_RSP_EBF,     4, NULL },
-+        { NCSI_PKT_RSP_DBF,     4, NULL },
-+        { NCSI_PKT_RSP_EGMF,    4, NULL },
-+        { NCSI_PKT_RSP_DGMF,    4, NULL },
-+        { NCSI_PKT_RSP_SNFC,    4, NULL },
-+        { NCSI_PKT_RSP_GVI,    36, NULL },
-+        { NCSI_PKT_RSP_GC,     32, ncsi_rsp_handler_gc },
-+        { NCSI_PKT_RSP_GP,     -1, NULL },
-+        { NCSI_PKT_RSP_GCPS,  172, NULL },
-+        { NCSI_PKT_RSP_GNS,   172, NULL },
-+        { NCSI_PKT_RSP_GNPTS, 172, NULL },
-+        { NCSI_PKT_RSP_GPS,     8, NULL },
-+        { NCSI_PKT_RSP_OEM,     0, NULL },
-+        { NCSI_PKT_RSP_PLDM,    0, NULL },
-+        { NCSI_PKT_RSP_GPUUID, 20, NULL }
-+};
-+
-+/*
-+ * packet format : ncsi header + payload + checksum
-+ */
-+#define NCSI_MAX_PAYLOAD 172
-+#define NCSI_MAX_LEN     (sizeof(struct ncsi_pkt_hdr) + NCSI_MAX_PAYLOAD=
- + 4)
-+
-+void ncsi_input(Slirp *slirp, const uint8_t *pkt, int pkt_len)
-+{
-+    struct ncsi_pkt_hdr *nh =3D (struct ncsi_pkt_hdr *)(pkt + ETH_HLEN);
-+    uint8_t ncsi_reply[ETH_HLEN + NCSI_MAX_LEN];
-+    struct ethhdr *reh =3D (struct ethhdr *)ncsi_reply;
-+    struct ncsi_rsp_pkt_hdr *rnh =3D (struct ncsi_rsp_pkt_hdr *)
-+        (ncsi_reply + ETH_HLEN);
-+    const struct ncsi_rsp_handler *handler =3D NULL;
-+    int i;
-+
-+    memset(ncsi_reply, 0, sizeof(ncsi_reply));
-+
-+    memset(reh->h_dest, 0xff, ETH_ALEN);
-+    memset(reh->h_source, 0xff, ETH_ALEN);
-+    reh->h_proto =3D htons(ETH_P_NCSI);
-+
-+    for (i =3D 0; i < ARRAY_SIZE(ncsi_rsp_handlers); i++) {
-+        if (ncsi_rsp_handlers[i].type =3D=3D nh->type + 0x80) {
-+            handler =3D &ncsi_rsp_handlers[i];
-+            break;
-+        }
-+    }
-+
-+    rnh->common.mc_id      =3D nh->mc_id;
-+    rnh->common.revision   =3D NCSI_PKT_REVISION;
-+    rnh->common.id         =3D nh->id;
-+    rnh->common.type       =3D nh->type + 0x80;
-+    rnh->common.channel    =3D nh->channel;
-+
-+    if (handler) {
-+        rnh->common.length =3D htons(handler->payload);
-+        rnh->code          =3D htons(NCSI_PKT_RSP_C_COMPLETED);
-+        rnh->reason        =3D htons(NCSI_PKT_RSP_R_NO_ERROR);
-+
-+        if (handler->handler) {
-+            /* TODO: handle errors */
-+            handler->handler(rnh);
-+        }
-+    } else {
-+        rnh->common.length =3D 0;
-+        rnh->code          =3D htons(NCSI_PKT_RSP_C_UNAVAILABLE);
-+        rnh->reason        =3D htons(NCSI_PKT_RSP_R_UNKNOWN);
-+    }
-+
-+    /* TODO: add a checksum at the end of the frame but the specs
-+     * allows it to be zero */
-+
-+    slirp_output(slirp->opaque, ncsi_reply, ETH_HLEN + sizeof(*nh) +
-+                 (handler ? handler->payload : 0) + 4);
-+}
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 5a94b06f5eb4..9a50918346b1 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -870,6 +870,10 @@ void slirp_input(Slirp *slirp, const uint8_t *pkt, i=
-nt pkt_len)
-         }
-         break;
-=20
-+    case ETH_P_NCSI:
-+        ncsi_input(slirp, pkt, pkt_len);
-+        break;
-+
-     default:
-         break;
-     }
-diff --git a/slirp/slirp.h b/slirp/slirp.h
-index 3877f667f027..5af4f482b55f 100644
---- a/slirp/slirp.h
-+++ b/slirp/slirp.h
-@@ -231,6 +231,9 @@ extern Slirp *slirp_instance;
-=20
- void if_start(Slirp *);
-=20
-+/* ncsi.c */
-+void ncsi_input(Slirp *slirp, const uint8_t *pkt, int pkt_len);
-+
- #ifndef _WIN32
- #include <netdb.h>
- #endif
---=20
-2.7.4
++	/*
++	 * By default, we allocate page_bmap[0] only. More page_bmap will be
++	 * allocated on demand.
++	 */
++	vb->page_bmap[0] = kmalloc(PAGE_BMAP_SIZE, GFP_KERNEL);
++	buf = kmalloc(sizeof(struct virtio_balloon_page_chunk_hdr) +
++		      sizeof(struct virtio_balloon_page_chunk) *
++		      MAX_PAGE_CHUNKS, GFP_KERNEL);
++	if (!vb->page_bmap[0] || !buf) {
++		__virtio_clear_bit(vb->vdev, VIRTIO_BALLOON_F_BALLOON_CHUNKS);
+
+> this doesn't work as expected as features has been OK'd by then.
+> You want something like
+> validate_features that I posted. See
+> "virtio: allow drivers to validate features".
+
+OK. I will change it after that patch is merged.
+
+>
+>> +		kfree(vb->page_bmap[0]);
+> Looks like this will double free. you want to zero them I think.
+>
+
+OK. I'll NULL the pointers after kfree().
+
+
+
+Best,
+Wei
