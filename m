@@ -1,33 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1cyzAM-0000RJ-Kb
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 07:13:27 -0400
+	(envelope-from <bounces@canonical.com>) id 1cz08J-0006aT-Iv
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 08:15:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1cyzAJ-0000sD-El
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 07:13:26 -0400
-Received: from mail-he1eur01on0099.outbound.protection.outlook.com
-	([104.47.0.99]:55726
-	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+	(envelope-from <bounces@canonical.com>) id 1cz08E-0007CY-KS
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 08:15:23 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52244)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1cyzAI-0000pz-Th
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 07:13:23 -0400
-Date: Fri, 14 Apr 2017 10:40:41 +0300
-From: Roman Kagan <rkagan@virtuozzo.com>
-Message-ID: <20170414074040.GA30735@rkaganb.sw.ru>
-References: <20170406150148.zwjpozqtale44jfh@perseus.local>
-	<b55603db-5215-ac30-29e4-f4764f17c14e@openvz.org>
-	<d77e0178-8898-3583-ca2c-adf43bf9e0f4@redhat.com>
-	<e00ab029-cf9f-5aca-9786-581915dd5189@openvz.org>
-	<20170413094454.GB5095@noname.redhat.com>
-	<1cc754f6-6718-edbc-96ef-ab0e0e10fd56@openvz.org>
-	<d34a20e9-8cb7-3b83-e96f-4631f91045cd@redhat.com>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cz08E-0007CQ-EM
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 08:15:18 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cz08C-0007Yb-GM
+	for <qemu-devel@nongnu.org>; Fri, 14 Apr 2017 12:15:16 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7AC742E80C4
+	for <qemu-devel@nongnu.org>; Fri, 14 Apr 2017 12:15:16 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <d34a20e9-8cb7-3b83-e96f-4631f91045cd@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC] Proposed qcow2 extension:
- subcluster allocation
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 14 Apr 2017 12:02:01 -0000
+From: Legorol <legorol.san@gmail.com>
+Reply-To: Bug 1030666 <1030666@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20120730014155.9541.71695.malonedeb@soybean.canonical.com>
+	<20170407134701.1808.15364.malone@chaenomeles.canonical.com>
+Message-Id: <58f0ba39.8688df0a.fef28.b25a@mx.google.com>
+Errors-To: bounces@canonical.com
+Subject: Re: [Qemu-devel] [Bug 1030666] Re: gdb can't proceed after a
+ breakpoint
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,48 +38,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: "Denis V. Lunev" <den@openvz.org>, Kevin Wolf <kwolf@redhat.com>, Stefan
-	Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Thu, Apr 13, 2017 at 09:06:19PM -0400, John Snow wrote:
-> So if we have a 1MB cluster with 64k subclusters as a hypothetical, if
-> we write just the first subcluster, we'll have a map like:
-> 
-> X---------------
-> 
-> Whatever actually happens to exist in this space, whether it be a hole
-> we punched via fallocate or literal zeroes, this space is known to the
-> filesystem to be contiguous.
-> 
-> If we write to the last subcluster, we'll get:
-> 
-> X--------------X
-> 
-> And again, maybe the dashes are a fallocate hole, maybe they're zeroes.
-> but the last subcluster is located virtually exactly 15 subclusters
-> behind the first, they're not physically contiguous. We've saved the
-> space between them. Future out-of-order writes won't contribute to any
-> fragmentation, at least at this level.
+Hi,
 
-Yeah I think this is where the confusion lies.  You apparently assume
-that the filesystem is smart enough to compensate for the subclusters
-being sparse within a cluster, and will make them eventually contiguous
-on the *media* once they are all written.  Denis is claiming the
-opposite.  I posted a simple experiment with a 64kB sparse file written
-out of order which ended up being 16 disparate blocks on the platters
-(ext4; with xfs this may be different), and this is obviously
-detrimental for performance with rotating disks.
+Thank you for your email, I remember this issue. Unfortunately I don=E2=80=
+=99t
+have the time to try this right now, but I may be able to get to it in
+the next couple of weeks.
 
-Note also that if the filesystem actually is smart to maintain the
-subclusters contiguos even if written out of order, apparently by not
-allowing blocks from other files to take the yet unused space between
-sparse subclusters, the disk space saving becomes not so obvious.
+Regards,
+Legorol
 
-> You might be able to reduce COW from 5 IOPs to 3 IOPs, but if we tune
-> the subclusters right, we'll have *zero*, won't we?
+From: Thomas Huth
+Sent: 07 April 2017 14:59
+To: legorol.san@gmail.com
+Subject: [Bug 1030666] Re: gdb can't proceed after a breakpoint
 
-Right, this is an attractive advantage.  Need to test if the later
-access to such interleaved clusters is not degraded, though.
+Triaging old bug tickets ... can you still reproduce this issue with the
+latest version of QEMU (version 2.9)?
 
-Roman.
+** Changed in: qemu
+       Status: New =3D> Incomplete
+
+-- =
+
+You received this bug notification because you are subscribed to the bug
+report.
+https://bugs.launchpad.net/bugs/1030666
+
+Title:
+  gdb can't proceed after a breakpoint
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Using qemu-1.1.0-windows.zip package from http://lassauge.free.fr/qemu/
+  Host: Windows 7 Ultimate 64-bit
+  Guest: i386 system running MS-DOS 6.22
+  Launch command line:
+  =C2=A0=C2=A0qemu-system-i386.exe -L Bios -fda "DOS.vfd" -fdb "Data.vfd" -=
+gdb tcp:127.0.0.1:1234
+  Debbugers tried:
+  =C2=A0=C2=A0gdb 7.3.50.20111026-cvs running on Cygwin 1.7.16
+  =C2=A0=C2=A0gdb 7.4 on MinGW
+
+  Short description:
+  I use gdb to attach to a running Qemu session, set a breakpoint and resum=
+e execution. When the breakpoint is hit, gdb gains control as expected. How=
+ever, trying to single-step or continue at this point just causes the same =
+breakpoint to be hit immediately again. Deleting the breakpoint allows sing=
+le-stepping or continue to work.
+
+  Steps to reproduce:
+  DOS.vfd is a floppy image containing an MS-DOS 6.22 startup disk.
+  Data.vfd is a floppy image containing a single program (hello.com).
+  The aim is to debug the execution of hello.com with gdb.
+  Launch Qemu.
+  Launch gdb, an attach to qemu:
+  =C2=A0=C2=A0"target remote localhost:1234"
+  I know the address at which hello.com will be loaded, so set a breakpoint=
+ there and resume execution:
+  =C2=A0=C2=A0"break *0xf730"
+  =C2=A0=C2=A0"continue"
+  In Qemu, start hello.com. The breakpoint is immediately hit, execution st=
+ops and gdb gains control.
+  Examining the program gives expected results (such as "info reg" or "disa=
+ssemble").
+  At this point, try to proceed either with single-stepping ("si" or "ni") =
+or with "continue", and the same breakpoint is immediately hit again. Subse=
+quent attempts to single-step or continue just keep hitting the same breakp=
+oint.
+  The only way to proceed at this point is to delete the breakpoint, after =
+which both single-stepping and continue work.
+
+  Note that single-stepping and continue works as expected if it is done
+  after interrupting execution with Ctrl-C.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1030666/+subscriptions
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1030666
+
+Title:
+  gdb can't proceed after a breakpoint
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Using qemu-1.1.0-windows.zip package from http://lassauge.free.fr/qemu/
+  Host: Windows 7 Ultimate 64-bit
+  Guest: i386 system running MS-DOS 6.22
+  Launch command line:
+  =C2=A0=C2=A0qemu-system-i386.exe -L Bios -fda "DOS.vfd" -fdb "Data.vfd" -=
+gdb tcp:127.0.0.1:1234
+  Debbugers tried:
+  =C2=A0=C2=A0gdb 7.3.50.20111026-cvs running on Cygwin 1.7.16
+  =C2=A0=C2=A0gdb 7.4 on MinGW
+
+  Short description:
+  I use gdb to attach to a running Qemu session, set a breakpoint and resum=
+e execution. When the breakpoint is hit, gdb gains control as expected. How=
+ever, trying to single-step or continue at this point just causes the same =
+breakpoint to be hit immediately again. Deleting the breakpoint allows sing=
+le-stepping or continue to work.
+
+  Steps to reproduce:
+  DOS.vfd is a floppy image containing an MS-DOS 6.22 startup disk.
+  Data.vfd is a floppy image containing a single program (hello.com).
+  The aim is to debug the execution of hello.com with gdb.
+  Launch Qemu.
+  Launch gdb, an attach to qemu:
+  =C2=A0=C2=A0"target remote localhost:1234"
+  I know the address at which hello.com will be loaded, so set a breakpoint=
+ there and resume execution:
+  =C2=A0=C2=A0"break *0xf730"
+  =C2=A0=C2=A0"continue"
+  In Qemu, start hello.com. The breakpoint is immediately hit, execution st=
+ops and gdb gains control.
+  Examining the program gives expected results (such as "info reg" or "disa=
+ssemble").
+  At this point, try to proceed either with single-stepping ("si" or "ni") =
+or with "continue", and the same breakpoint is immediately hit again. Subse=
+quent attempts to single-step or continue just keep hitting the same breakp=
+oint.
+  The only way to proceed at this point is to delete the breakpoint, after =
+which both single-stepping and continue work.
+
+  Note that single-stepping and continue works as expected if it is done
+  after interrupting execution with Ctrl-C.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1030666/+subscriptions
