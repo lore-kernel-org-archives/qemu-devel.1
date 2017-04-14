@@ -1,17 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1cz0cr-0001uK-D9
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 08:46:58 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1cz16g-0007QX-U0
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 09:17:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1cz0cq-00029h-JS
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 08:46:57 -0400
-From: Eric Auger <eric.auger@redhat.com>
-Date: Fri, 14 Apr 2017 14:46:34 +0200
-Message-Id: <1492173995-14140-4-git-send-email-eric.auger@redhat.com>
-In-Reply-To: <1492173995-14140-1-git-send-email-eric.auger@redhat.com>
-References: <1492173995-14140-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v5 3/4] hw/intc/arm_gicv3_kvm: Implement pending
- table save
+	(envelope-from <a.perevalov@samsung.com>) id 1cz16d-0008DD-OX
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 09:17:46 -0400
+Received: from mailout4.w1.samsung.com ([210.118.77.14]:11705)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1cz16d-0008C9-Im
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 09:17:43 -0400
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout4.w1.samsung.com
+	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
+	2014)) with ESMTP id <0OOE00BORI9DRT00@mailout4.w1.samsung.com> for
+	qemu-devel@nongnu.org; Fri, 14 Apr 2017 14:17:37 +0100 (BST)
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Date: Fri, 14 Apr 2017 16:17:14 +0300
+Message-id: <1492175840-5021-1-git-send-email-a.perevalov@samsung.com>
+References: <CGME20170414131735eucas1p21f1fcadf426789276f567191372f7794@eucas1p2.samsung.com>
+Subject: [Qemu-devel] [PATCH 0/6] calculate downtime for postcopy live
+ migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,73 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: vijay.kilari@gmail.com, Vijaya.Kumar@cavium.com, drjones@redhat.com, christoffer.dall@linaro.org, quintela@redhat.com, dgilbert@redhat.com
+To: dgilbert@redhat.com, qemu-devel@nongnu.org
+Cc: a.perevalov@samsung.com, i.maximets@samsung.com
 
-This patch adds the flush of the LPI pending bits into the
-redistributor pending tables. This happens on VM stop.
+This patch set includes downtime calculation on destination,
+sending it to source machine for statistics (query-migration).
 
-There is no explicit restore as the tables are implicitly sync'ed
-on ITS table restore and on LPI enable at redistributor level.
+Also additional traceses here for track down who was pagefault
+initiator.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+This patch set is based on master branch of git://git.qemu-project.org/qemu.git
+base commit is commit 372b3fe0b2ecdd39ba850e31c0c6686315c507af.
 
----
+It contains kernel side pages, just for convinience of applying current patch set,
+for testing util kernel headers arn't synced.
 
-v5: new
----
- hw/intc/arm_gicv3_kvm.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+Alexey Perevalov (6):
+  userfault: add pid into uffd_msg & update UFFD_FEATURE_*
+  util: introduce glib-helper.c
+  migration: add UFFD_FEATURE_THREAD_ID feature support
+  migration: calculate downtime on dst side
+  migration: send postcopy downtime back to source
+  migration: detailed traces for postcopy
 
-diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-index 19aab56..9898c49 100644
---- a/hw/intc/arm_gicv3_kvm.c
-+++ b/hw/intc/arm_gicv3_kvm.c
-@@ -25,6 +25,7 @@
- #include "hw/sysbus.h"
- #include "qemu/error-report.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/sysemu.h"
- #include "kvm_arm.h"
- #include "gicv3_internal.h"
- #include "vgic_common.h"
-@@ -680,6 +681,26 @@ static const ARMCPRegInfo gicv3_cpuif_reginfo[] = {
-     REGINFO_SENTINEL
- };
- 
-+/**
-+ * vm_change_state_handler - VM change state callback aiming at flushing
-+ * RDIST pending tables into guest RAM
-+ *
-+ * The tables get flushed to guest RAM whenever the VM gets stopped.
-+ */
-+static void vm_change_state_handler(void *opaque, int running,
-+                                    RunState state)
-+{
-+    GICv3State *s = (GICv3State *)opaque;
-+
-+    if (running) {
-+        return;
-+    }
-+
-+    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-+                      KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES, NULL, true);
-+}
-+
-+
- static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
- {
-     GICv3State *s = KVM_ARM_GICV3(dev);
-@@ -751,6 +772,10 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
-             return;
-         }
-     }
-+    if (kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-+                              KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES)) {
-+        qemu_add_vm_change_state_handler(vm_change_state_handler, s);
-+    }
- }
- 
- static void kvm_arm_gicv3_class_init(ObjectClass *klass, void *data)
+ hw/block/xen_disk.c               |  10 +-
+ include/glib-compat.h             | 352 --------------------------------------
+ include/glib/glib-compat.h        | 352 ++++++++++++++++++++++++++++++++++++++
+ include/glib/glib-helper.h        |  30 ++++
+ include/migration/migration.h     |  18 +-
+ include/migration/postcopy-ram.h  |   2 +-
+ include/qemu/osdep.h              |   2 +-
+ linux-headers/linux/userfaultfd.h |   5 +
+ linux-user/main.c                 |   2 +-
+ migration/migration.c             | 302 +++++++++++++++++++++++++++++++-
+ migration/postcopy-ram.c          | 133 +++++++++++++-
+ migration/qemu-file.c             |   1 -
+ migration/savevm.c                |   2 +-
+ migration/trace-events            |  15 +-
+ scripts/clean-includes            |   2 +-
+ util/Makefile.objs                |   1 +
+ util/glib-helper.c                |  29 ++++
+ 17 files changed, 878 insertions(+), 380 deletions(-)
+ delete mode 100644 include/glib-compat.h
+ create mode 100644 include/glib/glib-compat.h
+ create mode 100644 include/glib/glib-helper.h
+ create mode 100644 util/glib-helper.c
+
 -- 
-2.5.5
+1.8.3.1
