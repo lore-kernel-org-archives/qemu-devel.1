@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cywje-0006qz-7I
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:37:43 -0400
+	(envelope-from <stefanha@gmail.com>) id 1cywra-0004Ah-6d
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:45:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cywjd-0008T2-AB
-	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:37:42 -0400
-From: Laurent Vivier <lvivier@redhat.com>
-Date: Fri, 14 Apr 2017 10:37:17 +0200
-Message-Id: <20170414083717.13641-5-lvivier@redhat.com>
-In-Reply-To: <20170414083717.13641-1-lvivier@redhat.com>
-References: <20170414083717.13641-1-lvivier@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 4/4] qdev: remove
- cannot_destroy_with_object_finalize_yet
+	(envelope-from <stefanha@gmail.com>) id 1cywrY-0004BF-PG
+	for qemu-devel@nongnu.org; Fri, 14 Apr 2017 04:45:54 -0400
+MIME-Version: 1.0
+In-Reply-To: <20170414080206.2301-1-famz@redhat.com>
+References: <20170414080206.2301-1-famz@redhat.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Fri, 14 Apr 2017 09:45:50 +0100
+Message-ID: <CAJSP0QVgYNHh6P8HG20fzuq1dpMOAVs4ciY8Ho1hYLHED3xa_g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.9-rc5 v2] block: Drain
+ BH in bdrv_drained_begin
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,58 +22,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alistair Francis <alistair.francis@xilinx.com>, Antony Pavlov <antonynpavlov@gmail.com>, Beniamino Galvani <b.galvani@gmail.com>, Markus Armbruster <armbru@redhat.com>, qemu-arm@nongnu.org, Laurent Vivier <lvivier@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-As all users have been removed, we can remove
-cannot_destroy_with_object_finalize_yet field
-from the DeviceClass structure.
+On Fri, Apr 14, 2017 at 9:02 AM, Fam Zheng <famz@redhat.com> wrote:
+> During block job completion, nothing is preventing
+> block_job_defer_to_main_loop_bh from being called in a nested
+> aio_poll(), which is a trouble, such as in this code path:
+>
+>     qmp_block_commit
+>       commit_active_start
+>         bdrv_reopen
+>           bdrv_reopen_multiple
+>             bdrv_reopen_prepare
+>               bdrv_flush
+>                 aio_poll
+>                   aio_bh_poll
+>                     aio_bh_call
+>                       block_job_defer_to_main_loop_bh
+>                         stream_complete
+>                           bdrv_reopen
+>
+> block_job_defer_to_main_loop_bh is the last step of the stream job,
+> which should have been "paused" by the bdrv_drained_begin/end in
+> bdrv_reopen_multiple, but it is not done because it's in the form of a
+> main loop BH.
+>
+> Similar to why block jobs should be paused between drained_begin and
+> drained_end, BHs they schedule must be excluded as well.  To achieve
+> this, this patch forces draining the BH in BDRV_POLL_WHILE.
+>
+> Also because the BH in question can do bdrv_unref and child replacing,
+> protect @bs carefully to avoid use-after-free.
+>
+> As a side effect this fixes a hang in block_job_detach_aio_context
+> during system_reset when a block job is ready:
+>
+>     #0  0x0000555555aa79f3 in bdrv_drain_recurse
+>     #1  0x0000555555aa825d in bdrv_drained_begin
+>     #2  0x0000555555aa8449 in bdrv_drain
+>     #3  0x0000555555a9c356 in blk_drain
+>     #4  0x0000555555aa3cfd in mirror_drain
+>     #5  0x0000555555a66e11 in block_job_detach_aio_context
+>     #6  0x0000555555a62f4d in bdrv_detach_aio_context
+>     #7  0x0000555555a63116 in bdrv_set_aio_context
+>     #8  0x0000555555a9d326 in blk_set_aio_context
+>     #9  0x00005555557e38da in virtio_blk_data_plane_stop
+>     #10 0x00005555559f9d5f in virtio_bus_stop_ioeventfd
+>     #11 0x00005555559fa49b in virtio_bus_stop_ioeventfd
+>     #12 0x00005555559f6a18 in virtio_pci_stop_ioeventfd
+>     #13 0x00005555559f6a18 in virtio_pci_reset
+>     #14 0x00005555559139a9 in qdev_reset_one
+>     #15 0x0000555555916738 in qbus_walk_children
+>     #16 0x0000555555913318 in qdev_walk_children
+>     #17 0x0000555555916738 in qbus_walk_children
+>     #18 0x00005555559168ca in qemu_devices_reset
+>     #19 0x000055555581fcbb in pc_machine_reset
+>     #20 0x00005555558a4d96 in qemu_system_reset
+>     #21 0x000055555577157a in main_loop_should_exit
+>     #22 0x000055555577157a in main_loop
+>     #23 0x000055555577157a in main
+>
+> The rationale is that the loop in block_job_detach_aio_context cannot
+> make any progress in pausing/completing the job, because bs->in_flight
+> is 0, so bdrv_drain doesn't process the block_job_defer_to_main_loop
+> BH. With this patch, it does.
+>
+> Reported-by: Jeff Cody <jcody@redhat.com>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+>
+> ---
+>
+> v2: Do the BH poll in BDRV_POLL_WHILE to cover bdrv_drain_all_begin as
+> well. [Kevin]
+> ---
+>  block/io.c            | 10 +++++++---
+>  include/block/block.h | 21 +++++++++++++--------
+>  2 files changed, 20 insertions(+), 11 deletions(-)
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
----
- include/hw/qdev-core.h | 13 -------------
- qmp.c                  |  5 -----
- 2 files changed, 18 deletions(-)
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index b44b476..ac682a6 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -113,19 +113,6 @@ typedef struct DeviceClass {
-      * TODO remove once we're there
-      */
-     bool cannot_instantiate_with_device_add_yet;
--    /*
--     * Does this device model survive object_unref(object_new(TNAME))?
--     * All device models should, and this flag shouldn't exist.  Some
--     * devices crash in object_new(), some crash or hang in
--     * object_unref().  Makes introspecting properties with
--     * qmp_device_list_properties() dangerous.  Bad, because it's used
--     * by -device FOO,help.  This flag serves to protect that code.
--     * It should never be set without a comment explaining why it is
--     * set.
--     * TODO remove once we're there
--     */
--    bool cannot_destroy_with_object_finalize_yet;
--
-     bool hotpluggable;
- 
-     /* callbacks */
-diff --git a/qmp.c b/qmp.c
-index a744e44..ab74cd7 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -548,11 +548,6 @@ DevicePropertyInfoList *qmp_device_list_properties(const char *typename,
-         return NULL;
-     }
- 
--    if (DEVICE_CLASS(klass)->cannot_destroy_with_object_finalize_yet) {
--        error_setg(errp, "Can't list properties of device '%s'", typename);
--        return NULL;
--    }
--
-     obj = object_new(typename);
- 
-     object_property_iter_init(&iter, obj);
--- 
-2.9.3
+>
+> diff --git a/block/io.c b/block/io.c
+> index 8706bfa..a472157 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -158,7 +158,7 @@ bool bdrv_requests_pending(BlockDriverState *bs)
+>
+>  static bool bdrv_drain_recurse(BlockDriverState *bs)
+>  {
+> -    BdrvChild *child;
+> +    BdrvChild *child, *tmp;
+>      bool waited;
+>
+>      waited = BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
+> @@ -167,8 +167,12 @@ static bool bdrv_drain_recurse(BlockDriverState *bs)
+>          bs->drv->bdrv_drain(bs);
+>      }
+>
+> -    QLIST_FOREACH(child, &bs->children, next) {
+> -        waited |= bdrv_drain_recurse(child->bs);
+> +    QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
+> +        BlockDriverState *bs = child->bs;
+> +        assert(bs->refcnt > 0);
+> +        bdrv_ref(bs);
+> +        waited |= bdrv_drain_recurse(bs);
+> +        bdrv_unref(bs);
+>      }
+
+There are other loops over bs->children in the block layer code.  If a
+they indirectly call aio_poll() then the child bs could disappear.
+They should probably also take areference.
+
+That said, I wonder if this really solves the problem of graph changes
+during bs->children traversal.  We now have a reference but are
+iterating over stale data.
+
+This is a separate issue and doesn't need to hold up this patch.
+
+>
+>      return waited;
+> diff --git a/include/block/block.h b/include/block/block.h
+> index 97d4330..3f05e71 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
+> @@ -381,12 +381,13 @@ void bdrv_drain_all(void);
+>
+>  #define BDRV_POLL_WHILE(bs, cond) ({                       \
+>      bool waited_ = false;                                  \
+> +    bool busy_ = true;                                     \
+>      BlockDriverState *bs_ = (bs);                          \
+>      AioContext *ctx_ = bdrv_get_aio_context(bs_);          \
+>      if (aio_context_in_iothread(ctx_)) {                   \
+> -        while ((cond)) {                                   \
+> -            aio_poll(ctx_, true);                          \
+> -            waited_ = true;                                \
+> +        while ((cond) || busy_) {                          \
+> +            busy_ = aio_poll(ctx_, (cond));                \
+> +            waited_ |= !!(cond);                           \
+>          }                                                  \
+>      } else {                                               \
+>          assert(qemu_get_current_aio_context() ==           \
+> @@ -398,11 +399,15 @@ void bdrv_drain_all(void);
+>           */                                                \
+>          assert(!bs_->wakeup);                              \
+>          bs_->wakeup = true;                                \
+> -        while ((cond)) {                                   \
+> -            aio_context_release(ctx_);                     \
+> -            aio_poll(qemu_get_aio_context(), true);        \
+> -            aio_context_acquire(ctx_);                     \
+> -            waited_ = true;                                \
+> +        while (busy_) {                                    \
+> +            if ((cond)) {                                  \
+> +                waited_ = busy_ = true;                    \
+> +                aio_context_release(ctx_);                 \
+> +                aio_poll(qemu_get_aio_context(), true);    \
+> +                aio_context_acquire(ctx_);                 \
+> +            } else {                                       \
+> +                busy_ = aio_poll(ctx_, false);             \
+> +            }                                              \
+>          }                                                  \
+>          bs_->wakeup = false;                               \
+>      }                                                      \
+> --
+> 2.9.3
+>
+>
