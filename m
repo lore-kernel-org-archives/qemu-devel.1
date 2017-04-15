@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1czJEL-0003MK-UE
-	for qemu-devel@nongnu.org; Sat, 15 Apr 2017 04:38:55 -0400
+	(envelope-from <rth7680@gmail.com>) id 1czL7d-0001NO-ES
+	for qemu-devel@nongnu.org; Sat, 15 Apr 2017 06:40:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1czJEK-0001pi-Gq
-	for qemu-devel@nongnu.org; Sat, 15 Apr 2017 04:38:53 -0400
-Received: from mail-oi0-x229.google.com ([2607:f8b0:4003:c06::229]:32921)
+	(envelope-from <rth7680@gmail.com>) id 1czL7Z-0003Af-H7
+	for qemu-devel@nongnu.org; Sat, 15 Apr 2017 06:40:05 -0400
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:34580)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ashijeetacharya@gmail.com>)
-	id 1czJEK-0001pZ-Bc
-	for qemu-devel@nongnu.org; Sat, 15 Apr 2017 04:38:52 -0400
-Received: by mail-oi0-x229.google.com with SMTP id b187so107981720oif.0
-	for <qemu-devel@nongnu.org>; Sat, 15 Apr 2017 01:38:51 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1czL7Z-0003A7-Aj
+	for qemu-devel@nongnu.org; Sat, 15 Apr 2017 06:40:01 -0400
+Received: by mail-wr0-x231.google.com with SMTP id z109so61194986wrb.1
+	for <qemu-devel@nongnu.org>; Sat, 15 Apr 2017 03:40:01 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170404102315.24923-1-kraxel@redhat.com>
+	<20170404102315.24923-4-kraxel@redhat.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <d00b49ff-f541-78c8-2d68-4fa4e76ae8de@twiddle.net>
+Date: Sat, 15 Apr 2017 03:39:53 -0700
 MIME-Version: 1.0
-From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Sat, 15 Apr 2017 14:08:50 +0530
-Message-ID: <CAC2QTZa6LW2LcWQUDvT88KVw=O+D99ku03XcE3kiLi_SC4UMBw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: [Qemu-devel] DMG chunk size independence
+In-Reply-To: <20170404102315.24923-4-kraxel@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 03/10] vga: add vga_scanline_invalidated
+ helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,41 +31,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Fam Zheng <famz@redhat.com>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Hi,
+On 04/04/2017 03:23 AM, Gerd Hoffmann wrote:
+> +static bool vga_scanline_invalidated(VGACommonState *s, int y)
+> +{
+> +    if (y >= VGA_MAX_HEIGHT) {
+> +        return false;
+> +    }
+> +    return s->invalidated_y_table[y >> 5] |= 1 << (y & 0x1f);
+> +}
+> +
+>  void vga_sync_dirty_bitmap(VGACommonState *s)
+>  {
+>      memory_region_sync_dirty_bitmap(&s->vram);
+> @@ -1638,8 +1646,8 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
+>          page1 = addr + bwidth - 1;
+>          update |= memory_region_get_dirty(&s->vram, page0, page1 - page0,
+>                                            DIRTY_MEMORY_VGA);
+> -        /* explicit invalidation for the hardware cursor */
+> -        update |= (s->invalidated_y_table[y >> 5] >> (y & 0x1f)) & 1;
+> +        /* explicit invalidation for the hardware cursor (cirrus only) */
+> +        update |= vga_scanline_invalidated(s, y);
 
-Some of you are already aware but for the benefit of the open list,
-this mail is regarding the task mentioned
-Here -> http://wiki.qemu-project.org/ToDo/Block/DmgChunkSizeIndependence
+The return stmt doesn't match what you're replacing.  Are you really intending 
+to modify invalidated_y_table here?
 
-I had a chat with Fam regarding this and he suggested a solution where
-we fix the output buffer size to a max of say "64K" and keep inflating
-until we reach the end of the input stream. We extract the required
-data when we enter the desired range and discard the rest. Fam however
-termed this as only a  "quick fix".
 
-The ideal fix would obviously be if we can somehow predict the exact
-location inside the compressed stream relative to the desired offset
-in the output decompressed stream, such as a specific sector in a
-chunk. Unfortunately this is not possible without doing a first pass
-over the decompressed stream as answered on the zlib FAQ page
-Here -> http://zlib.net/zlib_faq.html#faq28
-
-AFAICT after reading the zran.c example in zlib, the above mentioned
-ideal fix would ultimately lead us to decompress the whole chunk in
-steps at least once to maintain an access point lookup table. This
-solution is better if we get several random access requests over
-different read requests, otherwise it ends up being equal to the fix
-suggested by Fam plus some extra effort needed in building and
-maintaining access points.
-
-I have not explored the bzip2 compressed chunks yet but have naively
-assumed that we will face the same situation there?
-
-I would like the community's opinion on this and add their suggestions
-if possible to give me some new thinking points.
-
-Thanks
-Ashijeet
+r~
