@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1czFLs-00039a-3t
-	for qemu-devel@nongnu.org; Sat, 15 Apr 2017 00:30:25 -0400
+	(envelope-from <bounces@canonical.com>) id 1czFLt-00039j-GF
+	for qemu-devel@nongnu.org; Sat, 15 Apr 2017 00:30:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1czFLq-0000lm-UC
-	for qemu-devel@nongnu.org; Sat, 15 Apr 2017 00:30:24 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57731)
+	(envelope-from <bounces@canonical.com>) id 1czFLs-0000mI-0P
+	for qemu-devel@nongnu.org; Sat, 15 Apr 2017 00:30:25 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57760)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1czFLq-0000lN-O1
-	for qemu-devel@nongnu.org; Sat, 15 Apr 2017 00:30:22 -0400
+	id 1czFLr-0000ly-QL
+	for qemu-devel@nongnu.org; Sat, 15 Apr 2017 00:30:23 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1czFLo-0005OE-Do
-	for <qemu-devel@nongnu.org>; Sat, 15 Apr 2017 04:30:20 +0000
+	id 1czFLq-0005Jm-Mu
+	for <qemu-devel@nongnu.org>; Sat, 15 Apr 2017 04:30:22 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 105722E80CE
-	for <qemu-devel@nongnu.org>; Sat, 15 Apr 2017 04:30:20 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 8243C2E80CE
+	for <qemu-devel@nongnu.org>; Sat, 15 Apr 2017 04:30:22 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 15 Apr 2017 04:18:03 -0000
-From: Launchpad Bug Tracker <989504@bugs.launchpad.net>
-Reply-To: Bug 989504 <989504@bugs.launchpad.net>
+Date: Sat, 15 Apr 2017 04:18:05 -0000
+From: Launchpad Bug Tracker <966316@bugs.launchpad.net>
+Reply-To: Bug 966316 <966316@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20120427090042.27084.71596.malonedeb@gac.canonical.com>
-Message-Id: <20170415041803.25352.13310.malone@loganberry.canonical.com>
+References: <20120327152951.2136.20096.malonedeb@gac.canonical.com>
+Message-Id: <20170415041806.25352.48506.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 989504] Re: assertion failed when attaching USB
- MSD device
+Subject: [Qemu-devel] [Bug 966316] Re: Can't load Android VBOX image or even
+ linux test image as well
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,39 +48,28 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/989504
+https://bugs.launchpad.net/bugs/966316
 
 Title:
-  assertion failed when attaching USB MSD device
+  Can't load Android VBOX image or even linux test image as well
 
 Status in QEMU:
   Expired
 
 Bug description:
-  version: git rev be5ea8ed4481f0ffa4ea0f7ba13e465701536001
-  commandline: qemu-system-i386 -usb -fda dosusb.img -drive if=3Dnone,id=3D=
-usbstick,file=3Dusb.img -device usb-storage,bus=3Dusb.0,drive=3Dusbstick -b=
-oot a -L d:\_programs\qemu
+  Can't load Android X86 ICS 4.0 VBOX image.
+  It worked with previous version before adding /qemu/hw/pc_sysfw.c file ( =
+tested with version 1.0 ). =
 
-  ---------------------------
-  Microsoft Visual C++ Runtime Library
-  ---------------------------
-  Assertion failed!
 
-  Program: E:\qemu-system-i386.exe
-  File: C:/msys/home/User/qemu/hw/usb/hcd-uhci.c
-  Line: 968
+  x86_64-softmmu# ./qemu-system-x86_64 ~/kvm-test-image/x86-linux-0.2.img
+  qemu: PC system firmware (pflash) must be a multiple of 0x1000
 
-  Expression: ret =3D=3D TD_RESULT_ASYNC_START
-
-  For information on how your program can cause an assertion
-  failure, see the Visual C++ documentation on asserts
-
-  (Press Retry to debug the application - JIT must be enabled)
-  ---------------------------
-  Abort   Retry   Ignore   =
-
-  ---------------------------
+  In QEMU website (http://wiki.qemu.org/Testing), there is a test image for=
+ linux
+  but, new version can't load the image as well because of upper error.
+  linux-0.2.img.bz2 (8 MB) 	Small Linux disk image containing a 2.6.20 Linu=
+x kernel, X11 and various utilities to test QEMU
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/989504/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/966316/+subscriptions
