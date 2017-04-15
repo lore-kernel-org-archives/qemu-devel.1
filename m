@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1czFLt-00039j-GF
-	for qemu-devel@nongnu.org; Sat, 15 Apr 2017 00:30:26 -0400
+	(envelope-from <bounces@canonical.com>) id 1czFLu-00039k-1G
+	for qemu-devel@nongnu.org; Sat, 15 Apr 2017 00:30:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1czFLs-0000mI-0P
-	for qemu-devel@nongnu.org; Sat, 15 Apr 2017 00:30:25 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57760)
+	(envelope-from <bounces@canonical.com>) id 1czFLs-0000ml-Vj
+	for qemu-devel@nongnu.org; Sat, 15 Apr 2017 00:30:26 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57788)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1czFLr-0000ly-QL
-	for qemu-devel@nongnu.org; Sat, 15 Apr 2017 00:30:23 -0400
+	id 1czFLs-0000mU-PG
+	for qemu-devel@nongnu.org; Sat, 15 Apr 2017 00:30:24 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1czFLq-0005Jm-Mu
-	for <qemu-devel@nongnu.org>; Sat, 15 Apr 2017 04:30:22 +0000
+	id 1czFLs-0005M2-1F
+	for <qemu-devel@nongnu.org>; Sat, 15 Apr 2017 04:30:24 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8243C2E80CE
-	for <qemu-devel@nongnu.org>; Sat, 15 Apr 2017 04:30:22 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 001B62E807D
+	for <qemu-devel@nongnu.org>; Sat, 15 Apr 2017 04:30:23 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 15 Apr 2017 04:18:05 -0000
-From: Launchpad Bug Tracker <966316@bugs.launchpad.net>
-Reply-To: Bug 966316 <966316@bugs.launchpad.net>
+Date: Sat, 15 Apr 2017 04:18:04 -0000
+From: Launchpad Bug Tracker <821078@bugs.launchpad.net>
+Reply-To: Bug 821078 <821078@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20120327152951.2136.20096.malonedeb@gac.canonical.com>
-Message-Id: <20170415041806.25352.48506.malone@loganberry.canonical.com>
+References: <20110804185353.20230.46645.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170415041804.25352.38030.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 966316] Re: Can't load Android VBOX image or even
- linux test image as well
+Subject: [Qemu-devel] [Bug 821078] Re: virtio-serial-bus: Unexpected port id
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,28 +47,43 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/966316
+https://bugs.launchpad.net/bugs/821078
 
 Title:
-  Can't load Android VBOX image or even linux test image as well
+  virtio-serial-bus: Unexpected port id
 
 Status in QEMU:
   Expired
 
 Bug description:
-  Can't load Android X86 ICS 4.0 VBOX image.
-  It worked with previous version before adding /qemu/hw/pc_sysfw.c file ( =
-tested with version 1.0 ). =
+  With qemu-kvm-0.15.0-rc1 virtio-serial-bus reports an error, and windows =
+vdagent can not start.  qemu-0.15.0-rc1 behaves as expected, ie vdagent run=
+s in the guest, mouse passes seamlessly between spicec and host and copy/pa=
+ste works between guest and host.
+  qemu-kvm has been configured with
+  ./configure --target-list=3Dx86_64-softmmu --disable-curses  --disable-cu=
+rl --audio-drv-list=3Dalsa --audio-card-list=3Dsb16,ac97,hda --enable-vnc-t=
+hread --disable-bluez --enable-vhost-net --enable-spice
+  and is started with
+  qemu-system-x86_64 -cpu host -enable-kvm -pidfile /home/rick/qemu/hds/wxp=
+.pid -drive file=3D/home/rick/qemu/hds/wxp.raw,if=3Dvirtio,aio=3Dnative -m =
+1536 -name WinXP -net nic,model -net user -localtime -usb -vga qxl -device =
+virtio-serial-pci,id=3Dvirtio-serial0,max_ports=3D16,bus=3Dpci.0,addr=3D0x5=
+ -chardev spicevmc,name=3Dvdagent,id=3Dvdagent -device virtserialport,nr=3D=
+1,bus=3Dvirtio-serial0.0,chardev=3Dvdagent,name=3Dcom.redhat.spice.0 -spice=
+ port=3D1234,disable-ticketing -monitor stdio
 
+  I've also tried start qemu like
+  qemu-system-x86_64 -cpu host -enable-kvm -pidfile /home/rick/qemu/hds/wxp=
+.pid -drive file=3D/home/rick/qemu/hds/wxp.raw,if=3Dvirtio -m 768 -name Win=
+XP -net nic,model=3Dvirtio -net user -localtime -usb -vga qxl -device virti=
+o-serial -chardev spicevmc,name=3Dvdagent,id=3Dvdagent -device virtserialpo=
+rt,chardev=3Dvdagent,name=3Dcom.redhat.spice.0 -spice port=3D1234,disable-t=
+icketing -monitor stdio
+  and observed the same results.
 
-  x86_64-softmmu# ./qemu-system-x86_64 ~/kvm-test-image/x86-linux-0.2.img
-  qemu: PC system firmware (pflash) must be a multiple of 0x1000
-
-  In QEMU website (http://wiki.qemu.org/Testing), there is a test image for=
- linux
-  but, new version can't load the image as well because of upper error.
-  linux-0.2.img.bz2 (8 MB) 	Small Linux disk image containing a 2.6.20 Linu=
-x kernel, X11 and various utilities to test QEMU
+  the host runs 2.6.39.4 vanilla kernel.  the guest uses the most recent
+  virtio-serial, vga-qxl and vdagent from spice-space.org
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/966316/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/821078/+subscriptions
