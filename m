@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.fonnemann@hexagon.com>) id 1czscN-00059O-Mc
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 18:26:04 -0400
+	(envelope-from <shorne@gmail.com>) id 1cztWZ-0003iU-Vw
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 19:24:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.fonnemann@hexagon.com>) id 1czscK-00036i-J1
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 18:26:03 -0400
-Received: from mail-db5eur01on0109.outbound.protection.outlook.com
-	([104.47.2.109]:27280
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.fonnemann@hexagon.com>)
-	id 1czscK-00035O-8h
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 18:26:00 -0400
-From: FONNEMANN Mark <mark.fonnemann@hexagon.com>
-Date: Sun, 16 Apr 2017 22:10:51 +0000
-Message-ID: <VI1PR0601MB2479E581256475D80164322A9C070@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-References: <VI1PR0601MB2479DE114384C023CA45C41E9C040@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-	<20170416080930.luq2l4p3e36vovkj@var.youpi.perso.aquilenet.fr>
-In-Reply-To: <20170416080930.luq2l4p3e36vovkj@var.youpi.perso.aquilenet.fr>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] dns server not working in QEMU using usermode
- networking (SLIRP)
+	(envelope-from <shorne@gmail.com>) id 1cztWW-0007pT-0Q
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 19:24:07 -0400
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:34142)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1cztWV-0007ou-Ph
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 19:24:03 -0400
+Received: by mail-pg0-x241.google.com with SMTP id o123so24023059pga.1
+	for <qemu-devel@nongnu.org>; Sun, 16 Apr 2017 16:24:03 -0700 (PDT)
+From: Stafford Horne <shorne@gmail.com>
+Date: Mon, 17 Apr 2017 08:23:49 +0900
+Message-Id: <cover.1492384862.git.shorne@gmail.com>
+Subject: [Qemu-devel] [PATCH 0/7] Openrisc misc features / fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,26 +23,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-
-This issue still exists for me in 2.9 rc4. =20
-
------Original Message-----
-From: Samuel Thibault [mailto:samuel.thibault@gnu.org]=20
-Sent: Sunday, April 16, 2017 04:10
-To: FONNEMANN Mark <mark.fonnemann@hexagon.com>
-Cc: qemu-devel@nongnu.org
-Subject: Re: [Qemu-devel] dns server not working in QEMU using usermode net=
-working (SLIRP)
+To: qemu-devel@nongnu.org
+Cc: openrisc@lists.librecores.org, Stafford Horne <shorne@gmail.com>
 
 Hello,
 
-I hadn't seen the original report on the list, sorry. There is too much tra=
-ffic on qemu-devel for me to manage to catch these :/
+The first patch here I sent a few weeks ago and got go response.  Sending
+again.
 
-This problem was fixed by
-e42f869b ("slirp: Make RA build more flexible") and a2f80fdf ("slirp: Send =
-RDNSS in RA only if host has an IPv6 DNS server") which will be included in=
- qemu 2.9.
+The second was requested by the uclibc-ng maintainer as when he is testing
+his builds he uses qemu and would like to have a way for the system to shut
+down.  This models how our other simulators shutdown, so no changes are
+needed on the kernel side.
 
-Samuel
+The others I added while working on upcoming openrisc smp support.
+
+-Stafford
+
+Stafford Horne (7):
+  target/openrisc: Fixes for memory debugging
+  target/openrisc: add shutdown logic
+  target/openrisc: add numcores and coreid support
+  target/openrisc: implement shadow registers
+  migration: Add VMSTATE_UINTTL_2DARRAY()
+  migration: Add VMSTATE_STRUCT_2DARRAY()
+  target/openrisc: Implement full vmstate serialization
+
+ include/migration/cpu.h      |  7 ++++
+ include/migration/vmstate.h  | 15 +++++++++
+ target/openrisc/cpu.c        |  5 ++-
+ target/openrisc/cpu.h        |  4 ++-
+ target/openrisc/helper.h     |  1 +
+ target/openrisc/machine.c    | 76 ++++++++++++++++++++++++++++++++++++++++++--
+ target/openrisc/mmu.c        | 23 +++++++++++---
+ target/openrisc/sys_helper.c | 32 +++++++++++++++++++
+ target/openrisc/translate.c  |  8 +++--
+ 9 files changed, 160 insertions(+), 11 deletions(-)
+
+-- 
+2.9.3
