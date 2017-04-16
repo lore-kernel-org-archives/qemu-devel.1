@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41442)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1czfFZ-0008AT-Gf
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 04:09:38 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1czgQq-0007Ol-IQ
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 05:25:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1czfFW-0005PX-D5
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 04:09:37 -0400
-Received: from hera.aquilenet.fr ([2a01:474::1]:39830)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1czgQm-0001Zk-08
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 05:25:20 -0400
+Received: from [59.151.112.132] (port=2168 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1czfFW-0005P2-7K
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 04:09:34 -0400
-Date: Sun, 16 Apr 2017 10:09:30 +0200
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20170416080930.luq2l4p3e36vovkj@var.youpi.perso.aquilenet.fr>
-References: <VI1PR0601MB2479DE114384C023CA45C41E9C040@VI1PR0601MB2479.eurprd06.prod.outlook.com>
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1czgQl-0001XK-Ks
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 05:25:15 -0400
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Date: Sun, 16 Apr 2017 17:24:36 +0800
+Message-ID: <1492334677-14170-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+In-Reply-To: <1492334677-14170-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+References: <1492334677-14170-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <VI1PR0601MB2479DE114384C023CA45C41E9C040@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-Subject: Re: [Qemu-devel] dns server not working in QEMU using usermode
- networking (SLIRP)
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 1/2] COLO-compare: Optimize tcp compare for
+ option field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,17 +26,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: FONNEMANN Mark <mark.fonnemann@hexagon.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
+Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-Hello,
+In this patch we support packet that have tcp options field.
+Add tcp options field check, If the packet have options
+field we just skip it and compare tcp payload,
+Avoid unnecessary checkpoint, optimize performance.
 
-I hadn't seen the original report on the list, sorry. There is too much
-traffic on qemu-devel for me to manage to catch these :/
+Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+---
+ net/colo-compare.c | 27 ++++++++++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
 
-This problem was fixed by 
-e42f869b ("slirp: Make RA build more flexible") and
-a2f80fdf ("slirp: Send RDNSS in RA only if host has an IPv6 DNS server")
-which will be included in qemu 2.9.
-
-Samuel
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index aada04e..881d6b2 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -228,6 +228,7 @@ static int colo_packet_compare_tcp(Packet *spkt, Packet *ppkt)
+ {
+     struct tcphdr *ptcp, *stcp;
+     int res;
++    int tcp_offset = 0;
+ 
+     trace_colo_compare_main("compare tcp");
+ 
+@@ -248,7 +249,31 @@ static int colo_packet_compare_tcp(Packet *spkt, Packet *ppkt)
+         spkt->ip->ip_sum = ppkt->ip->ip_sum;
+     }
+ 
+-    if (ptcp->th_sum == stcp->th_sum) {
++    /*
++     * Check tcp header length for tcp option field.
++     * th_off > 5 means this tcp packet have options field.
++     * The tcp options maybe always different.
++     * for example:
++     * From RFC 7323.
++     * TCP Timestamps option (TSopt):
++     * Kind: 8
++     *
++     * Length: 10 bytes
++     *
++     *    +-------+-------+---------------------+---------------------+
++     *    |Kind=8 |  10   |   TS Value (TSval)  |TS Echo Reply (TSecr)|
++     *    +-------+-------+---------------------+---------------------+
++     *       1       1              4                     4
++     *
++     * In this case the primary guest's timestamp always different with
++     * the secondary guest's timestamp. COLO just focus on payload,
++     * so we just need skip this field.
++     */
++    if (ptcp->th_off > 5) {
++        tcp_offset = ppkt->transport_header - (uint8_t *)ppkt->data
++                     + (ptcp->th_off * 4);
++        res = colo_packet_compare_common(ppkt, spkt, tcp_offset);
++    } else if (ptcp->th_sum == stcp->th_sum) {
+         res = colo_packet_compare_common(ppkt, spkt, ETH_HLEN);
+     } else {
+         res = -1;
+-- 
+2.7.4
