@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1cztWk-0003nZ-Q3
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 19:24:19 -0400
+	(envelope-from <shorne@gmail.com>) id 1cztWn-0003pp-5j
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 19:24:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1cztWj-0007zG-U0
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 19:24:18 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:33400)
+	(envelope-from <shorne@gmail.com>) id 1cztWm-00080g-9U
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 19:24:21 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:34155)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1cztWj-0007yk-OZ
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 19:24:17 -0400
-Received: by mail-pf0-x242.google.com with SMTP id c198so22067249pfc.0
-	for <qemu-devel@nongnu.org>; Sun, 16 Apr 2017 16:24:17 -0700 (PDT)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1cztWm-000804-3e
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 19:24:20 -0400
+Received: by mail-pg0-x244.google.com with SMTP id o123so24023636pga.1
+	for <qemu-devel@nongnu.org>; Sun, 16 Apr 2017 16:24:20 -0700 (PDT)
 From: Stafford Horne <shorne@gmail.com>
-Date: Mon, 17 Apr 2017 08:23:54 +0900
-Message-Id: <319fd7910ccc8ab543e2396f3d757f76084eac88.1492384862.git.shorne@gmail.com>
+Date: Mon, 17 Apr 2017 08:23:55 +0900
+Message-Id: <c0f619ebe8313d8d404fd6a7a0ab3ecab512e598.1492384862.git.shorne@gmail.com>
 In-Reply-To: <cover.1492384862.git.shorne@gmail.com>
 References: <cover.1492384862.git.shorne@gmail.com>
 In-Reply-To: <cover.1492384862.git.shorne@gmail.com>
 References: <cover.1492384862.git.shorne@gmail.com>
-Subject: [Qemu-devel] [PATCH 5/7] migration: Add VMSTATE_UINTTL_2DARRAY()
+Subject: [Qemu-devel] [PATCH 6/7] migration: Add VMSTATE_STRUCT_2DARRAY()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +30,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: openrisc@lists.librecores.org, Stafford Horne <shorne@gmail.com>
 
-In openRISC we are implementing the shadow registers as a 2d array.
-Using this target long method rather than direct 32-bit alternatives is
-consistent with the rest of our vm state serialization logic.
+For openrisc we implement tlb state as a 2d array of tlb entry structs.
+This is added to allow easy storing of state of 2d arrays.
 
 Signed-off-by: Stafford Horne <shorne@gmail.com>
 ---
- include/migration/cpu.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+ include/migration/vmstate.h | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/include/migration/cpu.h b/include/migration/cpu.h
-index f3d5dfc..a40bd35 100644
---- a/include/migration/cpu.h
-+++ b/include/migration/cpu.h
-@@ -18,6 +18,8 @@
-     VMSTATE_UINT64_EQUAL_V(_f, _s, _v)
- #define VMSTATE_UINTTL_ARRAY_V(_f, _s, _n, _v)                        \
-     VMSTATE_UINT64_ARRAY_V(_f, _s, _n, _v)
-+#define VMSTATE_UINTTL_2DARRAY_V(_f, _s, _n1, _n2, _v)                \
-+    VMSTATE_UINT64_2DARRAY_V(_f, _s, _n1, _n2, _v)
- #define VMSTATE_UINTTL_TEST(_f, _s, _t)                               \
-     VMSTATE_UINT64_TEST(_f, _s, _t)
- #define vmstate_info_uinttl vmstate_info_uint64
-@@ -37,6 +39,8 @@
-     VMSTATE_UINT32_EQUAL_V(_f, _s, _v)
- #define VMSTATE_UINTTL_ARRAY_V(_f, _s, _n, _v)                        \
-     VMSTATE_UINT32_ARRAY_V(_f, _s, _n, _v)
-+#define VMSTATE_UINTTL_2DARRAY_V(_f, _s, _n1, _n2, _v)                \
-+    VMSTATE_UINT32_2DARRAY_V(_f, _s, _n1, _n2, _v)
- #define VMSTATE_UINTTL_TEST(_f, _s, _t)                               \
-     VMSTATE_UINT32_TEST(_f, _s, _t)
- #define vmstate_info_uinttl vmstate_info_uint32
-@@ -48,5 +52,8 @@
-     VMSTATE_UINTTL_EQUAL_V(_f, _s, 0)
- #define VMSTATE_UINTTL_ARRAY(_f, _s, _n)                              \
-     VMSTATE_UINTTL_ARRAY_V(_f, _s, _n, 0)
-+#define VMSTATE_UINTTL_2DARRAY(_f, _s, _n1, _n2)                      \
-+    VMSTATE_UINTTL_2DARRAY_V(_f, _s, _n1, _n2, 0)
-+
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index f2dbf84..9b7dcdc 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -499,6 +499,17 @@ extern const VMStateInfo vmstate_info_qtailq;
+     .offset       = vmstate_offset_array(_state, _field, _type, _num),\
+ }
  
- #endif
++#define VMSTATE_STRUCT_2DARRAY_TEST(_field, _state, _n1, _n2, _test, _version, _vmsd, _type) { \
++    .name         = (stringify(_field)),                                    \
++    .num          = (_n1) * (_n2),                                          \
++    .field_exists = (_test),                                                \
++    .version_id   = (_version),                                             \
++    .vmsd         = &(_vmsd),                                               \
++    .size         = sizeof(_type),                                          \
++    .flags        = VMS_STRUCT|VMS_ARRAY,                                   \
++    .offset       = vmstate_offset_2darray(_state, _field, _type, _n1, _n2),\
++}
++
+ #define VMSTATE_STRUCT_VARRAY_UINT8(_field, _state, _field_num, _version, _vmsd, _type) { \
+     .name       = (stringify(_field)),                               \
+     .num_offset = vmstate_offset_value(_state, _field_num, uint8_t), \
+@@ -746,6 +757,10 @@ extern const VMStateInfo vmstate_info_qtailq;
+     VMSTATE_STRUCT_ARRAY_TEST(_field, _state, _num, NULL, _version,   \
+             _vmsd, _type)
+ 
++#define VMSTATE_STRUCT_2DARRAY(_field, _state, _n1, _n2, _version, _vmsd, _type) \
++    VMSTATE_STRUCT_2DARRAY_TEST(_field, _state, _n1, _n2, NULL, _version,   \
++            _vmsd, _type)
++
+ #define VMSTATE_BUFFER_UNSAFE_INFO(_field, _state, _version, _info, _size) \
+     VMSTATE_BUFFER_UNSAFE_INFO_TEST(_field, _state, NULL, _version, _info, \
+             _size)
 -- 
 2.9.3
