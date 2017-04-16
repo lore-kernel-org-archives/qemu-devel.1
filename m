@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1cztWp-0003ti-MM
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 19:24:27 -0400
+	(envelope-from <no-reply@patchew.org>) id 1cztfi-0000Qe-Qs
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 19:33:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1cztWo-00082I-Ni
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 19:24:23 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:33309)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1cztWo-00081r-I7
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 19:24:22 -0400
-Received: by mail-pg0-x244.google.com with SMTP id 63so10928262pgh.0
-	for <qemu-devel@nongnu.org>; Sun, 16 Apr 2017 16:24:22 -0700 (PDT)
-From: Stafford Horne <shorne@gmail.com>
-Date: Mon, 17 Apr 2017 08:23:56 +0900
-Message-Id: <fae2ac85b7226ec28c8419f488cd9947bb6142a0.1492384862.git.shorne@gmail.com>
+	(envelope-from <no-reply@patchew.org>) id 1cztff-0004zm-KU
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 19:33:34 -0400
+Resent-Message-Id: <E1cztff-0004zm-KU@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21478)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cztff-0004yi-Cb
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 19:33:31 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <149238559853.10512.7357340442722775269@6c512846dbc7>
 In-Reply-To: <cover.1492384862.git.shorne@gmail.com>
-References: <cover.1492384862.git.shorne@gmail.com>
-In-Reply-To: <cover.1492384862.git.shorne@gmail.com>
-References: <cover.1492384862.git.shorne@gmail.com>
-Subject: [Qemu-devel] [PATCH 7/7] target/openrisc: Implement full vmstate
- serialization
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 16 Apr 2017 16:33:19 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/7] Openrisc misc features / fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,102 +28,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: openrisc@lists.librecores.org, Stafford Horne <shorne@gmail.com>
+To: shorne@gmail.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, openrisc@lists.librecores.org
 
-Previously serialization did not persist the tlb, timer, pic and other
-key state items.  This meant snapshotting and restoring a running os
-would crash. After adding these I am able to take snapshots of a
-running linux os and restore at a later time.
-
-I am currently not trying to maintain capatibility with older versions
-as I do not believe this really worked before or anyone used it.
-
-Signed-off-by: Stafford Horne <shorne@gmail.com>
----
- target/openrisc/machine.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
-
-diff --git a/target/openrisc/machine.c b/target/openrisc/machine.c
-index 27cc751..2adcda8 100644
---- a/target/openrisc/machine.c
-+++ b/target/openrisc/machine.c
-@@ -30,9 +30,59 @@ static int env_post_load(void *opaque, int version_id)
- 
-     env->gpr = env->shadow_gpr[0];
- 
-+    /* Restore MMU handlers */
-+    if (env->sr & SR_DME) {
-+        env->tlb->cpu_openrisc_map_address_data =
-+            &cpu_openrisc_get_phys_data;
-+    } else {
-+        env->tlb->cpu_openrisc_map_address_data =
-+            &cpu_openrisc_get_phys_nommu;
-+    }
-+
-+    if (env->sr & SR_IME) {
-+        env->tlb->cpu_openrisc_map_address_code =
-+            &cpu_openrisc_get_phys_code;
-+    } else {
-+        env->tlb->cpu_openrisc_map_address_code =
-+            &cpu_openrisc_get_phys_nommu;
-+    }
-+
-+
-     return 0;
- }
- 
-+static const VMStateDescription vmstate_tlb_entry = {
-+    .name = "tlb_entry",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .minimum_version_id_old = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINTTL(mr, OpenRISCTLBEntry),
-+        VMSTATE_UINTTL(tr, OpenRISCTLBEntry),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static const VMStateDescription vmstate_cpu_tlb = {
-+    .name = "cpu_tlb",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .minimum_version_id_old = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_STRUCT_2DARRAY(itlb, CPUOpenRISCTLBContext,
-+                             ITLB_WAYS, ITLB_SIZE, 0,
-+                             vmstate_tlb_entry, OpenRISCTLBEntry),
-+        VMSTATE_STRUCT_2DARRAY(dtlb, CPUOpenRISCTLBContext,
-+                             DTLB_WAYS, DTLB_SIZE, 0,
-+                             vmstate_tlb_entry, OpenRISCTLBEntry),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+#define VMSTATE_CPU_TLB(_f, _s)                             \
-+    VMSTATE_STRUCT_POINTER(_f, _s, vmstate_cpu_tlb, CPUOpenRISCTLBContext)
-+
-+
- static int get_sr(QEMUFile *f, void *opaque, size_t size, VMStateField *field)
- {
-     CPUOpenRISCState *env = opaque;
-@@ -92,6 +142,16 @@ static const VMStateDescription vmstate_env = {
-         VMSTATE_UINT32(esr, CPUOpenRISCState),
-         VMSTATE_UINT32(fpcsr, CPUOpenRISCState),
-         VMSTATE_UINT64(mac, CPUOpenRISCState),
-+
-+        VMSTATE_CPU_TLB(tlb, CPUOpenRISCState),
-+
-+        VMSTATE_TIMER_PTR(timer, CPUOpenRISCState),
-+        VMSTATE_UINT32(ttmr, CPUOpenRISCState),
-+        VMSTATE_UINT32(ttcr, CPUOpenRISCState),
-+
-+        VMSTATE_UINT32(picmr, CPUOpenRISCState),
-+        VMSTATE_UINT32(picsr, CPUOpenRISCState),
-+
-         VMSTATE_END_OF_LIST()
-     }
- };
--- 
-2.9.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC83XSBPcGVucmlzYyBtaXNjIGZlYXR1cmVzIC8g
+Zml4ZXMKTWVzc2FnZS1pZDogY292ZXIuMTQ5MjM4NDg2Mi5naXQuc2hvcm5lQGdtYWlsLmNvbQoK
+PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3Rh
+bD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVs
+IGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3Jt
+YXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8g
+IkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMp
+Li4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVj
+a3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNo
+bwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQ
+VCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEz
+Mzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcg
+dGFnXSAgICAgICAgIHBhdGNoZXcvY292ZXIuMTQ5MjM4NDg2Mi5naXQuc2hvcm5lQGdtYWlsLmNv
+bSAtPiBwYXRjaGV3L2NvdmVyLjE0OTIzODQ4NjIuZ2l0LnNob3JuZUBnbWFpbC5jb20KU3dpdGNo
+ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoxMGUzNzZjIHRhcmdldC9vcGVucmlzYzogSW1wbGVt
+ZW50IGZ1bGwgdm1zdGF0ZSBzZXJpYWxpemF0aW9uCjFjOTY1ZDUgbWlncmF0aW9uOiBBZGQgVk1T
+VEFURV9TVFJVQ1RfMkRBUlJBWSgpCjY2ZDEyOWYgbWlncmF0aW9uOiBBZGQgVk1TVEFURV9VSU5U
+VExfMkRBUlJBWSgpCmRhNmUyOWUgdGFyZ2V0L29wZW5yaXNjOiBpbXBsZW1lbnQgc2hhZG93IHJl
+Z2lzdGVycwplZGQ2Yjc0IHRhcmdldC9vcGVucmlzYzogYWRkIG51bWNvcmVzIGFuZCBjb3JlaWQg
+c3VwcG9ydAoxNjcwMmI1IHRhcmdldC9vcGVucmlzYzogYWRkIHNodXRkb3duIGxvZ2ljCmM5N2Ew
+MGUgdGFyZ2V0L29wZW5yaXNjOiBGaXhlcyBmb3IgbWVtb3J5IGRlYnVnZ2luZwoKPT09IE9VVFBV
+VCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS83OiB0YXJnZXQvb3BlbnJpc2M6IEZpeGVzIGZv
+ciBtZW1vcnkgZGVidWdnaW5nLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0
+NDogRklMRTogdGFyZ2V0L29wZW5yaXNjL21tdS5jOjIzMjoKKyAgICAgICAgbWlzcyA9IGNwdV9v
+cGVucmlzY19nZXRfcGh5c19hZGRyKGNwdSwgJnBoeXNfYWRkciwgJnByb3QsIGFkZHIsIE1NVV9J
+TlNUX0ZFVENIKTsKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMzggbGluZXMgY2hlY2tl
+ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
+b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
+aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAy
+Lzc6IHRhcmdldC9vcGVucmlzYzogYWRkIHNodXRkb3duIGxvZ2ljLi4uCkNoZWNraW5nIFBBVENI
+IDMvNzogdGFyZ2V0L29wZW5yaXNjOiBhZGQgbnVtY29yZXMgYW5kIGNvcmVpZCBzdXBwb3J0Li4u
+CkNoZWNraW5nIFBBVENIIDQvNzogdGFyZ2V0L29wZW5yaXNjOiBpbXBsZW1lbnQgc2hhZG93IHJl
+Z2lzdGVycy4uLgpFUlJPUjogImZvbyAqIGJhciIgc2hvdWxkIGJlICJmb28gKmJhciIKIzY3OiBG
+SUxFOiB0YXJnZXQvb3BlbnJpc2MvY3B1Lmg6MjczOgorICAgIHRhcmdldF91bG9uZyAqIGdwcjsg
+ICAgICAgLyogR2VuZXJhbCByZWdpc3RlcnMgKGJhY2tlZCBieSBzaGFkb3cpICovCgp0b3RhbDog
+MSBlcnJvcnMsIDAgd2FybmluZ3MsIDk4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDUvNzogbWlncmF0aW9uOiBBZGQg
+Vk1TVEFURV9VSU5UVExfMkRBUlJBWSgpLi4uCkNoZWNraW5nIFBBVENIIDYvNzogbWlncmF0aW9u
+OiBBZGQgVk1TVEFURV9TVFJVQ1RfMkRBUlJBWSgpLi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hh
+cmFjdGVycwojMjA6IEZJTEU6IGluY2x1ZGUvbWlncmF0aW9uL3Ztc3RhdGUuaDo1MDI6CisjZGVm
+aW5lIFZNU1RBVEVfU1RSVUNUXzJEQVJSQVlfVEVTVChfZmllbGQsIF9zdGF0ZSwgX24xLCBfbjIs
+IF90ZXN0LCBfdmVyc2lvbiwgX3Ztc2QsIF90eXBlKSB7IFwKCkVSUk9SOiBzcGFjZXMgcmVxdWly
+ZWQgYXJvdW5kIHRoYXQgJ3wnIChjdHg6VnhWKQojMjc6IEZJTEU6IGluY2x1ZGUvbWlncmF0aW9u
+L3Ztc3RhdGUuaDo1MDk6CisgICAgLmZsYWdzICAgICAgICA9IFZNU19TVFJVQ1R8Vk1TX0FSUkFZ
+LCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAogICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgXgoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzM4OiBGSUxF
+OiBpbmNsdWRlL21pZ3JhdGlvbi92bXN0YXRlLmg6NzYwOgorI2RlZmluZSBWTVNUQVRFX1NUUlVD
+VF8yREFSUkFZKF9maWVsZCwgX3N0YXRlLCBfbjEsIF9uMiwgX3ZlcnNpb24sIF92bXNkLCBfdHlw
+ZSkgXAoKdG90YWw6IDIgZXJyb3JzLCAxIHdhcm5pbmdzLCAyNyBsaW5lcyBjaGVja2VkCgpZb3Vy
+IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
+ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
+ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA3Lzc6IHRh
+cmdldC9vcGVucmlzYzogSW1wbGVtZW50IGZ1bGwgdm1zdGF0ZSBzZXJpYWxpemF0aW9uLi4uCj09
+PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0K
+RW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcu
+b3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlz
+dHMub3Jn
