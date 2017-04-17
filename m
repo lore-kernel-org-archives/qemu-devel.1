@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1czwY8-0005FQ-SH
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 22:37:58 -0400
+	(envelope-from <yin.zuowei@zte.com.cn>) id 1czwmx-00072l-Ci
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 22:53:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1czwY4-0006mO-6F
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 22:37:56 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1487262963-11519-1-git-send-email-peter.maydell@linaro.org>
-	<1487262963-11519-5-git-send-email-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <8e9f5148-cfca-6108-e7d1-95e51398512a@amsat.org>
-Date: Sun, 16 Apr 2017 23:37:47 -0300
-MIME-Version: 1.0
-In-Reply-To: <1487262963-11519-5-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 04/13] armv7m: Fix condition
- check for taking exceptions
+	(envelope-from <yin.zuowei@zte.com.cn>) id 1czwmt-0006WL-FL
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 22:53:15 -0400
+Received: from mx7.zte.com.cn ([202.103.147.169]:41410)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <yin.zuowei@zte.com.cn>) id 1czwms-0006SS-KD
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 22:53:11 -0400
+Date: Mon, 17 Apr 2017 10:52:38 +0800 (CST)
+Message-ID: <201704171052388688908@zte.com.cn>
+References: 201704141630322119920@zte.com.cn
+Mime-Version: 1.0
+From: <yin.zuowei@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
+Subject: [Qemu-devel] =?utf-8?q?=C2=A0=5BBUG=5D_network_qga_=3A_windows_os?=
+ =?utf-8?q?_lost_ip_address_of_the_network_card_=C2=A0in_some_cases?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,104 +27,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: mdroth@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org
 
-On 02/16/2017 01:35 PM, Peter Maydell wrote:
-> The M profile condition for when we can take a pending exception or
-> interrupt is not the same as that for A/R profile.  The code
-> originally copied from the A/R profile version of the
-> cpu_exec_interrupt function only worked by chance for the
-> very simple case of exceptions being masked by PRIMASK.
-> Replace it with a call to a function in the NVIC code that
-> correctly compares the priority of the pending exception
-> against the current execution priority of the CPU.
->
-> [Michael Davidsaver's patchset had a patch to do something
-> similar but the implementation ended up being a rewrite.]
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> ---
->  target/arm/cpu.h      |  8 ++++++++
->  hw/intc/armv7m_nvic.c |  7 +++++++
->  target/arm/cpu.c      | 16 ++++++++--------
->  3 files changed, 23 insertions(+), 8 deletions(-)
->
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 0956a54..53299fa 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -1342,6 +1342,14 @@ uint32_t arm_phys_excp_target_el(CPUState *cs, uint32_t excp_idx,
->                                   uint32_t cur_el, bool secure);
->
->  /* Interface between CPU and Interrupt controller.  */
-> +#ifndef CONFIG_USER_ONLY
-> +bool armv7m_nvic_can_take_pending_exception(void *opaque);
-> +#else
-> +static inline bool armv7m_nvic_can_take_pending_exception(void *opaque)
-> +{
-> +    return true;
-> +}
-> +#endif
->  void armv7m_nvic_set_pending(void *opaque, int irq);
->  int armv7m_nvic_acknowledge_irq(void *opaque);
->  void armv7m_nvic_complete_irq(void *opaque, int irq);
-> diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-> index f45b897..e0fce3e 100644
-> --- a/hw/intc/armv7m_nvic.c
-> +++ b/hw/intc/armv7m_nvic.c
-> @@ -286,6 +286,13 @@ static inline int nvic_exec_prio(NVICState *s)
->      return MIN(running, s->exception_prio);
->  }
->
-> +bool armv7m_nvic_can_take_pending_exception(void *opaque)
-> +{
-> +    NVICState *s = opaque;
-> +
-> +    return nvic_exec_prio(s) > nvic_pending_prio(s);
-> +}
-> +
->  /* caller must call nvic_irq_update() after this */
->  static void set_prio(NVICState *s, unsigned irq, uint8_t prio)
->  {
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 4a069f6..edbc87b 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -338,13 +338,6 @@ static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
->      CPUARMState *env = &cpu->env;
->      bool ret = false;
->
-> -
-> -    if (interrupt_request & CPU_INTERRUPT_FIQ
-> -        && !(env->daif & PSTATE_F)) {
-> -        cs->exception_index = EXCP_FIQ;
-> -        cc->do_interrupt(cs);
-> -        ret = true;
-> -    }
->      /* ARMv7-M interrupt return works by loading a magic value
->       * into the PC.  On real hardware the load causes the
->       * return to occur.  The qemu implementation performs the
-> @@ -354,9 +347,16 @@ static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
->       * the stack if an interrupt occurred at the wrong time.
->       * We avoid this by disabling interrupts when
->       * pc contains a magic address.
-> +     *
-> +     * ARMv7-M interrupt masking works differently than -A or -R.
-> +     * There is no FIQ/IRQ distinction. Instead of I and F bits
-> +     * masking FIQ and IRQ interrupts, an exception is taken only
-> +     * if it is higher priority than the current execution priority
-> +     * (which depends on state like BASEPRI, FAULTMASK and the
-> +     * currently active exception).
->       */
->      if (interrupt_request & CPU_INTERRUPT_HARD
-> -        && !(env->daif & PSTATE_I)
-> +        && (armv7m_nvic_can_take_pending_exception(env->nvic))
->          && (env->regs[15] < 0xfffffff0)) {
->          cs->exception_index = EXCP_IRQ;
->          cc->do_interrupt(cs);
->
+V2UgdGhpbmsgdGhpcyBwcm9ibGVtIGNvdWxkZSBiZSBzb2xldmQgaW4gcWdhIG1vZHVsZXPjgIJj
+YW4gYW55Ym9keSBnaXZlIHNvbWUgYWR2aWNlID8NCg0KDQpbQlVHXSBuZXR3b3JrIDogd2luZG93
+cyBvcyBsb3N0IGlwIGFkZHJlc3Mgb2YgdGhlIG5ldHdvcmsgY2FyZCAgaW4gc29tZSBjYXNlcw0K
+DQp3ZSAgZm91bmQgdGhpcyBwcm9ibGVtIGZvciBhIGxvbmcgdGltZSDjgIJGb3IgZXhhbXBsZSwg
+aWYgd2UgaGFzIHRocmVlIG5ldHdvcmsgY2FyZCBpbiB2aXJ0dWFsIHhtbCBmaWxlIO+8jHN1Y2gg
+YXMgIm5ldHdvcmsgY29ubmVjdGlvbiAxIiAvICJuZXR3b3JrIGNvbm5lY3Rpb24gMiIvIm5ldHdv
+cmsgY29ubmVjdGlvbiAzIiDjgIINCg0KRWNobyBuZXR3b3JrIGNhcmQgaGFzIG93biBpcCBhZGRy
+ZXNzIO+8jHN1Y2ggYXMgMTkyLjE2OC4xLjEgLyAyLjEgLzMuMSAsIHdoZW4gZGVsZXRlIHRoZSBm
+aXJzdCBjYXJkIO+8jHJlYm9vdCB0aGUgd2luZG93cyB2aXJ0dWFsIG9zLCB0aGVuIHRoaXMgcHJv
+YmxlbSBoYXBwZW5lZCAhDQoNCg0KDQoNCndlIGZvdW5kIHRoYXQgdGhlIHNlbmNvbmQgbmV0d29y
+ayBjYXJkIHdpbGwgIHJlcGxhY2UgdGhlIGZpcnN0IG9uZSAsIHRoZW4gdGhlIGlwIGFkZHJlc3Mg
+b2YgIm5ldHdvcmsgY29ubmVjdGlvbiAyICIgYmVjb21lIDE5Mi4xNjguMS4xIOOAgg0KDQoNCk91
+ciB0aGlyZCBwYXJ0eSB1c2VycyBiZWdhbiB0byBjb21wbGFpbiBhYm91dCB0aGlzIGJ1ZyDjgIJB
+bGwgdGhlIGJ1c2luZXNzIG9mIHRoZSBzZWNvbmQgaXAgIGxvc3QgISEhIA0KDQpJIG1lYW4gYm90
+aCBvZiB3aW5kb3dzIGFuZCBsaW51eCBoYXMgdGhpcyBidWcgLCAgd2Ugc29sdmUgdGhpcyBidWcg
+aW4gbGludXggIHRocm91Z2h0IGJvbmRpbmcgbmV0Y3JhZCBwY2kgYW5kIG1hYyBhZGRyZXNzIOOA
+gg0KDQpUaGVyZSBpcyBubyBnb29kIHNvbHV0aW9uIG9uIHdpbmRvd3Mgb3MgLiB0aGVyYSBhcmUg
+PyAgd2UgaW1wbGVtZW50ZWQgYSBwbGFuIHRvIHJlc3VtcHRpb24gb2YgSVAgYnkgUUdBLiAgSXMg
+dGhlcmUgYSBiZXR0ZXIgd2F5ID8NCg0KDQoNCg0KDQoNCg0KDQrljp/lp4vpgq7ku7YNCg0KDQoN
+CuWPkeS7tuS6uu+8muWwueS9nOS4ujEwMTQ0NTc0DQrmlLbku7bkurrvvJog77yccWVtdS1kZXZl
+bEBub25nbnUub3Jn77yeDQrml6Ug5pyfIO+8mjIwMTflubQwNOaciDE05pelIDE2OjQ2DQrkuLsg
+6aKYIO+8mltCVUddIG5ldHdvcmsgOiB3aW5kb3dzIG9zIGxvc3QgaXAgYWRkcmVzcyBvZiB0aGUg
+bmV0d29yayBjYXJkICBpbiBzb21lIGNhc2VzDQoNCg0KDQoNCg0KDQp3ZSAgZm91bmQgdGhpcyBw
+cm9ibGVtIGZvciBhIGxvbmcgdGltZSDjgIJGb3IgZXhhbXBsZSwgaWYgd2UgaGFzIHRocmVlIG5l
+dHdvcmsgY2FyZCBpbiB2aXJ0dWFsIHhtbCBmaWxlIO+8jHN1Y2ggYXMgIm5ldHdvcmsgY29ubmVj
+dGlvbiAxIiAvICJuZXR3b3JrIGNvbm5lY3Rpb24gMiIvIm5ldHdvcmsgY29ubmVjdGlvbiAzIiDj
+gIINCg0KRWNobyBuZXR3b3JrIGNhcmQgaGFzIG93biBpcCBhZGRyZXNzIO+8jHN1Y2ggYXMgMTky
+LjE2OC4xLjEgLyAyLjEgLzMuMSAsIHdoZW4gZGVsZXRlIHRoZSBmaXJzdCBjYXJkIO+8jHJlYm9v
+dCB0aGUgd2luZG93cyB2aXJ0dWFsIG9zLCB0aGVuIHRoaXMgcHJvYmxlbSBoYXBwZW5lZCAhDQoN
+Cg0KDQoNCndlIGZvdW5kIHRoYXQgdGhlIHNlbmNvbmQgbmV0d29yayBjYXJkIHdpbGwgIHJlcGxh
+Y2UgdGhlIGZpcnN0IG9uZSAsIHRoZW4gdGhlIGlwIGFkZHJlc3Mgb2YgIm5ldHdvcmsgY29ubmVj
+dGlvbiAyICIgYmVjb21lIDE5Mi4xNjguMS4xIOOAgg0KDQoNCk91ciB0aGlyZCBwYXJ0eSB1c2Vy
+cyBiZWdhbiB0byBjb21wbGFpbiBhYm91dCB0aGlzIGJ1ZyDjgIJBbGwgdGhlIGJ1c2luZXNzIG9m
+IHRoZSBzZWNvbmQgaXAgIGxvc3QgISEhIA0KDQpJIG1lYW4gYm90aCBvZiB3aW5kb3dzIGFuZCBs
+aW51eCBoYXMgdGhpcyBidWcgLCAgd2Ugc29sdmUgdGhpcyBidWcgaW4gbGludXggIHRocm91Z2h0
+IGJvbmRpbmcgbmV0Y3JhZCBwY2kgYW5kIG1hYyBhZGRyZXNzIOOAgg0KDQpUaGVyZSBpcyBubyBn
+b29kIHNvbHV0aW9uIG9uIHdpbmRvd3Mgb3MgLiB0aGVyYSBhcmUgPyAgd2UgaW1wbGVtZW50ZWQg
+YSBwbGFuIHRvIHJlc3VtcHRpb24gb2YgSVAgYnkgUUdBLiAgSXMgdGhlcmUgYSBiZXR0ZXIgd2F5
+ID8=
