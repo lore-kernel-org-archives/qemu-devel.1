@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d04tu-0001Q4-T8
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 07:33:03 -0400
+	(envelope-from <peterx@redhat.com>) id 1d04u5-0001YP-7w
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 07:33:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d04tt-0003Xc-WD
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 07:32:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41548)
+	(envelope-from <peterx@redhat.com>) id 1d04u4-0003fE-56
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 07:33:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42860)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d04tt-0003XM-N8
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 07:32:57 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d04u3-0003eq-ST
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 07:33:08 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Mon, 17 Apr 2017 19:32:05 +0800
-Message-Id: <1492428730-13438-3-git-send-email-peterx@redhat.com>
+Date: Mon, 17 Apr 2017 19:32:06 +0800
+Message-Id: <1492428730-13438-4-git-send-email-peterx@redhat.com>
 In-Reply-To: <1492428730-13438-1-git-send-email-peterx@redhat.com>
 References: <1492428730-13438-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/7] memory: remove the last param in
- memory_region_iommu_replay()
+Subject: [Qemu-devel] [PATCH v2 3/7] x86-iommu: use DeviceClass properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,88 +24,81 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Lan Tianyu <tianyu.lan@intel.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Lan Tianyu <tianyu.lan@intel.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Marcel Apfelbaum <marcel@redhat.com>
 
-We were always passing in that one as "false" to assume that's an read
-operation, and we also assume that IOMMU translation would always have
-that read permission. A better permission would be IOMMU_NONE since the
-replay is after all not a real read operation, but just a page table
-rebuilding process.
+No reason to keep tens of lines if we can do it actually far shorter.
 
-CC: David Gibson <david@gibson.dropbear.id.au>
-CC: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- hw/vfio/common.c      | 2 +-
- include/exec/memory.h | 5 +----
- memory.c              | 8 +++-----
- 3 files changed, 5 insertions(+), 10 deletions(-)
+ hw/i386/x86-iommu.c | 47 +++++++----------------------------------------
+ 1 file changed, 7 insertions(+), 40 deletions(-)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 6b33b9f..d008a4b 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -488,7 +488,7 @@ static void vfio_listener_region_add(MemoryListener *listener,
-         QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
- 
-         memory_region_register_iommu_notifier(giommu->iommu, &giommu->n);
--        memory_region_iommu_replay(giommu->iommu, &giommu->n, false);
-+        memory_region_iommu_replay(giommu->iommu, &giommu->n);
- 
-         return;
-     }
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 9047bf3..8721d53 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -731,11 +731,8 @@ void memory_region_register_iommu_notifier(MemoryRegion *mr,
-  *
-  * @mr: the memory region to observe
-  * @n: the notifier to which to replay iommu mappings
-- * @is_write: Whether to treat the replay as a translate "write"
-- *     through the iommu
-  */
--void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n,
--                                bool is_write);
-+void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n);
- 
- /**
-  * memory_region_iommu_replay_all: replay existing IOMMU translations
-diff --git a/memory.c b/memory.c
-index 47dc107..6b2fdb7 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1620,12 +1620,10 @@ uint64_t memory_region_iommu_get_min_page_size(MemoryRegion *mr)
-     return TARGET_PAGE_SIZE;
+diff --git a/hw/i386/x86-iommu.c b/hw/i386/x86-iommu.c
+index 23dcd3f..02b8825 100644
+--- a/hw/i386/x86-iommu.c
++++ b/hw/i386/x86-iommu.c
+@@ -88,55 +88,22 @@ static void x86_iommu_realize(DeviceState *dev, Error **errp)
+     x86_iommu_set_default(X86_IOMMU_DEVICE(dev));
  }
  
--void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n,
--                                bool is_write)
-+void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n)
++static Property x86_iommu_properties[] = {
++    DEFINE_PROP_BOOL("intremap", X86IOMMUState, intr_supported, false),
++    DEFINE_PROP_BOOL("device-iotlb", X86IOMMUState, dt_supported, false),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void x86_iommu_class_init(ObjectClass *klass, void *data)
  {
-     hwaddr addr, granularity;
-     IOMMUTLBEntry iotlb;
--    IOMMUAccessFlags flag = is_write ? IOMMU_WO : IOMMU_RO;
- 
-     /* If the IOMMU has its own replay callback, override */
-     if (mr->iommu_ops->replay) {
-@@ -1636,7 +1634,7 @@ void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n,
-     granularity = memory_region_iommu_get_min_page_size(mr);
- 
-     for (addr = 0; addr < memory_region_size(mr); addr += granularity) {
--        iotlb = mr->iommu_ops->translate(mr, addr, flag);
-+        iotlb = mr->iommu_ops->translate(mr, addr, IOMMU_NONE);
-         if (iotlb.perm != IOMMU_NONE) {
-             n->notify(n, &iotlb);
-         }
-@@ -1654,7 +1652,7 @@ void memory_region_iommu_replay_all(MemoryRegion *mr)
-     IOMMUNotifier *notifier;
- 
-     IOMMU_NOTIFIER_FOREACH(notifier, mr) {
--        memory_region_iommu_replay(mr, notifier, false);
-+        memory_region_iommu_replay(mr, notifier);
-     }
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     dc->realize = x86_iommu_realize;
+-}
+-
+-static bool x86_iommu_intremap_prop_get(Object *o, Error **errp)
+-{
+-    X86IOMMUState *s = X86_IOMMU_DEVICE(o);
+-    return s->intr_supported;
+-}
+-
+-static void x86_iommu_intremap_prop_set(Object *o, bool value, Error **errp)
+-{
+-    X86IOMMUState *s = X86_IOMMU_DEVICE(o);
+-    s->intr_supported = value;
+-}
+-
+-static bool x86_iommu_device_iotlb_prop_get(Object *o, Error **errp)
+-{
+-    X86IOMMUState *s = X86_IOMMU_DEVICE(o);
+-    return s->dt_supported;
+-}
+-
+-static void x86_iommu_device_iotlb_prop_set(Object *o, bool value, Error **errp)
+-{
+-    X86IOMMUState *s = X86_IOMMU_DEVICE(o);
+-    s->dt_supported = value;
+-}
+-
+-static void x86_iommu_instance_init(Object *o)
+-{
+-    X86IOMMUState *s = X86_IOMMU_DEVICE(o);
+-
+-    /* By default, do not support IR */
+-    s->intr_supported = false;
+-    object_property_add_bool(o, "intremap", x86_iommu_intremap_prop_get,
+-                             x86_iommu_intremap_prop_set, NULL);
+-    s->dt_supported = false;
+-    object_property_add_bool(o, "device-iotlb",
+-                             x86_iommu_device_iotlb_prop_get,
+-                             x86_iommu_device_iotlb_prop_set,
+-                             NULL);
++    dc->props = x86_iommu_properties;
  }
  
+ static const TypeInfo x86_iommu_info = {
+     .name          = TYPE_X86_IOMMU_DEVICE,
+     .parent        = TYPE_SYS_BUS_DEVICE,
+-    .instance_init = x86_iommu_instance_init,
+     .instance_size = sizeof(X86IOMMUState),
+     .class_init    = x86_iommu_class_init,
+     .class_size    = sizeof(X86IOMMUClass),
 -- 
 2.7.4
