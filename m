@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d0DHA-0002aH-NR
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 16:29:34 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d0EgB-0000KC-NG
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 17:59:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d0DH6-0003ix-Os
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 16:29:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60958)
+	(envelope-from <ehabkost@redhat.com>) id 1d0Eg8-0005kp-NE
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 17:59:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53532)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1d0DH6-0003ih-FH
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 16:29:28 -0400
-References: <CAC2QTZa6LW2LcWQUDvT88KVw=O+D99ku03XcE3kiLi_SC4UMBw@mail.gmail.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <4ea264eb-128c-569a-264c-8ffa3956dca2@redhat.com>
-Date: Mon, 17 Apr 2017 16:29:24 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d0Eg8-0005ki-Gj
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 17:59:24 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Mon, 17 Apr 2017 18:59:09 -0300
+Message-Id: <20170417215916.12431-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAC2QTZa6LW2LcWQUDvT88KVw=O+D99ku03XcE3kiLi_SC4UMBw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] DMG chunk size independence
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [RFC 0/7] pci: Type-safety and phb->bus initialization
+ cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,119 +25,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: aik@ozlabs.ru, David Gibson <dgibson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
+I've noticed that pci_bus_new*() and pci_register_bus() require
+'parent' to be a PCI_HOST_BRIDGE object, but this is not clear
+from the function signatures.
 
+This series implements two changes in the PCI code:
 
-On 04/15/2017 04:38 AM, Ashijeet Acharya wrote:
-> Hi,
-> 
-> Some of you are already aware but for the benefit of the open list,
-> this mail is regarding the task mentioned
-> Here -> http://wiki.qemu-project.org/ToDo/Block/DmgChunkSizeIndependence
-> 
+1) Replace DeviceState with PCIHostState on functions that
+   already require a PCI_HOST_BRIDGE argument. Makes the
+   functions harder to misuse.
+2) Move PCIHostState::bus initialization inside pci_bus_new*(),
+   to avoid code duplication and make sure the field will be
+   always initialized consistently.
 
-OK, so the idea here is that we should be able to read portions of
-chunks instead of buffering entire chunks, because chunks can be quite
-large and an unverified DMG file should not be able to cause QEMU to
-allocate large portions of memory.
+Eduardo Habkost (7):
+  pci: Change pci_host_bus_register() parameter to PCIHostState
+  pci: Change pci_bus_init() 'parent' parameter to PCIHostState
+  pci: Change pci_bus_new*() parameter to PCIHostState
+  pci: Change pci_register_bus() 'parent' parameter to PCIHostState
+  pci: Set phb->bus inside pci_register_bus()
+  pci: Set phb->bus inside pci_bus_new()
+  pci: Set phb->bus inside pci_bus_new_inplace()
 
-Currently, QEMU has a maximum chunk size and it will not open DMG files
-that have chunks that exceed that size, correct?
+ include/hw/pci/pci.h                | 17 ++++++++--------
+ hw/alpha/typhoon.c                  | 10 +++++-----
+ hw/mips/gt64xxx_pci.c               |  9 +++------
+ hw/pci-bridge/pci_expander_bridge.c | 15 +++++++-------
+ hw/pci-host/apb.c                   |  7 ++-----
+ hw/pci-host/bonito.c                |  7 +++----
+ hw/pci-host/gpex.c                  |  5 ++---
+ hw/pci-host/grackle.c               |  9 ++-------
+ hw/pci-host/piix.c                  |  3 +--
+ hw/pci-host/ppce500.c               |  8 ++++----
+ hw/pci-host/prep.c                  |  4 +---
+ hw/pci-host/q35.c                   |  6 +++---
+ hw/pci-host/uninorth.c              | 18 ++++++-----------
+ hw/pci-host/versatile.c             |  3 +--
+ hw/pci-host/xilinx-pcie.c           |  6 +++---
+ hw/pci/pci.c                        | 40 ++++++++++++++++++-------------=
+------
+ hw/ppc/ppc4xx_pci.c                 |  8 ++++----
+ hw/ppc/spapr_pci.c                  | 10 +++++-----
+ hw/s390x/s390-pci-bus.c             | 10 +++++-----
+ hw/sh4/sh_pci.c                     |  9 +++------
+ 20 files changed, 89 insertions(+), 115 deletions(-)
 
-> I had a chat with Fam regarding this and he suggested a solution where
-> we fix the output buffer size to a max of say "64K" and keep inflating
-> until we reach the end of the input stream. We extract the required
-> data when we enter the desired range and discard the rest. Fam however
-> termed this as only a  "quick fix".
-> 
-
-So it looks like your problem now is how to allow reads to subsets while
-tolerating zipped chunks, right?
-
-We can't predict where the data we want is going to appear mid-stream,
-but I'm not that familiar with the DMG format, so what does the data
-look like and how do we seek to it in general?
-
-We've got the mish blocks stored inside of the ResouceFork (right?), and
-each mish block contains one-or-more chunk records. So given any offset
-into the virtual file, we at least know which chunk it belongs to, but
-thanks to zlib, we can't just read the bits we care about.
-
-(Correct so far?)
-
-> The ideal fix would obviously be if we can somehow predict the exact
-> location inside the compressed stream relative to the desired offset
-> in the output decompressed stream, such as a specific sector in a
-> chunk. Unfortunately this is not possible without doing a first pass
-> over the decompressed stream as answered on the zlib FAQ page
-> Here -> http://zlib.net/zlib_faq.html#faq28
-> 
-
-Yeah, I think you need to start reading the data from the beginning of
-each chunk -- but it depends on the zlib data. It COULD be broken up
-into different pieces, but there's no way to know without scanning it in
-advance.
-
-(Unrelated:
-
-Do we have a zlib format driver?
-
-It might be cute to break up such DMG files and offload zlib
-optimization to another driver, like this:
-
-[dmg]-->[zlib]-->[raw]
-
-And we could pretend that each zlib chunk in this file is virtually its
-own zlib "file" and access it with modified offsets as appropriate.
-
-Any optimizations we make could just apply to this driver.
-
-[anyway...])
-
-
-Pre-scanning for these sync points is probably a waste of time as
-there's no way to know (*I THINK*) how big each sync-block would be
-decompressed, so there's still no way this helps you seek within a
-compressed block...
-
-> AFAICT after reading the zran.c example in zlib, the above mentioned
-> ideal fix would ultimately lead us to decompress the whole chunk in
-> steps at least once to maintain an access point lookup table. This
-> solution is better if we get several random access requests over
-> different read requests, otherwise it ends up being equal to the fix
-> suggested by Fam plus some extra effort needed in building and
-> maintaining access points.
-> 
-
-Yeah, probably not worth it overall... I have to imagine that most uses
-of DMG files are for iso-like cases for installers where accesses are
-going to be either sequential (or mostly sequential) and most data will
-not be read twice.
-
-I could be wrong, but that's my hunch.
-
-Maybe you can cache the state of the INFLATE process such that once you
-fill the cache with data, we can simply resume the INFLATE procedure
-when the guest almost inevitably asks for the next subsequent bytes.
-
-That'd probably be efficient /enough/ in most cases without having to
-worry about a metadata cache for zlib blocks or a literal data cache for
-inflated data.
-
-Or maybe I'm full of crap, I don't know -- I'd probably try a few
-approaches and see which one empirically worked better.
-
-> I have not explored the bzip2 compressed chunks yet but have naively
-> assumed that we will face the same situation there?
-> 
-
-Not sure.
-
-> I would like the community's opinion on this and add their suggestions
-> if possible to give me some new thinking points.
-> 
-> Thanks
-> Ashijeet
-> 
+--=20
+2.11.0.259.g40922b1
