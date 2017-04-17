@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57642)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57629)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1czvYK-0003rK-WC
+	(envelope-from <longpeng2@huawei.com>) id 1czvYK-0003rF-MI
 	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 21:34:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1czvYI-0005WY-Br
+	(envelope-from <longpeng2@huawei.com>) id 1czvYI-0005WS-96
 	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 21:34:04 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3433
-	helo=dggrg02-dlp.huawei.com)
+Received: from szxga01-in.huawei.com ([45.249.212.187]:3474
+	helo=dggrg01-dlp.huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1czvYH-0005Ub-Hl
+	(envelope-from <longpeng2@huawei.com>) id 1czvYH-0005SL-FX
 	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 21:34:02 -0400
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
-Date: Mon, 17 Apr 2017 09:33:20 +0800
-Message-ID: <1492392806-53720-13-git-send-email-longpeng2@huawei.com>
-In-Reply-To: <1492392806-53720-1-git-send-email-longpeng2@huawei.com>
-References: <1492392806-53720-1-git-send-email-longpeng2@huawei.com>
+Date: Mon, 17 Apr 2017 09:33:08 +0800
+Message-ID: <1492392806-53720-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 for-2.10 12/18] crypto: introduce some
- common functions for af_alg backend
+Subject: [Qemu-devel] [PATCH v2 for-2.10 00/18] crypto: add afalg-backend
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,251 +29,130 @@ To: berrange@redhat.com
 Cc: arei.gonglei@huawei.com, weidong.huang@huawei.com, armbru@redhat.com, eblake@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, "Longpeng(Mike)" <longpeng2@huawei.com>
 
 The AF_ALG socket family is the userspace interface for linux
-crypto API, this patch adds af_alg family support and some common
-functions for af_alg backend. It'll be used by afalg-backend crypto
-latter.
+crypto API, users can use it to access hardware accelerators.
 
-Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+This patchset adds a afalg-backend for qemu crypto subsystem. Currently
+when performs encrypt/decrypt, we'll try afalg-backend first and will
+back to libiary-backend if it failed.
+
+In the next step, It would support a command parameter to specifies
+which backends prefer to and some other improvements.
+
+I measured the performance about the afalg-backend impls, I tested
+how many data could be encrypted in 5 seconds.
+
+NOTE: If we use specific hardware crypto cards, I think afalg-backend
+      would even faster.
+
+test-environment: Intel(R) Core(TM) i5-6500 CPU @ 3.20GHz
+
+*sha256*
+chunk_size(bytes)   MB/sec(afalg:sha256-ssse3)  MB/sec(nettle)
+512                 93.03                       185.87
+1024                146.32                      201.78
+2048                213.32                      210.93
+4096                275.48                      215.26
+8192                321.77                      217.49
+16384               349.60                      219.26
+32768               363.59                      219.73
+65536               375.79                      219.99
+
+*hmac(sha256)*
+chunk_size(bytes)   MB/sec(afalg:sha256-ssse3)  MB/sec(nettle)
+512                 71.26                       165.55
+1024                117.43                      189.15
+2048                180.96                      203.24
+4096                247.60                      211.38
+8192                301.99                      215.65
+16384               340.79                      218.22
+32768               365.51                      219.49
+65536               377.92                      220.24
+
+*cbc(aes128)*
+chunk_size(bytes)   MB/sec(afalg:cbc-aes-aesni)  MB/sec(nettle)
+512                 371.76                       188.41
+1024                559.86                       189.64
+2048                768.66                       192.11
+4096                939.15                       192.40
+8192                1029.48                      192.49
+16384               1072.79                      190.52
+32768               1109.38                      190.41
+65536               1102.38                      190.40
+
 ---
- configure            |  21 ++++++++++
- crypto/Makefile.objs |   1 +
- crypto/afalg.c       | 115 +++++++++++++++++++++++++++++++++++++++++++++++++++
- crypto/afalgpriv.h   |  54 ++++++++++++++++++++++++
- 4 files changed, 191 insertions(+)
+Changes since v1:
+	- use "make check-speed" to testing the performance. [Daniel]
+	- put private definations into crypto/***priv.h. [Daniel]
+	- remove afalg socket from qapi-schema, put them into crypto/. [Daniel]
+	- some Error report change. [Daniel]
+	- s/QCryptoAfalg/QCryptoAFAlg. [Daniel]
+	- use snprintf with bounds checking instead of sprintf. [Daniel]
+	- use "qcrypto_afalg_" prefix and "qcrypto_nettle(gcrypt,glib,builtin)_" prefix. [Daniel]
+	- add testing results in cover-letter. [Gonglei]
+
+---
+Longpeng(Mike) (18):
+  crypto: cipher: introduce context free function
+  crypto: cipher: introduce qcrypto_cipher_ctx_new for gcrypt-backend
+  crypto: cipher: introduce qcrypto_cipher_ctx_new for nettle-backend
+  crypto: cipher: introduce qcrypto_cipher_ctx_new for builtin-backend
+  crypto: cipher: add cipher driver framework
+  crypto: hash: add hash driver framework
+  crypto: hmac: move crypto/hmac.h into include/crypto/
+  crypto: hmac: introduce qcrypto_hmac_ctx_new for gcrypt-backend
+  crypto: hmac: introduce qcrypto_hmac_ctx_new for nettle-backend
+  crypto: hmac: introduce qcrypto_hmac_ctx_new for glib-backend
+  crypto: hmac: add hmac driver framework
+  crypto: introduce some common functions for af_alg backend
+  crypto: cipher: add afalg-backend cipher support
+  crypto: hash: add afalg-backend hash support
+  crypto: hmac: add af_alg hmac support
+  tests: crypto: add cipher speed benchmark support
+  tests: crypto: add hash speed benchmark support
+  tests: crypto: add hmac speed benchmark support
+
+ configure                       |  21 ++++
+ crypto/Makefile.objs            |   3 +
+ crypto/afalg.c                  | 115 ++++++++++++++++++++
+ crypto/afalgpriv.h              |  64 +++++++++++
+ crypto/cipher-afalg.c           | 225 +++++++++++++++++++++++++++++++++++++++
+ crypto/cipher-builtin.c         | 125 +++++++++++-----------
+ crypto/cipher-gcrypt.c          | 105 +++++++++---------
+ crypto/cipher-nettle.c          |  84 +++++++++------
+ crypto/cipher.c                 |  91 ++++++++++++++++
+ crypto/cipherpriv.h             |  51 +++++++++
+ crypto/hash-afalg.c             | 229 ++++++++++++++++++++++++++++++++++++++++
+ crypto/hash-gcrypt.c            |  19 ++--
+ crypto/hash-glib.c              |  19 ++--
+ crypto/hash-nettle.c            |  19 ++--
+ crypto/hash.c                   |  24 +++++
+ crypto/hashpriv.h               |  35 ++++++
+ crypto/hmac-gcrypt.c            |  42 ++++----
+ crypto/hmac-glib.c              |  63 ++++++-----
+ crypto/hmac-nettle.c            |  42 ++++----
+ crypto/hmac.c                   |  69 ++++++++++++
+ crypto/hmac.h                   | 166 -----------------------------
+ crypto/hmacpriv.h               |  45 ++++++++
+ include/crypto/cipher.h         |   9 ++
+ include/crypto/hmac.h           | 175 ++++++++++++++++++++++++++++++
+ tests/Makefile.include          |  13 ++-
+ tests/benchmark-crypto-cipher.c |  90 ++++++++++++++++
+ tests/benchmark-crypto-hash.c   |  67 ++++++++++++
+ tests/benchmark-crypto-hmac.c   |  96 +++++++++++++++++
+ tests/test-crypto-cipher.c      |  10 +-
+ 29 files changed, 1704 insertions(+), 412 deletions(-)
  create mode 100644 crypto/afalg.c
  create mode 100644 crypto/afalgpriv.h
+ create mode 100644 crypto/cipher-afalg.c
+ create mode 100644 crypto/cipherpriv.h
+ create mode 100644 crypto/hash-afalg.c
+ create mode 100644 crypto/hashpriv.h
+ delete mode 100644 crypto/hmac.h
+ create mode 100644 crypto/hmacpriv.h
+ create mode 100644 include/crypto/hmac.h
+ create mode 100644 tests/benchmark-crypto-cipher.c
+ create mode 100644 tests/benchmark-crypto-hash.c
+ create mode 100644 tests/benchmark-crypto-hmac.c
 
-diff --git a/configure b/configure
-index be4d326..088e2de 100755
---- a/configure
-+++ b/configure
-@@ -4741,6 +4741,23 @@ if compile_prog "" "" ; then
-     have_af_vsock=yes
- fi
- 
-+##########################################
-+# check for usable AF_ALG environment
-+hava_af_alg=no
-+cat > $TMPC << EOF
-+#include <errno.h>
-+#include <sys/types.h>
-+#include <sys/socket.h>
-+int main(void) {
-+    int sock;
-+    sock = socket(AF_ALG, SOCK_SEQPACKET, 0);
-+    return sock;
-+}
-+EOF
-+if compile_prog "" "" ; then
-+    have_af_alg=yes
-+fi
-+
- #################################################
- # Sparc implicitly links with --relax, which is
- # incompatible with -r, so --no-relax should be
-@@ -5771,6 +5788,10 @@ if test "$have_af_vsock" = "yes" ; then
-   echo "CONFIG_AF_VSOCK=y" >> $config_host_mak
- fi
- 
-+if test "$have_af_alg" = "yes" ; then
-+  echo "CONFIG_AF_ALG=y" >> $config_host_mak
-+fi
-+
- if test "$have_sysmacros" = "yes" ; then
-   echo "CONFIG_SYSMACROS=y" >> $config_host_mak
- fi
-diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
-index 1f749f2..2be5a3a 100644
---- a/crypto/Makefile.objs
-+++ b/crypto/Makefile.objs
-@@ -10,6 +10,7 @@ crypto-obj-$(if $(CONFIG_NETTLE),n,$(if $(CONFIG_GCRYPT_HMAC),n,y)) += hmac-glib
- crypto-obj-y += aes.o
- crypto-obj-y += desrfb.o
- crypto-obj-y += cipher.o
-+crypto-obj-$(CONFIG_AF_ALG) += afalg.o
- crypto-obj-y += tlscreds.o
- crypto-obj-y += tlscredsanon.o
- crypto-obj-y += tlscredsx509.o
-diff --git a/crypto/afalg.c b/crypto/afalg.c
-new file mode 100644
-index 0000000..72d668e
---- /dev/null
-+++ b/crypto/afalg.c
-@@ -0,0 +1,115 @@
-+/*
-+ * QEMU Crypto af_alg support
-+ *
-+ * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
-+ *
-+ * Authors:
-+ *    Longpeng(Mike) <longpeng2@huawei.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.  See the COPYING file in the
-+ * top-level directory.
-+ */
-+#include "qemu/osdep.h"
-+#include "qemu/cutils.h"
-+#include "qemu/sockets.h"
-+#include "qapi/error.h"
-+#include "afalgpriv.h"
-+
-+static bool
-+qcrypto_afalg_build_saddr(const char *type, const char *name,
-+                          struct sockaddr_alg *salg, Error **errp)
-+{
-+    memset(salg, 0, sizeof(*salg));
-+    salg->salg_family = AF_ALG;
-+
-+    if (qemu_strnlen(type, SALG_TYPE_LEN_MAX) == SALG_TYPE_LEN_MAX) {
-+        error_setg(errp, "Afalg type(%s) is larger than %d bytes",
-+                   type, SALG_TYPE_LEN_MAX);
-+        return false;
-+    }
-+
-+    if (qemu_strnlen(name, SALG_NAME_LEN_MAX) == SALG_NAME_LEN_MAX) {
-+        error_setg(errp, "Afalg name(%s) is larger than %d bytes",
-+                   name, SALG_NAME_LEN_MAX);
-+        return false;
-+    }
-+
-+    pstrcpy((char *)salg->salg_type, SALG_TYPE_LEN_MAX, type);
-+    pstrcpy((char *)salg->salg_name, SALG_NAME_LEN_MAX, name);
-+
-+    return true;
-+}
-+
-+static int
-+qcrypto_afalg_socket_bind(const char *type, const char *name,
-+                          Error **errp)
-+{
-+    int sbind;
-+    struct sockaddr_alg salg;
-+
-+    if (!qcrypto_afalg_build_saddr(type, name, &salg, errp)) {
-+        return -1;
-+    }
-+
-+    sbind = qemu_socket(AF_ALG, SOCK_SEQPACKET, 0);
-+    if (sbind < 0) {
-+        error_setg_errno(errp, errno, "Failed to create socket");
-+        return -1;
-+    }
-+
-+    if (bind(sbind, (const struct sockaddr *)&salg, sizeof(salg)) != 0) {
-+        error_setg_errno(errp, errno, "Failed to bind socket");
-+        closesocket(sbind);
-+        return -1;
-+    }
-+
-+    return sbind;
-+}
-+
-+QCryptoAFAlg *
-+qcrypto_afalg_comm_alloc(const char *type, const char *name,
-+                         Error **errp)
-+{
-+    QCryptoAFAlg *afalg = NULL;
-+
-+    afalg = g_new0(QCryptoAFAlg, 1);
-+    /* initilize crypto API socket */
-+    afalg->opfd = -1;
-+    afalg->tfmfd = qcrypto_afalg_socket_bind(type, name, errp);
-+    if (afalg->tfmfd == -1) {
-+        goto error;
-+    }
-+
-+    afalg->opfd = qemu_accept(afalg->tfmfd, NULL, 0);
-+    if (afalg->opfd == -1) {
-+        error_setg_errno(errp, errno, "Failed to accept socket");
-+        goto error;
-+    }
-+
-+    return afalg;
-+
-+error:
-+    qcrypto_afalg_comm_free(afalg);
-+    return NULL;
-+}
-+
-+void qcrypto_afalg_comm_free(QCryptoAFAlg *afalg)
-+{
-+    if (afalg) {
-+        if (afalg->msg) {
-+            g_free(afalg->msg->msg_control);
-+            g_free(afalg->msg);
-+        }
-+
-+        if (afalg->tfmfd != -1) {
-+            closesocket(afalg->tfmfd);
-+        }
-+
-+        if (afalg->opfd != -1) {
-+            closesocket(afalg->opfd);
-+        }
-+
-+        g_free(afalg);
-+    }
-+}
-diff --git a/crypto/afalgpriv.h b/crypto/afalgpriv.h
-new file mode 100644
-index 0000000..155130b
---- /dev/null
-+++ b/crypto/afalgpriv.h
-@@ -0,0 +1,54 @@
-+/*
-+ * QEMU Crypto af_alg support
-+ *
-+ * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
-+ *
-+ * Authors:
-+ *    Longpeng(Mike) <longpeng2@huawei.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.  See the COPYING file in the
-+ * top-level directory.
-+ */
-+
-+#ifndef QCRYPTO_AFALGPRIV_H
-+#define QCRYPTO_AFALGPRIV_H
-+
-+#include <linux/if_alg.h>
-+
-+#define SALG_TYPE_LEN_MAX 14
-+#define SALG_NAME_LEN_MAX 64
-+
-+typedef struct QCryptoAFAlg QCryptoAFAlg;
-+
-+struct QCryptoAFAlg {
-+    int tfmfd;
-+    int opfd;
-+    struct msghdr *msg;
-+    struct cmsghdr *cmsg;
-+};
-+
-+/**
-+ * qcrypto_afalg_comm_alloc:
-+ * @type: the type of crypto opeartion
-+ * @name: the name of crypto opeartion
-+ *
-+ * Allocate a QCryptoAFAlg object and bind itself to
-+ * a AF_ALG socket.
-+ *
-+ * Returns:
-+ *  a new QCryptoAFAlg object, or NULL in error.
-+ */
-+QCryptoAFAlg *
-+qcrypto_afalg_comm_alloc(const char *type, const char *name,
-+                         Error **errp);
-+
-+/**
-+ * afalg_comm_free:
-+ * @afalg: the QCryptoAFAlg object
-+ *
-+ * Free the @afalg.
-+ */
-+void qcrypto_afalg_comm_free(QCryptoAFAlg *afalg);
-+
-+#endif
 -- 
 1.8.3.1
