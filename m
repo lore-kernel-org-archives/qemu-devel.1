@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1czvYL-0003rM-Vu
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 21:34:07 -0400
+	(envelope-from <longpeng2@huawei.com>) id 1czvYN-0003sH-R6
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 21:34:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1czvYI-0005Wx-NS
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 21:34:06 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3428
-	helo=dggrg02-dlp.huawei.com)
+	(envelope-from <longpeng2@huawei.com>) id 1czvYM-0005ZV-1X
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 21:34:07 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:3483
+	helo=dggrg01-dlp.huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1czvYI-0005Tv-5G
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 21:34:02 -0400
+	(envelope-from <longpeng2@huawei.com>) id 1czvYL-0005XS-CY
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 21:34:05 -0400
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
-Date: Mon, 17 Apr 2017 09:33:17 +0800
-Message-ID: <1492392806-53720-10-git-send-email-longpeng2@huawei.com>
+Date: Mon, 17 Apr 2017 09:33:25 +0800
+Message-ID: <1492392806-53720-18-git-send-email-longpeng2@huawei.com>
 In-Reply-To: <1492392806-53720-1-git-send-email-longpeng2@huawei.com>
 References: <1492392806-53720-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 for-2.10 09/18] crypto: hmac: introduce
- qcrypto_hmac_ctx_new for nettle-backend
+Subject: [Qemu-devel] [PATCH v2 for-2.10 17/18] tests: crypto: add hash
+ speed benchmark support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +30,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: berrange@redhat.com
 Cc: arei.gonglei@huawei.com, weidong.huang@huawei.com, armbru@redhat.com, eblake@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-Extracts qcrypto_hmac_ctx_new() from qcrypto_hmac_new() for
-nettle-backend impls.
+This patch add a hash speed benchmark, it helps us to
+measure the performance by using "make check-speed" or
+using "./tests/benchmark-crypto-cipher" directly.
 
 Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 ---
- crypto/hmac-nettle.c | 34 ++++++++++++++++++++++++----------
- 1 file changed, 24 insertions(+), 10 deletions(-)
+ tests/Makefile.include        |  2 ++
+ tests/benchmark-crypto-hash.c | 67 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 69 insertions(+)
+ create mode 100644 tests/benchmark-crypto-hash.c
 
-diff --git a/crypto/hmac-nettle.c b/crypto/hmac-nettle.c
-index 4a9e6b2..19fbb4f 100644
---- a/crypto/hmac-nettle.c
-+++ b/crypto/hmac-nettle.c
-@@ -97,11 +97,11 @@ bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg)
-     return false;
- }
- 
--QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
--                              const uint8_t *key, size_t nkey,
--                              Error **errp)
-+static QCryptoHmacNettle *
-+qcrypto_hmac_ctx_new(QCryptoHashAlgorithm alg,
-+                     const uint8_t *key, size_t nkey,
-+                     Error **errp)
- {
--    QCryptoHmac *hmac;
-     QCryptoHmacNettle *ctx;
- 
-     if (!qcrypto_hmac_supports(alg)) {
-@@ -110,16 +110,11 @@ QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
-         return NULL;
-     }
- 
--    hmac = g_new0(QCryptoHmac, 1);
--    hmac->alg = alg;
--
-     ctx = g_new0(QCryptoHmacNettle, 1);
- 
-     qcrypto_hmac_alg_map[alg].setkey(&ctx->u, nkey, key);
- 
--    hmac->opaque = ctx;
--
--    return hmac;
-+    return ctx;
- }
- 
- void qcrypto_hmac_free(QCryptoHmac *hmac)
-@@ -173,3 +168,22 @@ int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
- 
-     return 0;
- }
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 3dde956..beb459c 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -99,6 +99,7 @@ gcov-files-test-keyval-y = util/keyval.c
+ check-unit-y += tests/test-write-threshold$(EXESUF)
+ gcov-files-test-write-threshold-y = block/write-threshold.c
+ check-unit-y += tests/test-crypto-hash$(EXESUF)
++check-speed-y += tests/benchmark-crypto-hash$(EXESUF)
+ check-unit-y += tests/test-crypto-hmac$(EXESUF)
+ check-unit-y += tests/test-crypto-cipher$(EXESUF)
+ check-speed-y += tests/benchmark-crypto-cipher$(EXESUF)
+@@ -628,6 +629,7 @@ tests/test-mul64$(EXESUF): tests/test-mul64.o $(test-util-obj-y)
+ tests/test-bitops$(EXESUF): tests/test-bitops.o $(test-util-obj-y)
+ tests/test-bitcnt$(EXESUF): tests/test-bitcnt.o $(test-util-obj-y)
+ tests/test-crypto-hash$(EXESUF): tests/test-crypto-hash.o $(test-crypto-obj-y)
++tests/benchmark-crypto-hash$(EXESUF): tests/benchmark-crypto-hash.o $(test-crypto-obj-y)
+ tests/test-crypto-hmac$(EXESUF): tests/test-crypto-hmac.o $(test-crypto-obj-y)
+ tests/test-crypto-cipher$(EXESUF): tests/test-crypto-cipher.o $(test-crypto-obj-y)
+ tests/benchmark-crypto-cipher$(EXESUF): tests/benchmark-crypto-cipher.o $(test-crypto-obj-y)
+diff --git a/tests/benchmark-crypto-hash.c b/tests/benchmark-crypto-hash.c
+new file mode 100644
+index 0000000..6769d2a
+--- /dev/null
++++ b/tests/benchmark-crypto-hash.c
+@@ -0,0 +1,67 @@
++/*
++ * QEMU Crypto hash speed benchmark
++ *
++ * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
++ *
++ * Authors:
++ *    Longpeng(Mike) <longpeng2@huawei.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * (at your option) any later version.  See the COPYING file in the
++ * top-level directory.
++ */
++#include "qemu/osdep.h"
++#include "crypto/init.h"
++#include "crypto/hash.h"
 +
-+QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
-+                              const uint8_t *key, size_t nkey,
-+                              Error **errp)
++static void test_hash_speed(const void *opaque)
 +{
-+    QCryptoHmac *hmac;
-+    QCryptoHmacNettle *ctx;
++    size_t chunk_size = (size_t)opaque;
++    uint8_t *in = NULL, *out = NULL;
++    size_t out_len = 0;
++    double total = 0.0;
++    struct iovec iov;
++    int ret;
 +
-+    ctx = qcrypto_hmac_ctx_new(alg, key, nkey, errp);
-+    if (ctx == NULL) {
-+        return NULL;
++    in = g_new0(uint8_t, chunk_size);
++    memset(in, g_test_rand_int(), chunk_size);
++
++    iov.iov_base = (char *)in;
++    iov.iov_len = chunk_size;
++
++    g_test_timer_start();
++    do {
++        ret = qcrypto_hash_bytesv(QCRYPTO_HASH_ALG_SHA256,
++                                  &iov, 1, &out, &out_len,
++                                  NULL);
++        g_assert(ret == 0);
++
++        total += chunk_size;
++    } while (g_test_timer_elapsed() < 5.0);
++
++    total /= 1024 * 1024; /* to MB */
++    g_print("sha256: ");
++    g_print("Testing chunk_size %ld bytes ", chunk_size);
++    g_print("done: %.2f MB in %.2f secs: ", total, g_test_timer_last());
++    g_print("%.2f MB/sec\n", total / g_test_timer_last());
++
++    g_free(out);
++    g_free(in);
++}
++
++int main(int argc, char **argv)
++{
++    size_t i;
++    char name[64];
++
++    g_test_init(&argc, &argv, NULL);
++    g_assert(qcrypto_init(NULL) == 0);
++
++    for (i = 512; i <= (64 * 1204); i *= 2) {
++        memset(name, 0 , sizeof(name));
++        snprintf(name, sizeof(name), "/crypto/hash/speed-%lu", i);
++        g_test_add_data_func(name, (void *)i, test_hash_speed);
 +    }
 +
-+    hmac = g_new0(QCryptoHmac, 1);
-+    hmac->alg = alg;
-+    hmac->opaque = ctx;
-+
-+    return hmac;
++    return g_test_run();
 +}
 -- 
 1.8.3.1
