@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1czy9B-0001Jo-Ji
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 00:20:19 -0400
+	(envelope-from <he.chen@linux.intel.com>) id 1czzJu-0006zq-Ai
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 01:35:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1czy98-0006Hl-Ba
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 00:20:17 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1491844419-12485-1-git-send-email-peter.maydell@linaro.org>
-	<1491844419-12485-8-git-send-email-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3dd852ae-3ff9-0b53-11f1-ea4e2a3ed59c@amsat.org>
-Date: Mon, 17 Apr 2017 01:20:06 -0300
+	(envelope-from <he.chen@linux.intel.com>) id 1czzJr-0004eq-6t
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 01:35:26 -0400
+Received: from mga14.intel.com ([192.55.52.115]:17031)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <he.chen@linux.intel.com>)
+	id 1czzJq-0004eM-TY
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 01:35:23 -0400
+Date: Mon, 17 Apr 2017 13:36:07 +0800
+From: He Chen <he.chen@linux.intel.com>
+Message-ID: <20170417053607.GA29789@he>
+References: <1491900566-32222-1-git-send-email-he.chen@linux.intel.com>
+	<173a855f-1ca7-e680-a39c-c5e6bce310be@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1491844419-12485-8-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 7/9] arm: Track M profile handler mode
- state in TB flags
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <173a855f-1ca7-e680-a39c-c5e6bce310be@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6] Allow setting NUMA distance for
+ different NUMA nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +29,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Andrew Jones <drjones@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Hi Peter,
+On Tue, Apr 11, 2017 at 08:18:49AM -0500, Eric Blake wrote:
+> On 04/11/2017 03:49 AM, He Chen wrote:
+> > This patch is going to add SLIT table support in QEMU, and provides
+> > additional option `dist` for command `-numa` to allow user set vNUMA
+> > distance by QEMU command.
+> > 
+> > With this patch, when a user wants to create a guest that contains
+> > several vNUMA nodes and also wants to set distance among those nodes,
+> > the QEMU command would like:
+> > 
+> > ```
+> > -numa node,nodeid=0,cpus=0 \
+> > -numa node,nodeid=1,cpus=1 \
+> > -numa node,nodeid=2,cpus=2 \
+> > -numa node,nodeid=3,cpus=3 \
+> > -numa dist,src=0,dst=1,val=21 \
+> > -numa dist,src=0,dst=2,val=31 \
+> > -numa dist,src=0,dst=3,val=41 \
+> > -numa dist,src=1,dst=2,val=21 \
+> > -numa dist,src=1,dst=3,val=31 \
+> > -numa dist,src=2,dst=3,val=21 \
+> > ```
+> > 
+> > Signed-off-by: He Chen <he.chen@linux.intel.com>
+> > ---
+> 
+> Here is where you should mention what changed since v5, to help focus
+> the attention of reviewers that have read earlier versions.
+> 
 
-On 04/10/2017 02:13 PM, Peter Maydell wrote:
-> For M profile exception-return handling we'd like to generate different
-> code for some instructions depending on whether we are in Handler
-> mode or Thread mode. This isn't the same as "are we privileged
-> or user", so we need an extra bit in the TB flags to distinguish.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/arm/cpu.h       | 9 +++++++++
->  target/arm/translate.h | 1 +
->  target/arm/translate.c | 1 +
->  3 files changed, 11 insertions(+)
->
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index e6f05e2..7d26357 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -2291,6 +2291,9 @@ static inline bool arm_cpu_data_is_big_endian(CPUARMState *env)
->  #define ARM_TBFLAG_NS_MASK          (1 << ARM_TBFLAG_NS_SHIFT)
->  #define ARM_TBFLAG_BE_DATA_SHIFT    20
->  #define ARM_TBFLAG_BE_DATA_MASK     (1 << ARM_TBFLAG_BE_DATA_SHIFT)
-> +/* For M profile only, Handler (ie not Thread) mode */
-> +#define ARM_TBFLAG_HANDLER_SHIFT    21
-> +#define ARM_TBFLAG_HANDLER_MASK     (1 << ARM_TBFLAG_HANDLER_SHIFT)
->
->  /* Bit usage when in AArch64 state */
->  #define ARM_TBFLAG_TBI0_SHIFT 0        /* TBI0 for EL0/1 or TBI for EL2/3 */
-> @@ -2327,6 +2330,8 @@ static inline bool arm_cpu_data_is_big_endian(CPUARMState *env)
->      (((F) & ARM_TBFLAG_NS_MASK) >> ARM_TBFLAG_NS_SHIFT)
->  #define ARM_TBFLAG_BE_DATA(F) \
->      (((F) & ARM_TBFLAG_BE_DATA_MASK) >> ARM_TBFLAG_BE_DATA_SHIFT)
-> +#define ARM_TBFLAG_HANDLER(F) \
-> +    (((F) & ARM_TBFLAG_HANDLER_MASK) >> ARM_TBFLAG_HANDLER_SHIFT)
->  #define ARM_TBFLAG_TBI0(F) \
->      (((F) & ARM_TBFLAG_TBI0_MASK) >> ARM_TBFLAG_TBI0_SHIFT)
->  #define ARM_TBFLAG_TBI1(F) \
-> @@ -2517,6 +2522,10 @@ static inline void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
->      }
->      *flags |= fp_exception_el(env) << ARM_TBFLAG_FPEXC_EL_SHIFT;
->
-> +    if (env->v7m.exception != 0) {
-> +        *flags |= ARM_TBFLAG_HANDLER_MASK;
-> +    }
-> +
->      *cs_base = 0;
->  }
->
-> diff --git a/target/arm/translate.h b/target/arm/translate.h
-> index abb0760..f955174 100644
-> --- a/target/arm/translate.h
-> +++ b/target/arm/translate.h
-> @@ -31,6 +31,7 @@ typedef struct DisasContext {
->      bool vfp_enabled; /* FP enabled via FPSCR.EN */
->      int vec_len;
->      int vec_stride;
-> +    bool handler; /* v7M Handler mode */
+Oh, sorry.
+Changes since v5:
+* Made the generation of the SLIT dependent on `have_numa_distance`.
+* Doc refinement.
+> > +++ b/qapi-schema.json
+> 
+> >  ##
+> > +# @NumaDistOptions:
+> > +#
+> > +# Set the distance between 2 NUMA nodes.
+> > +#
+> > +# @src: source NUMA node.
+> > +#
+> > +# @dst: destination NUMA node.
+> > +#
+> > +# @val: NUMA distance from source node to destination node.
+> > +#       When a node is unreachable from another node, set the distance
+> > +#       between them to 255.
+> 
+> Still no mention that distances less than 10 are invalid, or that a node
+> to itself defaults to 10 and can't be changed, or that other distances
+> default to 20.  But that starts to get complex enough, and you cover it
+> elsewhere, so I'm okay with what you have here.
+> 
+> Interface looks sane, but I'll leave others to do the code review.
+> 
+Is there anything I need to do to improve this patch? Still need another
+version patch or just wait for the code review?
 
-What about a more descriptive name like 'is_v7m_handler_mode' or 
-'v7m_mode_handler'? It makes your next patch easier to understand:
-
-     if (s->handler && arm_dc_feature(s, ARM_FEATURE_M)) {
-
->      /* Immediate value in AArch32 SVC insn; must be set if is_jmp == DISAS_SWI
->       * so that top level loop can generate correct syndrome information.
->       */
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index f28c4ca..f980cda 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -11780,6 +11780,7 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
->      dc->vec_len = ARM_TBFLAG_VECLEN(tb->flags);
->      dc->vec_stride = ARM_TBFLAG_VECSTRIDE(tb->flags);
->      dc->c15_cpar = ARM_TBFLAG_XSCALE_CPAR(tb->flags);
-> +    dc->handler = ARM_TBFLAG_HANDLER(tb->flags);
->      dc->cp_regs = cpu->cp_regs;
->      dc->features = env->features;
->
->
+Thanks,
+-He
