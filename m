@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d06wE-0002ol-Ks
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 09:43:31 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d0BQR-0003J7-2i
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 14:31:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d06wB-0001Rn-HZ
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 09:43:30 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:32994)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d06wB-0001Rc-Cu
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 09:43:27 -0400
-Received: by mail-qt0-x241.google.com with SMTP id c45so18634798qtb.0
-	for <qemu-devel@nongnu.org>; Mon, 17 Apr 2017 06:43:27 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1492334677-14170-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1492334677-14170-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3a4f5675-bcea-96f5-5dd2-a3d4355cbe7a@amsat.org>
-Date: Mon, 17 Apr 2017 10:43:22 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1d0BQM-0006rr-F5
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 14:30:59 -0400
+Date: Mon, 17 Apr 2017 15:30:46 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170417183045.GA7078@thinpad.lan.raisama.net>
+References: <20170328021651.19350-1-david@gibson.dropbear.id.au>
+	<20170328021651.19350-3-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <1492334677-14170-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] COLO-compare: Optimize tcp compare for
- option field
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170328021651.19350-3-david@gibson.dropbear.id.au>
+Subject: Re: [Qemu-devel] [RFC for-2.10 2/3] pci: Allow host bridges to
+ override PCI/PCIe hybrid device behaviour
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,73 +24,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, bian naimeng <biannm@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: aik@ozlabs.ru, marcel@redhat.com, lersek@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mst@redhat.com
 
-Hi Zhang,
-
-On 04/16/2017 06:24 AM, Zhang Chen wrote:
-> In this patch we support packet that have tcp options field.
-> Add tcp options field check, If the packet have options
-> field we just skip it and compare tcp payload,
-> Avoid unnecessary checkpoint, optimize performance.
->
-> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+On Tue, Mar 28, 2017 at 01:16:50PM +1100, David Gibson wrote:
+> Currently PCI/PCIe hybrid devices - that is, devices which can appear as
+> either plain PCI or PCIe depending on where they're attached - will only
+> appear in PCIe mode if they're attached to a PCIe bus via a root port or
+> downstream port.
+> 
+> This is correct for "standard" PCIe setups, but there are some platforms
+> which need different behaviour (notably "pseries" whose paravirtualized
+> PCI host bridges have some idiosyncracies).
+> 
+> This patch allows the host bridge to override the normal behaviour.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  net/colo-compare.c | 27 ++++++++++++++++++++++++++-
->  1 file changed, 26 insertions(+), 1 deletion(-)
->
-> diff --git a/net/colo-compare.c b/net/colo-compare.c
-> index aada04e..881d6b2 100644
-> --- a/net/colo-compare.c
-> +++ b/net/colo-compare.c
-> @@ -228,6 +228,7 @@ static int colo_packet_compare_tcp(Packet *spkt, Packet *ppkt)
+>  hw/pci/pci.c              | 11 +++++++++--
+>  include/hw/pci/pci_host.h |  1 +
+>  2 files changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 779787b..ac68065 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -392,9 +392,16 @@ bool pci_bus_is_root(PCIBus *bus)
+>  
+>  bool pci_allow_hybrid_pcie(PCIDevice *pci_dev)
+
+Why are we asking the device about allowing hybrid pcie, and not
+the bus itself? Shouldn't we be able to query this before the
+device is plugged, and before pci_dev->bus is even set?
+
+In other words, why pci_allow_hyberid_pcie() and
+pci_device_get_bus() get a PCIDevice* argument instead of a
+PCIBus* argument?
+
 >  {
->      struct tcphdr *ptcp, *stcp;
->      int res;
-> +    int tcp_offset = 0;
+> -    PCIBus *bus = pci_dev->bus;
+> +    PCIHostState *host_bridge = PCI_HOST_BRIDGE(pci_device_root_bus(pci_dev)->qbus.parent);
 
-No need to declare here, it can be restricted to the if {} body.
+There's something I don't understand completely: what exactly
+guarantees that pci_device_root_bus(...)->qbus.parent is always
+going to be a PCI_HOST_BRIDGE?
 
->
->      trace_colo_compare_main("compare tcp");
->
-> @@ -248,7 +249,31 @@ static int colo_packet_compare_tcp(Packet *spkt, Packet *ppkt)
->          spkt->ip->ip_sum = ppkt->ip->ip_sum;
->      }
->
-> -    if (ptcp->th_sum == stcp->th_sum) {
-> +    /*
-> +     * Check tcp header length for tcp option field.
-> +     * th_off > 5 means this tcp packet have options field.
-> +     * The tcp options maybe always different.
-> +     * for example:
-> +     * From RFC 7323.
-> +     * TCP Timestamps option (TSopt):
-> +     * Kind: 8
-> +     *
-> +     * Length: 10 bytes
-> +     *
-> +     *    +-------+-------+---------------------+---------------------+
-> +     *    |Kind=8 |  10   |   TS Value (TSval)  |TS Echo Reply (TSecr)|
-> +     *    +-------+-------+---------------------+---------------------+
-> +     *       1       1              4                     4
-> +     *
-> +     * In this case the primary guest's timestamp always different with
-> +     * the secondary guest's timestamp. COLO just focus on payload,
-> +     * so we just need skip this field.
-> +     */
-> +    if (ptcp->th_off > 5) {
+> +    PCIHostBridgeClass *hc = PCI_HOST_BRIDGE_GET_CLASS(host_bridge);
+> +
+> +    if (hc->allow_hybrid_pcie) {
+> +        return hc->allow_hybrid_pcie(host_bridge, pci_dev);
+> +    } else {
+> +        PCIBus *bus = pci_dev->bus;
+>  
+> -    return pci_bus_is_express(bus) && !pci_bus_is_root(bus);
+> +        return pci_bus_is_express(bus) && !pci_bus_is_root(bus);
+> +    }
+>  }
+>  
+>  void pci_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *parent,
+> diff --git a/include/hw/pci/pci_host.h b/include/hw/pci/pci_host.h
+> index ba31595..ad03cca 100644
+> --- a/include/hw/pci/pci_host.h
+> +++ b/include/hw/pci/pci_host.h
+> @@ -54,6 +54,7 @@ typedef struct PCIHostBridgeClass {
+>      SysBusDeviceClass parent_class;
+>  
+>      const char *(*root_bus_path)(PCIHostState *, PCIBus *);
+> +    bool (*allow_hybrid_pcie)(PCIHostState *, PCIDevice *);
+>  } PCIHostBridgeClass;
+>  
+>  /* common internal helpers for PCI/PCIe hosts, cut off overflows */
+> -- 
+> 2.9.3
+> 
+> 
 
-You can declare here.
-
-I'd rather declare tcp_offset as a ptrdiff_t.
-
-> +        tcp_offset = ppkt->transport_header - (uint8_t *)ppkt->data
-> +                     + (ptcp->th_off * 4);
-> +        res = colo_packet_compare_common(ppkt, spkt, tcp_offset);
-> +    } else if (ptcp->th_sum == stcp->th_sum) {
->          res = colo_packet_compare_common(ppkt, spkt, ETH_HLEN);
->      } else {
->          res = -1;
->
+-- 
+Eduardo
