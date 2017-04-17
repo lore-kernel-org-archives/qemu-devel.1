@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0DEf-0001m0-FW
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 16:26:58 -0400
+	(envelope-from <jsnow@redhat.com>) id 1d0DHA-0002aH-NR
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 16:29:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0DEb-0002ix-GQ
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 16:26:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59726)
+	(envelope-from <jsnow@redhat.com>) id 1d0DH6-0003ix-Os
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 16:29:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60958)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d0DEb-0002iY-7g
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 16:26:53 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D36BB6330D
-	for <qemu-devel@nongnu.org>; Mon, 17 Apr 2017 20:26:51 +0000 (UTC)
-References: <20170417200041.2451-1-quintela@redhat.com>
-	<20170417200041.2451-10-quintela@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ba199bb0-8946-e6c7-0f42-67d296c24afc@redhat.com>
-Date: Mon, 17 Apr 2017 15:26:50 -0500
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1d0DH6-0003ih-FH
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 16:29:28 -0400
+References: <CAC2QTZa6LW2LcWQUDvT88KVw=O+D99ku03XcE3kiLi_SC4UMBw@mail.gmail.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <4ea264eb-128c-569a-264c-8ffa3956dca2@redhat.com>
+Date: Mon, 17 Apr 2017 16:29:24 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170417200041.2451-10-quintela@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="MdiEKUxg78TGu0BVSL6X3xNm9Cn1AoE92"
-Subject: Re: [Qemu-devel] [PATCH 09/19] migration: Create block capabilities
- for shared and enable
+In-Reply-To: <CAC2QTZa6LW2LcWQUDvT88KVw=O+D99ku03XcE3kiLi_SC4UMBw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] DMG chunk size independence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,70 +26,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---MdiEKUxg78TGu0BVSL6X3xNm9Cn1AoE92
-From: Eric Blake <eblake@redhat.com>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com
-Message-ID: <ba199bb0-8946-e6c7-0f42-67d296c24afc@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 09/19] migration: Create block capabilities
- for shared and enable
-References: <20170417200041.2451-1-quintela@redhat.com>
- <20170417200041.2451-10-quintela@redhat.com>
-In-Reply-To: <20170417200041.2451-10-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 04/17/2017 03:00 PM, Juan Quintela wrote:
-> This two capabilites were added through the command line.  Notice that
-
-s/This/These/
-s/capabilites/capabilities/
-
-> we just created them.  This is just the boilerplate.
->=20
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  include/migration/migration.h |  3 +++
->  migration/migration.c         | 36 +++++++++++++++++++++++++++++++++++=
-+
->  qapi-schema.json              |  7 ++++++-
->  3 files changed, 45 insertions(+), 1 deletion(-)
-
-I think this is a nice cleanup, even if it is exposing the internal
-block migration (the 'migrate -b' stuff) that we really don't like (it
-is one of the things causing grief at the 2.9-rc4 stage), because users
-should be favoring NBD migration over internal block migration these days=
-=2E
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+To: Ashijeet Acharya <ashijeetacharya@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
 
---MdiEKUxg78TGu0BVSL6X3xNm9Cn1AoE92
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+On 04/15/2017 04:38 AM, Ashijeet Acharya wrote:
+> Hi,
+> 
+> Some of you are already aware but for the benefit of the open list,
+> this mail is regarding the task mentioned
+> Here -> http://wiki.qemu-project.org/ToDo/Block/DmgChunkSizeIndependence
+> 
 
-iQEcBAEBCAAGBQJY9SUKAAoJEKeha0olJ0Nqrz8H/RAf73+S74pxtIwGxQifCYqn
-WF1o1g1mBqSESHzrTdIIVdtcB/OLq5La5JisaLX8hiMGNBWGDnzgu5DzZJkpfjst
-40UlSmIup3ADYDpuwLWCXA04jajt0Q/Uuw9qKEgJvRtIR0QcFW+DME8aIUuCrAdD
-BP0Wt/1byYsr8e7VNYJpzdhpbLjHn8uCGQDyVcfFZp8CHmjNsHRi0PgVGW/zegeN
-9+0u1VdWmKy5tm8OwaUIvAepEr2bvTX+U30jJ/ZAkqcojm9+XyHJ0TiOvGFgQPk/
-VmervQV9NrpWLpvAufVCYuKC6ZR1in0h25ZlpUH2Bm1t1dMk3WLltrzlM7gNBQM=
-=QVt/
------END PGP SIGNATURE-----
+OK, so the idea here is that we should be able to read portions of
+chunks instead of buffering entire chunks, because chunks can be quite
+large and an unverified DMG file should not be able to cause QEMU to
+allocate large portions of memory.
 
---MdiEKUxg78TGu0BVSL6X3xNm9Cn1AoE92--
+Currently, QEMU has a maximum chunk size and it will not open DMG files
+that have chunks that exceed that size, correct?
+
+> I had a chat with Fam regarding this and he suggested a solution where
+> we fix the output buffer size to a max of say "64K" and keep inflating
+> until we reach the end of the input stream. We extract the required
+> data when we enter the desired range and discard the rest. Fam however
+> termed this as only a  "quick fix".
+> 
+
+So it looks like your problem now is how to allow reads to subsets while
+tolerating zipped chunks, right?
+
+We can't predict where the data we want is going to appear mid-stream,
+but I'm not that familiar with the DMG format, so what does the data
+look like and how do we seek to it in general?
+
+We've got the mish blocks stored inside of the ResouceFork (right?), and
+each mish block contains one-or-more chunk records. So given any offset
+into the virtual file, we at least know which chunk it belongs to, but
+thanks to zlib, we can't just read the bits we care about.
+
+(Correct so far?)
+
+> The ideal fix would obviously be if we can somehow predict the exact
+> location inside the compressed stream relative to the desired offset
+> in the output decompressed stream, such as a specific sector in a
+> chunk. Unfortunately this is not possible without doing a first pass
+> over the decompressed stream as answered on the zlib FAQ page
+> Here -> http://zlib.net/zlib_faq.html#faq28
+> 
+
+Yeah, I think you need to start reading the data from the beginning of
+each chunk -- but it depends on the zlib data. It COULD be broken up
+into different pieces, but there's no way to know without scanning it in
+advance.
+
+(Unrelated:
+
+Do we have a zlib format driver?
+
+It might be cute to break up such DMG files and offload zlib
+optimization to another driver, like this:
+
+[dmg]-->[zlib]-->[raw]
+
+And we could pretend that each zlib chunk in this file is virtually its
+own zlib "file" and access it with modified offsets as appropriate.
+
+Any optimizations we make could just apply to this driver.
+
+[anyway...])
+
+
+Pre-scanning for these sync points is probably a waste of time as
+there's no way to know (*I THINK*) how big each sync-block would be
+decompressed, so there's still no way this helps you seek within a
+compressed block...
+
+> AFAICT after reading the zran.c example in zlib, the above mentioned
+> ideal fix would ultimately lead us to decompress the whole chunk in
+> steps at least once to maintain an access point lookup table. This
+> solution is better if we get several random access requests over
+> different read requests, otherwise it ends up being equal to the fix
+> suggested by Fam plus some extra effort needed in building and
+> maintaining access points.
+> 
+
+Yeah, probably not worth it overall... I have to imagine that most uses
+of DMG files are for iso-like cases for installers where accesses are
+going to be either sequential (or mostly sequential) and most data will
+not be read twice.
+
+I could be wrong, but that's my hunch.
+
+Maybe you can cache the state of the INFLATE process such that once you
+fill the cache with data, we can simply resume the INFLATE procedure
+when the guest almost inevitably asks for the next subsequent bytes.
+
+That'd probably be efficient /enough/ in most cases without having to
+worry about a metadata cache for zlib blocks or a literal data cache for
+inflated data.
+
+Or maybe I'm full of crap, I don't know -- I'd probably try a few
+approaches and see which one empirically worked better.
+
+> I have not explored the bzip2 compressed chunks yet but have naively
+> assumed that we will face the same situation there?
+> 
+
+Not sure.
+
+> I would like the community's opinion on this and add their suggestions
+> if possible to give me some new thinking points.
+> 
+> Thanks
+> Ashijeet
+> 
