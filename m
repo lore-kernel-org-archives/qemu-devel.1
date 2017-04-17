@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d04tp-0001N5-Nt
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 07:32:54 -0400
+	(envelope-from <peterx@redhat.com>) id 1d04tr-0001O2-Ho
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 07:32:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d04tk-0003Vp-S5
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 07:32:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46224)
+	(envelope-from <peterx@redhat.com>) id 1d04tq-0003Wa-7D
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 07:32:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45592)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d04tk-0003VX-N8
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 07:32:48 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d04tp-0003WN-Ud
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 07:32:54 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Mon, 17 Apr 2017 19:32:03 +0800
-Message-Id: <1492428730-13438-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/7] VT-d: PT (passthrough) mode support and
- misc fixes
+Date: Mon, 17 Apr 2017 19:32:04 +0800
+Message-Id: <1492428730-13438-2-git-send-email-peterx@redhat.com>
+In-Reply-To: <1492428730-13438-1-git-send-email-peterx@redhat.com>
+References: <1492428730-13438-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/7] memory: tune last param of
+ iommu_ops.translate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,55 +25,218 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Lan Tianyu <tianyu.lan@intel.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Lan Tianyu <tianyu.lan@intel.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-v2:
-- resending v1 since my patch script had a regression, which failed to
-  send the patches to the list... trying again. sorry for the noise!
+This patch converts the old "is_write" bool into IOMMUAccessFlags. The
+difference is that "is_write" can only express either read/write, but
+sometimes what we really want is "none" here (neither read nor write).
+Replay is an good example - during replay, we should not check any RW
+permission bits since thats not an actual IO at all.
 
-This series is for 2.10, and based on following series:
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ exec.c                   |  6 ++++--
+ hw/alpha/typhoon.c       |  2 +-
+ hw/dma/rc4030.c          |  2 +-
+ hw/i386/amd_iommu.c      |  4 ++--
+ hw/i386/intel_iommu.c    |  4 ++--
+ hw/pci-host/apb.c        |  2 +-
+ hw/ppc/spapr_iommu.c     |  2 +-
+ hw/s390x/s390-pci-bus.c  |  2 +-
+ hw/s390x/s390-pci-inst.c |  2 +-
+ include/exec/memory.h    | 10 ++++++++--
+ memory.c                 |  3 ++-
+ 11 files changed, 24 insertions(+), 15 deletions(-)
 
-    [PATCH v8 0/9] VT-d: vfio enablement and misc enhances
-
-This series add support for per-device passthrough mode for VT-d
-emulation, along with some tweaks on existing codes.
-
-Patches 1-2 are memory related cleanups.
-Patches 3-6 are VT-d cleanups.
-Patch 7 add support for passthrough.
-
-todo:
-- vhost: when pt is specified for vhost-enabled device, kernel can
-  avoid translating the message and fallback to no-iommu mode.
-
-Please review. Thanks.
-
-Peter Xu (7):
-  memory: tune last param of iommu_ops.translate()
-  memory: remove the last param in memory_region_iommu_replay()
-  x86-iommu: use DeviceClass properties
-  intel_iommu: renaming context entry helpers
-  intel_iommu: provide vtd_ce_get_type()
-  intel_iommu: use IOMMU_ACCESS_FLAG()
-  intel_iommu: support passthrough (PT)
-
- exec.c                         |   6 +-
- hw/alpha/typhoon.c             |   2 +-
- hw/dma/rc4030.c                |   2 +-
- hw/i386/amd_iommu.c            |   4 +-
- hw/i386/intel_iommu.c          | 146 +++++++++++++++++++++++++++++++----------
- hw/i386/intel_iommu_internal.h |   1 +
- hw/i386/trace-events           |   1 +
- hw/i386/x86-iommu.c            |  48 +++-----------
- hw/pci-host/apb.c              |   2 +-
- hw/ppc/spapr_iommu.c           |   2 +-
- hw/s390x/s390-pci-bus.c        |   2 +-
- hw/s390x/s390-pci-inst.c       |   2 +-
- hw/vfio/common.c               |   2 +-
- include/exec/memory.h          |  15 +++--
- include/hw/i386/x86-iommu.h    |   1 +
- memory.c                       |   7 +-
- 16 files changed, 146 insertions(+), 97 deletions(-)
-
+diff --git a/exec.c b/exec.c
+index c97ef4a..188892b 100644
+--- a/exec.c
++++ b/exec.c
+@@ -475,7 +475,8 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
+             break;
+         }
+ 
+-        iotlb = mr->iommu_ops->translate(mr, addr, is_write);
++        iotlb = mr->iommu_ops->translate(mr, addr, is_write ?
++                                         IOMMU_WO : IOMMU_RO);
+         if (!(iotlb.perm & (1 << is_write))) {
+             iotlb.target_as = NULL;
+             break;
+@@ -507,7 +508,8 @@ MemoryRegion *address_space_translate(AddressSpace *as, hwaddr addr,
+             break;
+         }
+ 
+-        iotlb = mr->iommu_ops->translate(mr, addr, is_write);
++        iotlb = mr->iommu_ops->translate(mr, addr, is_write ?
++                                         IOMMU_WO : IOMMU_RO);
+         addr = ((iotlb.translated_addr & ~iotlb.addr_mask)
+                 | (addr & iotlb.addr_mask));
+         *plen = MIN(*plen, (addr | iotlb.addr_mask) - addr + 1);
+diff --git a/hw/alpha/typhoon.c b/hw/alpha/typhoon.c
+index f50f5cf..c1cf780 100644
+--- a/hw/alpha/typhoon.c
++++ b/hw/alpha/typhoon.c
+@@ -664,7 +664,7 @@ static bool window_translate(TyphoonWindow *win, hwaddr addr,
+ /* TODO: A translation failure here ought to set PCI error codes on the
+    Pchip and generate a machine check interrupt.  */
+ static IOMMUTLBEntry typhoon_translate_iommu(MemoryRegion *iommu, hwaddr addr,
+-                                             bool is_write)
++                                             IOMMUAccessFlags flag)
+ {
+     TyphoonPchip *pchip = container_of(iommu, TyphoonPchip, iommu);
+     IOMMUTLBEntry ret;
+diff --git a/hw/dma/rc4030.c b/hw/dma/rc4030.c
+index 0080141..edf9432 100644
+--- a/hw/dma/rc4030.c
++++ b/hw/dma/rc4030.c
+@@ -489,7 +489,7 @@ static const MemoryRegionOps jazzio_ops = {
+ };
+ 
+ static IOMMUTLBEntry rc4030_dma_translate(MemoryRegion *iommu, hwaddr addr,
+-                                          bool is_write)
++                                          IOMMUAccessFlags flag)
+ {
+     rc4030State *s = container_of(iommu, rc4030State, dma_mr);
+     IOMMUTLBEntry ret = {
+diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
+index f86a40a..42b34ef 100644
+--- a/hw/i386/amd_iommu.c
++++ b/hw/i386/amd_iommu.c
+@@ -987,7 +987,7 @@ static inline bool amdvi_is_interrupt_addr(hwaddr addr)
+ }
+ 
+ static IOMMUTLBEntry amdvi_translate(MemoryRegion *iommu, hwaddr addr,
+-                                     bool is_write)
++                                     IOMMUAccessFlags flag)
+ {
+     AMDVIAddressSpace *as = container_of(iommu, AMDVIAddressSpace, iommu);
+     AMDVIState *s = as->iommu_state;
+@@ -1016,7 +1016,7 @@ static IOMMUTLBEntry amdvi_translate(MemoryRegion *iommu, hwaddr addr,
+         return ret;
+     }
+ 
+-    amdvi_do_translate(as, addr, is_write, &ret);
++    amdvi_do_translate(as, addr, flag & IOMMU_WO, &ret);
+     trace_amdvi_translation_result(as->bus_num, PCI_SLOT(as->devfn),
+             PCI_FUNC(as->devfn), addr, ret.translated_addr);
+     return ret;
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 02f047c..ea54ec3 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -2221,7 +2221,7 @@ static void vtd_mem_write(void *opaque, hwaddr addr,
+ }
+ 
+ static IOMMUTLBEntry vtd_iommu_translate(MemoryRegion *iommu, hwaddr addr,
+-                                         bool is_write)
++                                         IOMMUAccessFlags flag)
+ {
+     VTDAddressSpace *vtd_as = container_of(iommu, VTDAddressSpace, iommu);
+     IntelIOMMUState *s = vtd_as->iommu_state;
+@@ -2243,7 +2243,7 @@ static IOMMUTLBEntry vtd_iommu_translate(MemoryRegion *iommu, hwaddr addr,
+     }
+ 
+     vtd_do_iommu_translate(vtd_as, vtd_as->bus, vtd_as->devfn, addr,
+-                           is_write, &ret);
++                           flag & IOMMU_WO, &ret);
+     VTD_DPRINTF(MMU,
+                 "bus %"PRIu8 " slot %"PRIu8 " func %"PRIu8 " devfn %"PRIu8
+                 " iova 0x%"PRIx64 " hpa 0x%"PRIx64, pci_bus_num(vtd_as->bus),
+diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
+index 653e711..ad7abb2 100644
+--- a/hw/pci-host/apb.c
++++ b/hw/pci-host/apb.c
+@@ -209,7 +209,7 @@ static AddressSpace *pbm_pci_dma_iommu(PCIBus *bus, void *opaque, int devfn)
+ 
+ /* Called from RCU critical section */
+ static IOMMUTLBEntry pbm_translate_iommu(MemoryRegion *iommu, hwaddr addr,
+-                                         bool is_write)
++                                         IOMMUAccessFlags flag)
+ {
+     IOMMUState *is = container_of(iommu, IOMMUState, iommu);
+     hwaddr baseaddr, offset;
+diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
+index ae30bbe..a3ae78d 100644
+--- a/hw/ppc/spapr_iommu.c
++++ b/hw/ppc/spapr_iommu.c
+@@ -110,7 +110,7 @@ static void spapr_tce_free_table(uint64_t *table, int fd, uint32_t nb_table)
+ 
+ /* Called from RCU critical section */
+ static IOMMUTLBEntry spapr_tce_translate_iommu(MemoryRegion *iommu, hwaddr addr,
+-                                               bool is_write)
++                                               IOMMUAccessFlags flag)
+ {
+     sPAPRTCETable *tcet = container_of(iommu, sPAPRTCETable, iommu);
+     uint64_t tce;
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index 69b0291..9b2c344 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -355,7 +355,7 @@ out:
+ }
+ 
+ static IOMMUTLBEntry s390_translate_iommu(MemoryRegion *mr, hwaddr addr,
+-                                          bool is_write)
++                                          IOMMUAccessFlags flag)
+ {
+     uint64_t pte;
+     uint32_t flags;
+diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+index d2a8c0a..0087aa7 100644
+--- a/hw/s390x/s390-pci-inst.c
++++ b/hw/s390x/s390-pci-inst.c
+@@ -622,7 +622,7 @@ int rpcit_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
+ 
+     mr = &iommu->iommu_mr;
+     while (start < end) {
+-        entry = mr->iommu_ops->translate(mr, start, 0);
++        entry = mr->iommu_ops->translate(mr, start, IOMMU_NONE);
+ 
+         if (!entry.translated_addr) {
+             pbdev->state = ZPCI_FS_ERROR;
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index c4fc94d..9047bf3 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -185,8 +185,14 @@ struct MemoryRegionOps {
+ typedef struct MemoryRegionIOMMUOps MemoryRegionIOMMUOps;
+ 
+ struct MemoryRegionIOMMUOps {
+-    /* Return a TLB entry that contains a given address. */
+-    IOMMUTLBEntry (*translate)(MemoryRegion *iommu, hwaddr addr, bool is_write);
++    /*
++     * Return a TLB entry that contains a given address. Flag should
++     * be the access permission of this translation operation. We can
++     * set flag to IOMMU_NONE to mean that we don't need any
++     * read/write permission checks, like, when for region replay.
++     */
++    IOMMUTLBEntry (*translate)(MemoryRegion *iommu, hwaddr addr,
++                               IOMMUAccessFlags flag);
+     /* Returns minimum supported page size */
+     uint64_t (*get_min_page_size)(MemoryRegion *iommu);
+     /* Called when IOMMU Notifier flag changed */
+diff --git a/memory.c b/memory.c
+index b782d5b..47dc107 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1625,6 +1625,7 @@ void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n,
+ {
+     hwaddr addr, granularity;
+     IOMMUTLBEntry iotlb;
++    IOMMUAccessFlags flag = is_write ? IOMMU_WO : IOMMU_RO;
+ 
+     /* If the IOMMU has its own replay callback, override */
+     if (mr->iommu_ops->replay) {
+@@ -1635,7 +1636,7 @@ void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n,
+     granularity = memory_region_iommu_get_min_page_size(mr);
+ 
+     for (addr = 0; addr < memory_region_size(mr); addr += granularity) {
+-        iotlb = mr->iommu_ops->translate(mr, addr, is_write);
++        iotlb = mr->iommu_ops->translate(mr, addr, flag);
+         if (iotlb.perm != IOMMU_NONE) {
+             n->notify(n, &iotlb);
+         }
 -- 
 2.7.4
