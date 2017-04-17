@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yin.zuowei@zte.com.cn>) id 1czwmx-00072l-Ci
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 22:53:17 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1czx4d-00010R-RT
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 23:11:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yin.zuowei@zte.com.cn>) id 1czwmt-0006WL-FL
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 22:53:15 -0400
-Received: from mx7.zte.com.cn ([202.103.147.169]:41410)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yin.zuowei@zte.com.cn>) id 1czwms-0006SS-KD
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 22:53:11 -0400
-Date: Mon, 17 Apr 2017 10:52:38 +0800 (CST)
-Message-ID: <201704171052388688908@zte.com.cn>
-References: 201704141630322119920@zte.com.cn
-Mime-Version: 1.0
-From: <yin.zuowei@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: [Qemu-devel] =?utf-8?q?=C2=A0=5BBUG=5D_network_qga_=3A_windows_os?=
- =?utf-8?q?_lost_ip_address_of_the_network_card_=C2=A0in_some_cases?=
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1czx4a-0008JU-HN
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 23:11:31 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1486065742-28639-1-git-send-email-peter.maydell@linaro.org>
+	<1486065742-28639-6-git-send-email-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <fd287323-58d2-77a6-50b4-99c5f29428bd@amsat.org>
+Date: Mon, 17 Apr 2017 00:11:23 -0300
+MIME-Version: 1.0
+In-Reply-To: <1486065742-28639-6-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 5/9] arm: gic: Remove references to NVIC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +27,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mdroth@linux.vnet.ibm.com
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: Liviu Ionescu <ilg@livius.net>, Michael Davidsaver <mdavidsaver@gmail.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, patches@linaro.org
 
-V2UgdGhpbmsgdGhpcyBwcm9ibGVtIGNvdWxkZSBiZSBzb2xldmQgaW4gcWdhIG1vZHVsZXPjgIJj
-YW4gYW55Ym9keSBnaXZlIHNvbWUgYWR2aWNlID8NCg0KDQpbQlVHXSBuZXR3b3JrIDogd2luZG93
-cyBvcyBsb3N0IGlwIGFkZHJlc3Mgb2YgdGhlIG5ldHdvcmsgY2FyZCAgaW4gc29tZSBjYXNlcw0K
-DQp3ZSAgZm91bmQgdGhpcyBwcm9ibGVtIGZvciBhIGxvbmcgdGltZSDjgIJGb3IgZXhhbXBsZSwg
-aWYgd2UgaGFzIHRocmVlIG5ldHdvcmsgY2FyZCBpbiB2aXJ0dWFsIHhtbCBmaWxlIO+8jHN1Y2gg
-YXMgIm5ldHdvcmsgY29ubmVjdGlvbiAxIiAvICJuZXR3b3JrIGNvbm5lY3Rpb24gMiIvIm5ldHdv
-cmsgY29ubmVjdGlvbiAzIiDjgIINCg0KRWNobyBuZXR3b3JrIGNhcmQgaGFzIG93biBpcCBhZGRy
-ZXNzIO+8jHN1Y2ggYXMgMTkyLjE2OC4xLjEgLyAyLjEgLzMuMSAsIHdoZW4gZGVsZXRlIHRoZSBm
-aXJzdCBjYXJkIO+8jHJlYm9vdCB0aGUgd2luZG93cyB2aXJ0dWFsIG9zLCB0aGVuIHRoaXMgcHJv
-YmxlbSBoYXBwZW5lZCAhDQoNCg0KDQoNCndlIGZvdW5kIHRoYXQgdGhlIHNlbmNvbmQgbmV0d29y
-ayBjYXJkIHdpbGwgIHJlcGxhY2UgdGhlIGZpcnN0IG9uZSAsIHRoZW4gdGhlIGlwIGFkZHJlc3Mg
-b2YgIm5ldHdvcmsgY29ubmVjdGlvbiAyICIgYmVjb21lIDE5Mi4xNjguMS4xIOOAgg0KDQoNCk91
-ciB0aGlyZCBwYXJ0eSB1c2VycyBiZWdhbiB0byBjb21wbGFpbiBhYm91dCB0aGlzIGJ1ZyDjgIJB
-bGwgdGhlIGJ1c2luZXNzIG9mIHRoZSBzZWNvbmQgaXAgIGxvc3QgISEhIA0KDQpJIG1lYW4gYm90
-aCBvZiB3aW5kb3dzIGFuZCBsaW51eCBoYXMgdGhpcyBidWcgLCAgd2Ugc29sdmUgdGhpcyBidWcg
-aW4gbGludXggIHRocm91Z2h0IGJvbmRpbmcgbmV0Y3JhZCBwY2kgYW5kIG1hYyBhZGRyZXNzIOOA
-gg0KDQpUaGVyZSBpcyBubyBnb29kIHNvbHV0aW9uIG9uIHdpbmRvd3Mgb3MgLiB0aGVyYSBhcmUg
-PyAgd2UgaW1wbGVtZW50ZWQgYSBwbGFuIHRvIHJlc3VtcHRpb24gb2YgSVAgYnkgUUdBLiAgSXMg
-dGhlcmUgYSBiZXR0ZXIgd2F5ID8NCg0KDQoNCg0KDQoNCg0KDQrljp/lp4vpgq7ku7YNCg0KDQoN
-CuWPkeS7tuS6uu+8muWwueS9nOS4ujEwMTQ0NTc0DQrmlLbku7bkurrvvJog77yccWVtdS1kZXZl
-bEBub25nbnUub3Jn77yeDQrml6Ug5pyfIO+8mjIwMTflubQwNOaciDE05pelIDE2OjQ2DQrkuLsg
-6aKYIO+8mltCVUddIG5ldHdvcmsgOiB3aW5kb3dzIG9zIGxvc3QgaXAgYWRkcmVzcyBvZiB0aGUg
-bmV0d29yayBjYXJkICBpbiBzb21lIGNhc2VzDQoNCg0KDQoNCg0KDQp3ZSAgZm91bmQgdGhpcyBw
-cm9ibGVtIGZvciBhIGxvbmcgdGltZSDjgIJGb3IgZXhhbXBsZSwgaWYgd2UgaGFzIHRocmVlIG5l
-dHdvcmsgY2FyZCBpbiB2aXJ0dWFsIHhtbCBmaWxlIO+8jHN1Y2ggYXMgIm5ldHdvcmsgY29ubmVj
-dGlvbiAxIiAvICJuZXR3b3JrIGNvbm5lY3Rpb24gMiIvIm5ldHdvcmsgY29ubmVjdGlvbiAzIiDj
-gIINCg0KRWNobyBuZXR3b3JrIGNhcmQgaGFzIG93biBpcCBhZGRyZXNzIO+8jHN1Y2ggYXMgMTky
-LjE2OC4xLjEgLyAyLjEgLzMuMSAsIHdoZW4gZGVsZXRlIHRoZSBmaXJzdCBjYXJkIO+8jHJlYm9v
-dCB0aGUgd2luZG93cyB2aXJ0dWFsIG9zLCB0aGVuIHRoaXMgcHJvYmxlbSBoYXBwZW5lZCAhDQoN
-Cg0KDQoNCndlIGZvdW5kIHRoYXQgdGhlIHNlbmNvbmQgbmV0d29yayBjYXJkIHdpbGwgIHJlcGxh
-Y2UgdGhlIGZpcnN0IG9uZSAsIHRoZW4gdGhlIGlwIGFkZHJlc3Mgb2YgIm5ldHdvcmsgY29ubmVj
-dGlvbiAyICIgYmVjb21lIDE5Mi4xNjguMS4xIOOAgg0KDQoNCk91ciB0aGlyZCBwYXJ0eSB1c2Vy
-cyBiZWdhbiB0byBjb21wbGFpbiBhYm91dCB0aGlzIGJ1ZyDjgIJBbGwgdGhlIGJ1c2luZXNzIG9m
-IHRoZSBzZWNvbmQgaXAgIGxvc3QgISEhIA0KDQpJIG1lYW4gYm90aCBvZiB3aW5kb3dzIGFuZCBs
-aW51eCBoYXMgdGhpcyBidWcgLCAgd2Ugc29sdmUgdGhpcyBidWcgaW4gbGludXggIHRocm91Z2h0
-IGJvbmRpbmcgbmV0Y3JhZCBwY2kgYW5kIG1hYyBhZGRyZXNzIOOAgg0KDQpUaGVyZSBpcyBubyBn
-b29kIHNvbHV0aW9uIG9uIHdpbmRvd3Mgb3MgLiB0aGVyYSBhcmUgPyAgd2UgaW1wbGVtZW50ZWQg
-YSBwbGFuIHRvIHJlc3VtcHRpb24gb2YgSVAgYnkgUUdBLiAgSXMgdGhlcmUgYSBiZXR0ZXIgd2F5
-ID8=
+On 02/02/2017 05:02 PM, Peter Maydell wrote:
+> From: Michael Davidsaver <mdavidsaver@gmail.com>
+>
+> Now that the NVIC is its own separate implementation, we can
+> clean up the GIC code by removing REV_NVIC and conditionals
+> which use it.
+>
+> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+>  hw/intc/gic_internal.h   |  7 ++-----
+>  hw/intc/arm_gic.c        | 31 +++++--------------------------
+>  hw/intc/arm_gic_common.c | 23 ++++++++---------------
+>  3 files changed, 15 insertions(+), 46 deletions(-)
+>
+> diff --git a/hw/intc/gic_internal.h b/hw/intc/gic_internal.h
+> index 3f31174..7fe87b1 100644
+> --- a/hw/intc/gic_internal.h
+> +++ b/hw/intc/gic_internal.h
+> @@ -25,9 +25,7 @@
+>
+>  #define ALL_CPU_MASK ((unsigned)(((1 << GIC_NCPU) - 1)))
+>
+> -/* The NVIC has 16 internal vectors.  However these are not exposed
+> -   through the normal GIC interface.  */
+> -#define GIC_BASE_IRQ ((s->revision == REV_NVIC) ? 32 : 0)
+> +#define GIC_BASE_IRQ 0
+>
+>  #define GIC_SET_ENABLED(irq, cm) s->irq_state[irq].enabled |= (cm)
+>  #define GIC_CLEAR_ENABLED(irq, cm) s->irq_state[irq].enabled &= ~(cm)
+> @@ -75,7 +73,6 @@
+>
+>  /* The special cases for the revision property: */
+>  #define REV_11MPCORE 0
+> -#define REV_NVIC 0xffffffff
+>
+>  void gic_set_pending_private(GICState *s, int cpu, int irq);
+>  uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs);
+> @@ -87,7 +84,7 @@ void gic_set_priority(GICState *s, int cpu, int irq, uint8_t val,
+>
+>  static inline bool gic_test_pending(GICState *s, int irq, int cm)
+>  {
+> -    if (s->revision == REV_NVIC || s->revision == REV_11MPCORE) {
+> +    if (s->revision == REV_11MPCORE) {
+>          return s->irq_state[irq].pending & cm;
+>      } else {
+>          /* Edge-triggered interrupts are marked pending on a rising edge, but
+> diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
+> index 521aac3..8e5a9d8 100644
+> --- a/hw/intc/arm_gic.c
+> +++ b/hw/intc/arm_gic.c
+> @@ -156,17 +156,6 @@ static void gic_set_irq_11mpcore(GICState *s, int irq, int level,
+>      }
+>  }
+>
+> -static void gic_set_irq_nvic(GICState *s, int irq, int level,
+> -                                 int cm, int target)
+> -{
+> -    if (level) {
+> -        GIC_SET_LEVEL(irq, cm);
+> -        GIC_SET_PENDING(irq, target);
+> -    } else {
+> -        GIC_CLEAR_LEVEL(irq, cm);
+> -    }
+> -}
+> -
+>  static void gic_set_irq_generic(GICState *s, int irq, int level,
+>                                  int cm, int target)
+>  {
+> @@ -214,8 +203,6 @@ static void gic_set_irq(void *opaque, int irq, int level)
+>
+>      if (s->revision == REV_11MPCORE) {
+>          gic_set_irq_11mpcore(s, irq, level, cm, target);
+> -    } else if (s->revision == REV_NVIC) {
+> -        gic_set_irq_nvic(s, irq, level, cm, target);
+>      } else {
+>          gic_set_irq_generic(s, irq, level, cm, target);
+>      }
+> @@ -367,7 +354,7 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
+>          return 1023;
+>      }
+>
+> -    if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
+> +    if (s->revision == REV_11MPCORE) {
+>          /* Clear pending flags for both level and edge triggered interrupts.
+>           * Level triggered IRQs will be reasserted once they become inactive.
+>           */
+> @@ -589,11 +576,6 @@ void gic_complete_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
+>              DPRINTF("Set %d pending mask %x\n", irq, cm);
+>              GIC_SET_PENDING(irq, cm);
+>          }
+> -    } else if (s->revision == REV_NVIC) {
+> -        if (GIC_TEST_LEVEL(irq, cm)) {
+> -            DPRINTF("Set nvic %d pending mask %x\n", irq, cm);
+> -            GIC_SET_PENDING(irq, cm);
+> -        }
+>      }
+>
+>      group = gic_has_groups(s) && GIC_TEST_GROUP(irq, cm);
+> @@ -768,7 +750,7 @@ static uint32_t gic_dist_readb(void *opaque, hwaddr offset, MemTxAttrs attrs)
+>      } else if (offset < 0xf10) {
+>          goto bad_reg;
+>      } else if (offset < 0xf30) {
+> -        if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
+> +        if (s->revision == REV_11MPCORE) {
+>              goto bad_reg;
+>          }
+>
+> @@ -802,9 +784,6 @@ static uint32_t gic_dist_readb(void *opaque, hwaddr offset, MemTxAttrs attrs)
+>              case 2:
+>                  res = gic_id_gicv2[(offset - 0xfd0) >> 2];
+>                  break;
+> -            case REV_NVIC:
+> -                /* Shouldn't be able to get here */
+> -                abort();
+>              default:
+>                  res = 0;
+>              }
+> @@ -1028,7 +1007,7 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
+>                  continue; /* Ignore Non-secure access of Group0 IRQ */
+>              }
+>
+> -            if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
+> +            if (s->revision == REV_11MPCORE) {
+>                  if (value & (1 << (i * 2))) {
+>                      GIC_SET_MODEL(irq + i);
+>                  } else {
+> @@ -1046,7 +1025,7 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
+>          goto bad_reg;
+>      } else if (offset < 0xf20) {
+>          /* GICD_CPENDSGIRn */
+> -        if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
+> +        if (s->revision == REV_11MPCORE) {
+>              goto bad_reg;
+>          }
+>          irq = (offset - 0xf10);
+> @@ -1060,7 +1039,7 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
+>          }
+>      } else if (offset < 0xf30) {
+>          /* GICD_SPENDSGIRn */
+> -        if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
+> +        if (s->revision == REV_11MPCORE) {
+>              goto bad_reg;
+>          }
+>          irq = (offset - 0xf20);
+> diff --git a/hw/intc/arm_gic_common.c b/hw/intc/arm_gic_common.c
+> index 4a8df44..70f1134 100644
+> --- a/hw/intc/arm_gic_common.c
+> +++ b/hw/intc/arm_gic_common.c
+> @@ -99,9 +99,7 @@ void gic_init_irqs_and_mmio(GICState *s, qemu_irq_handler handler,
+>       *  [N+32..N+63] PPIs for CPU 1
+>       *   ...
+>       */
+> -    if (s->revision != REV_NVIC) {
+> -        i += (GIC_INTERNAL * s->num_cpu);
+> -    }
+> +    i += (GIC_INTERNAL * s->num_cpu);
+>      qdev_init_gpio_in(DEVICE(s), handler, i);
+>
+>      for (i = 0; i < s->num_cpu; i++) {
+> @@ -121,16 +119,12 @@ void gic_init_irqs_and_mmio(GICState *s, qemu_irq_handler handler,
+>      memory_region_init_io(&s->iomem, OBJECT(s), ops, s, "gic_dist", 0x1000);
+>      sysbus_init_mmio(sbd, &s->iomem);
+>
+> -    if (s->revision != REV_NVIC) {
+> -        /* This is the main CPU interface "for this core". It is always
+> -         * present because it is required by both software emulation and KVM.
+> -         * NVIC is not handled here because its CPU interface is different,
+> -         * neither it can use KVM.
+> -         */
+> -        memory_region_init_io(&s->cpuiomem[0], OBJECT(s), ops ? &ops[1] : NULL,
+> -                              s, "gic_cpu", s->revision == 2 ? 0x2000 : 0x100);
+> -        sysbus_init_mmio(sbd, &s->cpuiomem[0]);
+> -    }
+> +    /* This is the main CPU interface "for this core". It is always
+> +     * present because it is required by both software emulation and KVM.
+> +     */
+> +    memory_region_init_io(&s->cpuiomem[0], OBJECT(s), ops ? &ops[1] : NULL,
+> +                          s, "gic_cpu", s->revision == 2 ? 0x2000 : 0x100);
+> +    sysbus_init_mmio(sbd, &s->cpuiomem[0]);
+>  }
+>
+>  static void arm_gic_common_realize(DeviceState *dev, Error **errp)
+> @@ -162,7 +156,7 @@ static void arm_gic_common_realize(DeviceState *dev, Error **errp)
+>      }
+>
+>      if (s->security_extn &&
+> -        (s->revision == REV_11MPCORE || s->revision == REV_NVIC)) {
+> +        (s->revision == REV_11MPCORE)) {
+>          error_setg(errp, "this GIC revision does not implement "
+>                     "the security extensions");
+>          return;
+> @@ -255,7 +249,6 @@ static Property arm_gic_common_properties[] = {
+>      DEFINE_PROP_UINT32("num-irq", GICState, num_irq, 32),
+>      /* Revision can be 1 or 2 for GIC architecture specification
+>       * versions 1 or 2, or 0 to indicate the legacy 11MPCore GIC.
+> -     * (Internally, 0xffffffff also indicates "not a GIC but an NVIC".)
+>       */
+>      DEFINE_PROP_UINT32("revision", GICState, revision, 1),
+>      /* True if the GIC should implement the security extensions */
+>
