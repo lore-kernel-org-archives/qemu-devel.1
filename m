@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d0CAa-00053O-IN
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 15:18:42 -0400
+	(envelope-from <amit@kernel.org>) id 1d0CPM-000836-2P
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 15:33:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d0CAY-0006er-Pj
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 15:18:40 -0400
-References: <20170411222945.11741-1-eblake@redhat.com>
-	<20170411222945.11741-3-eblake@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <50d265a3-dec8-59f9-6840-c5720e406fa6@redhat.com>
-Date: Mon, 17 Apr 2017 15:18:30 -0400
+	(envelope-from <amit@kernel.org>) id 1d0CPK-0005Zz-QL
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 15:33:56 -0400
+Received: from relay4-d.mail.gandi.net ([2001:4b98:c:538::196]:36439)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amit@kernel.org>) id 1d0CPK-0005YI-KU
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 15:33:54 -0400
+Date: Mon, 17 Apr 2017 21:33:51 +0200
+From: Amit Shah <amit@kernel.org>
+Message-ID: <20170417193351.GE32063@grmbl.mre>
+References: <20170412135312.1686-1-lvivier@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170411222945.11741-3-eblake@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 02/17] trace: Show blockjob
- actions via bytes, not sectors
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170412135312.1686-1-lvivier@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] migration: fix virtio-rng
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,268 +26,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 
+On (Wed) 12 Apr 2017 [15:53:10], Laurent Vivier wrote:
+> When post-copy migration is enabled, the destination
+> guest can ask for memory from the source when the
+> vmstate is restored.
+> 
+> In the case of virtio, a part of the virtqueue
+> is migrated by the vmstate structure (last_avail_idx)
+> another part is migrated inside the RAM (used_idx).
+> On the source side, the virtqueue can be modified
+> whereas the vmstate is already migrated, and the destination
+> side can ask for the value in RAM. In this case we have
+> an inconsistency that can generate this kind of error:
+>     "VQ 0 size 0x8 < last_avail_idx 0xa - used_idx 0"
+> in hw/virtio/virtio.c:2180, virtio_load().
+> 
+> This happens with virtio-rng as the chr_read()
+> function which modifies the virqueue is called
+> by the rng backend and the rng backend continues to
+> run while the migration is running and the CPU is stopped.
+> 
+> This series fixes this problem by ignoring chr_read()
+> calls while the CPU is stopped. The first patch of the
+> series fixes another problem triggered by this error
+> case: a use-after-free case.
+> 
+> The probability to have this problem is very low, as
+> generally the post-copy phase is very short, so the window
+> to modify the virtqueue while the vmstate has been sent
+> is very small... except if you are doing trans-continental
+> guest migration with high latency and post-copy phase that
+> can be run for minutes.
+> 
+> I've been able to reproduce the problem locally on a host,
+> by adding network latency with "tc". Another condition is
+> to have an rng daemon running in the guest to generate
+> events in the virtio-rng device.
 
+Acked-by: Amit Shah <amit@kernel.org>
 
-On 04/11/2017 06:29 PM, Eric Blake wrote:
-> Upcoming patches are going to switch to byte-based interfaces
-> instead of sector-based.  Even worse, trace_backup_do_cow_enter()
-> had a weird mix of cluster and sector indices.  Make the tracing
-> uniformly use bytes.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  block/backup.c     | 16 ++++++++++------
->  block/commit.c     |  3 ++-
->  block/mirror.c     | 26 +++++++++++++++++---------
->  block/stream.c     |  3 ++-
->  block/trace-events | 14 +++++++-------
->  5 files changed, 38 insertions(+), 24 deletions(-)
-> 
-> diff --git a/block/backup.c b/block/backup.c
-> index bcfa321..b28df8c 100644
-> --- a/block/backup.c
-> +++ b/block/backup.c
-> @@ -102,6 +102,7 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
->      void *bounce_buffer = NULL;
->      int ret = 0;
->      int64_t sectors_per_cluster = cluster_size_sectors(job);
-> +    int64_t bytes_per_cluster = sectors_per_cluster * BDRV_SECTOR_SIZE;
->      int64_t start, end;
->      int n;
-> 
-> @@ -110,18 +111,20 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
->      start = sector_num / sectors_per_cluster;
->      end = DIV_ROUND_UP(sector_num + nb_sectors, sectors_per_cluster);
-> 
-> -    trace_backup_do_cow_enter(job, start, sector_num, nb_sectors);
-> +    trace_backup_do_cow_enter(job, start * bytes_per_cluster,
-> +                              sector_num * BDRV_SECTOR_SIZE,
-> +                              nb_sectors * BDRV_SECTOR_SIZE);
-> 
->      wait_for_overlapping_requests(job, start, end);
->      cow_request_begin(&cow_request, job, start, end);
-> 
->      for (; start < end; start++) {
->          if (test_bit(start, job->done_bitmap)) {
-> -            trace_backup_do_cow_skip(job, start);
-> +            trace_backup_do_cow_skip(job, start * bytes_per_cluster);
->              continue; /* already copied */
->          }
-> 
-> -        trace_backup_do_cow_process(job, start);
-> +        trace_backup_do_cow_process(job, start * bytes_per_cluster);
-> 
->          n = MIN(sectors_per_cluster,
->                  job->common.len / BDRV_SECTOR_SIZE -
-> @@ -138,7 +141,7 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
->                              bounce_qiov.size, &bounce_qiov,
->                              is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
->          if (ret < 0) {
-> -            trace_backup_do_cow_read_fail(job, start, ret);
-> +            trace_backup_do_cow_read_fail(job, start * bytes_per_cluster, ret);
->              if (error_is_read) {
->                  *error_is_read = true;
->              }
-> @@ -154,7 +157,7 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
->                                   job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
->          }
->          if (ret < 0) {
-> -            trace_backup_do_cow_write_fail(job, start, ret);
-> +            trace_backup_do_cow_write_fail(job, start * bytes_per_cluster, ret);
->              if (error_is_read) {
->                  *error_is_read = false;
->              }
-> @@ -177,7 +180,8 @@ out:
-> 
->      cow_request_end(&cow_request);
-> 
-> -    trace_backup_do_cow_return(job, sector_num, nb_sectors, ret);
-> +    trace_backup_do_cow_return(job, sector_num * BDRV_SECTOR_SIZE,
-> +                               nb_sectors * BDRV_SECTOR_SIZE, ret);
-> 
->      qemu_co_rwlock_unlock(&job->flush_rwlock);
-> 
-> diff --git a/block/commit.c b/block/commit.c
-> index 8b684e0..11dab98 100644
-> --- a/block/commit.c
-> +++ b/block/commit.c
-> @@ -176,7 +176,8 @@ static void coroutine_fn commit_run(void *opaque)
->                                        COMMIT_BUFFER_SIZE / BDRV_SECTOR_SIZE,
->                                        &n);
->          copy = (ret == 1);
-> -        trace_commit_one_iteration(s, sector_num, n, ret);
-> +        trace_commit_one_iteration(s, sector_num * BDRV_SECTOR_SIZE,
-> +                                   n * BDRV_SECTOR_SIZE, ret);
->          if (copy) {
->              ret = commit_populate(s->top, s->base, sector_num, n, buf);
->              bytes_written += n * BDRV_SECTOR_SIZE;
-> diff --git a/block/mirror.c b/block/mirror.c
-> index a7d0960..d83d482 100644
-> --- a/block/mirror.c
-> +++ b/block/mirror.c
-> @@ -103,7 +103,8 @@ static void mirror_iteration_done(MirrorOp *op, int ret)
->      int64_t chunk_num;
->      int i, nb_chunks, sectors_per_chunk;
-> 
-> -    trace_mirror_iteration_done(s, op->sector_num, op->nb_sectors, ret);
-> +    trace_mirror_iteration_done(s, op->sector_num * BDRV_SECTOR_SIZE,
-> +                                op->nb_sectors * BDRV_SECTOR_SIZE, ret);
-> 
->      s->in_flight--;
->      s->sectors_in_flight -= op->nb_sectors;
-> @@ -268,7 +269,8 @@ static int mirror_do_read(MirrorBlockJob *s, int64_t sector_num,
->      nb_chunks = DIV_ROUND_UP(nb_sectors, sectors_per_chunk);
-> 
->      while (s->buf_free_count < nb_chunks) {
-> -        trace_mirror_yield_in_flight(s, sector_num, s->in_flight);
-> +        trace_mirror_yield_in_flight(s, sector_num * BDRV_SECTOR_SIZE,
-> +                                     s->in_flight);
->          mirror_wait_for_io(s);
->      }
-> 
-> @@ -294,7 +296,8 @@ static int mirror_do_read(MirrorBlockJob *s, int64_t sector_num,
->      /* Copy the dirty cluster.  */
->      s->in_flight++;
->      s->sectors_in_flight += nb_sectors;
-> -    trace_mirror_one_iteration(s, sector_num, nb_sectors);
-> +    trace_mirror_one_iteration(s, sector_num * BDRV_SECTOR_SIZE,
-> +                               nb_sectors * BDRV_SECTOR_SIZE);
-> 
->      blk_aio_preadv(source, sector_num * BDRV_SECTOR_SIZE, &op->qiov, 0,
->                     mirror_read_complete, op);
-> @@ -346,13 +349,15 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
->      if (sector_num < 0) {
->          bdrv_set_dirty_iter(s->dbi, 0);
->          sector_num = bdrv_dirty_iter_next(s->dbi);
-> -        trace_mirror_restart_iter(s, bdrv_get_dirty_count(s->dirty_bitmap));
-> +        trace_mirror_restart_iter(s, bdrv_get_dirty_count(s->dirty_bitmap) *
-> +                                  BDRV_SECTOR_SIZE);
-
-mirror_restart_iter(void *s, int64_t cnt) "s %p dirty count %"PRId64
-
-I guess the print doesn't really bother to say what the unit is, just a
-"dirty count."
-
-Does this conflict with the bitmap series, though? (Won't need to scale
-by BDRV_SECTOR_SIZE after that, I think.)
-
->          assert(sector_num >= 0);
->      }
-> 
->      first_chunk = sector_num / sectors_per_chunk;
->      while (test_bit(first_chunk, s->in_flight_bitmap)) {
-> -        trace_mirror_yield_in_flight(s, sector_num, s->in_flight);
-> +        trace_mirror_yield_in_flight(s, sector_num * BDRV_SECTOR_SIZE,
-> +                                     s->in_flight);
->          mirror_wait_for_io(s);
->      }
-> 
-> @@ -428,7 +433,8 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
->          }
-> 
->          while (s->in_flight >= MAX_IN_FLIGHT) {
-> -            trace_mirror_yield_in_flight(s, sector_num, s->in_flight);
-> +            trace_mirror_yield_in_flight(s, sector_num * BDRV_SECTOR_SIZE,
-> +                                         s->in_flight);
->              mirror_wait_for_io(s);
->          }
-> 
-> @@ -811,7 +817,8 @@ static void coroutine_fn mirror_run(void *opaque)
->              s->common.iostatus == BLOCK_DEVICE_IO_STATUS_OK) {
->              if (s->in_flight >= MAX_IN_FLIGHT || s->buf_free_count == 0 ||
->                  (cnt == 0 && s->in_flight > 0)) {
-> -                trace_mirror_yield(s, cnt, s->buf_free_count, s->in_flight);
-> +                trace_mirror_yield(s, cnt * BDRV_SECTOR_SIZE,
-> +                                   s->buf_free_count, s->in_flight);
-
-I guess this is another case where the unit wasn't really specified, so
-we can just change it.
-
->                  mirror_wait_for_io(s);
->                  continue;
->              } else if (cnt != 0) {
-> @@ -852,7 +859,7 @@ static void coroutine_fn mirror_run(void *opaque)
->               * whether to switch to target check one last time if I/O has
->               * come in the meanwhile, and if not flush the data to disk.
->               */
-> -            trace_mirror_before_drain(s, cnt);
-> +            trace_mirror_before_drain(s, cnt * BDRV_SECTOR_SIZE);
-> 
->              bdrv_drained_begin(bs);
->              cnt = bdrv_get_dirty_count(s->dirty_bitmap);
-> @@ -871,7 +878,8 @@ static void coroutine_fn mirror_run(void *opaque)
->          }
-> 
->          ret = 0;
-> -        trace_mirror_before_sleep(s, cnt, s->synced, delay_ns);
-> +        trace_mirror_before_sleep(s, cnt * BDRV_SECTOR_SIZE,
-> +                                  s->synced, delay_ns);
->          if (!s->synced) {
->              block_job_sleep_ns(&s->common, QEMU_CLOCK_REALTIME, delay_ns);
->              if (block_job_is_cancelled(&s->common)) {
-> diff --git a/block/stream.c b/block/stream.c
-> index 11c5cf1..3134ec5 100644
-> --- a/block/stream.c
-> +++ b/block/stream.c
-> @@ -168,7 +168,8 @@ static void coroutine_fn stream_run(void *opaque)
-> 
->              copy = (ret == 1);
->          }
-> -        trace_stream_one_iteration(s, sector_num, n, ret);
-> +        trace_stream_one_iteration(s, sector_num * BDRV_SECTOR_SIZE,
-> +                                   n * BDRV_SECTOR_SIZE, ret);
->          if (copy) {
->              ret = stream_populate(blk, sector_num, n, buf);
->          }
-> diff --git a/block/trace-events b/block/trace-events
-> index 0bc5c0a..04f6463 100644
-> --- a/block/trace-events
-> +++ b/block/trace-events
-> @@ -18,11 +18,11 @@ bdrv_co_pwrite_zeroes(void *bs, int64_t offset, int count, int flags) "bs %p off
->  bdrv_co_do_copy_on_readv(void *bs, int64_t offset, unsigned int bytes, int64_t cluster_offset, unsigned int cluster_bytes) "bs %p offset %"PRId64" bytes %u cluster_offset %"PRId64" cluster_bytes %u"
-> 
->  # block/stream.c
-> -stream_one_iteration(void *s, int64_t sector_num, int nb_sectors, int is_allocated) "s %p sector_num %"PRId64" nb_sectors %d is_allocated %d"
-> +stream_one_iteration(void *s, int64_t offset, uint64_t bytes, int is_allocated) "s %p offset %" PRId64 " bytes %" PRIu64 " is_allocated %d"
->  stream_start(void *bs, void *base, void *s) "bs %p base %p s %p"
-> 
->  # block/commit.c
-> -commit_one_iteration(void *s, int64_t sector_num, int nb_sectors, int is_allocated) "s %p sector_num %"PRId64" nb_sectors %d is_allocated %d"
-> +commit_one_iteration(void *s, int64_t offset, uint64_t bytes, int is_allocated) "s %p offset %" PRId64 " bytes %" PRIu64 " is_allocated %d"
->  commit_start(void *bs, void *base, void *top, void *s) "bs %p base %p top %p s %p"
-> 
->  # block/mirror.c
-> @@ -31,14 +31,14 @@ mirror_restart_iter(void *s, int64_t cnt) "s %p dirty count %"PRId64
->  mirror_before_flush(void *s) "s %p"
->  mirror_before_drain(void *s, int64_t cnt) "s %p dirty count %"PRId64
->  mirror_before_sleep(void *s, int64_t cnt, int synced, uint64_t delay_ns) "s %p dirty count %"PRId64" synced %d delay %"PRIu64"ns"
-> -mirror_one_iteration(void *s, int64_t sector_num, int nb_sectors) "s %p sector_num %"PRId64" nb_sectors %d"
-> -mirror_iteration_done(void *s, int64_t sector_num, int nb_sectors, int ret) "s %p sector_num %"PRId64" nb_sectors %d ret %d"
-> +mirror_one_iteration(void *s, int64_t offset, uint64_t bytes) "s %p offset %" PRId64 " bytes %" PRIu64
-> +mirror_iteration_done(void *s, int64_t offset, uint64_t bytes, int ret) "s %p offset %" PRId64 " bytes %" PRIu64 " ret %d"
->  mirror_yield(void *s, int64_t cnt, int buf_free_count, int in_flight) "s %p dirty count %"PRId64" free buffers %d in_flight %d"
-> -mirror_yield_in_flight(void *s, int64_t sector_num, int in_flight) "s %p sector_num %"PRId64" in_flight %d"
-> +mirror_yield_in_flight(void *s, int64_t offset, int in_flight) "s %p offset %" PRId64 " in_flight %d"
-> 
->  # block/backup.c
-> -backup_do_cow_enter(void *job, int64_t start, int64_t sector_num, int nb_sectors) "job %p start %"PRId64" sector_num %"PRId64" nb_sectors %d"
-> -backup_do_cow_return(void *job, int64_t sector_num, int nb_sectors, int ret) "job %p sector_num %"PRId64" nb_sectors %d ret %d"
-> +backup_do_cow_enter(void *job, int64_t start, int64_t offset, uint64_t bytes) "job %p start %" PRId64 " offset %" PRId64 " bytes %" PRIu64
-> +backup_do_cow_return(void *job, int64_t offset, uint64_t bytes, int ret) "job %p offset %" PRId64 " bytes %" PRIu64 " ret %d"
-
->  backup_do_cow_skip(void *job, int64_t start) "job %p start %"PRId64
->  backup_do_cow_process(void *job, int64_t start) "job %p start %"PRId64
->  backup_do_cow_read_fail(void *job, int64_t start, int ret) "job %p start %"PRId64" ret %d"
-
-I guess these three were "cluster" based, but you didn't need to change
-anything to assert them as byte-based.
-
-> 
-
-Under the assumption that it's okay to change tracing output without
-being able to differentiate between new and old output:
-
-Reviewed-by: John Snow <jsnow@redhat.com>
+		Amit
+-- 
+http://log.amitshah.net/
