@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d0Egi-0000h1-LY
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 18:00:02 -0400
+	(envelope-from <jsnow@redhat.com>) id 1d0G13-0005rd-48
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 19:25:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d0Egh-0005tH-Pk
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 18:00:00 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 17 Apr 2017 18:59:16 -0300
-Message-Id: <20170417215916.12431-8-ehabkost@redhat.com>
-In-Reply-To: <20170417215916.12431-1-ehabkost@redhat.com>
-References: <20170417215916.12431-1-ehabkost@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1d0G11-0003HD-Ue
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 19:25:05 -0400
+References: <20170411222945.11741-1-eblake@redhat.com>
+	<20170411222945.11741-14-eblake@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <4b9db542-0b8f-7c81-9c01-75b252888bd3@redhat.com>
+Date: Mon, 17 Apr 2017 19:24:53 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC 7/7] pci: Set phb->bus inside
- pci_bus_new_inplace()
+In-Reply-To: <20170411222945.11741-14-eblake@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 13/17] backup: Switch
+ block_backup.h to byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,66 +24,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: aik@ozlabs.ru, David Gibson <dgibson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Changlong Xie <xiecl.fnst@cn.fujitsu.com>, qemu-block@nongnu.org, Wen Congyang <wency@cn.fujitsu.com>, Max Reitz <mreitz@redhat.com>
 
-Every single caller of pci_bus_new_inplace() sets phb->bus to point to
-'bus'. Do that inside pci_bus_new_inplace() to avoid code duplication
-and make it harder to break.
 
-Cc: "Herv=C3=A9 Poussineau" <hpoussin@reactos.org>
-Cc: Marcel Apfelbaum <marcel@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org
-Cc: qemu-ppc@nongnu.org
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- hw/pci-host/prep.c      | 2 --
- hw/pci-host/versatile.c | 1 -
- hw/pci/pci.c            | 1 +
- 3 files changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
-index 2e2cd267f4..6efa5bc5ef 100644
---- a/hw/pci-host/prep.c
-+++ b/hw/pci-host/prep.c
-@@ -284,8 +284,6 @@ static void raven_pcihost_initfn(Object *obj)
-     address_space_init(&s->bm_as, &s->bm, "raven-bm");
-     pci_setup_iommu(&s->pci_bus, raven_pcihost_set_iommu, s);
-=20
--    h->bus =3D &s->pci_bus;
--
-     object_initialize(&s->pci_dev, sizeof(s->pci_dev), TYPE_RAVEN_PCI_DE=
-VICE);
-     pci_dev =3D DEVICE(&s->pci_dev);
-     qdev_set_parent_bus(pci_dev, BUS(&s->pci_bus));
-diff --git a/hw/pci-host/versatile.c b/hw/pci-host/versatile.c
-index 24ef87610b..630f1ac1c5 100644
---- a/hw/pci-host/versatile.c
-+++ b/hw/pci-host/versatile.c
-@@ -389,7 +389,6 @@ static void pci_vpb_init(Object *obj)
-     pci_bus_new_inplace(&s->pci_bus, sizeof(s->pci_bus), h, "pci",
-                         &s->pci_mem_space, &s->pci_io_space,
-                         PCI_DEVFN(11, 0), TYPE_PCI_BUS);
--    h->bus =3D &s->pci_bus;
-=20
-     object_initialize(&s->pci_dev, sizeof(s->pci_dev), TYPE_VERSATILE_PC=
-I_HOST);
-     qdev_set_parent_bus(DEVICE(&s->pci_dev), BUS(&s->pci_bus));
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 486aeb7514..ef226f8b41 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -397,6 +397,7 @@ void pci_bus_new_inplace(PCIBus *bus, size_t bus_size=
-,
- {
-     qbus_create_inplace(bus, bus_size, typename, DEVICE(phb), name);
-     pci_bus_init(bus, phb, address_space_mem, address_space_io, devfn_mi=
-n);
-+    phb->bus =3D bus;
- }
-=20
- PCIBus *pci_bus_new(PCIHostState *phb, const char *name,
---=20
-2.11.0.259.g40922b1
+On 04/11/2017 06:29 PM, Eric Blake wrote:
+> We are gradually converting to byte-based interfaces, as they are
+> easier to reason about than sector-based.  Continue by converting
+> the public interface to backup jobs (no semantic change), including
+> a change to CowRequest to track by bytes instead of cluster indices.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  include/block/block_backup.h | 11 +++++------
+>  block/backup.c               | 29 ++++++++++++++---------------
+>  block/replication.c          | 12 ++++++++----
+>  3 files changed, 27 insertions(+), 25 deletions(-)
+> 
+> diff --git a/include/block/block_backup.h b/include/block/block_backup.h
+> index 8a75947..994a3bd 100644
+> --- a/include/block/block_backup.h
+> +++ b/include/block/block_backup.h
+> @@ -21,17 +21,16 @@
+>  #include "block/block_int.h"
+> 
+>  typedef struct CowRequest {
+> -    int64_t start;
+> -    int64_t end;
+> +    int64_t start_byte;
+> +    int64_t end_byte;
+>      QLIST_ENTRY(CowRequest) list;
+>      CoQueue wait_queue; /* coroutines blocked on this request */
+>  } CowRequest;
+> 
+> -void backup_wait_for_overlapping_requests(BlockJob *job, int64_t sector_num,
+> -                                          int nb_sectors);
+> +void backup_wait_for_overlapping_requests(BlockJob *job, int64_t offset,
+> +                                          uint64_t bytes);
+>  void backup_cow_request_begin(CowRequest *req, BlockJob *job,
+> -                              int64_t sector_num,
+> -                              int nb_sectors);
+> +                              int64_t offset, uint64_t bytes);
+>  void backup_cow_request_end(CowRequest *req);
+
+Should we adjust the parameter names of cow_request_begin and
+wait_for_overlapping_requests, too?
+
+> 
+>  void backup_do_checkpoint(BlockJob *job, Error **errp);
+> diff --git a/block/backup.c b/block/backup.c
+> index a64a162..0502c1a 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -64,7 +64,7 @@ static void coroutine_fn wait_for_overlapping_requests(BackupBlockJob *job,
+>      do {
+>          retry = false;
+>          QLIST_FOREACH(req, &job->inflight_reqs, list) {
+> -            if (end > req->start && start < req->end) {
+> +            if (end > req->start_byte && start < req->end_byte) {
+>                  qemu_co_queue_wait(&req->wait_queue, NULL);
+>                  retry = true;
+>                  break;
+> @@ -77,8 +77,8 @@ static void coroutine_fn wait_for_overlapping_requests(BackupBlockJob *job,
+>  static void cow_request_begin(CowRequest *req, BackupBlockJob *job,
+>                                       int64_t start, int64_t end)
+>  {
+> -    req->start = start;
+> -    req->end = end;
+> +    req->start_byte = start;
+> +    req->end_byte = end;
+>      qemu_co_queue_init(&req->wait_queue);
+>      QLIST_INSERT_HEAD(&job->inflight_reqs, req, list);
+>  }
+> @@ -114,8 +114,10 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+>                                sector_num * BDRV_SECTOR_SIZE,
+>                                nb_sectors * BDRV_SECTOR_SIZE);
+> 
+> -    wait_for_overlapping_requests(job, start, end);
+> -    cow_request_begin(&cow_request, job, start, end);
+> +    wait_for_overlapping_requests(job, start * job->cluster_size,
+> +                                  end * job->cluster_size);
+> +    cow_request_begin(&cow_request, job, start * job->cluster_size,
+> +                      end * job->cluster_size);
+> 
+>      for (; start < end; start++) {
+>          if (test_bit(start, job->done_bitmap)) {
+> @@ -277,32 +279,29 @@ void backup_do_checkpoint(BlockJob *job, Error **errp)
+>      bitmap_zero(backup_job->done_bitmap, len);
+>  }
+> 
+> -void backup_wait_for_overlapping_requests(BlockJob *job, int64_t sector_num,
+> -                                          int nb_sectors)
+> +void backup_wait_for_overlapping_requests(BlockJob *job, int64_t offset,
+> +                                          uint64_t bytes)
+>  {
+>      BackupBlockJob *backup_job = container_of(job, BackupBlockJob, common);
+> -    int64_t sectors_per_cluster = cluster_size_sectors(backup_job);
+>      int64_t start, end;
+> 
+>      assert(job->driver->job_type == BLOCK_JOB_TYPE_BACKUP);
+> 
+> -    start = sector_num / sectors_per_cluster;
+> -    end = DIV_ROUND_UP(sector_num + nb_sectors, sectors_per_cluster);
+> +    start = QEMU_ALIGN_DOWN(offset, backup_job->cluster_size);
+> +    end = QEMU_ALIGN_UP(offset + bytes, backup_job->cluster_size);
+>      wait_for_overlapping_requests(backup_job, start, end);
+>  }
+> 
+>  void backup_cow_request_begin(CowRequest *req, BlockJob *job,
+> -                              int64_t sector_num,
+> -                              int nb_sectors)
+> +                              int64_t offset, uint64_t bytes)
+>  {
+>      BackupBlockJob *backup_job = container_of(job, BackupBlockJob, common);
+> -    int64_t sectors_per_cluster = cluster_size_sectors(backup_job);
+>      int64_t start, end;
+> 
+>      assert(job->driver->job_type == BLOCK_JOB_TYPE_BACKUP);
+> 
+> -    start = sector_num / sectors_per_cluster;
+> -    end = DIV_ROUND_UP(sector_num + nb_sectors, sectors_per_cluster);
+> +    start = QEMU_ALIGN_DOWN(offset, backup_job->cluster_size);
+> +    end = QEMU_ALIGN_UP(offset + bytes, backup_job->cluster_size);
+>      cow_request_begin(req, backup_job, start, end);
+>  }
+> 
+> diff --git a/block/replication.c b/block/replication.c
+> index bf3c395..414ecc4 100644
+> --- a/block/replication.c
+> +++ b/block/replication.c
+> @@ -234,10 +234,14 @@ static coroutine_fn int replication_co_readv(BlockDriverState *bs,
+>      }
+> 
+>      if (job) {
+> -        backup_wait_for_overlapping_requests(child->bs->job, sector_num,
+> -                                             remaining_sectors);
+> -        backup_cow_request_begin(&req, child->bs->job, sector_num,
+> -                                 remaining_sectors);
+> +        uint64_t remaining_bytes = remaining_sectors * BDRV_SECTOR_SIZE;
+> +
+> +        backup_wait_for_overlapping_requests(child->bs->job,
+> +                                             sector_num * BDRV_SECTOR_SIZE,
+> +                                             remaining_bytes);
+> +        backup_cow_request_begin(&req, child->bs->job,
+> +                                 sector_num * BDRV_SECTOR_SIZE,
+> +                                 remaining_bytes);
+>          ret = bdrv_co_readv(bs->file, sector_num, remaining_sectors,
+>                              qiov);
+>          backup_cow_request_end(&req);
+> 
