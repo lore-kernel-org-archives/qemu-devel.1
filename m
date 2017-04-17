@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57627)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cztfi-0000Qe-Qs
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 19:33:36 -0400
+	(envelope-from <longpeng2@huawei.com>) id 1czvYK-0003rD-M4
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 21:34:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cztff-0004zm-KU
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 19:33:34 -0400
-Resent-Message-Id: <E1cztff-0004zm-KU@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21478)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cztff-0004yi-Cb
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 19:33:31 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <149238559853.10512.7357340442722775269@6c512846dbc7>
-In-Reply-To: <cover.1492384862.git.shorne@gmail.com>
+	(envelope-from <longpeng2@huawei.com>) id 1czvYI-0005WI-2S
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 21:34:04 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:3475
+	helo=dggrg01-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <longpeng2@huawei.com>) id 1czvYH-0005SM-9M
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 21:34:02 -0400
+From: "Longpeng(Mike)" <longpeng2@huawei.com>
+Date: Mon, 17 Apr 2017 09:33:12 +0800
+Message-ID: <1492392806-53720-5-git-send-email-longpeng2@huawei.com>
+In-Reply-To: <1492392806-53720-1-git-send-email-longpeng2@huawei.com>
+References: <1492392806-53720-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 16 Apr 2017 16:33:19 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/7] Openrisc misc features / fixes
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2 for-2.10 04/18] crypto: cipher: introduce
+ qcrypto_cipher_ctx_new for builtin-backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +27,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: shorne@gmail.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, openrisc@lists.librecores.org
+To: berrange@redhat.com
+Cc: arei.gonglei@huawei.com, weidong.huang@huawei.com, armbru@redhat.com, eblake@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC83XSBPcGVucmlzYyBtaXNjIGZlYXR1cmVzIC8g
-Zml4ZXMKTWVzc2FnZS1pZDogY292ZXIuMTQ5MjM4NDg2Mi5naXQuc2hvcm5lQGdtYWlsLmNvbQoK
-PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3Rh
-bD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVs
-IGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3Jt
-YXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8g
-IkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMp
-Li4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVj
-a3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNo
-bwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQ
-VCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEz
-Mzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcg
-dGFnXSAgICAgICAgIHBhdGNoZXcvY292ZXIuMTQ5MjM4NDg2Mi5naXQuc2hvcm5lQGdtYWlsLmNv
-bSAtPiBwYXRjaGV3L2NvdmVyLjE0OTIzODQ4NjIuZ2l0LnNob3JuZUBnbWFpbC5jb20KU3dpdGNo
-ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoxMGUzNzZjIHRhcmdldC9vcGVucmlzYzogSW1wbGVt
-ZW50IGZ1bGwgdm1zdGF0ZSBzZXJpYWxpemF0aW9uCjFjOTY1ZDUgbWlncmF0aW9uOiBBZGQgVk1T
-VEFURV9TVFJVQ1RfMkRBUlJBWSgpCjY2ZDEyOWYgbWlncmF0aW9uOiBBZGQgVk1TVEFURV9VSU5U
-VExfMkRBUlJBWSgpCmRhNmUyOWUgdGFyZ2V0L29wZW5yaXNjOiBpbXBsZW1lbnQgc2hhZG93IHJl
-Z2lzdGVycwplZGQ2Yjc0IHRhcmdldC9vcGVucmlzYzogYWRkIG51bWNvcmVzIGFuZCBjb3JlaWQg
-c3VwcG9ydAoxNjcwMmI1IHRhcmdldC9vcGVucmlzYzogYWRkIHNodXRkb3duIGxvZ2ljCmM5N2Ew
-MGUgdGFyZ2V0L29wZW5yaXNjOiBGaXhlcyBmb3IgbWVtb3J5IGRlYnVnZ2luZwoKPT09IE9VVFBV
-VCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS83OiB0YXJnZXQvb3BlbnJpc2M6IEZpeGVzIGZv
-ciBtZW1vcnkgZGVidWdnaW5nLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0
-NDogRklMRTogdGFyZ2V0L29wZW5yaXNjL21tdS5jOjIzMjoKKyAgICAgICAgbWlzcyA9IGNwdV9v
-cGVucmlzY19nZXRfcGh5c19hZGRyKGNwdSwgJnBoeXNfYWRkciwgJnByb3QsIGFkZHIsIE1NVV9J
-TlNUX0ZFVENIKTsKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMzggbGluZXMgY2hlY2tl
-ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAy
-Lzc6IHRhcmdldC9vcGVucmlzYzogYWRkIHNodXRkb3duIGxvZ2ljLi4uCkNoZWNraW5nIFBBVENI
-IDMvNzogdGFyZ2V0L29wZW5yaXNjOiBhZGQgbnVtY29yZXMgYW5kIGNvcmVpZCBzdXBwb3J0Li4u
-CkNoZWNraW5nIFBBVENIIDQvNzogdGFyZ2V0L29wZW5yaXNjOiBpbXBsZW1lbnQgc2hhZG93IHJl
-Z2lzdGVycy4uLgpFUlJPUjogImZvbyAqIGJhciIgc2hvdWxkIGJlICJmb28gKmJhciIKIzY3OiBG
-SUxFOiB0YXJnZXQvb3BlbnJpc2MvY3B1Lmg6MjczOgorICAgIHRhcmdldF91bG9uZyAqIGdwcjsg
-ICAgICAgLyogR2VuZXJhbCByZWdpc3RlcnMgKGJhY2tlZCBieSBzaGFkb3cpICovCgp0b3RhbDog
-MSBlcnJvcnMsIDAgd2FybmluZ3MsIDk4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDUvNzogbWlncmF0aW9uOiBBZGQg
-Vk1TVEFURV9VSU5UVExfMkRBUlJBWSgpLi4uCkNoZWNraW5nIFBBVENIIDYvNzogbWlncmF0aW9u
-OiBBZGQgVk1TVEFURV9TVFJVQ1RfMkRBUlJBWSgpLi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hh
-cmFjdGVycwojMjA6IEZJTEU6IGluY2x1ZGUvbWlncmF0aW9uL3Ztc3RhdGUuaDo1MDI6CisjZGVm
-aW5lIFZNU1RBVEVfU1RSVUNUXzJEQVJSQVlfVEVTVChfZmllbGQsIF9zdGF0ZSwgX24xLCBfbjIs
-IF90ZXN0LCBfdmVyc2lvbiwgX3Ztc2QsIF90eXBlKSB7IFwKCkVSUk9SOiBzcGFjZXMgcmVxdWly
-ZWQgYXJvdW5kIHRoYXQgJ3wnIChjdHg6VnhWKQojMjc6IEZJTEU6IGluY2x1ZGUvbWlncmF0aW9u
-L3Ztc3RhdGUuaDo1MDk6CisgICAgLmZsYWdzICAgICAgICA9IFZNU19TVFJVQ1R8Vk1TX0FSUkFZ
-LCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAogICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgXgoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzM4OiBGSUxF
-OiBpbmNsdWRlL21pZ3JhdGlvbi92bXN0YXRlLmg6NzYwOgorI2RlZmluZSBWTVNUQVRFX1NUUlVD
-VF8yREFSUkFZKF9maWVsZCwgX3N0YXRlLCBfbjEsIF9uMiwgX3ZlcnNpb24sIF92bXNkLCBfdHlw
-ZSkgXAoKdG90YWw6IDIgZXJyb3JzLCAxIHdhcm5pbmdzLCAyNyBsaW5lcyBjaGVja2VkCgpZb3Vy
-IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA3Lzc6IHRh
-cmdldC9vcGVucmlzYzogSW1wbGVtZW50IGZ1bGwgdm1zdGF0ZSBzZXJpYWxpemF0aW9uLi4uCj09
-PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0K
-RW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcu
-b3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlz
-dHMub3Jn
+Extracts qcrypto_cipher_ctx_new() from qcrypto_cipher_new() for
+builtin-backend impls.
+
+Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+---
+ crypto/cipher-builtin.c | 101 ++++++++++++++++++++++++++----------------------
+ 1 file changed, 55 insertions(+), 46 deletions(-)
+
+diff --git a/crypto/cipher-builtin.c b/crypto/cipher-builtin.c
+index b4bc2b9..8cf47d1 100644
+--- a/crypto/cipher-builtin.c
++++ b/crypto/cipher-builtin.c
+@@ -235,23 +235,24 @@ static int qcrypto_cipher_setiv_aes(QCryptoCipher *cipher,
+ 
+ 
+ 
+-static int qcrypto_cipher_init_aes(QCryptoCipher *cipher,
+-                                   const uint8_t *key, size_t nkey,
+-                                   Error **errp)
++static QCryptoCipherBuiltin *
++qcrypto_cipher_init_aes(QCryptoCipherMode mode,
++                        const uint8_t *key, size_t nkey,
++                        Error **errp)
+ {
+     QCryptoCipherBuiltin *ctxt;
+ 
+-    if (cipher->mode != QCRYPTO_CIPHER_MODE_CBC &&
+-        cipher->mode != QCRYPTO_CIPHER_MODE_ECB &&
+-        cipher->mode != QCRYPTO_CIPHER_MODE_XTS) {
++    if (mode != QCRYPTO_CIPHER_MODE_CBC &&
++        mode != QCRYPTO_CIPHER_MODE_ECB &&
++        mode != QCRYPTO_CIPHER_MODE_XTS) {
+         error_setg(errp, "Unsupported cipher mode %s",
+-                   QCryptoCipherMode_lookup[cipher->mode]);
+-        return -1;
++                   QCryptoCipherMode_lookup[mode]);
++        return NULL;
+     }
+ 
+     ctxt = g_new0(QCryptoCipherBuiltin, 1);
+ 
+-    if (cipher->mode == QCRYPTO_CIPHER_MODE_XTS) {
++    if (mode == QCRYPTO_CIPHER_MODE_XTS) {
+         if (AES_set_encrypt_key(key, nkey * 4, &ctxt->state.aes.key.enc) != 0) {
+             error_setg(errp, "Failed to set encryption key");
+             goto error;
+@@ -291,13 +292,11 @@ static int qcrypto_cipher_init_aes(QCryptoCipher *cipher,
+     ctxt->encrypt = qcrypto_cipher_encrypt_aes;
+     ctxt->decrypt = qcrypto_cipher_decrypt_aes;
+ 
+-    cipher->opaque = ctxt;
+-
+-    return 0;
++    return ctxt;
+ 
+  error:
+     g_free(ctxt);
+-    return -1;
++    return NULL;
+ }
+ 
+ 
+@@ -370,16 +369,17 @@ static int qcrypto_cipher_setiv_des_rfb(QCryptoCipher *cipher,
+ }
+ 
+ 
+-static int qcrypto_cipher_init_des_rfb(QCryptoCipher *cipher,
+-                                       const uint8_t *key, size_t nkey,
+-                                       Error **errp)
++static QCryptoCipherBuiltin *
++qcrypto_cipher_init_des_rfb(QCryptoCipherMode mode,
++                            const uint8_t *key, size_t nkey,
++                            Error **errp)
+ {
+     QCryptoCipherBuiltin *ctxt;
+ 
+-    if (cipher->mode != QCRYPTO_CIPHER_MODE_ECB) {
++    if (mode != QCRYPTO_CIPHER_MODE_ECB) {
+         error_setg(errp, "Unsupported cipher mode %s",
+-                   QCryptoCipherMode_lookup[cipher->mode]);
+-        return -1;
++                   QCryptoCipherMode_lookup[mode]);
++        return NULL;
+     }
+ 
+     ctxt = g_new0(QCryptoCipherBuiltin, 1);
+@@ -394,9 +394,7 @@ static int qcrypto_cipher_init_des_rfb(QCryptoCipher *cipher,
+     ctxt->encrypt = qcrypto_cipher_encrypt_des_rfb;
+     ctxt->decrypt = qcrypto_cipher_decrypt_des_rfb;
+ 
+-    cipher->opaque = ctxt;
+-
+-    return 0;
++    return ctxt;
+ }
+ 
+ 
+@@ -426,12 +424,13 @@ bool qcrypto_cipher_supports(QCryptoCipherAlgorithm alg,
+ }
+ 
+ 
+-QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+-                                  QCryptoCipherMode mode,
+-                                  const uint8_t *key, size_t nkey,
+-                                  Error **errp)
++static QCryptoCipherBuiltin *qcrypto_cipher_ctx_new(QCryptoCipherAlgorithm alg,
++                                                    QCryptoCipherMode mode,
++                                                    const uint8_t *key,
++                                                    size_t nkey,
++                                                    Error **errp)
+ {
+-    QCryptoCipher *cipher;
++    QCryptoCipherBuiltin *ctxt;
+ 
+     switch (mode) {
+     case QCRYPTO_CIPHER_MODE_ECB:
+@@ -444,39 +443,27 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+         return NULL;
+     }
+ 
+-    cipher = g_new0(QCryptoCipher, 1);
+-    cipher->alg = alg;
+-    cipher->mode = mode;
+-
+     if (!qcrypto_cipher_validate_key_length(alg, mode, nkey, errp)) {
+-        goto error;
++        return NULL;
+     }
+ 
+-    switch (cipher->alg) {
++    switch (alg) {
+     case QCRYPTO_CIPHER_ALG_DES_RFB:
+-        if (qcrypto_cipher_init_des_rfb(cipher, key, nkey, errp) < 0) {
+-            goto error;
+-        }
++        ctxt = qcrypto_cipher_init_des_rfb(mode, key, nkey, errp);
+         break;
+     case QCRYPTO_CIPHER_ALG_AES_128:
+     case QCRYPTO_CIPHER_ALG_AES_192:
+     case QCRYPTO_CIPHER_ALG_AES_256:
+-        if (qcrypto_cipher_init_aes(cipher, key, nkey, errp) < 0) {
+-            goto error;
+-        }
++        ctxt = qcrypto_cipher_init_aes(mode, key, nkey, errp);
+         break;
+     default:
+         error_setg(errp,
+                    "Unsupported cipher algorithm %s",
+-                   QCryptoCipherAlgorithm_lookup[cipher->alg]);
+-        goto error;
++                   QCryptoCipherAlgorithm_lookup[alg]);
++        return NULL;
+     }
+ 
+-    return cipher;
+-
+- error:
+-    g_free(cipher);
+-    return NULL;
++    return ctxt;
+ }
+ 
+ void qcrypto_cipher_free(QCryptoCipher *cipher)
+@@ -537,3 +524,25 @@ int qcrypto_cipher_setiv(QCryptoCipher *cipher,
+ 
+     return ctxt->setiv(cipher, iv, niv, errp);
+ }
++
++
++QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
++                                  QCryptoCipherMode mode,
++                                  const uint8_t *key, size_t nkey,
++                                  Error **errp)
++{
++    QCryptoCipher *cipher;
++    QCryptoCipherBuiltin *ctxt;
++
++    ctxt = qcrypto_cipher_ctx_new(alg, mode, key, nkey, errp);
++    if (ctxt == NULL) {
++        return NULL;
++    }
++
++    cipher = g_new0(QCryptoCipher, 1);
++    cipher->alg = alg;
++    cipher->mode = mode;
++    cipher->opaque = ctxt;
++
++    return cipher;
++}
+-- 
+1.8.3.1
