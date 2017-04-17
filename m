@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1czxIt-0003hd-5v
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 23:26:16 -0400
+	(envelope-from <peterx@redhat.com>) id 1czxMr-0004kh-FN
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 23:30:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1czxIo-00070v-FR
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 23:26:15 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1487604965-23220-1-git-send-email-peter.maydell@linaro.org>
-	<1487604965-23220-7-git-send-email-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e0853a2f-7cc0-9ee5-fed6-d5af02e86b06@amsat.org>
-Date: Mon, 17 Apr 2017 00:26:06 -0300
+	(envelope-from <peterx@redhat.com>) id 1czxMm-0001dF-FY
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 23:30:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33814)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1czxMm-0001cK-7R
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 23:30:16 -0400
+Date: Mon, 17 Apr 2017 11:29:58 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170417032958.GA16703@pxdev.xzpeter.org>
+References: <20170414174056.28946-1-maxime.coquelin@redhat.com>
+	<20170414174056.28946-4-maxime.coquelin@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1487604965-23220-7-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 06/11] armv7m: Make NVIC expose a memory
- region rather than mapping itself
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170414174056.28946-4-maxime.coquelin@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 3/4] vhost-user: add slave-req-fd support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +27,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Alistair Francis <alistair23@gmail.com>, Michael Davidsaver <mdavidsaver@gmail.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, patches@linaro.org
+To: Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc: mst@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-On 02/20/2017 12:36 PM, Peter Maydell wrote:
-> Make the NVIC device expose a memory region for its users
-> to map, rather than mapping itself into the system memory
-> space on realize, and get the one user (the ARMv7M object)
-> to do this.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On Fri, Apr 14, 2017 at 07:40:55PM +0200, Maxime Coquelin wrote:
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+[...]
 
-> ---
->  hw/arm/armv7m.c       | 7 ++++++-
->  hw/intc/armv7m_nvic.c | 7 ++-----
->  2 files changed, 8 insertions(+), 6 deletions(-)
->
-> diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-> index 638c597..fb21f74 100644
-> --- a/hw/arm/armv7m.c
-> +++ b/hw/arm/armv7m.c
-> @@ -172,6 +172,7 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
->  {
->      /* here realize our children */
->      ARMv7MState *s = ARMV7M(dev);
-> +    SysBusDevice *sbd;
->      Error *err = NULL;
->      int i;
->      char **cpustr;
-> @@ -233,10 +234,14 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
->      qdev_pass_gpios(DEVICE(&s->nvic), dev, "SYSRESETREQ");
->
->      /* Wire the NVIC up to the CPU */
-> -    sysbus_connect_irq(SYS_BUS_DEVICE(&s->nvic), 0,
-> +    sbd = SYS_BUS_DEVICE(&s->nvic);
-> +    sysbus_connect_irq(sbd, 0,
->                         qdev_get_gpio_in(DEVICE(s->cpu), ARM_CPU_IRQ));
->      s->cpu->env.nvic = &s->nvic;
->
-> +    memory_region_add_subregion(&s->container, 0xe000e000,
-> +                                sysbus_mmio_get_region(sbd, 0));
+> @@ -486,6 +500,18 @@ Message types
+>        If VHOST_USER_PROTOCOL_F_REPLY_ACK is negotiated, slave must respond
+>        with zero in case the specified MTU is valid, or non-zero otherwise.
+>  
+> + * VHOST_USER_SET_SLAVE_REQ_FD
 > +
->      for (i = 0; i < ARRAY_SIZE(s->bitband); i++) {
->          Object *obj = OBJECT(&s->bitband[i]);
->          SysBusDevice *sbd = SYS_BUS_DEVICE(&s->bitband[i]);
-> diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-> index f2ada39..c814e16 100644
-> --- a/hw/intc/armv7m_nvic.c
-> +++ b/hw/intc/armv7m_nvic.c
-> @@ -19,7 +19,6 @@
->  #include "hw/arm/arm.h"
->  #include "hw/arm/armv7m_nvic.h"
->  #include "target/arm/cpu.h"
-> -#include "exec/address-spaces.h"
->  #include "qemu/log.h"
->  #include "trace.h"
->
-> @@ -1043,10 +1042,8 @@ static void armv7m_nvic_realize(DeviceState *dev, Error **errp)
->                            "nvic_sysregs", 0x1000);
->      memory_region_add_subregion(&s->container, 0, &s->sysregmem);
->
-> -    /* Map the whole thing into system memory at the location required
-> -     * by the v7M architecture.
-> -     */
-> -    memory_region_add_subregion(get_system_memory(), 0xe000e000, &s->container);
-> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->container);
+> +      Id: 21
+> +      Equivalent ioctl: N/A
+> +      Master payload: N/A
 > +
->      s->systick.timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, systick_timer_tick, s);
->  }
->
->
+> +      Set the socket file descriptor for slave initiated requests. It is passed
+> +      in the ancillary data.
+> +      This request should be sent only when VHOST_USER_F_PROTOCOL_FEATURES
+> +      has been negotiated, and protocol feature bit VHOST_USER_PROTOCOL_F_SLAVE_REQ
+> +      bit is present in VHOST_USER_GET_PROTOCOL_FEATURES.
+
+Here, do we need to mention REPLY_ACK as well? Like:
+
+      If VHOST_USER_PROTOCOL_F_REPLY_ACK is negotiated, slave must
+      respond with zero in case the slave request channel is setup
+      correctly, or non-zero otherwise.
+
+Since I see the other two users are mentioning it.
+
+[...]
+
+> +static int vhost_setup_slave_channel(struct vhost_dev *dev)
+> +{
+> +    VhostUserMsg msg = {
+> +        .request = VHOST_USER_SET_SLAVE_REQ_FD,
+> +        .flags = VHOST_USER_VERSION,
+> +    };
+> +    struct vhost_user *u = dev->opaque;
+> +    int sv[2];
+> +    bool reply_supported = virtio_has_feature(dev->protocol_features,
+> +                                              VHOST_USER_PROTOCOL_F_REPLY_ACK);
+> +
+> +    if (!virtio_has_feature(dev->protocol_features,
+> +                            VHOST_USER_PROTOCOL_F_SLAVE_REQ)) {
+> +        return 0;
+> +    }
+> +
+> +    if (socketpair(PF_UNIX, SOCK_STREAM, 0, sv) == -1) {
+> +        error_report("socketpair() failed");
+> +        return -1;
+> +    }
+> +
+> +    u->slave_fd = sv[0];
+> +    qemu_set_fd_handler(u->slave_fd, slave_read, NULL, dev);
+> +
+> +    if (reply_supported) {
+> +        msg.flags |= VHOST_USER_NEED_REPLY_MASK;
+> +    }
+> +
+> +    vhost_user_write(dev, &msg, &sv[1], 1);
+
+Do we need to close(sv[1]) afterward?
+
+> +
+> +    if (reply_supported) {
+> +        return process_message_reply(dev, msg.request);
+
+Here do we need to cleanup u->slave_fd if backend replied something
+wrong? Or I guess it might be leaked.
+
+Thanks,
+
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+
+-- 
+Peter Xu
