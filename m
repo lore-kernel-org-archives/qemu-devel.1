@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d0Cpi-0006Hl-MJ
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 16:01:11 -0400
+	(envelope-from <quintela@redhat.com>) id 1d0Cpj-0006IW-Ix
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 16:01:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d0Cph-0004Xp-I5
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 16:01:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60770)
+	(envelope-from <quintela@redhat.com>) id 1d0Cpi-0004Ye-MD
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 16:01:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33698)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d0Cph-0004Xb-8R
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 16:01:09 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d0Cpi-0004Xt-H6
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 16:01:10 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2756A61E4C
-	for <qemu-devel@nongnu.org>; Mon, 17 Apr 2017 20:01:08 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6C49A8050D
+	for <qemu-devel@nongnu.org>; Mon, 17 Apr 2017 20:01:09 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Mon, 17 Apr 2017 22:00:38 +0200
-Message-Id: <20170417200041.2451-17-quintela@redhat.com>
+Date: Mon, 17 Apr 2017 22:00:39 +0200
+Message-Id: <20170417200041.2451-18-quintela@redhat.com>
 In-Reply-To: <20170417200041.2451-1-quintela@redhat.com>
 References: <20170417200041.2451-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 16/19] migration: Export ram.c functions in its
- own file
+Subject: [Qemu-devel] [PATCH 17/19] migration: Export rdma.c functions in
+ its own file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,85 +35,36 @@ Cc: dgilbert@redhat.com
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- include/migration/migration.h | 36 -----------------------------
- include/migration/ram.h       | 54 +++++++++++++++++++++++++++++++++++++++++++
+ include/migration/migration.h |  4 ----
+ include/migration/rdma.h      | 22 ++++++++++++++++++++++
  migration/migration.c         |  1 +
- migration/postcopy-ram.c      |  1 +
- migration/ram.c               |  1 +
  migration/rdma.c              |  1 +
- migration/savevm.c            |  1 +
- 7 files changed, 59 insertions(+), 36 deletions(-)
- create mode 100644 include/migration/ram.h
+ 4 files changed, 24 insertions(+), 4 deletions(-)
+ create mode 100644 include/migration/rdma.h
 
 diff --git a/include/migration/migration.h b/include/migration/migration.h
-index 1451067..3e5d106 100644
+index 3e5d106..64c1ff3 100644
 --- a/include/migration/migration.h
 +++ b/include/migration/migration.h
-@@ -192,36 +192,6 @@ bool migration_is_blocked(Error **errp);
- bool migration_in_postcopy(void);
- MigrationState *migrate_get_current(void);
+@@ -177,10 +177,6 @@ void migration_fd_process_incoming(QEMUFile *f);
  
--void migrate_compress_threads_create(void);
--void migrate_compress_threads_join(void);
--void migrate_decompress_threads_create(void);
--void migrate_decompress_threads_join(void);
--uint64_t ram_bytes_remaining(void);
--uint64_t ram_bytes_transferred(void);
--uint64_t ram_bytes_total(void);
--uint64_t ram_dirty_sync_count(void);
--uint64_t ram_dirty_pages_rate(void);
--uint64_t ram_postcopy_requests(void);
--void free_xbzrle_decoded_buf(void);
--
--void acct_update_position(QEMUFile *f, size_t size, bool zero);
--
--uint64_t dup_mig_pages_transferred(void);
--uint64_t norm_mig_pages_transferred(void);
--uint64_t xbzrle_mig_bytes_transferred(void);
--uint64_t xbzrle_mig_pages_transferred(void);
--uint64_t xbzrle_mig_pages_overflow(void);
--uint64_t xbzrle_mig_pages_cache_miss(void);
--double xbzrle_mig_cache_miss_rate(void);
--
--void ram_handle_compressed(void *host, uint8_t ch, uint64_t size);
--void ram_debug_dump_bitmap(unsigned long *todump, bool expected);
--/* For outgoing discard bitmap */
--int ram_postcopy_send_discard_bitmap(MigrationState *ms);
--/* For incoming postcopy discard */
--int ram_discard_range(const char *block_name, uint64_t start, size_t length);
--int ram_postcopy_incoming_init(MigrationIncomingState *mis);
--void ram_postcopy_migrated_memory_release(MigrationState *ms);
+ uint64_t migrate_max_downtime(void);
  
- bool migrate_release_ram(void);
- bool migrate_postcopy_ram(void);
-@@ -233,8 +203,6 @@ int migrate_use_xbzrle(void);
- int64_t migrate_xbzrle_cache_size(void);
- bool migrate_colo_enabled(void);
- 
--int64_t xbzrle_cache_resize(int64_t new_size);
+-void rdma_start_outgoing_migration(void *opaque, const char *host_port, Error **errp);
 -
- bool migrate_use_block_enabled(void);
- bool migrate_use_block_shared(void);
- 
-@@ -273,10 +241,6 @@ size_t ram_control_save_page(QEMUFile *f, ram_addr_t block_offset,
-                              ram_addr_t offset, size_t size,
-                              uint64_t *bytes_sent);
- 
--void migration_page_queue_free(void);
--int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len);
--uint64_t ram_pagesize_summary(void);
+-void rdma_start_incoming_migration(const char *host_port, Error **errp);
 -
- PostcopyState postcopy_state_get(void);
- /* Set the state and return the old state */
- PostcopyState postcopy_state_set(PostcopyState new_state);
-diff --git a/include/migration/ram.h b/include/migration/ram.h
+ void migrate_fd_error(MigrationState *s, const Error *error);
+ 
+ void migrate_fd_connect(MigrationState *s);
+diff --git a/include/migration/rdma.h b/include/migration/rdma.h
 new file mode 100644
-index 0000000..c3653b3
+index 0000000..d2cf481
 --- /dev/null
-+++ b/include/migration/ram.h
-@@ -0,0 +1,54 @@
++++ b/include/migration/rdma.h
+@@ -0,0 +1,22 @@
 +/*
-+ * QEMU migration ram
++ * QEMU migration rdma functions
 + *
 + * Copyright IBM, Corp. 2008
 + *
@@ -125,106 +76,38 @@ index 0000000..c3653b3
 + *
 + */
 +
-+#ifndef QEMU_MIGRATION_RAM_H
-+#define QEMU_MIGRATION_RAM_H
++#ifndef QEMU_MIGRATION_RDMA_H
++#define QEMU_MIGRATION_RDMA_H
 +
-+#include "qemu-common.h"
-+#include "exec/cpu-common.h"
++void rdma_start_outgoing_migration(void *opaque, const char *host_port,
++                                   Error **errp);
 +
-+int64_t xbzrle_cache_resize(int64_t new_size);
-+uint64_t dup_mig_pages_transferred(void);
-+uint64_t norm_mig_pages_transferred(void);
-+uint64_t xbzrle_mig_bytes_transferred(void);
-+uint64_t xbzrle_mig_pages_transferred(void);
-+uint64_t xbzrle_mig_pages_cache_miss(void);
-+double xbzrle_mig_cache_miss_rate(void);
-+uint64_t xbzrle_mig_pages_overflow(void);
-+uint64_t ram_bytes_transferred(void);
-+uint64_t ram_bytes_remaining(void);
-+uint64_t ram_dirty_sync_count(void);
-+uint64_t ram_dirty_pages_rate(void);
-+uint64_t ram_postcopy_requests(void);
-+uint64_t ram_bytes_total(void);
++void rdma_start_incoming_migration(const char *host_port, Error **errp);
 +
-+void migrate_compress_threads_create(void);
-+void migrate_compress_threads_join(void);
-+void migrate_decompress_threads_create(void);
-+void migrate_decompress_threads_join(void);
-+
-+uint64_t ram_pagesize_summary(void);
-+void migration_page_queue_free(void);
-+int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len);
-+void acct_update_position(QEMUFile *f, size_t size, bool zero);
-+void free_xbzrle_decoded_buf(void);
-+void ram_debug_dump_bitmap(unsigned long *todump, bool expected);
-+void ram_postcopy_migrated_memory_release(MigrationState *ms);
-+/* For outgoing discard bitmap */
-+int ram_postcopy_send_discard_bitmap(MigrationState *ms);
-+/* For incoming postcopy discard */
-+int ram_discard_range(const char *block_name, uint64_t start, size_t length);
-+int ram_postcopy_incoming_init(MigrationIncomingState *mis);
-+
-+void ram_handle_compressed(void *host, uint8_t ch, uint64_t size);
 +#endif
 diff --git a/migration/migration.c b/migration/migration.c
-index 6e32be0..ba01ea2 100644
+index ba01ea2..04aa9ad 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
 @@ -23,6 +23,7 @@
  #include "migration/exec.h"
  #include "migration/fd.h"
  #include "migration/socket.h"
-+#include "migration/ram.h"
++#include "migration/rdma.h"
+ #include "migration/ram.h"
  #include "migration/migration.h"
  #include "migration/qemu-file-channel.h"
- #include "migration/vmstate.h"
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index 5aea2ff..aec40c3 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -19,6 +19,7 @@
- #include "qemu/osdep.h"
- #include "migration/migration.h"
- #include "migration/qemu-file.h"
-+#include "migration/ram.h"
- #include "migration/postcopy-ram.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/balloon.h"
-diff --git a/migration/ram.c b/migration/ram.c
-index 49e518f..eb1ec1b 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -36,6 +36,7 @@
- #include "qemu/main-loop.h"
- #include "migration/xbzrle.h"
- #include "migration/init.h"
-+#include "migration/ram.h"
- #include "migration/migration.h"
- #include "migration/qemu-file.h"
- #include "migration/vmstate.h"
 diff --git a/migration/rdma.c b/migration/rdma.c
-index d9a2d64..3b06fe6 100644
+index 3b06fe6..2b4276b 100644
 --- a/migration/rdma.c
 +++ b/migration/rdma.c
-@@ -18,6 +18,7 @@
+@@ -17,6 +17,7 @@
+ #include "qapi/error.h"
  #include "qemu-common.h"
  #include "qemu/cutils.h"
++#include "migration/rdma.h"
  #include "migration/migration.h"
-+#include "migration/ram.h"
+ #include "migration/ram.h"
  #include "migration/qemu-file-channel.h"
- #include "qemu/error-report.h"
- #include "qemu/main-loop.h"
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 1e6cf79..f628d01 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -36,6 +36,7 @@
- #include "audio/audio.h"
- #include "migration/machine.h"
- #include "migration/migration.h"
-+#include "migration/ram.h"
- #include "migration/qemu-file-channel.h"
- #include "migration/postcopy-ram.h"
- #include "qapi/qmp/qerror.h"
 -- 
 2.9.3
