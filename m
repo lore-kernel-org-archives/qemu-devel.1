@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33172)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1czxzm-0008A8-H4
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 00:10:35 -0400
+	id 1czy9B-0001Jo-Ji
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 00:20:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1czxzi-0008Mf-GR
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 00:10:34 -0400
+	id 1czy98-0006Hl-Ba
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 00:20:17 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <1487262963-11519-1-git-send-email-peter.maydell@linaro.org>
-	<1487262963-11519-6-git-send-email-peter.maydell@linaro.org>
+References: <1491844419-12485-1-git-send-email-peter.maydell@linaro.org>
+	<1491844419-12485-8-git-send-email-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b3c7907d-ab29-486c-102f-760b12e99688@amsat.org>
-Date: Mon, 17 Apr 2017 01:10:26 -0300
+Message-ID: <3dd852ae-3ff9-0b53-11f1-ea4e2a3ed59c@amsat.org>
+Date: Mon, 17 Apr 2017 01:20:06 -0300
 MIME-Version: 1.0
-In-Reply-To: <1487262963-11519-6-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 05/13] arm: gic: Remove
- references to NVIC
+In-Reply-To: <1491844419-12485-8-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 7/9] arm: Track M profile handler mode
+ state in TB flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,210 +29,85 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>
 
-On 02/16/2017 01:35 PM, Peter Maydell wrote:
-> From: Michael Davidsaver <mdavidsaver@gmail.com>
+Hi Peter,
+
+On 04/10/2017 02:13 PM, Peter Maydell wrote:
+> For M profile exception-return handling we'd like to generate different
+> code for some instructions depending on whether we are in Handler
+> mode or Thread mode. This isn't the same as "are we privileged
+> or user", so we need an extra bit in the TB flags to distinguish.
 >
-> Now that the NVIC is its own separate implementation, we can
-> clean up the GIC code by removing REV_NVIC and conditionals
-> which use it.
->
-> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
 > ---
->  hw/intc/gic_internal.h   |  7 ++-----
->  hw/intc/arm_gic.c        | 31 +++++--------------------------
->  hw/intc/arm_gic_common.c | 23 ++++++++---------------
->  3 files changed, 15 insertions(+), 46 deletions(-)
+>  target/arm/cpu.h       | 9 +++++++++
+>  target/arm/translate.h | 1 +
+>  target/arm/translate.c | 1 +
+>  3 files changed, 11 insertions(+)
 >
-> diff --git a/hw/intc/gic_internal.h b/hw/intc/gic_internal.h
-> index 3f31174..7fe87b1 100644
-> --- a/hw/intc/gic_internal.h
-> +++ b/hw/intc/gic_internal.h
-> @@ -25,9 +25,7 @@
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index e6f05e2..7d26357 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -2291,6 +2291,9 @@ static inline bool arm_cpu_data_is_big_endian(CPUARMState *env)
+>  #define ARM_TBFLAG_NS_MASK          (1 << ARM_TBFLAG_NS_SHIFT)
+>  #define ARM_TBFLAG_BE_DATA_SHIFT    20
+>  #define ARM_TBFLAG_BE_DATA_MASK     (1 << ARM_TBFLAG_BE_DATA_SHIFT)
+> +/* For M profile only, Handler (ie not Thread) mode */
+> +#define ARM_TBFLAG_HANDLER_SHIFT    21
+> +#define ARM_TBFLAG_HANDLER_MASK     (1 << ARM_TBFLAG_HANDLER_SHIFT)
 >
->  #define ALL_CPU_MASK ((unsigned)(((1 << GIC_NCPU) - 1)))
->
-> -/* The NVIC has 16 internal vectors.  However these are not exposed
-> -   through the normal GIC interface.  */
-> -#define GIC_BASE_IRQ ((s->revision == REV_NVIC) ? 32 : 0)
-> +#define GIC_BASE_IRQ 0
->
->  #define GIC_SET_ENABLED(irq, cm) s->irq_state[irq].enabled |= (cm)
->  #define GIC_CLEAR_ENABLED(irq, cm) s->irq_state[irq].enabled &= ~(cm)
-> @@ -75,7 +73,6 @@
->
->  /* The special cases for the revision property: */
->  #define REV_11MPCORE 0
-> -#define REV_NVIC 0xffffffff
->
->  void gic_set_pending_private(GICState *s, int cpu, int irq);
->  uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs);
-> @@ -87,7 +84,7 @@ void gic_set_priority(GICState *s, int cpu, int irq, uint8_t val,
->
->  static inline bool gic_test_pending(GICState *s, int irq, int cm)
->  {
-> -    if (s->revision == REV_NVIC || s->revision == REV_11MPCORE) {
-> +    if (s->revision == REV_11MPCORE) {
->          return s->irq_state[irq].pending & cm;
->      } else {
->          /* Edge-triggered interrupts are marked pending on a rising edge, but
-> diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-> index 521aac3..8e5a9d8 100644
-> --- a/hw/intc/arm_gic.c
-> +++ b/hw/intc/arm_gic.c
-> @@ -156,17 +156,6 @@ static void gic_set_irq_11mpcore(GICState *s, int irq, int level,
+>  /* Bit usage when in AArch64 state */
+>  #define ARM_TBFLAG_TBI0_SHIFT 0        /* TBI0 for EL0/1 or TBI for EL2/3 */
+> @@ -2327,6 +2330,8 @@ static inline bool arm_cpu_data_is_big_endian(CPUARMState *env)
+>      (((F) & ARM_TBFLAG_NS_MASK) >> ARM_TBFLAG_NS_SHIFT)
+>  #define ARM_TBFLAG_BE_DATA(F) \
+>      (((F) & ARM_TBFLAG_BE_DATA_MASK) >> ARM_TBFLAG_BE_DATA_SHIFT)
+> +#define ARM_TBFLAG_HANDLER(F) \
+> +    (((F) & ARM_TBFLAG_HANDLER_MASK) >> ARM_TBFLAG_HANDLER_SHIFT)
+>  #define ARM_TBFLAG_TBI0(F) \
+>      (((F) & ARM_TBFLAG_TBI0_MASK) >> ARM_TBFLAG_TBI0_SHIFT)
+>  #define ARM_TBFLAG_TBI1(F) \
+> @@ -2517,6 +2522,10 @@ static inline void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
 >      }
+>      *flags |= fp_exception_el(env) << ARM_TBFLAG_FPEXC_EL_SHIFT;
+>
+> +    if (env->v7m.exception != 0) {
+> +        *flags |= ARM_TBFLAG_HANDLER_MASK;
+> +    }
+> +
+>      *cs_base = 0;
 >  }
 >
-> -static void gic_set_irq_nvic(GICState *s, int irq, int level,
-> -                                 int cm, int target)
-> -{
-> -    if (level) {
-> -        GIC_SET_LEVEL(irq, cm);
-> -        GIC_SET_PENDING(irq, target);
-> -    } else {
-> -        GIC_CLEAR_LEVEL(irq, cm);
-> -    }
-> -}
-> -
->  static void gic_set_irq_generic(GICState *s, int irq, int level,
->                                  int cm, int target)
->  {
-> @@ -214,8 +203,6 @@ static void gic_set_irq(void *opaque, int irq, int level)
->
->      if (s->revision == REV_11MPCORE) {
->          gic_set_irq_11mpcore(s, irq, level, cm, target);
-> -    } else if (s->revision == REV_NVIC) {
-> -        gic_set_irq_nvic(s, irq, level, cm, target);
->      } else {
->          gic_set_irq_generic(s, irq, level, cm, target);
->      }
-> @@ -367,7 +354,7 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
->          return 1023;
->      }
->
-> -    if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
-> +    if (s->revision == REV_11MPCORE) {
->          /* Clear pending flags for both level and edge triggered interrupts.
->           * Level triggered IRQs will be reasserted once they become inactive.
->           */
-> @@ -589,11 +576,6 @@ void gic_complete_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
->              DPRINTF("Set %d pending mask %x\n", irq, cm);
->              GIC_SET_PENDING(irq, cm);
->          }
-> -    } else if (s->revision == REV_NVIC) {
-> -        if (GIC_TEST_LEVEL(irq, cm)) {
-> -            DPRINTF("Set nvic %d pending mask %x\n", irq, cm);
-> -            GIC_SET_PENDING(irq, cm);
-> -        }
->      }
->
->      group = gic_has_groups(s) && GIC_TEST_GROUP(irq, cm);
-> @@ -768,7 +750,7 @@ static uint32_t gic_dist_readb(void *opaque, hwaddr offset, MemTxAttrs attrs)
->      } else if (offset < 0xf10) {
->          goto bad_reg;
->      } else if (offset < 0xf30) {
-> -        if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
-> +        if (s->revision == REV_11MPCORE) {
->              goto bad_reg;
->          }
->
-> @@ -802,9 +784,6 @@ static uint32_t gic_dist_readb(void *opaque, hwaddr offset, MemTxAttrs attrs)
->              case 2:
->                  res = gic_id_gicv2[(offset - 0xfd0) >> 2];
->                  break;
-> -            case REV_NVIC:
-> -                /* Shouldn't be able to get here */
-> -                abort();
->              default:
->                  res = 0;
->              }
-> @@ -1028,7 +1007,7 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
->                  continue; /* Ignore Non-secure access of Group0 IRQ */
->              }
->
-> -            if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
-> +            if (s->revision == REV_11MPCORE) {
->                  if (value & (1 << (i * 2))) {
->                      GIC_SET_MODEL(irq + i);
->                  } else {
-> @@ -1046,7 +1025,7 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
->          goto bad_reg;
->      } else if (offset < 0xf20) {
->          /* GICD_CPENDSGIRn */
-> -        if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
-> +        if (s->revision == REV_11MPCORE) {
->              goto bad_reg;
->          }
->          irq = (offset - 0xf10);
-> @@ -1060,7 +1039,7 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
->          }
->      } else if (offset < 0xf30) {
->          /* GICD_SPENDSGIRn */
-> -        if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
-> +        if (s->revision == REV_11MPCORE) {
->              goto bad_reg;
->          }
->          irq = (offset - 0xf20);
-> diff --git a/hw/intc/arm_gic_common.c b/hw/intc/arm_gic_common.c
-> index 4a8df44..70f1134 100644
-> --- a/hw/intc/arm_gic_common.c
-> +++ b/hw/intc/arm_gic_common.c
-> @@ -99,9 +99,7 @@ void gic_init_irqs_and_mmio(GICState *s, qemu_irq_handler handler,
->       *  [N+32..N+63] PPIs for CPU 1
->       *   ...
+> diff --git a/target/arm/translate.h b/target/arm/translate.h
+> index abb0760..f955174 100644
+> --- a/target/arm/translate.h
+> +++ b/target/arm/translate.h
+> @@ -31,6 +31,7 @@ typedef struct DisasContext {
+>      bool vfp_enabled; /* FP enabled via FPSCR.EN */
+>      int vec_len;
+>      int vec_stride;
+> +    bool handler; /* v7M Handler mode */
+
+What about a more descriptive name like 'is_v7m_handler_mode' or 
+'v7m_mode_handler'? It makes your next patch easier to understand:
+
+     if (s->handler && arm_dc_feature(s, ARM_FEATURE_M)) {
+
+>      /* Immediate value in AArch32 SVC insn; must be set if is_jmp == DISAS_SWI
+>       * so that top level loop can generate correct syndrome information.
 >       */
-> -    if (s->revision != REV_NVIC) {
-> -        i += (GIC_INTERNAL * s->num_cpu);
-> -    }
-> +    i += (GIC_INTERNAL * s->num_cpu);
->      qdev_init_gpio_in(DEVICE(s), handler, i);
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index f28c4ca..f980cda 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -11780,6 +11780,7 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
+>      dc->vec_len = ARM_TBFLAG_VECLEN(tb->flags);
+>      dc->vec_stride = ARM_TBFLAG_VECSTRIDE(tb->flags);
+>      dc->c15_cpar = ARM_TBFLAG_XSCALE_CPAR(tb->flags);
+> +    dc->handler = ARM_TBFLAG_HANDLER(tb->flags);
+>      dc->cp_regs = cpu->cp_regs;
+>      dc->features = env->features;
 >
->      for (i = 0; i < s->num_cpu; i++) {
-> @@ -121,16 +119,12 @@ void gic_init_irqs_and_mmio(GICState *s, qemu_irq_handler handler,
->      memory_region_init_io(&s->iomem, OBJECT(s), ops, s, "gic_dist", 0x1000);
->      sysbus_init_mmio(sbd, &s->iomem);
->
-> -    if (s->revision != REV_NVIC) {
-> -        /* This is the main CPU interface "for this core". It is always
-> -         * present because it is required by both software emulation and KVM.
-> -         * NVIC is not handled here because its CPU interface is different,
-> -         * neither it can use KVM.
-> -         */
-> -        memory_region_init_io(&s->cpuiomem[0], OBJECT(s), ops ? &ops[1] : NULL,
-> -                              s, "gic_cpu", s->revision == 2 ? 0x2000 : 0x100);
-> -        sysbus_init_mmio(sbd, &s->cpuiomem[0]);
-> -    }
-> +    /* This is the main CPU interface "for this core". It is always
-> +     * present because it is required by both software emulation and KVM.
-> +     */
-> +    memory_region_init_io(&s->cpuiomem[0], OBJECT(s), ops ? &ops[1] : NULL,
-> +                          s, "gic_cpu", s->revision == 2 ? 0x2000 : 0x100);
-> +    sysbus_init_mmio(sbd, &s->cpuiomem[0]);
->  }
->
->  static void arm_gic_common_realize(DeviceState *dev, Error **errp)
-> @@ -162,7 +156,7 @@ static void arm_gic_common_realize(DeviceState *dev, Error **errp)
->      }
->
->      if (s->security_extn &&
-> -        (s->revision == REV_11MPCORE || s->revision == REV_NVIC)) {
-> +        (s->revision == REV_11MPCORE)) {
->          error_setg(errp, "this GIC revision does not implement "
->                     "the security extensions");
->          return;
-> @@ -255,7 +249,6 @@ static Property arm_gic_common_properties[] = {
->      DEFINE_PROP_UINT32("num-irq", GICState, num_irq, 32),
->      /* Revision can be 1 or 2 for GIC architecture specification
->       * versions 1 or 2, or 0 to indicate the legacy 11MPCore GIC.
-> -     * (Internally, 0xffffffff also indicates "not a GIC but an NVIC".)
->       */
->      DEFINE_PROP_UINT32("revision", GICState, revision, 1),
->      /* True if the GIC should implement the security extensions */
 >
