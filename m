@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53437)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d06lf-0000q2-TY
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 09:32:37 -0400
+	id 1d06ou-0001W8-Nf
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 09:35:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d06lc-00011S-JD
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 09:32:35 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33426)
+	id 1d06or-0002mn-I4
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 09:35:56 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:33978)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d06lc-00011M-DY
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 09:32:32 -0400
-Received: by mail-qk0-x244.google.com with SMTP id d131so19370764qkc.0
-	for <qemu-devel@nongnu.org>; Mon, 17 Apr 2017 06:32:32 -0700 (PDT)
+	id 1d06or-0002mU-D2
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 09:35:53 -0400
+Received: by mail-qt0-x241.google.com with SMTP id y33so4526088qta.1
+	for <qemu-devel@nongnu.org>; Mon, 17 Apr 2017 06:35:53 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <1492175840-5021-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170414131741eucas1p2f34e11e4292fef1c50ef63bd3522ad04@eucas1p2.samsung.com>
-	<1492175840-5021-7-git-send-email-a.perevalov@samsung.com>
+References: <1492392806-53720-1-git-send-email-longpeng2@huawei.com>
+	<1492392806-53720-8-git-send-email-longpeng2@huawei.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e015b45d-c7a2-2099-0394-cb344f0af298@amsat.org>
-Date: Mon, 17 Apr 2017 10:32:27 -0300
+Message-ID: <c8591ca3-0f82-161f-e472-5791a12e17a3@amsat.org>
+Date: Mon, 17 Apr 2017 10:35:48 -0300
 MIME-Version: 1.0
-In-Reply-To: <1492175840-5021-7-git-send-email-a.perevalov@samsung.com>
+In-Reply-To: <1492392806-53720-8-git-send-email-longpeng2@huawei.com>
 Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 6/6] migration: detailed traces for postcopy
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 07/18] crypto: hmac: move
+ crypto/hmac.h into include/crypto/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,189 +35,365 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>, dgilbert@redhat.com, qemu-devel@nongnu.org
-Cc: i.maximets@samsung.com
+To: "Longpeng(Mike)" <longpeng2@huawei.com>, berrange@redhat.com
+Cc: weidong.huang@huawei.com, mst@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, arei.gonglei@huawei.com
 
-Hi Alexey,
+On 04/16/2017 10:33 PM, Longpeng(Mike) wrote:
+> Moves crypto/hmac.h into include/crypto/, likes cipher.h and hash.h
+>
+> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 
-On 04/14/2017 10:17 AM, Alexey Perevalov wrote:
-> It could help to track down vCPU state during page fault and
-> page fault sources.
->
-> This patch showes proc's status/stack/syscall file at the moment of pagefault,
-> it's very interesting to know who was page fault initiator.
->
-> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 > ---
->  migration/postcopy-ram.c | 98 +++++++++++++++++++++++++++++++++++++++++++++++-
->  migration/trace-events   |  6 +++
->  2 files changed, 103 insertions(+), 1 deletion(-)
+>  crypto/hmac.h         | 166 --------------------------------------------------
+>  include/crypto/hmac.h | 166 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 166 insertions(+), 166 deletions(-)
+>  delete mode 100644 crypto/hmac.h
+>  create mode 100644 include/crypto/hmac.h
 >
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index 42330fd..513633c 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -412,7 +412,91 @@ static int ram_block_enable_notify(const char *block_name, void *host_addr,
->      return 0;
->  }
->
-> -static int get_mem_fault_cpu_index(uint32_t pid)
-> +#define PROC_LEN 1024
-
-Remove PROC_LEN it is not used.
-
-> +#define DEBUG_FAULT_PROCESS_STATUS 1
-> +
-> +#ifdef DEBUG_FAULT_PROCESS_STATUS
-> +
-> +static FILE *get_proc_file(const gchar *frmt, pid_t thread_id)
-> +{
-> +    FILE *f = NULL;
-> +    gchar *file_path = g_strdup_printf(frmt, thread_id);
-> +    if (file_path == NULL) {
-> +        error_report("Couldn't allocate path for %u", thread_id);
-> +        return NULL;
-> +    }
-> +    f = fopen(file_path, "r");
-> +    if (!f) {
-> +        error_report("can't open %s", file_path);
-> +    }
-> +
-> +    trace_get_proc_file(file_path);
-> +    g_free(file_path);
-> +    return f;
-> +}
-> +
-> +typedef void(*proc_line_handler)(const char *line);
-> +
-> +static void proc_line_cb(const char *line)
-> +{
-> +    /* trace_ functions are inline */
-> +    trace_proc_line_cb(line);
-> +}
-> +
-> +static void foreach_line_in_file(FILE *f, proc_line_handler cb)
-> +{
-> +    char *line = NULL;
-> +    ssize_t read;
-> +    size_t len;
-
-Please initialize len = 0.
-
-> +
-> +    while ((read = getline(&line, &len, f)) != -1) {
-> +        /* workaround, trace_ infrastructure already insert \n
-> +         * and getline includes it */
-> +        ssize_t str_len = strlen(line) - 1;
-> +        if (str_len <= 0)
-> +            continue;
-> +        line[str_len] = '\0';
-> +        cb(line);
-> +    }
-> +    free(line);
-> +}
-> +
-> +static void observe_thread_proc(const gchar *path_frmt, pid_t thread_id)
-> +{
-> +    FILE *f = get_proc_file(path_frmt, thread_id);
-> +    if (!f) {
-> +        error_report("can't read thread's proc");
-
-I'm not sure this _error_ is useful, it may be noisy (kernels compiled 
-without CONFIG_HAVE_ARCH_TRACEHOOK).
-
-> +        return;
-> +    }
-> +
-> +    foreach_line_in_file(f, proc_line_cb);
-> +    fclose(f);
-> +}
-> +
+> diff --git a/crypto/hmac.h b/crypto/hmac.h
+> deleted file mode 100644
+> index 0d3acd7..0000000
+> --- a/crypto/hmac.h
+> +++ /dev/null
+> @@ -1,166 +0,0 @@
+> -/*
+> - * QEMU Crypto hmac algorithms
+> - *
+> - * Copyright (c) 2016 HUAWEI TECHNOLOGIES CO., LTD.
+> - *
+> - * This work is licensed under the terms of the GNU GPL, version 2 or
+> - * (at your option) any later version.  See the COPYING file in the
+> - * top-level directory.
+> - *
+> - */
+> -
+> -#ifndef QCRYPTO_HMAC_H
+> -#define QCRYPTO_HMAC_H
+> -
+> -#include "qapi-types.h"
+> -
+> -typedef struct QCryptoHmac QCryptoHmac;
+> -struct QCryptoHmac {
+> -    QCryptoHashAlgorithm alg;
+> -    void *opaque;
+> -};
+> -
+> -/**
+> - * qcrypto_hmac_supports:
+> - * @alg: the hmac algorithm
+> - *
+> - * Determine if @alg hmac algorithm is supported by
+> - * the current configured build
+> - *
+> - * Returns:
+> - *  true if the algorithm is supported, false otherwise
+> - */
+> -bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg);
+> -
+> -/**
+> - * qcrypto_hmac_new:
+> - * @alg: the hmac algorithm
+> - * @key: the key bytes
+> - * @nkey: the length of @key
+> - * @errp: pointer to a NULL-initialized error object
+> - *
+> - * Creates a new hmac object with the algorithm @alg
+> - *
+> - * The @key parameter provides the bytes representing
+> - * the secret key to use. The @nkey parameter specifies
+> - * the length of @key in bytes
+> - *
+> - * Note: must use qcrypto_hmac_free() to release the
+> - * returned hmac object when no longer required
+> - *
+> - * Returns:
+> - *  a new hmac object, or NULL on error
+> - */
+> -QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
+> -                              const uint8_t *key, size_t nkey,
+> -                              Error **errp);
+> -
+> -/**
+> - * qcrypto_hmac_free:
+> - * @hmac: the hmac object
+> - *
+> - * Release the memory associated with @hmac that was
+> - * previously allocated by qcrypto_hmac_new()
+> - */
+> -void qcrypto_hmac_free(QCryptoHmac *hmac);
+> -
+> -/**
+> - * qcrypto_hmac_bytesv:
+> - * @hmac: the hmac object
+> - * @iov: the array of memory regions to hmac
+> - * @niov: the length of @iov
+> - * @result: pointer to hold output hmac
+> - * @resultlen: pointer to hold length of @result
+> - * @errp: pointer to a NULL-initialized error object
+> - *
+> - * Computes the hmac across all the memory regions
+> - * present in @iov. The @result pointer will be
+> - * filled with raw bytes representing the computed
+> - * hmac, which will have length @resultlen. The
+> - * memory pointer in @result must be released
+> - * with a call to g_free() when no longer required.
+> - *
+> - * Returns:
+> - *  0 on success, -1 on error
+> - */
+> -int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
+> -                        const struct iovec *iov,
+> -                        size_t niov,
+> -                        uint8_t **result,
+> -                        size_t *resultlen,
+> -                        Error **errp);
+> -
+> -/**
+> - * qcrypto_hmac_bytes:
+> - * @hmac: the hmac object
+> - * @buf: the memory region to hmac
+> - * @len: the length of @buf
+> - * @result: pointer to hold output hmac
+> - * @resultlen: pointer to hold length of @result
+> - * @errp: pointer to a NULL-initialized error object
+> - *
+> - * Computes the hmac across all the memory region
+> - * @buf of length @len. The @result pointer will be
+> - * filled with raw bytes representing the computed
+> - * hmac, which will have length @resultlen. The
+> - * memory pointer in @result must be released
+> - * with a call to g_free() when no longer required.
+> - *
+> - * Returns:
+> - *  0 on success, -1 on error
+> - */
+> -int qcrypto_hmac_bytes(QCryptoHmac *hmac,
+> -                       const char *buf,
+> -                       size_t len,
+> -                       uint8_t **result,
+> -                       size_t *resultlen,
+> -                       Error **errp);
+> -
+> -/**
+> - * qcrypto_hmac_digestv:
+> - * @hmac: the hmac object
+> - * @iov: the array of memory regions to hmac
+> - * @niov: the length of @iov
+> - * @digest: pointer to hold output hmac
+> - * @errp: pointer to a NULL-initialized error object
+> - *
+> - * Computes the hmac across all the memory regions
+> - * present in @iov. The @digest pointer will be
+> - * filled with the printable hex digest of the computed
+> - * hmac, which will be terminated by '\0'. The
+> - * memory pointer in @digest must be released
+> - * with a call to g_free() when no longer required.
+> - *
+> - * Returns:
+> - *  0 on success, -1 on error
+> - */
+> -int qcrypto_hmac_digestv(QCryptoHmac *hmac,
+> -                         const struct iovec *iov,
+> -                         size_t niov,
+> -                         char **digest,
+> -                         Error **errp);
+> -
+> -/**
+> - * qcrypto_hmac_digest:
+> - * @hmac: the hmac object
+> - * @buf: the memory region to hmac
+> - * @len: the length of @buf
+> - * @digest: pointer to hold output hmac
+> - * @errp: pointer to a NULL-initialized error object
+> - *
+> - * Computes the hmac across all the memory region
+> - * @buf of length @len. The @digest pointer will be
+> - * filled with the printable hex digest of the computed
+> - * hmac, which will be terminated by '\0'. The
+> - * memory pointer in @digest must be released
+> - * with a call to g_free() when no longer required.
+> - *
+> - * Returns: 0 on success, -1 on error
+> - */
+> -int qcrypto_hmac_digest(QCryptoHmac *hmac,
+> -                        const char *buf,
+> -                        size_t len,
+> -                        char **digest,
+> -                        Error **errp);
+> -
+> -#endif
+> diff --git a/include/crypto/hmac.h b/include/crypto/hmac.h
+> new file mode 100644
+> index 0000000..0d3acd7
+> --- /dev/null
+> +++ b/include/crypto/hmac.h
+> @@ -0,0 +1,166 @@
 > +/*
-> + * for convinience tracing need to trace
-> + * observe_thread_begin
-> + * get_proc_file
-> + * proc_line_cb
-> + * observe_thread_end
+> + * QEMU Crypto hmac algorithms
+> + *
+> + * Copyright (c) 2016 HUAWEI TECHNOLOGIES CO., LTD.
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or
+> + * (at your option) any later version.  See the COPYING file in the
+> + * top-level directory.
+> + *
 > + */
-> +static void observe_thread(const char *msg, pid_t thread_id)
-> +{
-> +    trace_observe_thread_begin(msg);
-> +    observe_thread_proc("/proc/%d/status", thread_id);
-
-Better use FMT_pid from "qemu/osdep.h":
-
-     observe_thread_proc("/proc/%" FMT_pid "/status", thread_id);
-
-> +    observe_thread_proc("/proc/%d/syscall", thread_id);
-> +    observe_thread_proc("/proc/%d/stack", thread_id);
-> +    trace_observe_thread_end(msg);
-> +}
 > +
-> +#else
-> +static void observe_thread(const char *msg, pid_t thread_id)
-> +{
-> +}
+> +#ifndef QCRYPTO_HMAC_H
+> +#define QCRYPTO_HMAC_H
 > +
-> +#endif /* DEBUG_FAULT_PROCESS_STATUS */
+> +#include "qapi-types.h"
 > +
-> +static int get_mem_fault_cpu_index(pid_t pid)
->  {
->      CPUState *cpu_iter;
->
-> @@ -421,9 +505,20 @@ static int get_mem_fault_cpu_index(uint32_t pid)
->             return cpu_iter->cpu_index;
->      }
->      trace_get_mem_fault_cpu_index(pid);
-> +    observe_thread("not a vCPU", pid);
+> +typedef struct QCryptoHmac QCryptoHmac;
+> +struct QCryptoHmac {
+> +    QCryptoHashAlgorithm alg;
+> +    void *opaque;
+> +};
 > +
->      return -1;
->  }
->
-> +static void observe_vcpu_state(void)
-> +{
-> +    CPUState *cpu_iter;
-> +    CPU_FOREACH(cpu_iter) {
-> +        observe_thread("vCPU", cpu_iter->thread_id);
-> +        trace_vcpu_state(cpu_iter->running, cpu_iter->cpu_index);
-
-You inverted arguments:
-
-trace_vcpu_state(cpu_iter->cpu_index, cpu_iter->running);
-
-> +    }
-> +}
+> +/**
+> + * qcrypto_hmac_supports:
+> + * @alg: the hmac algorithm
+> + *
+> + * Determine if @alg hmac algorithm is supported by
+> + * the current configured build
+> + *
+> + * Returns:
+> + *  true if the algorithm is supported, false otherwise
+> + */
+> +bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg);
 > +
->  /*
->   * Handle faults detected by the USERFAULT markings
->   */
-> @@ -465,6 +560,7 @@ static void *postcopy_ram_fault_thread(void *opaque)
->          }
->
->          ret = read(mis->userfault_fd, &msg, sizeof(msg));
-> +        observe_vcpu_state();
->          if (ret != sizeof(msg)) {
->              if (errno == EAGAIN) {
->                  /*
-> diff --git a/migration/trace-events b/migration/trace-events
-> index ab2e1e4..3a74f91 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -202,6 +202,12 @@ save_xbzrle_page_overflow(void) ""
->  ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait: %" PRIu64 " milliseconds, %d iterations"
->  ram_load_complete(int ret, uint64_t seq_iter) "exit_code %d seq iteration %" PRIu64
->  get_mem_fault_cpu_index(uint32_t pid) "pid %u is not vCPU"
-> +observe_thread_status(int ptid, char *name, char *status) "host_tid %d %s %s"
-
-First argument is "pid_t ptid" so format should be "host_tid " FMT_pid " 
-%s %s" but there is no trace_observe_thread_status() in your code...
-
-> +vcpu_state(int cpu_index, int is_running) "cpu %d running %d"
-> +proc_line_cb(const char *str) "%s"
-> +get_proc_file(const char *str) "opened %s"
-> +observe_thread_begin(const char *str) "%s"
-> +observe_thread_end(const char *str) "%s"
->
->  # migration/exec.c
->  migration_exec_outgoing(const char *cmd) "cmd=%s"
+> +/**
+> + * qcrypto_hmac_new:
+> + * @alg: the hmac algorithm
+> + * @key: the key bytes
+> + * @nkey: the length of @key
+> + * @errp: pointer to a NULL-initialized error object
+> + *
+> + * Creates a new hmac object with the algorithm @alg
+> + *
+> + * The @key parameter provides the bytes representing
+> + * the secret key to use. The @nkey parameter specifies
+> + * the length of @key in bytes
+> + *
+> + * Note: must use qcrypto_hmac_free() to release the
+> + * returned hmac object when no longer required
+> + *
+> + * Returns:
+> + *  a new hmac object, or NULL on error
+> + */
+> +QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
+> +                              const uint8_t *key, size_t nkey,
+> +                              Error **errp);
+> +
+> +/**
+> + * qcrypto_hmac_free:
+> + * @hmac: the hmac object
+> + *
+> + * Release the memory associated with @hmac that was
+> + * previously allocated by qcrypto_hmac_new()
+> + */
+> +void qcrypto_hmac_free(QCryptoHmac *hmac);
+> +
+> +/**
+> + * qcrypto_hmac_bytesv:
+> + * @hmac: the hmac object
+> + * @iov: the array of memory regions to hmac
+> + * @niov: the length of @iov
+> + * @result: pointer to hold output hmac
+> + * @resultlen: pointer to hold length of @result
+> + * @errp: pointer to a NULL-initialized error object
+> + *
+> + * Computes the hmac across all the memory regions
+> + * present in @iov. The @result pointer will be
+> + * filled with raw bytes representing the computed
+> + * hmac, which will have length @resultlen. The
+> + * memory pointer in @result must be released
+> + * with a call to g_free() when no longer required.
+> + *
+> + * Returns:
+> + *  0 on success, -1 on error
+> + */
+> +int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
+> +                        const struct iovec *iov,
+> +                        size_t niov,
+> +                        uint8_t **result,
+> +                        size_t *resultlen,
+> +                        Error **errp);
+> +
+> +/**
+> + * qcrypto_hmac_bytes:
+> + * @hmac: the hmac object
+> + * @buf: the memory region to hmac
+> + * @len: the length of @buf
+> + * @result: pointer to hold output hmac
+> + * @resultlen: pointer to hold length of @result
+> + * @errp: pointer to a NULL-initialized error object
+> + *
+> + * Computes the hmac across all the memory region
+> + * @buf of length @len. The @result pointer will be
+> + * filled with raw bytes representing the computed
+> + * hmac, which will have length @resultlen. The
+> + * memory pointer in @result must be released
+> + * with a call to g_free() when no longer required.
+> + *
+> + * Returns:
+> + *  0 on success, -1 on error
+> + */
+> +int qcrypto_hmac_bytes(QCryptoHmac *hmac,
+> +                       const char *buf,
+> +                       size_t len,
+> +                       uint8_t **result,
+> +                       size_t *resultlen,
+> +                       Error **errp);
+> +
+> +/**
+> + * qcrypto_hmac_digestv:
+> + * @hmac: the hmac object
+> + * @iov: the array of memory regions to hmac
+> + * @niov: the length of @iov
+> + * @digest: pointer to hold output hmac
+> + * @errp: pointer to a NULL-initialized error object
+> + *
+> + * Computes the hmac across all the memory regions
+> + * present in @iov. The @digest pointer will be
+> + * filled with the printable hex digest of the computed
+> + * hmac, which will be terminated by '\0'. The
+> + * memory pointer in @digest must be released
+> + * with a call to g_free() when no longer required.
+> + *
+> + * Returns:
+> + *  0 on success, -1 on error
+> + */
+> +int qcrypto_hmac_digestv(QCryptoHmac *hmac,
+> +                         const struct iovec *iov,
+> +                         size_t niov,
+> +                         char **digest,
+> +                         Error **errp);
+> +
+> +/**
+> + * qcrypto_hmac_digest:
+> + * @hmac: the hmac object
+> + * @buf: the memory region to hmac
+> + * @len: the length of @buf
+> + * @digest: pointer to hold output hmac
+> + * @errp: pointer to a NULL-initialized error object
+> + *
+> + * Computes the hmac across all the memory region
+> + * @buf of length @len. The @digest pointer will be
+> + * filled with the printable hex digest of the computed
+> + * hmac, which will be terminated by '\0'. The
+> + * memory pointer in @digest must be released
+> + * with a call to g_free() when no longer required.
+> + *
+> + * Returns: 0 on success, -1 on error
+> + */
+> +int qcrypto_hmac_digest(QCryptoHmac *hmac,
+> +                        const char *buf,
+> +                        size_t len,
+> +                        char **digest,
+> +                        Error **errp);
+> +
+> +#endif
 >
