@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1czvYN-0003sG-Qi
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 21:34:10 -0400
+	(envelope-from <longpeng2@huawei.com>) id 1czvYK-0003rH-Mi
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 21:34:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1czvYJ-0005X8-4e
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 21:34:07 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3431
-	helo=dggrg02-dlp.huawei.com)
+	(envelope-from <longpeng2@huawei.com>) id 1czvYI-0005W8-23
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 21:34:04 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:3478
+	helo=dggrg01-dlp.huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1czvYI-0005UB-2G
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 21:34:03 -0400
+	(envelope-from <longpeng2@huawei.com>) id 1czvYG-0005Sm-Us
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 21:34:01 -0400
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
-Date: Mon, 17 Apr 2017 09:33:15 +0800
-Message-ID: <1492392806-53720-8-git-send-email-longpeng2@huawei.com>
+Date: Mon, 17 Apr 2017 09:33:13 +0800
+Message-ID: <1492392806-53720-6-git-send-email-longpeng2@huawei.com>
 In-Reply-To: <1492392806-53720-1-git-send-email-longpeng2@huawei.com>
 References: <1492392806-53720-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 for-2.10 07/18] crypto: hmac: move
- crypto/hmac.h into include/crypto/
+Subject: [Qemu-devel] [PATCH v2 for-2.10 05/18] crypto: cipher: add cipher
+ driver framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,198 +30,476 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: berrange@redhat.com
 Cc: arei.gonglei@huawei.com, weidong.huang@huawei.com, armbru@redhat.com, eblake@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-Moves crypto/hmac.h into include/crypto/, likes cipher.h and hash.h
+1) makes the public APIs in cipher-nettle/gcrypt/builtin static,
+   and rename them with "nettle/gcrypt/builtin" prefix.
+
+2) introduces cipher framework, including QCryptoCipherDriver
+   and new public APIs.
 
 Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 ---
- crypto/hmac.h         | 166 --------------------------------------------------
- include/crypto/hmac.h | 166 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 166 insertions(+), 166 deletions(-)
- delete mode 100644 crypto/hmac.h
- create mode 100644 include/crypto/hmac.h
+ crypto/cipher-builtin.c | 64 +++++++++++++++++--------------------------
+ crypto/cipher-gcrypt.c  | 72 +++++++++++++++++++++----------------------------
+ crypto/cipher-nettle.c  | 71 ++++++++++++++++++++----------------------------
+ crypto/cipher.c         | 65 ++++++++++++++++++++++++++++++++++++++++++++
+ crypto/cipherpriv.h     | 40 +++++++++++++++++++++++++++
+ include/crypto/cipher.h |  1 +
+ 6 files changed, 190 insertions(+), 123 deletions(-)
+ create mode 100644 crypto/cipherpriv.h
 
-diff --git a/crypto/hmac.h b/crypto/hmac.h
-deleted file mode 100644
-index 0d3acd7..0000000
---- a/crypto/hmac.h
-+++ /dev/null
-@@ -1,166 +0,0 @@
--/*
-- * QEMU Crypto hmac algorithms
-- *
-- * Copyright (c) 2016 HUAWEI TECHNOLOGIES CO., LTD.
-- *
-- * This work is licensed under the terms of the GNU GPL, version 2 or
-- * (at your option) any later version.  See the COPYING file in the
-- * top-level directory.
-- *
-- */
+diff --git a/crypto/cipher-builtin.c b/crypto/cipher-builtin.c
+index 8cf47d1..16a36d4 100644
+--- a/crypto/cipher-builtin.c
++++ b/crypto/cipher-builtin.c
+@@ -22,6 +22,7 @@
+ #include "crypto/aes.h"
+ #include "crypto/desrfb.h"
+ #include "crypto/xts.h"
++#include "cipherpriv.h"
+ 
+ typedef struct QCryptoCipherBuiltinAESContext QCryptoCipherBuiltinAESContext;
+ struct QCryptoCipherBuiltinAESContext {
+@@ -466,25 +467,22 @@ static QCryptoCipherBuiltin *qcrypto_cipher_ctx_new(QCryptoCipherAlgorithm alg,
+     return ctxt;
+ }
+ 
+-void qcrypto_cipher_free(QCryptoCipher *cipher)
++static void
++qcrypto_builtin_cipher_ctx_free(QCryptoCipher *cipher)
+ {
+     QCryptoCipherBuiltin *ctxt;
+ 
+-    if (!cipher) {
+-        return;
+-    }
 -
--#ifndef QCRYPTO_HMAC_H
--#define QCRYPTO_HMAC_H
+     ctxt = cipher->opaque;
+     ctxt->free(cipher);
+-    g_free(cipher);
+ }
+ 
+ 
+-int qcrypto_cipher_encrypt(QCryptoCipher *cipher,
+-                           const void *in,
+-                           void *out,
+-                           size_t len,
+-                           Error **errp)
++static int
++qcrypto_builtin_cipher_encrypt(QCryptoCipher *cipher,
++                               const void *in,
++                               void *out,
++                               size_t len,
++                               Error **errp)
+ {
+     QCryptoCipherBuiltin *ctxt = cipher->opaque;
+ 
+@@ -498,11 +496,12 @@ int qcrypto_cipher_encrypt(QCryptoCipher *cipher,
+ }
+ 
+ 
+-int qcrypto_cipher_decrypt(QCryptoCipher *cipher,
+-                           const void *in,
+-                           void *out,
+-                           size_t len,
+-                           Error **errp)
++static int
++qcrypto_builtin_cipher_decrypt(QCryptoCipher *cipher,
++                               const void *in,
++                               void *out,
++                               size_t len,
++                               Error **errp)
+ {
+     QCryptoCipherBuiltin *ctxt = cipher->opaque;
+ 
+@@ -516,9 +515,10 @@ int qcrypto_cipher_decrypt(QCryptoCipher *cipher,
+ }
+ 
+ 
+-int qcrypto_cipher_setiv(QCryptoCipher *cipher,
+-                         const uint8_t *iv, size_t niv,
+-                         Error **errp)
++static int
++qcrypto_builtin_cipher_setiv(QCryptoCipher *cipher,
++                             const uint8_t *iv, size_t niv,
++                             Error **errp)
+ {
+     QCryptoCipherBuiltin *ctxt = cipher->opaque;
+ 
+@@ -526,23 +526,9 @@ int qcrypto_cipher_setiv(QCryptoCipher *cipher,
+ }
+ 
+ 
+-QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+-                                  QCryptoCipherMode mode,
+-                                  const uint8_t *key, size_t nkey,
+-                                  Error **errp)
+-{
+-    QCryptoCipher *cipher;
+-    QCryptoCipherBuiltin *ctxt;
 -
--#include "qapi-types.h"
+-    ctxt = qcrypto_cipher_ctx_new(alg, mode, key, nkey, errp);
+-    if (ctxt == NULL) {
+-        return NULL;
+-    }
 -
--typedef struct QCryptoHmac QCryptoHmac;
--struct QCryptoHmac {
--    QCryptoHashAlgorithm alg;
--    void *opaque;
--};
+-    cipher = g_new0(QCryptoCipher, 1);
+-    cipher->alg = alg;
+-    cipher->mode = mode;
+-    cipher->opaque = ctxt;
 -
--/**
-- * qcrypto_hmac_supports:
-- * @alg: the hmac algorithm
-- *
-- * Determine if @alg hmac algorithm is supported by
-- * the current configured build
-- *
-- * Returns:
-- *  true if the algorithm is supported, false otherwise
-- */
--bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg);
+-    return cipher;
+-}
++static struct QCryptoCipherDriver qcrypto_cipher_lib_driver = {
++    .cipher_encrypt = qcrypto_builtin_cipher_encrypt,
++    .cipher_decrypt = qcrypto_builtin_cipher_decrypt,
++    .cipher_setiv = qcrypto_builtin_cipher_setiv,
++    .cipher_free = qcrypto_builtin_cipher_ctx_free,
++};
+diff --git a/crypto/cipher-gcrypt.c b/crypto/cipher-gcrypt.c
+index 871730b..0489147 100644
+--- a/crypto/cipher-gcrypt.c
++++ b/crypto/cipher-gcrypt.c
+@@ -20,6 +20,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "crypto/xts.h"
++#include "cipherpriv.h"
+ 
+ #include <gcrypt.h>
+ 
+@@ -64,8 +65,9 @@ struct QCryptoCipherGcrypt {
+     uint8_t *iv;
+ };
+ 
+-static void gcrypt_cipher_free_ctx(QCryptoCipherGcrypt *ctx,
+-                                   QCryptoCipherMode mode)
++static void
++qcrypto_gcrypt_cipher_free_ctx(QCryptoCipherGcrypt *ctx,
++                               QCryptoCipherMode mode)
+ {
+     if (!ctx) {
+         return;
+@@ -239,18 +241,15 @@ static QCryptoCipherGcrypt *qcrypto_cipher_ctx_new(QCryptoCipherAlgorithm alg,
+     return ctx;
+ 
+  error:
+-    gcrypt_cipher_free_ctx(ctx, mode);
++    qcrypto_gcrypt_cipher_free_ctx(ctx, mode);
+     return NULL;
+ }
+ 
+ 
+-void qcrypto_cipher_free(QCryptoCipher *cipher)
++static void
++qcrypto_gcrypt_cipher_ctx_free(QCryptoCipher *cipher)
+ {
+-    if (!cipher) {
+-        return;
+-    }
+-    gcrypt_cipher_free_ctx(cipher->opaque, cipher->mode);
+-    g_free(cipher);
++    qcrypto_gcrypt_cipher_free_ctx(cipher->opaque, cipher->mode);
+ }
+ 
+ 
+@@ -274,11 +273,12 @@ static void qcrypto_gcrypt_xts_decrypt(const void *ctx,
+     g_assert(err == 0);
+ }
+ 
+-int qcrypto_cipher_encrypt(QCryptoCipher *cipher,
+-                           const void *in,
+-                           void *out,
+-                           size_t len,
+-                           Error **errp)
++static int
++qcrypto_gcrypt_cipher_encrypt(QCryptoCipher *cipher,
++                              const void *in,
++                              void *out,
++                              size_t len,
++                              Error **errp)
+ {
+     QCryptoCipherGcrypt *ctx = cipher->opaque;
+     gcry_error_t err;
+@@ -309,11 +309,12 @@ int qcrypto_cipher_encrypt(QCryptoCipher *cipher,
+ }
+ 
+ 
+-int qcrypto_cipher_decrypt(QCryptoCipher *cipher,
+-                           const void *in,
+-                           void *out,
+-                           size_t len,
+-                           Error **errp)
++static int
++qcrypto_gcrypt_cipher_decrypt(QCryptoCipher *cipher,
++                              const void *in,
++                              void *out,
++                              size_t len,
++                              Error **errp)
+ {
+     QCryptoCipherGcrypt *ctx = cipher->opaque;
+     gcry_error_t err;
+@@ -343,9 +344,10 @@ int qcrypto_cipher_decrypt(QCryptoCipher *cipher,
+     return 0;
+ }
+ 
+-int qcrypto_cipher_setiv(QCryptoCipher *cipher,
+-                         const uint8_t *iv, size_t niv,
+-                         Error **errp)
++static int
++qcrypto_gcrypt_cipher_setiv(QCryptoCipher *cipher,
++                            const uint8_t *iv, size_t niv,
++                            Error **errp)
+ {
+     QCryptoCipherGcrypt *ctx = cipher->opaque;
+     gcry_error_t err;
+@@ -381,23 +383,9 @@ int qcrypto_cipher_setiv(QCryptoCipher *cipher,
+ }
+ 
+ 
+-QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+-                                  QCryptoCipherMode mode,
+-                                  const uint8_t *key, size_t nkey,
+-                                  Error **errp)
+-{
+-    QCryptoCipher *cipher;
+-    QCryptoCipherGcrypt *ctx;
 -
--/**
-- * qcrypto_hmac_new:
-- * @alg: the hmac algorithm
-- * @key: the key bytes
-- * @nkey: the length of @key
-- * @errp: pointer to a NULL-initialized error object
-- *
-- * Creates a new hmac object with the algorithm @alg
-- *
-- * The @key parameter provides the bytes representing
-- * the secret key to use. The @nkey parameter specifies
-- * the length of @key in bytes
-- *
-- * Note: must use qcrypto_hmac_free() to release the
-- * returned hmac object when no longer required
-- *
-- * Returns:
-- *  a new hmac object, or NULL on error
-- */
--QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
--                              const uint8_t *key, size_t nkey,
--                              Error **errp);
+-    ctx = qcrypto_cipher_ctx_new(alg, mode, key, nkey, errp);
+-    if (ctx == NULL) {
+-        return NULL;
+-    }
 -
--/**
-- * qcrypto_hmac_free:
-- * @hmac: the hmac object
-- *
-- * Release the memory associated with @hmac that was
-- * previously allocated by qcrypto_hmac_new()
-- */
--void qcrypto_hmac_free(QCryptoHmac *hmac);
+-    cipher = g_new0(QCryptoCipher, 1);
+-    cipher->alg = alg;
+-    cipher->mode = mode;
+-    cipher->opaque = ctx;
 -
--/**
-- * qcrypto_hmac_bytesv:
-- * @hmac: the hmac object
-- * @iov: the array of memory regions to hmac
-- * @niov: the length of @iov
-- * @result: pointer to hold output hmac
-- * @resultlen: pointer to hold length of @result
-- * @errp: pointer to a NULL-initialized error object
-- *
-- * Computes the hmac across all the memory regions
-- * present in @iov. The @result pointer will be
-- * filled with raw bytes representing the computed
-- * hmac, which will have length @resultlen. The
-- * memory pointer in @result must be released
-- * with a call to g_free() when no longer required.
-- *
-- * Returns:
-- *  0 on success, -1 on error
-- */
--int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
--                        const struct iovec *iov,
--                        size_t niov,
--                        uint8_t **result,
--                        size_t *resultlen,
--                        Error **errp);
+-    return cipher;
+-}
++static struct QCryptoCipherDriver qcrypto_cipher_lib_driver = {
++    .cipher_encrypt = qcrypto_gcrypt_cipher_encrypt,
++    .cipher_decrypt = qcrypto_gcrypt_cipher_decrypt,
++    .cipher_setiv = qcrypto_gcrypt_cipher_setiv,
++    .cipher_free = qcrypto_gcrypt_cipher_ctx_free,
++};
+diff --git a/crypto/cipher-nettle.c b/crypto/cipher-nettle.c
+index e6d6e6c..c51f119 100644
+--- a/crypto/cipher-nettle.c
++++ b/crypto/cipher-nettle.c
+@@ -20,6 +20,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "crypto/xts.h"
++#include "cipherpriv.h"
+ 
+ #include <nettle/nettle-types.h>
+ #include <nettle/aes.h>
+@@ -249,7 +250,8 @@ bool qcrypto_cipher_supports(QCryptoCipherAlgorithm alg,
+ }
+ 
+ 
+-static void nettle_cipher_free_ctx(QCryptoCipherNettle *ctx)
++static void
++qcrypto_nettle_cipher_free_ctx(QCryptoCipherNettle *ctx)
+ {
+     if (!ctx) {
+         return;
+@@ -434,30 +436,27 @@ static QCryptoCipherNettle *qcrypto_cipher_ctx_new(QCryptoCipherAlgorithm alg,
+     return ctx;
+ 
+  error:
+-    nettle_cipher_free_ctx(ctx);
++    qcrypto_nettle_cipher_free_ctx(ctx);
+     return NULL;
+ }
+ 
+ 
+-void qcrypto_cipher_free(QCryptoCipher *cipher)
++static void
++qcrypto_nettle_cipher_ctx_free(QCryptoCipher *cipher)
+ {
+     QCryptoCipherNettle *ctx;
+ 
+-    if (!cipher) {
+-        return;
+-    }
 -
--/**
-- * qcrypto_hmac_bytes:
-- * @hmac: the hmac object
-- * @buf: the memory region to hmac
-- * @len: the length of @buf
-- * @result: pointer to hold output hmac
-- * @resultlen: pointer to hold length of @result
-- * @errp: pointer to a NULL-initialized error object
-- *
-- * Computes the hmac across all the memory region
-- * @buf of length @len. The @result pointer will be
-- * filled with raw bytes representing the computed
-- * hmac, which will have length @resultlen. The
-- * memory pointer in @result must be released
-- * with a call to g_free() when no longer required.
-- *
-- * Returns:
-- *  0 on success, -1 on error
-- */
--int qcrypto_hmac_bytes(QCryptoHmac *hmac,
--                       const char *buf,
--                       size_t len,
--                       uint8_t **result,
--                       size_t *resultlen,
--                       Error **errp);
+     ctx = cipher->opaque;
+-    nettle_cipher_free_ctx(ctx);
+-    g_free(cipher);
++    qcrypto_nettle_cipher_free_ctx(ctx);
+ }
+ 
+ 
+-int qcrypto_cipher_encrypt(QCryptoCipher *cipher,
+-                           const void *in,
+-                           void *out,
+-                           size_t len,
+-                           Error **errp)
++static int
++qcrypto_nettle_cipher_encrypt(QCryptoCipher *cipher,
++                              const void *in,
++                              void *out,
++                              size_t len,
++                              Error **errp)
+ {
+     QCryptoCipherNettle *ctx = cipher->opaque;
+ 
+@@ -499,11 +498,12 @@ int qcrypto_cipher_encrypt(QCryptoCipher *cipher,
+ }
+ 
+ 
+-int qcrypto_cipher_decrypt(QCryptoCipher *cipher,
+-                           const void *in,
+-                           void *out,
+-                           size_t len,
+-                           Error **errp)
++static int
++qcrypto_nettle_cipher_decrypt(QCryptoCipher *cipher,
++                              const void *in,
++                              void *out,
++                              size_t len,
++                              Error **errp)
+ {
+     QCryptoCipherNettle *ctx = cipher->opaque;
+ 
+@@ -543,9 +543,10 @@ int qcrypto_cipher_decrypt(QCryptoCipher *cipher,
+     return 0;
+ }
+ 
+-int qcrypto_cipher_setiv(QCryptoCipher *cipher,
+-                         const uint8_t *iv, size_t niv,
+-                         Error **errp)
++static int
++qcrypto_nettle_cipher_setiv(QCryptoCipher *cipher,
++                            const uint8_t *iv, size_t niv,
++                            Error **errp)
+ {
+     QCryptoCipherNettle *ctx = cipher->opaque;
+     if (niv != ctx->blocksize) {
+@@ -558,23 +559,9 @@ int qcrypto_cipher_setiv(QCryptoCipher *cipher,
+ }
+ 
+ 
+-QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+-                                  QCryptoCipherMode mode,
+-                                  const uint8_t *key, size_t nkey,
+-                                  Error **errp)
+-{
+-    QCryptoCipher *cipher;
+-    QCryptoCipherNettle *ctx;
 -
--/**
-- * qcrypto_hmac_digestv:
-- * @hmac: the hmac object
-- * @iov: the array of memory regions to hmac
-- * @niov: the length of @iov
-- * @digest: pointer to hold output hmac
-- * @errp: pointer to a NULL-initialized error object
-- *
-- * Computes the hmac across all the memory regions
-- * present in @iov. The @digest pointer will be
-- * filled with the printable hex digest of the computed
-- * hmac, which will be terminated by '\0'. The
-- * memory pointer in @digest must be released
-- * with a call to g_free() when no longer required.
-- *
-- * Returns:
-- *  0 on success, -1 on error
-- */
--int qcrypto_hmac_digestv(QCryptoHmac *hmac,
--                         const struct iovec *iov,
--                         size_t niov,
--                         char **digest,
--                         Error **errp);
+-    ctx = qcrypto_cipher_ctx_new(alg, mode, key, nkey, errp);
+-    if (!ctx) {
+-        return NULL;
+-    }
 -
--/**
-- * qcrypto_hmac_digest:
-- * @hmac: the hmac object
-- * @buf: the memory region to hmac
-- * @len: the length of @buf
-- * @digest: pointer to hold output hmac
-- * @errp: pointer to a NULL-initialized error object
-- *
-- * Computes the hmac across all the memory region
-- * @buf of length @len. The @digest pointer will be
-- * filled with the printable hex digest of the computed
-- * hmac, which will be terminated by '\0'. The
-- * memory pointer in @digest must be released
-- * with a call to g_free() when no longer required.
-- *
-- * Returns: 0 on success, -1 on error
-- */
--int qcrypto_hmac_digest(QCryptoHmac *hmac,
--                        const char *buf,
--                        size_t len,
--                        char **digest,
--                        Error **errp);
+-    cipher = g_new0(QCryptoCipher, 1);
+-    cipher->alg = alg;
+-    cipher->mode = mode;
+-    cipher->opaque = ctx;
 -
--#endif
-diff --git a/include/crypto/hmac.h b/include/crypto/hmac.h
+-    return cipher;
+-}
++static struct QCryptoCipherDriver qcrypto_cipher_lib_driver = {
++    .cipher_encrypt = qcrypto_nettle_cipher_encrypt,
++    .cipher_decrypt = qcrypto_nettle_cipher_decrypt,
++    .cipher_setiv = qcrypto_nettle_cipher_setiv,
++    .cipher_free = qcrypto_nettle_cipher_ctx_free,
++};
+diff --git a/crypto/cipher.c b/crypto/cipher.c
+index 5a96489..a6e052c 100644
+--- a/crypto/cipher.c
++++ b/crypto/cipher.c
+@@ -21,6 +21,7 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "crypto/cipher.h"
++#include "cipherpriv.h"
+ 
+ 
+ static size_t alg_key_len[QCRYPTO_CIPHER_ALG__MAX] = {
+@@ -155,3 +156,67 @@ qcrypto_cipher_munge_des_rfb_key(const uint8_t *key,
+ #else
+ #include "crypto/cipher-builtin.c"
+ #endif
++
++QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
++                                  QCryptoCipherMode mode,
++                                  const uint8_t *key, size_t nkey,
++                                  Error **errp)
++{
++    QCryptoCipher *cipher;
++    void *ctx;
++
++    ctx = qcrypto_cipher_ctx_new(alg, mode, key, nkey, errp);
++    if (ctx == NULL) {
++        return NULL;
++    }
++
++    cipher = g_new0(QCryptoCipher, 1);
++    cipher->alg = alg;
++    cipher->mode = mode;
++    cipher->opaque = ctx;
++    cipher->driver = (void *)&qcrypto_cipher_lib_driver;
++
++    return cipher;
++}
++
++
++int qcrypto_cipher_encrypt(QCryptoCipher *cipher,
++                           const void *in,
++                           void *out,
++                           size_t len,
++                           Error **errp)
++{
++    QCryptoCipherDriver *drv = cipher->driver;
++    return drv->cipher_encrypt(cipher, in, out, len, errp);
++}
++
++
++int qcrypto_cipher_decrypt(QCryptoCipher *cipher,
++                           const void *in,
++                           void *out,
++                           size_t len,
++                           Error **errp)
++{
++    QCryptoCipherDriver *drv = cipher->driver;
++    return drv->cipher_decrypt(cipher, in, out, len, errp);
++}
++
++
++int qcrypto_cipher_setiv(QCryptoCipher *cipher,
++                         const uint8_t *iv, size_t niv,
++                         Error **errp)
++{
++    QCryptoCipherDriver *drv = cipher->driver;
++    return drv->cipher_setiv(cipher, iv, niv, errp);
++}
++
++
++void qcrypto_cipher_free(QCryptoCipher *cipher)
++{
++    QCryptoCipherDriver *drv;
++    if (cipher) {
++        drv = cipher->driver;
++        drv->cipher_free(cipher);
++        g_free(cipher);
++    }
++}
+diff --git a/crypto/cipherpriv.h b/crypto/cipherpriv.h
 new file mode 100644
-index 0000000..0d3acd7
+index 0000000..4af5e85
 --- /dev/null
-+++ b/include/crypto/hmac.h
-@@ -0,0 +1,166 @@
++++ b/crypto/cipherpriv.h
+@@ -0,0 +1,40 @@
 +/*
-+ * QEMU Crypto hmac algorithms
++ * QEMU Crypto cipher driver supports
 + *
-+ * Copyright (c) 2016 HUAWEI TECHNOLOGIES CO., LTD.
++ * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
++ *
++ * Authors:
++ *    Longpeng(Mike) <longpeng2@huawei.com>
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or
 + * (at your option) any later version.  See the COPYING file in the
@@ -229,160 +507,43 @@ index 0000000..0d3acd7
 + *
 + */
 +
-+#ifndef QCRYPTO_HMAC_H
-+#define QCRYPTO_HMAC_H
++#ifndef QCRYPTO_CIPHERPRIV_H
++#define QCRYPTO_CIPHERPRIV_H
 +
-+#include "qapi-types.h"
++typedef struct QCryptoCipherDriver QCryptoCipherDriver;
 +
-+typedef struct QCryptoHmac QCryptoHmac;
-+struct QCryptoHmac {
-+    QCryptoHashAlgorithm alg;
-+    void *opaque;
++struct QCryptoCipherDriver {
++    int (*cipher_encrypt)(QCryptoCipher *cipher,
++                          const void *in,
++                          void *out,
++                          size_t len,
++                          Error **errp);
++
++    int (*cipher_decrypt)(QCryptoCipher *cipher,
++                          const void *in,
++                          void *out,
++                          size_t len,
++                          Error **errp);
++
++    int (*cipher_setiv)(QCryptoCipher *cipher,
++                        const uint8_t *iv, size_t niv,
++                        Error **errp);
++
++    void (*cipher_free)(QCryptoCipher *cipher);
 +};
 +
-+/**
-+ * qcrypto_hmac_supports:
-+ * @alg: the hmac algorithm
-+ *
-+ * Determine if @alg hmac algorithm is supported by
-+ * the current configured build
-+ *
-+ * Returns:
-+ *  true if the algorithm is supported, false otherwise
-+ */
-+bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg);
-+
-+/**
-+ * qcrypto_hmac_new:
-+ * @alg: the hmac algorithm
-+ * @key: the key bytes
-+ * @nkey: the length of @key
-+ * @errp: pointer to a NULL-initialized error object
-+ *
-+ * Creates a new hmac object with the algorithm @alg
-+ *
-+ * The @key parameter provides the bytes representing
-+ * the secret key to use. The @nkey parameter specifies
-+ * the length of @key in bytes
-+ *
-+ * Note: must use qcrypto_hmac_free() to release the
-+ * returned hmac object when no longer required
-+ *
-+ * Returns:
-+ *  a new hmac object, or NULL on error
-+ */
-+QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
-+                              const uint8_t *key, size_t nkey,
-+                              Error **errp);
-+
-+/**
-+ * qcrypto_hmac_free:
-+ * @hmac: the hmac object
-+ *
-+ * Release the memory associated with @hmac that was
-+ * previously allocated by qcrypto_hmac_new()
-+ */
-+void qcrypto_hmac_free(QCryptoHmac *hmac);
-+
-+/**
-+ * qcrypto_hmac_bytesv:
-+ * @hmac: the hmac object
-+ * @iov: the array of memory regions to hmac
-+ * @niov: the length of @iov
-+ * @result: pointer to hold output hmac
-+ * @resultlen: pointer to hold length of @result
-+ * @errp: pointer to a NULL-initialized error object
-+ *
-+ * Computes the hmac across all the memory regions
-+ * present in @iov. The @result pointer will be
-+ * filled with raw bytes representing the computed
-+ * hmac, which will have length @resultlen. The
-+ * memory pointer in @result must be released
-+ * with a call to g_free() when no longer required.
-+ *
-+ * Returns:
-+ *  0 on success, -1 on error
-+ */
-+int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
-+                        const struct iovec *iov,
-+                        size_t niov,
-+                        uint8_t **result,
-+                        size_t *resultlen,
-+                        Error **errp);
-+
-+/**
-+ * qcrypto_hmac_bytes:
-+ * @hmac: the hmac object
-+ * @buf: the memory region to hmac
-+ * @len: the length of @buf
-+ * @result: pointer to hold output hmac
-+ * @resultlen: pointer to hold length of @result
-+ * @errp: pointer to a NULL-initialized error object
-+ *
-+ * Computes the hmac across all the memory region
-+ * @buf of length @len. The @result pointer will be
-+ * filled with raw bytes representing the computed
-+ * hmac, which will have length @resultlen. The
-+ * memory pointer in @result must be released
-+ * with a call to g_free() when no longer required.
-+ *
-+ * Returns:
-+ *  0 on success, -1 on error
-+ */
-+int qcrypto_hmac_bytes(QCryptoHmac *hmac,
-+                       const char *buf,
-+                       size_t len,
-+                       uint8_t **result,
-+                       size_t *resultlen,
-+                       Error **errp);
-+
-+/**
-+ * qcrypto_hmac_digestv:
-+ * @hmac: the hmac object
-+ * @iov: the array of memory regions to hmac
-+ * @niov: the length of @iov
-+ * @digest: pointer to hold output hmac
-+ * @errp: pointer to a NULL-initialized error object
-+ *
-+ * Computes the hmac across all the memory regions
-+ * present in @iov. The @digest pointer will be
-+ * filled with the printable hex digest of the computed
-+ * hmac, which will be terminated by '\0'. The
-+ * memory pointer in @digest must be released
-+ * with a call to g_free() when no longer required.
-+ *
-+ * Returns:
-+ *  0 on success, -1 on error
-+ */
-+int qcrypto_hmac_digestv(QCryptoHmac *hmac,
-+                         const struct iovec *iov,
-+                         size_t niov,
-+                         char **digest,
-+                         Error **errp);
-+
-+/**
-+ * qcrypto_hmac_digest:
-+ * @hmac: the hmac object
-+ * @buf: the memory region to hmac
-+ * @len: the length of @buf
-+ * @digest: pointer to hold output hmac
-+ * @errp: pointer to a NULL-initialized error object
-+ *
-+ * Computes the hmac across all the memory region
-+ * @buf of length @len. The @digest pointer will be
-+ * filled with the printable hex digest of the computed
-+ * hmac, which will be terminated by '\0'. The
-+ * memory pointer in @digest must be released
-+ * with a call to g_free() when no longer required.
-+ *
-+ * Returns: 0 on success, -1 on error
-+ */
-+int qcrypto_hmac_digest(QCryptoHmac *hmac,
-+                        const char *buf,
-+                        size_t len,
-+                        char **digest,
-+                        Error **errp);
-+
 +#endif
+diff --git a/include/crypto/cipher.h b/include/crypto/cipher.h
+index bec9f41..984fb82 100644
+--- a/include/crypto/cipher.h
++++ b/include/crypto/cipher.h
+@@ -80,6 +80,7 @@ struct QCryptoCipher {
+     QCryptoCipherAlgorithm alg;
+     QCryptoCipherMode mode;
+     void *opaque;
++    void *driver;
+ };
+ 
+ /**
 -- 
 1.8.3.1
