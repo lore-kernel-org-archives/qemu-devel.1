@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0Ckp-00051u-Lr
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 15:56:08 -0400
+	(envelope-from <quintela@redhat.com>) id 1d0CpP-0005yO-Jj
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 16:00:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0Cko-0002eu-CQ
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 15:56:07 -0400
-References: <20170411222945.11741-1-eblake@redhat.com>
-	<20170411222945.11741-3-eblake@redhat.com>
-	<50d265a3-dec8-59f9-6840-c5720e406fa6@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1412228f-01c5-da47-31db-4ed34c7dc055@redhat.com>
-Date: Mon, 17 Apr 2017 14:55:53 -0500
-MIME-Version: 1.0
-In-Reply-To: <50d265a3-dec8-59f9-6840-c5720e406fa6@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="dT2A9X4PxkTFqOUsQ8UWkHI96V7TC1bJJ"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 02/17] trace: Show blockjob
- actions via bytes, not sectors
+	(envelope-from <quintela@redhat.com>) id 1d0CpN-0004Mb-Gs
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 16:00:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39298)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d0CpN-0004LO-Au
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 16:00:49 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BAE7C8047E
+	for <qemu-devel@nongnu.org>; Mon, 17 Apr 2017 20:00:46 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Mon, 17 Apr 2017 22:00:24 +0200
+Message-Id: <20170417200041.2451-3-quintela@redhat.com>
+In-Reply-To: <20170417200041.2451-1-quintela@redhat.com>
+References: <20170417200041.2451-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH 02/19] migration: They are called vmstate_foo,
+ move them to vmstate.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,103 +30,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---dT2A9X4PxkTFqOUsQ8UWkHI96V7TC1bJJ
-From: Eric Blake <eblake@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <1412228f-01c5-da47-31db-4ed34c7dc055@redhat.com>
-Subject: Re: [Qemu-block] [PATCH 02/17] trace: Show blockjob actions via
- bytes, not sectors
-References: <20170411222945.11741-1-eblake@redhat.com>
- <20170411222945.11741-3-eblake@redhat.com>
- <50d265a3-dec8-59f9-6840-c5720e406fa6@redhat.com>
-In-Reply-To: <50d265a3-dec8-59f9-6840-c5720e406fa6@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
+ migration/savevm.c  | 17 -----------------
+ migration/vmstate.c | 16 ++++++++++++++++
+ 2 files changed, 16 insertions(+), 17 deletions(-)
 
-On 04/17/2017 02:18 PM, John Snow wrote:
-
->> @@ -346,13 +349,15 @@ static uint64_t coroutine_fn mirror_iteration(Mi=
-rrorBlockJob *s)
->>      if (sector_num < 0) {
->>          bdrv_set_dirty_iter(s->dbi, 0);
->>          sector_num =3D bdrv_dirty_iter_next(s->dbi);
->> -        trace_mirror_restart_iter(s, bdrv_get_dirty_count(s->dirty_bi=
-tmap));
->> +        trace_mirror_restart_iter(s, bdrv_get_dirty_count(s->dirty_bi=
-tmap) *
->> +                                  BDRV_SECTOR_SIZE);
->=20
-> mirror_restart_iter(void *s, int64_t cnt) "s %p dirty count %"PRId64
->=20
-> I guess the print doesn't really bother to say what the unit is, just a=
-
-> "dirty count."
->=20
-> Does this conflict with the bitmap series, though? (Won't need to scale=
-
-> by BDRV_SECTOR_SIZE after that, I think.)
->=20
-
-That series depends on this one going in first (as currently written),
-and indeed, in that series, the code DOES simplify to drop the '*
-BDRV_SECTOR_SIZE' in the patch that changes the return scale of
-bdrv_get_dirty_count().
-
-
->>  backup_do_cow_skip(void *job, int64_t start) "job %p start %"PRId64
->>  backup_do_cow_process(void *job, int64_t start) "job %p start %"PRId6=
-4
->>  backup_do_cow_read_fail(void *job, int64_t start, int ret) "job %p st=
-art %"PRId64" ret %d"
->=20
-> I guess these three were "cluster" based, but you didn't need to change=
-
-> anything to assert them as byte-based.
->=20
->>
->=20
-> Under the assumption that it's okay to change tracing output without
-> being able to differentiate between new and old output:
-
-I'll leave that to Stefan's discretion as trace maintainer, but my
-thoughts are that tracing is for debugging purposes, and as long as you
-know what binary you are debugging, you can figure out what the trace
-message meant by referring back to the source that generated that binary.=
-
-
->=20
-> Reviewed-by: John Snow <jsnow@redhat.com>
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---dT2A9X4PxkTFqOUsQ8UWkHI96V7TC1bJJ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY9R3JAAoJEKeha0olJ0NqMooH/j617O5NHM271KrC6AT8c/zJ
-0+YPOlLFhTR2fZ9rxI/PHZnzStkhMbDrKyMua5k1yaAMXE8a2F5+8LzQuPJXJCO1
-ivfEmvS5m7teQbRhFVxuXeS/TLqqhPRTah5st+AGTw3wLQM2qKcHC+SfiavTg0Jq
-lNEZPvTvg8+xOo7+6XIw01NX/lQpKrrgyuTG1zfEZojYF0h9jOobEgVXLkHODS6N
-qr4dAP+SC7CBHk9F+rfBdMTwkSnPnXjHAx2dH+QUxGJRvp+VarhAyV7mSLaOsXqo
-NU+vJZK3WX7Laem9DSUlgXgT4RfO3QGq9yRaA/DYnW6ufDNmxEevDRHOg5HNooo=
-=+RfV
------END PGP SIGNATURE-----
-
---dT2A9X4PxkTFqOUsQ8UWkHI96V7TC1bJJ--
+diff --git a/migration/savevm.c b/migration/savevm.c
+index cc9c086..c47b209 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -45,7 +45,6 @@
+ #include "qemu/sockets.h"
+ #include "qemu/queue.h"
+ #include "sysemu/cpus.h"
+-#include "exec/memory.h"
+ #include "qmp-commands.h"
+ #include "trace.h"
+ #include "qemu/bitops.h"
+@@ -2465,19 +2464,3 @@ void hmp_info_snapshots(Monitor *mon, const QDict *qdict)
+     g_free(global_snapshots);
+ 
+ }
+-
+-void vmstate_register_ram(MemoryRegion *mr, DeviceState *dev)
+-{
+-    qemu_ram_set_idstr(mr->ram_block,
+-                       memory_region_name(mr), dev);
+-}
+-
+-void vmstate_unregister_ram(MemoryRegion *mr, DeviceState *dev)
+-{
+-    qemu_ram_unset_idstr(mr->ram_block);
+-}
+-
+-void vmstate_register_ram_global(MemoryRegion *mr)
+-{
+-    vmstate_register_ram(mr, NULL);
+-}
+diff --git a/migration/vmstate.c b/migration/vmstate.c
+index 8a71349..174c490 100644
+--- a/migration/vmstate.c
++++ b/migration/vmstate.c
+@@ -1,5 +1,6 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
++#include "exec/memory.h"
+ #include "migration/migration.h"
+ #include "migration/qemu-file.h"
+ #include "migration/vmstate.h"
+@@ -1127,3 +1128,18 @@ bool vmstate_device_is_migratable(const VMStateDescription *vmsd)
+     return true;
+ }
+ 
++void vmstate_register_ram(MemoryRegion *mr, DeviceState *dev)
++{
++    qemu_ram_set_idstr(mr->ram_block,
++                       memory_region_name(mr), dev);
++}
++
++void vmstate_unregister_ram(MemoryRegion *mr, DeviceState *dev)
++{
++    qemu_ram_unset_idstr(mr->ram_block);
++}
++
++void vmstate_register_ram_global(MemoryRegion *mr)
++{
++    vmstate_register_ram(mr, NULL);
++}
+-- 
+2.9.3
