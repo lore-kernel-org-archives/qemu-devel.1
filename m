@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47595)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liqiang6-s@360.cn>) id 1d04hB-0005tn-S9
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 07:19:51 -0400
+	(envelope-from <jcody@redhat.com>) id 1d04jC-0007D7-Dd
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 07:21:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liqiang6-s@360.cn>) id 1d04h6-0002yh-S5
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 07:19:49 -0400
-Received: from mtabjsc2.360.cn ([123.125.82.7]:41254)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liqiang6-s@360.cn>) id 1d04h5-0002wk-Tv
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 07:19:44 -0400
-From: =?utf-8?B?5p2O5by6?= <liqiang6-s@360.cn>
-Date: Mon, 17 Apr 2017 11:19:34 +0000
-Message-ID: <143C0AFC63FC204CB0C55BB88F3A8ABB333D79D0@EX01.corp.qihoo.net>
-References: <CADUDsAo4-QypkwSR9p8ABpBRqtvCO886fec2BGdq1JtgCgt-6w@mail.gmail.com>
-	<20170417102607.GE16703@pxdev.xzpeter.org>
-	<CADUDsAqnRJDhYcu2nR-zk5fkJDQ8GKkR7GjO-MrAEiJTt_X+oA@mail.gmail.com>
-In-Reply-To: <CADUDsAqnRJDhYcu2nR-zk5fkJDQ8GKkR7GjO-MrAEiJTt_X+oA@mail.gmail.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <jcody@redhat.com>) id 1d04jB-00043a-3g
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 07:21:54 -0400
+Date: Mon, 17 Apr 2017 07:21:39 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170417112139.GO1135@localhost.localdomain>
+References: <20170414080206.2301-1-famz@redhat.com>
+	<CAJSP0QVbYRW0VD_1zUqU0T6V48wr_g3co8Dxs_ndpfA70d4TkQ@mail.gmail.com>
+	<20170417082719.GC13582@lemon.lan>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] qemu memory manage question
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170417082719.GC13582@lemon.lan>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.9-rc5 v2] block: Drain
+ BH in bdrv_drained_begin
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +25,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "jack.chen" <zhunxun@gmail.com>
-Cc: qemu <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUWVtdS1kZXZlbA0KPiBb
-bWFpbHRvOnFlbXUtZGV2ZWwtYm91bmNlcytsaXFpYW5nNi1zPTM2MC5jbkBub25nbnUub3JnXSBP
-biBCZWhhbGYgT2YNCj4gamFjay5jaGVuDQo+IFNlbnQ6IE1vbmRheSwgQXByaWwgMTcsIDIwMTcg
-Njo1NiBQTQ0KPiBUbzogUGV0ZXIgWHUNCj4gQ2M6IHFlbXUNCj4gU3ViamVjdDogUmU6IFtRZW11
-LWRldmVsXSBxZW11IG1lbW9yeSBtYW5hZ2UgcXVlc3Rpb24NCj4gDQo+IFRoYW5rcyxmcm9tIHRo
-ZSBwYXRoIHlvdSBoYXZlIGxpc3QgdG8gbWUsaXQgY2FuIGJlICB3ZWxsIGV4cGxhaW5lZCxidXQN
-Cj4gYWNjb3JkaW5nIHRvIHRoZSBzb3VyY2UgY29kZSxpbiB0aGUgZW5kIG9mIGt2bV9pbml0LGt2
-bV9tZW1vcnlfbGlzdGVuZXIgYW5kDQo+IGt2bV9pb19saXN0ZW5lciB3ZXJlIHJlZ2lzdGVyZWQg
-YnkgbWVtb3J5X2xpc3RlbmVyX3JlZ2lzdGVyKCksYW5kICBpbiB0aGUNCj4gZW5kIG9mDQo+IG1l
-bW9yeV9saXN0ZW5lcl9yZWdpc3RlcigpLGxpc3RlbmVyX2FkZF9hZGRyZXNzX3NwYWNlKCkgd2Fz
-IGNhbGxlZCBmb3IgZWFjaA0KPiBhZGRyZXNzX3NwYWNlLHNvIHRoZSBsaXN0ZW5lci0+cmVnaW9u
-X2FkZCB3YXMgZXhlY3V0ZWQgdGhlbi5JIGRvIG5vdCBrbm93DQo+IHdoYXQgbWlzdGFrZSBJIGhh
-dmUgbWFkZSxjYW4geW91IGV4cGxhaW4gaXQgdG8gbWUgPz8gdGhhbmsgeW91IHZlcnkgbXVjaCEN
-Cj4gDQoNClRoZXkgYXJlIGNhbGxiYWNrcy4NCkV2ZXJ5IGNoYW5nZSBvZiBtZW1vcnkgdG9wb2xv
-Z3kgd2lsbCBjYWxsIHRoZXNlIGxpc3RlbmVycywgYWRkIHN1YnJlZ2lvbihQZXRlcidzIGV4YW1w
-bGUpLA0KbW9kaWZ5IHRoZSBwcm9wZXJ0eSBvZiBtZW1vcnksIGNyZWF0ZSBhZGRyZXNzIHNwYWNl
-IGZvciBleGFtcGxlLiANCg0KVGhhbmtzLg0KDQotLQ0KTGkgUWlhbmcgL3RoZSBHZWFyIFRlYW0s
-IFFpaG9vIDM2MCBJbmMNCg0KDQo+IDIwMTctMDQtMTcgMTg6MjYgR01UKzA4OjAwIFBldGVyIFh1
-IDxwZXRlcnhAcmVkaGF0LmNvbT46DQo+ID4gT24gTW9uLCBBcHIgMTcsIDIwMTcgYXQgMDY6MDk6
-MTFQTSArMDgwMCwgamFjay5jaGVuIHdyb3RlOg0KPiA+PiBoZWxsbyxJIGhhdmUgc29tZSBxdWVz
-dGlvbnMgYWJvdXQgbWVtb3J5IGFsbG9jYXRpb24gaW4gcWVtdSBmb3INCj4gPj4gdmlydHVhbCBt
-YWNoaW5lLkkgZm91bmQgd2hlbiBjb25maWd1cmVfYWNjZWxlcmF0b3IgZnVuY3Rpb24gd2FzDQo+
-ID4+IGNhbGxlZCAsbWVtb3J5IHNsb3RzICB3ZXJlIHJlZ2lzdGVyZWQgdG8gS1ZNLGJ1dCBhdCB0
-aGF0IHRpbWUNCj4gPj4gYWRkcmVzc19zcGFjZSBoYXZlIG5vdCBiZWVuIGluaXRpYWxpemVkIGFu
-ZCByYW0gaGF2ZSBub3QgYmVlbg0KPiA+PiBhbGxvY2F0ZWQsaXQgaXMgcmVhbGx5IGNvbmZ1c2Vk
-IG1lLFRoYW5rcyBhIGxvdCEhDQo+ID4NCj4gPiBIZXJlJ3MgaG93IEkgdW5kZXJzdGFuZCBpdC4u
-Lg0KPiA+DQo+ID4gY29uZmlndXJlX2FjY2VsZXJhdG9yKCkgZG9lcyBub3QgcmVnaXN0ZXIgbWVt
-b3J5IHNsb3RzIGluIEtWTS4NCj4gPiBJbnN0ZWFkLCBpdCByZWdpc3RlcnMgbWVtb3J5IGxpc3Rl
-bmVycy4gU2VlDQo+ID4ga3ZtX21lbW9yeV9saXN0ZW5lcl9yZWdpc3RlcigpLCBlc3BlY2lhbGx5
-Og0KPiA+DQo+ID4gICAgIGttbC0+bGlzdGVuZXIucmVnaW9uX2FkZCA9IGt2bV9yZWdpb25fYWRk
-Ow0KPiA+DQo+ID4gVGhhdCdzIHRoZSBob29rIGZ1bmN0aW9uIHRvIGJlIGNhbGxlZCB3aGVuIHRo
-ZXJlIGFyZSBuZXcgbWVtb3J5IHJlZ2lvbg0KPiA+IGFkZGVkIHRvIHRoZSBzeXN0ZW0uDQo+ID4N
-Cj4gPiBGdXJ0aGVyLCB3aGVuIFJBTSBpcyBpbml0aWFsemVkLCBpdCdsbCBtb2RpZnkgdGhlIGFk
-ZHJlc3Mgc3BhY2UgbGF5b3V0DQo+ID4gb2Ygc3lzdGVtX21lbW9yeSwgYW5kIHRoZSByZWdpc3Rl
-cmVkIGxpc3RlbmVyIG9mIEtWTSAoa3ZtX3JlZ2lvbl9hZGQpDQo+ID4gd2lsbCBiZSBpbnZva2Vk
-LCBpdCdsbCBmdXJ0aGVyIHN5bmMgd2l0aCBrdm0uIEl0IHNob3VsZCBiZSBpbiB0aGUNCj4gPiBm
-b2xsb3dpbmcgcGF0aCBpZiB5b3UgYnJlYWsgYXQga3ZtX3JlZ2lvbl9hZGQgaW4gZ2RiOg0KPiA+
-DQo+ID4gIzAgIDB4MDAwMDU1NTU1NTdiYTEzYSBpbiBrdm1fcmVnaW9uX2FkZCAobGlzdGVuZXI9
-MHg1NTU1NTY4MzMwYzAsDQo+ID4gc2VjdGlvbj0weDdmZmZmZmZmZDMxMCkgYXQgL3Jvb3QvZ2l0
-L3FlbXUva3ZtLWFsbC5jOjg1OQ0KPiA+ICMxICAweDAwMDA1NTU1NTU3YzE5MTAgaW4gYWRkcmVz
-c19zcGFjZV91cGRhdGVfdG9wb2xvZ3lfcGFzcw0KPiA+IChhcz0weDU1NTU1NjI5ZTI0MCA8YWRk
-cmVzc19zcGFjZV9tZW1vcnk+LA0KPiBvbGRfdmlldz0weDU1NTU1NjdhNzA5MCwNCj4gPiBuZXdf
-dmlldz0weDU1NTU1NjhkMzQ2MCwgYWRkaW5nPXRydWUpIGF0IC9yb290L2dpdC9xZW11L21lbW9y
-eS5jOjg3MQ0KPiA+ICMyICAweDAwMDA1NTU1NTU3YzE5ZjMgaW4gYWRkcmVzc19zcGFjZV91cGRh
-dGVfdG9wb2xvZ3kNCj4gPiAoYXM9MHg1NTU1NTYyOWUyNDAgPGFkZHJlc3Nfc3BhY2VfbWVtb3J5
-PikgYXQNCj4gPiAvcm9vdC9naXQvcWVtdS9tZW1vcnkuYzo4ODYNCj4gPiAjMyAgMHgwMDAwNTU1
-NTU1N2MxYjQxIGluIG1lbW9yeV9yZWdpb25fdHJhbnNhY3Rpb25fY29tbWl0ICgpIGF0DQo+ID4g
-L3Jvb3QvZ2l0L3FlbXUvbWVtb3J5LmM6OTIyDQo+ID4gIzQgIDB4MDAwMDU1NTU1NTdjNGJmZCBp
-biBtZW1vcnlfcmVnaW9uX3VwZGF0ZV9jb250YWluZXJfc3VicmVnaW9ucw0KPiA+IChzdWJyZWdp
-b249MHg1NTU1NTY4ZDJmYzApIGF0IC9yb290L2dpdC9xZW11L21lbW9yeS5jOjIwNzUNCj4gPiAj
-NSAgMHgwMDAwNTU1NTU1N2M0YzY0IGluIG1lbW9yeV9yZWdpb25fYWRkX3N1YnJlZ2lvbl9jb21t
-b24NCj4gPiAobXI9MHg1NTU1NTY3YTU4MzAsIG9mZnNldD0wLCBzdWJyZWdpb249MHg1NTU1NTY4
-ZDJmYzApIGF0DQo+ID4gL3Jvb3QvZ2l0L3FlbXUvbWVtb3J5LmM6MjA4NQ0KPiA+ICM2ICAweDAw
-MDA1NTU1NTU3YzRjYTAgaW4gbWVtb3J5X3JlZ2lvbl9hZGRfc3VicmVnaW9uDQo+ID4gKG1yPTB4
-NTU1NTU2N2E1ODMwLCBvZmZzZXQ9MCwgc3VicmVnaW9uPTB4NTU1NTU2OGQyZmMwKSBhdA0KPiA+
-IC9yb290L2dpdC9xZW11L21lbW9yeS5jOjIwOTMNCj4gPiAjNyAgMHgwMDAwNTU1NTU1ODNmZDY4
-IGluIHBjX21lbW9yeV9pbml0IChwY21zPTB4NTU1NTU2N2E0MTAwLA0KPiA+IHN5c3RlbV9tZW1v
-cnk9MHg1NTU1NTY3YTU4MzAsIHJvbV9tZW1vcnk9MHg1NTU1NTY4ZDIxYTAsDQo+ID4gcmFtX21l
-bW9yeT0weDdmZmZmZmZmZDU1MCkgYXQgL3Jvb3QvZ2l0L3FlbXUvaHcvaTM4Ni9wYy5jOjEzODMN
-Cj4gPiAjOCAgMHgwMDAwNTU1NTU1ODQ3MzYzIGluIHBjX3EzNV9pbml0IChtYWNoaW5lPTB4NTU1
-NTU2N2E0MTAwKSBhdA0KPiA+IC9yb290L2dpdC9xZW11L2h3L2kzODYvcGNfcTM1LmM6MTQ3DQo+
-ID4gIzkgIDB4MDAwMDU1NTU1NTg0N2NhYyBpbiBwY19pbml0X3YyXzkgKG1hY2hpbmU9MHg1NTU1
-NTY3YTQxMDApIGF0DQo+ID4gL3Jvb3QvZ2l0L3FlbXUvaHcvaTM4Ni9wY19xMzUuYzozMTANCj4g
-PiAjMTAgMHgwMDAwNTU1NTU1OGY3Y2Y4IGluIG1haW4gKGFyZ2M9MTEsIGFyZ3Y9MHg3ZmZmZmZm
-ZmRhNzgsDQo+ID4gZW52cD0weDdmZmZmZmZmZGFkOCkgYXQgL3Jvb3QvZ2l0L3FlbXUvdmwuYzo0
-NTU3DQo+ID4NCj4gPiBIb3BlIHRoaXMgaGVscHMuIFRoYW5rcy4NCj4gPg0KPiA+IC0tDQo+ID4g
-UGV0ZXIgWHUNCg0K
+On Mon, Apr 17, 2017 at 04:27:19PM +0800, Fam Zheng wrote:
+> On Fri, 04/14 09:51, Stefan Hajnoczi wrote:
+> > On Fri, Apr 14, 2017 at 9:02 AM, Fam Zheng <famz@redhat.com> wrote:
+> > > @@ -398,11 +399,15 @@ void bdrv_drain_all(void);
+> > >           */                                                \
+> > >          assert(!bs_->wakeup);                              \
+> > >          bs_->wakeup = true;                                \
+> > > -        while ((cond)) {                                   \
+> > > -            aio_context_release(ctx_);                     \
+> > > -            aio_poll(qemu_get_aio_context(), true);        \
+> > > -            aio_context_acquire(ctx_);                     \
+> > > -            waited_ = true;                                \
+> > > +        while (busy_) {                                    \
+> > > +            if ((cond)) {                                  \
+> > > +                waited_ = busy_ = true;                    \
+> > > +                aio_context_release(ctx_);                 \
+> > > +                aio_poll(qemu_get_aio_context(), true);    \
+> > > +                aio_context_acquire(ctx_);                 \
+> > > +            } else {                                       \
+> > > +                busy_ = aio_poll(ctx_, false);             \
+> > > +            }                                              \
+> > 
+> > Wait, I'm confused.  The current thread is not in the BDS AioContext.
+> > We're not allowed to call aio_poll(ctx_, false).
+> > 
+> > Did you mean aio_poll(qemu_get_aio_context(), false) in order to
+> > process defer to main loop BHs?
+> 
+> At this point it's even unclear to me what should be the plan for 2.9.  v1 IMO
+> was the least intrusive, but didn't cover bdrv_drain_all_begin. v2 has this
+> controversial "aio_poll(ctx_, false)", however its alternative,
+> "aio_poll(qemu_get_aio_context(), false)", "introduces" another crash that is
+> not seen otherwise.
+> 
+> What should we do now?
+> 
+> Fam
+>
+
+I think the priority is fixing the regression, which v1 does.  Is there a
+regression lurking in the bdrv_drain_all() path?  I've not been able to find
+one.
+
+If there is no regressive path through bdrv_drain_all(), my vote would be
+the simplest, least intrusive patch that fixes the current regression, and I
+think that is v1.  
+
+Then we can fix everything correctly, and more comprehensively, for 2.10.
+
+
+-Jeff
