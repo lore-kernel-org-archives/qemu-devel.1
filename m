@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d04uZ-0001ua-8n
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 07:33:40 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d05rf-0008PE-Qa
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 08:34:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d04uU-0003yy-8W
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 07:33:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43312)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d04uT-0003yL-Vm
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 07:33:34 -0400
-From: Peter Xu <peterx@redhat.com>
-Date: Mon, 17 Apr 2017 19:32:10 +0800
-Message-Id: <1492428730-13438-8-git-send-email-peterx@redhat.com>
-In-Reply-To: <1492428730-13438-1-git-send-email-peterx@redhat.com>
-References: <1492428730-13438-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 7/7] intel_iommu: support passthrough (PT)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d05rc-0002OL-GR
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 08:34:43 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170403160936.28293-1-mreitz@redhat.com>
+	<20170403160936.28293-13-mreitz@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <1faadca4-ce36-eedc-f22e-90a9740020f7@amsat.org>
+Date: Mon, 17 Apr 2017 09:34:35 -0300
+MIME-Version: 1.0
+In-Reply-To: <20170403160936.28293-13-mreitz@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 12/16] block/qcow2: Extract
+ qcow2_calc_size_usage()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,220 +28,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Lan Tianyu <tianyu.lan@intel.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Marcel Apfelbaum <marcel@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- hw/i386/intel_iommu.c          | 109 +++++++++++++++++++++++++++++++++--------
- hw/i386/intel_iommu_internal.h |   1 +
- hw/i386/trace-events           |   1 +
- hw/i386/x86-iommu.c            |   1 +
- include/hw/i386/x86-iommu.h    |   1 +
- 5 files changed, 93 insertions(+), 20 deletions(-)
+On 04/03/2017 01:09 PM, Max Reitz wrote:
+> We will need very similar functionality for full/falloc preallocation in
+> qcow2_truncate(). Although we will not be able to reuse much of the
+> actual code, it still makes sense to keep all of this in one place.
+>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 05ae631..deb2007 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -872,7 +872,7 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
-     } else {
-         switch (vtd_ce_get_type(ce)) {
-         case VTD_CONTEXT_TT_MULTI_LEVEL:
--            /* fall through */
-+        case VTD_CONTEXT_TT_PASS_THROUGH:
-         case VTD_CONTEXT_TT_DEV_IOTLB:
-             break;
-         default:
-@@ -883,6 +883,73 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
-     return 0;
- }
- 
-+/* Fetch translation type for specific device. Returns <0 if error
-+ * happens, otherwise return the shifted type to check against
-+ * VTD_CONTEXT_TT_*. */
-+static int vtd_dev_get_trans_type(VTDAddressSpace *as)
-+{
-+    IntelIOMMUState *s;
-+    VTDContextEntry ce;
-+    int ret;
-+
-+    s = as->iommu_state;
-+
-+    ret = vtd_dev_to_context_entry(s, pci_bus_num(as->bus),
-+                                   as->devfn, &ce);
-+    if (ret) {
-+        return ret;
-+    }
-+
-+    return vtd_ce_get_type(&ce);
-+}
-+
-+static bool vtd_dev_pt_enabled(VTDAddressSpace *as)
-+{
-+    int ret;
-+
-+    assert(as);
-+
-+    ret = vtd_dev_get_trans_type(as);
-+    if (ret < 0) {
-+        /*
-+         * Possibly failed to parse the context entry for some reason
-+         * (e.g., during init, or any guest configuration errors on
-+         * context entries). We should assume PT not enabled for
-+         * safety.
-+         */
-+        return false;
-+    }
-+
-+    return ret == VTD_CONTEXT_TT_PASS_THROUGH;
-+}
-+
-+static void vtd_switch_address_space(VTDAddressSpace *as)
-+{
-+    bool use_iommu;
-+
-+    assert(as);
-+
-+    use_iommu = as->iommu_state->dmar_enabled;
-+    if (use_iommu) {
-+        /* Further checks per-device configuration */
-+        use_iommu &= !vtd_dev_pt_enabled(as);
-+    }
-+
-+    trace_vtd_switch_address_space(pci_bus_num(as->bus),
-+                                   VTD_PCI_SLOT(as->devfn),
-+                                   VTD_PCI_FUNC(as->devfn),
-+                                   use_iommu);
-+
-+    /* Turn off first then on the other */
-+    if (use_iommu) {
-+        memory_region_set_enabled(&as->sys_alias, false);
-+        memory_region_set_enabled(&as->iommu, true);
-+    } else {
-+        memory_region_set_enabled(&as->iommu, false);
-+        memory_region_set_enabled(&as->sys_alias, true);
-+    }
-+}
-+
- static inline uint16_t vtd_make_source_id(uint8_t bus_num, uint8_t devfn)
- {
-     return ((bus_num & 0xffUL) << 8) | (devfn & 0xffUL);
-@@ -991,6 +1058,18 @@ static void vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
-         cc_entry->context_cache_gen = s->context_cache_gen;
-     }
- 
-+    /*
-+     * We don't need to translate for pass-through context entries.
-+     * Also, let's ignore IOTLB caching as well for PT devices.
-+     */
-+    if (vtd_ce_get_type(&ce) == VTD_CONTEXT_TT_PASS_THROUGH) {
-+        entry->translated_addr = entry->iova;
-+        entry->addr_mask = VTD_PAGE_SIZE - 1;
-+        entry->perm = IOMMU_RW;
-+        trace_vtd_translate_pt(source_id, entry->iova);
-+        return;
-+    }
-+
-     ret_fr = vtd_iova_to_slpte(&ce, addr, is_write, &slpte, &level,
-                                &reads, &writes);
-     if (ret_fr) {
-@@ -1135,6 +1214,11 @@ static void vtd_context_device_invalidate(IntelIOMMUState *s,
-                                              VTD_PCI_FUNC(devfn_it));
-                 vtd_as->context_cache_entry.context_cache_gen = 0;
-                 /*
-+                 * Do switch address space when needed, in case if the
-+                 * device passthrough bit is switched.
-+                 */
-+                vtd_switch_address_space(vtd_as);
-+                /*
-                  * So a device is moving out of (or moving into) a
-                  * domain, a replay() suites here to notify all the
-                  * IOMMU_NOTIFIER_MAP registers about this change.
-@@ -1366,25 +1450,6 @@ static void vtd_handle_gcmd_sirtp(IntelIOMMUState *s)
-     vtd_set_clear_mask_long(s, DMAR_GSTS_REG, 0, VTD_GSTS_IRTPS);
- }
- 
--static void vtd_switch_address_space(VTDAddressSpace *as)
--{
--    assert(as);
--
--    trace_vtd_switch_address_space(pci_bus_num(as->bus),
--                                   VTD_PCI_SLOT(as->devfn),
--                                   VTD_PCI_FUNC(as->devfn),
--                                   as->iommu_state->dmar_enabled);
--
--    /* Turn off first then on the other */
--    if (as->iommu_state->dmar_enabled) {
--        memory_region_set_enabled(&as->sys_alias, false);
--        memory_region_set_enabled(&as->iommu, true);
--    } else {
--        memory_region_set_enabled(&as->iommu, false);
--        memory_region_set_enabled(&as->sys_alias, true);
--    }
--}
--
- static void vtd_switch_address_space_all(IntelIOMMUState *s)
- {
-     GHashTableIter iter;
-@@ -2849,6 +2914,10 @@ static void vtd_init(IntelIOMMUState *s)
-         s->ecap |= VTD_ECAP_DT;
-     }
- 
-+    if (x86_iommu->pt_supported) {
-+        s->ecap |= VTD_ECAP_PT;
-+    }
-+
-     if (s->caching_mode) {
-         s->cap |= VTD_CAP_CM;
-     }
-diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-index 29d6707..0e73a65 100644
---- a/hw/i386/intel_iommu_internal.h
-+++ b/hw/i386/intel_iommu_internal.h
-@@ -187,6 +187,7 @@
- /* Interrupt Remapping support */
- #define VTD_ECAP_IR                 (1ULL << 3)
- #define VTD_ECAP_EIM                (1ULL << 4)
-+#define VTD_ECAP_PT                 (1ULL << 6)
- #define VTD_ECAP_MHMV               (15ULL << 20)
- 
- /* CAP_REG */
-diff --git a/hw/i386/trace-events b/hw/i386/trace-events
-index 04a6980..867ad0b 100644
---- a/hw/i386/trace-events
-+++ b/hw/i386/trace-events
-@@ -38,6 +38,7 @@ vtd_page_walk_skip_perm(uint64_t iova, uint64_t next) "Page walk skip iova 0x%"P
- vtd_page_walk_skip_reserve(uint64_t iova, uint64_t next) "Page walk skip iova 0x%"PRIx64" - 0x%"PRIx64" due to rsrv set"
- vtd_switch_address_space(uint8_t bus, uint8_t slot, uint8_t fn, bool on) "Device %02x:%02x.%x switching address space (iommu enabled=%d)"
- vtd_as_unmap_whole(uint8_t bus, uint8_t slot, uint8_t fn, uint64_t iova, uint64_t size) "Device %02x:%02x.%x start 0x%"PRIx64" size 0x%"PRIx64
-+vtd_translate_pt(uint16_t sid, uint64_t addr) "source id 0x%"PRIu16", iova 0x%"PRIx64
- 
- # hw/i386/amd_iommu.c
- amdvi_evntlog_fail(uint64_t addr, uint32_t head) "error: fail to write at addr 0x%"PRIx64" +  offset 0x%"PRIx32
-diff --git a/hw/i386/x86-iommu.c b/hw/i386/x86-iommu.c
-index 02b8825..293caf8 100644
---- a/hw/i386/x86-iommu.c
-+++ b/hw/i386/x86-iommu.c
-@@ -91,6 +91,7 @@ static void x86_iommu_realize(DeviceState *dev, Error **errp)
- static Property x86_iommu_properties[] = {
-     DEFINE_PROP_BOOL("intremap", X86IOMMUState, intr_supported, false),
-     DEFINE_PROP_BOOL("device-iotlb", X86IOMMUState, dt_supported, false),
-+    DEFINE_PROP_BOOL("pt", X86IOMMUState, pt_supported, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/include/hw/i386/x86-iommu.h b/include/hw/i386/x86-iommu.h
-index 361c07c..ef89c0c 100644
---- a/include/hw/i386/x86-iommu.h
-+++ b/include/hw/i386/x86-iommu.h
-@@ -74,6 +74,7 @@ struct X86IOMMUState {
-     SysBusDevice busdev;
-     bool intr_supported;        /* Whether vIOMMU supports IR */
-     bool dt_supported;          /* Whether vIOMMU supports DT */
-+    bool pt_supported;          /* Whether vIOMMU supports pass-through */
-     IommuType type;             /* IOMMU type - AMD/Intel     */
-     QLIST_HEAD(, IEC_Notifier) iec_notifiers; /* IEC notify list */
- };
--- 
-2.7.4
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+>  block/qcow2.c | 126 +++++++++++++++++++++++++++++++---------------------------
+>  1 file changed, 68 insertions(+), 58 deletions(-)
+>
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index bb0bd5561c..aafbc8dbed 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -2108,6 +2108,70 @@ done:
+>      return ret;
+>  }
+>
+> +static uint64_t qcow2_calc_size_usage(uint64_t new_size,
+> +                                      int cluster_bits, int refcount_order)
+> +{
+> +    size_t cluster_size = 1u << cluster_bits;
+> +
+> +    /* Note: The following calculation does not need to be exact; if it is a
+> +     * bit off, either some bytes will be "leaked" (which is fine) or we
+> +     * will need to increase the file size by some bytes (which is fine,
+> +     * too, as long as the bulk is allocated here). Therefore, using
+> +     * floating point arithmetic is fine. */
+> +    int64_t meta_size = 0;
+> +    uint64_t nreftablee, nrefblocke, nl1e, nl2e;
+> +    uint64_t aligned_total_size = align_offset(new_size, cluster_size);
+> +    int refblock_bits, refblock_size;
+> +    /* refcount entry size in bytes */
+> +    double rces = (1 << refcount_order) / 8.;
+> +
+> +    /* see qcow2_open() */
+> +    refblock_bits = cluster_bits - (refcount_order - 3);
+> +    refblock_size = 1 << refblock_bits;
+> +
+> +    /* header: 1 cluster */
+> +    meta_size += cluster_size;
+> +
+> +    /* total size of L2 tables */
+> +    nl2e = aligned_total_size / cluster_size;
+> +    nl2e = align_offset(nl2e, cluster_size / sizeof(uint64_t));
+> +    meta_size += nl2e * sizeof(uint64_t);
+> +
+> +    /* total size of L1 tables */
+> +    nl1e = nl2e * sizeof(uint64_t) / cluster_size;
+> +    nl1e = align_offset(nl1e, cluster_size / sizeof(uint64_t));
+> +    meta_size += nl1e * sizeof(uint64_t);
+> +
+> +    /* total size of refcount blocks
+> +     *
+> +     * note: every host cluster is reference-counted, including metadata
+> +     * (even refcount blocks are recursively included).
+> +     * Let:
+> +     *   a = total_size (this is the guest disk size)
+> +     *   m = meta size not including refcount blocks and refcount tables
+> +     *   c = cluster size
+> +     *   y1 = number of refcount blocks entries
+> +     *   y2 = meta size including everything
+> +     *   rces = refcount entry size in bytes
+> +     * then,
+> +     *   y1 = (y2 + a)/c
+> +     *   y2 = y1 * rces + y1 * rces * sizeof(u64) / c + m
+> +     * we can get y1:
+> +     *   y1 = (a + m) / (c - rces - rces * sizeof(u64) / c)
+> +     */
+> +    nrefblocke = (aligned_total_size + meta_size + cluster_size)
+> +               / (cluster_size - rces - rces * sizeof(uint64_t)
+> +                                             / cluster_size);
+> +    meta_size += DIV_ROUND_UP(nrefblocke, refblock_size) * cluster_size;
+> +
+> +    /* total size of refcount tables */
+> +    nreftablee = nrefblocke / refblock_size;
+> +    nreftablee = align_offset(nreftablee, cluster_size / sizeof(uint64_t));
+> +    meta_size += nreftablee * sizeof(uint64_t);
+> +
+> +    return aligned_total_size + meta_size;
+> +}
+> +
+>  static int qcow2_create2(const char *filename, int64_t total_size,
+>                           const char *backing_file, const char *backing_format,
+>                           int flags, size_t cluster_size, PreallocMode prealloc,
+> @@ -2146,64 +2210,10 @@ static int qcow2_create2(const char *filename, int64_t total_size,
+>      int ret;
+>
+>      if (prealloc == PREALLOC_MODE_FULL || prealloc == PREALLOC_MODE_FALLOC) {
+> -        /* Note: The following calculation does not need to be exact; if it is a
+> -         * bit off, either some bytes will be "leaked" (which is fine) or we
+> -         * will need to increase the file size by some bytes (which is fine,
+> -         * too, as long as the bulk is allocated here). Therefore, using
+> -         * floating point arithmetic is fine. */
+> -        int64_t meta_size = 0;
+> -        uint64_t nreftablee, nrefblocke, nl1e, nl2e;
+> -        int64_t aligned_total_size = align_offset(total_size, cluster_size);
+> -        int refblock_bits, refblock_size;
+> -        /* refcount entry size in bytes */
+> -        double rces = (1 << refcount_order) / 8.;
+> -
+> -        /* see qcow2_open() */
+> -        refblock_bits = cluster_bits - (refcount_order - 3);
+> -        refblock_size = 1 << refblock_bits;
+> -
+> -        /* header: 1 cluster */
+> -        meta_size += cluster_size;
+> -
+> -        /* total size of L2 tables */
+> -        nl2e = aligned_total_size / cluster_size;
+> -        nl2e = align_offset(nl2e, cluster_size / sizeof(uint64_t));
+> -        meta_size += nl2e * sizeof(uint64_t);
+> -
+> -        /* total size of L1 tables */
+> -        nl1e = nl2e * sizeof(uint64_t) / cluster_size;
+> -        nl1e = align_offset(nl1e, cluster_size / sizeof(uint64_t));
+> -        meta_size += nl1e * sizeof(uint64_t);
+> -
+> -        /* total size of refcount blocks
+> -         *
+> -         * note: every host cluster is reference-counted, including metadata
+> -         * (even refcount blocks are recursively included).
+> -         * Let:
+> -         *   a = total_size (this is the guest disk size)
+> -         *   m = meta size not including refcount blocks and refcount tables
+> -         *   c = cluster size
+> -         *   y1 = number of refcount blocks entries
+> -         *   y2 = meta size including everything
+> -         *   rces = refcount entry size in bytes
+> -         * then,
+> -         *   y1 = (y2 + a)/c
+> -         *   y2 = y1 * rces + y1 * rces * sizeof(u64) / c + m
+> -         * we can get y1:
+> -         *   y1 = (a + m) / (c - rces - rces * sizeof(u64) / c)
+> -         */
+> -        nrefblocke = (aligned_total_size + meta_size + cluster_size)
+> -                   / (cluster_size - rces - rces * sizeof(uint64_t)
+> -                                                 / cluster_size);
+> -        meta_size += DIV_ROUND_UP(nrefblocke, refblock_size) * cluster_size;
+> -
+> -        /* total size of refcount tables */
+> -        nreftablee = nrefblocke / refblock_size;
+> -        nreftablee = align_offset(nreftablee, cluster_size / sizeof(uint64_t));
+> -        meta_size += nreftablee * sizeof(uint64_t);
+> -
+> -        qemu_opt_set_number(opts, BLOCK_OPT_SIZE,
+> -                            aligned_total_size + meta_size, &error_abort);
+> +        uint64_t file_size = qcow2_calc_size_usage(total_size, cluster_bits,
+> +                                                   refcount_order);
+> +
+> +        qemu_opt_set_number(opts, BLOCK_OPT_SIZE, file_size, &error_abort);
+>          qemu_opt_set(opts, BLOCK_OPT_PREALLOC, PreallocMode_lookup[prealloc],
+>                       &error_abort);
+>      }
+>
