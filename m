@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59722)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1czxxk-0007SB-En
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 00:08:29 -0400
+	id 1czxzm-0008A8-H4
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 00:10:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1czxxg-00074D-8k
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 00:08:28 -0400
+	id 1czxzi-0008Mf-GR
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 00:10:34 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <1487604965-23220-1-git-send-email-peter.maydell@linaro.org>
-	<1487604965-23220-10-git-send-email-peter.maydell@linaro.org>
-	<b13702b2-44be-563b-5743-33c773a6e037@amsat.org>
-	<CAFEAcA_KnJPrKU2gWCkPJELkU3QtbTOu+_fMrHWwkPcwS+NE2w@mail.gmail.com>
+References: <1487262963-11519-1-git-send-email-peter.maydell@linaro.org>
+	<1487262963-11519-6-git-send-email-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <93f5df04-c4a3-7c21-0035-a9a9a711a792@amsat.org>
-Date: Mon, 17 Apr 2017 01:08:19 -0300
+Message-ID: <b3c7907d-ab29-486c-102f-760b12e99688@amsat.org>
+Date: Mon, 17 Apr 2017 01:10:26 -0300
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_KnJPrKU2gWCkPJELkU3QtbTOu+_fMrHWwkPcwS+NE2w@mail.gmail.com>
+In-Reply-To: <1487262963-11519-6-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 09/11] armv7m: Split systick out
- from NVIC
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 05/13] arm: gic: Remove
+ references to NVIC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,86 +28,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair23@gmail.com>, Michael Davidsaver <mdavidsaver@gmail.com>, "patches@linaro.org" <patches@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On 02/20/2017 03:51 PM, Peter Maydell wrote:
-> On 20 February 2017 at 17:43, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> On 02/20/2017 12:36 PM, Peter Maydell wrote:
->>> +/* Conversion factor from qemu timer to SysTick frequencies.  */
->>> +static inline int64_t systick_scale(SysTickState *s)
->>> +{
->>> +    if (s->control & SYSTICK_CLKSOURCE) {
->>> +        return system_clock_scale;
->>> +    } else {
->>> +        return 1000;
->>
->>
->> this magic seems to be SYSTICK_SCALE
->> (Paul Brook's commit 9ee6e8bb85)
+On 02/16/2017 01:35 PM, Peter Maydell wrote:
+> From: Michael Davidsaver <mdavidsaver@gmail.com>
 >
-> This patch is just copying this function from one file to the other...
-> at some point we might want to try to improve the handling of
-> the clock scale factors but that leads into complication, because
-> the external-clocksource scale factor should really be board
-> level configurable. (Slightly confusingly the leg of this if/else
-> which is board-configurable is the one for the internal clock,
-> because we're modelling the ability of the stellaris board to
-> configure the PLLs so as to downclock the whole CPU, which
-> incidentally affects the timing of the internal systick clock.
-> Modelling this properly needs to wait on Fred Konrad's clocktree
-> patches getting in, I think.) For the moment I chose to just
-> leave the existing source alone, mostly.
-
-Fine!
-
-I didn't know about those clocktree patches, I'll eventually use them 
-for MIPS.
-
->>> +static void systick_instance_init(Object *obj)
->>> +{
->>> +    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
->>> +    SysTickState *s = SYSTICK(obj);
->>> +
->>> +    memory_region_init_io(&s->iomem, obj, &systick_ops, s, "systick",
->>> 0xe0);
->>
->>
->> It seems to me the correct size is 0x10. The manual describes the range
->> 0x20-0xFF as _reserved_. This _reserved_ description is at the end of the
->> 'SysTick' chapter which seems weird to me... I rather think this range
->> belong to the 'Interrupt Controller'@'System Control Space'.
+> Now that the NVIC is its own separate implementation, we can
+> clean up the GIC code by removing REV_NVIC and conditionals
+> which use it.
 >
-> The table of the System Control Space (B3-3 in the v7M ARM ARM
-> rev E.b) defines the Systick space as 0xE000E010 - 0xE000E0FF,
-> which makes it 0xE0 bytes in size. The NVIC doesn't start
-> until 0xE000E100 in this table.
+> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 
-I still think it's weird from an electronic design point of view, but 
-since I don't have access to ARM internals I'll believe the datasheet 
-blindly :S
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> The table of the SysTick registers (B3-7) agrees, in that
-> it defines the registers as covering 0xE000E010 to 0xE000E0FF.
-> In the current architecture everything from 0x20..0xFF is
-> reserved, which just means there's nothing there, but if
-> there was ever a need for systick to get another register
-> for some reason then it would go into that space (and if
-> we then implemented the new register in QEMU we wouldn't need
-> to change the NVIC code, only the systick code).
+> ---
+>  hw/intc/gic_internal.h   |  7 ++-----
+>  hw/intc/arm_gic.c        | 31 +++++--------------------------
+>  hw/intc/arm_gic_common.c | 23 ++++++++---------------
+>  3 files changed, 15 insertions(+), 46 deletions(-)
 >
-> I think the way this patch has modelled things matches the
-> architecture -- it's a guest error to access the gap between
-> 0XE000E020 and 0xE000E0FF, but we should report it as an
-> attempt to access an invalid systick register rather than
-> an access to an invalid NVIC register.
-
-I agree.
-
-> thanks
-> -- PMM
+> diff --git a/hw/intc/gic_internal.h b/hw/intc/gic_internal.h
+> index 3f31174..7fe87b1 100644
+> --- a/hw/intc/gic_internal.h
+> +++ b/hw/intc/gic_internal.h
+> @@ -25,9 +25,7 @@
 >
-
-Regards,
-
-Phil.
+>  #define ALL_CPU_MASK ((unsigned)(((1 << GIC_NCPU) - 1)))
+>
+> -/* The NVIC has 16 internal vectors.  However these are not exposed
+> -   through the normal GIC interface.  */
+> -#define GIC_BASE_IRQ ((s->revision == REV_NVIC) ? 32 : 0)
+> +#define GIC_BASE_IRQ 0
+>
+>  #define GIC_SET_ENABLED(irq, cm) s->irq_state[irq].enabled |= (cm)
+>  #define GIC_CLEAR_ENABLED(irq, cm) s->irq_state[irq].enabled &= ~(cm)
+> @@ -75,7 +73,6 @@
+>
+>  /* The special cases for the revision property: */
+>  #define REV_11MPCORE 0
+> -#define REV_NVIC 0xffffffff
+>
+>  void gic_set_pending_private(GICState *s, int cpu, int irq);
+>  uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs);
+> @@ -87,7 +84,7 @@ void gic_set_priority(GICState *s, int cpu, int irq, uint8_t val,
+>
+>  static inline bool gic_test_pending(GICState *s, int irq, int cm)
+>  {
+> -    if (s->revision == REV_NVIC || s->revision == REV_11MPCORE) {
+> +    if (s->revision == REV_11MPCORE) {
+>          return s->irq_state[irq].pending & cm;
+>      } else {
+>          /* Edge-triggered interrupts are marked pending on a rising edge, but
+> diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
+> index 521aac3..8e5a9d8 100644
+> --- a/hw/intc/arm_gic.c
+> +++ b/hw/intc/arm_gic.c
+> @@ -156,17 +156,6 @@ static void gic_set_irq_11mpcore(GICState *s, int irq, int level,
+>      }
+>  }
+>
+> -static void gic_set_irq_nvic(GICState *s, int irq, int level,
+> -                                 int cm, int target)
+> -{
+> -    if (level) {
+> -        GIC_SET_LEVEL(irq, cm);
+> -        GIC_SET_PENDING(irq, target);
+> -    } else {
+> -        GIC_CLEAR_LEVEL(irq, cm);
+> -    }
+> -}
+> -
+>  static void gic_set_irq_generic(GICState *s, int irq, int level,
+>                                  int cm, int target)
+>  {
+> @@ -214,8 +203,6 @@ static void gic_set_irq(void *opaque, int irq, int level)
+>
+>      if (s->revision == REV_11MPCORE) {
+>          gic_set_irq_11mpcore(s, irq, level, cm, target);
+> -    } else if (s->revision == REV_NVIC) {
+> -        gic_set_irq_nvic(s, irq, level, cm, target);
+>      } else {
+>          gic_set_irq_generic(s, irq, level, cm, target);
+>      }
+> @@ -367,7 +354,7 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
+>          return 1023;
+>      }
+>
+> -    if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
+> +    if (s->revision == REV_11MPCORE) {
+>          /* Clear pending flags for both level and edge triggered interrupts.
+>           * Level triggered IRQs will be reasserted once they become inactive.
+>           */
+> @@ -589,11 +576,6 @@ void gic_complete_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
+>              DPRINTF("Set %d pending mask %x\n", irq, cm);
+>              GIC_SET_PENDING(irq, cm);
+>          }
+> -    } else if (s->revision == REV_NVIC) {
+> -        if (GIC_TEST_LEVEL(irq, cm)) {
+> -            DPRINTF("Set nvic %d pending mask %x\n", irq, cm);
+> -            GIC_SET_PENDING(irq, cm);
+> -        }
+>      }
+>
+>      group = gic_has_groups(s) && GIC_TEST_GROUP(irq, cm);
+> @@ -768,7 +750,7 @@ static uint32_t gic_dist_readb(void *opaque, hwaddr offset, MemTxAttrs attrs)
+>      } else if (offset < 0xf10) {
+>          goto bad_reg;
+>      } else if (offset < 0xf30) {
+> -        if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
+> +        if (s->revision == REV_11MPCORE) {
+>              goto bad_reg;
+>          }
+>
+> @@ -802,9 +784,6 @@ static uint32_t gic_dist_readb(void *opaque, hwaddr offset, MemTxAttrs attrs)
+>              case 2:
+>                  res = gic_id_gicv2[(offset - 0xfd0) >> 2];
+>                  break;
+> -            case REV_NVIC:
+> -                /* Shouldn't be able to get here */
+> -                abort();
+>              default:
+>                  res = 0;
+>              }
+> @@ -1028,7 +1007,7 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
+>                  continue; /* Ignore Non-secure access of Group0 IRQ */
+>              }
+>
+> -            if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
+> +            if (s->revision == REV_11MPCORE) {
+>                  if (value & (1 << (i * 2))) {
+>                      GIC_SET_MODEL(irq + i);
+>                  } else {
+> @@ -1046,7 +1025,7 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
+>          goto bad_reg;
+>      } else if (offset < 0xf20) {
+>          /* GICD_CPENDSGIRn */
+> -        if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
+> +        if (s->revision == REV_11MPCORE) {
+>              goto bad_reg;
+>          }
+>          irq = (offset - 0xf10);
+> @@ -1060,7 +1039,7 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
+>          }
+>      } else if (offset < 0xf30) {
+>          /* GICD_SPENDSGIRn */
+> -        if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
+> +        if (s->revision == REV_11MPCORE) {
+>              goto bad_reg;
+>          }
+>          irq = (offset - 0xf20);
+> diff --git a/hw/intc/arm_gic_common.c b/hw/intc/arm_gic_common.c
+> index 4a8df44..70f1134 100644
+> --- a/hw/intc/arm_gic_common.c
+> +++ b/hw/intc/arm_gic_common.c
+> @@ -99,9 +99,7 @@ void gic_init_irqs_and_mmio(GICState *s, qemu_irq_handler handler,
+>       *  [N+32..N+63] PPIs for CPU 1
+>       *   ...
+>       */
+> -    if (s->revision != REV_NVIC) {
+> -        i += (GIC_INTERNAL * s->num_cpu);
+> -    }
+> +    i += (GIC_INTERNAL * s->num_cpu);
+>      qdev_init_gpio_in(DEVICE(s), handler, i);
+>
+>      for (i = 0; i < s->num_cpu; i++) {
+> @@ -121,16 +119,12 @@ void gic_init_irqs_and_mmio(GICState *s, qemu_irq_handler handler,
+>      memory_region_init_io(&s->iomem, OBJECT(s), ops, s, "gic_dist", 0x1000);
+>      sysbus_init_mmio(sbd, &s->iomem);
+>
+> -    if (s->revision != REV_NVIC) {
+> -        /* This is the main CPU interface "for this core". It is always
+> -         * present because it is required by both software emulation and KVM.
+> -         * NVIC is not handled here because its CPU interface is different,
+> -         * neither it can use KVM.
+> -         */
+> -        memory_region_init_io(&s->cpuiomem[0], OBJECT(s), ops ? &ops[1] : NULL,
+> -                              s, "gic_cpu", s->revision == 2 ? 0x2000 : 0x100);
+> -        sysbus_init_mmio(sbd, &s->cpuiomem[0]);
+> -    }
+> +    /* This is the main CPU interface "for this core". It is always
+> +     * present because it is required by both software emulation and KVM.
+> +     */
+> +    memory_region_init_io(&s->cpuiomem[0], OBJECT(s), ops ? &ops[1] : NULL,
+> +                          s, "gic_cpu", s->revision == 2 ? 0x2000 : 0x100);
+> +    sysbus_init_mmio(sbd, &s->cpuiomem[0]);
+>  }
+>
+>  static void arm_gic_common_realize(DeviceState *dev, Error **errp)
+> @@ -162,7 +156,7 @@ static void arm_gic_common_realize(DeviceState *dev, Error **errp)
+>      }
+>
+>      if (s->security_extn &&
+> -        (s->revision == REV_11MPCORE || s->revision == REV_NVIC)) {
+> +        (s->revision == REV_11MPCORE)) {
+>          error_setg(errp, "this GIC revision does not implement "
+>                     "the security extensions");
+>          return;
+> @@ -255,7 +249,6 @@ static Property arm_gic_common_properties[] = {
+>      DEFINE_PROP_UINT32("num-irq", GICState, num_irq, 32),
+>      /* Revision can be 1 or 2 for GIC architecture specification
+>       * versions 1 or 2, or 0 to indicate the legacy 11MPCore GIC.
+> -     * (Internally, 0xffffffff also indicates "not a GIC but an NVIC".)
+>       */
+>      DEFINE_PROP_UINT32("revision", GICState, revision, 1),
+>      /* True if the GIC should implement the security extensions */
+>
