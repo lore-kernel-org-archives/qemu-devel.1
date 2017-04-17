@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50651)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1czxGR-000327-Vn
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 23:23:45 -0400
+	id 1czxIt-0003hd-5v
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 23:26:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1czxGN-00059b-8x
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 23:23:43 -0400
+	id 1czxIo-00070v-FR
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 23:26:15 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <1487604965-23220-1-git-send-email-peter.maydell@linaro.org>
-	<1487604965-23220-5-git-send-email-peter.maydell@linaro.org>
+	<1487604965-23220-7-git-send-email-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4261d33b-a3d8-06fd-7b06-0cd0a30bc987@amsat.org>
-Date: Mon, 17 Apr 2017 00:23:34 -0300
+Message-ID: <e0853a2f-7cc0-9ee5-fed6-d5af02e86b06@amsat.org>
+Date: Mon, 17 Apr 2017 00:26:06 -0300
 MIME-Version: 1.0
-In-Reply-To: <1487604965-23220-5-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1487604965-23220-7-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 04/11] armv7m: Use QOMified
- armv7m object in armv7m_init()
+Subject: Re: [Qemu-devel] [PATCH 06/11] armv7m: Make NVIC expose a memory
+ region rather than mapping itself
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +29,74 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Alistair Francis <alistair23@gmail.com>, Michael Davidsaver <mdavidsaver@gmail.com>, patches@linaro.org
+Cc: Alistair Francis <alistair23@gmail.com>, Michael Davidsaver <mdavidsaver@gmail.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, patches@linaro.org
 
-On 02/20/2017 12:35 PM, Peter Maydell wrote:
-> Make the legacy armv7m_init() function use the newly QOMified
-> armv7m object rather than doing everything by hand.
->
-> We can return the armv7m object rather than the NVIC from
-> armv7m_init() because its interface to the rest of the
-> board (GPIOs, etc) is identical.
+On 02/20/2017 12:36 PM, Peter Maydell wrote:
+> Make the NVIC device expose a memory region for its users
+> to map, rather than mapping itself into the system memory
+> space on realize, and get the one user (the ARMv7M object)
+> to do this.
 >
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  hw/arm/armv7m.c | 49 ++++++++++++-------------------------------------
->  1 file changed, 12 insertions(+), 37 deletions(-)
+>  hw/arm/armv7m.c       | 7 ++++++-
+>  hw/intc/armv7m_nvic.c | 7 ++-----
+>  2 files changed, 8 insertions(+), 6 deletions(-)
 >
 > diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-> index 56d02d4..36f213c 100644
+> index 638c597..fb21f74 100644
 > --- a/hw/arm/armv7m.c
 > +++ b/hw/arm/armv7m.c
-> @@ -131,21 +131,6 @@ static void bitband_init(Object *obj)
->      sysbus_init_mmio(dev, &s->iomem);
->  }
->
-> -static void armv7m_bitband_init(void)
-> -{
-> -    DeviceState *dev;
-> -
-> -    dev = qdev_create(NULL, TYPE_BITBAND);
-> -    qdev_prop_set_uint32(dev, "base", 0x20000000);
-> -    qdev_init_nofail(dev);
-> -    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0x22000000);
-> -
-> -    dev = qdev_create(NULL, TYPE_BITBAND);
-> -    qdev_prop_set_uint32(dev, "base", 0x40000000);
-> -    qdev_init_nofail(dev);
-> -    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0x42000000);
-> -}
-> -
->  /* Board init.  */
->
->  static const hwaddr bitband_input_addr[ARMV7M_NUM_BITBANDS] = {
-> @@ -283,35 +268,25 @@ static void armv7m_reset(void *opaque)
->
->  /* Init CPU and memory for a v7-M based board.
->     mem_size is in bytes.
-> -   Returns the NVIC array.  */
-> +   Returns the ARMv7M device.  */
->
->  DeviceState *armv7m_init(MemoryRegion *system_memory, int mem_size, int num_irq,
->                        const char *kernel_filename, const char *cpu_model)
+> @@ -172,6 +172,7 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
 >  {
-> -    ARMCPU *cpu;
-> -    CPUARMState *env;
-> -    DeviceState *nvic;
-> +    DeviceState *armv7m;
+>      /* here realize our children */
+>      ARMv7MState *s = ARMV7M(dev);
+> +    SysBusDevice *sbd;
+>      Error *err = NULL;
+>      int i;
+>      char **cpustr;
+> @@ -233,10 +234,14 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
+>      qdev_pass_gpios(DEVICE(&s->nvic), dev, "SYSRESETREQ");
 >
->      if (cpu_model == NULL) {
-> -	cpu_model = "cortex-m3";
-> +        cpu_model = "cortex-m3";
->      }
-> -    cpu = cpu_arm_init(cpu_model);
-> -    if (cpu == NULL) {
-> -        fprintf(stderr, "Unable to find CPU definition\n");
-> -        exit(1);
-> -    }
-> -    env = &cpu->env;
-> -
-> -    armv7m_bitband_init();
-> -
-> -    nvic = qdev_create(NULL, "armv7m_nvic");
-> -    qdev_prop_set_uint32(nvic, "num-irq", num_irq);
-> -    env->nvic = nvic;
-> -    qdev_init_nofail(nvic);
-> -    sysbus_connect_irq(SYS_BUS_DEVICE(nvic), 0,
-> -                       qdev_get_gpio_in(DEVICE(cpu), ARM_CPU_IRQ));
-> -    armv7m_load_kernel(cpu, kernel_filename, mem_size);
-> -    return nvic;
+>      /* Wire the NVIC up to the CPU */
+> -    sysbus_connect_irq(SYS_BUS_DEVICE(&s->nvic), 0,
+> +    sbd = SYS_BUS_DEVICE(&s->nvic);
+> +    sysbus_connect_irq(sbd, 0,
+>                         qdev_get_gpio_in(DEVICE(s->cpu), ARM_CPU_IRQ));
+>      s->cpu->env.nvic = &s->nvic;
+>
+> +    memory_region_add_subregion(&s->container, 0xe000e000,
+> +                                sysbus_mmio_get_region(sbd, 0));
 > +
-> +    armv7m = qdev_create(NULL, "armv7m");
-> +    qdev_prop_set_uint32(armv7m, "num-irq", num_irq);
-> +    qdev_prop_set_string(armv7m, "cpu-model", cpu_model);
-> +    /* This will exit with an error if the user passed us a bad cpu_model */
-> +    qdev_init_nofail(armv7m);
+>      for (i = 0; i < ARRAY_SIZE(s->bitband); i++) {
+>          Object *obj = OBJECT(&s->bitband[i]);
+>          SysBusDevice *sbd = SYS_BUS_DEVICE(&s->bitband[i]);
+> diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+> index f2ada39..c814e16 100644
+> --- a/hw/intc/armv7m_nvic.c
+> +++ b/hw/intc/armv7m_nvic.c
+> @@ -19,7 +19,6 @@
+>  #include "hw/arm/arm.h"
+>  #include "hw/arm/armv7m_nvic.h"
+>  #include "target/arm/cpu.h"
+> -#include "exec/address-spaces.h"
+>  #include "qemu/log.h"
+>  #include "trace.h"
+>
+> @@ -1043,10 +1042,8 @@ static void armv7m_nvic_realize(DeviceState *dev, Error **errp)
+>                            "nvic_sysregs", 0x1000);
+>      memory_region_add_subregion(&s->container, 0, &s->sysregmem);
+>
+> -    /* Map the whole thing into system memory at the location required
+> -     * by the v7M architecture.
+> -     */
+> -    memory_region_add_subregion(get_system_memory(), 0xe000e000, &s->container);
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->container);
 > +
-> +    armv7m_load_kernel(ARM_CPU(first_cpu), kernel_filename, mem_size);
-> +    return armv7m;
+>      s->systick.timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, systick_timer_tick, s);
 >  }
 >
->  void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_size)
 >
