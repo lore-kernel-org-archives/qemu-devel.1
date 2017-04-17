@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37303)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41542)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d05rf-0008PE-Qa
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 08:34:45 -0400
+	id 1d0687-0002oO-Mv
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 08:51:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d05rc-0002OL-GR
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 08:34:43 -0400
+	id 1d0685-0008MV-5P
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 08:51:43 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20170403160936.28293-1-mreitz@redhat.com>
-	<20170403160936.28293-13-mreitz@redhat.com>
+References: <20170413160625.27719-1-mreitz@redhat.com>
+	<20170413160625.27719-2-mreitz@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <1faadca4-ce36-eedc-f22e-90a9740020f7@amsat.org>
-Date: Mon, 17 Apr 2017 09:34:35 -0300
+Message-ID: <1f7840f6-d59f-2533-aeea-1ea6c1baf910@amsat.org>
+Date: Mon, 17 Apr 2017 09:51:36 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170403160936.28293-13-mreitz@redhat.com>
+In-Reply-To: <20170413160625.27719-2-mreitz@redhat.com>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 12/16] block/qcow2: Extract
- qcow2_calc_size_usage()
+Subject: Re: [Qemu-devel] [PATCH for-2.10 1/2] block: An empty filename
+ counts as no filename
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,164 +29,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable <qemu-stable@nongnu.org>, qemu-devel@nongnu.org
 
-On 04/03/2017 01:09 PM, Max Reitz wrote:
-> We will need very similar functionality for full/falloc preallocation in
-> qcow2_truncate(). Although we will not be able to reuse much of the
-> actual code, it still makes sense to keep all of this in one place.
+Hi Max,
+
+On 04/13/2017 01:06 PM, Max Reitz wrote:
+> Reproducer:
+>     $ ./qemu-img info ''
+>     qemu-img: ./block.c:1008: bdrv_open_driver: Assertion
+>         `!drv->bdrv_needs_filename || bs->filename[0]' failed.
+>     [1]    26105 abort (core dumped)  ./qemu-img info ''
 >
+> This patch fixes this to be:
+>     $ ./qemu-img info ''
+>     qemu-img: Could not open '': The 'file' block driver requires a file
+>     name
+>
+> Cc: qemu-stable <qemu-stable@nongnu.org>
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  block.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/block.c b/block.c
+> index 1fbbb8d606..46da908c93 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -1167,7 +1167,7 @@ static int bdrv_open_common(BlockDriverState *bs, BlockBackend *file,
+>          filename = qdict_get_try_str(options, "filename");
+>      }
+>
+> -    if (drv->bdrv_needs_filename && !filename) {
+> +    if (drv->bdrv_needs_filename && (!filename || !filename[0])) {
 
+What do you think about adding an inline function in "qemu/option.h" 
+like "is_valid_[option_]filename()" to avoid this bug template?
+
+Anyway:
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> ---
->  block/qcow2.c | 126 +++++++++++++++++++++++++++++++---------------------------
->  1 file changed, 68 insertions(+), 58 deletions(-)
->
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index bb0bd5561c..aafbc8dbed 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -2108,6 +2108,70 @@ done:
->      return ret;
->  }
->
-> +static uint64_t qcow2_calc_size_usage(uint64_t new_size,
-> +                                      int cluster_bits, int refcount_order)
-> +{
-> +    size_t cluster_size = 1u << cluster_bits;
-> +
-> +    /* Note: The following calculation does not need to be exact; if it is a
-> +     * bit off, either some bytes will be "leaked" (which is fine) or we
-> +     * will need to increase the file size by some bytes (which is fine,
-> +     * too, as long as the bulk is allocated here). Therefore, using
-> +     * floating point arithmetic is fine. */
-> +    int64_t meta_size = 0;
-> +    uint64_t nreftablee, nrefblocke, nl1e, nl2e;
-> +    uint64_t aligned_total_size = align_offset(new_size, cluster_size);
-> +    int refblock_bits, refblock_size;
-> +    /* refcount entry size in bytes */
-> +    double rces = (1 << refcount_order) / 8.;
-> +
-> +    /* see qcow2_open() */
-> +    refblock_bits = cluster_bits - (refcount_order - 3);
-> +    refblock_size = 1 << refblock_bits;
-> +
-> +    /* header: 1 cluster */
-> +    meta_size += cluster_size;
-> +
-> +    /* total size of L2 tables */
-> +    nl2e = aligned_total_size / cluster_size;
-> +    nl2e = align_offset(nl2e, cluster_size / sizeof(uint64_t));
-> +    meta_size += nl2e * sizeof(uint64_t);
-> +
-> +    /* total size of L1 tables */
-> +    nl1e = nl2e * sizeof(uint64_t) / cluster_size;
-> +    nl1e = align_offset(nl1e, cluster_size / sizeof(uint64_t));
-> +    meta_size += nl1e * sizeof(uint64_t);
-> +
-> +    /* total size of refcount blocks
-> +     *
-> +     * note: every host cluster is reference-counted, including metadata
-> +     * (even refcount blocks are recursively included).
-> +     * Let:
-> +     *   a = total_size (this is the guest disk size)
-> +     *   m = meta size not including refcount blocks and refcount tables
-> +     *   c = cluster size
-> +     *   y1 = number of refcount blocks entries
-> +     *   y2 = meta size including everything
-> +     *   rces = refcount entry size in bytes
-> +     * then,
-> +     *   y1 = (y2 + a)/c
-> +     *   y2 = y1 * rces + y1 * rces * sizeof(u64) / c + m
-> +     * we can get y1:
-> +     *   y1 = (a + m) / (c - rces - rces * sizeof(u64) / c)
-> +     */
-> +    nrefblocke = (aligned_total_size + meta_size + cluster_size)
-> +               / (cluster_size - rces - rces * sizeof(uint64_t)
-> +                                             / cluster_size);
-> +    meta_size += DIV_ROUND_UP(nrefblocke, refblock_size) * cluster_size;
-> +
-> +    /* total size of refcount tables */
-> +    nreftablee = nrefblocke / refblock_size;
-> +    nreftablee = align_offset(nreftablee, cluster_size / sizeof(uint64_t));
-> +    meta_size += nreftablee * sizeof(uint64_t);
-> +
-> +    return aligned_total_size + meta_size;
-> +}
-> +
->  static int qcow2_create2(const char *filename, int64_t total_size,
->                           const char *backing_file, const char *backing_format,
->                           int flags, size_t cluster_size, PreallocMode prealloc,
-> @@ -2146,64 +2210,10 @@ static int qcow2_create2(const char *filename, int64_t total_size,
->      int ret;
->
->      if (prealloc == PREALLOC_MODE_FULL || prealloc == PREALLOC_MODE_FALLOC) {
-> -        /* Note: The following calculation does not need to be exact; if it is a
-> -         * bit off, either some bytes will be "leaked" (which is fine) or we
-> -         * will need to increase the file size by some bytes (which is fine,
-> -         * too, as long as the bulk is allocated here). Therefore, using
-> -         * floating point arithmetic is fine. */
-> -        int64_t meta_size = 0;
-> -        uint64_t nreftablee, nrefblocke, nl1e, nl2e;
-> -        int64_t aligned_total_size = align_offset(total_size, cluster_size);
-> -        int refblock_bits, refblock_size;
-> -        /* refcount entry size in bytes */
-> -        double rces = (1 << refcount_order) / 8.;
-> -
-> -        /* see qcow2_open() */
-> -        refblock_bits = cluster_bits - (refcount_order - 3);
-> -        refblock_size = 1 << refblock_bits;
-> -
-> -        /* header: 1 cluster */
-> -        meta_size += cluster_size;
-> -
-> -        /* total size of L2 tables */
-> -        nl2e = aligned_total_size / cluster_size;
-> -        nl2e = align_offset(nl2e, cluster_size / sizeof(uint64_t));
-> -        meta_size += nl2e * sizeof(uint64_t);
-> -
-> -        /* total size of L1 tables */
-> -        nl1e = nl2e * sizeof(uint64_t) / cluster_size;
-> -        nl1e = align_offset(nl1e, cluster_size / sizeof(uint64_t));
-> -        meta_size += nl1e * sizeof(uint64_t);
-> -
-> -        /* total size of refcount blocks
-> -         *
-> -         * note: every host cluster is reference-counted, including metadata
-> -         * (even refcount blocks are recursively included).
-> -         * Let:
-> -         *   a = total_size (this is the guest disk size)
-> -         *   m = meta size not including refcount blocks and refcount tables
-> -         *   c = cluster size
-> -         *   y1 = number of refcount blocks entries
-> -         *   y2 = meta size including everything
-> -         *   rces = refcount entry size in bytes
-> -         * then,
-> -         *   y1 = (y2 + a)/c
-> -         *   y2 = y1 * rces + y1 * rces * sizeof(u64) / c + m
-> -         * we can get y1:
-> -         *   y1 = (a + m) / (c - rces - rces * sizeof(u64) / c)
-> -         */
-> -        nrefblocke = (aligned_total_size + meta_size + cluster_size)
-> -                   / (cluster_size - rces - rces * sizeof(uint64_t)
-> -                                                 / cluster_size);
-> -        meta_size += DIV_ROUND_UP(nrefblocke, refblock_size) * cluster_size;
-> -
-> -        /* total size of refcount tables */
-> -        nreftablee = nrefblocke / refblock_size;
-> -        nreftablee = align_offset(nreftablee, cluster_size / sizeof(uint64_t));
-> -        meta_size += nreftablee * sizeof(uint64_t);
-> -
-> -        qemu_opt_set_number(opts, BLOCK_OPT_SIZE,
-> -                            aligned_total_size + meta_size, &error_abort);
-> +        uint64_t file_size = qcow2_calc_size_usage(total_size, cluster_bits,
-> +                                                   refcount_order);
-> +
-> +        qemu_opt_set_number(opts, BLOCK_OPT_SIZE, file_size, &error_abort);
->          qemu_opt_set(opts, BLOCK_OPT_PREALLOC, PreallocMode_lookup[prealloc],
->                       &error_abort);
->      }
+>          error_setg(errp, "The '%s' block driver requires a file name",
+>                     drv->format_name);
+>          ret = -EINVAL;
 >
