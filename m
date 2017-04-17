@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d0CpP-0005yM-J2
+	(envelope-from <quintela@redhat.com>) id 1d0CpP-0005yQ-KT
 	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 16:00:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d0CpM-0004Lu-JL
+	(envelope-from <quintela@redhat.com>) id 1d0CpM-0004Lo-HJ
 	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 16:00:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60316)
+Received: from mx1.redhat.com ([209.132.183.28]:39270)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d0CpM-0004L4-AH
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d0CpM-0004LJ-At
 	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 16:00:48 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1ECA84AEA8
-	for <qemu-devel@nongnu.org>; Mon, 17 Apr 2017 20:00:44 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 654988047B
+	for <qemu-devel@nongnu.org>; Mon, 17 Apr 2017 20:00:45 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Mon, 17 Apr 2017 22:00:22 +0200
-Message-Id: <20170417200041.2451-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 00/19] Migration cleanup
+Date: Mon, 17 Apr 2017 22:00:23 +0200
+Message-Id: <20170417200041.2451-2-quintela@redhat.com>
+In-Reply-To: <20170417200041.2451-1-quintela@redhat.com>
+References: <20170417200041.2451-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH 01/19] migration: to_dst_file at that point is
+ NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,110 +33,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com
 
-Hi
+We have just arrived as:
 
-This is a cleanup on top of my previous series.  It does:
-- create one .h file for each migration/* file
-- export with meaningful include names the migration functions that we export
-- untangle the includes mess (migration.h in8cluded vmstate.h who
-  included qemu-file.h).  Fixed all callers.
-- once there, old MigrationParams are gone.  Now block migration can be configured
-  with migration capabilities like everything else in migration (old command line
-  parameters  are maintained, but on top of this)
-- start moving hmp* functions to monitor.c
+migration.c: qemu_migrate()
+  ....
+  s = migrate_init() <- puts it to NULL
+  ....
+  {tcp,unix}_start_outgoing_migration ->
+     socket_outgoing_migration
+        migration_channel_connect()
+	   sets to_dst_file
 
-ToDo:
-- move the two remaining hmp commands to monitor.c
+if tls is enabled, we do another round through
+migrate_channel_tls_connect(), but we only set it up if there is no
+error.  So we don't need the assignation.  I am removing it to remove
+in the follwing patches the knowledge about MigrationState in that two
+files.
 
-  really I should move them to block/* something, because they all use
-  block functions, nothing from migration.c.
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
+ migration/socket.c | 1 -
+ migration/tls.c    | 1 -
+ 2 files changed, 2 deletions(-)
 
-- savevm.c/vmstate.c/migration.c: they are still tangled, but I wanted
-  to send the easy parts for review.
-
-- half of the savevm.c functions are still exported from
-  sysemu/sysemu.h moving that to a different file, have to think about
-  it to make patches easier to understand.
-
-- split capabilities/qmp commands/... from migration.c they don't
-  belong there, and once they are out it would be easier to untangle
-  the remaining bits.
-
-- goal is still untangle normal migration/xbzrle/compression and rdma,
-  they are still too untangled together.
-
-- I can still remove some includes that are not needed, but with the
-  current code, it gets really complicated until there is more cleanup there.
-
-Please, comment.
-
-Juan Quintela (19):
-  migration: to_dst_file at that point is NULL
-  migration: They are called vmstate_foo, move them to vmstate.c
-  migration: Split migration/channel.c for channel operations
-  migration: Remove MigrationState from migration_channel_incomming()
-  migration: Export exec.c functions in its own file
-  migration: Export fd.c functions in its own file
-  migration: Export socket.c functions in its own file
-  migration: Export tls.c functions in its own file
-  migration: Create block capabilities for shared and enable
-  migration: Remove use of old MigrationParams
-  migration: Remove old MigrationParams
-  migration: Remove unneeded includes
-  migration: Remove qemu-file.h from vmstate.h
-  migration: Remove vmstate.h from migration.h
-  migration: Export qemu-file-channel.c functions in its own file
-  migration: Export ram.c functions in its own file
-  migration: Export rdma.c functions in its own file
-  monitor: move hmp_savevm() to monitor.c
-  monitor: remove monitor parameter from save_vmstate
-
- include/hw/hw.h                       |   1 +
- include/migration/channel.h           |  24 +++++++
- include/migration/colo.h              |   3 -
- include/migration/exec.h              |  20 ++++++
- include/migration/fd.h                |  20 ++++++
- include/migration/migration.h         |  86 ++-----------------------
- include/migration/qemu-file-channel.h |  22 +++++++
- include/migration/qemu-file.h         |   3 -
- include/migration/ram.h               |  54 ++++++++++++++++
- include/migration/rdma.h              |  22 +++++++
- include/migration/socket.h            |  25 ++++++++
- include/migration/tls.h               |  27 ++++++++
- include/migration/vmstate.h           |   4 --
- include/qemu/typedefs.h               |   1 -
- include/sysemu/sysemu.h               |   6 +-
- migration/Makefile.objs               |   2 +-
- migration/block.c                     |  26 ++------
- migration/channel.c                   |  72 +++++++++++++++++++++
- migration/colo-comm.c                 |   2 +-
- migration/colo-failover.c             |   1 +
- migration/colo.c                      |   8 +--
- migration/exec.c                      |   6 +-
- migration/fd.c                        |   6 +-
- migration/migration.c                 | 116 +++++++++++++++-------------------
- migration/postcopy-ram.c              |   4 +-
- migration/qemu-file-channel.c         |   2 +-
- migration/qemu-file.c                 |   4 +-
- migration/ram.c                       |   5 +-
- migration/rdma.c                      |   5 +-
- migration/savevm.c                    |  63 ++++--------------
- migration/socket.c                    |   6 +-
- migration/tls.c                       |   5 +-
- migration/vmstate.c                   |  16 +++++
- monitor.c                             |   5 ++
- qapi-schema.json                      |   7 +-
- replay/replay-snapshot.c              |   2 +-
- 36 files changed, 417 insertions(+), 264 deletions(-)
- create mode 100644 include/migration/channel.h
- create mode 100644 include/migration/exec.h
- create mode 100644 include/migration/fd.h
- create mode 100644 include/migration/qemu-file-channel.h
- create mode 100644 include/migration/ram.h
- create mode 100644 include/migration/rdma.h
- create mode 100644 include/migration/socket.h
- create mode 100644 include/migration/tls.h
- create mode 100644 migration/channel.c
-
+diff --git a/migration/socket.c b/migration/socket.c
+index 13966f1..dc88812 100644
+--- a/migration/socket.c
++++ b/migration/socket.c
+@@ -79,7 +79,6 @@ static void socket_outgoing_migration(QIOTask *task,
+ 
+     if (qio_task_propagate_error(task, &err)) {
+         trace_migration_socket_outgoing_error(error_get_pretty(err));
+-        data->s->to_dst_file = NULL;
+         migrate_fd_error(data->s, err);
+         error_free(err);
+     } else {
+diff --git a/migration/tls.c b/migration/tls.c
+index 45bec44..a33ecb7 100644
+--- a/migration/tls.c
++++ b/migration/tls.c
+@@ -116,7 +116,6 @@ static void migration_tls_outgoing_handshake(QIOTask *task,
+ 
+     if (qio_task_propagate_error(task, &err)) {
+         trace_migration_tls_outgoing_handshake_error(error_get_pretty(err));
+-        s->to_dst_file = NULL;
+         migrate_fd_error(s, err);
+         error_free(err);
+     } else {
 -- 
 2.9.3
