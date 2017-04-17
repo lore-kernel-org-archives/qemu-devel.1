@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d0G2M-0006Ty-HZ
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 19:26:27 -0400
+	(envelope-from <jsnow@redhat.com>) id 1d0GI2-0000tY-WC
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 19:42:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d0G2H-0003eP-PS
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 19:26:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37754)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d0G2H-0003dW-HA
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 19:26:21 -0400
-Date: Mon, 17 Apr 2017 20:26:17 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170417232617.GB7078@thinpad.lan.raisama.net>
-References: <20170329183017.14026-1-git@kirschju.re>
-	<f3547873-feaa-0d77-abb7-79140bd74cdb@kirschju.re>
+	(envelope-from <jsnow@redhat.com>) id 1d0GI1-0003h2-Ss
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 19:42:39 -0400
+References: <20170411222945.11741-1-eblake@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <a00efe8e-e10a-da03-c31b-d2817d562aea@redhat.com>
+Date: Mon, 17 Apr 2017 19:42:29 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f3547873-feaa-0d77-abb7-79140bd74cdb@kirschju.re>
-Subject: Re: [Qemu-devel] [PATCH v4 0/4] X86/HMP: Expose x86 model specific
- registers via human monitor
+In-Reply-To: <20170411222945.11741-1-eblake@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 00/17] make
+ bdrv_is_allocated[_above] byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,71 +23,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julian Kirsch <git@kirschju.re>
-Cc: qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org
 
-On Tue, Apr 04, 2017 at 11:33:33AM +0200, Julian Kirsch wrote:
-> ping
+
+
+On 04/11/2017 06:29 PM, Eric Blake wrote:
+> There are patches floating around to add NBD_CMD_BLOCK_STATUS,
+> but NBD wants to report status on byte granularity (even if the
+> reporting will probably be naturally aligned to sectors or even
+> much higher levels).  I've therefore started the task of
+> converting our block status code to report at a byte granularity
+> rather than sectors.
 > 
-> I kindly request your comments.
+> This is part one of that conversion: bdrv_is_allocated().
+> Other parts (still to be written) include tracking dirty bitmaps
+> by bytes (it's still one bit per granularity, but now we won't
+> be double-scaling from bytes to sectors to granularity), then
+> replacing bdrv_get_block_status() with a byte based callback
+> in all the drivers.
+> 
+> Available as a tag at:
+> git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-allocated-v1
+> 
+> It requires v9 or later of my prior work on blkdebug:
+> https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg01723.html
+> which in turn requires Max's block-next tree:
+> https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg01298.html
+> 
+> Eric Blake (17):
+>   blockjob: Track job ratelimits via bytes, not sectors
+>   trace: Show blockjob actions via bytes, not sectors
+>   stream: Switch stream_populate() to byte-based
+>   stream: Switch stream_run() to byte-based
+>   commit: Switch commit_populate() to byte-based
+>   commit: Switch commit_run() to byte-based
+>   mirror: Switch MirrorBlockJob to byte-based
+>   mirror: Switch mirror_do_zero_or_discard() to byte-based
+>   mirror: Switch mirror_cow_align() to byte-based
+>   mirror: Switch mirror_do_read() to byte-based
+>   mirror: Switch mirror_iteration() to byte-based
+>   backup: Switch BackupBlockJob to byte-based
+>   backup: Switch block_backup.h to byte-based
+>   backup: Switch backup_do_cow() to byte-based
+>   backup: Switch backup_run() to byte-based
+>   block: Make bdrv_is_allocated() byte-based
+>   block: Make bdrv_is_allocated_above() byte-based
+> 
+>  include/block/block.h        |   6 +-
+>  include/block/block_backup.h |  11 +-
+>  include/qemu/ratelimit.h     |   3 +-
+>  block/backup.c               | 126 ++++++++----------
+>  block/commit.c               |  54 ++++----
+>  block/io.c                   |  59 +++++----
+>  block/mirror.c               | 300 ++++++++++++++++++++++---------------------
+>  block/replication.c          |  29 +++--
+>  block/stream.c               |  35 +++--
+>  block/vvfat.c                |  34 +++--
+>  migration/block.c            |   9 +-
+>  qemu-img.c                   |  15 ++-
+>  qemu-io-cmds.c               |  57 ++++----
+>  block/trace-events           |  14 +-
+>  14 files changed, 381 insertions(+), 371 deletions(-)
 
-Hi Julian,
-
-Sorry for taking so long to reply.
-
-I can't find the original series on either qemu-devel archives,
-or on my own mail archive.
-
-Searching for the Message-Id you were replying to, I can't find
-any matches:
-https://www.mail-archive.com/search?l=mid&q=20170329183017.14026-1-git%40kirschju.re
-
-Can you resend?
+Shame, you added ten lines!
 
 > 
-> On 29.03.2017 20:30, Julian Kirsch wrote:
-> > Provide read/write access to x86 model specific registers (MSRs) by means of
-> > two new HMP commands "msr_get" and "msr_set". The rationale behind this
-> > is to improve introspection capabilities for system virtualization mode.
-> > For instance, many modern x86-64 operating systems maintain access to internal
-> > data structures via the MSR_GSBASE/MSR_KERNELGSBASE MSRs. Giving
-> > introspection utilities (such as a remotely attached gdb via "monitor msr_get")
-> > a way of accessing these registers improves analysis results drastically.
-> > 
-> > This iteration addresses Eduardo's comments of splitting the patch up into
-> > movement, reordering and addition of new MSRs.
-> > 
-> > Changes v3 -> v4:
-> > * Split up x86-related parts of the patch into three distinct patches performing
-> >   movement, reordering and addition of new MSRs.
-> > 
-> > Changes v2 -> v3:
-> > * Rename HMP commands to "msr_get" and "msr_set"
-> > 
-> > Changes v1 -> v2:
-> > * Rename HMP commands to "msr-get" and "msr-set"
-> > * HMP commands Operate on the current default CPU only
-> >   (removes need for cpu_index argument)
-> > * Remove QMP command alltogether
-> > * Implement HMP command in target/i386/monitor.c
-> > * Add #ifdef TARGET_I386 around msr-get/msr-set in hmp-commands.hx
-> > 
-> > Julian Kirsch (4):
-> >   X86: Move rdmsr/wrmsr functionality to standalone functions
-> >   X86: Reorder MSRs in rdmsr/wrmsr to follow the order used by KVM
-> >   X86: Add MSRs supported by KVM to rdmsr/wrmsr
-> >   HMP: Introduce msr_get and msr_set HMP commands
-> > 
-> >  hmp-commands.hx              |  38 ++++
-> >  include/monitor/hmp-target.h |   2 +
-> >  target/i386/cpu.h            |   3 +
-> >  target/i386/helper.c         | 524 +++++++++++++++++++++++++++++++++++++++++++
-> >  target/i386/misc_helper.c    | 297 +-----------------------
-> >  target/i386/monitor.c        |  76 +++++++
-> >  6 files changed, 654 insertions(+), 286 deletions(-)
-> > 
-> 
-> 
 
--- 
-Eduardo
+Patches 1-15:
+
+Reviewed-by: John Snow <jsnow@redhat.com>
+
+9: Is there a good reason for a void fn() to return its argument via a
+passed parameter? I see you're matching the other interface, but that
+strikes me as wonky.
+
+11: Looks correct to me, but this one's a bit hairier than the rest. How
+many times do we truly need to round, adjust, clip, round again, align,
+clip, round, align, ...
+
+I'll take a peek at the last two tomorrow.
+
+--js
