@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49547)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1czx4d-00010R-RT
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 23:11:33 -0400
+	id 1czxBE-00028L-PO
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 23:18:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1czx4a-0008JU-HN
-	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 23:11:31 -0400
+	id 1czxBA-0002p8-1I
+	for qemu-devel@nongnu.org; Sun, 16 Apr 2017 23:18:20 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <1486065742-28639-1-git-send-email-peter.maydell@linaro.org>
-	<1486065742-28639-6-git-send-email-peter.maydell@linaro.org>
+References: <1487604965-23220-1-git-send-email-peter.maydell@linaro.org>
+	<1487604965-23220-4-git-send-email-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <fd287323-58d2-77a6-50b4-99c5f29428bd@amsat.org>
-Date: Mon, 17 Apr 2017 00:11:23 -0300
+Message-ID: <26f455de-55c3-9429-0b32-ee06ae43603f@amsat.org>
+Date: Mon, 17 Apr 2017 00:18:10 -0300
 MIME-Version: 1.0
-In-Reply-To: <1486065742-28639-6-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1487604965-23220-4-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 5/9] arm: gic: Remove references to NVIC
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 03/11] armv7m: QOMify the armv7m
+ container
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,209 +29,249 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Liviu Ionescu <ilg@livius.net>, Michael Davidsaver <mdavidsaver@gmail.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, patches@linaro.org
+Cc: Alistair Francis <alistair23@gmail.com>, Michael Davidsaver <mdavidsaver@gmail.com>, patches@linaro.org
 
-On 02/02/2017 05:02 PM, Peter Maydell wrote:
-> From: Michael Davidsaver <mdavidsaver@gmail.com>
+On 02/20/2017 12:35 PM, Peter Maydell wrote:
+> Create a proper QOM object for the armv7m container, which
+> holds the CPU, the NVIC and the bitband regions.
 >
-> Now that the NVIC is its own separate implementation, we can
-> clean up the GIC code by removing REV_NVIC and conditionals
-> which use it.
->
-> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  hw/intc/gic_internal.h   |  7 ++-----
->  hw/intc/arm_gic.c        | 31 +++++--------------------------
->  hw/intc/arm_gic_common.c | 23 ++++++++---------------
->  3 files changed, 15 insertions(+), 46 deletions(-)
+>  include/hw/arm/armv7m.h |  51 ++++++++++++++++++
+>  hw/arm/armv7m.c         | 140 +++++++++++++++++++++++++++++++++++++++++++-----
+>  2 files changed, 179 insertions(+), 12 deletions(-)
+>  create mode 100644 include/hw/arm/armv7m.h
 >
-> diff --git a/hw/intc/gic_internal.h b/hw/intc/gic_internal.h
-> index 3f31174..7fe87b1 100644
-> --- a/hw/intc/gic_internal.h
-> +++ b/hw/intc/gic_internal.h
-> @@ -25,9 +25,7 @@
+> diff --git a/include/hw/arm/armv7m.h b/include/hw/arm/armv7m.h
+> new file mode 100644
+> index 0000000..193ad71
+> --- /dev/null
+> +++ b/include/hw/arm/armv7m.h
+> @@ -0,0 +1,51 @@
+> +/*
+> + * ARMv7M CPU object
+> + *
+> + * Copyright (c) 2017 Linaro Ltd
+> + * Written by Peter Maydell <peter.maydell@linaro.org>
+> + *
+> + * This code is licensed under the GPL version 2 or later.
+> + */
+> +
+> +#ifndef HW_ARM_ARMV7M_H
+> +#define HW_ARM_ARMV7M_H
+> +
+> +#include "hw/sysbus.h"
+> +#include "hw/arm/armv7m_nvic.h"
+> +
+> +#define TYPE_BITBAND "ARM,bitband-memory"
+> +#define BITBAND(obj) OBJECT_CHECK(BitBandState, (obj), TYPE_BITBAND)
+> +
+> +typedef struct {
+> +    /*< private >*/
+> +    SysBusDevice parent_obj;
+> +    /*< public >*/
+> +
+> +    MemoryRegion iomem;
+> +    uint32_t base;
+> +} BitBandState;
+> +
+> +#define TYPE_ARMV7M "armv7m"
+> +#define ARMV7M(obj) OBJECT_CHECK(ARMv7MState, (obj), TYPE_ARMV7M)
+> +
+> +#define ARMV7M_NUM_BITBANDS 2
+> +
+> +/* ARMv7M container object.
+> + * + Unnamed GPIO input lines: external IRQ lines for the NVIC
+> + * + Named GPIO output SYSRESETREQ: signalled for guest AIRCR.SYSRESETREQ
+> + * + Property "cpu-model": CPU model to instantiate
+> + * + Property "num-irq": number of external IRQ lines
+> + */
+> +typedef struct ARMv7MState {
+> +    /*< private >*/
+> +    SysBusDevice parent_obj;
+> +    /*< public >*/
+> +    NVICState nvic;
+> +    BitBandState bitband[ARMV7M_NUM_BITBANDS];
+> +    ARMCPU *cpu;
+> +
+> +    /* Properties */
+> +    char *cpu_model;
+> +} ARMv7MState;
+> +
+> +#endif
+> diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
+> index b2cc6e9..56d02d4 100644
+> --- a/hw/arm/armv7m.c
+> +++ b/hw/arm/armv7m.c
+> @@ -8,6 +8,7 @@
+>   */
 >
->  #define ALL_CPU_MASK ((unsigned)(((1 << GIC_NCPU) - 1)))
+>  #include "qemu/osdep.h"
+> +#include "hw/arm/armv7m.h"
+>  #include "qapi/error.h"
+>  #include "qemu-common.h"
+>  #include "cpu.h"
+> @@ -120,18 +121,6 @@ static const MemoryRegionOps bitband_ops = {
+>      .endianness = DEVICE_NATIVE_ENDIAN,
+>  };
 >
-> -/* The NVIC has 16 internal vectors.  However these are not exposed
-> -   through the normal GIC interface.  */
-> -#define GIC_BASE_IRQ ((s->revision == REV_NVIC) ? 32 : 0)
-> +#define GIC_BASE_IRQ 0
->
->  #define GIC_SET_ENABLED(irq, cm) s->irq_state[irq].enabled |= (cm)
->  #define GIC_CLEAR_ENABLED(irq, cm) s->irq_state[irq].enabled &= ~(cm)
-> @@ -75,7 +73,6 @@
->
->  /* The special cases for the revision property: */
->  #define REV_11MPCORE 0
-> -#define REV_NVIC 0xffffffff
->
->  void gic_set_pending_private(GICState *s, int cpu, int irq);
->  uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs);
-> @@ -87,7 +84,7 @@ void gic_set_priority(GICState *s, int cpu, int irq, uint8_t val,
->
->  static inline bool gic_test_pending(GICState *s, int irq, int cm)
->  {
-> -    if (s->revision == REV_NVIC || s->revision == REV_11MPCORE) {
-> +    if (s->revision == REV_11MPCORE) {
->          return s->irq_state[irq].pending & cm;
->      } else {
->          /* Edge-triggered interrupts are marked pending on a rising edge, but
-> diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-> index 521aac3..8e5a9d8 100644
-> --- a/hw/intc/arm_gic.c
-> +++ b/hw/intc/arm_gic.c
-> @@ -156,17 +156,6 @@ static void gic_set_irq_11mpcore(GICState *s, int irq, int level,
->      }
->  }
->
-> -static void gic_set_irq_nvic(GICState *s, int irq, int level,
-> -                                 int cm, int target)
-> -{
-> -    if (level) {
-> -        GIC_SET_LEVEL(irq, cm);
-> -        GIC_SET_PENDING(irq, target);
-> -    } else {
-> -        GIC_CLEAR_LEVEL(irq, cm);
-> -    }
-> -}
+> -#define TYPE_BITBAND "ARM,bitband-memory"
+> -#define BITBAND(obj) OBJECT_CHECK(BitBandState, (obj), TYPE_BITBAND)
 > -
->  static void gic_set_irq_generic(GICState *s, int irq, int level,
->                                  int cm, int target)
+> -typedef struct {
+> -    /*< private >*/
+> -    SysBusDevice parent_obj;
+> -    /*< public >*/
+> -
+> -    MemoryRegion iomem;
+> -    uint32_t base;
+> -} BitBandState;
+> -
+>  static void bitband_init(Object *obj)
 >  {
-> @@ -214,8 +203,6 @@ static void gic_set_irq(void *opaque, int irq, int level)
+>      BitBandState *s = BITBAND(obj);
+> @@ -159,6 +148,132 @@ static void armv7m_bitband_init(void)
 >
->      if (s->revision == REV_11MPCORE) {
->          gic_set_irq_11mpcore(s, irq, level, cm, target);
-> -    } else if (s->revision == REV_NVIC) {
-> -        gic_set_irq_nvic(s, irq, level, cm, target);
->      } else {
->          gic_set_irq_generic(s, irq, level, cm, target);
->      }
-> @@ -367,7 +354,7 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
->          return 1023;
->      }
+>  /* Board init.  */
 >
-> -    if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
-> +    if (s->revision == REV_11MPCORE) {
->          /* Clear pending flags for both level and edge triggered interrupts.
->           * Level triggered IRQs will be reasserted once they become inactive.
->           */
-> @@ -589,11 +576,6 @@ void gic_complete_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
->              DPRINTF("Set %d pending mask %x\n", irq, cm);
->              GIC_SET_PENDING(irq, cm);
->          }
-> -    } else if (s->revision == REV_NVIC) {
-> -        if (GIC_TEST_LEVEL(irq, cm)) {
-> -            DPRINTF("Set nvic %d pending mask %x\n", irq, cm);
-> -            GIC_SET_PENDING(irq, cm);
-> -        }
->      }
->
->      group = gic_has_groups(s) && GIC_TEST_GROUP(irq, cm);
-> @@ -768,7 +750,7 @@ static uint32_t gic_dist_readb(void *opaque, hwaddr offset, MemTxAttrs attrs)
->      } else if (offset < 0xf10) {
->          goto bad_reg;
->      } else if (offset < 0xf30) {
-> -        if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
-> +        if (s->revision == REV_11MPCORE) {
->              goto bad_reg;
->          }
->
-> @@ -802,9 +784,6 @@ static uint32_t gic_dist_readb(void *opaque, hwaddr offset, MemTxAttrs attrs)
->              case 2:
->                  res = gic_id_gicv2[(offset - 0xfd0) >> 2];
->                  break;
-> -            case REV_NVIC:
-> -                /* Shouldn't be able to get here */
-> -                abort();
->              default:
->                  res = 0;
->              }
-> @@ -1028,7 +1007,7 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
->                  continue; /* Ignore Non-secure access of Group0 IRQ */
->              }
->
-> -            if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
-> +            if (s->revision == REV_11MPCORE) {
->                  if (value & (1 << (i * 2))) {
->                      GIC_SET_MODEL(irq + i);
->                  } else {
-> @@ -1046,7 +1025,7 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
->          goto bad_reg;
->      } else if (offset < 0xf20) {
->          /* GICD_CPENDSGIRn */
-> -        if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
-> +        if (s->revision == REV_11MPCORE) {
->              goto bad_reg;
->          }
->          irq = (offset - 0xf10);
-> @@ -1060,7 +1039,7 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
->          }
->      } else if (offset < 0xf30) {
->          /* GICD_SPENDSGIRn */
-> -        if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
-> +        if (s->revision == REV_11MPCORE) {
->              goto bad_reg;
->          }
->          irq = (offset - 0xf20);
-> diff --git a/hw/intc/arm_gic_common.c b/hw/intc/arm_gic_common.c
-> index 4a8df44..70f1134 100644
-> --- a/hw/intc/arm_gic_common.c
-> +++ b/hw/intc/arm_gic_common.c
-> @@ -99,9 +99,7 @@ void gic_init_irqs_and_mmio(GICState *s, qemu_irq_handler handler,
->       *  [N+32..N+63] PPIs for CPU 1
->       *   ...
->       */
-> -    if (s->revision != REV_NVIC) {
-> -        i += (GIC_INTERNAL * s->num_cpu);
-> -    }
-> +    i += (GIC_INTERNAL * s->num_cpu);
->      qdev_init_gpio_in(DEVICE(s), handler, i);
->
->      for (i = 0; i < s->num_cpu; i++) {
-> @@ -121,16 +119,12 @@ void gic_init_irqs_and_mmio(GICState *s, qemu_irq_handler handler,
->      memory_region_init_io(&s->iomem, OBJECT(s), ops, s, "gic_dist", 0x1000);
->      sysbus_init_mmio(sbd, &s->iomem);
->
-> -    if (s->revision != REV_NVIC) {
-> -        /* This is the main CPU interface "for this core". It is always
-> -         * present because it is required by both software emulation and KVM.
-> -         * NVIC is not handled here because its CPU interface is different,
-> -         * neither it can use KVM.
-> -         */
-> -        memory_region_init_io(&s->cpuiomem[0], OBJECT(s), ops ? &ops[1] : NULL,
-> -                              s, "gic_cpu", s->revision == 2 ? 0x2000 : 0x100);
-> -        sysbus_init_mmio(sbd, &s->cpuiomem[0]);
-> -    }
-> +    /* This is the main CPU interface "for this core". It is always
-> +     * present because it is required by both software emulation and KVM.
+> +static const hwaddr bitband_input_addr[ARMV7M_NUM_BITBANDS] = {
+> +    0x20000000, 0x40000000
+> +};
+> +
+> +static const hwaddr bitband_output_addr[ARMV7M_NUM_BITBANDS] = {
+> +    0x22000000, 0x42000000
+> +};
+> +
+> +static void armv7m_instance_init(Object *obj)
+> +{
+> +    ARMv7MState *s = ARMV7M(obj);
+> +    int i;
+> +
+> +    /* Can't init the cpu here, we don't yet know which model to use */
+> +
+> +    object_initialize(&s->nvic, sizeof(s->nvic), "armv7m_nvic");
+> +    qdev_set_parent_bus(DEVICE(&s->nvic), sysbus_get_default());
+> +    object_property_add_alias(obj, "num-irq",
+> +                              OBJECT(&s->nvic), "num-irq", &error_abort);
+> +
+> +    for (i = 0; i < ARRAY_SIZE(s->bitband); i++) {
+> +        object_initialize(&s->bitband[i], sizeof(s->bitband[i]), TYPE_BITBAND);
+> +        qdev_set_parent_bus(DEVICE(&s->bitband[i]), sysbus_get_default());
+> +    }
+> +}
+> +
+> +static void armv7m_realize(DeviceState *dev, Error **errp)
+> +{
+> +    /* here realize our children */
+> +    ARMv7MState *s = ARMV7M(dev);
+> +    Error *err = NULL;
+> +    int i;
+> +    char **cpustr;
+> +    ObjectClass *oc;
+> +    const char *typename;
+> +    CPUClass *cc;
+> +
+> +    cpustr = g_strsplit(s->cpu_model, ",", 2);
+> +
+> +    oc = cpu_class_by_name(TYPE_ARM_CPU, cpustr[0]);
+> +    if (!oc) {
+> +        error_setg(errp, "Unknown CPU model %s", cpustr[0]);
+> +        g_strfreev(cpustr);
+> +        return;
+> +    }
+> +
+> +    cc = CPU_CLASS(oc);
+> +    typename = object_class_get_name(oc);
+> +    cc->parse_features(typename, cpustr[1], &err);
+> +    g_strfreev(cpustr);
+> +    if (err) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +
+> +    s->cpu = ARM_CPU(object_new(typename));
+> +    if (!s->cpu) {
+> +        error_setg(errp, "Unknown CPU model %s", s->cpu_model);
+> +        return;
+> +    }
+> +
+> +    object_property_set_bool(OBJECT(s->cpu), true, "realized", &err);
+> +    if (err != NULL) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +
+> +    /* Note that we must realize the NVIC after the CPU */
+> +    object_property_set_bool(OBJECT(&s->nvic), true, "realized", &err);
+> +    if (err != NULL) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +
+> +    /* Alias the NVIC's input and output GPIOs as our own so the board
+> +     * code can wire them up. (We do this in realize because the
+> +     * NVIC doesn't create the input GPIO array until realize.)
 > +     */
-> +    memory_region_init_io(&s->cpuiomem[0], OBJECT(s), ops ? &ops[1] : NULL,
-> +                          s, "gic_cpu", s->revision == 2 ? 0x2000 : 0x100);
-> +    sysbus_init_mmio(sbd, &s->cpuiomem[0]);
+> +    qdev_pass_gpios(DEVICE(&s->nvic), dev, NULL);
+> +    qdev_pass_gpios(DEVICE(&s->nvic), dev, "SYSRESETREQ");
+> +
+> +    /* Wire the NVIC up to the CPU */
+> +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->nvic), 0,
+> +                       qdev_get_gpio_in(DEVICE(s->cpu), ARM_CPU_IRQ));
+> +    s->cpu->env.nvic = &s->nvic;
+> +
+> +    for (i = 0; i < ARRAY_SIZE(s->bitband); i++) {
+> +        Object *obj = OBJECT(&s->bitband[i]);
+> +        SysBusDevice *sbd = SYS_BUS_DEVICE(&s->bitband[i]);
+> +
+> +        object_property_set_int(obj, bitband_input_addr[i], "base", &err);
+> +        if (err != NULL) {
+> +            error_propagate(errp, err);
+> +            return;
+> +        }
+> +        object_property_set_bool(obj, true, "realized", &err);
+> +        if (err != NULL) {
+> +            error_propagate(errp, err);
+> +            return;
+> +        }
+> +
+> +        sysbus_mmio_map(sbd, 0, bitband_output_addr[i]);
+> +    }
+> +}
+> +
+> +static Property armv7m_properties[] = {
+> +    DEFINE_PROP_STRING("cpu-model", ARMv7MState, cpu_model),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static void armv7m_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->realize = armv7m_realize;
+> +    dc->props = armv7m_properties;
+> +}
+> +
+> +static const TypeInfo armv7m_info = {
+> +    .name = TYPE_ARMV7M,
+> +    .parent = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(ARMv7MState),
+> +    .instance_init = armv7m_instance_init,
+> +    .class_init = armv7m_class_init,
+> +};
+> +
+>  static void armv7m_reset(void *opaque)
+>  {
+>      ARMCPU *cpu = opaque;
+> @@ -264,6 +379,7 @@ static const TypeInfo bitband_info = {
+>  static void armv7m_register_types(void)
+>  {
+>      type_register_static(&bitband_info);
+> +    type_register_static(&armv7m_info);
 >  }
 >
->  static void arm_gic_common_realize(DeviceState *dev, Error **errp)
-> @@ -162,7 +156,7 @@ static void arm_gic_common_realize(DeviceState *dev, Error **errp)
->      }
->
->      if (s->security_extn &&
-> -        (s->revision == REV_11MPCORE || s->revision == REV_NVIC)) {
-> +        (s->revision == REV_11MPCORE)) {
->          error_setg(errp, "this GIC revision does not implement "
->                     "the security extensions");
->          return;
-> @@ -255,7 +249,6 @@ static Property arm_gic_common_properties[] = {
->      DEFINE_PROP_UINT32("num-irq", GICState, num_irq, 32),
->      /* Revision can be 1 or 2 for GIC architecture specification
->       * versions 1 or 2, or 0 to indicate the legacy 11MPCore GIC.
-> -     * (Internally, 0xffffffff also indicates "not a GIC but an NVIC".)
->       */
->      DEFINE_PROP_UINT32("revision", GICState, revision, 1),
->      /* True if the GIC should implement the security extensions */
+>  type_init(armv7m_register_types)
 >
