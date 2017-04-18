@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1d0SlL-0003L7-J3
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:01:44 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1d0SyW-0005OZ-9m
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:15:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1d0SlG-0008In-2I
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:01:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60352)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1d0SlF-0008Ic-Se
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:01:38 -0400
-References: <20170417215916.12431-1-ehabkost@redhat.com>
-	<20170417215916.12431-2-ehabkost@redhat.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <9733cb3b-18b5-a9fb-3a63-622b4bdcc62b@redhat.com>
-Date: Tue, 18 Apr 2017 16:01:27 +0300
+	(envelope-from <peter.maydell@linaro.org>) id 1d0SyV-0007UT-6y
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:15:20 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:37888)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1d0SyU-0007UB-Vp
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:15:19 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id r190so14402504wme.1
+	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 06:15:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170417215916.12431-2-ehabkost@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 1/7] pci: Change pci_host_bus_register()
- parameter to PCIHostState
+In-Reply-To: <149193892875.15312.10880186639757781549@loki>
+References: <149193892875.15312.10880186639757781549@loki>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 18 Apr 2017 14:14:57 +0100
+Message-ID: <CAFEAcA-m67wXgX8W_jEj10T+P3A2NEa_iS3MdQqWhd7DD+W7HA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [ANNOUNCE] QEMU 2.9.0-rc4 is now available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: aik@ozlabs.ru, David Gibson <dgibson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 04/18/2017 12:59 AM, Eduardo Habkost wrote:
-> The function requires a PCI_HOST_BRIDGE object, so change the parameter
-> type to reflect that.
+On 11 April 2017 at 20:28, Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+> Hello,
 >
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Marcel Apfelbaum <marcel@redhat.com>
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  hw/pci/pci.c | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
+> On behalf of the QEMU Team, I'd like to announce the availability of the
+> fifth release candidate for the QEMU 2.9 release.  This release is meant
+> for testing purposes and should not be used in a production environment.
 >
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index 259483b1c0..25118fb91d 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -312,11 +312,9 @@ static void pcibus_reset(BusState *qbus)
->      }
->  }
+>   http://download.qemu-project.org/qemu-2.9.0-rc4.tar.xz
+>   http://download.qemu-project.org/qemu-2.9.0-rc4.tar.xz.sig
 >
-> -static void pci_host_bus_register(DeviceState *host)
-> +static void pci_host_bus_register(PCIHostState *phb)
->  {
-> -    PCIHostState *host_bridge = PCI_HOST_BRIDGE(host);
-> -
-> -    QLIST_INSERT_HEAD(&pci_host_bridges, host_bridge, next);
-> +    QLIST_INSERT_HEAD(&pci_host_bridges, phb, next);
->  }
+> A note from the maintainer:
 >
->  PCIBus *pci_find_primary_bus(void)
-> @@ -377,7 +375,7 @@ static void pci_bus_init(PCIBus *bus, DeviceState *parent,
->      /* host bridge */
->      QLIST_INIT(&bus->child);
->
-> -    pci_host_bus_register(parent);
-> +    pci_host_bus_register(PCI_HOST_BRIDGE(host));
->  }
->
->  bool pci_bus_is_express(PCIBus *bus)
->
+>   This is intended to be the final release candidate for v2.9.0, and
+>   unless any showstopper bugs are reported we plan to cut the final
+>   release next week on the 18th April.
 
+Regrettably there were a couple of final bugs we needed
+to squash, and so the revised plan is to roll an rc5 today
+and then have final release on Thursday or Friday.
 
-Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
-
-Thanks,
-Marcel
+thanks
+-- PMM
