@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tejaswinipoluri3@gmail.com>) id 1d0NCU-0002Tx-DS
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 03:05:23 -0400
+	(envelope-from <peterx@redhat.com>) id 1d0NY1-000501-CG
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 03:27:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tejaswinipoluri3@gmail.com>) id 1d0NCO-0005gM-7A
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 03:05:22 -0400
-Received: from mail-io0-x236.google.com ([2607:f8b0:4001:c06::236]:33508)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tejaswinipoluri3@gmail.com>)
-	id 1d0NCO-0005g9-1B
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 03:05:16 -0400
-Received: by mail-io0-x236.google.com with SMTP id k87so155792423ioi.0
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 00:05:15 -0700 (PDT)
+	(envelope-from <peterx@redhat.com>) id 1d0NXy-0005HX-4p
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 03:27:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39320)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d0NXx-0005HQ-SJ
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 03:27:34 -0400
+Date: Tue, 18 Apr 2017 15:27:17 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170418072717.GD22226@pxdev.xzpeter.org>
+References: <1492428730-13438-1-git-send-email-peterx@redhat.com>
+	<1492428730-13438-8-git-send-email-peterx@redhat.com>
+	<A2975661238FB949B60364EF0F2C257439054049@shsmsx102.ccr.corp.intel.com>
+	<20170418045400.GC22226@pxdev.xzpeter.org>
+	<A2975661238FB949B60364EF0F2C2574390540D1@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <CAH=b03tKZyiv3k6J6Mi4sujUTteV07Jsk4a+Lf_oDj-q7yFuUg@mail.gmail.com>
-References: <1490610662-5483-1-git-send-email-tejaswinipoluri3@gmail.com>
-	<20170327111309.GB26900@stefanha-x1.localdomain>
-	<CAH=b03tqB4vy0fg3ikhf1iGpbQyLfDd28ymrO_Qo_QSysHOAKA@mail.gmail.com>
-	<CAH=b03tKZyiv3k6J6Mi4sujUTteV07Jsk4a+Lf_oDj-q7yFuUg@mail.gmail.com>
-From: Tejaswini Poluri <tejaswinipoluri3@gmail.com>
-Date: Tue, 18 Apr 2017 12:35:14 +0530
-Message-ID: <CAH=b03vSKY3zcj8nSh9CXPkgCzGGWh1hcswEAtRctFsJRVWyEQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [[RFC]PATCH:hw/sd:sd_init()] hw/sd : modified the
- sd_init() function
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <A2975661238FB949B60364EF0F2C2574390540D1@shsmsx102.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v2 7/7] intel_iommu: support passthrough
+ (PT)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,89 +31,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: "Liu, Yi L" <yi.l.liu@intel.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Lan, Tianyu" <tianyu.lan@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-Hii,
+On Tue, Apr 18, 2017 at 06:02:44AM +0000, Liu, Yi L wrote:
+> > > Hi Peter,
+> > >
+> > > Skip address space switching is a good idea to support Passthru mode.
+> > > However, without the address space, the vfio notifier would not be
+> > > registered, thus vIOMMU emulator has no way to connect to host. It is
+> > > no harm if there is only map/unmap notifier. But if we have more
+> > > notifiers other than map/unmap, it may be a problem.
+> > >
+> > > I think we need to reconsider it here.
+> > 
+> > For now I think as switching is good to us in general. Could I know more context
+> > about this? Would it be okay to work on top of this in the future?
+> > 
+> 
+> Let me explain. For vSVM enabling, it needs to add new notifier to bind gPASID table
+> to host. If an assigned device uses SVM in guest, as designed guest IOMMU driver would
+> set "pt" for it. This is to make sure the host second-level page table stores GPA->HPA
+> mapping. So that pIOMMU can do nested translation to achieve gVA->GPA GPA->HPA 
+> mapping.
 
-A gentle reminder on the same!
+That should mean that in the guest it will only enable first level
+translation, while in the host it'll be nested (first + second)? Then
+you should be trapping the guest extended context entry invalidation,
+then pass the PASID table pointer downward to the host IOMMU, am I
+correct?
 
-Regards,
-Tejaswini
+> 
+> So the situation is if we want to keep GPA->HPA mapping, we should skip address space
+> switch, but the vfio listener would not know vIOMMU is added, so no vfio notifier would
+> be registered. But if we do the switch, the GPA->HPA mapping is unmapped. And need
+> another way to build the GPA->HPA mapping.
 
-On Sun, Apr 9, 2017 at 5:44 AM, Tejaswini Poluri <tejaswinipoluri3@gmail.com
-> wrote:
+If my understanding above is correct, current IOMMU notifier may not
+satisfy your need. If you see the current notify interface, it's
+delivering IOMMUTLBEntry. I suspect it only suites for IOTLB
+notifications, but not if you want to pass some pointer (one GPA)
+downward somewhere.
 
-> Hii Paolo,
-> Waiting for your comments on this patch
->
-> Regards,
-> Tejaswini
-> On 28 Mar 2017 11:01 a.m., "Tejaswini Poluri" <tejaswinipoluri3@gmail.com>
-> wrote:
->
->>
->>
->> On Mon, Mar 27, 2017 at 4:43 PM, Stefan Hajnoczi <stefanha@redhat.com>
->> wrote:
->>
->>> On Mon, Mar 27, 2017 at 04:01:02PM +0530, Tejaswini wrote:
->>> > From: Tejaswini Poluri <tejaswinipoluri3@gmail.com>
->>>
->>> Please shorten the subject line: "[PATCH] hw/sd: simplify sd_init()
->>> prototype"
->>>
->>> > @@ -573,16 +573,19 @@ SDState *sd_init(BlockBackend *blk, bool is_spi)
->>> >      qdev_prop_set_drive(dev, "drive", blk, &err);
->>> >      if (err) {
->>> >          error_report("sd_init failed: %s", error_get_pretty(err));
->>> > -        return NULL;
->>> > +        return -1;
->>> >      }
->>> >      qdev_prop_set_bit(dev, "spi", is_spi);
->>> >      object_property_set_bool(obj, true, "realized", &err);
->>> >      if (err) {
->>> >          error_report("sd_init failed: %s", error_get_pretty(err));
->>> > -        return NULL;
->>> > +        return -1;
->>> >      }
->>> > -
->>> > -    return SD_CARD(dev);
->>> > +    sd_state = SD_CARD(dev);
->>>
->>> The caller will not see the new value of sd_state.  In C arguments are
->>> passed by value.  That means they are local variables inside the
->>> function and do not affect the caller.
->>>
->>> The caller will call sd_init() along with passing SDState pointer as an
->> argument like below
->> if (sd_init(s->card, blk, false) < 0) .
->> And the sd_init() function is modified to
->> int sd_init(SDState *sd_state, BlockBackend *blk, bool is_spi)
->> so that the caller gets the new value of SDstate updated.
->> Looking forward for the comments of Paolo Bonzini to understand what more
->> needs to be done as part of the task.
->>
->> I have CCed Paolo Bonzini, who posted this task.  Maybe he can explain
->>> what he meant by "Include SDState by value instead of allocating it in
->>> sd_init (hw/sd/)".
->>>
->>> > +    if (!sd_state) {
->>> > +             return -1;
->>> > +     }
->>>
->>> QEMU use 4 space indentation.  Please do not use tabs.
->>>
->>
->>
->>
->> --
->> Regards,
->> Tejaswini
->>
->
+> 
+> I think we may have two choice here. Pls let me know your ideas.
+> 
+> 1. skip the switch for "pt" mode, find other way to register vfio notifiers. not sure if this
+> is workable. Just a quick thought.
+> 
+> 2. do the switch, and rebuild GPA->HPA mapping if device use "pt" mode. For this option,
+> I also have two way to build the GPA->HPA mapping.
+> a) walk all the memory region sections in address_space_memory, and build the mapping.
+> address_space_memory.dispatch->map.sections, sections stores all the mapped sections.
+> 
+> b) let guest iommu driver mimics a 1:1 mapping for the devices use "pt" mode. in this way,
+> the GPA->HPA mapping could be setup by walking the guest SL page table. This is consistent
+> with your vIOVA replay solution.
 
+I'll prefer (1). Reason explained above.
+
+> 
+> Also I'm curious if Tianyu's fault report framework needs to register new notifiers.
+
+For Tianyu's case, I feel like we need other kind of notifier as well,
+but not the current IOTLB one. And, of course in this case it'll be in
+an reverted direction, which is from device to vIOMMU.
+
+(I am thinking whether it's a good time now to let any PCI device able
+ to fetch its direct owner IOMMU object, then it can register anything
+ it want onto that object maybe?)
+
+Thanks,
 
 -- 
-Regards,
-Tejaswini
+Peter Xu
