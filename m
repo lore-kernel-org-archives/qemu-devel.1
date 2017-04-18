@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40085)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1d0UHM-0007Sf-VL
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:38:53 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d0UJK-0000TJ-D3
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:41:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1d0UHJ-0001L7-4U
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:38:53 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:38143
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1d0UHI-0001E7-Sj
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:38:49 -0400
-References: <1491381329-3995-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1491381329-3995-4-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<f56ec3d4-236e-2082-db5a-8402eb050503@twiddle.net>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <03d1cb2e-7b0d-7ae1-a884-413cf388762e@ilande.co.uk>
-Date: Tue, 18 Apr 2017 15:38:10 +0100
+	(envelope-from <stefanha@gmail.com>) id 1d0UJJ-0002OH-Ny
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:40:54 -0400
+Date: Tue, 18 Apr 2017 15:40:35 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170418144035.GI21261@stefanha-x1.localdomain>
+References: <20170412091819.GB4955@noname.str.redhat.com>
+	<CAOGPPbfkZ5qJC-YkeBs+LLdn88VTvij_Xk8_FEpaNmg_pyXVVA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <f56ec3d4-236e-2082-db5a-8402eb050503@twiddle.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 03/14] cg3: remove unused width and height
- variables
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="6lCXDTVICvIQMz0h"
+Content-Disposition: inline
+In-Reply-To: <CAOGPPbfkZ5qJC-YkeBs+LLdn88VTvij_Xk8_FEpaNmg_pyXVVA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [Qemu-block]  migrate -b problems
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,59 +24,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, kraxel@redhat.com, qemu-devel@nongnu.org
-
-On 15/04/17 11:54, Richard Henderson wrote:
-
-> On 04/05/2017 01:35 AM, Mark Cave-Ayland wrote:
->> These aren't required since we can use the display width and height
->> directly.
->>
->> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->> ---
->>  hw/display/cg3.c |   15 ++++++---------
->>  1 file changed, 6 insertions(+), 9 deletions(-)
->>
->> diff --git a/hw/display/cg3.c b/hw/display/cg3.c
->> index b42f60e..178a6dd 100644
->> --- a/hw/display/cg3.c
->> +++ b/hw/display/cg3.c
->> @@ -93,14 +93,11 @@ static void cg3_update_display(void *opaque)
->>      uint32_t *data;
->>      uint32_t dval;
->>      int x, y, y_start;
->> -    unsigned int width, height;
->>      ram_addr_t page, page_min, page_max;
->>
->>      if (surface_bits_per_pixel(surface) != 32) {
->>          return;
->>      }
->> -    width = s->width;
->> -    height = s->height;
->>
->>      y_start = -1;
->>      page_min = -1;
->> @@ -110,11 +107,11 @@ static void cg3_update_display(void *opaque)
->>      data = (uint32_t *)surface_data(surface);
->>
->>      memory_region_sync_dirty_bitmap(&s->vram_mem);
->> -    for (y = 0; y < height; y++) {
->> +    for (y = 0; y < s->height; y++) {
-> 
-> I suspect the generated code is much worse, since the compiler can no
-> longer tell that the loop bounds are constant.
-> 
-> You probably do want to keep width and height in local variables across
-> this function.
-
-Can you explain a bit more about this? My thoughts were that with
-optimisation enabled the compiler would assume s->width is constant
-throughout the loop by default (or at least in OpenBIOS I've had to
-explicitly mark variables as volatile to ensure the compiler refetches
-the original value instead of reusing a previous copy from the
-stack/registers)?
+To: 858585 jemmy <jemmy858585@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
 
-ATB,
+--6lCXDTVICvIQMz0h
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Mark.
+On Wed, Apr 12, 2017 at 05:51:23PM +0800, 858585 jemmy wrote:
+> it this bug?
+> https://bugs.launchpad.net/qemu/+bug/1681688
+
+Yes.  This discussion is about the long-term fix instead of a short-term
+hack for QEMU 2.9.
+
+Stefan
+
+--6lCXDTVICvIQMz0h
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJY9iVjAAoJEJykq7OBq3PI4qwIAJyUreKP9nDIBlyLV6yrFR6j
+StsrwDJDlJcRW76mEZXpLix3/gu8SO/bhalm+0FDMATwsBnXqW365nV/TPXPklUc
+bzYSgWfGyOz4QNIT0vuPyXN+1k0+vn3Id5ZEPY8TAmt+nbLhmm3OGmlxpL4Acrqg
+W7YhhtESvvHUnYZhNfpViHcFOHKCtlGBM9TRaQb/i84HUKjvNK2UAxem1a6niMpc
+BHp2Oy23PiYekAsJbH0OONBVOFUeXF5lMPz65uSf3kBYW2w0p1+mjef9+NFgurVB
+1lXm+Dzbl7KDoK/zOvZs+TuOqA01Kzh/6KEwkGH+skdNQAx7aknDTukPN9t/XuE=
+=Pahi
+-----END PGP SIGNATURE-----
+
+--6lCXDTVICvIQMz0h--
