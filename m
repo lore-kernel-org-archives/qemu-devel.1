@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d0Wil-0006qz-2r
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:15:20 -0400
+	(envelope-from <rjones@redhat.com>) id 1d0WkY-0007Td-50
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:17:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d0Wih-0008Cj-4B
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:15:19 -0400
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:35965)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d0Wig-0008Ce-TQ
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:15:15 -0400
-Received: by mail-wr0-x233.google.com with SMTP id c55so107165604wrc.3
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 10:15:14 -0700 (PDT)
-Date: Tue, 18 Apr 2017 18:14:57 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170418171457.GN21261@stefanha-x1.localdomain>
-References: <CACaajQtOS+=G4yHfymqFJiCZBtMfR=qUbfVi6n5quTRtffULjA@mail.gmail.com>
+	(envelope-from <rjones@redhat.com>) id 1d0WkU-0000Yq-58
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:17:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54222)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1d0WkT-0000YX-V2
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:17:06 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C3E629E61D
+	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 17:17:04 +0000 (UTC)
+Date: Tue, 18 Apr 2017 18:17:03 +0100
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20170418171703.GY30620@redhat.com>
+References: <20170418152424.GX30620@redhat.com>
+	<9ae9d913-2516-72dc-adaf-cdd0f082c486@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="3hAdtgBjtgL7p0NQ"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CACaajQtOS+=G4yHfymqFJiCZBtMfR=qUbfVi6n5quTRtffULjA@mail.gmail.com>
-Subject: Re: [Qemu-devel] qemu and own disk driver writing questions
+In-Reply-To: <9ae9d913-2516-72dc-adaf-cdd0f082c486@redhat.com>
+Subject: Re: [Qemu-devel] virtio-scsi limits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +33,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vasiliy Tolstov <v.tolstov@selfip.ru>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+On Tue, Apr 18, 2017 at 05:30:52PM +0200, Paolo Bonzini wrote:
+> > When I changed libguestfs to use LUNs instead of targets (target=0
+> > unit=i), I got a peculiar bug.  It looks like there is some kind of
+> > race when enumerating the device, where /sys is populated before the
+> > device is actually available.
+> 
+> That's not _too_ surprising because devtmpfs processes creation/deletion
+> requests asynchronously.
 
---3hAdtgBjtgL7p0NQ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+I had a bit of a look into this, and I don't think this can be right.
+At this point we're running inside the initramfs environment, where
+/dev is a rootfs (a special case of either ramfs or tmpfs).
 
-On Thu, Apr 13, 2017 at 01:57:17PM +0300, Vasiliy Tolstov wrote:
-> Hi! If i want to develop some sort of qemu network block driver to own
-> storage. I can write qemu driver or tcmu / scst userspace driver and
-> attach to qemu block device (i'm use linux)
-> So in theory what path have minimal overhead in case of memory copy
-> and performance?
-> Where i can find some info how qemu works with data that needs to be
-> written or readed from block device passed to vm?
+Would it still be the case that a single process that does mknod
+followed by mount could not see the effect of the mknod?
 
-The best approach depends on your requirements.  If you want the code to
-be merged into qemu.git it's important to discuss the requirements first
-so that everyone is on board with adding another block driver.
+The mount error (EINVAL) should indicate an invalid superblock rather
+than a missing inode (if you believe the documentation, so that may be
+wrong).
 
-Three options:
+The sequence of events (happening in a single init process) is as
+described below:
 
-1. Implement iSCSI, NBD, or NFS on your storage server.  Doesn't require
-   new QEMU code and users don't need to upgrade QEMU.
+> > https://github.com/libguestfs/supermin/blob/master/init/init.c#L176
+> > 
+> > * fp = fopen ("/sys/block/sdab/dev", "r") succeeds at line 181
+> > 
+> > * we read major:minor from fp at line 230
+> > 
+> > * we mknod ("/dev/root",...) at line 245
+> > 
+> > * we mount ("/dev/root", "/root", "ext2"...) at line 262, which fails with
+> >   EINVAL
+> > 
+> > * shortly after that, kernel messages indicate that sdab has been
+> >   attached.
 
-2. Implement a block driver in block/.  See iSCSI and other network
-   protocol drivers for examples.  Useful if your storage system offers
-   snapshot features.
+Thanks,
 
-3. Implement vhost-user-scsi in your storage server.  You need to write
-   a virtio-scsi backend that runs in a separate userspace process on
-   the host.  You are limited to supporting the virtio-scsi device - no
-   IDE, SATA, virtio-blk, etc.  vhost-user-scsi is still under active
-   development and you may need to contribute to it if you hit
-   limitations/bugs.  Requires low-level knowledge of virtio.
+Rich.
 
-Stefan
-
---3hAdtgBjtgL7p0NQ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJY9kmRAAoJEJykq7OBq3PIoEgIAIQP4dgk7O8dUK5bOwQs9GTk
-uPtFINksvK3fn6ICLrvX4NG8ZbS06y616oSI+YUd4kcS1y4dqGWXbZOigvbAPeBP
-4zfOFrYBHvPf1DHnNrHjMe5xpBxYJ4TkPuJrEBAstgN3fsQevgNaln0xxX7uUJoL
-RhFbDWS6GMkR05y75+eLtRAWhf2vIq0Xhb3XvIm7eYHtT9jmNtkOnazo0/LJjneG
-rJKu7om9MfRFYpYpxO+1KToVEcXhW2m99aN35H+dDHdLiJgZl7CEjQjqJIwcl/Kb
-FEQmT7SXfmTrbe9Zu4SBUDTTfVOXAI6ZDRSIGt0XBWk6tF/zJUCAstc7U6UiQJ8=
-=vDS1
------END PGP SIGNATURE-----
-
---3hAdtgBjtgL7p0NQ--
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+Fedora Windows cross-compiler. Compile Windows programs, test, and
+build Windows installers. Over 100 libraries supported.
+http://fedoraproject.org/wiki/MinGW
