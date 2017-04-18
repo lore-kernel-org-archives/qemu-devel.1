@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d0UB6-0002ym-Ow
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:32:25 -0400
+	(envelope-from <famz@redhat.com>) id 1d0UBM-0003Ay-90
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:32:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d0UB2-0006UL-Ju
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:32:24 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:34151)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d0UB2-0006TS-Dr
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:32:20 -0400
-Received: by mail-wr0-x244.google.com with SMTP id u18so25148238wrc.1
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 07:32:20 -0700 (PDT)
-Date: Tue, 18 Apr 2017 15:32:17 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170418143217.GH21261@stefanha-x1.localdomain>
-References: <CAJy91CZHb_aJncY1KSqTorZF3Gex=4_xd9=FmS5_QGzkXDNwGg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="PNpeiK4tTqhYOExY"
-Content-Disposition: inline
-In-Reply-To: <CAJy91CZHb_aJncY1KSqTorZF3Gex=4_xd9=FmS5_QGzkXDNwGg@mail.gmail.com>
-Subject: Re: [Qemu-devel] guest host time synchronization
+	(envelope-from <famz@redhat.com>) id 1d0UBL-0006Xy-Ap
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:32:40 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Tue, 18 Apr 2017 22:30:44 +0800
+Message-Id: <20170418143044.12187-3-famz@redhat.com>
+In-Reply-To: <20170418143044.12187-1-famz@redhat.com>
+References: <20170418143044.12187-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.9-rc5 v4 2/2] block: Drain BH in
+ bdrv_drained_begin
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +20,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jiahuan Zhang <jiahuanzhang90@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, jcody@redhat.com
 
+During block job completion, nothing is preventing
+block_job_defer_to_main_loop_bh from being called in a nested
+aio_poll(), which is a trouble, such as in this code path:
 
---PNpeiK4tTqhYOExY
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+    qmp_block_commit
+      commit_active_start
+        bdrv_reopen
+          bdrv_reopen_multiple
+            bdrv_reopen_prepare
+              bdrv_flush
+                aio_poll
+                  aio_bh_poll
+                    aio_bh_call
+                      block_job_defer_to_main_loop_bh
+                        stream_complete
+                          bdrv_reopen
 
-On Tue, Apr 11, 2017 at 09:01:40AM +0200, Jiahuan Zhang wrote:
-> I made a test to check the time difference of QEMU emulated ARM-based Lin=
-ux
-> guest and the Windows host. The result is, the guest time is around 0.2
-> second faster than the host. I used the "-rtc base" option.
->=20
-> So can I say that, the time precision of QEMU emulation is in seconds? Is
-> it possible to make it more precise? because I need to test the latency of
-> my guest/host communication with high time resolution, at least in
-> miliseconds.
->=20
-> Please let me know if you have any method  for the communication
-> performance testing. Thank you very much.
+block_job_defer_to_main_loop_bh is the last step of the stream job,
+which should have been "paused" by the bdrv_drained_begin/end in
+bdrv_reopen_multiple, but it is not done because it's in the form of a
+main loop BH.
 
-This can depend on the exact board (machine type) being emulated because
-the emulated clock and timer hardware may be different.
+Similar to why block jobs should be paused between drained_begin and
+drained_end, BHs they schedule must be excluded as well.  To achieve
+this, this patch forces draining the BH in BDRV_POLL_WHILE.
 
-Please share your QEMU command-line so we can see the exact ARM guest
-hardware configuration.
+As a side effect this fixes a hang in block_job_detach_aio_context
+during system_reset when a block job is ready:
 
-Stefan
+    #0  0x0000555555aa79f3 in bdrv_drain_recurse
+    #1  0x0000555555aa825d in bdrv_drained_begin
+    #2  0x0000555555aa8449 in bdrv_drain
+    #3  0x0000555555a9c356 in blk_drain
+    #4  0x0000555555aa3cfd in mirror_drain
+    #5  0x0000555555a66e11 in block_job_detach_aio_context
+    #6  0x0000555555a62f4d in bdrv_detach_aio_context
+    #7  0x0000555555a63116 in bdrv_set_aio_context
+    #8  0x0000555555a9d326 in blk_set_aio_context
+    #9  0x00005555557e38da in virtio_blk_data_plane_stop
+    #10 0x00005555559f9d5f in virtio_bus_stop_ioeventfd
+    #11 0x00005555559fa49b in virtio_bus_stop_ioeventfd
+    #12 0x00005555559f6a18 in virtio_pci_stop_ioeventfd
+    #13 0x00005555559f6a18 in virtio_pci_reset
+    #14 0x00005555559139a9 in qdev_reset_one
+    #15 0x0000555555916738 in qbus_walk_children
+    #16 0x0000555555913318 in qdev_walk_children
+    #17 0x0000555555916738 in qbus_walk_children
+    #18 0x00005555559168ca in qemu_devices_reset
+    #19 0x000055555581fcbb in pc_machine_reset
+    #20 0x00005555558a4d96 in qemu_system_reset
+    #21 0x000055555577157a in main_loop_should_exit
+    #22 0x000055555577157a in main_loop
+    #23 0x000055555577157a in main
 
---PNpeiK4tTqhYOExY
-Content-Type: application/pgp-signature; name="signature.asc"
+The rationale is that the loop in block_job_detach_aio_context cannot
+make any progress in pausing/completing the job, because bs->in_flight
+is 0, so bdrv_drain doesn't process the block_job_defer_to_main_loop
+BH. With this patch, it does.
 
------BEGIN PGP SIGNATURE-----
+Reported-by: Jeff Cody <jcody@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ include/block/block.h | 22 ++++++++++++++--------
+ 1 file changed, 14 insertions(+), 8 deletions(-)
 
-iQEcBAEBAgAGBQJY9iNxAAoJEJykq7OBq3PIAFsH/i6fmFyzyKQf8dIaJTyNde3U
-D/p1RG4pxrkOll43K+2IdKi4GC+l+NC3wyCAw1f6Jl8o4xz8oCbC3fxoJ/bsg+Pn
-Tc9cHPPuhKkQfr05FBP6zAaqs6yl1JASUh7LFuPwV777kU2q4JwxpgxjLcT5+k9m
-YuQF/XTgiTdv0HpVf+nFrdyrClIXvwQSwZywCKgQ+Ls/j3V3Eg4F7HQe/FJdwCuO
-EhJ2mx/kvjGI8qW8Cfhh04nCuYh0BEhHdY8PVa8J1GhWge1L/4c0vvUdECsCtvcW
-zZUY9ACrkc5VTCmHDV/9CYf5w/P2Wd54Fo8JG4As9F5vdDgjpy36hQ2F8mX8AFI=
-=rbp/
------END PGP SIGNATURE-----
-
---PNpeiK4tTqhYOExY--
+diff --git a/include/block/block.h b/include/block/block.h
+index 97d4330..5ddc0cf 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -381,12 +381,13 @@ void bdrv_drain_all(void);
+ 
+ #define BDRV_POLL_WHILE(bs, cond) ({                       \
+     bool waited_ = false;                                  \
++    bool busy_ = true;                                     \
+     BlockDriverState *bs_ = (bs);                          \
+     AioContext *ctx_ = bdrv_get_aio_context(bs_);          \
+     if (aio_context_in_iothread(ctx_)) {                   \
+-        while ((cond)) {                                   \
+-            aio_poll(ctx_, true);                          \
+-            waited_ = true;                                \
++        while ((cond) || busy_) {                          \
++            busy_ = aio_poll(ctx_, (cond));                \
++            waited_ |= !!(cond) | busy_;                   \
+         }                                                  \
+     } else {                                               \
+         assert(qemu_get_current_aio_context() ==           \
+@@ -398,11 +399,16 @@ void bdrv_drain_all(void);
+          */                                                \
+         assert(!bs_->wakeup);                              \
+         bs_->wakeup = true;                                \
+-        while ((cond)) {                                   \
+-            aio_context_release(ctx_);                     \
+-            aio_poll(qemu_get_aio_context(), true);        \
+-            aio_context_acquire(ctx_);                     \
+-            waited_ = true;                                \
++        while (busy_) {                                    \
++            if ((cond)) {                                  \
++                waited_ = busy_ = true;                    \
++                aio_context_release(ctx_);                 \
++                aio_poll(qemu_get_aio_context(), true);    \
++                aio_context_acquire(ctx_);                 \
++            } else {                                       \
++                busy_ = aio_poll(ctx_, false);             \
++                waited_ |= busy_;                          \
++            }                                              \
+         }                                                  \
+         bs_->wakeup = false;                               \
+     }                                                      \
+-- 
+2.9.3
