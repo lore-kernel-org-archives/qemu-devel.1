@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d0Wsl-0002Kk-GW
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:25:41 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d0Wy5-0003gV-AM
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:31:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d0Wsg-0004wT-BX
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:25:39 -0400
-Received: from mail.kernel.org ([198.145.29.136]:51942)
+	(envelope-from <ehabkost@redhat.com>) id 1d0Wy2-0007aP-4H
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:31:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55850)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1d0Wsg-0004up-2n
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:25:34 -0400
-Date: Tue, 18 Apr 2017 10:25:18 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <3bf23396-114a-922a-c99a-55153965d905@suse.com>
-Message-ID: <alpine.DEB.2.10.1704181021500.31486@sstabellini-ThinkPad-X260>
-References: <1491903346-16075-1-git-send-email-andr2000@gmail.com>
-	<alpine.DEB.2.10.1704131704560.2759@sstabellini-ThinkPad-X260>
-	<693ebf90-00d7-823e-4db8-9b9686e56941@gmail.com>
-	<f5ce758f-5f31-32d6-7e19-8c3a83017bab@suse.com>
-	<alpine.DEB.2.10.1704141035090.23677@sstabellini-ThinkPad-X260>
-	<3bf23396-114a-922a-c99a-55153965d905@suse.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d0Wy1-0007a4-SF
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:31:06 -0400
+Date: Tue, 18 Apr 2017 14:30:54 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170418173054.GC7078@thinpad.lan.raisama.net>
+References: <1491562755-23867-1-git-send-email-peterx@redhat.com>
+	<1491562755-23867-2-git-send-email-peterx@redhat.com>
+	<20170410043922.GI27571@umbus>
+	<20170410070950.GK3981@pxdev.xzpeter.org>
+	<dc26790e-8200-bbde-a7c3-70852f625424@redhat.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH] configure: introduce
- --enable-xen-fb-backend
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dc26790e-8200-bbde-a7c3-70852f625424@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v9 1/9] memory: add section range info for
+ IOMMU notifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,95 +31,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juergen Gross <jgross@suse.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, Oleksandr Andrushchenko <andr2000@gmail.com>, vlad.babchuk@gmail.com, qemu-devel@nongnu.org, andrii.anisov@gmail.com, olekstysh@gmail.com, al1img@gmail.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, joculator@gmail.com
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, qemu-devel@nongnu.org, alex.williamson@redhat.com, bd.aviv@gmail.com
 
-On Tue, 18 Apr 2017, Juergen Gross wrote:
-> On 14/04/17 19:52, Stefano Stabellini wrote:
-> > On Fri, 14 Apr 2017, Juergen Gross wrote:
-> >> On 14/04/17 08:06, Oleksandr Andrushchenko wrote:
-> >>> On 04/14/2017 03:12 AM, Stefano Stabellini wrote:
-> >>>> On Tue, 11 Apr 2017, Oleksandr Andrushchenko wrote:
-> >>>>> From: Oleksandr Andrushchenko <oleksandr_andrushchenko@epam.com>
-> >>>>>
-> >>>>> For some use cases when Xen framebuffer/input backend
-> >>>>> is not a part of Qemu it is required to disable it,
-> >>>>> because of conflicting access to input/display devices.
-> >>>>> Introduce additional configuration option for explicit
-> >>>>> input/display control.
-> >>>> In these cases when you don't want xenfb, why don't you just remove
-> >>>> "vfb" from the xl config file? QEMU only starts the xenfb backend when
-> >>>> requested by the toolstack.
-> >>>>
-> >>>> Is it because you have an alternative xenfb backend? If so, is it really
-> >>>> fully xenfb compatible, or is it a different protocol? If it is a
-> >>>> different protocol, I suggest you rename your frontend/backend PV device
-> >>>> name to something different from "vfb".
-> >>>>
-> >>> Well, offending part is vkbd actually (for multi-touch
-> >>> we run our own user-space backend which supports
-> >>> kbd/ptr/mtouch), but vfb and vkbd is the same backend
-> >>> in QEMU. So, I am ok for vfb, but just want vkbd off
-> >>> So, there are 2 options:
-> >>> 1. At compile time remove vkbd and still allow vfb
-> >>> 2. Remove xenfb completely, if acceptable (this is my case)
-> >>
-> >> What about adding a Xenstore entry for backend type and let qemu test
-> >> for it being not present or containing "qemu"?
+On Tue, Apr 18, 2017 at 06:20:11PM +0300, Marcel Apfelbaum wrote:
+> On 04/10/2017 10:09 AM, Peter Xu wrote:
+> > On Mon, Apr 10, 2017 at 02:39:22PM +1000, David Gibson wrote:
+> > > On Fri, Apr 07, 2017 at 06:59:07PM +0800, Peter Xu wrote:
+> > > > In this patch, IOMMUNotifier.{start|end} are introduced to store section
+> > > > information for a specific notifier. When notification occurs, we not
+> > > > only check the notification type (MAP|UNMAP), but also check whether the
+> > > > notified iova range overlaps with the range of specific IOMMU notifier,
+> > > > and skip those notifiers if not in the listened range.
+> > > > 
+> > > > When removing an region, we need to make sure we removed the correct
+> > > > VFIOGuestIOMMU by checking the IOMMUNotifier.start address as well.
+> > > > 
+> > > > This patch is solving the problem that vfio-pci devices receive
+> > > > duplicated UNMAP notification on x86 platform when vIOMMU is there. The
+> > > > issue is that x86 IOMMU has a (0, 2^64-1) IOMMU region, which is
+> > > > splitted by the (0xfee00000, 0xfeefffff) IRQ region. AFAIK
+> > > > this (splitted IOMMU region) is only happening on x86.
+> > > > 
+> > > > This patch also helps vhost to leverage the new interface as well, so
+> > > > that vhost won't get duplicated cache flushes. In that sense, it's an
+> > > > slight performance improvement.
+> > > > 
+> > > > Suggested-by: David Gibson <david@gibson.dropbear.id.au>
+> > > > Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> > > > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> > > > Acked-by: Alex Williamson <alex.williamson@redhat.com>
+> > > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > > ---
+> > > >  hw/vfio/common.c      | 12 +++++++++---
+> > > >  hw/virtio/vhost.c     | 10 ++++++++--
+> > > >  include/exec/memory.h | 19 ++++++++++++++++++-
+> > > >  memory.c              |  9 +++++++++
+> > > >  4 files changed, 44 insertions(+), 6 deletions(-)
+> > > > 
+> > > > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> > > > index f3ba9b9..6b33b9f 100644
+> > > > --- a/hw/vfio/common.c
+> > > > +++ b/hw/vfio/common.c
+> > > > @@ -478,8 +478,13 @@ static void vfio_listener_region_add(MemoryListener *listener,
+> > > >          giommu->iommu_offset = section->offset_within_address_space -
+> > > >                                 section->offset_within_region;
+> > > >          giommu->container = container;
+> > > > -        giommu->n.notify = vfio_iommu_map_notify;
+> > > > -        giommu->n.notifier_flags = IOMMU_NOTIFIER_ALL;
+> > > > +        llend = int128_add(int128_make64(section->offset_within_region),
+> > > > +                           section->size);
+> > > > +        llend = int128_sub(llend, int128_one());
+> > > > +        iommu_notifier_init(&giommu->n, vfio_iommu_map_notify,
+> > > > +                            IOMMU_NOTIFIER_ALL,
+> > > > +                            section->offset_within_region,
+> > > > +                            int128_get64(llend));
+> > > 
+> > > Seems to me it would make sense to put the fiddling around to convert
+> > > the MemoryRegionSection into the necessary values would make sense to
+> > > go inside iommu_notifier_init().
 > > 
-> > That is what we do for the console, using the xenstore node "type". QEMU
-> > is "ioemu" while xenconsoled is "xenconsoled". Weirdly, instead of a
-> > backend node, it is a read-only frontend node, see
-> > tools/libxl/libxl_console.c:libxl__device_console_add.
+> > But will we always get one MemoryRegionSection if we are not in any of
+> > the region_{add|del} callback? E.g., what if we want to init an IOMMU
+> > notifier that covers just the whole IOMMU region range?
 > > 
-> > Oleksandr, I am sorry to feature-creep this simple patch, but I think
-> > Juergen is right. But we cannot do it just for one protocol. We need to
-> > introduce a generic way to enable/disable backends in QEMU. Using a
-> > xenstore node is OK.
+> > Considering above, I would still slightly prefer current interface.
+> > 
+> > > 
+> > > >          QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
+> > > > 
+> > > >          memory_region_register_iommu_notifier(giommu->iommu, &giommu->n);
+> > > > @@ -550,7 +555,8 @@ static void vfio_listener_region_del(MemoryListener *listener,
+> > > >          VFIOGuestIOMMU *giommu;
+> > > > 
+> > > >          QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
+> > > > -            if (giommu->iommu == section->mr) {
+> > > > +            if (giommu->iommu == section->mr &&
+> > > > +                giommu->n.start == section->offset_within_region) {
+> > > 
+> > > This test should be sufficient, but I'd be a bit more comfortable if
+> > > there was a test and assert() that the end matches as well.  I also
+> > > wonder if remove-matching-notifier helper would be useful here.
+> > > Although vhost doesn't appear to ever remove, so maybe it's premature.
+> > 
+> > Oh... vhost does remove it, but I just forgot to touch it up :( ...
+> > Thanks for pointing out.
+> > 
+> > Marcel, if this is the only comment, would you mind squash below
+> > change into current patch? Thanks,
 > 
-> An alternative solution would be similar to qdisk/tap or qusb/vusb
-> backends: Use different device types on backend side while keeping
-> frontend side of Xenstore the same as today.
-> 
-> So today the vkbd backend nodes are:
-> 
-> /local/domain/0/backend/vkbd/
-> 
-> You could use:
-> 
-> /local/domain/0/backend/mtouch
-> 
-> and keep the frontend nodes (/local/domain/<n>/device/vkbd/), possibly
-> with additional feature node(s).
-> 
-> The qemu backend would have to check for the vkbd backend nodes to be
-> present before enabling the related backend.
+> Hi Peter,
+> I asked Eduardo to merge the series through this machine tree
+> since I don't have a tree yet.
+> He already squashed the change, thanks Eduardo!
+> Marcel
 
-Yes, that also works. Either way, we don't have a "registry" of backend
-protocol nodes; we don't have a doc that ties qdisk with QEMU and
-the block protocol. We should introduce one before adding any more.
+The series is queued at:
 
+git://github.com/ehabkost/qemu-hacks.git machine-next
 
-> > We could do exactly the same as the PV console, thus "type" = "ioemu",
-> > read-only, under the frontend xenstore directory. Or we could introduce
-> > new nodes. I would probably go for "backend-type" = "qemu" under the
-> > backend xenstore directory. I don't have a strong opinion about this. In
-> > the example below I'll use the PV console convention.
-> > 
-> > For starters:
-> > 
-> > * libxl needs to write the "type" node to xenstore for *all* protocols.
-> >   The "type" is not yet configurable.
-> > * qemu reads them for all backends, proceeds if "type" = "ioemu"
-> > 
-> > These should be two simple patches. Stage 2:
-> > 
-> > * we add options in the xl config file to configure any backend, libxl
-> >   set "type" accordingly (Maybe not *any*, but vif, vkbd, vfb could all
-> >   have a "type". It is OK if you only add an option for vkbd.)
-> > * non-QEMU backends, in particular Linux backends, also read the "type"
-> >   node and proceed if it's "linux"
-> > 
-> > Does this sound OK to you?
-> > 
-> 
+(Including the vhost_iommu_region_del() fixup below).
+
+v2.9.0-rc5 was tagged today, v2.9.0 is expected to be tagged in 2
+days. I plan to submit a pull request as soon as it is tagged.
+
+-- 
+Eduardo
