@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d0PlR-0003Yx-1G
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 05:49:37 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1d0Pm6-0003y8-DZ
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 05:50:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d0PlQ-0004Q8-EV
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 05:49:37 -0400
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:34941)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1d0Pm5-0004dA-5Z
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 05:50:18 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:32923)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1d0PlQ-0004Q2-7x
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 05:49:36 -0400
-Received: by mail-wm0-x22d.google.com with SMTP id w64so51761263wma.0
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 02:49:36 -0700 (PDT)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1d0Pm4-0004ct-PI
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 05:50:17 -0400
+Received: by mail-lf0-x243.google.com with SMTP id 88so7968114lfr.0
+	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 02:50:16 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <E8F93B5C-51EA-46F6-849E-3C0A2C2E33E1@gmail.com>
-References: <E8F93B5C-51EA-46F6-849E-3C0A2C2E33E1@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 18 Apr 2017 10:49:14 +0100
-Message-ID: <CAFEAcA-GptJjzNCEWXcsiVMtC8PcT=taMrJP=QU0f_m6XOkW1g@mail.gmail.com>
+References: <20170316092121.25672-1-marcandre.lureau@redhat.com>
+	<CAJ+F1C+t_5Gv8g91r0kZLZZaWq1PEMZL4KH0f2RU0ikk-EihuQ@mail.gmail.com>
+In-Reply-To: <CAJ+F1C+t_5Gv8g91r0kZLZZaWq1PEMZL4KH0f2RU0ikk-EihuQ@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 18 Apr 2017 09:50:04 +0000
+Message-ID: <CAJ+F1C+piLamcd_rS-9OLZ=0Cg8b7JkDZZsyK=fjkttubkOP6Q@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] define constant in .risu file
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 00/21] chardev clean-ups & tests (after
+ 2.9)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,22 +31,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: G 3 <programmingkidx@gmail.com>
-Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-On 18 April 2017 at 05:20, G 3 <programmingkidx@gmail.com> wrote:
-> Is there a way to define a constant in a .risu file? Something like this:
+Hi
+
+On Mon, Apr 10, 2017 at 5:58 PM Marc-Andr=C3=A9 Lureau <
+marcandre.lureau@gmail.com> wrote:
+
+> On Thu, Mar 16, 2017 at 10:23 AM Marc-Andr=C3=A9 Lureau <
+> marcandre.lureau@redhat.com> wrote:
 >
-> my $upper_imm_limit = 500;
+>> Hi,
+>>
+>> The following series contains various patches:
+>> - replace "chardevs" list for a /chardevs container object
+>> - add a few read-only socket properties mainly useful for testing
+>> - some chardev related clean-ups
+>> - add various chardev tests
+>>
+>> This series is part of a larger refactoring series that I try to keep
+>> up to date here: https://github.com/elmarco/qemu/commits/chrfe
+>>
+>>
+> ping (most of the patches are still unreviewed)
+>
 
-No - the risu file is just a bunch of patterns, with a
-few fragments of executable code mixed in.
-
-Currently constants defined in the perl source will
-be visible to the perl fragments in the risu file,
-but that's pretty ugly and one day I'll make it
-a requirement that the perl explicitly exports the
-functions/constants the risu fragments should see.
+Patches missing reviews: 5-9, 12, 16-21
 
 thanks
--- PMM
+
+v3:
+>> - open code object_new_with_props() as suggest by Paolo
+>> - added some r-b tags
+>> - rebased
+>>
+>> v2:
+>> - replaced root container unref with a TODO
+>> - call object_unparent() directly instead of qemu_chr_delete()
+>> - remove bad qcow2 NULL check removal
+>> - rebased
+>>
+>> Marc-Andr=C3=A9 Lureau (21):
+>>   char: remove qemu_chr_be_generic_open
+>>   mux: simplfy muxes_realize_done
+>>   xen: use a better chardev type check
+>>   container: don't leak container reference
+>>   char: add a /chardevs container
+>>   vl: add todo note about root container cleanup
+>>   char: use /chardevs container instead of chardevs list
+>>   char: remove qemu_chardev_add
+>>   char: remove chardevs list
+>>   char: useless NULL check
+>>   char-socket: introduce update_disconnected_filename()
+>>   char-socket: update local address after listen
+>>   char-socket: add 'addr' property
+>>   char-socket: add 'connected' property
+>>   char-udp: flush as much buffer as possible
+>>   tests: add alias check in /char/ringbuf
+>>   tests: add /char/pipe test
+>>   tests: add /char/file test
+>>   tests: add /char/socket test
+>>   tests: add /char/udp test
+>>   tests: add /char/console test
+>>
+>>  chardev/char-mux.h          |   2 +-
+>>  include/sysemu/char.h       |  10 --
+>>  chardev/char-mux.c          |  11 +-
+>>  chardev/char-pty.c          |   2 +-
+>>  chardev/char-socket.c       |  46 +++++-
+>>  chardev/char-udp.c          |  26 ++--
+>>  chardev/char.c              | 148 ++++++++----------
+>>  gdbstub.c                   |   4 +-
+>>  hw/usb/ccid-card-passthru.c |   2 +-
+>>  hw/usb/redirect.c           |   2 +-
+>>  net/vhost-user.c            |   2 +-
+>>  qom/container.c             |   1 +
+>>  tests/test-char.c           | 366
+>> +++++++++++++++++++++++++++++++++++++++++++-
+>>  tests/vhost-user-test.c     |   2 +-
+>>  ui/console.c                |   2 +-
+>>  ui/gtk.c                    |   2 +-
+>>  vl.c                        |   1 +
+>>  xen-common.c                |   2 +-
+>>  18 files changed, 504 insertions(+), 127 deletions(-)
+>>
+>> --
+>> 2.12.0.191.gc5d8de91d
+>>
+>>
+>> --
+> Marc-Andr=C3=A9 Lureau
+>
+--=20
+Marc-Andr=C3=A9 Lureau
