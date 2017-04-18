@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43900)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d0T9f-0000mX-Dv
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:26:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1d0TA5-0001BY-K0
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:27:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d0T9e-0003Nd-HF
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:26:51 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170414083717.13641-1-lvivier@redhat.com>
-	<20170414083717.13641-5-lvivier@redhat.com>
-Date: Tue, 18 Apr 2017 15:26:45 +0200
-In-Reply-To: <20170414083717.13641-5-lvivier@redhat.com> (Laurent Vivier's
-	message of "Fri, 14 Apr 2017 10:37:17 +0200")
-Message-ID: <87h91l3kyy.fsf@dusky.pond.sub.org>
+	(envelope-from <eblake@redhat.com>) id 1d0TA4-0003ae-P1
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:27:17 -0400
+References: <20170314023933.12118-1-famz@redhat.com>
+	<20170314023933.12118-4-famz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <811911cd-a8c9-90d2-2186-33f4db0a9af1@redhat.com>
+Date: Tue, 18 Apr 2017 08:27:04 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] qdev: remove
- cannot_destroy_with_object_finalize_yet
+In-Reply-To: <20170314023933.12118-4-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Pj31OkJnxG8VEUgLb16HeJHnUrEi4e3i4"
+Subject: Re: [Qemu-devel] [PATCH RFC 3/3] qemu-io: Add --unsafe-read option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,17 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Antony Pavlov <antonynpavlov@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Laurent Vivier <lvivier@redhat.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Pj31OkJnxG8VEUgLb16HeJHnUrEi4e3i4
+From: Eric Blake <eblake@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <811911cd-a8c9-90d2-2186-33f4db0a9af1@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 3/3] qemu-io: Add --unsafe-read option
+References: <20170314023933.12118-1-famz@redhat.com>
+ <20170314023933.12118-4-famz@redhat.com>
+In-Reply-To: <20170314023933.12118-4-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> As all users have been removed, we can remove
-> cannot_destroy_with_object_finalize_yet field
-> from the DeviceClass structure.
->
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+On 03/13/2017 09:39 PM, Fam Zheng wrote:
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  qemu-io.c | 28 +++++++++++++++++++++-------
+>  1 file changed, 21 insertions(+), 7 deletions(-)
+>=20
+> @@ -108,6 +112,7 @@ static void open_help(void)
+>  " -r, -- open file read-only\n"
+>  " -s, -- use snapshot file\n"
+>  " -n, -- disable host cache, short for -t none\n"
+> +" -U, -- accept unsafe opening of the image even if it's in use by ano=
+ther process\n"
 
-Huzzah!
+Long line (exceeds 80 columns of output); can we shorten it?  Maybe
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+ -U, allow unsafe reads when another process is writing
+
+You did get 'qemu-io -c "help open"' adjusted, but I don't see where you
+adjusted 'qemu-io --help'.  Since both places gained a -U, you still
+need more documentation. But at least there is no man page to worry
+about here.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--Pj31OkJnxG8VEUgLb16HeJHnUrEi4e3i4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY9hQoAAoJEKeha0olJ0NqYD8H/iAlgcgJ4bWTMujHVwv/Oi7F
++iWBqxJ6jV+U2b6TFbGSM5iy3F+qspFU69tMMwgulGHgu8nMzytI5ssJM337v2j7
+Z2TnwrARPZ4s0PZDPjCv8PQneKm+kgg43hxAubaBfpDwbyCUwevkfLaBobSKoLOI
+rcZW6NHjZizV9IMJg4c0SrOLcmXUrbe3GKuiOXlP0VZVgj76IbdGyvNzolLurc/w
+6INndRena7mHCStneZxf609td2A/BdLLQ2wDvbfr1n8H1zax/o89MJZB+hH1fDef
+TyAeXa6/lD+7EPWnc80i9wlrvniCvkKWG6zs7GycOFLWG/0KNYKodcHveHStdl0=
+=L38S
+-----END PGP SIGNATURE-----
+
+--Pj31OkJnxG8VEUgLb16HeJHnUrEi4e3i4--
