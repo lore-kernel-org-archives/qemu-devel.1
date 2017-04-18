@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d0PNI-0006zK-KG
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 05:24:41 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d0PgD-0001DB-L3
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 05:44:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d0PNH-0003Lc-EM
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 05:24:40 -0400
-Date: Tue, 18 Apr 2017 17:24:28 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170418092428.GB490@lemon.lan>
-References: <20170321031635.22123-1-famz@redhat.com>
-	<20170321031635.22123-5-famz@redhat.com>
-	<20170410085728.GB2567@stefanha-x1.localdomain>
+	(envelope-from <pbonzini@redhat.com>) id 1d0Pg8-00024t-N7
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 05:44:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52894)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d0Pg8-00024S-Dj
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 05:44:08 -0400
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1675C61D22
+	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 09:44:06 +0000 (UTC)
+References: <20170417200041.2451-1-quintela@redhat.com>
+	<20170417200041.2451-20-quintela@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c7f9792c-1e78-b7b9-c5cc-04b650b82820@redhat.com>
+Date: Tue, 18 Apr 2017 11:44:03 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170410085728.GB2567@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC 04/16] block: Propagate
- BLK_PERM_AIO_CONTEXT_CHANGE down the graph
+In-Reply-To: <20170417200041.2451-20-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 19/19] monitor: remove monitor parameter
+ from save_vmstate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,48 +34,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com
 
-On Mon, 04/10 09:57, Stefan Hajnoczi wrote:
-> On Tue, Mar 21, 2017 at 11:16:23AM +0800, Fam Zheng wrote:
-> > @@ -1713,21 +1714,22 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
-> >          perm |= BLK_PERM_CONSISTENT_READ;
-> >          shared &= ~(BLK_PERM_WRITE | BLK_PERM_RESIZE);
-> >      } else {
-> > -        /* We want consistent read from backing files if the parent needs it.
-> > +        /* We want consistent read and aio context change from backing files if
-> > +         * the parent needs it.
-> >           * No other operations are performed on backing files. */
-> > -        perm &= BLK_PERM_CONSISTENT_READ;
-> > +        perm &= BLK_PERM_CONSISTENT_READ | BLK_PERM_AIO_CONTEXT_CHANGE;
-> >  
-> > -        /* If the parent can deal with changing data, we're okay with a
-> > +        /* If the parent can deal with changing aio context, we're okay too;
-> > +         * If the parent can deal with changing data, we're okay with a
-> >           * writable and resizable backing file. */
-> >          /* TODO Require !(perm & BLK_PERM_CONSISTENT_READ), too? */
-> > +        shared &= BLK_PERM_AIO_CONTEXT_CHANGE | BLK_PERM_WRITE;
-> >          if (shared & BLK_PERM_WRITE) {
-> > -            shared = BLK_PERM_WRITE | BLK_PERM_RESIZE;
-> > -        } else {
-> > -            shared = 0;
-> > +            shared |= BLK_PERM_WRITE | BLK_PERM_RESIZE;
-> 
-> We already have BLK_PERM_WRITE so we're just adding BLK_PERM_RESIZE.
-> The following is clearer:
-> 
->   shared |= BLK_PERM_RESIZE;
-> 
-> >          }
-> >  
-> >          shared |= BLK_PERM_CONSISTENT_READ | BLK_PERM_GRAPH_MOD |
-> > -                  BLK_PERM_WRITE_UNCHANGED;
-> > +                  BLK_PERM_WRITE_UNCHANGED | BLK_PERM_AIO_CONTEXT_CHANGE;
-> 
-> Why was shared &= BLK_PERM_AIO_CONTEXT_CHANGE necessary above if we
-> unconditionally OR it here?
 
-It's redundant. Will fix both.
 
-Fam
+On 17/04/2017 22:00, Juan Quintela wrote:
+> load_vmstate() already use error_report, so be consistent.
+
+Better: make both return Error* via an Error** parameter, and add
+
+    hmp_handle_error(mon, &err);
+
+to hmp_savevm and error_report_err(err) on the loading side.
+
+Paolo
+
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  include/sysemu/sysemu.h  |  2 +-
+>  migration/savevm.c       | 16 ++++++++--------
+>  monitor.c                |  2 +-
+>  replay/replay-snapshot.c |  2 +-
+>  4 files changed, 11 insertions(+), 11 deletions(-)
+> 
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index 146a0dc..d2582fa 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -75,7 +75,7 @@ void qemu_remove_exit_notifier(Notifier *notify);
+>  void qemu_add_machine_init_done_notifier(Notifier *notify);
+>  void qemu_remove_machine_init_done_notifier(Notifier *notify);
+>  
+> -int save_vmstate(Monitor *mon, const char *name);
+> +int save_vmstate(const char *name);
+>  int load_vmstate(const char *name);
+>  void hmp_delvm(Monitor *mon, const QDict *qdict);
+>  void hmp_info_snapshots(Monitor *mon, const QDict *qdict);
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index cbd7e0d..36a6002 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -2055,7 +2055,7 @@ int qemu_loadvm_state(QEMUFile *f)
+>      return ret;
+>  }
+>  
+> -int save_vmstate(Monitor *mon, const char *name)
+> +int save_vmstate(const char *name)
+>  {
+>      BlockDriverState *bs, *bs1;
+>      QEMUSnapshotInfo sn1, *sn = &sn1, old_sn1, *old_sn = &old_sn1;
+> @@ -2069,8 +2069,8 @@ int save_vmstate(Monitor *mon, const char *name)
+>      AioContext *aio_context;
+>  
+>      if (!bdrv_all_can_snapshot(&bs)) {
+> -        monitor_printf(mon, "Device '%s' is writable but does not "
+> -                       "support snapshots.\n", bdrv_get_device_name(bs));
+> +        error_report("Device '%s' is writable but does not support snapshots.",
+> +                     bdrv_get_device_name(bs));
+>          return ret;
+>      }
+>  
+> @@ -2087,7 +2087,7 @@ int save_vmstate(Monitor *mon, const char *name)
+>  
+>      bs = bdrv_all_find_vmstate_bs();
+>      if (bs == NULL) {
+> -        monitor_printf(mon, "No block device can accept snapshots\n");
+> +        error_report("No block device can accept snapshots");
+>          return ret;
+>      }
+>      aio_context = bdrv_get_aio_context(bs);
+> @@ -2096,7 +2096,7 @@ int save_vmstate(Monitor *mon, const char *name)
+>  
+>      ret = global_state_store();
+>      if (ret) {
+> -        monitor_printf(mon, "Error saving global state\n");
+> +        error_report("Error saving global state");
+>          return ret;
+>      }
+>      vm_stop(RUN_STATE_SAVE_VM);
+> @@ -2128,7 +2128,7 @@ int save_vmstate(Monitor *mon, const char *name)
+>      /* save the VM state */
+>      f = qemu_fopen_bdrv(bs, 1);
+>      if (!f) {
+> -        monitor_printf(mon, "Could not open VM state file\n");
+> +        error_report("Could not open VM state file");
+>          goto the_end;
+>      }
+>      ret = qemu_savevm_state(f, &local_err);
+> @@ -2141,8 +2141,8 @@ int save_vmstate(Monitor *mon, const char *name)
+>  
+>      ret = bdrv_all_create_snapshot(sn, bs, vm_state_size, &bs);
+>      if (ret < 0) {
+> -        monitor_printf(mon, "Error while creating snapshot on '%s'\n",
+> -                       bdrv_get_device_name(bs));
+> +        error_report("Error while creating snapshot on '%s'",
+> +                     bdrv_get_device_name(bs));
+>          goto the_end;
+>      }
+>  
+> diff --git a/monitor.c b/monitor.c
+> index 2fca4fb..9e79a97 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -1856,7 +1856,7 @@ static void hmp_loadvm(Monitor *mon, const QDict *qdict)
+>  
+>  static void hmp_savevm(Monitor *mon, const QDict *qdict)
+>  {
+> -    save_vmstate(mon, qdict_get_try_str(qdict, "name"));
+> +    save_vmstate(qdict_get_try_str(qdict, "name"));
+>  }
+>  
+>  int monitor_get_fd(Monitor *mon, const char *fdname, Error **errp)
+> diff --git a/replay/replay-snapshot.c b/replay/replay-snapshot.c
+> index 65e2d37..8cced46 100644
+> --- a/replay/replay-snapshot.c
+> +++ b/replay/replay-snapshot.c
+> @@ -64,7 +64,7 @@ void replay_vmstate_init(void)
+>  {
+>      if (replay_snapshot) {
+>          if (replay_mode == REPLAY_MODE_RECORD) {
+> -            if (save_vmstate(cur_mon, replay_snapshot) != 0) {
+> +            if (save_vmstate(replay_snapshot) != 0) {
+>                  error_report("Could not create snapshot for icount record");
+>                  exit(1);
+>              }
+> 
