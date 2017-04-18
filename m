@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mithro@mithis.com>) id 1d0MRr-00044v-TD
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 02:17:12 -0400
+	(envelope-from <mithro@mithis.com>) id 1d0MSS-0004Jd-Nc
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 02:17:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mithro@mithis.com>) id 1d0MRo-0004i6-QO
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 02:17:11 -0400
-Received: from mail-pf0-x236.google.com ([2607:f8b0:400e:c00::236]:33152)
+	(envelope-from <mithro@mithis.com>) id 1d0MSP-0004tZ-Ix
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 02:17:48 -0400
+Received: from mail-pg0-x22a.google.com ([2607:f8b0:400e:c05::22a]:36624)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mithro@mithis.com>) id 1d0MRo-0004hs-Gb
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 02:17:08 -0400
-Received: by mail-pf0-x236.google.com with SMTP id s16so75995593pfs.0
-	for <qemu-devel@nongnu.org>; Mon, 17 Apr 2017 23:17:08 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mithro@mithis.com>) id 1d0MSP-0004tF-Cv
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 02:17:45 -0400
+Received: by mail-pg0-x22a.google.com with SMTP id g2so82567833pge.3
+	for <qemu-devel@nongnu.org>; Mon, 17 Apr 2017 23:17:45 -0700 (PDT)
 From: Tim 'mithro' Ansell <mithro@mithis.com>
-Date: Tue, 18 Apr 2017 16:15:49 +1000
-Message-Id: <20170418061551.196582-1-mithro@mithis.com>
-Subject: [Qemu-devel] [PATCH 0/2] targets/openrisc: Improve exception
- vectoring.
+Date: Tue, 18 Apr 2017 16:15:50 +1000
+Message-Id: <20170418061551.196582-2-mithro@mithis.com>
+In-Reply-To: <20170418061551.196582-1-mithro@mithis.com>
+References: <20170418061551.196582-1-mithro@mithis.com>
+Subject: [Qemu-devel] [PATCH 1/2] target/openrisc: Implement EVBAR register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,25 +26,119 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Tim 'mithro' Ansell <mithro@mithis.com>, shorne@gmail.com
+Cc: Tim 'mithro' Ansell <mithro@mithis.com>, shorne@gmail.com, Jia Liu <proljc@gmail.com>
 
-Hi,
+Exception Vector Base Address Register (EVBAR) - This optional register
+can be used to apply an offset to the exception vector addresses.
 
-This patch series improves the exception vectoring on the OpenRISC platform by
-adding support for both the EVBAR register and EPH bit.
+The significant bits (31-12) of the vector offset address for each
+exception depend on the setting of the Supervision Register (SR)'s EPH
+bit and the Exception Vector Base Address Register (EVBAR).
 
-This is my first patch to upstream QEMU, so please do point of if I have done
-anything silly.
+Its presence is indicated by the EVBARP bit in the CPU Configuration
+Register (CPUCFGR).
 
-Tim 'mithro' Ansell (2):
-  target/openrisc: Implement EVBAR register
-  target/openrisc: Implement EPH bit
-
+Signed-off-by: Tim 'mithro' Ansell <mithro@mithis.com>
+---
  target/openrisc/cpu.c        | 2 ++
  target/openrisc/cpu.h        | 7 +++++++
- target/openrisc/interrupt.c  | 9 ++++++++-
+ target/openrisc/interrupt.c  | 6 +++++-
  target/openrisc/sys_helper.c | 7 +++++++
- 4 files changed, 24 insertions(+), 1 deletion(-)
+ 4 files changed, 21 insertions(+), 1 deletion(-)
 
+diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
+index 7fd2b9a216..1524ed981a 100644
+--- a/target/openrisc/cpu.c
++++ b/target/openrisc/cpu.c
+@@ -134,6 +134,7 @@ static void or1200_initfn(Object *obj)
+ 
+     set_feature(cpu, OPENRISC_FEATURE_OB32S);
+     set_feature(cpu, OPENRISC_FEATURE_OF32S);
++    set_feature(cpu, OPENRISC_FEATURE_EVBAR);
+ }
+ 
+ static void openrisc_any_initfn(Object *obj)
+@@ -141,6 +142,7 @@ static void openrisc_any_initfn(Object *obj)
+     OpenRISCCPU *cpu = OPENRISC_CPU(obj);
+ 
+     set_feature(cpu, OPENRISC_FEATURE_OB32S);
++    set_feature(cpu, OPENRISC_FEATURE_EVBAR);
+ }
+ 
+ typedef struct OpenRISCCPUInfo {
+diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
+index 418a0e6960..1958b72718 100644
+--- a/target/openrisc/cpu.h
++++ b/target/openrisc/cpu.h
+@@ -111,6 +111,11 @@ enum {
+     CPUCFGR_OF32S = (1 << 7),
+     CPUCFGR_OF64S = (1 << 8),
+     CPUCFGR_OV64S = (1 << 9),
++    /* CPUCFGR_ND = (1 << 10), */
++    /* CPUCFGR_AVRP = (1 << 11), */
++    CPUCFGR_EVBARP = (1 << 12),
++    /* CPUCFGR_ISRP = (1 << 13), */
++    /* CPUCFGR_AECSRP = (1 << 14), */
+ };
+ 
+ /* DMMU configure register */
+@@ -200,6 +205,7 @@ enum {
+     OPENRISC_FEATURE_OF32S = (1 << 7),
+     OPENRISC_FEATURE_OF64S = (1 << 8),
+     OPENRISC_FEATURE_OV64S = (1 << 9),
++    OPENRISC_FEATURE_EVBAR = (1 << 12),
+ };
+ 
+ /* Tick Timer Mode Register */
+@@ -289,6 +295,7 @@ typedef struct CPUOpenRISCState {
+     uint32_t dmmucfgr;        /* DMMU configure register */
+     uint32_t immucfgr;        /* IMMU configure register */
+     uint32_t esr;             /* Exception supervisor register */
++    uint32_t evbar;           /* Exception vector base address register */
+     uint32_t fpcsr;           /* Float register */
+     float_status fp_status;
+ 
+diff --git a/target/openrisc/interrupt.c b/target/openrisc/interrupt.c
+index a2eec6fb32..78f0ba9421 100644
+--- a/target/openrisc/interrupt.c
++++ b/target/openrisc/interrupt.c
+@@ -65,7 +65,11 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
+     env->lock_addr = -1;
+ 
+     if (cs->exception_index > 0 && cs->exception_index < EXCP_NR) {
+-        env->pc = (cs->exception_index << 8);
++        hwaddr vect_pc = cs->exception_index << 8;
++        if (env->cpucfgr & CPUCFGR_EVBARP) {
++            vect_pc |= env->evbar;
++        }
++        env->pc = vect_pc;
+     } else {
+         cpu_abort(cs, "Unhandled exception 0x%x\n", cs->exception_index);
+     }
+diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
+index 60c3193656..6ba816249b 100644
+--- a/target/openrisc/sys_helper.c
++++ b/target/openrisc/sys_helper.c
+@@ -39,6 +39,10 @@ void HELPER(mtspr)(CPUOpenRISCState *env,
+         env->vr = rb;
+         break;
+ 
++    case TO_SPR(0, 11): /* EVBAR */
++        env->evbar = rb;
++        break;
++
+     case TO_SPR(0, 16): /* NPC */
+         cpu_restore_state(cs, GETPC());
+         /* ??? Mirror or1ksim in not trashing delayed branch state
+@@ -206,6 +210,9 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env,
+     case TO_SPR(0, 4): /* IMMUCFGR */
+         return env->immucfgr;
+ 
++    case TO_SPR(0, 11): /* EVBAR */
++        return env->evbar;
++
+     case TO_SPR(0, 16): /* NPC (equals PC) */
+         cpu_restore_state(cs, GETPC());
+         return env->pc;
 -- 
 2.12.1
