@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47170)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d0UXm-0007he-Vn
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:55:51 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d0Uc4-0001S8-MF
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 11:00:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d0UXk-0000zx-9J
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:55:51 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:36314)
+	(envelope-from <rth7680@gmail.com>) id 1d0Uc0-0002hO-6K
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 11:00:16 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:36139)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d0UXk-0000zq-4n
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:55:48 -0400
-Received: by mail-qk0-x242.google.com with SMTP id v75so24096137qkb.3
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 07:55:47 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d0Uc0-0002h6-1z
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 11:00:12 -0400
+Received: by mail-qk0-x242.google.com with SMTP id v75so24116408qkb.3
+	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 08:00:11 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
-References: <1491381329-3995-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1491381329-3995-4-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<f56ec3d4-236e-2082-db5a-8402eb050503@twiddle.net>
-	<03d1cb2e-7b0d-7ae1-a884-413cf388762e@ilande.co.uk>
+References: <cover.1492384862.git.shorne@gmail.com>
+	<575d21dff52df4fa53d17e77728018453f82e8e5.1492384862.git.shorne@gmail.com>
+	<382ab324-39c0-5549-ff01-3fe7cc1319de@twiddle.net>
+	<20170418141846.GA2599@lianli.shorne-pla.net>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <56405e09-c3ad-f8dc-7946-2f458727e482@twiddle.net>
-Date: Tue, 18 Apr 2017 07:55:41 -0700
+Message-ID: <54fe7d09-7f47-2c7d-c0f5-2f90daf6caba@twiddle.net>
+Date: Tue, 18 Apr 2017 08:00:06 -0700
 MIME-Version: 1.0
-In-Reply-To: <03d1cb2e-7b0d-7ae1-a884-413cf388762e@ilande.co.uk>
+In-Reply-To: <20170418141846.GA2599@lianli.shorne-pla.net>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 03/14] cg3: remove unused width and height
- variables
+Subject: Re: [Qemu-devel] [PATCH 1/7] target/openrisc: Fixes for memory
+ debugging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,62 +33,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, kraxel@redhat.com, qemu-devel@nongnu.org
+To: Stafford Horne <shorne@gmail.com>
+Cc: qemu-devel@nongnu.org, openrisc@lists.librecores.org
 
-On 04/18/2017 07:38 AM, Mark Cave-Ayland wrote:
-> On 15/04/17 11:54, Richard Henderson wrote:
->
->> On 04/05/2017 01:35 AM, Mark Cave-Ayland wrote:
->>> These aren't required since we can use the display width and height
->>> directly.
+On 04/18/2017 07:18 AM, Stafford Horne wrote:
+> On Tue, Apr 18, 2017 at 12:47:30AM -0700, Richard Henderson wrote:
+>> On 04/16/2017 04:23 PM, Stafford Horne wrote:
+>>> When debugging in gdb you might want to inspect instructions in mapped
+>>> pages or in exception vectors like 0x800 etc.  This was previously not
+>>> possible in qemu since the *get_phys_page_debug() routine only looked
+>>> into the data tlb.
 >>>
->>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->>> ---
->>>  hw/display/cg3.c |   15 ++++++---------
->>>  1 file changed, 6 insertions(+), 9 deletions(-)
+>>> Change to fall back to look into instruction tlb and plain physical
+>>> pages.
 >>>
->>> diff --git a/hw/display/cg3.c b/hw/display/cg3.c
->>> index b42f60e..178a6dd 100644
->>> --- a/hw/display/cg3.c
->>> +++ b/hw/display/cg3.c
->>> @@ -93,14 +93,11 @@ static void cg3_update_display(void *opaque)
->>>      uint32_t *data;
->>>      uint32_t dval;
->>>      int x, y, y_start;
->>> -    unsigned int width, height;
->>>      ram_addr_t page, page_min, page_max;
->>>
->>>      if (surface_bits_per_pixel(surface) != 32) {
->>>          return;
->>>      }
->>> -    width = s->width;
->>> -    height = s->height;
->>>
->>>      y_start = -1;
->>>      page_min = -1;
->>> @@ -110,11 +107,11 @@ static void cg3_update_display(void *opaque)
->>>      data = (uint32_t *)surface_data(surface);
->>>
->>>      memory_region_sync_dirty_bitmap(&s->vram_mem);
->>> -    for (y = 0; y < height; y++) {
->>> +    for (y = 0; y < s->height; y++) {
+>>> Signed-off-by: Stafford Horne <shorne@gmail.com>
 >>
->> I suspect the generated code is much worse, since the compiler can no
->> longer tell that the loop bounds are constant.
+>> Oh the horrors of a software managed TLB.
 >>
->> You probably do want to keep width and height in local variables across
->> this function.
+>> You might do well to architecturally define an SPR that holds the page table
+>> base, even if for real hardware that's only used by the software refill to
+>> load up the address.
+>>
+>> That would give qemu the option of performing a real page table walk.  This
+>> would fix this debug hook properly (so that you can examine pages that
+>> aren't in the TLB at all).  It would also optionally allow QEMU to skip the
+>> software refill, which *significantly* speeds up emulation.
 >
-> Can you explain a bit more about this? My thoughts were that with
-> optimisation enabled the compiler would assume s->width is constant
-> throughout the loop by default (or at least in OpenBIOS I've had to
-> explicitly mark variables as volatile to ensure the compiler refetches
-> the original value instead of reusing a previous copy from the
-> stack/registers)?
+> Understood, I guess we would also need a way to represent which paging
+> model we are using (1 level, 2 level etc)?
 
-With data in memory, as for foo->bar, the compiler is obliged to consider the 
-memory may be changed for e.g. an intervening function call baz(), when foo is 
-"global", as it is here.  You have many of those in those loops.
+I suppose.  You really have a 1-level lookup?  For huge pages only, or is this 
+a virtual 2-level lookup with double-faulting to handle the second level?
 
 
 r~
