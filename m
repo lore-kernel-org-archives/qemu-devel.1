@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60131)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1d0SXV-0008VV-Oh
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 08:47:26 -0400
+	(envelope-from <marcel@redhat.com>) id 1d0SlL-0003L7-J3
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:01:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1d0SXQ-0002uq-PN
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 08:47:25 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:34388)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1d0SXQ-0002u9-Ca
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 08:47:20 -0400
-Received: by mail-pg0-x244.google.com with SMTP id o123so33286966pga.1
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 05:47:20 -0700 (PDT)
-Date: Tue, 18 Apr 2017 21:47:11 +0900
-From: Stafford Horne <shorne@gmail.com>
-Message-ID: <20170418124711.GB2471@lianli.shorne-pla.net>
-References: <20170418061551.196582-1-mithro@mithis.com>
-	<20170418061551.196582-2-mithro@mithis.com>
+	(envelope-from <marcel@redhat.com>) id 1d0SlG-0008In-2I
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:01:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60352)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1d0SlF-0008Ic-Se
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:01:38 -0400
+References: <20170417215916.12431-1-ehabkost@redhat.com>
+	<20170417215916.12431-2-ehabkost@redhat.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <9733cb3b-18b5-a9fb-3a63-622b4bdcc62b@redhat.com>
+Date: Tue, 18 Apr 2017 16:01:27 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170418061551.196582-2-mithro@mithis.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] target/openrisc: Implement EVBAR
- register
+In-Reply-To: <20170417215916.12431-2-ehabkost@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 1/7] pci: Change pci_host_bus_register()
+ parameter to PCIHostState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,140 +28,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tim 'mithro' Ansell <mithro@mithis.com>
-Cc: qemu-devel@nongnu.org, Jia Liu <proljc@gmail.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: aik@ozlabs.ru, David Gibson <dgibson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 
-On Tue, Apr 18, 2017 at 04:15:50PM +1000, Tim 'mithro' Ansell wrote:
-> Exception Vector Base Address Register (EVBAR) - This optional register
-> can be used to apply an offset to the exception vector addresses.
-> 
-> The significant bits (31-12) of the vector offset address for each
-> exception depend on the setting of the Supervision Register (SR)'s EPH
-> bit and the Exception Vector Base Address Register (EVBAR).
-> 
-> Its presence is indicated by the EVBARP bit in the CPU Configuration
-> Register (CPUCFGR).
-> 
-> Signed-off-by: Tim 'mithro' Ansell <mithro@mithis.com>
+On 04/18/2017 12:59 AM, Eduardo Habkost wrote:
+> The function requires a PCI_HOST_BRIDGE object, so change the parameter
+> type to reflect that.
+>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel@redhat.com>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > ---
->  target/openrisc/cpu.c        | 2 ++
->  target/openrisc/cpu.h        | 7 +++++++
->  target/openrisc/interrupt.c  | 6 +++++-
->  target/openrisc/sys_helper.c | 7 +++++++
->  4 files changed, 21 insertions(+), 1 deletion(-)
-> 
-> diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
-> index 7fd2b9a216..1524ed981a 100644
-> --- a/target/openrisc/cpu.c
-> +++ b/target/openrisc/cpu.c
-> @@ -134,6 +134,7 @@ static void or1200_initfn(Object *obj)
->  
->      set_feature(cpu, OPENRISC_FEATURE_OB32S);
->      set_feature(cpu, OPENRISC_FEATURE_OF32S);
-> +    set_feature(cpu, OPENRISC_FEATURE_EVBAR);
->  }
->  
->  static void openrisc_any_initfn(Object *obj)
-> @@ -141,6 +142,7 @@ static void openrisc_any_initfn(Object *obj)
->      OpenRISCCPU *cpu = OPENRISC_CPU(obj);
->  
->      set_feature(cpu, OPENRISC_FEATURE_OB32S);
-> +    set_feature(cpu, OPENRISC_FEATURE_EVBAR);
->  }
->  
->  typedef struct OpenRISCCPUInfo {
-> diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
-> index 418a0e6960..1958b72718 100644
-> --- a/target/openrisc/cpu.h
-> +++ b/target/openrisc/cpu.h
-> @@ -111,6 +111,11 @@ enum {
->      CPUCFGR_OF32S = (1 << 7),
->      CPUCFGR_OF64S = (1 << 8),
->      CPUCFGR_OV64S = (1 << 9),
-> +    /* CPUCFGR_ND = (1 << 10), */
-> +    /* CPUCFGR_AVRP = (1 << 11), */
-> +    CPUCFGR_EVBARP = (1 << 12),
-> +    /* CPUCFGR_ISRP = (1 << 13), */
-> +    /* CPUCFGR_AECSRP = (1 << 14), */
->  };
->  
->  /* DMMU configure register */
-> @@ -200,6 +205,7 @@ enum {
->      OPENRISC_FEATURE_OF32S = (1 << 7),
->      OPENRISC_FEATURE_OF64S = (1 << 8),
->      OPENRISC_FEATURE_OV64S = (1 << 9),
-> +    OPENRISC_FEATURE_EVBAR = (1 << 12),
-
-Does anyone know why we have to add both Features and CPUCFG bits?
-
-It seems like duplication to me.
-
->  };
->  
->  /* Tick Timer Mode Register */
-> @@ -289,6 +295,7 @@ typedef struct CPUOpenRISCState {
->      uint32_t dmmucfgr;        /* DMMU configure register */
->      uint32_t immucfgr;        /* IMMU configure register */
->      uint32_t esr;             /* Exception supervisor register */
-> +    uint32_t evbar;           /* Exception vector base address register */
-
-If we add something to CPUOpenRISCState, we ideally need to also add it to
-machine.c vmstate definition.  However, I currently have a patch out to
-rework the vmstate serialization.  I can add this to that patch.
-
->      uint32_t fpcsr;           /* Float register */
->      float_status fp_status;
->  
-> diff --git a/target/openrisc/interrupt.c b/target/openrisc/interrupt.c
-> index a2eec6fb32..78f0ba9421 100644
-> --- a/target/openrisc/interrupt.c
-> +++ b/target/openrisc/interrupt.c
-> @@ -65,7 +65,11 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
->      env->lock_addr = -1;
->  
->      if (cs->exception_index > 0 && cs->exception_index < EXCP_NR) {
-> -        env->pc = (cs->exception_index << 8);
-> +        hwaddr vect_pc = cs->exception_index << 8;
-> +        if (env->cpucfgr & CPUCFGR_EVBARP) {
-> +            vect_pc |= env->evbar;
-> +        }
-> +        env->pc = vect_pc;
->      } else {
->          cpu_abort(cs, "Unhandled exception 0x%x\n", cs->exception_index);
+>  hw/pci/pci.c | 8 +++-----
+>  1 file changed, 3 insertions(+), 5 deletions(-)
+>
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 259483b1c0..25118fb91d 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -312,11 +312,9 @@ static void pcibus_reset(BusState *qbus)
 >      }
-> diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
-> index 60c3193656..6ba816249b 100644
-> --- a/target/openrisc/sys_helper.c
-> +++ b/target/openrisc/sys_helper.c
-> @@ -39,6 +39,10 @@ void HELPER(mtspr)(CPUOpenRISCState *env,
->          env->vr = rb;
->          break;
->  
-> +    case TO_SPR(0, 11): /* EVBAR */
-> +        env->evbar = rb;
-> +        break;
-> +
->      case TO_SPR(0, 16): /* NPC */
->          cpu_restore_state(cs, GETPC());
->          /* ??? Mirror or1ksim in not trashing delayed branch state
-> @@ -206,6 +210,9 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env,
->      case TO_SPR(0, 4): /* IMMUCFGR */
->          return env->immucfgr;
->  
-> +    case TO_SPR(0, 11): /* EVBAR */
-> +        return env->evbar;
-> +
->      case TO_SPR(0, 16): /* NPC (equals PC) */
->          cpu_restore_state(cs, GETPC());
->          return env->pc;
+>  }
+>
+> -static void pci_host_bus_register(DeviceState *host)
+> +static void pci_host_bus_register(PCIHostState *phb)
+>  {
+> -    PCIHostState *host_bridge = PCI_HOST_BRIDGE(host);
+> -
+> -    QLIST_INSERT_HEAD(&pci_host_bridges, host_bridge, next);
+> +    QLIST_INSERT_HEAD(&pci_host_bridges, phb, next);
+>  }
+>
+>  PCIBus *pci_find_primary_bus(void)
+> @@ -377,7 +375,7 @@ static void pci_bus_init(PCIBus *bus, DeviceState *parent,
+>      /* host bridge */
+>      QLIST_INIT(&bus->child);
+>
+> -    pci_host_bus_register(parent);
+> +    pci_host_bus_register(PCI_HOST_BRIDGE(host));
+>  }
+>
+>  bool pci_bus_is_express(PCIBus *bus)
+>
 
-Reviewed-by: Stafford Horne <shorne@gmail.com>
 
-I will pull into my branch and send PR as is unless someone has more to
-say.
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 
--Stafford
-
-> -- 
-> 2.12.1
-> 
+Thanks,
+Marcel
