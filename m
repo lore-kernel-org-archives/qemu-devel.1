@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0I2z-00063u-Pl
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 21:35:15 -0400
+	(envelope-from <eblake@redhat.com>) id 1d0I36-00068v-PJ
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 21:35:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0I2y-00046V-Qe
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 21:35:13 -0400
+	(envelope-from <eblake@redhat.com>) id 1d0I35-00048H-L5
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 21:35:20 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 17 Apr 2017 20:33:54 -0500
-Message-Id: <20170418013356.3578-30-eblake@redhat.com>
+Date: Mon, 17 Apr 2017 20:33:56 -0500
+Message-Id: <20170418013356.3578-32-eblake@redhat.com>
 In-Reply-To: <20170418013356.3578-1-eblake@redhat.com>
 References: <20170418013356.3578-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH 29/31] vpc: Switch to .bdrv_co_block_status()
+Subject: [Qemu-devel] [PATCH 31/31] block: Drop unused
+ .bdrv_co_get_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,89 +21,122 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@nongnu.org, jsnow@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, kwolf@nongnu.org, jsnow@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
 We are gradually moving away from sector-based interfaces, towards
-byte-based.  Update the vpc driver accordingly.
+byte-based.  Now that all drivers have been updated to provide the
+byte-based .bdrv_co_block_status(), we can delete the sector-based
+interface.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- block/vpc.c | 31 +++++++++++++++----------------
- 1 file changed, 15 insertions(+), 16 deletions(-)
+ include/block/block_int.h |  3 ---
+ block/io.c                | 59 ++++++++++++++++++++---------------------------
+ 2 files changed, 25 insertions(+), 37 deletions(-)
 
-diff --git a/block/vpc.c b/block/vpc.c
-index ecfee77..3cd56e7 100644
---- a/block/vpc.c
-+++ b/block/vpc.c
-@@ -689,46 +689,45 @@ fail:
-     return ret;
- }
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 8f20bc3..25197d7 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -174,9 +174,6 @@ struct BlockDriver {
+      * BDRV_BLOCK_DATA, _ZERO, _OFFSET_VALID, and _RAW, and only
+      * according to the current BDS.
+      */
+-    int64_t coroutine_fn (*bdrv_co_get_block_status)(BlockDriverState *bs,
+-        int64_t sector_num, int nb_sectors, int *pnum,
+-        BlockDriverState **file);
+     int64_t coroutine_fn (*bdrv_co_block_status)(BlockDriverState *bd,
+         int64_t offset, int64_t bytes, int64_t *pnum,
+         BlockDriverState **file);
+diff --git a/block/io.c b/block/io.c
+index 361eeb8..0488d08 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1719,6 +1719,7 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+     int64_t n; /* bytes */
+     int64_t ret, ret2;
+     BlockDriverState *tmp_file;
++    int64_t aligned_offset, aligned_bytes;
 
--static int64_t coroutine_fn vpc_co_get_block_status(BlockDriverState *bs,
--        int64_t sector_num, int nb_sectors, int *pnum, BlockDriverState **file)
-+static int64_t coroutine_fn vpc_co_block_status(BlockDriverState *bs,
-+        int64_t offset, int64_t bytes, int64_t *pnum, BlockDriverState **file)
- {
-     BDRVVPCState *s = bs->opaque;
-     VHDFooter *footer = (VHDFooter*) s->footer_buf;
--    int64_t start, offset;
-+    int64_t start, image_offset;
-     bool allocated;
-     int n;
-
-     if (be32_to_cpu(footer->type) == VHD_FIXED) {
--        *pnum = nb_sectors;
-+        *pnum = bytes;
-         *file = bs->file->bs;
-         return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID | BDRV_BLOCK_DATA |
--               (sector_num << BDRV_SECTOR_BITS);
-+               (offset & BDRV_BLOCK_OFFSET_MASK);
+     total_size = bdrv_getlength(bs);
+     if (total_size < 0) {
+@@ -1738,7 +1739,7 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+         bytes = n;
      }
 
--    offset = get_sector_offset(bs, sector_num, 0);
--    start = offset;
--    allocated = (offset != -1);
-+    image_offset = get_image_offset(bs, offset, 0);
-+    start = image_offset & BDRV_BLOCK_OFFSET_MASK;
-+    allocated = (image_offset != -1);
-     *pnum = 0;
+-    if (!bs->drv->bdrv_co_get_block_status && !bs->drv->bdrv_co_block_status) {
++    if (!bs->drv->bdrv_co_block_status) {
+         *pnum = bytes;
+         ret = BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED;
+         if (bs->drv->protocol_name) {
+@@ -1752,45 +1753,35 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+     }
+     *file = NULL;
+     bdrv_inc_in_flight(bs);
+-    if (bs->drv->bdrv_co_get_block_status) {
+-        int count; /* sectors */
 
-     do {
-         /* All sectors in a block are contiguous (without using the bitmap) */
--        n = ROUND_UP(sector_num + 1, s->block_size / BDRV_SECTOR_SIZE)
--          - sector_num;
--        n = MIN(n, nb_sectors);
-+        n = ROUND_UP(offset + 1, s->block_size) - offset;
-+        n = MIN(n, bytes);
+-        assert(QEMU_IS_ALIGNED(offset | bytes, BDRV_SECTOR_SIZE));
+-        ret = bs->drv->bdrv_co_get_block_status(bs, offset >> BDRV_SECTOR_BITS,
+-                                                bytes >> BDRV_SECTOR_BITS,
+-                                                &count, file);
+-        *pnum = count * BDRV_SECTOR_SIZE;
+-    } else {
+-        /* Round out to request_alignment boundaries */
+-        int64_t aligned_offset, aligned_bytes;
+-
+-        aligned_offset = QEMU_ALIGN_DOWN(offset, bs->bl.request_alignment);
+-        aligned_bytes = ROUND_UP(offset + bytes,
+-                                 bs->bl.request_alignment) - aligned_offset;
+-        ret = bs->drv->bdrv_co_block_status(bs, aligned_offset, aligned_bytes,
+-                                            &n, file);
+-        /* Clamp pnum and ret to original request */
+-        if (aligned_offset != offset && ret >= 0) {
+-            int sectors = DIV_ROUND_UP(offset, BDRV_SECTOR_SIZE) -
+-                DIV_ROUND_UP(aligned_offset, BDRV_SECTOR_SIZE);
+-
+-            assert(n >= offset - aligned_offset);
+-            n -= offset - aligned_offset;
+-            if (sectors) {
+-                ret += sectors * BDRV_SECTOR_SIZE;
+-            }
+-        }
+-        if (ret >= 0 && n > bytes) {
+-            assert(aligned_bytes != bytes);
+-            n = bytes;
+-        }
+-        *pnum = n;
+-    }
++    /* Round out to request_alignment boundaries */
++    aligned_offset = QEMU_ALIGN_DOWN(offset, bs->bl.request_alignment);
++    aligned_bytes = ROUND_UP(offset + bytes,
++                             bs->bl.request_alignment) - aligned_offset;
++    ret = bs->drv->bdrv_co_block_status(bs, aligned_offset, aligned_bytes,
++                                        &n, file);
+     if (ret < 0) {
+         *pnum = 0;
+         goto out;
+     }
 
-         *pnum += n;
--        sector_num += n;
--        nb_sectors -= n;
-+        offset += n;
-+        bytes -= n;
-         /* *pnum can't be greater than one block for allocated
-          * sectors since there is always a bitmap in between. */
-         if (allocated) {
-             *file = bs->file->bs;
-             return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | start;
-         }
--        if (nb_sectors == 0) {
-+        if (bytes == 0) {
-             break;
-         }
--        offset = get_sector_offset(bs, sector_num, 0);
-+        image_offset = get_sector_offset(bs, offset, 0);
-     } while (offset == -1);
-
-     return 0;
-@@ -1074,7 +1073,7 @@ static BlockDriver bdrv_vpc = {
-
-     .bdrv_co_preadv             = vpc_co_preadv,
-     .bdrv_co_pwritev            = vpc_co_pwritev,
--    .bdrv_co_get_block_status   = vpc_co_get_block_status,
-+    .bdrv_co_block_status       = vpc_co_block_status,
-
-     .bdrv_get_info          = vpc_get_info,
-
++    /* Clamp pnum and ret to original request */
++    if (aligned_offset != offset && ret >= 0) {
++        int sectors = DIV_ROUND_UP(offset, BDRV_SECTOR_SIZE) -
++            DIV_ROUND_UP(aligned_offset, BDRV_SECTOR_SIZE);
++
++        assert(n >= offset - aligned_offset);
++        n -= offset - aligned_offset;
++        if (sectors) {
++            ret += sectors * BDRV_SECTOR_SIZE;
++        }
++    }
++    if (n > bytes) {
++        assert(aligned_bytes != bytes);
++        n = bytes;
++    }
++    *pnum = n;
++
+     if (ret & BDRV_BLOCK_RAW) {
+         assert(ret & BDRV_BLOCK_OFFSET_VALID);
+         ret = bdrv_block_status(*file, ret & BDRV_BLOCK_OFFSET_MASK,
 -- 
 2.9.3
