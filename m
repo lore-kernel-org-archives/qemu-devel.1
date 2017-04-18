@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0SzF-0005jL-6J
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:16:08 -0400
+	(envelope-from <eblake@redhat.com>) id 1d0T4B-0007E9-67
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:21:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0SzD-0007eO-R1
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:16:05 -0400
+	(envelope-from <eblake@redhat.com>) id 1d0T47-0000cq-U2
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:21:11 -0400
 References: <20170314023933.12118-1-famz@redhat.com>
-	<20170314023933.12118-2-famz@redhat.com>
+	<20170314023933.12118-3-famz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <4086fd79-3226-0be2-a258-137b48095f94@redhat.com>
-Date: Tue, 18 Apr 2017 08:15:38 -0500
+Message-ID: <0f1ecad6-9e85-39a2-6d52-5481f7e309cb@redhat.com>
+Date: Tue, 18 Apr 2017 08:20:45 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170314023933.12118-2-famz@redhat.com>
+In-Reply-To: <20170314023933.12118-3-famz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="3eiJhGxLhqQaHPr947d9gB1ExnfVO9ur9"
-Subject: Re: [Qemu-devel] [PATCH RFC 1/3] block: Introduce BDRV_O_UNSAFE_READ
+	boundary="mC9FjOeGN5VdHSjK2Na47Q30e2EeeeBjQ"
+Subject: Re: [Qemu-devel] [PATCH RFC 2/3] qemu-img: Add --unsafe-read option
+ to subcommands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +29,64 @@ To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3eiJhGxLhqQaHPr947d9gB1ExnfVO9ur9
+--mC9FjOeGN5VdHSjK2Na47Q30e2EeeeBjQ
 From: Eric Blake <eblake@redhat.com>
 To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
  Max Reitz <mreitz@redhat.com>
-Message-ID: <4086fd79-3226-0be2-a258-137b48095f94@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 1/3] block: Introduce BDRV_O_UNSAFE_READ
+Message-ID: <0f1ecad6-9e85-39a2-6d52-5481f7e309cb@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 2/3] qemu-img: Add --unsafe-read option
+ to subcommands
 References: <20170314023933.12118-1-famz@redhat.com>
- <20170314023933.12118-2-famz@redhat.com>
-In-Reply-To: <20170314023933.12118-2-famz@redhat.com>
+ <20170314023933.12118-3-famz@redhat.com>
+In-Reply-To: <20170314023933.12118-3-famz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 03/13/2017 09:39 PM, Fam Zheng wrote:
-> This flag clears out the "consistent read" permission that blk_new_open=
-
-> requests.
->=20
 > Signed-off-by: Fam Zheng <famz@redhat.com>
 > ---
->  block/block-backend.c | 2 +-
->  include/block/block.h | 1 +
->  2 files changed, 2 insertions(+), 1 deletion(-)
+>  qemu-img.c | 148 +++++++++++++++++++++++++++++++++++++++++++++++------=
+--------
+>  1 file changed, 114 insertions(+), 34 deletions(-)
 >=20
-> diff --git a/block/block-backend.c b/block/block-backend.c
-> index 5742c09..99428ee 100644
-> --- a/block/block-backend.c
-> +++ b/block/block-backend.c
-> @@ -197,7 +197,7 @@ BlockBackend *blk_new_open(const char *filename, co=
-nst char *reference,
->       * caller of blk_new_open() doesn't make use of the permissions, b=
-ut they
->       * shouldn't hurt either. We can still share everything here becau=
-se the
->       * guest devices will add their own blockers if they can't share. =
-*/
-> -    perm =3D BLK_PERM_CONSISTENT_READ;
-> +    perm =3D flags & BDRV_O_UNSAFE_READ ? 0 : BLK_PERM_CONSISTENT_READ=
-;
 
-A bit awkward that we have to add an option that requests negation of a
-permission under the hood, but looks like it is the least-invasive way
-to get what we want.
+> @@ -2711,9 +2751,10 @@ static int img_map(int argc, char **argv)
+>              {"output", required_argument, 0, OPTION_OUTPUT},
+>              {"object", required_argument, 0, OPTION_OBJECT},
+>              {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
+> +            {"unsafe-read", no_argument, 0, 'U'},
+>              {0, 0, 0, 0}
+>          };
+> -        c =3D getopt_long(argc, argv, "f:h",
+> +        c =3D getopt_long(argc, argv, "f:hU",
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Yay for 'U' being an unambiguous mnemonic that we could use on all the
+commands.  You got lucky (it gets ever harder to add new options, as our
+letters get thinner ;)
+
+> @@ -2970,6 +3020,7 @@ static int img_rebase(int argc, char **argv)
+>      int c, flags, src_flags, ret;
+>      bool writethrough, src_writethrough;
+>      int unsafe =3D 0;
+> +    int unsafe_read =3D 0;
+
+bool, please.  (Just because existing code is lousy with using an int
+for a bool doesn't mean we should perpetuate it)
+
+
+> @@ -3033,6 +3085,9 @@ static int img_rebase(int argc, char **argv)
+>          case OPTION_IMAGE_OPTS:
+>              image_opts =3D true;
+>              break;
+> +        case 'U':
+> +            unsafe_read =3D 1;
+
+s/1/true/
+
+Good patch, but missing documentation updates to --help/man page.  So,
+as encouragement to add that when you drop the RFC, I'll withhold my R-b
+until then. ;)
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -80,7 +94,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---3eiJhGxLhqQaHPr947d9gB1ExnfVO9ur9
+--mC9FjOeGN5VdHSjK2Na47Q30e2EeeeBjQ
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -90,13 +104,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJY9hF6AAoJEKeha0olJ0Nq7NQH/3b6yREnmRGqM15txLkE5cVz
-jXmSMFsbl42VXKxvs2c5FWITmY/nPlUvwpHeOp9t4dwkB8DWCRJwt8BXdBdPPtDH
-N8JEcfpqS1LDqKIfu4i/sZqEEhQzFXOslU0BMw+BSEYYD9HUQebtgiW5jgQan1PZ
-LaOpGDtYYgfYQiNCU/+ebmVv2ClzC5JXWwBEDbHB0QDvFeg9G4dFv8mP6SGkS1Ay
-NyfHIQghJj7ZHA93Q8jxpw9uCx9yhv/aZtzZj9X75AOIyYcVR6OWmkTkCcWUN8sX
-xNl5wnirOOxzyRDALmIL3reomwSKZZHHijCdUWj4EPES7kbxus+sBDIko2xuDmQ=
-=KEJ8
+iQEcBAEBCAAGBQJY9hKtAAoJEKeha0olJ0NqSVYIAJOZ/0js164vupcyO/yCO/mA
+jAoM3tdQGyQLEf1ybAui9QAM48atrOJhTlOILZi7V9jawBQSE7kZZbQWbMJ26kUZ
+LYLV+v+w1BksOyjE/4tRRWdb9e52rlZXQNF6HyqVEjmuPz6KvSTJmuaQvJh2Wuhy
+1YOf2tmWrg4RiSQYAA2L46L01GdWzQNrVLpfMWQl2g9gcEz11cfwGbOanDEuP3lv
++yNlckN0iLpdBWSJhb5r9zcjMef4lc5qDjaK6XQCee1i7Kdrf6EK/6zVWBk3GWpX
+A8fKV4O64Bo6EDwyQlt4BIU9pEvOK1ma7E3k3ZCuWp7BD7DTXIHd9BRc8RMYrK4=
+=Ihuy
 -----END PGP SIGNATURE-----
 
---3eiJhGxLhqQaHPr947d9gB1ExnfVO9ur9--
+--mC9FjOeGN5VdHSjK2Na47Q30e2EeeeBjQ--
