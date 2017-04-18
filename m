@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0I2O-0005Na-8H
+	(envelope-from <eblake@redhat.com>) id 1d0I2O-0005Ng-Ar
 	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 21:34:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0I2N-0003ly-87
+	(envelope-from <eblake@redhat.com>) id 1d0I2N-0003m7-CL
 	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 21:34:36 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 17 Apr 2017 20:33:38 -0500
-Message-Id: <20170418013356.3578-14-eblake@redhat.com>
+Date: Mon, 17 Apr 2017 20:33:39 -0500
+Message-Id: <20170418013356.3578-15-eblake@redhat.com>
 In-Reply-To: <20170418013356.3578-1-eblake@redhat.com>
 References: <20170418013356.3578-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH 13/31] file-posix: Switch to
+Subject: [Qemu-devel] [PATCH 14/31] gluster: Switch to
  .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -21,21 +21,21 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@nongnu.org, jsnow@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, kwolf@nongnu.org, jsnow@redhat.com, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
 We are gradually moving away from sector-based interfaces, towards
-byte-based.  Update the file protocol driver accordingly.
+byte-based.  Update the gluster driver accordingly.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- block/file-posix.c | 47 +++++++++++++++++++++++------------------------
+ block/gluster.c | 47 +++++++++++++++++++++++------------------------
  1 file changed, 23 insertions(+), 24 deletions(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 1941fb6..690bd45 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1832,22 +1832,22 @@ static int find_allocation(BlockDriverState *bs, off_t start,
+diff --git a/block/gluster.c b/block/gluster.c
+index 1d4e2f7..3f252c6 100644
+--- a/block/gluster.c
++++ b/block/gluster.c
+@@ -1332,24 +1332,24 @@ exit:
  /*
   * Returns the allocation status of the specified sectors.
   *
@@ -52,22 +52,23 @@ index 1941fb6..690bd45 100644
 - * 'nb_sectors' is the max value 'pnum' should be set to.  If nb_sectors goes
 + * 'bytes' is the max value 'pnum' should be set to.  If bytes goes
   * beyond the end of the disk image it will be clamped.
+  *
+- * (Based on raw_co_get_block_status() from file-posix.c.)
++ * (Based on raw_co_block_status() from file-posix.c.)
   */
--static int64_t coroutine_fn raw_co_get_block_status(BlockDriverState *bs,
--                                                    int64_t sector_num,
--                                                    int nb_sectors, int *pnum,
--                                                    BlockDriverState **file)
-+static int64_t coroutine_fn raw_co_block_status(BlockDriverState *bs,
-+                                                int64_t offset,
-+                                                int64_t bytes, int64_t *pnum,
-+                                                BlockDriverState **file)
+-static int64_t coroutine_fn qemu_gluster_co_get_block_status(
+-        BlockDriverState *bs, int64_t sector_num, int nb_sectors, int *pnum,
++static int64_t coroutine_fn qemu_gluster_co_block_status(
++        BlockDriverState *bs, int64_t offset, int64_t bytes, int64_t *pnum,
+         BlockDriverState **file)
  {
+     BDRVGlusterState *s = bs->opaque;
 -    off_t start, data = 0, hole = 0;
 +    off_t data = 0, hole = 0;
      int64_t total_size;
-     int ret;
+     int ret = -EINVAL;
 
-@@ -1856,39 +1856,38 @@ static int64_t coroutine_fn raw_co_get_block_status(BlockDriverState *bs,
+@@ -1357,41 +1357,40 @@ static int64_t coroutine_fn qemu_gluster_co_get_block_status(
          return ret;
      }
 
@@ -98,36 +99,63 @@ index 1941fb6..690bd45 100644
 +        *pnum = bytes;
          ret = BDRV_BLOCK_DATA;
 -    } else if (data == start) {
--        /* On a data extent, compute sectors to the end of the extent,
 +    } else if (data == offset) {
-+        /* On a data extent, compute bytes to the end of the extent,
+         /* On a data extent, compute sectors to the end of the extent,
           * possibly including a partial sector at EOF. */
 -        *pnum = MIN(nb_sectors, DIV_ROUND_UP(hole - start, BDRV_SECTOR_SIZE));
 +        *pnum = MIN(bytes, hole - offset);
          ret = BDRV_BLOCK_DATA;
      } else {
--        /* On a hole, compute sectors to the beginning of the next extent.  */
+         /* On a hole, compute sectors to the beginning of the next extent.  */
 -        assert(hole == start);
 -        *pnum = MIN(nb_sectors, (data - start) / BDRV_SECTOR_SIZE);
-+        /* On a hole, compute bytes to the beginning of the next extent.  */
 +        assert(hole == offset);
 +        *pnum = MIN(bytes, data - offset);
          ret = BDRV_BLOCK_ZERO;
      }
+
      *file = bs;
+
 -    return ret | BDRV_BLOCK_OFFSET_VALID | start;
 +    return ret | BDRV_BLOCK_OFFSET_VALID | (offset & BDRV_BLOCK_OFFSET_MASK);
  }
 
- static coroutine_fn BlockAIOCB *raw_aio_pdiscard(BlockDriverState *bs,
-@@ -1963,7 +1962,7 @@ BlockDriver bdrv_file = {
-     .bdrv_close = raw_close,
-     .bdrv_create = raw_create,
-     .bdrv_has_zero_init = bdrv_has_zero_init_1,
--    .bdrv_co_get_block_status = raw_co_get_block_status,
-+    .bdrv_co_block_status = raw_co_block_status,
-     .bdrv_co_pwrite_zeroes = raw_co_pwrite_zeroes,
 
-     .bdrv_co_preadv         = raw_co_preadv,
+@@ -1419,7 +1418,7 @@ static BlockDriver bdrv_gluster = {
+ #ifdef CONFIG_GLUSTERFS_ZEROFILL
+     .bdrv_co_pwrite_zeroes        = qemu_gluster_co_pwrite_zeroes,
+ #endif
+-    .bdrv_co_get_block_status     = qemu_gluster_co_get_block_status,
++    .bdrv_co_block_status         = qemu_gluster_co_block_status,
+     .create_opts                  = &qemu_gluster_create_opts,
+ };
+
+@@ -1447,7 +1446,7 @@ static BlockDriver bdrv_gluster_tcp = {
+ #ifdef CONFIG_GLUSTERFS_ZEROFILL
+     .bdrv_co_pwrite_zeroes        = qemu_gluster_co_pwrite_zeroes,
+ #endif
+-    .bdrv_co_get_block_status     = qemu_gluster_co_get_block_status,
++    .bdrv_co_block_status         = qemu_gluster_co_block_status,
+     .create_opts                  = &qemu_gluster_create_opts,
+ };
+
+@@ -1475,7 +1474,7 @@ static BlockDriver bdrv_gluster_unix = {
+ #ifdef CONFIG_GLUSTERFS_ZEROFILL
+     .bdrv_co_pwrite_zeroes        = qemu_gluster_co_pwrite_zeroes,
+ #endif
+-    .bdrv_co_get_block_status     = qemu_gluster_co_get_block_status,
++    .bdrv_co_block_status         = qemu_gluster_co_block_status,
+     .create_opts                  = &qemu_gluster_create_opts,
+ };
+
+@@ -1509,7 +1508,7 @@ static BlockDriver bdrv_gluster_rdma = {
+ #ifdef CONFIG_GLUSTERFS_ZEROFILL
+     .bdrv_co_pwrite_zeroes        = qemu_gluster_co_pwrite_zeroes,
+ #endif
+-    .bdrv_co_get_block_status     = qemu_gluster_co_get_block_status,
++    .bdrv_co_block_status         = qemu_gluster_co_block_status,
+     .create_opts                  = &qemu_gluster_create_opts,
+ };
+
 -- 
 2.9.3
