@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d0ZOz-0003ek-Eh
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 16:07:06 -0400
+	(envelope-from <bounces@canonical.com>) id 1d0ZcG-00063M-5V
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 16:20:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d0ZOv-00017U-CT
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 16:07:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51428)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d0ZOv-000176-6h
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 16:07:01 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 34A3361B8F
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 20:07:00 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170418180253.GN2205@work-vm> (David Alan Gilbert's message of
-	"Tue, 18 Apr 2017 19:02:53 +0100")
-References: <20170417200041.2451-1-quintela@redhat.com>
-	<20170417200041.2451-20-quintela@redhat.com>
-	<20170418180253.GN2205@work-vm>
-Reply-To: quintela@redhat.com
-Date: Tue, 18 Apr 2017 22:06:58 +0200
-Message-ID: <87k26hh44d.fsf@secure.mitica>
+	(envelope-from <bounces@canonical.com>) id 1d0ZcC-00074z-Km
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 16:20:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37895)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d0ZcC-00074n-CV
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 16:20:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d0ZcB-0003Qp-EA
+	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 20:20:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 698E72E8076
+	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 20:20:43 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 19/19] monitor: remove monitor parameter
- from save_vmstate
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 18 Apr 2017 20:10:42 -0000
+From: pranith <1681688@bugs.launchpad.net>
+Reply-To: Bug 1681688 <1681688@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170411080154.12474.20009.malonedeb@gac.canonical.com>
+Message-Id: <20170418201043.1860.24006.launchpad@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1681688] Re: qemu live migration failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,17 +36,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> https://lists.nongnu.org/archive/html/qemu-devel/2017-03/msg03927.html
+** Changed in: qemu
+       Status: Incomplete =3D> Confirmed
 
-Damn thing.  And I did it by hand (not that it was very difficult).
+-- =
 
-Added bonus is that I have already changed load_vmstate on the same
-patch.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1681688
 
-Will post them on next respin.
+Title:
+  qemu live migration failed
 
-Later, Juan.
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  qemu live migration failed
+
+  the dest qemu report this error.
+
+  Receiving block device images
+  Completed 0 %^Mqemu-system-x86_64: block/io.c:1348: bdrv_aligned_pwritev:=
+ Assertion `child->perm & BLK_PERM_WRITE' failed.
+
+  this bug is caused by this patch:
+  http://git.qemu-project.org/?p=3Dqemu.git;a=3Dcommit;h=3Dd35ff5e6b3aa3a70=
+6b0aa3bcf11400fac945b67a
+
+  rollback this commit, the problem solved.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1681688/+subscriptions
