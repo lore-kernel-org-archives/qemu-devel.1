@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1d0Rh3-0004gq-A7
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 07:53:14 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d0Rhj-00051z-8B
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 07:53:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1d0Rh0-0002cz-8G
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 07:53:13 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <e1ae017b-a832-0e52-02d0-eaeb882a2b4d@openvz.org>
-References: <20170406150148.zwjpozqtale44jfh@perseus.local>
-	<2b915695-29b5-df8d-4d89-080eeaaaff13@openvz.org>
-	<w51shlcv7sb.fsf@maestria.local.igalia.com>
-	<565c1e1b-b9e1-e9c5-790e-283d04afc747@openvz.org>
-	<w51poggv3xh.fsf@maestria.local.igalia.com>
-	<ec4f6034-0c94-658c-6b2a-e0aecea173f4@openvz.org>
-	<w51h91suz53.fsf@maestria.local.igalia.com>
-	<e1ae017b-a832-0e52-02d0-eaeb882a2b4d@openvz.org>
-Date: Tue, 18 Apr 2017 13:52:29 +0200
-Message-ID: <w51wpaioruq.fsf@maestria.local.igalia.com>
+	(envelope-from <ehabkost@redhat.com>) id 1d0Rhf-0002z3-4c
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 07:53:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39824)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d0Rhe-0002yi-RX
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 07:53:51 -0400
+Date: Tue, 18 Apr 2017 08:48:26 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170418114826.GI25239@thinpad.lan.raisama.net>
+References: <20170417215916.12431-1-ehabkost@redhat.com>
+	<20170417215916.12431-3-ehabkost@redhat.com>
+	<20170418035101.GJ12235@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC] Proposed qcow2 extension: subcluster
- allocation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170418035101.GJ12235@umbus.fritz.box>
+Subject: Re: [Qemu-devel] [RFC 2/7] pci: Change pci_bus_init() 'parent'
+ parameter to PCIHostState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,88 +29,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, aik@ozlabs.ru, David Gibson <dgibson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-On Thu 13 Apr 2017 05:17:21 PM CEST, Denis V. Lunev wrote:
-> On 04/13/2017 06:04 PM, Alberto Garcia wrote:
->> On Thu 13 Apr 2017 03:30:43 PM CEST, Denis V. Lunev wrote:
->>> Yes, block size should be increased. I perfectly in agreement with
->>> your.  But I think that we could do that by plain increase of the
->>> cluster size without any further dances. Sub-clusters as sub-clusters
->>> will help if we are able to avoid COW. With COW I do not see much
->>> difference.
->> I'm trying to summarize your position, tell me if I got everything
->> correctly:
->>
->> 1. We should try to reduce data fragmentation on the qcow2 file,
->>    because it will have a long term effect on the I/O performance (as
->>    opposed to an effect on the initial operations on the empty image).
-> yes
->
->> 2. The way to do that is to increase the cluster size (to 1MB or
->>    more).
-> yes
->
->> 3. Benefit: increasing the cluster size also decreases the amount of
->>    metadata (L2 and refcount).
-> yes
->
->> 4. Problem: L2 tables become too big and fill up the cache more
->>    easily. To solve this the cache code should do partial reads
->>    instead of complete L2 clusters.
-> yes. We can read full cluster as originally if L2 cache is empty.
->
->> 5. Problem: larger cluster sizes also mean more data to copy when
->>    there's a COW. To solve this the COW code should be modified so it
->>    goes from 5 OPs (read head, write head, read tail, write tail,
->>    write data) to 2 OPs (read cluster, write modified cluster).
-> yes, with small tweak if head and tail are in different clusters. In
-> this case we
-> will end up with 3 OPs.
->
->> 6. Having subclusters adds incompatible changes to the file format,
->>    and they offer no benefit after allocation.
-> yes
->
->> 7. Subclusters are only really useful if they match the guest fs block
->>    size (because you would avoid doing COW on allocation). Otherwise
->>    the only thing that you get is a faster COW (because you move less
->>    data), but the improvement is not dramatic and it's better if we do
->>    what's proposed in point 5.
-> yes
->
->> 8. Even if the subcluster size matches the guest block size, you'll
->>    get very fast initial allocation but also more chances to end up
->>    with a very fragmented qcow2 image, which is worse in the long run.
-> yes
->
->> 9. Problem: larger clusters make a less efficient use of disk space,
->>    but that's a drawback you're fine with considering all of the
->>    above.
-> yes
->
->> Is that a fair summary of what you're trying to say? Anything else
->> missing?
-> yes.
->
-> 5a. Problem: initial cluster allocation without COW. Could be made
->       cluster-size agnostic with the help of fallocate() call. Big
-> clusters are even
->       better as the amount of such allocations is reduced.
->
-> Thank you very much for this cool summary! I am too tongue-tied.
+On Tue, Apr 18, 2017 at 01:51:02PM +1000, David Gibson wrote:
+> On Mon, Apr 17, 2017 at 06:59:11PM -0300, Eduardo Habkost wrote:
+> > pci_bus_init() already requires 'parent' to be a PCI_HOST_BRIDGE object,
+> > so change the parameter type to reflect that.
+> > 
+> > Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> > Cc: Marcel Apfelbaum <marcel@redhat.com>
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> 
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> 
+> I had to do some looking to convince myself this wouldn't break P2P
+> bridges.
+> 
+> I wonder if we should rename pci_bus_init() / pci_bus_new() to make it
+> clearer that they're about creating a whole new PCI domain, and not
+> for a new bus within an existing domain.
 
-Hi Denis,
+Good point. The current naming is confusing. I only knew the
+change was safe because pci_bus_new() would crash if 'parent'
+wasn't a PCI_HOST_BRIDGE. But I took some time to find the other
+places where PCI buses could be created, and I'm not sure yet if
+I found all of them.
 
-I don't have the have data to verify all your claims here, but in
-general what you say makes sense.
+Is there any other code that creates TYPE_PCI_BUS objects, except
+for the ones touched by this series and pci_bridge_initfn()?
 
-Although I'm not sure if I agree with everything (especially on whether
-any of this applies to SSD drives at all) it seems that we all agree
-that the COW algorithm can be improved, so perhaps I should start by
-taking a look at that.
+> 
+> > ---
+> >  hw/pci/pci.c | 10 ++++++----
+> >  1 file changed, 6 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> > index 25118fb91d..d9535c0bdc 100644
+> > --- a/hw/pci/pci.c
+> > +++ b/hw/pci/pci.c
+> > @@ -362,7 +362,7 @@ const char *pci_root_bus_path(PCIDevice *dev)
+> >      return rootbus->qbus.name;
+> >  }
+> >  
+> > -static void pci_bus_init(PCIBus *bus, DeviceState *parent,
+> > +static void pci_bus_init(PCIBus *bus, PCIHostState *phb,
+> >                           MemoryRegion *address_space_mem,
+> >                           MemoryRegion *address_space_io,
+> >                           uint8_t devfn_min)
+> > @@ -375,7 +375,7 @@ static void pci_bus_init(PCIBus *bus, DeviceState *parent,
+> >      /* host bridge */
+> >      QLIST_INIT(&bus->child);
+> >  
+> > -    pci_host_bus_register(PCI_HOST_BRIDGE(host));
+> > +    pci_host_bus_register(phb);
+> >  }
+> >  
+> >  bool pci_bus_is_express(PCIBus *bus)
+> > @@ -394,8 +394,9 @@ void pci_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *parent,
+> >                           MemoryRegion *address_space_io,
+> >                           uint8_t devfn_min, const char *typename)
+> >  {
+> > +    PCIHostState *phb = PCI_HOST_BRIDGE(parent);
+> >      qbus_create_inplace(bus, bus_size, typename, parent, name);
+> > -    pci_bus_init(bus, parent, address_space_mem, address_space_io, devfn_min);
+> > +    pci_bus_init(bus, phb, address_space_mem, address_space_io, devfn_min);
+> >  }
+> >  
+> >  PCIBus *pci_bus_new(DeviceState *parent, const char *name,
+> > @@ -403,10 +404,11 @@ PCIBus *pci_bus_new(DeviceState *parent, const char *name,
+> >                      MemoryRegion *address_space_io,
+> >                      uint8_t devfn_min, const char *typename)
+> >  {
+> > +    PCIHostState *phb = PCI_HOST_BRIDGE(parent);
+> >      PCIBus *bus;
+> >  
+> >      bus = PCI_BUS(qbus_create(typename, parent, name));
+> > -    pci_bus_init(bus, parent, address_space_mem, address_space_io, devfn_min);
+> > +    pci_bus_init(bus, phb, address_space_mem, address_space_io, devfn_min);
+> >      return bus;
+> >  }
+> >  
+> 
+> -- 
+> David Gibson			| I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
 
-Regards,
 
-Berto
+
+-- 
+Eduardo
