@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42676)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d0PgD-0001DB-L3
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 05:44:15 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d0PgY-0001NI-7A
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 05:44:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d0Pg8-00024t-N7
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 05:44:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52894)
+	(envelope-from <pbonzini@redhat.com>) id 1d0PgT-0002AJ-Cd
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 05:44:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54626)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d0Pg8-00024S-Dj
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 05:44:08 -0400
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d0PgT-0002A4-67
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 05:44:29 -0400
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1675C61D22
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 09:44:06 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2C66E4E35B
+	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 09:44:28 +0000 (UTC)
 References: <20170417200041.2451-1-quintela@redhat.com>
-	<20170417200041.2451-20-quintela@redhat.com>
+	<20170417200041.2451-19-quintela@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c7f9792c-1e78-b7b9-c5cc-04b650b82820@redhat.com>
-Date: Tue, 18 Apr 2017 11:44:03 +0200
+Message-ID: <9c1de8f4-f30a-e189-0da0-40768fb0e5a3@redhat.com>
+Date: Tue, 18 Apr 2017 11:44:21 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170417200041.2451-20-quintela@redhat.com>
+In-Reply-To: <20170417200041.2451-19-quintela@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 19/19] monitor: remove monitor parameter
- from save_vmstate
+Subject: Re: [Qemu-devel] [PATCH 18/19] monitor: move hmp_savevm() to
+ monitor.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,123 +40,61 @@ Cc: dgilbert@redhat.com
 
 
 On 17/04/2017 22:00, Juan Quintela wrote:
-> load_vmstate() already use error_report, so be consistent.
+> hmp_loadvm is already there, so be consistent.
 
-Better: make both return Error* via an Error** parameter, and add
-
-    hmp_handle_error(mon, &err);
-
-to hmp_savevm and error_report_err(err) on the loading side.
+Can you move both to hmp.c instead?
 
 Paolo
 
 > Signed-off-by: Juan Quintela <quintela@redhat.com>
 > ---
->  include/sysemu/sysemu.h  |  2 +-
->  migration/savevm.c       | 16 ++++++++--------
->  monitor.c                |  2 +-
->  replay/replay-snapshot.c |  2 +-
->  4 files changed, 11 insertions(+), 11 deletions(-)
+>  include/sysemu/sysemu.h | 1 -
+>  migration/savevm.c      | 5 -----
+>  monitor.c               | 5 +++++
+>  3 files changed, 5 insertions(+), 6 deletions(-)
 > 
 > diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> index 146a0dc..d2582fa 100644
+> index 5f2f21d..146a0dc 100644
 > --- a/include/sysemu/sysemu.h
 > +++ b/include/sysemu/sysemu.h
-> @@ -75,7 +75,7 @@ void qemu_remove_exit_notifier(Notifier *notify);
+> @@ -75,7 +75,6 @@ void qemu_remove_exit_notifier(Notifier *notify);
 >  void qemu_add_machine_init_done_notifier(Notifier *notify);
 >  void qemu_remove_machine_init_done_notifier(Notifier *notify);
 >  
-> -int save_vmstate(Monitor *mon, const char *name);
-> +int save_vmstate(const char *name);
+> -void hmp_savevm(Monitor *mon, const QDict *qdict);
+>  int save_vmstate(Monitor *mon, const char *name);
 >  int load_vmstate(const char *name);
 >  void hmp_delvm(Monitor *mon, const QDict *qdict);
->  void hmp_info_snapshots(Monitor *mon, const QDict *qdict);
 > diff --git a/migration/savevm.c b/migration/savevm.c
-> index cbd7e0d..36a6002 100644
+> index f628d01..cbd7e0d 100644
 > --- a/migration/savevm.c
 > +++ b/migration/savevm.c
-> @@ -2055,7 +2055,7 @@ int qemu_loadvm_state(QEMUFile *f)
+> @@ -2156,11 +2156,6 @@ int save_vmstate(Monitor *mon, const char *name)
 >      return ret;
 >  }
 >  
-> -int save_vmstate(Monitor *mon, const char *name)
-> +int save_vmstate(const char *name)
+> -void hmp_savevm(Monitor *mon, const QDict *qdict)
+> -{
+> -    save_vmstate(mon, qdict_get_try_str(qdict, "name"));
+> -}
+> -
+>  void qmp_xen_save_devices_state(const char *filename, Error **errp)
 >  {
->      BlockDriverState *bs, *bs1;
->      QEMUSnapshotInfo sn1, *sn = &sn1, old_sn1, *old_sn = &old_sn1;
-> @@ -2069,8 +2069,8 @@ int save_vmstate(Monitor *mon, const char *name)
->      AioContext *aio_context;
->  
->      if (!bdrv_all_can_snapshot(&bs)) {
-> -        monitor_printf(mon, "Device '%s' is writable but does not "
-> -                       "support snapshots.\n", bdrv_get_device_name(bs));
-> +        error_report("Device '%s' is writable but does not support snapshots.",
-> +                     bdrv_get_device_name(bs));
->          return ret;
->      }
->  
-> @@ -2087,7 +2087,7 @@ int save_vmstate(Monitor *mon, const char *name)
->  
->      bs = bdrv_all_find_vmstate_bs();
->      if (bs == NULL) {
-> -        monitor_printf(mon, "No block device can accept snapshots\n");
-> +        error_report("No block device can accept snapshots");
->          return ret;
->      }
->      aio_context = bdrv_get_aio_context(bs);
-> @@ -2096,7 +2096,7 @@ int save_vmstate(Monitor *mon, const char *name)
->  
->      ret = global_state_store();
->      if (ret) {
-> -        monitor_printf(mon, "Error saving global state\n");
-> +        error_report("Error saving global state");
->          return ret;
->      }
->      vm_stop(RUN_STATE_SAVE_VM);
-> @@ -2128,7 +2128,7 @@ int save_vmstate(Monitor *mon, const char *name)
->      /* save the VM state */
->      f = qemu_fopen_bdrv(bs, 1);
->      if (!f) {
-> -        monitor_printf(mon, "Could not open VM state file\n");
-> +        error_report("Could not open VM state file");
->          goto the_end;
->      }
->      ret = qemu_savevm_state(f, &local_err);
-> @@ -2141,8 +2141,8 @@ int save_vmstate(Monitor *mon, const char *name)
->  
->      ret = bdrv_all_create_snapshot(sn, bs, vm_state_size, &bs);
->      if (ret < 0) {
-> -        monitor_printf(mon, "Error while creating snapshot on '%s'\n",
-> -                       bdrv_get_device_name(bs));
-> +        error_report("Error while creating snapshot on '%s'",
-> +                     bdrv_get_device_name(bs));
->          goto the_end;
->      }
->  
+>      QEMUFile *f;
 > diff --git a/monitor.c b/monitor.c
-> index 2fca4fb..9e79a97 100644
+> index ceb0489..2fca4fb 100644
 > --- a/monitor.c
 > +++ b/monitor.c
-> @@ -1856,7 +1856,7 @@ static void hmp_loadvm(Monitor *mon, const QDict *qdict)
->  
->  static void hmp_savevm(Monitor *mon, const QDict *qdict)
->  {
-> -    save_vmstate(mon, qdict_get_try_str(qdict, "name"));
-> +    save_vmstate(qdict_get_try_str(qdict, "name"));
+> @@ -1854,6 +1854,11 @@ static void hmp_loadvm(Monitor *mon, const QDict *qdict)
+>      }
 >  }
 >  
+> +static void hmp_savevm(Monitor *mon, const QDict *qdict)
+> +{
+> +    save_vmstate(mon, qdict_get_try_str(qdict, "name"));
+> +}
+> +
 >  int monitor_get_fd(Monitor *mon, const char *fdname, Error **errp)
-> diff --git a/replay/replay-snapshot.c b/replay/replay-snapshot.c
-> index 65e2d37..8cced46 100644
-> --- a/replay/replay-snapshot.c
-> +++ b/replay/replay-snapshot.c
-> @@ -64,7 +64,7 @@ void replay_vmstate_init(void)
 >  {
->      if (replay_snapshot) {
->          if (replay_mode == REPLAY_MODE_RECORD) {
-> -            if (save_vmstate(cur_mon, replay_snapshot) != 0) {
-> +            if (save_vmstate(replay_snapshot) != 0) {
->                  error_report("Could not create snapshot for icount record");
->                  exit(1);
->              }
+>      mon_fd_t *monfd;
 > 
