@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34295)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0I2e-0005dG-6m
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 21:34:53 -0400
+	(envelope-from <eblake@redhat.com>) id 1d0I2f-0005ed-F8
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 21:34:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0I2d-0003sB-5r
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 21:34:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1d0I2e-0003sm-Jy
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 21:34:53 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 17 Apr 2017 20:33:44 -0500
-Message-Id: <20170418013356.3578-20-eblake@redhat.com>
+Date: Mon, 17 Apr 2017 20:33:45 -0500
+Message-Id: <20170418013356.3578-21-eblake@redhat.com>
 In-Reply-To: <20170418013356.3578-1-eblake@redhat.com>
 References: <20170418013356.3578-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH 19/31] null: Switch to .bdrv_co_block_status()
+Subject: [Qemu-devel] [PATCH 20/31] parallels: Switch to
+ .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,68 +21,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@nongnu.org, jsnow@redhat.com, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, kwolf@nongnu.org, jsnow@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
 We are gradually moving away from sector-based interfaces, towards
-byte-based.  Update the null driver accordingly.
+byte-based.  Update the parallels driver accordingly.  Note that
+the internal function block_status() is still sector-based, because
+it is still in use by other sector-based functions; but that's okay
+because request_alignment is 512 as a result of those functions.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- block/null.c | 21 ++++++++++-----------
- 1 file changed, 10 insertions(+), 11 deletions(-)
+ block/parallels.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/block/null.c b/block/null.c
-index b300390..2dc2dd7 100644
---- a/block/null.c
-+++ b/block/null.c
-@@ -204,22 +204,21 @@ static int null_reopen_prepare(BDRVReopenState *reopen_state,
-     return 0;
+diff --git a/block/parallels.c b/block/parallels.c
+index 8be46a7..2bc1918 100644
+--- a/block/parallels.c
++++ b/block/parallels.c
+@@ -274,22 +274,25 @@ static coroutine_fn int parallels_co_flush_to_os(BlockDriverState *bs)
  }
 
--static int64_t coroutine_fn null_co_get_block_status(BlockDriverState *bs,
--                                                     int64_t sector_num,
--                                                     int nb_sectors, int *pnum,
--                                                     BlockDriverState **file)
-+static int64_t coroutine_fn null_co_block_status(BlockDriverState *bs,
-+                                                 int64_t offset,
-+                                                 int64_t bytes, int64_t *pnum,
-+                                                 BlockDriverState **file)
+
+-static int64_t coroutine_fn parallels_co_get_block_status(BlockDriverState *bs,
+-        int64_t sector_num, int nb_sectors, int *pnum, BlockDriverState **file)
++static int64_t coroutine_fn parallels_co_block_status(BlockDriverState *bs,
++        int64_t offset, int64_t bytes, int64_t *pnum, BlockDriverState **file)
  {
-     BDRVNullState *s = bs->opaque;
--    off_t start = sector_num * BDRV_SECTOR_SIZE;
-+    int64_t ret = BDRV_BLOCK_OFFSET_VALID | (offset & BDRV_BLOCK_OFFSET_MASK);
+     BDRVParallelsState *s = bs->opaque;
+-    int64_t offset;
++    int count;
 
--    *pnum = nb_sectors;
-+    *pnum = bytes;
-     *file = bs;
++    assert(QEMU_IS_ALIGNED(offset | bytes, BDRV_SECTOR_SIZE));
+     qemu_co_mutex_lock(&s->lock);
+-    offset = block_status(s, sector_num, nb_sectors, pnum);
++    offset = block_status(s, offset >> BDRV_SECTOR_BITS,
++                          bytes >> BDRV_SECTOR_BITS, &count);
+     qemu_co_mutex_unlock(&s->lock);
 
-     if (s->read_zeroes) {
--        return BDRV_BLOCK_OFFSET_VALID | start | BDRV_BLOCK_ZERO;
--    } else {
--        return BDRV_BLOCK_OFFSET_VALID | start;
-+        ret |= BDRV_BLOCK_ZERO;
+     if (offset < 0) {
+         return 0;
      }
-+    return ret;
+
++    *pnum = count * BDRV_SECTOR_SIZE;
+     *file = bs->file->bs;
+-    return (offset << BDRV_SECTOR_BITS) |
++    return (offset & BDRV_BLOCK_OFFSET_MASK) |
+         BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID;
  }
 
- static void null_refresh_filename(BlockDriverState *bs, QDict *opts)
-@@ -250,7 +249,7 @@ static BlockDriver bdrv_null_co = {
-     .bdrv_co_flush_to_disk  = null_co_flush,
-     .bdrv_reopen_prepare    = null_reopen_prepare,
-
--    .bdrv_co_get_block_status   = null_co_get_block_status,
-+    .bdrv_co_block_status   = null_co_block_status,
-
-     .bdrv_refresh_filename  = null_refresh_filename,
- };
-@@ -269,7 +268,7 @@ static BlockDriver bdrv_null_aio = {
-     .bdrv_aio_flush         = null_aio_flush,
-     .bdrv_reopen_prepare    = null_reopen_prepare,
-
--    .bdrv_co_get_block_status   = null_co_get_block_status,
-+    .bdrv_co_block_status   = null_co_block_status,
-
-     .bdrv_refresh_filename  = null_refresh_filename,
- };
+@@ -775,7 +778,7 @@ static BlockDriver bdrv_parallels = {
+     .bdrv_open		= parallels_open,
+     .bdrv_close		= parallels_close,
+     .bdrv_child_perm          = bdrv_format_default_perms,
+-    .bdrv_co_get_block_status = parallels_co_get_block_status,
++    .bdrv_co_block_status     = parallels_co_block_status,
+     .bdrv_has_zero_init       = bdrv_has_zero_init_1,
+     .bdrv_co_flush_to_os      = parallels_co_flush_to_os,
+     .bdrv_co_readv  = parallels_co_readv,
 -- 
 2.9.3
