@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40900)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d0SyW-0005OZ-9m
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:15:21 -0400
+	(envelope-from <eblake@redhat.com>) id 1d0SzF-0005jL-6J
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:16:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d0SyV-0007UT-6y
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:15:20 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:37888)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1d0SyU-0007UB-Vp
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:15:19 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id r190so14402504wme.1
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 06:15:18 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1d0SzD-0007eO-R1
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:16:05 -0400
+References: <20170314023933.12118-1-famz@redhat.com>
+	<20170314023933.12118-2-famz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4086fd79-3226-0be2-a258-137b48095f94@redhat.com>
+Date: Tue, 18 Apr 2017 08:15:38 -0500
 MIME-Version: 1.0
-In-Reply-To: <149193892875.15312.10880186639757781549@loki>
-References: <149193892875.15312.10880186639757781549@loki>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 18 Apr 2017 14:14:57 +0100
-Message-ID: <CAFEAcA-m67wXgX8W_jEj10T+P3A2NEa_iS3MdQqWhd7DD+W7HA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [ANNOUNCE] QEMU 2.9.0-rc4 is now available
+In-Reply-To: <20170314023933.12118-2-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="3eiJhGxLhqQaHPr947d9gB1ExnfVO9ur9"
+Subject: Re: [Qemu-devel] [PATCH RFC 1/3] block: Introduce BDRV_O_UNSAFE_READ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +24,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 11 April 2017 at 20:28, Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
-> Hello,
->
-> On behalf of the QEMU Team, I'd like to announce the availability of the
-> fifth release candidate for the QEMU 2.9 release.  This release is meant
-> for testing purposes and should not be used in a production environment.
->
->   http://download.qemu-project.org/qemu-2.9.0-rc4.tar.xz
->   http://download.qemu-project.org/qemu-2.9.0-rc4.tar.xz.sig
->
-> A note from the maintainer:
->
->   This is intended to be the final release candidate for v2.9.0, and
->   unless any showstopper bugs are reported we plan to cut the final
->   release next week on the 18th April.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--3eiJhGxLhqQaHPr947d9gB1ExnfVO9ur9
+From: Eric Blake <eblake@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <4086fd79-3226-0be2-a258-137b48095f94@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 1/3] block: Introduce BDRV_O_UNSAFE_READ
+References: <20170314023933.12118-1-famz@redhat.com>
+ <20170314023933.12118-2-famz@redhat.com>
+In-Reply-To: <20170314023933.12118-2-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Regrettably there were a couple of final bugs we needed
-to squash, and so the revised plan is to roll an rc5 today
-and then have final release on Thursday or Friday.
+On 03/13/2017 09:39 PM, Fam Zheng wrote:
+> This flag clears out the "consistent read" permission that blk_new_open=
 
-thanks
--- PMM
+> requests.
+>=20
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  block/block-backend.c | 2 +-
+>  include/block/block.h | 1 +
+>  2 files changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/block/block-backend.c b/block/block-backend.c
+> index 5742c09..99428ee 100644
+> --- a/block/block-backend.c
+> +++ b/block/block-backend.c
+> @@ -197,7 +197,7 @@ BlockBackend *blk_new_open(const char *filename, co=
+nst char *reference,
+>       * caller of blk_new_open() doesn't make use of the permissions, b=
+ut they
+>       * shouldn't hurt either. We can still share everything here becau=
+se the
+>       * guest devices will add their own blockers if they can't share. =
+*/
+> -    perm =3D BLK_PERM_CONSISTENT_READ;
+> +    perm =3D flags & BDRV_O_UNSAFE_READ ? 0 : BLK_PERM_CONSISTENT_READ=
+;
+
+A bit awkward that we have to add an option that requests negation of a
+permission under the hood, but looks like it is the least-invasive way
+to get what we want.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--3eiJhGxLhqQaHPr947d9gB1ExnfVO9ur9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY9hF6AAoJEKeha0olJ0Nq7NQH/3b6yREnmRGqM15txLkE5cVz
+jXmSMFsbl42VXKxvs2c5FWITmY/nPlUvwpHeOp9t4dwkB8DWCRJwt8BXdBdPPtDH
+N8JEcfpqS1LDqKIfu4i/sZqEEhQzFXOslU0BMw+BSEYYD9HUQebtgiW5jgQan1PZ
+LaOpGDtYYgfYQiNCU/+ebmVv2ClzC5JXWwBEDbHB0QDvFeg9G4dFv8mP6SGkS1Ay
+NyfHIQghJj7ZHA93Q8jxpw9uCx9yhv/aZtzZj9X75AOIyYcVR6OWmkTkCcWUN8sX
+xNl5wnirOOxzyRDALmIL3reomwSKZZHHijCdUWj4EPES7kbxus+sBDIko2xuDmQ=
+=KEJ8
+-----END PGP SIGNATURE-----
+
+--3eiJhGxLhqQaHPr947d9gB1ExnfVO9ur9--
