@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1d0U05-0006Ep-R8
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:21:02 -0400
+	(envelope-from <shorne@gmail.com>) id 1d0U5Q-0008GM-N6
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:26:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1d0U03-00016a-4w
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:21:01 -0400
-Received: from mail-pf0-x22e.google.com ([2607:f8b0:400e:c00::22e]:36782)
+	(envelope-from <shorne@gmail.com>) id 1d0U5M-0003id-Fi
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:26:32 -0400
+Received: from mail-pf0-x234.google.com ([2607:f8b0:400e:c00::234]:36075)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1d0U02-00016N-Uy
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:20:59 -0400
-Received: by mail-pf0-x22e.google.com with SMTP id 194so42450215pfv.3
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 07:20:58 -0700 (PDT)
-Date: Tue, 18 Apr 2017 23:20:55 +0900
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1d0U5M-0003iI-9g
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:26:28 -0400
+Received: by mail-pf0-x234.google.com with SMTP id 194so42520711pfv.3
+	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 07:26:28 -0700 (PDT)
+Date: Tue, 18 Apr 2017 23:26:24 +0900
 From: Stafford Horne <shorne@gmail.com>
-Message-ID: <20170418142055.GB2599@lianli.shorne-pla.net>
+Message-ID: <20170418142624.GC2599@lianli.shorne-pla.net>
 References: <cover.1492384862.git.shorne@gmail.com>
-	<fb69c137317a365dcb549dfef1ecd2fbff48e92c.1492384862.git.shorne@gmail.com>
-	<6914f9b7-ece1-973d-2210-871b71319ae0@twiddle.net>
+	<b1be5af9a1d304f55847efeab706e88e3b9b1afa.1492384862.git.shorne@gmail.com>
+	<5447c3cd-4b64-3b71-fd77-33a29f225104@twiddle.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6914f9b7-ece1-973d-2210-871b71319ae0@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH 2/7] target/openrisc: add shutdown logic
+In-Reply-To: <5447c3cd-4b64-3b71-fd77-33a29f225104@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH 4/7] target/openrisc: implement shadow
+ registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,35 +34,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Richard Henderson <rth@twiddle.net>
 Cc: qemu-devel@nongnu.org, openrisc@lists.librecores.org
 
-On Tue, Apr 18, 2017 at 12:52:52AM -0700, Richard Henderson wrote:
+On Tue, Apr 18, 2017 at 01:11:53AM -0700, Richard Henderson wrote:
 > On 04/16/2017 04:23 PM, Stafford Horne wrote:
-> > In openrisc simulators we use hooks like 'l.nop 1' to cause the
-> > simulator to exit.  Implement that for qemu too.
+> > Shadow registers are part of the openrisc spec along with sr[cid], as
+> > part of the fast context switching feature.  When exceptions occur,
+> > instead of having to save registers to the stack if enabled the CID will
+> > increment and a new set of registers will be available.
 > > 
-> > Reported-by: Waldemar Brodkorb <wbx@openadk.org>
-> > Signed-off-by: Stafford Horne <shorne@gmail.com>
+> > This patch only implements shadow registers which can be used as extra
+> > scratch registers via the mfspr and mtspr if required.  This is
+> > implemented in a way where it would be easy to add on the fast context
+> > switching, currently cid is hardcoded to 0.
 > 
-> As I said the first time this was posted: This is horrible.
+> I'm not especially keen on this half-conversion.
+> If CID cannot be changed, then
 > 
-> If you want to do something like this, it needs to be buried under a special
-> run mode like -semihosting.
-
-Understood,  I will revise this.  I didnt know this was posted before.
-
-> >          case 0x01:    /* l.nop */
-> >              LOG_DIS("l.nop %d\n", I16);
-> > +            {
-> > +                TCGv_i32 arg = tcg_const_i32(I16);
-> > +                gen_helper_nop(arg);
-> > +            }
+> > -    target_ulong gpr[32];     /* General registers */
+> > +    target_ulong shadow_gpr[16][32]; /* Shadow registers */
+> > +    target_ulong * gpr;       /* General registers (backed by shadow) */
 > 
-> You also really really must special-case l.nop 0 so that it doesn't generate
-> a function call.  Just think of all the extra calls you're adding for every
-> delay slot that couldn't be filled.
+> this pointer should not be necessary.  Just use a union, or even just
+> 
+>     target_ulong gpr[32];
+>     target_ulong shadow_gpr[15][32];
+> 
+> for now.
+> 
+> Alternately, add accessor functions that take the whole ENV (which would be
+> able to read CID, when needed).  C.f.
+> 
+>     uint64_t cpu_alpha_load_gr(CPUAlphaState *env, unsigned reg);
+>     void cpu_alpha_store_gr(CPUAlphaState *env, unsigned reg, uint64_t val);
 
-Yeah, that makes sense.  Ill add that for l.nop 0.
+Actually, I started off writing it this way, but there were a lot of places
+that used env->gpr.  I had some regex's to replace everything, but in the
+end I thought using the gpr pointer was just easier.
+
+Using the union would work as well, but it wouldnt help to allow switching
+of cid.  My idea with the pointer was that if cid was updates I could
+update the pointer at that time.
+
+Ill rework this to use the accessor functions.
 
 -Stafford
 
+> If/when CID can be changed, then we can talk about various ways
+> that this can be modeled within TCG.
+> 
 > 
 > r~
