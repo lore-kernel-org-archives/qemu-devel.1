@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d0UUL-0005UB-9H
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:52:18 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d0UV7-00060B-RH
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:53:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d0UUK-0008GE-K6
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:52:17 -0400
-Date: Tue, 18 Apr 2017 10:51:59 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170418145159.GI5704@localhost.localdomain>
-References: <20170418143044.12187-1-famz@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1d0UV6-0008Tz-V3
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:53:05 -0400
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:35046)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d0UV6-0008SV-PU
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:53:04 -0400
+Received: by mail-wm0-x22b.google.com with SMTP id w64so58575813wma.0
+	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 07:53:04 -0700 (PDT)
+Date: Tue, 18 Apr 2017 15:53:01 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170418145301.GL21261@stefanha-x1.localdomain>
+References: <CAGKXQyfCwbZ3w1bi=TVeSH=ZGx-90JBf+Bn6qqMdkUZTOoWAow@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="QWRRbczYj8mXuejp"
 Content-Disposition: inline
-In-Reply-To: <20170418143044.12187-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9-rc5 v4 0/2] block: Drain BH in
- bdrv_drained_begin
+In-Reply-To: <CAGKXQyfCwbZ3w1bi=TVeSH=ZGx-90JBf+Bn6qqMdkUZTOoWAow@mail.gmail.com>
+Subject: Re: [Qemu-devel] sleeping in vm live migration code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,24 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
+To: ali saeedi <ali.saeedi56@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-On Tue, Apr 18, 2017 at 10:30:42PM +0800, Fam Zheng wrote:
-> v4: Split patch, and fix the unsafe bdrv_unref. [Paolo]
-> 
-> Fam Zheng (2):
->   block: Walk bs->children carefully in bdrv_drain_recurse
->   block: Drain BH in bdrv_drained_begin
-> 
->  block/io.c            | 23 ++++++++++++++++++++---
->  include/block/block.h | 22 ++++++++++++++--------
->  2 files changed, 34 insertions(+), 11 deletions(-)
-> 
-> -- 
-> 2.9.3
->
 
-Reviewed-by: Jeff Cody <jcody@redhat.com>
+--QWRRbczYj8mXuejp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-(also Tested-by)
+On Wed, Apr 12, 2017 at 06:13:33PM +0430, ali saeedi wrote:
+> why we have below code in vm live migration?
+>   * g_usleep((initial_time + BUFFER_DELAY - current_time)*1000);*
+
+It's for migration rate-limiting.  The migration thread throttles itself
+if the user has configured a maximum transmission rate for the live
+migration connection.
+
+Stefan
+
+--QWRRbczYj8mXuejp
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJY9ihNAAoJEJykq7OBq3PI4IwH/jsGDxCVpR2DVy+o1lkMUM1A
+jq93PU6vwVRCFh2DBOMdlf8846LdAeBkFRQN1Sf4lSgKmJDscWV61nTi0rha0I3R
+TqojZ+l8cGOJYYo9m4IcYZyeIhONy6qLB4DuYoaDld7+ohg5IBZIXeMnjGaISNbb
+rydj5BYbnqzpIx64t4oG9AtAHjXZkBQ1Z51m0kI+WZYR51Q46aVZm4cGElaKl7ad
+P5LUTH4nZUNJeqc2phxirvNlfSqNY7IlAMoyHF/RvUYNZgFwM+UWvedjweL+4pJn
+nuKaWBxxRBGX2w5K0t/StC7XCGZl4/Wf4Wd5ZPbvht/ybK9R+RMQyQItAdlYH04=
+=p09Y
+-----END PGP SIGNATURE-----
+
+--QWRRbczYj8mXuejp--
