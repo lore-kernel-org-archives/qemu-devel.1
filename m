@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mithro@mithis.com>) id 1d0MSd-0004Pd-NY
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 02:18:00 -0400
+	(envelope-from <quintela@redhat.com>) id 1d0Mjs-0007xo-8G
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 02:35:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mithro@mithis.com>) id 1d0MSa-0004w8-Hy
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 02:17:59 -0400
-Received: from mail-pf0-x22a.google.com ([2607:f8b0:400e:c00::22a]:34239)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mithro@mithis.com>) id 1d0MSa-0004w0-C2
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 02:17:56 -0400
-Received: by mail-pf0-x22a.google.com with SMTP id c198so76057926pfc.1
-	for <qemu-devel@nongnu.org>; Mon, 17 Apr 2017 23:17:56 -0700 (PDT)
-From: Tim 'mithro' Ansell <mithro@mithis.com>
-Date: Tue, 18 Apr 2017 16:15:51 +1000
-Message-Id: <20170418061551.196582-3-mithro@mithis.com>
-In-Reply-To: <20170418061551.196582-1-mithro@mithis.com>
-References: <20170418061551.196582-1-mithro@mithis.com>
-Subject: [Qemu-devel] [PATCH 2/2] target/openrisc: Implement EPH bit
+	(envelope-from <quintela@redhat.com>) id 1d0Mjo-0004Ny-VX
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 02:35:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46938)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d0Mjo-0004Nj-Pa
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 02:35:44 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8428431F3F8
+	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 06:35:43 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <ba199bb0-8946-e6c7-0f42-67d296c24afc@redhat.com> (Eric Blake's
+	message of "Mon, 17 Apr 2017 15:26:50 -0500")
+References: <20170417200041.2451-1-quintela@redhat.com>
+	<20170417200041.2451-10-quintela@redhat.com>
+	<ba199bb0-8946-e6c7-0f42-67d296c24afc@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Tue, 18 Apr 2017 08:35:42 +0200
+Message-ID: <874lxmjk8x.fsf@secure.mitica>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 09/19] migration: Create block capabilities
+ for shared and enable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,41 +36,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Tim 'mithro' Ansell <mithro@mithis.com>, shorne@gmail.com, Jia Liu <proljc@gmail.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
 
-Exception Prefix High (EPH) control bit of the Supervision Register
-(SR).
+Eric Blake <eblake@redhat.com> wrote:
+> On 04/17/2017 03:00 PM, Juan Quintela wrote:
+>> This two capabilites were added through the command line.  Notice that
+>
+> s/This/These/
+> s/capabilites/capabilities/
+>
+>> we just created them.  This is just the boilerplate.
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> ---
+>>  include/migration/migration.h |  3 +++
+>>  migration/migration.c         | 36 ++++++++++++++++++++++++++++++++++++
+>>  qapi-schema.json              |  7 ++++++-
+>>  3 files changed, 45 insertions(+), 1 deletion(-)
+>
+> I think this is a nice cleanup, even if it is exposing the internal
+> block migration (the 'migrate -b' stuff) that we really don't like (it
+> is one of the things causing grief at the 2.9-rc4 stage), because users
+> should be favoring NBD migration over internal block migration these days.
 
-The significant bits (31-12) of the vector offset address for each
-exception depend on the setting of the Supervision Register (SR)'s EPH
-bit and the Exception Vector Base Address Register (EVBAR).
+I am 1st in the queue to remove it, but each time that we talk about
+removing it, somebody appears to came to fix it :-p
 
-If SR[EPH] is set, the vector offset is logically ORed with the offset
-0xF0000000.
+So, if it has to stay, just update it with the times.
 
-This means if EPH is;
- * 0 - Exceptions vectors start at EVBAR
- * 1 - Exception vectors start at EVBAR | 0xF0000000
-
-Signed-off-by: Tim 'mithro' Ansell <mithro@mithis.com>
----
- target/openrisc/interrupt.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/target/openrisc/interrupt.c b/target/openrisc/interrupt.c
-index 78f0ba9421..2c91fab380 100644
---- a/target/openrisc/interrupt.c
-+++ b/target/openrisc/interrupt.c
-@@ -69,6 +69,9 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
-         if (env->cpucfgr & CPUCFGR_EVBARP) {
-             vect_pc |= env->evbar;
-         }
-+        if (env->sr & SR_EPH) {
-+            vect_pc |= 0xf0000000;
-+        }
-         env->pc = vect_pc;
-     } else {
-         cpu_abort(cs, "Unhandled exception 0x%x\n", cs->exception_index);
--- 
-2.12.1
+> Reviewed-by: Eric Blake <eblake@redhat.com>
