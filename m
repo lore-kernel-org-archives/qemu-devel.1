@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1d0YfE-0006SD-9H
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 15:19:49 -0400
+	(envelope-from <quintela@redhat.com>) id 1d0YpL-000068-Mz
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 15:30:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1d0YfD-0005BG-GC
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 15:19:48 -0400
-Received: from mail-yb0-x241.google.com ([2607:f8b0:4002:c09::241]:35556)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1d0YfD-0005BA-BU
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 15:19:47 -0400
-Received: by mail-yb0-x241.google.com with SMTP id 19so98795ybl.2
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 12:19:47 -0700 (PDT)
+	(envelope-from <quintela@redhat.com>) id 1d0YpI-0001FF-Dc
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 15:30:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41310)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d0YpI-0001Ex-7Y
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 15:30:12 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B1F2D7AEA4
+	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 19:30:10 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <76d42218-b542-4136-af87-5c0bc4d4afac@redhat.com> (Eric Blake's
+	message of "Thu, 6 Apr 2017 09:09:10 -0500")
+References: <20170406131326.2418-1-quintela@redhat.com>
+	<20170406131326.2418-5-quintela@redhat.com>
+	<76d42218-b542-4136-af87-5c0bc4d4afac@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Tue, 18 Apr 2017 21:30:06 +0200
+Message-ID: <87shl5h5tt.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <507aa35d-83dc-2861-ab3f-1e185da8ca02@redhat.com>
-References: <20170415192930.1443-1-bobby.prani@gmail.com>
-	<CAFEAcA-JrBV6Vi21NRPk25u+NuiLG-untt7qbnqfdtd96f63TA@mail.gmail.com>
-	<CAJhHMCBKQyOd8ZoDZWDV=NDu1PCx=6M8K1S0pfOr__H2TsR8sw@mail.gmail.com>
-	<507aa35d-83dc-2861-ab3f-1e185da8ca02@redhat.com>
-From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Tue, 18 Apr 2017 15:19:16 -0400
-Message-ID: <CAJhHMCDyAwNC1NYnE_oq-XnJ41-OXXk42bEGbWoGAWdc2xKJxA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] timer.h: Provide monotonic time for ARM
- guests
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 4/5] migration: Disable hotplug/unplug
+ during migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,32 +36,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, Michael Tokarev <mjt@tls.msk.ru>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
 
-On Tue, Apr 18, 2017 at 5:56 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+Eric Blake <eblake@redhat.com> wrote:
+> On 04/06/2017 08:13 AM, Juan Quintela wrote:
+>> Until we have reviewed what can/can't be hotplug during migration,
 >
+> s/hotplug/hotplugged/
 >
-> On 17/04/2017 20:55, Pranith Kumar wrote:
->>>> +/* ARM does not have a user-space readble cycle counter available.
->>>> + * This is a compromise to get monotonically increasing time.
->>>> + */
->>>> +static inline int64_t cpu_get_host_ticks(void)
->>>> +{
->>>> +    return get_clock();
->>>> +}
->>> This doesn't look like it should be ARM-specific. Is it
->>> better than the current default implementation? If so,
->>> why not make this the default implementation?
->>
->> I think we can do that...
+>> disable it.  We can enable it later for the things that we know that
+>> work.  For instance, memory hotplug during postcopy don't work
 >
-> Yes, it is always better for emulation accuracy.  It may be much slower,
-> depending on your OS (especially if get_clock requires a
-> user->kernel->user transition), but the current code is quite broken.
->
+> s/don't/doesn't/
 
-OK, I sent an updated patch using get_clock() for all other cases.
-
---
-Pranith
+Fixed the three typos, thanks.
