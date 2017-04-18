@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0T4B-0007E9-67
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:21:12 -0400
+	(envelope-from <marcel@redhat.com>) id 1d0T5w-0007qW-O7
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:23:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0T47-0000cq-U2
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:21:11 -0400
-References: <20170314023933.12118-1-famz@redhat.com>
-	<20170314023933.12118-3-famz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0f1ecad6-9e85-39a2-6d52-5481f7e309cb@redhat.com>
-Date: Tue, 18 Apr 2017 08:20:45 -0500
+	(envelope-from <marcel@redhat.com>) id 1d0T5t-0001Vb-F8
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:23:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41104)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1d0T5t-0001VS-60
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:22:57 -0400
+References: <20170417215916.12431-1-ehabkost@redhat.com>
+	<20170417215916.12431-3-ehabkost@redhat.com>
+	<20170418035101.GJ12235@umbus.fritz.box>
+	<20170418114826.GI25239@thinpad.lan.raisama.net>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <ba7863c5-af0f-b8d4-fec6-4c9515317467@redhat.com>
+Date: Tue, 18 Apr 2017 16:22:47 +0300
 MIME-Version: 1.0
-In-Reply-To: <20170314023933.12118-3-famz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="mC9FjOeGN5VdHSjK2Na47Q30e2EeeeBjQ"
-Subject: Re: [Qemu-devel] [PATCH RFC 2/3] qemu-img: Add --unsafe-read option
- to subcommands
+In-Reply-To: <20170418114826.GI25239@thinpad.lan.raisama.net>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 2/7] pci: Change pci_bus_init() 'parent'
+ parameter to PCIHostState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,92 +30,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, aik@ozlabs.ru, David Gibson <dgibson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mC9FjOeGN5VdHSjK2Na47Q30e2EeeeBjQ
-From: Eric Blake <eblake@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <0f1ecad6-9e85-39a2-6d52-5481f7e309cb@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 2/3] qemu-img: Add --unsafe-read option
- to subcommands
-References: <20170314023933.12118-1-famz@redhat.com>
- <20170314023933.12118-3-famz@redhat.com>
-In-Reply-To: <20170314023933.12118-3-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 04/18/2017 02:48 PM, Eduardo Habkost wrote:
+> On Tue, Apr 18, 2017 at 01:51:02PM +1000, David Gibson wrote:
+>> On Mon, Apr 17, 2017 at 06:59:11PM -0300, Eduardo Habkost wrote:
+>>> pci_bus_init() already requires 'parent' to be a PCI_HOST_BRIDGE object,
+>>> so change the parameter type to reflect that.
+>>>
+>>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>>> Cc: Marcel Apfelbaum <marcel@redhat.com>
+>>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>>
+>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>>
+>> I had to do some looking to convince myself this wouldn't break P2P
+>> bridges.
+>>
+>> I wonder if we should rename pci_bus_init() / pci_bus_new() to make it
+>> clearer that they're about creating a whole new PCI domain, and not
+>> for a new bus within an existing domain.
+>
+> Good point. The current naming is confusing. I only knew the
+> change was safe because pci_bus_new() would crash if 'parent'
+> wasn't a PCI_HOST_BRIDGE. But I took some time to find the other
+> places where PCI buses could be created, and I'm not sure yet if
+> I found all of them.
+>
+> Is there any other code that creates TYPE_PCI_BUS objects, except
+> for the ones touched by this series and pci_bridge_initfn()?
+>
 
-On 03/13/2017 09:39 PM, Fam Zheng wrote:
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  qemu-img.c | 148 +++++++++++++++++++++++++++++++++++++++++++++++------=
---------
->  1 file changed, 114 insertions(+), 34 deletions(-)
->=20
+pxb and pxb-pcie devices have a built-in PCI/PCIe bus,
+but I saw them handled by another patch.
 
-> @@ -2711,9 +2751,10 @@ static int img_map(int argc, char **argv)
->              {"output", required_argument, 0, OPTION_OUTPUT},
->              {"object", required_argument, 0, OPTION_OBJECT},
->              {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-> +            {"unsafe-read", no_argument, 0, 'U'},
->              {0, 0, 0, 0}
->          };
-> -        c =3D getopt_long(argc, argv, "f:h",
-> +        c =3D getopt_long(argc, argv, "f:hU",
-
-Yay for 'U' being an unambiguous mnemonic that we could use on all the
-commands.  You got lucky (it gets ever harder to add new options, as our
-letters get thinner ;)
-
-> @@ -2970,6 +3020,7 @@ static int img_rebase(int argc, char **argv)
->      int c, flags, src_flags, ret;
->      bool writethrough, src_writethrough;
->      int unsafe =3D 0;
-> +    int unsafe_read =3D 0;
-
-bool, please.  (Just because existing code is lousy with using an int
-for a bool doesn't mean we should perpetuate it)
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 
 
-> @@ -3033,6 +3085,9 @@ static int img_rebase(int argc, char **argv)
->          case OPTION_IMAGE_OPTS:
->              image_opts =3D true;
->              break;
-> +        case 'U':
-> +            unsafe_read =3D 1;
+Thanks,
+Marcel
 
-s/1/true/
-
-Good patch, but missing documentation updates to --help/man page.  So,
-as encouragement to add that when you drop the RFC, I'll withhold my R-b
-until then. ;)
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---mC9FjOeGN5VdHSjK2Na47Q30e2EeeeBjQ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY9hKtAAoJEKeha0olJ0NqSVYIAJOZ/0js164vupcyO/yCO/mA
-jAoM3tdQGyQLEf1ybAui9QAM48atrOJhTlOILZi7V9jawBQSE7kZZbQWbMJ26kUZ
-LYLV+v+w1BksOyjE/4tRRWdb9e52rlZXQNF6HyqVEjmuPz6KvSTJmuaQvJh2Wuhy
-1YOf2tmWrg4RiSQYAA2L46L01GdWzQNrVLpfMWQl2g9gcEz11cfwGbOanDEuP3lv
-+yNlckN0iLpdBWSJhb5r9zcjMef4lc5qDjaK6XQCee1i7Kdrf6EK/6zVWBk3GWpX
-A8fKV4O64Bo6EDwyQlt4BIU9pEvOK1ma7E3k3ZCuWp7BD7DTXIHd9BRc8RMYrK4=
-=Ihuy
------END PGP SIGNATURE-----
-
---mC9FjOeGN5VdHSjK2Na47Q30e2EeeeBjQ--
+>>
+>>> ---
+>>>  hw/pci/pci.c | 10 ++++++----
+>>>  1 file changed, 6 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+>>> index 25118fb91d..d9535c0bdc 100644
+>>> --- a/hw/pci/pci.c
+>>> +++ b/hw/pci/pci.c
+>>> @@ -362,7 +362,7 @@ const char *pci_root_bus_path(PCIDevice *dev)
+>>>      return rootbus->qbus.name;
+>>>  }
+>>>
+>>> -static void pci_bus_init(PCIBus *bus, DeviceState *parent,
+>>> +static void pci_bus_init(PCIBus *bus, PCIHostState *phb,
+>>>                           MemoryRegion *address_space_mem,
+>>>                           MemoryRegion *address_space_io,
+>>>                           uint8_t devfn_min)
+>>> @@ -375,7 +375,7 @@ static void pci_bus_init(PCIBus *bus, DeviceState *parent,
+>>>      /* host bridge */
+>>>      QLIST_INIT(&bus->child);
+>>>
+>>> -    pci_host_bus_register(PCI_HOST_BRIDGE(host));
+>>> +    pci_host_bus_register(phb);
+>>>  }
+>>>
+>>>  bool pci_bus_is_express(PCIBus *bus)
+>>> @@ -394,8 +394,9 @@ void pci_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *parent,
+>>>                           MemoryRegion *address_space_io,
+>>>                           uint8_t devfn_min, const char *typename)
+>>>  {
+>>> +    PCIHostState *phb = PCI_HOST_BRIDGE(parent);
+>>>      qbus_create_inplace(bus, bus_size, typename, parent, name);
+>>> -    pci_bus_init(bus, parent, address_space_mem, address_space_io, devfn_min);
+>>> +    pci_bus_init(bus, phb, address_space_mem, address_space_io, devfn_min);
+>>>  }
+>>>
+>>>  PCIBus *pci_bus_new(DeviceState *parent, const char *name,
+>>> @@ -403,10 +404,11 @@ PCIBus *pci_bus_new(DeviceState *parent, const char *name,
+>>>                      MemoryRegion *address_space_io,
+>>>                      uint8_t devfn_min, const char *typename)
+>>>  {
+>>> +    PCIHostState *phb = PCI_HOST_BRIDGE(parent);
+>>>      PCIBus *bus;
+>>>
+>>>      bus = PCI_BUS(qbus_create(typename, parent, name));
+>>> -    pci_bus_init(bus, parent, address_space_mem, address_space_io, devfn_min);
+>>> +    pci_bus_init(bus, phb, address_space_mem, address_space_io, devfn_min);
+>>>      return bus;
+>>>  }
+>>>
+>>
+>> --
+>> David Gibson			| I'll have my music baroque, and my code
+>> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+>> 				| _way_ _around_!
+>> http://www.ozlabs.org/~dgibson
+>
+>
+>
