@@ -1,15 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d0XBt-0000HB-UV
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:45:27 -0400
+	(envelope-from <den@virtuozzo.com>) id 1d0XQw-0003rz-7g
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 14:01:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d0XBs-0006FE-Sl
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:45:26 -0400
-From: Jeff Cody <jcody@redhat.com>
-Date: Tue, 18 Apr 2017 13:45:17 -0400
-Message-Id: <815765cfcea726c7a4cc619c4f6c3bedb47f16b9.1492537347.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 for-2.10 1/1] qemu-iotests: _cleanup_qemu
- must be called on exit
+	(envelope-from <den@virtuozzo.com>) id 1d0XQs-0004Ch-7u
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 14:00:58 -0400
+References: <20170406150148.zwjpozqtale44jfh@perseus.local>
+	<2b915695-29b5-df8d-4d89-080eeaaaff13@openvz.org>
+	<w51shlcv7sb.fsf@maestria.local.igalia.com>
+	<565c1e1b-b9e1-e9c5-790e-283d04afc747@openvz.org>
+	<w51poggv3xh.fsf@maestria.local.igalia.com>
+	<ec4f6034-0c94-658c-6b2a-e0aecea173f4@openvz.org>
+	<w51h91suz53.fsf@maestria.local.igalia.com>
+	<e1ae017b-a832-0e52-02d0-eaeb882a2b4d@openvz.org>
+	<w51wpaioruq.fsf@maestria.local.igalia.com>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <cdfb8fe2-a4f4-7b3f-5b9f-0702f1c7791f@openvz.org>
+Date: Tue, 18 Apr 2017 20:27:33 +0300
+MIME-Version: 1.0
+In-Reply-To: <w51wpaioruq.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] Proposed qcow2 extension: subcluster
+ allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,168 +31,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-For the tests that use the common.qemu functions for running a QEMU
-process, _cleanup_qemu must be called in the exit function.
+On 04/18/2017 02:52 PM, Alberto Garcia wrote:
+> On Thu 13 Apr 2017 05:17:21 PM CEST, Denis V. Lunev wrote:
+>> On 04/13/2017 06:04 PM, Alberto Garcia wrote:
+>>> On Thu 13 Apr 2017 03:30:43 PM CEST, Denis V. Lunev wrote:
+>>>> Yes, block size should be increased. I perfectly in agreement with
+>>>> your.  But I think that we could do that by plain increase of the
+>>>> cluster size without any further dances. Sub-clusters as sub-clusters
+>>>> will help if we are able to avoid COW. With COW I do not see much
+>>>> difference.
+>>> I'm trying to summarize your position, tell me if I got everything
+>>> correctly:
+>>>
+>>> 1. We should try to reduce data fragmentation on the qcow2 file,
+>>>    because it will have a long term effect on the I/O performance (as
+>>>    opposed to an effect on the initial operations on the empty image).
+>> yes
+>>
+>>> 2. The way to do that is to increase the cluster size (to 1MB or
+>>>    more).
+>> yes
+>>
+>>> 3. Benefit: increasing the cluster size also decreases the amount of
+>>>    metadata (L2 and refcount).
+>> yes
+>>
+>>> 4. Problem: L2 tables become too big and fill up the cache more
+>>>    easily. To solve this the cache code should do partial reads
+>>>    instead of complete L2 clusters.
+>> yes. We can read full cluster as originally if L2 cache is empty.
+>>
+>>> 5. Problem: larger cluster sizes also mean more data to copy when
+>>>    there's a COW. To solve this the COW code should be modified so it
+>>>    goes from 5 OPs (read head, write head, read tail, write tail,
+>>>    write data) to 2 OPs (read cluster, write modified cluster).
+>> yes, with small tweak if head and tail are in different clusters. In
+>> this case we
+>> will end up with 3 OPs.
+>>
+>>> 6. Having subclusters adds incompatible changes to the file format,
+>>>    and they offer no benefit after allocation.
+>> yes
+>>
+>>> 7. Subclusters are only really useful if they match the guest fs block
+>>>    size (because you would avoid doing COW on allocation). Otherwise
+>>>    the only thing that you get is a faster COW (because you move less
+>>>    data), but the improvement is not dramatic and it's better if we do
+>>>    what's proposed in point 5.
+>> yes
+>>
+>>> 8. Even if the subcluster size matches the guest block size, you'll
+>>>    get very fast initial allocation but also more chances to end up
+>>>    with a very fragmented qcow2 image, which is worse in the long run.
+>> yes
+>>
+>>> 9. Problem: larger clusters make a less efficient use of disk space,
+>>>    but that's a drawback you're fine with considering all of the
+>>>    above.
+>> yes
+>>
+>>> Is that a fair summary of what you're trying to say? Anything else
+>>> missing?
+>> yes.
+>>
+>> 5a. Problem: initial cluster allocation without COW. Could be made
+>>       cluster-size agnostic with the help of fallocate() call. Big
+>> clusters are even
+>>       better as the amount of such allocations is reduced.
+>>
+>> Thank you very much for this cool summary! I am too tongue-tied.
+> Hi Denis,
+>
+> I don't have the have data to verify all your claims here, but in
+> general what you say makes sense.
+>
+> Although I'm not sure if I agree with everything (especially on whether
+> any of this applies to SSD drives at all) it seems that we all agree
+> that the COW algorithm can be improved, so perhaps I should start by
+> taking a look at that.
+>
+> Regards,
+>
+> Berto
+I understand. I just wanted to raise another possible (compatible)
+approach, which could help.
 
-If it is not, if the qemu process aborts, then not all of the droppings
-are cleaned up (e.g. pidfile, fifos).
-
-This updates those tests that did not have a cleanup in qemu-iotests.
-
-(I swapped spaces for tabs in test 102 as well)
-
-Reported-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Jeff Cody <jcody@redhat.com>
----
-
-v2 fixed typo in test 094, s/cleanup/_cleanup/ for the trap function.
-
- tests/qemu-iotests/028 |  1 +
- tests/qemu-iotests/094 | 11 ++++++++---
- tests/qemu-iotests/102 |  5 +++--
- tests/qemu-iotests/109 |  1 +
- tests/qemu-iotests/117 |  1 +
- tests/qemu-iotests/130 |  1 +
- tests/qemu-iotests/140 |  1 +
- tests/qemu-iotests/141 |  1 +
- tests/qemu-iotests/143 |  1 +
- 9 files changed, 18 insertions(+), 5 deletions(-)
-
-diff --git a/tests/qemu-iotests/028 b/tests/qemu-iotests/028
-index 7783e57..97a8869 100755
---- a/tests/qemu-iotests/028
-+++ b/tests/qemu-iotests/028
-@@ -32,6 +32,7 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
-+    _cleanup_qemu
-     rm -f "${TEST_IMG}.copy"
-     _cleanup_test_img
- }
-diff --git a/tests/qemu-iotests/094 b/tests/qemu-iotests/094
-index 0ba0b0c..9aa01e3 100755
---- a/tests/qemu-iotests/094
-+++ b/tests/qemu-iotests/094
-@@ -27,7 +27,14 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--trap "exit \$status" 0 1 2 3 15
-+_cleanup()
-+{
-+    _cleanup_qemu
-+    _cleanup_test_img
-+    rm -f "$TEST_DIR/source.$IMGFMT"
-+}
-+
-+trap "_cleanup; exit \$status" 0 1 2 3 15
- 
- # get standard environment, filters and checks
- . ./common.rc
-@@ -73,8 +80,6 @@ _send_qemu_cmd $QEMU_HANDLE \
- 
- wait=1 _cleanup_qemu
- 
--_cleanup_test_img
--rm -f "$TEST_DIR/source.$IMGFMT"
- 
- # success, all done
- echo '*** done'
-diff --git a/tests/qemu-iotests/102 b/tests/qemu-iotests/102
-index 64b4af9..87db1bb 100755
---- a/tests/qemu-iotests/102
-+++ b/tests/qemu-iotests/102
-@@ -25,11 +25,12 @@ seq=$(basename $0)
- echo "QA output created by $seq"
- 
- here=$PWD
--status=1	# failure is the default!
-+status=1    # failure is the default!
- 
- _cleanup()
- {
--	_cleanup_test_img
-+    _cleanup_qemu
-+    _cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
-diff --git a/tests/qemu-iotests/109 b/tests/qemu-iotests/109
-index f980b0c..4781387 100755
---- a/tests/qemu-iotests/109
-+++ b/tests/qemu-iotests/109
-@@ -29,6 +29,7 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
-+    _cleanup_qemu
-     rm -f $TEST_IMG.src
- 	_cleanup_test_img
- }
-diff --git a/tests/qemu-iotests/117 b/tests/qemu-iotests/117
-index 9385b3f..9ebfc4b 100755
---- a/tests/qemu-iotests/117
-+++ b/tests/qemu-iotests/117
-@@ -29,6 +29,7 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
-+    _cleanup_qemu
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
-diff --git a/tests/qemu-iotests/130 b/tests/qemu-iotests/130
-index ecc8a5b..d4d148b 100755
---- a/tests/qemu-iotests/130
-+++ b/tests/qemu-iotests/130
-@@ -31,6 +31,7 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
-+    _cleanup_qemu
-     _cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
-diff --git a/tests/qemu-iotests/140 b/tests/qemu-iotests/140
-index 49f9df4..8c80a5a 100755
---- a/tests/qemu-iotests/140
-+++ b/tests/qemu-iotests/140
-@@ -33,6 +33,7 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
-+    _cleanup_qemu
-     _cleanup_test_img
-     rm -f "$TEST_DIR/nbd"
- }
-diff --git a/tests/qemu-iotests/141 b/tests/qemu-iotests/141
-index b2617e5..b1956d4 100755
---- a/tests/qemu-iotests/141
-+++ b/tests/qemu-iotests/141
-@@ -29,6 +29,7 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
-+    _cleanup_qemu
-     _cleanup_test_img
-     rm -f "$TEST_DIR/{b,m,o}.$IMGFMT"
- }
-diff --git a/tests/qemu-iotests/143 b/tests/qemu-iotests/143
-index ec4ef22..5ff1944 100755
---- a/tests/qemu-iotests/143
-+++ b/tests/qemu-iotests/143
-@@ -29,6 +29,7 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
-+    _cleanup_qemu
-     rm -f "$TEST_DIR/nbd"
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
--- 
-2.9.3
+Den
