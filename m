@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1d0aI3-0005Xa-Fx
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 17:04:00 -0400
+	(envelope-from <eblake@redhat.com>) id 1d0aWr-0007iR-TO
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 17:19:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1d0aHz-0006hH-HL
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 17:03:59 -0400
-References: <20170406150148.zwjpozqtale44jfh@perseus.local>
-	<b55603db-5215-ac30-29e4-f4764f17c14e@openvz.org>
-	<d77e0178-8898-3583-ca2c-adf43bf9e0f4@redhat.com>
-	<e00ab029-cf9f-5aca-9786-581915dd5189@openvz.org>
-	<20170413094454.GB5095@noname.redhat.com>
-	<1cc754f6-6718-edbc-96ef-ab0e0e10fd56@openvz.org>
-	<d34a20e9-8cb7-3b83-e96f-4631f91045cd@redhat.com>
-	<6727667f-5422-13d7-be70-b8515f3ff589@openvz.org>
-	<20170418112215.GC9236@noname.redhat.com>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <7e278fc7-675a-e42f-94d9-bff3f347a2c4@openvz.org>
-Date: Tue, 18 Apr 2017 20:30:17 +0300
+	(envelope-from <eblake@redhat.com>) id 1d0aWo-0004fx-NR
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 17:19:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41170)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d0aWo-0004f2-DH
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 17:19:14 -0400
+References: <1490700426-222115-1-git-send-email-agraf@suse.de>
+	<20170413173625.GG27126@thinpad.lan.raisama.net>
+	<149254928069.7320.7406236070784019013@loki>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <75cd49eb-7a78-ef86-9df4-8962228c8285@redhat.com>
+Date: Tue, 18 Apr 2017 16:19:10 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170418112215.GC9236@noname.redhat.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC] Proposed qcow2 extension:
- subcluster allocation
+In-Reply-To: <149254928069.7320.7406236070784019013@loki>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="CguwRoUIJqAQFlaRVSG0UXvJL352Gblas"
+Subject: Re: [Qemu-devel] [PATCH v2] i386: Allow cpuid bit override
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,127 +29,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 04/18/2017 02:22 PM, Kevin Wolf wrote:
-> Am 14.04.2017 um 06:17 hat Denis V. Lunev geschrieben:
->> [skipped...]
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--CguwRoUIJqAQFlaRVSG0UXvJL352Gblas
+From: Eric Blake <eblake@redhat.com>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>,
+ Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Richard Henderson <rth@twiddle.net>
+Message-ID: <75cd49eb-7a78-ef86-9df4-8962228c8285@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] i386: Allow cpuid bit override
+References: <1490700426-222115-1-git-send-email-agraf@suse.de>
+ <20170413173625.GG27126@thinpad.lan.raisama.net>
+ <149254928069.7320.7406236070784019013@loki>
+In-Reply-To: <149254928069.7320.7406236070784019013@loki>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 04/18/2017 04:01 PM, Michael Roth wrote:
+
+>>> @@ -3706,8 +3707,17 @@ static void x86_cpu_get_bit_prop(Object *obj, =
+Visitor *v, const char *name,
+>>>      X86CPU *cpu =3D X86_CPU(obj);
+>>>      BitProperty *fp =3D opaque;
+>>>      uint32_t f =3D cpu->env.features[fp->w];
+>>> +    uint32_t ff =3D cpu->forced_features[fp->w];
+>>>      bool value =3D (f & fp->mask) =3D=3D fp->mask;
+>>> -    visit_type_bool(v, name, &value, errp);
+>>> +    bool forced =3D (ff & fp->mask) =3D=3D fp->mask;
+>>> +    char str[] =3D "force";
+>>> +    char *strval =3D str;
+>>> +
+>>> +    if (forced) {
+>>> +        visit_type_str(v, name, &strval, errp);
+>>> +    } else {
+>>> +        visit_type_bool(v, name, &value, errp);
 >>
->>> Hi Denis,
->>>
->>> I've read this entire thread now and I really like Berto's summary wh=
-ich
->>> I think is one of the best recaps of existing qcow2 problems and this=
-
->>> discussion so far.
->>>
->>> I understand your opinion that we should focus on compatible changes
->>> before incompatible ones, and I also understand that you are very
->>> concerned about physical fragmentation for reducing long-term IO.
->>>
->>> What I don't understand is why you think that subclusters will increa=
-se
->>> fragmentation. If we admit that fragmentation is a problem now, surel=
-y
->>> increasing cluster sizes to 1 or 2 MB will only help to *reduce*
->>> physical fragmentation, right?
->>>
->>> Subclusters as far as I am understanding them will not actually allow=
-
->>> subclusters to be located at virtually disparate locations, we will
->>> continue to allocate clusters as normal -- we'll just keep track of
->>> which portions of the cluster we've written to to help us optimize CO=
-W*.
->>>
->>> So if we have a 1MB cluster with 64k subclusters as a hypothetical, i=
-f
->>> we write just the first subcluster, we'll have a map like:
->>>
->>> X---------------
->>>
->>> Whatever actually happens to exist in this space, whether it be a hol=
-e
->>> we punched via fallocate or literal zeroes, this space is known to th=
-e
->>> filesystem to be contiguous.
->>>
->>> If we write to the last subcluster, we'll get:
->>>
->>> X--------------X
->>>
->>> And again, maybe the dashes are a fallocate hole, maybe they're zeroe=
-s.
->>> but the last subcluster is located virtually exactly 15 subclusters
->>> behind the first, they're not physically contiguous. We've saved the
->>> space between them. Future out-of-order writes won't contribute to an=
-y
->>> fragmentation, at least at this level.
->>>
->>> You might be able to reduce COW from 5 IOPs to 3 IOPs, but if we tune=
-
->>> the subclusters right, we'll have *zero*, won't we?
->>>
->>> As far as I can tell, this lets us do a lot of good things all at onc=
-e:
->>>
->>> (1) We get some COW optimizations (for reasons Berto and Kevin have
->>> detailed)
->> Yes. We are fine with COW. Let us assume that we will have issued read=
-
->> entire cluster command after the COW, in the situation
+>> Interesting approach. This means we keep returning a boolean
+>> value on the property getter (which is important to not break
+>> compatibility), but return a string in case the feature was set
+>> to "force".
 >>
->> X--------------X
+>> We probably should update the 'type' field of the property, as it
+>> won't be a real "bool" property anymore.
 >>
->> with a backing store. This is possible even with 1-2 Mb cluster size.
->> I have seen 4-5 Mb requests from the guest in the real life. In this
->> case we will have 3 IOP:
->>     read left X area, read backing, read right X.
->> This is the real drawback of the approach, if sub-cluster size is real=
-ly
->> small enough, which should be the case for optimal COW. Thus we
->> will have random IO in the host instead of sequential one in guest.
->> Thus we have optimized COW at the cost of long term reads. This
->> is what I am worrying about as we can have a lot of such reads before
->> any further data change.
-> So just to avoid misunderstandings about what you're comparing here:
-> You get these 3 iops for 2 MB clusters with 64k subclusters, whereas yo=
-u
-> would get only a single operation for 2 MB clusters without subclusters=
-=2E
-> Today's 64k clusters without subclusters behave no better than the
-> 2M/64k version, but that's not what you're comparing.
->
-> Yes, you are correct about this observation. But it is a tradeoff that
-> you're intentionally making when using backing files. In the extreme,
-> there is an alternative that performs so much better: Instead of using =
-a
-> backing file, use 'qemu-img convert' to copy (and defragment) the whole=
+>> I won't say I love that solution, but it seems to work. I'm CCing
+>> the QAPI maintainers to see what they think about it.
 
-> image upfront. No COW whatsoever, no fragmentation, fast reads. The
-> downside is that it takes a while to copy the whole image upfront, and
-> it also costs quite a bit of disk space.
-in general, for production environments, this is total pain. We
-have a lot of customers with Tb images. Free space is also
-a real problem for them.
+Use of a formal QAPI alternate type seems reasonable here.
+
+>>
+>> (For reference: in the v1 thread I have suggested introducing a
+>> new enum type in the QAPI schema, but this would break
+>> compatibility with existing management code that expects the
+>> property to return a boolean value [like the users of
+>> query-cpu-model-expansion]).
+
+>>> @@ -3724,7 +3735,15 @@ static void x86_cpu_set_bit_prop(Object *obj, =
+Visitor *v, const char *name,
+>>>          return;
+>>>      }
+>>> =20
+>>> -    visit_type_bool(v, name, &value, &local_err);
+>>> +    visit_type_str(v, name, &strval, &local_err);
+>>> +    if (!local_err && !strcmp(strval, "force")) {
+>>> +        value =3D true;
+>>> +        cpu->forced_features[fp->w] |=3D fp->mask;
+>>> +    } else {
+>>> +        local_err =3D NULL;
+>>> +        visit_type_bool(v, name, &value, &local_err);
+>>> +    }
+>>
+>> I'm not sure this is valid usage of the visitor API. If the
+>> visit_type_str() call succeeds, isn't the visitor allowed to
+>> consume the original value, and return something completely
+>> different when visit_type_bool() is called?
+>=20
+
+Better would be defining the QAPI alternate type:
+
+{ 'enum': 'Force', 'data': ['force']}
+{ 'alternate': 'BoolOrForce',
+  'data': { 'b': 'bool', 's': 'Force' } }
+
+then given a BoolOrForce *state; declaration, you do either:
+
+state->type =3D QTYPE_QBOOL;
+state->u.b =3D true;
+
+or
+
+state->type =3D QTYPE_QSTRING;
+state->u.s =3D FORCE_FORCE;
+
+and then call visit_type_BoolOrForce(..., &state ...)
+
+Qcow2OverlapChecks is an example of an alternate in use, if that helps.
+
+> That was indeed one of the design goals, to the extent that
+> you could even take a stream of data types and actually build
+> up a dictionary based on the ordering visited (e.g. the
+> once-proposed BER visitor for migration and why QAPI uses
+> OrderedDict when generating visitors).
+
+We document that QMP is order-insensitive, but you are right that
+QAPI-generated code still respects ordering. Some of our testsuite at
+least relies on the stability you get by always visiting things in
+declaration order, even though other dictionary orders should still be
+valid.
+
+>=20
+> I'm not sure how important that is anymore, but even setting
+> that aside that we still have the issue of not handling the
+> data type as declared, and relying on error-handling to probe
+> it, which doesn't necessarily leave the visitor in a recoverable
+> state where we can continue visiting. I think it might be possible
+> to rely on the "alternate" QAPI type to handle this case. Maybe
+> something like this?
+
+Yes, that was the proposal I outlined above.  Note that your rough-idea
+code:
+
+>=20
+>     GenericAlternate *alt =3D NULL;
+>     visit_start_alternate(v, name, &alt, sizeof(*alt), false, &local_er=
+r);
+>     if (local_err) {
+>         goto out;
+>     }
+>     if (!alt) {
+>         goto out_obj;
+>     }
+>     switch (alt->type) {
+>     case QTYPE_QBOOL:
+>         visit_type_bool(v, name, &value, &local_err);
+>         break;
+>     case QTYPE_QSTRING:
+>         visit_type_str(v, name, &strval, &local_err);
+
+=2E..
+is a duplicate of what is already generated for
+visit_type_BoolOrForce(), so you don't need to open-code it.
+
+>=20
+> This would only work for setters/qobject-input-visitor ATM though since=
+
+> qobject-output-visitor doesn't support the visit_start_alternate()
+> interface. I'm not sure why it wasn't enabled on the output side, maybe=
+
+> Eric knows if doing so would be feasible for this situation?
+
+qobject-output-visitor DOES support alternates.  It doesn't need a
+=2Estart_alternate callback, because the generic visitor-core.c code
+handles things just fine for output visitors (only input visitors _have_
+to have a callback).  The comments in visitor-impl.h confirm that.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-> So once we acknowledge that we're dealing with a tradeoff here, it
-> becomes obvious that neither the extreme setup for performance (copy th=
-e
-> whole image upfront) nor the extreme setup for sparseness (COW on a
-> sector level) are the right default for the average case, nor is
-> optimising one-sidedly a good idea. It is good if we can provide
-> solutions for extreme cases, but by default we need to cater for the
-> average case, which cares both about reasonable performance and disk
-> usage.
-yes, I agree. But 64kb cluster size by default for big images (not for
-backup!)
-is another extreme ;) Who will care with 1 Tb image or 10 Tb image about
-several Mbs.
+--CguwRoUIJqAQFlaRVSG0UXvJL352Gblas
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Pls note, that 1 Mb is better for the default block size as with this siz=
-e
-sequential write is equal to the random write for non-SSD disks.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Den
+iQEcBAEBCAAGBQJY9oLOAAoJEKeha0olJ0NqSrQH/ir8m3JESlPt/Z+a3LCOwWvU
+bmXrczSL2B7esN14/lkzMW8Bt2V91yZr21DL7+QDkp3iGz9w2mWXqVV5JtElyb/L
+Qz/fqPrvc9mxZpmhISw6TOLjJa5knhTKI9LmBcl9wnxYk071LbDauJSZGcm90EYz
+U20x+BU5z2I17Fn5/a6eAoneQ6OHf5SxXpy9CpfnU3MgDjiNQc80cMXtoMYhZZvi
+ZfZj3/axfHKbW+ASIOIVkaktIVaSx8RaQb7qFIyRcXr3Fb+QAP9cnZlxxmrI4g6q
+gbpkFU4ur+7mA8pIzGe03+51u6o5RHEDkOjKWYaH6igw+vkBoUnf+j2uShpI5BM=
+=lJYZ
+-----END PGP SIGNATURE-----
+
+--CguwRoUIJqAQFlaRVSG0UXvJL352Gblas--
