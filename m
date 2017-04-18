@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhunxun@gmail.com>) id 1d0Ipa-0004L2-KL
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 22:25:27 -0400
+	(envelope-from <xiecl.fnst@cn.fujitsu.com>) id 1d0JD1-0007iv-52
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 22:49:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhunxun@gmail.com>) id 1d0IpZ-00070u-82
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 22:25:26 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:35614)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhunxun@gmail.com>) id 1d0IpZ-00070m-0V
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 22:25:25 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id w64so45362426wma.0
-	for <qemu-devel@nongnu.org>; Mon, 17 Apr 2017 19:25:24 -0700 (PDT)
+	(envelope-from <xiecl.fnst@cn.fujitsu.com>) id 1d0JD0-00080y-6p
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 22:49:39 -0400
+Message-ID: <58F57F8A.3060201@cn.fujitsu.com>
+Date: Tue, 18 Apr 2017 10:52:58 +0800
+From: Xie Changlong <xiecl.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <143C0AFC63FC204CB0C55BB88F3A8ABB333D79D0@EX01.corp.qihoo.net>
-References: <CADUDsAo4-QypkwSR9p8ABpBRqtvCO886fec2BGdq1JtgCgt-6w@mail.gmail.com>
-	<20170417102607.GE16703@pxdev.xzpeter.org>
-	<CADUDsAqnRJDhYcu2nR-zk5fkJDQ8GKkR7GjO-MrAEiJTt_X+oA@mail.gmail.com>
-	<143C0AFC63FC204CB0C55BB88F3A8ABB333D79D0@EX01.corp.qihoo.net>
-From: "jack.chen" <zhunxun@gmail.com>
-Date: Tue, 18 Apr 2017 10:25:23 +0800
-Message-ID: <CADUDsAqfy96pAVx6yfuG-4gk0-_hO2t+gB8JEUq-jzj_353ibA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] qemu memory manage question
+References: <1489756546-27142-1-git-send-email-kwolf@redhat.com>
+	<1489756546-27142-3-git-send-email-kwolf@redhat.com>
+	<ac3e7855-9dfb-5bc7-daee-6d062173f6cb@redhat.com>
+	<58F56D90.50509@huawei.com>
+In-Reply-To: <58F56D90.50509@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 2/8] replication: clarify permissions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,104 +25,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?5p2O5by6?= <liqiang6-s@360.cn>
-Cc: qemu <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
+To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: xuquan8@huawei.com, Wen Congyang <wencongyang@gmail.com>, Wen Congyang <wencongyang2@huawei.com>, qemu-devel@nongnu.org
 
-Thanks very much!!
 
-2017-04-17 19:19 GMT+08:00 =E6=9D=8E=E5=BC=BA <liqiang6-s@360.cn>:
->
->
->> -----Original Message-----
->> From: Qemu-devel
->> [mailto:qemu-devel-bounces+liqiang6-s=3D360.cn@nongnu.org] On Behalf Of
->> jack.chen
->> Sent: Monday, April 17, 2017 6:56 PM
->> To: Peter Xu
->> Cc: qemu
->> Subject: Re: [Qemu-devel] qemu memory manage question
+
+On 04/18/2017 09:36 AM, Hailiang Zhang wrote:
+> On 2017/4/18 9:23, Eric Blake wrote:
+>> On 03/17/2017 08:15 AM, Kevin Wolf wrote:
+>>> From: Changlong Xie <xiecl.fnst@cn.fujitsu.com>
+>>>
+>>> Even if hidden_disk, secondary_disk are backing files, they all need
+>>> write permissions in replication scenario. Otherwise we will encouter
+>>> below exceptions on secondary side during adding nbd server:
+>>>
+>>> {'execute': 'nbd-server-add', 'arguments': {'device': 'colo-disk', 
+>>> 'writable': true } }
+>>> {"error": {"class": "GenericError", "desc": "Conflicts with use by 
+>>> hidden-qcow2-driver as 'backing', which does not allow 'write' on 
+>>> sec-qcow2-driver-for-nbd"}}
+>>>
+>>> CC: Zhang Hailiang <zhang.zhanghailiang@huawei.com>
+>>> CC: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>>> CC: Wen Congyang <wencongyang2@huawei.com>
+>> This address for Wen Congyang is different than the one listed in
+>> MAINTAINERS for replication (M: Wen Congyang <wency@cn.fujitsu.com>),
+>> and different still from addresses my mailer has harvested from other
+>> posts (wencongyang@gmail.com).  The MAINTAINERS entry is now resulting
+>> in 'undelivered mail' bounce messages, can you please submit an update
+>> to MAINTAINERS with your new preferred address? [or gently correct me if
+>> I'm confusing two people with the same name?]
 >>
->> Thanks,from the path you have list to me,it can be  well explained,but
->> according to the source code,in the end of kvm_init,kvm_memory_listener =
-and
->> kvm_io_listener were registered by memory_listener_register(),and  in th=
-e
->> end of
->> memory_listener_register(),listener_add_address_space() was called for e=
-ach
->> address_space,so the listener->region_add was executed then.I do not kno=
-w
->> what mistake I have made,can you explain it to me ?? thank you very much=
-!
->>
 >
-> They are callbacks.
-> Every change of memory topology will call these listeners, add subregion(=
-Peter's example),
-> modify the property of memory, create address space for example.
+> No, the same people, he just left his job from fujitsu, the entry in 
+> MAINTAINERS
+> file needs to be updated.
 >
-> Thanks.
+> Cc: Changlong Xie <xiecl.fnst@cn.fujitsu.com>
+> Hi Changlong, would you please send a patch to update it ?
+Hi all
+
+After a short talk with Wen, i would like to update his new email 
+address now.
+
+Thanks
+     -Xie
 >
-> --
-> Li Qiang /the Gear Team, Qihoo 360 Inc
+> Hailiang
 >
 >
->> 2017-04-17 18:26 GMT+08:00 Peter Xu <peterx@redhat.com>:
->> > On Mon, Apr 17, 2017 at 06:09:11PM +0800, jack.chen wrote:
->> >> hello,I have some questions about memory allocation in qemu for
->> >> virtual machine.I found when configure_accelerator function was
->> >> called ,memory slots  were registered to KVM,but at that time
->> >> address_space have not been initialized and ram have not been
->> >> allocated,it is really confused me,Thanks a lot!!
->> >
->> > Here's how I understand it...
->> >
->> > configure_accelerator() does not register memory slots in KVM.
->> > Instead, it registers memory listeners. See
->> > kvm_memory_listener_register(), especially:
->> >
->> >     kml->listener.region_add =3D kvm_region_add;
->> >
->> > That's the hook function to be called when there are new memory region
->> > added to the system.
->> >
->> > Further, when RAM is initialzed, it'll modify the address space layout
->> > of system_memory, and the registered listener of KVM (kvm_region_add)
->> > will be invoked, it'll further sync with kvm. It should be in the
->> > following path if you break at kvm_region_add in gdb:
->> >
->> > #0  0x00005555557ba13a in kvm_region_add (listener=3D0x5555568330c0,
->> > section=3D0x7fffffffd310) at /root/git/qemu/kvm-all.c:859
->> > #1  0x00005555557c1910 in address_space_update_topology_pass
->> > (as=3D0x55555629e240 <address_space_memory>,
->> old_view=3D0x5555567a7090,
->> > new_view=3D0x5555568d3460, adding=3Dtrue) at /root/git/qemu/memory.c:8=
-71
->> > #2  0x00005555557c19f3 in address_space_update_topology
->> > (as=3D0x55555629e240 <address_space_memory>) at
->> > /root/git/qemu/memory.c:886
->> > #3  0x00005555557c1b41 in memory_region_transaction_commit () at
->> > /root/git/qemu/memory.c:922
->> > #4  0x00005555557c4bfd in memory_region_update_container_subregions
->> > (subregion=3D0x5555568d2fc0) at /root/git/qemu/memory.c:2075
->> > #5  0x00005555557c4c64 in memory_region_add_subregion_common
->> > (mr=3D0x5555567a5830, offset=3D0, subregion=3D0x5555568d2fc0) at
->> > /root/git/qemu/memory.c:2085
->> > #6  0x00005555557c4ca0 in memory_region_add_subregion
->> > (mr=3D0x5555567a5830, offset=3D0, subregion=3D0x5555568d2fc0) at
->> > /root/git/qemu/memory.c:2093
->> > #7  0x000055555583fd68 in pc_memory_init (pcms=3D0x5555567a4100,
->> > system_memory=3D0x5555567a5830, rom_memory=3D0x5555568d21a0,
->> > ram_memory=3D0x7fffffffd550) at /root/git/qemu/hw/i386/pc.c:1383
->> > #8  0x0000555555847363 in pc_q35_init (machine=3D0x5555567a4100) at
->> > /root/git/qemu/hw/i386/pc_q35.c:147
->> > #9  0x0000555555847cac in pc_init_v2_9 (machine=3D0x5555567a4100) at
->> > /root/git/qemu/hw/i386/pc_q35.c:310
->> > #10 0x00005555558f7cf8 in main (argc=3D11, argv=3D0x7fffffffda78,
->> > envp=3D0x7fffffffdad8) at /root/git/qemu/vl.c:4557
->> >
->> > Hope this helps. Thanks.
->> >
->> > --
->> > Peter Xu
+>
+>
+> .
 >
