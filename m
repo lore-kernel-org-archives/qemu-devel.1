@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d0KAG-0007pu-Hy
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 23:50:53 -0400
+	(envelope-from <jasowang@redhat.com>) id 1d0KEU-0000NF-W5
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 23:55:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d0KAD-0008At-E8
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 23:50:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49006)
+	(envelope-from <jasowang@redhat.com>) id 1d0KER-0001l1-Td
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 23:55:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60888)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d0KAD-0008AV-5Y
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 23:50:49 -0400
-Date: Tue, 18 Apr 2017 11:50:33 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170418035033.GH16703@pxdev.xzpeter.org>
-References: <1492426712-12230-1-git-send-email-peterx@redhat.com>
-	<1492426712-12230-8-git-send-email-peterx@redhat.com>
-	<1c5c9278-92b1-6f56-b251-53bf60c7f4e8@redhat.com>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d0KER-0001kf-Jm
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 23:55:11 -0400
+References: <1487734936-43472-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1487734936-43472-3-git-send-email-zhang.zhanghailiang@huawei.com>
+	<134776c2-a85d-d06f-5f98-2e664f9c8ca9@cn.fujitsu.com>
+	<d33b0150-5ed2-56cc-9261-da7deb1d0bfb@redhat.com>
+	<58F06AA1.2010301@huawei.com>
+	<9b42232a-e86f-2d61-7987-7a0559d6f705@redhat.com>
+	<58F4A12C.5070404@huawei.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <f7f4639d-7a08-5120-27f8-346011dc754f@redhat.com>
+Date: Tue, 18 Apr 2017 11:55:03 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1c5c9278-92b1-6f56-b251-53bf60c7f4e8@redhat.com>
+In-Reply-To: <58F4A12C.5070404@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 7/7] intel_iommu: support passthrough (PT)
+Subject: Re: [Qemu-devel] [PATCH 02/15] colo-compare: implement the process
+ of checkpoint
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,138 +33,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Lan Tianyu <tianyu.lan@intel.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S.Tsirkin" <mst@redhat.com>
+To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
+Cc: xuquan8@huawei.com, xiecl.fnst@cn.fujitsu.com, dgilbert@redhat.com, lizhijian@cn.fujitsu.com
 
-On Tue, Apr 18, 2017 at 11:23:35AM +0800, Jason Wang wrote:
-> On 2017=E5=B9=B404=E6=9C=8817=E6=97=A5 18:58, Peter Xu wrote:
 
-[...]
 
-> >+static void vtd_switch_address_space(VTDAddressSpace *as)
-> >+{
-> >+    bool use_iommu;
-> >+
-> >+    assert(as);
-> >+
-> >+    use_iommu =3D as->iommu_state->dmar_enabled;
-> >+    if (use_iommu) {
-> >+        /* Further checks per-device configuration */
-> >+        use_iommu &=3D !vtd_dev_pt_enabled(as);
-> >+    }
->=20
-> Looks like you can use as->iommu_state->dmar_enabled &&
-> !vtd_dev_pt_enabled(as)
+On 2017=E5=B9=B404=E6=9C=8817=E6=97=A5 19:04, Hailiang Zhang wrote:
+> Hi Jason,
+>
+> On 2017/4/14 14:38, Jason Wang wrote:
+>>
+>> On 2017=E5=B9=B404=E6=9C=8814=E6=97=A5 14:22, Hailiang Zhang wrote:
+>>> Hi Jason,
+>>>
+>>> On 2017/4/14 13:57, Jason Wang wrote:
+>>>> On 2017=E5=B9=B402=E6=9C=8822=E6=97=A5 17:31, Zhang Chen wrote:
+>>>>> On 02/22/2017 11:42 AM, zhanghailiang wrote:
+>>>>>> While do checkpoint, we need to flush all the unhandled packets,
+>>>>>> By using the filter notifier mechanism, we can easily to notify
+>>>>>> every compare object to do this process, which runs inside
+>>>>>> of compare threads as a coroutine.
+>>>>> Hi~ Jason and Hailiang.
+>>>>>
+>>>>> I will send a patch set later about colo-compare notify mechanism f=
+or
+>>>>> Xen like this patch.
+>>>>> I want to add a new chardev socket way in colo-comapre connect to X=
+en
+>>>>> colo, for notify
+>>>>> checkpoint or failover, Because We have no choice to use this way
+>>>>> communicate with Xen codes.
+>>>>> That's means we will have two notify mechanism.
+>>>>> What do you think about this?
+>>>>>
+>>>>>
+>>>>> Thanks
+>>>>> Zhang Chen
+>>>> I was thinking the possibility of using similar way to for colo=20
+>>>> compare.
+>>>> E.g can we use socket? This can saves duplicated codes more or less.
+>>> Since there are too many sockets used by filter and COLO, (Two unix
+>>> sockets and two
+>>>   tcp sockets for each vNIC), I don't want to introduce more ;) , but
+>>> i'm not sure if it is
+>>> possible to make it more flexible and optional, abstract these
+>>> duplicated codes,
+>>> pass the opened fd (No matter eventfd or socket fd ) as parameter, fo=
+r
+>>> example.
+>>> Is this way acceptable ?
+>>>
+>>> Thanks,
+>>> Hailiang
+>> Yes, that's kind of what I want. We don't want to use two message
+>> format. Passing a opened fd need management support, we still need a
+>> fallback if there's no management on top. For qemu/kvm, we can do all
+>> stuffs transparent to the cli by e.g socketpair() or others, but the k=
+ey
+>> is to have a unified message format.
+>
+> After a deeper investigation, i think we can re-use most codes, since=20
+> there is no
+> existing way to notify xen (no ?), we still needs notify chardev=20
+> socket (Be used to notify xen, it is optional.)
+> (http://patchwork.ozlabs.org/patch/733431/ "COLO-compare: Add Xen=20
+> notify chardev socket handler frame")
 
-vtd_dev_pt_enalbed() needs to read the guest memory (starting from
-reading root entry), which is slightly slow. I was trying to avoid
-unecessary reads.
+Yes and actually you can use this for bi-directional communication. The=20
+only differences is the implementation of comparing.
 
-[...]
+>
+> Besides, there is an existing qmp comand 'xen-colo-do-checkpoint',=20
 
-> >@@ -991,6 +1058,18 @@ static void vtd_do_iommu_translate(VTDAddressSpa=
-ce *vtd_as, PCIBus *bus,
-> >          cc_entry->context_cache_gen =3D s->context_cache_gen;
-> >      }
-> >+    /*
-> >+     * We don't need to translate for pass-through context entries.
-> >+     * Also, let's ignore IOTLB caching as well for PT devices.
-> >+     */
-> >+    if (vtd_ce_get_type(&ce) =3D=3D VTD_CONTEXT_TT_PASS_THROUGH) {
-> >+        entry->translated_addr =3D entry->iova;
-> >+        entry->addr_mask =3D VTD_PAGE_SIZE - 1;
-> >+        entry->perm =3D IOMMU_RW;
-> >+        trace_vtd_translate_pt(source_id, entry->iova);
-> >+        return;
-> >+    }
->=20
-> Several questions here:
->=20
-> 1) Is this just for vhost?
+I don't see this in master?
 
-No. When caching mode is not enabled, all passthroughed devices should
-be using this path.
+> we can re-use it to notify
+> colo-compare objects and other filter objects to do checkpoint, for=20
+> the opposite direction, we use
+> the notify chardev socket (Only for xen).
 
-> 2) Since this is done after IOTLB querying, do we need flush IOTLB duri=
-ng
-> address switching?
+Just want to make sure I understand the design, who will trigger this=20
+command? Management?
 
-IMHO if guest switches address space for a device, it is required to
-send IOTLB flush as well for that device/domain.
+Can we just use the socket?
 
-[...]
+>
+> So the codes will be like:
+> diff --git a/migration/colo.c b/migration/colo.c
+> index 91da936..813c281 100644
+> --- a/migration/colo.c
+> +++ b/migration/colo.c
+> @@ -224,7 +224,19 @@ ReplicationStatus=20
+> *qmp_query_xen_replication_status(Error **errp)
+>
+>  void qmp_xen_colo_do_checkpoint(Error **errp)
+>  {
+> +    Error *local_err =3D NULL;
+> +
+>      replication_do_checkpoint_all(errp);
+> +    /* Notify colo-compare and other filters to do checkpoint */
+> +    colo_notify_compares_event(NULL, COLO_CHECKPOINT, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +    colo_notify_filters_event(COLO_CHECKPOINT, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +    }
+>  }
+>
+>  static void colo_send_message(QEMUFile *f, COLOMessage msg,
+> diff --git a/net/colo-compare.c b/net/colo-compare.c
+> index 24e13f0..de975c5 100644
+> --- a/net/colo-compare.c
+> +++ b/net/colo-compare.c
+> @@ -391,6 +391,9 @@ static void colo_compare_inconsistent_notify(void)
+>  {
+>      notifier_list_notify(&colo_compare_notifiers,
+>                  migrate_get_current());
+> +    if (s->notify_dev) {
+> +       /* Do something, notify remote side through notify dev */
+> +    }
+>  }
+>
+>  void colo_compare_register_notifier(Notifier *notify)
+>
+> How about this scenario =EF=BC=9F
 
-> >  static void vtd_switch_address_space_all(IntelIOMMUState *s)
-> >  {
-> >      GHashTableIter iter;
-> >@@ -2849,6 +2914,10 @@ static void vtd_init(IntelIOMMUState *s)
-> >          s->ecap |=3D VTD_ECAP_DT;
-> >      }
-> >+    if (x86_iommu->pt_supported) {
-> >+        s->ecap |=3D VTD_ECAP_PT;
-> >+    }
->=20
-> Since we support migration now, need compat this for pre 2.10.
+See my reply above, and we need unify the message format too. Raw string=20
+is ok but we'd better have something like TLV or others.
 
-Oh yes. If I set pt=3Doff by default, it should be okay then, right?
+Thanks
 
-Then, at some point, we can switch to on by default, with a touch-up
-in include/hw/compat.h I guess?
-
->=20
-> >+
-> >      if (s->caching_mode) {
-> >          s->cap |=3D VTD_CAP_CM;
-> >      }
-> >diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_inte=
-rnal.h
-> >index 29d6707..0e73a65 100644
-> >--- a/hw/i386/intel_iommu_internal.h
-> >+++ b/hw/i386/intel_iommu_internal.h
-> >@@ -187,6 +187,7 @@
-> >  /* Interrupt Remapping support */
-> >  #define VTD_ECAP_IR                 (1ULL << 3)
-> >  #define VTD_ECAP_EIM                (1ULL << 4)
-> >+#define VTD_ECAP_PT                 (1ULL << 6)
-> >  #define VTD_ECAP_MHMV               (15ULL << 20)
-> >  /* CAP_REG */
-> >diff --git a/hw/i386/trace-events b/hw/i386/trace-events
-> >index 04a6980..867ad0b 100644
-> >--- a/hw/i386/trace-events
-> >+++ b/hw/i386/trace-events
-> >@@ -38,6 +38,7 @@ vtd_page_walk_skip_perm(uint64_t iova, uint64_t next=
-) "Page walk skip iova 0x%"P
-> >  vtd_page_walk_skip_reserve(uint64_t iova, uint64_t next) "Page walk =
-skip iova 0x%"PRIx64" - 0x%"PRIx64" due to rsrv set"
-> >  vtd_switch_address_space(uint8_t bus, uint8_t slot, uint8_t fn, bool=
- on) "Device %02x:%02x.%x switching address space (iommu enabled=3D%d)"
-> >  vtd_as_unmap_whole(uint8_t bus, uint8_t slot, uint8_t fn, uint64_t i=
-ova, uint64_t size) "Device %02x:%02x.%x start 0x%"PRIx64" size 0x%"PRIx6=
-4
-> >+vtd_translate_pt(uint16_t sid, uint64_t addr) "source id 0x%"PRIu16",=
- iova 0x%"PRIx64
-> >  # hw/i386/amd_iommu.c
-> >  amdvi_evntlog_fail(uint64_t addr, uint32_t head) "error: fail to wri=
-te at addr 0x%"PRIx64" +  offset 0x%"PRIx32
-> >diff --git a/hw/i386/x86-iommu.c b/hw/i386/x86-iommu.c
-> >index 02b8825..293caf8 100644
-> >--- a/hw/i386/x86-iommu.c
-> >+++ b/hw/i386/x86-iommu.c
-> >@@ -91,6 +91,7 @@ static void x86_iommu_realize(DeviceState *dev, Erro=
-r **errp)
-> >  static Property x86_iommu_properties[] =3D {
-> >      DEFINE_PROP_BOOL("intremap", X86IOMMUState, intr_supported, fals=
-e),
-> >      DEFINE_PROP_BOOL("device-iotlb", X86IOMMUState, dt_supported, fa=
-lse),
-> >+    DEFINE_PROP_BOOL("pt", X86IOMMUState, pt_supported, true),
->=20
-> Do you know if AMD IOMMU support this?
-
-AMD IOMMU should support this. IIUC it's the first bit of Device Table En=
-try.
-
-Thanks,
-
---=20
-Peter Xu
+>
+>> Thoughts?
+>>
+>> Thanks
+>>
+>>>> Thanks
+>>>>
+>>>>
+>>>> .
+>>>>
+>>>
+>>
+>> .
+>>
+>
+>
+>
