@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38127)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1d0RDo-0001bc-K5
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 07:23:01 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44469)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <berto@igalia.com>) id 1d0Rh3-0004gq-A7
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 07:53:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1d0RDk-0005bK-KI
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 07:23:00 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:58062 helo=mx01.kamp.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1d0RDk-0005Yg-Ao
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 07:22:56 -0400
-References: <1492511251-16720-1-git-send-email-den@openvz.org>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <8a5639d7-3bfa-606b-3e95-9f7f81f92578@kamp.de>
-Date: Tue, 18 Apr 2017 13:22:51 +0200
+	(envelope-from <berto@igalia.com>) id 1d0Rh0-0002cz-8G
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 07:53:13 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <e1ae017b-a832-0e52-02d0-eaeb882a2b4d@openvz.org>
+References: <20170406150148.zwjpozqtale44jfh@perseus.local>
+	<2b915695-29b5-df8d-4d89-080eeaaaff13@openvz.org>
+	<w51shlcv7sb.fsf@maestria.local.igalia.com>
+	<565c1e1b-b9e1-e9c5-790e-283d04afc747@openvz.org>
+	<w51poggv3xh.fsf@maestria.local.igalia.com>
+	<ec4f6034-0c94-658c-6b2a-e0aecea173f4@openvz.org>
+	<w51h91suz53.fsf@maestria.local.igalia.com>
+	<e1ae017b-a832-0e52-02d0-eaeb882a2b4d@openvz.org>
+Date: Tue, 18 Apr 2017 13:52:29 +0200
+Message-ID: <w51wpaioruq.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <1492511251-16720-1-git-send-email-den@openvz.org>
-Content-Type: text/plain; charset=iso-8859-15; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] qemu-img: wait for convert coroutines
- to complete
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC] Proposed qcow2 extension: subcluster
+ allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +30,87 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Anton Nefedov <anton.nefedov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Am 18.04.2017 um 12:27 schrieb Denis V. Lunev:
-> From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+On Thu 13 Apr 2017 05:17:21 PM CEST, Denis V. Lunev wrote:
+> On 04/13/2017 06:04 PM, Alberto Garcia wrote:
+>> On Thu 13 Apr 2017 03:30:43 PM CEST, Denis V. Lunev wrote:
+>>> Yes, block size should be increased. I perfectly in agreement with
+>>> your.  But I think that we could do that by plain increase of the
+>>> cluster size without any further dances. Sub-clusters as sub-clusters
+>>> will help if we are able to avoid COW. With COW I do not see much
+>>> difference.
+>> I'm trying to summarize your position, tell me if I got everything
+>> correctly:
+>>
+>> 1. We should try to reduce data fragmentation on the qcow2 file,
+>>    because it will have a long term effect on the I/O performance (as
+>>    opposed to an effect on the initial operations on the empty image).
+> yes
 >
-> We should wait for other coroutines on error path, i.e. one of coroutines
-> terminates with i/o error, before cleaning the common structures. In the
-> other case we would crash in a lot of different places. This behaviour
-> was introduced by commit 2d9187bc65.
+>> 2. The way to do that is to increase the cluster size (to 1MB or
+>>    more).
+> yes
 >
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> Signed-off-by: Denis V. Lunev <den@openvz.org>
-> CC: Peter Lieven <pl@kamp.de>
-> CC: Kevin Wolf <kwolf@redhat.com>
-> CC: Max Reitz <mreitz@redhat.com>
-> ---
->   qemu-img.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>> 3. Benefit: increasing the cluster size also decreases the amount of
+>>    metadata (L2 and refcount).
+> yes
 >
-> diff --git a/qemu-img.c b/qemu-img.c
-> index b220cf7..3b04c5f 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -1899,7 +1899,7 @@ static int convert_do_copy(ImgConvertState *s)
->           qemu_coroutine_enter(s->co[i]);
->       }
->   
-> -    while (s->ret == -EINPROGRESS) {
-> +    while (s->running_coroutines) {
->           main_loop_wait(false);
->       }
->   
+>> 4. Problem: L2 tables become too big and fill up the cache more
+>>    easily. To solve this the cache code should do partial reads
+>>    instead of complete L2 clusters.
+> yes. We can read full cluster as originally if L2 cache is empty.
+>
+>> 5. Problem: larger cluster sizes also mean more data to copy when
+>>    there's a COW. To solve this the COW code should be modified so it
+>>    goes from 5 OPs (read head, write head, read tail, write tail,
+>>    write data) to 2 OPs (read cluster, write modified cluster).
+> yes, with small tweak if head and tail are in different clusters. In
+> this case we
+> will end up with 3 OPs.
+>
+>> 6. Having subclusters adds incompatible changes to the file format,
+>>    and they offer no benefit after allocation.
+> yes
+>
+>> 7. Subclusters are only really useful if they match the guest fs block
+>>    size (because you would avoid doing COW on allocation). Otherwise
+>>    the only thing that you get is a faster COW (because you move less
+>>    data), but the improvement is not dramatic and it's better if we do
+>>    what's proposed in point 5.
+> yes
+>
+>> 8. Even if the subcluster size matches the guest block size, you'll
+>>    get very fast initial allocation but also more chances to end up
+>>    with a very fragmented qcow2 image, which is worse in the long run.
+> yes
+>
+>> 9. Problem: larger clusters make a less efficient use of disk space,
+>>    but that's a drawback you're fine with considering all of the
+>>    above.
+> yes
+>
+>> Is that a fair summary of what you're trying to say? Anything else
+>> missing?
+> yes.
+>
+> 5a. Problem: initial cluster allocation without COW. Could be made
+>       cluster-size agnostic with the help of fallocate() call. Big
+> clusters are even
+>       better as the amount of such allocations is reduced.
+>
+> Thank you very much for this cool summary! I am too tongue-tied.
 
-Reviewed-by: Peter Lieven <pl@kamp.de>
+Hi Denis,
 
+I don't have the have data to verify all your claims here, but in
+general what you say makes sense.
 
-Thanks for catching this.
+Although I'm not sure if I agree with everything (especially on whether
+any of this applies to SSD drives at all) it seems that we all agree
+that the COW algorithm can be improved, so perhaps I should start by
+taking a look at that.
 
+Regards,
 
-Peter
+Berto
