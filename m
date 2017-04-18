@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jgross@suse.com>) id 1d0LfO-0007yI-EM
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 01:27:07 -0400
+	(envelope-from <xiecl.fnst@cn.fujitsu.com>) id 1d0M7X-0001kH-8c
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 01:56:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jgross@suse.com>) id 1d0LfJ-0003qE-HH
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 01:27:06 -0400
-Received: from mx2.suse.de ([195.135.220.15]:54262 helo=mx1.suse.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jgross@suse.com>) id 1d0LfJ-0003q2-7Q
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 01:27:01 -0400
-References: <1491903346-16075-1-git-send-email-andr2000@gmail.com>
-	<alpine.DEB.2.10.1704131704560.2759@sstabellini-ThinkPad-X260>
-	<693ebf90-00d7-823e-4db8-9b9686e56941@gmail.com>
-	<f5ce758f-5f31-32d6-7e19-8c3a83017bab@suse.com>
-	<alpine.DEB.2.10.1704141035090.23677@sstabellini-ThinkPad-X260>
-From: Juergen Gross <jgross@suse.com>
-Message-ID: <3bf23396-114a-922a-c99a-55153965d905@suse.com>
-Date: Tue, 18 Apr 2017 07:26:55 +0200
+	(envelope-from <xiecl.fnst@cn.fujitsu.com>) id 1d0M7W-0005dR-0q
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 01:56:11 -0400
+Message-ID: <58F5AB45.1050505@cn.fujitsu.com>
+Date: Tue, 18 Apr 2017 13:59:33 +0800
+From: Xie Changlong <xiecl.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.10.1704141035090.23677@sstabellini-ThinkPad-X260>
-Content-Type: text/plain; charset=windows-1252
+References: <1492005921-15664-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1492005921-15664-3-git-send-email-zhang.zhanghailiang@huawei.com>
+In-Reply-To: <1492005921-15664-3-git-send-email-zhang.zhanghailiang@huawei.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH] configure: introduce
- --enable-xen-fb-backend
+Subject: Re: [Qemu-devel] [PATCH v4 2/6] replication: add shared-disk and
+ shared-disk-id options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,92 +24,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Oleksandr Andrushchenko <andr2000@gmail.com>, vlad.babchuk@gmail.com, qemu-devel@nongnu.org, andrii.anisov@gmail.com, olekstysh@gmail.com, al1img@gmail.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, joculator@gmail.com
-
-On 14/04/17 19:52, Stefano Stabellini wrote:
-> On Fri, 14 Apr 2017, Juergen Gross wrote:
->> On 14/04/17 08:06, Oleksandr Andrushchenko wrote:
->>> On 04/14/2017 03:12 AM, Stefano Stabellini wrote:
->>>> On Tue, 11 Apr 2017, Oleksandr Andrushchenko wrote:
->>>>> From: Oleksandr Andrushchenko <oleksandr_andrushchenko@epam.com>
->>>>>
->>>>> For some use cases when Xen framebuffer/input backend
->>>>> is not a part of Qemu it is required to disable it,
->>>>> because of conflicting access to input/display devices.
->>>>> Introduce additional configuration option for explicit
->>>>> input/display control.
->>>> In these cases when you don't want xenfb, why don't you just remove
->>>> "vfb" from the xl config file? QEMU only starts the xenfb backend when
->>>> requested by the toolstack.
->>>>
->>>> Is it because you have an alternative xenfb backend? If so, is it really
->>>> fully xenfb compatible, or is it a different protocol? If it is a
->>>> different protocol, I suggest you rename your frontend/backend PV device
->>>> name to something different from "vfb".
->>>>
->>> Well, offending part is vkbd actually (for multi-touch
->>> we run our own user-space backend which supports
->>> kbd/ptr/mtouch), but vfb and vkbd is the same backend
->>> in QEMU. So, I am ok for vfb, but just want vkbd off
->>> So, there are 2 options:
->>> 1. At compile time remove vkbd and still allow vfb
->>> 2. Remove xenfb completely, if acceptable (this is my case)
->>
->> What about adding a Xenstore entry for backend type and let qemu test
->> for it being not present or containing "qemu"?
-> 
-> That is what we do for the console, using the xenstore node "type". QEMU
-> is "ioemu" while xenconsoled is "xenconsoled". Weirdly, instead of a
-> backend node, it is a read-only frontend node, see
-> tools/libxl/libxl_console.c:libxl__device_console_add.
-> 
-> Oleksandr, I am sorry to feature-creep this simple patch, but I think
-> Juergen is right. But we cannot do it just for one protocol. We need to
-> introduce a generic way to enable/disable backends in QEMU. Using a
-> xenstore node is OK.
-
-An alternative solution would be similar to qdisk/tap or qusb/vusb
-backends: Use different device types on backend side while keeping
-frontend side of Xenstore the same as today.
-
-So today the vkbd backend nodes are:
-
-/local/domain/0/backend/vkbd/
-
-You could use:
-
-/local/domain/0/backend/mtouch
-
-and keep the frontend nodes (/local/domain/<n>/device/vkbd/), possibly
-with additional feature node(s).
-
-The qemu backend would have to check for the vkbd backend nodes to be
-present before enabling the related backend.
+To: zhanghailiang <zhang.zhanghailiang@huawei.com>, stefanha@redhat.com, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, zhangchen.fnst@cn.fujitsu.com, Wen Congyang <wency@cn.fujitsu.com>
 
 
-Juergen
 
-> 
-> We could do exactly the same as the PV console, thus "type" = "ioemu",
-> read-only, under the frontend xenstore directory. Or we could introduce
-> new nodes. I would probably go for "backend-type" = "qemu" under the
-> backend xenstore directory. I don't have a strong opinion about this. In
-> the example below I'll use the PV console convention.
-> 
-> For starters:
-> 
-> * libxl needs to write the "type" node to xenstore for *all* protocols.
->   The "type" is not yet configurable.
-> * qemu reads them for all backends, proceeds if "type" = "ioemu"
-> 
-> These should be two simple patches. Stage 2:
-> 
-> * we add options in the xl config file to configure any backend, libxl
->   set "type" accordingly (Maybe not *any*, but vif, vkbd, vfb could all
->   have a "type". It is OK if you only add an option for vkbd.)
-> * non-QEMU backends, in particular Linux backends, also read the "type"
->   node and proceed if it's "linux"
-> 
-> Does this sound OK to you?
-> 
+On 04/12/2017 10:05 PM, zhanghailiang wrote:
+> We use these two options to identify which disk is
+> shared
+>
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> Signed-off-by: Wen Congyang <wency@cn.fujitsu.com>
+> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+> ---
+> v4:
+> - Add proper comment for primary_disk (Stefan)
+> v2:
+> - Move g_free(s->shared_disk_id) to the common fail process place (Stefan)
+> - Fix comments for these two options
+> ---
+>   block/replication.c  | 43 +++++++++++++++++++++++++++++++++++++++++--
+>   qapi/block-core.json | 10 +++++++++-
+>   2 files changed, 50 insertions(+), 3 deletions(-)
+>
+> diff --git a/block/replication.c b/block/replication.c
+> index bf3c395..418b81b 100644
+> --- a/block/replication.c
+> +++ b/block/replication.c
+> @@ -25,9 +25,12 @@
+>   typedef struct BDRVReplicationState {
+>       ReplicationMode mode;
+>       int replication_state;
+> +    bool is_shared_disk;
+> +    char *shared_disk_id;
+>       BdrvChild *active_disk;
+>       BdrvChild *hidden_disk;
+>       BdrvChild *secondary_disk;
+> +    BdrvChild *primary_disk;
+>       char *top_id;
+>       ReplicationState *rs;
+>       Error *blocker;
+> @@ -53,6 +56,9 @@ static void replication_stop(ReplicationState *rs, bool failover,
+>   
+>   #define REPLICATION_MODE        "mode"
+>   #define REPLICATION_TOP_ID      "top-id"
+> +#define REPLICATION_SHARED_DISK "shared-disk"
+> +#define REPLICATION_SHARED_DISK_ID "shared-disk-id"
+> +
+>   static QemuOptsList replication_runtime_opts = {
+>       .name = "replication",
+>       .head = QTAILQ_HEAD_INITIALIZER(replication_runtime_opts.head),
+> @@ -65,6 +71,14 @@ static QemuOptsList replication_runtime_opts = {
+>               .name = REPLICATION_TOP_ID,
+>               .type = QEMU_OPT_STRING,
+>           },
+> +        {
+> +            .name = REPLICATION_SHARED_DISK_ID,
+> +            .type = QEMU_OPT_STRING,
+> +        },
+> +        {
+> +            .name = REPLICATION_SHARED_DISK,
+> +            .type = QEMU_OPT_BOOL,
+> +        },
+>           { /* end of list */ }
+>       },
+>   };
+> @@ -85,6 +99,9 @@ static int replication_open(BlockDriverState *bs, QDict *options,
+>       QemuOpts *opts = NULL;
+>       const char *mode;
+>       const char *top_id;
+> +    const char *shared_disk_id;
+> +    BlockBackend *blk;
+> +    BlockDriverState *tmp_bs;
+>   
+>       bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file,
+>                                  false, errp);
+> @@ -125,12 +142,33 @@ static int replication_open(BlockDriverState *bs, QDict *options,
+>                      "The option mode's value should be primary or secondary");
+>           goto fail;
+>       }
+> +    s->is_shared_disk = qemu_opt_get_bool(opts, REPLICATION_SHARED_DISK,
+> +
+
+What If secondary side is supplied with 'REPLICATION_SHARED_DISK_ID'? 
+Pls refer f4f2539bc to pefect the logical.
+>                                          false);
+> +    if (s->is_shared_disk && (s->mode == REPLICATION_MODE_PRIMARY)) {
+> +        shared_disk_id = qemu_opt_get(opts, REPLICATION_SHARED_DISK_ID);
+> +        if (!shared_disk_id) {
+> +            error_setg(&local_err, "Missing shared disk blk option");
+> +            goto fail;
+> +        }
+> +        s->shared_disk_id = g_strdup(shared_disk_id);
+> +        blk = blk_by_name(s->shared_disk_id);
+> +        if (!blk) {
+> +            error_setg(&local_err, "There is no %s block", s->shared_disk_id);
+> +            goto fail;
+> +        }
+> +        /* We have a BlockBackend for the primary disk but use BdrvChild for
+> +         * consistency - active_disk, secondary_disk, etc are also BdrvChild.
+> +         */
+> +        tmp_bs = blk_bs(blk);
+> +        s->primary_disk = QLIST_FIRST(&tmp_bs->parents);
+> +    }
+>   
+>       s->rs = replication_new(bs, &replication_ops);
+>   
+> -    ret = 0;
+> -
+> +    qemu_opts_del(opts);
+> +    return 0;
+>   fail:
+> +    g_free(s->shared_disk_id);
+>       qemu_opts_del(opts);
+>       error_propagate(errp, local_err);
+>   
+> @@ -141,6 +179,7 @@ static void replication_close(BlockDriverState *bs)
+>   {
+>       BDRVReplicationState *s = bs->opaque;
+>   
+> +    g_free(s->shared_disk_id);
+>       if (s->replication_state == BLOCK_REPLICATION_RUNNING) {
+>           replication_stop(s->rs, false, NULL);
+>       }
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 033457c..361c932 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -2661,12 +2661,20 @@
+>   #          node who owns the replication node chain. Must not be given in
+>   #          primary mode.
+>   #
+> +# @shared-disk-id: Id of shared disk while is replication mode, if @shared-disk
+> +#                  is true, this option is required (Since: 2.10)
+> +#
+Further explanations:
+
+For @shared-disk-id, it must/only be given when @shared-disk enable on
+Primary side.
+
+> +# @shared-disk: To indicate whether or not a disk is shared by primary VM
+> +#               and secondary VM. (The default is false) (Since: 2.10)
+> +#
+Further explanations:
+
+For @shared-disk, it must be given or not-given on both side at the same 
+time.
+
+>   # Since: 2.9
+>   ##
+>   { 'struct': 'BlockdevOptionsReplication',
+>     'base': 'BlockdevOptionsGenericFormat',
+>     'data': { 'mode': 'ReplicationMode',
+> -            '*top-id': 'str' } }
+> +            '*top-id': 'str',
+> +            '*shared-disk-id': 'str',
+> +            '*shared-disk': 'bool' } }
+>   
+>   ##
+>   # @NFSTransport:
