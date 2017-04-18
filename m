@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60411)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d0KKl-0001vb-Va
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 00:01:45 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d0KKn-0001ws-6P
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 00:01:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d0KKk-0005S3-Bl
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 00:01:44 -0400
-Date: Tue, 18 Apr 2017 13:53:35 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1d0KKl-0005SV-Np
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 00:01:45 -0400
+Date: Tue, 18 Apr 2017 13:52:40 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170418035335.GL12235@umbus.fritz.box>
+Message-ID: <20170418035240.GK12235@umbus.fritz.box>
 References: <20170417215916.12431-1-ehabkost@redhat.com>
-	<20170417215916.12431-5-ehabkost@redhat.com>
+	<20170417215916.12431-4-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ZrCu0B0FMx3UnjE2"
+	protocol="application/pgp-signature"; boundary="NqNl6FRZtoRUn5bW"
 Content-Disposition: inline
-In-Reply-To: <20170417215916.12431-5-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 4/7] pci: Change pci_register_bus() 'parent'
- parameter to PCIHostState
+In-Reply-To: <20170417215916.12431-4-ehabkost@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 3/7] pci: Change pci_bus_new*() parameter to
+ PCIHostState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,274 +26,238 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, aik@ozlabs.ru, David Gibson <dgibson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Alexander Graf <agraf@suse.de>, Scott Wood <scottwood@freescale.com>, Paul Burton <paul.burton@imgtec.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, aik@ozlabs.ru, David Gibson <dgibson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-ppc@nongnu.org, qemu-arm@nongnu.org
 
 
---ZrCu0B0FMx3UnjE2
-Content-Type: text/plain; charset=us-ascii
+--NqNl6FRZtoRUn5bW
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 17, 2017 at 06:59:13PM -0300, Eduardo Habkost wrote:
-> pci_register_bus() already requires the 'parent' argument to be a
-> PCI_HOST_BRIDGE object. Change the parameter type to reflect that.
+On Mon, Apr 17, 2017 at 06:59:12PM -0300, Eduardo Habkost wrote:
+> The pci_bus_new*() functions already require the 'parent' argument to be
+> a PCI_HOST_BRIDGE object. Change the parameter type to reflect that.
 >=20
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Aurelien Jarno <aurelien@aurel32.net>
-> Cc: Yongbok Kim <yongbok.kim@imgtec.com>
-> Cc: Alexander Graf <agraf@suse.de>
-> Cc: Scott Wood <scottwood@freescale.com>
-> Cc: Paul Burton <paul.burton@imgtec.com>
 > Cc: "Michael S. Tsirkin" <mst@redhat.com>
 > Cc: Marcel Apfelbaum <marcel@redhat.com>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
-> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Cc: "Herv=E9 Poussineau" <hpoussin@reactos.org>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
 > Cc: qemu-ppc@nongnu.org
+> Cc: qemu-arm@nongnu.org
 > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  include/hw/pci/pci.h      | 2 +-
->  hw/alpha/typhoon.c        | 2 +-
->  hw/mips/gt64xxx_pci.c     | 2 +-
->  hw/pci-host/apb.c         | 2 +-
->  hw/pci-host/bonito.c      | 2 +-
->  hw/pci-host/gpex.c        | 2 +-
->  hw/pci-host/grackle.c     | 2 +-
->  hw/pci-host/ppce500.c     | 2 +-
->  hw/pci-host/uninorth.c    | 4 ++--
->  hw/pci-host/xilinx-pcie.c | 2 +-
->  hw/pci/pci.c              | 4 ++--
->  hw/ppc/ppc4xx_pci.c       | 2 +-
->  hw/ppc/spapr_pci.c        | 2 +-
->  hw/s390x/s390-pci-bus.c   | 2 +-
->  hw/sh4/sh_pci.c           | 2 +-
->  15 files changed, 17 insertions(+), 17 deletions(-)
+>  include/hw/pci/pci.h                |  5 +++--
+>  hw/pci-bridge/pci_expander_bridge.c | 15 ++++++++-------
+>  hw/pci-host/piix.c                  |  2 +-
+>  hw/pci-host/prep.c                  |  2 +-
+>  hw/pci-host/q35.c                   |  2 +-
+>  hw/pci-host/versatile.c             |  2 +-
+>  hw/pci/pci.c                        | 13 ++++++-------
+>  7 files changed, 21 insertions(+), 20 deletions(-)
 >=20
 > diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> index 2242aa25eb..56387ccb0c 100644
+> index a37a2d5cb6..2242aa25eb 100644
 > --- a/include/hw/pci/pci.h
 > +++ b/include/hw/pci/pci.h
-> @@ -408,7 +408,7 @@ void pci_bus_irqs(PCIBus *bus, pci_set_irq_fn set_irq=
-, pci_map_irq_fn map_irq,
->  int pci_bus_get_irq_level(PCIBus *bus, int irq_num);
->  /* 0 <=3D pin <=3D 3 0 =3D INTA, 1 =3D INTB, 2 =3D INTC, 3 =3D INTD */
->  int pci_swizzle_map_irq_fn(PCIDevice *pci_dev, int pin);
-> -PCIBus *pci_register_bus(DeviceState *parent, const char *name,
-> +PCIBus *pci_register_bus(PCIHostState *phb, const char *name,
->                           pci_set_irq_fn set_irq, pci_map_irq_fn map_irq,
->                           void *irq_opaque,
+> @@ -393,12 +393,13 @@ typedef PCIINTxRoute (*pci_route_irq_fn)(void *opaq=
+ue, int pin);
+> =20
+>  bool pci_bus_is_express(PCIBus *bus);
+>  bool pci_bus_is_root(PCIBus *bus);
+> -void pci_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *pare=
+nt,
+> +void pci_bus_new_inplace(PCIBus *bus, size_t bus_size,
+> +                         PCIHostState *phb,
+>                           const char *name,
 >                           MemoryRegion *address_space_mem,
-> diff --git a/hw/alpha/typhoon.c b/hw/alpha/typhoon.c
-> index f50f5cf186..ac0633a55e 100644
-> --- a/hw/alpha/typhoon.c
-> +++ b/hw/alpha/typhoon.c
-> @@ -883,7 +883,7 @@ PCIBus *typhoon_init(ram_addr_t ram_size, ISABus **is=
-a_bus,
->      memory_region_add_subregion(addr_space, 0x801fc000000ULL,
->                                  &s->pchip.reg_io);
-> =20
-> -    b =3D pci_register_bus(dev, "pci",
-> +    b =3D pci_register_bus(phb, "pci",
->                           typhoon_set_irq, sys_map_irq, s,
->                           &s->pchip.reg_mem, &s->pchip.reg_io,
->                           0, 64, TYPE_PCI_BUS);
-> diff --git a/hw/mips/gt64xxx_pci.c b/hw/mips/gt64xxx_pci.c
-> index 4811843ab6..bd131bcdc6 100644
-> --- a/hw/mips/gt64xxx_pci.c
-> +++ b/hw/mips/gt64xxx_pci.c
-> @@ -1171,7 +1171,7 @@ PCIBus *gt64120_register(qemu_irq *pic)
->      phb =3D PCI_HOST_BRIDGE(dev);
->      memory_region_init(&d->pci0_mem, OBJECT(dev), "pci0-mem", UINT32_MAX=
-);
->      address_space_init(&d->pci0_mem_as, &d->pci0_mem, "pci0-mem");
-> -    phb->bus =3D pci_register_bus(dev, "pci",
-> +    phb->bus =3D pci_register_bus(phb, "pci",
->                                  gt64120_pci_set_irq, gt64120_pci_map_irq,
->                                  pic,
->                                  &d->pci0_mem,
-> diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
-> index 653e711121..1156a54224 100644
-> --- a/hw/pci-host/apb.c
-> +++ b/hw/pci-host/apb.c
-> @@ -671,7 +671,7 @@ PCIBus *pci_apb_init(hwaddr special_base,
->      dev =3D qdev_create(NULL, TYPE_APB);
->      d =3D APB_DEVICE(dev);
->      phb =3D PCI_HOST_BRIDGE(dev);
-> -    phb->bus =3D pci_register_bus(DEVICE(phb), "pci",
-> +    phb->bus =3D pci_register_bus(phb, "pci",
->                                  pci_apb_set_irq, pci_pbm_map_irq, d,
->                                  &d->pci_mmio,
->                                  get_system_io(),
-> diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
-> index 1999ece590..27842edc04 100644
-> --- a/hw/pci-host/bonito.c
-> +++ b/hw/pci-host/bonito.c
-> @@ -714,7 +714,7 @@ static int bonito_pcihost_initfn(SysBusDevice *dev)
+>                           MemoryRegion *address_space_io,
+>                           uint8_t devfn_min, const char *typename);
+> -PCIBus *pci_bus_new(DeviceState *parent, const char *name,
+> +PCIBus *pci_bus_new(PCIHostState *phb, const char *name,
+>                      MemoryRegion *address_space_mem,
+>                      MemoryRegion *address_space_io,
+>                      uint8_t devfn_min, const char *typename);
+> diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_expa=
+nder_bridge.c
+> index 6ac187fa32..39d29d2230 100644
+> --- a/hw/pci-bridge/pci_expander_bridge.c
+> +++ b/hw/pci-bridge/pci_expander_bridge.c
+> @@ -213,7 +213,8 @@ static gint pxb_compare(gconstpointer a, gconstpointe=
+r b)
+>  static void pxb_dev_realize_common(PCIDevice *dev, bool pcie, Error **er=
+rp)
 >  {
->      PCIHostState *phb =3D PCI_HOST_BRIDGE(dev);
-> =20
-> -    phb->bus =3D pci_register_bus(DEVICE(dev), "pci",
-> +    phb->bus =3D pci_register_bus(phb, "pci",
->                                  pci_bonito_set_irq, pci_bonito_map_irq, =
-dev,
->                                  get_system_memory(), get_system_io(),
->                                  0x28, 32, TYPE_PCI_BUS);
-> diff --git a/hw/pci-host/gpex.c b/hw/pci-host/gpex.c
-> index 66055ee5cc..042d127271 100644
-> --- a/hw/pci-host/gpex.c
-> +++ b/hw/pci-host/gpex.c
-> @@ -62,7 +62,7 @@ static void gpex_host_realize(DeviceState *dev, Error *=
-*errp)
->          sysbus_init_irq(sbd, &s->irq[i]);
+>      PXBDev *pxb =3D convert_to_pxb(dev);
+> -    DeviceState *ds, *bds =3D NULL;
+> +    DeviceState *bds =3D NULL;
+> +    PCIHostState *phb;
+>      PCIBus *bus;
+>      const char *dev_name =3D NULL;
+>      Error *local_err =3D NULL;
+> @@ -228,11 +229,11 @@ static void pxb_dev_realize_common(PCIDevice *dev, =
+bool pcie, Error **errp)
+>          dev_name =3D dev->qdev.id;
 >      }
 > =20
-> -    pci->bus =3D pci_register_bus(dev, "pcie.0", gpex_set_irq,
-> +    pci->bus =3D pci_register_bus(pci, "pcie.0", gpex_set_irq,
->                                  pci_swizzle_map_irq_fn, s, &s->io_mmio,
->                                  &s->io_ioport, 0, 4, TYPE_PCIE_BUS);
+> -    ds =3D qdev_create(NULL, TYPE_PXB_HOST);
+> +    phb =3D PCI_HOST_BRIDGE(qdev_create(NULL, TYPE_PXB_HOST));
+>      if (pcie) {
+> -        bus =3D pci_bus_new(ds, dev_name, NULL, NULL, 0, TYPE_PXB_PCIE_B=
+US);
+> +        bus =3D pci_bus_new(phb, dev_name, NULL, NULL, 0, TYPE_PXB_PCIE_=
+BUS);
+>      } else {
+> -        bus =3D pci_bus_new(ds, "pxb-internal", NULL, NULL, 0, TYPE_PXB_=
+BUS);
+> +        bus =3D pci_bus_new(phb, "pxb-internal", NULL, NULL, 0, TYPE_PXB=
+_BUS);
+>          bds =3D qdev_create(BUS(bus), "pci-bridge");
+>          bds->id =3D dev_name;
+>          qdev_prop_set_uint8(bds, PCI_BRIDGE_DEV_PROP_CHASSIS_NR, pxb->bu=
+s_nr);
+> @@ -244,7 +245,7 @@ static void pxb_dev_realize_common(PCIDevice *dev, bo=
+ol pcie, Error **errp)
+>      bus->address_space_io =3D dev->bus->address_space_io;
+>      bus->map_irq =3D pxb_map_irq_fn;
 > =20
-> diff --git a/hw/pci-host/grackle.c b/hw/pci-host/grackle.c
-> index 2c8acdaaca..a56c063be9 100644
-> --- a/hw/pci-host/grackle.c
-> +++ b/hw/pci-host/grackle.c
-> @@ -82,7 +82,7 @@ PCIBus *pci_grackle_init(uint32_t base, qemu_irq *pic,
->      memory_region_add_subregion(address_space_mem, 0x80000000ULL,
->                                  &d->pci_hole);
+> -    PCI_HOST_BRIDGE(ds)->bus =3D bus;
+> +    phb->bus =3D bus;
 > =20
-> -    phb->bus =3D pci_register_bus(dev, NULL,
-> +    phb->bus =3D pci_register_bus(phb, NULL,
->                                  pci_grackle_set_irq,
->                                  pci_grackle_map_irq,
->                                  pic,
-> diff --git a/hw/pci-host/ppce500.c b/hw/pci-host/ppce500.c
-> index e502bc0505..4a1e99f426 100644
-> --- a/hw/pci-host/ppce500.c
-> +++ b/hw/pci-host/ppce500.c
-> @@ -465,7 +465,7 @@ static int e500_pcihost_initfn(SysBusDevice *dev)
->      /* PIO lives at the bottom of our bus space */
->      memory_region_add_subregion_overlap(&s->busmem, 0, &s->pio, -2);
+>      pxb_register_bus(dev, bus, &local_err);
+>      if (local_err) {
+> @@ -252,7 +253,7 @@ static void pxb_dev_realize_common(PCIDevice *dev, bo=
+ol pcie, Error **errp)
+>          goto err_register_bus;
+>      }
 > =20
-> -    b =3D pci_register_bus(DEVICE(dev), NULL, mpc85xx_pci_set_irq,
-> +    b =3D pci_register_bus(h, NULL, mpc85xx_pci_set_irq,
->                           mpc85xx_pci_map_irq, s, &s->busmem, &s->pio,
->                           PCI_DEVFN(s->first_slot, 0), 4, TYPE_PCI_BUS);
->      h->bus =3D b;
-> diff --git a/hw/pci-host/uninorth.c b/hw/pci-host/uninorth.c
-> index df342ac3cb..b1b89183fc 100644
-> --- a/hw/pci-host/uninorth.c
-> +++ b/hw/pci-host/uninorth.c
-> @@ -233,7 +233,7 @@ PCIBus *pci_pmac_init(qemu_irq *pic,
->      memory_region_add_subregion(address_space_mem, 0x80000000ULL,
->                                  &d->pci_hole);
-> =20
-> -    h->bus =3D pci_register_bus(dev, NULL,
-> +    h->bus =3D pci_register_bus(h, NULL,
->                                pci_unin_set_irq, pci_unin_map_irq,
->                                pic,
->                                &d->pci_mmio,
-> @@ -299,7 +299,7 @@ PCIBus *pci_pmac_u3_init(qemu_irq *pic,
->      memory_region_add_subregion(address_space_mem, 0x80000000ULL,
->                                  &d->pci_hole);
-> =20
-> -    h->bus =3D pci_register_bus(dev, NULL,
-> +    h->bus =3D pci_register_bus(h, NULL,
->                                pci_unin_set_irq, pci_unin_map_irq,
->                                pic,
->                                &d->pci_mmio,
-> diff --git a/hw/pci-host/xilinx-pcie.c b/hw/pci-host/xilinx-pcie.c
-> index 8b71e2d950..c951684148 100644
-> --- a/hw/pci-host/xilinx-pcie.c
-> +++ b/hw/pci-host/xilinx-pcie.c
-> @@ -129,7 +129,7 @@ static void xilinx_pcie_host_realize(DeviceState *dev=
-, Error **errp)
->      sysbus_init_mmio(sbd, &pex->mmio);
->      sysbus_init_mmio(sbd, &s->mmio);
-> =20
-> -    pci->bus =3D pci_register_bus(dev, s->name, xilinx_pcie_set_irq,
-> +    pci->bus =3D pci_register_bus(pci, s->name, xilinx_pcie_set_irq,
->                                  pci_swizzle_map_irq_fn, s, &s->mmio,
->                                  &s->io, 0, 4, TYPE_PCIE_BUS);
-> =20
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index f4488b46fc..f60d0497ef 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -421,7 +421,7 @@ void pci_bus_irqs(PCIBus *bus, pci_set_irq_fn set_irq=
-, pci_map_irq_fn map_irq,
->      bus->irq_count =3D g_malloc0(nirq * sizeof(bus->irq_count[0]));
+> -    qdev_init_nofail(ds);
+> +    qdev_init_nofail(DEVICE(phb));
+>      if (bds) {
+>          qdev_init_nofail(bds);
+>      }
+> @@ -267,7 +268,7 @@ static void pxb_dev_realize_common(PCIDevice *dev, bo=
+ol pcie, Error **errp)
+>  err_register_bus:
+>      object_unref(OBJECT(bds));
+>      object_unparent(OBJECT(bus));
+> -    object_unref(OBJECT(ds));
+> +    object_unref(OBJECT(phb));
 >  }
 > =20
-> -PCIBus *pci_register_bus(DeviceState *parent, const char *name,
-> +PCIBus *pci_register_bus(PCIHostState *phb, const char *name,
->                           pci_set_irq_fn set_irq, pci_map_irq_fn map_irq,
->                           void *irq_opaque,
+>  static void pxb_dev_realize(PCIDevice *dev, Error **errp)
+> diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+> index f9218aa952..91fec05b38 100644
+> --- a/hw/pci-host/piix.c
+> +++ b/hw/pci-host/piix.c
+> @@ -340,7 +340,7 @@ PCIBus *i440fx_init(const char *host_type, const char=
+ *pci_type,
+> =20
+>      dev =3D qdev_create(NULL, host_type);
+>      s =3D PCI_HOST_BRIDGE(dev);
+> -    b =3D pci_bus_new(dev, NULL, pci_address_space,
+> +    b =3D pci_bus_new(s, NULL, pci_address_space,
+>                      address_space_io, 0, TYPE_PCI_BUS);
+>      s->bus =3D b;
+>      object_property_add_child(qdev_get_machine(), "i440fx", OBJECT(dev),=
+ NULL);
+> diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
+> index 260a119a9e..2e2cd267f4 100644
+> --- a/hw/pci-host/prep.c
+> +++ b/hw/pci-host/prep.c
+> @@ -269,7 +269,7 @@ static void raven_pcihost_initfn(Object *obj)
+>      memory_region_add_subregion_overlap(address_space_mem, 0x80000000,
+>                                          &s->pci_io_non_contiguous, 1);
+>      memory_region_add_subregion(address_space_mem, 0xc0000000, &s->pci_m=
+emory);
+> -    pci_bus_new_inplace(&s->pci_bus, sizeof(s->pci_bus), DEVICE(obj), NU=
+LL,
+> +    pci_bus_new_inplace(&s->pci_bus, sizeof(s->pci_bus), h, NULL,
+>                          &s->pci_memory, &s->pci_io, 0, TYPE_PCI_BUS);
+> =20
+>      /* Bus master address space */
+> diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+> index 344f77b10c..860b47a1ba 100644
+> --- a/hw/pci-host/q35.c
+> +++ b/hw/pci-host/q35.c
+> @@ -49,7 +49,7 @@ static void q35_host_realize(DeviceState *dev, Error **=
+errp)
+>      sysbus_add_io(sbd, MCH_HOST_BRIDGE_CONFIG_DATA, &pci->data_mem);
+>      sysbus_init_ioports(sbd, MCH_HOST_BRIDGE_CONFIG_DATA, 4);
+> =20
+> -    pci->bus =3D pci_bus_new(DEVICE(s), "pcie.0",
+> +    pci->bus =3D pci_bus_new(pci, "pcie.0",
+>                             s->mch.pci_address_space, s->mch.address_spac=
+e_io,
+>                             0, TYPE_PCIE_BUS);
+>      PC_MACHINE(qdev_get_machine())->bus =3D pci->bus;
+> diff --git a/hw/pci-host/versatile.c b/hw/pci-host/versatile.c
+> index 467cbb9cb8..24ef87610b 100644
+> --- a/hw/pci-host/versatile.c
+> +++ b/hw/pci-host/versatile.c
+> @@ -386,7 +386,7 @@ static void pci_vpb_init(Object *obj)
+>      memory_region_init(&s->pci_io_space, OBJECT(s), "pci_io", 1ULL << 32=
+);
+>      memory_region_init(&s->pci_mem_space, OBJECT(s), "pci_mem", 1ULL << =
+32);
+> =20
+> -    pci_bus_new_inplace(&s->pci_bus, sizeof(s->pci_bus), DEVICE(obj), "p=
+ci",
+> +    pci_bus_new_inplace(&s->pci_bus, sizeof(s->pci_bus), h, "pci",
+>                          &s->pci_mem_space, &s->pci_io_space,
+>                          PCI_DEVFN(11, 0), TYPE_PCI_BUS);
+>      h->bus =3D &s->pci_bus;
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index d9535c0bdc..f4488b46fc 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -388,26 +388,25 @@ bool pci_bus_is_root(PCIBus *bus)
+>      return PCI_BUS_GET_CLASS(bus)->is_root(bus);
+>  }
+> =20
+> -void pci_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *pare=
+nt,
+> +void pci_bus_new_inplace(PCIBus *bus, size_t bus_size,
+> +                         PCIHostState *phb,
+>                           const char *name,
 >                           MemoryRegion *address_space_mem,
-> @@ -430,7 +430,7 @@ PCIBus *pci_register_bus(DeviceState *parent, const c=
+>                           MemoryRegion *address_space_io,
+>                           uint8_t devfn_min, const char *typename)
+>  {
+> -    PCIHostState *phb =3D PCI_HOST_BRIDGE(parent);
+> -    qbus_create_inplace(bus, bus_size, typename, parent, name);
+> +    qbus_create_inplace(bus, bus_size, typename, DEVICE(phb), name);
+>      pci_bus_init(bus, phb, address_space_mem, address_space_io, devfn_mi=
+n);
+>  }
+> =20
+> -PCIBus *pci_bus_new(DeviceState *parent, const char *name,
+> +PCIBus *pci_bus_new(PCIHostState *phb, const char *name,
+>                      MemoryRegion *address_space_mem,
+>                      MemoryRegion *address_space_io,
+>                      uint8_t devfn_min, const char *typename)
+>  {
+> -    PCIHostState *phb =3D PCI_HOST_BRIDGE(parent);
+>      PCIBus *bus;
+> =20
+> -    bus =3D PCI_BUS(qbus_create(typename, parent, name));
+> +    bus =3D PCI_BUS(qbus_create(typename, DEVICE(phb), name));
+>      pci_bus_init(bus, phb, address_space_mem, address_space_io, devfn_mi=
+n);
+>      return bus;
+>  }
+> @@ -431,7 +430,7 @@ PCIBus *pci_register_bus(DeviceState *parent, const c=
 har *name,
 >  {
 >      PCIBus *bus;
 > =20
-> -    bus =3D pci_bus_new(PCI_HOST_BRIDGE(parent), name, address_space_mem,
-> +    bus =3D pci_bus_new(phb, name, address_space_mem,
+> -    bus =3D pci_bus_new(parent, name, address_space_mem,
+> +    bus =3D pci_bus_new(PCI_HOST_BRIDGE(parent), name, address_space_mem,
 >                        address_space_io, devfn_min, typename);
 >      pci_bus_irqs(bus, set_irq, map_irq, irq_opaque, nirq);
 >      return bus;
-> diff --git a/hw/ppc/ppc4xx_pci.c b/hw/ppc/ppc4xx_pci.c
-> index dc19682970..f755c6faae 100644
-> --- a/hw/ppc/ppc4xx_pci.c
-> +++ b/hw/ppc/ppc4xx_pci.c
-> @@ -314,7 +314,7 @@ static int ppc4xx_pcihost_initfn(SysBusDevice *dev)
->          sysbus_init_irq(dev, &s->irq[i]);
->      }
-> =20
-> -    b =3D pci_register_bus(DEVICE(dev), NULL, ppc4xx_pci_set_irq,
-> +    b =3D pci_register_bus(h, NULL, ppc4xx_pci_set_irq,
->                           ppc4xx_pci_map_irq, s->irq, get_system_memory(),
->                           get_system_io(), 0, 4, TYPE_PCI_BUS);
->      h->bus =3D b;
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index 98c52e411f..0f293f9e75 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -1697,7 +1697,7 @@ static void spapr_phb_realize(DeviceState *dev, Err=
-or **errp)
->      memory_region_add_subregion(get_system_memory(), sphb->io_win_addr,
->                                  &sphb->iowindow);
-> =20
-> -    bus =3D pci_register_bus(dev, NULL,
-> +    bus =3D pci_register_bus(phb, NULL,
->                             pci_spapr_set_irq, pci_spapr_map_irq, sphb,
->                             &sphb->memspace, &sphb->iospace,
->                             PCI_DEVFN(0, 0), PCI_NUM_PINS, TYPE_PCI_BUS);
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index 69b0291e8a..99aae965bb 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -560,7 +560,7 @@ static int s390_pcihost_init(SysBusDevice *dev)
-> =20
->      DPRINTF("host_init\n");
-> =20
-> -    b =3D pci_register_bus(DEVICE(dev), NULL,
-> +    b =3D pci_register_bus(phb, NULL,
->                           s390_pci_set_irq, s390_pci_map_irq, NULL,
->                           get_system_memory(), get_system_io(), 0, 64,
->                           TYPE_PCI_BUS);
-> diff --git a/hw/sh4/sh_pci.c b/hw/sh4/sh_pci.c
-> index 1747628f3d..bca849c10f 100644
-> --- a/hw/sh4/sh_pci.c
-> +++ b/hw/sh4/sh_pci.c
-> @@ -131,7 +131,7 @@ static int sh_pci_device_init(SysBusDevice *dev)
->      for (i =3D 0; i < 4; i++) {
->          sysbus_init_irq(dev, &s->irq[i]);
->      }
-> -    phb->bus =3D pci_register_bus(DEVICE(dev), "pci",
-> +    phb->bus =3D pci_register_bus(phb, "pci",
->                                  sh_pci_set_irq, sh_pci_map_irq,
->                                  s->irq,
->                                  get_system_memory(),
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -301,25 +265,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---ZrCu0B0FMx3UnjE2
+--NqNl6FRZtoRUn5bW
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJY9Y2/AAoJEGw4ysog2bOSx7sP/0pWUvOliX24/Cl5V8CToOSC
-ZHj62YQuV2MkHbPBnck0YPvxeZ+tAA2dUjaAGhXQ7FcmV1lCKxPmQI0omzrSyVwf
-A/UJXJwQWguqDTzSyCFTvPFvGiBbufZjbKDwO8MYLS4GgnQiWnU4vyK2AR6zO+YQ
-2abRt9ZFrk6m2X8n1lKqt5pedhLy+UbKE64dfVjf/kRWaWixVSC7XwYV+ahHc7Bc
-tVWgquc3xfQlTBXPwNNt6+5ZaaQz6UWCTNs1vs0Mz6cJt7gn6HqeRLFs+MOXeuMM
-D/+0CWx00/gc4ITItVedjCTpSp5jQywzK///fluuieztaMxd+xqYWYNDvWMl+MWZ
-2uRvOr2BXOFNofWydxL1axEkLp77D5f1h1+W3uqc23QqK/VtmTvUur3ouNIaYvYF
-DvSrYt49SU0dikxOnUufkfhHf4bURaf7L/nlM6drx6RNC7AQjUHXBOkY4gCR4M94
-4Jl9UzgEfWk1YbkU7hImekoJq0EO6U32I0dGA/zhhhzMy1AdfhzWSSpMY/WjPWT/
-HcB+ivmNwtDMCR1fG+2cYNWHjZYxa97yWE7RuGRZm0OVPEa+tDwkwBfGIAbdE+/S
-mH+s+O1xFjTav8mft0fbsrXqyymCqsjhdx9p62Fq6Ru/x7UyoZadcgAxZShMdRnD
-twaU83zwrdQAj6WRVFL3
-=eMQ1
+iQIcBAEBCAAGBQJY9Y2IAAoJEGw4ysog2bOSIK8QAMjig48kj6H7x1iGMhiGwm/m
+smHncY/m0cJPtJ1Q8e8SKhQjcP8m3Wshr4+bELS0IsUO48liN4Mdh+xVkkjeiihR
+QPrhgce1Sw0mYdYKQqnk3EXz7ZKudNMXhZqESVRvP7Dyt0kGJHLKtCLc1BP5yb0D
+bK0dJbKUxUOeUTCodAko+ojk0F2yOXZcW7PJKD/ZBeh4bnRNfqghfGVMWZbx50uI
+qYCyUFbzeAbXyRDNP1M+GhTDb4+VZkhgtOh5THCjMQWS7RsOFdJITfzZX/bx9zyj
+7QK0nwDZfzRp70e0usCLJfo7uIGaaEGWfwZlX5u9o4Xp+pOjf09ZpOA1vFRTC9dN
+8H+GrvU0njc1450e+qV/BKq28Y0bwXTvY5xLaHxacAfIwYz98DhSUyXRBa9Xme89
+ZYMjzQp/7HIR7B7hBzQUq7xRrBepaDnMlUIxNmhUIfksKSTNfOwI7qFVnQ2pFERV
+sh5qEvl4PG9nVvKph6zq9GpqJQsMSL1d7+k/tevhIeEhU9kmLt4Jbx7pRUFf6MSF
+OzLJP8Kb0EGnbXI7F0iFT34vHswPTWzSrhsPxMtqb0cTu7tbtdADGUnKQvYBOBpH
+KexDA9o+9CPBLXBs8atOzWdWO7YONoipp1+jLqlhs+sDdnwCx/VyVHKCHJxrRYV1
+CXlA4AW9qLA0vOINykfg
+=Cfd8
 -----END PGP SIGNATURE-----
 
---ZrCu0B0FMx3UnjE2--
+--NqNl6FRZtoRUn5bW--
