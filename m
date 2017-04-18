@@ -1,57 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44804)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@us.ibm.com>) id 1d0Y9Q-0008Kw-Q3
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 14:46:57 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d0YTo-0003bq-UG
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 15:08:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@us.ibm.com>) id 1d0Y9N-0000Fc-M5
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 14:46:56 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34290
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@us.ibm.com>) id 1d0Y9N-0000FS-F0
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 14:46:53 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3IIdW2Y103685
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 14:46:51 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29wqpt1t71-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 14:46:51 -0400
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@us.ibm.com>;
-	Tue, 18 Apr 2017 12:46:50 -0600
-Received: from b03ledav006.gho.boulder.ibm.com
-	(b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-	by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id v3IIklY92425274
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 11:46:48 -0700
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 05F75C6047
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 12:46:48 -0600 (MDT)
-Received: from d50lp31.co.us.ibm.com (unknown [9.17.249.32])
-	by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTPS id ED70DC6042
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 12:46:47 -0600 (MDT)
-Received: from localhost
-	by d50lp31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@us.ibm.com>;
-	Tue, 18 Apr 2017 12:46:47 -0600
-Received: from localhost
-	by smtp.notes.na.collabserv.com with smtp.notes.na.collabserv.com ESMTP
-	for <qemu-devel@nongnu.org> from <stefanb@us.ibm.com>;
-	Tue, 18 Apr 2017 18:46:44 -0000
-In-Reply-To: <152817b5-89cf-14fe-d83a-bb5c8d748c90@citrix.com>
-From: "Stefan Berger" <stefanb@us.ibm.com>
-Date: Tue, 18 Apr 2017 18:46:42 +0000
-References: <152817b5-89cf-14fe-d83a-bb5c8d748c90@citrix.com>
-Message-Id: <OF3C1CFB9D.4BFF82AD-ON00258106.00671A8D-00258106.00672723@notes.na.collabserv.com>
+	(envelope-from <dgilbert@redhat.com>) id 1d0YTj-00009A-Ub
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 15:08:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56240)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d0YTj-00008t-LQ
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 15:07:55 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0FBA419D38F
+	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 19:07:54 +0000 (UTC)
+Date: Tue, 18 Apr 2017 20:07:50 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170418190747.GP2205@work-vm>
+References: <20170417200041.2451-1-quintela@redhat.com>
+	<20170417200041.2451-11-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] CUSE-TPM : Win 10 reports TPM device doesn't have
- sufficient resources
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170417200041.2451-11-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 10/19] migration: Remove use of old
+ MigrationParams
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -60,143 +34,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: anshul.makkar@citrix.com
+To: Juan Quintela <quintela@redhat.com>
 Cc: qemu-devel@nongnu.org
 
-   You may want to try it from this version:[1]
-   https://github.com/stefanberger/qemu-tpm/tree/v2.8.0+tpm
+* Juan Quintela (quintela@redhat.com) wrote:
+> We have change in the previous patch to use migration capabilities for
+> it.  Notice that we continue using the old command line flags from
+> migrate command from the time being.  Remove the set_params method as
+> now it is empty.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  include/migration/migration.h |  2 --
+>  migration/block.c             | 17 ++---------------
+>  migration/colo.c              |  3 ---
+>  migration/migration.c         |  8 +++++---
+>  migration/savevm.c            |  2 --
+>  5 files changed, 7 insertions(+), 25 deletions(-)
+> 
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index 5c78ae1..09d3188 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -41,8 +41,6 @@
+>  extern int only_migratable;
+>  
+>  struct MigrationParams {
+> -    bool blk;
+> -    bool shared;
+>  };
 
+I'm not sure that's portable C - some suggests that empty struct's
+are a GNU addition.
+I suggest either leaving them here, or merging this with the next
+patch.
 
-     ----- Original message -----
-     From: anshul makkar <anshul.makkar@citrix.com>
-     To: <qemu-devel@nongnu.org>
-     Cc: Stefan Berger/Watson/IBM@IBMUS
-     Subject: CUSE-TPM : Win 10 reports TPM device doesn't have
-     sufficient resources
-     Date: Tue, Apr 18, 2017 1:42 PM
+Dave
 
-     Hi,
-
-
-     I am using CUSE-TPM based on
-
-     [2]https://github.com/stefanberger/qemu-tpm branch: 2.4.1+tpm
-
-
-     [3]https://github.com/stefanberger/swtpm
-
-
-     [4]https://github.com/ts468/seabios-tpm
-
-
-     I am facing an issue where WIndows 10 guest device manager reports
-     TPM status as @
-
-   The device status is "The device cannot find enough free resources it
-   can use (Code 12)"#
-
-     On browsing I found this page
-     @[5]https://bugzilla.redhat.com/show_bug.cgi?id=1281413" that
-     reports exactly the same problem and the resolution patch
-     @ [6]https://bugzilla.redhat.com/attachment.cgi?id=1137166â€‹ .
-
-
-     I applied the patch on the code and verified with debug trace that
-     the patch code does executes.
-
-
-     But, I am still observing the same issue on Win 10 guest and on
-     using ACPIdump utility in Windows guest I can still see "IRQ 5 and
-     IRQNoFlags" in the ssdt.dsl code.
-      Device (ISA.TPM)
-                 {
-                     Name (_HID, EisaId ("PNP0C31"))  // _HID: Hardware
-     ID
-                     Name (_STA, 0x0F)  // _STA: Status
-                     Name (_CRS, ResourceTemplate ()  // _CRS: Current
-     Resource Settings
-                     {
-                         Memory32Fixed (ReadWrite,
-                             0xFED40000,         // Address Base
-                             0x00005000,         // Address Length
-                             )
-                         IRQNoFlags ()
-                             {5}
-                     })
-
-
-
-     I am bit confused, from my understanding, its the QEMU that builds
-     the SSDT table and I can also verify it from the logs. But somehow
-     guest is getting the old ACPI values for TPM which is not acceptable
-     to Windows.
-
-     Just to be sure, I also verified the SeaBIOS code and couldn't find
-     any link to this table.
-
-
-     Here is the patch that I applied based on the link above:
-
-
-   if (misc->tpm_version != TPM_VERSION_UNSPEC) {
-
-                ACPI_BUILD_DPRINTF("TPM: add MMIO\n");
-
-
-                dev = aml_device("TPM");
-
-
-                aml_append(dev, aml_name_decl("_HID",
-   aml_eisaid("PNP0C31")));
-
-                aml_append(dev, aml_name_decl("_STA", aml_int(0xF)));
-
-
-                crs = aml_resource_template();
-
-
-                aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,
-
-
-
-
-                           TPM_TIS_ADDR_SIZE, AML_READ_WRITE));
-
-
-                aml_append(dev, aml_name_decl("_CRS", crs));
-
-
-                aml_append(sb_scope, dev);
-
-
-            }
-
-
-   aml_append(ssdt, sb_scope);
-
-     logs once I start qemu:
-     CPI_BUILD: init ACPI tables
-     ACPI_BUILD: TPM: add MMIO
-     ACPI_BUILD: init ACPI tables
-     ACPI_BUILD: TPM: add MMIO
-
-     tpm_tis:  read.4(00000f00) = 00011014
-     tpm_tis: write.1(00000008) = 00000000
-     tpm_tis:  read.1(00000000) = 00000081
-     Commands to start vTPM:
-     swtpm_cuse -M 260 -m 1 -n vtpm0
-     qemu-system-x86_64 -enable-kvm -m 1024 -boot d -bios bios.bin -boot
-     menu=on -tpmdev cuse-tpm,id=tpm0,path=/dev/vtpm0 -device
-     tpm-tis,tpmdev=tpm0 win.img
-     Please suggest if I am missing anything .
-     Thanks
-     Anshul Makkar
-
-References
-
-   1. https://github.com/stefanberger/qemu-tpm/tree/v2.8.0+tpm
-   2. https://github.com/stefanberger/qemu-tpm
-   3. https://github.com/stefanberger/swtpm
-   4. https://github.com/ts468/seabios-tpm
-   5. https://bugzilla.redhat.com/show_bug.cgi?id=1281413
-   6. https://bugzilla.redhat.com/attachment.cgi?id=1137166
+>  /* Messages sent on the return path from destination to source */
+> diff --git a/migration/block.c b/migration/block.c
+> index 7734ff7..9490343 100644
+> --- a/migration/block.c
+> +++ b/migration/block.c
+> @@ -94,9 +94,6 @@ typedef struct BlkMigBlock {
+>  } BlkMigBlock;
+>  
+>  typedef struct BlkMigState {
+> -    /* Written during setup phase.  Can be read without a lock.  */
+> -    int blk_enable;
+> -    int shared_base;
+>      QSIMPLEQ_HEAD(bmds_list, BlkMigDevState) bmds_list;
+>      int64_t total_sector_sum;
+>      bool zero_blocks;
+> @@ -425,7 +422,7 @@ static int init_blk_migration(QEMUFile *f)
+>          bmds->bulk_completed = 0;
+>          bmds->total_sectors = sectors;
+>          bmds->completed_sectors = 0;
+> -        bmds->shared_base = block_mig_state.shared_base;
+> +        bmds->shared_base = migrate_use_block_shared();
+>  
+>          assert(i < num_bs);
+>          bmds_bs[i].bmds = bmds;
+> @@ -963,22 +960,12 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
+>      return 0;
+>  }
+>  
+> -static void block_set_params(const MigrationParams *params, void *opaque)
+> -{
+> -    block_mig_state.blk_enable = params->blk;
+> -    block_mig_state.shared_base = params->shared;
+> -
+> -    /* shared base means that blk_enable = 1 */
+> -    block_mig_state.blk_enable |= params->shared;
+> -}
+> -
+>  static bool block_is_active(void *opaque)
+>  {
+> -    return block_mig_state.blk_enable == 1;
+> +    return migrate_use_block_enabled();
+>  }
+>  
+>  static SaveVMHandlers savevm_block_handlers = {
+> -    .set_params = block_set_params,
+>      .save_live_setup = block_save_setup,
+>      .save_live_iterate = block_save_iterate,
+>      .save_live_complete_precopy = block_save_complete,
+> diff --git a/migration/colo.c b/migration/colo.c
+> index eec1959..4c2365e 100644
+> --- a/migration/colo.c
+> +++ b/migration/colo.c
+> @@ -333,9 +333,6 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
+>          goto out;
+>      }
+>  
+> -    /* Disable block migration */
+> -    s->params.blk = 0;
+> -    s->params.shared = 0;
+>      qemu_savevm_state_header(fb);
+>      qemu_savevm_state_begin(fb, &s->params);
+>      qemu_mutex_lock_iothread();
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 2f10657..39b4a41 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -743,6 +743,10 @@ void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
+>          s->enabled_capabilities[cap->value->capability] = cap->value->state;
+>      }
+>  
+> +    if (s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_SHARED]) {
+> +        s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_ENABLED] = true;
+> +    }
+> +
+>      if (migrate_postcopy_ram()) {
+>          if (migrate_use_compression()) {
+>              /* The decompression threads asynchronously write into RAM
+> @@ -1170,9 +1174,6 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+>      MigrationParams params;
+>      const char *p;
+>  
+> -    params.blk = has_blk && blk;
+> -    params.shared = has_inc && inc;
+> -
+>      if (migration_is_setup_or_active(s->state) ||
+>          s->state == MIGRATION_STATUS_CANCELLING ||
+>          s->state == MIGRATION_STATUS_COLO) {
+> @@ -1195,6 +1196,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+>      }
+>  
+>      if (has_inc && inc) {
+> +        migrate_set_block_enabled(s);
+>          migrate_set_block_shared(s);
+>      }
+>  
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index c47b209..c4435e1 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1237,8 +1237,6 @@ static int qemu_savevm_state(QEMUFile *f, Error **errp)
+>  {
+>      int ret;
+>      MigrationParams params = {
+> -        .blk = 0,
+> -        .shared = 0
+>      };
+>      MigrationState *ms = migrate_init(&params);
+>      MigrationStatus status;
+> -- 
+> 2.9.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
