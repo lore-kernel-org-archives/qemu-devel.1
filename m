@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d0ZcG-00063M-5V
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 16:20:49 -0400
+	(envelope-from <eblake@redhat.com>) id 1d0Zeq-0006kh-5v
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 16:23:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d0ZcC-00074z-Km
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 16:20:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37895)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d0ZcC-00074n-CV
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 16:20:44 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d0ZcB-0003Qp-EA
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 20:20:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 698E72E8076
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 20:20:43 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1d0Zep-0007lP-43
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 16:23:28 -0400
+References: <20170418013356.3578-1-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7bb96664-b433-7850-db3b-dcec0c2016a3@redhat.com>
+Date: Tue, 18 Apr 2017 15:23:16 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 18 Apr 2017 20:10:42 -0000
-From: pranith <1681688@bugs.launchpad.net>
-Reply-To: Bug 1681688 <1681688@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170411080154.12474.20009.malonedeb@gac.canonical.com>
-Message-Id: <20170418201043.1860.24006.launchpad@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1681688] Re: qemu live migration failed
+In-Reply-To: <20170418013356.3578-1-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="x7lCXKWeuffrwgomlAbOKE3AsWrpiELuq"
+Subject: Re: [Qemu-devel] [PATCH 00/31] make bdrv_get_block_status byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,36 +24,72 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, jsnow@redhat.com, qemu-block@nongnu.org
 
-** Changed in: qemu
-       Status: Incomplete =3D> Confirmed
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--x7lCXKWeuffrwgomlAbOKE3AsWrpiELuq
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, jsnow@redhat.com,
+ qemu-block@nongnu.org
+Message-ID: <7bb96664-b433-7850-db3b-dcec0c2016a3@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 00/31] make bdrv_get_block_status byte-based
+References: <20170418013356.3578-1-eblake@redhat.com>
+In-Reply-To: <20170418013356.3578-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 04/17/2017 08:33 PM, Eric Blake wrote:
+> There are patches floating around to add NBD_CMD_BLOCK_STATUS,
+> but NBD wants to report status on byte granularity (even if the
+> reporting will probably be naturally aligned to sectors or even
+> much higher levels).  I've therefore started the task of
+> converting our block status code to report at a byte granularity
+> rather than sectors.
+>=20
+> This is part three of that conversion: dirty-bitmap. Earlier parts
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1681688
+Correction: this is part three: bdrv_get_block_status
 
-Title:
-  qemu live migration failed
+> have been (mostly) reviewed, for bdrv_is_allocated and dirty-bitmaps.
+>=20
+> Perhaps I could have split this in two; patches 1-10 vs. 11-31 make
+> a nice division of labor.
+>=20
+> Available as a tag at:
+> git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-status-v1
+>=20
+> It requires the following (v1 of bdrv_is_allocated, v1 of dirty-bitmap,=
 
-Status in QEMU:
-  Confirmed
+> v9 of blkdebug, and Max's block-next tree):
+> https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg01995.html
+> https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg01723.html
+> https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg01298.html
+> https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg02163.html
+>=20
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Bug description:
-  qemu live migration failed
 
-  the dest qemu report this error.
+--x7lCXKWeuffrwgomlAbOKE3AsWrpiELuq
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  Receiving block device images
-  Completed 0 %^Mqemu-system-x86_64: block/io.c:1348: bdrv_aligned_pwritev:=
- Assertion `child->perm & BLK_PERM_WRITE' failed.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-  this bug is caused by this patch:
-  http://git.qemu-project.org/?p=3Dqemu.git;a=3Dcommit;h=3Dd35ff5e6b3aa3a70=
-6b0aa3bcf11400fac945b67a
+iQEcBAEBCAAGBQJY9nW0AAoJEKeha0olJ0Nqm2kIAJTeLyYmkPDPCs18VO1DHgou
+UHWf+QtuEOj7cUwxe5uVm2lAoJ2HvIM+OUa3BRDkUBMDniuey1UjjzCykE1mzhYa
+onru4eYKB78ZFKfpiWxPQlU5+lzBbgRH4HTgqRHJYXFCRrXXBD1iNaiSTQWM/7Nj
+icmN6AXLuMmf76jNYMi5ncH/QgaaJkkvAzGTpXV9bnjOoZbwPLJbDlBqgxlRQcQ4
+Z1nIS5Tr4OiyWnB7sGunVbtsenYWA+71dEQkRmbnTJ9Wwg99YSkyamZ03nGAiexW
+ovSYJlD5U29hq98P/bVAEdYtrmRgtuTuKxgEASz20uomjowDacQa4kVTSnjMfFY=
+=8C2E
+-----END PGP SIGNATURE-----
 
-  rollback this commit, the problem solved.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1681688/+subscriptions
+--x7lCXKWeuffrwgomlAbOKE3AsWrpiELuq--
