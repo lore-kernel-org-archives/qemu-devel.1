@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <git@kirschju.re>) id 1d0NfQ-0005wS-VH
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 03:35:17 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d0NrR-0007MH-RH
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 03:47:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <git@kirschju.re>) id 1d0NfN-0007sM-S2
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 03:35:17 -0400
-Received: from h2042504.stratoserver.net ([85.214.107.226]:55228)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <git@kirschju.re>) id 1d0NfN-0007qc-Kn
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 03:35:13 -0400
-References: <20170329183017.14026-1-git@kirschju.re>
-	<f3547873-feaa-0d77-abb7-79140bd74cdb@kirschju.re>
-	<20170417232617.GB7078@thinpad.lan.raisama.net>
-From: Julian Kirsch <git@kirschju.re>
-Message-ID: <40105b40-cb1a-5daf-15fc-1e4ac20643db@kirschju.re>
-Date: Tue, 18 Apr 2017 09:34:37 +0200
+	(envelope-from <rth7680@gmail.com>) id 1d0NrN-0003qV-0D
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 03:47:41 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33370)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d0NrM-0003qJ-PT
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 03:47:36 -0400
+Received: by mail-wm0-x241.google.com with SMTP id o81so12985117wmb.0
+	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 00:47:36 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <cover.1492384862.git.shorne@gmail.com>
+	<575d21dff52df4fa53d17e77728018453f82e8e5.1492384862.git.shorne@gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <382ab324-39c0-5549-ff01-3fe7cc1319de@twiddle.net>
+Date: Tue, 18 Apr 2017 00:47:30 -0700
 MIME-Version: 1.0
-In-Reply-To: <20170417232617.GB7078@thinpad.lan.raisama.net>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <575d21dff52df4fa53d17e77728018453f82e8e5.1492384862.git.shorne@gmail.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 0/4] X86/HMP: Expose x86 model specific
- registers via human monitor
+Subject: Re: [Qemu-devel] [PATCH 1/7] target/openrisc: Fixes for memory
+ debugging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +31,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Stafford Horne <shorne@gmail.com>, qemu-devel@nongnu.org
+Cc: openrisc@lists.librecores.org
 
-Hi Eduardo,
+On 04/16/2017 04:23 PM, Stafford Horne wrote:
+> When debugging in gdb you might want to inspect instructions in mapped
+> pages or in exception vectors like 0x800 etc.  This was previously not
+> possible in qemu since the *get_phys_page_debug() routine only looked
+> into the data tlb.
+>
+> Change to fall back to look into instruction tlb and plain physical
+> pages.
+>
+> Signed-off-by: Stafford Horne <shorne@gmail.com>
 
-don't worry, it's not urgent anyway. I'll resend the patches right away. (No
-idea why they don't show up in the archives, though.)
+Oh the horrors of a software managed TLB.
 
-Best,
-Julian
+You might do well to architecturally define an SPR that holds the page table 
+base, even if for real hardware that's only used by the software refill to load 
+up the address.
 
-On 18.04.2017 01:26, Eduardo Habkost wrote:
-> 
-> Hi Julian,
-> 
-> Sorry for taking so long to reply.
-> 
-> I can't find the original series on either qemu-devel archives,
-> or on my own mail archive.
-> 
-> Searching for the Message-Id you were replying to, I can't find
-> any matches:
-> https://www.mail-archive.com/search?l=mid&q=20170329183017.14026-1-git%40kirschju.re
-> 
-> Can you resend?
-> 
->>
->> On 29.03.2017 20:30, Julian Kirsch wrote:
->>> Provide read/write access to x86 model specific registers (MSRs) by means of
->>> two new HMP commands "msr_get" and "msr_set". The rationale behind this
->>> is to improve introspection capabilities for system virtualization mode.
->>> For instance, many modern x86-64 operating systems maintain access to internal
->>> data structures via the MSR_GSBASE/MSR_KERNELGSBASE MSRs. Giving
->>> introspection utilities (such as a remotely attached gdb via "monitor msr_get")
->>> a way of accessing these registers improves analysis results drastically.
->>>
->>> This iteration addresses Eduardo's comments of splitting the patch up into
->>> movement, reordering and addition of new MSRs.
->>>
->>> Changes v3 -> v4:
->>> * Split up x86-related parts of the patch into three distinct patches performing
->>>   movement, reordering and addition of new MSRs.
->>>
->>> Changes v2 -> v3:
->>> * Rename HMP commands to "msr_get" and "msr_set"
->>>
->>> Changes v1 -> v2:
->>> * Rename HMP commands to "msr-get" and "msr-set"
->>> * HMP commands Operate on the current default CPU only
->>>   (removes need for cpu_index argument)
->>> * Remove QMP command alltogether
->>> * Implement HMP command in target/i386/monitor.c
->>> * Add #ifdef TARGET_I386 around msr-get/msr-set in hmp-commands.hx
->>>
->>> Julian Kirsch (4):
->>>   X86: Move rdmsr/wrmsr functionality to standalone functions
->>>   X86: Reorder MSRs in rdmsr/wrmsr to follow the order used by KVM
->>>   X86: Add MSRs supported by KVM to rdmsr/wrmsr
->>>   HMP: Introduce msr_get and msr_set HMP commands
->>>
->>>  hmp-commands.hx              |  38 ++++
->>>  include/monitor/hmp-target.h |   2 +
->>>  target/i386/cpu.h            |   3 +
->>>  target/i386/helper.c         | 524 +++++++++++++++++++++++++++++++++++++++++++
->>>  target/i386/misc_helper.c    | 297 +-----------------------
->>>  target/i386/monitor.c        |  76 +++++++
->>>  6 files changed, 654 insertions(+), 286 deletions(-)
->>>
->>
->>
-> 
+That would give qemu the option of performing a real page table walk.  This 
+would fix this debug hook properly (so that you can examine pages that aren't 
+in the TLB at all).  It would also optionally allow QEMU to skip the software 
+refill, which *significantly* speeds up emulation.
+
+That said,
+
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+
+
+r~
