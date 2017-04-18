@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1d0ZjV-0007gY-IY
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 16:28:18 -0400
+	(envelope-from <eblake@redhat.com>) id 1d0aAj-0003fk-0m
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 16:56:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1d0ZjS-00017R-F3
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 16:28:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44400)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1d0ZjS-00017H-8h
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 16:28:14 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 41C2E61B85
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 20:28:13 +0000 (UTC)
-Date: Tue, 18 Apr 2017 21:28:11 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20170418202811.GA1864@redhat.com>
-References: <20170418152424.GX30620@redhat.com>
-	<9ae9d913-2516-72dc-adaf-cdd0f082c486@redhat.com>
-	<20170418171703.GY30620@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1d0aAh-0003k4-M2
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 16:56:24 -0400
+References: <20170418013356.3578-1-eblake@redhat.com>
+	<20170418013356.3578-14-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <49861bf2-b648-2c85-ebba-31fb7b499d46@redhat.com>
+Date: Tue, 18 Apr 2017 15:56:12 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170418171703.GY30620@redhat.com>
-Subject: Re: [Qemu-devel] virtio-scsi limits
+In-Reply-To: <20170418013356.3578-14-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="iF1w9l1w2wlT3lBRejS71KdKHNUGhAQOE"
+Subject: Re: [Qemu-devel] [PATCH 13/31] file-posix: Switch to
+ .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,43 +25,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, jsnow@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--iF1w9l1w2wlT3lBRejS71KdKHNUGhAQOE
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, jsnow@redhat.com, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <49861bf2-b648-2c85-ebba-31fb7b499d46@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 13/31] file-posix: Switch to
+ .bdrv_co_block_status()
+References: <20170418013356.3578-1-eblake@redhat.com>
+ <20170418013356.3578-14-eblake@redhat.com>
+In-Reply-To: <20170418013356.3578-14-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 04/17/2017 08:33 PM, Eric Blake wrote:
+> We are gradually moving away from sector-based interfaces, towards
+> byte-based.  Update the file protocol driver accordingly.
+>=20
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  block/file-posix.c | 47 +++++++++++++++++++++++-----------------------=
+-
+>  1 file changed, 23 insertions(+), 24 deletions(-)
+
+This patch makes qemu-iotests 109 fail, due to an assertion in 6/31 that
+the nested call to bdrv_block_status() [thanks to BDRV_BLOCK_RAW] is
+still sector-aligned.  The culprit:
+
+> +static int64_t coroutine_fn raw_co_block_status(BlockDriverState *bs,
+> +                                                int64_t offset,
+> +                                                int64_t bytes, int64_t=
+ *pnum,
+> +                                                BlockDriverState **fil=
+e)
+>  {
+> -    off_t start, data =3D 0, hole =3D 0;
+> +    off_t data =3D 0, hole =3D 0;
+>      int64_t total_size;
+>      int ret;
+>=20
+> @@ -1856,39 +1856,38 @@ static int64_t coroutine_fn raw_co_get_block_st=
+atus(BlockDriverState *bs,
+>          return ret;
+>      }
+>=20
+> -    start =3D sector_num * BDRV_SECTOR_SIZE;
+>      total_size =3D bdrv_getlength(bs);
+
+total_size is always sector-aligned (bdrv_getlength() purposefully
+widens the input file size, 560 bytes in the case of an empty qcow image
+in test 109, out to a sector boundary)...
+
+>      if (total_size < 0) {
+>          return total_size;
+> -    } else if (start >=3D total_size) {
+> +    } else if (offset >=3D total_size) {
+>          *pnum =3D 0;
+>          return 0;
+> -    } else if (start + nb_sectors * BDRV_SECTOR_SIZE > total_size) {
+> -        nb_sectors =3D DIV_ROUND_UP(total_size - start, BDRV_SECTOR_SI=
+ZE);
+> +    } else if (offset + bytes > total_size) {
+> +        bytes =3D total_size - offset;
+>      }
+>=20
+> -    ret =3D find_allocation(bs, start, &data, &hole);
+> +    ret =3D find_allocation(bs, offset, &data, &hole);
+
+=2E..while find_allocation still obeys byte-granularity limits of the
+underlying file system, and therefore reports a hole starting at offset
+560 (the only time a hole starts at a non-sector boundary); pre-patch
+that didn't matter (because we rounded before returning sectors through
+*pnum), but post-patch, returning 560 instead of 1024 triggers problems.
+
+I'm still debating whether the best fix is to tweak the file-posix
+limits to just round up to sector boundaries at EOF, or to make the
+block layer itself special-case EOF in case other protocols also have
+byte-granularity support.  Any advice you have while reviewing is
+appreciated, but it does mean I'll need a v2 of the series one way or
+another.
+
+And I didn't spot it during my earlier testing because I was skipping
+109 as failing prior to my patches even started testing it - but now
+that Jeff and Fam have both posted patches for two separate problems in
+test 109 (the need to munge "len", and failure to do proper cleanup), I
+no longer have that excuse.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-On Tue, Apr 18, 2017 at 06:17:03PM +0100, Richard W.M. Jones wrote:
-> On Tue, Apr 18, 2017 at 05:30:52PM +0200, Paolo Bonzini wrote:
-> > > When I changed libguestfs to use LUNs instead of targets (target=0
-> > > unit=i), I got a peculiar bug.  It looks like there is some kind of
-> > > race when enumerating the device, where /sys is populated before the
-> > > device is actually available.
-> > 
-> > That's not _too_ surprising because devtmpfs processes creation/deletion
-> > requests asynchronously.
-> 
-> I had a bit of a look into this, and I don't think this can be right.
-> At this point we're running inside the initramfs environment, where
-> /dev is a rootfs (a special case of either ramfs or tmpfs).
-> 
-> Would it still be the case that a single process that does mknod
-> followed by mount could not see the effect of the mknod?
-> 
-> The mount error (EINVAL) should indicate an invalid superblock rather
-> than a missing inode (if you believe the documentation, so that may be
-> wrong).
-> 
-> The sequence of events (happening in a single init process) is as
-> described below:
+--iF1w9l1w2wlT3lBRejS71KdKHNUGhAQOE
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-I see now: this turns out to be a problem in the unpredictable
-enumeration order when we use LUNs instead of targets, and nothing to
-do with virtio-scsi.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Rich.
+iQEcBAEBCAAGBQJY9n1sAAoJEKeha0olJ0Nq3/gIAIbu6BZy2e7D5jCIRy8xj+a6
+Ll5F6QiMevHJVhvG22AdjAFIMs7YQFh1vtiVggymoi5sTzCVOE0ZE0g58oAJUmjQ
+cUAQ/w0OA0yXaZA4YIcijC5DzmclnVgCTHPL2D+yzEzx6Ap6W3FN4Av+LqKWA+/z
+wQwB5GXl8eT4FKp3lpkPC5C0WMWGWxRjAy4xBnY9ORYmN91btj0bwF8X0BlY+nBy
+4GsCoaIT2YLWpFD4Zg4e9LTFMvRKeS26dLd7FFxnj6bTbHfXTSX/dK9DrQWTfs5L
+g8c3GONrn6JZzOb6IWAfbHD24xa2pxBNj6OddnS1iCusSNcqxpUKwuj3TKQVDa4=
+=fjSN
+-----END PGP SIGNATURE-----
 
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-df lists disk usage of guests without needing to install any
-software inside the virtual machine.  Supports Linux and Windows.
-http://people.redhat.com/~rjones/virt-df/
+--iF1w9l1w2wlT3lBRejS71KdKHNUGhAQOE--
