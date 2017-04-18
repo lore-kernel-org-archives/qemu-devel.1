@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1d0P3q-0004mF-1q
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 05:04:35 -0400
+	(envelope-from <kraxel@redhat.com>) id 1d0PMZ-0006eL-Jz
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 05:23:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1d0P3m-0005MW-2l
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 05:04:34 -0400
-Received: from mga03.intel.com ([134.134.136.65]:24469)
+	(envelope-from <kraxel@redhat.com>) id 1d0PMW-0002yF-HW
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 05:23:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50126)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1d0P3l-0005MH-NO
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 05:04:30 -0400
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-Date: Tue, 18 Apr 2017 09:04:21 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C257439054360@shsmsx102.ccr.corp.intel.com>
-References: <1492428730-13438-1-git-send-email-peterx@redhat.com>
-	<1492428730-13438-8-git-send-email-peterx@redhat.com>
-	<A2975661238FB949B60364EF0F2C257439054049@shsmsx102.ccr.corp.intel.com>
-	<20170418045400.GC22226@pxdev.xzpeter.org>
-	<A2975661238FB949B60364EF0F2C2574390540D1@shsmsx102.ccr.corp.intel.com>
-	<20170418072717.GD22226@pxdev.xzpeter.org>
-In-Reply-To: <20170418072717.GD22226@pxdev.xzpeter.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 7/7] intel_iommu: support passthrough
- (PT)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d0PMW-0002wp-BV
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 05:23:52 -0400
+Message-ID: <1492507428.27392.0.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 18 Apr 2017 11:23:48 +0200
+In-Reply-To: <d00b49ff-f541-78c8-2d68-4fa4e76ae8de@twiddle.net>
+References: <20170404102315.24923-1-kraxel@redhat.com>
+	<20170404102315.24923-4-kraxel@redhat.com>
+	<d00b49ff-f541-78c8-2d68-4fa4e76ae8de@twiddle.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 03/10] vga: add vga_scanline_invalidated
+ helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,81 +29,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Lan, Tianyu" <tianyu.lan@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, "Tian, Kevin" <kevin.tian@intel.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBl
-dGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBUdWVzZGF5LCBBcHJpbCAxOCwgMjAxNyAzOjI3IFBN
-DQo+IFRvOiBMaXUsIFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gQ2M6IHFlbXUtZGV2ZWxA
-bm9uZ251Lm9yZzsgTGFuLCBUaWFueXUgPHRpYW55dS5sYW5AaW50ZWwuY29tPjsgTWljaGFlbCBT
-IC4NCj4gVHNpcmtpbiA8bXN0QHJlZGhhdC5jb20+OyBKYXNvbiBXYW5nIDxqYXNvd2FuZ0ByZWRo
-YXQuY29tPjsgTWFyY2VsDQo+IEFwZmVsYmF1bSA8bWFyY2VsQHJlZGhhdC5jb20+OyBEYXZpZCBH
-aWJzb24gPGRhdmlkQGdpYnNvbi5kcm9wYmVhci5pZC5hdT4NCj4gU3ViamVjdDogUmU6IFtRZW11
-LWRldmVsXSBbUEFUQ0ggdjIgNy83XSBpbnRlbF9pb21tdTogc3VwcG9ydCBwYXNzdGhyb3VnaCAo
-UFQpDQo+IA0KPiBPbiBUdWUsIEFwciAxOCwgMjAxNyBhdCAwNjowMjo0NEFNICswMDAwLCBMaXUs
-IFlpIEwgd3JvdGU6DQo+ID4gPiA+IEhpIFBldGVyLA0KPiA+ID4gPg0KPiA+ID4gPiBTa2lwIGFk
-ZHJlc3Mgc3BhY2Ugc3dpdGNoaW5nIGlzIGEgZ29vZCBpZGVhIHRvIHN1cHBvcnQgUGFzc3RocnUg
-bW9kZS4NCj4gPiA+ID4gSG93ZXZlciwgd2l0aG91dCB0aGUgYWRkcmVzcyBzcGFjZSwgdGhlIHZm
-aW8gbm90aWZpZXIgd291bGQgbm90IGJlDQo+ID4gPiA+IHJlZ2lzdGVyZWQsIHRodXMgdklPTU1V
-IGVtdWxhdG9yIGhhcyBubyB3YXkgdG8gY29ubmVjdCB0byBob3N0LiBJdA0KPiA+ID4gPiBpcyBu
-byBoYXJtIGlmIHRoZXJlIGlzIG9ubHkgbWFwL3VubWFwIG5vdGlmaWVyLiBCdXQgaWYgd2UgaGF2
-ZQ0KPiA+ID4gPiBtb3JlIG5vdGlmaWVycyBvdGhlciB0aGFuIG1hcC91bm1hcCwgaXQgbWF5IGJl
-IGEgcHJvYmxlbS4NCj4gPiA+ID4NCj4gPiA+ID4gSSB0aGluayB3ZSBuZWVkIHRvIHJlY29uc2lk
-ZXIgaXQgaGVyZS4NCj4gPiA+DQo+ID4gPiBGb3Igbm93IEkgdGhpbmsgYXMgc3dpdGNoaW5nIGlz
-IGdvb2QgdG8gdXMgaW4gZ2VuZXJhbC4gQ291bGQgSSBrbm93DQo+ID4gPiBtb3JlIGNvbnRleHQg
-YWJvdXQgdGhpcz8gV291bGQgaXQgYmUgb2theSB0byB3b3JrIG9uIHRvcCBvZiB0aGlzIGluIHRo
-ZSBmdXR1cmU/DQo+ID4gPg0KPiA+DQo+ID4gTGV0IG1lIGV4cGxhaW4uIEZvciB2U1ZNIGVuYWJs
-aW5nLCBpdCBuZWVkcyB0byBhZGQgbmV3IG5vdGlmaWVyIHRvDQo+ID4gYmluZCBnUEFTSUQgdGFi
-bGUgdG8gaG9zdC4gSWYgYW4gYXNzaWduZWQgZGV2aWNlIHVzZXMgU1ZNIGluIGd1ZXN0LCBhcw0K
-PiA+IGRlc2lnbmVkIGd1ZXN0IElPTU1VIGRyaXZlciB3b3VsZCBzZXQgInB0IiBmb3IgaXQuIFRo
-aXMgaXMgdG8gbWFrZQ0KPiA+IHN1cmUgdGhlIGhvc3Qgc2Vjb25kLWxldmVsIHBhZ2UgdGFibGUg
-c3RvcmVzIEdQQS0+SFBBIG1hcHBpbmcuIFNvIHRoYXQNCj4gPiBwSU9NTVUgY2FuIGRvIG5lc3Rl
-ZCB0cmFuc2xhdGlvbiB0byBhY2hpZXZlIGdWQS0+R1BBIEdQQS0+SFBBIG1hcHBpbmcuDQo+IA0K
-PiBUaGF0IHNob3VsZCBtZWFuIHRoYXQgaW4gdGhlIGd1ZXN0IGl0IHdpbGwgb25seSBlbmFibGUg
-Zmlyc3QgbGV2ZWwgdHJhbnNsYXRpb24sIHdoaWxlIGluDQo+IHRoZSBob3N0IGl0J2xsIGJlIG5l
-c3RlZCAoZmlyc3QgKyBzZWNvbmQpPyBUaGVuIHlvdSBzaG91bGQgYmUgdHJhcHBpbmcgdGhlIGd1
-ZXN0DQo+IGV4dGVuZGVkIGNvbnRleHQgZW50cnkgaW52YWxpZGF0aW9uLCB0aGVuIHBhc3MgdGhl
-IFBBU0lEIHRhYmxlIHBvaW50ZXIgZG93bndhcmQgdG8NCj4gdGhlIGhvc3QgSU9NTVUsIGFtIEkg
-Y29ycmVjdD8NCg0KZXhhY3RseS4NCg0KPiANCj4gPg0KPiA+IFNvIHRoZSBzaXR1YXRpb24gaXMg
-aWYgd2Ugd2FudCB0byBrZWVwIEdQQS0+SFBBIG1hcHBpbmcsIHdlIHNob3VsZA0KPiA+IHNraXAg
-YWRkcmVzcyBzcGFjZSBzd2l0Y2gsIGJ1dCB0aGUgdmZpbyBsaXN0ZW5lciB3b3VsZCBub3Qga25v
-dyB2SU9NTVUNCj4gPiBpcyBhZGRlZCwgc28gbm8gdmZpbyBub3RpZmllciB3b3VsZCBiZSByZWdp
-c3RlcmVkLiBCdXQgaWYgd2UgZG8gdGhlDQo+ID4gc3dpdGNoLCB0aGUgR1BBLT5IUEEgbWFwcGlu
-ZyBpcyB1bm1hcHBlZC4gQW5kIG5lZWQgYW5vdGhlciB3YXkgdG8gYnVpbGQgdGhlDQo+IEdQQS0+
-SFBBIG1hcHBpbmcuDQo+IA0KPiBJZiBteSB1bmRlcnN0YW5kaW5nIGFib3ZlIGlzIGNvcnJlY3Qs
-IGN1cnJlbnQgSU9NTVUgbm90aWZpZXIgbWF5IG5vdCBzYXRpc2Z5IHlvdXINCj4gbmVlZC4gSWYg
-eW91IHNlZSB0aGUgY3VycmVudCBub3RpZnkgaW50ZXJmYWNlLCBpdCdzIGRlbGl2ZXJpbmcgSU9N
-TVVUTEJFbnRyeS4gSQ0KPiBzdXNwZWN0IGl0IG9ubHkgc3VpdGVzIGZvciBJT1RMQiBub3RpZmlj
-YXRpb25zLCBidXQgbm90IGlmIHlvdSB3YW50IHRvIHBhc3Mgc29tZQ0KPiBwb2ludGVyIChvbmUg
-R1BBKSBkb3dud2FyZCBzb21ld2hlcmUuDQoNClllYWgsIHlvdSBnb3QgaXQgbW9yZSB0aGFuIGFi
-c29sdXRlbHkuIE9uZSBvZiBteSBwYXRjaCBpcyB0byBtb2RpZnkgdGhlIHBhcmEgdG8gYmUNCnZv
-aWQgKiBhbmQgbGV0IGVhY2ggbm90aWZpZXJzIHRvIHRyYW5zbGF0ZSBzZXBhcmF0ZWx5LiBJIHRo
-aW5rIGl0IHNob3VsZCBiZSBhIHJlYXNvbmFibGUNCmNoYW5nZS4NCg0KU3VwcG9zZWRseSwgSSB3
-b3VsZCBzZW5kIFJGQyBmb3IgdlNWTSBzb29uLiBXZSBtYXkgdGFsayBtb3JlIGl0IGF0IHRoYXQg
-dGhyZWFkLg0KDQo+ID4NCj4gPiBJIHRoaW5rIHdlIG1heSBoYXZlIHR3byBjaG9pY2UgaGVyZS4g
-UGxzIGxldCBtZSBrbm93IHlvdXIgaWRlYXMuDQo+ID4NCj4gPiAxLiBza2lwIHRoZSBzd2l0Y2gg
-Zm9yICJwdCIgbW9kZSwgZmluZCBvdGhlciB3YXkgdG8gcmVnaXN0ZXIgdmZpbw0KPiA+IG5vdGlm
-aWVycy4gbm90IHN1cmUgaWYgdGhpcyBpcyB3b3JrYWJsZS4gSnVzdCBhIHF1aWNrIHRob3VnaHQu
-DQo+ID4NCj4gPiAyLiBkbyB0aGUgc3dpdGNoLCBhbmQgcmVidWlsZCBHUEEtPkhQQSBtYXBwaW5n
-IGlmIGRldmljZSB1c2UgInB0Ig0KPiA+IG1vZGUuIEZvciB0aGlzIG9wdGlvbiwgSSBhbHNvIGhh
-dmUgdHdvIHdheSB0byBidWlsZCB0aGUgR1BBLT5IUEEgbWFwcGluZy4NCj4gPiBhKSB3YWxrIGFs
-bCB0aGUgbWVtb3J5IHJlZ2lvbiBzZWN0aW9ucyBpbiBhZGRyZXNzX3NwYWNlX21lbW9yeSwgYW5k
-IGJ1aWxkIHRoZQ0KPiBtYXBwaW5nLg0KPiA+IGFkZHJlc3Nfc3BhY2VfbWVtb3J5LmRpc3BhdGNo
-LT5tYXAuc2VjdGlvbnMsIHNlY3Rpb25zIHN0b3JlcyBhbGwgdGhlIG1hcHBlZA0KPiBzZWN0aW9u
-cy4NCj4gPg0KPiA+IGIpIGxldCBndWVzdCBpb21tdSBkcml2ZXIgbWltaWNzIGEgMToxIG1hcHBp
-bmcgZm9yIHRoZSBkZXZpY2VzIHVzZQ0KPiA+ICJwdCIgbW9kZS4gaW4gdGhpcyB3YXksIHRoZSBH
-UEEtPkhQQSBtYXBwaW5nIGNvdWxkIGJlIHNldHVwIGJ5IHdhbGtpbmcNCj4gPiB0aGUgZ3Vlc3Qg
-U0wgcGFnZSB0YWJsZS4gVGhpcyBpcyBjb25zaXN0ZW50IHdpdGggeW91ciB2SU9WQSByZXBsYXkg
-c29sdXRpb24uDQo+IA0KPiBJJ2xsIHByZWZlciAoMSkuIFJlYXNvbiBleHBsYWluZWQgYWJvdmUu
-DQo+IA0KPiA+DQo+ID4gQWxzbyBJJ20gY3VyaW91cyBpZiBUaWFueXUncyBmYXVsdCByZXBvcnQg
-ZnJhbWV3b3JrIG5lZWRzIHRvIHJlZ2lzdGVyIG5ldyBub3RpZmllcnMuDQo+IA0KPiBGb3IgVGlh
-bnl1J3MgY2FzZSwgSSBmZWVsIGxpa2Ugd2UgbmVlZCBvdGhlciBraW5kIG9mIG5vdGlmaWVyIGFz
-IHdlbGwsIGJ1dCBub3QgdGhlDQo+IGN1cnJlbnQgSU9UTEIgb25lLiBBbmQsIG9mIGNvdXJzZSBp
-biB0aGlzIGNhc2UgaXQnbGwgYmUgaW4gYW4gcmV2ZXJ0ZWQgZGlyZWN0aW9uLCB3aGljaA0KPiBp
-cyBmcm9tIGRldmljZSB0byB2SU9NTVUuDQo+IA0KPiAoSSBhbSB0aGlua2luZyB3aGV0aGVyIGl0
-J3MgYSBnb29kIHRpbWUgbm93IHRvIGxldCBhbnkgUENJIGRldmljZSBhYmxlICB0byBmZXRjaCBp
-dHMNCj4gZGlyZWN0IG93bmVyIElPTU1VIG9iamVjdCwgdGhlbiBpdCBjYW4gcmVnaXN0ZXIgYW55
-dGhpbmcgIGl0IHdhbnQgb250byB0aGF0IG9iamVjdA0KPiBtYXliZT8pDQo+IA0KSG1tbSwgbGV0
-J3Mgc2VlIFRpYW55dSdzIGNvbW1lbnQgYXMgaGUncyBkcml2aW5nIGZhdWx0IHJlcG9ydC4gTGV0
-J3Mga2VlcCBpbiB0b3VjaCBvbg0KdGhpcyBQYXNzdGhydS1Nb2RlIGVuYWJsaW5nLg0KDQpUaGFu
-a3MsDQpZaSBMDQoNCg==
+> > +static bool vga_scanline_invalidated(VGACommonState *s, int y)
+> > +{
+> > +    if (y >=3D VGA_MAX_HEIGHT) {
+> > +        return false;
+> > +    }
+> > +    return s->invalidated_y_table[y >> 5] |=3D 1 << (y & 0x1f);
+> > +}
+
+> The return stmt doesn't match what you're replacing.  Are you really inte=
+nding=20
+> to modify invalidated_y_table here?
+
+No.  Really stupid cut&paste bug.  Fixed.
+
+thanks,
+  Gerd
