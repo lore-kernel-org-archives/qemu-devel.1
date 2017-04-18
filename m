@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60951)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d0Qlu-000597-Nm
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 06:54:11 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d0QsV-0006tF-FC
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 07:01:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d0Qlt-0002cm-JH
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 06:54:10 -0400
-Date: Tue, 18 Apr 2017 12:53:55 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170418105355.GB9236@noname.redhat.com>
-References: <20170418103948.13965-1-famz@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1d0QsQ-0004xT-IE
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 07:00:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36372)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d0QsQ-0004x3-C0
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 07:00:54 -0400
+Date: Tue, 18 Apr 2017 12:00:48 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170418110047.GD2205@work-vm>
+References: <20170405190024.27581-1-dgilbert@redhat.com>
+	<20170413205525.GD4376@thinpad.lan.raisama.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170418103948.13965-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9-rc5 v3] block: Drain BH in
- bdrv_drained_begin
+In-Reply-To: <20170413205525.GD4376@thinpad.lan.raisama.net>
+Subject: Re: [Qemu-devel] [PATCH 0/3 for 2.10] migration/i386 cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,73 +27,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, pbonzini@redhat.com, jcody@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, quintela@redhat.com
 
-Am 18.04.2017 um 12:39 hat Fam Zheng geschrieben:
-> During block job completion, nothing is preventing
-> block_job_defer_to_main_loop_bh from being called in a nested
-> aio_poll(), which is a trouble, such as in this code path:
+* Eduardo Habkost (ehabkost@redhat.com) wrote:
+> On Wed, Apr 05, 2017 at 08:00:21PM +0100, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > Hi,
+> >   This removes some qemu_get_ and qemu_put_ use from i386/machine.c
+> > and cleans out some very old code.
+> >   It breaks migration compatibility from prior to 0.12
+> > for i386 and prior to ~0.14 for non-softfloat - it doesn't alter the
+> > machine type, it just removes some old stream features.
+> > 
+> > (Has anyone got a good test of FP migration to make sure
+> > I've not broken the FP/mmx/etc cases?)
 > 
->     qmp_block_commit
->       commit_active_start
->         bdrv_reopen
->           bdrv_reopen_multiple
->             bdrv_reopen_prepare
->               bdrv_flush
->                 aio_poll
->                   aio_bh_poll
->                     aio_bh_call
->                       block_job_defer_to_main_loop_bh
->                         stream_complete
->                           bdrv_reopen
-> 
-> block_job_defer_to_main_loop_bh is the last step of the stream job,
-> which should have been "paused" by the bdrv_drained_begin/end in
-> bdrv_reopen_multiple, but it is not done because it's in the form of a
-> main loop BH.
-> 
-> Similar to why block jobs should be paused between drained_begin and
-> drained_end, BHs they schedule must be excluded as well.  To achieve
-> this, this patch forces draining the BH in BDRV_POLL_WHILE.
-> 
-> Also because the BH in question can do bdrv_unref and child replacing,
-> protect @bs carefully to avoid use-after-free.
-> 
-> As a side effect this fixes a hang in block_job_detach_aio_context
-> during system_reset when a block job is ready:
-> 
->     #0  0x0000555555aa79f3 in bdrv_drain_recurse
->     #1  0x0000555555aa825d in bdrv_drained_begin
->     #2  0x0000555555aa8449 in bdrv_drain
->     #3  0x0000555555a9c356 in blk_drain
->     #4  0x0000555555aa3cfd in mirror_drain
->     #5  0x0000555555a66e11 in block_job_detach_aio_context
->     #6  0x0000555555a62f4d in bdrv_detach_aio_context
->     #7  0x0000555555a63116 in bdrv_set_aio_context
->     #8  0x0000555555a9d326 in blk_set_aio_context
->     #9  0x00005555557e38da in virtio_blk_data_plane_stop
->     #10 0x00005555559f9d5f in virtio_bus_stop_ioeventfd
->     #11 0x00005555559fa49b in virtio_bus_stop_ioeventfd
->     #12 0x00005555559f6a18 in virtio_pci_stop_ioeventfd
->     #13 0x00005555559f6a18 in virtio_pci_reset
->     #14 0x00005555559139a9 in qdev_reset_one
->     #15 0x0000555555916738 in qbus_walk_children
->     #16 0x0000555555913318 in qdev_walk_children
->     #17 0x0000555555916738 in qbus_walk_children
->     #18 0x00005555559168ca in qemu_devices_reset
->     #19 0x000055555581fcbb in pc_machine_reset
->     #20 0x00005555558a4d96 in qemu_system_reset
->     #21 0x000055555577157a in main_loop_should_exit
->     #22 0x000055555577157a in main_loop
->     #23 0x000055555577157a in main
-> 
-> The rationale is that the loop in block_job_detach_aio_context cannot
-> make any progress in pausing/completing the job, because bs->in_flight
-> is 0, so bdrv_drain doesn't process the block_job_defer_to_main_loop
-> BH. With this patch, it does.
-> 
-> Reported-by: Jeff Cody <jcody@redhat.com>
-> Signed-off-by: Fam Zheng <famz@redhat.com>
+> It would be nice if we could allow kvm-unit-tests test cases
+> trigger a migration operation at a specific instruction. I assume
+> we don't have an existing mechanism that could be used for that?
 
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Not that I know of, do we have any type of breakpoint type thing
+we could use?
+
+Dave
+
+> -- 
+> Eduardo
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
