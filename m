@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0I36-00068v-PJ
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 21:35:21 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d0I4y-0007gX-Sa
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 21:37:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0I35-00048H-L5
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 21:35:20 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Mon, 17 Apr 2017 20:33:56 -0500
-Message-Id: <20170418013356.3578-32-eblake@redhat.com>
-In-Reply-To: <20170418013356.3578-1-eblake@redhat.com>
-References: <20170418013356.3578-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH 31/31] block: Drop unused
- .bdrv_co_get_block_status()
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d0I4u-0005OJ-Kg
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 21:37:16 -0400
+References: <1489756546-27142-1-git-send-email-kwolf@redhat.com>
+	<1489756546-27142-3-git-send-email-kwolf@redhat.com>
+	<ac3e7855-9dfb-5bc7-daee-6d062173f6cb@redhat.com>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <58F56D90.50509@huawei.com>
+Date: Tue, 18 Apr 2017 09:36:16 +0800
+MIME-Version: 1.0
+In-Reply-To: <ac3e7855-9dfb-5bc7-daee-6d062173f6cb@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 2/8] replication: clarify permissions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,123 +24,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@nongnu.org, jsnow@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: xuquan8@huawei.com, Wen Congyang <wencongyang@gmail.com>, Wen Congyang <wencongyang2@huawei.com>, qemu-devel@nongnu.org, xiecl.fnst@cn.fujitsu.com
 
-We are gradually moving away from sector-based interfaces, towards
-byte-based.  Now that all drivers have been updated to provide the
-byte-based .bdrv_co_block_status(), we can delete the sector-based
-interface.
+On 2017/4/18 9:23, Eric Blake wrote:
+> On 03/17/2017 08:15 AM, Kevin Wolf wrote:
+>> From: Changlong Xie <xiecl.fnst@cn.fujitsu.com>
+>>
+>> Even if hidden_disk, secondary_disk are backing files, they all need
+>> write permissions in replication scenario. Otherwise we will encouter
+>> below exceptions on secondary side during adding nbd server:
+>>
+>> {'execute': 'nbd-server-add', 'arguments': {'device': 'colo-disk', 'writable': true } }
+>> {"error": {"class": "GenericError", "desc": "Conflicts with use by hidden-qcow2-driver as 'backing', which does not allow 'write' on sec-qcow2-driver-for-nbd"}}
+>>
+>> CC: Zhang Hailiang <zhang.zhanghailiang@huawei.com>
+>> CC: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>> CC: Wen Congyang <wencongyang2@huawei.com>
+> This address for Wen Congyang is different than the one listed in
+> MAINTAINERS for replication (M: Wen Congyang <wency@cn.fujitsu.com>),
+> and different still from addresses my mailer has harvested from other
+> posts (wencongyang@gmail.com).  The MAINTAINERS entry is now resulting
+> in 'undelivered mail' bounce messages, can you please submit an update
+> to MAINTAINERS with your new preferred address? [or gently correct me if
+> I'm confusing two people with the same name?]
+>
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- include/block/block_int.h |  3 ---
- block/io.c                | 59 ++++++++++++++++++++---------------------------
- 2 files changed, 25 insertions(+), 37 deletions(-)
+No, the same people, he just left his job from fujitsu, the entry in MAINTAINERS
+file needs to be updated.
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 8f20bc3..25197d7 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -174,9 +174,6 @@ struct BlockDriver {
-      * BDRV_BLOCK_DATA, _ZERO, _OFFSET_VALID, and _RAW, and only
-      * according to the current BDS.
-      */
--    int64_t coroutine_fn (*bdrv_co_get_block_status)(BlockDriverState *bs,
--        int64_t sector_num, int nb_sectors, int *pnum,
--        BlockDriverState **file);
-     int64_t coroutine_fn (*bdrv_co_block_status)(BlockDriverState *bd,
-         int64_t offset, int64_t bytes, int64_t *pnum,
-         BlockDriverState **file);
-diff --git a/block/io.c b/block/io.c
-index 361eeb8..0488d08 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -1719,6 +1719,7 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
-     int64_t n; /* bytes */
-     int64_t ret, ret2;
-     BlockDriverState *tmp_file;
-+    int64_t aligned_offset, aligned_bytes;
+Cc: Changlong Xie <xiecl.fnst@cn.fujitsu.com>
+Hi Changlong, would you please send a patch to update it ?
 
-     total_size = bdrv_getlength(bs);
-     if (total_size < 0) {
-@@ -1738,7 +1739,7 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
-         bytes = n;
-     }
-
--    if (!bs->drv->bdrv_co_get_block_status && !bs->drv->bdrv_co_block_status) {
-+    if (!bs->drv->bdrv_co_block_status) {
-         *pnum = bytes;
-         ret = BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED;
-         if (bs->drv->protocol_name) {
-@@ -1752,45 +1753,35 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
-     }
-     *file = NULL;
-     bdrv_inc_in_flight(bs);
--    if (bs->drv->bdrv_co_get_block_status) {
--        int count; /* sectors */
-
--        assert(QEMU_IS_ALIGNED(offset | bytes, BDRV_SECTOR_SIZE));
--        ret = bs->drv->bdrv_co_get_block_status(bs, offset >> BDRV_SECTOR_BITS,
--                                                bytes >> BDRV_SECTOR_BITS,
--                                                &count, file);
--        *pnum = count * BDRV_SECTOR_SIZE;
--    } else {
--        /* Round out to request_alignment boundaries */
--        int64_t aligned_offset, aligned_bytes;
--
--        aligned_offset = QEMU_ALIGN_DOWN(offset, bs->bl.request_alignment);
--        aligned_bytes = ROUND_UP(offset + bytes,
--                                 bs->bl.request_alignment) - aligned_offset;
--        ret = bs->drv->bdrv_co_block_status(bs, aligned_offset, aligned_bytes,
--                                            &n, file);
--        /* Clamp pnum and ret to original request */
--        if (aligned_offset != offset && ret >= 0) {
--            int sectors = DIV_ROUND_UP(offset, BDRV_SECTOR_SIZE) -
--                DIV_ROUND_UP(aligned_offset, BDRV_SECTOR_SIZE);
--
--            assert(n >= offset - aligned_offset);
--            n -= offset - aligned_offset;
--            if (sectors) {
--                ret += sectors * BDRV_SECTOR_SIZE;
--            }
--        }
--        if (ret >= 0 && n > bytes) {
--            assert(aligned_bytes != bytes);
--            n = bytes;
--        }
--        *pnum = n;
--    }
-+    /* Round out to request_alignment boundaries */
-+    aligned_offset = QEMU_ALIGN_DOWN(offset, bs->bl.request_alignment);
-+    aligned_bytes = ROUND_UP(offset + bytes,
-+                             bs->bl.request_alignment) - aligned_offset;
-+    ret = bs->drv->bdrv_co_block_status(bs, aligned_offset, aligned_bytes,
-+                                        &n, file);
-     if (ret < 0) {
-         *pnum = 0;
-         goto out;
-     }
-
-+    /* Clamp pnum and ret to original request */
-+    if (aligned_offset != offset && ret >= 0) {
-+        int sectors = DIV_ROUND_UP(offset, BDRV_SECTOR_SIZE) -
-+            DIV_ROUND_UP(aligned_offset, BDRV_SECTOR_SIZE);
-+
-+        assert(n >= offset - aligned_offset);
-+        n -= offset - aligned_offset;
-+        if (sectors) {
-+            ret += sectors * BDRV_SECTOR_SIZE;
-+        }
-+    }
-+    if (n > bytes) {
-+        assert(aligned_bytes != bytes);
-+        n = bytes;
-+    }
-+    *pnum = n;
-+
-     if (ret & BDRV_BLOCK_RAW) {
-         assert(ret & BDRV_BLOCK_OFFSET_VALID);
-         ret = bdrv_block_status(*file, ret & BDRV_BLOCK_OFFSET_MASK,
--- 
-2.9.3
+Hailiang
