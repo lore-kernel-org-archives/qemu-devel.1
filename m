@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=27457243e=anshul.makkar@citrix.com>)
-	id 1d0X8s-0007AG-G0
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:42:19 -0400
+	(envelope-from <ashijeetacharya@gmail.com>) id 1d0X9k-0007a4-VV
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:43:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=27457243e=anshul.makkar@citrix.com>)
-	id 1d0X8p-0004oC-BZ
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:42:18 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:14436)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=27457243e=anshul.makkar@citrix.com>)
-	id 1d0X8o-0004no-Vu
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:42:15 -0400
-From: anshul makkar <anshul.makkar@citrix.com>
-Message-ID: <152817b5-89cf-14fe-d83a-bb5c8d748c90@citrix.com>
-Date: Tue, 18 Apr 2017 18:42:08 +0100
+	(envelope-from <ashijeetacharya@gmail.com>) id 1d0X9j-0005R8-OH
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:43:13 -0400
+Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:33543)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ashijeetacharya@gmail.com>)
+	id 1d0X9j-0005Qt-JC
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:43:11 -0400
+Received: by mail-oi0-x230.google.com with SMTP id b187so169854oif.0
+	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 10:43:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] CUSE-TPM : Win 10 reports TPM device doesn't have
- sufficient resources
+In-Reply-To: <b45474c4-e4f6-6509-adcd-31aee92fd62c@redhat.com>
+References: <CAC2QTZa6LW2LcWQUDvT88KVw=O+D99ku03XcE3kiLi_SC4UMBw@mail.gmail.com>
+	<4ea264eb-128c-569a-264c-8ffa3956dca2@redhat.com>
+	<CAC2QTZYq4v+zcYQ3LrkWrYdZYEVwYe1kjpfh30+kKe+p+Z3-vg@mail.gmail.com>
+	<b45474c4-e4f6-6509-adcd-31aee92fd62c@redhat.com>
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Date: Tue, 18 Apr 2017 23:13:10 +0530
+Message-ID: <CAC2QTZbvyKNFjLhaDn_tWzeF=X2kkNpq=2wws_yBLkhFbiBJBA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] DMG chunk size independence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,101 +31,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: stefanb@us.ibm.com
+To: John Snow <jsnow@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-Hi,
+On Tue, Apr 18, 2017 at 10:35 PM, John Snow <jsnow@redhat.com> wrote:
+>
+>>
+>>     I could be wrong, but that's my hunch.
+>>
+>>     Maybe you can cache the state of the INFLATE process such that once you
+>>     fill the cache with data, we can simply resume the INFLATE procedure
+>>     when the guest almost inevitably asks for the next subsequent bytes.
+>>
+>>     That'd probably be efficient /enough/ in most cases without having to
+>>     worry about a metadata cache for zlib blocks or a literal data cache for
+>>     inflated data.
+>>
+>>
+>> Yes, I have a similar approach in mind to inflate one sector at a time
+>> and save the offset in the compressed stream and treat it as an access
+>> point for the next one.
+>>
+>
+> Right, just save whatever zlib library state you need to save and resume
+> inflating. Probably the most reasonable way to go for v1. As long as you
+> can avoid re-inflating prior data in a chunk when possible this is
+> probably good.
 
+Yup, I have started with that. Something you should know is that I had
+an IRC discussion with Kevin and he suggested to fix the buffer size
+to a max of 2MiB as 512b (which I proposed in my previous response) is
+excessively low and will slow down the driver drastically!
 
-I am using CUSE-TPM based on
-
-https://github.com/stefanberger/qemu-tpmbranch: 2.4.1+tpm
-
-
-https://github.com/stefanberger/swtpm
-
-
-https://github.com/ts468/seabios-tpm
-
-
-I am facing an issue where WIndows 10 guest device manager reports TPM 
-status as @
-
-The device status is "The device cannot find enough free resources it can use (Code 12)"#
-
-On browsing I found this page 
-  @https://bugzilla.redhat.com/show_bug.cgi?id=1281413" that reports 
-exactly the same problem and the resolution patch @ 
-https://bugzilla.redhat.com/attachment.cgi?id=1137166​ .
-
-
-I applied the patch on the code and verified with debug trace that the 
-patch code does executes.
-
-
-But, I am still observingthe sameissue on Win 10 guest and on using 
-ACPIdump utility in Windows guest I canstill see"IRQ5 and IRQNoFlags" in 
-the ssdt.dsl code.
-
-  Device (ISA.TPM)
-{
-Name (_HID, EisaId ("PNP0C31"))  // _HID: Hardware ID
-Name (_STA, 0x0F)  // _STA: Status
-Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
-{
-Memory32Fixed (ReadWrite,
-0xFED40000,         // Address Base
-0x00005000,         // Address Length
-)
-IRQNoFlags ()
-{5}
-})
-
-
-
-I am bit confused, from my understanding, its the QEMU that builds the 
-SSDT table and I can also verify it from the logs. But somehow guest is 
-getting the old ACPI values for TPM which is not acceptable to Windows.
-
-Just to be sure, I also verified the SeaBIOS code and couldn't find any 
-link to this table.
-
-
-Here is the patch that I applied based on the link above:
-
-
-if (misc->tpm_version != TPM_VERSION_UNSPEC) {
-          ACPI_BUILD_DPRINTF("TPM: add MMIO\n");
-          dev = aml_device("TPM");
-          aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0C31")));
-          aml_append(dev, aml_name_decl("_STA", aml_int(0xF)));
-          crs = aml_resource_template();
-          aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,
-                     TPM_TIS_ADDR_SIZE, AML_READ_WRITE));
-          aml_append(dev, aml_name_decl("_CRS", crs));
-          aml_append(sb_scope, dev);
-      }
-aml_append(ssdt, sb_scope);
-
-logs once I start qemu:
-
-CPI_BUILD: init ACPI tables
-ACPI_BUILD: TPM: add MMIO
-ACPI_BUILD: init ACPI tables
-ACPI_BUILD: TPM: add MMIO
-
-tpm_tis:  read.4(00000f00) = 00011014
-tpm_tis: write.1(00000008) = 00000000
-tpm_tis:  read.1(00000000) = 00000081
-
-Commands to start vTPM:
-swtpm_cuse -M 260 -m 1 -n vtpm0
-
-qemu-system-x86_64 -enable-kvm -m 1024 -boot d -bios bios.bin -boot 
-menu=on -tpmdev cuse-tpm,id=tpm0,path=/dev/vtpm0 -device 
-tpm-tis,tpmdev=tpm0 win.img
-
-Please suggest if I am missing anything .
-
-Thanks
-Anshul Makkar
+Ashijeet
