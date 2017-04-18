@@ -1,15 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d0Z1Y-0004Bw-4M
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 15:42:53 -0400
+	(envelope-from <bounces@canonical.com>) id 1d0Z98-0008Mu-Qn
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 15:50:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d0Z1X-0000Cj-02
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 15:42:52 -0400
-From: Jeff Cody <jcody@redhat.com>
-Date: Tue, 18 Apr 2017 15:42:41 -0400
-Message-Id: <d59c2f6ad6c1da8b9b3c7f357c94a7122ccfc55a.1492544096.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 for-2.10] qemu-iotests: _cleanup_qemu must
- be called on exit
+	(envelope-from <bounces@canonical.com>) id 1d0Z93-0008Hf-TL
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 15:50:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60489)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d0Z93-0008H1-N9
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 15:50:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d0Z90-0004wq-EP
+	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 19:50:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6C0612E80BF
+	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 19:50:34 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 18 Apr 2017 19:42:45 -0000
+From: pranith <1681688@bugs.launchpad.net>
+Reply-To: Bug 1681688 <1681688@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170411080154.12474.20009.malonedeb@gac.canonical.com>
+Message-Id: <20170418194245.17360.81760.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1681688] Re: qemu live migration failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,181 +37,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com
 
-For the tests that use the common.qemu functions for running a QEMU
-process, _cleanup_qemu must be called in the exit function.
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-If it is not, if the qemu process aborts, then not all of the droppings
-are cleaned up (e.g. pidfile, fifos).
+-- =
 
-This updates those tests that did not have a cleanup in qemu-iotests.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1681688
 
-(I swapped spaces for tabs in test 102 as well)
+Title:
+  qemu live migration failed
 
-Reported-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Jeff Cody <jcody@redhat.com>
----
+Status in QEMU:
+  Incomplete
 
-v3 added test 156
-v2 fixed typo in test 094, s/cleanup/_cleanup/ for the trap function. (Eric)
+Bug description:
+  qemu live migration failed
 
- tests/qemu-iotests/028 |  1 +
- tests/qemu-iotests/094 | 11 ++++++++---
- tests/qemu-iotests/102 |  5 +++--
- tests/qemu-iotests/109 |  1 +
- tests/qemu-iotests/117 |  1 +
- tests/qemu-iotests/130 |  1 +
- tests/qemu-iotests/140 |  1 +
- tests/qemu-iotests/141 |  1 +
- tests/qemu-iotests/143 |  1 +
- tests/qemu-iotests/156 |  1 +
- 10 files changed, 19 insertions(+), 5 deletions(-)
+  the dest qemu report this error.
 
-diff --git a/tests/qemu-iotests/028 b/tests/qemu-iotests/028
-index 7783e57..97a8869 100755
---- a/tests/qemu-iotests/028
-+++ b/tests/qemu-iotests/028
-@@ -32,6 +32,7 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
-+    _cleanup_qemu
-     rm -f "${TEST_IMG}.copy"
-     _cleanup_test_img
- }
-diff --git a/tests/qemu-iotests/094 b/tests/qemu-iotests/094
-index 0ba0b0c..9aa01e3 100755
---- a/tests/qemu-iotests/094
-+++ b/tests/qemu-iotests/094
-@@ -27,7 +27,14 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--trap "exit \$status" 0 1 2 3 15
-+_cleanup()
-+{
-+    _cleanup_qemu
-+    _cleanup_test_img
-+    rm -f "$TEST_DIR/source.$IMGFMT"
-+}
-+
-+trap "_cleanup; exit \$status" 0 1 2 3 15
- 
- # get standard environment, filters and checks
- . ./common.rc
-@@ -73,8 +80,6 @@ _send_qemu_cmd $QEMU_HANDLE \
- 
- wait=1 _cleanup_qemu
- 
--_cleanup_test_img
--rm -f "$TEST_DIR/source.$IMGFMT"
- 
- # success, all done
- echo '*** done'
-diff --git a/tests/qemu-iotests/102 b/tests/qemu-iotests/102
-index 64b4af9..87db1bb 100755
---- a/tests/qemu-iotests/102
-+++ b/tests/qemu-iotests/102
-@@ -25,11 +25,12 @@ seq=$(basename $0)
- echo "QA output created by $seq"
- 
- here=$PWD
--status=1	# failure is the default!
-+status=1    # failure is the default!
- 
- _cleanup()
- {
--	_cleanup_test_img
-+    _cleanup_qemu
-+    _cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
-diff --git a/tests/qemu-iotests/109 b/tests/qemu-iotests/109
-index 927151a..6161633 100755
---- a/tests/qemu-iotests/109
-+++ b/tests/qemu-iotests/109
-@@ -29,6 +29,7 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
-+    _cleanup_qemu
-     rm -f $TEST_IMG.src
- 	_cleanup_test_img
- }
-diff --git a/tests/qemu-iotests/117 b/tests/qemu-iotests/117
-index e955d52..6c83461 100755
---- a/tests/qemu-iotests/117
-+++ b/tests/qemu-iotests/117
-@@ -29,6 +29,7 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
-+    _cleanup_qemu
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
-diff --git a/tests/qemu-iotests/130 b/tests/qemu-iotests/130
-index ecc8a5b..d4d148b 100755
---- a/tests/qemu-iotests/130
-+++ b/tests/qemu-iotests/130
-@@ -31,6 +31,7 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
-+    _cleanup_qemu
-     _cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
-diff --git a/tests/qemu-iotests/140 b/tests/qemu-iotests/140
-index 49f9df4..8c80a5a 100755
---- a/tests/qemu-iotests/140
-+++ b/tests/qemu-iotests/140
-@@ -33,6 +33,7 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
-+    _cleanup_qemu
-     _cleanup_test_img
-     rm -f "$TEST_DIR/nbd"
- }
-diff --git a/tests/qemu-iotests/141 b/tests/qemu-iotests/141
-index 27fb1cc..40a3405 100755
---- a/tests/qemu-iotests/141
-+++ b/tests/qemu-iotests/141
-@@ -29,6 +29,7 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
-+    _cleanup_qemu
-     _cleanup_test_img
-     rm -f "$TEST_DIR/{b,m,o}.$IMGFMT"
- }
-diff --git a/tests/qemu-iotests/143 b/tests/qemu-iotests/143
-index ec4ef22..5ff1944 100755
---- a/tests/qemu-iotests/143
-+++ b/tests/qemu-iotests/143
-@@ -29,6 +29,7 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
-+    _cleanup_qemu
-     rm -f "$TEST_DIR/nbd"
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
-diff --git a/tests/qemu-iotests/156 b/tests/qemu-iotests/156
-index cc95ff1..2c9d23b 100755
---- a/tests/qemu-iotests/156
-+++ b/tests/qemu-iotests/156
-@@ -37,6 +37,7 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
-+    _cleanup_qemu
-     rm -f "$TEST_IMG{,.target}{,.backing,.overlay}"
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
--- 
-2.9.3
+  Receiving block device images
+  Completed 0 %^Mqemu-system-x86_64: block/io.c:1348: bdrv_aligned_pwritev:=
+ Assertion `child->perm & BLK_PERM_WRITE' failed.
+
+  this bug is caused by this patch:
+  http://git.qemu-project.org/?p=3Dqemu.git;a=3Dcommit;h=3Dd35ff5e6b3aa3a70=
+6b0aa3bcf11400fac945b67a
+
+  rollback this commit, the problem solved.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1681688/+subscriptions
