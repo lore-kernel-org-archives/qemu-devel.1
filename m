@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0X5H-0005mI-Ow
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:38:36 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1d0X7L-0006U5-DI
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:40:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0X5E-0003HA-JB
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:38:35 -0400
-References: <fa564521b3660d574057fde906624e621d518c92.1492536554.git.jcody@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <80faa666-bbb3-a068-8eaf-3f35331eaa27@redhat.com>
-Date: Tue, 18 Apr 2017 12:38:08 -0500
+	(envelope-from <sstabellini@kernel.org>) id 1d0X7I-0003vo-5Z
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:40:43 -0400
+Received: from mail.kernel.org ([198.145.29.136]:53970)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1d0X7H-0003vE-NP
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 13:40:40 -0400
+Date: Tue, 18 Apr 2017 10:40:33 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <03cfd81856554ecd91c0c317353e819b@AMSPEX02CL03.citrite.net>
+Message-ID: <alpine.DEB.2.10.1704181038360.31486@sstabellini-ThinkPad-X260>
+References: <alpine.DEB.2.10.1704141429110.23677@sstabellini-ThinkPad-X260>
+	<alpine.DEB.2.10.1704141734161.23677@sstabellini-ThinkPad-X260>
+	<03cfd81856554ecd91c0c317353e819b@AMSPEX02CL03.citrite.net>
 MIME-Version: 1.0
-In-Reply-To: <fa564521b3660d574057fde906624e621d518c92.1492536554.git.jcody@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="1CXrO2WhDWb6S6v5L9hJnXpgut5ddx2RQ"
-Subject: Re: [Qemu-devel] [PATCH for-2.10 1/1] qemu-iotests: _cleanup_qemu
- must be called on exit
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] QEMU build breakage on ARM against Xen 4.9 caused
+ by libxendevicemodel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,81 +29,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
+To: Paul Durrant <Paul.Durrant@citrix.com>
+Cc: 'Stefano Stabellini' <sstabellini@kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Anthony Perard <anthony.perard@citrix.com>, Wei Liu <wei.liu2@citrix.com>, "jgross@suse.com" <jgross@suse.com>, "julien.grall@arm.com" <julien.grall@arm.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1CXrO2WhDWb6S6v5L9hJnXpgut5ddx2RQ
-From: Eric Blake <eblake@redhat.com>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
-Message-ID: <80faa666-bbb3-a068-8eaf-3f35331eaa27@redhat.com>
-Subject: Re: [PATCH for-2.10 1/1] qemu-iotests: _cleanup_qemu must be called
- on exit
-References: <fa564521b3660d574057fde906624e621d518c92.1492536554.git.jcody@redhat.com>
-In-Reply-To: <fa564521b3660d574057fde906624e621d518c92.1492536554.git.jcody@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, 18 Apr 2017, Paul Durrant wrote:
+> > -----Original Message-----
+> > From: Stefano Stabellini [mailto:sstabellini@kernel.org]
+> > Sent: 15 April 2017 01:40
+> > To: Stefano Stabellini <sstabellini@kernel.org>
+> > Cc: Paul Durrant <Paul.Durrant@citrix.com>; qemu-devel@nongnu.org;
+> > Anthony Perard <anthony.perard@citrix.com>; Wei Liu
+> > <wei.liu2@citrix.com>; jgross@suse.com; julien.grall@arm.com; xen-
+> > devel@lists.xenproject.org
+> > Subject: Re: QEMU build breakage on ARM against Xen 4.9 caused by
+> > libxendevicemodel
+> > 
+> > On Fri, 14 Apr 2017, Stefano Stabellini wrote:
+> > > Hi Paul,
+> > >
+> > > The following commit in my qemu "next" branch breaks the build on arm
+> > > and arm64:
+> > >
+> > > commit 670271647ad15e9d937ced7a72c892349c709216
+> > > Author: Paul Durrant <paul.durrant@citrix.com>
+> > > Date:   Tue Mar 7 10:55:34 2017 +0000
+> > >
+> > >     xen: use libxendevicemodel when available
+> > >
+> > > See the appended build log. Sorry for not realizing it sooner.
+> > 
+> > As I imagined, this bug is easy to solve. It is reproducible on x86 too,
+> > if you pass -DXC_WANT_COMPAT_DEVICEMODEL_API=1 to configure and
+> > forcefully disable Xen 4.9 detection in the configure script.
+> > 
+> > If QEMU detects xen_ctrl_version = 480, the build will fail against Xen
+> > 4.9, even when -DXC_WANT_COMPAT_DEVICEMODEL_API=1 is specified.
+> > 
+> > The appended patch solves the problem. However, Xen 4.9 detection and
+> > compilation remain broken.
+> 
+> Ok, that fix looks fine to me.
 
-On 04/18/2017 12:31 PM, Jeff Cody wrote:
-> For the tests that use the common.qemu functions for running a QEMU
-> process, _cleanup_qemu must be called in the exit function.
->=20
-> If it is not, if the qemu process aborts, then not all of the droppings=
+I merged this change into "use libxendevicemodel when available" in my
+next branch.
 
-> are cleaned up (e.g. pidfile, fifos).
->=20
-> This updates those tests that did not have a cleanup in qemu-iotests.
->=20
-> (I swapped spaces for tabs in test 102 as well)
->=20
-> Reported-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
-> ---
-
-> +++ b/tests/qemu-iotests/094
-> @@ -27,7 +27,14 @@ echo "QA output created by $seq"
->  here=3D"$PWD"
->  status=3D1	# failure is the default!
-> =20
-> -trap "exit \$status" 0 1 2 3 15
-> +_cleanup()
-> +{
-> +    _cleanup_qemu
-> +    _cleanup_test_img
-> +    rm -f "$TEST_DIR/source.$IMGFMT"
-> +}
-> +
-> +trap "cleanup; exit \$status" 0 1 2 3 15
-
-s/cleanup/_cleanup/
-
-Once you fix that typo,
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Are you going to take care of getting the QEMU build on ARM to work
+against Xen 4.9 (properly detecting 4.9, without
+-DXC_WANT_COMPAT_DEVICEMODEL_API=1)?
 
 
---1CXrO2WhDWb6S6v5L9hJnXpgut5ddx2RQ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY9k8AAAoJEKeha0olJ0NqrNsIAISesUXen/C3KSJvYr5/HNlu
-PIjEeL9QmZO04IyN1qvha4ijmsMiOGtl1we9FsyswBPERfZZD+XLcEsbkh4dvdv+
-Cfk/m/FUkJ5zd4Rr9na1GU9fhr8CawrR3JQF5SNyk8aXnKoUQL3RhmnahXBv1CKn
-EeodN5um2HupuoT2fPXApsAW4k+ezMZsv9g7r/tM1xlSA3mtthbwHAO9GeaFIlnF
-GjMBLbat3NM4n1MtqG2DKn0BPH7ns1tzBZUkjYgrOLtuRdkDi6oxbd5OoDo7SLuM
-5pJ9t8M89McuWqbxRjt9VATXEGX1vZjAcQA5BMemKLz5IdU1ITgk0yj7ilQa3wA=
-=+BBX
------END PGP SIGNATURE-----
-
---1CXrO2WhDWb6S6v5L9hJnXpgut5ddx2RQ--
+> > 
+> > ---
+> > 
+> > diff --git a/include/hw/xen/xen_common.h
+> > b/include/hw/xen/xen_common.h
+> > index 274accc..b1f5f53 100644
+> > --- a/include/hw/xen/xen_common.h
+> > +++ b/include/hw/xen/xen_common.h
+> > @@ -9,7 +9,6 @@
+> >  #undef XC_WANT_COMPAT_EVTCHN_API
+> >  #undef XC_WANT_COMPAT_GNTTAB_API
+> >  #undef XC_WANT_COMPAT_MAP_FOREIGN_API
+> > -#undef XC_WANT_COMPAT_DEVICEMODEL_API
+> > 
+> >  #include <xenctrl.h>
+> >  #include <xenstore.h>
+> > @@ -154,6 +153,7 @@ static inline int xendevicemodel_set_mem_type(
+> > 
+> >  #else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 490 */
+> > 
+> > +#undef XC_WANT_COMPAT_DEVICEMODEL_API
+> >  #include <xendevicemodel.h>
+> > 
+> >  #endif
+> 
