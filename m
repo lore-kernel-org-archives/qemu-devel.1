@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d0UCC-0003mn-Ko
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:33:33 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1d0UHM-0007Sf-VL
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:38:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d0UCB-0006oH-Gl
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:33:32 -0400
-Date: Tue, 18 Apr 2017 11:33:12 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170418143312.GN25239@thinpad.lan.raisama.net>
-References: <20170328021651.19350-1-david@gibson.dropbear.id.au>
-	<20170328021651.19350-3-david@gibson.dropbear.id.au>
-	<20170417183045.GA7078@thinpad.lan.raisama.net>
-	<20170418022151.GD12235@umbus.fritz.box>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1d0UHJ-0001L7-4U
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:38:53 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:38143
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1d0UHI-0001E7-Sj
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:38:49 -0400
+References: <1491381329-3995-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1491381329-3995-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<f56ec3d4-236e-2082-db5a-8402eb050503@twiddle.net>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <03d1cb2e-7b0d-7ae1-a884-413cf388762e@ilande.co.uk>
+Date: Tue, 18 Apr 2017 15:38:10 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170418022151.GD12235@umbus.fritz.box>
-Subject: Re: [Qemu-devel] [RFC for-2.10 2/3] pci: Allow host bridges to
- override PCI/PCIe hybrid device behaviour
+In-Reply-To: <f56ec3d4-236e-2082-db5a-8402eb050503@twiddle.net>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 03/14] cg3: remove unused width and height
+ variables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,94 +31,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: aik@ozlabs.ru, marcel@redhat.com, lersek@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mst@redhat.com
+To: Richard Henderson <rth@twiddle.net>, kraxel@redhat.com, qemu-devel@nongnu.org
 
-On Tue, Apr 18, 2017 at 12:21:51PM +1000, David Gibson wrote:
-> On Mon, Apr 17, 2017 at 03:30:46PM -0300, Eduardo Habkost wrote:
-> > On Tue, Mar 28, 2017 at 01:16:50PM +1100, David Gibson wrote:
-> > > Currently PCI/PCIe hybrid devices - that is, devices which can appear as
-> > > either plain PCI or PCIe depending on where they're attached - will only
-> > > appear in PCIe mode if they're attached to a PCIe bus via a root port or
-> > > downstream port.
-> > > 
-> > > This is correct for "standard" PCIe setups, but there are some platforms
-> > > which need different behaviour (notably "pseries" whose paravirtualized
-> > > PCI host bridges have some idiosyncracies).
-> > > 
-> > > This patch allows the host bridge to override the normal behaviour.
-> > > 
-> > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > > ---
-> > >  hw/pci/pci.c              | 11 +++++++++--
-> > >  include/hw/pci/pci_host.h |  1 +
-> > >  2 files changed, 10 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> > > index 779787b..ac68065 100644
-> > > --- a/hw/pci/pci.c
-> > > +++ b/hw/pci/pci.c
-> > > @@ -392,9 +392,16 @@ bool pci_bus_is_root(PCIBus *bus)
-> > >  
-> > >  bool pci_allow_hybrid_pcie(PCIDevice *pci_dev)
-> > 
-> > Why are we asking the device about allowing hybrid pcie, and not
-> > the bus itself? Shouldn't we be able to query this before the
-> > device is plugged, and before pci_dev->bus is even set?
-> > 
-> > In other words, why pci_allow_hyberid_pcie() and
-> > pci_device_get_bus() get a PCIDevice* argument instead of a
-> > PCIBus* argument?
+On 15/04/17 11:54, Richard Henderson wrote:
+
+> On 04/05/2017 01:35 AM, Mark Cave-Ayland wrote:
+>> These aren't required since we can use the display width and height
+>> directly.
+>>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> ---
+>>  hw/display/cg3.c |   15 ++++++---------
+>>  1 file changed, 6 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/hw/display/cg3.c b/hw/display/cg3.c
+>> index b42f60e..178a6dd 100644
+>> --- a/hw/display/cg3.c
+>> +++ b/hw/display/cg3.c
+>> @@ -93,14 +93,11 @@ static void cg3_update_display(void *opaque)
+>>      uint32_t *data;
+>>      uint32_t dval;
+>>      int x, y, y_start;
+>> -    unsigned int width, height;
+>>      ram_addr_t page, page_min, page_max;
+>>
+>>      if (surface_bits_per_pixel(surface) != 32) {
+>>          return;
+>>      }
+>> -    width = s->width;
+>> -    height = s->height;
+>>
+>>      y_start = -1;
+>>      page_min = -1;
+>> @@ -110,11 +107,11 @@ static void cg3_update_display(void *opaque)
+>>      data = (uint32_t *)surface_data(surface);
+>>
+>>      memory_region_sync_dirty_bitmap(&s->vram_mem);
+>> -    for (y = 0; y < height; y++) {
+>> +    for (y = 0; y < s->height; y++) {
 > 
-> Ah good point.  I made it a PCIDevice simply for convenience, but
-> you're right we should be able to query before the device is plugged.
-
-Understood.
-
+> I suspect the generated code is much worse, since the compiler can no
+> longer tell that the loop bounds are constant.
 > 
-> > 
-> > >  {
-> > > -    PCIBus *bus = pci_dev->bus;
-> > > +    PCIHostState *host_bridge = PCI_HOST_BRIDGE(pci_device_root_bus(pci_dev)->qbus.parent);
-> > 
-> > There's something I don't understand completely: what exactly
-> > guarantees that pci_device_root_bus(...)->qbus.parent is always
-> > going to be a PCI_HOST_BRIDGE?
-> 
-> Well, by definition whatever is above the root bus isn't PCI, which
-> pretty much means it has to be a PCI host bridge.  A machine could
-> break this assumption, but I think that would be a bug.  We use this
-> same pattern to find a PCI device's (or bus's) host bridge in other
-> places - there doesn't appear to be another way.
+> You probably do want to keep width and height in local variables across
+> this function.
 
-After taking a better look at the way PCI buses are created, I
-agree it's OK. Maybe a
-  PCIHostState *pci_host_bridge(PCIBus *bus)
-helper would be useful?
+Can you explain a bit more about this? My thoughts were that with
+optimisation enabled the compiler would assume s->width is constant
+throughout the loop by default (or at least in OpenBIOS I've had to
+explicitly mark variables as volatile to ensure the compiler refetches
+the original value instead of reusing a previous copy from the
+stack/registers)?
 
-Anyway, both pci_bus_root_bus() and pci_host_bridge() could be
-implemented as follow-ups if you prefer, so:
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+ATB,
 
-But I still have another suggestion:
-
-> 
-> > > +    PCIHostBridgeClass *hc = PCI_HOST_BRIDGE_GET_CLASS(host_bridge);
-> > > +
-> > > +    if (hc->allow_hybrid_pcie) {
-> > > +        return hc->allow_hybrid_pcie(host_bridge, pci_dev);
-> > > +    } else {
-> > > +        PCIBus *bus = pci_dev->bus;
-> > >  
-> > > -    return pci_bus_is_express(bus) && !pci_bus_is_root(bus);
-> > > +        return pci_bus_is_express(bus) && !pci_bus_is_root(bus);
-
-Maybe it's a matter of personal taste, but instead of requiring
-an explicit check for NULL hc->allow_hybrid_pcie, why not set a
-default hc->allow_hybrid_pcie() implementation on
-TYPE_PCI_HOST_BRIDGE that returns
-(pci_bus_is_express(bus) && !pci_bus_is_root(bus))?
-
--- 
-Eduardo
+Mark.
