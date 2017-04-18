@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d0UPn-00039v-E5
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:47:36 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d0UUA-0005OX-P3
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:52:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d0UPm-0006Gy-Ju
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:47:35 -0400
-Date: Tue, 18 Apr 2017 15:47:25 +0100
+	(envelope-from <stefanha@gmail.com>) id 1d0UU7-00089R-Fk
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:52:06 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:37130)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d0UU7-00088n-8C
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:52:03 -0400
+Received: by mail-wm0-x233.google.com with SMTP id u2so57240199wmu.0
+	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 07:52:03 -0700 (PDT)
+Date: Tue, 18 Apr 2017 15:52:00 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170418144725.GJ21261@stefanha-x1.localdomain>
-References: <20170412091819.GB4955@noname.str.redhat.com>
+Message-ID: <20170418145200.GK21261@stefanha-x1.localdomain>
+References: <CAGKXQyeSAEHTnkvbjK8gSWf2GXH7Sqxp71N10r2sUdJubFC+RA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Ublo+h3cBgJ33ahC"
+	protocol="application/pgp-signature"; boundary="EVcIhgQsEzAXu06J"
 Content-Disposition: inline
-In-Reply-To: <20170412091819.GB4955@noname.str.redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] migrate -b problems
+In-Reply-To: <CAGKXQyeSAEHTnkvbjK8gSWf2GXH7Sqxp71N10r2sUdJubFC+RA@mail.gmail.com>
+Subject: Re: [Qemu-devel] help for code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,65 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, dgilbert@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, quintela@redhat.com
+To: ali saeedi <ali.saeedi56@gmail.com>
+Cc: qemu-devel@nongnu.org
 
 
---Ublo+h3cBgJ33ahC
+--EVcIhgQsEzAXu06J
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 12, 2017 at 11:18:19AM +0200, Kevin Wolf wrote:
-> after getting assertion failure reports for block migration in the last
-> minute, we just hacked around it by commenting out op blocker assertions
-> for the 2.9 release, but now we need to see how to fix things properly.
-> Luckily, get_maintainer.pl doesn't report me, but only you. :-)
->=20
-> The main problem I see with the block migration code (on the
-> destination) is that it abuses the BlockBackend that belongs to the
-> guest device to make its own writes to the image file. If the guest
-> isn't allowed to write to the image (which it now isn't during incoming
-> migration since it would conflict with the newer style of block
-> migration using an NBD server), writing to this BlockBackend doesn't
-> work any more.
->=20
-> So what should really happen is that incoming block migration creates
-> its own BlockBackend for writing to the image. Now we don't want to do
-> this anew for every incoming block, but ideally we'd just create all
-> necessary BlockBackends upfront and then keep using them throughout the
-> whole migration. Is there a way to get some setup/teardown callbacks
-> at the start/end of the migration that could initialise and free such
-> global data?
+On Wed, Apr 12, 2017 at 04:36:58PM +0430, ali saeedi wrote:
+> I am new in qemu vm live migration. why we have this condition
+> "current_time >= initial_time + BUFFER_DELAY" in qemu?
 
-It can be done in the beginning of block_load() similar to
-block_mig_state.bmds_list, which is created in init_blk_migration() at
-save time.
+BUFFER_DELAY is used for rate-limiting.  The maximum network throughput
+can be set by the user so that QEMU doesn't hog the network link.
 
-We can also move the if (blk !=3D blk_prev) blk_invalidate_cache() code
-out of the load loop.  It should be done once when setting up
-BlockBackends.
+Rate-limit calculations are done every BUFFER_DELAY time interval.
 
-> The other problem with block migration is that is uses a BlockBackend
-> name to identify which device is migrated. However, there can be images
-> that are not attached to any BlockBackend, or if it is, the BlockBackend
-> might be anonymous, so this doesn't work. I suppose changing the field
-> to "device name if available, node-name otherwise" would solve this.
+Stefan
 
-Yes, that sounds good and is backwards compatible.
-
---Ublo+h3cBgJ33ahC
+--EVcIhgQsEzAXu06J
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJY9ib9AAoJEJykq7OBq3PIvB0H/j3M2TMRTR+6itea3g3W2q4G
-icStmCwQg9G6s3xV8w7v9oyH5Drfs6lGMR6jWdFEwUszWQs07etpW81MruizIMc1
-meA0adTXzoZNo7rY4U/b5P1vE/7CQNwEvBfhyJB0wOeQHpOkw+xZwLXBoFLTE6Pr
-UWumas6+BxV0kV8zkDeg5jLAzCXvNNfKRZzyJeRAHZO1riqOEOQJhGgFfqb+ZTq5
-QTwJCh6Wd0JRVra+joMX44JROnw47FnnqL3/NCTUGnfnTlv6iqMRcn7fpiMF0UpU
-W7dYGbLlI8PKD/WYIPCsDMkTfwe/Ts2MLQrjwjlJG2pkLJTT1OR5r+VQGOzuyns=
-=Qz/7
+iQEcBAEBAgAGBQJY9igQAAoJEJykq7OBq3PI3QIH/3DB7B/c2KVviOLr0ZZbvJjt
+G33IoqgK8aQy7eO//PSrvRGADw0Z2qnnXI/SQEG2vM+9HYZbS/DyDWIVuRzkz0Yl
+oRDAtYL+gwe5pQJ7zXxMt9WsYCoP0uLNqzFnGZUyLGTduB9w6KA0BS+wq7B7AFle
+fTkWrlbuHNNkxAZZpenXoy2O3+nZ2xfr6vOsp/ddARt2Ei9nDnIS+QfGM9KsLMRT
+/nV0DRNhC1F5Q5vHM3FDzoYcyL+wzfBUpuVKYuNMCju+uho8lAuGc4LWEoInw1fD
+Znwryfb6SyE1EtMpPNFt1pTIh1X/f66eAIG53ocnfcTcnhVOV9WYHQObXI8DBsE=
+=1k+1
 -----END PGP SIGNATURE-----
 
---Ublo+h3cBgJ33ahC--
+--EVcIhgQsEzAXu06J--
