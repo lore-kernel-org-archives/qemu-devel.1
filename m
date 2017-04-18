@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d0KPu-0005i7-V3
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 00:07:04 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d0KRT-0006jE-LD
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 00:08:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d0KPt-0000JK-6G
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 00:07:02 -0400
-References: <1492158903-8016-1-git-send-email-clg@kaod.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <ea904ecf-4fe5-c437-e595-691c864ca142@redhat.com>
-Date: Tue, 18 Apr 2017 12:06:47 +0800
+	(envelope-from <dgibson@ozlabs.org>) id 1d0KRQ-0000tT-G2
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 00:08:39 -0400
+Received: from ozlabs.org ([103.22.144.67]:47539)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1d0KRQ-0000sq-4S
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 00:08:36 -0400
+Date: Tue, 18 Apr 2017 14:08:07 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170418040807.GQ12235@umbus.fritz.box>
+References: <1492428730-13438-1-git-send-email-peterx@redhat.com>
+	<1492428730-13438-3-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1492158903-8016-1-git-send-email-clg@kaod.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 0/5] FTGMAC100 nic model for the Aspeed
- SoCs
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="i/CQJCAqWP/GQJtX"
+Content-Disposition: inline
+In-Reply-To: <1492428730-13438-3-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/7] memory: remove the last param in
+ memory_region_iommu_replay()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,111 +29,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Dmitry Fleytman <dmitry@daynix.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Lan Tianyu <tianyu.lan@intel.com>, Jason Wang <jasowang@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 
+--i/CQJCAqWP/GQJtX
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 2017=E5=B9=B404=E6=9C=8814=E6=97=A5 16:34, C=C3=A9dric Le Goater wrote=
-:
-> Hi,
->
-> The Aspeed SoCs AST2400 and AST2500 have two FTGMAC100 ethernet
-> controllers. This series proposes a model for this device and a way to
-> customize the bit definitions which are slightly different from the
-> Faraday definitions.
->
-> The last patch adds a fake NC-SI (Network Controller Sideband
-> Interface) backend to pretend a NIC is being managed. This is only
-> usable with the slirp stack for the moment.
->
-> The model has been tested on the 'palmetto', 'romulus' and
-> 'ast2500-evb' machines using different implementations of the Linux
-> driver and with U-Boot. It has been stressed with iperf.
->
-> The full patchset is available here, based on QEMU v2.9.0-rc4 :
->
->    https://github.com/legoater/qemu/commits/aspeed
->
-> To test, grab a palmetto or a romulus BMC firmware image :
->
->    https://openpower.xyz/job/openbmc-build/distro=3Dubuntu,target=3Dpal=
-metto/lastSuccessfulBuild/artifact/images/palmetto/flash-palmetto
->    https://openpower.xyz/job/openbmc-build/distro=3Dubuntu,target=3Drom=
-ulus/lastSuccessfulBuild/artifact/images/romulus/flash-romulus
->
-> and start the machines with  :
->
->    qemu-system-arm -m 512 -M romulus-bmc  -drive file=3Dflash-romulus,f=
-ormat=3Draw,if=3Dmtd  -nographic
->    qemu-system-arm -m 512 -M palmetto-bmc -drive file=3Dflash-palmetto,=
-format=3Draw,if=3Dmtd -nographic
->
-> the fake NC-SI NIC should come up :
->
->    ftgmac100 1e660000.ethernet eth0: NCSI interface up
->
-> and to log, use credentials root/0penBmc
->
-> Thanks,
->
-> C.
->
-> Changes since v2:
->   - rebased on QEMU v2.9.0-rc4
->   - modified the 'ncsi-pkt.h' file to add its location under the Linux
->     tree
->   - removed useless zeroing of the 'reserved' fields
->   - introduced a ncsi_rsp_handlers array to hold the payload size and
->     a specific handler routine for each command
->   - fixed the output size of the frame to match the command payload
->     size
->
-> Changes since v1:
->   - removed TODO comments and used LOG_UNIMP in the read/write ops
->   - used camelcase for struct names and typedefs.
->   - removed the useless struct definitions for ring descriptors and
->     the alignment pragma
->   - introduced a frame buffer at the machine level to reduce stack
->     usage in the tx path.
->   - introduced symbolic constants for PHY values.
->   - introduced rtl8211e PHY chip specific registers
->   - removed qemu_set_irq() in reset path
->   - checked for dma_memory_read() errors. Also for write but that was
->     less important as the descriptor is first read so it should be
->     valid for the write.
->   - removed the irq state
->   - removed the weird hack to catch a first valid descriptor.
->   - fixed the read of the mac address
->
-> C=C3=A9dric Le Goater (5):
->    hw/net: add MII definitions
->    net: add FTGMAC100 support
->    net/ftgmac100: add a 'aspeed' property
->    aspeed: add a FTGMAC100 nic
->    slirp: add a fake NC-SI backend
->
->   default-configs/arm-softmmu.mak |    1 +
->   hw/arm/aspeed_soc.c             |   21 +
->   hw/net/Makefile.objs            |    1 +
->   hw/net/ftgmac100.c              | 1016 ++++++++++++++++++++++++++++++=
-+++++++++
->   include/hw/arm/aspeed_soc.h     |    2 +
->   include/hw/net/ftgmac100.h      |   64 +++
->   include/hw/net/mii.h            |   71 ++-
->   include/net/eth.h               |    1 +
->   slirp/Makefile.objs             |    2 +-
->   slirp/ncsi-pkt.h                |  419 ++++++++++++++++
->   slirp/ncsi.c                    |  130 +++++
->   slirp/slirp.c                   |    4 +
->   slirp/slirp.h                   |    3 +
->   13 files changed, 1716 insertions(+), 19 deletions(-)
->   create mode 100644 hw/net/ftgmac100.c
->   create mode 100644 include/hw/net/ftgmac100.h
->   create mode 100644 slirp/ncsi-pkt.h
->   create mode 100644 slirp/ncsi.c
->
+On Mon, Apr 17, 2017 at 07:32:05PM +0800, Peter Xu wrote:
+> We were always passing in that one as "false" to assume that's an read
+> operation, and we also assume that IOMMU translation would always have
+> that read permission. A better permission would be IOMMU_NONE since the
+> replay is after all not a real read operation, but just a page table
+> rebuilding process.
+>=20
+> CC: David Gibson <david@gibson.dropbear.id.au>
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Queued for 2.10.
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
-Thanks
+> ---
+>  hw/vfio/common.c      | 2 +-
+>  include/exec/memory.h | 5 +----
+>  memory.c              | 8 +++-----
+>  3 files changed, 5 insertions(+), 10 deletions(-)
+>=20
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 6b33b9f..d008a4b 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -488,7 +488,7 @@ static void vfio_listener_region_add(MemoryListener *=
+listener,
+>          QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
+> =20
+>          memory_region_register_iommu_notifier(giommu->iommu, &giommu->n);
+> -        memory_region_iommu_replay(giommu->iommu, &giommu->n, false);
+> +        memory_region_iommu_replay(giommu->iommu, &giommu->n);
+> =20
+>          return;
+>      }
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index 9047bf3..8721d53 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -731,11 +731,8 @@ void memory_region_register_iommu_notifier(MemoryReg=
+ion *mr,
+>   *
+>   * @mr: the memory region to observe
+>   * @n: the notifier to which to replay iommu mappings
+> - * @is_write: Whether to treat the replay as a translate "write"
+> - *     through the iommu
+>   */
+> -void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n,
+> -                                bool is_write);
+> +void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n);
+> =20
+>  /**
+>   * memory_region_iommu_replay_all: replay existing IOMMU translations
+> diff --git a/memory.c b/memory.c
+> index 47dc107..6b2fdb7 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -1620,12 +1620,10 @@ uint64_t memory_region_iommu_get_min_page_size(Me=
+moryRegion *mr)
+>      return TARGET_PAGE_SIZE;
+>  }
+> =20
+> -void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n,
+> -                                bool is_write)
+> +void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n)
+>  {
+>      hwaddr addr, granularity;
+>      IOMMUTLBEntry iotlb;
+> -    IOMMUAccessFlags flag =3D is_write ? IOMMU_WO : IOMMU_RO;
+> =20
+>      /* If the IOMMU has its own replay callback, override */
+>      if (mr->iommu_ops->replay) {
+> @@ -1636,7 +1634,7 @@ void memory_region_iommu_replay(MemoryRegion *mr, I=
+OMMUNotifier *n,
+>      granularity =3D memory_region_iommu_get_min_page_size(mr);
+> =20
+>      for (addr =3D 0; addr < memory_region_size(mr); addr +=3D granularit=
+y) {
+> -        iotlb =3D mr->iommu_ops->translate(mr, addr, flag);
+> +        iotlb =3D mr->iommu_ops->translate(mr, addr, IOMMU_NONE);
+>          if (iotlb.perm !=3D IOMMU_NONE) {
+>              n->notify(n, &iotlb);
+>          }
+> @@ -1654,7 +1652,7 @@ void memory_region_iommu_replay_all(MemoryRegion *m=
+r)
+>      IOMMUNotifier *notifier;
+> =20
+>      IOMMU_NOTIFIER_FOREACH(notifier, mr) {
+> -        memory_region_iommu_replay(mr, notifier, false);
+> +        memory_region_iommu_replay(mr, notifier);
+>      }
+>  }
+> =20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--i/CQJCAqWP/GQJtX
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJY9ZEnAAoJEGw4ysog2bOSln4P/AsGUqx7ZIzJOP2tTFbm8gxR
+9zbaj8je+dYzfxlFZDNrRzgqNlkfbxcaqzf+dvQ0ElARkTqZs5Akrrm4eUtxCms2
+xhzQq4rYOmkosH1HgrL/iARRO2FCJt9JBfz70rhRHPYW5vXryGQFVQFxwlb3V0Lx
+zgIuodI6NmMkF+rUwl/+8h0oE3EAMHU2816XJuBsQCDXItG/Fel4M+rkuCT64+fa
+86sQX+uMHxA2bP7gdIJJ+Nt32l98pKEPa4DqQ1Uw5Ccg0PisoRcO9YHI7uryt9RW
+0GKsxfPA9WSI/OP8oRWNxuF/5ywmLZi79oVJ5OGfdSyjOQZ8nucaZvmLIv/91nWT
+J7GIq2IHsKb4YnBI27cRsd6H7A90ANcUZhS2uTFHbCNxL7pR8EgwFVPSvAwEMIsU
+PiVV7WeUBUXPDcaRM+yqXe0BWk7vI9OMrK3O7z7lWJ7I+4d0ZRCSFulNSF5XLBT0
+vprVe5kj3lv/HiSmhKHPN2Wo8ydEMSg00gg4zB0IGPSyhwQjjyoZavOfZLUoVy7L
+8N7rW3RBzoogjRX62b6k0h919gKhHrr3v1HSyH4eJ6on+Q4MyG8+2rEHzAaYmr9t
+vOb23DaKnwdX4kFTgIor8UEaMTu0oAWRqNYbnIrUP6s5uZhTnxO5R6cRiW9/Cqub
+q8roKO7RGX8b/J+DRV+G
+=jynC
+-----END PGP SIGNATURE-----
+
+--i/CQJCAqWP/GQJtX--
