@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d0KJa-0001Fb-Jo
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 00:00:31 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d0KKi-0001th-GD
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 00:01:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d0KJX-0004kf-Hl
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 00:00:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42642)
+	(envelope-from <dgibson@ozlabs.org>) id 1d0KKh-0005Q8-CB
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 00:01:40 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:57039)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d0KJX-0004jy-7n
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 00:00:27 -0400
-References: <1492426712-12230-1-git-send-email-peterx@redhat.com>
-	<1492426712-12230-8-git-send-email-peterx@redhat.com>
-	<1c5c9278-92b1-6f56-b251-53bf60c7f4e8@redhat.com>
-	<20170418035033.GH16703@pxdev.xzpeter.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <18bd8627-bdca-b9e8-8d4e-c4aa0689d4aa@redhat.com>
-Date: Tue, 18 Apr 2017 12:00:13 +0800
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1d0KKg-0005NB-UE
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 00:01:39 -0400
+Date: Tue, 18 Apr 2017 13:56:01 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170418035601.GN12235@umbus.fritz.box>
+References: <20170417215916.12431-1-ehabkost@redhat.com>
+	<20170417215916.12431-7-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170418035033.GH16703@pxdev.xzpeter.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 7/7] intel_iommu: support passthrough (PT)
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="A2x6GFCQWVc4i5ud"
+Content-Disposition: inline
+In-Reply-To: <20170417215916.12431-7-ehabkost@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 6/7] pci: Set phb->bus inside pci_bus_new()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,147 +28,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Lan Tianyu <tianyu.lan@intel.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S.Tsirkin" <mst@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, aik@ozlabs.ru, David Gibson <dgibson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
 
+--A2x6GFCQWVc4i5ud
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 2017=E5=B9=B404=E6=9C=8818=E6=97=A5 11:50, Peter Xu wrote:
-> On Tue, Apr 18, 2017 at 11:23:35AM +0800, Jason Wang wrote:
->> On 2017=E5=B9=B404=E6=9C=8817=E6=97=A5 18:58, Peter Xu wrote:
-> [...]
->
->>> +static void vtd_switch_address_space(VTDAddressSpace *as)
->>> +{
->>> +    bool use_iommu;
->>> +
->>> +    assert(as);
->>> +
->>> +    use_iommu =3D as->iommu_state->dmar_enabled;
->>> +    if (use_iommu) {
->>> +        /* Further checks per-device configuration */
->>> +        use_iommu &=3D !vtd_dev_pt_enabled(as);
->>> +    }
->> Looks like you can use as->iommu_state->dmar_enabled &&
->> !vtd_dev_pt_enabled(as)
-> vtd_dev_pt_enalbed() needs to read the guest memory (starting from
-> reading root entry), which is slightly slow. I was trying to avoid
-> unecessary reads.
->
-> [...]
+On Mon, Apr 17, 2017 at 06:59:15PM -0300, Eduardo Habkost wrote:
+> Every single caller of pci_bus_new() saves the return value inside
+> phb->bus. Do that inside pci_bus_new() to avoid code duplication and
+> make it harder to break.
+>=20
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel@redhat.com>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-I think compiler won't go to vtd_dev_pt_enabled() if dmar_enabled is fals=
-e.
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
->
->>> @@ -991,6 +1058,18 @@ static void vtd_do_iommu_translate(VTDAddressSp=
-ace *vtd_as, PCIBus *bus,
->>>           cc_entry->context_cache_gen =3D s->context_cache_gen;
->>>       }
->>> +    /*
->>> +     * We don't need to translate for pass-through context entries.
->>> +     * Also, let's ignore IOTLB caching as well for PT devices.
->>> +     */
->>> +    if (vtd_ce_get_type(&ce) =3D=3D VTD_CONTEXT_TT_PASS_THROUGH) {
->>> +        entry->translated_addr =3D entry->iova;
->>> +        entry->addr_mask =3D VTD_PAGE_SIZE - 1;
->>> +        entry->perm =3D IOMMU_RW;
->>> +        trace_vtd_translate_pt(source_id, entry->iova);
->>> +        return;
->>> +    }
->> Several questions here:
->>
->> 1) Is this just for vhost?
-> No. When caching mode is not enabled, all passthroughed devices should
-> be using this path.
+> ---
+>  hw/pci-bridge/pci_expander_bridge.c | 2 --
+>  hw/pci-host/piix.c                  | 1 -
+>  hw/pci-host/q35.c                   | 6 +++---
+>  hw/pci/pci.c                        | 2 +-
+>  4 files changed, 4 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_expa=
+nder_bridge.c
+> index 39d29d2230..8344ca1cc8 100644
+> --- a/hw/pci-bridge/pci_expander_bridge.c
+> +++ b/hw/pci-bridge/pci_expander_bridge.c
+> @@ -245,8 +245,6 @@ static void pxb_dev_realize_common(PCIDevice *dev, bo=
+ol pcie, Error **errp)
+>      bus->address_space_io =3D dev->bus->address_space_io;
+>      bus->map_irq =3D pxb_map_irq_fn;
+> =20
+> -    phb->bus =3D bus;
+> -
+>      pxb_register_bus(dev, bus, &local_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+> diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+> index 91fec05b38..818e4979d8 100644
+> --- a/hw/pci-host/piix.c
+> +++ b/hw/pci-host/piix.c
+> @@ -342,7 +342,6 @@ PCIBus *i440fx_init(const char *host_type, const char=
+ *pci_type,
+>      s =3D PCI_HOST_BRIDGE(dev);
+>      b =3D pci_bus_new(s, NULL, pci_address_space,
+>                      address_space_io, 0, TYPE_PCI_BUS);
+> -    s->bus =3D b;
+>      object_property_add_child(qdev_get_machine(), "i440fx", OBJECT(dev),=
+ NULL);
+>      qdev_init_nofail(dev);
+> =20
+> diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+> index 860b47a1ba..5b41412075 100644
+> --- a/hw/pci-host/q35.c
+> +++ b/hw/pci-host/q35.c
+> @@ -49,9 +49,9 @@ static void q35_host_realize(DeviceState *dev, Error **=
+errp)
+>      sysbus_add_io(sbd, MCH_HOST_BRIDGE_CONFIG_DATA, &pci->data_mem);
+>      sysbus_init_ioports(sbd, MCH_HOST_BRIDGE_CONFIG_DATA, 4);
+> =20
+> -    pci->bus =3D pci_bus_new(pci, "pcie.0",
+> -                           s->mch.pci_address_space, s->mch.address_spac=
+e_io,
+> -                           0, TYPE_PCIE_BUS);
+> +    pci_bus_new(pci, "pcie.0",
+> +                s->mch.pci_address_space, s->mch.address_space_io,
+> +                0, TYPE_PCIE_BUS);
+>      PC_MACHINE(qdev_get_machine())->bus =3D pci->bus;
+>      qdev_set_parent_bus(DEVICE(&s->mch), BUS(pci->bus));
+>      qdev_init_nofail(DEVICE(&s->mch));
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index d3adf806e5..486aeb7514 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -408,6 +408,7 @@ PCIBus *pci_bus_new(PCIHostState *phb, const char *na=
+me,
+> =20
+>      bus =3D PCI_BUS(qbus_create(typename, DEVICE(phb), name));
+>      pci_bus_init(bus, phb, address_space_mem, address_space_io, devfn_mi=
+n);
+> +    phb->bus =3D bus;
+>      return bus;
+>  }
+> =20
+> @@ -433,7 +434,6 @@ void pci_register_bus(PCIHostState *phb, const char *=
+name,
+>      bus =3D pci_bus_new(phb, name, address_space_mem,
+>                        address_space_io, devfn_min, typename);
+>      pci_bus_irqs(bus, set_irq, map_irq, irq_opaque, nirq);
+> -    phb->bus =3D bus;
+>  }
+> =20
+>  int pci_bus_num(PCIBus *s)
 
-Ok, then it looks better to switch the address space if we've found it=20
-was PT?
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
->
->> 2) Since this is done after IOTLB querying, do we need flush IOTLB dur=
-ing
->> address switching?
-> IMHO if guest switches address space for a device, it is required to
-> send IOTLB flush as well for that device/domain.
->
-> [...]
+--A2x6GFCQWVc4i5ud
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Ok.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
->
->>>   static void vtd_switch_address_space_all(IntelIOMMUState *s)
->>>   {
->>>       GHashTableIter iter;
->>> @@ -2849,6 +2914,10 @@ static void vtd_init(IntelIOMMUState *s)
->>>           s->ecap |=3D VTD_ECAP_DT;
->>>       }
->>> +    if (x86_iommu->pt_supported) {
->>> +        s->ecap |=3D VTD_ECAP_PT;
->>> +    }
->> Since we support migration now, need compat this for pre 2.10.
-> Oh yes. If I set pt=3Doff by default, it should be okay then, right?
+iQIcBAEBCAAGBQJY9Y5RAAoJEGw4ysog2bOS4qwP/08d+wC2R9865VSp/qGPMApG
+JiAblrIzqpCnOlW2b7lovCOp96ZsDiGGp7TRHop3Y90JPhsUd7GEeRd5Ln4TnE0K
+mMU3kQVo4i1c38uZq4cP+bMU72wcTij/LdayfAoMuBWAAMPaywfRQPg7rfO1lW2m
+vcQa4aeRsV7ZK/t528DKJ0zuSZQFDuDP1xD+9i15kHNFm8ZZ0mhYH35xqBRTF+Qa
+97ki5emn6qAl9+3gYBpZCYIalTyERumfFF+PFugqqsB5b8r21RofR6wRjl+IObdM
+ksPgaUJr61uoEPU3rSoLzspw46FQJlpr7HDXfpJx03DpFv5AHHv+kFHc34gnCNON
+npfIXnjAn5e+cPhmZ0H1QJOHqE+qbBZKHkZjK/FG+pPEsP/Qrnpb/T8R01PsEQrh
++5NiHMognZKvm9dSwsjqa5kqIf6qatyGVokIkwNNZ/6gx3d6pNans1zv1Xz4GTYp
+p5zzd/1375fs77QSkDj27goakSBqE1VCw899haiNhkKtAgqO1liAy2VMier8XEqu
+5o5kMw0vAtbt+eIxm0JMLPvTtUQ6dnDuWImOvVqM5Ri62KMY8vxkHJ3qHOH8AQOr
+iL2+JS/wbRxFNwU4B/1BW4X5jcvSslh3O1jvWLrAYsrNLSUhs1VEMN42Smlnl1qC
+NYg04zKDJonpOssUixyk
+=aMYO
+-----END PGP SIGNATURE-----
 
-Right, but I think it's better to keep this on by default for=20
-performance reason.
-
->
-> Then, at some point, we can switch to on by default, with a touch-up
-> in include/hw/compat.h I guess?
-
-Yes.
-
-Thanks
->
->>> +
->>>       if (s->caching_mode) {
->>>           s->cap |=3D VTD_CAP_CM;
->>>       }
->>> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_int=
-ernal.h
->>> index 29d6707..0e73a65 100644
->>> --- a/hw/i386/intel_iommu_internal.h
->>> +++ b/hw/i386/intel_iommu_internal.h
->>> @@ -187,6 +187,7 @@
->>>   /* Interrupt Remapping support */
->>>   #define VTD_ECAP_IR                 (1ULL << 3)
->>>   #define VTD_ECAP_EIM                (1ULL << 4)
->>> +#define VTD_ECAP_PT                 (1ULL << 6)
->>>   #define VTD_ECAP_MHMV               (15ULL << 20)
->>>   /* CAP_REG */
->>> diff --git a/hw/i386/trace-events b/hw/i386/trace-events
->>> index 04a6980..867ad0b 100644
->>> --- a/hw/i386/trace-events
->>> +++ b/hw/i386/trace-events
->>> @@ -38,6 +38,7 @@ vtd_page_walk_skip_perm(uint64_t iova, uint64_t nex=
-t) "Page walk skip iova 0x%"P
->>>   vtd_page_walk_skip_reserve(uint64_t iova, uint64_t next) "Page walk=
- skip iova 0x%"PRIx64" - 0x%"PRIx64" due to rsrv set"
->>>   vtd_switch_address_space(uint8_t bus, uint8_t slot, uint8_t fn, boo=
-l on) "Device %02x:%02x.%x switching address space (iommu enabled=3D%d)"
->>>   vtd_as_unmap_whole(uint8_t bus, uint8_t slot, uint8_t fn, uint64_t =
-iova, uint64_t size) "Device %02x:%02x.%x start 0x%"PRIx64" size 0x%"PRIx=
-64
->>> +vtd_translate_pt(uint16_t sid, uint64_t addr) "source id 0x%"PRIu16"=
-, iova 0x%"PRIx64
->>>   # hw/i386/amd_iommu.c
->>>   amdvi_evntlog_fail(uint64_t addr, uint32_t head) "error: fail to wr=
-ite at addr 0x%"PRIx64" +  offset 0x%"PRIx32
->>> diff --git a/hw/i386/x86-iommu.c b/hw/i386/x86-iommu.c
->>> index 02b8825..293caf8 100644
->>> --- a/hw/i386/x86-iommu.c
->>> +++ b/hw/i386/x86-iommu.c
->>> @@ -91,6 +91,7 @@ static void x86_iommu_realize(DeviceState *dev, Err=
-or **errp)
->>>   static Property x86_iommu_properties[] =3D {
->>>       DEFINE_PROP_BOOL("intremap", X86IOMMUState, intr_supported, fal=
-se),
->>>       DEFINE_PROP_BOOL("device-iotlb", X86IOMMUState, dt_supported, f=
-alse),
->>> +    DEFINE_PROP_BOOL("pt", X86IOMMUState, pt_supported, true),
->> Do you know if AMD IOMMU support this?
-> AMD IOMMU should support this. IIUC it's the first bit of Device Table =
-Entry.
->
-> Thanks,
->
+--A2x6GFCQWVc4i5ud--
