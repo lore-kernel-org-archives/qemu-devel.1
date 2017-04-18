@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d0Y3C-0006qt-FM
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 14:40:31 -0400
+	(envelope-from <eblake@redhat.com>) id 1d0Y7R-0007f4-88
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 14:44:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d0Y39-0006DQ-Ct
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 14:40:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60332)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d0Y39-0006DB-60
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 14:40:27 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E282BC054900
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 18:40:25 +0000 (UTC)
-Date: Tue, 18 Apr 2017 19:40:22 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170418184022.GO2205@work-vm>
-References: <20170417200041.2451-1-quintela@redhat.com>
-	<20170417200041.2451-3-quintela@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1d0Y7Q-0007re-8I
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 14:44:53 -0400
+References: <815765cfcea726c7a4cc619c4f6c3bedb47f16b9.1492537347.git.jcody@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e649d1d3-6310-6607-22fe-82fc961d53c4@redhat.com>
+Date: Tue, 18 Apr 2017 13:44:43 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170417200041.2451-3-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 02/19] migration: They are called
- vmstate_foo, move them to vmstate.c
+In-Reply-To: <815765cfcea726c7a4cc619c4f6c3bedb47f16b9.1492537347.git.jcody@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="c2UuN0pvBlqKCsIlfL107fvW2bqHu2Bvx"
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 1/1] qemu-iotests:
+ _cleanup_qemu must be called on exit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,85 +24,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--c2UuN0pvBlqKCsIlfL107fvW2bqHu2Bvx
+From: Eric Blake <eblake@redhat.com>
+To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
+Message-ID: <e649d1d3-6310-6607-22fe-82fc961d53c4@redhat.com>
+Subject: Re: [PATCH v2 for-2.10 1/1] qemu-iotests: _cleanup_qemu must be
+ called on exit
+References: <815765cfcea726c7a4cc619c4f6c3bedb47f16b9.1492537347.git.jcody@redhat.com>
+In-Reply-To: <815765cfcea726c7a4cc619c4f6c3bedb47f16b9.1492537347.git.jcody@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 04/18/2017 12:45 PM, Jeff Cody wrote:
+> For the tests that use the common.qemu functions for running a QEMU
+> process, _cleanup_qemu must be called in the exit function.
+>=20
+> If it is not, if the qemu process aborts, then not all of the droppings=
+
+> are cleaned up (e.g. pidfile, fifos).
+>=20
+> This updates those tests that did not have a cleanup in qemu-iotests.
+>=20
+> (I swapped spaces for tabs in test 102 as well)
+>=20
+> Reported-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Jeff Cody <jcody@redhat.com>
 > ---
->  migration/savevm.c  | 17 -----------------
->  migration/vmstate.c | 16 ++++++++++++++++
->  2 files changed, 16 insertions(+), 17 deletions(-)
+>=20
+> v2 fixed typo in test 094, s/cleanup/_cleanup/ for the trap function.
+>=20
+>  tests/qemu-iotests/028 |  1 +
+>  tests/qemu-iotests/094 | 11 ++++++++---
+>  tests/qemu-iotests/102 |  5 +++--
+>  tests/qemu-iotests/109 |  1 +
+>  tests/qemu-iotests/117 |  1 +
+>  tests/qemu-iotests/130 |  1 +
+>  tests/qemu-iotests/140 |  1 +
+>  tests/qemu-iotests/141 |  1 +
+>  tests/qemu-iotests/143 |  1 +
+>  9 files changed, 18 insertions(+), 5 deletions(-)
 
-OK, but it's a little odd, savevm.c still has the vmstate_register_with_alias_id
-and vmstate-unregister,  so this is just the simple ram cases.
+Looks like you missed (at least?) 063
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index cc9c086..c47b209 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -45,7 +45,6 @@
->  #include "qemu/sockets.h"
->  #include "qemu/queue.h"
->  #include "sysemu/cpus.h"
-> -#include "exec/memory.h"
->  #include "qmp-commands.h"
->  #include "trace.h"
->  #include "qemu/bitops.h"
-> @@ -2465,19 +2464,3 @@ void hmp_info_snapshots(Monitor *mon, const QDict *qdict)
->      g_free(global_snapshots);
->  
->  }
-> -
-> -void vmstate_register_ram(MemoryRegion *mr, DeviceState *dev)
-> -{
-> -    qemu_ram_set_idstr(mr->ram_block,
-> -                       memory_region_name(mr), dev);
-> -}
-> -
-> -void vmstate_unregister_ram(MemoryRegion *mr, DeviceState *dev)
-> -{
-> -    qemu_ram_unset_idstr(mr->ram_block);
-> -}
-> -
-> -void vmstate_register_ram_global(MemoryRegion *mr)
-> -{
-> -    vmstate_register_ram(mr, NULL);
-> -}
-> diff --git a/migration/vmstate.c b/migration/vmstate.c
-> index 8a71349..174c490 100644
-> --- a/migration/vmstate.c
-> +++ b/migration/vmstate.c
-> @@ -1,5 +1,6 @@
->  #include "qemu/osdep.h"
->  #include "qemu-common.h"
-> +#include "exec/memory.h"
->  #include "migration/migration.h"
->  #include "migration/qemu-file.h"
->  #include "migration/vmstate.h"
-> @@ -1127,3 +1128,18 @@ bool vmstate_device_is_migratable(const VMStateDescription *vmsd)
->      return true;
->  }
->  
-> +void vmstate_register_ram(MemoryRegion *mr, DeviceState *dev)
-> +{
-> +    qemu_ram_set_idstr(mr->ram_block,
-> +                       memory_region_name(mr), dev);
-> +}
-> +
-> +void vmstate_unregister_ram(MemoryRegion *mr, DeviceState *dev)
-> +{
-> +    qemu_ram_unset_idstr(mr->ram_block);
-> +}
-> +
-> +void vmstate_register_ram_global(MemoryRegion *mr)
-> +{
-> +    vmstate_register_ram(mr, NULL);
-> +}
-> -- 
-> 2.9.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+--c2UuN0pvBlqKCsIlfL107fvW2bqHu2Bvx
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY9l6bAAoJEKeha0olJ0Nq+qkH/1vzfMQV7okvnYC3scyIb19x
+/MHEKdXGs7wHiJNJszsrEacJ4Sb2eRFCqs2cJX+oCnXF1p5Bvc2FIzTj3pSrfgfC
+UKU+Wo1y4LYFHWoGClgxy0UKzdyC1/Nqh7UaPi3ms5mRFhDvSscVMjMXiT+T0Ggz
+nliRU7NfXkbL3N5GGQ9h38Mb25YYHcBDqckIU1WQOL2uX/6zW6jZNGKq0E6zi6wa
+/X2U7NeXJYtfOgjZ81ZIjnTH0g1gL/GHg01olV2I8vYRZDhJ3oa7JRvgBlaKcqOc
+l4t6F1UeHchB6Gtlf8WKZ4YF8xNpRDvW3fKswzBiEimJv/Kw6WACtHJ6wouhivU=
+=tU96
+-----END PGP SIGNATURE-----
+
+--c2UuN0pvBlqKCsIlfL107fvW2bqHu2Bvx--
