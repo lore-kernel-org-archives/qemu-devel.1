@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d0Jp3-0003xQ-53
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 23:28:58 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d0Jp5-0003yT-Nk
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 23:29:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d0Jp1-0007Ix-MI
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 23:28:57 -0400
-Date: Tue, 18 Apr 2017 12:21:51 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1d0Jp4-0007Lv-NK
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 23:28:59 -0400
+Date: Tue, 18 Apr 2017 13:09:50 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170418022151.GD12235@umbus.fritz.box>
-References: <20170328021651.19350-1-david@gibson.dropbear.id.au>
-	<20170328021651.19350-3-david@gibson.dropbear.id.au>
-	<20170417183045.GA7078@thinpad.lan.raisama.net>
+Message-ID: <20170418030950.GE12235@umbus.fritz.box>
+References: <20170414083717.13641-1-lvivier@redhat.com>
+	<20170414083717.13641-3-lvivier@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="k4f25fnPtRuIRUb3"
+	protocol="application/pgp-signature"; boundary="TD8GDToEDw0WLGOL"
 Content-Disposition: inline
-In-Reply-To: <20170417183045.GA7078@thinpad.lan.raisama.net>
-Subject: Re: [Qemu-devel] [RFC for-2.10 2/3] pci: Allow host bridges to
- override PCI/PCIe hybrid device behaviour
+In-Reply-To: <20170414083717.13641-3-lvivier@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] ppc: remove
+ cannot_destroy_with_object_finalize_yet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,96 +25,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: aik@ozlabs.ru, marcel@redhat.com, lersek@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mst@redhat.com
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, Antony Pavlov <antonynpavlov@gmail.com>, Beniamino Galvani <b.galvani@gmail.com>, Markus Armbruster <armbru@redhat.com>, qemu-arm@nongnu.org
 
 
---k4f25fnPtRuIRUb3
+--TD8GDToEDw0WLGOL
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 17, 2017 at 03:30:46PM -0300, Eduardo Habkost wrote:
-> On Tue, Mar 28, 2017 at 01:16:50PM +1100, David Gibson wrote:
-> > Currently PCI/PCIe hybrid devices - that is, devices which can appear as
-> > either plain PCI or PCIe depending on where they're attached - will only
-> > appear in PCIe mode if they're attached to a PCIe bus via a root port or
-> > downstream port.
-> >=20
-> > This is correct for "standard" PCIe setups, but there are some platforms
-> > which need different behaviour (notably "pseries" whose paravirtualized
-> > PCI host bridges have some idiosyncracies).
-> >=20
-> > This patch allows the host bridge to override the normal behaviour.
-> >=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> >  hw/pci/pci.c              | 11 +++++++++--
-> >  include/hw/pci/pci_host.h |  1 +
-> >  2 files changed, 10 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> > index 779787b..ac68065 100644
-> > --- a/hw/pci/pci.c
-> > +++ b/hw/pci/pci.c
-> > @@ -392,9 +392,16 @@ bool pci_bus_is_root(PCIBus *bus)
-> > =20
-> >  bool pci_allow_hybrid_pcie(PCIDevice *pci_dev)
+On Fri, Apr 14, 2017 at 10:37:15AM +0200, Laurent Vivier wrote:
+> This removes the assert(kvm_enabled()) from kvmppc_host_cpu_initfn()
 >=20
-> Why are we asking the device about allowing hybrid pcie, and not
-> the bus itself? Shouldn't we be able to query this before the
-> device is plugged, and before pci_dev->bus is even set?
+> This assert can never be triggered as the function is only registered
+> when KVM is available (see also 4c315c2
+> "qdev: Protect device-list-properties against broken devices").
 >=20
-> In other words, why pci_allow_hyberid_pcie() and
-> pci_device_get_bus() get a PCIDevice* argument instead of a
-> PCIBus* argument?
+> So we can remove the cannot_destroy_with_object_finalize_yet from
+> kvmppc_host_cpu_class_init() without fear and beyond reproach.
+> (as it has already be done for i386 with 771a13e "i386: Unset
+> cannot_destroy_with_object_finalize_yet on "host" model" and
+> e435601 "target-i386: Remove assert(kvm_enabled()) from
+> host_x86_cpu_initfn()")
+>=20
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 
-Ah good point.  I made it a PCIDevice simply for convenience, but
-you're right we should be able to query before the device is plugged.
+Applied to ppc-for-2.10 (fixing a contextual conflict on the way).
 
->=20
-> >  {
-> > -    PCIBus *bus =3D pci_dev->bus;
-> > +    PCIHostState *host_bridge =3D PCI_HOST_BRIDGE(pci_device_root_bus(=
-pci_dev)->qbus.parent);
->=20
-> There's something I don't understand completely: what exactly
-> guarantees that pci_device_root_bus(...)->qbus.parent is always
-> going to be a PCI_HOST_BRIDGE?
 
-Well, by definition whatever is above the root bus isn't PCI, which
-pretty much means it has to be a PCI host bridge.  A machine could
-break this assumption, but I think that would be a bug.  We use this
-same pattern to find a PCI device's (or bus's) host bridge in other
-places - there doesn't appear to be another way.
-
-> > +    PCIHostBridgeClass *hc =3D PCI_HOST_BRIDGE_GET_CLASS(host_bridge);
-> > +
-> > +    if (hc->allow_hybrid_pcie) {
-> > +        return hc->allow_hybrid_pcie(host_bridge, pci_dev);
-> > +    } else {
-> > +        PCIBus *bus =3D pci_dev->bus;
-> > =20
-> > -    return pci_bus_is_express(bus) && !pci_bus_is_root(bus);
-> > +        return pci_bus_is_express(bus) && !pci_bus_is_root(bus);
-> > +    }
-> >  }
-> > =20
-> >  void pci_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *pa=
-rent,
-> > diff --git a/include/hw/pci/pci_host.h b/include/hw/pci/pci_host.h
-> > index ba31595..ad03cca 100644
-> > --- a/include/hw/pci/pci_host.h
-> > +++ b/include/hw/pci/pci_host.h
-> > @@ -54,6 +54,7 @@ typedef struct PCIHostBridgeClass {
-> >      SysBusDeviceClass parent_class;
-> > =20
-> >      const char *(*root_bus_path)(PCIHostState *, PCIBus *);
-> > +    bool (*allow_hybrid_pcie)(PCIHostState *, PCIDevice *);
-> >  } PCIHostBridgeClass;
-> > =20
-> >  /* common internal helpers for PCI/PCIe hosts, cut off overflows */
+> ---
+>  target/ppc/kvm.c | 10 ----------
+>  1 file changed, 10 deletions(-)
 >=20
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 9f1f132..64017ac 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -2245,14 +2245,8 @@ static void alter_insns(uint64_t *word, uint64_t f=
+lags, bool on)
+>      }
+>  }
+> =20
+> -static void kvmppc_host_cpu_initfn(Object *obj)
+> -{
+> -    assert(kvm_enabled());
+> -}
+> -
+>  static void kvmppc_host_cpu_class_init(ObjectClass *oc, void *data)
+>  {
+> -    DeviceClass *dc =3D DEVICE_CLASS(oc);
+>      PowerPCCPUClass *pcc =3D POWERPC_CPU_CLASS(oc);
+>      uint32_t vmx =3D kvmppc_get_vmx();
+>      uint32_t dfp =3D kvmppc_get_dfp();
+> @@ -2279,9 +2273,6 @@ static void kvmppc_host_cpu_class_init(ObjectClass =
+*oc, void *data)
+>      if (icache_size !=3D -1) {
+>          pcc->l1_icache_size =3D icache_size;
+>      }
+> -
+> -    /* Reason: kvmppc_host_cpu_initfn() dies when !kvm_enabled() */
+> -    dc->cannot_destroy_with_object_finalize_yet =3D true;
+>  }
+> =20
+>  bool kvmppc_has_cap_epr(void)
+> @@ -2333,7 +2324,6 @@ static int kvm_ppc_register_host_cpu_type(void)
+>  {
+>      TypeInfo type_info =3D {
+>          .name =3D TYPE_HOST_POWERPC_CPU,
+> -        .instance_init =3D kvmppc_host_cpu_initfn,
+>          .class_init =3D kvmppc_host_cpu_class_init,
+>      };
+>      PowerPCCPUClass *pvr_pcc;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -123,25 +103,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---k4f25fnPtRuIRUb3
+--TD8GDToEDw0WLGOL
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJY9Xg/AAoJEGw4ysog2bOSklYP/055wj4yq6sevItQuWmdVW/b
-xcYuOftfl8s9YfZxKQQp5Wga2csszcewQe25NaMtEitaWNNXlYKaDGLJMuzXck9N
-EwYwYXiwwOg59Rc5GOLj/oaRDCS+D/cF9H60R7ELw7TFJcgMVxQwj2behQkxTLCs
-SSvgYbMGGfQv30AGOIOC1wTzrFe8V+/jQ9nCHYFjTFtobmyMbwbkkkEDAgeTC55K
-CtC4+BH8R+ycMnaN34YXPkxndpjWUVVWpeR6BOQW5/F2mCOJBqC8PXsugkNnAxUN
-frrif0gpgbZ2OhW/s1kJE9bHRrgbIWoTOR5S/afCpTPKOxaWXYXkZYnKEbwd9NIU
-p/Sp6wgM5lQEwXflA0Qpf1gY/PmQwgqEOCRM1gW7LiObDf0J1wBPVVgUp9DVaDln
-5wKw9GFDaX3SjN8Tt4Qg9vB8wY1tV8C/HL6MipPipKhPnjcMC86uBkek3hlEXPu1
-ISCwz3PE1Mf7yGI8AifmGGEIMdoHQWLVGdeDjR4YWygqmwwDiJ62WhUKsiEVXu/z
-08a+LuSBvdswR8NBEgw5nQFrRD/Bwvo9LGtDfY/USOwBOVV30MQkl/PWZkjAd/7O
-43BzBxMN6octXKb4LtSGODgqF0ZTjOEQqMekZhA0Qm7D6HHnTLfgTNIok7KvcdMo
-9VoCs02pY+Rvi1wDv56C
-=MCbZ
+iQIcBAEBCAAGBQJY9YN7AAoJEGw4ysog2bOSYKkP/izHdQiPyoXpTMUu31HgUO6w
+p5mqU4/9CJVyceyPniQkiF6Ju5W1qkUVcOfXfxIzzzU5zjKvx/WvzV7MeUDdymw6
+V6V8W9A1EMzO71A341veLC1vkMNlANO3ENaF8Kzqu+MFFb8c9XYI1A2Te4rtN10e
+LPDBd3j8nKlH6qFjtZRtyQkguR3n7h0T3UYjz5giw0AOV2i0QkCfpy2ba/Jly1nk
+IMnyW23jp17bXBAzEvHhRLLZOnrdxDs4UBMWR+XxFWbMsCZeQ0+OZWaFiqaqhQP/
+GxLSCXeD6A66DZaHDE5kf8WHD938GP4/tNHmBm+rJHbiBiwPMAXPapNExXaEEfT/
+A7sXhty6bSBq7eiBf44PTNVR3VOmaC+4d5+QolXp0z3Hke5nMK27tfdB2VNZKmQM
+R2QVXIBxnvNXnH0+MKJ39yVhbldd6Q8SfArhyJLGhiEdf3DQUh5fljbmbfTJ5sJ4
+tl2dDckJjsPiC4OfJxmhFBFQ/l4WMTEh+/rMZOY6uqsYNPFBp3E5TPnQ1rxju84g
+fmx6NSM9bGk9Fn2CRhW3SscNnCtcp0myqKrnWex5Ay5G6ed79qlkbJNuDnjR7oxM
+C1xfymQT5HKkxc4uxf/2jGus6u2tOuhp6kHsGq+Xsdr+hgt5EfkqizSSZvpmj7z9
+8pK+TprQ8Y+Peh4wVz/Y
+=mACH
 -----END PGP SIGNATURE-----
 
---k4f25fnPtRuIRUb3--
+--TD8GDToEDw0WLGOL--
