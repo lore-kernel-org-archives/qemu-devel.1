@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d0QAX-0004Z1-Sq
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 06:15:35 -0400
+	(envelope-from <ashijeetacharya@gmail.com>) id 1d0QGQ-0005iY-PY
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 06:21:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d0QAS-0004pF-U1
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 06:15:33 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:35580)
+	(envelope-from <ashijeetacharya@gmail.com>) id 1d0QGO-0007Ul-My
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 06:21:38 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:35037)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d0QAS-0004oq-Ki
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 06:15:28 -0400
-Received: by mail-wr0-x242.google.com with SMTP id l44so24002808wrc.2
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 03:15:28 -0700 (PDT)
-Date: Tue, 18 Apr 2017 11:15:24 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170418101524.GG21261@stefanha-x1.localdomain>
-References: <20170331084147.32716-1-haozhong.zhang@intel.com>
-	<20170406094359.GB21261@stefanha-x1.localdomain>
-	<20170411063426.5fmxyuglhqk7qo3k@hz-desktop>
+	(Exim 4.71) (envelope-from <ashijeetacharya@gmail.com>)
+	id 1d0QGO-0007Ub-F6
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 06:21:36 -0400
+Received: by mail-oi0-x242.google.com with SMTP id g11so1042037oib.2
+	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 03:21:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="NPukt5Otb9an/u20"
-Content-Disposition: inline
-In-Reply-To: <20170411063426.5fmxyuglhqk7qo3k@hz-desktop>
-Subject: Re: [Qemu-devel] [RFC PATCH 0/4] nvdimm: enable flush hint address
- structure
+References: <CAC2QTZa6LW2LcWQUDvT88KVw=O+D99ku03XcE3kiLi_SC4UMBw@mail.gmail.com>
+	<4ea264eb-128c-569a-264c-8ffa3956dca2@redhat.com>
+In-Reply-To: <4ea264eb-128c-569a-264c-8ffa3956dca2@redhat.com>
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Date: Tue, 18 Apr 2017 10:21:25 +0000
+Message-ID: <CAC2QTZYq4v+zcYQ3LrkWrYdZYEVwYe1kjpfh30+kKe+p+Z3-vg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] DMG chunk size independence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,227 +29,202 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, dan.j.williams@intel.com, Richard Henderson <rth@twiddle.net>
+To: John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+
+On Tue, Apr 18, 2017 at 01:59 John Snow <jsnow@redhat.com> wrote:
+
+>
+>
+> On 04/15/2017 04:38 AM, Ashijeet Acharya wrote:
+> > Hi,
+> >
+> > Some of you are already aware but for the benefit of the open list,
+> > this mail is regarding the task mentioned
+> > Here -> http://wiki.qemu-project.org/ToDo/Block/DmgChunkSizeIndependence
+> >
+>
+> OK, so the idea here is that we should be able to read portions of
+> chunks instead of buffering entire chunks, because chunks can be quite
+> large and an unverified DMG file should not be able to cause QEMU to
+> allocate large portions of memory.
+>
+> Currently, QEMU has a maximum chunk size and it will not open DMG files
+> that have chunks that exceed that size, correct?
+>
+
+Yes, it has an upper limit 64MiB at the moment and refuses to cater
+anything beyond that.
 
 
---NPukt5Otb9an/u20
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> > I had a chat with Fam regarding this and he suggested a solution where
+> > we fix the output buffer size to a max of say "64K" and keep inflating
+> > until we reach the end of the input stream. We extract the required
+> > data when we enter the desired range and discard the rest. Fam however
+> > termed this as only a  "quick fix".
+> >
+>
+> So it looks like your problem now is how to allow reads to subsets while
+> tolerating zipped chunks, right?
 
-On Tue, Apr 11, 2017 at 02:34:26PM +0800, Haozhong Zhang wrote:
-> On 04/06/17 10:43 +0100, Stefan Hajnoczi wrote:
-> > On Fri, Mar 31, 2017 at 04:41:43PM +0800, Haozhong Zhang wrote:
-> > > This patch series constructs the flush hint address structures for
-> > > nvdimm devices in QEMU.
-> > >=20
-> > > It's of course not for 2.9. I send it out early in order to get
-> > > comments on one point I'm uncertain (see the detailed explanation
-> > > below). Thanks for any comments in advance!
-> > > Background
-> > > ---------------
-> >=20
-> > Extra background:
-> >=20
-> > Flush Hint Addresses are necessary because:
-> >=20
-> > 1. Some hardware configurations may require them.  In other words, a
-> >    cache flush instruction is not enough to persist data.
-> >=20
-> > 2. The host file system may need fsync(2) calls (e.g. to persist
-> >    metadata changes).
-> >=20
-> > Without Flush Hint Addresses only some NVDIMM configurations actually
-> > guarantee data persistence.
-> >=20
-> > > Flush hint address structure is a substructure of NFIT and specifies
-> > > one or more addresses, namely Flush Hint Addresses. Software can write
-> > > to any one of these flush hint addresses to cause any preceding writes
-> > > to the NVDIMM region to be flushed out of the intervening platform
-> > > buffers to the targeted NVDIMM. More details can be found in ACPI Spec
-> > > 6.1, Section 5.2.25.8 "Flush Hint Address Structure".
-> >=20
-> > Do you have performance data?  I'm concerned that Flush Hint Address
-> > hardware interface is not virtualization-friendly.
->=20
-> Some performance data below.
->=20
-> Host HW config:
->   CPU: Intel(R) Xeon(R) CPU E5-2699 v4 @ 2.20GHz x 2 sockets w/ HT enabled
->   MEM: 64 GB
->=20
->   As I don't have NVDIMM hardware, so I use files in ext4 fs on a
->   normal SATA SSD as the back storage of vNVDIMM.
->=20
->=20
-> Host SW config:
->   Kernel: 4.10.1
->   QEMU: commit ea2afcf with this patch series applied.
->=20
->=20
-> Guest config:
->   For flush hint enabled case, the following QEMU options are used
->     -enable-kvm -smp 4 -cpu host -machine pc,nvdimm \
->     -m 4G,slots=3D4,maxmem=3D128G \
->     -object memory-backend-file,id=3Dmem1,share,mem-path=3Dnvm-img,size=
-=3D8G \
->     -device nvdimm,id=3Dnv1,memdev=3Dmem1,reserved-size=3D4K,flush-hint \
->     -hda GUEST_DISK_IMG -serial pty
->=20
->   For flush hint disabled case, the following QEMU options are used
->     -enable-kvm -smp 4 -cpu host -machine pc,nvdimm \
->     -m 4G,slots=3D4,maxmem=3D128G \
->     -object memory-backend-file,id=3Dmem1,share,mem-path=3Dnvm-img,size=
-=3D8G \
->     -device nvdimm,id=3Dnv1,memdev=3Dmem1 \
->     -hda GUEST_DISK_IMG -serial pty
->=20
->   nvm-img used above is created in ext4 fs on the host SSD by
->     dd if=3D/dev/zero of=3Dnvm-img bs=3D1G count=3D8
->=20
->   Guest kernel: 4.11.0-rc4
->=20
->=20
-> Benchmark in guest:
->   mkfs.ext4 /dev/pmem0
->   mount -o dax /dev/pmem0 /mnt
->   dd if=3D/dev/zero of=3D/mnt/data bs=3D1G count=3D7 # warm up EPT mapping
->   rm /mnt/data                               #
->   dd if=3D/dev/zero of=3D/mnt/data bs=3D1G count=3D7
->=20
->   and record the write speed reported by the last 'dd' command.
->=20
->=20
-> Result:
->   - Flush hint disabled
->     Vary from 161 MB/s to 708 MB/s, depending on how many fs/device
->     flush operations are performed on the host side during the guest
->     'dd'.
->=20
->   - Flush hint enabled
->  =20
->     Vary from 164 MB/s to 546 MB/s, depending on how long fsync() in
->     QEMU takes. Usually, there is at least one fsync() during one 'dd'
->     command that takes several seconds (the worst one takes 39 s).
->=20
->     To be worse, during those long host-side fsync() operations, guest
->     kernel complained stalls.
 
-I'm surprised that maximum throughput was 708 MB/s.  The guest is
-DAX-aware and the write(2) syscall is a memcpy.  I expected higher
-numbers without flush hints.
+Yes
 
-Also strange that throughput varied so greatly.  A benchmark that varies
-4x is not useful since it's hard to tell if anything <4x indicates a
-significant performance difference.  In other words, the noise is huge!
+>
+>
+> We can't predict where the data we want is going to appear mid-stream,
+> but I'm not that familiar with the DMG format, so what does the data
+> look like and how do we seek to it in general?
 
-What results do you get on the host?
 
-Dan: Any comments on this benchmark and is there a recommended way to
-benchmark NVDIMM?
+If I understood correctly what you meant;
+The data is divided into three types
+a) Uncompressed
+b) zlib compressed
+c) bz2 compressed
 
-> Some thoughts:
->=20
-> - If the non-NVDIMM hardware is used as the back store of vNVDIMM,
->   QEMU may perform the host-side flush operations asynchronously with
->   VM, which will not block VM too long but sacrifice the durability
->   guarantee.
->=20
-> - If physical NVDIMM is used as the back store and ADR is supported on
->   the host, QEMU can rely on ADR to guarantee the data durability and
->   will not need to emulate flush hint for guest.
->=20
-> - If physical NVDIMM is used as the back store and ADR is not
->   supported on the host, QEMU will still need to emulate flush hint
->   for guest and need to use a fast approach other than fsync() to
->   trigger writes to host flush hint.
->=20
->   Could kernel expose an interface to allow the userland (i.e. QEMU in
->   this case) to directly write to the flush hint of a NVDIMM region?
->=20
->=20
-> Haozhong
->=20
-> >=20
-> > In Linux drivers/nvdimm/region_devs.c:nvdimm_flush() does:
-> >=20
-> >   wmb();
-> >   for (i =3D 0; i < nd_region->ndr_mappings; i++)
-> >       if (ndrd_get_flush_wpq(ndrd, i, 0))
-> >           writeq(1, ndrd_get_flush_wpq(ndrd, i, idx));
-> >   wmb();
-> >=20
-> > That looks pretty lightweight - it's an MMIO write between write
-> > barriers.
-> >=20
-> > This patch implements the MMIO write like this:
-> >=20
-> >   void nvdimm_flush(NVDIMMDevice *nvdimm)
-> >   {
-> >       if (nvdimm->backend_fd !=3D -1) {
-> >           /*
-> >            * If the backend store is a physical NVDIMM device, fsync()
-> >            * will trigger the flush via the flush hint on the host devi=
-ce.
-> >            */
-> >           fsync(nvdimm->backend_fd);
-> >       }
-> >   }
-> >=20
-> > The MMIO store instruction turned into a synchronous fsync(2) system
-> > call plus vmexit/vmenter and QEMU userspace context switch:
-> >=20
-> > 1. The vcpu blocks during the fsync(2) system call.  The MMIO write
-> >    instruction has an unexpected and huge latency.
-> >=20
-> > 2. The vcpu thread holds the QEMU global mutex so all other threads
-> >    (including the monitor) are blocked during fsync(2).  Other vcpu
-> >    threads may block if they vmexit.
-> >=20
-> > It is hard to implement this efficiently in QEMU.  This is why I said
-> > the hardware interface is not virtualization-friendly.  It's cheap on
-> > real hardware but expensive under virtualization.
-> >=20
-> > We should think about the optimal way of implementing Flush Hint
-> > Addresses in QEMU.  But if there is no reasonable way to implement them
-> > then I think it's better *not* to implement them, just like the Block
-> > Window feature which is also not virtualization-friendly.  Users who
-> > want a block device can use virtio-blk.  I don't think NVDIMM Block
-> > Window can achieve better performance than virtio-blk under
-> > virtualization (although I'm happy to be proven wrong).
-> >=20
-> > Some ideas for a faster implementation:
-> >=20
-> > 1. Use memory_region_clear_global_locking() to avoid taking the QEMU
-> >    global mutex.  Little synchronization is necessary as long as the
-> >    NVDIMM device isn't hot unplugged (not yet supported anyway).
-> >=20
-> > 2. Can the host kernel provide a way to mmap Address Flush Hints from
-> >    the physical NVDIMM in cases where the configuration does not require
-> >    host kernel interception?  That way QEMU can map the physical
-> >    NVDIMM's Address Flush Hints directly into the guest.  The hypervisor
-> >    is bypassed and performance would be good.
-> >=20
-> > I'm not sure there is anything we can do to make the case where the host
-> > kernel wants an fsync(2) fast :(.
-> >=20
-> > Benchmark results would be important for deciding how big the problem
-> > is.
->=20
->=20
+All these chunks appear in random order depending on the file.
 
---NPukt5Otb9an/u20
-Content-Type: application/pgp-signature; name="signature.asc"
+ATM we are decompressing the whole chunk in a buffer and start reading
+sector by sector until we have what we need or we run out of output in that
+chunk.
 
------BEGIN PGP SIGNATURE-----
+If you meant something else there, let me know.
 
-iQEcBAEBAgAGBQJY9ec8AAoJEJykq7OBq3PInMUIAIwk6v61xKT72vPDQlipbrNG
-WfPCObHBugvhwpfikXnINcVcDLJLyYAhhEt+37vPadqdF2SS7FElA44hB1nD4m7e
-DJNFDnftQRJLlYLh+ldRkgmbqqVpaMEuv5R70Lk5BCwAAcuqCRuQ6MyBmr8TEm/6
-7rL49EjCiK0qPH3yAPpm6iS6osZ8HmZyzli8jRr9GrrdqBoksu/Tw4sJFotJG8pi
-IBY0Xl1n/Ktsb6cyDeIAXb8tGGA6M67k3TP6HOkoh5Y3yGB/AHwH+S/ms94NHRah
-dqU442zIK3tZ/qXhqpX/kHN8+IenaeWEwjJapEq7Cnm/PTMg210gEGYAnEnBbx8=
-=q9op
------END PGP SIGNATURE-----
 
---NPukt5Otb9an/u20--
+>
+> We've got the mish blocks stored inside of the ResouceFork (right?), and
+
+
+I haven't understood yet what a ResourceFork is but its safe to say from
+what I know that mish blocks do appear inside resource forks and contain
+all the required info about the chunks.
+
+>
+> each mish block contains one-or-more chunk records. So given any offset
+> into the virtual file, we at least know which chunk it belongs to, but
+> thanks to zlib, we can't just read the bits we care about.
+>
+> (Correct so far?)
+
+
+Absolutely
+
+
+>
+> > The ideal fix would obviously be if we can somehow predict the exact
+> > location inside the compressed stream relative to the desired offset
+> > in the output decompressed stream, such as a specific sector in a
+> > chunk. Unfortunately this is not possible without doing a first pass
+> > over the decompressed stream as answered on the zlib FAQ page
+> > Here -> http://zlib.net/zlib_faq.html#faq28
+> >
+>
+> Yeah, I think you need to start reading the data from the beginning of
+> each chunk -- but it depends on the zlib data. It COULD be broken up
+> into different pieces, but there's no way to know without scanning it in
+> advance.
+
+
+Hmm, that's the real issue I am facing. MAYBE break it like
+
+a) inflate till the required starting offset in one go
+b) save the access point and discard the undesired data
+c) proceed by inflating one sector at a time and stop if we hit chunk's end
+or request's end
+
+
+>
+> (Unrelated:
+>
+> Do we have a zlib format driver?
+>
+> It might be cute to break up such DMG files and offload zlib
+> optimization to another driver, like this:
+>
+> [dmg]-->[zlib]-->[raw]
+>
+> And we could pretend that each zlib chunk in this file is virtually its
+> own zlib "file" and access it with modified offsets as appropriate.
+>
+> Any optimizations we make could just apply to this driver.
+>
+> [anyway...])
+
+
+Are you thinking about implementing zlib just like we have bz2 implemented
+currently?
+
+
+>
+>
+> Pre-scanning for these sync points is probably a waste of time as
+> there's no way to know (*I THINK*) how big each sync-block would be
+> decompressed, so there's still no way this helps you seek within a
+> compressed block...
+>
+
+I think we can predict that actually, because we know the number of sectors
+present in that chunk and each sector's size too. So...
+
+
+> > AFAICT after reading the zran.c example in zlib, the above mentioned
+> > ideal fix would ultimately lead us to decompress the whole chunk in
+> > steps at least once to maintain an access point lookup table. This
+> > solution is better if we get several random access requests over
+> > different read requests, otherwise it ends up being equal to the fix
+> > suggested by Fam plus some extra effort needed in building and
+> > maintaining access points.
+> >
+>
+> Yeah, probably not worth it overall... I have to imagine that most uses
+> of DMG files are for iso-like cases for installers where accesses are
+> going to be either sequential (or mostly sequential) and most data will
+> not be read twice.
+
+
+Exactly, if we are sure that there will be no requests to read the same
+data twice, its completely a wasted effort. But I am not aware of the use
+cases of DMG since I only learned about it last week. So maybe someone can
+enlighten me on those if possible?
+
+
+>
+> I could be wrong, but that's my hunch.
+>
+> Maybe you can cache the state of the INFLATE process such that once you
+> fill the cache with data, we can simply resume the INFLATE procedure
+> when the guest almost inevitably asks for the next subsequent bytes.
+>
+> That'd probably be efficient /enough/ in most cases without having to
+> worry about a metadata cache for zlib blocks or a literal data cache for
+> inflated data.
+
+
+Yes, I have a similar approach in mind to inflate one sector at a time and
+save the offset in the compressed stream and treat it as an access point
+for the next one.
+
+
+>
+> Or maybe I'm full of crap, I don't know -- I'd probably try a few
+> approaches and see which one empirically worked better.
+>
+> > I have not explored the bzip2 compressed chunks yet but have naively
+> > assumed that we will face the same situation there?
+> >
+>
+> Not sure.
+>
+
+I will look it up :)
+
+Stefan/Kevin, Do you have any other preferred solution in your mind?
+Because I am more or less getting inclined towards starting to inflate one
+sector at a time and submit v1
+
+>
+Ashijeet
+
+>
+>
