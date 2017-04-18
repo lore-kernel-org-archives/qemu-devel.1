@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiahuanzhang90@gmail.com>) id 1d0UmZ-0006gV-IJ
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 11:11:08 -0400
+	(envelope-from <marcel@redhat.com>) id 1d0Uvh-00008W-SX
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 11:20:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jiahuanzhang90@gmail.com>) id 1d0UmT-0008MU-H2
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 11:11:07 -0400
-Received: from mail-qk0-x232.google.com ([2607:f8b0:400d:c09::232]:35787)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jiahuanzhang90@gmail.com>)
-	id 1d0UmT-0008MB-AE
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 11:11:01 -0400
-Received: by mail-qk0-x232.google.com with SMTP id f133so132766346qke.2
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 08:11:01 -0700 (PDT)
+	(envelope-from <marcel@redhat.com>) id 1d0Uvd-0005Zf-Jt
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 11:20:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33078)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1d0Uvd-0005Z8-AW
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 11:20:29 -0400
+References: <1491562755-23867-1-git-send-email-peterx@redhat.com>
+	<1491562755-23867-2-git-send-email-peterx@redhat.com>
+	<20170410043922.GI27571@umbus>
+	<20170410070950.GK3981@pxdev.xzpeter.org>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <dc26790e-8200-bbde-a7c3-70852f625424@redhat.com>
+Date: Tue, 18 Apr 2017 18:20:11 +0300
 MIME-Version: 1.0
-In-Reply-To: <20170418143217.GH21261@stefanha-x1.localdomain>
-References: <CAJy91CZHb_aJncY1KSqTorZF3Gex=4_xd9=FmS5_QGzkXDNwGg@mail.gmail.com>
-	<20170418143217.GH21261@stefanha-x1.localdomain>
-From: Jiahuan Zhang <jiahuanzhang90@gmail.com>
-Date: Tue, 18 Apr 2017 17:10:59 +0200
-Message-ID: <CAJy91Cb-3GzZV-vCX7eqo6bPFwGdp9Quk2Ht-PEiH_xNdcOr9w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] guest host time synchronization
+In-Reply-To: <20170410070950.GK3981@pxdev.xzpeter.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v9 1/9] memory: add section range info for
+ IOMMU notifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +30,221 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: Peter Xu <peterx@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com, Eduardo Habkost <ehabkost@redhat.com>
 
-On 18 April 2017 at 16:32, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-
-> On Tue, Apr 11, 2017 at 09:01:40AM +0200, Jiahuan Zhang wrote:
-> > I made a test to check the time difference of QEMU emulated ARM-based
-> Linux
-> > guest and the Windows host. The result is, the guest time is around 0.2
-> > second faster than the host. I used the "-rtc base" option.
-> >
-> > So can I say that, the time precision of QEMU emulation is in seconds? Is
-> > it possible to make it more precise? because I need to test the latency
-> of
-> > my guest/host communication with high time resolution, at least in
-> > miliseconds.
-> >
-> > Please let me know if you have any method  for the communication
-> > performance testing. Thank you very much.
+On 04/10/2017 10:09 AM, Peter Xu wrote:
+> On Mon, Apr 10, 2017 at 02:39:22PM +1000, David Gibson wrote:
+>> On Fri, Apr 07, 2017 at 06:59:07PM +0800, Peter Xu wrote:
+>>> In this patch, IOMMUNotifier.{start|end} are introduced to store section
+>>> information for a specific notifier. When notification occurs, we not
+>>> only check the notification type (MAP|UNMAP), but also check whether the
+>>> notified iova range overlaps with the range of specific IOMMU notifier,
+>>> and skip those notifiers if not in the listened range.
+>>>
+>>> When removing an region, we need to make sure we removed the correct
+>>> VFIOGuestIOMMU by checking the IOMMUNotifier.start address as well.
+>>>
+>>> This patch is solving the problem that vfio-pci devices receive
+>>> duplicated UNMAP notification on x86 platform when vIOMMU is there. The
+>>> issue is that x86 IOMMU has a (0, 2^64-1) IOMMU region, which is
+>>> splitted by the (0xfee00000, 0xfeefffff) IRQ region. AFAIK
+>>> this (splitted IOMMU region) is only happening on x86.
+>>>
+>>> This patch also helps vhost to leverage the new interface as well, so
+>>> that vhost won't get duplicated cache flushes. In that sense, it's an
+>>> slight performance improvement.
+>>>
+>>> Suggested-by: David Gibson <david@gibson.dropbear.id.au>
+>>> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+>>> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+>>> Acked-by: Alex Williamson <alex.williamson@redhat.com>
+>>> Signed-off-by: Peter Xu <peterx@redhat.com>
+>>> ---
+>>>  hw/vfio/common.c      | 12 +++++++++---
+>>>  hw/virtio/vhost.c     | 10 ++++++++--
+>>>  include/exec/memory.h | 19 ++++++++++++++++++-
+>>>  memory.c              |  9 +++++++++
+>>>  4 files changed, 44 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+>>> index f3ba9b9..6b33b9f 100644
+>>> --- a/hw/vfio/common.c
+>>> +++ b/hw/vfio/common.c
+>>> @@ -478,8 +478,13 @@ static void vfio_listener_region_add(MemoryListener *listener,
+>>>          giommu->iommu_offset = section->offset_within_address_space -
+>>>                                 section->offset_within_region;
+>>>          giommu->container = container;
+>>> -        giommu->n.notify = vfio_iommu_map_notify;
+>>> -        giommu->n.notifier_flags = IOMMU_NOTIFIER_ALL;
+>>> +        llend = int128_add(int128_make64(section->offset_within_region),
+>>> +                           section->size);
+>>> +        llend = int128_sub(llend, int128_one());
+>>> +        iommu_notifier_init(&giommu->n, vfio_iommu_map_notify,
+>>> +                            IOMMU_NOTIFIER_ALL,
+>>> +                            section->offset_within_region,
+>>> +                            int128_get64(llend));
+>>
+>> Seems to me it would make sense to put the fiddling around to convert
+>> the MemoryRegionSection into the necessary values would make sense to
+>> go inside iommu_notifier_init().
 >
-> This can depend on the exact board (machine type) being emulated because
-> the emulated clock and timer hardware may be different.
+> But will we always get one MemoryRegionSection if we are not in any of
+> the region_{add|del} callback? E.g., what if we want to init an IOMMU
+> notifier that covers just the whole IOMMU region range?
 >
-> Please share your QEMU command-line so we can see the exact ARM guest
-> hardware configuration.
+> Considering above, I would still slightly prefer current interface.
 >
-> Stefan
+>>
+>>>          QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
+>>>
+>>>          memory_region_register_iommu_notifier(giommu->iommu, &giommu->n);
+>>> @@ -550,7 +555,8 @@ static void vfio_listener_region_del(MemoryListener *listener,
+>>>          VFIOGuestIOMMU *giommu;
+>>>
+>>>          QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
+>>> -            if (giommu->iommu == section->mr) {
+>>> +            if (giommu->iommu == section->mr &&
+>>> +                giommu->n.start == section->offset_within_region) {
+>>
+>> This test should be sufficient, but I'd be a bit more comfortable if
+>> there was a test and assert() that the end matches as well.  I also
+>> wonder if remove-matching-notifier helper would be useful here.
+>> Although vhost doesn't appear to ever remove, so maybe it's premature.
 >
-Hi. Sorry that I forgot to update the testing.
+> Oh... vhost does remove it, but I just forgot to touch it up :( ...
+> Thanks for pointing out.
+>
+> Marcel, if this is the only comment, would you mind squash below
+> change into current patch? Thanks,
 
-I found out an error in my application codes and fixed it.
+Hi Peter,
+I asked Eduardo to merge the series through this machine tree
+since I don't have a tree yet.
+He already squashed the change, thanks Eduardo!
+Marcel
 
-Now the testing is that, guest app sends data and host app receives data. I
-use gettimeofday() to get the time stamp before the sending function
-in LInux guest app, and use GetSystemAsFileTime() to get the timestamp
-after the receiving function in Windows Host.
-Now the testing result is that, the time difference is around 279ms.
 
-My QEMU command-line is
-
-$ qemu/build/arm-softmmu/qemu-system-arm.exe -M vexpress-a9 -kernel
-zImage_vexpress_4-10 -dtb vexpress-v2p-ca9.dtb -initrd rootfs.img.gz
--append "console=ttyAMA0 root=/dev/ram rdinit=linuxrc" -chardev
-pipe,id=char1,path=mynamedpipe -serial telnet:localhost:5555,server,nowait
--serial stdio -serial stdio -serial stdio -serial chardev:char1 -monitor
-telnet:localhost:4444,server,nowait -sd test.img -nographic -rtc
-base=utc,clock=host,driftfix=slew
-I want to get the latency of the pipe communication as precise as possible.
-Currently, the mehod I am using gets the time difference which must
-include some pre-emption that I don't know. So it's not reliable.
-
-Do you know any method for QEMU to evaluate this kind of communciation
-performance?
+>
+> ----8<----
+>
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index 185b95b..0001e60 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -771,7 +771,8 @@ static void vhost_iommu_region_del(MemoryListener *listener,
+>      }
+>
+>      QLIST_FOREACH(iommu, &dev->iommu_list, iommu_next) {
+> -        if (iommu->mr == section->mr) {
+> +        if (iommu->mr == section->mr &&
+> +            iommu->n.start == section->offset_within_region) {
+>              memory_region_unregister_iommu_notifier(iommu->mr,
+>                                                      &iommu->n);
+>              QLIST_REMOVE(iommu, iommu_next);
+>
+> ---->8----
+>
+>>
+>>>                  memory_region_unregister_iommu_notifier(giommu->iommu,
+>>>                                                          &giommu->n);
+>>>                  QLIST_REMOVE(giommu, giommu_next);
+>>> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+>>> index 613494d..185b95b 100644
+>>> --- a/hw/virtio/vhost.c
+>>> +++ b/hw/virtio/vhost.c
+>>> @@ -736,14 +736,20 @@ static void vhost_iommu_region_add(MemoryListener *listener,
+>>>      struct vhost_dev *dev = container_of(listener, struct vhost_dev,
+>>>                                           iommu_listener);
+>>>      struct vhost_iommu *iommu;
+>>> +    Int128 end;
+>>>
+>>>      if (!memory_region_is_iommu(section->mr)) {
+>>>          return;
+>>>      }
+>>>
+>>>      iommu = g_malloc0(sizeof(*iommu));
+>>> -    iommu->n.notify = vhost_iommu_unmap_notify;
+>>> -    iommu->n.notifier_flags = IOMMU_NOTIFIER_UNMAP;
+>>> +    end = int128_add(int128_make64(section->offset_within_region),
+>>> +                     section->size);
+>>> +    end = int128_sub(end, int128_one());
+>>> +    iommu_notifier_init(&iommu->n, vhost_iommu_unmap_notify,
+>>> +                        IOMMU_NOTIFIER_UNMAP,
+>>> +                        section->offset_within_region,
+>>> +                        int128_get64(end));
+>>>      iommu->mr = section->mr;
+>>>      iommu->iommu_offset = section->offset_within_address_space -
+>>>                            section->offset_within_region;
+>>> diff --git a/include/exec/memory.h b/include/exec/memory.h
+>>> index f20b191..0840c89 100644
+>>> --- a/include/exec/memory.h
+>>> +++ b/include/exec/memory.h
+>>> @@ -77,13 +77,30 @@ typedef enum {
+>>>
+>>>  #define IOMMU_NOTIFIER_ALL (IOMMU_NOTIFIER_MAP | IOMMU_NOTIFIER_UNMAP)
+>>>
+>>> +struct IOMMUNotifier;
+>>> +typedef void (*IOMMUNotify)(struct IOMMUNotifier *notifier,
+>>> +                            IOMMUTLBEntry *data);
+>>> +
+>>>  struct IOMMUNotifier {
+>>> -    void (*notify)(struct IOMMUNotifier *notifier, IOMMUTLBEntry *data);
+>>> +    IOMMUNotify notify;
+>>>      IOMMUNotifierFlag notifier_flags;
+>>> +    /* Notify for address space range start <= addr <= end */
+>>> +    hwaddr start;
+>>> +    hwaddr end;
+>>>      QLIST_ENTRY(IOMMUNotifier) node;
+>>>  };
+>>>  typedef struct IOMMUNotifier IOMMUNotifier;
+>>>
+>>> +static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
+>>> +                                       IOMMUNotifierFlag flags,
+>>> +                                       hwaddr start, hwaddr end)
+>>> +{
+>>> +    n->notify = fn;
+>>> +    n->notifier_flags = flags;
+>>> +    n->start = start;
+>>> +    n->end = end;
+>>> +}
+>>> +
+>>>  /* New-style MMIO accessors can indicate that the transaction failed.
+>>>   * A zero (MEMTX_OK) response means success; anything else is a failure
+>>>   * of some kind. The memory subsystem will bitwise-OR together results
+>>> diff --git a/memory.c b/memory.c
+>>> index 4c95aaf..75ac595 100644
+>>> --- a/memory.c
+>>> +++ b/memory.c
+>>> @@ -1606,6 +1606,7 @@ void memory_region_register_iommu_notifier(MemoryRegion *mr,
+>>>
+>>>      /* We need to register for at least one bitfield */
+>>>      assert(n->notifier_flags != IOMMU_NOTIFIER_NONE);
+>>> +    assert(n->start <= n->end);
+>>>      QLIST_INSERT_HEAD(&mr->iommu_notify, n, node);
+>>>      memory_region_update_iommu_notify_flags(mr);
+>>>  }
+>>> @@ -1667,6 +1668,14 @@ void memory_region_notify_iommu(MemoryRegion *mr,
+>>>      }
+>>>
+>>>      QLIST_FOREACH(iommu_notifier, &mr->iommu_notify, node) {
+>>> +        /*
+>>> +         * Skip the notification if the notification does not overlap
+>>> +         * with registered range.
+>>> +         */
+>>> +        if (iommu_notifier->start > entry.iova + entry.addr_mask + 1 ||
+>>> +            iommu_notifier->end < entry.iova) {
+>>> +            continue;
+>>> +        }
+>>>          if (iommu_notifier->notifier_flags & request_flags) {
+>>>              iommu_notifier->notify(iommu_notifier, &entry);
+>>>          }
+>>
+>> --
+>> David Gibson			| I'll have my music baroque, and my code
+>> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+>> 				| _way_ _around_!
+>> http://www.ozlabs.org/~dgibson
+>
+> -- peterx
+>
