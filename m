@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d0UPT-0002rF-8M
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:47:16 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d0UPn-00039v-E5
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:47:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d0UPS-0005zv-CX
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:47:15 -0400
-Date: Tue, 18 Apr 2017 16:46:47 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170418144647.GD9236@noname.redhat.com>
-References: <20170418143044.12187-1-famz@redhat.com>
-	<20170418143044.12187-2-famz@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1d0UPm-0006Gy-Ju
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:47:35 -0400
+Date: Tue, 18 Apr 2017 15:47:25 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170418144725.GJ21261@stefanha-x1.localdomain>
+References: <20170412091819.GB4955@noname.str.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Ublo+h3cBgJ33ahC"
 Content-Disposition: inline
-In-Reply-To: <20170418143044.12187-2-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9-rc5 v4 1/2] block: Walk
- bs->children carefully in bdrv_drain_recurse
+In-Reply-To: <20170412091819.GB4955@noname.str.redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] migrate -b problems
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,73 +23,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, jcody@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, dgilbert@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, quintela@redhat.com
 
-Am 18.04.2017 um 16:30 hat Fam Zheng geschrieben:
-> The recursive bdrv_drain_recurse may run a block job completion BH that
-> drops nodes. The coming changes will make that more likely and use-after-free
-> would happen without this patch
-> 
-> Stash the bs pointer and use bdrv_ref/bdrv_unref in addition to
-> QLIST_FOREACH_SAFE to prevent such a case from happening.
-> 
-> Since bdrv_unref accesses global state that is not protected by the AioContext
-> lock, we cannot use bdrv_ref/bdrv_unref unconditionally.  Fortunately the
-> protection is not needed in IOThread because only main loop can modify a graph
-> with the AioContext lock held.
-> 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  block/io.c | 23 ++++++++++++++++++++---
->  1 file changed, 20 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/io.c b/block/io.c
-> index 8706bfa..a0df8c4 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -158,7 +158,7 @@ bool bdrv_requests_pending(BlockDriverState *bs)
->  
->  static bool bdrv_drain_recurse(BlockDriverState *bs)
->  {
-> -    BdrvChild *child;
-> +    BdrvChild *child, *tmp;
->      bool waited;
->  
->      waited = BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
-> @@ -167,8 +167,25 @@ static bool bdrv_drain_recurse(BlockDriverState *bs)
->          bs->drv->bdrv_drain(bs);
->      }
->  
-> -    QLIST_FOREACH(child, &bs->children, next) {
-> -        waited |= bdrv_drain_recurse(child->bs);
-> +    QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
-> +        BlockDriverState *bs = child->bs;
-> +        bool in_main_loop =
-> +            qemu_get_current_aio_context() == qemu_get_aio_context();
-> +        assert(bs->refcnt > 0);
-> +        if (in_main_loop) {
-> +            /* In case the resursive bdrv_drain_recurse processes a
 
-s/resursive/recursive/
+--Ublo+h3cBgJ33ahC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> +             * block_job_defer_to_main_loop BH and modifies the graph,
-> +             * let's hold a reference to bs until we are done.
-> +             *
-> +             * IOThread doesn't have such a BH, and it is not safe to call
-> +             * bdrv_unref without BQL, so skip doing it there.
-> +             **/
+On Wed, Apr 12, 2017 at 11:18:19AM +0200, Kevin Wolf wrote:
+> after getting assertion failure reports for block migration in the last
+> minute, we just hacked around it by commenting out op blocker assertions
+> for the 2.9 release, but now we need to see how to fix things properly.
+> Luckily, get_maintainer.pl doesn't report me, but only you. :-)
+>=20
+> The main problem I see with the block migration code (on the
+> destination) is that it abuses the BlockBackend that belongs to the
+> guest device to make its own writes to the image file. If the guest
+> isn't allowed to write to the image (which it now isn't during incoming
+> migration since it would conflict with the newer style of block
+> migration using an NBD server), writing to this BlockBackend doesn't
+> work any more.
+>=20
+> So what should really happen is that incoming block migration creates
+> its own BlockBackend for writing to the image. Now we don't want to do
+> this anew for every incoming block, but ideally we'd just create all
+> necessary BlockBackends upfront and then keep using them throughout the
+> whole migration. Is there a way to get some setup/teardown callbacks
+> at the start/end of the migration that could initialise and free such
+> global data?
 
-And **/ is unusual, too.
+It can be done in the beginning of block_load() similar to
+block_mig_state.bmds_list, which is created in init_blk_migration() at
+save time.
 
-> +            bdrv_ref(bs);
-> +        }
-> +        waited |= bdrv_drain_recurse(bs);
-> +        if (in_main_loop) {
-> +            bdrv_unref(bs);
-> +        }
->      }
+We can also move the if (blk !=3D blk_prev) blk_invalidate_cache() code
+out of the load loop.  It should be done once when setting up
+BlockBackends.
 
-Other than this, the series looks good to me.
+> The other problem with block migration is that is uses a BlockBackend
+> name to identify which device is migrated. However, there can be images
+> that are not attached to any BlockBackend, or if it is, the BlockBackend
+> might be anonymous, so this doesn't work. I suppose changing the field
+> to "device name if available, node-name otherwise" would solve this.
 
-Kevin
+Yes, that sounds good and is backwards compatible.
+
+--Ublo+h3cBgJ33ahC
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJY9ib9AAoJEJykq7OBq3PIvB0H/j3M2TMRTR+6itea3g3W2q4G
+icStmCwQg9G6s3xV8w7v9oyH5Drfs6lGMR6jWdFEwUszWQs07etpW81MruizIMc1
+meA0adTXzoZNo7rY4U/b5P1vE/7CQNwEvBfhyJB0wOeQHpOkw+xZwLXBoFLTE6Pr
+UWumas6+BxV0kV8zkDeg5jLAzCXvNNfKRZzyJeRAHZO1riqOEOQJhGgFfqb+ZTq5
+QTwJCh6Wd0JRVra+joMX44JROnw47FnnqL3/NCTUGnfnTlv6iqMRcn7fpiMF0UpU
+W7dYGbLlI8PKD/WYIPCsDMkTfwe/Ts2MLQrjwjlJG2pkLJTT1OR5r+VQGOzuyns=
+=Qz/7
+-----END PGP SIGNATURE-----
+
+--Ublo+h3cBgJ33ahC--
