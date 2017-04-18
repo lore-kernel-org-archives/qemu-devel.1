@@ -1,17 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d0UAs-0002mD-N3
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:32:11 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d0UB6-0002ym-Ow
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:32:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d0UAo-0006NL-Gl
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:32:10 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Tue, 18 Apr 2017 22:30:43 +0800
-Message-Id: <20170418143044.12187-2-famz@redhat.com>
-In-Reply-To: <20170418143044.12187-1-famz@redhat.com>
-References: <20170418143044.12187-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9-rc5 v4 1/2] block: Walk bs->children
- carefully in bdrv_drain_recurse
+	(envelope-from <stefanha@gmail.com>) id 1d0UB2-0006UL-Ju
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:32:24 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:34151)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d0UB2-0006TS-Dr
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:32:20 -0400
+Received: by mail-wr0-x244.google.com with SMTP id u18so25148238wrc.1
+	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 07:32:20 -0700 (PDT)
+Date: Tue, 18 Apr 2017 15:32:17 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170418143217.GH21261@stefanha-x1.localdomain>
+References: <CAJy91CZHb_aJncY1KSqTorZF3Gex=4_xd9=FmS5_QGzkXDNwGg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="PNpeiK4tTqhYOExY"
+Content-Disposition: inline
+In-Reply-To: <CAJy91CZHb_aJncY1KSqTorZF3Gex=4_xd9=FmS5_QGzkXDNwGg@mail.gmail.com>
+Subject: Re: [Qemu-devel] guest host time synchronization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,66 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, jcody@redhat.com
+To: Jiahuan Zhang <jiahuanzhang90@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
 
-The recursive bdrv_drain_recurse may run a block job completion BH that
-drops nodes. The coming changes will make that more likely and use-after-free
-would happen without this patch
 
-Stash the bs pointer and use bdrv_ref/bdrv_unref in addition to
-QLIST_FOREACH_SAFE to prevent such a case from happening.
+--PNpeiK4tTqhYOExY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Since bdrv_unref accesses global state that is not protected by the AioContext
-lock, we cannot use bdrv_ref/bdrv_unref unconditionally.  Fortunately the
-protection is not needed in IOThread because only main loop can modify a graph
-with the AioContext lock held.
+On Tue, Apr 11, 2017 at 09:01:40AM +0200, Jiahuan Zhang wrote:
+> I made a test to check the time difference of QEMU emulated ARM-based Lin=
+ux
+> guest and the Windows host. The result is, the guest time is around 0.2
+> second faster than the host. I used the "-rtc base" option.
+>=20
+> So can I say that, the time precision of QEMU emulation is in seconds? Is
+> it possible to make it more precise? because I need to test the latency of
+> my guest/host communication with high time resolution, at least in
+> miliseconds.
+>=20
+> Please let me know if you have any method  for the communication
+> performance testing. Thank you very much.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- block/io.c | 23 ++++++++++++++++++++---
- 1 file changed, 20 insertions(+), 3 deletions(-)
+This can depend on the exact board (machine type) being emulated because
+the emulated clock and timer hardware may be different.
 
-diff --git a/block/io.c b/block/io.c
-index 8706bfa..a0df8c4 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -158,7 +158,7 @@ bool bdrv_requests_pending(BlockDriverState *bs)
- 
- static bool bdrv_drain_recurse(BlockDriverState *bs)
- {
--    BdrvChild *child;
-+    BdrvChild *child, *tmp;
-     bool waited;
- 
-     waited = BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
-@@ -167,8 +167,25 @@ static bool bdrv_drain_recurse(BlockDriverState *bs)
-         bs->drv->bdrv_drain(bs);
-     }
- 
--    QLIST_FOREACH(child, &bs->children, next) {
--        waited |= bdrv_drain_recurse(child->bs);
-+    QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
-+        BlockDriverState *bs = child->bs;
-+        bool in_main_loop =
-+            qemu_get_current_aio_context() == qemu_get_aio_context();
-+        assert(bs->refcnt > 0);
-+        if (in_main_loop) {
-+            /* In case the resursive bdrv_drain_recurse processes a
-+             * block_job_defer_to_main_loop BH and modifies the graph,
-+             * let's hold a reference to bs until we are done.
-+             *
-+             * IOThread doesn't have such a BH, and it is not safe to call
-+             * bdrv_unref without BQL, so skip doing it there.
-+             **/
-+            bdrv_ref(bs);
-+        }
-+        waited |= bdrv_drain_recurse(bs);
-+        if (in_main_loop) {
-+            bdrv_unref(bs);
-+        }
-     }
- 
-     return waited;
--- 
-2.9.3
+Please share your QEMU command-line so we can see the exact ARM guest
+hardware configuration.
+
+Stefan
+
+--PNpeiK4tTqhYOExY
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJY9iNxAAoJEJykq7OBq3PIAFsH/i6fmFyzyKQf8dIaJTyNde3U
+D/p1RG4pxrkOll43K+2IdKi4GC+l+NC3wyCAw1f6Jl8o4xz8oCbC3fxoJ/bsg+Pn
+Tc9cHPPuhKkQfr05FBP6zAaqs6yl1JASUh7LFuPwV777kU2q4JwxpgxjLcT5+k9m
+YuQF/XTgiTdv0HpVf+nFrdyrClIXvwQSwZywCKgQ+Ls/j3V3Eg4F7HQe/FJdwCuO
+EhJ2mx/kvjGI8qW8Cfhh04nCuYh0BEhHdY8PVa8J1GhWge1L/4c0vvUdECsCtvcW
+zZUY9ACrkc5VTCmHDV/9CYf5w/P2Wd54Fo8JG4As9F5vdDgjpy36hQ2F8mX8AFI=
+=rbp/
+-----END PGP SIGNATURE-----
+
+--PNpeiK4tTqhYOExY--
