@@ -1,30 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d0I09-0004SJ-DV
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 21:32:18 -0400
+	(envelope-from <eblake@redhat.com>) id 1d0I1w-00050Y-Ht
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 21:34:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d0I06-00030j-99
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 21:32:17 -0400
-Received: from [59.151.112.132] (port=11141 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d0I05-0002y0-Bt
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 21:32:14 -0400
-References: <1487734936-43472-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1487734936-43472-3-git-send-email-zhang.zhanghailiang@huawei.com>
-	<134776c2-a85d-d06f-5f98-2e664f9c8ca9@cn.fujitsu.com>
-	<d33b0150-5ed2-56cc-9261-da7deb1d0bfb@redhat.com>
-	<58F06AA1.2010301@huawei.com>
-	<9b42232a-e86f-2d61-7987-7a0559d6f705@redhat.com>
-	<58F4A12C.5070404@huawei.com>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <03b8406c-77ce-7517-f8db-ddf31cbb686e@cn.fujitsu.com>
-Date: Tue, 18 Apr 2017 09:32:17 +0800
-MIME-Version: 1.0
-In-Reply-To: <58F4A12C.5070404@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 02/15] colo-compare: implement the process
- of checkpoint
+	(envelope-from <eblake@redhat.com>) id 1d0I1v-0003Qq-7I
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 21:34:08 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Mon, 17 Apr 2017 20:33:25 -0500
+Message-Id: <20170418013356.3578-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH 00/31] make bdrv_get_block_status byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,144 +17,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
-Cc: zhangchen.fnst@cn.fujitsu.com, xuquan8@huawei.com, dgilbert@redhat.com, lizhijian@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@nongnu.org, jsnow@redhat.com
 
+There are patches floating around to add NBD_CMD_BLOCK_STATUS,
+but NBD wants to report status on byte granularity (even if the
+reporting will probably be naturally aligned to sectors or even
+much higher levels).  I've therefore started the task of
+converting our block status code to report at a byte granularity
+rather than sectors.
 
+This is part three of that conversion: dirty-bitmap. Earlier parts
+have been (mostly) reviewed, for bdrv_is_allocated and dirty-bitmaps.
 
-On 04/17/2017 07:04 PM, Hailiang Zhang wrote:
-> Hi Jason,
->
-> On 2017/4/14 14:38, Jason Wang wrote:
->>
->> On 2017年04月14日 14:22, Hailiang Zhang wrote:
->>> Hi Jason,
->>>
->>> On 2017/4/14 13:57, Jason Wang wrote:
->>>> On 2017年02月22日 17:31, Zhang Chen wrote:
->>>>> On 02/22/2017 11:42 AM, zhanghailiang wrote:
->>>>>> While do checkpoint, we need to flush all the unhandled packets,
->>>>>> By using the filter notifier mechanism, we can easily to notify
->>>>>> every compare object to do this process, which runs inside
->>>>>> of compare threads as a coroutine.
->>>>> Hi~ Jason and Hailiang.
->>>>>
->>>>> I will send a patch set later about colo-compare notify mechanism for
->>>>> Xen like this patch.
->>>>> I want to add a new chardev socket way in colo-comapre connect to Xen
->>>>> colo, for notify
->>>>> checkpoint or failover, Because We have no choice to use this way
->>>>> communicate with Xen codes.
->>>>> That's means we will have two notify mechanism.
->>>>> What do you think about this?
->>>>>
->>>>>
->>>>> Thanks
->>>>> Zhang Chen
->>>> I was thinking the possibility of using similar way to for colo 
->>>> compare.
->>>> E.g can we use socket? This can saves duplicated codes more or less.
->>> Since there are too many sockets used by filter and COLO, (Two unix
->>> sockets and two
->>>   tcp sockets for each vNIC), I don't want to introduce more ;) , but
->>> i'm not sure if it is
->>> possible to make it more flexible and optional, abstract these
->>> duplicated codes,
->>> pass the opened fd (No matter eventfd or socket fd ) as parameter, for
->>> example.
->>> Is this way acceptable ?
->>>
->>> Thanks,
->>> Hailiang
->> Yes, that's kind of what I want. We don't want to use two message
->> format. Passing a opened fd need management support, we still need a
->> fallback if there's no management on top. For qemu/kvm, we can do all
->> stuffs transparent to the cli by e.g socketpair() or others, but the key
->> is to have a unified message format.
->
-> After a deeper investigation, i think we can re-use most codes, since 
-> there is no
-> existing way to notify xen (no ?), we still needs notify chardev 
-> socket (Be used to notify xen, it is optional.)
-> (http://patchwork.ozlabs.org/patch/733431/ "COLO-compare: Add Xen 
-> notify chardev socket handler frame")
->
-> Besides, there is an existing qmp comand 'xen-colo-do-checkpoint', we 
-> can re-use it to notify
-> colo-compare objects and other filter objects to do checkpoint, for 
-> the opposite direction, we use
-> the notify chardev socket (Only for xen).
->
-> So the codes will be like:
-> diff --git a/migration/colo.c b/migration/colo.c
-> index 91da936..813c281 100644
-> --- a/migration/colo.c
-> +++ b/migration/colo.c
-> @@ -224,7 +224,19 @@ ReplicationStatus 
-> *qmp_query_xen_replication_status(Error **errp)
->
->  void qmp_xen_colo_do_checkpoint(Error **errp)
->  {
-> +    Error *local_err = NULL;
-> +
->      replication_do_checkpoint_all(errp);
-> +    /* Notify colo-compare and other filters to do checkpoint */
-> +    colo_notify_compares_event(NULL, COLO_CHECKPOINT, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +    colo_notify_filters_event(COLO_CHECKPOINT, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +    }
->  }
->
->  static void colo_send_message(QEMUFile *f, COLOMessage msg,
-> diff --git a/net/colo-compare.c b/net/colo-compare.c
-> index 24e13f0..de975c5 100644
-> --- a/net/colo-compare.c
-> +++ b/net/colo-compare.c
-> @@ -391,6 +391,9 @@ static void colo_compare_inconsistent_notify(void)
->  {
->      notifier_list_notify(&colo_compare_notifiers,
->                  migrate_get_current());
-> +    if (s->notify_dev) {
-> +       /* Do something, notify remote side through notify dev */
-> +    }
->  }
->
->  void colo_compare_register_notifier(Notifier *notify)
->
-> How about this scenario ？
+Perhaps I could have split this in two; patches 1-10 vs. 11-31 make
+a nice division of labor.
 
-I agree this way, maybe rename qmp_xen_colo_do_checkpoint()
-to qmp_remote_colo_do_checkpoint() is more generic.
+Available as a tag at:
+git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-status-v1
 
-Thanks
-Zhang Chen
+It requires the following (v1 of bdrv_is_allocated, v1 of dirty-bitmap,
+v9 of blkdebug, and Max's block-next tree):
+https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg01995.html
+https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg01723.html
+https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg01298.html
+https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg02163.html
 
->
->> Thoughts?
->>
->> Thanks
->>
->>>> Thanks
->>>>
->>>>
->>>> .
->>>>
->>>
->>
->> .
->>
->
->
->
->
-> .
->
+The diffstat shows no net change in total lines - but I know that the
+new code has more lines of comments than the old ;)
+
+I still haven't felt like tackling the task of rewriting migration/block.c
+to use bytes (instead of sectors) everywhere - that might give another
+net win in lines of code and legibility, but I also know it would
+conflict with some of the refactoring work that Juan is currently
+posting for review.
+
+Eric Blake (31):
+  block: Drop unused bdrv_round_sectors_to_clusters()
+  block: Make bdrv_round_to_clusters() signature more useful
+  qcow2: Switch is_zero_sectors() to byte-based
+  block: Switch bdrv_make_zero() to byte-based
+  qemu-img: Switch get_block_status() to byte-based
+  block: Convert bdrv_get_block_status() to bytes
+  block: Switch bdrv_co_get_block_status() to byte-based
+  block: Switch BdrvCoGetBlockStatusData to byte-based
+  block: Switch bdrv_co_get_block_status_above() to byte-based
+  block: Convert bdrv_get_block_status_above() to bytes
+  block: Add .bdrv_co_block_status() callback
+  commit: Switch to .bdrv_co_block_status()
+  file-posix: Switch to .bdrv_co_block_status()
+  gluster: Switch to .bdrv_co_block_status()
+  iscsi: Switch cluster_sectors to byte-based
+  iscsi: Switch iscsi_allocmap_update() to byte-based
+  iscsi: Switch to .bdrv_co_block_status()
+  mirror: Switch to .bdrv_co_block_status()
+  null: Switch to .bdrv_co_block_status()
+  parallels: Switch to .bdrv_co_block_status()
+  qcow: Switch to .bdrv_co_block_status()
+  qcow2: Switch to .bdrv_co_block_status()
+  qed: Switch to .bdrv_co_block_status()
+  raw: Switch to .bdrv_co_block_status()
+  sheepdog: Switch to .bdrv_co_block_status()
+  vdi: Avoid bitrot of debugging code
+  vdi: Switch to .bdrv_co_block_status()
+  vmdk: Switch to .bdrv_co_block_status()
+  vpc: Switch to .bdrv_co_block_status()
+  vvfat: Switch to .bdrv_co_block_status()
+  block: Drop unused .bdrv_co_get_block_status()
+
+ include/block/block.h     |  33 +++----
+ include/block/block_int.h |  13 ++-
+ block/commit.c            |  10 +-
+ block/file-posix.c        |  47 +++++----
+ block/gluster.c           |  47 +++++----
+ block/io.c                | 243 ++++++++++++++++++++++------------------------
+ block/iscsi.c             | 144 ++++++++++++++-------------
+ block/mirror.c            |  33 +++----
+ block/null.c              |  21 ++--
+ block/parallels.c         |  15 +--
+ block/qcow.c              |  22 +++--
+ block/qcow2-cluster.c     |   2 +-
+ block/qcow2.c             |  51 +++++-----
+ block/qed.c               |  22 ++---
+ block/raw-format.c        |  16 +--
+ block/sheepdog.c          |  23 +++--
+ block/vdi.c               |  37 ++++---
+ block/vmdk.c              |  24 ++---
+ block/vpc.c               |  31 +++---
+ block/vvfat.c             |  12 +--
+ qemu-img.c                |  70 ++++++-------
+ block/trace-events        |   2 +-
+ 22 files changed, 459 insertions(+), 459 deletions(-)
 
 -- 
-Thanks
-Zhang Chen
+2.9.3
