@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d0TSp-0000Wg-2J
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:46:40 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d0TZD-0002Il-00
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:53:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d0TSo-0002cx-Az
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:46:39 -0400
-Date: Tue, 18 Apr 2017 21:46:27 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170418134627.GC490@lemon.lan>
-References: <20170418103948.13965-1-famz@redhat.com>
-	<3b51de74-0d1b-ebae-1b98-fa74d028c982@redhat.com>
+	(envelope-from <ehabkost@redhat.com>) id 1d0TZ8-0005yf-V1
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 09:53:15 -0400
+Date: Tue, 18 Apr 2017 10:53:03 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170418135303.GM25239@thinpad.lan.raisama.net>
+References: <20170417215916.12431-1-ehabkost@redhat.com>
+	<20170417215916.12431-6-ehabkost@redhat.com>
+	<cdec6fba-6cbd-1e17-7f45-36dba034c174@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3b51de74-0d1b-ebae-1b98-fa74d028c982@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9-rc5 v3] block: Drain BH in
- bdrv_drained_begin
+In-Reply-To: <cdec6fba-6cbd-1e17-7f45-36dba034c174@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 5/7] pci: Set phb->bus inside
+ pci_register_bus()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,34 +25,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, jcody@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: qemu-devel@nongnu.org, aik@ozlabs.ru, David Gibson <dgibson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Alexander Graf <agraf@suse.de>, Scott Wood <scottwood@freescale.com>, Paul Burton <paul.burton@imgtec.com>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cornelia.huck@de.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-ppc@nongnu.org
 
-On Tue, 04/18 14:36, Paolo Bonzini wrote:
+On Tue, Apr 18, 2017 at 04:43:48PM +0300, Marcel Apfelbaum wrote:
+> On 04/18/2017 12:59 AM, Eduardo Habkost wrote:
+> > Every single caller of of pci_register_bus() saves the return value in
+> > phb->bus. Do that inside pci_register_bus() to avoid code duplication
+> > and make it harder to break.
+> > 
 > 
-> 
-> On 18/04/2017 12:39, Fam Zheng wrote:
-> > +    QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
-> > +        BlockDriverState *bs = child->bs;
-> > +        assert(bs->refcnt > 0);
-> > +        bdrv_ref(bs);
-> > +        waited |= bdrv_drain_recurse(bs);
-> > +        bdrv_unref(bs);
-> >      }
-> 
-> I think this accesses global state that is not protected by the
-> AioContext lock?
+> I personally find that more difficult to follow, maybe the function
+> name is misleading.
+> Maybe we can find a better function name or explain the side effect
+> in a comment?
 
-Good catch! If called from IOThread, this bdrv_unref is simply wrong, although
-in practice it cannot delete bs because of the reference held by the owning
-device.
+I agree we need better function names (for both
+pci_register_bus() and pci_bus_new*()). But I am not experienced
+enough with the PCI code to find a good name. Any suggestions?
 
-It may be better to wrap the bdrv_ref/bdrv_unref calls with
-
-     if (qemu_get_current_aio_context() == qemu_get_aio_context())
-
-because only the main loop needs it.
-
-Will make this hunk a separate patch in v4.
-
-Fam
+-- 
+Eduardo
