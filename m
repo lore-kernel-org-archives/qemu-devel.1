@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d0V5o-0003EW-N8
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 11:31:02 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d0V81-0004DP-MS
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 11:33:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d0V5l-0001lB-Hj
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 11:31:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59948)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d0V5l-0001kc-C1
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 11:30:57 -0400
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 249142D9EB5
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 15:30:55 +0000 (UTC)
-References: <20170418152424.GX30620@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9ae9d913-2516-72dc-adaf-cdd0f082c486@redhat.com>
-Date: Tue, 18 Apr 2017 17:30:52 +0200
+	(envelope-from <kwolf@redhat.com>) id 1d0V80-0003XJ-EV
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 11:33:17 -0400
+Date: Tue, 18 Apr 2017 17:32:56 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170418153256.GE9236@noname.redhat.com>
+References: <20170412091819.GB4955@noname.str.redhat.com>
+	<20170418144725.GJ21261@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20170418152424.GX30620@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] virtio-scsi limits
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Qxx1br4bt0+wmkIi"
+Content-Disposition: inline
+In-Reply-To: <20170418144725.GJ21261@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] migrate -b problems
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,62 +24,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-block@nongnu.org, dgilbert@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, quintela@redhat.com
 
 
+--Qxx1br4bt0+wmkIi
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 18/04/2017 17:24, Richard W.M. Jones wrote:
-> In libvirt, <address ... bus="0"> refers to the virtio-scsi "channel".
-> The current virtio-scsi driver in qemu has a hard limit of 1 channel,
-> so you can only use bus="0" (or channel=0).
-> 
-> Open question: Will this limit ever be increased?
+Am 18.04.2017 um 16:47 hat Stefan Hajnoczi geschrieben:
+> On Wed, Apr 12, 2017 at 11:18:19AM +0200, Kevin Wolf wrote:
+> > after getting assertion failure reports for block migration in the last
+> > minute, we just hacked around it by commenting out op blocker assertions
+> > for the 2.9 release, but now we need to see how to fix things properly.
+> > Luckily, get_maintainer.pl doesn't report me, but only you. :-)
+> >=20
+> > The main problem I see with the block migration code (on the
+> > destination) is that it abuses the BlockBackend that belongs to the
+> > guest device to make its own writes to the image file. If the guest
+> > isn't allowed to write to the image (which it now isn't during incoming
+> > migration since it would conflict with the newer style of block
+> > migration using an NBD server), writing to this BlockBackend doesn't
+> > work any more.
+> >=20
+> > So what should really happen is that incoming block migration creates
+> > its own BlockBackend for writing to the image. Now we don't want to do
+> > this anew for every incoming block, but ideally we'd just create all
+> > necessary BlockBackends upfront and then keep using them throughout the
+> > whole migration. Is there a way to get some setup/teardown callbacks
+> > at the start/end of the migration that could initialise and free such
+> > global data?
+>=20
+> It can be done in the beginning of block_load() similar to
+> block_mig_state.bmds_list, which is created in init_blk_migration() at
+> save time.
 
-No, it's only there because spapr_vscsi supports channel>0.
+The difference is that block_load() is the counterpart for
+block_save_iterate(), not for init_blk_migration(). That is, it is
+called for each chunk of block migration data, which is interleaved with
+normal RAM migration chunks.
 
-> In libvirt, <address ... target="0"> refers to the virtio-scsi
-> "scsi-id" (internally in the driver called just ".id").  You can use
-> any target from 0 to 255 inclusive.
-> 
-> In libvirt, <address ... unit="0"> refers to the virtio-scsi "unit" ie
-> the SCSI LUN.  You can use any LUN from 0 to 16383 inclusive.
-> 
-> Open question: What does the bus=scsi0.0 parameter mean?
+So we can either create each BlockBackend the first time we need it in
+block_load(), or create BlockBackends for all existing device BBs and
+BDSes the first time block_load() is called. We still need some place
+to actually free the BlockBackends again when the migration completes.
 
-The first bus in scsi0, where the 0 in scsi0 is the controller index.
+Dave suggested migration state notifiers, which looked like an option,
+but at least the existing migration states aren't enough, because the
+BlockBackends need to go away before blk_resume_after_migration() is
+called, but MIGRATION_STATUS_COMPLETED is set only afterwards.
 
-> Not tested yet: Does hotplugging work on individual LUNs?
+> We can also move the if (blk !=3D blk_prev) blk_invalidate_cache() code
+> out of the load loop.  It should be done once when setting up
+> BlockBackends.
 
-Yes.
+Same problem as above, while saving has setup/cleanup callbacks, we only
+have the iterate callback for loading.
 
-> Currently libguestfs puts each disk on a separate target (target=i
-> unit=0), and therefore has an effective limit of 255 disks (256 - 1
-> because the appliance uses a disk).
-> 
-> When I changed libguestfs to use LUNs instead of targets (target=0
-> unit=i), I got a peculiar bug.  It looks like there is some kind of
-> race when enumerating the device, where /sys is populated before the
-> device is actually available.
+> > The other problem with block migration is that is uses a BlockBackend
+> > name to identify which device is migrated. However, there can be images
+> > that are not attached to any BlockBackend, or if it is, the BlockBackend
+> > might be anonymous, so this doesn't work. I suppose changing the field
+> > to "device name if available, node-name otherwise" would solve this.
+>=20
+> Yes, that sounds good and is backwards compatible.
 
-That's not _too_ surprising because devtmpfs processes creation/deletion
-requests asynchronously.
+Kevin
 
-Paolo
+--Qxx1br4bt0+wmkIi
+Content-Type: application/pgp-signature
 
-> See the below boot log, and compare it
-> to the init code:
-> 
-> https://github.com/libguestfs/supermin/blob/master/init/init.c#L176
-> 
-> * fp = fopen ("/sys/block/sdab/dev", "r") succeeds at line 181
-> 
-> * we read major:minor from fp at line 230
-> 
-> * we mknod ("/dev/root",...) at line 245
-> 
-> * we mount ("/dev/root", "/root", "ext2"...) at line 262, which fails with
->   EINVAL
-> 
-> * shortly after that, kernel messages indicate that sdab has been
->   attached.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJY9jGoAAoJEH8JsnLIjy/Wo9AP/2sBxxpz0/DyE6iVBp4YYE0X
+6Ul/gfVmwAiF0d8v8XJFf0VgvQuTTlhfKAa7gPNwvoGKggq0vNy286rYm9/scGK4
+34/BQxqpNZLMu/x8t+ZTKoyzEy/tVkRTH+0OdlcLQAx7MDfQBH7HQjGr3OzTzHTL
+lNqwc05Z0zaaGp3uZwkvuQlzvqM3rn4X5SIcd+TGegxdAam1fqfkLynEAFPHn7Pv
+bYNBfQRs6y1ulpskz8dsgOsB4VLNCHxZcBNs4TtdrpMT8a042U4BHeejrcAoZLGt
+lm1jeJ0IM3sWyDiQFiUD0ZGVSboDAbSCtkIPX3D6iNw2bMZtVfuJSrrC4ZQjnYKX
+kYGaBy450o85qvg4kDi1LO2AacKdjFMLd6k/m9KCSXU36g5ZRd5MQ75+sw7bYUf6
+NaRB3oZhkGTgfCSViI94TAPQmaL6nQZGw9xQoz4V0hqMlO7lIoqC8Il7R5omgjum
+XhwLeV8AEC/jWZLhOmmgDYGwKLFqZTLd8dJ5Fsie5sWjImOSw15Aytcw25R9muw1
+6A4UgmsdeyfWZOEvWwYZnKWR1uGVUThHLkjcpZg3oN9svW3u47TnBxvXhppgffBF
++7d3QuGouBPuL6qqvF4tLRGe5Q1YPpxqavbsBCGXVSdIVcXXlQh8xDYOy4b9YPBC
+QTqGad+2PBhmAK3Z0XdG
+=nvy9
+-----END PGP SIGNATURE-----
+
+--Qxx1br4bt0+wmkIi--
