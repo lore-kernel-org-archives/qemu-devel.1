@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0I2q-0005r1-13
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 21:35:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1d0I2u-0005xH-Cx
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 21:35:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0I2p-0003yg-B0
-	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 21:35:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1d0I2r-0003zD-Ay
+	for qemu-devel@nongnu.org; Mon, 17 Apr 2017 21:35:08 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 17 Apr 2017 20:33:51 -0500
-Message-Id: <20170418013356.3578-27-eblake@redhat.com>
+Date: Mon, 17 Apr 2017 20:33:52 -0500
+Message-Id: <20170418013356.3578-28-eblake@redhat.com>
 In-Reply-To: <20170418013356.3578-1-eblake@redhat.com>
 References: <20170418013356.3578-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH 26/31] vdi: Avoid bitrot of debugging code
+Subject: [Qemu-devel] [PATCH 27/31] vdi: Switch to .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,39 +22,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@nongnu.org, jsnow@redhat.com, Stefan Weil <sw@weilnetz.de>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Rework the debug define so that we always get -Wformat checking,
-even when debugging is disabled.
+We are gradually moving away from sector-based interfaces, towards
+byte-based.  Update the vdi driver accordingly.  Note that the
+TODO is already covered (the block layer guarantees bounds of its
+requests), and that we can remove the now-unused s->block_sectors.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- block/vdi.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ block/vdi.c | 25 ++++++++-----------------
+ 1 file changed, 8 insertions(+), 17 deletions(-)
 
 diff --git a/block/vdi.c b/block/vdi.c
-index d12d9cd..a70b969 100644
+index a70b969..390e2f1 100644
 --- a/block/vdi.c
 +++ b/block/vdi.c
-@@ -86,12 +86,18 @@
- #define DEFAULT_CLUSTER_SIZE (1 * MiB)
+@@ -171,8 +171,6 @@ typedef struct {
+     uint32_t *bmap;
+     /* Size of block (bytes). */
+     uint32_t block_size;
+-    /* Size of block (sectors). */
+-    uint32_t block_sectors;
+     /* First sector of block map. */
+     uint32_t bmap_sector;
+     /* VDI header (converted to host endianness). */
+@@ -462,7 +460,6 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
+     bs->total_sectors = header.disk_size / SECTOR_SIZE;
 
- #if defined(CONFIG_VDI_DEBUG)
--#define logout(fmt, ...) \
--                fprintf(stderr, "vdi\t%-24s" fmt, __func__, ##__VA_ARGS__)
-+#define VDI_DEBUG 1
- #else
--#define logout(fmt, ...) ((void)0)
-+#define VDI_DEBUG 0
- #endif
+     s->block_size = header.block_size;
+-    s->block_sectors = header.block_size / SECTOR_SIZE;
+     s->bmap_sector = header.offset_bmap / SECTOR_SIZE;
+     s->header = header;
 
-+#define logout(fmt, ...) \
-+    do {                                                                \
-+        if (VDI_DEBUG) {                                                \
-+            fprintf(stderr, "vdi\t%-24s" fmt, __func__, ##__VA_ARGS__); \
-+        }                                                               \
-+    } while (0)
-+
- /* Image signature. */
- #define VDI_SIGNATURE 0xbeda107f
+@@ -508,23 +505,17 @@ static int vdi_reopen_prepare(BDRVReopenState *state,
+     return 0;
+ }
 
+-static int64_t coroutine_fn vdi_co_get_block_status(BlockDriverState *bs,
+-        int64_t sector_num, int nb_sectors, int *pnum, BlockDriverState **file)
++static int64_t coroutine_fn vdi_co_block_status(BlockDriverState *bs,
++        int64_t offset, int64_t bytes, int64_t *pnum, BlockDriverState **file)
+ {
+-    /* TODO: Check for too large sector_num (in bdrv_is_allocated or here). */
+     BDRVVdiState *s = (BDRVVdiState *)bs->opaque;
+-    size_t bmap_index = sector_num / s->block_sectors;
+-    size_t sector_in_block = sector_num % s->block_sectors;
+-    int n_sectors = s->block_sectors - sector_in_block;
++    size_t bmap_index = offset / s->block_size;
++    size_t index_in_block = offset % s->block_size;
+     uint32_t bmap_entry = le32_to_cpu(s->bmap[bmap_index]);
+-    uint64_t offset;
+     int result;
+
+-    logout("%p, %" PRId64 ", %d, %p\n", bs, sector_num, nb_sectors, pnum);
+-    if (n_sectors > nb_sectors) {
+-        n_sectors = nb_sectors;
+-    }
+-    *pnum = n_sectors;
++    logout("%p, %" PRId64 ", %" PRId64 ", %p\n", bs, offset, bytes, pnum);
++    *pnum = MIN(s->block_size, bytes);
+     result = VDI_IS_ALLOCATED(bmap_entry);
+     if (!result) {
+         return 0;
+@@ -532,7 +523,7 @@ static int64_t coroutine_fn vdi_co_get_block_status(BlockDriverState *bs,
+
+     offset = s->header.offset_data +
+                               (uint64_t)bmap_entry * s->block_size +
+-                              sector_in_block * SECTOR_SIZE;
++                              (index_in_block & BDRV_BLOCK_OFFSET_MASK);
+     *file = bs->file->bs;
+     return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | offset;
+ }
+@@ -901,7 +892,7 @@ static BlockDriver bdrv_vdi = {
+     .bdrv_child_perm          = bdrv_format_default_perms,
+     .bdrv_create = vdi_create,
+     .bdrv_has_zero_init = bdrv_has_zero_init_1,
+-    .bdrv_co_get_block_status = vdi_co_get_block_status,
++    .bdrv_co_block_status = vdi_co_block_status,
+     .bdrv_make_empty = vdi_make_empty,
+
+     .bdrv_co_preadv     = vdi_co_preadv,
 -- 
 2.9.3
