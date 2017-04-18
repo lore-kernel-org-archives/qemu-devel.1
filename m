@@ -1,17 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d0UBM-0003Ay-90
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:32:46 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d0UCC-0003mn-Ko
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:33:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d0UBL-0006Xy-Ap
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:32:40 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Tue, 18 Apr 2017 22:30:44 +0800
-Message-Id: <20170418143044.12187-3-famz@redhat.com>
-In-Reply-To: <20170418143044.12187-1-famz@redhat.com>
-References: <20170418143044.12187-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9-rc5 v4 2/2] block: Drain BH in
- bdrv_drained_begin
+	(envelope-from <ehabkost@redhat.com>) id 1d0UCB-0006oH-Gl
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 10:33:32 -0400
+Date: Tue, 18 Apr 2017 11:33:12 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170418143312.GN25239@thinpad.lan.raisama.net>
+References: <20170328021651.19350-1-david@gibson.dropbear.id.au>
+	<20170328021651.19350-3-david@gibson.dropbear.id.au>
+	<20170417183045.GA7078@thinpad.lan.raisama.net>
+	<20170418022151.GD12235@umbus.fritz.box>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170418022151.GD12235@umbus.fritz.box>
+Subject: Re: [Qemu-devel] [RFC for-2.10 2/3] pci: Allow host bridges to
+ override PCI/PCIe hybrid device behaviour
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,116 +26,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, jcody@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: aik@ozlabs.ru, marcel@redhat.com, lersek@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mst@redhat.com
 
-During block job completion, nothing is preventing
-block_job_defer_to_main_loop_bh from being called in a nested
-aio_poll(), which is a trouble, such as in this code path:
+On Tue, Apr 18, 2017 at 12:21:51PM +1000, David Gibson wrote:
+> On Mon, Apr 17, 2017 at 03:30:46PM -0300, Eduardo Habkost wrote:
+> > On Tue, Mar 28, 2017 at 01:16:50PM +1100, David Gibson wrote:
+> > > Currently PCI/PCIe hybrid devices - that is, devices which can appear as
+> > > either plain PCI or PCIe depending on where they're attached - will only
+> > > appear in PCIe mode if they're attached to a PCIe bus via a root port or
+> > > downstream port.
+> > > 
+> > > This is correct for "standard" PCIe setups, but there are some platforms
+> > > which need different behaviour (notably "pseries" whose paravirtualized
+> > > PCI host bridges have some idiosyncracies).
+> > > 
+> > > This patch allows the host bridge to override the normal behaviour.
+> > > 
+> > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > > ---
+> > >  hw/pci/pci.c              | 11 +++++++++--
+> > >  include/hw/pci/pci_host.h |  1 +
+> > >  2 files changed, 10 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> > > index 779787b..ac68065 100644
+> > > --- a/hw/pci/pci.c
+> > > +++ b/hw/pci/pci.c
+> > > @@ -392,9 +392,16 @@ bool pci_bus_is_root(PCIBus *bus)
+> > >  
+> > >  bool pci_allow_hybrid_pcie(PCIDevice *pci_dev)
+> > 
+> > Why are we asking the device about allowing hybrid pcie, and not
+> > the bus itself? Shouldn't we be able to query this before the
+> > device is plugged, and before pci_dev->bus is even set?
+> > 
+> > In other words, why pci_allow_hyberid_pcie() and
+> > pci_device_get_bus() get a PCIDevice* argument instead of a
+> > PCIBus* argument?
+> 
+> Ah good point.  I made it a PCIDevice simply for convenience, but
+> you're right we should be able to query before the device is plugged.
 
-    qmp_block_commit
-      commit_active_start
-        bdrv_reopen
-          bdrv_reopen_multiple
-            bdrv_reopen_prepare
-              bdrv_flush
-                aio_poll
-                  aio_bh_poll
-                    aio_bh_call
-                      block_job_defer_to_main_loop_bh
-                        stream_complete
-                          bdrv_reopen
+Understood.
 
-block_job_defer_to_main_loop_bh is the last step of the stream job,
-which should have been "paused" by the bdrv_drained_begin/end in
-bdrv_reopen_multiple, but it is not done because it's in the form of a
-main loop BH.
+> 
+> > 
+> > >  {
+> > > -    PCIBus *bus = pci_dev->bus;
+> > > +    PCIHostState *host_bridge = PCI_HOST_BRIDGE(pci_device_root_bus(pci_dev)->qbus.parent);
+> > 
+> > There's something I don't understand completely: what exactly
+> > guarantees that pci_device_root_bus(...)->qbus.parent is always
+> > going to be a PCI_HOST_BRIDGE?
+> 
+> Well, by definition whatever is above the root bus isn't PCI, which
+> pretty much means it has to be a PCI host bridge.  A machine could
+> break this assumption, but I think that would be a bug.  We use this
+> same pattern to find a PCI device's (or bus's) host bridge in other
+> places - there doesn't appear to be another way.
 
-Similar to why block jobs should be paused between drained_begin and
-drained_end, BHs they schedule must be excluded as well.  To achieve
-this, this patch forces draining the BH in BDRV_POLL_WHILE.
+After taking a better look at the way PCI buses are created, I
+agree it's OK. Maybe a
+  PCIHostState *pci_host_bridge(PCIBus *bus)
+helper would be useful?
 
-As a side effect this fixes a hang in block_job_detach_aio_context
-during system_reset when a block job is ready:
+Anyway, both pci_bus_root_bus() and pci_host_bridge() could be
+implemented as follow-ups if you prefer, so:
 
-    #0  0x0000555555aa79f3 in bdrv_drain_recurse
-    #1  0x0000555555aa825d in bdrv_drained_begin
-    #2  0x0000555555aa8449 in bdrv_drain
-    #3  0x0000555555a9c356 in blk_drain
-    #4  0x0000555555aa3cfd in mirror_drain
-    #5  0x0000555555a66e11 in block_job_detach_aio_context
-    #6  0x0000555555a62f4d in bdrv_detach_aio_context
-    #7  0x0000555555a63116 in bdrv_set_aio_context
-    #8  0x0000555555a9d326 in blk_set_aio_context
-    #9  0x00005555557e38da in virtio_blk_data_plane_stop
-    #10 0x00005555559f9d5f in virtio_bus_stop_ioeventfd
-    #11 0x00005555559fa49b in virtio_bus_stop_ioeventfd
-    #12 0x00005555559f6a18 in virtio_pci_stop_ioeventfd
-    #13 0x00005555559f6a18 in virtio_pci_reset
-    #14 0x00005555559139a9 in qdev_reset_one
-    #15 0x0000555555916738 in qbus_walk_children
-    #16 0x0000555555913318 in qdev_walk_children
-    #17 0x0000555555916738 in qbus_walk_children
-    #18 0x00005555559168ca in qemu_devices_reset
-    #19 0x000055555581fcbb in pc_machine_reset
-    #20 0x00005555558a4d96 in qemu_system_reset
-    #21 0x000055555577157a in main_loop_should_exit
-    #22 0x000055555577157a in main_loop
-    #23 0x000055555577157a in main
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
-The rationale is that the loop in block_job_detach_aio_context cannot
-make any progress in pausing/completing the job, because bs->in_flight
-is 0, so bdrv_drain doesn't process the block_job_defer_to_main_loop
-BH. With this patch, it does.
+But I still have another suggestion:
 
-Reported-by: Jeff Cody <jcody@redhat.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- include/block/block.h | 22 ++++++++++++++--------
- 1 file changed, 14 insertions(+), 8 deletions(-)
+> 
+> > > +    PCIHostBridgeClass *hc = PCI_HOST_BRIDGE_GET_CLASS(host_bridge);
+> > > +
+> > > +    if (hc->allow_hybrid_pcie) {
+> > > +        return hc->allow_hybrid_pcie(host_bridge, pci_dev);
+> > > +    } else {
+> > > +        PCIBus *bus = pci_dev->bus;
+> > >  
+> > > -    return pci_bus_is_express(bus) && !pci_bus_is_root(bus);
+> > > +        return pci_bus_is_express(bus) && !pci_bus_is_root(bus);
 
-diff --git a/include/block/block.h b/include/block/block.h
-index 97d4330..5ddc0cf 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -381,12 +381,13 @@ void bdrv_drain_all(void);
- 
- #define BDRV_POLL_WHILE(bs, cond) ({                       \
-     bool waited_ = false;                                  \
-+    bool busy_ = true;                                     \
-     BlockDriverState *bs_ = (bs);                          \
-     AioContext *ctx_ = bdrv_get_aio_context(bs_);          \
-     if (aio_context_in_iothread(ctx_)) {                   \
--        while ((cond)) {                                   \
--            aio_poll(ctx_, true);                          \
--            waited_ = true;                                \
-+        while ((cond) || busy_) {                          \
-+            busy_ = aio_poll(ctx_, (cond));                \
-+            waited_ |= !!(cond) | busy_;                   \
-         }                                                  \
-     } else {                                               \
-         assert(qemu_get_current_aio_context() ==           \
-@@ -398,11 +399,16 @@ void bdrv_drain_all(void);
-          */                                                \
-         assert(!bs_->wakeup);                              \
-         bs_->wakeup = true;                                \
--        while ((cond)) {                                   \
--            aio_context_release(ctx_);                     \
--            aio_poll(qemu_get_aio_context(), true);        \
--            aio_context_acquire(ctx_);                     \
--            waited_ = true;                                \
-+        while (busy_) {                                    \
-+            if ((cond)) {                                  \
-+                waited_ = busy_ = true;                    \
-+                aio_context_release(ctx_);                 \
-+                aio_poll(qemu_get_aio_context(), true);    \
-+                aio_context_acquire(ctx_);                 \
-+            } else {                                       \
-+                busy_ = aio_poll(ctx_, false);             \
-+                waited_ |= busy_;                          \
-+            }                                              \
-         }                                                  \
-         bs_->wakeup = false;                               \
-     }                                                      \
+Maybe it's a matter of personal taste, but instead of requiring
+an explicit check for NULL hc->allow_hybrid_pcie, why not set a
+default hc->allow_hybrid_pcie() implementation on
+TYPE_PCI_HOST_BRIDGE that returns
+(pci_bus_is_express(bus) && !pci_bus_is_root(bus))?
+
 -- 
-2.9.3
+Eduardo
