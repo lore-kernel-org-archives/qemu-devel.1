@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xiecl.fnst@cn.fujitsu.com>) id 1d0M7X-0001kH-8c
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 01:56:12 -0400
+	(envelope-from <yi.l.liu@intel.com>) id 1d0ME3-0002f1-G9
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 02:02:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xiecl.fnst@cn.fujitsu.com>) id 1d0M7W-0005dR-0q
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 01:56:11 -0400
-Message-ID: <58F5AB45.1050505@cn.fujitsu.com>
-Date: Tue, 18 Apr 2017 13:59:33 +0800
-From: Xie Changlong <xiecl.fnst@cn.fujitsu.com>
+	(envelope-from <yi.l.liu@intel.com>) id 1d0MDy-0008Ku-Gi
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 02:02:55 -0400
+Received: from mga01.intel.com ([192.55.52.88]:49019)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1d0MDy-0008KW-4v
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 02:02:50 -0400
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+Date: Tue, 18 Apr 2017 06:02:44 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C2574390540D1@shsmsx102.ccr.corp.intel.com>
+References: <1492428730-13438-1-git-send-email-peterx@redhat.com>
+	<1492428730-13438-8-git-send-email-peterx@redhat.com>
+	<A2975661238FB949B60364EF0F2C257439054049@shsmsx102.ccr.corp.intel.com>
+	<20170418045400.GC22226@pxdev.xzpeter.org>
+In-Reply-To: <20170418045400.GC22226@pxdev.xzpeter.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <1492005921-15664-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1492005921-15664-3-git-send-email-zhang.zhanghailiang@huawei.com>
-In-Reply-To: <1492005921-15664-3-git-send-email-zhang.zhanghailiang@huawei.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 2/6] replication: add shared-disk and
- shared-disk-id options
+Subject: Re: [Qemu-devel] [PATCH v2 7/7] intel_iommu: support passthrough
+ (PT)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,162 +31,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhanghailiang <zhang.zhanghailiang@huawei.com>, stefanha@redhat.com, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, zhangchen.fnst@cn.fujitsu.com, Wen Congyang <wency@cn.fujitsu.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Lan, Tianyu" <tianyu.lan@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-
-
-On 04/12/2017 10:05 PM, zhanghailiang wrote:
-> We use these two options to identify which disk is
-> shared
->
-> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> Signed-off-by: Wen Congyang <wency@cn.fujitsu.com>
-> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-> ---
-> v4:
-> - Add proper comment for primary_disk (Stefan)
-> v2:
-> - Move g_free(s->shared_disk_id) to the common fail process place (Stefan)
-> - Fix comments for these two options
-> ---
->   block/replication.c  | 43 +++++++++++++++++++++++++++++++++++++++++--
->   qapi/block-core.json | 10 +++++++++-
->   2 files changed, 50 insertions(+), 3 deletions(-)
->
-> diff --git a/block/replication.c b/block/replication.c
-> index bf3c395..418b81b 100644
-> --- a/block/replication.c
-> +++ b/block/replication.c
-> @@ -25,9 +25,12 @@
->   typedef struct BDRVReplicationState {
->       ReplicationMode mode;
->       int replication_state;
-> +    bool is_shared_disk;
-> +    char *shared_disk_id;
->       BdrvChild *active_disk;
->       BdrvChild *hidden_disk;
->       BdrvChild *secondary_disk;
-> +    BdrvChild *primary_disk;
->       char *top_id;
->       ReplicationState *rs;
->       Error *blocker;
-> @@ -53,6 +56,9 @@ static void replication_stop(ReplicationState *rs, bool failover,
->   
->   #define REPLICATION_MODE        "mode"
->   #define REPLICATION_TOP_ID      "top-id"
-> +#define REPLICATION_SHARED_DISK "shared-disk"
-> +#define REPLICATION_SHARED_DISK_ID "shared-disk-id"
-> +
->   static QemuOptsList replication_runtime_opts = {
->       .name = "replication",
->       .head = QTAILQ_HEAD_INITIALIZER(replication_runtime_opts.head),
-> @@ -65,6 +71,14 @@ static QemuOptsList replication_runtime_opts = {
->               .name = REPLICATION_TOP_ID,
->               .type = QEMU_OPT_STRING,
->           },
-> +        {
-> +            .name = REPLICATION_SHARED_DISK_ID,
-> +            .type = QEMU_OPT_STRING,
-> +        },
-> +        {
-> +            .name = REPLICATION_SHARED_DISK,
-> +            .type = QEMU_OPT_BOOL,
-> +        },
->           { /* end of list */ }
->       },
->   };
-> @@ -85,6 +99,9 @@ static int replication_open(BlockDriverState *bs, QDict *options,
->       QemuOpts *opts = NULL;
->       const char *mode;
->       const char *top_id;
-> +    const char *shared_disk_id;
-> +    BlockBackend *blk;
-> +    BlockDriverState *tmp_bs;
->   
->       bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file,
->                                  false, errp);
-> @@ -125,12 +142,33 @@ static int replication_open(BlockDriverState *bs, QDict *options,
->                      "The option mode's value should be primary or secondary");
->           goto fail;
->       }
-> +    s->is_shared_disk = qemu_opt_get_bool(opts, REPLICATION_SHARED_DISK,
-> +
-
-What If secondary side is supplied with 'REPLICATION_SHARED_DISK_ID'? 
-Pls refer f4f2539bc to pefect the logical.
->                                          false);
-> +    if (s->is_shared_disk && (s->mode == REPLICATION_MODE_PRIMARY)) {
-> +        shared_disk_id = qemu_opt_get(opts, REPLICATION_SHARED_DISK_ID);
-> +        if (!shared_disk_id) {
-> +            error_setg(&local_err, "Missing shared disk blk option");
-> +            goto fail;
-> +        }
-> +        s->shared_disk_id = g_strdup(shared_disk_id);
-> +        blk = blk_by_name(s->shared_disk_id);
-> +        if (!blk) {
-> +            error_setg(&local_err, "There is no %s block", s->shared_disk_id);
-> +            goto fail;
-> +        }
-> +        /* We have a BlockBackend for the primary disk but use BdrvChild for
-> +         * consistency - active_disk, secondary_disk, etc are also BdrvChild.
-> +         */
-> +        tmp_bs = blk_bs(blk);
-> +        s->primary_disk = QLIST_FIRST(&tmp_bs->parents);
-> +    }
->   
->       s->rs = replication_new(bs, &replication_ops);
->   
-> -    ret = 0;
-> -
-> +    qemu_opts_del(opts);
-> +    return 0;
->   fail:
-> +    g_free(s->shared_disk_id);
->       qemu_opts_del(opts);
->       error_propagate(errp, local_err);
->   
-> @@ -141,6 +179,7 @@ static void replication_close(BlockDriverState *bs)
->   {
->       BDRVReplicationState *s = bs->opaque;
->   
-> +    g_free(s->shared_disk_id);
->       if (s->replication_state == BLOCK_REPLICATION_RUNNING) {
->           replication_stop(s->rs, false, NULL);
->       }
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 033457c..361c932 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -2661,12 +2661,20 @@
->   #          node who owns the replication node chain. Must not be given in
->   #          primary mode.
->   #
-> +# @shared-disk-id: Id of shared disk while is replication mode, if @shared-disk
-> +#                  is true, this option is required (Since: 2.10)
-> +#
-Further explanations:
-
-For @shared-disk-id, it must/only be given when @shared-disk enable on
-Primary side.
-
-> +# @shared-disk: To indicate whether or not a disk is shared by primary VM
-> +#               and secondary VM. (The default is false) (Since: 2.10)
-> +#
-Further explanations:
-
-For @shared-disk, it must be given or not-given on both side at the same 
-time.
-
->   # Since: 2.9
->   ##
->   { 'struct': 'BlockdevOptionsReplication',
->     'base': 'BlockdevOptionsGenericFormat',
->     'data': { 'mode': 'ReplicationMode',
-> -            '*top-id': 'str' } }
-> +            '*top-id': 'str',
-> +            '*shared-disk-id': 'str',
-> +            '*shared-disk': 'bool' } }
->   
->   ##
->   # @NFSTransport:
+PiA+IEhpIFBldGVyLA0KPiA+DQo+ID4gU2tpcCBhZGRyZXNzIHNwYWNlIHN3aXRjaGluZyBpcyBh
+IGdvb2QgaWRlYSB0byBzdXBwb3J0IFBhc3N0aHJ1IG1vZGUuDQo+ID4gSG93ZXZlciwgd2l0aG91
+dCB0aGUgYWRkcmVzcyBzcGFjZSwgdGhlIHZmaW8gbm90aWZpZXIgd291bGQgbm90IGJlDQo+ID4g
+cmVnaXN0ZXJlZCwgdGh1cyB2SU9NTVUgZW11bGF0b3IgaGFzIG5vIHdheSB0byBjb25uZWN0IHRv
+IGhvc3QuIEl0IGlzDQo+ID4gbm8gaGFybSBpZiB0aGVyZSBpcyBvbmx5IG1hcC91bm1hcCBub3Rp
+Zmllci4gQnV0IGlmIHdlIGhhdmUgbW9yZQ0KPiA+IG5vdGlmaWVycyBvdGhlciB0aGFuIG1hcC91
+bm1hcCwgaXQgbWF5IGJlIGEgcHJvYmxlbS4NCj4gPg0KPiA+IEkgdGhpbmsgd2UgbmVlZCB0byBy
+ZWNvbnNpZGVyIGl0IGhlcmUuDQo+IA0KPiBGb3Igbm93IEkgdGhpbmsgYXMgc3dpdGNoaW5nIGlz
+IGdvb2QgdG8gdXMgaW4gZ2VuZXJhbC4gQ291bGQgSSBrbm93IG1vcmUgY29udGV4dA0KPiBhYm91
+dCB0aGlzPyBXb3VsZCBpdCBiZSBva2F5IHRvIHdvcmsgb24gdG9wIG9mIHRoaXMgaW4gdGhlIGZ1
+dHVyZT8NCj4gDQoNCkxldCBtZSBleHBsYWluLiBGb3IgdlNWTSBlbmFibGluZywgaXQgbmVlZHMg
+dG8gYWRkIG5ldyBub3RpZmllciB0byBiaW5kIGdQQVNJRCB0YWJsZQ0KdG8gaG9zdC4gSWYgYW4g
+YXNzaWduZWQgZGV2aWNlIHVzZXMgU1ZNIGluIGd1ZXN0LCBhcyBkZXNpZ25lZCBndWVzdCBJT01N
+VSBkcml2ZXIgd291bGQNCnNldCAicHQiIGZvciBpdC4gVGhpcyBpcyB0byBtYWtlIHN1cmUgdGhl
+IGhvc3Qgc2Vjb25kLWxldmVsIHBhZ2UgdGFibGUgc3RvcmVzIEdQQS0+SFBBDQptYXBwaW5nLiBT
+byB0aGF0IHBJT01NVSBjYW4gZG8gbmVzdGVkIHRyYW5zbGF0aW9uIHRvIGFjaGlldmUgZ1ZBLT5H
+UEEgR1BBLT5IUEEgDQptYXBwaW5nLg0KDQpTbyB0aGUgc2l0dWF0aW9uIGlzIGlmIHdlIHdhbnQg
+dG8ga2VlcCBHUEEtPkhQQSBtYXBwaW5nLCB3ZSBzaG91bGQgc2tpcCBhZGRyZXNzIHNwYWNlDQpz
+d2l0Y2gsIGJ1dCB0aGUgdmZpbyBsaXN0ZW5lciB3b3VsZCBub3Qga25vdyB2SU9NTVUgaXMgYWRk
+ZWQsIHNvIG5vIHZmaW8gbm90aWZpZXIgd291bGQNCmJlIHJlZ2lzdGVyZWQuIEJ1dCBpZiB3ZSBk
+byB0aGUgc3dpdGNoLCB0aGUgR1BBLT5IUEEgbWFwcGluZyBpcyB1bm1hcHBlZC4gQW5kIG5lZWQN
+CmFub3RoZXIgd2F5IHRvIGJ1aWxkIHRoZSBHUEEtPkhQQSBtYXBwaW5nLg0KDQpJIHRoaW5rIHdl
+IG1heSBoYXZlIHR3byBjaG9pY2UgaGVyZS4gUGxzIGxldCBtZSBrbm93IHlvdXIgaWRlYXMuDQoN
+CjEuIHNraXAgdGhlIHN3aXRjaCBmb3IgInB0IiBtb2RlLCBmaW5kIG90aGVyIHdheSB0byByZWdp
+c3RlciB2ZmlvIG5vdGlmaWVycy4gbm90IHN1cmUgaWYgdGhpcw0KaXMgd29ya2FibGUuIEp1c3Qg
+YSBxdWljayB0aG91Z2h0Lg0KDQoyLiBkbyB0aGUgc3dpdGNoLCBhbmQgcmVidWlsZCBHUEEtPkhQ
+QSBtYXBwaW5nIGlmIGRldmljZSB1c2UgInB0IiBtb2RlLiBGb3IgdGhpcyBvcHRpb24sDQpJIGFs
+c28gaGF2ZSB0d28gd2F5IHRvIGJ1aWxkIHRoZSBHUEEtPkhQQSBtYXBwaW5nLg0KYSkgd2FsayBh
+bGwgdGhlIG1lbW9yeSByZWdpb24gc2VjdGlvbnMgaW4gYWRkcmVzc19zcGFjZV9tZW1vcnksIGFu
+ZCBidWlsZCB0aGUgbWFwcGluZy4NCmFkZHJlc3Nfc3BhY2VfbWVtb3J5LmRpc3BhdGNoLT5tYXAu
+c2VjdGlvbnMsIHNlY3Rpb25zIHN0b3JlcyBhbGwgdGhlIG1hcHBlZCBzZWN0aW9ucy4NCg0KYikg
+bGV0IGd1ZXN0IGlvbW11IGRyaXZlciBtaW1pY3MgYSAxOjEgbWFwcGluZyBmb3IgdGhlIGRldmlj
+ZXMgdXNlICJwdCIgbW9kZS4gaW4gdGhpcyB3YXksDQp0aGUgR1BBLT5IUEEgbWFwcGluZyBjb3Vs
+ZCBiZSBzZXR1cCBieSB3YWxraW5nIHRoZSBndWVzdCBTTCBwYWdlIHRhYmxlLiBUaGlzIGlzIGNv
+bnNpc3RlbnQNCndpdGggeW91ciB2SU9WQSByZXBsYXkgc29sdXRpb24uDQoNCkFsc28gSSdtIGN1
+cmlvdXMgaWYgVGlhbnl1J3MgZmF1bHQgcmVwb3J0IGZyYW1ld29yayBuZWVkcyB0byByZWdpc3Rl
+ciBuZXcgbm90aWZpZXJzLg0KDQpUaGFua3MsDQpZaSBMDQo=
