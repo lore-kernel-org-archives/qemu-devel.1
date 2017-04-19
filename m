@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d0mL2-00053R-Ag
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 05:55:53 -0400
+	(envelope-from <stefanha@redhat.com>) id 1d0mN0-0006Y5-Ol
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 05:57:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d0mL1-0003MF-G2
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 05:55:52 -0400
-Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:33424)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1d0mL0-0003Lt-Rn
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 05:55:51 -0400
-Received: by mail-wr0-x235.google.com with SMTP id l28so11775754wre.0
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 02:55:50 -0700 (PDT)
+	(envelope-from <stefanha@redhat.com>) id 1d0mMz-0004YA-Op
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 05:57:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34718)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1d0mMz-0004Xp-Jk
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 05:57:53 -0400
+Date: Wed, 19 Apr 2017 10:57:48 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170419095748.GE3343@stefanha-x1.localdomain>
+References: <286AC319A985734F985F78AFA26841F7391EF490@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJy91CY=s2H0VYYuDUrs=HYTEKjKZHpU1MXrhStxGxxWg=hfEg@mail.gmail.com>
-References: <CAJy91CZpAiZ6adPmbAESrYqDgtK37CEgw4SAk97jCNduADy6Tw@mail.gmail.com>
-	<CAFEAcA-V3BNcrhhnap+Hn8spfZPd0=Dv2v0P5myGwqU2e5t0Eg@mail.gmail.com>
-	<CAJy91Ca2FTvBzd2OqQZyEJBtCAxxosdcAFP1RMgGCQe2PJXEJA@mail.gmail.com>
-	<CAFEAcA-f1P4OW+DwLRn1AZQCzoiWNX_8Rhq0oduppMOSLWo9Ww@mail.gmail.com>
-	<CAJy91CY=s2H0VYYuDUrs=HYTEKjKZHpU1MXrhStxGxxWg=hfEg@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 19 Apr 2017 10:55:29 +0100
-Message-ID: <CAFEAcA9mfnUF-ZtU+kGpSj2LqVxPi=0GLB4Jk9zLnhhfq_Su4A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Hight Processor time of Socket communciation
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="FEz7ebHBGB6b2e8X"
+Content-Disposition: inline
+In-Reply-To: <286AC319A985734F985F78AFA26841F7391EF490@shsmsx102.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Vhost-pci RFC2.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,45 +27,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jiahuan Zhang <jiahuanzhang90@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Wang, Wei W" <wei.w.wang@intel.com>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>
 
-On 19 April 2017 at 10:25, Jiahuan Zhang <jiahuanzhang90@gmail.com> wrote:
-> On 19 April 2017 at 11:15, Peter Maydell <peter.maydell@linaro.org> wrote:
->> What is happening is that the guest kernel's serial driver
->> has a loop that (simplified) looks like this:
->>
->>   do {
->>       if (pl011_read(REG_FR) & FR_TXFF)
->>           break; /* fifo full, try again later */
->>       pl011_write(buffer[x], REG_DR);  /* send one byte */
->>       x++;
->>   } while (x != len);
->>
->> This is a lot of guest CPU instructions (and two callouts
->> to QEMU's device emulation) for every single byte.
->>
-> Hi, no, I am not using any kernel driver and I only test the guest to host
-> data transfer.
 
-OK, then the equivalent loop is this one:
+--FEz7ebHBGB6b2e8X
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> /*
->  * write_to_uart(): write data to serial port
->  */
-> void write_to_uart(char* out, uint32_t writeSize){
->  int i;
->  for(i=0; i<writeSize; i++){
->   *UART1 =(unsigned char)(*(out+i));
->  }
-> }
+On Wed, Apr 19, 2017 at 06:38:11AM +0000, Wang, Wei W wrote:
+> We made some design changes to the original vhost-pci design, and want to=
+ open
+> a discussion about the latest design (labelled 2.0) and its extension (2.=
+1).
+> 2.0 design: One VM shares the entire memory of another VM
+> 2.1 design: One VM uses an intermediate memory shared with another VM for
+>                      packet transmission.
 
-except that your code is broken because it's not
-checking that the FIFO is ready to receive the character
-so it will drop data sometimes.
+Hi,
+Can you talk a bit about the motivation for the 2.x design and major
+changes compared to 1.x?
 
-The point is the same -- you're feeding the data to
-the UART byte-at-a-time.
+What is the relationship between 2.0 and 2.1?  Do you plan to upstream
+both?
 
-thanks
--- PMM
+> For the convenience of discussion, I have some pictures presented at this=
+ link:
+> https://github.com/wei-w-wang/vhost-pci-discussion/blob/master/vhost-pci-=
+rfc2.0.pdf
+>=20
+> Fig. 1 shows the common driver frame that we want use to build the 2.0 an=
+d 2.1
+
+What does "frame" mean in this context?  "Framework" or "design".
+
+--FEz7ebHBGB6b2e8X
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJY9zScAAoJEJykq7OBq3PIKPUIAJ2MqFikTCDReXSJORws9KFg
+zIGgv6S8kcNIwVNPbH/SzrEwpn01O5I0STpQQbVFJRSpBeo2TuGR/9ObDCBSQet+
+eJoKLs9eaYlSfWhrsZvMI+lIi8bLJIbrr7hKotjZS8GEQF62yVi1bW31X7EYc6G8
+BK3s3PnxQ9ajsAtASwtav2JTHYV1XeDqXL8f4CTbXHeuSKnvHOC1lrD1WdRDkxIZ
++f+arFWyVdOv+QguIfElN9tSnLJ5Npl1wfP8lx6U8DCW48k23PDR5YqH89LzrLJI
+Xc7dA9FoOv9LC3Y2TxU2imBPlxMVqfXV4uUtT+Bf2G/jSssl6j3Tri7+JXlYEs4=
+=GRLv
+-----END PGP SIGNATURE-----
+
+--FEz7ebHBGB6b2e8X--
