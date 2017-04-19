@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgnyang@gmail.com>) id 1d0uEn-0001s5-Fl
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 14:22:01 -0400
+	(envelope-from <marcel@redhat.com>) id 1d0uOo-0004Jh-AH
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 14:32:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgnyang@gmail.com>) id 1d0uEk-0003qa-CG
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 14:21:57 -0400
-Received: from mail-yb0-x244.google.com ([2607:f8b0:4002:c09::244]:34434)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tgnyang@gmail.com>) id 1d0uEk-0003qR-7A
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 14:21:54 -0400
-Received: by mail-yb0-x244.google.com with SMTP id l192so1163304ybl.1
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 11:21:54 -0700 (PDT)
-From: Zihan Yang <tgnyang@gmail.com>
-Date: Thu, 20 Apr 2017 02:21:29 +0800
-Message-Id: <1492626091-30531-1-git-send-email-tgnyang@gmail.com>
-Subject: [Qemu-devel] [PATCH 1/2] hw/char: remove console_exit function in
- sclp
+	(envelope-from <marcel@redhat.com>) id 1d0uOl-00005p-5X
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 14:32:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35910)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1d0uOk-00005T-T9
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 14:32:15 -0400
+References: <20170418221724.5707-1-ehabkost@redhat.com>
+	<20170418221724.5707-3-ehabkost@redhat.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <81474c63-c8b2-b62c-68f1-b9aca22bd0a5@redhat.com>
+Date: Wed, 19 Apr 2017 21:31:57 +0300
+MIME-Version: 1.0
+In-Reply-To: <20170418221724.5707-3-ehabkost@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v2 2/6] pci: Move pci_bus_init() logic to
+ pci_bus_new_inplace()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,81 +28,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Zihan Yang <tgnyang@gmail.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: aik@ozlabs.ru, David Gibson <dgibson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 
-    Currently, the console_exit function in sclpconsole-lm.c and
-    sclpconsole.c does nothing, just remove them. Since there is
-    a NULL check on the DeviceClass exit callback as suggested by
-    Frederic Konrad, it should be safe to simply remove them.
+On 04/19/2017 01:17 AM, Eduardo Habkost wrote:
+> Instead of having 3 separate functions, just make pci_bus_new() a
+> wrapper that allocates the object and calls pci_bus_new_inplace().
+>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel@redhat.com>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  hw/pci/pci.c | 39 +++++++++++++++++----------------------
+>  1 file changed, 17 insertions(+), 22 deletions(-)
+>
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 328f36cd21..0d28ee4e3f 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -357,24 +357,6 @@ const char *pci_root_bus_path(PCIDevice *dev)
+>      return rootbus->qbus.name;
+>  }
+>
+> -static void pci_bus_init(PCIBus *bus, DeviceState *parent,
+> -                         MemoryRegion *address_space_mem,
+> -                         MemoryRegion *address_space_io,
+> -                         uint8_t devfn_min)
+> -{
+> -    PCIHostState *phb = PCI_HOST_BRIDGE(parent);
+> -
+> -    assert(PCI_FUNC(devfn_min) == 0);
+> -    bus->devfn_min = devfn_min;
+> -    bus->address_space_mem = address_space_mem;
+> -    bus->address_space_io = address_space_io;
+> -
+> -    /* host bridge */
+> -    QLIST_INIT(&bus->child);
+> -
+> -    QLIST_INSERT_HEAD(&pci_host_bridges, phb, next);
+> -}
+> -
+>  bool pci_bus_is_express(PCIBus *bus)
+>  {
+>      return object_dynamic_cast(OBJECT(bus), TYPE_PCIE_BUS);
+> @@ -391,8 +373,20 @@ void pci_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *parent,
+>                           MemoryRegion *address_space_io,
+>                           uint8_t devfn_min, const char *typename)
+>  {
+> +    PCIHostState *phb = PCI_HOST_BRIDGE(parent);
+> +
+>      qbus_create_inplace(bus, bus_size, typename, parent, name);
+> -    pci_bus_init(bus, parent, address_space_mem, address_space_io, devfn_min);
+> +
+> +    assert(PCI_FUNC(devfn_min) == 0);
+> +    bus->devfn_min = devfn_min;
+> +    bus->address_space_mem = address_space_mem;
+> +    bus->address_space_io = address_space_io;
+> +
+> +    /* host bridge */
+> +    QLIST_INIT(&bus->child);
+> +
+> +    QLIST_INSERT_HEAD(&pci_host_bridges, phb, next);
+> +
+>  }
+>
+>  PCIBus *pci_bus_new(DeviceState *parent, const char *name,
+> @@ -400,10 +394,11 @@ PCIBus *pci_bus_new(DeviceState *parent, const char *name,
+>                      MemoryRegion *address_space_io,
+>                      uint8_t devfn_min, const char *typename)
+>  {
+> -    PCIBus *bus;
+> +    size_t bus_size = object_type_get_instance_size(typename);
+> +    PCIBus *bus = g_malloc(bus_size);
 
-Signed-off-by: Zihan Yang <tgnyang@gmail.com>
----
- hw/char/sclpconsole-lm.c          | 6 ------
- hw/char/sclpconsole.c             | 6 ------
- include/hw/s390x/event-facility.h | 2 +-
- 3 files changed, 1 insertion(+), 13 deletions(-)
+I am not sure what is the "win" here. Maybe because I don't personally
+like the 2 "low level" lines above. Maybe we have some QOM primitive to do that for us?
+At least we should use g_malloc0?
 
-diff --git a/hw/char/sclpconsole-lm.c b/hw/char/sclpconsole-lm.c
-index 07d6ebd..86ddda6 100644
---- a/hw/char/sclpconsole-lm.c
-+++ b/hw/char/sclpconsole-lm.c
-@@ -318,11 +318,6 @@ static int console_init(SCLPEvent *event)
-     return 0;
- }
- 
--static int console_exit(SCLPEvent *event)
--{
--    return 0;
--}
--
- static void console_reset(DeviceState *dev)
- {
-    SCLPEvent *event = SCLP_EVENT(dev);
-@@ -349,7 +344,6 @@ static void console_class_init(ObjectClass *klass, void *data)
-     dc->reset = console_reset;
-     dc->vmsd = &vmstate_sclplmconsole;
-     ec->init = console_init;
--    ec->exit = console_exit;
-     ec->get_send_mask = send_mask;
-     ec->get_receive_mask = receive_mask;
-     ec->can_handle_event = can_handle_event;
-diff --git a/hw/char/sclpconsole.c b/hw/char/sclpconsole.c
-index b78f240..e916cac 100644
---- a/hw/char/sclpconsole.c
-+++ b/hw/char/sclpconsole.c
-@@ -246,11 +246,6 @@ static void console_reset(DeviceState *dev)
-    scon->notify = false;
- }
- 
--static int console_exit(SCLPEvent *event)
--{
--    return 0;
--}
--
- static Property console_properties[] = {
-     DEFINE_PROP_CHR("chardev", SCLPConsole, chr),
-     DEFINE_PROP_END_OF_LIST(),
-@@ -265,7 +260,6 @@ static void console_class_init(ObjectClass *klass, void *data)
-     dc->reset = console_reset;
-     dc->vmsd = &vmstate_sclpconsole;
-     ec->init = console_init;
--    ec->exit = console_exit;
-     ec->get_send_mask = send_mask;
-     ec->get_receive_mask = receive_mask;
-     ec->can_handle_event = can_handle_event;
-diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-facility.h
-index def1bb0..1a32f3a 100644
---- a/include/hw/s390x/event-facility.h
-+++ b/include/hw/s390x/event-facility.h
-@@ -162,7 +162,7 @@ typedef struct SCLPEvent {
- typedef struct SCLPEventClass {
-     DeviceClass parent_class;
-     int (*init)(SCLPEvent *event);
--    int (*exit)(SCLPEvent *event);
-+    void (*exit)(SCLPEvent *event);
- 
-     /* get SCLP's send mask */
-     unsigned int (*get_send_mask)(void);
--- 
-2.7.4
+Thanks,
+Marcel
+
+>
+> -    bus = PCI_BUS(qbus_create(typename, parent, name));
+> -    pci_bus_init(bus, parent, address_space_mem, address_space_io, devfn_min);
+> +    pci_bus_new_inplace(bus, bus_size, parent, name, address_space_mem,
+> +                        address_space_io, devfn_min, typename);
+>      return bus;
+>  }
+>
+>
