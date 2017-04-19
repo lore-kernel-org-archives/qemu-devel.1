@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59588)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1d0vtl-00075p-8n
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 16:08:22 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d0vyc-0000x7-Gf
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 16:13:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1d0vti-00049n-41
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 16:08:21 -0400
-Received: from smtp2-g21.free.fr ([212.27.42.2]:27709)
+	(envelope-from <ehabkost@redhat.com>) id 1d0vyZ-0006pE-B3
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 16:13:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52134)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <hpoussin@reactos.org>)
-	id 1d0vth-00047w-TQ
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 16:08:18 -0400
-References: <20170419174535.1860.64403.malonedeb@wampee.canonical.com>
-From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Message-ID: <60156451-98ac-9c28-a19f-f46275bb1b5a@reactos.org>
-Date: Wed, 19 Apr 2017 22:08:09 +0200
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d0vyZ-0006oJ-1a
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 16:13:19 -0400
+Date: Wed, 19 Apr 2017 17:13:14 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170419201314.GX25239@thinpad.lan.raisama.net>
+References: <20170419195413.30141-1-bobby.prani@gmail.com>
+	<20170419195413.30141-2-bobby.prani@gmail.com>
+	<CAJhHMCAfexwn92bt0=rfzBB0hbgqzCpRpgnsEXbG5cnmnFYztA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170419174535.1860.64403.malonedeb@wampee.canonical.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Bug 1684239] [NEW] vvfat core dump when enabling
- RW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJhHMCAfexwn92bt0=rfzBB0hbgqzCpRpgnsEXbG5cnmnFYztA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] tcg/i386: Do not display HT warning for TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,65 +28,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1684239 <1684239@bugs.launchpad.net>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>
+To: Pranith Kumar <bobby.prani@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-Hi Rolando,
+On Wed, Apr 19, 2017 at 04:00:49PM -0400, Pranith Kumar wrote:
+> On Wed, Apr 19, 2017 at 3:54 PM, Pranith Kumar <bobby.prani@gmail.com> wrote:
+> > When we enable hyperthreading (using threads smp argument), we warn
+> > the user if the cpu is an AMD cpu. This does not make sense on TCG and
+> > is also obsolete now that AMD Ryzen support hyperthreading.
+> >
+> > Fix this by adding CPUID_HT bit to the TCG features and explicitly
+> > checking this bit in the cpuid.
+> >
+> > Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+> > ---
+> >  target/i386/cpu.c | 10 +++++-----
+> >  1 file changed, 5 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > index 13c0985f11..f34bb5ead7 100644
+> > --- a/target/i386/cpu.c
+> > +++ b/target/i386/cpu.c
+> > @@ -202,12 +202,12 @@ static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
+> >  #define TCG_FEATURES (CPUID_FP87 | CPUID_PSE | CPUID_TSC | CPUID_MSR | \
+> >            CPUID_PAE | CPUID_MCE | CPUID_CX8 | CPUID_APIC | CPUID_SEP | \
+> >            CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV | CPUID_PAT | \
+> > -          CPUID_PSE36 | CPUID_CLFLUSH | CPUID_ACPI | CPUID_MMX | \
+> > +          CPUID_PSE36 | CPUID_CLFLUSH | CPUID_ACPI | CPUID_MMX | CPUID_HT | \
+> >            CPUID_FXSR | CPUID_SSE | CPUID_SSE2 | CPUID_SS | CPUID_DE)
+> >            /* partly implemented:
+> >            CPUID_MTRR, CPUID_MCA, CPUID_CLFLUSH (needed for Win64) */
+> >            /* missing:
+> > -          CPUID_VME, CPUID_DTS, CPUID_SS, CPUID_HT, CPUID_TM, CPUID_PBE */
+> > +          CPUID_VME, CPUID_DTS, CPUID_SS, CPUID_TM, CPUID_PBE */
+> >  #define TCG_EXT_FEATURES (CPUID_EXT_SSE3 | CPUID_EXT_PCLMULQDQ | \
+> >            CPUID_EXT_MONITOR | CPUID_EXT_SSSE3 | CPUID_EXT_CX16 | \
+> >            CPUID_EXT_SSE41 | CPUID_EXT_SSE42 | CPUID_EXT_POPCNT | \
+> > @@ -3643,7 +3643,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+> >
+> >      qemu_init_vcpu(cs);
+> >
+> > -    /* Only Intel CPUs support hyperthreading. Even though QEMU fixes this
+> > +    /* Only some CPUs support hyperthreading. Even though QEMU fixes this
+> >       * issue by adjusting CPUID_0000_0001_EBX and CPUID_8000_0008_ECX
+> >       * based on inputs (sockets,cores,threads), it is still better to gives
+> >       * users a warning.
+> > @@ -3651,8 +3651,8 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+> >       * NOTE: the following code has to follow qemu_init_vcpu(). Otherwise
+> >       * cs->nr_threads hasn't be populated yet and the checking is incorrect.
+> >       */
+> > -    if (!IS_INTEL_CPU(env) && cs->nr_threads > 1 && !ht_warned) {
+> > -        error_report("AMD CPU doesn't support hyperthreading. Please configure"
+> > +    if ((env->features[FEAT_1_EDX] & CPUID_HT) && (cs->nr_threads > 1) && !ht_warned) {
+> 
+> I missed a '!' here. We need to warn if CPUID_HT is not set. But I see
+> that it is not being set even on HT enabled processors (i7-3770). How
+> do I test for it?
 
-Le 19/04/2017 =C3=A0 19:45, Rolando Zappacosta a =C3=A9crit :
-> Public bug reported:
->
-> Hi guys,
->
-> I'm getting this qemu crash message:
->>>> qemu-system-x86_64: /build/qemu-TziMIO/qemu-2.5+dfsg/block/vvfat.c:2=
-290: commit_direntries: Assertion `!strncmp(s->directory.pointer, "QEMU",=
- 4)' failed.
->>>> Aborted (core dumped)
-> when launching qemu with this options for a VVFAT drive:
->>>> -drive file=3Dfat:rw:./ROOT,if=3Dvirtio
-> (same happens when using cache=3Dnone and/or if=3Dide)
->
-> "uname -a" system info is:
->>>> Linux RJZ-WRK-LNX 4.4.0-72-generic #93-Ubuntu SMP Fri Mar 31 14:07:4=
-1 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
-> and "qemu --version" is:
->>>> QEMU emulator version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.10), Copyri=
-ght (c) 2003-2008 Fabrice Bellard
->
-> Not sure what logs to attach but I'll be glad to upload whatever needed=
-.
->
-> Thanks in advance for you help,
-> Rolando
->
+CPUID_HT is automatically set on the CPU if
+(nr_threads * nr_cores) > 1. See the "case 1:" block in
+cpu_x86_cpuid().
 
-This bug has been fixed in following commit:
+AFAIK, the point of the warning is to let the user know that the
+guest OS is likely to ignore thread topology information if CPUID
+vendor is not Intel, and has nothing to do with TCG or KVM
+capabilities. Maybe the warning is obsolete today and guests
+won't be confused by a HT AMD CPU, but we need to confirm that.
 
-commit ebb72c9f066e5f85259e1541a6d3fb5bfd6e73ff
-Author: Kevin Wolf <kwolf@redhat.com>
-Date:   Wed Apr 27 14:11:38 2016 +0200
-
-     vvfat: Fix volume name assertion
-
-     Commit d5941dd made the volume name configurable, but it didn't cons=
-ider
-     that the rw code compares the volume name string to assert that the
-     first directory entry is the volume name. This made vvfat crash in r=
-w
-     mode.
-
-     This fixes the assertion to compare with the configured volume name
-     instead of a literal string.
-
-     Cc: qemu-stable@nongnu.org
-     Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-     Reviewed-by: Markus Armbruster <armbru@redhat.com>
-     Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
-The fix is present since v2.6.0
-As you're using v2.5.0, can you try with a newer QEMU version?
-
-Regards,
-
-Herv=C3=A9
+-- 
+Eduardo
