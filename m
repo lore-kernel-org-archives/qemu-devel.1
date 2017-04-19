@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50106)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d0yib-0006x3-Ud
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 19:09:02 -0400
+	(envelope-from <edgari@xilinx.com>) id 1d0zZ2-0004aA-O8
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 20:03:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d0yiX-0005T6-05
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 19:09:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59534)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1d0yiW-0005Sx-Pf
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 19:08:56 -0400
-References: <3d1c16a1-ec05-0367-e569-64a63b34f2e3@redhat.com>
-	<4a56f716-3528-ddd4-f8c4-f3f6b23c469a@redhat.com>
-	<bbc2671a-42dd-aa2a-0f03-6a4a487cb8f5@redhat.com>
-	<20170327120148.GC26900@stefanha-x1.localdomain>
-	<CAFEAcA_YVJKobjJ2WeEquxUdXVYeaCvA-K0+zumCc-Rm4Tk5nQ@mail.gmail.com>
-	<20170403141912.GA3539@stefanha-x1.localdomain>
-	<87fuhf9kcz.fsf@dusky.pond.sub.org>
-	<20170418095103.GF21261@stefanha-x1.localdomain>
-	<1492516675.27392.45.camel@redhat.com>
-	<7ae1e13f-b6a0-a735-3952-4e3833e34ad8@redhat.com>
-	<1492596922.6853.5.camel@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <dbaad765-44b8-785f-3612-3173001b94bf@redhat.com>
-Date: Wed, 19 Apr 2017 19:08:52 -0400
+	(envelope-from <edgari@xilinx.com>) id 1d0zYz-0004my-L9
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 20:03:12 -0400
+Received: from mail-bl2nam02on0073.outbound.protection.outlook.com
+	([104.47.38.73]:59103
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <edgari@xilinx.com>) id 1d0zYz-0004mH-6N
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 20:03:09 -0400
+Date: Wed, 19 Apr 2017 22:30:05 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Message-ID: <20170419203005.GG19639@toto>
+References: <CAOT14F6f2rHB4Adqo1p-VDgn4dMPUbyuRo8XPa9s7Yin_xK8rQ@mail.gmail.com>
+	<29858b5d-edb6-bc5e-73df-84e8adfd2a61@web.de>
+	<7d43790d-b6ac-c997-69c3-8d0249c7b7be@web.de>
+	<4126cc24-3237-49fd-b28a-7d5583e1b2d4@googlegroups.com>
+	<1d51b078-d8e4-bea2-064b-2d7a8e41e9eb@web.de>
+	<CAOT14F6XqnYaKmNry-SN3uXzmm0Sv8RUM48074=t2d2Qmi+bkA@mail.gmail.com>
+	<CAOT14F77f3tdWDHMyVj1itUiyRPwp2GYgJwKuHF+WM1a-grbjQ@mail.gmail.com>
+	<363c3493-f7f4-25de-d679-3726651706c1@web.de>
+	<CAFEAcA9p0OuKt9yKsmB9qDnqR-EuVR8qzS9oENAW=MGkVE4CcA@mail.gmail.com>
+	<4c587382-b690-5011-6571-9361c30b2384@web.de>
 MIME-Version: 1.0
-In-Reply-To: <1492596922.6853.5.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] What's the next QEMU version after 2.9 ? (or: when
- is a good point in time to get rid of old interfaces)
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <4c587382-b690-5011-6571-9361c30b2384@web.de>
+Subject: Re: [Qemu-devel] Jailhouse on Ultrascale+ (ZCU102)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,36 +37,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Jan Kiszka <jan.kiszka@web.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Constantin Petra <constantin.petra@gmail.com>, Jailhouse <jailhouse-dev@googlegroups.com>, qemu-devel <qemu-devel@nongnu.org>
 
-
-
-On 04/19/2017 06:15 AM, Gerd Hoffmann wrote:
->   Hi,
+On Wed, Apr 19, 2017 at 11:02:21AM +0200, Jan Kiszka wrote:
+> On 2017-04-19 10:45, Peter Maydell wrote:
+> > On 19 April 2017 at 05:37, Jan Kiszka <jan.kiszka@web.de> wrote:
+> >> On 2017-04-19 05:48, Constantin Petra wrote:
+> >>> So from some reason, under QEMU something is not in place, but what can
+> >>> that be? It would be convenient from our perspective, if it would work...
+> >>
+> >> I fully agree, and I'm waiting for official EL2 support in QEMU in order
+> >> to introduce a virtual target for ARM[64], just like we have on x86 already.
+> > 
+> > This has been in upstream QEMU for a little while now,
+> > and will be in the upcoming 2.9 release. (Applies only for
+> > AArch64 hosts using GICv3, needs some board support changes
+> > which have currently only been done for 'virt'.)
 > 
->>> There is -global, which is actually used by libvirt to configure
->>> built-in floppy devices.  But as the name suggests it sets properties
->>> globally, i.e. for all instances.  Which works in this specific use
->>> case, as there can be only one floppy controller per machine, but I
->>
->> Spec-wise, Can't you have two?
-> 
-> You can have two floppy drives, but they are hooked to the same
+> Ah, v3 - oversaw this "minor" detail. Too bad that there is still no
+> GICv3 silicon in our hands that we could test against (do you know some
+> recommendable board?). I'm pretty sure Jailhouse's GICv3 support is
+> broken by now (due to lacking tests), plus it is not yet enabled for our
+> ARM64 port. But I'm a bit reluctant to enable this only over QEMU...
 
-Yes, I'm aware.
+Hi,
 
-I'm just saying here "Spec-wise" because you can have two controllers,
-one at 0x3F0 and one at 0x370. I realize this isn't particularly
-relevant for discussions relating to CLI design, but...
+Xilinx QEMU has support for the virtualization extensions in the GICv2 but
+we're seeing issues with running hypervisors in multi-core setups.
+It seems like guest migration between cores is causing trouble but we
+haven't pinpointed the exact cause.
 
-you *can* have two controllers if your heart truly desired it.
+I'd be interested in debugging the problem seen with Jailhouse.
+Can the images and instructions on howto run be shared with me?
 
---js
-
-> controller.  isa-fdc has two properties (driveA and driveB) for that
-> reason, so -global works even for two floppy drives.
-> 
-> cheers,
->   Gerd
-> 
+Thanks,
+Edgar
