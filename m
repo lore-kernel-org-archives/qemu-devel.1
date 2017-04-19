@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55128)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1d0vgB-0002oh-4P
+	(envelope-from <bobby.prani@gmail.com>) id 1d0vgB-0002og-4J
 	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 15:54:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1d0vg8-0005od-II
+	(envelope-from <bobby.prani@gmail.com>) id 1d0vg8-0005o1-2s
 	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 15:54:19 -0400
-Received: from mail-yb0-x244.google.com ([2607:f8b0:4002:c09::244]:36184)
+Received: from mail-yb0-x243.google.com ([2607:f8b0:4002:c09::243]:36184)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1d0vg8-0005o5-E4
+	id 1d0vg7-0005ni-VC
 	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 15:54:16 -0400
-Received: by mail-yb0-x244.google.com with SMTP id b2so2121098yba.3
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 12:54:16 -0700 (PDT)
+Received: by mail-yb0-x243.google.com with SMTP id b2so2121076yba.3
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 12:54:15 -0700 (PDT)
 From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Wed, 19 Apr 2017 15:54:13 -0400
-Message-Id: <20170419195413.30141-2-bobby.prani@gmail.com>
-In-Reply-To: <20170419195413.30141-1-bobby.prani@gmail.com>
-References: <20170419195413.30141-1-bobby.prani@gmail.com>
-Subject: [Qemu-devel] [PATCH] tcg/i386: Do not display HT warning for TCG
+Date: Wed, 19 Apr 2017 15:54:12 -0400
+Message-Id: <20170419195413.30141-1-bobby.prani@gmail.com>
+Subject: [Qemu-devel] [RFC PATCH] tcg/i386: Do not display HT warning for TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
