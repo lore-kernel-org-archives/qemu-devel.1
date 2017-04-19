@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d0tAu-0002hy-HT
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 13:13:53 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d0tDc-0003Z3-Se
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 13:16:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d0tAt-00067E-If
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 13:13:52 -0400
-Date: Wed, 19 Apr 2017 19:13:35 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170419171335.GH5826@noname.redhat.com>
-References: <20170419091757.15507-1-famz@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1d0tDY-0007Ha-Sy
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 13:16:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35104)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d0tDY-0007HD-Kc
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 13:16:36 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A876A80F7D
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 17:16:35 +0000 (UTC)
+Date: Wed, 19 Apr 2017 18:16:31 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170419171631.GD7758@work-vm>
+References: <20170417200041.2451-1-quintela@redhat.com>
+	<20170417200041.2451-15-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170419091757.15507-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] iotests: 109: Filter out "len" of
- failed jobs
+In-Reply-To: <20170417200041.2451-15-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 14/19] migration: Remove vmstate.h from
+ migration.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,50 +34,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Am 19.04.2017 um 11:17 hat Fam Zheng geschrieben:
-> Mirror calculates job len from current I/O progress:
-> 
->     s->common.len = s->common.offset +
->                     (cnt + s->sectors_in_flight) * BDRV_SECTOR_SIZE;
-> 
-> The final "len" of a failed mirror job in iotests 109 depends on the
-> subtle timing of the completion of read and write issued in the first
-> mirror iteration.  The second iteration may or may not have run when the
-> I/O error happens, resulting in non-deterministic output of the
-> BLOCK_JOB_COMPLETED event text.
-> 
-> Similar to what was done in a752e4786, filter out the field to make the
-> test robust.
-> 
-> Tested-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Fam Zheng <famz@redhat.com>
+* Juan Quintela (quintela@redhat.com) wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-This improves things a bit, but the test case is still failing for me.
-It's not deterministic, so the following is just an example.
+You probably need to do a build of all combos to make sure nothing
+is depending on the migration.h when it uses VMSTATE_ macros.
 
-Kevin
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
---- /home/kwolf/source/qemu/tests/qemu-iotests/109.out  2017-04-19 19:10:27.458121955 +0200
-+++ 109.out.bad 2017-04-19 19:10:49.782467425 +0200
-@@ -135,7 +135,7 @@
- Specify the 'raw' format explicitly to remove the restrictions.
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 65536, "offset": OFFSET, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 2560, "offset": OFFSET, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
- {"return": []}
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-@@ -195,7 +195,7 @@
- Specify the 'raw' format explicitly to remove the restrictions.
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 65536, "offset": OFFSET, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 2048, "offset": OFFSET, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
- {"return": []}
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+Dave
+
+> ---
+>  include/migration/migration.h | 1 -
+>  migration/block.c             | 1 +
+>  migration/colo-comm.c         | 1 +
+>  migration/migration.c         | 1 +
+>  migration/ram.c               | 1 +
+>  5 files changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index 3353de1..1451067 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -17,7 +17,6 @@
+>  #include "qapi/qmp/qdict.h"
+>  #include "qemu-common.h"
+>  #include "qemu/thread.h"
+> -#include "migration/vmstate.h"
+>  #include "qapi-types.h"
+>  #include "exec/cpu-common.h"
+>  #include "qemu/coroutine_int.h"
+> diff --git a/migration/block.c b/migration/block.c
+> index e45a42d..3048088 100644
+> --- a/migration/block.c
+> +++ b/migration/block.c
+> @@ -20,6 +20,7 @@
+>  #include "migration/block.h"
+>  #include "migration/migration.h"
+>  #include "migration/qemu-file.h"
+> +#include "migration/vmstate.h"
+>  #include "sysemu/block-backend.h"
+>  
+>  #define BLOCK_SIZE                       (1 << 20)
+> diff --git a/migration/colo-comm.c b/migration/colo-comm.c
+> index 4161242..f11fa81 100644
+> --- a/migration/colo-comm.c
+> +++ b/migration/colo-comm.c
+> @@ -13,6 +13,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "migration/migration.h"
+> +#include "migration/vmstate.h"
+>  #include "migration/colo.h"
+>  
+>  typedef struct {
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 9990c46..c2c25fe 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -25,6 +25,7 @@
+>  #include "migration/socket.h"
+>  #include "migration/migration.h"
+>  #include "migration/qemu-file.h"
+> +#include "migration/vmstate.h"
+>  #include "sysemu/sysemu.h"
+>  #include "block/block.h"
+>  #include "qapi/qmp/qerror.h"
+> diff --git a/migration/ram.c b/migration/ram.c
+> index b0759ac..49e518f 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -38,6 +38,7 @@
+>  #include "migration/init.h"
+>  #include "migration/migration.h"
+>  #include "migration/qemu-file.h"
+> +#include "migration/vmstate.h"
+>  #include "migration/postcopy-ram.h"
+>  #include "migration/page_cache.h"
+>  #include "qemu/error-report.h"
+> -- 
+> 2.9.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
