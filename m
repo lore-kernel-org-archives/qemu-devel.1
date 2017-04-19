@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiahuanzhang90@gmail.com>) id 1d0pkk-0008CH-OQ
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:34:39 -0400
+	(envelope-from <eblake@redhat.com>) id 1d0pl3-0008M0-QV
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:34:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jiahuanzhang90@gmail.com>) id 1d0pkj-0001qJ-Ml
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:34:38 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:33427)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jiahuanzhang90@gmail.com>)
-	id 1d0pkj-0001qA-HO
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:34:37 -0400
-Received: by mail-qt0-x241.google.com with SMTP id c45so3182371qtb.0
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 06:34:37 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1d0pl0-0001wE-Ny
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:34:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34984)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d0pl0-0001vs-E7
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:34:54 -0400
+References: <1492621028-16280-1-git-send-email-lu.zhipeng@zte.com.cn>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e9ca8e6d-6f82-a856-3c76-edbbbc57188a@redhat.com>
+Date: Wed, 19 Apr 2017 08:34:50 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA81o245N_zoSUtJ0SVupZyRE9cnfr15hmu+ReMuDj9iyQ@mail.gmail.com>
-References: <CAJy91CZpAiZ6adPmbAESrYqDgtK37CEgw4SAk97jCNduADy6Tw@mail.gmail.com>
-	<CAFEAcA-V3BNcrhhnap+Hn8spfZPd0=Dv2v0P5myGwqU2e5t0Eg@mail.gmail.com>
-	<CAJy91Ca2FTvBzd2OqQZyEJBtCAxxosdcAFP1RMgGCQe2PJXEJA@mail.gmail.com>
-	<CAFEAcA-f1P4OW+DwLRn1AZQCzoiWNX_8Rhq0oduppMOSLWo9Ww@mail.gmail.com>
-	<CAJy91CY=s2H0VYYuDUrs=HYTEKjKZHpU1MXrhStxGxxWg=hfEg@mail.gmail.com>
-	<CAFEAcA9mfnUF-ZtU+kGpSj2LqVxPi=0GLB4Jk9zLnhhfq_Su4A@mail.gmail.com>
-	<CAJy91CaB3kA0vNRGs52S=OweSfSXnkO71AHOa2XpUYNJTnZHDQ@mail.gmail.com>
-	<CAFEAcA81o245N_zoSUtJ0SVupZyRE9cnfr15hmu+ReMuDj9iyQ@mail.gmail.com>
-From: Jiahuan Zhang <jiahuanzhang90@gmail.com>
-Date: Wed, 19 Apr 2017 15:34:36 +0200
-Message-ID: <CAJy91Cbo+CQbRMmS-1b32Hf=kgWb22N3htmiuyORW7y-of7Raw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Hight Processor time of Socket communciation
+In-Reply-To: <1492621028-16280-1-git-send-email-lu.zhipeng@zte.com.cn>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="P17TtPN8vTvhaQnkuppWCchKowPOMuKWg"
+Subject: Re: [Qemu-devel] [PATCH] qemu-ga: add
+ guest-network-get-interface-stat command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,44 +28,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: ZhiPeng Lu <lu.zhipeng@zte.com.cn>, mdroth@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org
 
-On 19 April 2017 at 12:09, Peter Maydell <peter.maydell@linaro.org> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--P17TtPN8vTvhaQnkuppWCchKowPOMuKWg
+From: Eric Blake <eblake@redhat.com>
+To: ZhiPeng Lu <lu.zhipeng@zte.com.cn>, mdroth@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org
+Message-ID: <e9ca8e6d-6f82-a856-3c76-edbbbc57188a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-ga: add
+ guest-network-get-interface-stat command
+References: <1492621028-16280-1-git-send-email-lu.zhipeng@zte.com.cn>
+In-Reply-To: <1492621028-16280-1-git-send-email-lu.zhipeng@zte.com.cn>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 19 April 2017 at 11:04, Jiahuan Zhang <jiahuanzhang90@gmail.com> wrote:
-> > Okay. Thank you for pointing this out.
-> > I would like to make a new serial device based on pl011,
-> > but containing a buffer for guest-to-host data transfer.
->
-> As I've said, the PL011 is inherently byte at a time.
-> If you want better than that, I recommend you use virtio-serial,
-> because it already exists for this purpose.
->
-> thanks
-> -- PMM
->
+On 04/19/2017 11:57 AM, ZhiPeng Lu wrote:
+> we can get the  network card statistics inside  a virtual machine by gu=
+est-network-get-interface-stat command.
+> it is very userful for us to monitor and analyze network traff.
+>=20
+> Signed-off-by: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+> ---
 
-Hi Peter,
+> +++ b/qga/qapi-schema.json
+> @@ -1042,3 +1042,37 @@
+>    'data':    { 'path': 'str', '*arg': ['str'], '*env': ['str'],
+>                 '*input-data': 'str', '*capture-output': 'bool' },
+>    'returns': 'GuestExec' }
+> +##
+> +# @GuestNetworkInterfaceStat:
+> +#
+> +# @rx_bytes: received bytes of interface
+> +#
+> +# @rx_packets: received packets of interface
+> +#
+> +# @rx_errs: received error packets of interface
+> +# @rx_drop: received drop packets of interface
 
-But from the source code, I found the main characteristic of virtio-serial
-is that,
-virtio-serial can create multiple serial ports and each port has a pair of
-control virt-queues and
-a pair of guest input/output virt-queues.
-Its "have_data" callback function enables multi-byte data transfer from
-guest.
-And it is not in a tranditional device emulation format.
-I mean that no exact IO region is emulated for it.
-Without Linux kernel driver, I don't know how to manipulate it.
-For the time being, I enable the guest app to send data to
-the pl011's data register directly via a pointer, as you see that in the
-code above.
+New interfaces should favor the use of '-' rather than '_', as in
+'rx-bytes', 'rx-packets'...
 
-This is why I am thinking if adding a transmit buffer in pl011 for guest
-writing
-is a feasible alternative.
+> +#
+> +# Since: 2.10
+> +##
+> +{ 'struct': 'GuestNetworkInterfaceStat',
+> +  'data': {'rx_bytes': 'uint64',
+> +            'rx_packets': 'uint64',
+> +            'rx_errs': 'uint64',
+> +            'rx_drop': 'uint64',
+> +            'tx_bytes': 'uint64',
+> +            'tx_packets': 'uint64',
+> +            'tx_errs': 'uint64',
+> +            'tx_drop': 'uint64'
 
-Any suggestion is welcome.
-Regards,
-Huan
+You only documented four fields, but have a lot more in the structure.
+
+> +           } }
+> +##
+> +# @guest-network-get-interface-stat:
+> +#
+> +# Get list of interface stat
+> +#
+> +# Returns: List of GuestNetworkInterfaceStat on success.
+> +#
+> +# Since: 2.10
+> +##
+> +{ 'command': 'guest-network-get-interface-stat',
+> +  'data':    {'bus': 'int64', 'slot': 'int64', 'function': 'int64','ne=
+tname':'str'},
+
+Are all of these parameters requires on every invocation, or are they
+optional for filtering the results but with an intent to allow them to
+be omitted to get a full list at once?
+
+Missing documentation.
+
+> +  'returns': ['GuestNetworkInterfaceStat'] }
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--P17TtPN8vTvhaQnkuppWCchKowPOMuKWg
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY92d6AAoJEKeha0olJ0NqDGEIAKgc3TV1yHbMs0kwERXxKhpG
+gEehg7HnpMbh/qwohjwos5OXosupJPBbWQlmQ2zHmdLvswvZS0gcB+v7MpFSGOYF
+3mGqF8HHTkTv9jSGMTbCc7R53IwZZl0UQjO65QVvLQWwW6Aa+I238wLZkpHSjuwV
+c4pXSkkZ7M2DKUie7HlMdvt2FVCWX9Ae365yizORv/Bx+xm5Igc4+DcvpMJifVMY
+eOXaqPEQJESkf8un+20aHklKWx7mBrw2Ghjga2jraYVDZjqt6gLEJl5TWzzsmKmF
+F885uWJwOn1C2xDZGs7VaZylKmqWDM1V32wbS0QAedO58BiW2VcwfzZU5QpTYy8=
+=OSrC
+-----END PGP SIGNATURE-----
+
+--P17TtPN8vTvhaQnkuppWCchKowPOMuKWg--
