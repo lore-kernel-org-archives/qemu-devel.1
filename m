@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43966)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d0whn-0003tR-2V
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:00:07 -0400
+	(envelope-from <quintela@redhat.com>) id 1d0wiQ-0004b4-SP
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:00:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d0whm-00070F-8U
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:00:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39420)
+	(envelope-from <quintela@redhat.com>) id 1d0wiM-0007Ir-DW
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:00:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40206)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d0whm-0006ze-34
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:00:02 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0CBBF787FC
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 21:00:01 +0000 (UTC)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d0wiM-0007IU-78
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:00:38 -0400
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 19 Apr 2017 22:58:47 +0200
-Message-Id: <20170419205923.8808-24-quintela@redhat.com>
+Date: Wed, 19 Apr 2017 22:59:08 +0200
+Message-Id: <20170419205923.8808-45-quintela@redhat.com>
 In-Reply-To: <20170419205923.8808-1-quintela@redhat.com>
 References: <20170419205923.8808-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 23/59] ram: Move xbzrle_cache_miss_rate into
- RAMState
+Subject: [Qemu-devel] [PATCH 44/59] ram: Add page-size to output in 'info
+ migrate'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,61 +25,72 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com
+Cc: dgilbert@redhat.com, Chao Fan <fanc.fnst@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
+From: Chao Fan <fanc.fnst@cn.fujitsu.com>
+
+The number of dirty pages is output in 'pages' in the command
+'info migrate', so add page-size to calculate the number of dirty
+pages in bytes.
+
+Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
+Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- migration/ram.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ hmp.c                 | 3 +++
+ migration/migration.c | 1 +
+ qapi-schema.json      | 5 ++++-
+ 3 files changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index b70db68..09f9eff 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -179,6 +179,8 @@ struct RAMState {
-     uint64_t xbzrle_pages;
-     /* xbzrle number of cache miss */
-     uint64_t xbzrle_cache_miss;
-+    /* xbzrle miss rate */
-+    double xbzrle_cache_miss_rate;
- };
- typedef struct RAMState RAMState;
+diff --git a/hmp.c b/hmp.c
+index edb8970..be75e71 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -215,6 +215,9 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+                        info->ram->normal_bytes >> 10);
+         monitor_printf(mon, "dirty sync count: %" PRIu64 "\n",
+                        info->ram->dirty_sync_count);
++        monitor_printf(mon, "page size: %" PRIu64 " kbytes\n",
++                       info->ram->page_size >> 10);
++
+         if (info->ram->dirty_pages_rate) {
+             monitor_printf(mon, "dirty pages rate: %" PRIu64 " pages\n",
+                            info->ram->dirty_pages_rate);
+diff --git a/migration/migration.c b/migration/migration.c
+index 92a3754..156daf9 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -658,6 +658,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
+     info->ram->mbps = s->mbps;
+     info->ram->dirty_sync_count = ram_dirty_sync_count();
+     info->ram->postcopy_requests = ram_postcopy_requests();
++    info->ram->page_size = qemu_target_page_size();
  
-@@ -186,7 +188,6 @@ static RAMState ram_state;
+     if (s->state != MIGRATION_STATUS_COMPLETED) {
+         info->ram->remaining = ram_bytes_remaining();
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 250e4dc..01b087f 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -598,6 +598,9 @@
+ # @postcopy-requests: The number of page requests received from the destination
+ #        (since 2.7)
+ #
++# @page-size: The number of bytes per page for the various page-based
++#        statistics (since 2.10)
++#
+ # Since: 0.14.0
+ ##
+ { 'struct': 'MigrationStats',
+@@ -605,7 +608,7 @@
+            'duplicate': 'int', 'skipped': 'int', 'normal': 'int',
+            'normal-bytes': 'int', 'dirty-pages-rate' : 'int',
+            'mbps' : 'number', 'dirty-sync-count' : 'int',
+-           'postcopy-requests' : 'int' } }
++           'postcopy-requests' : 'int', 'page-size' : 'int' } }
  
- /* accounting for migration statistics */
- typedef struct AccountingInfo {
--    double xbzrle_cache_miss_rate;
-     uint64_t xbzrle_overflows;
- } AccountingInfo;
- 
-@@ -224,7 +225,7 @@ uint64_t xbzrle_mig_pages_cache_miss(void)
- 
- double xbzrle_mig_cache_miss_rate(void)
- {
--    return acct_info.xbzrle_cache_miss_rate;
-+    return ram_state.xbzrle_cache_miss_rate;
- }
- 
- uint64_t xbzrle_mig_pages_overflow(void)
-@@ -699,7 +700,7 @@ static void migration_bitmap_sync(RAMState *rs)
- 
-         if (migrate_use_xbzrle()) {
-             if (rs->iterations_prev != rs->iterations) {
--                acct_info.xbzrle_cache_miss_rate =
-+                rs->xbzrle_cache_miss_rate =
-                    (double)(rs->xbzrle_cache_miss -
-                             rs->xbzrle_cache_miss_prev) /
-                    (rs->iterations - rs->iterations_prev);
-@@ -2003,6 +2004,7 @@ static int ram_save_init_globals(RAMState *rs)
-     rs->xbzrle_bytes = 0;
-     rs->xbzrle_pages = 0;
-     rs->xbzrle_cache_miss = 0;
-+    rs->xbzrle_cache_miss_rate = 0;
-     migration_bitmap_sync_init(rs);
-     qemu_mutex_init(&migration_bitmap_mutex);
- 
+ ##
+ # @XBZRLECacheStats:
 -- 
 2.9.3
