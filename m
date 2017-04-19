@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d0tpT-0003F5-7j
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 13:55:48 -0400
+	(envelope-from <marcel@redhat.com>) id 1d0tyV-0006uj-N7
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 14:05:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d0tpO-00028P-C1
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 13:55:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47789)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d0tpO-000282-5p
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 13:55:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d0tpM-0002pu-27
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 17:55:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0E57E2E80C7
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 17:55:40 +0000 (UTC)
+	(envelope-from <marcel@redhat.com>) id 1d0tyR-0006A0-L6
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 14:05:07 -0400
+References: <20170328021651.19350-1-david@gibson.dropbear.id.au>
+	<20170328021651.19350-3-david@gibson.dropbear.id.au>
+	<20170417183045.GA7078@thinpad.lan.raisama.net>
+	<20170418022151.GD12235@umbus.fritz.box>
+	<20170418143312.GN25239@thinpad.lan.raisama.net>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <8d11bfb6-da4a-9972-112e-311859e0bc5b@redhat.com>
+Date: Wed, 19 Apr 2017 21:04:55 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 19 Apr 2017 17:45:35 -0000
-From: Rolando Zappacosta <zappacor@hotmail.com>
-Reply-To: Bug 1684239 <1684239@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20170419174535.1860.64403.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1684239] [NEW] vvfat core dump when enabling RW
+In-Reply-To: <20170418143312.GN25239@thinpad.lan.raisama.net>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC for-2.10 2/3] pci: Allow host bridges to
+ override PCI/PCIe hybrid device behaviour
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,76 +27,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: aik@ozlabs.ru, lersek@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mst@redhat.com
 
-Public bug reported:
+On 04/18/2017 05:33 PM, Eduardo Habkost wrote:
+> On Tue, Apr 18, 2017 at 12:21:51PM +1000, David Gibson wrote:
+>> On Mon, Apr 17, 2017 at 03:30:46PM -0300, Eduardo Habkost wrote:
+>>> On Tue, Mar 28, 2017 at 01:16:50PM +1100, David Gibson wrote:
+>>>> Currently PCI/PCIe hybrid devices - that is, devices which can appear as
+>>>> either plain PCI or PCIe depending on where they're attached - will only
+>>>> appear in PCIe mode if they're attached to a PCIe bus via a root port or
+>>>> downstream port.
+>>>>
+>>>> This is correct for "standard" PCIe setups, but there are some platforms
+>>>> which need different behaviour (notably "pseries" whose paravirtualized
+>>>> PCI host bridges have some idiosyncracies).
+>>>>
+>>>> This patch allows the host bridge to override the normal behaviour.
+>>>>
+>>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>>>> ---
+>>>>  hw/pci/pci.c              | 11 +++++++++--
+>>>>  include/hw/pci/pci_host.h |  1 +
+>>>>  2 files changed, 10 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+>>>> index 779787b..ac68065 100644
+>>>> --- a/hw/pci/pci.c
+>>>> +++ b/hw/pci/pci.c
+>>>> @@ -392,9 +392,16 @@ bool pci_bus_is_root(PCIBus *bus)
+>>>>
+>>>>  bool pci_allow_hybrid_pcie(PCIDevice *pci_dev)
+>>>
+>>> Why are we asking the device about allowing hybrid pcie, and not
+>>> the bus itself? Shouldn't we be able to query this before the
+>>> device is plugged, and before pci_dev->bus is even set?
+>>>
+>>> In other words, why pci_allow_hyberid_pcie() and
+>>> pci_device_get_bus() get a PCIDevice* argument instead of a
+>>> PCIBus* argument?
+>>
+>> Ah good point.  I made it a PCIDevice simply for convenience, but
+>> you're right we should be able to query before the device is plugged.
+>
+> Understood.
+>
+>>
+>>>
+>>>>  {
+>>>> -    PCIBus *bus = pci_dev->bus;
+>>>> +    PCIHostState *host_bridge = PCI_HOST_BRIDGE(pci_device_root_bus(pci_dev)->qbus.parent);
+>>>
+>>> There's something I don't understand completely: what exactly
+>>> guarantees that pci_device_root_bus(...)->qbus.parent is always
+>>> going to be a PCI_HOST_BRIDGE?
+>>
+>> Well, by definition whatever is above the root bus isn't PCI, which
+>> pretty much means it has to be a PCI host bridge.  A machine could
+>> break this assumption, but I think that would be a bug.  We use this
+>> same pattern to find a PCI device's (or bus's) host bridge in other
+>> places - there doesn't appear to be another way.
+>
 
-Hi guys,
+Agreed, the root bus is always exposed by (some kind of) a host bridge.
 
-I'm getting this qemu crash message:
->>> qemu-system-x86_64: /build/qemu-TziMIO/qemu-2.5+dfsg/block/vvfat.c:2290=
-: commit_direntries: Assertion `!strncmp(s->directory.pointer, "QEMU", 4)' =
-failed.
->>> Aborted (core dumped)
-when launching qemu with this options for a VVFAT drive:
->>> -drive file=3Dfat:rw:./ROOT,if=3Dvirtio
-(same happens when using cache=3Dnone and/or if=3Dide)
+> After taking a better look at the way PCI buses are created, I
+> agree it's OK. Maybe a
+>   PCIHostState *pci_host_bridge(PCIBus *bus)
+> helper would be useful?
+>
 
-"uname -a" system info is:
->>> Linux RJZ-WRK-LNX 4.4.0-72-generic #93-Ubuntu SMP Fri Mar 31 14:07:41 U=
-TC 2017 x86_64 x86_64 x86_64 GNU/Linux
-and "qemu --version" is:
->>> QEMU emulator version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.10), Copyright=
- (c) 2003-2008 Fabrice Bellard
+For sure.
 
-Not sure what logs to attach but I'll be glad to upload whatever needed.
+> Anyway, both pci_bus_root_bus() and pci_host_bridge() could be
+> implemented as follow-ups if you prefer, so:
+>
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>
 
-Thanks in advance for you help,
-Rolando
+Thanks,
+Marcel
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: directory.pointer direntries vvfat
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1684239
-
-Title:
-  vvfat core dump when enabling RW
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hi guys,
-
-  I'm getting this qemu crash message:
-  >>> qemu-system-x86_64: /build/qemu-TziMIO/qemu-2.5+dfsg/block/vvfat.c:22=
-90: commit_direntries: Assertion `!strncmp(s->directory.pointer, "QEMU", 4)=
-' failed.
-  >>> Aborted (core dumped)
-  when launching qemu with this options for a VVFAT drive:
-  >>> -drive file=3Dfat:rw:./ROOT,if=3Dvirtio
-  (same happens when using cache=3Dnone and/or if=3Dide)
-
-  "uname -a" system info is:
-  >>> Linux RJZ-WRK-LNX 4.4.0-72-generic #93-Ubuntu SMP Fri Mar 31 14:07:41=
- UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
-  and "qemu --version" is:
-  >>> QEMU emulator version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.10), Copyrig=
-ht (c) 2003-2008 Fabrice Bellard
-
-  Not sure what logs to attach but I'll be glad to upload whatever
-  needed.
-
-  Thanks in advance for you help,
-  Rolando
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1684239/+subscriptions
+> But I still have another suggestion:
+>
+>>
+>>>> +    PCIHostBridgeClass *hc = PCI_HOST_BRIDGE_GET_CLASS(host_bridge);
+>>>> +
+>>>> +    if (hc->allow_hybrid_pcie) {
+>>>> +        return hc->allow_hybrid_pcie(host_bridge, pci_dev);
+>>>> +    } else {
+>>>> +        PCIBus *bus = pci_dev->bus;
+>>>>
+>>>> -    return pci_bus_is_express(bus) && !pci_bus_is_root(bus);
+>>>> +        return pci_bus_is_express(bus) && !pci_bus_is_root(bus);
+>
+> Maybe it's a matter of personal taste, but instead of requiring
+> an explicit check for NULL hc->allow_hybrid_pcie, why not set a
+> default hc->allow_hybrid_pcie() implementation on
+> TYPE_PCI_HOST_BRIDGE that returns
+> (pci_bus_is_express(bus) && !pci_bus_is_root(bus))?
+>
