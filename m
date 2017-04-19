@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d0osg-0006Nn-Bb
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:38:47 -0400
+	(envelope-from <daniel@daynix.com>) id 1d0nOu-000562-3q
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 07:03:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d0osf-00036L-Ia
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:38:46 -0400
-References: <20170413203401.3213-1-mreitz@redhat.com>
-	<20170413203401.3213-4-mreitz@redhat.com>
-	<25e5ee1f-3bc7-d657-59db-c4e59baf8e28@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <23949686-9e74-6eb7-6f8c-c129f83d8faf@redhat.com>
-Date: Wed, 19 Apr 2017 14:38:36 +0200
-MIME-Version: 1.0
-In-Reply-To: <25e5ee1f-3bc7-d657-59db-c4e59baf8e28@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="xjLAdGavRXVi7hP2J3tCE1chr13aJGalQ"
-Subject: Re: [Qemu-devel] [PATCH for-2.10 3/3] qemu-img/convert: Move bs_n >
- 1 && -B check down
+	(envelope-from <daniel@daynix.com>) id 1d0nOq-0007In-2k
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 07:03:56 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:36714)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <daniel@daynix.com>) id 1d0nOp-0007IS-R5
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 07:03:52 -0400
+Received: by mail-wm0-x241.google.com with SMTP id q125so4305902wmd.3
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 04:03:51 -0700 (PDT)
+From: Daniel Rempel <daniel@daynix.com>
+Date: Wed, 19 Apr 2017 14:03:42 +0300
+Message-Id: <1492599822-10331-1-git-send-email-daniel@daynix.com>
+Subject: [Qemu-devel] [PATCH 1/1] qga-win: fix 1357789 - installation on
+ localized windows - acquire user and group names by well-known SIDs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,90 +24,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-stable <qemu-stable@nongnu.org>
+To: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Dmitry Fleytman <dmitry@daynix.com>, Yan Vugenfirer <yan@daynix.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---xjLAdGavRXVi7hP2J3tCE1chr13aJGalQ
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- qemu-stable <qemu-stable@nongnu.org>
-Message-ID: <23949686-9e74-6eb7-6f8c-c129f83d8faf@redhat.com>
-Subject: Re: [PATCH for-2.10 3/3] qemu-img/convert: Move bs_n > 1 && -B check
- down
-References: <20170413203401.3213-1-mreitz@redhat.com>
- <20170413203401.3213-4-mreitz@redhat.com>
- <25e5ee1f-3bc7-d657-59db-c4e59baf8e28@redhat.com>
-In-Reply-To: <25e5ee1f-3bc7-d657-59db-c4e59baf8e28@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Replace hardcoded user and group names ("Administrators", "SYSTEM") with the ones acquired from system. Windows uses localized strings for these names and it may cause the installation to fail.
+Windows has Well-known SIDs for "Administrators" group and "SYSTEM" user so they were used to identify required users and groups.
+Well-known SIDs: https://support.microsoft.com/en-us/help/243330/well-known-security-identifiers-in-windows-operating-systems
 
-On 13.04.2017 23:17, Eric Blake wrote:
-> On 04/13/2017 03:34 PM, Max Reitz wrote:
->> It does not make much sense to use a backing image for the target when=
+Signed-off-by: Daniel Rempel <daniel@daynix.com>
+---
 
->> you concatenate multiple images (because then there is no corresponden=
-ce
->> between the source images' backing files and the target's); but it was=
+ qga/vss-win32/install.cpp | 38 ++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 36 insertions(+), 2 deletions(-)
 
->> still possible to give one by using -o backing_file=3DX instead of -B =
-X.
->>
->> Fix this by moving the check.
->>
->> (Also, change the error message because -B is not the only way to
->>  specify the backing file, evidently.)
->=20
-> For that matter, 'create -B' is intentionally? undocumented in the
-> qemu-img --help and man page.  (Personally, I don't know why we don't
-> want it documented - is it because it it not a universal option because=
-
-> not all formats support backing files?)
-
-(I suppose you mean convert instead of create)
-
-Well, the man page at least documents that you can use backing_file for
-the destination and what it will do. So documenting would probably be
-just "Oh, you can also use -B, by the way."
-
-I won't promise to write a patch to fix that, but I do hope I will. :-)
-
->> Cc: qemu-stable <qemu-stable@nongnu.org>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  qemu-img.c                 | 14 +++++++-------
->>  tests/qemu-iotests/122.out |  4 ++--
->>  2 files changed, 9 insertions(+), 9 deletions(-)
->>
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks, as always!
-
-Max
-
-> Having a backing file for the destination may still make sense for some=
-
-> convoluted workflow, but you can get that with a followup qemu-img reba=
-se.
-
-
---xjLAdGavRXVi7hP2J3tCE1chr13aJGalQ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlj3WkwSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A/n0IAJB/25QpO4/+kAgJq2Iy8YqbUW+3BKXo
-UTwj9OZ8ZTw6lXGMSqKd32if7HnhQCCh30SRZ8dZhxokF8btUTtq0v2tA25UQwi+
-i/v/erCzLSK0ZUgAXOMmNBB0Vw4IjMAhHqG2uUNc+b7KdjpdIO5sV2LkPgtJau6+
-RIvIAPevlrYpbe8VB6pGqiNu8ivBJZU+j60u2bD7VKILQsNl0+8aH37DwLIPTgIV
-iueUXughXhEfXq3hnMo6ZPnY4ZfZHxQlm0vJAGB+Kqi+h6z6C/ndpY2LW4UB2G0I
-FW3ZpXhtvYL7viQFQkcZp8d9YZdbSn0TR4X+b+VE8ajPPjvDgeZyBC4=
-=n+lV
------END PGP SIGNATURE-----
-
---xjLAdGavRXVi7hP2J3tCE1chr13aJGalQ--
+diff --git a/qga/vss-win32/install.cpp b/qga/vss-win32/install.cpp
+index f4160a3..19220b7 100644
+--- a/qga/vss-win32/install.cpp
++++ b/qga/vss-win32/install.cpp
+@@ -18,6 +18,9 @@
+ #include <wbemidl.h>
+ #include <comdef.h>
+ #include <comutil.h>
++#include <sddl.h>
++
++#define BUFFER_SIZE 1024
+ 
+ extern HINSTANCE g_hinstDll;
+ 
+@@ -135,6 +138,30 @@ out:
+     return hr;
+ }
+ 
++/* Acquire group or user name by SID */
++static HRESULT getNameByStringSID(
++    const wchar_t *sid, LPWSTR buffer, LPDWORD bufferLen)
++{
++    HRESULT hr = S_OK;
++    PSID psid = NULL;
++    SID_NAME_USE groupType;
++    DWORD domainNameLen = BUFFER_SIZE, retval;
++    wchar_t domainName[BUFFER_SIZE];
++
++    chk(ConvertStringSidToSidW(sid, &psid));
++    retval = LookupAccountSidW(NULL, psid, buffer, bufferLen,
++                domainName, &domainNameLen, &groupType);
++
++    LocalFree(psid);
++
++    if (0 == retval) {
++        hr = HRESULT_FROM_WIN32(GetLastError());
++    }
++
++out:
++    return hr;
++}
++
+ /* Find and iterate QGA VSS provider in COM+ Application Catalog */
+ static HRESULT QGAProviderFind(
+     HRESULT (*found)(ICatalogCollection *, int, void *), void *arg)
+@@ -216,6 +243,10 @@ STDAPI COMRegister(void)
+     CHAR dllPath[MAX_PATH], tlbPath[MAX_PATH];
+     bool unregisterOnFailure = false;
+     int count = 0;
++    DWORD bufferLen = BUFFER_SIZE;
++    wchar_t buffer[BUFFER_SIZE];
++    const wchar_t *administratorsGroupSID = L"S-1-5-32-544";
++    const wchar_t *systemUserSID = L"S-1-5-18";
+ 
+     if (!g_hinstDll) {
+         errmsg(E_FAIL, "Failed to initialize DLL");
+@@ -284,11 +315,12 @@ STDAPI COMRegister(void)
+ 
+     /* Setup roles of the applicaion */
+ 
++    chk(getNameByStringSID(administratorsGroupSID, buffer, &bufferLen));
+     chk(pApps->GetCollection(_bstr_t(L"Roles"), key,
+                              (IDispatch **)pRoles.replace()));
+     chk(pRoles->Populate());
+     chk(pRoles->Add((IDispatch **)pObj.replace()));
+-    chk(put_Value(pObj, L"Name",        L"Administrators"));
++    chk(put_Value(pObj, L"Name", buffer));
+     chk(put_Value(pObj, L"Description", L"Administrators group"));
+     chk(pRoles->SaveChanges(&n));
+     chk(pObj->get_Key(&key));
+@@ -303,8 +335,10 @@ STDAPI COMRegister(void)
+     chk(GetAdminName(&name));
+     chk(put_Value(pObj, L"User", _bstr_t(".\\") + name));
+ 
++    bufferLen = BUFFER_SIZE;
++    chk(getNameByStringSID(systemUserSID, buffer, &bufferLen));
+     chk(pUsersInRole->Add((IDispatch **)pObj.replace()));
+-    chk(put_Value(pObj, L"User", L"SYSTEM"));
++    chk(put_Value(pObj, L"User", buffer));
+     chk(pUsersInRole->SaveChanges(&n));
+ 
+ out:
+-- 
+2.9.3
