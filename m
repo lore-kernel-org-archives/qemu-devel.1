@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d0mYb-0001yC-U2
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 06:09:55 -0400
+	(envelope-from <kraxel@redhat.com>) id 1d0me6-0003Ft-AA
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 06:15:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d0mYb-0004fR-2Q
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 06:09:53 -0400
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:38141)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1d0mYa-0004eg-RJ
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 06:09:52 -0400
-Received: by mail-wm0-x236.google.com with SMTP id r190so18039009wme.1
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 03:09:52 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CAJy91CaB3kA0vNRGs52S=OweSfSXnkO71AHOa2XpUYNJTnZHDQ@mail.gmail.com>
-References: <CAJy91CZpAiZ6adPmbAESrYqDgtK37CEgw4SAk97jCNduADy6Tw@mail.gmail.com>
-	<CAFEAcA-V3BNcrhhnap+Hn8spfZPd0=Dv2v0P5myGwqU2e5t0Eg@mail.gmail.com>
-	<CAJy91Ca2FTvBzd2OqQZyEJBtCAxxosdcAFP1RMgGCQe2PJXEJA@mail.gmail.com>
-	<CAFEAcA-f1P4OW+DwLRn1AZQCzoiWNX_8Rhq0oduppMOSLWo9Ww@mail.gmail.com>
-	<CAJy91CY=s2H0VYYuDUrs=HYTEKjKZHpU1MXrhStxGxxWg=hfEg@mail.gmail.com>
-	<CAFEAcA9mfnUF-ZtU+kGpSj2LqVxPi=0GLB4Jk9zLnhhfq_Su4A@mail.gmail.com>
-	<CAJy91CaB3kA0vNRGs52S=OweSfSXnkO71AHOa2XpUYNJTnZHDQ@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 19 Apr 2017 11:09:31 +0100
-Message-ID: <CAFEAcA81o245N_zoSUtJ0SVupZyRE9cnfr15hmu+ReMuDj9iyQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Hight Processor time of Socket communciation
+	(envelope-from <kraxel@redhat.com>) id 1d0me0-000882-PD
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 06:15:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40661)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d0me0-00086o-Ih
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 06:15:28 -0400
+Message-ID: <1492596922.6853.5.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 19 Apr 2017 12:15:22 +0200
+In-Reply-To: <7ae1e13f-b6a0-a735-3952-4e3833e34ad8@redhat.com>
+References: <3d1c16a1-ec05-0367-e569-64a63b34f2e3@redhat.com>
+	<4a56f716-3528-ddd4-f8c4-f3f6b23c469a@redhat.com>
+	<bbc2671a-42dd-aa2a-0f03-6a4a487cb8f5@redhat.com>
+	<20170327120148.GC26900@stefanha-x1.localdomain>
+	<CAFEAcA_YVJKobjJ2WeEquxUdXVYeaCvA-K0+zumCc-Rm4Tk5nQ@mail.gmail.com>
+	<20170403141912.GA3539@stefanha-x1.localdomain>
+	<87fuhf9kcz.fsf@dusky.pond.sub.org>
+	<20170418095103.GF21261@stefanha-x1.localdomain>
+	<1492516675.27392.45.camel@redhat.com>
+	<7ae1e13f-b6a0-a735-3952-4e3833e34ad8@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] What's the next QEMU version after 2.9 ? (or: when
+ is a good point in time to get rid of old interfaces)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,17 +36,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jiahuan Zhang <jiahuanzhang90@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: John Snow <jsnow@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 19 April 2017 at 11:04, Jiahuan Zhang <jiahuanzhang90@gmail.com> wrote:
-> Okay. Thank you for pointing this out.
-> I would like to make a new serial device based on pl011,
-> but containing a buffer for guest-to-host data transfer.
+  Hi,
 
-As I've said, the PL011 is inherently byte at a time.
-If you want better than that, I recommend you use virtio-serial,
-because it already exists for this purpose.
+> > There is -global, which is actually used by libvirt to configure
+> > built-in floppy devices.  But as the name suggests it sets properties
+> > globally, i.e. for all instances.  Which works in this specific use
+> > case, as there can be only one floppy controller per machine, but I
+>=20
+> Spec-wise, Can't you have two?
 
-thanks
--- PMM
+You can have two floppy drives, but they are hooked to the same
+controller.  isa-fdc has two properties (driveA and driveB) for that
+reason, so -global works even for two floppy drives.
+
+cheers,
+  Gerd
