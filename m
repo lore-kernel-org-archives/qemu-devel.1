@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1d0joK-0001Gi-Ea
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 03:13:57 -0400
+	(envelope-from <quintela@redhat.com>) id 1d0jrv-00023f-U4
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 03:17:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1d0joH-0006l0-0W
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 03:13:56 -0400
-Received: from mga06.intel.com ([134.134.136.31]:30768)
+	(envelope-from <quintela@redhat.com>) id 1d0jrs-0007x1-PW
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 03:17:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58852)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1d0joG-0006iq-N6
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 03:13:52 -0400
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-Date: Wed, 19 Apr 2017 07:13:47 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C257439054CF5@shsmsx102.ccr.corp.intel.com>
-References: <1492428730-13438-1-git-send-email-peterx@redhat.com>
-	<1492428730-13438-8-git-send-email-peterx@redhat.com>
-In-Reply-To: <1492428730-13438-8-git-send-email-peterx@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d0jrs-0007wS-JC
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 03:17:36 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 754258FCF8
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 07:17:35 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170418190747.GP2205@work-vm> (David Alan Gilbert's message of
+	"Tue, 18 Apr 2017 20:07:50 +0100")
+References: <20170417200041.2451-1-quintela@redhat.com>
+	<20170417200041.2451-11-quintela@redhat.com>
+	<20170418190747.GP2205@work-vm>
+Reply-To: quintela@redhat.com
+Date: Wed, 19 Apr 2017 09:17:32 +0200
+Message-ID: <87bmrshnn7.fsf@secure.mitica>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 7/7] intel_iommu: support passthrough
- (PT)
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 10/19] migration: Remove use of old
+ MigrationParams
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,113 +36,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "Lan, Tianyu" <tianyu.lan@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Peter,
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Juan Quintela (quintela@redhat.com) wrote:
+>> We have change in the previous patch to use migration capabilities for
+>> it.  Notice that we continue using the old command line flags from
+>> migrate command from the time being.  Remove the set_params method as
+>> now it is empty.
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> ---
+>>  include/migration/migration.h |  2 --
+>>  migration/block.c             | 17 ++---------------
+>>  migration/colo.c              |  3 ---
+>>  migration/migration.c         |  8 +++++---
+>>  migration/savevm.c            |  2 --
+>>  5 files changed, 7 insertions(+), 25 deletions(-)
+>> 
+>> diff --git a/include/migration/migration.h b/include/migration/migration.h
+>> index 5c78ae1..09d3188 100644
+>> --- a/include/migration/migration.h
+>> +++ b/include/migration/migration.h
+>> @@ -41,8 +41,6 @@
+>>  extern int only_migratable;
+>>  
+>>  struct MigrationParams {
+>> -    bool blk;
+>> -    bool shared;
+>>  };
+>
+> I'm not sure that's portable C - some suggests that empty struct's
+> are a GNU addition.
+> I suggest either leaving them here, or merging this with the next
+> patch.
 
-Besides the gPA->hPA mapping, pt mode enabling requires some sanity check o=
-n
-s->pt_supported. See comments inline.
+Added an unused bool.  I think it is clearer in two patches.
 
-> -----Original Message-----
-> From: Qemu-devel [mailto:qemu-devel-bounces+yi.l.liu=3Dintel.com@nongnu.o=
-rg] On
-> Behalf Of Peter Xu
-> Sent: Monday, April 17, 2017 7:32 PM
-> To: qemu-devel@nongnu.org
-> Cc: Lan, Tianyu <tianyu.lan@intel.com>; Michael S . Tsirkin <mst@redhat.c=
-om>;
-> Jason Wang <jasowang@redhat.com>; peterx@redhat.com; Marcel Apfelbaum
-> <marcel@redhat.com>; David Gibson <david@gibson.dropbear.id.au>
-> Subject: [Qemu-devel] [PATCH v2 7/7] intel_iommu: support passthrough (PT=
-)
->=20
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  hw/i386/intel_iommu.c          | 109 +++++++++++++++++++++++++++++++++--=
-------
->  hw/i386/intel_iommu_internal.h |   1 +
->  hw/i386/trace-events           |   1 +
->  hw/i386/x86-iommu.c            |   1 +
->  include/hw/i386/x86-iommu.h    |   1 +
->  5 files changed, 93 insertions(+), 20 deletions(-)
->=20
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c index
-> 05ae631..deb2007 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -872,7 +872,7 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *=
-s,
-> uint8_t bus_num,
->      } else {
->          switch (vtd_ce_get_type(ce)) {
->          case VTD_CONTEXT_TT_MULTI_LEVEL:
-> -            /* fall through */
-> +        case VTD_CONTEXT_TT_PASS_THROUGH:
-
-Passthru type is a reserved type if ecap.PT=3D0, so add a check here. If s-=
->pt_supported
-is false, report this translation type as unsupported and report an invalid=
- context=20
-programming to guest.
-
->          case VTD_CONTEXT_TT_DEV_IOTLB:
->              break;
->          default:
-> @@ -883,6 +883,73 @@ static int vtd_dev_to_context_entry(IntelIOMMUState =
-*s,
-> uint8_t bus_num,
->      return 0;
->  }
->=20
-> +/* Fetch translation type for specific device. Returns <0 if error
-> + * happens, otherwise return the shifted type to check against
-> + * VTD_CONTEXT_TT_*. */
-> +static int vtd_dev_get_trans_type(VTDAddressSpace *as) {
-> +    IntelIOMMUState *s;
-> +    VTDContextEntry ce;
-> +    int ret;
-> +
-> +    s =3D as->iommu_state;
-> +
-> +    ret =3D vtd_dev_to_context_entry(s, pci_bus_num(as->bus),
-> +                                   as->devfn, &ce);
-> +    if (ret) {
-> +        return ret;
-> +    }
-> +
-> +    return vtd_ce_get_type(&ce);
-> +}
-> +
-> +static bool vtd_dev_pt_enabled(VTDAddressSpace *as) {
-> +    int ret;
-> +
-> +    assert(as);
-> +
-> +    ret =3D vtd_dev_get_trans_type(as);
-> +    if (ret < 0) {
-> +        /*
-> +         * Possibly failed to parse the context entry for some reason
-> +         * (e.g., during init, or any guest configuration errors on
-> +         * context entries). We should assume PT not enabled for
-> +         * safety.
-> +         */
-> +        return false;
-> +    }
-> +
-> +    return ret =3D=3D VTD_CONTEXT_TT_PASS_THROUGH; }
-> +
-> +static void vtd_switch_address_space(VTDAddressSpace *as) {
-> +    bool use_iommu;
-> +
-> +    assert(as);
-> +
-> +    use_iommu =3D as->iommu_state->dmar_enabled;
-> +    if (use_iommu) {
-
-if s->pt_supported is false, no need to check the context.TT, even
-context.TT=3Dpt, then it should be an invalid context programming.
-
-Regards,
-Yi L
+Thanks, Juan.
