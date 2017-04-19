@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0paw-0004pl-Ps
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:24:31 -0400
+	(envelope-from <shah.suramya@gmail.com>) id 1d0pbp-0005J1-Tu
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:25:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0pat-0005lQ-Hc
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:24:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60432)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d0pat-0005l4-8L
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:24:27 -0400
-References: <201704192114358996932@zte.com.cn>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <4a29ee10-fb54-d904-a72a-f49eddb1f41f@redhat.com>
-Date: Wed, 19 Apr 2017 08:24:24 -0500
+	(envelope-from <shah.suramya@gmail.com>) id 1d0pbo-00064p-JU
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:25:25 -0400
+Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:36839)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <shah.suramya@gmail.com>)
+	id 1d0pbo-00064J-Cs
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:25:24 -0400
+Received: by mail-it0-x242.google.com with SMTP id a140so2812100ita.3
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 06:25:24 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <201704192114358996932@zte.com.cn>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="RiMXSTsSktlMrBDqoM6wJflhxEDb8tpov"
-Subject: Re: [Qemu-devel]
- =?utf-8?b?562U5aSNOiBSZTogW1BBVENIXSBxZW11LWdhOiBh?=
- =?utf-8?q?ddguest-network-get-interface-stat_command?=
+In-Reply-To: <20170415180316.2694-1-shah.suramya@gmail.com>
+References: <20170415180316.2694-1-shah.suramya@gmail.com>
+From: Suramya Shah <shah.suramya@gmail.com>
+Date: Wed, 19 Apr 2017 18:55:22 +0530
+Message-ID: <CABH=oPxjEROn-5m9cksJaN-VvL6BEmHeP-qTg2Tzuce9OhSXyw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] hw/arm: Qomify pxa2xx.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: lu.zhipeng@zte.com.cn, cornelia.huck@de.ibm.com
-Cc: mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RiMXSTsSktlMrBDqoM6wJflhxEDb8tpov
-From: Eric Blake <eblake@redhat.com>
-To: lu.zhipeng@zte.com.cn, cornelia.huck@de.ibm.com
-Cc: mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org
-Message-ID: <4a29ee10-fb54-d904-a72a-f49eddb1f41f@redhat.com>
-Subject: =?UTF-8?Q?Re:_[Qemu-devel]_=e7=ad=94=e5=a4=8d:_Re:_[PATCH]_qemu-ga:?=
- =?UTF-8?Q?_addguest-network-get-interface-stat_command?=
-References: <201704192114358996932@zte.com.cn>
-In-Reply-To: <201704192114358996932@zte.com.cn>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 15-Apr-2017 11:34 PM, "Suramya Shah" <shah.suramya@gmail.com> wrote:
 
-On 04/19/2017 08:14 AM, lu.zhipeng@zte.com.cn wrote:
-> ok,i agreed. i will do it
->=20
-
-Can you please fix your mailer to respect threading?  Your mails are
-missing 'In-Reply-To' and 'References' headers, so they are showing up
-as new top-level threads instead of being properly threaded.
-
-Also, on technical lists, it is customary to avoid top-posting, but to
-instead reply underneath the text you are responding to.
-
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---RiMXSTsSktlMrBDqoM6wJflhxEDb8tpov
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY92UIAAoJEKeha0olJ0NqgcEIAJ81tyx3IM9JKCxXjcCrwlr6
-YfHgZ6IFkTURjqjcecnVHxrcZGP8jBLSCxx97uROdMDbJ57cEJBxBlW/pb8WA+xO
-pszQ7zMF8yNZTL9P2wmIlcG+6ZrJgiFmKXuA10sbHSygBmUHa4PrNRBKLG8vuf+9
-psORzZJd8Wh2pkCnb6MNc0BHOw3Z3C3j+DwPOpF+DaSc+PhBsN80mGYeRRLqvYyz
-ilNsvePttBy093F1FQF73witKr/ZtOfpILLIgrI+dDJKxVbRU1RwyT0yA5Ne/YWP
-P12rGPoRq8T/7xKgeZkrE4l5Zv57YqlvElLwzRiDKb6U2W/7nXg54qaJ94G/MB4=
-=8zjN
------END PGP SIGNATURE-----
-
---RiMXSTsSktlMrBDqoM6wJflhxEDb8tpov--
+> Signed-off-by: Suramya Shah <shah.suramya@gmail.com>
+> ---
+>  hw/arm/pxa2xx.c | 14 ++++++--------
+>  1 file changed, 6 insertions(+), 8 deletions(-)
+>
+> diff --git a/hw/arm/pxa2xx.c b/hw/arm/pxa2xx.c
+> index cfee392..eea551d 100644
+> --- a/hw/arm/pxa2xx.c
+> +++ b/hw/arm/pxa2xx.c
+> @@ -755,19 +755,18 @@ static void pxa2xx_ssp_reset(DeviceState *d)
+>      s->rx_start = s->rx_level = 0;
+>  }
+>
+> -static int pxa2xx_ssp_init(SysBusDevice *sbd)
+> +static void pxa2xx_ssp_init(Object *obj)
+>  {
+> -    DeviceState *dev = DEVICE(sbd);
+> -    PXA2xxSSPState *s = PXA2XX_SSP(dev);
+> -
+> +    DeviceState *dev = DEVICE(obj);
+> +    PXA2xxSSPState *s = PXA2XX_SSP(obj);
+> +    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+>      sysbus_init_irq(sbd, &s->irq);
+>
+> -    memory_region_init_io(&s->iomem, OBJECT(s), &pxa2xx_ssp_ops, s,
+> +    memory_region_init_io(&s->iomem, obj, &pxa2xx_ssp_ops, s,
+>                            "pxa2xx-ssp", 0x1000);
+>      sysbus_init_mmio(sbd, &s->iomem);
+>
+>      s->bus = ssi_create_bus(dev, "ssi");
+> -    return 0;
+>  }
+>
+>  /* Real-Time Clock */
+> @@ -2321,10 +2320,8 @@ PXA2xxState *pxa255_init(MemoryRegion
+> *address_space, unsigned int sdram_size)
+>
+>  static void pxa2xx_ssp_class_init(ObjectClass *klass, void *data)
+>  {
+> -    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(klass);
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>
+> -    sdc->init = pxa2xx_ssp_init;
+>      dc->reset = pxa2xx_ssp_reset;
+>      dc->vmsd = &vmstate_pxa2xx_ssp;
+>  }
+> @@ -2333,6 +2330,7 @@ static const TypeInfo pxa2xx_ssp_info = {
+>      .name          = TYPE_PXA2XX_SSP,
+>      .parent        = TYPE_SYS_BUS_DEVICE,
+>      .instance_size = sizeof(PXA2xxSSPState),
+> +    .instance_init = pxa2xx_ssp_init,
+>      .class_init    = pxa2xx_ssp_class_init,
+>  };
+>
+> --
+> 2.9.3
+>
+>
