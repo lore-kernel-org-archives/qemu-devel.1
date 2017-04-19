@@ -1,36 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1d0ewu-0005SZ-OD
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 22:02:30 -0400
+	(envelope-from <peterx@redhat.com>) id 1d0f3W-0007Bt-Sk
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 22:09:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1d0ewr-00011H-MH
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 22:02:28 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:34257)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1d0ewr-00010o-EA
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 22:02:25 -0400
-Received: by mail-pf0-x244.google.com with SMTP id g23so1504837pfj.1
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 19:02:25 -0700 (PDT)
-References: <20170412095111.11728-1-xiaoguangrong@tencent.com>
-	<cdce9f8e-ec58-d210-3be2-932359e0dcf7@redhat.com>
-	<d684319d-afb7-62ea-8486-80c1bee23744@gmail.com>
-	<d59e2de5-959d-0b94-6030-264b2310c9e1@gmail.com>
-	<D1BD20B5DB34024DA951CEEE6C4C5998ADA414FF@DGGEMA501-MBX.china.huawei.com>
-	<418f9ca3-09a9-e40c-e15b-9498036f0b12@gmail.com>
-	<58EF4512.1060004@huawei.com>
-	<e596b57f-6f75-f872-1ac7-e83e8b3339bd@gmail.com>
-	<58EF4732.3050006@huawei.com>
-From: Xiao Guangrong <guangrong.xiao@gmail.com>
-Message-ID: <402d04f4-2baf-6bd0-57d6-fc5890ea603a@gmail.com>
-Date: Wed, 19 Apr 2017 10:02:22 +0800
+	(envelope-from <peterx@redhat.com>) id 1d0f3T-0003S9-NO
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 22:09:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39242)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d0f3T-0003Rh-EM
+	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 22:09:15 -0400
+Date: Wed, 19 Apr 2017 10:08:57 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170419020857.GG22226@pxdev.xzpeter.org>
+References: <1491562755-23867-1-git-send-email-peterx@redhat.com>
+	<1491562755-23867-2-git-send-email-peterx@redhat.com>
+	<20170410043922.GI27571@umbus>
+	<20170410070950.GK3981@pxdev.xzpeter.org>
+	<20170411015654.GU27571@umbus>
+	<20170418095637.GE22226@pxdev.xzpeter.org>
+	<20170418115511.GA12450@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <58EF4732.3050006@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel]
- =?utf-8?b?562U5aSNOiBbUEFUQ0ggMC81XSBtYzE0NjgxOHJ0?=
- =?utf-8?q?c=3A_fix_Windows_VM_clock_faster?=
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170418115511.GA12450@umbus.fritz.box>
+Subject: Re: [Qemu-devel] [PATCH v9 1/9] memory: add section range info for
+ IOMMU notifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,116 +33,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>
-Cc: xuquan8@huawei.com, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "yunfangtai@tencent.com" <yunfangtai@tencent.com>, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
 
+On Tue, Apr 18, 2017 at 09:55:11PM +1000, David Gibson wrote:
+> On Tue, Apr 18, 2017 at 05:56:37PM +0800, Peter Xu wrote:
+> > On Tue, Apr 11, 2017 at 11:56:54AM +1000, David Gibson wrote:
+> > > On Mon, Apr 10, 2017 at 03:09:50PM +0800, Peter Xu wrote:
+> > > > On Mon, Apr 10, 2017 at 02:39:22PM +1000, David Gibson wrote:
+> > > > > On Fri, Apr 07, 2017 at 06:59:07PM +0800, Peter Xu wrote:
+> > > > > > In this patch, IOMMUNotifier.{start|end} are introduced to store section
+> > > > > > information for a specific notifier. When notification occurs, we not
+> > > > > > only check the notification type (MAP|UNMAP), but also check whether the
+> > > > > > notified iova range overlaps with the range of specific IOMMU notifier,
+> > > > > > and skip those notifiers if not in the listened range.
+> > > > > > 
+> > > > > > When removing an region, we need to make sure we removed the correct
+> > > > > > VFIOGuestIOMMU by checking the IOMMUNotifier.start address as well.
+> > > > > > 
+> > > > > > This patch is solving the problem that vfio-pci devices receive
+> > > > > > duplicated UNMAP notification on x86 platform when vIOMMU is there. The
+> > > > > > issue is that x86 IOMMU has a (0, 2^64-1) IOMMU region, which is
+> > > > > > splitted by the (0xfee00000, 0xfeefffff) IRQ region. AFAIK
+> > > > > > this (splitted IOMMU region) is only happening on x86.
+> > > > > > 
+> > > > > > This patch also helps vhost to leverage the new interface as well, so
+> > > > > > that vhost won't get duplicated cache flushes. In that sense, it's an
+> > > > > > slight performance improvement.
+> > > > > > 
+> > > > > > Suggested-by: David Gibson <david@gibson.dropbear.id.au>
+> > > > > > Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> > > > > > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> > > > > > Acked-by: Alex Williamson <alex.williamson@redhat.com>
+> > > > > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > > > > ---
+> > > > > >  hw/vfio/common.c      | 12 +++++++++---
+> > > > > >  hw/virtio/vhost.c     | 10 ++++++++--
+> > > > > >  include/exec/memory.h | 19 ++++++++++++++++++-
+> > > > > >  memory.c              |  9 +++++++++
+> > > > > >  4 files changed, 44 insertions(+), 6 deletions(-)
+> > > > > > 
+> > > > > > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> > > > > > index f3ba9b9..6b33b9f 100644
+> > > > > > --- a/hw/vfio/common.c
+> > > > > > +++ b/hw/vfio/common.c
+> > > > > > @@ -478,8 +478,13 @@ static void vfio_listener_region_add(MemoryListener *listener,
+> > > > > >          giommu->iommu_offset = section->offset_within_address_space -
+> > > > > >                                 section->offset_within_region;
+> > > > > >          giommu->container = container;
+> > > > > > -        giommu->n.notify = vfio_iommu_map_notify;
+> > > > > > -        giommu->n.notifier_flags = IOMMU_NOTIFIER_ALL;
+> > > > > > +        llend = int128_add(int128_make64(section->offset_within_region),
+> > > > > > +                           section->size);
+> > > > > > +        llend = int128_sub(llend, int128_one());
+> > > > > > +        iommu_notifier_init(&giommu->n, vfio_iommu_map_notify,
+> > > > > > +                            IOMMU_NOTIFIER_ALL,
+> > > > > > +                            section->offset_within_region,
+> > > > > > +                            int128_get64(llend));
+> > > > > 
+> > > > > Seems to me it would make sense to put the fiddling around to convert
+> > > > > the MemoryRegionSection into the necessary values would make sense to
+> > > > > go inside iommu_notifier_init().
+> > > > 
+> > > > But will we always get one MemoryRegionSection if we are not in any of
+> > > > the region_{add|del} callback? E.g., what if we want to init an IOMMU
+> > > > notifier that covers just the whole IOMMU region range?
+> > > 
+> > > I suppose so.  It's just the only likely users of the interface I can
+> > > see will be always doing this from region_{add,del}.
+> > > 
+> > > > Considering above, I would still slightly prefer current interface.
+> > > 
+> > > Ok, well my opinion on the matter isn't terribly strong.
+> > 
+> > Hi, David,
+> > 
+> > Sorry to respond late (so that context might be lost). Just want to
+> > make sure that you are okay with current patch and interface, right?
+> > 
+> > I think Marcel is going to merge it if np, and I would like to have
+> > your confirmation on this before the merge. Thanks!
+> 
+> Yes, that's fine.
 
+I see that Edurado has already queued the patches. Thanks for the
+confirmation!
 
-On 04/13/2017 05:38 PM, Hailiang Zhang wrote:
-> On 2017/4/13 17:35, Xiao Guangrong wrote:
->>
->> On 04/13/2017 05:29 PM, Hailiang Zhang wrote:
->>> On 2017/4/13 17:18, Xiao Guangrong wrote:
->>>> On 04/13/2017 05:05 PM, Zhanghailiang wrote:
->>>>> Hi,
->>>>>
->>>>> -----邮件原件-----
->>>>> 发件人: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org]
->>>>> 代表 Xiao Guangrong
->>>>> 发送时间: 2017年4月13日 16:53
->>>>> 收件人: Paolo Bonzini; mst@redhat.com; mtosatti@redhat.com
->>>>> 抄送: qemu-devel@nongnu.org; kvm@vger.kernel.org;
->>>>> yunfangtai@tencent.com; Xiao Guangrong
->>>>> 主题: Re: [PATCH 0/5] mc146818rtc: fix Windows VM clock faster
->>>>>
->>>>>
->>>>>
->>>>> On 04/13/2017 04:39 PM, Xiao Guangrong wrote:
->>>>>> On 04/13/2017 02:37 PM, Paolo Bonzini wrote:
->>>>>>> On 12/04/2017 17:51, guangrong.xiao@gmail.com wrote:
->>>>>>>> The root cause is that the clock will be lost if the periodic
->>>>>>>> period
->>>>>>>> is changed as currently code counts the next periodic time like
->>>>>>>> this:
->>>>>>>>         next_irq_clock = (cur_clock & ~(period - 1)) + period;
->>>>>>>>
->>>>>>>> consider the case if cur_clock = 0x11FF and period = 0x100, then
->>>>>>>> the
->>>>>>>> next_irq_clock is 0x1200, however, there is only 1 clock left to
->>>>>>>> trigger the next irq. Unfortunately, Windows guests (at least
->>>>>>>> Windows7) change the period very frequently if it runs the attached
->>>>>>>> code, so that the lost clock is accumulated, the wall-time become
->>>>>>>> faster and faster
->>>>>>> Very interesting.
->>>>>>>
->>>>>> Yes, indeed.
->>>>>>
->>>>>>> However, I think that the above should be exactly how the RTC should
->>>>>>> work.  The original RTC circuit had 22 divider stages (see page
->>>>>>> 13 of
->>>>>>> the datasheet[1], at the bottom right), and the periodic interrupt
->>>>>>> taps the rising edge of one of the dividers (page 16, second
->>>>>>> paragraph).  The datasheet also never mentions a comparator being
->>>>>>> used to trigger the periodic interrupts.
->>>>>>>
->>>>>> That was my thought before, however, after more test, i am not
->>>>>> sure if
->>>>>> re-configuring RegA changes these divider stages internal...
->>>>>>
->>>>>>> Have you checked that this Windows bug doesn't happen on real
->>>>>>> hardware too?  Or is the combination of driftfix=slew and changing
->>>>>>> periods that is a problem?
->>>>>>>
->>>>>> I have two physical windows 7 machines, both of them have
->>>>>> 'useplatformclock = off' and ntp disabled, the wall time is really
->>>>>> accurate. The difference is that the physical machines are using
->>>>>> Intel
->>>>>> Q87 LPC chipset which is mc146818rtc compatible. However, on VM, the
->>>>>> issue is easily be reproduced just in ~10 mins.
->>>>>>
->>>>>> Our test mostly focus on 'driftfix=slew' and after this patchset the
->>>>>> time is accurate and stable.
->>>>>>
->>>>>> I will do the test for dropping 'slew' and see what will happen...
->>>>>>
->>>>>> Well, the time is easily observed to be faster if 'driftfix=slew' is
->>>>>> not used. :(
->>>>> You mean, it only fixes the one case which with the ' driftfix=slew '
->>>>> is used ?
->>>> No. for both.
->>>>
->>>>> We encountered this problem too, I have tried to fix it long time ago.
->>>>> https://lists.gnu.org/archive/html/qemu-devel/2016-03/msg06937.html.
->>>>> (It seems that your solution is more useful)
->>>>> But it seems that it is impossible to fix, we need to emulate the
->>>>> behaviors of real hardware,
->>>>> but we didn't find any clear description about it. And it seems that
->>>>> other virtualization platforms
->>>> That is the issue, the hardware spec does not detail how the clock is
->>>> counted when the timer interval is changed. What we can do at this time
->>>> is that speculate it from the behaviors. Current RTC is completely
->>>> unusable anyway.
->>>>
->>>>
->>>>> have this problem too:
->>>>> VMware:
->>>>> https://www.vmware.com/files/pdf/Timekeeping-In-VirtualMachines.pdf
->>>>> Heper-v:
->>>>> https://blogs.msdn.microsoft.com/virtual_pc_guy/2010/11/19/time-synchronization-in-hyper-v/
->>>>>
->>>>>
->>>> Hmm, slower clock is understandable, does really the Windows7 on hyperV
->>>> have faster clock? Did you meet it?
->>> I don't know, we didn't test it, besides, I'd like to know how long did
->>> your testcase run before
->>> you judge it is stable with 'driftfix=slew'  option? (My previous patch
->>> can't fix it completely but
->>> only narrows the gap between timer in guest and real timer.)
->> More than 12 hours.
->
-> Great, I'll test and look into it ... thanks.
->
-
-Hi Hailiang,
-
-Does this patchset work for you? :)
+-- 
+Peter Xu
