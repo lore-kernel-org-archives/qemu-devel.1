@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d0oUv-0005jV-4a
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:14:13 -0400
+	(envelope-from <famz@redhat.com>) id 1d0oVd-0006E0-Mg
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:14:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d0oUu-0005mk-AU
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:14:13 -0400
-Date: Wed, 19 Apr 2017 20:14:01 +0800
+	(envelope-from <famz@redhat.com>) id 1d0oVc-00068U-MQ
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:14:57 -0400
+Date: Wed, 19 Apr 2017 20:14:48 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170419121401.GA9638@lemon.lan>
+Message-ID: <20170419121448.GB9638@lemon.lan>
 References: <1491057878-27868-1-git-send-email-ashijeetacharya@gmail.com>
-	<1491057878-27868-2-git-send-email-ashijeetacharya@gmail.com>
-	<CAC2QTZaeOqHOwD5M=FU6Mg5HY1PvCgxbm1QyoAv0y2XE6xR5mA@mail.gmail.com>
+	<1491057878-27868-3-git-send-email-ashijeetacharya@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAC2QTZaeOqHOwD5M=FU6Mg5HY1PvCgxbm1QyoAv0y2XE6xR5mA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/6] vmdk: Move
- vmdk_find_offset_in_cluster() to the top
+In-Reply-To: <1491057878-27868-3-git-send-email-ashijeetacharya@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/6] vmdk: Rename get_whole_cluster() to
+ vmdk_perform_cow()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,19 +25,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com, stefanha@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Mon, 04/10 18:34, Ashijeet Acharya wrote:
-> On Sat, Apr 1, 2017 at 8:14 PM, Ashijeet Acharya
-> <ashijeetacharya@gmail.com> wrote:
-> > Move the existing vmdk_find_offset_in_cluster() function to the top of
-> > the driver. Also, introduce a new helper function size_to_clusters()
-> > which returns the number of clusters for a given size in bytes. Here,
-> > we leave the last cluster as we need to perform COW for that one.
-> >
-> I will remove the trailing part of the commit message in v4 as there
-> is no size_to_clusters() in this patch anymore, I forgot to update it!
-
-With that updated, you can add my:
+On Sat, 04/01 20:14, Ashijeet Acharya wrote:
+> Rename the existing function get_whole_cluster() to vmdk_perform_cow()
+> as its sole purpose is to perform COW for the first and the last
+> allocated clusters if needed.
+> 
+> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+> ---
+>  block/vmdk.c | 23 ++++++++++++++---------
+>  1 file changed, 14 insertions(+), 9 deletions(-)
+> 
+> diff --git a/block/vmdk.c b/block/vmdk.c
+> index 22be887..73ae786 100644
+> --- a/block/vmdk.c
+> +++ b/block/vmdk.c
+> @@ -1028,8 +1028,8 @@ static void vmdk_refresh_limits(BlockDriverState *bs, Error **errp)
+>      }
+>  }
+>  
+> -/**
+> - * get_whole_cluster
+> +/*
+> + * vmdk_perform_cow
+>   *
+>   * Copy backing file's cluster that covers @sector_num, otherwise write zero,
+>   * to the cluster at @cluster_sector_num.
+> @@ -1037,13 +1037,18 @@ static void vmdk_refresh_limits(BlockDriverState *bs, Error **errp)
+>   * If @skip_start_sector < @skip_end_sector, the relative range
+>   * [@skip_start_sector, @skip_end_sector) is not copied or written, and leave
+>   * it for call to write user data in the request.
+> + *
+> + * Returns:
+> + *   VMDK_OK:       on success
+> + *
+> + *   VMDK_ERROR:    in error cases
+>   */
+> -static int get_whole_cluster(BlockDriverState *bs,
+> -                             VmdkExtent *extent,
+> -                             uint64_t cluster_offset,
+> -                             uint64_t offset,
+> -                             uint64_t skip_start_bytes,
+> -                             uint64_t skip_end_bytes)
+> +static int vmdk_perform_cow(BlockDriverState *bs,
+> +                            VmdkExtent *extent,
+> +                            uint64_t cluster_offset,
+> +                            uint64_t offset,
+> +                            uint64_t skip_start_bytes,
+> +                            uint64_t skip_end_bytes)
+>  {
+>      int ret = VMDK_OK;
+>      int64_t cluster_bytes;
+> @@ -1244,7 +1249,7 @@ static int get_cluster_offset(BlockDriverState *bs,
+>           * This problem may occur because of insufficient space on host disk
+>           * or inappropriate VM shutdown.
+>           */
+> -        ret = get_whole_cluster(bs, extent, cluster_sector * BDRV_SECTOR_SIZE,
+> +        ret = vmdk_perform_cow(bs, extent, cluster_sector * BDRV_SECTOR_SIZE,
+>                                  offset, skip_start_bytes, skip_end_bytes);
+>          if (ret) {
+>              return ret;
+> -- 
+> 2.6.2
+> 
 
 Reviewed-by: Fam Zheng <famz@redhat.com>
