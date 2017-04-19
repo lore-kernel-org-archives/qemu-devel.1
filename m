@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d0wiR-0004bT-8p
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:00:44 -0400
+	(envelope-from <quintela@redhat.com>) id 1d0whv-000444-Fb
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:00:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d0wiP-0007Jo-Ka
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:00:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:27965)
+	(envelope-from <quintela@redhat.com>) id 1d0whq-00072R-LP
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:00:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48290)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d0wiP-0007JY-BF
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:00:41 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d0whq-000724-G2
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:00:06 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 369A92E6041
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 21:00:40 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5A6749D51F
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 21:00:05 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 19 Apr 2017 22:59:10 +0200
-Message-Id: <20170419205923.8808-47-quintela@redhat.com>
+Date: Wed, 19 Apr 2017 22:58:48 +0200
+Message-Id: <20170419205923.8808-25-quintela@redhat.com>
 In-Reply-To: <20170419205923.8808-1-quintela@redhat.com>
 References: <20170419205923.8808-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 46/59] ram: ram_discard_range() don't use the
- mis parameter
+Subject: [Qemu-devel] [PATCH 24/59] ram: Move xbzrle_overflows into RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,112 +32,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com
 
+Once there, remove the now unused AccountingInfo struct and var.
+
 Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- include/migration/migration.h | 3 +--
- migration/postcopy-ram.c      | 6 ++----
- migration/ram.c               | 9 +++------
- migration/savevm.c            | 3 +--
- 4 files changed, 7 insertions(+), 14 deletions(-)
+ migration/ram.c | 21 +++++----------------
+ 1 file changed, 5 insertions(+), 16 deletions(-)
 
-diff --git a/include/migration/migration.h b/include/migration/migration.h
-index 2cd2007..b84ec3d 100644
---- a/include/migration/migration.h
-+++ b/include/migration/migration.h
-@@ -270,8 +270,7 @@ void ram_debug_dump_bitmap(unsigned long *todump, bool expected);
- /* For outgoing discard bitmap */
- int ram_postcopy_send_discard_bitmap(MigrationState *ms);
- /* For incoming postcopy discard */
--int ram_discard_range(MigrationIncomingState *mis, const char *block_name,
--                      uint64_t start, size_t length);
-+int ram_discard_range(const char *block_name, uint64_t start, size_t length);
- int ram_postcopy_incoming_init(MigrationIncomingState *mis);
- void ram_postcopy_migrated_memory_release(MigrationState *ms);
- 
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index 8756364..85fd8d7 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -213,8 +213,6 @@ out:
- static int init_range(const char *block_name, void *host_addr,
-                       ram_addr_t offset, ram_addr_t length, void *opaque)
- {
--    MigrationIncomingState *mis = opaque;
--
-     trace_postcopy_init_range(block_name, host_addr, offset, length);
- 
-     /*
-@@ -223,7 +221,7 @@ static int init_range(const char *block_name, void *host_addr,
-      * - we're going to get the copy from the source anyway.
-      * (Precopy will just overwrite this data, so doesn't need the discard)
-      */
--    if (ram_discard_range(mis, block_name, 0, length)) {
-+    if (ram_discard_range(block_name, 0, length)) {
-         return -1;
-     }
- 
-@@ -271,7 +269,7 @@ static int cleanup_range(const char *block_name, void *host_addr,
-  */
- int postcopy_ram_incoming_init(MigrationIncomingState *mis, size_t ram_pages)
- {
--    if (qemu_ram_foreach_block(init_range, mis)) {
-+    if (qemu_ram_foreach_block(init_range, NULL)) {
-         return -1;
-     }
- 
 diff --git a/migration/ram.c b/migration/ram.c
-index 3f3842a..9ed91e5 100644
+index 09f9eff..88392e4 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -782,7 +782,7 @@ static void ram_release_pages(const char *rbname, uint64_t offset, int pages)
-         return;
-     }
+@@ -181,23 +181,13 @@ struct RAMState {
+     uint64_t xbzrle_cache_miss;
+     /* xbzrle miss rate */
+     double xbzrle_cache_miss_rate;
++    /* xbzrle number of overflows */
++    uint64_t xbzrle_overflows;
+ };
+ typedef struct RAMState RAMState;
  
--    ram_discard_range(NULL, rbname, offset, pages << TARGET_PAGE_BITS);
-+    ram_discard_range(rbname, offset, pages << TARGET_PAGE_BITS);
+ static RAMState ram_state;
+ 
+-/* accounting for migration statistics */
+-typedef struct AccountingInfo {
+-    uint64_t xbzrle_overflows;
+-} AccountingInfo;
+-
+-static AccountingInfo acct_info;
+-
+-static void acct_clear(void)
+-{
+-    memset(&acct_info, 0, sizeof(acct_info));
+-}
+-
+ uint64_t dup_mig_pages_transferred(void)
+ {
+     return ram_state.zero_pages;
+@@ -230,7 +220,7 @@ double xbzrle_mig_cache_miss_rate(void)
+ 
+ uint64_t xbzrle_mig_pages_overflow(void)
+ {
+-    return acct_info.xbzrle_overflows;
++    return ram_state.xbzrle_overflows;
  }
  
- /**
-@@ -1608,7 +1608,7 @@ void ram_postcopy_migrated_memory_release(MigrationState *ms)
+ static QemuMutex migration_bitmap_mutex;
+@@ -528,7 +518,7 @@ static int save_xbzrle_page(RAMState *rs, QEMUFile *f, uint8_t **current_data,
+         return 0;
+     } else if (encoded_len == -1) {
+         trace_save_xbzrle_page_overflow();
+-        acct_info.xbzrle_overflows++;
++        rs->xbzrle_overflows++;
+         /* update data in the cache */
+         if (!last_stage) {
+             memcpy(prev_cached_page, *current_data, TARGET_PAGE_SIZE);
+@@ -2005,6 +1995,7 @@ static int ram_save_init_globals(RAMState *rs)
+     rs->xbzrle_pages = 0;
+     rs->xbzrle_cache_miss = 0;
+     rs->xbzrle_cache_miss_rate = 0;
++    rs->xbzrle_overflows = 0;
+     migration_bitmap_sync_init(rs);
+     qemu_mutex_init(&migration_bitmap_mutex);
  
-         while (run_start < range) {
-             unsigned long run_end = find_next_bit(bitmap, range, run_start + 1);
--            ram_discard_range(NULL, block->idstr, run_start << TARGET_PAGE_BITS,
-+            ram_discard_range(block->idstr, run_start << TARGET_PAGE_BITS,
-                               (run_end - run_start) << TARGET_PAGE_BITS);
-             run_start = find_next_zero_bit(bitmap, range, run_end + 1);
+@@ -2035,8 +2026,6 @@ static int ram_save_init_globals(RAMState *rs)
+             XBZRLE.encoded_buf = NULL;
+             return -1;
          }
-@@ -1948,15 +1948,12 @@ int ram_postcopy_send_discard_bitmap(MigrationState *ms)
-  *
-  * Returns zero on success
-  *
-- * @mis: current migration incoming state
-  * @rbname: name of the RAMBlock of the request. NULL means the
-  *          same that last one.
-  * @start: RAMBlock starting page
-  * @length: RAMBlock size
-  */
--int ram_discard_range(MigrationIncomingState *mis,
--                      const char *rbname,
--                      uint64_t start, size_t length)
-+int ram_discard_range(const char *rbname, uint64_t start, size_t length)
- {
-     int ret = -1;
+-
+-        acct_clear();
+     }
  
-diff --git a/migration/savevm.c b/migration/savevm.c
-index bbf055d..7cf387f 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1479,8 +1479,7 @@ static int loadvm_postcopy_ram_handle_discard(MigrationIncomingState *mis,
-         block_length = qemu_get_be64(mis->from_src_file);
- 
-         len -= 16;
--        int ret = ram_discard_range(mis, ramid, start_addr,
--                                    block_length);
-+        int ret = ram_discard_range(ramid, start_addr, block_length);
-         if (ret) {
-             return ret;
-         }
+     /* For memory_global_dirty_log_start below.  */
 -- 
 2.9.3
