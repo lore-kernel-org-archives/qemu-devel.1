@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58877)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1d0mQH-0008F0-Rk
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 06:01:26 -0400
+	(envelope-from <jiahuanzhang90@gmail.com>) id 1d0mTi-0000hE-Ai
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 06:04:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1d0mQC-0006uJ-UH
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 06:01:17 -0400
-Received: from mga07.intel.com ([134.134.136.100]:50906)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1d0mQC-0006t4-Fo
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 06:01:12 -0400
-Message-ID: <58F735CF.7040404@intel.com>
-Date: Wed, 19 Apr 2017 18:02:55 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <jiahuanzhang90@gmail.com>) id 1d0mTh-00018x-3b
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 06:04:50 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:34278)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jiahuanzhang90@gmail.com>)
+	id 1d0mTg-00018f-U2
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 06:04:49 -0400
+Received: by mail-qk0-x241.google.com with SMTP id p68so2640285qke.1
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 03:04:48 -0700 (PDT)
 MIME-Version: 1.0
-References: <286AC319A985734F985F78AFA26841F7391EF490@shsmsx102.ccr.corp.intel.com>
-	<9ce5d497-c52a-23fc-a43d-ac7c895faedb@siemens.com>
-	<58F722EE.7030300@intel.com>
-	<d96b8097-b541-9908-8141-86267e726471@siemens.com>
-	<58F72942.3030802@intel.com>
-	<fcf62a96-b3fd-cffc-c784-7af46144cbb2@siemens.com>
-In-Reply-To: <fcf62a96-b3fd-cffc-c784-7af46144cbb2@siemens.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: Vhost-pci RFC2.0
+In-Reply-To: <CAFEAcA9mfnUF-ZtU+kGpSj2LqVxPi=0GLB4Jk9zLnhhfq_Su4A@mail.gmail.com>
+References: <CAJy91CZpAiZ6adPmbAESrYqDgtK37CEgw4SAk97jCNduADy6Tw@mail.gmail.com>
+	<CAFEAcA-V3BNcrhhnap+Hn8spfZPd0=Dv2v0P5myGwqU2e5t0Eg@mail.gmail.com>
+	<CAJy91Ca2FTvBzd2OqQZyEJBtCAxxosdcAFP1RMgGCQe2PJXEJA@mail.gmail.com>
+	<CAFEAcA-f1P4OW+DwLRn1AZQCzoiWNX_8Rhq0oduppMOSLWo9Ww@mail.gmail.com>
+	<CAJy91CY=s2H0VYYuDUrs=HYTEKjKZHpU1MXrhStxGxxWg=hfEg@mail.gmail.com>
+	<CAFEAcA9mfnUF-ZtU+kGpSj2LqVxPi=0GLB4Jk9zLnhhfq_Su4A@mail.gmail.com>
+From: Jiahuan Zhang <jiahuanzhang90@gmail.com>
+Date: Wed, 19 Apr 2017 12:04:47 +0200
+Message-ID: <CAJy91CaB3kA0vNRGs52S=OweSfSXnkO71AHOa2XpUYNJTnZHDQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] Hight Processor time of Socket communciation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,150 +33,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jan Kiszka <jan.kiszka@siemens.com>, =?windows-1252?Q?Marc-Andr=E9_?= =?windows-1252?Q?Lureau?= <marcandre.lureau@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>
-Cc: Jailhouse <jailhouse-dev@googlegroups.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 04/19/2017 05:31 PM, Jan Kiszka wrote:
-> On 2017-04-19 11:09, Wei Wang wrote:
->> On 04/19/2017 04:49 PM, Jan Kiszka wrote:
->>> On 2017-04-19 10:42, Wei Wang wrote:
->>>> On 04/19/2017 03:35 PM, Jan Kiszka wrote:
->>>>> On 2017-04-19 08:38, Wang, Wei W wrote:
->>>>>> Hi,
->>>>>>     We made some design changes to the original vhost-pci design,
->>>>>> and want
->>>>>> to open
->>>>>> a discussion about the latest design (labelled 2.0) and its extension
->>>>>> (2.1).
->>>>>> 2.0 design: One VM shares the entire memory of another VM
->>>>>> 2.1 design: One VM uses an intermediate memory shared with another VM
->>>>>> for
->>>>>>                         packet transmission.
->>>>>>     For the convenience of discussion, I have some pictures
->>>>>> presented at
->>>>>> this link:
->>>>>> _https://github.com/wei-w-wang/vhost-pci-discussion/blob/master/vhost-pci-rfc2.0.pdf_
->>>>>>
->>>>>>
->>>>>>     Fig. 1 shows the common driver frame that we want use to build
->>>>>> the 2.0
->>>>>> and 2.1
->>>>>> design. A TX/RX engine consists of a local ring and an exotic ring.
->>>>>> Local ring:
->>>>>> 1) allocated by the driver itself;
->>>>>> 2) registered with the device (i.e. virtio_add_queue())
->>>>>> Exotic ring:
->>>>>> 1) ring memory comes from the outside (of the driver), and exposed to
->>>>>> the driver
->>>>>>         via a BAR MMIO;
->>>>> Small additional requirement: In order to make this usable with
->>>>> Jailhouse as well, we need [also] a side-channel configuration for the
->>>>> regions, i.e. likely via a PCI capability. There are too few BARs, and
->>>>> they suggest relocatablity, which is not available under Jailhouse for
->>>>> simplicity reasons (IOW, the shared regions are statically mapped by
->>>>> the
->>>>> hypervisor into the affected guest address spaces).
->>>> What kind of configuration would you need for the regions?
->>>> I think adding a PCI capability should be easy.
->>> Basically address and size, see
->>> https://github.com/siemens/jailhouse/blob/wip/ivshmem2/Documentation/ivshmem-v2-specification.md#vendor-specific-capability-id-09h
->>>
->> Got it, thanks. That should be easy to add to 2.1.
->>
->>>>>> 2) does not have a registration in the device, so no ioeventfd/irqfd,
->>>>>> configuration
->>>>>> registers allocated in the device
->>>>>>     Fig. 2 shows how the driver frame is used to build the 2.0 design.
->>>>>> 1) Asymmetric: vhost-pci-net <-> virtio-net
->>>>>> 2) VM1 shares the entire memory of VM2, and the exotic rings are the
->>>>>> rings
->>>>>>        from VM2.
->>>>>> 3) Performance (in terms of copies between VMs):
->>>>>>        TX: 0-copy (packets are put to VM2’s RX ring directly)
->>>>>>        RX: 1-copy (the green arrow line in the VM1’s RX engine)
->>>>>>     Fig. 3 shows how the driver frame is used to build the 2.1 design.
->>>>>> 1) Symmetric: vhost-pci-net <-> vhost-pci-net
->>>>> This is interesting!
->>>>>
->>>>>> 2) Share an intermediate memory, allocated by VM1’s vhost-pci device,
->>>>>> for data exchange, and the exotic rings are built on the shared memory
->>>>>> 3) Performance:
->>>>>>        TX: 1-copy
->>>>>> RX: 1-copy
->>>>> I'm not yet sure I to this right: there are two different MMIO regions
->>>>> involved, right? One is used for VM1's RX / VM2's TX, and the other for
->>>>> the reverse path? Would allow our requirement to have those regions
->>>>> mapped with asymmetric permissions (RX read-only, TX read/write).
->>>> The design presented here intends to use only one BAR to expose
->>>> both TX and RX. The two VMs share an intermediate memory
->>>> here, why couldn't we give the same permission to TX and RX?
->>>>
->>> For security and/or safety reasons: the TX side can then safely prepare
->>> and sign a message in-place because the RX side cannot mess around with
->>> it while not yet being signed (or check-summed). Saves one copy from a
->>> secure place into the shared memory.
->> If we allow guest1 to write to RX, what safety issue would it cause to
->> guest2?
-> This way, guest1 could trick guest2, in a race condition, to sign a
-> modified message instead of the original one.
+On 19 April 2017 at 11:55, Peter Maydell <peter.maydell@linaro.org> wrote:
+
+> On 19 April 2017 at 10:25, Jiahuan Zhang <jiahuanzhang90@gmail.com> wrote:
+> > On 19 April 2017 at 11:15, Peter Maydell <peter.maydell@linaro.org>
+> wrote:
+> >> What is happening is that the guest kernel's serial driver
+> >> has a loop that (simplified) looks like this:
+> >>
+> >>   do {
+> >>       if (pl011_read(REG_FR) & FR_TXFF)
+> >>           break; /* fifo full, try again later */
+> >>       pl011_write(buffer[x], REG_DR);  /* send one byte */
+> >>       x++;
+> >>   } while (x != len);
+> >>
+> >> This is a lot of guest CPU instructions (and two callouts
+> >> to QEMU's device emulation) for every single byte.
+> >>
+> > Hi, no, I am not using any kernel driver and I only test the guest to
+> host
+> > data transfer.
 >
-Just align the context that we are talking about: RX is the intermediate
-shared ring that guest1 uses to receive packets and guest2 uses to send
-packet.
-
-Seems the issue is that guest1 will receive a hacked message from RX
-(modified by itself). How would it affect guest2?
-
->>
->>>>>>     Fig. 4 shows the inter-VM notification path for 2.0 (2.1 is
->>>>>> similar).
->>>>>> The four eventfds are allocated by virtio-net, and shared with
->>>>>> vhost-pci-net:
->>>>>> Uses virtio-net’s TX/RX kickfd as the vhost-pci-net’s RX/TX callfd
->>>>>> Uses virtio-net’s TX/RX callfd as the vhost-pci-net’s RX/TX kickfd
->>>>>> Example of how it works:
->>>>>> After packets are put into vhost-pci-net’s TX, the driver kicks TX,
->>>>>> which
->>>>>> causes the an interrupt associated with fd3 to be injected to
->>>>>> virtio-net
->>>>>>     The draft code of the 2.0 design is ready, and can be found here:
->>>>>> Qemu: _https://github.com/wei-w-wang/vhost-pci-device_
->>>>>> Guest driver: _https://github.com/wei-w-wang/vhost-pci-driver_
->>>>>>     We tested the 2.0 implementation using the Spirent packet
->>>>>> generator to transmit 64B packets, the results show that the
->>>>>> throughput of vhost-pci reaches around 1.8Mpps, which is around
->>>>>> two times larger than the legacy OVS+DPDK. Also, vhost-pci shows
->>>>>> better scalability than OVS+DPDK.
->>>>>>     
->>>>> Do you have numbers for the symmetric 2.1 case as well? Or is the
->>>>> driver
->>>>> not yet ready for that yet? Otherwise, I could try to make it work over
->>>>> a simplistic vhost-pci 2.1 version in Jailhouse as well. That would
->>>>> give
->>>>> a better picture of how much additional complexity this would mean
->>>>> compared to our ivshmem 2.0.
->>>>>
->>>> Implementation of 2.1 is not ready yet. We can extend it to 2.1 after
->>>> the common driver frame is reviewed.
->>> Can you you assess the needed effort?
->>>
->>> For us, this is a critical feature, because we need to decide if
->>> vhost-pci can be an option at all. In fact, the "exotic ring" will be
->>> the only way to provide secure inter-partition communication on
->>> Jailhouse.
->>>
->> If what is here for 2.0 is suitable to be upstream-ed, I think it will
->> be easy
->> to extend it to 2.1 (probably within 1 month).
-> Unfortunate ordering here, though. Specifically if we need to modify
-> existing things instead of just adding something. We will need 2.1 prior
-> to committing to 2.0 being the right thing.
+> OK, then the equivalent loop is this one:
+>
+> > /*
+> >  * write_to_uart(): write data to serial port
+> >  */
+> > void write_to_uart(char* out, uint32_t writeSize){
+> >  int i;
+> >  for(i=0; i<writeSize; i++){
+> >   *UART1 =(unsigned char)(*(out+i));
+> >  }
+> > }
+>
+> except that your code is broken because it's not
+> checking that the FIFO is ready to receive the character
+> so it will drop data sometimes.
 >
 
-If you want, we can get the common part of design ready first,
-then we can start to build on the common part at the same time.
-The draft code of 2.0 is ready. I can clean it up, making it easier for
-us to continue and change.
+Okay. Thank you for pointing this out.
+I would like to make a new serial device based on pl011,
+but containing a buffer for guest-to-host data transfer.
+I expect it would help to reduce the processor time while communicating.
+At this moment, I focus on having a better performance.
 
-Best,
-Wei
+regards,
+Jiahuan
+
+>
+> The point is the same -- you're feeding the data to
+> the UART byte-at-a-time.
+>
+> thanks
+> -- PMM
+>
