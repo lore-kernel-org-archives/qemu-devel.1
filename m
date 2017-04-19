@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52336)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d0m9y-00040N-Tb
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 05:44:27 -0400
+	(envelope-from <famz@redhat.com>) id 1d0mA2-00043U-2U
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 05:44:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d0m9v-0005Jc-Rh
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 05:44:26 -0400
+	(envelope-from <famz@redhat.com>) id 1d0mA0-0005N0-WD
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 05:44:30 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Wed, 19 Apr 2017 17:43:44 +0800
-Message-Id: <20170419094356.19826-5-famz@redhat.com>
+Date: Wed, 19 Apr 2017 17:43:45 +0800
+Message-Id: <20170419094356.19826-6-famz@redhat.com>
 In-Reply-To: <20170419094356.19826-1-famz@redhat.com>
 References: <20170419094356.19826-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 04/16] blockjob: Allow aio context change on
- intermediate nodes
+Subject: [Qemu-devel] [PATCH v2 05/16] block: Propagate
+ BLK_PERM_AIO_CONTEXT_CHANGE down the graph
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,57 +23,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-The intermediate nodes do work with aio context change, so allow that
-operations.
+bdrv_set_aio_context can take care of children recursively, so it is
+okay to pass down the perm.
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block/commit.c | 3 ++-
- block/mirror.c | 3 ++-
- block/stream.c | 3 ++-
- 3 files changed, 6 insertions(+), 3 deletions(-)
+ block.c       | 10 ++++++----
+ block/vvfat.c |  2 +-
+ 2 files changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/block/commit.c b/block/commit.c
-index 91d2c34..c07ee00 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -365,7 +365,8 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-          * for its backing file). The other options would be a second filter
-          * driver above s->base. */
-         ret = block_job_add_bdrv(&s->common, "intermediate node", iter, 0,
--                                 BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE,
-+                                 BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE |
-+                                 BLK_PERM_AIO_CONTEXT_CHANGE,
-                                  errp);
-         if (ret < 0) {
-             goto fail;
-diff --git a/block/mirror.c b/block/mirror.c
-index 164438f..7ab3289 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1231,7 +1231,8 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
-              * also blocked for its backing file). The other options would be a
-              * second filter driver above s->base (== target). */
-             ret = block_job_add_bdrv(&s->common, "intermediate node", iter, 0,
--                                     BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE,
-+                                     BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE |
-+                                     BLK_PERM_AIO_CONTEXT_CHANGE,
-                                      errp);
-             if (ret < 0) {
-                 goto fail;
-diff --git a/block/stream.c b/block/stream.c
-index 0113710..2fab1f4 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -265,7 +265,8 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-      * and resizes. */
-     for (iter = backing_bs(bs); iter && iter != base; iter = backing_bs(iter)) {
-         block_job_add_bdrv(&s->common, "intermediate node", iter, 0,
--                           BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED,
-+                           BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
-+                           BLK_PERM_AIO_CONTEXT_CHANGE,
-                            &error_abort);
+diff --git a/block.c b/block.c
+index 5a3affb..7e696e5 100644
+--- a/block.c
++++ b/block.c
+@@ -1685,7 +1685,8 @@ int bdrv_child_try_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared,
+ #define DEFAULT_PERM_PASSTHROUGH (BLK_PERM_CONSISTENT_READ \
+                                  | BLK_PERM_WRITE \
+                                  | BLK_PERM_WRITE_UNCHANGED \
+-                                 | BLK_PERM_RESIZE)
++                                 | BLK_PERM_RESIZE \
++                                 | BLK_PERM_AIO_CONTEXT_CHANGE)
+ #define DEFAULT_PERM_UNCHANGED (BLK_PERM_ALL & ~DEFAULT_PERM_PASSTHROUGH)
+ 
+ void bdrv_filter_default_perms(BlockDriverState *bs, BdrvChild *c,
+@@ -1728,9 +1729,10 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
+         perm |= BLK_PERM_CONSISTENT_READ;
+         shared &= ~(BLK_PERM_WRITE | BLK_PERM_RESIZE);
+     } else {
+-        /* We want consistent read from backing files if the parent needs it.
++        /* We want consistent read and aio context change from backing files if
++         * the parent needs it.
+          * No other operations are performed on backing files. */
+-        perm &= BLK_PERM_CONSISTENT_READ;
++        perm &= BLK_PERM_CONSISTENT_READ | BLK_PERM_AIO_CONTEXT_CHANGE;
+ 
+         /* If the parent can deal with changing data, we're okay with a
+          * writable and resizable backing file. */
+@@ -1742,7 +1744,7 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
+         }
+ 
+         shared |= BLK_PERM_CONSISTENT_READ | BLK_PERM_GRAPH_MOD |
+-                  BLK_PERM_WRITE_UNCHANGED;
++                  BLK_PERM_WRITE_UNCHANGED | BLK_PERM_AIO_CONTEXT_CHANGE;
      }
  
+     *nperm = perm;
+diff --git a/block/vvfat.c b/block/vvfat.c
+index af5153d..70ce452 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -3080,7 +3080,7 @@ static void vvfat_child_perm(BlockDriverState *bs, BdrvChild *c,
+     if (c == s->qcow) {
+         /* This is a private node, nobody should try to attach to it */
+         *nperm = BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE;
+-        *nshared = BLK_PERM_WRITE_UNCHANGED;
++        *nshared = BLK_PERM_WRITE_UNCHANGED | BLK_PERM_AIO_CONTEXT_CHANGE;
+     } else {
+         /* The backing file is there so 'commit' can use it. vvfat doesn't
+          * access it in any way. */
 -- 
 2.9.3
