@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d0oVd-0006E0-Mg
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:14:58 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d0oal-0008Av-9Z
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:20:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d0oVc-00068U-MQ
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:14:57 -0400
-Date: Wed, 19 Apr 2017 20:14:48 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170419121448.GB9638@lemon.lan>
-References: <1491057878-27868-1-git-send-email-ashijeetacharya@gmail.com>
-	<1491057878-27868-3-git-send-email-ashijeetacharya@gmail.com>
+	(envelope-from <mreitz@redhat.com>) id 1d0oak-0000of-HD
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:20:15 -0400
+References: <20170401155751.14322-1-mreitz@redhat.com>
+	<20170401155751.14322-5-mreitz@redhat.com>
+	<20170419112859.GC14508@lemon.lan>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <9d135f07-4b16-7798-a9fa-f5bbce6eb3d5@redhat.com>
+Date: Wed, 19 Apr 2017 14:19:52 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1491057878-27868-3-git-send-email-ashijeetacharya@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/6] vmdk: Rename get_whole_cluster() to
- vmdk_perform_cow()
+In-Reply-To: <20170419112859.GC14508@lemon.lan>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="cCHVlWAtxeKFApOUCKTTLLWWGTDSBbWOw"
+Subject: Re: [Qemu-devel] [RFC for-3.0 4/4] block/qcow2-rust: Register block
+ driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,70 +26,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com, stefanha@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
 
-On Sat, 04/01 20:14, Ashijeet Acharya wrote:
-> Rename the existing function get_whole_cluster() to vmdk_perform_cow()
-> as its sole purpose is to perform COW for the first and the last
-> allocated clusters if needed.
-> 
-> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
-> ---
->  block/vmdk.c | 23 ++++++++++++++---------
->  1 file changed, 14 insertions(+), 9 deletions(-)
-> 
-> diff --git a/block/vmdk.c b/block/vmdk.c
-> index 22be887..73ae786 100644
-> --- a/block/vmdk.c
-> +++ b/block/vmdk.c
-> @@ -1028,8 +1028,8 @@ static void vmdk_refresh_limits(BlockDriverState *bs, Error **errp)
->      }
->  }
->  
-> -/**
-> - * get_whole_cluster
-> +/*
-> + * vmdk_perform_cow
->   *
->   * Copy backing file's cluster that covers @sector_num, otherwise write zero,
->   * to the cluster at @cluster_sector_num.
-> @@ -1037,13 +1037,18 @@ static void vmdk_refresh_limits(BlockDriverState *bs, Error **errp)
->   * If @skip_start_sector < @skip_end_sector, the relative range
->   * [@skip_start_sector, @skip_end_sector) is not copied or written, and leave
->   * it for call to write user data in the request.
-> + *
-> + * Returns:
-> + *   VMDK_OK:       on success
-> + *
-> + *   VMDK_ERROR:    in error cases
->   */
-> -static int get_whole_cluster(BlockDriverState *bs,
-> -                             VmdkExtent *extent,
-> -                             uint64_t cluster_offset,
-> -                             uint64_t offset,
-> -                             uint64_t skip_start_bytes,
-> -                             uint64_t skip_end_bytes)
-> +static int vmdk_perform_cow(BlockDriverState *bs,
-> +                            VmdkExtent *extent,
-> +                            uint64_t cluster_offset,
-> +                            uint64_t offset,
-> +                            uint64_t skip_start_bytes,
-> +                            uint64_t skip_end_bytes)
->  {
->      int ret = VMDK_OK;
->      int64_t cluster_bytes;
-> @@ -1244,7 +1249,7 @@ static int get_cluster_offset(BlockDriverState *bs,
->           * This problem may occur because of insufficient space on host disk
->           * or inappropriate VM shutdown.
->           */
-> -        ret = get_whole_cluster(bs, extent, cluster_sector * BDRV_SECTOR_SIZE,
-> +        ret = vmdk_perform_cow(bs, extent, cluster_sector * BDRV_SECTOR_SIZE,
->                                  offset, skip_start_bytes, skip_end_bytes);
->          if (ret) {
->              return ret;
-> -- 
-> 2.6.2
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--cCHVlWAtxeKFApOUCKTTLLWWGTDSBbWOw
+From: Max Reitz <mreitz@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <9d135f07-4b16-7798-a9fa-f5bbce6eb3d5@redhat.com>
+Subject: Re: [Qemu-devel] [RFC for-3.0 4/4] block/qcow2-rust: Register block
+ driver
+References: <20170401155751.14322-1-mreitz@redhat.com>
+ <20170401155751.14322-5-mreitz@redhat.com> <20170419112859.GC14508@lemon.lan>
+In-Reply-To: <20170419112859.GC14508@lemon.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+On 19.04.2017 13:28, Fam Zheng wrote:
+> On Sat, 04/01 17:57, Max Reitz wrote:
+>> +/* This is just for the module loading system to detect this driver *=
+/
+>> +static BlockDriver _ __attribute__((used)) =3D {
+>> +    .format_name =3D "qcow2-rust",
+>> +};
+>=20
+> You see why I didn't like that system in the first place.
+
+Yes. We will have to adjust the module loading system before 3.0, but
+I'm confident we can port all block drivers to Rust by then so this will
+be a matter of course.
+
+OTOH, why would you ever not load the rust block driver? In the final
+version, we'd call it "qcow2", throw the legacy driver out and not even
+care about whether the module system detects this one (because it'll be
+statically linked anyway).
+
+(Honestly, I think this is just an artifact from beginning of last week
+where I wanted to make this driver a module... Beware, my April Fool's
+patches may not be polished.)
+
+Max
+
+
+--cCHVlWAtxeKFApOUCKTTLLWWGTDSBbWOw
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlj3VegSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A9GkIAJTr1Ab6hmd3Ao3+lXG0GWcSgxxAU6vu
+YqI8epzIUJnlb1hFx8VEg3dAGkoI8BfIYMN473vh/uOYx25oyHtAnx59m0KVnpU5
+Px1y2xLfHJXp8dpdRUvw6NPB4FeEQ9wHKuP+NT4PLdnfhK8mUhZHI+sLgpjkD2Gu
+DcMXzniESkLa4rcQhLY+aNTuFU72tbXbAHOoHSiYhYO+WBDGj+SWqQo2ZOc3f97C
+ikt4Q3WkDTbvdOvYItdsaMl2AaH+5seeVpEvRxMvW21przCFME3Ddr9V6l/okn2d
+OLVKDnxyH+3E6GFx/U5GgN4eP+4TSoSgKju4QktDFf7QfMU2rwm3HN4=
+=sfRX
+-----END PGP SIGNATURE-----
+
+--cCHVlWAtxeKFApOUCKTTLLWWGTDSBbWOw--
