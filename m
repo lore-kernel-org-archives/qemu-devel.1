@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1d0qgM-00009U-6z
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 10:34:11 -0400
+	(envelope-from <bounces@canonical.com>) id 1d0qhS-0000py-7Y
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 10:35:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1d0qgH-0006Tn-AC
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 10:34:10 -0400
-Received: from mga04.intel.com ([192.55.52.120]:49839)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1d0qgG-0006T5-Gj
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 10:34:05 -0400
-From: "Wang, Wei W" <wei.w.wang@intel.com>
-Date: Wed, 19 Apr 2017 14:33:58 +0000
-Message-ID: <286AC319A985734F985F78AFA26841F7391EFB38@shsmsx102.ccr.corp.intel.com>
-References: <286AC319A985734F985F78AFA26841F7391EF490@shsmsx102.ccr.corp.intel.com>
-	<9ce5d497-c52a-23fc-a43d-ac7c895faedb@siemens.com>
-	<58F722EE.7030300@intel.com>
-	<d96b8097-b541-9908-8141-86267e726471@siemens.com>
-	<58F72942.3030802@intel.com>
-	<fcf62a96-b3fd-cffc-c784-7af46144cbb2@siemens.com>
-	<58F735CF.7040404@intel.com>
-	<13ccf73a-1553-ce8c-df4a-89c26cdc27b6@siemens.com>
-	<58F745C9.9090106@intel.com>
-	<abdb3dab-d96d-927a-3a63-92ade03afc5a@siemens.com>
-In-Reply-To: <abdb3dab-d96d-927a-3a63-92ade03afc5a@siemens.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <bounces@canonical.com>) id 1d0qhQ-0006xZ-7F
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 10:35:18 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54007)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d0qhQ-0006wG-1D
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 10:35:16 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d0qhP-00010P-8o
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 14:35:15 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 3F9C32E80C2
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 14:35:15 +0000 (UTC)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [virtio-dev] Re: Vhost-pci RFC2.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 19 Apr 2017 14:22:32 -0000
+From: Matthias Schiffer <1581936@bugs.launchpad.net>
+Reply-To: Bug 1581936 <1581936@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160515095432.8440.97382.malonedeb@soybean.canonical.com>
+Message-Id: <20170419142232.17287.65024.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1581936] Re: Frozen Windows 7 VMs with VGA
+ CVE-2016-3712 fix (2.6.0 and 2.5.1.1)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,67 +37,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jan Kiszka <jan.kiszka@siemens.com>, =?iso-8859-1?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>
-Cc: Jailhouse <jailhouse-dev@googlegroups.com>
+To: qemu-devel@nongnu.org
 
-On 04/19/2017 07:21 PM, Jan Kiszka wrote:
-> On 2017-04-19 13:11, Wei Wang wrote:
-> > On 04/19/2017 06:36 PM, Jan Kiszka wrote:
-> >> On 2017-04-19 12:02, Wei Wang wrote:
-> >>>>>>> The design presented here intends to use only one BAR to expose
-> >>>>>>> both TX and RX. The two VMs share an intermediate memory here,
-> >>>>>>> why couldn't we give the same permission to TX and RX?
-> >>>>>>>
-> >>>>>> For security and/or safety reasons: the TX side can then safely
-> >>>>>> prepare and sign a message in-place because the RX side cannot
-> >>>>>> mess around with it while not yet being signed (or check-summed).
-> >>>>>> Saves one copy from a secure place into the shared memory.
-> >>>>> If we allow guest1 to write to RX, what safety issue would it
-> >>>>> cause to guest2?
-> >>>> This way, guest1 could trick guest2, in a race condition, to sign a
-> >>>> modified message instead of the original one.
-> >>>>
-> >>> Just align the context that we are talking about: RX is the
-> >>> intermediate shared ring that guest1 uses to receive packets and
-> >>> guest2 uses to send packet.
-> >>>
-> >>> Seems the issue is that guest1 will receive a hacked message from RX
-> >>> (modified by itself). How would it affect guest2?
-> >> Retry: guest2 wants to send a signed/hashed message to guest1. For
-> >> that purpose, it starts to build that message inside the shared
-> >> memory that
-> >> guest1 can at least read, then guest2 signs that message, also in-plac=
-e.
-> >> If guest1 can modify the message inside the ring while guest2 has not
-> >> yet signed it, the result is invalid.
-> >>
-> >> Now, if guest2 is the final receiver of the message, nothing is lost,
-> >> guest2 just shot itself into the foot. However, if guest2 is just a
-> >> router (gray channel) and the message travels further, guest2 now has
-> >> corrupted that channel without allowing the final receive to detect
-> >> that. That's the scenario.
-> >
-> > If guest2 has been a malicious guest, I think it wouldn't make a
-> > difference whether we protect the shared RX or not. As a router,
-> > guest2 can play tricks on the messages after read it and then send the
-> > modified message to a third man, right?
->=20
-> It can swallow it, "steal" it (redirect), but it can't manipulate the sig=
-ned content
-> without being caught, that's the idea. It's particularly relevant for saf=
-ety-critical
-> traffic from one safe application to another over unreliable channels, bu=
-t it may
-> also be relevant for the integrity of messages in a secure setup.
->=20
+Please let me know if there is anything I can do to help get these
+patches accepted for trusty/xenial.
 
-OK, I see most of your story, thanks. To get to the bottom of it, is it pos=
-sible to
-Sign the packet before put it onto the unreliable channel (e.g. the shared =
-RX),
-Instead of signing in-place? If that's doable, we can have a simpler shared=
- channel. =20
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1581936
 
-Best,
-Wei
+Title:
+  Frozen Windows 7 VMs with VGA CVE-2016-3712 fix (2.6.0 and 2.5.1.1)
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  Hi,
+
+  As already posted on the QEMU devel list [1] I stumbled upon a problem
+  with QEMU in version 2.5.1.1 and 2.6.0.
+
+  the VM shows Windows loading
+  files for the installation, then the "Starting Windows" screen appears
+  here it hangs and never continues.
+
+  Changing the "-vga" option to cirrus solves this, the installation can
+  proceed and finish. When changing back to std (or also qxl, vmware) the
+  installed VM also hangs on the "Starting Windows" screen while qemu
+  showing a little but no excessive load.
+
+  This phenomena appears also with QEMU 2.6.0 but not with 2.6.0-rc4, a
+  git bisect shows fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7 (vga: make
+  sure vga register setup for vbe stays intact (CVE-2016-3712)) as the
+  culprit for this regression, as its a fix for a DoS its not an option to
+  just revert it, I guess.
+
+  The bisect log is:
+
+  git bisect start
+  # bad: [bfc766d38e1fae5767d43845c15c79ac8fa6d6af] Update version for v2.6=
+.0 release
+  git bisect bad bfc766d38e1fae5767d43845c15c79ac8fa6d6af
+  # good: [975eb6a547f809608ccb08c221552f666611af25] Update version for v2.=
+6.0-rc4 release
+  git bisect good 975eb6a547f809608ccb08c221552f666611af25
+  # good: [2068192dcccd8a80dddfcc8df6164cf9c26e0fc4] vga: update vga regist=
+er setup on vbe changes
+  git bisect good 2068192dcccd8a80dddfcc8df6164cf9c26e0fc4
+  # bad: [53db932604dfa7bb9241d132e0173894cf54261c] Merge remote-tracking b=
+ranch 'remotes/kraxel/tags/pull-vga-20160509-1' into staging
+  git bisect bad 53db932604dfa7bb9241d132e0173894cf54261c
+  # bad: [fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7] vga: make sure vga regi=
+ster setup for vbe stays intact (CVE-2016-3712).
+  git bisect bad fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7
+  # first bad commit: [fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7] vga: make =
+sure vga register setup for vbe stays intact (CVE-2016-3712).
+
+  =
+
+  I could reproduce that with QEMU 2.5.1 and QEMU 2.6 on a Debian derivate
+  (Promox VE) with 4.4 Kernel and also with QEMU 2.6 on an Arch Linux
+  System with a 4.5 Kernel, so it should not be host distro depended. Both
+  machines have Intel x86_64 processors.
+  The problem should be reproducible with said Versions or a build from
+  git including the above mentioned commit (fd3c136) by starting a VM with
+  an Windows 7 ISO, e.g.:
+
+  Freezing installation (as vga defaults to std I marked it as optional):
+  ./x86_64-softmmu/qemu-system-x86_64 -boot d -cdrom win7.iso -m 1024 [-vga=
+ (std|qxl|vmware)]
+
+  Working installation:
+  ./x86_64-softmmu/qemu-system-x86_64 -boot d -cdrom win7.iso -m 1024 -vga =
+cirrus
+
+  If someone has already an installed Windows 7 VM this behaviour should be
+  also observable when trying to start it with the new versions of QEMU.
+
+  Noteworthy may be that Windows 10 is working, I do not had time to get
+  other Windows versions and test them, I'll do that as soon as possible.
+  Various Linux system also seems do work fine, at least I did not ran
+  into an issue there yet.
+
+  I also tried testing with SeaBIOS and OVMF as firmware, as initially I
+  had no idea what broke, both lead to the same result - without the =
+
+  CVE-2016-3712 fix they both work, with not.
+  Further, KVM enabled and disabled does not make any difference.
+
+  =
+
+  [1] http://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg02416.html
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1581936/+subscriptions
