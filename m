@@ -1,31 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34379)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tianyu.lan@intel.com>) id 1d0kAG-0007EI-JF
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 03:36:37 -0400
+	(envelope-from <constantin.petra@gmail.com>) id 1d0j3k-0003Yg-MC
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 02:25:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tianyu.lan@intel.com>) id 1d0kAD-0006fa-EE
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 03:36:36 -0400
-Received: from mga14.intel.com ([192.55.52.115]:55122)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tianyu.lan@intel.com>)
-	id 1d0kAD-0006eo-0Q
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 03:36:33 -0400
-References: <1492428730-13438-1-git-send-email-peterx@redhat.com>
-	<1492428730-13438-8-git-send-email-peterx@redhat.com>
-	<A2975661238FB949B60364EF0F2C257439054049@shsmsx102.ccr.corp.intel.com>
-	<20170418045400.GC22226@pxdev.xzpeter.org>
-	<A2975661238FB949B60364EF0F2C2574390540D1@shsmsx102.ccr.corp.intel.com>
-	<20170418072717.GD22226@pxdev.xzpeter.org>
-	<A2975661238FB949B60364EF0F2C257439054360@shsmsx102.ccr.corp.intel.com>
-From: Lan Tianyu <tianyu.lan@intel.com>
-Message-ID: <672ae592-e6ba-9152-b775-ec2bde931ef1@intel.com>
-Date: Wed, 19 Apr 2017 15:27:52 +0800
+	(envelope-from <constantin.petra@gmail.com>) id 1d0j3i-0003ge-WA
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 02:25:48 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:35270)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <constantin.petra@gmail.com>)
+	id 1d0j3i-0003fm-M8
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 02:25:46 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id o21so8242775wrb.2
+	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 23:25:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <A2975661238FB949B60364EF0F2C257439054360@shsmsx102.ccr.corp.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 7/7] intel_iommu: support passthrough
- (PT)
+In-Reply-To: <363c3493-f7f4-25de-d679-3726651706c1@web.de>
+References: <1856afd9-6c92-4309-8e92-8da478864752@googlegroups.com>
+	<2ab0912c-9581-7656-5a21-d7a261e62a90@siemens.com>
+	<CAOT14F66-BXb4KvgvSuebFLoPL=kZPoqAZ5dqhx+ftn7886m4A@mail.gmail.com>
+	<b5af41e1-d6cf-48ae-b758-a957bdb60391@googlegroups.com>
+	<cf570bb4-7b1b-9788-7e89-faff52ad4502@siemens.com>
+	<498d9e2d-e025-4aa1-9a47-76a9c94d8a5f@googlegroups.com>
+	<5acf6dd8-4ec5-0c57-9645-3615beb755af@siemens.com>
+	<CAOT14F6f2rHB4Adqo1p-VDgn4dMPUbyuRo8XPa9s7Yin_xK8rQ@mail.gmail.com>
+	<29858b5d-edb6-bc5e-73df-84e8adfd2a61@web.de>
+	<7d43790d-b6ac-c997-69c3-8d0249c7b7be@web.de>
+	<4126cc24-3237-49fd-b28a-7d5583e1b2d4@googlegroups.com>
+	<1d51b078-d8e4-bea2-064b-2d7a8e41e9eb@web.de>
+	<CAOT14F6XqnYaKmNry-SN3uXzmm0Sv8RUM48074=t2d2Qmi+bkA@mail.gmail.com>
+	<CAOT14F77f3tdWDHMyVj1itUiyRPwp2GYgJwKuHF+WM1a-grbjQ@mail.gmail.com>
+	<363c3493-f7f4-25de-d679-3726651706c1@web.de>
+From: Constantin Petra <constantin.petra@gmail.com>
+Date: Wed, 19 Apr 2017 09:25:44 +0300
+Message-ID: <CAOT14F69gS9Ss5ewkjdhk6qSHC3cr7qOHXVRg6Gn=qKJ1Q6Wkg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] Jailhouse on Ultrascale+ (ZCU102)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,124 +42,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@intel.com>, Peter Xu <peterx@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, "Tian, Kevin" <kevin.tian@intel.com>
+To: Jan Kiszka <jan.kiszka@web.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jailhouse <jailhouse-dev@googlegroups.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, qemu-devel <qemu-devel@nongnu.org>
 
-Hi All:
-	Sorry for later response.
-On 2017年04月18日 17:04, Liu, Yi L wrote:
->> -----Original Message-----
->> From: Peter Xu [mailto:peterx@redhat.com]
->> Sent: Tuesday, April 18, 2017 3:27 PM
->> To: Liu, Yi L <yi.l.liu@intel.com>
->> Cc: qemu-devel@nongnu.org; Lan, Tianyu <tianyu.lan@intel.com>; Michael S .
->> Tsirkin <mst@redhat.com>; Jason Wang <jasowang@redhat.com>; Marcel
->> Apfelbaum <marcel@redhat.com>; David Gibson <david@gibson.dropbear.id.au>
->> Subject: Re: [Qemu-devel] [PATCH v2 7/7] intel_iommu: support passthrough (PT)
->>
->> On Tue, Apr 18, 2017 at 06:02:44AM +0000, Liu, Yi L wrote:
->>>>> Hi Peter,
->>>>>
->>>>> Skip address space switching is a good idea to support Passthru mode.
->>>>> However, without the address space, the vfio notifier would not be
->>>>> registered, thus vIOMMU emulator has no way to connect to host. It
->>>>> is no harm if there is only map/unmap notifier. But if we have
->>>>> more notifiers other than map/unmap, it may be a problem.
->>>>>
->>>>> I think we need to reconsider it here.
->>>>
->>>> For now I think as switching is good to us in general. Could I know
->>>> more context about this? Would it be okay to work on top of this in the future?
->>>>
->>>
->>> Let me explain. For vSVM enabling, it needs to add new notifier to
->>> bind gPASID table to host. If an assigned device uses SVM in guest, as
->>> designed guest IOMMU driver would set "pt" for it. This is to make
->>> sure the host second-level page table stores GPA->HPA mapping. So that
->>> pIOMMU can do nested translation to achieve gVA->GPA GPA->HPA mapping.
->>
->> That should mean that in the guest it will only enable first level translation, while in
->> the host it'll be nested (first + second)? Then you should be trapping the guest
->> extended context entry invalidation, then pass the PASID table pointer downward to
->> the host IOMMU, am I correct?
-> 
-> exactly.
-> 
->>
->>>
->>> So the situation is if we want to keep GPA->HPA mapping, we should
->>> skip address space switch, but the vfio listener would not know vIOMMU
->>> is added, so no vfio notifier would be registered. But if we do the
->>> switch, the GPA->HPA mapping is unmapped. And need another way to build the
->> GPA->HPA mapping.
->>
->> If my understanding above is correct, current IOMMU notifier may not satisfy your
->> need. If you see the current notify interface, it's delivering IOMMUTLBEntry. I
->> suspect it only suites for IOTLB notifications, but not if you want to pass some
->> pointer (one GPA) downward somewhere.
-> 
-> Yeah, you got it more than absolutely. One of my patch is to modify the para to be
-> void * and let each notifiers to translate separately. I think it should be a reasonable
-> change.
-> 
-> Supposedly, I would send RFC for vSVM soon. We may talk more it at that thread.
-> 
->>>
->>> I think we may have two choice here. Pls let me know your ideas.
->>>
->>> 1. skip the switch for "pt" mode, find other way to register vfio
->>> notifiers. not sure if this is workable. Just a quick thought.
->>>
->>> 2. do the switch, and rebuild GPA->HPA mapping if device use "pt"
->>> mode. For this option, I also have two way to build the GPA->HPA mapping.
->>> a) walk all the memory region sections in address_space_memory, and build the
->> mapping.
->>> address_space_memory.dispatch->map.sections, sections stores all the mapped
->> sections.
->>>
->>> b) let guest iommu driver mimics a 1:1 mapping for the devices use
->>> "pt" mode. in this way, the GPA->HPA mapping could be setup by walking
->>> the guest SL page table. This is consistent with your vIOVA replay solution.
->>
->> I'll prefer (1). Reason explained above.
->>
->>>
->>> Also I'm curious if Tianyu's fault report framework needs to register new notifiers.
->>
->> For Tianyu's case, I feel like we need other kind of notifier as well, but not the
->> current IOTLB one. And, of course in this case it'll be in an reverted direction, which
->> is from device to vIOMMU.
->>
->> (I am thinking whether it's a good time now to let any PCI device able  to fetch its
->> direct owner IOMMU object, then it can register anything  it want onto that object
->> maybe?)
->>
-> Hmmm, let's see Tianyu's comment as he's driving fault report. Let's keep in touch on
-> this Passthru-Mode enabling.
+Yes, I am using the QEMU version included by Xilinx in PetaLinux 2016.4.
 
-In my previous RFC patchset of fault event reporting, I registered fault
-notifier when there is a VFIO group attached to VFIO container and used
-the address space to check whether vIOMMU is added. The address space is
-returned by vtd_host_dma_iommu(). vtd_find_add_as() initializes device's
-IOMMU memory region and put it into device's address space as root
-memory region.
-Does this make sense?
+On Wed, Apr 19, 2017 at 7:37 AM, Jan Kiszka <jan.kiszka@web.de> wrote:
 
-@@ -1103,6 +1132,14 @@ static int vfio_connect_container(VFIOGroup
-*group, AddressSpace *as,
-         goto listener_release_exit;
-     }
-
-+    if (memory_region_is_iommu(container->space->as->root)) {
-+        if (vfio_set_iommu_fault_notifier(container)) {
-+            error_setg_errno(errp, -ret,
-+                "Fail to set IOMMU fault notifier");
-+            goto listener_release_exit;
-+        }
-+    }
-+
-     container->initialized = true;
-
--- 
-Best regards
-Tianyu Lan
+> On 2017-04-19 05:48, Constantin Petra wrote:
+> > Hello,
+> >
+> > I have tried the same binaries on a ZCU102 board and it seems to work.
+> > Cannot be sure though, the board is remote and I don't have access to
+> > the secondary UART as I understand it would be required for the
+> uart-demo.
+>
+> You can always reconfigure this to the primary one. We share it in other
+> setups as well.
+>
+> > So from some reason, under QEMU something is not in place, but what can
+> > that be? It would be convenient from our perspective, if it would work...
+>
+> I fully agree, and I'm waiting for official EL2 support in QEMU in order
+> to introduce a virtual target for ARM[64], just like we have on x86
+> already.
+>
+> I suppose you are using Xilinx' version of QEMU, not upstream, correct?
+> I didn't track recently what the state of upstream is. Just checking the
+> list again, seeing some interesting patches from early this year...
+> Peter, can you comment on what is still missing? I'm reading that you
+> successfully booted KVM inside QEMU. Seems like we are pretty close now
+> and it could make sense to debug the remaining issues.
+>
+> Jan
+>
+> >
+> > root@plnx_aarch64:~# jailhouse/usr/local/sbin/jailhouse cell list
+> > ID      Name                    State           Assigned CPUs
+> > Failed CPUs
+> > 0       ZynqMP-ZCU102           running         0-2
+> > 1       gic-demo                running         3
+> >
+> >
+> > Best Regards,
+> > Constantin
+> >
+> > On Tue, Apr 18, 2017 at 1:32 PM, Constantin Petra
+> > <constantin.petra@gmail.com <mailto:constantin.petra@gmail.com>> wrote:
+> >
+> >     Hi,
+> >
+> >     Yes, that's correct, I'm trying to run the whole stack in QEMU, not
+> >     hardware.
+> >
+> >     Best Regards,
+> >     Constantin
+> >
+> >     On Tue, Apr 18, 2017 at 12:52 PM, Jan Kiszka <jan.kiszka@web.de
+> >     <mailto:jan.kiszka@web.de>> wrote:
+> >
+> >         On 2017-04-18 10:22, constantin.petra@gmail.com
+> >         <mailto:constantin.petra@gmail.com> wrote:
+> >         > Hi,
+> >         >
+> >         > I have made the changes to pci.c, but QEMU seems to freeze
+> after enabling Jailhouse after the "opening" message is displayed (I have
+> previously started a SSH connection which also freezes - to make sure the
+> Serial port is not somehow hijacked by hypervisor as described in the
+> documentaiton). I cannot start GDB using petalinux tools due to a Python
+> 2.6 dependency (the system has Python 2.7) so I don't really know what
+> happens. Any ideas? (Attached also a log file with the boot messages; tried
+> relying on configured dtb and here also tried memmap for the reserved
+> memory, with the same result).
+> >         >
+> >
+> >         Oh, now I get it: You are running the whole stack emulated in
+> >         QEMU, not
+> >         on real hardware, right? Maybe there is a subtle difference in
+> >         the QEMU
+> >         system configuration compared to the board, or Jailhouse is
+> >         stressing
+> >         some aspect of virtualization that the QEMU model does not yet
+> >         handle
+> >         correctly or at all.
+> >
+> >         Adding Edgar, maybe he can comment on the state of hypervisor
+> >         execution
+> >         in the Xilinx QEMU version. He will probably need some details
+> >         about the
+> >         setup (versions, configuration etc.).
+> >
+> >         Jan
+> >
+> >         > root@plnx_aarch64:~# jailhouse/usr/local/sbin/jailhouse enable
+> >         /home/root/jailhouse/configs/zynqmp-zcu102.cell
+> >         >
+> >         > Initializing Jailhouse hypervisor v0.6 (47-ge02403c-dirty) on
+> >         CPU 0
+> >         > Code location: 0x0000ffffc0200040
+> >         > Page pool usage after early setup: mem 33/996, remap 64/131072
+> >         > Initializing processors:
+> >         >  CPU 0... OK
+> >         >  CPU 1... OK
+> >         >  CPU 2... OK
+> >         >  CPU 3... OK
+> >         > Adding virtual PCI device 00:00.0 to cell "ZynqMP-ZCU102"
+> >         > Adding virtual PCI device 00:01.0 to cell "ZynqMP-ZCU102"
+> >         > Page pool usage after late setup: mem 44/996, remap 69/131072
+> >         > Activating hypervisor
+> >         > [   71.547900] OF: PCI: host bridge //vpci@0 ranges:
+> >         > [   71.549101] OF: PCI:   MEM 0xfc100000..0xfc103fff ->
+> 0xfc100000
+> >         > [   71.552493] pci-host-generic fc000000.vpci: ECAM at [mem
+> >         0xfc000000-0xfc0fffff] for [bus 00]
+> >         > [   71.555644] pci-host-generic fc000000.vpci: PCI host bridge
+> >         to bus 0001:00
+> >         > [   71.556337] pci_bus 0001:00: root bus resource [bus 00]
+> >         > [   71.556698] pci_bus 0001:00: root bus resource [mem
+> >         0xfc100000-0xfc103fff]
+> >         > [   71.569008] pci 0001:00:00.0: BAR 0: assigned [mem
+> >         0xfc100000-0xfc1000ff 64bit]
+> >         > [   71.570284] pci 0001:00:01.0: BAR 0: assigned [mem
+> >         0xfc100100-0xfc1001ff 64bit]
+> >         > [   71.576654] The Jailhouse is opening.
+> >         > root@plnx_aarch64:~#
+> >         >
+> >         > Best Regards,
+> >         > Constantin
+> >         >
+> >
+> >
+> >
+>
+>
