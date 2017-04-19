@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d0f5T-0008Gq-KJ
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 22:11:21 -0400
+	(envelope-from <bounces@canonical.com>) id 1d0hGi-0006Pu-Lf
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 00:31:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d0f5O-0004At-Qc
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 22:11:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46850)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d0f5O-0004Ak-KN
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 22:11:14 -0400
-Date: Wed, 19 Apr 2017 10:10:59 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170419021059.GH22226@pxdev.xzpeter.org>
-References: <1491562755-23867-1-git-send-email-peterx@redhat.com>
-	<1491562755-23867-2-git-send-email-peterx@redhat.com>
-	<20170410043922.GI27571@umbus>
-	<20170410070950.GK3981@pxdev.xzpeter.org>
-	<dc26790e-8200-bbde-a7c3-70852f625424@redhat.com>
-	<20170418173054.GC7078@thinpad.lan.raisama.net>
+	(envelope-from <bounces@canonical.com>) id 1d0hGf-0001VR-KG
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 00:31:04 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43966)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d0hGf-0001V8-E6
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 00:31:01 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d0hGc-0002zN-OU
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 04:30:58 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A02622E80D2
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 04:30:58 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170418173054.GC7078@thinpad.lan.raisama.net>
-Subject: Re: [Qemu-devel] [PATCH v9 1/9] memory: add section range info for
- IOMMU notifier
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 19 Apr 2017 04:17:18 -0000
+From: Launchpad Bug Tracker <946043@bugs.launchpad.net>
+Reply-To: Bug 946043 <946043@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20120304030417.15447.69091.malonedeb@gac.canonical.com>
+Message-Id: <20170419041720.29160.34511.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 946043] Re: Serial Named Pipe Unrecognized
+ Windows 7
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,33 +37,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, qemu-devel@nongnu.org, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: qemu-devel@nongnu.org
 
-On Tue, Apr 18, 2017 at 02:30:54PM -0300, Eduardo Habkost wrote:
-> On Tue, Apr 18, 2017 at 06:20:11PM +0300, Marcel Apfelbaum wrote:
-> > On 04/10/2017 10:09 AM, Peter Xu wrote:
-> > > On Mon, Apr 10, 2017 at 02:39:22PM +1000, David Gibson wrote:
-> > > > On Fri, Apr 07, 2017 at 06:59:07PM +0800, Peter Xu wrote:
+[Expired for QEMU because there has been no activity for 60 days.]
 
-[...]
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-> > Hi Peter,
-> > I asked Eduardo to merge the series through this machine tree
-> > since I don't have a tree yet.
-> > He already squashed the change, thanks Eduardo!
-> > Marcel
-> 
-> The series is queued at:
-> 
-> git://github.com/ehabkost/qemu-hacks.git machine-next
-> 
-> (Including the vhost_iommu_region_del() fixup below).
-> 
-> v2.9.0-rc5 was tagged today, v2.9.0 is expected to be tagged in 2
-> days. I plan to submit a pull request as soon as it is tagged.
+-- =
 
-Thanks Marcel and Edurado for your help on the merging!
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/946043
 
--- 
-Peter Xu
+Title:
+  Serial Named Pipe Unrecognized Windows 7
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  I created a named pipe serial hardware and supplied '/tmp/debug' which
+  I created using mkfifo
+
+  This is the snippet from ps -aux
+  -chardev pipe,id=3Dcharserial0,path=3D/tmp/debug -device isa-serial,chard=
+ev=3Dcharserial0,id=3Dserial0
+
+  failure@ubuntu1:~$ ls -al /tmp/debug*
+  prwxrwxrwx 1 jgp jgp 0 2012-03-03 18:40 /tmp/debug
+  prwxrwxrwx 1 jgp jgp 0 2012-03-03 18:40 /tmp/debug.in
+
+  However inside the Windows 7 guest (even after a restart) nothing is
+  recognized. Even after going through the add legacy hardware motions
+  it's still not picked up.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/946043/+subscriptions
