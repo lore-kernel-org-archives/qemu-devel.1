@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ndevos@redhat.com>) id 1d0pdM-00061n-9B
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:27:01 -0400
+	(envelope-from <stefanha@redhat.com>) id 1d0pe5-0006Qp-Me
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:27:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ndevos@redhat.com>) id 1d0pdL-0006rJ-4U
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:27:00 -0400
-Date: Wed, 19 Apr 2017 15:26:50 +0200
-From: Niels de Vos <ndevos@redhat.com>
-Message-ID: <20170419132650.GF17454@ndevos-x240.usersys.redhat.com>
-References: <20170418013356.3578-1-eblake@redhat.com>
-	<20170418013356.3578-15-eblake@redhat.com>
+	(envelope-from <stefanha@redhat.com>) id 1d0pe2-00073y-F0
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:27:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44468)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1d0pe2-00073n-54
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:27:42 -0400
+Date: Wed, 19 Apr 2017 14:27:37 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170419132737.GF3343@stefanha-x1.localdomain>
+References: <20170418135726.28022-1-stefanha@redhat.com>
+	<20170418135726.28022-2-stefanha@redhat.com>
+	<09309ca7-dea8-db26-5544-402964224ee1@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="p8PhoBjPxaQXD0vg"
 Content-Disposition: inline
-In-Reply-To: <20170418013356.3578-15-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 14/31] gluster: Switch to
- .bdrv_co_block_status()
+In-Reply-To: <09309ca7-dea8-db26-5544-402964224ee1@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 1/9] block: add bdrv_measure() API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,149 +30,137 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
-
-On Mon, Apr 17, 2017 at 08:33:39PM -0500, Eric Blake wrote:
-> We are gradually moving away from sector-based interfaces, towards
-> byte-based.  Update the gluster driver accordingly.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  block/gluster.c | 47 +++++++++++++++++++++++------------------------
->  1 file changed, 23 insertions(+), 24 deletions(-)
-
-Looks good to me, thanks.
-
-Reviewed-by: Niels de Vos <ndevos@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Nir Soffer <nsoffer@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>
 
 
-> diff --git a/block/gluster.c b/block/gluster.c
-> index 1d4e2f7..3f252c6 100644
-> --- a/block/gluster.c
-> +++ b/block/gluster.c
-> @@ -1332,24 +1332,24 @@ exit:
->  /*
->   * Returns the allocation status of the specified sectors.
->   *
-> - * If 'sector_num' is beyond the end of the disk image the return value is 0
-> + * If 'offset' is beyond the end of the disk image the return value is 0
->   * and 'pnum' is set to 0.
->   *
-> - * 'pnum' is set to the number of sectors (including and immediately following
-> - * the specified sector) that are known to be in the same
-> + * 'pnum' is set to the number of bytes (including and immediately following
-> + * the specified offset) that are known to be in the same
->   * allocated/unallocated state.
->   *
-> - * 'nb_sectors' is the max value 'pnum' should be set to.  If nb_sectors goes
-> + * 'bytes' is the max value 'pnum' should be set to.  If bytes goes
->   * beyond the end of the disk image it will be clamped.
->   *
-> - * (Based on raw_co_get_block_status() from file-posix.c.)
-> + * (Based on raw_co_block_status() from file-posix.c.)
->   */
-> -static int64_t coroutine_fn qemu_gluster_co_get_block_status(
-> -        BlockDriverState *bs, int64_t sector_num, int nb_sectors, int *pnum,
-> +static int64_t coroutine_fn qemu_gluster_co_block_status(
-> +        BlockDriverState *bs, int64_t offset, int64_t bytes, int64_t *pnum,
->          BlockDriverState **file)
->  {
->      BDRVGlusterState *s = bs->opaque;
-> -    off_t start, data = 0, hole = 0;
-> +    off_t data = 0, hole = 0;
->      int64_t total_size;
->      int ret = -EINVAL;
-> 
-> @@ -1357,41 +1357,40 @@ static int64_t coroutine_fn qemu_gluster_co_get_block_status(
->          return ret;
->      }
-> 
-> -    start = sector_num * BDRV_SECTOR_SIZE;
->      total_size = bdrv_getlength(bs);
->      if (total_size < 0) {
->          return total_size;
-> -    } else if (start >= total_size) {
-> +    } else if (offset >= total_size) {
->          *pnum = 0;
->          return 0;
-> -    } else if (start + nb_sectors * BDRV_SECTOR_SIZE > total_size) {
-> -        nb_sectors = DIV_ROUND_UP(total_size - start, BDRV_SECTOR_SIZE);
-> +    } else if (offset + bytes > total_size) {
-> +        bytes = total_size - offset;
->      }
-> 
-> -    ret = find_allocation(bs, start, &data, &hole);
-> +    ret = find_allocation(bs, offset, &data, &hole);
->      if (ret == -ENXIO) {
->          /* Trailing hole */
-> -        *pnum = nb_sectors;
-> +        *pnum = bytes;
->          ret = BDRV_BLOCK_ZERO;
->      } else if (ret < 0) {
->          /* No info available, so pretend there are no holes */
-> -        *pnum = nb_sectors;
-> +        *pnum = bytes;
->          ret = BDRV_BLOCK_DATA;
-> -    } else if (data == start) {
-> +    } else if (data == offset) {
->          /* On a data extent, compute sectors to the end of the extent,
->           * possibly including a partial sector at EOF. */
-> -        *pnum = MIN(nb_sectors, DIV_ROUND_UP(hole - start, BDRV_SECTOR_SIZE));
-> +        *pnum = MIN(bytes, hole - offset);
->          ret = BDRV_BLOCK_DATA;
->      } else {
->          /* On a hole, compute sectors to the beginning of the next extent.  */
-> -        assert(hole == start);
-> -        *pnum = MIN(nb_sectors, (data - start) / BDRV_SECTOR_SIZE);
-> +        assert(hole == offset);
-> +        *pnum = MIN(bytes, data - offset);
->          ret = BDRV_BLOCK_ZERO;
->      }
-> 
->      *file = bs;
-> 
-> -    return ret | BDRV_BLOCK_OFFSET_VALID | start;
-> +    return ret | BDRV_BLOCK_OFFSET_VALID | (offset & BDRV_BLOCK_OFFSET_MASK);
->  }
-> 
-> 
-> @@ -1419,7 +1418,7 @@ static BlockDriver bdrv_gluster = {
->  #ifdef CONFIG_GLUSTERFS_ZEROFILL
->      .bdrv_co_pwrite_zeroes        = qemu_gluster_co_pwrite_zeroes,
->  #endif
-> -    .bdrv_co_get_block_status     = qemu_gluster_co_get_block_status,
-> +    .bdrv_co_block_status         = qemu_gluster_co_block_status,
->      .create_opts                  = &qemu_gluster_create_opts,
->  };
-> 
-> @@ -1447,7 +1446,7 @@ static BlockDriver bdrv_gluster_tcp = {
->  #ifdef CONFIG_GLUSTERFS_ZEROFILL
->      .bdrv_co_pwrite_zeroes        = qemu_gluster_co_pwrite_zeroes,
->  #endif
-> -    .bdrv_co_get_block_status     = qemu_gluster_co_get_block_status,
-> +    .bdrv_co_block_status         = qemu_gluster_co_block_status,
->      .create_opts                  = &qemu_gluster_create_opts,
->  };
-> 
-> @@ -1475,7 +1474,7 @@ static BlockDriver bdrv_gluster_unix = {
->  #ifdef CONFIG_GLUSTERFS_ZEROFILL
->      .bdrv_co_pwrite_zeroes        = qemu_gluster_co_pwrite_zeroes,
->  #endif
-> -    .bdrv_co_get_block_status     = qemu_gluster_co_get_block_status,
-> +    .bdrv_co_block_status         = qemu_gluster_co_block_status,
->      .create_opts                  = &qemu_gluster_create_opts,
->  };
-> 
-> @@ -1509,7 +1508,7 @@ static BlockDriver bdrv_gluster_rdma = {
->  #ifdef CONFIG_GLUSTERFS_ZEROFILL
->      .bdrv_co_pwrite_zeroes        = qemu_gluster_co_pwrite_zeroes,
->  #endif
-> -    .bdrv_co_get_block_status     = qemu_gluster_co_get_block_status,
-> +    .bdrv_co_block_status         = qemu_gluster_co_block_status,
->      .create_opts                  = &qemu_gluster_create_opts,
->  };
-> 
-> -- 
-> 2.9.3
-> 
-> 
+--p8PhoBjPxaQXD0vg
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Apr 18, 2017 at 10:08:20AM -0500, Eric Blake wrote:
+> On 04/18/2017 08:57 AM, Stefan Hajnoczi wrote:
+> > bdrv_measure() provides a conservative maximum for the size of a new
+> > image.  This information is handy if storage needs to be allocated (e.g.
+> > a SAN or an LVM volume) ahead of time.
+> >=20
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > Reviewed-by: Alberto Garcia <berto@igalia.com>
+> > ---
+> >  qapi/block-core.json      | 25 +++++++++++++++++++++++++
+> >  include/block/block.h     |  4 ++++
+> >  include/block/block_int.h |  2 ++
+> >  block.c                   | 35 +++++++++++++++++++++++++++++++++++
+> >  4 files changed, 66 insertions(+)
+> >=20
+> > diff --git a/qapi/block-core.json b/qapi/block-core.json
+> > index 033457c..1ea5536 100644
+> > --- a/qapi/block-core.json
+> > +++ b/qapi/block-core.json
+> > @@ -463,6 +463,31 @@
+> >             '*dirty-bitmaps': ['BlockDirtyInfo'] } }
+> > =20
+> >  ##
+> > +# @BlockMeasureInfo:
+> > +#
+> > +# Image size calculation information.  This structure describes the si=
+ze
+> > +# requirements for creating a new image file.
+> > +#
+> > +# The size requirements depend on the new image file format.  File siz=
+e always
+> > +# equals virtual disk size for the 'raw' format.  Compact formats such=
+ as
+> > +# 'qcow2' represent unallocated and zero regions efficiently so file s=
+ize may
+> > +# be smaller than virtual disk size.
+>=20
+> I guess that implies that holes due to a file system that supports them
+> is NOT considered a compact format under qemu's control.  Or maybe
+> another way of wording it is that we are reporting the size of all guest
+> contents that are associated with a host offset by this layer (all
+> sectors of a raw format have a host offset, even if that offset falls in
+> the hole of a sparse file; but sectors of qcow2 do not necessarily have
+> a host offset if they are unallocated or zero).
+>=20
+> But I'm not sure my alternative wording adds anything, so I'm also fine
+> if you don't feel like tweaking it any further.
+
+Thanks for the feedback.  I'll clarify what "size" means.
+
+> > +#
+> > +# The values are upper bounds that are guaranteed to fit the new image=
+ file.
+> > +# Subsequent modification, such as internal snapshot or bitmap creatio=
+n, may
+> > +# require additional space and is not covered here.
+> > +#
+> > +# @required: Size required for a new image file, in bytes.
+> > +#
+> > +# @fully-allocated: Image file size, in bytes, once data has been writ=
+ten
+> > +#                   to all sectors.
+> > +#
+> > +# Since: 2.10
+> > +##
+> > +{ 'struct': 'BlockMeasureInfo',
+> > +  'data': {'required': 'int', 'fully-allocated': 'int'} }
+> > +
+>=20
+> > +++ b/include/block/block.h
+> > @@ -298,6 +298,10 @@ int bdrv_truncate(BdrvChild *child, int64_t offset=
+);
+> >  int64_t bdrv_nb_sectors(BlockDriverState *bs);
+> >  int64_t bdrv_getlength(BlockDriverState *bs);
+> >  int64_t bdrv_get_allocated_file_size(BlockDriverState *bs);
+> > +void bdrv_measure(BlockDriver *drv, QemuOpts *opts,
+> > +                  BlockDriverState *in_bs,
+> > +                  BlockMeasureInfo *info,
+> > +                  Error **errp);
+>=20
+> Would it be any better to have BlockMeasureInfo* be the return value (or
+> NULL on error), instead of an output-only parameter?  Of course, that
+> changes the allocation scheme (as written, a caller can stack-allocate
+> or malloc the pointer it passes in, but with a return value of a
+> pointer, it will always be malloc'd); on the other hand, the allocation
+> scheme may matter down the road if the struct ever gains a non-scalar
+> member where stack-allocation becomes harder to clean up than just
+> calling qapi_free_BlockMeasureInfo().
+
+Yes, that makes the function more self-explanatory.
+
+> > +++ b/include/block/block_int.h
+> > @@ -201,6 +201,8 @@ struct BlockDriver {
+> >      int64_t (*bdrv_getlength)(BlockDriverState *bs);
+> >      bool has_variable_length;
+> >      int64_t (*bdrv_get_allocated_file_size)(BlockDriverState *bs);
+> > +    void (*bdrv_measure)(QemuOpts *opts, BlockDriverState *in_bs,
+> > +                         BlockMeasureInfo *info, Error **errp);
+>=20
+> I know we haven't done a good job in the past, but should we start
+> trying to do better at documenting callback constraints of new things
+> added in this header?
+
+=2Ebdrv_measure() is a 1:1 pass-through of the public bdrv_measure()
+function.  All the public function does is to dereference
+drv->bdrv_measure.
+
+I think that's why many of the other callbacks also have no
+documentation - they inherit semantics from the public function.  We
+don't need to duplicate the doc comments.
+
+--p8PhoBjPxaQXD0vg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJY92XJAAoJEJykq7OBq3PISksIAJn82PFkT6SqDu+E/LOxzL1P
+fKkMV8fMdeljlSql3ynX2ahzIm+QSmoKZJ+emK9FIT4/48uSTR0Q5dvbiR9OiyAK
+Lq9hn4Jw/biQucMsBJT/3FaGekV+1dUpsuODEkQf+YrZAbrqk1G4GExbdt+FgMVg
+jgGC7Ka0AOgmN+epED+Cjuy2k+9mnvc8xKf03ahdj4999wV+iFHl4adlIDtbLy4u
++ENzRHDfltlfv/upUcx2tBQWGqCMoDK9RlcCki9VZpR8zWz0JUomo7s6pSCeQo1G
+EuP+JRsL3CVTpmBP0TpGnRTIQ5Q2I2x4O+dtgdpW7kxlXstJRX3FdM9YOtAIVdo=
+=IUog
+-----END PGP SIGNATURE-----
+
+--p8PhoBjPxaQXD0vg--
