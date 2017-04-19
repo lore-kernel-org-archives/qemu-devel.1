@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1d0xhF-0004w5-PT
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 18:03:36 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d0xvD-0006ov-5O
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 18:18:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1d0xhE-0007qB-Io
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 18:03:33 -0400
-Received: from mail-yb0-x242.google.com ([2607:f8b0:4002:c09::242]:33728)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d0xv8-0004Wz-3t
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 18:17:59 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:36636)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1d0xhE-0007po-Cq
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 18:03:32 -0400
-Received: by mail-yb0-x242.google.com with SMTP id 206so2626168ybe.0
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 15:03:32 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d0xv7-0004Wr-Us
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 18:17:54 -0400
+Received: by mail-qk0-x244.google.com with SMTP id v75so5335550qkb.3
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 15:17:53 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170419205923.8808-1-quintela@redhat.com>
+	<20170419205923.8808-50-quintela@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c52557bd-8621-6fdb-6fd2-2dfdc662d520@amsat.org>
+Date: Wed, 19 Apr 2017 19:17:50 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170419213349.GC25239@thinpad.lan.raisama.net>
-References: <20170419195413.30141-1-bobby.prani@gmail.com>
-	<20170419195413.30141-2-bobby.prani@gmail.com>
-	<CAJhHMCAfexwn92bt0=rfzBB0hbgqzCpRpgnsEXbG5cnmnFYztA@mail.gmail.com>
-	<20170419201314.GX25239@thinpad.lan.raisama.net>
-	<CAJhHMCDpJhRoeGXRvPdqLD7zeVh_dmKX9wDcZcCSFwLj_+Cwkw@mail.gmail.com>
-	<20170419205706.GY25239@thinpad.lan.raisama.net>
-	<CAJhHMCBN8N27M7H4a3ayv6rezKoc9+UH5xPqE4Pu2MPYKD8RgQ@mail.gmail.com>
-	<20170419213349.GC25239@thinpad.lan.raisama.net>
-From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Wed, 19 Apr 2017 18:03:01 -0400
-Message-ID: <CAJhHMCB1GBC6ay4O61gnF8NtHg9+DCVR3dAcVjd253-GX3BoAw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] tcg/i386: Do not display HT warning for TCG
+In-Reply-To: <20170419205923.8808-50-quintela@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 49/59] ram: Remember last_page instead of
+ last_offset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,123 +35,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com
 
-On Wed, Apr 19, 2017 at 5:33 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> On Wed, Apr 19, 2017 at 05:25:23PM -0400, Pranith Kumar wrote:
->> On Wed, Apr 19, 2017 at 4:57 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
->> > On Wed, Apr 19, 2017 at 04:16:53PM -0400, Pranith Kumar wrote:
->> >> On Wed, Apr 19, 2017 at 4:13 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
->> >> > On Wed, Apr 19, 2017 at 04:00:49PM -0400, Pranith Kumar wrote:
->> >> >> On Wed, Apr 19, 2017 at 3:54 PM, Pranith Kumar <bobby.prani@gmail.com> wrote:
->> >> >> > When we enable hyperthreading (using threads smp argument), we warn
->> >> >> > the user if the cpu is an AMD cpu. This does not make sense on TCG and
->> >> >> > is also obsolete now that AMD Ryzen support hyperthreading.
->> >> >> >
->> >> >> > Fix this by adding CPUID_HT bit to the TCG features and explicitly
->> >> >> > checking this bit in the cpuid.
->> >> >> >
->> >> >> > Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
->> >> >> > ---
->> >> >> >  target/i386/cpu.c | 10 +++++-----
->> >> >> >  1 file changed, 5 insertions(+), 5 deletions(-)
->> >> >> >
->> >> >> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> >> >> > index 13c0985f11..f34bb5ead7 100644
->> >> >> > --- a/target/i386/cpu.c
->> >> >> > +++ b/target/i386/cpu.c
->> >> >> > @@ -202,12 +202,12 @@ static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
->> >> >> >  #define TCG_FEATURES (CPUID_FP87 | CPUID_PSE | CPUID_TSC | CPUID_MSR | \
->> >> >> >            CPUID_PAE | CPUID_MCE | CPUID_CX8 | CPUID_APIC | CPUID_SEP | \
->> >> >> >            CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV | CPUID_PAT | \
->> >> >> > -          CPUID_PSE36 | CPUID_CLFLUSH | CPUID_ACPI | CPUID_MMX | \
->> >> >> > +          CPUID_PSE36 | CPUID_CLFLUSH | CPUID_ACPI | CPUID_MMX | CPUID_HT | \
->> >> >> >            CPUID_FXSR | CPUID_SSE | CPUID_SSE2 | CPUID_SS | CPUID_DE)
->> >> >> >            /* partly implemented:
->> >> >> >            CPUID_MTRR, CPUID_MCA, CPUID_CLFLUSH (needed for Win64) */
->> >> >> >            /* missing:
->> >> >> > -          CPUID_VME, CPUID_DTS, CPUID_SS, CPUID_HT, CPUID_TM, CPUID_PBE */
->> >> >> > +          CPUID_VME, CPUID_DTS, CPUID_SS, CPUID_TM, CPUID_PBE */
->> >> >> >  #define TCG_EXT_FEATURES (CPUID_EXT_SSE3 | CPUID_EXT_PCLMULQDQ | \
->> >> >> >            CPUID_EXT_MONITOR | CPUID_EXT_SSSE3 | CPUID_EXT_CX16 | \
->> >> >> >            CPUID_EXT_SSE41 | CPUID_EXT_SSE42 | CPUID_EXT_POPCNT | \
->> >> >> > @@ -3643,7 +3643,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
->> >> >> >
->> >> >> >      qemu_init_vcpu(cs);
->> >> >> >
->> >> >> > -    /* Only Intel CPUs support hyperthreading. Even though QEMU fixes this
->> >> >> > +    /* Only some CPUs support hyperthreading. Even though QEMU fixes this
->> >> >> >       * issue by adjusting CPUID_0000_0001_EBX and CPUID_8000_0008_ECX
->> >> >> >       * based on inputs (sockets,cores,threads), it is still better to gives
->> >> >> >       * users a warning.
->> >> >> > @@ -3651,8 +3651,8 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
->> >> >> >       * NOTE: the following code has to follow qemu_init_vcpu(). Otherwise
->> >> >> >       * cs->nr_threads hasn't be populated yet and the checking is incorrect.
->> >> >> >       */
->> >> >> > -    if (!IS_INTEL_CPU(env) && cs->nr_threads > 1 && !ht_warned) {
->> >> >> > -        error_report("AMD CPU doesn't support hyperthreading. Please configure"
->> >> >> > +    if ((env->features[FEAT_1_EDX] & CPUID_HT) && (cs->nr_threads > 1) && !ht_warned) {
->> >> >>
->> >> >> I missed a '!' here. We need to warn if CPUID_HT is not set. But I see
->> >> >> that it is not being set even on HT enabled processors (i7-3770). How
->> >> >> do I test for it?
->> >> >
->> >> > CPUID_HT is automatically set on the CPU if
->> >> > (nr_threads * nr_cores) > 1. See the "case 1:" block in
->> >> > cpu_x86_cpuid().
->> >> >
->> >> > AFAIK, the point of the warning is to let the user know that the
->> >> > guest OS is likely to ignore thread topology information if CPUID
->> >> > vendor is not Intel, and has nothing to do with TCG or KVM
->> >> > capabilities. Maybe the warning is obsolete today and guests
->> >> > won't be confused by a HT AMD CPU, but we need to confirm that.
->> >>
->> >> We assume an AMD cpu for x86 TCG and it prints this warning when an
->> >> smp guest is run with (cores=2,threads=2) argument. The main point of
->> >> this patch is to remove that warning when using TCG.
->> >
->> > What is different under TCG? If guests were confused with
->> > threads=2 + vendor=AMD using KVM, what exactly would make them
->> > not confused by threads=2 + vendor=AMD when using TCG?
->>
->> I am not sure why we chose AMD to be the vendor for TCG since, as you
->> note, it does not really matter if it's AMD or Intel in TCG mode.
+Hi Juan,
+
+On 04/19/2017 05:59 PM, Juan Quintela wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+
+I think you missed Dave's Reviewed-by (he sent April 7)
+
+"Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>"
+
 >
-> I don't know why the default on TCG is AMD, either.
+> --
 >
->>
->> >
->> > I just ran a Fedora 25 guest using "-machine accel=tcg
->> > -smp 2,threads=2", and it still thinks it's running on a 2-core
->> > CPU instead of a 2-thread CPU when CPU vendor is AMD.
->>
->> This all started with using Windows XP. It has an arbitrary limit on
->> the number of cores it can support to 2 cores. So using -smp 4 will
->> still only show 2 cores. However, we can overcome this by using -smp
->> cores=2,threads=2 and 4 cores show up in the guest. But we see the
->> ugly warning that HT is not supported on AMD cpus.
+> Improve comment
+> Fix typo
+
+^ remove?
+
+> ---
+>  migration/ram.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
 >
-> Is Windows XP able to detect 2 threads * 2 cores even if CPUID
-> vendor is AMD?
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 52ab14b..5b2045d 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -171,8 +171,8 @@ struct RAMState {
+>      RAMBlock *last_seen_block;
+>      /* Last block from where we have sent data */
+>      RAMBlock *last_sent_block;
+> -    /* Last offset we have sent data from */
+> -    ram_addr_t last_offset;
+> +    /* Last dirty targe page we have sent */
+
+
+still tipo in Dave's comment (you fixed it in PATCH 51/59)
+"Last dirty target page we have sent"
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> +    ram_addr_t last_page;
+>      /* last ram version we have seen */
+>      uint32_t last_version;
+>      /* We are in the first round */
+> @@ -1061,7 +1061,7 @@ static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss,
+>      pss->offset = migration_bitmap_find_dirty(rs, pss->block, pss->offset,
+>                                                page_abs);
+>      if (pss->complete_round && pss->block == rs->last_seen_block &&
+> -        pss->offset >= rs->last_offset) {
+> +        (pss->offset >> TARGET_PAGE_BITS) >= rs->last_page) {
+>          /*
+>           * We've been once around the RAM and haven't found anything.
+>           * Give up.
+> @@ -1402,7 +1402,7 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
+>      }
 >
-
-Yep. I don't think it cares for vendor id.
-
->> So we can either:
->>
->> * Change the vendor to Intel for TCG, or
->> * Warn based on the HT bit being set
+>      pss.block = rs->last_seen_block;
+> -    pss.offset = rs->last_offset;
+> +    pss.offset = rs->last_page << TARGET_PAGE_BITS;
+>      pss.complete_round = false;
 >
-> Could you clarify what you mean by the second item? The HT bit is
-> always set when nr_cores*nr_threads > 1.
-
-Hmm, I see it now. We just warn the user if the host processor does
-not support HT.
-
-So how about setting the HT bit only if the host processor supports
-it? Or since it apparently does not matter anyway, remove the warning
-entirely?
-
--- 
-Pranith
+>      if (!pss.block) {
+> @@ -1424,7 +1424,7 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
+>      } while (!pages && again);
+>
+>      rs->last_seen_block = pss.block;
+> -    rs->last_offset = pss.offset;
+> +    rs->last_page = pss.offset >> TARGET_PAGE_BITS;
+>
+>      return pages;
+>  }
+> @@ -1499,7 +1499,7 @@ static void ram_state_reset(RAMState *rs)
+>  {
+>      rs->last_seen_block = NULL;
+>      rs->last_sent_block = NULL;
+> -    rs->last_offset = 0;
+> +    rs->last_page = 0;
+>      rs->last_version = ram_list.version;
+>      rs->ram_bulk_stage = true;
+>  }
+> @@ -1844,7 +1844,7 @@ static int postcopy_chunk_hostpages(MigrationState *ms)
+>      /* Easiest way to make sure we don't resume in the middle of a host-page */
+>      rs->last_seen_block = NULL;
+>      rs->last_sent_block = NULL;
+> -    rs->last_offset     = 0;
+> +    rs->last_page = 0;
+>
+>      QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+>          unsigned long first = block->offset >> TARGET_PAGE_BITS;
+>
