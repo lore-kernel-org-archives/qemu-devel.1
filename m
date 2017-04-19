@@ -1,42 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1d0vY1-0008Po-L3
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 15:45:56 -0400
+	(envelope-from <bobby.prani@gmail.com>) id 1d0vgB-0002oh-4P
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 15:54:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1d0vXy-0007R5-Cc
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 15:45:53 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51284)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
-	id 1d0vXx-0007Qd-Vq
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 15:45:50 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3JJiOHP010064
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 15:45:48 -0400
-Received: from e24smtp02.br.ibm.com (e24smtp02.br.ibm.com [32.104.18.86])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29x0wjvhxr-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 15:45:48 -0400
-Received: from localhost
-	by e24smtp02.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
-	Wed, 19 Apr 2017 16:45:45 -0300
-Received: from d24av01.br.ibm.com (d24av01.br.ibm.com [9.8.31.91])
-	by d24relay04.br.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v3JJjhuP2359732
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 16:45:43 -0300
-Received: from d24av01.br.ibm.com (localhost [127.0.0.1])
-	by d24av01.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
-	v3JJjhAP018412
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 16:45:43 -0300
-From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Date: Wed, 19 Apr 2017 16:44:43 -0300
-In-Reply-To: <1492631083-23965-1-git-send-email-joserz@linux.vnet.ibm.com>
-References: <1492631083-23965-1-git-send-email-joserz@linux.vnet.ibm.com>
-Message-Id: <1492631083-23965-3-git-send-email-joserz@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 2/2] vfio: enable 8-byte reads/writes to vfio
+	(envelope-from <bobby.prani@gmail.com>) id 1d0vg8-0005od-II
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 15:54:19 -0400
+Received: from mail-yb0-x244.google.com ([2607:f8b0:4002:c09::244]:36184)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1d0vg8-0005o5-E4
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 15:54:16 -0400
+Received: by mail-yb0-x244.google.com with SMTP id b2so2121098yba.3
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 12:54:16 -0700 (PDT)
+From: Pranith Kumar <bobby.prani@gmail.com>
+Date: Wed, 19 Apr 2017 15:54:13 -0400
+Message-Id: <20170419195413.30141-2-bobby.prani@gmail.com>
+In-Reply-To: <20170419195413.30141-1-bobby.prani@gmail.com>
+References: <20170419195413.30141-1-bobby.prani@gmail.com>
+Subject: [Qemu-devel] [PATCH] tcg/i386: Do not display HT warning for TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,66 +26,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alex.williamson@redhat.com, pbonzini@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-This patch enables 8-byte writes and reads to VFIO. Such implemention
-is already done but it's missing the 'case' to handle such accesses in
-both vfio_region_write and vfio_region_read and the MemoryRegionOps:
-impl.max_access_size and impl.min_access_size.
+When we enable hyperthreading (using threads smp argument), we warn
+the user if the cpu is an AMD cpu. This does not make sense on TCG and
+is also obsolete now that AMD Ryzen support hyperthreading.
 
-After this patch, 8-byte writes such as:
+Fix this by adding CPUID_HT bit to the TCG features and explicitly
+checking this bit in the cpuid.
 
-qemu_mutex_lock locked mutex 0x10905ad8
-vfio_region_write  (0001:03:00.0:region1+0xc0, 0x4140c, 4)
-vfio_region_write  (0001:03:00.0:region1+0xc4, 0xa0000, 4)
-qemu_mutex_unlock unlocked mutex 0x10905ad8
-
-goes like this:
-
-qemu_mutex_lock locked mutex 0x10905ad8
-vfio_region_write  (0001:03:00.0:region1+0xc0, 0xbfd0008, 8)
-qemu_mutex_unlock unlocked mutex 0x10905ad8
-
-Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
 ---
- hw/vfio/common.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ target/i386/cpu.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 145f2f4..43c8e98 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -119,6 +119,9 @@ void vfio_region_write(void *opaque, hwaddr addr,
-     case 4:
-         buf.dword = cpu_to_le32(data);
-         break;
-+    case 8:
-+        buf.qword = cpu_to_le64(data);
-+        break;
-     default:
-         hw_error("vfio: unsupported write size, %d bytes", size);
-         break;
-@@ -173,6 +176,9 @@ uint64_t vfio_region_read(void *opaque,
-     case 4:
-         data = le32_to_cpu(buf.dword);
-         break;
-+    case 8:
-+        data = le64_to_cpu(buf.qword);
-+        break;
-     default:
-         hw_error("vfio: unsupported read size, %d bytes", size);
-         break;
-@@ -194,6 +200,10 @@ const MemoryRegionOps vfio_region_ops = {
-         .min_access_size = 1,
-         .max_access_size = 8,
-     },
-+    .impl = {
-+        .min_access_size = 1,
-+        .max_access_size = 8,
-+    },
- };
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 13c0985f11..f34bb5ead7 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -202,12 +202,12 @@ static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
+ #define TCG_FEATURES (CPUID_FP87 | CPUID_PSE | CPUID_TSC | CPUID_MSR | \
+           CPUID_PAE | CPUID_MCE | CPUID_CX8 | CPUID_APIC | CPUID_SEP | \
+           CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV | CPUID_PAT | \
+-          CPUID_PSE36 | CPUID_CLFLUSH | CPUID_ACPI | CPUID_MMX | \
++          CPUID_PSE36 | CPUID_CLFLUSH | CPUID_ACPI | CPUID_MMX | CPUID_HT | \
+           CPUID_FXSR | CPUID_SSE | CPUID_SSE2 | CPUID_SS | CPUID_DE)
+           /* partly implemented:
+           CPUID_MTRR, CPUID_MCA, CPUID_CLFLUSH (needed for Win64) */
+           /* missing:
+-          CPUID_VME, CPUID_DTS, CPUID_SS, CPUID_HT, CPUID_TM, CPUID_PBE */
++          CPUID_VME, CPUID_DTS, CPUID_SS, CPUID_TM, CPUID_PBE */
+ #define TCG_EXT_FEATURES (CPUID_EXT_SSE3 | CPUID_EXT_PCLMULQDQ | \
+           CPUID_EXT_MONITOR | CPUID_EXT_SSSE3 | CPUID_EXT_CX16 | \
+           CPUID_EXT_SSE41 | CPUID_EXT_SSE42 | CPUID_EXT_POPCNT | \
+@@ -3643,7 +3643,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
  
- /*
+     qemu_init_vcpu(cs);
+ 
+-    /* Only Intel CPUs support hyperthreading. Even though QEMU fixes this
++    /* Only some CPUs support hyperthreading. Even though QEMU fixes this
+      * issue by adjusting CPUID_0000_0001_EBX and CPUID_8000_0008_ECX
+      * based on inputs (sockets,cores,threads), it is still better to gives
+      * users a warning.
+@@ -3651,8 +3651,8 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+      * NOTE: the following code has to follow qemu_init_vcpu(). Otherwise
+      * cs->nr_threads hasn't be populated yet and the checking is incorrect.
+      */
+-    if (!IS_INTEL_CPU(env) && cs->nr_threads > 1 && !ht_warned) {
+-        error_report("AMD CPU doesn't support hyperthreading. Please configure"
++    if ((env->features[FEAT_1_EDX] & CPUID_HT) && (cs->nr_threads > 1) && !ht_warned) {
++        error_report("This CPU doesn't support hyperthreading. Please configure"
+                      " -smp options properly.");
+         ht_warned = true;
+     }
 -- 
-2.7.4
+2.11.0
