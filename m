@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d0uEE-0001dO-9j
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 14:21:23 -0400
+	(envelope-from <tgnyang@gmail.com>) id 1d0uEn-0001sC-Vk
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 14:22:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d0uEB-0003S6-4w
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 14:21:22 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52660)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d0uEA-0003Rm-Uq
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 14:21:19 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d0uE8-0000WY-R8
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 18:21:17 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7055C2E80CE
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 18:21:14 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 19 Apr 2017 18:15:13 -0000
-From: Mark <1683084@bugs.launchpad.net>
-Reply-To: Bug 1683084 <1683084@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170415232401.17219.37576.malonedeb@gac.canonical.com>
-Message-Id: <20170419181513.12295.48091.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1683084] Re: DNS server not working in QEMU
- usermode networking
+	(envelope-from <tgnyang@gmail.com>) id 1d0uEn-0003rT-3R
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 14:21:57 -0400
+Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:33615)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tgnyang@gmail.com>) id 1d0uEm-0003rI-V9
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 14:21:57 -0400
+Received: by mail-io0-x241.google.com with SMTP id k87so5889329ioi.0
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 11:21:56 -0700 (PDT)
+From: Zihan Yang <tgnyang@gmail.com>
+Date: Thu, 20 Apr 2017 02:21:30 +0800
+Message-Id: <1492626091-30531-2-git-send-email-tgnyang@gmail.com>
+In-Reply-To: <1492626091-30531-1-git-send-email-tgnyang@gmail.com>
+References: <1492626091-30531-1-git-send-email-tgnyang@gmail.com>
+Subject: [Qemu-devel] [PATCH 2/2] hw/s390x: make virtio_ccw_exit function in
+ virtio-ccw return void
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,53 +27,81 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Zihan Yang <tgnyang@gmail.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cornelia.huck@de.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-** Description changed:
+    Note that only the virtio_ccw_exit, which is the exit function
+    of VirtIOCCWDeviceClass, is modified to return void in this patch.
+    'virtio_ccw_busdev_exit' belongs to DeviceClass so it remains
+    unchanged for the moment to give a split-out patch, because
+    modifying it would involve some other folders like hw/audio.
 
-  Nslookup is returning "unknown host".
-  I try to ping 10.0.2.3 and it fails. Pinging 10.0.2.2 and 10.0.2.15 works=
- correctly.
-  Downloading files via wget using a static IP works well.
-  =
+Signed-off-by: Zihan Yang <tgnyang@gmail.com>
+---
+ hw/s390x/event-facility.c | 6 +-----
+ hw/s390x/virtio-ccw.c     | 6 +++---
+ hw/s390x/virtio-ccw.h     | 2 +-
+ 3 files changed, 5 insertions(+), 9 deletions(-)
 
-  Results of qemu monitor command "info network" included as an
-  attachment.
-  =
-
-  This bug was reported as a question on stack overflow:
-  http://stackoverflow.com/questions/43308310/dns-server-not-working-in-
-  qemu-usermode-networking.
-  =
-
-- This bug exists on 2.8.0 and 2.9-rc3.
-+ This bug exists on 2.8.0 and 2.9-rc4.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1683084
-
-Title:
-  DNS server not working in QEMU usermode networking
-
-Status in QEMU:
-  New
-
-Bug description:
-  Nslookup is returning "unknown host".
-  I try to ping 10.0.2.3 and it fails. Pinging 10.0.2.2 and 10.0.2.15 works=
- correctly.
-  Downloading files via wget using a static IP works well.
-
-  Results of qemu monitor command "info network" included as an
-  attachment.
-
-  This bug was reported as a question on stack overflow:
-  http://stackoverflow.com/questions/43308310/dns-server-not-working-in-
-  qemu-usermode-networking.
-
-  This bug exists on 2.8.0 and 2.9-rc4.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1683084/+subscriptions
+diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+index 34b2faf..f7c509c 100644
+--- a/hw/s390x/event-facility.c
++++ b/hw/s390x/event-facility.c
+@@ -413,11 +413,7 @@ static void event_unrealize(DeviceState *qdev, Error **errp)
+     SCLPEvent *event = SCLP_EVENT(qdev);
+     SCLPEventClass *child = SCLP_EVENT_GET_CLASS(event);
+     if (child->exit) {
+-        int rc = child->exit(event);
+-        if (rc < 0) {
+-            error_setg(errp, "SCLP event exit failed.");
+-            return;
+-        }
++        child->exit(event);
+     }
+ }
+ 
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index 00b3bde..0dbd3ee 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -722,7 +722,7 @@ static void virtio_ccw_device_realize(VirtioCcwDevice *dev, Error **errp)
+     }
+ }
+ 
+-static int virtio_ccw_exit(VirtioCcwDevice *dev)
++static void virtio_ccw_exit(VirtioCcwDevice *dev)
+ {
+     CcwDevice *ccw_dev = CCW_DEVICE(dev);
+     SubchDev *sch = ccw_dev->sch;
+@@ -735,7 +735,6 @@ static int virtio_ccw_exit(VirtioCcwDevice *dev)
+         release_indicator(&dev->routes.adapter, dev->indicators);
+         dev->indicators = NULL;
+     }
+-    return 0;
+ }
+ 
+ static void virtio_ccw_net_realize(VirtioCcwDevice *ccw_dev, Error **errp)
+@@ -1621,7 +1620,8 @@ static int virtio_ccw_busdev_exit(DeviceState *dev)
+     VirtioCcwDevice *_dev = (VirtioCcwDevice *)dev;
+     VirtIOCCWDeviceClass *_info = VIRTIO_CCW_DEVICE_GET_CLASS(dev);
+ 
+-    return _info->exit(_dev);
++    _info->exit(_dev);
++    return 0; /* TODO workaround, should remove once converted to unrealize */
+ }
+ 
+ static void virtio_ccw_busdev_unplug(HotplugHandler *hotplug_dev,
+diff --git a/hw/s390x/virtio-ccw.h b/hw/s390x/virtio-ccw.h
+index 41d4010..ce8baa3 100644
+--- a/hw/s390x/virtio-ccw.h
++++ b/hw/s390x/virtio-ccw.h
+@@ -74,7 +74,7 @@ typedef struct VirtioCcwDevice VirtioCcwDevice;
+ typedef struct VirtIOCCWDeviceClass {
+     CCWDeviceClass parent_class;
+     void (*realize)(VirtioCcwDevice *dev, Error **errp);
+-    int (*exit)(VirtioCcwDevice *dev);
++    void (*exit)(VirtioCcwDevice *dev);
+ } VirtIOCCWDeviceClass;
+ 
+ /* Performance improves when virtqueue kick processing is decoupled from the
+-- 
+2.7.4
