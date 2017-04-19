@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d0xUK-0002Pp-5r
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:50:14 -0400
+	(envelope-from <bobby.prani@gmail.com>) id 1d0xhF-0004w5-PT
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 18:03:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d0xUG-00030J-7Q
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:50:12 -0400
-Resent-Message-Id: <E1d0xUG-00030J-7Q@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21433)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1d0xUG-0002xQ-0A
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:50:08 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <149263859862.10521.4608468144116665031@6c512846dbc7>
-In-Reply-To: <20170419205923.8808-1-quintela@redhat.com>
+	(envelope-from <bobby.prani@gmail.com>) id 1d0xhE-0007qB-Io
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 18:03:33 -0400
+Received: from mail-yb0-x242.google.com ([2607:f8b0:4002:c09::242]:33728)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1d0xhE-0007po-Cq
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 18:03:32 -0400
+Received: by mail-yb0-x242.google.com with SMTP id 206so2626168ybe.0
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 15:03:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 19 Apr 2017 14:49:59 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 00/59] RAMState + qdev
+In-Reply-To: <20170419213349.GC25239@thinpad.lan.raisama.net>
+References: <20170419195413.30141-1-bobby.prani@gmail.com>
+	<20170419195413.30141-2-bobby.prani@gmail.com>
+	<CAJhHMCAfexwn92bt0=rfzBB0hbgqzCpRpgnsEXbG5cnmnFYztA@mail.gmail.com>
+	<20170419201314.GX25239@thinpad.lan.raisama.net>
+	<CAJhHMCDpJhRoeGXRvPdqLD7zeVh_dmKX9wDcZcCSFwLj_+Cwkw@mail.gmail.com>
+	<20170419205706.GY25239@thinpad.lan.raisama.net>
+	<CAJhHMCBN8N27M7H4a3ayv6rezKoc9+UH5xPqE4Pu2MPYKD8RgQ@mail.gmail.com>
+	<20170419213349.GC25239@thinpad.lan.raisama.net>
+From: Pranith Kumar <bobby.prani@gmail.com>
+Date: Wed, 19 Apr 2017 18:03:01 -0400
+Message-ID: <CAJhHMCB1GBC6ay4O61gnF8NtHg9+DCVR3dAcVjd253-GX3BoAw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] tcg/i386: Do not display HT warning for TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,161 +35,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcwNDE5MjA1OTIzLjg4MDgtMS1xdWludGVsYUByZWRoYXQuY29tClN1Ympl
-Y3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMDAvNTldIFJBTVN0YXRlICsgcWRldgoKPT09IFRFU1Qg
-U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBs
-b2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRp
-b25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1y
-ZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5n
-IFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAg
-aWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
-IC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkK
-ICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09
-CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20g
-aHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAg
-ICAgIHBhdGNoZXcvMjAxNzA0MTkyMDU5MjMuODgwOC0xLXF1aW50ZWxhQHJlZGhhdC5jb20gLT4g
-cGF0Y2hldy8yMDE3MDQxOTIwNTkyMy44ODA4LTEtcXVpbnRlbGFAcmVkaGF0LmNvbQpTd2l0Y2hl
-ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjZkMzA3MTEgcmFtOiBSZW1vdmUgbWlncmF0aW9uX2Jp
-dG1hcF9leHRlbmQoKQoxMjNjNDdhIG1pZ3JhdGlvbjogRGlzYWJsZSBob3RwbHVnL3VucGx1ZyBk
-dXJpbmcgbWlncmF0aW9uCmRmNDlhODQgcWRldjogTW92ZSBxZGV2X3VucGx1ZygpIHRvIHFkZXYt
-bW9uaXRvci5jCjljODdhYWMgcWRldjogRXhwb3J0IHFkZXZfaG90X3JlbW92ZWQKOGQxY2NlMiBx
-ZGV2OiBxZGV2X2hvdHBsdWcgaXMgcmVhbGx5IGEgYm9vbAplYTA3MjlhIG1pZ3JhdGlvbjogUmVt
-b3ZlIE1pZ3JhdGlvblN0YXRlIHBhcmFtZXRlciBmcm9tIG1pZ3JhdGlvbl9pc19pZGxlKCkKZTEz
-ZTdjMCByYW06IFVzZSBSQU1CaXRtYXAgdHlwZSBmb3IgY29oZXJlbmNlCjMxNzhhOGIgcmFtOiBy
-ZW5hbWUgbGFzdF9yYW1fb2Zmc2V0KCkgbGFzdF9yYW1fcGFnZXMoKQowOTU0ZjgyIHJhbTogVXNl
-IHJhbWJsb2NrIGFuZCBwYWdlIG9mZnNldCBpbnN0ZWFkIG9mIGFic29sdXRlIG9mZnNldApmMDk3
-ZGFjIHJhbTogQ2hhbmdlIG9mZnNldCBmaWVsZCBpbiBQYWdlU2VhcmNoU3RhdHVzIHRvIHBhZ2UK
-NWNkMmMyMSByYW06IFJlbWVtYmVyIGxhc3RfcGFnZSBpbnN0ZWFkIG9mIGxhc3Rfb2Zmc2V0CmJk
-MjZlOTggcmFtOiBVc2UgcGFnZSBudW1iZXIgaW5zdGVhZCBvZiBhbiBhZGRyZXNzIGZvciB0aGUg
-Yml0bWFwIG9wZXJhdGlvbnMKMzI0NTFiZCByYW06IHJlb3JnYW5pemUgbGFzdF9zZW50X2Jsb2Nr
-CjdmNWUwNGEgcmFtOiByYW1fZGlzY2FyZF9yYW5nZSgpIGRvbid0IHVzZSB0aGUgbWlzIHBhcmFt
-ZXRlcgo4MDFmNGJhIHJhbTogUGFzcyBSQU1CbG9jayB0byBiaXRtYXBfc3luYwoyMmZkNWFiIHJh
-bTogQWRkIHBhZ2Utc2l6ZSB0byBvdXRwdXQgaW4gJ2luZm8gbWlncmF0ZScKZGIzZjRkMSByYW06
-IFJlbmFtZSBxZW11X3RhcmdldF9wYWdlX2JpdHMoKSB0byBxZW11X3RhcmdldF9wYWdlX3NpemUo
-KQo3YmY5NTU2IHJhbTogV2UgZG9uJ3QgbmVlZCBNaWdyYXRpb25TdGF0ZSBwYXJhbWV0ZXIgYW55
-bW9yZQo3MDBjOTg1IG1pZ3JhdGlvbjogUmVtb3ZlIE1pZ3JhdGlvblN0YXRlIGZyb20gbWlncmF0
-aW9uX2luX3Bvc3Rjb3B5CmYwMjllZjkgcmFtOiBSZW1vdmUgY29tcHJlc3Npb25fc3dpdGNoIGFu
-ZCBpbmxpbmUgaXRzIGxvZ2ljCmM2NDZhZDQgcmFtOiBNb3ZlIFFFTVVGaWxlIGludG8gUkFNU3Rh
-dGUKOTM5NjIyZSByYW06IEFkZCBRRU1VRmlsZSB0byBSQU1TdGF0ZQo2ZjIwYTNkIHJhbTogTW92
-ZSBwb3N0Y29weV9yZXF1ZXN0cyBpbnRvIFJBTVN0YXRlCjA0OGFiNjYgcmFtOiBNb3ZlIGRpcnR5
-X3BhZ2VzX3JhdGUgdG8gUkFNU3RhdGUKYjBkNzBkOCByYW06IFJlbW92ZSBkaXJ0eV9ieXRlc19y
-YXRlCjNmNDEwNzEgcmFtOiBDcmVhdGUgcmFtX2RpcnR5X3N5bmNfY291bnQoKQozNzdhMmVkIHJh
-bTogTW92ZSBzcmNfcGFnZV9yZXEqIHRvIFJBTVN0YXRlCjg5MTAzZTcgcmFtOiBNb3ZlIGxhc3Rf
-cmVxX3JiIHRvIFJBTVN0YXRlCjc4MDFjOTggcmFtOiBSZW1vdmUgcmFtX3NhdmVfcmVtYWluaW5n
-CjgwNDNlYWQgcmFtOiBVc2UgdGhlIFJBTVN0YXRlIGJ5dGVzX3RyYW5zZmVycmVkIHBhcmFtZXRl
-cgowOWVlMDNlIHJhbTogTW92ZSBieXRlc190cmFuc2ZlcnJlZCBpbnRvIFJBTVN0YXRlCjZhOWNm
-OTcgcmFtOiBNb3ZlIG1pZ3JhdGlvbl9iaXRtYXBfcmN1IGludG8gUkFNU3RhdGUKZWExMTRjZCBy
-YW06IE1vdmUgbWlncmF0aW9uX2JpdG1hcF9tdXRleCBpbnRvIFJBTVN0YXRlCjNkNzU0MDAgcmFt
-OiBFdmVyeXRoaW5nIHdhcyBpbml0IHRvIHplcm8sIHNvIHVzZSBtZW1zZXQKM2UyMWVhZCByYW06
-IE1vdmUgbWlncmF0aW9uX2RpcnR5X3BhZ2VzIHRvIFJBTVN0YXRlCmNkYTU0MGIgcmFtOiBNb3Zl
-IHhienJsZV9vdmVyZmxvd3MgaW50byBSQU1TdGF0ZQpkYzA1OWMyIHJhbTogTW92ZSB4YnpybGVf
-Y2FjaGVfbWlzc19yYXRlIGludG8gUkFNU3RhdGUKMjkzY2U2ZiByYW06IE1vdmUgeGJ6cmxlX2Nh
-Y2hlX21pc3MgaW50byBSQU1TdGF0ZQo2NTAyYzI5IHJhbTogTW92ZSB4YnpybGVfcGFnZXMgaW50
-byBSQU1TdGF0ZQplNGYwZjU4IHJhbTogTW92ZSB4YnpybGVfYnl0ZXMgaW50byBSQU1TdGF0ZQo5
-OGZlODJjIHJhbTogTW92ZSBpdGVyYXRpb25zIGludG8gUkFNU3RhdGUKMzRiZTc5OSByYW06IFJl
-bW92ZSBub3JtX21pZ19ieXRlc190cmFuc2ZlcnJlZAo4ZTM0NWJjIHJhbTogTW92ZSBub3JtX3Bh
-Z2VzIHRvIFJBTVN0YXRlCmE0ZmZjMTkgcmFtOiBSZW1vdmUgdW51c2VkIHBhZ2VzX3NraXBwZWQg
-dmFyaWFibGUKODk1M2Y4YiByYW06IFJlbW92ZSB1bnVzZWQgZHVwX21pZ19ieXRlc190cmFuc2Zl
-cnJlZCgpCjI4MDI4MWYgcmFtOiBNb3ZlIGR1cF9wYWdlcyBpbnRvIFJBTVN0YXRlCmIzY2NjMmUg
-cmFtOiBNb3ZlIGl0ZXJhdGlvbnNfcHJldiBpbnRvIFJBTVN0YXRlCmJkZjM2MDQgcmFtOiBNb3Zl
-IHhienJsZV9jYWNoZV9taXNzX3ByZXYgaW50byBSQU1TdGF0ZQoxZDMzMjJiIHJhbTogQ2hhbmdl
-IG51bV9kaXJ0eV9wYWdlc19wZXJpb2QgdHlwZSB0byB1aW50NjRfdAphNjI1NGFiIHJhbTogTW92
-ZSBudW1fZGlydHlfcGFnZXNfcGVyaW9kIGludG8gUkFNU3RhdGUKYWFjZmUwNyByYW06IENoYW5n
-ZSBieXRlX3hmZXJfe3ByZXYsIG5vd30gdHlwZSB0byB1aW50NjRfdAo0OWYyMzY5IHJhbTogTW92
-ZSBieXRlc194ZmVyX3ByZXYgaW50byBSQU1TdGF0ZQo5YmI5NmEwIHJhbTogTW92ZSBzdGFydCB0
-aW1lIGludG8gUkFNU3RhdGUKZTBjMzNjNCByYW06IE1vdmUgYml0bWFwX3N5bmNfY291bnQgaW50
-byBSQU1TdGF0ZQpmZmI0ZmRhIHJhbTogQWRkIGRpcnR5X3JhdGVfaGlnaF9jbnQgdG8gUkFNU3Rh
-dGUKZTI0MzVjMyByYW06IENyZWF0ZSBSQU1TdGF0ZQo4MzkyNDUzIHJhbTogUmVuYW1lIGJsb2Nr
-X25hbWUgdG8gcmJuYW1lCmY2ODQwN2MgcmFtOiBSZW5hbWUgZmx1c2hfcGFnZV9xdWV1ZSgpIHRv
-IG1pZ3JhdGlvbl9wYWdlX3F1ZXVlX2ZyZWUoKQpjMTJmMmZmIHJhbTogVXBkYXRlIGFsbCBmdW5j
-dGlvbnMgY29tbWVudHMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNTk6
-IHJhbTogVXBkYXRlIGFsbCBmdW5jdGlvbnMgY29tbWVudHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi81
-OTogcmFtOiBSZW5hbWUgZmx1c2hfcGFnZV9xdWV1ZSgpIHRvIG1pZ3JhdGlvbl9wYWdlX3F1ZXVl
-X2ZyZWUoKS4uLgpDaGVja2luZyBQQVRDSCAzLzU5OiByYW06IFJlbmFtZSBibG9ja19uYW1lIHRv
-IHJibmFtZS4uLgpDaGVja2luZyBQQVRDSCA0LzU5OiByYW06IENyZWF0ZSBSQU1TdGF0ZS4uLgpD
-aGVja2luZyBQQVRDSCA1LzU5OiByYW06IEFkZCBkaXJ0eV9yYXRlX2hpZ2hfY250IHRvIFJBTVN0
-YXRlLi4uCkNoZWNraW5nIFBBVENIIDYvNTk6IHJhbTogTW92ZSBiaXRtYXBfc3luY19jb3VudCBp
-bnRvIFJBTVN0YXRlLi4uCkNoZWNraW5nIFBBVENIIDcvNTk6IHJhbTogTW92ZSBzdGFydCB0aW1l
-IGludG8gUkFNU3RhdGUuLi4KQ2hlY2tpbmcgUEFUQ0ggOC81OTogcmFtOiBNb3ZlIGJ5dGVzX3hm
-ZXJfcHJldiBpbnRvIFJBTVN0YXRlLi4uCkNoZWNraW5nIFBBVENIIDkvNTk6IHJhbTogQ2hhbmdl
-IGJ5dGVfeGZlcl97cHJldiwgbm93fSB0eXBlIHRvIHVpbnQ2NF90Li4uCkNoZWNraW5nIFBBVENI
-IDEwLzU5OiByYW06IE1vdmUgbnVtX2RpcnR5X3BhZ2VzX3BlcmlvZCBpbnRvIFJBTVN0YXRlLi4u
-CkNoZWNraW5nIFBBVENIIDExLzU5OiByYW06IENoYW5nZSBudW1fZGlydHlfcGFnZXNfcGVyaW9k
-IHR5cGUgdG8gdWludDY0X3QuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvNTk6IHJhbTogTW92ZSB4Ynpy
-bGVfY2FjaGVfbWlzc19wcmV2IGludG8gUkFNU3RhdGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvNTk6
-IHJhbTogTW92ZSBpdGVyYXRpb25zX3ByZXYgaW50byBSQU1TdGF0ZS4uLgpDaGVja2luZyBQQVRD
-SCAxNC81OTogcmFtOiBNb3ZlIGR1cF9wYWdlcyBpbnRvIFJBTVN0YXRlLi4uCkNoZWNraW5nIFBB
-VENIIDE1LzU5OiByYW06IFJlbW92ZSB1bnVzZWQgZHVwX21pZ19ieXRlc190cmFuc2ZlcnJlZCgp
-Li4uCkNoZWNraW5nIFBBVENIIDE2LzU5OiByYW06IFJlbW92ZSB1bnVzZWQgcGFnZXNfc2tpcHBl
-ZCB2YXJpYWJsZS4uLgpDaGVja2luZyBQQVRDSCAxNy81OTogcmFtOiBNb3ZlIG5vcm1fcGFnZXMg
-dG8gUkFNU3RhdGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTgvNTk6IHJhbTogUmVtb3ZlIG5vcm1fbWln
-X2J5dGVzX3RyYW5zZmVycmVkLi4uCkNoZWNraW5nIFBBVENIIDE5LzU5OiByYW06IE1vdmUgaXRl
-cmF0aW9ucyBpbnRvIFJBTVN0YXRlLi4uCkNoZWNraW5nIFBBVENIIDIwLzU5OiByYW06IE1vdmUg
-eGJ6cmxlX2J5dGVzIGludG8gUkFNU3RhdGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMjEvNTk6IHJhbTog
-TW92ZSB4YnpybGVfcGFnZXMgaW50byBSQU1TdGF0ZS4uLgpDaGVja2luZyBQQVRDSCAyMi81OTog
-cmFtOiBNb3ZlIHhienJsZV9jYWNoZV9taXNzIGludG8gUkFNU3RhdGUuLi4KQ2hlY2tpbmcgUEFU
-Q0ggMjMvNTk6IHJhbTogTW92ZSB4YnpybGVfY2FjaGVfbWlzc19yYXRlIGludG8gUkFNU3RhdGUu
-Li4KQ2hlY2tpbmcgUEFUQ0ggMjQvNTk6IHJhbTogTW92ZSB4YnpybGVfb3ZlcmZsb3dzIGludG8g
-UkFNU3RhdGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMjUvNTk6IHJhbTogTW92ZSBtaWdyYXRpb25fZGly
-dHlfcGFnZXMgdG8gUkFNU3RhdGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMjYvNTk6IHJhbTogRXZlcnl0
-aGluZyB3YXMgaW5pdCB0byB6ZXJvLCBzbyB1c2UgbWVtc2V0Li4uCkNoZWNraW5nIFBBVENIIDI3
-LzU5OiByYW06IE1vdmUgbWlncmF0aW9uX2JpdG1hcF9tdXRleCBpbnRvIFJBTVN0YXRlLi4uCkNo
-ZWNraW5nIFBBVENIIDI4LzU5OiByYW06IE1vdmUgbWlncmF0aW9uX2JpdG1hcF9yY3UgaW50byBS
-QU1TdGF0ZS4uLgpDaGVja2luZyBQQVRDSCAyOS81OTogcmFtOiBNb3ZlIGJ5dGVzX3RyYW5zZmVy
-cmVkIGludG8gUkFNU3RhdGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMzAvNTk6IHJhbTogVXNlIHRoZSBS
-QU1TdGF0ZSBieXRlc190cmFuc2ZlcnJlZCBwYXJhbWV0ZXIuLi4KQ2hlY2tpbmcgUEFUQ0ggMzEv
-NTk6IHJhbTogUmVtb3ZlIHJhbV9zYXZlX3JlbWFpbmluZy4uLgpDaGVja2luZyBQQVRDSCAzMi81
-OTogcmFtOiBNb3ZlIGxhc3RfcmVxX3JiIHRvIFJBTVN0YXRlLi4uCkNoZWNraW5nIFBBVENIIDMz
-LzU5OiByYW06IE1vdmUgc3JjX3BhZ2VfcmVxKiB0byBSQU1TdGF0ZS4uLgpDaGVja2luZyBQQVRD
-SCAzNC81OTogcmFtOiBDcmVhdGUgcmFtX2RpcnR5X3N5bmNfY291bnQoKS4uLgpDaGVja2luZyBQ
-QVRDSCAzNS81OTogcmFtOiBSZW1vdmUgZGlydHlfYnl0ZXNfcmF0ZS4uLgpDaGVja2luZyBQQVRD
-SCAzNi81OTogcmFtOiBNb3ZlIGRpcnR5X3BhZ2VzX3JhdGUgdG8gUkFNU3RhdGUuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMzcvNTk6IHJhbTogTW92ZSBwb3N0Y29weV9yZXF1ZXN0cyBpbnRvIFJBTVN0YXRl
-Li4uCkNoZWNraW5nIFBBVENIIDM4LzU5OiByYW06IEFkZCBRRU1VRmlsZSB0byBSQU1TdGF0ZS4u
-LgpDaGVja2luZyBQQVRDSCAzOS81OTogcmFtOiBNb3ZlIFFFTVVGaWxlIGludG8gUkFNU3RhdGUu
-Li4KQ2hlY2tpbmcgUEFUQ0ggNDAvNTk6IHJhbTogUmVtb3ZlIGNvbXByZXNzaW9uX3N3aXRjaCBh
-bmQgaW5saW5lIGl0cyBsb2dpYy4uLgpDaGVja2luZyBQQVRDSCA0MS81OTogbWlncmF0aW9uOiBS
-ZW1vdmUgTWlncmF0aW9uU3RhdGUgZnJvbSBtaWdyYXRpb25faW5fcG9zdGNvcHkuLi4KQ2hlY2tp
-bmcgUEFUQ0ggNDIvNTk6IHJhbTogV2UgZG9uJ3QgbmVlZCBNaWdyYXRpb25TdGF0ZSBwYXJhbWV0
-ZXIgYW55bW9yZS4uLgpDaGVja2luZyBQQVRDSCA0My81OTogcmFtOiBSZW5hbWUgcWVtdV90YXJn
-ZXRfcGFnZV9iaXRzKCkgdG8gcWVtdV90YXJnZXRfcGFnZV9zaXplKCkuLi4KQ2hlY2tpbmcgUEFU
-Q0ggNDQvNTk6IHJhbTogQWRkIHBhZ2Utc2l6ZSB0byBvdXRwdXQgaW4gJ2luZm8gbWlncmF0ZScu
-Li4KQ2hlY2tpbmcgUEFUQ0ggNDUvNTk6IHJhbTogUGFzcyBSQU1CbG9jayB0byBiaXRtYXBfc3lu
-Yy4uLgpDaGVja2luZyBQQVRDSCA0Ni81OTogcmFtOiByYW1fZGlzY2FyZF9yYW5nZSgpIGRvbid0
-IHVzZSB0aGUgbWlzIHBhcmFtZXRlci4uLgpDaGVja2luZyBQQVRDSCA0Ny81OTogcmFtOiByZW9y
-Z2FuaXplIGxhc3Rfc2VudF9ibG9jay4uLgpDaGVja2luZyBQQVRDSCA0OC81OTogcmFtOiBVc2Ug
-cGFnZSBudW1iZXIgaW5zdGVhZCBvZiBhbiBhZGRyZXNzIGZvciB0aGUgYml0bWFwIG9wZXJhdGlv
-bnMuLi4KQ2hlY2tpbmcgUEFUQ0ggNDkvNTk6IHJhbTogUmVtZW1iZXIgbGFzdF9wYWdlIGluc3Rl
-YWQgb2YgbGFzdF9vZmZzZXQuLi4KQ2hlY2tpbmcgUEFUQ0ggNTAvNTk6IHJhbTogQ2hhbmdlIG9m
-ZnNldCBmaWVsZCBpbiBQYWdlU2VhcmNoU3RhdHVzIHRvIHBhZ2UuLi4KQ2hlY2tpbmcgUEFUQ0gg
-NTEvNTk6IHJhbTogVXNlIHJhbWJsb2NrIGFuZCBwYWdlIG9mZnNldCBpbnN0ZWFkIG9mIGFic29s
-dXRlIG9mZnNldC4uLgpDaGVja2luZyBQQVRDSCA1Mi81OTogcmFtOiByZW5hbWUgbGFzdF9yYW1f
-b2Zmc2V0KCkgbGFzdF9yYW1fcGFnZXMoKS4uLgpDaGVja2luZyBQQVRDSCA1My81OTogcmFtOiBV
-c2UgUkFNQml0bWFwIHR5cGUgZm9yIGNvaGVyZW5jZS4uLgpDaGVja2luZyBQQVRDSCA1NC81OTog
-bWlncmF0aW9uOiBSZW1vdmUgTWlncmF0aW9uU3RhdGUgcGFyYW1ldGVyIGZyb20gbWlncmF0aW9u
-X2lzX2lkbGUoKS4uLgpDaGVja2luZyBQQVRDSCA1NS81OTogcWRldjogcWRldl9ob3RwbHVnIGlz
-IHJlYWxseSBhIGJvb2wuLi4KRVJST1I6IGRvIG5vdCBpbml0aWFsaXNlIGdsb2JhbHMgdG8gMCBv
-ciBOVUxMCiMyNDogRklMRTogaHcvY29yZS9xZGV2LmM6NDI6Citib29sIHFkZXZfaG90cGx1ZyA9
-IGZhbHNlOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNCBsaW5lcyBjaGVja2VkCgpZ
-b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA1Ni81
-OTogcWRldjogRXhwb3J0IHFkZXZfaG90X3JlbW92ZWQuLi4KRVJST1I6IGRvIG5vdCBpbml0aWFs
-aXNlIGdsb2JhbHMgdG8gMCBvciBOVUxMCiMyMzogRklMRTogaHcvY29yZS9xZGV2LmM6NDQ6Citi
-b29sIHFkZXZfaG90X3JlbW92ZWQgPSBmYWxzZTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5n
-cywgMTUgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgoKQ2hlY2tpbmcgUEFUQ0ggNTcvNTk6IHFkZXY6IE1vdmUgcWRldl91bnBsdWcoKSB0byBxZGV2
-LW1vbml0b3IuYy4uLgpDaGVja2luZyBQQVRDSCA1OC81OTogbWlncmF0aW9uOiBEaXNhYmxlIGhv
-dHBsdWcvdW5wbHVnIGR1cmluZyBtaWdyYXRpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggNTkvNTk6IHJh
-bTogUmVtb3ZlIG1pZ3JhdGlvbl9iaXRtYXBfZXh0ZW5kKCkuLi4KPT09IE9VVFBVVCBFTkQgPT09
-CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQg
-YXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
-bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On Wed, Apr 19, 2017 at 5:33 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> On Wed, Apr 19, 2017 at 05:25:23PM -0400, Pranith Kumar wrote:
+>> On Wed, Apr 19, 2017 at 4:57 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>> > On Wed, Apr 19, 2017 at 04:16:53PM -0400, Pranith Kumar wrote:
+>> >> On Wed, Apr 19, 2017 at 4:13 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>> >> > On Wed, Apr 19, 2017 at 04:00:49PM -0400, Pranith Kumar wrote:
+>> >> >> On Wed, Apr 19, 2017 at 3:54 PM, Pranith Kumar <bobby.prani@gmail.com> wrote:
+>> >> >> > When we enable hyperthreading (using threads smp argument), we warn
+>> >> >> > the user if the cpu is an AMD cpu. This does not make sense on TCG and
+>> >> >> > is also obsolete now that AMD Ryzen support hyperthreading.
+>> >> >> >
+>> >> >> > Fix this by adding CPUID_HT bit to the TCG features and explicitly
+>> >> >> > checking this bit in the cpuid.
+>> >> >> >
+>> >> >> > Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+>> >> >> > ---
+>> >> >> >  target/i386/cpu.c | 10 +++++-----
+>> >> >> >  1 file changed, 5 insertions(+), 5 deletions(-)
+>> >> >> >
+>> >> >> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>> >> >> > index 13c0985f11..f34bb5ead7 100644
+>> >> >> > --- a/target/i386/cpu.c
+>> >> >> > +++ b/target/i386/cpu.c
+>> >> >> > @@ -202,12 +202,12 @@ static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
+>> >> >> >  #define TCG_FEATURES (CPUID_FP87 | CPUID_PSE | CPUID_TSC | CPUID_MSR | \
+>> >> >> >            CPUID_PAE | CPUID_MCE | CPUID_CX8 | CPUID_APIC | CPUID_SEP | \
+>> >> >> >            CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV | CPUID_PAT | \
+>> >> >> > -          CPUID_PSE36 | CPUID_CLFLUSH | CPUID_ACPI | CPUID_MMX | \
+>> >> >> > +          CPUID_PSE36 | CPUID_CLFLUSH | CPUID_ACPI | CPUID_MMX | CPUID_HT | \
+>> >> >> >            CPUID_FXSR | CPUID_SSE | CPUID_SSE2 | CPUID_SS | CPUID_DE)
+>> >> >> >            /* partly implemented:
+>> >> >> >            CPUID_MTRR, CPUID_MCA, CPUID_CLFLUSH (needed for Win64) */
+>> >> >> >            /* missing:
+>> >> >> > -          CPUID_VME, CPUID_DTS, CPUID_SS, CPUID_HT, CPUID_TM, CPUID_PBE */
+>> >> >> > +          CPUID_VME, CPUID_DTS, CPUID_SS, CPUID_TM, CPUID_PBE */
+>> >> >> >  #define TCG_EXT_FEATURES (CPUID_EXT_SSE3 | CPUID_EXT_PCLMULQDQ | \
+>> >> >> >            CPUID_EXT_MONITOR | CPUID_EXT_SSSE3 | CPUID_EXT_CX16 | \
+>> >> >> >            CPUID_EXT_SSE41 | CPUID_EXT_SSE42 | CPUID_EXT_POPCNT | \
+>> >> >> > @@ -3643,7 +3643,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+>> >> >> >
+>> >> >> >      qemu_init_vcpu(cs);
+>> >> >> >
+>> >> >> > -    /* Only Intel CPUs support hyperthreading. Even though QEMU fixes this
+>> >> >> > +    /* Only some CPUs support hyperthreading. Even though QEMU fixes this
+>> >> >> >       * issue by adjusting CPUID_0000_0001_EBX and CPUID_8000_0008_ECX
+>> >> >> >       * based on inputs (sockets,cores,threads), it is still better to gives
+>> >> >> >       * users a warning.
+>> >> >> > @@ -3651,8 +3651,8 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+>> >> >> >       * NOTE: the following code has to follow qemu_init_vcpu(). Otherwise
+>> >> >> >       * cs->nr_threads hasn't be populated yet and the checking is incorrect.
+>> >> >> >       */
+>> >> >> > -    if (!IS_INTEL_CPU(env) && cs->nr_threads > 1 && !ht_warned) {
+>> >> >> > -        error_report("AMD CPU doesn't support hyperthreading. Please configure"
+>> >> >> > +    if ((env->features[FEAT_1_EDX] & CPUID_HT) && (cs->nr_threads > 1) && !ht_warned) {
+>> >> >>
+>> >> >> I missed a '!' here. We need to warn if CPUID_HT is not set. But I see
+>> >> >> that it is not being set even on HT enabled processors (i7-3770). How
+>> >> >> do I test for it?
+>> >> >
+>> >> > CPUID_HT is automatically set on the CPU if
+>> >> > (nr_threads * nr_cores) > 1. See the "case 1:" block in
+>> >> > cpu_x86_cpuid().
+>> >> >
+>> >> > AFAIK, the point of the warning is to let the user know that the
+>> >> > guest OS is likely to ignore thread topology information if CPUID
+>> >> > vendor is not Intel, and has nothing to do with TCG or KVM
+>> >> > capabilities. Maybe the warning is obsolete today and guests
+>> >> > won't be confused by a HT AMD CPU, but we need to confirm that.
+>> >>
+>> >> We assume an AMD cpu for x86 TCG and it prints this warning when an
+>> >> smp guest is run with (cores=2,threads=2) argument. The main point of
+>> >> this patch is to remove that warning when using TCG.
+>> >
+>> > What is different under TCG? If guests were confused with
+>> > threads=2 + vendor=AMD using KVM, what exactly would make them
+>> > not confused by threads=2 + vendor=AMD when using TCG?
+>>
+>> I am not sure why we chose AMD to be the vendor for TCG since, as you
+>> note, it does not really matter if it's AMD or Intel in TCG mode.
+>
+> I don't know why the default on TCG is AMD, either.
+>
+>>
+>> >
+>> > I just ran a Fedora 25 guest using "-machine accel=tcg
+>> > -smp 2,threads=2", and it still thinks it's running on a 2-core
+>> > CPU instead of a 2-thread CPU when CPU vendor is AMD.
+>>
+>> This all started with using Windows XP. It has an arbitrary limit on
+>> the number of cores it can support to 2 cores. So using -smp 4 will
+>> still only show 2 cores. However, we can overcome this by using -smp
+>> cores=2,threads=2 and 4 cores show up in the guest. But we see the
+>> ugly warning that HT is not supported on AMD cpus.
+>
+> Is Windows XP able to detect 2 threads * 2 cores even if CPUID
+> vendor is AMD?
+>
+
+Yep. I don't think it cares for vendor id.
+
+>> So we can either:
+>>
+>> * Change the vendor to Intel for TCG, or
+>> * Warn based on the HT bit being set
+>
+> Could you clarify what you mean by the second item? The HT bit is
+> always set when nr_cores*nr_threads > 1.
+
+Hmm, I see it now. We just warn the user if the host processor does
+not support HT.
+
+So how about setting the HT bit only if the host processor supports
+it? Or since it apparently does not matter anyway, remove the warning
+entirely?
+
+-- 
+Pranith
