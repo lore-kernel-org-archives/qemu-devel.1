@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39193)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d0qrp-0007a4-23
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 10:46:02 -0400
+	(envelope-from <jan.kiszka@siemens.com>) id 1d0qyi-0004YJ-KR
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 10:53:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d0qro-0002lD-78
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 10:46:01 -0400
-Date: Wed, 19 Apr 2017 16:45:46 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170419144546.GE5826@noname.redhat.com>
-References: <1492104214-29994-1-git-send-email-kwolf@redhat.com>
-	<1492104214-29994-3-git-send-email-kwolf@redhat.com>
-	<c8d62cd3-73fc-4461-a3f1-c050908e9bec@redhat.com>
+	(envelope-from <jan.kiszka@siemens.com>) id 1d0qye-0006Fe-MH
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 10:53:08 -0400
+Received: from thoth.sbs.de ([192.35.17.2]:50250)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
+	id 1d0qye-0006Em-CA
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 10:53:04 -0400
+References: <286AC319A985734F985F78AFA26841F7391EF490@shsmsx102.ccr.corp.intel.com>
+	<9ce5d497-c52a-23fc-a43d-ac7c895faedb@siemens.com>
+	<58F722EE.7030300@intel.com>
+	<d96b8097-b541-9908-8141-86267e726471@siemens.com>
+	<58F72942.3030802@intel.com>
+	<fcf62a96-b3fd-cffc-c784-7af46144cbb2@siemens.com>
+	<58F735CF.7040404@intel.com>
+	<13ccf73a-1553-ce8c-df4a-89c26cdc27b6@siemens.com>
+	<58F745C9.9090106@intel.com>
+	<abdb3dab-d96d-927a-3a63-92ade03afc5a@siemens.com>
+	<286AC319A985734F985F78AFA26841F7391EFB38@shsmsx102.ccr.corp.intel.com>
+From: Jan Kiszka <jan.kiszka@siemens.com>
+Message-ID: <b752f6cb-b75e-dbae-73cf-ef3fee5516d5@siemens.com>
+Date: Wed, 19 Apr 2017 16:52:51 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="FsscpQKzF/jJk6ya"
-Content-Disposition: inline
-In-Reply-To: <c8d62cd3-73fc-4461-a3f1-c050908e9bec@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/3] qemu-iotests: Filter HMP readline
- escape characters
+In-Reply-To: <286AC319A985734F985F78AFA26841F7391EFB38@shsmsx102.ccr.corp.intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [virtio-dev] Re: Vhost-pci RFC2.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,84 +37,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, quintela@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, lvivier@redhat.com, qemu-devel@nongnu.org
+To: "Wang, Wei W" <wei.w.wang@intel.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>
+Cc: Jailhouse <jailhouse-dev@googlegroups.com>
 
+On 2017-04-19 16:33, Wang, Wei W wrote:
+> On 04/19/2017 07:21 PM, Jan Kiszka wrote:
+>> On 2017-04-19 13:11, Wei Wang wrote:
+>>> On 04/19/2017 06:36 PM, Jan Kiszka wrote:
+>>>> On 2017-04-19 12:02, Wei Wang wrote:
+>>>>>>>>> The design presented here intends to use only one BAR to expose
+>>>>>>>>> both TX and RX. The two VMs share an intermediate memory here,
+>>>>>>>>> why couldn't we give the same permission to TX and RX?
+>>>>>>>>>
+>>>>>>>> For security and/or safety reasons: the TX side can then safely
+>>>>>>>> prepare and sign a message in-place because the RX side cannot
+>>>>>>>> mess around with it while not yet being signed (or check-summed).
+>>>>>>>> Saves one copy from a secure place into the shared memory.
+>>>>>>> If we allow guest1 to write to RX, what safety issue would it
+>>>>>>> cause to guest2?
+>>>>>> This way, guest1 could trick guest2, in a race condition, to sign a
+>>>>>> modified message instead of the original one.
+>>>>>>
+>>>>> Just align the context that we are talking about: RX is the
+>>>>> intermediate shared ring that guest1 uses to receive packets and
+>>>>> guest2 uses to send packet.
+>>>>>
+>>>>> Seems the issue is that guest1 will receive a hacked message from RX
+>>>>> (modified by itself). How would it affect guest2?
+>>>> Retry: guest2 wants to send a signed/hashed message to guest1. For
+>>>> that purpose, it starts to build that message inside the shared
+>>>> memory that
+>>>> guest1 can at least read, then guest2 signs that message, also in-place.
+>>>> If guest1 can modify the message inside the ring while guest2 has not
+>>>> yet signed it, the result is invalid.
+>>>>
+>>>> Now, if guest2 is the final receiver of the message, nothing is lost,
+>>>> guest2 just shot itself into the foot. However, if guest2 is just a
+>>>> router (gray channel) and the message travels further, guest2 now has
+>>>> corrupted that channel without allowing the final receive to detect
+>>>> that. That's the scenario.
+>>>
+>>> If guest2 has been a malicious guest, I think it wouldn't make a
+>>> difference whether we protect the shared RX or not. As a router,
+>>> guest2 can play tricks on the messages after read it and then send the
+>>> modified message to a third man, right?
+>>
+>> It can swallow it, "steal" it (redirect), but it can't manipulate the signed content
+>> without being caught, that's the idea. It's particularly relevant for safety-critical
+>> traffic from one safe application to another over unreliable channels, but it may
+>> also be relevant for the integrity of messages in a secure setup.
+>>
+> 
+> OK, I see most of your story, thanks. To get to the bottom of it, is it possible to
+> Sign the packet before put it onto the unreliable channel (e.g. the shared RX),
+> Instead of signing in-place? If that's doable, we can have a simpler shared channel.  
 
---FsscpQKzF/jJk6ya
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Of course, you can always add another copy... But as it was trivial to
+add unidirectional shared memory support to ivshmem [1], I see no reason
+this shouldn't be possible for vhost-pci as well.
 
-Am 13.04.2017 um 19:38 hat Eric Blake geschrieben:
-> On 04/13/2017 12:23 PM, Kevin Wolf wrote:
-> > The only thing the escape characters achieve is making the reference
-> > output unreadable and lines that are potentially so long that git
-> > doesn't want to put them into an email any more. Let's filter them out.
->=20
-> Hear! Hear!
->=20
-> >=20
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  tests/qemu-iotests/028.out       | 2 +-
-> >  tests/qemu-iotests/130.out       | 4 ++--
-> >  tests/qemu-iotests/common.filter | 7 +++++++
-> >  tests/qemu-iotests/common.qemu   | 4 ++--
-> >  4 files changed, 12 insertions(+), 5 deletions(-)
->=20
-> Yay!  But I think you're incomplete:
->=20
-> What about 051, 068, 142, and 145?
+Jan
 
-I only converted the cases that use common.qemu, so they failed after
-my change. The other test cases you found are running qemu manually and
-didn't apply the filter yet, so they wouldn't fail.
+[1] https://github.com/siemens/jailhouse/commit/cfbd0b96d9cdb1ab7246c64bc446be39deb3f087, hypervisor part:
 
-For v2, I'll add the new filter to them and change the reference output
-accordingly.
+ hypervisor/include/jailhouse/cell-config.h |  4 ++--
+ hypervisor/include/jailhouse/ivshmem.h     |  2 +-
+ hypervisor/ivshmem.c                       | 52 +++++++++++++++++++++++++++++++++++-----------------
+ 3 files changed, 38 insertions(+), 20 deletions(-)
 
-> (found by:
->  git grep -l $'\e' tests/qemu-iotests/*.out
-> using bash as the shell)
->=20
->=20
-> > +++ b/tests/qemu-iotests/common.filter
-> > @@ -86,6 +86,13 @@ _filter_qmp()
-> >          -e '    QMP_VERSION'
-> >  }
-> > =20
-> > +# readline makes HMP command strings so long that git complains
-> > +_filter_hmp()
-> > +{
-> > +    sed -e 's/(qemu).*\o33\[D/(qemu) /g' \
->=20
-> \oNN is a GNU sed-ism, as far as I can tell.  Is it portable to our
-> BSD/MacOS builds?
-
-I'll use your bash version in v2.
-
-Kevin
-
---FsscpQKzF/jJk6ya
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJY93gaAAoJEH8JsnLIjy/Ws14P/20Sc5ydUOtgb5DCmTyYCIGq
-Lll1PadPqAv9PPxqBfE7pNEgOK1rTCe8lhjAPCxN+74reMC2HnDHJygw7Dpb/S0Y
-t1ENnYVGMwyXK7dhgKU8iUPf9xnEhxrRXeg4NIhXOVACh5UzDefGQvtToHlXQXoq
-ncPvb6j7/VCs2R7ApNh/YLjyzJa9+LXg95Q1BEPz8zd0XKBYwLCMzb8/TrKD0Ack
-to1ENfJaGs7BICWVijQQ3TSB4RHS59weFKTot5gVsnvyRBprZIypGsw8zuyWrHwP
-1w/qZWTAPWt9jUOsAZ07UAYDYyYCVNOYoaSP9TxcraYl9IaLjCwYVfqzdKjxzL6u
-hfbQjhkZYeBHmu5S4xwLRSY097kaqIYtQCDXvulwn8JkaGm5tylel4GHduAu1Dt/
-VPhLESWYBerRtuTSZ/GQiOEqZP87oIH2u4vQ9+SSvw1KjnELRqBX9pt+kjk+neiS
-E4IbYgFo8hqAS/AzcKzgYdsD3UBu8CAZIyqJxUm5cKPHnGOKxsTugwyRYw1PK6L8
-9shj5LVKY2SygOJra8VDnc9lCvoVNtVvMgSVxjT2x/whOxnVCnXi3i7+6STGdE3l
-f6wUIl80gaEvMkySZ2wTVj2MURMP3qoAX20HMoDc77OgURwaSqjeAwXqzV4nrtxR
-c56t8pnE935vgN3oWAun
-=WRnt
------END PGP SIGNATURE-----
-
---FsscpQKzF/jJk6ya--
+-- 
+Siemens AG, Corporate Technology, CT RDA ITP SES-DE
+Corporate Competence Center Embedded Linux
