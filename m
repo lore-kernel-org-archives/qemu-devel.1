@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d0rmy-0004RF-TL
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 11:45:06 -0400
+	(envelope-from <eblake@redhat.com>) id 1d0rqK-0005lP-8X
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 11:48:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d0rmv-0000VQ-RS
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 11:45:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56024)
+	(envelope-from <eblake@redhat.com>) id 1d0rqH-0002xn-6n
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 11:48:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42866)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d0rmv-0000U7-IX
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 11:45:01 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d0rqG-0002xA-St
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 11:48:29 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 552CE8F869
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 15:44:59 +0000 (UTC)
-Date: Wed, 19 Apr 2017 16:44:56 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170419154455.GC7758@work-vm>
-References: <20170417200041.2451-1-quintela@redhat.com>
-	<20170417200041.2451-14-quintela@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id B67E7C04B94A
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 15:48:27 +0000 (UTC)
+References: <20170419144219.20371-1-pbonzini@redhat.com>
+	<20170419144219.20371-2-pbonzini@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <25c60922-5cb3-99c4-dd60-05bf1b6faca4@redhat.com>
+Date: Wed, 19 Apr 2017 10:48:26 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170417200041.2451-14-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 13/19] migration: Remove qemu-file.h from
- vmstate.h
+In-Reply-To: <20170419144219.20371-2-pbonzini@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="mUhmLSVp10bKasmiEchBeEinBwhIwUHXg"
+Subject: Re: [Qemu-devel] [PATCH 01/11] blockjob: remove unnecessary check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,112 +34,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--mUhmLSVp10bKasmiEchBeEinBwhIwUHXg
+From: Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <25c60922-5cb3-99c4-dd60-05bf1b6faca4@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 01/11] blockjob: remove unnecessary check
+References: <20170419144219.20371-1-pbonzini@redhat.com>
+ <20170419144219.20371-2-pbonzini@redhat.com>
+In-Reply-To: <20170419144219.20371-2-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
+On 04/19/2017 09:42 AM, Paolo Bonzini wrote:
+> !job is always checked prior to the call, drop it from here.
+>=20
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  include/hw/hw.h             | 1 +
->  include/migration/vmstate.h | 3 ---
->  migration/block.c           | 1 +
->  migration/channel.c         | 1 +
->  migration/colo.c            | 1 +
->  migration/postcopy-ram.c    | 1 +
->  migration/ram.c             | 1 +
->  7 files changed, 6 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/hw/hw.h b/include/hw/hw.h
-> index e22d4ce..af9eae1 100644
-> --- a/include/hw/hw.h
-> +++ b/include/hw/hw.h
-> @@ -11,6 +11,7 @@
->  #include "exec/memory.h"
->  #include "hw/irq.h"
->  #include "migration/vmstate.h"
-> +#include "migration/qemu-file.h"
->  #include "qemu/module.h"
->  #include "sysemu/reset.h"
->  
-> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-> index f4c5bed..1e6fcb5 100644
-> --- a/include/migration/vmstate.h
-> +++ b/include/migration/vmstate.h
-> @@ -27,9 +27,6 @@
->  #ifndef QEMU_VMSTATE_H
->  #define QEMU_VMSTATE_H
->  
-> -#ifndef CONFIG_USER_ONLY
-> -#include "migration/qemu-file.h"
-> -#endif
->  #include "migration/qjson.h"
->  
->  typedef void SaveStateHandler(QEMUFile *f, void *opaque);
-> diff --git a/migration/block.c b/migration/block.c
-> index 0722837..e45a42d 100644
-> --- a/migration/block.c
-> +++ b/migration/block.c
-> @@ -19,6 +19,7 @@
->  #include "qemu/cutils.h"
->  #include "migration/block.h"
->  #include "migration/migration.h"
-> +#include "migration/qemu-file.h"
->  #include "sysemu/block-backend.h"
->  
->  #define BLOCK_SIZE                       (1 << 20)
-> diff --git a/migration/channel.c b/migration/channel.c
-> index 10416e0..04a26c5 100644
-> --- a/migration/channel.c
-> +++ b/migration/channel.c
-> @@ -17,6 +17,7 @@
->  #include "migration/channel.h"
->  #include "migration/tls.h"
->  #include "migration/migration.h"
-> +#include "migration/qemu-file.h"
->  #include "trace.h"
->  #include "qapi/error.h"
->  #include "io/channel-tls.h"
-> diff --git a/migration/colo.c b/migration/colo.c
-> index d455884..e2eaccd 100644
-> --- a/migration/colo.c
-> +++ b/migration/colo.c
-> @@ -13,6 +13,7 @@
->  #include "qemu/osdep.h"
->  #include "sysemu/sysemu.h"
->  #include "migration/migration.h"
-> +#include "migration/qemu-file.h"
->  #include "migration/colo.h"
->  #include "io/channel-buffer.h"
->  #include "trace.h"
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index 11b24c6..5aea2ff 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -18,6 +18,7 @@
->  
->  #include "qemu/osdep.h"
->  #include "migration/migration.h"
-> +#include "migration/qemu-file.h"
->  #include "migration/postcopy-ram.h"
->  #include "sysemu/sysemu.h"
->  #include "sysemu/balloon.h"
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 4f49622..b0759ac 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -37,6 +37,7 @@
->  #include "migration/xbzrle.h"
->  #include "migration/init.h"
->  #include "migration/migration.h"
-> +#include "migration/qemu-file.h"
->  #include "migration/postcopy-ram.h"
->  #include "migration/page_cache.h"
->  #include "qemu/error-report.h"
-> -- 
-> 2.9.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>  blockjob.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/blockjob.c b/blockjob.c
+> index 6e48932..23022b3 100644
+> --- a/blockjob.c
+> +++ b/blockjob.c
+> @@ -480,7 +480,7 @@ static bool block_job_should_pause(BlockJob *job)
+> =20
+>  bool block_job_user_paused(BlockJob *job)
+>  {
+
+Is it worth using some form of attribute((nonnull)) annotations on
+various functions, to both state our intentions and let compilers help
+us catch obvious places where we are violating our intentions?  That's
+more of a generic question to all of qemu, and doesn't affect your
+particular patch, other than your patch is an instance where the
+annotation would be useful if we wanted to use them.
+
+> -    return job ? job->user_paused : 0;
+> +    return job->user_paused;
+>  }
+> =20
+>  void coroutine_fn block_job_pause_point(BlockJob *job)
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--mUhmLSVp10bKasmiEchBeEinBwhIwUHXg
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY94bKAAoJEKeha0olJ0NqAy0H/ju7Hl0dDYswVgTrtOEjPYHg
+72Njdd823f9uLtVxmlzGNQlxORCIpFcC1/jNHamIxRK+2A7m/SpViMpRo2Y6ARFu
+9dVi71k3okCrVInljZ1xXtviDPsPIVUB6hjCvJ04ttcaJeskUZ3JatHrlz7lhdoh
+444UUqmOzTCPzz9avW4iPD0oGCJHI4tjzkhtgZpNyYf6eQcDz5UDeOTsbecySc9e
+kwdphEy9oUUlfCVcix2ViJOwPMKY4k0zebtj7sXt5HgvE9hhkVqtb4lmUUJalIU5
+iAMFbZbWhnAE5tEC2JmfitgTvvX9isQri5Fk/U6eMTzwQUUGipr32M3u0A++xM4=
+=PBcd
+-----END PGP SIGNATURE-----
+
+--mUhmLSVp10bKasmiEchBeEinBwhIwUHXg--
