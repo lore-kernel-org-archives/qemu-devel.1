@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1d0tc3-0008Bg-V8
+	(envelope-from <alindsay@codeaurora.org>) id 1d0tc4-0008Bl-1R
 	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 13:41:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1d0tc2-0004Nn-VF
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 13:41:55 -0400
+	(envelope-from <alindsay@codeaurora.org>) id 1d0tc2-0004Ni-TV
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 13:41:56 -0400
 From: Aaron Lindsay <alindsay@codeaurora.org>
-Date: Wed, 19 Apr 2017 13:41:11 -0400
-Message-Id: <1492623684-25799-1-git-send-email-alindsay@codeaurora.org>
-Subject: [Qemu-devel] [PATCH 00/13] More fully implement ARM PMUv3
+Date: Wed, 19 Apr 2017 13:41:15 -0400
+Message-Id: <1492623684-25799-5-git-send-email-alindsay@codeaurora.org>
+In-Reply-To: <1492623684-25799-1-git-send-email-alindsay@codeaurora.org>
+References: <1492623684-25799-1-git-send-email-alindsay@codeaurora.org>
+Subject: [Qemu-devel] [PATCH 04/13] target/arm: Mask PMU register writes
+ based on PMCR_EL0.N
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,58 +23,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
 Cc: qemu-devel@nongnu.org, mspradli@codeaurora.org, Aaron Lindsay <alindsay@codeaurora.org>
 
-The ARM PMU implementation currently contains a basic cycle counter, but it is
-often useful to gather counts of other events and filter them based on
-execution mode. These patches flesh out the implementations of various PMU
-registers including PM[X]EVCNTR and PM[X]EVTYPER, add a struct definition to
-represent arbitrary counter types, implement mode filtering, and add
-instruction, cycle, and software increment events.
+This is in preparation for enabling counters other than PMCCNTR
 
-I am particularly interested in feedback on the following two patches because I
-think I'm likely Doing It Wrong:
- [1] target/arm: Filter cycle counter based on PMCCFILTR_EL0
- [2] target/arm: PMU: Add instruction and cycle events
+Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+---
+ target/arm/helper.c | 24 +++++++++++++++---------
+ 1 file changed, 15 insertions(+), 9 deletions(-)
 
-In order to implement mode filtering in an event-driven way, [1] adds a pair of
-calls to pmu_sync() surrounding every update to a register/variable which may
-affect whether any counter is currently filtered. These pmu_sync() calls
-ultimately call cpu_get_icount_raw() for enabled instruction and cycle counters
-when using icount. Unfortunately, cpu->can_do_io may otherwise be zero for
-these calls so the current implementation in [2] temporarily sets can_do_io to
-1. I haven't see any ill side effects from this in my testing, but it doesn't
-seem like the right way to handle this.
-
-I would like to eventually add sending interrupts on counter overflow.
-Suggestions for the best direction to handle this are most welcome.  
-
-Thanks for any feedback,
-Aaron
-
-
-Aaron Lindsay (13):
-  target/arm: A53: Initialize PMCEID[0]
-  target/arm: Check PMCNTEN for whether PMCCNTR is enabled
-  target/arm: Reorganize PMCCNTR read, write, sync
-  target/arm: Mask PMU register writes based on PMCR_EL0.N
-  target/arm: Allow AArch32 access for PMCCFILTR
-  target/arm: Filter cycle counter based on PMCCFILTR_EL0
-  target/arm: Implement PMOVSSET
-  target/arm: Split arm_ccnt_enabled into generic pmu_counter_enabled
-  target/arm: Add array for supported PMU events, generate PMCEID[01]
-  target/arm: Finish implementation of PM[X]EVCNTR and PM[X]EVTYPER
-  target/arm: PMU: Add instruction and cycle events
-  target/arm: PMU: Set PMCR.N to 4
-  target/arm: Implement PMSWINC
-
- target/arm/cpu.c       |  10 +-
- target/arm/cpu.h       |  34 +++-
- target/arm/cpu64.c     |   2 +
- target/arm/helper.c    | 523 ++++++++++++++++++++++++++++++++++++++++++-------
- target/arm/kvm64.c     |   2 +
- target/arm/machine.c   |   2 +
- target/arm/op_helper.c |   4 +
- 7 files changed, 500 insertions(+), 77 deletions(-)
-
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 390256b..e8189b8 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -30,11 +30,6 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+                                hwaddr *phys_ptr, MemTxAttrs *txattrs, int *prot,
+                                target_ulong *page_size_ptr, uint32_t *fsr,
+                                ARMMMUFaultInfo *fi);
+-
+-/* Definitions for the PMCCNTR and PMCR registers */
+-#define PMCRD   0x8
+-#define PMCRC   0x4
+-#define PMCRE   0x1
+ #endif
+ 
+ static int vfp_gdb_get_reg(CPUARMState *env, uint8_t *buf, int reg)
+@@ -876,6 +871,17 @@ static const ARMCPRegInfo v6_cp_reginfo[] = {
+     REGINFO_SENTINEL
+ };
+ 
++/* Definitions for the PMU registers */
++#define PMCRN   0xf800
++#define PMCRN_SHIFT 11
++#define PMCRD   0x8
++#define PMCRC   0x4
++#define PMCRE   0x1
++
++#define PMU_NUM_COUNTERS(env) ((env->cp15.c9_pmcr & PMCRN) >> PMCRN_SHIFT)
++/* Bits allowed to be set/cleared for PMCNTEN* and PMINTEN* */
++#define PMU_COUNTER_MASK(env) ((1 << 31) | ((1 << PMU_NUM_COUNTERS(env)) - 1))
++
+ static CPAccessResult pmreg_access(CPUARMState *env, const ARMCPRegInfo *ri,
+                                    bool isread)
+ {
+@@ -1060,14 +1066,14 @@ static void pmccfiltr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+ static void pmcntenset_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                             uint64_t value)
+ {
+-    value &= (1 << 31);
++    value &= (PMU_COUNTER_MASK(env) | (1 << 31));
+     env->cp15.c9_pmcnten |= value;
+ }
+ 
+ static void pmcntenclr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                              uint64_t value)
+ {
+-    value &= (1 << 31);
++    value &= (PMU_COUNTER_MASK(env) | (1 << 31));
+     env->cp15.c9_pmcnten &= ~value;
+ }
+ 
+@@ -1115,14 +1121,14 @@ static void pmintenset_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                              uint64_t value)
+ {
+     /* We have no event counters so only the C bit can be changed */
+-    value &= (1 << 31);
++    value &= PMU_COUNTER_MASK(env);
+     env->cp15.c9_pminten |= value;
+ }
+ 
+ static void pmintenclr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                              uint64_t value)
+ {
+-    value &= (1 << 31);
++    value &= PMU_COUNTER_MASK(env);
+     env->cp15.c9_pminten &= ~value;
+ }
+ 
 -- 
 Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
 Qualcomm Technologies, Inc. is a member of the
