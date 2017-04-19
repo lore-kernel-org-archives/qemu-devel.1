@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1d0vmz-0004v7-As
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 16:01:22 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1d0vpA-0005eW-IU
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 16:03:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1d0vmy-0001N0-JP
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 16:01:21 -0400
-Received: from mail-yb0-x244.google.com ([2607:f8b0:4002:c09::244]:33099)
+	(envelope-from <peter.maydell@linaro.org>) id 1d0vp9-0002DA-P6
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 16:03:36 -0400
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:33370)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1d0vmy-0001Mm-Eu
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 16:01:20 -0400
-Received: by mail-yb0-x244.google.com with SMTP id 206so2180318ybe.0
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 13:01:20 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1d0vp9-0002Cw-Hk
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 16:03:35 -0400
+Received: by mail-wr0-x229.google.com with SMTP id l28so22584091wre.0
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 13:03:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170419195413.30141-2-bobby.prani@gmail.com>
-References: <20170419195413.30141-1-bobby.prani@gmail.com>
-	<20170419195413.30141-2-bobby.prani@gmail.com>
-From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Wed, 19 Apr 2017 16:00:49 -0400
-Message-ID: <CAJhHMCAfexwn92bt0=rfzBB0hbgqzCpRpgnsEXbG5cnmnFYztA@mail.gmail.com>
+In-Reply-To: <CAJy91Cbo+CQbRMmS-1b32Hf=kgWb22N3htmiuyORW7y-of7Raw@mail.gmail.com>
+References: <CAJy91CZpAiZ6adPmbAESrYqDgtK37CEgw4SAk97jCNduADy6Tw@mail.gmail.com>
+	<CAFEAcA-V3BNcrhhnap+Hn8spfZPd0=Dv2v0P5myGwqU2e5t0Eg@mail.gmail.com>
+	<CAJy91Ca2FTvBzd2OqQZyEJBtCAxxosdcAFP1RMgGCQe2PJXEJA@mail.gmail.com>
+	<CAFEAcA-f1P4OW+DwLRn1AZQCzoiWNX_8Rhq0oduppMOSLWo9Ww@mail.gmail.com>
+	<CAJy91CY=s2H0VYYuDUrs=HYTEKjKZHpU1MXrhStxGxxWg=hfEg@mail.gmail.com>
+	<CAFEAcA9mfnUF-ZtU+kGpSj2LqVxPi=0GLB4Jk9zLnhhfq_Su4A@mail.gmail.com>
+	<CAJy91CaB3kA0vNRGs52S=OweSfSXnkO71AHOa2XpUYNJTnZHDQ@mail.gmail.com>
+	<CAFEAcA81o245N_zoSUtJ0SVupZyRE9cnfr15hmu+ReMuDj9iyQ@mail.gmail.com>
+	<CAJy91Cbo+CQbRMmS-1b32Hf=kgWb22N3htmiuyORW7y-of7Raw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 19 Apr 2017 21:03:13 +0100
+Message-ID: <CAFEAcA-07u6=pCcK-HsqBttwXemZ-c4QCjwc1V76S2r8obsRwg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] tcg/i386: Do not display HT warning for TCG
+Subject: Re: [Qemu-devel] Hight Processor time of Socket communciation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +36,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: Jiahuan Zhang <jiahuanzhang90@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, Apr 19, 2017 at 3:54 PM, Pranith Kumar <bobby.prani@gmail.com> wrote:
-> When we enable hyperthreading (using threads smp argument), we warn
-> the user if the cpu is an AMD cpu. This does not make sense on TCG and
-> is also obsolete now that AMD Ryzen support hyperthreading.
->
-> Fix this by adding CPUID_HT bit to the TCG features and explicitly
-> checking this bit in the cpuid.
->
-> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
-> ---
->  target/i386/cpu.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 13c0985f11..f34bb5ead7 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -202,12 +202,12 @@ static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
->  #define TCG_FEATURES (CPUID_FP87 | CPUID_PSE | CPUID_TSC | CPUID_MSR | \
->            CPUID_PAE | CPUID_MCE | CPUID_CX8 | CPUID_APIC | CPUID_SEP | \
->            CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV | CPUID_PAT | \
-> -          CPUID_PSE36 | CPUID_CLFLUSH | CPUID_ACPI | CPUID_MMX | \
-> +          CPUID_PSE36 | CPUID_CLFLUSH | CPUID_ACPI | CPUID_MMX | CPUID_HT | \
->            CPUID_FXSR | CPUID_SSE | CPUID_SSE2 | CPUID_SS | CPUID_DE)
->            /* partly implemented:
->            CPUID_MTRR, CPUID_MCA, CPUID_CLFLUSH (needed for Win64) */
->            /* missing:
-> -          CPUID_VME, CPUID_DTS, CPUID_SS, CPUID_HT, CPUID_TM, CPUID_PBE */
-> +          CPUID_VME, CPUID_DTS, CPUID_SS, CPUID_TM, CPUID_PBE */
->  #define TCG_EXT_FEATURES (CPUID_EXT_SSE3 | CPUID_EXT_PCLMULQDQ | \
->            CPUID_EXT_MONITOR | CPUID_EXT_SSSE3 | CPUID_EXT_CX16 | \
->            CPUID_EXT_SSE41 | CPUID_EXT_SSE42 | CPUID_EXT_POPCNT | \
-> @@ -3643,7 +3643,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
->
->      qemu_init_vcpu(cs);
->
-> -    /* Only Intel CPUs support hyperthreading. Even though QEMU fixes this
-> +    /* Only some CPUs support hyperthreading. Even though QEMU fixes this
->       * issue by adjusting CPUID_0000_0001_EBX and CPUID_8000_0008_ECX
->       * based on inputs (sockets,cores,threads), it is still better to gives
->       * users a warning.
-> @@ -3651,8 +3651,8 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
->       * NOTE: the following code has to follow qemu_init_vcpu(). Otherwise
->       * cs->nr_threads hasn't be populated yet and the checking is incorrect.
->       */
-> -    if (!IS_INTEL_CPU(env) && cs->nr_threads > 1 && !ht_warned) {
-> -        error_report("AMD CPU doesn't support hyperthreading. Please configure"
-> +    if ((env->features[FEAT_1_EDX] & CPUID_HT) && (cs->nr_threads > 1) && !ht_warned) {
+On 19 April 2017 at 14:34, Jiahuan Zhang <jiahuanzhang90@gmail.com> wrote:
+> But from the source code, I found the main characteristic of virtio-serial
+> is that,
+> virtio-serial can create multiple serial ports and each port has a pair of
+> control virt-queues and
+> a pair of guest input/output virt-queues.
 
-I missed a '!' here. We need to warn if CPUID_HT is not set. But I see
-that it is not being set even on HT enabled processors (i7-3770). How
-do I test for it?
+Its main characteristic is that the data transfer is over
+the standard virtio channel (ie a ring buffer in guest
+memory). That's why it's fast.
 
--- 
-Pranith
+> Its "have_data" callback function enables multi-byte data transfer from
+> guest.
+> And it is not in a tranditional device emulation format.
+> I mean that no exact IO region is emulated for it.
+
+It's a PCI device, it has registers the same way PCI
+devices do. (Or for virtio-mmio, it has MMIO registers
+like other MMIO devices).
+
+> Without Linux kernel driver, I don't know how to manipulate it.
+
+You can look at the virtio spec if you want to do direct
+work with virtio devices. Programming one isn't any
+more complicated than any other high-data-transfer
+device (like a modern ethernet card, for instance).
+
+> For the time being, I enable the guest app to send data to
+> the pl011's data register directly via a pointer, as you see that in the
+> code above.
+>
+> This is why I am thinking if adding a transmit buffer in pl011 for guest
+> writing
+> is a feasible alternative.
+
+Well, anything like this is never going to be of interest
+to QEMU upstream, because PL011s don't work like that.
+Virtio is our answer to "what is the most efficient way
+to transfer data from a guest to a host in a virtual
+machine", so we don't need to reinvent that wheel.
+The chances are that ad-hoc modifications to the PL011
+will end up being slower than virtio.
+
+thanks
+-- PMM
