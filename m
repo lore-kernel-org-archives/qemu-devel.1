@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vfeenstr@redhat.com>) id 1d0lsW-0006HD-Er
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 05:26:25 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d0lxH-0008Et-0g
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 05:31:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vfeenstr@redhat.com>) id 1d0lsT-0005d4-5O
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 05:26:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55136)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vfeenstr@redhat.com>) id 1d0lsS-0005cq-Rz
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 05:26:21 -0400
-From: Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>
-Date: Wed, 19 Apr 2017 11:26:15 +0200
-Message-Id: <20170419092615.11410-2-vfeenstr@redhat.com>
-In-Reply-To: <20170419092615.11410-1-vfeenstr@redhat.com>
-References: <20170419092615.11410-1-vfeenstr@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 1/1] qga: Add 'guest-get-users' command
+	(envelope-from <imammedo@redhat.com>) id 1d0lxF-0007pd-Hq
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 05:31:19 -0400
+Date: Wed, 19 Apr 2017 11:31:05 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170419113105.48020438@nial.brq.redhat.com>
+In-Reply-To: <20170413135805.GE27126@thinpad.lan.raisama.net>
+References: <1490189568-167621-1-git-send-email-imammedo@redhat.com>
+	<1490189568-167621-11-git-send-email-imammedo@redhat.com>
+	<20170413135805.GE27126@thinpad.lan.raisama.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.10 10/23] numa: mirror cpu to node
+ mapping in MachineState::possible_cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,292 +25,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: marcandre.lureau@gmail.com, eblake@redhat.com, mdroth@linux.vnet.ibm.com, Vinzenz Feenstra <vfeenstr@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Vinzenz Feenstra <vfeenstr@redhat.com>
+On Thu, 13 Apr 2017 10:58:05 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-A command that will list all currently logged in users, and the time
-since when they are logged in.
+> On Wed, Mar 22, 2017 at 02:32:35PM +0100, Igor Mammedov wrote:
+> > Introduce machine_set_cpu_numa_node() helper that stores
+> > node mapping for CPU in MachineState::possible_cpus.
+> > CPU and node it belongs to is specified by 'props' argument.
+> > 
+> > Patch doesn't remove old way of storing mapping in
+> > numa_info[X].node_cpu as removing it at the same time
+> > makes patch rather big. Instead it just mirrors mapping
+> > in possible_cpus and follow up per target patches will
+> > switch to possible_cpus and numa_info[X].node_cpu will
+> > be removed once there isn't any users left.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> >  include/hw/boards.h |  2 ++
+> >  hw/core/machine.c   | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  numa.c              |  8 +++++++
+> >  3 files changed, 78 insertions(+)
+> > 
+> > diff --git a/include/hw/boards.h b/include/hw/boards.h
+> > index 1dd0fde..40f30f1 100644
+> > --- a/include/hw/boards.h
+> > +++ b/include/hw/boards.h
+> > @@ -42,6 +42,8 @@ bool machine_dump_guest_core(MachineState *machine);
+> >  bool machine_mem_merge(MachineState *machine);
+> >  void machine_register_compat_props(MachineState *machine);
+> >  HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine);
+> > +void machine_set_cpu_numa_node(MachineState *machine,
+> > +                               CpuInstanceProperties *props, Error **errp);
+> >  
+> >  /**
+> >   * CPUArchId:
+> > diff --git a/hw/core/machine.c b/hw/core/machine.c
+> > index 0d92672..6ff0b45 100644
+> > --- a/hw/core/machine.c
+> > +++ b/hw/core/machine.c
+> > @@ -388,6 +388,74 @@ HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine)
+> >      return head;
+> >  }
+> >  
+> > +void machine_set_cpu_numa_node(MachineState *machine,
+> > +                               CpuInstanceProperties *props, Error **errp)  
+> 
+> If you change this to:
+> 
+>   void cpu_slot_set_numa_node(CPUArchId *slot, uint64_t node_id,
+>                               Error **errp);
+> 
+> and move the CPU slot lookup code from machine_set_cpu_numa_node()
+> to a helper:
+> 
+>   CPUArchId *machine_get_cpu_slot(MachineState *machine,
+>                                   CpuInstanceProperties *props, Error **errp);
+it would work in case of exact 1:1 lookup, but Paolo asked for
+wildcard support (i.e. -numa cpu,node-id=x,socket-id=y should set
+mapping for all cpus in socket y).
+So I'd prefer to keep machine_set_cpu_numa_node() as is,
+with it series splits nicely in clean and bisectable patches
+without breaking anything in the middle.
 
-Examples:
 
-virsh # qemu-agent-command F25 '{ "execute": "guest-get-users" }'
-{"return":[{"login-time":1490622289.903835,"user":"root"}]}
+> and change cpu_index_to_cpu_instance_props to return CPUArchId:
+> 
+>   CPUArchId *cpu_index_to_cpu_slot(MachineState *machine, int cpu_index);
+> 
+> We could simply have this on "-numa cpu" code:
+> 
+>     slot = machine_get_cpu_slot(machine, props);
+>     cpu_slot_set_numa_node(slot, node_id);
+> 
+> and this on the legacy "-numa node,cpu=..." code:
+> 
+>     slot = mc->cpu_index_to_cpu_slot(machine, i);
+>     cpu_slot_set_numa_node(slot, node_id);
+> 
+> I believe we will be able to reuse machine_get_cpu_slot() to
+> replace pc_find_cpu_slot() and spapr_find_cpu_slot() later.
+As I already replied to David, xxx_find_cpu_slot() possibly might
+be generalized but I'd like to postpone it until ARM topology
+is materialized and merged.
 
-virsh # qemu-agent-command Win2k12r2 '{ "execute": "guest-get-users" }'
-{"return":[{"login-time":1490351044.670552,"domain":"LADIDA",
-"user":"Administrator"}]}
+Another reason I'd like to postpone generalization is that
+xxx_find_cpu_slot() could be optimized in target specific way
+replacing CPU lookup in array with computational expression.
+It will make lookup O(1) function and it could be used as
+a better replacement for qemu_get_cpu()/cpu_exists() but
+I haven't looked into this yet.
 
-Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
----
- configure             |   2 +-
- include/glib-compat.h |   5 +++
- qga/commands-posix.c  |  60 +++++++++++++++++++++++++++++
- qga/commands-win32.c  | 103 ++++++++++++++++++++++++++++++++++++++++++++++++++
- qga/qapi-schema.json  |  24 ++++++++++++
- 5 files changed, 193 insertions(+), 1 deletion(-)
-
-diff --git a/configure b/configure
-index be4d326..55e6654 100755
---- a/configure
-+++ b/configure
-@@ -742,7 +742,7 @@ if test "$mingw32" = "yes" ; then
-   sysconfdir="\${prefix}"
-   local_statedir=
-   confsuffix=""
--  libs_qga="-lws2_32 -lwinmm -lpowrprof -liphlpapi -lnetapi32 $libs_qga"
-+  libs_qga="-lws2_32 -lwinmm -lpowrprof -lwtsapi32 -liphlpapi -lnetapi32 $libs_qga"
- fi
  
- werror=""
-diff --git a/include/glib-compat.h b/include/glib-compat.h
-index 863c8cf..f8ee9dc 100644
---- a/include/glib-compat.h
-+++ b/include/glib-compat.h
-@@ -217,6 +217,11 @@ static inline void g_hash_table_add(GHashTable *hash_table, gpointer key)
- {
-     g_hash_table_replace(hash_table, key, key);
- }
-+
-+static gboolean g_hash_table_contains(GHashTable *hash_table, gpointer key)
-+{
-+    return g_hash_table_lookup_extended(hash_table, key, NULL, NULL);
-+}
- #endif
- 
- #ifndef g_assert_true
-diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index 915df9e..ba06be4 100644
---- a/qga/commands-posix.c
-+++ b/qga/commands-posix.c
-@@ -15,6 +15,7 @@
- #include <sys/ioctl.h>
- #include <sys/wait.h>
- #include <dirent.h>
-+#include <utmpx.h>
- #include "qga/guest-agent-core.h"
- #include "qga-qmp-commands.h"
- #include "qapi/qmp/qerror.h"
-@@ -2517,3 +2518,62 @@ void ga_command_state_init(GAState *s, GACommandState *cs)
-     ga_command_state_add(cs, NULL, guest_fsfreeze_cleanup);
- #endif
- }
-+
-+#define QGA_MICRO_SECOND_TO_SECOND 1000000
-+
-+static double ga_get_login_time(struct utmpx *user_info)
-+{
-+    double seconds = (double)user_info->ut_tv.tv_sec;
-+    double useconds = (double)user_info->ut_tv.tv_usec;
-+    useconds /= QGA_MICRO_SECOND_TO_SECOND;
-+    return seconds + useconds;
-+}
-+
-+GuestUserList *qmp_guest_get_users(Error **err)
-+{
-+    GHashTable *cache = NULL;
-+    GuestUserList *head = NULL, *cur_item = NULL;
-+    struct utmpx *user_info = NULL;
-+    gpointer value = NULL;
-+    GuestUser *user = NULL;
-+    GuestUserList *item = NULL;
-+    double login_time = 0;
-+
-+    cache = g_hash_table_new(g_str_hash, g_str_equal);
-+    setutxent();
-+
-+    for (;;) {
-+        user_info = getutxent();
-+        if (user_info == NULL) {
-+            break;
-+        } else if (user_info->ut_type != USER_PROCESS) {
-+            continue;
-+        } else if (g_hash_table_contains(cache, user_info->ut_user)) {
-+            value = g_hash_table_lookup(cache, user_info->ut_user);
-+            user = (GuestUser *)value;
-+            login_time = ga_get_login_time(user_info);
-+            /* We're ensuring the earliest login time to be sent */
-+            if (login_time < user->login_time) {
-+                user->login_time = login_time;
-+            }
-+            continue;
-+        }
-+
-+        item = g_new0(GuestUserList, 1);
-+        item->value = g_new0(GuestUser, 1);
-+        item->value->user = g_strdup(user_info->ut_user);
-+        item->value->login_time = ga_get_login_time(user_info);
-+
-+        g_hash_table_insert(cache, item->value->user, item->value);
-+
-+        if (!cur_item) {
-+            head = cur_item = item;
-+        } else {
-+            cur_item->next = item;
-+            cur_item = item;
-+        }
-+    }
-+    endutxent();
-+    g_hash_table_destroy(cache);
-+    return head;
-+}
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 19d72b2..fa99a8f 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -11,6 +11,9 @@
-  * See the COPYING file in the top-level directory.
-  */
- 
-+#ifndef _WIN32_WINNT
-+#   define _WIN32_WINNT 0x0600
-+#endif
- #include "qemu/osdep.h"
- #include <wtypes.h>
- #include <powrprof.h>
-@@ -25,6 +28,7 @@
- #include <initguid.h>
- #endif
- #include <lm.h>
-+#include <wtsapi32.h>
- 
- #include "qga/guest-agent-core.h"
- #include "qga/vss-win32.h"
-@@ -1536,3 +1540,102 @@ void ga_command_state_init(GAState *s, GACommandState *cs)
-         ga_command_state_add(cs, NULL, guest_fsfreeze_cleanup);
-     }
- }
-+
-+/* MINGW is missing two fields: IncomingFrames & OutgoingFrames */
-+typedef struct _GA_WTSINFOA {
-+    WTS_CONNECTSTATE_CLASS State;
-+    DWORD SessionId;
-+    DWORD IncomingBytes;
-+    DWORD OutgoingBytes;
-+    DWORD IncomingFrames;
-+    DWORD OutgoingFrames;
-+    DWORD IncomingCompressedBytes;
-+    DWORD OutgoingCompressedBy;
-+    CHAR WinStationName[WINSTATIONNAME_LENGTH];
-+    CHAR Domain[DOMAIN_LENGTH];
-+    CHAR UserName[USERNAME_LENGTH + 1];
-+    LARGE_INTEGER ConnectTime;
-+    LARGE_INTEGER DisconnectTime;
-+    LARGE_INTEGER LastInputTime;
-+    LARGE_INTEGER LogonTime;
-+    LARGE_INTEGER CurrentTime;
-+
-+} GA_WTSINFOA;
-+
-+GuestUserList *qmp_guest_get_users(Error **err)
-+{
-+#if (_WIN32_WINNT >= 0x0600)
-+#define QGA_NANOSECONDS 10000000
-+
-+    GHashTable *cache = NULL;
-+    GuestUserList *head = NULL, *cur_item = NULL;
-+
-+    DWORD buffer_size = 0, count = 0, i = 0;
-+    GA_WTSINFOA *info = NULL;
-+    WTS_SESSION_INFOA *entries = NULL;
-+    GuestUserList *item = NULL;
-+    GuestUser *user = NULL;
-+    gpointer value = NULL;
-+    INT64 login = 0;
-+    double login_time = 0;
-+
-+    cache = g_hash_table_new(g_str_hash, g_str_equal);
-+
-+    if (WTSEnumerateSessionsA(NULL, 0, 1, &entries, &count)) {
-+        for (i = 0; i < count; ++i) {
-+            buffer_size = 0;
-+            info = NULL;
-+            if (WTSQuerySessionInformationA(
-+                NULL,
-+                entries[i].SessionId,
-+                WTSSessionInfo,
-+                (LPSTR *)&info,
-+                &buffer_size
-+            )) {
-+
-+                if (strlen(info->UserName) == 0) {
-+                    WTSFreeMemory(info);
-+                    continue;
-+                }
-+
-+                login = info->LogonTime.QuadPart;
-+                login -= W32_FT_OFFSET;
-+                login_time = ((double)login) / QGA_NANOSECONDS;
-+
-+                if (g_hash_table_contains(cache, info->UserName)) {
-+                    value = g_hash_table_lookup(cache, info->UserName);
-+                    user = (GuestUser *)value;
-+                    if (user->login_time > login_time) {
-+                        user->login_time = login_time;
-+                    }
-+                } else {
-+                    item = g_new0(GuestUserList, 1);
-+                    item->value = g_new0(GuestUser, 1);
-+
-+                    item->value->user = g_strdup(info->UserName);
-+                    item->value->domain = g_strdup(info->Domain);
-+                    item->value->has_domain = true;
-+
-+                    item->value->login_time = login_time;
-+
-+                    g_hash_table_add(cache, item->value->user);
-+
-+                    if (!cur_item) {
-+                        head = cur_item = item;
-+                    } else {
-+                        cur_item->next = item;
-+                        cur_item = item;
-+                    }
-+                }
-+            }
-+            WTSFreeMemory(info);
-+        }
-+        WTSFreeMemory(entries);
-+    }
-+    g_hash_table_destroy(cache);
-+    return head;
-+#else
-+    error_setg(err, QERR_UNSUPPORTED);
-+    return NULL;
-+#endif
-+}
-diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-index a02dbf2..27d10be 100644
---- a/qga/qapi-schema.json
-+++ b/qga/qapi-schema.json
-@@ -1042,3 +1042,27 @@
-   'data':    { 'path': 'str', '*arg': ['str'], '*env': ['str'],
-                '*input-data': 'str', '*capture-output': 'bool' },
-   'returns': 'GuestExec' }
-+
-+##
-+# @GuestUser:
-+# @user:       Username
-+# @domain:     Logon domain (windows only)
-+# @login-time: Time of login of this user on the computer. If multiple
-+#              instances of the user are logged in, the earliest login time is
-+#              reported. The value is in fractional seconds since epoch time.
-+#
-+# Since: 2.10
-+##
-+{ 'struct': 'GuestUser',
-+  'data': { 'user': 'str', 'login-time': 'number', '*domain': 'str' } }
-+
-+##
-+# @guest-get-users:
-+# Retrieves a list of currently active users on the VM.
-+#
-+# Returns: A unique list of users.
-+#
-+# Since: 2.10
-+##
-+{ 'command': 'guest-get-users',
-+  'returns': ['GuestUser'] }
--- 
-2.9.3
+> (I also suggest renaming "CPUArchId" and "possible CPUs" to
+> "CPUSlot" and "CPU slots" in the code and comments. This would
+> help people reviewing the code, but it can be done later if you
+> prefer.)
+I'm fine with changing CPUArchId to CPUSlot but I'd leave
+"possible CPUs" as is, since it precisely describes what it is,
+"CPU slots" is too ambiguous.
+
+> 
+> [...]
+> > @@ -177,6 +178,10 @@ static void numa_node_parse(MachineState *ms, NumaNodeOptions *node,
+> >              return;
+> >          }
+> >          bitmap_set(numa_info[nodenr].node_cpu, cpus->value, 1);
+> > +        props = mc->cpu_index_to_instance_props(ms, cpus->value);
+> > +        props.node_id = nodenr;
+> > +        props.has_node_id = true;
+> > +        machine_set_cpu_numa_node(ms, &props, &error_fatal);
+> >      }
+> >  
+> >      if (node->has_mem && node->has_memdev) {
+> > @@ -393,9 +398,12 @@ void parse_numa_opts(MachineState *ms)
+> >          if (i == nb_numa_nodes) {
+> >              for (i = 0; i < max_cpus; i++) {
+> >                  CpuInstanceProperties props;
+> > +                /* fetch default mapping from board and enable it */
+> >                  props = mc->cpu_index_to_instance_props(ms, i);
+> > +                props.has_node_id = true;
+> >  
+> >                  set_bit(i, numa_info[props.node_id].node_cpu);
+> > +                machine_set_cpu_numa_node(ms, &props, &error_fatal);
+> >              }
+> >          }
+> >  
+> > -- 
+> > 2.7.4
+> > 
+> >   
+> 
