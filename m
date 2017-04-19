@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d0rri-0006Lp-75
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 11:49:59 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d0rwI-00080Q-F0
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 11:54:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d0rrh-0003tm-9T
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 11:49:58 -0400
-Date: Wed, 19 Apr 2017 17:49:49 +0200
+	(envelope-from <kwolf@redhat.com>) id 1d0rwH-0006Z6-Ms
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 11:54:42 -0400
+Date: Wed, 19 Apr 2017 17:54:34 +0200
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170419154949.GF5826@noname.redhat.com>
-References: <20170413203401.3213-1-mreitz@redhat.com>
+Message-ID: <20170419155434.GG5826@noname.redhat.com>
+References: <20170413160625.27719-1-mreitz@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170413203401.3213-1-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 0/3] qemu-img/convert: Some small
- fixes
+In-Reply-To: <20170413160625.27719-1-mreitz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 0/2] block: An empty filename
+ counts as no filename
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,18 +24,14 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-Am 13.04.2017 um 22:33 hat Max Reitz geschrieben:
-> This series fixes some small issues I found in qemu-img's convert
-> subcommand while reviewing Dan's convert/dd series.
+Am 13.04.2017 um 18:06 hat Max Reitz geschrieben:
+> See patch 1 for what is happening when you try "qemu-img info ''" and
+> for the fix.
 > 
-> Nothing serious at all, so all for 2.10.
+> (Patch 2 just adds a simple test.)
 
-This series conflicts with Peter Lieven's "qemu-img: simplify
-img_convert" in my block-next branch.
-
-Patch 1 is unnecessary now (ret is still -EINVAL at this point), the
-other two probably just need rebasing.
+Thanks, applied to my block-next branch.
 
 Kevin
