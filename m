@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d0rLE-0003QI-Rl
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 11:16:25 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d0rLE-0003Q4-2R
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 11:16:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d0rLE-0000rO-6U
+	(envelope-from <kwolf@redhat.com>) id 1d0rLD-0000qQ-0b
 	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 11:16:24 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 19 Apr 2017 17:16:00 +0200
-Message-Id: <1492614962-20946-2-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1492614962-20946-1-git-send-email-kwolf@redhat.com>
-References: <1492614962-20946-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/3] migration: Call
+Date: Wed, 19 Apr 2017 17:15:59 +0200
+Message-Id: <1492614962-20946-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/3] migration: Call
  blk_resume_after_migration() for postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,38 +21,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, eblake@redhat.com, mreitz@redhat.com, quintela@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org, lvivier@redhat.com
 
-Commit d35ff5e6 ('block: Ignore guest dev permissions during incoming
-migration') added blk_resume_after_migration() to the precopy migration
-path, but neglected to add it to the duplicated code that is used for
-postcopy migration. This means that the guest device doesn't request the
-necessary permissions, which ultimately led to failing assertions.
+This fixes one of the bugs that made us disable the op blocker
+assertions for the 2.9 release.
 
-Add the missing blk_resume_after_migration() to the postcopy path.
+v2:
+- Filter HMP output not only for common.qemu users, but for all test
+  cases that had an escape character in their reference output. This
+  required matching also lines that don't begin with the (qemu) prompt
+  because other messages (from stderr) are interleaved. [Eric]
+- Use bash $'\e' instead of sed \o for better portability [Eric]
+- Added driver=$IMGFMT to test 181 [Eric]
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- migration/savevm.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Kevin Wolf (3):
+  migration: Call blk_resume_after_migration() for postcopy
+  qemu-iotests: Filter HMP readline escape characters
+  qemu-iotests: Test postcopy migration
 
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 3b19a4a..43fa9bf 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1623,6 +1623,14 @@ static void loadvm_postcopy_handle_run_bh(void *opaque)
-         error_report_err(local_err);
-     }
- 
-+    /* If we get an error here, just don't restart the VM yet. */
-+    blk_resume_after_migration(&local_err);
-+    if (local_err) {
-+        error_free(local_err);
-+        local_err = NULL;
-+        autostart = false;
-+    }
-+
-     trace_loadvm_postcopy_handle_run_cpu_sync();
-     cpu_synchronize_all_post_init();
- 
+ migration/savevm.c               |   8 +++
+ tests/qemu-iotests/028.out       |   2 +-
+ tests/qemu-iotests/051           |   3 +-
+ tests/qemu-iotests/051.out       | 106 +++++++++++++++----------------
+ tests/qemu-iotests/051.pc.out    | 132 +++++++++++++++++++--------------------
+ tests/qemu-iotests/068           |   4 +-
+ tests/qemu-iotests/068.out       |   6 +-
+ tests/qemu-iotests/130.out       |   4 +-
+ tests/qemu-iotests/142           |   2 +-
+ tests/qemu-iotests/142.out       |  10 +--
+ tests/qemu-iotests/145           |   3 +-
+ tests/qemu-iotests/145.out       |   2 +-
+ tests/qemu-iotests/181           | 119 +++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/181.out       |  38 +++++++++++
+ tests/qemu-iotests/common.filter |   7 +++
+ tests/qemu-iotests/common.qemu   |   4 +-
+ tests/qemu-iotests/group         |   1 +
+ 17 files changed, 313 insertions(+), 138 deletions(-)
+ create mode 100755 tests/qemu-iotests/181
+ create mode 100644 tests/qemu-iotests/181.out
+
 -- 
 1.8.3.1
