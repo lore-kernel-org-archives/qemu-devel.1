@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d0ycI-0005XV-MH
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 19:02:32 -0400
+	(envelope-from <jsnow@redhat.com>) id 1d0ygU-0006Ft-8E
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 19:06:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d0ycE-0003Wd-B8
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 19:02:30 -0400
-Received: from mail.kernel.org ([198.145.29.136]:46032)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1d0ycE-0003WH-3D
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 19:02:26 -0400
-Date: Wed, 19 Apr 2017 16:02:20 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <51ac3ff38f464abfb98928e6fb959bf7@AMSPEX02CL03.citrite.net>
-Message-ID: <alpine.DEB.2.10.1704191552450.31486@sstabellini-ThinkPad-X260>
-References: <alpine.DEB.2.10.1704141429110.23677@sstabellini-ThinkPad-X260>
-	<alpine.DEB.2.10.1704141734161.23677@sstabellini-ThinkPad-X260>
-	<03cfd81856554ecd91c0c317353e819b@AMSPEX02CL03.citrite.net>
-	<alpine.DEB.2.10.1704181038360.31486@sstabellini-ThinkPad-X260>
-	<51ac3ff38f464abfb98928e6fb959bf7@AMSPEX02CL03.citrite.net>
+	(envelope-from <jsnow@redhat.com>) id 1d0ygT-0004k9-3K
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 19:06:50 -0400
+References: <20170407113404.9351-1-vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <e8e164db-ef51-63e6-3294-c43e4951a89c@redhat.com>
+Date: Wed, 19 Apr 2017 19:06:38 -0400
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] QEMU build breakage on ARM against Xen 4.9 caused
- by libxendevicemodel
+In-Reply-To: <20170407113404.9351-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qemu-img: improve
+ convert_iteration_sectors()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,90 +24,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <Paul.Durrant@citrix.com>
-Cc: 'Stefano Stabellini' <sstabellini@kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Anthony Perard <anthony.perard@citrix.com>, Wei Liu <wei.liu2@citrix.com>, "jgross@suse.com" <jgross@suse.com>, "julien.grall@arm.com" <julien.grall@arm.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
 
-On Wed, 19 Apr 2017, Paul Durrant wrote:
-> > -----Original Message-----
-> > From: Stefano Stabellini [mailto:sstabellini@kernel.org]
-> > Sent: 18 April 2017 18:41
-> > To: Paul Durrant <Paul.Durrant@citrix.com>
-> > Cc: 'Stefano Stabellini' <sstabellini@kernel.org>; qemu-devel@nongnu.org;
-> > Anthony Perard <anthony.perard@citrix.com>; Wei Liu
-> > <wei.liu2@citrix.com>; jgross@suse.com; julien.grall@arm.com; xen-
-> > devel@lists.xenproject.org
-> > Subject: RE: QEMU build breakage on ARM against Xen 4.9 caused by
-> > libxendevicemodel
-> > 
-> > On Tue, 18 Apr 2017, Paul Durrant wrote:
-> > > > -----Original Message-----
-> > > > From: Stefano Stabellini [mailto:sstabellini@kernel.org]
-> > > > Sent: 15 April 2017 01:40
-> > > > To: Stefano Stabellini <sstabellini@kernel.org>
-> > > > Cc: Paul Durrant <Paul.Durrant@citrix.com>; qemu-devel@nongnu.org;
-> > > > Anthony Perard <anthony.perard@citrix.com>; Wei Liu
-> > > > <wei.liu2@citrix.com>; jgross@suse.com; julien.grall@arm.com; xen-
-> > > > devel@lists.xenproject.org
-> > > > Subject: Re: QEMU build breakage on ARM against Xen 4.9 caused by
-> > > > libxendevicemodel
-> > > >
-> > > > On Fri, 14 Apr 2017, Stefano Stabellini wrote:
-> > > > > Hi Paul,
-> > > > >
-> > > > > The following commit in my qemu "next" branch breaks the build on
-> > arm
-> > > > > and arm64:
-> > > > >
-> > > > > commit 670271647ad15e9d937ced7a72c892349c709216
-> > > > > Author: Paul Durrant <paul.durrant@citrix.com>
-> > > > > Date:   Tue Mar 7 10:55:34 2017 +0000
-> > > > >
-> > > > >     xen: use libxendevicemodel when available
-> > > > >
-> > > > > See the appended build log. Sorry for not realizing it sooner.
-> > > >
-> > > > As I imagined, this bug is easy to solve. It is reproducible on x86 too,
-> > > > if you pass -DXC_WANT_COMPAT_DEVICEMODEL_API=1 to configure
-> > and
-> > > > forcefully disable Xen 4.9 detection in the configure script.
-> > > >
-> > > > If QEMU detects xen_ctrl_version = 480, the build will fail against Xen
-> > > > 4.9, even when -DXC_WANT_COMPAT_DEVICEMODEL_API=1 is
-> > specified.
-> > > >
-> > > > The appended patch solves the problem. However, Xen 4.9 detection
-> > and
-> > > > compilation remain broken.
-> > >
-> > > Ok, that fix looks fine to me.
-> > 
-> > I merged this change into "use libxendevicemodel when available" in my
-> > next branch.
-> > 
-> > Are you going to take care of getting the QEMU build on ARM to work
-> > against Xen 4.9 (properly detecting 4.9, without
-> > -DXC_WANT_COMPAT_DEVICEMODEL_API=1)?
-> > 
+
+
+On 04/07/2017 07:34 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Do not do extra call to _get_block_status()
 > 
-> I can take a look once I get access to some h/w. Since the 4.9 detection should merely be based upon the presence of libxendevicemodel, I can't really imagine why ARM should behave any differently to x86.
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+> 
+> Also, I'm not sure about last line:
+> s->status = s->target_has_backing ? BLK_BACKING_FILE : BLK_DATA;
+> 
+> (which is equal to old code)
+> 
 
-I managed to find the time to do some debugging. You are right that is
-not anything major. The bug is due to a missing -lxencall in the QEMU
-configure script, I wonder why it works on x86.
+What a weird function.
 
-diff --git a/configure b/configure
-index 99d6cbc..363a126 100755
---- a/configure
-+++ b/configure
-@@ -2027,9 +2027,9 @@ int main(void) {
-   return 0;
- }
- EOF
--        compile_prog "" "$xen_libs $xen_stable_libs -lxendevicemodel"
-+        compile_prog "" "$xen_libs $xen_stable_libs -lxendevicemodel -lxencall"
-       then
--      xen_stable_libs="$xen_stable_libs -lxendevicemodel"
-+      xen_stable_libs="$xen_stable_libs -lxendevicemodel -lxencall"
-       xen_ctrl_version=40900
-       xen=yes
-     elif
+So, if the target has a backing file, literally nothing changes here.
+
+If it doesn't, we skip the initial call to get_block_status and just
+call the (effectively?) recursive version to find out if we have a ZERO
+or DATA type of allocation.
+
+The else clause here properly reflects the original reading of the code.
+
+OK.
+
+> may be, it should be
+> s->status = s->target_has_backing ? BLK_BACKING_FILE : BLK_ZERO;
+> 
+> as it is the case, when range is not allocated at all. Should we copy it in this case?
+> 
+
+I am not really clear on if either ZERO or DATA are correct in the case
+where we do not have a backing file, because maybe this depends on
+has_zero_init?
+
+If we are copying uninitialized data when has_zero_init is true on the
+source, we want zeroes on the target. If the target also has_zero_init,
+we can just skip this sector. If it doesn't, we want to copy zeroes.
+
+If has_zero_init is false and we have unallocated data on the source...
+what are we doing? Copying random debris?
+
+I'm pretty confused, but I'm pretty sure your patch doesn't actually
+change anything, so:
+
+Reviewed-by: John Snow <jsnow@redhat.com>
+
+>  qemu-img.c | 32 ++++++++++----------------------
+>  1 file changed, 10 insertions(+), 22 deletions(-)
+> 
+> diff --git a/qemu-img.c b/qemu-img.c
+> index b220cf71d7..490f6e97f6 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -1554,9 +1554,15 @@ static int convert_iteration_sectors(ImgConvertState *s, int64_t sector_num)
+>  
+>      if (s->sector_next_status <= sector_num) {
+>          BlockDriverState *file;
+> -        ret = bdrv_get_block_status(blk_bs(s->src[src_cur]),
+> -                                    sector_num - src_cur_offset,
+> -                                    n, &n, &file);
+> +        if (s->target_has_backing) {
+> +            ret = bdrv_get_block_status(blk_bs(s->src[src_cur]),
+> +                                        sector_num - src_cur_offset,
+> +                                        n, &n, &file);
+> +        } else {
+> +            ret = bdrv_get_block_status_above(blk_bs(s->src[src_cur]), NULL,
+> +                                              sector_num - src_cur_offset,
+> +                                              n, &n, &file);
+> +        }
+>          if (ret < 0) {
+>              return ret;
+>          }
+> @@ -1565,26 +1571,8 @@ static int convert_iteration_sectors(ImgConvertState *s, int64_t sector_num)
+>              s->status = BLK_ZERO;
+>          } else if (ret & BDRV_BLOCK_DATA) {
+>              s->status = BLK_DATA;
+> -        } else if (!s->target_has_backing) {
+> -            /* Without a target backing file we must copy over the contents of
+> -             * the backing file as well. */
+> -            /* Check block status of the backing file chain to avoid
+> -             * needlessly reading zeroes and limiting the iteration to the
+> -             * buffer size */
+> -            ret = bdrv_get_block_status_above(blk_bs(s->src[src_cur]), NULL,
+> -                                              sector_num - src_cur_offset,
+> -                                              n, &n, &file);
+> -            if (ret < 0) {
+> -                return ret;
+> -            }
+> -
+> -            if (ret & BDRV_BLOCK_ZERO) {
+> -                s->status = BLK_ZERO;
+> -            } else {
+> -                s->status = BLK_DATA;
+> -            }
+>          } else {
+> -            s->status = BLK_BACKING_FILE;
+> +            s->status = s->target_has_backing ? BLK_BACKING_FILE : BLK_DATA;
+>          }
+>  
+>          s->sector_next_status = sector_num + n;
+> 
