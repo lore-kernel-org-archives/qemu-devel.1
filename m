@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <naftaly.avadiaev@gmail.com>) id 1d0cGH-0000oC-FR
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 19:10:18 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1d0l1r-0000aP-3p
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 04:32:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <naftaly.avadiaev@gmail.com>) id 1d0cGE-0001Yq-B0
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 19:10:17 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:33354)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <naftaly.avadiaev@gmail.com>)
-	id 1d0cGE-0001Yd-16
-	for qemu-devel@nongnu.org; Tue, 18 Apr 2017 19:10:14 -0400
-Received: by mail-wr0-x234.google.com with SMTP id l28so4487712wre.0
-	for <qemu-devel@nongnu.org>; Tue, 18 Apr 2017 16:10:13 -0700 (PDT)
-Received: from m5510 (bzq-109-66-9-25.red.bezeqint.net. [109.66.9.25])
-	by smtp.gmail.com with ESMTPSA id r4sm714809wra.69.2017.04.18.16.10.11
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 18 Apr 2017 16:10:11 -0700 (PDT)
-From: "Naftaly Avadiaev" <naftaly.avadiaev@gmail.com>
-Date: Wed, 19 Apr 2017 02:10:10 +0300
-Message-ID: <000001d2b898$eed2d520$cc787f60$@gmail.com>
+	(envelope-from <wei.w.wang@intel.com>) id 1d0l1m-0005WT-Oj
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 04:31:59 -0400
+Received: from mga14.intel.com ([192.55.52.115]:28587)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1d0l1m-0005Vs-EF
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 04:31:54 -0400
+Message-ID: <58F720E0.6070709@intel.com>
+Date: Wed, 19 Apr 2017 16:33:36 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Language: en-us
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] Simulating Soft Error with MCE Injection method
+References: <286AC319A985734F985F78AFA26841F7391EF490@shsmsx102.ccr.corp.intel.com>
+	<CAJ+F1CL3P96gSVcZCCPatZGp7yUGeryEVSV4aX4rDXRjVBo0uw@mail.gmail.com>
+In-Reply-To: <CAJ+F1CL3P96gSVcZCCPatZGp7yUGeryEVSV4aX4rDXRjVBo0uw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] Vhost-pci RFC2.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,40 +28,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>
 
-Hi,
+On 04/19/2017 03:31 PM, Marc-André Lureau wrote:
+> Hi
+>
+> On Wed, Apr 19, 2017 at 10:38 AM Wang, Wei W <wei.w.wang@intel.com 
+> <mailto:wei.w.wang@intel.com>> wrote:
+>
+>     Hi,
+>     We made some design changes to the original vhost-pci design, and
+>     want to open
+>     a discussion about the latest design (labelled 2.0) and its
+>     extension (2.1).
+>     2.0 design: One VM shares the entire memory of another VM
+>     2.1 design: One VM uses an intermediate memory shared with another
+>     VM for
+>                          packet transmission.
+>     For the convenience of discussion, I have some pictures presented
+>     at this link:
+>     _https://github.com/wei-w-wang/vhost-pci-discussion/blob/master/vhost-pci-rfc2.0.pdf_
+>     Fig. 1 shows the common driver frame that we want use to build the
+>     2.0 and 2.1
+>     design. A TX/RX engine consists of a local ring and an exotic ring.
+>
+>
+> Isn't "external" (or "remote") more appropriate than "exotic" ?
 
- 
+OK, probably we can use "remote" here.
 
-QEMU has a build in mechanism for MCE injection. 
+>
+>     Local ring:
+>     1) allocated by the driver itself;
+>     2) registered with the device (i.e. virtio_add_queue())
+>     Exotic ring:
+>     1) ring memory comes from the outside (of the driver), and exposed
+>     to the driver
+>          via a BAR MMIO;
+>     2) does not have a registration in the device, so no
+>     ioeventfd/irqfd, configuration
+>     registers allocated in the device
+>     Fig. 2 shows how the driver frame is used to build the 2.0 design.
+>     1) Asymmetric: vhost-pci-net <-> virtio-net
+>     2) VM1 shares the entire memory of VM2, and the exotic rings are
+>     the rings
+>         from VM2.
+>     3) Performance (in terms of copies between VMs):
+>         TX: 0-copy (packets are put to VM2’s RX ring directly)
+>         RX: 1-copy (the green arrow line in the VM1’s RX engine)
+>
+>
+> Why is the copy necessary?
 
-However the mechanism is not perfect, QEMU just fills MCA registers with
-partial data and then triggers MCE.
+Because the packet from the remote ring can't be delivered to the
+network stack directly. To be more precise,
+1)  The buffer from the remote ring is not allocated by the guest 
+driver. If the
+      buffer is directly delivered to the network stack, the network 
+stack will free
+      the buffer that is not allocated by the guest;
+2) When we think about the vring operation, after getting the buffer 
+from the
+     avail ring, we need to put back the used buffer to the used ring to 
+tell the
+     other end that the buffer has been used. The network stack won't do 
+this
+     operation.
 
-I want to add a real corruption before triggering MCE.
+So, based on the two points. I think we need to use a local ring, and 
+copy the
+packet to the buffer from the local ring (i.e. buffer memory allocated 
+by the
+guest driver), and the driver will do the "give back used buffer" operation
+as explained in 2).
 
-The first thing which I tried is to add all MSRs as described in Intel
-Software Developer's Manual [now qemu implements 3 of 4 general status
-registers and 4 of 5 error reporting registers in a bank], however it seems
-that the guest OS is still not aware of the new registers that I have add.
 
-I did the following: 
+>     Fig. 3 shows how the driver frame is used to build the 2.1 design.
+>     1) Symmetric: vhost-pci-net <-> vhost-pci-net
+>     2) Share an intermediate memory, allocated by VM1’s vhost-pci device,
+>     for data exchange, and the exotic rings are built on the shared memory
+>     3) Performance:
+>         TX: 1-copy
+>     RX: 1-copy
+>     Fig. 4 shows the inter-VM notification path for 2.0 (2.1 is similar).
+>     The four eventfds are allocated by virtio-net, and shared with
+>     vhost-pci-net:
+>     Uses virtio-net’s TX/RX kickfd as the vhost-pci-net’s RX/TX callfd
+>     Uses virtio-net’s TX/RX callfd as the vhost-pci-net’s RX/TX kickfd
+>     Example of how it works:
+>     After packets are put into vhost-pci-net’s TX, the driver kicks
+>     TX, which
+>     causes the an interrupt associated with fd3 to be injected to
+>     virtio-net
+>     The draft code of the 2.0 design is ready, and can be found here:
+>     Qemu: _https://github.com/wei-w-wang/vhost-pci-device_
+>
+>
+> The repository contains a single big commit 
+> (https://github.com/wei-w-wang/vhost-pci-device/commit/fa01ec5e41de176197dae505c05b659f5483187f). 
+> Please try to provide a seperate patch or series of patch from an 
+> upstream commit/release point.
 
-1. Added the MSRs in CPUX86State. 
+It's the test-able version of the 2.0 design. I will separate it.
+If possible, hope we can review the design first, especially the common
+driver frame. Then I can make the related changes from the
+discussion, and post out the patch series.
 
-2. Added support for reading the new MSRs in helper_rdmsr & helper_wrmsr.
-
-Why the guest OS still unaware of these MSRs?
-
-I also tried to corrupt the EIP before triggering MCE, but the guest OS just
-crashed without arriving to MCE handler.
-
-In my understanding the MCE handler is exactly to deal with such errors.
-What I'm I missing?
-
- 
-
-Thanks,
-
-Naftaly
+Best,
+Wei
