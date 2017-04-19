@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d0wiU-0004eA-MY
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:00:47 -0400
+	(envelope-from <quintela@redhat.com>) id 1d0wi7-0004HA-J9
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:00:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d0wiT-0007LH-N8
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:00:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49788)
+	(envelope-from <quintela@redhat.com>) id 1d0wi6-0007Co-Ms
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:00:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52908)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d0wiT-0007Kv-F8
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:00:45 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d0wi6-0007CN-Dk
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:00:22 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 531759D50D
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 21:00:44 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3F6E1C04BD41
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 21:00:21 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 19 Apr 2017 22:59:13 +0200
-Message-Id: <20170419205923.8808-50-quintela@redhat.com>
+Date: Wed, 19 Apr 2017 22:58:58 +0200
+Message-Id: <20170419205923.8808-35-quintela@redhat.com>
 In-Reply-To: <20170419205923.8808-1-quintela@redhat.com>
 References: <20170419205923.8808-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 49/59] ram: Remember last_page instead of
- last_offset
+Subject: [Qemu-devel] [PATCH 34/59] ram: Create ram_dirty_sync_count()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,77 +32,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-
---
-
-Improve comment
-Fix typo
+This is a ram field that was inside MigrationState.  Move it to
+RAMState and make it the same that the other ram stats.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- migration/ram.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ include/migration/migration.h | 2 +-
+ migration/migration.c         | 3 +--
+ migration/ram.c               | 6 +++++-
+ 3 files changed, 7 insertions(+), 4 deletions(-)
 
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index 084d195..2f9c973 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -159,7 +159,6 @@ struct MigrationState
+     bool enabled_capabilities[MIGRATION_CAPABILITY__MAX];
+     int64_t xbzrle_cache_size;
+     int64_t setup_time;
+-    int64_t dirty_sync_count;
+     /* Count of requests incoming from destination */
+     int64_t postcopy_requests;
+ 
+@@ -255,6 +254,7 @@ void migrate_decompress_threads_join(void);
+ uint64_t ram_bytes_remaining(void);
+ uint64_t ram_bytes_transferred(void);
+ uint64_t ram_bytes_total(void);
++uint64_t ram_dirty_sync_count(void);
+ void free_xbzrle_decoded_buf(void);
+ 
+ void acct_update_position(QEMUFile *f, size_t size, bool zero);
+diff --git a/migration/migration.c b/migration/migration.c
+index 5918b21..94647a8 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -656,7 +656,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
+     info->ram->normal_bytes = norm_mig_pages_transferred() *
+         (1ul << qemu_target_page_bits());
+     info->ram->mbps = s->mbps;
+-    info->ram->dirty_sync_count = s->dirty_sync_count;
++    info->ram->dirty_sync_count = ram_dirty_sync_count();
+     info->ram->postcopy_requests = s->postcopy_requests;
+ 
+     if (s->state != MIGRATION_STATUS_COMPLETED) {
+@@ -1120,7 +1120,6 @@ MigrationState *migrate_init(const MigrationParams *params)
+     s->dirty_pages_rate = 0;
+     s->dirty_bytes_rate = 0;
+     s->setup_time = 0;
+-    s->dirty_sync_count = 0;
+     s->start_postcopy = false;
+     s->postcopy_after_devices = false;
+     s->postcopy_requests = 0;
 diff --git a/migration/ram.c b/migration/ram.c
-index 52ab14b..5b2045d 100644
+index be26d0c..1580617 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -171,8 +171,8 @@ struct RAMState {
-     RAMBlock *last_seen_block;
-     /* Last block from where we have sent data */
-     RAMBlock *last_sent_block;
--    /* Last offset we have sent data from */
--    ram_addr_t last_offset;
-+    /* Last dirty targe page we have sent */
-+    ram_addr_t last_page;
-     /* last ram version we have seen */
-     uint32_t last_version;
-     /* We are in the first round */
-@@ -1061,7 +1061,7 @@ static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss,
-     pss->offset = migration_bitmap_find_dirty(rs, pss->block, pss->offset,
-                                               page_abs);
-     if (pss->complete_round && pss->block == rs->last_seen_block &&
--        pss->offset >= rs->last_offset) {
-+        (pss->offset >> TARGET_PAGE_BITS) >= rs->last_page) {
-         /*
-          * We've been once around the RAM and haven't found anything.
-          * Give up.
-@@ -1402,7 +1402,7 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
+@@ -271,6 +271,11 @@ uint64_t ram_bytes_remaining(void)
+     return ram_state.migration_dirty_pages * TARGET_PAGE_SIZE;
+ }
+ 
++uint64_t ram_dirty_sync_count(void)
++{
++    return ram_state.bitmap_sync_count;
++}
++
+ /* used by the search for pages to send */
+ struct PageSearchStatus {
+     /* Current block being searched */
+@@ -727,7 +732,6 @@ static void migration_bitmap_sync(RAMState *rs)
+         rs->time_last_bitmap_sync = end_time;
+         rs->num_dirty_pages_period = 0;
      }
- 
-     pss.block = rs->last_seen_block;
--    pss.offset = rs->last_offset;
-+    pss.offset = rs->last_page << TARGET_PAGE_BITS;
-     pss.complete_round = false;
- 
-     if (!pss.block) {
-@@ -1424,7 +1424,7 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
-     } while (!pages && again);
- 
-     rs->last_seen_block = pss.block;
--    rs->last_offset = pss.offset;
-+    rs->last_page = pss.offset >> TARGET_PAGE_BITS;
- 
-     return pages;
- }
-@@ -1499,7 +1499,7 @@ static void ram_state_reset(RAMState *rs)
- {
-     rs->last_seen_block = NULL;
-     rs->last_sent_block = NULL;
--    rs->last_offset = 0;
-+    rs->last_page = 0;
-     rs->last_version = ram_list.version;
-     rs->ram_bulk_stage = true;
- }
-@@ -1844,7 +1844,7 @@ static int postcopy_chunk_hostpages(MigrationState *ms)
-     /* Easiest way to make sure we don't resume in the middle of a host-page */
-     rs->last_seen_block = NULL;
-     rs->last_sent_block = NULL;
--    rs->last_offset     = 0;
-+    rs->last_page = 0;
- 
-     QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-         unsigned long first = block->offset >> TARGET_PAGE_BITS;
+-    s->dirty_sync_count = rs->bitmap_sync_count;
+     if (migrate_use_events()) {
+         qapi_event_send_migration_pass(rs->bitmap_sync_count, NULL);
+     }
 -- 
 2.9.3
