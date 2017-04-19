@@ -1,20 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52951)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d0scj-0002h9-Vt
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 12:38:35 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d0siy-0005KV-4a
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 12:45:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d0scg-0004rD-Pw
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 12:38:34 -0400
-References: <20170419091757.15507-1-famz@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1d0siv-0007tD-3Q
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 12:45:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43308)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d0siu-0007sg-TE
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 12:44:57 -0400
+References: <20170412095111.11728-1-xiaoguangrong@tencent.com>
+	<cdce9f8e-ec58-d210-3be2-932359e0dcf7@redhat.com>
+	<d684319d-afb7-62ea-8486-80c1bee23744@gmail.com>
+	<d59e2de5-959d-0b94-6030-264b2310c9e1@gmail.com>
+	<D1BD20B5DB34024DA951CEEE6C4C5998ADA414FF@DGGEMA501-MBX.china.huawei.com>
+	<418f9ca3-09a9-e40c-e15b-9498036f0b12@gmail.com>
+	<58EF4512.1060004@huawei.com>
+	<e596b57f-6f75-f872-1ac7-e83e8b3339bd@gmail.com>
+	<58EF4732.3050006@huawei.com>
+	<402d04f4-2baf-6bd0-57d6-fc5890ea603a@gmail.com>
+	<58F73EE7.1030607@huawei.com>
+	<49848876-f710-8395-3029-47b8e71dc29f@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a3c28451-19fc-fee6-f28f-8679abf4be05@redhat.com>
-Date: Wed, 19 Apr 2017 18:38:14 +0200
+Message-ID: <a42dcfc6-a2c0-407a-4246-cd9da095220c@redhat.com>
+Date: Wed, 19 Apr 2017 18:44:50 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170419091757.15507-1-famz@redhat.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <49848876-f710-8395-3029-47b8e71dc29f@gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] iotests: 109: Filter out "len" of
- failed jobs
+Subject: Re: [Qemu-devel]
+ =?utf-8?b?562U5aSNOiBbUEFUQ0ggMC81XSBtYzE0NjgxOHJ0?=
+ =?utf-8?q?c=3A_fix_Windows_VM_clock_faster?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,155 +39,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Xiao Guangrong <guangrong.xiao@gmail.com>, Hailiang Zhang <zhang.zhanghailiang@huawei.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "mst@redhat.com" <mst@redhat.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>
+Cc: xuquan8@huawei.com, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "yunfangtai@tencent.com" <yunfangtai@tencent.com>, Xiao Guangrong <xiaoguangrong@tencent.com>
 
 
 
-On 19/04/2017 11:17, Fam Zheng wrote:
-> Mirror calculates job len from current I/O progress:
+On 19/04/2017 13:13, Xiao Guangrong wrote:
 > 
->     s->common.len = s->common.offset +
->                     (cnt + s->sectors_in_flight) * BDRV_SECTOR_SIZE;
 > 
-> The final "len" of a failed mirror job in iotests 109 depends on the
-> subtle timing of the completion of read and write issued in the first
-> mirror iteration.  The second iteration may or may not have run when the
-> I/O error happens, resulting in non-deterministic output of the
-> BLOCK_JOB_COMPLETED event text.
+> On 04/19/2017 06:41 PM, Hailiang Zhang wrote:
 > 
-> Similar to what was done in a752e4786, filter out the field to make the
-> test robust.
+>>> Hi Hailiang,
+>>>
+>>> Does this patchset work for you? :)
+>>
+>> Yes, i think it works for us, nice work :)
+> 
+> Appreciate your test, Hailiang!
+> 
+> Paolo, any comment? :)
 
-There are more occurrences:
-
---- /home/pbonzini/work/upstream/qemu/tests/qemu-iotests/109.out	2017-04-19 16:29:31.821480839 +0200
-+++ 109.out.bad	2017-04-19 18:26:54.537515323 +0200
-@@ -135,7 +135,7 @@
- Specify the 'raw' format explicitly to remove the restrictions.
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 65536, "offset": OFFSET, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 2560, "offset": OFFSET, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
- {"return": []}
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-@@ -195,7 +195,7 @@
- Specify the 'raw' format explicitly to remove the restrictions.
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 65536, "offset": OFFSET, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 2048, "offset": OFFSET, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
- {"return": []}
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-
-Thanks,
+Will review as soon as 2.9 gets out. :)
 
 Paolo
-
-> Tested-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> 
-> ---
-> 
-> v2: Add Eric's r-b.
->     Don't add '\' after '|'.
->     Add '/g/'
-> ---
->  tests/qemu-iotests/109           |  3 ++-
->  tests/qemu-iotests/109.out       | 12 ++++++------
->  tests/qemu-iotests/common.filter |  6 ++++++
->  3 files changed, 14 insertions(+), 7 deletions(-)
-> 
-> diff --git a/tests/qemu-iotests/109 b/tests/qemu-iotests/109
-> index 927151a..ce34c19 100755
-> --- a/tests/qemu-iotests/109
-> +++ b/tests/qemu-iotests/109
-> @@ -80,7 +80,8 @@ for fmt in qcow qcow2 qed vdi vmdk vpc; do
->  
->      # This first test should fail: The image format was probed, we may not
->      # write an image header at the start of the image
-> -    run_qemu "$TEST_IMG" "$TEST_IMG.src" "" "BLOCK_JOB_ERROR"
-> +    run_qemu "$TEST_IMG" "$TEST_IMG.src" "" "BLOCK_JOB_ERROR" |
-> +        _filter_block_job_len
->      $QEMU_IO -c 'read -P 0 0 64k' "$TEST_IMG" | _filter_qemu_io
->  
->  
-> diff --git a/tests/qemu-iotests/109.out b/tests/qemu-iotests/109.out
-> index 55fe536..6454b7e 100644
-> --- a/tests/qemu-iotests/109.out
-> +++ b/tests/qemu-iotests/109.out
-> @@ -10,7 +10,7 @@ Automatically detecting the format is dangerous for raw images, write operations
->  Specify the 'raw' format explicitly to remove the restrictions.
->  {"return": {}}
->  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 65536, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
->  {"return": []}
->  read 65536/65536 bytes at offset 0
->  64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> @@ -31,7 +31,7 @@ Automatically detecting the format is dangerous for raw images, write operations
->  Specify the 'raw' format explicitly to remove the restrictions.
->  {"return": {}}
->  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 197120, "offset": 512, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 512, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
->  {"return": []}
->  read 65536/65536 bytes at offset 0
->  64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> @@ -52,7 +52,7 @@ Automatically detecting the format is dangerous for raw images, write operations
->  Specify the 'raw' format explicitly to remove the restrictions.
->  {"return": {}}
->  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 327680, "offset": 262144, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 262144, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
->  {"return": []}
->  read 65536/65536 bytes at offset 0
->  64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> @@ -73,7 +73,7 @@ Automatically detecting the format is dangerous for raw images, write operations
->  Specify the 'raw' format explicitly to remove the restrictions.
->  {"return": {}}
->  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 65536, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
->  {"return": []}
->  read 65536/65536 bytes at offset 0
->  64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> @@ -94,7 +94,7 @@ Automatically detecting the format is dangerous for raw images, write operations
->  Specify the 'raw' format explicitly to remove the restrictions.
->  {"return": {}}
->  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 65536, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
->  {"return": []}
->  read 65536/65536 bytes at offset 0
->  64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> @@ -115,7 +115,7 @@ Automatically detecting the format is dangerous for raw images, write operations
->  Specify the 'raw' format explicitly to remove the restrictions.
->  {"return": {}}
->  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 65536, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
->  {"return": []}
->  read 65536/65536 bytes at offset 0
->  64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
-> index 1040013..5b2cb24 100644
-> --- a/tests/qemu-iotests/common.filter
-> +++ b/tests/qemu-iotests/common.filter
-> @@ -92,6 +92,12 @@ _filter_block_job_offset()
->      sed -e 's/, "offset": [0-9]\+,/, "offset": OFFSET,/'
->  }
->  
-> +# replace block job len
-> +_filter_block_job_len()
-> +{
-> +    sed -e 's/, "len": [0-9]\+,/, "len": LEN,/g'
-> +}
-> +
->  # replace driver-specific options in the "Formatting..." line
->  _filter_img_create()
->  {
-> 
