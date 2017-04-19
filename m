@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44103)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0sHM-0007Sm-Nb
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 12:16:29 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d0sRl-0001AM-Hz
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 12:27:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0sHI-0001YN-Mx
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 12:16:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42286)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d0sHI-0001XP-Dj
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 12:16:24 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6221D80F97
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 16:16:23 +0000 (UTC)
-References: <20170419144219.20371-1-pbonzini@redhat.com>
-	<20170419144219.20371-2-pbonzini@redhat.com>
-	<25c60922-5cb3-99c4-dd60-05bf1b6faca4@redhat.com>
-	<83bc60d2-c20f-1023-5337-b39b50a7fd6e@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3e9385cd-311c-82a9-a123-d5ed2130c559@redhat.com>
-Date: Wed, 19 Apr 2017 11:16:22 -0500
+	(envelope-from <stefanha@gmail.com>) id 1d0sRh-00086H-Jt
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 12:27:13 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35006)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d0sRh-00085Z-Cz
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 12:27:09 -0400
+Received: by mail-wm0-x242.google.com with SMTP id d79so5876914wmi.2
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 09:27:09 -0700 (PDT)
+Date: Wed, 19 Apr 2017 17:27:05 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170419162705.GG3343@stefanha-x1.localdomain>
+References: <1491277689-24949-1-git-send-email-Ashish.Mittal@veritas.com>
+	<1491277689-24949-2-git-send-email-Ashish.Mittal@veritas.com>
 MIME-Version: 1.0
-In-Reply-To: <83bc60d2-c20f-1023-5337-b39b50a7fd6e@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="uCqqivwHdCSRfFQFR3lqGWNP8feFxdLAs"
-Subject: Re: [Qemu-devel] [PATCH 01/11] blockjob: remove unnecessary check
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="JkW1gnuWHDypiMFO"
+Content-Disposition: inline
+In-Reply-To: <1491277689-24949-2-git-send-email-Ashish.Mittal@veritas.com>
+Subject: Re: [Qemu-devel] [PATCH v11 1/2] block/vxhs.c: Add support for a
+ new block device type called "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,71 +31,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Ashish Mittal <ashmit602@gmail.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, berrange@redhat.com, jcody@redhat.com, famz@redhat.com, ashish.mittal@veritas.com, Ketan.Nilangekar@veritas.com, jferlan@redhat.com, Buddhi.Madhav@veritas.com, Suraj.Singh@veritas.com, Nitin.Jerath@veritas.com, peter.maydell@linaro.org, venkatesha.mg@veritas.com, Rakesh.Ranjan@veritas.com, eblake@redhat.com, Abhijit.Dey@veritas.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---uCqqivwHdCSRfFQFR3lqGWNP8feFxdLAs
-From: Eric Blake <eblake@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <3e9385cd-311c-82a9-a123-d5ed2130c559@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 01/11] blockjob: remove unnecessary check
-References: <20170419144219.20371-1-pbonzini@redhat.com>
- <20170419144219.20371-2-pbonzini@redhat.com>
- <25c60922-5cb3-99c4-dd60-05bf1b6faca4@redhat.com>
- <83bc60d2-c20f-1023-5337-b39b50a7fd6e@redhat.com>
-In-Reply-To: <83bc60d2-c20f-1023-5337-b39b50a7fd6e@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--JkW1gnuWHDypiMFO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 04/19/2017 11:12 AM, Paolo Bonzini wrote:
+On Mon, Apr 03, 2017 at 08:48:08PM -0700, Ashish Mittal wrote:
+> Source code for the qnio library that this code loads can be downloaded f=
+rom:
+> https://github.com/VeritasHyperScale/libqnio.git
 >=20
+> Sample command line using JSON syntax:
+> ./x86_64-softmmu/qemu-system-x86_64 -name instance-00000008 -S -vnc 0.0.0=
+=2E0:0
+> -k en-us -vga cirrus -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0=
+,addr=3D0x5
+> -msg timestamp=3Don
+> 'json:{"driver":"vxhs","vdisk-id":"c3e9095a-a5ee-4dce-afeb-2a59fb387410",
+> "server":{"host":"172.172.17.4","port":"9999"}}'
 >=20
-> On 19/04/2017 17:48, Eric Blake wrote:
->>>  bool block_job_user_paused(BlockJob *job)
->>>  {
->> Is it worth using some form of attribute((nonnull)) annotations on
->> various functions, to both state our intentions and let compilers help=
-
->> us catch obvious places where we are violating our intentions?  That's=
-
->> more of a generic question to all of qemu, and doesn't affect your
->> particular patch, other than your patch is an instance where the
->> annotation would be useful if we wanted to use them.
+> Sample command line using URI syntax:
+> qemu-img convert -f raw -O raw -n
+> /var/lib/nova/instances/_base/0c5eacd5ebea5ed914b6a3e7b18f1ce734c386ad
+> vxhs://192.168.0.1:9999/c6718f6b-0401-441d-a8c3-1f0064d75ee0
 >=20
-> What kind of bug would the compiler catch?  I suppose Coverity would
-> catch all of them, and maybe -flto would as well.
+> Sample command line using TLS credentials (run in secure mode):
+> ./qemu-io --object
+> tls-creds-x509,id=3Dtls0,dir=3D/etc/pki/qemu/vxhs,endpoint=3Dclient -c 'r=
+ead
+> -v 66000 2.5k' 'json:{"server.host": "127.0.0.1", "server.port": "9999",
+> "vdisk-id": "/test.raw", "driver": "vxhs", "tls-creds":"tls0"}'
+>=20
+> Signed-off-by: Ashish Mittal <Ashish.Mittal@veritas.com>
+> ---
+> v11 changelog:
+> (1) Replaced InetSocketAddress with InetSocketAddressBase.
+> (2) Removed access to qemu_uuid.
+> (3) Removed unnecessary g_strdup()/g_free().
+> (4) Removed unused acb->qiov.
+> (5) Changed vxhs_init_and_ref() and vxhs_unref() per suggestion.
+> (6) Removed unnecessary initializations from local variables.
 
-Newer gcc is (finally) getting smarts about warning about passing a
-known-NULL value to a function parameter marked nonnull; I think Clang
-has been doing it for a while.  Coverity definitely flags mismatches
-like that.  Other bugs that can be caught include checking a parameter
-for NULL after it has already been declared to be non-null.  And if
-nothing else, the documentation factor makes it easier for developers to
-remember contracts of various functions.
+QEMU code:
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
+libvxhs is not robust yet.  Here are two examples:
 
---uCqqivwHdCSRfFQFR3lqGWNP8feFxdLAs
+1. If the response from the server has an invalid magic number then the
+   whole VM is aborted:
+
+   QNIO_API_(void) kvset_unmarshal(qnio_byte_t * bs, kvset_t * *p)
+   {
+       ...
+       assert(magic =3D=3D kvset_magic);
+
+2. There are buffer overflows and other memory corruptions.  For example
+   when kv_binary_unpack() gets size=3D-1 over the wire.
+
+The code needs to be audited line-by-line by someone aware of secure
+coding practices.  Please look into this.
+
+Also, is there a plan for getting libvxhs into Fedora and Debian?
+
+--JkW1gnuWHDypiMFO
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJY941WAAoJEKeha0olJ0NqnmgIAKxye6GYaL6iv8EFwKcPMrJe
-6bN619nFDfpPWBKRX2BqEDRAVmk2m0KcYZdjEBRDfi3X47joqbqazlw/ayuXbsos
-TtI2aQLExeip82Ey4ZFKfgw8uFw8YuYyeBt1lwdc07ySFEppv5owlf/O4yEaAHmB
-5G8cO69B1AIq+lBuNGtoqDK219nn9iZeV+S/4EyNz//YGMCBHY0iyhrZ3DWJqXAE
-79REhLvvIsS+Al//XPAsFYAIWHtEJD2Jly9JHyq88+XXzTa8goAw1e12tNLUZ0mT
-NMxQQpMixvFUNKoS01yBLTzkvIcJgcrSWv0Yn14C9tGWzaH6PzcUTdQhHjQ0Jjs=
-=pHvq
+iQEcBAEBAgAGBQJY94/ZAAoJEJykq7OBq3PIMycIALgzJkOcSVfloQ5W+XgPfwgZ
+9fkXRy7w6tzWbKG+Jz7H5bgzWImXY17IDrRG+MEHiGb1+p1/N+RxcD2DtBpsozee
+3SLB7oPhcOMd046YakrjoeJi9Bcj/iD+nvWomhAX6mtzhCIytiRgZdo2bYPgROfE
+PA8zdkAAzFrvw+uFNXRJOisYYRi2hU3Vf96V5PrLiwss1KewEoK6zNzbxYwfWDn0
+tPQfFwl5g4n9d1pHAQYoXWrLDFNqrGRSDAicEbSFP54KXz5sj6wwY1uCiHSTP/bm
+4LYApQoANDYwl8x9sIBv+mChu16k1p9fnFKVCpuabS/W/CDlYf7RyuiZytI5P9w=
+=vnf7
 -----END PGP SIGNATURE-----
 
---uCqqivwHdCSRfFQFR3lqGWNP8feFxdLAs--
+--JkW1gnuWHDypiMFO--
