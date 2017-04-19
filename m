@@ -1,20 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vfeenstr@redhat.com>) id 1d0nER-0002WW-92
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 06:53:11 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1d0nY5-0006R9-G0
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 07:13:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vfeenstr@redhat.com>) id 1d0nEN-00027T-Nw
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 06:53:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51946)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vfeenstr@redhat.com>) id 1d0nEN-00026z-F0
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 06:53:03 -0400
-From: Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>
-Date: Wed, 19 Apr 2017 12:52:58 +0200
-Message-Id: <20170419105258.4488-2-vfeenstr@redhat.com>
-In-Reply-To: <20170419105258.4488-1-vfeenstr@redhat.com>
-References: <20170419105258.4488-1-vfeenstr@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 1/1] qga: Add `guest-get-timezone` command
+	(envelope-from <guangrong.xiao@gmail.com>) id 1d0nY2-00034v-7l
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 07:13:25 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:33479)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1d0nY2-00034h-20
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 07:13:22 -0400
+Received: by mail-pf0-x244.google.com with SMTP id c198so3256033pfc.0
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 04:13:22 -0700 (PDT)
+References: <20170412095111.11728-1-xiaoguangrong@tencent.com>
+	<cdce9f8e-ec58-d210-3be2-932359e0dcf7@redhat.com>
+	<d684319d-afb7-62ea-8486-80c1bee23744@gmail.com>
+	<d59e2de5-959d-0b94-6030-264b2310c9e1@gmail.com>
+	<D1BD20B5DB34024DA951CEEE6C4C5998ADA414FF@DGGEMA501-MBX.china.huawei.com>
+	<418f9ca3-09a9-e40c-e15b-9498036f0b12@gmail.com>
+	<58EF4512.1060004@huawei.com>
+	<e596b57f-6f75-f872-1ac7-e83e8b3339bd@gmail.com>
+	<58EF4732.3050006@huawei.com>
+	<402d04f4-2baf-6bd0-57d6-fc5890ea603a@gmail.com>
+	<58F73EE7.1030607@huawei.com>
+From: Xiao Guangrong <guangrong.xiao@gmail.com>
+Message-ID: <49848876-f710-8395-3029-47b8e71dc29f@gmail.com>
+Date: Wed, 19 Apr 2017 19:13:19 +0800
+MIME-Version: 1.0
+In-Reply-To: <58F73EE7.1030607@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel]
+ =?utf-8?b?562U5aSNOiBbUEFUQ0ggMC81XSBtYzE0NjgxOHJ0?=
+ =?utf-8?q?c=3A_fix_Windows_VM_clock_faster?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,103 +41,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: marcandre.lureau@gmail.com, sameeh@daynix.com, mdroth@linux.vnet.ibm.com, Vinzenz Feenstra <vfeenstr@redhat.com>
+To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>
+Cc: xuquan8@huawei.com, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "yunfangtai@tencent.com" <yunfangtai@tencent.com>, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-From: Vinzenz Feenstra <vfeenstr@redhat.com>
 
-Adds a new command `guest-get-timezone` reporting the currently
-configured timezone on the system. The information on what timezone is
-currently is configured is useful in case of Windows VMs where the
-offset of the hardware clock is required to have the same offset. This
-can be used for management systems like `oVirt` to detect the timezone
-difference and warn administrators of the misconfiguration.
 
-Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
----
- qga/commands.c       | 38 ++++++++++++++++++++++++++++++++++++++
- qga/qapi-schema.json | 26 ++++++++++++++++++++++++++
- 2 files changed, 64 insertions(+)
+On 04/19/2017 06:41 PM, Hailiang Zhang wrote:
 
-diff --git a/qga/commands.c b/qga/commands.c
-index 4d92946..999538d 100644
---- a/qga/commands.c
-+++ b/qga/commands.c
-@@ -499,3 +499,41 @@ int ga_parse_whence(GuestFileWhence *whence, Error **errp)
-     error_setg(errp, "invalid whence code %"PRId64, whence->u.value);
-     return -1;
- }
-+
-+GuestTimezone *qmp_guest_get_timezone(Error **errp)
-+{
-+#if !GLIB_CHECK_VERSION(2, 28, 0)
-+    error_setg(errp, QERR_UNSUPPORTED);
-+    return NULL;
-+#else
-+    GuestTimezone *info = NULL;
-+    GTimeZone *tz = NULL;
-+    gint64 now = 0;
-+    gint32 intv = 0;
-+    gchar const *name = NULL;
-+
-+    info = g_new0(GuestTimezone, 1);
-+    tz = g_time_zone_new_local();
-+    if (tz == NULL) {
-+        error_setg(errp, QERR_QGA_COMMAND_FAILED,
-+                   "Couldn't retrieve local timezone");
-+        goto error;
-+    }
-+
-+    now = g_get_real_time() / G_USEC_PER_SEC;
-+    intv = g_time_zone_find_interval(tz, G_TIME_TYPE_UNIVERSAL, now);
-+    info->offset = g_time_zone_get_offset(tz, intv);
-+    name = g_time_zone_get_abbreviation(tz, intv);
-+    if (name != NULL) {
-+        info->has_zone = true;
-+        info->zone = g_strdup(name);
-+    }
-+    g_time_zone_unref(tz);
-+
-+    return info;
-+
-+error:
-+    g_free(info);
-+    return NULL;
-+#endif
-+}
-diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-index a02dbf2..5183ea2 100644
---- a/qga/qapi-schema.json
-+++ b/qga/qapi-schema.json
-@@ -1042,3 +1042,29 @@
-   'data':    { 'path': 'str', '*arg': ['str'], '*env': ['str'],
-                '*input-data': 'str', '*capture-output': 'bool' },
-   'returns': 'GuestExec' }
-+
-+
-+##
-+# @GuestTimezone:
-+#
-+# @zone:    Timezone name
-+# @offset:  Offset to UTC in seconds, negative numbers for time zones west of
-+#           GMT, positive numbers for east
-+#
-+# Since: 2.10
-+##
-+{ 'struct': 'GuestTimezone',
-+  'data':   { '*zone': 'str', 'offset': 'int' } }
-+
-+
-+##
-+# @guest-get-timezone:
-+#
-+# Retrieves the timezone information from the guest.
-+#
-+# Returns: A GuestTimezone dictionary.
-+#
-+# Since: 2.10
-+##
-+{ 'command': 'guest-get-timezone',
-+  'returns': 'GuestTimezone' }
--- 
-2.9.3
+>> Hi Hailiang,
+>>
+>> Does this patchset work for you? :)
+>
+> Yes, i think it works for us, nice work :)
+
+Appreciate your test, Hailiang!
+
+Paolo, any comment? :)
