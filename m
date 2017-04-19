@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1d0k8f-0006CN-Cr
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 03:34:58 -0400
+	(envelope-from <jan.kiszka@siemens.com>) id 1d0k9E-0006ZU-DO
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 03:35:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1d0k8c-00060w-A7
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 03:34:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36842)
+	(envelope-from <jan.kiszka@siemens.com>) id 1d0k9B-0006Bs-97
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 03:35:32 -0400
+Received: from david.siemens.de ([192.35.17.14]:55373)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1d0k8c-00060f-01
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 03:34:54 -0400
-References: <20170414174056.28946-1-maxime.coquelin@redhat.com>
-	<20170414174056.28946-5-maxime.coquelin@redhat.com>
-	<20170417035027.GB16703@pxdev.xzpeter.org>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <615dc39c-6db5-2062-d053-1324c1d1dcce@redhat.com>
-Date: Wed, 19 Apr 2017 09:34:45 +0200
+	(Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
+	id 1d0k9A-0006BB-VL
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 03:35:29 -0400
+References: <286AC319A985734F985F78AFA26841F7391EF490@shsmsx102.ccr.corp.intel.com>
+From: Jan Kiszka <jan.kiszka@siemens.com>
+Message-ID: <9ce5d497-c52a-23fc-a43d-ac7c895faedb@siemens.com>
+Date: Wed, 19 Apr 2017 09:35:16 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170417035027.GB16703@pxdev.xzpeter.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 4/4] spec/vhost-user spec: Add IOMMU
- support
+In-Reply-To: <286AC319A985734F985F78AFA26841F7391EF490@shsmsx102.ccr.corp.intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Vhost-pci RFC2.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,91 +27,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: mst@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org
+To: "Wang, Wei W" <wei.w.wang@intel.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>
+Cc: Jailhouse <jailhouse-dev@googlegroups.com>
 
+On 2017-04-19 08:38, Wang, Wei W wrote:
+> Hi,
+> =20
+> We made some design changes to the original vhost-pci design, and want
+> to open
+> a discussion about the latest design (labelled 2.0) and its extension (=
+2.1).
+> 2.0 design: One VM shares the entire memory of another VM
+> 2.1 design: One VM uses an intermediate memory shared with another VM f=
+or
+>                      packet transmission.
+> =20
+> For the convenience of discussion, I have some pictures presented at
+> this link:
+> _https://github.com/wei-w-wang/vhost-pci-discussion/blob/master/vhost-p=
+ci-rfc2.0.pdf_
+> =20
+> Fig. 1 shows the common driver frame that we want use to build the 2.0
+> and 2.1
+> design. A TX/RX engine consists of a local ring and an exotic ring.
+> Local ring:
+> 1) allocated by the driver itself;
+> 2) registered with the device (i.e. virtio_add_queue())
+> Exotic ring:
+> 1) ring memory comes from the outside (of the driver), and exposed to
+> the driver
+>      via a BAR MMIO;
 
+Small additional requirement: In order to make this usable with
+Jailhouse as well, we need [also] a side-channel configuration for the
+regions, i.e. likely via a PCI capability. There are too few BARs, and
+they suggest relocatablity, which is not available under Jailhouse for
+simplicity reasons (IOW, the shared regions are statically mapped by the
+hypervisor into the affected guest address spaces).
 
-On 04/17/2017 05:50 AM, Peter Xu wrote:
-> On Fri, Apr 14, 2017 at 07:40:56PM +0200, Maxime Coquelin wrote:
-> 
-> [...]
-> 
->> +IOMMU support
->> +-------------
->> +
->> +When the VIRTIO_F_IOMMU_PLATFORM feature has been negotiated, the master has
->> +to send IOTLB entries update & invalidation by sending VHOST_USER_IOTLB_MSG
->> +requests to the slave with a struct vhost_iotlb_msg payload. For update events,
->> +the iotlb payload has to be filled with the update message type (2), the I/O
->> +virtual address, the size, the user virtual address, and the permissions
->> +flags. For invalidation events, the iotlb payload has to be filled with the
->> +update message type (3), the I/O virtual address and the size. On success, the
-> 
-> s/update/invalidate/ again?
+> 2) does not have a registration in the device, so no ioeventfd/irqfd,
+> configuration
+> registers allocated in the device
+> =20
+> Fig. 2 shows how the driver frame is used to build the 2.0 design.
+> 1) Asymmetric: vhost-pci-net <-> virtio-net
+> 2) VM1 shares the entire memory of VM2, and the exotic rings are the ri=
+ngs
+>     from VM2.
+> 3) Performance (in terms of copies between VMs):
+>     TX: 0-copy (packets are put to VM2=92s RX ring directly)
+>     RX: 1-copy (the green arrow line in the VM1=92s RX engine)
+> =20
+> Fig. 3 shows how the driver frame is used to build the 2.1 design.
+> 1) Symmetric: vhost-pci-net <-> vhost-pci-net
 
-Oh, sorry, I missed to fix it last time.
+This is interesting!
 
->> +slave is expected to reply with a zero payload, non-zero otherwise.
->> +
->> +When the VHOST_USER_PROTOCOL_F_SLAVE_REQ is supported by the slave, and the
->> +master initiated the slave to master communication channel using the
->> +VHOST_USER_SET_SLAVE_REQ_FD request, the slave can send IOTLB miss and access
->> +failure events by sending VHOST_USER_SLAVE_IOTLB_MSG requests to the master
->> +with a struct vhost_iotlb_msg payload. For miss events, the iotlb payload has
->> +to be filled with the miss message type (1), the I/O virtual address and the
->> +permissions flags. For access failure event, the iotlb payload has to be
->> +filled with the access failure message type (4), the I/O virtual address and
->> +the permissions flags. For synchronization purpose, the slave may rely on the
->> +reply-ack feature, so the master may send a reply when operation is completed
->> +if the reply-ack feature is negotiated and slaves requests a reply.
->> +
->>   Slave communication
->>   -------------------
->>   
->> @@ -512,6 +554,38 @@ Master message types
->>         has been negotiated, and protocol feature bit VHOST_USER_PROTOCOL_F_SLAVE_REQ
->>         bit is present in VHOST_USER_GET_PROTOCOL_FEATURES.
->>   
->> + * VHOST_USER_IOTLB_MSG
->> +
->> +      Id: 22
->> +      Equivalent ioctl: N/A (equivalent to VHOST_IOTLB_MSG message type)
->> +      Master payload: struct vhost_iotlb_msg
->> +      Slave payload: u64
->> +
->> +      Send IOTLB messages with struct vhost_iotlb_msg as payload.
->> +      Master sends such requests to update and invalidate entries in the device
->> +      IOTLB. The slave has to acknowledge the request with sending zero as u64
->> +      payload for success, non-zero otherwise.
->> +      This request should be send only when VIRTIO_F_IOMMU_PLATFORM feature
->> +      has been successfully negotiated.
->> +
->> +Slave message types
->> +-------------------
->> +
->> + * VHOST_USER_SLAVE_IOTLB_MSG
->> +
->> +      Id: 1
->> +      Equivalent ioctl: N/A (equivalent to VHOST_IOTLB_MSG message type)
->> +      Slave payload: struct vhost_iotlb_msg
->> +      Master payload: N/A
-> 
-> Master payload should be u64 due to REPLY_ACK?
+> 2) Share an intermediate memory, allocated by VM1=92s vhost-pci device,
+> for data exchange, and the exotic rings are built on the shared memory
+> 3) Performance:
+>     TX: 1-copy
+> RX: 1-copy
 
-Not sure it should be specified, as this is an optional reply in this
-case. Or it should be "u64 if REPLY_ACK".
+I'm not yet sure I to this right: there are two different MMIO regions
+involved, right? One is used for VM1's RX / VM2's TX, and the other for
+the reverse path? Would allow our requirement to have those regions
+mapped with asymmetric permissions (RX read-only, TX read/write).
 
-> A comment regarding to this whole patch - I see that there will be
-> lots of things in common between vhost-kernel and vhost-user iotlb
-> support at least in this patch. Would it be nice that we consider to
-> leverage shared codes with vhost-kernel? I see the most difference is
-> the channel (one using vhost fd, one using socket pair), but the
-> protocol and logic should merely the same after all. Not sure whether
-> we can just abstract the channel handling out of the logic (e.g., on
-> how to read/write to the channel, and how to deal with reply_ack).
+> =20
+> Fig. 4 shows the inter-VM notification path for 2.0 (2.1 is similar).
+> The four eventfds are allocated by virtio-net, and shared with
+> vhost-pci-net:
+> Uses virtio-net=92s TX/RX kickfd as the vhost-pci-net=92s RX/TX callfd
+> Uses virtio-net=92s TX/RX callfd as the vhost-pci-net=92s RX/TX kickfd
+> Example of how it works:
+> After packets are put into vhost-pci-net=92s TX, the driver kicks TX, w=
+hich
+> causes the an interrupt associated with fd3 to be injected to virtio-ne=
+t
+> =20
+> The draft code of the 2.0 design is ready, and can be found here:
+> Qemu: _https://github.com/wei-w-wang/vhost-pci-device_
+> Guest driver: _https://github.com/wei-w-wang/vhost-pci-driver_
+> =20
+> We tested the 2.0 implementation using the Spirent packet
+> generator to transmit 64B packets, the results show that the
+> throughput of vhost-pci reaches around 1.8Mpps, which is around
+> two times larger than the legacy OVS+DPDK. Also, vhost-pci shows
+> better scalability than OVS+DPDK.
+> =20
 
-Right, I think we can go further in sharing code between backends.
+Do you have numbers for the symmetric 2.1 case as well? Or is the driver
+not yet ready for that yet? Otherwise, I could try to make it work over
+a simplistic vhost-pci 2.1 version in Jailhouse as well. That would give
+a better picture of how much additional complexity this would mean
+compared to our ivshmem 2.0.
 
-Thanks for the review,
-Maxime
+Jan
+
+--=20
+Siemens AG, Corporate Technology, CT RDA ITP SES-DE
+Corporate Competence Center Embedded Linux
