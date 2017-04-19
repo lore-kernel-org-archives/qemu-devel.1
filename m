@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1d0tc4-0008CD-7d
+	(envelope-from <alindsay@codeaurora.org>) id 1d0tc4-0008Cr-Sg
 	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 13:41:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1d0tc2-0004Nd-TV
+	(envelope-from <alindsay@codeaurora.org>) id 1d0tc3-0004OS-ME
 	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 13:41:56 -0400
 From: Aaron Lindsay <alindsay@codeaurora.org>
-Date: Wed, 19 Apr 2017 13:41:14 -0400
-Message-Id: <1492623684-25799-4-git-send-email-alindsay@codeaurora.org>
+Date: Wed, 19 Apr 2017 13:41:16 -0400
+Message-Id: <1492623684-25799-6-git-send-email-alindsay@codeaurora.org>
 In-Reply-To: <1492623684-25799-1-git-send-email-alindsay@codeaurora.org>
 References: <1492623684-25799-1-git-send-email-alindsay@codeaurora.org>
-Subject: [Qemu-devel] [PATCH 03/13] target/arm: Reorganize PMCCNTR read,
- write, sync
+Subject: [Qemu-devel] [PATCH 05/13] target/arm: Allow AArch32 access for
+ PMCCFILTR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,98 +23,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
 Cc: qemu-devel@nongnu.org, mspradli@codeaurora.org, Aaron Lindsay <alindsay@codeaurora.org>
 
-pmccntr_read and pmccntr_write contained duplicate code that was already
-being handled by pmccntr_sync. This also moves the calls to get the
-clock inside the 'if' statement so they are not executed if not needed.
+Also fix the existing bitmask for writes.
 
 Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
 ---
- target/arm/helper.c | 55 ++++++++++++++++-------------------------------------
- 1 file changed, 16 insertions(+), 39 deletions(-)
+ target/arm/helper.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 8888391..390256b 100644
+index e8189b8..530fc7c 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -973,17 +973,18 @@ static inline bool arm_ccnt_enabled(CPUARMState *env)
- 
- void pmccntr_sync(CPUARMState *env)
+@@ -1059,10 +1059,25 @@ static void pmccfiltr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                             uint64_t value)
  {
--    uint64_t temp_ticks;
-+    if (arm_ccnt_enabled(env) &&
-+          !pmu_counter_filtered(env, env->cp15.pmccfiltr_el0)) {
-+        uint64_t temp_ticks;
- 
--    temp_ticks = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
--                          ARM_CPU_FREQ, NANOSECONDS_PER_SECOND);
-+        temp_ticks = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
-+                              ARM_CPU_FREQ, NANOSECONDS_PER_SECOND);
- 
--    if (env->cp15.c9_pmcr & PMCRD) {
--        /* Increment once every 64 processor clock cycles */
--        temp_ticks /= 64;
--    }
-+        if (env->cp15.c9_pmcr & PMCRD) {
-+            /* Increment once every 64 processor clock cycles */
-+            temp_ticks /= 64;
-+        }
- 
--    if (arm_ccnt_enabled(env)) {
-         env->cp15.c15_ccnt = temp_ticks - env->cp15.c15_ccnt;
-     }
- }
-@@ -1007,21 +1008,11 @@ static void pmcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
- 
- static uint64_t pmccntr_read(CPUARMState *env, const ARMCPRegInfo *ri)
- {
--    uint64_t total_ticks;
--
--    if (!arm_ccnt_enabled(env)) {
--        /* Counter is disabled, do not change value */
--        return env->cp15.c15_ccnt;
--    }
--
--    total_ticks = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
--                           ARM_CPU_FREQ, NANOSECONDS_PER_SECOND);
--
--    if (env->cp15.c9_pmcr & PMCRD) {
--        /* Increment once every 64 processor clock cycles */
--        total_ticks /= 64;
--    }
--    return total_ticks - env->cp15.c15_ccnt;
-+    uint64_t ret;
-+    pmccntr_sync(env);
-+    ret = env->cp15.c15_ccnt;
-+    pmccntr_sync(env);
-+    return ret;
+     pmccntr_sync(env);
+-    env->cp15.pmccfiltr_el0 = value & 0x7E000000;
++    env->cp15.pmccfiltr_el0 = value & 0xfc000000;
+     pmccntr_sync(env);
  }
  
- static void pmselr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -1038,22 +1029,8 @@ static void pmselr_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void pmccntr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                         uint64_t value)
- {
--    uint64_t total_ticks;
--
--    if (!arm_ccnt_enabled(env)) {
--        /* Counter is disabled, set the absolute value */
--        env->cp15.c15_ccnt = value;
--        return;
--    }
--
--    total_ticks = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
--                           ARM_CPU_FREQ, NANOSECONDS_PER_SECOND);
--
--    if (env->cp15.c9_pmcr & PMCRD) {
--        /* Increment once every 64 processor clock cycles */
--        total_ticks /= 64;
--    }
--    env->cp15.c15_ccnt = total_ticks - value;
-+    env->cp15.c15_ccnt = value;
++static void pmccfiltr_write_a32(CPUARMState *env, const ARMCPRegInfo *ri,
++                            uint64_t value)
++{
 +    pmccntr_sync(env);
- }
- 
- static void pmccntr_write32(CPUARMState *env, const ARMCPRegInfo *ri,
++    env->cp15.pmccfiltr_el0 = (env->cp15.pmccfiltr_el0 & 0x04000000) |
++        (value & 0xf8000000); /* M is not visible in AArch32 */
++    pmccntr_sync(env);
++}
++
++static uint64_t pmccfiltr_read_a32(CPUARMState *env, const ARMCPRegInfo *ri)
++{
++    /* M is not visible in AArch32 */
++    return env->cp15.pmccfiltr_el0 & 0xf8000000;
++}
++
+ static void pmcntenset_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                             uint64_t value)
+ {
+@@ -1280,6 +1295,12 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
+       .type = ARM_CP_IO,
+       .readfn = pmccntr_read, .writefn = pmccntr_write, },
+ #endif
++    { .name = "PMCCFILTR", .cp = 15, .opc1 = 0, .crn = 14, .crm = 15, .opc2 = 7,
++      .writefn = pmccfiltr_write_a32, .readfn = pmccfiltr_read_a32,
++      .access = PL0_RW, .accessfn = pmreg_access,
++      .type = ARM_CP_ALIAS,
++      .fieldoffset = offsetoflow32(CPUARMState, cp15.pmccfiltr_el0),
++      .resetvalue = 0, },
+     { .name = "PMCCFILTR_EL0", .state = ARM_CP_STATE_AA64,
+       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 15, .opc2 = 7,
+       .writefn = pmccfiltr_write,
 -- 
 Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
 Qualcomm Technologies, Inc. is a member of the
