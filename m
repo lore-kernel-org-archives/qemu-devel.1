@@ -1,42 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1d0oMg-0003wb-Dx
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:05:43 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d0oUY-0005XM-Oa
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:13:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1d0oMa-0008PZ-PW
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:05:42 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41746
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1d0oMa-0008P4-KJ
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:05:36 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3JC3ZML059731
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 08:05:35 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29x77cs6jp-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 08:05:35 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Wed, 19 Apr 2017 13:05:31 +0100
-Date: Wed, 19 Apr 2017 14:05:22 +0200
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <20170419014207.GT25239@thinpad.lan.raisama.net>
-References: <20170418221724.5707-1-ehabkost@redhat.com>
-	<20170418221724.5707-4-ehabkost@redhat.com>
-	<20170419002926.GC23273@umbus.fritz.box>
-	<20170419014207.GT25239@thinpad.lan.raisama.net>
+	(envelope-from <mreitz@redhat.com>) id 1d0oUX-0005dk-M0
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:13:50 -0400
+References: <815765cfcea726c7a4cc619c4f6c3bedb47f16b9.1492537347.git.jcody@redhat.com>
+	<e649d1d3-6310-6607-22fe-82fc961d53c4@redhat.com>
+	<20170418193129.GJ5704@localhost.localdomain>
+	<c0a0816b-9ff9-a285-dbe1-c5b4f78e6ee4@redhat.com>
+	<20170418194223.GK5704@localhost.localdomain>
+	<20170419103635.GB14508@lemon.lan>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <63eb8549-dea7-ba35-021c-78697aa5f099@redhat.com>
+Date: Wed, 19 Apr 2017 14:13:35 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170419140522.391f0b50.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [RFC v2 3/6] pci: Rename and change signatures of
- pci_bus_new() & related functions
+In-Reply-To: <20170419103635.GB14508@lemon.lan>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="i1MBWBE2Uuk4MAHI0s1M6wcltvFjL2p4V"
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 1/1] qemu-iotests:
+ _cleanup_qemu must be called on exit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,47 +29,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, aik@ozlabs.ru, David Gibson <dgibson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Alexander Graf <agraf@suse.de>, Aurelien Jarno <aurelien@aurel32.net>, Christian Borntraeger <borntraeger@de.ibm.com>, =?UTF-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>, Paul Burton <paul.burton@imgtec.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>, Scott Wood <scottwood@freescale.com>, Yongbok Kim <yongbok.kim@imgtec.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
+To: Fam Zheng <famz@redhat.com>, Jeff Cody <jcody@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Tue, 18 Apr 2017 22:42:07 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--i1MBWBE2Uuk4MAHI0s1M6wcltvFjL2p4V
+From: Max Reitz <mreitz@redhat.com>
+To: Fam Zheng <famz@redhat.com>, Jeff Cody <jcody@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, kwolf@redhat.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
+Message-ID: <63eb8549-dea7-ba35-021c-78697aa5f099@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 1/1] qemu-iotests: _cleanup_qemu
+ must be called on exit
+References: <815765cfcea726c7a4cc619c4f6c3bedb47f16b9.1492537347.git.jcody@redhat.com>
+ <e649d1d3-6310-6607-22fe-82fc961d53c4@redhat.com>
+ <20170418193129.GJ5704@localhost.localdomain>
+ <c0a0816b-9ff9-a285-dbe1-c5b4f78e6ee4@redhat.com>
+ <20170418194223.GK5704@localhost.localdomain>
+ <20170419103635.GB14508@lemon.lan>
+In-Reply-To: <20170419103635.GB14508@lemon.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Wed, Apr 19, 2017 at 10:29:26AM +1000, David Gibson wrote:
-> > On Tue, Apr 18, 2017 at 07:17:21PM -0300, Eduardo Habkost wrote:
-> > > pci_bus_new*() and pci_register_bus() work only when the 'parent'
-> > > argument is a PCI_HOST_BRIDGE object. Rename them to reflect that they
-> > > are meant to initialize a bus that's in a PCI host bridge.
-> > > 
-> > > The new function names are:
-> > > * pci_host_bus_init() (replacing pci_bus_new())
-> > > * pci_host_bus_init_inplace() (replacing pci_bus_new_inplace())
-> > > * pci_host_bus_init_irqs() (replacing pci_register_bus())
-> > 
-> > I like the idea, but I'm not terribly convinced by these names.
-> > Aren't functions which allocate objects usually called whatever_new()
-> > rather than whatever_init()?  And pci_register_bus() appears to do
-> > more than just initialize irqs.
-> 
-> I agree the names aren't terribly clear. This is what they are
-> supposed to mean:
-> 
-> * pci_host_bus_init(phb) initializes phb->bus.
-> * pci_host_bus_init(phb) initializes phb->bus using an
->   already-allocated object.
-> * pci_host_bus_init_irqs() does the same as pci_host_bus_init(),
->   but also calls pci_bus_irqs().
-> 
-> I plan to submit API documentation comments later. I am open to
-> alternative name suggestions.
-> 
+On 19.04.2017 12:36, Fam Zheng wrote:
+> On Tue, 04/18 15:42, Jeff Cody wrote:
+>>> One idea presented in an earlier thread was that common.rc should cre=
+ate
+>>> a subdirectory per test (rather than all tests sharing scratch/), and=
 
-pci_host_bus_init_irqs() sounds as if it would only init irqs. What
-about:
+>>> then common.rc itself install the cleanup hook that wipes out the ent=
+ire
+>>> subdirectory (or maybe even add a command-line option to ./check to
+>>> suppress wiping when it is desirable to debug a test failure by seein=
+g
+>>> the droppings left behind).
+>>>
+>>
+>> Yep, good ideas.  I'll leave that for another series though; there are=
+ a few
+>> other changes based on some suggestions from Daniel that I'd like to
+>> implement as well, and I can fold your suggestions above into a new se=
+ries
+>> (unless someone else does it first).
+>=20
+> Sounds good, I was thinking about making ./check run tests in parallel.=
+ If each
+> test has its own tmpdir, it will be much easier.
 
-pci_host_bus_new()
-pci_host_bus_new_inplace()
-pci_host_bus_new_with_irqs()
+In case you were not yet aware: you can manually set TEST_DIR, this is
+what I do.
 
-(the last one might be a bit long, though, especially as it takes so
-many arguments already)
+(I have a script that basically does TEST_DIR=3D/tmp/test-$1 ./check -$1)=
+
+
+Max
+
+
+--i1MBWBE2Uuk4MAHI0s1M6wcltvFjL2p4V
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlj3VG8SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AdF4H/1WdrAjm8OuNdUaeXB0VxTwcjatU1IGc
+A980lgujDHZd8vAaJUkA3rjh+8KU1coVwqp3V8txsbV2HRGGxY1lAcb5gvxcL9P8
+gmAMqQD/UsueExh8OkcnRBSe6Yl4MFkieQ/7vzcEF/gxPMJyrnl9m+U8FWm/9t89
+OvBIsQqFfAOEydLFGjnkIgsJPPzvpGahSeCJDOj0tb/4hQmhuvbGpof185tjUC5b
+4nQdZ01SO/YBrhi8CXVvs6R94tuwwpZtdnzail0VTe7QmIhXUrl2p0HxkXTiK/V3
+I47hEpjjoULED+KLJvg5Sgu9yMNRlL5DGkQLx7uxVBULxcPWUZG2xuc=
+=svyG
+-----END PGP SIGNATURE-----
+
+--i1MBWBE2Uuk4MAHI0s1M6wcltvFjL2p4V--
