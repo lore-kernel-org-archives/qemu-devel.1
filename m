@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d0whV-0003d8-Nk
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 16:59:47 -0400
+	(envelope-from <quintela@redhat.com>) id 1d0wha-0003gN-Dk
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 16:59:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d0whP-0006qX-Nv
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 16:59:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39662)
+	(envelope-from <quintela@redhat.com>) id 1d0whZ-0006um-LI
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 16:59:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42538)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d0whP-0006qC-Hr
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 16:59:39 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d0whZ-0006uF-Ey
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 16:59:49 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 738C1C3A76
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 20:59:38 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5942FC054910
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 20:59:48 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 19 Apr 2017 22:58:32 +0200
-Message-Id: <20170419205923.8808-9-quintela@redhat.com>
+Date: Wed, 19 Apr 2017 22:58:39 +0200
+Message-Id: <20170419205923.8808-16-quintela@redhat.com>
 In-Reply-To: <20170419205923.8808-1-quintela@redhat.com>
 References: <20170419205923.8808-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 08/59] ram: Move bytes_xfer_prev into RAMState
+Subject: [Qemu-devel] [PATCH 15/59] ram: Remove unused
+ dup_mig_bytes_transferred()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,64 +37,37 @@ Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- migration/ram.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ include/migration/migration.h | 1 -
+ migration/ram.c               | 5 -----
+ 2 files changed, 6 deletions(-)
 
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index 24487be..f07700f 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -276,7 +276,6 @@ void free_xbzrle_decoded_buf(void);
+ 
+ void acct_update_position(QEMUFile *f, size_t size, bool zero);
+ 
+-uint64_t dup_mig_bytes_transferred(void);
+ uint64_t dup_mig_pages_transferred(void);
+ uint64_t skipped_mig_bytes_transferred(void);
+ uint64_t skipped_mig_pages_transferred(void);
 diff --git a/migration/ram.c b/migration/ram.c
-index 53a547c..aeef563 100644
+index cdd56b7..1398597 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -157,6 +157,8 @@ struct RAMState {
-     /* these variables are used for bitmap sync */
-     /* last time we did a full bitmap_sync */
-     int64_t time_last_bitmap_sync;
-+    /* bytes transferred at start_time */
-+    int64_t bytes_xfer_prev;
- };
- typedef struct RAMState RAMState;
- 
-@@ -620,14 +622,13 @@ static void migration_bitmap_sync_range(ram_addr_t start, ram_addr_t length)
+@@ -192,11 +192,6 @@ static void acct_clear(void)
+     memset(&acct_info, 0, sizeof(acct_info));
  }
  
- /* Fix me: there are too many global variables used in migration process. */
--static int64_t bytes_xfer_prev;
- static uint64_t xbzrle_cache_miss_prev;
- static uint64_t iterations_prev;
- 
- static void migration_bitmap_sync_init(RAMState *rs)
+-uint64_t dup_mig_bytes_transferred(void)
+-{
+-    return ram_state.zero_pages * TARGET_PAGE_SIZE;
+-}
+-
+ uint64_t dup_mig_pages_transferred(void)
  {
-     rs->time_last_bitmap_sync = 0;
--    bytes_xfer_prev = 0;
-+    rs->bytes_xfer_prev = 0;
-     num_dirty_pages_period = 0;
-     xbzrle_cache_miss_prev = 0;
-     iterations_prev = 0;
-@@ -663,8 +664,8 @@ static void migration_bitmap_sync(RAMState *rs)
- 
-     rs->bitmap_sync_count++;
- 
--    if (!bytes_xfer_prev) {
--        bytes_xfer_prev = ram_bytes_transferred();
-+    if (!rs->bytes_xfer_prev) {
-+        rs->bytes_xfer_prev = ram_bytes_transferred();
-     }
- 
-     if (!rs->time_last_bitmap_sync) {
-@@ -698,13 +699,13 @@ static void migration_bitmap_sync(RAMState *rs)
- 
-             if (s->dirty_pages_rate &&
-                (num_dirty_pages_period * TARGET_PAGE_SIZE >
--                   (bytes_xfer_now - bytes_xfer_prev)/2) &&
-+                   (bytes_xfer_now - rs->bytes_xfer_prev) / 2) &&
-                (rs->dirty_rate_high_cnt++ >= 2)) {
-                     trace_migration_throttle();
-                     rs->dirty_rate_high_cnt = 0;
-                     mig_throttle_guest_down();
-              }
--             bytes_xfer_prev = bytes_xfer_now;
-+             rs->bytes_xfer_prev = bytes_xfer_now;
-         }
- 
-         if (migrate_use_xbzrle()) {
+     return ram_state.zero_pages;
 -- 
 2.9.3
