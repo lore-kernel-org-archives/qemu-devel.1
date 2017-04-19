@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0piW-0007Yn-3p
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:32:21 -0400
+	(envelope-from <jiahuanzhang90@gmail.com>) id 1d0pkk-0008CH-OQ
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:34:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d0piT-0000yF-1A
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:32:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33954)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d0piS-0000xr-O1
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:32:16 -0400
-References: <20170418135726.28022-1-stefanha@redhat.com>
-	<20170418135726.28022-2-stefanha@redhat.com>
-	<09309ca7-dea8-db26-5544-402964224ee1@redhat.com>
-	<20170419132737.GF3343@stefanha-x1.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8c7093c1-8c10-c36c-3628-421664ca02be@redhat.com>
-Date: Wed, 19 Apr 2017 08:32:06 -0500
+	(envelope-from <jiahuanzhang90@gmail.com>) id 1d0pkj-0001qJ-Ml
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:34:38 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:33427)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jiahuanzhang90@gmail.com>)
+	id 1d0pkj-0001qA-HO
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:34:37 -0400
+Received: by mail-qt0-x241.google.com with SMTP id c45so3182371qtb.0
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 06:34:37 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170419132737.GF3343@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="itOOSVUkjRnD9EaUb6c0frgPP71BgJtEB"
-Subject: Re: [Qemu-devel] [PATCH v5 1/9] block: add bdrv_measure() API
+In-Reply-To: <CAFEAcA81o245N_zoSUtJ0SVupZyRE9cnfr15hmu+ReMuDj9iyQ@mail.gmail.com>
+References: <CAJy91CZpAiZ6adPmbAESrYqDgtK37CEgw4SAk97jCNduADy6Tw@mail.gmail.com>
+	<CAFEAcA-V3BNcrhhnap+Hn8spfZPd0=Dv2v0P5myGwqU2e5t0Eg@mail.gmail.com>
+	<CAJy91Ca2FTvBzd2OqQZyEJBtCAxxosdcAFP1RMgGCQe2PJXEJA@mail.gmail.com>
+	<CAFEAcA-f1P4OW+DwLRn1AZQCzoiWNX_8Rhq0oduppMOSLWo9Ww@mail.gmail.com>
+	<CAJy91CY=s2H0VYYuDUrs=HYTEKjKZHpU1MXrhStxGxxWg=hfEg@mail.gmail.com>
+	<CAFEAcA9mfnUF-ZtU+kGpSj2LqVxPi=0GLB4Jk9zLnhhfq_Su4A@mail.gmail.com>
+	<CAJy91CaB3kA0vNRGs52S=OweSfSXnkO71AHOa2XpUYNJTnZHDQ@mail.gmail.com>
+	<CAFEAcA81o245N_zoSUtJ0SVupZyRE9cnfr15hmu+ReMuDj9iyQ@mail.gmail.com>
+From: Jiahuan Zhang <jiahuanzhang90@gmail.com>
+Date: Wed, 19 Apr 2017 15:34:36 +0200
+Message-ID: <CAJy91Cbo+CQbRMmS-1b32Hf=kgWb22N3htmiuyORW7y-of7Raw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] Hight Processor time of Socket communciation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,73 +35,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Nir Soffer <nsoffer@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---itOOSVUkjRnD9EaUb6c0frgPP71BgJtEB
-From: Eric Blake <eblake@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Maor Lipchuk <mlipchuk@redhat.com>, "Daniel P. Berrange"
- <berrange@redhat.com>, Nir Soffer <nsoffer@redhat.com>,
- Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>
-Message-ID: <8c7093c1-8c10-c36c-3628-421664ca02be@redhat.com>
-Subject: Re: [PATCH v5 1/9] block: add bdrv_measure() API
-References: <20170418135726.28022-1-stefanha@redhat.com>
- <20170418135726.28022-2-stefanha@redhat.com>
- <09309ca7-dea8-db26-5544-402964224ee1@redhat.com>
- <20170419132737.GF3343@stefanha-x1.localdomain>
-In-Reply-To: <20170419132737.GF3343@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 19 April 2017 at 12:09, Peter Maydell <peter.maydell@linaro.org> wrote:
 
-On 04/19/2017 08:27 AM, Stefan Hajnoczi wrote:
+> On 19 April 2017 at 11:04, Jiahuan Zhang <jiahuanzhang90@gmail.com> wrote:
+> > Okay. Thank you for pointing this out.
+> > I would like to make a new serial device based on pl011,
+> > but containing a buffer for guest-to-host data transfer.
+>
+> As I've said, the PL011 is inherently byte at a time.
+> If you want better than that, I recommend you use virtio-serial,
+> because it already exists for this purpose.
+>
+> thanks
+> -- PMM
+>
 
->>
->> I know we haven't done a good job in the past, but should we start
->> trying to do better at documenting callback constraints of new things
->> added in this header?
->=20
-> .bdrv_measure() is a 1:1 pass-through of the public bdrv_measure()
-> function.  All the public function does is to dereference
-> drv->bdrv_measure.
->=20
-> I think that's why many of the other callbacks also have no
-> documentation - they inherit semantics from the public function.  We
-> don't need to duplicate the doc comments.
+Hi Peter,
 
-Sometimes, though, there are slightly different semantics (for example,
-we guarantee that the parameters to the driver code have already been
-validated against image size, properly sliced-and-diced to match block
-limits, and so on), so that the drivers don't have to do as much work.
-Documenting these contract guarantees would be useful.
+But from the source code, I found the main characteristic of virtio-serial
+is that,
+virtio-serial can create multiple serial ports and each port has a pair of
+control virt-queues and
+a pair of guest input/output virt-queues.
+Its "have_data" callback function enables multi-byte data transfer from
+guest.
+And it is not in a tranditional device emulation format.
+I mean that no exact IO region is emulated for it.
+Without Linux kernel driver, I don't know how to manipulate it.
+For the time being, I enable the guest app to send data to
+the pl011's data register directly via a pointer, as you see that in the
+code above.
 
-But as I said, it's not something we have to solve in this series.
+This is why I am thinking if adding a transmit buffer in pl011 for guest
+writing
+is a feasible alternative.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---itOOSVUkjRnD9EaUb6c0frgPP71BgJtEB
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY92bWAAoJEKeha0olJ0Nq+2YIAKMn8B2Xk/06nTANVsSeiHBi
-9M8kZTkwKd9AJGpP77lyzrsEefcu2LzkmcSbRJi9ZpGDcxm5sd+1/rx7DagBJlPn
-tr+thOYKTpnKBvHmXkzPZ+UNtR+ByU88tG5swAe1vKWb5iCTq1O5FVmrWM6dm44h
-cYLpvH5QcctRk1cLdWnH69mIDiG4Xhty7P9pojzFpAVkv5s8VOVW6epU5ZXUHzUU
-QKxNaANgi83eUPozXKmlTD7Nil2ym28bZgDAVnn+qTe6P0f2Yd0w+b9wgFpgsD70
-Ke3vkFkpvRcPRKkQ2+Yc8K+spbqco0u5RCfnerkZ/Fp9R9ofsVHGfL2Mi3cGYsc=
-=T6Qy
------END PGP SIGNATURE-----
-
---itOOSVUkjRnD9EaUb6c0frgPP71BgJtEB--
+Any suggestion is welcome.
+Regards,
+Huan
