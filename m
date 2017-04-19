@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1d0tyV-0006uj-N7
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 14:05:08 -0400
+	(envelope-from <marcel@redhat.com>) id 1d0u2z-00081G-Tq
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 14:09:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1d0tyR-0006A0-L6
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 14:05:07 -0400
-References: <20170328021651.19350-1-david@gibson.dropbear.id.au>
-	<20170328021651.19350-3-david@gibson.dropbear.id.au>
-	<20170417183045.GA7078@thinpad.lan.raisama.net>
-	<20170418022151.GD12235@umbus.fritz.box>
-	<20170418143312.GN25239@thinpad.lan.raisama.net>
+	(envelope-from <marcel@redhat.com>) id 1d0u2w-0007TJ-Op
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 14:09:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39840)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1d0u2w-0007Sx-Iy
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 14:09:42 -0400
+References: <20170418221724.5707-1-ehabkost@redhat.com>
+	<20170418221724.5707-2-ehabkost@redhat.com>
 From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <8d11bfb6-da4a-9972-112e-311859e0bc5b@redhat.com>
-Date: Wed, 19 Apr 2017 21:04:55 +0300
+Message-ID: <e893eeb7-f256-eb9a-d2fe-54370d2b6e86@redhat.com>
+Date: Wed, 19 Apr 2017 21:09:36 +0300
 MIME-Version: 1.0
-In-Reply-To: <20170418143312.GN25239@thinpad.lan.raisama.net>
+In-Reply-To: <20170418221724.5707-2-ehabkost@redhat.com>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC for-2.10 2/3] pci: Allow host bridges to
- override PCI/PCIe hybrid device behaviour
+Subject: Re: [Qemu-devel] [RFC v2 1/6] pci: Inline pci_host_bus_register()
+ inside pci_bus_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,103 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
-Cc: aik@ozlabs.ru, lersek@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mst@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: aik@ozlabs.ru, David Gibson <dgibson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 
-On 04/18/2017 05:33 PM, Eduardo Habkost wrote:
-> On Tue, Apr 18, 2017 at 12:21:51PM +1000, David Gibson wrote:
->> On Mon, Apr 17, 2017 at 03:30:46PM -0300, Eduardo Habkost wrote:
->>> On Tue, Mar 28, 2017 at 01:16:50PM +1100, David Gibson wrote:
->>>> Currently PCI/PCIe hybrid devices - that is, devices which can appear as
->>>> either plain PCI or PCIe depending on where they're attached - will only
->>>> appear in PCIe mode if they're attached to a PCIe bus via a root port or
->>>> downstream port.
->>>>
->>>> This is correct for "standard" PCIe setups, but there are some platforms
->>>> which need different behaviour (notably "pseries" whose paravirtualized
->>>> PCI host bridges have some idiosyncracies).
->>>>
->>>> This patch allows the host bridge to override the normal behaviour.
->>>>
->>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->>>> ---
->>>>  hw/pci/pci.c              | 11 +++++++++--
->>>>  include/hw/pci/pci_host.h |  1 +
->>>>  2 files changed, 10 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
->>>> index 779787b..ac68065 100644
->>>> --- a/hw/pci/pci.c
->>>> +++ b/hw/pci/pci.c
->>>> @@ -392,9 +392,16 @@ bool pci_bus_is_root(PCIBus *bus)
->>>>
->>>>  bool pci_allow_hybrid_pcie(PCIDevice *pci_dev)
->>>
->>> Why are we asking the device about allowing hybrid pcie, and not
->>> the bus itself? Shouldn't we be able to query this before the
->>> device is plugged, and before pci_dev->bus is even set?
->>>
->>> In other words, why pci_allow_hyberid_pcie() and
->>> pci_device_get_bus() get a PCIDevice* argument instead of a
->>> PCIBus* argument?
->>
->> Ah good point.  I made it a PCIDevice simply for convenience, but
->> you're right we should be able to query before the device is plugged.
+On 04/19/2017 01:17 AM, Eduardo Habkost wrote:
+> There's no need for a separate function just to append an item to
+> pci_host_bridges.
 >
-> Understood.
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel@redhat.com>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  hw/pci/pci.c | 11 +++--------
+>  1 file changed, 3 insertions(+), 8 deletions(-)
 >
->>
->>>
->>>>  {
->>>> -    PCIBus *bus = pci_dev->bus;
->>>> +    PCIHostState *host_bridge = PCI_HOST_BRIDGE(pci_device_root_bus(pci_dev)->qbus.parent);
->>>
->>> There's something I don't understand completely: what exactly
->>> guarantees that pci_device_root_bus(...)->qbus.parent is always
->>> going to be a PCI_HOST_BRIDGE?
->>
->> Well, by definition whatever is above the root bus isn't PCI, which
->> pretty much means it has to be a PCI host bridge.  A machine could
->> break this assumption, but I think that would be a bug.  We use this
->> same pattern to find a PCI device's (or bus's) host bridge in other
->> places - there doesn't appear to be another way.
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 259483b1c0..328f36cd21 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -312,13 +312,6 @@ static void pcibus_reset(BusState *qbus)
+>      }
+>  }
+>
+> -static void pci_host_bus_register(DeviceState *host)
+> -{
+> -    PCIHostState *host_bridge = PCI_HOST_BRIDGE(host);
+> -
+> -    QLIST_INSERT_HEAD(&pci_host_bridges, host_bridge, next);
+> -}
+> -
+>  PCIBus *pci_find_primary_bus(void)
+>  {
+>      PCIBus *primary_bus = NULL;
+> @@ -369,6 +362,8 @@ static void pci_bus_init(PCIBus *bus, DeviceState *parent,
+>                           MemoryRegion *address_space_io,
+>                           uint8_t devfn_min)
+>  {
+> +    PCIHostState *phb = PCI_HOST_BRIDGE(parent);
+> +
+>      assert(PCI_FUNC(devfn_min) == 0);
+>      bus->devfn_min = devfn_min;
+>      bus->address_space_mem = address_space_mem;
+> @@ -377,7 +372,7 @@ static void pci_bus_init(PCIBus *bus, DeviceState *parent,
+>      /* host bridge */
+>      QLIST_INIT(&bus->child);
+>
+> -    pci_host_bus_register(parent);
+> +    QLIST_INSERT_HEAD(&pci_host_bridges, phb, next);
+>  }
+>
+>  bool pci_bus_is_express(PCIBus *bus)
 >
 
-Agreed, the root bus is always exposed by (some kind of) a host bridge.
 
-> After taking a better look at the way PCI buses are created, I
-> agree it's OK. Maybe a
->   PCIHostState *pci_host_bridge(PCIBus *bus)
-> helper would be useful?
->
-
-For sure.
-
-> Anyway, both pci_bus_root_bus() and pci_host_bridge() could be
-> implemented as follow-ups if you prefer, so:
->
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
->
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 
 Thanks,
 Marcel
-
-> But I still have another suggestion:
->
->>
->>>> +    PCIHostBridgeClass *hc = PCI_HOST_BRIDGE_GET_CLASS(host_bridge);
->>>> +
->>>> +    if (hc->allow_hybrid_pcie) {
->>>> +        return hc->allow_hybrid_pcie(host_bridge, pci_dev);
->>>> +    } else {
->>>> +        PCIBus *bus = pci_dev->bus;
->>>>
->>>> -    return pci_bus_is_express(bus) && !pci_bus_is_root(bus);
->>>> +        return pci_bus_is_express(bus) && !pci_bus_is_root(bus);
->
-> Maybe it's a matter of personal taste, but instead of requiring
-> an explicit check for NULL hc->allow_hybrid_pcie, why not set a
-> default hc->allow_hybrid_pcie() implementation on
-> TYPE_PCI_HOST_BRIDGE that returns
-> (pci_bus_is_express(bus) && !pci_bus_is_root(bus))?
->
