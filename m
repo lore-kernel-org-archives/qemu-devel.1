@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d0why-00047R-FJ
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:00:16 -0400
+	(envelope-from <quintela@redhat.com>) id 1d0wiL-0004WC-JD
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:00:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d0whx-000780-54
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:00:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52696)
+	(envelope-from <quintela@redhat.com>) id 1d0wiK-0007IE-Hw
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:00:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36476)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d0whw-00077g-Rd
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:00:13 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d0wiK-0007Hw-99
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:00:36 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B4E3FC04BD41
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 21:00:11 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2672531F3FB
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 21:00:35 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 19 Apr 2017 22:58:52 +0200
-Message-Id: <20170419205923.8808-29-quintela@redhat.com>
+Date: Wed, 19 Apr 2017 22:59:07 +0200
+Message-Id: <20170419205923.8808-44-quintela@redhat.com>
 In-Reply-To: <20170419205923.8808-1-quintela@redhat.com>
 References: <20170419205923.8808-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 28/59] ram: Move migration_bitmap_rcu into
- RAMState
+Subject: [Qemu-devel] [PATCH 43/59] ram: Rename qemu_target_page_bits() to
+ qemu_target_page_size()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,267 +33,124 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com
 
-Once there, rename the type to be shorter.
+It was used as a size in all cases except one.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- migration/ram.c | 86 +++++++++++++++++++++++++++++++--------------------------
- 1 file changed, 47 insertions(+), 39 deletions(-)
+ exec.c                   | 4 ++--
+ include/sysemu/sysemu.h  | 2 +-
+ migration/migration.c    | 4 ++--
+ migration/postcopy-ram.c | 8 ++++----
+ migration/savevm.c       | 8 ++++----
+ 5 files changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 23819cd..f6ae17f 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -138,6 +138,19 @@ out:
-     return ret;
- }
- 
-+struct RAMBitmap {
-+    struct rcu_head rcu;
-+    /* Main migration bitmap */
-+    unsigned long *bmap;
-+    /* bitmap of pages that haven't been sent even once
-+     * only maintained and used in postcopy at the moment
-+     * where it's used to send the dirtymap at the start
-+     * of the postcopy phase
-+     */
-+    unsigned long *unsentmap;
-+};
-+typedef struct RAMBitmap RAMBitmap;
-+
- /* State of RAM for migration */
- struct RAMState {
-     /* Last block that we have visited searching for dirty pages */
-@@ -187,6 +200,8 @@ struct RAMState {
-     uint64_t migration_dirty_pages;
-     /* protects modification of the bitmap */
-     QemuMutex bitmap_mutex;
-+    /* Ram Bitmap protected by RCU */
-+    RAMBitmap *ram_bitmap;
- };
- typedef struct RAMState RAMState;
- 
-@@ -243,18 +258,6 @@ struct PageSearchStatus {
- };
- typedef struct PageSearchStatus PageSearchStatus;
- 
--static struct BitmapRcu {
--    struct rcu_head rcu;
--    /* Main migration bitmap */
--    unsigned long *bmap;
--    /* bitmap of pages that haven't been sent even once
--     * only maintained and used in postcopy at the moment
--     * where it's used to send the dirtymap at the start
--     * of the postcopy phase
--     */
--    unsigned long *unsentmap;
--} *migration_bitmap_rcu;
--
- struct CompressParam {
-     bool done;
-     bool quit;
-@@ -577,7 +580,7 @@ ram_addr_t migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
- 
-     unsigned long next;
- 
--    bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
-+    bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
-     if (rs->ram_bulk_stage && nr > base) {
-         next = nr + 1;
-     } else {
-@@ -592,7 +595,7 @@ static inline bool migration_bitmap_clear_dirty(RAMState *rs, ram_addr_t addr)
- {
-     bool ret;
-     int nr = addr >> TARGET_PAGE_BITS;
--    unsigned long *bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
-+    unsigned long *bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
- 
-     ret = test_and_clear_bit(nr, bitmap);
- 
-@@ -606,7 +609,7 @@ static void migration_bitmap_sync_range(RAMState *rs, ram_addr_t start,
-                                         ram_addr_t length)
- {
-     unsigned long *bitmap;
--    bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
-+    bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
-     rs->migration_dirty_pages +=
-         cpu_physical_memory_sync_dirty_bitmap(bitmap, start, length,
-                                               &rs->num_dirty_pages_period);
-@@ -1149,14 +1152,14 @@ static bool get_queued_page(RAMState *rs, MigrationState *ms,
-          */
-         if (block) {
-             unsigned long *bitmap;
--            bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
-+            bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
-             dirty = test_bit(*ram_addr_abs >> TARGET_PAGE_BITS, bitmap);
-             if (!dirty) {
-                 trace_get_queued_page_not_dirty(
-                     block->idstr, (uint64_t)offset,
-                     (uint64_t)*ram_addr_abs,
-                     test_bit(*ram_addr_abs >> TARGET_PAGE_BITS,
--                         atomic_rcu_read(&migration_bitmap_rcu)->unsentmap));
-+                         atomic_rcu_read(&rs->ram_bitmap)->unsentmap));
-             } else {
-                 trace_get_queued_page(block->idstr,
-                                       (uint64_t)offset,
-@@ -1316,7 +1319,7 @@ static int ram_save_target_page(RAMState *rs, MigrationState *ms, QEMUFile *f,
-         if (res < 0) {
-             return res;
-         }
--        unsentmap = atomic_rcu_read(&migration_bitmap_rcu)->unsentmap;
-+        unsentmap = atomic_rcu_read(&rs->ram_bitmap)->unsentmap;
-         if (unsentmap) {
-             clear_bit(dirty_ram_abs >> TARGET_PAGE_BITS, unsentmap);
-         }
-@@ -1480,7 +1483,7 @@ void free_xbzrle_decoded_buf(void)
-     xbzrle_decoded_buf = NULL;
- }
- 
--static void migration_bitmap_free(struct BitmapRcu *bmap)
-+static void migration_bitmap_free(struct RAMBitmap *bmap)
- {
-     g_free(bmap->bmap);
-     g_free(bmap->unsentmap);
-@@ -1489,11 +1492,13 @@ static void migration_bitmap_free(struct BitmapRcu *bmap)
- 
- static void ram_migration_cleanup(void *opaque)
- {
-+    RAMState *rs = opaque;
-+
-     /* caller have hold iothread lock or is in a bh, so there is
-      * no writing race against this migration_bitmap
-      */
--    struct BitmapRcu *bitmap = migration_bitmap_rcu;
--    atomic_rcu_set(&migration_bitmap_rcu, NULL);
-+    struct RAMBitmap *bitmap = rs->ram_bitmap;
-+    atomic_rcu_set(&rs->ram_bitmap, NULL);
-     if (bitmap) {
-         memory_global_dirty_log_stop();
-         call_rcu(bitmap, migration_bitmap_free, rcu);
-@@ -1530,9 +1535,9 @@ void migration_bitmap_extend(ram_addr_t old, ram_addr_t new)
-     /* called in qemu main thread, so there is
-      * no writing race against this migration_bitmap
-      */
--    if (migration_bitmap_rcu) {
--        struct BitmapRcu *old_bitmap = migration_bitmap_rcu, *bitmap;
--        bitmap = g_new(struct BitmapRcu, 1);
-+    if (rs->ram_bitmap) {
-+        struct RAMBitmap *old_bitmap = rs->ram_bitmap, *bitmap;
-+        bitmap = g_new(struct RAMBitmap, 1);
-         bitmap->bmap = bitmap_new(new);
- 
-         /* prevent migration_bitmap content from being set bit
-@@ -1550,7 +1555,7 @@ void migration_bitmap_extend(ram_addr_t old, ram_addr_t new)
-          */
-         bitmap->unsentmap = NULL;
- 
--        atomic_rcu_set(&migration_bitmap_rcu, bitmap);
-+        atomic_rcu_set(&rs->ram_bitmap, bitmap);
-         qemu_mutex_unlock(&rs->bitmap_mutex);
-         rs->migration_dirty_pages += new - old;
-         call_rcu(old_bitmap, migration_bitmap_free, rcu);
-@@ -1565,13 +1570,13 @@ void migration_bitmap_extend(ram_addr_t old, ram_addr_t new)
- void ram_debug_dump_bitmap(unsigned long *todump, bool expected)
- {
-     int64_t ram_pages = last_ram_offset() >> TARGET_PAGE_BITS;
--
-+    RAMState *rs = &ram_state;
-     int64_t cur;
-     int64_t linelen = 128;
-     char linebuf[129];
- 
-     if (!todump) {
--        todump = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
-+        todump = atomic_rcu_read(&rs->ram_bitmap)->bmap;
-     }
- 
-     for (cur = 0; cur < ram_pages; cur += linelen) {
-@@ -1600,8 +1605,9 @@ void ram_debug_dump_bitmap(unsigned long *todump, bool expected)
- 
- void ram_postcopy_migrated_memory_release(MigrationState *ms)
- {
-+    RAMState *rs = &ram_state;
-     struct RAMBlock *block;
--    unsigned long *bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
-+    unsigned long *bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
- 
-     QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-         unsigned long first = block->offset >> TARGET_PAGE_BITS;
-@@ -1636,11 +1642,12 @@ static int postcopy_send_discard_bm_ram(MigrationState *ms,
-                                         unsigned long start,
-                                         unsigned long length)
- {
-+    RAMState *rs = &ram_state;
-     unsigned long end = start + length; /* one after the end */
-     unsigned long current;
-     unsigned long *unsentmap;
- 
--    unsentmap = atomic_rcu_read(&migration_bitmap_rcu)->unsentmap;
-+    unsentmap = atomic_rcu_read(&rs->ram_bitmap)->unsentmap;
-     for (current = start; current < end; ) {
-         unsigned long one = find_next_bit(unsentmap, end, current);
- 
-@@ -1739,8 +1746,8 @@ static void postcopy_chunk_hostpages_pass(MigrationState *ms, bool unsent_pass,
-         return;
-     }
- 
--    bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
--    unsentmap = atomic_rcu_read(&migration_bitmap_rcu)->unsentmap;
-+    bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
-+    unsentmap = atomic_rcu_read(&rs->ram_bitmap)->unsentmap;
- 
-     if (unsent_pass) {
-         /* Find a sent page */
-@@ -1898,15 +1905,16 @@ static int postcopy_chunk_hostpages(MigrationState *ms)
+diff --git a/exec.c b/exec.c
+index c97ef4a..7a640c7 100644
+--- a/exec.c
++++ b/exec.c
+@@ -3307,9 +3307,9 @@ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
+  * Allows code that needs to deal with migration bitmaps etc to still be built
+  * target independent.
   */
- int ram_postcopy_send_discard_bitmap(MigrationState *ms)
+-size_t qemu_target_page_bits(void)
++size_t qemu_target_page_size(void)
  {
-+    RAMState *rs = &ram_state;
-     int ret;
-     unsigned long *bitmap, *unsentmap;
+-    return TARGET_PAGE_BITS;
++    return TARGET_PAGE_SIZE;
+ }
  
-     rcu_read_lock();
+ #endif
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 576c7ce..16175f7 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -67,7 +67,7 @@ int qemu_reset_requested_get(void);
+ void qemu_system_killed(int signal, pid_t pid);
+ void qemu_system_reset(bool report);
+ void qemu_system_guest_panicked(GuestPanicInformation *info);
+-size_t qemu_target_page_bits(void);
++size_t qemu_target_page_size(void);
  
-     /* This should be our last sync, the src is now paused */
--    migration_bitmap_sync(&ram_state);
-+    migration_bitmap_sync(rs);
+ void qemu_add_exit_notifier(Notifier *notify);
+ void qemu_remove_exit_notifier(Notifier *notify);
+diff --git a/migration/migration.c b/migration/migration.c
+index 7da16cf..92a3754 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -654,7 +654,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
+     info->ram->skipped = 0;
+     info->ram->normal = norm_mig_pages_transferred();
+     info->ram->normal_bytes = norm_mig_pages_transferred() *
+-        (1ul << qemu_target_page_bits());
++        qemu_target_page_size();
+     info->ram->mbps = s->mbps;
+     info->ram->dirty_sync_count = ram_dirty_sync_count();
+     info->ram->postcopy_requests = ram_postcopy_requests();
+@@ -2009,7 +2009,7 @@ static void *migration_thread(void *opaque)
+                10000 is a small enough number for our purposes */
+             if (ram_dirty_pages_rate() && transferred_bytes > 10000) {
+                 s->expected_downtime = ram_dirty_pages_rate() *
+-                    (1ul << qemu_target_page_bits()) / bandwidth;
++                    qemu_target_page_size() / bandwidth;
+             }
  
--    unsentmap = atomic_rcu_read(&migration_bitmap_rcu)->unsentmap;
-+    unsentmap = atomic_rcu_read(&rs->ram_bitmap)->unsentmap;
-     if (!unsentmap) {
-         /* We don't have a safe way to resize the sentmap, so
-          * if the bitmap was resized it will be NULL at this
-@@ -1927,7 +1935,7 @@ int ram_postcopy_send_discard_bitmap(MigrationState *ms)
-     /*
-      * Update the unsentmap to be unsentmap = unsentmap | dirty
-      */
--    bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
-+    bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
-     bitmap_or(unsentmap, unsentmap, bitmap,
-                last_ram_offset() >> TARGET_PAGE_BITS);
+             qemu_file_reset_rate_limit(s->to_dst_file);
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index dc80dbb..8756364 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -123,7 +123,7 @@ bool postcopy_ram_supported_by_host(void)
+     struct uffdio_range range_struct;
+     uint64_t feature_mask;
  
-@@ -2022,16 +2030,16 @@ static int ram_state_init(RAMState *rs)
-     bytes_transferred = 0;
-     ram_state_reset(rs);
+-    if ((1ul << qemu_target_page_bits()) > pagesize) {
++    if (qemu_target_page_size() > pagesize) {
+         error_report("Target page size bigger than host page size");
+         goto out;
+     }
+@@ -745,10 +745,10 @@ PostcopyDiscardState *postcopy_discard_send_init(MigrationState *ms,
+ void postcopy_discard_send_range(MigrationState *ms, PostcopyDiscardState *pds,
+                                 unsigned long start, unsigned long length)
+ {
+-    size_t tp_bits = qemu_target_page_bits();
++    size_t tp_size = qemu_target_page_size();
+     /* Convert to byte offsets within the RAM block */
+-    pds->start_list[pds->cur_entry] = (start - pds->offset) << tp_bits;
+-    pds->length_list[pds->cur_entry] = length << tp_bits;
++    pds->start_list[pds->cur_entry] = (start - pds->offset) * tp_size;
++    pds->length_list[pds->cur_entry] = length * tp_size;
+     trace_postcopy_discard_send_range(pds->ramblock_name, start, length);
+     pds->cur_entry++;
+     pds->nsentwords++;
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 853a81a..bbf055d 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -871,7 +871,7 @@ void qemu_savevm_send_postcopy_advise(QEMUFile *f)
+ {
+     uint64_t tmp[2];
+     tmp[0] = cpu_to_be64(ram_pagesize_summary());
+-    tmp[1] = cpu_to_be64(1ul << qemu_target_page_bits());
++    tmp[1] = cpu_to_be64(qemu_target_page_size());
  
--    migration_bitmap_rcu = g_new0(struct BitmapRcu, 1);
-+    rs->ram_bitmap = g_new0(struct RAMBitmap, 1);
-     /* Skip setting bitmap if there is no RAM */
-     if (ram_bytes_total()) {
-         ram_bitmap_pages = last_ram_offset() >> TARGET_PAGE_BITS;
--        migration_bitmap_rcu->bmap = bitmap_new(ram_bitmap_pages);
--        bitmap_set(migration_bitmap_rcu->bmap, 0, ram_bitmap_pages);
-+        rs->ram_bitmap->bmap = bitmap_new(ram_bitmap_pages);
-+        bitmap_set(rs->ram_bitmap->bmap, 0, ram_bitmap_pages);
+     trace_qemu_savevm_send_postcopy_advise();
+     qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE, 16, (uint8_t *)tmp);
+@@ -1390,13 +1390,13 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
+     }
  
-         if (migrate_postcopy_ram()) {
--            migration_bitmap_rcu->unsentmap = bitmap_new(ram_bitmap_pages);
--            bitmap_set(migration_bitmap_rcu->unsentmap, 0, ram_bitmap_pages);
-+            rs->ram_bitmap->unsentmap = bitmap_new(ram_bitmap_pages);
-+            bitmap_set(rs->ram_bitmap->unsentmap, 0, ram_bitmap_pages);
-         }
+     remote_tps = qemu_get_be64(mis->from_src_file);
+-    if (remote_tps != (1ul << qemu_target_page_bits())) {
++    if (remote_tps != qemu_target_page_size()) {
+         /*
+          * Again, some differences could be dealt with, but for now keep it
+          * simple.
+          */
+-        error_report("Postcopy needs matching target page sizes (s=%d d=%d)",
+-                     (int)remote_tps, 1 << qemu_target_page_bits());
++        error_report("Postcopy needs matching target page sizes (s=%d d=%zd)",
++                     (int)remote_tps, qemu_target_page_size());
+         return -1;
      }
  
 -- 
