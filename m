@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1d0nYG-0006Xk-6I
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 07:13:37 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d0nYU-0006fg-PQ
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 07:13:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1d0nYC-00037o-Sr
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 07:13:36 -0400
-Received: from mga01.intel.com ([192.55.52.88]:22345)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1d0nYC-00037G-8b
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 07:13:32 -0400
-Message-ID: <58F745C9.9090106@intel.com>
-Date: Wed, 19 Apr 2017 19:11:05 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <dgilbert@redhat.com>) id 1d0nYT-0003D2-Ri
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 07:13:50 -0400
+Date: Wed, 19 Apr 2017 12:13:37 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170419111328.GB2099@work-vm>
+References: <20170412091819.GB4955@noname.str.redhat.com>
+	<20170418144725.GJ21261@stefanha-x1.localdomain>
+	<20170418153256.GE9236@noname.redhat.com>
 MIME-Version: 1.0
-References: <286AC319A985734F985F78AFA26841F7391EF490@shsmsx102.ccr.corp.intel.com>
-	<9ce5d497-c52a-23fc-a43d-ac7c895faedb@siemens.com>
-	<58F722EE.7030300@intel.com>
-	<d96b8097-b541-9908-8141-86267e726471@siemens.com>
-	<58F72942.3030802@intel.com>
-	<fcf62a96-b3fd-cffc-c784-7af46144cbb2@siemens.com>
-	<58F735CF.7040404@intel.com>
-	<13ccf73a-1553-ce8c-df4a-89c26cdc27b6@siemens.com>
-In-Reply-To: <13ccf73a-1553-ce8c-df4a-89c26cdc27b6@siemens.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: Vhost-pci RFC2.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170418153256.GE9236@noname.redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] migrate -b problems
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,116 +24,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jan Kiszka <jan.kiszka@siemens.com>, =?windows-1252?Q?Marc-Andr=E9_?= =?windows-1252?Q?Lureau?= <marcandre.lureau@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>
-Cc: Jailhouse <jailhouse-dev@googlegroups.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-block@nongnu.org, famz@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, quintela@redhat.com
 
-On 04/19/2017 06:36 PM, Jan Kiszka wrote:
-> On 2017-04-19 12:02, Wei Wang wrote:
->>>>>> The design presented here intends to use only one BAR to expose
->>>>>> both TX and RX. The two VMs share an intermediate memory
->>>>>> here, why couldn't we give the same permission to TX and RX?
->>>>>>
->>>>> For security and/or safety reasons: the TX side can then safely prepare
->>>>> and sign a message in-place because the RX side cannot mess around with
->>>>> it while not yet being signed (or check-summed). Saves one copy from a
->>>>> secure place into the shared memory.
->>>> If we allow guest1 to write to RX, what safety issue would it cause to
->>>> guest2?
->>> This way, guest1 could trick guest2, in a race condition, to sign a
->>> modified message instead of the original one.
->>>
->> Just align the context that we are talking about: RX is the intermediate
->> shared ring that guest1 uses to receive packets and guest2 uses to send
->> packet.
->>
->> Seems the issue is that guest1 will receive a hacked message from RX
->> (modified by itself). How would it affect guest2?
-> Retry: guest2 wants to send a signed/hashed message to guest1. For that
-> purpose, it starts to build that message inside the shared memory that
-> guest1 can at least read, then guest2 signs that message, also in-place.
-> If guest1 can modify the message inside the ring while guest2 has not
-> yet signed it, the result is invalid.
->
-> Now, if guest2 is the final receiver of the message, nothing is lost,
-> guest2 just shot itself into the foot. However, if guest2 is just a
-> router (gray channel) and the message travels further, guest2 now has
-> corrupted that channel without allowing the final receive to detect
-> that. That's the scenario.
-
-If guest2 has been a malicious guest, I think it wouldn't make a
-difference whether we protect the shared RX or not. As a router,
-guest2 can play tricks on the messages after read it and then
-send the modified message to a third man, right?
-
-
->>>>>>>>      Fig. 4 shows the inter-VM notification path for 2.0 (2.1 is
->>>>>>>> similar).
->>>>>>>> The four eventfds are allocated by virtio-net, and shared with
->>>>>>>> vhost-pci-net:
->>>>>>>> Uses virtio-net’s TX/RX kickfd as the vhost-pci-net’s RX/TX callfd
->>>>>>>> Uses virtio-net’s TX/RX callfd as the vhost-pci-net’s RX/TX kickfd
->>>>>>>> Example of how it works:
->>>>>>>> After packets are put into vhost-pci-net’s TX, the driver kicks TX,
->>>>>>>> which
->>>>>>>> causes the an interrupt associated with fd3 to be injected to
->>>>>>>> virtio-net
->>>>>>>>      The draft code of the 2.0 design is ready, and can be found
->>>>>>>> here:
->>>>>>>> Qemu: _https://github.com/wei-w-wang/vhost-pci-device_
->>>>>>>> Guest driver: _https://github.com/wei-w-wang/vhost-pci-driver_
->>>>>>>>      We tested the 2.0 implementation using the Spirent packet
->>>>>>>> generator to transmit 64B packets, the results show that the
->>>>>>>> throughput of vhost-pci reaches around 1.8Mpps, which is around
->>>>>>>> two times larger than the legacy OVS+DPDK. Also, vhost-pci shows
->>>>>>>> better scalability than OVS+DPDK.
->>>>>>>>      
->>>>>>> Do you have numbers for the symmetric 2.1 case as well? Or is the
->>>>>>> driver
->>>>>>> not yet ready for that yet? Otherwise, I could try to make it work
->>>>>>> over
->>>>>>> a simplistic vhost-pci 2.1 version in Jailhouse as well. That would
->>>>>>> give
->>>>>>> a better picture of how much additional complexity this would mean
->>>>>>> compared to our ivshmem 2.0.
->>>>>>>
->>>>>> Implementation of 2.1 is not ready yet. We can extend it to 2.1 after
->>>>>> the common driver frame is reviewed.
->>>>> Can you you assess the needed effort?
->>>>>
->>>>> For us, this is a critical feature, because we need to decide if
->>>>> vhost-pci can be an option at all. In fact, the "exotic ring" will be
->>>>> the only way to provide secure inter-partition communication on
->>>>> Jailhouse.
->>>>>
->>>> If what is here for 2.0 is suitable to be upstream-ed, I think it will
->>>> be easy
->>>> to extend it to 2.1 (probably within 1 month).
->>> Unfortunate ordering here, though. Specifically if we need to modify
->>> existing things instead of just adding something. We will need 2.1 prior
->>> to committing to 2.0 being the right thing.
->>>
->> If you want, we can get the common part of design ready first,
->> then we can start to build on the common part at the same time.
->> The draft code of 2.0 is ready. I can clean it up, making it easier for
->> us to continue and change.
-> Without going into details yet, a meta requirement for us will be to
-> have advanced features optional, negotiable. Basically, we would like to
-> minimize the interface to an equivalent of what the ivshmem 2.0 is about
-> (there is no need for more in a safe/secure partitioning scenario). At
-> the same time, the complexity for a guest should remain low as well.
->
->  From past experience, the only way to ensure that is having a working
-> prototype. So I will have to look into enabling that.
->
-
-OK. Looks like the ordering needs to be changed. This doesn't appear
-to be a problem to me.
-
-If the final design doesn't deviate a lot from what's presented here,
-I think it should be easy to get 2.1 implemented quickly.
-Let's first get the design ready, then assess the effort for
-implementation.
+* Kevin Wolf (kwolf@redhat.com) wrote:
+> Am 18.04.2017 um 16:47 hat Stefan Hajnoczi geschrieben:
+> > On Wed, Apr 12, 2017 at 11:18:19AM +0200, Kevin Wolf wrote:
+> > > after getting assertion failure reports for block migration in the last
+> > > minute, we just hacked around it by commenting out op blocker assertions
+> > > for the 2.9 release, but now we need to see how to fix things properly.
+> > > Luckily, get_maintainer.pl doesn't report me, but only you. :-)
+> > > 
+> > > The main problem I see with the block migration code (on the
+> > > destination) is that it abuses the BlockBackend that belongs to the
+> > > guest device to make its own writes to the image file. If the guest
+> > > isn't allowed to write to the image (which it now isn't during incoming
+> > > migration since it would conflict with the newer style of block
+> > > migration using an NBD server), writing to this BlockBackend doesn't
+> > > work any more.
+> > > 
+> > > So what should really happen is that incoming block migration creates
+> > > its own BlockBackend for writing to the image. Now we don't want to do
+> > > this anew for every incoming block, but ideally we'd just create all
+> > > necessary BlockBackends upfront and then keep using them throughout the
+> > > whole migration. Is there a way to get some setup/teardown callbacks
+> > > at the start/end of the migration that could initialise and free such
+> > > global data?
+> > 
+> > It can be done in the beginning of block_load() similar to
+> > block_mig_state.bmds_list, which is created in init_blk_migration() at
+> > save time.
+> 
+> The difference is that block_load() is the counterpart for
+> block_save_iterate(), not for init_blk_migration(). That is, it is
+> called for each chunk of block migration data, which is interleaved with
+> normal RAM migration chunks.
+> 
+> So we can either create each BlockBackend the first time we need it in
+> block_load(), or create BlockBackends for all existing device BBs and
+> BDSes the first time block_load() is called. We still need some place
+> to actually free the BlockBackends again when the migration completes.
+> 
+> Dave suggested migration state notifiers, which looked like an option,
+> but at least the existing migration states aren't enough, because the
+> BlockBackends need to go away before blk_resume_after_migration() is
+> called, but MIGRATION_STATUS_COMPLETED is set only afterwards.
+> 
+> > We can also move the if (blk != blk_prev) blk_invalidate_cache() code
+> > out of the load loop.  It should be done once when setting up
+> > BlockBackends.
+> 
+> Same problem as above, while saving has setup/cleanup callbacks, we only
+> have the iterate callback for loading.
 
 
-Best,
-Wei
+Yes, and while we have the notifier chain for the source on migration state
+changes we don't have the notifier on the destination.
+
+If we just add a load_cleanup  member to SaveVMHandlers and call all of them
+at the end of an inbound migration would that be enough?
+(And define 'end')
+
+Dave
+
+> > > The other problem with block migration is that is uses a BlockBackend
+> > > name to identify which device is migrated. However, there can be images
+> > > that are not attached to any BlockBackend, or if it is, the BlockBackend
+> > > might be anonymous, so this doesn't work. I suppose changing the field
+> > > to "device name if available, node-name otherwise" would solve this.
+> > 
+> > Yes, that sounds good and is backwards compatible.
+> 
+> Kevin
+
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
