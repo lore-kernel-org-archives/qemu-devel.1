@@ -1,21 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49718)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d0ygU-0006Ft-8E
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 19:06:51 -0400
+	(envelope-from <jsnow@redhat.com>) id 1d0yib-0006x3-Ud
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 19:09:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d0ygT-0004k9-3K
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 19:06:50 -0400
-References: <20170407113404.9351-1-vsementsov@virtuozzo.com>
+	(envelope-from <jsnow@redhat.com>) id 1d0yiX-0005T6-05
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 19:09:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59534)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1d0yiW-0005Sx-Pf
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 19:08:56 -0400
+References: <3d1c16a1-ec05-0367-e569-64a63b34f2e3@redhat.com>
+	<4a56f716-3528-ddd4-f8c4-f3f6b23c469a@redhat.com>
+	<bbc2671a-42dd-aa2a-0f03-6a4a487cb8f5@redhat.com>
+	<20170327120148.GC26900@stefanha-x1.localdomain>
+	<CAFEAcA_YVJKobjJ2WeEquxUdXVYeaCvA-K0+zumCc-Rm4Tk5nQ@mail.gmail.com>
+	<20170403141912.GA3539@stefanha-x1.localdomain>
+	<87fuhf9kcz.fsf@dusky.pond.sub.org>
+	<20170418095103.GF21261@stefanha-x1.localdomain>
+	<1492516675.27392.45.camel@redhat.com>
+	<7ae1e13f-b6a0-a735-3952-4e3833e34ad8@redhat.com>
+	<1492596922.6853.5.camel@redhat.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <e8e164db-ef51-63e6-3294-c43e4951a89c@redhat.com>
-Date: Wed, 19 Apr 2017 19:06:38 -0400
+Message-ID: <dbaad765-44b8-785f-3612-3173001b94bf@redhat.com>
+Date: Wed, 19 Apr 2017 19:08:52 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170407113404.9351-1-vsementsov@virtuozzo.com>
+In-Reply-To: <1492596922.6853.5.camel@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qemu-img: improve
- convert_iteration_sectors()
+Subject: Re: [Qemu-devel] What's the next QEMU version after 2.9 ? (or: when
+ is a good point in time to get rid of old interfaces)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,109 +38,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
 
 
-On 04/07/2017 07:34 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Do not do extra call to _get_block_status()
+On 04/19/2017 06:15 AM, Gerd Hoffmann wrote:
+>   Hi,
 > 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
+>>> There is -global, which is actually used by libvirt to configure
+>>> built-in floppy devices.  But as the name suggests it sets properties
+>>> globally, i.e. for all instances.  Which works in this specific use
+>>> case, as there can be only one floppy controller per machine, but I
+>>
+>> Spec-wise, Can't you have two?
 > 
-> Also, I'm not sure about last line:
-> s->status = s->target_has_backing ? BLK_BACKING_FILE : BLK_DATA;
+> You can have two floppy drives, but they are hooked to the same
+
+Yes, I'm aware.
+
+I'm just saying here "Spec-wise" because you can have two controllers,
+one at 0x3F0 and one at 0x370. I realize this isn't particularly
+relevant for discussions relating to CLI design, but...
+
+you *can* have two controllers if your heart truly desired it.
+
+--js
+
+> controller.  isa-fdc has two properties (driveA and driveB) for that
+> reason, so -global works even for two floppy drives.
 > 
-> (which is equal to old code)
-> 
-
-What a weird function.
-
-So, if the target has a backing file, literally nothing changes here.
-
-If it doesn't, we skip the initial call to get_block_status and just
-call the (effectively?) recursive version to find out if we have a ZERO
-or DATA type of allocation.
-
-The else clause here properly reflects the original reading of the code.
-
-OK.
-
-> may be, it should be
-> s->status = s->target_has_backing ? BLK_BACKING_FILE : BLK_ZERO;
-> 
-> as it is the case, when range is not allocated at all. Should we copy it in this case?
-> 
-
-I am not really clear on if either ZERO or DATA are correct in the case
-where we do not have a backing file, because maybe this depends on
-has_zero_init?
-
-If we are copying uninitialized data when has_zero_init is true on the
-source, we want zeroes on the target. If the target also has_zero_init,
-we can just skip this sector. If it doesn't, we want to copy zeroes.
-
-If has_zero_init is false and we have unallocated data on the source...
-what are we doing? Copying random debris?
-
-I'm pretty confused, but I'm pretty sure your patch doesn't actually
-change anything, so:
-
-Reviewed-by: John Snow <jsnow@redhat.com>
-
->  qemu-img.c | 32 ++++++++++----------------------
->  1 file changed, 10 insertions(+), 22 deletions(-)
-> 
-> diff --git a/qemu-img.c b/qemu-img.c
-> index b220cf71d7..490f6e97f6 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -1554,9 +1554,15 @@ static int convert_iteration_sectors(ImgConvertState *s, int64_t sector_num)
->  
->      if (s->sector_next_status <= sector_num) {
->          BlockDriverState *file;
-> -        ret = bdrv_get_block_status(blk_bs(s->src[src_cur]),
-> -                                    sector_num - src_cur_offset,
-> -                                    n, &n, &file);
-> +        if (s->target_has_backing) {
-> +            ret = bdrv_get_block_status(blk_bs(s->src[src_cur]),
-> +                                        sector_num - src_cur_offset,
-> +                                        n, &n, &file);
-> +        } else {
-> +            ret = bdrv_get_block_status_above(blk_bs(s->src[src_cur]), NULL,
-> +                                              sector_num - src_cur_offset,
-> +                                              n, &n, &file);
-> +        }
->          if (ret < 0) {
->              return ret;
->          }
-> @@ -1565,26 +1571,8 @@ static int convert_iteration_sectors(ImgConvertState *s, int64_t sector_num)
->              s->status = BLK_ZERO;
->          } else if (ret & BDRV_BLOCK_DATA) {
->              s->status = BLK_DATA;
-> -        } else if (!s->target_has_backing) {
-> -            /* Without a target backing file we must copy over the contents of
-> -             * the backing file as well. */
-> -            /* Check block status of the backing file chain to avoid
-> -             * needlessly reading zeroes and limiting the iteration to the
-> -             * buffer size */
-> -            ret = bdrv_get_block_status_above(blk_bs(s->src[src_cur]), NULL,
-> -                                              sector_num - src_cur_offset,
-> -                                              n, &n, &file);
-> -            if (ret < 0) {
-> -                return ret;
-> -            }
-> -
-> -            if (ret & BDRV_BLOCK_ZERO) {
-> -                s->status = BLK_ZERO;
-> -            } else {
-> -                s->status = BLK_DATA;
-> -            }
->          } else {
-> -            s->status = BLK_BACKING_FILE;
-> +            s->status = s->target_has_backing ? BLK_BACKING_FILE : BLK_DATA;
->          }
->  
->          s->sector_next_status = sector_num + n;
+> cheers,
+>   Gerd
 > 
