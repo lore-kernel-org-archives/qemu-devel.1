@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aderumier@oxygem.tv>) id 1d0pnX-0001hA-6W
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:37:32 -0400
+	(envelope-from <aderumier@oxygem.tv>) id 1d0pz3-0005GI-25
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:49:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aderumier@oxygem.tv>) id 1d0pnU-0002zK-2O
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:37:31 -0400
-Received: from mailpro.odiso.net ([89.248.211.110]:39000)
+	(envelope-from <aderumier@oxygem.tv>) id 1d0pyy-0008KM-K9
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:49:25 -0400
+Received: from mailpro.odiso.net ([89.248.211.110]:41988)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aderumier@oxygem.tv>) id 1d0pnT-0002yp-OW
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:37:27 -0400
-Date: Wed, 19 Apr 2017 15:36:48 +0200 (CEST)
+	(Exim 4.71) (envelope-from <aderumier@oxygem.tv>) id 1d0pyy-0008Jf-AM
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 09:49:20 -0400
+Date: Wed, 19 Apr 2017 15:48:39 +0200 (CEST)
 From: Alexandre DERUMIER <aderumier@odiso.com>
-Message-ID: <708656279.11020244.1492609008406.JavaMail.zimbra@oxygem.tv>
-In-Reply-To: <20170419125801.ort44uiuepmklm5j@eukaryote>
+Message-ID: <854566934.11020438.1492609719869.JavaMail.zimbra@oxygem.tv>
+In-Reply-To: <708656279.11020244.1492609008406.JavaMail.zimbra@oxygem.tv>
 References: <1009091132.10984059.1492585700295.JavaMail.zimbra@oxygem.tv>
 	<20170419104300.gousbztqfl5j4k7q@eukaryote>
 	<111400435.11010636.1492604926409.JavaMail.zimbra@oxygem.tv>
 	<20170419125801.ort44uiuepmklm5j@eukaryote>
+	<708656279.11020244.1492609008406.JavaMail.zimbra@oxygem.tv>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
@@ -33,7 +34,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Kashyap Chamarthy <kchamart@redhat.com>
 Cc: qemu-devel <qemu-devel@nongnu.org>
 
-Ok, I have same result than my test:
+>>What I don't understand is how do you map device to the blockdev ?
+
+Ah,ok, got it.
+
+info qtree show me that device drive is now the new nodename !
+
+So it's working fine.
+
+Thanks for help.
+
+
+
+----- Mail original -----
+De: "aderumier" <aderumier@odiso.com>
+=C3=80: "Kashyap Chamarthy" <kchamart@redhat.com>
+Cc: "qemu-devel" <qemu-devel@nongnu.org>
+Envoy=C3=A9: Mercredi 19 Avril 2017 15:36:48
+Objet: Re: [Qemu-devel] blockdev-mirror , how to replace old nodename by ne=
+w nodename ?
+
+Ok, I have same result than my test:=20
 
 {"iops_rd": 0, "detect_zeroes": "off", "image": {"virtual-size": 1073741824=
 , "filename": "base.raw", "format": "raw", "actual-size": 0, "dirty-flag": =
@@ -64,26 +85,26 @@ al-size": 352256, "dirty-flag": false}, "iops_wr": 0, "ro": false, "node-na=
 me": "#block008", "backing_file_depth": 0, "drv": "file", "iops": 0, "bps_w=
 r": 0, "write_threshold": 0, "encrypted": false, "bps": 0, "bps_rd": 0, "ca=
 che": {"no-flush": false, "direct": false, "writeback": true}, "file": "tar=
-get.qcow2", "encryption_key_missing": false}]}
+get.qcow2", "encryption_key_missing": false}]}=20
 
 
-What I don't understand is how do you map device to the blockdev ?
+What I don't understand is how do you map device to the blockdev ?=20
 
-qemu doc said something like
+qemu doc said something like=20
 
--device virtio-blk,drive=3Dblk0 where blk0 is the nodename.
+-device virtio-blk,drive=3Dblk0 where blk0 is the nodename.=20
 
-but when I blockdev-mirror, the target blockdev has a new nodename.
-So how does it work ?
+but when I blockdev-mirror, the target blockdev has a new nodename.=20
+So how does it work ?=20
 
 
------ Mail original -----
-De: "Kashyap Chamarthy" <kchamart@redhat.com>
-=C3=80: "aderumier" <aderumier@odiso.com>
-Cc: "qemu-devel" <qemu-devel@nongnu.org>
-Envoy=C3=A9: Mercredi 19 Avril 2017 14:58:01
+----- Mail original -----=20
+De: "Kashyap Chamarthy" <kchamart@redhat.com>=20
+=C3=80: "aderumier" <aderumier@odiso.com>=20
+Cc: "qemu-devel" <qemu-devel@nongnu.org>=20
+Envoy=C3=A9: Mercredi 19 Avril 2017 14:58:01=20
 Objet: Re: [Qemu-devel] blockdev-mirror , how to replace old nodename by ne=
-w nodename ?
+w nodename ?=20
 
 On Wed, Apr 19, 2017 at 02:28:46PM +0200, Alexandre DERUMIER wrote:=20
 > Thanks I'll try. (I'm on 2.9.0-rc4)=20
