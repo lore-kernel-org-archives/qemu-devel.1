@@ -1,39 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1d0oar-0008Ed-NU
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:20:22 -0400
+	(envelope-from <aderumier@oxygem.tv>) id 1d0ojh-0003bc-Qp
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:29:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1d0oan-0000rI-NI
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:20:21 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51586)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1d0oan-0000qr-EI
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:20:17 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3JCE3uI119166
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 08:20:16 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29x74mj65v-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 08:20:15 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Wed, 19 Apr 2017 13:20:09 +0100
-Date: Wed, 19 Apr 2017 14:20:02 +0200
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <20170418221724.5707-7-ehabkost@redhat.com>
-References: <20170418221724.5707-1-ehabkost@redhat.com>
-	<20170418221724.5707-7-ehabkost@redhat.com>
+	(envelope-from <aderumier@oxygem.tv>) id 1d0oje-0006L7-Km
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:29:29 -0400
+Received: from mailpro.odiso.net ([89.248.211.110]:49768)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aderumier@oxygem.tv>) id 1d0oje-0006KI-B5
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:29:26 -0400
+Date: Wed, 19 Apr 2017 14:28:46 +0200 (CEST)
+From: Alexandre DERUMIER <aderumier@odiso.com>
+Message-ID: <111400435.11010636.1492604926409.JavaMail.zimbra@oxygem.tv>
+In-Reply-To: <20170419104300.gousbztqfl5j4k7q@eukaryote>
+References: <1009091132.10984059.1492585700295.JavaMail.zimbra@oxygem.tv>
+	<20170419104300.gousbztqfl5j4k7q@eukaryote>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170419142002.01ba3138.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [RFC v2 6/6] pci: Remove unnecessary PCIBus
- variables
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] blockdev-mirror ,
+ how to replace old nodename by new nodename ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,82 +28,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, aik@ozlabs.ru, David Gibson <dgibson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Scott Wood <scottwood@freescale.com>, David Gibson <david@gibson.dropbear.id.au>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-ppc@nongnu.org
+To: Kashyap Chamarthy <kchamart@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-On Tue, 18 Apr 2017 19:17:24 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+Thanks I'll try. (I'm on 2.9.0-rc4)
 
-> "phb->bus" is a short expression, there's no need for an extra variable
-> just to hold its value.
-> 
-> Generated using the following Coccinelle patch:
-> 
->     @@
->     identifier b;
->     identifier phb;
->     typedef PCIBus;
->     @@
->     -PCIBus *b;
->      ... when != b
->     -b = phb->bus;
->      <...
->     -b
->     +phb->bus
->      ...>
-> 
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Marcel Apfelbaum <marcel@redhat.com>
-> Cc: Alexander Graf <agraf@suse.de>
-> Cc: Scott Wood <scottwood@freescale.com>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
-> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-> Cc: qemu-ppc@nongnu.org
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  hw/alpha/typhoon.c                  | 10 ++++------
->  hw/pci-bridge/pci_expander_bridge.c |  4 +---
->  hw/pci-host/piix.c                  | 26 +++++++++++++-------------
->  hw/pci-host/ppce500.c               |  8 +++-----
->  hw/ppc/ppc4xx_pci.c                 |  4 +---
->  hw/ppc/spapr_pci.c                  |  6 ++----
->  hw/s390x/s390-pci-bus.c             |  6 ++----
->  7 files changed, 26 insertions(+), 38 deletions(-)
-> 
+can you send your initial qemu command line ?
 
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index 5e174e90f4..c2776ba221 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -553,7 +553,6 @@ static void s390_pci_iommu_free(S390pciState *s, PCIBus *bus, int32_t devfn)
-> 
->  static int s390_pcihost_init(SysBusDevice *dev)
->  {
-> -    PCIBus *b;
->      BusState *bus;
->      PCIHostState *phb = PCI_HOST_BRIDGE(dev);
->      S390pciState *s = S390_PCI_HOST_BRIDGE(dev);
-> @@ -563,10 +562,9 @@ static int s390_pcihost_init(SysBusDevice *dev)
->      pci_host_bus_init_irqs(phb, NULL, s390_pci_set_irq, s390_pci_map_irq,
->                             NULL, get_system_memory(), get_system_io(), 0, 64,
->                             TYPE_PCI_BUS);
-> -    b = phb->bus;
-> -    pci_setup_iommu(b, s390_pci_dma_iommu, s);
-> +    pci_setup_iommu(phb->bus, s390_pci_dma_iommu, s);
-> 
-> -    bus = BUS(b);
-> +    bus = BUS(phb->bus);
+also :
 
-This BusState variable is equally unnecessary, as is it just used in
-the line below. But that is outside the scope of that simple coccinelle
-patch, so
+>>"execute":"blockdev-add",=20
+>>"arguments":{=20
+>>"driver":"qcow2",=20
+>>"node-name":"node1",
+...
 
->      qbus_set_hotplug_handler(bus, DEVICE(dev), NULL);
-> 
->      s->bus = S390_PCI_BUS(qbus_create(TYPE_S390_PCI_BUS, DEVICE(s), NULL));
+then=20
 
-Acked-by: Cornelia Huck <cornelia.huck@de.ibm.com>
 
-for the s390 part.
+>>"execute":"blockdev-mirror",=20
+>>"arguments":{=20
+>>"device":"foo",=20
+>>"job-id":"job-2",=20
+>>"target":"node2",    --> node2 ? =20
+>>"sync":"full"=20
+
+
+----- Mail original -----
+De: "Kashyap Chamarthy" <kchamart@redhat.com>
+=C3=80: "aderumier" <aderumier@odiso.com>
+Cc: "qemu-devel" <qemu-devel@nongnu.org>
+Envoy=C3=A9: Mercredi 19 Avril 2017 12:43:00
+Objet: Re: [Qemu-devel] blockdev-mirror , how to replace old nodename by ne=
+w nodename ?
+
+On Wed, Apr 19, 2017 at 09:08:20AM +0200, Alexandre DERUMIER wrote:=20
+> Hi,=20
+>=20
+> I'm trying to implement blockdev-mirror, to replace drive-mirror as we=20
+> can pass more options with blockdev-mirror.=20
+>=20
+>=20
+> I would like to mirror an attached blockdev to a new blockdev, then=20
+> switch at the end of block-job-complete, like for drive-mirror.=20
+
+[...]=20
+
+> blockdev-mirror:=20
+>=20
+> {"arguments":{"job-id":"drive-virtio0","target":"tempmirror","sync":"full=
+","replaces":"drive-virtio0","device":"drive-virtio0"},"execute":"blockdev-=
+mirror"}=20
+>=20
+> (I have try with or without replaces option)=20
+>=20
+> then query-name-block-nodes, show vm-138-disk-2.raw file on tempmirror=20
+> "node-name", and vm-138-disk1.qcow2 on "drive-virtio0" node-name=20
+>=20
+> I expected that both was switched, like for drive-mirror.=20
+
+For me, 'blockdev-mirror' does do the switch when I issue=20
+'block-job-complete' (similar to 'drive-mirror')=20
+
+The below is my test from Git:=20
+
+I was here (on Git):=20
+
+$ git describe=20
+v2.9.0-rc5=20
+
+-----------------------------------------------------------------------=20
+$ qemu-img create -f qcow2 /export/target2.qcow2 1G=20
+Formatting '/export/target2.qcow2', fmt=3Dqcow2 size=3D1073741824 encryptio=
+n=3Doff cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16=20
+-----------------------------------------------------------------------=20
+QMP>=20
+{=20
+"execute":"blockdev-add",=20
+"arguments":{=20
+"driver":"qcow2",=20
+"node-name":"node1",=20
+"file":{=20
+"driver":"file",=20
+"filename":"/export/target2.qcow2"=20
+}=20
+}=20
+}=20
+{"return": {}}=20
+-----------------------------------------------------------------------=20
+QMP>=20
+{"execute":"query-named-block-nodes"}=20
+[...]=20
+-----------------------------------------------------------------------=20
+QMP>=20
+{=20
+"execute":"blockdev-mirror",=20
+"arguments":{=20
+"device":"foo",=20
+"job-id":"job-2",=20
+"target":"node2",=20
+"sync":"full"=20
+}=20
+}=20
+{"return": {}}=20
+{"timestamp": {"seconds": 1492598410, "microseconds": 35946}, "event": "BLO=
+CK_JOB_READY", "data": {"device": "job-2", "len": 24182784, "offset": 24182=
+784, "speed": 0, "type": "mirror"}}=20
+-----------------------------------------------------------------------=20
+QMP>=20
+{=20
+"execute":"block-job-complete",=20
+"arguments":{=20
+"device":"job-2"=20
+}=20
+}=20
+{"return": {}}=20
+{"timestamp": {"seconds": 1492598419, "microseconds": 115458}, "event": "BL=
+OCK_JOB_COMPLETED", "data": {"device": "job-2", "len": 24182784, "offset": =
+24182784, "speed": 0, "type": "mirror"}}=20
+-----------------------------------------------------------------------=20
+
+
+[...]=20
+
+
+--=20
+/kashyap=20
