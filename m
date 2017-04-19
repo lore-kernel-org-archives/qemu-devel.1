@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d0qhS-0000py-7Y
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 10:35:19 -0400
+	(envelope-from <bounces@canonical.com>) id 1d0qhS-0000pz-7r
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 10:35:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d0qhQ-0006xZ-7F
+	(envelope-from <bounces@canonical.com>) id 1d0qhO-0006vr-Ob
 	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 10:35:18 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54007)
+Received: from indium.canonical.com ([91.189.90.7]:53990)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d0qhQ-0006wG-1D
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 10:35:16 -0400
+	id 1d0qhO-0006ve-IY
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 10:35:14 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d0qhP-00010P-8o
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 14:35:15 +0000
+	id 1d0qhN-0000z9-QH
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 14:35:13 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3F9C32E80C2
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 14:35:15 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id C3A292E8048
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 14:35:13 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 19 Apr 2017 14:22:32 -0000
+Date: Wed, 19 Apr 2017 14:19:11 -0000
 From: Matthias Schiffer <1581936@bugs.launchpad.net>
 Reply-To: Bug 1581936 <1581936@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20160515095432.8440.97382.malonedeb@soybean.canonical.com>
-Message-Id: <20170419142232.17287.65024.malone@gac.canonical.com>
+Message-Id: <20170419141912.2173.99656.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1581936] Re: Frozen Windows 7 VMs with VGA
  CVE-2016-3712 fix (2.6.0 and 2.5.1.1)
@@ -39,8 +39,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Please let me know if there is anything I can do to help get these
-patches accepted for trusty/xenial.
+** Patch added: "Proposed fix for xenial"
+   https://bugs.launchpad.net/qemu/+bug/1581936/+attachment/4864875/+files/=
+qemu-xenial.debdiff
 
 -- =
 
