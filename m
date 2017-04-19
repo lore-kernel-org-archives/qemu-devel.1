@@ -1,27 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41372)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d0liU-00037n-VF
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 05:16:04 -0400
+	(envelope-from <famz@redhat.com>) id 1d0lka-0003qn-7S
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 05:18:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d0liT-0000Ww-TM
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 05:16:02 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:37125)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1d0liT-0000Vp-Mb
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 05:16:01 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id m123so6210523wma.0
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 02:16:01 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CAJy91Ca2FTvBzd2OqQZyEJBtCAxxosdcAFP1RMgGCQe2PJXEJA@mail.gmail.com>
-References: <CAJy91CZpAiZ6adPmbAESrYqDgtK37CEgw4SAk97jCNduADy6Tw@mail.gmail.com>
-	<CAFEAcA-V3BNcrhhnap+Hn8spfZPd0=Dv2v0P5myGwqU2e5t0Eg@mail.gmail.com>
-	<CAJy91Ca2FTvBzd2OqQZyEJBtCAxxosdcAFP1RMgGCQe2PJXEJA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 19 Apr 2017 10:15:40 +0100
-Message-ID: <CAFEAcA-f1P4OW+DwLRn1AZQCzoiWNX_8Rhq0oduppMOSLWo9Ww@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Hight Processor time of Socket communciation
+	(envelope-from <famz@redhat.com>) id 1d0lkY-0001cJ-Sr
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 05:18:12 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Wed, 19 Apr 2017 17:17:57 +0800
+Message-Id: <20170419091757.15507-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] iotests: 109: Filter out "len" of failed
+ jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +18,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jiahuan Zhang <jiahuanzhang90@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-On 19 April 2017 at 09:56, Jiahuan Zhang <jiahuanzhang90@gmail.com> wrote:
-> Do you mean that it is reasonable for QEMU emulation consumes high CPU time
-> when doing host-guest interaction, since the interaction calls many QEMU
-> codes in the background?
+Mirror calculates job len from current I/O progress:
 
-> Since my guest app is rather simple and no while() is included, according to
-> your words,
-> can I conclude that the high processor time is cause by the callbacks for
-> guest to host data transfer?
+    s->common.len = s->common.offset +
+                    (cnt + s->sectors_in_flight) * BDRV_SECTOR_SIZE;
 
-What is happening is that the guest kernel's serial driver
-has a loop that (simplified) looks like this:
+The final "len" of a failed mirror job in iotests 109 depends on the
+subtle timing of the completion of read and write issued in the first
+mirror iteration.  The second iteration may or may not have run when the
+I/O error happens, resulting in non-deterministic output of the
+BLOCK_JOB_COMPLETED event text.
 
-  do {
-      if (pl011_read(REG_FR) & FR_TXFF)
-          break; /* fifo full, try again later */
-      pl011_write(buffer[x], REG_DR);  /* send one byte */
-      x++;
-  } while (x != len);
+Similar to what was done in a752e4786, filter out the field to make the
+test robust.
 
-This is a lot of guest CPU instructions (and two callouts
-to QEMU's device emulation) for every single byte.
+Tested-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
 
->> You will likely get better throughput if you use the 'virt' board
->> where you can use the virtio-serial device which can send
->> data more efficiently.
+---
 
-> Here, can I understand your statement in this way,
-> a transmit buffer in the serial device for guest to host data transfer
-> may reduce the processor time, and in turn, increase the throughput?
+v2: Add Eric's r-b.
+    Don't add '\' after '|'.
+    Add '/g/'
+---
+ tests/qemu-iotests/109           |  3 ++-
+ tests/qemu-iotests/109.out       | 12 ++++++------
+ tests/qemu-iotests/common.filter |  6 ++++++
+ 3 files changed, 14 insertions(+), 7 deletions(-)
 
-The reason virtio-serial is faster is because the guest
-kernel driver can essentially tell QEMU
- "the data is in guest memory at address X length L"
-and then QEMU takes all that data at once. This is much
-more efficient.
-
-thanks
--- PMM
+diff --git a/tests/qemu-iotests/109 b/tests/qemu-iotests/109
+index 927151a..ce34c19 100755
+--- a/tests/qemu-iotests/109
++++ b/tests/qemu-iotests/109
+@@ -80,7 +80,8 @@ for fmt in qcow qcow2 qed vdi vmdk vpc; do
+ 
+     # This first test should fail: The image format was probed, we may not
+     # write an image header at the start of the image
+-    run_qemu "$TEST_IMG" "$TEST_IMG.src" "" "BLOCK_JOB_ERROR"
++    run_qemu "$TEST_IMG" "$TEST_IMG.src" "" "BLOCK_JOB_ERROR" |
++        _filter_block_job_len
+     $QEMU_IO -c 'read -P 0 0 64k' "$TEST_IMG" | _filter_qemu_io
+ 
+ 
+diff --git a/tests/qemu-iotests/109.out b/tests/qemu-iotests/109.out
+index 55fe536..6454b7e 100644
+--- a/tests/qemu-iotests/109.out
++++ b/tests/qemu-iotests/109.out
+@@ -10,7 +10,7 @@ Automatically detecting the format is dangerous for raw images, write operations
+ Specify the 'raw' format explicitly to remove the restrictions.
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 65536, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
+ {"return": []}
+ read 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -31,7 +31,7 @@ Automatically detecting the format is dangerous for raw images, write operations
+ Specify the 'raw' format explicitly to remove the restrictions.
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 197120, "offset": 512, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 512, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
+ {"return": []}
+ read 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -52,7 +52,7 @@ Automatically detecting the format is dangerous for raw images, write operations
+ Specify the 'raw' format explicitly to remove the restrictions.
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 327680, "offset": 262144, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 262144, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
+ {"return": []}
+ read 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -73,7 +73,7 @@ Automatically detecting the format is dangerous for raw images, write operations
+ Specify the 'raw' format explicitly to remove the restrictions.
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 65536, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
+ {"return": []}
+ read 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -94,7 +94,7 @@ Automatically detecting the format is dangerous for raw images, write operations
+ Specify the 'raw' format explicitly to remove the restrictions.
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 65536, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
+ {"return": []}
+ read 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -115,7 +115,7 @@ Automatically detecting the format is dangerous for raw images, write operations
+ Specify the 'raw' format explicitly to remove the restrictions.
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 65536, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
+ {"return": []}
+ read 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
+index 1040013..5b2cb24 100644
+--- a/tests/qemu-iotests/common.filter
++++ b/tests/qemu-iotests/common.filter
+@@ -92,6 +92,12 @@ _filter_block_job_offset()
+     sed -e 's/, "offset": [0-9]\+,/, "offset": OFFSET,/'
+ }
+ 
++# replace block job len
++_filter_block_job_len()
++{
++    sed -e 's/, "len": [0-9]\+,/, "len": LEN,/g'
++}
++
+ # replace driver-specific options in the "Formatting..." line
+ _filter_img_create()
+ {
+-- 
+2.9.3
