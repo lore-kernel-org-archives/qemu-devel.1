@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44279)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d0omz-0004NS-Tc
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:32:55 -0400
+	(envelope-from <jcody@redhat.com>) id 1d0or1-0005it-Ac
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:37:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d0omy-0008Hu-QX
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:32:53 -0400
-Date: Wed, 19 Apr 2017 14:32:38 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170419123238.GC5826@noname.redhat.com>
-References: <20170412091819.GB4955@noname.str.redhat.com>
-	<20170418144725.GJ21261@stefanha-x1.localdomain>
-	<20170418153256.GE9236@noname.redhat.com>
-	<20170419111328.GB2099@work-vm>
+	(envelope-from <jcody@redhat.com>) id 1d0oqy-0002Py-K6
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:37:01 -0400
+Date: Wed, 19 Apr 2017 08:36:47 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170419123647.GL5704@localhost.localdomain>
+References: <815765cfcea726c7a4cc619c4f6c3bedb47f16b9.1492537347.git.jcody@redhat.com>
+	<e649d1d3-6310-6607-22fe-82fc961d53c4@redhat.com>
+	<20170418193129.GJ5704@localhost.localdomain>
+	<c0a0816b-9ff9-a285-dbe1-c5b4f78e6ee4@redhat.com>
+	<20170418194223.GK5704@localhost.localdomain>
+	<20170419103635.GB14508@lemon.lan>
+	<63eb8549-dea7-ba35-021c-78697aa5f099@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170419111328.GB2099@work-vm>
-Subject: Re: [Qemu-devel] [Qemu-block] migrate -b problems
+In-Reply-To: <63eb8549-dea7-ba35-021c-78697aa5f099@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 1/1] qemu-iotests:
+ _cleanup_qemu must be called on exit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,74 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-block@nongnu.org, famz@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, quintela@redhat.com
+To: Max Reitz <mreitz@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, Eric Blake <eblake@redhat.com>, kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-Am 19.04.2017 um 13:13 hat Dr. David Alan Gilbert geschrieben:
-> * Kevin Wolf (kwolf@redhat.com) wrote:
-> > Am 18.04.2017 um 16:47 hat Stefan Hajnoczi geschrieben:
-> > > On Wed, Apr 12, 2017 at 11:18:19AM +0200, Kevin Wolf wrote:
-> > > > after getting assertion failure reports for block migration in the last
-> > > > minute, we just hacked around it by commenting out op blocker assertions
-> > > > for the 2.9 release, but now we need to see how to fix things properly.
-> > > > Luckily, get_maintainer.pl doesn't report me, but only you. :-)
-> > > > 
-> > > > The main problem I see with the block migration code (on the
-> > > > destination) is that it abuses the BlockBackend that belongs to the
-> > > > guest device to make its own writes to the image file. If the guest
-> > > > isn't allowed to write to the image (which it now isn't during incoming
-> > > > migration since it would conflict with the newer style of block
-> > > > migration using an NBD server), writing to this BlockBackend doesn't
-> > > > work any more.
-> > > > 
-> > > > So what should really happen is that incoming block migration creates
-> > > > its own BlockBackend for writing to the image. Now we don't want to do
-> > > > this anew for every incoming block, but ideally we'd just create all
-> > > > necessary BlockBackends upfront and then keep using them throughout the
-> > > > whole migration. Is there a way to get some setup/teardown callbacks
-> > > > at the start/end of the migration that could initialise and free such
-> > > > global data?
-> > > 
-> > > It can be done in the beginning of block_load() similar to
-> > > block_mig_state.bmds_list, which is created in init_blk_migration() at
-> > > save time.
+On Wed, Apr 19, 2017 at 02:13:35PM +0200, Max Reitz wrote:
+> On 19.04.2017 12:36, Fam Zheng wrote:
+> > On Tue, 04/18 15:42, Jeff Cody wrote:
+> >>> One idea presented in an earlier thread was that common.rc should create
+> >>> a subdirectory per test (rather than all tests sharing scratch/), and
+> >>> then common.rc itself install the cleanup hook that wipes out the entire
+> >>> subdirectory (or maybe even add a command-line option to ./check to
+> >>> suppress wiping when it is desirable to debug a test failure by seeing
+> >>> the droppings left behind).
+> >>>
+> >>
+> >> Yep, good ideas.  I'll leave that for another series though; there are a few
+> >> other changes based on some suggestions from Daniel that I'd like to
+> >> implement as well, and I can fold your suggestions above into a new series
+> >> (unless someone else does it first).
 > > 
-> > The difference is that block_load() is the counterpart for
-> > block_save_iterate(), not for init_blk_migration(). That is, it is
-> > called for each chunk of block migration data, which is interleaved with
-> > normal RAM migration chunks.
-> > 
-> > So we can either create each BlockBackend the first time we need it in
-> > block_load(), or create BlockBackends for all existing device BBs and
-> > BDSes the first time block_load() is called. We still need some place
-> > to actually free the BlockBackends again when the migration completes.
-> > 
-> > Dave suggested migration state notifiers, which looked like an option,
-> > but at least the existing migration states aren't enough, because the
-> > BlockBackends need to go away before blk_resume_after_migration() is
-> > called, but MIGRATION_STATUS_COMPLETED is set only afterwards.
-> > 
-> > > We can also move the if (blk != blk_prev) blk_invalidate_cache() code
-> > > out of the load loop.  It should be done once when setting up
-> > > BlockBackends.
-> > 
-> > Same problem as above, while saving has setup/cleanup callbacks, we only
-> > have the iterate callback for loading.
+> > Sounds good, I was thinking about making ./check run tests in parallel. If each
+> > test has its own tmpdir, it will be much easier.
 > 
-> Yes, and while we have the notifier chain for the source on migration state
-> changes we don't have the notifier on the destination.
+
+Neat - it'd be cool to be able to use the same options as for 'make', e.g.
+./check -j5.
+
+
+> In case you were not yet aware: you can manually set TEST_DIR, this is
+> what I do.
 > 
-> If we just add a load_cleanup  member to SaveVMHandlers and call all of them
-> at the end of an inbound migration would that be enough?
-> (And define 'end')
+> (I have a script that basically does TEST_DIR=/tmp/test-$1 ./check -$1)
+>
 
-Ideally both setup and cleanup, but yes, cleanup is the one that we
-definitely need if we don't want hardcoded calls into block migration
-code.
+Baking it into common without relying on external env variables adds extra
+niceties, because as Eric mentioned cleanup is not left up to the script
+then, and the subdir can be nuked (or kept, via an option to 'check').
 
-As for the place where to call it, I'd say at the very beginning of
-process_incoming_migration_bh(), before bdrv_invalidate_cache_all() (and
-at the corresponding place for postcopy, because this is duplicated
-code).
+This would make the scripts simpler to read and implement, and less prone to
+do Bad Things. (I keep waiting for some iotest script to misquote a var
+during cleanup and do an rm -f ~/* or something...  it'd be nice to not have
+to worry about that).
 
-Kevin
+
+-Jeff
