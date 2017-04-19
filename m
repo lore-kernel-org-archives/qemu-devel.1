@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d0ooU-0004zn-Pk
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:34:28 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d0ozq-0001Dw-Sr
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:46:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d0ooR-0000dH-Kh
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:34:26 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54080)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d0ooR-0000cu-EI
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:34:23 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d0ooP-0007V5-GI
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 12:34:21 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7694E2E80BF
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 12:34:21 +0000 (UTC)
+	(envelope-from <mreitz@redhat.com>) id 1d0ozp-0006Z7-Rl
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 08:46:10 -0400
+References: <815765cfcea726c7a4cc619c4f6c3bedb47f16b9.1492537347.git.jcody@redhat.com>
+	<e649d1d3-6310-6607-22fe-82fc961d53c4@redhat.com>
+	<20170418193129.GJ5704@localhost.localdomain>
+	<c0a0816b-9ff9-a285-dbe1-c5b4f78e6ee4@redhat.com>
+	<20170418194223.GK5704@localhost.localdomain>
+	<20170419103635.GB14508@lemon.lan>
+	<63eb8549-dea7-ba35-021c-78697aa5f099@redhat.com>
+	<20170419123647.GL5704@localhost.localdomain>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <5da01fb0-eb55-c5f8-9abe-280613444c84@redhat.com>
+Date: Wed, 19 Apr 2017 14:45:56 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 19 Apr 2017 12:21:19 -0000
-From: Mike Mol <mikemol@gmail.com>
-Reply-To: Bug 1523246 <1523246@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20151206150708.14182.82430.malonedeb@wampee.canonical.com>
-Message-Id: <20170419122119.11033.64682.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1523246] Re: Virtio-blk does not support TRIM
+In-Reply-To: <20170419123647.GL5704@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="WJ2sFs68FGtE1v4r0RxBLOOabIkQ78Bgq"
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 1/1] qemu-iotests:
+ _cleanup_qemu must be called on exit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,43 +31,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Jeff Cody <jcody@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, Eric Blake <eblake@redhat.com>, kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-Granted, it's been there since October of 2014. http://wiki.qemu-
-project.org/index.php?title=3DToDo/Block&oldid=3D4410#virtio-
-blk_discard_support_.5BPeter_Lieven.5D
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--WJ2sFs68FGtE1v4r0RxBLOOabIkQ78Bgq
+From: Max Reitz <mreitz@redhat.com>
+To: Jeff Cody <jcody@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, Eric Blake <eblake@redhat.com>,
+ kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Message-ID: <5da01fb0-eb55-c5f8-9abe-280613444c84@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 1/1] qemu-iotests: _cleanup_qemu
+ must be called on exit
+References: <815765cfcea726c7a4cc619c4f6c3bedb47f16b9.1492537347.git.jcody@redhat.com>
+ <e649d1d3-6310-6607-22fe-82fc961d53c4@redhat.com>
+ <20170418193129.GJ5704@localhost.localdomain>
+ <c0a0816b-9ff9-a285-dbe1-c5b4f78e6ee4@redhat.com>
+ <20170418194223.GK5704@localhost.localdomain>
+ <20170419103635.GB14508@lemon.lan>
+ <63eb8549-dea7-ba35-021c-78697aa5f099@redhat.com>
+ <20170419123647.GL5704@localhost.localdomain>
+In-Reply-To: <20170419123647.GL5704@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 19.04.2017 14:36, Jeff Cody wrote:
+> On Wed, Apr 19, 2017 at 02:13:35PM +0200, Max Reitz wrote:
+>> On 19.04.2017 12:36, Fam Zheng wrote:
+>>> On Tue, 04/18 15:42, Jeff Cody wrote:
+>>>>> One idea presented in an earlier thread was that common.rc should c=
+reate
+>>>>> a subdirectory per test (rather than all tests sharing scratch/), a=
+nd
+>>>>> then common.rc itself install the cleanup hook that wipes out the e=
+ntire
+>>>>> subdirectory (or maybe even add a command-line option to ./check to=
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1523246
+>>>>> suppress wiping when it is desirable to debug a test failure by see=
+ing
+>>>>> the droppings left behind).
+>>>>>
+>>>>
+>>>> Yep, good ideas.  I'll leave that for another series though; there a=
+re a few
+>>>> other changes based on some suggestions from Daniel that I'd like to=
 
-Title:
-  Virtio-blk does not support TRIM
+>>>> implement as well, and I can fold your suggestions above into a new =
+series
+>>>> (unless someone else does it first).
+>>>
+>>> Sounds good, I was thinking about making ./check run tests in paralle=
+l. If each
+>>> test has its own tmpdir, it will be much easier.
+>>
+>=20
+> Neat - it'd be cool to be able to use the same options as for 'make', e=
+=2Eg.
+> ./check -j5.
+>=20
+>=20
+>> In case you were not yet aware: you can manually set TEST_DIR, this is=
 
-Status in QEMU:
-  Confirmed
+>> what I do.
+>>
+>> (I have a script that basically does TEST_DIR=3D/tmp/test-$1 ./check -=
+$1)
+>>
+>=20
+> Baking it into common without relying on external env variables adds ex=
+tra
+> niceties, because as Eric mentioned cleanup is not left up to the scrip=
+t
+> then, and the subdir can be nuked (or kept, via an option to 'check').
+>=20
+> This would make the scripts simpler to read and implement, and less pro=
+ne to
+> do Bad Things. (I keep waiting for some iotest script to misquote a var=
 
-Bug description:
-  When model=3Dvirtio is used, TRIM is not supported.
+> during cleanup and do an rm -f ~/* or something...  it'd be nice to not=
+ have
+> to worry about that).
 
-  # mount -o discard /dev/vda4 /mnt
-  # mount | tail -1
-  /dev/vda4 on /mnt type fuseblk (rw,nosuid,nodev,relatime,user_id=3D0,grou=
-p_id=3D0,allow_other,blksize=3D4096)
-  # fstrim /mnt/
-  fstrim: /mnt/: the discard operation is not supported
+Sure, I agree. I just wanted to throw in that it isn't completely
+impossible to run iotests in parallel, at least for different formats.
 
-  Booting without model=3Dvirtio allows using TRIM (in Windows as well).
+(Baking it in would also mean that we could automatically distribute
+test invocations for a single format to multiple instances, yes (as in
+your ./check -j5 proposal). But that's work to do. :-))
 
-  Full QEMU line:
+Max
 
-  qemu-system-x86_64 -enable-kvm -cpu host -bios
-  /usr/share/ovmf/ovmf_x64.bin -smp 2 -m 7G -vga qxl -usbdevice tablet
-  -net nic,model=3Dvirtio -net user -drive discard=3Dunmap,detect-
-  zeroes=3Dunmap,cache=3Dnone,file=3Dvms/win10.hd.img.vmdk,format=3Dvmdk,if=
-=3Dvirtio
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1523246/+subscriptions
+--WJ2sFs68FGtE1v4r0RxBLOOabIkQ78Bgq
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlj3XAQSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A20sH/0ChiiH0WwcAAbFuHZbkzDaeayDRKU3G
+vA6Aaf4tnV8X3Sq/jVPyBPrfypOBjbAgk/GkDnWJSssV06TvMvhVlDqY/A/QdTUm
+FeAuZu737ewqjj/8eu7krr/hm6Gip1iv6jugYY1UQsJAiL98DF64Ob40FLahUT6y
+7GVDN2mtD+/sfuW9Nv4LGowH8H1p7vJx0oGuWrj5clOR+YlxkBQXcDe3JmyVYwfO
+nciDo9X3xeXDPbUpFqzZNbyzl/QUTk9R0FBAMXguOSZRYxBBVifl0+iJC3S0rQg7
+ro9aQrbgc4D3LyZulDJiweB5qBekNH6NXO2h0ruMDbTgJ7LROm+1Dt8=
+=jrU7
+-----END PGP SIGNATURE-----
+
+--WJ2sFs68FGtE1v4r0RxBLOOabIkQ78Bgq--
