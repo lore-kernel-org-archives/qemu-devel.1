@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d0win-0004uR-8R
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:01:11 -0400
+	(envelope-from <quintela@redhat.com>) id 1d0wo7-0000yg-Go
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:06:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d0wij-0007Ql-Df
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:01:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41514)
+	(envelope-from <quintela@redhat.com>) id 1d0wo3-0001ks-Pf
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:06:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42508)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d0wij-0007QI-7W
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:01:01 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d0wo3-0001iv-Jl
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 17:06:31 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2177712B24
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 21:01:00 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9AD5231F3FD
+	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 21:06:30 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 19 Apr 2017 22:59:22 +0200
-Message-Id: <20170419205923.8808-59-quintela@redhat.com>
-In-Reply-To: <20170419205923.8808-1-quintela@redhat.com>
-References: <20170419205923.8808-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 58/59] migration: Disable hotplug/unplug during
- migration
+Date: Wed, 19 Apr 2017 23:06:26 +0200
+Message-Id: <20170419210627.8946-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v3] Split migration bitmaps by ramblock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,61 +30,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com
 
-Until we have reviewed what can/can't be hotplugged during migration,
-disable it.  We can enable it later for the things that we know that
-work.  For instance, memory hotplug during postcopy doesn't work
-currently.
+Hi
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 
---
+I messed up previous submission and sent the wrong patch.
 
-- Fix typo.  Thanks Thomas.
-- Delay migration check after we have checked that we can hotplug that
-  device.
-- more typos
+- This verios is a rebase on top of the ramstate series
+- Fixed the problem with postcopy
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- qdev-monitor.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+Important bit is this one:
 
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index bb3d8ba..e61d596 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -29,6 +29,7 @@
- #include "qemu/error-report.h"
- #include "qemu/help_option.h"
- #include "sysemu/block-backend.h"
-+#include "migration/migration.h"
- 
- /*
-  * Aliases were a bad idea from the start.  Let's keep them
-@@ -603,6 +604,11 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
-         return NULL;
-     }
- 
-+    if (!migration_is_idle()) {
-+        error_setg(errp, "device_add not allowed while migrating");
-+        return NULL;
-+    }
-+
-     /* create device */
-     dev = DEVICE(object_new(driver));
- 
-@@ -853,6 +859,11 @@ void qdev_unplug(DeviceState *dev, Error **errp)
-         return;
-     }
- 
-+    if (!migration_is_idle()) {
-+        error_setg(errp, "device_del not allowed while migrating");
-+        return;
-+    }
-+
-     qdev_hot_removed = true;
- 
-     hotplug_ctrl = qdev_get_hotplug_handler(dev);
+-    pds->start_list[pds->cur_entry] = (start - pds->offset) * tp_size;
++    pds->start_list[pds->cur_entry] = start  * tp_size;
+
+This chunk is only used in postcopy, that is why it didn't failed
+precopy tests.  Once ther, just remove the start parameter and offset
+member because it is not used anywhere else.
+
+Please comment.
+
+Later, Juan.
+
+
+[v2]
+
+For v2 this is a rebase on top of all the changes that happened in the
+prvious two series.
+
+Please, review.
+
+[RFC]
+This series split the migration and unsent bitmaps by ramblock.  This
+makes it easier to synchronize in small bits.  This is on top of the
+RAMState and not-hotplug series.
+
+Why?
+
+reason 1:
+
+People have complained that by the time that we detect that a page is
+sent, it has already been marked dirty "again" inside kvm, so we are
+going to send it again.  On top of this patch, my idea is, for words
+of the bitmap that have any bit set, just synchonize the bitmap before
+sending the pages.  I have not looking into performance numbers yet,
+jsut asking for comments about how it is done.
+
+reason 2:
+
+In case where the host page is a multiple of the the TARGET_PAGE_SIZE,
+we do a lot of work when we are synchronizing the bitmaps to pass it
+to target page size.  The idea is to change the bitmaps on that
+RAMBlocks to mean host page size and not TARGET_PAGE_SIZE.
+
+Note that there are two reason for this, ARM and PPC do things like
+guests with 4kb pages on hosts with 16/64kb hosts, and then we have
+HugePages.  Note all the workarounds that postcopy has to do because
+to work in HugePages size.
+
+Please, comment?
+
+Later, Juan.
+
+
+*** BLURB HERE ***
+
+Juan Quintela (1):
+  ram: Split dirty bitmap by RAMBlock
+
+ include/exec/ram_addr.h          |  13 ++-
+ include/migration/postcopy-ram.h |   3 -
+ migration/postcopy-ram.c         |   5 +-
+ migration/ram.c                  | 215 +++++++++++++++------------------------
+ 4 files changed, 91 insertions(+), 145 deletions(-)
+
 -- 
 2.9.3
