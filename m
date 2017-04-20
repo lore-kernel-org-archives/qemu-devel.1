@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d1AAL-0008EN-Q7
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 07:22:27 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d1AES-0000ht-PU
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 07:26:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d1AAH-0000RR-Kn
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 07:22:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54038)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1d1AAH-0000Qt-BD
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 07:22:21 -0400
-Date: Thu, 20 Apr 2017 13:22:14 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170420132214.39606e4d@nial.brq.redhat.com>
-In-Reply-To: <20170331084147.32716-5-haozhong.zhang@intel.com>
-References: <20170331084147.32716-1-haozhong.zhang@intel.com>
-	<20170331084147.32716-5-haozhong.zhang@intel.com>
+	(envelope-from <kwolf@redhat.com>) id 1d1AER-0003ct-Kb
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 07:26:40 -0400
+Date: Thu, 20 Apr 2017 13:26:29 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170420112629.GF4747@noname.redhat.com>
+References: <20170420075237.18219-1-famz@redhat.com>
+	<20170420075237.18219-20-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 4/4] nvdimm acpi: build flush hint
- address structure if required
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170420075237.18219-20-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v13 19/20] file-posix: Add image locking in
+ perm operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,263 +24,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Haozhong Zhang <haozhong.zhang@intel.com>
-Cc: qemu-devel@nongnu.org, dan.j.williams@intel.com, "Michael S. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-On Fri, 31 Mar 2017 16:41:47 +0800
-Haozhong Zhang <haozhong.zhang@intel.com> wrote:
-
-> Add an boolean option 'flush-hint' to device 'nvdimm'. If it's on, a
-> flush hint address structure will be constructed for each nvdimm
-> device.
+Am 20.04.2017 um 09:52 hat Fam Zheng geschrieben:
+> virtlockd in libvirt locks the first byte, so we start looking at the
+> file bytes from 0x10.
 > 
-> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> ---
->  hw/acpi/nvdimm.c        | 106 +++++++++++++++++++++++++++++++++++++++++++++---
->  hw/i386/pc.c            |   5 ++-
->  hw/mem/nvdimm.c         |  26 ++++++++++++
->  include/hw/mem/nvdimm.h |   2 +-
->  4 files changed, 132 insertions(+), 7 deletions(-)
+> The complication is in the transactional interface.  To make the reopen
+> logic managable, and allow better reuse, the code is internally
+> organized with a table from old mode to the new one.
 > 
-> diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
-> index ea2ac3e..a7ff0b2 100644
-> --- a/hw/acpi/nvdimm.c
-> +++ b/hw/acpi/nvdimm.c
-> @@ -32,6 +32,8 @@
->  #include "hw/acpi/bios-linker-loader.h"
->  #include "hw/nvram/fw_cfg.h"
->  #include "hw/mem/nvdimm.h"
-> +#include "exec/address-spaces.h"
-> +#include "qapi/error.h"
->  
->  static int nvdimm_device_list(Object *obj, void *opaque)
->  {
-> @@ -168,6 +170,22 @@ struct NvdimmNfitControlRegion {
->  typedef struct NvdimmNfitControlRegion NvdimmNfitControlRegion;
->  
->  /*
-> + * NVDIMM Flush Hint Address Structure
-> + *
-> + * It enables the data durability mechanism via ACPI.
-> + */
-> +struct NvdimmNfitFlushHintAddress {
-> +    uint16_t type;
-> +    uint16_t length;
-> +    uint32_t nfit_handle;
-> +    uint16_t nr_flush_hint_addr;
-> +    uint8_t  reserved[6];
-> +#define NR_FLUSH_HINT_ADDR 1
-> +    uint64_t flush_hint_addr[NR_FLUSH_HINT_ADDR];
-> +} QEMU_PACKED;
-> +typedef struct NvdimmNfitFlushHintAddress NvdimmNfitFlushHintAddress;
-> +
-> +/*
->   * Module serial number is a unique number for each device. We use the
->   * slot id of NVDIMM device to generate this number so that each device
->   * associates with a different number.
-> @@ -343,10 +361,79 @@ static void nvdimm_build_structure_dcr(GArray *structures, DeviceState *dev)
->                                           (DSM) in DSM Spec Rev1.*/);
->  }
->  
-> -static GArray *nvdimm_build_device_structure(void)
-> +static uint64_t nvdimm_flush_hint_read(void *opaque, hwaddr addr, unsigned size)
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+
+Looking at the very early patches in this series, I think it quickly
+becomes obvious that we need to discuss one thing first:
+
+> +static int raw_check_perm(BlockDriverState *bs, uint64_t perm, uint64_t shared,
+> +                          Error **errp)
 > +{
-> +    return 0;
-> +}
+> +    bool is_shared;
+> +    BDRVRawState *s = bs->opaque;
 > +
-> +static void nvdimm_flush_hint_write(void *opaque, hwaddr addr,
-> +                                    uint64_t data, unsigned size)
-> +{
-> +    nvdimm_debug("Write Flush Hint: offset 0x%"HWADDR_PRIx", data 0x%"PRIx64"\n",
-> +                 addr, data);
-> +    nvdimm_flush((NVDIMMDevice *)opaque);
-> +}
-> +
-> +static const MemoryRegionOps nvdimm_flush_hint_ops = {
-> +    .read = nvdimm_flush_hint_read,
-> +    .write = nvdimm_flush_hint_write,
-> +};
-> +
-> +/*
-> + * ACPI 6.0: 5.2.25.7 Flush Hint Address Structure
-> + */
-> +static void nvdimm_build_structure_flush_hint(GArray *structures,
-> +                                              DeviceState *dev,
-> +                                              unsigned int cache_line_size,
-> +                                              Error **errp)
-> +{
-> +    NvdimmNfitFlushHintAddress *flush_hint;
-> +    int slot = object_property_get_int(OBJECT(dev), PC_DIMM_SLOT_PROP, NULL);
-> +    PCDIMMDevice *dimm = PC_DIMM(dev);
-> +    NVDIMMDevice *nvdimm = NVDIMM(dev);
-> +    uint64_t addr;
-> +    unsigned int i;
-> +    MemoryRegion *mr;
-> +    Error *local_err = NULL;
-> +
-> +    if (!nvdimm->flush_hint_enabled) {
-> +        return;
+> +    if (!RAW_LOCK_SUPPORTED) {
+> +        return 0;
 > +    }
-> +
-> +    if (cache_line_size * NR_FLUSH_HINT_ADDR > dimm->reserved_size) {
-> +        error_setg(&local_err,
-> +                   "insufficient reserved space for flush hint buffers");
-> +        goto out;
+> +    if (s->lock_update) {
+> +        /* Override the previously stashed update. */
+> +        g_free(s->lock_update);
+> +        s->lock_update = NULL;
 > +    }
-> +
-> +    addr = object_property_get_int(OBJECT(dev), PC_DIMM_ADDR_PROP, NULL);
-> +    addr += object_property_get_int(OBJECT(dev), PC_DIMM_SIZE_PROP, NULL);
-> +
-> +    flush_hint = acpi_data_push(structures, sizeof(*flush_hint));
-> +    flush_hint->type = cpu_to_le16(6 /* Flush Hint Address Structure */);
-> +    flush_hint->length = cpu_to_le16(sizeof(*flush_hint));
-> +    flush_hint->nfit_handle = cpu_to_le32(nvdimm_slot_to_handle(slot));
-> +    flush_hint->nr_flush_hint_addr = cpu_to_le16(NR_FLUSH_HINT_ADDR);
+> +    is_shared = !(perm & BLK_PERM_CONSISTENT_READ) && (shared & BLK_PERM_WRITE);
 
+Why do you check BLK_PERM_CONSISTENT_READ? The locks that we said we
+would take on the image file represent BLK_PERM_WRITE, both in perm and
+in shared, so this is what they should be checked against. Opening the
+image in another process is fine if BLK_PERM_WRITE is set in shared,
+even if BLK_PERM_CONSISTENT_READ is also set in perm.
 
+BLK_PERM_CONSISTENT_READ is for cases where the contents of an image
+is inherently invalid, not just because of a concurrent writer that we
+might not be aware of, but because the image just doesn't makes sense on
+it own. It may make sense as part of larger backing chain, though (the
+only place where we clear the flag is for intermediate nodes in the
+commit job). This semantics is more or less separate from what we want
+to achieve here.
 
-> +    for (i = 0; i < NR_FLUSH_HINT_ADDR; i++, addr += cache_line_size) {
-> +        flush_hint->flush_hint_addr[i] = cpu_to_le64(addr);
-> +
-> +        mr = g_new0(MemoryRegion, 1);
-> +        memory_region_init_io(mr, OBJECT(dev), &nvdimm_flush_hint_ops, nvdimm,
-> +                              "nvdimm-flush-hint", cache_line_size);
-> +        memory_region_add_subregion(get_system_memory(), addr, mr);
-this hunk should be in nvdimm_plug() and use hotplug_memory MR
-also it this region might consume upto 1G of address space due to
-1Gb alignment per slot.
+Of course, if we wanted, I guess we could individually map all 64
+bits of each perm and shared to bytes to be locked in the file, so that
+all permissions would be shared between qemu instances. That's probably
+not worth the effort though.
 
-Alternatively instead of mapping flush hint after nvdimm, you can
-use the approach used for label_data and cut out a piece for
-flush hint from the end of nvdimm's address range and possibly
-use backend's MR as parent for it, doing mapping in nvdimm_realize().
+And even if we did that, most likely you still wouldn't need any special
+exceptions for BLK_PERM_CONSISTENT_READ, because it is always shared
+except when one process wants to run a commit job - and for a commit
+job, making sure that nobody else uses the image would probably be
+right.
 
-Then flush hint would affect only nvdimm code and won't touch generic
-pc-dimm code.
+So if we really treat the file system level locks just as a mapping of
+BLK_PERM_WRITE, things should become a bit easier in the early patches
+of this series.
 
-> +    }
-> +
-> + out:
-> +    error_propagate(errp, local_err);
-> +}
-> +
-> +static GArray *nvdimm_build_device_structure(AcpiNVDIMMState *state,
-> +                                             Error **errp)
->  {
->      GSList *device_list = nvdimm_get_device_list();
->      GArray *structures = g_array_new(false, true /* clear */, 1);
-> +    Error *local_err = NULL;
->  
->      for (; device_list; device_list = device_list->next) {
->          DeviceState *dev = device_list->data;
-> @@ -362,9 +449,17 @@ static GArray *nvdimm_build_device_structure(void)
->  
->          /* build NVDIMM Control Region Structure. */
->          nvdimm_build_structure_dcr(structures, dev);
-> +
-> +        /* build Flush Hint Address Structure */
-> +        nvdimm_build_structure_flush_hint(structures, dev,
-> +                                          state->cache_line_size, &local_err);
-> +        if (local_err) {
-> +            break;
-> +        }
->      }
->      g_slist_free(device_list);
->  
-> +    error_propagate(errp, local_err);
->      return structures;
->  }
->  
-> @@ -373,16 +468,17 @@ static void nvdimm_init_fit_buffer(NvdimmFitBuffer *fit_buf)
->      fit_buf->fit = g_array_new(false, true /* clear */, 1);
->  }
->  
-> -static void nvdimm_build_fit_buffer(NvdimmFitBuffer *fit_buf)
-> +static void nvdimm_build_fit_buffer(AcpiNVDIMMState *state, Error **errp)
->  {
-> +    NvdimmFitBuffer *fit_buf = &state->fit_buf;
->      g_array_free(fit_buf->fit, true);
-> -    fit_buf->fit = nvdimm_build_device_structure();
-> +    fit_buf->fit = nvdimm_build_device_structure(state, errp);
->      fit_buf->dirty = true;
->  }
->  
-> -void nvdimm_plug(AcpiNVDIMMState *state)
-> +void nvdimm_plug(AcpiNVDIMMState *state, Error **errp)
->  {
-> -    nvdimm_build_fit_buffer(&state->fit_buf);
-> +    nvdimm_build_fit_buffer(state, errp);
->  }
->  
->  static void nvdimm_build_nfit(AcpiNVDIMMState *state, GArray *table_offsets,
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index d24388e..da4a5d7 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1718,7 +1718,10 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
->                         "nvdimm is not enabled: missing 'nvdimm' in '-M'");
->              goto out;
->          }
-> -        nvdimm_plug(&pcms->acpi_nvdimm_state);
-> +        nvdimm_plug(&pcms->acpi_nvdimm_state, &local_err);
-> +        if (local_err) {
-> +            goto out;
-> +        }
->      }
->  
->      hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
-> diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
-> index 484ab8b..a26908b 100644
-> --- a/hw/mem/nvdimm.c
-> +++ b/hw/mem/nvdimm.c
-> @@ -64,11 +64,37 @@ out:
->      error_propagate(errp, local_err);
->  }
->  
-> +static bool nvdimm_get_flush_hint(Object *obj, Error **errp)
-> +{
-> +    NVDIMMDevice *nvdimm = NVDIMM(obj);
-> +
-> +    return nvdimm->flush_hint_enabled;
-> +}
-> +
-> +static void nvdimm_set_flush_hint(Object *obj, bool val, Error **errp)
-> +{
-> +    NVDIMMDevice *nvdimm = NVDIMM(obj);
-> +    Error *local_err = NULL;
-> +
-> +    if (nvdimm->flush_hint_enabled) {
-> +        error_setg(&local_err, "cannot change property value");
-> +        goto out;
-> +    }
-> +
-> +    nvdimm->flush_hint_enabled = val;
-> +
-> + out:
-> +    error_propagate(errp, local_err);
-> +}
-> +
->  static void nvdimm_init(Object *obj)
->  {
->      object_property_add(obj, "label-size", "int",
->                          nvdimm_get_label_size, nvdimm_set_label_size, NULL,
->                          NULL, NULL);
-> +    object_property_add_bool(obj, "flush-hint",
-> +                             nvdimm_get_flush_hint, nvdimm_set_flush_hint,
-> +                             NULL);
->  }
->  
->  static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm)
-> diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
-> index 888def6..726f4d9 100644
-> --- a/include/hw/mem/nvdimm.h
-> +++ b/include/hw/mem/nvdimm.h
-> @@ -145,7 +145,7 @@ void nvdimm_init_acpi_state(AcpiNVDIMMState *state, MemoryRegion *io,
->  void nvdimm_build_acpi(GArray *table_offsets, GArray *table_data,
->                         BIOSLinker *linker, AcpiNVDIMMState *state,
->                         uint32_t ram_slots);
-> -void nvdimm_plug(AcpiNVDIMMState *state);
-> +void nvdimm_plug(AcpiNVDIMMState *state, Error **errp);
->  void nvdimm_acpi_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev);
->  void nvdimm_flush(NVDIMMDevice *nvdimm);
->  #endif
+Kevin
