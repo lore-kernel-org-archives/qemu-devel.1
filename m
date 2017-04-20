@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38670)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d1Amn-0007cR-3D
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:02:18 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d1Amv-0007nb-IE
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:02:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d1Ama-0002yS-7t
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:02:09 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d1Ami-00034b-PS
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:02:17 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 20 Apr 2017 14:00:49 +0200
-Message-Id: <20170420120058.28404-9-pbonzini@redhat.com>
+Date: Thu, 20 Apr 2017 14:00:53 +0200
+Message-Id: <20170420120058.28404-13-pbonzini@redhat.com>
 In-Reply-To: <20170420120058.28404-1-pbonzini@redhat.com>
 References: <20170420120058.28404-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 08/17] throttle-groups: protect throttled
- requests with a CoMutex
+Subject: [Qemu-devel] [PATCH 12/17] block: protect tracked_requests and
+ flush_queue with reqs_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +25,148 @@ Cc: qemu-block@nongnu.org
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/block-backend.c          |  1 +
- block/throttle-groups.c        | 11 +++++++++--
- include/sysemu/block-backend.h |  7 ++-----
- 3 files changed, 12 insertions(+), 7 deletions(-)
+ block.c                   |  1 +
+ block/io.c                | 20 +++++++++++++++++---
+ include/block/block_int.h | 12 +++++++-----
+ 3 files changed, 25 insertions(+), 8 deletions(-)
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 915ccc5..a37d74d 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -163,6 +163,7 @@ BlockBackend *blk_new(uint64_t perm, uint64_t shared_perm)
-     blk->shared_perm = shared_perm;
-     blk_set_enable_write_cache(blk, true);
+diff --git a/block.c b/block.c
+index f1aec36..3b2ed29 100644
+--- a/block.c
++++ b/block.c
+@@ -234,6 +234,7 @@ BlockDriverState *bdrv_new(void)
+         QLIST_INIT(&bs->op_blockers[i]);
+     }
+     notifier_with_return_list_init(&bs->before_write_notifiers);
++    qemu_co_mutex_init(&bs->reqs_lock);
+     bs->refcnt = 1;
+     bs->aio_context = qemu_get_aio_context();
  
-+    qemu_co_mutex_init(&blk->public.reqs_lock);
-     qemu_co_queue_init(&blk->public.throttled_reqs[0]);
-     qemu_co_queue_init(&blk->public.throttled_reqs[1]);
+diff --git a/block/io.c b/block/io.c
+index d17564b..7af9d47 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -378,8 +378,10 @@ static void tracked_request_end(BdrvTrackedRequest *req)
+         atomic_dec(&req->bs->serialising_in_flight);
+     }
  
-diff --git a/block/throttle-groups.c b/block/throttle-groups.c
-index d66bf62..695d28d 100644
---- a/block/throttle-groups.c
-+++ b/block/throttle-groups.c
-@@ -268,8 +268,13 @@ static bool throttle_group_schedule_timer(BlockBackend *blk, bool is_write)
- static bool throttle_group_co_restart_queue(BlockBackend *blk, bool is_write)
- {
-     BlockBackendPublic *blkp = blk_get_public(blk);
-+    bool ret;
- 
--    return qemu_co_queue_next(&blkp->throttled_reqs[is_write]);
-+    qemu_co_mutex_lock(&blkp->reqs_lock);
-+    ret = qemu_co_queue_next(&blkp->throttled_reqs[is_write]);
-+    qemu_co_mutex_unlock(&blkp->reqs_lock);
-+
-+    return ret;
++    qemu_co_mutex_lock(&req->bs->reqs_lock);
+     QLIST_REMOVE(req, list);
+     qemu_co_queue_restart_all(&req->wait_queue);
++    qemu_co_mutex_unlock(&req->bs->reqs_lock);
  }
  
- /* Look for the next pending I/O request and schedule it.
-@@ -338,7 +343,9 @@ void coroutine_fn throttle_group_co_io_limits_intercept(BlockBackend *blk,
-     if (must_wait || blkp->pending_reqs[is_write]) {
-         blkp->pending_reqs[is_write]++;
-         qemu_mutex_unlock(&tg->lock);
--        qemu_co_queue_wait(&blkp->throttled_reqs[is_write], NULL);
-+        qemu_co_mutex_lock(&blkp->reqs_lock);
-+        qemu_co_queue_wait(&blkp->throttled_reqs[is_write], &blkp->reqs_lock);
-+        qemu_co_mutex_unlock(&blkp->reqs_lock);
-         qemu_mutex_lock(&tg->lock);
-         blkp->pending_reqs[is_write]--;
-     }
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
-index 87a43b0..e9529fb 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -72,11 +72,8 @@ typedef struct BlockDevOps {
-  * fields that must be public. This is in particular for QLIST_ENTRY() and
-  * friends so that BlockBackends can be kept in lists outside block-backend.c */
- typedef struct BlockBackendPublic {
--    /* I/O throttling has its own locking, but also some fields are
--     * protected by the AioContext lock.
--     */
--
--    /* Protected by AioContext lock.  */
-+    /* reqs_lock protects the CoQueues for throttled requests.  */
-+    CoMutex      reqs_lock;
-     CoQueue      throttled_reqs[2];
+ /**
+@@ -404,7 +406,9 @@ static void tracked_request_begin(BdrvTrackedRequest *req,
  
-     /* Nonzero if the I/O limits are currently being ignored; generally
+     qemu_co_queue_init(&req->wait_queue);
+ 
++    qemu_co_mutex_lock(&bs->reqs_lock);
+     QLIST_INSERT_HEAD(&bs->tracked_requests, req, list);
++    qemu_co_mutex_unlock(&bs->reqs_lock);
+ }
+ 
+ static void mark_request_serialising(BdrvTrackedRequest *req, uint64_t align)
+@@ -526,6 +530,7 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
+ 
+     do {
+         retry = false;
++        qemu_co_mutex_lock(&bs->reqs_lock);
+         QLIST_FOREACH(req, &bs->tracked_requests, list) {
+             if (req == self || (!req->serialising && !self->serialising)) {
+                 continue;
+@@ -544,7 +549,7 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
+                  * (instead of producing a deadlock in the former case). */
+                 if (!req->waiting_for) {
+                     self->waiting_for = req;
+-                    qemu_co_queue_wait(&req->wait_queue, NULL);
++                    qemu_co_queue_wait(&req->wait_queue, &bs->reqs_lock);
+                     self->waiting_for = NULL;
+                     retry = true;
+                     waited = true;
+@@ -552,6 +557,7 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
+                 }
+             }
+         }
++        qemu_co_mutex_unlock(&bs->reqs_lock);
+     } while (retry);
+ 
+     return waited;
+@@ -2302,11 +2308,13 @@ int coroutine_fn bdrv_co_flush(BlockDriverState *bs)
+     current_gen = atomic_read(&bs->write_gen);
+ 
+     /* Wait until any previous flushes are completed */
++    qemu_co_mutex_lock(&bs->reqs_lock);
+     while (bs->active_flush_req) {
+-        qemu_co_queue_wait(&bs->flush_queue, NULL);
++        qemu_co_queue_wait(&bs->flush_queue, &bs->reqs_lock);
+     }
+ 
+     bs->active_flush_req = true;
++    qemu_co_mutex_unlock(&bs->reqs_lock);
+ 
+     /* Write back all layers by calling one driver function */
+     if (bs->drv->bdrv_co_flush) {
+@@ -2328,10 +2336,14 @@ int coroutine_fn bdrv_co_flush(BlockDriverState *bs)
+         goto flush_parent;
+     }
+ 
+-    /* Check if we really need to flush anything */
++    /* Check if we really need to flush anything
++     * TODO: use int and atomic access */
++    qemu_co_mutex_lock(&bs->reqs_lock);
+     if (bs->flushed_gen == current_gen) {
++        qemu_co_mutex_unlock(&bs->reqs_lock);
+         goto flush_parent;
+     }
++    qemu_co_mutex_unlock(&bs->reqs_lock);
+ 
+     BLKDBG_EVENT(bs->file, BLKDBG_FLUSH_TO_DISK);
+     if (bs->drv->bdrv_co_flush_to_disk) {
+@@ -2375,12 +2387,14 @@ flush_parent:
+     ret = bs->file ? bdrv_co_flush(bs->file->bs) : 0;
+ out:
+     /* Notify any pending flushes that we have completed */
++    qemu_co_mutex_lock(&bs->reqs_lock);
+     if (ret == 0) {
+         bs->flushed_gen = current_gen;
+     }
+     bs->active_flush_req = false;
+     /* Return value is ignored - it's ok if wait queue is empty */
+     qemu_co_queue_next(&bs->flush_queue);
++    qemu_co_mutex_unlock(&bs->reqs_lock);
+ 
+ early_exit:
+     bdrv_dec_in_flight(bs);
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 552680c..42b49f5 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -595,11 +595,6 @@ struct BlockDriverState {
+     uint64_t write_threshold_offset;
+     NotifierWithReturn write_threshold_notifier;
+ 
+-    QLIST_HEAD(, BdrvTrackedRequest) tracked_requests;
+-    CoQueue flush_queue;                  /* Serializing flush queue */
+-    bool active_flush_req;                /* Flush request in flight? */
+-    unsigned int flushed_gen;             /* Flushed write generation */
+-
+     QLIST_HEAD(, BdrvDirtyBitmap) dirty_bitmaps;
+ 
+     /* Offset after the highest byte written to */
+@@ -630,6 +625,13 @@ struct BlockDriverState {
+     /* Accessed with atomic ops.  */
+     int quiesce_counter;
+     unsigned int write_gen;               /* Current data generation */
++
++    /* Protected by reqs_lock.  */
++    QLIST_HEAD(, BdrvTrackedRequest) tracked_requests;
++    CoQueue flush_queue;                  /* Serializing flush queue */
++    bool active_flush_req;                /* Flush request in flight? */
++    unsigned int flushed_gen;             /* Flushed write generation */
++    CoMutex reqs_lock;
+ };
+ 
+ struct BlockBackendRootState {
 -- 
 2.9.3
