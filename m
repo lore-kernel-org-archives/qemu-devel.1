@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d1H7J-0001iG-HR
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 14:47:46 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d1H7U-0001oU-BS
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 14:47:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d1H7I-0004RU-3G
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 14:47:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38698)
+	(envelope-from <ehabkost@redhat.com>) id 1d1H7P-0004Uz-Oy
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 14:47:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53358)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d1H7H-0004R8-Q9
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 14:47:44 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d1H7P-0004UY-Id
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 14:47:51 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 20 Apr 2017 15:46:54 -0300
-Message-Id: <20170420184705.25018-5-ehabkost@redhat.com>
+Date: Thu, 20 Apr 2017 15:46:55 -0300
+Message-Id: <20170420184705.25018-6-ehabkost@redhat.com>
 In-Reply-To: <20170420184705.25018-1-ehabkost@redhat.com>
 References: <20170420184705.25018-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 04/15] memory: introduce
- memory_region_notify_one()
+Subject: [Qemu-devel] [PULL 05/15] memory: add MemoryRegionIOMMUOps.replay()
+ callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,107 +29,52 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>,
 
 From: Peter Xu <peterx@redhat.com>
 
-Generalizing the notify logic in memory_region_notify_iommu() into a
-single function. This can be further used in customized replay()
-functions for IOMMUs.
+Originally we have one memory_region_iommu_replay() function, which is
+the default behavior to replay the translations of the whole IOMMU
+region. However, on some platform like x86, we may want our own replay
+logic for IOMMU regions. This patch adds one more hook for IOMMUOps for
+the callback, and it'll override the default if set.
 
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: \"Michael S. Tsirkin\" <mst@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <1491562755-23867-5-git-send-email-peterx@redhat.com>
+Message-Id: <1491562755-23867-6-git-send-email-peterx@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/exec/memory.h | 15 +++++++++++++++
- memory.c              | 40 ++++++++++++++++++++++++----------------
- 2 files changed, 39 insertions(+), 16 deletions(-)
+ include/exec/memory.h | 2 ++
+ memory.c              | 6 ++++++
+ 2 files changed, 8 insertions(+)
 
 diff --git a/include/exec/memory.h b/include/exec/memory.h
-index fb7dff3405..055b3a8b23 100644
+index 055b3a8b23..c0280b7064 100644
 --- a/include/exec/memory.h
 +++ b/include/exec/memory.h
-@@ -688,6 +688,21 @@ void memory_region_notify_iommu(MemoryRegion *mr,
-                                 IOMMUTLBEntry entry);
+@@ -191,6 +191,8 @@ struct MemoryRegionIOMMUOps {
+     void (*notify_flag_changed)(MemoryRegion *iommu,
+                                 IOMMUNotifierFlag old_flags,
+                                 IOMMUNotifierFlag new_flags);
++    /* Set this up to provide customized IOMMU replay function */
++    void (*replay)(MemoryRegion *iommu, IOMMUNotifier *notifier);
+ };
  
- /**
-+ * memory_region_notify_one: notify a change in an IOMMU translation
-+ *                           entry to a single notifier
-+ *
-+ * This works just like memory_region_notify_iommu(), but it only
-+ * notifies a specific notifier, not all of them.
-+ *
-+ * @notifier: the notifier to be notified
-+ * @entry: the new entry in the IOMMU translation table.  The entry
-+ *         replaces all old entries for the same virtual I/O address range.
-+ *         Deleted entries have .@perm == 0.
-+ */
-+void memory_region_notify_one(IOMMUNotifier *notifier,
-+                              IOMMUTLBEntry *entry);
-+
-+/**
-  * memory_region_register_iommu_notifier: register a notifier for changes to
-  * IOMMU translation entries.
-  *
+ typedef struct CoalescedMemoryRange CoalescedMemoryRange;
 diff --git a/memory.c b/memory.c
-index b4ed67b27a..ded4bf13d6 100644
+index ded4bf13d6..b782d5bc5a 100644
 --- a/memory.c
 +++ b/memory.c
-@@ -1662,32 +1662,40 @@ void memory_region_unregister_iommu_notifier(MemoryRegion *mr,
-     memory_region_update_iommu_notify_flags(mr);
- }
+@@ -1626,6 +1626,12 @@ void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n,
+     hwaddr addr, granularity;
+     IOMMUTLBEntry iotlb;
  
--void memory_region_notify_iommu(MemoryRegion *mr,
--                                IOMMUTLBEntry entry)
-+void memory_region_notify_one(IOMMUNotifier *notifier,
-+                              IOMMUTLBEntry *entry)
- {
--    IOMMUNotifier *iommu_notifier;
-     IOMMUNotifierFlag request_flags;
- 
--    assert(memory_region_is_iommu(mr));
-+    /*
-+     * Skip the notification if the notification does not overlap
-+     * with registered range.
-+     */
-+    if (notifier->start > entry->iova + entry->addr_mask + 1 ||
-+        notifier->end < entry->iova) {
++    /* If the IOMMU has its own replay callback, override */
++    if (mr->iommu_ops->replay) {
++        mr->iommu_ops->replay(mr, n);
 +        return;
 +    }
- 
--    if (entry.perm & IOMMU_RW) {
-+    if (entry->perm & IOMMU_RW) {
-         request_flags = IOMMU_NOTIFIER_MAP;
-     } else {
-         request_flags = IOMMU_NOTIFIER_UNMAP;
-     }
- 
-+    if (notifier->notifier_flags & request_flags) {
-+        notifier->notify(notifier, entry);
-+    }
-+}
 +
-+void memory_region_notify_iommu(MemoryRegion *mr,
-+                                IOMMUTLBEntry entry)
-+{
-+    IOMMUNotifier *iommu_notifier;
-+
-+    assert(memory_region_is_iommu(mr));
-+
-     IOMMU_NOTIFIER_FOREACH(iommu_notifier, mr) {
--        /*
--         * Skip the notification if the notification does not overlap
--         * with registered range.
--         */
--        if (iommu_notifier->start > entry.iova + entry.addr_mask + 1 ||
--            iommu_notifier->end < entry.iova) {
--            continue;
--        }
--        if (iommu_notifier->notifier_flags & request_flags) {
--            iommu_notifier->notify(iommu_notifier, &entry);
--        }
-+        memory_region_notify_one(iommu_notifier, &entry);
-     }
- }
+     granularity = memory_region_iommu_get_min_page_size(mr);
  
+     for (addr = 0; addr < memory_region_size(mr); addr += granularity) {
 -- 
 2.11.0.259.g40922b1
