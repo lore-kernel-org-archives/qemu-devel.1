@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d1Amg-0007W2-P8
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:02:08 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d1Amk-0007Z9-GC
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:02:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d1AmY-0002w3-LA
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:02:02 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d1AmZ-0002wo-5Y
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:02:06 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 20 Apr 2017 14:00:47 +0200
-Message-Id: <20170420120058.28404-7-pbonzini@redhat.com>
+Date: Thu, 20 Apr 2017 14:00:46 +0200
+Message-Id: <20170420120058.28404-6-pbonzini@redhat.com>
 In-Reply-To: <20170420120058.28404-1-pbonzini@redhat.com>
 References: <20170420120058.28404-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 06/17] block: access io_plugged with atomic ops
+Subject: [Qemu-devel] [PATCH 05/17] block: access wakeup with atomic ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,54 +24,97 @@ Cc: qemu-block@nongnu.org
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/io.c                | 4 ++--
- include/block/block_int.h | 8 +++++---
- 2 files changed, 7 insertions(+), 5 deletions(-)
+ block/io.c                | 3 ++-
+ block/nfs.c               | 4 +++-
+ block/sheepdog.c          | 3 ++-
+ include/block/block.h     | 5 +++--
+ include/block/block_int.h | 4 ++--
+ 5 files changed, 12 insertions(+), 7 deletions(-)
 
 diff --git a/block/io.c b/block/io.c
-index 3b2ede9..3ab9476 100644
+index 869322a..3b2ede9 100644
 --- a/block/io.c
 +++ b/block/io.c
-@@ -2653,7 +2653,7 @@ void bdrv_io_plug(BlockDriverState *bs)
-         bdrv_io_plug(child->bs);
+@@ -501,7 +501,8 @@ static void dummy_bh_cb(void *opaque)
+ 
+ void bdrv_wakeup(BlockDriverState *bs)
+ {
+-    if (bs->wakeup) {
++    /* The barrier (or an atomic op) is in the caller.  */
++    if (atomic_read(&bs->wakeup)) {
+         aio_bh_schedule_oneshot(qemu_get_aio_context(), dummy_bh_cb, NULL);
      }
+ }
+diff --git a/block/nfs.c b/block/nfs.c
+index 0816678..fd2508a 100644
+--- a/block/nfs.c
++++ b/block/nfs.c
+@@ -736,7 +736,9 @@ nfs_get_allocated_file_size_cb(int ret, struct nfs_context *nfs, void *data,
+     if (task->ret < 0) {
+         error_report("NFS Error: %s", nfs_get_error(nfs));
+     }
+-    task->complete = 1;
++
++    /* Set task->complete before reading bs->wakeup.  */
++    atomic_mb_set(&task->complete, 1);
+     bdrv_wakeup(task->bs);
+ }
  
--    if (bs->io_plugged++ == 0) {
-+    if (atomic_fetch_inc(&bs->io_plugged) == 0) {
-         BlockDriver *drv = bs->drv;
-         if (drv && drv->bdrv_io_plug) {
-             drv->bdrv_io_plug(bs);
-@@ -2666,7 +2666,7 @@ void bdrv_io_unplug(BlockDriverState *bs)
-     BdrvChild *child;
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index fb9203e..7e90a24 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -704,7 +704,8 @@ out:
  
-     assert(bs->io_plugged);
--    if (--bs->io_plugged == 0) {
-+    if (atomic_fetch_dec(&bs->io_plugged) == 1) {
-         BlockDriver *drv = bs->drv;
-         if (drv && drv->bdrv_io_unplug) {
-             drv->bdrv_io_unplug(bs);
+     srco->co = NULL;
+     srco->ret = ret;
+-    srco->finished = true;
++    /* Set srco->finished before reading bs->wakeup.  */
++    atomic_mb_set(&srco->finished, true);
+     if (srco->bs) {
+         bdrv_wakeup(srco->bs);
+     }
+diff --git a/include/block/block.h b/include/block/block.h
+index 5ddc0cf..486b6ed 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -398,7 +398,8 @@ void bdrv_drain_all(void);
+          * block_job_defer_to_main_loop for how to do it). \
+          */                                                \
+         assert(!bs_->wakeup);                              \
+-        bs_->wakeup = true;                                \
++        /* Set bs->wakeup before evaluating cond.  */      \
++        atomic_mb_set(&bs_->wakeup, true);                 \
+         while (busy_) {                                    \
+             if ((cond)) {                                  \
+                 waited_ = busy_ = true;                    \
+@@ -410,7 +411,7 @@ void bdrv_drain_all(void);
+                 waited_ |= busy_;                          \
+             }                                              \
+         }                                                  \
+-        bs_->wakeup = false;                               \
++        atomic_set(&bs_->wakeup, false);                   \
+     }                                                      \
+     waited_; })
+ 
 diff --git a/include/block/block_int.h b/include/block/block_int.h
-index ca34c99..283d079 100644
+index 7317db6..ca34c99 100644
 --- a/include/block/block_int.h
 +++ b/include/block/block_int.h
-@@ -597,9 +597,6 @@ struct BlockDriverState {
-     uint64_t write_threshold_offset;
-     NotifierWithReturn write_threshold_notifier;
+@@ -590,8 +590,6 @@ struct BlockDriverState {
+     /* Callback before write request is processed */
+     NotifierWithReturnList before_write_notifiers;
  
--    /* counter for nested bdrv_io_plug */
--    unsigned io_plugged;
+-    bool wakeup;
 -
-     QLIST_HEAD(, BdrvTrackedRequest) tracked_requests;
-     CoQueue flush_queue;                  /* Serializing flush queue */
-     bool active_flush_req;                /* Flush request in flight? */
-@@ -622,6 +619,11 @@ struct BlockDriverState {
+     /* Offset after the highest byte written to */
+     uint64_t wr_highest_offset;
  
-     bool wakeup;
+@@ -622,6 +620,8 @@ struct BlockDriverState {
+     unsigned int in_flight;
+     unsigned int serialising_in_flight;
  
-+    /* counter for nested bdrv_io_plug.
-+     * Accessed with atomic ops.
-+    */
-+    unsigned io_plugged;
++    bool wakeup;
 +
      /* do we need to tell the quest if we have a volatile write cache? */
      int enable_write_cache;
