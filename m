@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38653)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d1Amm-0007bt-HV
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:02:16 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d1Amq-0007gZ-4t
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:02:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d1Amc-00031g-9i
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:02:08 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d1Ami-00034h-Pf
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:02:12 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 20 Apr 2017 14:00:43 +0200
-Message-Id: <20170420120058.28404-3-pbonzini@redhat.com>
+Date: Thu, 20 Apr 2017 14:00:45 +0200
+Message-Id: <20170420120058.28404-5-pbonzini@redhat.com>
 In-Reply-To: <20170420120058.28404-1-pbonzini@redhat.com>
 References: <20170420120058.28404-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 02/17] block: access quiesce_counter with
+Subject: [Qemu-devel] [PATCH 04/17] block: access serialising_in_flight with
  atomic ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,43 +25,68 @@ Cc: qemu-block@nongnu.org
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/io.c                | 4 ++--
- include/block/block_int.h | 1 +
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ block/io.c                |  6 +++---
+ include/block/block_int.h | 10 ++++++----
+ 2 files changed, 9 insertions(+), 7 deletions(-)
 
 diff --git a/block/io.c b/block/io.c
-index 08de488..3a27fd5 100644
+index 3a27fd5..869322a 100644
 --- a/block/io.c
 +++ b/block/io.c
-@@ -241,7 +241,7 @@ void bdrv_drained_begin(BlockDriverState *bs)
-         return;
+@@ -375,7 +375,7 @@ void bdrv_drain_all(void)
+ static void tracked_request_end(BdrvTrackedRequest *req)
+ {
+     if (req->serialising) {
+-        req->bs->serialising_in_flight--;
++        atomic_dec(&req->bs->serialising_in_flight);
      }
  
--    if (!bs->quiesce_counter++) {
-+    if (atomic_fetch_inc(&bs->quiesce_counter) == 0) {
-         aio_disable_external(bdrv_get_aio_context(bs));
-         bdrv_parent_drained_begin(bs);
+     QLIST_REMOVE(req, list);
+@@ -414,7 +414,7 @@ static void mark_request_serialising(BdrvTrackedRequest *req, uint64_t align)
+                                - overlap_offset;
+ 
+     if (!req->serialising) {
+-        req->bs->serialising_in_flight++;
++        atomic_inc(&req->bs->serialising_in_flight);
+         req->serialising = true;
      }
-@@ -252,7 +252,7 @@ void bdrv_drained_begin(BlockDriverState *bs)
- void bdrv_drained_end(BlockDriverState *bs)
- {
-     assert(bs->quiesce_counter > 0);
--    if (--bs->quiesce_counter > 0) {
-+    if (atomic_fetch_dec(&bs->quiesce_counter) > 1) {
-         return;
+ 
+@@ -519,7 +519,7 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
+     bool retry;
+     bool waited = false;
+ 
+-    if (!bs->serialising_in_flight) {
++    if (!atomic_read(&bs->serialising_in_flight)) {
+         return false;
      }
  
 diff --git a/include/block/block_int.h b/include/block/block_int.h
-index d0b88ff..a43fe78 100644
+index a43fe78..7317db6 100644
 --- a/include/block/block_int.h
 +++ b/include/block/block_int.h
-@@ -623,6 +623,7 @@ struct BlockDriverState {
+@@ -590,10 +590,6 @@ struct BlockDriverState {
+     /* Callback before write request is processed */
+     NotifierWithReturnList before_write_notifiers;
+ 
+-    /* number of in-flight requests; overall and serialising */
+-    unsigned int in_flight;
+-    unsigned int serialising_in_flight;
+-
+     bool wakeup;
+ 
+     /* Offset after the highest byte written to */
+@@ -620,6 +616,12 @@ struct BlockDriverState {
+      */
+     int copy_on_read;
+ 
++    /* number of in-flight requests; overall and serialising.
++     * Accessed with atomic ops.
++     */
++    unsigned int in_flight;
++    unsigned int serialising_in_flight;
++
      /* do we need to tell the quest if we have a volatile write cache? */
      int enable_write_cache;
- 
-+    /* Accessed with atomic ops.  */
-     int quiesce_counter;
- };
  
 -- 
 2.9.3
