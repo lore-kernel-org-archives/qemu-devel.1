@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1d1F90-0008Oh-3S
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:23 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1d1F90-0008Oi-8C
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1d1F8y-00085A-NU
+	(envelope-from <pm215@archaic.org.uk>) id 1d1F8z-00085T-2m
 	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:22 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:36886)
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:36885)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1d1F8y-00084S-F6
+	id 1d1F8y-0007wI-Rb
 	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:20 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1d1F8x-0006yI-Iu
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 17:41:19 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1d1F8y-0006yW-1d
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 17:41:20 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 20 Apr 2017 17:41:03 +0100
-Message-Id: <1492706470-10921-18-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 20 Apr 2017 17:41:04 +0100
+Message-Id: <1492706470-10921-19-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1492706470-10921-1-git-send-email-peter.maydell@linaro.org>
 References: <1492706470-10921-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 17/24] arm: Thumb shift operations should not
- permit interworking branches
+Subject: [Qemu-devel] [PULL 18/24] arm: Factor out "generate right kind of
+ step exception"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,44 +33,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-In Thumb mode, the only instructions which can cause an interworking
-branch by writing the PC are BLX, BX, BXJ, LDR, POP and LDM. Unlike
-ARM mode, data processing instructions which target the PC do not
-cause interworking branches.
+We currently have two places that do:
+            if (dc->ss_active) {
+                gen_step_complete_exception(dc);
+            } else {
+                gen_exception_internal(EXCP_DEBUG);
+            }
 
-When we added support for doing interworking branches on writes to
-PC from data processing instructions in commit 21aeb3430ce7ba, we
-accidentally changed a Thumb instruction to have interworking
-branch behaviour for writes to PC. (MOV, MOVS register-shifted
-register, encoding T2; this is the standard encoding for
-LSL/LSR/ASR/ROR (register).)
-
-For this encoding, behaviour with Rd == R15 is specified as
-UNPREDICTABLE, so allowing an interworking branch is within
-spec, but it's confusing and differs from our handling of this
-class of UNPREDICTABLE for other Thumb ALU operations. Make
-it perform a simple (non-interworking) branch like the others.
+Factor this out into its own function, as we're about to add
+a third place that needs the same logic.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 1491844419-12485-3-git-send-email-peter.maydell@linaro.org
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Message-id: 1491844419-12485-4-git-send-email-peter.maydell@linaro.org
 ---
- target/arm/translate.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/arm/translate.c | 28 ++++++++++++++++------------
+ 1 file changed, 16 insertions(+), 12 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index fe3f442..ddc62b6 100644
+index ddc62b6..870e320 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -9959,7 +9959,7 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
-             gen_arm_shift_reg(tmp, op, tmp2, logic_cc);
-             if (logic_cc)
-                 gen_logic_CC(tmp);
--            store_reg_bx(s, rd, tmp);
-+            store_reg(s, rd, tmp);
-             break;
-         case 1: /* Sign/zero extend.  */
-             op = (insn >> 20) & 7;
+@@ -296,6 +296,19 @@ static void gen_step_complete_exception(DisasContext *s)
+     s->is_jmp = DISAS_EXC;
+ }
+ 
++static void gen_singlestep_exception(DisasContext *s)
++{
++    /* Generate the right kind of exception for singlestep, which is
++     * either the architectural singlestep or EXCP_DEBUG for QEMU's
++     * gdb singlestepping.
++     */
++    if (s->ss_active) {
++        gen_step_complete_exception(s);
++    } else {
++        gen_exception_internal(EXCP_DEBUG);
++    }
++}
++
+ static void gen_smul_dual(TCGv_i32 a, TCGv_i32 b)
+ {
+     TCGv_i32 tmp1 = tcg_temp_new_i32();
+@@ -11998,24 +12011,15 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
+             gen_set_pc_im(dc, dc->pc);
+             /* fall through */
+         default:
+-            if (dc->ss_active) {
+-                gen_step_complete_exception(dc);
+-            } else {
+-                /* FIXME: Single stepping a WFI insn will not halt
+-                   the CPU.  */
+-                gen_exception_internal(EXCP_DEBUG);
+-            }
++            /* FIXME: Single stepping a WFI insn will not halt the CPU. */
++            gen_singlestep_exception(dc);
+         }
+         if (dc->condjmp) {
+             /* "Condition failed" instruction codepath. */
+             gen_set_label(dc->condlabel);
+             gen_set_condexec(dc);
+             gen_set_pc_im(dc, dc->pc);
+-            if (dc->ss_active) {
+-                gen_step_complete_exception(dc);
+-            } else {
+-                gen_exception_internal(EXCP_DEBUG);
+-            }
++            gen_singlestep_exception(dc);
+         }
+     } else {
+         /* While branches must always occur at the end of an IT block,
 -- 
 2.7.4
