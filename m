@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49586)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d1BQM-0008V3-TI
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:43:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1d1BcK-00028j-M4
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:55:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d1BQJ-0004EW-KT
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:43:02 -0400
-Resent-Message-Id: <E1d1BQJ-0004EW-KT@eggs.gnu.org>
-In-Reply-To: <20170420120058.28404-1-pbonzini@redhat.com>
-Message-ID: <149269216180.42.10888603719254337083@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <eblake@redhat.com>) id 1d1BcJ-0001op-J3
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:55:24 -0400
+References: <20170420005428.11465-1-famz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e7241a3d-fb8e-582e-abe7-bff2c8658d52@redhat.com>
+Date: Thu, 20 Apr 2017 07:55:11 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 20 Apr 2017 05:42:42 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH for 2.10 00/17] Block layer thread safety,
- part 1
+In-Reply-To: <20170420005428.11465-1-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="PtIaRsu3QmiV4e0qCOjdwRGOF0a6Fjpgm"
+Subject: Re: [Qemu-devel] [PATCH v3] iotests: 109: Filter out "len" of
+ failed jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,73 +24,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, pbonzini@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcwNDIwMTIwMDU4LjI4NDA0LTEtcGJvbnppbmlAcmVkaGF0LmNvbQpTdWJq
-ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIGZvciAyLjEwIDAwLzE3XSBCbG9jayBsYXllciB0aHJl
-YWQgc2FmZXR5LCBwYXJ0IDEKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gK
-CkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwp
-CmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
-ZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0
-cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNv
-bW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAt
-biAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1h
-aWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBm
-YWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZh
-aWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIx
-NjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXBy
-b2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwNDIwMTIxNjM5LjMy
-Njg1LTEtYmVycmFuZ2VAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTcwNDIwMTIxNjM5LjMyNjg1
-LTEtYmVycmFuZ2VAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmM3
-MTYyNjQgYmxvY2s6IG1ha2UgYWNjb3VudGluZyB0aHJlYWQtc2FmZQo3ZDA3MDRmIGJsb2NrOiBw
-cm90ZWN0IG1vZGlmaWNhdGlvbiBvZiBkaXJ0eSBiaXRtYXBzIHdpdGggYSBtdXRleAoyMjU5OTUw
-IGJsb2NrOiBpbnRyb2R1Y2UgZGlydHlfYml0bWFwX211dGV4CjA1MzIwMDkgYmxvY2s6IG9wdGlt
-aXplIGFjY2VzcyB0byByZXFzX2xvY2sKODYyZmQ5OCBjb3JvdXRpbmUtbG9jazogaW50cm9kdWNl
-IHFlbXVfY29fbXV0ZXhfbG9ja191bmxvY2sKNWQ5ZDY5OSBibG9jazogcHJvdGVjdCB0cmFja2Vk
-X3JlcXVlc3RzIGFuZCBmbHVzaF9xdWV1ZSB3aXRoIHJlcXNfbG9jawphNjVkNGIwIGJsb2NrOiBh
-Y2Nlc3Mgd3JpdGVfZ2VuIHdpdGggYXRvbWljcwowMWFjNzViIGJsb2NrOiB1c2UgU3RhdDY0IGZv
-ciB3cl9oaWdoZXN0X29mZnNldAo2MjhkMWJhIHV0aWw6IGFkZCBzdGF0czY0IG1vZHVsZQplYTZi
-YjU5IHRocm90dGxlLWdyb3VwczogcHJvdGVjdCB0aHJvdHRsZWQgcmVxdWVzdHMgd2l0aCBhIENv
-TXV0ZXgKODk1YTExZCB0aHJvdHRsZS1ncm91cHM6IGRvIG5vdCB1c2UgcWVtdV9jb19lbnRlcl9u
-ZXh0CjQyY2U0YjMgYmxvY2s6IGFjY2VzcyBpb19wbHVnZ2VkIHdpdGggYXRvbWljIG9wcwpiYzJk
-ZWIxIGJsb2NrOiBhY2Nlc3Mgd2FrZXVwIHdpdGggYXRvbWljIG9wcwoxOGQyZDk2IGJsb2NrOiBh
-Y2Nlc3Mgc2VyaWFsaXNpbmdfaW5fZmxpZ2h0IHdpdGggYXRvbWljIG9wcwphMTExNTFkIGJsb2Nr
-OiBhY2Nlc3MgaW9fbGltaXRzX2Rpc2FibGVkIHdpdGggYXRvbWljIG9wcwpjNGQ3MzIzIGJsb2Nr
-OiBhY2Nlc3MgcXVpZXNjZV9jb3VudGVyIHdpdGggYXRvbWljIG9wcwo5YzE5MmJkIGJsb2NrOiBh
-Y2Nlc3MgY29weV9vbl9yZWFkIHdpdGggYXRvbWljIG9wcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0K
-Q2hlY2tpbmcgUEFUQ0ggMS8xNzogYmxvY2s6IGFjY2VzcyBjb3B5X29uX3JlYWQgd2l0aCBhdG9t
-aWMgb3BzLi4uCkNoZWNraW5nIFBBVENIIDIvMTc6IGJsb2NrOiBhY2Nlc3MgcXVpZXNjZV9jb3Vu
-dGVyIHdpdGggYXRvbWljIG9wcy4uLgpDaGVja2luZyBQQVRDSCAzLzE3OiBibG9jazogYWNjZXNz
-IGlvX2xpbWl0c19kaXNhYmxlZCB3aXRoIGF0b21pYyBvcHMuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8x
-NzogYmxvY2s6IGFjY2VzcyBzZXJpYWxpc2luZ19pbl9mbGlnaHQgd2l0aCBhdG9taWMgb3BzLi4u
-CkNoZWNraW5nIFBBVENIIDUvMTc6IGJsb2NrOiBhY2Nlc3Mgd2FrZXVwIHdpdGggYXRvbWljIG9w
-cy4uLgpDaGVja2luZyBQQVRDSCA2LzE3OiBibG9jazogYWNjZXNzIGlvX3BsdWdnZWQgd2l0aCBh
-dG9taWMgb3BzLi4uCkNoZWNraW5nIFBBVENIIDcvMTc6IHRocm90dGxlLWdyb3VwczogZG8gbm90
-IHVzZSBxZW11X2NvX2VudGVyX25leHQuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xNzogdGhyb3R0bGUt
-Z3JvdXBzOiBwcm90ZWN0IHRocm90dGxlZCByZXF1ZXN0cyB3aXRoIGEgQ29NdXRleC4uLgpDaGVj
-a2luZyBQQVRDSCA5LzE3OiB1dGlsOiBhZGQgc3RhdHM2NCBtb2R1bGUuLi4KV0FSTklORzogYXJj
-aGl0ZWN0dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzM1OiBGSUxFOiBp
-bmNsdWRlL3FlbXUvc3RhdHM2NC5oOjE4OgorI2lmIF9fU0laRU9GX0xPTkdfXyA8IDgKCkVSUk9S
-OiBtZW1vcnkgYmFycmllciB3aXRob3V0IGNvbW1lbnQKIzM0MzogRklMRTogdXRpbC9zdGF0czY0
-LmM6MTAwOgorICAgICAgICBzbXBfd21iKCk7CgpFUlJPUjogbWVtb3J5IGJhcnJpZXIgd2l0aG91
-dCBjb21tZW50CiMzNzI6IEZJTEU6IHV0aWwvc3RhdHM2NC5jOjEyOToKKyAgICAgICAgc21wX3dt
-YigpOwoKdG90YWw6IDIgZXJyb3JzLCAxIHdhcm5pbmdzLCAzNTAgbGluZXMgY2hlY2tlZAoKWW91
-ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTAvMTc6
-IGJsb2NrOiB1c2UgU3RhdDY0IGZvciB3cl9oaWdoZXN0X29mZnNldC4uLgpDaGVja2luZyBQQVRD
-SCAxMS8xNzogYmxvY2s6IGFjY2VzcyB3cml0ZV9nZW4gd2l0aCBhdG9taWNzLi4uCkNoZWNraW5n
-IFBBVENIIDEyLzE3OiBibG9jazogcHJvdGVjdCB0cmFja2VkX3JlcXVlc3RzIGFuZCBmbHVzaF9x
-dWV1ZSB3aXRoIHJlcXNfbG9jay4uLgpDaGVja2luZyBQQVRDSCAxMy8xNzogY29yb3V0aW5lLWxv
-Y2s6IGludHJvZHVjZSBxZW11X2NvX211dGV4X2xvY2tfdW5sb2NrLi4uCkNoZWNraW5nIFBBVENI
-IDE0LzE3OiBibG9jazogb3B0aW1pemUgYWNjZXNzIHRvIHJlcXNfbG9jay4uLgpDaGVja2luZyBQ
-QVRDSCAxNS8xNzogYmxvY2s6IGludHJvZHVjZSBkaXJ0eV9iaXRtYXBfbXV0ZXguLi4KQ2hlY2tp
-bmcgUEFUQ0ggMTYvMTc6IGJsb2NrOiBwcm90ZWN0IG1vZGlmaWNhdGlvbiBvZiBkaXJ0eSBiaXRt
-YXBzIHdpdGggYSBtdXRleC4uLgpDaGVja2luZyBQQVRDSCAxNy8xNzogYmxvY2s6IG1ha2UgYWNj
-b3VudGluZyB0aHJlYWQtc2FmZS4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBl
-eGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
-IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
-IHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--PtIaRsu3QmiV4e0qCOjdwRGOF0a6Fjpgm
+From: Eric Blake <eblake@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ qemu-block@nongnu.org, pbonzini@redhat.com
+Message-ID: <e7241a3d-fb8e-582e-abe7-bff2c8658d52@redhat.com>
+Subject: Re: [PATCH v3] iotests: 109: Filter out "len" of failed jobs
+References: <20170420005428.11465-1-famz@redhat.com>
+In-Reply-To: <20170420005428.11465-1-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 04/19/2017 07:54 PM, Fam Zheng wrote:
+> Mirror calculates job len from current I/O progress:
+>=20
+>     s->common.len =3D s->common.offset +
+>                     (cnt + s->sectors_in_flight) * BDRV_SECTOR_SIZE;
+>=20
+> The final "len" of a failed mirror job in iotests 109 depends on the
+> subtle timing of the completion of read and write issued in the first
+> mirror iteration.  The second iteration may or may not have run when th=
+e
+> I/O error happens, resulting in non-deterministic output of the
+> BLOCK_JOB_COMPLETED event text.
+>=20
+> Similar to what was done in a752e4786, filter out the field to make the=
+
+> test robust.
+>=20
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+>=20
+> ---
+>=20
+> v3: Cover more cases. [Kevin, Paolo]
+
+That my testing missed those extra cases is just proof that the behavior
+is non-deterministic.  Munging the 'len' data in more places is the
+right solution.
+
+>=20
+> v2: Add Eric's r-b.
+
+Once again:
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Tested-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--PtIaRsu3QmiV4e0qCOjdwRGOF0a6Fjpgm
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY+K+vAAoJEKeha0olJ0NqurYH/iM3r8fkH/b0Vaj/Ms5RhR5+
+qIUnV9Dy8LiucBfbcnGavlWkcNxaa5czPD5W2JJmoXhnfKwbVAL+fbKtGIg38MGi
+nQHSkVyuwmE59YMPRmLw3r49MAhvrcYr+bGcy2G/Sx7eCdQBGW37bZWNX9hibIev
+JXYFGi12ECZ5eAK+IFdB5a4xzJnBOs5qCUcI/jInnLgAGJbPerbC/IdIefUegKJw
+K75+joQlRgmzFKVy3d4tRkm3FfkCVuYHIoTD8lJX6hm4uIHL1J/4/RXiTXG4gwEr
+qg+baT7Ko5GnUjo/qtNysA06dGpZSvqphqWaztq9mRjFmygkiZDu2FK8nbySTHQ=
+=1mMe
+-----END PGP SIGNATURE-----
+
+--PtIaRsu3QmiV4e0qCOjdwRGOF0a6Fjpgm--
