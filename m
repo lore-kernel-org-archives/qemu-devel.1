@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46915)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d1Dvx-0007Gl-CW
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 11:23:50 -0400
+	(envelope-from <berrange@redhat.com>) id 1d1E2R-0000ff-Mz
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 11:30:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d1Dvw-0008Ss-LK
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 11:23:49 -0400
-Date: Thu, 20 Apr 2017 11:23:39 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170420152339.GB3676@localhost.localdomain>
+	(envelope-from <berrange@redhat.com>) id 1d1E2Q-0002wW-MF
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 11:30:31 -0400
+Date: Thu, 20 Apr 2017 16:30:16 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170420153016.GI3227@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <20170420040003.31074-1-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <20170420040003.31074-1-famz@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH] sheepdog: Set error when connection fails
@@ -23,7 +24,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, sheepdog@lists.wpkg.org, qemu-block@nongnu.org, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Liu Yuan <namei.unix@gmail.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, sheepdog@lists.wpkg.org, qemu-block@nongnu.org, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, Liu Yuan <namei.unix@gmail.com>
 
 On Thu, Apr 20, 2017 at 12:00:03PM +0800, Fam Zheng wrote:
 > Signed-off-by: Fam Zheng <famz@redhat.com>
@@ -41,16 +42,23 @@ On Thu, Apr 20, 2017 at 12:00:03PM +0800, Fam Zheng wrote:
 >          fd = -EIO;
 > +        error_setg(errp, "Failed to connect to sheepdog server");
 >      }
->  
->      return fd;
-> -- 
-> 2.9.3
-> 
 
-Thanks,
+This doesn't make much sense to me. The lines just above the
+diff context have this:
 
-Applied to my block branch:
+    fd = socket_connect(s->addr, errp, NULL, NULL);
 
-git://github.com/codyprime/qemu-kvm-jtc block
+socket_connect should have already reported an error on "errp"
+in the scenario that 'fd == -1'. So AFAICT the new error_setg is
+just throwing away the real detailed error message in favour of
+a generic message.
 
--Jeff
+So I'm puzzelled why we need to change anything - error reporting
+should already be working fine.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
