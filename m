@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54075)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d14HN-00059f-Kg
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 01:05:18 -0400
+	(envelope-from <jasowang@redhat.com>) id 1d14Rb-0006e0-2K
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 01:15:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d14HM-00009k-FG
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 01:05:17 -0400
-Date: Thu, 20 Apr 2017 15:04:29 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170420050429.GD13992@umbus.fritz.box>
-References: <20170418221724.5707-1-ehabkost@redhat.com>
-	<20170418221724.5707-4-ehabkost@redhat.com>
-	<CAFEAcA_Ky5SecogNFq3+RO8pX4sqxvsSbw0KihAv=8teqCSJbw@mail.gmail.com>
-	<20170419125001.GU25239@thinpad.lan.raisama.net>
+	(envelope-from <jasowang@redhat.com>) id 1d14RW-00035c-4u
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 01:15:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35798)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d14RV-00035V-SK
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 01:15:46 -0400
+References: <1487734936-43472-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1487734936-43472-3-git-send-email-zhang.zhanghailiang@huawei.com>
+	<134776c2-a85d-d06f-5f98-2e664f9c8ca9@cn.fujitsu.com>
+	<d33b0150-5ed2-56cc-9261-da7deb1d0bfb@redhat.com>
+	<58F06AA1.2010301@huawei.com>
+	<9b42232a-e86f-2d61-7987-7a0559d6f705@redhat.com>
+	<58F4A12C.5070404@huawei.com>
+	<f7f4639d-7a08-5120-27f8-346011dc754f@redhat.com>
+	<58F5B902.8030105@huawei.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <c92f4670-5ecc-c048-b017-d78966a89514@redhat.com>
+Date: Thu, 20 Apr 2017 13:15:34 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="pQhZXvAqiZgbeUkD"
-Content-Disposition: inline
-In-Reply-To: <20170419125001.GU25239@thinpad.lan.raisama.net>
-Subject: Re: [Qemu-devel] [RFC v2 3/6] pci: Rename and change signatures of
- pci_bus_new() & related functions
+In-Reply-To: <58F5B902.8030105@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 02/15] colo-compare: implement the process
+ of checkpoint
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,86 +35,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, David Gibson <dgibson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Alexander Graf <agraf@suse.de>, Aurelien Jarno <aurelien@aurel32.net>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Paul Burton <paul.burton@imgtec.com>, Richard Henderson <rth@twiddle.net>, Scott Wood <scottwood@freescale.com>, Yongbok Kim <yongbok.kim@imgtec.com>, qemu-arm <qemu-arm@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
+To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
+Cc: xuquan8@huawei.com, xiecl.fnst@cn.fujitsu.com, dgilbert@redhat.com, lizhijian@cn.fujitsu.com
 
 
---pQhZXvAqiZgbeUkD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 19, 2017 at 09:50:01AM -0300, Eduardo Habkost wrote:
-> On Wed, Apr 19, 2017 at 09:41:42AM +0100, Peter Maydell wrote:
-> > On 18 April 2017 at 23:17, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > > pci_bus_new*() and pci_register_bus() work only when the 'parent'
-> > > argument is a PCI_HOST_BRIDGE object. Rename them to reflect that they
-> > > are meant to initialize a bus that's in a PCI host bridge.
-> > >
-> > > The new function names are:
-> > > * pci_host_bus_init() (replacing pci_bus_new())
-> > > * pci_host_bus_init_inplace() (replacing pci_bus_new_inplace())
-> > > * pci_host_bus_init_irqs() (replacing pci_register_bus())
-> >=20
-> > This is moving these functions away from the convention that
-> > we seem to mostly follow for buses (eg ISA, SCSI) of
-> > foo_bus_new() to allocate and return a new bus, and
-> > foo_bus_new_inplace() to initialize a bus that's inline in
-> > some other struct.
-> >=20
-> > I'm not sure this is a good idea unless we have a plan to
-> > convert all the other QOM buses and document that this is
-> > the right way to implement init for a bus.
->=20
-> The point of the rename is that those functions are doing more
-> than just allocating a PCIBus. They do some initialization of
-> PCIHostState as well. That's why non-root PCI buses can't be
-> created by pci_bus_new*() today.
+On 2017=E5=B9=B404=E6=9C=8818=E6=97=A5 14:58, Hailiang Zhang wrote:
+> On 2017/4/18 11:55, Jason Wang wrote:
+>>
+>> On 2017=E5=B9=B404=E6=9C=8817=E6=97=A5 19:04, Hailiang Zhang wrote:
+>>> Hi Jason,
+>>>
+>>> On 2017/4/14 14:38, Jason Wang wrote:
+>>>> On 2017=E5=B9=B404=E6=9C=8814=E6=97=A5 14:22, Hailiang Zhang wrote:
+>>>>> Hi Jason,
+>>>>>
+>>>>> On 2017/4/14 13:57, Jason Wang wrote:
+>>>>>> On 2017=E5=B9=B402=E6=9C=8822=E6=97=A5 17:31, Zhang Chen wrote:
+>>>>>>> On 02/22/2017 11:42 AM, zhanghailiang wrote:
+>>>>>>>> While do checkpoint, we need to flush all the unhandled packets,
+>>>>>>>> By using the filter notifier mechanism, we can easily to notify
+>>>>>>>> every compare object to do this process, which runs inside
+>>>>>>>> of compare threads as a coroutine.
+>>>>>>> Hi~ Jason and Hailiang.
+>>>>>>>
+>>>>>>> I will send a patch set later about colo-compare notify=20
+>>>>>>> mechanism for
+>>>>>>> Xen like this patch.
+>>>>>>> I want to add a new chardev socket way in colo-comapre connect=20
+>>>>>>> to Xen
+>>>>>>> colo, for notify
+>>>>>>> checkpoint or failover, Because We have no choice to use this way
+>>>>>>> communicate with Xen codes.
+>>>>>>> That's means we will have two notify mechanism.
+>>>>>>> What do you think about this?
+>>>>>>>
+>>>>>>>
+>>>>>>> Thanks
+>>>>>>> Zhang Chen
+>>>>>> I was thinking the possibility of using similar way to for colo
+>>>>>> compare.
+>>>>>> E.g can we use socket? This can saves duplicated codes more or les=
+s.
+>>>>> Since there are too many sockets used by filter and COLO, (Two unix
+>>>>> sockets and two
+>>>>>    tcp sockets for each vNIC), I don't want to introduce more ;) ,=20
+>>>>> but
+>>>>> i'm not sure if it is
+>>>>> possible to make it more flexible and optional, abstract these
+>>>>> duplicated codes,
+>>>>> pass the opened fd (No matter eventfd or socket fd ) as parameter,=20
+>>>>> for
+>>>>> example.
+>>>>> Is this way acceptable ?
+>>>>>
+>>>>> Thanks,
+>>>>> Hailiang
+>>>> Yes, that's kind of what I want. We don't want to use two message
+>>>> format. Passing a opened fd need management support, we still need a
+>>>> fallback if there's no management on top. For qemu/kvm, we can do al=
+l
+>>>> stuffs transparent to the cli by e.g socketpair() or others, but=20
+>>>> the key
+>>>> is to have a unified message format.
+>>> After a deeper investigation, i think we can re-use most codes, since
+>>> there is no
+>>> existing way to notify xen (no ?), we still needs notify chardev
+>>> socket (Be used to notify xen, it is optional.)
+>>> (http://patchwork.ozlabs.org/patch/733431/ "COLO-compare: Add Xen
+>>> notify chardev socket handler frame")
+>> Yes and actually you can use this for bi-directional communication. Th=
+e
+>> only differences is the implementation of comparing.
+>>
+>>> Besides, there is an existing qmp comand 'xen-colo-do-checkpoint',
+>> I don't see this in master?
+>
+> Er, it has been merged already, please see migration/colo.c, void=20
+> qmp_xen_colo_do_checkpoint(Error **errp);
 
-Hm, yeah.
+Aha, I see. Thanks.
 
-So.. for what's now pci_register_bus() is it even worth keeping a
-helper?  Could we just require that callers call the other init
-function then call pci_bus_irqs().  That would be one less name to
-come up with.
+>
+>>> we can re-use it to notify
+>>> colo-compare objects and other filter objects to do checkpoint, for
+>>> the opposite direction, we use
+>>> the notify chardev socket (Only for xen).
+>> Just want to make sure I understand the design, who will trigger this
+>> command? Management?
+>
+> The command will be issued by XEN (xc_save ?), the original existing=20
+> xen-colo-do-checkpoint
+> command now only be used to notify block replication to do checkpoint,=20
+> we can re-use it for filters too.
 
-For the others, what about
-	pci_common_root_bus_new()
-	pci_common_root_bus_init_inplace()
-?
+So it was called by management. For KVM case, we probably don't need=20
+this since the comparing thread are under control of qemu.
 
-> Maybe the answer here is to move the PCI_HOST_BRIDGE-specific
-> code somewhere else, and make pci_bus_new*() more generic. This
-> would allow us to reuse pci_bus_new*() when creating non-root PCI
-> buses, later.
+>
+>> Can we just use the socket?
+>
+> I don't quite understand ...
+> Just as the codes showed bellow, in this scenario,
+> XEN notifies colo-compare and fiters do checkpoint by using qmp command=
+,
 
-That might work even better.
+Yes, that's just what I mean. Technically Xen can use socket to do this t=
+oo.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Thanks
 
---pQhZXvAqiZgbeUkD
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJY+EFdAAoJEGw4ysog2bOSXqUQAJc6NVR9euDF5VoL3+4bIU5u
-vtNWoK6pISy831mbKsKSIpLQQ+x+lrZaOrtlP8IjLoQWwxywNKybg+EIw8KEwmlW
-R4zJll5gxGdr3On6qI4TJ9QowRc1nWKNZAk0DLRlq26+Hcucb7hU4pwbnL9448RT
-eCOioV00nV5pKk1PsnNXu89EpvklwASUWB52nSIuFbg4p4xzBEZnWFq5Uh/rS2aH
-gkBD2pyxb736tl30SsEAYBOjQUmQS4ULnfu6GkNaMpD0+VmTChiF8eUoixdU1z3k
-0LIFSh4uaSiBDlD/CnlyTMQ0f9/g3HFepqpzW+QMS1KJ5xESKw4l8kAukICdNci+
-luKT0j7FEkTzThLUp+26DfTx59yxSOqt3l87Z0BC3MYV8vzwqReTxyIwBZ0DALli
-QCNzJLODndxLByqO6WNIzrGarMbLis8IUXbF427AUBVepLh/Cs7eEe1ohLCk4NtP
-/xOLVcu3mRdVoeeTOjrI8Trr+P9NEkD9BULRQkcEKX6P5oAD8/iag3dDO6YOC45D
-nyP2LgN7KqccnjQnZxWu/kBU2uBw/dAi/8GIh/q2xakuIcb7NGqAcjIM0PrPThSW
-ErcK9JJ9rlHHWcNUfUJfjmRHtuQb1WE+tlgeBGzrhpd80kZeJP1zDfy52mRv1nx3
-+AwjG2nhvfCbkymP3xGJ
-=csp7
------END PGP SIGNATURE-----
-
---pQhZXvAqiZgbeUkD--
+> and colo-compare notifies XEN about net inconsistency event by using=20
+> the new socket.
+>
+>>> So the codes will be like:
+>>> diff --git a/migration/colo.c b/migration/colo.c
+>>> index 91da936..813c281 100644
+>>> --- a/migration/colo.c
+>>> +++ b/migration/colo.c
+>>> @@ -224,7 +224,19 @@ ReplicationStatus
+>>> *qmp_query_xen_replication_status(Error **errp)
+>>>
+>>>   void qmp_xen_colo_do_checkpoint(Error **errp)
+>>>   {
+>>> +    Error *local_err =3D NULL;
+>>> +
+>>>       replication_do_checkpoint_all(errp);
+>>> +    /* Notify colo-compare and other filters to do checkpoint */
+>>> +    colo_notify_compares_event(NULL, COLO_CHECKPOINT, &local_err);
+>>> +    if (local_err) {
+>>> +        error_propagate(errp, local_err);
+>>> +        return;
+>>> +    }
+>>> +    colo_notify_filters_event(COLO_CHECKPOINT, &local_err);
+>>> +    if (local_err) {
+>>> +        error_propagate(errp, local_err);
+>>> +    }
+>>>   }
+>>>
+>>>   static void colo_send_message(QEMUFile *f, COLOMessage msg,
+>>> diff --git a/net/colo-compare.c b/net/colo-compare.c
+>>> index 24e13f0..de975c5 100644
+>>> --- a/net/colo-compare.c
+>>> +++ b/net/colo-compare.c
+>>> @@ -391,6 +391,9 @@ static void colo_compare_inconsistent_notify(void=
+)
+>>>   {
+>>>       notifier_list_notify(&colo_compare_notifiers,
+>>>                   migrate_get_current());
+>
+> KVM will use this notifier/callback way, and in this way, we can avoid=20
+> the redundant socket.
+>
+>>> +    if (s->notify_dev) {
+>>> +       /* Do something, notify remote side through notify dev */
+>>> +    }
+>>>   }
+>
+> If we have a notify socket configured, we will send the message about=20
+> net inconsistent event.
+>
+>>>
+>>>   void colo_compare_register_notifier(Notifier *notify)
+>>>
+>>> How about this scenario =EF=BC=9F
+>> See my reply above, and we need unify the message format too. Raw stri=
+ng
+>> is ok but we'd better have something like TLV or others.
+>
+> Agreed, we need it to be more standard.
+>
+> Thanks,
+> Hailiang
+>
+>> Thanks
+>>
+>>>> Thoughts?
+>>>>
+>>>> Thanks
+>>>>
+>>>>>> Thanks
+>>>>>>
+>>>>>>
+>>>>>> .
+>>>>>>
+>>>> .
+>>>>
+>>>
+>>>
+>>
+>> .
+>>
+>
+>
