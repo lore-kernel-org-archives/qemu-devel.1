@@ -1,36 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.kiszka@siemens.com>) id 1d16AR-0005Xd-5P
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:06:16 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d16NH-0007Bj-Rx
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:19:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.kiszka@siemens.com>) id 1d16AN-0000sP-2g
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:06:15 -0400
-Received: from goliath.siemens.de ([192.35.17.28]:53055)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
-	id 1d16AM-0000qB-O6
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:06:10 -0400
-References: <286AC319A985734F985F78AFA26841F7391EF490@shsmsx102.ccr.corp.intel.com>
-	<9ce5d497-c52a-23fc-a43d-ac7c895faedb@siemens.com>
-	<58F722EE.7030300@intel.com>
-	<d96b8097-b541-9908-8141-86267e726471@siemens.com>
-	<58F72942.3030802@intel.com>
-	<fcf62a96-b3fd-cffc-c784-7af46144cbb2@siemens.com>
-	<58F735CF.7040404@intel.com>
-	<13ccf73a-1553-ce8c-df4a-89c26cdc27b6@siemens.com>
-	<58F745C9.9090106@intel.com>
-	<abdb3dab-d96d-927a-3a63-92ade03afc5a@siemens.com>
-	<286AC319A985734F985F78AFA26841F7391EFB38@shsmsx102.ccr.corp.intel.com>
-	<b752f6cb-b75e-dbae-73cf-ef3fee5516d5@siemens.com>
-	<58F85A70.8080006@intel.com>
-From: Jan Kiszka <jan.kiszka@siemens.com>
-Message-ID: <f536cee8-a17e-bcfe-d16e-6ec266baf924@siemens.com>
-Date: Thu, 20 Apr 2017 09:05:59 +0200
+	(envelope-from <rth7680@gmail.com>) id 1d16NE-0005NP-MN
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:19:31 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33939)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d16NE-0005NG-FQ
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:19:28 -0400
+Received: by mail-wm0-x241.google.com with SMTP id z129so8996468wmb.1
+	for <qemu-devel@nongnu.org>; Thu, 20 Apr 2017 00:19:28 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1492631083-23965-1-git-send-email-joserz@linux.vnet.ibm.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <a8eb495d-7c03-2d6f-c8df-3970f08bc05d@twiddle.net>
+Date: Thu, 20 Apr 2017 00:19:23 -0700
 MIME-Version: 1.0
-In-Reply-To: <58F85A70.8080006@intel.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <1492631083-23965-1-git-send-email-joserz@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: Vhost-pci RFC2.0
+Subject: Re: [Qemu-devel] [PATCH 0/2] VFIO: Make 8-byte accesses atomic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,87 +29,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>
-Cc: Jailhouse <jailhouse-dev@googlegroups.com>
+To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: aik@ozlabs.ru, pbonzini@redhat.com, alex.williamson@redhat.com, mdroth@linux.vnet.ibm.com
 
-On 2017-04-20 08:51, Wei Wang wrote:
-> On 04/19/2017 10:52 PM, Jan Kiszka wrote:
->> On 2017-04-19 16:33, Wang, Wei W wrote:
->>> On 04/19/2017 07:21 PM, Jan Kiszka wrote:
->>>> On 2017-04-19 13:11, Wei Wang wrote:
->>>>> On 04/19/2017 06:36 PM, Jan Kiszka wrote:
->>>>>> On 2017-04-19 12:02, Wei Wang wrote:
->>>>>>>>>>> The design presented here intends to use only one BAR to expose
->>>>>>>>>>> both TX and RX. The two VMs share an intermediate memory here,
->>>>>>>>>>> why couldn't we give the same permission to TX and RX?
->>>>>>>>>>>
->>>>>>>>>> For security and/or safety reasons: the TX side can then safely
->>>>>>>>>> prepare and sign a message in-place because the RX side cannot
->>>>>>>>>> mess around with it while not yet being signed (or check-summed).
->>>>>>>>>> Saves one copy from a secure place into the shared memory.
->>>>>>>>> If we allow guest1 to write to RX, what safety issue would it
->>>>>>>>> cause to guest2?
->>>>>>>> This way, guest1 could trick guest2, in a race condition, to sign a
->>>>>>>> modified message instead of the original one.
->>>>>>>>
->>>>>>> Just align the context that we are talking about: RX is the
->>>>>>> intermediate shared ring that guest1 uses to receive packets and
->>>>>>> guest2 uses to send packet.
->>>>>>>
->>>>>>> Seems the issue is that guest1 will receive a hacked message from RX
->>>>>>> (modified by itself). How would it affect guest2?
->>>>>> Retry: guest2 wants to send a signed/hashed message to guest1. For
->>>>>> that purpose, it starts to build that message inside the shared
->>>>>> memory that
->>>>>> guest1 can at least read, then guest2 signs that message, also
->>>>>> in-place.
->>>>>> If guest1 can modify the message inside the ring while guest2 has not
->>>>>> yet signed it, the result is invalid.
->>>>>>
->>>>>> Now, if guest2 is the final receiver of the message, nothing is lost,
->>>>>> guest2 just shot itself into the foot. However, if guest2 is just a
->>>>>> router (gray channel) and the message travels further, guest2 now has
->>>>>> corrupted that channel without allowing the final receive to detect
->>>>>> that. That's the scenario.
->>>>> If guest2 has been a malicious guest, I think it wouldn't make a
->>>>> difference whether we protect the shared RX or not. As a router,
->>>>> guest2 can play tricks on the messages after read it and then send the
->>>>> modified message to a third man, right?
->>>> It can swallow it, "steal" it (redirect), but it can't manipulate
->>>> the signed content
->>>> without being caught, that's the idea. It's particularly relevant
->>>> for safety-critical
->>>> traffic from one safe application to another over unreliable
->>>> channels, but it may
->>>> also be relevant for the integrity of messages in a secure setup.
->>>>
->>> OK, I see most of your story, thanks. To get to the bottom of it, is
->>> it possible to
->>> Sign the packet before put it onto the unreliable channel (e.g. the
->>> shared RX),
->>> Instead of signing in-place? If that's doable, we can have a simpler
->>> shared channel.
->> Of course, you can always add another copy... But as it was trivial to
->> add unidirectional shared memory support to ivshmem [1], I see no reason
->> this shouldn't be possible for vhost-pci as well.
->>
-> 
-> IIUC, this requires the ring and it's head/tail to be put into different
-> regions, it would
-> be hard to fit the existing virtqueue into the shared the channel, since
-> the vring and
-> its pointers (e.g. idx) and flags are on the same page.
-> So, probably will need to use another ring type.
+On 04/19/2017 12:44 PM, Jose Ricardo Ziviani wrote:
+> This patchset has two patches:
+> [1] 8-byte writes to non-mapped MMIO are broken into pairs of 4-byte writes, this patch makes such pairs atomic.
+>
+> [2] Enable 8-byte accesses in vfio_region_write and vfio_region_read.
+>
+> Patches based on master.
+>
+> Jose Ricardo Ziviani (2):
+>   vfio: Set MemoryRegionOps:max_access_size and min_access_size
+>   vfio: enable 8-byte reads/writes to vfio
+>
+>  hw/vfio/common.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+>
 
-The current virtio spec allows this split already - though it may not be
-lived by existing implementations (we do, though, in ivshmem-net).
-Future virtio spec (1.1 IIRC) will require a third region that holds the
-meta data and has to be writable by both sides. But it will remain
-possible to keep outgoing and incoming payload in separate pages, thus
-with different access permissions.
+I think these patches need to be squashed to be bisectable.
 
-Jan
 
--- 
-Siemens AG, Corporate Technology, CT RDA ITP SES-DE
-Corporate Competence Center Embedded Linux
+r~
