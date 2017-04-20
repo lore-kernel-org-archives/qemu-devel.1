@@ -1,13 +1,13 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d1DuK-0006SZ-O6
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 11:22:09 -0400
+	(envelope-from <jcody@redhat.com>) id 1d1Dvx-0007Gl-CW
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 11:23:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d1DuJ-0007vw-P8
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 11:22:08 -0400
-Date: Thu, 20 Apr 2017 11:21:59 -0400
+	(envelope-from <jcody@redhat.com>) id 1d1Dvw-0008Ss-LK
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 11:23:49 -0400
+Date: Thu, 20 Apr 2017 11:23:39 -0400
 From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170420152159.GA3676@localhost.localdomain>
+Message-ID: <20170420152339.GB3676@localhost.localdomain>
 References: <20170420040003.31074-1-famz@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -41,16 +41,16 @@ On Thu, Apr 20, 2017 at 12:00:03PM +0800, Fam Zheng wrote:
 >          fd = -EIO;
 > +        error_setg(errp, "Failed to connect to sheepdog server");
 >      }
-
-A bit odd that we don't just return right away in this function after a
-failed called to socket_connect(), but that has nothing to do with your
-patch.
-
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-
-
 >  
 >      return fd;
 > -- 
 > 2.9.3
 > 
+
+Thanks,
+
+Applied to my block branch:
+
+git://github.com/codyprime/qemu-kvm-jtc block
+
+-Jeff
