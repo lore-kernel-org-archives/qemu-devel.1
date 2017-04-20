@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d16oi-00041a-D3
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:47:53 -0400
+	(envelope-from <famz@redhat.com>) id 1d16sO-000679-7K
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:51:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d16od-0001Ed-HP
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:47:52 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3443
-	helo=dggrg02-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d16od-00013y-5q
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:47:47 -0400
-From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Date: Thu, 20 Apr 2017 15:46:52 +0800
-Message-ID: <1492674416-9408-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	(envelope-from <famz@redhat.com>) id 1d16sN-0002jR-7s
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:51:40 -0400
+Date: Thu, 20 Apr 2017 15:51:28 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170420075128.GD24486@lemon.lan>
+References: <1492661065-18510-1-git-send-email-lidongchen@tencent.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 0/3] colo-compare: fix three bugs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1492661065-18510-1-git-send-email-lidongchen@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: check bs_n when use old style
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,23 +23,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jasowang@redhat.com, zhangchen.fnst@cn.fujitsu.com
-Cc: qemu-devel@nongnu.org, weidong.huang@huawei.com, zhanghailiang <zhang.zhanghailiang@huawei.com>
+To: jemmy858585@gmail.com
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, Lidong Chen <lidongchen@tencent.com>, qemu-block@nongnu.org, mreitz@redhat.com
 
-Hi, 
+On Thu, 04/20 12:04, jemmy858585@gmail.com wrote:
+> From: Lidong Chen <lidongchen@tencent.com>
+> 
+> When use old style option like -o backing_file, img_convert
+> continue run when bs_n > 1, this patch fix this bug.
+> 
+> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+> ---
+>  qemu-img.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/qemu-img.c b/qemu-img.c
+> index b220cf7..c673aef 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -2225,6 +2225,13 @@ static int img_convert(int argc, char **argv)
+>          out_baseimg = out_baseimg_param;
+>      }
+>  
+> +    if (bs_n > 1 && out_baseimg) {
+> +        error_report("-B makes no sense when concatenating multiple input "
+> +                     "images");
+> +        ret = -1;
+> +        goto out;
+> +    }
+> +
+>      /* Check if compression is supported */
+>      if (compress) {
+>          bool encryption =
+> -- 
+> 1.8.3.1
+> 
+> 
 
-This series fixes three bugs found in our test, please review.
+Is this essentially the same as the check a few lines above:
 
-Thanks.
+    ...
+    if (bs_n < 1) {
+        error_exit("Must specify image file name");
+    }
 
-zhanghailiang (3):
-  colo-compare: serialize compare thread's initialization with main
-    thread
-  colo-compare: Check main_loop value before call g_main_loop_quit
-  colo-compare: fix a memory leak
 
- net/colo-compare.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+    if (bs_n > 1 && out_baseimg) {
+        error_report("-B makes no sense when concatenating multiple input "
+                     "images");
+        ret = -1;
+        goto out;
+    }
 
--- 
-1.8.3.1
+    src_flags = 0;
+    ret = bdrv_parse_cache_mode(src_cache, &src_flags, &src_writethrough);
+    if (ret < 0) {
+        error_report("Invalid source cache option: %s", src_cache);
+        goto out;
+    }
+    ...
+
+How about moving that down?
+
+Fam
