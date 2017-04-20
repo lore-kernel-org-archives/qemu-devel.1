@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d1GZM-00037k-Hc
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 14:12:41 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d1H23-0008Nq-5E
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 14:42:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d1GZL-0001wE-G9
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 14:12:40 -0400
-References: <20170419222258.13415-1-eblake@redhat.com>
-	<87k26fffxa.fsf@dusky.pond.sub.org> <20170420120922.GJ20955@redhat.com>
-	<1f4e72ed-fab1-7099-768e-2a111df3a633@redhat.com>
-	<87r30n83d1.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <65718a2d-c866-09a9-b60c-69a6b9a263fd@redhat.com>
-Date: Thu, 20 Apr 2017 13:12:19 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1d1H1z-00037n-8G
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 14:42:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52696)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d1H1y-00037U-V5
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 14:42:15 -0400
+Date: Thu, 20 Apr 2017 15:42:10 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170420184210.GF25239@thinpad.lan.raisama.net>
+References: <20170419195413.30141-2-bobby.prani@gmail.com>
+	<CAJhHMCAfexwn92bt0=rfzBB0hbgqzCpRpgnsEXbG5cnmnFYztA@mail.gmail.com>
+	<20170419201314.GX25239@thinpad.lan.raisama.net>
+	<CAJhHMCDpJhRoeGXRvPdqLD7zeVh_dmKX9wDcZcCSFwLj_+Cwkw@mail.gmail.com>
+	<20170419205706.GY25239@thinpad.lan.raisama.net>
+	<CAJhHMCBN8N27M7H4a3ayv6rezKoc9+UH5xPqE4Pu2MPYKD8RgQ@mail.gmail.com>
+	<20170419213349.GC25239@thinpad.lan.raisama.net>
+	<CAJhHMCB1GBC6ay4O61gnF8NtHg9+DCVR3dAcVjd253-GX3BoAw@mail.gmail.com>
+	<20170420022629.GD25239@thinpad.lan.raisama.net>
+	<CAJhHMCAjHsRDwa5sbWeQstLCe3o4nA7-GHAYrewP59H7wYeBBg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <87r30n83d1.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="30j48tWkATCMtRibvP1ewUFpnIoeIFhgu"
-Subject: Re: [Qemu-devel] [PATCH v2] event: Add source information to
- SHUTDOWN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJhHMCAjHsRDwa5sbWeQstLCe3o4nA7-GHAYrewP59H7wYeBBg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] tcg/i386: Do not display HT warning for TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,95 +35,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:Overall" <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, Scott Wood <scottwood@freescale.com>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Rob Herring <robh@kernel.org>, Stefano Stabellini <sstabellini@kernel.org>, Magnus Damm <magnus.damm@gmail.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Anthony Perard <anthony.perard@citrix.com>, "open list:X86" <xen-devel@lists.xenproject.org>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>, Alistair Francis <alistair.francis@xilinx.com>, "open list:Calxeda Highbank" <qemu-arm@nongnu.org>, Jan Kiszka <jan.kiszka@web.de>, Igor Mammedov <imammedo@redhat.com>, Cor nelia Huck <cornelia.huck@de.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Paul Burton <paul.burton@imgtec.com>, Max Filippov <jcmvbkbc@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, Michael Walle <michael@walle.cc>, "open list:New World" <qemu-ppc@nongnu.org>, Yongbok Kim <yongbok.kim@imgtec.com>, Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Pranith Kumar <bobby.prani@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---30j48tWkATCMtRibvP1ewUFpnIoeIFhgu
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- "open list:Overall" <kvm@vger.kernel.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Scott Wood <scottwood@freescale.com>, Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Rob Herring
- <robh@kernel.org>, Stefano Stabellini <sstabellini@kernel.org>,
- Magnus Damm <magnus.damm@gmail.com>, Alexander Graf <agraf@suse.de>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Anthony Perard <anthony.perard@citrix.com>,
- "open list:X86" <xen-devel@lists.xenproject.org>,
- Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>,
- Alistair Francis <alistair.francis@xilinx.com>,
- "open list:Calxeda Highbank" <qemu-arm@nongnu.org>,
- Jan Kiszka <jan.kiszka@web.de>, Igor Mammedov <imammedo@redhat.com>,
- Cor nelia Huck <cornelia.huck@de.ibm.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Paul Burton <paul.burton@imgtec.com>, Max Filippov <jcmvbkbc@gmail.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, Michael Walle <michael@walle.cc>,
- "open list:New World" <qemu-ppc@nongnu.org>,
- Yongbok Kim <yongbok.kim@imgtec.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <65718a2d-c866-09a9-b60c-69a6b9a263fd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] event: Add source information to SHUTDOWN
-References: <20170419222258.13415-1-eblake@redhat.com>
- <87k26fffxa.fsf@dusky.pond.sub.org> <20170420120922.GJ20955@redhat.com>
- <1f4e72ed-fab1-7099-768e-2a111df3a633@redhat.com>
- <87r30n83d1.fsf@dusky.pond.sub.org>
-In-Reply-To: <87r30n83d1.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, Apr 20, 2017 at 12:14:18AM -0400, Pranith Kumar wrote:
+> On Wed, Apr 19, 2017 at 10:26 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > On Wed, Apr 19, 2017 at 06:03:01PM -0400, Pranith Kumar wrote:
+> >> On Wed, Apr 19, 2017 at 5:33 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> >> > On Wed, Apr 19, 2017 at 05:25:23PM -0400, Pranith Kumar wrote:
+> >> >> On Wed, Apr 19, 2017 at 4:57 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> >> >> > On Wed, Apr 19, 2017 at 04:16:53PM -0400, Pranith Kumar wrote:
+> >> >> >> On Wed, Apr 19, 2017 at 4:13 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> >> >> >> > On Wed, Apr 19, 2017 at 04:00:49PM -0400, Pranith Kumar wrote:
+> >> >> >> >> On Wed, Apr 19, 2017 at 3:54 PM, Pranith Kumar <bobby.prani@gmail.com> wrote:
+> >> >> >> >> > When we enable hyperthreading (using threads smp argument), we warn
+> >> >> >> >> > the user if the cpu is an AMD cpu. This does not make sense on TCG and
+> >> >> >> >> > is also obsolete now that AMD Ryzen support hyperthreading.
+> >> >> >> >> >
+> >> >> >> >> > Fix this by adding CPUID_HT bit to the TCG features and explicitly
+> >> >> >> >> > checking this bit in the cpuid.
+> >> >> >> >> >
+> >> >> >> >> > Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+> >> >> >> >> > ---
+> >> >> >> >> >  target/i386/cpu.c | 10 +++++-----
+> >> >> >> >> >  1 file changed, 5 insertions(+), 5 deletions(-)
+> >> >> >> >> >
+> >> >> >> >> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> >> >> >> >> > index 13c0985f11..f34bb5ead7 100644
+> >> >> >> >> > --- a/target/i386/cpu.c
+> >> >> >> >> > +++ b/target/i386/cpu.c
+> >> >> >> >> > @@ -202,12 +202,12 @@ static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
+> >> >> >> >> >  #define TCG_FEATURES (CPUID_FP87 | CPUID_PSE | CPUID_TSC | CPUID_MSR | \
+> >> >> >> >> >            CPUID_PAE | CPUID_MCE | CPUID_CX8 | CPUID_APIC | CPUID_SEP | \
+> >> >> >> >> >            CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV | CPUID_PAT | \
+> >> >> >> >> > -          CPUID_PSE36 | CPUID_CLFLUSH | CPUID_ACPI | CPUID_MMX | \
+> >> >> >> >> > +          CPUID_PSE36 | CPUID_CLFLUSH | CPUID_ACPI | CPUID_MMX | CPUID_HT | \
+> >> >> >> >> >            CPUID_FXSR | CPUID_SSE | CPUID_SSE2 | CPUID_SS | CPUID_DE)
+> >> >> >> >> >            /* partly implemented:
+> >> >> >> >> >            CPUID_MTRR, CPUID_MCA, CPUID_CLFLUSH (needed for Win64) */
+> >> >> >> >> >            /* missing:
+> >> >> >> >> > -          CPUID_VME, CPUID_DTS, CPUID_SS, CPUID_HT, CPUID_TM, CPUID_PBE */
+> >> >> >> >> > +          CPUID_VME, CPUID_DTS, CPUID_SS, CPUID_TM, CPUID_PBE */
+> >> >> >> >> >  #define TCG_EXT_FEATURES (CPUID_EXT_SSE3 | CPUID_EXT_PCLMULQDQ | \
+> >> >> >> >> >            CPUID_EXT_MONITOR | CPUID_EXT_SSSE3 | CPUID_EXT_CX16 | \
+> >> >> >> >> >            CPUID_EXT_SSE41 | CPUID_EXT_SSE42 | CPUID_EXT_POPCNT | \
+> >> >> >> >> > @@ -3643,7 +3643,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+> >> >> >> >> >
+> >> >> >> >> >      qemu_init_vcpu(cs);
+> >> >> >> >> >
+> >> >> >> >> > -    /* Only Intel CPUs support hyperthreading. Even though QEMU fixes this
+> >> >> >> >> > +    /* Only some CPUs support hyperthreading. Even though QEMU fixes this
+> >> >> >> >> >       * issue by adjusting CPUID_0000_0001_EBX and CPUID_8000_0008_ECX
+> >> >> >> >> >       * based on inputs (sockets,cores,threads), it is still better to gives
+> >> >> >> >> >       * users a warning.
+> >> >> >> >> > @@ -3651,8 +3651,8 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+> >> >> >> >> >       * NOTE: the following code has to follow qemu_init_vcpu(). Otherwise
+> >> >> >> >> >       * cs->nr_threads hasn't be populated yet and the checking is incorrect.
+> >> >> >> >> >       */
+> >> >> >> >> > -    if (!IS_INTEL_CPU(env) && cs->nr_threads > 1 && !ht_warned) {
+> >> >> >> >> > -        error_report("AMD CPU doesn't support hyperthreading. Please configure"
+> >> >> >> >> > +    if ((env->features[FEAT_1_EDX] & CPUID_HT) && (cs->nr_threads > 1) && !ht_warned) {
+> >> >> >> >>
+> >> >> >> >> I missed a '!' here. We need to warn if CPUID_HT is not set. But I see
+> >> >> >> >> that it is not being set even on HT enabled processors (i7-3770). How
+> >> >> >> >> do I test for it?
+> >> >> >> >
+> >> >> >> > CPUID_HT is automatically set on the CPU if
+> >> >> >> > (nr_threads * nr_cores) > 1. See the "case 1:" block in
+> >> >> >> > cpu_x86_cpuid().
+> >> >> >> >
+> >> >> >> > AFAIK, the point of the warning is to let the user know that the
+> >> >> >> > guest OS is likely to ignore thread topology information if CPUID
+> >> >> >> > vendor is not Intel, and has nothing to do with TCG or KVM
+> >> >> >> > capabilities. Maybe the warning is obsolete today and guests
+> >> >> >> > won't be confused by a HT AMD CPU, but we need to confirm that.
+> >> >> >>
+> >> >> >> We assume an AMD cpu for x86 TCG and it prints this warning when an
+> >> >> >> smp guest is run with (cores=2,threads=2) argument. The main point of
+> >> >> >> this patch is to remove that warning when using TCG.
+> >> >> >
+> >> >> > What is different under TCG? If guests were confused with
+> >> >> > threads=2 + vendor=AMD using KVM, what exactly would make them
+> >> >> > not confused by threads=2 + vendor=AMD when using TCG?
+> >> >>
+> >> >> I am not sure why we chose AMD to be the vendor for TCG since, as you
+> >> >> note, it does not really matter if it's AMD or Intel in TCG mode.
+> >> >
+> >> > I don't know why the default on TCG is AMD, either.
+> >> >
+> >> >>
+> >> >> >
+> >> >> > I just ran a Fedora 25 guest using "-machine accel=tcg
+> >> >> > -smp 2,threads=2", and it still thinks it's running on a 2-core
+> >> >> > CPU instead of a 2-thread CPU when CPU vendor is AMD.
+> >> >>
+> >> >> This all started with using Windows XP. It has an arbitrary limit on
+> >> >> the number of cores it can support to 2 cores. So using -smp 4 will
+> >> >> still only show 2 cores. However, we can overcome this by using -smp
+> >> >> cores=2,threads=2 and 4 cores show up in the guest. But we see the
+> >> >> ugly warning that HT is not supported on AMD cpus.
+> >> >
+> >> > Is Windows XP able to detect 2 threads * 2 cores even if CPUID
+> >> > vendor is AMD?
+> >> >
+> >>
+> >> Yep. I don't think it cares for vendor id.
+> >
+> > What happens if you use -smp 4,cores=4 ?
+> 
+> This is interesting. The above shows 4 cores in the guest. I then
+> tried various combinations:
+> 
+> -smp 4 shows 2 cores
 
-On 04/20/2017 11:12 AM, Markus Armbruster wrote:
+This is a shortcut for 4 sockets, 1 core per socket, 1 thread per
+core.
 
->>> Well technically /usr/sbin/halt just terminates all processes / kerne=
-l and
->>> halts CPUs, but the virtual machine is still active (and a 'reset' in=
- the
->>> monitor can start it again. /usr/sbin/poweroff is what actually does =
-the
->>> ACPI poweroff to trigger QEMU to exit[1]
->>
->> I'm thinking of this wording:
->>
->> triggered by a guest request (such as the guest running
->> /usr/sbin/poweroff to trigger an ACPI shutdown or machine halt instruc=
-tion)
->=20
-> A quick glance at the patch suggests the instructions in question are
-> typically writes to some device register.  I wouldn't call them "halt
-> instructions", in particular since there's the x86 "hlt" instruction
-> that does something else.
+> -smp 4,cores=4 shows 4 cores
 
-Then maybe: a guest request (such as the guest running
-/usr/sbin/poweroff to trigger an ACPI or other hardware-specific
-shutdown sequence)
+This is a shortcut for 1 socket with 4 cores, 1 thread per core.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> -smp 4,threads=4 shows 4 cores
 
+This means 1 socket with 1 core, 4 threads per core. But if
+vendor ID is AMD, guests will probably ignore the hyperthreading
+info and treat each thread as a separate core. That's why we have
+a warning.
 
---30j48tWkATCMtRibvP1ewUFpnIoeIFhgu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> -smp 4,sockets=1 shows 4 cores
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+This is a shortcut for 1 socket with 4 cores, 1 thread per core.
 
-iQEcBAEBCAAGBQJY+PoDAAoJEKeha0olJ0NqInsH/1pcxnHBUPsEeRlLCD2Z78MC
-1oHlpynEqi/qskZ2R/V1xPziwCKKyq/n6XplCn743NZ9mq8fp7cV9pvkdh0HbmyW
-zCaSum4FcBRsoyClfBd9SZd6KowRpbYNdvT023naU84ppRvwSkdkxraMT4Vv+9/f
-/N4wXenMxPl/dxaFL3E/n9cXDggXQM+C0j4Sl1vf25pAMnCZhDt2nyM/KCiBzt+q
-FFH1DfJVO0E6WL+c25q5FmZz4BL6CYRYh50neQxAcTT89GhPQbpGyd8aFvlDbTqi
-VAGdfTJNgD2nRKXShoDeAEGgh9b8QyA2eb+76W+aaGsQkYnO5x1Qh+qYuLWy15Y=
-=18eE
------END PGP SIGNATURE-----
+> 
+> I am a bit confused why smp 4 is showing only 2 cores? and why the
+> rest are showing 4 cores
 
---30j48tWkATCMtRibvP1ewUFpnIoeIFhgu--
+Probably because Windows XP is limited to 2 sockets.
+
+-- 
+Eduardo
