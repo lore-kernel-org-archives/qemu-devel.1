@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d1C0e-0002ON-S8
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 09:20:39 -0400
+	(envelope-from <clg@kaod.org>) id 1d1C1q-00031U-Un
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 09:21:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d1C0d-0006ns-D2
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 09:20:32 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:34380)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1d1C0d-0006na-3a
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 09:20:31 -0400
-Received: by mail-wr0-x230.google.com with SMTP id z109so35518841wrb.1
-	for <qemu-devel@nongnu.org>; Thu, 20 Apr 2017 06:20:31 -0700 (PDT)
+	(envelope-from <clg@kaod.org>) id 1d1C1m-0007C7-Lg
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 09:21:46 -0400
+Received: from 4.mo4.mail-out.ovh.net ([178.32.98.131]:43317)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1d1C1m-00079y-FV
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 09:21:42 -0400
+Received: from player159.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 07BF55FA97
+	for <qemu-devel@nongnu.org>; Thu, 20 Apr 2017 15:21:33 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Thu, 20 Apr 2017 15:21:15 +0200
+Message-Id: <1492694475-18198-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <20170408054318.19830-1-omar.rizwan@gmail.com>
-References: <20170408054318.19830-1-omar.rizwan@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 20 Apr 2017 14:20:09 +0100
-Message-ID: <CAFEAcA_t1L_UPwV7Uwy9ygEOjBw=RLEkdcD13yepMJe+s7kQmg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] raspi: Add Raspberry Pi 1 support
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] slirp: add checksum support to NC-SI backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,216 +27,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Omar Rizwan <omar.rizwan@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, Gavin Shan <gwshan@linux.vnet.ibm.com>, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-On 8 April 2017 at 06:43, Omar Rizwan <omar.rizwan@gmail.com> wrote:
-> Signed-off-by: Omar Rizwan <omar.rizwan@gmail.com>
-> ---
->  hw/arm/Makefile.objs         |   2 +-
->  hw/arm/bcm2835.c             | 119 +++++++++++++++++++++++++++++++++++++++++++
->  hw/arm/bcm2835_peripherals.c |   1 +
->  hw/arm/raspi.c               |  47 ++++++++++++++---
->  include/hw/arm/bcm2835.h     |  31 +++++++++++
->  5 files changed, 191 insertions(+), 9 deletions(-)
->  create mode 100644 hw/arm/bcm2835.c
->  create mode 100644 include/hw/arm/bcm2835.h
+The checksum field of a NC-SI packet contains a value that may be
+included in each command and response. The verification is optional
+but the Linux driver does so when a non-zero value is provided. Let's
+extend the model to compute the checksum value and exercise a little
+more the Linux driver.
 
-Hi; thanks for this patch. I have a few comments below to add to the ones
-from Andrew.
+See section "8.2.2.3 - 2's Complement Checksum Compensation" in the
+Network Controller Sideband Interface (NC-SI) Specification for more
+details.
 
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ slirp/ncsi.c | 29 +++++++++++++++++++++++++----
+ 1 file changed, 25 insertions(+), 4 deletions(-)
 
-> +/* Peripheral base address seen by the CPU */
-> +#define BCM2835_PERI_BASE       0x20000000
-> +
-> +static void bcm2835_init(Object *obj)
-> +{
-> +    BCM2835State *s = BCM2835(obj);
-> +
-> +    object_initialize(&s->cpu, sizeof(s->cpu), "arm1176-" TYPE_ARM_CPU);
-> +    object_property_add_child(obj, "cpu", OBJECT(&s->cpu), &error_abort);
-> +
-> +    object_initialize(&s->peripherals, sizeof(s->peripherals),
-> +                      TYPE_BCM2835_PERIPHERALS);
-> +    object_property_add_child(obj, "peripherals", OBJECT(&s->peripherals),
-> +                              &error_abort);
-> +    object_property_add_alias(obj, "board-rev", OBJECT(&s->peripherals),
-> +                              "board-rev", &error_abort);
-> +    object_property_add_alias(obj, "vcram-size", OBJECT(&s->peripherals),
-> +                              "vcram-size", &error_abort);
-> +    qdev_set_parent_bus(DEVICE(&s->peripherals), sysbus_get_default());
-> +}
-> +
-> +static void bcm2835_realize(DeviceState *dev, Error **errp)
-> +{
-> +    BCM2835State *s = BCM2835(dev);
-> +    Object *obj;
-> +    Error *err = NULL;
-> +
-> +    /* common peripherals from bcm2835 */
-> +    obj = object_property_get_link(OBJECT(dev), "ram", &err);
-> +    if (obj == NULL) {
-> +        error_setg(errp, "%s: required ram link not found: %s",
-> +                   __func__, error_get_pretty(err));
-> +        return;
-> +    }
-> +
-> +    object_property_add_const_link(OBJECT(&s->peripherals), "ram", obj, &err);
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
-> +
-> +    object_property_set_bool(OBJECT(&s->peripherals), true, "realized", &err);
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
-> +
-> +    object_property_add_alias(OBJECT(s), "sd-bus", OBJECT(&s->peripherals),
-> +                              "sd-bus", &err);
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
-> +
-> +    sysbus_mmio_map_overlap(SYS_BUS_DEVICE(&s->peripherals), 0,
-> +                            BCM2835_PERI_BASE, 1);
-> +
-> +    sysbus_mmio_map_overlap(SYS_BUS_DEVICE(&s->peripherals), 1,
-> +                            0x40000000, 1);
-
-If this mapping is correct, can we have a #define for this address, like we
-do for BCM2835_PERI_BASE ?
-
-(I see from Andrew's review that it's not clear whether we should be
-mapping this here.)
-
-> +
-> +    object_property_set_bool(OBJECT(&s->cpu), true, "realized", &err);
-> +    if (err) {
-> +        error_report_err(err);
-> +        exit(1);
-> +    }
-> +
-> +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->peripherals), 0,
-> +                       qdev_get_gpio_in(DEVICE(&s->cpu), ARM_CPU_IRQ));
-> +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->peripherals), 1,
-> +                       qdev_get_gpio_in(DEVICE(&s->cpu), ARM_CPU_FIQ));
-> +
-> +}
-> +
-> +static void bcm2835_class_init(ObjectClass *oc, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(oc);
-> +
-> +    dc->realize = bcm2835_realize;
-> +
-> +    /*
-> +     * Reason: creates an ARM CPU, thus use after free(), see
-> +     * arm_cpu_class_init()
-> +     */
-> +    dc->cannot_destroy_with_object_finalize_yet = true;
-
-This assignment and its attached comment can be deleted, because
-the issue with arm_cpu_class_init() has now been fixed upstream
-(there's a patchset on the list that removes the DeviceClass
-field entirely).
-
-> +}
-> +
-> +static const TypeInfo bcm2835_type_info = {
-> +    .name = TYPE_BCM2835,
-> +    .parent = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(BCM2835State),
-> +    .instance_init = bcm2835_init,
-> +    .class_init = bcm2835_class_init,
-> +};
-> +
-> +static void bcm2835_register_types(void)
-> +{
-> +    type_register_static(&bcm2835_type_info);
-> +}
-> +
-> +type_init(bcm2835_register_types)
-> diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-> index 369ef1e..a6cd54a 100644
-> --- a/hw/arm/bcm2835_peripherals.c
-> +++ b/hw/arm/bcm2835_peripherals.c
-> @@ -34,6 +34,7 @@ static void bcm2835_peripherals_init(Object *obj)
->      /* Internal memory region for peripheral bus addresses (not exported) */
->      memory_region_init(&s->gpu_bus_mr, obj, "bcm2835-gpu", (uint64_t)1 << 32);
->      object_property_add_child(obj, "gpu-bus", OBJECT(&s->gpu_bus_mr), NULL);
-> +    sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->gpu_bus_mr);
-
-If we determine that this is correct, then we should delete the "(not exported)"
-part of the comment above, because this added call to sysbus_init_mmio()
-is exporting the memory region.
-
->      /* Internal memory region for request/response communication with
->       * mailbox-addressable peripherals (not exported)
-> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-> index 2b295f1..dca6077 100644
-> --- a/hw/arm/raspi.c
-> +++ b/hw/arm/raspi.c
-> @@ -2,9 +2,11 @@
->   * Raspberry Pi emulation (c) 2012 Gregory Estrade
->   * Upstreaming code cleanup [including bcm2835_*] (c) 2013 Jan Petrous
->   *
-> - * Rasperry Pi 2 emulation Copyright (c) 2015, Microsoft
-> + * Raspberry Pi 2 emulation Copyright (c) 2015, Microsoft
->   * Written by Andrew Baumann
->   *
-> + * Raspberry Pi 1 rebase onto master (c) 2017, Omar Rizwan
-> + *
->   * This code is licensed under the GNU GPLv2 and later.
->   */
->
-> @@ -12,6 +14,7 @@
->  #include "qapi/error.h"
->  #include "qemu-common.h"
->  #include "cpu.h"
-> +#include "hw/arm/bcm2835.h"
->  #include "hw/arm/bcm2836.h"
->  #include "qemu/error-report.h"
->  #include "hw/boards.h"
-> @@ -27,6 +30,11 @@
->  /* Table of Linux board IDs for different Pi versions */
->  static const int raspi_boardid[] = {[1] = 0xc42, [2] = 0xc43};
->
-> +/* Table of board revisions:
-> + * https://github.com/AndrewFromMelbourne/raspberry_pi_revision/blob/2764c19983fb7b1ef8cb21031e94c293703afa2e/README.md
-> + */
-> +static const uint32_t raspi_boardrev[] = {[1] = 0x10, [2] = 0xa21041};
-
-So we have three things here that are per-board:
- * the boardid value
- * the boardrev value
- * the soc_type value
-
-which we have stored in two arrays plus passing a different parameter
-to the raspi_machine_init function.
-
-Perhaps this would be better as a
-typedef struct RPiInfo {
-    const char *soc_type;
-    uint32_t boardrev;
-    uint32_t boardid;
-} RPiInfo;
-
-static const RPiInfo rpi_boards[] = {
-    {
-         /* Raspberry Pi 1 */
-         .soc_type = TYPE_BCM2835,
-         .boardrev = 0x10,
-         .boardid = 0xc42,
-    }, {
-         /* Raspberry Pi 2 */
-         ...
-    }
-};
-
-?
-
-thanks
--- PMM
+diff --git a/slirp/ncsi.c b/slirp/ncsi.c
+index d12ba3e494b0..81c6bc5576d3 100644
+--- a/slirp/ncsi.c
++++ b/slirp/ncsi.c
+@@ -8,9 +8,23 @@
+  */
+ #include "qemu/osdep.h"
+ #include "slirp.h"
++#include "net/checksum.h"
+=20
+ #include "ncsi-pkt.h"
+=20
++static uint32_t ncsi_calculate_checksum(unsigned char *data, int len)
++{
++    uint32_t checksum =3D 0;
++    int i;
++
++    for (i =3D 0; i < len; i +=3D 2) {
++        checksum +=3D (((uint32_t)data[i] << 8) | data[i + 1]);
++    }
++
++    checksum =3D (~checksum + 1);
++    return checksum;
++}
++
+ /* Get Capabilities */
+ static int ncsi_rsp_handler_gc(struct ncsi_rsp_pkt_hdr *rnh)
+ {
+@@ -87,6 +101,9 @@ void ncsi_input(Slirp *slirp, const uint8_t *pkt, int =
+pkt_len)
+         (ncsi_reply + ETH_HLEN);
+     const struct ncsi_rsp_handler *handler =3D NULL;
+     int i;
++    int ncsi_rsp_len =3D sizeof(*nh);
++    uint32_t checksum;
++    uint32_t *pchecksum;
+=20
+     memset(ncsi_reply, 0, sizeof(ncsi_reply));
+=20
+@@ -116,15 +133,19 @@ void ncsi_input(Slirp *slirp, const uint8_t *pkt, i=
+nt pkt_len)
+             /* TODO: handle errors */
+             handler->handler(rnh);
+         }
++        ncsi_rsp_len +=3D handler->payload;
+     } else {
+         rnh->common.length =3D 0;
+         rnh->code          =3D htons(NCSI_PKT_RSP_C_UNAVAILABLE);
+         rnh->reason        =3D htons(NCSI_PKT_RSP_R_UNKNOWN);
+     }
+=20
+-    /* TODO: add a checksum at the end of the frame but the specs
+-     * allows it to be zero */
++    /* add a checksum at the end of the frame (the specs allows it to
++     * be zero */
++    checksum =3D ncsi_calculate_checksum((unsigned char *) rnh, ncsi_rsp=
+_len);
++    pchecksum =3D (uint32_t *)((void *) rnh + ncsi_rsp_len);
++    *pchecksum =3D htonl(checksum);
++    ncsi_rsp_len +=3D 4;
+=20
+-    slirp_output(slirp->opaque, ncsi_reply, ETH_HLEN + sizeof(*nh) +
+-                 (handler ? handler->payload : 0) + 4);
++    slirp_output(slirp->opaque, ncsi_reply, ETH_HLEN + ncsi_rsp_len);
+ }
+--=20
+2.7.4
