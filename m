@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d1Amo-0007eU-BO
+	(envelope-from <pbonzini@redhat.com>) id 1d1Amp-0007gB-Re
 	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:02:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d1Amb-000314-Qv
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:02:10 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d1Amd-00032H-4U
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:02:11 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 20 Apr 2017 14:00:50 +0200
-Message-Id: <20170420120058.28404-10-pbonzini@redhat.com>
+Date: Thu, 20 Apr 2017 14:00:55 +0200
+Message-Id: <20170420120058.28404-15-pbonzini@redhat.com>
 In-Reply-To: <20170420120058.28404-1-pbonzini@redhat.com>
 References: <20170420120058.28404-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 09/17] util: add stats64 module
+Subject: [Qemu-devel] [PATCH 14/17] block: optimize access to reqs_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,384 +22,120 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org
 
-This module provides fast paths for 64-bit atomic operations on machines
-that only have 32-bit atomic access.
+Hot path reqs_lock critical sections are very small; the only large critical
+sections happen when a request waits for serialising requests, and these
+should never happen in usual circumstances.
+
+We do not want these small critical sections to yield in any case,
+which calls for using a spinlock while writing the list.  The reqs_lock
+is still used to protect the individual requests' CoQueue.  For this
+purpose, serializing removals against concurrent walks of the request
+list can use lock_unlock for efficiency and determinism.
+
+The reqs_lock is also used to protect the flush generation counts, but
+that's unrelated.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/qemu/stats64.h | 210 +++++++++++++++++++++++++++++++++++++++++++++++++
- util/Makefile.objs     |   1 +
- util/stats64.c         | 135 ++++++++++++++++++++++++++++++++
- 3 files changed, 346 insertions(+)
- create mode 100644 include/qemu/stats64.h
- create mode 100644 util/stats64.c
+ block.c                   |  1 +
+ block/io.c                | 25 ++++++++++++++++++++-----
+ include/block/block_int.h | 11 ++++++++---
+ 3 files changed, 29 insertions(+), 8 deletions(-)
 
-diff --git a/include/qemu/stats64.h b/include/qemu/stats64.h
-new file mode 100644
-index 0000000..70963f4
---- /dev/null
-+++ b/include/qemu/stats64.h
-@@ -0,0 +1,210 @@
-+/*
-+ * Atomic operations on 64-bit quantities.
-+ *
-+ * Copyright (C) 2017 Red Hat, Inc.
-+ *
-+ * Author: Paolo Bonzini <pbonzini@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
+diff --git a/block.c b/block.c
+index 3b2ed29..7ba6afe 100644
+--- a/block.c
++++ b/block.c
+@@ -234,6 +234,7 @@ BlockDriverState *bdrv_new(void)
+         QLIST_INIT(&bs->op_blockers[i]);
+     }
+     notifier_with_return_list_init(&bs->before_write_notifiers);
++    qemu_spin_init(&bs->reqs_list_write_lock);
+     qemu_co_mutex_init(&bs->reqs_lock);
+     bs->refcnt = 1;
+     bs->aio_context = qemu_get_aio_context();
+diff --git a/block/io.c b/block/io.c
+index 7af9d47..476807d 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -374,14 +374,29 @@ void bdrv_drain_all(void)
+  */
+ static void tracked_request_end(BdrvTrackedRequest *req)
+ {
++    BlockDriverState *bs = req->bs;
 +
-+#ifndef QEMU_STATS64_H
-+#define QEMU_STATS64_H 1
-+
-+#include "qemu/atomic.h"
-+
-+/* FIXME: i386 doesn't need the spinlock.  Are there any others? */
-+#if __SIZEOF_LONG__ < 8
-+#define STAT64_NEED_SPINLOCK 1
-+#endif
-+
-+/* This provides atomic operations on 64-bit type, using a reader-writer
-+ * spinlock on architectures that do not have 64-bit accesses.  However
-+ * it tries hard not to take the lock.
-+ */
-+
-+typedef struct Stat64 {
-+#ifdef STAT64_NEED_SPINLOCK
-+    uint32_t low, high;
-+    uint32_t lock;
-+#else
-+    uint64_t value;
-+#endif
-+} Stat64;
-+
-+#ifndef STAT64_NEED_SPINLOCK
-+static inline void stat64_init(Stat64 *s, uint64_t value)
-+{
-+    /* This is not guaranteed to be atomic! */
-+    *s = (Stat64) { value };
-+}
-+
-+static inline uint64_t stat64_get(const Stat64 *s)
-+{
-+    return atomic_read(&s->value);
-+}
-+
-+static inline void stat64_add(Stat64 *s, uint64_t value)
-+{
-+    atomic_add(&s->value, value);
-+}
-+
-+static inline void stat64_min(Stat64 *s, uint32_t value)
-+{
-+    for (;;) {
-+        uint64_t orig = atomic_read(&s->value);
-+        if (orig <= value) {
-+            break;
-+        }
-+        orig = atomic_cmpxchg(&s->value, orig, value);
-+        if (orig <= value) {
-+            break;
-+        }
-+    }
-+}
-+
-+static inline void stat64_max(Stat64 *s, uint32_t value)
-+{
-+    for (;;) {
-+        uint64_t orig = atomic_read(&s->value);
-+        if (orig >= value) {
-+            break;
-+        }
-+        orig = atomic_cmpxchg(&s->value, orig, value);
-+        if (orig >= value) {
-+            break;
-+        }
-+    }
-+}
-+#else
-+uint64_t stat64_get(const Stat64 *s);
-+bool stat64_min_slow(Stat64 *s, uint64_t value);
-+bool stat64_max_slow(Stat64 *s, uint64_t value);
-+bool stat64_add32_carry(Stat64 *s, uint32_t low, uint32_t high);
-+
-+static inline void stat64_init(Stat64 *s, uint64_t value)
-+{
-+    /* This is not guaranteed to be atomic! */
-+    *s = (Stat64) { .low = value, .high = value >> 32, .lock = 0 };
-+}
-+
-+static inline void stat64_add(Stat64 *s, uint64_t value)
-+{
-+    uint32_t low, high;
-+    high = value >> 32;
-+    low = (uint32_t) value;
-+    if (!low) {
-+        if (high) {
-+            atomic_add(&s->high, high);
-+        }
-+        return;
-+    }
-+
-+    for (;;) {
-+        uint32_t orig = s->low;
-+        uint32_t result = orig + low;
-+        uint32_t old;
-+
-+        if (result < low || high) {
-+            /* If the high part is affected, take the lock.  */
-+            if (stat64_add32_carry(s, low, high)) {
-+                return;
-+            }
-+            continue;
-+        }
-+
-+        /* No carry, try with a 32-bit cmpxchg.  The result is independent of
-+         * the high 32 bits, so it can race just fine with stat64_add32_carry
-+         * and even stat64_get!
-+         */
-+        old = atomic_cmpxchg(&s->low, orig, result);
-+        if (orig == old) {
-+            return;
-+        }
-+    }
-+}
-+
-+static inline void stat64_min(Stat64 *s, uint64_t value)
-+{
-+    uint32_t low, high;
-+    uint32_t orig_low, orig_high;
-+
-+    high = value >> 32;
-+    low = (uint32_t) value;
-+    do {
-+        orig_high = atomic_read(&s->high);
-+        if (orig_high < high) {
-+            return;
-+        }
-+
-+        if (orig_high == high) {
-+            /* High 32 bits are equal.  Read low after high, otherwise we
-+             * can get a false positive (e.g. 0x1235,0x0000 changes to
-+             * 0x1234,0x8000 and we read it as 0x1234,0x0000). Pairs with
-+             * the write barrier in stat64_min_slow.
-+             */
-+            smp_rmb();
-+            orig_low = atomic_read(&s->low);
-+            if (orig_low <= low) {
-+                return;
-+            }
-+
-+            /* See if we were lucky and a writer raced against us.  The
-+             * barrier is theoretically unnecessary, but if we remove it
-+             * we may miss being lucky.
-+             */
-+            smp_rmb();
-+            orig_high = atomic_read(&s->high);
-+            if (orig_high < high) {
-+                return;
-+            }
-+        }
-+
-+        /* If the value changes in any way, we have to take the lock.  */
-+    } while (!stat64_min_slow(s, value));
-+}
-+
-+static inline void stat64_max(Stat64 *s, uint64_t value)
-+{
-+    uint32_t low, high;
-+    uint32_t orig_low, orig_high;
-+
-+    high = value >> 32;
-+    low = (uint32_t) value;
-+    do {
-+        orig_high = atomic_read(&s->high);
-+        if (orig_high > high) {
-+            return;
-+        }
-+
-+        if (orig_high == high) {
-+            /* High 32 bits are equal.  Read low after high, otherwise we
-+             * can get a false positive (e.g. 0x1234,0x8000 changes to
-+             * 0x1235,0x0000 and we read it as 0x1235,0x8000). Pairs with
-+             * the write barrier in stat64_max_slow.
-+             */
-+            smp_rmb();
-+            orig_low = atomic_read(&s->low);
-+            if (orig_low >= low) {
-+                return;
-+            }
-+
-+            /* See if we were lucky and a writer raced against us.  The
-+             * barrier is theoretically unnecessary, but if we remove it
-+             * we may miss being lucky.
-+             */
-+            smp_rmb();
-+            orig_high = atomic_read(&s->high);
-+            if (orig_high > high) {
-+                return;
-+            }
-+        }
-+
-+        /* If the value changes in any way, we have to take the lock.  */
-+    } while (!stat64_max_slow(s, value));
-+}
-+
-+#endif
-+
-+#endif
-diff --git a/util/Makefile.objs b/util/Makefile.objs
-index c6205eb..8a333d3 100644
---- a/util/Makefile.objs
-+++ b/util/Makefile.objs
-@@ -42,4 +42,5 @@ util-obj-y += log.o
- util-obj-y += qdist.o
- util-obj-y += qht.o
- util-obj-y += range.o
-+util-obj-y += stats64.o
- util-obj-y += systemd.o
-diff --git a/util/stats64.c b/util/stats64.c
-new file mode 100644
-index 0000000..b9238d7
---- /dev/null
-+++ b/util/stats64.c
-@@ -0,0 +1,135 @@
-+/*
-+ * Atomic operations on 64-bit quantities.
-+ *
-+ * Copyright (C) 2017 Red Hat, Inc.
-+ *
-+ * Author: Paolo Bonzini <pbonzini@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/atomic.h"
-+#include "qemu/stats64.h"
-+
-+#ifdef STAT64_NEED_SPINLOCK
-+static inline void stat64_rdlock(Stat64 *s)
-+{
-+    /* Keep out incoming writers to avoid them starving us. */
-+    atomic_add(&s->lock, 2);
-+
-+    /* If there is a concurrent writer, wait for it.  */
-+    while (atomic_read(&s->lock) & 1) {
-+        g_usleep(5);
-+    }
-+}
-+
-+static inline void stat64_rdunlock(Stat64 *s)
-+{
-+    atomic_sub(&s->lock, 2);
-+}
-+
-+static inline bool stat64_wrtrylock(Stat64 *s)
-+{
-+    return atomic_cmpxchg(&s->lock, 0, 1) == 0;
-+}
-+
-+static inline void stat64_wrunlock(Stat64 *s)
-+{
-+    atomic_dec(&s->lock);
-+}
-+
-+uint64_t stat64_get(const Stat64 *s)
-+{
-+    uint32_t high, low;
-+
-+    stat64_rdlock((Stat64 *)s);
-+
-+    /* 64-bit writes always take the lock, so we can read in
-+     * any order.
+     if (req->serialising) {
+-        atomic_dec(&req->bs->serialising_in_flight);
++        atomic_dec(&bs->serialising_in_flight);
+     }
+ 
+-    qemu_co_mutex_lock(&req->bs->reqs_lock);
++    /* Note that there can be a concurrent visit while we remove the list,
++     * so we need to...
 +     */
-+    high = atomic_read(&s->high);
-+    low = atomic_read(&s->low);
-+    stat64_rdunlock((Stat64 *)s);
++    qemu_spin_lock(&bs->reqs_list_write_lock);
+     QLIST_REMOVE(req, list);
++    qemu_spin_unlock(&bs->reqs_list_write_lock);
 +
-+    return ((uint64_t)high << 32) | low;
-+}
-+
-+bool stat64_add32_carry(Stat64 *s, uint32_t low, uint32_t high)
-+{
-+    uint32_t old;
-+
-+    if (!stat64_wrtrylock(s)) {
-+        return false;
-+    }
-+
-+    /* 64-bit reads always take the lock, so they don't care about the
-+     * order of our update.  By updating s->low first, we can check
-+     * whether we have to carry into s->high.
++    /* ... wait for it to end before we leave.  qemu_co_mutex_lock_unlock
++     * avoids cacheline bouncing in the common case of no concurrent
++     * reader.
 +     */
-+    old = atomic_fetch_add(&s->low, value);
-+    high += (old + value < old);
-+    atomic_add(&s->high, high);
-+    stat64_wrunlock(s);
-+    return true;
-+}
++    qemu_co_mutex_lock_unlock(&bs->reqs_lock);
 +
-+bool stat64_min_slow(Stat64 *s, uint64_t value)
-+{
-+    uint32_t high, low;
-+    uint64_t orig;
++    /* Now no coroutine can add itself to the wait queue, so it is
++     * safe to call qemu_co_queue_restart_all outside the reqs_lock.
++     */
+     qemu_co_queue_restart_all(&req->wait_queue);
+-    qemu_co_mutex_unlock(&req->bs->reqs_lock);
+ }
+ 
+ /**
+@@ -406,9 +421,9 @@ static void tracked_request_begin(BdrvTrackedRequest *req,
+ 
+     qemu_co_queue_init(&req->wait_queue);
+ 
+-    qemu_co_mutex_lock(&bs->reqs_lock);
++    qemu_spin_lock(&bs->reqs_list_write_lock);
+     QLIST_INSERT_HEAD(&bs->tracked_requests, req, list);
+-    qemu_co_mutex_unlock(&bs->reqs_lock);
++    qemu_spin_unlock(&bs->reqs_list_write_lock);
+ }
+ 
+ static void mark_request_serialising(BdrvTrackedRequest *req, uint64_t align)
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 42b49f5..b298de8 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -78,9 +78,10 @@ typedef struct BdrvTrackedRequest {
+ 
+     QLIST_ENTRY(BdrvTrackedRequest) list;
+     Coroutine *co; /* owner, used for deadlock detection */
+-    CoQueue wait_queue; /* coroutines blocked on this request */
+-
+     struct BdrvTrackedRequest *waiting_for;
 +
-+    if (!stat64_wrtrylock(s)) {
-+        return false;
-+    }
++    /* Protected by BlockDriverState's reqs_lock.  */
++    CoQueue wait_queue; /* coroutines blocked on this request */
+ } BdrvTrackedRequest;
+ 
+ struct BlockDriver {
+@@ -626,11 +627,15 @@ struct BlockDriverState {
+     int quiesce_counter;
+     unsigned int write_gen;               /* Current data generation */
+ 
+-    /* Protected by reqs_lock.  */
++    /* Writes are protected by reqs_list_write_lock.  Reads take
++     * reqs_lock so that removals can easily synchronize with walks.
++     */
+     QLIST_HEAD(, BdrvTrackedRequest) tracked_requests;
+     CoQueue flush_queue;                  /* Serializing flush queue */
+     bool active_flush_req;                /* Flush request in flight? */
+     unsigned int flushed_gen;             /* Flushed write generation */
 +
-+    high = atomic_read(&s->high);
-+    low = atomic_read(&s->low);
-+
-+    orig = ((uint64_t)high << 32) | low;
-+    if (orig < value) {
-+        /* The value may become higher temporarily, but stat64_get does not
-+         * notice (it takes the lock) and the only effect on stat64_min is
-+         * that the slow path may be triggered unnecessarily.
-+         *
-+         * But, we have to set low before high, just like stat64_min reads
-+         * high before low.
-+         */
-+        atomic_set(&s->low, (uint32_t)value);
-+        smp_wmb();
-+        atomic_set(&s->high, value >> 32);
-+    }
-+    stat64_wrunlock(s);
-+    return true;
-+}
-+
-+bool stat64_max_slow(Stat64 *s, uint64_t value)
-+{
-+    uint32_t high, low;
-+    uint64_t orig;
-+
-+    if (!stat64_wrtrylock(s)) {
-+        return false;
-+    }
-+
-+    high = atomic_read(&s->high);
-+    low = atomic_read(&s->low);
-+
-+    orig = ((uint64_t)high << 32) | low;
-+    if (orig > value) {
-+        /* The value may become lower temporarily, but stat64_get does not
-+         * notice (it takes the lock) and the only effect on stat64_max is
-+         * that the slow path may be triggered unnecessarily.
-+         *
-+         * But, we have to set low before high, just like stat64_max reads
-+         * high before low.
-+         */
-+        atomic_set(&s->low, (uint32_t)value);
-+        smp_wmb();
-+        atomic_set(&s->high, value >> 32);
-+    }
-+    stat64_wrunlock(s);
-+    return true;
-+}
-+#endif
++    QemuSpin reqs_list_write_lock;
+     CoMutex reqs_lock;
+ };
+ 
 -- 
 2.9.3
