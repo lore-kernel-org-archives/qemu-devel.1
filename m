@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d14Rb-0006e0-2K
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 01:15:52 -0400
+	(envelope-from <jasowang@redhat.com>) id 1d14UQ-0007Xb-Kg
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 01:18:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d14RW-00035c-4u
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 01:15:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35798)
+	(envelope-from <jasowang@redhat.com>) id 1d14UL-0003yv-JA
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 01:18:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58368)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d14RV-00035V-SK
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 01:15:46 -0400
-References: <1487734936-43472-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1487734936-43472-3-git-send-email-zhang.zhanghailiang@huawei.com>
-	<134776c2-a85d-d06f-5f98-2e664f9c8ca9@cn.fujitsu.com>
-	<d33b0150-5ed2-56cc-9261-da7deb1d0bfb@redhat.com>
-	<58F06AA1.2010301@huawei.com>
-	<9b42232a-e86f-2d61-7987-7a0559d6f705@redhat.com>
-	<58F4A12C.5070404@huawei.com>
-	<f7f4639d-7a08-5120-27f8-346011dc754f@redhat.com>
-	<58F5B902.8030105@huawei.com>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d14UL-0003yi-AP
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 01:18:41 -0400
+References: <1492426712-12230-1-git-send-email-peterx@redhat.com>
+	<1492426712-12230-8-git-send-email-peterx@redhat.com>
+	<1c5c9278-92b1-6f56-b251-53bf60c7f4e8@redhat.com>
+	<20170418035033.GH16703@pxdev.xzpeter.org>
+	<18bd8627-bdca-b9e8-8d4e-c4aa0689d4aa@redhat.com>
+	<20170418042109.GA22226@pxdev.xzpeter.org>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <c92f4670-5ecc-c048-b017-d78966a89514@redhat.com>
-Date: Thu, 20 Apr 2017 13:15:34 +0800
+Message-ID: <a9ec14d0-3c43-a66a-afdb-13f644857004@redhat.com>
+Date: Thu, 20 Apr 2017 13:18:28 +0800
 MIME-Version: 1.0
-In-Reply-To: <58F5B902.8030105@huawei.com>
+In-Reply-To: <20170418042109.GA22226@pxdev.xzpeter.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 02/15] colo-compare: implement the process
- of checkpoint
+Subject: Re: [Qemu-devel] [PATCH 7/7] intel_iommu: support passthrough (PT)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,196 +31,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
-Cc: xuquan8@huawei.com, xiecl.fnst@cn.fujitsu.com, dgilbert@redhat.com, lizhijian@cn.fujitsu.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Lan Tianyu <tianyu.lan@intel.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S.Tsirkin" <mst@redhat.com>
 
 
 
-On 2017=E5=B9=B404=E6=9C=8818=E6=97=A5 14:58, Hailiang Zhang wrote:
-> On 2017/4/18 11:55, Jason Wang wrote:
+On 2017=E5=B9=B404=E6=9C=8818=E6=97=A5 12:21, Peter Xu wrote:
+> On Tue, Apr 18, 2017 at 12:00:13PM +0800, Jason Wang wrote:
 >>
->> On 2017=E5=B9=B404=E6=9C=8817=E6=97=A5 19:04, Hailiang Zhang wrote:
->>> Hi Jason,
+>> On 2017=E5=B9=B404=E6=9C=8818=E6=97=A5 11:50, Peter Xu wrote:
+>>> On Tue, Apr 18, 2017 at 11:23:35AM +0800, Jason Wang wrote:
+>>>> On 2017=E5=B9=B404=E6=9C=8817=E6=97=A5 18:58, Peter Xu wrote:
+>>> [...]
 >>>
->>> On 2017/4/14 14:38, Jason Wang wrote:
->>>> On 2017=E5=B9=B404=E6=9C=8814=E6=97=A5 14:22, Hailiang Zhang wrote:
->>>>> Hi Jason,
->>>>>
->>>>> On 2017/4/14 13:57, Jason Wang wrote:
->>>>>> On 2017=E5=B9=B402=E6=9C=8822=E6=97=A5 17:31, Zhang Chen wrote:
->>>>>>> On 02/22/2017 11:42 AM, zhanghailiang wrote:
->>>>>>>> While do checkpoint, we need to flush all the unhandled packets,
->>>>>>>> By using the filter notifier mechanism, we can easily to notify
->>>>>>>> every compare object to do this process, which runs inside
->>>>>>>> of compare threads as a coroutine.
->>>>>>> Hi~ Jason and Hailiang.
->>>>>>>
->>>>>>> I will send a patch set later about colo-compare notify=20
->>>>>>> mechanism for
->>>>>>> Xen like this patch.
->>>>>>> I want to add a new chardev socket way in colo-comapre connect=20
->>>>>>> to Xen
->>>>>>> colo, for notify
->>>>>>> checkpoint or failover, Because We have no choice to use this way
->>>>>>> communicate with Xen codes.
->>>>>>> That's means we will have two notify mechanism.
->>>>>>> What do you think about this?
->>>>>>>
->>>>>>>
->>>>>>> Thanks
->>>>>>> Zhang Chen
->>>>>> I was thinking the possibility of using similar way to for colo
->>>>>> compare.
->>>>>> E.g can we use socket? This can saves duplicated codes more or les=
-s.
->>>>> Since there are too many sockets used by filter and COLO, (Two unix
->>>>> sockets and two
->>>>>    tcp sockets for each vNIC), I don't want to introduce more ;) ,=20
->>>>> but
->>>>> i'm not sure if it is
->>>>> possible to make it more flexible and optional, abstract these
->>>>> duplicated codes,
->>>>> pass the opened fd (No matter eventfd or socket fd ) as parameter,=20
->>>>> for
->>>>> example.
->>>>> Is this way acceptable ?
->>>>>
->>>>> Thanks,
->>>>> Hailiang
->>>> Yes, that's kind of what I want. We don't want to use two message
->>>> format. Passing a opened fd need management support, we still need a
->>>> fallback if there's no management on top. For qemu/kvm, we can do al=
-l
->>>> stuffs transparent to the cli by e.g socketpair() or others, but=20
->>>> the key
->>>> is to have a unified message format.
->>> After a deeper investigation, i think we can re-use most codes, since
->>> there is no
->>> existing way to notify xen (no ?), we still needs notify chardev
->>> socket (Be used to notify xen, it is optional.)
->>> (http://patchwork.ozlabs.org/patch/733431/ "COLO-compare: Add Xen
->>> notify chardev socket handler frame")
->> Yes and actually you can use this for bi-directional communication. Th=
-e
->> only differences is the implementation of comparing.
+>>>>> +static void vtd_switch_address_space(VTDAddressSpace *as)
+>>>>> +{
+>>>>> +    bool use_iommu;
+>>>>> +
+>>>>> +    assert(as);
+>>>>> +
+>>>>> +    use_iommu =3D as->iommu_state->dmar_enabled;
+>>>>> +    if (use_iommu) {
+>>>>> +        /* Further checks per-device configuration */
+>>>>> +        use_iommu &=3D !vtd_dev_pt_enabled(as);
+>>>>> +    }
+>>>> Looks like you can use as->iommu_state->dmar_enabled &&
+>>>> !vtd_dev_pt_enabled(as)
+>>> vtd_dev_pt_enalbed() needs to read the guest memory (starting from
+>>> reading root entry), which is slightly slow. I was trying to avoid
+>>> unecessary reads.
+>>>
+>>> [...]
+>> I think compiler won't go to vtd_dev_pt_enabled() if dmar_enabled is f=
+alse.
+> You are right. I'll switch.
+>
+>>>>> @@ -991,6 +1058,18 @@ static void vtd_do_iommu_translate(VTDAddress=
+Space *vtd_as, PCIBus *bus,
+>>>>>           cc_entry->context_cache_gen =3D s->context_cache_gen;
+>>>>>       }
+>>>>> +    /*
+>>>>> +     * We don't need to translate for pass-through context entries=
+.
+>>>>> +     * Also, let's ignore IOTLB caching as well for PT devices.
+>>>>> +     */
+>>>>> +    if (vtd_ce_get_type(&ce) =3D=3D VTD_CONTEXT_TT_PASS_THROUGH) {
+>>>>> +        entry->translated_addr =3D entry->iova;
+>>>>> +        entry->addr_mask =3D VTD_PAGE_SIZE - 1;
+>>>>> +        entry->perm =3D IOMMU_RW;
+>>>>> +        trace_vtd_translate_pt(source_id, entry->iova);
+>>>>> +        return;
+>>>>> +    }
+>>>> Several questions here:
+>>>>
+>>>> 1) Is this just for vhost?
+>>> No. When caching mode is not enabled, all passthroughed devices shoul=
+d
+>>> be using this path.
+>> Ok, then it looks better to switch the address space if we've found it=
+ was
+>> PT?
+> Do you mean to switch in that if() above? Then when invalidate context
+> entry, we switch back if needed?
+
+Yes.
+
+
+>
+>>>> 2) Since this is done after IOTLB querying, do we need flush IOTLB d=
+uring
+>>>> address switching?
+>>> IMHO if guest switches address space for a device, it is required to
+>>> send IOTLB flush as well for that device/domain.
+>>>
+>>> [...]
+>> Ok.
 >>
->>> Besides, there is an existing qmp comand 'xen-colo-do-checkpoint',
->> I don't see this in master?
+>>>>>   static void vtd_switch_address_space_all(IntelIOMMUState *s)
+>>>>>   {
+>>>>>       GHashTableIter iter;
+>>>>> @@ -2849,6 +2914,10 @@ static void vtd_init(IntelIOMMUState *s)
+>>>>>           s->ecap |=3D VTD_ECAP_DT;
+>>>>>       }
+>>>>> +    if (x86_iommu->pt_supported) {
+>>>>> +        s->ecap |=3D VTD_ECAP_PT;
+>>>>> +    }
+>>>> Since we support migration now, need compat this for pre 2.10.
+>>> Oh yes. If I set pt=3Doff by default, it should be okay then, right?
+>> Right, but I think it's better to keep this on by default for performa=
+nce
+>> reason.
+> Okay. Just to confirm, that'll need one entry for HW_COMPAT_2_9,
+> right? (though it is still not there)
 >
-> Er, it has been merged already, please see migration/colo.c, void=20
-> qmp_xen_colo_do_checkpoint(Error **errp);
 
-Aha, I see. Thanks.
-
->
->>> we can re-use it to notify
->>> colo-compare objects and other filter objects to do checkpoint, for
->>> the opposite direction, we use
->>> the notify chardev socket (Only for xen).
->> Just want to make sure I understand the design, who will trigger this
->> command? Management?
->
-> The command will be issued by XEN (xc_save ?), the original existing=20
-> xen-colo-do-checkpoint
-> command now only be used to notify block replication to do checkpoint,=20
-> we can re-use it for filters too.
-
-So it was called by management. For KVM case, we probably don't need=20
-this since the comparing thread are under control of qemu.
-
->
->> Can we just use the socket?
->
-> I don't quite understand ...
-> Just as the codes showed bellow, in this scenario,
-> XEN notifies colo-compare and fiters do checkpoint by using qmp command=
-,
-
-Yes, that's just what I mean. Technically Xen can use socket to do this t=
-oo.
+Right.
 
 Thanks
-
-> and colo-compare notifies XEN about net inconsistency event by using=20
-> the new socket.
->
->>> So the codes will be like:
->>> diff --git a/migration/colo.c b/migration/colo.c
->>> index 91da936..813c281 100644
->>> --- a/migration/colo.c
->>> +++ b/migration/colo.c
->>> @@ -224,7 +224,19 @@ ReplicationStatus
->>> *qmp_query_xen_replication_status(Error **errp)
->>>
->>>   void qmp_xen_colo_do_checkpoint(Error **errp)
->>>   {
->>> +    Error *local_err =3D NULL;
->>> +
->>>       replication_do_checkpoint_all(errp);
->>> +    /* Notify colo-compare and other filters to do checkpoint */
->>> +    colo_notify_compares_event(NULL, COLO_CHECKPOINT, &local_err);
->>> +    if (local_err) {
->>> +        error_propagate(errp, local_err);
->>> +        return;
->>> +    }
->>> +    colo_notify_filters_event(COLO_CHECKPOINT, &local_err);
->>> +    if (local_err) {
->>> +        error_propagate(errp, local_err);
->>> +    }
->>>   }
->>>
->>>   static void colo_send_message(QEMUFile *f, COLOMessage msg,
->>> diff --git a/net/colo-compare.c b/net/colo-compare.c
->>> index 24e13f0..de975c5 100644
->>> --- a/net/colo-compare.c
->>> +++ b/net/colo-compare.c
->>> @@ -391,6 +391,9 @@ static void colo_compare_inconsistent_notify(void=
-)
->>>   {
->>>       notifier_list_notify(&colo_compare_notifiers,
->>>                   migrate_get_current());
->
-> KVM will use this notifier/callback way, and in this way, we can avoid=20
-> the redundant socket.
->
->>> +    if (s->notify_dev) {
->>> +       /* Do something, notify remote side through notify dev */
->>> +    }
->>>   }
->
-> If we have a notify socket configured, we will send the message about=20
-> net inconsistent event.
->
->>>
->>>   void colo_compare_register_notifier(Notifier *notify)
->>>
->>> How about this scenario =EF=BC=9F
->> See my reply above, and we need unify the message format too. Raw stri=
-ng
->> is ok but we'd better have something like TLV or others.
->
-> Agreed, we need it to be more standard.
->
-> Thanks,
-> Hailiang
->
->> Thanks
->>
->>>> Thoughts?
->>>>
->>>> Thanks
->>>>
->>>>>> Thanks
->>>>>>
->>>>>>
->>>>>> .
->>>>>>
->>>> .
->>>>
->>>
->>>
->>
->> .
->>
->
->
