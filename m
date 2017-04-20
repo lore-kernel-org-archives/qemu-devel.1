@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d1Bul-00082V-6y
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 09:14:28 -0400
+	(envelope-from <eblake@redhat.com>) id 1d1BwU-0000i4-9a
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 09:16:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d1Buh-0002rt-05
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 09:14:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58766)
+	(envelope-from <eblake@redhat.com>) id 1d1BwQ-0004G7-21
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 09:16:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40424)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d1Bug-0002qw-N0
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 09:14:22 -0400
-References: <1492684955-27154-1-git-send-email-lu.zhipeng@zte.com.cn>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d1BwP-0004FD-Ga
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 09:16:09 -0400
+References: <1492685851-27921-1-git-send-email-lu.zhipeng@zte.com.cn>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <bd4021f8-1f41-e904-1f1e-e965bec2584d@redhat.com>
-Date: Thu, 20 Apr 2017 08:14:19 -0500
+Message-ID: <b88c7ee7-0221-8166-72af-64e172e5056f@redhat.com>
+Date: Thu, 20 Apr 2017 08:16:05 -0500
 MIME-Version: 1.0
-In-Reply-To: <1492684955-27154-1-git-send-email-lu.zhipeng@zte.com.cn>
+In-Reply-To: <1492685851-27921-1-git-send-email-lu.zhipeng@zte.com.cn>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="EbwlKiPw8UPE51cnW6UfGqexmJ6ewagKN"
-Subject: Re: [Qemu-devel] [PATCH v2] qga: Add support network interface
+	boundary="GViAcdwBA3lb1EUpMfC22MexXNxGtUE4j"
+Subject: Re: [Qemu-devel] [PATCH] qga: Add support network interface
  statistics in guest-network-get-interfaces command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -32,116 +32,35 @@ To: ZhiPeng Lu <lu.zhipeng@zte.com.cn>, mdroth@linux.vnet.ibm.com
 Cc: berrange@redhat.com, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---EbwlKiPw8UPE51cnW6UfGqexmJ6ewagKN
+--GViAcdwBA3lb1EUpMfC22MexXNxGtUE4j
 From: Eric Blake <eblake@redhat.com>
 To: ZhiPeng Lu <lu.zhipeng@zte.com.cn>, mdroth@linux.vnet.ibm.com
 Cc: berrange@redhat.com, qemu-devel@nongnu.org
-Message-ID: <bd4021f8-1f41-e904-1f1e-e965bec2584d@redhat.com>
-Subject: Re: [PATCH v2] qga: Add support network interface statistics in
+Message-ID: <b88c7ee7-0221-8166-72af-64e172e5056f@redhat.com>
+Subject: Re: [PATCH] qga: Add support network interface statistics in
  guest-network-get-interfaces command
-References: <1492684955-27154-1-git-send-email-lu.zhipeng@zte.com.cn>
-In-Reply-To: <1492684955-27154-1-git-send-email-lu.zhipeng@zte.com.cn>
+References: <1492685851-27921-1-git-send-email-lu.zhipeng@zte.com.cn>
+In-Reply-To: <1492685851-27921-1-git-send-email-lu.zhipeng@zte.com.cn>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 04/20/2017 05:42 AM, ZhiPeng Lu wrote:
-> we can get the  network inetrface statistics inside  a virtual machine =
+On 04/20/2017 05:57 AM, ZhiPeng Lu wrote:
+> we can get the  network interface statistics inside  a virtual machine =
 by
-
-s/inetrface/interface/
-
-lose the double spaces (twice)
-
 > guest-network-get-interfaces command.
 > it is very userful for us to monitor and analyze network traff.
-
-s/userful/useful/
-s/traff/traffic/
-
 >=20
 > Signed-off-by: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
 > Signed-off-by: DanielP.Berrange <berrange@redhat.com>
 > Reviewed-by: EricBlake  <eblake@redhat.com>
+> ---
+>  qga/commands-posix.c | 73 ++++++++++++++++++++++++++++++++++++++++++++=
++++++++-
+>  qga/qapi-schema.json | 28 +++++++++++++++++++-
+>  2 files changed, 99 insertions(+), 2 deletions(-)
 
-Please fix the spacing of Daniel and my names to match the spacing we
-typically use (I like to visit 'git log' to learn statistics of patches
-I've helped on, and incorrect spellings are easy to miss).
-
-Worse, you added Reviewed-by: attributed to me when I did NOT authorize
-it on v1:
-https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg03026.html
-
-I pointed out that your v1 was incomplete.  Sometimes, I authorize a
-conditional R-b, where I state what trivial action must be taken to fix
-the patch without needing me to re-read things - but in the case of
-missing documentation, where there is a good chance that it may need
-wording improvements, I prefer to omit my R-b and read v2 in its entirety=
-=2E
-
-> +++ b/qga/qapi-schema.json
-> @@ -635,6 +635,31 @@
->             'prefix': 'int'} }
-> =20
->  ##
-> +# @GuestNetworkInterfaceStat:
-> +#
-> +# @rx-bytes: received bytes of interface
-> +# @rx-packets: received packets of interface
-> +# @rx-errs: received error packets of interface
-> +# @rx-drop: received drop packets of interface
-
-s/ of interface//g - it's not adding any useful information.
-
-How can you receive a dropped packet?  Obviously, the statistic is
-available, but what is it really representing?  Maybe 'dropped packets
-detected on receive side' reads better.
-
-> +#
-> +# @tx-bytes: send bytes of interface
-> +# @tx-packets: send packets of interface
-
-s/send/transmitted/
-
-> +# @tx-errs: send error packets of interface
-
-It's not how many error packets were sent, but how many errors were
-detected while attempting to send, so maybe 'error packets detected on
-transmission side'
-
-> +# @tx-drop: send drop packets of interface
-and 'dropped packets detected on transmission side'
-
-> +# Since: 2.10
-> +##
-> +{ 'struct': 'GuestNetworkInterfaceStat',
-> +  'data': {'rx-bytes': 'uint64',
-> +            'rx-packets': 'uint64',
-> +            'rx-errs': 'uint64',
-> +            'rx-drop': 'uint64',
-> +            'tx-bytes': 'uint64',
-> +            'tx-packets': 'uint64',
-> +            'tx-errs': 'uint64',
-> +            'tx-drop': 'uint64'
-> +           } }
-> +
-> +##
->  # @GuestNetworkInterface:
->  #
->  # @name: The name of interface for which info are being delivered
-> @@ -648,7 +673,8 @@
->  { 'struct': 'GuestNetworkInterface',
->    'data': {'name': 'str',
->             '*hardware-address': 'str',
-> -           '*ip-addresses': ['GuestIpAddress'] } }
-> +           '*ip-addresses': ['GuestIpAddress'],
-> +           '*interface-statics': ['GuestNetworkInterfaceStat'] } }
-
-s/interface-statics/statistics/ (the 'interface-' prefix is redundant,
-and you typo'd the remaining portion of the name)
-
-Missing documentation, including a (since 2.10) tag.
-
-So you still do not have my R-b; looking forward to v3.
+It looks like you resent this as v2; see my comments there. It will need =
+v3.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -149,7 +68,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---EbwlKiPw8UPE51cnW6UfGqexmJ6ewagKN
+--GViAcdwBA3lb1EUpMfC22MexXNxGtUE4j
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -159,13 +78,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJY+LQrAAoJEKeha0olJ0Nqt4YH/3wiPpr2uoRu8uz+8Th66WaK
-XFUQdCre6VBgnO2ztvHlzW3+s6JyE171A1uZsM/zZM3g0Bu0pA2KeoLxfAia3MTz
-sQCVgcnvZZz+qbSKMyBK1mKnbrdFBL8zi9VH+ROyxvNn9hoOPZDELQe4gn+HxcGw
-b8uGdKuoCgCbVzaAp23+HheoV08/gvQDBZIvz3RYAAJAx8Mc6lOU9BDc7utAaDfi
-EHT65SFfpTnl/zJh4tuRAv2/okr9DFjsRoG5A/3rmBfpYwTQxTNZ5shnEHPs0rdi
-+j6XCsOK0R0v+CE3TuPWgaPRYWS0oE3W5Fytf1a2WMBjrrwcwg64YK1uZJu7jrY=
-=9DmI
+iQEcBAEBCAAGBQJY+LSVAAoJEKeha0olJ0Nq0yIH/3U8OrwRyPkRfdAeTnQu0dqf
+uRBKhPZlyOWhbdLzN3ksJVCgEZzCVv/H6p83lXCR8YVIGYTvYmBKtyboI54pwkQ5
+W6c/6JgqRcMN4+or0lwQB5pG9PSU+Pn9VBQ+bOpQmIzWbIhYigvl5Vm5nn+fvkuR
+CqKafWZL8n8cZQvXiRZ+OqetbZcmXx2IeL7IRyWPO6RAPS6+tsxJm/vQpVRf/m2w
+fol4LUSLovqZqO0sp2QmJ3MdjMOrXemFidWoFmRqGPV/NTB+hqh6H1qE06qlmU0m
+l47orpZl7b9UtnZA5RKTKk6Jb1I4ICdRZ1+WK6gj/RoHC5MK9tUff4/jj2skoX4=
+=6JwQ
 -----END PGP SIGNATURE-----
 
---EbwlKiPw8UPE51cnW6UfGqexmJ6ewagKN--
+--GViAcdwBA3lb1EUpMfC22MexXNxGtUE4j--
