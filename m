@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d1EHS-0006Du-Rf
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 11:46:03 -0400
+	(envelope-from <armbru@redhat.com>) id 1d1EUc-0001W0-9P
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 11:59:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d1EHR-0001pE-Mo
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 11:46:02 -0400
-Date: Thu, 20 Apr 2017 16:45:45 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170420154545.GJ3227@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170420040003.31074-1-famz@redhat.com>
-	<20170420153016.GI3227@redhat.com>
-	<20170420154200.GK15762@localhost.localdomain>
+	(envelope-from <armbru@redhat.com>) id 1d1EUb-0001ex-AA
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 11:59:38 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170414083717.13641-1-lvivier@redhat.com>
+	<CAFEAcA-NTpaXL9foLOqZ1AyBOcFokKfJGMxicQFXeAzkMATfBA@mail.gmail.com>
+Date: Thu, 20 Apr 2017 17:59:27 +0200
+In-Reply-To: <CAFEAcA-NTpaXL9foLOqZ1AyBOcFokKfJGMxicQFXeAzkMATfBA@mail.gmail.com>
+	(Peter Maydell's message of "Thu, 20 Apr 2017 14:02:38 +0100")
+Message-ID: <871ssn9ijk.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170420154200.GK15762@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH] sheepdog: Set error when connection fails
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] qdev: remove all remaining
+ cannot_destroy_with_object_finalize_yet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,54 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, sheepdog@lists.wpkg.org, qemu-block@nongnu.org, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Max Reitz <mreitz@redhat.com>, Liu Yuan <namei.unix@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Antony Pavlov <antonynpavlov@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On Thu, Apr 20, 2017 at 11:42:00AM -0400, Jeff Cody wrote:
-> On Thu, Apr 20, 2017 at 04:30:16PM +0100, Daniel P. Berrange wrote:
-> > On Thu, Apr 20, 2017 at 12:00:03PM +0800, Fam Zheng wrote:
-> > > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > > ---
-> > >  block/sheepdog.c | 1 +
-> > >  1 file changed, 1 insertion(+)
-> > > 
-> > > diff --git a/block/sheepdog.c b/block/sheepdog.c
-> > > index fb9203e..7e889ee 100644
-> > > --- a/block/sheepdog.c
-> > > +++ b/block/sheepdog.c
-> > > @@ -608,6 +608,7 @@ static int connect_to_sdog(BDRVSheepdogState *s, Error **errp)
-> > >          qemu_set_nonblock(fd);
-> > >      } else {
-> > >          fd = -EIO;
-> > > +        error_setg(errp, "Failed to connect to sheepdog server");
-> > >      }
-> > 
-> > This doesn't make much sense to me. The lines just above the
-> > diff context have this:
-> > 
-> >     fd = socket_connect(s->addr, errp, NULL, NULL);
-> > 
-> > socket_connect should have already reported an error on "errp"
-> > in the scenario that 'fd == -1'. So AFAICT the new error_setg is
-> > just throwing away the real detailed error message in favour of
-> > a generic message.
-> > 
-> > So I'm puzzelled why we need to change anything - error reporting
-> > should already be working fine.
-> > 
-> 
-> Indeed, you are right. (Dequeuing patch)
-> 
-> It would also make more sense to check fd after the socket_connect() call
-> and return error then, rather than keep checking fd throughout the rest of
-> the function.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-Yeah that would make it much more obvious that the error reporting is
-correct.
+> On 14 April 2017 at 09:37, Laurent Vivier <lvivier@redhat.com> wrote:
+>> This series removes all the remaining uses of
+>> cannot_destroy_with_object_finalize_yet to finally remove
+>> the flag itself.
+>>
+>> The ARM patch has already been sent alone and reviewed by Markus.
+>> I have tested the ppc one on ppc64 machine with KVM and using
+>> QDM device-list-properties command.
+>>
+>> For the versatile one, the flag allowed to workaround a problem
+>> in the bus unparent function: the bus unparent is trying to
+>> unparent all the children of the bus. To do that, it has a list
+>> of the children of the bus, and calls object_unparent() for each
+>> child, and object_unparent() calls object_property_del_child() if
+>> obj->parent is not NULL.  As qdev_set_parent_bus() set only
+>> parent_bus and the list of children, parent is NULL and the child
+>> is never deleted.  We can avoid the problem by moving the
+>> qdev_set_parent_bus() to the realize part.
+>>
+>> I've tested all the changes with "make check" (including
+>> device-introspect-test). I've booted a versatilepb machine
+>> with a 3.16.0-4 debian installer kernel.
+>>
+>> Laurent Vivier (4):
+>>   arm: remove remaining cannot_destroy_with_object_finalize_yet
+>>   ppc: remove cannot_destroy_with_object_finalize_yet
+>>   versatile: remove cannot_destroy_with_object_finalize_yet
+>>   qdev: remove cannot_destroy_with_object_finalize_yet
+>
+> Markus -- are you planning to take this whole series through
+> your tree? I'm happy with the ARM patches but I guess we
+> should keep the whole series together since patch 4 depends
+> on the other 3...
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+We have no qdev maintainer.  David, you wrote you applied PATCH 2.  Are
+you okay with me taking all four?  If yes, would you like me to add your
+Acked-by or Reviewed-by to PATCH 2?
+
+> I guess that means
+> Acked-by: Peter Maydell <peter.maydell@linaro.org>
+
+Noted.
