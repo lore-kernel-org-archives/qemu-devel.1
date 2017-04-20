@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d1JW3-0000st-C2
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 17:21:28 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1d1JvL-0005xH-4w
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 17:47:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d1JVz-0004WH-VU
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 17:21:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52668)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d1JVz-0004VA-LW
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 17:21:23 -0400
-References: <58F92229.1080402@windriver.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a09762ce-092f-6fb1-6cc3-08a94a3c3dd1@redhat.com>
-Date: Thu, 20 Apr 2017 16:21:16 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1d1JvK-00024t-5O
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 17:47:35 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:38369)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1d1JvJ-00023w-Vd
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 17:47:34 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id r190so3345481wme.1
+	for <qemu-devel@nongnu.org>; Thu, 20 Apr 2017 14:47:33 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <58F92229.1080402@windriver.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="WQHX0INf0l7FqHLSuHi1PTWqArTVD1miE"
-Subject: Re: [Qemu-devel] question about block size and virtual disks
+In-Reply-To: <33474e1b82c6459604edec522cee585ccdb871ee.1492721026.git.balaton@eik.bme.hu>
+References: <cover.1492721026.git.balaton@eik.bme.hu>
+	<33474e1b82c6459604edec522cee585ccdb871ee.1492721026.git.balaton@eik.bme.hu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 20 Apr 2017 22:47:12 +0100
+Message-ID: <CAFEAcA-Q7PaT0ejkXHCTnUkfsOHUg8HdY7KtYc0Bo7On3+oDhg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v5 07/13] sm501: Fix device endianness
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,85 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Chris Friesen <chris.friesen@windriver.com>, qemu-devel@nongnu.org
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, David Gibson <david@gibson.dropbear.id.au>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WQHX0INf0l7FqHLSuHi1PTWqArTVD1miE
-From: Eric Blake <eblake@redhat.com>
-To: Chris Friesen <chris.friesen@windriver.com>, qemu-devel@nongnu.org
-Message-ID: <a09762ce-092f-6fb1-6cc3-08a94a3c3dd1@redhat.com>
-Subject: Re: [Qemu-devel] question about block size and virtual disks
-References: <58F92229.1080402@windriver.com>
-In-Reply-To: <58F92229.1080402@windriver.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 20 April 2017 at 21:43, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+> We only emulate the sysbus device in its default LE mode and PCI is LE
+> as well so specify this for registers and framebuffer memory.
+>
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> ---
 
-On 04/20/2017 04:03 PM, Chris Friesen wrote:
-> Hi,
->=20
-> Suppose the host has a physical disk that only supports 4KB access, wit=
-h
-> no 512B fallback.
->=20
-> If we boot a guest with "cache=3Dnone", does the guest need to be able =
-to
-> handle disks with 4KB blocks or is qemu able to handle guests trying to=
+I think it's worth a comment to the effect of:
 
-> access the disk with 512B granularity?
+Note that though the Linux kernel driver has code which
+claims to handle both big and little endian, it is obviously
+bogus for 16 bit and cannot be trusted as a source of
+information on the framebuffer pixel format. This is
+our best guess about device behaviour based on the specs.
 
-qemu should be able to handle the fallback automatically (that is, the
-block layer is smart enough to honor bs->bl.request_alignment=3D4096 such=
+(so if we find ourselves wondering about this mismatch
+in a couple of years time at least we'll know why this
+end is the way it is.)
 
-that it will never submit a request smaller than 4096 to the underlying
-host storage, regardless of what size request the guest uses).
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-In fact, the blkdebug driver can be used to test this setup on top of
-any real driver constraints, so we have some pretty good assurance that
-our minimum-size code works even when tested on a platform that still
-has 512B granularity.
-
->=20
-> Also, does the 4KB block size get "passed-through" to the guest somehow=
-
-> so that the guest knows it needs to use 4KB blocks, or does that need t=
-o
-> be explicitly specified via virtio-blk-pci.logical_block_size and/or
-> virtio-blk-pci.physical_block_size parameters?  (Assuming I'm using
-> virtio-blk-pci.)
-
-Again, qemu should be passing the advertisement of host properties down
-to the guest insofar as possible (so a good guest will see that the
-hardware is 4k only and will not try to make 512-byte requests), but at
-the same time, qemu should handle guests that are so old that they are
-blissfully unaware of the hardware advertisements and send 512-byte
-requests anyway.  Of course, such guests are penalized with
-read-modify-write delays when submitting 512-byte IO.  But explicitly
-stating available parameters is always the wisest course of action, if
-you don't want to rely on defaults changing underneath you.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---WQHX0INf0l7FqHLSuHi1PTWqArTVD1miE
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY+SZMAAoJEKeha0olJ0Nqy9sH/jy/aszYhVmFlUCZvqIY3GhK
-iROq1vGQVXFltBX+cEvdg/6F8QLiudnQ9ef0TbrHYiwBaO64IxI8vNAtlh1bgKTW
-lTnedHczf1VPbJirQHwpfHcg71Yy4Ua6bSuct15+yQQMaXJVh0jLx/dWzpToJuxf
-wgaZBMyAj76ZFCur0v9o6Mwzl7CVv6WjHIoHpPOMIxDqqhkzYkjusn/h4T1psA65
-lWgdaglaecr6wqRJXML79i3wIDfmLEBOhuMS+ZfeTFR4sEyYEn2Z7fJeCGRKWXJS
-dpdBZrt0QErfZR8Hs7mestR6sZSGNZZccGwyngj5EwZO/sMduQewnTRZnEVCaIA=
-=oEMI
------END PGP SIGNATURE-----
-
---WQHX0INf0l7FqHLSuHi1PTWqArTVD1miE--
+thanks
+-- PMM
