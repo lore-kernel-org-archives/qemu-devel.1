@@ -1,35 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1d15hZ-0003IX-Pr
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:36:26 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d15jz-0004U9-5F
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:38:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1d15hW-0004GM-M4
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:36:25 -0400
-Received: from mga03.intel.com ([134.134.136.65]:56242)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1d15hW-0004Fm-BC
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:36:22 -0400
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-Date: Thu, 20 Apr 2017 06:36:16 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C257439055667@shsmsx102.ccr.corp.intel.com>
-References: <1492428730-13438-1-git-send-email-peterx@redhat.com>
-	<1492428730-13438-8-git-send-email-peterx@redhat.com>
-	<A2975661238FB949B60364EF0F2C257439054049@shsmsx102.ccr.corp.intel.com>
-	<20170418045400.GC22226@pxdev.xzpeter.org>
-	<A2975661238FB949B60364EF0F2C2574390540D1@shsmsx102.ccr.corp.intel.com>
-	<20170418072717.GD22226@pxdev.xzpeter.org>
-	<A2975661238FB949B60364EF0F2C257439054360@shsmsx102.ccr.corp.intel.com>
-	<672ae592-e6ba-9152-b775-ec2bde931ef1@intel.com>
-	<20170420030427.GA26087@pxdev.xzpeter.org>
-	<A2975661238FB949B60364EF0F2C2574390555FB@shsmsx102.ccr.corp.intel.com>
-	<20170420054018.GD26087@pxdev.xzpeter.org>
-In-Reply-To: <20170420054018.GD26087@pxdev.xzpeter.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d15jw-0005T6-1b
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:38:55 -0400
+Received: from [59.151.112.132] (port=59779 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d15jv-0005Sl-3y
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:38:51 -0400
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Date: Thu, 20 Apr 2017 14:39:02 +0800
+Message-ID: <1492670346-18004-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+In-Reply-To: <1492670346-18004-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+References: <1492670346-18004-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 7/7] intel_iommu: support passthrough
- (PT)
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH V2 2/6] net/net.c: Add vnet header length to
+ SocketReadState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,68 +26,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: "Lan, Tianyu" <tianyu.lan@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, "Tian, Kevin" <kevin.tian@intel.com>
+To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
+Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGV0ZXIgWHUgW21haWx0
-bzpwZXRlcnhAcmVkaGF0LmNvbV0NCj4gU2VudDogVGh1cnNkYXksIEFwcmlsIDIwLCAyMDE3IDE6
-NDAgUE0NCj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVAaW50ZWwuY29tPg0KPiBDYzogTGFuLCBU
-aWFueXUgPHRpYW55dS5sYW5AaW50ZWwuY29tPjsgcWVtdS1kZXZlbEBub25nbnUub3JnOyBNaWNo
-YWVsIFMgLg0KPiBUc2lya2luIDxtc3RAcmVkaGF0LmNvbT47IEphc29uIFdhbmcgPGphc293YW5n
-QHJlZGhhdC5jb20+OyBNYXJjZWwNCj4gQXBmZWxiYXVtIDxtYXJjZWxAcmVkaGF0LmNvbT47IERh
-dmlkIEdpYnNvbiA8ZGF2aWRAZ2lic29uLmRyb3BiZWFyLmlkLmF1PjsNCj4gVGlhbiwgS2V2aW4g
-PGtldmluLnRpYW5AaW50ZWwuY29tPg0KPiBTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFtQQVRD
-SCB2MiA3LzddIGludGVsX2lvbW11OiBzdXBwb3J0IHBhc3N0aHJvdWdoIChQVCkNCj4gDQo+IE9u
-IFRodSwgQXByIDIwLCAyMDE3IGF0IDA0OjU1OjI0QU0gKzAwMDAsIExpdSwgWWkgTCB3cm90ZToN
-Cj4gDQo+IFsuLi5dDQo+IA0KPiA+ID4gPiBJbiBteSBwcmV2aW91cyBSRkMgcGF0Y2hzZXQgb2Yg
-ZmF1bHQgZXZlbnQgcmVwb3J0aW5nLCBJIHJlZ2lzdGVyZWQNCj4gPiA+ID4gZmF1bHQgbm90aWZp
-ZXIgd2hlbiB0aGVyZSBpcyBhIFZGSU8gZ3JvdXAgYXR0YWNoZWQgdG8gVkZJTw0KPiA+ID4gPiBj
-b250YWluZXIgYW5kIHVzZWQgdGhlIGFkZHJlc3Mgc3BhY2UgdG8gY2hlY2sgd2hldGhlciB2SU9N
-TVUgaXMNCj4gPiA+ID4gYWRkZWQuIFRoZSBhZGRyZXNzIHNwYWNlIGlzIHJldHVybmVkIGJ5IHZ0
-ZF9ob3N0X2RtYV9pb21tdSgpLg0KPiA+ID4gPiB2dGRfZmluZF9hZGRfYXMoKSBpbml0aWFsaXpl
-cyBkZXZpY2UncyBJT01NVSBtZW1vcnkgcmVnaW9uIGFuZCBwdXQNCj4gPiA+ID4gaXQgaW50byBk
-ZXZpY2UncyBhZGRyZXNzIHNwYWNlIGFzIHJvb3QgbWVtb3J5IHJlZ2lvbi4NCj4gPiA+ID4gRG9l
-cyB0aGlzIG1ha2Ugc2Vuc2U/DQo+ID4gPiA+DQo+ID4gPiA+IEBAIC0xMTAzLDYgKzExMzIsMTQg
-QEAgc3RhdGljIGludCB2ZmlvX2Nvbm5lY3RfY29udGFpbmVyKFZGSU9Hcm91cA0KPiA+ID4gPiAq
-Z3JvdXAsIEFkZHJlc3NTcGFjZSAqYXMsDQo+ID4gPiA+ICAgICAgICAgIGdvdG8gbGlzdGVuZXJf
-cmVsZWFzZV9leGl0Ow0KPiA+ID4gPiAgICAgIH0NCj4gPiA+ID4NCj4gPiA+ID4gKyAgICBpZiAo
-bWVtb3J5X3JlZ2lvbl9pc19pb21tdShjb250YWluZXItPnNwYWNlLT5hcy0+cm9vdCkpIHsNCj4g
-PiA+DQo+ID4gPiBJIHdvdWxkIHN1Z2dlc3Qgd2UgZG9uJ3QgcGxheSB3aXRoIGFzLT5yb290IGFu
-eSBtb3JlLiBBZnRlciB2dGQgdmZpbw0KPiA+ID4gc2VyaWVzLCB0aGlzIG1heSBub3QgYmUgdHJ1
-ZSBpZiBwYXNzdGhyb3VnaCBtb2RlIGlzIGVuYWJsZWQgKHRoZW4NCj4gPiA+IHRoZSByb290IG1h
-eSBiZSBzd2l0Y2hlZCB0byBhbiBzeXN0ZW0gbWVtb3J5IGFsaWFzKS4gSSBkb24ndCBrbm93DQo+
-ID4gPiB0aGUgYmVzdCB3YXkgdG8gY2hlY2sgdGhpcywgb25lIGFsdGVybmF0aXZlIG1pZ2h0IGJl
-IHRoYXQgd2UgY2hlY2sNCj4gPiA+IHdoZXRoZXINCj4gPiA+IGNvbnRhaW5lci0+c3BhY2UtPmFz
-ID09IHN5c3RlbV9tZW1vcnkoKSwgaXQgc2hvdWxkIGJlIHdvcmthYmxlLCBidXQNCj4gPiA+IGNv
-bnRhaW5lci0+c3BhY2UtPmluDQo+IA0KPiBTb3JyeSwgSSB3YXMgbWVhbmluZyAmYWRkcmVzc19z
-cGFjZV9tZW1vcnkuDQoNCmNvcnJlY3QsIEkgZ290IHlvdXIgcG9pbnQgYWxsIHRoZSBzYW1lLg0K
-DQo+IA0KPiA+ID4gYSBzbGlnaHRseSBoYWNraXNoIHdheS4NCj4gPg0KPiA+IEluIG15IHVuZGVy
-c3RhbmRpbmcsIGNvbnRhaW5lci0+c3BhY2UtPmFzLT5yb290IGNhbm5vdCB3b3JrIGhlcmUgbm8N
-Cj4gPiBtYXR0ZXIgcGFzc3RocnUtbW9kZSBpcyBlbmFibGVkIG9yIG5vdC4gVGhlIGNvZGUgaGVy
-ZSBpcyBhaW1pbmcgdG8NCj4gPiBjaGVjayBpZiB2SU9NTVUgZXhpc3RzLiBBZnRlciB0aGUgdmZp
-byBzZXJpZXMsIHRoZSB2dGRfZGV2X2FzLT5yb290IGlzDQo+ID4gbm90IGluaXRpYWxpemVkIHRv
-IGJlIGEgaW9tbXUgTWVtb3J5UmVnaW9uLiBDb21wYXJlZCB3aXRoIGNoZWNraW5nIGlmDQo+ID4g
-aXQgaXMgc3lzdGVtX21lbW9yeSgpLCBJIHRoaW5rIGFkZGluZyBhIG1lY2hhbmlzbSB0byBnZXQg
-dGhlIGlvbW11DQo+IE1lbW9yeVJlZ2lvbiBtYXkgYmUgYSBiZXR0ZXIgY2hvaWNlLiBKdXN0IGxp
-a2UgdGhlIGN1cnJlbnQNCj4gcGNpX2RldmljZV9pb21tdV9hZGRyZXNzX3NwYWNlKCkuDQo+IA0K
-PiBJc24ndCBwY2lfZGV2aWNlX2lvbW11X2FkZHJlc3Nfc3BhY2UoKSB1c2VkIHRvIGdldCB0aGF0
-IElPTU1VIG1lbW9yeSByZWdpb24/DQoNCkl0IGFjdHVhbGx5IHJldHVybnMgdGhlIEFkZHJlc3NT
-cGFjZSwgYW5kIHRoZSBBZGRyZXNzU3BhY2UgaW5jbHVkZXMgYSBtZW1vcnkgcmVnaW9uLg0KSXQg
-aXMgYXMtPnJvb3QuIEJ1dCBhZnRlciBhZGRpbmcgdGhlIHZmaW8gc2VyaWVzLCB0aHJvdWdoIHRo
-ZSBJT01NVSBtZW1vcnkgcmVnaW9uDQppcyBnb3QsIGJ1dCBpdCBoYXMgbm8gaW9tbXVfb3BzLiBK
-dXN0IGFzIHRoZSBmb2xsb3dpbmcgY29kZSBzaG93cy4gVGhhdCdzIHdoeSBJIHNhaWQNCmV2ZW4g
-d2l0aG91dCBwYXNzdGhydS1tb2RlLCBUaWFueXUncyB0aGF0IGNvZGUgc25pcHBldCBpcyBub3Qg
-YWJsZSB0byBnZXQgdGhlIGNvcnJlY3QNCmNoZWNrLg0KDQogICAgICAgIG1lbW9yeV9yZWdpb25f
-aW5pdCgmdnRkX2Rldl9hcy0+cm9vdCwgT0JKRUNUKHMpLA0KICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgInZ0ZF9yb290IiwgVUlOVDY0X01BWCk7DQogICAgICAgIGFkZHJlc3Nfc3BhY2VfaW5p
-dCgmdnRkX2Rldl9hcy0+YXMsICZ2dGRfZGV2X2FzLT5yb290LCBuYW1lKTsNCg0KPiBBbmQsIG9u
-ZSB0aGluZyB0byBtZW50aW9uIGlzIHRoYXQgY29udGFpbmVyLT5zcGFjZS0+YXMgaXMgYWN0dWFs
-bHkgZGVyaXZlZCBmcm9tDQo+IHBjaV9kZXZpY2VfaW9tbXVfYWRkcmVzc19zcGFjZSgpICh3aGVu
-IGNhbGxpbmcgdmZpb19nZXRfZ3JvdXAoKSkuDQoNCnllcywgaXQgaXMuDQoNCj4gSSBmZWVsIGxp
-a2UgdGhhdCBwbGF5aW5nIGFyb3VuZCB3aXRoIGFuIElPTU1VIG1lbW9yeSByZWdpb24gaXMgc3Rp
-bGwgbm90IGNsZWFyDQo+IGVub3VnaCBpbiBtYW55IGNhc2VzLiBJIHN0aWxsIGZlZWwgbGlrZSBz
-b21lIGRheSB3ZSB3b3VsZCBsaWtlIGFuICJJT01NVSBvYmplY3QiLg0KPiBUaGVuLCB3ZSBjYW4g
-cmVnaXN0ZXIgbm9uLWlvdGxiIG5vdGlmaWVycyBhZ2FpbnN0IHRoYXQgSU9NTVUgb2JqZWN0LCBy
-YXRoZXIgdGhhbg0KPiBtZW1vcnkgcmVnaW9ucy4uLg0KPiANCmhhdmVu4oCZdCB0aGluayBtdWNo
-IGFib3V0IGl0LiBpZiB5b3UgaGF2ZSBhbnkgZWFybHkgcGF0Y2gsIG1heSBiZSBnbGFkIHRvIGhh
-dmUgYSBsb29rLg0KDQpUaGFua3MsDQpZaSBMDQo=
+Address Jason Wang's comments add vnet header length to SocketReadState.
+So we change net_fill_rstate() to read
+struct  {int size; int vnet_hdr_len; const uint8_t buf[];}.
+
+Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+---
+ include/net/net.h |  4 +++-
+ net/net.c         | 24 ++++++++++++++++++++++--
+ 2 files changed, 25 insertions(+), 3 deletions(-)
+
+diff --git a/include/net/net.h b/include/net/net.h
+index 99b28d5..1204fe5 100644
+--- a/include/net/net.h
++++ b/include/net/net.h
+@@ -111,9 +111,11 @@ typedef struct NICState {
+ } NICState;
+ 
+ struct SocketReadState {
+-    int state; /* 0 = getting length, 1 = getting data */
++    /* 0 = getting length, 1 = getting vnet header length, 2 = getting data */
++    int state;
+     uint32_t index;
+     uint32_t packet_len;
++    uint32_t vnet_hdr_len;
+     uint8_t buf[NET_BUFSIZE];
+     SocketReadStateFinalize *finalize;
+ };
+diff --git a/net/net.c b/net/net.c
+index 0ac3b9e..d467452 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -1621,8 +1621,12 @@ int net_fill_rstate(SocketReadState *rs, const uint8_t *buf, int size)
+     unsigned int l;
+ 
+     while (size > 0) {
+-        /* reassemble a packet from the network */
+-        switch (rs->state) { /* 0 = getting length, 1 = getting data */
++        /* Reassemble a packet from the network.
++         * 0 = getting length.
++         * 1 = getting vnet header length.
++         * 2 = getting data.
++         */
++        switch (rs->state) {
+         case 0:
+             l = 4 - rs->index;
+             if (l > size) {
+@@ -1640,6 +1644,22 @@ int net_fill_rstate(SocketReadState *rs, const uint8_t *buf, int size)
+             }
+             break;
+         case 1:
++            l = 4 - rs->index;
++            if (l > size) {
++                l = size;
++            }
++            memcpy(rs->buf + rs->index, buf, l);
++            buf += l;
++            size -= l;
++            rs->index += l;
++            if (rs->index == 4) {
++                /* got vnet header length */
++                rs->vnet_hdr_len = ntohl(*(uint32_t *)rs->buf);
++                rs->index = 0;
++                rs->state = 2;
++            }
++            break;
++        case 2:
+             l = rs->packet_len - rs->index;
+             if (l > size) {
+                 l = size;
+-- 
+2.7.4
