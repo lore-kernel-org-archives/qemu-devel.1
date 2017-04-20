@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d1Amq-0007gi-5W
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:02:21 -0400
+	(envelope-from <berrange@redhat.com>) id 1d1AuF-0005n7-Kv
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:09:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d1Ami-00034o-Ri
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:02:12 -0400
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 20 Apr 2017 14:00:57 +0200
-Message-Id: <20170420120058.28404-17-pbonzini@redhat.com>
-In-Reply-To: <20170420120058.28404-1-pbonzini@redhat.com>
-References: <20170420120058.28404-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 16/17] block: protect modification of dirty
- bitmaps with a mutex
+	(envelope-from <berrange@redhat.com>) id 1d1AuE-0005tO-34
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:09:51 -0400
+Date: Thu, 20 Apr 2017 13:09:22 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170420120922.GJ20955@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170419222258.13415-1-eblake@redhat.com>
+	<87k26fffxa.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87k26fffxa.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v2] event: Add source information to
+ SHUTDOWN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,293 +25,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:Overall" <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Rob Herring <robh@kernel.org>, Stefano Stabellini <sstabellini@kernel.org>, Magnus Damm <magnus.damm@gmail.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Anthony Perard <anthony.perard@citrix.com>, "open list:X86" <xen-devel@lists.xenproject.org>, David Gibson <david@gibson.dropbear.id.au>, Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>, Alistair Francis <alistair.francis@xilinx.com>, "open list:Calxeda Highbank" <qemu-arm@nongnu.org>, Jan Kiszka <jan.kiszka@web.de>, Paolo Bonzini <pbonzini@redhat.com>, Scott Wood <scottwood@freescale.com>, Richard Henderson <rth@twiddle.net>, Paul Burton <paul.burton@imgtec.com>, Max Filippov <jcmvbkbc@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, Michael Walle <michael@walle.cc>, "open list:New World" <qemu-ppc@nongnu.org>, Yongbok Kim <yongbok.kim@imgtec.com>, Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- block/dirty-bitmap.c         | 74 +++++++++++++++++++++++++++++++++++++++++---
- block/mirror.c               | 11 +++++--
- include/block/block_int.h    |  4 +--
- include/block/dirty-bitmap.h | 23 +++++++++++---
- 4 files changed, 97 insertions(+), 15 deletions(-)
+On Thu, Apr 20, 2017 at 01:59:29PM +0200, Markus Armbruster wrote:
+> Eric Blake <eblake@redhat.com> writes:
+> 
+> > Libvirt would like to be able to distinguish between a SHUTDOWN
+> > event triggered solely by guest request and one triggered by a
+> > SIGTERM or other action on the host.  qemu_kill_report() is
+> > already able to tell whether a shutdown was triggered by a host
+> > signal (but NOT by a host UI event, such as clicking the X on
+> > the window), but that information was then lost after being
+> > printed to stderr.
+> >
+> > Enhance the shutdown request path to take a parameter of which
+> > way it is being triggered, and update ALL callers.  It would have
+> > been less churn to keep the common case with no arguments as
+> > meaning guest-triggered, and only modified the host-triggered
+> > code paths, via a wrapper function, but then we'd still have to
+> > audit that I didn't miss any host-triggered spots; changing the
+> > signature forces us to double-check that I correctly categorized
+> > all callers.
+> >
+> > Here is output from 'virsh qemu-monitor-event --loop' with the
+> > patch installed:
+> >
+> > event SHUTDOWN at 1492639680.731251 for domain fedora_13: {"guest":true}
+> > event STOP at 1492639680.732116 for domain fedora_13: <null>
+> > event SHUTDOWN at 1492639680.732830 for domain fedora_13: {"guest":false}
+> >
+> > Note that libvirt runs qemu with -no-quit: the first SHUTDOWN event
+> > was triggered by an action I took directly in the guest (shutdown -h),
+> > at which point qemu stops the vcpus and waits for libvirt to do any
+> > final cleanups; the second SHUTDOWN event is the result of libvirt
+> > sending SIGTERM now that it has completed cleanup.
+> >
+> > See also https://bugzilla.redhat.com/1384007
+> >
+> > Signed-off-by: Eric Blake <eblake@redhat.com>
+> >
+> > ---
+> >
+> > I did not wire up the RESET event to report guest-triggered, although
+> > I had to plumb that through all the guests since qemu has options that
+> > allow remapping reset to shutdown.  It's easy to add that if we want
+> > it in v3.
+> >
+> > The replay driver needs a followup patch if we want to be able to
+> > faithfully replay the difference between a host- and guest-initiated
+> > shutdown (for now, the replayed event is always attributed to host).
+> >
+> >
+> > v2: retitle (was "event: Add signal information to SHUTDOWN"),
+> > completely rework to post bool based on whether it is guest-initiated
+> > v1: initial submission, exposing just Unix signals from host
+> > ---
+> >  qapi/event.json             |  8 ++++++--
+> >  include/sysemu/sysemu.h     |  4 ++--
+> >  vl.c                        | 19 +++++++++++--------
+> >  hw/acpi/core.c              |  4 ++--
+> >  hw/arm/highbank.c           |  4 ++--
+> >  hw/arm/integratorcp.c       |  2 +-
+> >  hw/arm/musicpal.c           |  2 +-
+> >  hw/arm/omap1.c              |  6 +++---
+> >  hw/arm/omap2.c              |  2 +-
+> >  hw/arm/spitz.c              |  2 +-
+> >  hw/arm/stellaris.c          |  2 +-
+> >  hw/arm/tosa.c               |  2 +-
+> >  hw/i386/pc.c                |  2 +-
+> >  hw/input/pckbd.c            |  4 ++--
+> >  hw/ipmi/ipmi.c              |  4 ++--
+> >  hw/isa/lpc_ich9.c           |  2 +-
+> >  hw/mips/boston.c            |  2 +-
+> >  hw/mips/mips_malta.c        |  2 +-
+> >  hw/mips/mips_r4k.c          |  4 ++--
+> >  hw/misc/arm_sysctl.c        |  8 ++++----
+> >  hw/misc/cbus.c              |  2 +-
+> >  hw/misc/macio/cuda.c        |  4 ++--
+> >  hw/misc/slavio_misc.c       |  4 ++--
+> >  hw/misc/zynq_slcr.c         |  2 +-
+> >  hw/pci-host/apb.c           |  4 ++--
+> >  hw/pci-host/bonito.c        |  2 +-
+> >  hw/pci-host/piix.c          |  2 +-
+> >  hw/ppc/e500.c               |  2 +-
+> >  hw/ppc/mpc8544_guts.c       |  2 +-
+> >  hw/ppc/ppc.c                |  2 +-
+> >  hw/ppc/ppc405_uc.c          |  2 +-
+> >  hw/ppc/spapr_hcall.c        |  2 +-
+> >  hw/ppc/spapr_rtas.c         |  4 ++--
+> >  hw/s390x/ipl.c              |  2 +-
+> >  hw/sh4/r2d.c                |  2 +-
+> >  hw/timer/etraxfs_timer.c    |  2 +-
+> >  hw/timer/m48t59.c           |  4 ++--
+> >  hw/timer/milkymist-sysctl.c |  4 ++--
+> >  hw/timer/pxa2xx_timer.c     |  2 +-
+> >  hw/watchdog/watchdog.c      |  2 +-
+> >  hw/xenpv/xen_domainbuild.c  |  2 +-
+> >  hw/xtensa/xtfpga.c          |  2 +-
+> >  kvm-all.c                   |  6 +++---
+> >  os-win32.c                  |  2 +-
+> >  qmp.c                       |  4 ++--
+> >  replay/replay.c             |  5 ++++-
+> >  target/alpha/sys_helper.c   |  4 ++--
+> >  target/arm/psci.c           |  4 ++--
+> >  target/i386/excp_helper.c   |  2 +-
+> >  target/i386/hax-all.c       |  6 +++---
+> >  target/i386/helper.c        |  2 +-
+> >  target/i386/kvm.c           |  2 +-
+> >  target/s390x/helper.c       |  2 +-
+> >  target/s390x/kvm.c          |  4 ++--
+> >  target/s390x/misc_helper.c  |  4 ++--
+> >  target/sparc/int32_helper.c |  2 +-
+> >  ui/sdl.c                    |  2 +-
+> >  ui/sdl2.c                   |  4 ++--
+> >  xen-hvm.c                   |  2 +-
+> >  trace-events                |  2 +-
+> >  ui/cocoa.m                  |  2 +-
+> >  61 files changed, 106 insertions(+), 96 deletions(-)
+> >
+> > diff --git a/qapi/event.json b/qapi/event.json
+> > index e80f3f4..c230265 100644
+> > --- a/qapi/event.json
+> > +++ b/qapi/event.json
+> > @@ -10,6 +10,10 @@
+> >  # Emitted when the virtual machine has shut down, indicating that qemu is
+> >  # about to exit.
+> >  #
+> > +# @guest: If true, the shutdown was triggered by a guest request (such as
+> > +# executing a halt instruction) rather than a host request (such as sending
+> > +# qemu a SIGINT). (since 2.10)
+> > +#
+> 
+> "executing a halt instruction" suggests "halt" is a machine instruction.
+> I think you mean /usr/sbin/halt.  Suggest something like "executing a
+> halt command".
 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index e13718e..b854077 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -37,6 +37,7 @@
-  *     or enabled. A frozen bitmap can only abdicate() or reclaim().
-  */
- struct BdrvDirtyBitmap {
-+    QemuMutex *mutex;
-     HBitmap *bitmap;            /* Dirty sector bitmap implementation */
-     HBitmap *meta;              /* Meta dirty bitmap */
-     BdrvDirtyBitmap *successor; /* Anonymous child; implies frozen status */
-@@ -69,6 +70,16 @@ static inline void bdrv_dirty_bitmaps_unlock(BlockDriverState *bs)
-     qemu_mutex_unlock(&dirty_bitmap_mutex);
- }
- 
-+void bdrv_dirty_bitmap_lock(BdrvDirtyBitmap *bitmap)
-+{
-+    qemu_mutex_lock(bitmap->mutex);
-+}
-+
-+void bdrv_dirty_bitmap_unlock(BdrvDirtyBitmap *bitmap)
-+{
-+    qemu_mutex_unlock(bitmap->mutex);
-+}
-+
- /* Called with BQL or dirty_bitmap lock taken.  */
- BdrvDirtyBitmap *bdrv_find_dirty_bitmap(BlockDriverState *bs, const char *name)
- {
-@@ -116,6 +127,7 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriverState *bs,
-         return NULL;
-     }
-     bitmap = g_new0(BdrvDirtyBitmap, 1);
-+    bitmap->mutex = &bs->dirty_bitmap_mutex;
-     bitmap->bitmap = hbitmap_alloc(bitmap_size, ctz32(sector_granularity));
-     bitmap->size = bitmap_size;
-     bitmap->name = g_strdup(name);
-@@ -141,18 +153,22 @@ void bdrv_create_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap,
-                                    int chunk_size)
- {
-     assert(!bitmap->meta);
-+    qemu_mutex_lock(bitmap->mutex);
-     bitmap->meta = hbitmap_create_meta(bitmap->bitmap,
-                                        chunk_size * BITS_PER_BYTE);
-+    qemu_mutex_unlock(bitmap->mutex);
- }
- 
- void bdrv_release_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap)
- {
-     assert(bitmap->meta);
-+    qemu_mutex_lock(bitmap->mutex);
-     hbitmap_free_meta(bitmap->bitmap);
-     bitmap->meta = NULL;
-+    qemu_mutex_unlock(bitmap->mutex);
- }
- 
--int bdrv_dirty_bitmap_get_meta(BlockDriverState *bs,
-+int bdrv_dirty_bitmap_get_meta_locked(BlockDriverState *bs,
-                                BdrvDirtyBitmap *bitmap, int64_t sector,
-                                int nb_sectors)
- {
-@@ -169,11 +185,26 @@ int bdrv_dirty_bitmap_get_meta(BlockDriverState *bs,
-     return false;
- }
- 
-+int bdrv_dirty_bitmap_get_meta(BlockDriverState *bs,
-+                               BdrvDirtyBitmap *bitmap, int64_t sector,
-+                               int nb_sectors)
-+{
-+    bool dirty;
-+
-+    qemu_mutex_lock(bitmap->mutex);
-+    dirty = bdrv_dirty_bitmap_get_meta_locked(bs, bitmap, sector, nb_sectors);
-+    qemu_mutex_unlock(bitmap->mutex);
-+
-+    return dirty;
-+}
-+
- void bdrv_dirty_bitmap_reset_meta(BlockDriverState *bs,
-                                   BdrvDirtyBitmap *bitmap, int64_t sector,
-                                   int nb_sectors)
- {
-+    qemu_mutex_lock(bitmap->mutex);
-     hbitmap_reset(bitmap->meta, sector, nb_sectors);
-+    qemu_mutex_unlock(bitmap->mutex);
- }
- 
- int64_t bdrv_dirty_bitmap_size(const BdrvDirtyBitmap *bitmap)
-@@ -400,7 +431,8 @@ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs)
-     return list;
- }
- 
--int bdrv_get_dirty(BlockDriverState *bs, BdrvDirtyBitmap *bitmap,
-+/* Called within bdrv_dirty_bitmap_lock..unlock */
-+int bdrv_get_dirty_locked(BlockDriverState *bs, BdrvDirtyBitmap *bitmap,
-                    int64_t sector)
- {
-     if (bitmap) {
-@@ -410,6 +442,18 @@ int bdrv_get_dirty(BlockDriverState *bs, BdrvDirtyBitmap *bitmap,
-     }
- }
- 
-+int bdrv_get_dirty(BlockDriverState *bs, BdrvDirtyBitmap *bitmap,
-+                   int64_t sector)
-+{
-+    bool dirty;
-+
-+    bdrv_dirty_bitmap_lock(bitmap);
-+    dirty = bdrv_get_dirty_locked(bs, bitmap, sector);
-+    bdrv_dirty_bitmap_unlock(bitmap);
-+
-+    return dirty;
-+}
-+
- /**
-  * Chooses a default granularity based on the existing cluster size,
-  * but clamped between [4K, 64K]. Defaults to 64K in the case that there
-@@ -474,23 +518,42 @@ int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter)
-     return hbitmap_iter_next(&iter->hbi);
- }
- 
-+/* Called within bdrv_dirty_bitmap_lock..unlock */
-+void bdrv_set_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
-+                                  int64_t cur_sector, int64_t nr_sectors)
-+{
-+    assert(bdrv_dirty_bitmap_enabled(bitmap));
-+    hbitmap_set(bitmap->bitmap, cur_sector, nr_sectors);
-+}
-+
- void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
-                            int64_t cur_sector, int64_t nr_sectors)
- {
-+    bdrv_dirty_bitmap_lock(bitmap);
-+    bdrv_set_dirty_bitmap_locked(bitmap, cur_sector, nr_sectors);
-+    bdrv_dirty_bitmap_unlock(bitmap);
-+}
-+
-+/* Called within bdrv_dirty_bitmap_lock..unlock */
-+void bdrv_reset_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
-+                                    int64_t cur_sector, int64_t nr_sectors)
-+{
-     assert(bdrv_dirty_bitmap_enabled(bitmap));
--    hbitmap_set(bitmap->bitmap, cur_sector, nr_sectors);
-+    hbitmap_reset(bitmap->bitmap, cur_sector, nr_sectors);
- }
- 
- void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
-                              int64_t cur_sector, int64_t nr_sectors)
- {
--    assert(bdrv_dirty_bitmap_enabled(bitmap));
--    hbitmap_reset(bitmap->bitmap, cur_sector, nr_sectors);
-+    bdrv_dirty_bitmap_lock(bitmap);
-+    bdrv_reset_dirty_bitmap_locked(bitmap, cur_sector, nr_sectors);
-+    bdrv_dirty_bitmap_unlock(bitmap);
- }
- 
- void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out)
- {
-     assert(bdrv_dirty_bitmap_enabled(bitmap));
-+    bdrv_dirty_bitmap_lock(bitmap);
-     if (!out) {
-         hbitmap_reset_all(bitmap->bitmap);
-     } else {
-@@ -499,6 +562,7 @@ void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out)
-                                        hbitmap_granularity(backup));
-         *out = backup;
-     }
-+    bdrv_dirty_bitmap_unlock(bitmap);
- }
- 
- void bdrv_undo_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap *in)
-diff --git a/block/mirror.c b/block/mirror.c
-index dc227a2..6a5b0f8 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -344,10 +344,12 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
- 
-     sector_num = bdrv_dirty_iter_next(s->dbi);
-     if (sector_num < 0) {
-+        bdrv_dirty_bitmap_lock(s->dirty_bitmap);
-         bdrv_set_dirty_iter(s->dbi, 0);
-         sector_num = bdrv_dirty_iter_next(s->dbi);
-         trace_mirror_restart_iter(s, bdrv_get_dirty_count(s->dirty_bitmap));
-         assert(sector_num >= 0);
-+        bdrv_dirty_bitmap_unlock(s->dirty_bitmap);
-     }
- 
-     first_chunk = sector_num / sectors_per_chunk;
-@@ -360,12 +362,13 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
- 
-     /* Find the number of consective dirty chunks following the first dirty
-      * one, and wait for in flight requests in them. */
-+    bdrv_dirty_bitmap_lock(s->dirty_bitmap);
-     while (nb_chunks * sectors_per_chunk < (s->buf_size >> BDRV_SECTOR_BITS)) {
-         int64_t next_dirty;
-         int64_t next_sector = sector_num + nb_chunks * sectors_per_chunk;
-         int64_t next_chunk = next_sector / sectors_per_chunk;
-         if (next_sector >= end ||
--            !bdrv_get_dirty(source, s->dirty_bitmap, next_sector)) {
-+            !bdrv_get_dirty_locked(source, s->dirty_bitmap, next_sector)) {
-             break;
-         }
-         if (test_bit(next_chunk, s->in_flight_bitmap)) {
-@@ -386,8 +389,10 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
-      * calling bdrv_get_block_status_above could yield - if some blocks are
-      * marked dirty in this window, we need to know.
-      */
--    bdrv_reset_dirty_bitmap(s->dirty_bitmap, sector_num,
--                            nb_chunks * sectors_per_chunk);
-+    bdrv_reset_dirty_bitmap_locked(s->dirty_bitmap, sector_num,
-+                                  nb_chunks * sectors_per_chunk);
-+    bdrv_dirty_bitmap_unlock(s->dirty_bitmap);
-+
-     bitmap_set(s->in_flight_bitmap, sector_num / sectors_per_chunk, nb_chunks);
-     while (nb_chunks > 0 && sector_num < end) {
-         int64_t ret;
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 03db2cf..c264ead 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -598,8 +598,8 @@ struct BlockDriverState {
- 
-     /* Writing to the list requires the BQL _and_ the dirty_bitmap_mutex.
-      * Reading from the list can be done with either the BQL or the
--     * dirty_bitmap_mutex.  Modifying a bitmap requires the AioContext
--     * lock.  */
-+     * dirty_bitmap_mutex.  Modifying a bitmap only requires
-+     * dirty_bitmap_mutex.  */
-     QemuMutex dirty_bitmap_mutex;
-     QLIST_HEAD(, BdrvDirtyBitmap) dirty_bitmaps;
- 
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 9dea14b..b6fc35b 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -45,6 +45,9 @@ void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
- int bdrv_dirty_bitmap_get_meta(BlockDriverState *bs,
-                                BdrvDirtyBitmap *bitmap, int64_t sector,
-                                int nb_sectors);
-+int bdrv_dirty_bitmap_get_meta_locked(BlockDriverState *bs,
-+                                      BdrvDirtyBitmap *bitmap, int64_t sector,
-+                                      int nb_sectors);
- void bdrv_dirty_bitmap_reset_meta(BlockDriverState *bs,
-                                   BdrvDirtyBitmap *bitmap, int64_t sector,
-                                   int nb_sectors);
-@@ -52,11 +55,6 @@ BdrvDirtyBitmapIter *bdrv_dirty_meta_iter_new(BdrvDirtyBitmap *bitmap);
- BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap,
-                                          uint64_t first_sector);
- void bdrv_dirty_iter_free(BdrvDirtyBitmapIter *iter);
--int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter);
--void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t sector_num);
--int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
--int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
--void bdrv_dirty_bitmap_truncate(BlockDriverState *bs);
- 
- uint64_t bdrv_dirty_bitmap_serialization_size(const BdrvDirtyBitmap *bitmap,
-                                               uint64_t start, uint64_t count);
-@@ -72,4 +70,19 @@ void bdrv_dirty_bitmap_deserialize_zeroes(BdrvDirtyBitmap *bitmap,
-                                           bool finish);
- void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
- 
-+/* Functions that require manual locking.  */
-+void bdrv_dirty_bitmap_lock(BdrvDirtyBitmap *bitmap);
-+void bdrv_dirty_bitmap_unlock(BdrvDirtyBitmap *bitmap);
-+int bdrv_get_dirty_locked(BlockDriverState *bs, BdrvDirtyBitmap *bitmap,
-+                          int64_t sector);
-+void bdrv_set_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
-+                                  int64_t cur_sector, int64_t nr_sectors);
-+void bdrv_reset_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
-+                                    int64_t cur_sector, int64_t nr_sectors);
-+int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter);
-+void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t sector_num);
-+int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
-+int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
-+void bdrv_dirty_bitmap_truncate(BlockDriverState *bs);
-+
- #endif
+Well technically /usr/sbin/halt just terminates all processes / kernel and
+halts CPUs, but the virtual machine is still active (and a 'reset' in the
+monitor can start it again. /usr/sbin/poweroff is what actually does the
+ACPI poweroff to trigger QEMU to exit[1]
+
+Regards,
+Daniel
+
+[1] assuming ACPI poweroff is exposed to guest and supported by the guest
+    kernel.
 -- 
-2.9.3
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
