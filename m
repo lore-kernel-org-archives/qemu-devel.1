@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1d1J80-0005en-VG
+	(envelope-from <balaton@eik.bme.hu>) id 1d1J80-0005ek-UO
 	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 16:56:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1d1J7y-00051I-Ru
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 16:56:37 -0400
-Message-Id: <c4328880c5a143eab3e835dd9d2e2efcd86d98d1.1492721026.git.balaton@eik.bme.hu>
+	(envelope-from <balaton@eik.bme.hu>) id 1d1J7z-00051l-3n
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 16:56:36 -0400
+Message-Id: <33474e1b82c6459604edec522cee585ccdb871ee.1492721026.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1492721026.git.balaton@eik.bme.hu>
 References: <cover.1492721026.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
 Date: Thu, 20 Apr 2017 22:43:46 +0200
-Subject: [Qemu-devel] [PATCH v5 13/13] ppc: Add SM501 device in ppc softmmu
- targets default configs
+Subject: [Qemu-devel] [PATCH v5 07/13] sm501: Fix device endianness
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +22,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 Cc: Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
 
-This is not used by default on any emulated machine yet but it is
-still useful to have it compiled so it can be added from the command
-line for clients that can use it (e.g. MorphOS has no driver for any
-other emulated video cards but can output via SM501)
+We only emulate the sysbus device in its default LE mode and PCI is LE
+as well so specify this for registers and framebuffer memory.
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
 
-v5: Added sm501 also to ppc64-softmmu default config
+v2: Split off small clean up to other patch
+v4: Set serial part to little endian as well
+v5: Make framebuffer always LE as suggested by Peter Maydell
 
- default-configs/ppc-softmmu.mak    | 1 +
- default-configs/ppc64-softmmu.mak  | 1 +
- default-configs/ppcemb-softmmu.mak | 1 +
- 3 files changed, 3 insertions(+)
+ hw/display/sm501.c          |  8 ++++----
+ hw/display/sm501_template.h | 19 ++++++-------------
+ 2 files changed, 10 insertions(+), 17 deletions(-)
 
-diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-index 09c1d45..1f1cd85 100644
---- a/default-configs/ppc-softmmu.mak
-+++ b/default-configs/ppc-softmmu.mak
-@@ -45,6 +45,7 @@ CONFIG_OPENPIC_KVM=$(and $(CONFIG_E500),$(CONFIG_KVM))
- CONFIG_PLATFORM_BUS=y
- CONFIG_ETSEC=y
- CONFIG_LIBDECNUMBER=y
-+CONFIG_SM501=y
- # For PReP
- CONFIG_SERIAL_ISA=y
- CONFIG_MC146818RTC=y
-diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-softmmu.mak
-index 05c8335..f6ccb1b 100644
---- a/default-configs/ppc64-softmmu.mak
-+++ b/default-configs/ppc64-softmmu.mak
-@@ -47,6 +47,7 @@ CONFIG_OPENPIC_KVM=$(and $(CONFIG_E500),$(CONFIG_KVM))
- CONFIG_PLATFORM_BUS=y
- CONFIG_ETSEC=y
- CONFIG_LIBDECNUMBER=y
-+CONFIG_SM501=y
- # For pSeries
- CONFIG_XICS=$(CONFIG_PSERIES)
- CONFIG_XICS_SPAPR=$(CONFIG_PSERIES)
-diff --git a/default-configs/ppcemb-softmmu.mak b/default-configs/ppcemb-softmmu.mak
-index 7f56004..94340de 100644
---- a/default-configs/ppcemb-softmmu.mak
-+++ b/default-configs/ppcemb-softmmu.mak
-@@ -15,3 +15,4 @@ CONFIG_I8259=y
- CONFIG_XILINX=y
- CONFIG_XILINX_ETHLITE=y
- CONFIG_LIBDECNUMBER=y
-+CONFIG_SM501=y
+diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+index c92a5fa..a628ef1 100644
+--- a/hw/display/sm501.c
++++ b/hw/display/sm501.c
+@@ -850,7 +850,7 @@ static const MemoryRegionOps sm501_system_config_ops = {
+         .min_access_size = 4,
+         .max_access_size = 4,
+     },
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
+ static uint32_t sm501_palette_read(void *opaque, hwaddr addr)
+@@ -1086,7 +1086,7 @@ static const MemoryRegionOps sm501_disp_ctrl_ops = {
+         .min_access_size = 4,
+         .max_access_size = 4,
+     },
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
+ static uint64_t sm501_2d_engine_read(void *opaque, hwaddr addr,
+@@ -1174,7 +1174,7 @@ static const MemoryRegionOps sm501_2d_engine_ops = {
+         .min_access_size = 4,
+         .max_access_size = 4,
+     },
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
+ /* draw line functions for all console modes */
+@@ -1510,7 +1510,7 @@ static void sm501_realize_sysbus(DeviceState *dev, Error **errp)
+     if (s->chr_state) {
+         serial_mm_init(&s->state.mmio_region, SM501_UART0, 2,
+                        NULL, /* TODO : chain irq to IRL */
+-                       115200, s->chr_state, DEVICE_NATIVE_ENDIAN);
++                       115200, s->chr_state, DEVICE_LITTLE_ENDIAN);
+     }
+ }
+ 
+diff --git a/hw/display/sm501_template.h b/hw/display/sm501_template.h
+index 832ee61..54807bd 100644
+--- a/hw/display/sm501_template.h
++++ b/hw/display/sm501_template.h
+@@ -64,10 +64,10 @@ static void glue(draw_line16_, PIXEL_NAME)(
+     uint8_t r, g, b;
+ 
+     do {
+-        rgb565 = lduw_p(s);
+-        r = ((rgb565 >> 11) & 0x1f) << 3;
+-        g = ((rgb565 >>  5) & 0x3f) << 2;
+-        b = ((rgb565 >>  0) & 0x1f) << 3;
++        rgb565 = lduw_le_p(s);
++        r = (rgb565 >> 8) & 0xf8;
++        g = (rgb565 >> 3) & 0xfc;
++        b = (rgb565 << 3) & 0xf8;
+         *(PIXEL_TYPE *)d = glue(rgb_to_pixel, PIXEL_NAME)(r, g, b);
+         s += 2;
+         d += BPP;
+@@ -80,16 +80,9 @@ static void glue(draw_line32_, PIXEL_NAME)(
+     uint8_t r, g, b;
+ 
+     do {
+-        ldub_p(s);
+-#if defined(TARGET_WORDS_BIGENDIAN)
+-        r = s[1];
+-        g = s[2];
+-        b = s[3];
+-#else
+-        b = s[0];
+-        g = s[1];
+         r = s[2];
+-#endif
++        g = s[1];
++        b = s[0];
+         *(PIXEL_TYPE *)d = glue(rgb_to_pixel, PIXEL_NAME)(r, g, b);
+         s += 4;
+         d += BPP;
 -- 
 2.7.4
