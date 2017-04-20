@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d11nq-0000fa-Gg
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 22:26:40 -0400
+	(envelope-from <peterx@redhat.com>) id 1d12Om-0005Xf-8y
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 23:04:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d11nm-0005T6-FU
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 22:26:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37676)
+	(envelope-from <peterx@redhat.com>) id 1d12Oi-0008US-7N
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 23:04:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54994)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d11nm-0005Sq-6S
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 22:26:34 -0400
-Date: Wed, 19 Apr 2017 23:26:29 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170420022629.GD25239@thinpad.lan.raisama.net>
-References: <20170419195413.30141-1-bobby.prani@gmail.com>
-	<20170419195413.30141-2-bobby.prani@gmail.com>
-	<CAJhHMCAfexwn92bt0=rfzBB0hbgqzCpRpgnsEXbG5cnmnFYztA@mail.gmail.com>
-	<20170419201314.GX25239@thinpad.lan.raisama.net>
-	<CAJhHMCDpJhRoeGXRvPdqLD7zeVh_dmKX9wDcZcCSFwLj_+Cwkw@mail.gmail.com>
-	<20170419205706.GY25239@thinpad.lan.raisama.net>
-	<CAJhHMCBN8N27M7H4a3ayv6rezKoc9+UH5xPqE4Pu2MPYKD8RgQ@mail.gmail.com>
-	<20170419213349.GC25239@thinpad.lan.raisama.net>
-	<CAJhHMCB1GBC6ay4O61gnF8NtHg9+DCVR3dAcVjd253-GX3BoAw@mail.gmail.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d12Oh-0008U5-VJ
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 23:04:44 -0400
+Date: Thu, 20 Apr 2017 11:04:27 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170420030427.GA26087@pxdev.xzpeter.org>
+References: <1492428730-13438-1-git-send-email-peterx@redhat.com>
+	<1492428730-13438-8-git-send-email-peterx@redhat.com>
+	<A2975661238FB949B60364EF0F2C257439054049@shsmsx102.ccr.corp.intel.com>
+	<20170418045400.GC22226@pxdev.xzpeter.org>
+	<A2975661238FB949B60364EF0F2C2574390540D1@shsmsx102.ccr.corp.intel.com>
+	<20170418072717.GD22226@pxdev.xzpeter.org>
+	<A2975661238FB949B60364EF0F2C257439054360@shsmsx102.ccr.corp.intel.com>
+	<672ae592-e6ba-9152-b775-ec2bde931ef1@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAJhHMCB1GBC6ay4O61gnF8NtHg9+DCVR3dAcVjd253-GX3BoAw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] tcg/i386: Do not display HT warning for TCG
+In-Reply-To: <672ae592-e6ba-9152-b775-ec2bde931ef1@intel.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 7/7] intel_iommu: support passthrough
+ (PT)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,140 +35,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pranith Kumar <bobby.prani@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: Lan Tianyu <tianyu.lan@intel.com>
+Cc: "Liu, Yi L" <yi.l.liu@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, "Tian, Kevin" <kevin.tian@intel.com>
 
-On Wed, Apr 19, 2017 at 06:03:01PM -0400, Pranith Kumar wrote:
-> On Wed, Apr 19, 2017 at 5:33 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > On Wed, Apr 19, 2017 at 05:25:23PM -0400, Pranith Kumar wrote:
-> >> On Wed, Apr 19, 2017 at 4:57 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >> > On Wed, Apr 19, 2017 at 04:16:53PM -0400, Pranith Kumar wrote:
-> >> >> On Wed, Apr 19, 2017 at 4:13 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >> >> > On Wed, Apr 19, 2017 at 04:00:49PM -0400, Pranith Kumar wrote:
-> >> >> >> On Wed, Apr 19, 2017 at 3:54 PM, Pranith Kumar <bobby.prani@gmail.com> wrote:
-> >> >> >> > When we enable hyperthreading (using threads smp argument), we warn
-> >> >> >> > the user if the cpu is an AMD cpu. This does not make sense on TCG and
-> >> >> >> > is also obsolete now that AMD Ryzen support hyperthreading.
-> >> >> >> >
-> >> >> >> > Fix this by adding CPUID_HT bit to the TCG features and explicitly
-> >> >> >> > checking this bit in the cpuid.
-> >> >> >> >
-> >> >> >> > Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
-> >> >> >> > ---
-> >> >> >> >  target/i386/cpu.c | 10 +++++-----
-> >> >> >> >  1 file changed, 5 insertions(+), 5 deletions(-)
-> >> >> >> >
-> >> >> >> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> >> >> >> > index 13c0985f11..f34bb5ead7 100644
-> >> >> >> > --- a/target/i386/cpu.c
-> >> >> >> > +++ b/target/i386/cpu.c
-> >> >> >> > @@ -202,12 +202,12 @@ static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
-> >> >> >> >  #define TCG_FEATURES (CPUID_FP87 | CPUID_PSE | CPUID_TSC | CPUID_MSR | \
-> >> >> >> >            CPUID_PAE | CPUID_MCE | CPUID_CX8 | CPUID_APIC | CPUID_SEP | \
-> >> >> >> >            CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV | CPUID_PAT | \
-> >> >> >> > -          CPUID_PSE36 | CPUID_CLFLUSH | CPUID_ACPI | CPUID_MMX | \
-> >> >> >> > +          CPUID_PSE36 | CPUID_CLFLUSH | CPUID_ACPI | CPUID_MMX | CPUID_HT | \
-> >> >> >> >            CPUID_FXSR | CPUID_SSE | CPUID_SSE2 | CPUID_SS | CPUID_DE)
-> >> >> >> >            /* partly implemented:
-> >> >> >> >            CPUID_MTRR, CPUID_MCA, CPUID_CLFLUSH (needed for Win64) */
-> >> >> >> >            /* missing:
-> >> >> >> > -          CPUID_VME, CPUID_DTS, CPUID_SS, CPUID_HT, CPUID_TM, CPUID_PBE */
-> >> >> >> > +          CPUID_VME, CPUID_DTS, CPUID_SS, CPUID_TM, CPUID_PBE */
-> >> >> >> >  #define TCG_EXT_FEATURES (CPUID_EXT_SSE3 | CPUID_EXT_PCLMULQDQ | \
-> >> >> >> >            CPUID_EXT_MONITOR | CPUID_EXT_SSSE3 | CPUID_EXT_CX16 | \
-> >> >> >> >            CPUID_EXT_SSE41 | CPUID_EXT_SSE42 | CPUID_EXT_POPCNT | \
-> >> >> >> > @@ -3643,7 +3643,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-> >> >> >> >
-> >> >> >> >      qemu_init_vcpu(cs);
-> >> >> >> >
-> >> >> >> > -    /* Only Intel CPUs support hyperthreading. Even though QEMU fixes this
-> >> >> >> > +    /* Only some CPUs support hyperthreading. Even though QEMU fixes this
-> >> >> >> >       * issue by adjusting CPUID_0000_0001_EBX and CPUID_8000_0008_ECX
-> >> >> >> >       * based on inputs (sockets,cores,threads), it is still better to gives
-> >> >> >> >       * users a warning.
-> >> >> >> > @@ -3651,8 +3651,8 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-> >> >> >> >       * NOTE: the following code has to follow qemu_init_vcpu(). Otherwise
-> >> >> >> >       * cs->nr_threads hasn't be populated yet and the checking is incorrect.
-> >> >> >> >       */
-> >> >> >> > -    if (!IS_INTEL_CPU(env) && cs->nr_threads > 1 && !ht_warned) {
-> >> >> >> > -        error_report("AMD CPU doesn't support hyperthreading. Please configure"
-> >> >> >> > +    if ((env->features[FEAT_1_EDX] & CPUID_HT) && (cs->nr_threads > 1) && !ht_warned) {
-> >> >> >>
-> >> >> >> I missed a '!' here. We need to warn if CPUID_HT is not set. But I see
-> >> >> >> that it is not being set even on HT enabled processors (i7-3770). How
-> >> >> >> do I test for it?
-> >> >> >
-> >> >> > CPUID_HT is automatically set on the CPU if
-> >> >> > (nr_threads * nr_cores) > 1. See the "case 1:" block in
-> >> >> > cpu_x86_cpuid().
-> >> >> >
-> >> >> > AFAIK, the point of the warning is to let the user know that the
-> >> >> > guest OS is likely to ignore thread topology information if CPUID
-> >> >> > vendor is not Intel, and has nothing to do with TCG or KVM
-> >> >> > capabilities. Maybe the warning is obsolete today and guests
-> >> >> > won't be confused by a HT AMD CPU, but we need to confirm that.
-> >> >>
-> >> >> We assume an AMD cpu for x86 TCG and it prints this warning when an
-> >> >> smp guest is run with (cores=2,threads=2) argument. The main point of
-> >> >> this patch is to remove that warning when using TCG.
-> >> >
-> >> > What is different under TCG? If guests were confused with
-> >> > threads=2 + vendor=AMD using KVM, what exactly would make them
-> >> > not confused by threads=2 + vendor=AMD when using TCG?
+On Wed, Apr 19, 2017 at 03:27:52PM +0800, Lan Tianyu wrote:
+> Hi All:
+> 	Sorry for later response.
+> On 2017=E5=B9=B404=E6=9C=8818=E6=97=A5 17:04, Liu, Yi L wrote:
+> >> -----Original Message-----
+> >> From: Peter Xu [mailto:peterx@redhat.com]
+> >> Sent: Tuesday, April 18, 2017 3:27 PM
+> >> To: Liu, Yi L <yi.l.liu@intel.com>
+> >> Cc: qemu-devel@nongnu.org; Lan, Tianyu <tianyu.lan@intel.com>; Micha=
+el S .
+> >> Tsirkin <mst@redhat.com>; Jason Wang <jasowang@redhat.com>; Marcel
+> >> Apfelbaum <marcel@redhat.com>; David Gibson <david@gibson.dropbear.i=
+d.au>
+> >> Subject: Re: [Qemu-devel] [PATCH v2 7/7] intel_iommu: support passth=
+rough (PT)
 > >>
-> >> I am not sure why we chose AMD to be the vendor for TCG since, as you
-> >> note, it does not really matter if it's AMD or Intel in TCG mode.
-> >
-> > I don't know why the default on TCG is AMD, either.
-> >
+> >> On Tue, Apr 18, 2017 at 06:02:44AM +0000, Liu, Yi L wrote:
+> >>>>> Hi Peter,
+> >>>>>
+> >>>>> Skip address space switching is a good idea to support Passthru m=
+ode.
+> >>>>> However, without the address space, the vfio notifier would not b=
+e
+> >>>>> registered, thus vIOMMU emulator has no way to connect to host. I=
+t
+> >>>>> is no harm if there is only map/unmap notifier. But if we have
+> >>>>> more notifiers other than map/unmap, it may be a problem.
+> >>>>>
+> >>>>> I think we need to reconsider it here.
+> >>>>
+> >>>> For now I think as switching is good to us in general. Could I kno=
+w
+> >>>> more context about this? Would it be okay to work on top of this i=
+n the future?
+> >>>>
+> >>>
+> >>> Let me explain. For vSVM enabling, it needs to add new notifier to
+> >>> bind gPASID table to host. If an assigned device uses SVM in guest,=
+ as
+> >>> designed guest IOMMU driver would set "pt" for it. This is to make
+> >>> sure the host second-level page table stores GPA->HPA mapping. So t=
+hat
+> >>> pIOMMU can do nested translation to achieve gVA->GPA GPA->HPA mappi=
+ng.
 > >>
-> >> >
-> >> > I just ran a Fedora 25 guest using "-machine accel=tcg
-> >> > -smp 2,threads=2", and it still thinks it's running on a 2-core
-> >> > CPU instead of a 2-thread CPU when CPU vendor is AMD.
+> >> That should mean that in the guest it will only enable first level t=
+ranslation, while in
+> >> the host it'll be nested (first + second)? Then you should be trappi=
+ng the guest
+> >> extended context entry invalidation, then pass the PASID table point=
+er downward to
+> >> the host IOMMU, am I correct?
+> >=20
+> > exactly.
+> >=20
 > >>
-> >> This all started with using Windows XP. It has an arbitrary limit on
-> >> the number of cores it can support to 2 cores. So using -smp 4 will
-> >> still only show 2 cores. However, we can overcome this by using -smp
-> >> cores=2,threads=2 and 4 cores show up in the guest. But we see the
-> >> ugly warning that HT is not supported on AMD cpus.
-> >
-> > Is Windows XP able to detect 2 threads * 2 cores even if CPUID
-> > vendor is AMD?
-> >
-> 
-> Yep. I don't think it cares for vendor id.
-
-What happens if you use -smp 4,cores=4 ?
-
-> 
-> >> So we can either:
+> >>>
+> >>> So the situation is if we want to keep GPA->HPA mapping, we should
+> >>> skip address space switch, but the vfio listener would not know vIO=
+MMU
+> >>> is added, so no vfio notifier would be registered. But if we do the
+> >>> switch, the GPA->HPA mapping is unmapped. And need another way to b=
+uild the
+> >> GPA->HPA mapping.
 > >>
-> >> * Change the vendor to Intel for TCG, or
-> >> * Warn based on the HT bit being set
-> >
-> > Could you clarify what you mean by the second item? The HT bit is
-> > always set when nr_cores*nr_threads > 1.
-> 
-> Hmm, I see it now. We just warn the user if the host processor does
-> not support HT.
+> >> If my understanding above is correct, current IOMMU notifier may not=
+ satisfy your
+> >> need. If you see the current notify interface, it's delivering IOMMU=
+TLBEntry. I
+> >> suspect it only suites for IOTLB notifications, but not if you want =
+to pass some
+> >> pointer (one GPA) downward somewhere.
+> >=20
+> > Yeah, you got it more than absolutely. One of my patch is to modify t=
+he para to be
+> > void * and let each notifiers to translate separately. I think it sho=
+uld be a reasonable
+> > change.
+> >=20
+> > Supposedly, I would send RFC for vSVM soon. We may talk more it at th=
+at thread.
 
-We don't look at the host processor at all: the warn depends only
-on the CPUID data we're showing to the guest.
+I suspect whether it'll be good that we hang everything under current
+IOMMU notifiers... But sure I'm looking forward to your RFC. :)
 
-> 
-> So how about setting the HT bit only if the host processor supports
-> it? Or since it apparently does not matter anyway, remove the warning
-> entirely?
+> >=20
+> >>>
+> >>> I think we may have two choice here. Pls let me know your ideas.
+> >>>
+> >>> 1. skip the switch for "pt" mode, find other way to register vfio
+> >>> notifiers. not sure if this is workable. Just a quick thought.
+> >>>
+> >>> 2. do the switch, and rebuild GPA->HPA mapping if device use "pt"
+> >>> mode. For this option, I also have two way to build the GPA->HPA ma=
+pping.
+> >>> a) walk all the memory region sections in address_space_memory, and=
+ build the
+> >> mapping.
+> >>> address_space_memory.dispatch->map.sections, sections stores all th=
+e mapped
+> >> sections.
+> >>>
+> >>> b) let guest iommu driver mimics a 1:1 mapping for the devices use
+> >>> "pt" mode. in this way, the GPA->HPA mapping could be setup by walk=
+ing
+> >>> the guest SL page table. This is consistent with your vIOVA replay =
+solution.
+> >>
+> >> I'll prefer (1). Reason explained above.
+> >>
+> >>>
+> >>> Also I'm curious if Tianyu's fault report framework needs to regist=
+er new notifiers.
+> >>
+> >> For Tianyu's case, I feel like we need other kind of notifier as wel=
+l, but not the
+> >> current IOTLB one. And, of course in this case it'll be in an revert=
+ed direction, which
+> >> is from device to vIOMMU.
+> >>
+> >> (I am thinking whether it's a good time now to let any PCI device ab=
+le  to fetch its
+> >> direct owner IOMMU object, then it can register anything  it want on=
+to that object
+> >> maybe?)
+> >>
+> > Hmmm, let's see Tianyu's comment as he's driving fault report. Let's =
+keep in touch on
+> > this Passthru-Mode enabling.
+>=20
+> In my previous RFC patchset of fault event reporting, I registered faul=
+t
+> notifier when there is a VFIO group attached to VFIO container and used
+> the address space to check whether vIOMMU is added. The address space i=
+s
+> returned by vtd_host_dma_iommu(). vtd_find_add_as() initializes device'=
+s
+> IOMMU memory region and put it into device's address space as root
+> memory region.
+> Does this make sense?
+>=20
+> @@ -1103,6 +1132,14 @@ static int vfio_connect_container(VFIOGroup
+> *group, AddressSpace *as,
+>          goto listener_release_exit;
+>      }
+>=20
+> +    if (memory_region_is_iommu(container->space->as->root)) {
 
-The host processor doesn't matter. What matters is the CPUID
-data seen by the guest, and it doesn't matter if we're using TCG
-or KVM.
+I would suggest we don't play with as->root any more. After vtd vfio
+series, this may not be true if passthrough mode is enabled (then the
+root may be switched to an system memory alias). I don't know the best
+way to check this, one alternative might be that we check whether
+container->space->as =3D=3D system_memory(), it should be workable, but i=
+n
+a slightly hackish way.
 
-Linux guests seem to ignore the hyperthreading information if
-vendor ID is AMD, and that seems to be the original reason for
-the warning. I would like to remove the warning, too, but it
-looks like this fact hasn't changed.
+Thanks,
 
--- 
-Eduardo
+> +        if (vfio_set_iommu_fault_notifier(container)) {
+> +            error_setg_errno(errp, -ret,
+> +                "Fail to set IOMMU fault notifier");
+> +            goto listener_release_exit;
+> +        }
+> +    }
+> +
+>      container->initialized =3D true;
+>=20
+> --=20
+> Best regards
+> Tianyu Lan
+
+--=20
+Peter Xu
