@@ -1,36 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d1Etl-0005U4-Bz
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:25:38 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1d1F8z-0008Og-BW
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d1Eth-0000rK-5G
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:25:37 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43938
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1d1Etg-0000qq-Vv
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:25:33 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3KGNv6G111414
-	for <qemu-devel@nongnu.org>; Thu, 20 Apr 2017 12:25:30 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 29xvy1v186-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 20 Apr 2017 12:25:30 -0400
-Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Thu, 20 Apr 2017 12:25:29 -0400
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <pm215@archaic.org.uk>) id 1d1F8y-00084j-BT
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:21 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:36885)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1d1F8y-0007wI-3K
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:20 -0400
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
+	(envelope-from <pm215@archaic.org.uk>) id 1d1F8x-0006xt-3d
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 17:41:19 +0100
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 20 Apr 2017 17:41:02 +0100
+Message-Id: <1492706470-10921-17-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1492706470-10921-1-git-send-email-peter.maydell@linaro.org>
+References: <1492706470-10921-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Thu, 20 Apr 2017 11:25:20 -0500
-Message-Id: <149270552086.2252.8482717579448766252@loki>
-Subject: [Qemu-devel] [ANNOUNCE] QEMU 2.9.0 is now available
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 16/24] arm: Don't implement BXJ on M-profile CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,58 +31,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, stefanha@redhat.com
 
-Hello,
+For M-profile CPUs, the BXJ instruction does not exist at all, and
+the encoding should always UNDEF. We were accidentally implementing
+it to behave like A-profile BXJ; correct the error.
 
-On behalf of the QEMU Team, I'd like to announce the availability of
-the QEMU 2.9.0 release. This release contains 2300+ commits from 199
-authors.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Message-id: 1491844419-12485-2-git-send-email-peter.maydell@linaro.org
+---
+ target/arm/translate.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-You can grab the tarball from our download page here:
-
-  http://www.qemu.org/download/#source
-
-The full list of changes are available at:
-
-  http://wiki.qemu.org/ChangeLog/2.9
-
-Highlights include:
-
- * I/O-polling support for virtio-blk (and virtio-scsi experimentally), whi=
-ch
-   can improve I/O-heavy workloads by as much as 10-20%
- * Core support for MTTCG (multi-threaded TCG emulation), now enabled by
-   default for Alpha and ARM on x86 machines
- * Hardware-acceleration support for x86 guests on Windows via HAXM =
-
- * Hotplug and HMAC algorithm support for virtio-crypto devices
- * vhost support for virtio-pci devices behind a guest IOMMU
- * Many stability fixes for XHCI emulation
- * Significant security improvements and I/O throttling support for
-   virtfs/virtio-9p
- * Texinfo documentation for all QMP commands and events
- * Postcopy migration can now by used for guests using hugetlbfs-backed mem=
-ory
-
- * ARM: support for MTTCG (see above)
- * ARM: support for hardware RNG, BCM2835 SD card controller, and GPIO
-   controller when emulating Raspberry Pi board.
- * MIPS: support for MIPS Boston board on MIPS64EL =
-
- * Nios2: Initial support for Nios-II R1 boards, emulating 10M50 development
-   kit with Nios2 GHRD loaded in the FPGA
- * OpenRISC: Lots of fixes and new instructions
- * PowerPC: support for many new POWER9 instructions via TCG emulation, new
-   "40p" machine type, and pseries support for H_SIGNAL_SYS_RESET hypercall
- * s390: support for multiple buses for zPCI, virtio-crypto, and booting via
-   network.
- * SPARC: rewritten support for Niagara
- * Tricore: support for many additional instructions
- * x86: support for 5-level paging under TCG emulation, caching mode support
-   for emulation guest IOMMU, and SMI feature negotiation for q35 machines.
- * Xtensa: support for -icount
-
- * and lots more...
-
-Thank you to everyone involved!
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index e32e38c..fe3f442 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -10485,7 +10485,12 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
+                         }
+                         break;
+                     case 4: /* bxj */
+-                        /* Trivial implementation equivalent to bx.  */
++                        /* Trivial implementation equivalent to bx.
++                         * This instruction doesn't exist at all for M-profile.
++                         */
++                        if (arm_dc_feature(s, ARM_FEATURE_M)) {
++                            goto illegal_op;
++                        }
+                         tmp = load_reg(s, rn);
+                         gen_bx(s, tmp);
+                         break;
+-- 
+2.7.4
