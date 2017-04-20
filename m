@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1d1F92-0008PT-I0
+	(envelope-from <pm215@archaic.org.uk>) id 1d1F91-0008Ot-2U
 	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1d1F90-00087n-WE
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:24 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:36886)
+	(envelope-from <pm215@archaic.org.uk>) id 1d1F8z-00086E-SM
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:23 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:36885)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1d1F90-00084S-OF
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:22 -0400
+	id 1d1F8z-0007wI-KJ
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:21 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1d1F8v-0006wP-6V
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 17:41:17 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1d1F8y-0006yx-H9
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 17:41:20 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 20 Apr 2017 17:40:58 +0100
-Message-Id: <1492706470-10921-13-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 20 Apr 2017 17:41:05 +0100
+Message-Id: <1492706470-10921-20-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1492706470-10921-1-git-send-email-peter.maydell@linaro.org>
 References: <1492706470-10921-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 12/24] cadence_gem: Correct the multi-queue can
- rx logic
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 19/24] arm: Move gen_set_condexec() and
+ gen_set_pc_im() up in the file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +33,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Alistair Francis <alistair.francis@xilinx.com>
+Move the utility routines gen_set_condexec() and gen_set_pc_im()
+up in the file, as we will want to use them from a function
+placed earlier in the file than their current location.
 
-Correct the buffer descriptor busy logic to work correctly when using
-multiple queues.
-
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Message-id: 8a7e8059984e27d46a276a66299d035a0afd280f.1491947224.git.alistair.francis@xilinx.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Message-id: 1491844419-12485-5-git-send-email-peter.maydell@linaro.org
 ---
- hw/net/cadence_gem.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
+ target/arm/translate.c | 31 +++++++++++++++----------------
+ 1 file changed, 15 insertions(+), 16 deletions(-)
 
-diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-index 17c229d..a66a9cc 100644
---- a/hw/net/cadence_gem.c
-+++ b/hw/net/cadence_gem.c
-@@ -481,14 +481,17 @@ static int gem_can_receive(NetClientState *nc)
-     }
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 870e320..a1a0e73 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -893,6 +893,21 @@ static const uint8_t table_logic_cc[16] = {
+     1, /* mvn */
+ };
  
-     for (i = 0; i < s->num_priority_queues; i++) {
--        if (rx_desc_get_ownership(s->rx_desc[i]) == 1) {
--            if (s->can_rx_state != 2) {
--                s->can_rx_state = 2;
--                DB_PRINT("can't receive - busy buffer descriptor (q%d) 0x%x\n",
--                         i, s->rx_desc_addr[i]);
--             }
--            return 0;
-+        if (rx_desc_get_ownership(s->rx_desc[i]) != 1) {
-+            break;
-+        }
-+    };
++static inline void gen_set_condexec(DisasContext *s)
++{
++    if (s->condexec_mask) {
++        uint32_t val = (s->condexec_cond << 4) | (s->condexec_mask >> 1);
++        TCGv_i32 tmp = tcg_temp_new_i32();
++        tcg_gen_movi_i32(tmp, val);
++        store_cpu_field(tmp, condexec_bits);
++    }
++}
 +
-+    if (i == s->num_priority_queues) {
-+        if (s->can_rx_state != 2) {
-+            s->can_rx_state = 2;
-+            DB_PRINT("can't receive - all the buffer descriptors are busy\n");
-         }
-+        return 0;
-     }
++static inline void gen_set_pc_im(DisasContext *s, target_ulong val)
++{
++    tcg_gen_movi_i32(cpu_R[15], val);
++}
++
+ /* Set PC and Thumb state from an immediate address.  */
+ static inline void gen_bx_im(DisasContext *s, uint32_t addr)
+ {
+@@ -1069,11 +1084,6 @@ DO_GEN_ST(8, MO_UB)
+ DO_GEN_ST(16, MO_UW)
+ DO_GEN_ST(32, MO_UL)
  
-     if (s->can_rx_state != 0) {
+-static inline void gen_set_pc_im(DisasContext *s, target_ulong val)
+-{
+-    tcg_gen_movi_i32(cpu_R[15], val);
+-}
+-
+ static inline void gen_hvc(DisasContext *s, int imm16)
+ {
+     /* The pre HVC helper handles cases when HVC gets trapped
+@@ -1107,17 +1117,6 @@ static inline void gen_smc(DisasContext *s)
+     s->is_jmp = DISAS_SMC;
+ }
+ 
+-static inline void
+-gen_set_condexec (DisasContext *s)
+-{
+-    if (s->condexec_mask) {
+-        uint32_t val = (s->condexec_cond << 4) | (s->condexec_mask >> 1);
+-        TCGv_i32 tmp = tcg_temp_new_i32();
+-        tcg_gen_movi_i32(tmp, val);
+-        store_cpu_field(tmp, condexec_bits);
+-    }
+-}
+-
+ static void gen_exception_internal_insn(DisasContext *s, int offset, int excp)
+ {
+     gen_set_condexec(s);
 -- 
 2.7.4
