@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d16tt-00078B-N6
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:53:14 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d16ts-0003Nl-39
+	(envelope-from <famz@redhat.com>) id 1d16ts-00076E-0N
 	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:53:13 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <famz@redhat.com>) id 1d16tm-0003KL-VF
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:53:11 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Thu, 20 Apr 2017 15:52:23 +0800
-Message-Id: <20170420075237.18219-7-famz@redhat.com>
+Date: Thu, 20 Apr 2017 15:52:22 +0800
+Message-Id: <20170420075237.18219-6-famz@redhat.com>
 In-Reply-To: <20170420075237.18219-1-famz@redhat.com>
 References: <20170420075237.18219-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v13 06/20] qemu-io: Add --unsafe-read option
+Subject: [Qemu-devel] [PATCH v13 05/20] qemu-img: Update documentation for
+ --unsafe-read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,143 +25,115 @@ Cc: eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.c
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- qemu-io.c | 31 +++++++++++++++++++++++--------
- 1 file changed, 23 insertions(+), 8 deletions(-)
+ qemu-img-cmds.hx | 48 ++++++++++++++++++++++++------------------------
+ 1 file changed, 24 insertions(+), 24 deletions(-)
 
-diff --git a/qemu-io.c b/qemu-io.c
-index 427cbae..e7e032c 100644
---- a/qemu-io.c
-+++ b/qemu-io.c
-@@ -53,7 +53,8 @@ static const cmdinfo_t close_cmd = {
-     .oneline    = "close the current open file",
- };
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index 8ac7822..da76b8e 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -10,15 +10,15 @@ STEXI
+ ETEXI
  
--static int openfile(char *name, int flags, bool writethrough, QDict *opts)
-+static int openfile(char *name, int flags, bool writethrough, bool unsafe_read,
-+                    QDict *opts)
- {
-     Error *local_err = NULL;
-     BlockDriverState *bs;
-@@ -64,6 +65,9 @@ static int openfile(char *name, int flags, bool writethrough, QDict *opts)
-         return 1;
-     }
+ DEF("bench", img_bench,
+-    "bench [-c count] [-d depth] [-f fmt] [--flush-interval=flush_interval] [-n] [--no-drain] [-o offset] [--pattern=pattern] [-q] [-s buffer_size] [-S step_size] [-t cache] [-w] filename")
++    "bench [-c count] [-d depth] [-f fmt] [--flush-interval=flush_interval] [-n] [--no-drain] [-o offset] [--pattern=pattern] [-q] [-s buffer_size] [-S step_size] [-t cache] [-w] [--unsafe-read] filename")
+ STEXI
+-@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-interval=@var{flush_interval}] [-n] [--no-drain] [-o @var{offset}] [--pattern=@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @var{cache}] [-w] @var{filename}
++@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-interval=@var{flush_interval}] [-n] [--no-drain] [-o @var{offset}] [--pattern=@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @var{cache}] [-w] [--unsafe-read] @var{filename}
+ ETEXI
  
-+    if (unsafe_read) {
-+        flags |= BDRV_O_UNSAFE_READ;
-+    }
-     qemuio_blk = blk_new_open(name, NULL, opts, flags, &local_err);
-     if (!qemuio_blk) {
-         error_reportf_err(local_err, "can't open%s%s: ",
-@@ -108,6 +112,7 @@ static void open_help(void)
- " -r, -- open file read-only\n"
- " -s, -- use snapshot file\n"
- " -n, -- disable host cache, short for -t none\n"
-+" -U, -- allow unsafe reads when another process is writing\n"
- " -k, -- use kernel AIO implementation (on Linux only)\n"
- " -t, -- use the given cache mode for the image\n"
- " -d, -- use the given discard mode for the image\n"
-@@ -124,7 +129,7 @@ static const cmdinfo_t open_cmd = {
-     .argmin     = 1,
-     .argmax     = -1,
-     .flags      = CMD_NOFILE_OK,
--    .args       = "[-rsnk] [-t cache] [-d discard] [-o options] [path]",
-+    .args       = "[-rsnkU] [-t cache] [-d discard] [-o options] [path]",
-     .oneline    = "open the file specified by path",
-     .help       = open_help,
- };
-@@ -147,8 +152,9 @@ static int open_f(BlockBackend *blk, int argc, char **argv)
-     int c;
-     QemuOpts *qopts;
-     QDict *opts;
-+    bool unsafe_read = false;
+ DEF("check", img_check,
+-    "check [-q] [--object objectdef] [--image-opts] [-f fmt] [--output=ofmt] [-r [leaks | all]] [-T src_cache] filename")
++    "check [-q] [--object objectdef] [--image-opts] [-f fmt] [--output=ofmt] [-r [leaks | all]] [-T src_cache] [--unsafe-read] filename")
+ STEXI
+-@item check [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [--output=@var{ofmt}] [-r [leaks | all]] [-T @var{src_cache}] @var{filename}
++@item check [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [--output=@var{ofmt}] [-r [leaks | all]] [-T @var{src_cache}] [--unsafe-read] @var{filename}
+ ETEXI
  
--    while ((c = getopt(argc, argv, "snro:kt:d:")) != -1) {
-+    while ((c = getopt(argc, argv, "snro:kt:d:U")) != -1) {
-         switch (c) {
-         case 's':
-             flags |= BDRV_O_SNAPSHOT;
-@@ -188,6 +194,9 @@ static int open_f(BlockBackend *blk, int argc, char **argv)
-                 return 0;
-             }
-             break;
-+        case 'U':
-+            unsafe_read = true;
-+            break;
-         default:
-             qemu_opts_reset(&empty_opts);
-             return qemuio_command_usage(&open_cmd);
-@@ -211,9 +220,9 @@ static int open_f(BlockBackend *blk, int argc, char **argv)
-     qemu_opts_reset(&empty_opts);
+ DEF("create", img_create,
+@@ -28,62 +28,62 @@ STEXI
+ ETEXI
  
-     if (optind == argc - 1) {
--        return openfile(argv[optind], flags, writethrough, opts);
-+        return openfile(argv[optind], flags, writethrough, unsafe_read, opts);
-     } else if (optind == argc) {
--        return openfile(NULL, flags, writethrough, opts);
-+        return openfile(NULL, flags, writethrough, unsafe_read, opts);
-     } else {
-         QDECREF(opts);
-         return qemuio_command_usage(&open_cmd);
-@@ -257,6 +266,7 @@ static void usage(const char *name)
- "  -T, --trace [[enable=]<pattern>][,events=<file>][,file=<file>]\n"
- "                       specify tracing options\n"
- "                       see qemu-img(1) man page for full description\n"
-+"  -U, --unsafe-read    allow unsafe reads when another process is writing\n"
- "  -h, --help           display this help and exit\n"
- "  -V, --version        output version information and exit\n"
- "\n"
-@@ -436,7 +446,7 @@ static QemuOptsList file_opts = {
- int main(int argc, char **argv)
- {
-     int readonly = 0;
--    const char *sopt = "hVc:d:f:rsnmkt:T:";
-+    const char *sopt = "hVc:d:f:rsnmkt:T:U";
-     const struct option lopt[] = {
-         { "help", no_argument, NULL, 'h' },
-         { "version", no_argument, NULL, 'V' },
-@@ -452,6 +462,7 @@ int main(int argc, char **argv)
-         { "trace", required_argument, NULL, 'T' },
-         { "object", required_argument, NULL, OPTION_OBJECT },
-         { "image-opts", no_argument, NULL, OPTION_IMAGE_OPTS },
-+        { "unsafe-read", no_argument, 0, 'U'},
-         { NULL, 0, NULL, 0 }
-     };
-     int c;
-@@ -462,6 +473,7 @@ int main(int argc, char **argv)
-     QDict *opts = NULL;
-     const char *format = NULL;
-     char *trace_file = NULL;
-+    bool unsafe_read = false;
+ DEF("commit", img_commit,
+-    "commit [-q] [--object objectdef] [--image-opts] [-f fmt] [-t cache] [-b base] [-d] [-p] filename")
++    "commit [-q] [--object objectdef] [--image-opts] [-f fmt] [-t cache] [-b base] [-d] [-p] [--unsafe-read] filename")
+ STEXI
+-@item commit [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [-t @var{cache}] [-b @var{base}] [-d] [-p] @var{filename}
++@item commit [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [-t @var{cache}] [-b @var{base}] [-d] [-p] [--unsafe-read] @var{filename}
+ ETEXI
  
- #ifdef CONFIG_POSIX
-     signal(SIGPIPE, SIG_IGN);
-@@ -524,6 +536,9 @@ int main(int argc, char **argv)
-         case 'h':
-             usage(progname);
-             exit(0);
-+        case 'U':
-+            unsafe_read = true;
-+            break;
-         case OPTION_OBJECT: {
-             QemuOpts *qopts;
-             qopts = qemu_opts_parse_noisily(&qemu_object_opts,
-@@ -595,7 +610,7 @@ int main(int argc, char **argv)
-                 exit(1);
-             }
-             opts = qemu_opts_to_qdict(qopts, NULL);
--            if (openfile(NULL, flags, writethrough, opts)) {
-+            if (openfile(NULL, flags, writethrough, unsafe_read, opts)) {
-                 exit(1);
-             }
-         } else {
-@@ -603,7 +618,7 @@ int main(int argc, char **argv)
-                 opts = qdict_new();
-                 qdict_put(opts, "driver", qstring_from_str(format));
-             }
--            if (openfile(argv[optind], flags, writethrough, opts)) {
-+            if (openfile(argv[optind], flags, writethrough, unsafe_read, opts)) {
-                 exit(1);
-             }
-         }
+ DEF("compare", img_compare,
+-    "compare [--object objectdef] [--image-opts] [-f fmt] [-F fmt] [-T src_cache] [-p] [-q] [-s] filename1 filename2")
++    "compare [--object objectdef] [--image-opts] [-f fmt] [-F fmt] [-T src_cache] [-p] [-q] [-s] [--unsafe-read] filename1 filename2")
+ STEXI
+-@item compare [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [-F @var{fmt}] [-T @var{src_cache}] [-p] [-q] [-s] @var{filename1} @var{filename2}
++@item compare [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [-F @var{fmt}] [-T @var{src_cache}] [-p] [-q] [-s] [--unsafe-read] @var{filename1} @var{filename2}
+ ETEXI
+ 
+ DEF("convert", img_convert,
+-    "convert [--object objectdef] [--image-opts] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-o options] [-s snapshot_id_or_name] [-l snapshot_param] [-S sparse_size] [-m num_coroutines] [-W] filename [filename2 [...]] output_filename")
++    "convert [--object objectdef] [--image-opts] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-o options] [-s snapshot_id_or_name] [-l snapshot_param] [-S sparse_size] [-m num_coroutines] [-W] [--unsafe-read] filename [filename2 [...]] output_filename")
+ STEXI
+-@item convert [--object @var{objectdef}] [--image-opts] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-o @var{options}] [-s @var{snapshot_id_or_name}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] @var{filename} [@var{filename2} [...]] @var{output_filename}
++@item convert [--object @var{objectdef}] [--image-opts] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-o @var{options}] [-s @var{snapshot_id_or_name}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] [--unsafe-read] @var{filename} [@var{filename2} [...]] @var{output_filename}
+ ETEXI
+ 
+ DEF("dd", img_dd,
+-    "dd [--image-opts] [-f fmt] [-O output_fmt] [bs=block_size] [count=blocks] [skip=blocks] if=input of=output")
++    "dd [--image-opts] [--unsafe-read] [-f fmt] [-O output_fmt] [bs=block_size] [count=blocks] [skip=blocks] if=input of=output")
+ STEXI
+-@item dd [--image-opts] [-f @var{fmt}] [-O @var{output_fmt}] [bs=@var{block_size}] [count=@var{blocks}] [skip=@var{blocks}] if=@var{input} of=@var{output}
++@item dd [--image-opts] [--unsafe-read] [-f @var{fmt}] [-O @var{output_fmt}] [bs=@var{block_size}] [count=@var{blocks}] [skip=@var{blocks}] if=@var{input} of=@var{output}
+ ETEXI
+ 
+ DEF("info", img_info,
+-    "info [--object objectdef] [--image-opts] [-f fmt] [--output=ofmt] [--backing-chain] filename")
++    "info [--object objectdef] [--image-opts] [-f fmt] [--output=ofmt] [--backing-chain] [--unsafe-read] filename")
+ STEXI
+-@item info [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [--output=@var{ofmt}] [--backing-chain] @var{filename}
++@item info [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [--output=@var{ofmt}] [--backing-chain] [--unsafe-read] @var{filename}
+ ETEXI
+ 
+ DEF("map", img_map,
+-    "map [--object objectdef] [--image-opts] [-f fmt] [--output=ofmt] filename")
++    "map [--object objectdef] [--image-opts] [-f fmt] [--output=ofmt] [--unsafe-read] filename")
+ STEXI
+-@item map [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [--output=@var{ofmt}] @var{filename}
++@item map [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [--output=@var{ofmt}] [--unsafe-read] @var{filename}
+ ETEXI
+ 
+ DEF("snapshot", img_snapshot,
+-    "snapshot [--object objectdef] [--image-opts] [-q] [-l | -a snapshot | -c snapshot | -d snapshot] filename")
++    "snapshot [--object objectdef] [--image-opts] [--unsafe-read] [-q] [-l | -a snapshot | -c snapshot | -d snapshot] filename")
+ STEXI
+-@item snapshot [--object @var{objectdef}] [--image-opts] [-q] [-l | -a @var{snapshot} | -c @var{snapshot} | -d @var{snapshot}] @var{filename}
++@item snapshot [--object @var{objectdef}] [--image-opts] [--unsafe-read] [-q] [-l | -a @var{snapshot} | -c @var{snapshot} | -d @var{snapshot}] @var{filename}
+ ETEXI
+ 
+ DEF("rebase", img_rebase,
+-    "rebase [--object objectdef] [--image-opts] [-q] [-f fmt] [-t cache] [-T src_cache] [-p] [-u] -b backing_file [-F backing_fmt] filename")
++    "rebase [--object objectdef] [--image-opts] [--unsafe-read] [-q] [-f fmt] [-t cache] [-T src_cache] [-p] [-u] -b backing_file [-F backing_fmt] filename")
+ STEXI
+-@item rebase [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-p] [-u] -b @var{backing_file} [-F @var{backing_fmt}] @var{filename}
++@item rebase [--object @var{objectdef}] [--image-opts] [--unsafe-read] [-q] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-p] [-u] -b @var{backing_file} [-F @var{backing_fmt}] @var{filename}
+ ETEXI
+ 
+ DEF("resize", img_resize,
+-    "resize [--object objectdef] [--image-opts] [-q] filename [+ | -]size")
++    "resize [--object objectdef] [--image-opts] [--unsafe-read] [-q] filename [+ | -]size")
+ STEXI
+-@item resize [--object @var{objectdef}] [--image-opts] [-q] @var{filename} [+ | -]@var{size}
++@item resize [--object @var{objectdef}] [--image-opts] [--unsafe-read] [-q] @var{filename} [+ | -]@var{size}
+ ETEXI
+ 
+ DEF("amend", img_amend,
+-    "amend [--object objectdef] [--image-opts] [-p] [-q] [-f fmt] [-t cache] -o options filename")
++    "amend [--object objectdef] [--image-opts] [--unsafe-read] [-p] [-q] [-f fmt] [-t cache] -o options filename")
+ STEXI
+-@item amend [--object @var{objectdef}] [--image-opts] [-p] [-q] [-f @var{fmt}] [-t @var{cache}] -o @var{options} @var{filename}
++@item amend [--object @var{objectdef}] [--image-opts] [--unsafe-read] [-p] [-q] [-f @var{fmt}] [-t @var{cache}] -o @var{options} @var{filename}
+ @end table
+ ETEXI
 -- 
 2.9.3
