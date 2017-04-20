@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d1Aml-0007am-QE
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:02:12 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d1Amo-0007eU-BO
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:02:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d1Amf-00033G-Lt
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:02:07 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d1Amb-000314-Qv
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 08:02:10 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 20 Apr 2017 14:00:54 +0200
-Message-Id: <20170420120058.28404-14-pbonzini@redhat.com>
+Date: Thu, 20 Apr 2017 14:00:50 +0200
+Message-Id: <20170420120058.28404-10-pbonzini@redhat.com>
 In-Reply-To: <20170420120058.28404-1-pbonzini@redhat.com>
 References: <20170420120058.28404-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 13/17] coroutine-lock: introduce
- qemu_co_mutex_lock_unlock
+Subject: [Qemu-devel] [PATCH 09/17] util: add stats64 module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,79 +22,384 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org
 
-This primitive lets you lock/unlock a CoMutex, guaranteeing neither
-blocking nor cacheline bouncing if there is no qemu_co_mutex_lock
-critical section.
+This module provides fast paths for 64-bit atomic operations on machines
+that only have 32-bit atomic access.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/qemu/coroutine.h   |  6 ++++++
- util/qemu-coroutine-lock.c | 36 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 42 insertions(+)
+ include/qemu/stats64.h | 210 +++++++++++++++++++++++++++++++++++++++++++++++++
+ util/Makefile.objs     |   1 +
+ util/stats64.c         | 135 ++++++++++++++++++++++++++++++++
+ 3 files changed, 346 insertions(+)
+ create mode 100644 include/qemu/stats64.h
+ create mode 100644 util/stats64.c
 
-diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
-index a4509bd..8d4416c 100644
---- a/include/qemu/coroutine.h
-+++ b/include/qemu/coroutine.h
-@@ -157,6 +157,12 @@ void qemu_co_mutex_init(CoMutex *mutex);
- void coroutine_fn qemu_co_mutex_lock(CoMutex *mutex);
- 
- /**
-+ * Locks the mutex and immediately unlock it.  This is faster than back-to-back
-+ * lock/unlock if the mutex is not taken by anyone.
+diff --git a/include/qemu/stats64.h b/include/qemu/stats64.h
+new file mode 100644
+index 0000000..70963f4
+--- /dev/null
++++ b/include/qemu/stats64.h
+@@ -0,0 +1,210 @@
++/*
++ * Atomic operations on 64-bit quantities.
++ *
++ * Copyright (C) 2017 Red Hat, Inc.
++ *
++ * Author: Paolo Bonzini <pbonzini@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
 + */
-+void coroutine_fn qemu_co_mutex_lock_unlock(CoMutex *mutex);
 +
-+/**
-  * Unlocks the mutex and schedules the next coroutine that was waiting for this
-  * lock to be run.
-  */
-diff --git a/util/qemu-coroutine-lock.c b/util/qemu-coroutine-lock.c
-index 6328eed..86f56cd 100644
---- a/util/qemu-coroutine-lock.c
-+++ b/util/qemu-coroutine-lock.c
-@@ -287,6 +287,42 @@ retry_fast_path:
-     self->locks_held++;
- }
- 
-+void coroutine_fn qemu_co_mutex_lock_unlock(CoMutex *mutex)
++#ifndef QEMU_STATS64_H
++#define QEMU_STATS64_H 1
++
++#include "qemu/atomic.h"
++
++/* FIXME: i386 doesn't need the spinlock.  Are there any others? */
++#if __SIZEOF_LONG__ < 8
++#define STAT64_NEED_SPINLOCK 1
++#endif
++
++/* This provides atomic operations on 64-bit type, using a reader-writer
++ * spinlock on architectures that do not have 64-bit accesses.  However
++ * it tries hard not to take the lock.
++ */
++
++typedef struct Stat64 {
++#ifdef STAT64_NEED_SPINLOCK
++    uint32_t low, high;
++    uint32_t lock;
++#else
++    uint64_t value;
++#endif
++} Stat64;
++
++#ifndef STAT64_NEED_SPINLOCK
++static inline void stat64_init(Stat64 *s, uint64_t value)
 +{
-+    AioContext *ctx = qemu_get_current_aio_context();
-+    int waiters, i;
++    /* This is not guaranteed to be atomic! */
++    *s = (Stat64) { value };
++}
 +
-+retry_fast_path:
-+    waiters = atomic_read(&mutex->locked);
-+    if (waiters == 0) {
-+        /* Provide same memory ordering semantics as mutex lock/unlock.  */
-+        smp_mb_acquire();
-+        smp_mb_release();
++static inline uint64_t stat64_get(const Stat64 *s)
++{
++    return atomic_read(&s->value);
++}
++
++static inline void stat64_add(Stat64 *s, uint64_t value)
++{
++    atomic_add(&s->value, value);
++}
++
++static inline void stat64_min(Stat64 *s, uint32_t value)
++{
++    for (;;) {
++        uint64_t orig = atomic_read(&s->value);
++        if (orig <= value) {
++            break;
++        }
++        orig = atomic_cmpxchg(&s->value, orig, value);
++        if (orig <= value) {
++            break;
++        }
++    }
++}
++
++static inline void stat64_max(Stat64 *s, uint32_t value)
++{
++    for (;;) {
++        uint64_t orig = atomic_read(&s->value);
++        if (orig >= value) {
++            break;
++        }
++        orig = atomic_cmpxchg(&s->value, orig, value);
++        if (orig >= value) {
++            break;
++        }
++    }
++}
++#else
++uint64_t stat64_get(const Stat64 *s);
++bool stat64_min_slow(Stat64 *s, uint64_t value);
++bool stat64_max_slow(Stat64 *s, uint64_t value);
++bool stat64_add32_carry(Stat64 *s, uint32_t low, uint32_t high);
++
++static inline void stat64_init(Stat64 *s, uint64_t value)
++{
++    /* This is not guaranteed to be atomic! */
++    *s = (Stat64) { .low = value, .high = value >> 32, .lock = 0 };
++}
++
++static inline void stat64_add(Stat64 *s, uint64_t value)
++{
++    uint32_t low, high;
++    high = value >> 32;
++    low = (uint32_t) value;
++    if (!low) {
++        if (high) {
++            atomic_add(&s->high, high);
++        }
 +        return;
 +    }
 +
-+    i = 0;
-+    while (waiters == 1 && ++i < 1000) {
-+        if (atomic_read(&mutex->ctx) == ctx) {
-+            break;
++    for (;;) {
++        uint32_t orig = s->low;
++        uint32_t result = orig + low;
++        uint32_t old;
++
++        if (result < low || high) {
++            /* If the high part is affected, take the lock.  */
++            if (stat64_add32_carry(s, low, high)) {
++                return;
++            }
++            continue;
 +        }
-+        waiters = atomic_read(&mutex->locked);
-+        if (waiters == 0) {
-+            smp_mb_acquire();
-+            smp_mb_release();
++
++        /* No carry, try with a 32-bit cmpxchg.  The result is independent of
++         * the high 32 bits, so it can race just fine with stat64_add32_carry
++         * and even stat64_get!
++         */
++        old = atomic_cmpxchg(&s->low, orig, result);
++        if (orig == old) {
 +            return;
 +        }
-+        cpu_relax();
 +    }
-+
-+    if (atomic_cmpxchg(&mutex->locked, waiters, waiters + 1) != waiters) {
-+        goto retry_fast_path;
-+    }
-+
-+    qemu_co_mutex_lock_slowpath(ctx, mutex);
-+    qemu_co_mutex_unlock(mutex);
 +}
 +
- void coroutine_fn qemu_co_mutex_unlock(CoMutex *mutex)
- {
-     Coroutine *self = qemu_coroutine_self();
++static inline void stat64_min(Stat64 *s, uint64_t value)
++{
++    uint32_t low, high;
++    uint32_t orig_low, orig_high;
++
++    high = value >> 32;
++    low = (uint32_t) value;
++    do {
++        orig_high = atomic_read(&s->high);
++        if (orig_high < high) {
++            return;
++        }
++
++        if (orig_high == high) {
++            /* High 32 bits are equal.  Read low after high, otherwise we
++             * can get a false positive (e.g. 0x1235,0x0000 changes to
++             * 0x1234,0x8000 and we read it as 0x1234,0x0000). Pairs with
++             * the write barrier in stat64_min_slow.
++             */
++            smp_rmb();
++            orig_low = atomic_read(&s->low);
++            if (orig_low <= low) {
++                return;
++            }
++
++            /* See if we were lucky and a writer raced against us.  The
++             * barrier is theoretically unnecessary, but if we remove it
++             * we may miss being lucky.
++             */
++            smp_rmb();
++            orig_high = atomic_read(&s->high);
++            if (orig_high < high) {
++                return;
++            }
++        }
++
++        /* If the value changes in any way, we have to take the lock.  */
++    } while (!stat64_min_slow(s, value));
++}
++
++static inline void stat64_max(Stat64 *s, uint64_t value)
++{
++    uint32_t low, high;
++    uint32_t orig_low, orig_high;
++
++    high = value >> 32;
++    low = (uint32_t) value;
++    do {
++        orig_high = atomic_read(&s->high);
++        if (orig_high > high) {
++            return;
++        }
++
++        if (orig_high == high) {
++            /* High 32 bits are equal.  Read low after high, otherwise we
++             * can get a false positive (e.g. 0x1234,0x8000 changes to
++             * 0x1235,0x0000 and we read it as 0x1235,0x8000). Pairs with
++             * the write barrier in stat64_max_slow.
++             */
++            smp_rmb();
++            orig_low = atomic_read(&s->low);
++            if (orig_low >= low) {
++                return;
++            }
++
++            /* See if we were lucky and a writer raced against us.  The
++             * barrier is theoretically unnecessary, but if we remove it
++             * we may miss being lucky.
++             */
++            smp_rmb();
++            orig_high = atomic_read(&s->high);
++            if (orig_high > high) {
++                return;
++            }
++        }
++
++        /* If the value changes in any way, we have to take the lock.  */
++    } while (!stat64_max_slow(s, value));
++}
++
++#endif
++
++#endif
+diff --git a/util/Makefile.objs b/util/Makefile.objs
+index c6205eb..8a333d3 100644
+--- a/util/Makefile.objs
++++ b/util/Makefile.objs
+@@ -42,4 +42,5 @@ util-obj-y += log.o
+ util-obj-y += qdist.o
+ util-obj-y += qht.o
+ util-obj-y += range.o
++util-obj-y += stats64.o
+ util-obj-y += systemd.o
+diff --git a/util/stats64.c b/util/stats64.c
+new file mode 100644
+index 0000000..b9238d7
+--- /dev/null
++++ b/util/stats64.c
+@@ -0,0 +1,135 @@
++/*
++ * Atomic operations on 64-bit quantities.
++ *
++ * Copyright (C) 2017 Red Hat, Inc.
++ *
++ * Author: Paolo Bonzini <pbonzini@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/atomic.h"
++#include "qemu/stats64.h"
++
++#ifdef STAT64_NEED_SPINLOCK
++static inline void stat64_rdlock(Stat64 *s)
++{
++    /* Keep out incoming writers to avoid them starving us. */
++    atomic_add(&s->lock, 2);
++
++    /* If there is a concurrent writer, wait for it.  */
++    while (atomic_read(&s->lock) & 1) {
++        g_usleep(5);
++    }
++}
++
++static inline void stat64_rdunlock(Stat64 *s)
++{
++    atomic_sub(&s->lock, 2);
++}
++
++static inline bool stat64_wrtrylock(Stat64 *s)
++{
++    return atomic_cmpxchg(&s->lock, 0, 1) == 0;
++}
++
++static inline void stat64_wrunlock(Stat64 *s)
++{
++    atomic_dec(&s->lock);
++}
++
++uint64_t stat64_get(const Stat64 *s)
++{
++    uint32_t high, low;
++
++    stat64_rdlock((Stat64 *)s);
++
++    /* 64-bit writes always take the lock, so we can read in
++     * any order.
++     */
++    high = atomic_read(&s->high);
++    low = atomic_read(&s->low);
++    stat64_rdunlock((Stat64 *)s);
++
++    return ((uint64_t)high << 32) | low;
++}
++
++bool stat64_add32_carry(Stat64 *s, uint32_t low, uint32_t high)
++{
++    uint32_t old;
++
++    if (!stat64_wrtrylock(s)) {
++        return false;
++    }
++
++    /* 64-bit reads always take the lock, so they don't care about the
++     * order of our update.  By updating s->low first, we can check
++     * whether we have to carry into s->high.
++     */
++    old = atomic_fetch_add(&s->low, value);
++    high += (old + value < old);
++    atomic_add(&s->high, high);
++    stat64_wrunlock(s);
++    return true;
++}
++
++bool stat64_min_slow(Stat64 *s, uint64_t value)
++{
++    uint32_t high, low;
++    uint64_t orig;
++
++    if (!stat64_wrtrylock(s)) {
++        return false;
++    }
++
++    high = atomic_read(&s->high);
++    low = atomic_read(&s->low);
++
++    orig = ((uint64_t)high << 32) | low;
++    if (orig < value) {
++        /* The value may become higher temporarily, but stat64_get does not
++         * notice (it takes the lock) and the only effect on stat64_min is
++         * that the slow path may be triggered unnecessarily.
++         *
++         * But, we have to set low before high, just like stat64_min reads
++         * high before low.
++         */
++        atomic_set(&s->low, (uint32_t)value);
++        smp_wmb();
++        atomic_set(&s->high, value >> 32);
++    }
++    stat64_wrunlock(s);
++    return true;
++}
++
++bool stat64_max_slow(Stat64 *s, uint64_t value)
++{
++    uint32_t high, low;
++    uint64_t orig;
++
++    if (!stat64_wrtrylock(s)) {
++        return false;
++    }
++
++    high = atomic_read(&s->high);
++    low = atomic_read(&s->low);
++
++    orig = ((uint64_t)high << 32) | low;
++    if (orig > value) {
++        /* The value may become lower temporarily, but stat64_get does not
++         * notice (it takes the lock) and the only effect on stat64_max is
++         * that the slow path may be triggered unnecessarily.
++         *
++         * But, we have to set low before high, just like stat64_max reads
++         * high before low.
++         */
++        atomic_set(&s->low, (uint32_t)value);
++        smp_wmb();
++        atomic_set(&s->high, value >> 32);
++    }
++    stat64_wrunlock(s);
++    return true;
++}
++#endif
 -- 
 2.9.3
