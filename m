@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d16u5-0007Kg-BC
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:53:26 -0400
+	(envelope-from <famz@redhat.com>) id 1d16u7-0007Ni-By
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:53:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d16u4-0003Vq-BB
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:53:25 -0400
+	(envelope-from <famz@redhat.com>) id 1d16u6-0003Wt-Jw
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:53:27 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Thu, 20 Apr 2017 15:52:27 +0800
-Message-Id: <20170420075237.18219-11-famz@redhat.com>
+Date: Thu, 20 Apr 2017 15:52:29 +0800
+Message-Id: <20170420075237.18219-13-famz@redhat.com>
 In-Reply-To: <20170420075237.18219-1-famz@redhat.com>
 References: <20170420075237.18219-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v13 10/20] iotests: 085: Avoid image locking
- conflict
+Subject: [Qemu-devel] [PATCH v13 12/20] iotests: 091: Quit QEMU before
+ checking image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,95 +23,25 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-In the case where we test the expected error when a blockdev-snapshot
-target already has a backing image, the backing chain is opened multiple
-times. This will be a problem when we use image locking, so use a
-different backing file that is not already open.
-
 Signed-off-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/085     | 34 ++++++++++++++++++++--------------
- tests/qemu-iotests/085.out |  3 ++-
- 2 files changed, 22 insertions(+), 15 deletions(-)
+ tests/qemu-iotests/091 | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/tests/qemu-iotests/085 b/tests/qemu-iotests/085
-index c53e97f..cc6efd8 100755
---- a/tests/qemu-iotests/085
-+++ b/tests/qemu-iotests/085
-@@ -45,7 +45,7 @@ _cleanup()
-         rm -f "${TEST_DIR}/${i}-${snapshot_virt0}"
-         rm -f "${TEST_DIR}/${i}-${snapshot_virt1}"
-     done
--    rm -f "${TEST_IMG}.1" "${TEST_IMG}.2"
-+    rm -f "${TEST_IMG}" "${TEST_IMG}.1" "${TEST_IMG}.2" "${TEST_IMG}.base"
+diff --git a/tests/qemu-iotests/091 b/tests/qemu-iotests/091
+index 32bbd56..10ac4a8 100755
+--- a/tests/qemu-iotests/091
++++ b/tests/qemu-iotests/091
+@@ -95,7 +95,9 @@ echo "vm2: qemu process running successfully"
+ echo "vm2: flush io, and quit"
+ _send_qemu_cmd $h2 'qemu-io disk flush' "(qemu)"
+ _send_qemu_cmd $h2 'quit' ""
++_send_qemu_cmd $h1 'quit' ""
  
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
-@@ -87,24 +87,26 @@ function create_group_snapshot()
- }
- 
- # ${1}: unique identifier for the snapshot filename
--# ${2}: true: open backing images; false: don't open them (default)
-+# ${2}: extra_params to the blockdev-add command
-+# ${3}: filename
-+function do_blockdev_add()
-+{
-+    cmd="{ 'execute': 'blockdev-add', 'arguments':
-+           { 'driver': 'qcow2', 'node-name': 'snap_${1}', ${2}
-+             'file':
-+             { 'driver': 'file', 'filename': '${3}',
-+               'node-name': 'file_${1}' } } }"
-+    _send_qemu_cmd $h "${cmd}" "return"
-+}
-+
-+# ${1}: unique identifier for the snapshot filename
- function add_snapshot_image()
- {
--    if [ "${2}" = "true" ]; then
--        extra_params=""
--    else
--        extra_params="'backing': '', "
--    fi
-     base_image="${TEST_DIR}/$((${1}-1))-${snapshot_virt0}"
-     snapshot_file="${TEST_DIR}/${1}-${snapshot_virt0}"
-     _make_test_img -b "${base_image}" "$size"
-     mv "${TEST_IMG}" "${snapshot_file}"
--    cmd="{ 'execute': 'blockdev-add', 'arguments':
--           { 'driver': 'qcow2', 'node-name': 'snap_${1}', ${extra_params}
--             'file':
--             { 'driver': 'file', 'filename': '${snapshot_file}',
--               'node-name': 'file_${1}' } } }"
--    _send_qemu_cmd $h "${cmd}" "return"
-+    do_blockdev_add "$1" "'backing': '', " "${snapshot_file}"
- }
- 
- # ${1}: unique identifier for the snapshot filename
-@@ -222,7 +224,11 @@ echo === Invalid command - snapshot node has a backing image ===
- echo
- 
- SNAPSHOTS=$((${SNAPSHOTS}+1))
--add_snapshot_image ${SNAPSHOTS} true
-+
-+_make_test_img "$size"
-+mv "${TEST_IMG}" "${TEST_IMG}.base"
-+_make_test_img -b "${TEST_IMG}.base" "$size"
-+do_blockdev_add ${SNAPSHOTS} "" "${TEST_IMG}"
- blockdev_snapshot ${SNAPSHOTS} error
- 
- echo
-diff --git a/tests/qemu-iotests/085.out b/tests/qemu-iotests/085.out
-index 182acb4..65b0f68 100644
---- a/tests/qemu-iotests/085.out
-+++ b/tests/qemu-iotests/085.out
-@@ -78,7 +78,8 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/
- 
- === Invalid command - snapshot node has a backing image ===
- 
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/12-snapshot-v0.IMGFMT
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.base
- {"return": {}}
- {"error": {"class": "GenericError", "desc": "The snapshot already has a backing image"}}
++wait
+ echo "Check image pattern"
+ ${QEMU_IO} -c "read -P 0x22 0 4M" "${TEST_IMG}" | _filter_testdir | _filter_qemu_io
  
 -- 
 2.9.3
