@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d1IsA-0002DM-AY
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 16:40:15 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1d1J80-0005en-VG
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 16:56:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d1Is9-0001rq-BX
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 16:40:14 -0400
-Date: Thu, 20 Apr 2017 16:40:05 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170420204005.GL15762@localhost.localdomain>
-References: <20170420040003.31074-1-famz@redhat.com>
-	<20170420153016.GI3227@redhat.com>
-	<20170420203250.GI4747@noname.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170420203250.GI4747@noname.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] sheepdog: Set error when connection fails
+	(envelope-from <balaton@eik.bme.hu>) id 1d1J7y-00051I-Ru
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 16:56:37 -0400
+Message-Id: <c4328880c5a143eab3e835dd9d2e2efcd86d98d1.1492721026.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1492721026.git.balaton@eik.bme.hu>
+References: <cover.1492721026.git.balaton@eik.bme.hu>
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Date: Thu, 20 Apr 2017 22:43:46 +0200
+Subject: [Qemu-devel] [PATCH v5 13/13] ppc: Add SM501 device in ppc softmmu
+ targets default configs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,42 +20,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, sheepdog@lists.wpkg.org, qemu-block@nongnu.org, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Max Reitz <mreitz@redhat.com>, Liu Yuan <namei.unix@gmail.com>
+To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
 
-On Thu, Apr 20, 2017 at 10:32:50PM +0200, Kevin Wolf wrote:
-> Am 20.04.2017 um 17:30 hat Daniel P. Berrange geschrieben:
-> > On Thu, Apr 20, 2017 at 12:00:03PM +0800, Fam Zheng wrote:
-> > > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > > ---
-> > >  block/sheepdog.c | 1 +
-> > >  1 file changed, 1 insertion(+)
-> > > 
-> > > diff --git a/block/sheepdog.c b/block/sheepdog.c
-> > > index fb9203e..7e889ee 100644
-> > > --- a/block/sheepdog.c
-> > > +++ b/block/sheepdog.c
-> > > @@ -608,6 +608,7 @@ static int connect_to_sdog(BDRVSheepdogState *s, Error **errp)
-> > >          qemu_set_nonblock(fd);
-> > >      } else {
-> > >          fd = -EIO;
-> > > +        error_setg(errp, "Failed to connect to sheepdog server");
-> > >      }
-> > 
-> > This doesn't make much sense to me. The lines just above the
-> > diff context have this:
-> > 
-> >     fd = socket_connect(s->addr, errp, NULL, NULL);
-> > 
-> > socket_connect should have already reported an error on "errp"
-> > in the scenario that 'fd == -1'.
-> 
-> By the way, am I the only one who thinks that having errp anywhere else
-> than as the last argument is bad style? I can easily see myself missing
-> that this functions sets it because the last argument is NULL.
->
+This is not used by default on any emulated machine yet but it is
+still useful to have it compiled so it can be added from the command
+line for clients that can use it (e.g. MorphOS has no driver for any
+other emulated video cards but can output via SM501)
 
-No, you are not - that is precisely why I missed it in my review.
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+---
 
+v5: Added sm501 also to ppc64-softmmu default config
 
--Jeff
+ default-configs/ppc-softmmu.mak    | 1 +
+ default-configs/ppc64-softmmu.mak  | 1 +
+ default-configs/ppcemb-softmmu.mak | 1 +
+ 3 files changed, 3 insertions(+)
+
+diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
+index 09c1d45..1f1cd85 100644
+--- a/default-configs/ppc-softmmu.mak
++++ b/default-configs/ppc-softmmu.mak
+@@ -45,6 +45,7 @@ CONFIG_OPENPIC_KVM=$(and $(CONFIG_E500),$(CONFIG_KVM))
+ CONFIG_PLATFORM_BUS=y
+ CONFIG_ETSEC=y
+ CONFIG_LIBDECNUMBER=y
++CONFIG_SM501=y
+ # For PReP
+ CONFIG_SERIAL_ISA=y
+ CONFIG_MC146818RTC=y
+diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-softmmu.mak
+index 05c8335..f6ccb1b 100644
+--- a/default-configs/ppc64-softmmu.mak
++++ b/default-configs/ppc64-softmmu.mak
+@@ -47,6 +47,7 @@ CONFIG_OPENPIC_KVM=$(and $(CONFIG_E500),$(CONFIG_KVM))
+ CONFIG_PLATFORM_BUS=y
+ CONFIG_ETSEC=y
+ CONFIG_LIBDECNUMBER=y
++CONFIG_SM501=y
+ # For pSeries
+ CONFIG_XICS=$(CONFIG_PSERIES)
+ CONFIG_XICS_SPAPR=$(CONFIG_PSERIES)
+diff --git a/default-configs/ppcemb-softmmu.mak b/default-configs/ppcemb-softmmu.mak
+index 7f56004..94340de 100644
+--- a/default-configs/ppcemb-softmmu.mak
++++ b/default-configs/ppcemb-softmmu.mak
+@@ -15,3 +15,4 @@ CONFIG_I8259=y
+ CONFIG_XILINX=y
+ CONFIG_XILINX_ETHLITE=y
+ CONFIG_LIBDECNUMBER=y
++CONFIG_SM501=y
+-- 
+2.7.4
