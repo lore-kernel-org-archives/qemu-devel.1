@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1d1F93-0008Qi-L8
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:28 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1d1F95-0008SQ-7K
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1d1F91-00088B-FA
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:25 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1d1F92-00089G-Br
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:27 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:36885)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1d1F91-0007wI-6p
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:23 -0400
+	id 1d1F92-0007wI-0G
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:24 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1d1F90-000709-0W
+	(envelope-from <pm215@archaic.org.uk>) id 1d1F90-000711-Vj
 	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 17:41:22 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 20 Apr 2017 17:41:08 +0100
-Message-Id: <1492706470-10921-23-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 20 Apr 2017 17:41:10 +0100
+Message-Id: <1492706470-10921-25-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1492706470-10921-1-git-send-email-peter.maydell@linaro.org>
 References: <1492706470-10921-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 22/24] arm: Track M profile handler mode state
- in TB flags
+Subject: [Qemu-devel] [PULL 24/24] arm: Remove workarounds for old M-profile
+ exception return implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,78 +33,112 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-For M profile exception-return handling we'd like to generate different
-code for some instructions depending on whether we are in Handler
-mode or Thread mode. This isn't the same as "are we privileged
-or user", so we need an extra bit in the TB flags to distinguish.
+Now that we've rewritten M-profile exception return so that the magic
+PC values are not visible to other parts of QEMU, we can delete the
+special casing of them elsewhere.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 1491844419-12485-8-git-send-email-peter.maydell@linaro.org
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Message-id: 1491844419-12485-10-git-send-email-peter.maydell@linaro.org
 ---
- target/arm/cpu.h       | 9 +++++++++
- target/arm/translate.h | 1 +
- target/arm/translate.c | 1 +
- 3 files changed, 11 insertions(+)
+ target/arm/cpu.c       | 43 ++-----------------------------------------
+ target/arm/translate.c |  8 --------
+ 2 files changed, 2 insertions(+), 49 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index ab86943..1055bfe 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -2291,6 +2291,9 @@ static inline bool arm_cpu_data_is_big_endian(CPUARMState *env)
- #define ARM_TBFLAG_NS_MASK          (1 << ARM_TBFLAG_NS_SHIFT)
- #define ARM_TBFLAG_BE_DATA_SHIFT    20
- #define ARM_TBFLAG_BE_DATA_MASK     (1 << ARM_TBFLAG_BE_DATA_SHIFT)
-+/* For M profile only, Handler (ie not Thread) mode */
-+#define ARM_TBFLAG_HANDLER_SHIFT    21
-+#define ARM_TBFLAG_HANDLER_MASK     (1 << ARM_TBFLAG_HANDLER_SHIFT)
- 
- /* Bit usage when in AArch64 state */
- #define ARM_TBFLAG_TBI0_SHIFT 0        /* TBI0 for EL0/1 or TBI for EL2/3 */
-@@ -2327,6 +2330,8 @@ static inline bool arm_cpu_data_is_big_endian(CPUARMState *env)
-     (((F) & ARM_TBFLAG_NS_MASK) >> ARM_TBFLAG_NS_SHIFT)
- #define ARM_TBFLAG_BE_DATA(F) \
-     (((F) & ARM_TBFLAG_BE_DATA_MASK) >> ARM_TBFLAG_BE_DATA_SHIFT)
-+#define ARM_TBFLAG_HANDLER(F) \
-+    (((F) & ARM_TBFLAG_HANDLER_MASK) >> ARM_TBFLAG_HANDLER_SHIFT)
- #define ARM_TBFLAG_TBI0(F) \
-     (((F) & ARM_TBFLAG_TBI0_MASK) >> ARM_TBFLAG_TBI0_SHIFT)
- #define ARM_TBFLAG_TBI1(F) \
-@@ -2517,6 +2522,10 @@ static inline void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-     }
-     *flags |= fp_exception_el(env) << ARM_TBFLAG_FPEXC_EL_SHIFT;
- 
-+    if (env->v7m.exception != 0) {
-+        *flags |= ARM_TBFLAG_HANDLER_MASK;
-+    }
-+
-     *cs_base = 0;
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 04b062c..b357aee 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -304,33 +304,6 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
  }
  
-diff --git a/target/arm/translate.h b/target/arm/translate.h
-index abb0760..3d0e8a6 100644
---- a/target/arm/translate.h
-+++ b/target/arm/translate.h
-@@ -31,6 +31,7 @@ typedef struct DisasContext {
-     bool vfp_enabled; /* FP enabled via FPSCR.EN */
-     int vec_len;
-     int vec_stride;
-+    bool v7m_handler_mode;
-     /* Immediate value in AArch32 SVC insn; must be set if is_jmp == DISAS_SWI
-      * so that top level loop can generate correct syndrome information.
+ #if !defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64)
+-static void arm_v7m_unassigned_access(CPUState *cpu, hwaddr addr,
+-                                      bool is_write, bool is_exec, int opaque,
+-                                      unsigned size)
+-{
+-    ARMCPU *arm = ARM_CPU(cpu);
+-    CPUARMState *env = &arm->env;
+-
+-    /* ARMv7-M interrupt return works by loading a magic value into the PC.
+-     * On real hardware the load causes the return to occur.  The qemu
+-     * implementation performs the jump normally, then does the exception
+-     * return by throwing a special exception when when the CPU tries to
+-     * execute code at the magic address.
+-     */
+-    if (env->v7m.exception != 0 && addr >= 0xfffffff0 && is_exec) {
+-        cpu->exception_index = EXCP_EXCEPTION_EXIT;
+-        cpu_loop_exit(cpu);
+-    }
+-
+-    /* In real hardware an attempt to access parts of the address space
+-     * with nothing there will usually cause an external abort.
+-     * However our QEMU board models are often missing device models where
+-     * the guest can boot anyway with the default read-as-zero/writes-ignored
+-     * behaviour that you get without a QEMU unassigned_access hook.
+-     * So just return here to retain that default behaviour.
+-     */
+-}
+-
+ static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+ {
+     CPUClass *cc = CPU_GET_CLASS(cs);
+@@ -338,17 +311,7 @@ static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+     CPUARMState *env = &cpu->env;
+     bool ret = false;
+ 
+-    /* ARMv7-M interrupt return works by loading a magic value
+-     * into the PC.  On real hardware the load causes the
+-     * return to occur.  The qemu implementation performs the
+-     * jump normally, then does the exception return when the
+-     * CPU tries to execute code at the magic address.
+-     * This will cause the magic PC value to be pushed to
+-     * the stack if an interrupt occurred at the wrong time.
+-     * We avoid this by disabling interrupts when
+-     * pc contains a magic address.
+-     *
+-     * ARMv7-M interrupt masking works differently than -A or -R.
++    /* ARMv7-M interrupt masking works differently than -A or -R.
+      * There is no FIQ/IRQ distinction. Instead of I and F bits
+      * masking FIQ and IRQ interrupts, an exception is taken only
+      * if it is higher priority than the current execution priority
+@@ -356,8 +319,7 @@ static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+      * currently active exception).
       */
+     if (interrupt_request & CPU_INTERRUPT_HARD
+-        && (armv7m_nvic_can_take_pending_exception(env->nvic))
+-        && (env->regs[15] < 0xfffffff0)) {
++        && (armv7m_nvic_can_take_pending_exception(env->nvic))) {
+         cs->exception_index = EXCP_IRQ;
+         cc->do_interrupt(cs);
+         ret = true;
+@@ -1091,7 +1053,6 @@ static void arm_v7m_class_init(ObjectClass *oc, void *data)
+     cc->do_interrupt = arm_v7m_cpu_do_interrupt;
+ #endif
+ 
+-    cc->do_unassigned_access = arm_v7m_unassigned_access;
+     cc->cpu_exec_interrupt = arm_v7m_cpu_exec_interrupt;
+ }
+ 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index f28c4ca..4fe7692 100644
+index da03e153..0b5a0bc 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -11780,6 +11780,7 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
-     dc->vec_len = ARM_TBFLAG_VECLEN(tb->flags);
-     dc->vec_stride = ARM_TBFLAG_VECSTRIDE(tb->flags);
-     dc->c15_cpar = ARM_TBFLAG_XSCALE_CPAR(tb->flags);
-+    dc->v7m_handler_mode = ARM_TBFLAG_HANDLER(tb->flags);
-     dc->cp_regs = cpu->cp_regs;
-     dc->features = env->features;
+@@ -11927,14 +11927,6 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
+             dc->is_jmp = DISAS_EXC;
+             break;
+         }
+-#else
+-        if (arm_dc_feature(dc, ARM_FEATURE_M)) {
+-            /* Branches to the magic exception-return addresses should
+-             * already have been caught via the arm_v7m_unassigned_access hook,
+-             * and never get here.
+-             */
+-            assert(dc->pc < 0xfffffff0);
+-        }
+ #endif
  
+         if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
 -- 
 2.7.4
