@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d16uR-0007iE-5u
+	(envelope-from <famz@redhat.com>) id 1d16uR-0007j4-SA
 	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:53:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d16uQ-0003g3-55
+	(envelope-from <famz@redhat.com>) id 1d16uR-0003gP-5h
 	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:53:47 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Thu, 20 Apr 2017 15:52:33 +0800
-Message-Id: <20170420075237.18219-17-famz@redhat.com>
+Date: Thu, 20 Apr 2017 15:52:34 +0800
+Message-Id: <20170420075237.18219-18-famz@redhat.com>
 In-Reply-To: <20170420075237.18219-1-famz@redhat.com>
 References: <20170420075237.18219-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v13 16/20] tests: Disable image lock in
- test-replication
+Subject: [Qemu-devel] [PATCH v13 17/20] block: Workaround drive-backup
+ sync=none for image locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,51 +23,24 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-The COLO block replication architecture requires one disk to be shared
-between primary and secondary, in the test both processes use posix file
-protocol (instead of over NBD) so it is affected by image locking.
-Disable the lock.
-
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- tests/test-replication.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ blockdev.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/tests/test-replication.c b/tests/test-replication.c
-index fac2da3..e1c4235 100644
---- a/tests/test-replication.c
-+++ b/tests/test-replication.c
-@@ -179,7 +179,8 @@ static BlockBackend *start_primary(void)
-     char *cmdline;
+diff --git a/blockdev.c b/blockdev.c
+index 4927914..5831b95 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3223,6 +3223,9 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
+         }
+     }
+     if (backup->sync == MIRROR_SYNC_MODE_NONE) {
++        /* FIXME: block layer should really open target with BDRV_O_NO_BACKING
++         * and reuse source's backing chain, if they share one. */
++        flags |= BDRV_O_UNSAFE_READ;
+         source = bs;
+     }
  
-     cmdline = g_strdup_printf("driver=replication,mode=primary,node-name=xxx,"
--                              "file.driver=qcow2,file.file.filename=%s"
-+                              "file.driver=qcow2,file.file.filename=%s,"
-+                              "file.file.locking=off"
-                               , p_local_disk);
-     opts = qemu_opts_parse_noisily(&qemu_drive_opts, cmdline, false);
-     g_free(cmdline);
-@@ -310,7 +311,9 @@ static BlockBackend *start_secondary(void)
-     Error *local_err = NULL;
- 
-     /* add s_local_disk and forge S_LOCAL_DISK_ID */
--    cmdline = g_strdup_printf("file.filename=%s,driver=qcow2", s_local_disk);
-+    cmdline = g_strdup_printf("file.filename=%s,driver=qcow2,"
-+                              "file.locking=off",
-+                              s_local_disk);
-     opts = qemu_opts_parse_noisily(&qemu_drive_opts, cmdline, false);
-     g_free(cmdline);
- 
-@@ -331,8 +334,10 @@ static BlockBackend *start_secondary(void)
-     /* add S_(ACTIVE/HIDDEN)_DISK and forge S_ID */
-     cmdline = g_strdup_printf("driver=replication,mode=secondary,top-id=%s,"
-                               "file.driver=qcow2,file.file.filename=%s,"
-+                              "file.file.locking=off,"
-                               "file.backing.driver=qcow2,"
-                               "file.backing.file.filename=%s,"
-+                              "file.backing.file.locking=off,"
-                               "file.backing.backing=%s"
-                               , S_ID, s_active_disk, s_hidden_disk
-                               , S_LOCAL_DISK_ID);
 -- 
 2.9.3
