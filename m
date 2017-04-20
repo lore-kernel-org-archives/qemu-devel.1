@@ -1,25 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d15oa-0007wd-8J
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:43:41 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1d15uY-0001J4-Mp
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:49:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d15oX-00077c-2E
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:43:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34910)
+	(envelope-from <wei.w.wang@intel.com>) id 1d15uT-0002uU-Pu
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:49:50 -0400
+Received: from mga05.intel.com ([192.55.52.43]:59239)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d15oW-00077V-Pd
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:43:36 -0400
-References: <1492482020-29745-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1492482020-29745-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <77fcaf8a-4352-feca-358e-379ff4006d18@redhat.com>
-Date: Thu, 20 Apr 2017 14:43:27 +0800
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1d15uT-0002te-Gh
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:49:45 -0400
+Message-ID: <58F85A70.8080006@intel.com>
+Date: Thu, 20 Apr 2017 14:51:28 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1492482020-29745-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V2 1/2] COLO-compare: Optimize tcp compare
- for option field
+References: <286AC319A985734F985F78AFA26841F7391EF490@shsmsx102.ccr.corp.intel.com>
+	<9ce5d497-c52a-23fc-a43d-ac7c895faedb@siemens.com>
+	<58F722EE.7030300@intel.com>
+	<d96b8097-b541-9908-8141-86267e726471@siemens.com>
+	<58F72942.3030802@intel.com>
+	<fcf62a96-b3fd-cffc-c784-7af46144cbb2@siemens.com>
+	<58F735CF.7040404@intel.com>
+	<13ccf73a-1553-ce8c-df4a-89c26cdc27b6@siemens.com>
+	<58F745C9.9090106@intel.com>
+	<abdb3dab-d96d-927a-3a63-92ade03afc5a@siemens.com>
+	<286AC319A985734F985F78AFA26841F7391EFB38@shsmsx102.ccr.corp.intel.com>
+	<b752f6cb-b75e-dbae-73cf-ef3fee5516d5@siemens.com>
+In-Reply-To: <b752f6cb-b75e-dbae-73cf-ef3fee5516d5@siemens.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [virtio-dev] Re: Vhost-pci RFC2.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +38,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: Jan Kiszka <jan.kiszka@siemens.com>, =?windows-1252?Q?Marc-Andr=E9_?= =?windows-1252?Q?Lureau?= <marcandre.lureau@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>
+Cc: Jailhouse <jailhouse-dev@googlegroups.com>
 
-
-
-On 2017=E5=B9=B404=E6=9C=8818=E6=97=A5 10:20, Zhang Chen wrote:
-> In this patch we support packet that have tcp options field.
-> Add tcp options field check, If the packet have options
-> field we just skip it and compare tcp payload,
-> Avoid unnecessary checkpoint, optimize performance.
+On 04/19/2017 10:52 PM, Jan Kiszka wrote:
+> On 2017-04-19 16:33, Wang, Wei W wrote:
+>> On 04/19/2017 07:21 PM, Jan Kiszka wrote:
+>>> On 2017-04-19 13:11, Wei Wang wrote:
+>>>> On 04/19/2017 06:36 PM, Jan Kiszka wrote:
+>>>>> On 2017-04-19 12:02, Wei Wang wrote:
+>>>>>>>>>> The design presented here intends to use only one BAR to expose
+>>>>>>>>>> both TX and RX. The two VMs share an intermediate memory here,
+>>>>>>>>>> why couldn't we give the same permission to TX and RX?
+>>>>>>>>>>
+>>>>>>>>> For security and/or safety reasons: the TX side can then safely
+>>>>>>>>> prepare and sign a message in-place because the RX side cannot
+>>>>>>>>> mess around with it while not yet being signed (or check-summed).
+>>>>>>>>> Saves one copy from a secure place into the shared memory.
+>>>>>>>> If we allow guest1 to write to RX, what safety issue would it
+>>>>>>>> cause to guest2?
+>>>>>>> This way, guest1 could trick guest2, in a race condition, to sign a
+>>>>>>> modified message instead of the original one.
+>>>>>>>
+>>>>>> Just align the context that we are talking about: RX is the
+>>>>>> intermediate shared ring that guest1 uses to receive packets and
+>>>>>> guest2 uses to send packet.
+>>>>>>
+>>>>>> Seems the issue is that guest1 will receive a hacked message from RX
+>>>>>> (modified by itself). How would it affect guest2?
+>>>>> Retry: guest2 wants to send a signed/hashed message to guest1. For
+>>>>> that purpose, it starts to build that message inside the shared
+>>>>> memory that
+>>>>> guest1 can at least read, then guest2 signs that message, also in-place.
+>>>>> If guest1 can modify the message inside the ring while guest2 has not
+>>>>> yet signed it, the result is invalid.
+>>>>>
+>>>>> Now, if guest2 is the final receiver of the message, nothing is lost,
+>>>>> guest2 just shot itself into the foot. However, if guest2 is just a
+>>>>> router (gray channel) and the message travels further, guest2 now has
+>>>>> corrupted that channel without allowing the final receive to detect
+>>>>> that. That's the scenario.
+>>>> If guest2 has been a malicious guest, I think it wouldn't make a
+>>>> difference whether we protect the shared RX or not. As a router,
+>>>> guest2 can play tricks on the messages after read it and then send the
+>>>> modified message to a third man, right?
+>>> It can swallow it, "steal" it (redirect), but it can't manipulate the signed content
+>>> without being caught, that's the idea. It's particularly relevant for safety-critical
+>>> traffic from one safe application to another over unreliable channels, but it may
+>>> also be relevant for the integrity of messages in a secure setup.
+>>>
+>> OK, I see most of your story, thanks. To get to the bottom of it, is it possible to
+>> Sign the packet before put it onto the unreliable channel (e.g. the shared RX),
+>> Instead of signing in-place? If that's doable, we can have a simpler shared channel.
+> Of course, you can always add another copy... But as it was trivial to
+> add unidirectional shared memory support to ivshmem [1], I see no reason
+> this shouldn't be possible for vhost-pci as well.
 >
-> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-> ---
->   net/colo-compare.c | 27 ++++++++++++++++++++++++++-
->   1 file changed, 26 insertions(+), 1 deletion(-)
->
-> diff --git a/net/colo-compare.c b/net/colo-compare.c
-> index aada04e..049f6f8 100644
-> --- a/net/colo-compare.c
-> +++ b/net/colo-compare.c
-> @@ -248,7 +248,32 @@ static int colo_packet_compare_tcp(Packet *spkt, P=
-acket *ppkt)
->           spkt->ip->ip_sum =3D ppkt->ip->ip_sum;
->       }
->  =20
-> -    if (ptcp->th_sum =3D=3D stcp->th_sum) {
-> +    /*
-> +     * Check tcp header length for tcp option field.
-> +     * th_off > 5 means this tcp packet have options field.
-> +     * The tcp options maybe always different.
-> +     * for example:
-> +     * From RFC 7323.
-> +     * TCP Timestamps option (TSopt):
-> +     * Kind: 8
-> +     *
-> +     * Length: 10 bytes
-> +     *
-> +     *    +-------+-------+---------------------+---------------------=
-+
-> +     *    |Kind=3D8 |  10   |   TS Value (TSval)  |TS Echo Reply (TSec=
-r)|
-> +     *    +-------+-------+---------------------+---------------------=
-+
-> +     *       1       1              4                     4
-> +     *
-> +     * In this case the primary guest's timestamp always different wit=
-h
-> +     * the secondary guest's timestamp. COLO just focus on payload,
-> +     * so we just need skip this field.h
 
-Probably a good explanation why we can skip this kind of header. But it=20
-does not explain why we can skip all the rest?
+IIUC, this requires the ring and it's head/tail to be put into different 
+regions, it would
+be hard to fit the existing virtqueue into the shared the channel, since 
+the vring and
+its pointers (e.g. idx) and flags are on the same page.
+So, probably will need to use another ring type.
 
-Thanks
 
-> +     */
-> +    if (ptcp->th_off > 5) {
-> +        ptrdiff_t tcp_offset;
-> +        tcp_offset =3D ppkt->transport_header - (uint8_t *)ppkt->data
-> +                     + (ptcp->th_off * 4);
-> +        res =3D colo_packet_compare_common(ppkt, spkt, tcp_offset);
-> +    } else if (ptcp->th_sum =3D=3D stcp->th_sum) {
->           res =3D colo_packet_compare_common(ppkt, spkt, ETH_HLEN);
->       } else {
->           res =3D -1;
+Best,
+Wei
