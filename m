@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d12RP-0006ES-Lg
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 23:07:32 -0400
+	(envelope-from <famz@redhat.com>) id 1d12lN-0000c3-Jn
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 23:28:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d12RL-00017J-Ia
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 23:07:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58702)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d12RL-000177-Ai
-	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 23:07:27 -0400
-Date: Thu, 20 Apr 2017 11:07:14 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170420030714.GB26087@pxdev.xzpeter.org>
-References: <1492428730-13438-1-git-send-email-peterx@redhat.com>
-	<1492428730-13438-8-git-send-email-peterx@redhat.com>
-	<A2975661238FB949B60364EF0F2C257439054CF5@shsmsx102.ccr.corp.intel.com>
+	(envelope-from <famz@redhat.com>) id 1d12lM-0007Ac-OR
+	for qemu-devel@nongnu.org; Wed, 19 Apr 2017 23:28:09 -0400
+Date: Thu, 20 Apr 2017 11:27:56 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170420032756.GA24486@lemon.lan>
+References: <20170314023933.12118-1-famz@redhat.com>
+	<20170314023933.12118-3-famz@redhat.com>
+	<0f1ecad6-9e85-39a2-6d52-5481f7e309cb@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <A2975661238FB949B60364EF0F2C257439054CF5@shsmsx102.ccr.corp.intel.com>
-Subject: Re: [Qemu-devel] [PATCH v2 7/7] intel_iommu: support passthrough
- (PT)
+In-Reply-To: <0f1ecad6-9e85-39a2-6d52-5481f7e309cb@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 2/3] qemu-img: Add --unsafe-read option
+ to subcommands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,107 +25,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@intel.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Lan, Tianyu" <tianyu.lan@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Wed, Apr 19, 2017 at 07:13:47AM +0000, Liu, Yi L wrote:
-> Peter,
+On Tue, 04/18 08:20, Eric Blake wrote:
+> bool, please.  (Just because existing code is lousy with using an int
+> for a bool doesn't mean we should perpetuate it)
+
+OK, will fix.
+
 > 
-> Besides the gPA->hPA mapping, pt mode enabling requires some sanity check on
-> s->pt_supported. See comments inline.
 > 
-> > -----Original Message-----
-> > From: Qemu-devel [mailto:qemu-devel-bounces+yi.l.liu=intel.com@nongnu.org] On
-> > Behalf Of Peter Xu
-> > Sent: Monday, April 17, 2017 7:32 PM
-> > To: qemu-devel@nongnu.org
-> > Cc: Lan, Tianyu <tianyu.lan@intel.com>; Michael S . Tsirkin <mst@redhat.com>;
-> > Jason Wang <jasowang@redhat.com>; peterx@redhat.com; Marcel Apfelbaum
-> > <marcel@redhat.com>; David Gibson <david@gibson.dropbear.id.au>
-> > Subject: [Qemu-devel] [PATCH v2 7/7] intel_iommu: support passthrough (PT)
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  hw/i386/intel_iommu.c          | 109 +++++++++++++++++++++++++++++++++--------
-> >  hw/i386/intel_iommu_internal.h |   1 +
-> >  hw/i386/trace-events           |   1 +
-> >  hw/i386/x86-iommu.c            |   1 +
-> >  include/hw/i386/x86-iommu.h    |   1 +
-> >  5 files changed, 93 insertions(+), 20 deletions(-)
-> > 
-> > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c index
-> > 05ae631..deb2007 100644
-> > --- a/hw/i386/intel_iommu.c
-> > +++ b/hw/i386/intel_iommu.c
-> > @@ -872,7 +872,7 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s,
-> > uint8_t bus_num,
-> >      } else {
-> >          switch (vtd_ce_get_type(ce)) {
-> >          case VTD_CONTEXT_TT_MULTI_LEVEL:
-> > -            /* fall through */
-> > +        case VTD_CONTEXT_TT_PASS_THROUGH:
-> 
-> Passthru type is a reserved type if ecap.PT=0, so add a check here. If s->pt_supported
-> is false, report this translation type as unsupported and report an invalid context 
-> programming to guest.
-> 
-> >          case VTD_CONTEXT_TT_DEV_IOTLB:
+> > @@ -3033,6 +3085,9 @@ static int img_rebase(int argc, char **argv)
+> >          case OPTION_IMAGE_OPTS:
+> >              image_opts = true;
 > >              break;
-> >          default:
-> > @@ -883,6 +883,73 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s,
-> > uint8_t bus_num,
-> >      return 0;
-> >  }
-> > 
-> > +/* Fetch translation type for specific device. Returns <0 if error
-> > + * happens, otherwise return the shifted type to check against
-> > + * VTD_CONTEXT_TT_*. */
-> > +static int vtd_dev_get_trans_type(VTDAddressSpace *as) {
-> > +    IntelIOMMUState *s;
-> > +    VTDContextEntry ce;
-> > +    int ret;
-> > +
-> > +    s = as->iommu_state;
-> > +
-> > +    ret = vtd_dev_to_context_entry(s, pci_bus_num(as->bus),
-> > +                                   as->devfn, &ce);
-> > +    if (ret) {
-> > +        return ret;
-> > +    }
-> > +
-> > +    return vtd_ce_get_type(&ce);
-> > +}
-> > +
-> > +static bool vtd_dev_pt_enabled(VTDAddressSpace *as) {
-> > +    int ret;
-> > +
-> > +    assert(as);
-> > +
-> > +    ret = vtd_dev_get_trans_type(as);
-> > +    if (ret < 0) {
-> > +        /*
-> > +         * Possibly failed to parse the context entry for some reason
-> > +         * (e.g., during init, or any guest configuration errors on
-> > +         * context entries). We should assume PT not enabled for
-> > +         * safety.
-> > +         */
-> > +        return false;
-> > +    }
-> > +
-> > +    return ret == VTD_CONTEXT_TT_PASS_THROUGH; }
-> > +
-> > +static void vtd_switch_address_space(VTDAddressSpace *as) {
-> > +    bool use_iommu;
-> > +
-> > +    assert(as);
-> > +
-> > +    use_iommu = as->iommu_state->dmar_enabled;
-> > +    if (use_iommu) {
+> > +        case 'U':
+> > +            unsafe_read = 1;
 > 
-> if s->pt_supported is false, no need to check the context.TT, even
-> context.TT=pt, then it should be an invalid context programming.
+> s/1/true/
+> 
+> Good patch, but missing documentation updates to --help/man page.  So,
+> as encouragement to add that when you drop the RFC, I'll withhold my R-b
+> until then. ;)
 
-Agree with you on both comments. Thanks. :-)
+Yes, I'll add another patch for ease of review.
 
--- 
-Peter Xu
+Fam
