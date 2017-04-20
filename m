@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1d18Xj-0001EV-JL
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 05:38:28 -0400
+	(envelope-from <famz@redhat.com>) id 1d18bW-0002OE-Br
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 05:42:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1d18Xi-00013o-Nb
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 05:38:27 -0400
+	(envelope-from <famz@redhat.com>) id 1d18bV-0002nw-Dp
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 05:42:22 -0400
+Date: Thu, 20 Apr 2017 17:42:12 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170420094212.GI24486@lemon.lan>
+References: <20170420075237.18219-1-famz@redhat.com>
+	<20170420075237.18219-20-famz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170420093325.GA4747@noname.redhat.com>
-References: <1492679992-7805-1-git-send-email-lidongchen@tencent.com>
-	<20170420093325.GA4747@noname.redhat.com>
-From: 858585 jemmy <jemmy858585@gmail.com>
-Date: Thu, 20 Apr 2017 17:38:25 +0800
-Message-ID: <CAOGPPbcyiFU6Z16rWRCAw4XEOHhp8WN+9KPepnjkSqu6wTR8Qw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2] qemu-img: check bs_n when use old style
- option
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170420075237.18219-20-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v13 19/20] file-posix: Add image locking in
+ perm operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,23 +24,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, mreitz@redhat.com, qemu block <qemu-block@nongnu.org>, Lidong Chen <lidongchen@tencent.com>
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Thu, Apr 20, 2017 at 5:33 PM, Kevin Wolf <kwolf@redhat.com> wrote:
-> Am 20.04.2017 um 11:19 hat jemmy858585@gmail.com geschrieben:
->> From: Lidong Chen <lidongchen@tencent.com>
->>
->> When use old style option like -o backing_file, img_convert
->> continue run when bs_n > 1, this patch fix this bug.
->>
->> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
->
-> I think this is a duplicate of Max' "[PATCH for-2.10 3/3]
-> qemu-img/convert: Move bs_n > 1 && -B check down".
-ok, thanks.
+On Thu, 04/20 15:52, Fam Zheng wrote:
+> virtlockd in libvirt locks the first byte, so we start looking at the
+> file bytes from 0x10.
+> 
+> The complication is in the transactional interface.  To make the reopen
+> logic managable, and allow better reuse, the code is internally
+> organized with a table from old mode to the new one.
+> 
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  block/file-posix.c | 744 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 741 insertions(+), 3 deletions(-)
 
->
-> Also, -B is the old-style option, not -o backing_file.
->
-> Kevin
+Need to squash this in to fix the patchew make check error on centos 6:
+
+diff --git a/block/file-posix.c b/block/file-posix.c
+index b85ac9c..f1563ae 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -1069,7 +1069,7 @@ static int raw_handle_lock_update(BlockDriverState *bs,
+     int lock_fd;
+ 
+     if (!RAW_LOCK_SUPPORTED) {
+-        return 0;
++        goto cleanup;
+     }
+ 
+     if (bdrv_get_flags(bs) & BDRV_O_INACTIVE) {
