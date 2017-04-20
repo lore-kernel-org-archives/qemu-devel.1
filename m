@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1d1F94-0008RC-5V
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:28 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1d1F95-0008Sy-Oc
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1d1F92-00089X-Jo
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:26 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:36887)
+	(envelope-from <pm215@archaic.org.uk>) id 1d1F93-0008Ap-Lm
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:27 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:36888)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1d1F92-00085i-8b
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:24 -0400
+	id 1d1F93-00087d-8l
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:25 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1d1F8t-0006vI-PA
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 17:41:15 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1d1F8q-0006t3-UQ
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 17:41:12 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 20 Apr 2017 17:40:55 +0100
-Message-Id: <1492706470-10921-10-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 20 Apr 2017 17:40:49 +0100
+Message-Id: <1492706470-10921-4-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1492706470-10921-1-git-send-email-peter.maydell@linaro.org>
 References: <1492706470-10921-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 09/24] arm/kvm: Remove trailing newlines from
- error_report()
+Subject: [Qemu-devel] [PULL 03/24] hw/char/exynos4210_uart: Constify static
+ array and few arguments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +30,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+From: Krzysztof Kozlowski <krzk@kernel.org>
 
-Signed-off-by: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-id: 1491629987-6826-1-git-send-email-chugh.ishani@research.iiit.ac.in
+The static array exynos4210_uart_regs with register values is not
+modified so it can be made const.
+
+Few other functions accept driver or uart state as an argument but they
+do not change it and do not cast it so this can be made const for code
+safeness.
+
+Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+Message-id: 20170313184750.429-3-krzk@kernel.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/kvm64.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/char/exynos4210_uart.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 6111109..a16abc8 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -940,7 +940,7 @@ bool kvm_arm_handle_debug(CPUState *cs, struct kvm_debug_exit_arch *debug_exit)
-              * single step at this point so something has gone wrong.
-              */
-             error_report("%s: guest single-step while debugging unsupported"
--                         " (%"PRIx64", %"PRIx32")\n",
-+                         " (%"PRIx64", %"PRIx32")",
-                          __func__, env->pc, debug_exit->hsr);
-             return false;
-         }
-@@ -965,7 +965,7 @@ bool kvm_arm_handle_debug(CPUState *cs, struct kvm_debug_exit_arch *debug_exit)
-         break;
-     }
-     default:
--        error_report("%s: unhandled debug exit (%"PRIx32", %"PRIx64")\n",
-+        error_report("%s: unhandled debug exit (%"PRIx32", %"PRIx64")",
-                      __func__, debug_exit->hsr, env->pc);
-     }
+diff --git a/hw/char/exynos4210_uart.c b/hw/char/exynos4210_uart.c
+index b75f28d..bff706a 100644
+--- a/hw/char/exynos4210_uart.c
++++ b/hw/char/exynos4210_uart.c
+@@ -102,7 +102,7 @@ typedef struct Exynos4210UartReg {
+     uint32_t            reset_value;
+ } Exynos4210UartReg;
  
+-static Exynos4210UartReg exynos4210_uart_regs[] = {
++static const Exynos4210UartReg exynos4210_uart_regs[] = {
+     {"ULCON",    ULCON,    0x00000000},
+     {"UCON",     UCON,     0x00003000},
+     {"UFCON",    UFCON,    0x00000000},
+@@ -220,7 +220,7 @@ static uint8_t fifo_retrieve(Exynos4210UartFIFO *q)
+     return  ret;
+ }
+ 
+-static int fifo_elements_number(Exynos4210UartFIFO *q)
++static int fifo_elements_number(const Exynos4210UartFIFO *q)
+ {
+     if (q->sp < q->rp) {
+         return q->size - q->rp + q->sp;
+@@ -229,7 +229,7 @@ static int fifo_elements_number(Exynos4210UartFIFO *q)
+     return q->sp - q->rp;
+ }
+ 
+-static int fifo_empty_elements_number(Exynos4210UartFIFO *q)
++static int fifo_empty_elements_number(const Exynos4210UartFIFO *q)
+ {
+     return q->size - fifo_elements_number(q);
+ }
+@@ -245,7 +245,7 @@ static void fifo_reset(Exynos4210UartFIFO *q)
+     q->rp = 0;
+ }
+ 
+-static uint32_t exynos4210_uart_Tx_FIFO_trigger_level(Exynos4210UartState *s)
++static uint32_t exynos4210_uart_Tx_FIFO_trigger_level(const Exynos4210UartState *s)
+ {
+     uint32_t level = 0;
+     uint32_t reg;
 -- 
 2.7.4
