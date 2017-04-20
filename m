@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d18T0-00085F-53
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 05:33:34 -0400
+	(envelope-from <anonym@riseup.net>) id 1d18Vh-0000LB-Eo
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 05:36:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d18Sz-0007QU-8a
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 05:33:34 -0400
-Date: Thu, 20 Apr 2017 11:33:25 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170420093325.GA4747@noname.redhat.com>
-References: <1492679992-7805-1-git-send-email-lidongchen@tencent.com>
+	(envelope-from <anonym@riseup.net>) id 1d18Ve-0000Lw-5T
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 05:36:21 -0400
+Received: from mx1.riseup.net ([198.252.153.129]:52612)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <anonym@riseup.net>) id 1d18Vd-0000LC-UX
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 05:36:18 -0400
+References: <20170117190056.1195-1-anonym@riseup.net>
+	<20170117190056.1195-2-anonym@riseup.net>
+From: anonym <anonym@riseup.net>
+Message-ID: <9b6090d8-4aec-351c-a733-12a6f5b5457c@riseup.net>
+Date: Thu, 20 Apr 2017 09:35:00 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1492679992-7805-1-git-send-email-lidongchen@tencent.com>
-Subject: Re: [Qemu-devel] [PATCH v2] qemu-img: check bs_n when use old style
- option
+In-Reply-To: <20170117190056.1195-2-anonym@riseup.net>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] xhci: bump the link TRB cycle detection
+ limit.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,20 +28,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jemmy858585@gmail.com
-Cc: qemu-devel@nongnu.org, mreitz@redhat.com, qemu-block@nongnu.org, Lidong Chen <lidongchen@tencent.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Am 20.04.2017 um 11:19 hat jemmy858585@gmail.com geschrieben:
-> From: Lidong Chen <lidongchen@tencent.com>
+Hi, list!
+
+I guess you can take this as a ping for this patch submission. We'd very much like this to be dealt with soon, so the fix can land into Debian Stretch before it is released, otherwise some of us will have to work around this issue for the next two years. :/
+
+Hi, Gerd!
+
+You are the author of QEMU commit 05f43d4 which fixed CVE-2016-8576, which I believe introduced the regression described below. Do you think my patch's approach is safe and makes sense?
+
+At the moment this issue is causing trouble for Tails [1] since its installer hits this bug, which affects both users of QEMU + Tails, and our automated QA infrastructure, which uses QEMU.
+
+Cheers!
+
+[1] https://tails.boum.org/
+
+anonym@riseup.net:
+> From: anonym <anonym@riseup.net>
 > 
-> When use old style option like -o backing_file, img_convert
-> continue run when bs_n > 1, this patch fix this bug.
+> While formatting partitions (on virtual USB drives and the nec-xhci
+> virtual USB controller) to EXT4, I have observed errors like these:
 > 
-> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
-
-I think this is a duplicate of Max' "[PATCH for-2.10 3/3]
-qemu-img/convert: Move bs_n > 1 && -B check down".
-
-Also, -B is the old-style option, not -o backing_file.
-
-Kevin
+>     kernel: sd 8:0:0:0: [sda] tag#0 FAILED Result: hostbyte=DID_ABORT
+>     driverbyte=DRIVER_OK
+>     kernel: sd 8:0:0:0: [sda] tag#0 CDB: Write(10) 2a 00 00 66 49 86
+>     00 08 00 00
+>     kernel: blk_update_request: I/O error, dev sda, sector 6703494
+>     kernel: Buffer I/O error on dev dm-0, logical block 1573254, lost
+>     async page write
+> 
+> Raising TRB_LINK_LIMIT fixes the limit, but the new value was
+> admittedly arbitrarily chosen.
+> 
+> Regarding cycle detection in general, allowing at most 4 levels of
+> links seems pretty low. This bump should be safe: a high number only
+> means that we get a performance hit when encountering cycles but then
+> we should have a fatal error any way; a low number instead means that
+> we'll incorrectly identify cycles and abort operations that otherwise
+> would succeed, like in the case above.
+> 
+> Signed-off-by: anonym <anonym@riseup.net>
+> ---
+>  hw/usb/hcd-xhci.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+> index 4acf0c6dd8..d14ce126a2 100644
+> --- a/hw/usb/hcd-xhci.c
+> +++ b/hw/usb/hcd-xhci.c
+> @@ -53,7 +53,7 @@
+>   * to the specs when it gets them */
+>  #define ER_FULL_HACK
+>  
+> -#define TRB_LINK_LIMIT  4
+> +#define TRB_LINK_LIMIT  32
+>  
+>  #define LEN_CAP         0x40
+>  #define LEN_OPER        (0x400 + 0x10 * MAXPORTS)
+> 
