@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d16cz-0002Ia-PD
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:35:46 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d16oi-00041d-Dw
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:47:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d16cw-0003NU-I9
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:35:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46010)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d16cw-0003NB-Bf
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:35:42 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <149263859862.10521.4608468144116665031@6c512846dbc7>
-	(no-reply@patchew.org's message of "Wed, 19 Apr 2017 14:49:59 -0700
-	(PDT)")
-References: <149263859862.10521.4608468144116665031@6c512846dbc7>
-Reply-To: quintela@redhat.com
-Date: Thu, 20 Apr 2017 09:35:32 +0200
-Message-ID: <87pog7fs57.fsf@secure.mitica>
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d16od-0001Et-SK
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:47:52 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:3442
+	helo=dggrg02-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d16od-00013x-5s
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:47:47 -0400
+From: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Date: Thu, 20 Apr 2017 15:46:54 +0800
+Message-ID: <1492674416-9408-3-git-send-email-zhang.zhanghailiang@huawei.com>
+In-Reply-To: <1492674416-9408-1-git-send-email-zhang.zhanghailiang@huawei.com>
+References: <1492674416-9408-1-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 00/59] RAMState + qdev
+Subject: [Qemu-devel] [PATCH 2/3] colo-compare: Check main_loop value before
+ call g_main_loop_quit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,21 +27,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: no-reply@patchew.org
-Cc: qemu-devel@nongnu.org, famz@redhat.com, dgilbert@redhat.com
+To: jasowang@redhat.com, zhangchen.fnst@cn.fujitsu.com
+Cc: qemu-devel@nongnu.org, weidong.huang@huawei.com, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-no-reply@patchew.org wrote:
-> Hi,
+If some errors happen before main_loop is initialized in colo
+compare thread, qemu will go into finalizing process where
+we call g_main_loop_quit(s->main_loop), if main_loop is NULL, there
+will be an error report:
+"(process:14861): GLib-CRITICAL **: g_main_loop_quit: assertion 'loop != NULL' failed".
 
-> ERROR: do not initialise globals to 0 or NULL
-> #24: FILE: hw/core/qdev.c:42:
-> +bool qdev_hotplug = false;
->
-> total: 1 errors, 0 warnings, 24 lines checked
+We need to check if main_loop is NULL or not before call g_main_loop_quit().
 
-I am just removing one static here.  This is maintainer preference.
-there are three bools together, but I don't feel like changing this.
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+---
+ net/colo-compare.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-How are we supposed to fix this kind of errors?
-
-Later, Juan.
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index a6bf419..d6a5e4c 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -770,7 +770,9 @@ static void colo_compare_finalize(Object *obj)
+                              s->worker_context, true);
+     qemu_chr_fe_deinit(&s->chr_out);
+ 
+-    g_main_loop_quit(s->compare_loop);
++    if (s->compare_loop) {
++        g_main_loop_quit(s->compare_loop);
++    }
+     qemu_thread_join(&s->thread);
+ 
+     /* Release all unhandled packets after compare thead exited */
+-- 
+1.8.3.1
