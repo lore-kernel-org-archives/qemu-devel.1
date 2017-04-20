@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d1D5H-0007f9-8T
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 10:29:24 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1d1DDq-0001QE-2M
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 10:38:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d1D5G-0002lK-7z
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 10:29:23 -0400
-Date: Thu, 20 Apr 2017 16:29:12 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170420162912.52241bfe@nial.brq.redhat.com>
-In-Reply-To: <20170328041920.GC21068@umbus.fritz.box>
-References: <1490189568-167621-1-git-send-email-imammedo@redhat.com>
-	<1490189568-167621-6-git-send-email-imammedo@redhat.com>
-	<20170328041920.GC21068@umbus.fritz.box>
+	(envelope-from <peter.maydell@linaro.org>) id 1d1DDp-0001Jp-8r
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 10:38:14 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:36227)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1d1DDp-0001JP-2A
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 10:38:13 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id o81so105448102wmb.1
+	for <qemu-devel@nongnu.org>; Thu, 20 Apr 2017 07:38:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.10 05/23] numa: move source of
- default CPUs to NUMA node mapping into boards
+In-Reply-To: <20170418150133.22436-1-famz@redhat.com>
+References: <20170418150133.22436-1-famz@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 20 Apr 2017 15:37:51 +0100
+Message-ID: <CAFEAcA9G=o4wBCMTuxOudL6bUzceLu+f78dxv5HjpWydAP6JBA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 0/2] Block patches for 2.9-rc5
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,72 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, 28 Mar 2017 15:19:20 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+On 18 April 2017 at 16:01, Fam Zheng <famz@redhat.com> wrote:
+> The following changes since commit 9c6b899f7a46893ab3b671e341a2234e9c0c060e:
+>
+>   9pfs: local: set the path of the export root to "." (2017-04-18 14:01:43 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/famz/qemu.git tags/block-pull-request
+>
+> for you to fetch changes up to 91af091f92358c2ff828fa1def1a7bea9b701cdf:
+>
+>   block: Drain BH in bdrv_drained_begin (2017-04-18 22:56:28 +0800)
+>
+> ----------------------------------------------------------------
+>
+> Hi Peter,
+>
+> This fixes the system_reset hanging issue when a block job is running reported
+> by Jeff Cody.
+>
+> ----------------------------------------------------------------
+>
+> Fam Zheng (2):
+>   block: Walk bs->children carefully in bdrv_drain_recurse
+>   block: Drain BH in bdrv_drained_begin
 
-> On Wed, Mar 22, 2017 at 02:32:30PM +0100, Igor Mammedov wrote:
-[...]
-answering to questions that I forgot to answer before
+Applied to master on Tuesday, but I forgot to say so...
 
-> > @@ -1554,6 +1554,16 @@ static void virt_set_gic_version(Object *obj, const char *value, Error **errp)
-> >      }
-> >  }
-> >  
-> > +static CpuInstanceProperties
-> > +virt_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
-> > +{
-> > +    MachineClass *mc = MACHINE_GET_CLASS(ms);
-> > +    const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(ms);
-> > +
-> > +    assert(cpu_index < possible_cpus->len);
-> > +    return possible_cpus->cpus[cpu_index].props;;
-> > +}
-> > +  
-> 
-> It seems a bit weird to have a machine specific hook to pull the
-> property information when one way or another it's coming from the
-> possible_cpus table, which is already constructed by a machine
-> specific hook.  Could we add a range or list of cpu_index values to
-> each possible_cpus entry instead, and have a generic lookup of the
-> right entry based on that?
-Mainly I dislike the idea because it adds duplicate data to manage
-that could be computed from already stored there CpuInstanceProperties.
-
-And secondly if it were just 1 number then generic lookup would be trivial
-but with list it becomes cumbersome to manage and implementation
-larger then 3 *_cpu_index_to_props() hooks combined, it's not worth it
-in foreseeable future.
- 
-> >  static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
-> >  {
-> >      int n;
-> > @@ -1573,8 +1583,12 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
-> >          ms->possible_cpus->cpus[n].props.has_thread_id = true;
-> >          ms->possible_cpus->cpus[n].props.thread_id = n;
-> >  
-> > -        /* TODO: add 'has_node/node' here to describe
-> > -           to which node core belongs */
-> > +        /* default distribution of CPUs over NUMA nodes */
-> > +        if (nb_numa_nodes) {
-> > +            /* preset values but do not enable them i.e. 'has_node_id = false',
-> > +             * board will enable them if manual mapping wasn't present on CLI */  
-> 
-> I'm a little confused by this comment, since I don't see any board
-> code altering has_node_id.
-it happens in the last 2 hunks of patch 10/23
-may be I should write it like this:
-
-+            /* preset values but do not enable them i.e. 'has_node_id = false',
-+             * numa initialization code will enable them later if manual mapping
-+             * wasn't present on CLI */
-
-> 
-> > +            ms->possible_cpus->cpus[n].props.node_id = n % nb_numa_nodes;;
-> > +        }
-> >      }
-> >      return ms->possible_cpus;
-> >  }
-[...]
+thanks
+-- PMM
