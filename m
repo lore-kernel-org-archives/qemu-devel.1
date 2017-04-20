@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d16ue-0007wA-Ey
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:54:01 -0400
+	(envelope-from <famz@redhat.com>) id 1d16ud-0007uz-IV
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:54:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d16uc-0003tj-HF
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:54:00 -0400
+	(envelope-from <famz@redhat.com>) id 1d16ua-0003rT-Uo
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:53:59 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Thu, 20 Apr 2017 15:52:37 +0800
-Message-Id: <20170420075237.18219-21-famz@redhat.com>
+Date: Thu, 20 Apr 2017 15:52:36 +0800
+Message-Id: <20170420075237.18219-20-famz@redhat.com>
 In-Reply-To: <20170420075237.18219-1-famz@redhat.com>
 References: <20170420075237.18219-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v13 20/20] tests: Add test-image-lock
+Subject: [Qemu-devel] [PATCH v13 19/20] file-posix: Add image locking in
+ perm operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,297 +23,867 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
+virtlockd in libvirt locks the first byte, so we start looking at the
+file bytes from 0x10.
+
+The complication is in the transactional interface.  To make the reopen
+logic managable, and allow better reuse, the code is internally
+organized with a table from old mode to the new one.
+
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- tests/Makefile.include  |   2 +
- tests/test-image-lock.c | 259 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 261 insertions(+)
- create mode 100644 tests/test-image-lock.c
+ block/file-posix.c | 744 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 741 insertions(+), 3 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index f3de81f..20e3093 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -58,6 +58,7 @@ check-unit-y += tests/test-hbitmap$(EXESUF)
- gcov-files-test-hbitmap-y = blockjob.c
- check-unit-y += tests/test-blockjob$(EXESUF)
- check-unit-y += tests/test-blockjob-txn$(EXESUF)
-+check-unit-y += tests/test-image-lock$(EXESUF)
- check-unit-y += tests/test-x86-cpuid$(EXESUF)
- # all code tested by test-x86-cpuid is inside topology.h
- gcov-files-test-x86-cpuid-y =
-@@ -545,6 +546,7 @@ tests/test-aio-multithread$(EXESUF): tests/test-aio-multithread.o $(test-block-o
- tests/test-throttle$(EXESUF): tests/test-throttle.o $(test-block-obj-y)
- tests/test-blockjob$(EXESUF): tests/test-blockjob.o $(test-block-obj-y) $(test-util-obj-y)
- tests/test-blockjob-txn$(EXESUF): tests/test-blockjob-txn.o $(test-block-obj-y) $(test-util-obj-y)
-+tests/test-image-lock$(EXESUF): tests/test-image-lock.o $(test-block-obj-y) $(libqos-obj-y)
- tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
- tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
- tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y)
-diff --git a/tests/test-image-lock.c b/tests/test-image-lock.c
-new file mode 100644
-index 0000000..a118e89
---- /dev/null
-+++ b/tests/test-image-lock.c
-@@ -0,0 +1,259 @@
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 24ea3ff..b85ac9c 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -131,8 +131,54 @@ do { \
+ 
+ #define MAX_BLOCKSIZE	4096
+ 
++/* Posix file locking bytes. Libvirt takes byte 0, we start from byte 0x10,
++ * leaving a few more bytes for its future use. */
++#define RAW_LOCK_BYTE_MIN             0x10
++#define RAW_LOCK_BYTE_NO_OTHER_WRITER 0x10
++#define RAW_LOCK_BYTE_WRITE           0x11
++#ifdef F_OFD_SETLK
++#define RAW_LOCK_SUPPORTED 1
++#else
++#define RAW_LOCK_SUPPORTED 0
++#endif
++
 +/*
-+ * Image lock tests
++ ** reader that can tolerate writers: Don't do anything
 + *
-+ * Copyright 2016 Red Hat, Inc.
++ ** reader that can't tolerate writers: Take shared lock on byte 0x10. Test
++ *  byte 0x11 is unlocked.
 + *
-+ * Authors:
-+ *  Fam Zheng <famz@redhat.com>
++ ** shared writer: Take shared lock on byte 0x11. Test byte 0x10 is unlocked.
 + *
-+ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
-+ * See the COPYING.LIB file in the top-level directory.
++ ** exclusive writer: Take exclusive locks on both bytes.
 + */
 +
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qemu/error-report.h"
-+#include "qapi/qmp/qbool.h"
-+#include "qapi/qmp/qstring.h"
-+#include "sysemu/block-backend.h"
++typedef enum {
++    /* Read only and accept other writers. */
++    RAW_L_READ_SHARE_RW,
++    /* Read only and try to forbid other writers. */
++    RAW_L_READ,
++    /* Read/write and accept other writers. */
++    RAW_L_WRITE_SHARE_RW,
++    /* Read/write and try to forbid other writers. */
++    RAW_L_WRITE,
++} BDRVRawLockMode;
 +
-+#define DEBUG_IMAGE_LOCK_TEST 0
-+#define DPRINTF(...) do { \
-+        if (DEBUG_IMAGE_LOCK_TEST) { \
-+            printf(__VA_ARGS__); \
-+        } \
-+    } while (0)
++typedef struct BDRVRawLockUpdateState {
++    /* A dup of @fd used for acquiring lock. */
++    int image_fd;
++    int lock_fd;
++    int open_flags;
++    BDRVRawLockMode new_lock;
++    bool use_lock;
++} BDRVRawLockUpdateState;
 +
-+#define TEST_IMAGE_SIZE 4096
-+static char test_image[] = "/tmp/qtest.XXXXXX";
-+static int test_image_fd;
-+
-+static BlockBackend *open_test_image(const char *format,
-+                                     int flags, bool disable_lock, Error **errp)
+ typedef struct BDRVRawState {
+     int fd;
++    /* A dup of @fd to make manipulating lock easier, especially during reopen,
++     * where this will accept BDRVRawReopenState.lock_fd. */
++    int lock_fd;
++    bool use_lock;
+     int type;
+     int open_flags;
+     size_t buf_align;
+@@ -147,6 +193,11 @@ typedef struct BDRVRawState {
+     bool page_cache_inconsistent:1;
+     bool has_fallocate;
+     bool needs_alignment;
++    /* The current lock mode we are in. Note that in incoming migration this is
++     * the "desired" mode to be applied at bdrv_invalidate_cache. */
++    BDRVRawLockMode cur_lock_mode;
++    /* Used by raw_check_perm/raw_set_perm. */
++    BDRVRawLockUpdateState *lock_update;
+ } BDRVRawState;
+ 
+ typedef struct BDRVRawReopenState {
+@@ -369,6 +420,64 @@ static void raw_parse_flags(int bdrv_flags, int *open_flags)
+     }
+ }
+ 
++static int raw_lock_fd(int fd, BDRVRawLockMode mode, Error **errp)
 +{
-+    QDict *opts = qdict_new();
-+
-+    qdict_set_default_str(opts, "driver", format);
-+    qdict_set_default_str(opts, "file.driver", "file");
-+    qdict_set_default_str(opts, "file.filename", test_image);
-+    qdict_set_default_str(opts, "file.locking", disable_lock ? "off" : "on");
-+
-+    return blk_new_open(NULL, NULL, opts, flags, errp);
++    int ret;
++    assert(fd >= 0);
++    assert(RAW_LOCK_SUPPORTED);
++    switch (mode) {
++    case RAW_L_READ_SHARE_RW:
++        ret = qemu_unlock_fd(fd, RAW_LOCK_BYTE_MIN, 2);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Failed to unlock fd");
++            goto fail;
++        }
++        break;
++    case RAW_L_READ:
++        ret = qemu_lock_fd(fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, false);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Failed to lock share byte");
++            goto fail;
++        }
++        ret = qemu_lock_fd_test(fd, RAW_LOCK_BYTE_WRITE, 1, true);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Write byte lock is taken");
++            goto fail;
++        }
++        break;
++    case RAW_L_WRITE_SHARE_RW:
++        ret = qemu_lock_fd(fd, RAW_LOCK_BYTE_WRITE, 1, true);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Failed to lock write byte exclusively");
++            goto fail;
++        }
++        ret = qemu_lock_fd(fd, RAW_LOCK_BYTE_WRITE, 1, false);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Failed to downgrade lock write byte");
++            goto fail;
++        }
++        ret = qemu_lock_fd_test(fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, true);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Share byte lock is taken");
++            goto fail;
++        }
++        break;
++    case RAW_L_WRITE:
++        ret = qemu_lock_fd(fd, RAW_LOCK_BYTE_MIN, 2, true);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Failed to lock image");
++            goto fail;
++        }
++        break;
++    default:
++        abort();
++    }
++    return 0;
++fail:
++    qemu_unlock_fd(fd, RAW_LOCK_BYTE_MIN, 2);
++    return ret;
 +}
 +
-+#define RW true
-+#define RO false
-+#define SHARE true
-+#define EXCLU false
+ static void raw_parse_filename(const char *filename, QDict *options,
+                                Error **errp)
+ {
+@@ -403,6 +512,23 @@ static QemuOptsList raw_runtime_opts = {
+     },
+ };
+ 
++static BDRVRawLockMode raw_get_lock_mode(bool write, bool shared)
++{
++    if (write) {
++        if (shared) {
++            return RAW_L_WRITE_SHARE_RW;
++        } else {
++            return RAW_L_WRITE;
++        }
++    } else {
++        if (shared) {
++            return RAW_L_READ_SHARE_RW;
++        } else {
++            return RAW_L_READ;
++        }
++    }
++}
 +
-+static struct CompatData {
-+    bool write_1;
-+    bool share_1;
-+    bool write_2;
-+    bool share_2;
-+    bool compatible;
-+} compat_data[] = {
-+    /* Write 1, Share 1, Write 2, Share 2, Compatible. */
-+    { RO,       SHARE,   RO,      SHARE,   true,  },
-+    { RO,       SHARE,   RO,      EXCLU,   true,  },
-+    { RO,       SHARE,   RW,      SHARE,   true,  },
-+    { RO,       SHARE,   RW,      EXCLU,   true,  },
+ static int raw_open_common(BlockDriverState *bs, QDict *options,
+                            int bdrv_flags, int open_flags, Error **errp)
+ {
+@@ -442,10 +568,13 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
+     }
+     s->use_linux_aio = (aio == BLOCKDEV_AIO_OPTIONS_NATIVE);
+ 
++    s->use_lock = qemu_opt_get_bool(opts, "locking", true);
 +
-+    { RO,       EXCLU,   RO,      EXCLU,   true,  },
-+    { RO,       EXCLU,   RW,      SHARE,   false, },
-+    { RO,       EXCLU,   RW,      EXCLU,   false, },
+     s->open_flags = open_flags;
+     raw_parse_flags(bdrv_flags, &s->open_flags);
+ 
+     s->fd = -1;
++    s->lock_fd = -1;
+     fd = qemu_open(filename, s->open_flags, 0644);
+     if (fd < 0) {
+         ret = -errno;
+@@ -544,6 +673,509 @@ static int raw_open(BlockDriverState *bs, QDict *options, int flags,
+     return raw_open_common(bs, options, flags, 0, errp);
+ }
+ 
++typedef enum {
++    RAW_LT_PREPARE,
++    RAW_LT_COMMIT,
++    RAW_LT_ABORT
++} RawLockTransOp;
 +
-+    { RW,       SHARE,   RW,      SHARE,   false, },
-+    { RW,       SHARE,   RW,      EXCLU,   false, },
++typedef int (*RawLockTransFunc)(RawLockTransOp op,
++                                int old_lock_fd, int new_lock_fd,
++                                BDRVRawLockMode old_lock,
++                                BDRVRawLockMode new_lock,
++                                Error **errp);
 +
-+    { RW,       EXCLU,   RW,      EXCLU,   false, },
++static int raw_lt_nop(RawLockTransOp op,
++                      int old_lock_fd, int new_lock_fd,
++                      BDRVRawLockMode old_lock,
++                      BDRVRawLockMode new_lock,
++                      Error **errp)
++{
++    assert(old_lock == new_lock || new_lock == RAW_L_READ_SHARE_RW);
++    return 0;
++}
++
++static int raw_lt_from_unlock(RawLockTransOp op,
++                              int old_lock_fd, int new_lock_fd,
++                              BDRVRawLockMode old_lock,
++                              BDRVRawLockMode new_lock,
++                              Error **errp)
++{
++    assert(old_lock != new_lock);
++    assert(old_lock == RAW_L_READ_SHARE_RW);
++    switch (op) {
++    case RAW_LT_PREPARE:
++        return raw_lock_fd(new_lock_fd, new_lock, errp);
++    case RAW_LT_COMMIT:
++        break;
++    case RAW_LT_ABORT:
++        break;
++    }
++
++    return 0;
++}
++
++static int raw_lt_read_to_write_share(RawLockTransOp op,
++                                      int old_lock_fd, int new_lock_fd,
++                                      BDRVRawLockMode old_lock,
++                                      BDRVRawLockMode new_lock,
++                                      Error **errp)
++{
++    int ret = 0;
++
++    assert(old_lock == RAW_L_READ);
++    assert(new_lock == RAW_L_WRITE_SHARE_RW);
++
++    /*
++     *        lock byte "no other writer"      lock byte "write"
++     * old                S                           0
++     * new                0                           S
++     *
++     * (0 = unlocked; S = shared; X = exclusive.)
++     */
++    switch (op) {
++    case RAW_LT_PREPARE:
++        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_WRITE, 1, true);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Failed to lock new fd (write byte)");
++            break;
++        }
++        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, false);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Failed to lock new fd (share byte)");
++            break;
++        }
++        ret = qemu_unlock_fd(old_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Failed to unlock old fd (share byte)");
++            break;
++        }
++        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, true);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Failed to upgrade new fd (share byte)");
++            break;
++        }
++        ret = qemu_unlock_fd(new_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1);
++        if (ret) {
++            /* This is very unlikely, but catch it anyway. */
++            error_setg_errno(errp, -ret, "Failed to unlock new fd (share byte)");
++            break;
++        }
++        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_WRITE, 1, false);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Failed to downgrade new fd (write byte)");
++            break;
++        }
++        break;
++    case RAW_LT_COMMIT:
++        break;
++    case RAW_LT_ABORT:
++        ret = qemu_lock_fd(old_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, false);
++        if (ret) {
++            /* As unlikely as above unlock failure, but report it anyway. */
++            error_report("Failed to restore lock on old fd (share byte)");
++        }
++        break;
++    }
++    return ret;
++}
++
++static int raw_lt_read_to_write(RawLockTransOp op,
++                                int old_lock_fd, int new_lock_fd,
++                                BDRVRawLockMode old_lock,
++                                BDRVRawLockMode new_lock,
++                                Error **errp)
++{
++    int ret = 0;
++
++    assert(old_lock == RAW_L_READ);
++    assert(new_lock == RAW_L_WRITE);
++    /*
++     *        lock byte "no other writer"      lock byte "write"
++     * old                S                           0
++     * new                X                           X
++     *
++     * (0 = unlocked; S = shared; X = exclusive.)
++     */
++    switch (op) {
++    case RAW_LT_PREPARE:
++        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_WRITE, 1, true);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Failed to lock new fd (write byte)");
++            break;
++        }
++        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, false);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Failed to lock new fd (share byte)");
++            break;
++        }
++        ret = qemu_unlock_fd(old_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Failed to unlock old fd (share byte)");
++            break;
++        }
++        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, true);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Failed to upgrade new fd (share byte)");
++            break;
++        }
++        break;
++    case RAW_LT_COMMIT:
++        break;
++    case RAW_LT_ABORT:
++        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, false);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Failed to downgrade new fd (share byte)");
++            break;
++        }
++        ret = qemu_lock_fd(old_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, false);
++        if (ret) {
++            error_report("Failed to restore lock on old fd (share byte)");
++        }
++        break;
++    }
++    return ret;
++}
++
++static int raw_lt_write_share_to_read(RawLockTransOp op,
++                                      int old_lock_fd, int new_lock_fd,
++                                      BDRVRawLockMode old_lock,
++                                      BDRVRawLockMode new_lock,
++                                      Error **errp)
++{
++    int ret = 0;
++
++    assert(old_lock == RAW_L_WRITE_SHARE_RW);
++    assert(new_lock == RAW_L_READ);
++    /*
++     *        lock byte "no other writer"      lock byte "write"
++     * old                0                           S
++     * new                S                           0
++     *
++     * (0 = unlocked; S = shared; X = exclusive.)
++     */
++    switch (op) {
++    case RAW_LT_PREPARE:
++        /* Make sure there are no other writers. */
++        ret = qemu_lock_fd(old_lock_fd, RAW_LOCK_BYTE_WRITE, 1, true);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Failed to lock old fd (write byte)");
++            break;
++        }
++        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, false);
++        if (!ret) {
++            break;
++        }
++        error_setg_errno(errp, -ret, "Failed to lock new fd (share byte)");
++        /* fall through */
++    case RAW_LT_ABORT:
++        ret = qemu_lock_fd(old_lock_fd, RAW_LOCK_BYTE_WRITE, 1, false);
++        if (ret) {
++            error_report("Failed to downgrade old fd (write byte)");
++        }
++        break;
++    case RAW_LT_COMMIT:
++        break;
++    }
++    return ret;
++}
++
++static int raw_lt_write_share_to_write(RawLockTransOp op,
++                                       int old_lock_fd, int new_lock_fd,
++                                       BDRVRawLockMode old_lock,
++                                       BDRVRawLockMode new_lock,
++                                       Error **errp)
++{
++    int ret = 0;
++
++    assert(old_lock == RAW_L_WRITE_SHARE_RW);
++    assert(new_lock == RAW_L_WRITE);
++    /*
++     *        lock byte "no other writer"      lock byte "write"
++     * old                0                           S
++     * new                X                           X
++     *
++     * (0 = unlocked; S = shared; X = exclusive.)
++     */
++    switch (op) {
++    case RAW_LT_PREPARE:
++        /* Make sure there are no other writers. */
++        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, true);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Failed to lock new fd (share byte)");
++            break;
++        }
++        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_WRITE, 1, false);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Failed to lock new fd (write byte)");
++            break;
++        }
++        ret = qemu_unlock_fd(old_lock_fd, RAW_LOCK_BYTE_WRITE, 1);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Failed to unlock old fd (write byte)");
++            break;
++        }
++        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_WRITE, 1, true);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Failed to upgrade new fd (write byte)");
++            break;
++        }
++        break;
++    case RAW_LT_COMMIT:
++        break;
++    case RAW_LT_ABORT:
++        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_WRITE, 1, false);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Failed to downgrade new fd (write byte)");
++            break;
++        }
++        ret = qemu_lock_fd(old_lock_fd, RAW_LOCK_BYTE_WRITE, 1, false);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Failed to restore old fd (write byte)");
++            break;
++        }
++        break;
++    }
++    return ret;
++}
++
++static int raw_lt_write_to_read(RawLockTransOp op,
++                                int old_lock_fd, int new_lock_fd,
++                                BDRVRawLockMode old_lock,
++                                BDRVRawLockMode new_lock,
++                                Error **errp)
++{
++    int ret = 0;
++
++    assert(old_lock == RAW_L_WRITE);
++    assert(new_lock == RAW_L_READ);
++    /*
++     *        lock byte "no other writer"      lock byte "write"
++     * old                X                           X
++     * new                S                           0
++     *
++     * (0 = unlocked; S = shared; X = exclusive.)
++     */
++    switch (op) {
++    case RAW_LT_PREPARE:
++        break;
++    case RAW_LT_COMMIT:
++        ret = qemu_lock_fd(old_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, false);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Failed to downgrade old fd (share byte)");
++            break;
++        }
++        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, false);
++        if (ret) {
++            error_setg_errno(errp, -ret, "Failed to lock new fd (share byte)");
++            break;
++        }
++        break;
++    case RAW_LT_ABORT:
++        break;
++    }
++    return ret;
++}
++
++static int raw_lt_write_to_write_share(RawLockTransOp op,
++                                       int old_lock_fd, int new_lock_fd,
++                                       BDRVRawLockMode old_lock,
++                                       BDRVRawLockMode new_lock,
++                                       Error **errp)
++{
++    int ret = 0;
++
++    assert(old_lock == RAW_L_WRITE);
++    assert(new_lock == RAW_L_WRITE_SHARE_RW);
++    /*
++     *        lock byte "no other writer"      lock byte "write"
++     * old                X                           X
++     * new                0                           S
++     *
++     * (0 = unlocked; S = shared; X = exclusive.)
++     */
++    switch (op) {
++    case RAW_LT_PREPARE:
++        break;
++    case RAW_LT_COMMIT:
++        ret = qemu_lock_fd(old_lock_fd, RAW_LOCK_BYTE_WRITE, 1, false);
++        if (ret) {
++            error_report("Failed to downgrade old fd (share byte)");
++            break;
++        }
++        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_WRITE, 1, false);
++        if (ret) {
++            error_report("Failed to lock new fd (write byte)");
++        }
++        break;
++    case RAW_LT_ABORT:
++        break;
++    }
++    return ret;
++}
++
++/**
++ * Transactionally moving between possible locking states is tricky and must be
++ * done carefully. That is mostly because downgrading an exclusive lock to
++ * shared or unlocked is not guaranteed to be revertible. As a result, in such
++ * cases we have to defer the downgrading to "commit", given that no revert will
++ * happen after that point, and that downgrading a lock should never fail.
++ *
++ * On the other hand, upgrading a lock (e.g. from unlocked or shared to
++ * exclusive lock) must happen in "prepare" because it may fail.
++ *
++ * Manage the operation matrix with this state transition table to make
++ * fulfilling above conditions easier.
++ */
++static const struct RawLockTransOp {
++    BDRVRawLockMode old_lock;
++    BDRVRawLockMode new_lock;
++    RawLockTransFunc func;
++    bool need_lock_fd;
++    bool close_old_lock_fd;
++} raw_lock_trans_ops[] = {
++
++    {RAW_L_READ_SHARE_RW,  RAW_L_READ_SHARE_RW,  raw_lt_nop,                  false, false},
++    {RAW_L_READ_SHARE_RW,  RAW_L_READ,           raw_lt_from_unlock,          true},
++    {RAW_L_READ_SHARE_RW,  RAW_L_WRITE_SHARE_RW, raw_lt_from_unlock,          true},
++    {RAW_L_READ_SHARE_RW,  RAW_L_WRITE,          raw_lt_from_unlock,          true},
++
++    {RAW_L_READ,           RAW_L_READ_SHARE_RW,  raw_lt_nop,                  false, true},
++    {RAW_L_READ,           RAW_L_READ,           raw_lt_nop,                  false, false},
++    {RAW_L_READ,           RAW_L_WRITE_SHARE_RW, raw_lt_read_to_write_share,  true},
++    {RAW_L_READ,           RAW_L_WRITE,          raw_lt_read_to_write,        true},
++
++    {RAW_L_WRITE_SHARE_RW, RAW_L_READ_SHARE_RW,  raw_lt_nop,                  false, true},
++    {RAW_L_WRITE_SHARE_RW, RAW_L_READ,           raw_lt_write_share_to_read,  true},
++    {RAW_L_WRITE_SHARE_RW, RAW_L_WRITE_SHARE_RW, raw_lt_nop,                  false, false},
++    {RAW_L_WRITE_SHARE_RW, RAW_L_WRITE,          raw_lt_write_share_to_write, true},
++
++    {RAW_L_WRITE,          RAW_L_READ_SHARE_RW,  raw_lt_nop,                  false, true},
++    {RAW_L_WRITE,          RAW_L_READ,           raw_lt_write_to_read,        true},
++    {RAW_L_WRITE,          RAW_L_WRITE_SHARE_RW, raw_lt_write_to_write_share, true},
++    {RAW_L_WRITE,          RAW_L_WRITE,          raw_lt_nop,                  false, false},
 +};
 +
-+static void dprint_flags(int flags)
++static int raw_handle_lock_update(BlockDriverState *bs,
++                                  RawLockTransOp op,
++                                  Error **errp)
 +{
-+    DPRINTF(" %8x", flags);
-+    if (flags & BDRV_O_RDWR) {
-+        DPRINTF(" RW");
-+    } else {
-+        DPRINTF(" RO");
-+    }
-+    if (flags & BDRV_O_UNSAFE_READ) {
-+        DPRINTF(" SHARE");
-+    } else {
-+        DPRINTF(" EXCLU");
-+    }
-+    DPRINTF("\n");
-+}
-+
-+/* Test one combination scenario.
-+ *
-+ * @flags1: The flags of the first blk.
-+ * @flags2: The flags of the second blk.
-+ * @disable1: The value for raw-posix disable-lock option of the first blk.
-+ * @disable2: The value for raw-posix disable-lock option of the second blk.
-+ * @from_reopen: Whether or not the first blk should get flags1 from a reopen.
-+ * @initial: The source flags from which the blk1 is reopened, only
-+ *                effective if @from_reopen is true.
-+ */
-+static void do_test_compat_one(const char *format,
-+                               int flags1, int flags2,
-+                               bool disable1, bool disable2,
-+                               bool from_reopen, int initial_readonly,
-+                               bool compatible)
-+{
-+    int ret;
-+    BlockBackend *blk1, *blk2;
-+    int initial_flags = flags1;
++    BDRVRawState *s = bs->opaque;
++    BDRVRawLockMode old_lock, new_lock;
++    const struct RawLockTransOp *rec;
++    int ret = 0;
 +    Error *local_err = NULL;
++    BDRVRawLockUpdateState *lu = s->lock_update;
++    int lock_fd;
 +
-+    DPRINTF("\n===\ndo test compat one\n");
-+    DPRINTF("flags1:");
-+    dprint_flags(flags1);
-+    DPRINTF("flags2:");
-+    dprint_flags(flags2);
-+    DPRINTF("disable %d %d\n", disable1, disable2);
-+    DPRINTF("from reopen %d, initial readonly: %d\n", from_reopen, initial_readonly);
-+    DPRINTF("compatible %d\n", compatible);
-+    if (!from_reopen) {
-+        blk1 = open_test_image(format, flags1, disable1, &local_err);
++    if (!RAW_LOCK_SUPPORTED) {
++        return 0;
++    }
++
++    if (bdrv_get_flags(bs) & BDRV_O_INACTIVE) {
++        /* leave the work to bdrv_invalidate_cache. */
++        return 0;
++    }
++
++    if (op == RAW_LT_PREPARE) {
++        lock_fd = qemu_open(bs->filename, lu->open_flags);
++        if (lock_fd == -1) {
++            if (errno == ENOENT) {
++                /* The file is gone, probably BDRV_O_SNAPSHOT? Skip locking. */
++                lu->use_lock = false;
++            } else {
++                /* other errors handled later. */
++            }
++        }
++    }
++
++    old_lock = s->cur_lock_mode;
++    new_lock = lu->use_lock ? lu->new_lock : RAW_L_READ_SHARE_RW;
++    for (rec = &raw_lock_trans_ops[0];
++         rec < &raw_lock_trans_ops[ARRAY_SIZE(raw_lock_trans_ops)];
++         rec++) {
++        if (rec->old_lock == old_lock && rec->new_lock == new_lock) {
++            break;
++        }
++    }
++    assert(rec != &raw_lock_trans_ops[ARRAY_SIZE(raw_lock_trans_ops)]);
++
++    assert(old_lock == RAW_L_READ_SHARE_RW || s->lock_fd >= 0);
++
++    DPRINTF("handle lock %p old lock %d new lock %d op %d func %p\n", bs,
++            old_lock, new_lock, op, rec->func);
++    switch (op) {
++    case RAW_LT_PREPARE:
++        if (rec->need_lock_fd) {
++            if (lock_fd >= 0) {
++                lu->lock_fd = lock_fd;
++            } else {
++                error_setg(errp, "Failed to initialize lock fd");
++            }
++        } else {
++            if (lock_fd >= 0) {
++                qemu_close(lock_fd);
++                lock_fd = -1;
++            }
++        }
++        ret = rec->func(op, s->lock_fd, lu->lock_fd, old_lock, new_lock, errp);
++        if (!ret) {
++            break;
++        }
++        /* Only succeeded preparation will be reverted by block layer, we
++         * need to clean up this failure manually. */
++        op = RAW_LT_ABORT;
++        /* fall through */
++    case RAW_LT_ABORT:
++        rec->func(op, s->lock_fd, lu->lock_fd, old_lock, new_lock, &local_err);
 +        if (local_err) {
-+            abort();
++            error_report_err(local_err);
 +        }
-+    } else {
-+        if (initial_readonly) {
-+            initial_flags &= ~BDRV_O_RDWR;
-+        } else {
-+            initial_flags |= BDRV_O_RDWR;
++        if (lu->lock_fd >= 0) {
++            qemu_close(lu->lock_fd);
++            lu->lock_fd = -1;
 +        }
-+        if ((initial_flags & BDRV_O_RDWR) != (flags1 & BDRV_O_RDWR)) {
-+            flags1 |= BDRV_O_ALLOW_RDWR;
-+            initial_flags |= BDRV_O_ALLOW_RDWR;
++        goto cleanup;
++    case RAW_LT_COMMIT:
++        rec->func(op, s->lock_fd, lu->lock_fd, old_lock, new_lock, &error_abort);
++        if ((rec->need_lock_fd || rec->close_old_lock_fd) && s->lock_fd >= 0) {
++            raw_lock_fd(s->lock_fd, RAW_L_READ_SHARE_RW, NULL);
++            qemu_close(s->lock_fd);
++            s->lock_fd = -1;
 +        }
-+        DPRINTF("initial flags: ");
-+        dprint_flags(initial_flags);
-+        blk1 = open_test_image(format, initial_flags, disable1, &error_abort);
-+        BlockReopenQueue *rq = NULL;
-+
-+        rq = bdrv_reopen_queue(rq, blk_bs(blk1), NULL, flags1);
-+        ret = bdrv_reopen_multiple(blk_get_aio_context(blk1), rq, &error_abort);
-+        g_assert_cmpint(ret, ==, 0);
-+    }
-+    g_assert_nonnull(blk1);
-+    blk2 = open_test_image(format, flags2, disable2, &local_err);
-+    if (compatible) {
-+        g_assert_nonnull(blk2);
-+    } else {
-+        g_assert_null(blk2);
-+    }
-+    blk_unref(blk2);
-+    if (from_reopen && initial_flags != flags1) {
-+        BlockReopenQueue *rq = NULL;
-+
-+        rq = bdrv_reopen_queue(rq, blk_bs(blk1), NULL, initial_flags);
-+        ret = bdrv_reopen_multiple(blk_get_aio_context(blk1), rq, &error_abort);
-+        g_assert_cmpint(ret, ==, 0);
-+    }
-+    blk_unref(blk1);
-+}
-+
-+static void do_test_compat(const char *format,
-+                           bool test_disable, bool from_reopen,
-+                           int initial_readonly)
-+{
-+    int i;
-+    int flags1, flags2;
-+
-+    for (i = 0; i < ARRAY_SIZE(compat_data); i++) {
-+        struct CompatData *data = &compat_data[i];
-+        bool compat = data->compatible;
-+
-+        flags1 = (data->write_1 ? BDRV_O_RDWR : 0) |
-+                 (data->share_1 ? BDRV_O_UNSAFE_READ : 0);
-+        flags2 = (data->write_2 ? BDRV_O_RDWR : 0) |
-+                 (data->share_2 ? BDRV_O_UNSAFE_READ : 0);
-+        if (!test_disable) {
-+            do_test_compat_one(format,
-+                               flags1, flags2, false, false,
-+                               from_reopen, initial_readonly, compat);
-+
-+            do_test_compat_one(format,
-+                               flags2, flags1, false, false,
-+                               from_reopen, initial_readonly, compat);
-+        } else {
-+            compat = true;
-+            do_test_compat_one(format,
-+                               flags1, flags2, true, false,
-+                               from_reopen, initial_readonly, compat);
-+            do_test_compat_one(format,
-+                               flags1, flags2, false, true,
-+                               from_reopen, initial_readonly, compat);
-+            do_test_compat_one(format,
-+                               flags2, flags1, true, false,
-+                               from_reopen, initial_readonly, compat);
-+            do_test_compat_one(format,
-+                               flags2, flags1, false, true,
-+                               from_reopen, initial_readonly, compat);
-+            do_test_compat_one(format,
-+                               flags1, flags2, true, true,
-+                               from_reopen, initial_readonly, compat);
++        if (rec->need_lock_fd) {
++            s->lock_fd = lu->lock_fd;
 +        }
++        assert(s->lock_fd >= 0 || new_lock == RAW_L_READ_SHARE_RW);
++        s->cur_lock_mode = new_lock;
++        s->use_lock = lu->use_lock;
++        goto cleanup;
 +    }
++    return ret;
++cleanup:
++    g_free(s->lock_update);
++    s->lock_update = NULL;
++    return ret;
 +}
 +
-+static void test_compat(void)
++static void raw_init_lock_update(BlockDriverState *bs,
++                                 int image_fd,
++                                 bool write, bool shared,
++                                 bool use_lock)
 +{
-+    bdrv_img_create(test_image, "qcow2", NULL, NULL, NULL, TEST_IMAGE_SIZE,
-+                    BDRV_O_RDWR, &error_fatal, true);
-+    do_test_compat("qcow2", false, false, false);
++    BDRVRawState *s = bs->opaque;
++
++    assert(!s->lock_update);
++    s->lock_update = g_new0(BDRVRawLockUpdateState, 1);
++    *s->lock_update = (BDRVRawLockUpdateState) {
++        .image_fd = image_fd,
++        .new_lock = raw_get_lock_mode(write, shared),
++        .use_lock = use_lock,
++        .open_flags = (s->open_flags & ~(O_RDWR | O_RDONLY)) |
++                       (write ? O_RDWR : O_RDONLY),
++    };
 +}
 +
-+static void test_compat_after_reopen(void)
-+{
-+    bdrv_img_create(test_image, "qcow2", NULL, NULL, NULL, TEST_IMAGE_SIZE,
-+                    BDRV_O_RDWR, &error_fatal, true);
-+    do_test_compat("qcow2", false, true, false);
-+    do_test_compat("qcow2", false, true, true);
-+}
+ static int raw_reopen_prepare(BDRVReopenState *state,
+                               BlockReopenQueue *queue, Error **errp)
+ {
+@@ -551,6 +1183,7 @@ static int raw_reopen_prepare(BDRVReopenState *state,
+     BDRVRawReopenState *rs;
+     int ret = 0;
+     Error *local_err = NULL;
++    bool shared;
+ 
+     assert(state != NULL);
+     assert(state->bs != NULL);
+@@ -615,13 +1248,27 @@ static int raw_reopen_prepare(BDRVReopenState *state,
+     if (rs->fd != -1) {
+         raw_probe_alignment(state->bs, rs->fd, &local_err);
+         if (local_err) {
+-            qemu_close(rs->fd);
+-            rs->fd = -1;
+             error_propagate(errp, local_err);
+             ret = -EINVAL;
++            goto fail;
+         }
+     }
++    shared = s->cur_lock_mode == RAW_L_READ_SHARE_RW ||
++        s->cur_lock_mode == RAW_L_WRITE_SHARE_RW;
++    /* Shared perm doesn't change during reopen. */
++    raw_init_lock_update(state->bs, rs->fd, state->flags & BDRV_O_RDWR, shared,
++                         s->use_lock);
+ 
++    qdict_del(state->options, "locking");
++    ret = raw_handle_lock_update(state->bs, RAW_LT_PREPARE, errp);
++    if (ret) {
++        goto fail;
++    }
 +
-+static void test_disable(void)
-+{
-+    bdrv_img_create(test_image, "qcow2", NULL, NULL, NULL, TEST_IMAGE_SIZE,
-+                    BDRV_O_RDWR, &error_fatal, true);
-+    do_test_compat("qcow2", true, false, 0);
-+    do_test_compat("qcow2", true, true, false);
-+    do_test_compat("qcow2", true, true, true);
-+}
-+
-+static void test_0bytefile(void)
-+{
-+    int ret;
-+
-+    ret = ftruncate(test_image_fd, 0);
-+    g_assert_cmpint(ret, ==, 0);
-+    do_test_compat("raw", false, false, 0);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+#ifndef F_OFD_SETLK
 +    return 0;
-+#endif
-+    int r;
-+    test_image_fd = mkstemp(test_image);
-+    g_assert(test_image_fd >= 0);
++fail:
++    qemu_close(rs->fd);
++    rs->fd = -1;
+     return ret;
+ }
+ 
+@@ -632,6 +1279,8 @@ static void raw_reopen_commit(BDRVReopenState *state)
+ 
+     s->open_flags = rs->open_flags;
+ 
++    raw_handle_lock_update(state->bs, RAW_LT_COMMIT, &error_abort);
 +
-+    qemu_init_main_loop(&error_fatal);
-+    bdrv_init();
+     qemu_close(s->fd);
+     s->fd = rs->fd;
+ 
+@@ -649,6 +1298,8 @@ static void raw_reopen_abort(BDRVReopenState *state)
+         return;
+     }
+ 
++    raw_handle_lock_update(state->bs, RAW_LT_ABORT, &error_abort);
 +
-+    g_test_init(&argc, &argv, NULL);
-+    g_test_add_func("/image-lock/compat", test_compat);
-+    g_test_add_func("/image-lock/compat_after_reopen", test_compat_after_reopen);
-+    g_test_add_func("/image-lock/disable", test_disable);
-+    g_test_add_func("/image-lock/compat_0bytefile", test_0bytefile);
-+    aio_context_acquire(qemu_get_aio_context());
-+    r = g_test_run();
-+    aio_context_release(qemu_get_aio_context());
-+    close(test_image_fd);
-+    unlink(test_image);
+     if (rs->fd >= 0) {
+         qemu_close(rs->fd);
+         rs->fd = -1;
+@@ -1412,6 +2063,10 @@ static void raw_close(BlockDriverState *bs)
+         qemu_close(s->fd);
+         s->fd = -1;
+     }
++    if (s->lock_fd >= 0) {
++        qemu_close(s->lock_fd);
++        s->lock_fd = -1;
++    }
+ }
+ 
+ static int raw_truncate(BlockDriverState *bs, int64_t offset)
+@@ -1949,6 +2604,85 @@ static QemuOptsList raw_create_opts = {
+     }
+ };
+ 
++static int raw_check_perm(BlockDriverState *bs, uint64_t perm, uint64_t shared,
++                          Error **errp)
++{
++    bool is_shared;
++    BDRVRawState *s = bs->opaque;
++
++    if (!RAW_LOCK_SUPPORTED) {
++        return 0;
++    }
++    if (s->lock_update) {
++        /* Override the previously stashed update. */
++        g_free(s->lock_update);
++        s->lock_update = NULL;
++    }
++    is_shared = !(perm & BLK_PERM_CONSISTENT_READ) && (shared & BLK_PERM_WRITE);
++    DPRINTF("raw check perm %p rw %d shared %d\n",
++            bs, perm & BLK_PERM_WRITE ? 1 : 0,
++            is_shared);
++    raw_init_lock_update(bs, s->fd,
++                         perm & BLK_PERM_WRITE, is_shared, s->use_lock);
++
++    return raw_handle_lock_update(bs, RAW_LT_PREPARE, errp);
++}
++
++static void raw_set_perm(BlockDriverState *bs, uint64_t perm, uint64_t shared)
++{
++    BDRVRawState *s = bs->opaque;
++
++    if (!RAW_LOCK_SUPPORTED) {
++        return;
++    }
++    assert(s->lock_update);
++
++    raw_handle_lock_update(bs, RAW_LT_COMMIT, NULL);
++}
++
++static void raw_abort_perm_update(BlockDriverState *bs)
++{
++    BDRVRawState *s = bs->opaque;
++
++    if (!RAW_LOCK_SUPPORTED) {
++        return;
++    }
++    if (!s->lock_update) {
++        return;
++    }
++    raw_handle_lock_update(bs, RAW_LT_ABORT, NULL);
++}
++
++static int raw_inactivate(BlockDriverState *bs)
++{
++    BDRVRawState *s = bs->opaque;
++    int r = 0;
++
++    if (RAW_LOCK_SUPPORTED && s->cur_lock_mode != RAW_L_READ_SHARE_RW) {
++        r = raw_lock_fd(s->lock_fd, RAW_L_READ_SHARE_RW, NULL);
++    }
 +    return r;
 +}
++
++static void raw_invalidate_cache(BlockDriverState *bs, Error **errp)
++{
++    int r;
++    BDRVRawState *s = bs->opaque;
++
++    if (!RAW_LOCK_SUPPORTED) {
++        return;
++    }
++    if (s->lock_update) {
++        /* Apply the pending lock update from perm or reopen. */
++        r = raw_handle_lock_update(bs, RAW_LT_PREPARE, errp);
++        if (r) {
++            return;
++        }
++        raw_handle_lock_update(bs, RAW_LT_COMMIT, errp);
++        assert(!s->lock_update);
++    }
++}
++
+ BlockDriver bdrv_file = {
+     .format_name = "file",
+     .protocol_name = "file",
+@@ -1979,7 +2713,11 @@ BlockDriver bdrv_file = {
+     .bdrv_get_info = raw_get_info,
+     .bdrv_get_allocated_file_size
+                         = raw_get_allocated_file_size,
+-
++    .bdrv_inactivate = raw_inactivate,
++    .bdrv_invalidate_cache = raw_invalidate_cache,
++    .bdrv_check_perm = raw_check_perm,
++    .bdrv_set_perm   = raw_set_perm,
++    .bdrv_abort_perm_update = raw_abort_perm_update,
+     .create_opts = &raw_create_opts,
+ };
+ 
 -- 
 2.9.3
