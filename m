@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1d15uY-0001J4-Mp
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:49:51 -0400
+	(envelope-from <tianyu.lan@intel.com>) id 1d15w1-0001u4-EF
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:51:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1d15uT-0002uU-Pu
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:49:50 -0400
-Received: from mga05.intel.com ([192.55.52.43]:59239)
+	(envelope-from <tianyu.lan@intel.com>) id 1d15vw-0003Tn-H9
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:51:21 -0400
+Received: from mga03.intel.com ([134.134.136.65]:35512)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1d15uT-0002te-Gh
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:49:45 -0400
-Message-ID: <58F85A70.8080006@intel.com>
-Date: Thu, 20 Apr 2017 14:51:28 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <tianyu.lan@intel.com>)
+	id 1d15vw-0003Sy-92
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:51:16 -0400
+References: <1492428730-13438-1-git-send-email-peterx@redhat.com>
+	<1492428730-13438-8-git-send-email-peterx@redhat.com>
+	<A2975661238FB949B60364EF0F2C257439054049@shsmsx102.ccr.corp.intel.com>
+	<20170418045400.GC22226@pxdev.xzpeter.org>
+	<A2975661238FB949B60364EF0F2C2574390540D1@shsmsx102.ccr.corp.intel.com>
+	<20170418072717.GD22226@pxdev.xzpeter.org>
+	<A2975661238FB949B60364EF0F2C257439054360@shsmsx102.ccr.corp.intel.com>
+	<672ae592-e6ba-9152-b775-ec2bde931ef1@intel.com>
+	<20170420030427.GA26087@pxdev.xzpeter.org>
+	<A2975661238FB949B60364EF0F2C2574390555FB@shsmsx102.ccr.corp.intel.com>
+	<20170420054018.GD26087@pxdev.xzpeter.org>
+From: "Lan, Tianyu" <tianyu.lan@intel.com>
+Message-ID: <1001fe60-570f-9882-a0b7-b74b7ea59a95@intel.com>
+Date: Thu, 20 Apr 2017 14:51:11 +0800
 MIME-Version: 1.0
-References: <286AC319A985734F985F78AFA26841F7391EF490@shsmsx102.ccr.corp.intel.com>
-	<9ce5d497-c52a-23fc-a43d-ac7c895faedb@siemens.com>
-	<58F722EE.7030300@intel.com>
-	<d96b8097-b541-9908-8141-86267e726471@siemens.com>
-	<58F72942.3030802@intel.com>
-	<fcf62a96-b3fd-cffc-c784-7af46144cbb2@siemens.com>
-	<58F735CF.7040404@intel.com>
-	<13ccf73a-1553-ce8c-df4a-89c26cdc27b6@siemens.com>
-	<58F745C9.9090106@intel.com>
-	<abdb3dab-d96d-927a-3a63-92ade03afc5a@siemens.com>
-	<286AC319A985734F985F78AFA26841F7391EFB38@shsmsx102.ccr.corp.intel.com>
-	<b752f6cb-b75e-dbae-73cf-ef3fee5516d5@siemens.com>
-In-Reply-To: <b752f6cb-b75e-dbae-73cf-ef3fee5516d5@siemens.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <20170420054018.GD26087@pxdev.xzpeter.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: Vhost-pci RFC2.0
+Subject: Re: [Qemu-devel] [PATCH v2 7/7] intel_iommu: support passthrough
+ (PT)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,70 +38,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jan Kiszka <jan.kiszka@siemens.com>, =?windows-1252?Q?Marc-Andr=E9_?= =?windows-1252?Q?Lureau?= <marcandre.lureau@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>
-Cc: Jailhouse <jailhouse-dev@googlegroups.com>
+To: Peter Xu <peterx@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, "Tian, Kevin" <kevin.tian@intel.com>
 
-On 04/19/2017 10:52 PM, Jan Kiszka wrote:
-> On 2017-04-19 16:33, Wang, Wei W wrote:
->> On 04/19/2017 07:21 PM, Jan Kiszka wrote:
->>> On 2017-04-19 13:11, Wei Wang wrote:
->>>> On 04/19/2017 06:36 PM, Jan Kiszka wrote:
->>>>> On 2017-04-19 12:02, Wei Wang wrote:
->>>>>>>>>> The design presented here intends to use only one BAR to expose
->>>>>>>>>> both TX and RX. The two VMs share an intermediate memory here,
->>>>>>>>>> why couldn't we give the same permission to TX and RX?
->>>>>>>>>>
->>>>>>>>> For security and/or safety reasons: the TX side can then safely
->>>>>>>>> prepare and sign a message in-place because the RX side cannot
->>>>>>>>> mess around with it while not yet being signed (or check-summed).
->>>>>>>>> Saves one copy from a secure place into the shared memory.
->>>>>>>> If we allow guest1 to write to RX, what safety issue would it
->>>>>>>> cause to guest2?
->>>>>>> This way, guest1 could trick guest2, in a race condition, to sign a
->>>>>>> modified message instead of the original one.
->>>>>>>
->>>>>> Just align the context that we are talking about: RX is the
->>>>>> intermediate shared ring that guest1 uses to receive packets and
->>>>>> guest2 uses to send packet.
->>>>>>
->>>>>> Seems the issue is that guest1 will receive a hacked message from RX
->>>>>> (modified by itself). How would it affect guest2?
->>>>> Retry: guest2 wants to send a signed/hashed message to guest1. For
->>>>> that purpose, it starts to build that message inside the shared
->>>>> memory that
->>>>> guest1 can at least read, then guest2 signs that message, also in-place.
->>>>> If guest1 can modify the message inside the ring while guest2 has not
->>>>> yet signed it, the result is invalid.
->>>>>
->>>>> Now, if guest2 is the final receiver of the message, nothing is lost,
->>>>> guest2 just shot itself into the foot. However, if guest2 is just a
->>>>> router (gray channel) and the message travels further, guest2 now has
->>>>> corrupted that channel without allowing the final receive to detect
->>>>> that. That's the scenario.
->>>> If guest2 has been a malicious guest, I think it wouldn't make a
->>>> difference whether we protect the shared RX or not. As a router,
->>>> guest2 can play tricks on the messages after read it and then send the
->>>> modified message to a third man, right?
->>> It can swallow it, "steal" it (redirect), but it can't manipulate the signed content
->>> without being caught, that's the idea. It's particularly relevant for safety-critical
->>> traffic from one safe application to another over unreliable channels, but it may
->>> also be relevant for the integrity of messages in a secure setup.
->>>
->> OK, I see most of your story, thanks. To get to the bottom of it, is it possible to
->> Sign the packet before put it onto the unreliable channel (e.g. the shared RX),
->> Instead of signing in-place? If that's doable, we can have a simpler shared channel.
-> Of course, you can always add another copy... But as it was trivial to
-> add unidirectional shared memory support to ivshmem [1], I see no reason
-> this shouldn't be possible for vhost-pci as well.
+On 4/20/2017 1:40 PM, Peter Xu wrote:
+> On Thu, Apr 20, 2017 at 04:55:24AM +0000, Liu, Yi L wrote:
 >
+> [...]
+>
+>>>> In my previous RFC patchset of fault event reporting, I registered
+>>>> fault notifier when there is a VFIO group attached to VFIO container
+>>>> and used the address space to check whether vIOMMU is added. The
+>>>> address space is returned by vtd_host_dma_iommu(). vtd_find_add_as()
+>>>> initializes device's IOMMU memory region and put it into device's
+>>>> address space as root memory region.
+>>>> Does this make sense?
+>>>>
+>>>> @@ -1103,6 +1132,14 @@ static int vfio_connect_container(VFIOGroup
+>>>> *group, AddressSpace *as,
+>>>>          goto listener_release_exit;
+>>>>      }
+>>>>
+>>>> +    if (memory_region_is_iommu(container->space->as->root)) {
+>>>
+>>> I would suggest we don't play with as->root any more. After vtd vfio series, this may
+>>> not be true if passthrough mode is enabled (then the root may be switched to an
+>>> system memory alias). I don't know the best way to check this, one alternative might
+>>> be that we check whether
+>>> container->space->as == system_memory(), it should be workable, but in
+>
+> Sorry, I was meaning &address_space_memory.
+>
+>>> a slightly hackish way.
+>>
+>> In my understanding, container->space->as->root cannot work here no matter passthru-mode
+>> is enabled or not. The code here is aiming to check if vIOMMU exists. After the vfio series,
+>> the vtd_dev_as->root is not initialized to be a iommu MemoryRegion. Compared with checking
+>> if it is system_memory(), I think adding a mechanism to get the iommu MemoryRegion may
+>> be a better choice. Just like the current pci_device_iommu_address_space().
+>
+> Isn't pci_device_iommu_address_space() used to get that IOMMU memory
+> region? And, one thing to mention is that container->space->as is
+> actually derived from pci_device_iommu_address_space() (when calling
+> vfio_get_group()).
+>
+> I feel like that playing around with an IOMMU memory region is still
+> not clear enough in many cases. I still feel like some day we would
+> like an "IOMMU object". Then, we can register non-iotlb notifiers
+> against that IOMMU object, rather than memory regions...
 
-IIUC, this requires the ring and it's head/tail to be put into different 
-regions, it would
-be hard to fit the existing virtqueue into the shared the channel, since 
-the vring and
-its pointers (e.g. idx) and flags are on the same page.
-So, probably will need to use another ring type.
-
-
-Best,
-Wei
+Our target is to check whether assigned device is under a vIOMMU.
+We may check whether iommu_fn point has been populated in its pci bus' 
+data structure(PCIDevice). This is what pci_device_iommu_address_space()
+does.
