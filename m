@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48458)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d19jJ-0001lW-Sl
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 06:54:30 -0400
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1d19mD-0002Uq-JL
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 06:57:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d19jG-00080G-Qr
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 06:54:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55392)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1d19jG-0007yx-HB
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 06:54:26 -0400
-Date: Thu, 20 Apr 2017 12:54:19 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170420125419.0c0bf21f@nial.brq.redhat.com>
-In-Reply-To: <20170411085700.3cgrvorievwcpc6r@hz-desktop>
-References: <20170331084147.32716-1-haozhong.zhang@intel.com>
-	<20170331084147.32716-2-haozhong.zhang@intel.com>
-	<20170406102416.GA21895@stefanha-x1.localdomain>
-	<20170406104649.jh263v7zijdxsywl@hz-desktop>
-	<20170407134641.GH16146@stefanha-x1.localdomain>
-	<20170411085700.3cgrvorievwcpc6r@hz-desktop>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 1/4] pc-dimm: add 'reserved-size' to
- reserve address range after the ending address
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1d19mA-0001Zs-Eg
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 06:57:29 -0400
+Received: from out1.zte.com.cn ([202.103.147.172]:50712)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1d19m9-0001YO-Jt
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 06:57:26 -0400
+From: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+Date: Thu, 20 Apr 2017 18:57:31 +0800
+Message-Id: <1492685851-27921-1-git-send-email-lu.zhipeng@zte.com.cn>
+Subject: [Qemu-devel] [PATCH] qga: Add support network interface statistics
+ in guest-network-get-interfaces command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,90 +22,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Haozhong Zhang <haozhong.zhang@intel.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, dan.j.williams@intel.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: mdroth@linux.vnet.ibm.com
+Cc: berrange@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org, ZhiPeng Lu <lu.zhipeng@zte.com.cn>
 
-On Tue, 11 Apr 2017 16:57:00 +0800
-Haozhong Zhang <haozhong.zhang@intel.com> wrote:
+we can get the  network interface statistics inside  a virtual machine by
+guest-network-get-interfaces command.
+it is very userful for us to monitor and analyze network traff.
 
-> On 04/07/17 14:46 +0100, Stefan Hajnoczi wrote:
-> > On Thu, Apr 06, 2017 at 06:46:49PM +0800, Haozhong Zhang wrote:  
-> > > On 04/06/17 11:24 +0100, Stefan Hajnoczi wrote:  
-> > > > On Fri, Mar 31, 2017 at 04:41:44PM +0800, Haozhong Zhang wrote:  
-> > > > > If option 'reserved-size=RSVD' is present, QEMU will reserve an
-> > > > > address range of size 'RSVD' after the ending address of pc-dimm
-> > > > > device.
-> > > > > 
-> > > > > For the following example,
-> > > > >     -object memory-backend-file,id=mem0,size=4G,...
-> > > > >     -device nvdimm,id=dimm0,memdev=mem0,reserved-size=4K,...  
-> > > > 
-> > > > "reserved-size" is not a clear name.  I suggest calling the property
-> > > > "num-flush-hints" (default 0).  QEMU can calculate the actual size in
-> > > > bytes.
-> > > > 
-> > > >   -device nvdimm,num-flush-hints=1
-I'm for this approach as well
+Signed-off-by: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+Signed-off-by: DanielP.Berrange <berrange@redhat.com>
+Reviewed-by: EricBlake  <eblake@redhat.com>
+---
+ qga/commands-posix.c | 73 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ qga/qapi-schema.json | 28 +++++++++++++++++++-
+ 2 files changed, 99 insertions(+), 2 deletions(-)
 
-I see that in patchset you hardcode cache line size to 64 for pc/q35
-machines. What you could do is to introduce machine or cpu callback to
-fetch cache line size and then you can calculate needed MMIO region size
-using it and num-flush-hints in target independent way
-
-> > > > 
-> > > > QEMU will use one flush hint and reserve enough space (e.g. 1 page) for
-> > > > the MMIO region.
-> > > >  
-> > > 
-> > > Each flush hint can be as small as one cache line size which is also
-> > > the size used in this patch series.
-> > > 
-> > > We need to calculate the size of all flush hints in pc_dimm_memory_plug(),
-> > > because when building the flush hint address structure we need to know
-> > > the address of flush hints.
-> > > 
-> > > IIUC, pc_dimm_memory_plug() is not specific to x86, so it's better
-> > > take a general way to get the vcpu cache line size in pc_dimm_memory_plug(),
-> > > which seemingly lacks in QEMU (though I believe it should be doable).
-> > > 
-> > > To make things simple, I leave the size decision to users, and check
-> > > whether it's large enough when building the flush hint address
-> > > structures in patch 4.  
-> > 
-> > Do you see my concern that "reserved-size" is not a good property?
-> > 
-> >  * How does the user choose a sensible value?  
-> 
-> A user has to calculate the size by himself by multiplying the number
-> of flush hint address (currently it's hardcoded to 1) with the cache
-> line size (e.g. 64 bytes on x86) and properly align it, or simply uses
-> 4KB or even a larger value.
-> 
-> In case the reserved-size is too small, QEMU will complain and abort,
-> so the user still has chance to know what goes wrong.
-> 
-> > 
-> >  * Why is it called "reserved-size" instead of "flush-hints-size"?
-> >  
-> 
-> This property is made as a property of pc-dimm rather than nvdimm,
-> which could be used for other purposes, e.g. adjust the alignment the
-> base address of hotplugged pc-dimm (I remember old linux kernels on
-> x86-64 requires hotplugged memory chunk be 128MB aligned).
-it would be rather awkward to use with pc-dimm:
- 1: it would affect not the dimm for which it's specified but the following one
- 2: to set it to correct value that would align base address of the next dimm
-    to need value, the user first would have to know (set manually) a base address
-    of dimm for which reserved-size is provided.
-
-Users would be better off if he/she just provided properly aligned base address
-instead of reserved-size.
-
-> Of course,
-> it can be limited to be a nvdimm-only property, and renamed to
-> 'flush-hints-size' in that case.
-pls move this property to nvdimm
-
-> 
-> Thanks,
-> Haozhong
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 915df9e..0c48707 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -1638,6 +1638,65 @@ guest_find_interface(GuestNetworkInterfaceList *head,
+     return head;
+ }
+ 
++ static int guest_get_network_stats(const char *path,
++                       GuestNetworkInterfaceStat *stats)
++{
++    int path_len;
++    char const *devinfo = "/proc/net/dev";
++    FILE *fp;
++    char *line = NULL, *colon;
++    size_t n;
++    fp = fopen(devinfo, "r");
++    if (!fp) {
++        return -1;
++    }
++    path_len = strlen(path);
++    while (getline(&line, &n, fp) != -1) {
++        long long dummy;
++        long long rx_bytes;
++        long long rx_packets;
++        long long rx_errs;
++        long long rx_drop;
++        long long tx_bytes;
++        long long tx_packets;
++        long long tx_errs;
++        long long tx_drop;
++
++  /* The line looks like:
++   *"   eth0:..."
++   *Split it at the colon.
++   */
++        colon = strchr(line, ':');
++        if (!colon) {
++            continue;
++        }
++        *colon = '\0';
++        if (colon - path_len >= line && strcmp(colon - path_len, path) == 0) {
++            if (sscanf(colon + 1,
++                "%lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld",
++                  &rx_bytes, &rx_packets, &rx_errs, &rx_drop,
++                  &dummy, &dummy, &dummy, &dummy,
++                  &tx_bytes, &tx_packets, &tx_errs, &tx_drop,
++                  &dummy, &dummy, &dummy, &dummy) != 16) {
++                continue;
++            }
++            stats->rx_bytes = rx_bytes;
++            stats->rx_packets = rx_packets;
++            stats->rx_errs = rx_errs;
++            stats->rx_drop = rx_drop;
++            stats->tx_bytes = tx_bytes;
++            stats->tx_packets = tx_packets;
++            stats->tx_errs = tx_errs;
++            stats->tx_drop = tx_drop;
++            fclose(fp);
++            return 0;
++        }
++    }
++    fclose(fp);
++    g_debug("/proc/net/dev: Interface not found");
++    return -1;
++}
++
+ /*
+  * Build information about guest interfaces
+  */
+@@ -1654,6 +1713,7 @@ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
+     for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
+         GuestNetworkInterfaceList *info;
+         GuestIpAddressList **address_list = NULL, *address_item = NULL;
++        GuestNetworkInterfaceStatList  *interface_stat_item = NULL;
+         char addr4[INET_ADDRSTRLEN];
+         char addr6[INET6_ADDRSTRLEN];
+         int sock;
+@@ -1770,9 +1830,20 @@ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
+         } else {
+             (*address_list)->next = address_item;
+         }
+-
+         info->value->has_ip_addresses = true;
+ 
++        if (!info->value->has_interface_statics) {
++            interface_stat_item = g_malloc0(sizeof(*interface_stat_item));
++            interface_stat_item->value = g_malloc0(
++               sizeof(*interface_stat_item->value));
++            if (guest_get_network_stats(info->value->name,
++                interface_stat_item->value) == -1) {
++                error_setg_errno(errp, errno, "guest_get_network_stats failed");
++                goto error;
++            }
++            info->value->interface_statics = interface_stat_item;
++        }
++        info->value->has_interface_statics = true;
+ 
+     }
+ 
+diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+index a02dbf2..44bcced 100644
+--- a/qga/qapi-schema.json
++++ b/qga/qapi-schema.json
+@@ -635,6 +635,31 @@
+            'prefix': 'int'} }
+ 
+ ##
++# @GuestNetworkInterfaceStat:
++#
++# @rx-bytes: received bytes of interface
++# @rx-packets: received packets of interface
++# @rx-errs: received error packets of interface
++# @rx-drop: received drop packets of interface
++#
++# @tx-bytes: send bytes of interface
++# @tx-packets: send packets of interface
++# @tx-errs: send error packets of interface
++# @tx-drop: send drop packets of interface
++# Since: 2.10
++##
++{ 'struct': 'GuestNetworkInterfaceStat',
++  'data': {'rx-bytes': 'uint64',
++            'rx-packets': 'uint64',
++            'rx-errs': 'uint64',
++            'rx-drop': 'uint64',
++            'tx-bytes': 'uint64',
++            'tx-packets': 'uint64',
++            'tx-errs': 'uint64',
++            'tx-drop': 'uint64'
++           } }
++
++##
+ # @GuestNetworkInterface:
+ #
+ # @name: The name of interface for which info are being delivered
+@@ -648,7 +673,8 @@
+ { 'struct': 'GuestNetworkInterface',
+   'data': {'name': 'str',
+            '*hardware-address': 'str',
+-           '*ip-addresses': ['GuestIpAddress'] } }
++           '*ip-addresses': ['GuestIpAddress'],
++           '*interface-statics': ['GuestNetworkInterfaceStat'] } }
+ 
+ ##
+ # @guest-network-get-interfaces:
+-- 
+1.8.3.1
