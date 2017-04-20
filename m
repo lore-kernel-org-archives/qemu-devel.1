@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43718)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1d1F92-0008PM-C8
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:26 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1d1F93-0008QH-BX
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1d1F90-00087i-Tx
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:24 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:36887)
+	(envelope-from <pm215@archaic.org.uk>) id 1d1F90-00087T-NA
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:25 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:36885)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1d1F90-00085i-Ln
+	id 1d1F90-0007wI-Dx
 	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:22 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1d1F8v-0006wm-LT
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 17:41:17 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1d1F8z-0006zi-G3
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 17:41:21 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 20 Apr 2017 17:40:59 +0100
-Message-Id: <1492706470-10921-14-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 20 Apr 2017 17:41:07 +0100
+Message-Id: <1492706470-10921-22-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1492706470-10921-1-git-send-email-peter.maydell@linaro.org>
 References: <1492706470-10921-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 13/24] cadence_gem: Correct the interupt logic
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 21/24] arm: Abstract out "are we singlestepping"
+ test to utility function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,68 +33,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Alistair Francis <alistair.francis@xilinx.com>
+We now test for "are we singlestepping" in several places and
+it's not a trivial check because we need to care about both
+architectural singlestep and QEMU gdbstub singlestep. We're
+also about to add another place that needs to make this check,
+so pull the condition out into a function.
 
-This patch fixes two mistakes in the interrupt logic.
-
-First we only trigger single-queue or multi-queue interrupts if the status
-register is set. This logic was already used for non multi-queue interrupts
-but it also applies to multi-queue interrupts.
-
-Secondly we need to lower the interrupts if the ISR isn't set. As part
-of this we can remove the other interrupt lowering logic and consolidate
-it inside gem_update_int_status().
-
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Message-id: 438bcc014f8f8a2f8f68f322cb6a53f4c04688c2.1491947224.git.alistair.francis@xilinx.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 1491844419-12485-7-git-send-email-peter.maydell@linaro.org
 ---
- hw/net/cadence_gem.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+ target/arm/translate.c | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-index a66a9cc..e1962e1 100644
---- a/hw/net/cadence_gem.c
-+++ b/hw/net/cadence_gem.c
-@@ -509,7 +509,18 @@ static void gem_update_int_status(CadenceGEMState *s)
- {
-     int i;
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 87fd702..f28c4ca 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -309,6 +309,17 @@ static void gen_singlestep_exception(DisasContext *s)
+     }
+ }
  
--    if ((s->num_priority_queues == 1) && s->regs[GEM_ISR]) {
-+    if (!s->regs[GEM_ISR]) {
-+        /* ISR isn't set, clear all the interrupts */
-+        for (i = 0; i < s->num_priority_queues; ++i) {
-+            qemu_set_irq(s->irq[i], 0);
-+        }
-+        return;
-+    }
-+
-+    /* If we get here we know s->regs[GEM_ISR] is set, so we don't need to
-+     * check it again.
++static inline bool is_singlestepping(DisasContext *s)
++{
++    /* Return true if we are singlestepping either because of
++     * architectural singlestep or QEMU gdbstub singlestep. This does
++     * not include the command line '-singlestep' mode which is rather
++     * misnamed as it only means "one instruction per TB" and doesn't
++     * affect the code we generate.
 +     */
-+    if (s->num_priority_queues == 1) {
-         /* No priority queues, just trigger the interrupt */
-         DB_PRINT("asserting int.\n");
-         qemu_set_irq(s->irq[0], 1);
-@@ -1274,7 +1285,6 @@ static uint64_t gem_read(void *opaque, hwaddr offset, unsigned size)
++    return s->singlestep_enabled || s->ss_active;
++}
++
+ static void gen_smul_dual(TCGv_i32 a, TCGv_i32 b)
  {
-     CadenceGEMState *s;
-     uint32_t retval;
--    int i;
-     s = (CadenceGEMState *)opaque;
+     TCGv_i32 tmp1 = tcg_temp_new_i32();
+@@ -4104,7 +4115,7 @@ static inline void gen_goto_tb(DisasContext *s, int n, target_ulong dest)
  
-     offset >>= 2;
-@@ -1285,9 +1295,7 @@ static uint64_t gem_read(void *opaque, hwaddr offset, unsigned size)
-     switch (offset) {
-     case GEM_ISR:
-         DB_PRINT("lowering irqs on ISR read\n");
--        for (i = 0; i < s->num_priority_queues; ++i) {
--            qemu_set_irq(s->irq[i], 0);
--        }
-+        /* The interrupts get updated at the end of the function. */
-         break;
-     case GEM_PHYMNTNC:
-         if (retval & GEM_PHYMNTNC_OP_R) {
+ static inline void gen_jmp (DisasContext *s, uint32_t dest)
+ {
+-    if (unlikely(s->singlestep_enabled || s->ss_active)) {
++    if (unlikely(is_singlestepping(s))) {
+         /* An indirect jump so that we still trigger the debug exception.  */
+         if (s->thumb)
+             dest |= 1;
+@@ -11970,9 +11981,8 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
+             ((dc->pc >= next_page_start - 3) && insn_crosses_page(env, dc));
+ 
+     } while (!dc->is_jmp && !tcg_op_buf_full() &&
+-             !cs->singlestep_enabled &&
++             !is_singlestepping(dc) &&
+              !singlestep &&
+-             !dc->ss_active &&
+              !end_of_page &&
+              num_insns < max_insns);
+ 
+@@ -11989,7 +11999,7 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
+        instruction was a conditional branch or trap, and the PC has
+        already been written.  */
+     gen_set_condexec(dc);
+-    if (unlikely(cs->singlestep_enabled || dc->ss_active)) {
++    if (unlikely(is_singlestepping(dc))) {
+         /* Unconditional and "condition passed" instruction codepath. */
+         switch (dc->is_jmp) {
+         case DISAS_SWI:
+@@ -12067,7 +12077,7 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
+         /* "Condition failed" instruction codepath for the branch/trap insn */
+         gen_set_label(dc->condlabel);
+         gen_set_condexec(dc);
+-        if (unlikely(cs->singlestep_enabled || dc->ss_active)) {
++        if (unlikely(is_singlestepping(dc))) {
+             gen_set_pc_im(dc, dc->pc);
+             gen_singlestep_exception(dc);
+         } else {
 -- 
 2.7.4
