@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1d1F95-0008SN-6H
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:29 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1d1F94-0008R2-1y
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1d1F92-0008A7-R4
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:27 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:36888)
+	(envelope-from <pm215@archaic.org.uk>) id 1d1F91-00088X-Qi
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:25 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:36886)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1d1F92-00087d-DG
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:24 -0400
+	id 1d1F91-00084S-GP
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:41:23 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1d1F8s-0006uY-RM
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 17:41:14 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1d1F8u-0006vf-7z
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 17:41:16 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 20 Apr 2017 17:40:53 +0100
-Message-Id: <1492706470-10921-8-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 20 Apr 2017 17:40:56 +0100
+Message-Id: <1492706470-10921-11-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1492706470-10921-1-git-send-email-peter.maydell@linaro.org>
 References: <1492706470-10921-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 07/24] target/arm: Add assertion about FSC
- format for syndrome registers
+Subject: [Qemu-devel] [PULL 10/24] hw/arm: Qomify pxa2xx.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,79 +29,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-In tlb_fill() we construct a syndrome register value from a
-fault status register value which is filled in by arm_tlb_fill().
-arm_tlb_fill() returns FSR values which might be in the format
-used with short-format page descriptors, or the format used
-with long-format (LPAE) descriptors. The syndrome register
-always uses LPAE-format FSR status codes.
+From: Suramya Shah <shah.suramya@gmail.com>
 
-It isn't actually possible to end up delivering a syndrome
-register value to the guest for a fault which is reported
-with a short-format FSR (that kind of stage 1 fault will only
-happen for an AArch32 translation regime which doesn't have
-a syndrome register, and can never be redirected to an AArch64
-or Hyp exception level). Add an assertion which checks this,
-and adjust the code so that we construct a syndrome with
-an invalid status code, rather than allowing set bits in
-the FSR input to randomly corrupt other fields in the syndrome.
-
+Signed-off-by: Suramya Shah <shah.suramya@gmail.com>
+Message-id: 20170415180316.2694-1-shah.suramya@gmail.com
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Message-id: 1491486152-24304-1-git-send-email-peter.maydell@linaro.org
 ---
- target/arm/op_helper.c | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+ hw/arm/pxa2xx.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index d64c867..156b825 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -130,7 +130,7 @@ void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType access_type,
-     if (unlikely(ret)) {
-         ARMCPU *cpu = ARM_CPU(cs);
-         CPUARMState *env = &cpu->env;
--        uint32_t syn, exc;
-+        uint32_t syn, exc, fsc;
-         unsigned int target_el;
-         bool same_el;
+diff --git a/hw/arm/pxa2xx.c b/hw/arm/pxa2xx.c
+index cfee392..eea551d 100644
+--- a/hw/arm/pxa2xx.c
++++ b/hw/arm/pxa2xx.c
+@@ -755,19 +755,18 @@ static void pxa2xx_ssp_reset(DeviceState *d)
+     s->rx_start = s->rx_level = 0;
+ }
  
-@@ -145,19 +145,32 @@ void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType access_type,
-             env->cp15.hpfar_el2 = extract64(fi.s2addr, 12, 47) << 4;
-         }
-         same_el = arm_current_el(env) == target_el;
--        /* AArch64 syndrome does not have an LPAE bit */
--        syn = fsr & ~(1 << 9);
-+
-+        if (fsr & (1 << 9)) {
-+            /* LPAE format fault status register : bottom 6 bits are
-+             * status code in the same form as needed for syndrome
-+             */
-+            fsc = extract32(fsr, 0, 6);
-+        } else {
-+            /* Short format FSR : this fault will never actually be reported
-+             * to an EL that uses a syndrome register. Check that here,
-+             * and use a (currently) reserved FSR code in case the constructed
-+             * syndrome does leak into the guest somehow.
-+             */
-+            assert(target_el != 2 && !arm_el_is_aa64(env, target_el));
-+            fsc = 0x3f;
-+        }
+-static int pxa2xx_ssp_init(SysBusDevice *sbd)
++static void pxa2xx_ssp_init(Object *obj)
+ {
+-    DeviceState *dev = DEVICE(sbd);
+-    PXA2xxSSPState *s = PXA2XX_SSP(dev);
+-
++    DeviceState *dev = DEVICE(obj);
++    PXA2xxSSPState *s = PXA2XX_SSP(obj);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+     sysbus_init_irq(sbd, &s->irq);
  
-         /* For insn and data aborts we assume there is no instruction syndrome
-          * information; this is always true for exceptions reported to EL1.
-          */
-         if (access_type == MMU_INST_FETCH) {
--            syn = syn_insn_abort(same_el, 0, fi.s1ptw, syn);
-+            syn = syn_insn_abort(same_el, 0, fi.s1ptw, fsc);
-             exc = EXCP_PREFETCH_ABORT;
-         } else {
-             syn = merge_syn_data_abort(env->exception.syndrome, target_el,
-                                        same_el, fi.s1ptw,
--                                       access_type == MMU_DATA_STORE, syn);
-+                                       access_type == MMU_DATA_STORE, fsc);
-             if (access_type == MMU_DATA_STORE
-                 && arm_feature(env, ARM_FEATURE_V6)) {
-                 fsr |= (1 << 11);
+-    memory_region_init_io(&s->iomem, OBJECT(s), &pxa2xx_ssp_ops, s,
++    memory_region_init_io(&s->iomem, obj, &pxa2xx_ssp_ops, s,
+                           "pxa2xx-ssp", 0x1000);
+     sysbus_init_mmio(sbd, &s->iomem);
+ 
+     s->bus = ssi_create_bus(dev, "ssi");
+-    return 0;
+ }
+ 
+ /* Real-Time Clock */
+@@ -2321,10 +2320,8 @@ PXA2xxState *pxa255_init(MemoryRegion *address_space, unsigned int sdram_size)
+ 
+ static void pxa2xx_ssp_class_init(ObjectClass *klass, void *data)
+ {
+-    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(klass);
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+-    sdc->init = pxa2xx_ssp_init;
+     dc->reset = pxa2xx_ssp_reset;
+     dc->vmsd = &vmstate_pxa2xx_ssp;
+ }
+@@ -2333,6 +2330,7 @@ static const TypeInfo pxa2xx_ssp_info = {
+     .name          = TYPE_PXA2XX_SSP,
+     .parent        = TYPE_SYS_BUS_DEVICE,
+     .instance_size = sizeof(PXA2xxSSPState),
++    .instance_init = pxa2xx_ssp_init,
+     .class_init    = pxa2xx_ssp_class_init,
+ };
+ 
 -- 
 2.7.4
