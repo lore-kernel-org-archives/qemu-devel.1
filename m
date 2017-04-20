@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54805)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d16sO-000679-7K
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:51:41 -0400
+	(envelope-from <famz@redhat.com>) id 1d16ta-0006rU-4Y
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:52:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d16sN-0002jR-7s
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:51:40 -0400
-Date: Thu, 20 Apr 2017 15:51:28 +0800
+	(envelope-from <famz@redhat.com>) id 1d16tZ-0003F1-Ax
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 03:52:54 -0400
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170420075128.GD24486@lemon.lan>
-References: <1492661065-18510-1-git-send-email-lidongchen@tencent.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1492661065-18510-1-git-send-email-lidongchen@tencent.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-img: check bs_n when use old style
- option
+Date: Thu, 20 Apr 2017 15:52:18 +0800
+Message-Id: <20170420075237.18219-2-famz@redhat.com>
+In-Reply-To: <20170420075237.18219-1-famz@redhat.com>
+References: <20170420075237.18219-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v13 01/20] block: Introduce BDRV_O_UNSAFE_READ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,66 +19,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jemmy858585@gmail.com
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, Lidong Chen <lidongchen@tencent.com>, qemu-block@nongnu.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-On Thu, 04/20 12:04, jemmy858585@gmail.com wrote:
-> From: Lidong Chen <lidongchen@tencent.com>
-> 
-> When use old style option like -o backing_file, img_convert
-> continue run when bs_n > 1, this patch fix this bug.
-> 
-> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
-> ---
->  qemu-img.c | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/qemu-img.c b/qemu-img.c
-> index b220cf7..c673aef 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -2225,6 +2225,13 @@ static int img_convert(int argc, char **argv)
->          out_baseimg = out_baseimg_param;
->      }
->  
-> +    if (bs_n > 1 && out_baseimg) {
-> +        error_report("-B makes no sense when concatenating multiple input "
-> +                     "images");
-> +        ret = -1;
-> +        goto out;
-> +    }
-> +
->      /* Check if compression is supported */
->      if (compress) {
->          bool encryption =
-> -- 
-> 1.8.3.1
-> 
-> 
+This flag clears out the "consistent read" permission that blk_new_open
+requests.
 
-Is this essentially the same as the check a few lines above:
+Signed-off-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ block/block-backend.c | 2 +-
+ include/block/block.h | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-    ...
-    if (bs_n < 1) {
-        error_exit("Must specify image file name");
-    }
-
-
-    if (bs_n > 1 && out_baseimg) {
-        error_report("-B makes no sense when concatenating multiple input "
-                     "images");
-        ret = -1;
-        goto out;
-    }
-
-    src_flags = 0;
-    ret = bdrv_parse_cache_mode(src_cache, &src_flags, &src_writethrough);
-    if (ret < 0) {
-        error_report("Invalid source cache option: %s", src_cache);
-        goto out;
-    }
-    ...
-
-How about moving that down?
-
-Fam
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 7405024..b4ba182 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -200,7 +200,7 @@ BlockBackend *blk_new_open(const char *filename, const char *reference,
+      * caller of blk_new_open() doesn't make use of the permissions, but they
+      * shouldn't hurt either. We can still share everything here because the
+      * guest devices will add their own blockers if they can't share. */
+-    perm = BLK_PERM_CONSISTENT_READ;
++    perm = flags & BDRV_O_UNSAFE_READ ? 0 : BLK_PERM_CONSISTENT_READ;
+     if (flags & BDRV_O_RDWR) {
+         perm |= BLK_PERM_WRITE;
+     }
+diff --git a/include/block/block.h b/include/block/block.h
+index 5ddc0cf..a4917d7 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -98,6 +98,7 @@ typedef struct HDGeometry {
+                                       select an appropriate protocol driver,
+                                       ignoring the format layer */
+ #define BDRV_O_NO_IO       0x10000 /* don't initialize for I/O */
++#define BDRV_O_UNSAFE_READ 0x20000 /* don't require consistent read */
+ 
+ #define BDRV_O_CACHE_MASK  (BDRV_O_NOCACHE | BDRV_O_NO_FLUSH)
+ 
+-- 
+2.9.3
