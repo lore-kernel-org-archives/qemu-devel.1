@@ -1,22 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d1En3-0003AC-JQ
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:18:43 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d1Etl-0005U4-Bz
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:25:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d1En2-0005LS-Gp
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:18:41 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170419222258.13415-1-eblake@redhat.com>
-	<87k26fffxa.fsf@dusky.pond.sub.org>
-	<1adf2797-b86a-00be-bb98-658ee8d0a55d@redhat.com>
-Date: Thu, 20 Apr 2017 18:18:26 +0200
-In-Reply-To: <1adf2797-b86a-00be-bb98-658ee8d0a55d@redhat.com> (Eric Blake's
-	message of "Thu, 20 Apr 2017 08:31:13 -0500")
-Message-ID: <87lgqv833h.fsf@dusky.pond.sub.org>
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d1Eth-0000rK-5G
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:25:37 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43938
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1d1Etg-0000qq-Vv
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 12:25:33 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3KGNv6G111414
+	for <qemu-devel@nongnu.org>; Thu, 20 Apr 2017 12:25:30 -0400
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 29xvy1v186-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 20 Apr 2017 12:25:30 -0400
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Thu, 20 Apr 2017 12:25:29 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2] event: Add source information to
- SHUTDOWN
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+Date: Thu, 20 Apr 2017 11:25:20 -0500
+Message-Id: <149270552086.2252.8482717579448766252@loki>
+Subject: [Qemu-devel] [ANNOUNCE] QEMU 2.9.0 is now available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,89 +39,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "open list:Overall" <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Rob Herring <robh@kernel.org>, Stefano Stabellini <sstabellini@kernel.org>, Magnus Damm <magnus.damm@gmail.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Anthony Perard <anthony.perard@citrix.com>, "open list:X86" <xen-devel@lists.xenproject.org>, David Gibson <david@gibson.dropbear.id.au>, Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>, Alistair Francis <alistair.francis@xilinx.com>, "open list:Calxeda Highbank" <qemu-arm@nongnu.org>, Jan Kiszka <jan.kiszka@web.de>, Paolo Bonzini <pbonzini@redhat.com>, Scott Wood <scottwood@freescale.com>, Richard Henderson <rth@twiddle.net>, Paul Burton <paul.burton@imgtec.com>, Max Filippov <jcmvbkbc@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, Michael Walle <michael@walle.cc>, "open list:New World" <qemu-ppc@nongnu.org>, Yongbok Kim <yongbok.kim@imgtec.com>, Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, stefanha@redhat.com
 
-Eric Blake <eblake@redhat.com> writes:
+Hello,
 
-> On 04/20/2017 06:59 AM, Markus Armbruster wrote:
->
->> 
->> No objection to Alistair's idea to turn this into an enumeration.
->
-> Question - should the enum be more than just 'guest' and 'host'?  For
-> example, my patch proves that we have a lot of places that handle
-> complimentary machine commands to reset and shutdown, and that whether
-> 'reset' triggers a reset (and the guest keeps running as if rebooted) or
-> a shutdown is then based on the command-line arguments given to qemu.
-> So having the enum differentiate between 'guest-reset' and
-> 'guest-shutdown' would be a possibility, if we want the enum to have
-> additional states.
+On behalf of the QEMU Team, I'd like to announce the availability of
+the QEMU 2.9.0 release. This release contains 2300+ commits from 199
+authors.
 
-I don't know.  What I do know is that we better get the enum right:
-while adding members is backwards-compatible, changing the member sent
-for a specific trigger is not.  If we want to reserve the option to do
-that anyway, we need suitable documentation.
+You can grab the tarball from our download page here:
 
->>> +++ b/vl.c
->>> @@ -1717,7 +1717,7 @@ void qemu_system_guest_panicked(GuestPanicInformation *info)
->>>      if (!no_shutdown) {
->>>          qapi_event_send_guest_panicked(GUEST_PANIC_ACTION_POWEROFF,
->>>                                         !!info, info, &error_abort);
->>> -        qemu_system_shutdown_request();
->>> +        qemu_system_shutdown_request(false);
->> 
->> Panicking is a guest action.  Whether the shutdown on panic should be
->> attributed to guest or host is perhaps debatable.
->
-> And it relates to the idea that a guest request for a 'reset' turns into
-> a qemu response of 'shutdown'.  After all, whether a guest panic results
-> in a shutdown action is determined by command-line arguments to qemu.
-> So if we DO want to differentiate between a guest panic and a normal
-> guest shutdown, when both events are wired at the command line to cause
-> the SHUTDOWN action, then that's another enum to add to my list.
->
->
->>> +++ b/replay/replay.c
->>> @@ -51,7 +51,10 @@ bool replay_next_event_is(int event)
->>>          switch (replay_state.data_kind) {
->>>          case EVENT_SHUTDOWN:
->>>              replay_finish_event();
->>> -            qemu_system_shutdown_request();
->>> +            /* TODO: track source of shutdown request, to replay a
->>> +             * guest-initiated request rather than always claiming to
->>> +             * be from the host? */
->>> +            qemu_system_shutdown_request(false);
->> 
->> This is what your "need a followup patch" refers to.  I'd like to have
->> an opinion from someone familiar with replay on what exactly we need
->> here.
->
-> replay-internal.h has an enum ReplayEvents, which is a list of one-byte
-> codes used in the replay data stream to record which event to replay. I
-> don't know if it is easier to change the replay stream to add a 2-byte
-> code (shutdown-with-cause, followed by an encoding of the cause enum),
-> or a range of one-byte codes (one new code per number of enum members).
-> I also don't know how easy or hard it is to extend the enum (are we free
-> to add events in the middle, or are we worried about back-compat to an
-> older replay stream that must still play correctly with a newer qemu,
-> such that new events must be higher than all existing events).
->
-> So yes, I'm hoping for feedback from someone familiar with replay.
->
->> 
->> Amazing number of ways to shut down or reset a machine.
->
-> And as I said, it would be easier to submit a patch with less churn by
-> having the uncommon case (host-triggered) call a new
-> qemu_system_shutdown_request_reason(enum), while the common case
-> (guest-triggered) be handled by having qemu_system_shutdown_request()
-> with no arguments call
-> qemu_system_shutdown_request_reason(SHUTDOWN_GUEST).  I'm just worried
-> that doing it that way makes it easy for yet another new host shutdown
-> method to use the wrong wrapper.
+  http://www.qemu.org/download/#source
 
-I don't mind the churn.  It does simplify review.
+The full list of changes are available at:
 
->> Looks sane on first glance.
->> 
+  http://wiki.qemu.org/ChangeLog/2.9
+
+Highlights include:
+
+ * I/O-polling support for virtio-blk (and virtio-scsi experimentally), whi=
+ch
+   can improve I/O-heavy workloads by as much as 10-20%
+ * Core support for MTTCG (multi-threaded TCG emulation), now enabled by
+   default for Alpha and ARM on x86 machines
+ * Hardware-acceleration support for x86 guests on Windows via HAXM =
+
+ * Hotplug and HMAC algorithm support for virtio-crypto devices
+ * vhost support for virtio-pci devices behind a guest IOMMU
+ * Many stability fixes for XHCI emulation
+ * Significant security improvements and I/O throttling support for
+   virtfs/virtio-9p
+ * Texinfo documentation for all QMP commands and events
+ * Postcopy migration can now by used for guests using hugetlbfs-backed mem=
+ory
+
+ * ARM: support for MTTCG (see above)
+ * ARM: support for hardware RNG, BCM2835 SD card controller, and GPIO
+   controller when emulating Raspberry Pi board.
+ * MIPS: support for MIPS Boston board on MIPS64EL =
+
+ * Nios2: Initial support for Nios-II R1 boards, emulating 10M50 development
+   kit with Nios2 GHRD loaded in the FPGA
+ * OpenRISC: Lots of fixes and new instructions
+ * PowerPC: support for many new POWER9 instructions via TCG emulation, new
+   "40p" machine type, and pseries support for H_SIGNAL_SYS_RESET hypercall
+ * s390: support for multiple buses for zPCI, virtio-crypto, and booting via
+   network.
+ * SPARC: rewritten support for Niagara
+ * Tricore: support for many additional instructions
+ * x86: support for 5-level paging under TCG emulation, caching mode support
+   for emulation guest IOMMU, and SMI feature negotiation for q35 machines.
+ * Xtensa: support for -icount
+
+ * and lots more...
+
+Thank you to everyone involved!
