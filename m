@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d1CiF-0003wk-8Y
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 10:05:36 -0400
+	(envelope-from <hossein.ajallooiean@epfl.ch>) id 1d1Ckh-0004l7-J7
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 10:08:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d1CiB-0006Iz-8z
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 10:05:35 -0400
-Date: Thu, 20 Apr 2017 22:05:14 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170420140514.GM24486@lemon.lan>
-References: <1488288927-4607-1-git-send-email-pl@kamp.de>
+	(envelope-from <hossein.ajallooiean@epfl.ch>) id 1d1Ckd-0008Aa-Hs
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 10:08:07 -0400
+Received: from smtp0.epfl.ch ([2001:620:618:1e0:1:80b2:e058:1]:36864)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <hossein.ajallooiean@epfl.ch>)
+	id 1d1Ckd-00089I-87
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 10:08:03 -0400
+From: Ajallooiean Hossein <hossein.ajallooiean@epfl.ch>
+Date: Thu, 20 Apr 2017 14:07:54 +0000
+Message-ID: <1492697274243.46100@epfl.ch>
+References: <5a275226-bce0-4c8f-a708-063245cfe8f2@Spark>
+	<583d86e4-dc32-ca67-6157-2b4c1654a758@ilande.co.uk>
+	<1492680594151.52017@epfl.ch>
+	<CAFEAcA8dows4s2MfpkK0ndMXXt3DgxBhqJCWJqpH1JCuieidiA@mail.gmail.com>,
+	<20dcfe00-767a-4246-97d1-86f4cbf47de7@Spark>
+In-Reply-To: <20dcfe00-767a-4246-97d1-86f4cbf47de7@Spark>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1488288927-4607-1-git-send-email-pl@kamp.de>
-Subject: Re: [Qemu-devel] [PATCH] qemu-img: simplify img_convert
+Subject: Re: [Qemu-devel] Help needed: Sparc 64, kernel panic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,33 +32,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, stefanha@gmail.com, ct@flyingcircus.io, mreitz@redhat.com, eblake@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Tue, 02/28 14:35, Peter Lieven wrote:
-> img_convert has been around before there was an ImgConvertState or
-> a block backend, but it has never been modified to directly use
-> these structs. Change this by parsing parameters directly into
-> the ImgConvertState and directly use BlockBackend where possible.
-> Futhermore variable initalization has been reworked and sorted.
-> 
-> Signed-off-by: Peter Lieven <pl@kamp.de>
-
-I see an iotest failure with this patch, in Kevin's block-next tree:
-
-019 1s ... - output mismatch (see 019.out.bad)
---- /stor/work/qemu/tests/qemu-iotests/019.out	2017-04-17 16:19:56.523968474 +0800
-+++ 019.out.bad	2017-04-20 22:03:29.868216955 +0800
-@@ -1086,8 +1086,8 @@
- 
- Checking if backing clusters are allocated when they shouldn't
- 
--0/128 sectors allocated at offset 1 MiB
--0/128 sectors allocated at offset 4.001 GiB
-+128/128 sectors allocated at offset 1 MiB
-+128/128 sectors allocated at offset 4.001 GiB
- Reading
- 
- === IO: pattern 42
-Failures: 019
-Failed 1 of 1 tests
+Just to add to the below:=0A=
+=0A=
+I'm configuring qemu with only one option "--target-list=3Dsparc64-softmmu"=
+ =0A=
+=0A=
+see here for my configure output: =0A=
+https://pastebin.com/sLShqF36=0A=
+=0A=
+thanks for the support=0A=
+Hoss=0A=
+________________________________________=0A=
+From: Qemu-devel <qemu-devel-bounces+hossein.ajallooiean=3Depfl.ch@nongnu.o=
+rg> on behalf of Ajallooiean Hossein <hossein.ajallooiean@epfl.ch>=0A=
+Sent: Thursday, April 20, 2017 3:08 PM=0A=
+To: Peter Maydell=0A=
+Cc: Mark Cave-Ayland; qemu-devel@nongnu.org=0A=
+Subject: Re: [Qemu-devel] Help needed: Sparc 64, kernel panic=0A=
+=0A=
+Ive downloaded the rc4 link you posted for 2.9 and am using that. - vanilla=
+ qemu=0A=
+=0A=
+And am getting the error with that version.=0A=
+=0A=
+Kindest regards=0A=
+Hoss=0A=
+=0A=
+On 20 Apr 2017, 14:40 +0200, Peter Maydell <peter.maydell@linaro.org>, wrot=
+e:=0A=
+On 20 April 2017 at 10:29, Ajallooiean Hossein=0A=
+<hossein.ajallooiean@epfl.ch> wrote:=0A=
+Thanks for getting back to me so quickly.=0A=
+=0A=
+I can boot Sparc64 -- ONLY when using the qemu from package manager. suppos=
+edly version 2.5=0A=
+=0A=
+but when building it myself (as i have some additions) - im getting this ke=
+rnel error:=0A=
+=0A=
+Sanity check -- if you build a purely upstream QEMU without any=0A=
+of your additions does it still have this kernel error?=0A=
+=0A=
+thanks=0A=
+-- PMM=0A=
