@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1d1J80-0005ej-UM
+	(envelope-from <balaton@eik.bme.hu>) id 1d1J80-0005el-Uq
 	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 16:56:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1d1J7x-0004zz-OR
+	(envelope-from <balaton@eik.bme.hu>) id 1d1J7x-0004zu-Ns
 	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 16:56:36 -0400
-Message-Id: <3c5b0d9bcf770cb87f84cb5649d7119b37647355.1492721026.git.balaton@eik.bme.hu>
+Message-Id: <eb3e9e4493a68b8a26e64a99d1f50c8ef26b4e4d.1492721026.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1492721026.git.balaton@eik.bme.hu>
 References: <cover.1492721026.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
 Date: Thu, 20 Apr 2017 22:43:46 +0200
-Subject: [Qemu-devel] [PATCH v5 05/13] sm501: Get rid of base address in
- draw_hwc_line
+Subject: [Qemu-devel] [PATCH v5 02/13] sm501: Use defined constants instead
+ of literal values where available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,80 +23,90 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 Cc: Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
 
-Do not use the base address to access data in local memory. This is in
-preparation to allow chip connected via PCI where base address depends
-on where the BAR is mapped so it will be unknown.
-
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/display/sm501.c          | 6 ++----
- hw/display/sm501_template.h | 8 ++++----
- 2 files changed, 6 insertions(+), 8 deletions(-)
+
+v3: Fix initial value of misc_control register as Peter Maydell suggested
+    Also use M_BYTE constant from cutils.h
+
+ hw/display/sm501.c          | 29 +++++++++++++++++++----------
+ hw/display/sm501_template.h |  2 +-
+ 2 files changed, 20 insertions(+), 11 deletions(-)
 
 diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index 571a7e6..09c023d 100644
+index 4f40dee..6b72964 100644
 --- a/hw/display/sm501.c
 +++ b/hw/display/sm501.c
-@@ -461,7 +461,6 @@ typedef struct SM501State {
-     QemuConsole *con;
+@@ -23,6 +23,7 @@
+  */
  
-     /* status & internal resources */
--    hwaddr base;
-     uint32_t local_mem_size_index;
-     uint8_t *local_mem;
-     MemoryRegion local_mem_region;
-@@ -1432,10 +1431,9 @@ static void sm501_reset(SM501State *s)
-     s->twoD_control = 0;
+ #include "qemu/osdep.h"
++#include "qemu/cutils.h"
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "cpu.h"
+@@ -446,12 +447,12 @@
+ 
+ /* SM501 local memory size taken from "linux/drivers/mfd/sm501.c" */
+ static const uint32_t sm501_mem_local_size[] = {
+-    [0] = 4 * 1024 * 1024,
+-    [1] = 8 * 1024 * 1024,
+-    [2] = 16 * 1024 * 1024,
+-    [3] = 32 * 1024 * 1024,
+-    [4] = 64 * 1024 * 1024,
+-    [5] = 2 * 1024 * 1024,
++    [0] = 4 * M_BYTE,
++    [1] = 8 * M_BYTE,
++    [2] = 16 * M_BYTE,
++    [3] = 32 * M_BYTE,
++    [4] = 64 * M_BYTE,
++    [5] = 2 * M_BYTE,
+ };
+ #define get_local_mem_size(s) sm501_mem_local_size[(s)->local_mem_size_index]
+ 
+@@ -555,7 +556,7 @@ static uint32_t get_local_mem_size_index(uint32_t size)
+ static inline int is_hwc_enabled(SM501State *state, int crt)
+ {
+     uint32_t addr = crt ? state->dc_crt_hwc_addr : state->dc_panel_hwc_addr;
+-    return addr & 0x80000000;
++    return addr & SM501_HWC_EN;
  }
  
--static void sm501_init(SM501State *s, DeviceState *dev, uint32_t base,
-+static void sm501_init(SM501State *s, DeviceState *dev,
-                        uint32_t local_mem_bytes)
- {
--    s->base = base;
+ /**
+@@ -1411,9 +1412,17 @@ void sm501_init(MemoryRegion *address_space_mem, uint32_t base,
      s->local_mem_size_index = get_local_mem_size_index(local_mem_bytes);
-     SM501_DPRINTF("sm501 local mem size=%x. index=%d\n", get_local_mem_size(s),
+     SM501_DPRINTF("local mem size=%x. index=%d\n", get_local_mem_size(s),
                    s->local_mem_size_index);
-@@ -1489,7 +1487,7 @@ static void sm501_realize_sysbus(DeviceState *dev, Error **errp)
-     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-     DeviceState *usb_dev;
+-    s->system_control = 0x00100000;
+-    s->misc_control = 0x00001000; /* assumes SH, active=low */
+-    s->dc_panel_control = 0x00010000;
++    s->system_control = 0x00100000; /* 2D engine FIFO empty */
++    /* Bits 17 (SH), 7 (CDR), 6:5 (Test), 2:0 (Bus) are all supposed
++     * to be determined at reset by GPIO lines which set config bits.
++     * We hardwire them:
++     *  SH = 0 : Hitachi Ready Polarity == Active Low
++     *  CDR = 0 : do not reset clock divider
++     *  TEST = 0 : Normal mode (not testing the silicon)
++     *  BUS = 0 : Hitachi SH3/SH4
++     */
++    s->misc_control = SM501_MISC_DAC_POWER;
++    s->dc_panel_control = 0x00010000; /* FIFO level 3 */
+     s->dc_crt_control = 0x00010000;
  
--    sm501_init(&s->state, dev, s->base, s->vram_size);
-+    sm501_init(&s->state, dev, s->vram_size);
-     if (get_local_mem_size(&s->state) != s->vram_size) {
-         error_setg(errp, "Invalid VRAM size, nearest valid size is %" PRIu32,
-                    get_local_mem_size(&s->state));
+     /* allocate local memory */
 diff --git a/hw/display/sm501_template.h b/hw/display/sm501_template.h
-index 16e500b..832ee61 100644
+index aeeac5d..16e500b 100644
 --- a/hw/display/sm501_template.h
 +++ b/hw/display/sm501_template.h
-@@ -103,13 +103,13 @@ static void glue(draw_hwc_line_, PIXEL_NAME)(SM501State *s, int crt,
-                  uint8_t *palette, int c_y, uint8_t *d, int width)
- {
-     int x, i;
--    uint8_t bitset = 0;
-+    uint8_t *pixval, bitset = 0;
- 
+@@ -108,7 +108,7 @@ static void glue(draw_hwc_line_, PIXEL_NAME)(SM501State *s, int crt,
      /* get hardware cursor pattern */
      uint32_t cursor_addr = get_hwc_address(s, crt);
      assert(0 <= c_y && c_y < SM501_HWC_HEIGHT);
-     cursor_addr += SM501_HWC_WIDTH * c_y / 4;  /* 4 pixels per byte */
--    cursor_addr += s->base;
-+    pixval = s->local_mem + cursor_addr;
+-    cursor_addr += 64 * c_y / 4;  /* 4 pixels per byte */
++    cursor_addr += SM501_HWC_WIDTH * c_y / 4;  /* 4 pixels per byte */
+     cursor_addr += s->base;
  
      /* get cursor position */
-     x = get_hwc_x(s, crt);
-@@ -120,8 +120,8 @@ static void glue(draw_hwc_line_, PIXEL_NAME)(SM501State *s, int crt,
- 
-         /* get pixel value */
-         if (i % 4 == 0) {
--            bitset = ldub_phys(&address_space_memory, cursor_addr);
--            cursor_addr++;
-+            bitset = ldub_p(pixval);
-+            pixval++;
-         }
-         v = bitset & 3;
-         bitset >>= 2;
 -- 
 2.7.4
