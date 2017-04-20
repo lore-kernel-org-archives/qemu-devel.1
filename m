@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41058)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d15k3-0004Wz-T6
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:39:00 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d15k4-0004XY-J3
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:39:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d15k2-0005VP-Vz
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:38:59 -0400
-Received: from [59.151.112.132] (port=46559 helo=heian.cn.fujitsu.com)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d15k3-0005Va-KK
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:39:00 -0400
+Received: from [59.151.112.132] (port=32048 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d15k2-0005Uj-JI
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:38:58 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d15k3-0005V6-9Q
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:38:59 -0400
 From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Thu, 20 Apr 2017 14:39:05 +0800
-Message-ID: <1492670346-18004-6-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Date: Thu, 20 Apr 2017 14:39:06 +0800
+Message-ID: <1492670346-18004-7-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 In-Reply-To: <1492670346-18004-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 References: <1492670346-18004-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH V2 5/6] net/colo.c: Add vnet packet parse
- feature in colo-proxy
+Subject: [Qemu-devel] [PATCH V2 6/6] net/colo-compare.c: Add vnet packet's
+ tcp/udp/icmp compare
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +29,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
 Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-Make colo-compare and filter-rewriter can parse vnet packet.
+COLO-Proxy just focus on packet payload, So we skip vnet header.
 
 Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 ---
- net/colo.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ net/colo-compare.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/net/colo.c b/net/colo.c
-index 180eaed..28ce7c8 100644
---- a/net/colo.c
-+++ b/net/colo.c
-@@ -43,11 +43,11 @@ int parse_packet_early(Packet *pkt)
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index b3e933c..1941ad9 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -187,6 +187,8 @@ static int packet_enqueue(CompareState *s, int mode)
+  */
+ static int colo_packet_compare_common(Packet *ppkt, Packet *spkt, int offset)
  {
-     int network_length;
-     static const uint8_t vlan[] = {0x81, 0x00};
--    uint8_t *data = pkt->data;
-+    uint8_t *data = pkt->data + pkt->vnet_hdr_len;
-     uint16_t l3_proto;
-     ssize_t l2hdr_len = eth_get_l2_hdr_length(data);
++    int offset_all;
++
+     if (trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
+         char pri_ip_src[20], pri_ip_dst[20], sec_ip_src[20], sec_ip_dst[20];
  
--    if (pkt->size < ETH_HLEN) {
-+    if (pkt->size < ETH_HLEN + pkt->vnet_hdr_len) {
-         trace_colo_proxy_main("pkt->size < ETH_HLEN");
-         return 1;
-     }
-@@ -73,7 +73,7 @@ int parse_packet_early(Packet *pkt)
+@@ -200,9 +202,12 @@ static int colo_packet_compare_common(Packet *ppkt, Packet *spkt, int offset)
+                                    sec_ip_src, sec_ip_dst);
      }
  
-     network_length = pkt->ip->ip_hl * 4;
--    if (pkt->size < l2hdr_len + network_length) {
-+    if (pkt->size < l2hdr_len + network_length + pkt->vnet_hdr_len) {
-         trace_colo_proxy_main("pkt->size < network_header + network_length");
-         return 1;
-     }
++    offset_all = ppkt->vnet_hdr_len + offset;
++
+     if (ppkt->size == spkt->size) {
+-        return memcmp(ppkt->data + offset, spkt->data + offset,
+-                      spkt->size - offset);
++        return memcmp(ppkt->data + offset_all,
++                      spkt->data + offset_all,
++                      spkt->size - offset_all);
+     } else {
+         trace_colo_compare_main("Net packet size are not the same");
+         return -1;
 -- 
 2.7.4
