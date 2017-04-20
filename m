@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d17uf-0008Pe-K9
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 04:58:06 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d185W-0002go-QO
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 05:09:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d17ub-0006tJ-Lm
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 04:58:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54752)
+	(envelope-from <dgilbert@redhat.com>) id 1d185S-0004IZ-Dx
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 05:09:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60132)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d17ub-0006sm-Bz
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 04:58:01 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0BDA47F7DB
-	for <qemu-devel@nongnu.org>; Thu, 20 Apr 2017 08:58:00 +0000 (UTC)
-Date: Thu, 20 Apr 2017 09:57:56 +0100
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d185S-0004IE-4d
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 05:09:14 -0400
+Date: Thu, 20 Apr 2017 10:09:08 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170420085756.GC2094@work-vm>
-References: <20170419205923.8808-1-quintela@redhat.com>
-	<20170419205923.8808-50-quintela@redhat.com>
+Message-ID: <20170420090908.GE2094@work-vm>
+References: <1487734936-43472-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1487734936-43472-13-git-send-email-zhang.zhanghailiang@huawei.com>
+	<20170407171840.GE2623@work-vm> <58EB41C0.5060203@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170419205923.8808-50-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 49/59] ram: Remember last_page instead of
- last_offset
+In-Reply-To: <58EB41C0.5060203@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH 12/15] savevm: split the process of
+ different stages for loadvm/savevm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,87 +29,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Cc: qemu-devel@nongnu.org, zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, Juan Quintela <quintela@redhat.com>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+* Hailiang Zhang (zhang.zhanghailiang@huawei.com) wrote:
+> On 2017/4/8 1:18, Dr. David Alan Gilbert wrote:
+> > * zhanghailiang (zhang.zhanghailiang@huawei.com) wrote:
+> > > There are several stages during loadvm/savevm process. In different stage,
+> > > migration incoming processes different types of sections.
+> > > We want to control these stages more accuracy, it will benefit COLO
+> > > performance, we don't have to save type of QEMU_VM_SECTION_START
+> > > sections everytime while do checkpoint, besides, we want to separate
+> > > the process of saving/loading memory and devices state.
+> > > 
+> > > So we add three new helper functions: qemu_loadvm_state_begin(),
+> > > qemu_load_device_state() and qemu_savevm_live_state() to achieve
+> > > different process during migration.
+> > > 
+> > > Besides, we make qemu_loadvm_state_main() and qemu_save_device_state()
+> > > public.
+> > > 
+> > > Cc: Juan Quintela <quintela@redhat.com>
+> > > Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> > > Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+> > > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > ---
+> > >   include/sysemu/sysemu.h |  6 ++++++
+> > >   migration/savevm.c      | 55 ++++++++++++++++++++++++++++++++++++++++++-------
+> > >   2 files changed, 54 insertions(+), 7 deletions(-)
+> > > 
+> > > diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> > > index 7ed665a..95cae41 100644
+> > > --- a/include/sysemu/sysemu.h
+> > > +++ b/include/sysemu/sysemu.h
+> > > @@ -132,7 +132,13 @@ void qemu_savevm_send_postcopy_ram_discard(QEMUFile *f, const char *name,
+> > >                                              uint64_t *start_list,
+> > >                                              uint64_t *length_list);
+> > > +void qemu_savevm_live_state(QEMUFile *f);
+> > > +int qemu_save_device_state(QEMUFile *f);
+> > > +
+> > >   int qemu_loadvm_state(QEMUFile *f);
+> > > +int qemu_loadvm_state_begin(QEMUFile *f);
+> > > +int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
+> > > +int qemu_load_device_state(QEMUFile *f);
+> > >   extern int autostart;
+> > > diff --git a/migration/savevm.c b/migration/savevm.c
+> > > index 9c2d239..dac478b 100644
+> > > --- a/migration/savevm.c
+> > > +++ b/migration/savevm.c
+> > > @@ -54,6 +54,7 @@
+> > >   #include "qemu/cutils.h"
+> > >   #include "io/channel-buffer.h"
+> > >   #include "io/channel-file.h"
+> > > +#include "migration/colo.h"
+> > >   #ifndef ETH_P_RARP
+> > >   #define ETH_P_RARP 0x8035
+> > > @@ -1279,13 +1280,21 @@ done:
+> > >       return ret;
+> > >   }
+> > > -static int qemu_save_device_state(QEMUFile *f)
+> > > +void qemu_savevm_live_state(QEMUFile *f)
+> > >   {
+> > > -    SaveStateEntry *se;
+> > > +    /* save QEMU_VM_SECTION_END section */
+> > > +    qemu_savevm_state_complete_precopy(f, true);
+> > > +    qemu_put_byte(f, QEMU_VM_EOF);
+> > > +}
+> > > -    qemu_put_be32(f, QEMU_VM_FILE_MAGIC);
+> > > -    qemu_put_be32(f, QEMU_VM_FILE_VERSION);
+> > > +int qemu_save_device_state(QEMUFile *f)
+> > > +{
+> > > +    SaveStateEntry *se;
+> > > +    if (!migration_in_colo_state()) {
+> > > +        qemu_put_be32(f, QEMU_VM_FILE_MAGIC);
+> > > +        qemu_put_be32(f, QEMU_VM_FILE_VERSION);
+> > > +    }
+> > Note that got split out into qemu_savevm_state_header() at some point.
 > 
-> --
-> 
-> Improve comment
-> Fix typo
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> Do you mean i should use the wrapper qemu_savevm_state_heade() here ?
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Yes, I think so; best to keep the code that writes the file headers in one place.
 
-> ---
->  migration/ram.c | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
+Dave
+
+> > Dave
+> > 
+> > >       cpu_synchronize_all_states();
+> > >       QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> > > @@ -1336,8 +1345,6 @@ enum LoadVMExitCodes {
+> > >       LOADVM_QUIT     =  1,
+> > >   };
+> > > -static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
+> > > -
+> > >   /* ------ incoming postcopy messages ------ */
+> > >   /* 'advise' arrives before any transfers just to tell us that a postcopy
+> > >    * *might* happen - it might be skipped if precopy transferred everything
+> > > @@ -1942,7 +1949,7 @@ qemu_loadvm_section_part_end(QEMUFile *f, MigrationIncomingState *mis)
+> > >       return 0;
+> > >   }
+> > > -static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
+> > > +int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
+> > >   {
+> > >       uint8_t section_type;
+> > >       int ret = 0;
+> > > @@ -2080,6 +2087,40 @@ int qemu_loadvm_state(QEMUFile *f)
+> > >       return ret;
+> > >   }
+> > > +int qemu_loadvm_state_begin(QEMUFile *f)
+> > > +{
+> > > +    MigrationIncomingState *mis = migration_incoming_get_current();
+> > > +    Error *local_err = NULL;
+> > > +    int ret;
+> > > +
+> > > +    if (qemu_savevm_state_blocked(&local_err)) {
+> > > +        error_report_err(local_err);
+> > > +        return -EINVAL;
+> > > +    }
+> > > +    /* Load QEMU_VM_SECTION_START section */
+> > > +    ret = qemu_loadvm_state_main(f, mis);
+> > > +    if (ret < 0) {
+> > > +        error_report("Failed to loadvm begin work: %d", ret);
+> > > +    }
+> > > +    return ret;
+> > > +}
+> > > +
+> > > +int qemu_load_device_state(QEMUFile *f)
+> > > +{
+> > > +    MigrationIncomingState *mis = migration_incoming_get_current();
+> > > +    int ret;
+> > > +
+> > > +    /* Load QEMU_VM_SECTION_FULL section */
+> > > +    ret = qemu_loadvm_state_main(f, mis);
+> > > +    if (ret < 0) {
+> > > +        error_report("Failed to load device state: %d", ret);
+> > > +        return ret;
+> > > +    }
+> > > +
+> > > +    cpu_synchronize_all_post_init();
+> > > +    return 0;
+> > > +}
+> > > +
+> > >   int save_vmstate(Monitor *mon, const char *name)
+> > >   {
+> > >       BlockDriverState *bs, *bs1;
+> > > -- 
+> > > 1.8.3.1
+> > > 
+> > > 
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
+> > .
+> > 
 > 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 52ab14b..5b2045d 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -171,8 +171,8 @@ struct RAMState {
->      RAMBlock *last_seen_block;
->      /* Last block from where we have sent data */
->      RAMBlock *last_sent_block;
-> -    /* Last offset we have sent data from */
-> -    ram_addr_t last_offset;
-> +    /* Last dirty targe page we have sent */
-> +    ram_addr_t last_page;
->      /* last ram version we have seen */
->      uint32_t last_version;
->      /* We are in the first round */
-> @@ -1061,7 +1061,7 @@ static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss,
->      pss->offset = migration_bitmap_find_dirty(rs, pss->block, pss->offset,
->                                                page_abs);
->      if (pss->complete_round && pss->block == rs->last_seen_block &&
-> -        pss->offset >= rs->last_offset) {
-> +        (pss->offset >> TARGET_PAGE_BITS) >= rs->last_page) {
->          /*
->           * We've been once around the RAM and haven't found anything.
->           * Give up.
-> @@ -1402,7 +1402,7 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
->      }
->  
->      pss.block = rs->last_seen_block;
-> -    pss.offset = rs->last_offset;
-> +    pss.offset = rs->last_page << TARGET_PAGE_BITS;
->      pss.complete_round = false;
->  
->      if (!pss.block) {
-> @@ -1424,7 +1424,7 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
->      } while (!pages && again);
->  
->      rs->last_seen_block = pss.block;
-> -    rs->last_offset = pss.offset;
-> +    rs->last_page = pss.offset >> TARGET_PAGE_BITS;
->  
->      return pages;
->  }
-> @@ -1499,7 +1499,7 @@ static void ram_state_reset(RAMState *rs)
->  {
->      rs->last_seen_block = NULL;
->      rs->last_sent_block = NULL;
-> -    rs->last_offset = 0;
-> +    rs->last_page = 0;
->      rs->last_version = ram_list.version;
->      rs->ram_bulk_stage = true;
->  }
-> @@ -1844,7 +1844,7 @@ static int postcopy_chunk_hostpages(MigrationState *ms)
->      /* Easiest way to make sure we don't resume in the middle of a host-page */
->      rs->last_seen_block = NULL;
->      rs->last_sent_block = NULL;
-> -    rs->last_offset     = 0;
-> +    rs->last_page = 0;
->  
->      QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
->          unsigned long first = block->offset >> TARGET_PAGE_BITS;
-> -- 
-> 2.9.3
 > 
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
