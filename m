@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andr2000@gmail.com>) id 1d15M9-0008Dq-ME
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:14:18 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d15SB-0000lw-Mf
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:20:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andr2000@gmail.com>) id 1d15M4-0005I6-I6
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:14:17 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36463)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <andr2000@gmail.com>) id 1d15M4-0005Hy-BT
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:14:12 -0400
-Received: by mail-wm0-x242.google.com with SMTP id u65so997620wmu.3
-	for <qemu-devel@nongnu.org>; Wed, 19 Apr 2017 23:14:12 -0700 (PDT)
-References: <1491903346-16075-1-git-send-email-andr2000@gmail.com>
-	<alpine.DEB.2.10.1704131704560.2759@sstabellini-ThinkPad-X260>
-	<693ebf90-00d7-823e-4db8-9b9686e56941@gmail.com>
-	<f5ce758f-5f31-32d6-7e19-8c3a83017bab@suse.com>
-	<alpine.DEB.2.10.1704141035090.23677@sstabellini-ThinkPad-X260>
-From: Oleksandr Andrushchenko <andr2000@gmail.com>
-Message-ID: <2da8fea2-6293-c1b5-c671-ae16b8445de4@gmail.com>
-Date: Thu, 20 Apr 2017 09:14:09 +0300
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d15S7-0006pD-Mr
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:20:31 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:3381
+	helo=dggrg03-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d15S7-0006or-1N
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 02:20:27 -0400
+References: <1492662763-13852-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <58F85316.3010509@huawei.com>
+Date: Thu, 20 Apr 2017 14:20:06 +0800
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.10.1704141035090.23677@sstabellini-ThinkPad-X260>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <1492662763-13852-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH] configure: introduce
- --enable-xen-fb-backend
+Subject: Re: [Qemu-devel] [PATCH] COLO-compare: Add compare_lock aviod
+ comparison conflict
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,76 +28,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>, Juergen Gross <jgross@suse.com>
-Cc: vlad.babchuk@gmail.com, qemu-devel@nongnu.org, andrii.anisov@gmail.com, olekstysh@gmail.com, al1img@gmail.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, joculator@gmail.com
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
+Cc: xuquan8@huawei.com
 
-On 04/14/2017 08:52 PM, Stefano Stabellini wrote:
-> On Fri, 14 Apr 2017, Juergen Gross wrote:
->> On 14/04/17 08:06, Oleksandr Andrushchenko wrote:
->>> On 04/14/2017 03:12 AM, Stefano Stabellini wrote:
->>>> On Tue, 11 Apr 2017, Oleksandr Andrushchenko wrote:
->>>>> From: Oleksandr Andrushchenko <oleksandr_andrushchenko@epam.com>
->>>>>
->>>>> For some use cases when Xen framebuffer/input backend
->>>>> is not a part of Qemu it is required to disable it,
->>>>> because of conflicting access to input/display devices.
->>>>> Introduce additional configuration option for explicit
->>>>> input/display control.
->>>> In these cases when you don't want xenfb, why don't you just remove
->>>> "vfb" from the xl config file? QEMU only starts the xenfb backend when
->>>> requested by the toolstack.
->>>>
->>>> Is it because you have an alternative xenfb backend? If so, is it really
->>>> fully xenfb compatible, or is it a different protocol? If it is a
->>>> different protocol, I suggest you rename your frontend/backend PV device
->>>> name to something different from "vfb".
->>>>
->>> Well, offending part is vkbd actually (for multi-touch
->>> we run our own user-space backend which supports
->>> kbd/ptr/mtouch), but vfb and vkbd is the same backend
->>> in QEMU. So, I am ok for vfb, but just want vkbd off
->>> So, there are 2 options:
->>> 1. At compile time remove vkbd and still allow vfb
->>> 2. Remove xenfb completely, if acceptable (this is my case)
->> What about adding a Xenstore entry for backend type and let qemu test
->> for it being not present or containing "qemu"?
-sounds reasonable
-> That is what we do for the console, using the xenstore node "type". QEMU
-> is "ioemu" while xenconsoled is "xenconsoled". Weirdly, instead of a
-> backend node, it is a read-only frontend node, see
-> tools/libxl/libxl_console.c:libxl__device_console_add.
->
-> Oleksandr, I am sorry to feature-creep this simple patch, but I think
-> Juergen is right. But we cannot do it just for one protocol. We need to
-> introduce a generic way to enable/disable backends in QEMU. Using a
-> xenstore node is OK.
-agree
->
-> We could do exactly the same as the PV console, thus "type" = "ioemu",
-> read-only, under the frontend xenstore directory. Or we could introduce
-> new nodes. I would probably go for "backend-type" = "qemu" under the
-> backend xenstore directory. I don't have a strong opinion about this. In
-> the example below I'll use the PV console convention.
->
-> For starters:
->
-> * libxl needs to write the "type" node to xenstore for *all* protocols.
->    The "type" is not yet configurable.
-> * qemu reads them for all backends, proceeds if "type" = "ioemu"
->
-> These should be two simple patches. Stage 2:
->
-> * we add options in the xl config file to configure any backend, libxl
->    set "type" accordingly (Maybe not *any*, but vif, vkbd, vfb could all
->    have a "type". It is OK if you only add an option for vkbd.)
-> * non-QEMU backends, in particular Linux backends, also read the "type"
->    node and proceed if it's "linux"
->
-> Does this sound OK to you?
-For the first take it does, but I'll get back to it a bit later
-Actually the purpose of the change was to find a way
-we can live with backends implemented in QEMU and user-space
-and how they can co-exist
+On 2017/4/20 12:32, Zhang Chen wrote:
+> When network traffic heavy, compare_pri_rs_finalize() and
+> compare_sec_rs_finalize() have a chance to confilct.
+> Both of them call colo_compare_connection() to compare packet,
+> But during compare_pri_rs_finalize() comparison, have secondary
+> packet come and call compare_sec_rs_finalize(), that packet will be
+> handle twice. If packet same, the pkt will be double free.
 
-Thank you,
-Oleksandr
+Interesting, if I'm right, this should not happen, because, all the comparing works
+are done in colo compare thread, so there is no chance to access the connect_list
+concurrently.  Besides, even both of the packets from primary and secondary arrive
+at the same time, it should only be handle once, we will handle it with the later arrived one,
+No ?
+
+> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+> ---
+>   net/colo-compare.c | 8 ++++++++
+>   1 file changed, 8 insertions(+)
+>
+> diff --git a/net/colo-compare.c b/net/colo-compare.c
+> index 54e6d40..686c1b4 100644
+> --- a/net/colo-compare.c
+> +++ b/net/colo-compare.c
+> @@ -79,6 +79,8 @@ typedef struct CompareState {
+>        * element type: Connection
+>        */
+>       GQueue conn_list;
+> +    /* compare lock */
+> +    QemuMutex compare_lock;
+>       /* hashtable to save connection */
+>       GHashTable *connection_track_table;
+>       /* compare thread, a thread for each NIC */
+> @@ -619,7 +621,9 @@ static void compare_pri_rs_finalize(SocketReadState *pri_rs)
+>           compare_chr_send(&s->chr_out, pri_rs->buf, pri_rs->packet_len);
+>       } else {
+>           /* compare connection */
+> +        qemu_mutex_lock(&s->compare_lock);
+>           g_queue_foreach(&s->conn_list, colo_compare_connection, s);
+> +        qemu_mutex_unlock(&s->compare_lock);
+>       }
+>   }
+>   
+> @@ -631,7 +635,9 @@ static void compare_sec_rs_finalize(SocketReadState *sec_rs)
+>           trace_colo_compare_main("secondary: unsupported packet in");
+>       } else {
+>           /* compare connection */
+> +        qemu_mutex_lock(&s->compare_lock);
+>           g_queue_foreach(&s->conn_list, colo_compare_connection, s);
+> +        qemu_mutex_unlock(&s->compare_lock);
+>       }
+>   }
+>   
+> @@ -702,6 +708,7 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
+>       net_socket_rs_init(&s->sec_rs, compare_sec_rs_finalize);
+>   
+>       g_queue_init(&s->conn_list);
+> +    qemu_mutex_init(&s->compare_lock);
+>   
+>       s->connection_track_table = g_hash_table_new_full(connection_key_hash,
+>                                                         connection_key_equal,
+> @@ -771,6 +778,7 @@ static void colo_compare_finalize(Object *obj)
+>       g_queue_foreach(&s->conn_list, colo_flush_packets, s);
+>   
+>       g_queue_clear(&s->conn_list);
+> +    qemu_mutex_destroy(&s->compare_lock);
+>   
+>       g_hash_table_destroy(s->connection_track_table);
+>       g_free(s->pri_indev);
