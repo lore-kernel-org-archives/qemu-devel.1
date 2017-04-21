@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51777)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d1Yu2-0005HE-MJ
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 09:47:15 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d1Yy1-0000AY-I6
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 09:51:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d1Yu1-0002ap-Jo
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 09:47:14 -0400
-From: Jeff Cody <jcody@redhat.com>
-Date: Fri, 21 Apr 2017 09:46:44 -0400
-Message-Id: <20170421134644.10239-13-jcody@redhat.com>
-In-Reply-To: <20170421134644.10239-1-jcody@redhat.com>
-References: <20170421134644.10239-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL 12/12] qemu-iotests: _cleanup_qemu must be
- called on exit
+	(envelope-from <kwolf@redhat.com>) id 1d1Yxw-0003MO-0x
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 09:51:21 -0400
+Date: Fri, 21 Apr 2017 15:51:05 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170421135105.GF4318@noname.redhat.com>
+References: <20170421035606.448-1-famz@redhat.com>
+	<20170421035606.448-8-famz@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170421035606.448-8-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v14 07/20] iotests: 030: Prepare for image
+ locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,179 +24,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-For the tests that use the common.qemu functions for running a QEMU
-process, _cleanup_qemu must be called in the exit function.
+Am 21.04.2017 um 05:55 hat Fam Zheng geschrieben:
+> qemu-img and qemu-io commands when guest is running need "-U" option,
+> add it.
+> 
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  tests/qemu-iotests/030 | 24 ++++++++++++------------
+>  1 file changed, 12 insertions(+), 12 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
+> index 0d472d5..5f1dce8 100755
+> --- a/tests/qemu-iotests/030
+> +++ b/tests/qemu-iotests/030
+> @@ -63,8 +63,8 @@ class TestSingleDrive(iotests.QMPTestCase):
+>      def test_stream_intermediate(self):
+>          self.assert_no_active_block_jobs()
+>  
+> -        self.assertNotEqual(qemu_io('-f', 'raw', '-c', 'map', backing_img),
+> -                            qemu_io('-f', iotests.imgfmt, '-c', 'map', mid_img),
+> +        self.assertNotEqual(qemu_io('-f', 'raw', '-rU', '-c', 'map', backing_img),
+> +                            qemu_io('-f', iotests.imgfmt, '-rU', '-c', 'map', mid_img),
+>                              'image file map matches backing file before streaming')
+>  
+>          result = self.vm.qmp('block-stream', device='mid', job_id='stream-mid')
+> @@ -114,7 +114,7 @@ class TestSingleDrive(iotests.QMPTestCase):
+>          self.assert_no_active_block_jobs()
+>  
+>          # The image map is empty before the operation
+> -        empty_map = qemu_io('-f', iotests.imgfmt, '-c', 'map', test_img)
+> +        empty_map = qemu_io('-f', iotests.imgfmt, '-rU', '-c', 'map', test_img)
+>  
+>          # This is a no-op: no data should ever be copied from the base image
+>          result = self.vm.qmp('block-stream', device='drive0', base=mid_img)
+> @@ -125,7 +125,7 @@ class TestSingleDrive(iotests.QMPTestCase):
+>          self.assert_no_active_block_jobs()
+>          self.vm.shutdown()
+>  
+> -        self.assertEqual(qemu_io('-f', iotests.imgfmt, '-c', 'map', test_img),
+> +        self.assertEqual(qemu_io('-f', iotests.imgfmt, '-c', 'map', '-r', test_img),
+>                           empty_map, 'image file map changed after a no-op')
 
-If it is not, if the qemu process aborts, then not all of the droppings
-are cleaned up (e.g. pidfile, fifos).
+This one doesn't seem strictly necessary, as you're only adding -r
+without -U. I still think it's a good idea to use -r where we can, but
+if we decide to do this, there are more places in this test that could
+be updated.
 
-This updates those tests that did not have a cleanup in qemu-iotests.
+Maybe a separate patch for adding -r without -U to the cases where
+qemu-io is run after shutting down the VM?
 
-(I swapped spaces for tabs in test 102 as well)
+>      def test_stream_partial(self):
+> @@ -197,8 +197,8 @@ class TestParallelOps(iotests.QMPTestCase):
+>  
+>          # Check that the maps don't match before the streaming operations
+>          for i in range(2, self.num_imgs, 2):
+> -            self.assertNotEqual(qemu_io('-f', iotests.imgfmt, '-c', 'map', self.imgs[i]),
+> -                                qemu_io('-f', iotests.imgfmt, '-c', 'map', self.imgs[i-1]),
+> +            self.assertNotEqual(qemu_io('-f', iotests.imgfmt, '-U', '-c', 'map', self.imgs[i]),
+> +                                qemu_io('-f', iotests.imgfmt, '-U', '-c', 'map', self.imgs[i-1]),
+>                                  'image file map matches backing file before streaming')
+>  
+>          # Create all streaming jobs
+> @@ -351,8 +351,8 @@ class TestParallelOps(iotests.QMPTestCase):
+>      def test_stream_base_node_name(self):
+>          self.assert_no_active_block_jobs()
+>  
+> -        self.assertNotEqual(qemu_io('-f', iotests.imgfmt, '-c', 'map', self.imgs[4]),
+> -                            qemu_io('-f', iotests.imgfmt, '-c', 'map', self.imgs[3]),
+> +        self.assertNotEqual(qemu_io('-f', iotests.imgfmt, '-U', '-c', 'map', self.imgs[4]),
+> +                            qemu_io('-f', iotests.imgfmt, '-U', '-c', 'map', self.imgs[3]),
+>                              'image file map matches backing file before streaming')
+>  
+>          # Error: the base node does not exist
+> @@ -422,8 +422,8 @@ class TestQuorum(iotests.QMPTestCase):
+>          if not iotests.supports_quorum():
+>              return
+>  
+> -        self.assertNotEqual(qemu_io('-f', iotests.imgfmt, '-c', 'map', self.children[0]),
+> -                            qemu_io('-f', iotests.imgfmt, '-c', 'map', self.backing[0]),
+> +        self.assertNotEqual(qemu_io('-f', iotests.imgfmt, '-U', '-c', 'map', self.children[0]),
+> +                            qemu_io('-f', iotests.imgfmt, '-U', '-c', 'map', self.backing[0]),
+>                              'image file map matches backing file before streaming')
+>  
+>          self.assert_no_active_block_jobs()
+> @@ -436,8 +436,8 @@ class TestQuorum(iotests.QMPTestCase):
+>          self.assert_no_active_block_jobs()
+>          self.vm.shutdown()
+>  
+> -        self.assertEqual(qemu_io('-f', iotests.imgfmt, '-c', 'map', self.children[0]),
+> -                         qemu_io('-f', iotests.imgfmt, '-c', 'map', self.backing[0]),
+> +        self.assertEqual(qemu_io('-f', iotests.imgfmt, '-U', '-c', 'map', self.children[0]),
+> +                         qemu_io('-f', iotests.imgfmt, '-U', '-c', 'map', self.backing[0]),
+>                           'image file map does not match backing file after streaming')
 
-Reported-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Jeff Cody <jcody@redhat.com>
-Message-id: d59c2f6ad6c1da8b9b3c7f357c94a7122ccfc55a.1492544096.git.jcody@redhat.com
----
- tests/qemu-iotests/028 |  1 +
- tests/qemu-iotests/094 | 11 ++++++++---
- tests/qemu-iotests/102 |  5 +++--
- tests/qemu-iotests/109 |  1 +
- tests/qemu-iotests/117 |  1 +
- tests/qemu-iotests/130 |  1 +
- tests/qemu-iotests/140 |  1 +
- tests/qemu-iotests/141 |  1 +
- tests/qemu-iotests/143 |  1 +
- tests/qemu-iotests/156 |  1 +
- 10 files changed, 19 insertions(+), 5 deletions(-)
+These hunks all have -U without -r, which I think we wanted to make an
+error.
 
-diff --git a/tests/qemu-iotests/028 b/tests/qemu-iotests/028
-index 7783e57..97a8869 100755
---- a/tests/qemu-iotests/028
-+++ b/tests/qemu-iotests/028
-@@ -32,6 +32,7 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
-+    _cleanup_qemu
-     rm -f "${TEST_IMG}.copy"
-     _cleanup_test_img
- }
-diff --git a/tests/qemu-iotests/094 b/tests/qemu-iotests/094
-index 0ba0b0c..9aa01e3 100755
---- a/tests/qemu-iotests/094
-+++ b/tests/qemu-iotests/094
-@@ -27,7 +27,14 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--trap "exit \$status" 0 1 2 3 15
-+_cleanup()
-+{
-+    _cleanup_qemu
-+    _cleanup_test_img
-+    rm -f "$TEST_DIR/source.$IMGFMT"
-+}
-+
-+trap "_cleanup; exit \$status" 0 1 2 3 15
- 
- # get standard environment, filters and checks
- . ./common.rc
-@@ -73,8 +80,6 @@ _send_qemu_cmd $QEMU_HANDLE \
- 
- wait=1 _cleanup_qemu
- 
--_cleanup_test_img
--rm -f "$TEST_DIR/source.$IMGFMT"
- 
- # success, all done
- echo '*** done'
-diff --git a/tests/qemu-iotests/102 b/tests/qemu-iotests/102
-index 64b4af9..87db1bb 100755
---- a/tests/qemu-iotests/102
-+++ b/tests/qemu-iotests/102
-@@ -25,11 +25,12 @@ seq=$(basename $0)
- echo "QA output created by $seq"
- 
- here=$PWD
--status=1	# failure is the default!
-+status=1    # failure is the default!
- 
- _cleanup()
- {
--	_cleanup_test_img
-+    _cleanup_qemu
-+    _cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
-diff --git a/tests/qemu-iotests/109 b/tests/qemu-iotests/109
-index 927151a..6161633 100755
---- a/tests/qemu-iotests/109
-+++ b/tests/qemu-iotests/109
-@@ -29,6 +29,7 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
-+    _cleanup_qemu
-     rm -f $TEST_IMG.src
- 	_cleanup_test_img
- }
-diff --git a/tests/qemu-iotests/117 b/tests/qemu-iotests/117
-index e955d52..6c83461 100755
---- a/tests/qemu-iotests/117
-+++ b/tests/qemu-iotests/117
-@@ -29,6 +29,7 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
-+    _cleanup_qemu
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
-diff --git a/tests/qemu-iotests/130 b/tests/qemu-iotests/130
-index f941fc9..e7e43de 100755
---- a/tests/qemu-iotests/130
-+++ b/tests/qemu-iotests/130
-@@ -31,6 +31,7 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
-+    _cleanup_qemu
-     _cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
-diff --git a/tests/qemu-iotests/140 b/tests/qemu-iotests/140
-index 49f9df4..8c80a5a 100755
---- a/tests/qemu-iotests/140
-+++ b/tests/qemu-iotests/140
-@@ -33,6 +33,7 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
-+    _cleanup_qemu
-     _cleanup_test_img
-     rm -f "$TEST_DIR/nbd"
- }
-diff --git a/tests/qemu-iotests/141 b/tests/qemu-iotests/141
-index 27fb1cc..40a3405 100755
---- a/tests/qemu-iotests/141
-+++ b/tests/qemu-iotests/141
-@@ -29,6 +29,7 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
-+    _cleanup_qemu
-     _cleanup_test_img
-     rm -f "$TEST_DIR/{b,m,o}.$IMGFMT"
- }
-diff --git a/tests/qemu-iotests/143 b/tests/qemu-iotests/143
-index ec4ef22..5ff1944 100755
---- a/tests/qemu-iotests/143
-+++ b/tests/qemu-iotests/143
-@@ -29,6 +29,7 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
-+    _cleanup_qemu
-     rm -f "$TEST_DIR/nbd"
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
-diff --git a/tests/qemu-iotests/156 b/tests/qemu-iotests/156
-index 78deaff..d799b73 100755
---- a/tests/qemu-iotests/156
-+++ b/tests/qemu-iotests/156
-@@ -37,6 +37,7 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
-+    _cleanup_qemu
-     rm -f "$TEST_IMG{,.target}{,.backing,.overlay}"
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
--- 
-2.9.3
+Kevin
