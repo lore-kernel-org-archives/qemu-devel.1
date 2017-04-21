@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1d1VG2-0005pZ-S7
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:53:43 -0400
+	(envelope-from <stefanha@redhat.com>) id 1d1VG2-0005pa-SK
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:53:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1d1VFz-0002VS-1E
+	(envelope-from <stefanha@redhat.com>) id 1d1VG1-0002Ve-2m
 	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:53:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59456)
+Received: from mx1.redhat.com ([209.132.183.28]:42606)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1d1VFy-0002VH-RM
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:53:38 -0400
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1d1VG0-0002VY-Pq
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:53:41 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri, 21 Apr 2017 10:53:31 +0100
-Message-Id: <20170421095334.26692-1-stefanha@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL for-2.9 0/3] Tracing patches
+Date: Fri, 21 Apr 2017 10:53:32 +0100
+Message-Id: <20170421095334.26692-2-stefanha@redhat.com>
+In-Reply-To: <20170421095334.26692-1-stefanha@redhat.com>
+References: <20170421095334.26692-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PULL for-2.9 1/3] configure: eliminate Python
+ dependency for --help
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,38 +27,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-The following changes since commit fa54abb8c298f892639ffc4bc2f61448ac3be4=
-a1:
+The ./configure script should produce --help output even if Python is
+not installed.
 
-  Drop QEMU_GNUC_PREREQ() checks for gcc older than 4.1 (2017-04-20 18:33=
-:33 +0100)
+Listing trace backends is simple: show the names of all Python modules
+in scripts/tracetool/backend/ whose source code contains 'PUBLIC =
+True'.
 
-are available in the git repository at:
+Perform the backend enumeration in shell instead of Python so that we
+can move the Python check until after ./configure --help.
 
-  git://github.com/stefanha/qemu.git tags/tracing-pull-request
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 20170328134418.3426-1-stefanha@redhat.com
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ configure | 35 +++++++++++++++++++----------------
+ 1 file changed, 19 insertions(+), 16 deletions(-)
 
-for you to fetch changes up to 659370f71f2c3d4105b04178abd751242e1c1b68:
-
-  simpletrace: document Analyzer method signatures (2017-04-21 10:45:35 +=
-0100)
-
-----------------------------------------------------------------
-
-----------------------------------------------------------------
-
-Stefan Hajnoczi (2):
-  configure: eliminate Python dependency for --help
-  simpletrace: document Analyzer method signatures
-
-Xu, Anthony (1):
-  trace: Put all trace.o into libqemuutil.a
-
- configure              | 35 +++++++++++++++++++----------------
- Makefile               |  6 +++---
- Makefile.target        |  5 ++---
- tests/Makefile.include |  2 +-
- scripts/simpletrace.py | 23 ++++++++++++++++++++++-
- 5 files changed, 47 insertions(+), 24 deletions(-)
-
---=20
+diff --git a/configure b/configure
+index be4d326..6db3044 100755
+--- a/configure
++++ b/configure
+@@ -1191,21 +1191,6 @@ for opt do
+   esac
+ done
+ 
+-if ! has $python; then
+-  error_exit "Python not found. Use --python=/path/to/python"
+-fi
+-
+-# Note that if the Python conditional here evaluates True we will exit
+-# with status 1 which is a shell 'false' value.
+-if ! $python -c 'import sys; sys.exit(sys.version_info < (2,6) or sys.version_info >= (3,))'; then
+-  error_exit "Cannot use '$python', Python 2.6 or later is required." \
+-      "Note that Python 3 or later is not yet supported." \
+-      "Use --python=/path/to/python to specify a supported Python."
+-fi
+-
+-# Suppress writing compiled files
+-python="$python -B"
+-
+ case "$cpu" in
+     ppc)
+            CPU_CFLAGS="-m32"
+@@ -1280,6 +1265,9 @@ for config in $mak_wilds; do
+     default_target_list="${default_target_list} $(basename "$config" .mak)"
+ done
+ 
++# Enumerate public trace backends for --help output
++trace_backend_list=$(echo $(grep -le '^PUBLIC = True$' scripts/tracetool/backend/*.py | sed -e 's/^.*\/\(.*\)\.py$/\1/'))
++
+ if test x"$show_help" = x"yes" ; then
+ cat << EOF
+ 
+@@ -1333,7 +1321,7 @@ Advanced options (experts only):
+                            set block driver read-only whitelist
+                            (affects only QEMU, not qemu-img)
+   --enable-trace-backends=B Set trace backend
+-                           Available backends: $($python $source_path/scripts/tracetool.py --list-backends)
++                           Available backends: $trace_backend_list
+   --with-trace-file=NAME   Full PATH,NAME of file to store traces
+                            Default:trace-<pid>
+   --disable-slirp          disable SLIRP userspace network connectivity
+@@ -1433,6 +1421,21 @@ EOF
+ exit 0
+ fi
+ 
++if ! has $python; then
++  error_exit "Python not found. Use --python=/path/to/python"
++fi
++
++# Note that if the Python conditional here evaluates True we will exit
++# with status 1 which is a shell 'false' value.
++if ! $python -c 'import sys; sys.exit(sys.version_info < (2,6) or sys.version_info >= (3,))'; then
++  error_exit "Cannot use '$python', Python 2.6 or later is required." \
++      "Note that Python 3 or later is not yet supported." \
++      "Use --python=/path/to/python to specify a supported Python."
++fi
++
++# Suppress writing compiled files
++python="$python -B"
++
+ # Now we have handled --enable-tcg-interpreter and know we're not just
+ # printing the help message, bail out if the host CPU isn't supported.
+ if test "$ARCH" = "unknown"; then
+-- 
 2.9.3
