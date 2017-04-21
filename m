@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51731)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d1Yts-00055O-OY
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 09:47:06 -0400
+	(envelope-from <jcody@redhat.com>) id 1d1Yu2-0005HE-MJ
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 09:47:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d1Ytr-0002Tf-Ls
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 09:47:04 -0400
+	(envelope-from <jcody@redhat.com>) id 1d1Yu1-0002ap-Jo
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 09:47:14 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Fri, 21 Apr 2017 09:46:42 -0400
-Message-Id: <20170421134644.10239-11-jcody@redhat.com>
+Date: Fri, 21 Apr 2017 09:46:44 -0400
+Message-Id: <20170421134644.10239-13-jcody@redhat.com>
 In-Reply-To: <20170421134644.10239-1-jcody@redhat.com>
 References: <20170421134644.10239-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL 10/12] block/rbd - update variable names to more
- apt names
+Subject: [Qemu-devel] [PULL 12/12] qemu-iotests: _cleanup_qemu must be
+ called on exit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,136 +23,176 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org
 
-Update 'clientname' to be 'user', which tracks better with both
-the QAPI and rados variable naming.
+For the tests that use the common.qemu functions for running a QEMU
+process, _cleanup_qemu must be called in the exit function.
 
-Update 'name' to be 'image_name', as it indicates the rbd image.
-Naming it 'image' would have been ideal, but we are using that for
-the rados_image_t value returned by rbd_open().
+If it is not, if the qemu process aborts, then not all of the droppings
+are cleaned up (e.g. pidfile, fifos).
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+This updates those tests that did not have a cleanup in qemu-iotests.
+
+(I swapped spaces for tabs in test 102 as well)
+
+Reported-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Jeff Cody <jcody@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: b7ec1fb2e1cf36f9b6911631447a5b0422590b7d.1491597120.git.jcody@redhat.com
+Message-id: d59c2f6ad6c1da8b9b3c7f357c94a7122ccfc55a.1492544096.git.jcody@redhat.com
 ---
- block/rbd.c | 33 +++++++++++++++++----------------
- 1 file changed, 17 insertions(+), 16 deletions(-)
+ tests/qemu-iotests/028 |  1 +
+ tests/qemu-iotests/094 | 11 ++++++++---
+ tests/qemu-iotests/102 |  5 +++--
+ tests/qemu-iotests/109 |  1 +
+ tests/qemu-iotests/117 |  1 +
+ tests/qemu-iotests/130 |  1 +
+ tests/qemu-iotests/140 |  1 +
+ tests/qemu-iotests/141 |  1 +
+ tests/qemu-iotests/143 |  1 +
+ tests/qemu-iotests/156 |  1 +
+ 10 files changed, 19 insertions(+), 5 deletions(-)
 
-diff --git a/block/rbd.c b/block/rbd.c
-index 1c43171..35853c9 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -94,7 +94,7 @@ typedef struct BDRVRBDState {
-     rados_t cluster;
-     rados_ioctx_t io_ctx;
-     rbd_image_t image;
--    char *name;
-+    char *image_name;
-     char *snap;
- } BDRVRBDState;
+diff --git a/tests/qemu-iotests/028 b/tests/qemu-iotests/028
+index 7783e57..97a8869 100755
+--- a/tests/qemu-iotests/028
++++ b/tests/qemu-iotests/028
+@@ -32,6 +32,7 @@ status=1	# failure is the default!
  
-@@ -350,7 +350,7 @@ static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
-     int64_t bytes = 0;
-     int64_t objsize;
-     int obj_order = 0;
--    const char *pool, *name, *conf, *clientname, *keypairs;
-+    const char *pool, *image_name, *conf, *user, *keypairs;
-     const char *secretid;
-     rados_t cluster;
-     rados_ioctx_t io_ctx;
-@@ -393,11 +393,11 @@ static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
-      */
-     pool       = qdict_get_try_str(options, "pool");
-     conf       = qdict_get_try_str(options, "conf");
--    clientname = qdict_get_try_str(options, "user");
--    name       = qdict_get_try_str(options, "image");
-+    user       = qdict_get_try_str(options, "user");
-+    image_name = qdict_get_try_str(options, "image");
-     keypairs   = qdict_get_try_str(options, "=keyvalue-pairs");
- 
--    ret = rados_create(&cluster, clientname);
-+    ret = rados_create(&cluster, user);
-     if (ret < 0) {
-         error_setg_errno(errp, -ret, "error initializing");
-         goto exit;
-@@ -434,7 +434,7 @@ static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
-         goto shutdown;
-     }
- 
--    ret = rbd_create(io_ctx, name, bytes, &obj_order);
-+    ret = rbd_create(io_ctx, image_name, bytes, &obj_order);
-     if (ret < 0) {
-         error_setg_errno(errp, -ret, "error rbd create");
-     }
-@@ -540,7 +540,7 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-                          Error **errp)
+ _cleanup()
  {
-     BDRVRBDState *s = bs->opaque;
--    const char *pool, *snap, *conf, *clientname, *name, *keypairs;
-+    const char *pool, *snap, *conf, *user, *image_name, *keypairs;
-     const char *secretid;
-     QemuOpts *opts;
-     Error *local_err = NULL;
-@@ -567,24 +567,24 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-     pool           = qemu_opt_get(opts, "pool");
-     conf           = qemu_opt_get(opts, "conf");
-     snap           = qemu_opt_get(opts, "snapshot");
--    clientname     = qemu_opt_get(opts, "user");
--    name           = qemu_opt_get(opts, "image");
-+    user           = qemu_opt_get(opts, "user");
-+    image_name     = qemu_opt_get(opts, "image");
-     keypairs       = qemu_opt_get(opts, "=keyvalue-pairs");
- 
--    if (!pool || !name) {
-+    if (!pool || !image_name) {
-         error_setg(errp, "Parameters 'pool' and 'image' are required");
-         r = -EINVAL;
-         goto failed_opts;
-     }
- 
--    r = rados_create(&s->cluster, clientname);
-+    r = rados_create(&s->cluster, user);
-     if (r < 0) {
-         error_setg_errno(errp, -r, "error initializing");
-         goto failed_opts;
-     }
- 
-     s->snap = g_strdup(snap);
--    s->name = g_strdup(name);
-+    s->image_name = g_strdup(image_name);
- 
-     /* try default location when conf=NULL, but ignore failure */
-     r = rados_conf_read_file(s->cluster, conf);
-@@ -636,9 +636,10 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-     }
- 
-     /* rbd_open is always r/w */
--    r = rbd_open(s->io_ctx, s->name, &s->image, s->snap);
-+    r = rbd_open(s->io_ctx, s->image_name, &s->image, s->snap);
-     if (r < 0) {
--        error_setg_errno(errp, -r, "error reading header from %s", s->name);
-+        error_setg_errno(errp, -r, "error reading header from %s",
-+                         s->image_name);
-         goto failed_open;
-     }
- 
-@@ -660,7 +661,7 @@ failed_open:
- failed_shutdown:
-     rados_shutdown(s->cluster);
-     g_free(s->snap);
--    g_free(s->name);
-+    g_free(s->image_name);
- failed_opts:
-     qemu_opts_del(opts);
-     g_free(mon_host);
-@@ -674,7 +675,7 @@ static void qemu_rbd_close(BlockDriverState *bs)
-     rbd_close(s->image);
-     rados_ioctx_destroy(s->io_ctx);
-     g_free(s->snap);
--    g_free(s->name);
-+    g_free(s->image_name);
-     rados_shutdown(s->cluster);
++    _cleanup_qemu
+     rm -f "${TEST_IMG}.copy"
+     _cleanup_test_img
  }
+diff --git a/tests/qemu-iotests/094 b/tests/qemu-iotests/094
+index 0ba0b0c..9aa01e3 100755
+--- a/tests/qemu-iotests/094
++++ b/tests/qemu-iotests/094
+@@ -27,7 +27,14 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
  
+-trap "exit \$status" 0 1 2 3 15
++_cleanup()
++{
++    _cleanup_qemu
++    _cleanup_test_img
++    rm -f "$TEST_DIR/source.$IMGFMT"
++}
++
++trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+ # get standard environment, filters and checks
+ . ./common.rc
+@@ -73,8 +80,6 @@ _send_qemu_cmd $QEMU_HANDLE \
+ 
+ wait=1 _cleanup_qemu
+ 
+-_cleanup_test_img
+-rm -f "$TEST_DIR/source.$IMGFMT"
+ 
+ # success, all done
+ echo '*** done'
+diff --git a/tests/qemu-iotests/102 b/tests/qemu-iotests/102
+index 64b4af9..87db1bb 100755
+--- a/tests/qemu-iotests/102
++++ b/tests/qemu-iotests/102
+@@ -25,11 +25,12 @@ seq=$(basename $0)
+ echo "QA output created by $seq"
+ 
+ here=$PWD
+-status=1	# failure is the default!
++status=1    # failure is the default!
+ 
+ _cleanup()
+ {
+-	_cleanup_test_img
++    _cleanup_qemu
++    _cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+diff --git a/tests/qemu-iotests/109 b/tests/qemu-iotests/109
+index 927151a..6161633 100755
+--- a/tests/qemu-iotests/109
++++ b/tests/qemu-iotests/109
+@@ -29,6 +29,7 @@ status=1	# failure is the default!
+ 
+ _cleanup()
+ {
++    _cleanup_qemu
+     rm -f $TEST_IMG.src
+ 	_cleanup_test_img
+ }
+diff --git a/tests/qemu-iotests/117 b/tests/qemu-iotests/117
+index e955d52..6c83461 100755
+--- a/tests/qemu-iotests/117
++++ b/tests/qemu-iotests/117
+@@ -29,6 +29,7 @@ status=1	# failure is the default!
+ 
+ _cleanup()
+ {
++    _cleanup_qemu
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+diff --git a/tests/qemu-iotests/130 b/tests/qemu-iotests/130
+index f941fc9..e7e43de 100755
+--- a/tests/qemu-iotests/130
++++ b/tests/qemu-iotests/130
+@@ -31,6 +31,7 @@ status=1	# failure is the default!
+ 
+ _cleanup()
+ {
++    _cleanup_qemu
+     _cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+diff --git a/tests/qemu-iotests/140 b/tests/qemu-iotests/140
+index 49f9df4..8c80a5a 100755
+--- a/tests/qemu-iotests/140
++++ b/tests/qemu-iotests/140
+@@ -33,6 +33,7 @@ status=1	# failure is the default!
+ 
+ _cleanup()
+ {
++    _cleanup_qemu
+     _cleanup_test_img
+     rm -f "$TEST_DIR/nbd"
+ }
+diff --git a/tests/qemu-iotests/141 b/tests/qemu-iotests/141
+index 27fb1cc..40a3405 100755
+--- a/tests/qemu-iotests/141
++++ b/tests/qemu-iotests/141
+@@ -29,6 +29,7 @@ status=1	# failure is the default!
+ 
+ _cleanup()
+ {
++    _cleanup_qemu
+     _cleanup_test_img
+     rm -f "$TEST_DIR/{b,m,o}.$IMGFMT"
+ }
+diff --git a/tests/qemu-iotests/143 b/tests/qemu-iotests/143
+index ec4ef22..5ff1944 100755
+--- a/tests/qemu-iotests/143
++++ b/tests/qemu-iotests/143
+@@ -29,6 +29,7 @@ status=1	# failure is the default!
+ 
+ _cleanup()
+ {
++    _cleanup_qemu
+     rm -f "$TEST_DIR/nbd"
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+diff --git a/tests/qemu-iotests/156 b/tests/qemu-iotests/156
+index 78deaff..d799b73 100755
+--- a/tests/qemu-iotests/156
++++ b/tests/qemu-iotests/156
+@@ -37,6 +37,7 @@ status=1	# failure is the default!
+ 
+ _cleanup()
+ {
++    _cleanup_qemu
+     rm -f "$TEST_IMG{,.target}{,.backing,.overlay}"
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
 -- 
 2.9.3
