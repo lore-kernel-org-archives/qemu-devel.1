@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1d1Zvp-0006y2-DO
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 10:53:10 -0400
+	(envelope-from <felipe@nutanix.com>) id 1d1ZwM-0007DU-Bt
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 10:53:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1d1Zvo-0005Zl-LO
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 10:53:09 -0400
+	(envelope-from <felipe@nutanix.com>) id 1d1ZwI-0005g6-Ep
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 10:53:42 -0400
+Received: from mail-bl2nam02on0114.outbound.protection.outlook.com
+	([104.47.38.114]:21680
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <felipe@nutanix.com>) id 1d1ZwI-0005fI-72
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 10:53:38 -0400
+From: Felipe Franciosi <felipe@nutanix.com>
+Date: Fri, 21 Apr 2017 14:53:33 +0000
+Message-ID: <9950C259-FD65-4286-84D0-89FA00420E86@nutanix.com>
+References: <1488479153-21203-1-git-send-email-felipe@nutanix.com>
+	<20170302214746.GA4711@redhat.com>
+In-Reply-To: <20170302214746.GA4711@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <132B368A1149F142A21D3652F54A3602@namprd02.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20170419130044.GB12781@lemon.lan>
-References: <1491057878-27868-1-git-send-email-ashijeetacharya@gmail.com>
-	<1491057878-27868-6-git-send-email-ashijeetacharya@gmail.com>
-	<20170419130044.GB12781@lemon.lan>
-From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Fri, 21 Apr 2017 20:23:07 +0530
-Message-ID: <CAC2QTZbH_LYaEYr_p6wKbek8X0PFfoAJp=tC9dCBryyC_R6_Ow@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v3 5/6] vmdk: Set maximum bytes allocated
- in one cycle
+Subject: Re: [Qemu-devel] [PATCH v5 0/4] Introduce vhost-user-scsi and
+ sample application
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,53 +32,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>, "james.r.harris@intel.com" <james.r.harris@intel.com>, "yuanhan.liu@linux.intel.com" <yuanhan.liu@linux.intel.com>
 
-On Wed, Apr 19, 2017 at 6:30 PM, Fam Zheng <famz@redhat.com> wrote:
-> On Sat, 04/01 20:14, Ashijeet Acharya wrote:
->> Set the maximum bytes allowed to get allocated at once to be not more
->> than the extent size boundary to handle writes at two separate extents
->> appropriately.
->>
->> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
->> ---
->>  block/vmdk.c | 13 +++++++++++--
->>  1 file changed, 11 insertions(+), 2 deletions(-)
->>
->> diff --git a/block/vmdk.c b/block/vmdk.c
->> index a8babd7..9456ddd 100644
->> --- a/block/vmdk.c
->> +++ b/block/vmdk.c
->> @@ -1767,6 +1767,7 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
->>      int64_t offset_in_cluster, n_bytes;
->>      uint64_t cluster_offset;
->>      uint64_t bytes_done = 0;
->> +    uint64_t extent_size;
->>      VmdkMetaData m_data;
->>      uint32_t total_alloc_clusters = 0;
->>
->> @@ -1782,9 +1783,17 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
->>          if (!extent) {
->>              return -EIO;
->>          }
->> +        extent_size = extent->end_sector * BDRV_SECTOR_SIZE;
->
-> Maybe extent_end to be more accurate?
 
-Done
+> On 2 Mar 2017, at 21:47, Michael S. Tsirkin <mst@redhat.com> wrote:
+>=20
+> On Thu, Mar 02, 2017 at 10:25:49AM -0800, Felipe Franciosi wrote:
+>> Based on various discussions on the 2016 KVM Forum, I'm sending over a
+>> vhost-user-scsi implementation for your consideration.
+>>=20
+>> This patchset introduces a new vhost-user SCSI device. While heavily
+>> based on vhost-scsi, it is implemented using vhost's userspace
+>> counterpart. The device has been coded and tested to work with live
+>> migration.
+>>=20
+>> As part of this work, a new vhost-scsi-common device was created and
+>> the existing vhost-scsi device moved underneath it. The new
+>> vhost-user-scsi device is also placed underneath it.
+>>=20
+>> A sample application based on the newly introduced libvhost-user is
+>> also included. It makes use of libiscsi for simplicity.
+>>=20
+>> For convenience, I'm maintaining an up-to-date version of these
+>> patches (including some necessary fixes for libvhost-user) on:
+>>=20
+>> https://github.com/franciozzy/qemu/tree/vus-upstream-v5
+>>=20
+>> See the individual patches for build and use instructions.
+>>=20
+>> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+>=20
+> BTW, pls remember to ping after QEMU release.
 
->> +
->>          offset_in_cluster = vmdk_find_offset_in_cluster(extent, offset);
->> -        n_bytes = MIN(bytes, extent->cluster_sectors * BDRV_SECTOR_SIZE
->> -                             - offset_in_cluster);
->> +
->> +        /* truncate n_bytes to first cluster because we need to perform COW */
->
-> Makes sense, but shouldn't this be squashed into patch patch 3? Because it looks
-> like it is fixing an intermediate bug.
+Ping! :-)
 
-Did you mean that I should merge this whole patch into patch 3? Maybe
-moving it before patch 3 rather than squashing it make more sense?
+F.
 
-Ashijeet
+>=20
+>> v4 -> v5:
+>> - Add a patch to fix a build issue with libvhost-user.
+>>=20
+>> v3 -> v4:
+>> - Drop configure switches and build vus by default.
+>> - Add sample application to .gitignore.
+>> - Removed a whitespace error.
+>> - Rebase on master.
+>>=20
+>> v2 -> v3:
+>> - Rebase after vhost notifier fixes by Paolo.
+>> - Exposed F_HOTPLUG and F_CHANGE on vhost-user-scsi.
+>>=20
+>> v1 -> v2:
+>> - Introduce new vhost-scsi-common device type.
+>> - Move vhost-scsi device underneath vhost-scsi-common.
+>> - Move sample application from tests/ to contrib/.
+>> - Make sample application use the glib event loop.
+>> - Minor fixes.
+>>=20
+>> Felipe Franciosi (4):
+>>  libvhost-user: replace vasprintf() to fix build
+>>  vhost-scsi: create a vhost-scsi-common abstraction
+>>  vus: Introduce vhost-user-scsi host device
+>>  vus: Introduce a vhost-user-scsi sample application
+>>=20
+>> .gitignore                                |   1 +
+>> Makefile                                  |   3 +
+>> Makefile.objs                             |   4 +
+>> configure                                 |   1 +
+>> contrib/libvhost-user/libvhost-user.c     |   2 +-
+>> contrib/vhost-user-scsi/Makefile.objs     |   1 +
+>> contrib/vhost-user-scsi/vhost-user-scsi.c | 886 ++++++++++++++++++++++++=
+++++++
+>> default-configs/pci.mak                   |   1 +
+>> hw/scsi/Makefile.objs                     |   3 +-
+>> hw/scsi/vhost-scsi-common.c               | 143 +++++
+>> hw/scsi/vhost-scsi.c                      | 194 ++-----
+>> hw/scsi/vhost-user-scsi.c                 | 215 ++++++++
+>> hw/virtio/virtio-pci.c                    |  54 ++
+>> hw/virtio/virtio-pci.h                    |  11 +
+>> include/hw/virtio/vhost-scsi-common.h     |  48 ++
+>> include/hw/virtio/vhost-scsi.h            |  11 +-
+>> include/hw/virtio/vhost-user-scsi.h       |  35 ++
+>> include/hw/virtio/virtio-scsi.h           |   5 +
+>> 18 files changed, 1469 insertions(+), 149 deletions(-)
+>> create mode 100644 contrib/vhost-user-scsi/Makefile.objs
+>> create mode 100644 contrib/vhost-user-scsi/vhost-user-scsi.c
+>> create mode 100644 hw/scsi/vhost-scsi-common.c
+>> create mode 100644 hw/scsi/vhost-user-scsi.c
+>> create mode 100644 include/hw/virtio/vhost-scsi-common.h
+>> create mode 100644 include/hw/virtio/vhost-user-scsi.h
+>>=20
+>> --=20
+>> 1.9.4
