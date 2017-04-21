@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d1PgD-0005e1-4R
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 23:56:24 -0400
+	(envelope-from <famz@redhat.com>) id 1d1PgI-0005iA-5U
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 23:56:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d1PgC-0003gA-C1
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 23:56:21 -0400
+	(envelope-from <famz@redhat.com>) id 1d1PgH-0003hj-D1
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 23:56:26 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 21 Apr 2017 11:55:48 +0800
-Message-Id: <20170421035606.448-3-famz@redhat.com>
+Date: Fri, 21 Apr 2017 11:55:49 +0800
+Message-Id: <20170421035606.448-4-famz@redhat.com>
 In-Reply-To: <20170421035606.448-1-famz@redhat.com>
 References: <20170421035606.448-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v14 02/20] qapi: Add 'force-shared-write' to
- blockdev-add arguments
+Subject: [Qemu-devel] [PATCH v14 03/20] block: Respect "force-shared-write"
+ in perm propagating
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,29 +25,71 @@ Cc: eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.c
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- qapi/block-core.json | 3 +++
- 1 file changed, 3 insertions(+)
+ block.c | 31 +++++++++++++++++++++++--------
+ 1 file changed, 23 insertions(+), 8 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 033457c..b9b8002 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2880,6 +2880,8 @@
- #                 (default: false)
- # @detect-zeroes: detect and optimize zero writes (Since 2.1)
- #                 (default: off)
-+# @force-shared-write: enforce shared write permission on added nodes
-+#                      (Since 2.10)
- #
- # Remaining options are determined by the block driver.
- #
-@@ -2891,6 +2893,7 @@
-             '*discard': 'BlockdevDiscardOptions',
-             '*cache': 'BlockdevCacheOptions',
-             '*read-only': 'bool',
-+            '*force-shared-write': 'bool',
-             '*detect-zeroes': 'BlockdevDetectZeroesOptions' },
-   'discriminator': 'driver',
-   'data': {
+diff --git a/block.c b/block.c
+index f5c4e97..6acf618 100644
+--- a/block.c
++++ b/block.c
+@@ -1422,6 +1422,21 @@ static int bdrv_child_check_perm(BdrvChild *c, uint64_t perm, uint64_t shared,
+ static void bdrv_child_abort_perm_update(BdrvChild *c);
+ static void bdrv_child_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared);
+ 
++static void bdrv_child_perm(BlockDriverState *bs, BdrvChild *c,
++                            const BdrvChildRole *role,
++                            uint64_t parent_perm, uint64_t parent_shared,
++                            uint64_t *nperm, uint64_t *nshared)
++{
++    if (bs->drv && bs->drv->bdrv_child_perm) {
++        bs->drv->bdrv_child_perm(bs, c, role,
++                                 parent_perm, parent_shared,
++                                 nperm, nshared);
++    }
++    if (bs->force_shared_write) {
++        *nshared |= BLK_PERM_WRITE;
++    }
++}
++
+ /*
+  * Check whether permissions on this node can be changed in a way that
+  * @cumulative_perms and @cumulative_shared_perms are the new cumulative
+@@ -1466,9 +1481,9 @@ static int bdrv_check_perm(BlockDriverState *bs, uint64_t cumulative_perms,
+     /* Check all children */
+     QLIST_FOREACH(c, &bs->children, next) {
+         uint64_t cur_perm, cur_shared;
+-        drv->bdrv_child_perm(bs, c, c->role,
+-                             cumulative_perms, cumulative_shared_perms,
+-                             &cur_perm, &cur_shared);
++        bdrv_child_perm(bs, c, c->role,
++                        cumulative_perms, cumulative_shared_perms,
++                        &cur_perm, &cur_shared);
+         ret = bdrv_child_check_perm(c, cur_perm, cur_shared, ignore_children,
+                                     errp);
+         if (ret < 0) {
+@@ -1528,9 +1543,9 @@ static void bdrv_set_perm(BlockDriverState *bs, uint64_t cumulative_perms,
+     /* Update all children */
+     QLIST_FOREACH(c, &bs->children, next) {
+         uint64_t cur_perm, cur_shared;
+-        drv->bdrv_child_perm(bs, c, c->role,
+-                             cumulative_perms, cumulative_shared_perms,
+-                             &cur_perm, &cur_shared);
++        bdrv_child_perm(bs, c, c->role,
++                        cumulative_perms, cumulative_shared_perms,
++                        &cur_perm, &cur_shared);
+         bdrv_child_set_perm(c, cur_perm, cur_shared);
+     }
+ }
+@@ -1865,8 +1880,8 @@ BdrvChild *bdrv_attach_child(BlockDriverState *parent_bs,
+ 
+     assert(parent_bs->drv);
+     assert(bdrv_get_aio_context(parent_bs) == bdrv_get_aio_context(child_bs));
+-    parent_bs->drv->bdrv_child_perm(parent_bs, NULL, child_role,
+-                                    perm, shared_perm, &perm, &shared_perm);
++    bdrv_child_perm(parent_bs, NULL, child_role,
++                    perm, shared_perm, &perm, &shared_perm);
+ 
+     child = bdrv_root_attach_child(child_bs, child_name, child_role,
+                                    perm, shared_perm, parent_bs, errp);
 -- 
 2.9.3
