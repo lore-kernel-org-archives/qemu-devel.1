@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1d1ehL-0005UD-RV
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 15:58:32 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1d1exJ-0003ak-F7
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1d1ehH-000762-VU
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 15:58:31 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:47448
-	helo=v2201612906741603.powersrv.de)
+	(envelope-from <sstabellini@kernel.org>) id 1d1exG-0002ZI-7e
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:01 -0400
+Received: from mail.kernel.org ([198.145.29.136]:42522)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1d1ehH-00075p-Nm
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 15:58:27 -0400
-From: Stefan Weil <sw@weilnetz.de>
-References: <VI1PR0601MB2479DE114384C023CA45C41E9C040@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-	<20170416080930.luq2l4p3e36vovkj@var.youpi.perso.aquilenet.fr>
-	<VI1PR0601MB2479E581256475D80164322A9C070@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-Message-ID: <cd2a810c-d717-4666-4a95-b185c02d83df@weilnetz.de>
-Date: Fri, 21 Apr 2017 21:58:18 +0200
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1d1exF-0002Z1-Vj
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:14:58 -0400
+Date: Fri, 21 Apr 2017 13:14:51 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+Message-ID: <alpine.DEB.2.10.1704211258580.18403@sstabellini-ThinkPad-X260>
 MIME-Version: 1.0
-In-Reply-To: <VI1PR0601MB2479E581256475D80164322A9C070@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] dns server not working in QEMU using usermode
- networking (SLIRP)
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Qemu-devel] [PULL 0/21] Please pull xen-20170421-tag for 2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,32 +24,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: FONNEMANN Mark <mark.fonnemann@hexagon.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Samuel Thibault <samuel.thibault@gnu.org>
+To: peter.maydell@linaro.org, stefanha@gmail.com
+Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
 
-Am 17.04.2017 um 00:10 schrieb FONNEMANN Mark:
-> This issue still exists for me in 2.9 rc4.
->
-> -----Original Message-----
-> From: Samuel Thibault [mailto:samuel.thibault@gnu.org]
-> Sent: Sunday, April 16, 2017 04:10
-> To: FONNEMANN Mark <mark.fonnemann@hexagon.com>
-> Cc: qemu-devel@nongnu.org
-> Subject: Re: [Qemu-devel] dns server not working in QEMU using usermode networking (SLIRP)
->
-> Hello,
->
-> I hadn't seen the original report on the list, sorry. There is too much traffic on qemu-devel for me to manage to catch these :/
->
-> This problem was fixed by
-> e42f869b ("slirp: Make RA build more flexible") and a2f80fdf ("slirp: Send RDNSS in RA only if host has an IPv6 DNS server") which will be included in qemu 2.9.
->
-> Samuel
+The following changes since commit 55a19ad8b2d0797e3a8fe90ab99a9bb713824059:
 
-See report on 
-http://stackoverflow.com/questions/43308310/dns-server-not-working-in-qemu-usermode-networking.
+  Update version for v2.9.0-rc1 release (2017-03-21 17:13:29 +0000)
 
-Mark, did you also get that problem with QEMU running on a Linux host,
-or is it specific for QEMU running on Windows?
+are available in the git repository at:
 
-Regards,
-Stefan
+  git://xenbits.xen.org/people/sstabellini/qemu-dm.git tags/xen-20170421-tag
+
+for you to fetch changes up to b0d48550a2d10f0fa8c30a7cc3ff5a1cbda8d4c4:
+
+  move xen-mapcache.c to hw/i386/xen/ (2017-04-21 12:41:29 -0700)
+
+----------------------------------------------------------------
+Xen 2017/04/21
+
+----------------------------------------------------------------
+Anthony Xu (3):
+      move xen-common.c to hw/xen/
+      move xen-hvm.c to hw/i386/xen/
+      move xen-mapcache.c to hw/i386/xen/
+
+Juergen Gross (2):
+      xen: use 5 digit xen versions
+      configure: use pkg-config for obtaining xen version
+
+Paul Durrant (7):
+      xen: make use of xen_xc implicit in xen_common.h inlines
+      xen: rename xen_modified_memory() to xen_hvm_modified_memory()
+      xen: create wrappers for all other uses of xc_hvm_XXX() functions
+      configure: detect presence of libxendevicemodel
+      xen: use libxendevicemodel when available
+      xen: use libxendevice model to restrict operations
+      xen: additionally restrict xenforeignmemory operations
+
+Stefano Stabellini (9):
+      xen: import ring.h from xen
+      9p: introduce a type for the 9p header
+      xen/9pfs: introduce Xen 9pfs backend
+      xen/9pfs: connect to the frontend
+      xen/9pfs: receive requests from the frontend
+      xen/9pfs: implement in/out_iov_from_pdu and vmarshal/vunmarshal
+      xen/9pfs: send responses back to the frontend
+      xen/9pfs: build and register Xen 9pfs backend
+      add xen-9p-backend to MAINTAINERS under Xen
+
+ MAINTAINERS                                  |   1 +
+ Makefile.target                              |   6 -
+ configure                                    | 164 +++++----
+ default-configs/i386-softmmu.mak             |   1 -
+ default-configs/x86_64-softmmu.mak           |   1 -
+ hw/9pfs/9p.h                                 |   6 +
+ hw/9pfs/Makefile.objs                        |   1 +
+ hw/9pfs/virtio-9p-device.c                   |   6 +-
+ hw/9pfs/xen-9p-backend.c                     | 443 ++++++++++++++++++++++++
+ hw/block/xen_blkif.h                         |   2 +-
+ hw/block/xen_disk.c                          |   2 +-
+ hw/i386/xen/Makefile.objs                    |   2 +-
+ hw/i386/xen/trace-events                     |  17 +
+ xen-hvm.c => hw/i386/xen/xen-hvm.c           |  59 ++--
+ xen-mapcache.c => hw/i386/xen/xen-mapcache.c |   2 +-
+ hw/i386/xen/xen_platform.c                   |   2 +-
+ hw/usb/xen-usb.c                             |   2 +-
+ hw/xen/Makefile.objs                         |   2 +-
+ hw/xen/trace-events                          |   1 +
+ xen-common.c => hw/xen/xen-common.c          |  11 +
+ hw/xen/xen_backend.c                         |   5 +-
+ include/exec/ram_addr.h                      |   4 +-
+ include/hw/xen/io/ring.h                     | 482 +++++++++++++++++++++++++++
+ include/hw/xen/xen.h                         |   3 +-
+ include/hw/xen/xen_backend.h                 |   5 +-
+ include/hw/xen/xen_common.h                  | 345 +++++++++++++++----
+ qemu-options.hx                              |   7 +
+ stubs/Makefile.objs                          |   2 +
+ xen-common-stub.c => stubs/xen-common.c      |   0
+ xen-hvm-stub.c => stubs/xen-hvm.c            |   2 +-
+ trace-events                                 |  16 -
+ vl.c                                         |   8 +
+ 32 files changed, 1417 insertions(+), 193 deletions(-)
+ create mode 100644 hw/9pfs/xen-9p-backend.c
+ rename xen-hvm.c => hw/i386/xen/xen-hvm.c (96%)
+ rename xen-mapcache.c => hw/i386/xen/xen-mapcache.c (99%)
+ rename xen-common.c => hw/xen/xen-common.c (91%)
+ create mode 100644 include/hw/xen/io/ring.h
+ rename xen-common-stub.c => stubs/xen-common.c (100%)
+ rename xen-hvm-stub.c => stubs/xen-hvm.c (94%)
