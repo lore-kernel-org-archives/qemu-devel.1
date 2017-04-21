@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d1VSK-0003Qe-DG
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:06:25 -0400
+	(envelope-from <berrange@redhat.com>) id 1d1VSf-0003e7-69
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:06:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d1VSH-0006qR-4j
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:06:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59672)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d1VSG-0006q5-UE
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:06:21 -0400
-References: <1492631083-23965-1-git-send-email-joserz@linux.vnet.ibm.com>
-	<a8eb495d-7c03-2d6f-c8df-3970f08bc05d@twiddle.net>
-	<20170420100301.51a7f10c@t450s.home>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <07d71898-c392-c14a-9901-87ad4287bd5d@redhat.com>
-Date: Fri, 21 Apr 2017 12:06:15 +0200
+	(envelope-from <berrange@redhat.com>) id 1d1VSe-0006tO-3A
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:06:45 -0400
+Date: Fri, 21 Apr 2017 11:06:29 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170421100629.GN27925@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170420040003.31074-1-famz@redhat.com>
+	<20170420153016.GI3227@redhat.com>
+	<20170420203250.GI4747@noname.redhat.com>
+	<87pog61fjr.fsf@dusky.pond.sub.org>
+	<20170421083137.GD27925@redhat.com>
+	<20170421085034.GD8342@lemon.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170420100301.51a7f10c@t450s.home>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/2] VFIO: Make 8-byte accesses atomic
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170421085034.GD8342@lemon.lan>
+Subject: Re: [Qemu-devel] [PATCH] sheepdog: Set error when connection fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +28,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, Richard Henderson <rth@twiddle.net>
-Cc: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, qemu-devel@nongnu.org, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com
+To: Fam Zheng <famz@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, sheepdog@lists.wpkg.org, qemu-block@nongnu.org, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Liu Yuan <namei.unix@gmail.com>
 
-
-
-On 20/04/2017 18:03, Alex Williamson wrote:
-> On Thu, 20 Apr 2017 00:19:23 -0700
-> Richard Henderson <rth@twiddle.net> wrote:
+On Fri, Apr 21, 2017 at 04:50:34PM +0800, Fam Zheng wrote:
+> On Fri, 04/21 09:31, Daniel P. Berrange wrote:
+> > On Fri, Apr 21, 2017 at 07:43:36AM +0200, Markus Armbruster wrote:
+> > > Kevin Wolf <kwolf@redhat.com> writes:
+> > > 
+> > > > Am 20.04.2017 um 17:30 hat Daniel P. Berrange geschrieben:
+> > > >> On Thu, Apr 20, 2017 at 12:00:03PM +0800, Fam Zheng wrote:
+> > > >> > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > > >> > ---
+> > > >> >  block/sheepdog.c | 1 +
+> > > >> >  1 file changed, 1 insertion(+)
+> > > >> > 
+> > > >> > diff --git a/block/sheepdog.c b/block/sheepdog.c
+> > > >> > index fb9203e..7e889ee 100644
+> > > >> > --- a/block/sheepdog.c
+> > > >> > +++ b/block/sheepdog.c
+> > > >> > @@ -608,6 +608,7 @@ static int connect_to_sdog(BDRVSheepdogState *s, Error **errp)
+> > > >> >          qemu_set_nonblock(fd);
+> > > >> >      } else {
+> > > >> >          fd = -EIO;
+> > > >> > +        error_setg(errp, "Failed to connect to sheepdog server");
+> > > >> >      }
+> > > >> 
+> > > >> This doesn't make much sense to me. The lines just above the
+> > > >> diff context have this:
+> > > >> 
+> > > >>     fd = socket_connect(s->addr, errp, NULL, NULL);
+> > > >> 
+> > > >> socket_connect should have already reported an error on "errp"
+> > > >> in the scenario that 'fd == -1'.
+> > > >
+> > > > By the way, am I the only one who thinks that having errp anywhere else
+> > > > than as the last argument is bad style? I can easily see myself missing
+> > > > that this functions sets it because the last argument is NULL.
+> > > 
+> > > Yes, it's bad style because it's suprising.  Worth fixing.
+> > 
+> > In fact we can simply delete the last two arguments to socket_connect()
+> > entirely. Most code is now switched over to use QIOChannel APIs, so we
+> > don't have anything which uses the non-blocking connect feature of
+> > socket_connect() anymore.
 > 
->> On 04/19/2017 12:44 PM, Jose Ricardo Ziviani wrote:
->>> This patchset has two patches:
->>> [1] 8-byte writes to non-mapped MMIO are broken into pairs of 4-byte writes, this patch makes such pairs atomic.
->>>
->>> [2] Enable 8-byte accesses in vfio_region_write and vfio_region_read.
->>>
->>> Patches based on master.
->>>
->>> Jose Ricardo Ziviani (2):
->>>   vfio: Set MemoryRegionOps:max_access_size and min_access_size
->>>   vfio: enable 8-byte reads/writes to vfio
->>>
->>>  hw/vfio/common.c | 14 ++++++++++++++
->>>  1 file changed, 14 insertions(+)
->>>  
->>
->> I think these patches need to be squashed to be bisectable.
+> There is one caller that passes non-NULL last two parameters, which seems
+> non-trivial to convert:
 > 
-> No, I think it's fine.  The point of patch 1/2 is to indicate that the
-> hardware supports 8-byte accesses, which will still be broken into 2
-> 4-byte accesses because we don't yet set the implemented width beyond
-> the default.  The important part is that the mutex will now group the 4
-> byte access pair together rather than letting them get re-ordered.
-> Patch 2/2 then implements native 8-byte access.  I appreciate them
-> being separate for this subtle nuance, but maybe I'm not seeing the
-> same issue as you.  Thanks,
-'
-I agree, the patches looks fine as is.
+> static int net_socket_connect_init(NetClientState *peer,
+>                                    const char *model,
+>                                    const char *name,
+>                                    const char *host_str)
+> {
+>     socket_connect_data *c = g_new0(socket_connect_data, 1);
+>     int fd = -1;
+>     Error *local_error = NULL;
+> 
+>     c->peer = peer;
+>     c->model = g_strdup(model);
+>     c->name = g_strdup(name);
+>     c->saddr = socket_parse(host_str, &local_error);
+>     if (c->saddr == NULL) {
+>         goto err;
+>     }
+> 
+>     fd = socket_connect(c->saddr, net_socket_connected, c, &local_error);
+>     if (fd < 0) {
+>         goto err;
+>     }
+> 
+>     return 0;
+> 
+> err:
+>     error_report_err(local_error);
+>     socket_connect_data_free(c);
+>     return -1;
+> }
 
-Paolo
+Oh i missed that in my grep. I think it could probably be converted to
+QIOChannel though, at least for the initial connection setup. Then
+just steal the FD from the QIOChannel object for direct usage thereafter
+or something like that.
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
