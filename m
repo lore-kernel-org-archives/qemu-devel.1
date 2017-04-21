@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1d1VG7-0005t0-ME
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:53:48 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1d1VJy-0008Kg-Aa
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:57:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1d1VG6-0002Wf-D7
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:53:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42688)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1d1VG6-0002WQ-6O
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:53:46 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri, 21 Apr 2017 10:53:34 +0100
-Message-Id: <20170421095334.26692-4-stefanha@redhat.com>
-In-Reply-To: <20170421095334.26692-1-stefanha@redhat.com>
-References: <20170421095334.26692-1-stefanha@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL for-2.9 3/3] simpletrace: document Analyzer
- method signatures
+	(envelope-from <jemmy858585@gmail.com>) id 1d1VJu-0003Yd-Cy
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:57:46 -0400
+From: jemmy858585@gmail.com
+Date: Fri, 21 Apr 2017 17:57:34 +0800
+Message-Id: <1492768654-11053-1-git-send-email-lidongchen@tencent.com>
+Subject: [Qemu-devel] [PATCH v2] qemu-img: use blk_co_pwrite_zeroes for zero
+ sectors when compressed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +19,94 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, Lidong Chen <lidongchen@tencent.com>
 
-Users can inherit from the simpletrace.Analyzer class and receive
-callbacks when events of interest occur in a trace file.  The method
-signature is a little magic because the timestamp and pid arguments are
-optional.  Document this.
+From: Lidong Chen <lidongchen@tencent.com>
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Message-id: 20170411095654.18383-1-stefanha@redhat.com
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+when the buffer is zero, blk_co_pwrite_zeroes is more effectively than
+blk_co_pwritev with BDRV_REQ_WRITE_COMPRESSED. this patch can reduces
+the time when converts the qcow2 image with lots of zero.
+
+Signed-off-by: Lidong Chen <lidongchen@tencent.com>
 ---
- scripts/simpletrace.py | 23 ++++++++++++++++++++++-
- 1 file changed, 22 insertions(+), 1 deletion(-)
+v2 changelog:
+    unify the compressed and non-compressed code paths
+---
+ qemu-img.c | 41 +++++++++++------------------------------
+ 1 file changed, 11 insertions(+), 30 deletions(-)
 
-diff --git a/scripts/simpletrace.py b/scripts/simpletrace.py
-index 4c99004..d60b3a0 100755
---- a/scripts/simpletrace.py
-+++ b/scripts/simpletrace.py
-@@ -116,7 +116,28 @@ class Analyzer(object):
-     is invoked.
-=20
-     If a method matching a trace event name exists, it is invoked to pro=
-cess
--    that trace record.  Otherwise the catchall() method is invoked."""
-+    that trace record.  Otherwise the catchall() method is invoked.
+diff --git a/qemu-img.c b/qemu-img.c
+index b220cf7..60c9adf 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -1661,6 +1661,8 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
+ 
+     while (nb_sectors > 0) {
+         int n = nb_sectors;
++        BdrvRequestFlags flags = s->compressed ? BDRV_REQ_WRITE_COMPRESSED : 0;
 +
-+    Example:
-+    The following method handles the runstate_set(int new_state) trace e=
-vent::
+         switch (status) {
+         case BLK_BACKING_FILE:
+             /* If we have a backing file, leave clusters unallocated that are
+@@ -1670,43 +1672,21 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
+             break;
+ 
+         case BLK_DATA:
+-            /* We must always write compressed clusters as a whole, so don't
+-             * try to find zeroed parts in the buffer. We can only save the
+-             * write if the buffer is completely zeroed and we're allowed to
+-             * keep the target sparse. */
+-            if (s->compressed) {
+-                if (s->has_zero_init && s->min_sparse &&
+-                    buffer_is_zero(buf, n * BDRV_SECTOR_SIZE))
+-                {
+-                    assert(!s->target_has_backing);
+-                    break;
+-                }
+-
+-                iov.iov_base = buf;
+-                iov.iov_len = n << BDRV_SECTOR_BITS;
+-                qemu_iovec_init_external(&qiov, &iov, 1);
+-
+-                ret = blk_co_pwritev(s->target, sector_num << BDRV_SECTOR_BITS,
+-                                     n << BDRV_SECTOR_BITS, &qiov,
+-                                     BDRV_REQ_WRITE_COMPRESSED);
+-                if (ret < 0) {
+-                    return ret;
+-                }
+-                break;
+-            }
+-
+-            /* If there is real non-zero data or we're told to keep the target
+-             * fully allocated (-S 0), we must write it. Otherwise we can treat
++            /* If we're told to keep the target fully allocated (-S 0) or there
++             * is real non-zero data, we must write it. Otherwise we can treat
+              * it as zero sectors. */
+             if (!s->min_sparse ||
+-                is_allocated_sectors_min(buf, n, &n, s->min_sparse))
+-            {
++                (!s->compressed &&
++                 is_allocated_sectors_min(buf, n, &n, s->min_sparse)) ||
++                (s->compressed &&
++                 !buffer_is_zero(buf, n * BDRV_SECTOR_SIZE))) {
 +
-+      def runstate_set(self, new_state):
-+          ...
-+
-+    The method can also take a timestamp argument before the trace event
-+    arguments::
-+
-+      def runstate_set(self, timestamp, new_state):
-+          ...
-+
-+    Timestamps have the uint64_t type and are in nanoseconds.
-+
-+    The pid can be included in addition to the timestamp and is useful w=
-hen
-+    dealing with traces from multiple processes::
-+
-+      def runstate_set(self, timestamp, pid, new_state):
-+          ...
-+    """
-=20
-     def begin(self):
-         """Called at the start of the trace."""
---=20
-2.9.3
+                 iov.iov_base = buf;
+                 iov.iov_len = n << BDRV_SECTOR_BITS;
+                 qemu_iovec_init_external(&qiov, &iov, 1);
+ 
+                 ret = blk_co_pwritev(s->target, sector_num << BDRV_SECTOR_BITS,
+-                                     n << BDRV_SECTOR_BITS, &qiov, 0);
++                                     n << BDRV_SECTOR_BITS, &qiov, flags);
+                 if (ret < 0) {
+                     return ret;
+                 }
+@@ -1716,6 +1696,7 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
+ 
+         case BLK_ZERO:
+             if (s->has_zero_init) {
++                assert(!s->target_has_backing);
+                 break;
+             }
+             ret = blk_co_pwrite_zeroes(s->target,
+-- 
+1.8.3.1
