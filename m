@@ -1,23 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1d1W1A-00045D-LG
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:42:25 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1d1W1M-0004CB-A5
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:42:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1d1W17-0008PM-J7
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:42:24 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:25171)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1d1W17-0008O0-By
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:42:21 -0400
-Date: Fri, 21 Apr 2017 12:42:18 +0200 (CEST)
+	(envelope-from <balaton@eik.bme.hu>) id 1d1W1K-000057-C2
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:42:36 -0400
+Message-Id: <3d654355201680faca4375eed57f312de8736df1.1492770667.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1492770667.git.balaton@eik.bme.hu>
+References: <cover.1492770667.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20170421091632.30900-10-kraxel@redhat.com>
-Message-ID: <alpine.BSF.2.20.1704211236100.58688@zero.eik.bme.hu>
-References: <20170421091632.30900-1-kraxel@redhat.com>
-	<20170421091632.30900-10-kraxel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH 9/9] sm501: make display updates thread safe
+Date: Fri, 21 Apr 2017 12:31:07 +0200
+Subject: [Qemu-devel] [PATCH v6 07/13] sm501: Fix device endianness
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,16 +19,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
 
-On Fri, 21 Apr 2017, Gerd Hoffmann wrote:
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
-> hw/display/sm501.c | 23 ++++++-----------------
-> 1 file changed, 6 insertions(+), 17 deletions(-)
+We only emulate the sysbus device in its default LE mode and PCI is LE
+as well so specify this for registers and framebuffer memory.
 
-Hold on with this please too. I have a series pending that changes this.
+Note that though the Linux kernel driver has code which claims to
+handle both big and little endian, it is obviously bogus for 16 bit
+and cannot be trusted as a source of information on the framebuffer
+pixel format. This is our best guess about device behaviour based on
+the specs and testing with MorphOS that is known to work on real HW.
 
-Regards,
-BALATON Zoltan
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+---
+
+v2: Split off small clean up to other patch
+v4: Set serial part to little endian as well
+v5: Make framebuffer always LE as suggested by Peter Maydell
+v6: Extended commit message
+
+ hw/display/sm501.c          |  8 ++++----
+ hw/display/sm501_template.h | 19 ++++++-------------
+ 2 files changed, 10 insertions(+), 17 deletions(-)
+
+diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+index c92a5fa..a628ef1 100644
+--- a/hw/display/sm501.c
++++ b/hw/display/sm501.c
+@@ -850,7 +850,7 @@ static const MemoryRegionOps sm501_system_config_ops = {
+         .min_access_size = 4,
+         .max_access_size = 4,
+     },
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
+ static uint32_t sm501_palette_read(void *opaque, hwaddr addr)
+@@ -1086,7 +1086,7 @@ static const MemoryRegionOps sm501_disp_ctrl_ops = {
+         .min_access_size = 4,
+         .max_access_size = 4,
+     },
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
+ static uint64_t sm501_2d_engine_read(void *opaque, hwaddr addr,
+@@ -1174,7 +1174,7 @@ static const MemoryRegionOps sm501_2d_engine_ops = {
+         .min_access_size = 4,
+         .max_access_size = 4,
+     },
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
+ /* draw line functions for all console modes */
+@@ -1510,7 +1510,7 @@ static void sm501_realize_sysbus(DeviceState *dev, Error **errp)
+     if (s->chr_state) {
+         serial_mm_init(&s->state.mmio_region, SM501_UART0, 2,
+                        NULL, /* TODO : chain irq to IRL */
+-                       115200, s->chr_state, DEVICE_NATIVE_ENDIAN);
++                       115200, s->chr_state, DEVICE_LITTLE_ENDIAN);
+     }
+ }
+ 
+diff --git a/hw/display/sm501_template.h b/hw/display/sm501_template.h
+index 832ee61..54807bd 100644
+--- a/hw/display/sm501_template.h
++++ b/hw/display/sm501_template.h
+@@ -64,10 +64,10 @@ static void glue(draw_line16_, PIXEL_NAME)(
+     uint8_t r, g, b;
+ 
+     do {
+-        rgb565 = lduw_p(s);
+-        r = ((rgb565 >> 11) & 0x1f) << 3;
+-        g = ((rgb565 >>  5) & 0x3f) << 2;
+-        b = ((rgb565 >>  0) & 0x1f) << 3;
++        rgb565 = lduw_le_p(s);
++        r = (rgb565 >> 8) & 0xf8;
++        g = (rgb565 >> 3) & 0xfc;
++        b = (rgb565 << 3) & 0xf8;
+         *(PIXEL_TYPE *)d = glue(rgb_to_pixel, PIXEL_NAME)(r, g, b);
+         s += 2;
+         d += BPP;
+@@ -80,16 +80,9 @@ static void glue(draw_line32_, PIXEL_NAME)(
+     uint8_t r, g, b;
+ 
+     do {
+-        ldub_p(s);
+-#if defined(TARGET_WORDS_BIGENDIAN)
+-        r = s[1];
+-        g = s[2];
+-        b = s[3];
+-#else
+-        b = s[0];
+-        g = s[1];
+         r = s[2];
+-#endif
++        g = s[1];
++        b = s[0];
+         *(PIXEL_TYPE *)d = glue(rgb_to_pixel, PIXEL_NAME)(r, g, b);
+         s += 4;
+         d += BPP;
+-- 
+2.7.4
