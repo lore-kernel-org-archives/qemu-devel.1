@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d1bqA-0002OP-Dr
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 12:55:27 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1d1cHW-0003EJ-KA
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 13:23:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d1bq9-0001WI-Eg
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 12:55:26 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:33002)
+	(envelope-from <peter.maydell@linaro.org>) id 1d1cHV-0001oL-Qb
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 13:23:42 -0400
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:36441)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1d1bq9-0001Vx-6d
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 12:55:25 -0400
-Received: by mail-wr0-x234.google.com with SMTP id w50so34965681wrc.0
-	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 09:55:24 -0700 (PDT)
+	id 1d1cHV-0001oF-Jz
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 13:23:41 -0400
+Received: by mail-wm0-x230.google.com with SMTP id o81so20808535wmb.1
+	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 10:23:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170421134644.10239-1-jcody@redhat.com>
-References: <20170421134644.10239-1-jcody@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 21 Apr 2017 17:55:02 +0100
-Message-ID: <CAFEAcA95ex0YG4tD-qdSQrfEiL-RFWumq-qGS3Ej=o6MUmA7Jw@mail.gmail.com>
+Date: Fri, 21 Apr 2017 18:23:19 +0100
+Message-ID: <CAFEAcA_3fm+-6QaH0eb46wF7OS1qFnCEcEBa-q6UnGZD5HemPA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 00/12] Block patches
+Subject: [Qemu-devel] How expensive is an extra QEMU TLB MMU index ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +26,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-On 21 April 2017 at 14:46, Jeff Cody <jcody@redhat.com> wrote:
-> The following changes since commit bfec359afba088aaacc7d316f43302f28c6e642a:
->
->   Merge remote-tracking branch 'remotes/armbru/tags/pull-qdev-2017-04-21' into staging (2017-04-21 11:42:03 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/codyprime/qemu-kvm-jtc.git tags/block-pull-request
->
-> for you to fetch changes up to 1507631e438930bc07f776f303af127a9cdb4d41:
->
->   qemu-iotests: _cleanup_qemu must be called on exit (2017-04-21 08:32:44 -0400)
->
-> ----------------------------------------------------------------
->
-> Block patches for 2.10
->
+Hi; I have a feature for the ARM M profile emulation which I think
+needs to be implemented by giving it a separate mmu index value.
+[The HFNMIENA control bit allows "privileged and execution priority
+is higher than 0" to run with the MPU effectively off even if normal
+privileged execution has enabled the MPU.]
 
-Hi, I'm afraid this runs into format string compile issues:
+I could implement this by just bumping ARM's NB_MMU_MODES to 8
+and using the extra value for this. On the other hand, several
+of the current 7 index values are not needed for M profile CPUs,
+so in theory I could reuse one of those (so it would have different
+meanings if the CPU was M profile or not). But that feels like it would
+be pretty accident-prone, since so much of the code is shared.
 
-In file included from block/trace.c:4:
-/Users/pm215/src/qemu-for-merges/build/all/block/trace.h:1465:42:
-error: format specifies type 'unsigned long' but the argument has type
-'uint64_t' (aka 'unsigned long long') [-Werror,-Wformat]
-                          , guid, iodir, size, off, acb, ret, err);
-                                         ^~~~
-/Users/pm215/src/qemu-for-merges/include/qemu/log.h:94:30: note:
-expanded from macro 'qemu_log_mask'
-            qemu_log(FMT, ## __VA_ARGS__);              \
-                             ^
-In file included from block/trace.c:4:
-/Users/pm215/src/qemu-for-merges/build/all/block/trace.h:1465:48:
-error: format specifies type 'unsigned long' but the argument has type
-'uint64_t' (aka 'unsigned long long') [-Werror,-Wformat]
-                          , guid, iodir, size, off, acb, ret, err);
-                                               ^~~
-/Users/pm215/src/qemu-for-merges/include/qemu/log.h:94:30: note:
-expanded from macro 'qemu_log_mask'
-            qemu_log(FMT, ## __VA_ARGS__);              \
-                             ^
-In file included from block/trace.c:4:
-/Users/pm215/src/qemu-for-merges/build/all/block/trace.h:1493:41:
-error: format specifies type 'unsigned long' but the argument has type
-'uint64_t' (aka 'unsigned long long') [-Werror,-Wformat]
-                          , vdisk_guid, vdisk_size);
-                                        ^~~~~~~~~~
-/Users/pm215/src/qemu-for-merges/include/qemu/log.h:94:30: note:
-expanded from macro 'qemu_log_mask'
-            qemu_log(FMT, ## __VA_ARGS__);              \
-                             ^
-In file included from block/trace.c:4:
-/Users/pm215/src/qemu-for-merges/build/all/block/trace.h:1507:34:
-error: format specifies type 'long' but the argument has type
-'uint64_t' (aka 'unsigned long long') [-Werror,-Wformat]
-                          , acb, ret);
-                                 ^~~
-/Users/pm215/src/qemu-for-merges/include/qemu/log.h:94:30: note:
-expanded from macro 'qemu_log_mask'
-            qemu_log(FMT, ## __VA_ARGS__);              \
-                             ^
-4 errors generated.
-
-
-Those are the OSX errors, but the compile also fails for 32-bit
-hosts (including w32).
+So, just how expensive is having an extra MMU mode which isn't
+actually used? Is it bad enough to be worth the reduced
+maintainability?
 
 thanks
 -- PMM
