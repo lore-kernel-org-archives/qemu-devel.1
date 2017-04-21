@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d1llj-0005jv-Jq
+	(envelope-from <eblake@redhat.com>) id 1d1llj-0005j7-D4
 	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 23:31:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d1lli-0004xv-GE
+	(envelope-from <eblake@redhat.com>) id 1d1lli-0004xq-D8
 	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 23:31:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38344)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d1lli-0004wu-3o
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 23:31:30 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2B8D6F806D
+	for <qemu-devel@nongnu.org>; Sat, 22 Apr 2017 02:54:14 +0000 (UTC)
+References: <20170421122710.15373-1-famz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-References: <20170421035606.448-1-famz@redhat.com>
-	<20170421035606.448-5-famz@redhat.com>
-	<20170421132509.GD4318@noname.redhat.com>
-Message-ID: <65060af3-0984-dd20-43b7-1257d2dcbb6b@redhat.com>
-Date: Fri, 21 Apr 2017 10:35:18 -0500
+Message-ID: <b44af76d-400e-10cb-19a3-fe9e107f602d@redhat.com>
+Date: Fri, 21 Apr 2017 09:45:26 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170421132509.GD4318@noname.redhat.com>
+In-Reply-To: <20170421122710.15373-1-famz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="VnroslwBRdMJPe2kMXEJj2G83mi0LwSg9"
-Subject: Re: [Qemu-devel] [PATCH v14 04/20] qemu-img: Add --share-rw option
- to subcommands
+	boundary="trxgx6WJAURCgx2av7raGdS24Xh608x1e"
+Subject: Re: [Qemu-devel] [PATCH 00/14] Trivial cleanups around error
+ reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,88 +34,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---VnroslwBRdMJPe2kMXEJj2G83mi0LwSg9
+--trxgx6WJAURCgx2av7raGdS24Xh608x1e
 From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- qemu-block@nongnu.org
-Message-ID: <65060af3-0984-dd20-43b7-1257d2dcbb6b@redhat.com>
-Subject: Re: [PATCH v14 04/20] qemu-img: Add --share-rw option to subcommands
-References: <20170421035606.448-1-famz@redhat.com>
- <20170421035606.448-5-famz@redhat.com>
- <20170421132509.GD4318@noname.redhat.com>
-In-Reply-To: <20170421132509.GD4318@noname.redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>
+Message-ID: <b44af76d-400e-10cb-19a3-fe9e107f602d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 00/14] Trivial cleanups around error
+ reporting
+References: <20170421122710.15373-1-famz@redhat.com>
+In-Reply-To: <20170421122710.15373-1-famz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 04/21/2017 08:25 AM, Kevin Wolf wrote:
-> Am 21.04.2017 um 05:55 hat Fam Zheng geschrieben:
->> Similar to share-rw qdev property, this will force the opened images t=
-o
->> allow shared write permission of other programs.
->>
->> Signed-off-by: Fam Zheng <famz@redhat.com>
+On 04/21/2017 07:26 AM, Fam Zheng wrote:
+> These are patches to:
 >=20
-> General observation: We were considering to make share-rw require
-> read-only. Some of the commands converted here always open the image
-> read-write, so if we go ahead with the restriction, will the option
-> become useless in many of the subcommands?
+> 1) reorder the function parameters so that Error **errp comes
+> last.
 >=20
-
->>  static BlockBackend *img_open_opts(const char *optstr,
->>                                     QemuOpts *opts, int flags, bool wr=
-itethrough,
->> -                                   bool quiet)
->> +                                   bool quiet, bool share_rw)
->>  {
->>      QDict *options;
->>      Error *local_err =3D NULL;
->>      BlockBackend *blk;
->>      options =3D qemu_opts_to_qdict(opts, NULL);
->> +    if (share_rw) {
->> +        qdict_put(options, BDRV_OPT_FORCE_SHARED_WRITE, qbool_from_bo=
-ol(true));
->> +    }
+> Error pointer in the middle of a function parameter list is very uncomm=
+on, and
+> does caused mistakes, thus is not a good style. Change to the usual way=
+=2E
 >=20
-> It's interesting that you chose a conditional qdict_put for true rather=
-
-> than an unconditional one for share_rw here. The difference becomes
-> visible when someone sets both -U and share-rw=3Doff; we need to decide=
-
-> which one should take precedence.
+> 2) apply the error_propagate_null.cocci semantics patch again.
 >=20
-> Generally, we always give explicit options the precedence, so if we wer=
-e
-> to follow suit here, we would set share-rw here only if the option isn'=
-t
-> already set. For strings, we have qdict_set_default_str() to achieve
-> this, for bools we probably need a new function (or does Eric's series
-> which introduces qdict_put_bool() also introduce a similar function,
-> like some qdict_set_default_bool?)
+> Fam Zheng (14):
+>   socket: Make errp the last parameter of socket_connect
+>   socket: Make errp the last parameter of inet_connect_saddr
+>   socket: Make errp the last parameter of unix_connect_saddr
+>   socket: Make errp the last parameter of vsock_connect_saddr
+>   block: Make errp the last parameter of bdrv_img_create
+>   crypto: Make errp the last parameter of functions
+>   mirror: Make errp the last parameter of mirror_start_job
+>   block: Make errp the last parameter of commit_active_start
+>   nfs: Make errp the last parameter of nfs_client_open
+>   fdc: Make errp the last parameter of fdctrl_connect_drives
+>   scsi: Make errp the last parameter of virtio_scsi_common_realize
+>   migration: Make errp the last parameter of local functions
+>   qga: Make errp the last parameter of qga_vss_fsfreeze
+>   error: Apply error_propagate_null.cocci again
 
-It doesn't (yet), but I could add one if it is a common pattern that we
-envision using.
+Series:
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-
->> @@ -3126,6 +3182,9 @@ static int img_rebase(int argc, char **argv)
->>              qdict_put(options, "driver", qstring_from_str(bs->backing=
-_format));
->>          }
->> =20
->> +        if (share_rw) {
->> +            qdict_put(options, BDRV_OPT_FORCE_SHARED_WRITE, qbool_fro=
-m_bool(true));
->=20
-> This is longer than 80 lines and wrapping wouldn't make it unreadable. =
-I
-> think there are more similar instances in this series (even though you
-> replied to the patchew mail that they are intentional).
-
-This one would indeed benefit from my patch for qdict_put_bool().
+but you have a typo in the commit message of 6/14
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -115,8 +90,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
-
---VnroslwBRdMJPe2kMXEJj2G83mi0LwSg9
+--trxgx6WJAURCgx2av7raGdS24Xh608x1e
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -126,13 +100,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJY+ia2AAoJEKeha0olJ0Nq7QIH/2H26FCQcnS2U+mBkTaDscH6
-2lg83AQfNcLBxDPkyc5X4AN6iqN+nPusabY71Ec7+MZpZ7JaSE4dgPlLD/RIUW2l
-Thkkmb6rM0Tjj6GMRMNOyUHFYVBMo6r2J9BeMbl+nJRWhsbosMZCwx3Xs2LatK1I
-TsjT6XOfTem7y8LnpKROFjo4ELXakIFezO9Mu0N7H3dkQ1Vf6M6xhMHn8ZCOWwDU
-Fai2/VntY0w+HdV8E25vqTUlO6W+czHTdSo3tP215NmPbZATfRs5QUXJO/ZqYb5p
-j39ecv/UNxF5qDor8iz8LBC4BPLc4KBIHkReS0mOPmXRFjgB+V+eIzFjOxNiSHI=
-=X0Ug
+iQEcBAEBCAAGBQJY+hsGAAoJEKeha0olJ0NqPHwH/0HTKfIyrWMPDaTDuLkbCmLU
+EDyQxWD1C1Rh7ELtBR6W4kvAAMIdn9ZWuQbSaDIEuwsSkI+jdBl/s+kAiwcfSlKQ
+HIvHzBZKd+AbsK1MKCKiAqNv40+XfHQP4rBKR54P4L+9i7IzfDiGhBWzsQP5xO89
+hD53EbJGASlX9uZX/7OCUx8rhVuoOel4aHKMw/+0zdGXVTxECC/PkDbTsFsJ/cqZ
+GhhP6tmMTCMELowtw4izDAf4RCR4OXOHVQQDVsngLA/YfbHgJc2XTMXh+yZYtjc3
+Olmg0KabSh7EcLXZG2f6PD+djn0jlAX2UgnLtLc91xLX28VzhPvci9eX5lkX9Gs=
+=HorO
 -----END PGP SIGNATURE-----
 
---VnroslwBRdMJPe2kMXEJj2G83mi0LwSg9--
+--trxgx6WJAURCgx2av7raGdS24Xh608x1e--
