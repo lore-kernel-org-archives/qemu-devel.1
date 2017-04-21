@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38487)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Chris.Friesen@windriver.com>) id 1d1bOi-0000An-BP
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 12:27:05 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1d1bqA-0002OP-Dr
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 12:55:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Chris.Friesen@windriver.com>) id 1d1bOe-00023U-6K
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 12:27:04 -0400
-Received: from mail1.windriver.com ([147.11.146.13]:43692)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Chris.Friesen@windriver.com>)
-	id 1d1bOd-00023G-TJ
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 12:27:00 -0400
-Message-ID: <58FA32CC.2060104@windriver.com>
-Date: Fri, 21 Apr 2017 10:26:52 -0600
-From: Chris Friesen <chris.friesen@windriver.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1d1bq9-0001WI-Eg
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 12:55:26 -0400
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:33002)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1d1bq9-0001Vx-6d
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 12:55:25 -0400
+Received: by mail-wr0-x234.google.com with SMTP id w50so34965681wrc.0
+	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 09:55:24 -0700 (PDT)
 MIME-Version: 1.0
-References: <58F92229.1080402@windriver.com>
-	<a09762ce-092f-6fb1-6cc3-08a94a3c3dd1@redhat.com>
-In-Reply-To: <a09762ce-092f-6fb1-6cc3-08a94a3c3dd1@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] question about block size and virtual disks
+In-Reply-To: <20170421134644.10239-1-jcody@redhat.com>
+References: <20170421134644.10239-1-jcody@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 21 Apr 2017 17:55:02 +0100
+Message-ID: <CAFEAcA95ex0YG4tD-qdSQrfEiL-RFWumq-qGS3Ej=o6MUmA7Jw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 00/12] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +28,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+To: Jeff Cody <jcody@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 04/20/2017 03:21 PM, Eric Blake wrote:
-> On 04/20/2017 04:03 PM, Chris Friesen wrote:
-
->> Also, does the 4KB block size get "passed-through" to the guest somehow
->> so that the guest knows it needs to use 4KB blocks, or does that need to
->> be explicitly specified via virtio-blk-pci.logical_block_size and/or
->> virtio-blk-pci.physical_block_size parameters?  (Assuming I'm using
->> virtio-blk-pci.)
+On 21 April 2017 at 14:46, Jeff Cody <jcody@redhat.com> wrote:
+> The following changes since commit bfec359afba088aaacc7d316f43302f28c6e642a:
 >
-> Again, qemu should be passing the advertisement of host properties down
-> to the guest insofar as possible (so a good guest will see that the
-> hardware is 4k only and will not try to make 512-byte requests), but at
-> the same time, qemu should handle guests that are so old that they are
-> blissfully unaware of the hardware advertisements and send 512-byte
-> requests anyway.  Of course, such guests are penalized with
-> read-modify-write delays when submitting 512-byte IO.  But explicitly
-> stating available parameters is always the wisest course of action, if
-> you don't want to rely on defaults changing underneath you.
+>   Merge remote-tracking branch 'remotes/armbru/tags/pull-qdev-2017-04-21' into staging (2017-04-21 11:42:03 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/codyprime/qemu-kvm-jtc.git tags/block-pull-request
+>
+> for you to fetch changes up to 1507631e438930bc07f776f303af127a9cdb4d41:
+>
+>   qemu-iotests: _cleanup_qemu must be called on exit (2017-04-21 08:32:44 -0400)
+>
+> ----------------------------------------------------------------
+>
+> Block patches for 2.10
+>
 
-I did an experiment with qemu-kvm-ev-2.6.0-28.el7_3.6.1, using -drive 
-cache=none,aio=native and an LVM volume as the storage.
+Hi, I'm afraid this runs into format string compile issues:
 
-The guest saw the logical/physical block size as 512B, even though on the host 
-both were 4KB.
+In file included from block/trace.c:4:
+/Users/pm215/src/qemu-for-merges/build/all/block/trace.h:1465:42:
+error: format specifies type 'unsigned long' but the argument has type
+'uint64_t' (aka 'unsigned long long') [-Werror,-Wformat]
+                          , guid, iodir, size, off, acb, ret, err);
+                                         ^~~~
+/Users/pm215/src/qemu-for-merges/include/qemu/log.h:94:30: note:
+expanded from macro 'qemu_log_mask'
+            qemu_log(FMT, ## __VA_ARGS__);              \
+                             ^
+In file included from block/trace.c:4:
+/Users/pm215/src/qemu-for-merges/build/all/block/trace.h:1465:48:
+error: format specifies type 'unsigned long' but the argument has type
+'uint64_t' (aka 'unsigned long long') [-Werror,-Wformat]
+                          , guid, iodir, size, off, acb, ret, err);
+                                               ^~~
+/Users/pm215/src/qemu-for-merges/include/qemu/log.h:94:30: note:
+expanded from macro 'qemu_log_mask'
+            qemu_log(FMT, ## __VA_ARGS__);              \
+                             ^
+In file included from block/trace.c:4:
+/Users/pm215/src/qemu-for-merges/build/all/block/trace.h:1493:41:
+error: format specifies type 'unsigned long' but the argument has type
+'uint64_t' (aka 'unsigned long long') [-Werror,-Wformat]
+                          , vdisk_guid, vdisk_size);
+                                        ^~~~~~~~~~
+/Users/pm215/src/qemu-for-merges/include/qemu/log.h:94:30: note:
+expanded from macro 'qemu_log_mask'
+            qemu_log(FMT, ## __VA_ARGS__);              \
+                             ^
+In file included from block/trace.c:4:
+/Users/pm215/src/qemu-for-merges/build/all/block/trace.h:1507:34:
+error: format specifies type 'long' but the argument has type
+'uint64_t' (aka 'unsigned long long') [-Werror,-Wformat]
+                          , acb, ret);
+                                 ^~~
+/Users/pm215/src/qemu-for-merges/include/qemu/log.h:94:30: note:
+expanded from macro 'qemu_log_mask'
+            qemu_log(FMT, ## __VA_ARGS__);              \
+                             ^
+4 errors generated.
 
-Unless something is being lost in the LVM layer (which is possible) it appears 
-that qemu defaults to 512B block size unless explicitly told otherwise.
 
-Chris
+Those are the OSX errors, but the compile also fails for 32-bit
+hosts (including w32).
+
+thanks
+-- PMM
