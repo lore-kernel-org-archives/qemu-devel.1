@@ -1,30 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1d1SZM-0002ah-Uc
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 03:01:30 -0400
+	(envelope-from <constantin.petra@gmail.com>) id 1d1Scn-0003rU-2P
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 03:05:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1d1SZJ-0004bo-Sl
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 03:01:29 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:49754
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1d1SZJ-0004a7-Ke
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 03:01:25 -0400
-References: <1491381329-3995-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1491381329-3995-4-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<f56ec3d4-236e-2082-db5a-8402eb050503@twiddle.net>
-	<03d1cb2e-7b0d-7ae1-a884-413cf388762e@ilande.co.uk>
-	<56405e09-c3ad-f8dc-7946-2f458727e482@twiddle.net>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <df8a5fdf-a364-91fb-7ef8-08e106ab1374@ilande.co.uk>
-Date: Fri, 21 Apr 2017 08:00:56 +0100
+	(envelope-from <constantin.petra@gmail.com>) id 1d1Scl-0005dF-2I
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 03:05:01 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:35493)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <constantin.petra@gmail.com>)
+	id 1d1Sck-0005d0-LY
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 03:04:58 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id w64so8769465wma.0
+	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 00:04:58 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <56405e09-c3ad-f8dc-7946-2f458727e482@twiddle.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 03/14] cg3: remove unused width and height
- variables
+In-Reply-To: <CAOT14F776jM5frvEazwmtwUXKWDednp+CT9DRP2NbKOGZ2H1_A@mail.gmail.com>
+References: <CAOT14F6f2rHB4Adqo1p-VDgn4dMPUbyuRo8XPa9s7Yin_xK8rQ@mail.gmail.com>
+	<29858b5d-edb6-bc5e-73df-84e8adfd2a61@web.de>
+	<7d43790d-b6ac-c997-69c3-8d0249c7b7be@web.de>
+	<4126cc24-3237-49fd-b28a-7d5583e1b2d4@googlegroups.com>
+	<1d51b078-d8e4-bea2-064b-2d7a8e41e9eb@web.de>
+	<CAOT14F6XqnYaKmNry-SN3uXzmm0Sv8RUM48074=t2d2Qmi+bkA@mail.gmail.com>
+	<CAOT14F77f3tdWDHMyVj1itUiyRPwp2GYgJwKuHF+WM1a-grbjQ@mail.gmail.com>
+	<363c3493-f7f4-25de-d679-3726651706c1@web.de>
+	<CAFEAcA9p0OuKt9yKsmB9qDnqR-EuVR8qzS9oENAW=MGkVE4CcA@mail.gmail.com>
+	<4c587382-b690-5011-6571-9361c30b2384@web.de>
+	<20170419203005.GG19639@toto>
+	<CAOT14F776jM5frvEazwmtwUXKWDednp+CT9DRP2NbKOGZ2H1_A@mail.gmail.com>
+From: Constantin Petra <constantin.petra@gmail.com>
+Date: Fri, 21 Apr 2017 10:04:56 +0300
+Message-ID: <CAOT14F7Bj5+s5EyceAUchNofLXY34ZwvfaosdUQt+NcSpip1PA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] Jailhouse on Ultrascale+ (ZCU102)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,74 +39,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, kraxel@redhat.com, qemu-devel@nongnu.org
+To: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Jan Kiszka <jan.kiszka@web.de>, Jailhouse <jailhouse-dev@googlegroups.com>
 
-On 18/04/17 15:55, Richard Henderson wrote:
+OK,
 
-> On 04/18/2017 07:38 AM, Mark Cave-Ayland wrote:
->> On 15/04/17 11:54, Richard Henderson wrote:
+Changed configs for inmate to UART0, and the messages appeared on the
+console (on the ZCU102 board, not QEMU), so it is indeed functional.
+root@plnx_aarch64:~# jailhouse/usr/local/sbin/jailhouse cell start
+ZynqMP-linux-demo
+Started cell "ZynqMP-linux-demo"
+Hello 1 from cell!
+Hello 2 from cell!
+Hello 3 from cell!
+---
+etc
+
+Edgar, are the images I have sent of any help?
+Let me know if you need any other information about the setup.
+
+Best Regards,
+Constantin
+P.S. Sent the above previously by chance only to Edgar, reposted again for
+the larger audience :)
+
+On Thu, Apr 20, 2017 at 11:19 AM, Constantin Petra <
+constantin.petra@gmail.com> wrote:
+
+> Hi,
+>
+> Sure, I have added the archive containing the image files and jailhouse
+> build here (the archive contains the /tftpboot folder directly)
+> https://drive.google.com/file/d/0B2bhbcx8eg-caTBNdnZ4cWhJcWc/view?usp=
+> sharing
+>
+> I use the following sequence to start qemu / kernel / jailhouse, provided
+> the /tftpboot folder has the structure in the previously archive and, of
+> course, there is tftp access to the host)
+> petalinux-boot --qemu --uboot --qemu-args "-redir tcp:10022:10.0.2.15:22"
+>
+> In QEMU:
+> setenv bootargs 'console=ttyPS0,115200'; tftpboot 0x10000000  image.ub;
+> bootm
+>
+> tftp -g 10.0.2.2 jailhouse.tar.gz -r jailhouse.tar.gz
+>
+> tar zvxf jailhouse.tar.gz
+>
+> mv tftpboot/jailhouse jailhouse
+>
+> mkdir -p  /lib/firmware
+>
+> cp ./jailhouse/lib/firmware/jailhouse.bin /lib/firmware
+>
+> insmod ./jailhouse/lib/modules/4.11.0-rc4/extra/driver/jailhouse.ko
+>
+> sleep 2
+>
+> jailhouse/usr/local/sbin/jailhouse enable /home/root/jailhouse/configs/
+> zynqmp-zcu102.cell
+>
+>
+> Thank you,
+>
+> Constantin
+>
+>
+> On Apr 19, 2017 23:30, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+> wrote:
+>
+>> On Wed, Apr 19, 2017 at 11:02:21AM +0200, Jan Kiszka wrote:
+>> > On 2017-04-19 10:45, Peter Maydell wrote:
+>> > > On 19 April 2017 at 05:37, Jan Kiszka <jan.kiszka@web.de> wrote:
+>> > >> On 2017-04-19 05:48, Constantin Petra wrote:
+>> > >>> So from some reason, under QEMU something is not in place, but what
+>> can
+>> > >>> that be? It would be convenient from our perspective, if it would
+>> work...
+>> > >>
+>> > >> I fully agree, and I'm waiting for official EL2 support in QEMU in
+>> order
+>> > >> to introduce a virtual target for ARM[64], just like we have on x86
+>> already.
+>> > >
+>> > > This has been in upstream QEMU for a little while now,
+>> > > and will be in the upcoming 2.9 release. (Applies only for
+>> > > AArch64 hosts using GICv3, needs some board support changes
+>> > > which have currently only been done for 'virt'.)
+>> >
+>> > Ah, v3 - oversaw this "minor" detail. Too bad that there is still no
+>> > GICv3 silicon in our hands that we could test against (do you know some
+>> > recommendable board?). I'm pretty sure Jailhouse's GICv3 support is
+>> > broken by now (due to lacking tests), plus it is not yet enabled for our
+>> > ARM64 port. But I'm a bit reluctant to enable this only over QEMU...
 >>
->>> On 04/05/2017 01:35 AM, Mark Cave-Ayland wrote:
->>>> These aren't required since we can use the display width and height
->>>> directly.
->>>>
->>>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->>>> ---
->>>>  hw/display/cg3.c |   15 ++++++---------
->>>>  1 file changed, 6 insertions(+), 9 deletions(-)
->>>>
->>>> diff --git a/hw/display/cg3.c b/hw/display/cg3.c
->>>> index b42f60e..178a6dd 100644
->>>> --- a/hw/display/cg3.c
->>>> +++ b/hw/display/cg3.c
->>>> @@ -93,14 +93,11 @@ static void cg3_update_display(void *opaque)
->>>>      uint32_t *data;
->>>>      uint32_t dval;
->>>>      int x, y, y_start;
->>>> -    unsigned int width, height;
->>>>      ram_addr_t page, page_min, page_max;
->>>>
->>>>      if (surface_bits_per_pixel(surface) != 32) {
->>>>          return;
->>>>      }
->>>> -    width = s->width;
->>>> -    height = s->height;
->>>>
->>>>      y_start = -1;
->>>>      page_min = -1;
->>>> @@ -110,11 +107,11 @@ static void cg3_update_display(void *opaque)
->>>>      data = (uint32_t *)surface_data(surface);
->>>>
->>>>      memory_region_sync_dirty_bitmap(&s->vram_mem);
->>>> -    for (y = 0; y < height; y++) {
->>>> +    for (y = 0; y < s->height; y++) {
->>>
->>> I suspect the generated code is much worse, since the compiler can no
->>> longer tell that the loop bounds are constant.
->>>
->>> You probably do want to keep width and height in local variables across
->>> this function.
+>> Hi,
 >>
->> Can you explain a bit more about this? My thoughts were that with
->> optimisation enabled the compiler would assume s->width is constant
->> throughout the loop by default (or at least in OpenBIOS I've had to
->> explicitly mark variables as volatile to ensure the compiler refetches
->> the original value instead of reusing a previous copy from the
->> stack/registers)?
-> 
-> With data in memory, as for foo->bar, the compiler is obliged to
-> consider the memory may be changed for e.g. an intervening function call
-> baz(), when foo is "global", as it is here.  You have many of those in
-> those loops.
-
-Given that you know a lot more about this than I do, I'll drop this
-patch for now and send a v2. I see that TCX references s->width in a
-similar way, however I'm going to be AFK for a while and so I'll try and
-send a PR later today since this is a blocker on Gerd's VGA fixes
-patchset - TCX can be altered later in a similar way if it is deemed to
-give a noticeable performance benefit.
-
-
-ATB,
-
-Mark.
+>> Xilinx QEMU has support for the virtualization extensions in the GICv2 but
+>> we're seeing issues with running hypervisors in multi-core setups.
+>> It seems like guest migration between cores is causing trouble but we
+>> haven't pinpointed the exact cause.
+>>
+>> I'd be interested in debugging the problem seen with Jailhouse.
+>> Can the images and instructions on howto run be shared with me?
+>>
+>> Thanks,
+>> Edgar
+>>
+>
