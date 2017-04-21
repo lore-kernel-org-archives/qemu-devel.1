@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1d1aWD-0001SD-22
+	(envelope-from <balaton@eik.bme.hu>) id 1d1aWD-0001SE-1p
 	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 11:30:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1d1aW9-0007pi-JN
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 11:30:45 -0400
-Message-Id: <6970a5e9868b7246656c1d02038dc5d5fa369507.1492787889.git.balaton@eik.bme.hu>
+	(envelope-from <balaton@eik.bme.hu>) id 1d1aW8-0007of-5u
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 11:30:44 -0400
+Message-Id: <a32b7fc981a20205f96d530d8e958f12ace1104c.1492787889.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1492787889.git.balaton@eik.bme.hu>
 References: <cover.1492787889.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
 Date: Fri, 21 Apr 2017 17:18:09 +0200
-Subject: [Qemu-devel] [PATCH v7 08/13] sm501: Fix hardware cursor
+Subject: [Qemu-devel] [PATCH v7 04/13] sm501: QOMify
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,342 +22,279 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 Cc: Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
 
-Rework HWC handling to simplify it and fix cursor not updating on
-screen as needed. Previously cursor was not updated because checking
-for changes in a line overrode the update flag set for the cursor but
-fixing this is not enough because the cursor should also be updated if
-its shape or location changes. Introduce hwc_invalidate() function to
-handle that similar to other display controller models.
+Adding vmstate saving is not in this patch because the state structure
+will be changed in further patches, then another patch will add
+vmstate descriptor after those changes.
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Tested-by: Aurelien Jarno <aurelien@aurel32.net>
 ---
 
-v3: simplify return expression in get_bpp
-v7: Avoid some (invalid) warnings with gcc 6 or 7
+v2: Add memory regions to device state instead of allocating them
+v3: Added reset function and make sure to use adjusted mem size when
+    creating local mem region (also print a warning when mem size was
+    adjusted)
+v4: Replace warning for corrected memory size with a hard error
 
- hw/display/sm501.c          | 169 +++++++++++++++++++++++++-------------------
- hw/display/sm501_template.h |  25 +++----
- 2 files changed, 107 insertions(+), 87 deletions(-)
+ hw/display/sm501.c   | 170 +++++++++++++++++++++++++++++++++++++--------------
+ hw/sh4/r2d.c         |  11 +++-
+ include/hw/devices.h |   5 --
+ 3 files changed, 133 insertions(+), 53 deletions(-)
 
 diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index a628ef1..72e86ba 100644
+index 6e74200..571a7e6 100644
 --- a/hw/display/sm501.c
 +++ b/hw/display/sm501.c
-@@ -554,6 +554,24 @@ static uint32_t get_local_mem_size_index(uint32_t size)
-     return index;
- }
+@@ -59,8 +59,8 @@
+ #define SM501_DPRINTF(fmt, ...) do {} while (0)
+ #endif
  
-+static inline int get_width(SM501State *s, int crt)
-+{
-+    int width = crt ? s->dc_crt_h_total : s->dc_panel_h_total;
-+    return (width & 0x00000FFF) + 1;
-+}
-+
-+static inline int get_height(SM501State *s, int crt)
-+{
-+    int height = crt ? s->dc_crt_v_total : s->dc_panel_v_total;
-+    return (height & 0x00000FFF) + 1;
-+}
-+
-+static inline int get_bpp(SM501State *s, int crt)
-+{
-+    int bpp = crt ? s->dc_crt_control : s->dc_panel_control;
-+    return 1 << (bpp & 3);
-+}
-+
- /**
-  * Check the availability of hardware cursor.
-  * @param crt  0 for PANEL, 1 for CRT.
-@@ -568,10 +586,10 @@ static inline int is_hwc_enabled(SM501State *state, int crt)
-  * Get the address which holds cursor pattern data.
-  * @param crt  0 for PANEL, 1 for CRT.
-  */
--static inline uint32_t get_hwc_address(SM501State *state, int crt)
-+static inline uint8_t *get_hwc_address(SM501State *state, int crt)
- {
-     uint32_t addr = crt ? state->dc_crt_hwc_addr : state->dc_panel_hwc_addr;
--    return (addr & 0x03FFFFF0)/* >> 4*/;
-+    return state->local_mem + (addr & 0x03FFFFF0);
- }
- 
- /**
-@@ -597,50 +615,48 @@ static inline uint32_t get_hwc_x(SM501State *state, int crt)
- }
- 
- /**
-- * Get the cursor position in x coordinate.
-+ * Get the hardware cursor palette.
-  * @param crt  0 for PANEL, 1 for CRT.
-- * @param index  0, 1, 2 or 3 which specifies color of corsor dot.
-+ * @param palette  pointer to a [3 * 3] array to store color values in
-  */
--static inline uint16_t get_hwc_color(SM501State *state, int crt, int index)
-+static inline void get_hwc_palette(SM501State *state, int crt, uint8_t *palette)
- {
--    uint32_t color_reg = 0;
--    uint16_t color_565 = 0;
 -
--    if (index == 0) {
--        return 0;
--    }
--
--    switch (index) {
--    case 1:
--    case 2:
--        color_reg = crt ? state->dc_crt_hwc_color_1_2
--                        : state->dc_panel_hwc_color_1_2;
--        break;
--    case 3:
--        color_reg = crt ? state->dc_crt_hwc_color_3
--                        : state->dc_panel_hwc_color_3;
--        break;
--    default:
--        printf("invalid hw cursor color.\n");
--        abort();
--    }
-+    int i;
-+    uint32_t color_reg;
-+    uint16_t rgb565;
-+
-+    for (i = 0; i < 3; i++) {
-+        if (i + 1 == 3) {
-+            color_reg = crt ? state->dc_crt_hwc_color_3
-+                            : state->dc_panel_hwc_color_3;
-+        } else {
-+            color_reg = crt ? state->dc_crt_hwc_color_1_2
-+                            : state->dc_panel_hwc_color_1_2;
-+        }
+ #define MMIO_BASE_OFFSET 0x3e00000
++#define MMIO_SIZE 0x200000
  
--    switch (index) {
--    case 1:
--    case 3:
--        color_565 = (uint16_t)(color_reg & 0xFFFF);
--        break;
--    case 2:
--        color_565 = (uint16_t)((color_reg >> 16) & 0xFFFF);
--        break;
-+        if (i + 1 == 2) {
-+            rgb565 = (color_reg >> 16) & 0xFFFF;
-+        } else {
-+            rgb565 = color_reg & 0xFFFF;
-+        }
-+        palette[i * 3 + 0] = (rgb565 << 3) & 0xf8; /* red */
-+        palette[i * 3 + 1] = (rgb565 >> 3) & 0xfc; /* green */
-+        palette[i * 3 + 2] = (rgb565 >> 8) & 0xf8; /* blue */
+ /* SM501 register definitions taken from "linux/include/linux/sm501-regs.h" */
+ 
+@@ -465,6 +465,10 @@ typedef struct SM501State {
+     uint32_t local_mem_size_index;
+     uint8_t *local_mem;
+     MemoryRegion local_mem_region;
++    MemoryRegion mmio_region;
++    MemoryRegion system_config_region;
++    MemoryRegion disp_ctrl_region;
++    MemoryRegion twoD_engine_region;
+     uint32_t last_width;
+     uint32_t last_height;
+ 
+@@ -1404,21 +1408,8 @@ static const GraphicHwOps sm501_ops = {
+     .gfx_update  = sm501_update_display,
+ };
+ 
+-void sm501_init(MemoryRegion *address_space_mem, uint32_t base,
+-                uint32_t local_mem_bytes, qemu_irq irq, Chardev *chr)
++static void sm501_reset(SM501State *s)
+ {
+-    SM501State *s;
+-    DeviceState *dev;
+-    MemoryRegion *sm501_system_config = g_new(MemoryRegion, 1);
+-    MemoryRegion *sm501_disp_ctrl = g_new(MemoryRegion, 1);
+-    MemoryRegion *sm501_2d_engine = g_new(MemoryRegion, 1);
+-
+-    /* allocate management data region */
+-    s = g_new0(SM501State, 1);
+-    s->base = base;
+-    s->local_mem_size_index = get_local_mem_size_index(local_mem_bytes);
+-    SM501_DPRINTF("local mem size=%x. index=%d\n", get_local_mem_size(s),
+-                  s->local_mem_size_index);
+     s->system_control = 0x00100000; /* 2D engine FIFO empty */
+     /* Bits 17 (SH), 7 (CDR), 6:5 (Test), 2:0 (Bus) are all supposed
+      * to be determined at reset by GPIO lines which set config bits.
+@@ -1429,51 +1420,138 @@ void sm501_init(MemoryRegion *address_space_mem, uint32_t base,
+      *  BUS = 0 : Hitachi SH3/SH4
+      */
+     s->misc_control = SM501_MISC_DAC_POWER;
++    s->gpio_31_0_control = 0;
++    s->gpio_63_32_control = 0;
++    s->dram_control = 0;
+     s->arbitration_control = 0x05146732;
++    s->irq_mask = 0;
++    s->misc_timing = 0;
++    s->power_mode_control = 0;
+     s->dc_panel_control = 0x00010000; /* FIFO level 3 */
+     s->dc_crt_control = 0x00010000;
++    s->twoD_control = 0;
++}
+ 
+-    /* allocate local memory */
+-    memory_region_init_ram(&s->local_mem_region, NULL, "sm501.local",
+-                           local_mem_bytes, &error_fatal);
++static void sm501_init(SM501State *s, DeviceState *dev, uint32_t base,
++                       uint32_t local_mem_bytes)
++{
++    s->base = base;
++    s->local_mem_size_index = get_local_mem_size_index(local_mem_bytes);
++    SM501_DPRINTF("sm501 local mem size=%x. index=%d\n", get_local_mem_size(s),
++                  s->local_mem_size_index);
++
++    /* local memory */
++    memory_region_init_ram(&s->local_mem_region, OBJECT(dev), "sm501.local",
++                           get_local_mem_size(s), &error_fatal);
+     vmstate_register_ram_global(&s->local_mem_region);
+     memory_region_set_log(&s->local_mem_region, true, DIRTY_MEMORY_VGA);
+     s->local_mem = memory_region_get_ram_ptr(&s->local_mem_region);
+-    memory_region_add_subregion(address_space_mem, base, &s->local_mem_region);
+-
+-    /* map mmio */
+-    memory_region_init_io(sm501_system_config, NULL, &sm501_system_config_ops,
+-                          s, "sm501-system-config", 0x6c);
+-    memory_region_add_subregion(address_space_mem, base + MMIO_BASE_OFFSET,
+-                                sm501_system_config);
+-    memory_region_init_io(sm501_disp_ctrl, NULL, &sm501_disp_ctrl_ops, s,
++
++    /* mmio */
++    memory_region_init(&s->mmio_region, OBJECT(dev), "sm501.mmio", MMIO_SIZE);
++    memory_region_init_io(&s->system_config_region, OBJECT(dev),
++                          &sm501_system_config_ops, s,
++                          "sm501-system-config", 0x6c);
++    memory_region_add_subregion(&s->mmio_region, SM501_SYS_CONFIG,
++                                &s->system_config_region);
++    memory_region_init_io(&s->disp_ctrl_region, OBJECT(dev),
++                          &sm501_disp_ctrl_ops, s,
+                           "sm501-disp-ctrl", 0x1000);
+-    memory_region_add_subregion(address_space_mem,
+-                                base + MMIO_BASE_OFFSET + SM501_DC,
+-                                sm501_disp_ctrl);
+-    memory_region_init_io(sm501_2d_engine, NULL, &sm501_2d_engine_ops, s,
++    memory_region_add_subregion(&s->mmio_region, SM501_DC,
++                                &s->disp_ctrl_region);
++    memory_region_init_io(&s->twoD_engine_region, OBJECT(dev),
++                          &sm501_2d_engine_ops, s,
+                           "sm501-2d-engine", 0x54);
+-    memory_region_add_subregion(address_space_mem,
+-                                base + MMIO_BASE_OFFSET + SM501_2D_ENGINE,
+-                                sm501_2d_engine);
++    memory_region_add_subregion(&s->mmio_region, SM501_2D_ENGINE,
++                                &s->twoD_engine_region);
++
++    /* create qemu graphic console */
++    s->con = graphic_console_init(DEVICE(dev), 0, &sm501_ops, s);
++}
++
++#define TYPE_SYSBUS_SM501 "sysbus-sm501"
++#define SYSBUS_SM501(obj) \
++    OBJECT_CHECK(SM501SysBusState, (obj), TYPE_SYSBUS_SM501)
++
++typedef struct {
++    /*< private >*/
++    SysBusDevice parent_obj;
++    /*< public >*/
++    SM501State state;
++    uint32_t vram_size;
++    uint32_t base;
++    void *chr_state;
++} SM501SysBusState;
++
++static void sm501_realize_sysbus(DeviceState *dev, Error **errp)
++{
++    SM501SysBusState *s = SYSBUS_SM501(dev);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
++    DeviceState *usb_dev;
++
++    sm501_init(&s->state, dev, s->base, s->vram_size);
++    if (get_local_mem_size(&s->state) != s->vram_size) {
++        error_setg(errp, "Invalid VRAM size, nearest valid size is %" PRIu32,
++                   get_local_mem_size(&s->state));
++        return;
++    }
++    sysbus_init_mmio(sbd, &s->state.local_mem_region);
++    sysbus_init_mmio(sbd, &s->state.mmio_region);
+ 
+     /* bridge to usb host emulation module */
+-    dev = qdev_create(NULL, "sysbus-ohci");
+-    qdev_prop_set_uint32(dev, "num-ports", 2);
+-    qdev_prop_set_uint64(dev, "dma-offset", base);
+-    qdev_init_nofail(dev);
+-    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0,
+-                    base + MMIO_BASE_OFFSET + SM501_USB_HOST);
+-    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, irq);
++    usb_dev = qdev_create(NULL, "sysbus-ohci");
++    qdev_prop_set_uint32(usb_dev, "num-ports", 2);
++    qdev_prop_set_uint64(usb_dev, "dma-offset", s->base);
++    qdev_init_nofail(usb_dev);
++    memory_region_add_subregion(&s->state.mmio_region, SM501_USB_HOST,
++                       sysbus_mmio_get_region(SYS_BUS_DEVICE(usb_dev), 0));
++    sysbus_pass_irq(sbd, SYS_BUS_DEVICE(usb_dev));
+ 
+     /* bridge to serial emulation module */
+-    if (chr) {
+-        serial_mm_init(address_space_mem,
+-                       base + MMIO_BASE_OFFSET + SM501_UART0, 2,
++    if (s->chr_state) {
++        serial_mm_init(&s->state.mmio_region, SM501_UART0, 2,
+                        NULL, /* TODO : chain irq to IRL */
+-                       115200, chr, DEVICE_NATIVE_ENDIAN);
++                       115200, s->chr_state, DEVICE_NATIVE_ENDIAN);
      }
--    return color_565;
- }
++}
  
--static int within_hwc_y_range(SM501State *state, int y, int crt)
-+static inline void hwc_invalidate(SM501State *s, int crt)
- {
--    int hwc_y = get_hwc_y(state, crt);
--    return (hwc_y <= y && y < hwc_y + SM501_HWC_HEIGHT);
-+    int w = get_width(s, crt);
-+    int h = get_height(s, crt);
-+    int bpp = get_bpp(s, crt);
-+    int start = get_hwc_y(s, crt);
-+    int end = MIN(h, start + SM501_HWC_HEIGHT) + 1;
+-    /* create qemu graphic console */
+-    s->con = graphic_console_init(DEVICE(dev), 0, &sm501_ops, s);
++static Property sm501_sysbus_properties[] = {
++    DEFINE_PROP_UINT32("vram-size", SM501SysBusState, vram_size, 0),
++    DEFINE_PROP_UINT32("base", SM501SysBusState, base, 0),
++    DEFINE_PROP_PTR("chr-state", SM501SysBusState, chr_state),
++    DEFINE_PROP_END_OF_LIST(),
++};
 +
-+    start *= w * bpp;
-+    end *= w * bpp;
-+
-+    memory_region_set_dirty(&s->local_mem_region, start, end - start);
++static void sm501_reset_sysbus(DeviceState *dev)
++{
++    SM501SysBusState *s = SYSBUS_SM501(dev);
++    sm501_reset(&s->state);
  }
++
++static void sm501_sysbus_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = sm501_realize_sysbus;
++    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
++    dc->desc = "SM501 Multimedia Companion";
++    dc->props = sm501_sysbus_properties;
++    dc->reset = sm501_reset_sysbus;
++    /* Note: pointer property "chr-state" may remain null, thus
++     * no need for dc->cannot_instantiate_with_device_add_yet = true;
++     */
++}
++
++static const TypeInfo sm501_sysbus_info = {
++    .name          = TYPE_SYSBUS_SM501,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(SM501SysBusState),
++    .class_init    = sm501_sysbus_class_init,
++};
++
++static void sm501_register_types(void)
++{
++    type_register_static(&sm501_sysbus_info);
++}
++
++type_init(sm501_register_types)
+diff --git a/hw/sh4/r2d.c b/hw/sh4/r2d.c
+index 6d06968..8f520ce 100644
+--- a/hw/sh4/r2d.c
++++ b/hw/sh4/r2d.c
+@@ -277,8 +277,15 @@ static void r2d_init(MachineState *machine)
+     sysbus_connect_irq(busdev, 2, irq[PCI_INTC]);
+     sysbus_connect_irq(busdev, 3, irq[PCI_INTD]);
  
- static void sm501_2d_operation(SM501State *s)
-@@ -1021,10 +1037,18 @@ static void sm501_disp_ctrl_write(void *opaque, hwaddr addr,
-         break;
+-    sm501_init(address_space_mem, 0x10000000, SM501_VRAM_SIZE,
+-               irq[SM501], serial_hds[2]);
++    dev = qdev_create(NULL, "sysbus-sm501");
++    busdev = SYS_BUS_DEVICE(dev);
++    qdev_prop_set_uint32(dev, "vram-size", SM501_VRAM_SIZE);
++    qdev_prop_set_uint32(dev, "base", 0x10000000);
++    qdev_prop_set_ptr(dev, "chr-state", serial_hds[2]);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(busdev, 0, 0x10000000);
++    sysbus_mmio_map(busdev, 1, 0x13e00000);
++    sysbus_connect_irq(busdev, 0, irq[SM501]);
  
-     case SM501_DC_PANEL_HWC_ADDR:
--        s->dc_panel_hwc_addr = value & 0x8FFFFFF0;
-+        value &= 0x8FFFFFF0;
-+        if (value != s->dc_panel_hwc_addr) {
-+            hwc_invalidate(s, 0);
-+            s->dc_panel_hwc_addr = value;
-+        }
-         break;
-     case SM501_DC_PANEL_HWC_LOC:
--        s->dc_panel_hwc_location = value & 0x0FFF0FFF;
-+        value &= 0x0FFF0FFF;
-+        if (value != s->dc_panel_hwc_location) {
-+            hwc_invalidate(s, 0);
-+            s->dc_panel_hwc_location = value;
-+        }
-         break;
-     case SM501_DC_PANEL_HWC_COLOR_1_2:
-         s->dc_panel_hwc_color_1_2 = value;
-@@ -1056,10 +1080,18 @@ static void sm501_disp_ctrl_write(void *opaque, hwaddr addr,
-         break;
+     /* onboard CF (True IDE mode, Master only). */
+     dinfo = drive_get(IF_IDE, 0, 0);
+diff --git a/include/hw/devices.h b/include/hw/devices.h
+index 7475b71..861ddea 100644
+--- a/include/hw/devices.h
++++ b/include/hw/devices.h
+@@ -62,9 +62,4 @@ void tc6393xb_gpio_out_set(TC6393xbState *s, int line,
+ qemu_irq *tc6393xb_gpio_in_get(TC6393xbState *s);
+ qemu_irq tc6393xb_l3v_get(TC6393xbState *s);
  
-     case SM501_DC_CRT_HWC_ADDR:
--        s->dc_crt_hwc_addr = value & 0x8FFFFFF0;
-+        value &= 0x8FFFFFF0;
-+        if (value != s->dc_crt_hwc_addr) {
-+            hwc_invalidate(s, 1);
-+            s->dc_crt_hwc_addr = value;
-+        }
-         break;
-     case SM501_DC_CRT_HWC_LOC:
--        s->dc_crt_hwc_location = value & 0x0FFF0FFF;
-+        value &= 0x0FFF0FFF;
-+        if (value != s->dc_crt_hwc_location) {
-+            hwc_invalidate(s, 1);
-+            s->dc_crt_hwc_location = value;
-+        }
-         break;
-     case SM501_DC_CRT_HWC_COLOR_1_2:
-         s->dc_crt_hwc_color_1_2 = value;
-@@ -1182,8 +1214,9 @@ static const MemoryRegionOps sm501_2d_engine_ops = {
- typedef void draw_line_func(uint8_t *d, const uint8_t *s,
-                             int width, const uint32_t *pal);
- 
--typedef void draw_hwc_line_func(SM501State *s, int crt, uint8_t *palette,
--                                int c_y, uint8_t *d, int width);
-+typedef void draw_hwc_line_func(uint8_t *d, const uint8_t *s,
-+                                int width, const uint8_t *palette,
-+                                int c_x, int c_y);
- 
- #define DEPTH 8
- #include "sm501_template.h"
-@@ -1271,12 +1304,11 @@ static inline int get_depth_index(DisplaySurface *surface)
- static void sm501_draw_crt(SM501State *s)
- {
-     DisplaySurface *surface = qemu_console_surface(s->con);
--    int y;
--    int width = (s->dc_crt_h_total & 0x00000FFF) + 1;
--    int height = (s->dc_crt_v_total & 0x00000FFF) + 1;
+-/* sm501.c */
+-void sm501_init(struct MemoryRegion *address_space_mem, uint32_t base,
+-                uint32_t local_mem_bytes, qemu_irq irq,
+-                Chardev *chr);
 -
--    uint8_t  *src = s->local_mem;
--    int src_bpp = 0;
-+    int y, c_x = 0, c_y = 0;
-+    uint8_t *hwc_src = NULL, *src = s->local_mem;
-+    int width = get_width(s, 1);
-+    int height = get_height(s, 1);
-+    int src_bpp = get_bpp(s, 1);
-     int dst_bpp = surface_bytes_per_pixel(surface);
-     uint32_t *palette = (uint32_t *)&s->dc_palette[SM501_DC_CRT_PALETTE -
-                                                    SM501_DC_PANEL_PALETTE];
-@@ -1291,17 +1323,14 @@ static void sm501_draw_crt(SM501State *s)
-     ram_addr_t offset = 0;
- 
-     /* choose draw_line function */
--    switch (s->dc_crt_control & 3) {
--    case SM501_DC_CRT_CONTROL_8BPP:
--        src_bpp = 1;
-+    switch (src_bpp) {
-+    case 1:
-         draw_line = draw_line8_funcs[ds_depth_index];
-         break;
--    case SM501_DC_CRT_CONTROL_16BPP:
--        src_bpp = 2;
-+    case 2:
-         draw_line = draw_line16_funcs[ds_depth_index];
-         break;
--    case SM501_DC_CRT_CONTROL_32BPP:
--        src_bpp = 4;
-+    case 4:
-         draw_line = draw_line32_funcs[ds_depth_index];
-         break;
-     default:
-@@ -1313,18 +1342,12 @@ static void sm501_draw_crt(SM501State *s)
- 
-     /* set up to draw hardware cursor */
-     if (is_hwc_enabled(s, 1)) {
--        int i;
--
--        /* get cursor palette */
--        for (i = 0; i < 3; i++) {
--            uint16_t rgb565 = get_hwc_color(s, 1, i + 1);
--            hwc_palette[i * 3 + 0] = (rgb565 & 0xf800) >> 8; /* red */
--            hwc_palette[i * 3 + 1] = (rgb565 & 0x07e0) >> 3; /* green */
--            hwc_palette[i * 3 + 2] = (rgb565 & 0x001f) << 3; /* blue */
--        }
--
-         /* choose cursor draw line function */
-         draw_hwc_line = draw_hwc_line_funcs[ds_depth_index];
-+        hwc_src = get_hwc_address(s, 1);
-+        c_x = get_hwc_x(s, 1);
-+        c_y = get_hwc_y(s, 1);
-+        get_hwc_palette(s, 1, hwc_palette);
-     }
- 
-     /* adjust console size */
-@@ -1339,14 +1362,16 @@ static void sm501_draw_crt(SM501State *s)
-     /* draw each line according to conditions */
-     memory_region_sync_dirty_bitmap(&s->local_mem_region);
-     for (y = 0; y < height; y++) {
--        int update_hwc = draw_hwc_line ? within_hwc_y_range(s, y, 1) : 0;
--        int update = full_update || update_hwc;
-+        int update, update_hwc;
-         ram_addr_t page0 = offset;
-         ram_addr_t page1 = offset + width * src_bpp - 1;
- 
-+        /* check if hardware cursor is enabled and we're within its range */
-+        update_hwc = draw_hwc_line && c_y <= y && y < c_y + SM501_HWC_HEIGHT;
-+        update = full_update || update_hwc;
-         /* check dirty flags for each line */
--        update = memory_region_get_dirty(&s->local_mem_region, page0,
--                                         page1 - page0, DIRTY_MEMORY_VGA);
-+        update |= memory_region_get_dirty(&s->local_mem_region, page0,
-+                                          page1 - page0, DIRTY_MEMORY_VGA);
- 
-         /* draw line and change status */
-         if (update) {
-@@ -1358,7 +1383,7 @@ static void sm501_draw_crt(SM501State *s)
- 
-             /* draw hardware cursor */
-             if (update_hwc) {
--                draw_hwc_line(s, 1, hwc_palette, y - get_hwc_y(s, 1), d, width);
-+                draw_hwc_line(d, hwc_src, width, hwc_palette, c_x, y - c_y);
-             }
- 
-             if (y_start < 0) {
-diff --git a/hw/display/sm501_template.h b/hw/display/sm501_template.h
-index 54807bd..fa0d6a9 100644
---- a/hw/display/sm501_template.h
-+++ b/hw/display/sm501_template.h
-@@ -92,29 +92,24 @@ static void glue(draw_line32_, PIXEL_NAME)(
- /**
-  * Draw hardware cursor image on the given line.
-  */
--static void glue(draw_hwc_line_, PIXEL_NAME)(SM501State *s, int crt,
--                 uint8_t *palette, int c_y, uint8_t *d, int width)
-+static void glue(draw_hwc_line_, PIXEL_NAME)(uint8_t *d, const uint8_t *s,
-+                 int width, const uint8_t *palette, int c_x, int c_y)
- {
--    int x, i;
--    uint8_t *pixval, bitset = 0;
--
--    /* get hardware cursor pattern */
--    uint32_t cursor_addr = get_hwc_address(s, crt);
--    assert(0 <= c_y && c_y < SM501_HWC_HEIGHT);
--    cursor_addr += SM501_HWC_WIDTH * c_y / 4;  /* 4 pixels per byte */
--    pixval = s->local_mem + cursor_addr;
-+    int i;
-+    uint8_t bitset = 0;
- 
-     /* get cursor position */
--    x = get_hwc_x(s, crt);
--    d += x * BPP;
-+    assert(0 <= c_y && c_y < SM501_HWC_HEIGHT);
-+    s += SM501_HWC_WIDTH * c_y / 4;  /* 4 pixels per byte */
-+    d += c_x * BPP;
- 
--    for (i = 0; i < SM501_HWC_WIDTH && x + i < width; i++) {
-+    for (i = 0; i < SM501_HWC_WIDTH && c_x + i < width; i++) {
-         uint8_t v;
- 
-         /* get pixel value */
-         if (i % 4 == 0) {
--            bitset = ldub_p(pixval);
--            pixval++;
-+            bitset = ldub_p(s);
-+            s++;
-         }
-         v = bitset & 3;
-         bitset >>= 2;
+ #endif
 -- 
 2.7.4
