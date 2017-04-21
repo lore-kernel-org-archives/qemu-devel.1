@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1d1e0h-00071G-L2
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 15:14:28 -0400
+	(envelope-from <bobby.prani@gmail.com>) id 1d1e2e-0000Hk-Kd
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 15:16:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1d1e0g-0002ku-J8
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 15:14:27 -0400
-Received: from mail-oi0-x22a.google.com ([2607:f8b0:4003:c06::22a]:35998)
+	(envelope-from <bobby.prani@gmail.com>) id 1d1e2d-0003RY-KT
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 15:16:28 -0400
+Received: from mail-yw0-x244.google.com ([2607:f8b0:4002:c05::244]:34715)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
-	id 1d1e0g-0002kZ-Du
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 15:14:26 -0400
-Received: by mail-oi0-x22a.google.com with SMTP id s131so22113690oia.3
-	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 12:14:24 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1d1e2d-0003RI-Fs
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 15:16:27 -0400
+Received: by mail-yw0-x244.google.com with SMTP id u70so9153379ywe.1
+	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 12:16:27 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170421135634.GB28249@stefanha-x1.localdomain>
-References: <20170331084147.32716-1-haozhong.zhang@intel.com>
-	<20170406094359.GB21261@stefanha-x1.localdomain>
-	<30db934f-d27e-1d15-6257-84224283dea9@gmail.com>
-	<20170411084133.wroqrhn5eczesqam@hz-desktop>
-	<CAPcyv4hmQRTn-KdUVYQjgb16cnprJ9yep+STFd1id4zEgL1rCg@mail.gmail.com>
-	<CAPcyv4hV2-ZW8SMCRtD0P_86KgR3DHOvNe+6T5SY2u7wXg3gEg@mail.gmail.com>
-	<20170421135634.GB28249@stefanha-x1.localdomain>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Fri, 21 Apr 2017 12:14:23 -0700
-Message-ID: <CAPcyv4hu6F+tDDf3x4m=hB8zg4Lfp54zzRQ-V1f7O991vVPELQ@mail.gmail.com>
+In-Reply-To: <20161229100420.i66zeaxc4qbp3p3p@hawk.localdomain>
+References: <20161229080217.16446.50840.malonedeb@wampee.canonical.com>
+	<20161229100420.i66zeaxc4qbp3p3p@hawk.localdomain>
+From: Pranith Kumar <bobby.prani@gmail.com>
+Date: Fri, 21 Apr 2017 15:15:56 -0400
+Message-ID: <CAJhHMCD4W39=7FR-uJBt1SpOR6UJCLwGgp4DPMDZ9AeJNRxDFQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [RFC PATCH 0/4] nvdimm: enable flush hint address
- structure
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Bug 1653063] [NEW] qemu-system-arm hangs with
+ -icount and -nodefaults
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,80 +31,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Xiao Guangrong <guangrong.xiao@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Christoph Hellwig <hch@infradead.org>, linux-xfs@vger.kernel.org, linux-fsdevel <linux-fsdevel@vger.kernel.org>
+To: Andrew Jones <drjones@redhat.com>
+Cc: Hansni Bu <1653063@bugs.launchpad.net>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, qemu-devel <qemu-devel@nongnu.org>
 
-[ adding xfs and fsdevel ]
-
-On Fri, Apr 21, 2017 at 6:56 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-[..]
->> >>> If the vNVDIMM device is based on the regular file, i think
->> >>> fsync is the bottleneck rather than this mmio-virtualization. :(
->> >>>
->> >>
->> >> Yes, fsync() on the regular file is the bottleneck. We may either
->> >>
->> >> 1/ perform the host-side flush in an asynchronous way which will not
->> >>    block vcpu too long,
->> >>
->> >> or
->> >>
->> >> 2/ not provide strong durability guarantee for non-NVDIMM backend and
->> >>    not emulate flush-hint for guest at all. (I know 1/ does not
->> >>    provide strong durability guarantee either).
->> >
->> > or
->> >
->> > 3/ Use device-dax as a stop-gap until we can get an efficient fsync()
->> > overhead reduction (or bypass) mechanism built and accepted for
->> > filesystem-dax.
+On Thu, Dec 29, 2016 at 5:04 AM, Andrew Jones <drjones@redhat.com> wrote:
+> On Thu, Dec 29, 2016 at 08:02:16AM -0000, Hansni Bu wrote:
+>> Public bug reported:
+> ...
+>> https://bugs.launchpad.net/bugs/1653063
+> ...
+>>   After console prints the message below:
+>>   "Uncompressing Linux..................................................=
+........................ done, booting the kernel."
+>>   there's no further action noticed.
 >>
->> I didn't realize we have a bigger problem with host filesystem-fsync
->> and that WPQ exits will not save us. Applications that use device-dax
->> in the guest may never trigger a WPQ flush, because userspace flushing
->> with device-dax is expected to be safe. WPQ flush was never meant to
->> be a persistency mechanism the way it is proposed here, it's only
->> meant to minimize the fallout from potential ADR failure. My apologies
->> for insinuating that it was viable.
+>>   If "-icount" is not set, namely run as:
+>>   qemu-system-arm -M integratorcp -kernel arm-test/zImage.integrator -in=
+itrd arm-test/arm_root.img -nographic -nodefaults -chardev stdio,mux=3Don,i=
+d=3Dchar0 -serial chardev:char0 --append "console=3DttyAMA0"
 >>
->> So, until we solve this userspace flushing problem virtualization must
->> not pass through any file except a device-dax instance for any
->> production workload.
+>>   or if "-nodefaults" is not set, namely run as:
+>>   qemu-system-arm -M integratorcp -kernel arm-test/zImage.integrator -in=
+itrd arm-test/arm_root.img -nographic -icount 1 --append "console=3DttyAMA0=
+"
+>>
+>>   The Linux boot procedure can finish successfully.
 >
-> Okay.  That's what I've assumed up until now and I think distros will
-> document this limitation.
+> Hi Hansni,
 >
->> Also these performance overheads seem prohibitive. We really want to
->> take whatever fsync minimization / bypass mechanism we come up with on
->> the host into a fast para-virtualized interface for the guest. Guests
->> need to be able to avoid hypervisor and host syscall overhead in the
->> fast path.
+> The fact things work when you remove -nodefaults is a sign that with it
+> your single cpu may just not be getting scheduled again. Does the patch
+> from Alex Benn=C3=A9e here[*] help?
 >
-> It's hard to avoid the hypervisor if the host kernel file system needs
-> an fsync() to persist everything.  There should be a fast path where the
-> host file is preallocated and no fancy file system features are in use
-> (e.g. deduplication, copy-on-write snapshots) where host file systems
-> don't need fsync().
+> [*] https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg01743.html
 >
 
-So we've gone around and around on this with XFS folks with various
-levels of disagreement about how to achieve synchronous faulting or
-disabling metadata updates for a file. I think at some point someone
-is going to want some fancy filesystem feature *and* DAX *and* still
-want it to be fast.
+This bug is still reproducible with the latest git.
 
-The current problem is that if you want to checkpoint persistence at a
-high rate, think committing updates to a tree data structure, an
-fsync() call is going to burn a lot of cycles just to find out that
-there is nothing to do in most cases. Especially when you've only
-touched a couple pointers in a cache line, calling into the kernel to
-sync those writes is a ridiculous proposition.
+--
+Pranith
 
-One of the current ideas to resolve this is instead of trying to
-implement synchronous faulting and wrestle with the constraints that
-puts on fs-fault paths, is to instead have synchronous notification of
-metadata dirtying events to userspace. That notification mechanism
-would be associated with something like an fsync2() library call that
-knows how to bypass sys_fsync in the common case. Of course, this is
-still in the idea phase, so until we can get a proof-of-concept on its
-feet this is all subject to further debate.
+--=20
+Pranith
