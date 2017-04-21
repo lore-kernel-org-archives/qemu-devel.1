@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d1Pgs-0006K7-DQ
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 23:57:03 -0400
+	(envelope-from <famz@redhat.com>) id 1d1Pgt-0006N0-PM
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 23:57:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d1Pgr-00042b-Jw
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 23:57:02 -0400
+	(envelope-from <famz@redhat.com>) id 1d1Pgs-00043E-UN
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 23:57:03 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 21 Apr 2017 11:56:01 +0800
-Message-Id: <20170421035606.448-16-famz@redhat.com>
+Date: Fri, 21 Apr 2017 11:56:02 +0800
+Message-Id: <20170421035606.448-17-famz@redhat.com>
 In-Reply-To: <20170421035606.448-1-famz@redhat.com>
 References: <20170421035606.448-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v14 15/20] file-posix: Add 'locking' option
+Subject: [Qemu-devel] [PATCH v14 16/20] tests: Disable image lock in
+ test-replication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,31 +23,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-Making this option available even before implementing it will let
-converting tests easier: in coming patches they can specify the option
-already when necessary, before we actually write code to lock the
-images.
+The COLO block replication architecture requires one disk to be shared
+between primary and secondary, in the test both processes use posix file
+protocol (instead of over NBD) so it is affected by image locking.
+Disable the lock.
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block/file-posix.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ tests/test-replication.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index ade71db..2114720 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -392,6 +392,11 @@ static QemuOptsList raw_runtime_opts = {
-             .type = QEMU_OPT_STRING,
-             .help = "host AIO implementation (threads, native)",
-         },
-+        {
-+            .name = "locking",
-+            .type = QEMU_OPT_BOOL,
-+            .help = "lock the file",
-+        },
-         { /* end of list */ }
-     },
- };
+diff --git a/tests/test-replication.c b/tests/test-replication.c
+index fac2da3..e1c4235 100644
+--- a/tests/test-replication.c
++++ b/tests/test-replication.c
+@@ -179,7 +179,8 @@ static BlockBackend *start_primary(void)
+     char *cmdline;
+ 
+     cmdline = g_strdup_printf("driver=replication,mode=primary,node-name=xxx,"
+-                              "file.driver=qcow2,file.file.filename=%s"
++                              "file.driver=qcow2,file.file.filename=%s,"
++                              "file.file.locking=off"
+                               , p_local_disk);
+     opts = qemu_opts_parse_noisily(&qemu_drive_opts, cmdline, false);
+     g_free(cmdline);
+@@ -310,7 +311,9 @@ static BlockBackend *start_secondary(void)
+     Error *local_err = NULL;
+ 
+     /* add s_local_disk and forge S_LOCAL_DISK_ID */
+-    cmdline = g_strdup_printf("file.filename=%s,driver=qcow2", s_local_disk);
++    cmdline = g_strdup_printf("file.filename=%s,driver=qcow2,"
++                              "file.locking=off",
++                              s_local_disk);
+     opts = qemu_opts_parse_noisily(&qemu_drive_opts, cmdline, false);
+     g_free(cmdline);
+ 
+@@ -331,8 +334,10 @@ static BlockBackend *start_secondary(void)
+     /* add S_(ACTIVE/HIDDEN)_DISK and forge S_ID */
+     cmdline = g_strdup_printf("driver=replication,mode=secondary,top-id=%s,"
+                               "file.driver=qcow2,file.file.filename=%s,"
++                              "file.file.locking=off,"
+                               "file.backing.driver=qcow2,"
+                               "file.backing.file.filename=%s,"
++                              "file.backing.file.locking=off,"
+                               "file.backing.backing=%s"
+                               , S_ID, s_active_disk, s_hidden_disk
+                               , S_LOCAL_DISK_ID);
 -- 
 2.9.3
