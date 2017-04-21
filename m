@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1Tef-0003kO-7W
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 04:11:02 -0400
+	(envelope-from <famz@redhat.com>) id 1d1Tit-0005A0-13
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 04:15:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1Tec-0003yL-01
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 04:11:01 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:3385
-	helo=dggrg03-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1Teb-0003xE-4l
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 04:10:57 -0400
-References: <1487734936-43472-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1487734936-43472-3-git-send-email-zhang.zhanghailiang@huawei.com>
-	<134776c2-a85d-d06f-5f98-2e664f9c8ca9@cn.fujitsu.com>
-	<d33b0150-5ed2-56cc-9261-da7deb1d0bfb@redhat.com>
-	<58F06AA1.2010301@huawei.com>
-	<9b42232a-e86f-2d61-7987-7a0559d6f705@redhat.com>
-	<58F4A12C.5070404@huawei.com>
-	<f7f4639d-7a08-5120-27f8-346011dc754f@redhat.com>
-	<58F5B902.8030105@huawei.com>
-	<c92f4670-5ecc-c048-b017-d78966a89514@redhat.com>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <58F9BE5A.3050807@huawei.com>
-Date: Fri, 21 Apr 2017 16:10:02 +0800
+	(envelope-from <famz@redhat.com>) id 1d1Tin-0005Ku-LG
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 04:15:23 -0400
+Date: Fri, 21 Apr 2017 16:15:04 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170421081504.GA8342@lemon.lan>
+References: <1491057878-27868-1-git-send-email-ashijeetacharya@gmail.com>
+	<1491057878-27868-7-git-send-email-ashijeetacharya@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <c92f4670-5ecc-c048-b017-d78966a89514@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 02/15] colo-compare: implement the process
- of checkpoint
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1491057878-27868-7-git-send-email-ashijeetacharya@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3 6/6] vmdk: Update metadata for multiple
+ clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,185 +24,317 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
-Cc: xuquan8@huawei.com, xiecl.fnst@cn.fujitsu.com, dgilbert@redhat.com, lizhijian@cn.fujitsu.com
+To: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com, stefanha@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On 2017/4/20 13:15, Jason Wang wrote:
->
-> On 2017年04月18日 14:58, Hailiang Zhang wrote:
->> On 2017/4/18 11:55, Jason Wang wrote:
->>> On 2017年04月17日 19:04, Hailiang Zhang wrote:
->>>> Hi Jason,
->>>>
->>>> On 2017/4/14 14:38, Jason Wang wrote:
->>>>> On 2017年04月14日 14:22, Hailiang Zhang wrote:
->>>>>> Hi Jason,
->>>>>>
->>>>>> On 2017/4/14 13:57, Jason Wang wrote:
->>>>>>> On 2017年02月22日 17:31, Zhang Chen wrote:
->>>>>>>> On 02/22/2017 11:42 AM, zhanghailiang wrote:
->>>>>>>>> While do checkpoint, we need to flush all the unhandled packets,
->>>>>>>>> By using the filter notifier mechanism, we can easily to notify
->>>>>>>>> every compare object to do this process, which runs inside
->>>>>>>>> of compare threads as a coroutine.
->>>>>>>> Hi~ Jason and Hailiang.
->>>>>>>>
->>>>>>>> I will send a patch set later about colo-compare notify
->>>>>>>> mechanism for
->>>>>>>> Xen like this patch.
->>>>>>>> I want to add a new chardev socket way in colo-comapre connect
->>>>>>>> to Xen
->>>>>>>> colo, for notify
->>>>>>>> checkpoint or failover, Because We have no choice to use this way
->>>>>>>> communicate with Xen codes.
->>>>>>>> That's means we will have two notify mechanism.
->>>>>>>> What do you think about this?
->>>>>>>>
->>>>>>>>
->>>>>>>> Thanks
->>>>>>>> Zhang Chen
->>>>>>> I was thinking the possibility of using similar way to for colo
->>>>>>> compare.
->>>>>>> E.g can we use socket? This can saves duplicated codes more or less.
->>>>>> Since there are too many sockets used by filter and COLO, (Two unix
->>>>>> sockets and two
->>>>>>     tcp sockets for each vNIC), I don't want to introduce more ;) ,
->>>>>> but
->>>>>> i'm not sure if it is
->>>>>> possible to make it more flexible and optional, abstract these
->>>>>> duplicated codes,
->>>>>> pass the opened fd (No matter eventfd or socket fd ) as parameter,
->>>>>> for
->>>>>> example.
->>>>>> Is this way acceptable ?
->>>>>>
->>>>>> Thanks,
->>>>>> Hailiang
->>>>> Yes, that's kind of what I want. We don't want to use two message
->>>>> format. Passing a opened fd need management support, we still need a
->>>>> fallback if there's no management on top. For qemu/kvm, we can do all
->>>>> stuffs transparent to the cli by e.g socketpair() or others, but
->>>>> the key
->>>>> is to have a unified message format.
->>>> After a deeper investigation, i think we can re-use most codes, since
->>>> there is no
->>>> existing way to notify xen (no ?), we still needs notify chardev
->>>> socket (Be used to notify xen, it is optional.)
->>>> (http://patchwork.ozlabs.org/patch/733431/ "COLO-compare: Add Xen
->>>> notify chardev socket handler frame")
->>> Yes and actually you can use this for bi-directional communication. The
->>> only differences is the implementation of comparing.
->>>
->>>> Besides, there is an existing qmp comand 'xen-colo-do-checkpoint',
->>> I don't see this in master?
->> Er, it has been merged already, please see migration/colo.c, void
->> qmp_xen_colo_do_checkpoint(Error **errp);
-> Aha, I see. Thanks.
+On Sat, 04/01 20:14, Ashijeet Acharya wrote:
+> Include a next pointer in VmdkMetaData struct to point to the previous
+> allocated L2 table. Modify vmdk_L2update to start updating metadata for
+> allocation of multiple clusters at once.
+> 
+> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
 
-;)
+This is the metadata part of the coalesed allocation. I think patch 3 is
+functionally incomplete without these changes, and is perhaps broken because
+metadata is not handled correctly.
 
->>>> we can re-use it to notify
->>>> colo-compare objects and other filter objects to do checkpoint, for
->>>> the opposite direction, we use
->>>> the notify chardev socket (Only for xen).
->>> Just want to make sure I understand the design, who will trigger this
->>> command? Management?
->> The command will be issued by XEN (xc_save ?), the original existing
->> xen-colo-do-checkpoint
->> command now only be used to notify block replication to do checkpoint,
->> we can re-use it for filters too.
-> So it was called by management. For KVM case, we probably don't need
-> this since the comparing thread are under control of qemu.
+Such an "intermediate functional regression" is not good in a series, which we
+need to avoid.
 
-Yes, you are right.
+> ---
+>  block/vmdk.c | 136 ++++++++++++++++++++++++++++++++++++++++++++++++-----------
+>  1 file changed, 111 insertions(+), 25 deletions(-)
+> 
+> diff --git a/block/vmdk.c b/block/vmdk.c
+> index 9456ddd..c7675db 100644
+> --- a/block/vmdk.c
+> +++ b/block/vmdk.c
+> @@ -137,6 +137,8 @@ typedef struct VmdkMetaData {
+>      int valid;
+>      uint32_t *l2_cache_entry;
+>      uint32_t nb_clusters;
+> +    uint32_t offset;
+> +    struct VmdkMetaData *next;
+>  } VmdkMetaData;
+>  
+>  typedef struct VmdkGrainMarker {
+> @@ -263,6 +265,12 @@ static inline uint64_t size_to_clusters(VmdkExtent *extent, uint64_t size)
+>      return (DIV_ROUND_UP(size + round_off_size, BDRV_SECTOR_SIZE * 128) - 1);
+>  }
+>  
+> +static inline int64_t vmdk_align_offset(int64_t offset, int n)
+> +{
+> +    offset = (offset + n - 1) & ~(n - 1);
+> +    return offset;
+> +}
+> +
+>  static uint32_t vmdk_read_cid(BlockDriverState *bs, int parent)
+>  {
+>      char *desc;
+> @@ -1037,29 +1045,88 @@ static void vmdk_refresh_limits(BlockDriverState *bs, Error **errp)
+>      }
+>  }
+>  
+> -static int vmdk_L2update(VmdkExtent *extent, VmdkMetaData *m_data,
+> -                         uint32_t offset)
+> +static int vmdk_alloc_cluster_link_l2(VmdkExtent *extent,
+> +                                      VmdkMetaData *m_data, bool zeroed)
+>  {
+> -    offset = cpu_to_le32(offset);
+> +    int i;
+> +    uint32_t offset, temp_offset;
+> +    int *l2_table_array;
+> +    int l2_array_size;
+> +
+> +    if (zeroed) {
+> +        temp_offset = VMDK_GTE_ZEROED;
+> +    } else {
+> +        temp_offset = m_data->offset;
+> +    }
+> +
+> +    temp_offset = cpu_to_le32(temp_offset);
+> +
+> +    l2_array_size = sizeof(uint32_t) * m_data->nb_clusters;
+> +    l2_table_array = qemu_try_blockalign(extent->file->bs,
+> +                                    vmdk_align_offset(l2_array_size, 512));
 
->>> Can we just use the socket?
->> I don't quite understand ...
->> Just as the codes showed bellow, in this scenario,
->> XEN notifies colo-compare and fiters do checkpoint by using qmp command,
-> Yes, that's just what I mean. Technically Xen can use socket to do this too.
+Indentation is off.
 
-Yes, great, since we have come to an agreement on the scenario, I'll update this series.
+Use QEMU_ALIGN_UP, instead of vmdk_align_offset.
 
-Thanks,
-Hailiang.
+512 is a magic number, use BDRV_SECTOR_SIZE.
 
-> Thanks
->
->> and colo-compare notifies XEN about net inconsistency event by using
->> the new socket.
->>
->>>> So the codes will be like:
->>>> diff --git a/migration/colo.c b/migration/colo.c
->>>> index 91da936..813c281 100644
->>>> --- a/migration/colo.c
->>>> +++ b/migration/colo.c
->>>> @@ -224,7 +224,19 @@ ReplicationStatus
->>>> *qmp_query_xen_replication_status(Error **errp)
->>>>
->>>>    void qmp_xen_colo_do_checkpoint(Error **errp)
->>>>    {
->>>> +    Error *local_err = NULL;
->>>> +
->>>>        replication_do_checkpoint_all(errp);
->>>> +    /* Notify colo-compare and other filters to do checkpoint */
->>>> +    colo_notify_compares_event(NULL, COLO_CHECKPOINT, &local_err);
->>>> +    if (local_err) {
->>>> +        error_propagate(errp, local_err);
->>>> +        return;
->>>> +    }
->>>> +    colo_notify_filters_event(COLO_CHECKPOINT, &local_err);
->>>> +    if (local_err) {
->>>> +        error_propagate(errp, local_err);
->>>> +    }
->>>>    }
->>>>
->>>>    static void colo_send_message(QEMUFile *f, COLOMessage msg,
->>>> diff --git a/net/colo-compare.c b/net/colo-compare.c
->>>> index 24e13f0..de975c5 100644
->>>> --- a/net/colo-compare.c
->>>> +++ b/net/colo-compare.c
->>>> @@ -391,6 +391,9 @@ static void colo_compare_inconsistent_notify(void)
->>>>    {
->>>>        notifier_list_notify(&colo_compare_notifiers,
->>>>                    migrate_get_current());
->> KVM will use this notifier/callback way, and in this way, we can avoid
->> the redundant socket.
->>
->>>> +    if (s->notify_dev) {
->>>> +       /* Do something, notify remote side through notify dev */
->>>> +    }
->>>>    }
->> If we have a notify socket configured, we will send the message about
->> net inconsistent event.
->>
->>>>    void colo_compare_register_notifier(Notifier *notify)
->>>>
->>>> How about this scenario ？
->>> See my reply above, and we need unify the message format too. Raw string
->>> is ok but we'd better have something like TLV or others.
->> Agreed, we need it to be more standard.
->>
->> Thanks,
->> Hailiang
->>
->>> Thanks
->>>
->>>>> Thoughts?
->>>>>
->>>>> Thanks
->>>>>
->>>>>>> Thanks
->>>>>>>
->>>>>>>
->>>>>>> .
->>>>>>>
->>>>> .
->>>>>
->>>>
->>> .
->>>
->>
->
-> .
->
+> +    if (l2_table_array == NULL) {
+> +        return VMDK_ERROR;
+> +    }
+> +    memset(l2_table_array, 0, vmdk_align_offset(l2_array_size, 512));
+> +
+>      /* update L2 table */
+> +    offset = temp_offset;
+> +    for (i = 0; i < m_data->nb_clusters; i++) {
+> +        l2_table_array[i] = offset;
+> +        if (!zeroed) {
+> +            offset += 128;
+
+Something is going wrong here with endianness on BE host, I believe.
+
+> +        }
+> +    }
+> +
+>      if (bdrv_pwrite_sync(extent->file,
+> -                ((int64_t)m_data->l2_offset * 512)
+> -                    + (m_data->l2_index * sizeof(offset)),
+> -                &offset, sizeof(offset)) < 0) {
+> +            ((int64_t)m_data->l2_offset * 512)
+> +                + ((m_data->l2_index) * sizeof(offset)),
+> +                         l2_table_array, l2_array_size) < 0) {
+
+You can fix the indentation while changing these lines. If not, don't change it,
+or at least don't make it uglier.
+
+>          return VMDK_ERROR;
+>      }
+> +
+>      /* update backup L2 table */
+>      if (extent->l1_backup_table_offset != 0) {
+>          m_data->l2_offset = extent->l1_backup_table[m_data->l1_index];
+>          if (bdrv_pwrite_sync(extent->file,
+>                      ((int64_t)m_data->l2_offset * 512)
+> -                        + (m_data->l2_index * sizeof(offset)),
+> -                    &offset, sizeof(offset)) < 0) {
+> +                        + ((m_data->l2_index) * sizeof(offset)),
+> +                                l2_table_array, l2_array_size) < 0) {
+
+Same here.
+
+>              return VMDK_ERROR;
+>          }
+>      }
+> +
+> +    offset = temp_offset;
+>      if (m_data->l2_cache_entry) {
+> -        *m_data->l2_cache_entry = offset;
+> +        for (i = 0; i < m_data->nb_clusters; i++) {
+> +            *m_data->l2_cache_entry = offset;
+> +            m_data->l2_cache_entry++;
+> +
+> +            if (!zeroed) {
+> +                offset += 128;
+> +            }
+> +        }
+> +    }
+> +
+> +    qemu_vfree(l2_table_array);
+> +    return VMDK_OK;
+> +}
+> +
+> +static int vmdk_L2update(VmdkExtent *extent, VmdkMetaData *m_data,
+> +                         bool zeroed)
+> +{
+> +    int ret;
+> +
+> +    while (m_data->next != NULL) {
+> +        VmdkMetaData *next;
+> +
+> +        ret = vmdk_alloc_cluster_link_l2(extent, m_data, zeroed);
+> +        if (ret < 0) {
+> +            return ret;
+> +        }
+> +
+> +        next = m_data->next;
+> +        m_data = next;
+
+Why not simply "m_data = m_data->next" and drop "next" variable?
+
+>      }
+>  
+>      return VMDK_OK;
+> @@ -1271,7 +1338,7 @@ exit:
+>   */
+>  static int handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
+>                          uint64_t offset, uint64_t *cluster_offset,
+> -                        int64_t *bytes, VmdkMetaData *m_data,
+> +                        int64_t *bytes, VmdkMetaData **m_data,
+>                          bool allocate, uint32_t *total_alloc_clusters)
+>  {
+>      int l1_index, l2_offset, l2_index;
+> @@ -1280,6 +1347,7 @@ static int handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
+>      uint32_t nb_clusters;
+>      bool zeroed = false;
+>      uint64_t skip_start_bytes, skip_end_bytes;
+> +    VmdkMetaData *old_m_data;
+>      int ret;
+>  
+>      ret = get_cluster_table(extent, offset, &l1_index, &l2_offset,
+> @@ -1330,13 +1398,21 @@ static int handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
+>          if (ret < 0) {
+>              return ret;
+>          }
+> -        if (m_data) {
+> -            m_data->valid = 1;
+> -            m_data->l1_index = l1_index;
+> -            m_data->l2_index = l2_index;
+> -            m_data->l2_offset = l2_offset;
+> -            m_data->l2_cache_entry = &l2_table[l2_index];
+> -            m_data->nb_clusters = nb_clusters;
+> +
+> +        if (*m_data) {
+> +            old_m_data = *m_data;
+> +            *m_data = g_malloc0(sizeof(**m_data));
+> +
+> +            **m_data = (VmdkMetaData) {
+> +                .valid            =    1,
+> +                .l1_index         =    l1_index,
+> +                .l2_index         =    l2_index,
+> +                .l2_offset        =    l2_offset,
+> +                .l2_cache_entry   =    &l2_table[l2_index],
+> +                .nb_clusters      =    nb_clusters,
+> +                .offset           =    cluster_sector,
+> +                .next             =    old_m_data,
+> +            };
+
+I think if the new m_data can be merged into the old, there is no need to
+allocate a new one.
+
+>          }
+>      }
+>      *cluster_offset = cluster_sector << BDRV_SECTOR_BITS;
+> @@ -1365,7 +1441,7 @@ static int handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
+>   */
+>  static int vmdk_alloc_cluster_offset(BlockDriverState *bs,
+>                                       VmdkExtent *extent,
+> -                                     VmdkMetaData *m_data, uint64_t offset,
+> +                                     VmdkMetaData **m_data, uint64_t offset,
+>                                       bool allocate, uint64_t *cluster_offset,
+>                                       int64_t bytes,
+>                                       uint32_t *total_alloc_clusters)
+> @@ -1385,8 +1461,8 @@ static int vmdk_alloc_cluster_offset(BlockDriverState *bs,
+>      new_cluster_offset = 0;
+>      *cluster_offset = 0;
+>      n_bytes = 0;
+> -    if (m_data) {
+> -        m_data->valid = 0;
+> +    if (*m_data) {
+> +        (*m_data)->valid = 0;
+>      }
+>  
+>      /* due to L2 table margins all bytes may not get allocated at once */
+> @@ -1768,9 +1844,11 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>      uint64_t cluster_offset;
+>      uint64_t bytes_done = 0;
+>      uint64_t extent_size;
+> -    VmdkMetaData m_data;
+> +    VmdkMetaData *m_data;
+>      uint32_t total_alloc_clusters = 0;
+>  
+> +    m_data = g_malloc0(sizeof(*m_data));
+> +
+>      if (DIV_ROUND_UP(offset, BDRV_SECTOR_SIZE) > bs->total_sectors) {
+>          error_report("Wrong offset: offset=0x%" PRIx64
+>                       " total_sectors=0x%" PRIx64,
+> @@ -1779,6 +1857,7 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>      }
+>  
+>      while (bytes > 0) {
+> +        m_data->next = NULL;
+>          extent = find_extent(s, offset >> BDRV_SECTOR_BITS, extent);
+>          if (!extent) {
+>              return -EIO;
+> @@ -1825,7 +1904,7 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>                                          total_alloc_clusters;
+>                  if (!zero_dry_run) {
+>                      /* update L2 tables */
+> -                    if (vmdk_L2update(extent, &m_data, VMDK_GTE_ZEROED)
+> +                    if (vmdk_L2update(extent, m_data, zeroed)
+>                              != VMDK_OK) {
+>                          return -EIO;
+>                      }
+> @@ -1839,10 +1918,9 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>              if (ret) {
+>                  return ret;
+>              }
+> -            if (m_data.valid) {
+> +            if (m_data->valid) {
+>                  /* update L2 tables */
+> -                if (vmdk_L2update(extent, &m_data,
+> -                                  cluster_offset >> BDRV_SECTOR_BITS)
+> +                if (vmdk_L2update(extent, m_data, zeroed)
+>                          != VMDK_OK) {
+>                      return -EIO;
+>                  }
+> @@ -1852,6 +1930,13 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>          offset += n_bytes;
+>          bytes_done += n_bytes;
+>  
+> +        while (m_data->next != NULL) {
+> +            VmdkMetaData *next;
+> +            next = m_data->next;
+> +            g_free(m_data);
+> +            m_data = next;
+> +        }
+> +
+>          /* update CID on the first write every time the virtual disk is
+>           * opened */
+>          if (!s->cid_updated) {
+> @@ -1862,6 +1947,7 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>              s->cid_updated = true;
+>          }
+>      }
+> +    g_free(m_data);
+
+This is weird, you free all but the last m_data with a while loop, a few lines
+above, and this one with a separate g_free().
+
+Please use one loop:
+
+    for (p = m_data; p; p = next) {
+        next = p->next;
+        g_free(p);
+    }
+
+>      return 0;
+>  }
+>  
+> -- 
+> 2.6.2
+> 
