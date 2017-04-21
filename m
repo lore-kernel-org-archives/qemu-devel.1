@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=277ba7b8b=anshul.makkar@citrix.com>)
-	id 1d1TX5-0001Ws-2g
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 04:03:12 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1Tef-0003kO-7W
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 04:11:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=277ba7b8b=anshul.makkar@citrix.com>)
-	id 1d1TX1-00010G-4K
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 04:03:11 -0400
-Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:8560
-	helo=SMTP.EU.CITRIX.COM)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1Tec-0003yL-01
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 04:11:01 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:3385
+	helo=dggrg03-dlp.huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=277ba7b8b=anshul.makkar@citrix.com>)
-	id 1d1TX0-0000za-Ip
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 04:03:07 -0400
-From: Anshul Makkar <anshul.makkar@citrix.com>
-Date: Fri, 21 Apr 2017 08:03:01 +0000
-Message-ID: <2484ff2a1cfc4415aa2ace3218ec4c75@AMSPEX02CL03.citrite.net>
-References: <152817b5-89cf-14fe-d83a-bb5c8d748c90@citrix.com>
-	<OF3C1CFB9D.4BFF82AD-ON00258106.00671A8D-00258106.00672723@notes.na.collabserv.com>
-In-Reply-To: <OF3C1CFB9D.4BFF82AD-ON00258106.00671A8D-00258106.00672723@notes.na.collabserv.com>
-Content-Language: en-US
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1Teb-0003xE-4l
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 04:10:57 -0400
+References: <1487734936-43472-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1487734936-43472-3-git-send-email-zhang.zhanghailiang@huawei.com>
+	<134776c2-a85d-d06f-5f98-2e664f9c8ca9@cn.fujitsu.com>
+	<d33b0150-5ed2-56cc-9261-da7deb1d0bfb@redhat.com>
+	<58F06AA1.2010301@huawei.com>
+	<9b42232a-e86f-2d61-7987-7a0559d6f705@redhat.com>
+	<58F4A12C.5070404@huawei.com>
+	<f7f4639d-7a08-5120-27f8-346011dc754f@redhat.com>
+	<58F5B902.8030105@huawei.com>
+	<c92f4670-5ecc-c048-b017-d78966a89514@redhat.com>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <58F9BE5A.3050807@huawei.com>
+Date: Fri, 21 Apr 2017 16:10:02 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] CUSE-TPM : Win 10 reports TPM device doesn't have
- sufficient resources
+In-Reply-To: <c92f4670-5ecc-c048-b017-d78966a89514@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 02/15] colo-compare: implement the process
+ of checkpoint
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,71 +37,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@us.ibm.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Jason Wang <jasowang@redhat.com>, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
+Cc: xuquan8@huawei.com, xiecl.fnst@cn.fujitsu.com, dgilbert@redhat.com, lizhijian@cn.fujitsu.com
 
-WWVzLCB2Mi44LjArdHBtIGJyYW5jaCB3b3JrZWQuIFRoYW5rcyBTdGVmYW4uDQoNCkFuc2h1bA0K
-DQpGcm9tOiBTdGVmYW4gQmVyZ2VyIFttYWlsdG86c3RlZmFuYkB1cy5pYm0uY29tXQ0KU2VudDog
-MTggQXByaWwgMjAxNyAxOTo0Nw0KVG86IEFuc2h1bCBNYWtrYXIgPGFuc2h1bC5tYWtrYXJAY2l0
-cml4LmNvbT4NCkNjOiBxZW11LWRldmVsQG5vbmdudS5vcmcNClN1YmplY3Q6IFJlOiBDVVNFLVRQ
-TSA6IFdpbiAxMCByZXBvcnRzIFRQTSBkZXZpY2UgZG9lc24ndCBoYXZlIHN1ZmZpY2llbnQgcmVz
-b3VyY2VzDQoNCllvdSBtYXkgd2FudCB0byB0cnkgaXQgZnJvbSB0aGlzIHZlcnNpb246IGh0dHBz
-Oi8vZ2l0aHViLmNvbS9zdGVmYW5iZXJnZXIvcWVtdS10cG0vdHJlZS92Mi44LjArdHBtDQoNCg0K
-LS0tLS0gT3JpZ2luYWwgbWVzc2FnZSAtLS0tLQ0KRnJvbTogYW5zaHVsIG1ha2thciA8YW5zaHVs
-Lm1ha2thckBjaXRyaXguY29tPG1haWx0bzphbnNodWwubWFra2FyQGNpdHJpeC5jb20+Pg0KVG86
-IDxxZW11LWRldmVsQG5vbmdudS5vcmc8bWFpbHRvOnFlbXUtZGV2ZWxAbm9uZ251Lm9yZz4+DQpD
-YzogU3RlZmFuIEJlcmdlci9XYXRzb24vSUJNQElCTVVTDQpTdWJqZWN0OiBDVVNFLVRQTSA6IFdp
-biAxMCByZXBvcnRzIFRQTSBkZXZpY2UgZG9lc24ndCBoYXZlIHN1ZmZpY2llbnQgcmVzb3VyY2Vz
-DQpEYXRlOiBUdWUsIEFwciAxOCwgMjAxNyAxOjQyIFBNDQoNCg0KSGksDQoNCg0KDQpJIGFtIHVz
-aW5nIENVU0UtVFBNIGJhc2VkIG9uDQoNCmh0dHBzOi8vZ2l0aHViLmNvbS9zdGVmYW5iZXJnZXIv
-cWVtdS10cG0gYnJhbmNoOiAyLjQuMSt0cG0NCg0KDQoNCmh0dHBzOi8vZ2l0aHViLmNvbS9zdGVm
-YW5iZXJnZXIvc3d0cG0NCg0KDQoNCmh0dHBzOi8vZ2l0aHViLmNvbS90czQ2OC9zZWFiaW9zLXRw
-bQ0KDQoNCg0KSSBhbSBmYWNpbmcgYW4gaXNzdWUgd2hlcmUgV0luZG93cyAxMCBndWVzdCBkZXZp
-Y2UgbWFuYWdlciByZXBvcnRzIFRQTSBzdGF0dXMgYXMgQA0KVGhlIGRldmljZSBzdGF0dXMgaXMg
-IlRoZSBkZXZpY2UgY2Fubm90IGZpbmQgZW5vdWdoIGZyZWUgcmVzb3VyY2VzIGl0IGNhbiB1c2Ug
-KENvZGUgMTIpIiMNCg0KT24gYnJvd3NpbmcgSSBmb3VuZCB0aGlzIHBhZ2UgIEBodHRwczovL2J1
-Z3ppbGxhLnJlZGhhdC5jb20vc2hvd19idWcuY2dpP2lkPTEyODE0MTMiIHRoYXQgcmVwb3J0cyBl
-eGFjdGx5IHRoZSBzYW1lIHByb2JsZW0gYW5kIHRoZSByZXNvbHV0aW9uIHBhdGNoIEAgaHR0cHM6
-Ly9idWd6aWxsYS5yZWRoYXQuY29tL2F0dGFjaG1lbnQuY2dpP2lkPTExMzcxNjbigIsgLg0KDQoN
-Cg0KSSBhcHBsaWVkIHRoZSBwYXRjaCBvbiB0aGUgY29kZSBhbmQgdmVyaWZpZWQgd2l0aCBkZWJ1
-ZyB0cmFjZSB0aGF0IHRoZSBwYXRjaCBjb2RlIGRvZXMgZXhlY3V0ZXMuDQoNCg0KDQpCdXQsIEkg
-YW0gc3RpbGwgb2JzZXJ2aW5nIHRoZSBzYW1lIGlzc3VlIG9uIFdpbiAxMCBndWVzdCBhbmQgb24g
-dXNpbmcgQUNQSWR1bXAgdXRpbGl0eSBpbiBXaW5kb3dzIGd1ZXN0IEkgY2FuIHN0aWxsIHNlZSAi
-SVJRIDUgYW5kIElSUU5vRmxhZ3MiIGluIHRoZSBzc2R0LmRzbCBjb2RlLg0KIERldmljZSAoSVNB
-LlRQTSkNCiAgICAgICAgICAgIHsNCiAgICAgICAgICAgICAgICBOYW1lIChfSElELCBFaXNhSWQg
-KCJQTlAwQzMxIikpICAvLyBfSElEOiBIYXJkd2FyZSBJRA0KICAgICAgICAgICAgICAgIE5hbWUg
-KF9TVEEsIDB4MEYpICAvLyBfU1RBOiBTdGF0dXMNCiAgICAgICAgICAgICAgICBOYW1lIChfQ1JT
-LCBSZXNvdXJjZVRlbXBsYXRlICgpICAvLyBfQ1JTOiBDdXJyZW50IFJlc291cmNlIFNldHRpbmdz
-DQogICAgICAgICAgICAgICAgew0KICAgICAgICAgICAgICAgICAgICBNZW1vcnkzMkZpeGVkIChS
-ZWFkV3JpdGUsDQogICAgICAgICAgICAgICAgICAgICAgICAweEZFRDQwMDAwLCAgICAgICAgIC8v
-IEFkZHJlc3MgQmFzZQ0KICAgICAgICAgICAgICAgICAgICAgICAgMHgwMDAwNTAwMCwgICAgICAg
-ICAvLyBBZGRyZXNzIExlbmd0aA0KICAgICAgICAgICAgICAgICAgICAgICAgKQ0KICAgICAgICAg
-ICAgICAgICAgICBJUlFOb0ZsYWdzICgpDQogICAgICAgICAgICAgICAgICAgICAgICB7NX0NCiAg
-ICAgICAgICAgICAgICB9KQ0KDQoNCg0KDQoNCkkgYW0gYml0IGNvbmZ1c2VkLCBmcm9tIG15IHVu
-ZGVyc3RhbmRpbmcsIGl0cyB0aGUgUUVNVSB0aGF0IGJ1aWxkcyB0aGUgU1NEVCB0YWJsZSBhbmQg
-SSBjYW4gYWxzbyB2ZXJpZnkgaXQgZnJvbSB0aGUgbG9ncy4gQnV0IHNvbWVob3cgZ3Vlc3QgaXMg
-Z2V0dGluZyB0aGUgb2xkIEFDUEkgdmFsdWVzIGZvciBUUE0gd2hpY2ggaXMgbm90IGFjY2VwdGFi
-bGUgdG8gV2luZG93cy4NCg0KSnVzdCB0byBiZSBzdXJlLCBJIGFsc28gdmVyaWZpZWQgdGhlIFNl
-YUJJT1MgY29kZSBhbmQgY291bGRuJ3QgZmluZCBhbnkgbGluayB0byB0aGlzIHRhYmxlLg0KDQoN
-Cg0KSGVyZSBpcyB0aGUgcGF0Y2ggdGhhdCBJIGFwcGxpZWQgYmFzZWQgb24gdGhlIGxpbmsgYWJv
-dmU6DQoNCg0KaWYgKG1pc2MtPnRwbV92ZXJzaW9uICE9IFRQTV9WRVJTSU9OX1VOU1BFQykgew0K
-ICAgICAgICAgICAgIEFDUElfQlVJTERfRFBSSU5URigiVFBNOiBhZGQgTU1JT1xuIik7DQogICAg
-ICAgICAgICAgZGV2ID0gYW1sX2RldmljZSgiVFBNIik7DQogICAgICAgICAgICAgYW1sX2FwcGVu
-ZChkZXYsIGFtbF9uYW1lX2RlY2woIl9ISUQiLCBhbWxfZWlzYWlkKCJQTlAwQzMxIikpKTsNCiAg
-ICAgICAgICAgICBhbWxfYXBwZW5kKGRldiwgYW1sX25hbWVfZGVjbCgiX1NUQSIsIGFtbF9pbnQo
-MHhGKSkpOw0KICAgICAgICAgICAgIGNycyA9IGFtbF9yZXNvdXJjZV90ZW1wbGF0ZSgpOw0KICAg
-ICAgICAgICAgIGFtbF9hcHBlbmQoY3JzLCBhbWxfbWVtb3J5MzJfZml4ZWQoVFBNX1RJU19BRERS
-X0JBU0UsDQogICAgICAgICAgICAgICAgICAgICAgICBUUE1fVElTX0FERFJfU0laRSwgQU1MX1JF
-QURfV1JJVEUpKTsNCiAgICAgICAgICAgICBhbWxfYXBwZW5kKGRldiwgYW1sX25hbWVfZGVjbCgi
-X0NSUyIsIGNycykpOw0KICAgICAgICAgICAgIGFtbF9hcHBlbmQoc2Jfc2NvcGUsIGRldik7DQog
-ICAgICAgICB9DQphbWxfYXBwZW5kKHNzZHQsIHNiX3Njb3BlKTsNCg0KbG9ncyBvbmNlIEkgc3Rh
-cnQgcWVtdToNCg0KQ1BJX0JVSUxEOiBpbml0IEFDUEkgdGFibGVzDQpBQ1BJX0JVSUxEOiBUUE06
-IGFkZCBNTUlPDQpBQ1BJX0JVSUxEOiBpbml0IEFDUEkgdGFibGVzDQpBQ1BJX0JVSUxEOiBUUE06
-IGFkZCBNTUlPDQoNCnRwbV90aXM6ICByZWFkLjQoMDAwMDBmMDApID0gMDAwMTEwMTQNCnRwbV90
-aXM6IHdyaXRlLjEoMDAwMDAwMDgpID0gMDAwMDAwMDANCnRwbV90aXM6ICByZWFkLjEoMDAwMDAw
-MDApID0gMDAwMDAwODENCg0KQ29tbWFuZHMgdG8gc3RhcnQgdlRQTToNCnN3dHBtX2N1c2UgLU0g
-MjYwIC1tIDEgLW4gdnRwbTANCg0KcWVtdS1zeXN0ZW0teDg2XzY0IC1lbmFibGUta3ZtIC1tIDEw
-MjQgLWJvb3QgZCAtYmlvcyBiaW9zLmJpbiAtYm9vdCBtZW51PW9uIC10cG1kZXYgY3VzZS10cG0s
-aWQ9dHBtMCxwYXRoPS9kZXYvdnRwbTAgLWRldmljZSB0cG0tdGlzLHRwbWRldj10cG0wIHdpbi5p
-bWcNCg0KUGxlYXNlIHN1Z2dlc3QgaWYgSSBhbSBtaXNzaW5nIGFueXRoaW5nIC4NCg0KVGhhbmtz
-DQpBbnNodWwgTWFra2FyDQoNCg0K
+On 2017/4/20 13:15, Jason Wang wrote:
+>
+> On 2017年04月18日 14:58, Hailiang Zhang wrote:
+>> On 2017/4/18 11:55, Jason Wang wrote:
+>>> On 2017年04月17日 19:04, Hailiang Zhang wrote:
+>>>> Hi Jason,
+>>>>
+>>>> On 2017/4/14 14:38, Jason Wang wrote:
+>>>>> On 2017年04月14日 14:22, Hailiang Zhang wrote:
+>>>>>> Hi Jason,
+>>>>>>
+>>>>>> On 2017/4/14 13:57, Jason Wang wrote:
+>>>>>>> On 2017年02月22日 17:31, Zhang Chen wrote:
+>>>>>>>> On 02/22/2017 11:42 AM, zhanghailiang wrote:
+>>>>>>>>> While do checkpoint, we need to flush all the unhandled packets,
+>>>>>>>>> By using the filter notifier mechanism, we can easily to notify
+>>>>>>>>> every compare object to do this process, which runs inside
+>>>>>>>>> of compare threads as a coroutine.
+>>>>>>>> Hi~ Jason and Hailiang.
+>>>>>>>>
+>>>>>>>> I will send a patch set later about colo-compare notify
+>>>>>>>> mechanism for
+>>>>>>>> Xen like this patch.
+>>>>>>>> I want to add a new chardev socket way in colo-comapre connect
+>>>>>>>> to Xen
+>>>>>>>> colo, for notify
+>>>>>>>> checkpoint or failover, Because We have no choice to use this way
+>>>>>>>> communicate with Xen codes.
+>>>>>>>> That's means we will have two notify mechanism.
+>>>>>>>> What do you think about this?
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> Thanks
+>>>>>>>> Zhang Chen
+>>>>>>> I was thinking the possibility of using similar way to for colo
+>>>>>>> compare.
+>>>>>>> E.g can we use socket? This can saves duplicated codes more or less.
+>>>>>> Since there are too many sockets used by filter and COLO, (Two unix
+>>>>>> sockets and two
+>>>>>>     tcp sockets for each vNIC), I don't want to introduce more ;) ,
+>>>>>> but
+>>>>>> i'm not sure if it is
+>>>>>> possible to make it more flexible and optional, abstract these
+>>>>>> duplicated codes,
+>>>>>> pass the opened fd (No matter eventfd or socket fd ) as parameter,
+>>>>>> for
+>>>>>> example.
+>>>>>> Is this way acceptable ?
+>>>>>>
+>>>>>> Thanks,
+>>>>>> Hailiang
+>>>>> Yes, that's kind of what I want. We don't want to use two message
+>>>>> format. Passing a opened fd need management support, we still need a
+>>>>> fallback if there's no management on top. For qemu/kvm, we can do all
+>>>>> stuffs transparent to the cli by e.g socketpair() or others, but
+>>>>> the key
+>>>>> is to have a unified message format.
+>>>> After a deeper investigation, i think we can re-use most codes, since
+>>>> there is no
+>>>> existing way to notify xen (no ?), we still needs notify chardev
+>>>> socket (Be used to notify xen, it is optional.)
+>>>> (http://patchwork.ozlabs.org/patch/733431/ "COLO-compare: Add Xen
+>>>> notify chardev socket handler frame")
+>>> Yes and actually you can use this for bi-directional communication. The
+>>> only differences is the implementation of comparing.
+>>>
+>>>> Besides, there is an existing qmp comand 'xen-colo-do-checkpoint',
+>>> I don't see this in master?
+>> Er, it has been merged already, please see migration/colo.c, void
+>> qmp_xen_colo_do_checkpoint(Error **errp);
+> Aha, I see. Thanks.
+
+;)
+
+>>>> we can re-use it to notify
+>>>> colo-compare objects and other filter objects to do checkpoint, for
+>>>> the opposite direction, we use
+>>>> the notify chardev socket (Only for xen).
+>>> Just want to make sure I understand the design, who will trigger this
+>>> command? Management?
+>> The command will be issued by XEN (xc_save ?), the original existing
+>> xen-colo-do-checkpoint
+>> command now only be used to notify block replication to do checkpoint,
+>> we can re-use it for filters too.
+> So it was called by management. For KVM case, we probably don't need
+> this since the comparing thread are under control of qemu.
+
+Yes, you are right.
+
+>>> Can we just use the socket?
+>> I don't quite understand ...
+>> Just as the codes showed bellow, in this scenario,
+>> XEN notifies colo-compare and fiters do checkpoint by using qmp command,
+> Yes, that's just what I mean. Technically Xen can use socket to do this too.
+
+Yes, great, since we have come to an agreement on the scenario, I'll update this series.
+
+Thanks,
+Hailiang.
+
+> Thanks
+>
+>> and colo-compare notifies XEN about net inconsistency event by using
+>> the new socket.
+>>
+>>>> So the codes will be like:
+>>>> diff --git a/migration/colo.c b/migration/colo.c
+>>>> index 91da936..813c281 100644
+>>>> --- a/migration/colo.c
+>>>> +++ b/migration/colo.c
+>>>> @@ -224,7 +224,19 @@ ReplicationStatus
+>>>> *qmp_query_xen_replication_status(Error **errp)
+>>>>
+>>>>    void qmp_xen_colo_do_checkpoint(Error **errp)
+>>>>    {
+>>>> +    Error *local_err = NULL;
+>>>> +
+>>>>        replication_do_checkpoint_all(errp);
+>>>> +    /* Notify colo-compare and other filters to do checkpoint */
+>>>> +    colo_notify_compares_event(NULL, COLO_CHECKPOINT, &local_err);
+>>>> +    if (local_err) {
+>>>> +        error_propagate(errp, local_err);
+>>>> +        return;
+>>>> +    }
+>>>> +    colo_notify_filters_event(COLO_CHECKPOINT, &local_err);
+>>>> +    if (local_err) {
+>>>> +        error_propagate(errp, local_err);
+>>>> +    }
+>>>>    }
+>>>>
+>>>>    static void colo_send_message(QEMUFile *f, COLOMessage msg,
+>>>> diff --git a/net/colo-compare.c b/net/colo-compare.c
+>>>> index 24e13f0..de975c5 100644
+>>>> --- a/net/colo-compare.c
+>>>> +++ b/net/colo-compare.c
+>>>> @@ -391,6 +391,9 @@ static void colo_compare_inconsistent_notify(void)
+>>>>    {
+>>>>        notifier_list_notify(&colo_compare_notifiers,
+>>>>                    migrate_get_current());
+>> KVM will use this notifier/callback way, and in this way, we can avoid
+>> the redundant socket.
+>>
+>>>> +    if (s->notify_dev) {
+>>>> +       /* Do something, notify remote side through notify dev */
+>>>> +    }
+>>>>    }
+>> If we have a notify socket configured, we will send the message about
+>> net inconsistent event.
+>>
+>>>>    void colo_compare_register_notifier(Notifier *notify)
+>>>>
+>>>> How about this scenario ？
+>>> See my reply above, and we need unify the message format too. Raw string
+>>> is ok but we'd better have something like TLV or others.
+>> Agreed, we need it to be more standard.
+>>
+>> Thanks,
+>> Hailiang
+>>
+>>> Thanks
+>>>
+>>>>> Thoughts?
+>>>>>
+>>>>> Thanks
+>>>>>
+>>>>>>> Thanks
+>>>>>>>
+>>>>>>>
+>>>>>>> .
+>>>>>>>
+>>>>> .
+>>>>>
+>>>>
+>>> .
+>>>
+>>
+>
+> .
+>
