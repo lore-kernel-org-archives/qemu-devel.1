@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d1RJa-0005sf-2T
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 01:41:07 -0400
+	(envelope-from <armbru@redhat.com>) id 1d1RME-0008Ik-HC
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 01:43:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d1RJZ-0004e9-6r
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 01:41:06 -0400
+	(envelope-from <armbru@redhat.com>) id 1d1RMD-0005aF-PY
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 01:43:50 -0400
 From: Markus Armbruster <armbru@redhat.com>
-References: <20170414083717.13641-1-lvivier@redhat.com>
-Date: Fri, 21 Apr 2017 07:40:55 +0200
-In-Reply-To: <20170414083717.13641-1-lvivier@redhat.com> (Laurent Vivier's
-	message of "Fri, 14 Apr 2017 10:37:13 +0200")
-Message-ID: <87tw5i1fo8.fsf@dusky.pond.sub.org>
+References: <20170420040003.31074-1-famz@redhat.com>
+	<20170420153016.GI3227@redhat.com>
+	<20170420203250.GI4747@noname.redhat.com>
+Date: Fri, 21 Apr 2017 07:43:36 +0200
+In-Reply-To: <20170420203250.GI4747@noname.redhat.com> (Kevin Wolf's message
+	of "Thu, 20 Apr 2017 22:32:50 +0200")
+Message-ID: <87pog61fjr.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] qdev: remove all remaining
- cannot_destroy_with_object_finalize_yet
+Subject: Re: [Qemu-devel] [PATCH] sheepdog: Set error when connection fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,31 +24,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Antony Pavlov <antonynpavlov@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, sheepdog@lists.wpkg.org, qemu-block@nongnu.org, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Liu Yuan <namei.unix@gmail.com>, Fam Zheng <famz@redhat.com>
 
-Laurent Vivier <lvivier@redhat.com> writes:
+Kevin Wolf <kwolf@redhat.com> writes:
 
-> This series removes all the remaining uses of
-> cannot_destroy_with_object_finalize_yet to finally remove
-> the flag itself.
+> Am 20.04.2017 um 17:30 hat Daniel P. Berrange geschrieben:
+>> On Thu, Apr 20, 2017 at 12:00:03PM +0800, Fam Zheng wrote:
+>> > Signed-off-by: Fam Zheng <famz@redhat.com>
+>> > ---
+>> >  block/sheepdog.c | 1 +
+>> >  1 file changed, 1 insertion(+)
+>> > 
+>> > diff --git a/block/sheepdog.c b/block/sheepdog.c
+>> > index fb9203e..7e889ee 100644
+>> > --- a/block/sheepdog.c
+>> > +++ b/block/sheepdog.c
+>> > @@ -608,6 +608,7 @@ static int connect_to_sdog(BDRVSheepdogState *s, Error **errp)
+>> >          qemu_set_nonblock(fd);
+>> >      } else {
+>> >          fd = -EIO;
+>> > +        error_setg(errp, "Failed to connect to sheepdog server");
+>> >      }
+>> 
+>> This doesn't make much sense to me. The lines just above the
+>> diff context have this:
+>> 
+>>     fd = socket_connect(s->addr, errp, NULL, NULL);
+>> 
+>> socket_connect should have already reported an error on "errp"
+>> in the scenario that 'fd == -1'.
 >
-> The ARM patch has already been sent alone and reviewed by Markus.
-> I have tested the ppc one on ppc64 machine with KVM and using
-> QDM device-list-properties command.
->
-> For the versatile one, the flag allowed to workaround a problem
-> in the bus unparent function: the bus unparent is trying to
-> unparent all the children of the bus. To do that, it has a list
-> of the children of the bus, and calls object_unparent() for each
-> child, and object_unparent() calls object_property_del_child() if
-> obj->parent is not NULL.  As qdev_set_parent_bus() set only
-> parent_bus and the list of children, parent is NULL and the child
-> is never deleted.  We can avoid the problem by moving the
-> qdev_set_parent_bus() to the realize part.
->
-> I've tested all the changes with "make check" (including
-> device-introspect-test). I've booted a versatilepb machine
-> with a 3.16.0-4 debian installer kernel.
+> By the way, am I the only one who thinks that having errp anywhere else
+> than as the last argument is bad style? I can easily see myself missing
+> that this functions sets it because the last argument is NULL.
 
-Applied to my tree, thanks!
+Yes, it's bad style because it's suprising.  Worth fixing.
