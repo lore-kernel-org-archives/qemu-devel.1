@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d1Ytl-0004vc-Fz
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 09:47:01 -0400
+	(envelope-from <jcody@redhat.com>) id 1d1Ytp-00051F-VA
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 09:47:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d1Ytk-0002RH-Jb
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 09:46:57 -0400
+	(envelope-from <jcody@redhat.com>) id 1d1Ytl-0002Rl-Us
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 09:47:01 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Fri, 21 Apr 2017 09:46:39 -0400
-Message-Id: <20170421134644.10239-8-jcody@redhat.com>
+Date: Fri, 21 Apr 2017 09:46:40 -0400
+Message-Id: <20170421134644.10239-9-jcody@redhat.com>
 In-Reply-To: <20170421134644.10239-1-jcody@redhat.com>
 References: <20170421134644.10239-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL 07/12] block: code movement
+Subject: [Qemu-devel] [PULL 08/12] block: introduce bdrv_can_set_read_only()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,43 +22,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org
 
-Move bdrv_is_read_only() up with its friends.
+Introduce check function for setting read_only flags.  Will return < 0 on
+error, with appropriate Error value set.  Does not alter any flags.
 
+Signed-off-by: Jeff Cody <jcody@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
-Signed-off-by: Jeff Cody <jcody@redhat.com>
-Message-id: 73b2399459760c32506f9407efb9dddb3a2789de.1491597120.git.jcody@redhat.com
+Message-id: e2bba34ac3bc76a0c42adc390413f358ae0566e8.1491597120.git.jcody@redhat.com
 ---
- block.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ block.c               | 14 +++++++++++++-
+ include/block/block.h |  1 +
+ 2 files changed, 14 insertions(+), 1 deletion(-)
 
 diff --git a/block.c b/block.c
-index b74d445..bf09026 100644
+index bf09026..84f12f7 100644
 --- a/block.c
 +++ b/block.c
-@@ -192,6 +192,11 @@ void path_combine(char *dest, int dest_size,
-     }
+@@ -197,7 +197,7 @@ bool bdrv_is_read_only(BlockDriverState *bs)
+     return bs->read_only;
  }
  
-+bool bdrv_is_read_only(BlockDriverState *bs)
-+{
-+    return bs->read_only;
-+}
-+
- int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
+-int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
++int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
  {
      /* Do not set read_only if copy_on_read is enabled */
-@@ -3375,11 +3380,6 @@ void bdrv_get_geometry(BlockDriverState *bs, uint64_t *nb_sectors_ptr)
-     *nb_sectors_ptr = nb_sectors < 0 ? 0 : nb_sectors;
- }
+     if (bs->copy_on_read && read_only) {
+@@ -213,6 +213,18 @@ int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
+         return -EPERM;
+     }
  
--bool bdrv_is_read_only(BlockDriverState *bs)
--{
--    return bs->read_only;
--}
--
- bool bdrv_is_sg(BlockDriverState *bs)
- {
-     return bs->sg;
++    return 0;
++}
++
++int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
++{
++    int ret = 0;
++
++    ret = bdrv_can_set_read_only(bs, read_only, errp);
++    if (ret < 0) {
++        return ret;
++    }
++
+     bs->read_only = read_only;
+     return 0;
+ }
+diff --git a/include/block/block.h b/include/block/block.h
+index 3525590..56b27fb 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -434,6 +434,7 @@ int bdrv_is_allocated_above(BlockDriverState *top, BlockDriverState *base,
+                             int64_t sector_num, int nb_sectors, int *pnum);
+ 
+ bool bdrv_is_read_only(BlockDriverState *bs);
++int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only, Error **errp);
+ int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp);
+ bool bdrv_is_sg(BlockDriverState *bs);
+ bool bdrv_is_inserted(BlockDriverState *bs);
 -- 
 2.9.3
