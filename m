@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d1Ph9-0006dA-8w
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 23:57:21 -0400
+	(envelope-from <famz@redhat.com>) id 1d1PhG-0006j7-AA
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 23:57:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d1Ph6-0004C3-66
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 23:57:19 -0400
+	(envelope-from <famz@redhat.com>) id 1d1PhC-0004GH-Bg
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 23:57:26 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 21 Apr 2017 11:56:05 +0800
-Message-Id: <20170421035606.448-20-famz@redhat.com>
+Date: Fri, 21 Apr 2017 11:56:06 +0800
+Message-Id: <20170421035606.448-21-famz@redhat.com>
 In-Reply-To: <20170421035606.448-1-famz@redhat.com>
 References: <20170421035606.448-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v14 19/20] file-posix: Add image locking in
- perm operations
+Subject: [Qemu-devel] [PATCH v14 20/20] qemu-iotests: Add test case 153 for
+ image locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,862 +23,884 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-virtlockd in libvirt locks the first byte, so we start looking at the
-file bytes from 0x10.
-
-The complication is in the transactional interface.  To make the reopen
-logic managable, and allow better reuse, the code is internally
-organized with a table from old mode to the new one.
-
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block/file-posix.c | 739 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 736 insertions(+), 3 deletions(-)
+ tests/qemu-iotests/153     | 219 ++++++++++++++++
+ tests/qemu-iotests/153.out | 627 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 847 insertions(+)
+ create mode 100755 tests/qemu-iotests/153
+ create mode 100644 tests/qemu-iotests/153.out
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 2114720..c307493 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -129,8 +129,54 @@ do { \
- 
- #define MAX_BLOCKSIZE	4096
- 
-+/* Posix file locking bytes. Libvirt takes byte 0, we start from byte 0x10,
-+ * leaving a few more bytes for its future use. */
-+#define RAW_LOCK_BYTE_MIN             0x10
-+#define RAW_LOCK_BYTE_NO_OTHER_WRITER 0x10
-+#define RAW_LOCK_BYTE_WRITE           0x11
-+#ifdef F_OFD_SETLK
-+#define RAW_LOCK_SUPPORTED 1
-+#else
-+#define RAW_LOCK_SUPPORTED 0
-+#endif
+diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
+new file mode 100755
+index 0000000..ff22615
+--- /dev/null
++++ b/tests/qemu-iotests/153
+@@ -0,0 +1,219 @@
++#!/bin/bash
++#
++# Test image locking
++#
++# Copyright 2016, 2017 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-+/*
-+ ** reader that can tolerate writers: Don't do anything
-+ *
-+ ** reader that can't tolerate writers: Take shared lock on byte 0x10. Test
-+ *  byte 0x11 is unlocked.
-+ *
-+ ** shared writer: Take shared lock on byte 0x11. Test byte 0x10 is unlocked.
-+ *
-+ ** exclusive writer: Take exclusive locks on both bytes.
-+ */
++# creator
++owner=famz@redhat.com
 +
-+typedef enum {
-+    /* Read only and accept other writers. */
-+    RAW_L_READ_SHARE_RW,
-+    /* Read only and try to forbid other writers. */
-+    RAW_L_READ,
-+    /* Read/write and accept other writers. */
-+    RAW_L_WRITE_SHARE_RW,
-+    /* Read/write and try to forbid other writers. */
-+    RAW_L_WRITE,
-+} BDRVRawLockMode;
++seq="$(basename $0)"
++echo "QA output created by $seq"
 +
-+typedef struct BDRVRawLockUpdateState {
-+    /* A dup of @fd used for acquiring lock. */
-+    int image_fd;
-+    int lock_fd;
-+    int open_flags;
-+    BDRVRawLockMode new_lock;
-+    bool use_lock;
-+} BDRVRawLockUpdateState;
++here="$PWD"
++tmp=/tmp/$$
++status=1	# failure is the default!
 +
- typedef struct BDRVRawState {
-     int fd;
-+    /* A dup of @fd to make manipulating lock easier, especially during reopen,
-+     * where this will accept BDRVRawReopenState.lock_fd. */
-+    int lock_fd;
-+    bool use_lock;
-     int type;
-     int open_flags;
-     size_t buf_align;
-@@ -145,6 +191,11 @@ typedef struct BDRVRawState {
-     bool page_cache_inconsistent:1;
-     bool has_fallocate;
-     bool needs_alignment;
-+    /* The current lock mode we are in. Note that in incoming migration this is
-+     * the "desired" mode to be applied at bdrv_invalidate_cache. */
-+    BDRVRawLockMode cur_lock_mode;
-+    /* Used by raw_check_perm/raw_set_perm. */
-+    BDRVRawLockUpdateState *lock_update;
- } BDRVRawState;
- 
- typedef struct BDRVRawReopenState {
-@@ -367,6 +418,59 @@ static void raw_parse_flags(int bdrv_flags, int *open_flags)
-     }
- }
- 
-+static int raw_lock_fd(int fd, BDRVRawLockMode mode, Error **errp)
++_cleanup()
 +{
-+    int ret;
-+    assert(fd >= 0);
-+    assert(RAW_LOCK_SUPPORTED);
-+    switch (mode) {
-+    case RAW_L_READ_SHARE_RW:
-+        ret = qemu_unlock_fd(fd, RAW_LOCK_BYTE_MIN, 2);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Failed to unlock fd");
-+            goto fail;
-+        }
-+        break;
-+    case RAW_L_READ:
-+        ret = qemu_lock_fd(fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, false);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Failed to lock share byte");
-+            goto fail;
-+        }
-+        ret = qemu_lock_fd_test(fd, RAW_LOCK_BYTE_WRITE, 1, true);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Write byte lock is taken");
-+            goto fail;
-+        }
-+        break;
-+    case RAW_L_WRITE_SHARE_RW:
-+        ret = qemu_lock_fd(fd, RAW_LOCK_BYTE_WRITE, 1, false);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Failed to lock write byte");
-+            goto fail;
-+        }
-+        ret = qemu_lock_fd_test(fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, true);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Share byte lock is taken");
-+            goto fail;
-+        }
-+        break;
-+    case RAW_L_WRITE:
-+        ret = qemu_lock_fd(fd, RAW_LOCK_BYTE_MIN, 2, true);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Failed to lock image");
-+            goto fail;
-+        }
-+        break;
-+    default:
-+        abort();
-+    }
-+    return 0;
-+fail:
-+    qemu_unlock_fd(fd, RAW_LOCK_BYTE_MIN, 2);
-+    return ret;
++    _cleanup_test_img
++    rm -f "${TEST_IMG}.base"
++    rm -f "${TEST_IMG}.convert"
++    rm -f "${TEST_IMG}.a"
++    rm -f "${TEST_IMG}.b"
++    rm -f "${TEST_IMG}.lnk"
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++. ./common.qemu
++
++_supported_fmt qcow2
++_supported_proto file
++_supported_os Linux
++
++size=32M
++
++_run_cmd()
++{
++    echo
++    (echo "$@"; "$@" 2>&1 1>/dev/null) | _filter_testdir
 +}
 +
- static void raw_parse_filename(const char *filename, QDict *options,
-                                Error **errp)
- {
-@@ -401,6 +505,23 @@ static QemuOptsList raw_runtime_opts = {
-     },
- };
- 
-+static BDRVRawLockMode raw_get_lock_mode(bool write, bool shared)
++function _do_run_qemu()
 +{
-+    if (write) {
-+        if (shared) {
-+            return RAW_L_WRITE_SHARE_RW;
-+        } else {
-+            return RAW_L_WRITE;
-+        }
-+    } else {
-+        if (shared) {
-+            return RAW_L_READ_SHARE_RW;
-+        } else {
-+            return RAW_L_READ;
-+        }
-+    }
++    (
++        if ! test -t 0; then
++            while read cmd; do
++                echo $cmd
++            done
++        fi
++        echo quit
++    ) | $QEMU -nographic -monitor stdio -serial none "$@" 1>/dev/null
 +}
 +
- static int raw_open_common(BlockDriverState *bs, QDict *options,
-                            int bdrv_flags, int open_flags, Error **errp)
- {
-@@ -440,10 +561,13 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
-     }
-     s->use_linux_aio = (aio == BLOCKDEV_AIO_OPTIONS_NATIVE);
- 
-+    s->use_lock = qemu_opt_get_bool(opts, "locking", true);
-+
-     s->open_flags = open_flags;
-     raw_parse_flags(bdrv_flags, &s->open_flags);
- 
-     s->fd = -1;
-+    s->lock_fd = -1;
-     fd = qemu_open(filename, s->open_flags, 0644);
-     if (fd < 0) {
-         ret = -errno;
-@@ -542,6 +666,509 @@ static int raw_open(BlockDriverState *bs, QDict *options, int flags,
-     return raw_open_common(bs, options, flags, 0, errp);
- }
- 
-+typedef enum {
-+    RAW_LT_PREPARE,
-+    RAW_LT_COMMIT,
-+    RAW_LT_ABORT
-+} RawLockTransOp;
-+
-+typedef int (*RawLockTransFunc)(RawLockTransOp op,
-+                                int old_lock_fd, int new_lock_fd,
-+                                BDRVRawLockMode old_lock,
-+                                BDRVRawLockMode new_lock,
-+                                Error **errp);
-+
-+static int raw_lt_nop(RawLockTransOp op,
-+                      int old_lock_fd, int new_lock_fd,
-+                      BDRVRawLockMode old_lock,
-+                      BDRVRawLockMode new_lock,
-+                      Error **errp)
++function _run_qemu_with_images()
 +{
-+    assert(old_lock == new_lock || new_lock == RAW_L_READ_SHARE_RW);
-+    return 0;
++    _do_run_qemu \
++        $(for i in $@; do echo "-drive if=none,file=$i"; done) 2>&1 \
++        | _filter_testdir | _filter_qemu
 +}
 +
-+static int raw_lt_from_unlock(RawLockTransOp op,
-+                              int old_lock_fd, int new_lock_fd,
-+                              BDRVRawLockMode old_lock,
-+                              BDRVRawLockMode new_lock,
-+                              Error **errp)
-+{
-+    assert(old_lock != new_lock);
-+    assert(old_lock == RAW_L_READ_SHARE_RW);
-+    switch (op) {
-+    case RAW_LT_PREPARE:
-+        return raw_lock_fd(new_lock_fd, new_lock, errp);
-+    case RAW_LT_COMMIT:
-+        break;
-+    case RAW_LT_ABORT:
-+        break;
-+    }
++test_opts="$(echo readonly={on,off},force-shared-write={on,off})"
 +
-+    return 0;
-+}
++for opts1 in "" $test_opts; do
++    echo
++    echo "== Creating base image =="
++    TEST_IMG="${TEST_IMG}.base" _make_test_img $size
 +
-+static int raw_lt_read_to_write_share(RawLockTransOp op,
-+                                      int old_lock_fd, int new_lock_fd,
-+                                      BDRVRawLockMode old_lock,
-+                                      BDRVRawLockMode new_lock,
-+                                      Error **errp)
-+{
-+    int ret = 0;
++    echo
++    echo "== Creating test image =="
++    $QEMU_IMG create -f $IMGFMT "${TEST_IMG}" -b ${TEST_IMG}.base | _filter_img_create
 +
-+    assert(old_lock == RAW_L_READ);
-+    assert(new_lock == RAW_L_WRITE_SHARE_RW);
++    echo
++    echo "== Launching QEMU, opts: '$opts1' =="
++    _launch_qemu -drive file="${TEST_IMG}",if=none,$opts1
++    h=$QEMU_HANDLE
 +
-+    /*
-+     *        lock byte "no other writer"      lock byte "write"
-+     * old                S                           0
-+     * new                0                           S
-+     *
-+     * (0 = unlocked; S = shared; X = exclusive.)
-+     */
-+    switch (op) {
-+    case RAW_LT_PREPARE:
-+        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_WRITE, 1, true);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Failed to lock new fd (write byte)");
-+            break;
-+        }
-+        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, false);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Failed to lock new fd (share byte)");
-+            break;
-+        }
-+        ret = qemu_unlock_fd(old_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Failed to unlock old fd (share byte)");
-+            break;
-+        }
-+        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, true);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Failed to upgrade new fd (share byte)");
-+            break;
-+        }
-+        ret = qemu_unlock_fd(new_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1);
-+        if (ret) {
-+            /* This is very unlikely, but catch it anyway. */
-+            error_setg_errno(errp, -ret, "Failed to unlock new fd (share byte)");
-+            break;
-+        }
-+        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_WRITE, 1, false);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Failed to downgrade new fd (write byte)");
-+            break;
-+        }
-+        break;
-+    case RAW_LT_COMMIT:
-+        break;
-+    case RAW_LT_ABORT:
-+        ret = qemu_lock_fd(old_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, false);
-+        if (ret) {
-+            /* As unlikely as above unlock failure, but report it anyway. */
-+            error_report("Failed to restore lock on old fd (share byte)");
-+        }
-+        break;
-+    }
-+    return ret;
-+}
++    for opts2 in "" $test_opts; do
++        echo
++        echo "== Launching another QEMU, opts: '$opts2' =="
++        echo "quit" | \
++            $QEMU -nographic -monitor stdio \
++            -drive file="${TEST_IMG}",if=none,$opts2 2>&1 1>/dev/null | \
++            _filter_testdir | _filter_qemu
++    done
 +
-+static int raw_lt_read_to_write(RawLockTransOp op,
-+                                int old_lock_fd, int new_lock_fd,
-+                                BDRVRawLockMode old_lock,
-+                                BDRVRawLockMode new_lock,
-+                                Error **errp)
-+{
-+    int ret = 0;
++    for L in "" "-U"; do
 +
-+    assert(old_lock == RAW_L_READ);
-+    assert(new_lock == RAW_L_WRITE);
-+    /*
-+     *        lock byte "no other writer"      lock byte "write"
-+     * old                S                           0
-+     * new                X                           X
-+     *
-+     * (0 = unlocked; S = shared; X = exclusive.)
-+     */
-+    switch (op) {
-+    case RAW_LT_PREPARE:
-+        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_WRITE, 1, true);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Failed to lock new fd (write byte)");
-+            break;
-+        }
-+        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, false);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Failed to lock new fd (share byte)");
-+            break;
-+        }
-+        ret = qemu_unlock_fd(old_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Failed to unlock old fd (share byte)");
-+            break;
-+        }
-+        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, true);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Failed to upgrade new fd (share byte)");
-+            break;
-+        }
-+        break;
-+    case RAW_LT_COMMIT:
-+        break;
-+    case RAW_LT_ABORT:
-+        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, false);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Failed to downgrade new fd (share byte)");
-+            break;
-+        }
-+        ret = qemu_lock_fd(old_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, false);
-+        if (ret) {
-+            error_report("Failed to restore lock on old fd (share byte)");
-+        }
-+        break;
-+    }
-+    return ret;
-+}
++        echo
++        echo "== Running utility commands $L =="
++        _run_cmd $QEMU_IO $L -c "read 0 512" "${TEST_IMG}"
++        _run_cmd $QEMU_IO $L -r -c "read 0 512" "${TEST_IMG}"
++        _run_cmd $QEMU_IO -c "open $L ${TEST_IMG}" -c "read 0 512"
++        _run_cmd $QEMU_IO -c "open -r $L ${TEST_IMG}" -c "read 0 512"
++        _run_cmd $QEMU_IMG info        $L "${TEST_IMG}"
++        _run_cmd $QEMU_IMG check       $L "${TEST_IMG}"
++        _run_cmd $QEMU_IMG compare     $L "${TEST_IMG}" "${TEST_IMG}"
++        _run_cmd $QEMU_IMG map         $L "${TEST_IMG}"
++        _run_cmd $QEMU_IMG amend -o "" $L "${TEST_IMG}"
++        _run_cmd $QEMU_IMG commit      $L "${TEST_IMG}"
++        _run_cmd $QEMU_IMG resize      $L "${TEST_IMG}" $size
++        _run_cmd $QEMU_IMG rebase      $L "${TEST_IMG}" -b "${TEST_IMG}.base"
++        _run_cmd $QEMU_IMG snapshot -l $L "${TEST_IMG}"
++        _run_cmd $QEMU_IMG convert     $L "${TEST_IMG}" "${TEST_IMG}.convert"
++        _run_cmd $QEMU_IMG dd          $L if="${TEST_IMG}" of="${TEST_IMG}.convert" bs=512 count=1
++        _run_cmd $QEMU_IMG bench       $L -c 1 "${TEST_IMG}"
++        _run_cmd $QEMU_IMG bench       $L -w -c 1 "${TEST_IMG}"
++    done
++    _send_qemu_cmd $h "{ 'execute': 'quit', }" ""
++    echo
++    echo "Round done"
++    _cleanup_qemu
++done
 +
-+static int raw_lt_write_share_to_read(RawLockTransOp op,
-+                                      int old_lock_fd, int new_lock_fd,
-+                                      BDRVRawLockMode old_lock,
-+                                      BDRVRawLockMode new_lock,
-+                                      Error **errp)
-+{
-+    int ret = 0;
++for opt1 in $test_opts; do
++    for opt2 in $test_opts; do
++        echo
++        echo "== Two devices with the same image ($opt1 - $opt2) =="
++        _run_qemu_with_images "${TEST_IMG},$opt1" "${TEST_IMG},$opt2"
++    done
++done
 +
-+    assert(old_lock == RAW_L_WRITE_SHARE_RW);
-+    assert(new_lock == RAW_L_READ);
-+    /*
-+     *        lock byte "no other writer"      lock byte "write"
-+     * old                0                           S
-+     * new                S                           0
-+     *
-+     * (0 = unlocked; S = shared; X = exclusive.)
-+     */
-+    switch (op) {
-+    case RAW_LT_PREPARE:
-+        /* Make sure there are no other writers. */
-+        ret = qemu_lock_fd(old_lock_fd, RAW_LOCK_BYTE_WRITE, 1, true);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Failed to lock old fd (write byte)");
-+            break;
-+        }
-+        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, false);
-+        if (!ret) {
-+            break;
-+        }
-+        error_setg_errno(errp, -ret, "Failed to lock new fd (share byte)");
-+        /* fall through */
-+    case RAW_LT_ABORT:
-+        ret = qemu_lock_fd(old_lock_fd, RAW_LOCK_BYTE_WRITE, 1, false);
-+        if (ret) {
-+            error_report("Failed to downgrade old fd (write byte)");
-+        }
-+        break;
-+    case RAW_LT_COMMIT:
-+        break;
-+    }
-+    return ret;
-+}
++echo "== Creating ${TEST_IMG}.[abc] =="
++(
++    $QEMU_IMG create -f qcow2 "${TEST_IMG}.a" -b "${TEST_IMG}"
++    $QEMU_IMG create -f qcow2 "${TEST_IMG}.b" -b "${TEST_IMG}"
++    $QEMU_IMG create -f qcow2 "${TEST_IMG}.c" -b "${TEST_IMG}.b"
++) | _filter_img_create
 +
-+static int raw_lt_write_share_to_write(RawLockTransOp op,
-+                                       int old_lock_fd, int new_lock_fd,
-+                                       BDRVRawLockMode old_lock,
-+                                       BDRVRawLockMode new_lock,
-+                                       Error **errp)
-+{
-+    int ret = 0;
++echo
++echo "== Two devices sharing the same file in backing chain =="
++_run_qemu_with_images "${TEST_IMG}.a" "${TEST_IMG}.b"
++_run_qemu_with_images "${TEST_IMG}.a" "${TEST_IMG}.c"
 +
-+    assert(old_lock == RAW_L_WRITE_SHARE_RW);
-+    assert(new_lock == RAW_L_WRITE);
-+    /*
-+     *        lock byte "no other writer"      lock byte "write"
-+     * old                0                           S
-+     * new                X                           X
-+     *
-+     * (0 = unlocked; S = shared; X = exclusive.)
-+     */
-+    switch (op) {
-+    case RAW_LT_PREPARE:
-+        /* Make sure there are no other writers. */
-+        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, true);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Failed to lock new fd (share byte)");
-+            break;
-+        }
-+        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_WRITE, 1, false);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Failed to lock new fd (write byte)");
-+            break;
-+        }
-+        ret = qemu_unlock_fd(old_lock_fd, RAW_LOCK_BYTE_WRITE, 1);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Failed to unlock old fd (write byte)");
-+            break;
-+        }
-+        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_WRITE, 1, true);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Failed to upgrade new fd (write byte)");
-+            break;
-+        }
-+        break;
-+    case RAW_LT_COMMIT:
-+        break;
-+    case RAW_LT_ABORT:
-+        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_WRITE, 1, false);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Failed to downgrade new fd (write byte)");
-+            break;
-+        }
-+        ret = qemu_lock_fd(old_lock_fd, RAW_LOCK_BYTE_WRITE, 1, false);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Failed to restore old fd (write byte)");
-+            break;
-+        }
-+        break;
-+    }
-+    return ret;
-+}
++echo
++echo "== Backing image also as an active device =="
++_run_qemu_with_images "${TEST_IMG}.a" "${TEST_IMG}"
 +
-+static int raw_lt_write_to_read(RawLockTransOp op,
-+                                int old_lock_fd, int new_lock_fd,
-+                                BDRVRawLockMode old_lock,
-+                                BDRVRawLockMode new_lock,
-+                                Error **errp)
-+{
-+    int ret = 0;
++echo
++echo "== Backing image also as an active device (ro) =="
++_run_qemu_with_images "${TEST_IMG}.a" "${TEST_IMG},readonly=on"
 +
-+    assert(old_lock == RAW_L_WRITE);
-+    assert(new_lock == RAW_L_READ);
-+    /*
-+     *        lock byte "no other writer"      lock byte "write"
-+     * old                X                           X
-+     * new                S                           0
-+     *
-+     * (0 = unlocked; S = shared; X = exclusive.)
-+     */
-+    switch (op) {
-+    case RAW_LT_PREPARE:
-+        break;
-+    case RAW_LT_COMMIT:
-+        ret = qemu_lock_fd(old_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, false);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Failed to downgrade old fd (share byte)");
-+            break;
-+        }
-+        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITER, 1, false);
-+        if (ret) {
-+            error_setg_errno(errp, -ret, "Failed to lock new fd (share byte)");
-+            break;
-+        }
-+        break;
-+    case RAW_LT_ABORT:
-+        break;
-+    }
-+    return ret;
-+}
++echo
++echo "== Symbolic link =="
++rm -f "${TEST_IMG}.lnk" &>/dev/null
++ln -s ${TEST_IMG} "${TEST_IMG}.lnk" || echo "Failed to create link"
++_run_qemu_with_images "${TEST_IMG}.lnk" "${TEST_IMG}"
 +
-+static int raw_lt_write_to_write_share(RawLockTransOp op,
-+                                       int old_lock_fd, int new_lock_fd,
-+                                       BDRVRawLockMode old_lock,
-+                                       BDRVRawLockMode new_lock,
-+                                       Error **errp)
-+{
-+    int ret = 0;
++echo
++echo "== Closing an image should unlock it =="
++_launch_qemu
 +
-+    assert(old_lock == RAW_L_WRITE);
-+    assert(new_lock == RAW_L_WRITE_SHARE_RW);
-+    /*
-+     *        lock byte "no other writer"      lock byte "write"
-+     * old                X                           X
-+     * new                0                           S
-+     *
-+     * (0 = unlocked; S = shared; X = exclusive.)
-+     */
-+    switch (op) {
-+    case RAW_LT_PREPARE:
-+        break;
-+    case RAW_LT_COMMIT:
-+        ret = qemu_lock_fd(old_lock_fd, RAW_LOCK_BYTE_WRITE, 1, false);
-+        if (ret) {
-+            error_report("Failed to downgrade old fd (share byte)");
-+            break;
-+        }
-+        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_WRITE, 1, false);
-+        if (ret) {
-+            error_report("Failed to lock new fd (write byte)");
-+        }
-+        break;
-+    case RAW_LT_ABORT:
-+        break;
-+    }
-+    return ret;
-+}
++_send_qemu_cmd $QEMU_HANDLE \
++    "{ 'execute': 'qmp_capabilities' }" \
++    'return'
 +
-+/**
-+ * Transactionally moving between possible locking states is tricky and must be
-+ * done carefully. That is mostly because downgrading an exclusive lock to
-+ * shared or unlocked is not guaranteed to be revertible. As a result, in such
-+ * cases we have to defer the downgrading to "commit", given that no revert will
-+ * happen after that point, and that downgrading a lock should never fail.
-+ *
-+ * On the other hand, upgrading a lock (e.g. from unlocked or shared to
-+ * exclusive lock) must happen in "prepare" because it may fail.
-+ *
-+ * Manage the operation matrix with this state transition table to make
-+ * fulfilling above conditions easier.
-+ */
-+static const struct RawLockTransOp {
-+    BDRVRawLockMode old_lock;
-+    BDRVRawLockMode new_lock;
-+    RawLockTransFunc func;
-+    bool need_lock_fd;
-+    bool close_old_lock_fd;
-+} raw_lock_trans_ops[] = {
++echo "Adding drive"
++_send_qemu_cmd $QEMU_HANDLE \
++    "{ 'execute': 'human-monitor-command',
++       'arguments': { 'command-line': 'drive_add 0 if=none,id=d0,file=${TEST_IMG}' } }" \
++    ""
 +
-+    {RAW_L_READ_SHARE_RW,  RAW_L_READ_SHARE_RW,  raw_lt_nop,                  false, false},
-+    {RAW_L_READ_SHARE_RW,  RAW_L_READ,           raw_lt_from_unlock,          true},
-+    {RAW_L_READ_SHARE_RW,  RAW_L_WRITE_SHARE_RW, raw_lt_from_unlock,          true},
-+    {RAW_L_READ_SHARE_RW,  RAW_L_WRITE,          raw_lt_from_unlock,          true},
++_run_cmd $QEMU_IO "${TEST_IMG}" -c 'write 0 512'
 +
-+    {RAW_L_READ,           RAW_L_READ_SHARE_RW,  raw_lt_nop,                  false, true},
-+    {RAW_L_READ,           RAW_L_READ,           raw_lt_nop,                  false, false},
-+    {RAW_L_READ,           RAW_L_WRITE_SHARE_RW, raw_lt_read_to_write_share,  true},
-+    {RAW_L_READ,           RAW_L_WRITE,          raw_lt_read_to_write,        true},
++echo "Closing drive"
++_send_qemu_cmd $QEMU_HANDLE \
++    "{ 'execute': 'human-monitor-command',
++       'arguments': { 'command-line': 'drive_del d0' } }" \
++    ""
 +
-+    {RAW_L_WRITE_SHARE_RW, RAW_L_READ_SHARE_RW,  raw_lt_nop,                  false, true},
-+    {RAW_L_WRITE_SHARE_RW, RAW_L_READ,           raw_lt_write_share_to_read,  true},
-+    {RAW_L_WRITE_SHARE_RW, RAW_L_WRITE_SHARE_RW, raw_lt_nop,                  false, false},
-+    {RAW_L_WRITE_SHARE_RW, RAW_L_WRITE,          raw_lt_write_share_to_write, true},
++_run_cmd $QEMU_IO "${TEST_IMG}" -c 'write 0 512'
 +
-+    {RAW_L_WRITE,          RAW_L_READ_SHARE_RW,  raw_lt_nop,                  false, true},
-+    {RAW_L_WRITE,          RAW_L_READ,           raw_lt_write_to_read,        true},
-+    {RAW_L_WRITE,          RAW_L_WRITE_SHARE_RW, raw_lt_write_to_write_share, true},
-+    {RAW_L_WRITE,          RAW_L_WRITE,          raw_lt_nop,                  false, false},
-+};
++echo "Adding two and closing one"
++for d in d0 d1; do
++    _send_qemu_cmd $QEMU_HANDLE \
++        "{ 'execute': 'human-monitor-command',
++           'arguments': { 'command-line': 'drive_add 0 if=none,id=$d,file=${TEST_IMG},readonly=on' } }" \
++        ""
++done
 +
-+static int raw_handle_lock_update(BlockDriverState *bs,
-+                                  RawLockTransOp op,
-+                                  Error **errp)
-+{
-+    BDRVRawState *s = bs->opaque;
-+    BDRVRawLockMode old_lock, new_lock;
-+    const struct RawLockTransOp *rec;
-+    int ret = 0;
-+    Error *local_err = NULL;
-+    BDRVRawLockUpdateState *lu = s->lock_update;
-+    int lock_fd = -1;
++_run_cmd $QEMU_IMG info "${TEST_IMG}"
 +
-+    if (!RAW_LOCK_SUPPORTED) {
-+        goto cleanup;
-+    }
++_send_qemu_cmd $QEMU_HANDLE \
++    "{ 'execute': 'human-monitor-command',
++       'arguments': { 'command-line': 'drive_del d0' } }" \
++    ""
 +
-+    if (bdrv_get_flags(bs) & BDRV_O_INACTIVE) {
-+        /* leave the work to bdrv_invalidate_cache. */
-+        return 0;
-+    }
++_run_cmd $QEMU_IO "${TEST_IMG}" -c 'write 0 512'
 +
-+    if (op == RAW_LT_PREPARE) {
-+        lock_fd = qemu_open(bs->filename, lu->open_flags);
-+        if (lock_fd == -1) {
-+            if (errno == ENOENT) {
-+                /* The file is gone, probably BDRV_O_SNAPSHOT? Skip locking. */
-+                lu->use_lock = false;
-+            } else {
-+                /* other errors handled later. */
-+            }
-+        }
-+    }
++echo "Closing the other"
++_send_qemu_cmd $QEMU_HANDLE \
++    "{ 'execute': 'human-monitor-command',
++       'arguments': { 'command-line': 'drive_del d1' } }" \
++    ""
 +
-+    old_lock = s->cur_lock_mode;
-+    new_lock = lu->use_lock ? lu->new_lock : RAW_L_READ_SHARE_RW;
-+    for (rec = &raw_lock_trans_ops[0];
-+         rec < &raw_lock_trans_ops[ARRAY_SIZE(raw_lock_trans_ops)];
-+         rec++) {
-+        if (rec->old_lock == old_lock && rec->new_lock == new_lock) {
-+            break;
-+        }
-+    }
-+    assert(rec != &raw_lock_trans_ops[ARRAY_SIZE(raw_lock_trans_ops)]);
++_run_cmd $QEMU_IO "${TEST_IMG}" -c 'write 0 512'
 +
-+    assert(old_lock == RAW_L_READ_SHARE_RW || s->lock_fd >= 0);
++_cleanup_qemu
 +
-+    DPRINTF("handle lock %p old lock %d new lock %d op %d func %p\n", bs,
-+            old_lock, new_lock, op, rec->func);
-+    switch (op) {
-+    case RAW_LT_PREPARE:
-+        if (rec->need_lock_fd) {
-+            if (lock_fd >= 0) {
-+                lu->lock_fd = lock_fd;
-+            } else {
-+                error_setg(errp, "Failed to initialize lock fd");
-+            }
-+        } else {
-+            if (lock_fd >= 0) {
-+                qemu_close(lock_fd);
-+                lock_fd = -1;
-+            }
-+        }
-+        ret = rec->func(op, s->lock_fd, lu->lock_fd, old_lock, new_lock, errp);
-+        if (!ret) {
-+            break;
-+        }
-+        /* Only succeeded preparation will be reverted by block layer, we
-+         * need to clean up this failure manually. */
-+        op = RAW_LT_ABORT;
-+        /* fall through */
-+    case RAW_LT_ABORT:
-+        rec->func(op, s->lock_fd, lu->lock_fd, old_lock, new_lock, &local_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+        }
-+        if (lu->lock_fd >= 0) {
-+            qemu_close(lu->lock_fd);
-+            lu->lock_fd = -1;
-+        }
-+        goto cleanup;
-+    case RAW_LT_COMMIT:
-+        rec->func(op, s->lock_fd, lu->lock_fd, old_lock, new_lock, &error_abort);
-+        if ((rec->need_lock_fd || rec->close_old_lock_fd) && s->lock_fd >= 0) {
-+            raw_lock_fd(s->lock_fd, RAW_L_READ_SHARE_RW, NULL);
-+            qemu_close(s->lock_fd);
-+            s->lock_fd = -1;
-+        }
-+        if (rec->need_lock_fd) {
-+            s->lock_fd = lu->lock_fd;
-+        }
-+        assert(s->lock_fd >= 0 || new_lock == RAW_L_READ_SHARE_RW);
-+        s->cur_lock_mode = new_lock;
-+        s->use_lock = lu->use_lock;
-+        goto cleanup;
-+    }
-+    return ret;
-+cleanup:
-+    g_free(s->lock_update);
-+    s->lock_update = NULL;
-+    return ret;
-+}
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/153.out b/tests/qemu-iotests/153.out
+new file mode 100644
+index 0000000..786ff0b
+--- /dev/null
++++ b/tests/qemu-iotests/153.out
+@@ -0,0 +1,627 @@
++QA output created by 153
 +
-+static void raw_init_lock_update(BlockDriverState *bs,
-+                                 int image_fd,
-+                                 bool write, bool shared,
-+                                 bool use_lock)
-+{
-+    BDRVRawState *s = bs->opaque;
++== Creating base image ==
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=33554432
 +
-+    assert(!s->lock_update);
-+    s->lock_update = g_new0(BDRVRawLockUpdateState, 1);
-+    *s->lock_update = (BDRVRawLockUpdateState) {
-+        .image_fd = image_fd,
-+        .new_lock = raw_get_lock_mode(write, shared),
-+        .use_lock = use_lock,
-+        .open_flags = (s->open_flags & ~(O_RDWR | O_RDONLY)) |
-+                       (write ? O_RDWR : O_RDONLY),
-+    };
-+}
++== Creating test image ==
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=33554432 backing_file=TEST_DIR/t.IMGFMT.base
 +
- static int raw_reopen_prepare(BDRVReopenState *state,
-                               BlockReopenQueue *queue, Error **errp)
- {
-@@ -549,6 +1176,7 @@ static int raw_reopen_prepare(BDRVReopenState *state,
-     BDRVRawReopenState *rs;
-     int ret = 0;
-     Error *local_err = NULL;
-+    bool shared;
- 
-     assert(state != NULL);
-     assert(state->bs != NULL);
-@@ -613,13 +1241,27 @@ static int raw_reopen_prepare(BDRVReopenState *state,
-     if (rs->fd != -1) {
-         raw_probe_alignment(state->bs, rs->fd, &local_err);
-         if (local_err) {
--            qemu_close(rs->fd);
--            rs->fd = -1;
-             error_propagate(errp, local_err);
-             ret = -EINVAL;
-+            goto fail;
-         }
-     }
-+    shared = s->cur_lock_mode == RAW_L_READ_SHARE_RW ||
-+        s->cur_lock_mode == RAW_L_WRITE_SHARE_RW;
-+    /* Shared perm doesn't change during reopen. */
-+    raw_init_lock_update(state->bs, rs->fd, state->flags & BDRV_O_RDWR, shared,
-+                         s->use_lock);
- 
-+    qdict_del(state->options, "locking");
-+    ret = raw_handle_lock_update(state->bs, RAW_LT_PREPARE, errp);
-+    if (ret) {
-+        goto fail;
-+    }
++== Launching QEMU, opts: '' ==
 +
-+    return 0;
-+fail:
-+    qemu_close(rs->fd);
-+    rs->fd = -1;
-     return ret;
- }
- 
-@@ -630,6 +1272,8 @@ static void raw_reopen_commit(BDRVReopenState *state)
- 
-     s->open_flags = rs->open_flags;
- 
-+    raw_handle_lock_update(state->bs, RAW_LT_COMMIT, &error_abort);
++== Launching another QEMU, opts: '' ==
++QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=none,: Failed to lock image: Resource temporarily unavailable
 +
-     qemu_close(s->fd);
-     s->fd = rs->fd;
- 
-@@ -647,6 +1291,8 @@ static void raw_reopen_abort(BDRVReopenState *state)
-         return;
-     }
- 
-+    raw_handle_lock_update(state->bs, RAW_LT_ABORT, &error_abort);
++== Launching another QEMU, opts: 'readonly=on,force-shared-write=on' ==
 +
-     if (rs->fd >= 0) {
-         qemu_close(rs->fd);
-         rs->fd = -1;
-@@ -1410,6 +2056,10 @@ static void raw_close(BlockDriverState *bs)
-         qemu_close(s->fd);
-         s->fd = -1;
-     }
-+    if (s->lock_fd >= 0) {
-+        qemu_close(s->lock_fd);
-+        s->lock_fd = -1;
-+    }
- }
- 
- static int raw_truncate(BlockDriverState *bs, int64_t offset)
-@@ -1947,6 +2597,85 @@ static QemuOptsList raw_create_opts = {
-     }
- };
- 
-+static int raw_check_perm(BlockDriverState *bs, uint64_t perm, uint64_t shared,
-+                          Error **errp)
-+{
-+    bool is_shared;
-+    BDRVRawState *s = bs->opaque;
++== Launching another QEMU, opts: 'readonly=on,force-shared-write=off' ==
++QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=none,readonly=on,force-shared-write=off: Failed to lock share byte: Resource temporarily unavailable
 +
-+    if (!RAW_LOCK_SUPPORTED) {
-+        return 0;
-+    }
-+    if (s->lock_update) {
-+        /* Override the previously stashed update. */
-+        g_free(s->lock_update);
-+        s->lock_update = NULL;
-+    }
-+    is_shared = shared & BLK_PERM_WRITE;
-+    DPRINTF("raw check perm %p rw %d shared %d\n",
-+            bs, perm & BLK_PERM_WRITE ? 1 : 0,
-+            is_shared);
-+    raw_init_lock_update(bs, s->fd,
-+                         perm & BLK_PERM_WRITE, is_shared, s->use_lock);
++== Launching another QEMU, opts: 'readonly=off,force-shared-write=on' ==
++QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=none,readonly=off,force-shared-write=on: Failed to lock write byte: Resource temporarily unavailable
 +
-+    return raw_handle_lock_update(bs, RAW_LT_PREPARE, errp);
-+}
++== Launching another QEMU, opts: 'readonly=off,force-shared-write=off' ==
++QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=none,readonly=off,force-shared-write=off: Failed to lock image: Resource temporarily unavailable
 +
-+static void raw_set_perm(BlockDriverState *bs, uint64_t perm, uint64_t shared)
-+{
-+    BDRVRawState *s = bs->opaque;
++== Running utility commands  ==
 +
-+    if (!RAW_LOCK_SUPPORTED) {
-+        return;
-+    }
-+    assert(s->lock_update);
++_qemu_io_wrapper -c read 0 512 TEST_DIR/t.qcow2
++can't open device TEST_DIR/t.qcow2: Failed to lock image: Resource temporarily unavailable
 +
-+    raw_handle_lock_update(bs, RAW_LT_COMMIT, NULL);
-+}
++_qemu_io_wrapper -r -c read 0 512 TEST_DIR/t.qcow2
++can't open device TEST_DIR/t.qcow2: Failed to lock share byte: Resource temporarily unavailable
 +
-+static void raw_abort_perm_update(BlockDriverState *bs)
-+{
-+    BDRVRawState *s = bs->opaque;
++_qemu_io_wrapper -c open  TEST_DIR/t.qcow2 -c read 0 512
++can't open device TEST_DIR/t.qcow2: Failed to lock image: Resource temporarily unavailable
 +
-+    if (!RAW_LOCK_SUPPORTED) {
-+        return;
-+    }
-+    if (!s->lock_update) {
-+        return;
-+    }
-+    raw_handle_lock_update(bs, RAW_LT_ABORT, NULL);
-+}
++_qemu_io_wrapper -c open -r  TEST_DIR/t.qcow2 -c read 0 512
++can't open device TEST_DIR/t.qcow2: Failed to lock share byte: Resource temporarily unavailable
 +
-+static int raw_inactivate(BlockDriverState *bs)
-+{
-+    BDRVRawState *s = bs->opaque;
-+    int r = 0;
++_qemu_img_wrapper info TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock share byte: Resource temporarily unavailable
 +
-+    if (RAW_LOCK_SUPPORTED && s->cur_lock_mode != RAW_L_READ_SHARE_RW) {
-+        r = raw_lock_fd(s->lock_fd, RAW_L_READ_SHARE_RW, NULL);
-+    }
-+    return r;
-+}
++_qemu_img_wrapper check TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock share byte: Resource temporarily unavailable
 +
-+static void raw_invalidate_cache(BlockDriverState *bs, Error **errp)
-+{
-+    int r;
-+    BDRVRawState *s = bs->opaque;
++_qemu_img_wrapper compare TEST_DIR/t.qcow2 TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock share byte: Resource temporarily unavailable
 +
-+    if (!RAW_LOCK_SUPPORTED) {
-+        return;
-+    }
-+    if (s->lock_update) {
-+        /* Apply the pending lock update from perm or reopen. */
-+        r = raw_handle_lock_update(bs, RAW_LT_PREPARE, errp);
-+        if (r) {
-+            return;
-+        }
-+        raw_handle_lock_update(bs, RAW_LT_COMMIT, errp);
-+        assert(!s->lock_update);
-+    }
-+}
++_qemu_img_wrapper map TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock share byte: Resource temporarily unavailable
 +
- BlockDriver bdrv_file = {
-     .format_name = "file",
-     .protocol_name = "file",
-@@ -1977,7 +2706,11 @@ BlockDriver bdrv_file = {
-     .bdrv_get_info = raw_get_info,
-     .bdrv_get_allocated_file_size
-                         = raw_get_allocated_file_size,
--
-+    .bdrv_inactivate = raw_inactivate,
-+    .bdrv_invalidate_cache = raw_invalidate_cache,
-+    .bdrv_check_perm = raw_check_perm,
-+    .bdrv_set_perm   = raw_set_perm,
-+    .bdrv_abort_perm_update = raw_abort_perm_update,
-     .create_opts = &raw_create_opts,
- };
- 
++_qemu_img_wrapper amend -o  TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock image: Resource temporarily unavailable
++
++_qemu_img_wrapper commit TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock image: Resource temporarily unavailable
++
++_qemu_img_wrapper resize TEST_DIR/t.qcow2 32M
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock image: Resource temporarily unavailable
++
++_qemu_img_wrapper rebase TEST_DIR/t.qcow2 -b TEST_DIR/t.qcow2.base
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock image: Resource temporarily unavailable
++
++_qemu_img_wrapper snapshot -l TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock share byte: Resource temporarily unavailable
++
++_qemu_img_wrapper convert TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.convert
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock share byte: Resource temporarily unavailable
++
++_qemu_img_wrapper dd if=TEST_DIR/t.qcow2 of=TEST_DIR/t.qcow2.convert bs=512 count=1
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock share byte: Resource temporarily unavailable
++
++_qemu_img_wrapper bench -c 1 TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock share byte: Resource temporarily unavailable
++
++_qemu_img_wrapper bench -w -c 1 TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock image: Resource temporarily unavailable
++
++== Running utility commands -U ==
++
++_qemu_io_wrapper -U -c read 0 512 TEST_DIR/t.qcow2
++can't open device TEST_DIR/t.qcow2: Failed to lock write byte: Resource temporarily unavailable
++
++_qemu_io_wrapper -U -r -c read 0 512 TEST_DIR/t.qcow2
++
++_qemu_io_wrapper -c open -U TEST_DIR/t.qcow2 -c read 0 512
++can't open device TEST_DIR/t.qcow2: Failed to lock write byte: Resource temporarily unavailable
++
++_qemu_io_wrapper -c open -r -U TEST_DIR/t.qcow2 -c read 0 512
++
++_qemu_img_wrapper info -U TEST_DIR/t.qcow2
++
++_qemu_img_wrapper check -U TEST_DIR/t.qcow2
++
++_qemu_img_wrapper compare -U TEST_DIR/t.qcow2 TEST_DIR/t.qcow2
++
++_qemu_img_wrapper map -U TEST_DIR/t.qcow2
++
++_qemu_img_wrapper amend -o  -U TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock write byte: Resource temporarily unavailable
++
++_qemu_img_wrapper commit -U TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock write byte: Resource temporarily unavailable
++
++_qemu_img_wrapper resize -U TEST_DIR/t.qcow2 32M
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock write byte: Resource temporarily unavailable
++
++_qemu_img_wrapper rebase -U TEST_DIR/t.qcow2 -b TEST_DIR/t.qcow2.base
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock write byte: Resource temporarily unavailable
++
++_qemu_img_wrapper snapshot -l -U TEST_DIR/t.qcow2
++
++_qemu_img_wrapper convert -U TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.convert
++
++_qemu_img_wrapper dd -U if=TEST_DIR/t.qcow2 of=TEST_DIR/t.qcow2.convert bs=512 count=1
++
++_qemu_img_wrapper bench -U -c 1 TEST_DIR/t.qcow2
++
++_qemu_img_wrapper bench -U -w -c 1 TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock write byte: Resource temporarily unavailable
++
++Round done
++
++== Creating base image ==
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=33554432
++
++== Creating test image ==
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=33554432 backing_file=TEST_DIR/t.IMGFMT.base
++
++== Launching QEMU, opts: 'readonly=on,force-shared-write=on' ==
++
++== Launching another QEMU, opts: '' ==
++
++== Launching another QEMU, opts: 'readonly=on,force-shared-write=on' ==
++
++== Launching another QEMU, opts: 'readonly=on,force-shared-write=off' ==
++
++== Launching another QEMU, opts: 'readonly=off,force-shared-write=on' ==
++
++== Launching another QEMU, opts: 'readonly=off,force-shared-write=off' ==
++
++== Running utility commands  ==
++
++_qemu_io_wrapper -c read 0 512 TEST_DIR/t.qcow2
++
++_qemu_io_wrapper -r -c read 0 512 TEST_DIR/t.qcow2
++
++_qemu_io_wrapper -c open  TEST_DIR/t.qcow2 -c read 0 512
++
++_qemu_io_wrapper -c open -r  TEST_DIR/t.qcow2 -c read 0 512
++
++_qemu_img_wrapper info TEST_DIR/t.qcow2
++
++_qemu_img_wrapper check TEST_DIR/t.qcow2
++
++_qemu_img_wrapper compare TEST_DIR/t.qcow2 TEST_DIR/t.qcow2
++
++_qemu_img_wrapper map TEST_DIR/t.qcow2
++
++_qemu_img_wrapper amend -o  TEST_DIR/t.qcow2
++
++_qemu_img_wrapper commit TEST_DIR/t.qcow2
++
++_qemu_img_wrapper resize TEST_DIR/t.qcow2 32M
++
++_qemu_img_wrapper rebase TEST_DIR/t.qcow2 -b TEST_DIR/t.qcow2.base
++
++_qemu_img_wrapper snapshot -l TEST_DIR/t.qcow2
++
++_qemu_img_wrapper convert TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.convert
++
++_qemu_img_wrapper dd if=TEST_DIR/t.qcow2 of=TEST_DIR/t.qcow2.convert bs=512 count=1
++
++_qemu_img_wrapper bench -c 1 TEST_DIR/t.qcow2
++
++_qemu_img_wrapper bench -w -c 1 TEST_DIR/t.qcow2
++
++== Running utility commands -U ==
++
++_qemu_io_wrapper -U -c read 0 512 TEST_DIR/t.qcow2
++
++_qemu_io_wrapper -U -r -c read 0 512 TEST_DIR/t.qcow2
++
++_qemu_io_wrapper -c open -U TEST_DIR/t.qcow2 -c read 0 512
++
++_qemu_io_wrapper -c open -r -U TEST_DIR/t.qcow2 -c read 0 512
++
++_qemu_img_wrapper info -U TEST_DIR/t.qcow2
++
++_qemu_img_wrapper check -U TEST_DIR/t.qcow2
++
++_qemu_img_wrapper compare -U TEST_DIR/t.qcow2 TEST_DIR/t.qcow2
++
++_qemu_img_wrapper map -U TEST_DIR/t.qcow2
++
++_qemu_img_wrapper amend -o  -U TEST_DIR/t.qcow2
++
++_qemu_img_wrapper commit -U TEST_DIR/t.qcow2
++
++_qemu_img_wrapper resize -U TEST_DIR/t.qcow2 32M
++
++_qemu_img_wrapper rebase -U TEST_DIR/t.qcow2 -b TEST_DIR/t.qcow2.base
++
++_qemu_img_wrapper snapshot -l -U TEST_DIR/t.qcow2
++
++_qemu_img_wrapper convert -U TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.convert
++
++_qemu_img_wrapper dd -U if=TEST_DIR/t.qcow2 of=TEST_DIR/t.qcow2.convert bs=512 count=1
++
++_qemu_img_wrapper bench -U -c 1 TEST_DIR/t.qcow2
++
++_qemu_img_wrapper bench -U -w -c 1 TEST_DIR/t.qcow2
++
++Round done
++
++== Creating base image ==
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=33554432
++
++== Creating test image ==
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=33554432 backing_file=TEST_DIR/t.IMGFMT.base
++
++== Launching QEMU, opts: 'readonly=on,force-shared-write=off' ==
++
++== Launching another QEMU, opts: '' ==
++QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=none,: Failed to lock image: Resource temporarily unavailable
++
++== Launching another QEMU, opts: 'readonly=on,force-shared-write=on' ==
++
++== Launching another QEMU, opts: 'readonly=on,force-shared-write=off' ==
++
++== Launching another QEMU, opts: 'readonly=off,force-shared-write=on' ==
++QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=none,readonly=off,force-shared-write=on: Share byte lock is taken: Resource temporarily unavailable
++
++== Launching another QEMU, opts: 'readonly=off,force-shared-write=off' ==
++QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=none,readonly=off,force-shared-write=off: Failed to lock image: Resource temporarily unavailable
++
++== Running utility commands  ==
++
++_qemu_io_wrapper -c read 0 512 TEST_DIR/t.qcow2
++can't open device TEST_DIR/t.qcow2: Failed to lock image: Resource temporarily unavailable
++
++_qemu_io_wrapper -r -c read 0 512 TEST_DIR/t.qcow2
++
++_qemu_io_wrapper -c open  TEST_DIR/t.qcow2 -c read 0 512
++can't open device TEST_DIR/t.qcow2: Failed to lock image: Resource temporarily unavailable
++
++_qemu_io_wrapper -c open -r  TEST_DIR/t.qcow2 -c read 0 512
++
++_qemu_img_wrapper info TEST_DIR/t.qcow2
++
++_qemu_img_wrapper check TEST_DIR/t.qcow2
++
++_qemu_img_wrapper compare TEST_DIR/t.qcow2 TEST_DIR/t.qcow2
++
++_qemu_img_wrapper map TEST_DIR/t.qcow2
++
++_qemu_img_wrapper amend -o  TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock image: Resource temporarily unavailable
++
++_qemu_img_wrapper commit TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock image: Resource temporarily unavailable
++
++_qemu_img_wrapper resize TEST_DIR/t.qcow2 32M
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock image: Resource temporarily unavailable
++
++_qemu_img_wrapper rebase TEST_DIR/t.qcow2 -b TEST_DIR/t.qcow2.base
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock image: Resource temporarily unavailable
++
++_qemu_img_wrapper snapshot -l TEST_DIR/t.qcow2
++
++_qemu_img_wrapper convert TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.convert
++
++_qemu_img_wrapper dd if=TEST_DIR/t.qcow2 of=TEST_DIR/t.qcow2.convert bs=512 count=1
++
++_qemu_img_wrapper bench -c 1 TEST_DIR/t.qcow2
++
++_qemu_img_wrapper bench -w -c 1 TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock image: Resource temporarily unavailable
++
++== Running utility commands -U ==
++
++_qemu_io_wrapper -U -c read 0 512 TEST_DIR/t.qcow2
++can't open device TEST_DIR/t.qcow2: Share byte lock is taken: Resource temporarily unavailable
++
++_qemu_io_wrapper -U -r -c read 0 512 TEST_DIR/t.qcow2
++
++_qemu_io_wrapper -c open -U TEST_DIR/t.qcow2 -c read 0 512
++can't open device TEST_DIR/t.qcow2: Share byte lock is taken: Resource temporarily unavailable
++
++_qemu_io_wrapper -c open -r -U TEST_DIR/t.qcow2 -c read 0 512
++
++_qemu_img_wrapper info -U TEST_DIR/t.qcow2
++
++_qemu_img_wrapper check -U TEST_DIR/t.qcow2
++
++_qemu_img_wrapper compare -U TEST_DIR/t.qcow2 TEST_DIR/t.qcow2
++
++_qemu_img_wrapper map -U TEST_DIR/t.qcow2
++
++_qemu_img_wrapper amend -o  -U TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Share byte lock is taken: Resource temporarily unavailable
++
++_qemu_img_wrapper commit -U TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Share byte lock is taken: Resource temporarily unavailable
++
++_qemu_img_wrapper resize -U TEST_DIR/t.qcow2 32M
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Share byte lock is taken: Resource temporarily unavailable
++
++_qemu_img_wrapper rebase -U TEST_DIR/t.qcow2 -b TEST_DIR/t.qcow2.base
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Share byte lock is taken: Resource temporarily unavailable
++
++_qemu_img_wrapper snapshot -l -U TEST_DIR/t.qcow2
++
++_qemu_img_wrapper convert -U TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.convert
++
++_qemu_img_wrapper dd -U if=TEST_DIR/t.qcow2 of=TEST_DIR/t.qcow2.convert bs=512 count=1
++
++_qemu_img_wrapper bench -U -c 1 TEST_DIR/t.qcow2
++
++_qemu_img_wrapper bench -U -w -c 1 TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Share byte lock is taken: Resource temporarily unavailable
++
++Round done
++
++== Creating base image ==
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=33554432
++
++== Creating test image ==
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=33554432 backing_file=TEST_DIR/t.IMGFMT.base
++
++== Launching QEMU, opts: 'readonly=off,force-shared-write=on' ==
++
++== Launching another QEMU, opts: '' ==
++QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=none,: Failed to lock image: Resource temporarily unavailable
++
++== Launching another QEMU, opts: 'readonly=on,force-shared-write=on' ==
++
++== Launching another QEMU, opts: 'readonly=on,force-shared-write=off' ==
++QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=none,readonly=on,force-shared-write=off: Write byte lock is taken: Resource temporarily unavailable
++
++== Launching another QEMU, opts: 'readonly=off,force-shared-write=on' ==
++
++== Launching another QEMU, opts: 'readonly=off,force-shared-write=off' ==
++QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=none,readonly=off,force-shared-write=off: Failed to lock image: Resource temporarily unavailable
++
++== Running utility commands  ==
++
++_qemu_io_wrapper -c read 0 512 TEST_DIR/t.qcow2
++can't open device TEST_DIR/t.qcow2: Failed to lock image: Resource temporarily unavailable
++
++_qemu_io_wrapper -r -c read 0 512 TEST_DIR/t.qcow2
++can't open device TEST_DIR/t.qcow2: Write byte lock is taken: Resource temporarily unavailable
++
++_qemu_io_wrapper -c open  TEST_DIR/t.qcow2 -c read 0 512
++can't open device TEST_DIR/t.qcow2: Failed to lock image: Resource temporarily unavailable
++
++_qemu_io_wrapper -c open -r  TEST_DIR/t.qcow2 -c read 0 512
++can't open device TEST_DIR/t.qcow2: Write byte lock is taken: Resource temporarily unavailable
++
++_qemu_img_wrapper info TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Write byte lock is taken: Resource temporarily unavailable
++
++_qemu_img_wrapper check TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Write byte lock is taken: Resource temporarily unavailable
++
++_qemu_img_wrapper compare TEST_DIR/t.qcow2 TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Write byte lock is taken: Resource temporarily unavailable
++
++_qemu_img_wrapper map TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Write byte lock is taken: Resource temporarily unavailable
++
++_qemu_img_wrapper amend -o  TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock image: Resource temporarily unavailable
++
++_qemu_img_wrapper commit TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock image: Resource temporarily unavailable
++
++_qemu_img_wrapper resize TEST_DIR/t.qcow2 32M
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock image: Resource temporarily unavailable
++
++_qemu_img_wrapper rebase TEST_DIR/t.qcow2 -b TEST_DIR/t.qcow2.base
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock image: Resource temporarily unavailable
++
++_qemu_img_wrapper snapshot -l TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Write byte lock is taken: Resource temporarily unavailable
++
++_qemu_img_wrapper convert TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.convert
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Write byte lock is taken: Resource temporarily unavailable
++
++_qemu_img_wrapper dd if=TEST_DIR/t.qcow2 of=TEST_DIR/t.qcow2.convert bs=512 count=1
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Write byte lock is taken: Resource temporarily unavailable
++
++_qemu_img_wrapper bench -c 1 TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Write byte lock is taken: Resource temporarily unavailable
++
++_qemu_img_wrapper bench -w -c 1 TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock image: Resource temporarily unavailable
++
++== Running utility commands -U ==
++
++_qemu_io_wrapper -U -c read 0 512 TEST_DIR/t.qcow2
++
++_qemu_io_wrapper -U -r -c read 0 512 TEST_DIR/t.qcow2
++
++_qemu_io_wrapper -c open -U TEST_DIR/t.qcow2 -c read 0 512
++
++_qemu_io_wrapper -c open -r -U TEST_DIR/t.qcow2 -c read 0 512
++
++_qemu_img_wrapper info -U TEST_DIR/t.qcow2
++
++_qemu_img_wrapper check -U TEST_DIR/t.qcow2
++
++_qemu_img_wrapper compare -U TEST_DIR/t.qcow2 TEST_DIR/t.qcow2
++
++_qemu_img_wrapper map -U TEST_DIR/t.qcow2
++
++_qemu_img_wrapper amend -o  -U TEST_DIR/t.qcow2
++
++_qemu_img_wrapper commit -U TEST_DIR/t.qcow2
++
++_qemu_img_wrapper resize -U TEST_DIR/t.qcow2 32M
++
++_qemu_img_wrapper rebase -U TEST_DIR/t.qcow2 -b TEST_DIR/t.qcow2.base
++
++_qemu_img_wrapper snapshot -l -U TEST_DIR/t.qcow2
++
++_qemu_img_wrapper convert -U TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.convert
++
++_qemu_img_wrapper dd -U if=TEST_DIR/t.qcow2 of=TEST_DIR/t.qcow2.convert bs=512 count=1
++
++_qemu_img_wrapper bench -U -c 1 TEST_DIR/t.qcow2
++
++_qemu_img_wrapper bench -U -w -c 1 TEST_DIR/t.qcow2
++
++Round done
++
++== Creating base image ==
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=33554432
++
++== Creating test image ==
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=33554432 backing_file=TEST_DIR/t.IMGFMT.base
++
++== Launching QEMU, opts: 'readonly=off,force-shared-write=off' ==
++
++== Launching another QEMU, opts: '' ==
++QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=none,: Failed to lock image: Resource temporarily unavailable
++
++== Launching another QEMU, opts: 'readonly=on,force-shared-write=on' ==
++
++== Launching another QEMU, opts: 'readonly=on,force-shared-write=off' ==
++QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=none,readonly=on,force-shared-write=off: Failed to lock share byte: Resource temporarily unavailable
++
++== Launching another QEMU, opts: 'readonly=off,force-shared-write=on' ==
++QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=none,readonly=off,force-shared-write=on: Failed to lock write byte: Resource temporarily unavailable
++
++== Launching another QEMU, opts: 'readonly=off,force-shared-write=off' ==
++QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=none,readonly=off,force-shared-write=off: Failed to lock image: Resource temporarily unavailable
++
++== Running utility commands  ==
++
++_qemu_io_wrapper -c read 0 512 TEST_DIR/t.qcow2
++can't open device TEST_DIR/t.qcow2: Failed to lock image: Resource temporarily unavailable
++
++_qemu_io_wrapper -r -c read 0 512 TEST_DIR/t.qcow2
++can't open device TEST_DIR/t.qcow2: Failed to lock share byte: Resource temporarily unavailable
++
++_qemu_io_wrapper -c open  TEST_DIR/t.qcow2 -c read 0 512
++can't open device TEST_DIR/t.qcow2: Failed to lock image: Resource temporarily unavailable
++
++_qemu_io_wrapper -c open -r  TEST_DIR/t.qcow2 -c read 0 512
++can't open device TEST_DIR/t.qcow2: Failed to lock share byte: Resource temporarily unavailable
++
++_qemu_img_wrapper info TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock share byte: Resource temporarily unavailable
++
++_qemu_img_wrapper check TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock share byte: Resource temporarily unavailable
++
++_qemu_img_wrapper compare TEST_DIR/t.qcow2 TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock share byte: Resource temporarily unavailable
++
++_qemu_img_wrapper map TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock share byte: Resource temporarily unavailable
++
++_qemu_img_wrapper amend -o  TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock image: Resource temporarily unavailable
++
++_qemu_img_wrapper commit TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock image: Resource temporarily unavailable
++
++_qemu_img_wrapper resize TEST_DIR/t.qcow2 32M
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock image: Resource temporarily unavailable
++
++_qemu_img_wrapper rebase TEST_DIR/t.qcow2 -b TEST_DIR/t.qcow2.base
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock image: Resource temporarily unavailable
++
++_qemu_img_wrapper snapshot -l TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock share byte: Resource temporarily unavailable
++
++_qemu_img_wrapper convert TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.convert
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock share byte: Resource temporarily unavailable
++
++_qemu_img_wrapper dd if=TEST_DIR/t.qcow2 of=TEST_DIR/t.qcow2.convert bs=512 count=1
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock share byte: Resource temporarily unavailable
++
++_qemu_img_wrapper bench -c 1 TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock share byte: Resource temporarily unavailable
++
++_qemu_img_wrapper bench -w -c 1 TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock image: Resource temporarily unavailable
++
++== Running utility commands -U ==
++
++_qemu_io_wrapper -U -c read 0 512 TEST_DIR/t.qcow2
++can't open device TEST_DIR/t.qcow2: Failed to lock write byte: Resource temporarily unavailable
++
++_qemu_io_wrapper -U -r -c read 0 512 TEST_DIR/t.qcow2
++
++_qemu_io_wrapper -c open -U TEST_DIR/t.qcow2 -c read 0 512
++can't open device TEST_DIR/t.qcow2: Failed to lock write byte: Resource temporarily unavailable
++
++_qemu_io_wrapper -c open -r -U TEST_DIR/t.qcow2 -c read 0 512
++
++_qemu_img_wrapper info -U TEST_DIR/t.qcow2
++
++_qemu_img_wrapper check -U TEST_DIR/t.qcow2
++
++_qemu_img_wrapper compare -U TEST_DIR/t.qcow2 TEST_DIR/t.qcow2
++
++_qemu_img_wrapper map -U TEST_DIR/t.qcow2
++
++_qemu_img_wrapper amend -o  -U TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock write byte: Resource temporarily unavailable
++
++_qemu_img_wrapper commit -U TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock write byte: Resource temporarily unavailable
++
++_qemu_img_wrapper resize -U TEST_DIR/t.qcow2 32M
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock write byte: Resource temporarily unavailable
++
++_qemu_img_wrapper rebase -U TEST_DIR/t.qcow2 -b TEST_DIR/t.qcow2.base
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock write byte: Resource temporarily unavailable
++
++_qemu_img_wrapper snapshot -l -U TEST_DIR/t.qcow2
++
++_qemu_img_wrapper convert -U TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.convert
++
++_qemu_img_wrapper dd -U if=TEST_DIR/t.qcow2 of=TEST_DIR/t.qcow2.convert bs=512 count=1
++
++_qemu_img_wrapper bench -U -c 1 TEST_DIR/t.qcow2
++
++_qemu_img_wrapper bench -U -w -c 1 TEST_DIR/t.qcow2
++qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to lock write byte: Resource temporarily unavailable
++
++Round done
++
++== Two devices with the same image (readonly=on,force-shared-write=on - readonly=on,force-shared-write=on) ==
++
++== Two devices with the same image (readonly=on,force-shared-write=on - readonly=on,force-shared-write=off) ==
++
++== Two devices with the same image (readonly=on,force-shared-write=on - readonly=off,force-shared-write=on) ==
++
++== Two devices with the same image (readonly=on,force-shared-write=on - readonly=off,force-shared-write=off) ==
++
++== Two devices with the same image (readonly=on,force-shared-write=off - readonly=on,force-shared-write=on) ==
++
++== Two devices with the same image (readonly=on,force-shared-write=off - readonly=on,force-shared-write=off) ==
++
++== Two devices with the same image (readonly=on,force-shared-write=off - readonly=off,force-shared-write=on) ==
++QEMU_PROG: -drive if=none,file=TEST_DIR/t.qcow2,readonly=off,force-shared-write=on: Share byte lock is taken: Resource temporarily unavailable
++
++== Two devices with the same image (readonly=on,force-shared-write=off - readonly=off,force-shared-write=off) ==
++QEMU_PROG: -drive if=none,file=TEST_DIR/t.qcow2,readonly=off,force-shared-write=off: Failed to lock image: Resource temporarily unavailable
++
++== Two devices with the same image (readonly=off,force-shared-write=on - readonly=on,force-shared-write=on) ==
++
++== Two devices with the same image (readonly=off,force-shared-write=on - readonly=on,force-shared-write=off) ==
++QEMU_PROG: -drive if=none,file=TEST_DIR/t.qcow2,readonly=on,force-shared-write=off: Write byte lock is taken: Resource temporarily unavailable
++
++== Two devices with the same image (readonly=off,force-shared-write=on - readonly=off,force-shared-write=on) ==
++
++== Two devices with the same image (readonly=off,force-shared-write=on - readonly=off,force-shared-write=off) ==
++QEMU_PROG: -drive if=none,file=TEST_DIR/t.qcow2,readonly=off,force-shared-write=off: Failed to lock image: Resource temporarily unavailable
++
++== Two devices with the same image (readonly=off,force-shared-write=off - readonly=on,force-shared-write=on) ==
++
++== Two devices with the same image (readonly=off,force-shared-write=off - readonly=on,force-shared-write=off) ==
++QEMU_PROG: -drive if=none,file=TEST_DIR/t.qcow2,readonly=on,force-shared-write=off: Failed to lock share byte: Resource temporarily unavailable
++
++== Two devices with the same image (readonly=off,force-shared-write=off - readonly=off,force-shared-write=on) ==
++QEMU_PROG: -drive if=none,file=TEST_DIR/t.qcow2,readonly=off,force-shared-write=on: Failed to lock write byte: Resource temporarily unavailable
++
++== Two devices with the same image (readonly=off,force-shared-write=off - readonly=off,force-shared-write=off) ==
++QEMU_PROG: -drive if=none,file=TEST_DIR/t.qcow2,readonly=off,force-shared-write=off: Failed to lock image: Resource temporarily unavailable
++== Creating /var/tmp/q/build/tests/qemu-iotests/scratch/t.qcow2.[abc] ==
++Formatting 'TEST_DIR/t.IMGFMT.a', fmt=IMGFMT size=33554432 backing_file=TEST_DIR/t.IMGFMT
++Formatting 'TEST_DIR/t.IMGFMT.b', fmt=IMGFMT size=33554432 backing_file=TEST_DIR/t.IMGFMT
++Formatting 'TEST_DIR/t.IMGFMT.c', fmt=IMGFMT size=33554432 backing_file=TEST_DIR/t.IMGFMT.b
++
++== Two devices sharing the same file in backing chain ==
++
++== Backing image also as an active device ==
++QEMU_PROG: -drive if=none,file=TEST_DIR/t.qcow2: Failed to lock image: Resource temporarily unavailable
++
++== Backing image also as an active device (ro) ==
++
++== Symbolic link ==
++QEMU_PROG: -drive if=none,file=TEST_DIR/t.qcow2: Failed to lock image: Resource temporarily unavailable
++
++== Closing an image should unlock it ==
++{"return": {}}
++Adding drive
++
++_qemu_io_wrapper TEST_DIR/t.qcow2 -c write 0 512
++can't open device TEST_DIR/t.qcow2: Failed to lock image: Resource temporarily unavailable
++Closing drive
++
++_qemu_io_wrapper TEST_DIR/t.qcow2 -c write 0 512
++Adding two and closing one
++
++_qemu_img_wrapper info TEST_DIR/t.qcow2
++
++_qemu_io_wrapper TEST_DIR/t.qcow2 -c write 0 512
++can't open device TEST_DIR/t.qcow2: Failed to lock image: Resource temporarily unavailable
++Closing the other
++
++_qemu_io_wrapper TEST_DIR/t.qcow2 -c write 0 512
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 893962d..c8ae60e 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -154,6 +154,7 @@
+ 149 rw auto sudo
+ 150 rw auto quick
+ 152 rw auto quick
++153 rw auto quick
+ 154 rw auto backing quick
+ 155 rw auto
+ 156 rw auto quick
 -- 
 2.9.3
