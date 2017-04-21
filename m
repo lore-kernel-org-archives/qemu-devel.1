@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d1exJ-0003ak-F7
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:02 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1d1exV-0003lo-Bb
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d1exG-0002ZI-7e
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:01 -0400
-Received: from mail.kernel.org ([198.145.29.136]:42522)
+	(envelope-from <sstabellini@kernel.org>) id 1d1exS-0002eX-HZ
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:13 -0400
+Received: from mail.kernel.org ([198.145.29.136]:42592)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1d1exF-0002Z1-Vj
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:14:58 -0400
-Date: Fri, 21 Apr 2017 13:14:51 -0700 (PDT)
+	id 1d1exS-0002dz-Bf
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:10 -0400
 From: Stefano Stabellini <sstabellini@kernel.org>
-Message-ID: <alpine.DEB.2.10.1704211258580.18403@sstabellini-ThinkPad-X260>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Qemu-devel] [PULL 0/21] Please pull xen-20170421-tag for 2.10
+Date: Fri, 21 Apr 2017 13:14:43 -0700
+Message-Id: <1492805702-19690-2-git-send-email-sstabellini@kernel.org>
+In-Reply-To: <1492805702-19690-1-git-send-email-sstabellini@kernel.org>
+References: <alpine.DEB.2.10.1704211258580.18403@sstabellini-ThinkPad-X260>
+	<1492805702-19690-1-git-send-email-sstabellini@kernel.org>
+Subject: [Qemu-devel] [PULL 02/21] xen: rename xen_modified_memory() to
+ xen_hvm_modified_memory()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,91 +26,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, stefanha@gmail.com
-Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
+To: peter.maydell@linaro.org
+Cc: stefanha@gmail.com, sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Paul Durrant <paul.durrant@citrix.com>
 
-The following changes since commit 55a19ad8b2d0797e3a8fe90ab99a9bb713824059:
+From: Paul Durrant <paul.durrant@citrix.com>
 
-  Update version for v2.9.0-rc1 release (2017-03-21 17:13:29 +0000)
+This patch is a purely cosmetic change that avoids a name collision in
+a subsequent patch.
 
-are available in the git repository at:
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Reviewed-by: Anthony Perard <anthony.perard@citrix.com>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+---
+ include/exec/ram_addr.h | 4 ++--
+ include/hw/xen/xen.h    | 2 +-
+ xen-hvm-stub.c          | 2 +-
+ xen-hvm.c               | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
 
-  git://xenbits.xen.org/people/sstabellini/qemu-dm.git tags/xen-20170421-tag
-
-for you to fetch changes up to b0d48550a2d10f0fa8c30a7cc3ff5a1cbda8d4c4:
-
-  move xen-mapcache.c to hw/i386/xen/ (2017-04-21 12:41:29 -0700)
-
-----------------------------------------------------------------
-Xen 2017/04/21
-
-----------------------------------------------------------------
-Anthony Xu (3):
-      move xen-common.c to hw/xen/
-      move xen-hvm.c to hw/i386/xen/
-      move xen-mapcache.c to hw/i386/xen/
-
-Juergen Gross (2):
-      xen: use 5 digit xen versions
-      configure: use pkg-config for obtaining xen version
-
-Paul Durrant (7):
-      xen: make use of xen_xc implicit in xen_common.h inlines
-      xen: rename xen_modified_memory() to xen_hvm_modified_memory()
-      xen: create wrappers for all other uses of xc_hvm_XXX() functions
-      configure: detect presence of libxendevicemodel
-      xen: use libxendevicemodel when available
-      xen: use libxendevice model to restrict operations
-      xen: additionally restrict xenforeignmemory operations
-
-Stefano Stabellini (9):
-      xen: import ring.h from xen
-      9p: introduce a type for the 9p header
-      xen/9pfs: introduce Xen 9pfs backend
-      xen/9pfs: connect to the frontend
-      xen/9pfs: receive requests from the frontend
-      xen/9pfs: implement in/out_iov_from_pdu and vmarshal/vunmarshal
-      xen/9pfs: send responses back to the frontend
-      xen/9pfs: build and register Xen 9pfs backend
-      add xen-9p-backend to MAINTAINERS under Xen
-
- MAINTAINERS                                  |   1 +
- Makefile.target                              |   6 -
- configure                                    | 164 +++++----
- default-configs/i386-softmmu.mak             |   1 -
- default-configs/x86_64-softmmu.mak           |   1 -
- hw/9pfs/9p.h                                 |   6 +
- hw/9pfs/Makefile.objs                        |   1 +
- hw/9pfs/virtio-9p-device.c                   |   6 +-
- hw/9pfs/xen-9p-backend.c                     | 443 ++++++++++++++++++++++++
- hw/block/xen_blkif.h                         |   2 +-
- hw/block/xen_disk.c                          |   2 +-
- hw/i386/xen/Makefile.objs                    |   2 +-
- hw/i386/xen/trace-events                     |  17 +
- xen-hvm.c => hw/i386/xen/xen-hvm.c           |  59 ++--
- xen-mapcache.c => hw/i386/xen/xen-mapcache.c |   2 +-
- hw/i386/xen/xen_platform.c                   |   2 +-
- hw/usb/xen-usb.c                             |   2 +-
- hw/xen/Makefile.objs                         |   2 +-
- hw/xen/trace-events                          |   1 +
- xen-common.c => hw/xen/xen-common.c          |  11 +
- hw/xen/xen_backend.c                         |   5 +-
- include/exec/ram_addr.h                      |   4 +-
- include/hw/xen/io/ring.h                     | 482 +++++++++++++++++++++++++++
- include/hw/xen/xen.h                         |   3 +-
- include/hw/xen/xen_backend.h                 |   5 +-
- include/hw/xen/xen_common.h                  | 345 +++++++++++++++----
- qemu-options.hx                              |   7 +
- stubs/Makefile.objs                          |   2 +
- xen-common-stub.c => stubs/xen-common.c      |   0
- xen-hvm-stub.c => stubs/xen-hvm.c            |   2 +-
- trace-events                                 |  16 -
- vl.c                                         |   8 +
- 32 files changed, 1417 insertions(+), 193 deletions(-)
- create mode 100644 hw/9pfs/xen-9p-backend.c
- rename xen-hvm.c => hw/i386/xen/xen-hvm.c (96%)
- rename xen-mapcache.c => hw/i386/xen/xen-mapcache.c (99%)
- rename xen-common.c => hw/xen/xen-common.c (91%)
- create mode 100644 include/hw/xen/io/ring.h
- rename xen-common-stub.c => stubs/xen-common.c (100%)
- rename xen-hvm-stub.c => stubs/xen-hvm.c (94%)
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+index b05dc84..2964730 100644
+--- a/include/exec/ram_addr.h
++++ b/include/exec/ram_addr.h
+@@ -260,7 +260,7 @@ static inline void cpu_physical_memory_set_dirty_range(ram_addr_t start,
+ 
+     rcu_read_unlock();
+ 
+-    xen_modified_memory(start, length);
++    xen_hvm_modified_memory(start, length);
+ }
+ 
+ #if !defined(_WIN32)
+@@ -314,7 +314,7 @@ static inline void cpu_physical_memory_set_dirty_lebitmap(unsigned long *bitmap,
+ 
+         rcu_read_unlock();
+ 
+-        xen_modified_memory(start, pages << TARGET_PAGE_BITS);
++        xen_hvm_modified_memory(start, pages << TARGET_PAGE_BITS);
+     } else {
+         uint8_t clients = tcg_enabled() ? DIRTY_CLIENTS_ALL : DIRTY_CLIENTS_NOCODE;
+         /*
+diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
+index 09c2ce5..2b1733b 100644
+--- a/include/hw/xen/xen.h
++++ b/include/hw/xen/xen.h
+@@ -43,7 +43,7 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory);
+ 
+ void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size,
+                    struct MemoryRegion *mr, Error **errp);
+-void xen_modified_memory(ram_addr_t start, ram_addr_t length);
++void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length);
+ 
+ void xen_register_framebuffer(struct MemoryRegion *mr);
+ 
+diff --git a/xen-hvm-stub.c b/xen-hvm-stub.c
+index c500325..3ca6c51 100644
+--- a/xen-hvm-stub.c
++++ b/xen-hvm-stub.c
+@@ -50,7 +50,7 @@ void xen_register_framebuffer(MemoryRegion *mr)
+ {
+ }
+ 
+-void xen_modified_memory(ram_addr_t start, ram_addr_t length)
++void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length)
+ {
+ }
+ 
+diff --git a/xen-hvm.c b/xen-hvm.c
+index dbb8c66..edf4983 100644
+--- a/xen-hvm.c
++++ b/xen-hvm.c
+@@ -1391,7 +1391,7 @@ void xen_shutdown_fatal_error(const char *fmt, ...)
+     qemu_system_shutdown_request();
+ }
+ 
+-void xen_modified_memory(ram_addr_t start, ram_addr_t length)
++void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length)
+ {
+     if (unlikely(xen_in_migration)) {
+         int rc;
+-- 
+1.9.1
