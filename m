@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54197)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d1Xeu-0002Kc-0f
+	(envelope-from <famz@redhat.com>) id 1d1Xev-0002Lm-5P
 	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:27:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d1Xet-0000l7-3y
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:27:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44470)
+	(envelope-from <famz@redhat.com>) id 1d1Xeu-0000ln-GV
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:27:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51150)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1d1Xes-0000jz-QF
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:27:31 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1d1Xeu-0000lX-Az
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:27:32 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C2F9B624D5
-	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 12:27:29 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 582A6C00C0ED
+	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 12:27:31 +0000 (UTC)
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 21 Apr 2017 20:27:04 +0800
-Message-Id: <20170421122710.15373-9-famz@redhat.com>
+Date: Fri, 21 Apr 2017 20:27:05 +0800
+Message-Id: <20170421122710.15373-10-famz@redhat.com>
 In-Reply-To: <20170421122710.15373-1-famz@redhat.com>
 References: <20170421122710.15373-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH 08/14] block: Make errp the last parameter of
- commit_active_start
+Subject: [Qemu-devel] [PATCH 09/14] nfs: Make errp the last parameter of
+ nfs_client_open
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,90 +35,39 @@ Cc: Markus Armbruster <armbru@redhat.com>
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block/mirror.c            | 4 ++--
- block/replication.c       | 2 +-
- blockdev.c                | 2 +-
- include/block/block_int.h | 6 +++---
- qemu-img.c                | 2 +-
- 5 files changed, 8 insertions(+), 8 deletions(-)
+ block/nfs.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/block/mirror.c b/block/mirror.c
-index 0c1a56c..9f5eb69 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1290,8 +1290,8 @@ void commit_active_start(const char *job_id, BlockDriverState *bs,
-                          BlockDriverState *base, int creation_flags,
-                          int64_t speed, BlockdevOnError on_error,
-                          const char *filter_node_name,
--                         BlockCompletionFunc *cb, void *opaque, Error **errp,
--                         bool auto_complete)
-+                         BlockCompletionFunc *cb, void *opaque,
-+                         bool auto_complete, Error **errp)
+diff --git a/block/nfs.c b/block/nfs.c
+index 0816678..6541dec 100644
+--- a/block/nfs.c
++++ b/block/nfs.c
+@@ -497,7 +497,7 @@ out:
+ 
+ 
+ static int64_t nfs_client_open(NFSClient *client, QDict *options,
+-                               int flags, Error **errp, int open_flags)
++                               int flags, int open_flags, Error **errp)
  {
-     int orig_base_flags;
-     Error *local_err = NULL;
-diff --git a/block/replication.c b/block/replication.c
-index bf3c395..d300c15 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -656,7 +656,7 @@ static void replication_stop(ReplicationState *rs, bool failover, Error **errp)
-         s->replication_state = BLOCK_REPLICATION_FAILOVER;
-         commit_active_start(NULL, s->active_disk->bs, s->secondary_disk->bs,
-                             BLOCK_JOB_INTERNAL, 0, BLOCKDEV_ON_ERROR_REPORT,
--                            NULL, replication_done, bs, errp, true);
-+                            NULL, replication_done, bs, true, errp);
-         break;
-     default:
-         aio_context_release(aio_context);
-diff --git a/blockdev.c b/blockdev.c
-index 94726ed..6428206 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3142,7 +3142,7 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
-         }
-         commit_active_start(has_job_id ? job_id : NULL, bs, base_bs,
-                             BLOCK_JOB_DEFAULT, speed, on_error,
--                            filter_node_name, NULL, NULL, &local_err, false);
-+                            filter_node_name, NULL, NULL, false, &local_err);
-     } else {
-         BlockDriverState *overlay_bs = bdrv_find_overlay(bs, top_bs);
-         if (bdrv_op_is_blocked(overlay_bs, BLOCK_OP_TYPE_COMMIT_TARGET, errp)) {
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 59400bd..4f8cd29 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -805,16 +805,16 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-  * a node name should be autogenerated.
-  * @cb: Completion function for the job.
-  * @opaque: Opaque pointer value passed to @cb.
-- * @errp: Error object.
-  * @auto_complete: Auto complete the job.
-+ * @errp: Error object.
-  *
-  */
- void commit_active_start(const char *job_id, BlockDriverState *bs,
-                          BlockDriverState *base, int creation_flags,
-                          int64_t speed, BlockdevOnError on_error,
-                          const char *filter_node_name,
--                         BlockCompletionFunc *cb, void *opaque, Error **errp,
--                         bool auto_complete);
-+                         BlockCompletionFunc *cb, void *opaque,
-+                         bool auto_complete, Error **errp);
- /*
-  * mirror_start:
-  * @job_id: The id of the newly-created job, or %NULL to use the
-diff --git a/qemu-img.c b/qemu-img.c
-index 2c09053..bbe1574 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -984,7 +984,7 @@ static int img_commit(int argc, char **argv)
-     aio_context_acquire(aio_context);
-     commit_active_start("commit", bs, base_bs, BLOCK_JOB_DEFAULT, 0,
-                         BLOCKDEV_ON_ERROR_REPORT, NULL, common_block_job_cb,
--                        &cbi, &local_err, false);
-+                        &cbi, false, &local_err);
-     aio_context_release(aio_context);
-     if (local_err) {
-         goto done;
+     int ret = -EINVAL;
+     QemuOpts *opts = NULL;
+@@ -663,7 +663,7 @@ static int nfs_file_open(BlockDriverState *bs, QDict *options, int flags,
+ 
+     ret = nfs_client_open(client, options,
+                           (flags & BDRV_O_RDWR) ? O_RDWR : O_RDONLY,
+-                          errp, bs->open_flags);
++                          bs->open_flags, errp);
+     if (ret < 0) {
+         return ret;
+     }
+@@ -705,7 +705,7 @@ static int nfs_file_create(const char *url, QemuOpts *opts, Error **errp)
+         goto out;
+     }
+ 
+-    ret = nfs_client_open(client, options, O_CREAT, errp, 0);
++    ret = nfs_client_open(client, options, O_CREAT, 0, errp);
+     if (ret < 0) {
+         goto out;
+     }
 -- 
 2.9.3
