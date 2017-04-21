@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1d1W1M-0004Cb-Tj
+	(envelope-from <balaton@eik.bme.hu>) id 1d1W1M-0004Cc-UM
 	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:42:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1d1W1J-0008WK-Lv
+	(envelope-from <balaton@eik.bme.hu>) id 1d1W1K-00006f-W6
 	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:42:36 -0400
-Message-Id: <4be9f17c5bcd5e7350e7d6feeab27245a16336a9.1492770667.git.balaton@eik.bme.hu>
+Message-Id: <9d124428a51191596a40c79c91340029e5eb0bf2.1492770667.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1492770667.git.balaton@eik.bme.hu>
 References: <cover.1492770667.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
 Date: Fri, 21 Apr 2017 12:31:07 +0200
-Subject: [Qemu-devel] [PATCH v6 05/13] sm501: Get rid of base address in
- draw_hwc_line
+Subject: [Qemu-devel] [PATCH v6 13/13] ppc: Add SM501 device in ppc softmmu
+ targets default configs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,80 +23,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 Cc: Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
 
-Do not use the base address to access data in local memory. This is in
-preparation to allow chip connected via PCI where base address depends
-on where the BAR is mapped so it will be unknown.
+This is not used by default on any emulated machine yet but it is
+still useful to have it compiled so it can be added from the command
+line for clients that can use it (e.g. MorphOS has no driver for any
+other emulated video cards but can output via SM501)
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/display/sm501.c          | 6 ++----
- hw/display/sm501_template.h | 8 ++++----
- 2 files changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index 571a7e6..09c023d 100644
---- a/hw/display/sm501.c
-+++ b/hw/display/sm501.c
-@@ -461,7 +461,6 @@ typedef struct SM501State {
-     QemuConsole *con;
- 
-     /* status & internal resources */
--    hwaddr base;
-     uint32_t local_mem_size_index;
-     uint8_t *local_mem;
-     MemoryRegion local_mem_region;
-@@ -1432,10 +1431,9 @@ static void sm501_reset(SM501State *s)
-     s->twoD_control = 0;
- }
- 
--static void sm501_init(SM501State *s, DeviceState *dev, uint32_t base,
-+static void sm501_init(SM501State *s, DeviceState *dev,
-                        uint32_t local_mem_bytes)
- {
--    s->base = base;
-     s->local_mem_size_index = get_local_mem_size_index(local_mem_bytes);
-     SM501_DPRINTF("sm501 local mem size=%x. index=%d\n", get_local_mem_size(s),
-                   s->local_mem_size_index);
-@@ -1489,7 +1487,7 @@ static void sm501_realize_sysbus(DeviceState *dev, Error **errp)
-     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-     DeviceState *usb_dev;
- 
--    sm501_init(&s->state, dev, s->base, s->vram_size);
-+    sm501_init(&s->state, dev, s->vram_size);
-     if (get_local_mem_size(&s->state) != s->vram_size) {
-         error_setg(errp, "Invalid VRAM size, nearest valid size is %" PRIu32,
-                    get_local_mem_size(&s->state));
-diff --git a/hw/display/sm501_template.h b/hw/display/sm501_template.h
-index 16e500b..832ee61 100644
---- a/hw/display/sm501_template.h
-+++ b/hw/display/sm501_template.h
-@@ -103,13 +103,13 @@ static void glue(draw_hwc_line_, PIXEL_NAME)(SM501State *s, int crt,
-                  uint8_t *palette, int c_y, uint8_t *d, int width)
- {
-     int x, i;
--    uint8_t bitset = 0;
-+    uint8_t *pixval, bitset = 0;
- 
-     /* get hardware cursor pattern */
-     uint32_t cursor_addr = get_hwc_address(s, crt);
-     assert(0 <= c_y && c_y < SM501_HWC_HEIGHT);
-     cursor_addr += SM501_HWC_WIDTH * c_y / 4;  /* 4 pixels per byte */
--    cursor_addr += s->base;
-+    pixval = s->local_mem + cursor_addr;
- 
-     /* get cursor position */
-     x = get_hwc_x(s, crt);
-@@ -120,8 +120,8 @@ static void glue(draw_hwc_line_, PIXEL_NAME)(SM501State *s, int crt,
- 
-         /* get pixel value */
-         if (i % 4 == 0) {
--            bitset = ldub_phys(&address_space_memory, cursor_addr);
--            cursor_addr++;
-+            bitset = ldub_p(pixval);
-+            pixval++;
-         }
-         v = bitset & 3;
-         bitset >>= 2;
+v5: Added sm501 also to ppc64-softmmu default config
+
+ default-configs/ppc-softmmu.mak    | 1 +
+ default-configs/ppc64-softmmu.mak  | 1 +
+ default-configs/ppcemb-softmmu.mak | 1 +
+ 3 files changed, 3 insertions(+)
+
+diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
+index 09c1d45..1f1cd85 100644
+--- a/default-configs/ppc-softmmu.mak
++++ b/default-configs/ppc-softmmu.mak
+@@ -45,6 +45,7 @@ CONFIG_OPENPIC_KVM=$(and $(CONFIG_E500),$(CONFIG_KVM))
+ CONFIG_PLATFORM_BUS=y
+ CONFIG_ETSEC=y
+ CONFIG_LIBDECNUMBER=y
++CONFIG_SM501=y
+ # For PReP
+ CONFIG_SERIAL_ISA=y
+ CONFIG_MC146818RTC=y
+diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-softmmu.mak
+index 05c8335..f6ccb1b 100644
+--- a/default-configs/ppc64-softmmu.mak
++++ b/default-configs/ppc64-softmmu.mak
+@@ -47,6 +47,7 @@ CONFIG_OPENPIC_KVM=$(and $(CONFIG_E500),$(CONFIG_KVM))
+ CONFIG_PLATFORM_BUS=y
+ CONFIG_ETSEC=y
+ CONFIG_LIBDECNUMBER=y
++CONFIG_SM501=y
+ # For pSeries
+ CONFIG_XICS=$(CONFIG_PSERIES)
+ CONFIG_XICS_SPAPR=$(CONFIG_PSERIES)
+diff --git a/default-configs/ppcemb-softmmu.mak b/default-configs/ppcemb-softmmu.mak
+index 7f56004..94340de 100644
+--- a/default-configs/ppcemb-softmmu.mak
++++ b/default-configs/ppcemb-softmmu.mak
+@@ -15,3 +15,4 @@ CONFIG_I8259=y
+ CONFIG_XILINX=y
+ CONFIG_XILINX_ETHLITE=y
+ CONFIG_LIBDECNUMBER=y
++CONFIG_SM501=y
 -- 
 2.7.4
