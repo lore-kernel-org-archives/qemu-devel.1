@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgnyang@gmail.com>) id 1d1RFA-0003zo-3V
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 01:36:33 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1d1RGF-0004XI-Nj
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 01:37:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgnyang@gmail.com>) id 1d1RF8-00037p-I0
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 01:36:32 -0400
-Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:33315)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tgnyang@gmail.com>) id 1d1RF8-00036P-C3
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 01:36:30 -0400
-Received: by mail-io0-x243.google.com with SMTP id k87so26012482ioi.0
-	for <qemu-devel@nongnu.org>; Thu, 20 Apr 2017 22:36:29 -0700 (PDT)
+	(envelope-from <jemmy858585@gmail.com>) id 1d1RGE-0003jt-GX
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 01:37:39 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170418181504.66fb3a11.cornelia.huck@de.ibm.com>
-References: <1492345561-10267-1-git-send-email-tgnyang@gmail.com>
-	<20170418181504.66fb3a11.cornelia.huck@de.ibm.com>
-From: Zihan Yang <tgnyang@gmail.com>
-Date: Fri, 21 Apr 2017 13:36:28 +0800
-Message-ID: <CAPnP68hvotOdPXb64JDXQS8Ld5PSbY6GGfLyL-rcDt1W3+83ow@mail.gmail.com>
+In-Reply-To: <CAOGPPbcWmuysTJzuYS9vA2m6QBBmTnP9PLC-qXdU0u83hvj6=A@mail.gmail.com>
+References: <1492677526-4739-1-git-send-email-lidongchen@tencent.com>
+	<20170420100045.GB4747@noname.redhat.com>
+	<CAOGPPbcWmuysTJzuYS9vA2m6QBBmTnP9PLC-qXdU0u83hvj6=A@mail.gmail.com>
+From: 858585 jemmy <jemmy858585@gmail.com>
+Date: Fri, 21 Apr 2017 13:37:35 +0800
+Message-ID: <CAOGPPbcw=WeLoFw-Vf7RrDhTQp5i8QNhoobXgaudZu=RNcyEJg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] hw: make *_exit functions return void
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: use blk_co_pwrite_zeroes for
+ zero sectors when compressed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,88 +24,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, mreitz@redhat.com, qemu block <qemu-block@nongnu.org>, Lidong Chen <lidongchen@tencent.com>
 
-(I forgot to reply all in last email, so I resend the reply again)
-I have resubmitted two split-out patches in https://lists.nongnu.org/
-archive/html/qemu-devel/2017-04/msg03096.html, which change the exit
-funtion of sclp and virtio-ccw. But the exit function of DeviceClass still
-returns int after the patch because it involves other folders like hw/audio,
-and as suggested by Markus Armbruster, the exit function of DeviceClass
-should be converted to unrealize(), so I just leave `virtio_ccw_busdev_exit`
-at present because it is an exit function of DeviceClass.
+On Fri, Apr 21, 2017 at 10:58 AM, 858585 jemmy <jemmy858585@gmail.com> wrote:
+> On Thu, Apr 20, 2017 at 6:00 PM, Kevin Wolf <kwolf@redhat.com> wrote:
+>> Am 20.04.2017 um 10:38 hat jemmy858585@gmail.com geschrieben:
+>>> From: Lidong Chen <lidongchen@tencent.com>
+>>>
+>>> when the buffer is zero, blk_co_pwrite_zeroes is more effectively than
+>>> blk_co_pwritev with BDRV_REQ_WRITE_COMPRESSED. this patch can reduces
+>>> the time when converts the qcow2 image with lots of zero.
+>>>
+>>> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+>>
+>> Good catch, using blk_co_pwrite_zeroes() makes sense even for compressed
+>> images.
+>>
+>>> diff --git a/qemu-img.c b/qemu-img.c
+>>> index b220cf7..0256539 100644
+>>> --- a/qemu-img.c
+>>> +++ b/qemu-img.c
+>>> @@ -1675,13 +1675,20 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
+>>>               * write if the buffer is completely zeroed and we're allowed to
+>>>               * keep the target sparse. */
+>>>              if (s->compressed) {
+>>> -                if (s->has_zero_init && s->min_sparse &&
+>>> -                    buffer_is_zero(buf, n * BDRV_SECTOR_SIZE))
+>>> -                {
+>>> -                    assert(!s->target_has_backing);
+>>> -                    break;
+>>> +                if (buffer_is_zero(buf, n * BDRV_SECTOR_SIZE)) {
+>>> +                    if (s->has_zero_init && s->min_sparse) {
+>>> +                        assert(!s->target_has_backing);
+>>> +                        break;
+>>> +                    } else {
+>>> +                        ret = blk_co_pwrite_zeroes(s->target,
+>>> +                                           sector_num << BDRV_SECTOR_BITS,
+>>> +                                           n << BDRV_SECTOR_BITS, 0);
+>>> +                        if (ret < 0) {
+>>> +                            return ret;
+>>> +                        }
+>>> +                        break;
+>>> +                    }
+>>>                  }
+>>
+>> If s->min_sparse == 0, we may neither skip the write not use
+>> blk_co_pwrite_zeroes(), because this requires actual full allocation
+>> with explicit zero sectors.
+>>
+>> Of course, if you fix this, what you end up with here is a duplicate of
+>> the code path for non-compressed images. The remaining difference seems
+>> to be the BDRV_REQ_WRITE_COMPRESSED flag and buffer_is_zero() vs.
+>> is_allocated_sectors_min() (because uncompressed clusters can be written
+>> partially, but compressed clusters can't).
+>
+> I have a try to unify the code.
+>
+> I don't understand why use  is_allocated_sectors_min when don't compressed.
+> the s->min_sparse is 8 default, which is smaller than cluster_sectors.
+>
+> if a cluster which data is  8 sector zero and 8 sector non-zero
+> repeated, it will call
+> blk_co_pwritev and blk_co_pwrite_zeroes many times for a cluster.
+>
+> why not compare the zero by cluster_sectors size?
 
+I write this code, run in guest os.
 
-2017-04-19 0:15 GMT+08:00 Cornelia Huck <cornelia.huck@de.ibm.com>:
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-> On Sun, 16 Apr 2017 20:26:01 +0800
-> Zihan Yang <tgnyang@gmail.com> wrote:
+int main()
+{
+    char *zero;
+    char *nonzero;
+    FILE* fp = fopen("./test.dat", "ab");
+
+    zero = malloc(sizeof(char)*512*8);
+    nonzero = malloc(sizeof(char)*512*8);
+
+    memset(zero, 0, sizeof(char)*512*8);
+    memset(nonzero, 1, sizeof(char)*512*8);
+
+    while (1) {
+        fwrite(zero, sizeof(char)*512*8, 1, fp);
+        fwrite(nonzero, sizeof(char)*512*8, 1, fp);
+    }
+    fclose(fp);
+}
+
+qemu-img info /mnt/img2016111016860868.qcow2
+image: /mnt/img2016111016860868.qcow2
+file format: qcow2
+virtual size: 20G (21474836480 bytes)
+disk size: 19G (20061552640 bytes)
+cluster_size: 65536
+backing file: /baseimage/img2016042213665396/img2016042213665396.qcow2
+
+use -S 65536 option.
+
+time /root/kvm/bin/qemu-img convert -p -B
+/baseimage/img2016042213665396/img2016042213665396.qcow2 -O qcow2
+/mnt/img2016111016860868.qcow2 /mnt/img2017041611162809_zip_new.qcow2
+-S 65536
+    (100.00/100%)
+
+real    0m32.203s
+user    0m5.165s
+sys     0m27.887s
+
+time /root/kvm/bin/qemu-img convert -p -B
+/baseimage/img2016042213665396/img2016042213665396.qcow2 -O qcow2
+/mnt/img2016111016860868.qcow2 /mnt/img2017041611162809_zip_new.qcow2
+    (100.00/100%)
+
+real    1m38.665s
+user    0m45.418s
+sys     1m7.518s
+
+should we set cluster_sectors as the default value of s->min_sparse?
+
 >
-> >     According to the second suggestion listed on Dead code Removal
-> >     of BiteSizedTasks, I modify some *_exit functions to make them
-> >     return void. Some *_exit and *_exitfn functions that already
-> >     return void remain unchanged. Also, the checks for the callers
-> >     are deleted.
-> >
-> > Signed-off-by: Zihan Yang <tgnyang@gmail.com>
-> > ---
-> >  hw/audio/hda-codec.c              | 3 +--
-> >  hw/audio/intel-hda.c              | 3 +--
-> >  hw/audio/intel-hda.h              | 2 +-
-> >  hw/char/sclpconsole-lm.c          | 3 +--
-> >  hw/char/sclpconsole.c             | 3 +--
-> >  hw/core/qdev.c                    | 6 +-----
-> >  hw/s390x/event-facility.c         | 6 +-----
-> >  hw/s390x/virtio-ccw.c             | 7 +++----
-> >  hw/s390x/virtio-ccw.h             | 2 +-
-> >  hw/usb/dev-smartcard-reader.c     | 3 +--
-> >  include/hw/qdev-core.h            | 2 +-
-> >  include/hw/s390x/event-facility.h | 2 +-
-> >  12 files changed, 14 insertions(+), 28 deletions(-)
->
-> Hm, I wondered why I had a deja vu... ah, here:
-> https://marc.info/?t=149003291200008&r=1&w=2
->
-> The author of that patch did not follow up AFAICS, but some of the
-> suggestions made in that thread apply to your patch as well.
->
-> In particular:
->
->
-> > diff --git a/hw/char/sclpconsole-lm.c b/hw/char/sclpconsole-lm.c
-> > index 07d6ebd..6fa8922 100644
-> > --- a/hw/char/sclpconsole-lm.c
-> > +++ b/hw/char/sclpconsole-lm.c
-> > @@ -318,9 +318,8 @@ static int console_init(SCLPEvent *event)
-> >      return 0;
-> >  }
-> >
-> > -static int console_exit(SCLPEvent *event)
-> > +static void console_exit(SCLPEvent *event)
-> >  {
-> > -    return 0;
-> >  }
-> >
-> >  static void console_reset(DeviceState *dev)
-> > diff --git a/hw/char/sclpconsole.c b/hw/char/sclpconsole.c
-> > index b78f240..d9bbc5e 100644
-> > --- a/hw/char/sclpconsole.c
-> > +++ b/hw/char/sclpconsole.c
-> > @@ -246,9 +246,8 @@ static void console_reset(DeviceState *dev)
-> >     scon->notify = false;
-> >  }
-> >
-> > -static int console_exit(SCLPEvent *event)
-> > +static void console_exit(SCLPEvent *event)
-> >  {
-> > -    return 0;
-> >  }
->
-> These two now empty functions are not very useful; it is better to
-> simply remove them.
->
-> With that change, I'd take a split-out patch for sclp and virtio-ccw
-> through my tree, or I'd ack a not-split-out version.
->
->
+>>
+>> So I suppose that instead of just fixing the above bug, we could actually
+>> mostly unify the two code paths, if you want to have a try at it.
+>>
+>> Kevin
