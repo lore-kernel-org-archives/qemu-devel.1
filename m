@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1d1YcC-0004hw-C6
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 09:28:49 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1d1Yk6-00007b-12
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 09:36:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1d1Yc9-0004Op-4M
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 09:28:48 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:3390
-	helo=dggrg03-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1d1Yc8-0004Ma-9F
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 09:28:45 -0400
-References: <76795e20-2f20-1e54-cfa5-7444f28b18ee@huawei.com>
-	<20170321113428.GC15920@cbox> <58D17AF0.2010802@arm.com>
-	<20170321193933.GB31111@cbox> <58DA3F68.6090901@arm.com>
-	<20170328112328.GA31156@cbox> <20170328115413.GJ23682@e104320-lin>
-	<b1c6e747-2fa7-b7a1-60d5-4a9c480b9dc9@huawei.com>
-	<58DA67BA.8070404@arm.com>
-	<5b7352f4-4965-3ed5-3879-db871797be47@huawei.com>
-	<20170329103658.GQ23682@e104320-lin>
-	<2a427164-9b37-6711-3a56-906634ba7f12@redhat.com>
-	<7c5c8ab7-8fcc-1c98-0bc1-cccb66c4c84d@huawei.com>
-	<6ac1597a-2ed5-36b2-848d-5fd048b16d66@redhat.com>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <3fdc8c8c-1cd9-b609-c7af-52d40e6141c5@huawei.com>
-Date: Fri, 21 Apr 2017 21:27:31 +0800
+	(envelope-from <peter.maydell@linaro.org>) id 1d1Yk5-0007Yc-4L
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 09:36:58 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:36113)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1d1Yk4-0007YM-TA
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 09:36:57 -0400
+Received: by mail-wm0-x234.google.com with SMTP id o81so16044949wmb.1
+	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 06:36:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <6ac1597a-2ed5-36b2-848d-5fd048b16d66@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] kvm: pass the virtual SEI syndrome to
- guest OS
+In-Reply-To: <20170421094316.19361-1-stefanha@redhat.com>
+References: <20170421094316.19361-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 21 Apr 2017 14:36:35 +0100
+Message-ID: <CAFEAcA8mV6owgr=zL1yRpUOh-bm0YWLi6PNwvi5O9_Tkukwe5Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL for-2.9 0/6] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,96 +28,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, Achin Gupta <achin.gupta@arm.com>
-Cc: ard.biesheuvel@linaro.org, edk2-devel@lists.01.org, qemu-devel@nongnu.org, zhaoshenglong@huawei.com, James Morse <james.morse@arm.com>, Christoffer Dall <cdall@linaro.org>, xiexiuqi@huawei.com, Marc Zyngier <marc.zyngier@arm.com>, catalin.marinas@arm.com, will.deacon@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, suzuki.poulose@arm.com, andre.przywara@arm.com, mark.rutland@arm.com, vladimir.murzin@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, wangxiongfeng2@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com, Leif.Lindholm@linaro.comnd@arm.com, Michael Tsirkin <mtsirkin@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Hi all/Laszlo,
+On 21 April 2017 at 10:43, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> The following changes since commit fa54abb8c298f892639ffc4bc2f61448ac3be4a1:
+>
+>   Drop QEMU_GNUC_PREREQ() checks for gcc older than 4.1 (2017-04-20 18:33:33 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/stefanha/qemu.git tags/block-pull-request
+>
+> for you to fetch changes up to 3ccc0a0163b932fe980dce8d26db4bf98b1900e9:
+>
+>   MAINTAINERS: update my email address (2017-04-21 10:36:12 +0100)
+>
+> ----------------------------------------------------------------
+>
+> ----------------------------------------------------------------
 
-  sorry, I have a question to consult with you.
+Applied, thanks.
 
-
-On 2017/4/7 2:55, Laszlo Ersek wrote:
-> On 04/06/17 14:35, gengdongjiu wrote:
->> Dear, Laszlo
->>    Thanks for your detailed explanation.
->>
->> On 2017/3/29 19:58, Laszlo Ersek wrote:
->>> (This ought to be one of the longest address lists I've ever seen :)
->>> Thanks for the CC. I'm glad Shannon is already on the CC list. For good
->>> measure, I'm adding MST and Igor.)
->>>
->>> On 03/29/17 12:36, Achin Gupta wrote:
->>>> Hi gengdongjiu,
->>>>
->>>> On Wed, Mar 29, 2017 at 05:36:37PM +0800, gengdongjiu wrote:
->>>>>
->>>>> Hi Laszlo/Biesheuvel/Qemu developer,
->>>>>
->>>>>    Now I encounter a issue and want to consult with you in ARM64 platform， as described below:
->>>>>
->>>>> when guest OS happen synchronous or asynchronous abort, kvm needs
->>>>> to send the error address to Qemu or UEFI through sigbus to
->>>>> dynamically generate APEI table. from my investigation, there are
->>>>> two ways:
->>>>>
->>>>> (1) Qemu get the error address, and generate the APEI table, then
->>>>> notify UEFI to know this generation, then inject abort error to
->>>>> guest OS, guest OS read the APEI table.
->>>>> (2) Qemu get the error address, and let UEFI to generate the APEI
->>>>> table, then inject abort error to guest OS, guest OS read the APEI
->>>>> table.
->>>>
->>>> Just being pedantic! I don't think we are talking about creating the APEI table
->>>> dynamically here. The issue is: Once KVM has received an error that is destined
->>>> for a guest it will raise a SIGBUS to Qemu. Now before Qemu can inject the error
->>>> into the guest OS, a CPER (Common Platform Error Record) has to be generated
->>>> corresponding to the error source (GHES corresponding to memory subsystem,
->>>> processor etc) to allow the guest OS to do anything meaningful with the
->>>> error. So who should create the CPER is the question.
->>>>
->>>> At the EL3/EL2 interface (Secure Firmware and OS/Hypervisor), an error arrives
->>>> at EL3 and secure firmware (at EL3 or a lower secure exception level) is
->>>> responsible for creating the CPER. ARM is experimenting with using a Standalone
->>>> MM EDK2 image in the secure world to do the CPER creation. This will avoid
->>>> adding the same code in ARM TF in EL3 (better for security). The error will then
->>>> be injected into the OS/Hypervisor (through SEA/SEI/SDEI) through ARM Trusted
->>>> Firmware.
->>>>
->>>> Qemu is essentially fulfilling the role of secure firmware at the EL2/EL1
->>>> interface (as discussed with Christoffer below). So it should generate the CPER
->>>> before injecting the error.
->>>>
->>>> This is corresponds to (1) above apart from notifying UEFI (I am assuming you
->>>> mean guest UEFI). At this time, the guest OS already knows where to pick up the
->>>> CPER from through the HEST. Qemu has to create the CPER and populate its address
->>>> at the address exported in the HEST. Guest UEFI should not be involved in this
->>>> flow. Its job was to create the HEST at boot and that has been done by this
->>>> stage.
->>>>
->>>> Qemu folk will be able to add but it looks like support for CPER generation will
->>>> need to be added to Qemu. We need to resolve this.
->>>>
->>>> Do shout if I am missing anything above.
->>>
->>> After reading this email, the use case looks *very* similar to what
->>> we've just done with VMGENID for QEMU 2.9.
->>>
->>> We have a facility between QEMU and the guest firmware, called "ACPI
->>> linker/loader", with which QEMU instructs the firmware to
->>>
->>> - allocate and download blobs into guest RAM (AcpiNVS type memory) --
->>> ALLOCATE command,
->>>
->>> - relocate pointers in those blobs, to fields in other (or the same)
->>> blobs -- ADD_POINTER command,
->>>
->>> - set ACPI table checksums -- ADD_CHECKSUM command,
->>>
->>> - and send GPAs of fields within such blobs back to QEMU --
->>> WRITE_POINTER command.
->>>
->>> This is how I imagine we can map the facility to the current use case
->>> (note that this is the first time I read about HEST / GHES / CPER):
-
-Laszlo lists a Qemu GHES table generation solution, Mainly use the four commands: "ALLOCATE/ADD_POINTER/ADD_CHECKSUM/WRITE_POINTER" to communicate with BIOS
-so whether the four commands needs to be supported by the guest firware/UEFI.  I found the  "WRITE_POINTER" always failed. so I suspect guest UEFI/firmware not support the "WRITE_POINTER" command. please help me confirm it, thanks so much.
+-- PMM
