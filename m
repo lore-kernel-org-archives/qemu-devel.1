@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36131)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d1Q4R-0002w8-7P
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 00:21:24 -0400
+	(envelope-from <tgnyang@gmail.com>) id 1d1RFA-0003zo-3V
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 01:36:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d1Q4N-0005Di-AC
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 00:21:23 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:36256)
+	(envelope-from <tgnyang@gmail.com>) id 1d1RF8-00037p-I0
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 01:36:32 -0400
+Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:33315)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d1Q4N-0005Da-5E
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 00:21:19 -0400
-Received: by mail-qt0-x241.google.com with SMTP id t52so10534771qtb.3
-	for <qemu-devel@nongnu.org>; Thu, 20 Apr 2017 21:21:18 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20170420193616.36780-1-lepton@google.com>
-Message-ID: <b31b761d-71e1-c322-5b42-a29cd8882b75@amsat.org>
-Date: Fri, 21 Apr 2017 01:21:14 -0300
+	(Exim 4.71) (envelope-from <tgnyang@gmail.com>) id 1d1RF8-00036P-C3
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 01:36:30 -0400
+Received: by mail-io0-x243.google.com with SMTP id k87so26012482ioi.0
+	for <qemu-devel@nongnu.org>; Thu, 20 Apr 2017 22:36:29 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170420193616.36780-1-lepton@google.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] Fix wrong mss bug.
+In-Reply-To: <20170418181504.66fb3a11.cornelia.huck@de.ibm.com>
+References: <1492345561-10267-1-git-send-email-tgnyang@gmail.com>
+	<20170418181504.66fb3a11.cornelia.huck@de.ibm.com>
+From: Zihan Yang <tgnyang@gmail.com>
+Date: Fri, 21 Apr 2017 13:36:28 +0800
+Message-ID: <CAPnP68hvotOdPXb64JDXQS8Ld5PSbY6GGfLyL-rcDt1W3+83ow@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] hw: make *_exit functions return void
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,50 +28,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tao Wu <ytht.net@gmail.com>, qemu-devel@nongnu.org, Samuel Thibault <samuel.thibault@ens-lyon.org>
-Cc: Tao Wu <lepton@google.com>
+To: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Hi Tao,
+(I forgot to reply all in last email, so I resend the reply again)
+I have resubmitted two split-out patches in https://lists.nongnu.org/
+archive/html/qemu-devel/2017-04/msg03096.html, which change the exit
+funtion of sclp and virtio-ccw. But the exit function of DeviceClass still
+returns int after the patch because it involves other folders like hw/audio,
+and as suggested by Markus Armbruster, the exit function of DeviceClass
+should be converted to unrealize(), so I just leave `virtio_ccw_busdev_exit`
+at present because it is an exit function of DeviceClass.
 
-On 04/20/2017 04:36 PM, Tao Wu wrote:
-> This bug was introduced by https://github.com/qemu/qemu/commit/98c6305
 
-Nice catch...
+2017-04-19 0:15 GMT+08:00 Cornelia Huck <cornelia.huck@de.ibm.com>:
 
-In 98c6305 Guillaume probably missed parentheses :S
-- mss = min(IF_MTU, IF_MRU) - sizeof(struct tcpiphdr);
-+ mss = min(IF_MTU, IF_MRU) - sizeof(struct tcphdr) + sizeof(struct ip);
-
-This would have been ok:
-mss = min(IF_MTU, IF_MRU) - (sizeof(struct tcphdr) + sizeof(struct ip));
-
-"The MSS value to be sent in an MSS option should be equal to the 
-effective MTU minus the fixed IP and TCP headers." (RFC6691)
-
-> Signed-off-by: Tao Wu <lepton@google.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> ---
->  slirp/tcp_input.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> On Sun, 16 Apr 2017 20:26:01 +0800
+> Zihan Yang <tgnyang@gmail.com> wrote:
 >
-> diff --git a/slirp/tcp_input.c b/slirp/tcp_input.c
-> index edb98f06f3..07bcbdb2dd 100644
-> --- a/slirp/tcp_input.c
-> +++ b/slirp/tcp_input.c
-> @@ -1587,11 +1587,11 @@ tcp_mss(struct tcpcb *tp, u_int offer)
->  	switch (so->so_ffamily) {
->  	case AF_INET:
->              mss = MIN(IF_MTU, IF_MRU) - sizeof(struct tcphdr)
-> -	                              + sizeof(struct ip);
-> +	                              - sizeof(struct ip);
->  	    break;
->  	case AF_INET6:
->              mss = MIN(IF_MTU, IF_MRU) - sizeof(struct tcphdr)
-> -	                              + sizeof(struct ip6);
-> +	                              - sizeof(struct ip6);
->  	    break;
->  	default:
->  	    g_assert_not_reached();
+> >     According to the second suggestion listed on Dead code Removal
+> >     of BiteSizedTasks, I modify some *_exit functions to make them
+> >     return void. Some *_exit and *_exitfn functions that already
+> >     return void remain unchanged. Also, the checks for the callers
+> >     are deleted.
+> >
+> > Signed-off-by: Zihan Yang <tgnyang@gmail.com>
+> > ---
+> >  hw/audio/hda-codec.c              | 3 +--
+> >  hw/audio/intel-hda.c              | 3 +--
+> >  hw/audio/intel-hda.h              | 2 +-
+> >  hw/char/sclpconsole-lm.c          | 3 +--
+> >  hw/char/sclpconsole.c             | 3 +--
+> >  hw/core/qdev.c                    | 6 +-----
+> >  hw/s390x/event-facility.c         | 6 +-----
+> >  hw/s390x/virtio-ccw.c             | 7 +++----
+> >  hw/s390x/virtio-ccw.h             | 2 +-
+> >  hw/usb/dev-smartcard-reader.c     | 3 +--
+> >  include/hw/qdev-core.h            | 2 +-
+> >  include/hw/s390x/event-facility.h | 2 +-
+> >  12 files changed, 14 insertions(+), 28 deletions(-)
+>
+> Hm, I wondered why I had a deja vu... ah, here:
+> https://marc.info/?t=149003291200008&r=1&w=2
+>
+> The author of that patch did not follow up AFAICS, but some of the
+> suggestions made in that thread apply to your patch as well.
+>
+> In particular:
+>
+>
+> > diff --git a/hw/char/sclpconsole-lm.c b/hw/char/sclpconsole-lm.c
+> > index 07d6ebd..6fa8922 100644
+> > --- a/hw/char/sclpconsole-lm.c
+> > +++ b/hw/char/sclpconsole-lm.c
+> > @@ -318,9 +318,8 @@ static int console_init(SCLPEvent *event)
+> >      return 0;
+> >  }
+> >
+> > -static int console_exit(SCLPEvent *event)
+> > +static void console_exit(SCLPEvent *event)
+> >  {
+> > -    return 0;
+> >  }
+> >
+> >  static void console_reset(DeviceState *dev)
+> > diff --git a/hw/char/sclpconsole.c b/hw/char/sclpconsole.c
+> > index b78f240..d9bbc5e 100644
+> > --- a/hw/char/sclpconsole.c
+> > +++ b/hw/char/sclpconsole.c
+> > @@ -246,9 +246,8 @@ static void console_reset(DeviceState *dev)
+> >     scon->notify = false;
+> >  }
+> >
+> > -static int console_exit(SCLPEvent *event)
+> > +static void console_exit(SCLPEvent *event)
+> >  {
+> > -    return 0;
+> >  }
+>
+> These two now empty functions are not very useful; it is better to
+> simply remove them.
+>
+> With that change, I'd take a split-out patch for sclp and virtio-ccw
+> through my tree, or I'd ack a not-split-out version.
+>
 >
